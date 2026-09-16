@@ -1,0 +1,14 @@
+Error compiling source files:
+
+FB_Sim_Translation.st:65:17: error: Undefined type 'FB_SIM_TRANSLATIONDRIVE' in FUNCTION_BLOCK 'FB_SIM_TRANSLATION'
+  65 |     instDrive : FB_Sim_TranslationDrive;
+     |                 ^
+
+FB_Sim_Translation.st:66:17: error: Undefined type 'FB_SIM_TRANSLATIONBRAKE' in FUNCTION_BLOCK 'FB_SIM_TRANSLATION'
+  66 |     instBrake : FB_Sim_TranslationBrake;
+     |                 ^
+
+FB_Sim_Translation.st:67:25: error: Undefined type 'FB_SIM_SUSPENDEDLOAD' in FUNCTION_BLOCK 'FB_SIM_TRANSLATION'
+  67 |     instSuspendedLoad : FB_Sim_SuspendedLoad;
+     |                         ^
+

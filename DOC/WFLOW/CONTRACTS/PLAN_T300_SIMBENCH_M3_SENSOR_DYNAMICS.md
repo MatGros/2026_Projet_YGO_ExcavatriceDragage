@@ -1,6 +1,8 @@
 # T300 — Conception dynamique SimBench M3
 
-Statut : proposition de conception, à valider avant ST. Mise à jour : 2026-09-15.
+Statut : implémentation incrémentale en cours avec paramètres calibrables ; fidélité terrain finale soumise aux données matérielles restantes. Mise à jour : 2026-09-16.
+
+Reviews expertes du 2026-09-16 : les corrections d'architecture, ownership, délai N+1 et tests sont intégrées dans `INTERFACES_T300_SIMBENCH_M3.md` et `TEST_DESIGN_T300_SIMBENCH_M3.md`. La trace terrain fournie le 2026-09-16 autorise l'implémentation du profil fréquence et d'un frein temporisé. Les paramètres encore inconnus restent configurables et marqués `SYNTHETIQUE` ; ils bloquent la qualification de fidélité, pas la compilation ni les essais du modèle.
 
 ## Observations et limites de connaissance
 
@@ -11,6 +13,22 @@ Statut : proposition de conception, à valider avant ST. Mise à jour : 2026-09-
 | Godet chargé environ 10 tonnes | Estimation utilisateur | Profil chargé provisoire, masse totale suspendue à confirmer |
 | Câble environ 1 à 2 m | Estimation utilisateur | Longueur pendulaire effective à confirmer ; distincte de la seule longueur de câble visible |
 | Amplitude, amortissement, masse du chariot, transmission, géométrie des cames | Non mesurés | Paramètres calibrables ; profils synthétiques identifiés |
+
+## Trace terrain M3 — calibration initiale du 2026-09-16
+
+Source : analyse utilisateur d'une trace CODESYS de 351 points, `VISU_TASK`, période observée environ 100 ms, fréquences codées au centième de hertz.
+
+| Paramètre | Valeur retenue | Incertitude / usage |
+|---|---:|---|
+| Rampe accélération/décélération | 20 Hz/s nominal | plage observée 18–20 Hz/s |
+| Décélération vers PV | 16,8 Hz/s observé | modèle configurable séparément |
+| Grande vitesse / petite vitesse | 40 Hz / 10 Hz | valeurs observées |
+| Constante de temps retour fréquence | 0,15 s | identification premier ordre sur trace |
+| Ouverture frein | 0 à 0,10 s | bornée par l'échantillonnage ; pas d'instantanéité prouvée |
+| Fermeture frein après vitesse nulle | 0,08 à 0,10 s | observation directe à résolution 100 ms |
+| Seuil PV | DI active à l'état FALSE | transition observée à 18,362 s ; retour TRUE après franchissement |
+
+La fréquence commandée suit une rampe bornée. La fréquence retournée suit séparément un premier ordre discret `alpha = dt/(tau+dt)`. Le retour frein n'est jamais recopié directement depuis l'ordre : la commande électrique, l'ouverture mécanique et le contact auxiliaire restent trois états distincts. La trace ne fournit pas encore la position vraie, le couple, la masse du chariot, la transmission ni la technologie exacte du frein.
 
 La masse seule ne détermine ni l'amplitude ni la période. La géométrie, la longueur effective, l'accélération et l'amortissement interviennent. Le mouvement de la charge peut durer après que le capteur ne commute plus. Aucune équivalence automatique entre stabilisation électrique en 1 s et extinction du mouvement mécanique.
 
@@ -26,7 +44,7 @@ La masse seule ne détermine ni l'amplitude ni la période. La géométrie, la l
 | `FB_Sim_PositionSensor` (5 instances) | Géométrie cible/came, polarité, hystérésis physique et réponse du capteur ; publication DI |
 | `FB_SimBench` | Composition existante et publication cohérente capteurs, frein et variateur |
 
-Noms et interfaces proposés, non implémentés. Un seul intégrateur possède l'état mécanique ; l'entraînement ne maintient pas une seconde position concurrente. Le modèle mécanique reçoit une excitation issue des commandes finales après interlocks, et conserve sa dynamique résiduelle après retrait de commande. Le frein freine le chariot ; il ne doit pas effacer instantanément l'angle de charge.
+`FB_Sim_PositionSensor` est livré dans ce lot : capteur cumulatif compatible avec le mot thermomètre M3, hystérésis, délai électrique et épisode de perte/reprise rejouable. `FB_Sim_TranslationDrive`, `FB_Sim_TranslationBrake` et `FB_Sim_SuspendedLoad` sont désormais des briques distinctes, avec tests unitaires ; leurs constantes restent synthétiques tant que les paramètres mécaniques et la sémantique complète de l'AC600 ne sont pas identifiés. `FB_Sim_Translation` reste l'unique intégrateur de position chariot ; l'entraînement ne maintient pas une seconde position concurrente. Le modèle mécanique reçoit une excitation issue des commandes finales après interlocks, et conserve sa dynamique résiduelle après retrait de commande. Le frein freine le chariot ; il ne doit pas effacer instantanément l'angle de charge.
 
 Choix recommandé : modèle réduit chariot/pendule amorti, avec effort de réaction sur le chariot et réponse limitée de l'entraînement. Une simple sinusoïde ajoutée à une position linéaire reste un profil synthétique de comparaison : elle ne suffit pas à représenter le couplage demandé. L'identification des paramètres de couplage conditionne la fidélité quantitative.
 
@@ -118,7 +136,7 @@ Chaque réponse est classée MESURÉE / DOCUMENTÉE / ESTIMÉE / SYNTHÉTIQUE / 
 
 ## Objectifs quantifiés et oracles (à figer à R2)
 
-Les valeurs de campagne/temps ci-dessous sont des propositions de recette, pas des mesures machine. Δt désigne le pas d'échantillonnage effectif validé en P0 ; la CI annonce actuellement 10 ms, à rapprocher des tâches CODESYS et de leurs ordres.
+Les valeurs de campagne/temps ci-dessous sont des propositions de recette, pas des mesures machine. Δt désigne le pas d'échantillonnage effectif validé en P0 ; la CI utilise 10 ms par défaut. Le modèle M3 suit le Δt réel jusqu'à 100 ms pour ne pas ralentir artificiellement une trace VISU_TASK, mais toute qualification de délais inférieurs à 100 ms exige une tâche CODESYS plus rapide et la mesure de sa période effective.
 
 | ID | Critère de succès mesurable | Oracle / preuve |
 |---|---|---|

@@ -80,3 +80,58 @@ END_VAR
     ASSERT_TRUE(fb.PowerCutOff, 'Thermique frein -> PowerCutOff TRUE (securite materielle)');
     ASSERT_TRUE(fb.Fault.Latched, 'Thermique frein -> Defaut latche');
 END_TEST
+
+TEST 'TC-T300-SAF-060 Arret FDC sans requete persistante ne declenche pas l escalade'
+VAR
+    fb : FB_Safety_Translation;
+    i : INT;
+END_VAR
+    fb.Enable := TRUE;
+    fb.PowerContactorEngaged := TRUE;
+    fb.HeartbeatIhmOk := TRUE;
+    fb.JoystickOnline := TRUE;
+    fb.JoystickOperational := TRUE;
+    fb.PhaseRotationOk := TRUE;
+    fb.DriveOnline := TRUE;
+    fb.DriveOperational := TRUE;
+    fb.DriveStatusWord := 16#0080; (* Variateur arrete, bit0 inactif, frequence nulle *)
+    fb.DriveActualFreqHz := 0.0;
+    fb.LimitSwitchMaintenance := TRUE;
+    fb.ReqMaintenance := FALSE;
+    fb.RunRequest := FALSE;
+    fb.BrakeCmd := FALSE;
+    fb.BrakeFeedback := FALSE;
+    fb();
+    ADVANCE_TIME(1600000000); (* 1,6 s : au-dela de l escalade FDC 1,5 s *)
+    fb();
+    ASSERT_FALSE(fb.ErrorLimitSwitch, 'FDC atteint et variateur pret sans requete : aucune escalade');
+    ASSERT_FALSE(fb.PowerCutOff, 'Arret final normal ne coupe pas la puissance');
+END_TEST
+
+TEST 'TC-T300-SAF-061 Requete persistante au FDC escalade meme frequence nulle'
+VAR
+    fb : FB_Safety_Translation;
+    i : INT;
+END_VAR
+    fb.Enable := TRUE;
+    fb.PowerContactorEngaged := TRUE;
+    fb.HeartbeatIhmOk := TRUE;
+    fb.JoystickOnline := TRUE;
+    fb.JoystickOperational := TRUE;
+    fb.PhaseRotationOk := TRUE;
+    fb.DriveOnline := TRUE;
+    fb.DriveOperational := TRUE;
+    fb.DriveStatusWord := 16#0081; (* Bit0 de marche/pret maintenu pour caracteriser l escalade *)
+    fb.DriveActualFreqHz := 0.0;
+    fb.LimitSwitchMaintenance := TRUE;
+    fb.ReqMaintenance := TRUE;
+    fb.RunRequest := TRUE;
+    fb.BrakeCmd := FALSE;
+    fb.BrakeFeedback := FALSE;
+    fb();
+    ADVANCE_TIME(1600000000); (* 1,6 s : au-dela de l escalade FDC 1,5 s *)
+    fb();
+    ASSERT_TRUE(fb.ErrorLimitSwitch, 'Requete maintenance maintenue au FDC -> escalade apres 1,5 s');
+    ASSERT_EQ(fb.Fault.ErrorId, 16#0040, 'Cause 6 seule = ErrorId 64');
+    ASSERT_TRUE(fb.PowerCutOff, 'Escalade FDC est une coupure puissance');
+END_TEST

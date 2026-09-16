@@ -70,12 +70,114 @@ TEST 'TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd'
     ASSERT_FALSE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'M1_BrakeCmd=FALSE -> M1_BrakeIsOpen_DI=FALSE');
 END_TEST
 
-TEST 'TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret'
-    FB_Bench(Enable := TRUE, M3_ReqTremie := TRUE, M3_ReqMaintenance := FALSE, M3_SpeedCmd_Pct := 50.0, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
-    ASSERT_EQ(FB_Bench.Translation.M3_StatusWord, 16#0087, 'M3 en mouvement -> StatusWord 0x0087');
-    ADVANCE_TIME(10000000);
-    FB_Bench(Enable := TRUE, M3_ReqTremie := FALSE, M3_ReqMaintenance := FALSE, M3_SpeedCmd_Pct := 0.0, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
-    ASSERT_EQ(FB_Bench.Translation.M3_StatusWord, 16#0080, 'M3 a l arret -> StatusWord 0x0080 (bit0 retombe)');
+TEST 'TC-T300-INT-010 SimBench M3 publie le retour dynamique du drive'
+VAR
+    i : INT;
+END_VAR
+    FB_Bench(Enable := TRUE, M3_ReqTremie := TRUE, M3_ReqMaintenance := FALSE,
+             M3_SpeedCmd_Pct := 50.0, M3_BrakeCmd := TRUE,
+             RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    FOR i := 1 TO 20 DO
+        FB_Bench(Enable := TRUE, M3_ReqTremie := TRUE, M3_ReqMaintenance := FALSE,
+                 M3_SpeedCmd_Pct := 50.0, M3_BrakeCmd := TRUE,
+                 RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    END_FOR;
+    ASSERT_EQ(FB_Bench.Translation.M3_StatusWord, 16#0087, 'M3 actif apres ouverture frein et retour frequence');
+    FB_Bench(Enable := TRUE, M3_ReqTremie := FALSE, M3_ReqMaintenance := FALSE,
+             M3_SpeedCmd_Pct := 0.0, M3_BrakeCmd := FALSE,
+             RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    FOR i := 1 TO 50 DO
+        FB_Bench(Enable := TRUE, M3_ReqTremie := FALSE, M3_ReqMaintenance := FALSE,
+                 M3_SpeedCmd_Pct := 0.0, M3_BrakeCmd := FALSE,
+                 RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    END_FOR;
+    ASSERT_EQ(FB_Bench.Translation.M3_StatusWord, 16#0080, 'M3 arrete apres decroissance reelle de frequence');
+END_TEST
+
+TEST 'TC-T300-INT-030 Image SimBench relaye les DI M3 au decodeur production'
+VAR
+    Decoder : FB_Translation_PositionDecoder;
+    HwInTranslation : ST_HwTranslation;
+    i : INT;
+END_VAR
+    (* Le premier appel neutralise l'etat precedent. La copie explicite ci-dessous
+       est representative du pont reel HwSim.Translation -> HwIn.Translation ;
+       son unicite dans le programme est imposee statiquement par G502. *)
+    FB_Bench(Enable := FALSE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    FB_Bench(Enable := TRUE, M3_ReqTremie := FALSE, M3_ReqMaintenance := FALSE,
+             M3_SpeedCmd_Pct := 0.0, M3_BrakeCmd := FALSE,
+             RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    HwInTranslation := FB_Bench.Translation;
+    Decoder(SensorTremie := HwInTranslation.M3_PosTremie_DI,
+            SensorPV := HwInTranslation.M3_PosPV_DI,
+            SensorP2 := HwInTranslation.M3_PosPVP2_DI,
+            SensorP1 := HwInTranslation.M3_PosP1_DI,
+            SensorMaintenance := HwInTranslation.M3_PosMaintenance_DI);
+    ASSERT_EQ(Decoder.SensorsWord, 2#00011, 'Repli P1 publie par l image puis decode sans injection aval');
+    ASSERT_FALSE(Decoder.Incoherent, 'Mot P1 issu du SimBench coherent au decodeur production');
+
+    FOR i := 1 TO 1100 DO
+        FB_Bench(Enable := TRUE, M3_ReqTremie := FALSE, M3_ReqMaintenance := TRUE,
+                 M3_SpeedCmd_Pct := 100.0, M3_BrakeCmd := TRUE,
+                 RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+        HwInTranslation := FB_Bench.Translation;
+        Decoder(SensorTremie := HwInTranslation.M3_PosTremie_DI,
+                SensorPV := HwInTranslation.M3_PosPV_DI,
+                SensorP2 := HwInTranslation.M3_PosPVP2_DI,
+                SensorP1 := HwInTranslation.M3_PosP1_DI,
+                SensorMaintenance := HwInTranslation.M3_PosMaintenance_DI);
+    END_FOR;
+    ASSERT_EQ(Decoder.SensorsWord, 2#00000, 'Fin Maintenance dynamique traverse image et decodeur');
+    ASSERT_TRUE(Decoder.LimitSwitchMaintenance, 'FDC Maintenance derive uniquement du mot image');
+    ASSERT_FALSE(Decoder.Incoherent, 'Fin Maintenance dynamique reste coherente');
+END_TEST
+
+TEST 'TC-T300-INT-031 Intermittence P1 dynamique relayee au decodeur production'
+VAR
+    Decoder : FB_Translation_PositionDecoder;
+    HwInTranslation : ST_HwTranslation;
+    P1Previous : BOOL;
+    P1Lost : BOOL := FALSE;
+    P1Recovered : BOOL := FALSE;
+    i : INT;
+END_VAR
+    FB_Bench(Enable := FALSE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    FB_Bench(Enable := TRUE, M3_ReqTremie := FALSE, M3_ReqMaintenance := FALSE,
+             M3_SpeedCmd_Pct := 0.0, M3_BrakeCmd := FALSE,
+             RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    HwInTranslation := FB_Bench.Translation;
+    P1Previous := HwInTranslation.M3_PosP1_DI;
+
+    (* Angle declencheur nul : l'episode est impose par la traversee mecanique,
+       pas par un mot DI force. La graine et la periode restent deterministes. *)
+    FOR i := 1 TO 1500 DO
+        FB_Bench(Enable := TRUE, M3_ReqTremie := FALSE, M3_ReqMaintenance := TRUE,
+                 M3_SpeedCmd_Pct := 100.0, M3_BrakeCmd := TRUE,
+                 SimM3SensorIntermittenceActive := TRUE,
+                 SimM3SensorStabilizationS := 1.0,
+                 SimM3SensorIntermittencePeriodS := 0.12,
+                 SimM3SensorElectricalDelayS := 0.0,
+                 SimM3SensorLoadAngleTriggerRad := 0.0,
+                 SimM3SensorScenarioSeed := 3001,
+                 RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+        HwInTranslation := FB_Bench.Translation;
+        Decoder(SensorTremie := HwInTranslation.M3_PosTremie_DI,
+                SensorPV := HwInTranslation.M3_PosPV_DI,
+                SensorP2 := HwInTranslation.M3_PosPVP2_DI,
+                SensorP1 := HwInTranslation.M3_PosP1_DI,
+                SensorMaintenance := HwInTranslation.M3_PosMaintenance_DI);
+        IF P1Previous AND NOT HwInTranslation.M3_PosP1_DI THEN
+            P1Lost := TRUE;
+        END_IF;
+        IF P1Lost AND HwInTranslation.M3_PosP1_DI THEN
+            P1Recovered := TRUE;
+        END_IF;
+        P1Previous := HwInTranslation.M3_PosP1_DI;
+    END_FOR;
+    ASSERT_TRUE(P1Lost, 'P1 perd au moins une fois son etat pendant le franchissement');
+    ASSERT_TRUE(P1Recovered, 'P1 est repris pendant l episode borne');
+    ASSERT_FALSE(HwInTranslation.M3_PosP1_DI, 'P1 se stabilise a FALSE apres franchissement vers Maintenance');
+    ASSERT_FALSE(Decoder.TranslationPosP1, 'Decodeur production voit la stabilisation du DI image');
 END_TEST
 
 TEST 'T196-003 Capteur haut manuel et polarite Free_DI correcte'
@@ -214,108 +316,48 @@ END_TEST
    AF-13 — FB_Sim_Translation (TC-P13-040/041/042/043)
    ========================================================================= *)
 
-TEST 'TC-P13-040 Sim_Translation progression publie des mots thermometre valides'
-    (* Direction=0 : reste sur Tremie (11111) *)
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ASSERT_TRUE(FB_SimTrans.PosTremie, 'init Tremie -> PosTremie=TRUE');
-    ASSERT_TRUE(FB_SimTrans.PosMaintenance, 'init Tremie -> PosMaintenance=TRUE');
-    ADVANCE_TIME(10000000);
-    (* Direction=-1 : progresse vers Maintenance *)
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ASSERT_FALSE(FB_SimTrans.PosTremie, 'pos 6m -> PosTremie=FALSE');
-    ASSERT_TRUE(FB_SimTrans.PosP2, 'pos 6m -> PosP2=TRUE');
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ASSERT_FALSE(FB_SimTrans.PosP2, 'pos 18m -> PosP2=FALSE');
-    ASSERT_TRUE(FB_SimTrans.PosP1, 'pos 18m -> PosP1=TRUE');
+TEST 'TC-T300-INT-020 Sim_Translation initialise le mot P1'
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := FALSE,
+                SpeedTgt_Pct := 0.0, BrakeReleaseCmd := FALSE);
+    ASSERT_FALSE(FB_SimTrans.PosTremie, 'P1 ne doit pas annoncer Tremie');
+    ASSERT_FALSE(FB_SimTrans.PosPV, 'P1 ne doit pas annoncer PV');
+    ASSERT_FALSE(FB_SimTrans.PosP2, 'P1 ne doit pas annoncer P2');
+    ASSERT_TRUE(FB_SimTrans.PosP1, 'P1 actif au repli');
+    ASSERT_TRUE(FB_SimTrans.PosMaintenance, 'Mot thermometre P1 coherent');
 END_TEST
 
-TEST 'TC-P13-041 Sim_Translation Direction +1/-1/0'
-    (* Direction=0 : maintient la position (Tremie) *)
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ASSERT_TRUE(FB_SimTrans.PosTremie, 'Direction=0 -> reste sur Tremie');
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ASSERT_TRUE(FB_SimTrans.PosTremie, 'Direction=0 -> position maintenue');
-    (* Direction=-1 : progresse vers Maintenance *)
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ASSERT_FALSE(FB_SimTrans.PosTremie, 'Direction=-1 -> quitte Tremie');
-    (* Direction=+1 : revient vers Tremie *)
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := TRUE, ReqMaintenance := FALSE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := TRUE, ReqMaintenance := FALSE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ASSERT_TRUE(FB_SimTrans.PosTremie, 'Direction=+1 -> retour vers Tremie');
+TEST 'TC-T300-INT-021 Sim_Translation neutralise deux sens simultanes'
+    FB_SimTrans(Enable := TRUE, ReqTremie := TRUE, ReqMaintenance := TRUE,
+                SpeedTgt_Pct := 100.0, BrakeReleaseCmd := TRUE);
+    ASSERT_EQ(FB_SimTrans.FrequencyCmd_Hz, 0.0, 'Deux sens ne creent aucune consigne');
+    ASSERT_EQ(FB_SimTrans.ActualFrequency_Hz, 0.0, 'Aucun retour variateur sans sens unique');
 END_TEST
 
-TEST 'TC-P13-042 Sim_Translation position bornee [Tremie, Maintenance]'
-    (* Direction=-1 longtemps -> atteint Maintenance et s y bloque (00000) *)
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ASSERT_FALSE(FB_SimTrans.PosMaintenance, 'a Maintenance -> PosMaintenance=FALSE (00000)');
-    (* Encore des scans -> reste a Maintenance, pas de depassement *)
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ASSERT_FALSE(FB_SimTrans.PosMaintenance, 'reste a Maintenance, pas de depassement');
-    (* Direction=+1 : revient vers Tremie *)
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := TRUE, ReqMaintenance := FALSE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ASSERT_TRUE(FB_SimTrans.PosMaintenance, 'retour vers Tremie -> PosMaintenance=TRUE');
+TEST 'TC-T300-INT-022 Sim_Translation borne et publie la fin de course Maintenance'
+VAR
+    i : INT;
+END_VAR
+    FB_SimTrans(Enable := FALSE);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE,
+                SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.5,
+                BrakeReleaseCmd := TRUE, SensorElectricalDelayS := 0.0);
+    FOR i := 1 TO 400 DO
+        FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE,
+                    SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.5,
+                    BrakeReleaseCmd := TRUE, SensorElectricalDelayS := 0.0);
+    END_FOR;
+    ASSERT_GE(FB_SimTrans.PositionTrue_M, 0.0, 'Borne Tremie respectee');
+    ASSERT_LE(FB_SimTrans.PositionTrue_M, 30.0, 'Borne Maintenance respectee');
+    ASSERT_FALSE(FB_SimTrans.PosMaintenance, 'Maintenance publie le mot 00000 a la butee');
 END_TEST
 
-TEST 'TC-P13-043 Sim_Translation Enable=FALSE reinitialise sur Tremie'
-    (* Progresse vers Maintenance *)
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ASSERT_FALSE(FB_SimTrans.PosTremie, 'a P2 -> PosTremie=FALSE');
-    (* Enable=FALSE -> reinit interne sur Tremie, sorties neutralisees *)
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := FALSE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
-    ASSERT_FALSE(FB_SimTrans.PosTremie, 'Enable=FALSE -> sorties neutralisees');
-    (* Re-Enable -> demarre proprement sur Tremie (11111) *)
-    ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 0.0, FullTravelTimeS := 0.1);
-    ASSERT_TRUE(FB_SimTrans.PosTremie, 're-Enable -> reinit sur Tremie (PosTremie=TRUE)');
-    ASSERT_TRUE(FB_SimTrans.PosMaintenance, 're-Enable -> reinit sur Tremie (PosMaintenance=TRUE)');
+TEST 'TC-T300-INT-023 Sim_Translation desactive se replie P1'
+    FB_SimTrans(Enable := FALSE, ReqTremie := FALSE, ReqMaintenance := TRUE,
+                SpeedTgt_Pct := 100.0, BrakeReleaseCmd := TRUE);
+    ASSERT_EQ(FB_SimTrans.PositionTrue_M, 20.0, 'Repli physique P1');
+    ASSERT_TRUE(FB_SimTrans.PosP1, 'Capteur P1 coherent hors simulation');
+    ASSERT_TRUE(FB_SimTrans.PosMaintenance, 'Mot P1 coherent hors simulation');
+    ASSERT_FALSE(FB_SimTrans.BrakeContactOpen, 'Frein confirme ferme hors simulation');
 END_TEST
 
 (* =========================================================================

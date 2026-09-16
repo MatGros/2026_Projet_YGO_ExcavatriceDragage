@@ -32,16 +32,7 @@
     },
     {
       "name": "TC-P11-005 Translation interlock sens : inversion Fwd->Rev differee (pas immediate)",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0",
-        "file": "test_fb_translation.st",
-        "line": 200,
-        "message": "mouvement Fwd -> mot 1",
-        "expected": "1",
-        "actual": "0"
-      }
+      "passed": true
     },
     {
       "name": "TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel \u2014 stub)",
@@ -81,29 +72,11 @@
     },
     {
       "name": "TC-P11-016 Translation vers Tr\u00e9mie : cycle complet r\u00e9aliste (rampe, frein, mot FWD, fr\u00e9quence)",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0",
-        "file": "test_fb_translation.st",
-        "line": 466,
-        "message": "magn\u00e9tisation en cours -> mot 1 (FWD)",
-        "expected": "1",
-        "actual": "0"
-      }
+      "passed": true
     },
     {
       "name": "TC-P11-017 Translation vers Maintenance : mot REV (2) + fr\u00e9quence pleine",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB_T.REQUESTEDDRIVECONTROLWORD expected 2, got 0",
-        "file": "test_fb_translation.st",
-        "line": 520,
-        "message": "magn\u00e9tisation en cours -> mot 2 (REV)",
-        "expected": "2",
-        "actual": "0"
-      }
+      "passed": true
     },
     {
       "name": "TC-P11-018 Translation : arriv\u00e9e sur capteur cible (debounce 100ms) + arr\u00eat exact + frein coll\u00e9",
@@ -159,14 +132,7 @@
     },
     {
       "name": "TC-P11-031 Translation : fin de course extr\u00eame coupe le mouvement (bit6)",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB_T.FAULT.ERROR expected TRUE, got FALSE",
-        "file": "test_fb_translation.st",
-        "line": 1188,
-        "message": "Fdc Tr\u00e9mie -> d\u00e9faut"
-      }
+      "passed": true
     },
     {
       "name": "TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -> rampe bloquee (mot 0, freq 0)",
@@ -178,34 +144,16 @@
     },
     {
       "name": "TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -> mouvement autorise",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0",
-        "file": "test_fb_translation.st",
-        "line": 1240,
-        "message": "TremiePermit=TRUE -> mot 1 (FWD)",
-        "expected": "1",
-        "actual": "0"
-      }
+      "passed": true
     },
     {
       "name": "TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -> mouvement autorise",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB_T.REQUESTEDDRIVECONTROLWORD expected 2, got 0",
-        "file": "test_fb_translation.st",
-        "line": 1257,
-        "message": "MaintenancePermit=TRUE -> mot 2 (REV)",
-        "expected": "2",
-        "actual": "0"
-      }
+      "passed": true
     }
   ],
   "summary": {
     "total": 37,
-    "passed": 31,
-    "failed": 6
+    "passed": 37,
+    "failed": 0
   }
 }

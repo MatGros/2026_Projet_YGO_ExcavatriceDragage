@@ -373,11 +373,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-13 23:14:39</div>
+    <div class="exec-time">2026-09-16 02:25:29</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (3 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-0">TC-P11-SAF-001 Dynamique Enable : neutralisation initiale, transition Ready, coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-1">TC-P11-SAF-002 Defaut rotation de phase (defaut process sans PowerCutOff)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-2">TC-P11-SAF-003 Surchauffe thermique frein -&gt; SafeStop + PowerCutOff (defaut dur)</a></li></ul>
+        <summary>📋 Sommaire (5 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-0">TC-P11-SAF-001 Dynamique Enable : neutralisation initiale, transition Ready, coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-1">TC-P11-SAF-002 Defaut rotation de phase (defaut process sans PowerCutOff)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-2">TC-P11-SAF-003 Surchauffe thermique frein -&gt; SafeStop + PowerCutOff (defaut dur)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-3">TC-T300-SAF-060 Arret FDC sans requete persistante ne declenche pas l escalade</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-4">TC-T300-SAF-061 Requete persistante au FDC escalade meme frequence nulle</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -386,7 +386,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            3/3 vérifications validées
+            5/5 vérifications validées
         </div>
     </div>
     
@@ -802,7 +802,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-safety-translation-0" class="test-card test-card-pass test-card-collapsed">
@@ -866,6 +866,50 @@
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>Thermique frein -&gt; SafeStop TRUE</li><li>Thermique frein -&gt; PowerCutOff TRUE (securite materielle)</li><li>Thermique frein -&gt; Defaut latche</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-safety-translation-3" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T300-SAF-060 Arret FDC sans requete persistante ne declenche pas l escalade </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T300-SAF-060 Arret FDC sans requete persistante ne declenche pas l escalade')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Variateur arrete, bit0 inactif, frequence nulle</li><li>1,6 s : au-dela de l escalade FDC 1,5 s</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>FDC atteint et variateur pret sans requete : aucune escalade</li><li>Arret final normal ne coupe pas la puissance</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-safety-translation-4" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T300-SAF-061 Requete persistante au FDC escalade meme frequence nulle </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T300-SAF-061 Requete persistante au FDC escalade meme frequence nulle')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Bit0 de marche/pret maintenu pour caracteriser l escalade</li><li>1,6 s : au-dela de l escalade FDC 1,5 s</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Requete maintenance maintenue au FDC -&gt; escalade apres 1,5 s</li><li>Cause 6 seule = ErrorId 64</li><li>Escalade FDC est une coupure puissance</li></ul>
             </details>
                 
                 
@@ -1367,9 +1411,11 @@ test_fb_safety_translation.st
   [PASS] TC-P11-SAF-001 Dynamique Enable : neutralisation initiale, transition Ready, coupure
   [PASS] TC-P11-SAF-002 Defaut rotation de phase (defaut process sans PowerCutOff)
   [PASS] TC-P11-SAF-003 Surchauffe thermique frein -&gt; SafeStop + PowerCutOff (defaut dur)
+  [PASS] TC-T300-SAF-060 Arret FDC sans requete persistante ne declenche pas l escalade
+  [PASS] TC-T300-SAF-061 Requete persistante au FDC escalade meme frequence nulle
 
 -----------------------------------------
-3 tests, 3 passed, 0 failed
+5 tests, 5 passed, 0 failed
 </pre>
     </details>
 </div>

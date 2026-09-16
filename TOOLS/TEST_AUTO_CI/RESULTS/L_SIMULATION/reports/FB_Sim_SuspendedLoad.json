@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "file": "test_fb_sim_suspended_load.st",
+  "results": [
+    {
+      "name": "TC-T300-MEC-010 Charge au repos ne cree pas d energie",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-MEC-040 Acceleration excite charge et reaction reste conditionnee au frein",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-MEC-020 Convergence pendule entre pas 10 ms et 5 ms",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0
+  }
+}

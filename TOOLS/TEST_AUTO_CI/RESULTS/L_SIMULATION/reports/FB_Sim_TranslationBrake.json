@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "file": "test_fb_sim_translation_brake.st",
+  "results": [
+    {
+      "name": "TC-T300-BRK-010 Bobine mecanique et contact restent distincts",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-BRK-020 Serrage attend vitesse nulle",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0
+  }
+}

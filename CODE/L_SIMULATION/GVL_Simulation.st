@@ -33,6 +33,16 @@ VAR_GLOBAL
     // Bit4=Trémie, bit3=PV, bit2=PVP2, bit1=P1, bit0=Maintenance ; 16#07 = position P2 (00111).
     SimM3SensorsWordOverrideActive : BOOL := FALSE; // TRUE = SimM3SensorsWord remplace le modèle ; réserver aux injections ciblées
     SimM3SensorsWord               : BYTE := 16#07; // Mot manuel valide nominal : P2
+    // Episode capteur dynamique : FALSE conserve le profil nominal. TRUE publie des
+    // pertes/reprises deterministes apres un franchissement mecanique, pour qualifier
+    // le decodeur et les fins de course sans ecrire directement dans le metier.
+    SimM3SensorIntermittenceActive  : BOOL := FALSE;
+    SimM3SensorStabilizationS       : REAL := 1.0;
+    SimM3SensorElectricalDelayS     : REAL := 0.01;
+    SimM3SensorIntermittencePeriodS : REAL := 0.12;
+    SimM3SensorHysteresis_M         : REAL := 0.02;
+    SimM3SensorLoadAngleTriggerRad  : REAL := 0.01;
+    SimM3SensorScenarioSeed         : UDINT := 3001;
 
     // 🕹️ STIMULI OPÉRATEUR — les boutons directionnels imposent 0/5000/10000 ; combinaison = neutre.
     SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE; // Translation M3 Arrière vers Trémie (RawX=0, RawY=5000)

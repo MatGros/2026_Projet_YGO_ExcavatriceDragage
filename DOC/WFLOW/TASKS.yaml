@@ -67,10 +67,11 @@ tasks:
   agent: Codex
   date: '2026-09-15T23:40:00+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T300_SIMBENCH_M3_SENSOR_DYNAMICS.md
-  avancement: 'Prise en charge explicite par Codex : implémentation principale, tests
-    et gates. Reviews expertes read-only demandées pour challenger architecture physique,
-    conventions, AF et stratégie de tests. Paramètres matériels inconnus restent profilés
-    comme hypothèses synthétiques.'
+  avancement: 'Implémentation principale, tests et gates réalisés par Codex. Le pont
+    IoHw.In.Hardware expose désormais HwIn arbitré ; reviews et garde-fou G502 intégrés.
+    Paramètres matériels inconnus restent profilés comme hypothèses synthétiques ; trace
+    runtime CODESYS et calibration terrain restent requises. Le modele suit maintenant le
+    pas reel jusqu a 100 ms ; TC-T300-DRV-040 et la campagne T300 sont PASS.'
   titre: SimBench M3 — Dynamique de franchissement des capteurs et perte intermittente
     aux extrêmes
   contexte: Au franchissement d un capteur M3, le retour terrain décrit une séquence

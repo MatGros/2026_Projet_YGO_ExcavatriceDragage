@@ -145,7 +145,12 @@ def main() -> int:
     parser.add_argument("--fb", help="Limite le rapport a un FB du registry")
     args = parser.parse_args()
     root = args.root.resolve()
-    registry_path = root / "TOOLS/TEST_AUTO_CI/registry.yaml"
+    # Le registre actif est celui consommé par le runner CI. Conserver un
+    # fallback historique uniquement pour les clones qui n'ont pas encore
+    # migré leur arborescence.
+    registry_path = root / "TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml"
+    if not registry_path.is_file():
+        registry_path = root / "TOOLS/TEST_AUTO_CI/registry.yaml"
     if not registry_path.is_file():
         print(f"ERROR: registre introuvable : {registry_path}")
         return 2

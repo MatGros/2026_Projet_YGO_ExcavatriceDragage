@@ -195,9 +195,21 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
 
     try:
-        n_tests_declared = len(re.findall(r"^TEST\s+'", test_file.read_text(encoding="utf-8"), re.MULTILINE))
+        test_source = test_file.read_text(encoding="utf-8")
+        n_tests_declared = len(re.findall(r"^TEST\s+'", test_source, re.MULTILINE))
+        # Le nom de l'instance testee est libre dans SETUP (FB_Bench est courant).
+        # Le post-traitement VAR_IN_OUT doit donc viser l'instance effectivement
+        # declaree et jamais supposer le nom historique "FB".
+        fb_instances = re.findall(
+            rf"^\s*([A-Za-z_]\w*)\s*:\s*{re.escape(fb_name)}\s*;",
+            test_source,
+            re.MULTILINE,
+        )
+        # STruCpp normalise les identifiants C++ en majuscules.
+        fb_var = fb_instances[0].upper() if len(fb_instances) == 1 else "FB"
     except OSError:
         n_tests_declared = None
+        fb_var = "FB"
 
     def _progress_line(phase: str) -> str:
         return f"-> {fb_name} ({domain})... {phase}".ljust(70)
@@ -271,7 +283,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
             if fb_st_path is not None:
                 try:
                     modified = inject_var_in_out_copyout.postprocess_file(
-                        strucpp_temp_dir / "test_main.cpp", fb_st_path, fb_var="FB")
+                        strucpp_temp_dir / "test_main.cpp", fb_st_path, fb_var=fb_var)
                     if modified:
                         copyout_exe = inject_var_in_out_copyout.recompile_test_runner(
                             strucpp_temp_dir, RUNTIME_INCLUDE, RUNTIME_TEST)
@@ -281,6 +293,30 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                 except Exception as exc:
                     _log(f"[var_in_out] post-traitement indisponible pour {fb_name} : {exc}")
             test_runner = copyout_exe or (strucpp_temp_dir / "test_runner.exe")
+            # T300 guard: some STruCpp Windows builds generate valid C++ but fail
+            # their internal link step without returning the compiler diagnostic.
+            # Rebuild the generated runner explicitly so tests remain executable
+            # and preserve stderr when the generated C++ is genuinely invalid.
+            if not test_runner.exists():
+                fallback_runner = strucpp_temp_dir / "test_runner_fallback.exe"
+                fallback_cmd = [
+                    "g++", "-std=c++17", "-O0",
+                    f"-I{RUNTIME_INCLUDE}", f"-I{RUNTIME_TEST}",
+                    f"-I{strucpp_temp_dir}",
+                    str(strucpp_temp_dir / "test_main.cpp"),
+                    str(strucpp_temp_dir / "generated.cpp"),
+                    "-o", str(fallback_runner),
+                ]
+                fallback_result = subprocess.run(
+                    fallback_cmd, capture_output=True, text=True,
+                    encoding="utf-8", errors="replace",
+                    cwd=str(strucpp_temp_dir), creationflags=subproc_flags)
+                if fallback_result.returncode == 0:
+                    test_runner = fallback_runner
+                    _log("[fallback g++] runner genere apres echec liaison interne STruCpp")
+                else:
+                    _log("[fallback g++] echec compilation explicite:\n"
+                         + fallback_result.stdout + fallback_result.stderr)
             if test_runner.exists():
                 t_exec_start = _time.perf_counter()
                 json_result = subprocess.run([str(test_runner), "--json"], capture_output=True, text=True, encoding="utf-8",

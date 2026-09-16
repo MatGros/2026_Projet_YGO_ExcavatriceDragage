@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-16T00:09:12.424660" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-16T00:09:12.424660">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_Sim_TranslationDrive" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FrequencyTgt_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="AccelRate_HzPerS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+            </variable>
+            <variable name="DecelRate_HzPerS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+            </variable>
+            <variable name="TimeConstant_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.15" />
+              </initialValue>
+            </variable>
+            <variable name="LoadAngularVelocity_RadPerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="LoadFrequencyDroopGain_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+            </variable>
+            <variable name="CycleTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FrequencyCmd_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ElectricalFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ActualFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ResponseAlpha">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="FrequencyDelta_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="FrequencyStep_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CST_MinTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.001" />
+              </initialValue>
+            </variable>
+            <variable name="CST_MaxFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="40" />
+              </initialValue>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Dynamique reduite du variateur M3, sans commande metier.</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Ready := FALSE;
+    FrequencyCmd_Hz := 0.0;
+    ElectricalFrequency_Hz := 0.0;
+    ActualFrequency_Hz := 0.0;
+    ResponseAlpha := 0.0;
+    RETURN;
+END_IF;
+
+FrequencyDelta_Hz := LIMIT(0.0, FrequencyTgt_Hz, CST_MaxFrequency_Hz) - FrequencyCmd_Hz;
+IF FrequencyDelta_Hz &gt;= 0.0 THEN
+    FrequencyStep_Hz := MAX(0.0, AccelRate_HzPerS) * CycleTime_S;
+ELSE
+    FrequencyStep_Hz := MAX(0.0, DecelRate_HzPerS) * CycleTime_S;
+END_IF;
+FrequencyCmd_Hz := FrequencyCmd_Hz + LIMIT(-FrequencyStep_Hz, FrequencyDelta_Hz, FrequencyStep_Hz);
+IF TimeConstant_S &gt; CST_MinTime_S THEN
+    ResponseAlpha := CycleTime_S / (TimeConstant_S + CycleTime_S);
+ELSE
+    ResponseAlpha := 1.0;
+END_IF;
+ElectricalFrequency_Hz := ElectricalFrequency_Hz
+    + ResponseAlpha * (FrequencyCmd_Hz - ElectricalFrequency_Hz);
+ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz
+    - MAX(0.0, LoadFrequencyDroopGain_Hz) * ABS(LoadAngularVelocity_RadPerS));
+IF ActualFrequency_Hz &lt; 0.005 THEN
+    ActualFrequency_Hz := 0.0;
+END_IF;
+Ready := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>03da2ca5-829e-5f35-a2f5-646da12c2d06</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="L_SIMULATION">
+          <Object Name="FB_Sim_TranslationDrive" ObjectId="03da2ca5-829e-5f35-a2f5-646da12c2d06" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

@@ -75,6 +75,13 @@ VAR_INPUT
 
     SimM3SensorsWordOverrideActive : BOOL := FALSE;   (* --> [TST] Override mot capteurs M3 *)
     SimM3SensorsWord               : BYTE := 16#07;   (* --> [TST] Mot capteurs M3 forcé *)
+    SimM3SensorIntermittenceActive  : BOOL := FALSE;   (* --> [TST] Episode perte/reprise DI M3 *)
+    SimM3SensorStabilizationS       : REAL := 1.0;     (* --> [CFG] Duree episode capteur M3, s *)
+    SimM3SensorElectricalDelayS     : REAL := 0.01;    (* --> [CFG] Delai electrique capteur M3, s *)
+    SimM3SensorIntermittencePeriodS : REAL := 0.12;    (* --> [CFG] Periode des bascules episode, s *)
+    SimM3SensorHysteresis_M         : REAL := 0.02;    (* --> [CFG] Hysteresis seuils capteurs M3, m *)
+    SimM3SensorLoadAngleTriggerRad  : REAL := 0.01;    (* --> [CFG] Angle charge minimal episode, rad *)
+    SimM3SensorScenarioSeed         : UDINT := 3001;   (* --> [CFG] Graine episode capteurs M3 *)
 
     SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick gauche *)
     SimJoystickRight_Fwd_MAINT_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick droite *)
@@ -326,7 +333,15 @@ instSimTranslation(
     ReqTremie       := M3_RelayFwd,
     ReqMaintenance  := M3_RelayRev,
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
-    FullTravelTimeS := CST_M3FullTravelTimeS
+    FullTravelTimeS := CST_M3FullTravelTimeS,
+    BrakeReleaseCmd := M3_BrakeCmd,
+    SensorIntermittenceActive := SimM3SensorIntermittenceActive,
+    SensorStabilizationS := SimM3SensorStabilizationS,
+    SensorElectricalDelayS := SimM3SensorElectricalDelayS,
+    SensorIntermittencePeriodS := SimM3SensorIntermittencePeriodS,
+    SensorHysteresis_M := SimM3SensorHysteresis_M,
+    SensorLoadAngleTriggerRad := SimM3SensorLoadAngleTriggerRad,
+    SensorScenarioSeed := SimM3SensorScenarioSeed
 );
 
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
@@ -345,8 +360,8 @@ ELSE
     Translation.M3_PosMaintenance_DI := instSimTranslation.PosMaintenance;
 END_IF;
 
-// Polarité frein M3 (1 = OUVERT)
-Translation.M3_BrakeIsOpen_DI    := M3_BrakeCmd;
+// Retour auxiliaire du frein, distinct de la commande electrique.
+Translation.M3_BrakeIsOpen_DI    := instSimTranslation.BrakeContactOpen;
 
 // Thermique moteur/variateur AC600 — pas de panne simulée, toujours OK (comme Winch.M1/M2_ThermalOk_DI)
 Translation.M3_ThermalOK_DI      := TRUE;
@@ -357,13 +372,12 @@ Translation.M3_ThermalOK_DI      := TRUE;
 // un Bit0 forcé à 1 en continu à l'arrêt déclencherait un PowerCutOff simulé permanent après 3s.
 // DrivePowerReady (diagnostic IHM seul, non consommé par un interlock) est le seul autre lecteur,
 // aucune régression de mouvement possible.
-IF M3_RelayFwd OR M3_RelayRev THEN
+IF instSimTranslation.ActualFrequency_Hz > 0.5 THEN
     M3_StatusWordSim := 16#0087; // + Operating/Running
-    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedCmd_Pct * 50.0); // 50.0 Hz à 100% (x100 -> 5000)
 ELSE
     M3_StatusWordSim := 16#0080; // Comm Ready seul -- Bit0 retombé, arrêt confirmé
-    M3_ActualFreqHz  := 0;
 END_IF;
+M3_ActualFreqHz := REAL_TO_UINT(instSimTranslation.ActualFrequency_Hz * 100.0);
 
 Translation.M3_StatusWord        := M3_StatusWordSim;
 Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;

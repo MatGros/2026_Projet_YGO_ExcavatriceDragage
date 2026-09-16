@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T00:22:11.126432" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T00:22:11.126432">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-16T18:02:52.977228" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-16T18:02:52.977228">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -138,6 +138,67 @@ TRUE = SimM3SensorsWord remplace le modèle ; réserver aux injections ciblées<
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot manuel valide nominal : P2</xhtml>
           </documentation>
+        </variable>
+        <variable name="SimM3SensorIntermittenceActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Episode capteur dynamique : FALSE conserve le profil nominal. TRUE publie des
+pertes/reprises deterministes apres un franchissement mecanique, pour qualifier
+le decodeur et les fins de course sans ecrire directement dans le metier.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorStabilizationS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="1" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorElectricalDelayS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.01" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorIntermittencePeriodS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.12" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorHysteresis_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.02" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorLoadAngleTriggerRad">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.01" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorScenarioSeed">
+          <type>
+            <UDINT />
+          </type>
+          <initialValue>
+            <simpleValue value="3001" />
+          </initialValue>
         </variable>
         <variable name="SimJoystickLeft_Rev_TREMIE_Active">
           <type>

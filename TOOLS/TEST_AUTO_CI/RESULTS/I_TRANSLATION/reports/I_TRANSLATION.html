@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Rapport de test — I_TRANSLATION [FAIL]</title>
+<title>Rapport de test — I_TRANSLATION [PASS]</title>
 <style>
     :root {
         --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
@@ -370,14 +370,14 @@
         <div style="display:flex;align-items:center;gap:12px;">
             <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
-            <span class="badge badge-fail">FAIL</span>
+            <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">4/5 FB OK · 2026-09-13 23:14:53</div>
+    <div class="exec-time">5/5 FB OK · 2026-09-16 02:25:33</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (48 tests)</summary>
-        <div class="toc-group-title"><a href="#fb-section-fb_safety_translation" style="color:var(--accent);text-decoration:none;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">📦 FB_Safety_Translation <span style="font-size:11px;font-weight:normal;color:var(--muted);">➔ sauter au bloc</span></a></div><ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-0">TC-P11-SAF-001 Dynamique Enable : neutralisation initiale, transition Ready, coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-1">TC-P11-SAF-002 Defaut rotation de phase (defaut process sans PowerCutOff)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-2">TC-P11-SAF-003 Surchauffe thermique frein -&gt; SafeStop + PowerCutOff (defaut dur)</a></li></ul><div class="toc-group-title"><a href="#fb-section-fb_translation" style="color:var(--accent);text-decoration:none;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">📦 FB_Translation <span style="font-size:11px;font-weight:normal;color:var(--muted);">➔ sauter au bloc</span></a></div><ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-1">TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-2">TC-P11-010 Translation : commande variateur nominale</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-3">TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -&gt; Incoherent</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-4">TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-5">TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-6">TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie)</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-7">TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-8">TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-9">TC-P11-006 Watchdog frein 500ms : frontiere 499/500</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-10">TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-11">TC-P11-008 Gate final : mot/freq nuls sans confirmation frein simultanee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-12">TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-13">TC-P11-011 Meca B : incohérence arret &gt;3s -&gt; SafeStop+PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-14">TC-P11-011.1 Meca B variante perte IHM : condition elargie</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-15">TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-16">TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub)</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-17">TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence)</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-18">TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-19">TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-20">TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-21">TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-22">TC-P11-021 Translation : StartStop=FALSE -&gt; rampe normale (décélération normale)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-23">TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-24">TC-P11-023 Safety : perte comm opérateur (bit0) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-25">TC-P11-024 Safety : défaut rotation de phases (bit2) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-26">TC-P11-025 Safety : surchauffe thermique frein (bit3) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-27">TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-28">TC-P11-027 Safety : escalade fin de course (bit6) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-29">TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-30">TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-31">TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal)</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-32">TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-33">TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-34">TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe)</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-35">TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-36">TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise</a></li></ul><div class="toc-group-title"><a href="#fb-section-fb_translationoutputinterlock" style="color:var(--accent);text-decoration:none;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">📦 FB_TranslationOutputInterlock <span style="font-size:11px;font-weight:normal;color:var(--muted);">➔ sauter au bloc</span></a></div><ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translationoutputinterlock-0">TC-P11-INT-001 Enable FALSE coupe consignes variateur et ordre frein</a></li><li class="toc-item toc-pass"><a href="#test-fb-translationoutputinterlock-1">TC-P11-INT-002 Blocage sens sans permis directionnel (fail-safe)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translationoutputinterlock-2">TC-P11-INT-003 Mouvement nominal autorise avec permis et confirmation frein</a></li></ul><div class="toc-group-title"><a href="#fb-section-fb_translation_positiondecoder" style="color:var(--accent);text-decoration:none;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">📦 FB_Translation_PositionDecoder <span style="font-size:11px;font-weight:normal;color:var(--muted);">➔ sauter au bloc</span></a></div><ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-positiondecoder-0">TC-P11-DEC-001 Decodage extremite Tremie (mot 11111) et Maintenance (00000)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positiondecoder-1">TC-P11-DEC-002 Detection mot incoherente (came defectueuse / capteur colle)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positiondecoder-2">TC-P11-DEC-003 Mots de progression monotone intermediaires</a></li></ul><div class="toc-group-title"><a href="#fb-section-fb_translation_positionestimator" style="color:var(--accent);text-decoration:none;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">📦 FB_Translation_PositionEstimator <span style="font-size:11px;font-weight:normal;color:var(--muted);">➔ sauter au bloc</span></a></div><ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-0">TC-P11-EST-001 Reprise sur ColdStart avec position persistee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-1">TC-P11-EST-002 Recalage absolu instantane sur front montant capteur P1 (20.0m)</a></li></ul>
+        <summary>📋 Sommaire (50 tests)</summary>
+        <div class="toc-group-title"><a href="#fb-section-fb_safety_translation" style="color:var(--accent);text-decoration:none;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">📦 FB_Safety_Translation <span style="font-size:11px;font-weight:normal;color:var(--muted);">➔ sauter au bloc</span></a></div><ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-0">TC-P11-SAF-001 Dynamique Enable : neutralisation initiale, transition Ready, coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-1">TC-P11-SAF-002 Defaut rotation de phase (defaut process sans PowerCutOff)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-2">TC-P11-SAF-003 Surchauffe thermique frein -&gt; SafeStop + PowerCutOff (defaut dur)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-3">TC-T300-SAF-060 Arret FDC sans requete persistante ne declenche pas l escalade</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-translation-4">TC-T300-SAF-061 Requete persistante au FDC escalade meme frequence nulle</a></li></ul><div class="toc-group-title"><a href="#fb-section-fb_translation" style="color:var(--accent);text-decoration:none;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">📦 FB_Translation <span style="font-size:11px;font-weight:normal;color:var(--muted);">➔ sauter au bloc</span></a></div><ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-1">TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-2">TC-P11-010 Translation : commande variateur nominale</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-3">TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -&gt; Incoherent</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-4">TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-5">TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-6">TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-7">TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-8">TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-9">TC-P11-006 Watchdog frein 500ms : frontiere 499/500</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-10">TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-11">TC-P11-008 Gate final : mot/freq nuls sans confirmation frein simultanee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-12">TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-13">TC-P11-011 Meca B : incohérence arret &gt;3s -&gt; SafeStop+PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-14">TC-P11-011.1 Meca B variante perte IHM : condition elargie</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-15">TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-16">TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-17">TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-18">TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-19">TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-20">TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-21">TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-22">TC-P11-021 Translation : StartStop=FALSE -&gt; rampe normale (décélération normale)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-23">TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-24">TC-P11-023 Safety : perte comm opérateur (bit0) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-25">TC-P11-024 Safety : défaut rotation de phases (bit2) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-26">TC-P11-025 Safety : surchauffe thermique frein (bit3) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-27">TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-28">TC-P11-027 Safety : escalade fin de course (bit6) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-29">TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-30">TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-31">TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-32">TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-33">TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-34">TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-35">TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-36">TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise</a></li></ul><div class="toc-group-title"><a href="#fb-section-fb_translationoutputinterlock" style="color:var(--accent);text-decoration:none;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">📦 FB_TranslationOutputInterlock <span style="font-size:11px;font-weight:normal;color:var(--muted);">➔ sauter au bloc</span></a></div><ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translationoutputinterlock-0">TC-P11-INT-001 Enable FALSE coupe consignes variateur et ordre frein</a></li><li class="toc-item toc-pass"><a href="#test-fb-translationoutputinterlock-1">TC-P11-INT-002 Blocage sens sans permis directionnel (fail-safe)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translationoutputinterlock-2">TC-P11-INT-003 Mouvement nominal autorise avec permis et confirmation frein</a></li></ul><div class="toc-group-title"><a href="#fb-section-fb_translation_positiondecoder" style="color:var(--accent);text-decoration:none;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">📦 FB_Translation_PositionDecoder <span style="font-size:11px;font-weight:normal;color:var(--muted);">➔ sauter au bloc</span></a></div><ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-positiondecoder-0">TC-P11-DEC-001 Decodage extremite Tremie (mot 11111) et Maintenance (00000)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positiondecoder-1">TC-P11-DEC-002 Detection mot incoherente (came defectueuse / capteur colle)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positiondecoder-2">TC-P11-DEC-003 Mots de progression monotone intermediaires</a></li></ul><div class="toc-group-title"><a href="#fb-section-fb_translation_positionestimator" style="color:var(--accent);text-decoration:none;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">📦 FB_Translation_PositionEstimator <span style="font-size:11px;font-weight:normal;color:var(--muted);">➔ sauter au bloc</span></a></div><ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-0">TC-P11-EST-001 Reprise sur ColdStart avec position persistee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-1">TC-P11-EST-002 Recalage absolu instantane sur front montant capteur P1 (20.0m)</a></li></ul>
     </details>
     
     <div id="fb-section-fb_safety_translation" class="fb-section-title" style="scroll-margin-top:20px;">
@@ -390,7 +390,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            3/3 vérifications validées
+            5/5 vérifications validées
         </div>
     </div>
     
@@ -806,7 +806,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-safety-translation-0" class="test-card test-card-pass test-card-collapsed">
@@ -870,6 +870,50 @@
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>Thermique frein -&gt; SafeStop TRUE</li><li>Thermique frein -&gt; PowerCutOff TRUE (securite materielle)</li><li>Thermique frein -&gt; Defaut latche</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-safety-translation-3" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T300-SAF-060 Arret FDC sans requete persistante ne declenche pas l escalade </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T300-SAF-060 Arret FDC sans requete persistante ne declenche pas l escalade')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Variateur arrete, bit0 inactif, frequence nulle</li><li>1,6 s : au-dela de l escalade FDC 1,5 s</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>FDC atteint et variateur pret sans requete : aucune escalade</li><li>Arret final normal ne coupe pas la puissance</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-safety-translation-4" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T300-SAF-061 Requete persistante au FDC escalade meme frequence nulle </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T300-SAF-061 Requete persistante au FDC escalade meme frequence nulle')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Bit0 de marche/pret maintenu pour caracteriser l escalade</li><li>1,6 s : au-dela de l escalade FDC 1,5 s</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Requete maintenance maintenue au FDC -&gt; escalade apres 1,5 s</li><li>Cause 6 seule = ErrorId 64</li><li>Escalade FDC est une coupure puissance</li></ul>
             </details>
                 
                 
@@ -1371,13 +1415,15 @@ test_fb_safety_translation.st
   [PASS] TC-P11-SAF-001 Dynamique Enable : neutralisation initiale, transition Ready, coupure
   [PASS] TC-P11-SAF-002 Defaut rotation de phase (defaut process sans PowerCutOff)
   [PASS] TC-P11-SAF-003 Surchauffe thermique frein -&gt; SafeStop + PowerCutOff (defaut dur)
+  [PASS] TC-T300-SAF-060 Arret FDC sans requete persistante ne declenche pas l escalade
+  [PASS] TC-T300-SAF-061 Requete persistante au FDC escalade meme frequence nulle
 
 -----------------------------------------
-3 tests, 3 passed, 0 failed
+5 tests, 5 passed, 0 failed
 </pre>
     </details>
     <div id="fb-section-fb_translation" class="fb-section-title" style="scroll-margin-top:20px;">
-        <span style="font-family:monospace;font-size:18px;font-weight:900;color:var(--text);">📦 FB_Translation</span> <span class="badge badge-fail">FAIL</span>
+        <span style="font-family:monospace;font-size:18px;font-weight:900;color:var(--text);">📦 FB_Translation</span> <span class="badge badge-pass">PASS</span>
     </div>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -1386,7 +1432,7 @@ test_fb_safety_translation.st
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            31/37 vérifications validées
+            37/37 vérifications validées
         </div>
     </div>
     
@@ -1999,9 +2045,9 @@ test_fb_safety_translation.st
                 
             </div>
         </article>
-        <article id="test-fb-translation-7" class="test-card test-card-fail">
+        <article id="test-fb-translation-7" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate) </h3>
                 <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
@@ -2017,7 +2063,7 @@ test_fb_safety_translation.st
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
                 <ul class="checks-list"><li>mouvement Fwd -&gt; mot 1</li><li>inversion pas immediate (interlock)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0</div><div class='failure-loc'>test_fb_translation.st:200</div><div class='failure-msg'>mouvement Fwd -&gt; mot 1</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
                 
             </div>
         </article>
@@ -2225,9 +2271,9 @@ test_fb_safety_translation.st
                 
             </div>
         </article>
-        <article id="test-fb-translation-17" class="test-card test-card-fail">
+        <article id="test-fb-translation-17" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence) </h3>
                 <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
@@ -2241,15 +2287,15 @@ test_fb_safety_translation.st
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (8)</span></summary>
-                <ul class="checks-list"><li>frein non desserré -&gt; mot 0</li><li>magnétisation en cours -&gt; mot 1 (FWD)</li><li>magnétisation en cours -&gt; mot 1 (FWD)</li><li>magnétisation en cours -&gt; mot 1 (FWD)</li><li>frein desserré -&gt; mot 1 (FWD)</li><li>fréquence ~24Hz</li><li>mouvement FWD maintenu</li><li>fréquence pleine ~30Hz</li></ul>
+                <ul class="checks-list"><li>frein non desserré -&gt; mot 0</li><li>magnétisation en cours -&gt; mot 0 (frein encore serré)</li><li>frein relâché -&gt; mot 1 (FWD)</li><li>magnétisation en cours -&gt; mot 1 (FWD)</li><li>frein desserré -&gt; mot 1 (FWD)</li><li>fréquence ~24Hz</li><li>mouvement FWD maintenu</li><li>fréquence pleine ~30Hz</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0</div><div class='failure-loc'>test_fb_translation.st:466</div><div class='failure-msg'>magnétisation en cours -&gt; mot 1 (FWD)</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
                 
             </div>
         </article>
-        <article id="test-fb-translation-18" class="test-card test-card-fail">
+        <article id="test-fb-translation-18" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine </h3>
                 <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
@@ -2263,9 +2309,9 @@ test_fb_safety_translation.st
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (8)</span></summary>
-                <ul class="checks-list"><li>frein non desserré -&gt; mot 0</li><li>magnétisation en cours -&gt; mot 2 (REV)</li><li>magnétisation en cours -&gt; mot 2 (REV)</li><li>magnétisation en cours -&gt; mot 2 (REV)</li><li>frein desserré -&gt; mot 2 (REV)</li><li>fréquence ~24Hz</li><li>mouvement REV maintenu</li><li>fréquence pleine ~30Hz</li></ul>
+                <ul class="checks-list"><li>frein non desserré -&gt; mot 0</li><li>magnétisation en cours -&gt; mot 0 (frein encore serré)</li><li>frein relâché -&gt; mot 2 (REV)</li><li>magnétisation en cours -&gt; mot 2 (REV)</li><li>frein desserré -&gt; mot 2 (REV)</li><li>fréquence ~24Hz</li><li>mouvement REV maintenu</li><li>fréquence pleine ~30Hz</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — FB_T.REQUESTEDDRIVECONTROLWORD expected 2, got 0</div><div class='failure-loc'>test_fb_translation.st:520</div><div class='failure-msg'>magnétisation en cours -&gt; mot 2 (REV)</div><div class='failure-diff'>attendu <code class='val-expected'>2</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
                 
             </div>
         </article>
@@ -2543,9 +2589,9 @@ test_fb_safety_translation.st
                 
             </div>
         </article>
-        <article id="test-fb-translation-32" class="test-card test-card-fail">
+        <article id="test-fb-translation-32" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6) </h3>
                 <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
@@ -2554,14 +2600,14 @@ test_fb_safety_translation.st
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
-                <ul class="scenario-list"><li>Monter à 50% FWD (6 scans)</li><li>Fdc Trémie atteinte pendant mouvement FWD -&gt; Fault.Error -&gt; coupure</li></ul>
+                <ul class="scenario-list"><li>Monter à 50% FWD (6 scans)</li><li>Fdc Trémie atteinte pendant mouvement FWD avec rotation active (10Hz) -&gt; Ton 1.5s -&gt; Fault.Error -&gt; coupure</li></ul>
             </details>
                 
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
                 <ul class="checks-list"><li>mouvement FWD établi</li><li>Fdc Trémie -&gt; défaut</li><li>défaut -&gt; mot 0</li><li>défaut -&gt; freq 0</li><li>défaut -&gt; frein non desserré</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB_T.FAULT.ERROR expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_translation.st:1188</div><div class='failure-msg'>Fdc Trémie -&gt; défaut</div></div>
+                
                 
             </div>
         </article>
@@ -2605,9 +2651,9 @@ test_fb_safety_translation.st
                 
             </div>
         </article>
-        <article id="test-fb-translation-35" class="test-card test-card-fail">
+        <article id="test-fb-translation-35" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise </h3>
                 <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
@@ -2623,13 +2669,13 @@ test_fb_safety_translation.st
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
                 <ul class="checks-list"><li>TremiePermit=TRUE -&gt; mot 1 (FWD)</li><li>TremiePermit=TRUE -&gt; freq &gt; 0</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0</div><div class='failure-loc'>test_fb_translation.st:1240</div><div class='failure-msg'>TremiePermit=TRUE -&gt; mot 1 (FWD)</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
                 
             </div>
         </article>
-        <article id="test-fb-translation-36" class="test-card test-card-fail">
+        <article id="test-fb-translation-36" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise </h3>
                 <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
@@ -2645,7 +2691,7 @@ test_fb_safety_translation.st
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
                 <ul class="checks-list"><li>MaintenancePermit=TRUE -&gt; mot 2 (REV)</li><li>MaintenancePermit=TRUE -&gt; freq &gt; 0</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — FB_T.REQUESTEDDRIVECONTROLWORD expected 2, got 0</div><div class='failure-loc'>test_fb_translation.st:1257</div><div class='failure-msg'>MaintenancePermit=TRUE -&gt; mot 2 (REV)</div><div class='failure-diff'>attendu <code class='val-expected'>2</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
                 
             </div>
         </article>
@@ -4127,10 +4173,7 @@ test_fb_translation.st
   [PASS] TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff
   [PASS] TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop
   [PASS] TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie)
-         ASSERT_EQ failed: FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0
-         at test_fb_translation.st:200
-         Message: mouvement Fwd -&gt; mot 1
-  [FAIL] TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)
+  [PASS] TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)
   [PASS] TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub)
   [PASS] TC-P11-006 Watchdog frein 500ms : frontiere 499/500
   [PASS] TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation
@@ -4140,14 +4183,8 @@ test_fb_translation.st
   [PASS] TC-P11-011.1 Meca B variante perte IHM : condition elargie
   [PASS] TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut
   [PASS] TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub)
-         ASSERT_EQ failed: FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0
-         at test_fb_translation.st:466
-         Message: magnétisation en cours -&gt; mot 1 (FWD)
-  [FAIL] TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence)
-         ASSERT_EQ failed: FB_T.REQUESTEDDRIVECONTROLWORD expected 2, got 0
-         at test_fb_translation.st:520
-         Message: magnétisation en cours -&gt; mot 2 (REV)
-  [FAIL] TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine
+  [PASS] TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence)
+  [PASS] TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine
   [PASS] TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé
   [PASS] TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle)
   [PASS] TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide)
@@ -4161,23 +4198,14 @@ test_fb_translation.st
   [PASS] TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe)
   [PASS] TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop
   [PASS] TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal)
-         ASSERT_TRUE failed: FB_T.FAULT.ERROR expected TRUE, got FALSE
-         at test_fb_translation.st:1188
-         Message: Fdc Trémie -&gt; défaut
-  [FAIL] TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6)
+  [PASS] TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6)
   [PASS] TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0)
   [PASS] TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe)
-         ASSERT_EQ failed: FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0
-         at test_fb_translation.st:1240
-         Message: TremiePermit=TRUE -&gt; mot 1 (FWD)
-  [FAIL] TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise
-         ASSERT_EQ failed: FB_T.REQUESTEDDRIVECONTROLWORD expected 2, got 0
-         at test_fb_translation.st:1257
-         Message: MaintenancePermit=TRUE -&gt; mot 2 (REV)
-  [FAIL] TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise
+  [PASS] TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise
+  [PASS] TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise
 
 -----------------------------------------
-37 tests, 31 passed, 6 failed
+37 tests, 37 passed, 0 failed
 </pre>
     </details>
     <div id="fb-section-fb_translationoutputinterlock" class="fb-section-title" style="scroll-margin-top:20px;">

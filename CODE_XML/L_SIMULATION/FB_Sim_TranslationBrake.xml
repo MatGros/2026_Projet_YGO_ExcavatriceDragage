@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-16T00:09:11.737597" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-16T00:09:11.737597">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_Sim_TranslationBrake" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ReleaseCmd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ActualFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="OpenDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+            </variable>
+            <variable name="CloseDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.09" />
+              </initialValue>
+            </variable>
+            <variable name="ContactDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="CycleTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CoilEnergized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MechanicallyOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ContactOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="MechanicalTimer_S">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ContactTimer_S">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CST_StopFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Chaine bobine, effet mecanique et contact frein M3.</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Ready := FALSE;
+    CoilEnergized := FALSE;
+    MechanicallyOpen := FALSE;
+    ContactOpen := FALSE;
+    MechanicalTimer_S := 0.0;
+    ContactTimer_S := 0.0;
+    RETURN;
+END_IF;
+
+CoilEnergized := ReleaseCmd;
+IF CoilEnergized THEN
+    IF NOT MechanicallyOpen THEN
+        MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
+        IF MechanicalTimer_S &gt;= MAX(0.0, OpenDelay_S) THEN
+            MechanicallyOpen := TRUE;
+            MechanicalTimer_S := 0.0;
+        END_IF;
+    ELSE
+        MechanicalTimer_S := 0.0;
+    END_IF;
+ELSIF ActualFrequency_Hz &lt;= CST_StopFrequency_Hz THEN
+    IF MechanicallyOpen THEN
+        MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
+        IF MechanicalTimer_S &gt;= MAX(0.0, CloseDelay_S) THEN
+            MechanicallyOpen := FALSE;
+            MechanicalTimer_S := 0.0;
+        END_IF;
+    ELSE
+        MechanicalTimer_S := 0.0;
+    END_IF;
+ELSE
+    MechanicalTimer_S := 0.0;
+END_IF;
+IF MechanicallyOpen &lt;&gt; ContactOpen THEN
+    ContactTimer_S := ContactTimer_S + CycleTime_S;
+    IF ContactTimer_S &gt;= MAX(0.0, ContactDelay_S) THEN
+        ContactOpen := MechanicallyOpen;
+        ContactTimer_S := 0.0;
+    END_IF;
+ELSE
+    ContactTimer_S := 0.0;
+END_IF;
+Ready := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>df996876-0665-532f-9bbb-9be3ca7669e4</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="L_SIMULATION">
+          <Object Name="FB_Sim_TranslationBrake" ObjectId="df996876-0665-532f-9bbb-9be3ca7669e4" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
