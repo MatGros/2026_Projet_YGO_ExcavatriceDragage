@@ -118,10 +118,10 @@ Si cette frontière n'est pas tenue, le problème qu'on voulait résoudre est re
 TOOLS/TWINBENCH/
 ├── README.md                          ← ce fichier
 ├── DOC/
-│   ├── SPEC_01_Modele_Composants.md   ✅ écrit (T304)
-│   ├── SPEC_02_Interface_Frame.md     ⏳ reprend TEST_AUTO_CI/DIGITAL_TWIN/
-│   ├── SPEC_03_Vues_2D.md             ⏳ après POC
-│   └── SPEC_04_Tracabilite_AF.md      ⏳ après POC
+│   ├── SPEC_01_Modele_Composants.md               ✅ écrit
+│   ├── SPEC_02_Interface_Frame.md                 ⏳ reprend TEST_AUTO_CI/DIGITAL_TWIN/
+│   ├── SPEC_03_Interface_Devoilement_Progressif.md ✅ écrit — 🔴 LIGNE ROUGE UX
+│   └── SPEC_04_Tracabilite_AF.md                  ⏳ après POC
 ├── LIB/                               bibliothèque de TYPES réutilisables
 │   ├── actuators/  winch · gearmotor · brake · cylinder
 │   ├── sensors/    limit_switch · encoder · probe
@@ -137,8 +137,20 @@ TOOLS/TWINBENCH/
 └── out/             🗑️ sorties générées — JAMAIS recopiées dans CODE/ par l'outil
 ```
 
-> ⚠️ `SPEC_02..04` sont volontairement **non écrites** avant le POC. Écrire une spec avant
-> d'avoir éprouvé le format, c'est fabriquer de la dette documentaire.
+> ⚠️ `SPEC_02` et `SPEC_04` sont volontairement **non écrites** avant que le POC en ait besoin.
+> Écrire une spec avant d'avoir éprouvé le format, c'est fabriquer de la dette documentaire.
+> `SPEC_03` fait exception : elle pose une contrainte d'interface **avant** tout code d'IHM,
+> parce que la reprendre après coup coûte une refonte, pas un ajustement.
+
+### 🔴 Ligne rouge — dévoilement progressif de l'interface
+
+> Épuré et intuitif au premier regard — une machine qui bouge, rien d'autre. Toute la
+> puissance (électrique, dynamique, thermique, balayages, invariants) reste atteignable,
+> jamais imposée : elle se révèle en cliquant sur les objets. Détail des règles et de leur
+> contrôle : [`DOC/SPEC_03_Interface_Devoilement_Progressif.md`](DOC/SPEC_03_Interface_Devoilement_Progressif.md).
+>
+> État actuel : la vue du POC **viole cette règle** (tableau de bord chargé dès l'ouverture) —
+> c'est un lecteur de trace de mise au point, la refonte reste à faire.
 
 ---
 
