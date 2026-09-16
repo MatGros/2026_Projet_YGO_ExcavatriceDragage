@@ -1,6 +1,6 @@
 # 🧊 TwinBench — banc de simulation & jumeau numérique
 
-> **Statut** : 🚧 POC en cours (tâche `T300`) — aucune brique n'est encore en production.
+> **Statut** : 🚧 POC en cours (tâche `T304`) — aucune brique n'est encore en production.
 > **Périmètre** : `TOOLS/TWINBENCH/` uniquement. **N'écrit jamais dans `CODE/`.**
 
 ---
@@ -72,7 +72,7 @@ Si cette frontière n'est pas tenue, le problème qu'on voulait résoudre est re
 TOOLS/TWINBENCH/
 ├── README.md                          ← ce fichier
 ├── DOC/
-│   ├── SPEC_01_Modele_Composants.md   ✅ écrit (T300)
+│   ├── SPEC_01_Modele_Composants.md   ✅ écrit (T304)
 │   ├── SPEC_02_Interface_Frame.md     ⏳ reprend TEST_AUTO_CI/DIGITAL_TWIN/
 │   ├── SPEC_03_Vues_2D.md             ⏳ après POC
 │   └── SPEC_04_Tracabilite_AF.md      ⏳ après POC
@@ -111,5 +111,5 @@ TOOLS/TWINBENCH/
 ## 📚 Documents liés
 
 - [`DOC/SPEC_01_Modele_Composants.md`](DOC/SPEC_01_Modele_Composants.md) — le format `.twin.yaml`
-- `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T300_POC_TWINBENCH_JOYSTICK_M3.yaml` — contrat du POC
+- `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T304_POC_TWINBENCH_JOYSTICK_M3.yaml` — contrat du POC
 - `AGENTS.md` — consignes agent du projet (source unique)
