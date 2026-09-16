@@ -1,0 +1,92 @@
+# ══════════════════════════════════════════════════════════════════
+# TYPE : chaine de cames de position — GENERIQUE
+# UN SEUL composant, pas N detecteurs independants : les cames
+# produisent un MOT dont seules certaines valeurs sont coherentes.
+# Une valeur hors liste est un defaut systeme, pas un defaut capteur.
+# ══════════════════════════════════════════════════════════════════
+type: cam_chain
+version: 0.1
+af_class: sensor
+
+ports:
+  in:  { axis_position_m: REAL }
+  out: { word: BYTE, cams: "[BOOL]", at_low_limit: BOOL, at_high_limit: BOOL,
+         incoherent: BOOL }
+
+params:
+
+  # ── Geometrie des cames ─────────────────────────────────────────
+  cams:
+    class: machine
+    type: "[{name, position_m, cam_length_m, bit}]"
+    required: true
+    doc: >
+      Une came a une LONGUEUR physique, pas une position ponctuelle : c'est
+      elle qui fixe la duree de detection a une vitesse donnee, et donc si
+      l'automate peut la voir a son temps de scan.
+  encoding:
+    class: machine
+    type: STRING
+    default: monotonic_progressive
+    enum: [monotonic_progressive, independent_zones, gray]
+    doc: "progressive : chaque came reste active tant qu'elle n'est pas depassee"
+  valid_words:
+    class: machine
+    type: "[BYTE]"
+    required: true
+    doc: "liste EXHAUSTIVE des mots coherents ; tout autre mot leve incoherent"
+
+  # ── Technologie de detection ────────────────────────────────────
+  technology:         { class: machine, type: STRING, default: inductive,
+                        enum: [inductive, mechanical, magnetic, optical] }
+  sensing_range_mm:   { class: machine, type: REAL, default: 8 }
+  hysteresis_mm:      { class: machine, type: REAL, default: 1.5,
+                        doc: "evite le bagotement en bordure de came" }
+  response_time_ms:   { class: machine, type: REAL, default: 2,
+                        spread_pct: 30 }
+  repeatability_mm:   { class: machine, type: REAL, default: 0.5,
+                        doc: "dispersion du point de commutation d'un passage a l'autre" }
+  mounting_offset_mm: { class: config,  type: REAL, default: 0.0,
+                        doc: "reglage mecanique ; derive avec les vibrations" }
+
+  # ── Cablage / polarite ──────────────────────────────────────────
+  polarity:           { class: machine, type: STRING, default: normally_open,
+                        enum: [normally_open, normally_closed],
+                        doc: "NC = 1 quand libre : la rupture de fil se voit" }
+  wire_break_detectable:
+                      { class: machine, type: BOOL, default: false }
+
+  # ── Contrainte de detectabilite ─────────────────────────────────
+  min_detect_scans:
+    class: config
+    type: INT
+    default: 2
+    doc: >
+      Nombre minimal de scans automate pendant lesquels la came doit etre vue.
+      Contrainte DERIVEE : cam_length_m / vitesse doit depasser
+      min_detect_scans * scan_ms. A grande vitesse, une came courte peut etre
+      MANQUEE — defaut classique, invisible en simulation ideale.
+
+faults:
+  - stuck_low          # came jamais vue
+  - stuck_high         # came toujours vue
+  - delayed
+  - chatter            # bagotement en bordure
+  - misaligned         # came dereglee : commute au mauvais endroit
+  - wire_break
+  - word_incoherent    # deux cames incompatibles : defaut systeme
+
+invariants:
+  - id: INV_CAM_WORD_VALID
+    statement: "le mot capteurs appartient toujours a valid_words"
+    severity: safety
+  - id: INV_CAM_DETECTABLE
+    statement: "toute came est vue au moins min_detect_scans a la vitesse maximale"
+    severity: safety
+
+inspect:
+  - { key: word,          label: Mot capteurs,   kind: bits }
+  - { key: cams,          label: Cames,          kind: bool_list }
+  - { key: at_low_limit,  label: Extreme bas,    kind: bool }
+  - { key: at_high_limit, label: Extreme haut,   kind: bool }
+  - { key: incoherent,    label: Mot incoherent, kind: bool, severity: crit }

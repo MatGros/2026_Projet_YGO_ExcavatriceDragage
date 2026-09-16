@@ -1,0 +1,116 @@
+# ══════════════════════════════════════════════════════════════════
+# TYPE : variateur de frequence (VFD) — GENERIQUE
+# Toute valeur ci-dessous est un PLACEHOLDER : provenance guessed,
+# verification unverified. Le schema est le livrable, pas les chiffres.
+# ══════════════════════════════════════════════════════════════════
+type: vfd
+version: 0.2
+af_class: drive
+
+ports:
+  in:
+    freq_setpoint_hz: REAL
+    run_fwd:          BOOL
+    run_rev:          BOOL
+    fault_reset:      BOOL
+    enable:           BOOL
+  out:
+    actual_freq_hz:   REAL        # publie en UINT x100 cote automate
+    status_word:      WORD
+    output_current_a: REAL
+    output_torque_pct: REAL
+    device_state:     ENUM
+
+params:
+
+  # ── Plage de frequence ──────────────────────────────────────────
+  freq_min_hz:        { class: config,  type: REAL, default: 0.0 }
+  freq_max_hz:        { class: config,  type: REAL, required: true,
+                        doc: "plafond applicatif ; distinct de la freq nominale moteur" }
+  freq_stop_threshold_hz:
+                      { class: config,  type: REAL, default: 0.5,
+                        doc: "en dessous, le moteur est considere a l'arret" }
+  freq_resolution_hz: { class: machine, type: REAL, default: 0.01 }
+
+  # ── Rampes — le coeur du realisme dynamique ─────────────────────
+  accel_time_s:       { class: config,  type: REAL, required: true,
+                        doc: "temps 0 -> freq_max_hz" }
+  decel_time_s:       { class: config,  type: REAL, required: true,
+                        doc: "asymetrique en pratique : rarement egal a accel" }
+  ramp_shape:         { class: config,  type: STRING, default: linear,
+                        enum: [linear, s_curve], doc: "courbe en S = jerk limite" }
+  s_curve_jerk_pct:   { class: config,  type: REAL, default: 0.0 }
+  quickstop_time_s:   { class: config,  type: REAL,
+                        doc: "rampe d'arret rapide, distincte de decel" }
+
+  # ── Comportement a l'arret et au defaut ─────────────────────────
+  stop_mode:          { class: config,  type: STRING, default: ramp,
+                        enum: [ramp, coast, dc_injection] }
+  fault_stop_mode:    { class: config,  type: STRING, default: coast,
+                        enum: [ramp, coast],
+                        doc: "ce que fait le variateur en defaut : DECISIF pour la surcourse" }
+  dc_inject_level_pct: { class: config, type: REAL, default: 0.0 }
+  dc_inject_time_s:   { class: config,  type: REAL, default: 0.0 }
+
+  # ── Limites electriques ─────────────────────────────────────────
+  rated_current_a:    { class: machine, type: REAL, required: true }
+  current_limit_pct:  { class: config,  type: REAL, default: 150 }
+  overload_pct:       { class: machine, type: REAL, default: 150,
+                        doc: "surcharge admissible pendant overload_time_s" }
+  overload_time_s:    { class: machine, type: REAL, default: 60 }
+  supply_voltage_v:   { class: machine, type: REAL, required: true }
+  undervoltage_trip_v: { class: machine, type: REAL }
+  overvoltage_trip_v: { class: machine, type: REAL }
+
+  # ── Freinage ────────────────────────────────────────────────────
+  braking_resistor:   { class: machine, type: BOOL, default: false,
+                        doc: "sans resistance, une decel trop courte declenche en surtension bus" }
+  braking_power_w:    { class: machine, type: REAL }
+
+  # ── Temps de reponse (non-idealites) ────────────────────────────
+  command_latency_ms: { class: machine, type: REAL, default: 20,
+                        spread: [10, 40], doc: "ordre automate -> action variateur" }
+  status_refresh_ms:  { class: machine, type: REAL, default: 50,
+                        spread: [30, 80], doc: "rafraichissement du status word sur le bus" }
+  freq_feedback_lag_ms: { class: machine, type: REAL, default: 40 }
+
+  # ── Couplage moteur ─────────────────────────────────────────────
+  control_mode:       { class: config,  type: STRING, default: v_over_f,
+                        enum: [v_over_f, sensorless_vector, closed_loop] }
+  slip_compensation:  { class: config,  type: BOOL, default: false,
+                        doc: "sans compensation, la freq reelle s'ecarte sous charge" }
+
+status_word_bits:
+  0:  ready
+  1:  running
+  2:  at_speed
+  3:  fault
+  4:  warning
+  5:  current_limit
+  6:  dc_bus_ok
+  7:  direction_rev
+
+faults:
+  - overcurrent            # surintensite instantanee
+  - overload_i2t           # surcharge thermique cumulee
+  - undervoltage
+  - overvoltage            # typiquement decel trop courte sans resistance
+  - overtemperature
+  - comm_loss              # perte bus : le variateur ne recoit plus de consigne
+  - stuck_at_speed         # le variateur ignore la consigne d'arret
+  - freq_feedback_frozen   # retour fige : l'automate croit l'axe arrete
+
+degradation:
+  - id: DEG_DRIVE_THERMAL
+    kind: thermal
+    reversible: true
+    charge:   { law: i2t, tau_heat_s: 120 }
+    recovery: { law: exponential, tau_cool_s: 600 }
+
+inspect:
+  - { key: freq_setpoint_hz, label: Consigne,        unit: Hz,  fmt: "0.00" }
+  - { key: actual_freq_hz,   label: Freq. reelle,    unit: Hz,  fmt: "0.00" }
+  - { key: output_current_a, label: Courant,         unit: A,   fmt: "0.0" }
+  - { key: output_torque_pct, label: Couple,         unit: "%", fmt: "0" }
+  - { key: status_word,      label: Status word,     kind: bits }
+  - { key: device_state,     label: Etat device,     kind: enum }

@@ -1,0 +1,95 @@
+# ══════════════════════════════════════════════════════════════════
+# TYPE : frein a manque de courant — GENERIQUE
+# Equipement A PART ENTIERE, jamais un sous-composant de moteur :
+# sa protection thermique peut etre MUTUALISEE entre plusieurs axes,
+# ce qu'un modele imbrique dans un moteur ne sait pas representer.
+# ══════════════════════════════════════════════════════════════════
+type: brake
+version: 0.2
+af_class: actuator
+
+ports:
+  in:  { release_cmd: BOOL, shaft_speed_rpm: REAL }
+  out: { is_released: BOOL, holding_torque_nm: REAL, thermal_ok: BOOL }
+
+params:
+
+  # ── Couple ──────────────────────────────────────────────────────
+  rated_holding_torque_nm:
+                      { class: machine, type: REAL, required: true,
+                        doc: "doit couvrir le couple de charge AVEC marge ; sinon l'axe derive frein serre" }
+  dynamic_torque_pct: { class: machine, type: REAL, default: 80,
+                        doc: "couple en freinage dynamique, inferieur au statique" }
+  torque_derate_when_hot_pct:
+                      { class: machine, type: REAL, default: 70 }
+
+  # ── Temps — asymetriques, et c'est essentiel ────────────────────
+  release_time_ms:    { class: machine, type: REAL, required: true,
+                        spread_pct: 25,
+                        doc: "desserrage : retarde le demarrage" }
+  engage_time_ms:     { class: machine, type: REAL, required: true,
+                        spread_pct: 25,
+                        doc: "serrage : pendant ce temps la charge DESCEND/DERIVE encore" }
+  feedback_delay_ms:  { class: machine, type: REAL, default: 15,
+                        doc: "retard du contact de retour par rapport a l'etat mecanique reel" }
+
+  # ── Electrique (bobine) ─────────────────────────────────────────
+  coil_voltage_v:     { class: machine, type: REAL, required: true }
+  coil_inrush_a:      { class: machine, type: REAL,
+                        doc: "appel a l'enclenchement, typiquement ~10x le maintien" }
+  coil_holding_a:     { class: machine, type: REAL }
+  freewheel_circuit:  { class: machine, type: STRING, default: none,
+                        enum: [none, diode, rc, varistor],
+                        doc: "sans ecretage, chaque coupure erode l'organe de pilotage (effet self)" }
+
+  # ── Usure et thermique ──────────────────────────────────────────
+  energy_per_stop_j:  { class: machine, type: REAL,
+                        doc: "energie dissipee par freinage dynamique" }
+  thermal_capacity_j: { class: machine, type: REAL }
+  thermal_tau_cool_s: { class: machine, type: REAL }
+  lining_life_j:      { class: machine, type: REAL,
+                        doc: "energie cumulee admissible avant remplacement de garniture" }
+  max_operations:     { class: machine, type: INT,
+                        doc: "endurance mecanique en nombre de manoeuvres" }
+  airgap_wear_mm:     { class: machine, type: REAL,
+                        doc: "l'entrefer croit avec l'usure et allonge release_time_ms" }
+
+  # ── Mutualisation ───────────────────────────────────────────────
+  thermal_shared_with:
+                      { class: machine, type: "[STRING]", default: [],
+                        doc: "instances partageant le meme retour thermique ; une surchauffe les affecte TOUTES" }
+
+faults:
+  - stuck_released       # ne serre plus : la charge part en roue libre
+  - stuck_engaged        # ne desserre plus : le moteur force contre le frein
+  - torque_degraded      # garniture usee ou grasse : derive sous charge
+  - feedback_stuck       # le retour ment sur l'etat reel
+  - coil_open
+
+degradation:
+  - id: DEG_LINING_THERMAL
+    kind: thermal
+    reversible: true
+    charge:   { law: energy_accumulation, per_event: energy_per_stop_j }
+    recovery: { law: exponential, tau: thermal_tau_cool_s }
+    scope: shared          # suit thermal_shared_with
+
+  - id: DEG_LINING_WEAR
+    kind: energy
+    reversible: false
+    state: cumulated_energy_j
+    limit: lining_life_j
+    effect: { on: release_time_ms, law: increase_with_airgap }
+
+  - id: DEG_PILOT_EROSION
+    kind: operations
+    reversible: false
+    limit: max_operations
+    aggravated_when: { freewheel_circuit: none }
+
+inspect:
+  - { key: is_released,       label: Desserre,        kind: bool }
+  - { key: holding_torque_nm, label: Couple tenu,     unit: Nm, fmt: "0" }
+  - { key: thermal_pct,       label: Etat thermique,  unit: "%", kind: gauge }
+  - { key: operations,        label: Manoeuvres,      kind: counter }
+  - { key: thermal_ok,        label: Thermique OK,    kind: bool }
