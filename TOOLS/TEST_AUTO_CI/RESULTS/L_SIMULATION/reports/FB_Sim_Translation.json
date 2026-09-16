@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "file": "test_fb_sim_translation.st",
+  "results": [
+    {
+      "name": "TC-T300-TR-001 Etat sur desactive est P1 sans mouvement",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-SEN-010 Les deux extremites publient les mots thermometres valides",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-SEN-011 Le capteur PV commute au franchissement vers Tremie",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-DRV-020 Rampe terrain 20 Hz par seconde",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-BRK-025 Frein temporise et retour distinct",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-MEC-010 Le chariot suit la frequence et excite la charge",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-MEC-030 Commandes contradictoires restent neutres",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-SEN-030 Episode capteur intermittent rejouable avant stabilisation",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-CAM-100 Matrice 48 scenarios par 100 graines respecte invariants",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0
+  }
+}

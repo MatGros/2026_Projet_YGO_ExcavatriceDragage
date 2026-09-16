@@ -5,9 +5,11 @@ contract:
   planning_deliverables:
     plan: DOC/WFLOW/CONTRACTS/PLAN_T300_SIMBENCH_M3_SENSOR_DYNAMICS.md
     audit: DOC/WFLOW/CONTRACTS/AUDIT_T300_TC_CI.md
+    interfaces: DOC/WFLOW/CONTRACTS/INTERFACES_T300_SIMBENCH_M3.md
+    test_design: DOC/WFLOW/CONTRACTS/TEST_DESIGN_T300_SIMBENCH_M3.md
     phase_contracts: 'P0-P5 dans le plan : entrées, livrables, critères de sortie et revues R0-R5.'
     measurement_baseline: 'Q01-Q14 du plan font foi pour les mesures ; propositions à figer à R2 avant ST.'
-    current_authority: 'Planification et audit statique uniquement ; code, TC et runner inchangés.'
+    current_authority: 'Implementation T300 dans le scope autorise : briques simulation, TC, garde-fou CI et exports ; aucune modification de protection, AU, mapping materiel ou sortie physique.'
   objective: >
     Reproduire en SimBench le franchissement intermittent des capteurs M3 et le
     balancement amorti observé aux fins de course extrêmes, pour qualifier sans
@@ -59,13 +61,13 @@ contract:
       statement: "La boucle M3 lit les sorties finales post-interlock et réinjecte les retours uniquement via HwSim puis HwIn. Les stimuli boutons passent par une frontière opérateur explicite ; aucune sélection directe via GVL_Simulation dans le métier."
       verified_by: "Cartographie des producteurs/consommateurs, garde-fou source et test ordre amont bloqué sans nouvelle excitation mécanique."
     - id: AC15
-      statement: "Les revues R0-R2 valident 100 % des paramètres bloquants et des seuils Q01-Q14 avant implémentation ; 0 attendu modifié uniquement pour faire passer le code."
+      statement: "Avant implémentation, 100 % des paramètres sont classés TERRAIN, ESTIME ou SYNTHETIQUE et les seuils logiciels Q01-Q14 sont gelés ; les inconnues matérielles bloquent la qualification de fidélité, pas les essais d'un profil synthétique déclaré. Aucun attendu n'est modifié uniquement pour faire passer le code."
       verified_by: "Manifestes exigences/tests versionnés, visas de review et journal motivé de changements d oracles."
     - id: AC16
       statement: "Le modèle distingue ordre, état électrique, effet mécanique et retour contact du frein ; chaque délai respecte Q03 et chaque PDO Q04."
       verified_by: "Chronogrammes magnétisation/desserrage/serrage et cas de panne après identification technologie R0."
     - id: AC17
-      statement: "Le lot de conception livre 6 contrats de phase, 14 critères Q mesurables, un audit sourcé et un échéancier avec dépendances ; aucune source CODE ni suite CI ne change."
+      statement: "Le lot T300 livre les contrats de phase, critères Q, audit, échéancier, briques ST, tests et garde-fous CI dans le scope autorisé ; tout changement hors scope est signalé et aucun artefact tiers n'est supprimé."
       verified_by: "Revue plan/audit, validation YAML et diff des chemins modifiés."
   scope:
     # Noms des nouvelles briques proposés ; interfaces à valider avant ST.
@@ -79,6 +81,8 @@ contract:
       - CODE/L_SIMULATION/GVL_Simulation.st
       - CODE/M_MAIN/PRG_02_Acquisition.st
       - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st
       - TOOLS/TEST_AUTO_CI/
       - TOOLS/AGENT_WORKFLOW/scripts/
       - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
@@ -87,11 +91,12 @@ contract:
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T300_SIMBENCH_M3_SENSOR_DYNAMICS.yaml
       - DOC/WFLOW/CONTRACTS/PLAN_T300_SIMBENCH_M3_SENSOR_DYNAMICS.md
       - DOC/WFLOW/CONTRACTS/AUDIT_T300_TC_CI.md
+      - DOC/WFLOW/CONTRACTS/INTERFACES_T300_SIMBENCH_M3.md
+      - DOC/WFLOW/CONTRACTS/TEST_DESIGN_T300_SIMBENCH_M3.md
       - CODE_XML/CODE_Bundle.xml
       - CODE_XML/CODE_DiffBundle.xml
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
-      - CODE/M_MAIN/PRG_06_Outputs.st
       - CODE/I_TRANSLATION/FB_Safety_Translation.st
       - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
       - Modification de protections, mappings matériel, AU ou sorties physiques sans contrat distinct approuvé.
@@ -117,15 +122,23 @@ contract:
     Une hypothèse synthétique est permise si explicitement marquée non calibrée ;
     elle ne constitue pas une mesure terrain. Faire valider le plan avant ST.
     Ne jamais filtrer le comportement pour rendre les protections vertes.
-status: PENDING
+status: IN_PROGRESS
 execution:
-  executed_by: ""
+  executed_by: "Codex"
   completed_at: ""
-  status: PENDING
-  summary: "Conception et audit statique livrés ; implémentation non commencée. Phases P0-P5 et critères Q01-Q14 référencés dans planning_deliverables."
-  evidence_submitted: []
+  status: ALERT_RAISED
+  summary: "Implementation synthetique V1 en cours : dynamique drive/frein/charge et capteur cumulatif a hysteresis avec episode intermittent, publies exclusivement via SimBench et HwSim/HwIn. La campagne 48x100 est une exploration synthetique bornee, pas 4800 scenarios terrain independants ; les parametres materiels AC600, frein, transmission et geometrie exacte ainsi que la fidelite terrain restent non identifies. AC4/AC4bis exigent encore une trace runtime de la chaine complete."
+  evidence_submitted:
+    - "FB_Sim_Translation: PASS 9/9, dont TC-T300-SEN-011 (commutation PV au franchissement vers Tremie) et TC-T300-CAM-100 : exploration synthetique 48 profils x 100 graines, 960000 pas ; invariants bornes et thermometriques seulement (derniere execution fraiche)"
+    - "FB_Sim_TranslationDrive: PASS 3/3, dont TC-T300-DRV-050 au pas 100 ms ; FB_Sim_TranslationBrake: PASS 2/2 ; FB_Sim_SuspendedLoad: PASS 3/3, dont convergence 10 ms / 5 ms"
+    - "FB_Sim_PositionSensor: PASS 4/4, dont campagne deterministe 100 graines (derniere execution fraiche)"
+    - "FB_SimBench: PASS 26/26, dont TC-T300-INT-030 : SimBench -> copie image HwIn representative -> FB_Translation_PositionDecoder production, et TC-T300-INT-031 : perte/reprise/stabilisation P1 dynamique dans cette chaine representative (dernière exécution fraîche)"
+    - "FB_Safety_Translation: PASS 5/5, dont TC-T300-SAF-060/061 ; le test 061 caracterise le bit0 actif du mot variateur avec frequence nulle."
+    - "G200: PASS, L1-L7 129 OK / 0 KO ; L12 7 OK / 0 KO ; L13 82 OK / 0 KO"
+    - "G502: PASS ; garde-fou statique SimBench M3 : sorties post-interlock -> SimBench -> HwSim -> HwIn -> miroir GVL_IHM.IoHw, sans injection DI metier. Il ne remplace pas la preuve runtime AC4/AC4bis."
+    - "Bundle et diff bundle frais : 254/254 objets ; import CODESYS et trace humaine encore requis"
 validation:
   status: PENDING
   validated_by: ""
   validated_at: ""
-  notes: "Plan technique et paramètres terrain requis avant toute écriture ST."
+  notes: "Validation humaine CODESYS et trace runtime HwSim -> HwIn -> instPosDecoderM3 -> TranslationState requises avant qualification de fidelite ou cloture T300. Ecart NC-030 restant : les interfaces publiques historiques doivent faire l objet d une migration atomique vers des suffixes d unites normalises, hors modification opportuniste."

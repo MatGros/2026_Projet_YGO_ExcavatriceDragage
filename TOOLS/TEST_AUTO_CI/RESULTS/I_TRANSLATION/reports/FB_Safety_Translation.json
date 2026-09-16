@@ -13,11 +13,19 @@
     {
       "name": "TC-P11-SAF-003 Surchauffe thermique frein -> SafeStop + PowerCutOff (defaut dur)",
       "passed": true
+    },
+    {
+      "name": "TC-T300-SAF-060 Arret FDC sans requete persistante ne declenche pas l escalade",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-SAF-061 Requete persistante au FDC escalade meme frequence nulle",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 5,
+    "passed": 5,
     "failed": 0
   }
 }

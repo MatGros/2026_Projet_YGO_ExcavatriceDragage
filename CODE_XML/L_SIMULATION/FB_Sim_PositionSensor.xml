@@ -1,0 +1,304 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-16T00:09:09.772095" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-16T00:09:09.772095">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_Sim_PositionSensor" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Position_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Threshold_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Hysteresis_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+            </variable>
+            <variable name="ActiveBelowThreshold">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+            <variable name="ElectricalDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
+            <variable name="IntermittenceActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="IntermittenceDurationS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="IntermittencePeriodS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.12" />
+              </initialValue>
+            </variable>
+            <variable name="ScenarioSeed">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="RawDetected">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ElectricalOutput">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EpisodeActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TransitionCount">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="EpisodeTogglePeriodS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreviousRawDetected">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EpisodeTarget">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DelayTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="EpisodeTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ToggleTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="RandomState">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Capteur de position cumulatif avec hysteresis et episode intermittent rejouable.
+   Cette brique ne connait ni le mouvement ni la logique M3 : elle transforme uniquement
+   une position mecanique vraie en DI.</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Initialized := FALSE;
+    RawDetected := FALSE;
+    ElectricalOutput := FALSE;
+    PreviousRawDetected := FALSE;
+    EpisodeActive := FALSE;
+    DelayTimerS := 0.0;
+    EpisodeTimerS := 0.0;
+    ToggleTimerS := 0.0;
+    TransitionCount := 0;
+    EpisodeTogglePeriodS := 0.0;
+    RETURN;
+END_IF;
+
+(* Hysteresis sur une frontiere cumulative : les cinq DI restent compatibles avec
+   le mot thermometre du decodeur M3, contrairement a cinq fenetres independantes. *)
+IF NOT Initialized THEN
+    IF ActiveBelowThreshold THEN
+        RawDetected := Position_M &lt;= Threshold_M;
+    ELSE
+        RawDetected := Position_M &gt;= Threshold_M;
+    END_IF;
+    ElectricalOutput := RawDetected;
+    PreviousRawDetected := RawDetected;
+    RandomState := ScenarioSeed MOD 1000000;
+    IF RandomState = 0 THEN
+        RandomState := 1;
+    END_IF;
+    EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS);
+    Initialized := TRUE;
+    RETURN;
+END_IF;
+
+IF ActiveBelowThreshold THEN
+    IF RawDetected THEN
+        RawDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    ELSE
+        RawDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    END_IF;
+ELSE
+    IF RawDetected THEN
+        RawDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    ELSE
+        RawDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    END_IF;
+END_IF;
+
+(* Un episode est declenche par un franchissement mecanique, pas par une de ses
+   propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)
+IF RawDetected &lt;&gt; PreviousRawDetected THEN
+    PreviousRawDetected := RawDetected;
+    EpisodeTarget := RawDetected;
+    (* Une bascule mecanique pendant l'episode modifie seulement la cible finale.
+       Elle ne remet jamais son chronometre a zero : l'episode reste borne. *)
+    IF NOT EpisodeActive THEN
+        DelayTimerS := 0.0;
+        EpisodeTimerS := 0.0;
+        ToggleTimerS := 0.0;
+        (* Tirage unique par episode : reproductible pour une graine et sans bruit
+           blanc scan-par-scan. La periode varie de 70 % a 130 % du nominal. *)
+        RandomState := RandomState + 7919;
+        IF RandomState &gt;= 1000000 THEN
+            RandomState := RandomState - 1000000;
+        END_IF;
+        EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS
+            * (0.7 + UDINT_TO_REAL(RandomState MOD 6000) / 10000.0));
+        EpisodeActive := IntermittenceActive AND (IntermittenceDurationS &gt; 0.0);
+    END_IF;
+END_IF;
+
+IF EpisodeActive THEN
+    EpisodeTimerS := EpisodeTimerS + CycleTimeS;
+    ToggleTimerS := ToggleTimerS + CycleTimeS;
+    IF ToggleTimerS &gt;= EpisodeTogglePeriodS THEN
+        ElectricalOutput := NOT ElectricalOutput;
+        ToggleTimerS := 0.0;
+        TransitionCount := TransitionCount + 1;
+    END_IF;
+    IF EpisodeTimerS &gt;= IntermittenceDurationS THEN
+        EpisodeActive := FALSE;
+        IF ElectricalOutput &lt;&gt; EpisodeTarget THEN
+            ElectricalOutput := EpisodeTarget;
+            TransitionCount := TransitionCount + 1;
+        END_IF;
+        DelayTimerS := 0.0;
+    END_IF;
+ELSIF ElectricalOutput &lt;&gt; RawDetected THEN
+    DelayTimerS := DelayTimerS + CycleTimeS;
+    IF DelayTimerS &gt;= MAX(0.0, ElectricalDelayS) THEN
+        ElectricalOutput := RawDetected;
+        DelayTimerS := 0.0;
+        TransitionCount := TransitionCount + 1;
+    END_IF;
+ELSE
+    DelayTimerS := 0.0;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>538b32eb-6dc2-59d5-8226-64383264fe4b</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="L_SIMULATION">
+          <Object Name="FB_Sim_PositionSensor" ObjectId="538b32eb-6dc2-59d5-8226-64383264fe4b" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

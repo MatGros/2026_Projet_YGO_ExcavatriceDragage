@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "file": "test_fb_simbench.st",
+  "results": [
+    {
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-001 Sim_Safety : neutralisation sans Enable",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-010 SimBench Enable=FALSE neutralise tout le banc",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-014 SimBench initialise les codeurs absolus vierges a son activation",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel \u2014 stub)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-INT-010 SimBench M3 publie le retour dynamique du drive",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-INT-030 Image SimBench relaye les DI M3 au decodeur production",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-INT-031 Intermittence P1 dynamique relayee au decodeur production",
+      "passed": true
+    },
+    {
+      "name": "T196-003 Capteur haut manuel et polarite Free_DI correcte",
+      "passed": true
+    },
+    {
+      "name": "T196-004 Capteur haut auto : for\u00e7age manuel SimTopPositionActive",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-022 Sim_Safety Enable=FALSE neutralise tout",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-023 Sim_Safety latch AU non lie a la sim (essai manuel \u2014 stub)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-030 Sim_Encoder RelayFwd/Rev font compter RawPos",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-031 Sim_Encoder PresetCmd charge PresetValue",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-033 Sim_Encoder RawPos survit a un reset froid (essai manuel \u2014 stub)",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-INT-020 Sim_Translation initialise le mot P1",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-INT-021 Sim_Translation neutralise deux sens simultanes",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-INT-022 Sim_Translation borne et publie la fin de course Maintenance",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-INT-023 Sim_Translation desactive se replie P1",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-050 Sim_Joystick initialise au neutre au premier cycle",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-051 Sim_Joystick sorties for\u00e7ables en instance (essai manuel \u2014 stub)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO)",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 26,
+    "passed": 26,
+    "failed": 0
+  }
+}

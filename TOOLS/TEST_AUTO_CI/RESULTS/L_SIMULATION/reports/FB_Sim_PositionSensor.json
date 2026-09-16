@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "file": "test_fb_sim_position_sensor.st",
+  "results": [
+    {
+      "name": "TC-T300-SEN-010 Hysteresis cumulative conserve le mot thermometre",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-SEN-030 Episode intermittent est borne et rejoint la position",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-SEN-031 Recroisements mecaniques ne reinitialisent pas episode",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-SEN-040 Cent graines deterministes bornent la stabilisation",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0
+  }
+}

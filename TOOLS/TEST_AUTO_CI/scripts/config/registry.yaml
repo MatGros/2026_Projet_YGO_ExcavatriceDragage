@@ -444,6 +444,7 @@ FB_SimBench:
   - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
   - CODE/G_CYCLE/_TYPES/E_OperatorAxis.st
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st
+  - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_CycleDepthStopMode.st
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleHMI.st
@@ -469,20 +470,7 @@ FB_SimBench:
   - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickCmd.st
   - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickHMI.st
   - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickState.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_ChainDredgingAssist.st
   - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleAssistToggles.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDiveSearchCfg.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDiveSearchCmd.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDiveSearchHMI.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDiveSearchState.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDumpAtTremieCfg.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDumpAtTremieCmd.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDumpAtTremieHMI.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDumpAtTremieState.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleExtractionCfg.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleExtractionCmd.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleExtractionHMI.st
-  - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleExtractionState.st
   - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_ChainContextGlobal.st
   - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_HomingChecklist.st
   - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_IOModuleDiag.st
@@ -505,7 +493,12 @@ FB_SimBench:
   - CODE/L_SIMULATION/FB_Sim_Encoder.st
   - CODE/L_SIMULATION/FB_Sim_Joystick.st
   - CODE/L_SIMULATION/FB_Sim_Safety.st
+  - CODE/L_SIMULATION/FB_Sim_TranslationDrive.st
+  - CODE/L_SIMULATION/FB_Sim_TranslationBrake.st
+  - CODE/L_SIMULATION/FB_Sim_SuspendedLoad.st
+  - CODE/L_SIMULATION/FB_Sim_PositionSensor.st
   - CODE/L_SIMULATION/FB_Sim_Translation.st
+  - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st
   - CODE/L_SIMULATION/FB_SimBench.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_simbench.st
 FB_Hmi_BannerFormatter:
@@ -1601,5 +1594,33 @@ FB_Sim_Translation:
   af_doc: DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md
   sources:
   - CODE/A_COMMUN/FB_CycleTime.st
+  - CODE/L_SIMULATION/FB_Sim_TranslationDrive.st
+  - CODE/L_SIMULATION/FB_Sim_TranslationBrake.st
+  - CODE/L_SIMULATION/FB_Sim_SuspendedLoad.st
+  - CODE/L_SIMULATION/FB_Sim_PositionSensor.st
   - CODE/L_SIMULATION/FB_Sim_Translation.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_translation.st
+FB_Sim_PositionSensor:
+  domain: L_SIMULATION
+  af_doc: DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md
+  sources:
+  - CODE/L_SIMULATION/FB_Sim_PositionSensor.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_position_sensor.st
+FB_Sim_TranslationDrive:
+  domain: L_SIMULATION
+  af_doc: DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md
+  sources:
+  - CODE/L_SIMULATION/FB_Sim_TranslationDrive.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_translation_drive.st
+FB_Sim_TranslationBrake:
+  domain: L_SIMULATION
+  af_doc: DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md
+  sources:
+  - CODE/L_SIMULATION/FB_Sim_TranslationBrake.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_translation_brake.st
+FB_Sim_SuspendedLoad:
+  domain: L_SIMULATION
+  af_doc: DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md
+  sources:
+  - CODE/L_SIMULATION/FB_Sim_SuspendedLoad.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_suspended_load.st

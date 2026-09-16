@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T00:21:57.779681" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T00:21:57.779681">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-16T18:02:52.982193" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-16T18:02:52.982193">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3325,6 +3325,13 @@ instSimBench(
                                 AND PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend,
     SimM3SensorsWordOverrideActive := GVL_Simulation.SimM3SensorsWordOverrideActive,
     SimM3SensorsWord               := GVL_Simulation.SimM3SensorsWord,
+    SimM3SensorIntermittenceActive  := GVL_Simulation.SimM3SensorIntermittenceActive,
+    SimM3SensorStabilizationS       := GVL_Simulation.SimM3SensorStabilizationS,
+    SimM3SensorElectricalDelayS     := GVL_Simulation.SimM3SensorElectricalDelayS,
+    SimM3SensorIntermittencePeriodS := GVL_Simulation.SimM3SensorIntermittencePeriodS,
+    SimM3SensorHysteresis_M         := GVL_Simulation.SimM3SensorHysteresis_M,
+    SimM3SensorLoadAngleTriggerRad  := GVL_Simulation.SimM3SensorLoadAngleTriggerRad,
+    SimM3SensorScenarioSeed         := GVL_Simulation.SimM3SensorScenarioSeed,
     SimJoystickLeft_Rev_TREMIE_Active  := GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active,
     SimJoystickRight_Fwd_MAINT_Active  := GVL_Simulation.SimJoystickRight_Fwd_MAINT_Active,
     SimJoystickFwd_Up_Close_Active     := GVL_Simulation.SimJoystickFwd_Up_Close_Active,
@@ -7319,6 +7326,83 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Mot capteurs M3 forcé</xhtml>
               </documentation>
             </variable>
+            <variable name="SimM3SensorIntermittenceActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Episode perte/reprise DI M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorStabilizationS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Duree episode capteur M3, s</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorElectricalDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai electrique capteur M3, s</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorIntermittencePeriodS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.12" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Periode des bascules episode, s</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorHysteresis_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Hysteresis seuils capteurs M3, m</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorLoadAngleTriggerRad">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Angle charge minimal episode, rad</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorScenarioSeed">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="3001" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Graine episode capteurs M3</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimJoystickLeft_Rev_TREMIE_Active">
               <type>
                 <BOOL />
@@ -8038,7 +8122,15 @@ instSimTranslation(
     ReqTremie       := M3_RelayFwd,
     ReqMaintenance  := M3_RelayRev,
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
-    FullTravelTimeS := CST_M3FullTravelTimeS
+    FullTravelTimeS := CST_M3FullTravelTimeS,
+    BrakeReleaseCmd := M3_BrakeCmd,
+    SensorIntermittenceActive := SimM3SensorIntermittenceActive,
+    SensorStabilizationS := SimM3SensorStabilizationS,
+    SensorElectricalDelayS := SimM3SensorElectricalDelayS,
+    SensorIntermittencePeriodS := SimM3SensorIntermittencePeriodS,
+    SensorHysteresis_M := SimM3SensorHysteresis_M,
+    SensorLoadAngleTriggerRad := SimM3SensorLoadAngleTriggerRad,
+    SensorScenarioSeed := SimM3SensorScenarioSeed
 );
 
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
@@ -8057,8 +8149,8 @@ ELSE
     Translation.M3_PosMaintenance_DI := instSimTranslation.PosMaintenance;
 END_IF;
 
-// Polarité frein M3 (1 = OUVERT)
-Translation.M3_BrakeIsOpen_DI    := M3_BrakeCmd;
+// Retour auxiliaire du frein, distinct de la commande electrique.
+Translation.M3_BrakeIsOpen_DI    := instSimTranslation.BrakeContactOpen;
 
 // Thermique moteur/variateur AC600 — pas de panne simulée, toujours OK (comme Winch.M1/M2_ThermalOk_DI)
 Translation.M3_ThermalOK_DI      := TRUE;
@@ -8069,13 +8161,12 @@ Translation.M3_ThermalOK_DI      := TRUE;
 // un Bit0 forcé à 1 en continu à l'arrêt déclencherait un PowerCutOff simulé permanent après 3s.
 // DrivePowerReady (diagnostic IHM seul, non consommé par un interlock) est le seul autre lecteur,
 // aucune régression de mouvement possible.
-IF M3_RelayFwd OR M3_RelayRev THEN
+IF instSimTranslation.ActualFrequency_Hz &gt; 0.5 THEN
     M3_StatusWordSim := 16#0087; // + Operating/Running
-    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedCmd_Pct * 50.0); // 50.0 Hz à 100% (x100 -&gt; 5000)
 ELSE
     M3_StatusWordSim := 16#0080; // Comm Ready seul -- Bit0 retombé, arrêt confirmé
-    M3_ActualFreqHz  := 0;
 END_IF;
+M3_ActualFreqHz := REAL_TO_UINT(instSimTranslation.ActualFrequency_Hz * 100.0);
 
 Translation.M3_StatusWord        := M3_StatusWordSim;
 Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
@@ -11366,33 +11457,21 @@ SimContactorOk := ContactorLatch;
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = modèle actif</xhtml>
-              </documentation>
             </variable>
             <variable name="ReqTremie">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Trémie</xhtml>
-              </documentation>
             </variable>
             <variable name="ReqMaintenance">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Maintenance</xhtml>
-              </documentation>
             </variable>
             <variable name="SpeedTgt_Pct">
               <type>
                 <REAL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Magnitude commande 0..100 %, bornée avant calcul</xhtml>
-              </documentation>
             </variable>
             <variable name="FullTravelTimeS">
               <type>
@@ -11401,9 +11480,158 @@ SimContactorOk := ContactorLatch;
               <initialValue>
                 <simpleValue value="8" />
               </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps complet Trémie→Maintenance à 100 %, simulation seulement</xhtml>
-              </documentation>
+            </variable>
+            <variable name="BrakeReleaseCmd">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+            <variable name="AccelRate_HzPerS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+            </variable>
+            <variable name="DecelRate_HzPerS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+            </variable>
+            <variable name="DriveTimeConstantS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.15" />
+              </initialValue>
+            </variable>
+            <variable name="BrakeOpenDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+            </variable>
+            <variable name="BrakeCloseDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.09" />
+              </initialValue>
+            </variable>
+            <variable name="BrakeContactDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="SuspendedLoadLength_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+            </variable>
+            <variable name="SuspendedLoadDamping">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.35" />
+              </initialValue>
+            </variable>
+            <variable name="LoadReactionGain_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.2" />
+              </initialValue>
+            </variable>
+            <variable name="LoadFrequencyDroopGain_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+            </variable>
+            <variable name="SensorJitterAmplitude_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="SensorStabilizationS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="SensorElectricalDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="SensorIntermittenceActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SensorLoadAngleTriggerRad">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="SensorScenarioSeed">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="3001" />
+              </initialValue>
+            </variable>
+            <variable name="SensorHysteresis_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+            </variable>
+            <variable name="SensorIntermittencePeriodS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.12" />
+              </initialValue>
             </variable>
           </inputVars>
           <outputVars>
@@ -11411,41 +11639,91 @@ SimContactorOk := ContactorLatch;
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bit4 du mot capteurs</xhtml>
-              </documentation>
             </variable>
             <variable name="PosPV">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bit3 du mot capteurs</xhtml>
-              </documentation>
             </variable>
             <variable name="PosP2">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bit2 du mot capteurs (point matériel PVP2)</xhtml>
-              </documentation>
             </variable>
             <variable name="PosP1">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bit1 du mot capteurs</xhtml>
-              </documentation>
             </variable>
             <variable name="PosMaintenance">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bit0 du mot capteurs</xhtml>
-              </documentation>
+            </variable>
+            <variable name="FrequencyCmd_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ElectricalFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ActualFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="BrakeCoilEnergized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BrakeMechanicallyOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BrakeContactOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PositionTrue_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="VelocityTrue_Mps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="LoadAngle_Rad">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="SensorPosition_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="SensorTransitionCount">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="HardStopTremieActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HardStopMaintenanceActive">
+              <type>
+                <BOOL />
+              </type>
             </variable>
           </outputVars>
           <localVars>
@@ -11453,44 +11731,104 @@ SimContactorOk := ContactorLatch;
               <type>
                 <derived name="FB_CycleTime" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Mesure temps de cycle</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PositionProgress">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] 0 m=Trémie ... 30 m=Maintenance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedPctBounded">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse bornée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PositionIncrement">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Incrément de progression</xhtml>
-              </documentation>
             </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
               </type>
+            </variable>
+            <variable name="DirectionSign">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="FrequencyTarget_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="SpeedAt40Hz_Mps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="VelocityTarget_Mps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CartAcceleration_Mps2">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="PreviousVelocity_Mps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="PositionCandidate_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="SensorNoiseState">
+              <type>
+                <REAL />
+              </type>
               <initialValue>
-                <simpleValue value="FALSE" />
+                <simpleValue value="0.371" />
               </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Initialisation</xhtml>
-              </documentation>
+            </variable>
+            <variable name="SensorNoise_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="instSensorTremie">
+              <type>
+                <derived name="FB_Sim_PositionSensor" />
+              </type>
+            </variable>
+            <variable name="instSensorPV">
+              <type>
+                <derived name="FB_Sim_PositionSensor" />
+              </type>
+            </variable>
+            <variable name="instSensorP2">
+              <type>
+                <derived name="FB_Sim_PositionSensor" />
+              </type>
+            </variable>
+            <variable name="instSensorP1">
+              <type>
+                <derived name="FB_Sim_PositionSensor" />
+              </type>
+            </variable>
+            <variable name="instSensorMaintenance">
+              <type>
+                <derived name="FB_Sim_PositionSensor" />
+              </type>
+            </variable>
+            <variable name="instDrive">
+              <type>
+                <derived name="FB_Sim_TranslationDrive" />
+              </type>
+            </variable>
+            <variable name="instBrake">
+              <type>
+                <derived name="FB_Sim_TranslationBrake" />
+              </type>
+            </variable>
+            <variable name="instSuspendedLoad">
+              <type>
+                <derived name="FB_Sim_SuspendedLoad" />
+              </type>
             </variable>
             <variable name="CST_PositionAtTremie">
               <type>
@@ -11499,9 +11837,17 @@ SimContactorOk := ContactorLatch;
               <initialValue>
                 <simpleValue value="0" />
               </initialValue>
+            </variable>
+            <variable name="CST_PositionAtTremieSensor_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.05" />
+              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Positions réelles des 5 capteurs (mètres) — convention 0 m=Trémie, 30 m=Maintenance.
-Distances NON-linéaires : 0→5 (PV), 5→15 (P2), 15→20 (P1), 20→30 (Maintenance).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Meme principe a Tremie : le seuil DI est legerement avant la butee afin
+       que l'hysteresis puisse commuter sans depassement numerique de course.</xhtml>
               </documentation>
             </variable>
             <variable name="CST_PositionAtPV">
@@ -11536,136 +11882,222 @@ Distances NON-linéaires : 0→5 (PV), 5→15 (P2), 15→20 (P1), 20→30 (Maint
                 <simpleValue value="30" />
               </initialValue>
             </variable>
-            <variable name="CST_TotalDistanceM">
+            <variable name="CST_PositionAtMaintenanceSensor_M">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="30" />
+                <simpleValue value="29.95" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance totale Trémie→Maintenance (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Le capteur cumulatif Maintenance doit commuter avant la butee mecanique,
+       sinon un modele borne a 30 m ne peut jamais produire le mot 00000. Cette
+       position est SYNTHETIQUE en attente de la mesure de la came reelle.</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_MinFullTravelTimeS">
+            <variable name="CST_NominalFrequency_Hz">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.1" />
+                <simpleValue value="40" />
               </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Protection division : modèle sans dynamique sous ce seuil</xhtml>
-              </documentation>
+            </variable>
+            <variable name="CST_MinTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.001" />
+              </initialValue>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Translation — Progression capteurs simulés M3
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Produit les cinq capteurs de position M3 par progression continue
-      de Trémie vers Maintenance. Le modèle ne publie que les six mots valides
-      de FB_Translation_PositionDecoder : 11111 → 01111 → 00111 → 00011 →
-      00001 → 00000.
-(* ═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Translation — Progression capteurs simulés M3
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Produit les cinq capteurs de position M3 par progression continue
-      de Trémie vers Maintenance. Le modèle ne publie que les six mots valides
-      de FB_Translation_PositionDecoder : 11111 → 01111 → 00111 → 00011 →
-      00001 → 00000.
-   📏 Convention : PositionProgress en mètres, 0 m = Trémie … 30 m = Maintenance.
-      Distances NON-linéaires : Trémie(0)→PV(5)=5 m, PV(5)→P2(15)=10 m,
-      P2(15)→P1(20)=5 m, P1(20)→Maintenance(30)=10 m.
-   🔒 Le modèle est une source d'entrée confinée derrière HwIn ; il ne pilote
-      aucune sortie réelle. Un override manuel valide est appliqué par
-      FB_SimBench, pas par ce FB.
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-             DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
-   ═══════════════════════════════════════════════════════════════</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Modele dynamique M3 confine au SimBench.</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === IMPLEMENTATION ===
+instCycleTime(DefaultValueS := 0.010);
+(* Le modele mono-pas suit le temps de cycle reel jusqu'a 100 ms. Cette borne
+   evite de ralentir artificiellement la dynamique lorsque la trace est executee
+   dans VISU_TASK (environ 100 ms), tout en restant stable pour le pendule reduit.
+   Au-dela, FB_CycleTime fournit deja son temps de secours et aucun saut aberrant
+   n'est accepte. La qualification des delais sub-100 ms exige toutefois une tache
+   de trace plus rapide que 100 ms. *)
+CycleTimeS := LIMIT(0.001, instCycleTime.CycleTimeS, 0.100);
 
-{region "§1 Gate"}
 IF NOT Enable THEN
-    // Démarrage déterministe au P1 (20 m) = position de travail : mot capteurs 00011
-    // (P1 + Maintenance faits). Evite qu'un boot sim en 00000 (tout FALSE) fasse croire
-    // au decodeur "extreme Maintenance" et bloque le verrou descente treuil (T249-A).
-    PositionProgress := CST_PositionAtP1;
     Initialized := FALSE;
+    instDrive(Enable := FALSE);
+    instBrake(Enable := FALSE);
+    instSuspendedLoad(Enable := FALSE);
+    FrequencyCmd_Hz := 0.0;
+    ElectricalFrequency_Hz := 0.0;
+    ActualFrequency_Hz := 0.0;
+    BrakeMechanicallyOpen := FALSE;
+    BrakeContactOpen := FALSE;
+    BrakeCoilEnergized := FALSE;
+    PositionTrue_M := CST_PositionAtP1;
+    VelocityTrue_Mps := 0.0;
+    PreviousVelocity_Mps := 0.0;
+    LoadAngle_Rad := 0.0;
+    SensorTransitionCount := 0;
+    HardStopTremieActive := FALSE;
+    HardStopMaintenanceActive := FALSE;
+    (* Repli deterministe compatible avec le mot thermometre P1 = 00011. *)
     PosTremie := FALSE;
     PosPV := FALSE;
     PosP2 := FALSE;
     PosP1 := TRUE;
     PosMaintenance := TRUE;
+    instSensorTremie(Enable := FALSE);
+    instSensorPV(Enable := FALSE);
+    instSensorP2(Enable := FALSE);
+    instSensorP1(Enable := FALSE);
+    instSensorMaintenance(Enable := FALSE);
     RETURN;
-END_IF;
-{endregion}
-
-{region "§2 Initialisation"}
-IF NOT Initialized THEN
-    PositionProgress := CST_PositionAtP1;   // etat de depart = position de travail P1 (voir §1)
+ELSIF NOT Initialized THEN
     Initialized := TRUE;
+    PositionTrue_M := CST_PositionAtP1;
 END_IF;
-{endregion}
 
-{region "§3 Progression"}
-instCycleTime(DefaultValueS := 0.010);
-SpeedPctBounded := LIMIT(0.0, ABS(SpeedTgt_Pct), 100.0);
+IF Enable THEN
+    DirectionSign := 0.0;
+    IF ReqTremie AND NOT ReqMaintenance THEN
+        DirectionSign := -1.0;
+    ELSIF ReqMaintenance AND NOT ReqTremie THEN
+        DirectionSign := 1.0;
+    END_IF;
 
-// Une vitesse à 100 % parcourt les 30 m (Trémie→Maintenance) pendant FullTravelTimeS.
-// Les demandes de sens sont des bits explicites ; une demande contradictoire est neutre.
-IF FullTravelTimeS &gt;= CST_MinFullTravelTimeS THEN
-    PositionIncrement := (SpeedPctBounded / 100.0)
-                         * (CST_TotalDistanceM / FullTravelTimeS)
-                         * instCycleTime.CycleTimeS;
+    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * 0.4, CST_NominalFrequency_Hz);
+    IF DirectionSign = 0.0 THEN
+        FrequencyTarget_Hz := 0.0;
+    END_IF;
+    instDrive(Enable := TRUE, FrequencyTgt_Hz := FrequencyTarget_Hz,
+        AccelRate_HzPerS := AccelRate_HzPerS, DecelRate_HzPerS := DecelRate_HzPerS,
+        TimeConstant_S := DriveTimeConstantS,
+        LoadAngularVelocity_RadPerS := instSuspendedLoad.AngularVelocity_RadPerS,
+        LoadFrequencyDroopGain_Hz := LoadFrequencyDroopGain_Hz, CycleTime_S := CycleTimeS);
+    FrequencyCmd_Hz := instDrive.FrequencyCmd_Hz;
+    ElectricalFrequency_Hz := instDrive.ElectricalFrequency_Hz;
+    ActualFrequency_Hz := instDrive.ActualFrequency_Hz;
+    instBrake(Enable := TRUE, ReleaseCmd := BrakeReleaseCmd,
+        ActualFrequency_Hz := ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
+        CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
+        CycleTime_S := CycleTimeS);
+    BrakeCoilEnergized := instBrake.CoilEnergized;
+    BrakeMechanicallyOpen := instBrake.MechanicallyOpen;
+    BrakeContactOpen := instBrake.ContactOpen;
+
+    PreviousVelocity_Mps := VelocityTrue_Mps;
+    IF (FullTravelTimeS &gt; CST_MinTimeS) AND BrakeMechanicallyOpen THEN
+        SpeedAt40Hz_Mps := CST_PositionAtMaintenance / FullTravelTimeS;
+        VelocityTarget_Mps := DirectionSign * SpeedAt40Hz_Mps * ActualFrequency_Hz / CST_NominalFrequency_Hz;
+    ELSE
+        VelocityTarget_Mps := 0.0;
+    END_IF;
+    VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
+    IF NOT BrakeMechanicallyOpen THEN
+        VelocityTrue_Mps := 0.0;
+    END_IF;
+    HardStopTremieActive := FALSE;
+    HardStopMaintenanceActive := FALSE;
+    PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
+    IF PositionCandidate_M &lt; CST_PositionAtTremie THEN
+        PositionTrue_M := CST_PositionAtTremie;
+        VelocityTrue_Mps := 0.0;
+        HardStopTremieActive := TRUE;
+    ELSIF PositionCandidate_M &gt; CST_PositionAtMaintenance THEN
+        PositionTrue_M := CST_PositionAtMaintenance;
+        VelocityTrue_Mps := 0.0;
+        HardStopMaintenanceActive := TRUE;
+    END_IF;
+    CartAcceleration_Mps2 := (VelocityTrue_Mps - PreviousVelocity_Mps) / CycleTimeS;
+    instSuspendedLoad(Enable := TRUE, BrakeMechanicallyOpen := BrakeMechanicallyOpen,
+        CartAcceleration_Mps2 := CartAcceleration_Mps2, Length_M := SuspendedLoadLength_M,
+        Damping := SuspendedLoadDamping, ReactionGain_Mps2 := LoadReactionGain_Mps2,
+        CycleTime_S := CycleTimeS);
+    LoadAngle_Rad := instSuspendedLoad.Angle_Rad;
+    IF HardStopTremieActive OR HardStopMaintenanceActive THEN
+        VelocityTrue_Mps := 0.0;
+    ELSE
+        VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+        PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
+        IF PositionCandidate_M &lt; CST_PositionAtTremie THEN
+            PositionTrue_M := CST_PositionAtTremie;
+            VelocityTrue_Mps := 0.0;
+            HardStopTremieActive := TRUE;
+        ELSIF PositionCandidate_M &gt; CST_PositionAtMaintenance THEN
+            PositionTrue_M := CST_PositionAtMaintenance;
+            VelocityTrue_Mps := 0.0;
+            HardStopMaintenanceActive := TRUE;
+        ELSE
+            PositionTrue_M := PositionCandidate_M;
+        END_IF;
+    END_IF;
+END_IF;
+
+IF Enable AND (ABS(LoadAngle_Rad) &gt; 0.0001) THEN
+    SensorNoiseState := 3.91 * SensorNoiseState * (1.0 - SensorNoiseState);
+    SensorNoise_M := (2.0 * SensorNoiseState - 1.0) * SensorJitterAmplitude_M;
 ELSE
-    PositionIncrement := 0.0;
+    SensorNoise_M := 0.0;
 END_IF;
+(* Les capteurs sont fixes au rail et observent le chariot. Le balancier agit
+   seulement par la reaction mecanique sur PositionTrue_M et conditionne un
+   episode electrique ; aucune deflexion de godet n'est injectee directement. *)
+SensorPosition_M := PositionTrue_M + SensorNoise_M;
+(* Les capteurs M3 sont volontairement cumulatifs : 11111 -&gt; 00000. Chaque
+   brique garde son hysteresis et son episode propres ; aucun timer partage ne
+   peut masquer un front d'un autre capteur. *)
+instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtTremieSensor_M, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 11,
+    CycleTimeS := CycleTimeS);
+instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtPV, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 23,
+    CycleTimeS := CycleTimeS);
+instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtP2, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 37,
+    CycleTimeS := CycleTimeS);
+instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtP1, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 53,
+    CycleTimeS := CycleTimeS);
+instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtMaintenanceSensor_M, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 71,
+    CycleTimeS := CycleTimeS);
 
-IF ReqTremie AND NOT ReqMaintenance THEN
-    PositionProgress := MAX(CST_PositionAtTremie, PositionProgress - PositionIncrement);
-ELSIF ReqMaintenance AND NOT ReqTremie THEN
-    PositionProgress := MIN(CST_PositionAtMaintenance, PositionProgress + PositionIncrement);
-END_IF;
-{endregion}
-
-{region "§4 Publication capteurs"}
-// Réinitialisation explicite : aucune valeur transitoire héritée d'une zone précédente.
-PosTremie := FALSE;
-PosPV := FALSE;
-PosP2 := FALSE;
-PosP1 := FALSE;
-PosMaintenance := FALSE;
-
-// Chaque intervalle correspond à un seul mot thermomètre valide.
-IF PositionProgress &lt;= CST_PositionAtTremie THEN
-    PosTremie := TRUE;
-    PosPV := TRUE;
-    PosP2 := TRUE;
-    PosP1 := TRUE;
-    PosMaintenance := TRUE;
-ELSIF PositionProgress &lt;= CST_PositionAtPV THEN
-    PosPV := TRUE;
-    PosP2 := TRUE;
-    PosP1 := TRUE;
-    PosMaintenance := TRUE;
-ELSIF PositionProgress &lt;= CST_PositionAtP2 THEN
-    PosP2 := TRUE;
-    PosP1 := TRUE;
-    PosMaintenance := TRUE;
-ELSIF PositionProgress &lt;= CST_PositionAtP1 THEN
-    PosP1 := TRUE;
-    PosMaintenance := TRUE;
-ELSIF PositionProgress &lt; CST_PositionAtMaintenance THEN
-    PosMaintenance := TRUE;
-END_IF;
-{endregion}
+PosTremie := instSensorTremie.ElectricalOutput;
+PosPV := instSensorPV.ElectricalOutput;
+PosP2 := instSensorP2.ElectricalOutput;
+PosP1 := instSensorP1.ElectricalOutput;
+PosMaintenance := instSensorMaintenance.ElectricalOutput;
+SensorTransitionCount := instSensorTremie.TransitionCount + instSensorPV.TransitionCount
+    + instSensorP2.TransitionCount + instSensorP1.TransitionCount
+    + instSensorMaintenance.TransitionCount;
 </xhtml>
           </ST>
         </body>
@@ -11825,6 +12257,737 @@ TimeLast := TimeCurrent;
           </data>
         </addData>
       </pou>
+      <pou name="FB_Sim_PositionSensor" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Position_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Threshold_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Hysteresis_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+            </variable>
+            <variable name="ActiveBelowThreshold">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+            <variable name="ElectricalDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
+            <variable name="IntermittenceActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="IntermittenceDurationS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="IntermittencePeriodS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.12" />
+              </initialValue>
+            </variable>
+            <variable name="ScenarioSeed">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="RawDetected">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ElectricalOutput">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EpisodeActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TransitionCount">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="EpisodeTogglePeriodS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreviousRawDetected">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EpisodeTarget">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DelayTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="EpisodeTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ToggleTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="RandomState">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Capteur de position cumulatif avec hysteresis et episode intermittent rejouable.
+   Cette brique ne connait ni le mouvement ni la logique M3 : elle transforme uniquement
+   une position mecanique vraie en DI.</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Initialized := FALSE;
+    RawDetected := FALSE;
+    ElectricalOutput := FALSE;
+    PreviousRawDetected := FALSE;
+    EpisodeActive := FALSE;
+    DelayTimerS := 0.0;
+    EpisodeTimerS := 0.0;
+    ToggleTimerS := 0.0;
+    TransitionCount := 0;
+    EpisodeTogglePeriodS := 0.0;
+    RETURN;
+END_IF;
+
+(* Hysteresis sur une frontiere cumulative : les cinq DI restent compatibles avec
+   le mot thermometre du decodeur M3, contrairement a cinq fenetres independantes. *)
+IF NOT Initialized THEN
+    IF ActiveBelowThreshold THEN
+        RawDetected := Position_M &lt;= Threshold_M;
+    ELSE
+        RawDetected := Position_M &gt;= Threshold_M;
+    END_IF;
+    ElectricalOutput := RawDetected;
+    PreviousRawDetected := RawDetected;
+    RandomState := ScenarioSeed MOD 1000000;
+    IF RandomState = 0 THEN
+        RandomState := 1;
+    END_IF;
+    EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS);
+    Initialized := TRUE;
+    RETURN;
+END_IF;
+
+IF ActiveBelowThreshold THEN
+    IF RawDetected THEN
+        RawDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    ELSE
+        RawDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    END_IF;
+ELSE
+    IF RawDetected THEN
+        RawDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    ELSE
+        RawDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    END_IF;
+END_IF;
+
+(* Un episode est declenche par un franchissement mecanique, pas par une de ses
+   propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)
+IF RawDetected &lt;&gt; PreviousRawDetected THEN
+    PreviousRawDetected := RawDetected;
+    EpisodeTarget := RawDetected;
+    (* Une bascule mecanique pendant l'episode modifie seulement la cible finale.
+       Elle ne remet jamais son chronometre a zero : l'episode reste borne. *)
+    IF NOT EpisodeActive THEN
+        DelayTimerS := 0.0;
+        EpisodeTimerS := 0.0;
+        ToggleTimerS := 0.0;
+        (* Tirage unique par episode : reproductible pour une graine et sans bruit
+           blanc scan-par-scan. La periode varie de 70 % a 130 % du nominal. *)
+        RandomState := RandomState + 7919;
+        IF RandomState &gt;= 1000000 THEN
+            RandomState := RandomState - 1000000;
+        END_IF;
+        EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS
+            * (0.7 + UDINT_TO_REAL(RandomState MOD 6000) / 10000.0));
+        EpisodeActive := IntermittenceActive AND (IntermittenceDurationS &gt; 0.0);
+    END_IF;
+END_IF;
+
+IF EpisodeActive THEN
+    EpisodeTimerS := EpisodeTimerS + CycleTimeS;
+    ToggleTimerS := ToggleTimerS + CycleTimeS;
+    IF ToggleTimerS &gt;= EpisodeTogglePeriodS THEN
+        ElectricalOutput := NOT ElectricalOutput;
+        ToggleTimerS := 0.0;
+        TransitionCount := TransitionCount + 1;
+    END_IF;
+    IF EpisodeTimerS &gt;= IntermittenceDurationS THEN
+        EpisodeActive := FALSE;
+        IF ElectricalOutput &lt;&gt; EpisodeTarget THEN
+            ElectricalOutput := EpisodeTarget;
+            TransitionCount := TransitionCount + 1;
+        END_IF;
+        DelayTimerS := 0.0;
+    END_IF;
+ELSIF ElectricalOutput &lt;&gt; RawDetected THEN
+    DelayTimerS := DelayTimerS + CycleTimeS;
+    IF DelayTimerS &gt;= MAX(0.0, ElectricalDelayS) THEN
+        ElectricalOutput := RawDetected;
+        DelayTimerS := 0.0;
+        TransitionCount := TransitionCount + 1;
+    END_IF;
+ELSE
+    DelayTimerS := 0.0;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>538b32eb-6dc2-59d5-8226-64383264fe4b</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_SuspendedLoad" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BrakeMechanicallyOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CartAcceleration_Mps2">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Length_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+            </variable>
+            <variable name="Damping">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.35" />
+              </initialValue>
+            </variable>
+            <variable name="ReactionGain_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.2" />
+              </initialValue>
+            </variable>
+            <variable name="CycleTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Angle_Rad">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="AngularVelocity_RadPerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="VelocityReaction_Mps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="AngularAccel_RadPerS2">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CST_Gravity_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="9.81" />
+              </initialValue>
+            </variable>
+            <variable name="CST_MinLength_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+            </variable>
+            <variable name="CST_MaxAngle_Rad">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.6" />
+              </initialValue>
+            </variable>
+            <variable name="CST_MaxAngularVelocity_RadPerS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Pendule reduit : reaction sur chariot sans injection DI directe.</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Ready := FALSE;
+    Angle_Rad := 0.0;
+    AngularVelocity_RadPerS := 0.0;
+    VelocityReaction_Mps := 0.0;
+    RETURN;
+END_IF;
+
+VelocityReaction_Mps := 0.0;
+IF Length_M &gt; CST_MinLength_M THEN
+    AngularAccel_RadPerS2 := -(CST_Gravity_Mps2 / Length_M) * Angle_Rad
+        - MAX(0.0, Damping) * AngularVelocity_RadPerS
+        - CartAcceleration_Mps2 / Length_M;
+    AngularVelocity_RadPerS := LIMIT(-CST_MaxAngularVelocity_RadPerS,
+        AngularVelocity_RadPerS + AngularAccel_RadPerS2 * CycleTime_S, CST_MaxAngularVelocity_RadPerS);
+    Angle_Rad := LIMIT(-CST_MaxAngle_Rad, Angle_Rad + AngularVelocity_RadPerS * CycleTime_S,
+        CST_MaxAngle_Rad);
+    IF BrakeMechanicallyOpen THEN
+        VelocityReaction_Mps := ReactionGain_Mps2 * Angle_Rad * CycleTime_S;
+    END_IF;
+END_IF;
+Ready := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5e90360e-a4b1-5c07-88d0-97d04f31b674</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_TranslationBrake" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ReleaseCmd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ActualFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="OpenDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+            </variable>
+            <variable name="CloseDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.09" />
+              </initialValue>
+            </variable>
+            <variable name="ContactDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="CycleTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CoilEnergized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MechanicallyOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ContactOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="MechanicalTimer_S">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ContactTimer_S">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CST_StopFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Chaine bobine, effet mecanique et contact frein M3.</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Ready := FALSE;
+    CoilEnergized := FALSE;
+    MechanicallyOpen := FALSE;
+    ContactOpen := FALSE;
+    MechanicalTimer_S := 0.0;
+    ContactTimer_S := 0.0;
+    RETURN;
+END_IF;
+
+CoilEnergized := ReleaseCmd;
+IF CoilEnergized THEN
+    IF NOT MechanicallyOpen THEN
+        MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
+        IF MechanicalTimer_S &gt;= MAX(0.0, OpenDelay_S) THEN
+            MechanicallyOpen := TRUE;
+            MechanicalTimer_S := 0.0;
+        END_IF;
+    ELSE
+        MechanicalTimer_S := 0.0;
+    END_IF;
+ELSIF ActualFrequency_Hz &lt;= CST_StopFrequency_Hz THEN
+    IF MechanicallyOpen THEN
+        MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
+        IF MechanicalTimer_S &gt;= MAX(0.0, CloseDelay_S) THEN
+            MechanicallyOpen := FALSE;
+            MechanicalTimer_S := 0.0;
+        END_IF;
+    ELSE
+        MechanicalTimer_S := 0.0;
+    END_IF;
+ELSE
+    MechanicalTimer_S := 0.0;
+END_IF;
+IF MechanicallyOpen &lt;&gt; ContactOpen THEN
+    ContactTimer_S := ContactTimer_S + CycleTime_S;
+    IF ContactTimer_S &gt;= MAX(0.0, ContactDelay_S) THEN
+        ContactOpen := MechanicallyOpen;
+        ContactTimer_S := 0.0;
+    END_IF;
+ELSE
+    ContactTimer_S := 0.0;
+END_IF;
+Ready := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>df996876-0665-532f-9bbb-9be3ca7669e4</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_TranslationDrive" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FrequencyTgt_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="AccelRate_HzPerS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+            </variable>
+            <variable name="DecelRate_HzPerS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+            </variable>
+            <variable name="TimeConstant_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.15" />
+              </initialValue>
+            </variable>
+            <variable name="LoadAngularVelocity_RadPerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="LoadFrequencyDroopGain_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+            </variable>
+            <variable name="CycleTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FrequencyCmd_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ElectricalFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ActualFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ResponseAlpha">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="FrequencyDelta_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="FrequencyStep_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CST_MinTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.001" />
+              </initialValue>
+            </variable>
+            <variable name="CST_MaxFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="40" />
+              </initialValue>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Dynamique reduite du variateur M3, sans commande metier.</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Ready := FALSE;
+    FrequencyCmd_Hz := 0.0;
+    ElectricalFrequency_Hz := 0.0;
+    ActualFrequency_Hz := 0.0;
+    ResponseAlpha := 0.0;
+    RETURN;
+END_IF;
+
+FrequencyDelta_Hz := LIMIT(0.0, FrequencyTgt_Hz, CST_MaxFrequency_Hz) - FrequencyCmd_Hz;
+IF FrequencyDelta_Hz &gt;= 0.0 THEN
+    FrequencyStep_Hz := MAX(0.0, AccelRate_HzPerS) * CycleTime_S;
+ELSE
+    FrequencyStep_Hz := MAX(0.0, DecelRate_HzPerS) * CycleTime_S;
+END_IF;
+FrequencyCmd_Hz := FrequencyCmd_Hz + LIMIT(-FrequencyStep_Hz, FrequencyDelta_Hz, FrequencyStep_Hz);
+IF TimeConstant_S &gt; CST_MinTime_S THEN
+    ResponseAlpha := CycleTime_S / (TimeConstant_S + CycleTime_S);
+ELSE
+    ResponseAlpha := 1.0;
+END_IF;
+ElectricalFrequency_Hz := ElectricalFrequency_Hz
+    + ResponseAlpha * (FrequencyCmd_Hz - ElectricalFrequency_Hz);
+ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz
+    - MAX(0.0, LoadFrequencyDroopGain_Hz) * ABS(LoadAngularVelocity_RadPerS));
+IF ActualFrequency_Hz &lt; 0.005 THEN
+    ActualFrequency_Hz := 0.0;
+END_IF;
+Ready := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>03da2ca5-829e-5f35-a2f5-646da12c2d06</ObjectId>
+          </data>
+        </addData>
+      </pou>
     </pous>
   </types>
   <instances>
@@ -11883,6 +13046,10 @@ TimeLast := TimeCurrent;
           <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
           <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
+          <Object Name="FB_Sim_PositionSensor" ObjectId="538b32eb-6dc2-59d5-8226-64383264fe4b" />
+          <Object Name="FB_Sim_SuspendedLoad" ObjectId="5e90360e-a4b1-5c07-88d0-97d04f31b674" />
+          <Object Name="FB_Sim_TranslationBrake" ObjectId="df996876-0665-532f-9bbb-9be3ca7669e4" />
+          <Object Name="FB_Sim_TranslationDrive" ObjectId="03da2ca5-829e-5f35-a2f5-646da12c2d06" />
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">

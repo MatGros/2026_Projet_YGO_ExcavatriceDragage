@@ -485,7 +485,9 @@ GVL_IHM.Emergency.State.ArmPulse_Cmd  := PRG_06_Outputs.EmergencyArmingCmd;
 // par PRG_02/PRG_06. Aucun champ GVL_IHM.IoHw n'est consommé comme commande.
 // Les deux voies réservées/non documentées restent visibles explicitement.
 // =======================================================================
-GVL_IHM.IoHw.In.Hardware := PRG_02_Acquisition.HwReal;
+// Image arbitrée (réel hors simulation, SimBench lorsque le domaine Translation est actif).
+// Le miroir IHM/Trace doit observer exactement la même image que PRG_05.
+GVL_IHM.IoHw.In.Hardware := PRG_02_Acquisition.HwIn;
 GVL_IHM.IoHw.In.Network := PRG_02_Acquisition.Data.Network;
 GVL_IHM.IoHw.In.InputModules := PRG_02_Acquisition.Data.InputModules;
 GVL_IHM.IoHw.In.DataValid := PRG_02_Acquisition.Data.DataValid;

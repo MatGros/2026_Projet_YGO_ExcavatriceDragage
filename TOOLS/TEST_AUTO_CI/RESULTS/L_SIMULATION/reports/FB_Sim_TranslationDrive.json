@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "file": "test_fb_sim_translation_drive.st",
+  "results": [
+    {
+      "name": "TC-T300-DRV-010 Drive rampe et reponse premier ordre",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-DRV-030 Charge reduit retour sans inverser la frequence",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-DRV-050 Pas de 100 ms conserve le temps physique",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0
+  }
+}
