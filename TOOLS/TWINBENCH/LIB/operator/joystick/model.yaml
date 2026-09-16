@@ -1,0 +1,74 @@
+# ══════════════════════════════════════════════════════════════════
+# TYPE : manipulateur operateur — GENERIQUE
+# En mode interactif c'est une ENTREE PILOTEE par l'humain devant la
+# page ; en mode scenario, la meme interface est jouee par un script.
+# Les deux passent par le meme port : le modele ne fait pas la difference.
+# ══════════════════════════════════════════════════════════════════
+type: joystick
+version: 0.1
+af_class: operator_input
+
+ports:
+  in:  { operator_intent: REAL, deadman_pressed: BOOL }   # -1..+1
+  out: { raw_x: INT, raw_y: INT, deadman: BOOL, buttons: "[BOOL]" }
+
+params:
+
+  # ── Echelle brute ───────────────────────────────────────────────
+  raw_min:            { class: machine, type: INT, default: 0 }
+  raw_center:         { class: machine, type: INT, required: true }
+  raw_max:            { class: machine, type: INT, required: true }
+  adc_bits:           { class: machine, type: INT, default: 12,
+                        doc: "quantification : la valeur lue est un PALIER, jamais continue" }
+
+  # ── Zone morte et seuils ────────────────────────────────────────
+  deadband_pct:       { class: config,  type: REAL, default: 8,
+                        doc: "sous ce seuil, aucune commande" }
+  engage_threshold_pct: { class: config, type: REAL, default: 12 }
+  release_threshold_pct: { class: config, type: REAL, default: 6,
+                        doc: "hysteresis d'engagement, evite le bagotement au seuil" }
+
+  # ── Retour mecanique au neutre ──────────────────────────────────
+  spring_return_ms:
+    class: machine
+    type: REAL
+    required: true
+    spread_pct: 20
+    doc: >
+      Le retour au neutre n'est PAS instantane. Selon la phase de scan, l'automate
+      voit 90 % puis 45 % puis 0, ou bien 70 % puis 0, ou directement 0.
+      Source classique de bugs non reproductibles.
+  overshoot_pct:      { class: machine, type: REAL, default: 0,
+                        doc: "depassement du neutre au relachement (balancement)" }
+  bounce_ms:          { class: machine, type: REAL, default: 0 }
+
+  # ── Homme-mort ──────────────────────────────────────────────────
+  deadman_type:       { class: machine, type: STRING, default: button,
+                        enum: [button, trigger, pedal, none] }
+  deadman_debounce_ms: { class: config, type: REAL, default: 20 }
+  deadman_release_max_ms:
+                      { class: config, type: REAL, required: true,
+                        doc: "delai maximal admis entre relachement et arret effectif — c'est l'invariant de securite" }
+
+  # ── Defauts d'entree analogique ─────────────────────────────────
+  out_of_range_low:   { class: machine, type: INT,
+                        doc: "sous ce brut, entree hors plage = rupture de fil" }
+  out_of_range_high:  { class: machine, type: INT }
+
+faults:
+  - stuck_center
+  - stuck_full        # reste a fond : commande fantome
+  - wire_break
+  - jitter
+  - deadman_stuck_pressed   # homme-mort neutralise : le plus grave
+
+invariants:
+  - id: INV_DEADMAN_STOPS_MOTION
+    statement: "homme-mort relache => vitesse nulle sous deadman_release_max_ms"
+    severity: safety
+
+inspect:
+  - { key: operator_intent, label: Intention,   fmt: "0.00" }
+  - { key: raw_x,           label: Brut X,      kind: raw }
+  - { key: deadman,         label: Homme-mort,  kind: bool }
+  - { key: in_deadband,     label: Zone morte,  kind: bool }

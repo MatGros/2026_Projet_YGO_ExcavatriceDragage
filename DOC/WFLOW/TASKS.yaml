@@ -4,6 +4,48 @@ archive_reference: DOC/WFLOW/ARCHIVES/TASKS_SNAPSHOT_20260915/TASKS_20260915_234
 note: Catalogue actif de la phase de Mise en Service (Septembre 2026). Les 213 tâches
   historiques antérieures au 01/09/2026 sont conservées dans archive_reference.
 tasks:
+- id: T305
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: TREUILS / SECURITE MACHINE / ELECTROTHERMIQUE
+  agent: '—'
+  date: '2026-09-16T12:00:28+02:00'
+  avancement: 'Cadré le 2026-09-16 suite analyse des contraintes électromécaniques : trois questions sans réponse écrite sur le plancher de commutation de palier et la tenue thermique des moteurs de treuil.'
+  titre: 'Treuils — Tracer l''origine du plancher de commutation 400 ms, statuer sur l''asymétrie montée/descente et évaluer la marge thermique à la cadence nominale'
+  contexte: 'FB_WinchOutputInterlock.st:136 porte CST_StepRampFloorDelay := T#400ms, plancher dur de cadence de montée de palier à la barrière finale. Le commentaire justifie le mécanisme logiciel (filet de sécurité si FB_WinchStepShaper déraille) mais la contrainte physique sous-jacente n''est écrite nulle part : moteur à rotor bobiné, commutation trop rapide entre paliers, surintensité, déclenchement disjoncteur et à terme échauffement puis destruction du bobinage. Conséquences : l''origine du chiffre 400 est inconnue, et l''asymétrie déclarée (descente non limitée) n''est ni justifiée ni vérifiable. En parallèle, le thermique moteur est uniquement subi (retours matériels M1ThermalOk / M2ThermalOk câblés, latchés, affichés) : aucun compteur de démarrages, aucune limitation de cadence, aucun modèle thermique logiciel. Or en SEMI_AUTO la cadence de cycle est fixée par le programme.'
+  description: 'Tâche d''investigation et de documentation sur machine en service, sans modification de CODE/. Établir et consigner l''origine de la valeur 400 ms avec sa source et sa date de vérification, écrire en clair la contrainte électrique réelle, conclure explicitement sur l''asymétrie montée/descente parmi trois issues possibles, inventorier les protections thermiques en séparant détection et prévention, et produire une première évaluation chiffrée de la marge thermique à la cadence nominale à partir des 63 traces PLC disponibles. Toute correction de code découlant des conclusions fera l''objet d''une tâche distincte.'
+  objectifs:
+  - 'Tracer l''origine du 400 ms : notice constructeur, plaque, essai, reprise d''affaire ou estimation — et le consigner avec sa date de vérification.'
+  - 'Écrire la contrainte physique elle-même (rotor bobiné, surintensité à la commutation) et non seulement le comportement logiciel attendu.'
+  - 'Statuer sur l''asymétrie montée/descente : justifiée, insuffisante, ou indécidable et renvoyée à mesure.'
+  - 'Inventorier les protections thermiques en distinguant ce qui est détecté de ce qui est prévenu.'
+  - 'Évaluer si la cadence de cycle nominale laisse une marge thermique aux moteurs, à partir des traces existantes.'
+  - 'Convertir les données manquantes en points de relevé de mise en service.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T305_TREUILS_CONTRAINTES_ELECTROTHERMIQUES.yaml
+  bloque_par: []
+- id: T304
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: OUTILLAGE / SIMULATION / JUMEAU NUMERIQUE
+  agent: '—'
+  date: '2026-09-16T11:27:22+02:00'
+  avancement: 'Cadré le 2026-09-16 suite étude Phase 1 sur la simulation électromécanique : POC vertical du nouvel outil TwinBench, périmètre volontairement réduit à Joystick + M3 Translation.'
+  titre: 'TwinBench — POC vertical du simulateur électromécanique et du jumeau 2D (périmètre Joystick + M3 Translation)'
+  contexte: 'Le modèle physique de la machine est aujourd''hui écrit à trois endroits : les FB ST de CODE/L_SIMULATION, le JavaScript du banc engine/cycle_bench.html, et les stimuli du harnais anim_bench. Ces trois implémentations divergent sans contrôle (constat T304 : une grandeur d''environnement paramétrable côté ST est figée en constante côté JS, rendant inatteignable un pan entier de l''espace de test). Aucun outil commun, éditable et visuel n''existe. L''étude de conception TEST_AUTO_CI/DIGITAL_TWIN/ a défini le contrat Frame et la règle du pur rendu, mais n''a jamais tranché qui porte la physique côté source.'
+  description: 'Éprouver par un POC vertical le format de modèle .twin.yaml et la chaîne complète TwinBench : modèle déclaratif unique, moteur Python, frames, vue 2D générée, injection joystick bidirectionnelle, invariant de sécurité balayé sur les modes de panne, et génération du ST du profil embarqué. Périmètre restreint à un seul axe non couplé (M3 Translation) et au joystick, afin de valider la chaîne de bout en bout sans toucher aux treuils. Aucune écriture dans CODE/ : la sortie générée reste dans TOOLS/TWINBENCH/out/ et sa recopie éventuelle est une décision humaine distincte.'
+  objectifs:
+  - 'Valider que le format .twin.yaml exprime réellement un axe, ses capteurs et le joystick, avec les 3 classes de grandeurs (machine / config / environment) et les niveaux L0-L1-L2.'
+  - 'Prouver la chaîne moteur Python -> frames -> vue 2D SVG sans aucun calcul de position en JavaScript (garde-fou pur rendu PASS).'
+  - 'Prouver l''injection inverse : le joystick de la page pilote la source et remplace les mocks.'
+  - 'Exprimer et évaluer l''invariant de sécurité homme-mort sur au moins 200 runs balayant les modes de panne des 5 capteurs M3.'
+  - 'Éprouver le détecteur lui-même : une violation volontaire doit être trouvée ET minimisée à 5 stimuli ou moins.'
+  - 'Générer FB_Sim_Translation.st en profil embarqué dans out/, avec rapport de différences face au ST existant.'
+  - 'Produire le rapport de couverture croisée AF <-> modèle <-> code ST réel.'
+  - 'Objectif étendu décrochable : gate d''équivalence trace Python <-> trace ST compilé.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T304_POC_TWINBENCH_JOYSTICK_M3.yaml
+  bloque_par: []
 - id: T302
   parent_id: ''
   statut: ✅

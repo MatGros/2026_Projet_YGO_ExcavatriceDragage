@@ -1,0 +1,66 @@
+# ⛔ TYPE PERIME — ne pas instancier.
+# Remplace par actuators/induction_motor + drives/vfd + mechanical/brake
+#              + mechanical/linear_axis (2026-09-16).
+# Defaut de conception : ce type portait le frein en interne (brake_release_ms).
+# Or un frein est un equipement A PART, dont la protection thermique peut etre
+# MUTUALISEE entre plusieurs axes — ce qu'un modele imbrique ne sait pas dire.
+# Conserve pour tracabilite, jamais supprime.
+deprecated: true
+superseded_by: [actuators/induction_motor, drives/vfd, mechanical/brake, mechanical/linear_axis]
+
+# ══════════════════════════════════════════════════════════════════
+# TYPE : motoreducteur sur axe lineaire — GENERIQUE
+# Ne nomme aucune machine, aucun equipement reel. Reutilisable tel quel.
+# ══════════════════════════════════════════════════════════════════
+type: gearmotor
+version: 0.1
+af_class: actuator
+
+ports:
+  in:
+    relay_fwd:  BOOL
+    relay_rev:  BOOL
+    brake_cmd:  BOOL          # TRUE = desserrage (polarite directe, jamais NOT)
+  out:
+    position_m: REAL
+    speed_mps:  REAL
+    moving:     BOOL
+
+params:
+  travel_m:
+    class: machine
+    type: [REAL, REAL]
+    required: true
+    doc: "course utile ; la franchir emet un evenement, ne l'ecrete JAMAIS (SPEC_01 §3.1)"
+  nominal_speed_mps:
+    class: machine
+    type: REAL
+    required: true
+  brake_release_ms:
+    class: config
+    type: REAL
+    default: 120
+  accel_mps2:
+    class: config
+    type: REAL
+    default: 0.8
+  coast_mps2:
+    class: config
+    type: REAL
+    default: 0.35
+    doc: "deceleration en roue libre apres coupure relais"
+
+dynamics:
+  host:     integrator_1st_order_with_brake_and_coast
+  embedded: integrator_1st_order
+
+faults: [stuck, drift, overspeed, brake_stuck_released]
+
+# Grandeurs exposees au panneau de detail de l'instance (vue du composant).
+inspect:
+  - { key: position_m,     label: Position,          unit: m,   fmt: "0.00" }
+  - { key: speed_mps,      label: Vitesse,           unit: m/s, fmt: "0.000" }
+  - { key: brake_released, label: Frein desserre,    kind: bool }
+  - { key: relay_fwd,      label: Relais avant,      kind: bool }
+  - { key: relay_rev,      label: Relais arriere,    kind: bool }
+  - { key: phase,          label: Phase dynamique,   kind: enum }
