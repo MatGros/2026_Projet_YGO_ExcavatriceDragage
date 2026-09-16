@@ -55,14 +55,18 @@ def main() -> int:
         for e in result["events"]:
             print(f"  [{e['t_ms']:>6} ms] {e['kind']} {e['instance']} "
                   f"depassement {e['overshoot_m']} m a {e['speed_mps']} m/s "
-                  f"({e['kinetic_energy_J']} J)")
+                  f"({e['kinetic_energy_J'] if e['kinetic_energy_J'] is not None else e['energy_note']})")
     else:
         print("evenements       : aucun")
     try:
         shown = out.relative_to(ROOT.parents[1])
     except ValueError:
         shown = out
-    print(f"position finale  : {result['frames'][-1]['actuators']['M3']['position_m']} m")
+    print(f"position finale  : {result['frames'][-1]['M3_Axis']['position_m']} m")
+    if m["blocked_invariants"]:
+        print("INVARIANTS BLOQUES (verdict UNKNOWN) :")
+        for b in m["blocked_invariants"]:
+            print(f"  - {b}")
     print(f"-> {shown}")
     return 0
 

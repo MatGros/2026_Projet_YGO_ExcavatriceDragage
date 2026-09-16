@@ -1,0 +1,95 @@
+# ══════════════════════════════════════════════════════════════════
+# TYPE : moteur asynchrone triphase — GENERIQUE
+# Le moteur ne porte PAS son frein : le frein est un equipement
+# distinct, parfois mutualise entre plusieurs axes.
+# ══════════════════════════════════════════════════════════════════
+type: induction_motor
+version: 0.2
+af_class: actuator
+
+ports:
+  in:  { supply_freq_hz: REAL, supply_voltage_v: REAL, load_torque_nm: REAL }
+  out: { shaft_speed_rpm: REAL, shaft_torque_nm: REAL, current_a: REAL,
+         winding_temp_pct: REAL, thermal_ok: BOOL }
+
+params:
+
+  # ── Plaque signaletique ─────────────────────────────────────────
+  rated_power_kw:     { class: machine, type: REAL, required: true }
+  rated_voltage_v:    { class: machine, type: REAL, required: true }
+  rated_current_a:    { class: machine, type: REAL, required: true }
+  rated_freq_hz:      { class: machine, type: REAL, required: true }
+  rated_speed_rpm:    { class: machine, type: REAL, required: true }
+  pole_pairs:         { class: machine, type: INT,  required: true }
+  power_factor:       { class: machine, type: REAL, default: 0.82 }
+  efficiency:         { class: machine, type: REAL, default: 0.88 }
+  duty_type:          { class: machine, type: STRING, default: S1,
+                        enum: [S1, S2, S3, S4, S5],
+                        doc: "S3 = service intermittent : le facteur de marche est une LIMITE" }
+  duty_cycle_pct:     { class: machine, type: REAL,
+                        doc: "requis si duty_type != S1" }
+
+  # ── Couples ─────────────────────────────────────────────────────
+  rated_torque_nm:    { class: machine, type: REAL, required: true }
+  starting_torque_pct: { class: machine, type: REAL, default: 180 }
+  breakdown_torque_pct: { class: machine, type: REAL, default: 250,
+                        doc: "couple de decrochage : au-dela, le moteur cale" }
+  starting_current_pct: { class: machine, type: REAL, default: 600,
+                        doc: "courant d'appel au demarrage direct" }
+
+  # ── Mecanique ───────────────────────────────────────────────────
+  rotor_inertia_kgm2: { class: machine, type: REAL, required: true,
+                        doc: "determine le temps de montee en vitesse et l'energie a dissiper" }
+  rated_slip_pct:     { class: machine, type: REAL, default: 4.0,
+                        doc: "ecart freq commandee / vitesse reelle sous charge" }
+
+  # ── Thermique ───────────────────────────────────────────────────
+  thermal_class:      { class: machine, type: STRING, default: F,
+                        enum: [B, F, H] }
+  thermal_tau_heat_s: { class: machine, type: REAL, required: true }
+  thermal_tau_cool_s: { class: machine, type: REAL, required: true,
+                        doc: "typiquement 3 a 6x tau_heat : c'est CETTE asymetrie qui rend l'absence de pause dangereuse" }
+  cooling_type:       { class: machine, type: STRING, default: self_ventilated,
+                        enum: [self_ventilated, forced_ventilation, natural],
+                        doc: "autoventile = refroidissement proportionnel a la vitesse" }
+  cooling_derate_at_low_speed:
+                      { class: machine, type: REAL, default: 2.5,
+                        doc: "facteur d'aggravation du tau_cool a basse vitesse (autoventile)" }
+  max_starts_per_hour: { class: machine, type: INT,
+                        doc: "limite constructeur ; rarement surveillee en logiciel" }
+  ambient_temp_c:     { class: environment, type: REAL, domain: [-5, 45], default: 25 }
+
+  # ── Protection cablee ───────────────────────────────────────────
+  thermal_protection: { class: machine, type: STRING, default: klixon,
+                        enum: [klixon, ptc, pt100, drive_internal, none],
+                        doc: "DETECTION, jamais prevention : quand ca tombe, il est deja trop tard" }
+
+faults:
+  - winding_short
+  - phase_loss             # marche sur 2 phases : couple chute, courant explose
+  - bearing_wear
+  - thermal_trip
+  - stall                  # couple resistant > couple de decrochage
+
+degradation:
+  - id: DEG_WINDING_THERMAL
+    kind: thermal
+    reversible: true
+    state: winding_temp_pct
+    charge:   { law: i2t, tau: thermal_tau_heat_s }
+    recovery: { law: exponential, tau: thermal_tau_cool_s,
+                derate_when: { speed_below_pct: 30, factor: cooling_derate_at_low_speed } }
+    capacity: "rated * (1 - winding_temp_pct/100)"
+    on_exhausted: { consequence: damage_material, note: "destruction du bobinage" }
+
+  - id: DEG_BEARING
+    kind: operations
+    reversible: false
+    state: revolutions_total
+
+inspect:
+  - { key: shaft_speed_rpm,  label: Vitesse arbre,   unit: rpm, fmt: "0" }
+  - { key: shaft_torque_nm,  label: Couple,          unit: Nm,  fmt: "0.0" }
+  - { key: current_a,        label: Courant,         unit: A,   fmt: "0.0" }
+  - { key: winding_temp_pct, label: Etat thermique,  unit: "%", kind: gauge }
+  - { key: thermal_ok,       label: Thermique OK,    kind: bool }

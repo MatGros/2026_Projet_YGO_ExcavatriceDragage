@@ -1,3 +1,13 @@
+# ⛔ TYPE PERIME — ne pas instancier.
+# Remplace par actuators/induction_motor + drives/vfd + mechanical/brake
+#              + mechanical/linear_axis (2026-09-16).
+# Defaut de conception : ce type portait le frein en interne (brake_release_ms).
+# Or un frein est un equipement A PART, dont la protection thermique peut etre
+# MUTUALISEE entre plusieurs axes — ce qu'un modele imbrique ne sait pas dire.
+# Conserve pour tracabilite, jamais supprime.
+deprecated: true
+superseded_by: [actuators/induction_motor, drives/vfd, mechanical/brake, mechanical/linear_axis]
+
 # ══════════════════════════════════════════════════════════════════
 # TYPE : motoreducteur sur axe lineaire — GENERIQUE
 # Ne nomme aucune machine, aucun equipement reel. Reutilisable tel quel.
