@@ -1,0 +1,89 @@
+# ══════════════════════════════════════════════════════════════════
+# INSTANCIATION — specifique a l'affaire.
+# POC phase 1 : axe de translation M3 + ses 5 detecteurs de position.
+# Modele volontairement MINIMAL : quelques chiffres suffisent a le faire tourner.
+# ══════════════════════════════════════════════════════════════════
+schema_version: 0.1
+machine: excavatrice_dragage
+scan_ms: 20
+
+instances:
+
+  M3:
+    from: actuators/gearmotor
+    af_ref: [F11.01, AF_Partie-11]
+    level:
+      kinematics:   L1        # calcule depuis les provenances ci-dessous
+      non_ideality: L1
+      limits:       L1        # butees non dimensionnees — drapeau leve
+      degradation:  off       # non modelise, assume
+    unknowns: [end_stop_max_impact_J, brake_type]
+    params:
+      travel_m:
+        value: [0.0, 12.40]
+        provenance: { source: estimated, reference: "releve approximatif sur plan" }
+        verification: { status: unverified }
+      nominal_speed_mps:
+        value: 0.35
+        provenance: { source: estimated, reference: "ordre de grandeur, a confirmer par trace" }
+        verification: { status: unverified }
+      brake_release_ms:
+        value: 120
+        provenance: { source: guessed }
+        verification: { status: unverified }
+      coast_mps2:
+        value: 0.35
+        provenance: { source: guessed }
+        verification: { status: unverified }
+
+  S1_Tremie:
+    from: sensors/limit_switch
+    af_ref: [F11.02]
+    on_axis: M3
+    params: { trigger_m: 0.00, window_m: 0.30 }
+
+  S2_PreP1:
+    from: sensors/limit_switch
+    af_ref: [F11.02]
+    on_axis: M3
+    params: { trigger_m: 4.80, window_m: 0.25 }
+
+  S3_P1:
+    from: sensors/limit_switch
+    af_ref: [F11.02]
+    on_axis: M3
+    params: { trigger_m: 6.20, window_m: 0.30 }
+
+  S4_PreMaintenance:
+    from: sensors/limit_switch
+    af_ref: [F11.02]
+    on_axis: M3
+    params: { trigger_m: 10.90, window_m: 0.25 }
+
+  S5_Maintenance:
+    from: sensors/limit_switch
+    af_ref: [F11.02]
+    on_axis: M3
+    params: { trigger_m: 12.40, window_m: 0.30 }
+
+  Joystick:
+    from: operator/joystick_1axis
+    af_ref: [F08.01, AF_Partie-08]
+    params:
+      spring_return_ms:
+        value: 60
+        provenance: { source: guessed }
+        verification: { status: unverified }
+
+links:
+  - { from: M3.position_m, to: "S*.axis_position_m" }
+
+views:
+  translation:
+    kind: linear_axis
+    axis: M3.position_m
+    domain_m: [0.0, 12.40]
+    landmarks:
+      - { at: 0.00,  label: TREMIE }
+      - { at: 6.20,  label: P1 }
+      - { at: 12.40, label: MAINTENANCE }

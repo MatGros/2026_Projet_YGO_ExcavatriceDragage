@@ -1,0 +1,41 @@
+# ══════════════════════════════════════════════════════════════════
+# TYPE : detecteur de position sur axe — GENERIQUE
+# ══════════════════════════════════════════════════════════════════
+type: limit_switch
+version: 0.1
+af_class: sensor
+
+ports:
+  in:  { axis_position_m: REAL }
+  out: { detected: BOOL }
+
+params:
+  trigger_m:
+    class: machine
+    type: REAL
+    required: true
+  window_m:
+    class: machine
+    type: REAL
+    default: 0.25
+    doc: "demi-largeur de la zone de detection"
+  hysteresis_m:
+    class: config
+    type: REAL
+    default: 0.05
+  response_ms:
+    class: config
+    type: REAL
+    default: 8
+  polarity:
+    class: machine
+    type: STRING
+    default: normally_open
+    doc: "normally_open : 1 = detecte · normally_closed : 1 = libre (sain)"
+
+faults: [stuck_low, stuck_high, delayed, chatter]
+
+inspect:
+  - { key: detected,  label: Detecte,        kind: bool }
+  - { key: distance_m, label: Distance seuil, unit: m, fmt: "0.00" }
+  - { key: fault,     label: Mode de panne,  kind: enum }
