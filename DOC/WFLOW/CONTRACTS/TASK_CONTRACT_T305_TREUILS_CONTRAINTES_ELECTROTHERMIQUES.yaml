@@ -1,0 +1,87 @@
+contract:
+  task_id: T305
+  criticality: C2
+  strategy: patch
+  objective: >
+    Tracer l'origine physique du plancher de commutation de palier des treuils,
+    statuer sur l'asymetrie montee/descente, et evaluer si la cadence de cycle
+    nominale est compatible avec la tenue thermique des moteurs M1/M2. Tache
+    d'investigation et de documentation : aucune modification de CODE/.
+
+  acceptance:
+    - id: AC1
+      statement: "L'origine de la valeur 400 ms de CST_StepRampFloorDelay (FB_WinchOutputInterlock.st) est etablie et consignee dans AF_Partie-10 avec sa source nommee (notice constructeur, plaque moteur, essai, reprise d'affaire ou estimation) et la date de verification ; si l'origine reste introuvable, elle est consignee comme non tracable avec la mesure ou la recherche a mener."
+      verified_by: "Section dediee ajoutee a DOC/AF/AF_Partie-10_Fonction_Winch et relecture humaine de la source citee."
+
+    - id: AC2
+      statement: "La contrainte physique reelle est ecrite en clair : nature du moteur (rotor bobine), mecanisme de la surintensite a la commutation, et consequences distinguees entre declenchement du disjoncteur et echauffement cumulatif du bobinage."
+      verified_by: "Lecture de la section ajoutee a AF_Partie-10, qui doit nommer le mecanisme electrique et non seulement le comportement logiciel attendu."
+
+    - id: AC3
+      statement: "L'asymetrie du plancher (montee cadencee, descente non limitee, FB_WinchOutputInterlock.st:130-136) recoit une conclusion explicite parmi trois : justifiee par la physique et documentee comme telle, insuffisante et necessitant une extension du plancher a la descente, ou indecidable en l'etat et renvoyee a une mesure."
+      verified_by: "Conclusion ecrite et datee dans AF_Partie-10, avec le raisonnement electrique qui la soutient."
+
+    - id: AC4
+      statement: "L'inventaire des protections thermiques existantes distingue ce qui est detecte de ce qui est prevenu : les retours materiels M1ThermalOk, M2ThermalOk et BrakeThermalOk sont recenses avec leur chaine de traitement, et l'absence de toute limitation logicielle de cadence ou de comptage de demarrages est constatee par ecrit."
+      verified_by: "Recherche exhaustive sur CODE/ des mecanismes de limitation de cadence, resultat consigne dans la fiche de tache."
+
+    - id: AC5
+      statement: "Une premiere evaluation chiffree indique si la cadence de cycle nominale du mode SEMI_AUTO laisse une marge thermique aux moteurs de treuil, a partir des donnees de plaque disponibles et des durees de mouvement relevees dans les traces de TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/."
+      verified_by: "Note de calcul versionnee dans DOC/WFLOW/, citant les traces exploitees et les hypotheses retenues."
+
+    - id: AC6
+      statement: "Les donnees manquantes empechant de conclure sont listees nommement et converties en points de releve de mise en service, chacun rattache a la question qu'il permettra de trancher."
+      verified_by: "Checklist de releve produite dans DOC/WFLOW/, une ligne par donnee manquante."
+
+  scope:
+    allowed:
+      - DOC/AF/AF_Partie-10_Fonction_Winch
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - DOC/WFLOW/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/TWINBENCH/
+
+  conservation:
+    must_survive:
+      - "CST_StepRampFloorDelay conserve sa valeur de 400 ms tant qu'aucune mesure ne justifie de la changer : cette tache documente et evalue, elle ne regle pas."
+      - "Les protections thermiques materielles existantes (klixon et retours cables) restent inchangees."
+    dropped_on_purpose:
+      - "La preuve exhaustive que les bits contacteurs ne commutent jamais sous le plancher est hors perimetre : elle demande l'observateur de sortie de TwinBench et fera l'objet d'une tache dediee."
+      - "Toute correction de code decoulant des conclusions est hors perimetre et donnera lieu a une tache distincte."
+
+  evidence_required:
+    - "Section AF_Partie-10 citant l'origine du 400 ms, sa source et sa date de verification."
+    - "Conclusion ecrite sur l'asymetrie montee/descente parmi les trois issues possibles."
+    - "Inventaire des protections thermiques separant detection et prevention."
+    - "Note de calcul de marge thermique citant les traces exploitees."
+    - "Checklist de releve de mise en service pour les donnees manquantes."
+    - "git status --short prouvant qu'aucun fichier de CODE/ n'est modifie."
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Cette tache porte sur une machine en service. Si l'evaluation thermique
+    conclut que la cadence nominale ne laisse pas de marge, ou si l'asymetrie du
+    plancher se revele insuffisante, le signaler immediatement et ne pas attendre
+    la fin de la tache : la consequence est une usure ou une destruction de
+    bobinage sur une installation exploitee. De meme, si l'origine du 400 ms
+    s'avere etre une reprise d'un autre projet sur un moteur different, c'est un
+    constat a remonter tel quel, sans chercher a le justifier apres coup.
+
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""
