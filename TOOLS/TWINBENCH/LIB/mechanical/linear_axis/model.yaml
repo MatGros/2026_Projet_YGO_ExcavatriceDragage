@@ -1,0 +1,108 @@
+# ══════════════════════════════════════════════════════════════════
+# TYPE : axe lineaire guide (chariot sur rail) — GENERIQUE
+# Porte la CHARGE, la TRANSMISSION et les BUTEES. C'est ici que vit
+# la chaine d'effort, donc la resolution du maillon faible.
+# ══════════════════════════════════════════════════════════════════
+type: linear_axis
+version: 0.1
+af_class: mechanism
+
+ports:
+  in:  { drive_torque_nm: REAL, brake_torque_nm: REAL }
+  out: { position_m: REAL, speed_mps: REAL, load_torque_nm: REAL }
+
+params:
+
+  # ── Course ──────────────────────────────────────────────────────
+  travel_m:           { class: machine, type: [REAL, REAL], required: true,
+                        doc: "course UTILE ; la franchir emet un evenement, jamais un ecretage" }
+  overtravel_margin_m: { class: machine, type: REAL, required: true,
+                        doc: "distance entre fin de course utile et butee physique — c'est la marge qui absorbe une defaillance capteur" }
+
+  # ── Charge ──────────────────────────────────────────────────────
+  moving_mass_kg:     { class: machine, type: REAL, required: true,
+                        doc: "determine l'energie cinetique, donc la casse a l'impact" }
+  payload_mass_kg:    { class: environment, type: REAL, domain: [0, 2000],
+                        doc: "charge transportee : variable d'un cycle a l'autre" }
+  incline_deg:        { class: machine, type: REAL, default: 0.0,
+                        doc: "une pente cree un couple resistant permanent, et fait DERIVER frein desserre" }
+
+  # ── Transmission ────────────────────────────────────────────────
+  transmission:       { class: machine, type: STRING, required: true,
+                        enum: [chain, belt, rack_pinion, screw, cable] }
+  gear_ratio:         { class: machine, type: REAL, required: true }
+  meters_per_motor_rev: { class: machine, type: REAL, required: true }
+  efficiency:         { class: machine, type: REAL, default: 0.85 }
+  backlash_m:         { class: machine, type: REAL, default: 0.0,
+                        doc: "jeu a l'inversion de sens" }
+  reversible:         { class: machine, type: BOOL, default: true,
+                        doc: "irreversible (vis) = ne derive pas frein desserre" }
+
+  # ── Frottements ─────────────────────────────────────────────────
+  static_friction_n:  { class: machine, type: REAL, default: 0.0,
+                        doc: "stiction : couple de decollage > couple de maintien" }
+  viscous_friction_ns_m: { class: machine, type: REAL, default: 0.0 }
+  friction_derate:    { class: environment, type: REAL, domain: [1.0, 2.0], default: 1.0,
+                        doc: "aggravation durable : rouille, encrassement, guidage sec" }
+
+  # ── Chaine d'effort — le maillon faible se calcule ici ──────────
+  load_path:
+    class: machine
+    type: "[{element, limit_kind, limit_value, unit}]"
+    required: true
+    doc: >
+      Ordonnee du moteur vers la charge. A chaque pas de temps, le maillon
+      faible est celui dont la CAPACITE COURANTE est la plus basse — capacite
+      courante, pas nominale : elle depend de l'etat de degradation.
+
+  # ── Butees ──────────────────────────────────────────────────────
+  end_stops:
+    class: machine
+    type: "[{at_m, construction, max_impact_energy_j, max_static_force_n, stiffness_n_m}]"
+    required: true
+    doc: >
+      construction : welded_frame | sheet_metal | rubber_buffer | hydraulic_damper.
+      Sans max_impact_energy_j, aucun invariant de non-sortie de guidage ne peut
+      conclure : il rend UNKNOWN et nomme cette donnee.
+
+  guiding_retention:  { class: machine, type: STRING, default: unknown,
+                        enum: [captive, non_captive, unknown],
+                        doc: "non_captive : la perte de butee = sortie de rail = risque humain" }
+
+faults:
+  - stuck              # axe bloque : le moteur force
+  - drift              # derive frein serre
+  - guide_seized
+  - transmission_slip  # chaine qui saute, courroie qui patine
+
+degradation:
+  - id: DEG_TRANSMISSION_FATIGUE
+    kind: cycles
+    reversible: false
+    state: cycles_total
+  - id: DEG_STALL_TORQUE
+    kind: cumulative
+    reversible: false
+    rule: "torque * duration <= load_path.weakest"
+    on_exhausted: { consequence: damage_material }
+
+consequences:
+  none:                "absorbe, rien de casse"
+  damage_material:     "casse, machine a l'arret, masse restee guidee"
+  loss_of_function:    "protection perdue, machine dangereuse mais contenue"
+  loss_of_containment: "masse en mouvement hors de son guidage — RISQUE HUMAIN"
+
+invariants:
+  - id: INV_SINGLE_FAULT_NO_CONTAINMENT_LOSS
+    statement: "aucune panne simple ne conduit a loss_of_containment"
+    severity: safety_critical
+  - id: INV_OVERTRAVEL_MARGIN_SUFFICIENT
+    statement: "a vitesse maximale, la distance d'arret tient dans overtravel_margin_m"
+    severity: safety
+
+inspect:
+  - { key: position_m,     label: Position,        unit: m,   fmt: "0.000" }
+  - { key: speed_mps,      label: Vitesse,         unit: m/s, fmt: "0.000" }
+  - { key: load_torque_nm, label: Couple resistant, unit: Nm, fmt: "0.0" }
+  - { key: weakest_link,   label: Maillon faible,  kind: enum }
+  - { key: kinetic_energy_j, label: Energie cinetique, unit: J, fmt: "0.0" }

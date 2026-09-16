@@ -1,89 +1,173 @@
 # ══════════════════════════════════════════════════════════════════
-# INSTANCIATION — specifique a l'affaire.
-# POC phase 1 : axe de translation M3 + ses 5 detecteurs de position.
-# Modele volontairement MINIMAL : quelques chiffres suffisent a le faire tourner.
+# INSTANCIATION — axe de translation M3 de l'excavatrice de dragage.
+#
+# ⚠️ TOUTES les valeurs numeriques absentes du code sont des
+#    PLACEHOLDERS : provenance guessed, verification unverified.
+#    Le schema est le livrable ; les chiffres se releveront en MES.
+#    Les valeurs marquees source: code_source sont LUES dans CODE/.
+#
+# Reperes et positions : FB_Translation_PositionDecoder.st,
+# FB_Sim_Translation.st, ST_HwTranslation.st.
 # ══════════════════════════════════════════════════════════════════
-schema_version: 0.1
+schema_version: 0.2
 machine: excavatrice_dragage
 scan_ms: 20
 
 instances:
 
-  M3:
-    from: actuators/gearmotor
+  # ── 1. Variateur ────────────────────────────────────────────────
+  AC600:
+    from: drives/vfd
+    af_ref: [F11.03, AF_Partie-11]
+    io: { status_word: M3_StatusWord, actual_freq: M3_ActualFrequencyHz,
+          device_state: AC600_DeviceState }
+    level: { kinematics: L1, non_ideality: L1, limits: L0, degradation: off }
+    unknowns: [rated_current_a, supply_voltage_v, accel_time_s, decel_time_s,
+               braking_resistor, overload_time_s]
+    params:
+      freq_stop_threshold_hz:
+        value: 0.5
+        provenance: { source: code_source,
+                      reference: "FB_Safety_Translation.st:76 CST_StopFreqThresholdHz" }
+        verification: { status: verified, method: "lecture du code source" }
+      freq_max_hz:
+        value: 50.0
+        provenance: { source: guessed,
+                      reference: "reel = GVL_PERSISTENT._TranslationMaxFreq_Hz, non releve" }
+        verification: { status: unverified }
+      accel_time_s: { value: 2.0, provenance: { source: guessed } }
+      decel_time_s: { value: 2.0, provenance: { source: guessed } }
+      fault_stop_mode:
+        value: coast
+        provenance: { source: guessed,
+                      reference: "DECISIF pour la surcourse — a confirmer sur le variateur" }
+        verification: { status: disputed }
+
+  # ── 2. Moteur ───────────────────────────────────────────────────
+  M3_Motor:
+    from: actuators/induction_motor
     af_ref: [F11.01, AF_Partie-11]
-    level:
-      kinematics:   L1        # calcule depuis les provenances ci-dessous
-      non_ideality: L1
-      limits:       L1        # butees non dimensionnees — drapeau leve
-      degradation:  off       # non modelise, assume
-    unknowns: [end_stop_max_impact_J, brake_type]
+    io: { thermal_ok: M3_ThermalOK_DI }
+    level: { kinematics: L1, non_ideality: L0, limits: L0, degradation: off }
+    unknowns: [rated_power_kw, rated_voltage_v, rated_current_a, rated_freq_hz,
+               rated_speed_rpm, pole_pairs, rated_torque_nm, rotor_inertia_kgm2,
+               thermal_tau_heat_s, thermal_tau_cool_s, cooling_type,
+               max_starts_per_hour, duty_type]
+    params:
+      thermal_protection:
+        value: drive_internal
+        provenance: { source: code_source,
+                      reference: "ST_HwTranslation.st — diagnostic seul, l'AC600 se protege lui-meme" }
+        verification: { status: verified }
+
+  # ── 3. Frein ────────────────────────────────────────────────────
+  M3_Brake:
+    from: mechanical/brake
+    af_ref: [F11.04, AF_Partie-11]
+    io: { release_cmd: BrakeCmd, is_released: M3_BrakeIsOpen_DI,
+          thermal_ok: BrakeThermalFeedback }
+    level: { kinematics: L1, non_ideality: L0, limits: L0, degradation: off }
+    unknowns: [rated_holding_torque_nm, release_time_ms, engage_time_ms,
+               coil_voltage_v, freewheel_circuit, energy_per_stop_j, max_operations]
+    params:
+      thermal_shared_with:
+        value: [M1_Brake, M2_Brake]
+        provenance: { source: code_source,
+                      reference: "FB_Safety_Translation.st:23 BrakeThermalFeedback — thermique frein COMMUN M1/M2/M3" }
+        verification: { status: verified }
+      release_time_ms: { value: 120, provenance: { source: guessed } }
+      engage_time_ms:  { value: 80,  provenance: { source: guessed } }
+
+  # ── 4. Axe mecanique ────────────────────────────────────────────
+  M3_Axis:
+    from: mechanical/linear_axis
+    af_ref: [F11.01, AF_Partie-11]
+    level: { kinematics: L1, non_ideality: L0, limits: L0, degradation: off }
+    unknowns: [moving_mass_kg, overtravel_margin_m, gear_ratio, incline_deg,
+               static_friction_n, load_path, end_stops, guiding_retention]
     params:
       travel_m:
-        value: [0.0, 12.40]
-        provenance: { source: estimated, reference: "releve approximatif sur plan" }
-        verification: { status: unverified }
-      nominal_speed_mps:
-        value: 0.35
-        provenance: { source: estimated, reference: "ordre de grandeur, a confirmer par trace" }
-        verification: { status: unverified }
-      brake_release_ms:
-        value: 120
+        value: [0.0, 30.0]
+        provenance: { source: code_source,
+                      reference: "FB_Sim_Translation.st — 0 m = Tremie, 30 m = Maintenance" }
+        verification: { status: verified }
+      meters_per_motor_rev:
+        value: null
+        derived_from: "GainMetersPerHzSec = 0.008333 m/Hz.s (FB_Translation_PositionEstimator.st:33) — 50 Hz => 0.4166 m/s"
+        provenance: { source: code_source }
+        verification: { status: verified }
+      transmission: { value: chain, provenance: { source: guessed } }
+      moving_mass_kg:
+        value: null
         provenance: { source: guessed }
         verification: { status: unverified }
-      coast_mps2:
-        value: 0.35
+        blocks: [INV_SINGLE_FAULT_NO_CONTAINMENT_LOSS]
+      end_stops:
+        value: null
         provenance: { source: guessed }
-        verification: { status: unverified }
+        blocks: [INV_SINGLE_FAULT_NO_CONTAINMENT_LOSS,
+                 INV_OVERTRAVEL_MARGIN_SUFFICIENT]
 
-  S1_Tremie:
-    from: sensors/limit_switch
-    af_ref: [F11.02]
-    on_axis: M3
-    params: { trigger_m: 0.00, window_m: 0.30 }
-
-  S2_PreP1:
-    from: sensors/limit_switch
-    af_ref: [F11.02]
-    on_axis: M3
-    params: { trigger_m: 4.80, window_m: 0.25 }
-
-  S3_P1:
-    from: sensors/limit_switch
-    af_ref: [F11.02]
-    on_axis: M3
-    params: { trigger_m: 6.20, window_m: 0.30 }
-
-  S4_PreMaintenance:
-    from: sensors/limit_switch
-    af_ref: [F11.02]
-    on_axis: M3
-    params: { trigger_m: 10.90, window_m: 0.25 }
-
-  S5_Maintenance:
-    from: sensors/limit_switch
-    af_ref: [F11.02]
-    on_axis: M3
-    params: { trigger_m: 12.40, window_m: 0.30 }
-
-  Joystick:
-    from: operator/joystick_1axis
-    af_ref: [F08.01, AF_Partie-08]
+  # ── 5. Chaine de cames ──────────────────────────────────────────
+  M3_Cams:
+    from: sensors/cam_chain
+    af_ref: [F11.02, AF_Partie-11]
+    on_axis: M3_Axis
+    level: { kinematics: L2, non_ideality: L0, limits: L1, degradation: off }
+    unknowns: [cam_length_m, technology, hysteresis_mm, repeatability_mm]
     params:
-      spring_return_ms:
-        value: 60
+      cams:
+        value:
+          - { name: SensorTremie,      position_m:  0.0, bit: 4, io: M3_PosTremie_DI }
+          - { name: SensorPV,          position_m:  5.0, bit: 3, io: M3_PosPV_DI }
+          - { name: SensorP2,          position_m: 15.0, bit: 2, io: M3_PosPVP2_DI }
+          - { name: SensorP1,          position_m: 20.0, bit: 1, io: M3_PosP1_DI }
+          - { name: SensorMaintenance, position_m: 30.0, bit: 0, io: M3_PosMaintenance_DI }
+        provenance: { source: code_source,
+                      reference: "FB_Sim_Translation.st CST_PositionAt* et FB_Translation_PositionDecoder.st:17-21" }
+        verification: { status: verified }
+      encoding:
+        value: monotonic_progressive
+        provenance: { source: code_source,
+                      reference: "FB_Translation_PositionDecoder.st:10" }
+        verification: { status: verified }
+      valid_words:
+        value: [2#11111, 2#01111, 2#00111, 2#00011, 2#00001, 2#00000]
+        provenance: { source: code_source,
+                      reference: "FB_Translation_PositionDecoder.st:10 — tout autre mot est incoherent" }
+        verification: { status: verified }
+      cam_length_m:
+        value: null
         provenance: { source: guessed }
-        verification: { status: unverified }
+        blocks: [INV_CAM_DETECTABLE]
+        note: "sans longueur de came, impossible de dire si une came est manquee a vitesse max"
+
+  # ── 6. Manipulateur ─────────────────────────────────────────────
+  Joystick:
+    from: operator/joystick
+    af_ref: [F08.01, AF_Partie-08]
+    level: { kinematics: L1, non_ideality: L1, limits: L1, degradation: off }
+    unknowns: [raw_center, raw_max, spring_return_ms, deadband_pct]
+    params:
+      deadman_release_max_ms: { value: 100, provenance: { source: guessed } }
+      spring_return_ms:       { value: 60,  provenance: { source: guessed } }
 
 links:
-  - { from: M3.position_m, to: "S*.axis_position_m" }
+  - { from: Joystick.operator_intent, to: AC600.freq_setpoint_hz, via: scale }
+  - { from: AC600.actual_freq_hz,     to: M3_Motor.supply_freq_hz }
+  - { from: M3_Motor.shaft_torque_nm, to: M3_Axis.drive_torque_nm }
+  - { from: M3_Brake.holding_torque_nm, to: M3_Axis.brake_torque_nm }
+  - { from: M3_Axis.position_m,       to: M3_Cams.axis_position_m }
+  - { from: M3_Axis.load_torque_nm,   to: M3_Motor.load_torque_nm }
 
 views:
   translation:
     kind: linear_axis
-    axis: M3.position_m
-    domain_m: [0.0, 12.40]
+    axis: M3_Axis.position_m
+    domain_m: [0.0, 30.0]
     landmarks:
-      - { at: 0.00,  label: TREMIE }
-      - { at: 6.20,  label: P1 }
-      - { at: 12.40, label: MAINTENANCE }
+      - { at:  0.0, label: TREMIE,      role: extreme }
+      - { at:  5.0, label: PV,          role: pre_ralentissement }
+      - { at: 15.0, label: P2,          role: travail }
+      - { at: 20.0, label: P1,          role: travail }
+      - { at: 30.0, label: MAINTENANCE, role: extreme }

@@ -1,3 +1,13 @@
+# ⛔ TYPE PERIME — ne pas instancier.
+# Remplace par sensors/cam_chain (2026-09-16).
+# Defaut de conception : modelisait N detecteurs de zone INDEPENDANTS. La machine
+# porte une chaine de cames a progression monotone produisant un MOT dont seules
+# certaines valeurs sont coherentes — une incoherence est un defaut SYSTEME, que
+# des capteurs independants ne peuvent pas representer.
+# Conserve pour tracabilite, jamais supprime.
+deprecated: true
+superseded_by: [sensors/cam_chain]
+
 # ══════════════════════════════════════════════════════════════════
 # TYPE : detecteur de position sur axe — GENERIQUE
 # ══════════════════════════════════════════════════════════════════

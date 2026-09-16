@@ -9,39 +9,37 @@ import json
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parents[1] / "out"
-STEP = 2   # sous-echantillonnage d'affichage (le moteur, lui, garde tout)
+STEP = 3
 
 
 def pack(path: Path) -> dict:
     d = json.loads(path.read_text(encoding="utf-8"))
     fr = d["frames"][::STEP]
-    names = list(fr[0]["sensors"].keys())
+    cams = list(fr[0]["M3_Cams"]["cams"].keys())
+    col = lambda f: [f(x) for x in fr]
     return {
-        "meta": d["meta"],
-        "params": d["params"],
-        "views": d["views"],
-        "events": d["events"],
-        "n": len(fr),
-        "t": [f["t_ms"] for f in fr],
-        "pos": [f["actuators"]["M3"]["position_m"] for f in fr],
-        "vel": [f["actuators"]["M3"]["speed_mps"] for f in fr],
-        "brake": [int(f["actuators"]["M3"]["brake_released"]) for f in fr],
-        "fwd": [int(f["actuators"]["M3"]["relay_fwd"]) for f in fr],
-        "rev": [int(f["actuators"]["M3"]["relay_rev"]) for f in fr],
-        "phase": [f["actuators"]["M3"]["phase"] for f in fr],
-        "joy": [f["operator"]["joystick"] for f in fr],
-        "deadman": [int(f["operator"]["deadman"]) for f in fr],
-        "sensorNames": names,
-        "sensors": {n: {
-            "det": [int(f["sensors"][n]["detected"]) for f in fr],
-            "dist": [f["sensors"][n]["distance_m"] for f in fr],
-            "fault": fr[0]["sensors"][n]["fault"],
-            "trigger": None,
-        } for n in names},
+        "meta": d["meta"], "params": d["params"], "views": d["views"],
+        "events": d["events"], "n": len(fr),
+        "t":        col(lambda f: f["t_ms"]),
+        "pos":      col(lambda f: f["M3_Axis"]["position_m"]),
+        "vel":      col(lambda f: f["M3_Axis"]["speed_mps"]),
+        "over":     col(lambda f: int(f["M3_Axis"]["overtravel"])),
+        "setpoint": col(lambda f: f["AC600"]["freq_setpoint_hz"]),
+        "freq":     col(lambda f: f["AC600"]["actual_freq_hz"]),
+        "sw":       col(lambda f: f["AC600"]["status_word"]),
+        "brake":    col(lambda f: int(f["M3_Brake"]["is_released"])),
+        "word":     col(lambda f: f["M3_Cams"]["word"]),
+        "incoh":    col(lambda f: int(f["M3_Cams"]["incoherent"])),
+        "atlow":    col(lambda f: int(f["M3_Cams"]["at_low"])),
+        "athigh":   col(lambda f: int(f["M3_Cams"]["at_high"])),
+        "joy":      col(lambda f: f["Joystick"]["intent"]),
+        "deadman":  col(lambda f: int(f["Joystick"]["deadman"])),
+        "camNames": cams,
+        "cams": {c: col(lambda f, c=c: int(f["M3_Cams"]["cams"][c])) for c in cams},
     }
 
 
-bundle = {s: pack(OUT / f"trace_{s}.json") for s in ("nominal", "capteur_hs")}
+bundle = {s: pack(OUT / f"trace_{s}.json") for s in ("nominal", "came_hs")}
 dest = Path(__file__).resolve().parent / "traces.json"
 dest.write_text(json.dumps(bundle, separators=(",", ":")), encoding="utf-8")
 print(f"{dest.name} : {dest.stat().st_size / 1024:.0f} Ko · "
