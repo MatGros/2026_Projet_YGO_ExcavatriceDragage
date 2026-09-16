@@ -1,0 +1,107 @@
+contract:
+  task_id: T300
+  criticality: C2
+  strategy: patch
+  objective: >
+    Eprouver par un POC vertical le format de modele .twin.yaml et la chaine
+    TwinBench (modele -> moteur Python -> frames -> vue 2D -> injection joystick
+    -> invariant de securite -> generation ST) sur le seul perimetre Joystick +
+    axe de translation M3, sans ecrire une ligne dans CODE/.
+
+  acceptance:
+    - id: AC1
+      statement: "Le modele PROJECTS/excavatrice_dragage/machine.twin.yaml decrit l'axe M3 et le joystick, chaque parametre portant sa classe machine/config/environment, et le validateur refuse avec un code de retour non nul un modele dont une instance perd son af_ref."
+      verified_by: "python TOOLS/TWINBENCH/cli.py validate PROJECTS/excavatrice_dragage/machine.twin.yaml (exit 0) puis rejeu du meme fichier ampute de l'af_ref de M3 (exit non nul)."
+
+    - id: AC2
+      statement: "Le moteur Python execute le scenario m3_p1_to_tremie et produit une trace ou le chariot part de P1, atteint TREMIE, et les 5 capteurs M3 commutent dans l'ordre declare par le modele."
+      verified_by: "python TOOLS/TWINBENCH/cli.py run --scenario m3_p1_to_tremie --out out/trace_m3.json, puis assertions d'ordre de commutation dans TOOLS/TWINBENCH/tests/test_m3_sequence.py."
+
+    - id: AC3
+      statement: "Une impulsion joystick gauche injectee par l'API inject() met M3 en mouvement vers TREMIE, et le relachement de l'homme-mort ramene la vitesse M3 a zero."
+      verified_by: "TOOLS/TWINBENCH/tests/test_inject_joystick.py, deux cas : demarrage sur injection, arret sur relachement homme-mort."
+
+    - id: AC4
+      statement: "L'invariant INV_DEADMAN_STOPS_MOTION est exprime en declaratif dans le modele et evalue sur au moins 200 runs balayant les modes de panne stuck_low, stuck_high et chatter des 5 capteurs M3."
+      verified_by: "python TOOLS/TWINBENCH/cli.py sweep --invariants --runs 200 --report out/sweep_report.json."
+
+    - id: AC5
+      statement: "Le moteur de detection est lui-meme eprouve : un modele de test portant une violation volontaire de INV_DEADMAN_STOPS_MOTION est detecte, et le contre-exemple est minimise a 5 stimuli ou moins."
+      verified_by: "TOOLS/TWINBENCH/tests/test_invariant_detector.py — echoue si la violation injectee n'est pas trouvee ou pas minimisee."
+
+    - id: AC6
+      statement: "La vue 2D translation est generee en SVG depuis views.twin.yaml (rail, chariot, 5 zones capteurs) et est alimentee uniquement par les champs de la frame, sans aucun calcul de position dans le JavaScript."
+      verified_by: "python TOOLS/TEST_AUTO_CI/anim_bench/guard_animation_no_business_logic.py sur TOOLS/TWINBENCH/ui/ (PASS) et comparaison du SVG genere a l'instantane de reference."
+
+    - id: AC7
+      statement: "Le generateur profil embedded produit TOOLS/TWINBENCH/out/FB_Sim_Translation.st portant l'en-tete GENERATED, avec interface conforme au profil AF_Partie-03 (VAR_INPUT / VAR_OUTPUT declares, PascalCase), accompagne d'un rapport de differences semantiques face a CODE/L_SIMULATION/FB_Sim_Translation.st."
+      verified_by: "python TOOLS/TWINBENCH/cli.py generate --profile embedded, passage du LINTER_ST sur le fichier genere, et lecture du rapport out/diff_FB_Sim_Translation.md."
+
+    - id: AC8
+      statement: "Le rapport de couverture croise les instances M3 et joystick du modele, les entrees-sorties declarees dans AF_Partie-11 et AF_Partie-08, et les variables reellement declarees dans les fichiers ST correspondants, en listant nommement tout ecart."
+      verified_by: "python TOOLS/TWINBENCH/gates/G4xx_twinbench_af_coverage.py --report, reutilisant af_coverage_v2.py et extract_io.py."
+
+    - id: AC9
+      statement: "Objectif etendu, decrochable : sur le scenario de reference, la trace du moteur Python et celle du ST genere compile via COMPILER_ST2C_STruCpp coincident a la tolerance REAL declaree. Si le temps imparti est depasse, l'ecart est remonte en ALERT_RAISED avec les constats, jamais abandonne silencieusement."
+      verified_by: "python TOOLS/TWINBENCH/gates/G4xx_plant_equivalence.py --scenario m3_p1_to_tremie."
+
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T300_POC_TWINBENCH_JOYSTICK_M3.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/AF/
+      - DOC/STDS/
+      - TOOLS/TEST_AUTO_CI/anim_bench/
+      - TOOLS/TEST_AUTO_CI/engine/
+
+  conservation:
+    must_survive:
+      - "CODE/L_SIMULATION/ reste intact : FB_SimBench et les quatre FB_Sim_* ne sont ni modifies ni supprimes par ce POC."
+      - "Le banc TOOLS/TEST_AUTO_CI/anim_bench/ et son moteur restent operationnels et inchanges pendant toute la duree du POC."
+      - "Le schema Frame defini dans TEST_AUTO_CI/DIGITAL_TWIN/SPEC_INTERFACE_FRAME.md est repris tel quel, sans rupture de contrat."
+    dropped_on_purpose:
+      - "La physique des treuils M1/M2 et leur couplage en descente sont hors POC : un seul axe, non couple, suffit a eprouver la chaine."
+      - "L'export FMU et l'export AutomationML sont hors POC."
+      - "Le generateur de schema cinematique est hors POC."
+
+  evidence_required:
+    - "Sortie de python TOOLS/TWINBENCH/cli.py validate sur le modele nominal et sur le modele ampute d'af_ref."
+    - "Trace out/trace_m3.json et resultat des tests TOOLS/TWINBENCH/tests/."
+    - "Rapport de balayage out/sweep_report.json avec le compte de runs et d'invariants evalues."
+    - "Fichier genere out/FB_Sim_Translation.st et rapport out/diff_FB_Sim_Translation.md."
+    - "Rapport de couverture AF croisee produit par G4xx_twinbench_af_coverage.py."
+    - "Sortie du garde-fou guard_animation_no_business_logic.py sur TOOLS/TWINBENCH/ui/."
+    - "git status --short avant et apres execution, prouvant qu'aucun fichier de CODE/ n'est touche."
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Trois points de vigilance propres a ce POC.
+    1. Si le format .twin.yaml se revele incapable d'exprimer un comportement reel
+    de M3 ou du joystick, le signaler immediatement : c'est le resultat utile du
+    POC, pas un echec a contourner par un cas particulier code en dur.
+    2. Si la generation ST ou le gate d'equivalence (AC9) menace de depasser le
+    temps imparti, le dire avant de s'y enfoncer et rendre le POC sur AC1 a AC8.
+    3. Toute incoherence decouverte dans CODE/L_SIMULATION ou dans les specs
+    AF_Partie-08 / AF_Partie-11 est remontee telle quelle, sans correction :
+    ce POC n'a pas le droit d'ecrire dans CODE/.
+
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""
