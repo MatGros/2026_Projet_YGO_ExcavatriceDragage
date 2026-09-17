@@ -123,7 +123,9 @@
             border-collapse: collapse;
             font-size: 12px;
             text-align: left;
-            min-width: 960px;
+            /* Responsive : plus de largeur minimale figée à 960px (les colonnes compressent,
+               la ligne de détail sous chaque tache s'adapte a la largeur de la page). */
+            min-width: 0px;
         }
         .col-title {
             white-space: normal;
@@ -306,6 +308,9 @@
             padding: 10px 14px;
             border-radius: 6px;
             white-space: pre-line;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            max-width: 100%;
             border-left: 3px solid var(--cyan);
         }
         .detail-meta {
@@ -314,23 +319,38 @@
             align-items: center;
             font-size: 12px;
             color: var(--subtext);
+            flex-wrap: wrap;
+            gap: 8px 12px;
         }
-        /* Table lisible sur ecran large ; cartes empilees sur mobile. */
+        .detail-meta > div { flex-wrap: wrap; gap: 8px; }
+        /* Table lisible sur ecran large ; cartes empilees sur mobile.
+           Les largeurs de colonnes sont gerees par le <colgroup> (voir HTML) et
+           redimensionnables manuellement a la souris (poignee dans chaque <th>). */
         .table-container { overflow-x: auto; }
         #task-table { table-layout: auto; }
+        #task-table th { position: relative; }
         #task-table th, #task-table td { overflow-wrap: anywhere; word-break: normal; }
-        #task-table th:nth-child(1) { width: 42px !important; }
-        #task-table th:nth-child(2), #task-table td:nth-child(2),
-        #task-table th:nth-child(3), #task-table td:nth-child(3) {
-            width: 1% !important;
-            white-space: nowrap;
-            padding-left: 3px;
-            padding-right: 3px;
+
+        /* Poignees de redimensionnement manuel des colonnes */
+        #task-table .resize-handle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 100%;
+            cursor: col-resize;
+            user-select: none;
+            touch-action: none;
+            z-index: 2;
+            border-right: 1px solid transparent;
         }
-        #task-table th:nth-child(4), #task-table td:nth-child(4) { width: 1% !important; white-space: nowrap; }
-        #task-table th:nth-child(5) { width: 112px !important; }
-        #task-table th:nth-child(6) { width: 52px !important; }
-        #task-table th:nth-child(7) { width: 108px !important; }
+        #task-table .resize-handle:hover,
+        #task-table .resize-handle.active {
+            border-right: 1px solid var(--accent);
+            background: rgba(189,147,249,0.30);
+        }
+        #task-table .resize-handle.ready { border-right: 1px dashed rgba(189,147,249,0.4); }
+        body.resizing, body.resizing * { cursor: col-resize !important; user-select: none !important; }
         @media (max-width: 760px) {
             body { overflow-x: hidden; }
             .header, .toolbar { flex-wrap: wrap; gap: 8px; }
@@ -341,6 +361,12 @@
             #task-table tr { margin: 10px 0; border: 1px solid var(--border); border-radius: 8px; }
             #task-table td { border: 0; padding: 7px 10px; }
             #task-table td[data-label]::before { content: attr(data-label); display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; }
+            /* Ligne de detail : rendu carte pleine largeur sur mobile (contenu responsive) */
+            #task-table .detail-row td { display: block !important; width: 100% !important; padding: 0; }
+            #task-table .detail-box { padding: 10px; width: 100%; }
+            #task-table .detail-meta { flex-direction: column; align-items: stretch; gap: 10px; }
+            #task-table .detail-meta > div { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+            #task-table .resize-handle { display: none; }   /* pas de redimensionnement sur mobile */
             .modal-box { width: calc(100% - 24px) !important; max-width: none !important; }
         }
 
@@ -551,17 +577,29 @@
     </div>
     <div class="table-container">
         <table id="task-table">
+            <!-- Largeurs des colonnes : source unique (redimensionnables a la souris) -->
+            <colgroup>
+                <col id="col-0" data-def="44"  style="width:44px;  min-width:32px;">
+                <col id="col-1" data-def="88"  style="width:88px;  min-width:64px;">
+                <col id="col-2" data-def="54"  style="width:54px;  min-width:40px;">
+                <col id="col-3" data-def="62"  style="width:62px;  min-width:44px;">
+                <col id="col-4" data-def="84"  style="width:84px;  min-width:60px;">
+                <col id="col-5" data-def="40"  style="width:40px;  min-width:30px;">
+                <col id="col-6" data-def="94"  style="width:94px;  min-width:60px;">
+                <col id="col-7" data-def="auto"> <!-- Titre : flexible -->
+                <col id="col-8" data-def="118" style="width:118px; min-width:96px;">
+            </colgroup>
             <thead>
                 <tr>
-                    <th style="width: 32px; text-align: center;" onclick="sortBy('statut')" id="th-statut">État</th>
-                    <th style="width: 76px;" onclick="sortBy('id')" id="th-id">ID ↕</th>
-                    <th style="width: 48px;" onclick="sortBy('parent_id')" id="th-parent_id">Parent</th>
-                    <th style="width: 52px;" onclick="sortBy('agent')" id="th-agent">Agent</th>
-                    <th style="width: 78px;" onclick="sortBy('date')" id="th-date">Date ↕</th>
-                    <th style="width: 34px; text-align: center;" onclick="sortBy('criticite')" id="th-criticite">Crit.</th>
-                    <th style="width: 82px;" onclick="sortBy('domaine')" id="th-domaine">Domaine</th>
-                    <th onclick="sortBy('titre')" id="th-titre">Titre ↕</th>
-                    <th style="width: 110px; text-align: center;">Actions</th>
+                    <th style="text-align: center;" onclick="sortBy('statut')" id="th-statut">État<span class="resize-handle" data-col="0" title="Redimensionner (double-clic = défaut)"></span></th>
+                    <th onclick="sortBy('id')" id="th-id">ID ↕<span class="resize-handle" data-col="1" title="Redimensionner (double-clic = défaut)"></span></th>
+                    <th onclick="sortBy('parent_id')" id="th-parent_id">Parent<span class="resize-handle" data-col="2" title="Redimensionner (double-clic = défaut)"></span></th>
+                    <th onclick="sortBy('agent')" id="th-agent">Agent<span class="resize-handle" data-col="3" title="Redimensionner (double-clic = défaut)"></span></th>
+                    <th onclick="sortBy('date')" id="th-date">Date ↕<span class="resize-handle" data-col="4" title="Redimensionner (double-clic = défaut)"></span></th>
+                    <th style="text-align: center;" onclick="sortBy('criticite')" id="th-criticite">Crit.<span class="resize-handle" data-col="5" title="Redimensionner (double-clic = défaut)"></span></th>
+                    <th onclick="sortBy('domaine')" id="th-domaine">Domaine<span class="resize-handle" data-col="6" title="Redimensionner (double-clic = défaut)"></span></th>
+                    <th onclick="sortBy('titre')" id="th-titre">Titre ↕<span class="resize-handle" data-col="7" title="Redimensionner (double-clic = défaut)"></span></th>
+                    <th style="text-align: center;">Actions<span class="resize-handle" data-col="8" title="Redimensionner (double-clic = défaut)"></span></th>
                 </tr>
             </thead>
             <tbody id="table-body"></tbody>
@@ -2104,6 +2142,106 @@
         if (!section) return;
         section.classList.toggle('open');
     }
+
+    // ===== Redimensionnement manuel des colonnes (drag sur en-tête + persistance localStorage) =====
+    const COL_RESIZE_KEY = 'taskViewer_colWidths_v1';
+
+    function colPersistence() {
+        let store = null;
+        try { store = localStorage; } catch (e) { /* localStorage indisponible (file://) */ }
+        return {
+            load() {
+                if (!store) return {};
+                try { return JSON.parse(store.getItem(COL_RESIZE_KEY) || '{}'); } catch (e) { return {}; }
+            },
+            save(map) {
+                if (!store) return;
+                try { store.setItem(COL_RESIZE_KEY, JSON.stringify(map)); } catch (e) { /* non bloquant */ }
+            }
+        };
+    }
+
+    function initColumnResize() {
+        const table = document.getElementById('task-table');
+        if (!table) return;
+        const cols = Array.from(table.querySelectorAll('colgroup col'));
+        const handles = Array.from(table.querySelectorAll('th .resize-handle'));
+        const persist = colPersistence();
+
+        // 1) Réappliquer les largeurs mémorisées
+        const saved = persist.load();
+        cols.forEach((col, idx) => {
+            const w = parseInt(saved[idx], 10);
+            if (Number.isFinite(w)) col.style.width = w + 'px';
+        });
+
+        const persistWidths = () => {
+            const out = {};
+            cols.forEach((col, idx) => { out[idx] = col.style.width || ''; });
+            persist.save(out);
+        };
+        const resetCol = (idx) => {
+            const col = cols[idx];
+            if (!col) return;
+            const def = col.getAttribute('data-def');
+            if (def === 'auto' || def === '') col.style.width = '';
+            else col.style.width = def + 'px';
+            persistWidths();
+        };
+
+        handles.forEach(handle => {
+            const idx = parseInt(handle.getAttribute('data-col'), 10);
+            const col = cols[idx];
+            if (!col) return;
+
+            handle.classList.add('ready');
+
+            // Double-clic = retour à la largeur par défaut
+            handle.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                resetCol(idx);
+            });
+
+            handle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();          // éteint le tri sur le <th> pendant le drag
+                if (e.button !== 0) return;
+                const startX = e.clientX;
+                const startW = Math.round(col.getBoundingClientRect().width || col.offsetWidth) || 60;
+                const minW = parseInt(col.style.minWidth, 10) || 30;
+
+                handle.classList.add('active');
+                document.body.classList.add('resizing');
+
+                const onMove = (ev) => {
+                    const w = Math.max(minW, Math.round(startW + (ev.clientX - startX)));
+                    col.style.width = w + 'px';
+                };
+                const onUp = () => {
+                    const moved = Math.abs(e.clientX - startX) >= 1;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                    handle.classList.remove('active');
+                    document.body.classList.remove('resizing');
+                    persistWidths();
+                    // Si on a vraiment dragué, avaler le clic qui suivrait pour ne pas déclencher le tri
+                    if (moved) {
+                        const swallow = () => {
+                            document.removeEventListener('click', swallow, true);
+                            e.preventDefault();
+                            e.stopPropagation();
+                        };
+                        document.addEventListener('click', swallow, true);
+                    }
+                };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+        });
+    }
+
+    initColumnResize();
 
     // Chargement initial silencieux (données prêtes dès l'ouverture de l'accordéon)
     loadOrchestrator();

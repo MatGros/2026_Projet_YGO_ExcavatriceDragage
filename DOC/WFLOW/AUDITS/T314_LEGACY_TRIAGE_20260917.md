@@ -9,14 +9,16 @@ Après challenge utilisateur, la phase active est recentrée strictement sur OME
 `TOOLS/TWINBENCH/modelica_atelier/` ne porte plus que :
 
 - `Dredge.mo` : source Modelica éditable, scénarios, chronogrammes et animations OMEdit ;
-- `Ouvrir_Dredge_OMEdit.bat` : ouverture directe du modèle avec l'exécutable Windows ;
 - `README.md` : parcours minimal.
+
+Le seul point d'entrée est `TOOLS/TWINBENCH/Lancer_TwinBench.bat`, hors du dossier modèle.
 
 ## Classement
 
 | Élément antérieur | Décision | Motif |
 |---|---|---|
-| `Dredge.mo`, `dredge_runtime.py`, contrats Dredge | Conserver actif | Socle OpenModelica conforme au contrat T314 |
+| `Dredge.mo` | Conserver actif | Source unique ouverte et exécutée dans OMEdit |
+| catalogues de signaux/parité | Déplacer vers `DOC/WFLOW/CONTRACTS/` | Preuves actives sans encombrer l'atelier utilisateur |
 | viewer interactif situé sous `rumoca_poc/` | Archiver | L'utilisateur a demandé de rester dans OMEdit ; aucune IHM web active |
 | `Atelier.mo`, ancien `runtime.py`, ancienne IHM AxisLab | Archiver | Modèle pédagogique concurrent de `Dredge.mo`, source de confusion |
 | pont Claude et documents API/design du premier POC | Archiver | Documents datés, non contractuels pour T314 |

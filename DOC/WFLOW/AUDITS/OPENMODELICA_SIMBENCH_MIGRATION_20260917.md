@@ -1,6 +1,6 @@
 # Audit de migration SimBench → OpenModelica — 2026-09-17
 
-Statut : **L0 terminé · L1 M3 FMU validé · remplacement PLC interdit à ce stade**.
+Statut : **travaux FMU historiques archivés · socle utilisateur recentré sur OMEdit par T314 · remplacement PLC interdit**.
 
 ## Décision d’architecture
 
@@ -41,7 +41,7 @@ aucun de ces écarts ne peut traverser directement `HwIn`.
 
 ## Parité tracée
 
-Le contrat versionné [simbench_parity.yaml](../../../TOOLS/TWINBENCH/modelica_atelier/contracts/simbench_parity.yaml)
+Le contrat versionné [T314_SIMBENCH_PARITY.yaml](../CONTRACTS/T314_SIMBENCH_PARITY.yaml)
 classe les **69 entrées** de `FB_SimBench` une fois et les cinq sorties contractuelles.
 
 ```powershell
@@ -57,17 +57,12 @@ python TOOLS/AGENT_WORKFLOW/scripts/check_simbenc_parity.py
 | Chaîne machine | AU, contacteur, phases, thermiques | L4 : image banc seulement |
 | Joystick | image brute CANopen, deadman | L5 : HID hors PLC ; qualification PLC conservée |
 
-## Preuve d'exécution L1
+## Preuve d'exécution historique L1
 
-`Dredge.TranslationM3Plant` est exporté en **FMU Co-Simulation 2.0** par OpenModelica puis
-exécuté par la DLL native OMSimulator dans `dredge_runtime.py`. Ce n'est donc ni une courbe
-OMEdit seule, ni une seconde implémentation Python de la plante.
-
-```powershell
-py -3.13 TOOLS/TWINBENCH/modelica_atelier/verify_dredge_m3.py
-```
-
-Résultat du 2026-09-17 :
+Le runtime FMU Python et sa vérification ont servi à prouver la faisabilité, puis ont été
+archivés lors du recentrage T314. Ils ne sont plus une dépendance ni une commande active.
+La preuve utilisateur active est maintenant la simulation directe des classes `Dredge.Examples`
+dans OMEdit. Résultats historiques du 2026-09-17 :
 
 | Critère | Preuve |
 |---|---|
@@ -108,9 +103,9 @@ Masse/inertie, réducteurs, rayons de tambours, mouflage/nombre de brins, frotte
 caractéristiques plaque moteur/rotor, cotes cinq capteurs M3, calibration codeurs, charge eau/sol
 et traces machine de référence. Les valeurs POC servent uniquement à un comportement pédagogique.
 
-## Étapes suivantes
+## Étapes suivantes — décision T314
 
-1. L1 : exporter FMU `Dredge.TranslationM3Plant`, adaptateur shadow, tests fréquence/frein/5 DI/défauts.
-2. L2 : tambours M1/M2, codeurs, paliers, freins, contacteurs et capteurs.
-3. L3 : cinématique vraie benne/mouflage/charge et Kobold.
-4. L4 : SSP, rejeu SimBench, comparaisons et seulement ensuite décision humaine de retrait par domaine.
+1. Calibrer M1/M2 et M3 avec des traces réelles horodatées.
+2. Reproduire dans OMEdit les rebonds capteurs/frein et la transition fermeture-remontée.
+3. Comparer comportement actuel et modèle corrigé avant toute discussion de FMU ou d'adaptateur.
+4. Toute reprise d'une intégration PLC/SSP exige un nouveau contrat et une validation humaine.
