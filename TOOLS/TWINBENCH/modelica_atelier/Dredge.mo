@@ -212,6 +212,79 @@ package Dredge "Plante hors ligne de dragage : aucune logique PLC ni safety"
         m2BrakeReleaseCmd=if (time >= 1 and time < 4) or (time >= 6 and time < 10) then 1 else 0);
       annotation(experiment(StartTime=0, StopTime=12, Tolerance=1e-6, Interval=.01));
     end M1M2BucketCycle;
+
+    model GrabClosureThenHoist
+      "Fermer la benne, valider le retour fermé 300 ms, puis remonter M1 et M2"
+      discrete Real closedAt(start=-1, fixed=true)
+        "Instant du premier retour bucketClosedDI";
+      Boolean closureCmd "Commande de fermeture M2";
+      Boolean hoistCmd "Commande de remontée conjointe M1/M2";
+      WinchesM1M2Plant plant(
+        m1RelayFwd=0,
+        m1RelayRev=if hoistCmd then 1 else 0,
+        m1StepNumber=if hoistCmd then 3 else 0,
+        m1BrakeReleaseCmd=if hoistCmd then 1 else 0,
+        m2RelayFwd=if closureCmd then 1 else 0,
+        m2RelayRev=if hoistCmd then 1 else 0,
+        m2StepNumber=if closureCmd or hoistCmd then 3 else 0,
+        m2BrakeReleaseCmd=if closureCmd or hoistCmd then 1 else 0);
+    equation
+      closureCmd = time >= 1 and plant.bucketClosedDI < .5;
+      hoistCmd = closedAt >= 0 and time >= closedAt + .30 and time < closedAt + 5.30;
+    algorithm
+      when plant.bucketClosedDI > .5 then
+        closedAt := time;
+      end when;
+      annotation(
+        experiment(StartTime=0, StopTime=20, Tolerance=1e-6, Interval=.01),
+        Documentation(info="<html><p>Scénario de mise au point AX10 vers AX11 : M2 ferme la benne jusqu'au retour <code>bucketClosedDI</code>. Le retour est observé pendant 300 ms avant d'autoriser la remontée conjointe M1/M2. Il s'agit d'une séquence de simulation hors ligne, pas du séquenceur PLC.</p><p>À tracer : <code>closureCmd</code>, <code>plant.bucketClosedDI</code>, <code>hoistCmd</code>, <code>plant.m1CablePositionM</code> et <code>plant.m2CablePositionM</code>.</p></html>"));
+    end GrabClosureThenHoist;
+
+    model AnimatedGrabClosureThenHoist
+      "Animation OMEdit X-Z du scénario fermeture puis remontée"
+      extends GrabClosureThenHoist;
+      import Shape = Modelica.Mechanics.MultiBody.Visualizers.Advanced.Shape;
+
+      Real bucketZ "Hauteur schématique de la benne";
+      Real jawOffset "Ecartement schématique des coquilles";
+      Shape water(
+        shapeType="box", r={15,-4,0}, length=34, width=8, height=.15,
+        color={25,110,165});
+      Shape bridge(
+        shapeType="box", r={15,0,12}, length=32, width=1.2, height=.55,
+        color={70,80,90});
+      Shape trolley(
+        shapeType="box", r={15,0,11.4}, length=2.4, width=2.2, height=.9,
+        color={225,155,35});
+      Shape cableM1(
+        shapeType="cylinder", r={14.5,-.55,bucketZ},
+        lengthDirection={0,0,1}, widthDirection={1,0,0},
+        length=max(.1,11.4-bucketZ), width=.08, height=.08,
+        color={215,215,205});
+      Shape cableM2(
+        shapeType="cylinder", r={15.5,.55,bucketZ},
+        lengthDirection={0,0,1}, widthDirection={1,0,0},
+        length=max(.1,11.4-bucketZ), width=.08, height=.08,
+        color={230,185,105});
+      Shape spreader(
+        shapeType="box", r={15,0,bucketZ}, length=2.2, width=1.2, height=.35,
+        color={105,85,65});
+      Shape leftJaw(
+        shapeType="box", r={15-jawOffset,0,bucketZ-1},
+        length=max(.45,jawOffset), width=1.7, height=1.7,
+        color={125,75,50});
+      Shape rightJaw(
+        shapeType="box", r={15+jawOffset,0,bucketZ-1},
+        length=max(.45,jawOffset), width=1.7, height=1.7,
+        color={125,75,50});
+    equation
+      // Projection X-Z volontairement schématique : les cotes réelles seront calibrées par traces.
+      bucketZ = max(1.5, 8 - .18*(plant.m1CablePositionM + plant.m2CablePositionM));
+      jawOffset = .35 + 2.2*plant.bucketOpeningPct/100;
+      annotation(
+        experiment(StartTime=0, StopTime=20, Tolerance=1e-6, Interval=.01),
+        Documentation(info="<html><p>Dans OMEdit, utiliser <b>Simuler avec animation</b>, puis regarder suivant l'axe Y pour obtenir la vue métier X-Z. La fermeture des coquilles suit <code>plant.bucketOpeningPct</code> et la hauteur suit les deux longueurs de câble. La géométrie reste une hypothèse éditable, distincte de la dynamique Modelica.</p></html>"));
+    end AnimatedGrabClosureThenHoist;
   end Examples;
   annotation(uses(Modelica(version="4.0.0")));
 end Dredge;

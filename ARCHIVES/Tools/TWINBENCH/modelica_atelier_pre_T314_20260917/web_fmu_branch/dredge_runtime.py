@@ -15,8 +15,6 @@ from pathlib import Path
 import subprocess
 import tempfile
 
-from runtime import installation
-
 ROOT = Path(__file__).resolve().parent
 STEP_S = 0.02
 INPUTS = ("reqTremie", "reqMaintenance", "speedCmdPct", "brakeReleaseCmd")
@@ -25,6 +23,22 @@ OUTPUTS = (
     "posTremieDI", "posPVDI", "posP2DI", "posP1DI", "posMaintenanceDI",
     "statusWord", "commandConflict", "hardStopTremie", "hardStopMaintenance",
 )
+
+
+def installation():
+    """Retourne une installation Windows OpenModelica complète et exploitable."""
+    override = os.environ.get("OPENMODELICAHOME")
+    candidates = ([Path(override)] if override else [])
+    candidates += sorted(Path("C:/Program Files").glob("OpenModelica*"), reverse=True)
+    for candidate in candidates:
+        if ((candidate / "bin" / "omc.exe").exists()
+                and (candidate / "bin" / "OMEdit.exe").exists()
+                and (candidate / "bin" / "libOMSimulator.dll").exists()):
+            return candidate
+    raise RuntimeError(
+        "OpenModelica Windows complet introuvable (omc.exe, OMEdit.exe, "
+        "libOMSimulator.dll). Définir OPENMODELICAHOME si nécessaire."
+    )
 
 
 def compile_plant_fmu(model, prefix):

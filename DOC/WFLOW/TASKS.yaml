@@ -80,21 +80,22 @@ tasks:
   bloque_par: []
 - id: T309
   parent_id: ''
-  statut: '⬜'
+  statut: '❌'
   criticite: C3
   domaine: TREUILS_BENNE / CYCLE_AUTO
   agent: '—'
-  date: '2026-09-17T10:02:00+02:00'
-  avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO. Stade simulation/étude uniquement pour l''instant ; passage à du code réel à statuer ultérieurement.'
-  titre: 'Transition fermeture/remontée en grappin (AX10→AX11) — ne pas attendre la fermeture complète pour engager la remontée à deux treuils'
-  contexte: 'Mail YGO 2026-09-15 : "objectif = ne pas attendre la fermeture complète avant de monter avec les deux treuils, afin de soulager M2 seul. À simuler et tester avant toute mise en réel : passage AX10 → AX11, commandes, freins, contacteurs et continuité de mouvement." Sujet important mais qui reste au stade simulation/étude ; l''avancement vers du code réel de production sera décidé dans un lot ultérieur distinct.'
-  description: 'Étudier et simuler la transition anticipée AX10 (fermeture benne) → AX11 (remontée à deux treuils) sans attendre la fermeture complète, dans le seul objectif de réduire la charge sur M2 seul. Couvrir commandes, freins, contacteurs et continuité de mouvement en SimBench. Aucune écriture de code de production dans ce lot — étude et simulation uniquement.'
-  objectifs:
-  - 'Modéliser en SimBench la transition anticipée AX10→AX11 (seuil de fermeture partielle à définir) et son impact sur M2.'
-  - 'Vérifier la continuité de mouvement, l''absence de à-coup et la cohérence commandes/freins/contacteurs pendant la transition.'
-  - 'Documenter le seuil de fermeture retenu et sa justification physique (charge M2).'
-  - 'Ne pas modifier CODE/ de production dans ce lot ; toute avancée vers du code réel fait l''objet d''un lot distinct après validation humaine explicite.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T309_TRANSITION_FERMETURE_REMONTEE_GRAPPIN.yaml
+  date: '2026-09-17T10:23:00+02:00'
+  avancement: 'DOUBLON identifié le 2026-09-17 (relecture utilisateur) de T262
+    (seuil configurable benne et continuité AX10→AX11→AX12, Phase A déjà codée :
+    GVL/IHM persistant ExtractionStartOpening_Pct). ALERTE : le mail YGO du
+    2026-09-15 décrivait ce sujet comme "à simuler avant toute mise en réel",
+    mais T262 montre une Phase A déjà codée (pas seulement simulation) — écart
+    à clarifier avec l''utilisateur avant reprise de T262.'
+  titre: 'Transition fermeture/remontée en grappin (AX10→AX11) [DOUBLON de T262, fusionnée]'
+  contexte: 'Mail YGO 2026-09-15 : ne pas attendre la fermeture complète avant de monter avec les deux treuils, afin de soulager M2 seul.'
+  description: 'Voir T262 pour la suite.'
+  objectifs: []
+  contrat: ''
   bloque_par: []
 - id: T308
   parent_id: ''
@@ -115,23 +116,20 @@ tasks:
   bloque_par: []
 - id: T307
   parent_id: ''
-  statut: '⬜'
+  statut: '❌'
   criticite: C2
   domaine: SECURITE_MACHINE / ALARMES / REARMEMENT
   agent: '—'
-  date: '2026-09-17T10:00:00+02:00'
-  avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO : le 24V variateurs doit rester alimenté même AU relâché (déjà traité) ; reste le nettoyage des alarmes transitoires parasites au réarmement.'
-  titre: '24V variateurs — auto-acquittement borné des alarmes transitoires après réarmement (hors AU actif)'
-  contexte: 'Demande utilisateur 2026-09-17 : après rétablissement du 24V au réarmement (AU relâché, aucun AU actif), des alarmes parasites transitoires peuvent apparaître juste après le réarmement sans utilité (bruit de démarrage des variateurs/codeurs). Demande une salve d''acquittements automatiques bornée pour nettoyer ces alarmes transitoires, sans jamais acquitter une alarme réellement active et justifiée.'
-  description: 'Mettre en place une salve d''acquittement automatique bornée (2 à 3 acquittements, espacés d''environ 1 s, pendant environ 3 s) déclenchée uniquement après réarmement complet et en l''absence de tout AU actif. La salve ne doit jamais masquer une alarme réellement active : seules les alarmes transitoires apparues dans la fenêtre de démarrage sont concernées, et toute alarme qui persiste après la salve reste visible et non acquittée automatiquement.'
-  objectifs:
-  - 'Déclencher la salve uniquement sur front de réarmement complet, AU non actif, jamais en fonctionnement normal.'
-  - 'Borner strictement la salve à 2-3 acquittements espacés d''environ 1 s sur une fenêtre d''environ 3 s après réarmement.'
-  - 'Ne jamais acquitter automatiquement une alarme qui persiste après la fenêtre — elle reste affichée et nécessite un acquittement opérateur conscient.'
-  - 'Vérifier qu''aucune alarme de sécurité bloquante (AU, discordance, PowerCutOff) n''est concernée par l''auto-acquittement.'
-  - 'Tests couvrant : réarmement sans alarme parasite, réarmement avec alarme transitoire nettoyée, réarmement avec alarme réelle persistante non acquittée, AU actif pendant la fenêtre (salve annulée).'
-  - 'Bundle PLCopenXML, G200 liaison et gates applicables PASS.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T307_AUTO_ACQUITTEMENT_ALARMES_REARMEMENT.yaml
+  date: '2026-09-17T10:22:00+02:00'
+  avancement: 'DOUBLON identifié le 2026-09-17 (relecture utilisateur) de T278
+    (filtrage alarmes parasites AU et auto-reset temporisé post-réarmement, déjà
+    cadrée par Antigravity le 2026-09-07, contrat existant). Contenu utile fusionné
+    dans T278. Ne pas retravailler ici.'
+  titre: '24V variateurs — auto-acquittement borné des alarmes transitoires après réarmement [DOUBLON de T278, fusionnée]'
+  contexte: 'Demande utilisateur 2026-09-17 : après rétablissement du 24V au réarmement (AU relâché, aucun AU actif), des alarmes parasites transitoires peuvent apparaître juste après le réarmement sans utilité.'
+  description: 'Voir T278 pour la suite.'
+  objectifs: []
+  contrat: ''
   bloque_par: []
 - id: T306
   parent_id: ''
@@ -197,12 +195,12 @@ tasks:
   bloque_par: []
 - id: T314
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: OUTILLAGE / SIMULATION / OPENMODELICA
-  agent: '—'
-  date: '2026-09-17T00:00:00+02:00'
-  avancement: 'Recentrage décidé : OpenModelica/OMEdit/OMSimulator Windows devient le socle unique de modélisation et d''exécution ; Rumoca est gelé comme piste R&D sans dépendance utilisateur.'
+  agent: Codex
+  date: '2026-09-17T23:21:15+02:00'
+  avancement: 'Rebuild engagé : inventaire du legacy TwinBench/Rumoca, archivage des preuves utiles et reconstruction d''un point d''entrée Windows unique sur OpenModelica/OMEdit/OMSimulator.'
   titre: 'OpenModelica Windows — atelier éditable, animation et conduite interactive M1/M2/M3'
   contexte: 'Le POC Rumoca a produit des rapports et un viewer, mais l''installation/runtime Windows et la compatibilité Modelica/animation ne permettent pas d''en faire le logiciel utilisateur. OpenModelica est déjà installé, maintenu sur le poste et fournit OMEdit, MSL, FMU et OMSimulator. Le besoin prioritaire est donc un atelier utilisable : ouvrir/modifier un modèle, simuler, animer et piloter sans générer un rapport intermédiaire obligatoire.'
   description: 'Rebâtir l''atelier autour de l''exécutable OpenModelica Windows. Le modèle source reste Dredge.mo ; OMEdit est l''éditeur de classes/diagrammes, OMSimulator ou l''exécutable OpenModelica assure l''exécution, et une vue opérateur lit uniquement les sorties de la plante. Le banc CODESYS/SimBench reste conservé et aucune commande réelle n''est autorisée.'
@@ -990,7 +988,7 @@ tasks:
   bloque_par: []
 - id: T092
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: SÉCURITÉ
   agent: HUM
@@ -1002,7 +1000,10 @@ tasks:
   - Valider la persistance NVRAM après redémarrage automate
   - Valider le comportement du référencement 0 m conjointement à la benne
   contrat: ''
-  date: '2026-09-05T08:44:00+02:00'
+  date: '2026-09-17T10:20:00+02:00'
+  avancement: 'Validée sur site le 2026-09-17 (confirmation utilisateur) : persistance
+    NVRAM/RETAIN et comportement homing à 0 m avec benne raccordée testés et conformes.'
+  completed_at: '2026-09-17T10:20:00+02:00'
   bloque_par: []
 - id: T125
   parent_id: ''
@@ -1046,32 +1047,23 @@ tasks:
   bloque_par: []
 - id: T157
   parent_id: ''
-  statut: ⏳
+  statut: ❌
   criticite: C4
   domaine: SÉCURITÉ
   agent: HUM
-  date: '2026-09-05T08:46:00+02:00'
-  titre: Permis d'armement joystick (ArmingPermit) — [Asymétrie Q2 traitée, reste
-    gestion fine permis armement]
+  date: '2026-09-17T10:21:00+02:00'
+  titre: Permis d'armement joystick (ArmingPermit) — [DOUBLON de T224, fusionnée]
   contexte: Asymétrie homme-mort treuils/translation (Q2) déjà arbitrée et mergée
-    dans l'architecture 7 POU. Reste à finaliser la gestion fine et le câblage dynamique
-    de ArmingPermit pour l'armement du joystick.
-  description: '⏳ **Partiellement mergé & Requalifié** : L''alignement des arbitrages
-    de mouvement contre DeadmanArmed dans PRG_04/PRG_05 est en place. Le point ouvert
-    restant concerne la condition dynamique de `ArmingPermit` dans PRG_02_Acquisition
-    (actuellement forcé/simplifié) pour éviter les armements hors conditions sûres.'
+    dans l'architecture 7 POU.
+  description: 'DOUBLON identifié le 2026-09-17 (relecture utilisateur) : le point
+    ouvert "calcul dynamique de ArmingPermit" est déjà couvert et plus précisément
+    cadré par T224 (ArmingPermit cohérent avec disponibilité réelle des actionneurs,
+    contrat existant, en cours de revue). Contenu utile fusionné dans T224. Ne pas
+    retravailler ici.'
   objectifs:
   - 'Clos : Arbitrage et symétrie homme-mort sur l''ensemble des actionneurs (PRG_04/PRG_05).'
-  - 'Restant : Définir et raccorder le calcul dynamique de ArmingPermit (position
-    neutre, absence de défaut bloquant, mode valide).'
-  - 'Ajouté 2026-09-17 (mail YGO/retour utilisateur) : le joystick peut s''armer alors
-    que les moteurs/mouvement ne sont pas réellement autorisés/prêts, ce qui pousse
-    à piloter les contacteurs dans un état incohérent et génère des défauts "commande
-    sans mouvement". Corriger la logique d''armement pour qu''elle reflète réellement
-    les permis de déplacement (bonne information/entrée de disponibilité moteur).
-    Cette correction DOIT être challengée/revue par un expert avant toute implémentation
-    — pas d''implémentation directe.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T157_ARMING_PERMIT_JOYSTICK.yaml
+  - 'Voir T224 pour la suite.'
+  contrat: ''
   bloque_par: []
 - id: T208
   parent_id: ''
@@ -1483,6 +1475,11 @@ tasks:
   - Préserver les mouvements disponibles sur les autres axes
   - Définir et tester la reprise consciente après pause/interlock
   - Publier axe, sens et raison pour l'IHM/troubleshooting
+  - 'Fusionné 2026-09-17 (doublon T157, mail YGO) : confirmation terrain du symptôme
+    — le joystick s''arme alors que les moteurs/mouvement ne sont pas réellement
+    prêts, ce qui pousse à piloter les contacteurs dans un état incohérent et génère
+    des défauts "commande sans mouvement". Cette correction DOIT être challengée/revue
+    par un expert avant toute implémentation — pas d''implémentation directe.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T224_ARMINGPERMIT_ACTIONNEUR_PRET.yaml
   bloque_par:
   - Arbitrage humain requis: politique au neutre et reprise consciente après pause
@@ -2827,7 +2824,11 @@ tasks:
   date: '2026-09-15T15:10:00+02:00'
   avancement: 'Phase A codee : GVL/IHM persistant ExtractionStartOpening_Pct [0..50],
     defaut 0, sans lecture cycle. Interface IHM figee ; verification pre-CODESYS en
-    cours. B conserve AX10b, C raccordement P1, D AX11 P2 puis AX12.'
+    cours. B conserve AX10b, C raccordement P1, D AX11 P2 puis AX12. ALERTE 2026-09-17
+    (fusion T309/mail YGO) : le mail utilisateur du 2026-09-15 décrit ce sujet comme
+    "à simuler avant toute mise en réel", en écart avec la Phase A déjà codée ici —
+    à clarifier avec l''utilisateur avant de poursuivre B/C/D (statut réel simulation
+    vs code engagé).'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T262_TRANSFERT_AX10_AX11_20260915.md
   titre: Seuil configurable benne et continuité AX10→AX11→AX12
   contexte: 'Demande client cycle automatique : réduire l effort appliqué sur M2 seul
@@ -3151,6 +3152,12 @@ tasks:
     bus SR4) suivie d un auto-reset unique.
   - Garantir le respect strict de la non-reprise automatique de mouvement (sécurité
     ISO 13849).
+  - 'Fusionné 2026-09-17 (doublon T307, mail YGO — précision 24V variateurs) :
+    borner la salve à 2-3 acquittements espacés d''environ 1 s sur une fenêtre
+    d''environ 3 s, déclenchée uniquement sur front de réarmement complet et en
+    l''absence de tout AU actif (annulée si AU redevient actif pendant la fenêtre).
+    Ne jamais acquitter automatiquement une alarme qui persiste au-delà de la
+    fenêtre ni une alarme de sécurité bloquante (AU, discordance, PowerCutOff).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T278_AU_ALARMS_FILTERING_AND_AUTO_RESET.yaml
   bloque_par: []
 - id: T279

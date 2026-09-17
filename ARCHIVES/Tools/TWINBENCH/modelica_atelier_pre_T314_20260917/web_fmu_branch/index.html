@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TwinBench · OpenModelica</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main class="shell">
+  <header class="topbar">
+    <div class="brand"><span class="kicker">TWINBENCH / HORS LIGNE</span><h1>Atelier OpenModelica</h1></div>
+    <div class="top-actions">
+      <span id="connection" class="status pending">Chargement des FMU…</span>
+      <button id="openOmEdit" class="omedit" type="button">Ouvrir Dredge.mo dans OMEdit</button>
+      <button id="reloadModel" type="button">Recharger le modèle</button>
+    </div>
+  </header>
+
+  <div id="error" class="error" role="alert" hidden></div>
+
+  <section class="workspace">
+    <aside class="controls">
+      <div class="section-title">01 · Conduire</div>
+      <div class="safety-row">
+        <span id="deadmanLamp" class="lamp"></span>
+        <span>Homme-mort</span>
+        <button id="deadman" class="deadman" type="button">MAINTENIR</button>
+      </div>
+
+      <div class="control-block">
+        <label>M3 · translation</label>
+        <div class="pad"><button data-axis="m3" data-dir="-1">◀ Trémie</button><button data-axis="m3" data-dir="1">Maintenance ▶</button></div>
+      </div>
+      <div class="control-block">
+        <label>M1 · retenue / levage</label>
+        <div class="pad"><button data-axis="m1" data-dir="-1">Remonter</button><button data-axis="m1" data-dir="1">Descendre</button></div>
+      </div>
+      <div class="control-block">
+        <label>M2 · fermeture benne</label>
+        <div class="pad"><button data-axis="m2" data-dir="-1">Ouvrir</button><button data-axis="m2" data-dir="1">Fermer</button></div>
+      </div>
+
+      <label class="range-label">Vitesse <output id="speedValue">70 %</output><input id="speed" type="range" min="0" max="100" value="70"></label>
+      <div class="actions"><button id="play" class="primary">▶ Démarrer</button><button id="pause">Ⅱ Pause</button><button id="reset">↺ Reset</button></div>
+
+      <div class="section-title">02 · Joystick USB / HID</div>
+      <select id="gamepadSelect"><option value="">Brancher puis sélectionner…</option></select>
+      <div id="gamepadStatus" class="device-status">Aucun joystick actif</div>
+      <div class="mapping-grid">
+        <label>M3 <select id="mapM3"></select><button class="learn" data-learn="m3">Apprendre</button></label>
+        <label>M1 <select id="mapM1"></select><button class="learn" data-learn="m1">Apprendre</button></label>
+        <label>M2 <select id="mapM2"></select><button class="learn" data-learn="m2">Apprendre</button></label>
+        <label>Homme-mort <select id="mapDeadman"></select><button class="learn" data-learn="deadman">Apprendre</button></label>
+      </div>
+      <div class="joystick-actions"><button id="calibrate">Calibrer le neutre</button><button id="armGamepad">Activer le joystick</button></div>
+      <div id="rawInputs" class="raw-inputs">Les axes et boutons apparaîtront ici.</div>
+      <p class="hint">Périphérique préféré : STANDARD GAMEPAD 045e:0b22. La sélection ne l'arme jamais. Déconnexion, perte de focus ou perte d'homme-mort = commandes à zéro.</p>
+
+      <div class="section-title">03 · Scénarios</div>
+      <button id="grab" class="scenario">Fermeture benne → remontée M1 + M2</button>
+      <div id="phase" class="phase">Prêt</div>
+
+      <details class="settings">
+        <summary>Paramètres de plante</summary>
+        <div class="parameter-grid">
+          <label>Course M3 (m)<input id="cfgTravel" type="number" min="1" max="100" step="0.1" value="30"></label>
+          <label>Temps M3 (s)<input id="cfgTravelTime" type="number" min="0.2" max="60" step="0.1" value="8"></label>
+          <label>Treuil min (m/s)<input id="cfgWinchMin" type="number" min="0.05" max="10" step="0.05" value="1"></label>
+          <label>Treuil max (m/s)<input id="cfgWinchMax" type="number" min="0.05" max="10" step="0.05" value="2"></label>
+          <label>Fermeture benne (m)<input id="cfgBucket" type="number" min="0.1" max="100" step="0.1" value="15"></label>
+        </div>
+        <button id="applyConfig" class="wide">Appliquer et réinitialiser</button>
+      </details>
+    </aside>
+
+    <section class="stage">
+      <div class="stage-head">
+        <div><span class="kicker">VUE OPÉRATEUR · PLAN X–Z</span><h2>Chariot, treuils et benne preneuse</h2></div>
+        <div class="stage-tools"><span id="mode" class="mode">MANUEL</span><button id="edit">✎ Éditer la vue</button><button id="save">Enregistrer</button><button id="resetLayout">Vue initiale</button></div>
+      </div>
+      <svg id="scene" viewBox="0 0 900 470" role="img" aria-label="Vue 2D animée du portique et de la benne">
+        <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#1b3348"/><stop offset="1" stop-color="#102434"/></linearGradient></defs>
+        <rect width="900" height="470" fill="url(#sky)"/>
+        <rect class="water" x="0" y="310" width="900" height="160"/><path class="waterline" d="M0 310H900"/>
+        <rect class="bridge" x="70" y="82" width="760" height="28" rx="8"/><rect class="rail" x="90" y="112" width="720" height="10"/>
+        <text class="landmark" x="90" y="65">TRÉMIE · 0 m</text><text class="landmark" x="810" y="65" text-anchor="end">MAINTENANCE</text>
+        <g id="trolley" class="editable">
+          <rect class="carriage" x="-42" y="100" width="84" height="48" rx="7"/><rect class="cabinet" x="-22" y="72" width="44" height="30" rx="4"/>
+          <circle class="wheel" cx="-27" cy="132" r="11"/><circle class="wheel" cx="27" cy="132" r="11"/>
+        </g>
+        <g id="winches" class="editable">
+          <line id="cableM1" class="cable m1" x1="-20" y1="148" x2="-28" y2="278"/>
+          <line id="cableM2" class="cable m2" x1="20" y1="148" x2="28" y2="278"/>
+          <circle class="drum" cx="-20" cy="150" r="12"/><circle class="drum" cx="20" cy="150" r="12"/>
+        </g>
+        <g id="bucket" class="editable">
+          <rect class="spreader" x="-48" y="-8" width="96" height="16" rx="5"/>
+          <path id="leftJaw" class="jaw" d="M-45 2 L0 16 L-18 88 L-62 58 Z"/>
+          <path id="rightJaw" class="jaw" d="M45 2 L0 16 L18 88 L62 58 Z"/>
+          <path id="leftTeeth" class="tooth" d="M-62 58l-5 18 15-10 8 17 10-18"/>
+          <path id="rightTeeth" class="tooth" d="M62 58l5 18-15-10-8 17-10-18"/>
+        </g>
+        <text id="positionLabel" class="position-label" x="450" y="42">M3 0,0 m</text>
+        <g id="editHint" class="edit-hint" visibility="hidden"><rect x="14" y="14" width="235" height="30" rx="6"/><text x="27" y="34">Glisser les éléments pour ajuster la vue</text></g>
+      </svg>
+      <div class="readouts">
+        <div><span>Position M3</span><strong id="position">—</strong><small>m</small></div>
+        <div><span>Câbles M1 / M2</span><strong id="cables">— / —</strong><small>m</small></div>
+        <div><span>Ouverture benne</span><strong id="opening">—</strong><small>%</small></div>
+        <div><span>Fréquence M3</span><strong id="frequency">—</strong><small>Hz</small></div>
+        <div><span>Freins M1 / M2</span><strong id="brakes">— / —</strong><small>DI</small></div>
+        <div><span>Pas calcul</span><strong id="stepMs">—</strong><small>ms</small></div>
+      </div>
+    </section>
+  </section>
+
+  <section class="signals-panel">
+    <div class="panel-head"><div><span class="kicker">VARIABLES MODELICA</span><h2>Commandes, états, sorties et défauts</h2></div><div class="filters"><input id="signalFilter" type="search" placeholder="Filtrer…"><select id="roleFilter"><option value="">Tous les types</option><option value="cmd">CMD</option><option value="state">STATE</option><option value="output">OUTPUT</option><option value="fault">FAULT</option></select></div></div>
+    <div id="signalTable" class="signal-table"></div>
+  </section>
+
+  <section class="timeline">
+    <div class="timeline-head"><div><span class="kicker">CHRONOGRAMME LIVE</span><h2>Signaux sélectionnés</h2></div><div class="chart-actions"><button id="zoomOut">−</button><button id="zoomReset">100 %</button><button id="zoomIn">+</button></div></div>
+    <div id="tracePicker" class="trace-picker"></div>
+    <div class="chart-wrap"><svg id="chart" viewBox="0 0 1200 340" role="img" aria-label="Chronogramme interactif"><g id="chartGrid"></g><g id="chartLines"></g><line id="cursor" class="cursor" y1="18" y2="310" visibility="hidden"/></svg><div id="chartTooltip" class="chart-tooltip" hidden></div></div>
+    <div id="chartLegend" class="legend"></div>
+  </section>
+
+  <section class="journal"><div><span class="kicker">JOURNAL</span><h2>Événements de session</h2></div><div id="eventLog" class="event-log">En attente du moteur…</div></section>
+  <footer><span><b>Dredge.mo → FMU → OMSimulator → même frame pour vue et courbes</b></span><span>Aucune liaison PLC · aucune sortie physique</span></footer>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>
