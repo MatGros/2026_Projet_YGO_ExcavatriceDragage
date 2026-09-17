@@ -1,0 +1,57 @@
+contract:
+  task_id: T306
+  criticality: C2
+  strategy: patch
+  objective: >
+    Qualifier et prouver par simulation et tests automatisés que l'inversion ou la perte
+    d'ordre des phases réseau (PhaseRotationOk_DI = FALSE) interdit immédiatement et
+    totalement toute mise en mouvement et toute alimentation de puissance sur les treuils
+    M1/M2 et le chariot de translation M3.
+
+  acceptance:
+    - id: AC1
+      statement: "Le signal Machine.PhaseRotationOk_DI est injectable ou configurable dans le banc de simulation SimBench (CODE/L_SIMULATION/FB_SimBench.st ou GVL_Simulation) pour permettre le jeu de scénarios de défaut sans modifier la structure des PRG métier."
+      verified_by: "Inspection de FB_SimBench / GVL_Simulation montrant l'injection sur HwSim.Machine.PhaseRotationOk_DI et passage de G502."
+
+    - id: AC2
+      statement: "Lorsque PhaseRotationOk est mis à FALSE, les blocs FB_Safety_Winch (M1 et M2) passent immédiatement CausePhaseRotationActive à TRUE, latché dans instCauses[4], déclenchant SafeStop et interdisant les consignes de mouvement."
+      verified_by: "Test unitaire dans TOOLS/TEST_AUTO_CI/ pour FB_Safety_Winch vérifiant SafeStop=TRUE et ErrorId bit 4 actif en 1 scan."
+
+    - id: AC3
+      statement: "Lorsque PhaseRotationOk est mis à FALSE, le bloc FB_Safety_Translation (M3) passe immédiatement ErrorPhaseRotation à TRUE (instCauses[2].Active), interdisant toute consigne de translation."
+      verified_by: "Test unitaire dans TOOLS/TEST_AUTO_CI/ pour FB_Safety_Translation vérifiant ErrorPhaseRotation=TRUE et interdiction de marche."
+
+    - id: AC4
+      statement: "Dans PRG_06_Outputs, l'activation de ErrorPhaseRotation sur n'importe quel axe (M1, M2 ou M3) force les autorisations de puissance (PowerPermit / DrivePermit) et les ordres contacteurs à FALSE."
+      verified_by: "Test d'intégration vérifiant l'absence d'ordres contacteurs et de consigne vitesse vers les variateurs dans PRG_06_Outputs sous défaut phase."
+
+    - id: AC5
+      statement: "Sous défaut PhaseRotationOk = FALSE, l'alarme est correctement projetée sur GVL_IHM.Commun.PhaseRotationFault et prise en compte dans la bannière FB_Hmi_BannerFormatter et FB_Acquisition_Preflight (PreflightErrorId OR 16#0100)."
+      verified_by: "Vérification des variables de sortie de PRG_07_Supervision et FB_Acquisition_Preflight lors de l'exécution du test."
+
+    - id: AC6
+      statement: "La disparition du défaut (PhaseRotationOk revenant à TRUE) ne déverrouille PAS automatiquement les axes : un front montant conscient sur Reset est obligatoire pour acquitter."
+      verified_by: "Test unitaire simulant PhaseRotationOk=TRUE maintenu sans front de Reset, prouvant le maintien du verrouillage de sécurité."
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/
+      - TOOLS/TEST_AUTO_CI/
+      - DOC/WFLOW/
+    forbidden:
+      - CODE/A_COMMUN/
+      - CODE/H_TREUILS_BENNE/
+      - CODE/I_TRANSLATION/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "La logique de sécurité existante dans FB_Safety_Winch et FB_Safety_Translation est préservée sans régression : seule la simulation et la qualification par test sont enrichies."
+      - "Le traitement matériel de PhaseRotationOk_DI dans PRG_02_Acquisition et PRG_06_Outputs conserve ses affectations et sa polarité active."
+    dropped_on_purpose:
+      - "Le test physique sous tension avec inversion réelle de phases sur armoire est reporté aux essais d'homologation SAT sur site."
+
+  evidence_required:
+    - "Scénario de test CI validé et vert dans TOOLS/TEST_AUTO_CI/ couvrant l'interdiction de mouvement."
+    - "Rapport d'exécution G200 (liaison) confirmant 0 erreur."
+    - "Validation par check_task_contract.py du présent contrat."

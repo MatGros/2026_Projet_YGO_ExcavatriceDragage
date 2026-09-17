@@ -4,6 +4,26 @@ archive_reference: DOC/WFLOW/ARCHIVES/TASKS_SNAPSHOT_20260915/TASKS_20260915_234
 note: Catalogue actif de la phase de Mise en Service (Septembre 2026). Les 213 tâches
   historiques antérieures au 01/09/2026 sont conservées dans archive_reference.
 tasks:
+- id: T306
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: SECURITE / SIMULATION / CONTROLE_PHASES
+  agent: '—'
+  date: '2026-09-16T21:36:00+02:00'
+  avancement: 'Cadré le 2026-09-16 suite demande utilisateur : vérification en simulation de l''interdiction de fonctionnement sous défaut de rotation de phase (PhaseRotationOk_DI = FALSE).'
+  titre: 'Sécurité Machine — Vérifier en simulation le défaut de rotation de phase et l''interdiction totale de fonctionnement'
+  contexte: 'L''automate acquiert l''ordre des phases réseau via PhaseRotationOk_DI (HwIn.Machine.PhaseRotationOk_DI). En cas d''ordre incorrect des phases, les moteurs asynchrones tourneraient en sens inverse, risquant la chute brutale de la benne ou l''arrachement des câbles. La sécurité machine traite ce défaut à plusieurs niveaux : FB_Acquisition_Preflight (erreur 16#0100), FB_Safety_Winch (CausePhaseRotationActive bit4 -> SafeStop et disjonction), FB_Safety_Translation (ErrorPhaseRotation bit2), PRG_06_Outputs (coupure des autorisations de puissance/contacteurs M1/M2/M3) et PRG_07_Supervision (alarme IHM et bandeau). Actuellement, dans FB_SimBench, Machine.PhaseRotationOk_DI est figé à TRUE sans mécanisme d''injection de défaut.'
+  description: 'Établir et qualifier le scénario de test et de simulation du défaut de rotation de phase : 1) Rendre le signal PhaseRotationOk_DI injectable/altérable dans le banc de simulation SimBench/HwSim. 2) Vérifier scan par scan qu''un front descendant (PhaseRotationOk_DI passant de TRUE à FALSE) déclenche immédiatement le verrouillage sur FB_Safety_Winch (M1/M2) et FB_Safety_Translation (M3). 3) Valider formellement que PRG_06_Outputs coupe et interdit toute commande de mouvement et retombe les contacteurs. 4) Vérifier la visibilité du défaut sur l''IHM (alarme bandeau, bit PhaseRotationFault, diagnostic preflight). 5) Vérifier l''inhibition conditionnelle par BypassPhaseRotation (réservé Maintenance N2) et le réarmement après rétablissement nominal.'
+  objectifs:
+  - 'Rendre PhaseRotationOk_DI pilotable ou injectable dans la simulation (HwSim / SimBench) sans modifier la logique métier de production.'
+  - 'Vérifier par test unitaire/CI automatisé l''interdiction immédiate de tout mouvement Treuils M1/M2 et Chariot M3 dès que PhaseRotationOk passe à FALSE.'
+  - 'Vérifier la coupure matérielle logique dans PRG_06_Outputs (PowerPermit / DrivePermit / contacteurs à FALSE).'
+  - 'Vérifier l''affichage de l''alarme sur la bannière de supervision et le code d''erreur preflight (16#0100).'
+  - 'Valider le comportement de contournement contrôlé sous BypassPhaseRotation (autorisé uniquement selon matrice de maintenance).'
+  - 'Valider la procédure de réarmement (Reset front montant) après rétablissement de PhaseRotationOk = TRUE.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T306_VERIFICATION_DEFAUT_ROTATION_PHASE.yaml
+  bloque_par: []
 - id: T305
   parent_id: ''
   statut: '⬜'

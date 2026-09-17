@@ -1,0 +1,87 @@
+version: 1
+source:
+  file: CODE/L_SIMULATION/FB_SimBench.st
+  declaration: VAR_INPUT
+  role: "Contrat historique de commandes PLC reçues par le banc SimBench"
+
+# Chaque entrée actuelle de FB_SimBench doit appartenir à une ligne, même si sa
+# migration est différée. Les motifs sont ancrés : une nouvelle entrée PLC non
+# classée casse check_simbenc_parity.py.
+groups:
+  - id: master_enable
+    match: ["^Enable$"]
+    destination: "ControllerContract.session.enable"
+    phase: L0
+    status: contract_only
+    safety: "Ne produit aucune autorisation; sélection de source reste PLC."
+  - id: m1_final_command
+    match: ["^M1_(RelayFwd|RelayRev|SpeedContactor_[1-4]|SpeedCmd_Pct|StepNumber|PresetTriggerCmd|PresetValueOut|BrakeCmd)$"]
+    destination: "ControllerContract.winchM1.finalCommand"
+    phase: L2
+    status: planned
+    safety: "Commande post-interlocks; la FMU ne réécrit jamais cette commande."
+  - id: m2_final_command
+    match: ["^M2_(RelayFwd|RelayRev|SpeedContactor_[1-4]|SpeedCmd_Pct|StepNumber|PresetTriggerCmd|PresetValueOut|BrakeCmd)$"]
+    destination: "ControllerContract.winchM2.finalCommand"
+    phase: L2
+    status: planned
+    safety: "Commande post-interlocks; la FMU ne réécrit jamais cette commande."
+  - id: m3_final_command
+    match: ["^M3_(ReqTremie|ReqMaintenance|SpeedCmd_Pct|BrakeCmd)$"]
+    destination: "ControllerContract.translationM3.finalCommand"
+    phase: L1
+    status: planned
+    safety: "Deux directions simultanées sont une commande invalide, jamais une permission."
+  - id: power_chain_observation
+    match: ["^(PowerKeepAlive_A|PowerKeepAlive_B|EmergencyArming_RQ|TestCutActive|PowerCutOffRequest|SimChainOkBit)$"]
+    destination: "ControllerContract.machine.observationOnly"
+    phase: L4
+    status: planned
+    safety: "AU matériel et PowerCutOff restent PLC/matériel; FMU produit seulement des DI simulées."
+  - id: winch_scenarios
+    match: ["^(SimEncoderSpeedFactor|SimWinchCoast_M|SimTopPositionActive|SimSyncDeviationInjectM1|SimSyncDeviationInjectM2|SimSyncDeviationOffset_M|SimM2CoupledDescentModelActive|SimM2CoupledDescentFactor|WinchBothDescentIntent)$"]
+    destination: "Scenario.Winch"
+    phase: L2
+    status: planned
+    safety: "Injection de défauts seulement à la frontière capteurs."
+  - id: m3_sensor_scenarios
+    match: ["^SimM3(SensorsWordOverrideActive|SensorsWord|SensorIntermittenceActive|SensorStabilizationS|SensorElectricalDelayS|SensorIntermittencePeriodS|SensorHysteresis_M|SensorLoadAngleTriggerRad|SensorScenarioSeed)$"]
+    destination: "Scenario.TranslationSensors"
+    phase: L1
+    status: planned
+    safety: "Un scénario peut dégrader une DI, jamais écrire HwIn ni une autorisation."
+  - id: operator_scenarios
+    match: ["^SimJoystick(Left_Rev_TREMIE_Active|Right_Fwd_MAINT_Active|Fwd_Up_Close_Active|Rev_Down_Open_Active|RawX|RawY|RawButton|Overshoot_Active|Bagotement_Active)$"]
+    destination: "Scenario.Operator"
+    phase: L5
+    status: deferred
+    safety: "Le joystick natif est une source de stimulus, l'homme-mort reste qualifié par PLC."
+  - id: kobold_scenarios
+    match: ["^(SimKoboldContactValue|SimKoboldAutoModeActive|SimKoboldAutoDepth_M|SimKoboldPowerUpTime|SimKoboldCoast_M|KoboldMeasureEnable|M1_CablePos_M|BtnEmergencyStop)$"]
+    destination: "Scenario.KoboldAndMachine"
+    phase: L3
+    status: deferred
+    safety: "Le bouton AU reste une DI simulée; aucune logique de réarmement dans la plante."
+  - id: real_fallback
+    match: ["^HwReal$"]
+    destination: "PLC only"
+    phase: none
+    status: not_migrable
+    safety: "Image réelle de repli : elle ne doit jamais traverser la FMU."
+
+outputs:
+  - name: Winch
+    destination: "ST_HwWinch simulée"
+    phase: L2
+  - name: Translation
+    destination: "ST_HwTranslation simulée"
+    phase: L1
+  - name: Operator
+    destination: "ST_HwOperator simulée"
+    phase: L5
+  - name: Machine
+    destination: "ST_HwMachine simulée"
+    phase: L4
+  - name: Ready/Busy/Done
+    destination: "Etat adaptateur de co-simulation, jamais état de sûreté"
+    phase: L0

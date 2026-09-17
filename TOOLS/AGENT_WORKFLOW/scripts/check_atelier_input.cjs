@@ -1,0 +1,67 @@
+// Exercise the actual browser event handlers with a minimal DOM, without a native FMU.
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),path=require('node:path');
+const listeners={},elements=new Map();let created=0;
+function el(id){if(!elements.has(id))elements.set(id,{id,tagName:'DIV',value:'0',style:{},classList:{toggle(){}},events:{},setAttribute(){},append(){},before(){},after(){},replaceChildren(){},focus(){},setPointerCapture(){},querySelector(selector){return el(id+selector);},getBoundingClientRect(){return {left:0,width:200};},addEventListener(k,f){this.events[k]=f;}});return elements.get(id);}
+el('deadman').tagName='BUTTON';
+el('usbPanel').prepend=()=>{};
+const context=vm.createContext({console,document:{hidden:false,getElementById:el,querySelector:()=>el('query'),querySelectorAll:()=>[],createElement:()=>el('new'+created++),createElementNS:()=>el('svg'+created++),createTextNode:t=>t,addEventListener(){}},window:{addEventListener(k,f){listeners[k]=f;}},navigator:{},localStorage:{getItem(){return null;}},fetch:()=>new Promise(()=>{}),setTimeout(){},devicePixelRatio:1});
+vm.runInContext(fs.readFileSync(path.resolve(__dirname,'../../TWINBENCH/modelica_atelier/app.js'),'utf8'),context);
+const run=s=>vm.runInContext(s,context);
+run("state={ready:false,scenario:'manual'}");
+function key(code,down=true,target=el('stick')){listeners[down?'keydown':'keyup']({code,target,preventDefault(){}});}
+el('stick').onpointerdown({pointerId:1,clientX:150});
+const mouseLever=run('lever');assert(mouseLever>0);
+key('Space');assert.equal(run('lever'),mouseLever);assert.equal(run('held'),1);
+key('Space',false);assert.equal(run('lever'),mouseLever);assert.equal(run('held'),0);
+el('stick').onpointerup();assert.equal(run('lever'),0);
+el('deadman').onpointerdown({pointerId:2});key('ArrowRight',true,el('deadman'));
+assert.equal(run('lever'),1);assert.equal(run('held'),1);
+key('ArrowRight',false,el('deadman'));assert.equal(run('held'),1);
+key('Space',true,el('deadman'));el('deadman').events.pointerup();assert.equal(run('held'),1);
+listeners.blur();assert.equal(run('lever'),0);assert.equal(run('held'),0);
+key('Space',false);assert.equal(run('held'),0);
+run("source='usb'");key('ArrowLeft');assert.equal(run('lever'),0);
+run("source='virtual';state.scenario='brake'");key('Space');assert.equal(run('held'),0);
+run("state.scenario='manual'");
+el('mass').tagName='INPUT';key('ArrowRight',true,el('mass'));assert.equal(run('lever'),0);
+key('ArrowRight');key('ArrowRight',false,el('mass'));assert.equal(run('lever'),0);
+el('stick').onpointerdown({pointerId:3,clientX:150});key('Space');
+run('releaseLocal()');assert.equal(run('lever'),0);assert.equal(run('held'),0);
+assert.equal(run('keys.size'),0);assert.equal(run('dragging || pointerHeld'),false);
+console.log('PASS: souris + espace, pointeur + fleches, maintien combine, blur, isolation USB/scenario');
+run(`
+  let testPads=[{index:0,id:'vJoy',axes:[0],buttons:[{pressed:false}]},{index:1,id:'STANDARD GAMEPAD Vendor: 045e Product: 0b22',axes:[.4],buttons:[{pressed:true}]}];
+  navigator.getGamepads=()=>testPads;source='usb';state.scenario='manual';deviceSelectionMode='automatic';selectedPad=null;usbInput();
+`);
+assert.equal(run('pad().id'),'STANDARD GAMEPAD Vendor: 045e Product: 0b22');assert.equal(run('usbArmed'),false);
+console.log('PASS: sélection automatique du contrôleur HID 045e:0b22, sans armement');
+run(`
+  testPads=[{index:0,id:'vJoy',axes:[-1],buttons:[{pressed:true}]},{index:2,id:'Gamepad USB',axes:[.6],buttons:[{pressed:true}]}];
+  navigator.getGamepads=()=>testPads;
+  source='usb';state.scenario='manual';deviceSelectionMode='automatic';selectedPad=null;
+  $('deadzone').value='0.08';
+  usbInput();
+`);
+assert.equal(run('pad()'),undefined);assert.equal(run('held'),0);
+run("deviceSelect.value='2';deviceSelect.onchange();$('armUsb').onclick();usbInput()");
+assert.equal(run('pad().id'),'Gamepad USB');assert(run('lever')>0);assert.equal(run('held'),1);
+run("pad().axes=[.2,.55,-.7];m1AxisInput.value='1';m2AxisInput.value='2';center=m1Center=m2Center=0;usbInput()");
+assert(run('m1Command')>.4);assert(run('m2Command')<-.6);
+run("deviceSelect.value='0';deviceSelect.onchange()");
+assert.equal(run('usbArmed'),false);assert.equal(run('lever'),0);assert.equal(run('held'),0);
+run("deviceSelect.value='2';deviceSelect.onchange();$('armUsb').onclick();testPads=[testPads[0]];usbInput()");
+assert.equal(run('selectedPad'),null);assert.equal(run('usbArmed'),false);assert.equal(run('held'),0);
+run("testPads.push({index:2,id:'Gamepad USB',axes:[1],buttons:[{pressed:true}]});usbInput()");
+assert.equal(run('pad()'),undefined);assert.equal(run('lever'),0);
+console.log('PASS: choix explicite gamepad/vJoy, changement neutralise, perte sans bascule, reconnexion sans activation');
+run("deviceSelect.value='2';deviceSelect.onchange();learnAxis.onclick();testPads[1].axes[0]=-.6;usbInput()");
+assert.equal(Number(run("$('axisIndex').value")),0);assert.equal(run('learning'),null);
+run("pad().buttons[0].pressed=false");assert.equal(run('pad().buttons[0].pressed'),false);
+run("learnDeadman.onclick()");assert.equal(run('learning.baseline[0]'),false);
+run("pad().buttons[0].pressed=true;usbInput()");
+assert.equal(Number(run("$('buttonIndex').value")),0);assert.equal(run('learning'),null);
+console.log('PASS: apprentissage axe et homme-mort par entrée réellement actionnée');
+run("m1Control.input.value='.4';m1Control.input.oninput();m2Control.input.value='-.7';m2Control.input.oninput()");
+assert.equal(run('m1Command'),.4);assert.equal(run('m2Command'),-.7);
+run('releaseLocal()');assert.equal(run('m1Command'),0);assert.equal(run('m2Command'),0);
+console.log('PASS: commandes virtuelles M1/M2 et neutralisation');
