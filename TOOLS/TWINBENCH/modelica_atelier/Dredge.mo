@@ -35,7 +35,7 @@ package Dredge "Plante hors ligne de dragage : aucune logique PLC ni safety"
     commandConflict = if reqTremie > .5 and reqMaintenance > .5 then 1 else 0;
     direction = if reqTremie > .5 and reqMaintenance <= .5 then -1 else
                 if reqMaintenance > .5 and reqTremie <= .5 then 1 else 0;
-    actualFrequencyHz = if direction <> 0 and not
+    actualFrequencyHz = if abs(direction) > .5 and not
                           ((positionM <= 0 and direction < 0) or
                            (positionM >= travelM and direction > 0))
                         then min(nominalFrequencyHz,
@@ -165,6 +165,41 @@ package Dredge "Plante hors ligne de dragage : aucune logique PLC ni safety"
         brakeReleaseCmd=if (time >= 1 and time < 5) or (time >= 7 and time < 11) then 1 else 0);
       annotation(experiment(StartTime=0, StopTime=12, Tolerance=1e-6, Interval=.01));
     end M3ContractCycle;
+
+    model AnimatedM3ContractCycle "Vue 3D M3 liée à la même plante que les chronogrammes"
+      extends M3ContractCycle;
+      import Shape = Modelica.Mechanics.MultiBody.Visualizers.Advanced.Shape;
+
+      Shape water(
+        shapeType="box", r={15,-4,0}, length=34, width=8, height=.15,
+        color={25,110,165});
+      Shape bridgeRail(
+        shapeType="box", r={15,0,12}, length=32, width=1.2, height=.55,
+        color={70,80,90});
+      Shape tremieStop(
+        shapeType="box", r={0,0,11.2}, length=.3, width=2, height=1.8,
+        color={185,65,45});
+      Shape maintenanceStop(
+        shapeType="box", r={30,0,11.2}, length=.3, width=2, height=1.8,
+        color={55,150,80});
+      Shape carriage(
+        shapeType="box", r={plant.positionM,0,11.3}, length=1.8, width=2.2, height=.9,
+        color={225,155,35});
+      Shape driveCabinet(
+        shapeType="box", r={plant.positionM,0,12.1}, length=1.15, width=1.2, height=.65,
+        color={52,57,63});
+      Shape leftWheel(
+        shapeType="cylinder", r={plant.positionM,-.72,10.7},
+        lengthDirection={0,1,0}, widthDirection={1,0,0},
+        length=.24, width=.42, height=.42, color={30,30,35});
+      Shape rightWheel(
+        shapeType="cylinder", r={plant.positionM,.72,10.7},
+        lengthDirection={0,1,0}, widthDirection={1,0,0},
+        length=.24, width=.42, height=.42, color={30,30,35});
+      annotation(
+        experiment(StartTime=0, StopTime=12, Tolerance=1e-6, Interval=.01),
+        Documentation(info="<html><p>Animation M3 directement liée à <code>plant.positionM</code> de TranslationM3Plant. Repère mécanique figé : <b>X</b> = Trémie (0 m) vers Maintenance (30 m), <b>Z</b> = vertical vers le haut, <b>Y</b> = transversal avant/arrière du pont. La vue de conduite attendue est donc la projection X-Z, en regardant suivant Y ; les vues &#171; Front &#187; / &#171; Side &#187; du visualiseur sont des repères génériques et ne sont pas des noms métier.</p><p>Cette vue est schématique : elle démontre la cohérence calcul/animation, pas la géométrie finale du pont. Le pilotage live cible le TwinBench FMU, pas le bouton expérimental Interactive Control d'OMEdit.</p></html>"));
+    end AnimatedM3ContractCycle;
 
     model M1M2BucketCycle "Exemple treuils : levage conjoint puis fermeture M2"
       WinchesM1M2Plant plant(

@@ -1,0 +1,64 @@
+contract:
+  task_id: T313_GVL_TROUBLESHOOTING_CHRONOLOGIQUE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Réorganiser la présentation de GVL_Troubleshooting dans l'ordre chronologique
+    d'un blocage (commande → permis → retour capteurs/contacteurs → cause), sans
+    changer les producteurs uniques des données sous-jacentes.
+
+  acceptance:
+    - id: AC1
+      statement: "La structure/présentation suit l'ordre chronologique commande→permis→retour→cause pour un axe donné."
+      verified_by: "revue de structure GVL_Troubleshooting"
+    - id: AC2
+      statement: "Aucun producteur de donnée n'est déplacé ; seule la présentation/regroupement change."
+      verified_by: "revue de diff — aucune écriture de variable métier modifiée"
+    - id: AC3
+      statement: "Sur un cas réel archivé (fiche troubleshooting existante), la nouvelle présentation permet de retrouver la cause plus rapidement."
+      verified_by: "rejeu manuel sur une fiche DOC/WFLOW/TROUBLESHOOTING/FICHES/ existante"
+
+  scope:
+    allowed:
+      - CODE/**/GVL_Troubleshooting.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Toutes les variables actuellement exposées dans GVL_Troubleshooting."
+      - "Producteur unique de chaque donnée (aucune duplication d'écriture)."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug
+    preexistant, risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur,
+    pas a la fin et jamais silencieusement. Signaler n'est pas elargir le scope.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

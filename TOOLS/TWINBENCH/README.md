@@ -46,8 +46,22 @@ cmp /tmp/a.json /tmp/c.json || echo "différentes"     # graine différente
 `PROJECTS/excavatrice_dragage/machine.twin.yaml` (fréquence max, temps de
 frein, positions de cames) et relance. Aucune recompilation.
 
-> ⚠️ Le pilotage interactif (joystick et consignes en direct) **n'existe pas
-> encore** : les scénarios sont joués par le moteur. C'est la prochaine brique.
+> ✅ L'atelier interactif est disponible : double-cliquer sur
+> `TOOLS/TWINBENCH/Lancer_TwinBench.bat`. Il fournit les commandes M3/M1/M2,
+> le joystick USB/HID, le scénario benne, la vue 2D éditable et le chronogramme.
+
+### Parcours utilisateur unique
+
+1. Brancher le joystick (le `STANDARD GAMEPAD Vendor: 045e Product: 0b22` est
+   sélectionné automatiquement s'il est présent).
+2. Double-cliquer `Lancer_TwinBench.bat`.
+3. Dans la fenêtre « Atelier de conduite », maintenir l'homme-mort (bouton A /
+   bouton 0), puis piloter les axes : axe 0 = M3, axe 1 = M1, axe 2 = M2.
+4. Dans « Paramètres plante », modifier les cotes de course/vitesse puis cliquer
+   « Appliquer au modèle » : la plante OpenModelica est réinitialisée avec ces valeurs.
+
+Les autres fichiers sont des composants internes du POC ; ils ne sont pas
+nécessaires pour démarrer une session.
 
 ---
 

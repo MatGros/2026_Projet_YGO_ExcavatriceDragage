@@ -1,0 +1,69 @@
+contract:
+  task_id: T310_TREUILS_VITESSE_CABLE_PALIER
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Ajouter, en complément du plancher temporisé existant, une condition de vitesse
+    câble minimale avant passage à un palier de treuil supérieur, pour éviter
+    l'enchaînement de contacteurs sur un treuil pas encore à vitesse.
+
+  acceptance:
+    - id: AC1
+      statement: "Sous le seuil de vitesse câble configuré (par axe M1/M2 et par sens), le passage au palier supérieur est retardé."
+      verified_by: "test unitaire CI"
+    - id: AC2
+      statement: "Une hystérésis empêche le basculement instable autour du seuil."
+      verified_by: "test unitaire CI dédié oscillation seuil"
+    - id: AC3
+      statement: "La fonction est désactivable depuis l'IHM et son état est persistant."
+      verified_by: "test unitaire CI redémarrage/persistance"
+    - id: AC4
+      statement: "Le plancher temporisé existant (CST_StepRampFloorDelay) n'est pas supprimé ni modifié par ce lot."
+      verified_by: "revue de diff FB_WinchOutputInterlock.st"
+
+  scope:
+    allowed:
+      - CODE/**/FB_WinchOutputInterlock.st
+      - CODE/**/GVL_PERSISTENT.st
+      - CODE/**/GVL_IHM.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Plancher temporisé CST_StepRampFloorDelay existant, inchangé."
+      - "Comportement descente/montée hors zone de seuil vitesse câble."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug
+    preexistant, risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur,
+    pas a la fin et jamais silencieusement. Signaler n'est pas elargir le scope.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

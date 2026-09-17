@@ -16,6 +16,21 @@ OpenModelica ne reçoit que des commandes finales et ne publie que des faits cap
 Le PLC reste propriétaire unique : sélection de source, safety M1/M2/M3, AU matériel,
 `PowerCutOff`, réarmement, homme-mort qualifié et sorties physiques.
 
+## Convention de signaux — revue et décision
+
+Le standard [TWINBENCH_SIGNAL_CONVENTION_v1.0.md](../../STDS/TWINBENCH_SIGNAL_CONVENTION_v1.0.md)
+est adopté pour les nouvelles interfaces FMU/IHM. Deux revues indépendantes ont refusé la première
+taxonomie plate `CMD/CFG/STAT/DI/DIAG` : elle confondait la causalité Modelica, le flux PLC et la
+nature d'affichage. Décision :
+
+1. causalité Modelica : `input`/`output`/`parameter` ;
+2. classe de flux : tags projet existants (`CMD`, `CFG`, `HW`, `SAFE`, `TST`, `STAT`, `ACT`, `DIAG`) ;
+3. nature IHM : commande, configuration, mesure, retour discret, état device, diagnostic ou alarme.
+
+Écarts L1 tracés : `reqTremie`/`reqMaintenance` et les retours numériques `Real 0/1` ne sont pas
+le contrat cible. L'adaptateur les mappe ultérieurement vers `*Cmd`, `Boolean` et `UInt16` typés ;
+aucun de ces écarts ne peut traverser directement `HwIn`.
+
 | Verdict de revue | Décision |
 |---|---|
 | Remplacement direct SimBench dans PLC relié à la machine | **BLOCK** |

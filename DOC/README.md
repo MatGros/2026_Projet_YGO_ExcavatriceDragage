@@ -11,6 +11,7 @@
 |---|---|
 | [STDS/CODE_QUALITY_STANDARDS.md](STDS/CODE_QUALITY_STANDARDS.md) | **Déclaration, liaison, POO, robustesse, non-régression** — propriétaire unique |
 | [STDS/NAMING_CONVENTION.md](STDS/NAMING_CONVENTION.md) | Nommage normatif (préfixes, unités, polarité, construction d'un nom) |
+| [STDS/TWINBENCH_SIGNAL_CONVENTION_v1.0.md](STDS/TWINBENCH_SIGNAL_CONVENTION_v1.0.md) | Contrat signaux OpenModelica/FMU/IHM : causalité, flux industriel, qualité et traçabilité |
 | [WFLOW/AUDITS/REX_Nommage_v1.0.md](WFLOW/AUDITS/REX_Nommage_v1.0.md) | 📖 *Non normatif* : incidents fondateurs, chantiers différés, décisions rejetées |
 | [Sample CFC natif](../TOOLS/SAMPLES_XML_CODESYS/PRG_CFC_3FB.xml) | Structure PLCopenXML exportée par CODESYS ; procédure normative dans AF_Partie-03 §5 |
 | [Guide configuration IDE CODESYS](STDS/GUIDES/GUIDE_CONFIGURATION_IDE_CODESYS_v1.0.md) | Raccourcis clavier perso (`Ctrl+R` réduire tout, `Ctrl+E` étendre tout) et chemin de configuration |
