@@ -28,8 +28,12 @@ contract:
   scope:
     allowed:
       - TOOLS/TWINBENCH/modelica_atelier/
+      - TOOLS/TWINBENCH/Lancer_TwinBench.bat
+      - TOOLS/TWINBENCH/README.md
+      - ARCHIVES/Tools/TWINBENCH/modelica_atelier_pre_T314_20260917/
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T314_OPENMODELICA_WINDOWS_ATELIER.yaml
       - DOC/WFLOW/AUDITS/REORIENTATION_RUMOCA_OPENMODELICA_20260917.md
+      - DOC/WFLOW/AUDITS/T314_LEGACY_TRIAGE_20260917.md
       - DOC/WFLOW/TASKS.yaml
     forbidden:
       - CODE/
@@ -48,7 +52,7 @@ contract:
     - "Trace de rechargement après modification de Dredge.mo."
     - "Preuve animation/trace issue de la même frame."
     - "Essais de commande et perte d'homme-mort hors machine réelle."
-  status: PLANNED
+  status: IN_PROGRESS
   alert_duty: >
     Toute incompatibilité Modelica, erreur de compilation ou hypothèse mécanique
     non calibrée est affichée à l'utilisateur ; aucune approximation ne doit être
