@@ -1,0 +1,65 @@
+contract:
+  task_id: T315
+  criticality: C2
+  strategy: patch
+  objective: >
+    Aligner l'intégralité du programme CODESYS, des types DUT, de la supervision,
+    de l'outil de diagnostic OmniDiag et de la documentation AF sur la relocalisation
+    physique des 4 commandes de direction treuils M1/M2 et de l'alimentation Kobold
+    vers les sorties relais du module VH_0008ER (%QX27.3..%QX27.7, suffixe _RQ).
+
+  acceptance:
+    - id: AC1
+      statement: "La source matérielle Device_IO_20260917.csv est harmonisée et porte M2_RelayDescent_Open_RQ sur %QX27.7."
+      verified_by: "Vérification textuelle dans TOOLS/AGENT_WORKFLOW/config/Device_IO_20260917.csv."
+
+    - id: AC2
+      statement: "PRG_06_Outputs affecte les 5 sorties physiques avec les noms et suffixes normalisés _RQ sur la carte relais VH_0008ER."
+      verified_by: "Inspection de PRG_06_Outputs.st et validation par G350_check_hw_name_collision.py."
+
+    - id: AC3
+      statement: "PRG_07_Supervision recopie fidèlement les 5 sorties vers GVL_IHM.IoHw.Out."
+      verified_by: "Inspection de PRG_07_Supervision.st."
+
+    - id: AC4
+      statement: "Les structures ST_IoHw_Out et ST_Chain_Winch_Outputs reflètent l'affectation sur VH_0008ER et le suffixe _RQ."
+      verified_by: "Compilation et validation par G200_check_linkage.py."
+
+    - id: AC5
+      statement: "Le stub de linter GVL_Device_IO.st et l'outil OmniDiag (io_mapper.py, knowledge_base.py) sont mis à jour avec le nouveau câblage."
+      verified_by: "Génération du bundle XML et re-génération du viewer OmniDiag sans erreur."
+
+    - id: AC6
+      statement: "L'analyse fonctionnelle AF_Partie-06 consigne formellement la nouvelle répartition des sorties du rack."
+      verified_by: "Vérification documentaire dans AF_Partie-06_Acquisition_Qualification_IO_v2.4.md."
+
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_IoHw_Out.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Outputs.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - TOOLS/LINTER_ST/stubs/GVL_Device_IO.st
+      - TOOLS/AGENT_WORKFLOW/config/Device_IO_20260917.csv
+      - TOOLS/OMNIDIAG/
+      - DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+      - DOC/WFLOW/
+    forbidden:
+      - CODE/A_COMMUN/
+      - CODE/H_TREUILS_BENNE/
+      - CODE/I_TRANSLATION/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Les interlocks finaux, DeadTime 1.0s et gardes anti-chatter FB_ContactorProtector dans PRG_06_Outputs restent strictement inchangés."
+      - "Le bus inter-PRG Data.M1RelayFwd, Data.M1RelayRev, etc. conserve sa structure et ses consommateurs."
+    dropped_on_purpose:
+      - "L'utilisation des sorties transistor %QX0.0..%QX0.3 de la CPU pour les contacteurs est abandonnée au profit du module relais."
+
+  evidence_required:
+    - "G350_check_hw_name_collision PASS (0 erreur)."
+    - "G200_check_linkage PASS (0 erreur)."
+    - "Bundle PLCopenXML généré et vert."
+    - "check_task_contract.py PASS."

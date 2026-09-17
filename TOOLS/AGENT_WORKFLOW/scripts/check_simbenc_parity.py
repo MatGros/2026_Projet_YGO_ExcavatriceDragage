@@ -9,7 +9,7 @@ except ImportError as exc:
     raise SystemExit("PyYAML requis pour check_simbenc_parity.py") from exc
 
 ROOT = Path(__file__).resolve().parents[3]
-MANIFEST = ROOT / "TOOLS/TWINBENCH/modelica_atelier/contracts/simbench_parity.yaml"
+MANIFEST = ROOT / "DOC/WFLOW/CONTRACTS/T314_SIMBENCH_PARITY.yaml"
 
 def names_in_var_input(source: str) -> list[str]:
     section = re.search(r"VAR_INPUT(.*?)END_VAR", source, re.S)

@@ -1,0 +1,44 @@
+version: 2
+scope: Dredge.TranslationM3Plant
+purpose: >-
+  Contrat visible OMEdit : causalité Modelica, groupe fonctionnel, rôle industriel,
+  type, unité et autorité. Les noms sont les chemins publics réellement simulés.
+roles:
+  CMD: "Commande finale PLC vers plante ; jamais une permission de sécurité."
+  CFG: "Paramètre de modèle ; hypothèse tant qu'une mesure terrain ne le qualifie pas."
+  HW: "Fait physique ou image capteur simulée destinée à HwSim."
+  DIAG: "Diagnostic de cohérence ; non utilisé pour autoriser un mouvement."
+role_profiles:
+  CMD: {kind: Command, access: write, authority: Adapter, source_stage: Cmd}
+  CFG: {kind: Configuration, access: parameter, authority: ModelOwner, configuration_class: CFG_BUILD, calibration_status: assumed}
+  HW: {kind: DiscreteFeedback, access: read, authority: FMU, source_stage: Act}
+  DIAG: {kind: Diagnostic, access: read, authority: FMU}
+signals:
+  - {name: commands.cmdMoveToTremie, direction: input, role: CMD, data_type: Boolean, unit: bool, label: "M3 — commande finale vers Trémie", polarity: "TRUE = mouvement vers Trémie demandé"}
+  - {name: commands.cmdMoveToMaintenance, direction: input, role: CMD, data_type: Boolean, unit: bool, label: "M3 — commande finale vers Maintenance", polarity: "TRUE = mouvement vers Maintenance demandé"}
+  - {name: commands.cmdSpeed_Pct, direction: input, role: CMD, data_type: Real, unit: "%", label: "M3 — commande finale de vitesse"}
+  - {name: commands.cmdBrakeRelease, direction: input, role: CMD, data_type: Boolean, unit: bool, label: "M3 — commande finale desserrage frein", polarity: "TRUE = desserrage demandé"}
+
+  - {name: configuration.travel_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "M3 — course Trémie à Maintenance", calibration: required}
+  - {name: configuration.fullTravelTime_S, direction: parameter, role: CFG, data_type: Real, unit: s, label: "M3 — durée course pleine vitesse", calibration: required}
+  - {name: configuration.nominalFrequency_Hz, direction: parameter, role: CFG, data_type: Real, unit: Hz, label: "M3 — fréquence nominale simulée", calibration: required}
+  - {name: configuration.brakeOpenDelay_S, direction: parameter, role: CFG, data_type: Real, unit: s, label: "M3 — délai ouverture frein", calibration: required}
+  - {name: configuration.brakeCloseDelay_S, direction: parameter, role: CFG, data_type: Real, unit: s, label: "M3 — délai fermeture frein", calibration: required}
+  - {name: configuration.sensorHysteresis_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "M3 — hystérésis capteurs position", calibration: required}
+
+  - {name: measurements.positionAct_M, direction: output, role: HW, kind: Measurement, data_type: Real, encoding: IEEE754, unit: m, label: "M3 — position chariot"}
+  - {name: measurements.velocityAct_Mps, direction: output, role: HW, kind: Measurement, data_type: Real, encoding: IEEE754, unit: m/s, label: "M3 — vitesse chariot"}
+  - {name: measurements.frequencyAct_Hz, direction: output, role: HW, kind: Measurement, data_type: Real, encoding: IEEE754, unit: Hz, label: "M3 — fréquence effective simulée"}
+
+  - {name: feedback.brakeIsOpen, direction: output, role: HW, kind: DiscreteFeedback, data_type: Boolean, encoding: native, unit: bool, label: "M3 — retour frein ouvert", polarity: "TRUE = frein physiquement ouvert"}
+  - {name: feedback.tremiePositionIsActive, direction: output, role: HW, kind: DiscreteFeedback, data_type: Boolean, encoding: native, unit: bool, label: "M3 — capteur Trémie", polarity: "TRUE = capteur actif"}
+  - {name: feedback.pvPositionIsActive, direction: output, role: HW, kind: DiscreteFeedback, data_type: Boolean, encoding: native, unit: bool, label: "M3 — capteur PV", polarity: "TRUE = capteur actif"}
+  - {name: feedback.p2PositionIsActive, direction: output, role: HW, kind: DiscreteFeedback, data_type: Boolean, encoding: native, unit: bool, label: "M3 — capteur P2", polarity: "TRUE = capteur actif"}
+  - {name: feedback.p1PositionIsActive, direction: output, role: HW, kind: DiscreteFeedback, data_type: Boolean, encoding: native, unit: bool, label: "M3 — capteur P1", polarity: "TRUE = capteur actif"}
+  - {name: feedback.maintenancePositionIsActive, direction: output, role: HW, kind: DiscreteFeedback, data_type: Boolean, encoding: native, unit: bool, label: "M3 — capteur Maintenance", polarity: "TRUE = capteur actif"}
+
+  - {name: deviceState.driveStatusWord, direction: output, role: HW, kind: DeviceState, data_type: Integer, encoding: UInt16, unit: word, label: "M3 — StatusWord AC600 simulé"}
+
+  - {name: diagnostics.commandConflict, direction: output, role: DIAG, data_type: Boolean, unit: bool, label: "M3 — commandes de sens simultanées"}
+  - {name: diagnostics.hardStopTremie, direction: output, role: DIAG, data_type: Boolean, unit: bool, label: "M3 — commande contre butée Trémie"}
+  - {name: diagnostics.hardStopMaintenance, direction: output, role: DIAG, data_type: Boolean, unit: bool, label: "M3 — commande contre butée Maintenance"}
