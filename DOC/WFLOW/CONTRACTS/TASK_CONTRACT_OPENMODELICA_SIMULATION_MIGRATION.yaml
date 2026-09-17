@@ -1,0 +1,63 @@
+contract:
+  task_id: OPENMODELICA_SIMULATION_MIGRATION
+  criticality: C3
+  strategy: rebuild
+  objective: >
+    Construire et qualifier un simulateur hors ligne OpenModelica M1/M2/M3 capable de rejouer les
+    interfaces utiles du banc PLC actuel sans créer de second chemin de sécurité ni modifier la machine réelle.
+  acceptance:
+    - id: AC1
+      statement: Une matrice source-à-source associe chaque fonction active de FB_SimBench aux entrées, sorties et tests du simulateur OpenModelica, ou la classe explicitement non migrable.
+      verified_by: "rapport de parité avec références CODE/L_SIMULATION et test automatisé de couverture"
+    - id: AC2
+      statement: Le simulateur expose une frontière explicite Commandes PLC -> Plant OpenModelica -> Image capteurs, avec provenance et fraîcheur de chaque signal.
+      verified_by: "contrat d'interface versionné et test de schéma"
+    - id: AC3
+      statement: Les scénarios M1/M2/M3 produisent positions, vitesses, états freins, contacteurs, codeurs et capteurs M3 nécessaires aux tests PLC hors ligne.
+      verified_by: "recette FMU/OMSimulator et trace CSV comparée à des assertions"
+    - id: AC4
+      statement: Les défauts de simulation sont injectés à la frontière image-capteurs et ne peuvent ni produire une autorisation ni neutraliser les interlocks ou la chaîne AU du PLC.
+      verified_by: "tests négatifs de sûreté et revue CODESYS"
+    - id: AC5
+      statement: La vue OMEdit animée et l'interface opérateur lisent les mêmes sorties de plant que les traces, sans modèle de mouvement dupliqué en JavaScript ou ST.
+      verified_by: "test de cohérence modèle/animation/trace"
+    - id: AC6
+      statement: Aucun retrait de FB_SimBench ou de logique PLC n'est entrepris tant que les critères AC1 à AC5 et une recette humaine de non-régression ne sont pas satisfaits.
+      verified_by: "audit git et revue humaine explicite"
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/modelica_atelier/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_OPENMODELICA_SIMULATION_MIGRATION.yaml
+      - DOC/WFLOW/AUDITS/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - DOC/WFLOW/TASKS.yaml
+  conservation:
+    must_survive:
+      - "Frontière unique HwReal/HwSim/HwIn et absence de OR entre réel et simulé."
+      - "AU matériel indépendant, PowerCutOff et réarmement conscient du PLC."
+      - "Homme-mort, interlocks M1/M2/M3, homing et diagnostics PLC."
+      - "Possibilité de tester le PLC sans matériel par l'image simulée tant que la migration n'est pas validée."
+    dropped_on_purpose: []
+  evidence_required:
+    - "Matrice de parité SimBench/OpenModelica avec fichier:ligne"
+    - "Recettes natives OpenModelica/OMSimulator"
+    - "Tests négatifs de sécurité"
+    - "Revue indépendante automatisme et Modelica"
+  models_allowed:
+    - "gpt-5.6-sol"
+  alert_duty: >
+    Toute divergence entre les sorties simulées et les contrats PLC, toute hypothèse mécanique
+    non calibrée, et toute tentative de contourner la sécurité doit être remontée avant intégration.
+status: IN_PROGRESS
+execution:
+  executed_by: Codex
+  status: IN_PROGRESS
+  summary: "Cartographie SimBench et revues indépendantes en cours; aucun fichier CODE/ modifié."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  notes: "Aucun retrait de SimBench autorisé à ce stade."

@@ -1,0 +1,68 @@
+contract:
+  task_id: POC_MODELICA_ATELIER
+  criticality: C2
+  strategy: patch
+  objective: Construire un atelier local indépendant pour conduire un axe simulé par Modelica, éditer ses paramètres et tracer ses grandeurs.
+  acceptance:
+    - id: AC12
+      statement: OMEdit expose une animation 3D pédagogique du cycle M1/M2/M3 montrant le chariot, les câbles et l'ouverture de la benne à partir des variables du modèle.
+      verified_by: python TOOLS/TWINBENCH/modelica_atelier/verify.py
+    - id: AC11
+      statement: OMEdit expose un exemple autonome M1/M2/M3 avec des commandes temporelles, simulable sans joystick ni application externe, afin de découvrir les variables et les tracés.
+      verified_by: python TOOLS/TWINBENCH/modelica_atelier/verify.py
+    - id: AC9
+      statement: L'interface affiche une cinématique explicite M1, M2, benne et M3, et refuse de piloter silencieusement un serveur resté sur le schéma M3 historique.
+      verified_by: node TOOLS/AGENT_WORKFLOW/scripts/check_atelier_input.cjs
+    - id: AC10
+      statement: Une déconnexion ou un rechargement navigateur ne transforme jamais la session FMU en erreur moteur.
+      verified_by: python TOOLS/AGENT_WORKFLOW/scripts/check_atelier_server.py
+    - id: AC8
+      statement: Le modèle Modelica représente M3, les positions de câble M1/M2, le delta M2-M1, l'ouverture de benne et l'interlock de translation M1/M2 >= 6 m, selon les conventions documentées du projet.
+      verified_by: python TOOLS/TWINBENCH/modelica_atelier/verify.py
+    - id: AC7
+      statement: Le joystick sélectionné affiche ses axes et boutons en direct et permet d'apprendre un axe ainsi qu'un bouton homme-mort par une action volontaire.
+      verified_by: node TOOLS/AGENT_WORKFLOW/scripts/check_atelier_input.cjs
+    - id: AC6
+      statement: Le pilote choisit explicitement son périphérique parmi plusieurs joysticks ; changement et déconnexion neutralisent la commande sans bascule automatique.
+      verified_by: node TOOLS/AGENT_WORKFLOW/scripts/check_atelier_input.cjs
+    - id: AC5
+      statement: Espace ne modifie pas le levier tenu à la souris, les flèches ne relâchent pas l'homme-mort tenu au pointeur, et une perte de focus neutralise les deux.
+      verified_by: node TOOLS/AGENT_WORKFLOW/scripts/check_atelier_input.cjs
+    - id: AC1
+      statement: Le modèle source ouvre un schéma annoté et se compile en FMU avec OpenModelica installé.
+      verified_by: python TOOLS/TWINBENCH/modelica_atelier/verify.py
+    - id: AC2
+      statement: OMSimulator avance la physique, les commandes positives et négatives déplacent l'axe, et la masse influence sa réponse.
+      verified_by: python TOOLS/TWINBENCH/modelica_atelier/verify.py
+    - id: AC3
+      statement: Le navigateur permet conduite virtuelle, sélection USB, scénarios, édition et choix de courbes.
+      verified_by: Recette navigateur de la page locale et inspection des fonctions USB sans matériel.
+    - id: AC4
+      statement: Une variante exportée en Modelica se recharge et se vérifie avec le compilateur.
+      verified_by: python TOOLS/TWINBENCH/modelica_atelier/verify.py
+  scope:
+    allowed:
+      - TOOLS/AGENT_WORKFLOW/scripts/check_atelier_input.cjs
+      - TOOLS/AGENT_WORKFLOW/scripts/check_atelier_server.py
+      - TOOLS/TWINBENCH/modelica_atelier/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_POC_MODELICA_ATELIER.yaml
+      - DOC/WFLOW/AUDITS/POC_MODELICA_ATELIER_20260917.md
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - DOC/WFLOW/TASKS.yaml
+      - TOOLS/TWINBENCH/engine/
+  evidence_required:
+    - Compilation FMU et test dynamique natif
+    - Recette UI et limites matérielles explicites
+    - Vérification de la variante exportée
+  alert_duty: Signaler les limites du modèle, les échecs de compilation et toute divergence de source.
+status: IN_PROGRESS
+execution:
+  executed_by: Codex
+  status: PENDING
+  summary: POC indépendant autorisé par carte blanche utilisateur. Aucun changement PLC ni commit.
+  evidence_submitted: []
+validation:
+  status: PENDING
+  notes: Recette utilisateur du workflow attendue après livraison.
