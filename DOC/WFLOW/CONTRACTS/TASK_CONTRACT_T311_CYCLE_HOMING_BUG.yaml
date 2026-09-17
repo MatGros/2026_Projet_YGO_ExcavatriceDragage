@@ -1,0 +1,68 @@
+contract:
+  task_id: T311_CYCLE_HOMING_BUG
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Reproduire le défaut du cycle homing signalé par l'utilisateur, en identifier
+    la cause exacte, corriger la séquence sans régression sur les lots déjà validés
+    (T146/T226/T233).
+
+  acceptance:
+    - id: AC1
+      statement: "Une trace réelle ou une reproduction SimBench déterministe du défaut est obtenue."
+      verified_by: "trace/log fourni en preuve"
+    - id: AC2
+      statement: "La cause exacte est identifiée et documentée avant toute correction."
+      verified_by: "note de diagnostic versionnée"
+    - id: AC3
+      statement: "Après correction, le cycle homing aboutit sans le défaut signalé, en simulation puis sur machine."
+      verified_by: "test unitaire CI + essai machine"
+    - id: AC4
+      statement: "Aucune régression sur les cas déjà validés (T146 plafond palier hors homing, T226 refonte, T233 GRAFCET HX0..HX6)."
+      verified_by: "suite de tests CI existante PASS"
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleMachineHoming.st
+      - CODE/**/FB_Encoder_Homing.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "GRAFCET HX0..HX6 validé (T233)."
+      - "Plafond palier=1 hors homing (T146)."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug
+    preexistant, risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur,
+    pas a la fin et jamais silencieusement. Signaler n'est pas elargir le scope.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

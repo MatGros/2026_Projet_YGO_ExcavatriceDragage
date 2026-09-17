@@ -1,9 +1,138 @@
 version: 2.0.0
-derniere_mise_a_jour: '2026-09-16T00:36:00+02:00'
+derniere_mise_a_jour: '2026-09-17T10:10:00+02:00'
 archive_reference: DOC/WFLOW/ARCHIVES/TASKS_SNAPSHOT_20260915/TASKS_20260915_234600.yaml
 note: Catalogue actif de la phase de Mise en Service (Septembre 2026). Les 213 tâches
   historiques antérieures au 01/09/2026 sont conservées dans archive_reference.
 tasks:
+- id: T313
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: DIAGNOSTIC / GVL_TROUBLESHOOTING
+  agent: '—'
+  date: '2026-09-17T10:06:00+02:00'
+  avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO : demande de réorganisation chronologique du GVL de troubleshooting pour exploitation rapide en maintenance.'
+  titre: 'GVL Troubleshooting — refactor présentation chronologique pour diagnostic rapide en maintenance'
+  contexte: 'Mail YGO 2026-09-15 : "refactorer la présentation des informations pour qu''elle soit chronologique et directement exploitable en maintenance : comprendre rapidement pourquoi un moteur est bloqué, sans devoir parcourir le code." La structure actuelle de GVL_Troubleshooting expose les variables par domaine technique, pas dans l''ordre où un mainteneur les consulterait pour reconstituer la séquence d''un blocage.'
+  description: 'Réorganiser la présentation (structure GVL et/ou vue IHM associée) pour suivre l''ordre chronologique d''un événement de blocage (dernière commande → permis → retour capteurs/contacteurs → cause), sans changer la sémantique ni les producteurs uniques des variables sous-jacentes.'
+  objectifs:
+  - 'Cartographier l''ordre chronologique utile au diagnostic (commande → permis → retour → cause) pour un axe donné.'
+  - 'Réorganiser la structure/présentation GVL_Troubleshooting selon cet ordre, sans déplacer la production des données (producteur unique inchangé).'
+  - 'Valider sur au moins un cas réel de blocage (archive troubleshooting existante) que la nouvelle présentation raccourcit le temps de compréhension.'
+  - 'Bundle PLCopenXML, G200 liaison et gates applicables PASS.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T313_GVL_TROUBLESHOOTING_CHRONOLOGIQUE.yaml
+  bloque_par: []
+- id: T312
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: IHM / DIAGNOSTIC / EXPORT
+  agent: '—'
+  date: '2026-09-17T10:05:00+02:00'
+  avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO : outil de recherche/export CSV/Excel des messages opérateur, alarmes et indications. Structure prête selon le mail, reste à valider les textes.'
+  titre: 'Export CSV/Excel des messages opérateur, alarmes et indications — finaliser les textes'
+  contexte: 'Mail YGO 2026-09-15 : "finaliser l''outil de recherche et d''export CSV/Excel des messages opérateur, alarmes et indications. La structure est prête ; restent à valider tous les textes de cause, conseils de maintenance et actions opérateur."'
+  description: 'Reprendre l''outil existant (structure export déjà posée) et valider/compléter l''intégralité des textes : cause, conseil de maintenance, action opérateur, pour chaque message/alarme/indication répertorié.'
+  objectifs:
+  - 'Recenser exhaustivement les messages/alarmes/indications existants et leur texte actuel.'
+  - 'Valider ou rédiger le texte de cause, le conseil de maintenance et l''action opérateur pour chacun.'
+  - 'Vérifier que l''export CSV/Excel produit un fichier exploitable sans erreur pour l''ensemble du périmètre.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T312_EXPORT_MESSAGES_OPERATEUR.yaml
+  bloque_par: []
+- id: T311
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: CYCLE / HOMING
+  agent: '—'
+  date: '2026-09-17T10:04:00+02:00'
+  avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO : "le cycle homing est actuellement buggué : reproduire le défaut, corriger la séquence, valider en simulation puis tester sur machine."'
+  titre: 'Cycle homing — reproduire le défaut signalé, corriger la séquence, valider simulation puis machine'
+  contexte: 'Signalement mail YGO 2026-09-15 d''un bug sur le cycle homing (FB_CycleMachineHoming / GRAFCET HX0..HX6), malgré les travaux antérieurs déjà clos (T146, T226, T233). Le défaut exact n''est pas encore décrit précisément côté trace/reproduction.'
+  description: 'Reproduire le défaut homing signalé (trace réelle ou SimBench), identifier la cause exacte sans présumer d''une régression sur les lots déjà clos, corriger la séquence concernée, puis valider en simulation avant tout essai machine.'
+  objectifs:
+  - 'Obtenir une trace ou une reproduction SimBench déterministe du défaut homing signalé.'
+  - 'Identifier la cause exacte (séquence GRAFCET, préset, synchronisation Homed) avant toute correction.'
+  - 'Corriger la séquence a minima, sans régression sur les cas déjà validés (T146/T226/T233).'
+  - 'Valider en simulation puis sur machine avant clôture.'
+  - 'Bundle PLCopenXML, G200 liaison et gates applicables PASS.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T311_CYCLE_HOMING_BUG.yaml
+  bloque_par: []
+- id: T310
+  parent_id: ''
+  statut: '⬜'
+  criticite: C3
+  domaine: TREUILS / SECURITE_MACHINE
+  agent: '—'
+  date: '2026-09-17T10:03:00+02:00'
+  avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO : passage à un palier de treuil supérieur conditionné à une vitesse câble suffisante, en complément des temporisations fixes existantes.'
+  titre: 'Treuils — condition de vitesse câble avant passage à un palier supérieur (en complément des temporisations fixes)'
+  contexte: 'Mail YGO 2026-09-15 : "prévoir, en complément des temporisations fixes, une condition de vitesse câble avant le passage à un palier supérieur. Le but est d''éviter l''enchaînement des contacteurs alors que le treuil n''a pas atteint une vitesse suffisante, avec risque de calage, surintensité et disjonction." Fonction désactivable IHM, mémorisée en persistant, seuils distincts montée/descente et M1/M2, hystérésis anti-basculement. Sujet distinct de T305 (plancher 400ms/thermique) : ici la condition porte sur la vitesse mesurée, pas sur un délai fixe.'
+  description: 'Étudier puis simuler une condition de vitesse câble minimale avant transition de palier, en complément (pas en remplacement) du plancher temporisé existant (FB_WinchOutputInterlock CST_StepRampFloorDelay). Fonction désactivable depuis l''IHM, seuils M1/M2 et montée/descente distincts et persistants, hystérésis anti-basculement. À simuler et valider avant tout essai machine.'
+  objectifs:
+  - 'Définir le seuil de vitesse câble minimal par axe (M1/M2) et par sens (montée/descente), configurable et persistant.'
+  - 'Ajouter une hystérésis pour éviter les basculements instables autour du seuil.'
+  - 'Rendre la fonction désactivable depuis l''IHM, mémorisée en persistant, sans supprimer le plancher temporisé existant.'
+  - 'Ne pas modifier T305 (investigation origine 400ms/thermique) — sujet distinct et complémentaire.'
+  - 'Simuler et valider tous les cas (seuil franchi/non franchi, désactivation, persistance) avant tout essai machine.'
+  - 'Bundle PLCopenXML, G200 liaison et gates applicables PASS.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T310_TREUILS_VITESSE_CABLE_PALIER.yaml
+  bloque_par: []
+- id: T309
+  parent_id: ''
+  statut: '⬜'
+  criticite: C3
+  domaine: TREUILS_BENNE / CYCLE_AUTO
+  agent: '—'
+  date: '2026-09-17T10:02:00+02:00'
+  avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO. Stade simulation/étude uniquement pour l''instant ; passage à du code réel à statuer ultérieurement.'
+  titre: 'Transition fermeture/remontée en grappin (AX10→AX11) — ne pas attendre la fermeture complète pour engager la remontée à deux treuils'
+  contexte: 'Mail YGO 2026-09-15 : "objectif = ne pas attendre la fermeture complète avant de monter avec les deux treuils, afin de soulager M2 seul. À simuler et tester avant toute mise en réel : passage AX10 → AX11, commandes, freins, contacteurs et continuité de mouvement." Sujet important mais qui reste au stade simulation/étude ; l''avancement vers du code réel de production sera décidé dans un lot ultérieur distinct.'
+  description: 'Étudier et simuler la transition anticipée AX10 (fermeture benne) → AX11 (remontée à deux treuils) sans attendre la fermeture complète, dans le seul objectif de réduire la charge sur M2 seul. Couvrir commandes, freins, contacteurs et continuité de mouvement en SimBench. Aucune écriture de code de production dans ce lot — étude et simulation uniquement.'
+  objectifs:
+  - 'Modéliser en SimBench la transition anticipée AX10→AX11 (seuil de fermeture partielle à définir) et son impact sur M2.'
+  - 'Vérifier la continuité de mouvement, l''absence de à-coup et la cohérence commandes/freins/contacteurs pendant la transition.'
+  - 'Documenter le seuil de fermeture retenu et sa justification physique (charge M2).'
+  - 'Ne pas modifier CODE/ de production dans ce lot ; toute avancée vers du code réel fait l''objet d''un lot distinct après validation humaine explicite.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T309_TRANSITION_FERMETURE_REMONTEE_GRAPPIN.yaml
+  bloque_par: []
+- id: T308
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: TREUILS_BENNE / CYCLE_AUTO
+  agent: '—'
+  date: '2026-09-17T10:01:00+02:00'
+  avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO : variables IHM prêtes, aucune logique cycle encore écrite. Cadrage minimal, sans sur-spécification.'
+  titre: '% de fermeture benne avant remontée — cadrage de la logique cycle (variables IHM déjà prêtes)'
+  contexte: 'Mail YGO 2026-09-15 et 2026-09-17 : "les variables sont prêtes, mais aucune logique cycle n''est encore faite." Sujet distinct et plus simple que T309 (transition grappin) : ici il s''agit du seuil de % de fermeture benne en-dessous duquel la remontée n''est pas autorisée en cycle auto.'
+  description: 'Cadrer a minima la logique cycle consommant le % de fermeture benne existant côté IHM : seuil minimal avant autorisation de remontée en cycle auto, sans sur-spécifier ni anticiper sur T309 (transition grappin, sujet distinct traité séparément).'
+  objectifs:
+  - 'Définir le seuil minimal de % de fermeture benne autorisant la remontée en cycle auto.'
+  - 'Raccorder la variable IHM existante à la condition de cycle, sans dupliquer ou modifier T309.'
+  - 'Simuler le comportement avant tout essai machine.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T308_PCT_FERMETURE_BENNE_REMONTEE.yaml
+  bloque_par: []
+- id: T307
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: SECURITE_MACHINE / ALARMES / REARMEMENT
+  agent: '—'
+  date: '2026-09-17T10:00:00+02:00'
+  avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO : le 24V variateurs doit rester alimenté même AU relâché (déjà traité) ; reste le nettoyage des alarmes transitoires parasites au réarmement.'
+  titre: '24V variateurs — auto-acquittement borné des alarmes transitoires après réarmement (hors AU actif)'
+  contexte: 'Demande utilisateur 2026-09-17 : après rétablissement du 24V au réarmement (AU relâché, aucun AU actif), des alarmes parasites transitoires peuvent apparaître juste après le réarmement sans utilité (bruit de démarrage des variateurs/codeurs). Demande une salve d''acquittements automatiques bornée pour nettoyer ces alarmes transitoires, sans jamais acquitter une alarme réellement active et justifiée.'
+  description: 'Mettre en place une salve d''acquittement automatique bornée (2 à 3 acquittements, espacés d''environ 1 s, pendant environ 3 s) déclenchée uniquement après réarmement complet et en l''absence de tout AU actif. La salve ne doit jamais masquer une alarme réellement active : seules les alarmes transitoires apparues dans la fenêtre de démarrage sont concernées, et toute alarme qui persiste après la salve reste visible et non acquittée automatiquement.'
+  objectifs:
+  - 'Déclencher la salve uniquement sur front de réarmement complet, AU non actif, jamais en fonctionnement normal.'
+  - 'Borner strictement la salve à 2-3 acquittements espacés d''environ 1 s sur une fenêtre d''environ 3 s après réarmement.'
+  - 'Ne jamais acquitter automatiquement une alarme qui persiste après la fenêtre — elle reste affichée et nécessite un acquittement opérateur conscient.'
+  - 'Vérifier qu''aucune alarme de sécurité bloquante (AU, discordance, PowerCutOff) n''est concernée par l''auto-acquittement.'
+  - 'Tests couvrant : réarmement sans alarme parasite, réarmement avec alarme transitoire nettoyée, réarmement avec alarme réelle persistante non acquittée, AU actif pendant la fenêtre (salve annulée).'
+  - 'Bundle PLCopenXML, G200 liaison et gates applicables PASS.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T307_AUTO_ACQUITTEMENT_ALARMES_REARMEMENT.yaml
+  bloque_par: []
 - id: T306
   parent_id: ''
   statut: '⬜'
@@ -46,12 +175,12 @@ tasks:
   bloque_par: []
 - id: T304
   parent_id: ''
-  statut: '⬜'
+  statut: ⏸️
   criticite: C2
   domaine: OUTILLAGE / SIMULATION / JUMEAU NUMERIQUE
   agent: '—'
   date: '2026-09-16T11:27:22+02:00'
-  avancement: 'Cadré le 2026-09-16 suite étude Phase 1 sur la simulation électromécanique : POC vertical du nouvel outil TwinBench, périmètre volontairement réduit à Joystick + M3 Translation.'
+  avancement: '⏸️ Réorientée le 2026-09-17 : le POC Rumoca/TwinBench a confirmé une chaîne technique, mais ne constitue pas un socle Windows exploitable pour l''édition et l''animation Modelica. Conservation des artefacts pour R&D ; aucun remplacement du banc OpenModelica/SimBench.'
   titre: 'TwinBench — POC vertical du simulateur électromécanique et du jumeau 2D (périmètre Joystick + M3 Translation)'
   contexte: 'Le modèle physique de la machine est aujourd''hui écrit à trois endroits : les FB ST de CODE/L_SIMULATION, le JavaScript du banc engine/cycle_bench.html, et les stimuli du harnais anim_bench. Ces trois implémentations divergent sans contrôle (constat T304 : une grandeur d''environnement paramétrable côté ST est figée en constante côté JS, rendant inatteignable un pan entier de l''espace de test). Aucun outil commun, éditable et visuel n''existe. L''étude de conception TEST_AUTO_CI/DIGITAL_TWIN/ a défini le contrat Frame et la règle du pur rendu, mais n''a jamais tranché qui porte la physique côté source.'
   description: 'Éprouver par un POC vertical le format de modèle .twin.yaml et la chaîne complète TwinBench : modèle déclaratif unique, moteur Python, frames, vue 2D générée, injection joystick bidirectionnelle, invariant de sécurité balayé sur les modes de panne, et génération du ST du profil embarqué. Périmètre restreint à un seul axe non couplé (M3 Translation) et au joystick, afin de valider la chaîne de bout en bout sans toucher aux treuils. Aucune écriture dans CODE/ : la sortie générée reste dans TOOLS/TWINBENCH/out/ et sa recopie éventuelle est une décision humaine distincte.'
@@ -65,6 +194,26 @@ tasks:
   - 'Produire le rapport de couverture croisée AF <-> modèle <-> code ST réel.'
   - 'Objectif étendu décrochable : gate d''équivalence trace Python <-> trace ST compilé.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T304_POC_TWINBENCH_JOYSTICK_M3.yaml
+  bloque_par: []
+- id: T314
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: OUTILLAGE / SIMULATION / OPENMODELICA
+  agent: '—'
+  date: '2026-09-17T00:00:00+02:00'
+  avancement: 'Recentrage décidé : OpenModelica/OMEdit/OMSimulator Windows devient le socle unique de modélisation et d''exécution ; Rumoca est gelé comme piste R&D sans dépendance utilisateur.'
+  titre: 'OpenModelica Windows — atelier éditable, animation et conduite interactive M1/M2/M3'
+  contexte: 'Le POC Rumoca a produit des rapports et un viewer, mais l''installation/runtime Windows et la compatibilité Modelica/animation ne permettent pas d''en faire le logiciel utilisateur. OpenModelica est déjà installé, maintenu sur le poste et fournit OMEdit, MSL, FMU et OMSimulator. Le besoin prioritaire est donc un atelier utilisable : ouvrir/modifier un modèle, simuler, animer et piloter sans générer un rapport intermédiaire obligatoire.'
+  description: 'Rebâtir l''atelier autour de l''exécutable OpenModelica Windows. Le modèle source reste Dredge.mo ; OMEdit est l''éditeur de classes/diagrammes, OMSimulator ou l''exécutable OpenModelica assure l''exécution, et une vue opérateur lit uniquement les sorties de la plante. Le banc CODESYS/SimBench reste conservé et aucune commande réelle n''est autorisée.'
+  objectifs:
+  - 'Lancer une session depuis un point d''entrée unique Windows et détecter l''installation OpenModelica/OMEdit.'
+  - 'Ouvrir Dredge.mo dans OMEdit, modifier une classe/connexion, sauvegarder, puis recharger/recompiler la plante depuis l''atelier.'
+  - 'Animer au minimum une vue 2D M3/M1/M2 synchronisée avec les sorties OpenModelica, sans seconde physique en JavaScript.'
+  - 'Piloter manuellement par boutons, clavier et joystick HID sélectionné, avec homme-mort et neutralisation à la perte de commande.'
+  - 'Permettre les scénarios et le tracé live de toute grandeur déclarée dans la frame, avec curseur, zoom et choix de signaux.'
+  - 'Documenter la frontière hors ligne : plante OpenModelica -> image observée ; aucun bypass, interlock ou sortie physique.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T314_OPENMODELICA_WINDOWS_ATELIER.yaml
   bloque_par: []
 - id: T302
   parent_id: ''
@@ -257,8 +406,12 @@ tasks:
   domaine: CYCLE_AUTO / IHM_MISE_EN_SERVICE
   agent: —
   date: '2026-09-15T13:16:00+02:00'
-  avancement: Demandé le 2026-09-15 ; cadrage seulement, aucune modification automate
-    ou IHM engagée.
+  avancement: 'Demandé le 2026-09-15 ; cadrage seulement, aucune modification automate
+    ou IHM engagée. Précision utilisateur 2026-09-17 : point mineur/simple — les
+    variables (étape en cours, champ de saut d''étape) existent déjà en local sur
+    l''IHM mais ne sont pas encore diffusées dans GVL_IHM. En attente des noms exacts
+    de variables fournis par l''utilisateur avant diffusion. Scope réduit, criticité
+    inchangée.'
   titre: Cycle SEMI_AUTO — afficher CycleStep et préparer un saut de test vers AX7
     (G7)
   contexte: 'Demande utilisateur : exposer sur l’IHM l’étape courante du cycle (GVL_IHM.CycleSemiAuto.State.CycleStep)
@@ -296,13 +449,14 @@ tasks:
   bloque_par: []
 - id: T296
   parent_id: ''
-  statut: ⏳
+  statut: '⬜'
   criticite: C3
   domaine: TRANSLATION_M3 / CONFIGURATION
-  agent: —
-  date: '2026-09-15T15:05:00+02:00'
-  avancement: Prise en charge par Antigravity. Cadrage et analyse de la persistance
-    et des consignes M3 (50 Hz nominal / 15 Hz zone PV).
+  agent: '—'
+  date: '2026-09-17T10:07:00+02:00'
+  avancement: 'Agent libéré le 2026-09-17 (personne ne travaille dessus actuellement).
+    Cadrage antérieur conservé : persistance et consignes M3 (50 Hz nominal / 15 Hz
+    zone PV) restent à implémenter.'
   titre: 'M3 — fréquences configurables et persistantes : 50 Hz standard / 15 Hz en
     zone PV'
   contexte: 'Demande utilisateur : utiliser 50 Hz en régime normal et limiter M3 à
@@ -363,6 +517,11 @@ tasks:
     autres séquences benne, réarmement conscient conservé, aucun redémarrage automatique.'
   - Bundle PLCopenXML, G200 liaison, tests de non-régression et gates applicables
     PASS avant intégration CODESYS.
+  note_utilisateur_20260917: 'Avant tout diagnostic approfondi : questionner
+    l''utilité réelle de ce défaut logiciel. L''opérateur constate de toute
+    façon rapidement l''absence de mouvement — la valeur ajoutée du timeout
+    logiciel est peut-être faible. Trancher (garder / simplifier / retirer la
+    détection logicielle) avant d''investir du temps de diagnostic dessus.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T295_AX15B_BUCKET_OPEN_TIMEOUT.yaml
   bloque_par: []
 - id: T294
@@ -569,6 +728,16 @@ tasks:
   condition_reprise: Reprise uniquement sur demande explicite, apres validation humaine
     du plan C4 et definition de la reference M2 corrigee independante en position
     benne intermediaire.
+  objectif_supplementaire_20260917: 'URGENT — Utilisateur a physiquement déplacé
+    les 4 sorties de direction des treuils M1/M2 hors des sorties digitales transistor
+    (risque de défaut/écroulement lié aux transistors), export I/O frais du projet
+    à venir. Dès réception de cet export : parcourir EXHAUSTIVEMENT le code (grep
+    systématique) toutes les références aux 4 sorties de direction M1/M2 déplacées
+    et les mettre à jour partout où nécessaire, y compris dans l''outil de diagnostic
+    (OmniDiag / GVL Troubleshooting) et tout autre consommateur de ces sorties.
+    Risque de régressions dispersées dans tout le code suite à ce déplacement
+    matériel — traiter en priorité dès l''export reçu. Aucun code à écrire avant
+    réception de l''export.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T291_B_AUTORITE_M1_LIMITES_HAUTES.yaml
   bloque_par: []
 - id: T290
@@ -599,15 +768,16 @@ tasks:
   bloque_par: []
 - id: T289
   parent_id: ''
-  statut: ✅
+  statut: ⏳
   criticite: C2
   domaine: CYCLE_AUTO / IHM
   agent: Codex
-  date: '2026-09-15T15:40:00+02:00'
+  date: '2026-09-17T10:08:00+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T289_DECOMPTE_RESTANT_20260915.md
-  avancement: 'Terminée et validée sur banc et machine : consigne égouttage IHM en
-    secondes (DrainTime_S), décompte restant DrainTimeRemaining / DrainTimeElapsed_S
-    et bypass Skip opérationnels.'
+  avancement: 'Rouverte le 2026-09-17 sur correction utilisateur : implémentation
+    testée et validée en simulation uniquement (consigne égouttage IHM en secondes
+    DrainTime_S, décompte restant DrainTimeRemaining / DrainTimeElapsed_S, bypass
+    Skip). Le test sur site réel reste à faire avant toute clôture définitive.'
   titre: Égouttage AX13 — consigne IHM et décompte du temps restant en secondes (INT)
   contexte: 'La consigne DrainTime_S en secondes et la mesure actuelle DrainTimeElapsed_S
     ont été implémentées et validées en essai utilisateur. Nouvelle décision utilisateur
@@ -632,6 +802,8 @@ tasks:
     parallèle n’est réintroduit
   - Zéro régression sur le comportement AX13 (SkipDrainRequest, bypass, PT effectif)
   - Gates G200 + palier C PASS
+  - 'Ajouté 2026-09-17 — essai machine sur site réel (hors simulation) confirmant
+    le décompte restant et le bypass Skip avant toute clôture définitive de la tâche'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T289_EGOUTTAGE_IHM_SECONDES.yaml
   bloque_par: []
 - id: T288
@@ -675,6 +847,12 @@ tasks:
   - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T288_PHASE2_REGISTRE_ERREURS.yaml
   - DOC/WFLOW/CONTRACTS/TEST_DESIGN_T288_PHASE2_REGISTRE_ERREURS_20260915.md
   - DOC/WFLOW/REVIEWS/REVIEW_T288_PHASE2_REGISTRE_ERREURS_20260915.md
+  objectif_supplementaire_20260917: 'Lié au déplacement des 4 sorties de direction
+    M1/M2 hors sorties transistor (cf. T291-B) : vérifier que la détection de
+    discordance commande/retour contacteurs reste cohérente avec le nouveau
+    câblage/sorties, et que la sortie du diagnostic ne référence plus les
+    anciennes sorties transistor obsolètes. À traiter après réception de
+    l''export I/O frais annoncé par l''utilisateur.'
   bloque_par: []
 - id: T287
   parent_id: T286
@@ -886,7 +1064,14 @@ tasks:
   - 'Clos : Arbitrage et symétrie homme-mort sur l''ensemble des actionneurs (PRG_04/PRG_05).'
   - 'Restant : Définir et raccorder le calcul dynamique de ArmingPermit (position
     neutre, absence de défaut bloquant, mode valide).'
-  contrat: ''
+  - 'Ajouté 2026-09-17 (mail YGO/retour utilisateur) : le joystick peut s''armer alors
+    que les moteurs/mouvement ne sont pas réellement autorisés/prêts, ce qui pousse
+    à piloter les contacteurs dans un état incohérent et génère des défauts "commande
+    sans mouvement". Corriger la logique d''armement pour qu''elle reflète réellement
+    les permis de déplacement (bonne information/entrée de disponibilité moteur).
+    Cette correction DOIT être challengée/revue par un expert avant toute implémentation
+    — pas d''implémentation directe.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T157_ARMING_PERMIT_JOYSTICK.yaml
   bloque_par: []
 - id: T208
   parent_id: ''

@@ -1,0 +1,69 @@
+contract:
+  task_id: T157_ARMING_PERMIT_JOYSTICK
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Corriger le calcul dynamique de ArmingPermit pour que l'armement du joystick
+    reflète réellement les permis de déplacement (disponibilité moteur), et non
+    un état simplifié/forcé — étape préalable OBLIGATOIRE : revue par un expert
+    automatisme/sécurité avant toute implémentation.
+
+  acceptance:
+    - id: AC1
+      statement: "Une revue experte du design ArmingPermit est produite et versionnée avant tout code."
+      verified_by: "document de revue DOC/WFLOW/REVIEWS/ ou équivalent"
+    - id: AC2
+      statement: "Après implémentation validée, le joystick ne s'arme plus si le moteur/mouvement visé n'est pas réellement disponible."
+      verified_by: "test unitaire CI"
+    - id: AC3
+      statement: "Les défauts 'commande sans mouvement' liés à un armement incohérent disparaissent en test."
+      verified_by: "test unitaire CI de non-régression"
+    - id: AC4
+      statement: "L'arbitrage homme-mort existant (PRG_04/PRG_05) n'est pas régressé."
+      verified_by: "suite de tests CI existante PASS"
+
+  scope:
+    allowed:
+      - CODE/**/PRG_02_Acquisition.st
+      - CODE/**/FB_Joystick*.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Arbitrage et symétrie homme-mort sur l'ensemble des actionneurs (déjà clos)."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug
+    preexistant, risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur,
+    pas a la fin et jamais silencieusement. Signaler n'est pas elargir le scope.
+    Aucune implémentation ne démarre avant la revue experte (AC1).
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

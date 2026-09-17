@@ -109,15 +109,15 @@ contract:
     AF_Partie-08 / AF_Partie-11 est remontee telle quelle, sans correction :
     ce POC n'a pas le droit d'ecrire dans CODE/.
 
-status: PENDING
+status: DEFERRED_REORIENTED
 execution:
   executed_by: ""
   completed_at: ""
-  status: PENDING
-  summary: ""
+  status: DEFERRED
+  summary: "POC Rumoca/TwinBench conserve pour R&D ; reorientation vers T314 car le runtime/éditeur Windows utilisateur n'est pas suffisamment direct et la compatibilité Modelica/animation complète n'est pas démontrée."
   evidence_submitted: []
 validation:
-  status: PENDING
+  status: DEFERRED
   validated_by: ""
   validated_at: ""
-  notes: ""
+  notes: "Aucun remplacement du banc OpenModelica/SimBench. Voir DOC/WFLOW/AUDITS/REORIENTATION_RUMOCA_OPENMODELICA_20260917.md."

@@ -1,0 +1,65 @@
+contract:
+  task_id: T308_PCT_FERMETURE_BENNE_REMONTEE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    En cycle auto, interdire la remontée tant que le % de fermeture benne (déjà
+    disponible côté IHM) n'atteint pas un seuil minimal configurable.
+
+  acceptance:
+    - id: AC1
+      statement: "Sous le seuil configuré, la remontée en cycle auto n'est pas autorisée."
+      verified_by: "test unitaire CI"
+    - id: AC2
+      statement: "Au-dessus du seuil, la remontée est autorisée comme actuellement (aucune régression)."
+      verified_by: "test unitaire CI de non-régression"
+    - id: AC3
+      statement: "Le seuil est configurable et persistant (GVL_PERSISTENT)."
+      verified_by: "test unitaire CI redémarrage/persistance"
+
+  scope:
+    allowed:
+      - CODE/**/PRG_03_Modes_Cycle.st
+      - CODE/**/PRG_04_Treuils_Benne.st
+      - CODE/**/GVL_PERSISTENT.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+      - CODE/**/FB_Cycle*.st  # T309 (transition grappin) reste hors scope de ce lot
+
+  conservation:
+    must_survive:
+      - "Comportement actuel du cycle auto hors ce nouveau garde-fou."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug
+    preexistant, risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur,
+    pas a la fin et jamais silencieusement. Signaler n'est pas elargir le scope.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

@@ -1,0 +1,55 @@
+contract:
+  task_id: T314
+  criticality: C3
+  strategy: rebuild
+  objective: >
+    Recentrer l'atelier de simulation sur les exécutables Windows OpenModelica,
+    OMEdit et OMSimulator afin que l'utilisateur puisse modifier le modèle,
+    l'exécuter, l'animer et le piloter sans dépendre de Rumoca.
+  acceptance:
+    - id: AC1
+      statement: "Le point d'entrée Windows vérifie l'installation OpenModelica et ouvre l'atelier sans générer de rapport obligatoire."
+      verified_by: "Recette humaine sur Windows : lancement unique, état moteur READY et fenêtre opérateur visible."
+    - id: AC2
+      statement: "OMEdit ouvre le Dredge.mo versionné ; une modification sauvegardée peut être rechargée et recompilée depuis l'atelier."
+      verified_by: "Recette fichier modifié -> bouton rechargement -> FMU reconstruite -> simulation démarrable."
+    - id: AC3
+      statement: "La vue opérateur lit les sorties de la plante OpenModelica et anime M3/M1/M2 en direct, sans calcul physique parallèle dans le rendu."
+      verified_by: "Trace de cohérence sorties FMU / frame / vue et revue du code de rendu."
+    - id: AC4
+      statement: "Les commandes manuelles, clavier et joystick HID sélectionné appliquent un homme-mort et neutralisent les axes après perte de commande."
+      verified_by: "Essais bouton, clavier, joystick et débranchement/perte de heartbeat hors machine réelle."
+    - id: AC5
+      statement: "Les scénarios et grandeurs tracées sont disponibles en direct avec sélection, zoom et curseur temporel."
+      verified_by: "Recette opérateur sur cycle fermeture/remontée et sélection d'au moins trois signaux."
+    - id: AC6
+      statement: "Le banc CODESYS/SimBench reste intact ; aucun chemin OpenModelica ne commande une sortie physique ou ne contourne un interlock."
+      verified_by: "Audit des chemins et vérification git ; aucune modification CODE/ ni PRJ_CODESYS/."
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/modelica_atelier/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T314_OPENMODELICA_WINDOWS_ATELIER.yaml
+      - DOC/WFLOW/AUDITS/REORIENTATION_RUMOCA_OPENMODELICA_20260917.md
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - pilotage_machine_reelle
+  conservation:
+    must_survive:
+      - "FB_SimBench et la frontière HwReal/HwSim/HwIn restent la référence PLC."
+      - "AU matériel, PowerCutOff, interlocks, homme-mort et réarmement conscient restent hors de la plante."
+      - "Les artefacts Rumoca restent archivés comme R&D et ne sont pas présentés comme moteur de référence."
+  dropped_on_purpose:
+    - "Rumoca n'est plus une dépendance de lancement ni la référence de compilation utilisateur."
+  evidence_required:
+    - "Journal de recette Windows OpenModelica/OMEdit/OMSimulator."
+    - "Trace de rechargement après modification de Dredge.mo."
+    - "Preuve animation/trace issue de la même frame."
+    - "Essais de commande et perte d'homme-mort hors machine réelle."
+  status: PLANNED
+  alert_duty: >
+    Toute incompatibilité Modelica, erreur de compilation ou hypothèse mécanique
+    non calibrée est affichée à l'utilisateur ; aucune approximation ne doit être
+    masquée par une courbe ou un viewer.

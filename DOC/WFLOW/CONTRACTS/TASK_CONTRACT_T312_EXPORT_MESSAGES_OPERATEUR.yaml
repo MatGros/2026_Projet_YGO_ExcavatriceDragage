@@ -1,0 +1,62 @@
+contract:
+  task_id: T312_EXPORT_MESSAGES_OPERATEUR
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Finaliser l'outil d'export CSV/Excel des messages opérateur/alarmes/indications
+    en validant l'intégralité des textes de cause, conseil de maintenance et action
+    opérateur (structure d'export déjà en place).
+
+  acceptance:
+    - id: AC1
+      statement: "L'inventaire exhaustif des messages/alarmes/indications existants est recensé."
+      verified_by: "liste versionnée"
+    - id: AC2
+      statement: "Chaque message dispose d'un texte de cause, d'un conseil de maintenance et d'une action opérateur validés."
+      verified_by: "revue humaine du fichier de textes"
+    - id: AC3
+      statement: "L'export CSV/Excel s'exécute sans erreur sur l'ensemble du périmètre."
+      verified_by: "exécution de l'outil d'export + vérification du fichier produit"
+
+  scope:
+    allowed:
+      - TOOLS/**/export*.py
+      - DOC/**/MESSAGES_*
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/**
+
+  conservation:
+    must_survive:
+      - "Structure d'export CSV/Excel déjà posée."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - run_all_gates
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug
+    preexistant, risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur,
+    pas a la fin et jamais silencieusement. Signaler n'est pas elargir le scope.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

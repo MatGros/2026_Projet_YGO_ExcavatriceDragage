@@ -1,0 +1,190 @@
+version: 1
+scope: Dredge.TranslationM3Plant
+purpose: >-
+  Métadonnées industrielles perdues dans le résultat MAT : direction Modelica,
+  rôle fonctionnel, unité, provenance et visibilité proposée dans l'explorateur.
+roles:
+  CMD: "Commande finale PLC vers plante ; jamais une permission de sécurité."
+  CFG: "Paramètre de modèle ; hypothèse tant qu'une mesure terrain ne le qualifie pas."
+  STAT: "Etat de session/adaptateur, jamais une mesure matérielle."
+  HW: "Fait matériel ou image capteur simulée vers HwSim."
+  DIAG: "Diagnostic de cohérence ; non utilisé pour autoriser un mouvement."
+role_profiles:
+  CMD: {kind: Command, access: write, authority: Adapter, source_stage: Cmd}
+  CFG: {kind: Configuration, access: parameter, authority: ModelOwner, configuration_class: CFG_BUILD, calibration_status: assumed}
+  STAT: {kind: State, access: read, authority: FMU}
+  HW: {kind: DiscreteFeedback, access: read, authority: FMU, source_stage: Act}
+  DIAG: {kind: Diagnostic, access: read, authority: FMU}
+signals:
+  - name: reqTremie
+    direction: input
+    role: CMD
+    data_type: Real
+    unit: "0/1"
+    label: "M3 — demande finale vers Trémie"
+    provenance: "PLC post-interlocks"
+    legacy_contract_name: true
+    target_name: tremieCmd
+  - name: reqMaintenance
+    direction: input
+    role: CMD
+    data_type: Real
+    unit: "0/1"
+    label: "M3 — demande finale vers Maintenance"
+    provenance: "PLC post-interlocks"
+    legacy_contract_name: true
+    target_name: maintenanceCmd
+  - name: speedCmdPct
+    direction: input
+    role: CMD
+    data_type: Real
+    unit: "%"
+    label: "M3 — consigne vitesse finale"
+    provenance: "PLC post-interlocks"
+  - name: brakeReleaseCmd
+    direction: input
+    role: CMD
+    data_type: Real
+    unit: "0/1"
+    label: "M3 — commande desserrage frein"
+    provenance: "PLC post-interlocks"
+  - name: travelM
+    direction: parameter
+    role: CFG
+    data_type: Real
+    unit: m
+    label: "M3 — course Trémie à Maintenance"
+    calibration: required
+  - name: fullTravelTimeS
+    direction: parameter
+    role: CFG
+    data_type: Real
+    unit: s
+    label: "M3 — durée course pleine vitesse"
+    calibration: required
+  - name: nominalFrequencyHz
+    direction: parameter
+    role: CFG
+    data_type: Real
+    unit: Hz
+    label: "M3 — fréquence nominale simulée"
+    calibration: required
+  - name: brakeOpenDelayS
+    direction: parameter
+    role: CFG
+    data_type: Real
+    unit: s
+    label: "M3 — délai ouverture frein"
+    calibration: required
+  - name: brakeCloseDelayS
+    direction: parameter
+    role: CFG
+    data_type: Real
+    unit: s
+    label: "M3 — délai fermeture frein"
+    calibration: required
+  - name: sensorHysteresisM
+    direction: parameter
+    role: CFG
+    data_type: Real
+    unit: m
+    label: "M3 — hystérésis capteurs position"
+    calibration: required
+  - name: positionM
+    direction: output
+    role: HW
+    data_type: Real
+    unit: m
+    label: "M3 — position chariot"
+    kind: Measurement
+    encoding: IEEE754
+  - name: velocityMps
+    direction: output
+    role: HW
+    data_type: Real
+    unit: m/s
+    label: "M3 — vitesse chariot"
+    kind: Measurement
+    encoding: IEEE754
+  - name: actualFrequencyHz
+    direction: output
+    role: HW
+    data_type: Real
+    unit: Hz
+    label: "M3 — fréquence effective simulée"
+    kind: Measurement
+    encoding: IEEE754
+  - name: brakeIsOpenDI
+    direction: output
+    role: HW
+    data_type: Real
+    unit: "0/1"
+    label: "M3 — retour frein ouvert"
+    encoding: NumericBoolean
+    polarity: "TRUE = frein physiquement ouvert"
+  - name: posTremieDI
+    direction: output
+    role: HW
+    data_type: Real
+    unit: "0/1"
+    label: "M3 — capteur Trémie"
+    encoding: NumericBoolean
+    polarity: "TRUE = chariot à la position Trémie"
+  - name: posPVDI
+    direction: output
+    role: HW
+    data_type: Real
+    unit: "0/1"
+    label: "M3 — capteur PV"
+    encoding: NumericBoolean
+    polarity: "TRUE = capteur PV actif"
+  - name: posP2DI
+    direction: output
+    role: HW
+    data_type: Real
+    unit: "0/1"
+    label: "M3 — capteur P2"
+    encoding: NumericBoolean
+    polarity: "TRUE = capteur P2 actif"
+  - name: posP1DI
+    direction: output
+    role: HW
+    data_type: Real
+    unit: "0/1"
+    label: "M3 — capteur P1"
+    encoding: NumericBoolean
+    polarity: "TRUE = capteur P1 actif"
+  - name: posMaintenanceDI
+    direction: output
+    role: HW
+    data_type: Real
+    unit: "0/1"
+    label: "M3 — capteur Maintenance"
+    encoding: NumericBoolean
+    polarity: "TRUE = chariot à la position Maintenance"
+  - name: statusWord
+    direction: output
+    role: HW
+    data_type: Real
+    unit: word
+    label: "M3 — StatusWord AC600 simulé"
+    kind: DeviceState
+    encoding: NumericUInt16
+  - name: commandConflict
+    direction: output
+    role: DIAG
+    data_type: Real
+    unit: "0/1"
+    label: "M3 — deux commandes de sens simultanées"
+  - name: hardStopTremie
+    direction: output
+    role: DIAG
+    data_type: Real
+    unit: "0/1"
+    label: "M3 — butée physique Trémie"
+  - name: hardStopMaintenance
+    direction: output
+    role: DIAG
+    data_type: Real
+    unit: "0/1"
+    label: "M3 — butée physique Maintenance"
