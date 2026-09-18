@@ -4413,7 +4413,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
       <dataType name="ST_Chain_Winch_Outputs">
         <baseType>
           <struct>
-            <variable name="Idx501_CmdRelayAscent_DQ">
+            <variable name="Idx501_CmdRelayAscent_RQ">
               <type>
                 <BOOL />
               </type>
@@ -4421,7 +4421,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Ascending ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx502_CmdRelayDescent_DQ">
+            <variable name="Idx502_CmdRelayDescent_RQ">
               <type>
                 <BOOL />
               </type>
@@ -7716,29 +7716,6 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Commandes finales logiques effectivement produites</xhtml>
               </documentation>
             </variable>
-            <variable name="M1_RelayAscent_DQ">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Local_Digital_IO — sorties relais direction M1/M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_RelayDescent_DQ">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M2_RelayAscent_Close_DQ">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M2_RelayDescent_Open_DQ">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
             <variable name="M1_SpeedContactor_1_DQ">
               <type>
                 <BOOL />
@@ -7787,7 +7764,7 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0008ER — freins et mesure Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0008ER — freins, direction treuils et mesure Kobold (sorties relais)</xhtml>
               </documentation>
             </variable>
             <variable name="M2_BrakeRelease_RQ">
@@ -7800,7 +7777,27 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="M1_M2_KoboldMeasureEnable_DQ">
+            <variable name="M1_M2_KoboldMeasureEnable_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_RelayAscent_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_RelayDescent_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayAscent_Close_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayDescent_Open_RQ">
               <type>
                 <BOOL />
               </type>
@@ -42745,8 +42742,8 @@ GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx416_RestartRequired := Win
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx417_RestartInhibit := WinchM1.State.FinalRestartInhibit;
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx418_NeutralRequestSeen := WinchM1.State.FinalNeutralRequestSeen;
 
-GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_DQ := WinchM1.State.RelayFwd;
-GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_DQ := WinchM1.State.RelayRev;
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ := WinchM1.State.RelayFwd;
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_RQ := WinchM1.State.RelayRev;
 GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM1.State.Contactor1;
 GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM1.State.Contactor4;
 GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM1.State.BrakeCmd;
@@ -42824,8 +42821,8 @@ GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx416_RestartRequired := Win
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx417_RestartInhibit := WinchM2.State.FinalRestartInhibit;
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx418_NeutralRequestSeen := WinchM2.State.FinalNeutralRequestSeen;
 
-GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_DQ := WinchM2.State.RelayFwd;
-GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_DQ := WinchM2.State.RelayRev;
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ := WinchM2.State.RelayFwd;
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_RQ := WinchM2.State.RelayRev;
 GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM2.State.Contactor1;
 GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM2.State.Contactor4;
 GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM2.State.BrakeCmd;
@@ -54649,8 +54646,8 @@ Data.SyncContactorDiag          := instSyncContactorFinal.Diag;
 {endregion}
 
 // ── Sorties physiques M1 (apres controle concordance §2ter) ──
-M1_RelayAscent_DQ            := M1RelayFwd;
-M1_RelayDescent_DQ           := M1RelayRev;
+M1_RelayAscent_RQ            := M1RelayFwd;
+M1_RelayDescent_RQ           := M1RelayRev;
 M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
 M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
 M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
@@ -54658,8 +54655,8 @@ M1_SpeedContactor_4_DQ       := M1SpeedContactor4;
 M1_BrakeRelease_RQ           := M1BrakeCmd;
 
 // ── Sorties physiques M2 (apres controle concordance §2ter) ──
-M2_RelayAscent_Close_DQ      := M2RelayFwd;
-M2_RelayDescent_Open_DQ      := M2RelayRev;
+M2_RelayAscent_Close_RQ      := M2RelayFwd;
+M2_RelayDescent_Open_RQ      := M2RelayRev;
 M2_SpeedContactor_1_DQ       := M2SpeedContactor1;
 M2_SpeedContactor_2_DQ       := M2SpeedContactor2;
 M2_SpeedContactor_3_DQ       := M2SpeedContactor3;
@@ -54749,7 +54746,7 @@ Data.TranslationBrakeCmd   := TranslationBrakeCmd;
 // ═══════════════════════════════════════════════════════════════
 // Source : PRG_04 (KoboldContactorCmdArbitrated).
 KoboldContactorCmd := PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated;
-M1_M2_KoboldMeasureEnable_DQ := KoboldContactorCmd;
+M1_M2_KoboldMeasureEnable_RQ := KoboldContactorCmd;
 
 // ═══════════════════════════════════════════════════════════════
 // 🛡️ §5 AU / MAINTIEN PUISSANCE — coupure + réarmement + sorties
@@ -55705,10 +55702,10 @@ GVL_IHM.IoHw.In.JoyAna4Raw := joyANA4;
 GVL_IHM.IoHw.In.Vh0800EndBit05Reserved := FALSE;
 
 GVL_IHM.IoHw.Out.Logical := PRG_06_Outputs.Data;
-GVL_IHM.IoHw.Out.M1_RelayAscent_DQ := M1_RelayAscent_DQ;
-GVL_IHM.IoHw.Out.M1_RelayDescent_DQ := M1_RelayDescent_DQ;
-GVL_IHM.IoHw.Out.M2_RelayAscent_Close_DQ := M2_RelayAscent_Close_DQ;
-GVL_IHM.IoHw.Out.M2_RelayDescent_Open_DQ := M2_RelayDescent_Open_DQ;
+GVL_IHM.IoHw.Out.M1_RelayAscent_RQ := M1_RelayAscent_RQ;
+GVL_IHM.IoHw.Out.M1_RelayDescent_RQ := M1_RelayDescent_RQ;
+GVL_IHM.IoHw.Out.M2_RelayAscent_Close_RQ := M2_RelayAscent_Close_RQ;
+GVL_IHM.IoHw.Out.M2_RelayDescent_Open_RQ := M2_RelayDescent_Open_RQ;
 GVL_IHM.IoHw.Out.M1_SpeedContactor_1_DQ := M1_SpeedContactor_1_DQ;
 GVL_IHM.IoHw.Out.M1_SpeedContactor_2_DQ := M1_SpeedContactor_2_DQ;
 GVL_IHM.IoHw.Out.M1_SpeedContactor_3_DQ := M1_SpeedContactor_3_DQ;
@@ -55720,7 +55717,7 @@ GVL_IHM.IoHw.Out.M2_SpeedContactor_4_DQ := M2_SpeedContactor_4_DQ;
 GVL_IHM.IoHw.Out.M1_BrakeRelease_RQ := M1_BrakeRelease_RQ;
 GVL_IHM.IoHw.Out.M2_BrakeRelease_RQ := M2_BrakeRelease_RQ;
 GVL_IHM.IoHw.Out.M3_BrakeRelease_RQ := M3_BrakeRelease_RQ;
-GVL_IHM.IoHw.Out.M1_M2_KoboldMeasureEnable_DQ := M1_M2_KoboldMeasureEnable_DQ;
+GVL_IHM.IoHw.Out.M1_M2_KoboldMeasureEnable_RQ := M1_M2_KoboldMeasureEnable_RQ;
 GVL_IHM.IoHw.Out.EmergencyArming_RQ := EmergencyArming_RQ;
 GVL_IHM.IoHw.Out.PowerKeepAlive_A_RQ := PowerKeepAlive_A_RQ;
 GVL_IHM.IoHw.Out.PowerKeepAlive_B_RQ := PowerKeepAlive_B_RQ;

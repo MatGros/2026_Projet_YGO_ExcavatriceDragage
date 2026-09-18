@@ -67,8 +67,8 @@ VAR_GLOBAL
     // === 📤 SORTIES MATÉRIELLES (PRG_06_Outputs) ===
 
     // Treuil M1 (Retenue)
-    M1_RelayAscent_DQ            : BOOL;
-    M1_RelayDescent_DQ           : BOOL;
+    M1_RelayAscent_RQ            : BOOL;
+    M1_RelayDescent_RQ           : BOOL;
     M1_SpeedContactor_1_DQ       : BOOL;
     M1_SpeedContactor_2_DQ       : BOOL;
     M1_SpeedContactor_3_DQ       : BOOL;
@@ -76,8 +76,8 @@ VAR_GLOBAL
     M1_BrakeRelease_RQ           : BOOL;
 
     // Treuil M2 (Benne)
-    M2_RelayAscent_Close_DQ      : BOOL;
-    M2_RelayDescent_Open_DQ      : BOOL;
+    M2_RelayAscent_Close_RQ      : BOOL;
+    M2_RelayDescent_Open_RQ      : BOOL;
     M2_SpeedContactor_1_DQ       : BOOL;
     M2_SpeedContactor_2_DQ       : BOOL;
     M2_SpeedContactor_3_DQ       : BOOL;
@@ -90,7 +90,7 @@ VAR_GLOBAL
     M3_BrakeRelease_RQ           : BOOL;
 
     // Capteur fond Kobold
-    M1_M2_KoboldMeasureEnable_DQ : BOOL;
+    M1_M2_KoboldMeasureEnable_RQ : BOOL;
 
     // Chaîne Arrêt d'Urgence / Puissance
     PowerKeepAlive_A_RQ          : BOOL;

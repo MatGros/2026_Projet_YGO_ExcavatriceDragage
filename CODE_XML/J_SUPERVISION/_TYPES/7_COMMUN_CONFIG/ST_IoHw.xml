@@ -163,29 +163,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Commandes finales logiques effectivement produites</xhtml>
               </documentation>
             </variable>
-            <variable name="M1_RelayAscent_DQ">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Local_Digital_IO — sorties relais direction M1/M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_RelayDescent_DQ">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M2_RelayAscent_Close_DQ">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M2_RelayDescent_Open_DQ">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
             <variable name="M1_SpeedContactor_1_DQ">
               <type>
                 <BOOL />
@@ -234,7 +211,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0008ER — freins et mesure Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0008ER — freins, direction treuils et mesure Kobold (sorties relais)</xhtml>
               </documentation>
             </variable>
             <variable name="M2_BrakeRelease_RQ">
@@ -247,7 +224,27 @@
                 <BOOL />
               </type>
             </variable>
-            <variable name="M1_M2_KoboldMeasureEnable_DQ">
+            <variable name="M1_M2_KoboldMeasureEnable_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_RelayAscent_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_RelayDescent_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayAscent_Close_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayDescent_Open_RQ">
               <type>
                 <BOOL />
               </type>

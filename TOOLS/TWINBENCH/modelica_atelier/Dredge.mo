@@ -231,7 +231,10 @@ package Dredge "Plante hors ligne de dragage : aucune logique PLC ni safety"
       plant.commands.cmdMoveToTremie = time >= 7 and time < 11;
       plant.commands.cmdSpeed_Pct = if time >= 1 and time < 5 then 70 else if time >= 7 and time < 11 then 55 else 0;
       plant.commands.cmdBrakeRelease = (time >= 1 and time < 5) or (time >= 7 and time < 11);
-      annotation(experiment(StartTime=0, StopTime=12, Tolerance=1e-6, Interval=.01));
+      annotation(
+        experiment(StartTime=0, StopTime=12, Tolerance=1e-6, Interval=.01),
+        __OpenModelica_simulationFlags(
+          variableFilter="plant\\.(commands|measurements|feedback|deviceState|diagnostics)\\..*"));
     end M3ContractCycle;
 
     model AnimatedM3ContractCycle "Vue 3D M3 liée à la même plante que les chronogrammes"
@@ -239,40 +242,40 @@ package Dredge "Plante hors ligne de dragage : aucune logique PLC ni safety"
       import Shape = Modelica.Mechanics.MultiBody.Visualizers.Advanced.Shape;
 
       Shape water(
-        shapeType="box", r={-4,0,-15}, lengthDirection={0,0,-1}, widthDirection={-1,0,0},
+        shapeType="box", r={-2,-4,0}, lengthDirection={1,0,0}, widthDirection={0,1,0},
         length=34, width=8, height=.15,
         color={25,110,165});
       Shape bridgeRail(
-        shapeType="box", r={0,12,-15}, lengthDirection={0,0,-1}, widthDirection={-1,0,0},
+        shapeType="box", r={-1,-.6,12}, lengthDirection={1,0,0}, widthDirection={0,1,0},
         length=32, width=1.2, height=.55,
         color={70,80,90});
       Shape tremieStop(
-        shapeType="box", r={0,11.2,0}, lengthDirection={0,0,-1}, widthDirection={-1,0,0},
+        shapeType="box", r={-.15,-1,11.2}, lengthDirection={1,0,0}, widthDirection={0,1,0},
         length=.3, width=2, height=1.8,
         color={185,65,45});
       Shape maintenanceStop(
-        shapeType="box", r={0,11.2,-30}, lengthDirection={0,0,-1}, widthDirection={-1,0,0},
+        shapeType="box", r={29.85,-1,11.2}, lengthDirection={1,0,0}, widthDirection={0,1,0},
         length=.3, width=2, height=1.8,
         color={55,150,80});
       Shape carriage(
-        shapeType="box", r={0,11.3,-plant.measurements.positionAct_M},
-        lengthDirection={0,0,-1}, widthDirection={-1,0,0}, length=1.8, width=2.2, height=.9,
+        shapeType="box", r={plant.measurements.positionAct_M-.9,-1.1,11.3},
+        lengthDirection={1,0,0}, widthDirection={0,1,0}, length=1.8, width=2.2, height=.9,
         color={225,155,35});
       Shape driveCabinet(
-        shapeType="box", r={0,12.1,-plant.measurements.positionAct_M},
-        lengthDirection={0,0,-1}, widthDirection={-1,0,0}, length=1.15, width=1.2, height=.65,
+        shapeType="box", r={plant.measurements.positionAct_M-.575,-.6,12.1},
+        lengthDirection={1,0,0}, widthDirection={0,1,0}, length=1.15, width=1.2, height=.65,
         color={52,57,63});
       Shape leftWheel(
-        shapeType="cylinder", r={-.72,10.7,-plant.measurements.positionAct_M},
-        lengthDirection={1,0,0}, widthDirection={0,0,-1},
+        shapeType="cylinder", r={plant.measurements.positionAct_M-.65,-.84,10.7},
+        lengthDirection={0,1,0}, widthDirection={1,0,0},
         length=.24, width=.42, height=.42, color={30,30,35});
       Shape rightWheel(
-        shapeType="cylinder", r={.72,10.7,-plant.measurements.positionAct_M},
-        lengthDirection={1,0,0}, widthDirection={0,0,-1},
+        shapeType="cylinder", r={plant.measurements.positionAct_M+.41,.60,10.7},
+        lengthDirection={0,1,0}, widthDirection={1,0,0},
         length=.24, width=.42, height=.42, color={30,30,35});
       annotation(
         experiment(StartTime=0, StopTime=12, Tolerance=1e-6, Interval=.01),
-        Documentation(info="<html><p>Animation M3 liée à <code>plant.measurements.positionAct_M</code>. Repère cabine : <b>X</b> pointe de la machine vers la cabine, <b>Y</b> est vertical vers le haut, <b>Z</b> suit le rail de Maintenance vers Trémie. La position métier croît de Trémie vers Maintenance et est donc projetée sur <b>-Z</b>.</p><p>Avec OMEdit 1.27.1, le sélecteur interne inverse les actions Front et Top. La géométrie est volontairement orientée pour que le bouton affiché <b>Front</b> donne la vue opérateur demandée : Trémie à gauche, Maintenance à droite.</p><p>Cette vue est schématique et hors ligne.</p></html>"));
+        Documentation(info="<html><p>Animation M3 liée à <code>plant.measurements.positionAct_M</code>. Repère physique : <b>X</b> de Trémie vers Maintenance, <b>Y</b> de la cabine vers la machine, <b>Z</b> vertical vers le haut. La vue cabine est le plan X-Z.</p><p>La vue 2D <code>Dredge.Atelier</code> est la référence opérateur. Cette 3D est une vue secondaire ; les presets de caméra d'OMEdit 1.27.1 ne définissent jamais le repère physique.</p></html>"));
     end AnimatedM3ContractCycle;
 
     model M1M2BucketCycle "Exemple treuils : levage conjoint puis fermeture M2"
@@ -294,7 +297,10 @@ package Dredge "Plante hors ligne de dragage : aucune logique PLC ni safety"
       plant.commands.cmdM2SpeedContactor2 = false;
       plant.commands.cmdM2SpeedContactor3 = false;
       plant.commands.cmdM2SpeedContactor4 = false;
-      annotation(experiment(StartTime=0, StopTime=12, Tolerance=1e-6, Interval=.01));
+      annotation(
+        experiment(StartTime=0, StopTime=12, Tolerance=1e-6, Interval=.01),
+        __OpenModelica_simulationFlags(
+          variableFilter="plant\\.(commands|measurements|feedback|diagnostics)\\..*"));
     end M1M2BucketCycle;
 
     model GrabClosureThenHoist
@@ -326,6 +332,8 @@ package Dredge "Plante hors ligne de dragage : aucune logique PLC ni safety"
                  time < closureValidation.validatedAtS + 5;
       annotation(
         experiment(StartTime=0, StopTime=20, Tolerance=1e-6, Interval=.01),
+        __OpenModelica_simulationFlags(
+          variableFilter="closureCmd|hoistCmd|closureValidation\\..*|plant\\.(commands|measurements|feedback|diagnostics)\\..*"),
         Documentation(info="<html><p>Scénario de mise au point AX10 vers AX11 : M2 ferme la benne jusqu'au retour <code>plant.feedback.bucketIsClosed</code>. Le retour doit rester continuellement actif pendant 300 ms avant d'autoriser la remontée conjointe M1/M2 ; toute retombée réinitialise la validation et interdit la remontée. Il s'agit d'une séquence de simulation hors ligne, pas du séquenceur PLC.</p><p>À tracer : <code>closureCmd</code>, <code>plant.feedback.bucketIsClosed</code>, <code>hoistCmd</code>, <code>plant.measurements.m1CablePositionAct_M</code> et <code>plant.measurements.m2CablePositionAct_M</code>.</p></html>"));
     end GrabClosureThenHoist;
 
@@ -359,57 +367,113 @@ package Dredge "Plante hors ligne de dragage : aucune logique PLC ni safety"
       Real bucketZ "Hauteur schématique de la benne";
       Real jawOffset "Ecartement schématique des coquilles";
       Shape water(
-        shapeType="box", r={-4,0,-15}, lengthDirection={0,0,-1}, widthDirection={-1,0,0},
+        shapeType="box", r={-2,-4,0}, lengthDirection={1,0,0}, widthDirection={0,1,0},
         length=34, width=8, height=.15,
         color={25,110,165});
       Shape bridge(
-        shapeType="box", r={0,12,-15}, lengthDirection={0,0,-1}, widthDirection={-1,0,0},
+        shapeType="box", r={-1,-.6,12}, lengthDirection={1,0,0}, widthDirection={0,1,0},
         length=32, width=1.2, height=.55,
         color={70,80,90});
       Shape trolley(
-        shapeType="box", r={0,11.4,-15}, lengthDirection={0,0,-1}, widthDirection={-1,0,0},
+        shapeType="box", r={13.8,-1.1,11.4}, lengthDirection={1,0,0}, widthDirection={0,1,0},
         length=2.4, width=2.2, height=.9,
         color={225,155,35});
       Shape cableM1(
-        shapeType="cylinder", r={-.55,bucketZ,-14.5},
-        lengthDirection={0,1,0}, widthDirection={0,0,-1},
+        shapeType="cylinder", r={14.5,-.55,bucketZ},
+        lengthDirection={0,0,1}, widthDirection={1,0,0},
         length=max(.1,11.4-bucketZ), width=.08, height=.08,
         color={215,215,205});
       Shape cableM2(
-        shapeType="cylinder", r={.55,bucketZ,-15.5},
-        lengthDirection={0,1,0}, widthDirection={0,0,-1},
+        shapeType="cylinder", r={15.5,.55,bucketZ},
+        lengthDirection={0,0,1}, widthDirection={1,0,0},
         length=max(.1,11.4-bucketZ), width=.08, height=.08,
         color={230,185,105});
       Shape spreader(
-        shapeType="box", r={0,bucketZ,-15}, lengthDirection={0,0,-1}, widthDirection={-1,0,0},
+        shapeType="box", r={13.9,-.6,bucketZ}, lengthDirection={1,0,0}, widthDirection={0,1,0},
         length=2.2, width=1.2, height=.35,
         color={105,85,65});
       Shape leftJaw(
-        shapeType="box", r={0,bucketZ-1,-15+jawOffset},
-        lengthDirection={0,0,-1}, widthDirection={-1,0,0},
+        shapeType="box", r={15-jawOffset-max(.45,jawOffset)/2,-.85,bucketZ-1},
+        lengthDirection={1,0,0}, widthDirection={0,1,0},
         length=max(.45,jawOffset), width=1.7, height=1.7,
         color={125,75,50});
       Shape rightJaw(
-        shapeType="box", r={0,bucketZ-1,-15-jawOffset},
-        lengthDirection={0,0,-1}, widthDirection={-1,0,0},
+        shapeType="box", r={15+jawOffset-max(.45,jawOffset)/2,-.85,bucketZ-1},
+        lengthDirection={1,0,0}, widthDirection={0,1,0},
         length=max(.45,jawOffset), width=1.7, height=1.7,
         color={125,75,50});
     equation
       // Projection X-Z volontairement schématique : les cotes réelles seront calibrées par traces.
-      bucketZ = max(1.5, 8 - .18*(plant.measurements.m1CablePositionAct_M + plant.measurements.m2CablePositionAct_M));
+      bucketZ = max(1.5, min(10.5, 5 - .30*plant.measurements.m1CablePositionAct_M));
       jawOffset = .35 + 2.2*plant.measurements.bucketOpeningAct_Pct/100;
       annotation(
         experiment(StartTime=0, StopTime=20, Tolerance=1e-6, Interval=.01),
-        Documentation(info="<html><p>Dans OMEdit 1.27.1, utiliser <b>Simuler avec animation</b> puis choisir le bouton affiché <b>Front</b>. Le repère cabine est X vers la cabine, Y vertical et Z le long du rail ; Trémie apparaît à gauche et Maintenance à droite. La fermeture suit <code>plant.measurements.bucketOpeningAct_Pct</code> et la hauteur suit les deux longueurs de câble.</p><p>Attention : les actions Front et Top sont inversées dans le sélecteur de cette version d'OMEdit ; l'orientation du modèle compense volontairement ce défaut.</p></html>"));
+        Documentation(info="<html><p>Repère physique inchangé : <b>X</b> le long du rail de Trémie vers Maintenance, <b>Y</b> de la cabine vers la machine, <b>Z</b> vertical. La plongée est en Z négatif et la remontée en Z positif. La fermeture suit <code>plant.measurements.bucketOpeningAct_Pct</code>.</p><p>La vue 2D <code>Dredge.Atelier</code> est la référence face cabine. Les boutons Front/Top d'OMEdit sont des projections génériques et ne redéfinissent pas ce repère.</p></html>"));
     end AnimatedGrabClosureThenHoist;
   end Examples;
 
-  model Atelier
-    "POINT D'ENTREE - atelier anime fermeture benne puis remontee M1/M2"
+  model Atelier3D
+    "Vue 3D secondaire - fermeture benne puis remontee M1/M2"
     extends Examples.AnimatedGrabClosureThenHoist;
     annotation(
       preferredView="diagram",
-      Documentation(info="<html><h2>Atelier TwinBench</h2><p><b>Point d'entrée utilisateur.</b> Ouvrir ce modèle puis cliquer sur <i>Simuler avec animation</i>.</p><p>La fermeture de la benne est suivie d'une validation continue de 300 ms du retour fermé, puis de la remontée conjointe M1/M2. Toute retombée du retour fermé annule immédiatement la validation.</p><p>Ce modèle reste un POC hors ligne non calibré et ne commande aucune machine réelle.</p></html>"));
+      Documentation(info="<html><h2>Vue 3D secondaire</h2><p>Utiliser seulement pour contrôler la géométrie volumique. L'atelier principal opérateur est <code>Dredge.Atelier</code> en 2D.</p></html>"));
+  end Atelier3D;
+
+  model Atelier
+    "POINT D'ENTREE - synoptique 2D de face M3 + M1/M2 + benne"
+    Examples.M3ContractCycle m3 "Translation du chariot";
+    Examples.GrabClosureThenHoist winches "Fermeture puis remontée";
+    Real carriageX "Position écran du chariot, gauche=-80, droite=80";
+    Real bucketY "Hauteur écran de la benne";
+    Real jawGap "Demi-écartement écran des coquilles";
+  equation
+    carriageX = -80 + 160*m3.plant.measurements.positionAct_M/
+      max(.1, m3.plant.configuration.travel_M);
+    // M1 porte la hauteur ; le différentiel M2-M1 ferme les coquilles.
+    bucketY = max(-58, min(42, 5 - 3*winches.plant.measurements.m1CablePositionAct_M));
+    jawGap = 4 + 14*winches.plant.measurements.bucketOpeningAct_Pct/100;
+    annotation(
+      preferredView="diagram",
+      experiment(StartTime=0, StopTime=20, Tolerance=1e-6, Interval=.01),
+      __OpenModelica_simulationFlags(
+        variableFilter="carriageX|bucketY|jawGap|m3\\.plant\\.(commands|measurements|feedback|deviceState|diagnostics)\\..*|winches\\.(closureCmd|hoistCmd|closureValidation\\..*|plant\\.(commands|measurements|feedback|diagnostics)\\..*)"),
+      Diagram(coordinateSystem(preserveAspectRatio=true, extent={{-110,-110},{110,110}}), graphics={
+        Rectangle(extent={{-108,-108},{108,108}}, lineColor={70,80,90}, fillColor={242,246,248}, fillPattern=FillPattern.Solid),
+        Text(extent={{-105,92},{105,106}}, textString="TWINBENCH — VUE CABINE", textColor={35,45,55}, textStyle={TextStyle.Bold}),
+        Line(points={{-92,70},{92,70}}, color={55,60,65}, thickness=4),
+        Rectangle(extent={{-96,-100},{96,-70}}, lineColor={25,110,165}, fillColor={60,155,205}, fillPattern=FillPattern.Solid),
+        Line(points={{-80,66},{-80,75}}, color={190,55,45}, thickness=3),
+        Line(points={{80,66},{80,75}}, color={45,145,75}, thickness=3),
+        Text(extent={{-103,76},{-56,88}}, textString="TRÉMIE", textColor={190,55,45}, textStyle={TextStyle.Bold}),
+        Text(extent={{48,76},{105,88}}, textString="MAINTENANCE", textColor={45,145,75}, textStyle={TextStyle.Bold}),
+        Rectangle(
+          extent=DynamicSelect({{-10,54},{10,69}}, {{carriageX-10,54},{carriageX+10,69}}),
+          lineColor={85,75,45}, fillColor={235,165,40}, fillPattern=FillPattern.Solid),
+        Line(
+          points=DynamicSelect({{0,54},{0,5}}, {{carriageX,54},{carriageX,bucketY+8}}),
+          color={70,70,70}, thickness=1.5),
+        Rectangle(
+          extent=DynamicSelect({{-9,3},{9,9}}, {{carriageX-9,bucketY+2},{carriageX+9,bucketY+8}}),
+          lineColor={95,75,55}, fillColor={125,95,65}, fillPattern=FillPattern.Solid),
+        Polygon(
+          points=DynamicSelect({{-4,3},{-18,-18},{-3,-12},{0,0},{-4,3}},
+            {{carriageX-4,bucketY+3},{carriageX-jawGap,bucketY-18},{carriageX-3,bucketY-12},{carriageX,bucketY},{carriageX-4,bucketY+3}}),
+          lineColor={105,60,40}, fillColor={150,90,55}, fillPattern=FillPattern.Solid),
+        Polygon(
+          points=DynamicSelect({{4,3},{18,-18},{3,-12},{0,0},{4,3}},
+            {{carriageX+4,bucketY+3},{carriageX+jawGap,bucketY-18},{carriageX+3,bucketY-12},{carriageX,bucketY},{carriageX+4,bucketY+3}}),
+          lineColor={105,60,40}, fillColor={150,90,55}, fillPattern=FillPattern.Solid),
+        Ellipse(extent={{-104,48},{-94,58}}, lineColor={60,70,75},
+          fillColor=DynamicSelect({180,180,180}, if winches.closureCmd then {245,170,35} else {180,180,180}),
+          fillPattern=FillPattern.Solid),
+        Text(extent={{-92,47},{-48,59}}, textString="FERMETURE", horizontalAlignment=TextAlignment.Left),
+        Ellipse(extent={{-104,32},{-94,42}}, lineColor={60,70,75},
+          fillColor=DynamicSelect({180,180,180}, if winches.hoistCmd then {45,185,90} else {180,180,180}),
+          fillPattern=FillPattern.Solid),
+        Text(extent={{-92,31},{-48,43}}, textString="REMONTÉE", horizontalAlignment=TextAlignment.Left),
+        Text(extent={{-105,-66},{105,-54}}, textString=DynamicSelect("Position M3", "Position M3 = " + String(m3.plant.measurements.positionAct_M, significantDigits=3) + " m"), textColor={35,45,55})}),
+      Documentation(info="<html><h2>Atelier TwinBench 2D</h2><p><b>Vue principale opérateur.</b> Simuler normalement, revenir sur l'onglet <i>Diagramme</i>, puis utiliser Lecture ou le curseur temporel du navigateur de variables. Le chariot se déplace horizontalement de Trémie à gauche vers Maintenance à droite. La benne se ferme puis remonte sous le chariot.</p><p>La vue 3D reste disponible dans <code>Dredge.Atelier3D</code>, uniquement comme contrôle secondaire.</p></html>"));
   end Atelier;
 
   annotation(uses(Modelica(version="4.1.0")),

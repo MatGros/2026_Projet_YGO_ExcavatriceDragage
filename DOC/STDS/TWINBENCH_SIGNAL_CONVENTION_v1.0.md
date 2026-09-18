@@ -128,6 +128,38 @@ Chaque ligne expose nom lisible, valeur, unité, qualité, source et âge. Les c
 aussi le niveau de chaîne (`Req/Tgt/Cmd`) ; les paramètres affichent leur statut de calibration.
 Les signaux `[SAFE]` sont lecture seule et portent un bandeau « autorité PLC ».
 
+### 7.1 Structure Modelica visible dans OMEdit
+
+Le catalogue ne suffit pas à ranger le navigateur natif d'OMEdit. Toute plante publiée regroupe
+donc ses champs dans des `record` Modelica portant exactement les instances suivantes :
+
+```text
+commands | configuration | measurements | feedback | deviceState | diagnostics | alarms | scenarios
+```
+
+Seuls les groupes réellement utiles sont instanciés. Les variables publiques plates sont interdites
+sur une nouvelle plante : elles mélangent causalité, paramètres et résultats dans la même branche.
+Les commandes sont des `input`, la configuration est un `parameter`, les autres groupes sont des
+`output`. Les états d'intégration et calculs intermédiaires restent `protected`.
+
+Exemples : `plant.commands.cmdSpeed_Pct`, `plant.measurements.positionAct_M`,
+`plant.feedback.brakeIsOpen`, `plant.diagnostics.commandConflict`.
+
+### 7.2 Repère machine des animations
+
+Le repère physique TwinBench est droitier et indépendant du visualiseur utilisé :
+
+| Axe | Sens positif |
+|---|---|
+| `X` | le long du rail, de Trémie vers Maintenance |
+| `Y` | profondeur, depuis la cabine vers la machine |
+| `Z` | vertical vers le haut ; une plongée est en `Z` négatif |
+
+La position M3 vaut `X=0 m` à Trémie et croît vers Maintenance. Depuis la cabine, la vue de face
+est le plan `X-Z` : Trémie à gauche, Maintenance à droite, montée en haut et plongée en bas.
+Un défaut de libellé ou de caméra d'un outil ne doit jamais changer ce repère physique ni le signe
+de la grandeur métier ; la vue 2D opérateur reste alors la référence et la 3D est secondaire.
+
 ## 8. Critères de conformité
 
 - Aucun signal publié sans catalogue, classe de flux, nature, unité/polarité et autorité.

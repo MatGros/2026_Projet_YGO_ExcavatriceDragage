@@ -399,10 +399,10 @@ separee : c'est ce qui supprime le cycle prouve `Acquisition ↔ Diagnostics` et
 
 | Module | Type | E/S portées | Fonctions critiques supportées |
 |---|---|---|---|
-| `Local_Digital_IO` | DI8 / DO8 | 8 DI + 8 DO | Winch (mou câble, sécurité), Machine (Kobold) |
+| `Local_Digital_IO` | DI8 / DO8 | 8 DI (DO libres) | Winch (mou câble, sécurité, retours contacteurs, thermiques), Machine (Kobold touch) |
 | `VH_0800END` | DI8 | 8 DI | Machine (AU, phases, thermiques), retours freins M1/M2/M3, voie Bit5 non nommée |
 | `VH_0808ETP` | DI8 / DO8 | 8 DI + 8 DO | Translation (positions M3), résistances contacteurs M1/M2, Bit5 `TremieFull_OR_GateRaised_DI` réservée non câblée |
-| `VH_0008ER` | DO8 Relais | 8 DO relais | Bobines freins treuils M1/M2/M3 & Moteur Kobold |
+| `VH_0008ER` | DO8 Relais | 8 DO relais | Bobines freins M1/M2/M3, mesure Kobold & contacteurs direction treuils M1/M2 |
 | `VH_0008ER_1` | DO8 Relais | 8 DO relais | Réarmement AU (`EmergencyArming_RQ`) & Coupure puissance (`PowerKeepAlive_A/B_RQ`) |
 
 **Granularite MODULE, pas canal.** `GetDeviceState()` renseigne la santé d'une carte, pas d'une
@@ -481,14 +481,16 @@ métier actuel et doit rester identique dans `HwReal`/`HwIn`, sauf décision saf
 > bornier que la voie vaut `FALSE` hors détection ; une entrée DI non raccordée ne doit jamais être
 > présumée stable uniquement par logiciel.
 
-### Sorties de maintien / réarmement (familles liées, Q/RQ)
-
+### Sorties de maintien / réarmement / commande relais (familles liées, Q/RQ)
+ 
 | Q/RQ | Rôle |
 |---|---|
 | `PowerKeepAlive_A_RQ`, `PowerKeepAlive_B_RQ` | `TRUE` = maintien de la puissance voie A/B (NC, fail-safe) — sa retombée ouvre la chaîne |
 | `EmergencyArming_RQ` | `TRUE` = impulsion de réarmement (1 s / 5 s) |
 | `M*_BrakeRelease_RQ` | `TRUE` = desserrage de frein commandé |
-| `M1_M2_KoboldMeasureEnable_DQ` | `TRUE` = mesure Kobold activée |
+| `M1_M2_KoboldMeasureEnable_RQ` | `TRUE` = mesure Kobold activée (relais %QX27.3) |
+| `M1_RelayAscent_RQ`, `M1_RelayDescent_RQ` | `TRUE` = sens montée / descente Treuil M1 (relais %QX27.4, %QX27.5) |
+| `M2_RelayAscent_Close_RQ`, `M2_RelayDescent_Open_RQ` | `TRUE` = sens montée/fermeture et descente/ouverture Treuil M2 (relais %QX27.6, %QX27.7) |
 
 `PowerContactorEngaged_DI` alimente le portail `PowerContactorEngaged`. `EmergencyChainClosed_DI`
 confirme la boucle AU (Partie 01).

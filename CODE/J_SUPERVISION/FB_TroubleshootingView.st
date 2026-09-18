@@ -230,8 +230,8 @@ GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx416_RestartRequired := Win
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx417_RestartInhibit := WinchM1.State.FinalRestartInhibit;
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx418_NeutralRequestSeen := WinchM1.State.FinalNeutralRequestSeen;
 
-GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_DQ := WinchM1.State.RelayFwd;
-GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_DQ := WinchM1.State.RelayRev;
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ := WinchM1.State.RelayFwd;
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_RQ := WinchM1.State.RelayRev;
 GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM1.State.Contactor1;
 GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM1.State.Contactor4;
 GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM1.State.BrakeCmd;
@@ -309,8 +309,8 @@ GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx416_RestartRequired := Win
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx417_RestartInhibit := WinchM2.State.FinalRestartInhibit;
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx418_NeutralRequestSeen := WinchM2.State.FinalNeutralRequestSeen;
 
-GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_DQ := WinchM2.State.RelayFwd;
-GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_DQ := WinchM2.State.RelayRev;
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ := WinchM2.State.RelayFwd;
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_RQ := WinchM2.State.RelayRev;
 GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM2.State.Contactor1;
 GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM2.State.Contactor4;
 GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM2.State.BrakeCmd;
