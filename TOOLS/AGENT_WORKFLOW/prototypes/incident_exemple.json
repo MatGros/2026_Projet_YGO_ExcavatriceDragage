@@ -1,0 +1,8 @@
+{
+  "t_end": 8.0,
+  "genset": {"U_nom": 400, "I_nom_groupe": 350},
+  "winches": [
+    {"name": "M1", "load_frac": 0.85, "gradin_times": [0.0, 0.4, 0.9, 1.3]},
+    {"name": "M2", "load_frac": 0.0,  "gradin_times": [2.0, 2.4, 2.9, 3.3]}
+  ]
+}

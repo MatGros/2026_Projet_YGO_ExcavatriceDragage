@@ -1,0 +1,61 @@
+contract:
+  task_id: T317
+  criticality: C3
+  strategy: patch
+  planning_deliverables:
+    plan: DOC/WFLOW/CONTRACTS/PLAN_T317_SIMBENCH_TREUIL_ELECTRIQUE.md
+    research_synthesis: "Recherche approfondie (agent) + challenge expert électrotechnique, 2026-09-18 — voir plan §Corrections obligatoires."
+    current_authority: "P0 uniquement : identification des inconnues et cadrage du scope. Aucune modification de code CODE/ autorisée dans ce lot."
+  objective: >
+    Cadrer (P0) un modèle électrotechnique simplifié du moteur rotor bobiné M1/M2 et du groupe
+    électrogène, pour estimer en SimBench couple/courants/tension sous gradins de résistance
+    rotorique, sans coder tant que le scope sécurité vs macro et les inconnues matérielles ne sont
+    pas tranchés par l'humain.
+  acceptance:
+    - id: AC1
+      statement: "Le registre des 5 questions P0 (plaque signalétique moteur, coffret résistances, fiche groupe électrogène, portée sécurité vs macro, quadrant génératrice) est répondu ou explicitement classé INCONNU par l'humain."
+      verified_by: "Revue R0 humaine du plan PLAN_T317_SIMBENCH_TREUIL_ELECTRIQUE.md, § Registre des questions."
+    - id: AC2
+      statement: "La décision Q4 (portée sécurité temporelle vs logique macro uniquement) est tranchée avant toute écriture ST, car elle conditionne si la correction 1 (terme transitoire de commutation) est un blocant de scope ou une limite documentée acceptée."
+      verified_by: "Notes de validation R0 dans ce contrat."
+    - id: AC3
+      statement: "Aucun fichier CODE/ n'est modifié dans ce lot P0."
+      verified_by: "git diff restreint à DOC/WFLOW/CONTRACTS/ et DOC/WFLOW/TASKS.yaml."
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T317_SIMBENCH_TREUIL_ELECTRIQUE.yaml
+      - DOC/WFLOW/CONTRACTS/PLAN_T317_SIMBENCH_TREUIL_ELECTRIQUE.md
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive: []
+    dropped_on_purpose: []
+  evidence_required:
+    - "Registre P0 répondu ou classé INCONNU par l'humain."
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+  alert_duty: >
+    Le second avis expert (2026-09-18) juge la synthèse recherche initiale trop optimiste pour un
+    usage sécurité (lisse commutation gradin + oscillation groupe électrogène, deux effets qui vont
+    dans le sens de la sous-estimation des pics de courant/creux de tension). Ne jamais présenter ce
+    modèle comme validant une logique anti-surintensité tant que la correction 1 n'est pas actée ou
+    la limite explicitement documentée et acceptée par l'humain.
+status: PENDING
+execution:
+  executed_by: "Claude Sonnet 5"
+  completed_at: "2026-09-18T00:00:00+02:00"
+  status: BLOCKED
+  summary: >
+    P0 rédigé : plan + registre de 5 questions à trancher par l'humain (plaque signalétique moteur,
+    coffret résistances, fiche groupe électrogène, portée sécurité vs macro, quadrant génératrice).
+    Recherche + contre-expertise déjà menées et synthétisées dans le plan. Bloqué en attente de R0.
+  evidence_submitted:
+    - "PLAN_T317_SIMBENCH_TREUIL_ELECTRIQUE.md rédigé avec synthèse recherche + challenge expert intégrés."
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    En attente de réponse humaine au registre P0, en particulier Q4 (portée sécurité vs macro).
