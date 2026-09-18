@@ -1,4 +1,25 @@
 tasks:
+- id: T315
+  parent_id: ''
+  statut: ✅
+  criticite: C2
+  domaine: HARDWARE / MAPPING_SORTIES_RELAIS
+  agent: Antigravity
+  date: '2026-09-18T00:10:00+02:00'
+  avancement: 'Terminée : relocalisation physique des sorties de direction treuils M1/M2 et Kobold vers VH_0008ER (%QX27.3..%QX27.7, suffixe _RQ) appliquée dans CODE, types, GVL, stubs, CSV, OmniDiag et AF_Partie-06. G200 PASS 0 err, G350 PASS, bundle XML généré.'
+  titre: Relocalisation des sorties de direction treuils M1/M2 et Kobold vers la carte relais VH_0008ER
+  contexte: 'Les commandes contacteurs de direction des treuils M1/M2 ont été physiquement déplacées des sorties transistors de la CPU (Local_Digital_IO, %QX0.0..%QX0.3) vers les sorties relais de la carte d''extension (VH_0008ER, %QX27.4..%QX27.7). La sortie Kobold est également passée en suffixe _RQ sur %QX27.3. Entrées contacteurs type PLC basse consommation (quelques mA, sans besoin d''antiparasitage RC lourd).'
+  description: 'Mettre à jour PRG_06_Outputs, PRG_07_Supervision, ST_IoHw_Out, ST_Chain_Winch_Outputs, FB_TroubleshootingView, GVL_Device_IO, Device_IO_20260917.csv, OmniDiag et AF_Partie-06 pour refléter le câblage et la convention _RQ.'
+  objectifs:
+  - 'Harmoniser Device_IO_20260917.csv (%QX27.7 en _RQ).'
+  - 'Mettre à jour PRG_06_Outputs.st et PRG_07_Supervision.st avec les 5 sorties _RQ.'
+  - 'Mettre à jour les types ST_IoHw_Out et ST_Chain_Winch_Outputs.'
+  - 'Mettre à jour FB_TroubleshootingView.st et le stub GVL_Device_IO.st.'
+  - 'Mettre à jour OmniDiag (io_mapper.py, build_knowledge_base.py) et regénérer le viewer.'
+  - 'Mettre à jour AF_Partie-06.'
+  - 'Valider avec G200, G350 et le bundle PLCopenXML.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T315_RELOCATION_SORTIES_RELAIS_TREUILS_KOBOLD.yaml
+  bloque_par: []
 - id: T313
   parent_id: ''
   statut: ⬜
@@ -261,14 +282,16 @@ tasks:
   bloque_par: []
 - id: T314
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C3
   domaine: OUTILLAGE / SIMULATION / OPENMODELICA
   agent: Codex
-  date: '2026-09-17T23:49:58+02:00'
-  avancement: 'Jalon OMEdit validé : dossier actif réduit à Dredge.mo + README et un seul lanceur racine ; scénario/animation
-    fermeture benne -> validation continue 300 ms -> remontée M1/M2 compilé et simulé ; test de rebond avec assert PASS. AC4
-    HID et AC5 live restent ouverts.'
+  date: '2026-09-18T00:30:00+02:00'
+  avancement: 'PAUSE 2026-09-18 (décision utilisateur) : TwinBench/OpenModelica mis de côté faute de temps pour finir le banc
+    de test externe. Dernier jalon avant pause — OMEdit validé : dossier actif réduit à Dredge.mo + README et un seul lanceur
+    racine ; scénario/animation fermeture benne -> validation continue 300 ms -> remontée M1/M2 compilé et simulé ; test de
+    rebond avec assert PASS. AC4 HID et AC5 live restent ouverts. Reprise différée : priorité repositionnée sur la simulation
+    intégrée à l''automate (GVL_Simulation / SimBench existant), pas de nouveau développement TwinBench tant que non redemandé.'
   titre: OpenModelica Windows — atelier éditable, animation et conduite interactive M1/M2/M3
   contexte: 'Le POC Rumoca a produit des rapports et un viewer, mais l''installation/runtime Windows et la compatibilité Modelica/animation
     ne permettent pas d''en faire le logiciel utilisateur. OpenModelica est déjà installé, maintenu sur le poste et fournit

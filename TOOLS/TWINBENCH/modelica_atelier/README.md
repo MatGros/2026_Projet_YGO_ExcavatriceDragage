@@ -13,10 +13,12 @@ pour sélectionner automatiquement une classe interne. Dans l'arborescence, il r
 **un seul double-clic** à faire :
 
 1. développer `Dredge` ;
-2. double-cliquer `Atelier` — point d'entrée treuil/benne placé à la racine ;
-3. cliquer **Simuler avec animation** ;
-4. pour les courbes, ouvrir `Examples > GrabClosureThenHoist` puis **Simuler** ;
-5. tracer au minimum `plant.measurements.bucketOpeningAct_Pct`,
+2. double-cliquer `Atelier` — synoptique 2D principal placé à la racine ;
+3. ouvrir l'onglet **Diagramme**, puis cliquer **Simuler** (simulation normale) ;
+4. après le calcul, revenir au Diagramme et utiliser **Lecture** ou le curseur temporel du
+   navigateur de variables pour rejouer le mouvement 2D ;
+5. pour les courbes, ouvrir `Examples > GrabClosureThenHoist` puis **Simuler** ;
+6. tracer au minimum `plant.measurements.bucketOpeningAct_Pct`,
    `plant.feedback.bucketIsClosed`, `plant.measurements.m1CablePositionAct_M` et
    `plant.measurements.m2CablePositionAct_M`.
 
@@ -25,18 +27,25 @@ Dans le navigateur de variables, les grandeurs sont maintenant rangées par rôl
 `plant.deviceState` (M3) et `plant.diagnostics`. Les entrées/sorties ne sont donc plus
 mélangées dans une liste plate.
 
-Pour M3, utiliser `Examples > AnimatedM3ContractCycle` (animation) ou
-`Examples > M3ContractCycle` (courbes).
+Pour la 3D secondaire, utiliser `Atelier3D`, `Examples > AnimatedM3ContractCycle` ou
+`Examples > AnimatedGrabClosureThenHoist`, puis **Simuler avec animation**.
 
-## Repère animation OMEdit 1.27.1
+Dans OMEdit, désactiver une fois `Tools > Options > Simulation > Switch to plotting perspective
+after simulation`. Sinon OMEdit masque automatiquement le Diagramme après le calcul et affiche
+uniquement les courbes. Cette option est un réglage d'interface, pas un paramètre du modèle.
 
-Le repère cabine est : `X` vers la cabine, `Y` vertical, `Z` le long du rail. La position
-métier croît de Trémie vers Maintenance et est affichée sur `-Z`. Le bouton affiché **Front**
-doit donc montrer **Trémie à gauche** et **Maintenance à droite**.
+## Repère machine
 
-OMEdit 1.27.1 inverse dans son sélecteur les actions internes **Front** et **Top**. Le modèle
-compense volontairement ce défaut connu de cette version ; ce n'est pas une convention physique
-à recopier dans les calculs métier.
+Le repère physique est : `X` le long du rail de Trémie vers Maintenance, `Y` en profondeur
+depuis la cabine vers la machine et `Z` vertical vers le haut. Une plongée est en `Z` négatif,
+une remontée en `Z` positif. La vue cabine est donc le plan `X-Z`, avec Trémie à gauche et
+Maintenance à droite.
+
+La vue principale `Dredge.Atelier` est un synoptique 2D qui respecte directement cette convention.
+`Dredge.Atelier3D` reste secondaire : les presets OMEdit sont des caméras génériques et ne
+correspondent pas à la vue cabine métier. En particulier, le bouton **Front** d'OMEdit 1.27.1
+projette `Z` horizontal et `X` vertical ; il ne faut pas l'interpréter comme la face cabine.
+Pour la 3D, utiliser une vue manuelle tournée jusqu'à obtenir le plan X-Z.
 
 ## Modifier soi-même
 

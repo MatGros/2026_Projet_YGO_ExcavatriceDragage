@@ -9,12 +9,6 @@ TYPE ST_IoHw_Out :
 STRUCT
     Logical : ST_OutputsInterPrg; // Commandes finales logiques effectivement produites
 
-    // Local_Digital_IO — sorties relais direction M1/M2
-    M1_RelayAscent_DQ        : BOOL;
-    M1_RelayDescent_DQ       : BOOL;
-    M2_RelayAscent_Close_DQ  : BOOL;
-    M2_RelayDescent_Open_DQ  : BOOL;
-
     // VH_0808ETP — contacteurs de vitesse M1/M2
     M1_SpeedContactor_1_DQ : BOOL;
     M1_SpeedContactor_2_DQ : BOOL;
@@ -25,11 +19,15 @@ STRUCT
     M2_SpeedContactor_3_DQ : BOOL;
     M2_SpeedContactor_4_DQ : BOOL;
 
-    // VH_0008ER — freins et mesure Kobold
+    // VH_0008ER — freins, direction treuils et mesure Kobold (sorties relais)
     M1_BrakeRelease_RQ           : BOOL;
     M2_BrakeRelease_RQ           : BOOL;
     M3_BrakeRelease_RQ           : BOOL;
-    M1_M2_KoboldMeasureEnable_DQ : BOOL;
+    M1_M2_KoboldMeasureEnable_RQ : BOOL;
+    M1_RelayAscent_RQ            : BOOL;
+    M1_RelayDescent_RQ           : BOOL;
+    M2_RelayAscent_Close_RQ      : BOOL;
+    M2_RelayDescent_Open_RQ      : BOOL;
 
     // VH_0008ER_1 — réarmement AU et maintien puissance
     EmergencyArming_RQ   : BOOL;

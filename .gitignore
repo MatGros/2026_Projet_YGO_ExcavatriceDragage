@@ -5,6 +5,10 @@ pi-agent-duration-notify.ts
 # Backups generes par inject.py
 PRJ/*.bak
 *.bak
+*.bak_*
+
+# Cache local outil MCP modex (non reproductible pour le depot)
+.modex/
 
 # CODESYS temporary files
 *.~u

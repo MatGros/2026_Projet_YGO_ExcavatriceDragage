@@ -33,6 +33,10 @@ contract:
       statement: "L'analyse fonctionnelle AF_Partie-06 consigne formellement la nouvelle répartition des sorties du rack."
       verified_by: "Vérification documentaire dans AF_Partie-06_Acquisition_Qualification_IO_v2.4.md."
 
+    - id: AC7
+      statement: "Pour tout POU modifié dans CODE/M_MAIN, le nom de fichier est égal au nom de POU et le suffixe est égal au langage ST dans le bundle."
+      verified_by: "Vérification mécanique par G310_check_structure.py et generate_codesys_bundle.py."
+
   scope:
     allowed:
       - CODE/M_MAIN/PRG_06_Outputs.st

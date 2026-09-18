@@ -368,7 +368,7 @@
       <dataType name="ST_Chain_Winch_Outputs">
         <baseType>
           <struct>
-            <variable name="Idx501_CmdRelayAscent_DQ">
+            <variable name="Idx501_CmdRelayAscent_RQ">
               <type>
                 <BOOL />
               </type>
@@ -376,7 +376,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Ascending ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx502_CmdRelayDescent_DQ">
+            <variable name="Idx502_CmdRelayDescent_RQ">
               <type>
                 <BOOL />
               </type>

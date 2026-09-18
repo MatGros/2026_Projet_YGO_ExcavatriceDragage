@@ -14,5 +14,5 @@ if not defined OMEDIT (
 )
 
 echo Ouverture de TwinBench dans OMEdit...
-echo Point d'entree : Dredge ^> Atelier ^(double-clic^), puis Simuler avec animation.
+echo Point d'entree : Dredge ^> Atelier ^(double-clic^), onglet Diagramme, puis Simuler.
 start "" "%OMEDIT%" "%~dp0modelica_atelier\Dredge.mo"

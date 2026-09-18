@@ -40,7 +40,7 @@ def parse_rack_io(base_dir: Path) -> Dict[str, Any]:
         {"dev_id": "Local_Digital_IO", "slot": "Slot 1 (CPU)", "name": "Carte 1 : Local_Digital_IO", "desc": "Base CPU E/S Intégrées (%IX0 / %QX0)", "badge": "bg-cyan-500/10 text-cyan-400 border-cyan-500/20"},
         {"dev_id": "VH_0808ETP",       "slot": "Slot 2",       "name": "Carte 2 : VH_0808ETP",       "desc": "Transistors & Cames M3 (%IX224 / %QX26)", "badge": "bg-indigo-500/10 text-indigo-400 border-indigo-500/20"},
         {"dev_id": "VH_0800END",       "slot": "Slot 3",       "name": "Carte 3 : VH_0800END",       "desc": "Sécurité & Retours Freins (%IX225)",     "badge": "bg-purple-500/10 text-purple-400 border-purple-500/20"},
-        {"dev_id": "VH_0008ER",        "slot": "Slot 4",       "name": "Carte 4 : VH_0008ER",        "desc": "Relais Bobines Freins (%QX27)",          "badge": "bg-rose-500/10 text-rose-400 border-rose-500/20"},
+        {"dev_id": "VH_0008ER",        "slot": "Slot 4",       "name": "Carte 4 : VH_0008ER",        "desc": "Relais Freins, Kobold & Direction Treuils (%QX27)", "badge": "bg-rose-500/10 text-rose-400 border-rose-500/20"},
         {"dev_id": "VH_0008ER_1",      "slot": "Slot 5",       "name": "Carte 5 : VH_0008ER_1",      "desc": "Relais Sécurité & AU (%QX28)",           "badge": "bg-amber-500/10 text-amber-400 border-amber-500/20"},
     ]
 

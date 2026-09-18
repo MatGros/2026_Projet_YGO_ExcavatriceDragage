@@ -482,7 +482,7 @@ M1_M2_KoboldMeasureEnable_RQ;Bit3;;Commande moteur Kobol obligatoire pour détec
 M1_RelayAscent_RQ;Bit4;;+1 Sens ENROULAGE MONTEE EXTRACTION;%QX27.4;VH_0008ER
 M1_RelayDescent_RQ;Bit5;;-1 Sens DEROULAGE DESCENTE PLONGEE;%QX27.5;VH_0008ER
 M2_RelayAscent_Close_RQ;Bit6;;+1 Sens ENROULAGE MONTEE EXTRACTION - FERMETURE GRAPPIN;%QX27.6;VH_0008ER
-M2_RelayDescent_Open_DQ;Bit7;;-1 Sens DEROULAGE DESCENTE PLONGEE - OUVERTURE GRAPPIN;%QX27.7;VH_0008ER
+M2_RelayDescent_Open_RQ;Bit7;;-1 Sens DEROULAGE DESCENTE PLONGEE - OUVERTURE GRAPPIN;%QX27.7;VH_0008ER
 ;out0;;Digital output00~07;%QB28;VH_0008ER_1
 EmergencyArming_RQ;Bit0;;Impulsion de 1s toutes les 5s minimum pour demander un réarmement de la puissance;%QX28.0;VH_0008ER_1
 ;Bit1;;;%QX28.1;VH_0008ER_1
