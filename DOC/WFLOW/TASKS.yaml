@@ -1,24 +1,85 @@
 tasks:
+- id: T317
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: ''
+  agent: CC01
+  titre: SimBench — Modèle électrotechnique treuils M1/M2 (moteur rotor bobiné, gradins résistance rotorique, chute tension
+    groupe électrogène)
+  contexte: Demande utilisateur de modéliser dans SimBench le comportement électrique du moteur asynchrone à rotor bobiné
+    (~200A) des treuils M1/M2 piloté par cascade de résistances rotoriques, ainsi que l'effet sur la tension du groupe électrogène
+    (observé 400V→360V sous appel de charge), pour tester si un enchaînement trop rapide de gradins produit une surintensité
+    dangereuse.
+  description: ''
+  objectifs:
+  - Répondre ou classer explicitement INCONNU les 5 questions du registre P0 (plaque signalétique moteur, coffret résistances
+    rotoriques, fiche groupe électrogène, portée sécurité temporelle vs logique macro, quadrant génératrice/descente).
+  - Trancher si la correction 1 (terme transitoire de commutation de gradin, jugée manquante par le challenge expert) est
+    un blocant de scope ou une limite documentée acceptée.
+  - Ne pas écrire de code ST tant que R0 n'est pas validé par l'humain.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T317_SIMBENCH_TREUIL_ELECTRIQUE.yaml
+  date: '2026-09-18T13:45:30'
+  bloque_par: []
+- id: T316
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: SIMULATION / FIDELITE_SIMBENCH_TREUILS
+  agent: CC01
+  date: '2026-09-18T00:00:00+02:00'
+  avancement: 'Phase 1 livree et testee : dynamique treuil M1/M2 opt-in dans SimBench (defaut 0.0 = comportement historique
+    inchange) — retour vitesse rapportee M1/M2 en 1er ordre (SimWinchSpeedReportTauS, FB_Sim_Encoder.st) et delai electrique/meca
+    frein M1/M2 (SimWinchBrakeOpenDelayS/CloseDelayS, FB_SimBench.st) au lieu d''un saut instantane. Tests TC-P13-034/035
+    (FB_Sim_Encoder) et TC-P13-015 (FB_SimBench) verts, non-regression 27/27 + 4/4 confirmee, parite check_simbenc_parity.py
+    PASS, G200 liaison PASS, gates palier C : 3 echecs (G300/G340/G406/G430/G483) tous pre-existants et hors perimetre (aucun
+    ne cite FB_Sim_Encoder.st ni FB_SimBench.st), verifie explicitement. Reste ouvert (phase 2, non commencee) : test CI de
+    bout en bout au niveau du grafcet (FB_CycleSemiAuto AX10_WAIT_ASCENT_START) assertant absence de discontinuite de commande
+    finale M1/M2 et continuite de l''armement joystick sur toute la fenetre — cette phase 1 fournit uniquement la capacite
+    de simulation, pas encore la preuve au niveau sequenceur. Constantes ajoutees marquees SYNTHETIQUE, non calibrees terrain.'
+  titre: SimBench — Fidelite dynamique treuils M1/M2 (retour vitesse et frein temporises) pour tester la fenetre AX10_WAIT_ASCENT_START
+  contexte: 'Demande utilisateur : verifier que SimBench permet reellement de tester l''absence de secousse moteur et la continuite
+    de l''armement joystick pendant la transition AX10_WAIT_ASCENT_START (arret controle avant repassage en montee, FB_CycleSemiAuto.st).
+    Audit du code existant (FB_Sim_Encoder.st, FB_SimBench.st) a montre que le retour vitesse simule M1/M2 sautait instantanement
+    a 0 a la coupure des relais et que le retour frein etait recopie sans delai — un test SimBench sur cette fenetre aurait
+    donc passe trivialement sans jamais exercer la vraie dynamique de decelaration/freinage. Diagnostic challenge par un sous-agent
+    expert automatisme : confirme que la mesure de vitesse reelle M1/M2 (FB_Encoder.st) est independante de la commande (bonne
+    conception, pas un defaut de securite) — le trou est uniquement cote fidelite de simulation.'
+  objectifs:
+  - Ajouter une dynamique minimale de retour vitesse M1/M2 (1er ordre) et de delai frein M1/M2 dans SimBench, opt-in et retro-compatible
+    (defaut = comportement historique instantane inchange).
+  - Constantes ajoutees marquees SYNTHETIQUE, non calibrees terrain — a mesurer en carriere avant d''exploiter les valeurs
+    par defaut comme reference quantitative.
+  - Tests SimBench prouvant la capacite (rampe continue, delai frein sans jamais inverser la polarite), sans casser les tests
+    existants (TC-P13-012 notamment).
+  - Rester dans CODE/L_SIMULATION/ ; aucune modification du code metier (FB_CycleSemiAuto.st etc.).
+  - 'Phase 2 (non commencee, a cadrer separement) : test CI de bout en bout au niveau du grafcet AX10_WAIT_ASCENT_START exercant
+    reellement cette dynamique et assertant absence de secousse + continuite armement joystick.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T316_SIMBENCH_FIDELITE_TREUILS.yaml
+  bloque_par: []
 - id: T315
   parent_id: ''
   statut: ✅
   criticite: C2
-  domaine: HARDWARE / MAPPING_SORTIES_RELAIS
-  agent: Antigravity
-  date: '2026-09-18T00:10:00+02:00'
-  avancement: 'Terminée : relocalisation physique des sorties de direction treuils M1/M2 et Kobold vers VH_0008ER (%QX27.3..%QX27.7, suffixe _RQ) appliquée dans CODE, types, GVL, stubs, CSV, OmniDiag et AF_Partie-06. G200 PASS 0 err, G350 PASS, bundle XML généré.'
+  domaine: ''
+  agent: AGY01
   titre: Relocalisation des sorties de direction treuils M1/M2 et Kobold vers la carte relais VH_0008ER
-  contexte: 'Les commandes contacteurs de direction des treuils M1/M2 ont été physiquement déplacées des sorties transistors de la CPU (Local_Digital_IO, %QX0.0..%QX0.3) vers les sorties relais de la carte d''extension (VH_0008ER, %QX27.4..%QX27.7). La sortie Kobold est également passée en suffixe _RQ sur %QX27.3. Entrées contacteurs type PLC basse consommation (quelques mA, sans besoin d''antiparasitage RC lourd).'
-  description: 'Mettre à jour PRG_06_Outputs, PRG_07_Supervision, ST_IoHw_Out, ST_Chain_Winch_Outputs, FB_TroubleshootingView, GVL_Device_IO, Device_IO_20260917.csv, OmniDiag et AF_Partie-06 pour refléter le câblage et la convention _RQ.'
+  contexte: Les commandes contacteurs de direction des treuils M1/M2 ont été physiquement déplacées des sorties transistors
+    de la CPU (Local_Digital_IO, %QX0.0..%QX0.3) vers les sorties relais de la carte d'extension (VH_0008ER, %QX27.4..%QX27.7).
+    La sortie Kobold est également passée en suffixe _RQ sur %QX27.3. Entrées contacteurs type PLC basse consommation (quelques
+    mA, sans besoin d'antiparasitage RC lourd).
+  description: Mettre à jour PRG_06_Outputs, PRG_07_Supervision, ST_IoHw_Out, ST_Chain_Winch_Outputs, FB_TroubleshootingView,
+    GVL_Device_IO, Device_IO_20260917.csv, OmniDiag et AF_Partie-06 pour refléter le câblage et la convention _RQ.
   objectifs:
-  - 'Harmoniser Device_IO_20260917.csv (%QX27.7 en _RQ).'
-  - 'Mettre à jour PRG_06_Outputs.st et PRG_07_Supervision.st avec les 5 sorties _RQ.'
-  - 'Mettre à jour les types ST_IoHw_Out et ST_Chain_Winch_Outputs.'
-  - 'Mettre à jour FB_TroubleshootingView.st et le stub GVL_Device_IO.st.'
-  - 'Mettre à jour OmniDiag (io_mapper.py, build_knowledge_base.py) et regénérer le viewer.'
-  - 'Mettre à jour AF_Partie-06.'
-  - 'Valider avec G200, G350 et le bundle PLCopenXML.'
+  - Harmoniser Device_IO_20260917.csv (%QX27.7 en _RQ).
+  - Mettre à jour PRG_06_Outputs.st et PRG_07_Supervision.st avec les 5 sorties _RQ.
+  - Mettre à jour les types ST_IoHw_Out et ST_Chain_Winch_Outputs.
+  - Mettre à jour FB_TroubleshootingView.st et le stub GVL_Device_IO.st.
+  - Mettre à jour OmniDiag (io_mapper.py, build_knowledge_base.py) et regénérer le viewer.
+  - Mettre à jour AF_Partie-06.
+  - Valider avec G200, G350 et le bundle PLCopenXML.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T315_RELOCATION_SORTIES_RELAIS_TREUILS_KOBOLD.yaml
+  date: '2026-09-18T13:45:44'
   bloque_par: []
 - id: T313
   parent_id: ''
@@ -285,7 +346,7 @@ tasks:
   statut: ⏸️
   criticite: C3
   domaine: OUTILLAGE / SIMULATION / OPENMODELICA
-  agent: Codex
+  agent: CDX01
   date: '2026-09-18T00:30:00+02:00'
   avancement: 'PAUSE 2026-09-18 (décision utilisateur) : TwinBench/OpenModelica mis de côté faute de temps pour finir le banc
     de test externe. Dernier jalon avant pause — OMEdit validé : dossier actif réduit à Dredge.mo + README et un seul lanceur
@@ -315,7 +376,7 @@ tasks:
   statut: ✅
   criticite: C1
   domaine: METHODOLOGIE / STANDARD_AF_ET_TESTS
-  agent: Antigravity
+  agent: AGY01
   date: '2026-09-16T01:05:00+02:00'
   avancement: 'Terminée : guide méthodologique GUIDE_METHODOLOGIE_AF_ET_TESTS_2_ETAGES_v1.0.md créé (flat & fluide), contre-expertise
     Ollama versée aux audits, et éprouvé sur AF_Partie-11_Fonction_Translation_v2.4.md.'
@@ -366,7 +427,7 @@ tasks:
   statut: ⏳
   criticite: C3
   domaine: SIMULATION / TRANSLATION_M3
-  agent: Codex
+  agent: CDX01
   date: '2026-09-15T23:40:00+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T300_SIMBENCH_M3_SENSOR_DYNAMICS.md
   avancement: Implémentation principale, tests et gates réalisés par Codex. Le pont IoHw.In.Hardware expose désormais HwIn
@@ -592,7 +653,7 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: SIMULATION
-  agent: Codex
+  agent: CDX01
   date: '2026-09-14T23:40:26+02:00'
   avancement: 'Termine : modele M2 couple a M1 valide au banc CODESYS par l utilisateur.'
   completed_at: '2026-09-15T01:40:00+02:00'
@@ -614,7 +675,7 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: SIMULATION
-  agent: Codex
+  agent: CDX01
   date: '2026-09-14T23:40:26+02:00'
   avancement: 'Termine : simulation Kobold et dynamique de fond validees au banc CODESYS par l utilisateur.'
   completed_at: '2026-09-15T01:40:00+02:00'
@@ -636,7 +697,7 @@ tasks:
   statut: ✅
   criticite: C4
   domaine: SECURITE_SYNCHRO_TREUILS
-  agent: Codex
+  agent: CDX01
   date: '2026-09-15T11:34:47+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
   avancement: 'Terminée et validée machine : descente auto M1 palier 4 / M2 palier 5 éprouvée sur site carrière (commit 196abd5c).'
@@ -661,7 +722,7 @@ tasks:
   statut: ✅
   criticite: C4
   domaine: SECURITE_SYNCHRO_TREUILS
-  agent: Codex
+  agent: CDX01
   date: '2026-09-15T08:10:00+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
   avancement: 'Terminée et validée machine : profil asymétrique descente auto M1=P4 / M2=P5.'
@@ -767,7 +828,7 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: CYCLE_AUTO / IHM
-  agent: Codex
+  agent: CDX01
   date: '2026-09-17T10:08:00+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T289_DECOMPTE_RESTANT_20260915.md
   avancement: 'Rouverte le 2026-09-17 sur correction utilisateur : implémentation testée et validée en simulation uniquement
@@ -840,7 +901,7 @@ tasks:
   statut: ⏳
   criticite: C3
   domaine: TRANSLATION_M3
-  agent: Codex
+  agent: CDX01
   date: '2026-09-15T12:45:29+02:00'
   titre: Régression M3 sur butées — escalade graduée sans toucher FB_Brake
   contexte: 'Arrêt directionnel immédiat conservé ; qualifie un mouvement réel persistant après arrêt. Retour terrain 2026-09-15
@@ -874,7 +935,7 @@ tasks:
   statut: ⬜
   criticite: C2
   domaine: OUTILLAGE
-  agent: ''
+  agent: —
   date: '2026-09-13T23:30:00+02:00'
   titre: Refactor CI non-régression mise en service — domaines A à G
   contexte: Réduire les faux verts et prioriser les scénarios de mise en service à risque.
@@ -887,7 +948,7 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: OUTILLAGE
-  agent: Codex
+  agent: CDX01
   date: '2026-09-13T23:00:00+02:00'
   titre: Regrouper les scratchs CI sous un conteneur unique
   contexte: Nouveaux scratchs sous .scratch/<FB>/<run> ; run_all nettoie seulement après succès global.
@@ -900,7 +961,7 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: OUTILLAGE
-  agent: Codex
+  agent: CDX01
   date: '2026-09-13T22:00:00+02:00'
   titre: Migrer les lanceurs CI apres retrait du runner racine
   contexte: Lanceurs migrés vers scripts/run_tests.py ; config et registre déplacés sous scripts/config/.
@@ -913,7 +974,7 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: OUTILLAGE
-  agent: Codex
+  agent: CDX01
   date: '2026-09-13T21:35:00+02:00'
   titre: Sortir le cache dashboard de RESULTS
   contexte: Cache index_state local sous .state, sans suppression automatique.
@@ -926,7 +987,7 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: OUTILLAGE
-  agent: Codex
+  agent: CDX01
   date: '2026-09-13T21:10:00+02:00'
   titre: Unifier les deux runners TEST_AUTO_CI et mesurer une baseline
   contexte: scripts/run_tests.py canonique ; runner racine conserve comme compatibilite.
@@ -939,7 +1000,7 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: OUTILLAGE
-  agent: Codex
+  agent: CDX01
   date: '2026-09-13T20:45:00+02:00'
   titre: Normaliser le workspace CI de troubleshooting par agent
   contexte: RESULTATS troubleshooting historiques sous HUM_LEGACY ; aucune suppression autorisee.
@@ -1065,7 +1126,7 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: TREUILS / SÉCURITÉ
-  agent: DSH (DeepSeek)
+  agent: DSH01
   date: '2026-09-01T00:00:00+02:00'
   completed_at: '2026-08-31T23:20:00+02:00'
   titre: FB_WinchSync — découpler la concordance contacteurs (FB_SyncContactor) du mode synchronisme
@@ -1117,7 +1178,7 @@ tasks:
   statut: ⬜
   criticite: C2
   domaine: SAFETY
-  agent: ''
+  agent: —
   date: '2026-09-01T00:00:00+02:00'
   titre: Sécurité Kobold hors cycle — interlock anti-surchauffe (temps cumulé + repos)
   contexte: 'Demande utilisateur (2026-09-01) : il ne faut pas pouvoir piloter le contacteur de commande Kobold trop longtemps
@@ -1142,7 +1203,7 @@ tasks:
   statut: ⬜
   criticite: C2
   domaine: OUTILLAGE
-  agent: ''
+  agent: —
   date: '2026-09-01T00:00:00+02:00'
   titre: Refactorer le troubleshooting — ajouter les variables de homing M2 (cible dynamique, offset benne)
   contexte: 'Demande utilisateur (2026-09-01) : le snapshot troubleshooting ne contient pas les variables détaillées du homing
@@ -1166,7 +1227,7 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: SIMULATION / IHM
-  agent: DSH-02
+  agent: DSH02
   date: '2026-09-01T00:00:00'
   completed_at: '2026-09-01T00:00:00'
   titre: Stimuli de simulation des boutons IHM M3 (testabilité pilotage IHM)
@@ -1192,7 +1253,7 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: IHM
-  agent: DSH (orchestrateur)
+  agent: DSH01
   date: '2026-09-01T00:00:00+02:00'
   completed_at: '2026-09-01T03:20:00+02:00'
   titre: Refactor GVL_IHM.DredgingAssist en 3 sous-structures (CycleDiveSearch/CycleExtraction/CycleDumpAtTremie)
@@ -1216,7 +1277,7 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: SORTIES PRG_06 / STANDARDS
-  agent: DSH-02
+  agent: DSH02
   date: '2026-09-01T00:00:00'
   titre: Mise en conformité PRG_06_Outputs §3bis — sorties variateur M3 ne doivent PAS être déclarées en VAR_OUTPUT homonyme
     d'un point matériel
@@ -1235,7 +1296,7 @@ tasks:
   statut: ⬜
   criticite: C4
   domaine: MODES / SÉCURITÉ
-  agent: ''
+  agent: —
   date: '2026-09-01T00:00:00'
   titre: Résoudre le blocage de mode (déverrouiller la bascule quand le retour contacteur n'est pas câblé)
   contexte: 'L''opérateur est bloqué dans un mode quand le retour contacteur M1/M2_ContactorsReleased_DI n''est pas câblé
@@ -1256,7 +1317,7 @@ tasks:
   statut: ⬜
   criticite: C2
   domaine: IHM / DIAGNOSTIC
-  agent: ''
+  agent: —
   date: '2026-09-01T00:00:00'
   titre: Historique d'alarmes (buffer borné + horodatage), en complément du bandeau d'alarmes actives
   contexte: 'Le bandeau d''alarmes actives ne montre que l''état courant. Besoin d''un historique (buffer FIFO borné, horodatage,
@@ -1276,7 +1337,7 @@ tasks:
   statut: ⬜
   criticite: C2
   domaine: IHM / BANDEAU
-  agent: ''
+  agent: —
   date: '2026-09-15T12:45:29+02:00'
   titre: 'Enrichir le bandeau IHM (maximum d''infos : défauts actifs, état AU, homing, blocage de mode)'
   contexte: 'Donner à l''opérateur le maximum d''infos utiles au bandeau : défauts actifs (codeur, synchro, benne, translation),
@@ -1358,7 +1419,7 @@ tasks:
   statut: ''
   criticite: C4
   domaine: ''
-  agent: Claude
+  agent: CC01
   titre: ArmingPermit cohérent avec disponibilité réelle des actionneurs
   contexte: ArmingPermit peut actuellement rester TRUE alors qu'un interlock final, un délai de reprise, un défaut mouvement
     ou un actionneur M3 indisponible empêche le mouvement demandé. L'opérateur peut donc armer sans pouvoir agir.
@@ -1383,7 +1444,7 @@ tasks:
   statut: ⬜
   criticite: C3
   domaine: TREUILS M1/M2 / CONCORDANCE CONTACTEURS
-  agent: ''
+  agent: —
   date: '2026-09-02T13:45:00+02:00'
   titre: Concordance contacteurs M1/M2 graduee (SafeStop -> escalade PowerCutOff) en PRG_06
   contexte: '§2ter (PRG_06) met INSTANTANEMENT toutes les sorties treuil a FALSE des qu''un ecart de vecteur M1/M2 est vu
@@ -1415,7 +1476,7 @@ tasks:
   statut: ⬜
   criticite: C4
   domaine: ''
-  agent: Claude
+  agent: CC01
   titre: Refonte de la frontiere Referencement machine <-> SEMI_AUTO
   contexte: 'Aujourd''hui SEMI_AUTO reste selectionnable sans machine referencee (le re-homing est seulement publie a l''IHM
     et le cycle ne progresse pas), et l''etape X1_HOMING de FB_Cycle realise elle-meme une recherche de capteur et un referencement
@@ -1441,7 +1502,7 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: B_AU_SECURITE / TESTS CI
-  agent: Antigravity
+  agent: AGY01
   date: '2026-09-02T18:07:00+02:00'
   titre: Tests unitaires ST & non-régression réarmement AU (AF01 v1.4)
   contexte: 'Validation par la preuve du réarmement AU sous cinématique et temporisations réelles (500ms pré-armement, 1s
@@ -1466,7 +1527,7 @@ tasks:
   statut: ⬜
   criticite: C3
   domaine: SEQUENCEUR SEMI_AUTO / FB_CYCLE
-  agent: ''
+  agent: —
   date: '2026-09-02T19:45:00+02:00'
   titre: FB_Cycle - une config treuil unique par etape (split X11, sequenceur au propre avant MES)
   contexte: 'Le sequenceur SEMI_AUTO (FB_Cycle) et le homing machine ne sont PAS encore en service. L''etape X11_OPEN_DUMP
@@ -1497,7 +1558,7 @@ tasks:
   statut: ⬜
   criticite: C2
   domaine: SEQUENCEUR SEMI_AUTO / KOBOLD / PROTECTION MOTEUR
-  agent: ''
+  agent: —
   date: '2026-09-03T00:00:00+02:00'
   titre: Protection thermique moteur / contacteur Kobold (temps maxi + repos impose + bypass)
   contexte: 'Le moteur du capteur de fond Kobold chauffe et risque de griller. Le contacteur est active dans le cycle a l''approche
@@ -1528,7 +1589,7 @@ tasks:
   statut: ⬜
   criticite: C1
   domaine: OUTILLAGE / TEST_AUTO_CI
-  agent: ''
+  agent: —
   date: '2026-09-03T01:25:00+02:00'
   titre: Assainissement compilation des harnais STruCpp et types résiduels (WINCH_INTEG, FB_Bucket, FB_TroubleshootingView)
   contexte: 'La suite de tests automatiques CI (run_tests.py) relève 3 blocs/harnais non compilés ou en échec de types STruCpp
@@ -1555,7 +1616,7 @@ tasks:
   statut: ⏳
   criticite: C1
   domaine: TESTS & SPECIFICATIONS (TRANSLATION & SIMULATION)
-  agent: AGY-01
+  agent: AGY01
   date: '2026-09-03T08:00:00+02:00'
   titre: Granularisation des tests unitaires et fiches AF pour Translation et Simulation (I_TRANSLATION & L_SIMULATION)
   contexte: 'Actuellement, I_TRANSLATION et L_SIMULATION ne disposent que d''un test monolithique (FB_Translation et FB_SimBench),
@@ -1640,7 +1701,7 @@ tasks:
   statut: ⬜
   criticite: C4
   domaine: CODEURS / HOMING
-  agent: ''
+  agent: —
   date: '2026-09-03T09:00:00+02:00'
   titre: Refonte transaction de vérification preset homing (suppression latence 500 ms)
   contexte: 'Demande utilisateur (2026-09-03) : retirer la temporisation de référencement CST_PresetVerifyTime (500 ms) dans
@@ -1898,7 +1959,7 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: SECURITE / DEFAUTS MISE EN SERVICE
-  agent: ''
+  agent: —
   date: '2026-09-04T08:00:00+02:00'
   titre: Inventaire exhaustif des defauts bloquants MES - decisions seuil / faux positif / bypass granulaire
   contexte: 'Seance 2026-09-03 : serie de defauts bloquants en cascade (MES-045) - MecaA/MecaE parasites, OffsetMaxFault a
@@ -1928,7 +1989,7 @@ tasks:
   statut: ⬜
   criticite: C2
   domaine: MISE EN SERVICE / PERSISTANCE ET BITS FORCES
-  agent: ''
+  agent: —
   date: '2026-09-04T08:00:00+02:00'
   titre: Test hors tension + reboot - ref codeurs persistantes + bits forces provisoires (usage partiel)
   contexte: 'Objectif seance 6 (2026-09-04). Verifier qu apres coupure d alimentation et reboot automate, les references codeurs
@@ -1955,7 +2016,7 @@ tasks:
   statut: ⬜
   criticite: C2
   domaine: CYCLE SEMI_AUTO / GRAFCET
-  agent: ''
+  agent: —
   date: '2026-09-04T08:00:00+02:00'
   titre: Debug + execution banc du GRAFCET cycle SEMI_AUTO (20 steps, T237)
   contexte: 'T237 (MES-041) : GRAFCET SEMI_AUTO refondu en 20 steps, 13/13 tests CI, G200 PASS, revue agent - mais JAMAIS
@@ -1982,7 +2043,7 @@ tasks:
   statut: ⬜
   criticite: C2
   domaine: SECURITE / SYNCHRO TREUILS M1-M2
-  agent: ''
+  agent: —
   date: '2026-09-04T00:30:00+02:00'
   titre: Garde de re-couplage M1/M2 - interdire le retour couple si ecart reel > tolerance
   contexte: 'Suite au challenge du gate Meca E (commit a venir). Le controle d''ecart croise M1/M2 (Meca E) est desormais
@@ -2085,7 +2146,7 @@ tasks:
   statut: ⬜
   criticite: C3
   domaine: MESURE POSITION / REFERENTIEL BENNE (ActiveOffsetM) - TRANSVERSE
-  agent: ''
+  agent: —
   date: '2026-09-04T17:30:00+02:00'
   titre: Rendre offset-aware tous les consommateurs de la position M2 (cycle, safety dure, legal, dive, HMI)
   contexte: 'MES 2026-09-04. Audit position par 3 agents (treuils/benne, M3, cycle/modes/safety). Cause racine des petites
@@ -2131,7 +2192,7 @@ tasks:
   statut: ⬜
   criticite: C3
   domaine: TREUILS M1/M2 - CONFORT/MECANIQUE
-  agent: ''
+  agent: —
   date: '2026-09-04T19:50:00+02:00'
   titre: Arret plus doux sur FdC haut (rampe deceleration au capteur haut)
   contexte: 'MES 2026-09-04. Note operateur : l''arret au fin de course haut (capteur M1M2_TopPositionFree_DI / TopPositionSensor)
@@ -2190,7 +2251,7 @@ tasks:
   statut: ⏳
   criticite: C4
   domaine: BENNE_PERSISTANCE
-  agent: AGY-01
+  agent: AGY01
   date: '2026-09-05T08:11:00+02:00'
   titre: Calibration géométrie benne réelle et fiabilisation persistance NVRAM
   contexte: 'Constat terrain 2026-09-05 : au démarrage matin, après homing à 0m, la benne est reconnue ''ouverte'' au lieu
@@ -2210,7 +2271,7 @@ tasks:
   statut: ✅
   criticite: C4
   domaine: CODEURS_VITESSE
-  agent: AGY-01
+  agent: AGY01
   date: '2026-09-05T09:05:00+02:00'
   completed_at: '2026-09-05T09:18:00+02:00'
   titre: Conversion directe vitesse codeur EtherCAT (m/s) — suppression dérivation/filtre
@@ -2259,7 +2320,7 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: CYCLE_SEMIAUTO
-  agent: AGY-01
+  agent: AGY01
   date: '2026-09-05T10:33:00+02:00'
   titre: Déblocage commande Exit / Abort en état pause (WaitingResume) et hors mode
   contexte: 'Constat terrain MES : quand le cycle est en pause (WaitingResume), l''appui sur Exit/BtnAbort ne réinitialise
@@ -2277,7 +2338,7 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: CYCLE_SEMIAUTO
-  agent: AGY-01
+  agent: AGY01
   date: '2026-09-05T10:33:00+02:00'
   titre: Assouplissement condition départ cycle AX1_INIT (état benne qualifié vs range rigide M2)
   contexte: 'Constat terrain MES : au départ cycle, PRG_03 impose M1 ET M2 dans ±0.4m du FDC haut. Si la benne est entre-ouverte
@@ -2295,7 +2356,7 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: SUPERVISION_IHM
-  agent: AGY-01
+  agent: AGY01
   date: '2026-09-05T10:33:00+02:00'
   titre: Dynamisation des messages de conditions et actions opérateur (Bandeau IHM)
   contexte: Les messages affichés lors d'une attente ou d'un blocage sont trop génériques. Nécessité d'exposer la condition
@@ -2369,7 +2430,7 @@ tasks:
   statut: ⬜
   criticite: C3
   domaine: CYCLE_DIVING_KOBOLD
-  agent: Codex
+  agent: CDX01
   date: '2026-09-05T23:30:27+02:00'
   titre: Fiabiliser AX4 a AX8 diving et sequence Kobold
   contexte: Le contacteur alimente le capteur sans retour auxiliaire. La DI unique suit la sequence terrain a confirmer 0
@@ -2387,7 +2448,7 @@ tasks:
   statut: ⬜
   criticite: C3
   domaine: CYCLE_EXTRACTION
-  agent: Codex
+  agent: CDX01
   date: '2026-09-05T23:30:27+02:00'
   titre: Fiabiliser AX9 a AX12 pretension, fermeture et remontee
   contexte: Le code accepte toute deflexion joystick, partage une cible M1 avec M2 et compare un ecart brut incompatible avec
@@ -2406,7 +2467,7 @@ tasks:
   statut: ⬜
   criticite: C3
   domaine: COMMISSIONING_IHM
-  agent: Codex
+  agent: CDX01
   date: '2026-09-05T23:30:27+02:00'
   titre: Ajouter mode essai controle et forçage transactionnel de step
   contexte: Le forçage actuel execute la cible dans le meme scan et ne publie aucun accepte/refuse. L inhibition demandee
@@ -2425,7 +2486,7 @@ tasks:
   statut: ⬜
   criticite: C3
   domaine: VALIDATION_SAT
-  agent: Codex
+  agent: CDX01
   date: '2026-09-05T23:30:27+02:00'
   titre: Integrer, documenter et qualifier le lot cycle SAT J2
   contexte: Cloture seulement apres tests cibles, AF conforme au code, bundle frais, G200 et gates complets.
@@ -2535,7 +2596,7 @@ tasks:
   statut: ⏳
   criticite: C3
   domaine: SECURITE_SYNCHRO_BENNE
-  agent: Codex
+  agent: CDX01
   date: '2026-09-07T13:05:00+02:00'
   titre: Étendre à 4 s le maintien d'inhibition synchro après pilotage benne
   contexte: Défaut écart/synchronisme rapporté pendant le pilotage manuel de la benne. Une temporisation TOF existante de
@@ -2556,7 +2617,7 @@ tasks:
   statut: ⬜
   criticite: C3
   domaine: LIVRAISON_SECURITE_AU
-  agent: Antigravity
+  agent: AGY01
   date: '2026-09-07T14:10:00+02:00'
   titre: Retrait des bypass ingénierie AU (BypassAuPowerCutOff et RedundancyTestA) à la livraison machine
   contexte: Pendant la mise en service (MES), BypassAuPowerCutOff et BypassAuRedundancyTestA ont été initialisés à TRUE au
@@ -2579,7 +2640,7 @@ tasks:
   statut: ⏳
   criticite: C3
   domaine: SECURITE_TREUILS_BENNE
-  agent: Codex
+  agent: CDX01
   date: '2026-09-07T14:35:00+02:00'
   titre: Empêcher le faux MecaD pendant ouverture benne au FdC haut
   contexte: Le snapshot 20260907_143114 montre ErrorMecaD M1/M2 et SafeStop pendant la manœuvre benne alors que le FdC haut
@@ -2602,7 +2663,7 @@ tasks:
   statut: ⏳
   criticite: C3
   domaine: CYCLE_AUTO_EXTRACTION
-  agent: Codex
+  agent: CDX01
   date: '2026-09-07T14:45:00+02:00'
   titre: Remontée en charge AX12 au palier 5
   contexte: 'Demande opérateur : la remontée en cycle automatique doit utiliser P5 sur AX12. AX10 et AX11 restent inchangés.'
@@ -2637,7 +2698,7 @@ tasks:
   statut: ⏳
   criticite: C3
   domaine: TREUILS_BENNE_TRANSLATION
-  agent: Codex
+  agent: CDX01
   date: '2026-09-07T15:20:00+02:00'
   titre: Verrou descente M3 basé sur State.AtMaintenance/AtP1
   contexte: Le verrou de descente ne doit pas utiliser les entrées brutes de position. La source consommée est l état validé
@@ -2655,7 +2716,7 @@ tasks:
   statut: ⬜
   criticite: C3
   domaine: TREUILS_BENNE_TRANSLATION
-  agent: Antigravity
+  agent: AGY01
   date: '2026-09-07T16:40:00+02:00'
   titre: Révision cinématique treuils en maintenance (Descente frein, Remontée synchro/fermée P1 & Inhibition défauts)
   contexte: 'Besoin d optimiser et sécuriser les mouvements treuils en maintenance : descente par relâchement de frein, remontée
@@ -2753,7 +2814,7 @@ tasks:
   statut: ⬜
   criticite: C3
   domaine: SECURITE_ET_AU
-  agent: Antigravity
+  agent: AGY01
   date: '2026-09-07T18:45:00+02:00'
   titre: Filtrage alarmes parasites AU et séquence d auto-reset temporisé post-réarmement
   contexte: L ouverture de l AU génère une cascade de faux positifs (coupure bus, perte codeurs, discordance contacteurs),

@@ -1,0 +1,717 @@
+<title>Simulateur Treuil</title>
+<meta name="description" content="Simulateur électrotechnique interactif du treuil M1/M2 — moteur rotor bobiné, groupe électrogène, protections">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --surface-2:#eef1f5; --text:#16202b; --muted:#5c6b7a;
+  --border:#d7dee6; --accent:#2b6cb0; --accent-soft:#e3edf9; --mech:#b3541e; --mech-soft:#fbe9dc;
+  --ok:#15803d; --ok-soft:#e4f6ea; --warn:#b45309; --warn-soft:#fdf0dd; --danger:#b91c1c; --danger-soft:#fbe6e6;
+  --shadow:0 1px 2px rgba(20,30,45,.06),0 8px 24px -12px rgba(20,30,45,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c131c; --surface:#131c28; --surface-2:#0f1722; --text:#e7edf3; --muted:#8fa0b3;
+    --border:#233040; --accent:#69a3e0; --accent-soft:#16283b; --mech:#e0955a; --mech-soft:#2c1c10;
+    --ok:#4fce8a; --ok-soft:#12271a; --warn:#e0ab5a; --warn-soft:#2c220f; --danger:#f28b8b; --danger-soft:#2c1414;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px -12px rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c131c; --surface:#131c28; --surface-2:#0f1722; --text:#e7edf3; --muted:#8fa0b3;
+  --border:#233040; --accent:#69a3e0; --accent-soft:#16283b; --mech:#e0955a; --mech-soft:#2c1c10;
+  --ok:#4fce8a; --ok-soft:#12271a; --warn:#e0ab5a; --warn-soft:#2c220f; --danger:#f28b8b; --danger-soft:#2c1414;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px -12px rgba(0,0,0,.55);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",system-ui,sans-serif;margin:0;padding-inline:16px;padding-block:20px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+h1{font-size:1.35rem;font-weight:700;margin:0 0 2px}
+.sub{color:var(--muted);font-size:.85rem;margin:0 0 18px}
+.wrap{max-width:1180px;margin:0 auto}
+.grid{display:grid;grid-template-columns:340px 1fr;gap:16px}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.panel + .panel{margin-top:16px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:4px;font-weight:500}
+.field input[type=number],.field input[type=text],.field select,textarea{
+  width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:7px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:.88rem
+}
+textarea{font-family:"IBM Plex Mono",monospace;font-size:.78rem;min-height:90px;resize:vertical}
+.row{display:flex;gap:8px}
+.row > *{flex:1}
+.seg{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.seg button{flex:1;padding:7px 4px;background:var(--surface-2);border:none;color:var(--muted);font-size:.78rem;cursor:pointer;font-family:inherit;border-right:1px solid var(--border)}
+.seg button:last-child{border-right:none}
+.seg button.active{background:var(--accent);color:#fff;font-weight:600}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:600;font-size:.9rem;cursor:pointer;width:100%}
+.btn:hover{filter:brightness(1.08)}
+.btn.secondary{background:var(--surface-2);color:var(--text);border:1px solid var(--border);margin-top:8px}
+.hint{font-size:.72rem;color:var(--muted);margin-top:3px;line-height:1.4}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tab{padding:7px 14px;border-radius:8px 8px 0 0;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--muted);border:1px solid transparent}
+.tab.active{background:var(--surface);border-color:var(--border);border-bottom-color:var(--surface);color:var(--text)}
+.tabpanel{display:none}
+.tabpanel.active{display:block}
+.genset-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:10px;background:var(--accent-soft);margin-bottom:14px;font-family:"IBM Plex Mono",monospace}
+.genset-bar .big{font-size:1.3rem;font-weight:600}
+.treuil-block{border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.treuil-title{font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.pill{font-size:.68rem;padding:2px 8px;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.danger{background:var(--danger-soft);color:var(--danger)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.kpi{background:var(--surface-2);border-radius:8px;padding:8px 10px}
+.kpi .l{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.kpi .v{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:1rem}
+table.risk{width:100%;border-collapse:collapse;font-size:.82rem}
+table.risk td{padding:6px 4px;border-top:1px solid var(--border);vertical-align:top}
+table.risk td.status{width:70px}
+table.risk td.detail{color:var(--muted);font-size:.78rem}
+.commuts{margin-top:8px;font-size:.78rem}
+.commuts .c-row{display:flex;justify-content:space-between;padding:3px 0;border-top:1px dashed var(--border);font-family:"IBM Plex Mono",monospace}
+.warnbox{background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:8px 10px;font-size:.76rem;margin-top:10px;line-height:1.5}
+canvas{width:100%;display:block;background:var(--surface-2);border-radius:8px}
+.schema-wrap{display:flex;flex-direction:column;gap:10px}
+.schema-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.schema-controls select{max-width:260px}
+input[type=range]{flex:1;accent-color:var(--accent)}
+svg text{font-family:"IBM Plex Sans",sans-serif}
+.block{fill:var(--surface-2);stroke:var(--border);stroke-width:1.5}
+.block-title{font-size:11px;font-weight:700;fill:var(--text)}
+.block-sub{font-size:8.5px;fill:var(--muted)}
+.block-val{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:700;fill:var(--ok)}
+.flow{stroke:var(--accent);stroke-width:2;fill:none;marker-end:url(#arrow)}
+.flow-label{font-size:9px;fill:var(--accent)}
+.empty{color:var(--muted);font-size:.85rem;padding:20px;text-align:center}
+.legend{display:flex;gap:14px;font-size:.72rem;color:var(--muted);flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+</style>
+
+<div class="wrap">
+  <h1>⚡ Simulateur treuil — moteur rotor bobiné + groupe électrogène</h1>
+  <p class="sub">Prototype T317 · Portage web du simulateur Python · Paramètres SYNTHÉTIQUES, non calibrés terrain</p>
+
+  <div class="grid">
+    <!-- ============== PANNEAU DE CONTROLE ============== -->
+    <div>
+      <div class="panel">
+        <div class="field">
+          <label>Mode</label>
+          <select id="mode">
+            <option value="un">Un treuil</option>
+            <option value="compare">Comparer charge / à vide</option>
+            <option value="deux">Deux treuils simultanés</option>
+            <option value="incident">Rejeu d'incident (JSON)</option>
+          </select>
+        </div>
+
+        <div id="params-un">
+          <div class="field">
+            <label>Charge (0–1)</label>
+            <input type="number" id="load" value="0.9" min="0" max="1" step="0.05">
+          </div>
+          <div class="field">
+            <label>Sens</label>
+            <div class="seg" id="dirSeg">
+              <button data-v="1" class="active">Montée</button>
+              <button data-v="-1">Descente</button>
+            </div>
+            <div class="hint">Descente + charge lourde peut activer le régime génératrice (freinage électrique automatique)</div>
+          </div>
+          <div class="field">
+            <label>Instants de bascule gradins (s, séparés par virgule)</label>
+            <input type="text" id="gradinTimes" value="0,0.4,0.8,1.2">
+          </div>
+          <div class="field">
+            <label>Durée simulée (s)</label>
+            <input type="number" id="tEnd" value="5" min="0.5" step="0.5">
+          </div>
+        </div>
+
+        <div id="params-incident" style="display:none">
+          <div class="field">
+            <label>JSON incident (mêmes champs que le prototype Python)</label>
+            <textarea id="incidentJson">{
+  "t_end": 8.0,
+  "genset": {"U_nom": 400, "I_nom_groupe": 350},
+  "winches": [
+    {"name": "M1", "load_frac": 0.85, "gradin_times": [0.0, 0.4, 0.9, 1.3], "direction": 1},
+    {"name": "M2", "load_frac": 0.0,  "gradin_times": [2.0, 2.4, 2.9, 3.3], "direction": 1}
+  ]
+}</textarea>
+          </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
+
+        <div class="field">
+          <label>Caractéristiques techniques (SYNTHÉTIQUES)</label>
+        </div>
+        <div class="row">
+          <div class="field"><label>Cmax moteur (N·m)</label><input type="number" id="cmax" value="3800"></div>
+          <div class="field"><label>In stator (A)</label><input type="number" id="inStator" value="200"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Inertie J (kg·m²)</label><input type="number" id="jTotal" value="45"></div>
+          <div class="field"><label>Seuil choc réd. (×nom.)</label><input type="number" id="sfChoc" value="2.5" step="0.1"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>U nominal GE (V)</label><input type="number" id="uNom" value="400"></div>
+          <div class="field"><label>I nominal GE (A)</label><input type="number" id="iNomGe" value="350"></div>
+        </div>
+
+        <button class="btn" onclick="runSimulation()">▶ Simuler</button>
+        <button class="btn secondary" onclick="location.reload()">↺ Réinitialiser</button>
+      </div>
+    </div>
+
+    <!-- ============== RESULTATS ============== -->
+    <div>
+      <div class="tabs">
+        <div class="tab active" data-tab="resultats" onclick="showTab('resultats')">📋 Résultats</div>
+        <div class="tab" data-tab="schema" onclick="showTab('schema')">🔌 Schéma synoptique</div>
+        <div class="tab" data-tab="graphe" onclick="showTab('graphe')">📈 Courbes</div>
+      </div>
+
+      <div id="tab-resultats" class="tabpanel active">
+        <div id="results-empty" class="panel"><div class="empty">Lance une simulation pour voir les résultats.</div></div>
+        <div id="results-content" style="display:none"></div>
+      </div>
+
+      <div id="tab-schema" class="tabpanel">
+        <div class="panel">
+          <div class="schema-wrap">
+            <div class="schema-controls">
+              <label class="hint" style="margin:0">Treuil :</label>
+              <select id="schemaWinch" onchange="updateSchema()"></select>
+              <span id="schemaTimeLabel" class="mono hint" style="margin:0">t = --</span>
+            </div>
+            <input type="range" id="schemaSlider" min="0" max="0" value="0" oninput="updateSchema()">
+            <svg id="schemaSvg" viewBox="0 0 900 480" style="width:100%;height:auto">
+              <defs>
+                <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                  <path d="M0,0 L8,4 L0,8 z" fill="var(--accent)"></path>
+                </marker>
+              </defs>
+            </svg>
+            <p class="hint">Flèches = flux de grandeurs entre blocs physiques. Déplace le curseur pour rejouer la séquence pas à pas.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-graphe" class="tabpanel">
+        <div class="panel">
+          <div style="margin-bottom:6px" class="legend" id="chartLegend"></div>
+          <canvas id="chartU" height="90"></canvas>
+          <p class="hint" style="margin:8px 0 4px">Tension réseau (V)</p>
+          <canvas id="chartI" height="110" style="margin-top:14px"></canvas>
+          <p class="hint" style="margin:8px 0 4px">Courant stator — trait plein = lissé, zone claire = brut (pics de commutation)</p>
+          <canvas id="chartN" height="110" style="margin-top:14px"></canvas>
+          <p class="hint" style="margin:8px 0 4px">Vitesse (rpm) — négatif = descente</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================================
+// Portage JS du moteur de simulation Python (sim_treuil_electrique.py)
+// Memes formules, memes noms de variables autant que possible.
+// ============================================================================
+
+function safeG(g, eps=1e-4){ if(Math.abs(g)<eps) return g>=0?eps:-eps; return g; }
+
+function coupleKloss(Cmax, g, gmax, Uratio2=1.0){
+  const ge = safeG(g);
+  return 2.0*Cmax/(ge/gmax + gmax/ge) * Uratio2;
+}
+
+function makeMotor(over={}){
+  const m = Object.assign({
+    name:"M1", p:4, f_nom:50.0, Cmax:3800.0, C_nominal:2500.0, gmax0:0.08, X2:1.0,
+    R2_rotor:0.08, R2_ext_gradins:[2.4,1.1,0.35,0.0], In_stator:200.0, I0_pu:0.35,
+    J_total:45.0, Tau_elec:0.03
+  }, over);
+  m.Ns_rpm = 120.0*m.f_nom/m.p;
+  m.Ns_rad_s = m.Ns_rpm*2*Math.PI/60.0;
+  const I0 = m.I0_pu*m.In_stator;
+  m.I_actif_nominal = Math.sqrt(Math.max(m.In_stator**2 - I0**2, 0));
+  m.courantStator = (Cmotor)=>{
+    const I0_ = m.I0_pu*m.In_stator;
+    const ratio = Math.abs(Cmotor)/Math.max(m.C_nominal,1e-6);
+    const Iactif = ratio*m.I_actif_nominal;
+    return Math.sqrt(I0_**2 + Iactif**2);
+  };
+  m.gmax = (gradin)=>{ const r2 = m.R2_rotor + m.R2_ext_gradins[gradin]; return m.gmax0*r2/m.R2_rotor; };
+  m.tauRotor = (gradin)=>{ const r2 = m.R2_rotor + m.R2_ext_gradins[gradin]; const L2 = m.X2/(2*Math.PI*m.f_nom); return L2/Math.max(r2,1e-6); };
+  return m;
+}
+
+function makeGenset(over={}){
+  const g = Object.assign({U_nom:400.0, I_nom_groupe:350.0, Xpp_pu:0.13, Tavr:0.4, I_base_site:20.0}, over);
+  g.Xpp_ohm = g.Xpp_pu*g.U_nom/g.I_nom_groupe;
+  return g;
+}
+
+function tauDeclenchement(classe){
+  const temps72 = {10:10.0,20:20.0,30:30.0}[classe] ?? 20.0;
+  const ratio = 7.2**2;
+  return temps72*ratio/Math.log(ratio/(ratio-1));
+}
+
+function makeWinch(motor, load_frac, gradin_times, direction=1, over={}){
+  gradin_times = [...gradin_times].sort((a,b)=>a-b);
+  const thermal = Object.assign({Ith_reglage:motor.In_stator*1.1, classe:20}, over.thermal||{});
+  const insulation = Object.assign({classe:"F", theta_ambiante:40.0, delta_theta_nominal:105.0,
+    tau_th_winding_s:1200.0, delta_T_montsinger:10.0, duree_vie_nominale_h:87600.0}, over.insulation||{});
+  const gearbox = Object.assign({C_nominal:2500.0, SF_choc_admissible:2.5, jerk_seuil_Nm_s:15000.0}, over.gearbox||{});
+  const THETA_LIMITE = {B:130.0, F:155.0, H:180.0};
+
+  const w = {
+    motor, load_frac, gradin_times, direction, thermal, insulation, gearbox,
+    N:0.0, I1_filt:0.0, stalled:false, ever_stalled:false, stall_time:null,
+    image:{theta:0.0, tripped:false, trip_time:null, tau:tauDeclenchement(thermal.classe)},
+    aging:{theta:insulation.theta_ambiante, vieillissement_cumule_h:0.0, isolant_endommage:false, isolant_endommage_time:null},
+    shock:{C_prev:0.0, choc_detecte:false, choc_time:null, choc_severe:false},
+    last_gradin:null, I_transitoire:0.0, commutations:[], k_inrush: over.k_inrush ?? 1.0,
+    hist:{t:[],N_rpm:[],g:[],C:[],Cr:[],I1:[],I1_brut:[],theta:[],gradin:[],theta_bobinage:[],pct_vie:[]}
+  };
+  w.gradinActif = (t)=>{ let gr=0; for(let i=0;i<w.gradin_times.length;i++){ if(t>=w.gradin_times[i]) gr=Math.min(i, w.motor.R2_ext_gradins.length-1);} return gr; };
+  w.coupleResistant = ()=> 80.0 + w.direction*w.load_frac*2500.0;
+
+  w.step = (t, dt, U_reseau, U_nom)=>{
+    const gradin = w.gradinActif(t);
+    const g = 1.0 - w.N/w.motor.Ns_rad_s;
+    const Uratio2 = (U_reseau/U_nom)**2;
+    const gmax = w.motor.gmax(gradin);
+    const C_motor = coupleKloss(w.motor.Cmax, g, gmax, Uratio2);
+    const Cr = w.coupleResistant();
+
+    if(w.last_gradin!==null && gradin!==w.last_gradin){
+      const gmaxAvant = w.motor.gmax(w.last_gradin);
+      const C_avant = coupleKloss(w.motor.Cmax, g, gmaxAvant, Uratio2);
+      const I_avant = w.motor.courantStator(C_avant);
+      const I_apres = w.motor.courantStator(C_motor);
+      const saut = Math.abs(I_apres-I_avant);
+      w.I_transitoire += w.k_inrush*saut;
+      w.commutations.push({t, saut, pic: w.I_transitoire+I_apres});
+    }
+    w.last_gradin = gradin;
+
+    const tauR = w.motor.tauRotor(gradin);
+    w.I_transitoire *= Math.exp(-dt/Math.max(tauR,1e-6));
+
+    const dNdt = (C_motor - Cr)/w.motor.J_total;
+    w.N = w.N + dNdt*dt;
+
+    const C_locked = coupleKloss(w.motor.Cmax, 1.0, gmax, Uratio2);
+    if(Math.abs(w.N)<3.0 && C_locked<Cr && t>0.2){
+      if(!w.stalled){ w.stalled=true; w.ever_stalled=true; w.stall_time=t; }
+    } else if(Math.abs(w.N)>3.0){ w.stalled=false; }
+
+    const I1_quasi = w.motor.courantStator(C_motor);
+    const I1_brut = I1_quasi + w.I_transitoire;
+    w.I1_filt += (I1_brut - w.I1_filt)*dt/w.motor.Tau_elec;
+
+    // Image thermique relais (I2t)
+    if(!w.image.tripped){
+      const ratio2 = (I1_brut/Math.max(w.thermal.Ith_reglage,1e-6))**2;
+      w.image.theta += (ratio2 - w.image.theta)*dt/w.image.tau;
+      if(w.image.theta>=1.0){ w.image.tripped=true; w.image.trip_time=t; }
+    }
+    // Vieillissement isolant
+    const ratio2b = (I1_brut/Math.max(w.motor.In_stator,1e-6))**2;
+    const thetaCible = w.insulation.theta_ambiante + w.insulation.delta_theta_nominal*ratio2b;
+    w.aging.theta += (thetaCible - w.aging.theta)*dt/w.insulation.tau_th_winding_s;
+    if(!w.aging.isolant_endommage && w.aging.theta>THETA_LIMITE[w.insulation.classe]){
+      w.aging.isolant_endommage=true; w.aging.isolant_endommage_time=t;
+    }
+    const F_AA = Math.pow(2.0, (w.aging.theta - (w.insulation.theta_ambiante+w.insulation.delta_theta_nominal))/w.insulation.delta_T_montsinger);
+    w.aging.vieillissement_cumule_h += F_AA*dt/3600.0;
+
+    // Choc reducteur
+    const ratio = Math.abs(C_motor)/Math.max(w.gearbox.C_nominal,1e-6);
+    const jerk = (C_motor - w.shock.C_prev)/Math.max(dt,1e-9);
+    w.shock.C_prev = C_motor;
+    if(ratio>w.gearbox.SF_choc_admissible){
+      if(!w.shock.choc_detecte){ w.shock.choc_detecte=true; w.shock.choc_time=t; }
+      if(Math.abs(jerk)>w.gearbox.jerk_seuil_Nm_s) w.shock.choc_severe=true;
+    }
+
+    w.hist.t.push(t);
+    w.hist.N_rpm.push(w.N*w.direction*60.0/(2*Math.PI));
+    w.hist.g.push(g);
+    w.hist.C.push(C_motor);
+    w.hist.Cr.push(Cr);
+    w.hist.I1.push(w.I1_filt);
+    w.hist.I1_brut.push(I1_brut);
+    w.hist.theta.push(w.image.theta);
+    w.hist.gradin.push(gradin);
+    w.hist.theta_bobinage.push(w.aging.theta);
+    w.hist.pct_vie.push(100.0*w.aging.vieillissement_cumule_h/87600.0);
+
+    return I1_brut;
+  };
+  return w;
+}
+
+function simulateMulti(genset, winches, t_end, dt=0.01){
+  let U_reseau = genset.U_nom;
+  const t_hist=[], U_hist=[];
+  let t=0;
+  const steps = Math.floor(t_end/dt);
+  for(let i=0;i<steps;i++){
+    let I_total = genset.I_base_site;
+    for(const w of winches) I_total += w.step(t, dt, U_reseau, genset.U_nom);
+    const U_instant = genset.U_nom - genset.Xpp_ohm*I_total;
+    U_reseau += (U_instant - U_reseau)*dt/genset.Tavr;
+    U_reseau = Math.max(U_reseau, 0);
+    t_hist.push(t); U_hist.push(U_reseau);
+    t += dt;
+  }
+  return {winches, U_reseau_hist:U_hist, t_hist};
+}
+
+// ============================================================================
+// UI
+// ============================================================================
+let lastResults = []; // [{title, res}]
+
+document.getElementById('mode').addEventListener('change', (e)=>{
+  document.getElementById('params-un').style.display = e.target.value==='incident' ? 'none':'block';
+  document.getElementById('params-incident').style.display = e.target.value==='incident' ? 'block':'none';
+});
+document.querySelectorAll('#dirSeg button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('#dirSeg button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+  });
+});
+
+// Auto-ajustement de la duree simulee quand les instants de gradins depassent la duree actuelle
+// (sinon la validation bloque silencieusement -- source de confusion signalee 2026-09-18).
+document.getElementById('gradinTimes').addEventListener('change', autoAdjustTEnd);
+document.getElementById('gradinTimes').addEventListener('blur', autoAdjustTEnd);
+function autoAdjustTEnd(){
+  const gt = document.getElementById('gradinTimes').value.split(',').map(s=>parseFloat(s.trim())).filter(v=>!isNaN(v));
+  if(!gt.length) return;
+  const tEndEl = document.getElementById('tEnd');
+  const maxGradin = Math.max(...gt);
+  const current = parseFloat(tEndEl.value) || 0;
+  if(maxGradin >= current){
+    tEndEl.value = (maxGradin + 2).toFixed(1);
+    tEndEl.style.background = 'var(--accent-soft)';
+    setTimeout(()=>{ tEndEl.style.background=''; }, 900);
+  }
+}
+
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+  document.querySelectorAll('.tabpanel').forEach(p=>p.classList.toggle('active', p.id==='tab-'+name));
+  if(name==='graphe') drawCharts();
+  if(name==='schema') updateSchema();
+}
+
+function advancedOverrides(){
+  return {
+    cmax: parseFloat(document.getElementById('cmax').value),
+    inStator: parseFloat(document.getElementById('inStator').value),
+    jTotal: parseFloat(document.getElementById('jTotal').value),
+    uNom: parseFloat(document.getElementById('uNom').value),
+    iNomGe: parseFloat(document.getElementById('iNomGe').value),
+    sfChoc: parseFloat(document.getElementById('sfChoc').value),
+  };
+}
+
+function buildWinch(name, load, gradinTimes, direction, adv){
+  const motor = makeMotor({name, Cmax:adv.cmax, In_stator:adv.inStator, J_total:adv.jTotal});
+  return makeWinch(motor, load, gradinTimes, direction, {gearbox:{C_nominal:2500.0, SF_choc_admissible:adv.sfChoc, jerk_seuil_Nm_s:15000.0}});
+}
+
+function validateUn(){
+  const gt = document.getElementById('gradinTimes').value.split(',').map(s=>parseFloat(s.trim()));
+  if(gt.some(isNaN)) return "Instants de bascule gradins invalides -- utilise des nombres separes par des virgules.";
+  const tEnd = parseFloat(document.getElementById('tEnd').value);
+  if(!(tEnd>0)) return "La duree simulee doit etre strictement positive.";
+  if(Math.max(...gt)>=tEnd) return `Le dernier gradin bascule a t=${Math.max(...gt)}s mais la duree simulee n'est que de ${tEnd}s -- augmente "Duree simulee" (ex: ${(Math.max(...gt)+2).toFixed(1)}s) pour voir le regime etabli apres le dernier gradin.`;
+  const load = parseFloat(document.getElementById('load').value);
+  if(!(load>=0 && load<=1)) return `Charge ${load} hors plage physique [0,1].`;
+  return null;
+}
+
+function runSimulation(){
+  const mode = document.getElementById('mode').value;
+  const adv = advancedOverrides();
+  let results = [];
+
+  try{
+    if(mode==='incident'){
+      const data = JSON.parse(document.getElementById('incidentJson').value);
+      const genset = makeGenset(data.genset||{});
+      const winches = data.winches.map(w=> buildWinch(w.name, w.load_frac, w.gradin_times, w.direction??1, adv));
+      const res = simulateMulti(genset, winches, data.t_end??8.0);
+      results.push({title:`Rejeu incident`, res});
+    } else if(mode==='deux'){
+      const genset = makeGenset({U_nom:adv.uNom, I_nom_groupe:adv.iNomGe});
+      const m1 = buildWinch('M1', 0.7, [0.0,0.5,1.0,1.5], 1, adv);
+      const m2 = buildWinch('M2', 0.5, [0.5,1.0,1.5,2.0], 1, adv);
+      const res = simulateMulti(genset, [m1,m2], 6.0);
+      results.push({title:'Deux treuils simultanés', res});
+    } else {
+      const err = validateUn();
+      if(err){ alert(err); return; }
+      const load = parseFloat(document.getElementById('load').value);
+      const gt = document.getElementById('gradinTimes').value.split(',').map(s=>parseFloat(s.trim()));
+      const tEnd = parseFloat(document.getElementById('tEnd').value);
+      const direction = parseInt(document.querySelector('#dirSeg button.active').dataset.v);
+      const sens = direction===1 ? 'montée':'descente';
+
+      const genset = makeGenset({U_nom:adv.uNom, I_nom_groupe:adv.iNomGe});
+      const w1 = buildWinch('M1', load, gt, direction, adv);
+      const res = simulateMulti(genset, [w1], tEnd);
+      results.push({title:`Charge ${(load*100).toFixed(0)}% (${sens})`, res});
+
+      if(mode==='compare'){
+        const genset2 = makeGenset({U_nom:adv.uNom, I_nom_groupe:adv.iNomGe});
+        const w2 = buildWinch('M1', 0.0, gt, direction, adv);
+        const res2 = simulateMulti(genset2, [w2], tEnd);
+        results.push({title:`À vide (${sens})`, res:res2});
+      }
+    }
+  } catch(e){
+    alert("Erreur de simulation : " + e.message);
+    return;
+  }
+
+  lastResults = results;
+  renderResults(results);
+  populateSchemaSelector(results);
+  showTab('resultats');
+}
+
+function verdictPill(ok){ return ok ? '<span class="pill ok">OK</span>' : '<span class="pill danger">Alerte</span>'; }
+
+function renderResults(results){
+  document.getElementById('results-empty').style.display='none';
+  const el = document.getElementById('results-content');
+  el.style.display='block';
+  el.innerHTML='';
+
+  for(const {title, res} of results){
+    const Umin = Math.min(...res.U_reseau_hist), Ufin = res.U_reseau_hist[res.U_reseau_hist.length-1];
+    let html = `<div class="genset-bar"><div><div class="hint" style="margin:0">${title} · Groupe électrogène</div>
+      <div class="big">${Umin.toFixed(0)} V <span class="hint">min</span> &nbsp;·&nbsp; ${Ufin.toFixed(0)} V <span class="hint">final</span></div></div>
+      ${verdictPill(Umin>0.85*400)}</div>`;
+
+    for(const [name, w] of Object.entries(res.winches.reduce((o,w)=>{o[w.motor.name]=w;return o;},{}))){
+      const sens = w.direction===1?'MONTÉE':'DESCENTE';
+      const Nfin = w.hist.N_rpm[w.hist.N_rpm.length-1];
+      const I1max = Math.max(...w.hist.I1), I1brutMax = Math.max(...w.hist.I1_brut);
+      const Cmax_ = Math.max(...w.hist.C);
+      const genIdx = w.hist.C.findIndex(c=>c<0);
+
+      html += `<div class="treuil-block">
+        <div class="treuil-title">🧲 Treuil ${name} <span class="pill ${w.direction===1?'ok':'warn'}">${sens}</span> <span class="hint" style="margin:0">charge ${(w.load_frac*100).toFixed(0)}%</span></div>
+        <div class="kpis">
+          <div class="kpi"><div class="l">Vitesse finale</div><div class="v">${Nfin.toFixed(0)} rpm</div></div>
+          <div class="kpi"><div class="l">I1 max (brut)</div><div class="v">${I1brutMax.toFixed(0)} A</div></div>
+          <div class="kpi"><div class="l">Couple max</div><div class="v">${Cmax_.toFixed(0)} N·m</div></div>
+        </div>`;
+
+      if(genIdx>=0) html += `<div class="warnbox">⚡ Régime GÉNÉRATRICE détecté à partir de t=${w.hist.t[genIdx].toFixed(2)}s — freinage électrique (la charge entraîne le moteur)</div>`;
+
+      if(w.commutations.length){
+        html += `<div class="commuts"><b class="hint" style="color:var(--text)">Commutations de gradin (${w.commutations.length})</b>`;
+        for(const c of w.commutations){
+          const ratioIn = c.pic/w.motor.In_stator;
+          const alert_ = ratioIn>3 ? ' ⚠⚠' : (ratioIn>2 ? ' ⚠' : '');
+          html += `<div class="c-row"><span>t=${c.t.toFixed(2)}s</span><span>saut +${c.saut.toFixed(0)} A</span><span>pic ${c.pic.toFixed(0)} A (${ratioIn.toFixed(1)}×In)${alert_}</span></div>`;
+        }
+        html += `</div>`;
+      }
+
+      const okMeca = !w.ever_stalled;
+      const okTherm = !w.image.tripped;
+      const okIso = !w.aging.isolant_endommage;
+      const pctVie = 100.0*w.aging.vieillissement_cumule_h/87600.0;
+      const okVie = pctVie<0.01;
+      const okChoc = !w.shock.choc_detecte;
+
+      html += `<table class="risk">
+        <tr><td class="status">${verdictPill(okMeca)}</td><td>1. Blocage mécanique</td><td class="detail">${w.ever_stalled?('décrochage constaté à t='+w.stall_time.toFixed(2)+'s'):'vitesse atteinte normalement'}</td></tr>
+        <tr><td class="status">${verdictPill(okTherm)}</td><td>2. Protection thermique relais</td><td class="detail">${w.image.tripped?('déclenché à t='+w.image.trip_time.toFixed(2)+'s'):('image '+(w.image.theta*100).toFixed(0)+'%')}</td></tr>
+        <tr><td class="status">${verdictPill(okIso)}</td><td>3. Isolant bobinage (classe ${w.insulation.classe})</td><td class="detail">${w.aging.isolant_endommage?('dépasse la classe à t='+w.aging.isolant_endommage_time.toFixed(2)+'s'):('θ='+w.aging.theta.toFixed(0)+'°C / limite '+{B:130,F:155,H:180}[w.insulation.classe]+'°C')}</td></tr>
+        <tr><td class="status">${verdictPill(okVie)}</td><td>4. Vieillissement isolant</td><td class="detail">${pctVie.toFixed(4)}% durée de vie consommée</td></tr>
+        <tr><td class="status">${verdictPill(okChoc)}</td><td>5. Choc réducteur (SF ${w.gearbox.SF_choc_admissible}×)</td><td class="detail">${w.shock.choc_detecte?('crête à t='+w.shock.choc_time.toFixed(2)+'s, '+(w.shock.choc_severe?'SÉVÈRE':'modéré')):('max '+Cmax_.toFixed(0)+' N·m')}</td></tr>
+      </table>
+      <div class="warnbox">Le courant inclut désormais un transitoire réel de commutation (L2/R2). Le couple mécanique reste quasi-statique (Kloss pur) — le choc réducteur peut donc rester sous-estimé.</div>
+      </div>`;
+    }
+    el.innerHTML += `<div class="panel" style="margin-bottom:16px">${html}</div>`;
+  }
+  el.innerHTML += `<p class="hint">Tous les paramètres moteur/genset/thermique sont SYNTHÉTIQUES (non mesurés terrain).</p>`;
+}
+
+// ---------------- Schema synoptique ----------------
+function populateSchemaSelector(results){
+  const sel = document.getElementById('schemaWinch');
+  sel.innerHTML='';
+  const map = {};
+  for(const {title, res} of results){
+    for(const w of res.winches){
+      const label = (results.length>1 || res.winches.length>1) ? `${title} / ${w.motor.name}` : title;
+      map[label] = {w, res};
+      const opt = document.createElement('option'); opt.value=label; opt.textContent=label;
+      sel.appendChild(opt);
+    }
+  }
+  window._schemaMap = map;
+  const keys = Object.keys(map);
+  if(keys.length){
+    sel.value = keys[0];
+    const n = map[keys[0]].w.hist.t.length;
+    const slider = document.getElementById('schemaSlider');
+    slider.max = Math.max(n-1,0); slider.value = Math.max(n-1,0);
+  }
+  drawSchemaLayout();
+  updateSchema();
+}
+
+function drawSchemaLayout(){
+  const svg = document.getElementById('schemaSvg');
+  svg.querySelectorAll('.gen').forEach(e=>e.remove());
+  const blocks = [
+    {id:'ge', x:20, y:40, w:150, h:85, title:'⚡ Groupe électrogène', sub:'U réseau', color:'var(--accent-soft)'},
+    {id:'moteur', x:240, y:40, w:150, h:85, title:'🧲 Moteur (bobinage)', sub:'Couple électromagnétique', color:'var(--accent-soft)'},
+    {id:'mecanique', x:460, y:40, w:150, h:85, title:'⚙️ Mécanique + réducteur', sub:'Vitesse / glissement', color:'var(--mech-soft)'},
+    {id:'charge', x:680, y:40, w:150, h:85, title:'🪝 Charge (treuil)', sub:'Couple résistant', color:'var(--danger-soft)'},
+    {id:'courant', x:240, y:190, w:150, h:85, title:'🔥 Courant stator I1', sub:'I0 / Iactif + transitoire', color:'var(--warn-soft)'},
+    {id:'thermique', x:190, y:330, w:150, h:85, title:'🌡️ Protection thermique', sub:'Image I²t (relais)', color:'var(--danger-soft)'},
+    {id:'isolant', x:400, y:330, w:150, h:85, title:'🧪 Isolant bobinage', sub:'Vieillissement Montsinger', color:'var(--danger-soft)'},
+    {id:'choc', x:610, y:330, w:150, h:85, title:'💥 Choc réducteur', sub:'Seuil SF × nominal', color:'var(--danger-soft)'},
+  ];
+  let html='';
+  for(const b of blocks){
+    html += `<g class="gen" id="blk-${b.id}">
+      <rect class="block" x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="8" style="fill:${b.color}"></rect>
+      <text class="block-title" x="${b.x+b.w/2}" y="${b.y+18}" text-anchor="middle">${b.title}</text>
+      <text class="block-sub" x="${b.x+b.w/2}" y="${b.y+b.h-12}" text-anchor="middle">${b.sub}</text>
+      <text class="block-val" id="val-${b.id}" x="${b.x+b.w/2}" y="${b.y+b.h/2+12}" text-anchor="middle">--</text>
+    </g>`;
+  }
+  const arrow=(x1,y1,x2,y2,label)=>`<g class="gen"><line class="flow" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"></line>${label?`<text class="flow-label" x="${(x1+x2)/2}" y="${(y1+y2)/2-6}" text-anchor="middle">${label}</text>`:''}</g>`;
+  html += arrow(170,82,240,82,'U (V)');
+  html += arrow(390,82,460,82,'C moteur (N·m)');
+  html += arrow(610,82,680,82,'N (rpm)');
+  html += `<g class="gen"><text class="flow-label" x="610" y="145" text-anchor="middle" fill="var(--danger)">← C résistant (rétro-action)</text></g>`;
+  html += arrow(315,125,315,190,'');
+  html += arrow(295,275,265,330,'I1');
+  html += arrow(335,275,455,330,'I1');
+  html += arrow(535,125,535,330,'C moteur');
+  document.getElementById('schemaSvg').innerHTML += html;
+}
+
+function updateSchema(){
+  const sel = document.getElementById('schemaWinch');
+  const entry = window._schemaMap ? window._schemaMap[sel.value] : null;
+  if(!entry) return;
+  const {w, res} = entry;
+  const slider = document.getElementById('schemaSlider');
+  let idx = Math.max(0, Math.min(parseInt(slider.value), w.hist.t.length-1));
+  const t = w.hist.t[idx];
+  document.getElementById('schemaTimeLabel').textContent = `t = ${t.toFixed(2)} s  (gradin ${w.hist.gradin[idx]})`;
+
+  const setVal = (id, text)=>{ const el = document.getElementById('val-'+id); if(el) el.textContent = text; };
+  const regime = w.hist.C[idx] < 0 ? 'GÉNÉRATRICE' : 'moteur';
+  setVal('ge', res.U_reseau_hist[idx].toFixed(0)+' V');
+  setVal('moteur', w.hist.C[idx].toFixed(0)+' N·m ('+regime+')');
+  setVal('mecanique', w.hist.N_rpm[idx].toFixed(0)+' rpm  g='+w.hist.g[idx].toFixed(2));
+  setVal('charge', w.hist.Cr[idx].toFixed(0)+' N·m');
+  const pic = w.hist.I1_brut[idx] > w.hist.I1[idx]*1.05 ? ' [PIC]' : '';
+  setVal('courant', w.hist.I1_brut[idx].toFixed(0)+' A'+pic);
+  setVal('thermique', (w.image.theta*100).toFixed(0)+'%');
+  setVal('isolant', w.hist.theta_bobinage[idx].toFixed(0)+' °C');
+  const chocTxt = (w.shock.choc_detecte && w.shock.choc_time!==null && w.shock.choc_time<=t) ? (w.shock.choc_severe?'SÉVÈRE':'choc') : '--';
+  setVal('choc', chocTxt);
+}
+
+// ---------------- Graphes canvas ----------------
+function drawLineChart(canvasId, series, opts={}){
+  const canvas = document.getElementById(canvasId);
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = canvas.clientWidth || 600, cssH = canvas.height;
+  canvas.width = cssW*dpr; canvas.height = cssH*dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,cssW,cssH);
+
+  let allY = [];
+  for(const s of series) allY = allY.concat(s.y.filter(v=>!isNaN(v)));
+  if(!allY.length) return;
+  let yMin = Math.min(...allY, opts.zeroLine?0:Infinity), yMax = Math.max(...allY, opts.zeroLine?0:-Infinity);
+  if(yMin===yMax){ yMin-=1; yMax+=1; }
+  const pad = (yMax-yMin)*0.08; yMin-=pad; yMax+=pad;
+  const xMax = Math.max(...series.map(s=>s.x[s.x.length-1]||0));
+
+  const M = {l:44,r:10,t:8,b:18};
+  const W = cssW-M.l-M.r, H = cssH-M.t-M.b;
+  const xToPx = x => M.l + (x/Math.max(xMax,1e-6))*W;
+  const yToPx = y => M.t + H - ((y-yMin)/(yMax-yMin))*H;
+
+  ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--border');
+  ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--muted');
+  ctx.font = '10px "IBM Plex Mono", monospace';
+  ctx.lineWidth=1;
+  for(let i=0;i<=3;i++){
+    const yy = yMin + (yMax-yMin)*i/3;
+    const py = yToPx(yy);
+    ctx.beginPath(); ctx.moveTo(M.l,py); ctx.lineTo(M.l+W,py); ctx.stroke();
+    ctx.fillText(yy.toFixed(0), 2, py+3);
+  }
+
+  for(const s of series){
+    ctx.beginPath();
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = s.width||1.6;
+    ctx.globalAlpha = s.alpha ?? 1;
+    s.x.forEach((x,i)=>{
+      const px=xToPx(x), py=yToPx(s.y[i]);
+      if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    });
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+}
+
+function drawCharts(){
+  if(!lastResults.length) return;
+  const colors = ['#2b6cb0','#c2410c','#15803d','#b91c1c'];
+  const Useries = lastResults.map((r,i)=>({x:r.res.t_hist, y:r.res.U_reseau_hist, color:colors[i%4]}));
+  drawLineChart('chartU', Useries);
+
+  let Iseries = [];
+  lastResults.forEach((r,i)=>{
+    r.res.winches.forEach(w=>{
+      Iseries.push({x:w.hist.t, y:w.hist.I1_brut, color:colors[i%4], alpha:0.35, width:1});
+      Iseries.push({x:w.hist.t, y:w.hist.I1, color:colors[i%4], width:1.8});
+    });
+  });
+  drawLineChart('chartI', Iseries);
+
+  let Nseries = [];
+  lastResults.forEach((r,i)=>{
+    r.res.winches.forEach(w=>{ Nseries.push({x:w.hist.t, y:w.hist.N_rpm, color:colors[i%4]}); });
+  });
+  drawLineChart('chartN', Nseries, {zeroLine:true});
+
+  const legend = document.getElementById('chartLegend');
+  legend.innerHTML = lastResults.map((r,i)=>`<span><span class="dot" style="background:${colors[i%4]}"></span>${r.title}</span>`).join('');
+}
+
+window.addEventListener('resize', ()=>{ if(document.getElementById('tab-graphe').classList.contains('active')) drawCharts(); });
+</script>
