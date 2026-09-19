@@ -2935,12 +2935,12 @@ tasks:
   avancement: 'Terminée : sortie mode maintenance N2 avec désactivation automatique du bouton dans FB_Modes.'
 - id: T278
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: SECURITE_ET_AU
-  agent: AGY01
-  date: '2026-09-07T18:45:00+02:00'
-  titre: Filtrage alarmes parasites AU et séquence d auto-reset temporisé post-réarmement
+  agent: CDX01
+  date: '2026-09-19T12:00:00+02:00'
+  titre: Filtrage alarmes transitoires demarrage CPU et auto-reset post-rearmement
   contexte: L ouverture de l AU génère une cascade de faux positifs (coupure bus, perte codeurs, discordance contacteurs),
     et le réarmement nécessite des resets manuels répétés pendant le démarrage des équipements.
   description: Étude et spécification du masquage des alarmes induites par la coupure AU et de l auto-reset temporisé (1..3
@@ -2955,6 +2955,7 @@ tasks:
     persiste au-delà de la fenêtre ni une alarme de sécurité bloquante (AU, discordance, PowerCutOff).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T278_AU_ALARMS_FILTERING_AND_AUTO_RESET.yaml
   bloque_par: []
+  avancement: 'Implementation ST faite : FB_AutoResetTransientDiag, reset cible EtherCAT/CANopen, bypass maitre supprime, flags GVL par defaut FALSE. Bundle/G200 PASS ; validation CODESYS humaine restante.'
 - id: T279
   parent_id: ''
   statut: ✅

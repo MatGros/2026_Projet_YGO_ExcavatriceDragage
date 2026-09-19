@@ -10,6 +10,7 @@ VAR_INPUT
     // === COMMANDES & CONTROLE ===
     Enable                      : BOOL;         // --> [CMD] Active la surveillance EtherCAT
     Reset                       : BOOL;         // --> [CMD] Front d'acquittement des defauts
+    ResetTransient              : BOOL;         // --> [CMD] Front cible pertes de communication transitoires uniquement
 
     // === ETATS BRUTS MATERIEL & BYPASS VARIATEUR M3 ===
     DeviceVariateurStateRaw     : DEVICE_STATE; // --> [HW]  Valeur brute AC600_ECAT_Drive.GetDeviceState()
@@ -43,6 +44,7 @@ END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
     ResetEdge                   : R_TRIG;       // * [INST] Detecteur front de reset
+    ResetTransientEdge          : R_TRIG;       // * [INST] Detecteur front reset transitoire
 
     // === CALCULS ET ETATS INTERNES ===
     VariateurOnlineReal         : BOOL;         // . [LOC]  GetDeviceState() = RUNNING, hors tout bypass
@@ -100,6 +102,21 @@ EncoderM2OnlineEff := EncoderM2OnlineReal OR EncoderM2Bypass;
 
 // 🔑 3. RESET FRONT
 ResetEdge(CLK := Reset);
+ResetTransientEdge(CLK := ResetTransient);
+IF ResetTransientEdge.Q THEN
+    // Auto-reset : liste blanche stricte des seuls bits de perte de liaison.
+    // Les futurs bits variateur/codeur ne peuvent donc pas etre effaces ici.
+    IF VariateurOnlineEff THEN DeviceVariateur.ErrorId := DeviceVariateur.ErrorId AND 16#FFEF; END_IF;
+    IF EncoderM1OnlineEff THEN DeviceEncoderM1.ErrorId := DeviceEncoderM1.ErrorId AND 16#FFDF; END_IF;
+    IF EncoderM2OnlineEff THEN DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId AND 16#FFCF; END_IF;
+END_IF;
+IF ResetEdge.Q THEN
+    // Reset operateur : acquittement complet du diagnostic reseau si l equipement
+    // est revenu effectif. Cette voie reste distincte de ResetTransient.
+    IF VariateurOnlineEff THEN DeviceVariateur.ErrorId := 16#0000; DeviceVariateur.StateAtError := E_Diag_State.DISABLED; END_IF;
+    IF EncoderM1OnlineEff THEN DeviceEncoderM1.ErrorId := 16#0000; DeviceEncoderM1.StateAtError := E_Diag_State.DISABLED; END_IF;
+    IF EncoderM2OnlineEff THEN DeviceEncoderM2.ErrorId := 16#0000; DeviceEncoderM2.StateAtError := E_Diag_State.DISABLED; END_IF;
+END_IF;
 
 {endregion}
 

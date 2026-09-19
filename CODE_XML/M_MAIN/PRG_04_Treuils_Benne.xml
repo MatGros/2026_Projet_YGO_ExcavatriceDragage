@@ -8711,11 +8711,9 @@ IF NOT BypassGlobal THEN
     // probleme -&gt; plus besoin de ce contournement.)
     MaxAllowedOffset := Config.OffsetCloseM + 2.0;
     MinAllowedOffset := Config.OffsetOpenM - Config.CoherenceLimitM;
-    HomingPositionValid := HomedM1
-                             AND HomedM2
-                             AND NOT HomingSuspectM1
-                             AND NOT HomingSuspectM2
-                             AND NOT MachineHomingActive;
+    HomingPositionValid := HomedAndReliableM1
+                         AND HomedAndReliableM2
+                         AND NOT MachineHomingActive;
     OffsetMaxViolNow := HomingPositionValid
                      AND ((CablePosM2 &gt; (CablePosM1 + MaxAllowedOffset))
                           OR (CablePosM2 &lt; (CablePosM1 + MinAllowedOffset)));

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T13:43:56.259418" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T13:43:56.259418">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T21:10:45.929082" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T21:10:45.929082">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2798,6 +2798,14 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Diagnostic reseau EtherCAT (codeurs/variateur) — rang 02</xhtml>
               </documentation>
             </variable>
+            <variable name="instAutoResetTransientDiag">
+              <type>
+                <derived name="FB_AutoResetTransientDiag" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Acquittement borne diagnostics T278 (EtherCAT/CANopen uniquement)</xhtml>
+              </documentation>
+            </variable>
             <variable name="instEncoderM1">
               <type>
                 <derived name="FB_Encoder" />
@@ -3225,9 +3233,28 @@ Data.InputModules.Fault := NOT (Data.InputModules.LocalDigitalIoOk AND Data.Inpu
 // === 🔌 §1ter DIAGNOSTIC RÉSEAUX (CANopen + EtherCAT) ===
 // 🔌 Diagnostics reseau produits ICI (rang 02) car consommes par PRG_02 (joystick,
 // codeurs) et par les PRG 04/05 — producteur avant consommateur (AF02 §4).
+instAutoResetTransientDiag(
+    Enable                  := TRUE,
+    StartupEnable           := GVL_Simulation.AutoResetTransientDiagAtStartupEnable,
+    PowerRearmEnable        := GVL_Simulation.AutoResetTransientDiagAfterRearmEnable,
+    EmergencyChainClosed    := HwIn.Machine.EmergencyChainClosed_DI,
+    PowerContactorEngaged   := HwIn.Machine.PowerContactorEngaged_DI,
+    PowerCutOffActive       := PRG_06_Outputs.PowerCutOffActive,
+    MotionActive             := PRG_04_Treuils_Benne.Data.BothActive
+                                  OR PRG_04_Treuils_Benne.Data.WinchM1State.Busy
+                                  OR PRG_04_Treuils_Benne.Data.WinchM2State.Busy
+                                  OR PRG_05_Translation.TranslationState.Busy,
+    DiagnosticsStable        := instDiagEthercat.DeviceEthercatMaster.Operational
+                                  AND instDiagCanOpen.DeviceCanOpenMaster.Operational,
+    Cfg_MaxAttempts           := GVL_Simulation.AutoResetTransientDiagMaxAttempts,
+    Cfg_StabilizationTime     := GVL_Simulation.AutoResetTransientDiagStabilizationTime,
+    Cfg_InterAttemptTime      := GVL_Simulation.AutoResetTransientDiagInterAttemptTime
+);
+
 instDiagCanOpen(
     Enable                 := TRUE,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
+    ResetTransient         := instAutoResetTransientDiag.ResetPulse,
     CANbusStateRaw         := HwReal.Operator.CanBusState,
     DeviceJoystickStateRaw := HwReal.Operator.JOY1_DeviceState,
     SimBypassActive        := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive,
@@ -3238,6 +3265,7 @@ instDiagCanOpen(
 instDiagEthercat(
     Enable                   := TRUE,
     Reset                    := PRG_07_Supervision.FaultMachineReset_IHM,
+    ResetTransient           := instAutoResetTransientDiag.ResetPulse,
     DeviceVariateurStateRaw  := HwReal.Translation.AC600_DeviceState,
     DeviceVariateurSimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive,
     DeviceEncoderM1StateRaw  := HwReal.Winch.COD1_DeviceState,
@@ -3246,8 +3274,8 @@ instDiagEthercat(
     DeviceEncoderM2SimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive,
     NetworkBypassActive      := GVL_IHM.Network.Bypass.Global,
     // ⚠️ TEST MES TEMPORAIRE : inhibition EtherCAT forcée par le code.
-    // Aucun champ IHM ne peut piloter ce bypass pendant l'essai.
-    EcatBusBypassActive      := TRUE,
+    // Le bypass maitre est desactive : la stabilite reelle reste observable.
+    EcatBusBypassActive      := FALSE,
     VariateurBypassActive    := GVL_IHM.Network.Bypass.VariateurM3,
     EncoderM1BypassActive    := GVL_IHM.Network.Bypass.EncoderM1,
     EncoderM2BypassActive    := GVL_IHM.Network.Bypass.EncoderM2
@@ -3680,6 +3708,379 @@ Data.DataValid := NOT Data.InputModules.Fault
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>212fd0f8-509e-536e-99de-b75543d86add</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_AutoResetTransientDiag" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Activation du service</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Autorise la sequence au demarrage CPU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerRearmEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Autorise la sequence apres front contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine AU fermee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Retour contacteur puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Coupure puissance active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Mouvement ou demande mouvement active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiagnosticsStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Diagnostics reseau operationnels</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg_MaxAttempts">
+              <type>
+                <USINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Borne 1..3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg_StabilizationTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Stabilisation avant impulsion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg_InterAttemptTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Intervalle entre impulsions</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="ResetPulse">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Impulsion vers diagnostics autorises</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SequenceActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Lockout">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Salve terminee ou annulee, attente nouvel evenement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cancelled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Sequence annulee par une condition de securite</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Phase">
+              <type>
+                <USINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] 0 idle, 1 startup, 2 post-rearmement, 3 lockout</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AttemptCount">
+              <type>
+                <USINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Nombre d impulsions emises</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="PowerRearmEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front contacteur engage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StabilizationTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Tempo avant premiere impulsion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InterAttemptTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Tempo entre impulsions</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <USINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] 0 idle, 1 wait startup, 2 wait rearm, 3 intervalle, 4 lockout</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupStarted">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sequence startup deja declenchee au boot</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RearmStarted">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sequence du front courant deja declenchee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RearmPending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front rearmement memorise pendant startup</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PendingPhase">
+              <type>
+                <USINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Phase a executer apres stabilisation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxAttemptsEffective">
+              <type>
+                <USINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Borne appliquee 1..3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeCommon">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Conditions communes d autorisation</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   FB_AutoResetTransientDiag - Acquittement borne des diagnostics transitoires
+   =======================================================================
+   Responsabilite unique : produire une impulsion de reset pour les FB de
+   diagnostic reseau autorises (EtherCAT/CANopen) apres stabilisation.
+
+   ⛔ Ce FB ne reset jamais la chaine AU, les securites mouvement, les codeurs
+      de securite, les contacteurs, les freins ou les defauts mecaniques.
+   ⛔ Ce FB ne genere aucune commande de mouvement et aucun redemarrage cycle.
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// Sorties impulsionnelles : FALSE par defaut, TRUE pendant un seul scan.
+ResetPulse := FALSE;
+Cancelled := FALSE;
+
+IF NOT Enable THEN
+    SequenceActive := FALSE;
+    Lockout := FALSE;
+    Phase := 0;
+    AttemptCount := 0;
+    State := 0;
+    StartupStarted := FALSE;
+    RearmStarted := FALSE;
+    RearmPending := FALSE;
+    PendingPhase := 0;
+    StabilizationTimer(IN := FALSE);
+    InterAttemptTimer(IN := FALSE);
+    PowerRearmEdge(CLK := FALSE);
+    RETURN;
+END_IF;
+
+MaxAttemptsEffective := Cfg_MaxAttempts;
+IF MaxAttemptsEffective &lt; 1 THEN MaxAttemptsEffective := 1; END_IF;
+IF MaxAttemptsEffective &gt; 3 THEN MaxAttemptsEffective := 3; END_IF;
+
+SafeCommon := EmergencyChainClosed AND NOT PowerCutOffActive AND NOT MotionActive;
+PowerRearmEdge(CLK := PowerContactorEngaged);
+
+// Le front contacteur ne peut armer qu une seule salve. Une retombee rearme
+// uniquement la detection du prochain cycle de puissance.
+IF NOT PowerContactorEngaged THEN
+    RearmStarted := FALSE;
+    RearmPending := FALSE;
+END_IF;
+
+// Si le contacteur revient pendant la sequence startup, memoriser le front :
+// le rearmement sera traite apres la fin de la sequence startup, jamais perdu.
+IF PowerRearmEnable AND PowerRearmEdge.Q AND (State &lt;&gt; 0) AND (State &lt;&gt; 4) THEN
+    RearmPending := TRUE;
+END_IF;
+
+// Priorite au demarrage CPU. Le contacteur doit etre au repos pour cette phase.
+IF (State = 0) AND StartupEnable AND NOT StartupStarted AND SafeCommon AND NOT PowerContactorEngaged THEN
+    StartupStarted := TRUE;
+    PendingPhase := 1;
+    AttemptCount := 0;
+    Lockout := FALSE;
+    State := 1;
+END_IF;
+
+// La phase post-rearmement est declenchee exclusivement sur le front du retour
+// contacteur et ne peut pas etre confondue avec le demarrage CPU.
+IF (State = 0 OR State = 4) AND PowerRearmEnable AND PowerRearmEdge.Q AND NOT RearmStarted THEN
+    RearmStarted := TRUE;
+    IF SafeCommon AND PowerContactorEngaged THEN
+        PendingPhase := 2;
+        AttemptCount := 0;
+        Lockout := FALSE;
+        State := 2;
+    ELSE
+        Lockout := TRUE;
+        Cancelled := TRUE;
+        Phase := 3;
+    END_IF;
+END_IF;
+
+IF (State = 4) AND PowerRearmEnable AND RearmPending AND NOT RearmStarted
+   AND SafeCommon AND PowerContactorEngaged THEN
+    RearmPending := FALSE;
+    RearmStarted := TRUE;
+    PendingPhase := 2;
+    AttemptCount := 0;
+    Lockout := FALSE;
+    State := 2;
+END_IF;
+
+// Les deux sequences sont annulees a la moindre condition safety invalide.
+IF (State = 1 OR State = 2 OR State = 3) AND NOT SafeCommon THEN
+    State := 4;
+    Lockout := TRUE;
+    Cancelled := TRUE;
+END_IF;
+
+// Stabilisation : le timer ne progresse que si les diagnostics sont revenus
+// operationnels et si les conditions safety restent valides.
+StabilizationTimer(
+    IN := (State = 1 OR State = 2) AND SafeCommon AND DiagnosticsStable,
+    PT := Cfg_StabilizationTime
+);
+
+IF (State = 1 OR State = 2) AND StabilizationTimer.Q THEN
+    ResetPulse := TRUE;
+    AttemptCount := AttemptCount + 1;
+    IF AttemptCount &gt;= MaxAttemptsEffective THEN
+        State := 4;
+        Lockout := TRUE;
+    ELSE
+        State := 3;
+    END_IF;
+END_IF;
+
+// Intervalle inter-impulsions. La condition safety reste re-evaluee au scan.
+InterAttemptTimer(IN := (State = 3) AND SafeCommon, PT := Cfg_InterAttemptTime);
+IF (State = 3) AND InterAttemptTimer.Q THEN
+    State := PendingPhase;
+END_IF;
+
+SequenceActive := (State = 1 OR State = 2 OR State = 3);
+IF State = 4 THEN
+    Phase := 3;
+ELSIF SequenceActive THEN
+    Phase := PendingPhase;
+ELSE
+    Phase := 0;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c7ba8d37-387d-51cd-8b08-2c1332258d0f</ObjectId>
           </data>
         </addData>
       </pou>
@@ -5097,6 +5498,14 @@ FirstScanDone := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement des defauts</xhtml>
               </documentation>
             </variable>
+            <variable name="ResetTransient">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front cible pertes de communication transitoires uniquement</xhtml>
+              </documentation>
+            </variable>
             <variable name="CANbusStateRaw">
               <type>
                 <INT />
@@ -5186,6 +5595,14 @@ FirstScanDone := TRUE;
 * [INST] Detecteur front de reset</xhtml>
               </documentation>
             </variable>
+            <variable name="ResetTransientEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front reset transitoire</xhtml>
+              </documentation>
+            </variable>
             <variable name="CANbusOnlineReal">
               <type>
                 <BOOL />
@@ -5266,7 +5683,15 @@ DeviceJoystickOnlineEff  := DeviceJoystickOnlineReal OR SimBypassActive OR Netwo
 {region "§3 Reset front"}
 // 🔑 3. RESET FRONT — Efface les défauts si la cause a disparu
 ResetEdge(CLK := Reset);
+ResetTransientEdge(CLK := ResetTransient);
+IF ResetTransientEdge.Q THEN
+    // Auto-reset : seuls les bits communication connus sont effaces.
+    IF (CANbusOnlineEff AND DeviceJoystickOnlineEff) THEN
+        DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFC;
+    END_IF;
+END_IF;
 IF ResetEdge.Q THEN
+    // Reset operateur complet du diagnostic joystick.
     IF (CANbusOnlineEff AND DeviceJoystickOnlineEff) THEN
         DeviceJoystick.ErrorId := 16#0000;
         DeviceJoystick.StateAtError := E_Diag_State.DISABLED;
@@ -5356,6 +5781,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement des defauts</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetTransient">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front cible pertes de communication transitoires uniquement</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceVariateurStateRaw">
@@ -5505,6 +5938,14 @@ END_IF;
 * [INST] Detecteur front de reset</xhtml>
               </documentation>
             </variable>
+            <variable name="ResetTransientEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front reset transitoire</xhtml>
+              </documentation>
+            </variable>
             <variable name="VariateurOnlineReal">
               <type>
                 <BOOL />
@@ -5637,6 +6078,21 @@ EncoderM2OnlineEff := EncoderM2OnlineReal OR EncoderM2Bypass;
 
 // 🔑 3. RESET FRONT
 ResetEdge(CLK := Reset);
+ResetTransientEdge(CLK := ResetTransient);
+IF ResetTransientEdge.Q THEN
+    // Auto-reset : liste blanche stricte des seuls bits de perte de liaison.
+    // Les futurs bits variateur/codeur ne peuvent donc pas etre effaces ici.
+    IF VariateurOnlineEff THEN DeviceVariateur.ErrorId := DeviceVariateur.ErrorId AND 16#FFEF; END_IF;
+    IF EncoderM1OnlineEff THEN DeviceEncoderM1.ErrorId := DeviceEncoderM1.ErrorId AND 16#FFDF; END_IF;
+    IF EncoderM2OnlineEff THEN DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId AND 16#FFCF; END_IF;
+END_IF;
+IF ResetEdge.Q THEN
+    // Reset operateur : acquittement complet du diagnostic reseau si l equipement
+    // est revenu effectif. Cette voie reste distincte de ResetTransient.
+    IF VariateurOnlineEff THEN DeviceVariateur.ErrorId := 16#0000; DeviceVariateur.StateAtError := E_Diag_State.DISABLED; END_IF;
+    IF EncoderM1OnlineEff THEN DeviceEncoderM1.ErrorId := 16#0000; DeviceEncoderM1.StateAtError := E_Diag_State.DISABLED; END_IF;
+    IF EncoderM2OnlineEff THEN DeviceEncoderM2.ErrorId := 16#0000; DeviceEncoderM2.StateAtError := E_Diag_State.DISABLED; END_IF;
+END_IF;
 
 {endregion}
 
@@ -14405,6 +14861,13 @@ Ready := TRUE;
         <Folder Name="M_MAIN">
           <Object Name="PRG_02_Acquisition" ObjectId="212fd0f8-509e-536e-99de-b75543d86add" />
         </Folder>
+        <Folder Name="C_DIAG_RESEAUX">
+          <Object Name="FB_AutoResetTransientDiag" ObjectId="c7ba8d37-387d-51cd-8b08-2c1332258d0f" />
+          <Object Name="FB_Diag_CanOpen" ObjectId="335793a2-469c-5bc1-8663-6c12c4d0dfde" />
+          <Object Name="FB_Diag_Ethercat" ObjectId="014990de-caff-57d6-8d15-66c7ad1a6908" />
+          <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
+          <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
+        </Folder>
         <Folder Name="G_CYCLE">
           <Object Name="FB_CycleMachineHoming" ObjectId="b5c9dd36-3240-54e6-ad41-55265cc042b2" />
           <Folder Name="_TYPES">
@@ -14416,12 +14879,6 @@ Ready := TRUE;
             <Object Name="ST_fbMachineHomingCycle_HomingDemand" ObjectId="a0819120-1e85-5b22-8a6d-414f9c7d9a11" />
             <Object Name="ST_MachineHoming" ObjectId="719346ef-3775-5b4e-ac3c-37b255640eba" />
           </Folder>
-        </Folder>
-        <Folder Name="C_DIAG_RESEAUX">
-          <Object Name="FB_Diag_CanOpen" ObjectId="335793a2-469c-5bc1-8663-6c12c4d0dfde" />
-          <Object Name="FB_Diag_Ethercat" ObjectId="014990de-caff-57d6-8d15-66c7ad1a6908" />
-          <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
-          <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
         </Folder>
         <Folder Name="E_CODEURS">
           <Object Name="FB_Encoder" ObjectId="290327ae-3055-58e1-9bbd-038d8cd93901" />

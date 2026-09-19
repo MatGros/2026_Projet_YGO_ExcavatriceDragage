@@ -10,6 +10,7 @@ VAR_INPUT
     // === COMMANDES & CONTROLE ===
     Enable                      : BOOL;         // --> [CMD] Active la surveillance CAN
     Reset                       : BOOL;         // --> [CMD] Front d'acquittement des defauts
+    ResetTransient              : BOOL;         // --> [CMD] Front cible pertes de communication transitoires uniquement
 
     // === ETATS BRUTS MATERIEL ===
     CANbusStateRaw              : INT;          // --> [HW]  Valeur brute CANbus.GetBusState() (2 = ACTIVE)
@@ -32,6 +33,7 @@ END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
     ResetEdge                   : R_TRIG;       // * [INST] Detecteur front de reset
+    ResetTransientEdge          : R_TRIG;       // * [INST] Detecteur front reset transitoire
 
     // === CALCULS ET ETATS INTERNES ===
     CANbusOnlineReal            : BOOL;         // . [LOC]  Bus reellement actif, hors tout bypass
@@ -72,7 +74,15 @@ DeviceJoystickOnlineEff  := DeviceJoystickOnlineReal OR SimBypassActive OR Netwo
 {region "§3 Reset front"}
 // 🔑 3. RESET FRONT — Efface les défauts si la cause a disparu
 ResetEdge(CLK := Reset);
+ResetTransientEdge(CLK := ResetTransient);
+IF ResetTransientEdge.Q THEN
+    // Auto-reset : seuls les bits communication connus sont effaces.
+    IF (CANbusOnlineEff AND DeviceJoystickOnlineEff) THEN
+        DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFC;
+    END_IF;
+END_IF;
 IF ResetEdge.Q THEN
+    // Reset operateur complet du diagnostic joystick.
     IF (CANbusOnlineEff AND DeviceJoystickOnlineEff) THEN
         DeviceJoystick.ErrorId := 16#0000;
         DeviceJoystick.StateAtError := E_Diag_State.DISABLED;
