@@ -52572,6 +52572,14 @@ les structs WinchRequest / Sensors / Config sont remplies champ par champ ici.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Egalite effective des demandes physiques M1/M2 du scan</xhtml>
               </documentation>
             </variable>
+            <variable name="HandoffBridgeAscentActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pont AX10-&gt;AX11 borne : M2 continue pendant la purge directionnelle M1</xhtml>
+              </documentation>
+            </variable>
             <variable name="WinchBothFinalStep45Coherent">
               <type>
                 <BOOL />
@@ -54753,11 +54761,38 @@ WinchBothFinalRequestsCoherent :=
         AND (WinchM1FinalInterlockRequest.RequestedContactor4 = WinchM2FinalInterlockRequest.RequestedContactor4)
         AND (WinchM1FinalInterlockRequest.RequestedStep = WinchM2FinalInterlockRequest.RequestedStep));
 
+// Pont de transfert AX10 -&gt; AX11 : pendant que M1 purge son interlock de
+// demarrage, M2 peut continuer a P1 sans que la defense Both ne coupe les deux
+// axes. La derogation est strictement bornee a AX11, M1 en DirectionChangePending,
+// M1 finalement neutre et M2 deja pret en montee P1. Les permis, SafeStop,
+// PowerCutOff, frein et contacteurs restent controles par la barriere finale.
+HandoffBridgeAscentActive :=
+    (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
+    AND (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX11_CTRL_ASCENT)
+    AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqAscent
+    AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.ReqAscent
+    AND instWinchM1.DirectionChangePending
+    AND NOT instWinchM2.DirectionChangePending
+    AND NOT WinchM1FinalInterlockRequest.RequestedRelayFwd
+    AND NOT WinchM1FinalInterlockRequest.RequestedRelayRev
+    AND (WinchM1FinalInterlockRequest.RequestedStep = 0)
+    AND WinchM2FinalInterlockRequest.RequestedRelayFwd
+    AND NOT WinchM2FinalInterlockRequest.RequestedRelayRev
+    AND (WinchM2FinalInterlockRequest.RequestedStep = 1)
+    AND WinchM2FinalInterlockRequest.AscentPermit
+    AND NOT WinchM2FinalInterlockRequest.SafeStop
+    AND NOT WinchM2FinalInterlockRequest.PowerCutOff
+    AND WinchM2FinalInterlockRequest.Enable
+    AND WinchM2FinalInterlockRequest.PowerContactorEngaged
+    AND NOT instSafetyWinchM1.Fault.Latched
+    AND NOT instSafetyWinchM2.Fault.Latched;
+
 // Defense en profondeur apres les deux FB : en intention couplee, aucun actionneur ne
 // peut etre publie seul. Les FB continuent d'evaluer leurs interlocks internes, mais les
 // deux demandes physiques restent neutres jusqu'a readiness commune.
 IF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
    AND WinchBothMotionActive
+   AND NOT HandoffBridgeAscentActive
    AND (NOT WinchBothMotionReady OR NOT WinchBothFinalRequestsCoherent) THEN
     WinchM1FinalInterlockRequest.RequestedRelayFwd := FALSE;
     WinchM1FinalInterlockRequest.RequestedRelayRev := FALSE;

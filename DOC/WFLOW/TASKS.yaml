@@ -1,4 +1,24 @@
 tasks:
+- id: T324
+  parent_id: T262
+  statut: ⬜
+  criticite: C2
+  domaine: CYCLE_AUTO_BENNE
+  agent: '—'
+  date: '2026-09-19T00:00:00+02:00'
+  updated_at: '2026-09-19T00:00:00+02:00'
+  titre: Regulariser et renumeroter les steps speciaux hors GEL (AX3_WAIT_DIVE_START, AX10B_RACCORDEMENT_P1)
+  contexte: 'Analyse trace Suivi_62_SIMU_AX10_AX11 (troubleshooting 2026-09-19) : AX10B_RACCORDEMENT_P1 (implemente par T262, valeur enum 22) et AX3_WAIT_DIVE_START (valeur enum 21) sont deux etapes speciales inserees en fin d''enum E_AutoCycleStep, absentes du GEL fige GEL_GRAFCET_SEMIAUTO_20260903.md, et contredisant chacune un principe de continuite sans temps mort du GEL (C1e pour AX10B). A la difference de AX_STAB/AX_DIVING_RETRY (steps speciaux actes et documentes dans le GEL), ces deux ajouts n''ont jamais ete formalises ni renumerotes a leur place logique.'
+  description: 'Une fois T262 valide (essai CODESYS manuel en cours), renumeroter proprement AX3_WAIT_DIVE_START et AX10B_RACCORDEMENT_P1 a leur place logique dans E_AutoCycleStep (decalage des steps suivants), mettre a jour le GEL_GRAFCET_SEMIAUTO_20260903.md pour les documenter officiellement, et corriger la table CfgForceStepTarget (mapping INT brut, FB_CycleSemiAuto.st) qui devra etre entierement reecrite a la main. Analyse pure a ce stade, aucun code modifie.'
+  objectifs:
+  - 'GEL_GRAFCET_SEMIAUTO_20260903.md documente AX3_WAIT_DIVE_START et AX10B_RACCORDEMENT_P1 (contenu, transitions, position dans la sequence).'
+  - 'E_AutoCycleStep renumerote sans trou ni step hors sequence logique, renommage symbolique complet (aucune reference litterale cassee).'
+  - 'Table CfgForceStepTarget (FB_CycleSemiAuto.st) recalee sur la nouvelle numerotation, verifiee contre tout ecran IHM referencant un entier en dur.'
+  - 'Ripple complet applique : PRG_02/04/05/07, ST_ChainCycleSemiAuto, ST_SequencePublicState, ST_CycleCfg/State/Cmd, ST_WinchInterPrg, ST_OutputsInterPrg, ST_ProgramBucketRequest, ST_fbWinchCmdArbitration_Context, FB_Hmi_BannerFormatter, FB_TroubleshootingView, FB_Bucket, gates G408/G494/G495/G500, test_fb_cyclesemiauto.st.'
+  - 'Bundle PLCopenXML regenere, G200 liaison PASS, gates palier C PASS.'
+  contrat: ''
+  bloque_par:
+  - T262
 - id: T323
   parent_id: ''
   statut: ⏳
@@ -2674,9 +2694,9 @@ tasks:
   domaine: CYCLE_AUTO_BENNE
   agent: CDX01
   date: '2026-09-19T00:00:00+02:00'
-  updated_at: '2026-09-19T20:50:00+02:00'
-  implementation_note: 'AX10B_RACCORDEMENT_P1 implemente le 2026-09-19 : M2 maintenu P1, attente M1 bornee 2 s, transfert Both P1/P1, puis AX11 P1..P2. Tests C++ T262-002/T262-003 PASS ; en attente essai CODESYS manuel.'
-  validation_note: 'Micro-phase validée en simulation par l utilisateur : fermeture AUTO proportionnelle plafonnée au palier AX11 effectif P1..P2 ; jog manuel/maintenance inchangé. Le transfert anticipé AX10→AX11 et la validation machine restent ouverts.'
+  updated_at: '2026-09-19T23:36:00+02:00'
+  implementation_note: 'AX10B_RACCORDEMENT_P1 implemente le 2026-09-19 : M2 maintenu P1, attente M1 bornee 2 s, transfert Both P1/P1, puis AX11 P1..P2. Phase corrective 2026-09-19 : pont strictement borne AX11 dans PRG_04, M2 P1 maintenu pendant DirectionChangePending M1 ; aucun bypass FB_WinchOutputInterlock. Tests C++ T262-002/T262-003 PASS, PRG_04 2/2 PASS ; en attente essai CODESYS manuel.'
+  validation_note: 'Micro-phase validée en simulation par l utilisateur : fermeture AUTO proportionnelle plafonnée au palier AX11 effectif P1..P2 ; jog manuel/maintenance inchangé. La trace 62 a révélé un trou ~0,8 s à la barrière Both ; correction phasée appliquée, validation CODESYS et machine encore ouvertes.'
   avancement: 'Micro-phase AX10 plafond demarree le 2026-09-19 apres validation humaine : fermeture AUTO proportionnelle mais
     plafonnee au palier AX11 effectif P1..P2, sans brider le jog maintenance. Phase A codee : GVL/IHM persistant ExtractionStartOpening_Pct [0..50], defaut 0, sans lecture cycle. Interface
     IHM figee ; verification pre-CODESYS en cours. B conserve AX10b, C raccordement P1, D AX11 P2 puis AX12. ALERTE 2026-09-17

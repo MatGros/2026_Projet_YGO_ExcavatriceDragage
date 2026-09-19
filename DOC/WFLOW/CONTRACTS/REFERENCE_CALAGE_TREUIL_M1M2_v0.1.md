@@ -1,6 +1,9 @@
 # REFERENCE_CALAGE_TREUIL_M1M2_v0.1 — Bloc de calage du modèle électrique treuils
 
-**Statut** : 🟡 **PROPOSITION — RÉVISION 2** · valeurs `ESTIMÉE` (sauf la section « MESURÉ »).
+**Statut** : 🟡 **PROPOSITION — RÉVISION 3** · valeurs `ESTIMÉE` sauf §0 (plaque **MESURÉE**).
+> 🚩 **RÉVISION 3 (2026-09-20)** — **PLAQUE SIGNALÉTIQUE RÉELLE OBTENUE** (132 kW · 1475 tr/min · In 242 A · E2 280 V · I2n 295 A · S3-40 %) ⇒ **lire §0 EN PREMIER**.
+> **Conséquences** : ① la **charge réelle** est **7 t de tare + jusqu'à 9 t de matière ≈ 16 t** (l'arbitrage « 10 t » du §1 est **caduc**) ② `Cnom = 854,6 Nm` et `Cmax ≈ 2051-2222 Nm` (le sim à 3800 est faux de **78 %**) ③ `R2 = 9,1 mΩ` ⇒ le coffret inventé est **absurde** et il est désormais **borné sans l'ouvrir** ④ `i ≈ 31-34` confirmé par un argument de conception ⇒ **la voie POSITION est la référence**.
+> ⚠️ **Sections à recalculer** (valeurs dérivées des anciennes hypothèses 111 kW / 10 t / i=48 ou 37) : **§2** (termes de charge), **§8.1/8.2/8.3** (masses et fenêtres de décrochage, bâties sur le **coffret inventé**). Le recalcul est **le périmètre de T321**.
 **Révision 2 (2026-09-20)** — corrections issues d'un **challenge par 3 agents indépendants** :
 ① la borne de masse est **PAR CÂBLE** (la charge est partagée entre les 2 câbles) ② le mapping couple était **construit sur `i = 48`** alors que la mesure donne **`i ≈ 34-39`** ⇒ **à recalculer** ③ la **voie de vitesse CoE est fausse** — **démontré par le code** (§6) ④ intégrer la chute **400→360 V** (couple **×0,81**) et le **service S3**.
 **Date** : 2026-09-20 · **Périmètre** : `FB_Sim_WinchMotor` / `FB_Sim_WinchElectrical` / `FB_Sim_Encoder` (T317, T318)
@@ -9,7 +12,67 @@
 
 ---
 
-## 1. Arbitrage verrouillé : « 10 t » = masse TOTALE suspendue (SWL)
+## 0. 📋 PLAQUE SIGNALÉTIQUE RÉELLE — **MESURÉE** (transmise le 2026-09-20)
+
+| Grandeur | Valeur plaque | Impact |
+|---|---|---|
+| **Puissance nominale** | **132 kW** | *(et non 111 kW estimés)* |
+| **Vitesse nominale** | **1475 tr/min** | ω = 154,46 rad/s |
+| **cosφ / rendement** | **0,86 / 93,5 %** | recalcul de contrôle : √3×400×242×0,86×0,935 = **134,8 kW** ⇒ **cohérent à 2,1 %** ✅ |
+| **Service** | **S3 - 40 %** | confirme le levage par cycles (duty mesurée ≈ 20-30 %) |
+| **Stator** | 400 V Δ · **In = 242 A** | *(et non ~200 A estimés)* |
+| **Rotor (bagues)** | **E2 = 280 V** · **I2n = 295 A** | **base physique du coffret** |
+| Masse | 1150 kg | cohérent avec J ≈ 4-7 kg·m² (roulements 6319 C3) |
+
+**Valeurs dérivées — vérifiées :**
+- **`Cnom = 854,6 Nm`** (132 000 / 154,46)
+- **`R2 ≈ 9,1 mΩ`** par phase rotor : `sn·E2 / (√3·I2n)` avec `sn = 1,67 %` ✅ *formule valide car `sX2 ≪ R2` à faible glissement (+2 % d'erreur)*
+- **`Cmax ≈ 2051-2222 Nm`** pour `Cmax/Cnom = 2,4-2,6` — ⚠️ **ratio typique, PAS mesuré** ⇒ **le sim à 3800 Nm est faux de ~78 %**
+
+### 🔴 Conséquence 1 — le coffret rotorique INVENTÉ est absurde, et il est maintenant **BORNÉ**
+
+| Modèle | R2 par phase | R_total (P1) | **I2 au démarrage** | Verdict |
+|---|---|---|---|---|
+| **Sim actuel** | 0,08 Ω | 3,6 Ω | **45 A** *(vs 295 A nominal)* | ❌ **absurde** — le moteur ne produirait presque pas de couple |
+| **Réel (dérivé)** | **9,1 mΩ** | **0,23-0,32 Ω** | **~500-700 A** (170-240 % de I2n) | ✅ cohérent avec un démarrage rhéostatique |
+
+⇒ `RotorResistanceOwn_Ohm` du code est **8,8× trop grand**, et l'array `[3,6 ; 1,9 ; 0,9 ; 0,35 ; 0] Ω` est **hors d'échelle d'un facteur ~10-100**.
+🎯 **Contrainte physique NOUVELLE** : en imposant `I2_démarrage ≈ 2-2,5 × I2n` (pratique des démarreurs rotoriques) ⇒ **`gmax(P1) ≈ 2,5-3,5`** ⇒ **`R_total(P1) ≈ 0,23-0,32 Ω`** ⇒ **`Rext(P1) ≈ 0,22-0,31 Ω`**. **Le coffret est donc borné SANS l'ouvrir** (à confirmer par relevé ohmique).
+
+### 🔴 Conséquence 2 — la CHARGE réelle **remplace** l'arbitrage « 10 t » du §1
+
+| Élément | Valeur | Statut |
+|---|---|---|
+| **Benne à VIDE (tare)** | **7 t** | ✅ **MESURÉE** — fin des 3 estimations divergentes (1-3 / 3,5 / 4,5-5 t) |
+| Capacité | **~4 m³** | DOCUMENTÉE |
+| Matière (2,25 t/m³) | ~9 t | ESTIMÉE (densité en place) |
+| **TOTAL benne pleine** | **≈ 16 t** *(en air)* | ESTIMÉE mais **ancrée sur la tare mesurée** |
+
+⇒ **§1 ci-dessous (« 10 t = masse totale suspendue ») est CADUC** : il reposait sur une estimation utilisateur (« godet chargé ~10 t »). **Valeur réelle : 7 t de tare + jusqu'à ~9 t de matière.**
+
+### 🎯 Conséquence 3 — la plaque **CONFIRME `i ≈ 31-34`**, donc la voie **POSITION**
+
+Argument de conception canonique en levage : **une benne pleine à la vitesse maximale ≈ le point nominal du moteur**.
+```text
+i = (m_totale/2) × g × r / (Cnom × η)     m_totale = 16 t, Cnom = 854,6 Nm
+   η = 0,85 → i = 34,4            η = 0,95 → i = 30,8
+   ⇒ i ≈ 31-34, à confronter à la borne dure i ≤ 33,6 (vitesse ascensionnelle)
+```
+Et le couple/puissance correspondants : **16 t à i = 32,5 ⇒ 904 Nm/câble = 106 % de Cnom = 140 kW = 106 % de 132 kW** ⇒ la machine travaille **à sa limite S3** avec une benne pleine à vitesse max ⇒ **explique le plateau observé** et **confirme `i ≈ 32-34`**.
+⇒ La vitesse max vraie qui en découle (**≈ 1,40-1,49 m/s**) correspond à la **voie POSITION (1,486 m/s)** et **pas** à la voie CoE (1,287 m/s) ⇒ **la voie CoE est bien la fautive** (sous-lecture 12,7 %) ⇒ 🚨 **la marge de survitesse reste érodée** (§6).
+
+### 🟠 Conséquence 4 — bornes de masse recalculées (132 kW, pas 110)
+
+`m ≤ P·η/(g·v)` **par câble** : à 1,486 m/s et **132 kW** ⇒ **≤ 7,7 t/câble** ⇒ **≤ 15,4 t au total** ⇒ **une benne de 16 t à ~1,43 m/s est cohérente** ✅ *(l'ancienne borne « 7,4 t » utilisait 110 kW : elle sous-estimait la machine).*
+
+⚠️ **À REFAIRE** : toutes les **fenêtres de décrochage par palier** (§8.2 / §8.3) ont été calculées avec le **coffret inventé** ⇒ à recalculer dès que les gradins réels seront connus. Et « le palier 5 ne tient pas 5 t/câble » vaut pour un **démarrage à l'arrêt** (couple à `s=1`) — **pas** pour un maintien en mouvement (le couple **max** du palier reste 2051-2222 Nm).
+
+---
+
+## 1. ⚠️ Arbitrage « 10 t » — **CADUC depuis la plaque signalétique** (voir §0)
+
+> Conservé pour traçabilité. **La valeur réelle est : tare 7 t + jusqu'à 9 t de matière.**
+
 
 | Élément | Valeur | Statut |
 |---|---|---|
@@ -96,8 +159,8 @@ P_par_moteur = 9 000 × 9,81 × 1,0 / 0,85 ≈ 104 kW   (≈ 115 kW à 10 t/câb
 | Constante **du code** (nom exact) | Fichier | Défaut actuel | **Valeur recalée** | Statut | **Ce qui la mesurera** |
 |---|---|---|---|---|---|
 | `MaxTorque_Nm` (Cmax) | `FB_Sim_WinchMotor` | 3800 (**SYNTHÉTIQUE**) | **1750-1800 Nm** | ESTIMÉE | Plaque (Cmax/Cnom ≈ 2,4-2,6) ou essai de calage / traction |
-| `LoadNominalTorque_Nm` (terme **matière**) | `FB_Sim_WinchElectrical` | 2500 (**SYNTHÉTIQUE**) | **≈ 400 Nm/câble** (≈ 4 t de matière/câble à i=37, η=0,85) | ESTIMÉE | Courant stator stable en montée pleine charge |
-| `LoadFrictionTorque_Nm` → devient **terme tare** | idem | 80 (**SYNTHÉTIQUE**) | **≈ 100 Nm/câble** (tare ≈ 2 t) | ESTIMÉE | Courant stator stable en montée benne vide |
+| `LoadNominalTorque_Nm` (terme **matière**) | `FB_Sim_WinchElectrical` | 2500 (**SYNTHÉTIQUE**) | **≈ 509 Nm/câble** (4,5 t de matière/câble à i=32,5, η=0,85) | ESTIMÉE (matière) / **MESURÉE** (tare 7 t) | Courant stator stable en montée pleine charge |
+| `LoadFrictionTorque_Nm` → devient **terme tare** | idem | 80 (**SYNTHÉTIQUE**) | **≈ 396 Nm/câble** (tare **7 t** ⇒ 3,5 t/câble) | **MESURÉE** (tare plaque benne) | Courant stator stable en montée benne vide |
 | `Inertia_KgM2` | `FB_Sim_WinchMotor` | 45 (**SYNTHÉTIQUE**) | **3,5-4,5 kg·m²** | ESTIMÉE | Fiche moteur carcasse 315 (J rotor 2,2-3,2 + frein 0,5-0,8 + charge 0,44) |
 | `SlipAtMaxTorqueBase_Ratio` (gmax base) | idem | 0,08 | **0,08-0,10** — ✅ *plage confirmée plausible* | ESTIMÉE | Calcul `R2/X2` ou mesure du glissement au couple max |
 | `CST_RotorExtResistanceStep_Ohm` | idem | [3,6 ; 1,9 ; 0,9 ; 0,35 ; 0] (**SYNTHÉTIQUE**) | **gradins réels du coffret** | INCONNUE | Relevé ohmique aux bornes du coffret (nb réel de gradins inconnu) |
