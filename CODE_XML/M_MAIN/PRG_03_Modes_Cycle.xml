@@ -4166,7 +4166,7 @@ IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
     SpeedMismatchConfirmed := FALSE;
     OperatorActionId := 0;
     IF EncoderFaultPresent THEN
-        OperatorAction := 'Cycle non autorise : defaut codeur present. Reinitialiser le defaut codeur.';
+        OperatorAction := 'Cycle non autorise : defaut codeur a acquitter.';
     ELSE
         OperatorAction := 'Passer en mode Semi-Auto et engager la securite pour activer le cycle.';
     END_IF;
@@ -4221,7 +4221,7 @@ IF WaitingResume AND NOT StateExecutionInhibit THEN
         WaitingForOperator := TRUE;
         WaitingForProcess := FALSE;
         OperatorActionId := 16#0400;
-        OperatorAction := 'Reprendre le cycle (StartCycle ou armer Homme-Mort) ou Abandonner (Exit/Abort).';
+        OperatorAction := 'Reprendre (Start) ou Abandonner (Abort).';
         RequestActive := FALSE;
     END_IF;
 END_IF;
@@ -4275,7 +4275,7 @@ CASE State OF
         WaitingForOperator := TRUE;
         WaitingForProcess := FALSE;
         OperatorActionId := 16#0400;
-        OperatorAction := 'AX0 - Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
+        OperatorAction := 'AX0 - Demarrer le cycle (bouton IHM ou homme-mort).';
         SampleCountDone := FALSE;   // F2: réarmement du front de comptage à chaque entrée en X0
         BottomTouched   := FALSE;   // info fond touche effacee au repos
         BottomStopByKobold := FALSE;
@@ -4331,7 +4331,7 @@ CASE State OF
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'AX1 - Amener treuil M1 au FDC logiciel haut et qualifier benne (ouverte/fermee).';
+            OperatorAction := 'AX1 - Amener M1 au FDC haut et qualifier la benne.';
         ELSE
             CycleStateStr := 'AX1 - Conditions initiales non remplies';
             ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -4362,7 +4362,7 @@ CASE State OF
             WaitingForOperator := JoystickDeflected;
             WaitingForProcess := NOT JoystickDeflected;
             OperatorActionId := 16#0402;
-            OperatorAction := 'AX2 - P1 atteint : relacher le joystick au neutre avant ouverture benne.';
+            OperatorAction := 'AX2 - P1 atteint : relacher le joystick avant ouverture.';
             TranslationCmd.ReqStart := FALSE;
             TranslationCmd.PositionTgt := 3;
             IF TranslationStopTimer.Q AND NOT JoystickDeflected THEN
@@ -4375,7 +4375,7 @@ CASE State OF
             WaitingForOperator := NOT JoystickDeflected;
             WaitingForProcess := JoystickDeflected;
             OperatorActionId := 16#0402;
-            OperatorAction := 'AX2 - Pousser le joystick a gauche ou a droite : arret automatique sur P1.';
+            OperatorAction := 'AX2 - Pousser gauche/droite : arret automatique sur P1.';
             TranslationCmd.PositionTgt := 3;
             TranslationCmd.ReqStart := TranslationTremiePermit OR TranslationP1Permit;
         END_IF;
@@ -4390,7 +4390,7 @@ CASE State OF
         WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
         WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#0403;
-        OperatorAction := 'AX3 - Pousser le joystick pour ouvrir la benne (tirer pour refermer si besoin).';
+        OperatorAction := 'AX3 - Pousser pour ouvrir la benne (tirer pour refermer).';
 
         // X3 = etape benne seule : treuils explicitement neutralises (config treuil unique par etape).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -4422,7 +4422,7 @@ CASE State OF
         WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
         WaitingForProcess := NOT DiveStartStopTimer.Q;
         OperatorActionId := 16#0403;
-        OperatorAction := 'AX3 - Maintenir le joystick pousse : attente arret M1/M2 avant plongee.';
+        OperatorAction := 'AX3 - Maintenir : attente arret M1/M2 avant plongee.';
 
         // Separation mecanique stricte : aucune demande pendant la retombee M2.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -4441,7 +4441,7 @@ CASE State OF
 
     E_AutoCycleStep.AX4_DESCEND_DIVING:
         CycleStep := E_AutoCycleStep.AX4_DESCEND_DIVING;
-        CycleStateStr := 'AX4 - Plongee couplee palier 4 jusqu a l altimetrie de lancement';
+        CycleStateStr := 'AX4 - Plongee couplee palier 4 jusqu a l altimetrie';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -4508,7 +4508,7 @@ CASE State OF
         WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
         WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#0406;
-        OperatorAction := 'AX6 - Maintenir la descente palier 4 : stabilisation signal Kobold (500ms).';
+        OperatorAction := 'AX6 - Maintenir : stabilisation signal Kobold (500ms).';
 
         WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
@@ -4626,7 +4626,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0481;
-        OperatorAction := 'AX_DIVING_RETRY - Reprise plongee : monter jusqu au FDC haut, puis relancer.';
+        OperatorAction := 'AX retry - Remonter au FDC haut puis relancer la plongee.';
 
         // Remontee assistee palier lent, Kobold coupe.
         WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
@@ -4734,7 +4734,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := 'AX11 - Maintenir la montee : surveiller visuellement M1/M2 (securites actives).';
+        OperatorAction := 'AX11 - Maintenir la montee : surveiller M1/M2.';
 
         // Palier max reglable IHM, borne [1..2] (defaut 1 / P1 ; P2 possible au besoin).
         WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
@@ -4795,7 +4795,7 @@ CASE State OF
         WaitingForOperator := FALSE;
         WaitingForProcess := TRUE;
         OperatorActionId := 16#0409;
-        OperatorAction := 'AX13 - Egouttage : attendre la tempo ou appuyer sur "passer egouttage".';
+        OperatorAction := 'AX13 - Attendre la tempo ou appuyer sur "passer egouttage".';
         WinchM1Cmd.RunRequest := FALSE;
         WinchM2Cmd.RunRequest := FALSE;
 
@@ -4829,7 +4829,7 @@ CASE State OF
             TranslationCmd.PositionTgt := 0;
             WaitingForOperator := JoystickDeflected;
             WaitingForProcess := NOT JoystickDeflected;
-            OperatorAction := 'AX14 - Tremie atteinte : relacher le joystick au neutre avant ouverture benne.';
+            OperatorAction := 'AX14 - Tremie : relacher le joystick avant ouverture.';
             IF TranslationStopTimer.Q AND NOT JoystickDeflected THEN
                 State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
             END_IF;
@@ -4845,7 +4845,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := 'AX15a - A la tremie : deflechir vers le bas pour ouvrir la benne et vider.';
+        OperatorAction := 'AX15a - Deflechir vers le bas pour ouvrir et vider.';
 
         // Config treuil UNIQUE : arret des deux treuils (aucune descente couplee ici).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -4860,7 +4860,7 @@ CASE State OF
 
     E_AutoCycleStep.AX15B_DUMP_OPEN:
         CycleStep := E_AutoCycleStep.AX15B_DUMP_OPEN;
-        CycleStateStr := 'AX15b - Vidage : ouverture benne pour vider le contenu, treuils arretes';
+        CycleStateStr := 'AX15b - Vidage : ouverture benne, treuils arretes';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -4868,7 +4868,7 @@ CASE State OF
         WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
         WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#040B;
-        OperatorAction := 'AX15b - Maintenir : ouverture complete de la benne, vidage a la tremie.';
+        OperatorAction := 'AX15b - Maintenir : ouverture complete, vidage a la tremie.';
 
         // Config treuil UNIQUE : etape benne seule, les deux treuils neutralises
         // (plus de descente couplee M1+M2 simultanee a l'ouverture benne -&gt; plus
@@ -4936,7 +4936,7 @@ CASE State OF
         WaitingForOperator := NOT (DeadmanArmed AND JoystickRight);
         WaitingForProcess := DeadmanArmed AND JoystickRight;
         OperatorActionId := 16#040D;
-        OperatorAction := 'AX18 - Cycle termine. Aller en P1 (joystick vers la droite) pour recommencer.';
+        OperatorAction := 'AX18 - Cycle termine. Aller en P1 (joystick a droite).';
 
         // Compteur de prélèvements (RETAIN) + durée du cycle — F2: cadré par front (1 seul par cycle)
         IF NOT SampleCountDone THEN
@@ -4957,7 +4957,7 @@ CASE State OF
 
     E_AutoCycleStep.AX_STAB:
         CycleStep := E_AutoCycleStep.AX_STAB;
-        CycleStateStr := 'AX_STAB - Defaut cycle : etape origine memorisee, choisir reprise ou abandon';
+        CycleStateStr := 'STABILISATION - defaut cycle';
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE;
         TranslationCmd.ReqStart := FALSE;
@@ -4972,7 +4972,7 @@ CASE State OF
         WaitingForProcess := FALSE;
         OperatorActionId := 16#0480;
         IF ResumeAfterFaultAvailable THEN
-            OperatorAction := 'AX_STAB - Cause disparue et arret confirme : appuyer Reprendre defaut ou Abandonner.';
+            OperatorAction := 'AX_STAB : cause disparue - Reprendre ou Abandonner.';
         ELSIF Translation_PosMaintenance AND NOT Translation_PosP1 THEN
             // Reprise boot : Maintenance active + P1 retombe = chariot déjà au-delà
             // de P1. Ne jamais proposer de continuer à droite vers Maintenance.
@@ -4986,7 +4986,7 @@ CASE State OF
             TranslationCmd.PositionTgt := 1;      // sens retour vers Trémie
             TranslationCmd.ReqStart := TranslationTremiePermit;
         ELSE
-            OperatorAction := 'AX_STAB - Sorties neutres : supprimer la cause, mettre le joystick au neutre, puis choisir Reprendre ou Abandonner.';
+            OperatorAction := 'AX_STAB : lever la cause puis Reprendre/Abandonner.';
         END_IF;
 
 END_CASE;

@@ -96,6 +96,12 @@ VAR
     OperatorActionCandidate   : STRING(120);   // . [LOC] Texte action opérateur
     StepAtErrorStr            : STRING(40);   // . [LOC] Libellé de l'étape d'origine du défaut
     CycleFaultCauseStr        : STRING(120);  // . [LOC] Cause cycle décodée pour acquittement terrain
+    WinchRootCauseStr         : STRING(32);   // . [LOC] Cause racine winch affichée en repli AX_STAB
+    WinchRootTagStr           : STRING(4);    // . [LOC] Étiquette treuil concerné (M1/M2) de la cause racine
+    WinchRootCauseLbl         : STRING(20);   // . [LOC] Libellé court de la cause racine winch
+    WinchRootMaskId           : WORD;         // . [LOC] Masque latché du treuil retenu (M1 prioritaire, sinon M2)
+    CycleFaultActive          : BOOL;         // . [LOC] Repli AX_STAB sur défaut cycle (cause latchee presente)
+    CycleFaultMsgStr          : STRING(120);  // . [LOC] Message [CYCLE] de repli : cause cycle + cause racine
     AntiFlickSpecial     : FB_AntiFlickerText; // * [INST] §3 Condition spéciale (warning → maintenu)
     AntiFlickOperator    : FB_AntiFlickerText; // * [INST] §4 Action opérateur (critique → direct, warning → maintenu)
     LastAbortEdge        : F_TRIG; // . [LOC] Front descendant ArmingSeqStep (abandon de sequence AU)
@@ -237,6 +243,46 @@ END_IF;
 Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
 {endregion}
 
+{region "§1bis Repli defaut (etape origine)"}
+// ═══════════════════════════════════════════════════════════════
+// 🧊 REPLI DÉFAUT (AX_STAB) — étape d'ORIGINE du défaut.
+// Calculé AVANT §2 et §4 car deux champs du bandeau l'utilisent :
+//   - §2 Progression : « Cycle: STABILISATION (defaut a AX7) » — en repli on n'est PLUS
+//     a AX7 : le champ doit situer l'origine SANS laisser croire qu'on y est encore ;
+//   - §4 Action opérateur : « [CYCLE]AX7:cause(cause racine)>Repr/Abandon ».
+// ═══════════════════════════════════════════════════════════════
+CycleFaultActive := (CycleStep = E_AutoCycleStep.AX_STAB) AND (CycleErrorId <> 0);
+StepAtErrorStr   := '';
+IF CycleFaultActive THEN
+    CASE CycleStepAtError OF
+        E_AutoCycleStep.AX0_REPOS: StepAtErrorStr := 'X0';
+        E_AutoCycleStep.AX1_INIT: StepAtErrorStr := 'X1';
+        E_AutoCycleStep.AX2_TRANSLATE_P1: StepAtErrorStr := 'X2';
+        E_AutoCycleStep.AX3_OPEN_BUCKET: StepAtErrorStr := 'X3';
+        E_AutoCycleStep.AX4_DESCEND_DIVING: StepAtErrorStr := 'AX4';
+        E_AutoCycleStep.AX5_KOBOLD_INIT: StepAtErrorStr := 'AX5';
+        E_AutoCycleStep.AX6_SEARCH_IMMERSION: StepAtErrorStr := 'AX6';
+        E_AutoCycleStep.AX7_SEARCH_BOTTOM: StepAtErrorStr := 'AX7';
+        E_AutoCycleStep.AX8_BOTTOM_CONFIRMED: StepAtErrorStr := 'AX8';
+        E_AutoCycleStep.AX_DIVING_RETRY: StepAtErrorStr := 'RETRY';
+        E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9';
+        E_AutoCycleStep.AX10_CLOSE_BUCKET: StepAtErrorStr := 'AX10';
+        E_AutoCycleStep.AX10_WAIT_ASCENT_START: StepAtErrorStr := 'AX10b';
+        E_AutoCycleStep.AX11_CTRL_ASCENT: StepAtErrorStr := 'AX11';
+        E_AutoCycleStep.AX12_LOADED_ASCENT: StepAtErrorStr := 'AX12';
+        E_AutoCycleStep.AX13_DRAIN_PAUSE: StepAtErrorStr := 'AX13';
+        E_AutoCycleStep.AX14_TRANSLATE_DUMP: StepAtErrorStr := 'AX14';
+        E_AutoCycleStep.AX15A_DUMP_ARRIVE: StepAtErrorStr := 'AX15a';
+        E_AutoCycleStep.AX15B_DUMP_OPEN: StepAtErrorStr := 'AX15b';
+        E_AutoCycleStep.AX15C_DUMP_REPOSITION: StepAtErrorStr := 'AX15c';
+        E_AutoCycleStep.AX18_DONE_SYNC: StepAtErrorStr := 'AX18';
+        E_AutoCycleStep.AX_STAB: StepAtErrorStr := 'STAB';
+        ELSE
+            StepAtErrorStr := '?';
+    END_CASE;
+END_IF;
+{endregion}
+
 {region "§2 Progression"}
 // ═══════════════════════════════════════════════════════════════
 // 2. PROGRESSION — le numéro et l'étape restent exclusivement ici
@@ -247,8 +293,13 @@ Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
 IF (MachineHomingStep > 0) AND (MachineHomingStep <> 60) THEN
     Banner.SequenceProgressText := CONCAT('Homing: ', MachineHomingInstruction);
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
-    // Détail de l'étape (FB_CycleSemiAuto.CycleStateStr) prioritaire ; label court en fallback.
-    IF CycleStateStr <> '' THEN
+    // Repli defaut : on n'est PLUS a l'etape d'origine — on est en STABILISATION. Le champ
+    // situe l'origine du defaut sans laisser croire qu'on y est encore.
+    IF CycleFaultActive THEN
+        Banner.SequenceProgressText := CONCAT('Cycle: STABILISATION (defaut a ',
+                                     CONCAT(StepAtErrorStr, ')'));
+    // Sinon : détail de l'étape (FB_CycleSemiAuto.CycleStateStr) prioritaire ; label court en fallback.
+    ELSIF CycleStateStr <> '' THEN
         Banner.SequenceProgressText := CONCAT('Cycle: ', CycleStateStr);
     ELSE
         CASE CycleStep OF
@@ -412,11 +463,11 @@ IF AbortMsgActive THEN
     IF LastAbortCause = INT_TO_WORD(CST_ABORT_CUT_IHM) THEN
         AbortMsgText := '[AU] Coupure volontaire IHM - relacher le bouton puis rearmer';
     ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_CHAIN_DROP) THEN
-        AbortMsgText := '[AU] Chute boucle urgence pendant test - relacher coup-de-poing puis rearmer';
+        AbortMsgText := '[AU] Boucle urgence ouverte (test) - relacher puis rearmer';
     ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A) THEN
-        AbortMsgText := '[AU] Chaine non remontee apres test A (200ms) - verifier boucle puis rearmer';
+        AbortMsgText := '[AU] Chaine non remontee apres test A - verifier puis rearmer';
     ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B) THEN
-        AbortMsgText := '[AU] Chaine non remontee apres test B (200ms) - verifier boucle puis rearmer';
+        AbortMsgText := '[AU] Chaine non remontee apres test B - verifier puis rearmer';
     ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_POWER_CUTOFF) THEN
         // 🩹 Décodage de la cause CST_ABORT_POWER_CUTOFF (PowerCutOff métier) en cause explicite
         // M1/M2/M3 + bit MecaA/MecaB/thermique, à partir des DUT Safety déjà en entrée.
@@ -457,6 +508,100 @@ IF AbortMsgActive THEN
     END_IF;
 END_IF;
 
+// ═══════════════════════════════════════════════════════════════
+// 🧊 MESSAGE DE REPLI AX_STAB — CAUSE RACINE (étape + cause cycle + cause winch)
+// Construit AVANT la chaîne de priorités qui suit : toutes les causes winch décodables
+// (MecaA/B/C/D/E, codeur, com opérateur, sens opposé, absence mouvement) SONT des causes
+// SafeStop/PowerCutOff (FB_Safety_Winch §Agrégats) et restent vraies tant que le latch est
+// posé. Sans cette priorité, le bandeau n'afficherait que « Acquitter SafeStop » ou
+// « Coupure puissance » — conséquences, jamais la cause.
+// ═══════════════════════════════════════════════════════════════
+// CycleFaultActive et StepAtErrorStr sont calcules en §1bis (avant §2 et §4).
+CycleFaultMsgStr := '';
+IF CycleFaultActive THEN
+    // Décodage priorisé de la cause cycle : l'opérateur voit la grandeur fautive, pas un masque.
+    // Bits cycle : 0 limite, 1 synchro, 2 vitesse, 3 IHM, 4 tempo,
+    // 5 stabilisation, 6 position, 7 FDC haut, 8/9 paliers, 10 arrêt.
+    IF (CycleErrorId AND 16#0001) <> 0 THEN
+        CycleFaultCauseStr := 'limite profondeur';
+    ELSIF (CycleErrorId AND 16#0002) <> 0 THEN
+        CycleFaultCauseStr := 'synchro M1/M2';
+    ELSIF (CycleErrorId AND 16#0004) <> 0 THEN
+        CycleFaultCauseStr := 'ecart vitesse M1/M2';
+    ELSIF (CycleErrorId AND 16#0008) <> 0 THEN
+        CycleFaultCauseStr := 'com IHM perdue';
+    ELSIF (CycleErrorId AND 16#0010) <> 0 THEN
+        CycleFaultCauseStr := 'tempo etape';
+    ELSIF (CycleErrorId AND 16#0020) <> 0 THEN
+        CycleFaultCauseStr := 'stabilisation';
+    ELSIF (CycleErrorId AND 16#0040) <> 0 THEN
+        CycleFaultCauseStr := 'ecart position M1/M2';
+    ELSIF (CycleErrorId AND 16#0080) <> 0 THEN
+        CycleFaultCauseStr := 'hors FDC haut';
+    ELSIF (CycleErrorId AND 16#0100) <> 0 THEN
+        CycleFaultCauseStr := 'palier 5 interdit';
+    ELSIF (CycleErrorId AND 16#0200) <> 0 THEN
+        CycleFaultCauseStr := 'palier 4 non confirme';
+    ELSIF (CycleErrorId AND 16#0400) <> 0 THEN
+        CycleFaultCauseStr := 'arret meca non confirme';
+    ELSE
+        CycleFaultCauseStr := CONCAT('cause inconnue #', WORD_TO_STRING(CycleErrorId));
+    END_IF;
+    // 🔎 CAUSE RACINE WINCH — vue LATCHÉE (WinchMxSafety.LatchedId), jamais les bits LIVE : en
+    // repli AX_STAB le cycle neutralise les ordres, donc le défaut safety live s'efface et
+    // n'expliquerait plus rien. La vue latchée persiste jusqu'au Reset (acquittement).
+    // Décodage PAR TREUIL : le masque et l'étiquette proviennent du MÊME treuil (M1 prioritaire),
+    // pour ne jamais afficher la cause d'un treuil avec l'étiquette de l'autre (multi-latch).
+    WinchRootCauseStr := '';
+    WinchRootCauseLbl := '';
+    WinchRootTagStr   := '';
+    WinchRootMaskId   := 0;
+    IF WinchM1Safety.LatchedId <> 0 THEN
+        WinchRootTagStr := 'M1 ';
+        WinchRootMaskId := WinchM1Safety.LatchedId;
+    ELSIF WinchM2Safety.LatchedId <> 0 THEN
+        WinchRootTagStr := 'M2 ';
+        WinchRootMaskId := WinchM2Safety.LatchedId;
+    END_IF;
+    IF WinchRootMaskId <> 0 THEN
+        IF (WinchRootMaskId AND 16#3000) <> 0 THEN
+            WinchRootCauseLbl := 'MecaE';
+        ELSIF (WinchRootMaskId AND 16#0080) <> 0 THEN
+            WinchRootCauseLbl := 'MecaA';
+        ELSIF (WinchRootMaskId AND 16#0100) <> 0 THEN
+            WinchRootCauseLbl := 'MecaB';
+        ELSIF (WinchRootMaskId AND 16#0200) <> 0 THEN
+            WinchRootCauseLbl := 'MecaC';
+        ELSIF (WinchRootMaskId AND 16#0800) <> 0 THEN
+            WinchRootCauseLbl := 'MecaD';
+        ELSIF (WinchRootMaskId AND 16#0002) <> 0 THEN
+            WinchRootCauseLbl := 'codeur';
+        ELSIF (WinchRootMaskId AND 16#0001) <> 0 THEN
+            WinchRootCauseLbl := 'com op';
+        ELSIF (WinchRootMaskId AND 16#4000) <> 0 THEN
+            WinchRootCauseLbl := 'sens opp';
+        ELSIF (WinchRootMaskId AND 16#8000) <> 0 THEN
+            WinchRootCauseLbl := 'sans mvt';
+        END_IF;
+    END_IF;
+    // Mou de câble : vue LIVE seule (non latchée dans FB_Safety_Winch) — sans étiquette treuil
+    // car la détection est commune M1/M2 (les deux lisent M2_TensionedCable_DI).
+    IF WinchRootMaskId = 0 THEN
+        IF WinchM1Safety.SlackCable OR WinchM2Safety.SlackCable THEN
+            WinchRootCauseLbl := 'mou cable';
+            WinchRootTagStr   := '';
+        END_IF;
+    END_IF;
+    IF WinchRootCauseLbl <> '' THEN
+        WinchRootCauseStr := CONCAT(' (', CONCAT(WinchRootTagStr,
+                                 CONCAT(WinchRootCauseLbl, ')')));
+    END_IF;
+    // Concaténation (jamais substitution) : cause dérivée cycle PUIS cause racine.
+    CycleFaultMsgStr := CONCAT('[CYCLE]', CONCAT(StepAtErrorStr,
+                        CONCAT(':', CONCAT(CycleFaultCauseStr,
+                        CONCAT(WinchRootCauseStr, '>Repr/Abandon')))));
+END_IF;
+
 IF NOT EmergencyChainClosed THEN
     OperatorActionCandidate := '[PUPITRE] Boucle urgence ouverte - réarmer';
 ELSIF NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid THEN
@@ -480,6 +625,12 @@ ELSIF AbortMsgActive THEN
     // son message spécifique — le message d'abandon est la CAUSE RACINE (plus pertinente
     // que le SafeStop qui en est une conséquence) — il prime sur SafeStop/DirectionBlocked.
     OperatorActionCandidate := AbortMsgText;
+ELSIF CycleFaultActive THEN
+    // 🩹 Repli AX_STAB sur défaut cycle : la CAUSE RACINE (étape d'origine + cause cycle +
+    // cause winch latchée) PRIME sur les messages génériques de coupure puissance et de
+    // SafeStop, qui n'en sont que la CONSÉQUENCE (toutes les causes winch Meca* sont des
+    // causes SafeStop/PowerCutOff et resteraient affichées sinon).
+    OperatorActionCandidate := CycleFaultMsgStr;
 ELSIF PowerCutOffActiveAny THEN
     OperatorActionCandidate := '[SÉCURITÉ] Coupure puissance active - acquitter défaut treuil/pont';
 ELSIF RedundancyTestFailed THEN
@@ -576,64 +727,10 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
         E_AutoCycleStep.AX18_DONE_SYNC:
             OperatorActionCandidate := '[JOY] Cycle termine : pousser a droite vers P1';
         E_AutoCycleStep.AX_STAB:
-            // Libellé de l'étape d'origine du défaut (CycleStepAtError).
-            CASE CycleStepAtError OF
-                E_AutoCycleStep.AX0_REPOS: StepAtErrorStr := 'X0 (preparation)';
-                E_AutoCycleStep.AX1_INIT: StepAtErrorStr := 'X1 (referencement)';
-                E_AutoCycleStep.AX2_TRANSLATE_P1: StepAtErrorStr := 'X2 (selection position)';
-                E_AutoCycleStep.AX3_OPEN_BUCKET: StepAtErrorStr := 'X3 (ouverture benne)';
-                E_AutoCycleStep.AX4_DESCEND_DIVING: StepAtErrorStr := 'AX4 (plongee palier 4)';
-                E_AutoCycleStep.AX5_KOBOLD_INIT: StepAtErrorStr := 'AX5 (init Kobold)';
-                E_AutoCycleStep.AX6_SEARCH_IMMERSION: StepAtErrorStr := 'AX6 (recherche immersion)';
-                E_AutoCycleStep.AX7_SEARCH_BOTTOM: StepAtErrorStr := 'AX7 (recherche fond)';
-                E_AutoCycleStep.AX8_BOTTOM_CONFIRMED: StepAtErrorStr := 'AX8 (fond confirme)';
-                E_AutoCycleStep.AX_DIVING_RETRY: StepAtErrorStr := 'AX_DIVING_RETRY (reprise plongee)';
-                E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (montee sync)';
-                E_AutoCycleStep.AX10_CLOSE_BUCKET: StepAtErrorStr := 'AX10 (fermeture benne)';
-                E_AutoCycleStep.AX10_WAIT_ASCENT_START: StepAtErrorStr := 'AX10b (stabilisation avant montee)';
-                E_AutoCycleStep.AX11_CTRL_ASCENT: StepAtErrorStr := 'AX11 (remontee controle)';
-                E_AutoCycleStep.AX12_LOADED_ASCENT: StepAtErrorStr := 'AX12 (remontee chargee)';
-                E_AutoCycleStep.AX13_DRAIN_PAUSE: StepAtErrorStr := 'AX13 (egouttage)';
-                E_AutoCycleStep.AX14_TRANSLATE_DUMP: StepAtErrorStr := 'AX14 (translation tremie)';
-                E_AutoCycleStep.AX15A_DUMP_ARRIVE: StepAtErrorStr := 'AX15a (arrivee tremie)';
-                E_AutoCycleStep.AX15B_DUMP_OPEN: StepAtErrorStr := 'AX15b (vidage benne)';
-                E_AutoCycleStep.AX15C_DUMP_REPOSITION: StepAtErrorStr := 'AX15c (repositionnement)';
-                E_AutoCycleStep.AX18_DONE_SYNC: StepAtErrorStr := 'AX18 (cycle termine)';
-                E_AutoCycleStep.AX_STAB: StepAtErrorStr := 'AX_STAB (stabilisation)';
-                ELSE
-                    StepAtErrorStr := '?';
-            END_CASE;
-            // Décodage priorisé : l'opérateur voit la grandeur fautive, pas un masque.
-            // Bits cycle : 0 limite, 1 synchro, 2 vitesse, 3 IHM, 4 tempo,
-            // 5 stabilisation, 6 position, 7 FDC haut, 8/9 paliers, 10 arrêt.
-            IF (CycleErrorId AND 16#0001) <> 0 THEN
-                CycleFaultCauseStr := 'limite legale de profondeur atteinte';
-            ELSIF (CycleErrorId AND 16#0002) <> 0 THEN
-                CycleFaultCauseStr := 'synchronisme M1/M2 bloquant';
-            ELSIF (CycleErrorId AND 16#0004) <> 0 THEN
-                CycleFaultCauseStr := 'ecart vitesse M1/M2 confirme';
-            ELSIF (CycleErrorId AND 16#0008) <> 0 THEN
-                CycleFaultCauseStr := 'communication IHM perdue';
-            ELSIF (CycleErrorId AND 16#0010) <> 0 THEN
-                CycleFaultCauseStr := 'tempo maximale etape depassee';
-            ELSIF (CycleErrorId AND 16#0020) <> 0 THEN
-                CycleFaultCauseStr := 'stabilisation remontee hors tolerance';
-            ELSIF (CycleErrorId AND 16#0040) <> 0 THEN
-                CycleFaultCauseStr := 'ecart position M1/M2 > 1,5 m (anti-telescopage)';
-            ELSIF (CycleErrorId AND 16#0080) <> 0 THEN
-                CycleFaultCauseStr := 'M1/M2 hors FDC haut pendant translation P1';
-            ELSIF (CycleErrorId AND 16#0100) <> 0 THEN
-                CycleFaultCauseStr := 'palier 5 interdit sur M1 ou M2 pendant plongee';
-            ELSIF (CycleErrorId AND 16#0200) <> 0 THEN
-                CycleFaultCauseStr := 'palier 4 non confirme M1/M2 recherche Kobold';
-            ELSIF (CycleErrorId AND 16#0400) <> 0 THEN
-                CycleFaultCauseStr := 'arret mecanique M1/M2 non confirme avant plongee';
-            ELSE
-                CycleFaultCauseStr := CONCAT('cause cycle inconnue #', WORD_TO_STRING(CycleErrorId));
-            END_IF;
-            OperatorActionCandidate := CONCAT('[CYCLE] ', CONCAT(StepAtErrorStr,
-                                         CONCAT(' : ', CONCAT(CycleFaultCauseStr,
-                                         ' > Reprendre/Abandonner'))));
+            // Repli défaut : le message complet (étape d'origine + cause cycle + cause racine
+            // winch) est construit AVANT la chaîne de priorités, pour que la CAUSE prime sur les
+            // messages génériques SafeStop / coupure puissance qui n'en sont que la conséquence.
+            OperatorActionCandidate := CycleFaultMsgStr;
         ELSE
             OperatorActionCandidate := '[CYCLE] Cycle en cours...';
     END_CASE;
@@ -727,7 +824,7 @@ IF WinchM1Safety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount < CST_NbMaxA
     AlarmArray[AlarmCount] := '[M1] ErrorID:05 - rotation phases'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorMecaA AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] ErrorID:08 - MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:08 - MecaA - deplacement sans commande'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorMecaB AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] ErrorID:09 - MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
@@ -762,7 +859,7 @@ IF WinchM2Safety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount < CST_NbMaxA
     AlarmArray[AlarmCount] := '[M2] ErrorID:05 - rotation phases'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorMecaA AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] ErrorID:08 - MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:08 - MecaA - deplacement sans commande'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorMecaB AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] ErrorID:09 - MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
@@ -977,7 +1074,7 @@ IF (HistoM1 AND 16#0010) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:05 - rotation phases'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF (HistoM1 AND 16#0080) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:08 - MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:08 - MecaA - deplacement sans commande'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF (HistoM1 AND 16#0100) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:09 - MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
@@ -1018,7 +1115,7 @@ IF (HistoM2 AND 16#0010) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:05 - rotation phases'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF (HistoM2 AND 16#0080) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:08 - MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:08 - MecaA - deplacement sans commande'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF (HistoM2 AND 16#0100) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:09 - MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;

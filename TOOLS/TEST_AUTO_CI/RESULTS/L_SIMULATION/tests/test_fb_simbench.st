@@ -70,6 +70,27 @@ TEST 'TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd'
     ASSERT_FALSE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'M1_BrakeCmd=FALSE -> M1_BrakeIsOpen_DI=FALSE');
 END_TEST
 
+TEST 'TC-T318-010 SimBench cable nominal independent du Kobold et injection explicite'
+    FB_Bench(Enable := TRUE, SimKoboldContactValue := TRUE,
+             SimM2TensionedCableFaultInject := FALSE,
+             RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_TRUE(FB_Bench.Winch.M2_TensionedCable_DI,
+                'Kobold ne produit pas de mou de cable sans injection explicite');
+    FB_Bench(Enable := TRUE, SimM2TensionedCableFaultInject := TRUE,
+             RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_FALSE(FB_Bench.Winch.M2_TensionedCable_DI,
+                 'Injection explicite -> cable non tendu');
+END_TEST
+
+TEST 'TC-T318-020 Diagnostic electrique desactive publie etat neutre'
+    FB_Bench(Enable := TRUE, SimWinchElectricalDiagnosticsActive := FALSE,
+             RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_EQ(FB_Bench.MotorTorqueM1_Nm, 0.0, 'Diagnostic M1 OFF -> couple neutre');
+    ASSERT_FALSE(FB_Bench.MotorIsStalledM1, 'Diagnostic M1 OFF -> stall FALSE');
+    ASSERT_EQ(FB_Bench.MotorTorqueM2_Nm, 0.0, 'Diagnostic M2 OFF -> couple neutre');
+    ASSERT_FALSE(FB_Bench.MotorIsStalledM2, 'Diagnostic M2 OFF -> stall FALSE');
+END_TEST
+
 TEST 'TC-P13-015 SimBench delai frein M1 opt-in (T316) : SimWinchBrakeOpenDelayS retarde M1_BrakeIsOpen_DI sans jamais inverser la polarite'
     (* Delai desactive (0.0) : comportement historique, bascule au meme scan *)
     FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchBrakeOpenDelayS := 0.0, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
@@ -80,19 +101,19 @@ TEST 'TC-P13-015 SimBench delai frein M1 opt-in (T316) : SimWinchBrakeOpenDelayS
 
     (* Delai actif (50 ms = 5 scans a 10 ms) : la DI reste fausse pendant le delai puis bascule *)
     ADVANCE_TIME(10000000);
-    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchDynamicsActive := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     ASSERT_FALSE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'Scan 1/5 du delai : M1_BrakeIsOpen_DI reste FALSE, jamais TRUE en avance');
     ADVANCE_TIME(10000000);
-    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchDynamicsActive := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     ASSERT_FALSE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'Scan 2/5 du delai : toujours FALSE');
     ADVANCE_TIME(10000000);
-    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchDynamicsActive := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     ASSERT_FALSE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'Scan 3/5 du delai : toujours FALSE');
     ADVANCE_TIME(10000000);
-    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchDynamicsActive := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     ASSERT_FALSE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'Scan 4/5 du delai : toujours FALSE');
     ADVANCE_TIME(10000000);
-    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchDynamicsActive := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     ASSERT_TRUE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'Delai ecoule (5e scan) : M1_BrakeIsOpen_DI bascule TRUE');
 END_TEST
 

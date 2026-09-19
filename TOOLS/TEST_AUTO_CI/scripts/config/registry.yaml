@@ -499,6 +499,9 @@ FB_SimBench:
   - CODE/L_SIMULATION/FB_Sim_PositionSensor.st
   - CODE/L_SIMULATION/FB_Sim_Translation.st
   - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st
+  - CODE/L_SIMULATION/FB_Sim_KlossTorque.st
+  - CODE/L_SIMULATION/FB_Sim_WinchMotor.st
+  - CODE/L_SIMULATION/FB_Sim_WinchElectrical.st
   - CODE/L_SIMULATION/FB_SimBench.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_simbench.st
 FB_Hmi_BannerFormatter:

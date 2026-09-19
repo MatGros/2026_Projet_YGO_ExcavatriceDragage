@@ -416,6 +416,9 @@ TEST 'TC-P07-030 Abandon AU 16#0010 decode en cause explicite M3 MecaA (Bug A+B)
 END_TEST
 
 TEST 'TC-P07-031 AX_STAB affiche le bit defaut latche, jamais #0'
+    // Etat winch explicite : aucun latch, aucun mou de cable (deterministe, tests partages).
+    WinchM1Safety.LatchedId := 0; WinchM1Safety.SlackCable := FALSE;
+    WinchM2Safety.LatchedId := 0; WinchM2Safety.SlackCable := FALSE;
     FB_Banner(Enable := TRUE, CurrentMode := E_Mode.SEMI_AUTO,
               EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
               CycleStep := E_AutoCycleStep.AX_STAB,
@@ -424,7 +427,29 @@ TEST 'TC-P07-031 AX_STAB affiche le bit defaut latche, jamais #0'
               WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
               Network := NetDiag);
     ASSERT_EQ(FB_Banner.Banner.OperatorActionText,
-              '[CYCLE] palier 4 non confirme sur M1 ou M2 en recherche Kobold (AX7 (recherche fond)) - cause disparue puis acquitter',
-              'AX_STAB decode le code cause latche');
+              '[CYCLE]AX7:palier 4 non confirme>Repr/Abandon',
+              'AX_STAB decode le code cause cycle latche (format concis)');
+END_TEST
+
+TEST 'TC-P07-032 AX_STAB remonte la cause RACINE winch et prime sur le SafeStop generique'
+    // Cause racine = vue LATCHEE (M2 MecaE). SafeStopActive est TRUE car toute cause winch
+    // Meca* est une cause SafeStop : le message de cause doit malgre tout etre affiche
+    // (la coupure/SafeStop est une CONSEQUENCE, pas la cause). REX 2026-09-19.
+    WinchM1Safety.LatchedId := 0; WinchM1Safety.SlackCable := FALSE;
+    WinchM2Safety.LatchedId := 16#3000; WinchM2Safety.SlackCable := FALSE;
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.SEMI_AUTO,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              SafeStopActive := TRUE,
+              CycleStep := E_AutoCycleStep.AX_STAB,
+              CycleStepAtError := E_AutoCycleStep.AX7_SEARCH_BOTTOM,
+              CycleErrorId := 16#0200,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ASSERT_EQ(FB_Banner.Banner.OperatorActionText,
+              '[CYCLE]AX7:palier 4 non confirme (M2 MecaE)>Repr/Abandon',
+              'cause racine winch latchee affichee et prioritaire sur le message SafeStop generique');
+    ASSERT_EQ(FB_Banner.Banner.SequenceProgressText,
+              'Cycle: STABILISATION (defaut a AX7)',
+              'repli AX_STAB : la progression situe lorigine sans laisser croire quon y est encore');
 END_TEST
 

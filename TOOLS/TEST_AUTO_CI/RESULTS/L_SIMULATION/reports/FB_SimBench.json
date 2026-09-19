@@ -27,6 +27,14 @@
       "passed": true
     },
     {
+      "name": "TC-T318-010 SimBench cable nominal independent du Kobold et injection explicite",
+      "passed": true
+    },
+    {
+      "name": "TC-T318-020 Diagnostic electrique desactive publie etat neutre",
+      "passed": true
+    },
+    {
       "name": "TC-P13-015 SimBench delai frein M1 opt-in (T316) : SimWinchBrakeOpenDelayS retarde M1_BrakeIsOpen_DI sans jamais inverser la polarite",
       "passed": true
     },
@@ -112,8 +120,8 @@
     }
   ],
   "summary": {
-    "total": 27,
-    "passed": 27,
+    "total": 29,
+    "passed": 29,
     "failed": 0
   }
 }

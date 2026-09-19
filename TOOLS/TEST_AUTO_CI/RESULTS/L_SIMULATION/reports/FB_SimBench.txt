@@ -1,10 +1,10 @@
-Error parsing test_fb_simbench.st:
+Error compiling source files:
 
-test_fb_simbench.st:86:9: error: Expected `END_FOR`, found `ADVANCE_TIME`.
-  86 |         ADVANCE_TIME(10000000);
-     |         ^
+FB_SimBench.st:160:34: error: Undefined type 'FB_SIM_WINCHELECTRICAL' in FUNCTION_BLOCK 'FB_SIMBENCH'
+ 160 |     instWinchElectricalM1      : FB_Sim_WinchElectrical;   (* * [INST] T317 exploratoire -- electrique+charge M1 *)
+     |                                  ^
 
-test_fb_simbench.st:89:5: error: Expected `END_TEST`, found `END_FOR`.
-  89 |     END_FOR;
-     |     ^
+FB_SimBench.st:161:34: error: Undefined type 'FB_SIM_WINCHELECTRICAL' in FUNCTION_BLOCK 'FB_SIMBENCH'
+ 161 |     instWinchElectricalM2      : FB_Sim_WinchElectrical;   (* * [INST] T317 exploratoire -- electrique+charge M2 *)
+     |                                  ^
 

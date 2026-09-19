@@ -1,0 +1,57 @@
+contract:
+  task_id: T318
+  criticality: C3
+  strategy: patch
+  objective: >
+    Rendre le profil simple du SimBench explicitement selectionnable pour isoler
+    les regressions recentes des treuils, sans fabriquer de signal safety implicite.
+  acceptance:
+    - id: AC1
+      statement: "Sans injection explicite, M2_TensionedCable_DI reste TRUE meme si le Kobold detecte le fond."
+      verified_by: "Test SimBench ciblé + revue de FB_SimBench.st"
+    - id: AC2
+      statement: "SimM2TensionedCableFaultInject=TRUE est la seule source simulee qui peut publier un cable non tendu."
+      verified_by: "Trace producteur -> HwSim/HwIn -> FB_Safety_Winch"
+    - id: AC3
+      statement: "SimWinchDynamicsActive=FALSE transmet des delais et tau nuls; TRUE transmet les reglages GVL."
+      verified_by: "Test SimBench ciblé"
+    - id: AC4
+      statement: "SimWinchElectricalDiagnosticsActive=FALSE publie couple nul et stall FALSE sans ecrire de signal safety."
+      verified_by: "Test SimBench ciblé + revue de liaison"
+    - id: AC5
+      statement: "Aucun fichier CODE/G_CYCLE/ ni texte Operator Action n'est modifie."
+      verified_by: "git diff --name-only"
+    - id: AC6
+      statement: "Le nom de fichier est identique au nom de POU; le suffixe est associe au langage du bundle Structured Text."
+      verified_by: "G310_check_code_structure.py sur bundle frais"
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_simbench.st
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - DOC/WFLOW/CONTRACTS/T314_SIMBENCH_PARITY.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T318_SIMBENCH_PROFIL_SIMPLE.yaml
+      - DOC/WFLOW/TESTS/TEST_DESIGN_T318_SIMBENCH_PROFIL_SIMPLE.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - CODE/G_CYCLE/
+      - CODE/J_SUPERVISION/
+      - PRJ_CODESYS/
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  alert_duty: >
+    Toute activation involontaire d'un interlock safety par la simulation est
+    signalee immediatement et ne devient pas une fonctionnalite implicite.
+status: IN_PROGRESS
+execution:
+  executed_by: CDX01
+  status: IN_PROGRESS
+validation:
+  status: APPROVED
+  validated_by: HUM
+  notes: "Autorisation utilisateur du 2026-09-19 apres double revue read-only."

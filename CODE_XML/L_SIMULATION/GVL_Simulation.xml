@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-16T18:02:52.977228" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-16T18:02:52.977228">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T13:43:26.221619" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T13:43:26.221619">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -381,12 +381,70 @@ Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart signé injecté, mètres ; persiste dans la position simulée jusqu'au reset/preset</xhtml>
           </documentation>
         </variable>
+        <variable name="SimWinchDynamicsActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PROFIL SIMPLE / DYNAMIQUES TREUILS ===
+FALSE = retour historique instantané ; TRUE = applique les trois réglages synthétiques ci-dessous.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimWinchSpeedReportTauS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.15" />
+          </initialValue>
+        </variable>
+        <variable name="SimWinchBrakeOpenDelayS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.1" />
+          </initialValue>
+        </variable>
+        <variable name="SimWinchBrakeCloseDelayS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.09" />
+          </initialValue>
+        </variable>
+        <variable name="SimWinchElectricalDiagnosticsActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic électrique isolé : ne pilote jamais une entrée safety ou une commande moteur.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM2TensionedCableFaultInject">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Injection safety explicite : TRUE simule le câble non tendu ; FALSE = signal nominal sain.</xhtml>
+          </documentation>
+        </variable>
         <variable name="SimM2CoupledDescentModelActive">
           <type>
             <BOOL />
           </type>
           <initialValue>
-            <simpleValue value="TRUE" />
+            <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 MODÈLE M2 / KOBOLD — réglages de banc, actifs exclusivement via FB_SimBench.
