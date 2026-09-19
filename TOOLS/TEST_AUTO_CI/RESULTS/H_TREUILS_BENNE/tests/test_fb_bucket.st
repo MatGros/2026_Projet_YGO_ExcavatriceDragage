@@ -183,6 +183,82 @@ TEST 'T262-001 Fermeture atteinte : maintien M2 P1 puis liberation explicite'
     ASSERT_FALSE(FB.M2_ReqAscent, 'T262 sens benne libere');
 END_TEST
 
+TEST 'T323-001 Boot non reference : pas de faux ecart ni defaut de qualification au repos'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 1.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CablePosM1 := 0.0, CablePosM2 := 25.0,
+       HomedM1 := FALSE, HomedM2 := FALSE,
+       MachineHomingActive := FALSE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_EQ(FB.Fault.ErrorId, 0, 'T323 boot non reference -> ErrorId live nul');
+    ASSERT_FALSE(FB.Fault.Latched, 'T323 boot non reference -> aucun latch');
+END_TEST
+
+TEST 'T323-002 Homing actif : les commandes de reference ne declenchent pas ErrorID'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 1.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ReqAscent := TRUE, CmdClose_IHM := TRUE,
+       HomedM1 := FALSE, HomedM2 := FALSE,
+       MachineHomingActive := TRUE,
+       EffectivePermitBucket_Close := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_EQ(FB.Fault.ErrorId, 0, 'T323 homing actif -> pas de defaut non reference');
+END_TEST
+
+TEST 'T323-003 Passage homed : ErrorID non reference retombe sans Reset'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 1.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ReqAscent := TRUE, CmdClose_IHM := TRUE,
+       HomedM1 := FALSE, HomedM2 := FALSE,
+       MachineHomingActive := FALSE,
+       EffectivePermitBucket_Close := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Fault.Error, 'T323 demande sans reference -> cause live');
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       HomingSuspectM1 := FALSE, HomingSuspectM2 := FALSE,
+       MachineHomingActive := FALSE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_EQ(FB.Fault.ErrorId, 0, 'T323 homed -> ErrorID retombe sans Reset');
+END_TEST
+
+TEST 'T323-004 Ecart reel apres qualification reste acquittable'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 1.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.BucketReferenced := TRUE;
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CablePosM1 := 0.0, CablePosM2 := 10.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       HomedAndReliableM1 := TRUE, HomedAndReliableM2 := TRUE,
+       HomingSuspectM1 := FALSE, HomingSuspectM2 := FALSE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(600000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CablePosM1 := 0.0, CablePosM2 := 10.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       HomedAndReliableM1 := TRUE, HomedAndReliableM2 := TRUE,
+       HomingSuspectM1 := FALSE, HomingSuspectM2 := FALSE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE((FB.Fault.ErrorId AND 2) <> 0, 'T323 ecart reel -> masque 16#0002');
+    ASSERT_TRUE(FB.Fault.Latched, 'T323 ecart reel -> latch conserve');
+END_TEST
+
 TEST 'T196-002 Etat ouvert publie apres atteinte de l offset'
     Config.OffsetOpenM := 0.0;
     Config.OffsetCloseM := 3.0;
@@ -578,7 +654,7 @@ TEST 'TC-P10-030 ConfirmOpen/ClosePosition reference directement la benne en mai
     ASSERT_TRUE(BucketState.IsClosed, 'SEMI_AUTO + ConfirmOpen conserve etat ferme');
 END_TEST
 
-TEST 'TC-P10-031 Codeur(s) non reference(s) -> defaut permanent, independant de Reset'
+TEST 'T323-005 Codeur(s) non reference(s) : statut au repos, defaut live seulement sur mouvement'
     Config.OffsetOpenM := 0.0;
     Config.OffsetCloseM := 3.0;
     Config.CoherenceLimitM := 5.0;
@@ -586,33 +662,26 @@ TEST 'TC-P10-031 Codeur(s) non reference(s) -> defaut permanent, independant de 
     Config.OpenAnticipationM := 0.2;
     BucketState.IsOpen := TRUE;
 
-    (* Scan 1 : HomedM1=FALSE -> defaut non reference *)
+    (* Scan 1 : HomedM1=FALSE au repos -> aucun defaut *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
        HomedM1 := FALSE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
-    ASSERT_TRUE(FB.Fault.Error, 'Codeur M1 non reference -> Error');
+    ASSERT_FALSE(FB.Fault.Error, 'Codeur M1 non reference au repos -> statut seul');
 
-    (* Scan 2 : Reset -> defaut PERSISTE (cause toujours presente) *)
-    ADVANCE_TIME(10000000);
-    FB(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE,
-       HomedM1 := FALSE, HomedM2 := TRUE,
-       Config := Config, BucketState := BucketState);
+    (* Scan 2 : une demande normale sans reference produit un defaut live *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ReqAscent := TRUE,
        HomedM1 := FALSE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
-    ASSERT_TRUE(FB.Fault.Error, 'Reset seul -> defaut non reference PERSISTE (cause brute)');
+    ASSERT_TRUE(FB.Fault.Error, 'Commande sans reference -> defaut live');
 
-    (* Scan 3 : referencement restaure -> defaut acquittable *)
-    ADVANCE_TIME(10000000);
-    FB(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE,
-       HomedM1 := TRUE, HomedM2 := TRUE,
-       Config := Config, BucketState := BucketState);
+    (* Scan 3 : referencement restaure -> disparition sans Reset *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
-    ASSERT_FALSE(FB.Fault.Error, 'Referencement restaure + Reset -> plus d erreur');
+    ASSERT_FALSE(FB.Fault.Error, 'Referencement restaure sans Reset -> plus d erreur');
 END_TEST
 
 TEST 'TC-P10-032 FB_ExtractionSequence.Busy preserve l armement joystick en fin benne'
