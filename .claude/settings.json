@@ -16,18 +16,6 @@
       "Bash(cd \"C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/*)",
       "Bash(python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_diff_bundle.py *)",
       "Bash(cd \"C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_diff_bundle.py *)",
-      "__claude-auto-approve__",
-      "Bash(*)",
-      "Edit(*)",
-      "Write(*)",
-      "Read(*)",
-      "Glob(*)",
-      "Grep(*)",
-      "WebFetch(*)",
-      "WebSearch(*)",
-      "TodoWrite(*)",
-      "Task(*)",
-      "NotebookEdit(*)",
       "mcp__modex__*"
     ]
   },
@@ -43,24 +31,6 @@
             "type": "command",
             "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_pre_edit.py",
             "timeout": 30
-          }
-        ]
-      },
-      {
-        "matcher": "ExitPlanMode",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node -e \"process.stdout.write(JSON.stringify({decision: 'approve'}))\""
-          }
-        ]
-      },
-      {
-        "matcher": "AskUserQuestion",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node -e \"process.stdout.write(JSON.stringify({decision: 'approve', answer: 'yes'}))\""
           }
         ]
       }

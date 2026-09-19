@@ -3475,6 +3475,22 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Essai T291-A actif (M2 cible palier 5 en plongee)</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx310_M1SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier M1 applique, fige au moment du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx311_M2SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier M2 applique, fige au moment du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -11457,6 +11473,22 @@ TRUE = Défaut sécurité actif</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Reprise AX_STAB disponible apres disparition de la cause</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier vitesse M1 applique, fige a l'instant du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier vitesse M2 applique, fige a l'instant du defaut (0..5)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -22049,6 +22081,22 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etape specifique au moment du defaut</xhtml>
               </documentation>
             </variable>
+            <variable name="M1SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Palier M1 applique, fige au moment du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Palier M2 applique, fige au moment du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
             <variable name="ResumeAfterFaultAvailable">
               <type>
                 <BOOL />
@@ -23461,6 +23509,8 @@ END_IF;
 // 🧊 R9 — capture l'étape spécifique AVANT la bascule vers AX_STAB
 IF ErrorEdge.Q THEN
     CycleStepAtError := State;
+    M1SpeedStepAtFault := M1_SpeedStepApplied;
+    M2SpeedStepAtFault := M2_SpeedStepApplied;
     State := E_AutoCycleStep.AX_STAB;
     WaitingResume := FALSE;   // un défaut abroge la reprise consciente : repli AX_STAB
 END_IF;
@@ -43913,6 +43963,22 @@ PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenance
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Essai T291-A actif (M2 cible palier 5 en plongée)</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleM1SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Palier M1 appliqué, figé au moment du défaut (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleM2SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Palier M2 appliqué, figé au moment du défaut (0..5)</xhtml>
+              </documentation>
+            </variable>
             <variable name="JoystickDeadmanArmed">
               <type>
                 <BOOL />
@@ -44606,6 +44672,8 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx306_WinchSyncError            := CycleWin
 GVL_Troubleshooting.G_CycleSemiAuto.Idx307_M1SpeedStepApplied        := CycleM1SpeedStepApplied;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx308_M2SpeedStepApplied        := CycleM2SpeedStepApplied;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx309_AutoDiveM2Step5Active     := CycleAutoDiveM2Step5Active;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx310_M1SpeedStepAtFault        := CycleM1SpeedStepAtFault;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx311_M2SpeedStepAtFault        := CycleM2SpeedStepAtFault;
 {endregion}
 
 {region "§14 Trace de blocage terrain (winch M1/M2 + translation M3)"}
@@ -51125,6 +51193,8 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.Step                   := instCycleSemiAuto.CycleStep;
     Data.SequenceState.StepStr                := instCycleSemiAuto.CycleStateStr;
     Data.SequenceState.StepAtFault            := instCycleSemiAuto.CycleStepAtError;
+    Data.SequenceState.M1SpeedStepAtFault     := instCycleSemiAuto.M1SpeedStepAtFault;
+    Data.SequenceState.M2SpeedStepAtFault     := instCycleSemiAuto.M2SpeedStepAtFault;
     Data.SequenceState.ResumeAfterFaultAvailable := instCycleSemiAuto.ResumeAfterFaultAvailable;
     Data.SequenceState.OperatorActionId       := instCycleSemiAuto.OperatorActionId;
     Data.SequenceState.OperatorAction         := instCycleSemiAuto.OperatorAction;
@@ -51223,6 +51293,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.Step                   := E_AutoCycleStep.AX0_REPOS;
     Data.SequenceState.StepStr                := 'ASSIST_MODE';
     Data.SequenceState.StepAtFault            := E_AutoCycleStep.AX0_REPOS;
+    Data.SequenceState.M1SpeedStepAtFault     := 0;
+    Data.SequenceState.M2SpeedStepAtFault     := 0;
     Data.SequenceState.ResumeAfterFaultAvailable := FALSE;
     Data.SequenceState.ExpectedAxis           := E_OperatorAxis.JOYSTICK_Y;
     Data.SequenceState.ExpectedDirection      := WinchBothMotionDirection;
@@ -51292,6 +51364,8 @@ ELSE
     Data.SequenceState.Step                    := E_AutoCycleStep.AX0_REPOS;
     Data.SequenceState.StepStr                 := 'AX0_REPOS';
     Data.SequenceState.StepAtFault             := E_AutoCycleStep.AX0_REPOS;
+    Data.SequenceState.M1SpeedStepAtFault      := 0;
+    Data.SequenceState.M2SpeedStepAtFault      := 0;
     Data.SequenceState.ResumeAfterFaultAvailable := FALSE;
     Data.SequenceState.OperatorActionId        := 0;
     Data.SequenceState.OperatorAction          := '';
@@ -57425,6 +57499,8 @@ instTroubleshootingView(
     CycleM1SpeedStepApplied := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber,
     CycleM2SpeedStepApplied := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
     CycleAutoDiveM2Step5Active := PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active,
+    CycleM1SpeedStepAtFault := PRG_03_Modes_Cycle.Data.SequenceState.M1SpeedStepAtFault,
+    CycleM2SpeedStepAtFault := PRG_03_Modes_Cycle.Data.SequenceState.M2SpeedStepAtFault,
     CycleChecksInhibited := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
     CycleIgnoredCheckId  := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId,
     CycleForceStepPrepared := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared,

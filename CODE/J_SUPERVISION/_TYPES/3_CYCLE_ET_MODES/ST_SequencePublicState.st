@@ -37,5 +37,7 @@ STRUCT
     BottomStopBySetpoint        : BOOL;                    // Fond confirmé par limite de travail/consigne
     WinchDescentAuth_M3         : BOOL;                    // Autorisation positive descente treuil selon position M3 (P1/Maintenance) — PRG_04 §5
     ResumeAfterFaultAvailable : BOOL;     // Reprise AX_STAB disponible apres disparition de la cause
+    M1SpeedStepAtFault  : INT;              // Palier vitesse M1 applique, fige a l'instant du defaut (0..5)
+    M2SpeedStepAtFault  : INT;              // Palier vitesse M2 applique, fige a l'instant du defaut (0..5)
 END_STRUCT
 END_TYPE

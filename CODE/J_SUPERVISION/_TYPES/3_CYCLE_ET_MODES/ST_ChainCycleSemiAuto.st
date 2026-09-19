@@ -52,5 +52,7 @@ STRUCT
     Idx307_M1SpeedStepApplied        : INT;  // Palier vitesse applique M1 (0..5, causes 8/9)
     Idx308_M2SpeedStepApplied        : INT;  // Palier vitesse applique M2 (0..5, causes 8/9)
     Idx309_AutoDiveM2Step5Active     : BOOL; // 1 = Essai T291-A actif (M2 cible palier 5 en plongee)
+    Idx310_M1SpeedStepAtFault        : INT;  // Palier M1 applique, fige au moment du defaut (0..5)
+    Idx311_M2SpeedStepAtFault        : INT;  // Palier M2 applique, fige au moment du defaut (0..5)
 END_STRUCT
 END_TYPE

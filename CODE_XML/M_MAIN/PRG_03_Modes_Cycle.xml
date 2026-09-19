@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T11:35:25.643365" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T11:35:25.643365">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T10:25:00.674151" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T10:25:00.674151">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1226,6 +1226,22 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Reprise AX_STAB disponible apres disparition de la cause</xhtml>
               </documentation>
             </variable>
+            <variable name="M1SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier vitesse M1 applique, fige a l'instant du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier vitesse M2 applique, fige a l'instant du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -1820,6 +1836,8 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.Step                   := instCycleSemiAuto.CycleStep;
     Data.SequenceState.StepStr                := instCycleSemiAuto.CycleStateStr;
     Data.SequenceState.StepAtFault            := instCycleSemiAuto.CycleStepAtError;
+    Data.SequenceState.M1SpeedStepAtFault     := instCycleSemiAuto.M1SpeedStepAtFault;
+    Data.SequenceState.M2SpeedStepAtFault     := instCycleSemiAuto.M2SpeedStepAtFault;
     Data.SequenceState.ResumeAfterFaultAvailable := instCycleSemiAuto.ResumeAfterFaultAvailable;
     Data.SequenceState.OperatorActionId       := instCycleSemiAuto.OperatorActionId;
     Data.SequenceState.OperatorAction         := instCycleSemiAuto.OperatorAction;
@@ -1918,6 +1936,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.Step                   := E_AutoCycleStep.AX0_REPOS;
     Data.SequenceState.StepStr                := 'ASSIST_MODE';
     Data.SequenceState.StepAtFault            := E_AutoCycleStep.AX0_REPOS;
+    Data.SequenceState.M1SpeedStepAtFault     := 0;
+    Data.SequenceState.M2SpeedStepAtFault     := 0;
     Data.SequenceState.ResumeAfterFaultAvailable := FALSE;
     Data.SequenceState.ExpectedAxis           := E_OperatorAxis.JOYSTICK_Y;
     Data.SequenceState.ExpectedDirection      := WinchBothMotionDirection;
@@ -1987,6 +2007,8 @@ ELSE
     Data.SequenceState.Step                    := E_AutoCycleStep.AX0_REPOS;
     Data.SequenceState.StepStr                 := 'AX0_REPOS';
     Data.SequenceState.StepAtFault             := E_AutoCycleStep.AX0_REPOS;
+    Data.SequenceState.M1SpeedStepAtFault      := 0;
+    Data.SequenceState.M2SpeedStepAtFault      := 0;
     Data.SequenceState.ResumeAfterFaultAvailable := FALSE;
     Data.SequenceState.OperatorActionId        := 0;
     Data.SequenceState.OperatorAction          := '';
@@ -2777,6 +2799,22 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etape specifique au moment du defaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Palier M1 applique, fige au moment du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Palier M2 applique, fige au moment du defaut (0..5)</xhtml>
               </documentation>
             </variable>
             <variable name="ResumeAfterFaultAvailable">
@@ -4191,6 +4229,8 @@ END_IF;
 // 🧊 R9 — capture l'étape spécifique AVANT la bascule vers AX_STAB
 IF ErrorEdge.Q THEN
     CycleStepAtError := State;
+    M1SpeedStepAtFault := M1_SpeedStepApplied;
+    M2SpeedStepAtFault := M2_SpeedStepApplied;
     State := E_AutoCycleStep.AX_STAB;
     WaitingResume := FALSE;   // un défaut abroge la reprise consciente : repli AX_STAB
 END_IF;

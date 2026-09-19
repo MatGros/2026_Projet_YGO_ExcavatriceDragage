@@ -128,6 +128,8 @@ VAR_OUTPUT
     CycleStep               : E_AutoCycleStep;          // <-- [STAT] Etape active du Grafcet
     CycleStateStr           : STRING(80);           // <-- [STAT] Libelle en clair de l'etape
     CycleStepAtError        : E_AutoCycleStep;          // <-- [DIAG] Etape specifique au moment du defaut
+    M1SpeedStepAtFault      : INT;                      // <-- [DIAG] Palier M1 applique, fige au moment du defaut (0..5)
+    M2SpeedStepAtFault      : INT;                      // <-- [DIAG] Palier M2 applique, fige au moment du defaut (0..5)
     ResumeAfterFaultAvailable : BOOL;                   // <-- [STAT] Reprise AX_STAB autorisee
     OperatorActionId        : WORD;                 // <-- [DIAG] ID action operateur requise
     OperatorAction          : STRING(120);          // <-- [DIAG] Message explicatif pour l'IHM
@@ -743,6 +745,8 @@ END_IF;
 // 🧊 R9 — capture l'étape spécifique AVANT la bascule vers AX_STAB
 IF ErrorEdge.Q THEN
     CycleStepAtError := State;
+    M1SpeedStepAtFault := M1_SpeedStepApplied;
+    M2SpeedStepAtFault := M2_SpeedStepApplied;
     State := E_AutoCycleStep.AX_STAB;
     WaitingResume := FALSE;   // un défaut abroge la reprise consciente : repli AX_STAB
 END_IF;

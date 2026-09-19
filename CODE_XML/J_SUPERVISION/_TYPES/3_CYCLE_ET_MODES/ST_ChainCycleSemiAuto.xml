@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T10:10:17.703019" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T10:10:17.703019">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T10:25:07.486202" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T10:25:07.486202">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -339,6 +339,22 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Essai T291-A actif (M2 cible palier 5 en plongee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx310_M1SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier M1 applique, fige au moment du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx311_M2SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier M2 applique, fige au moment du defaut (0..5)</xhtml>
               </documentation>
             </variable>
           </struct>
