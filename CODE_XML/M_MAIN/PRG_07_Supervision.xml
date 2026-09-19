@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-17T22:11:49.790545" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-17T22:11:49.790545">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T10:11:11.735923" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T10:11:11.735923">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -8624,6 +8624,9 @@ instTroubleshootingView(
     CycleErrorId         := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
     CycleFaultLatched    := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Latched,
     CycleFaultLatchedId  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.LatchedId,
+    CycleM1SpeedStepApplied := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber,
+    CycleM2SpeedStepApplied := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
+    CycleAutoDiveM2Step5Active := PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active,
     CycleChecksInhibited := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
     CycleIgnoredCheckId  := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId,
     CycleForceStepPrepared := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared,
@@ -11513,6 +11516,21 @@ END_IF;
 IF ((CycleErrorId AND 16#0040) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ErrorID:07 - timeout etape'; AlarmCount := AlarmCount + 1;
 END_IF;
+IF ((CycleErrorId AND 16#0004) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:03 - ecart vitesse montee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0080) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:08 - hors FDC haut translation P1'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0100) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:09 - palier 5 interdit en plongee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0200) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:10 - palier 4 non confirme Kobold'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0800) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:12 - consigne profondeur invalide'; AlarmCount := AlarmCount + 1;
+END_IF;
 
 // 5i. Collecte [HISTO] — défauts latched passés (LatchedId AND NOT ErrorId)
 // 🕘 Marqueur [HISTO] (AF-07 §6, décision 2026-09-01) : un défaut laté dont la cause a
@@ -12262,6 +12280,30 @@ Prev := Hmi;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Erreur synchro treuils</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleM1SpeedStepApplied">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Palier vitesse appliqué M1 (0..5, causes 8/9 FB_CycleSemiAuto)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleM2SpeedStepApplied">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Palier vitesse appliqué M2 (0..5, causes 8/9 FB_CycleSemiAuto)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleAutoDiveM2Step5Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Essai T291-A actif (M2 cible palier 5 en plongée)</xhtml>
+              </documentation>
+            </variable>
             <variable name="JoystickDeadmanArmed">
               <type>
                 <BOOL />
@@ -12952,6 +12994,9 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx303_KoboldBottomTouch         := CycleKob
 GVL_Troubleshooting.G_CycleSemiAuto.Idx304_SpeedMismatchActive       := CycleSpeedMismatchActive;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx305_LimitLegalReached         := CycleLimitLegalReached;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx306_WinchSyncError            := CycleWinchSyncError;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx307_M1SpeedStepApplied        := CycleM1SpeedStepApplied;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx308_M2SpeedStepApplied        := CycleM2SpeedStepApplied;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx309_AutoDiveM2Step5Active     := CycleAutoDiveM2Step5Active;
 {endregion}
 
 {region "§14 Trace de blocage terrain (winch M1/M2 + translation M3)"}

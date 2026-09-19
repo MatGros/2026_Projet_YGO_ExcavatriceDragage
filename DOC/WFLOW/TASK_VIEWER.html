@@ -683,7 +683,8 @@
                 </div>
                 <div class="form-group">
                     <label>Agent assigné :</label>
-                    <input type="text" id="edit-agent" class="form-control" placeholder="ex: AGY-01, DSH-02, HUM, —">
+                    <input type="text" id="edit-agent" class="form-control" maxlength="6" style="text-transform:uppercase;" placeholder="ex: CC01, AGY01, CDX01, DSH01, HUM, —">
+                    <small style="color:var(--subtext); font-size:11px; display:block; margin-top:2px;">Format strict : CC01, AGY01, CDX01, DSH01, OPC01, HUM ou —</small>
                 </div>
                 <div class="form-group full">
                     <label>Titre concis :</label>
@@ -1551,6 +1552,27 @@
             originalAgentBeforeEdit = null;
         }
 
+        function normalizeAgentInput(raw) {
+            const v = (raw || '').trim();
+            if (!v || v === '—' || v === '-' || v.toLowerCase() === 'none' || v.toLowerCase() === 'null') {
+                return '—';
+            }
+            const upper = v.toUpperCase();
+            if (upper === 'HUM') return 'HUM';
+            const aliasMap = {
+                'CLAUDE': 'CC01', 'CC': 'CC01', 'CC-01': 'CC01', 'CC-SUB': 'CC02',
+                'ANTIGRAVITY': 'AGY01', 'AGY': 'AGY01', 'AGY-01': 'AGY01', 'AGY-02': 'AGY02',
+                'CODEX': 'CDX01', 'CDX': 'CDX01',
+                'DSH': 'DSH01', 'DSH-01': 'DSH01', 'DSH-02': 'DSH02',
+                'DSH (DEEPSEEK)': 'DSH01', 'DSH (ORCHESTRATEUR)': 'DSH01',
+                'OPENCODE': 'OPC01', 'OPC': 'OPC01'
+            };
+            if (aliasMap[upper]) return aliasMap[upper];
+            const clean = upper.replace(/[^A-Z0-9]/g, '');
+            if (/^(CC|AGY|CDX|DSH|OPC)\d{2}$/.test(clean)) return clean;
+            throw new Error(`Format d'agent non conforme (« ${v} »).\nFormat strict exigé : CC01, AGY01, CDX01, DSH01, OPC01, HUM ou —.`);
+        }
+
         async function saveTaskModal() {
             const idVal = document.getElementById('edit-id').value.trim();
             if (!idVal) {
@@ -1563,7 +1585,13 @@
             const nowIso = new Date().toISOString().substring(0, 19);
 
             const savedStatus = document.getElementById('edit-statut').value;
-            const savedAgent = document.getElementById('edit-agent').value.trim() || '—';
+            let savedAgent = '—';
+            try {
+                savedAgent = normalizeAgentInput(document.getElementById('edit-agent').value);
+            } catch (err) {
+                alert(err.message);
+                return;
+            }
 
             const taskData = {
                 id: idVal,
@@ -1949,10 +1977,16 @@
     window.saveTaskModal = async function() {
         const id = document.getElementById('edit-id').value.trim();
         if (!id) return alert('Identifiant obligatoire.');
+        let agentNorm = '—';
+        try {
+            agentNorm = normalizeAgentInput(document.getElementById('edit-agent').value);
+        } catch (err) {
+            return alert(err.message);
+        }
         const task = {
             id, parent_id: document.getElementById('edit-parent').value.trim(),
             statut: document.getElementById('edit-statut').value, criticite: document.getElementById('edit-crit').value,
-            domaine: document.getElementById('edit-domaine').value, agent: document.getElementById('edit-agent').value.trim() || '—',
+            domaine: document.getElementById('edit-domaine').value, agent: agentNorm,
             titre: document.getElementById('edit-titre').value.trim(), contexte: document.getElementById('edit-contexte').value.trim(),
             description: document.getElementById('edit-desc').value.trim(),
             objectifs: document.getElementById('edit-obj').value.split('\n').map(v => v.trim()).filter(Boolean),

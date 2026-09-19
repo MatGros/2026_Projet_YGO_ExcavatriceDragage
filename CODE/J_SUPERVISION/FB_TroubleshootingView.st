@@ -97,6 +97,9 @@ VAR_INPUT
     CycleSpeedMismatchActive : BOOL;   (* --> [DIAG] Écart vitesse M1/M2 *)
     CycleLimitLegalReached   : BOOL;   (* --> [SAFE] Limite légale atteinte *)
     CycleWinchSyncError      : BOOL;   (* --> [SAFE] Erreur synchro treuils *)
+    CycleM1SpeedStepApplied  : INT;    (* --> [HW] Palier vitesse appliqué M1 (0..5, causes 8/9 FB_CycleSemiAuto) *)
+    CycleM2SpeedStepApplied  : INT;    (* --> [HW] Palier vitesse appliqué M2 (0..5, causes 8/9 FB_CycleSemiAuto) *)
+    CycleAutoDiveM2Step5Active : BOOL; (* --> [STAT] Essai T291-A actif (M2 cible palier 5 en plongée) *)
     JoystickDeadmanArmed     : BOOL;   (* --> [CMD] Homme-mort armé *)
     JoystickAtNeutral        : BOOL;   (* --> [HW] Joystick au neutre *)
     HomedM1                  : BOOL;   (* --> [HW] Codeur M1 référencé *)
@@ -701,6 +704,9 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx303_KoboldBottomTouch         := CycleKob
 GVL_Troubleshooting.G_CycleSemiAuto.Idx304_SpeedMismatchActive       := CycleSpeedMismatchActive;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx305_LimitLegalReached         := CycleLimitLegalReached;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx306_WinchSyncError            := CycleWinchSyncError;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx307_M1SpeedStepApplied        := CycleM1SpeedStepApplied;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx308_M2SpeedStepApplied        := CycleM2SpeedStepApplied;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx309_AutoDiveM2Step5Active     := CycleAutoDiveM2Step5Active;
 {endregion}
 
 {region "§14 Trace de blocage terrain (winch M1/M2 + translation M3)"}

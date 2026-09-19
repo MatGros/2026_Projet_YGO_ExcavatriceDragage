@@ -45,6 +45,10 @@ VAR_INPUT
     PointsPerRev     : UDINT := 8192;  (* --> [CFG] Résolution codeur (pts/tour) *)
     CableM_PerRev    : REAL := 2.0;    (* --> [CFG] Développement câble (m/tour) *)
     CycleTimeS       : REAL := 0.010;  (* --> [CFG] Période tâche PLC (s) — MainTask 10 ms *)
+    SpeedReportTauS  : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Constante de temps 1er ordre du retour vitesse
+        (RawSpdOut), s. 0.0 = saut instantane. >0 = RawSpdOut suit un 1er ordre vers la vitesse reelle du modele
+        au lieu de sauter en escalier a la coupure des relais ; RawPosOut (position) n'est pas affecte. Valeur
+        non calibree treuil M1/M2, plage indicative issue de la dynamique variateur M3 identifiee sur trace. *)
 END_VAR
 VAR_OUTPUT
     RawPosOut   : UDINT;   (* <-- [DIAG] Position brute simulée *)
@@ -54,16 +58,18 @@ VAR_IN_OUT
     RawPos      : UDINT;   (* <-> [BUS] Référence _SimEncoderRawPosM1/M2 (survit au reset froid) *)
 END_VAR
 VAR
-    Increment      : UDINT;              (* . [LOC] Points ajoutés par cycle *)
-    EffStep        : INT;               (* . [LOC] Pas borné (>= 1) *)
-    SpeedMps       : REAL;              (* . [LOC] Vitesse simulée (m/s) *)
-    TestOffsetEdge : R_TRIG;             (* . [LOC] Front TestOffsetCmd *)
-    PresetEdge     : R_TRIG;             (* . [LOC] Front montant PresetCmd *)
-    PresetPending  : BOOL;               (* . [LOC] Preset en attente d'application (latence) *)
-    PresetCount    : INT;                (* . [LOC] Compteur cycles de latence restants *)
-    IncrStep1      : UDINT;              (* . [LOC] Increment par cycle a vitesse palier 1 (pour le roulis) *)
-    MovingDir      : INT;                (* . [LOC] Dernier sens actif : +1 avant, -1 arriere, 0 arret *)
-    CoastPtsLeft   : REAL;               (* . [LOC] Roulis inertiel restant (points bruts) *)
+    Increment        : UDINT;            (* . [LOC] Points ajoutés par cycle *)
+    EffStep          : INT;              (* . [LOC] Pas borné (>= 1) *)
+    SpeedMps         : REAL;             (* . [LOC] Vitesse simulée (m/s) *)
+    TestOffsetEdge   : R_TRIG;           (* . [LOC] Front TestOffsetCmd *)
+    PresetEdge       : R_TRIG;           (* . [LOC] Front montant PresetCmd *)
+    PresetPending    : BOOL;             (* . [LOC] Preset en attente d'application (latence) *)
+    PresetCount      : INT;              (* . [LOC] Compteur cycles de latence restants *)
+    IncrStep1        : UDINT;            (* . [LOC] Increment par cycle a vitesse palier 1 (pour le roulis) *)
+    MovingDir        : INT;              (* . [LOC] Dernier sens actif : +1 avant, -1 arriere, 0 arret *)
+    CoastPtsLeft     : REAL;             (* . [LOC] Roulis inertiel restant (points bruts) *)
+    TargetSpeedMps   : REAL;             (* . [LOC] Vitesse instantanee signee du modele position, avant filtrage retour *)
+    ReportedSpeedMps : REAL;             (* . [LOC] Vitesse rapportee filtree 1er ordre, publiee dans RawSpdOut *)
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
@@ -113,10 +119,12 @@ IF PresetPending THEN
         RawPos := PresetValue;
         PresetPending := FALSE;
     END_IF;
+    TargetSpeedMps := 0.0;
 ELSIF RelayFwd THEN
     RawPos := RawPos + Increment;
     MovingDir := 1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    TargetSpeedMps := SpeedMps;
 ELSIF RelayRev THEN
     IF RawPos >= Increment THEN
         RawPos := RawPos - Increment;
@@ -125,35 +133,40 @@ ELSIF RelayRev THEN
     END_IF;
     MovingDir := -1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    TargetSpeedMps := -SpeedMps;
 ELSE
     // Relais coupes : roulis inertiel (anticipation d'arret mecanique). Le treuil
     // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
     IF (CoastPtsLeft >= 1.0) AND (MovingDir <> 0) THEN
         IF MovingDir = 1 THEN
             RawPos := RawPos + IncrStep1;
+            TargetSpeedMps := MinSpeedMps;
         ELSIF RawPos >= IncrStep1 THEN
             RawPos := RawPos - IncrStep1;
+            TargetSpeedMps := -MinSpeedMps;
         ELSE
             RawPos := 0;
+            TargetSpeedMps := 0.0;
         END_IF;
         CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
     ELSE
         MovingDir := 0;
         CoastPtsLeft := 0.0;
+        TargetSpeedMps := 0.0;
     END_IF;
 END_IF;
 {endregion}
 
 {region "§4 Sortie"}
 RawPosOut := RawPos;
+// Retour vitesse rapporte (RawSpdOut) : 1er ordre vers TargetSpeedMps. SpeedReportTauS=0.0
+// -> alpha=1 -> saut instantane (comportement historique inchange).
+ReportedSpeedMps := ReportedSpeedMps
+    + (CycleTimeS / (SpeedReportTauS + CycleTimeS)) * (TargetSpeedMps - ReportedSpeedMps);
 // Formule inverse vitesse brute EtherCAT CoE (0.1 RPM) :
 // SpdValue = (V_mps * 60.0) / (0.1 * CableM_PerRev) = V_mps * 300.0 (sur tambour 2m)
-IF (MovingDir <> 0) AND (CableM_PerRev > 0.0) THEN
-    IF MovingDir = 1 THEN
-        RawSpdOut := REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
-    ELSE
-        RawSpdOut := -REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
-    END_IF;
+IF (CableM_PerRev > 0.0) THEN
+    RawSpdOut := REAL_TO_DINT((ReportedSpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
 ELSE
     RawSpdOut := 0;
 END_IF;

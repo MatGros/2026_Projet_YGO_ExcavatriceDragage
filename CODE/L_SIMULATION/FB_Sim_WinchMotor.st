@@ -5,7 +5,7 @@
    predictif et mode generatrice pour un treuil M1/M2.
    📄 Doc metier : DOC/WFLOW/CONTRACTS/PLAN_T317_SIMBENCH_TREUIL_ELECTRIQUE.md
    (pas encore integre a AF_Partie-13 -- entree F13.06 a creer lot dedie)
-   🧩 Dependances : aucune (brique de calcul pure)
+   🧩 Dependances : FB_Sim_KlossTorque
    ═══════════════════════════════════════════════════════════════ *)
 FUNCTION_BLOCK PUBLIC FB_Sim_WinchMotor
 VAR_INPUT
@@ -18,13 +18,17 @@ VAR_INPUT
 
     // === MESURES / CHARGE ===
     NetworkVoltageAct_V       : REAL := 400.0; // --> [HW] Tension reseau mesuree/simulee
-    ResistiveTorque_Nm        : REAL; // --> [CMD] Couple de charge, repere de commande
+    ResistiveTorque_Nm        : REAL; // --> [CMD] Couple de charge DEJA projete en repere de
+        // commande (N_rel) par l'appelant : positif = s'oppose au mouvement commande, negatif =
+        // aide le mouvement (ex. gravite en descente -> peut declencher le mode generatrice).
+        // Ce FB ne connait pas le taux de charge/la gravite -- calcul delegue a FB_Sim_WinchElectrical.
 
     // === REGLAGES & CONFIGURATION ===
     NetworkVoltageNom_V          : REAL := 400.0; // --> [CFG] Tension nominale reseau
     MaxTorque_Nm                 : REAL := 3800.0; // --> [CFG] Cmax decrochage -- SYNTHETIQUE
-    SlipAtMaxTorqueStep1_Ratio   : REAL := 0.08;   // --> [CFG] gmax palier 1 -- SYNTHETIQUE
-    RotorResistanceOwn_Ohm       : REAL := 0.08;   // --> [CFG] R2 propre rotor
+    SlipAtMaxTorqueBase_Ratio    : REAL := 0.08;   // --> [CFG] gmax au palier rotor court-circuite
+        // (resistance externe nulle) -- SYNTHETIQUE. Sert de base a la mise a l'echelle par palier.
+    RotorResistanceOwn_Ohm       : REAL := 0.08;   // --> [CFG] R2 propre rotor (palier court-circuite)
     Inertia_KgM2                 : REAL := 45.0;   // --> [CFG] Inertie ramenee -- SYNTHETIQUE
     SynchronousSpeed_Rpm         : REAL := 1500.0; // --> [CFG] Vitesse synchronisme
     CycleTime_S                  : REAL := 0.01;   // --> [CFG] Pas d'integration
@@ -41,18 +45,32 @@ VAR_OUTPUT
     IsGeneratorMode            : BOOL; // <-- [DIAG] Couple oppose au sens de commande (freinage)
 END_VAR
 VAR
+    // === SOUS-INSTANCES FB ===
+    KlossRunning               : FB_Sim_KlossTorque; // * [INST] Couple regime etabli
+    KlossLockedRotor           : FB_Sim_KlossTorque; // * [INST] Couple test decrochage (g=1)
+
     // === ETAT INTERNE ===
     SpeedRel_RadPerS           : REAL; // . [LOC] Vitesse en repere de commande (N_rel)
     SynchronousSpeed_RadPerS   : REAL; // . [LOC] Vitesse synchronisme, rad/s
     SlipAtMaxTorqueStep_Ratio  : REAL; // . [LOC] gmax au palier courant
     SlipEff_Ratio               : REAL; // . [LOC] Glissement protege division par zero
+    VoltageRatio2               : REAL; // . [LOC] (U_act/U_nom)^2
     Stalled                    : BOOL; // . [LOC] Etat instantane, peut se relever
+
+    // === ENTREES BORNEES (SECURISE DIVISIONS) ===
+    InertiaSafe_KgM2            : REAL; // . [LOC] Inertia_KgM2 bornee > 0
+    RotorResistanceOwnSafe_Ohm  : REAL; // . [LOC] RotorResistanceOwn_Ohm bornee > 0
+    SlipAtMaxTorqueBaseSafe_Ratio : REAL; // . [LOC] SlipAtMaxTorqueBase_Ratio bornee > 0
+    NetworkVoltageNomSafe_V     : REAL; // . [LOC] NetworkVoltageNom_V bornee > 0
+    StepCmdSafe                : INT;  // . [LOC] StepCmd borne [1..5]
 END_VAR
 VAR CONSTANT
     CST_StepCount              : INT := 5;
     CST_RotorExtResistanceStep_Ohm : ARRAY[1..5] OF REAL := [3.6, 1.9, 0.9, 0.35, 0.0];
         // palier 1 = resistance max (demarrage), palier 5 = rotor court-circuite -- SYNTHETIQUE
+        // (indexation/valeurs propres au ST, pas un portage 1:1 du prototype Python 4 gradins)
     CST_MinSlip_Ratio          : REAL := 0.0001;
+    CST_MinDenominator         : REAL := 0.001; // plancher generique config sensible (division)
     CST_StallSpeedThreshold_Rpm : REAL := 28.0; // ~3 rad/s, "quasi arrete"
 END_VAR
 
@@ -68,7 +86,8 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-IF (StepCmd < 1) OR (StepCmd > CST_StepCount) THEN
+StepCmdSafe := LIMIT(1, StepCmd, CST_StepCount);
+IF StepCmdSafe <> StepCmd THEN
     Ready := FALSE;
     RETURN;
 END_IF;
@@ -77,14 +96,21 @@ IF (DirectionCmd <> 1) AND (DirectionCmd <> -1) THEN
     RETURN;
 END_IF;
 
+// Bornage systematique des entrees de config sensibles (denominateurs) -- CODE_QUALITY_STANDARDS §6
+InertiaSafe_KgM2 := MAX(CST_MinDenominator, Inertia_KgM2);
+RotorResistanceOwnSafe_Ohm := MAX(CST_MinDenominator, RotorResistanceOwn_Ohm);
+SlipAtMaxTorqueBaseSafe_Ratio := MAX(CST_MinDenominator, SlipAtMaxTorqueBase_Ratio);
+NetworkVoltageNomSafe_V := MAX(1.0, NetworkVoltageNom_V);
+
 // === §2 GLISSEMENT ET COUPLE (FORMULE DE KLOSS) ===
 SynchronousSpeed_RadPerS := SynchronousSpeed_Rpm * 2.0 * 3.14159265 / 60.0;
 
-// gmax(palier) proportionnel a la resistance rotorique totale : plus de resistance ajoutee
-// deplace le glissement au couple max vers 1 (couple demarrage) sans changer Cmax.
-SlipAtMaxTorqueStep_Ratio := SlipAtMaxTorqueStep1_Ratio
-    * (RotorResistanceOwn_Ohm + CST_RotorExtResistanceStep_Ohm[StepCmd])
-    / (RotorResistanceOwn_Ohm + CST_RotorExtResistanceStep_Ohm[1]);
+// gmax(palier) = gmax_base * R2_total(palier) / R2_rotor_propre -- ajouter de la resistance
+// externe deplace le glissement au couple max vers 1 (couple demarrage), sans changer Cmax.
+// gmax_base = gmax au palier rotor court-circuite (resistance externe nulle).
+SlipAtMaxTorqueStep_Ratio := SlipAtMaxTorqueBaseSafe_Ratio
+    * (RotorResistanceOwnSafe_Ohm + CST_RotorExtResistanceStep_Ohm[StepCmdSafe])
+    / RotorResistanceOwnSafe_Ohm;
 
 // Glissement en repere de commande (N_rel) : peut etre negatif (survitesse -> freinage
 // generateur). SpeedRel_RadPerS reste dans ce repere ; SpeedAct_Rpm restitue le signe physique.
@@ -100,15 +126,21 @@ ELSE
     SlipEff_Ratio := Slip_Ratio;
 END_IF;
 
-MotorTorque_Nm := 2.0 * MaxTorque_Nm
-    / (SlipEff_Ratio / SlipAtMaxTorqueStep_Ratio + SlipAtMaxTorqueStep_Ratio / SlipEff_Ratio)
-    * (NetworkVoltageAct_V / NetworkVoltageNom_V) ** 2;
+VoltageRatio2 := (NetworkVoltageAct_V / NetworkVoltageNomSafe_V) * (NetworkVoltageAct_V / NetworkVoltageNomSafe_V);
+
+KlossRunning(
+    Enable := TRUE,
+    MaxTorque_Nm := MaxTorque_Nm,
+    Slip_Ratio := SlipEff_Ratio,
+    SlipAtMaxTorque_Ratio := SlipAtMaxTorqueStep_Ratio,
+    VoltageRatio2 := VoltageRatio2);
+MotorTorque_Nm := KlossRunning.Torque_Nm;
 
 // === §3 DYNAMIQUE MECANIQUE ===
 // Pas de saturation basse : SpeedRel_RadPerS peut devenir negatif (glissement arriere sous
 // surcharge) ou depasser le synchronisme (regime generateur).
 SpeedRel_RadPerS := SpeedRel_RadPerS
-    + (MotorTorque_Nm - ResistiveTorque_Nm) / Inertia_KgM2 * CycleTime_S;
+    + (MotorTorque_Nm - ResistiveTorque_Nm) / InertiaSafe_KgM2 * CycleTime_S;
 
 SpeedAct_Rpm := SpeedRel_RadPerS * DirectionCmd * 60.0 / (2.0 * 3.14159265);
 
@@ -117,9 +149,13 @@ SpeedAct_Rpm := SpeedRel_RadPerS * DirectionCmd * 60.0 / (2.0 * 3.14159265);
 // vitesse quasi nulle -- prediction "ce palier peut-il tenir la charge depuis l'arret ?",
 // pas une mesure d'arret reel.
 IF ABS(SpeedAct_Rpm) < CST_StallSpeedThreshold_Rpm THEN
-    Stalled := (2.0 * MaxTorque_Nm
-        / (1.0 / SlipAtMaxTorqueStep_Ratio + SlipAtMaxTorqueStep_Ratio)
-        * (NetworkVoltageAct_V / NetworkVoltageNom_V) ** 2) < ResistiveTorque_Nm;
+    KlossLockedRotor(
+        Enable := TRUE,
+        MaxTorque_Nm := MaxTorque_Nm,
+        Slip_Ratio := 1.0,
+        SlipAtMaxTorque_Ratio := SlipAtMaxTorqueStep_Ratio,
+        VoltageRatio2 := VoltageRatio2);
+    Stalled := KlossLockedRotor.Torque_Nm < ResistiveTorque_Nm;
     IF Stalled THEN
         IsStalled := TRUE;
     END_IF;

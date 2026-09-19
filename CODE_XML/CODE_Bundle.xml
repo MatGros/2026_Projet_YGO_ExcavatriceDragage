@@ -3451,6 +3451,30 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Erreur de synchronisme M1/M2</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx307_M1SpeedStepApplied">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier vitesse applique M1 (0..5, causes 8/9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx308_M2SpeedStepApplied">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier vitesse applique M2 (0..5, causes 8/9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx309_AutoDiveM2Step5Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Essai T291-A actif (M2 cible palier 5 en plongee)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -29528,6 +29552,21 @@ END_IF;
 IF ((CycleErrorId AND 16#0040) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ErrorID:07 - timeout etape'; AlarmCount := AlarmCount + 1;
 END_IF;
+IF ((CycleErrorId AND 16#0004) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:03 - ecart vitesse montee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0080) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:08 - hors FDC haut translation P1'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0100) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:09 - palier 5 interdit en plongee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0200) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:10 - palier 4 non confirme Kobold'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0800) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:12 - consigne profondeur invalide'; AlarmCount := AlarmCount + 1;
+END_IF;
 
 // 5i. Collecte [HISTO] — défauts latched passés (LatchedId AND NOT ErrorId)
 // 🕘 Marqueur [HISTO] (AF-07 §6, décision 2026-09-01) : un défaut laté dont la cause a
@@ -35360,6 +35399,63 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention BOTH descente PRG_03</xhtml>
               </documentation>
             </variable>
+            <variable name="SimWinchSpeedReportTauS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Tau 1er ordre retour vitesse rapportee M1/M2, s. 0.0 = saut instantane (comportement historique).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimWinchBrakeOpenDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Delai electrique/meca ouverture frein M1/M2 apres BrakeCmd=TRUE, s. 0.0 = instantane (comportement historique).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimWinchBrakeCloseDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Delai electrique/meca fermeture frein M1/M2 apres BrakeCmd=FALSE, s. 0.0 = instantane (comportement historique).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimWinchLoadFrac_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T317 exploratoire -- charge/couplage electrique treuil (interface prete, defaut = comportement
+historique inchange tant que non cablee sur un vrai signal amont, cf. registre PLAN_T317).
+--&gt; [CFG][SYNTHETIQUE] Taux de charge M1/M2, 0=a vide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimWinchCoupledActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] M1/M2 couples -- en attente cablage CoupledBoth reel</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimM3SensorsWordOverrideActive">
               <type>
                 <BOOL />
@@ -35716,6 +35812,40 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Image machine simulée</xhtml>
               </documentation>
             </variable>
+            <variable name="MotorTorqueM1_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T317 exploratoire -- modele electrique treuil, diagnostic seul, non consomme par le metier.
+ResistiveTorque_Nm reste a 0.0 (pas de modele de charge/gravite encore ecrit -- FB_Sim_WinchElectrical).
+&lt;-- [DIAG] T317 -- Couple electromagnetique simule M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotorTorqueM2_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] T317 -- Couple electromagnetique simule M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotorIsStalledM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] T317 -- Decrochage predictif simule M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotorIsStalledM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] T317 -- Decrochage predictif simule M2</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <inOutVars>
             <variable name="RawPosM1">
@@ -35769,6 +35899,17 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Comptage absolu propre au device M2 simulé</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_SimBenchCycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Période tâche PLC (s) — MainTask 10 ms</xhtml>
+              </documentation>
+            </variable>
             <variable name="instSimEncoderM1">
               <type>
                 <derived name="FB_Sim_Encoder" />
@@ -35808,6 +35949,62 @@ palier est encore engagé (fausse condition d'armement Méca A).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Modèle sécurité</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instWinchElectricalM1">
+              <type>
+                <derived name="FB_Sim_WinchElectrical" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] T317 exploratoire -- electrique+charge M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instWinchElectricalM2">
+              <type>
+                <derived name="FB_Sim_WinchElectrical" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] T317 exploratoire -- electrique+charge M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PeerTorqueM1Prev_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T317 -- couple M1 cycle precedent, pour M2 couple</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PeerTorqueM2Prev_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T317 -- couple M2 cycle precedent, pour M1 couple</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PeerSpeedM1Prev_Rpm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T317 -- vitesse M1 cycle precedent, pour M2 couple</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PeerSpeedM2Prev_Rpm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T317 -- vitesse M2 cycle precedent, pour M1 couple</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldBottomTouchPrev_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T317 -- Machine.M1_M2_KoboldBottomTouch_DI cycle precedent (benne au sol)</xhtml>
               </documentation>
             </variable>
             <variable name="M1_PresetCmd">
@@ -35986,6 +36183,55 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Détection du premier scan de simulation</xhtml>
               </documentation>
             </variable>
+            <variable name="M1_BrakeIsOpenState">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dynamique treuil M1/M2 : delais opt-in — defaut 0.0 = comportement historique
+. [LOC] Etat frein M1 filtre par le delai</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_BrakeOpenTimerS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accumulateur delai ouverture frein M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_BrakeCloseTimerS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accumulateur delai fermeture frein M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeIsOpenState">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat frein M2 filtre par le delai</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeOpenTimerS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accumulateur delai ouverture frein M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeCloseTimerS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accumulateur delai fermeture frein M2</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -36083,10 +36329,46 @@ instSimEncoderM1(
     PresetValue      := M1_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
     CoastDistanceM   := SimWinchCoast_M,
+    SpeedReportTauS  := SimWinchSpeedReportTauS,
     TestOffsetCmd    := SimSyncDeviationInjectM1,
     TestOffsetPts    := M1_OffsetPts,
     RawPos           := RawPosM1
 );
+
+// T317 exploratoire -- electrique+charge+couplage M1/M2, diagnostic seul (Winch.* metier deja
+// consomme via M2_TensionedCable_DI ci-dessous). Couplage/charge cables sur stimuli de banc en
+// attente des signaux reels amont (CoupledBoth, benne au sol) -- cf. registre PLAN_T317.
+instWinchElectricalM1(
+    Enable                := Enable,
+    StepCmd               := MAX(1, M1_StepNumber),
+    DirectionCmd          := SEL(M1_RelayRev, 1, -1),
+    NetworkVoltageAct_V   := 400.0,
+    LoadFrac_Ratio         := SimWinchLoadFrac_Ratio,
+    IsBucketGrounded      := KoboldBottomTouchPrev_DI,
+    IsCoupledToPeer        := SimWinchCoupledActive,
+    PeerTorque_Nm          := PeerTorqueM2Prev_Nm,
+    PeerSpeed_Rpm          := PeerSpeedM2Prev_Rpm
+);
+MotorTorqueM1_Nm := instWinchElectricalM1.MotorTorque_Nm;
+MotorIsStalledM1 := instWinchElectricalM1.IsStalled;
+PeerTorqueM1Prev_Nm := instWinchElectricalM1.MotorTorque_Nm;
+PeerSpeedM1Prev_Rpm := instWinchElectricalM1.SpeedAct_Rpm;
+
+instWinchElectricalM2(
+    Enable                := Enable,
+    StepCmd               := MAX(1, M2_StepNumber),
+    DirectionCmd          := SEL(M2_RelayRev, 1, -1),
+    NetworkVoltageAct_V   := 400.0,
+    LoadFrac_Ratio         := SimWinchLoadFrac_Ratio,
+    IsBucketGrounded      := KoboldBottomTouchPrev_DI,
+    IsCoupledToPeer        := SimWinchCoupledActive,
+    PeerTorque_Nm          := PeerTorqueM1Prev_Nm,
+    PeerSpeed_Rpm          := PeerSpeedM1Prev_Rpm
+);
+MotorTorqueM2_Nm := instWinchElectricalM2.MotorTorque_Nm;
+MotorIsStalledM2 := instWinchElectricalM2.IsStalled;
+PeerTorqueM2Prev_Nm := instWinchElectricalM2.MotorTorque_Nm;
+PeerSpeedM2Prev_Rpm := instWinchElectricalM2.SpeedAct_Rpm;
 
 // Détection coupure relais M2 pour renouveler la dispersion pseudo-aléatoire (±0.1m)
 IF (M2_RelayFwdPrev AND NOT M2_RelayFwd) OR (M2_RelayRevPrev AND NOT M2_RelayRev) THEN
@@ -36119,6 +36401,7 @@ instSimEncoderM2(
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := M2EffectiveSpeedScaleFactor,
     CoastDistanceM   := M2_EffectiveCoastM,
+    SpeedReportTauS  := SimWinchSpeedReportTauS,
     TestOffsetCmd    := SimSyncDeviationInjectM2,
     TestOffsetPts    := M2_OffsetPts,
     RawPos           := RawPosM2
@@ -36134,7 +36417,29 @@ END_IF;
 // Recopie structures Winch simulées :
 // 🛑 POLARITÉ DE FREIN SIMULÉ : 1 = contacteur commandé = frein OUVERT.
 // Câblage réel : DI = 1 ⟺ frein OUVERT. Le modèle produit donc M1_BrakeIsOpen_DI := M1_BrakeCmd !
-Winch.M1_BrakeIsOpen_DI        := M1_BrakeCmd;
+// Delai electrique/meca opt-in : SimWinchBrakeOpenDelayS/CloseDelayS=0.0 -&gt; bascule le
+// meme scan (comportement historique inchange, TC-P13-012). &gt;0 -&gt; retour retarde, sans jamais
+// inverser la polarite (M1_BrakeIsOpenState suit toujours M1_BrakeCmd, juste avec latence).
+IF M1_BrakeCmd THEN
+    IF NOT M1_BrakeIsOpenState THEN
+        M1_BrakeOpenTimerS := M1_BrakeOpenTimerS + CST_SimBenchCycleTimeS;
+        IF M1_BrakeOpenTimerS &gt;= MAX(0.0, SimWinchBrakeOpenDelayS) THEN
+            M1_BrakeIsOpenState := TRUE;
+            M1_BrakeOpenTimerS := 0.0;
+        END_IF;
+    END_IF;
+    M1_BrakeCloseTimerS := 0.0;
+ELSE
+    IF M1_BrakeIsOpenState THEN
+        M1_BrakeCloseTimerS := M1_BrakeCloseTimerS + CST_SimBenchCycleTimeS;
+        IF M1_BrakeCloseTimerS &gt;= MAX(0.0, SimWinchBrakeCloseDelayS) THEN
+            M1_BrakeIsOpenState := FALSE;
+            M1_BrakeCloseTimerS := 0.0;
+        END_IF;
+    END_IF;
+    M1_BrakeOpenTimerS := 0.0;
+END_IF;
+Winch.M1_BrakeIsOpen_DI        := M1_BrakeIsOpenState;
 // Retour UNIQUE « tous contacteurs retombés » = sens ET vitesse.
 // Omettre les paliers ferait croire à l'arrêt pendant les transitoires → Méca A armée à tort.
 Winch.M1_ContactorsReleased_DI := NOT (M1_RelayFwd OR M1_RelayRev
@@ -36142,7 +36447,26 @@ Winch.M1_ContactorsReleased_DI := NOT (M1_RelayFwd OR M1_RelayRev
                                     OR M1_SpeedContactor_3 OR M1_SpeedContactor_4);
 Winch.M1_ThermalOk_DI          := TRUE; // Sauf panne simulée
 
-Winch.M2_BrakeIsOpen_DI        := M2_BrakeCmd;
+IF M2_BrakeCmd THEN
+    IF NOT M2_BrakeIsOpenState THEN
+        M2_BrakeOpenTimerS := M2_BrakeOpenTimerS + CST_SimBenchCycleTimeS;
+        IF M2_BrakeOpenTimerS &gt;= MAX(0.0, SimWinchBrakeOpenDelayS) THEN
+            M2_BrakeIsOpenState := TRUE;
+            M2_BrakeOpenTimerS := 0.0;
+        END_IF;
+    END_IF;
+    M2_BrakeCloseTimerS := 0.0;
+ELSE
+    IF M2_BrakeIsOpenState THEN
+        M2_BrakeCloseTimerS := M2_BrakeCloseTimerS + CST_SimBenchCycleTimeS;
+        IF M2_BrakeCloseTimerS &gt;= MAX(0.0, SimWinchBrakeCloseDelayS) THEN
+            M2_BrakeIsOpenState := FALSE;
+            M2_BrakeCloseTimerS := 0.0;
+        END_IF;
+    END_IF;
+    M2_BrakeOpenTimerS := 0.0;
+END_IF;
+Winch.M2_BrakeIsOpen_DI        := M2_BrakeIsOpenState;
 Winch.M2_ContactorsReleased_DI := NOT (M2_RelayFwd OR M2_RelayRev
                                     OR M2_SpeedContactor_1 OR M2_SpeedContactor_2
                                     OR M2_SpeedContactor_3 OR M2_SpeedContactor_4);
@@ -36151,7 +36475,9 @@ Winch.M2_ThermalOk_DI          := TRUE;
 // Cohérent avec M2_TensionedCable_DI (sain par défaut) : capteur TOP libre en simu,
 // sauf stimulus manuel SimTopPositionActive (injection de fait capteur au banc).
 Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
-Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
+// T317 : cable tendu tant que la benne n'est pas posee -- auparavant force TRUE en dur,
+// desormais reactif au stimulus banc (interface prete, source reelle amont pas encore cablee).
+Winch.M2_TensionedCable_DI     := NOT KoboldBottomTouchPrev_DI;
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;
 Winch.COD1_SpdValue            := instSimEncoderM1.RawSpdOut;
@@ -36300,6 +36626,9 @@ IF KoboldAutoEpisodeActive THEN
 ELSE
     Machine.M1_M2_KoboldBottomTouch_DI := SimKoboldContactValue;
 END_IF;
+// T317 : memorise pour le prochain scan -- reutilise le VRAI capteur fond (Kobold), pas un
+// stimulus invente, cf. retour utilisateur 2026-09-18 (le capteur fond existe deja reel+sim).
+KoboldBottomTouchPrev_DI := Machine.M1_M2_KoboldBottomTouch_DI;
 Machine.HydraulicThermalOk_DI          := TRUE;
 Machine.TremieFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
 
@@ -36477,6 +36806,17 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — MainTask 10 ms</xhtml>
               </documentation>
             </variable>
+            <variable name="SpeedReportTauS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Constante de temps 1er ordre du retour vitesse</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawPosOut">
@@ -36587,6 +36927,22 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Roulis inertiel restant (points bruts)</xhtml>
               </documentation>
             </variable>
+            <variable name="TargetSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse instantanee signee du modele position, avant filtrage retour</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReportedSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse rapportee filtree 1er ordre, publiee dans RawSpdOut</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -36667,10 +37023,12 @@ IF PresetPending THEN
         RawPos := PresetValue;
         PresetPending := FALSE;
     END_IF;
+    TargetSpeedMps := 0.0;
 ELSIF RelayFwd THEN
     RawPos := RawPos + Increment;
     MovingDir := 1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    TargetSpeedMps := SpeedMps;
 ELSIF RelayRev THEN
     IF RawPos &gt;= Increment THEN
         RawPos := RawPos - Increment;
@@ -36679,35 +37037,40 @@ ELSIF RelayRev THEN
     END_IF;
     MovingDir := -1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    TargetSpeedMps := -SpeedMps;
 ELSE
     // Relais coupes : roulis inertiel (anticipation d'arret mecanique). Le treuil
     // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
     IF (CoastPtsLeft &gt;= 1.0) AND (MovingDir &lt;&gt; 0) THEN
         IF MovingDir = 1 THEN
             RawPos := RawPos + IncrStep1;
+            TargetSpeedMps := MinSpeedMps;
         ELSIF RawPos &gt;= IncrStep1 THEN
             RawPos := RawPos - IncrStep1;
+            TargetSpeedMps := -MinSpeedMps;
         ELSE
             RawPos := 0;
+            TargetSpeedMps := 0.0;
         END_IF;
         CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
     ELSE
         MovingDir := 0;
         CoastPtsLeft := 0.0;
+        TargetSpeedMps := 0.0;
     END_IF;
 END_IF;
 {endregion}
 
 {region "§4 Sortie"}
 RawPosOut := RawPos;
+// Retour vitesse rapporte (RawSpdOut) : 1er ordre vers TargetSpeedMps. SpeedReportTauS=0.0
+// -&gt; alpha=1 -&gt; saut instantane (comportement historique inchange).
+ReportedSpeedMps := ReportedSpeedMps
+    + (CycleTimeS / (SpeedReportTauS + CycleTimeS)) * (TargetSpeedMps - ReportedSpeedMps);
 // Formule inverse vitesse brute EtherCAT CoE (0.1 RPM) :
 // SpdValue = (V_mps * 60.0) / (0.1 * CableM_PerRev) = V_mps * 300.0 (sur tambour 2m)
-IF (MovingDir &lt;&gt; 0) AND (CableM_PerRev &gt; 0.0) THEN
-    IF MovingDir = 1 THEN
-        RawSpdOut := REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
-    ELSE
-        RawSpdOut := -REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
-    END_IF;
+IF (CableM_PerRev &gt; 0.0) THEN
+    RawSpdOut := REAL_TO_DINT((ReportedSpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
 ELSE
     RawSpdOut := 0;
 END_IF;
@@ -37268,6 +37631,108 @@ ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>a481952f-eb98-506a-b160-fd074635a746</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_KlossTorque" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT LIGHT ===
+--&gt; [CMD] Autorisation generale FB</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCUL ===
+--&gt; [CFG] Cmax decrochage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Slip_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Glissement (jamais 0.0 -- protege par l'appelant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlipAtMaxTorque_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] gmax au point de fonctionnement courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="VoltageRatio2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] (U_act/U_nom)^2</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB pret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Torque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Couple electromagnetique resultant</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_KlossTorque — Couple electromagnetique, formule de Kloss
+   ───────────────────────────────────────────────────────────────
+   🎯 Role : Calcul factorise du couple moteur asynchrone (Kloss), reutilise
+   par le regime etabli et le test de decrochage a glissement bloque.
+   📄 Doc metier : DOC/WFLOW/CONTRACTS/PLAN_T317_SIMBENCH_TREUIL_ELECTRIQUE.md
+   🧩 Dependances : aucune (calcul pur)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Ready := FALSE;
+    Torque_Nm := 0.0;
+    RETURN;
+END_IF;
+
+Torque_Nm := 2.0 * MaxTorque_Nm
+    / (Slip_Ratio / SlipAtMaxTorque_Ratio + SlipAtMaxTorque_Ratio / Slip_Ratio)
+    * VoltageRatio2;
+
+Ready := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>319a2f9e-c6a8-5252-8df3-c9df3e0746f8</ObjectId>
           </data>
         </addData>
       </pou>
@@ -38991,6 +39456,907 @@ Ready := TRUE;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>03da2ca5-829e-5f35-a2f5-646da12c2d06</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_WinchElectrical" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT LIGHT ===
+--&gt; [CMD] Autorisation generale FB</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepCmd">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ===
+--&gt; [CMD] Palier resistance rotorique actif (1..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionCmd">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens (1=Montee, -1=Descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NetworkVoltageAct_V">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="400" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Tension reseau mesuree/simulee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadFrac_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHARGE ===
+--&gt; [CMD] Taux de charge commande/estime (0..1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsBucketGrounded">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] TRUE = benne posee/cable detendu -&gt; charge forcee a 0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadTransitionFilter_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">A cabler sur l'image simulee de M2_TensionedCable_DI (NOT IsBucketGrounded) une fois le
+stimulus expose en amont (GVL_Simulation) -- interface prete, cablage source en attente.
+--&gt; [CFG] Constante de temps lissage charge (evite a-coup)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsCoupledToPeer">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COUPLAGE M1/M2 ===
+--&gt; [CMD] TRUE = les deux treuils sont couples (benne commune)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PeerTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">A cabler sur l'equivalent simule de CoupledBoth/SyncActive (PRG_04_Treuils_Benne) une fois
+expose en amont -- interface prete, cablage source en attente (lag 1 cycle accepte).
+--&gt; [BUS] Couple moteur de l'autre treuil (cycle precedent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PeerSpeed_Rpm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [BUS] Vitesse physique de l'autre treuil (cycle precedent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NetworkVoltageNom_V">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="400" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES &amp; CONFIGURATION (relayes a FB_Sim_WinchMotor) ===
+--&gt; [CFG] Tension nominale reseau</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="3800" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cmax decrochage -- SYNTHETIQUE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlipAtMaxTorqueBase_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.08" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] gmax palier rotor court-circuite</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RotorResistanceOwn_Ohm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.08" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] R2 propre rotor</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Inertia_KgM2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="45" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Inertie ramenee -- SYNTHETIQUE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SynchronousSpeed_Rpm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1500" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse synchronisme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadNominalTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2500" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Couple resistant a pleine charge -- SYNTHETIQUE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadFrictionTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="80" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Frottements residuels a vide -- SYNTHETIQUE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoupledPeerGain_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Poids de l'effort differentiel du pair en mode couple</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Pas d'integration</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT LIGHT ===
+&lt;-- [STAT] FB pret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotorTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RESULTATS PHYSIQUES (relayes de FB_Sim_WinchMotor) ===
+&lt;-- [DIAG] Couple electromagnetique, repere de commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResistiveTorqueAct_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Couple resistant reellement applique (charge+couplage, lisse)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Slip_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Glissement, repere de commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedAct_Rpm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse physique reelle signee (+montee/-descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsStalled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Decrochage constate</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsGeneratorMode">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Mode freinage electrique</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="Motor">
+              <type>
+                <derived name="FB_Sim_WinchMotor" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCE FB ===
+* [INST] Couple electromagnetique elementaire</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadFracFiltered_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAT INTERNE ===
+. [LOC] Taux de charge lisse (PT1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadFracTarget_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible : 0 si benne au sol, sinon LoadFrac_Ratio</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PeerDifferentialTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Effort differentiel du pair en mode couple</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FilterAlpha_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Coefficient de lissage du pas courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_MinFilterTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.001" />
+              </initialValue>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_WinchElectrical — Composite electrique treuil (charge + couplage)
+   ───────────────────────────────────────────────────────────────
+   🎯 Role : Calcule le couple resistant reel (charge, benne au sol, couplage
+   M1/M2) et pilote FB_Sim_WinchMotor. Transition de charge lissee (evite les
+   a-coups de couple/vitesse a la bascule seul&lt;-&gt;couple ou charge&lt;-&gt;benne au sol).
+   📄 Doc metier : DOC/WFLOW/CONTRACTS/PLAN_T317_SIMBENCH_TREUIL_ELECTRIQUE.md
+   (registre sequence/interface 2026-09-18 -- pas encore integre a AF_Partie-13)
+   🧩 Dependances : FB_Sim_WinchMotor
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === §1 GATE NEUTRALISATION ===
+IF NOT Enable THEN
+    Ready := FALSE;
+    MotorTorque_Nm := 0.0;
+    ResistiveTorqueAct_Nm := 0.0;
+    Slip_Ratio := 0.0;
+    SpeedAct_Rpm := 0.0;
+    IsStalled := FALSE;
+    IsGeneratorMode := FALSE;
+    LoadFracFiltered_Ratio := 0.0;
+    RETURN;
+END_IF;
+
+// === §2 CHARGE LISSEE (benne au sol force la cible a 0, transition sans a-coup) ===
+IF IsBucketGrounded THEN
+    LoadFracTarget_Ratio := 0.0;
+ELSE
+    LoadFracTarget_Ratio := LIMIT(0.0, LoadFrac_Ratio, 1.0);
+END_IF;
+
+IF LoadTransitionFilter_S &gt; CST_MinFilterTime_S THEN
+    FilterAlpha_Ratio := CycleTime_S / (LoadTransitionFilter_S + CycleTime_S);
+ELSE
+    FilterAlpha_Ratio := 1.0;
+END_IF;
+LoadFracFiltered_Ratio := LoadFracFiltered_Ratio
+    + FilterAlpha_Ratio * (LoadFracTarget_Ratio - LoadFracFiltered_Ratio);
+
+// === §3 COUPLAGE M1/M2 ===
+// En mode couple, la benne lie mecaniquement les deux treuils : un ecart de couple entre pairs
+// se traduit en effort differentiel de rattrapage (proportionnel a l'ecart de vitesse), pas en
+// deux dynamiques d'inertie totalement independantes qui divergent librement.
+IF IsCoupledToPeer THEN
+    PeerDifferentialTorque_Nm := CoupledPeerGain_Ratio * (SpeedAct_Rpm - PeerSpeed_Rpm)
+        * LoadNominalTorque_Nm / MAX(SynchronousSpeed_Rpm, 1.0);
+ELSE
+    PeerDifferentialTorque_Nm := 0.0;
+END_IF;
+
+// === §4 COUPLE RESISTANT APPLIQUE ===
+ResistiveTorqueAct_Nm := LoadFrictionTorque_Nm
+    + DirectionCmd * LoadFracFiltered_Ratio * LoadNominalTorque_Nm
+    + PeerDifferentialTorque_Nm;
+
+// === §5 MOTEUR ELEMENTAIRE ===
+Motor(
+    Enable := TRUE,
+    StepCmd := StepCmd,
+    DirectionCmd := DirectionCmd,
+    NetworkVoltageAct_V := NetworkVoltageAct_V,
+    ResistiveTorque_Nm := ResistiveTorqueAct_Nm,
+    NetworkVoltageNom_V := NetworkVoltageNom_V,
+    MaxTorque_Nm := MaxTorque_Nm,
+    SlipAtMaxTorqueBase_Ratio := SlipAtMaxTorqueBase_Ratio,
+    RotorResistanceOwn_Ohm := RotorResistanceOwn_Ohm,
+    Inertia_KgM2 := Inertia_KgM2,
+    SynchronousSpeed_Rpm := SynchronousSpeed_Rpm,
+    CycleTime_S := CycleTime_S
+);
+
+MotorTorque_Nm := Motor.MotorTorque_Nm;
+Slip_Ratio := Motor.Slip_Ratio;
+SpeedAct_Rpm := Motor.SpeedAct_Rpm;
+IsStalled := Motor.IsStalled;
+IsGeneratorMode := Motor.IsGeneratorMode;
+
+Ready := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d4300e91-0ca0-50b0-9b21-524eed13dd0f</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_WinchMotor" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT LIGHT ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepCmd">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ===
+--&gt; [CMD] Palier resistance rotorique actif (1..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionCmd">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens (1=Montee, -1=Descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NetworkVoltageAct_V">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="400" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES / CHARGE ===
+--&gt; [HW] Tension reseau mesuree/simulee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResistiveTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Couple de charge DEJA projete en repere de</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NetworkVoltageNom_V">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="400" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">commande (N_rel) par l'appelant : positif = s'oppose au mouvement commande, negatif =
+aide le mouvement (ex. gravite en descente -&gt; peut declencher le mode generatrice).
+Ce FB ne connait pas le taux de charge/la gravite -- calcul delegue a FB_Sim_WinchElectrical.
+=== REGLAGES &amp; CONFIGURATION ===
+--&gt; [CFG] Tension nominale reseau</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="3800" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cmax decrochage -- SYNTHETIQUE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlipAtMaxTorqueBase_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.08" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] gmax au palier rotor court-circuite</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RotorResistanceOwn_Ohm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.08" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(resistance externe nulle) -- SYNTHETIQUE. Sert de base a la mise a l'echelle par palier.
+--&gt; [CFG] R2 propre rotor (palier court-circuite)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Inertia_KgM2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="45" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Inertie ramenee -- SYNTHETIQUE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SynchronousSpeed_Rpm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1500" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse synchronisme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Pas d'integration</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT LIGHT ===
+&lt;-- [STAT] FB pret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotorTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RESULTATS PHYSIQUES ===
+&lt;-- [DIAG] Couple electromagnetique, repere de commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Slip_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Glissement, repere de commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedAct_Rpm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse physique reelle signee (+montee/-descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsStalled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Decrochage constate (jamais reinitialise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsGeneratorMode">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Couple oppose au sens de commande (freinage)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="KlossRunning">
+              <type>
+                <derived name="FB_Sim_KlossTorque" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Couple regime etabli</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KlossLockedRotor">
+              <type>
+                <derived name="FB_Sim_KlossTorque" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Couple test decrochage (g=1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedRel_RadPerS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAT INTERNE ===
+. [LOC] Vitesse en repere de commande (N_rel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SynchronousSpeed_RadPerS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse synchronisme, rad/s</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlipAtMaxTorqueStep_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] gmax au palier courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlipEff_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Glissement protege division par zero</xhtml>
+              </documentation>
+            </variable>
+            <variable name="VoltageRatio2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] (U_act/U_nom)^2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Stalled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat instantane, peut se relever</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InertiaSafe_KgM2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ENTREES BORNEES (SECURISE DIVISIONS) ===
+. [LOC] Inertia_KgM2 bornee &gt; 0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RotorResistanceOwnSafe_Ohm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] RotorResistanceOwn_Ohm bornee &gt; 0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlipAtMaxTorqueBaseSafe_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] SlipAtMaxTorqueBase_Ratio bornee &gt; 0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NetworkVoltageNomSafe_V">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] NetworkVoltageNom_V bornee &gt; 0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepCmdSafe">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] StepCmd borne [1..5]</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_StepCount">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+            </variable>
+            <variable name="CST_RotorExtResistanceStep_Ohm">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <initialValue>
+                <arrayValue>
+                  <value>
+                    <simpleValue value="3.6" />
+                  </value>
+                  <value>
+                    <simpleValue value="1.9" />
+                  </value>
+                  <value>
+                    <simpleValue value="0.9" />
+                  </value>
+                  <value>
+                    <simpleValue value="0.35" />
+                  </value>
+                  <value>
+                    <simpleValue value="0" />
+                  </value>
+                </arrayValue>
+              </initialValue>
+            </variable>
+            <variable name="CST_MinSlip_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.0001" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">palier 1 = resistance max (demarrage), palier 5 = rotor court-circuite -- SYNTHETIQUE
+(indexation/valeurs propres au ST, pas un portage 1:1 du prototype Python 4 gradins)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_MinDenominator">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.001" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">plancher generique config sensible (division)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_StallSpeedThreshold_Rpm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="28" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">~3 rad/s, "quasi arrete"</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_WinchMotor — Couple electromagnetique moteur treuil (rotor bobine)
+   ───────────────────────────────────────────────────────────────
+   🎯 Role : Couple (formule de Kloss), glissement bidirectionnel, decrochage
+   predictif et mode generatrice pour un treuil M1/M2.
+   📄 Doc metier : DOC/WFLOW/CONTRACTS/PLAN_T317_SIMBENCH_TREUIL_ELECTRIQUE.md
+   (pas encore integre a AF_Partie-13 -- entree F13.06 a creer lot dedie)
+   🧩 Dependances : FB_Sim_KlossTorque
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === §1 GATE NEUTRALISATION ===
+IF NOT Enable THEN
+    Ready := FALSE;
+    MotorTorque_Nm := 0.0;
+    Slip_Ratio := 0.0;
+    SpeedAct_Rpm := 0.0;
+    IsStalled := FALSE;
+    IsGeneratorMode := FALSE;
+    SpeedRel_RadPerS := 0.0;
+    RETURN;
+END_IF;
+
+StepCmdSafe := LIMIT(1, StepCmd, CST_StepCount);
+IF StepCmdSafe &lt;&gt; StepCmd THEN
+    Ready := FALSE;
+    RETURN;
+END_IF;
+IF (DirectionCmd &lt;&gt; 1) AND (DirectionCmd &lt;&gt; -1) THEN
+    Ready := FALSE;
+    RETURN;
+END_IF;
+
+// Bornage systematique des entrees de config sensibles (denominateurs) -- CODE_QUALITY_STANDARDS §6
+InertiaSafe_KgM2 := MAX(CST_MinDenominator, Inertia_KgM2);
+RotorResistanceOwnSafe_Ohm := MAX(CST_MinDenominator, RotorResistanceOwn_Ohm);
+SlipAtMaxTorqueBaseSafe_Ratio := MAX(CST_MinDenominator, SlipAtMaxTorqueBase_Ratio);
+NetworkVoltageNomSafe_V := MAX(1.0, NetworkVoltageNom_V);
+
+// === §2 GLISSEMENT ET COUPLE (FORMULE DE KLOSS) ===
+SynchronousSpeed_RadPerS := SynchronousSpeed_Rpm * 2.0 * 3.14159265 / 60.0;
+
+// gmax(palier) = gmax_base * R2_total(palier) / R2_rotor_propre -- ajouter de la resistance
+// externe deplace le glissement au couple max vers 1 (couple demarrage), sans changer Cmax.
+// gmax_base = gmax au palier rotor court-circuite (resistance externe nulle).
+SlipAtMaxTorqueStep_Ratio := SlipAtMaxTorqueBaseSafe_Ratio
+    * (RotorResistanceOwnSafe_Ohm + CST_RotorExtResistanceStep_Ohm[StepCmdSafe])
+    / RotorResistanceOwnSafe_Ohm;
+
+// Glissement en repere de commande (N_rel) : peut etre negatif (survitesse -&gt; freinage
+// generateur). SpeedRel_RadPerS reste dans ce repere ; SpeedAct_Rpm restitue le signe physique.
+Slip_Ratio := 1.0 - SpeedRel_RadPerS / SynchronousSpeed_RadPerS;
+
+IF ABS(Slip_Ratio) &lt; CST_MinSlip_Ratio THEN
+    IF Slip_Ratio &gt;= 0.0 THEN
+        SlipEff_Ratio := CST_MinSlip_Ratio;
+    ELSE
+        SlipEff_Ratio := -CST_MinSlip_Ratio;
+    END_IF;
+ELSE
+    SlipEff_Ratio := Slip_Ratio;
+END_IF;
+
+VoltageRatio2 := (NetworkVoltageAct_V / NetworkVoltageNomSafe_V) * (NetworkVoltageAct_V / NetworkVoltageNomSafe_V);
+
+KlossRunning(
+    Enable := TRUE,
+    MaxTorque_Nm := MaxTorque_Nm,
+    Slip_Ratio := SlipEff_Ratio,
+    SlipAtMaxTorque_Ratio := SlipAtMaxTorqueStep_Ratio,
+    VoltageRatio2 := VoltageRatio2);
+MotorTorque_Nm := KlossRunning.Torque_Nm;
+
+// === §3 DYNAMIQUE MECANIQUE ===
+// Pas de saturation basse : SpeedRel_RadPerS peut devenir negatif (glissement arriere sous
+// surcharge) ou depasser le synchronisme (regime generateur).
+SpeedRel_RadPerS := SpeedRel_RadPerS
+    + (MotorTorque_Nm - ResistiveTorque_Nm) / InertiaSafe_KgM2 * CycleTime_S;
+
+SpeedAct_Rpm := SpeedRel_RadPerS * DirectionCmd * 60.0 / (2.0 * 3.14159265);
+
+// === §4 DECROCHAGE PREDICTIF ===
+// Au palier courant, couple disponible a glissement bloque (g=1) &lt; couple resistant, ET
+// vitesse quasi nulle -- prediction "ce palier peut-il tenir la charge depuis l'arret ?",
+// pas une mesure d'arret reel.
+IF ABS(SpeedAct_Rpm) &lt; CST_StallSpeedThreshold_Rpm THEN
+    KlossLockedRotor(
+        Enable := TRUE,
+        MaxTorque_Nm := MaxTorque_Nm,
+        Slip_Ratio := 1.0,
+        SlipAtMaxTorque_Ratio := SlipAtMaxTorqueStep_Ratio,
+        VoltageRatio2 := VoltageRatio2);
+    Stalled := KlossLockedRotor.Torque_Nm &lt; ResistiveTorque_Nm;
+    IF Stalled THEN
+        IsStalled := TRUE;
+    END_IF;
+ELSE
+    Stalled := FALSE;
+END_IF;
+
+IsGeneratorMode := MotorTorque_Nm &lt; 0.0;
+
+Ready := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>cce43b3e-95fc-50e1-8d52-471f9c714033</ObjectId>
           </data>
         </addData>
       </pou>
@@ -42523,6 +43889,30 @@ PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenance
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Erreur synchro treuils</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleM1SpeedStepApplied">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Palier vitesse appliqué M1 (0..5, causes 8/9 FB_CycleSemiAuto)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleM2SpeedStepApplied">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Palier vitesse appliqué M2 (0..5, causes 8/9 FB_CycleSemiAuto)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleAutoDiveM2Step5Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Essai T291-A actif (M2 cible palier 5 en plongée)</xhtml>
+              </documentation>
+            </variable>
             <variable name="JoystickDeadmanArmed">
               <type>
                 <BOOL />
@@ -43213,6 +44603,9 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx303_KoboldBottomTouch         := CycleKob
 GVL_Troubleshooting.G_CycleSemiAuto.Idx304_SpeedMismatchActive       := CycleSpeedMismatchActive;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx305_LimitLegalReached         := CycleLimitLegalReached;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx306_WinchSyncError            := CycleWinchSyncError;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx307_M1SpeedStepApplied        := CycleM1SpeedStepApplied;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx308_M2SpeedStepApplied        := CycleM2SpeedStepApplied;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx309_AutoDiveM2Step5Active     := CycleAutoDiveM2Step5Active;
 {endregion}
 
 {region "§14 Trace de blocage terrain (winch M1/M2 + translation M3)"}
@@ -56029,6 +57422,9 @@ instTroubleshootingView(
     CycleErrorId         := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
     CycleFaultLatched    := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Latched,
     CycleFaultLatchedId  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.LatchedId,
+    CycleM1SpeedStepApplied := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber,
+    CycleM2SpeedStepApplied := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
+    CycleAutoDiveM2Step5Active := PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active,
     CycleChecksInhibited := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
     CycleIgnoredCheckId  := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId,
     CycleForceStepPrepared := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared,
@@ -57625,12 +59021,15 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
           <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
           <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
           <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
+          <Object Name="FB_Sim_KlossTorque" ObjectId="319a2f9e-c6a8-5252-8df3-c9df3e0746f8" />
           <Object Name="FB_Sim_PositionSensor" ObjectId="538b32eb-6dc2-59d5-8226-64383264fe4b" />
           <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
           <Object Name="FB_Sim_SuspendedLoad" ObjectId="5e90360e-a4b1-5c07-88d0-97d04f31b674" />
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
           <Object Name="FB_Sim_TranslationBrake" ObjectId="df996876-0665-532f-9bbb-9be3ca7669e4" />
           <Object Name="FB_Sim_TranslationDrive" ObjectId="03da2ca5-829e-5f35-a2f5-646da12c2d06" />
+          <Object Name="FB_Sim_WinchElectrical" ObjectId="d4300e91-0ca0-50b0-9b21-524eed13dd0f" />
+          <Object Name="FB_Sim_WinchMotor" ObjectId="cce43b3e-95fc-50e1-8d52-471f9c714033" />
           <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
           <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
         </Folder>

@@ -49,5 +49,8 @@ STRUCT
     Idx304_SpeedMismatchActive       : BOOL; // 1 = Alerte écart de vitesse M1/M2 active
     Idx305_LimitLegalReached         : BOOL; // 1 = Limite légale atteinte (descente bloquée)
     Idx306_WinchSyncError            : BOOL; // 1 = Erreur de synchronisme M1/M2
+    Idx307_M1SpeedStepApplied        : INT;  // Palier vitesse applique M1 (0..5, causes 8/9)
+    Idx308_M2SpeedStepApplied        : INT;  // Palier vitesse applique M2 (0..5, causes 8/9)
+    Idx309_AutoDiveM2Step5Active     : BOOL; // 1 = Essai T291-A actif (M2 cible palier 5 en plongee)
 END_STRUCT
 END_TYPE

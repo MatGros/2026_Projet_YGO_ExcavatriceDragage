@@ -9,11 +9,19 @@
     {
       "name": "TC-P13-ENC-002 Simulation incrementation comptage en montee",
       "passed": true
+    },
+    {
+      "name": "TC-P13-034 SpeedReportTauS=0.0 conserve le saut instantane historique (non-regression)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-035 SpeedReportTauS>0 fait decroitre RawSpdOut sur plusieurs scans (fidelite AX10, T316)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 4,
+    "passed": 4,
     "failed": 0
   }
 }

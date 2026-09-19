@@ -27,6 +27,10 @@
       "passed": true
     },
     {
+      "name": "TC-P13-015 SimBench delai frein M1 opt-in (T316) : SimWinchBrakeOpenDelayS retarde M1_BrakeIsOpen_DI sans jamais inverser la polarite",
+      "passed": true
+    },
+    {
       "name": "TC-T300-INT-010 SimBench M3 publie le retour dynamique du drive",
       "passed": true
     },
@@ -108,8 +112,8 @@
     }
   ],
   "summary": {
-    "total": 26,
-    "passed": 26,
+    "total": 27,
+    "passed": 27,
     "failed": 0
   }
 }

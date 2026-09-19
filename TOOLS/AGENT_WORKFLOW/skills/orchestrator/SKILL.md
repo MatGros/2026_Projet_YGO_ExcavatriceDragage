@@ -121,7 +121,7 @@ Chaque tâche porte : `id`, `parent_id`, `statut`, `criticite`, `domaine`, `agen
 | `statut` | `✅` / `⏳` / `⬜` / `⏸️` / `⛔` / `❌` | avancement métier : fait / en cours / à faire / en pause / bloqué / échoué |
 | `criticite` | `C0`–`C4` | criticité (C0 = critique, C4 = mineure) |
 | `domaine` | ex. `STANDARDS`, `OUTILLAGE`, `SAFETY` | domaine fonctionnel |
-| `agent` | ex. `AGY-01` | acteur attribué |
+| `agent` | `CC01`, `AGY01`, `CDX01`, `DSH01`, `OPC01`, `HUM`, `—` | acteur attribué (format strict Trigramme+01..99, max 6 car., zéro libellé long) |
 
 ### Verrouiller une tâche
 

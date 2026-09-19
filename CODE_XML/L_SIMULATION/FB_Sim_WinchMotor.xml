@@ -1,0 +1,628 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-18T18:21:17.608336" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-18T18:21:17.608336">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_Sim_WinchMotor" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT LIGHT ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepCmd">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ===
+--&gt; [CMD] Palier resistance rotorique actif (1..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionCmd">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens (1=Montee, -1=Descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NetworkVoltageAct_V">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="400" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES / CHARGE ===
+--&gt; [HW] Tension reseau mesuree/simulee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResistiveTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Couple de charge DEJA projete en repere de</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NetworkVoltageNom_V">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="400" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">commande (N_rel) par l'appelant : positif = s'oppose au mouvement commande, negatif =
+aide le mouvement (ex. gravite en descente -&gt; peut declencher le mode generatrice).
+Ce FB ne connait pas le taux de charge/la gravite -- calcul delegue a FB_Sim_WinchElectrical.
+=== REGLAGES &amp; CONFIGURATION ===
+--&gt; [CFG] Tension nominale reseau</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="3800" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cmax decrochage -- SYNTHETIQUE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlipAtMaxTorqueBase_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.08" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] gmax au palier rotor court-circuite</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RotorResistanceOwn_Ohm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.08" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(resistance externe nulle) -- SYNTHETIQUE. Sert de base a la mise a l'echelle par palier.
+--&gt; [CFG] R2 propre rotor (palier court-circuite)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Inertia_KgM2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="45" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Inertie ramenee -- SYNTHETIQUE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SynchronousSpeed_Rpm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1500" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse synchronisme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Pas d'integration</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT LIGHT ===
+&lt;-- [STAT] FB pret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotorTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RESULTATS PHYSIQUES ===
+&lt;-- [DIAG] Couple electromagnetique, repere de commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Slip_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Glissement, repere de commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedAct_Rpm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse physique reelle signee (+montee/-descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsStalled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Decrochage constate (jamais reinitialise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsGeneratorMode">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Couple oppose au sens de commande (freinage)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="KlossRunning">
+              <type>
+                <derived name="FB_Sim_KlossTorque" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Couple regime etabli</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KlossLockedRotor">
+              <type>
+                <derived name="FB_Sim_KlossTorque" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Couple test decrochage (g=1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedRel_RadPerS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAT INTERNE ===
+. [LOC] Vitesse en repere de commande (N_rel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SynchronousSpeed_RadPerS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse synchronisme, rad/s</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlipAtMaxTorqueStep_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] gmax au palier courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlipEff_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Glissement protege division par zero</xhtml>
+              </documentation>
+            </variable>
+            <variable name="VoltageRatio2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] (U_act/U_nom)^2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Stalled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat instantane, peut se relever</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InertiaSafe_KgM2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ENTREES BORNEES (SECURISE DIVISIONS) ===
+. [LOC] Inertia_KgM2 bornee &gt; 0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RotorResistanceOwnSafe_Ohm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] RotorResistanceOwn_Ohm bornee &gt; 0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlipAtMaxTorqueBaseSafe_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] SlipAtMaxTorqueBase_Ratio bornee &gt; 0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NetworkVoltageNomSafe_V">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] NetworkVoltageNom_V bornee &gt; 0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepCmdSafe">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] StepCmd borne [1..5]</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_StepCount">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+            </variable>
+            <variable name="CST_RotorExtResistanceStep_Ohm">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <initialValue>
+                <arrayValue>
+                  <value>
+                    <simpleValue value="3.6" />
+                  </value>
+                  <value>
+                    <simpleValue value="1.9" />
+                  </value>
+                  <value>
+                    <simpleValue value="0.9" />
+                  </value>
+                  <value>
+                    <simpleValue value="0.35" />
+                  </value>
+                  <value>
+                    <simpleValue value="0" />
+                  </value>
+                </arrayValue>
+              </initialValue>
+            </variable>
+            <variable name="CST_MinSlip_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.0001" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">palier 1 = resistance max (demarrage), palier 5 = rotor court-circuite -- SYNTHETIQUE
+(indexation/valeurs propres au ST, pas un portage 1:1 du prototype Python 4 gradins)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_MinDenominator">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.001" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">plancher generique config sensible (division)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_StallSpeedThreshold_Rpm">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="28" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">~3 rad/s, "quasi arrete"</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_WinchMotor — Couple electromagnetique moteur treuil (rotor bobine)
+   ───────────────────────────────────────────────────────────────
+   🎯 Role : Couple (formule de Kloss), glissement bidirectionnel, decrochage
+   predictif et mode generatrice pour un treuil M1/M2.
+   📄 Doc metier : DOC/WFLOW/CONTRACTS/PLAN_T317_SIMBENCH_TREUIL_ELECTRIQUE.md
+   (pas encore integre a AF_Partie-13 -- entree F13.06 a creer lot dedie)
+   🧩 Dependances : FB_Sim_KlossTorque
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === §1 GATE NEUTRALISATION ===
+IF NOT Enable THEN
+    Ready := FALSE;
+    MotorTorque_Nm := 0.0;
+    Slip_Ratio := 0.0;
+    SpeedAct_Rpm := 0.0;
+    IsStalled := FALSE;
+    IsGeneratorMode := FALSE;
+    SpeedRel_RadPerS := 0.0;
+    RETURN;
+END_IF;
+
+StepCmdSafe := LIMIT(1, StepCmd, CST_StepCount);
+IF StepCmdSafe &lt;&gt; StepCmd THEN
+    Ready := FALSE;
+    RETURN;
+END_IF;
+IF (DirectionCmd &lt;&gt; 1) AND (DirectionCmd &lt;&gt; -1) THEN
+    Ready := FALSE;
+    RETURN;
+END_IF;
+
+// Bornage systematique des entrees de config sensibles (denominateurs) -- CODE_QUALITY_STANDARDS §6
+InertiaSafe_KgM2 := MAX(CST_MinDenominator, Inertia_KgM2);
+RotorResistanceOwnSafe_Ohm := MAX(CST_MinDenominator, RotorResistanceOwn_Ohm);
+SlipAtMaxTorqueBaseSafe_Ratio := MAX(CST_MinDenominator, SlipAtMaxTorqueBase_Ratio);
+NetworkVoltageNomSafe_V := MAX(1.0, NetworkVoltageNom_V);
+
+// === §2 GLISSEMENT ET COUPLE (FORMULE DE KLOSS) ===
+SynchronousSpeed_RadPerS := SynchronousSpeed_Rpm * 2.0 * 3.14159265 / 60.0;
+
+// gmax(palier) = gmax_base * R2_total(palier) / R2_rotor_propre -- ajouter de la resistance
+// externe deplace le glissement au couple max vers 1 (couple demarrage), sans changer Cmax.
+// gmax_base = gmax au palier rotor court-circuite (resistance externe nulle).
+SlipAtMaxTorqueStep_Ratio := SlipAtMaxTorqueBaseSafe_Ratio
+    * (RotorResistanceOwnSafe_Ohm + CST_RotorExtResistanceStep_Ohm[StepCmdSafe])
+    / RotorResistanceOwnSafe_Ohm;
+
+// Glissement en repere de commande (N_rel) : peut etre negatif (survitesse -&gt; freinage
+// generateur). SpeedRel_RadPerS reste dans ce repere ; SpeedAct_Rpm restitue le signe physique.
+Slip_Ratio := 1.0 - SpeedRel_RadPerS / SynchronousSpeed_RadPerS;
+
+IF ABS(Slip_Ratio) &lt; CST_MinSlip_Ratio THEN
+    IF Slip_Ratio &gt;= 0.0 THEN
+        SlipEff_Ratio := CST_MinSlip_Ratio;
+    ELSE
+        SlipEff_Ratio := -CST_MinSlip_Ratio;
+    END_IF;
+ELSE
+    SlipEff_Ratio := Slip_Ratio;
+END_IF;
+
+VoltageRatio2 := (NetworkVoltageAct_V / NetworkVoltageNomSafe_V) * (NetworkVoltageAct_V / NetworkVoltageNomSafe_V);
+
+KlossRunning(
+    Enable := TRUE,
+    MaxTorque_Nm := MaxTorque_Nm,
+    Slip_Ratio := SlipEff_Ratio,
+    SlipAtMaxTorque_Ratio := SlipAtMaxTorqueStep_Ratio,
+    VoltageRatio2 := VoltageRatio2);
+MotorTorque_Nm := KlossRunning.Torque_Nm;
+
+// === §3 DYNAMIQUE MECANIQUE ===
+// Pas de saturation basse : SpeedRel_RadPerS peut devenir negatif (glissement arriere sous
+// surcharge) ou depasser le synchronisme (regime generateur).
+SpeedRel_RadPerS := SpeedRel_RadPerS
+    + (MotorTorque_Nm - ResistiveTorque_Nm) / InertiaSafe_KgM2 * CycleTime_S;
+
+SpeedAct_Rpm := SpeedRel_RadPerS * DirectionCmd * 60.0 / (2.0 * 3.14159265);
+
+// === §4 DECROCHAGE PREDICTIF ===
+// Au palier courant, couple disponible a glissement bloque (g=1) &lt; couple resistant, ET
+// vitesse quasi nulle -- prediction "ce palier peut-il tenir la charge depuis l'arret ?",
+// pas une mesure d'arret reel.
+IF ABS(SpeedAct_Rpm) &lt; CST_StallSpeedThreshold_Rpm THEN
+    KlossLockedRotor(
+        Enable := TRUE,
+        MaxTorque_Nm := MaxTorque_Nm,
+        Slip_Ratio := 1.0,
+        SlipAtMaxTorque_Ratio := SlipAtMaxTorqueStep_Ratio,
+        VoltageRatio2 := VoltageRatio2);
+    Stalled := KlossLockedRotor.Torque_Nm &lt; ResistiveTorque_Nm;
+    IF Stalled THEN
+        IsStalled := TRUE;
+    END_IF;
+ELSE
+    Stalled := FALSE;
+END_IF;
+
+IsGeneratorMode := MotorTorque_Nm &lt; 0.0;
+
+Ready := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>cce43b3e-95fc-50e1-8d52-471f9c714033</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_KlossTorque" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT LIGHT ===
+--&gt; [CMD] Autorisation generale FB</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxTorque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCUL ===
+--&gt; [CFG] Cmax decrochage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Slip_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Glissement (jamais 0.0 -- protege par l'appelant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlipAtMaxTorque_Ratio">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] gmax au point de fonctionnement courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="VoltageRatio2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] (U_act/U_nom)^2</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB pret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Torque_Nm">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Couple electromagnetique resultant</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_KlossTorque — Couple electromagnetique, formule de Kloss
+   ───────────────────────────────────────────────────────────────
+   🎯 Role : Calcul factorise du couple moteur asynchrone (Kloss), reutilise
+   par le regime etabli et le test de decrochage a glissement bloque.
+   📄 Doc metier : DOC/WFLOW/CONTRACTS/PLAN_T317_SIMBENCH_TREUIL_ELECTRIQUE.md
+   🧩 Dependances : aucune (calcul pur)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Ready := FALSE;
+    Torque_Nm := 0.0;
+    RETURN;
+END_IF;
+
+Torque_Nm := 2.0 * MaxTorque_Nm
+    / (Slip_Ratio / SlipAtMaxTorque_Ratio + SlipAtMaxTorque_Ratio / Slip_Ratio)
+    * VoltageRatio2;
+
+Ready := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>319a2f9e-c6a8-5252-8df3-c9df3e0746f8</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="L_SIMULATION">
+          <Object Name="FB_Sim_WinchMotor" ObjectId="cce43b3e-95fc-50e1-8d52-471f9c714033" />
+          <Object Name="FB_Sim_KlossTorque" ObjectId="319a2f9e-c6a8-5252-8df3-c9df3e0746f8" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

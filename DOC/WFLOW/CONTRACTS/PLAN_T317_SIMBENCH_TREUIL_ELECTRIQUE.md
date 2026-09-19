@@ -1,6 +1,35 @@
 # T317 — Modèle électrotechnique treuils M1/M2 (moteur rotor bobiné + groupe électrogène)
 
-Statut : P0 (identification), aucun code écrit. Mise à jour : 2026-09-18.
+Statut : FB_Sim_WinchMotor + FB_Sim_KlossTorque écrits, câblés (G200 PASS), 2 bugs de formule
+corrigés (gmax par palier inversé, dénominateurs non bornés). FB_Sim_WinchElectrical (composite
+charge/couplage) PAS ENCORE ÉCRIT — bloqué sur le registre ci-dessous. Mise à jour : 2026-09-18.
+
+## ⚠️ Registre séquence/interface (revue automatisme 2026-09-18) — à trancher avant FB_Sim_WinchElectrical
+
+1. **Couplage M1/M2** : signal métier existant à réutiliser tel quel, ne pas réinventer —
+   `CoupledBoth := instWinchSync.SyncActive OR WinchBothMotionActive` (`PRG_04_Treuils_Benne.st:1058`).
+   Le futur composite doit router `PeerTorque_Nm`/`PeerSpeed_Rpm` entre instances M1/M2 en mode
+   couplé (sinon deux dynamiques d'inertie indépendantes qui divergent librement — pas réaliste,
+   la benne les lie mécaniquement).
+2. **"Benne au sol" (charge nulle)** : **aucun signal métier fiable n'existe aujourd'hui**.
+   `M1SlipDetected` (`FB_Bucket.st:202`) est un indicateur de défaut glissement câble, pas un état
+   "sans charge". `AF_Partie-10` mentionne un futur `FB_WinchLoadEstimator` non tranché (§7.3).
+   **Décision requise** : inventer ce signal proprement, ou documenter le cas comme non modélisé
+   pour l'instant (limite assumée, pas cachée).
+3. **Articulation avec T293** (`SimM2CoupledDescentModelActive`, `PRG_04:303-310`, module déjà la
+   position M2 simulée en descente couplée) : le nouveau modèle couple/courant doit partager le
+   même signal source de détection de couplage, pas en créer un deuxième qui pourrait diverger.
+4. **Bascule sans à-coup** : rien aujourd'hui ne lisse une transition brutale de `ResistiveTorque_Nm`
+   (ex. benne qui touche le sol d'un coup, bascule seul→couplé). Le composite doit soit lisser
+   lui-même (constante de temps), soit documenter que l'amont doit déjà fournir un signal continu.
+
+**Interface proposée pour `FB_Sim_WinchElectrical`** (composite, pas `FB_Sim_WinchMotor` élémentaire
+qui reste pur) : `IsCoupledToPeer : BOOL`, `PeerTorque_Nm : REAL`, `PeerSpeed_Rpm : REAL`,
+`IsBucketGrounded : BOOL`, `LoadFrac_Ratio : REAL`, `LoadTransitionFilter_S : REAL`.
+
+**Limite actuelle assumée** : `FB_SimBench.st` câble `instWinchMotorM1`/`M2` de façon totalement
+indépendante, `ResistiveTorque_Nm := 0.0` en dur — diagnostic seul, pas encore représentatif d'une
+vraie charge/couplage. Documenté en commentaire dans le code, pas dissimulé.
 
 ## Origine
 
