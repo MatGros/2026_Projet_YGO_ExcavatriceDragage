@@ -100,6 +100,8 @@ VAR_INPUT
     CycleM1SpeedStepApplied  : INT;    (* --> [HW] Palier vitesse appliqué M1 (0..5, causes 8/9 FB_CycleSemiAuto) *)
     CycleM2SpeedStepApplied  : INT;    (* --> [HW] Palier vitesse appliqué M2 (0..5, causes 8/9 FB_CycleSemiAuto) *)
     CycleAutoDiveM2Step5Active : BOOL; (* --> [STAT] Essai T291-A actif (M2 cible palier 5 en plongée) *)
+    CycleM1SpeedStepAtFault  : INT;    (* --> [DIAG] Palier M1 appliqué, figé au moment du défaut (0..5) *)
+    CycleM2SpeedStepAtFault  : INT;    (* --> [DIAG] Palier M2 appliqué, figé au moment du défaut (0..5) *)
     JoystickDeadmanArmed     : BOOL;   (* --> [CMD] Homme-mort armé *)
     JoystickAtNeutral        : BOOL;   (* --> [HW] Joystick au neutre *)
     HomedM1                  : BOOL;   (* --> [HW] Codeur M1 référencé *)
@@ -707,6 +709,8 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx306_WinchSyncError            := CycleWin
 GVL_Troubleshooting.G_CycleSemiAuto.Idx307_M1SpeedStepApplied        := CycleM1SpeedStepApplied;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx308_M2SpeedStepApplied        := CycleM2SpeedStepApplied;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx309_AutoDiveM2Step5Active     := CycleAutoDiveM2Step5Active;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx310_M1SpeedStepAtFault        := CycleM1SpeedStepAtFault;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx311_M2SpeedStepAtFault        := CycleM2SpeedStepAtFault;
 {endregion}
 
 {region "§14 Trace de blocage terrain (winch M1/M2 + translation M3)"}

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T11:35:24.197546" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T11:35:24.197546">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T10:24:28.838035" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T10:24:28.838035">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1424,6 +1424,22 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etape specifique au moment du defaut</xhtml>
               </documentation>
             </variable>
+            <variable name="M1SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Palier M1 applique, fige au moment du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Palier M2 applique, fige au moment du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
             <variable name="ResumeAfterFaultAvailable">
               <type>
                 <BOOL />
@@ -2836,6 +2852,8 @@ END_IF;
 // 🧊 R9 — capture l'étape spécifique AVANT la bascule vers AX_STAB
 IF ErrorEdge.Q THEN
     CycleStepAtError := State;
+    M1SpeedStepAtFault := M1_SpeedStepApplied;
+    M2SpeedStepAtFault := M2_SpeedStepApplied;
     State := E_AutoCycleStep.AX_STAB;
     WaitingResume := FALSE;   // un défaut abroge la reprise consciente : repli AX_STAB
 END_IF;

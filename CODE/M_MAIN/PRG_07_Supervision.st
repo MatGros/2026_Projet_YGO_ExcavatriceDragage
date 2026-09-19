@@ -828,6 +828,8 @@ instTroubleshootingView(
     CycleM1SpeedStepApplied := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber,
     CycleM2SpeedStepApplied := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
     CycleAutoDiveM2Step5Active := PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active,
+    CycleM1SpeedStepAtFault := PRG_03_Modes_Cycle.Data.SequenceState.M1SpeedStepAtFault,
+    CycleM2SpeedStepAtFault := PRG_03_Modes_Cycle.Data.SequenceState.M2SpeedStepAtFault,
     CycleChecksInhibited := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
     CycleIgnoredCheckId  := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId,
     CycleForceStepPrepared := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared,

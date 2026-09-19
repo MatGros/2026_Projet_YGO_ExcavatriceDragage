@@ -328,6 +328,8 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.Step                   := instCycleSemiAuto.CycleStep;
     Data.SequenceState.StepStr                := instCycleSemiAuto.CycleStateStr;
     Data.SequenceState.StepAtFault            := instCycleSemiAuto.CycleStepAtError;
+    Data.SequenceState.M1SpeedStepAtFault     := instCycleSemiAuto.M1SpeedStepAtFault;
+    Data.SequenceState.M2SpeedStepAtFault     := instCycleSemiAuto.M2SpeedStepAtFault;
     Data.SequenceState.ResumeAfterFaultAvailable := instCycleSemiAuto.ResumeAfterFaultAvailable;
     Data.SequenceState.OperatorActionId       := instCycleSemiAuto.OperatorActionId;
     Data.SequenceState.OperatorAction         := instCycleSemiAuto.OperatorAction;
@@ -426,6 +428,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.Step                   := E_AutoCycleStep.AX0_REPOS;
     Data.SequenceState.StepStr                := 'ASSIST_MODE';
     Data.SequenceState.StepAtFault            := E_AutoCycleStep.AX0_REPOS;
+    Data.SequenceState.M1SpeedStepAtFault     := 0;
+    Data.SequenceState.M2SpeedStepAtFault     := 0;
     Data.SequenceState.ResumeAfterFaultAvailable := FALSE;
     Data.SequenceState.ExpectedAxis           := E_OperatorAxis.JOYSTICK_Y;
     Data.SequenceState.ExpectedDirection      := WinchBothMotionDirection;
@@ -495,6 +499,8 @@ ELSE
     Data.SequenceState.Step                    := E_AutoCycleStep.AX0_REPOS;
     Data.SequenceState.StepStr                 := 'AX0_REPOS';
     Data.SequenceState.StepAtFault             := E_AutoCycleStep.AX0_REPOS;
+    Data.SequenceState.M1SpeedStepAtFault      := 0;
+    Data.SequenceState.M2SpeedStepAtFault      := 0;
     Data.SequenceState.ResumeAfterFaultAvailable := FALSE;
     Data.SequenceState.OperatorActionId        := 0;
     Data.SequenceState.OperatorAction          := '';

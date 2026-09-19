@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T10:10:34.200796" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T10:10:34.200796">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T10:25:19.361965" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T10:25:19.361965">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -7365,6 +7365,22 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Essai T291-A actif (M2 cible palier 5 en plongée)</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleM1SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Palier M1 appliqué, figé au moment du défaut (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleM2SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Palier M2 appliqué, figé au moment du défaut (0..5)</xhtml>
+              </documentation>
+            </variable>
             <variable name="JoystickDeadmanArmed">
               <type>
                 <BOOL />
@@ -8058,6 +8074,8 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx306_WinchSyncError            := CycleWin
 GVL_Troubleshooting.G_CycleSemiAuto.Idx307_M1SpeedStepApplied        := CycleM1SpeedStepApplied;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx308_M2SpeedStepApplied        := CycleM2SpeedStepApplied;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx309_AutoDiveM2Step5Active     := CycleAutoDiveM2Step5Active;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx310_M1SpeedStepAtFault        := CycleM1SpeedStepAtFault;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx311_M2SpeedStepAtFault        := CycleM2SpeedStepAtFault;
 {endregion}
 
 {region "§14 Trace de blocage terrain (winch M1/M2 + translation M3)"}

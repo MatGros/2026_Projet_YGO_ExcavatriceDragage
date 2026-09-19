@@ -588,7 +588,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 E_AutoCycleStep.AX7_SEARCH_BOTTOM: StepAtErrorStr := 'AX7 (recherche fond)';
                 E_AutoCycleStep.AX8_BOTTOM_CONFIRMED: StepAtErrorStr := 'AX8 (fond confirme)';
                 E_AutoCycleStep.AX_DIVING_RETRY: StepAtErrorStr := 'AX_DIVING_RETRY (reprise plongee)';
-                E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (montee sync - retendre cables)';
+                E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (montee sync)';
                 E_AutoCycleStep.AX10_CLOSE_BUCKET: StepAtErrorStr := 'AX10 (fermeture benne)';
                 E_AutoCycleStep.AX10_WAIT_ASCENT_START: StepAtErrorStr := 'AX10b (stabilisation avant montee)';
                 E_AutoCycleStep.AX11_CTRL_ASCENT: StepAtErrorStr := 'AX11 (remontee controle)';
@@ -625,15 +625,15 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             ELSIF (CycleErrorId AND 16#0100) <> 0 THEN
                 CycleFaultCauseStr := 'palier 5 interdit sur M1 ou M2 pendant plongee';
             ELSIF (CycleErrorId AND 16#0200) <> 0 THEN
-                CycleFaultCauseStr := 'palier 4 non confirme sur M1 ou M2 en recherche Kobold';
+                CycleFaultCauseStr := 'palier 4 non confirme M1/M2 recherche Kobold';
             ELSIF (CycleErrorId AND 16#0400) <> 0 THEN
                 CycleFaultCauseStr := 'arret mecanique M1/M2 non confirme avant plongee';
             ELSE
                 CycleFaultCauseStr := CONCAT('cause cycle inconnue #', WORD_TO_STRING(CycleErrorId));
             END_IF;
-            OperatorActionCandidate := CONCAT('[CYCLE] Defaut a ', CONCAT(StepAtErrorStr,
+            OperatorActionCandidate := CONCAT('[CYCLE] ', CONCAT(StepAtErrorStr,
                                          CONCAT(' : ', CONCAT(CycleFaultCauseStr,
-                                         '). Choisir Reprendre ou Abandonner.'))));
+                                         ' > Reprendre/Abandonner'))));
         ELSE
             OperatorActionCandidate := '[CYCLE] Cycle en cours...';
     END_CASE;

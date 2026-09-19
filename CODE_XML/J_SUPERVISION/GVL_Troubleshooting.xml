@@ -779,6 +779,22 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Essai T291-A actif (M2 cible palier 5 en plongee)</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx310_M1SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier M1 applique, fige au moment du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx311_M2SpeedStepAtFault">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier M2 applique, fige au moment du defaut (0..5)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
