@@ -48,15 +48,17 @@ contract:
   alert_duty: >
     Toute ambiguite entre la position P1 memoiree, les capteurs M3 et le geste
     joystick suspend l'implementation avant modification du cycle.
-status: PENDING
+status: VALIDATED
 execution:
-  executed_by: ''
-  completed_at: ''
-  status: PENDING
-  summary: 'Creee le 2026-09-19 a la demande utilisateur ; non analysee et non implementee.'
-  evidence_submitted: []
+  executed_by: 'CDX01'
+  completed_at: '2026-09-19T19:18:02+02:00'
+  status: COMPLETED
+  summary: 'Correction implementee dans FB_CycleSemiAuto : AX2 franchit P1 vers AX3 sous geste joystick pousse maintenu ; les gardes homme-mort, ouverture benne et transition AX4 restent actives.'
+  evidence_submitted:
+    - 'Validation utilisateur en simulation 2026-09-19 : AX2 -> AX3 sans relachement/re-appui joystick lorsque M3 est deja P1.'
+    - 'CODE/G_CYCLE/FB_CycleSemiAuto.st : branche AX2 P1 et garde JoystickPushOnly.'
 validation:
-  status: PENDING
-  validated_by: ''
-  validated_at: ''
-  notes: ''
+  status: VALIDATED
+  validated_by: 'HUM'
+  validated_at: '2026-09-19T19:18:02+02:00'
+  notes: 'Validation utilisateur en simulation : le cycle peut enchainer depuis P1 sans relacher/re-enclencher le joystick. Gates et bundle deja verifies dans la session ; validation machine hors perimetre.'

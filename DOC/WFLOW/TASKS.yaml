@@ -1,11 +1,14 @@
 tasks:
 - id: T319
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: CYCLE_AUTO / TRANSLATION
-  agent: —
+  agent: CDX01
   date: '2026-09-19T00:00:00+02:00'
+  updated_at: '2026-09-19T19:18:02+02:00'
+  completed_at: '2026-09-19T19:18:02+02:00'
+  avancement: 'Terminée et validée en simulation par l utilisateur : M3 déjà qualifié P1, AX2 enchaîne vers AX3 sous le même geste joystick maintenu ; l ouverture benne puis la plongée restent conditionnées par homme-mort, joystick et états mécaniques.'
   titre: Cycle — continuité AX2 lorsque la translation est déjà confirmée P1
   contexte: Après réinitialisation du graphe 7, un lancement avec joystick déjà poussé reste en AX2 même si M3 est déjà à P1 ; l'opérateur doit relâcher puis réenclencher.
   description: Si la position P1 est déjà stable et qualifiée au démarrage, mémoriser ce fait et enchaîner AX2 vers AX3 ouverture benne puis plongée sous le même geste maintenu. Aucun saut de sécurité ni reprise automatique hors geste.
@@ -840,6 +843,8 @@ tasks:
   domaine: TREUILS_BENNE
   agent: —
   date: '2026-09-15T11:34:47+02:00'
+  updated_at: '2026-09-19T19:18:02+02:00'
+  validation_note: 'P2 AX11 confirmé en simulation utilisateur ; recette terrain et validation mécanique restent nécessaires avant clôture.'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
   avancement: '✅ Essai simulation utilisateur 2026-09-15 : AX11 monte M1+M2 au palier 2. Validation terrain reel et gates
     finaux encore requis avant cloture.'
@@ -2586,8 +2591,10 @@ tasks:
   statut: ⏳
   criticite: C4
   domaine: CYCLE_AUTO_BENNE
-  agent: —
+  agent: CDX01
   date: '2026-09-19T00:00:00+02:00'
+  updated_at: '2026-09-19T19:18:02+02:00'
+  validation_note: 'Micro-phase validée en simulation par l utilisateur : fermeture AUTO proportionnelle plafonnée au palier AX11 effectif P1..P2 ; jog manuel/maintenance inchangé. Le transfert anticipé AX10→AX11 et la validation machine restent ouverts.'
   avancement: 'Micro-phase AX10 plafond demarree le 2026-09-19 apres validation humaine : fermeture AUTO proportionnelle mais
     plafonnee au palier AX11 effectif P1..P2, sans brider le jog maintenance. Phase A codee : GVL/IHM persistant ExtractionStartOpening_Pct [0..50], defaut 0, sans lecture cycle. Interface
     IHM figee ; verification pre-CODESYS en cours. B conserve AX10b, C raccordement P1, D AX11 P2 puis AX12. ALERTE 2026-09-17

@@ -132,10 +132,11 @@ execution:
   completed_at: ""
   status: PENDING
   summary: >
-    Prise en charge et plan prepares le 2026-09-15, challenge lecture seule expert
-    automatisme. MAJOR sur plan initial : trou de commande au scan de fermeture,
-    atomicite Both, disponibilite direction M1 et plafond P1 benne partielle.
-    Plan revise documente ; aucun code ST modifie ni test T262 execute.
+    Micro-phase AX10 plafond executee et validee en simulation utilisateur le
+    2026-09-19 : fermeture automatique proportionnelle plafonnee au palier AX11
+    effectif P1..P2, sans bridage du jog manuel/maintenance. Le transfert anticipe
+    AX10 vers AX11, la reprise Both et la validation machine restent a executer
+    selon le plan revise.
   evidence_submitted:
     - DOC/WFLOW/CONTRACTS/PLAN_T262_TRANSFERT_AX10_AX11_20260915.md
 validation:
