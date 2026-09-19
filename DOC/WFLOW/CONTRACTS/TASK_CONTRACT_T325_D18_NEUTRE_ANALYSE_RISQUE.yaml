@@ -1,0 +1,95 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+# T325 — Analyse de risque D18 (FB_WinchDirectionInterlock ne credite pas
+# le temps reel deja passe au neutre)
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T325_D18_NEUTRE_ANALYSE_RISQUE
+  criticality: C2            # C0 | C1 | C2 | C3 | C4
+  strategy: patch            # analyse pure -> pas de rebuild, pas de code cette tache
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Determiner si le non-credit du temps reel passe au neutre par
+    FB_WinchDirectionInterlock (D18, delais M1WinchCfg/M2WinchCfg
+    DirectionInterlockDelayAscent/Descent) est un defaut de conception ou un
+    choix volontaire documente, et cadrer un correctif eventuel SANS l'ecrire,
+    pour double relecture humaine (Mathieu + expert externe) avant toute
+    implementation.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "AF_Partie-10_Fonction_Winch_v2.1.md est relu integralement sur la section D18 ; la citation exacte de l'intention de conception est reportee dans la fiche d'analyse, ou son absence est explicitement constatee."
+      verified_by: "citation section/paragraphe dans la fiche livree, ou mention 'absent de la spec' tracee"
+    - id: AC2
+      statement: "Une analyse de risque couvre au moins un scenario concret par mode (MANU joystick, MAINTENANCE, AUTO/SEMI_AUTO grafcet) ou l'ecart de comportement entre FB_WinchDirectionInterlock (ET remis a 0 par RequestActive=FALSE) et FB_WinchOutputInterlock.DeadTime (credite via NOT BrakeFeedback) a un impact operationnel ou securitaire identifie."
+      verified_by: "lecture de la fiche : 3 scenarios nommes, un par mode, avec consequence machine decrite"
+    - id: AC3
+      statement: "La fiche conclut par un verdict binaire explicite : 'defaut de conception a corriger' OU 'comportement D18 volontaire et justifie', jamais une conclusion ambigue."
+      verified_by: "presence d'un paragraphe Verdict non equivoque dans la fiche"
+    - id: AC4
+      statement: "Si le verdict est 'defaut confirme', un correctif est propose en principe (texte, pas de code) avec les FB/fichiers impactes nommes et les risques de regression identifies."
+      verified_by: "section Correctif propose presente si AC3=defaut, absente/vide si AC3=volontaire"
+    - id: AC5
+      statement: "Aucune ligne de code CODE/*.st n'est modifiee par cette tache."
+      verified_by: "git diff --stat ne montre aucun fichier sous CODE/ modifie a l'issue de la tache"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/*.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T325_D18_NEUTRE_ANALYSE_RISQUE.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/**/*.st
+      - CODE_XML/**
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md   # lecture seule, jamais modifie par cette tache
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Comportement machine actuel de FB_WinchDirectionInterlock et FB_WinchOutputInterlock, intacts (aucun code touche)."
+    dropped_on_purpose: []
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - fiche_analyse            # Note versionnee DOC/WFLOW/ tracant citation AF-10, 3 scenarios, verdict
+    - git_diff_scope_check      # Preuve qu'aucun fichier CODE/ n'a ete touche
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Si l'analyse revele que d'autres interlocks (Translation, Benne) partagent
+    le meme defaut de conception potentiel, le signaler immediatement dans la
+    fiche sans elargir le scope de cette tache (creer une tache de suite si besoin).
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    A completer par l'agent qui execute la tache.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Double relecture requise avant implementation : Mathieu (HUM) + revue
+    expert externe. Aucune implementation tant que les deux visas ne sont
+    pas apposes.
