@@ -4,6 +4,14 @@
 > **Aucune ligne de code ST modifiée par cette fiche** — un seul correctif (Défaut 1) est déjà
 > committé et non testé (`6f708b22`), les deux autres (Défauts 2 et 3) sont proposés ici pour
 > relecture croisée avant implémentation. Classement cible de l'implémentation future : **C4**.
+>
+> ⚠️ **Distinction avec T224** (précisée par Mathieu, 2026-09-20) : T224 décrit une commande
+> **émise** vers les contacteurs puis bloquée par un interlock **aval** (joystick actionné
+> rapidement, ordre présent mais refusé). Les Défauts A/B ci-dessous sont **différents** : la
+> commande n'est **jamais formée** — `DirectionChangePending` bloqué en amont force
+> `RampTargetStep=0` dans `FB_Winch` avant tout calcul d'ordre contacteur. Même symptôme côté
+> opérateur (armé, aucun mouvement, aucun défaut), mécanismes distincts — à ne pas traiter comme
+> un seul et même défaut lors du cadrage de l'implémentation C4.
 
 ---
 
