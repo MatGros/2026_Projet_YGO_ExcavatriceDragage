@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T14:52:36.601260" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T14:52:36.601260">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T20:50:07.117936" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T20:50:07.117936">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -427,6 +427,51 @@ FALSE = retour historique instantané ; TRUE = applique les trois réglages synt
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic électrique isolé : ne pilote jamais une entrée safety ou une commande moteur.</xhtml>
           </documentation>
+        </variable>
+        <variable name="AutoResetTransientDiagAtStartupEnable">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACQUITTEMENT DIAGNOSTIC TRANSITOIRE T278 ===
+Parametres du FB dedie ; aucun effet sur la safety AU ou les mouvements.
+FALSE par defaut : comportement historique conserve jusqu a validation.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="AutoResetTransientDiagAfterRearmEnable">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+        </variable>
+        <variable name="AutoResetTransientDiagMaxAttempts">
+          <type>
+            <USINT />
+          </type>
+          <initialValue>
+            <simpleValue value="1" />
+          </initialValue>
+        </variable>
+        <variable name="AutoResetTransientDiagStabilizationTime">
+          <type>
+            <TIME />
+          </type>
+          <initialValue>
+            <simpleValue value="TIME#1s0ms" />
+          </initialValue>
+        </variable>
+        <variable name="AutoResetTransientDiagInterAttemptTime">
+          <type>
+            <TIME />
+          </type>
+          <initialValue>
+            <simpleValue value="TIME#1s0ms" />
+          </initialValue>
         </variable>
         <variable name="SimM2TensionedCableFaultInject">
           <type>

@@ -76,6 +76,15 @@ VAR_GLOBAL
     SimWinchBrakeCloseDelayS            : REAL := 0.09;
     // Diagnostic électrique isolé : ne pilote jamais une entrée safety ou une commande moteur.
     SimWinchElectricalDiagnosticsActive : BOOL := TRUE;
+
+    // === ACQUITTEMENT DIAGNOSTIC TRANSITOIRE T278 ===
+    // Parametres du FB dedie ; aucun effet sur la safety AU ou les mouvements.
+    // FALSE par defaut : comportement historique conserve jusqu a validation.
+    AutoResetTransientDiagAtStartupEnable    : BOOL := FALSE;
+    AutoResetTransientDiagAfterRearmEnable   : BOOL := FALSE;
+    AutoResetTransientDiagMaxAttempts        : USINT := 1;
+    AutoResetTransientDiagStabilizationTime  : TIME := T#1s;
+    AutoResetTransientDiagInterAttemptTime   : TIME := T#1s;
     // Injection safety explicite : TRUE simule le câble non tendu ; FALSE = signal nominal sain.
     SimM2TensionedCableFaultInject      : BOOL := FALSE;
 

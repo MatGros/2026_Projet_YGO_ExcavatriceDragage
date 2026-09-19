@@ -30,6 +30,7 @@ VAR
     instJoystick             : FB_Joystick;                   // * [INST] Traitement et filtrage joystick
     instDiagCanOpen          : FB_Diag_CanOpen;               // * [INST] Diagnostic reseau CANopen (joystick) — rang 02 (consomme PRG 04/05)
     instDiagEthercat         : FB_Diag_Ethercat;              // * [INST] Diagnostic reseau EtherCAT (codeurs/variateur) — rang 02
+    instAutoResetTransientDiag : FB_AutoResetTransientDiag;    // * [INST] Acquittement borne diagnostics T278 (EtherCAT/CANopen uniquement)
     instEncoderM1            : FB_Encoder;                    // * [INST] Facade codeur complet M1 (Abs+Homing+Scale+Safety+Rel+Speed)
     instEncoderM2            : FB_Encoder;                    // * [INST] Facade codeur complet M2
     instCycleMachineHoming       : FB_CycleMachineHoming;             // * [INST] Guide reference machine et homing conjoint benne
@@ -219,9 +220,28 @@ Data.InputModules.Fault := NOT (Data.InputModules.LocalDigitalIoOk AND Data.Inpu
 // === 🔌 §1ter DIAGNOSTIC RÉSEAUX (CANopen + EtherCAT) ===
 // 🔌 Diagnostics reseau produits ICI (rang 02) car consommes par PRG_02 (joystick,
 // codeurs) et par les PRG 04/05 — producteur avant consommateur (AF02 §4).
+instAutoResetTransientDiag(
+    Enable                  := TRUE,
+    StartupEnable           := GVL_Simulation.AutoResetTransientDiagAtStartupEnable,
+    PowerRearmEnable        := GVL_Simulation.AutoResetTransientDiagAfterRearmEnable,
+    EmergencyChainClosed    := HwIn.Machine.EmergencyChainClosed_DI,
+    PowerContactorEngaged   := HwIn.Machine.PowerContactorEngaged_DI,
+    PowerCutOffActive       := PRG_06_Outputs.PowerCutOffActive,
+    MotionActive             := PRG_04_Treuils_Benne.Data.BothActive
+                                  OR PRG_04_Treuils_Benne.Data.WinchM1State.Busy
+                                  OR PRG_04_Treuils_Benne.Data.WinchM2State.Busy
+                                  OR PRG_05_Translation.TranslationState.Busy,
+    DiagnosticsStable        := instDiagEthercat.DeviceEthercatMaster.Operational
+                                  AND instDiagCanOpen.DeviceCanOpenMaster.Operational,
+    Cfg_MaxAttempts           := GVL_Simulation.AutoResetTransientDiagMaxAttempts,
+    Cfg_StabilizationTime     := GVL_Simulation.AutoResetTransientDiagStabilizationTime,
+    Cfg_InterAttemptTime      := GVL_Simulation.AutoResetTransientDiagInterAttemptTime
+);
+
 instDiagCanOpen(
     Enable                 := TRUE,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
+    ResetTransient         := instAutoResetTransientDiag.ResetPulse,
     CANbusStateRaw         := HwReal.Operator.CanBusState,
     DeviceJoystickStateRaw := HwReal.Operator.JOY1_DeviceState,
     SimBypassActive        := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive,
@@ -232,6 +252,7 @@ instDiagCanOpen(
 instDiagEthercat(
     Enable                   := TRUE,
     Reset                    := PRG_07_Supervision.FaultMachineReset_IHM,
+    ResetTransient           := instAutoResetTransientDiag.ResetPulse,
     DeviceVariateurStateRaw  := HwReal.Translation.AC600_DeviceState,
     DeviceVariateurSimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive,
     DeviceEncoderM1StateRaw  := HwReal.Winch.COD1_DeviceState,
@@ -240,8 +261,8 @@ instDiagEthercat(
     DeviceEncoderM2SimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive,
     NetworkBypassActive      := GVL_IHM.Network.Bypass.Global,
     // ⚠️ TEST MES TEMPORAIRE : inhibition EtherCAT forcée par le code.
-    // Aucun champ IHM ne peut piloter ce bypass pendant l'essai.
-    EcatBusBypassActive      := TRUE,
+    // Le bypass maitre est desactive : la stabilite reelle reste observable.
+    EcatBusBypassActive      := FALSE,
     VariateurBypassActive    := GVL_IHM.Network.Bypass.VariateurM3,
     EncoderM1BypassActive    := GVL_IHM.Network.Bypass.EncoderM1,
     EncoderM2BypassActive    := GVL_IHM.Network.Bypass.EncoderM2

@@ -1,45 +1,160 @@
-version: '1.0'
+version: '1.1'
 task_id: T278
 type: REBUILD_ANALYSE
-title: Filtrage des alarmes transitoires avant/pendant AU et séquence d auto-reset temporisé post-réarmement
-date: '2026-09-07T18:45:00+02:00'
-author: Antigravity
+title: Filtrage alarmes transitoires au demarrage CPU et auto-reset post-rearmement
+date: '2026-09-19T12:00:00+02:00'
+author: CDX01
+
+contract:
+  task_id: T278
+  criticality: C3
+  strategy: rebuild
+  objective: >
+    Acquitter de facon bornee et tracee uniquement les diagnostics transitoires au demarrage CPU
+    et apres rearmement puissance, sans reset safety global ni reprise automatique de mouvement.
+  acceptance:
+    - id: AC1
+      statement: "Le demarrage CPU utilise une sequence AutoReset_Startup distincte et bornee."
+      verified_by: "Trace PLC + test ST hors CI"
+    - id: AC2
+      statement: "Le rearmement puissance utilise une sequence AutoReset_PostPowerRearm de 1 a 3 impulsions maximum."
+      verified_by: "Trace PLC simulation et voie reelle"
+    - id: AC3
+      statement: "Les causes AU, PowerCutOff, contacteur, frein, securite codeur, mecanique et mouvement restent a acquittement operateur."
+      verified_by: "Revue code + injection de defauts"
+    - id: AC4
+      statement: "Aucun mouvement ou cycle ne redemarre automatiquement."
+      verified_by: "Trace des commandes mouvement"
+    - id: AC5
+      statement: "La simulation et la voie materielle sont verifiees separement sans bypass permanent."
+      verified_by: "G200 + bundle + essais CODESYS"
+    - id: AC6
+      statement: "Le fichier CODE/M_MAIN/PRG_02_Acquisition.st est identique au nom du POU PRG_02_Acquisition et son suffixe ST correspond au langage genere dans le bundle."
+      verified_by: "G310 + bundle PLCopenXML"
+    - id: AC7
+      statement: "Le nom de fichier est identique au nom de POU."
+      verified_by: "G310"
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T278_AU_ALARMS_FILTERING_AND_AUTO_RESET.yaml
+      - CODE/A_COMMUN/FB_FaultCore.st
+      - CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st
+      - CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE_XML/Device.export
+  conservation:
+    must_survive:
+      - "Reset operateur sur front et latchs safety existants"
+      - "Aucune reprise automatique de mouvement ou de cycle"
+      - "Diagnostics bruts et tracabilite des causes"
+    dropped_on_purpose:
+      - "Aucun comportement existant abandonne sans validation humaine"
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Signaler immediatement toute ambiguite de classification des causes, tout conflit
+    avec la chaine safety ou toute dependance a un bypass de simulation.
 
 context:
   description: >
-    Constat opérationnel sur les alarmes et la séquence d'Arrêt d'Urgence :
-    1. Phase avant / pendant l'Arrêt d'Urgence : Dès la coupure de la chaîne ou du contacteur général,
-       une cascade de faux positifs apparaît (perte de communication bus CAN/SR4, coupure alimentation codeurs,
-       retours contacteurs discordants, variateurs offline, etc.). Ces alarmes parasites masquent la cause réelle.
-    2. Phase après réarmement de l'AU : Une fois la puissance réenclenchée (`PowerContactorEngaged = TRUE`),
-       les équipements (codeurs absolus, variateurs, bus) mettent un certain temps de boot/stabilisation (ex. 1 à 3 s).
-       Les défauts restent actuellement verrouillés et nécessitent de multiples resets manuels opérateur.
-    3. Besoin :
-       - Masquer/inhiber la capture des alarmes secondaires dérivées lorsque la chaîne AU est ouverte ou en cours de coupure.
-       - Mettre en place un auto-acquittement (Auto-Reset) temporisé et sécurisé après confirmation de réarmement puissance
-         (laissant le temps aux codeurs / bus SR4 de redevenir opérationnels), tout en conservant le blocage si un vrai défaut persiste.
+    Les equipements peuvent publier des defauts transitoires lors de la coupure AU,
+    du demarrage CPU et du rearmement puissance (bus EtherCAT/CAN, codeurs, variateurs,
+    retours contacteurs). Le besoin est de limiter les acquittements repetitifs sans
+    masquer une cause reelle ni provoquer une reprise automatique de mouvement.
 
 scope:
   in_scope:
-    - Analyse de la propagation des alarmes dans FB_Safety_EmergencyManagement, FB_Hmi_BannerFormatter, FB_Encoder_Abs et FB_Safety_Winch / Translation.
-    - Définition d'un temps de grâce / masquage des alarmes de communication (bus SR4, CANopen, codeurs) tant que l'AU est coupée.
-    - Spécification de la séquence post-réarmement : temporisation de stabilisation matériel (`TonEquipmentsReady`, 1..3s) suivie d'une impulsion unique d'auto-reset (`AutoResetAfterArming`).
-    - Respect des normes de sécurité (l'auto-reset ne doit en aucun cas provoquer un redémarrage automatique d'un mouvement ; seuls les blocs de diagnostic sont acquittés).
+    - Analyse de FB_Safety_EmergencyManagement, FB_Hmi_BannerFormatter, FB_Encoder_Abs, FB_Diag_Ethercat et FB_Diag_CanOpen.
+    - Hierarchisation IHM sans suppression de la cause brute ni inhibition safety.
+    - Deux sequences distinctes : AutoReset_Startup et AutoReset_PostPowerRearm.
+    - Liste blanche des diagnostics transitoires acquittables.
+    - Parametres bornes : activation par phase, 1..3 tentatives, intervalles et stabilisation.
+    - Tests separes simulation et voie materielle reelle.
   out_of_scope:
-    - Modification de la chaîne matérielle de sécurité ou des règles de coupure immédiate.
-    - Redémarrage automatique de mouvement (interdit par ISO 13849).
+    - Modification de la chaine materielle de securite ou des regles de coupure immediate.
+    - Auto-reset de FB_Safety_EmergencyManagement, AU, PowerCutOff, discordance contacteur, frein, securite codeur, defaut mecanique ou mouvement.
+    - Redemarrage automatique de mouvement, cycle ou sequence.
+    - Bypass EtherCAT permanent ou dependance a un bypass de simulation.
+
+safety_constraints:
+  - L auto-reset est un acquittement diagnostique cible, jamais FaultMachineReset_IHM global.
+  - La cause brute reste tracee ; seul l ordre de priorite IHM peut etre filtre.
+  - Autorisation : AU fermee, PowerCutOff inactif, contacteur attendu, machine immobile, equipement stable et cause transitoire.
+  - Annulation immediate si AU, PowerCutOff, discordance, perte puissance, mouvement ou defaut persistant apparait.
+  - Compteur et verrouillage apres salve epuisee ; action operateur obligatoire pour un defaut persistant.
+
+parameters:
+  AutoResetAtStartupEnable: false
+  AutoResetAfterPowerRearmEnable: false
+  AutoResetMaxAttempts: 1
+  AutoResetInterAttemptTime: 'T#1s'
+  AutoResetStabilizationTime: 'T#1s'
 
 objectifs_testables:
   - id: OBJ-01
-    description: Identifier et classifier les alarmes parasites déclenchées par l'ouverture de l'AU (bus, alimentation capteurs, feedbacks contacteurs).
-    critere_succes: Matrice de corrélation des alarmes parasites vs cause racine AU documentée.
+    description: Classifier les alarmes secondaires generees par AU, demarrage CPU et rearmement puissance.
+    critere_succes: Matrice cause racine / alarme / classe acquittable documentee.
+    verified_by: Revue code + trace PLC
   - id: OBJ-02
-    description: Définir la logique de filtrage/masquage au bandeau et dans les journaux d'alarmes lorsque l'AU est ouverte.
-    critere_succes: Seule l'alarme primaire d'AU est mise en avant lors d'une chute de chaîne.
+    description: Separer filtrage IHM, suppression de cause et inhibition safety.
+    critere_succes: Cause brute conservee et alarme primaire AU prioritaire.
+    verified_by: Revue FB_Hmi_BannerFormatter + trace
   - id: OBJ-03
-    description: Spécifier la temporisation d'établissement bus/codeurs et la génération sécurisée de l'auto-reset post-réarmement.
-    critere_succes: Chronogramme et logique validés sans contournement des sécurités de mouvement.
+    description: Definir deux automates bornes AutoReset_Startup et AutoReset_PostPowerRearm.
+    critere_succes: Chronogrammes distincts, sans reprise de mouvement ni cycle.
+    verified_by: Revue architecture + test ST hors CI
+  - id: OBJ-04
+    description: Tester le demarrage CPU avec une seule sequence maximale autorisee.
+    critere_succes: Aucun mouvement ; seuls les diagnostics en liste blanche sont acquittes ; un defaut persistant reste bloquant.
+    verified_by: Trace PLC + test unitaire ST hors CI
+  - id: OBJ-05
+    description: Tester le front de rearmement puissance et la salve temporisee.
+    critere_succes: 1 a 3 impulsions maximum, espacees de l intervalle configure, annulees sur cause safety ou mouvement.
+    verified_by: Trace PLC simulation et voie reelle
+  - id: OBJ-06
+    description: Garantir la non-regression entre simulation et materiel reel.
+    critere_succes: Aucun bypass permanent ajoute ; voies HwSim et HwReal verifiees separement.
+    verified_by: G200 + bundle + essais CODESYS
+
+acceptance_tests:
+  - "AC-01: Boot CPU avec defaut transitoire autorise : auto-acquittement borne, aucun mouvement, trace phase/compteur/code."
+  - "AC-02: Boot CPU avec AU, PowerCutOff ou discordance active : aucun auto-reset safety, defaut visible et bloquant."
+  - "AC-03: Rearmement puissance nominal : stabilisation puis 1..3 impulsions selon parametre."
+  - "AC-04: Defaut persistant : salve epuisee, verrouillage et reset operateur obligatoire."
+  - "AC-05: AU ou mouvement pendant la fenetre : annulation immediate, aucune reprise automatique."
+  - "AC-06: Simulation et reel : diagnostic source separe, aucun bypass permanent requis."
 
 livrables:
-  - Contrat de tâche T278 et entrée dans TASKS.yaml.
-  - Proposition d'architecture technique et plan d'implémentation.
+  - Contrat T278 versionne et entree TASKS.yaml.
+  - Matrice des causes acquittables / non acquittables.
+  - Chronogrammes demarrage CPU et rearmement puissance.
+  - Plan d implementation, test ST hors CI et preuves G200/bundle/gates.
+
+status: IN_PROGRESS
+execution:
+  executed_by: CDX01
+  completed_at: '2026-09-19T12:00:00+02:00'
+  status: COMPLETED
+  summary: Implementation FB dediee, reset transitoire cible EtherCAT/CANopen, bypass maitre supprime et parametres GVL exposes.
+  evidence_submitted:
+    - task_contract_check: PASS
+    - safety_challenge: PASS avec exigences MUST
+    - diagnostic_challenge: PASS avec separation reset cible/global
+    - bundle: PASS 258/258 objets, 0 erreur
+    - linkage: PASS 0 erreur
+    - diff_bundle: PASS objets T278 exportes
+    - gates_C: FAIL uniquement anomalies preexistantes G300/G340/G408/G430/G483
+    - WINCH_INTEG: FAIL harnais sans JSON, encapsulation FB PASS
+validation:
+  status: PENDING
+  validated_by: HUM
+  validated_at: ''
+  notes: Validation humaine et essais CODESYS requis avant activation des flags AutoResetTransientDiag*.

@@ -1,0 +1,414 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T20:55:40.823861" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T20:55:40.823861">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_AutoResetTransientDiag" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Activation du service</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Autorise la sequence au demarrage CPU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerRearmEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Autorise la sequence apres front contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine AU fermee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Retour contacteur puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Coupure puissance active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Mouvement ou demande mouvement active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiagnosticsStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Diagnostics reseau operationnels</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg_MaxAttempts">
+              <type>
+                <USINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Borne 1..3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg_StabilizationTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Stabilisation avant impulsion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg_InterAttemptTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Intervalle entre impulsions</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="ResetPulse">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Impulsion vers diagnostics autorises</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SequenceActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Lockout">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Salve terminee ou annulee, attente nouvel evenement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cancelled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Sequence annulee par une condition de securite</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Phase">
+              <type>
+                <USINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] 0 idle, 1 startup, 2 post-rearmement, 3 lockout</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AttemptCount">
+              <type>
+                <USINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Nombre d impulsions emises</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="PowerRearmEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front contacteur engage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StabilizationTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Tempo avant premiere impulsion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InterAttemptTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Tempo entre impulsions</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <USINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] 0 idle, 1 wait startup, 2 wait rearm, 3 intervalle, 4 lockout</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupStarted">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sequence startup deja declenchee au boot</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RearmStarted">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sequence du front courant deja declenchee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RearmPending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front rearmement memorise pendant startup</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PendingPhase">
+              <type>
+                <USINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Phase a executer apres stabilisation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxAttemptsEffective">
+              <type>
+                <USINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Borne appliquee 1..3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeCommon">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Conditions communes d autorisation</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   FB_AutoResetTransientDiag - Acquittement borne des diagnostics transitoires
+   =======================================================================
+   Responsabilite unique : produire une impulsion de reset pour les FB de
+   diagnostic reseau autorises (EtherCAT/CANopen) apres stabilisation.
+
+   ⛔ Ce FB ne reset jamais la chaine AU, les securites mouvement, les codeurs
+      de securite, les contacteurs, les freins ou les defauts mecaniques.
+   ⛔ Ce FB ne genere aucune commande de mouvement et aucun redemarrage cycle.
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// Sorties impulsionnelles : FALSE par defaut, TRUE pendant un seul scan.
+ResetPulse := FALSE;
+Cancelled := FALSE;
+
+IF NOT Enable THEN
+    SequenceActive := FALSE;
+    Lockout := FALSE;
+    Phase := 0;
+    AttemptCount := 0;
+    State := 0;
+    StartupStarted := FALSE;
+    RearmStarted := FALSE;
+    RearmPending := FALSE;
+    PendingPhase := 0;
+    StabilizationTimer(IN := FALSE);
+    InterAttemptTimer(IN := FALSE);
+    PowerRearmEdge(CLK := FALSE);
+    RETURN;
+END_IF;
+
+MaxAttemptsEffective := Cfg_MaxAttempts;
+IF MaxAttemptsEffective &lt; 1 THEN MaxAttemptsEffective := 1; END_IF;
+IF MaxAttemptsEffective &gt; 3 THEN MaxAttemptsEffective := 3; END_IF;
+
+SafeCommon := EmergencyChainClosed AND NOT PowerCutOffActive AND NOT MotionActive;
+PowerRearmEdge(CLK := PowerContactorEngaged);
+
+// Le front contacteur ne peut armer qu une seule salve. Une retombee rearme
+// uniquement la detection du prochain cycle de puissance.
+IF NOT PowerContactorEngaged THEN
+    RearmStarted := FALSE;
+    RearmPending := FALSE;
+END_IF;
+
+// Si le contacteur revient pendant la sequence startup, memoriser le front :
+// le rearmement sera traite apres la fin de la sequence startup, jamais perdu.
+IF PowerRearmEnable AND PowerRearmEdge.Q AND (State &lt;&gt; 0) AND (State &lt;&gt; 4) THEN
+    RearmPending := TRUE;
+END_IF;
+
+// Priorite au demarrage CPU. Le contacteur doit etre au repos pour cette phase.
+IF (State = 0) AND StartupEnable AND NOT StartupStarted AND SafeCommon AND NOT PowerContactorEngaged THEN
+    StartupStarted := TRUE;
+    PendingPhase := 1;
+    AttemptCount := 0;
+    Lockout := FALSE;
+    State := 1;
+END_IF;
+
+// La phase post-rearmement est declenchee exclusivement sur le front du retour
+// contacteur et ne peut pas etre confondue avec le demarrage CPU.
+IF (State = 0 OR State = 4) AND PowerRearmEnable AND PowerRearmEdge.Q AND NOT RearmStarted THEN
+    RearmStarted := TRUE;
+    IF SafeCommon AND PowerContactorEngaged THEN
+        PendingPhase := 2;
+        AttemptCount := 0;
+        Lockout := FALSE;
+        State := 2;
+    ELSE
+        Lockout := TRUE;
+        Cancelled := TRUE;
+        Phase := 3;
+    END_IF;
+END_IF;
+
+IF (State = 4) AND PowerRearmEnable AND RearmPending AND NOT RearmStarted
+   AND SafeCommon AND PowerContactorEngaged THEN
+    RearmPending := FALSE;
+    RearmStarted := TRUE;
+    PendingPhase := 2;
+    AttemptCount := 0;
+    Lockout := FALSE;
+    State := 2;
+END_IF;
+
+// Les deux sequences sont annulees a la moindre condition safety invalide.
+IF (State = 1 OR State = 2 OR State = 3) AND NOT SafeCommon THEN
+    State := 4;
+    Lockout := TRUE;
+    Cancelled := TRUE;
+END_IF;
+
+// Stabilisation : le timer ne progresse que si les diagnostics sont revenus
+// operationnels et si les conditions safety restent valides.
+StabilizationTimer(
+    IN := (State = 1 OR State = 2) AND SafeCommon AND DiagnosticsStable,
+    PT := Cfg_StabilizationTime
+);
+
+IF (State = 1 OR State = 2) AND StabilizationTimer.Q THEN
+    ResetPulse := TRUE;
+    AttemptCount := AttemptCount + 1;
+    IF AttemptCount &gt;= MaxAttemptsEffective THEN
+        State := 4;
+        Lockout := TRUE;
+    ELSE
+        State := 3;
+    END_IF;
+END_IF;
+
+// Intervalle inter-impulsions. La condition safety reste re-evaluee au scan.
+InterAttemptTimer(IN := (State = 3) AND SafeCommon, PT := Cfg_InterAttemptTime);
+IF (State = 3) AND InterAttemptTimer.Q THEN
+    State := PendingPhase;
+END_IF;
+
+SequenceActive := (State = 1 OR State = 2 OR State = 3);
+IF State = 4 THEN
+    Phase := 3;
+ELSIF SequenceActive THEN
+    Phase := PendingPhase;
+ELSE
+    Phase := 0;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c7ba8d37-387d-51cd-8b08-2c1332258d0f</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="C_DIAG_RESEAUX">
+          <Object Name="FB_AutoResetTransientDiag" ObjectId="c7ba8d37-387d-51cd-8b08-2c1332258d0f" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
