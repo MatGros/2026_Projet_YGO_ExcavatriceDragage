@@ -46918,7 +46918,31 @@ END_IF;
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation changement de sens</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Xa-&gt;Xb : compte le reliquat apres la nouvelle demande d'inversion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StoppedTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Xc-&gt;Xd : accumule le temps d'arret physique reel (Enable, hors demande)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CapturedStoppedTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Arret reel credite, fige au front RequestActive, purge une fois consomme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RemainingDelay">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Reliquat a appliquer par DirectionChangeDelay (delai plein - arret credite)</xhtml>
               </documentation>
             </variable>
             <variable name="EffectiveDelay">
@@ -46926,7 +46950,15 @@ END_IF;
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Delai effectif selon sens</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Delai plein selon sens demande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxDirectionDelay">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] MAX(ChangeDelayAscent, ChangeDelayDescent) : base d'accumulation StoppedTimer</xhtml>
               </documentation>
             </variable>
             <variable name="DeadTimeArmed">
@@ -46961,6 +46993,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Une seule demande de sens active</xhtml>
               </documentation>
             </variable>
+            <variable name="RequestActiveRising">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front nouvelle demande : capture le credit avant le rappel de StoppedTimer</xhtml>
+              </documentation>
+            </variable>
             <variable name="DirectionChanged">
               <type>
                 <BOOL />
@@ -46982,11 +47022,14 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🔀 FB_WinchDirectionInterlock — Interlock de changement de sens
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Temporise le changement de sens d'un treuil (dead time)
+   🎯 Rôle : Temporise l'INVERSION de sens d'un treuil, en creditant le
+             temps d'arret physique reel deja ecoule (dead time)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Brique technique (contrat light, pas de defaut)
    🔒 Sécurité : D18 — au front montant Enable, n'adopte pas le sens
-                 immediatement (temps mort) ; pas de redemarrage inrush
+                 immediatement (temps mort) ; pas de redemarrage inrush.
+                 Le sens IDENTIQUE au dernier sens adopte reste toujours
+                 immediat depuis le neutre : seule l'INVERSION est temporisee.
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -47006,17 +47049,29 @@ IF ResetEdge.Q THEN
     CommandedDescend := FALSE;
     DeadTimeArmed := FALSE;
     DirectionChangePending := FALSE;
+    CapturedStoppedTime := T#0ms;
 END_IF;
 
 RequestConflict := ReqAscent AND ReqDescend;
 RequestActive := (ReqAscent OR ReqDescend) AND NOT RequestConflict;
 
-// Délai effectif selon le sens demandé
+// Xc-&gt;Xd : capture l'arret physique REEL deja ecoule (StoppedTimer.ET) AU FRONT de
+// la nouvelle demande, AVANT le rappel de StoppedTimer plus bas dans ce scan (un TON
+// dont IN retombe a FALSE remet son ET a 0 des cet appel — lire apres serait deja 0).
+RequestActiveRising(CLK := RequestActive);
+IF RequestActiveRising.Q THEN
+    CapturedStoppedTime := StoppedTimer.ET;
+END_IF;
+
+// Délai plein selon le sens demandé, et base commune pour l'accumulation d'arret
+// (le sens final n'est pas encore connu pendant le neutre).
 IF ReqAscent AND NOT ReqDescend THEN
     EffectiveDelay := ChangeDelayAscent;
 ELSE
     EffectiveDelay := ChangeDelayDescent;
 END_IF;
+MaxDirectionDelay := MAX(ChangeDelayAscent, ChangeDelayDescent);
+RemainingDelay := MAX(EffectiveDelay - CapturedStoppedTime, T#0ms);
 
 DirectionChanged := (ReqAscent AND NOT CommandedAscent)
                  OR (ReqDescend AND NOT CommandedDescend)
@@ -47029,10 +47084,17 @@ IF EnableRising AND RequestActive THEN
     DeadTimeArmed := TRUE;
 END_IF;
 
-// Temporisation : compte quand un changement de sens est demande et treuil arrete
+// Xc-&gt;Xd : StoppedTimer compte l'arret physique REEL (Enable = treuil arrete,
+// contacteurs retombes, cf. FB_Winch) pendant TOUT le neutre, jamais reinitialise
+// par le simple relachement du joystick — c'est ce cumul qui alimente la capture
+// ci-dessus au scan suivant.
+StoppedTimer(IN := Enable AND NOT RequestActive, PT := MaxDirectionDelay);
+
+// Xa-&gt;Xb : compte le reliquat (delai plein - arret deja credite) apres la nouvelle
+// demande d'inversion.
 DirectionChangeDelay(
     IN := Enable AND RequestActive AND DirectionChanged,
-    PT := EffectiveDelay
+    PT := RemainingDelay
 );
 DelayElapsed := DirectionChangeDelay.ET;
 
@@ -47077,6 +47139,14 @@ END_IF;
 IF CommandedAscent OR CommandedDescend THEN
     LastAscent := CommandedAscent;
     LastDescend := CommandedDescend;
+END_IF;
+
+// Le sens adopte correspond desormais a la demande (aucune inversion en cours) :
+// le credit d'arret est CONSOMME. Une inversion ULTERIEURE sans nouveau passage au
+// neutre (RequestActive reste continuellement vrai) ne doit jamais reutiliser un
+// arret perime — elle applique alors le delai plein (CapturedStoppedTime := 0).
+IF NOT DirectionChangePending AND (CommandedAscent = ReqAscent) AND (CommandedDescend = ReqDescend) THEN
+    CapturedStoppedTime := T#0ms;
 END_IF;
 </xhtml>
           </ST>
@@ -52572,14 +52642,6 @@ les structs WinchRequest / Sensors / Config sont remplies champ par champ ici.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Egalite effective des demandes physiques M1/M2 du scan</xhtml>
               </documentation>
             </variable>
-            <variable name="HandoffBridgeAscentActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pont AX10-&gt;AX11 borne : M2 continue pendant la purge directionnelle M1</xhtml>
-              </documentation>
-            </variable>
             <variable name="WinchBothFinalStep45Coherent">
               <type>
                 <BOOL />
@@ -54761,38 +54823,11 @@ WinchBothFinalRequestsCoherent :=
         AND (WinchM1FinalInterlockRequest.RequestedContactor4 = WinchM2FinalInterlockRequest.RequestedContactor4)
         AND (WinchM1FinalInterlockRequest.RequestedStep = WinchM2FinalInterlockRequest.RequestedStep));
 
-// Pont de transfert AX10 -&gt; AX11 : pendant que M1 purge son interlock de
-// demarrage, M2 peut continuer a P1 sans que la defense Both ne coupe les deux
-// axes. La derogation est strictement bornee a AX11, M1 en DirectionChangePending,
-// M1 finalement neutre et M2 deja pret en montee P1. Les permis, SafeStop,
-// PowerCutOff, frein et contacteurs restent controles par la barriere finale.
-HandoffBridgeAscentActive :=
-    (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
-    AND (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX11_CTRL_ASCENT)
-    AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqAscent
-    AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.ReqAscent
-    AND instWinchM1.DirectionChangePending
-    AND NOT instWinchM2.DirectionChangePending
-    AND NOT WinchM1FinalInterlockRequest.RequestedRelayFwd
-    AND NOT WinchM1FinalInterlockRequest.RequestedRelayRev
-    AND (WinchM1FinalInterlockRequest.RequestedStep = 0)
-    AND WinchM2FinalInterlockRequest.RequestedRelayFwd
-    AND NOT WinchM2FinalInterlockRequest.RequestedRelayRev
-    AND (WinchM2FinalInterlockRequest.RequestedStep = 1)
-    AND WinchM2FinalInterlockRequest.AscentPermit
-    AND NOT WinchM2FinalInterlockRequest.SafeStop
-    AND NOT WinchM2FinalInterlockRequest.PowerCutOff
-    AND WinchM2FinalInterlockRequest.Enable
-    AND WinchM2FinalInterlockRequest.PowerContactorEngaged
-    AND NOT instSafetyWinchM1.Fault.Latched
-    AND NOT instSafetyWinchM2.Fault.Latched;
-
 // Defense en profondeur apres les deux FB : en intention couplee, aucun actionneur ne
 // peut etre publie seul. Les FB continuent d'evaluer leurs interlocks internes, mais les
 // deux demandes physiques restent neutres jusqu'a readiness commune.
 IF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
    AND WinchBothMotionActive
-   AND NOT HandoffBridgeAscentActive
    AND (NOT WinchBothMotionReady OR NOT WinchBothFinalRequestsCoherent) THEN
     WinchM1FinalInterlockRequest.RequestedRelayFwd := FALSE;
     WinchM1FinalInterlockRequest.RequestedRelayRev := FALSE;
