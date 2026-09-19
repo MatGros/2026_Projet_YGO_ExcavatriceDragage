@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.318697" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.318697">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T14:19:27.250494" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T14:19:27.250494">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -432,6 +432,17 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond benne descente/ouverture</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketAutoMaxStepUp">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond AX10 fermeture auto (P1..P2, M2 seul)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -485,6 +496,14 @@ M1 : contacteurs retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande descente M2 issue benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketAutoCloseActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] AX10 fermeture auto active (plafond AX10 M2, issu de CtrlAscentMaxStep)</xhtml>
               </documentation>
             </variable>
             <variable name="WinchBothMotionBlockedByBucket">
@@ -1062,6 +1081,8 @@ ELSE
         BucketRequestedStep := LIMIT(1, Joystick.AxisY.StepTgt, 5);
         IF ReqDescend THEN
             StepTgt := MIN(BucketRequestedStep, Cfg.BucketOverrideStepDownTgt);
+        ELSIF ReqAscent AND Context.BucketAutoCloseActive THEN
+            StepTgt := MIN(BucketRequestedStep, Cfg.BucketAutoMaxStepUp);
         ELSE
             StepTgt := MIN(BucketRequestedStep, Cfg.BucketOverrideStepUpTgt);
         END_IF;

@@ -14,5 +14,6 @@ STRUCT
     BtnStepTgt : INT := 5;  // --> [CFG] Palier boutons/both (100 % → palier max)
     BucketOverrideStepUpTgt   : INT := 1;  // --> [CFG] Plafond benne montée/fermeture
     BucketOverrideStepDownTgt : INT := 1;  // --> [CFG] Plafond benne descente/ouverture
+    BucketAutoMaxStepUp       : INT := 1;  // --> [CFG] Plafond AX10 fermeture auto (P1..P2, M2 seul)
 END_STRUCT
 END_TYPE

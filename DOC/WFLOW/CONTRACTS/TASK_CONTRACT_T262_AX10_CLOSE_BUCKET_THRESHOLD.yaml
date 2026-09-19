@@ -3,7 +3,7 @@ contract:
   criticality: C4
   strategy: patch
   technical_plan: DOC/WFLOW/CONTRACTS/PLAN_T262_TRANSFERT_AX10_AX11_20260915.md
-  updated_at: '2026-09-15T15:10:00+02:00'
+  updated_at: '2026-09-19T00:00:00+02:00'
   objective: >
     Permettre la transition anticipée de AX10 vers AX11 par seuil configurable
     d ouverture benne, puis assurer un transfert continu et maîtrisé de M2 seul
@@ -56,6 +56,12 @@ contract:
     - id: AC15
       statement: "La validite du seuil exige geometrie et references fiables ; un affichage 0 % issu d une configuration invalide n autorise pas de transfert."
       verified_by: "tests references douteuses, geometrie invalide, mesure invalide et bornes de configuration"
+    - id: AC16
+      statement: "En SEMI_AUTO, AX10 fermeture M2 conserve le palier joystick mais ne depasse pas le plafond effectif AX11 borne P1..P2 ; le raccordement Both P1 reste prioritaire."
+      verified_by: "TEST_DESIGN_T262_AX10_STEP_CEILING.md et test integration arbitre M2"
+    - id: AC17
+      statement: "La regle AX10 AUTO ne bride pas le jog M2 manuel ou maintenance, qui conserve son plafond benne existant et les protections aval."
+      verified_by: "test non-regression manuel P1..P5 et revue de branche mode"
   scope:
     allowed:
       - CODE/G_CYCLE/FB_CycleSemiAuto.st
@@ -65,6 +71,9 @@ contract:
       - CODE/M_MAIN/PRG_04_Treuils_Benne.st
       - CODE/M_MAIN/PRG_06_Outputs.st
       - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM2.st
+      - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchCmdArbitration_Cfg.st
+      - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchCmdArbitration_Context.st
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st
       - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st
@@ -95,6 +104,7 @@ contract:
       - "La pleine vitesse AX12 exige toujours Benne_IsClosed."
       - "Le calcul codeurs, la calibration et l algorithme d offset benne restent inchanges."
       - "Les modes manuel/maintenance et le passage ouverture vers plongee restent inchanges."
+      - "La proportionnalite manuelle M2, hors plafonds safety et ralentissement d'approche."
     dropped_on_purpose:
       - "Attente d arret AX10b dans le seul cas du transfert nominal prepare et qualifie ; maintien comme repli."
       - "Plafond benne partielle P1 en AX11 uniquement : cible P2 demandee par utilisateur, autres plafonds prioritaires conserves."

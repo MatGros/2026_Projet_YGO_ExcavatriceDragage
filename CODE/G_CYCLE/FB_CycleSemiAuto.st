@@ -162,6 +162,7 @@ VAR
     CycleMotionPermit       : BOOL; // . [LOC] Permis de mouvement cycle = JoystickDeflected AND DeadmanArmed (manche deflechi + homme-mort arme)
     TranslationP1Permit     : BOOL; // . [LOC] Translation vers P1 : axe X droit seul, axe Y au neutre
     TranslationTremiePermit : BOOL; // . [LOC] Translation vers tremie : axe X gauche seul, axe Y au neutre
+    JoystickPushOnly        : BOOL; // . [LOC] Geste Y- seul : ouverture benne/plongee, diagonales X+Y refusees
     WinchesAtDiveStep       : BOOL; // . [LOC] M1 ET M2 confirmes au palier 4 (mesure Kobold fiable seulement a vitesse stabilisee)
     AutoDiveM2Step5TrialLatched : BOOL := FALSE; // . [LOC] Capture essai T291-A avant depart plongee, figee jusqu'a sortie AX4..AX7
     DiveM2StepTgt           : INT := 4;  // . [LOC] Palier cible M2 plongee : 4 nominal, 5 essai T291-A
@@ -704,6 +705,7 @@ Ready := Enable AND NOT Fault.Latched;
 CycleMotionPermit := JoystickDeflected AND DeadmanArmed;
 TranslationP1Permit := DeadmanArmed AND JoystickRight AND NOT JoystickPush AND NOT JoystickPull;
 TranslationTremiePermit := DeadmanArmed AND JoystickLeft AND NOT JoystickPush AND NOT JoystickPull;
+JoystickPushOnly := JoystickPush AND NOT (JoystickLeft OR JoystickRight);
 
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
 IF WaitingResume AND NOT StateExecutionInhibit THEN
@@ -874,14 +876,18 @@ CASE State OF
         TranslationCmd.PositionTgt := 3;          // AX2 : jog bidirectionnel, cible d'arrêt P1
 
         IF Translation_At_P1 THEN
-            ExpectedDirection := 0;
-            WaitingForOperator := JoystickDeflected;
-            WaitingForProcess := NOT JoystickDeflected;
+            // P1 est toujours qualifie par le retour stable M3 et l'arrêt physique.
+            // Pas de memorisation qui masquerait une perte capteur : si l'operateur
+            // maintient Y- avec homme-mort, il enchaine directement AX3 puis AX4.
+            ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+            ExpectedDirection := -1;
+            WaitingForOperator := NOT (DeadmanArmed AND JoystickPushOnly);
+            WaitingForProcess := NOT TranslationStopTimer.Q;
             OperatorActionId := 16#0402;
-            OperatorAction := 'AX2 - P1 atteint : relacher le joystick avant ouverture.';
+            OperatorAction := 'AX2 - P1 atteint : pousser pour ouvrir la benne.';
             TranslationCmd.ReqStart := FALSE;
             TranslationCmd.PositionTgt := 3;
-            IF TranslationStopTimer.Q AND NOT JoystickDeflected THEN
+            IF TranslationStopTimer.Q AND DeadmanArmed AND JoystickPushOnly THEN
                 State := E_AutoCycleStep.AX3_OPEN_BUCKET;
             END_IF;
         ELSE
