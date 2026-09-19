@@ -1,0 +1,77 @@
+contract:
+  task_id: T316
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    SimBench simule une dynamique de treuil M1/M2 (retour vitesse et frein) suffisamment
+    realiste pour exercer reellement la fenetre AX10_WAIT_ASCENT_START, au lieu de sauter
+    instantanement a l'arret comme aujourd'hui.
+
+  acceptance:
+    - id: AC1
+      statement: "Par defaut (SimWinchSpeedReportTauS=0.0, SimWinchBrakeOpenDelayS/CloseDelayS=0.0), le comportement de FB_Sim_Encoder et FB_SimBench est strictement identique a l'existant."
+      verified_by: "TC-P13-ENC-001/002 et TC-P13-010..014 verts sans modification (non-regression, confirme)"
+    - id: AC2
+      statement: "Avec SimWinchSpeedReportTauS>0, RawSpdOut decroit sur plusieurs scans apres coupure relais au lieu d'un saut instantane."
+      verified_by: "TC-P13-034/035 (test_fb_sim_encoder.st)"
+    - id: AC3
+      statement: "Avec SimWinchBrakeOpenDelayS>0, M1/M2_BrakeIsOpen_DI reste FALSE pendant le delai puis bascule TRUE, sans jamais inverser la polarite."
+      verified_by: "TC-P13-015 (test_fb_simbench.st)"
+    - id: AC4
+      statement: "check_simbenc_parity.py reste PASS (nouvelles entrees classifiees)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_simbenc_parity.py"
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_Sim_Encoder.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_encoder.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_simbench.st
+      - DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.0.md
+      - DOC/AF/AF_Partie-13_Fonction_Simulation/FB_SimBench_v1.0.md
+      - DOC/WFLOW/CONTRACTS/T314_SIMBENCH_PARITY.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/G_CYCLE/
+      - CODE/M_MAIN/
+      - PRJ_CODESYS/
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    Toute incoherence de spec ou risque hors scope est remonte immediatement, pas a la fin.
+
+status: COMPLETED
+
+execution:
+  executed_by: "Claude Sonnet 5"
+  completed_at: "2026-09-18T01:00:00+02:00"
+  status: COMPLETED
+  summary: >
+    Phase 1 seulement (voir avancement T316 dans TASKS.yaml) : dynamique treuil M1/M2 opt-in
+    ajoutee dans FB_Sim_Encoder.st (retour vitesse 1er ordre) et FB_SimBench.st (delai frein),
+    defaut 0.0 = comportement historique inchange. Tests TC-P13-034/035 et TC-P13-015 ajoutes et
+    verts. Non-regression confirmee (FB_SimBench 27/27, FB_Sim_Encoder 4/4). Bundle regenere,
+    diff bundle genere (FB_SimBench + FB_Sim_Encoder). check_simbenc_parity.py PASS.
+    G200_check_linkage.py --report PASS (0 erreur). run_all_gates.py --palier C : 5 echecs
+    (G300/G340/G406/G430/G483), verifies un par un — aucun ne cite FB_Sim_Encoder.st ni
+    FB_SimBench.st, tous pre-existants (dette legacy sans rapport avec ce lot).
+    Phase 2 (test CI grafcet AX10_WAIT_ASCENT_START) non commencee — a cadrer separement.
+    Zero commit effectue (consigne explicite de l'utilisateur, diff laisse en attente de revue).
+  evidence_submitted:
+    - "FB_SimBench tests: 27/27 PASS"
+    - "FB_Sim_Encoder tests: 4/4 PASS"
+    - "check_simbenc_parity.py: PASS (72 entrees classifiees)"
+    - "G200_check_linkage.py --report: PASS (0 erreur, 1910 instances verifiees)"
+    - "run_all_gates.py --palier C: 33/38 PASS, 5 echecs tous pre-existants hors perimetre du lot"
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    En attente de relecture humaine du diff (aucun commit effectue).

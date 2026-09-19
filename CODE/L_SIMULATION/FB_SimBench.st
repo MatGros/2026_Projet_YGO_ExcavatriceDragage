@@ -72,6 +72,14 @@ VAR_INPUT
     SimM2CoupledDescentModelActive : BOOL := TRUE; (* --> [CFG] M2 calculé depuis M1 en descente BOTH *)
     SimM2CoupledDescentFactor  : REAL := 0.9333; (* --> [CFG] Ratio déplacement M2/M1 mesuré: 0,6m d'écart sur 9m *)
     WinchBothDescentIntent     : BOOL := FALSE;  (* --> [CMD] Intention BOTH descente PRG_03 *)
+    SimWinchSpeedReportTauS    : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Tau 1er ordre retour vitesse rapportee M1/M2, s. 0.0 = saut instantane (comportement historique). *)
+    SimWinchBrakeOpenDelayS    : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Delai electrique/meca ouverture frein M1/M2 apres BrakeCmd=TRUE, s. 0.0 = instantane (comportement historique). *)
+    SimWinchBrakeCloseDelayS   : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Delai electrique/meca fermeture frein M1/M2 apres BrakeCmd=FALSE, s. 0.0 = instantane (comportement historique). *)
+
+    // T317 exploratoire -- charge/couplage electrique treuil (interface prete, defaut = comportement
+    // historique inchange tant que non cablee sur un vrai signal amont, cf. registre PLAN_T317).
+    SimWinchLoadFrac_Ratio     : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Taux de charge M1/M2, 0=a vide *)
+    SimWinchCoupledActive      : BOOL := FALSE;  (* --> [TST] M1/M2 couples -- en attente cablage CoupledBoth reel *)
 
     SimM3SensorsWordOverrideActive : BOOL := FALSE;   (* --> [TST] Override mot capteurs M3 *)
     SimM3SensorsWord               : BYTE := 16#07;   (* --> [TST] Mot capteurs M3 forcé *)
@@ -118,6 +126,13 @@ VAR_OUTPUT
     Translation                : ST_HwTranslation;   (* <-- [DIAG] Image translation simulée *)
     Operator                   : ST_HwOperator;   (* <-- [DIAG] Image opérateur simulée *)
     Machine                    : ST_HwMachine;   (* <-- [DIAG] Image machine simulée *)
+
+    // T317 exploratoire -- modele electrique treuil, diagnostic seul, non consomme par le metier.
+    // ResistiveTorque_Nm reste a 0.0 (pas de modele de charge/gravite encore ecrit -- FB_Sim_WinchElectrical).
+    MotorTorqueM1_Nm           : REAL;   (* <-- [DIAG] T317 -- Couple electromagnetique simule M1 *)
+    MotorTorqueM2_Nm           : REAL;   (* <-- [DIAG] T317 -- Couple electromagnetique simule M2 *)
+    MotorIsStalledM1           : BOOL;   (* <-- [DIAG] T317 -- Decrochage predictif simule M1 *)
+    MotorIsStalledM2           : BOOL;   (* <-- [DIAG] T317 -- Decrochage predictif simule M2 *)
 END_VAR
 
 VAR_IN_OUT
@@ -129,6 +144,7 @@ VAR CONSTANT
     CST_M3FullTravelTimeS       : REAL := 8.0; // Temps de Trémie à Maintenance à 100 %, modèle banc uniquement
     CST_M1EncoderInitialRaw     : UDINT := 1000000; // Comptage absolu plausible du device M1 simulé
     CST_M2EncoderInitialRaw     : UDINT := 1100000; // Comptage absolu propre au device M2 simulé
+    CST_SimBenchCycleTimeS      : REAL := 0.010; // Période tâche PLC (s) — MainTask 10 ms
 END_VAR
 
 VAR
@@ -138,6 +154,13 @@ VAR
     instSimTranslation         : FB_Sim_Translation;   (* * [INST] Modèle translation M3 *)
     instSimJoystick            : FB_Sim_Joystick;   (* * [INST] Modèle joystick *)
     instSimSafety              : FB_Sim_Safety;   (* * [INST] Modèle sécurité *)
+    instWinchElectricalM1      : FB_Sim_WinchElectrical;   (* * [INST] T317 exploratoire -- electrique+charge M1 *)
+    instWinchElectricalM2      : FB_Sim_WinchElectrical;   (* * [INST] T317 exploratoire -- electrique+charge M2 *)
+    PeerTorqueM1Prev_Nm        : REAL;   (* . [LOC] T317 -- couple M1 cycle precedent, pour M2 couple *)
+    PeerTorqueM2Prev_Nm        : REAL;   (* . [LOC] T317 -- couple M2 cycle precedent, pour M1 couple *)
+    PeerSpeedM1Prev_Rpm        : REAL;   (* . [LOC] T317 -- vitesse M1 cycle precedent, pour M2 couple *)
+    PeerSpeedM2Prev_Rpm        : REAL;   (* . [LOC] T317 -- vitesse M2 cycle precedent, pour M1 couple *)
+    KoboldBottomTouchPrev_DI   : BOOL;   (* . [LOC] T317 -- Machine.M1_M2_KoboldBottomTouch_DI cycle precedent (benne au sol) *)
 
     // Calculs internes
     M1_PresetCmd               : BOOL;   (* . [LOC] Trigger preset M1 *)
@@ -166,6 +189,14 @@ VAR
     KoboldPowerUpEpisodeTime   : TIME;                (* . [LOC] Délai sonde figé durant une plongée *)
     instKoboldPowerUpTimer     : TON;                 (* . [LOC] Réponse sonde après alimentation *)
     SimBenchWasEnabled         : BOOL;                (* . [LOC] Détection du premier scan de simulation *)
+
+    // Dynamique treuil M1/M2 : delais opt-in — defaut 0.0 = comportement historique
+    M1_BrakeIsOpenState        : BOOL;                (* . [LOC] Etat frein M1 filtre par le delai *)
+    M1_BrakeOpenTimerS         : REAL;                (* . [LOC] Accumulateur delai ouverture frein M1 *)
+    M1_BrakeCloseTimerS        : REAL;                (* . [LOC] Accumulateur delai fermeture frein M1 *)
+    M2_BrakeIsOpenState        : BOOL;                (* . [LOC] Etat frein M2 filtre par le delai *)
+    M2_BrakeOpenTimerS         : REAL;                (* . [LOC] Accumulateur delai ouverture frein M2 *)
+    M2_BrakeCloseTimerS        : REAL;                (* . [LOC] Accumulateur delai fermeture frein M2 *)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -238,10 +269,46 @@ instSimEncoderM1(
     PresetValue      := M1_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
     CoastDistanceM   := SimWinchCoast_M,
+    SpeedReportTauS  := SimWinchSpeedReportTauS,
     TestOffsetCmd    := SimSyncDeviationInjectM1,
     TestOffsetPts    := M1_OffsetPts,
     RawPos           := RawPosM1
 );
+
+// T317 exploratoire -- electrique+charge+couplage M1/M2, diagnostic seul (Winch.* metier deja
+// consomme via M2_TensionedCable_DI ci-dessous). Couplage/charge cables sur stimuli de banc en
+// attente des signaux reels amont (CoupledBoth, benne au sol) -- cf. registre PLAN_T317.
+instWinchElectricalM1(
+    Enable                := Enable,
+    StepCmd               := MAX(1, M1_StepNumber),
+    DirectionCmd          := SEL(M1_RelayRev, 1, -1),
+    NetworkVoltageAct_V   := 400.0,
+    LoadFrac_Ratio         := SimWinchLoadFrac_Ratio,
+    IsBucketGrounded      := KoboldBottomTouchPrev_DI,
+    IsCoupledToPeer        := SimWinchCoupledActive,
+    PeerTorque_Nm          := PeerTorqueM2Prev_Nm,
+    PeerSpeed_Rpm          := PeerSpeedM2Prev_Rpm
+);
+MotorTorqueM1_Nm := instWinchElectricalM1.MotorTorque_Nm;
+MotorIsStalledM1 := instWinchElectricalM1.IsStalled;
+PeerTorqueM1Prev_Nm := instWinchElectricalM1.MotorTorque_Nm;
+PeerSpeedM1Prev_Rpm := instWinchElectricalM1.SpeedAct_Rpm;
+
+instWinchElectricalM2(
+    Enable                := Enable,
+    StepCmd               := MAX(1, M2_StepNumber),
+    DirectionCmd          := SEL(M2_RelayRev, 1, -1),
+    NetworkVoltageAct_V   := 400.0,
+    LoadFrac_Ratio         := SimWinchLoadFrac_Ratio,
+    IsBucketGrounded      := KoboldBottomTouchPrev_DI,
+    IsCoupledToPeer        := SimWinchCoupledActive,
+    PeerTorque_Nm          := PeerTorqueM1Prev_Nm,
+    PeerSpeed_Rpm          := PeerSpeedM1Prev_Rpm
+);
+MotorTorqueM2_Nm := instWinchElectricalM2.MotorTorque_Nm;
+MotorIsStalledM2 := instWinchElectricalM2.IsStalled;
+PeerTorqueM2Prev_Nm := instWinchElectricalM2.MotorTorque_Nm;
+PeerSpeedM2Prev_Rpm := instWinchElectricalM2.SpeedAct_Rpm;
 
 // Détection coupure relais M2 pour renouveler la dispersion pseudo-aléatoire (±0.1m)
 IF (M2_RelayFwdPrev AND NOT M2_RelayFwd) OR (M2_RelayRevPrev AND NOT M2_RelayRev) THEN
@@ -274,6 +341,7 @@ instSimEncoderM2(
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := M2EffectiveSpeedScaleFactor,
     CoastDistanceM   := M2_EffectiveCoastM,
+    SpeedReportTauS  := SimWinchSpeedReportTauS,
     TestOffsetCmd    := SimSyncDeviationInjectM2,
     TestOffsetPts    := M2_OffsetPts,
     RawPos           := RawPosM2
@@ -289,7 +357,29 @@ END_IF;
 // Recopie structures Winch simulées :
 // 🛑 POLARITÉ DE FREIN SIMULÉ : 1 = contacteur commandé = frein OUVERT.
 // Câblage réel : DI = 1 ⟺ frein OUVERT. Le modèle produit donc M1_BrakeIsOpen_DI := M1_BrakeCmd !
-Winch.M1_BrakeIsOpen_DI        := M1_BrakeCmd;
+// Delai electrique/meca opt-in : SimWinchBrakeOpenDelayS/CloseDelayS=0.0 -> bascule le
+// meme scan (comportement historique inchange, TC-P13-012). >0 -> retour retarde, sans jamais
+// inverser la polarite (M1_BrakeIsOpenState suit toujours M1_BrakeCmd, juste avec latence).
+IF M1_BrakeCmd THEN
+    IF NOT M1_BrakeIsOpenState THEN
+        M1_BrakeOpenTimerS := M1_BrakeOpenTimerS + CST_SimBenchCycleTimeS;
+        IF M1_BrakeOpenTimerS >= MAX(0.0, SimWinchBrakeOpenDelayS) THEN
+            M1_BrakeIsOpenState := TRUE;
+            M1_BrakeOpenTimerS := 0.0;
+        END_IF;
+    END_IF;
+    M1_BrakeCloseTimerS := 0.0;
+ELSE
+    IF M1_BrakeIsOpenState THEN
+        M1_BrakeCloseTimerS := M1_BrakeCloseTimerS + CST_SimBenchCycleTimeS;
+        IF M1_BrakeCloseTimerS >= MAX(0.0, SimWinchBrakeCloseDelayS) THEN
+            M1_BrakeIsOpenState := FALSE;
+            M1_BrakeCloseTimerS := 0.0;
+        END_IF;
+    END_IF;
+    M1_BrakeOpenTimerS := 0.0;
+END_IF;
+Winch.M1_BrakeIsOpen_DI        := M1_BrakeIsOpenState;
 // Retour UNIQUE « tous contacteurs retombés » = sens ET vitesse.
 // Omettre les paliers ferait croire à l'arrêt pendant les transitoires → Méca A armée à tort.
 Winch.M1_ContactorsReleased_DI := NOT (M1_RelayFwd OR M1_RelayRev
@@ -297,7 +387,26 @@ Winch.M1_ContactorsReleased_DI := NOT (M1_RelayFwd OR M1_RelayRev
                                     OR M1_SpeedContactor_3 OR M1_SpeedContactor_4);
 Winch.M1_ThermalOk_DI          := TRUE; // Sauf panne simulée
 
-Winch.M2_BrakeIsOpen_DI        := M2_BrakeCmd;
+IF M2_BrakeCmd THEN
+    IF NOT M2_BrakeIsOpenState THEN
+        M2_BrakeOpenTimerS := M2_BrakeOpenTimerS + CST_SimBenchCycleTimeS;
+        IF M2_BrakeOpenTimerS >= MAX(0.0, SimWinchBrakeOpenDelayS) THEN
+            M2_BrakeIsOpenState := TRUE;
+            M2_BrakeOpenTimerS := 0.0;
+        END_IF;
+    END_IF;
+    M2_BrakeCloseTimerS := 0.0;
+ELSE
+    IF M2_BrakeIsOpenState THEN
+        M2_BrakeCloseTimerS := M2_BrakeCloseTimerS + CST_SimBenchCycleTimeS;
+        IF M2_BrakeCloseTimerS >= MAX(0.0, SimWinchBrakeCloseDelayS) THEN
+            M2_BrakeIsOpenState := FALSE;
+            M2_BrakeCloseTimerS := 0.0;
+        END_IF;
+    END_IF;
+    M2_BrakeOpenTimerS := 0.0;
+END_IF;
+Winch.M2_BrakeIsOpen_DI        := M2_BrakeIsOpenState;
 Winch.M2_ContactorsReleased_DI := NOT (M2_RelayFwd OR M2_RelayRev
                                     OR M2_SpeedContactor_1 OR M2_SpeedContactor_2
                                     OR M2_SpeedContactor_3 OR M2_SpeedContactor_4);
@@ -306,7 +415,9 @@ Winch.M2_ThermalOk_DI          := TRUE;
 // Cohérent avec M2_TensionedCable_DI (sain par défaut) : capteur TOP libre en simu,
 // sauf stimulus manuel SimTopPositionActive (injection de fait capteur au banc).
 Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
-Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
+// T317 : cable tendu tant que la benne n'est pas posee -- auparavant force TRUE en dur,
+// desormais reactif au stimulus banc (interface prete, source reelle amont pas encore cablee).
+Winch.M2_TensionedCable_DI     := NOT KoboldBottomTouchPrev_DI;
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;
 Winch.COD1_SpdValue            := instSimEncoderM1.RawSpdOut;
@@ -455,6 +566,9 @@ IF KoboldAutoEpisodeActive THEN
 ELSE
     Machine.M1_M2_KoboldBottomTouch_DI := SimKoboldContactValue;
 END_IF;
+// T317 : memorise pour le prochain scan -- reutilise le VRAI capteur fond (Kobold), pas un
+// stimulus invente, cf. retour utilisateur 2026-09-18 (le capteur fond existe deja reel+sim).
+KoboldBottomTouchPrev_DI := Machine.M1_M2_KoboldBottomTouch_DI;
 Machine.HydraulicThermalOk_DI          := TRUE;
 Machine.TremieFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
 

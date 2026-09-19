@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.362372" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.362372">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T10:10:17.703019" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T10:10:17.703019">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -315,6 +315,30 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Erreur de synchronisme M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx307_M1SpeedStepApplied">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier vitesse applique M1 (0..5, causes 8/9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx308_M2SpeedStepApplied">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier vitesse applique M2 (0..5, causes 8/9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx309_AutoDiveM2Step5Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Essai T291-A actif (M2 cible palier 5 en plongee)</xhtml>
               </documentation>
             </variable>
           </struct>

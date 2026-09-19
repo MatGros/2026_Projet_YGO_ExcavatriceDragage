@@ -68,6 +68,12 @@
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-015</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">🆕 <code>SimWinchBrakeOpenDelayS/CloseDelayS</code> (T316, opt-in, défaut 0.0 = instantané) retardent <code>M1/M2_BrakeIsOpen_DI</code> sans jamais inverser la polarité — fidélité fenêtre <code>AX10_WAIT_ASCENT_START</code></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>V-I</code></small></td>
+    </tr>
   </tbody>
 </table>
 

@@ -373,11 +373,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-13 23:14:45</div>
+    <div class="exec-time">2026-09-18 09:25:29</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-sim-encoder-0">TC-P13-ENC-001 Enable FALSE conserve la valeur passee par VAR_IN_OUT</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-encoder-1">TC-P13-ENC-002 Simulation incrementation comptage en montee</a></li></ul>
+        <summary>📋 Sommaire (4 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-sim-encoder-0">TC-P13-ENC-001 Enable FALSE conserve la valeur passee par VAR_IN_OUT</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-encoder-1">TC-P13-ENC-002 Simulation incrementation comptage en montee</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-encoder-2">TC-P13-034 SpeedReportTauS=0.0 conserve le saut instantane historique (non-regression)</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-encoder-3">TC-P13-035 SpeedReportTauS&gt;0 fait decroitre RawSpdOut sur plusieurs scans (fidelite AX10, T316)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -386,7 +386,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            4/4 vérifications validées
         </div>
     </div>
     
@@ -420,14 +420,14 @@
     </div>
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Sim_Encoder</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 20 flux entrants · 2 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Sim_Encoder</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 21 flux entrants · 2 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TestOffsetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ PresetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span></div>
         </div>
         
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PresetCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PresetValue <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedScaleFactor <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CoastDistanceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PresetLatencyCycles <span class="pin-type" style="color:var(--muted);">INT := 3</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TestOffsetCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TestOffsetPts <span class="pin-type" style="color:var(--muted);">DINT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MinSpeedMps <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MaxSpeedMps <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PointsPerRev <span class="pin-type" style="color:var(--muted);">UDINT := 8192</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CableM_PerRev <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CycleTimeS <span class="pin-type" style="color:var(--muted);">REAL := 0.010</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPos <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PresetCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PresetValue <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedScaleFactor <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CoastDistanceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PresetLatencyCycles <span class="pin-type" style="color:var(--muted);">INT := 3</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TestOffsetCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TestOffsetPts <span class="pin-type" style="color:var(--muted);">DINT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MinSpeedMps <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MaxSpeedMps <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PointsPerRev <span class="pin-type" style="color:var(--muted);">UDINT := 8192</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CableM_PerRev <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CycleTimeS <span class="pin-type" style="color:var(--muted);">REAL := 0.010</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedReportTauS <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPos <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div>
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(225,29,72,0.18);border:1px solid #9f1239;cursor:pointer;">
@@ -457,7 +457,7 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">17</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">18</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
@@ -465,7 +465,7 @@
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">2</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">0</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">20 IN</b> / <b style="color:#ffffff;">2 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">21 IN</b> / <b style="color:#ffffff;">2 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -489,10 +489,10 @@
     </details>
     
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 19 écarts</span></summary>
+        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 20 écarts</span></summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 19 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>CABLEM_PERREV</code> jamais câblé en production</li><li>Pin <code>COASTDISTANCEM</code> jamais câblé en production</li><li>Pin <code>CYCLETIMES</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>MAXSPEEDMPS</code> jamais câblé en production</li><li>Pin <code>MINSPEEDMPS</code> jamais câblé en production</li><li>Pin <code>POINTSPERREV</code> jamais câblé en production</li><li>Pin <code>PRESETCMD</code> jamais câblé en production</li><li>Pin <code>PRESETLATENCYCYCLES</code> jamais câblé en production</li><li>Pin <code>PRESETVALUE</code> jamais câblé en production</li><li>Pin <code>RAWPOS</code> jamais câblé en production</li><li>Pin <code>RAWPOSOUT</code> jamais câblé en production</li><li>Pin <code>RAWSPDOUT</code> jamais câblé en production</li><li>Pin <code>RELAYFWD</code> jamais câblé en production</li><li>Pin <code>RELAYREV</code> jamais câblé en production</li><li>Pin <code>SPEEDSCALEFACTOR</code> jamais câblé en production</li><li>Pin <code>STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>TESTOFFSETCMD</code> jamais câblé en production</li><li>Pin <code>TESTOFFSETPTS</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 20 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>CABLEM_PERREV</code> jamais câblé en production</li><li>Pin <code>COASTDISTANCEM</code> jamais câblé en production</li><li>Pin <code>CYCLETIMES</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>MAXSPEEDMPS</code> jamais câblé en production</li><li>Pin <code>MINSPEEDMPS</code> jamais câblé en production</li><li>Pin <code>POINTSPERREV</code> jamais câblé en production</li><li>Pin <code>PRESETCMD</code> jamais câblé en production</li><li>Pin <code>PRESETLATENCYCYCLES</code> jamais câblé en production</li><li>Pin <code>PRESETVALUE</code> jamais câblé en production</li><li>Pin <code>RAWPOS</code> jamais câblé en production</li><li>Pin <code>RAWPOSOUT</code> jamais câblé en production</li><li>Pin <code>RAWSPDOUT</code> jamais câblé en production</li><li>Pin <code>RELAYFWD</code> jamais câblé en production</li><li>Pin <code>RELAYREV</code> jamais câblé en production</li><li>Pin <code>SPEEDREPORTTAUS</code> jamais câblé en production</li><li>Pin <code>SPEEDSCALEFACTOR</code> jamais câblé en production</li><li>Pin <code>STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>TESTOFFSETCMD</code> jamais câblé en production</li><li>Pin <code>TESTOFFSETPTS</code> jamais câblé en production</li></ul>
         </div>
         <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
@@ -544,6 +544,9 @@
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
             <div class="pin-name">IN CYCLETIMES <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SPEEDREPORTTAUS <span class="pin-type">IEC_REAL</span></div>
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
             <div class="pin-name">IN RAWPOS<span class='pin-tag'>IN_OUT</span> <span class="pin-type">IEC_UDINT</span></div>
@@ -634,9 +637,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Sim_Encoder</code></td>
-                <td>16</td><td>2</td>
-                <td>1</td><td>10</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (10 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>17</td><td>2</td>
+                <td>1</td><td>12</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (12 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
@@ -649,7 +652,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 4 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-sim-encoder-0" class="test-card test-card-pass test-card-collapsed">
@@ -687,6 +690,46 @@
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
                 <ul class="checks-list"><li>RelayFwd TRUE -&gt; RawPosOut augmente</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-sim-encoder-2" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-P13-034 SpeedReportTauS=0.0 conserve le saut instantane historique (non-regression) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P13-034 SpeedReportTauS=0.0 conserve le saut instantane historique (non-regression)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>Tau=0.0, coupure sans roulis -&gt; vitesse rapportee tombe a 0 des le meme scan</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-sim-encoder-3" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-P13-035 SpeedReportTauS&gt;0 fait decroitre RawSpdOut sur plusieurs scans (fidelite AX10, T316) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P13-035 SpeedReportTauS&gt;0 fait decroitre RawSpdOut sur plusieurs scans (fidelite AX10, T316)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>mirror tau M3 identifie sur trace, SYNTHETIQUE treuil</li><li>stabilise ReportedSpeedMps a la vitesse palier 5</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Coupure relais : vitesse rapportee encore non nulle au 1er scan (pas de saut instantane)</li><li>Vitesse rapportee decroit scan apres scan (rampe continue, pas un escalier)</li><li>Decroissance progressive : pas encore a zero au 2e scan</li></ul>
             </details>
                 
                 
@@ -835,6 +878,11 @@ VAR_INPUT
     PointsPerRev     : UDINT := 8192;  (* --&gt; [CFG] Résolution codeur (pts/tour) *)
     CableM_PerRev    : REAL := 2.0;    (* --&gt; [CFG] Développement câble (m/tour) *)
     CycleTimeS       : REAL := 0.010;  (* --&gt; [CFG] Période tâche PLC (s) — MainTask 10 ms *)
+    SpeedReportTauS  : REAL := 0.0;    (* --&gt; [CFG] Constante de temps 1er ordre du retour vitesse (RawSpdOut), s.
+        0.0 = comportement historique (saut instantane, defaut, compatibilite tests existants). &gt;0 = RawSpdOut
+        suit un 1er ordre vers la vitesse reelle du modele au lieu de sauter en escalier a la coupure des
+        relais ; RawPosOut (position) n&#x27;est pas affecte. Non calibre treuil M1/M2 (T316, SYNTHETIQUE) : mirror
+        du tau M3 identifie sur trace (FB_Sim_TranslationDrive, tau=0.15s) faute de mesure treuil propre. *)
 END_VAR
 VAR_OUTPUT
     RawPosOut   : UDINT;   (* &lt;-- [DIAG] Position brute simulée *)
@@ -844,16 +892,18 @@ VAR_IN_OUT
     RawPos      : UDINT;   (* &lt;-&gt; [BUS] Référence _SimEncoderRawPosM1/M2 (survit au reset froid) *)
 END_VAR
 VAR
-    Increment      : UDINT;              (* . [LOC] Points ajoutés par cycle *)
-    EffStep        : INT;               (* . [LOC] Pas borné (&gt;= 1) *)
-    SpeedMps       : REAL;              (* . [LOC] Vitesse simulée (m/s) *)
-    TestOffsetEdge : R_TRIG;             (* . [LOC] Front TestOffsetCmd *)
-    PresetEdge     : R_TRIG;             (* . [LOC] Front montant PresetCmd *)
-    PresetPending  : BOOL;               (* . [LOC] Preset en attente d&#x27;application (latence) *)
-    PresetCount    : INT;                (* . [LOC] Compteur cycles de latence restants *)
-    IncrStep1      : UDINT;              (* . [LOC] Increment par cycle a vitesse palier 1 (pour le roulis) *)
-    MovingDir      : INT;                (* . [LOC] Dernier sens actif : +1 avant, -1 arriere, 0 arret *)
-    CoastPtsLeft   : REAL;               (* . [LOC] Roulis inertiel restant (points bruts) *)
+    Increment        : UDINT;            (* . [LOC] Points ajoutés par cycle *)
+    EffStep          : INT;              (* . [LOC] Pas borné (&gt;= 1) *)
+    SpeedMps         : REAL;             (* . [LOC] Vitesse simulée (m/s) *)
+    TestOffsetEdge   : R_TRIG;           (* . [LOC] Front TestOffsetCmd *)
+    PresetEdge       : R_TRIG;           (* . [LOC] Front montant PresetCmd *)
+    PresetPending    : BOOL;             (* . [LOC] Preset en attente d&#x27;application (latence) *)
+    PresetCount      : INT;              (* . [LOC] Compteur cycles de latence restants *)
+    IncrStep1        : UDINT;            (* . [LOC] Increment par cycle a vitesse palier 1 (pour le roulis) *)
+    MovingDir        : INT;              (* . [LOC] Dernier sens actif : +1 avant, -1 arriere, 0 arret *)
+    CoastPtsLeft     : REAL;             (* . [LOC] Roulis inertiel restant (points bruts) *)
+    TargetSpeedMps   : REAL;             (* . [LOC] Vitesse instantanee signee du modele position, avant filtrage retour *)
+    ReportedSpeedMps : REAL;             (* . [LOC] Vitesse rapportee filtree 1er ordre, publiee dans RawSpdOut *)
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
@@ -903,10 +953,12 @@ IF PresetPending THEN
         RawPos := PresetValue;
         PresetPending := FALSE;
     END_IF;
+    TargetSpeedMps := 0.0;
 ELSIF RelayFwd THEN
     RawPos := RawPos + Increment;
     MovingDir := 1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    TargetSpeedMps := SpeedMps;
 ELSIF RelayRev THEN
     IF RawPos &gt;= Increment THEN
         RawPos := RawPos - Increment;
@@ -915,35 +967,41 @@ ELSIF RelayRev THEN
     END_IF;
     MovingDir := -1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    TargetSpeedMps := -SpeedMps;
 ELSE
     // Relais coupes : roulis inertiel (anticipation d&#x27;arret mecanique). Le treuil
     // continue a vitesse palier 1 dans le dernier sens jusqu&#x27;a epuisement de CoastPtsLeft.
     IF (CoastPtsLeft &gt;= 1.0) AND (MovingDir &lt;&gt; 0) THEN
         IF MovingDir = 1 THEN
             RawPos := RawPos + IncrStep1;
+            TargetSpeedMps := MinSpeedMps;
         ELSIF RawPos &gt;= IncrStep1 THEN
             RawPos := RawPos - IncrStep1;
+            TargetSpeedMps := -MinSpeedMps;
         ELSE
             RawPos := 0;
+            TargetSpeedMps := 0.0;
         END_IF;
         CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
     ELSE
         MovingDir := 0;
         CoastPtsLeft := 0.0;
+        TargetSpeedMps := 0.0;
     END_IF;
 END_IF;
 {endregion}
 
 {region &quot;§4 Sortie&quot;}
 RawPosOut := RawPos;
+// Retour vitesse rapporte (RawSpdOut) : 1er ordre vers TargetSpeedMps (mirror du tau M3
+// identifie sur trace, T316). SpeedReportTauS=0.0 -&gt; alpha=1 -&gt; saut instantane (comportement
+// historique inchange).
+ReportedSpeedMps := ReportedSpeedMps
+    + (CycleTimeS / (SpeedReportTauS + CycleTimeS)) * (TargetSpeedMps - ReportedSpeedMps);
 // Formule inverse vitesse brute EtherCAT CoE (0.1 RPM) :
 // SpdValue = (V_mps * 60.0) / (0.1 * CableM_PerRev) = V_mps * 300.0 (sur tambour 2m)
-IF (MovingDir &lt;&gt; 0) AND (CableM_PerRev &gt; 0.0) THEN
-    IF MovingDir = 1 THEN
-        RawSpdOut := REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
-    ELSE
-        RawSpdOut := -REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
-    END_IF;
+IF (CableM_PerRev &gt; 0.0) THEN
+    RawSpdOut := REAL_TO_DINT((ReportedSpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
 ELSE
     RawSpdOut := 0;
 END_IF;
@@ -960,9 +1018,11 @@ END_FUNCTION_BLOCK
 test_fb_sim_encoder.st
   [PASS] TC-P13-ENC-001 Enable FALSE conserve la valeur passee par VAR_IN_OUT
   [PASS] TC-P13-ENC-002 Simulation incrementation comptage en montee
+  [PASS] TC-P13-034 SpeedReportTauS=0.0 conserve le saut instantane historique (non-regression)
+  [PASS] TC-P13-035 SpeedReportTauS&gt;0 fait decroitre RawSpdOut sur plusieurs scans (fidelite AX10, T316)
 
 -----------------------------------------
-2 tests, 2 passed, 0 failed
+4 tests, 4 passed, 0 failed
 </pre>
     </details>
 </div>

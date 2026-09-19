@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T00:32:07.723030" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T00:32:07.723030">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-18T07:29:58.989236" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-18T07:29:58.989236">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -184,6 +184,17 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — MainTask 10 ms</xhtml>
               </documentation>
             </variable>
+            <variable name="SpeedReportTauS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Constante de temps 1er ordre du retour vitesse</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawPosOut">
@@ -294,6 +305,22 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Roulis inertiel restant (points bruts)</xhtml>
               </documentation>
             </variable>
+            <variable name="TargetSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse instantanee signee du modele position, avant filtrage retour</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReportedSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse rapportee filtree 1er ordre, publiee dans RawSpdOut</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -374,10 +401,12 @@ IF PresetPending THEN
         RawPos := PresetValue;
         PresetPending := FALSE;
     END_IF;
+    TargetSpeedMps := 0.0;
 ELSIF RelayFwd THEN
     RawPos := RawPos + Increment;
     MovingDir := 1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    TargetSpeedMps := SpeedMps;
 ELSIF RelayRev THEN
     IF RawPos &gt;= Increment THEN
         RawPos := RawPos - Increment;
@@ -386,35 +415,40 @@ ELSIF RelayRev THEN
     END_IF;
     MovingDir := -1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    TargetSpeedMps := -SpeedMps;
 ELSE
     // Relais coupes : roulis inertiel (anticipation d'arret mecanique). Le treuil
     // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
     IF (CoastPtsLeft &gt;= 1.0) AND (MovingDir &lt;&gt; 0) THEN
         IF MovingDir = 1 THEN
             RawPos := RawPos + IncrStep1;
+            TargetSpeedMps := MinSpeedMps;
         ELSIF RawPos &gt;= IncrStep1 THEN
             RawPos := RawPos - IncrStep1;
+            TargetSpeedMps := -MinSpeedMps;
         ELSE
             RawPos := 0;
+            TargetSpeedMps := 0.0;
         END_IF;
         CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
     ELSE
         MovingDir := 0;
         CoastPtsLeft := 0.0;
+        TargetSpeedMps := 0.0;
     END_IF;
 END_IF;
 {endregion}
 
 {region "§4 Sortie"}
 RawPosOut := RawPos;
+// Retour vitesse rapporte (RawSpdOut) : 1er ordre vers TargetSpeedMps. SpeedReportTauS=0.0
+// -&gt; alpha=1 -&gt; saut instantane (comportement historique inchange).
+ReportedSpeedMps := ReportedSpeedMps
+    + (CycleTimeS / (SpeedReportTauS + CycleTimeS)) * (TargetSpeedMps - ReportedSpeedMps);
 // Formule inverse vitesse brute EtherCAT CoE (0.1 RPM) :
 // SpdValue = (V_mps * 60.0) / (0.1 * CableM_PerRev) = V_mps * 300.0 (sur tambour 2m)
-IF (MovingDir &lt;&gt; 0) AND (CableM_PerRev &gt; 0.0) THEN
-    IF MovingDir = 1 THEN
-        RawSpdOut := REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
-    ELSE
-        RawSpdOut := -REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
-    END_IF;
+IF (CableM_PerRev &gt; 0.0) THEN
+    RawSpdOut := REAL_TO_DINT((ReportedSpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
 ELSE
     RawSpdOut := 0;
 END_IF;

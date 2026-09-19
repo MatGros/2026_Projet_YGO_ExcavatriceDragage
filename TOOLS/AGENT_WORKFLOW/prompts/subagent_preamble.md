@@ -57,6 +57,7 @@ tout critère générique d'acceptation. Ta restitution se juge **contre eux**, 
   ```
   - `<SESSION>` : id unique de ta mission (ex. `task-AF10`, ou horodatage).
   - `<etat>` : `en_cours | ok | fail | attente_validation | termine`.
+  - `<nom>` (`--agent`) : code court normalisé obligatoire (`CC01`/`CC02`, `AGY01`/`AGY02`, `CDX01`/`CDX02`, `DSH01`/`DSH02`, `OPC01`), zéro libellé long.
 - Les nouveaux fichiers vivent dans `TOOLS/AGENT_WORKFLOW/status/` (local et ignoré).
   Des fichiers historiques peuvent encore être suivis : ne pas les supprimer ni les désindexer,
   leur régularisation relève de la phase 4 T279.

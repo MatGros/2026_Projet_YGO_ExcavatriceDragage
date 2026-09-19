@@ -13,6 +13,8 @@ from urllib.request import Request, urlopen
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 PORT = 8093
 BASE = f"http://127.0.0.1:{PORT}"
 
@@ -43,14 +45,15 @@ class TaskManagerApiTest(unittest.TestCase):
 
     def test_lock_conflict_revision_and_global_reset(self):
         _, values = request("/api/tasks/json")
-        task = next(value for value in values if value["id"] == "T162")
+        target_id = values[0]["id"]
+        task = next(value for value in values if value["id"] == target_id)
         revision = task.pop("revision")
         task.pop("edit_flag")
         task.pop("work_lock")
-        _, locked = request("/api/task/edit-flag/acquire", {"id": "T162", "actor": "TEST-A"})
+        _, locked = request("/api/task/edit-flag/acquire", {"id": target_id, "actor": "TEST-A"})
         token = locked["edit_flag"]["token"]
         with self.assertRaises(HTTPError) as locked_by_other:
-            request("/api/task/edit-flag/acquire", {"id": "T162", "actor": "TEST-B"})
+            request("/api/task/edit-flag/acquire", {"id": target_id, "actor": "TEST-B"})
         self.assertEqual(locked_by_other.exception.code, 423)
         locked_by_other.exception.close()
         with self.assertRaises(HTTPError) as obsolete:
@@ -60,7 +63,7 @@ class TaskManagerApiTest(unittest.TestCase):
         _, reset = request("/api/tasks/unlock-all", {"actor": "TEST-HUM", "confirm_all": True})
         self.assertGreaterEqual(reset["cleared"], 1)
         _, after = request("/api/tasks/json")
-        self.assertEqual(revision, next(value for value in after if value["id"] == "T162")["revision"])
+        self.assertEqual(revision, next(value for value in after if value["id"] == target_id)["revision"])
 
     def test_broken_yaml_returns_precise_error(self):
         """Regression REX 2026-08-30 : TASKS.yaml casse -> 500 avec ligne fautive, pas un message generique."""
@@ -84,6 +87,53 @@ class TaskManagerApiTest(unittest.TestCase):
             tasks_path.write_text(original, encoding="utf-8")
         _, status = request("/api/status")  # catalogue restaure : le serveur doit se retablir seul
         self.assertEqual(status["status"], "ok")
+
+    def test_agent_normalization(self):
+        """Verifie que le serveur normalise les agents vers la convention stricte (CC01, CDX01, AGY01...)."""
+        from TOOLS.TASK_MANAGER.task_server import normalize_agent
+        self.assertEqual(normalize_agent("Claude"), "CC01")
+        self.assertEqual(normalize_agent("CC"), "CC01")
+        self.assertEqual(normalize_agent("CC-01"), "CC01")
+        self.assertEqual(normalize_agent("Antigravity"), "AGY01")
+        self.assertEqual(normalize_agent("AGY"), "AGY01")
+        self.assertEqual(normalize_agent("AGY-02"), "AGY02")
+        self.assertEqual(normalize_agent("Codex"), "CDX01")
+        self.assertEqual(normalize_agent("CDX"), "CDX01")
+        self.assertEqual(normalize_agent("DSH (DeepSeek)"), "DSH01")
+        self.assertEqual(normalize_agent("DSH-02"), "DSH02")
+        self.assertEqual(normalize_agent("OpenCode"), "OPC01")
+        self.assertEqual(normalize_agent("HUM"), "HUM")
+        self.assertEqual(normalize_agent("—"), "—")
+        self.assertEqual(normalize_agent(""), "—")
+
+    def test_cli_arguments(self):
+        """Verifie que le navigateur ne s'ouvre pas par defaut et que les flags CLI fonctionnent."""
+        from TOOLS.TASK_MANAGER.task_server import parse_cli_args, PORT
+        port, open_browser, verbose = parse_cli_args([])
+        self.assertEqual(port, PORT)
+        self.assertFalse(open_browser)
+        self.assertFalse(verbose)
+
+        port, open_browser, verbose = parse_cli_args(["8090"])
+        self.assertEqual(port, 8090)
+        self.assertFalse(open_browser)
+        self.assertFalse(verbose)
+
+        port, open_browser, verbose = parse_cli_args(["--open-browser"])
+        self.assertEqual(port, PORT)
+        self.assertTrue(open_browser)
+        self.assertFalse(verbose)
+
+        port, open_browser, verbose = parse_cli_args(["8095", "--open-browser", "--verbose"])
+        self.assertEqual(port, 8095)
+        self.assertTrue(open_browser)
+        self.assertTrue(verbose)
+
+        port, open_browser, verbose = parse_cli_args(["--no-browser", "-v"])
+        self.assertEqual(port, PORT)
+        self.assertFalse(open_browser)
+        self.assertTrue(verbose)
+
 
 
 if __name__ == "__main__":

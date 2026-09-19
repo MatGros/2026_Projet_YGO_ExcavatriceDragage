@@ -7,12 +7,12 @@
     "sessions": {
         "AI": [
             {
-                "name": "Task Manager & AF Viewer",
+                "name": "Task Manager",
                 "autoExecuteCommands": true,
                 "icon": "server",
                 "color": "terminal.ansiBrightMagenta",
                 "commands": [
-                    "Start-Process 'DOC\\WFLOW\\AF_VIEWER.html'; cmd /c TOOLS\\TASK_MANAGER\\LANCER_TASK_MANAGER.bat"
+                    "cmd /c TOOLS\\TASK_MANAGER\\LANCER_TASK_MANAGER.bat"
                 ]
             },
             {

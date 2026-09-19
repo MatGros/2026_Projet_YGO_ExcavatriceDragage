@@ -70,6 +70,32 @@ TEST 'TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd'
     ASSERT_FALSE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'M1_BrakeCmd=FALSE -> M1_BrakeIsOpen_DI=FALSE');
 END_TEST
 
+TEST 'TC-P13-015 SimBench delai frein M1 opt-in (T316) : SimWinchBrakeOpenDelayS retarde M1_BrakeIsOpen_DI sans jamais inverser la polarite'
+    (* Delai desactive (0.0) : comportement historique, bascule au meme scan *)
+    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchBrakeOpenDelayS := 0.0, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_TRUE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'Delai=0.0 -> ouverture instantanee (non-regression)');
+    ADVANCE_TIME(10000000);
+    FB_Bench(Enable := TRUE, M1_BrakeCmd := FALSE, SimWinchBrakeOpenDelayS := 0.0, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_FALSE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'Retour delai=0.0 avant test delai>0 : etat repos');
+
+    (* Delai actif (50 ms = 5 scans a 10 ms) : la DI reste fausse pendant le delai puis bascule *)
+    ADVANCE_TIME(10000000);
+    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_FALSE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'Scan 1/5 du delai : M1_BrakeIsOpen_DI reste FALSE, jamais TRUE en avance');
+    ADVANCE_TIME(10000000);
+    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_FALSE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'Scan 2/5 du delai : toujours FALSE');
+    ADVANCE_TIME(10000000);
+    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_FALSE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'Scan 3/5 du delai : toujours FALSE');
+    ADVANCE_TIME(10000000);
+    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_FALSE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'Scan 4/5 du delai : toujours FALSE');
+    ADVANCE_TIME(10000000);
+    FB_Bench(Enable := TRUE, M1_BrakeCmd := TRUE, SimWinchBrakeOpenDelayS := 0.042, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_TRUE(FB_Bench.Winch.M1_BrakeIsOpen_DI, 'Delai ecoule (5e scan) : M1_BrakeIsOpen_DI bascule TRUE');
+END_TEST
+
 TEST 'TC-T300-INT-010 SimBench M3 publie le retour dynamique du drive'
 VAR
     i : INT;

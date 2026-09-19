@@ -145,7 +145,15 @@
       "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"PLAN_AlarmBanner_20260820.md\")",
       "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"PLAN_DIAGNO_ALARMES_T218_220.md\")",
       "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"PLAN_MIGRATION_TABLES.md\")",
-      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"PLAN_RootCauseMasking_HmiBanner_20260826.md\")"
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"PLAN_RootCauseMasking_HmiBanner_20260826.md\")",
+      "Bash(git worktree *)",
+      "Bash(git log --oneline *)",
+      "Bash(git diff --stat*)",
+      "Bash(*)",
+      "Bash(ls *)",
+      "Bash(python TOOLS/AGENT_WORKFLOW/prototypes/sim_treuil_electrique.py --load 0.7 --compare --gradin-times 0,0.4,0.8,1.2 --t-end 8)",
+      "Bash(python TOOLS/AGENT_WORKFLOW/prototypes/sim_treuil_electrique.py --scenario deux_treuils --t-end 6)",
+      "Bash(python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report)"
     ],
     "ask": [
       "Bash(git push --force*)",

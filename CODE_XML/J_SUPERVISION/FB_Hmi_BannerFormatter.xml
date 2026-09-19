@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T05:11:23.755270" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T05:11:23.755270">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T10:09:59.486833" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T10:09:59.486833">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3127,6 +3127,21 @@ IF ((CycleErrorId AND 16#0020) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxA
 END_IF;
 IF ((CycleErrorId AND 16#0040) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ErrorID:07 - timeout etape'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0004) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:03 - ecart vitesse montee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0080) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:08 - hors FDC haut translation P1'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0100) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:09 - palier 5 interdit en plongee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0200) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:10 - palier 4 non confirme Kobold'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0800) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:12 - consigne profondeur invalide'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5i. Collecte [HISTO] — défauts latched passés (LatchedId AND NOT ErrorId)

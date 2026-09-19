@@ -25,6 +25,7 @@ LOCKS_PATH = WFLOW / "TASK_LOCKS.json"
 MUTEX_PATH = WFLOW / ".task_manager.write.lock"
 HOST, PORT = "127.0.0.1", 8081
 LOCAL_MUTEX = threading.Lock()
+VERBOSE = False
 
 
 def now() -> str:
@@ -94,6 +95,30 @@ def save_tasks(value: list[dict]) -> None:
     atomic_write(TASKS_PATH, yaml.safe_dump({"tasks": value}, allow_unicode=True, sort_keys=False, width=120))
 
 
+def normalize_agent(raw: str) -> str:
+    v = (raw or "").strip()
+    if not v or v in ("—", "-", "None", "null"):
+        return "—"
+    upper = v.upper()
+    if upper == "HUM":
+        return "HUM"
+    alias_map = {
+        "CLAUDE": "CC01", "CC": "CC01", "CC-01": "CC01", "CC-SUB": "CC02",
+        "ANTIGRAVITY": "AGY01", "AGY": "AGY01", "AGY-01": "AGY01", "AGY-02": "AGY02",
+        "CODEX": "CDX01", "CDX": "CDX01",
+        "DSH": "DSH01", "DSH-01": "DSH01", "DSH-02": "DSH02",
+        "DSH (DEEPSEEK)": "DSH01", "DSH (ORCHESTRATEUR)": "DSH01",
+        "OPENCODE": "OPC01", "OPC": "OPC01",
+    }
+    if upper in alias_map:
+        return alias_map[upper]
+    import re
+    clean = re.sub(r"[^A-Z0-9]", "", upper)
+    if re.match(r"^(CC|AGY|CDX|DSH|OPC)\d{2}$", clean):
+        return clean
+    return v[:10]
+
+
 def locks() -> dict[str, dict[str, dict]]:
     if not LOCKS_PATH.exists():
         return {"work_locks": {}, "edit_flags": {}}
@@ -143,7 +168,23 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(WFLOW), **kwargs)
 
     def log_message(self, fmt, *args):
+        if VERBOSE:
+            print(f"[{self.log_date_time_string()}] {fmt % args}")
+            return
+        # Mode silencieux par defaut : masquer les requetes GET de routine (polling status/tasks, assets, etc.)
+        if len(args) >= 2:
+            req, code = str(args[0]), str(args[1])
+            if req.startswith("GET ") and (code.startswith(("2", "3")) or code == "404"):
+                return
+        elif len(args) >= 1 and "404" in str(args[0]):
+            return
         print(f"[{self.log_date_time_string()}] {fmt % args}")
+
+    def log_error(self, fmt, *args):
+        if not VERBOSE:
+            if len(args) >= 1 and str(args[0]) in ("404", "File not found"):
+                return
+        super().log_error(fmt, *args)
 
     def reply(self, status: int, data: dict | list):
         try:
@@ -180,6 +221,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         try:
             if path in ("/", "/index.html"):
                 self.send_response(302); self.send_header("Location", "/TASK_VIEWER.html"); self.end_headers(); return
+            if path == "/favicon.ico":
+                self.send_response(204); self.end_headers(); return
             if path in ("/omnidiag", "/omnidiag.html"):
                 omnidiag_html = ROOT / "TOOLS" / "OMNIDIAG" / "EXPORTS" / "omnidiag_viewer.html"
                 if not omnidiag_html.exists():
@@ -305,6 +348,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         task, who = data.get("task"), actor(data)
         if not isinstance(task, dict) or not str(task.get("id", "")).strip():
             raise ValueError("task.id obligatoire")
+        task["agent"] = normalize_agent(str(task.get("agent", "")))
         task_id, expected, token = str(task["id"]), str(data.get("expected_revision", "")), str(data.get("token", ""))
         with mutex():
             all_tasks, state = tasks(), locks(); all_locks = state["edit_flags"]
@@ -334,7 +378,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.reply(200, {"success": True, "task_id": task_id})
 
 
-def start(port: int = PORT):
+def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
+    global VERBOSE
+    VERBOSE = verbose
     # Ce verrou reste pris pendant toute la vie du serveur : une seule instance locale.
     import msvcrt
     server_mutex_path = WFLOW / f".task_manager.server.{port}.lock"
@@ -356,7 +402,9 @@ def start(port: int = PORT):
         return
     url = f"http://{HOST}:{port}/TASK_VIEWER.html"
     print(f"Task Manager local : {url}")
-    webbrowser.open(url)
+    print("  -> Ctrl+Clic sur le lien pour ouvrir Task Viewer dans votre navigateur.")
+    if open_browser:
+        webbrowser.open(url)
     try: server.serve_forever()
     except KeyboardInterrupt: pass
     finally:
@@ -364,5 +412,20 @@ def start(port: int = PORT):
         lock_handle.seek(0); msvcrt.locking(lock_handle.fileno(), msvcrt.LK_UNLCK, 1); lock_handle.close()
 
 
+def parse_cli_args(argv: list[str] | None = None) -> tuple[int, bool, bool]:
+    import argparse
+    parser = argparse.ArgumentParser(description="Serveur local Task Manager : taches YAML, verrous JSON separes.")
+    parser.add_argument("port", nargs="?", type=int, default=PORT, help=f"Port d'ecoute HTTP (defaut: {PORT})")
+    parser.add_argument("--port", dest="named_port", type=int, default=None, help="Port d'ecoute HTTP nomme")
+    parser.add_argument("--open-browser", action="store_true", default=False, help="Ouvrir automatiquement Task Viewer dans le navigateur")
+    parser.add_argument("--no-browser", action="store_false", dest="open_browser", help="Ne pas ouvrir automatiquement le navigateur (comportement par defaut)")
+    parser.add_argument("--verbose", "-v", action="store_true", default=False, help="Afficher tous les acces HTTP GET de polling dans le terminal")
+    args = parser.parse_args(argv)
+    selected_port = args.named_port if args.named_port is not None else args.port
+    return selected_port, args.open_browser, args.verbose
+
+
 if __name__ == "__main__":
-    start(int(sys.argv[1]) if len(sys.argv) > 1 else PORT)
+    selected_port, should_open_browser, is_verbose = parse_cli_args()
+    start(selected_port, open_browser=should_open_browser, verbose=is_verbose)
+

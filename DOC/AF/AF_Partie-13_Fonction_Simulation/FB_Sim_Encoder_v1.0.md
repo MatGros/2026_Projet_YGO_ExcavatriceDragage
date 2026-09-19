@@ -58,6 +58,18 @@
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>👁️ MANUEL</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-034</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>SpeedReportTauS=0.0</code> conserve le saut instantané historique de <code>RawSpdOut</code> (non-régression T316)</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-035</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><code>SpeedReportTauS&gt;0</code> fait décroître <code>RawSpdOut</code> sur plusieurs scans après coupure relais (rampe 1er ordre, pas un escalier) — fidélité fenêtre AX10_WAIT_ASCENT_START, T316</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>V-I</code></small></td>
+    </tr>
   </tbody>
 </table>
 
@@ -86,6 +98,7 @@ Deux instances : une par treuil (M1/M2), câblées depuis `FB_SimBench`.
 | `PresetValue` | UDINT | Valeur brute à charger lors du preset |
 | `SpeedScaleFactor` | REAL | Multiplicateur confort de test banc (défaut 1.0), `GVL_Simulation.SimEncoderSpeedFactor` |
 | `TestOffsetCmd`/`TestOffsetPts` | BOOL / DINT | Front = injecte un vrai saut de position (test Méca E / rattrapage synchro) |
+| `SpeedReportTauS` | REAL | Constante de temps 1er ordre du retour vitesse rapporté (`RawSpdOut`), s. `0.0` = saut instantané (défaut, historique). `>0` = rampe continue au lieu d'un escalier à la coupure relais — position (`RawPosOut`) non affectée. Non calibré treuil (T316, `SYNTHETIQUE`). |
 
 | Sortie/IN_OUT | Type | Sens |
 |---|---|---|
