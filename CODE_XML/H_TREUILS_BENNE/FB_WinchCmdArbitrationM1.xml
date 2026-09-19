@@ -506,6 +506,14 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] AX10 fermeture auto active (plafond AX10 M2, issu de CtrlAscentMaxStep)</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketHandoffP1Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] AX10B : fermeture atteinte, M2 maintenu au palier 1 avant transfert couple</xhtml>
+              </documentation>
+            </variable>
             <variable name="WinchBothMotionBlockedByBucket">
               <type>
                 <BOOL />

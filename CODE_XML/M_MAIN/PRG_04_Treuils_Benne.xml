@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T14:53:25.793510" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T14:53:25.793510">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T18:22:00.918729" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T18:22:00.918729">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1170,6 +1170,14 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur sous-systeme benne</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketCloseReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne atteinte (avant transfert AX10B)</xhtml>
+              </documentation>
+            </variable>
             <variable name="EffectivePermitBucket_Open">
               <type>
                 <BOOL />
@@ -1986,6 +1994,14 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] AX10 fermeture auto active (plafond AX10 M2, issu de CtrlAscentMaxStep)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketHandoffP1Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] AX10B : fermeture atteinte, M2 maintenu au palier 1 avant transfert couple</xhtml>
               </documentation>
             </variable>
             <variable name="WinchBothMotionBlockedByBucket">
@@ -3145,6 +3161,14 @@ M1 : contacteurs retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqHoldAscentP1AfterClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien M2 en montee P1 apres fermeture, pour raccordement AX10B sans coupure</xhtml>
               </documentation>
             </variable>
             <variable name="ReqKoboldMeasureEnable">
@@ -6176,6 +6200,7 @@ instBucket(
     Mode                := PRG_03_Modes_Cycle.Data.Auth.Mode,
     CmdOpen_IHM         := instArbBucket.CmdOpen_IHM,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
+    HoldAscentP1AfterClose := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqHoldAscentP1AfterClose,
     ReqAscent           := WinchBothReqAscent OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_02_Acquisition.Data.Joystick.AxisY.Direction &gt; 0),
     ReqDescend          := WinchBothReqDescend OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_02_Acquisition.Data.Joystick.AxisY.Direction &lt; 0),
     EffectivePermitBucket_Open := EffectivePermitBucket_Open,
@@ -6191,7 +6216,8 @@ instBucket(
     WinchSelBucket      := (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
     BucketJogActive     := ManualBucketJogActive,
     ProgramBucketDriveActive := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
-                                OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose,
+                                OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose
+                                OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqHoldAscentP1AfterClose,
     M1_Busy             := (instWinchM1.StepNumber &gt; 0),
     M2_Busy             := (instWinchM2.StepNumber &gt; 0),
     // Confirmations visuelles N2 : publication et offset benne. Le preset
@@ -6328,6 +6354,10 @@ ArbContext.BucketM2ReqDescend             := BucketM2ReqDescend;
 ArbContext.BucketAutoCloseActive          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
     AND (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX10_CLOSE_BUCKET)
     AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;
+ArbContext.BucketHandoffP1Active          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
+    AND (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX10B_RACCORDEMENT_P1)
+    AND instBucket.CloseReached
+    AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqHoldAscentP1AfterClose;
 ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
 ArbContext.SyncBlocksAscent                   := SyncMinorDeviationBlocksUp;
 ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown;
@@ -7090,7 +7120,9 @@ END_IF;
 // Auto-séquencement benne : AX10 SEMI_AUTO garde le plafond AX11 P1..P2 ; les
 // autres manoeuvres benne conservent leur plafond dédié.
 IF instBucket.M2_BucketJogLimit THEN
-    IF ArbContext.BucketAutoCloseActive THEN
+    IF ArbContext.BucketHandoffP1Active THEN
+        M2MaxStepUp := 1;
+    ELSIF ArbContext.BucketAutoCloseActive THEN
         M2MaxStepUp := MIN(M2MaxStepUp, LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.CtrlAscentMaxStep, 2));
     ELSE
         M2MaxStepUp := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
@@ -7557,6 +7589,7 @@ BucketState.M2PositionCorrectedValid := _BucketState.BucketReferenced
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Lifecycle.Busy;
 BucketState.Done := instBucket.Lifecycle.Done;
+Data.BucketCloseReached := instBucket.CloseReached;
 BucketState.Error := instBucket.Fault.Error;
 BucketState.ErrorId := instBucket.Fault.ErrorId;
 BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
@@ -7793,6 +7826,17 @@ Data.BothBlockReason              := BothBlockReason;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande fermeture depuis IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HoldAscentP1AfterClose">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] AX10B : maintient M2 en montee P1 apres fermeture, jusqu'au transfert atomique</xhtml>
               </documentation>
             </variable>
             <variable name="ReqAscent">
@@ -8135,6 +8179,14 @@ Data.BothBlockReason              := BothBlockReason;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Plafond palier 1 du jog benne M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CloseReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fermeture atteinte, maintien AX10B eventuel en cours</xhtml>
               </documentation>
             </variable>
             <variable name="M1SlipDetected">
@@ -8728,6 +8780,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     M2_ReqAscent := FALSE;
     M2_ReqDescend := FALSE;
     M2_BucketJogLimit := FALSE;
+    CloseReached := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
     RETURN;
@@ -8894,9 +8947,11 @@ ELSE
     IF CmdOpen_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
         OpenReq := TRUE;
         CloseReq := FALSE;
+        CloseReached := FALSE;
     ELSIF CmdClose_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
         CloseReq := TRUE;
         OpenReq := FALSE;
+        CloseReached := FALSE;
     END_IF;
 
     BusyEdge(CLK := (CloseReq OR OpenReq) AND MotionRequestActive);
@@ -8911,7 +8966,21 @@ ELSE
         Lifecycle.Done := FALSE;
     END_IF;
 
-    IF Lifecycle.Busy THEN
+    IF Lifecycle.Busy AND CloseReached AND NOT HoldAscentP1AfterClose THEN
+        // AX10B relache explicitement la benne : le cycle prend M1+M2 P1 au meme scan.
+        M2_RunRequest := FALSE;
+        M2_ReqAscent := FALSE;
+        M2_ReqDescend := FALSE;
+        M2_BucketJogLimit := FALSE;
+        Lifecycle.Busy := FALSE;
+        Lifecycle.Done := TRUE;
+    ELSIF Lifecycle.Busy AND CloseReached AND HoldAscentP1AfterClose THEN
+        // Raccordement AX10B : M2 continue en montee, palier impose par l'arbitre a P1.
+        M2_BucketJogLimit := TRUE;
+        M2_RunRequest := MotionRequestActive AND ReqAscent AND EffectivePermitBucket_Close;
+        M2_ReqAscent := M2_RunRequest;
+        M2_ReqDescend := FALSE;
+    ELSIF Lifecycle.Busy THEN
         IF CloseReq THEN
             RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
             M2_BucketJogLimit := TRUE;
@@ -8958,16 +9027,26 @@ ELSE
         // Arrêt fermeture
         IF CloseReq THEN
             IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
-                M2_RunRequest := FALSE;
-                M2_ReqAscent := FALSE;
+                M2_RunRequest := MotionRequestActive AND ReqAscent AND EffectivePermitBucket_Close;
+                M2_ReqAscent := M2_RunRequest;
                 M2_ReqDescend := FALSE;
+                M2_BucketJogLimit := TRUE;
                 BucketState.IsOpen := FALSE;
                 BucketState.IsClosed := TRUE;
                 BucketState.LastPosM2Close := CablePosM2;
                 BucketState.StateIncoherent := FALSE;
                 CloseReq := FALSE;
-                Lifecycle.Busy := FALSE;
-                Lifecycle.Done := TRUE;
+                CloseReached := TRUE;
+                IF HoldAscentP1AfterClose THEN
+                    Lifecycle.Busy := TRUE;
+                    Lifecycle.Done := FALSE;
+                ELSE
+                    M2_RunRequest := FALSE;
+                    M2_ReqAscent := FALSE;
+                    M2_BucketJogLimit := FALSE;
+                    Lifecycle.Busy := FALSE;
+                    Lifecycle.Done := TRUE;
+                END_IF;
             END_IF;
         END_IF;
 
@@ -12086,6 +12165,8 @@ ELSE
         BucketRequestedStep := LIMIT(1, Joystick.AxisY.StepTgt, 5);
         IF ReqDescend THEN
             StepTgt := MIN(BucketRequestedStep, Cfg.BucketOverrideStepDownTgt);
+        ELSIF ReqAscent AND Context.BucketHandoffP1Active THEN
+            StepTgt := 1;
         ELSIF ReqAscent AND Context.BucketAutoCloseActive THEN
             StepTgt := MIN(BucketRequestedStep, Cfg.BucketAutoMaxStepUp);
         ELSE

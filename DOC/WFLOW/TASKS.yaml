@@ -1,4 +1,64 @@
 tasks:
+- id: T322
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: MISE_EN_SERVICE / SIMULATION / TREUILS
+  agent: HUM
+  date: '2026-09-20T00:00:00+02:00'
+  updated_at: '2026-09-20T00:00:00+02:00'
+  titre: Mise en service - campagne de recalage terrain des hypotheses du modele treuils (M1/M2)
+  contexte: Le simulateur travaille sur des hypotheses (constantes SYNTHETIQUES puis HYPOTHESE) ; 6 inconnues bloquantes subsistent, la voie de vitesse (ecart 12,7 %), le rapport de reduction i, la plaque moteur, le coffret de resistances rotoriques, la tare de la benne et la course ouverture/fermeture.
+  description: Lever les inconnues pendant la mise en service reelle et convertir les hypotheses en MESURE. Aucune modification de code dans cette tache, uniquement des mesures, des traces et la mise a jour du bloc de calage.
+  objectifs:
+  - Trancher la voie de vitesse (config EtherCAT 0x6031 et PointsPerRev reel contre la resolution codeur) et nommer l'origine de l'ecart de 12,7 %.
+  - Mesurer i (tours moteur par tour de tambour) et le comparer a la borne deduite (i inferieur ou egal a 33,6 si la voie position est la reference, 38,9 si c'est la voie CoE).
+  - Relever la plaque moteur (puissance, vitesse nominale, In, E2 rotor, R2, service) et le coffret (nombre reel de gradins et valeurs ohmiques).
+  - Etablir la tare de la benne (pesee) et reconfirmer la course de 15 m en charge.
+  - Etablir la pente charge contre vitesse sur au moins 2 paliers, benne vide fermee et benne pleine, avec l'etat de benne NOTE.
+  - Caracteriser le partage de charge M1/M2 (M1 seul porteur benne fermee, ouverture en l'air).
+  - Faire passer chaque valeur du bloc de calage de ESTIMEE a MESUREE, ou ecrire la raison du maintien en ESTIMEE.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T322_MISE_EN_SERVICE_RECALAGE.yaml
+  bloque_par: []
+- id: T321
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: SIMULATION / TREUILS
+  agent: '—'
+  date: '2026-09-20T00:00:00+02:00'
+  updated_at: '2026-09-20T00:00:00+02:00'
+  titre: SimBench - appliquer les valeurs d'hypothese du bloc de calage et cabler la charge M1/M2
+  contexte: La charge n'est pas cablee (SimWinchLoadFrac_Ratio absent de GVL_Simulation et non passe dans l'appel instSimBench), donc aucun decrochage par charge n'est executable au banc. Les constantes du modele sont SYNTHETIQUES (Cmax 3800, charge nominale 2500, frottement 80, inertie 45).
+  description: Cabler la charge et remplacer les constantes SYNTHETIQUES par les valeurs d'HYPOTHESE du bloc de calage, chacune etiquetee avec sa source et jamais presentee comme mesuree.
+  objectifs:
+  - SimWinchLoadFrac_Ratio et SimWinchCoupledActive exposes dans GVL_Simulation et cables dans l'appel instSimBench.
+  - Charge modelisee sans restructuration, terme fixe egal tare et terme variable egal taux fois matiere (0 = benne vide, 1 = benne pleine).
+  - Chaque constante recalee porte la mention HYPOTHESE et la source de sa valeur (REFERENCE_CALAGE).
+  - Commentaire faux FB_SimBench.st 133-134 corrige.
+  - Aucune ecriture dans _WinchSpeedLearnTable, SpeedGuardEnable reste FALSE, aucune sortie consommee par le metier.
+  - Un scenario au banc declenche IsStalled sur un palier capable de decrocher, et pas sur un palier qui tient la charge.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T321_SIMBENCH_HYPOTHESES_ET_CHARGE.yaml
+  bloque_par: []
+- id: T320
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: SIMULATION / TREUILS
+  agent: '—'
+  date: '2026-09-20T00:00:00+02:00'
+  updated_at: '2026-09-20T00:00:00+02:00'
+  titre: SimBench - miroir de l'apprentissage vitesse par palier (comparaison sim contre reel automatique)
+  contexte: La table d'apprentissage reelle (RETAIN, axe fois sens fois charge/vide fois palier) existe et est cablee mais n'a jamais ete alimentee. Le simulateur doit publier ses vitesses avec la MEME indexation pour que la comparaison sim contre reel devienne automatique le jour ou l'apprentissage tournera.
+  description: Le banc publie une enveloppe de vitesse modele (minimum, maximum, moyenne, nombre d'echantillons) indexee comme la table reelle. Aucune ecriture dans la table RETAIN et le simulateur ne remplace jamais la mesure.
+  objectifs:
+  - Structure publiee indexee comme ST_fbWinchSpeedLearning_Table (axe, sens, charge, palier).
+  - Aucune ecriture dans _WinchSpeedLearnTable, la table terrain reste preservee.
+  - Vitesse modele en m/s publiee et tracable, elle est interne aujourd'hui.
+  - Aucun consommateur metier et simulateur inoperant sur machine reelle.
+  - Cas de test CI, gate OFF, palier hors bornes, sens conflictuel, isolation M1/M2.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T320_SIMBENCH_MIROIR_VITESSE.yaml
+  bloque_par: []
 - id: T319
   parent_id: ''
   statut: ✅
@@ -2593,7 +2653,8 @@ tasks:
   domaine: CYCLE_AUTO_BENNE
   agent: CDX01
   date: '2026-09-19T00:00:00+02:00'
-  updated_at: '2026-09-19T19:18:02+02:00'
+  updated_at: '2026-09-19T20:50:00+02:00'
+  implementation_note: 'AX10B_RACCORDEMENT_P1 implemente le 2026-09-19 : M2 maintenu P1, attente M1 bornee 2 s, transfert Both P1/P1, puis AX11 P1..P2. Tests C++ T262-002/T262-003 PASS ; en attente essai CODESYS manuel.'
   validation_note: 'Micro-phase validée en simulation par l utilisateur : fermeture AUTO proportionnelle plafonnée au palier AX11 effectif P1..P2 ; jog manuel/maintenance inchangé. Le transfert anticipé AX10→AX11 et la validation machine restent ouverts.'
   avancement: 'Micro-phase AX10 plafond demarree le 2026-09-19 apres validation humaine : fermeture AUTO proportionnelle mais
     plafonnee au palier AX11 effectif P1..P2, sans brider le jog maintenance. Phase A codee : GVL/IHM persistant ExtractionStartOpening_Pct [0..50], defaut 0, sans lecture cycle. Interface

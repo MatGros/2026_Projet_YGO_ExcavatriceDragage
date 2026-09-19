@@ -39,6 +39,7 @@ STRUCT
     BucketBusy                   : BOOL;               // ⚙️ Mouvement d'ouverture/fermeture benne en cours
     BucketDone                   : BOOL;               // ✅ Mouvement benne termine avec succes
     BucketError                  : BOOL;               // ❌ Defaut sur sous-systeme benne
+    BucketCloseReached           : BOOL;               // Fermeture benne atteinte (avant transfert AX10B)
     EffectivePermitBucket_Open   : BOOL;               // 🟢 Permis effectif ouverture benne
     EffectivePermitBucket_Close  : BOOL;               // 🟢 Permis effectif fermeture benne
 

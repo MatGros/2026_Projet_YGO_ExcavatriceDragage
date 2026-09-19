@@ -24,6 +24,10 @@ def main() -> int:
     context = ROOT / "CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchCmdArbitration_Context.st"
     arbiter = ROOT / "CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM2.st"
     prg04 = ROOT / "CODE/M_MAIN/PRG_04_Treuils_Benne.st"
+    bucket = ROOT / "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st"
+    cycle = ROOT / "CODE/G_CYCLE/FB_CycleSemiAuto.st"
+    prg03 = ROOT / "CODE/M_MAIN/PRG_03_Modes_Cycle.st"
+    prg06 = ROOT / "CODE/M_MAIN/PRG_06_Outputs.st"
 
     checks = [
         require(cfg, "BucketAutoMaxStepUp       : INT := 1;", "Configuration dédiée AX10 présente"),
@@ -58,6 +62,16 @@ def main() -> int:
             "Plafond benne non fermée ne réécrase pas AX10 actif",
         ),
     ]
+    checks.extend([
+        require(bucket, "HoldAscentP1AfterClose", "FB_Bucket porte le maintien AX10B explicite"),
+        require(bucket, "CloseReached", "FB_Bucket publie la fermeture atteinte sans faux Done"),
+        require(cycle, "E_AutoCycleStep.AX10B_RACCORDEMENT_P1", "Cycle possede une etape AX10B nommee sans ambiguite"),
+        require(cycle, "WinchM1Cmd.RunRequest := TRUE; WinchM1Cmd.ReqAscent := TRUE;", "Transfert demande M1 P1 explicitement"),
+        require(cycle, "WinchM2Cmd.RunRequest := TRUE; WinchM2Cmd.ReqAscent := TRUE;", "Transfert demande M2 P1 explicitement"),
+        require(cycle, "CST_Ax10bHandoffWaitTime : TIME := T#2s;", "Repli borne si M1 indisponible"),
+        require(prg03, "M1FinalAscentStartReady := PRG_06_Outputs.Data.M1AscentStartReady", "Disponibilite finale M1 retournee au cycle"),
+        require(prg06, "AND (instWinchOutputInterlockM1.DeadTimeElapsed >= T#700ms);", "Disponibilite finale exige la purge du temps mort maximal"),
+    ])
     return 0 if all(checks) else 1
 
 

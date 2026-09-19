@@ -240,9 +240,11 @@ instCycleSemiAuto(
     Translation_Done        := PRG_05_Translation.Data.TranslationDone,
     Benne_Busy              := PRG_04_Treuils_Benne.Data.BucketBusy,
     Benne_Done              := PRG_04_Treuils_Benne.Data.BucketDone,
+    Benne_CloseReached      := PRG_04_Treuils_Benne.Data.BucketCloseReached,
     Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
+    M1FinalAscentStartReady := PRG_06_Outputs.Data.M1AscentStartReady,
     HomedM1                 := PRG_02_Acquisition.Data.EncoderM1.Homed,
     HomedM2                 := PRG_02_Acquisition.Data.EncoderM2.Homed,
     InitPositionOk          := CycleInitPositionOk,
@@ -397,6 +399,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
 
     Data.ReqProgram.ReqBucket.ReqOpen                     := DumpAtTremieBucketOpenArmed;
     Data.ReqProgram.ReqBucket.ReqClose                    := FALSE;
+    Data.ReqProgram.ReqBucket.ReqHoldAscentP1AfterClose   := FALSE;
     // Assistants dragage retires (FB_DiveSearch/FB_ExtractionAssist supprimes) : sorties neutres.
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := FALSE;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
@@ -482,6 +485,7 @@ ELSE
 
     Data.ReqProgram.ReqBucket.ReqOpen                     := FALSE;
     Data.ReqProgram.ReqBucket.ReqClose                    := FALSE;
+    Data.ReqProgram.ReqBucket.ReqHoldAscentP1AfterClose   := FALSE;
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := FALSE;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
     Data.ReqProgram.ReqBucket.ExtractionControlActive     := FALSE;

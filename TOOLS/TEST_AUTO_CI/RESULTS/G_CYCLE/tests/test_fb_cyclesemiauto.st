@@ -5,6 +5,94 @@ VAR
 END_VAR
 END_SETUP
 
+TEST 'T262-002 AX10B : transfert Both P1 sans coupure M2 puis AX11 P2'
+    (* Chargement securise de AX10B : forçage au joystick neutre. *)
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 22,
+       CfgForceStepApply := FALSE, CfgCtrlAscentMaxStep := 2,
+       CfgCtrlAscentDistanceM := 2.0, SampleCount := SampleCount);
+    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.ForceStepPrepared, 'AX10B preparee au repos');
+
+    (* Start au neutre : aucun mouvement au scan de chargement. *)
+    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'Chargement AX10B sans mouvement');
+
+    (* Nouveau geste Y+ : M1 et M2 sont publies simultanement a P1. *)
+    FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE,
+       JoystickPull := TRUE, M2_SpeedStepApplied := 1,
+       M1FinalAscentStartReady := TRUE, Benne_CloseReached := TRUE,
+       Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10B_RACCORDEMENT_P1,
+                'Scan transfert execute en AX10B');
+    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest AND FB.WinchM2Cmd.RunRequest,
+                'AX10B publie Both sans trou de commande');
+    ASSERT_TRUE((FB.WinchM1Cmd.StepTgt = 1) AND (FB.WinchM2Cmd.StepTgt = 1),
+                'AX10B publie M1 P1 et M2 P1');
+    ASSERT_TRUE(FB.WinchM1Cmd.ReqAscent AND FB.WinchM2Cmd.ReqAscent,
+                'AX10B conserve le sens montee des deux treuils');
+
+    (* Scan suivant : AX11 reprend avec le plafond commun configure P2. *)
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT,
+                'AX11 prend le relais apres transfert P1/P1');
+    ASSERT_TRUE((FB.WinchM1Cmd.StepTgt = 2) AND (FB.WinchM2Cmd.StepTgt = 2),
+                'AX11 applique le plafond commun P2');
+END_TEST
+
+TEST 'T262-003 AX10B : timeout M1 borne a 2 s puis repli sans redemarrage implicite'
+    (* Preparation AX10B au neutre, comme pour le test nominal. *)
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 22,
+       CfgForceStepApply := FALSE, CfgCtrlAscentMaxStep := 2,
+       CfgCtrlAscentDistanceM := 2.0, SampleCount := SampleCount);
+    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.ForceStepPrepared, 'AX10B preparee pour test timeout');
+    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
+
+    (* M1 indisponible : M2 est tenu en P1 pendant la fenetre bornee. *)
+    FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE,
+       JoystickPull := TRUE, M2_SpeedStepApplied := 1,
+       M1FinalAscentStartReady := FALSE, Benne_CloseReached := TRUE,
+       Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.BucketCmd.ReqHoldAscentP1AfterClose,
+                'Fenetre AX10B : maintien P1 actif avant timeout');
+
+    ADVANCE_TIME(2100000000);
+    FB(SampleCount := SampleCount);
+    ASSERT_FALSE(FB.BucketCmd.ReqHoldAscentP1AfterClose,
+                 'Timeout : maintien M2 libere');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'Timeout : aucun redemarrage pendant arret de repli');
+
+    ADVANCE_TIME(600000000);
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10B_RACCORDEMENT_P1,
+                'Repli : AX10B conserve la main pendant la confirmation arret');
+    ADVANCE_TIME(600000000);
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10B_RACCORDEMENT_P1,
+                'Repli : dernier scan AX10B avant reprise');
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT,
+                'Repli : reprise explicite par AX11');
+    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest AND FB.WinchM2Cmd.RunRequest,
+                'Repli : AX11 reprend les deux treuils ensemble');
+END_TEST
+
 TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
     (* Scan 0 : Enable=FALSE -> Neutralisation *)
     FB(Enable := FALSE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,

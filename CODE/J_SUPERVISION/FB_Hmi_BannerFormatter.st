@@ -267,7 +267,7 @@ IF CycleFaultActive THEN
         E_AutoCycleStep.AX_DIVING_RETRY: StepAtErrorStr := 'RETRY';
         E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9';
         E_AutoCycleStep.AX10_CLOSE_BUCKET: StepAtErrorStr := 'AX10';
-        E_AutoCycleStep.AX10_WAIT_ASCENT_START: StepAtErrorStr := 'AX10b';
+        E_AutoCycleStep.AX10B_RACCORDEMENT_P1: StepAtErrorStr := 'AX10b';
         E_AutoCycleStep.AX11_CTRL_ASCENT: StepAtErrorStr := 'AX11';
         E_AutoCycleStep.AX12_LOADED_ASCENT: StepAtErrorStr := 'AX12';
         E_AutoCycleStep.AX13_DRAIN_PAUSE: StepAtErrorStr := 'AX13';
@@ -315,7 +315,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_AutoCycleStep.AX_DIVING_RETRY: Banner.SequenceProgressText := 'Cycle: REPRISE PLONGÉE';
             E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: Banner.SequenceProgressText := 'Cycle: MONTEE SYNCHRONISEE - RETENDRE CABLES';
             E_AutoCycleStep.AX10_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
-            E_AutoCycleStep.AX10_WAIT_ASCENT_START: Banner.SequenceProgressText := 'Cycle: STABILISATION AVANT MONTEE';
+            E_AutoCycleStep.AX10B_RACCORDEMENT_P1: Banner.SequenceProgressText := 'Cycle: RACCORDEMENT P1 AVANT MONTEE';
             E_AutoCycleStep.AX11_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: MONTÉE CONTRÔLE';
             E_AutoCycleStep.AX12_LOADED_ASCENT: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
             E_AutoCycleStep.AX13_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';

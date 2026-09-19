@@ -3,13 +3,14 @@ contract:
   criticality: C4
   strategy: patch
   technical_plan: DOC/WFLOW/CONTRACTS/PLAN_T262_TRANSFERT_AX10_AX11_20260915.md
-  updated_at: '2026-09-19T00:00:00+02:00'
+  updated_at: '2026-09-19T20:48:00+02:00'
   objective: >
     Permettre la transition anticipée de AX10 vers AX11 par seuil configurable
     d ouverture benne, puis assurer un transfert continu et maîtrisé de M2 seul
-    vers M1+M2 Both, extraction AX11 cible P2 puis AX12, sans supprimer les barrieres
-    de securite. Preparation au P1 sans arret franc ; repli historique si la
-    fermeture arrive avant la disponibilite du transfert. Plan soumis a validation.
+    vers M1+M2 Both. AX10B_RACCORDEMENT_P1 conserve M2 en montée, ramène P2 vers P1
+    si nécessaire, puis engage les deux treuils à P1 avant AX11 cible P2 et AX12,
+    sans supprimer les barrières de sécurité. Repli historique si la fermeture
+    arrive avant la disponibilité du transfert. Plan validé humainement.
   acceptance:
     - id: AC1
       statement: "La configuration INT persistante proposee est bornee a 0..50 % et sa valeur par defaut est 0 % ; borne maximale a valider humainement."
@@ -45,7 +46,7 @@ contract:
       statement: "Apres raccordement des deux axes au P1, AX11 demande P2 avec le cadenceur existant et CtrlAscentMaxStep ; l exception benne partielle ne releve aucun plafond mou de cable, limite, codeur, maintenance ou securite."
       verified_by: "tests ST integration AX11 benne partielle, puis chaque plafond prioritaire ; trace des paliers reels"
     - id: AC12
-      statement: "La liberation de propriete benne et la reprise Both sont effectives dans le meme scan PRG04 ; aucun retrait de sens M2 nominal n atteint les sorties finales pendant le transfert."
+      statement: "Au scan de transfert, Both recoit M1=P1 et M2=P1 tandis que FB_Bucket conserve M2=P1 comme pont atomique ; il libere la propriete au scan suivant, sans retrait nominal de sens M2 vers les sorties finales."
       verified_by: "chronogramme PRG03/PRG04/PRG06 avec M2 initial P1..P5, M1 dernier sens montee et descente"
     - id: AC13
       statement: "La preparation logique M1 reste sans marche ni contacteurs ; disponibilite du FB mouvement et de l interlock final verifiee avant transfert, pas seulement Ready."
@@ -62,9 +63,13 @@ contract:
     - id: AC17
       statement: "La regle AX10 AUTO ne bride pas le jog M2 manuel ou maintenance, qui conserve son plafond benne existant et les protections aval."
       verified_by: "test non-regression manuel P1..P5 et revue de branche mode"
+    - id: AC18
+      statement: "AX10B_RACCORDEMENT_P1 ne coupe pas nominalement les relais de sens ni le frein M2 pendant le raccordement P2 vers P1 ; seul le repli sûr peut arrêter le mouvement."
+      verified_by: "chronogramme sorties finales PRG06 : relais, contacteurs, frein et paliers M2"
   scope:
     allowed:
       - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
       - CODE/GVL_PERSISTENT.st
       - CODE/M_MAIN/PRG_03_Modes_Cycle.st
       - CODE/M_MAIN/PRG_07_Supervision.st
@@ -87,6 +92,9 @@ contract:
       - TOOLS/AGENT_WORKFLOW/scripts/G500_check_t262_bucket_ascent_handoff.py
       - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
       - TOOLS/tests/integration/test_t262_bucket_ascent_handoff.py
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
+      - DOC/WFLOW/CONTRACTS/T262_VALIDATION_CODESYS_20260919.md
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
       - CODE/FB_Safety_Winch.st
@@ -130,15 +138,20 @@ status: IN_PROGRESS
 execution:
   executed_by: "Codex"
   completed_at: ""
-  status: PENDING
+  status: IN_PROGRESS
   summary: >
     Micro-phase AX10 plafond executee et validee en simulation utilisateur le
     2026-09-19 : fermeture automatique proportionnelle plafonnee au palier AX11
-    effectif P1..P2, sans bridage du jog manuel/maintenance. Le transfert anticipe
-    AX10 vers AX11, la reprise Both et la validation machine restent a executer
-    selon le plan revise.
+    effectif P1..P2, sans bridage du jog manuel/maintenance. Le raccordement
+    continu AX10B est implemente : maintien M2 P1, attente bornee M1, transfert
+    Both P1/P1 et repli historique. Tests automatiques et validation CODESYS
+    manuelle restent requis avant cloture.
   evidence_submitted:
     - DOC/WFLOW/CONTRACTS/PLAN_T262_TRANSFERT_AX10_AX11_20260915.md
+    - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st (T262-001 PASS, 2026-09-19)
+    - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st (T262-002 et T262-003 PASS, 2026-09-19)
+    - TOOLS/AGENT_WORKFLOW/scripts/G500_check_t262_bucket_ascent_handoff.py (15 checks PASS, 2026-09-19)
+    - DOC/WFLOW/CONTRACTS/T262_VALIDATION_CODESYS_20260919.md (procedure de validation manuelle)
 validation:
   status: PENDING
   validated_by: ""

@@ -70,7 +70,7 @@ TEST 'TC-P10-023 Fermeture seulement si MotionDirection=1 ET MotionRequestActive
     (* Scan 2 : CmdClose + MotionDirection=1 + MotionRequestActive -> fermeture *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -100,7 +100,7 @@ TEST 'TC-P10-024 Ouverture seulement si MotionDirection=-1 ET MotionRequestActiv
     (* Scan 2 : CmdOpen + MotionDirection=-1 + MotionRequestActive -> ouverture *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdOpen_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       CmdOpen_IHM := TRUE, MotionRequestActive := TRUE, ReqDescend := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 3.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -125,7 +125,7 @@ TEST 'T196-001 Etat ferme publie apres atteinte de l offset'
        Config := Config, BucketState := BucketState);
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
        Config := Config, BucketState := BucketState);
     ASSERT_TRUE(FB.Lifecycle.Busy, 'T196 fermeture armee -> Busy');
@@ -133,12 +133,54 @@ TEST 'T196-001 Etat ferme publie apres atteinte de l offset'
     (* Le modèle physique atteint la cible : seul ce fait valide IsClosed. *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       MotionRequestActive := TRUE, MotionDirection := 1,
+       MotionRequestActive := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
        HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 2.9,
        Config := Config, BucketState := BucketState);
     ASSERT_TRUE(BucketState.IsClosed, 'T196 cible atteinte -> IsClosed=TRUE');
     ASSERT_FALSE(BucketState.IsOpen, 'T196 cible atteinte -> IsOpen=FALSE');
     ASSERT_TRUE(FB.Lifecycle.Done, 'T196 cible atteinte -> Done=TRUE');
+END_TEST
+
+TEST 'T262-001 Fermeture atteinte : maintien M2 P1 puis liberation explicite'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+    BucketState.IsClosed := FALSE;
+
+    (* Armer la fermeture AX10 avec le maintien deja autorise. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, HoldAscentP1AfterClose := TRUE,
+       MotionRequestActive := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T262 fermeture armee');
+
+    (* Fermeture : le proprietaire benne conserve M2 en montee P1. *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HoldAscentP1AfterClose := TRUE,
+       MotionRequestActive := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 2.9,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.CloseReached, 'T262 fermeture atteinte publiee');
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T262 pont actif : proprietaire benne conserve');
+    ASSERT_TRUE(FB.M2_RunRequest, 'T262 pont actif : M2 maintenu');
+    ASSERT_TRUE(FB.M2_ReqAscent, 'T262 pont actif : sens montee conserve');
+    ASSERT_TRUE(FB.M2_BucketJogLimit, 'T262 pont actif : palier P1 impose');
+
+    (* Le transfert Both est publie par PRG04 ; le scan suivant libere la benne. *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HoldAscentP1AfterClose := FALSE,
+       MotionRequestActive := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 2.9,
+       Config := Config, BucketState := BucketState);
+    ASSERT_FALSE(FB.Lifecycle.Busy, 'T262 proprietaire benne libere');
+    ASSERT_FALSE(FB.M2_RunRequest, 'T262 M2 remis a Both sans ordre benne residuel');
+    ASSERT_FALSE(FB.M2_ReqAscent, 'T262 sens benne libere');
 END_TEST
 
 TEST 'T196-002 Etat ouvert publie apres atteinte de l offset'
@@ -155,14 +197,14 @@ TEST 'T196-002 Etat ouvert publie apres atteinte de l offset'
        Config := Config, BucketState := BucketState);
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdOpen_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       CmdOpen_IHM := TRUE, MotionRequestActive := TRUE, ReqDescend := TRUE,
        HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 3.0,
        Config := Config, BucketState := BucketState);
     ASSERT_TRUE(FB.Lifecycle.Busy, 'T196 ouverture armee -> Busy');
 
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       MotionRequestActive := TRUE, MotionDirection := -1,
+       MotionRequestActive := TRUE, ReqDescend := TRUE,
        HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.1,
        Config := Config, BucketState := BucketState);
     ASSERT_TRUE(BucketState.IsOpen, 'T196 cible atteinte -> IsOpen=TRUE');
@@ -190,7 +232,7 @@ TEST 'TC-P10-025 Demande benne refusee si M1_Busy OR M2_Busy a l entree (READY)'
     (* Scan 2 : M1_Busy=TRUE -> demande fermeture REFUSEE (anti-traversee) *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        M1_Busy := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -221,7 +263,7 @@ TEST 'TC-P10-025.1 Anti-traversee : M2_Busy seul refuse une demande benne a l en
     (* Scan 2 : M2_Busy=TRUE -> demande fermeture REFUSEE (anti-traversee) *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        M2_Busy := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -253,7 +295,7 @@ TEST 'TC-P10-025.2 Anti-traversee : mouvement deja engage + M2_Busy -> pas d avo
     (* Scan 2 : demarrage fermeture, M2_Busy encore FALSE *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        M2_Busy := FALSE, CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -262,7 +304,7 @@ TEST 'TC-P10-025.2 Anti-traversee : mouvement deja engage + M2_Busy -> pas d avo
     (* Scan 3 : toujours en fermeture, M2_Busy passe a TRUE (M2 agit sous ordre benne) *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        M2_Busy := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.5,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -291,7 +333,7 @@ TEST 'TC-P10-026 Glissement M1 >1.0m pendant BUSY -> M1SlipDetected + coupe M2'
     (* Scan 2 : demarrage fermeture, M1RefPosM capture a 0.0 *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -300,7 +342,7 @@ TEST 'TC-P10-026 Glissement M1 >1.0m pendant BUSY -> M1SlipDetected + coupe M2'
     (* Scan 3 : glissement M1 > 1.0m -> M1SlipDetected + coupe M2 *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        CablePosM1 := 2.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -325,13 +367,13 @@ TEST 'TC-P10-027 M1SlipDetected force SafeStop sur M1 cote Treuils'
        Config := Config, BucketState := BucketState);
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        CablePosM1 := 2.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -375,7 +417,7 @@ TEST 'TC-P10-029 Recul (sens inverse) borne a la position de depart, jamais au-d
     (* Scan 2 : demarrage fermeture, M2StartPosM=0.0 *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -384,7 +426,7 @@ TEST 'TC-P10-029 Recul (sens inverse) borne a la position de depart, jamais au-d
     (* Scan 3 : inversion de sens (MotionDirection=-1) -> M2 pilote en descente *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqDescend := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -415,7 +457,7 @@ TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Directi
     (* Scan 2 : demarrage fermeture, M2StartPosM capture a 0.0 *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -424,7 +466,7 @@ TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Directi
     (* Scan 3 : M2 monte au-dessus de M2StartPosM -> LeftStartSinceArm arme *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 1.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -432,7 +474,7 @@ TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Directi
     (* Scan 4 : inversion de sens (recul) -> M2 pilote en descente *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqDescend := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 1.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -442,7 +484,7 @@ TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Directi
     (* Scan 5 : le recul n'a pas encore atteint M2StartPosM -> pas d arret *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqDescend := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.5,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -451,7 +493,7 @@ TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Directi
     (* Scan 6 : recul A M2StartPosM (0.0) -> ARRET reel, jamais au-dela *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqDescend := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
@@ -661,7 +703,7 @@ TEST 'TC-P10-046.1 Timeout mouvement pendant BUSY -> defaut timeout + latch'
     (* Scan 2 : demarrage fermeture, cible non atteinte -> BUSY maintenu *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
@@ -670,7 +712,7 @@ TEST 'TC-P10-046.1 Timeout mouvement pendant BUSY -> defaut timeout + latch'
     (* Scan 3 : le TON lit Lifecycle.Busy au scan suivant son armement. *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
@@ -678,7 +720,7 @@ TEST 'TC-P10-046.1 Timeout mouvement pendant BUSY -> defaut timeout + latch'
     (* Scan 4 : apres 1s de BUSY sans atteindre la cible -> timeout. *)
     ADVANCE_TIME(1000000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, ReqAscent := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);

@@ -15,6 +15,7 @@ VAR_INPUT
     Mode                            : E_Mode;                         // --> [CMD] Mode de marche machine
     CmdOpen_IHM                     : BOOL;                           // --> [CMD] Demande ouverture depuis IHM
     CmdClose_IHM                    : BOOL;                           // --> [CMD] Demande fermeture depuis IHM
+    HoldAscentP1AfterClose          : BOOL := FALSE;                  // --> [CMD] AX10B : maintient M2 en montee P1 apres fermeture, jusqu'au transfert atomique
     ReqAscent                       : BOOL;                           // --> [CMD] Demande montee arbitree
     ReqDescend                      : BOOL;                           // --> [CMD] Demande descente arbitree
     EffectivePermitBucket_Open      : BOOL;                           // --> [SAFE] Ouverture benne autorisee
@@ -67,6 +68,7 @@ VAR_OUTPUT
     M2_ReqAscent                    : BOOL;                           // <-- [ACT] Ordre montee vers Winch M2
     M2_ReqDescend                   : BOOL;                           // <-- [ACT] Ordre descente vers Winch M2
     M2_BucketJogLimit               : BOOL;                           // <-- [ACT] Plafond palier 1 du jog benne M2
+    CloseReached                    : BOOL;                           // <-- [STAT] Fermeture atteinte, maintien AX10B eventuel en cours
 
     // === DIAGNOSTICS ET MESURES ===
     M1SlipDetected                  : BOOL;                           // <-- [DIAG] Glissement M1 detecte
@@ -251,6 +253,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     M2_ReqAscent := FALSE;
     M2_ReqDescend := FALSE;
     M2_BucketJogLimit := FALSE;
+    CloseReached := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
     RETURN;
@@ -417,9 +420,11 @@ ELSE
     IF CmdOpen_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
         OpenReq := TRUE;
         CloseReq := FALSE;
+        CloseReached := FALSE;
     ELSIF CmdClose_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
         CloseReq := TRUE;
         OpenReq := FALSE;
+        CloseReached := FALSE;
     END_IF;
 
     BusyEdge(CLK := (CloseReq OR OpenReq) AND MotionRequestActive);
@@ -434,7 +439,21 @@ ELSE
         Lifecycle.Done := FALSE;
     END_IF;
 
-    IF Lifecycle.Busy THEN
+    IF Lifecycle.Busy AND CloseReached AND NOT HoldAscentP1AfterClose THEN
+        // AX10B relache explicitement la benne : le cycle prend M1+M2 P1 au meme scan.
+        M2_RunRequest := FALSE;
+        M2_ReqAscent := FALSE;
+        M2_ReqDescend := FALSE;
+        M2_BucketJogLimit := FALSE;
+        Lifecycle.Busy := FALSE;
+        Lifecycle.Done := TRUE;
+    ELSIF Lifecycle.Busy AND CloseReached AND HoldAscentP1AfterClose THEN
+        // Raccordement AX10B : M2 continue en montee, palier impose par l'arbitre a P1.
+        M2_BucketJogLimit := TRUE;
+        M2_RunRequest := MotionRequestActive AND ReqAscent AND EffectivePermitBucket_Close;
+        M2_ReqAscent := M2_RunRequest;
+        M2_ReqDescend := FALSE;
+    ELSIF Lifecycle.Busy THEN
         IF CloseReq THEN
             RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
             M2_BucketJogLimit := TRUE;
@@ -481,16 +500,26 @@ ELSE
         // Arrêt fermeture
         IF CloseReq THEN
             IF CablePosM2 >= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
-                M2_RunRequest := FALSE;
-                M2_ReqAscent := FALSE;
+                M2_RunRequest := MotionRequestActive AND ReqAscent AND EffectivePermitBucket_Close;
+                M2_ReqAscent := M2_RunRequest;
                 M2_ReqDescend := FALSE;
+                M2_BucketJogLimit := TRUE;
                 BucketState.IsOpen := FALSE;
                 BucketState.IsClosed := TRUE;
                 BucketState.LastPosM2Close := CablePosM2;
                 BucketState.StateIncoherent := FALSE;
                 CloseReq := FALSE;
-                Lifecycle.Busy := FALSE;
-                Lifecycle.Done := TRUE;
+                CloseReached := TRUE;
+                IF HoldAscentP1AfterClose THEN
+                    Lifecycle.Busy := TRUE;
+                    Lifecycle.Done := FALSE;
+                ELSE
+                    M2_RunRequest := FALSE;
+                    M2_ReqAscent := FALSE;
+                    M2_BucketJogLimit := FALSE;
+                    Lifecycle.Busy := FALSE;
+                    Lifecycle.Done := TRUE;
+                END_IF;
             END_IF;
         END_IF;
 

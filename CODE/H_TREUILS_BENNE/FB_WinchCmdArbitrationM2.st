@@ -73,6 +73,8 @@ ELSE
         BucketRequestedStep := LIMIT(1, Joystick.AxisY.StepTgt, 5);
         IF ReqDescend THEN
             StepTgt := MIN(BucketRequestedStep, Cfg.BucketOverrideStepDownTgt);
+        ELSIF ReqAscent AND Context.BucketHandoffP1Active THEN
+            StepTgt := 1;
         ELSIF ReqAscent AND Context.BucketAutoCloseActive THEN
             StepTgt := MIN(BucketRequestedStep, Cfg.BucketAutoMaxStepUp);
         ELSE

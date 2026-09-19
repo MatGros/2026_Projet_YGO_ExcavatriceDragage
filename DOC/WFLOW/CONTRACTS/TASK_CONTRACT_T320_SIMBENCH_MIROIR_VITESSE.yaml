@@ -1,0 +1,90 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T320 : SimBench, miroir de l'apprentissage vitesse
+# ═══════════════════════════════════════════════════════════════════════════
+# Plan source : DOC/WFLOW/CONTRACTS/PLAN_T320_SIMBENCH_MIROIR_APPRENTISSAGE_VITESSE.md
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T320_SIMBENCH_MIROIR_APPRENTISSAGE_VITESSE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Le simulateur publie une enveloppe de vitesse MODELE indexee exactement comme la table
+    d'apprentissage reelle (axe x sens x charge/vide x palier), afin que la comparaison
+    sim <-> reel soit automatique le jour ou l'apprentissage terrain sera execute.
+    Le simulateur ne remplace jamais la mesure : il prepare sa validation.
+
+  acceptance:
+    - id: AC1
+      statement: "La structure publiee a exactement la meme cle d'indexation que ST_fbWinchSpeedLearning_Table : ARRAY[1..2,1..2,1..2,1..5] (axe, sens, charge/vide, palier 1..5)."
+      verified_by: "Lecture des deux DUT + gate de structure"
+    - id: AC2
+      statement: "Aucun FB_Sim_* n'ecrit dans une variable _WinchSpeedLearn* (la table RETAIN terrain reste vierge de toute donnee simulee)."
+      verified_by: "Gate statique (grep cible) + lecture du code"
+    - id: AC3
+      statement: "La vitesse modele en m/s est publiee par FB_Sim_Encoder et tracable au runtime (elle ne l'est pas aujourd'hui)."
+      verified_by: "Bundle PLCopenXML + chemin d'instance verifie"
+    - id: AC4
+      statement: "Aucun POU metier (PRG_03..PRG_07) ne lit les sorties du miroir ; le simulateur reste inoperant sur machine reelle."
+      verified_by: "G200_check_linkage.py --report"
+    - id: AC5
+      statement: "La semantique de Valid DIFFERE volontairement du reel (le miroir n'applique pas le filtre de plausibilite) : c'est documente dans le code ET dans AF_Partie-13, et le comparateur futur comparera des VALEURS, pas des drapeaux."
+      verified_by: "Lecture du code + doc"
+    - id: AC6
+      statement: "Les cas de test CI passent : gate OFF sans collecte, palier hors 1..5, sens conflictuel, axe hors 1..2, isolation M1/M2, Valid seulement a SampleCount >= MinSamples."
+      verified_by: "TOOLS/TEST_AUTO_CI (suite FB_Sim_WinchSpeedEnvelope)"
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/ST_SimWinchSpeedCell.st
+      - CODE/L_SIMULATION/ST_SimWinchSpeedEnvelope.st
+      - CODE/L_SIMULATION/FB_Sim_WinchSpeedEnvelope.st
+      - CODE/L_SIMULATION/FB_Sim_Encoder.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - TOOLS/TEST_AUTO_CI/**
+      - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/H_TREUILS_BENNE/FB_WinchSpeedLearning.st
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+
+  models_allowed:
+    - "dsh/deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug preexistant, risque
+    hors scope) est remonte IMMEDIATEMENT a l'orchestrateur, pas a la fin et jamais
+    silencieusement. Signaler n'est pas elargir le scope.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Non execute. Pre-requis : validation humaine des decisions D1..D5 du plan
+    (forme de l'enveloppe, emplacement des DUT, tranche charge, criticite, lot 2).
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    En attente d'arbitrage humain sur D1..D5 avant toute ecriture de code.

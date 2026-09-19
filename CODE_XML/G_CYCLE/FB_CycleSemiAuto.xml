@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T14:55:35.507546" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T14:55:35.507546">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T18:31:52.833010" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T18:31:52.833010">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -49,7 +49,7 @@
               <value name="AX_STAB" value="19" />
               <value name="AX_DIVING_RETRY" value="20" />
               <value name="AX3_WAIT_DIVE_START" value="21" />
-              <value name="AX10_WAIT_ASCENT_START" value="22" />
+              <value name="AX10B_RACCORDEMENT_P1" value="22" />
             </values>
           </enum>
         </baseType>
@@ -193,9 +193,9 @@
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX10_WAIT_ASCENT_START</Name>
+                <Name>AX10B_RACCORDEMENT_P1</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Transition fermeture-&gt;montee : sorties neutres jusqu'a l'arret confirme M1/M2, joystick tire maintenu</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Raccordement continu P1 fermeture benne -&gt; montee controlee</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -522,6 +522,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqHoldAscentP1AfterClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien M2 en montee P1 apres fermeture, pour raccordement AX10B sans coupure</xhtml>
               </documentation>
             </variable>
             <variable name="ReqKoboldMeasureEnable">
@@ -1053,6 +1061,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mouvement ouverture/fermeture termine</xhtml>
               </documentation>
             </variable>
+            <variable name="Benne_CloseReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fermeture atteinte, maintien AX10B disponible</xhtml>
+              </documentation>
+            </variable>
             <variable name="Benne_IsOpen">
               <type>
                 <BOOL />
@@ -1075,6 +1091,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Benne a peu pres fermee (tolerance matiere)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1FinalAscentStartReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] M1 pret au demarrage montee (barriere finale purgee)</xhtml>
               </documentation>
             </variable>
             <variable name="HomedM1">
@@ -1164,7 +1188,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Step cible du forcage (0=AX0 .. 22=AX10_WAIT_ASCENT_START), borne dans le FB</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Step cible du forcage (0=AX0 .. 22=AX10B_RACCORDEMENT_P1), borne dans le FB</xhtml>
               </documentation>
             </variable>
             <variable name="CfgForceStepApply">
@@ -2156,6 +2180,22 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation arret mecanique avant depart montee couplee</xhtml>
               </documentation>
             </variable>
+            <variable name="Ax10bHandoffWaitTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fenetre bornee d'attente disponibilite M1 pendant maintien M2 P1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ax10bFallbackStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Repli arret historique si M1 ne devient pas disponible</xhtml>
+              </documentation>
+            </variable>
             <variable name="DiveStartTimeoutTimer">
               <type>
                 <derived name="TON" />
@@ -2327,6 +2367,17 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Purge redemarrage apres fermeture benne</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_Ax10bHandoffWaitTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#2s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente maximale M1 pendant effort M2 P1 avant repli arret sur</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_DiveStartStopTimeout">
               <type>
                 <TIME />
@@ -2397,8 +2448,13 @@ DiveStartStopped := M1_SpeedValid AND M2_SpeedValid
                     AND (ABS(M2_MeasuredSpeedMps) &lt; CST_DiveStartSpeedThresholdMps);
 DiveStartStopTimer(IN := (State = E_AutoCycleStep.AX3_WAIT_DIVE_START) AND DiveStartStopped,
                    PT := CST_DiveStartStopConfirmTime);
-AscentStartStopTimer(IN := (State = E_AutoCycleStep.AX10_WAIT_ASCENT_START) AND DiveStartStopped,
+AscentStartStopTimer(IN := (State = E_AutoCycleStep.AX10B_RACCORDEMENT_P1) AND Ax10bFallbackStopActive AND DiveStartStopped,
                      PT := CST_AscentStartStopConfirmTime);
+Ax10bHandoffWaitTimer(IN := (State = E_AutoCycleStep.AX10B_RACCORDEMENT_P1)
+                              AND Benne_CloseReached
+                              AND NOT Ax10bFallbackStopActive
+                              AND NOT ((M2_SpeedStepApplied = 1) AND M1FinalAscentStartReady),
+                         PT := CST_Ax10bHandoffWaitTime);
 // AX3_WAIT_DIVE_START est une attente de condition mecanique, sans sanction
 // temporelle : l'arret confirme reste obligatoire pour passer en AX4.
 DiveStartTimeoutTimer(IN := FALSE, PT := CST_DiveStartStopTimeout);
@@ -2687,7 +2743,7 @@ IF ForceStepApplyEdge.Q AND NOT AbortEdge.Q THEN
             18: ForceStepCandidate := E_AutoCycleStep.AX18_DONE_SYNC;
             20: ForceStepCandidate := E_AutoCycleStep.AX_DIVING_RETRY;
             21: ForceStepCandidate := E_AutoCycleStep.AX3_WAIT_DIVE_START;
-            22: ForceStepCandidate := E_AutoCycleStep.AX10_WAIT_ASCENT_START;
+            22: ForceStepCandidate := E_AutoCycleStep.AX10B_RACCORDEMENT_P1;
         END_CASE;
         IF (CfgForceStepTarget = 7) AND NOT KoboldImmersionQualified THEN
             ForceStepRejected := TRUE;
@@ -2775,9 +2831,9 @@ IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
 
     // Si on quitte le semi-auto alors qu'un cycle de MOUVEMENT était en cours (AX2 à AX15), on mémorise pour la pause.
     // Les étapes de repos (AX0) et d'initialisation (AX1) ne sont PAS mises en pause -&gt; retour direct à AX0.
-    IF (State &lt;&gt; E_AutoCycleStep.AX0_REPOS) 
+    IF (State &lt;&gt; E_AutoCycleStep.AX0_REPOS)
        AND (State &lt;&gt; E_AutoCycleStep.AX1_INIT)
-       AND (State &lt;&gt; E_AutoCycleStep.AX18_DONE_SYNC) 
+       AND (State &lt;&gt; E_AutoCycleStep.AX18_DONE_SYNC)
        AND (State &lt;&gt; E_AutoCycleStep.AX_STAB) THEN
         PausedState := State;
         WaitingResume := TRUE;
@@ -2881,6 +2937,7 @@ END_IF;
 BucketCmd.DescendPermitDiveBucketOpen := TRUE;
 BucketCmd.ExtractionControlActive := FALSE;
 BucketCmd.MinStepDown := 0;
+BucketCmd.ReqHoldAscentP1AfterClose := FALSE;
 {endregion}
 
 {region "§3 Machine etat cycle automatique"}
@@ -3325,32 +3382,57 @@ CASE State OF
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
         BucketCmd.ReqClose := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
+        // Arme le maintien avant la fermeture effective : FB_Bucket garde M2 sans trou de commande.
+        BucketCmd.ReqHoldAscentP1AfterClose := BucketCmd.ReqClose;
+        Ax10bFallbackStopActive := FALSE;
 
-        IF DeadmanArmed AND JoystickPull AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
+        IF DeadmanArmed AND JoystickPull AND Benne_CloseReached AND (Benne_IsClosed OR Benne_IsRoughlyClosed) THEN
             BucketCmd.ReqClose := FALSE;
-            // Transition vers l'etape dediee de stabilisation, symetrique a AX21.
-            State := E_AutoCycleStep.AX10_WAIT_ASCENT_START;
+            // M2 est deja maintenu a P1 par FB_Bucket ; AX10B prepare le transfert couple.
+            State := E_AutoCycleStep.AX10B_RACCORDEMENT_P1;
         END_IF;
 
-    E_AutoCycleStep.AX10_WAIT_ASCENT_START:
-        CycleStep := E_AutoCycleStep.AX10_WAIT_ASCENT_START;
-        CycleStateStr := 'AX10b - Stabilisation avant montee';
+    E_AutoCycleStep.AX10B_RACCORDEMENT_P1:
+        CycleStep := E_AutoCycleStep.AX10B_RACCORDEMENT_P1;
+        CycleStateStr := 'AX10b - Raccordement P1 avant montee controlee';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
         WaitingForOperator := NOT (DeadmanArmed AND JoystickPull);
-        WaitingForProcess := NOT AscentStartStopTimer.Q;
+        WaitingForProcess := NOT ((M2_SpeedStepApplied = 1) AND M1FinalAscentStartReady)
+                             AND NOT (Ax10bFallbackStopActive AND AscentStartStopTimer.Q);
         OperatorActionId := 16#040A;
-        OperatorAction := 'AX10b - Maintenir le joystick tire : attente arret M1/M2 avant montee.';
+        OperatorAction := 'AX10b - Maintenir le joystick tire : raccordement P1 en cours.';
 
-        // Etape de transfert symetrique a AX3_WAIT_DIVE_START : aucune commande
-        // treuil pendant la retombee, purge interlock et confirmation arret physique.
+        // M2 reste pilote par FB_Bucket pendant le raccordement. Aucun Both asymetrique :
+        // les deux demandes programme ne sont publiees qu'au scan du transfert P1/P1.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
         BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE;
+        BucketCmd.ReqHoldAscentP1AfterClose := DeadmanArmed AND JoystickPull AND NOT Ax10bFallbackStopActive;
 
-        IF AscentStartStopTimer.Q AND DeadmanArmed AND JoystickPull THEN
+        IF NOT Ax10bFallbackStopActive
+           AND Ax10bHandoffWaitTimer.Q THEN
+            // M1 non disponible dans la fenetre bornee : repli sur l'arret historique.
+            Ax10bFallbackStopActive := TRUE;
+            BucketCmd.ReqHoldAscentP1AfterClose := FALSE;
+        ELSIF NOT Ax10bFallbackStopActive
+              AND (M2_SpeedStepApplied = 1)
+              AND M1FinalAscentStartReady
+              AND DeadmanArmed AND JoystickPull THEN
+            // Transfert atomique : M2 est encore tenu par la benne P1 ce scan ; M1/M2
+            // recoivent simultanement P1, puis AX11 poursuit avec son plafond commun P1..P2.
+            WinchM1Cmd.RunRequest := TRUE; WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 1;
+            WinchM2Cmd.RunRequest := TRUE; WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 1;
+            CtrlAscentStartM1 := M1_CablePosM;
+            CtrlAscentStartM2 := M2_CablePosM;
+            IF CfgCtrlAscentDistanceM &lt;= 0.0 THEN
+                State := E_AutoCycleStep.AX12_LOADED_ASCENT;
+            ELSE
+                State := E_AutoCycleStep.AX11_CTRL_ASCENT;
+            END_IF;
+        ELSIF Ax10bFallbackStopActive AND AscentStartStopTimer.Q AND DeadmanArmed AND JoystickPull THEN
             CtrlAscentStartM1 := M1_CablePosM;
             CtrlAscentStartM2 := M2_CablePosM;
             IF CfgCtrlAscentDistanceM &lt;= 0.0 THEN
@@ -3642,7 +3724,7 @@ IF Lifecycle.Busy AND NOT CycleMotionPermit THEN
     BucketCmd.ReqKoboldMeasureEnable := FALSE;
 END_IF;
 
-RequestActive := WinchM1Cmd.RunRequest OR WinchM2Cmd.RunRequest OR TranslationCmd.ReqStart OR BucketCmd.ReqOpen OR BucketCmd.ReqClose OR BucketCmd.ReqKoboldMeasureEnable; // Somme logique complete des demandes (contacteur Kobold inclus)
+RequestActive := WinchM1Cmd.RunRequest OR WinchM2Cmd.RunRequest OR TranslationCmd.ReqStart OR BucketCmd.ReqOpen OR BucketCmd.ReqClose OR BucketCmd.ReqHoldAscentP1AfterClose OR BucketCmd.ReqKoboldMeasureEnable; // Somme logique complete des demandes (contacteur Kobold inclus)
 {endregion}
 </xhtml>
           </ST>

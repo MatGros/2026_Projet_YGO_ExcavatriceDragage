@@ -581,6 +581,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Ordre desserrage frein M1 (1=Desserrer)</xhtml>
               </documentation>
             </variable>
+            <variable name="M1AscentStartReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 disponible pour le transfert AX10B (barriere finale purgee)</xhtml>
+              </documentation>
+            </variable>
             <variable name="M2RelayFwd">
               <type>
                 <BOOL />

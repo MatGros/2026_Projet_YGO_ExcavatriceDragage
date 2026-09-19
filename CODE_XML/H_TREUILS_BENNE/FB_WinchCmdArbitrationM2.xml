@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T14:19:27.250494" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T14:19:27.250494">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T18:18:08.139647" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T18:18:08.139647">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -504,6 +504,14 @@ M1 : contacteurs retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] AX10 fermeture auto active (plafond AX10 M2, issu de CtrlAscentMaxStep)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketHandoffP1Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] AX10B : fermeture atteinte, M2 maintenu au palier 1 avant transfert couple</xhtml>
               </documentation>
             </variable>
             <variable name="WinchBothMotionBlockedByBucket">
@@ -1081,6 +1089,8 @@ ELSE
         BucketRequestedStep := LIMIT(1, Joystick.AxisY.StepTgt, 5);
         IF ReqDescend THEN
             StepTgt := MIN(BucketRequestedStep, Cfg.BucketOverrideStepDownTgt);
+        ELSIF ReqAscent AND Context.BucketHandoffP1Active THEN
+            StepTgt := 1;
         ELSIF ReqAscent AND Context.BucketAutoCloseActive THEN
             StepTgt := MIN(BucketRequestedStep, Cfg.BucketAutoMaxStepUp);
         ELSE

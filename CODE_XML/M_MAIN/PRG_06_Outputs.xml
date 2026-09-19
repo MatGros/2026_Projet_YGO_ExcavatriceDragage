@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-17T22:11:43.325880" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-17T22:11:43.325880">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T18:32:35.760814" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T18:32:35.760814">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -141,6 +141,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Ordre desserrage frein M1 (1=Desserrer)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1AscentStartReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 disponible pour le transfert AX10B (barriere finale purgee)</xhtml>
               </documentation>
             </variable>
             <variable name="M2RelayFwd">
@@ -1671,6 +1679,13 @@ M1SpeedContactor3 := instWinchOutputInterlockM1.Contactor3;
 M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
 // Pre-calcul frein M1 (regate en §2ter apres controle concordance M1/M2).
 M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
+// Publication lecture seule : M1 est disponible seulement quand la barriere
+// finale est saine, sans demande moteur residuelle, et que son temps mort maximal
+// est purge. La barriere elle-meme reste strictement inchangee.
+Data.M1AscentStartReady := instWinchOutputInterlockM1.Ready
+    AND NOT instWinchOutputInterlockM1.RestartRequired
+    AND NOT instWinchOutputInterlockM1.MotorRequest
+    AND (instWinchOutputInterlockM1.DeadTimeElapsed &gt;= T#700ms);
 // Sorties physiques M1 + bus inter-PRG : ecrites en §2ter, apres le controle
 // de concordance des vecteurs M1/M2 (une seule ecriture des DQ treuils).
 
