@@ -317,6 +317,12 @@ instSimBench(
     SimM2CoupledDescentFactor := GVL_Simulation.SimM2CoupledDescentFactor,
     WinchBothDescentIntent   := PRG_03_Modes_Cycle.Data.WinchBothIntent.Active
                                 AND PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend,
+    SimWinchDynamicsActive   := GVL_Simulation.SimWinchDynamicsActive,
+    SimWinchSpeedReportTauS  := GVL_Simulation.SimWinchSpeedReportTauS,
+    SimWinchBrakeOpenDelayS  := GVL_Simulation.SimWinchBrakeOpenDelayS,
+    SimWinchBrakeCloseDelayS := GVL_Simulation.SimWinchBrakeCloseDelayS,
+    SimWinchElectricalDiagnosticsActive := GVL_Simulation.SimWinchElectricalDiagnosticsActive,
+    SimM2TensionedCableFaultInject := GVL_Simulation.SimM2TensionedCableFaultInject,
     SimM3SensorsWordOverrideActive := GVL_Simulation.SimM3SensorsWordOverrideActive,
     SimM3SensorsWord               := GVL_Simulation.SimM3SensorsWord,
     SimM3SensorIntermittenceActive  := GVL_Simulation.SimM3SensorIntermittenceActive,

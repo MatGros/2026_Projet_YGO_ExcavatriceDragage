@@ -75,11 +75,14 @@ VAR_INPUT
     SimWinchSpeedReportTauS    : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Tau 1er ordre retour vitesse rapportee M1/M2, s. 0.0 = saut instantane (comportement historique). *)
     SimWinchBrakeOpenDelayS    : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Delai electrique/meca ouverture frein M1/M2 apres BrakeCmd=TRUE, s. 0.0 = instantane (comportement historique). *)
     SimWinchBrakeCloseDelayS   : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Delai electrique/meca fermeture frein M1/M2 apres BrakeCmd=FALSE, s. 0.0 = instantane (comportement historique). *)
+    SimWinchDynamicsActive     : BOOL := FALSE;  (* --> [CFG] TRUE = applique tau et delais treuils ; FALSE = profil simple historique *)
 
     // T317 exploratoire -- charge/couplage electrique treuil (interface prete, defaut = comportement
     // historique inchange tant que non cablee sur un vrai signal amont, cf. registre PLAN_T317).
     SimWinchLoadFrac_Ratio     : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Taux de charge M1/M2, 0=a vide *)
     SimWinchCoupledActive      : BOOL := FALSE;  (* --> [TST] M1/M2 couples -- en attente cablage CoupledBoth reel *)
+    SimWinchElectricalDiagnosticsActive : BOOL := FALSE; (* --> [CFG] TRUE = publie diagnostic electrique treuils, sans action safety *)
+    SimM2TensionedCableFaultInject : BOOL := FALSE; (* --> [TST] TRUE = injecte capteur cable non tendu M2 *)
 
     SimM3SensorsWordOverrideActive : BOOL := FALSE;   (* --> [TST] Override mot capteurs M3 *)
     SimM3SensorsWord               : BYTE := 16#07;   (* --> [TST] Mot capteurs M3 forcé *)
@@ -197,6 +200,9 @@ VAR
     M2_BrakeIsOpenState        : BOOL;                (* . [LOC] Etat frein M2 filtre par le delai *)
     M2_BrakeOpenTimerS         : REAL;                (* . [LOC] Accumulateur delai ouverture frein M2 *)
     M2_BrakeCloseTimerS        : REAL;                (* . [LOC] Accumulateur delai fermeture frein M2 *)
+    WinchSpeedReportTauEffectiveS : REAL;             (* . [LOC] Tau applique apres gate profil dynamique *)
+    WinchBrakeOpenDelayEffectiveS : REAL;             (* . [LOC] Delai ouverture applique apres gate profil dynamique *)
+    WinchBrakeCloseDelayEffectiveS : REAL;            (* . [LOC] Delai fermeture applique apres gate profil dynamique *)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -244,6 +250,9 @@ Done  := FALSE;
 // Presets codeurs : déclenchés si PresetTriggerCmd = 2
 M1_PresetCmd := (M1_PresetTriggerCmd = 2);
 M2_PresetCmd := (M2_PresetTriggerCmd = 2);
+WinchSpeedReportTauEffectiveS := SEL(SimWinchDynamicsActive, 0.0, SimWinchSpeedReportTauS);
+WinchBrakeOpenDelayEffectiveS := SEL(SimWinchDynamicsActive, 0.0, SimWinchBrakeOpenDelayS);
+WinchBrakeCloseDelayEffectiveS := SEL(SimWinchDynamicsActive, 0.0, SimWinchBrakeCloseDelayS);
 
 // Conversions d'injection d'écart synchro (0.5m -> points codeur avec 8192 pts/tour, 2m/tour)
 // 1m = 4096 points codeur.
@@ -269,7 +278,7 @@ instSimEncoderM1(
     PresetValue      := M1_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
     CoastDistanceM   := SimWinchCoast_M,
-    SpeedReportTauS  := SimWinchSpeedReportTauS,
+    SpeedReportTauS  := WinchSpeedReportTauEffectiveS,
     TestOffsetCmd    := SimSyncDeviationInjectM1,
     TestOffsetPts    := M1_OffsetPts,
     RawPos           := RawPosM1
@@ -279,7 +288,7 @@ instSimEncoderM1(
 // consomme via M2_TensionedCable_DI ci-dessous). Couplage/charge cables sur stimuli de banc en
 // attente des signaux reels amont (CoupledBoth, benne au sol) -- cf. registre PLAN_T317.
 instWinchElectricalM1(
-    Enable                := Enable,
+    Enable                := Enable AND SimWinchElectricalDiagnosticsActive,
     StepCmd               := MAX(1, M1_StepNumber),
     DirectionCmd          := SEL(M1_RelayRev, 1, -1),
     NetworkVoltageAct_V   := 400.0,
@@ -289,13 +298,20 @@ instWinchElectricalM1(
     PeerTorque_Nm          := PeerTorqueM2Prev_Nm,
     PeerSpeed_Rpm          := PeerSpeedM2Prev_Rpm
 );
-MotorTorqueM1_Nm := instWinchElectricalM1.MotorTorque_Nm;
-MotorIsStalledM1 := instWinchElectricalM1.IsStalled;
-PeerTorqueM1Prev_Nm := instWinchElectricalM1.MotorTorque_Nm;
-PeerSpeedM1Prev_Rpm := instWinchElectricalM1.SpeedAct_Rpm;
+IF SimWinchElectricalDiagnosticsActive THEN
+    MotorTorqueM1_Nm := instWinchElectricalM1.MotorTorque_Nm;
+    MotorIsStalledM1 := instWinchElectricalM1.IsStalled;
+    PeerTorqueM1Prev_Nm := instWinchElectricalM1.MotorTorque_Nm;
+    PeerSpeedM1Prev_Rpm := instWinchElectricalM1.SpeedAct_Rpm;
+ELSE
+    MotorTorqueM1_Nm := 0.0;
+    MotorIsStalledM1 := FALSE;
+    PeerTorqueM1Prev_Nm := 0.0;
+    PeerSpeedM1Prev_Rpm := 0.0;
+END_IF;
 
 instWinchElectricalM2(
-    Enable                := Enable,
+    Enable                := Enable AND SimWinchElectricalDiagnosticsActive,
     StepCmd               := MAX(1, M2_StepNumber),
     DirectionCmd          := SEL(M2_RelayRev, 1, -1),
     NetworkVoltageAct_V   := 400.0,
@@ -305,10 +321,17 @@ instWinchElectricalM2(
     PeerTorque_Nm          := PeerTorqueM1Prev_Nm,
     PeerSpeed_Rpm          := PeerSpeedM1Prev_Rpm
 );
-MotorTorqueM2_Nm := instWinchElectricalM2.MotorTorque_Nm;
-MotorIsStalledM2 := instWinchElectricalM2.IsStalled;
-PeerTorqueM2Prev_Nm := instWinchElectricalM2.MotorTorque_Nm;
-PeerSpeedM2Prev_Rpm := instWinchElectricalM2.SpeedAct_Rpm;
+IF SimWinchElectricalDiagnosticsActive THEN
+    MotorTorqueM2_Nm := instWinchElectricalM2.MotorTorque_Nm;
+    MotorIsStalledM2 := instWinchElectricalM2.IsStalled;
+    PeerTorqueM2Prev_Nm := instWinchElectricalM2.MotorTorque_Nm;
+    PeerSpeedM2Prev_Rpm := instWinchElectricalM2.SpeedAct_Rpm;
+ELSE
+    MotorTorqueM2_Nm := 0.0;
+    MotorIsStalledM2 := FALSE;
+    PeerTorqueM2Prev_Nm := 0.0;
+    PeerSpeedM2Prev_Rpm := 0.0;
+END_IF;
 
 // Détection coupure relais M2 pour renouveler la dispersion pseudo-aléatoire (±0.1m)
 IF (M2_RelayFwdPrev AND NOT M2_RelayFwd) OR (M2_RelayRevPrev AND NOT M2_RelayRev) THEN
@@ -341,7 +364,7 @@ instSimEncoderM2(
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := M2EffectiveSpeedScaleFactor,
     CoastDistanceM   := M2_EffectiveCoastM,
-    SpeedReportTauS  := SimWinchSpeedReportTauS,
+    SpeedReportTauS  := WinchSpeedReportTauEffectiveS,
     TestOffsetCmd    := SimSyncDeviationInjectM2,
     TestOffsetPts    := M2_OffsetPts,
     RawPos           := RawPosM2
@@ -363,7 +386,7 @@ END_IF;
 IF M1_BrakeCmd THEN
     IF NOT M1_BrakeIsOpenState THEN
         M1_BrakeOpenTimerS := M1_BrakeOpenTimerS + CST_SimBenchCycleTimeS;
-        IF M1_BrakeOpenTimerS >= MAX(0.0, SimWinchBrakeOpenDelayS) THEN
+        IF M1_BrakeOpenTimerS >= MAX(0.0, WinchBrakeOpenDelayEffectiveS) THEN
             M1_BrakeIsOpenState := TRUE;
             M1_BrakeOpenTimerS := 0.0;
         END_IF;
@@ -372,7 +395,7 @@ IF M1_BrakeCmd THEN
 ELSE
     IF M1_BrakeIsOpenState THEN
         M1_BrakeCloseTimerS := M1_BrakeCloseTimerS + CST_SimBenchCycleTimeS;
-        IF M1_BrakeCloseTimerS >= MAX(0.0, SimWinchBrakeCloseDelayS) THEN
+        IF M1_BrakeCloseTimerS >= MAX(0.0, WinchBrakeCloseDelayEffectiveS) THEN
             M1_BrakeIsOpenState := FALSE;
             M1_BrakeCloseTimerS := 0.0;
         END_IF;
@@ -390,7 +413,7 @@ Winch.M1_ThermalOk_DI          := TRUE; // Sauf panne simulée
 IF M2_BrakeCmd THEN
     IF NOT M2_BrakeIsOpenState THEN
         M2_BrakeOpenTimerS := M2_BrakeOpenTimerS + CST_SimBenchCycleTimeS;
-        IF M2_BrakeOpenTimerS >= MAX(0.0, SimWinchBrakeOpenDelayS) THEN
+        IF M2_BrakeOpenTimerS >= MAX(0.0, WinchBrakeOpenDelayEffectiveS) THEN
             M2_BrakeIsOpenState := TRUE;
             M2_BrakeOpenTimerS := 0.0;
         END_IF;
@@ -399,7 +422,7 @@ IF M2_BrakeCmd THEN
 ELSE
     IF M2_BrakeIsOpenState THEN
         M2_BrakeCloseTimerS := M2_BrakeCloseTimerS + CST_SimBenchCycleTimeS;
-        IF M2_BrakeCloseTimerS >= MAX(0.0, SimWinchBrakeCloseDelayS) THEN
+        IF M2_BrakeCloseTimerS >= MAX(0.0, WinchBrakeCloseDelayEffectiveS) THEN
             M2_BrakeIsOpenState := FALSE;
             M2_BrakeCloseTimerS := 0.0;
         END_IF;
@@ -415,9 +438,8 @@ Winch.M2_ThermalOk_DI          := TRUE;
 // Cohérent avec M2_TensionedCable_DI (sain par défaut) : capteur TOP libre en simu,
 // sauf stimulus manuel SimTopPositionActive (injection de fait capteur au banc).
 Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
-// T317 : cable tendu tant que la benne n'est pas posee -- auparavant force TRUE en dur,
-// desormais reactif au stimulus banc (interface prete, source reelle amont pas encore cablee).
-Winch.M2_TensionedCable_DI     := NOT KoboldBottomTouchPrev_DI;
+// Le Kobold ne deduit pas l'etat cable : seul le stimulus safety explicite injecte une panne.
+Winch.M2_TensionedCable_DI     := NOT SimM2TensionedCableFaultInject;
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;
 Winch.COD1_SpdValue            := instSimEncoderM1.RawSpdOut;

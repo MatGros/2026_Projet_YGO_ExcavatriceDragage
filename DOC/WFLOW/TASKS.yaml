@@ -1,4 +1,20 @@
 tasks:
+- id: T318
+  parent_id: ''
+  statut: ⏳
+  criticite: C3
+  domaine: SIMULATION / TREUILS
+  agent: CDX01
+  date: '2026-09-19T00:00:00+02:00'
+  titre: SimBench - profil simple treuils et injection explicite cable
+  contexte: Le lien implicite Kobold -> cable mou declenche SlackCable en cycle auto.
+  description: Restaurer le profil nominal simple et rendre les modeles recents treuils activables explicitement.
+  objectifs:
+  - Restaurer cable tendu nominal et separer son injection de defaut.
+  - Exposer les gates de dynamique et diagnostics electriques dans GVL_Simulation.
+  - Ne pas toucher le cycle semi-auto ni les textes operateur.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T318_SIMBENCH_PROFIL_SIMPLE.yaml
+  bloque_par: []
 - id: T317
   parent_id: ''
   statut: ⬜

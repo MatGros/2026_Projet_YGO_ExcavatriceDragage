@@ -118,6 +118,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "405", "G405 â€” LittÃ©raux STRING ASCII (REX 2026-08-17)",   [sys.executable, f"{S}/G405_check_st_string_ascii.py", "."]),
     ("C", "406", "G406 â€” Longueur littÃ©raux STRING (REX 2026-08-31)", [sys.executable, f"{S}/G406_check_st_string_length.py", "."]),
     ("C", "407", "G407 â€” Pire cas CONCAT vs STRING(N) cible (REX 2026-09-19)", [sys.executable, f"{S}/G407_check_concat_worst_case.py", "."]),
+    ("C", "408", "G408 - Longueur max messages IHM (lisibilite operateur, REX 2026-09-19)", [sys.executable, f"{S}/G408_check_ihm_message_length.py", "."]),
     ("C", "420", "G420 â€” PyTest (gates + convertisseur)",           [str(_py313()), "-m", "pytest",
                                                                      "TOOLS/CONVERTER_ST2XML_PLCopenXML/tests",
                                                                      "TOOLS/AGENT_WORKFLOW/tests", "-q"]),

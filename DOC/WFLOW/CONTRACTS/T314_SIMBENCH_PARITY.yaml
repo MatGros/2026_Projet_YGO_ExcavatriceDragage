@@ -39,7 +39,7 @@ groups:
     status: planned
     safety: "AU matériel et PowerCutOff restent PLC/matériel; FMU produit seulement des DI simulées."
   - id: winch_scenarios
-    match: ["^(SimEncoderSpeedFactor|SimWinchCoast_M|SimTopPositionActive|SimSyncDeviationInjectM1|SimSyncDeviationInjectM2|SimSyncDeviationOffset_M|SimM2CoupledDescentModelActive|SimM2CoupledDescentFactor|WinchBothDescentIntent|SimWinchSpeedReportTauS|SimWinchBrakeOpenDelayS|SimWinchBrakeCloseDelayS)$"]
+    match: ["^(SimEncoderSpeedFactor|SimWinchCoast_M|SimTopPositionActive|SimSyncDeviationInjectM1|SimSyncDeviationInjectM2|SimSyncDeviationOffset_M|SimM2CoupledDescentModelActive|SimM2CoupledDescentFactor|WinchBothDescentIntent|SimWinchSpeedReportTauS|SimWinchBrakeOpenDelayS|SimWinchBrakeCloseDelayS|SimWinchDynamicsActive|SimWinchLoadFrac_Ratio|SimWinchCoupledActive|SimWinchElectricalDiagnosticsActive|SimM2TensionedCableFaultInject)$"]
     destination: "Scenario.Winch"
     phase: L2
     status: planned
