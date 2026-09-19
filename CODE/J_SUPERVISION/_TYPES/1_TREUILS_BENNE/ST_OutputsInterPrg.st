@@ -20,6 +20,8 @@ STRUCT
     M1SpeedContactor4     : BOOL; // 🔌 Ordre contacteur palier 4 treuil M1
     M1BrakeCmd            : BOOL; // 🔓 Ordre desserrage frein M1 (1=Desserrer)
 
+    M1AscentStartReady    : BOOL; // M1 disponible pour le transfert AX10B (barriere finale purgee)
+
     // === 🪝 Ordres actionneurs finaux treuil M2 ===
     M2RelayFwd            : BOOL; // 🛗 Ordre contacteur montee/fermeture treuil M2
     M2RelayRev            : BOOL; // 🛗 Ordre contacteur descente/ouverture treuil M2

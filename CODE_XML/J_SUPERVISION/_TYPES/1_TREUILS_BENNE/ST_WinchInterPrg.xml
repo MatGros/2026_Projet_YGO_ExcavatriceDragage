@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T02:09:01.635784" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T02:09:01.635784">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T18:19:31.340169" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T18:19:31.340169">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -173,6 +173,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur sous-systeme benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketCloseReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne atteinte (avant transfert AX10B)</xhtml>
               </documentation>
             </variable>
             <variable name="EffectivePermitBucket_Open">

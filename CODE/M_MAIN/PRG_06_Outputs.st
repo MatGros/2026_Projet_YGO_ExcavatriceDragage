@@ -172,6 +172,13 @@ M1SpeedContactor3 := instWinchOutputInterlockM1.Contactor3;
 M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
 // Pre-calcul frein M1 (regate en §2ter apres controle concordance M1/M2).
 M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
+// Publication lecture seule : M1 est disponible seulement quand la barriere
+// finale est saine, sans demande moteur residuelle, et que son temps mort maximal
+// est purge. La barriere elle-meme reste strictement inchangee.
+Data.M1AscentStartReady := instWinchOutputInterlockM1.Ready
+    AND NOT instWinchOutputInterlockM1.RestartRequired
+    AND NOT instWinchOutputInterlockM1.MotorRequest
+    AND (instWinchOutputInterlockM1.DeadTimeElapsed >= T#700ms);
 // Sorties physiques M1 + bus inter-PRG : ecrites en §2ter, apres le controle
 // de concordance des vecteurs M1/M2 (une seule ecriture des DQ treuils).
 

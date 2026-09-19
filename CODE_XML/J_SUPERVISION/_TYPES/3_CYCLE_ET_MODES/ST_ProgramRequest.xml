@@ -93,6 +93,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture benne</xhtml>
               </documentation>
             </variable>
+            <variable name="ReqHoldAscentP1AfterClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien M2 en montee P1 apres fermeture, pour raccordement AX10B sans coupure</xhtml>
+              </documentation>
+            </variable>
             <variable name="ReqKoboldMeasureEnable">
               <type>
                 <BOOL />

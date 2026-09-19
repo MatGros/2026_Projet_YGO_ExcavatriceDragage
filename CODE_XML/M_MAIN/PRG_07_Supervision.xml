@@ -814,7 +814,7 @@ fournie par la configuration persistante de l'appelant.
               <value name="AX_STAB" value="19" />
               <value name="AX_DIVING_RETRY" value="20" />
               <value name="AX3_WAIT_DIVE_START" value="21" />
-              <value name="AX10_WAIT_ASCENT_START" value="22" />
+              <value name="AX10B_RACCORDEMENT_P1" value="22" />
             </values>
           </enum>
         </baseType>
@@ -958,9 +958,9 @@ fournie par la configuration persistante de l'appelant.
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX10_WAIT_ASCENT_START</Name>
+                <Name>AX10B_RACCORDEMENT_P1</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Transition fermeture-&gt;montee : sorties neutres jusqu'a l'arret confirme M1/M2, joystick tire maintenu</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Raccordement continu P1 fermeture benne -&gt; montee controlee</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -10893,7 +10893,7 @@ IF CycleFaultActive THEN
         E_AutoCycleStep.AX_DIVING_RETRY: StepAtErrorStr := 'RETRY';
         E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9';
         E_AutoCycleStep.AX10_CLOSE_BUCKET: StepAtErrorStr := 'AX10';
-        E_AutoCycleStep.AX10_WAIT_ASCENT_START: StepAtErrorStr := 'AX10b';
+        E_AutoCycleStep.AX10B_RACCORDEMENT_P1: StepAtErrorStr := 'AX10b';
         E_AutoCycleStep.AX11_CTRL_ASCENT: StepAtErrorStr := 'AX11';
         E_AutoCycleStep.AX12_LOADED_ASCENT: StepAtErrorStr := 'AX12';
         E_AutoCycleStep.AX13_DRAIN_PAUSE: StepAtErrorStr := 'AX13';
@@ -10941,7 +10941,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_AutoCycleStep.AX_DIVING_RETRY: Banner.SequenceProgressText := 'Cycle: REPRISE PLONGÉE';
             E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: Banner.SequenceProgressText := 'Cycle: MONTEE SYNCHRONISEE - RETENDRE CABLES';
             E_AutoCycleStep.AX10_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
-            E_AutoCycleStep.AX10_WAIT_ASCENT_START: Banner.SequenceProgressText := 'Cycle: STABILISATION AVANT MONTEE';
+            E_AutoCycleStep.AX10B_RACCORDEMENT_P1: Banner.SequenceProgressText := 'Cycle: RACCORDEMENT P1 AVANT MONTEE';
             E_AutoCycleStep.AX11_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: MONTÉE CONTRÔLE';
             E_AutoCycleStep.AX12_LOADED_ASCENT: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
             E_AutoCycleStep.AX13_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';

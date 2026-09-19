@@ -1,0 +1,99 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T321 : SimBench, appliquer les valeurs d'hypothese + cabler la charge
+# ═══════════════════════════════════════════════════════════════════════════
+# Reference des valeurs : DOC/WFLOW/CONTRACTS/REFERENCE_CALAGE_TREUIL_M1M2_v0.1.md
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T321_SIMBENCH_HYPOTHESES_ET_CHARGE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Rendre le banc EXECUTABLE et non plus inerte : cabler la charge sur les deux treuils et
+    remplacer les constantes SYNTHETIQUES par les valeurs d'HYPOTHESE du bloc de calage,
+    chacune etiquetee comme hypothese avec sa source. Le banc doit pouvoir declencher un
+    decrochage, ce qu'il ne peut pas faire aujourd'hui.
+
+  acceptance:
+    - id: AC1
+      statement: "SimWinchLoadFrac_Ratio et SimWinchCoupledActive existent dans GVL_Simulation et sont passes dans l'appel instSimBench de PRG_02 ; modifier la valeur change observablement ResistiveTorqueAct_Nm."
+      verified_by: "Lecture PRG_02 + trace/watch au banc"
+    - id: AC2
+      statement: "La charge vue par le modele suit la structure existante sans restructuration : terme fixe = TARE, terme variable = taux x MATIERE, avec la semantique documentee 0 = benne vide, 1 = benne pleine."
+      verified_by: "Lecture FB_Sim_WinchElectrical + calcul de verification"
+    - id: AC3
+      statement: "Chaque constante recalibree porte la mention HYPOTHESE et la source de sa valeur (REFERENCE_CALAGE) ; aucune n'est presentee comme mesuree."
+      verified_by: "Lecture du code (commentaires) + REFERENCE_CALAGE"
+    - id: AC4
+      statement: "Le commentaire faux FB_SimBench.st:133-134 (« ResistiveTorque_Nm reste a 0.0 ») est corrige et decrit l'etat reel."
+      verified_by: "Lecture du fichier"
+    - id: AC5
+      statement: "Aucune ecriture dans _WinchSpeedLearnTable ; SpeedGuardEnable reste FALSE ; aucune sortie du banc n'est consommee par le metier."
+      verified_by: "G200_check_linkage.py --report + gate statique"
+    - id: AC6
+      statement: "Un scenario de test au banc declenche IsStalled sur un palier physiquement capable de decrocher, et PAS sur un palier qui tient la charge (coherence avec le tableau du bloc de calage)."
+      verified_by: "Test CI dedie + observation au banc (trace)"
+    - id: AC7
+      statement: "Le cas « gate diagnostic OFF » ne produit plus un zero indiscernable d'un vrai zero : il est trace ou documente explicitement."
+      verified_by: "Lecture FB_SimBench + test CI"
+    - id: AC8
+      statement: "Preuves structurelles obligatoires pour PRG_02_Acquisition : le nom de fichier est identique au nom de POU, et le suffixe correspond au langage genere dans le bundle (aucun suffixe _LD, _CFC ou _ST si le bundle ne genere pas ce langage)."
+      verified_by: "generate_codesys_bundle.py + lecture du PLCopenXML genere (nom d'objet et langage effectif)"
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/L_SIMULATION/FB_Sim_WinchMotor.st
+      - CODE/L_SIMULATION/FB_Sim_WinchElectrical.st
+      - CODE/L_SIMULATION/FB_Sim_Encoder.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - TOOLS/TEST_AUTO_CI/**
+      - DOC/WFLOW/CONTRACTS/REFERENCE_CALAGE_TREUIL_M1M2_v0.1.md
+      - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/GVL_PERSISTENT.st
+      - CODE/H_TREUILS_BENNE/**
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+
+  models_allowed:
+    - "dsh/deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Toute valeur d'hypothese presentee comme mesuree, tout effet sur le metier, ou toute
+    ecriture dans une table RETAIN est remonte IMMEDIATEMENT. Signaler n'est pas elargir
+    le scope : aucune correction spontanee hors perimetre.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Non execute. Pre-requis : validation humaine du bloc de calage (valeurs d'hypothese)
+    et arbitrage du partage de charge ainsi que de la voie de vitesse de reference.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    La valeur de i utilisee pour calculer les couples doit etre declaree comme hypothese
+    (i mesure non disponible) et la borne haute connue (i <= 33,6 si la voie position est
+    la reference ; i <= 38,9 si la voie CoE l'est).

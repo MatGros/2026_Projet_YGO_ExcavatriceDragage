@@ -337,6 +337,7 @@ instBucket(
     Mode                := PRG_03_Modes_Cycle.Data.Auth.Mode,
     CmdOpen_IHM         := instArbBucket.CmdOpen_IHM,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
+    HoldAscentP1AfterClose := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqHoldAscentP1AfterClose,
     ReqAscent           := WinchBothReqAscent OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_02_Acquisition.Data.Joystick.AxisY.Direction > 0),
     ReqDescend          := WinchBothReqDescend OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_02_Acquisition.Data.Joystick.AxisY.Direction < 0),
     EffectivePermitBucket_Open := EffectivePermitBucket_Open,
@@ -352,7 +353,8 @@ instBucket(
     WinchSelBucket      := (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
     BucketJogActive     := ManualBucketJogActive,
     ProgramBucketDriveActive := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
-                                OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose,
+                                OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose
+                                OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqHoldAscentP1AfterClose,
     M1_Busy             := (instWinchM1.StepNumber > 0),
     M2_Busy             := (instWinchM2.StepNumber > 0),
     // Confirmations visuelles N2 : publication et offset benne. Le preset
@@ -489,6 +491,10 @@ ArbContext.BucketM2ReqDescend             := BucketM2ReqDescend;
 ArbContext.BucketAutoCloseActive          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
     AND (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX10_CLOSE_BUCKET)
     AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;
+ArbContext.BucketHandoffP1Active          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
+    AND (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX10B_RACCORDEMENT_P1)
+    AND instBucket.CloseReached
+    AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqHoldAscentP1AfterClose;
 ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
 ArbContext.SyncBlocksAscent                   := SyncMinorDeviationBlocksUp;
 ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown;
@@ -1251,7 +1257,9 @@ END_IF;
 // Auto-séquencement benne : AX10 SEMI_AUTO garde le plafond AX11 P1..P2 ; les
 // autres manoeuvres benne conservent leur plafond dédié.
 IF instBucket.M2_BucketJogLimit THEN
-    IF ArbContext.BucketAutoCloseActive THEN
+    IF ArbContext.BucketHandoffP1Active THEN
+        M2MaxStepUp := 1;
+    ELSIF ArbContext.BucketAutoCloseActive THEN
         M2MaxStepUp := MIN(M2MaxStepUp, LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.CtrlAscentMaxStep, 2));
     ELSE
         M2MaxStepUp := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
@@ -1718,6 +1726,7 @@ BucketState.M2PositionCorrectedValid := _BucketState.BucketReferenced
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Lifecycle.Busy;
 BucketState.Done := instBucket.Lifecycle.Done;
+Data.BucketCloseReached := instBucket.CloseReached;
 BucketState.Error := instBucket.Fault.Error;
 BucketState.ErrorId := instBucket.Fault.ErrorId;
 BucketState.RemainingTravel_M := instBucket.RemainingTravelM;

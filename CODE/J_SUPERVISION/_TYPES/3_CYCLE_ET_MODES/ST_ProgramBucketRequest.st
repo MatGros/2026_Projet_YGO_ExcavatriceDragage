@@ -8,6 +8,7 @@ TYPE ST_ProgramBucketRequest :
 STRUCT
     ReqOpen                     : BOOL; // Demande ouverture benne
     ReqClose                    : BOOL; // Demande fermeture benne
+    ReqHoldAscentP1AfterClose   : BOOL; // Maintien M2 en montee P1 apres fermeture, pour raccordement AX10B sans coupure
     ReqKoboldMeasureEnable      : BOOL; // Demande activation mesure/contacteur Kobold
     DescendPermitDiveBucketOpen : BOOL; // Autorisation de descente conditionnée benne ouverte (DiveSearch)
     ExtractionControlActive     : BOOL; // Plafond palier 1 pendant la montée contrôlée

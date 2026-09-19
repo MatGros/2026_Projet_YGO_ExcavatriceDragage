@@ -1,0 +1,91 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T322 : Mise en service, campagne de recalage terrain
+# ═══════════════════════════════════════════════════════════════════════════
+# Procedure de trace : DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_TREUIL_CHARGE_v0.1.md
+# Liste de variables  : TOOLS/PLC_CSV_SNAPSHOT/variable_lists/trace_treuils_charge_v1.txt
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T322_MISE_EN_SERVICE_RECALAGE_TREUILS
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Convertir en MESURE les hypotheses sur lesquelles le banc travaille aujourd'hui, lors
+    de la mise en service reelle : lever les inconnues bloquantes (voie de vitesse, rapport
+    de reduction, plaque moteur, coffret de resistances, tare, course de benne) et etablir
+    la pente charge <-> vitesse. Aucune modification de code dans cette tache : mesures,
+    traces et mise a jour du bloc de calage uniquement.
+
+  acceptance:
+    - id: AC1
+      statement: "La divergence de 12,7 % entre la voie position et la voie vitesse est EXPLIQUEE et nommee : config EtherCAT de l'objet 0x6031 (numerateur/denominateur) ou valeur reelle de PointsPerRev vs la resolution du codeur."
+      verified_by: "Lecture de la config device dans l'IDE + note ecrite dans REFERENCE_CALAGE"
+    - id: AC2
+      statement: "Le rapport de reduction i est MESURE (tours moteur par tour de tambour) et compare a la borne deduite (i <= 33,6 si la voie position est la reference ; <= 38,9 si c'est la voie CoE). L'ecart est explicite."
+      verified_by: "Comptage sur machine + calcul documente"
+    - id: AC3
+      statement: "La plaque signaletique moteur (P, n nominal, In, E2 rotor, R2, service S3/S1) et le coffret de resistances (nombre reel de gradins + valeurs ohmiques) sont releves et consignes avec statut MESUREE."
+      verified_by: "Photo/transcription de plaque + releve ohmique au multimetre"
+    - id: AC4
+      statement: "La tare de la benne (pesee ou donnee constructeur) et la course ouverture/fermeture (reconfirmation des 15 m, en charge) sont etablies ; l'ouverture maximale (angle) est notee si elle est retenue comme grandeur."
+      verified_by: "Pesee / fiche benne / mesure de course"
+    - id: AC5
+      statement: "La pente charge <-> vitesse est etablie sur au moins 2 paliers en montant et en descendant, avec l'etat de benne NOTE (vide fermee / pleine) : les vitesses sont donc associees a une charge connue."
+      verified_by: "Procedure PROCEDURE_TRACE_TREUIL_CHARGE_v0.1.md + grille de notation remplie"
+    - id: AC6
+      statement: "Le test d'etalonnage (test d'un tour de tambour + comparaison mtre ruban / position / integrale de vitesse) est realise et tranche la voie de reference."
+      verified_by: "Fiche d'essai remplie + trace associee"
+    - id: AC7
+      statement: "Le partage de charge M1/M2 est caracterise : au minimum une sequence ou M1 seul leve la benne FERMEE (charge totale sur un seul treuil) et une sequence d'ouverture en l'air (M1 porteur seul)."
+      verified_by: "Traces + notation"
+    - id: AC8
+      statement: "Chaque valeur du bloc de calage passe de ESTIMEE a MESUREE, ou reste ESTIMEE avec la raison ecrite (donnee non obtenue, essai non realise)."
+      verified_by: "REFERENCE_CALAGE_TREUIL_M1M2_v0.1.md relu ligne a ligne"
+
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/REFERENCE_CALAGE_TREUIL_M1M2_v0.1.md
+      - DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_TREUIL_CHARGE_v0.1.md
+      - DOC/WFLOW/TROUBLESHOOTING/**
+      - DOC/WFLOW/REGISTRES/**
+      - TOOLS/PLC_CSV_SNAPSHOT/variable_lists/**
+      - TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/**
+    forbidden:
+      - CODE/**
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/GVL_PERSISTENT.st
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  evidence_required:
+    - traces_archivees
+    - grille_notation_remplie
+    - reference_calage_mise_a_jour
+
+  models_allowed:
+    - "dsh/deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Aucune mesure ne justifie de modifier un seuil de securite, une limite de course ou une
+    configuration de surveillance pendant la campagne. Tout ecart entre le comportement
+    attendu et le comportement observe est remonte immediatement, avec la trace.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Non execute. Campagne a realiser pendant la mise en service reelle, machine en etat.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Rappel securite : palier 5 en montant a vide en premier (valide machine le 2026-09-15) ;
+    la descente est plafonnee a P4 (WinchMaxStepDescent = 4 en RETAIN) ; toute tenue forcee
+    de palier est interdite benne chargee ou benne au fond.

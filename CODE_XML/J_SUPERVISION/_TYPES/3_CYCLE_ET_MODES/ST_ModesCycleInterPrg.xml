@@ -790,6 +790,14 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture benne</xhtml>
               </documentation>
             </variable>
+            <variable name="ReqHoldAscentP1AfterClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien M2 en montee P1 apres fermeture, pour raccordement AX10B sans coupure</xhtml>
+              </documentation>
+            </variable>
             <variable name="ReqKoboldMeasureEnable">
               <type>
                 <BOOL />
@@ -958,7 +966,7 @@ M1 : contacteurs retombés</xhtml>
               <value name="AX_STAB" value="19" />
               <value name="AX_DIVING_RETRY" value="20" />
               <value name="AX3_WAIT_DIVE_START" value="21" />
-              <value name="AX10_WAIT_ASCENT_START" value="22" />
+              <value name="AX10B_RACCORDEMENT_P1" value="22" />
             </values>
           </enum>
         </baseType>
@@ -1102,9 +1110,9 @@ M1 : contacteurs retombés</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX10_WAIT_ASCENT_START</Name>
+                <Name>AX10B_RACCORDEMENT_P1</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Transition fermeture-&gt;montee : sorties neutres jusqu'a l'arret confirme M1/M2, joystick tire maintenu</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Raccordement continu P1 fermeture benne -&gt; montee controlee</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

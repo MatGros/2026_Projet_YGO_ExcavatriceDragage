@@ -1,6 +1,6 @@
 # T262 — Fermeture benne → extraction sans arrêt franc
 
-> 🔴 C4 · Responsable : Codex · 2026-09-15 · **Plan technique en revue, code non modifié**.
+> 🔴 C4 · Responsable : Codex · 2026-09-19 · **Implémentation réalisée, validation CODESYS manuelle en attente**.
 > Contrat : [TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml](TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml).
 
 ## 🎯 Besoin confirmé
@@ -61,10 +61,12 @@ AND Benne_Done
 AND (Benne_IsClosed OR Benne_IsRoughlyClosed)
 ```
 
-Après cette sortie, AX10b impose aujourd'hui un arrêt physique stable de **500 ms**
-avant AX11 : vitesses M1/M2 valides, contacteurs M1/M2 tous relâchés, freins M1/M2
-serrés, et `|vitesse| < 0,02 m/s` pour les deux treuils. Le joystick tiré et
-l'homme-mort restent requis.
+Après cette sortie, le comportement nominal visé remplace l'arrêt AX10b par
+`AX10B_RACCORDEMENT_P1` : M2 conserve son sens de montée et son frein ouvert, redescend
+éventuellement de P2 vers P1 sans ordre d'arrêt, puis M1+M2 prennent P1 dans le
+même scan de transfert. AX11 demande ensuite P2 commun avec les cadenceurs
+existants. Le joystick tiré et l'homme-mort restent requis. L'arrêt physique
+stable de 500 ms reste le repli si le raccordement n'est pas qualifié.
 
 Ces valeurs sont le point de départ de T262. Le nouveau seuil d'ouverture ne doit
 pas modifier `OffsetCloseM`, la bande de cohérence, l'anticipation de fermeture ou
@@ -91,7 +93,7 @@ barrières finales ; ne pas modifier la garde manuelle pour résoudre T262.
 | Phase interne | M1 | M2 | Condition de sortie |
 |---|---|---|---|
 | Préparation pendant AX10 | Intention montée préparée, **marche FALSE**, contacteurs au repos. | Ferme selon le pilotage actuel. | Seuil valide ou fin historique. |
-| Raccordement | Attend prêt à monter. | Rejoint **P1**, avec sens maintenu et cadencement existant. | M2 réellement P1 et M1 prêt, protections autorisant le transfert. |
+| AX10B_RACCORDEMENT_P1 | Attend prêt à monter, sans relais ni frein. | Reste propriétaire, conserve le sens montée et rejoint **P1** depuis P1/P2, sans arrêt. | M2 réellement P1 et M1 prêt, protections autorisant le transfert. |
 | Transfert effectif | Demande montée P1. | Demande montée P1 reprise par Both. | Fin de propriété benne et demandes Both produites dans **le même scan PRG04**. |
 | Extraction AX11 | Cible P2 avec cadenceur. | Cible P2 avec cadenceur. | Les deux axes sont réellement au P1 avant la demande commune P2. |
 | AX12 | Règle de charge actuelle. | Règle de charge actuelle. | Distance AX11 et conditions actuelles satisfaites. |
@@ -294,5 +296,10 @@ ou toute perte de permis. L'essai ne sert pas à « forcer » la transition.
   cible P2 ; fluidité ; automatique uniquement ; responsabilité qualité et revue ciblée.
 - Proposition présentée : plage 0..50 %, comparaison `≤`, raccordement P1 sans arrêt,
   repli historique si préparation insuffisante à la fermeture.
-- **Validation humaine du plan technique encore requise** par `AGENTS.md`, avant ST.
-  Aucun code ni bundle T262 livré à ce stade.
+- **Implémentation livrée** : `AX10B_RACCORDEMENT_P1` conserve M2 en P1, attend la
+  disponibilité finale M1 pendant 2 s maximum, transfère M1+M2 en P1 dans le même
+  scan, puis AX11 reprend avec le plafond commun P1..P2. Le repli historique est
+  conservé si la disponibilité n'est pas obtenue.
+- Preuves : test compilé `T262-002 PASS`, garde-fou G500 `15/15 PASS`, G200 liaison
+  `0 erreur`, bundle PLCopenXML frais. La validation finale du comportement réel
+  reste l'essai manuel dans CODESYS.

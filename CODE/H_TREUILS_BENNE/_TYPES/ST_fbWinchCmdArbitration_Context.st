@@ -16,6 +16,7 @@ STRUCT
     BucketM2ReqAscent              : BOOL;  // --> [CMD] Demande montée M2 issue benne
     BucketM2ReqDescend             : BOOL;  // --> [CMD] Demande descente M2 issue benne
     BucketAutoCloseActive           : BOOL;  // --> [STAT] AX10 fermeture auto active (plafond AX10 M2, issu de CtrlAscentMaxStep)
+    BucketHandoffP1Active           : BOOL;  // --> [STAT] AX10B : fermeture atteinte, M2 maintenu au palier 1 avant transfert couple
     WinchBothMotionBlockedByBucket : BOOL;  // --> [STAT] Mouvement both bloqué par benne (ex CoupledMotionBlockedByBucket)
     SyncBlocksAscent                   : BOOL;  // --> [STAT] Synchro bloque la montée (SyncMinorDeviationBlocksUp)
     SyncBlocksDescent                 : BOOL;  // --> [STAT] Synchro bloque la descente (SyncMinorDeviationBlocksDown)
