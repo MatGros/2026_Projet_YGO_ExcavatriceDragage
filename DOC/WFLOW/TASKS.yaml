@@ -1,4 +1,25 @@
 tasks:
+- id: T323
+  parent_id: ''
+  statut: ⏳
+  criticite: C3
+  domaine: TREUILS / BENNE / DIAGNOSTIC / HOMING
+  agent: CDX01
+  date: '2026-09-19T00:00:00+02:00'
+  updated_at: '2026-09-19T00:00:00+02:00'
+  avancement: 'Diagnostic confirme, correctif FB_Bucket implemente et 5 tests T323 PASS. La suite FB_Bucket conserve 9 echecs preexistants/hors scope ; gates C echouent sur dettes documentaires et G483 preexistants. Validation CODESYS humaine restante.'
+  titre: Benne — supprimer les faux défauts avant référencement et rafraîchir l'état après homing
+  contexte: 'Lorsque les codeurs M1/M2 ou la benne ne sont pas référencés, FB_Bucket peut produire ErrorID:02 (écart max) sur des mesures non qualifiées et ErrorID:05 (codeurs non référencés) latched. Après référencement par les boutons, l''état reste masqué jusqu''au Reset alarm.'
+  description: 'Séparer l''état de qualification (non référencé) du défaut mécanique réel. Inhiber les comparaisons d''écart tant que les références ne sont pas fiables, ne pas alarmer au repos ou pendant le homing, et rendre l''état référencé visible sans Reset parasite, sans effacer les défauts mécaniques indépendants.'
+  objectifs:
+  - 'ErrorID:02 ne s''active pas lorsque HomedM1/M2 ne sont pas references ou qu''un homing est actif.'
+  - 'ErrorID:05 ne s''active pas au repos ni pendant MachineHomingActive ; une commande normale sans référence reste interdite et diagnostiquée.'
+  - 'Après référencement réussi, la cause non-reference retombe sans acquittement manuel ; BucketReferenced et ActiveOffsetValid restent produits par leur logique existante.'
+  - 'Un vrai écart après référencement reste latched et acquittable par Reset.'
+  - 'Les causes configuration, timeout, glissement et datum suspect restent inchangées.'
+  - 'Tests FB_Bucket, bundle PLCopenXML, G200 et gates palier C fournis.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T323_BENNE_NON_REFERENCEE_DIAGNOSTIC.yaml
+  bloque_par: []
 - id: T322
   parent_id: ''
   statut: ⬜

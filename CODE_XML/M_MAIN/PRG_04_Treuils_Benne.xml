@@ -8460,6 +8460,16 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart M2-M1 hors plage plausible ce scan</xhtml>
               </documentation>
             </variable>
+            <variable name="HomingPositionValid">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HomingMotionWithoutReference">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
             <variable name="FirstCycle">
               <type>
                 <BOOL />
@@ -8583,11 +8593,6 @@ Data.BothBlockReason              := BothBlockReason;
                 <BOOL />
               </type>
             </variable>
-            <variable name="HomingFaultLatched">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
             <variable name="instFault">
               <type>
                 <derived name="FB_FaultCore" />
@@ -8681,7 +8686,6 @@ IF ResetEdge.Q OR BypassGlobal THEN
     OffsetMaxFaultLatched := FALSE;
     TimeoutFaultLatched   := FALSE;
     M1SlipFaultLatched    := FALSE;
-    HomingFaultLatched    := FALSE;
 END_IF;
 
 IF NOT BypassGlobal THEN
@@ -8707,8 +8711,14 @@ IF NOT BypassGlobal THEN
     // probleme -&gt; plus besoin de ce contournement.)
     MaxAllowedOffset := Config.OffsetCloseM + 2.0;
     MinAllowedOffset := Config.OffsetOpenM - Config.CoherenceLimitM;
-    OffsetMaxViolNow := (CablePosM2 &gt; (CablePosM1 + MaxAllowedOffset))
-                     OR (CablePosM2 &lt; (CablePosM1 + MinAllowedOffset));
+    HomingPositionValid := HomedM1
+                             AND HomedM2
+                             AND NOT HomingSuspectM1
+                             AND NOT HomingSuspectM2
+                             AND NOT MachineHomingActive;
+    OffsetMaxViolNow := HomingPositionValid
+                     AND ((CablePosM2 &gt; (CablePosM1 + MaxAllowedOffset))
+                          OR (CablePosM2 &lt; (CablePosM1 + MinAllowedOffset)));
     // Anti-pic : ne latche que si l'ecart reste hors plage &gt; 500 ms (bruit codeur / glitch).
     TonOffsetMaxViol(IN := OffsetMaxViolNow, PT := T#500ms);
     IF TonOffsetMaxViol.Q THEN
@@ -8737,11 +8747,11 @@ IF NOT BypassGlobal THEN
     instCauses[3].Texte    := 'Glissement treuil M1 pendant manoeuvre benne';
 
     // Cause 4 : Non référencé
-    IF NOT HomedM1 OR NOT HomedM2 THEN
-        HomingFaultLatched := TRUE;
-    END_IF;
-    instCauses[4].Active   := HomingFaultLatched;
-    instCauses[4].Latching := TRUE;
+    HomingMotionWithoutReference := (ReqAscent OR ReqDescend OR CmdOpen_IHM OR CmdClose_IHM OR ProgramBucketDriveActive)
+                                  AND NOT MachineHomingActive
+                                  AND NOT (HomedM1 AND HomedM2);
+    instCauses[4].Active   := HomingMotionWithoutReference;
+    instCauses[4].Latching := FALSE;
     instCauses[4].Texte    := 'Codeurs treuils non references pour sequence benne';
 ELSE
     TonTimeout(IN := FALSE);

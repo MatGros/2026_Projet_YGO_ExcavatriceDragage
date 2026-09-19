@@ -1,0 +1,66 @@
+contract:
+  task_id: T323_BENNE_NON_REFERENCEE_DIAGNOSTIC
+  criticality: C3
+  strategy: patch
+  objective: >
+    Separer le statut non reference du defaut mecanique benne. Les mesures M1/M2
+    ne sont comparees qu apres homing qualifie ; une commande normale sans codeurs
+    references reste bloquee et diagnostiquee, mais le homing se termine sans
+    alarme latchee parasite. ErrorID:02 = masque 16#0002 (cause index 1) ;
+    non-reference = cause index 4, masque 16#0010 (numero IHM distinct).
+  acceptance:
+    - id: AC1
+      statement: "Avec HomedM1=FALSE ou HomedM2=FALSE au repos, ErrorID masque 16#0002 reste nul, meme si les positions brutes sont incoherentes."
+      verified_by: "Test T323-001."
+    - id: AC2
+      statement: "L'absence de reference au repos ou pendant MachineHomingActive ne produit pas ErrorID masque 16#0010."
+      verified_by: "Tests T323-001 et T323-002."
+    - id: AC3
+      statement: "Une commande normale sans Homed M1+M2 produit uniquement une cause live non-reference, sans latch permanent."
+      verified_by: "Tests T323-003 et T323-005 ; sorties de mouvement neutres."
+    - id: AC4
+      statement: "Quand HomedM1 et HomedM2 redeviennent vrais, la cause non-reference retombe sans Reset supplementaire."
+      verified_by: "Tests T323-003 et T323-005."
+    - id: AC5
+      statement: "Un ecart reel apres homing reste signale par 16#0002 et latchable apres 500 ms."
+      verified_by: "Test T323-004."
+    - id: AC6
+      statement: "Les causes configuration, timeout, glissement et datum suspect ne sont pas effacees."
+      verified_by: "Tests FB_Bucket existants et non-regression cible."
+    - id: AC7
+      statement: "La chaine FB_Bucket -> PRG_04 -> diagnostic reste cablee sans nouveau producteur."
+      verified_by: "G200_check_linkage.py --report."
+    - id: AC8
+      statement: "Bundle PLCopenXML et gates applicables fournis."
+      verified_by: "generate_codesys_bundle.py et run_all_gates.py --palier C."
+    - id: AC9
+      statement: "Le correctif est dans FB_Bucket, appele sans condition SimulationModeActive ; ses positions et HomedAndReliable viennent du bus codeur HwIn, lui-meme arbitre reel/simulation en amont."
+      verified_by: "Lecture PRG_04_Treuils_Benne.st et PRG_02_Acquisition.st : aucun branchement SimBench dans le correctif, chemin HwReal confirme."
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_BENNE_NON_REFERENCEE_ERROR02_ERROR05_20260919.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - DOC/STDS/NAMING_CONVENTION.md
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - unit_test_report
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

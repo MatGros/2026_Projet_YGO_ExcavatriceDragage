@@ -110,6 +110,8 @@ VAR
     BandLatchConcord                : BOOL;                           // . [LOC] Etat latche ET bande mesuree concordent -> offset benne fiable
     StateOffsetM                    : REAL;                           // . [LOC] Offset issu de l'ETAT LATCHE seul (reference du filet §5a, independant du recalage)
     OffsetMaxViolNow                : BOOL;                           // . [LOC] Ecart M2-M1 hors plage plausible ce scan
+    HomingPositionValid             : BOOL;
+    HomingMotionWithoutReference    : BOOL;
 
     // === VARIABLES LOCALES CALCULÉES ===
     FirstCycle                      : BOOL := TRUE;                  // . [LOC] Drapeau de premier cycle API
@@ -130,7 +132,6 @@ VAR
     OffsetMaxFaultLatched           : BOOL;
     TimeoutFaultLatched             : BOOL;
     M1SlipFaultLatched              : BOOL;
-    HomingFaultLatched              : BOOL;
 
     // Socle défaut
     instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
@@ -154,7 +155,6 @@ IF ResetEdge.Q OR BypassGlobal THEN
     OffsetMaxFaultLatched := FALSE;
     TimeoutFaultLatched   := FALSE;
     M1SlipFaultLatched    := FALSE;
-    HomingFaultLatched    := FALSE;
 END_IF;
 
 IF NOT BypassGlobal THEN
@@ -180,8 +180,12 @@ IF NOT BypassGlobal THEN
     // probleme -> plus besoin de ce contournement.)
     MaxAllowedOffset := Config.OffsetCloseM + 2.0;
     MinAllowedOffset := Config.OffsetOpenM - Config.CoherenceLimitM;
-    OffsetMaxViolNow := (CablePosM2 > (CablePosM1 + MaxAllowedOffset))
-                     OR (CablePosM2 < (CablePosM1 + MinAllowedOffset));
+    HomingPositionValid := HomedAndReliableM1
+                         AND HomedAndReliableM2
+                         AND NOT MachineHomingActive;
+    OffsetMaxViolNow := HomingPositionValid
+                     AND ((CablePosM2 > (CablePosM1 + MaxAllowedOffset))
+                          OR (CablePosM2 < (CablePosM1 + MinAllowedOffset)));
     // Anti-pic : ne latche que si l'ecart reste hors plage > 500 ms (bruit codeur / glitch).
     TonOffsetMaxViol(IN := OffsetMaxViolNow, PT := T#500ms);
     IF TonOffsetMaxViol.Q THEN
@@ -210,11 +214,11 @@ IF NOT BypassGlobal THEN
     instCauses[3].Texte    := 'Glissement treuil M1 pendant manoeuvre benne';
 
     // Cause 4 : Non référencé
-    IF NOT HomedM1 OR NOT HomedM2 THEN
-        HomingFaultLatched := TRUE;
-    END_IF;
-    instCauses[4].Active   := HomingFaultLatched;
-    instCauses[4].Latching := TRUE;
+    HomingMotionWithoutReference := (ReqAscent OR ReqDescend OR CmdOpen_IHM OR CmdClose_IHM OR ProgramBucketDriveActive)
+                                  AND NOT MachineHomingActive
+                                  AND NOT (HomedM1 AND HomedM2);
+    instCauses[4].Active   := HomingMotionWithoutReference;
+    instCauses[4].Latching := FALSE;
     instCauses[4].Texte    := 'Codeurs treuils non references pour sequence benne';
 ELSE
     TonTimeout(IN := FALSE);

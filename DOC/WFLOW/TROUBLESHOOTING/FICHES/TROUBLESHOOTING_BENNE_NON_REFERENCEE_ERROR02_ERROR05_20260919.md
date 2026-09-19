@@ -72,3 +72,11 @@ Le comportement observé est cohérent avec le code actuel, mais il n'est pas co
 - 2026-09-19 : symptôme opérateur recueilli.
 - 2026-09-19 : lecture statique de `FB_Bucket.st`, cause ErrorID 02/05 confirmée.
 - 2026-09-19 : aucune modification de code effectuée.
+
+## 7. ✅ T323 — correction appliquee et revuee
+
+- Cause non-reference : cause live uniquement lorsqu'une commande benne normale est demandee hors homing ; elle n'est plus latchee au repos.
+- Ecart M1/M2 : comparaison armee seulement avec les deux codeurs homed et fiables, hors homing ; le defaut mecanique reste latchable.
+- Revue independante : validation du principe et rappel de la distinction `16#0002` / `16#0010`.
+- Tests T323-001 a T323-005 : PASS.
+- Validation CODESYS et gates completes : restantes avant cloture.
