@@ -1,11 +1,14 @@
 (* =======================================================================
    🔀 FB_WinchDirectionInterlock — Interlock de changement de sens
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Temporise le changement de sens d'un treuil (dead time)
+   🎯 Rôle : Temporise l'INVERSION de sens d'un treuil, en creditant le
+             temps d'arret physique reel deja ecoule (dead time)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Brique technique (contrat light, pas de defaut)
    🔒 Sécurité : D18 — au front montant Enable, n'adopte pas le sens
-                 immediatement (temps mort) ; pas de redemarrage inrush
+                 immediatement (temps mort) ; pas de redemarrage inrush.
+                 Le sens IDENTIQUE au dernier sens adopte reste toujours
+                 immediat depuis le neutre : seule l'INVERSION est temporisee.
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_WinchDirectionInterlock
@@ -26,14 +29,19 @@ VAR_OUTPUT
     DelayElapsed            : TIME;  // <-- [DIAG] Ecoule delai changement de sens
 END_VAR
 VAR
-    DirectionChangeDelay : TON;      // . [LOC] Temporisation changement de sens
-    EffectiveDelay       : TIME;     // . [LOC] Delai effectif selon sens
-    DeadTimeArmed        : BOOL;     // . [LOC] Temps mort D18 arme (front Enable)
-    LastAscent           : BOOL;     // . [LOC] Dernier sens adopté : montée
-    LastDescend          : BOOL;     // . [LOC] Dernier sens adopté : descente
-    RequestActive        : BOOL;     // . [LOC] Une seule demande de sens active
-    DirectionChanged     : BOOL;     // . [LOC] Demande différente du sens commandé
-    ResetEdge            : R_TRIG;   // . [LOC] Front Reset : purge la memoire de direction
+    DirectionChangeDelay  : TON;      // . [LOC] Xa->Xb : compte le reliquat apres la nouvelle demande d'inversion
+    StoppedTimer          : TON;      // . [LOC] Xc->Xd : accumule le temps d'arret physique reel (Enable, hors demande)
+    CapturedStoppedTime   : TIME;     // . [LOC] Arret reel credite, fige au front RequestActive, purge une fois consomme
+    RemainingDelay        : TIME;     // . [LOC] Reliquat a appliquer par DirectionChangeDelay (delai plein - arret credite)
+    EffectiveDelay        : TIME;     // . [LOC] Delai plein selon sens demande
+    MaxDirectionDelay     : TIME;     // . [LOC] MAX(ChangeDelayAscent, ChangeDelayDescent) : base d'accumulation StoppedTimer
+    DeadTimeArmed         : BOOL;     // . [LOC] Temps mort D18 arme (front Enable)
+    LastAscent            : BOOL;     // . [LOC] Dernier sens adopté : montée
+    LastDescend           : BOOL;     // . [LOC] Dernier sens adopté : descente
+    RequestActive         : BOOL;     // . [LOC] Une seule demande de sens active
+    RequestActiveRising   : R_TRIG;   // . [LOC] Front nouvelle demande : capture le credit avant le rappel de StoppedTimer
+    DirectionChanged      : BOOL;     // . [LOC] Demande différente du sens commandé
+    ResetEdge             : R_TRIG;   // . [LOC] Front Reset : purge la memoire de direction
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -48,17 +56,29 @@ IF ResetEdge.Q THEN
     CommandedDescend := FALSE;
     DeadTimeArmed := FALSE;
     DirectionChangePending := FALSE;
+    CapturedStoppedTime := T#0ms;
 END_IF;
 
 RequestConflict := ReqAscent AND ReqDescend;
 RequestActive := (ReqAscent OR ReqDescend) AND NOT RequestConflict;
 
-// Délai effectif selon le sens demandé
+// Xc->Xd : capture l'arret physique REEL deja ecoule (StoppedTimer.ET) AU FRONT de
+// la nouvelle demande, AVANT le rappel de StoppedTimer plus bas dans ce scan (un TON
+// dont IN retombe a FALSE remet son ET a 0 des cet appel — lire apres serait deja 0).
+RequestActiveRising(CLK := RequestActive);
+IF RequestActiveRising.Q THEN
+    CapturedStoppedTime := StoppedTimer.ET;
+END_IF;
+
+// Délai plein selon le sens demandé, et base commune pour l'accumulation d'arret
+// (le sens final n'est pas encore connu pendant le neutre).
 IF ReqAscent AND NOT ReqDescend THEN
     EffectiveDelay := ChangeDelayAscent;
 ELSE
     EffectiveDelay := ChangeDelayDescent;
 END_IF;
+MaxDirectionDelay := MAX(ChangeDelayAscent, ChangeDelayDescent);
+RemainingDelay := MAX(EffectiveDelay - CapturedStoppedTime, T#0ms);
 
 DirectionChanged := (ReqAscent AND NOT CommandedAscent)
                  OR (ReqDescend AND NOT CommandedDescend)
@@ -71,10 +91,17 @@ IF EnableRising AND RequestActive THEN
     DeadTimeArmed := TRUE;
 END_IF;
 
-// Temporisation : compte quand un changement de sens est demande et treuil arrete
+// Xc->Xd : StoppedTimer compte l'arret physique REEL (Enable = treuil arrete,
+// contacteurs retombes, cf. FB_Winch) pendant TOUT le neutre, jamais reinitialise
+// par le simple relachement du joystick — c'est ce cumul qui alimente la capture
+// ci-dessus au scan suivant.
+StoppedTimer(IN := Enable AND NOT RequestActive, PT := MaxDirectionDelay);
+
+// Xa->Xb : compte le reliquat (delai plein - arret deja credite) apres la nouvelle
+// demande d'inversion.
 DirectionChangeDelay(
     IN := Enable AND RequestActive AND DirectionChanged,
-    PT := EffectiveDelay
+    PT := RemainingDelay
 );
 DelayElapsed := DirectionChangeDelay.ET;
 
@@ -119,6 +146,14 @@ END_IF;
 IF CommandedAscent OR CommandedDescend THEN
     LastAscent := CommandedAscent;
     LastDescend := CommandedDescend;
+END_IF;
+
+// Le sens adopte correspond desormais a la demande (aucune inversion en cours) :
+// le credit d'arret est CONSOMME. Une inversion ULTERIEURE sans nouveau passage au
+// neutre (RequestActive reste continuellement vrai) ne doit jamais reutiliser un
+// arret perime — elle applique alors le delai plein (CapturedStoppedTime := 0).
+IF NOT DirectionChangePending AND (CommandedAscent = ReqAscent) AND (CommandedDescend = ReqDescend) THEN
+    CapturedStoppedTime := T#0ms;
 END_IF;
 
 END_FUNCTION_BLOCK
