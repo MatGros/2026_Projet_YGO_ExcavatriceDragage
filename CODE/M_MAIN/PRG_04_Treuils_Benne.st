@@ -486,6 +486,9 @@ ArbContext.BucketBusy                     := instBucket.Lifecycle.Busy;
 ArbContext.BucketM2RunRequest             := instBucket.M2_RunRequest;
 ArbContext.BucketM2ReqAscent              := BucketM2ReqAscent;
 ArbContext.BucketM2ReqDescend             := BucketM2ReqDescend;
+ArbContext.BucketAutoCloseActive          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
+    AND (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX10_CLOSE_BUCKET)
+    AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;
 ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
 ArbContext.SyncBlocksAscent                   := SyncMinorDeviationBlocksUp;
 ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown;
@@ -503,6 +506,7 @@ ArbM1Cfg.BtnStepTgt := 5;
 ArbM2Cfg.BtnStepTgt := 5;
 ArbM2Cfg.BucketOverrideStepUpTgt   := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
 ArbM2Cfg.BucketOverrideStepDownTgt := LIMIT(1, _BucketCfgPersist.Config.MaxStepDown, 5);
+ArbM2Cfg.BucketAutoMaxStepUp       := LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.CtrlAscentMaxStep, 2);
 
 // ── Arbitrage M1 (FB_WinchCmdArbitrationM1) ──
 instArbM1(
@@ -1244,9 +1248,14 @@ IF PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active
    AND (CommonMaxStepDescent = EffectiveMaxStepDescent) THEN
     M2MaxStepDown := 5;
 END_IF;
-// Auto-séquencement benne (FB_Bucket) : palier 1 sur toute la manœuvre.
+// Auto-séquencement benne : AX10 SEMI_AUTO garde le plafond AX11 P1..P2 ; les
+// autres manoeuvres benne conservent leur plafond dédié.
 IF instBucket.M2_BucketJogLimit THEN
-    M2MaxStepUp   := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
+    IF ArbContext.BucketAutoCloseActive THEN
+        M2MaxStepUp := MIN(M2MaxStepUp, LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.CtrlAscentMaxStep, 2));
+    ELSE
+        M2MaxStepUp := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
+    END_IF;
     M2MaxStepDown := LIMIT(1, _BucketCfgPersist.Config.MaxStepDown, 5);
 END_IF;
 // Jog unitaire M2 : palier libre en course, palier 1 uniquement dans la zone de
@@ -1268,7 +1277,8 @@ IF ManualBucketJogActive THEN
         END_IF;
     END_IF;
 END_IF;
-IF BucketNotClosedAscentCapStep1 OR SlackCableAscentCapStep1 THEN
+IF SlackCableAscentCapStep1
+   OR (BucketNotClosedAscentCapStep1 AND NOT ArbContext.BucketAutoCloseActive) THEN
     M2MaxStepUp := 1;
 END_IF;
 

@@ -1,0 +1,25 @@
+task_id: T262
+micro_phase: AX10_AUTO_STEP_CEILING
+criticality: C4
+decision_human: "2026-09-19: AX10 AUTO est proportionnel au joystick et plafonne au palier effectif AX11; maintenance M2 reste P1..P5."
+scope:
+  allowed:
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchCmdArbitration_Cfg.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchCmdArbitration_Context.st
+    - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM2.st
+    - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+  forbidden:
+    - CODE/G_CYCLE/FB_CycleSemiAuto.st
+    - CODE/FB_Safety_Winch.st
+    - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+    - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+acceptance:
+  - "SEMI_AUTO + AX10 fermeture M2 : StepTgt = MIN(Joystick.AxisY.StepTgt, CfgCtrlAscentMaxStep IHM borne 1..2)."
+  - "MANUEL/MAINTENANCE + fermeture M2 : StepTgt conserve le plafond BucketOverrideStepUpTgt existant."
+  - "Les clamps safety aval restent producteurs uniques et peuvent seulement reduire le palier."
+  - "Aucun changement de transition AX10 vers AX11, de frein, de contacteur ou de safety."
+trace:
+  - PRG_02_Acquisition.Data.Joystick.AxisY.StepTgt
+  - PRG_04_Treuils_Benne.instArbM2.StepTgt
+  - PRG_04_Treuils_Benne.ReqM2Winch.MaxStepUp
+  - PRG_04_Treuils_Benne.instWinchM2.StepNumber

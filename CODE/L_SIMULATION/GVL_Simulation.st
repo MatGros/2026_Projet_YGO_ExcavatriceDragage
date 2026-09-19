@@ -75,14 +75,14 @@ VAR_GLOBAL
     SimWinchBrakeOpenDelayS             : REAL := 0.10;
     SimWinchBrakeCloseDelayS            : REAL := 0.09;
     // Diagnostic électrique isolé : ne pilote jamais une entrée safety ou une commande moteur.
-    SimWinchElectricalDiagnosticsActive : BOOL := FALSE;
+    SimWinchElectricalDiagnosticsActive : BOOL := TRUE;
     // Injection safety explicite : TRUE simule le câble non tendu ; FALSE = signal nominal sain.
     SimM2TensionedCableFaultInject      : BOOL := FALSE;
 
     // 🪝 MODÈLE M2 / KOBOLD — réglages de banc, actifs exclusivement via FB_SimBench.
     // M2 est calculé depuis M1 pendant une descente BOTH effective. Le coefficient est
     // issu de la trace 2026-09-05 ; TRUE par défaut pour reproduire le comportement mesuré.
-    SimM2CoupledDescentModelActive : BOOL := FALSE;
+    SimM2CoupledDescentModelActive : BOOL := TRUE;
     SimM2CoupledDescentFactor      : REAL := 0.9333; // Ratio déplacement M2 / déplacement M1 en descente BOTH (mesure: 0,6 m / 9 m)
 
     // Le mode auto est armé sur entrée SEMI_AUTO pendant la simulation et libéré à sa sortie.

@@ -1,0 +1,62 @@
+contract:
+  task_id: T319
+  criticality: C3
+  strategy: patch
+  objective: >
+    Eviter le relachement et re-appui joystick lorsque le cycle semi-auto demarre
+    alors que M3 est deja qualifie a la position P1, sans contourner les permis,
+    l'homme-mort, l'ouverture benne ou les interlocks de translation.
+  acceptance:
+    - id: AC1
+      statement: "M3 deja P1 stable et joystick pousse au depart : AX2 enchaine vers AX3 sans front joystick supplementaire."
+      verified_by: "test cycle scan-par-scan AX2 -> AX3"
+    - id: AC2
+      statement: "M3 hors P1 ou position non qualifiee : AX2 maintient la demande de mise en position actuelle."
+      verified_by: "test hors P1 et capteurs incoherents"
+    - id: AC3
+      statement: "AX3 ouvre la benne si necessaire et AX4 ne demarre que sous joystick et homme-mort maintenus."
+      verified_by: "test benne fermee puis ouverte, perte geste et perte homme-mort"
+    - id: AC4
+      statement: "Aucun changement des sorties physiques, interlocks M3, modes maintenance ou safety treuils."
+      verified_by: "revue diff, G200 et gates applicables"
+    - id: AC5
+      statement: "Le nom de fichier est identique au nom de POU et le suffixe est égal au langage du bundle PLCopenXML."
+      verified_by: "G310 et generation du bundle"
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - TOOLS/TEST_AUTO_CI/
+      - DOC/WFLOW/
+    forbidden:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/FB_Safety_Winch.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "Homme-mort et joystick maintenus pour chaque mouvement."
+      - "Ouverture benne avant plongée."
+      - "Absence de redémarrage automatique après perte de geste, permis ou défaut."
+      - "Chemins maintenance inchangés."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  alert_duty: >
+    Toute ambiguite entre la position P1 memoiree, les capteurs M3 et le geste
+    joystick suspend l'implementation avant modification du cycle.
+status: PENDING
+execution:
+  executed_by: ''
+  completed_at: ''
+  status: PENDING
+  summary: 'Creee le 2026-09-19 a la demande utilisateur ; non analysee et non implementee.'
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ''
+  validated_at: ''
+  notes: ''

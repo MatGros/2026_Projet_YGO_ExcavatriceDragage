@@ -1,4 +1,22 @@
 tasks:
+- id: T319
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: CYCLE_AUTO / TRANSLATION
+  agent: —
+  date: '2026-09-19T00:00:00+02:00'
+  titre: Cycle — continuité AX2 lorsque la translation est déjà confirmée P1
+  contexte: Après réinitialisation du graphe 7, un lancement avec joystick déjà poussé reste en AX2 même si M3 est déjà à P1 ; l'opérateur doit relâcher puis réenclencher.
+  description: Si la position P1 est déjà stable et qualifiée au démarrage, mémoriser ce fait et enchaîner AX2 vers AX3 ouverture benne puis plongée sous le même geste maintenu. Aucun saut de sécurité ni reprise automatique hors geste.
+  objectifs:
+  - À P1 stable au démarrage, AX2 ne réclame aucun relâchement/re-appui joystick avant AX3.
+  - Hors P1 ou position non qualifiée, AX2 conserve la mise en position et ses autorisations actuelles.
+  - La continuité atteint AX3 puis AX4 uniquement sous homme-mort et joystick maintenus ; benne fermée s'ouvre avant plongée.
+  - Perte du geste, du mode ou d'un permis stoppe les demandes sans reprise automatique.
+  - Aucun changement aux modes maintenance, interlocks M3, sécurité treuils ou sorties physiques.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T319_AX2_P1_CONTINUITY.yaml
+  bloque_par: []
 - id: T318
   parent_id: ''
   statut: ⏳
@@ -2569,8 +2587,9 @@ tasks:
   criticite: C4
   domaine: CYCLE_AUTO_BENNE
   agent: —
-  date: '2026-09-15T15:10:00+02:00'
-  avancement: 'Phase A codee : GVL/IHM persistant ExtractionStartOpening_Pct [0..50], defaut 0, sans lecture cycle. Interface
+  date: '2026-09-19T00:00:00+02:00'
+  avancement: 'Micro-phase AX10 plafond demarree le 2026-09-19 apres validation humaine : fermeture AUTO proportionnelle mais
+    plafonnee au palier AX11 effectif P1..P2, sans brider le jog maintenance. Phase A codee : GVL/IHM persistant ExtractionStartOpening_Pct [0..50], defaut 0, sans lecture cycle. Interface
     IHM figee ; verification pre-CODESYS en cours. B conserve AX10b, C raccordement P1, D AX11 P2 puis AX12. ALERTE 2026-09-17
     (fusion T309/mail YGO) : le mail utilisateur du 2026-09-15 décrit ce sujet comme "à simuler avant toute mise en réel",
     en écart avec la Phase A déjà codée ici — à clarifier avec l''utilisateur avant de poursuivre B/C/D (statut réel simulation

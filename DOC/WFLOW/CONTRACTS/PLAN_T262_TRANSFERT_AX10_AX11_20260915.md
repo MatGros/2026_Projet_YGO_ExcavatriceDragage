@@ -5,6 +5,16 @@
 
 ## 🎯 Besoin confirmé
 
+### Décision utilisateur du 2026-09-19 — plafond AX10 cohérent avec AX11
+
+En `SEMI_AUTO`, la fermeture AX10 reste proportionnelle au joystick mais son plafond
+est le plafond effectif de AX11, borné P1..P2. Cela interdit une fermeture M2 P5
+suivie d'une montée contrôlée P1/P2. Le raccordement Both P1 reste le cran obligatoire
+d'alignement avant toute demande commune supérieure.
+
+Cette règle est limitée à AX10 automatique : le jog M2 manuel/maintenance conserve
+la proportionnalité P1..P5, sous ses ralentissements et protections existants.
+
 Soulager M2 en engageant la montée des deux treuils avant la fermeture complète,
 selon un seuil d'ouverture réglable. Enchaîner fermeture → AX11 (cible P2) → AX12.
 
