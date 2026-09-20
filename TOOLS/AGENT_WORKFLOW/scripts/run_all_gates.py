@@ -144,6 +144,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "499", "G499 - Egouttage IHM en secondes, autorite unique (T289)", [sys.executable, f"{S}/G499_check_t289_drain_time_seconds.py", "."]),
     ("C", "501", "G501 - Absence mouvement sous commande (T288)", [sys.executable, f"{S}/G501_check_t288_no_movement_feedback.py", "."]),
     ("C", "502", "G502 - Frontiere SimBench M3 HwSim/HwIn (T300 AC4bis/AC14)", [sys.executable, f"{S}/G502_check_simbench_m3_boundary.py", "."]),
+    ("C", "503", "G503 - Portee stricte ManualBucketLimitsActive + borne T248 (T327)", [sys.executable, f"{S}/G503_check_manual_bucket_limits_scope.py"]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]

@@ -108,6 +108,46 @@
 # STATUT : plan amende, PAS d'autorisation d'implementation. Attente validation humaine
 # explicite de : (1) la duree du timeout B (recommandation 20-25 s), (2) le plan ci-dessus dans
 # son ensemble. Garde automatique fix:+guard: a fournir avec l'implementation (AGENTS.md).
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# AMENDEMENT ARCHITECTURE FINALE — validation Mathieu 2026-09-20, 3 corrections obligatoires
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# COMPOSANT : FB_Safety_BucketPhaseGuard (nouveau, contrat standard : Enable/Reset + Fault via
+# FB_FaultCore). Instance instBucketPhaseGuard dans PRG_04_Treuils_Benne.st (NC-010, prefixe inst).
+#
+# 1. SORTIE SAFETY : SafeStop : BOOL (PAS SafeStopRequest -- NC-050, sortie canonique d'un
+#    FB_Safety_*). Consommee : SafeStopM2_Raw := ... OR instBucketPhaseGuard.SafeStop
+#    (PRG_04:701, agregateur existant, producteur unique inchange, une cause de plus).
+#
+# 2. TIMER : TON standard (PAS d'accumulateur FB_CycleTime -- refuse, deuxieme semantique
+#    temporelle inutile). Regle : joystick relache OU phase T248 abandonnee -> tentative
+#    terminee -> timer REMIS A ZERO (pas de pause). Nouvelle demande -> nouveau delai complet.
+#    BucketPhaseTimeout_S capture au FRONT d'entree en phase (R_TRIG sur armement), jamais
+#    relu en cours de mouvement (meme valeur jusqu'a la fin de la tentative courante).
+#
+# 3. DEFAUT & PRODUCTEUR UNIQUE : PAS d'ecriture dans BucketState.ErrorId (deja produit par
+#    instBucket) ni dans un bitfield M2 existant. Nouveau champ dedie et separe :
+#      BucketState.PhaseGuardFault : ST_Fault
+#      bit 0 : timeout T248 (latched)
+#      bit 1 : configuration invalide -- BucketPhaseTimeout_S hors [20.0 .. 45.0] (latched)
+#    Decodage IHM depuis ce bitfield dedie, jamais melange aux causes instBucket existantes.
+#    DOCTRINE RESET (CODE_QUALITY_STANDARDS §9, deja en vigueur, pas une nouveaute) : SafeStop
+#    reste base sur la CAUSE BRUTE (Active), jamais sur Fault.Latched seul -- un front Reset
+#    est TOUJOURS effectif (jamais conditionne, §9) mais tant que la phase fautive est encore
+#    DEMANDEE (Active reste vrai), SafeStop et Fault.Error restent vrais malgre l'acquittement
+#    du Latched -- meme mecanisme Cause/Ack que EmergencyArmingFailed (§9), rien d'invente.
+#
+# NOMMAGE (NC-030/NC-070/NC-110) :
+#    DUT metier (config regroupee, ST_fbBucketPhaseGuard_Cfg) : BucketPhaseTimeout_S
+#    Champ IHM (ST_*HMI, prefixe Cfg sans underscore) : CfgBucketPhaseTimeout_S
+#    Suffixe _S obligatoire (duree en secondes, NC-030)
+#    Persistance : GVL_PERSISTENT._BucketCfgPersist (meme porteur que Config existant, NC-070) --
+#    OU nouveau _BucketPhaseGuardCfgPersist si le pont FB_CfgPersistBridge dedie est prefere
+#    (a trancher a l'implementation selon le pattern §"Reglages FB regroupes" NAMING_CONVENTION).
+#
+# STATUT FINAL : architecture validee (Mathieu, 2026-09-20). GO HUMAIN EXPLICITE ENCORE REQUIS
+# avant d'ecrire tests ou code -- ne pas demarrer sans ce feu vert.
 # ═══════════════════════════════════════════════════════════════════════════
 
 contract:
