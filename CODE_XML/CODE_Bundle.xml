@@ -18752,6 +18752,30 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce court bande "ouverte" -&gt; cible offset</xhtml>
               </documentation>
             </variable>
+            <variable name="TonRecoilLimit">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-chatter de la limite de recul benne (meme base de temps que TonBand*)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RecoilLimitReachedNow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Recul au bord de la frontiere PHYSIQUE benne ce scan (instantane, non confirme)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RecoilLimitActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Limite de recul ACTIVE (confirmee CST_BandStableTime)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonOffsetResettle">
               <type>
                 <derived name="TON" />
@@ -18832,22 +18856,6 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bande "ouverte" confirmee CST_BandStableTime</xhtml>
               </documentation>
             </variable>
-            <variable name="BandLatchConcord">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat latche ET bande mesuree concordent -&gt; offset benne fiable</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateOffsetM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Offset issu de l'ETAT LATCHE seul (reference du filet §5a, independant du recalage)</xhtml>
-              </documentation>
-            </variable>
             <variable name="OffsetMaxViolNow">
               <type>
                 <BOOL />
@@ -18908,38 +18916,6 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M1 memorisee a l'entree Busy</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2StartPosM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M2 memorisee a l'entree Busy</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WasOpenAtStart">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat IsOpen memorise a l'entree Busy</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WasClosedAtStart">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat IsClosed memorise a l'entree Busy</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LeftStartSinceArm">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Quitte position de depart</xhtml>
               </documentation>
             </variable>
             <variable name="HoldOffsetM">
@@ -19413,14 +19389,16 @@ ELSE
         CloseReached := FALSE;
     END_IF;
 
-    BusyEdge(CLK := (CloseReq OR OpenReq) AND MotionRequestActive);
+    // Armement de la manoeuvre : uniquement HORS manoeuvre deja engagee.
+    // M1RefPosM est la reference de la detection de glissement M1 (§1, cause 3). La recapturer en
+    // cours de manoeuvre re-baselinerait cette reference a chaque relachement puis repompage du
+    // joystick, ce qui rendrait un glissement reel indetectable (derive decoupee en tranches sous
+    // la tolerance). Le front d'armement est preserve : Lifecycle.Busy est pose plus bas dans ce
+    // meme scan, il vaut donc encore FALSE au scan d'armement.
+    BusyEdge(CLK := (CloseReq OR OpenReq) AND MotionRequestActive AND NOT Lifecycle.Busy);
 
     IF BusyEdge.Q THEN
         M1RefPosM := CablePosM1;
-        M2StartPosM := CablePosM2;
-        WasOpenAtStart := BucketState.IsOpen;
-        WasClosedAtStart := BucketState.IsClosed;
-        LeftStartSinceArm := FALSE;
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
     END_IF;
@@ -19479,8 +19457,35 @@ ELSE
             M2_BucketJogLimit := FALSE;
         END_IF;
 
-        IF (CloseReq AND (CablePosM2 &gt; M2StartPosM)) OR (OpenReq AND (CablePosM2 &lt; M2StartPosM)) THEN
-            LeftStartSinceArm := TRUE;
+        // --- Limite de recul : frontiere PHYSIQUE benne, directionnelle ---------------------------
+        // Sous une commande engagee, un recul (sens OPPOSE a la manoeuvre) ne peut pas franchir la
+        // frontiere physique de la benne : bord de la zone "trop ouvert" pour une fermeture
+        // (Delta &lt;= OffsetOpenM - CoherenceLimitM), bord de la zone "trop ferme" pour une ouverture
+        // (Delta &gt;= OffsetCloseM + CoherenceLimitM). C'est la MEME frontiere que TooOpen/TooClosed
+        // (§4a), MinAllowedOffset et la cause 1 (OffsetMaxViolNow) : aucune constante nouvelle.
+        // Sans cette limite, un recul soutenu franchit la frontiere puis latche la cause 1 en 500 ms
+        // (arret + Reset) ; ici le recul est simplement inhibe, proprement, sans defaut.
+        // Anti-chatter : frontiere FIXE (independante du geste operateur) + confirmation
+        // CST_BandStableTime, la temporisation "anti-chatter au bord" deja utilisee par les bandes.
+        // DIRECTIONNEL : seule la direction de RECUL est inhibee ; le sens allant VERS LA CIBLE reste
+        // servi (HoldAscentP1AfterClose force deja M2_ReqDescend a FALSE : non affecte).
+        // ClassCanRun gate la mesure : sans datum M1/M2 la position relative n'a pas de sens (le
+        // mouvement sans reference est deja couvert par la cause 4, HomingMotionWithoutReference).
+        // CloseReq / OpenReq, Lifecycle et BucketState ne sont PAS touches : la reprise se fait au
+        // joystick sans reappui IHM, et aucun etat n'est falsifie.
+        RecoilLimitReachedNow := ClassCanRun
+                                 AND ((CloseReq AND (DeltaPosition_M &lt;= (Config.OffsetOpenM - Config.CoherenceLimitM)))
+                                      OR (OpenReq AND (DeltaPosition_M &gt;= (Config.OffsetCloseM + Config.CoherenceLimitM))));
+        TonRecoilLimit(IN := RecoilLimitReachedNow, PT := CST_BandStableTime);
+        RecoilLimitActive := TonRecoilLimit.Q;
+
+        IF RecoilLimitActive THEN
+            IF CloseReq THEN
+                M2_ReqDescend := FALSE;                          // recul vers l'ouverture interdit
+            ELSE
+                M2_ReqAscent := FALSE;                           // recul vers la fermeture interdit
+            END_IF;
+            M2_RunRequest := M2_ReqAscent OR M2_ReqDescend;       // le sens VERS LA CIBLE reste servi
         END_IF;
 
         // Arrêt fermeture

@@ -548,24 +548,32 @@ TEST 'TC-P10-029 Recul (sens inverse) sous commande engagee : sens descente comm
     ASSERT_TRUE(FB.M2_RunRequest, 'Recul commande (commande engagee)');
 END_TEST
 
-TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Direction/StartStop)'
-    (* ⛔ ECART ESCALADE T339 (non corrige dans ce lot — aucun fichier CODE/ modifie) :
-       cette exigence n'est PLUS implementee. Le lot du 2026-09-05 (commit 2a307b5b
-       « suppression des coupures parasites LeftStartSinceArm pour ouverture et fermeture
-       completes ») a retire les deux branches d'arret a M2StartPosM ; le drapeau
-       LeftStartSinceArm est encore AFFECTE (FB_Bucket.st:561) mais plus JAMAIS LU : le recul
-       n'est donc borne par RIEN cote FB_Bucket quand la commande de fermeture reste engagee.
-       La fiche FB_Bucket_v1.0.md:288 promettait encore « sens inverse tolere mais borne ».
-       Le test est conserve tel quel sur ses assertions d'ARRET (seule la migration d'API
-       M2_Direction INT -> M2_ReqDescend BOOL a ete appliquee) : il reste ROUGE et sert de
-       preuve vivante du defaut. Arbitrage orchestrateur requis (restaurer la borne, ou acter
-       la perte de protection et realigner la spec). *)
+TEST 'TC-P10-029.1 Recul borne : arret reel a la frontiere PHYSIQUE benne (T346, variante b)'
+    (* ✅ CORRIGE PAR T346 (2026-09-20, C1 securite machine). Historique : le lot du 2026-09-05
+       (commit 2a307b5b « suppression des coupures parasites LeftStartSinceArm ») avait retire les
+       deux branches d'arret a M2StartPosM, laissant le recul NON BORNE sous commande engagee. Ce
+       test etait ROUGE et servait de preuve vivante du defaut (ecart escalade par T339).
+       ARBITRAGE HUMAIN 2026-09-20 (Q1 = frontiere physique, Q2 = option A) : la borne est
+       reconstruite sur la frontiere PHYSIQUE de la benne, JAMAIS sur la position de depart de
+       manoeuvre — celle-ci dependait du geste operateur, ce qui produisait les coupures parasites
+       d'origine (recapture de la reference a chaque front de joystick).
+       FRONTIERE = OffsetOpenM - CoherenceLimitM pour une fermeture (bord de la zone « trop
+       ouvert »), OffsetCloseM + CoherenceLimitM pour une ouverture. C'est la MEME frontiere que
+       TooOpen/TooClosed, MinAllowedOffset et le defaut cause 1 : aucune valeur nouvelle.
+       Sans cette borne, un recul soutenu franchit la frontiere puis latche le DEFAUT cause 1 en
+       500 ms. La confirmation CST_BandStableTime (200 ms) est volontairement INFERIEURE a ces
+       500 ms : la borne gagne toujours la course contre le defaut.
+       Q2 option A : CloseReq/Lifecycle/BucketState ne sont pas touches -> reprise au joystick. *)
     Config.OffsetOpenM := 0.0;
-    Config.OffsetCloseM := 3.0;
-    Config.CoherenceLimitM := 5.0;
-    Config.CloseAnticipationM := 0.2;
-    Config.OpenAnticipationM := 0.2;
-    BucketState.IsOpen := TRUE;
+    Config.OffsetCloseM := 15.0;
+    Config.CoherenceLimitM := 1.0;
+    Config.CloseAnticipationM := 1.2;
+    Config.OpenAnticipationM := 1.3;
+    (* Etat de depart VOLONTAIREMENT « ni ouvert ni ferme » : si la borne restaurait l'etat memorise
+       (defaut D5 de l'ancien code, via WasOpenAtStart), les assertions d'etat finales echoueraient.
+       Elles ne peuvent donc passer que par le classement CONTINU sur la mesure (T247). *)
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := FALSE;
 
     (* Scan 1 : regime nominal *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
@@ -576,62 +584,251 @@ TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Directi
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
 
-    (* Scan 2 : demarrage fermeture, M2StartPosM capture a 0.0 *)
+    (* Scan 2 : demarrage fermeture en zone INTERMEDIAIRE (Delta = 7.0 ; cible fermeture = 13.8).
+       Le depart est volontairement intermediaire : l'etat benne vaut alors IsOpen=FALSE, ce qui
+       rend l'assertion d'etat du scan 8 discriminante vis-a-vis du defaut D5 (restauration). *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
        CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
-       CablePosM1 := 0.0, CablePosM2 := 0.0,
+       CablePosM1 := 0.0, CablePosM2 := 7.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
     ASSERT_TRUE(FB.Lifecycle.Busy, 'Fermeture engagee -> Busy');
 
-    (* Scan 3 : M2 monte au-dessus de M2StartPosM -> LeftStartSinceArm arme *)
+    (* Scan 3 : recul commande en zone SURE (Delta = 1.0 ; frontiere a -1.0) -> recul AUTORISE.
+       ⚠️ Le harnais STruCpp conserve les entrees non passees entre deux appels : ReqAscent doit
+       etre explicitement relache, sinon MotionRequestConflict neutralise la demande. *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := FALSE, ReqDescend := TRUE, EffectivePermitBucket_Open := TRUE,
+       CablePosM1 := 0.0, CablePosM2 := 1.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.M2_ReqDescend, 'Recul en zone sure -> M2_ReqDescend=TRUE');
+    ASSERT_FALSE(FB.M2_ReqAscent, 'Recul -> M2_ReqAscent=FALSE (sens unique)');
+    ASSERT_TRUE(FB.M2_RunRequest, 'Recul en zone sure -> commande servie');
+
+    (* Scan 4 : recul encore DANS la zone (Delta = -0.9) -> toujours autorise : PAS de faux arret.
+       C'est l'invariant qui protege contre la reintroduction des « coupures parasites ». *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := FALSE, ReqDescend := TRUE, EffectivePermitBucket_Open := TRUE,
+       CablePosM1 := 0.0, CablePosM2 := -0.9,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.M2_RunRequest, 'Recul avant la frontiere -> toujours commande');
+
+    (* Scan 5 : recul A la frontiere (Delta = -1.0) mais < CST_BandStableTime :
+       la confirmation anti-chatter est en cours, le recul est encore servi (pas de coupure au
+       premier scan de contact — c'est exactement le defaut d'origine qui est evite). *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := FALSE, ReqDescend := TRUE, EffectivePermitBucket_Open := TRUE,
+       CablePosM1 := 0.0, CablePosM2 := -1.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.M2_ReqDescend, 'Frontiere atteinte < CST_BandStableTime -> anti-chatter en cours');
+
+    (* Scan 6 : frontiere TENUE au-dela de CST_BandStableTime (250 ms > 200 ms) -> ARRET ATTENDU.
+       Aucun defaut : OffsetMaxViolNow est STRICT (<) et TonOffsetMaxViol exige 500 ms ; la borne
+       confirmee a 200 ms gagne donc la course contre le defaut cause 1. *)
+    ADVANCE_TIME(250000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := FALSE, ReqDescend := TRUE, EffectivePermitBucket_Open := TRUE,
+       CablePosM1 := 0.0, CablePosM2 := -1.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_FALSE(FB.M2_ReqDescend, 'Recul a la frontiere confirmee -> plus de sens RECUL commande');
+    ASSERT_FALSE(FB.M2_RunRequest, 'Recul a la frontiere confirmee -> aucun ordre M2 (recul seul demande)');
+    ASSERT_FALSE(FB.Fault.Error, 'Borne de recul -> AUCUN defaut (une borne n est pas un defaut)');
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'Borne de recul -> manoeuvre TOUJOURS engagee (Busy conserve)');
+    ASSERT_FALSE(FB.Lifecycle.Done, 'Borne de recul -> Done NON pose (option A : reprise au joystick)');
+
+    (* Scan 7 : etat benne = CLASSEMENT CONTINU sur la mesure, jamais une restauration d'etat.
+       Delta = -1.0 -> NearOpen TRUE (|-1.0 - 0.0| <= CoherenceLimitM). Or l'etat au DEPART de la
+       manoeuvre (Delta = 7.0) valait IsOpen = FALSE : cette assertion ne peut donc passer que si
+       l'etat vient de la MESURE. Elle est discriminante contre le defaut D5. *)
+    BucketState := FB.BucketState;
+    ASSERT_TRUE(BucketState.IsOpen, 'Etat benne classe sur la MESURE (Delta=-1.0 -> ouvert), non restore');
+    ASSERT_FALSE(BucketState.IsClosed, 'Etat benne -> IsClosed FALSE (mesure, non restaure)');
+
+    (* Scan 8 : reprise du sens VERS LA CIBLE, SANS reappui IHM -> option A verifiee. *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, ReqDescend := FALSE, EffectivePermitBucket_Close := TRUE,
+       CablePosM1 := 0.0, CablePosM2 := -1.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.M2_ReqAscent, 'Borne DIRECTIONNELLE -> montee VERS LA CIBLE toujours servie');
+    ASSERT_TRUE(FB.M2_RunRequest, 'Reprise APRES la borne sans reappui IHM -> ordre M2 servi');
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'Manoeuvre toujours engagee apres la borne de recul');
+END_TEST
+
+TEST 'TC-P10-T346-N2 Glissement M1 cumule : non contournable par repompage du joystick (D6)'
+    (* T346 D6 (defaut DECOUVERT pendant T346, absent du brief initial) : M1RefPosM est la reference
+       de la DETECTION DE GLISSEMENT M1 (FB_Bucket.st:262 -> instCauses[3] -> Fault -> SevereError)
+       et elle est capturee sur BusyEdge.Q. Or BusyEdge n'avait PAS de clause NOT Lifecycle.Busy :
+       chaque relachement/repompage du joystick en pleine manoeuvre RECAPTURAIT la reference, ce qui
+       DECOUPAIT la derive en tranches sous la tolerance (1.0 m). Une derive cumulee de 1.6 m passait
+       donc totalement inapercue — defaite de detection de securite.
+       Correctif : BusyEdge(CLK := ... AND NOT Lifecycle.Busy) fige la reference de manoeuvre.
+       ⚠️ Le front d'armement reste preserve : Lifecycle.Busy est pose plus bas dans le meme scan. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 15.0;
+    Config.CoherenceLimitM := 1.0;
+    Config.CloseAnticipationM := 1.2;
+    Config.OpenAnticipationM := 1.3;
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := FALSE;
+
+    (* Scan 1-2 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       M1SlipToleranceM := 1.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       M1SlipToleranceM := 1.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState);
+
+    (* Scan 3 : armement fermeture — M1RefPosM capture a 0.0 *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
        CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
-       CablePosM1 := 0.0, CablePosM2 := 1.0,
-       HomedM1 := TRUE, HomedM2 := TRUE,
+       M1SlipToleranceM := 1.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 7.0,
        Config := Config, BucketState := BucketState);
-    ASSERT_TRUE(FB.Lifecycle.Busy, 'Fermeture en cours au-dessus du depart');
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'D6 fermeture engagee -> Busy');
 
-    (* Scan 4 : inversion de sens (recul) -> M2 pilote en descente.
-       ⚠️ Le harnais STruCpp conserve les entrees non passees entre deux appels : ReqAscent
-       doit etre explicitement relache, sinon MotionRequestConflict neutralise la demande. *)
+    (* Scan 4 : PAUSE operateur, derive M1 = 0.8 m (< tolerance 1.0) -> aucun faux defaut *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := FALSE,
+       M1SlipToleranceM := 1.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.8, CablePosM2 := 7.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_FALSE(FB.M1SlipDetected, 'D6 derive 0.8 m < 1.0 -> pas de faux defaut');
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'D6 pause -> manoeuvre encore engagee');
+
+    (* Scan 5 : REPOMPAGE du joystick a position constante -> NE DOIT PAS re-baseliner la reference *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       M1SlipToleranceM := 1.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.8, CablePosM2 := 7.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_FALSE(FB.M1SlipDetected, 'D6 repompage -> derive 0.8 m toujours sous le seuil');
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'D6 repompage -> manoeuvre toujours engagee');
+
+    (* Scan 6 : derive CUMULEE 1.6 m depuis le vrai depart de manoeuvre -> DETECTION ATTENDUE.
+       ⛔ AVANT CORRECTIF ce test etait ROUGE : le repompage du scan 5 avait recapture M1RefPosM a
+       0.8, donc ABS(1.6 - 0.8) = 0.8 <= 1.0 et le glissement restait invisible. *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := FALSE,
+       M1SlipToleranceM := 1.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 1.6, CablePosM2 := 7.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.M1SlipDetected, 'D6 derive cumulee 1.6 m -> M1SlipDetected (reference NON recapturee)');
+    ASSERT_TRUE(FB.Fault.Error, 'D6 glissement M1 -> Error (cause 3)');
+END_TEST
+
+TEST 'TC-P10-T346-N1 Limite de recul : frontiere PHYSIQUE, relache, pas de re-armement (D1)'
+    (* T346 D1 : l'ancienne borne recapturait sa reference a chaque front de joystick et se re-armait
+       au scan suivant des +1 increment, d'ou les « coupures parasites ». Ce test verrouille les trois
+       invariants de la nouvelle borne : (a) elle RELACHE quand la benne revient dans la zone,
+       (b) elle NE SE RE-ARME PAS sur un relachement/repompage du joystick (sa reference est PHYSIQUE,
+       donc independante du geste), (c) elle reste observable via TooOpen, deja publie a l'IHM.
+       ⚠️ PIEGE EVITE : ce test ne reste JAMAIS au-dela de la frontiere plus de 10 ms, et revient
+       dedans. Sinon les assertions « recul inhibe » passeraient VERTES pour la MAUVAISE raison —
+       le defaut cause 1 (OffsetMaxViolNow, strict, confirme 500 ms) au lieu de la borne. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 15.0;
+    Config.CoherenceLimitM := 1.0;
+    Config.CloseAnticipationM := 1.2;
+    Config.OpenAnticipationM := 1.3;
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := FALSE;
+
+    (* Scan 1-2 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState);
+
+    (* Scan 3 : fermeture engagee en zone intermediaire *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 7.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'N1 fermeture engagee -> Busy');
+
+    (* Scan 4 : recul a la frontiere exacte (Delta = -1.0) -> confirmation anti-chatter en cours *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
        CmdClose_IHM := TRUE, ReqAscent := FALSE, ReqDescend := TRUE, EffectivePermitBucket_Open := TRUE,
-       CablePosM1 := 0.0, CablePosM2 := 1.0,
-       HomedM1 := TRUE, HomedM2 := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := -1.0,
        Config := Config, BucketState := BucketState);
-    ASSERT_TRUE(FB.M2_ReqDescend, 'Recul -> M2_ReqDescend=TRUE');
-    ASSERT_FALSE(FB.M2_ReqAscent, 'Recul -> M2_ReqAscent=FALSE');
-    ASSERT_TRUE(FB.M2_RunRequest, 'Recul commande');
+    ASSERT_TRUE(FB.M2_ReqDescend, 'N1 frontiere atteinte < CST_BandStableTime -> anti-chatter en cours');
 
-    (* Scan 5 : le recul n'a pas encore atteint M2StartPosM -> pas d arret *)
+    (* Scan 5 : frontiere tenue > CST_BandStableTime -> limite CONFIRMEE *)
+    ADVANCE_TIME(250000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := FALSE, ReqDescend := TRUE, EffectivePermitBucket_Open := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := -1.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_FALSE(FB.M2_ReqDescend, 'N1 frontiere confirmee -> recul inhibe');
+    ASSERT_FALSE(FB.Fault.Error, 'N1 borne -> aucun defaut (la borne n est pas un defaut)');
+
+    (* Scan 6 : retour DANS la zone (Delta = -0.5) -> la limite RELACHE (pas de verrou collant) *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
        CmdClose_IHM := TRUE, ReqAscent := FALSE, ReqDescend := TRUE, EffectivePermitBucket_Open := TRUE,
-       CablePosM1 := 0.0, CablePosM2 := 0.5,
-       HomedM1 := TRUE, HomedM2 := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := -0.5,
        Config := Config, BucketState := BucketState);
-    ASSERT_TRUE(FB.M2_RunRequest, 'Recul avant M2StartPosM -> toujours commande');
+    ASSERT_TRUE(FB.M2_ReqDescend, 'N1 retour dans la zone -> recul de nouveau autorise');
 
-    (* Scan 6 : recul A M2StartPosM (0.0) -> ARRET attendu, jamais au-dela (ECART ESCALADE) *)
+    (* Scan 7 : RELACHEMENT du joystick a la frontiere (la limite se re-arme) *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := FALSE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := -1.0,
+       Config := Config, BucketState := BucketState);
+
+    (* Scan 8 : REPOMPAGE a la frontiere -> la limite NE DOIT PAS avoir bouge (invariant D1).
+       Sous l'ancienne borne, le front recapturait la reference et rendait le recul possible :
+       ce test echouerait. *)
+    ADVANCE_TIME(250000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := FALSE, ReqDescend := TRUE, EffectivePermitBucket_Open := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := -1.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_FALSE(FB.M2_ReqDescend, 'N1 repompage -> recul TOUJOURS inhibe (reference non recapturee)');
+    ASSERT_FALSE(FB.M2_RunRequest, 'N1 repompage -> aucun ordre M2');
+
+    (* Scan 9 : 1 SEUL scan au-dela (Delta = -1.2, 10 ms) -> observabilite IHM, et toujours < 500 ms *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
        CmdClose_IHM := TRUE, ReqAscent := FALSE, ReqDescend := TRUE, EffectivePermitBucket_Open := TRUE,
-       CablePosM1 := 0.0, CablePosM2 := 0.0,
-       HomedM1 := TRUE, HomedM2 := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := -1.2,
        Config := Config, BucketState := BucketState);
-    ASSERT_FALSE(FB.M2_RunRequest, 'Recul a M2StartPosM -> M2_StartStop=FALSE (arret)');
-    ASSERT_FALSE(FB.M2_ReqDescend, 'Recul a M2StartPosM -> plus aucun sens commande');
-    ASSERT_FALSE(FB.Lifecycle.Busy, 'Recul a M2StartPosM -> Busy=FALSE');
-    ASSERT_TRUE(FB.Lifecycle.Done, 'Recul a M2StartPosM -> Done=TRUE');
-
-    (* Recopie etat memorise restaure (WasOpenAtStart=TRUE) *)
     BucketState := FB.BucketState;
-    ASSERT_TRUE(BucketState.IsOpen, 'Recul a M2StartPosM -> IsOpen restaure TRUE');
-    ASSERT_FALSE(BucketState.IsClosed, 'Recul a M2StartPosM -> IsClosed restaure FALSE');
+    ASSERT_TRUE(BucketState.TooOpen, 'N1 au-dela de la frontiere -> TooOpen publie (IHM Idx109)');
+    ASSERT_FALSE(FB.Fault.Error, 'N1 10 ms au-dela -> defaut cause 1 NON latche (< 500 ms)');
+
+    (* Scan 10 : retour dans la zone -> aucune traîne *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := FALSE, ReqDescend := TRUE, EffectivePermitBucket_Open := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := -0.5,
+       Config := Config, BucketState := BucketState);
+    ASSERT_FALSE(FB.Fault.Error, 'N1 retour dans la zone -> aucun defaut accumule');
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'N1 manoeuvre toujours engagee (Lifecycle intact)');
 END_TEST
 
 TEST 'TC-P10-030 ConfirmOpen/ClosePosition reference la benne : MAINT_N2 seul, etat publie par la mesure'

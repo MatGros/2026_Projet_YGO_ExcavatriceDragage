@@ -1,0 +1,230 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T346 « borne de recul FB_Bucket »
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# Diagnostic source : DOC/WFLOW/AUDITS/DESIGN/DIAGNOSTIC_T346_BORNE_RECUL_2026-09-20.md
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T346_BORNE_RECUL
+  criticality: C1
+  strategy: patch
+
+  objective: >
+    Sous une commande de fermeture (ou d'ouverture) engagee, un recul M2 (ReqDescend en
+    fermeture, ReqAscent en ouverture) reste borne par une limite de recul deterministe et
+    insensible au relachement/repompage du joystick, au lieu de ne s'arreter que sur la cible
+    finale ou sur le defaut machine de timeout 60 s.
+
+  acceptance:
+    - id: AC1
+      statement: "Sous fermeture engagee, un recul commande s'arrete a la limite de recul retenue : M2_RunRequest revient a FALSE, plus aucun sens n'est commande."
+      verified_by: "TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st — bloc TC-P10-029.1 (assertions d'arret, scans 5 et 6), ROUGE avant correctif et VERT apres"
+    - id: AC2
+      statement: "Un relachement puis repompage du joystick en pleine manoeuvre ne deplace pas la limite de recul : aucun arret parasite n'est declenche par ce geste."
+      verified_by: "Test CI neuf : scans successifs avec MotionRequestActive FALSE puis TRUE a position constante, assertion M2_RunRequest reste TRUE et Lifecycle.Busy reste TRUE ; le test doit echouer si la reference de recul est recapturee a chaque front"
+    - id: AC3
+      statement: "Un bagotement de mesure de faible amplitude autour de la limite de recul ne coupe pas la commande."
+      verified_by: "Test CI neuf : position oscillant de part et d'autre de la limite dans la bande de tolerance, assertion M2_RunRequest reste TRUE ; le test doit echouer si la comparaison redevient une egalite stricte sans marge"
+    - id: AC4
+      statement: "La sortie de borne suit le comportement arbitre par l'humain (reprise au joystick, ou fin de manoeuvre propre avec BucketState intact) et laisse la machine reprenable selon ce choix."
+      verified_by: "Test CI neuf dedie au comportement arbitre ; il doit echouer quand on inverse ce choix dans le code"
+    - id: AC5
+      statement: "L'activation de la limite de recul ne modifie ni BucketState.IsOpen ni BucketState.IsClosed."
+      verified_by: "Test CI neuf : capture de BucketState avant/apres l'activation de la limite, assertion d'egalite des deux champs, l'etat benne restant celui classe sur la mesure"
+    - id: AC6
+      statement: "La limite de recul n'inhibe jamais le sens allant vers la cible : fermeture et ouverture nominales atteignent OffsetCloseM et OffsetOpenM."
+      verified_by: "Suite CI FB_Bucket complete : TC-P10-023, TC-P10-024, T196-001, T196-002, T262-001 et TC-P10-046.x restent verts apres correctif"
+    - id: AC7
+      statement: "La limite de recul est symetrique : elle est active en fermeture et en ouverture, avec la meme semantique dans les deux sens."
+      verified_by: "Deux tests CI neufs symetriques, un par sens, chacun echouant si la branche de l'autre sens est retiree"
+    - id: AC8
+      statement: "Les variables locales de FB_Bucket.st declarees pour l'ancienne borne ne restent plus a moitie mortes : chacune est soit reellement lue, soit supprimee."
+      verified_by: "Recherche des identifiants dans CODE/ : LeftStartSinceArm, M2StartPosM, WasOpenAtStart, WasClosedAtStart, BandLatchConcord, StateOffsetM ; plus aucune occurrence n'est ecrite sans etre lue"
+    - id: AC9
+      statement: "Un garde-fou automatique refuse toute variable locale ecrite et jamais lue dans le perimetre qu'il declare, et son auto-test rejette des mutations injectees."
+      verified_by: "TOOLS/AGENT_WORKFLOW/scripts/G514_check_dead_local_variable.py --selftest PASS (forme reelle de FB_Bucket.st : 5 variables sur 6 detectees, M2StartPosM correctement non signalee car il s'agit d'une chaine morte) ; branchement dans PLANS de run_all_gates.py en attente des arbitrages Q4 et de la liberation du fichier par T339"
+    - id: AC10
+      statement: "La fiche FB_Bucket_v1.0.md ne presente plus la perte de la borne de recul comme un ecart ouvert, et TC-P10-029.1 n'est plus decrit comme rouge."
+      verified_by: "Lecture de DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md : alerte 5 du paragraphe 8 close, mentions des etapes TC-P10-029 et etat BUSY realignees"
+    - id: AC11
+      statement: "Le bundle PLCopenXML est regenere, la liaison est verifiee et les gates applicables passent sans nouvel echec."
+      verified_by: "generate_codesys_bundle.py, generate_codesys_diff_bundle.py, G200_check_linkage.py avec report, run_all_gates.py en palier C"
+    - id: AC12
+      statement: "Un relachement puis repompage du joystick en pleine manoeuvre ne recapture plus la reference de M1, donc un glissement reel de M1 pendant la manoeuvre declenche M1SlipDetected puis la cause 3 meme si l'operateur pompe le joystick."
+      verified_by: "Test CI neuf N2 (derive de CablePosM1 superieure a M1SlipToleranceM avec pompage intercale) ; il doit echouer si la clause NOT Lifecycle.Busy est retiree du CLK de BusyEdge"
+    - id: AC13
+      statement: "M1RefPosM est conservee car elle est reellement lue, et les six autres variables locales mortes de FB_Bucket.st sont purgees."
+      verified_by: "Recherche des sept identifiants dans CODE/ : M1RefPosM doit rester lue par la detection de glissement, les six autres ne doivent plus apparaitre"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/reports/
+      - TOOLS/AGENT_WORKFLOW/scripts/G514_check_dead_local_variable.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T346_BORNE_RECUL.yaml
+      - DOC/WFLOW/AUDITS/DESIGN/DIAGNOSTIC_T346_BORNE_RECUL_2026-09-20.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/CODE_DiffBundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+
+  interdits_de_fond:
+    - "Aucune nouvelle constante ni aucun champ de configuration pour la marge de recul : reutiliser une valeur deja documentee, ou demander."
+    - "Aucune reinjection du code retire par le commit 2a307b5b tel quel : c'est exactement le defaut que la tache doit ne pas reproduire."
+    - "Aucune desactivation, suppression ou affaiblissement d'un test ou d'une assertion existante."
+    - "Aucune modification de CfgTimeoutDuration, de ses defauts, ni du latch de la cause 2."
+
+  conservation:
+    must_survive:
+      - "Arret nominal de fermeture sur CablePosM1 + OffsetCloseM - CloseAnticipationM et d'ouverture sur CablePosM1 + OffsetOpenM + OpenAnticipationM"
+      - "Branche AX10B HoldAscentP1AfterClose, qui force M2_ReqDescend a FALSE et ne commande que la montee"
+      - "Watchdog de commande engagee CfgTimeoutDuration a 60 s, avec cumul suspendu hors engagement et latch de la cause 2"
+      - "Classement continu de BucketState.IsOpen et IsClosed sur la mesure, sans latch par la confirmation"
+      - "Permis de securite EffectivePermitBucket_Close et EffectivePermitBucket_Open comme seule condition de sortie d'ordre M2"
+      - "Anti-traversee des demandes IHM a l'entree, sous NOT Lifecycle.Busy et NOT M1_Busy et NOT M2_Busy"
+    dropped_on_purpose:
+      - "Restons en attente d'arbitrage : la reference de recul ancree sur la position de depart M2StartPosM n'est pas retenue a priori, car elle depend du geste operateur. Voir arbitrages_ouverts Q1."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+    - ci_report_avant_apres
+
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug preexistant, risque hors
+    scope) est remonte IMMEDIATEMENT a l'orchestrateur, pas a la fin et jamais silencieusement.
+    Signaler n'est pas elargir le scope. Cas deja remontes par T346 : (1) le brief affirme a tort
+    qu'il n'y a pas de collision d'ecriture, alors que le verrou T339/DSH11 detient
+    test_fb_bucket.st avec des modifications non commitees ; (2) le verrou T295/DSH08 est
+    formellement pose sur FB_Bucket.st alors que son lot est commite et revu ;
+    (3) deux variables mortes supplementaires existent dans FB_Bucket.st hors perimetre du
+    commit 2a307b5b : BandLatchConcord et StateOffsetM, cette derniere decrite comme reference
+    d'un filet de securite disparu.
+
+  # ── Arbitrages ouverts — BLOQUANTS avant toute ecriture de code ─────────────
+  arbitrages_ouverts:
+    Q1_ancrage:
+      question: >
+        Sur quoi ancrer la limite de recul : la position de depart de manoeuvre, ou la frontiere
+        reelle de l'etat oppose ?
+      options: >
+        (a) M2StartPosM plus ou moins une marge, comme l'ancien code ; (b) frontiere reelle de
+        l'etat oppose, formule OffsetOpenM plus CoherenceLimitM en fermeture et OffsetCloseM
+        moins CoherenceLimitM en ouverture, comme PRG_04_Treuils_Benne.st lignes 774 a 788.
+      recommandation: >
+        (b) : supprime par construction la dependance au geste operateur qui est la cause dominante
+        des coupures parasites, n'invente aucun chiffre nouveau et suit la doctrine projet ecrite
+        au fichier PRG_04 lignes 761 a 766.
+      reserve: >
+        En valeurs de production OffsetOpenM vaut 0.0 et CoherenceLimitM vaut 1.0 : une fermeture
+        engagee dans la bande ouverte serait immediatement a la limite, ce qui change le
+        comportement observable et impacte TC-P10-029, aujourd'hui vert avec CoherenceLimitM a 5.0.
+
+    Q2_comportement_a_la_limite:
+      question: Que fait le FB quand la limite de recul est atteinte ?
+      options: >
+        (A) coupe M2 et laisse CloseReq ou OpenReq arme, reprise des que l'operateur repousse vers
+        la cible ; (B) coupe et pose Lifecycle.Done sans toucher BucketState, reprise par nouvel
+        appui IHM ; (C) coupe et diagnostic nomme.
+      recommandation: "(A), geste continu sans verrou, coherent avec une commande manuelle continue."
+      contrainte_verifiee: >
+        Tout slot instCauses alimente FB_FaultCore et aboutit a SevereError et a un Reset. Un simple
+        signalement exige une VAR_OUTPUT dediee, sur le modele de M2_BucketJogLimit.
+
+    Q3_collision_test:
+      question: Comment traiter la collision d'ecriture sur test_fb_bucket.st avec T339/DSH11 ?
+      options: >
+        attendre la cloture de T339, ou autoriser T346 a n'editer que le bloc TC-P10-029.1 en
+        cohabitation.
+
+    Q4_perimetre_garde_fou:
+      question: >
+        Le garde-fou variable locale ecrite et jamais lue doit-il etre bloquant sur tout CODE/ ?
+      constat: >
+        Une mesure sur les 261 fichiers .st de CODE/ remonte environ 70 occurrences candidates
+        dans une dizaine de fichiers, dont beaucoup sont des faux positifs car une VAR locale de
+        PROGRAM est lisible de l'exterieur, par exemple PRG_02_Acquisition.st ligne 285 lit
+        PRG_06_Outputs.M1RelayFwd. Un garde-fou bloquant sur tout CODE/ serait donc rouge sur des
+        sites hors perimetre T346.
+      options: >
+        perimetre limite aux fichiers du lot, ou detection des references croisees, ou garde-fou
+        non bloquant en avertissement.
+      note: >
+        Une exemption ou une allowlist n'est pas une decision d'agent : le choix revient a
+        l'orchestrateur.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "DSH13 (deepseek-v4.1-flash:cloud)"
+  completed_at: "2026-09-20T23:58:00+02:00"
+  status: COMPLETED
+  summary: >
+    LOT LIVRE, NON COMMITE. Phase 1 diagnostic (6 defauts D1 a D6 prouves fichier:ligne sur la version
+    reelle d'avant le commit 2a307b5b) puis phase 2 implementation apres arbitrage humain du
+    2026-09-20 (Q1 = frontiere physique, Q2 = option A reprise au joystick, Q3 resolu par le commit
+    T339 83a24ef4, Q4 = gate bloquante limitee au perimetre du lot).
+    (1) CORRECTIF SECURITE : BusyEdge recoit la clause NOT Lifecycle.Busy. Elle ferme D6 (defaut de
+    detection de glissement M1, absent du brief initial : M1RefPosM etait recapturee a chaque front de
+    joystick, ce qui decoupait la derive en tranches sous la tolerance) et supprime la recapture des
+    temoins de l'ancienne borne (D1). Le front d'armement reste preserve car Lifecycle.Busy est pose
+    plus bas dans le meme scan.
+    (2) BORNE DE RECUL : reconstruction sur la frontiere PHYSIQUE de la benne, formule
+    Delta <= OffsetOpenM - CoherenceLimitM en fermeture et Delta >= OffsetCloseM + CoherenceLimitM en
+    ouverture, gatee par ClassCanRun, confirmee par CST_BandStableTime (temporisation anti-chatter deja
+    en place), DIRECTIONNELLE (seule la direction de recul est inhibee). Zero constante nouvelle : la
+    frontiere est la meme que TooOpen/TooClosed, MinAllowedOffset et la cause 1. Elle EMPECHE un defaut
+    deja defini (cause 1, latchee 500 ms apres franchissement) au lieu d'en creer un. CloseReq/OpenReq,
+    Lifecycle et BucketState ne sont pas touches : reprise au joystick sans reappui IHM, aucun etat
+    falsifie. Aucune sortie nouvelle : l'observabilite passe par TooOpen/TooClosed, deja publies a l'IHM.
+    (3) PURGE : 6 variables locales mortes retirees (LeftStartSinceArm, M2StartPosM, WasOpenAtStart,
+    WasClosedAtStart, BandLatchConcord, StateOffsetM). M1RefPosM est CONSERVEE (elle est lue par la
+    detection de glissement).
+    (4) TESTS : TC-P10-029.1 reecrit (le rouge historique passe au vert ; les assertions de
+    restauration d'etat, qui violaient D5, sont remplacees par une preuve de classement sur la mesure) ;
+    2 tests neufs TC-P10-T346-N1 (frontiere, relache, non-rearmement) et TC-P10-T346-N2 (glissement M1
+    cumule). CI FB_Bucket 38/38 PASS, contre 35/36 avant (seul rouge : TC-P10-029.1).
+    (5) MUTATION TESTS : retirer la clause NOT Lifecycle.Busy rend N2 ROUGE ; desactiver la borne rend
+    029.1 ET N1 ROUGES. Les tests ne sont donc pas vacues.
+    (6) GARDE-FOU : G514_check_dead_local_variable.py (regle A variable locale ecrite et jamais lue,
+    regle B lecture croisee <POU>.<Variable> pour les PROGRAM sans laquelle ~50 faux positifs),
+    --selftest PASS sur 6 cas, branche dans PLANS palier C en portee limitee aux fichiers du lot.
+  evidence_submitted:
+    - "Diagnostic : DOC/WFLOW/AUDITS/DESIGN/DIAGNOSTIC_T346_BORNE_RECUL_2026-09-20.md (6 defauts prouves)"
+    - "Plan : DOC/WFLOW/CONTRACTS/PLAN_T346_BORNE_RECUL.md"
+    - "Dossier de test : DOC/WFLOW/CONTRACTS/TESTPLAN_T346_BORNE_RECUL.md"
+    - "CI FB_Bucket : 38/38 PASS (avant : 35/36, seul rouge TC-P10-029.1)"
+    - "Mutations : N2 ROUGE sans NOT Lifecycle.Busy ; 029.1 et N1 ROUGES borne desactivee"
+    - "Bundle : 260/260 objets, 0 erreur, frais (G390 PASS) + diff bundle FB_Bucket"
+    - "G200 --report : PASS, 0 erreur, 136 OK / 0 KO, 2029 instances"
+    - "Gates palier C : 5 echecs, IDENTIQUES aux dettes preexistantes G300/G340/G408/G430/G483 ; G514 PASS ; groupe G500 13/13"
+    - "G514 --selftest : PASS (5 des 6 variables de FB_Bucket detectees, M2StartPosM correctement non signalee)"
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    En attente de la relecture du git diff par l'humain puis d'un accord de commit EXPLICITE et DISTINCT
+    du GO d'implementation. POINT D'ATTENTION signale : le diff du depot contient des fichiers que le lot
+    T346 n'a PAS ecrits (CODE/GVL_PERSISTENT.st, CODE/J_SUPERVISION/_TYPES/.../ST_CycleCfg.st,
+    CODE/M_MAIN/PRG_02_Acquisition.st, plusieurs CODE_XML/*.xml et rapports CI) : ce sont des travaux de
+    lots tiers non commites, presents avant l'intervention T346. La regeneration du bundle (etape
+    obligatoire par lot) les a mecaniquement traverses. Relecture humaine requise avant tout commit.
