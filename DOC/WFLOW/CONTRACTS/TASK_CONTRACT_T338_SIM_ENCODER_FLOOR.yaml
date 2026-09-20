@@ -1,0 +1,145 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T338 Phase 2 (Option 1) — Plancher de comptage FB_Sim_Encoder
+# ═══════════════════════════════════════════════════════════════════════════
+# Origine : diagnostic T338 (DOC/WFLOW/TROUBLESHOOTING/TROUBLESHOOTING_T338_PositionM2_Figee_2026-09-20.md)
+#   CR1 — FB_Sim_Encoder.st:128-133 : `ELSE RawPos := 0;` = butee DURE SILENCIEUSE sur un
+#         compteur non signe, en branche descente (et :144-149 en roulis arriere). Une fois a 0,
+#         la position est figee pour toujours en descente, alors que :136 continue de publier la
+#         vitesse PLEINE commandee -> "position figee + vitesse non nulle + ZERO defaut".
+#   GO humain 2026-09-20 (CC01) : corriger le plancher, M1 ET M2 (meme code, faute latente sur M1).
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T338_SIM_ENCODER_FLOOR
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Supprimer la butee silencieuse a 0 du compteur brut du modele codeur simule (FB_Sim_Encoder) :
+    le comptage devient un compteur SIGNE 32 bits continu, qui franchit 0 sans jamais s'y figer en
+    descente, et dont la seule borne restante (plage de representation) est explicitement signalee
+    par une sortie de saturation au lieu d'etre un zero muet. Effet machine attendu : le banc ne peut
+    plus produire une position figee alors qu'une vitesse non nulle est publiee — la chaine M2 cesse
+    de se verrouiller et de fabriquer une reference de homing aberrante (saut de 204,677 m).
+
+  acceptance:
+    - id: AC1
+      statement: "Depuis un comptage brut a 0 avec RelayRev actif, un scan produit un comptage STRICTEMENT inferieur a 0 (jamais 0 maintenu) : la position ne peut plus rester figee a 0 en descente."
+      verified_by: "test CI TC-P13-036 dans TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_encoder.st + python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Sim_Encoder"
+    - id: AC2
+      statement: "Le comptage est bidirectionnel et continu : N scans de descente au palier 1 depuis 1000 donnent exactement 1000 - N*40 points, y compris pour un resultat negatif (aucune borne intermediaire) ; une montee ulterieure ramene le comptage vers 0 puis au-dessus, sans saut."
+      verified_by: "test CI TC-P13-032 (revise) et TC-P13-038, valeurs calculees : Increment = 1,0 m/s x 4096 pts/m x 0,010 s = 40 pts/scan"
+    - id: AC3
+      statement: "La seule borne restante est explicite : au franchissement de +/-CST_CountTravelLimitPts, RawPosOut est borne a la limite ET CountSaturated passe a TRUE dans le MEME scan ; aucun rebouclage UDINT silencieux n'est possible."
+      verified_by: "test CI TC-P13-037 : comptage force a 2147483647 puis un scan de montee -> CountSaturated = TRUE et RawPosOut = 1073741824"
+    - id: AC4
+      statement: "En saturation de comptage, le modele ne publie plus de vitesse incoherente : RawSpdOut vaut 0 au scan de saturation (position bornee et vitesse nulle sont coherentes)."
+      verified_by: "test CI TC-P13-037, assertion sur fb.RawSpdOut"
+    - id: AC5
+      statement: "Aucune regression sur les comportements conserves du modele : montee, latence et chargement du preset, roulis inertiel (CoastDistanceM), echelle de vitesse par palier, retour vitesse 1er ordre (SpeedReportTauS) et persistance VAR_IN_OUT du comptage."
+      verified_by: "rapport CI FB_Sim_Encoder 100% PASS, avec TC-P13-001, TC-P13-002, TC-P13-034, TC-P13-035 inchanges et verts ; comparatif avant/apres du rapport"
+    - id: AC6
+      statement: "L'exigence contredite est retiree de la specification composant : TC-P13-032 ('RawPos ne descend jamais sous 0') est remplace par le franchissement continu de 0 + saturation signalee, dans une version v1.1 ; le cartouche du code ST et la registry CI pointent la nouvelle version."
+      verified_by: "DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md + python TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py + grep du cartouche FB_Sim_Encoder.st et de registry.yaml"
+    - id: AC7
+      statement: "Le bug est garde : un gate statique echoue si un compteur de modele de simulation est ramene a un litteral (butee silencieuse) sans marqueur de saturation, et son --selftest rejette une mutation du code surveille."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G510_check_sim_silent_floor.py --selftest + ligne PLANS dans run_all_gates.py (palier C)"
+    - id: AC8
+      statement: "La liaison logique est prouvee : instSimEncoderM1/M2 sont declarees et appelees dans FB_SimBench, et le comptage publie atteint Winch.COD1/COS2_PosValue sans double declaration."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report (bloc colle en restitution) + bundle PLCopenXML frais"
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_Sim_Encoder.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_encoder.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G510_check_sim_silent_floor.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md
+      - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+      - DOC/WFLOW/TROUBLESHOOTING/TROUBLESHOOTING_T338_PositionM2_Figee_2026-09-20.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+    forbidden:
+      - CODE/E_CODEURS/FB_Encoder.st
+      - CODE/E_CODEURS/FB_Encoder_Homing.st
+      - CODE/E_CODEURS/FB_Encoder_Abs.st
+      - CODE/E_CODEURS/FB_Encoder_Scale.st
+      - CODE/E_CODEURS/FB_Encoder_Safety.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/WFLOW/CONTRACTS/T314_SIMBENCH_PARITY.yaml
+
+  conservation:
+    must_survive:
+      - "Comptage brut en VAR_IN_OUT (reference _SimEncoderRawPosM1/M2 de GVL_PERSISTENT) : survie au reset froid, aucun champ interne ajoute"
+      - "Latence de referencement PresetLatencyCycles : position conservee et vitesse nulle pendant l'attente, puis chargement de PresetValue"
+      - "Roulis inertiel CoastDistanceM (vitesse palier 1 dans le dernier sens apres coupure des relais) et sa dispersion pseudo-aleatoire cote M2"
+      - "Echelle de vitesse par palier (MinSpeedMps palier 1 -> MaxSpeedMps palier 5) et facteur SpeedScaleFactor"
+      - "Retour vitesse rapporte 1er ordre SpeedReportTauS (0,0 = saut instantane) et formule CoE 0,1 RPM de RawSpdOut"
+      - "Injection de test TestOffsetCmd/TestOffsetPts (vrai saut de position pour l'essai Meca E)"
+      - "Interface d'entree inchangee : aucune VAR_INPUT ajoutee ni renommee (aucun impact sur FB_SimBench, verrouille)"
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+    - ci_domain_report
+    - selftest_guard
+
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Tout ecart constate en cours de route (spec contredite, comportement voisin du meme defaut,
+    fichier hors perimetre, conflit de verrou) est remonte IMMEDIATEMENT, pas a la fin et jamais
+    silencieusement. Signaler n'est pas elargir le scope : CR2 (re-injection silencieuse
+    RawPosM2 = 0 -> 1100000 dans FB_SimBench.st:273-280, verrou DSH03) et l'inhibition AG2 du
+    garde-fou d'absence de mouvement restent HORS de ce lot et sont remontes separement.
+
+status: COMPLETED
+
+execution:
+  executed_by: "DSH10 (deepseek-v4.1-flash:cloud)"
+  completed_at: "2026-09-20T20:35:00+02:00"
+  status: COMPLETED
+  summary: >
+    Plancher silencieux supprime dans FB_Sim_Encoder.st : comptage brut traite en entier SIGNE 32 bits
+    (idiome DINT_TO_UDINT(UDINT_TO_DINT(...))), franchissement de 0 sans figement en descente comme en
+    montee et en roulis inertiel ; seule borne restante = garde de plage +/-CST_CountTravelLimitPts
+    (2^30 pts) avec sortie CountSaturated (saturation signalee au meme scan + vitesse de mouvement
+    purgee), remise a FALSE hors Enable. Une seule correction de code couvre M1 ET M2 (meme FB, deux
+    instances instSimEncoderM1/M2). Q3 tranchee par l'agent : conteneur UDINT CONSERVE (semantique
+    signee deja appliquee par toute la chaine aval via UDINT_TO_DINT) -> aucune VAR_INPUT modifiee,
+    aucun impact sur FB_SimBench (verrouille). Spec composant v1.1 (TC-P13-032 remplace, TC-P13-036/037/038
+    ajoutes, TC-P13-031 passe NV -> V-I) + chapo AF-13 + registry.yaml alignes. Garde-fou
+    G510_check_sim_silent_floor.py (--selftest rejetant la mutation d'incident) branche palier C.
+    CR2 (re-injection silencieuse FB_SimBench.st:273-280, verrou DSH03) et AG1/AG2/AG3 restent HORS LOT.
+  evidence_submitted:
+    - "CI FB_Sim_Encoder : 9/9 PASS, 0 FAIL (run_tests.py --fb FB_Sim_Encoder)"
+    - "G510 --selftest : PASS (mutation d'incident re-injectee dans le fichier reel -> detectee)"
+    - "G510 sur depot : PASS"
+    - "G200_check_linkage.py --report : PASS (135 OK / 0 KO, 2006 instances)"
+    - "run_all_gates.py --palier C : 41/46 PASS, 5 FAIL = dettes pre-existantes uniquement (G300/G340/G408/G430/G483), G510 PASS"
+    - "Bundle CODE_XML/CODE_Bundle.xml frais (G390 PASS) + CODE_XML/CODE_DiffBundle.xml (FB_Sim_Encoder)"
+    - "check_task_contract.py : PASS 0 erreur / 0 avertissement"
+
+validation:
+  status: PENDING
+  validated_by: "CC01 (orchestrateur) / HUM"
+  validated_at: "PENDING"
+  notes: >
+    Correctif en attente de recette humaine : integration CODESYS manuelle par l'humain + essai banc
+    (M2 sous commande de descente : position qui evolue avec la vitesse, plus de blocage definitif a
+    0, CountSaturated FALSE en usage reel). CR2 reste ouvert : sans lui, le SAUT post-AU (symptome 2)
+    peut se reproduire. Aucun commit.

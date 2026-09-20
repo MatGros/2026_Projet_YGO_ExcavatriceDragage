@@ -2,6 +2,7 @@
    🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   📄 Spec composant : DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md
    🧩 Brique réduite (Partie3 §1bis, "briques E/S & diagnostics") : pas de contrat
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
@@ -17,6 +18,10 @@
       réelle telle que définie par MinSpeedMps/MaxSpeedMps/PointsPerRev/CableM_PerRev/CycleTimeS.
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
+   🔒 Comptage brut : entier SIGNÉ 32 bits (le conteneur UDINT n'est qu'un support d'échange,
+      relu en DINT par toute la chaîne aval). Il franchit 0 sans jamais s'y figer ; la seule
+      borne est la plage de représentation, signalée par CountSaturated — jamais muette.
+   📤 CountSaturated : comptage en butée de plage du modèle (saturation signalée, vitesse purgée)
    `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
       (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
       `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB. Un vrai codeur absolu physique
@@ -53,6 +58,7 @@ END_VAR
 VAR_OUTPUT
     RawPosOut   : UDINT;   (* <-- [DIAG] Position brute simulée *)
     RawSpdOut   : DINT;    (* <-- [DIAG] Vitesse brute simulée (0x6031:01 en 0.1 RPM) *)
+    CountSaturated : BOOL; (* <-- [DIAG] Comptage en butée de plage du modèle (saturation signalée) *)
 END_VAR
 VAR_IN_OUT
     RawPos      : UDINT;   (* <-> [BUS] Référence _SimEncoderRawPosM1/M2 (survit au reset froid) *)
@@ -71,12 +77,21 @@ VAR
     TargetSpeedMps   : REAL;             (* . [LOC] Vitesse instantanee signee du modele position, avant filtrage retour *)
     ReportedSpeedMps : REAL;             (* . [LOC] Vitesse rapportee filtree 1er ordre, publiee dans RawSpdOut *)
 END_VAR
+VAR CONSTANT
+    // 🛑 Plage de comptage du modèle : le compteur brut est un entier SIGNÉ 32 bits (le conteneur
+    // UDINT n'est qu'un support d'échange, relu en DINT par toute la chaîne aval). La garde reste
+    // volontairement à la moitié de la plage signée (2^30 pts = 262 144 m de câble) : inatteignable
+    // en essai, elle interdit tout rebouclage silencieux si le modèle consommait toute sa plage.
+    CST_CountTravelLimitPts : DINT := 1073741824; // 2^30 pts — demi-plage signée
+END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
 
 {region "§1 Gate"}
 IF NOT Enable THEN
     RawPosOut := RawPos;
+    // Comptage non evalue hors simulation : la saturation ne doit pas rester figee a TRUE.
+    CountSaturated := FALSE;
     RETURN;
 END_IF;
 {endregion}
@@ -109,7 +124,13 @@ IF PresetEdge.Q THEN
     PresetCount := PresetLatencyCycles;
 END_IF;
 
-// Pendant l'attente, la position brute est conservee (le codeur n'a pas encore re-reference).
+// 📐 Le comptage brut est un entier SIGNÉ 32 bits : le conteneur UDINT n'est qu'un support
+// d'échange (toute la chaîne aval le relit via UDINT_TO_DINT : FB_Encoder_Scale, FB_Encoder_Homing).
+// Sa valeur 0 n'est donc PAS une butée mécanique — c'est un point de passage comme un autre, et
+// c'est la seule façon de rester fidèle à un codeur absolu, dont le zéro de comptage est arbitraire.
+// Aucune branche de comptage ne borne donc à un littéral : seule la garde de plage §3bis intervient,
+// et elle est signalée (CountSaturated).
+// Pendant l'attente du preset, la position brute est conservee (le codeur n'a pas encore re-reference).
 // Le mouvement est gelé pendant la latence, comme un codeur réel en cours de referencement.
 IF PresetPending THEN
     IF PresetCount > 0 THEN
@@ -121,16 +142,12 @@ IF PresetPending THEN
     END_IF;
     TargetSpeedMps := 0.0;
 ELSIF RelayFwd THEN
-    RawPos := RawPos + Increment;
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(Increment));
     MovingDir := 1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
     TargetSpeedMps := SpeedMps;
 ELSIF RelayRev THEN
-    IF RawPos >= Increment THEN
-        RawPos := RawPos - Increment;
-    ELSE
-        RawPos := 0;
-    END_IF;
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Increment));
     MovingDir := -1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
     TargetSpeedMps := -SpeedMps;
@@ -139,14 +156,11 @@ ELSE
     // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
     IF (CoastPtsLeft >= 1.0) AND (MovingDir <> 0) THEN
         IF MovingDir = 1 THEN
-            RawPos := RawPos + IncrStep1;
+            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(IncrStep1));
             TargetSpeedMps := MinSpeedMps;
-        ELSIF RawPos >= IncrStep1 THEN
-            RawPos := RawPos - IncrStep1;
-            TargetSpeedMps := -MinSpeedMps;
         ELSE
-            RawPos := 0;
-            TargetSpeedMps := 0.0;
+            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(IncrStep1));
+            TargetSpeedMps := -MinSpeedMps;
         END_IF;
         CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
     ELSE
@@ -154,6 +168,23 @@ ELSE
         CoastPtsLeft := 0.0;
         TargetSpeedMps := 0.0;
     END_IF;
+END_IF;
+{endregion}
+
+{region "§3bis Garde de plage de comptage"}
+// 🛑 SEULE borne du comptage : la plage de représentation signée. Elle est SIGNALÉE
+// (CountSaturated) et cohérente — une position bornée ne publie plus de vitesse de mouvement,
+// ce qui interdit la signature « position figée + vitesse non nulle + zéro défaut ».
+CountSaturated := FALSE;
+IF UDINT_TO_DINT(RawPos) > CST_CountTravelLimitPts THEN
+    RawPos := DINT_TO_UDINT(CST_CountTravelLimitPts);
+    CountSaturated := TRUE;
+ELSIF UDINT_TO_DINT(RawPos) < -CST_CountTravelLimitPts THEN
+    RawPos := DINT_TO_UDINT(-CST_CountTravelLimitPts);
+    CountSaturated := TRUE;
+END_IF;
+IF CountSaturated THEN
+    TargetSpeedMps := 0.0;
 END_IF;
 {endregion}
 
