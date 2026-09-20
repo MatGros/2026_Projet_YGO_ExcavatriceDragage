@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T11:43:28.799811" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T11:43:28.799811">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T22:17:31.156582" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T22:17:31.156582">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -218,20 +218,50 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur de prélèvements (RETAIN, Q3bis)</xhtml>
               </documentation>
             </variable>
-            <variable name="CurrentCycleElapsed">
+            <variable name="SampleCountTotal">
               <type>
-                <TIME />
+                <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée écoulée du cycle en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Inséré volontairement À CÔTÉ de SampleCount (regroupement sémantique des deux compteurs).
+       ST_CycleState est une structure d'ÉCHANGE IHM volatile : elle n'est ni persistée ni
+       mappée par position (aucune occurrence dans GVL_PERSISTENT) — l'ordre des champs y est
+       donc libre, contrairement à ST_CycleCfg/ST_CycleCmd dont les ajouts vont en fin.
+🔒 TOTALISATEUR de prélèvements (PERSISTENT) — LECTURE SEULE : jamais remis à zéro, aucune commande d'écriture</xhtml>
               </documentation>
             </variable>
-            <variable name="LastCycleDuration">
+            <variable name="CurrentCycleElapsed_Min">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée du dernier cycle achevé (figée à X13)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durées de cycle exposées IHM en 2 champs entiers (T347) : minutes illimitées + secondes 0..59.
+       Le type TIME est abandonné côté IHM (affichage panel peu lisible) ; suffixes d'unité NC-030.
+⏱️ Minutes écoulées du cycle en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CurrentCycleElapsed_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Secondes écoulées du cycle en cours (0..59)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Minutes du dernier cycle achevé (figées à X13)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Secondes du dernier cycle achevé (figées à X13, 0..59)</xhtml>
               </documentation>
             </variable>
             <variable name="DrainTimeElapsed_S">

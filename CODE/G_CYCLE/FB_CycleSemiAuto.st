@@ -145,8 +145,10 @@ VAR_OUTPUT
     WaitingForOperator      : BOOL;                 // <-- [STAT] En attente d'une action operateur
     WaitingForProcess       : BOOL;                 // <-- [STAT] En attente d'une condition procede
     RequestActive           : BOOL;                 // <-- [STAT] Demande de mouvement active
-    CurrentCycleElapsed     : TIME;                 // <-- [DIAG] Duree ecoulee du cycle en cours (chronometre sur Lifecycle.Busy)
-    LastCycleDuration       : TIME;                 // <-- [DIAG] Duree du dernier cycle acheve (figee a X13, persiste au cycle suivant)
+    CurrentCycleElapsed_Min : INT;                  // <-- [DIAG] Minutes ecoulees du cycle en cours (chronometre sur Lifecycle.Busy)
+    CurrentCycleElapsed_S   : INT;                  // <-- [DIAG] Secondes ecoulees du cycle en cours (0..59)
+    LastCycleDuration_Min   : INT;                  // <-- [DIAG] Minutes du dernier cycle acheve (figees a X13, persistent au cycle suivant)
+    LastCycleDuration_S     : INT;                  // <-- [DIAG] Secondes du dernier cycle acheve (figees a X13, 0..59)
     DrainTimeRemaining      : TIME;                 // <-- [DIAG] Temps restant en AX13 ; zero hors AX13
     AutoDiveM1Step4M2Step5Active : BOOL;            // <-- [STAT] Profil T291-A actif sur la phase plongee auto
 END_VAR
@@ -229,6 +231,7 @@ VAR
     // === TEMPORISATEURS INTERNES ===
     DrainingTimer           : TON;          // . [LOC] Temporisateur de vidage (egouttage), PT = DrainTimeEff
     CycleRunTimer           : TON;          // . [LOC] Chronometre du cycle en cours (IN = Lifecycle.Busy) ; .ET = duree
+    CycleElapsedTotal_S     : DINT;         // . [LOC] Duree du cycle en cours en secondes entieres (base de la conversion min/sec T347)
     SkipDrainEdge           : R_TRIG;       // . [LOC] Front bouton IHM "passer egouttage"
     DrainTimeEff            : TIME;         // . [LOC] Duree d'egouttage effective (CfgDrainTime bornee au defaut interne)
     StabilizationTimer      : TON;          // . [LOC] Temporisation maximale de remontee lente
@@ -327,9 +330,12 @@ CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 CtrlAscentDistEffM := SEL(CfgCtrlAscentDistanceM <= 0.0, CtrlAscentDistM, CfgCtrlAscentDistanceM);
 
 // ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
-// .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration à l'achèvement (X13).
+// .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration_Min/_S à l'achèvement (X13).
+// Conversion TIME -> minutes/secondes (T347) : troncature à la seconde, aucun arrondi.
 CycleRunTimer(IN := Lifecycle.Busy, PT := T#12h);
-CurrentCycleElapsed := CycleRunTimer.ET;
+CycleElapsedTotal_S := TIME_TO_DINT(CycleRunTimer.ET) / DINT#1000;
+CurrentCycleElapsed_Min := DINT_TO_INT(CycleElapsedTotal_S / DINT#60);
+CurrentCycleElapsed_S   := DINT_TO_INT(CycleElapsedTotal_S MOD DINT#60);
 
 // Durée d'égouttage effective : config IHM si valide, sinon défaut interne.
 DrainTimeEff := SEL(CfgDrainTime <= T#0s, CfgDrainTime, DrainingTime);
@@ -1574,7 +1580,8 @@ CASE State OF
         IF NOT SampleCountDone THEN
             SampleCount := SampleCount + 1;            // JOURNALIER (RAZ IHM/mode auto possible)
             SampleCountTotal := SampleCountTotal + 1;  // TOTALISATEUR : SEULE ecriture de toute l'application (gate G508)
-            LastCycleDuration := CurrentCycleElapsed;   // fige la durée du cycle qui vient de s'achever
+            LastCycleDuration_Min := CurrentCycleElapsed_Min;  // fige la duree du cycle qui vient de s'achever
+            LastCycleDuration_S   := CurrentCycleElapsed_S;
             SampleCountDone := TRUE;
         END_IF;
 

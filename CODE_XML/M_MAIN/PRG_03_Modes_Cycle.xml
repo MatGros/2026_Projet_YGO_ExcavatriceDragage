@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T18:22:01.376841" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T18:22:01.376841">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T22:17:39.418073" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T22:17:39.418073">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -326,6 +326,50 @@ un interlock qu'on ne voit pas est un interlock qu'on contourne.
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>a4e533cc-1a07-5fca-8da6-b652a120d4dd</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_CycleSampleCountResetMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NEVER" value="0" />
+              <value name="ON_FIRST_START" value="1" />
+              <value name="ON_SAFETY_REARM" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NEVER</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut : RAZ manuelle IHM uniquement (comportement historique, aucun changement)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ON_FIRST_START</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">RAZ au premier demarrage de cycle apres mise sous tension de l'automate</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ON_SAFETY_REARM</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">RAZ au rearmement de la chaine AU (contacteur puissance reengage)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ea6305ea-87dc-5770-9254-60521a6d4291</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -1122,20 +1166,36 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart vitesse confirmé pendant timeout</xhtml>
               </documentation>
             </variable>
-            <variable name="CurrentCycleElapsed">
+            <variable name="CurrentCycleElapsed_Min">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée écoulée du cycle SEMI_AUTO en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Minutes écoulées du cycle SEMI_AUTO en cours</xhtml>
               </documentation>
             </variable>
-            <variable name="LastCycleDuration">
+            <variable name="CurrentCycleElapsed_S">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée du dernier cycle SEMI_AUTO achevé (figée à X13)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Secondes écoulées du cycle SEMI_AUTO en cours (0..59)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Minutes du dernier cycle SEMI_AUTO achevé (figées à X13)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Secondes du dernier cycle SEMI_AUTO achevé (figées à X13, 0..59)</xhtml>
               </documentation>
             </variable>
             <variable name="DrainTimeRemaining">
@@ -1746,7 +1806,10 @@ instCycleSemiAuto(
     SpeedMismatchTimeout    := T#0ms,   // Désactivé ; protections FB_WinchSync conservées
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
     M1TopLimitReached       := PRG_04_Treuils_Benne.Data.WinchM1Safety.CableLimitAscent,
-    M2TopLimitReached       := PRG_04_Treuils_Benne.Data.WinchM2Safety.CableLimitAscent,
+    // M1 est la seule autorité nominale de fin de montée AX12.
+    // M2TopLimitReached est neutralisé ici pour le séquenceur : M2 reste protégé par ses sécurités
+    // propres (instSafetyWinchM2.AscentPermit) sans provoquer de fin de montée prématurée en cas d'écart.
+    M2TopLimitReached       := FALSE,
     Translation_At_P1       := PRG_05_Translation.Data.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.Data.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.Data.M3_AtMaintenanceStable,
@@ -1781,7 +1844,17 @@ instCycleSemiAuto(
     CfgCtrlAscentDistanceM  := GVL_IHM.CycleSemiAuto.Cfg.ExtractionControlDistance_M, // Distance controle AX11 depuis AX10
     M1_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber, // palier applique (0..5) : garde palier&lt;&gt;4 en plongee (GT-dive-retry) + cause 8 (palier 5)
     M2_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
-    SampleCount            := _CycleSampleCount
+    // 🔢 Compteurs de prélèvements : journalier (RAZ IHM + mode auto configurable) et
+    // totalisateur (jamais remis à zéro, aucune commande). Même événement d'incrément (AX18, FB).
+    SampleCount            := _CycleSampleCount,
+    SampleCountTotal       := _CycleSampleCountTotal,
+    ResetSampleCountRequest := GVL_IHM.CycleSemiAuto.Cmd.BtnResetSampleCount,
+    CfgSampleCountResetMode := GVL_IHM.CycleSemiAuto.Cfg.SampleCountResetMode,
+    // Réarmement AU : contacteur puissance réengagé après armement de la chaîne (consommé
+    // uniquement si Cfg.SampleCountResetMode = ON_SAFETY_REARM). Lecture directe assumée :
+    // le bus Data de PRG_06 n'expose pas cet état ; le FB le consomme sur front (R_TRIG),
+    // donc un éventuel retard de tâche d'un scan est sans effet.
+    SafetyRearmed          := PRG_06_Outputs.EmergencyDone
 );
 
 {endregion}
@@ -1859,8 +1932,10 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.SpeedMismatchMps       := instCycleSemiAuto.SpeedMismatchMps;
     Data.SequenceState.SpeedMismatchActive    := instCycleSemiAuto.SpeedMismatchActive;
     Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
-    Data.SequenceState.CurrentCycleElapsed    := instCycleSemiAuto.CurrentCycleElapsed;
-    Data.SequenceState.LastCycleDuration      := instCycleSemiAuto.LastCycleDuration;
+    Data.SequenceState.CurrentCycleElapsed_Min := instCycleSemiAuto.CurrentCycleElapsed_Min;
+    Data.SequenceState.CurrentCycleElapsed_S  := instCycleSemiAuto.CurrentCycleElapsed_S;
+    Data.SequenceState.LastCycleDuration_Min  := instCycleSemiAuto.LastCycleDuration_Min;
+    Data.SequenceState.LastCycleDuration_S    := instCycleSemiAuto.LastCycleDuration_S;
     Data.SequenceState.DrainTimeRemaining     := instCycleSemiAuto.DrainTimeRemaining;
     Data.SequenceState.CycleChecksInhibited   := instCycleSemiAuto.CycleChecksInhibited;
     Data.SequenceState.IgnoredCycleCheckId    := instCycleSemiAuto.IgnoredCycleCheckId;
@@ -1958,8 +2033,10 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.SpeedMismatchMps       := 0.0;
     Data.SequenceState.SpeedMismatchActive    := FALSE;
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
-    Data.SequenceState.CurrentCycleElapsed    := T#0s;
-    Data.SequenceState.LastCycleDuration      := T#0s;
+    Data.SequenceState.CurrentCycleElapsed_Min := 0;
+    Data.SequenceState.CurrentCycleElapsed_S  := 0;
+    Data.SequenceState.LastCycleDuration_Min  := 0;
+    Data.SequenceState.LastCycleDuration_S    := 0;
     Data.SequenceState.DrainTimeRemaining     := T#0s;
     Data.SequenceState.CycleChecksInhibited   := FALSE;
     Data.SequenceState.IgnoredCycleCheckId    := 0;
@@ -2032,8 +2109,10 @@ ELSE
     Data.SequenceState.SpeedMismatchMps        := 0.0;
     Data.SequenceState.SpeedMismatchActive     := FALSE;
     Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
-    Data.SequenceState.CurrentCycleElapsed     := T#0s;
-    Data.SequenceState.LastCycleDuration       := T#0s;
+    Data.SequenceState.CurrentCycleElapsed_Min := 0;
+    Data.SequenceState.CurrentCycleElapsed_S   := 0;
+    Data.SequenceState.LastCycleDuration_Min   := 0;
+    Data.SequenceState.LastCycleDuration_S     := 0;
     Data.SequenceState.DrainTimeRemaining      := T#0s;
     Data.SequenceState.CycleChecksInhibited    := FALSE;
     Data.SequenceState.IgnoredCycleCheckId     := 0;
@@ -2637,6 +2716,31 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Essai T291-A : M2 palier 5 en descente auto AX4..AX7, non persistant</xhtml>
               </documentation>
             </variable>
+            <variable name="ResetSampleCountRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMPTEURS DE PRELEVEMENTS ===
+--&gt; [CMD] RAZ IHM du compteur JOURNALIER (front montant conscient)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgSampleCountResetMode">
+              <type>
+                <derived name="E_CycleSampleCountResetMode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Mode de RAZ AUTOMATIQUE du journalier (NEVER par defaut = aucune RAZ auto)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyRearmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine AU rearmee (contacteur puissance reengage) — consomme par ON_SAFETY_REARM uniquement</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -2909,20 +3013,36 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Demande de mouvement active</xhtml>
               </documentation>
             </variable>
-            <variable name="CurrentCycleElapsed">
+            <variable name="CurrentCycleElapsed_Min">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Duree ecoulee du cycle en cours (chronometre sur Lifecycle.Busy)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Minutes ecoulees du cycle en cours (chronometre sur Lifecycle.Busy)</xhtml>
               </documentation>
             </variable>
-            <variable name="LastCycleDuration">
+            <variable name="CurrentCycleElapsed_S">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Duree du dernier cycle acheve (figee a X13, persiste au cycle suivant)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Secondes ecoulees du cycle en cours (0..59)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Minutes du dernier cycle acheve (figees a X13, persistent au cycle suivant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Secondes du dernier cycle acheve (figees a X13, 0..59)</xhtml>
               </documentation>
             </variable>
             <variable name="DrainTimeRemaining">
@@ -2949,7 +3069,15 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTURES PARTAGEES &amp; COMPTEURS ===
-&lt;-&gt; [BUS] Compteur de prelevements (RETAIN)</xhtml>
+&lt;-&gt; [BUS] Compteur JOURNALIER de prelevements (RAZ IHM/mode auto possible)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCountTotal">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] TOTALISATEUR de prelevements — JAMAIS remis a zero, ecrit au seul incrément AX18</xhtml>
               </documentation>
             </variable>
           </inOutVars>
@@ -3017,6 +3145,22 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant CfgForceStepApply</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetSampleCountEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant demande de RAZ IHM du compteur journalier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyRearmedEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant rearmement de la chaine AU</xhtml>
               </documentation>
             </variable>
             <variable name="CycleMotionPermit">
@@ -3092,6 +3236,26 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMPTEUR PRELEVEMENTS (garde de front) ===
 . [LOC] F2: front de comptage SampleCount (1 seul increment par cycle)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DayStartResetDone">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMPTEURS PRELEVEMENTS (RAZ journalier) ===
+. [LOC] Mode ON_FIRST_START : un demarrage de cycle a deja ete vu depuis le boot</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCountAutoResetPulse">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Impulsion interne de RAZ automatique issue du mode configure</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -3418,6 +3582,14 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Chronometre du cycle en cours (IN = Lifecycle.Busy) ; .ET = duree</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleElapsedTotal_S">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Duree du cycle en cours en secondes entieres (base de la conversion min/sec T347)</xhtml>
               </documentation>
             </variable>
             <variable name="SkipDrainEdge">
@@ -3818,6 +3990,8 @@ SkipDrainEdge(CLK := SkipDrainRequest);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 JoyDeflectedEdge(CLK := JoystickDeflected);
+ResetSampleCountEdge(CLK := ResetSampleCountRequest);
+SafetyRearmedEdge(CLK := SafetyRearmed);
 StateExecutionInhibit := FALSE;
 ForceStepAccepted := FALSE;
 ForceStepRejected := FALSE;
@@ -3854,9 +4028,12 @@ CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 CtrlAscentDistEffM := SEL(CfgCtrlAscentDistanceM &lt;= 0.0, CtrlAscentDistM, CfgCtrlAscentDistanceM);
 
 // ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
-// .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration à l'achèvement (X13).
+// .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration_Min/_S à l'achèvement (X13).
+// Conversion TIME -&gt; minutes/secondes (T347) : troncature à la seconde, aucun arrondi.
 CycleRunTimer(IN := Lifecycle.Busy, PT := T#12h);
-CurrentCycleElapsed := CycleRunTimer.ET;
+CycleElapsedTotal_S := TIME_TO_DINT(CycleRunTimer.ET) / DINT#1000;
+CurrentCycleElapsed_Min := DINT_TO_INT(CycleElapsedTotal_S / DINT#60);
+CurrentCycleElapsed_S   := DINT_TO_INT(CycleElapsedTotal_S MOD DINT#60);
 
 // Durée d'égouttage effective : config IHM si valide, sinon défaut interne.
 DrainTimeEff := SEL(CfgDrainTime &lt;= T#0s, CfgDrainTime, DrainingTime);
@@ -4071,6 +4248,51 @@ instFault(Enable := Enable,
           Causes := instCauses);
 Fault := instFault.Fault;
 ErrorEdge(CLK := Fault.Error);
+{endregion}
+
+{region "§1bis Compteurs de prelevements"}
+// 🔢 DEUX compteurs DISTINCTS, incrementes au MEME evenement (depose tremie AX18, 1 fois par
+// cycle, garde de front SampleCountDone) :
+//    - SampleCount      : JOURNALIER — RAZ possible (bouton IHM conscient, ou mode AUTO configurable) ;
+//    - SampleCountTotal : TOTALISATEUR — JAMAIS remis a zero, aucun chemin d'ecriture hors l'increment AX18.
+// Cette region est volontairement AVANT le gate securite/mode (§2) : le compteur est une donnee
+// d'exploitation, pas une commande de mouvement — la RAZ reste donc effective hors SEMI_AUTO
+// (ex. remise a zero par le responsable en MAINT_N1). Aucune commande d'actionneur n'est produite ici.
+SampleCountAutoResetPulse := FALSE;
+
+// (b) ON_FIRST_START — premier demarrage de cycle depuis la mise sous tension de l'automate.
+// ⚠️ L'automate n'embarque AUCUNE horloge calendaire (pas de RTC, pas de bibliotheque temps) :
+//    le proxy "jour" retenu est le boot, valable pour une machine arretee entre deux postes.
+//    Conditions calquees sur la transition AX0-&gt;AX1 (§3) + le gate du FB (§2) : une simple
+//    pression de bouton hors conditions normales ne consomme PAS l'armement.
+// 🔒 Le drapeau "1er demarrage deja vu" est consomme par TOUT demarrage de cycle, QUEL QUE SOIT
+//    le mode en vigueur a cet instant : une bascule de mode en cours de poste n'arme donc
+//    JAMAIS une RAZ differee qui effacerait les comptes deja realises.
+IF Enable AND PowerContactorEngaged AND NOT EncoderFaultPresent AND NOT Fault.Latched
+   AND (State = E_AutoCycleStep.AX0_REPOS)
+   AND (StartEdge.Q OR DeadmanArmedEdge.Q) THEN
+    IF NOT DayStartResetDone THEN
+        DayStartResetDone := TRUE;
+        IF CfgSampleCountResetMode = E_CycleSampleCountResetMode.ON_FIRST_START THEN
+            SampleCountAutoResetPulse := TRUE;
+        END_IF;
+    END_IF;
+END_IF;
+
+// (c) ON_SAFETY_REARM — rearmement de la chaine AU (contacteur puissance reengage).
+IF (CfgSampleCountResetMode = E_CycleSampleCountResetMode.ON_SAFETY_REARM)
+   AND SafetyRearmedEdge.Q THEN
+    SampleCountAutoResetPulse := TRUE;
+END_IF;
+
+// (a) NEVER (defaut) : aucune RAZ automatique — seul le bouton IHM remet le journalier a zero.
+// 🔒 La RAZ ci-dessous n'ecrit QUE SampleCount : le totalisateur n'est jamais dans ce chemin.
+// ⚠️ Ordre intra-scan : cette region precede le CASE du Grafcet. Si une RAZ tombe sur le scan ou
+//    l'etape de fin de cycle s'execute, le journalier finit a 1 (remise a zero puis comptage de
+//    la depose en cours) : rien ne se perd.
+IF ResetSampleCountEdge.Q OR SampleCountAutoResetPulse THEN
+    SampleCount := 0;
+END_IF;
 {endregion}
 
 {region "§2 Gate securite &amp; Bascule Mode"}
@@ -4762,6 +4984,10 @@ CASE State OF
         // Etape benne seule : les DEUX treuils explicitement neutralises.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        // Demande d'ouverture publiee a 0 par l'etape elle-meme : AX10 est atteignable
+        // depuis un etat ou l'ouverture etait commandee (repli du vidage) et l'etape ne
+        // doit jamais laisser coexister une ouverture et une fermeture benne.
+        BucketCmd.ReqOpen := FALSE;
         BucketCmd.ReqClose := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
         // Arme le maintien avant la fermeture effective : FB_Bucket garde M2 sans trou de commande.
         BucketCmd.ReqHoldAscentP1AfterClose := BucketCmd.ReqClose;
@@ -4967,7 +5193,7 @@ CASE State OF
         WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
         WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#040B;
-        OperatorAction := 'AX15b - Maintenir : ouverture complete, vidage a la tremie.';
+        OperatorAction := 'AX15b - Pousser : vidage. Tirer : fermer et remonter.';
 
         // Config treuil UNIQUE : etape benne seule, les deux treuils neutralises
         // (plus de descente couplee M1+M2 simultanee a l'ouverture benne -&gt; plus
@@ -4979,10 +5205,21 @@ CASE State OF
 
         BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
 
-        // Option operateur (bit IHM) : descendre la benne dans la gueule de tremie
-        // pour aider la vidange -&gt; repositionnement couple M1+M2 (AX15C). Prioritaire
-        // sur la fin de vidage.
-        IF RepositionRequest THEN
+        // 🆘 Repli benne + treuils depuis le vidage : geste INVERSE maintenu (Y+, montee)
+        // sous homme-mort. La benne est REFERMEE puis les treuils remontent couples.
+        // Entree dans l'etape de fermeture existante AX10_CLOSE_BUCKET : la chaine
+        // AX10 -&gt; AX10B -&gt; AX11/AX12 est reutilisee telle quelle, sans duplication de
+        // logique ni nouvelle variable de position. AX10 est aussi l'etape sur laquelle
+        // la commande benne et la surveillance de synchronisme sont deja bornees en aval.
+        // Prioritaire sur l'option de repositionnement (AX15C commande une DESCENTE
+        // couplee : elle contredirait le geste de repli) et sur la fin de vidage.
+        // L'ouverture est neutralisee des ce scan, et AX10 publie lui aussi ReqOpen a 0
+        // sur toute la duree du repli : les deux demandes benne ne doivent jamais etre
+        // vraies sur le meme scan.
+        IF DeadmanArmed AND JoystickPull THEN
+            BucketCmd.ReqOpen := FALSE;
+            State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
+        ELSIF RepositionRequest THEN
             State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
         ELSIF DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
@@ -5039,8 +5276,10 @@ CASE State OF
 
         // Compteur de prélèvements (RETAIN) + durée du cycle — F2: cadré par front (1 seul par cycle)
         IF NOT SampleCountDone THEN
-            SampleCount := SampleCount + 1;
-            LastCycleDuration := CurrentCycleElapsed;   // fige la durée du cycle qui vient de s'achever
+            SampleCount := SampleCount + 1;            // JOURNALIER (RAZ IHM/mode auto possible)
+            SampleCountTotal := SampleCountTotal + 1;  // TOTALISATEUR : SEULE ecriture de toute l'application (gate G508)
+            LastCycleDuration_Min := CurrentCycleElapsed_Min;  // fige la duree du cycle qui vient de s'achever
+            LastCycleDuration_S   := CurrentCycleElapsed_S;
             SampleCountDone := TRUE;
         END_IF;
 
@@ -6160,6 +6399,7 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
             <Folder Name="3_CYCLE_ET_MODES">
               <Object Name="ST_ModesCycleInterPrg" ObjectId="c66e2ea9-61f6-5705-86e7-b9f19e28d4f1" />
               <Object Name="E_CycleDepthStopMode" ObjectId="a4e533cc-1a07-5fca-8da6-b652a120d4dd" />
+              <Object Name="E_CycleSampleCountResetMode" ObjectId="ea6305ea-87dc-5770-9254-60521a6d4291" />
               <Object Name="ST_ProgramBucketRequest" ObjectId="5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca" />
               <Object Name="ST_ProgramTranslationRequest" ObjectId="478a938b-bb21-5d74-8556-79842696e566" />
               <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />

@@ -23,8 +23,10 @@ STRUCT
     SpeedMismatchMps    : REAL;             // Écart absolu vitesse M1/M2 (m/s)
     SpeedMismatchActive : BOOL;             // Seuil vitesse dépassé
     SpeedMismatchConfirmed : BOOL;          // Écart vitesse confirmé pendant timeout
-    CurrentCycleElapsed : TIME;             // Durée écoulée du cycle SEMI_AUTO en cours
-    LastCycleDuration   : TIME;             // Durée du dernier cycle SEMI_AUTO achevé (figée à X13)
+    CurrentCycleElapsed_Min : INT;          // Minutes écoulées du cycle SEMI_AUTO en cours
+    CurrentCycleElapsed_S   : INT;          // Secondes écoulées du cycle SEMI_AUTO en cours (0..59)
+    LastCycleDuration_Min   : INT;          // Minutes du dernier cycle SEMI_AUTO achevé (figées à X13)
+    LastCycleDuration_S     : INT;          // Secondes du dernier cycle SEMI_AUTO achevé (figées à X13, 0..59)
     DrainTimeRemaining  : TIME;             // Temps restant en AX13 ; remis a zero hors AX13
     CycleChecksInhibited: BOOL;             // Mode essai : controles procede inhibes
     IgnoredCycleCheckId : WORD;             // Causes procede actives mais ignorees

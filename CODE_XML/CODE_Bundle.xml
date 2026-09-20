@@ -5983,20 +5983,38 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
 🔒 TOTALISATEUR de prélèvements (PERSISTENT) — LECTURE SEULE : jamais remis à zéro, aucune commande d'écriture</xhtml>
               </documentation>
             </variable>
-            <variable name="CurrentCycleElapsed">
+            <variable name="CurrentCycleElapsed_Min">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée écoulée du cycle en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durées de cycle exposées IHM en 2 champs entiers (T347) : minutes illimitées + secondes 0..59.
+       Le type TIME est abandonné côté IHM (affichage panel peu lisible) ; suffixes d'unité NC-030.
+⏱️ Minutes écoulées du cycle en cours</xhtml>
               </documentation>
             </variable>
-            <variable name="LastCycleDuration">
+            <variable name="CurrentCycleElapsed_S">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée du dernier cycle achevé (figée à X13)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Secondes écoulées du cycle en cours (0..59)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Minutes du dernier cycle achevé (figées à X13)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Secondes du dernier cycle achevé (figées à X13, 0..59)</xhtml>
               </documentation>
             </variable>
             <variable name="DrainTimeElapsed_S">
@@ -11468,20 +11486,36 @@ TRUE = Défaut sécurité actif</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart vitesse confirmé pendant timeout</xhtml>
               </documentation>
             </variable>
-            <variable name="CurrentCycleElapsed">
+            <variable name="CurrentCycleElapsed_Min">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée écoulée du cycle SEMI_AUTO en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Minutes écoulées du cycle SEMI_AUTO en cours</xhtml>
               </documentation>
             </variable>
-            <variable name="LastCycleDuration">
+            <variable name="CurrentCycleElapsed_S">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée du dernier cycle SEMI_AUTO achevé (figée à X13)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Secondes écoulées du cycle SEMI_AUTO en cours (0..59)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Minutes du dernier cycle SEMI_AUTO achevé (figées à X13)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Secondes du dernier cycle SEMI_AUTO achevé (figées à X13, 0..59)</xhtml>
               </documentation>
             </variable>
             <variable name="DrainTimeRemaining">
@@ -23502,20 +23536,36 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Demande de mouvement active</xhtml>
               </documentation>
             </variable>
-            <variable name="CurrentCycleElapsed">
+            <variable name="CurrentCycleElapsed_Min">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Duree ecoulee du cycle en cours (chronometre sur Lifecycle.Busy)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Minutes ecoulees du cycle en cours (chronometre sur Lifecycle.Busy)</xhtml>
               </documentation>
             </variable>
-            <variable name="LastCycleDuration">
+            <variable name="CurrentCycleElapsed_S">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Duree du dernier cycle acheve (figee a X13, persiste au cycle suivant)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Secondes ecoulees du cycle en cours (0..59)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Minutes du dernier cycle acheve (figees a X13, persistent au cycle suivant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Secondes du dernier cycle acheve (figees a X13, 0..59)</xhtml>
               </documentation>
             </variable>
             <variable name="DrainTimeRemaining">
@@ -24057,6 +24107,14 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Chronometre du cycle en cours (IN = Lifecycle.Busy) ; .ET = duree</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleElapsedTotal_S">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Duree du cycle en cours en secondes entieres (base de la conversion min/sec T347)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SkipDrainEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -24493,9 +24551,12 @@ CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 CtrlAscentDistEffM := SEL(CfgCtrlAscentDistanceM &lt;= 0.0, CtrlAscentDistM, CfgCtrlAscentDistanceM);
 
 // ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
-// .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration à l'achèvement (X13).
+// .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration_Min/_S à l'achèvement (X13).
+// Conversion TIME -&gt; minutes/secondes (T347) : troncature à la seconde, aucun arrondi.
 CycleRunTimer(IN := Lifecycle.Busy, PT := T#12h);
-CurrentCycleElapsed := CycleRunTimer.ET;
+CycleElapsedTotal_S := TIME_TO_DINT(CycleRunTimer.ET) / DINT#1000;
+CurrentCycleElapsed_Min := DINT_TO_INT(CycleElapsedTotal_S / DINT#60);
+CurrentCycleElapsed_S   := DINT_TO_INT(CycleElapsedTotal_S MOD DINT#60);
 
 // Durée d'égouttage effective : config IHM si valide, sinon défaut interne.
 DrainTimeEff := SEL(CfgDrainTime &lt;= T#0s, CfgDrainTime, DrainingTime);
@@ -25740,7 +25801,8 @@ CASE State OF
         IF NOT SampleCountDone THEN
             SampleCount := SampleCount + 1;            // JOURNALIER (RAZ IHM/mode auto possible)
             SampleCountTotal := SampleCountTotal + 1;  // TOTALISATEUR : SEULE ecriture de toute l'application (gate G508)
-            LastCycleDuration := CurrentCycleElapsed;   // fige la durée du cycle qui vient de s'achever
+            LastCycleDuration_Min := CurrentCycleElapsed_Min;  // fige la duree du cycle qui vient de s'achever
+            LastCycleDuration_S   := CurrentCycleElapsed_S;
             SampleCountDone := TRUE;
         END_IF;
 
@@ -53940,8 +54002,10 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.SpeedMismatchMps       := instCycleSemiAuto.SpeedMismatchMps;
     Data.SequenceState.SpeedMismatchActive    := instCycleSemiAuto.SpeedMismatchActive;
     Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
-    Data.SequenceState.CurrentCycleElapsed    := instCycleSemiAuto.CurrentCycleElapsed;
-    Data.SequenceState.LastCycleDuration      := instCycleSemiAuto.LastCycleDuration;
+    Data.SequenceState.CurrentCycleElapsed_Min := instCycleSemiAuto.CurrentCycleElapsed_Min;
+    Data.SequenceState.CurrentCycleElapsed_S  := instCycleSemiAuto.CurrentCycleElapsed_S;
+    Data.SequenceState.LastCycleDuration_Min  := instCycleSemiAuto.LastCycleDuration_Min;
+    Data.SequenceState.LastCycleDuration_S    := instCycleSemiAuto.LastCycleDuration_S;
     Data.SequenceState.DrainTimeRemaining     := instCycleSemiAuto.DrainTimeRemaining;
     Data.SequenceState.CycleChecksInhibited   := instCycleSemiAuto.CycleChecksInhibited;
     Data.SequenceState.IgnoredCycleCheckId    := instCycleSemiAuto.IgnoredCycleCheckId;
@@ -54039,8 +54103,10 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.SpeedMismatchMps       := 0.0;
     Data.SequenceState.SpeedMismatchActive    := FALSE;
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
-    Data.SequenceState.CurrentCycleElapsed    := T#0s;
-    Data.SequenceState.LastCycleDuration      := T#0s;
+    Data.SequenceState.CurrentCycleElapsed_Min := 0;
+    Data.SequenceState.CurrentCycleElapsed_S  := 0;
+    Data.SequenceState.LastCycleDuration_Min  := 0;
+    Data.SequenceState.LastCycleDuration_S    := 0;
     Data.SequenceState.DrainTimeRemaining     := T#0s;
     Data.SequenceState.CycleChecksInhibited   := FALSE;
     Data.SequenceState.IgnoredCycleCheckId    := 0;
@@ -54113,8 +54179,10 @@ ELSE
     Data.SequenceState.SpeedMismatchMps        := 0.0;
     Data.SequenceState.SpeedMismatchActive     := FALSE;
     Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
-    Data.SequenceState.CurrentCycleElapsed     := T#0s;
-    Data.SequenceState.LastCycleDuration       := T#0s;
+    Data.SequenceState.CurrentCycleElapsed_Min := 0;
+    Data.SequenceState.CurrentCycleElapsed_S   := 0;
+    Data.SequenceState.LastCycleDuration_Min   := 0;
+    Data.SequenceState.LastCycleDuration_S     := 0;
     Data.SequenceState.DrainTimeRemaining      := T#0s;
     Data.SequenceState.CycleChecksInhibited    := FALSE;
     Data.SequenceState.IgnoredCycleCheckId     := 0;
@@ -60148,8 +60216,10 @@ GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 // 🔒 Totalisateur de prélèvements : PUBLICATION LECTURE SEULE — son seul écrivain est
 // l'incrément AX18 de FB_CycleSemiAuto (PRG_03, VAR_IN_OUT).
 GVL_IHM.CycleSemiAuto.State.SampleCountTotal       := _CycleSampleCountTotal;
-GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
-GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
+GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_Min := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed_Min;
+GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_S   := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed_S;
+GVL_IHM.CycleSemiAuto.State.LastCycleDuration_Min   := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration_Min;
+GVL_IHM.CycleSemiAuto.State.LastCycleDuration_S     := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration_S;
 GVL_IHM.CycleSemiAuto.State.DrainTimeElapsed_S     := DINT_TO_INT((TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeRemaining) + DINT#999) / DINT#1000);
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
 // Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit
