@@ -1,20 +1,65 @@
 tasks:
-- id: T327
+- id: T329
   parent_id: ''
   statut: ⬜
   criticite: C2
-  domaine: TREUILS_BENNE / SYNCHRO / PROCESS
+  domaine: TREUILS_BENNE / SEQUENCEMENT_AUTO / MODES
   agent: '—'
+  date: '2026-09-20T04:57:48+02:00'
+  updated_at: '2026-09-20T04:57:48+02:00'
+  titre: MAINT WinchSel=0 + benne auto - armement fermeture/ouverture bloque par dependance circulaire (benne fermee non francs ne demarre jamais)
+  contexte: 'Trouve en marge de T327 (CC01, 2026-09-20, analyse code, PAS encore confirme par trace) : en pilotage couple (SelJoystickWinch=0) avec benne-auto (TglEnableCoupledBucketSequencing), quand la benne est dans un etat franc oppose au sens demande (ex. franchement ouverte et on demande la montee), rien ne demarre -- contacteurs frein/direction restent ouverts indefiniment. Chaine tracee : FB_BucketCmdArbitration.st:54-58 WinchBothAscentBucketCloseArmed (et :49-53 WinchBothDiveBucketOpenArmed) exige Context.MotionActive=TRUE pour armer la fermeture/ouverture auto de la benne. Context.MotionActive := WinchBothMotionActive (PRG_04_Treuils_Benne.st:309, ArbBucketContext.MotionActive). WinchBothMotionActive (PRG_03_Modes_Cycle.st:141-143) exige Auth.JoystickWinchSelectArbitrated=0. Or Arbitrated ne repasse a 0 que lorsque BucketSeqSatisfied est vrai (FB_Modes.st:385-393), qui exige que la benne soit DEJA dans l etat requis (JoystickPull AND BucketIsClosed, ou JoystickPush AND BucketIsOpen). DEPENDANCE CIRCULAIRE : il faut le mouvement couple actif pour armer la fermeture auto de la benne, mais il faut que la benne soit deja fermee pour activer le mouvement couple. Distinct de T327 (ManualBucketLimitsActive, deja corrige) -- fichiers non touches par T327 (FB_Modes.st, FB_BucketCmdArbitration.st, PRG_03_Modes_Cycle.st explicitement hors scope T327).'
+  description: 'Verifier par trace (HUM) la dependance circulaire decrite, puis concevoir un correctif MINIMAL sans elargir le rayon d impact : introduire un signal d intention operateur distinct (ex. WinchBothIntent.OperatorIntentActive, meme calcul que WinchBothMotionActive MOINS la condition Arbitrated=0, homme-mort + mode conserves dans les deux branches joystick/boutons de PRG_03), utilise UNIQUEMENT par ArbBucketContext.MotionActive pour armer WinchBothDiveBucketOpenArmed/WinchBothAscentBucketCloseArmed -- WinchBothMotionActive existant reste INCHANGE pour tout le reste (permis M1/M2 etc.). Point de verification EXPLICITE demande par Mathieu (2026-09-20) : prouver par trace/test que le cycle automatique SEMI_AUTO n est PAS affecte -- la garde (Auth.Mode <> E_Mode.SEMI_AUTO) existe deja dans FB_BucketCmdArbitration.st:50/55 et n est PAS touchee par ce correctif, et SEMI_AUTO utilise un calcul totalement distinct de WinchBothMotionActive/Intent (PRG_03_Modes_Cycle.st:298-311, pilote par instCycleSemiAuto) -- a demontrer, pas seulement affirmer.'
+  objectifs:
+  - 'Preuve par trace (HUM) de la dependance circulaire : benne franchement ouverte, demande montee couplee WinchSel=0, aucun demarrage, contacteurs a 0 en continu.'
+  - 'Correctif localise a PRG_03_Modes_Cycle.st (nouveau champ bus) + PRG_04_Treuils_Benne.st (cablage ArbBucketContext.MotionActive) -- WinchBothMotionActive et ses autres consommateurs (permis M1/M2) strictement inchanges.'
+  - 'Preuve explicite (test CI + trace) que le cycle SEMI_AUTO est inchange avant/apres le correctif -- pas seulement une garde de mode citee, un scenario SEMI_AUTO rejoue avec resultat identique.'
+  - 'Non-regression WinchSel=2 (jog M2 manuel) et pilotage boutons (TglJoystickMaster=FALSE) : les deux branches de calcul couvertes.'
+  - 'Aucun changement sur FB_WinchSync.st, FB_Safety_Winch, ni sur la chaine SafeStop/Enable.'
+  contrat: ''
+  bloque_par: []
+- id: T328
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: SIMULATION / TREUILS
+  agent: DSH01
   date: '2026-09-20T00:00:00+02:00'
-  updated_at: '2026-09-20T00:00:00+02:00'
-  titre: Descente interdite en position benne intermediaire (ni franchement ouverte ni fermee)
+  updated_at: '2026-09-20T04:40:00+02:00'
+  titre: SimBench - couplage mecanique M1/M2 et rattrapage (anti-blocage des machoires)
+  contexte: >-
+    En simulation, une fermeture de benne suivie d'une montee directe laisse un ecart residuel (benne autour de 10 % ouverte, dans le trou metier de fermeture 13,8 / 14,0 m traite par T327) ; l'automate plafonne alors la montee au palier 1 (PRG_04_Treuils_Benne.st 1224). En realite l'ecart se resorbe par le couplage mecanique des deux treuils, sauf si les machoires sont bloquees. Le banc modelisait les deux treuils independamment et ne connaissait un couplage qu'en descente (SimM2CoupledDescentModelActive). ARBITRAGE HUMAIN 2026-09-20 : DSH01 est confirme sur T328, l'autre agent travaille sur T327.
+  description: Rattrapage mecanique M1/M2 implemente dans FB_SimBench (region 2bis) sur l'IMAGE publiee du codeur M2 (jamais sur la memoire persistante RETAIN), gate sur le mouvement physique reel des deux treuils, plus un stimulus de blocage des machoires. Plan et contrat amendes apres deux challenges independants AVANT ecriture, puis revue independante APRES ecriture (defauts corriges).
+  objectifs:
+  - Montee couplee sans blocage, l'ecart relatif rejoint l'entree de la bande fermee (OffsetCloseM moins 0,5 x CoherenceLimitM) - FAIT (TC-P13-060 et 066).
+  - Arret, jog M2 seul, cable mou, benne au fond, preset - aucun rattrapage (TC-P13-061 et 064).
+  - Machoires bloquees - rattrapage inhibe et charge forcee observable en diagnostic (TC-P13-062).
+  - Modele desactive - image M2 strictement identique, non-masquage de T327 (TC-P13-063 et 068).
+  - Correction bornee a 0,02 m par scan et ecriture limitee a l'image publiee - FAIT.
+  - RESTE A FAIRE - purge de l'accumulateur sur Enable OFF vers ON ; test d'integration AC1 jusqu'au palier autorise.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T328_SIMBENCH_COUPLAGE_M1M2.yaml
+  bloque_par: []
+- id: T327
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: TREUILS_BENNE / SYNCHRO / PROCESS
+  agent: CC01
+  date: '2026-09-20T03:37:18+02:00'
+  updated_at: '2026-09-20T03:37:18+02:00'
+  locked_at: '2026-09-20T03:37:18+02:00'
+  titre: MAINT WinchSel=0 + benne auto - ManualBucketLimits (jog M2) fuit dans la phase JOG automatique (palier 1 force + trou permis/IsClosed)
+  diagnostic_20260920: 'CAUSE LOCALISEE (CC01, trace 70 + code) : FB_Modes.st:392 force Auth.JoystickWinchSelectArbitrated := 2 pendant la phase JOG benne-auto (WinchSel operateur = 0). PRG_04_Treuils_Benne.st:749-750 calcule ManualBucketLimitsActive := TglManualBucketLimits AND (Arbitrated = 2) -> les bornes JOG MANUEL M2 s''appliquent a la phase AUTOMATIQUE. Effet 1 : M2MaxStep=1 force pendant toute la fermeture (trace 70 t=50133-55264 : SpeedTgt=100, M2_SpeedContactor_1 seul, 1,25 m/s). Effet 2 : ProcessPermitM2_Ascent (PRG_04:769) coupe a Delta >= OffsetCloseM - CloseAnticipationM = 13,8 m alors que FB_Bucket.st:364 IsClosed exige Delta >= OffsetCloseM - CoherenceLimitM = 14,0 m -> trou de 0,2 m comble par la seule inertie (trace 70 t=56372 Delta=13,89 relais M2=0 joystick tire ; t=57780 Delta=14,22 -> BucketSeqSatisfied -> M1+M2). Sur machine chargee / inertie < 0,2 m = blocage franc (symptome 1). Les 8,75 s M2 seul = 6 s palier 1 + 1,4 s trou + rampes. PAS D18 (DirectionChangePending=0 confirme). Pistes : (1) ManualBucketLimitsActive sur JoystickWinchSelectRequest (selection operateur) et non Arbitrated ; (2) gate config CloseAnticipationM <= CoherenceLimitM et OpenAnticipationM <= CoherenceLimitM (CfgFault FB_Bucket) ; (3) libelle IHM honnete. Le symptome DESCENTE interdite en benne intermediaire reste a tracer separement (probablement le meme trou cote ouverture : OpenAnticipationM 1,3 > CoherenceLimitM 1,0).'
   contexte: 'Signale par Mathieu 2026-09-20 (session MAINT_N1, essais D18) : quand un ecart M1-M2 commence a se creer (benne en position intermediaire, ni IsOpen ni IsClosed francs), la descente peut se retrouver interdite, y compris en mode auto benne -- blocage total. Le contournement observe : piloter un peu la benne pour la ramener a un etat FRANC (ouverte ou fermee) la debloque. Suspicion : un permis process (chaine ProcessPermit_Descend / EffectivePermit, cf. NAMING_CONVENTION.md taxonomie D-P1->D-P11) ou une condition de FB_Bucket (IsOpen/IsClosed/IsIntermediate, FB_Bucket.st ~L369-376) exige un etat franc pour autoriser la descente, ce qui bloque le cas normal ou la benne est temporairement en transition. SECOND SYMPTOME APPARENTE (trace 70, 2026-09-20, MAINT_N1 confirme explicitement -- PAS AX10B/SEMI_AUTO) : en pilotage couple (WinchSel=0, "les deux") avec toggle benne-auto actif (Context.TglEnableCoupledBucketSequencing), une demande de MONTEE mesure M2 seul actif (M2_RelayAscent_Close_RQ=1) pendant 8,75s (t=49028->57780ms) avant que M1 ne rejoigne -- D18 M1/M2 (DirectionChangePending/DelayElapsed) reste a 0 tout du long, confirme hors-D18. Code trouve (FB_BucketCmdArbitration.st:54-58 WinchBothAscentBucketCloseArmed ; PRG_04_Treuils_Benne.st:384 WinchBothMotionBlockedByBucket ne couvre QUE le cas descente/WinchBothDiveBucketOpenArmed ; PRG_04:385-388 BucketNotClosedAscentCapStep1 ne prevoit qu''une DEGRADATION PALIER 1 pour la montee, PAS un blocage total de relais) -- INCOHERENCE NON RESOLUE : le code lu ne devrait pas bloquer totalement M1 en montee (seulement degrader la vitesse), mais la trace montre un blocage total du relais pendant 8,75s. Mecanisme exact du blocage total en montee non localise -- a chercher en priorite a la reprise.'
   description: 'Identifier precisement quel permis/interlock exige un etat benne franc pour autoriser la descente, et si cette exigence est justifiee (securite reelle) ou trop stricte (bloque un cas normal de transition). Tracer la chaine complete producteur->consommateur (cf. CODE_QUALITY_STANDARDS.md §3ter) avant tout correctif. Analyse et cadrage uniquement dans un premier temps -- pas de modification de code sans validation.'
   objectifs:
   - 'Identifier le permis/interlock exact qui bloque la descente en position benne intermediaire (nom de variable, fichier, ligne).'
   - 'Determiner si cette exigence "etat franc requis" est une securite documentee/justifiee ou un defaut de conception.'
   - 'Proposer un correctif cadre si defaut confirme, avec analyse de risque (meme methode que T325) avant toute implementation.'
-  contrat: ''
+  - 'MAINT WinchSel=0 + benne auto : la phase JOG automatique n''est plus bornee par ManualBucketLimitsActive (ni palier 1 force, ni coupure permis avant IsClosed/IsOpen) -- reactivite identique au jog WinchSel=2.'
+  - 'WinchSel=2 operateur : bornes manuelles strictement inchangees (non-regression).'
+  - 'Config incoherente (Anticipation > CoherenceLimit) detectee au boot par CfgFault, jamais un blocage silencieux.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T327_MANUAL_BUCKET_LIMITS_PHASE_JOG.yaml
   bloque_par: []
 - id: T326
   parent_id: ''
@@ -120,45 +165,6 @@ tasks:
   - Caracteriser le partage de charge M1/M2 (M1 seul porteur benne fermee, ouverture en l'air).
   - Faire passer chaque valeur du bloc de calage de ESTIMEE a MESUREE, ou ecrire la raison du maintien en ESTIMEE.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T322_MISE_EN_SERVICE_RECALAGE.yaml
-  bloque_par: []
-- id: T321
-  parent_id: ''
-  statut: ⬜
-  criticite: C2
-  domaine: SIMULATION / TREUILS
-  agent: '—'
-  date: '2026-09-20T00:00:00+02:00'
-  updated_at: '2026-09-20T00:00:00+02:00'
-  titre: SimBench - appliquer les valeurs d'hypothese du bloc de calage et cabler la charge M1/M2
-  contexte: La charge n'est pas cablee (SimWinchLoadFrac_Ratio absent de GVL_Simulation et non passe dans l'appel instSimBench), donc aucun decrochage par charge n'est executable au banc. Les constantes du modele sont SYNTHETIQUES (Cmax 3800, charge nominale 2500, frottement 80, inertie 45).
-  description: Cabler la charge et remplacer les constantes SYNTHETIQUES par les valeurs d'HYPOTHESE du bloc de calage, chacune etiquetee avec sa source et jamais presentee comme mesuree.
-  objectifs:
-  - SimWinchLoadFrac_Ratio et SimWinchCoupledActive exposes dans GVL_Simulation et cables dans l'appel instSimBench.
-  - Charge modelisee sans restructuration, terme fixe egal tare et terme variable egal taux fois matiere (0 = benne vide, 1 = benne pleine).
-  - Chaque constante recalee porte la mention HYPOTHESE et la source de sa valeur (REFERENCE_CALAGE).
-  - Commentaire faux FB_SimBench.st 133-134 corrige.
-  - Aucune ecriture dans _WinchSpeedLearnTable, SpeedGuardEnable reste FALSE, aucune sortie consommee par le metier.
-  - Un scenario au banc declenche IsStalled sur un palier capable de decrocher, et pas sur un palier qui tient la charge.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T321_SIMBENCH_HYPOTHESES_ET_CHARGE.yaml
-  bloque_par: []
-- id: T320
-  parent_id: ''
-  statut: ⬜
-  criticite: C2
-  domaine: SIMULATION / TREUILS
-  agent: '—'
-  date: '2026-09-20T00:00:00+02:00'
-  updated_at: '2026-09-20T00:00:00+02:00'
-  titre: SimBench - miroir de l'apprentissage vitesse par palier (comparaison sim contre reel automatique)
-  contexte: La table d'apprentissage reelle (RETAIN, axe fois sens fois charge/vide fois palier) existe et est cablee mais n'a jamais ete alimentee. Le simulateur doit publier ses vitesses avec la MEME indexation pour que la comparaison sim contre reel devienne automatique le jour ou l'apprentissage tournera.
-  description: Le banc publie une enveloppe de vitesse modele (minimum, maximum, moyenne, nombre d'echantillons) indexee comme la table reelle. Aucune ecriture dans la table RETAIN et le simulateur ne remplace jamais la mesure.
-  objectifs:
-  - Structure publiee indexee comme ST_fbWinchSpeedLearning_Table (axe, sens, charge, palier).
-  - Aucune ecriture dans _WinchSpeedLearnTable, la table terrain reste preservee.
-  - Vitesse modele en m/s publiee et tracable, elle est interne aujourd'hui.
-  - Aucun consommateur metier et simulateur inoperant sur machine reelle.
-  - Cas de test CI, gate OFF, palier hors bornes, sens conflictuel, isolation M1/M2.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T320_SIMBENCH_MIROIR_VITESSE.yaml
   bloque_par: []
 - id: T319
   parent_id: ''

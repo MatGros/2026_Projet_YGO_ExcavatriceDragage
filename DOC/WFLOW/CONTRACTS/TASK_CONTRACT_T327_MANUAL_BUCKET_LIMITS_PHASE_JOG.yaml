@@ -1,0 +1,144 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T327 : MAINT WinchSel=0 + benne auto, ManualBucketLimits
+#                    (jog M2 manuel) fuit dans la phase JOG automatique
+# ═══════════════════════════════════════════════════════════════════════════
+# Diagnostic : DOC/WFLOW/TASKS.yaml (T327, champ diagnostic_20260920)
+# Preuve     : trace 70 (TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/Suivi_70_SIMU_MaintMANU_20260919.trace)
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# LOGIQUE FINALE RETENUE (arbitrage humain 2026-09-20, apres 2 iterations) :
+#   PRG_04:750-751   ManualBucketLimitsActive := TglManualBucketLimits AND NOT instBucket.Lifecycle.Busy
+#   - Le toggle IHM seul decide, quel que soit le selecteur treuil (WinchSel 0 ou 2) : demande
+#     humaine explicite, corrige une 1re version qui gatait encore sur SelJoystickWinch=2.
+#   - Exclusion NOT instBucket.Lifecycle.Busy : un cycle gere par instBucket (bouton confirme OU
+#     sequence auto benne) a deja ses propres bornes via FB_Bucket (IsClosed/IsOpen) -- un double
+#     bornage y recree le palier 1 force + la coupure avant IsClosed (chaine ci-dessous), donc DOIT
+#     rester exclu. Ne s'applique qu'au jog LIBRE (pas de CloseReq/OpenReq memorise).
+#
+# CHAINE FAUTIVE D'ORIGINE (T327, prouvee par trace 70) -- reste vraie pour le jog libre seul :
+#   PRG_04 §6 (instWinchM2) M2MaxStep := 1 si ManualBucketLimitsActive -> fermeture au palier 1
+#   PRG_04:769  ProcessPermitM2_Ascent coupe a Delta >= OffsetCloseM - CloseAnticipationM (13,8 m)
+#   FB_Bucket.st:364  IsClosed exige Delta >= OffsetCloseM - CoherenceLimitM (14,0 m)
+#   FB_Modes.st:385-388  BucketSeqSatisfied attend IsClosed -> trou 0,2 m comble par la seule inertie
+#
+# PISTE ABANDONNEE (retiree en session, cause une regression live confirmee utilisateur) :
+#   Gate config CfgFault si CloseAnticipationM > CoherenceLimitM -- casse le referencement benne
+#   (BucketRefRequest gate sur NOT CfgFaultLatched, FB_Bucket.st:339) avec le calage actuel
+#   (1,2/1,3 vs 1,0), observe en direct (CfgFault + BucketOpening_Pct a 183%). Retiree du code.
+#   Le trou 0,2/0,3 m reste couvert par l'inertie residuelle, non corrige par ce lot.
+#
+# BUG DISTINCT TROUVE EN MARGE (PAS dans ce lot, ouvert separement) : T329 -- dependance
+# circulaire WinchBothAscentBucketCloseArmed/MotionActive, benne franchement ouverte ne demarre
+# jamais en couple. Fichiers hors scope T327 (FB_Modes.st, PRG_03, FB_BucketCmdArbitration.st).
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T327_MANUAL_BUCKET_LIMITS_PHASE_JOG
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Le toggle IHM TglManualBucketLimits doit borner le jog benne LIBRE (bornes ouvert/fermé +
+    palier 1) dès qu'il est TRUE, quel que soit le sélecteur treuil (WinchSel 0 ou 2) -- demande
+    opérateur explicite. Il ne doit JAMAIS s'appliquer à un cycle géré par instBucket (bouton
+    confirmé ou séquence auto benne-couplée), qui a déjà ses propres bornes via FB_Bucket
+    (IsClosed/IsOpen) : un double bornage y recrée le palier 1 forcé et la coupure du permis M2
+    avant l'état franc (trace 70, T327 d'origine).
+
+  acceptance:
+    - id: AC1
+      statement: "TglManualBucketLimits=TRUE, jog LIBRE (instBucket pas Busy), quel que soit WinchSel (0 ou 2) : ManualBucketLimitsActive=TRUE, bornes ouvert/fermé + palier 1 appliqués."
+      verified_by: "Test CI test_winch_integ : TglManualBucketLimits=TRUE, CmdWinchSelect=0 puis 2, instBucket non Busy -> ManualBucketLimitsActive=TRUE dans les deux cas"
+    - id: AC2
+      statement: "instBucket.Lifecycle.Busy=TRUE (cycle géré : bouton confirmé ou séquence auto benne-couplée) : ManualBucketLimitsActive=FALSE quel que soit le toggle -- pas de double bornage, pas de plateau relais=0 avant BucketSeqSatisfied (ref. trace 70 t=56372-57780)."
+      verified_by: "Test CI : instBucket.Lifecycle.Busy=TRUE force -> ManualBucketLimitsActive=FALSE ; trace au banc : plus de coupure prématurée pendant un cycle auto"
+    - id: AC3
+      statement: "TglManualBucketLimits=FALSE : ManualBucketLimitsActive=FALSE dans tous les cas (jog libre ou instBucket Busy)."
+      verified_by: "Non-regression test_winch_integ.st l.80 (TglManualBucketLimits=FALSE)"
+    - id: AC4
+      statement: "Aucune valeur de GVL_PERSISTENT (OffsetOpenM/CloseM, CoherenceLimitM, Anticipation*) modifiée -- le trou 0,2/0,3 m entre coupure permis et IsClosed reste couvert par l'inertie résiduelle, non corrigé par ce lot (piste CfgFault abandonnée en session, cf. en-tête)."
+      verified_by: "git diff GVL_PERSISTENT.st vide"
+    - id: AC5
+      statement: "Aucun redemarrage automatique, aucun changement de la chaine SafeStop/Enable, aucun changement de FB_Modes/PRG_03/FB_BucketCmdArbitration (hors scope, cf. T329) : la correction est confinée au calcul de ManualBucketLimitsActive dans PRG_04."
+      verified_by: "git diff limité à PRG_04_Treuils_Benne.st (ManualBucketLimitsActive) + FB_Bucket.st (Cause 0, aucun changement fonctionnel net) + ST_BucketCmd.st/ST_BucketHMIState.st (libellés) ; G200_check_linkage.py --report PASS"
+    - id: AC6
+      statement: "IHM : le libellé du toggle et l'état publié disent explicitement que les bornes s'appliquent au jog libre, indépendamment du sélecteur ; IHM_VARIABLES_MIGRATION.md mis à jour si un chemin change."
+      verified_by: "Lecture ST_BucketCmd.st / ST_BucketHMIState.st commentaires + IHM_VARIABLES_MIGRATION.md"
+
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st
+      - TOOLS/TEST_AUTO_CI/**
+      - DOC/WFLOW/REGISTRES/REGISTRE_VALEURS_TREUIL_STATUTS_v1.0.md
+      - DOC/AF/AF_Partie-10_Fonction_Treuils_Benne_v*.md
+      - DOC/WFLOW/IHM_VARIABLES_MIGRATION.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/F_MODES/FB_Modes.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/H_TREUILS_BENNE/FB_BucketCmdArbitration.st
+      - CODE/H_TREUILS_BENNE/FB_WinchSync.st
+      - CODE/L_SIMULATION/**
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Bornes manuelles M2 (13,8 m / OffsetOpenM + OpenAnticipationM) et palier 1 pour tout jog LIBRE, quel que soit WinchSel, tant que toggle TRUE"
+      - "Garde M3AtTremie (FB_Modes.st:372-374, force Arbitrated=2) : non touchee, hors scope"
+      - "Plafond BucketNotClosedAscentCapStep1 en phase COUPLEE (PRG_04:1224) : inchange (couvert par T328 cote banc)"
+      - "instBucket.Lifecycle.Busy (bouton confirme ou sequence auto) jamais borne par ManualBucketLimitsActive"
+    dropped_on_purpose:
+      - "Gate CfgFault sur Anticipation > CoherenceLimitM : retire en session (regression live confirmee, cf. en-tete) -- le trou 0,2/0,3 m reste non corrige, couvert par l'inertie residuelle"
+      - "Gating sur SelJoystickWinch operateur : retire, le toggle seul decide desormais (demande explicite Mathieu)"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+
+  models_allowed:
+    - "omni/cc/claude-opus-5"
+    - "opencode-go/glm-5.2"
+
+  alert_duty: >
+    Si instBucket.Lifecycle.Busy ne suffit pas a distinguer jog libre / cycle gere (ex. un
+    scenario ou le bouton confirme n'active pas Busy), STOP et remonter. Aucune valeur de
+    GVL_PERSISTENT n'est touchee par ce lot. Signaler n'est pas elargir le scope.
+
+status: IN_PROGRESS
+
+execution:
+  executed_by: "Claude Opus 5 (Claude Code, CC01)"
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Code implemente (ManualBucketLimitsActive := TglManualBucketLimits AND NOT
+    instBucket.Lifecycle.Busy, PRG_04:750-751), libelles IHM corriges (AC6), bundle+diff bundle
+    frais, G200 PASS. MANQUANT avant cloture : tests CI dedies (AC1-AC3, aucun scenario
+    test_winch_integ.st n'existe encore pour ce comportement precis), validation terrain/banc
+    par l'operateur (test reel en cours, en attente de retour explicite AC1/AC2), mise a jour
+    IHM_VARIABLES_MIGRATION.md si necessaire (a verifier, probablement sans objet ici car aucun
+    chemin renomme), decision explicite sur AC4 (trou 0,2/0,3 m non corrige -- accepte ou a
+    traiter ailleurs ?).
+  evidence_submitted:
+    - "check_linkage: PASS (0 erreur)"
+    - "bundle: CODE_XML/CODE_Bundle.xml frais"
+    - "diff_bundle: CODE_XML/CODE_DiffBundle.xml (FB_Bucket, PRG_04_Treuils_Benne, ST_BucketCmd, ST_BucketHMIState)"
+    - "run_all_gates --palier C: memes echecs preexistants que baseline (G300/G340/G408/G430/G483), aucun nouveau"
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Diagnostic CC01 2026-09-20 sur trace 70, logique amendee 2 fois en session suite retours
+    Mathieu (toggle seul, exclusion instBucket.Busy). Le symptome "descente interdite en benne
+    intermediaire" n'est PAS prouve par trace -- hypothese (meme trou cote ouverture), pas
+    confirme. T329 ouvert separement pour la dependance circulaire trouvee en marge
+    (benne franchement ouverte ne demarre jamais en couple WinchSel=0).

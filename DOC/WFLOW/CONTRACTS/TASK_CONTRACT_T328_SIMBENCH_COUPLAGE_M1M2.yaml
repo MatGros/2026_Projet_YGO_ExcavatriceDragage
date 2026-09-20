@@ -1,0 +1,115 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T328 : SimBench, couplage mecanique M1/M2 et rattrapage
+# ═══════════════════════════════════════════════════════════════════════════
+# Plan source : DOC/WFLOW/CONTRACTS/PLAN_T328_SIMBENCH_COUPLAGE_MECANIQUE_M1M2.md
+# Registre des statuts : DOC/WFLOW/REGISTRES/REGISTRE_VALEURS_TREUIL_STATUTS_v1.0.md
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T328_SIMBENCH_COUPLAGE_MECANIQUE_M1M2
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Le banc doit reproduire le RATTRAPAGE mecanique entre M1 et M2 PENDANT LE MOUVEMENT REEL
+    des deux treuils (relais de sens identiques actifs + freins desserres cote sim) : quand
+    les deux treuils sont en mouvement couple et que les mâchoires ne sont pas bloquees,
+    l'ecart relatif sature vers la butee mecanique (OffsetCloseM en montee, OffsetOpenM en
+    descente) et la benne retrouve l'etat ferme/ouvert qui autorise la montee a pleine vitesse.
+    A L'ARRET ou en mouvement d'un seul treuil (jog M2 seul), l'ecart reste STRICTEMENT FIGE :
+    le gate n'est JAMAIS le couplage logique (SyncActive/CoupledBoth, vrai en permanence),
+    seulement le mouvement physique observe. Quand les mâchoires sont bloquees, le rattrapage
+    est inhibe et le banc doit rester en petite vitesse, sans masquer le cas de blocage.
+
+  acceptance:
+    - id: AC1
+      statement: "Montee couplee REELLE (M1_RelayAscent_RQ ET M2_RelayAscent_Close_RQ actifs, freins sim ouverts) et SANS blocage : apres une fermeture suivie d'une montee, l'ecart relatif M2-M1 revient dans la bande fermee (ecart superieur ou egal a OffsetCloseM moins CoherenceLimitM) en un temps borne PENDANT le mouvement, et le palier autorise remonte (FinalAuthorizedStep)."
+      verified_by: "Test CI dedie + trace au banc (observation de FinalAuthorizedStep et de l'ecart)"
+    - id: AC2
+      statement: "Couple et blocage actif : l'ecart NE converge PAS, la montee reste plafonnee au palier 1 ET la charge simulee des deux treuils augmente (le cas de blocage n'est jamais masque). [reformule DSH01 2026-09-20 apres challenge modele] La charge est OBSERVABLE EN DIAGNOSTIC seulement (MotorTorqueM1/M2_Nm) : aucun rebouclage couple -> vitesse n'est modelise (non-objectif ecrit, cf. PLAN_T328 §12.3)."
+      verified_by: "Test CI TC-P13-062 (SimBucketJamActive) + trace"
+    - id: AC3
+      statement: "Non couple, ou modele desactive : le comportement du banc est STRICTEMENT inchange (aucun rattrapage applique). [reformule DSH01 2026-09-20] Le critere porte sur SimWinchCouplingModelActive = FALSE : l'image M2 reste strictement identique a l'image codeur."
+      verified_by: "Test CI TC-P13-063 (modele OFF => image M2 inchangee) + non-regression de la suite existante (FB_SimBench 35/35 PASS le 2026-09-20)"
+    - id: AC6
+      statement: "A l'arret (relais a 0) ou en mouvement d'un seul treuil (jog M2 seul) : l'ecart relatif reste FIGE -- le rattrapage n'agit JAMAIS hors mouvement reel des deux treuils meme sens. Le gate n'est PAS SyncActive/CoupledBoth (vrai en permanence y compris a l'arret, cf. FB_WinchSync.st:119/123). [reformule DSH01 2026-09-20 apres challenge modele] << Fige >> s'entend HORS ROULIS : le roulis (coast) de FB_Sim_Encoder fait encore varier la position apres coupure des relais ; l'assertion stricte au mm n'est valable qu'une fois le roulis termine."
+      verified_by: "Test CI TC-P13-061 (relais a 0 puis jog M2 seul) + TC-P13-064 (cable mou)"
+    - id: AC7
+      statement: "Le banc CONSERVE les trous metier observables (ex. T327 : plateau relais M2=0 entre OffsetCloseM-CloseAnticipationM et OffsetCloseM-CoherenceLimitM). [reformule DSH01 2026-09-20 apres challenge modele : la separation << fermeture = jog M2 seul >> est FAUSSE, la trace 70 montre 184 scans a 2 relais montee pendant la fermeture] Le non-masquage est garanti par SimWinchCouplingModelActive = FALSE, PAS par une separation de phases : modele OFF => plateau T327 identique avant/apres le lot ; modele ACTIF => le trou est comble PAR CONCEPTION (la realite le comble aussi) et la correction metier reste T327."
+      verified_by: "Test CI TC-P13-063 + rejeu du scenario T327 avec modele OFF"
+    - id: AC4
+      statement: "Le rattrapage est borne : aucun saut de position superieur au seuil physique par scan (pas de transition mecanique cachee)."
+      verified_by: "Test CI sur la limite de pente"
+    - id: AC5
+      statement: "Aucun effet metier : le simulateur reste inoperant sur machine reelle, aucune sortie n'est consommee par PRG_03 a PRG_07, et aucune ecriture n'a lieu dans les tables RETAIN."
+      verified_by: "G200_check_linkage.py --report + gate statique"
+    - id: AC8
+      statement: "Le plafonnement metier de montee (BucketNotClosedAscentCapStep1) n'est PAS modifie : le lot ne touche pas au metier."
+      verified_by: "git diff limite a CODE/L_SIMULATION + lecture de PRG_04"
+    - id: AC9
+      statement: "Preuves structurelles obligatoires pour PRG_02_Acquisition : le nom de fichier est identique au nom de POU, et le suffixe correspond au langage genere dans le bundle (aucun suffixe _LD, _CFC ou _ST si le bundle ne genere pas ce langage)."
+      verified_by: "generate_codesys_bundle.py + lecture du PLCopenXML genere (nom d'objet et langage effectif)"
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/L_SIMULATION/FB_Sim_WinchElectrical.st
+      - CODE/L_SIMULATION/FB_Sim_Encoder.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - TOOLS/TEST_AUTO_CI/**
+      - DOC/WFLOW/CONTRACTS/PLAN_T328_SIMBENCH_COUPLAGE_MECANIQUE_M1M2.md
+      - DOC/WFLOW/REGISTRES/REGISTRE_VALEURS_TREUIL_STATUTS_v1.0.md
+      - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/GVL_PERSISTENT.st
+      - CODE/H_TREUILS_BENNE/**
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+
+  models_allowed:
+    - "dsh/deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Tout ecart entre le comportement attendu et le comportement observe sur le rattrapage
+    est remonte IMMEDIATEMENT avec la trace. Signaler n'est pas elargir le scope : aucune
+    correction spontanee hors perimetre, et aucun seuil de securite ni de synchro touche.
+    Interdiction explicite de gater le rattrapage sur SyncActive/CoupledBoth (AC6) : si le
+    mouvement physique reel des deux treuils n'est pas observable facilement au banc, STOP
+    et remonter avant d'implementer un gate de repli.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Non execute. Pre-requis : validation humaine du plan T328 amende (gate = mouvement
+    physique reel des deux treuils, jamais SyncActive/CoupledBoth ; rattrapage = saturation
+    directionnelle vers la butee, pas une attraction 1er ordre symetrique ; ajout du stimulus
+    de blocage ; constante de temps declaree en HYPOTHESE). AUCUNE dependance a
+    SimWinchCoupledActive / CoupledBoth : le gate est bati sur les relais de sens reels des
+    deux treuils et sur l'etat des freins sim.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Constante de rattrapage a declarer en ESTIMEE (HYPOTHESE ASSUMEE) dans le registre des
+    statuts et a mesurer en mise en service (T322). Le cas de blocage des mâchoires est un
+    NOUVEAU stimulus : il doit rester explicitement un stimulus de banc.

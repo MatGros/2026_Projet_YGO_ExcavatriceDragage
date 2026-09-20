@@ -7614,12 +7614,12 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode pilotage unitaire M2 "sécurisé" -- actif
-uniquement en SelJoystickWinch=2 (unitaire M2). Si TRUE : borne le déplacement entre les
-positions ouvert/fermé configurées (OffsetOpenM/OffsetCloseM relatif à M1, mêmes bornes que
-FB_Bucket) ET plafonne la vitesse au palier 1, sans passer par instBucket (pas de mémorisation
-CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sans limite dédiée.
-Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bornes benne -- actif tant que TRUE, quel que soit le sélecteur treuil (unitaire M2 ou
+couplé). Si TRUE : borne le déplacement entre les positions ouvert/fermé configurées
+(OffsetOpenM/OffsetCloseM relatif à M1, mêmes bornes que FB_Bucket) ET plafonne la
+vitesse au palier 1, sans passer par instBucket (pas de mémorisation CloseReq/OpenReq,
+jogging libre borné). Défaut FALSE : pilotage benne sans limite dédiée.
+Défaut TRUE -- bornes benne actives + palier 1 par défaut</xhtml>
               </documentation>
             </variable>
             <variable name="TglEnableDumpAtTremie">
@@ -7711,7 +7711,7 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Butees relatives benne actives en jog unitaire M2 (TglManualBucketLimits ET WinchSel=2)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Butees relatives benne actives en jog M2 MANUEL (TglManualBucketLimits ET selection operateur WinchSel=2 -- jamais pendant une phase automatique)</xhtml>
               </documentation>
             </variable>
             <variable name="OffsetStateMismatchWarn">

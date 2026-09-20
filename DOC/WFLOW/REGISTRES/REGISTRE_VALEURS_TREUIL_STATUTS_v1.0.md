@@ -167,6 +167,7 @@ C'est le cas de **toute la section B** : ce sont les valeurs qui **font tourner 
 | 7 | **Charge réelle en service** (immergée, après égouttage) | tare **7 t MESURÉE** ; total ≤ 16 t en air |
 | 8 | **`P5` (palier 5)** : vitesse et tenue réelles | jamais mesuré (P5 effectif depuis le 2026-09-15) |
 | 9 | **Pente charge ↔ vitesse** | exige des essais **avec la charge NOTÉE** (protocole T322) |
+| 10 | **Raideur / constante de temps du COUPLAGE mécanique M1/M2** + **cas de blocage des mâchoires** | 🆕 **non modélisés avant T328** (seule liaison existante : descente couplée `SimM2CoupledDescentModelActive`) ⇒ plan `PLAN_T328_SIMBENCH_COUPLAGE_MECANIQUE_M1M2.md` · constante de rattrapage `CST_SimWinchCouplingTauS = 1,0 s` en `ESTIMÉE (HYPOTHÈSE ASSUMÉE)`, **à mesurer en T322** · plage plausible selon le challenger physique : **0,2 à 2 s** — **aucune trace disponible ne permet de la borner** |
 
 ---
 

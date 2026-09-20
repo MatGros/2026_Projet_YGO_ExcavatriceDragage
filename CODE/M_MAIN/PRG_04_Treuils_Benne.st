@@ -742,12 +742,15 @@ DescendPermitDiveBucketOpen := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.Desc
 
 // Le bypass arrête aussi la descente instantanément, même doctrine que le mécanisme
 // KoboldBottomTouchLatched.
-// Mode "pilotage unitaire M2 sécurisé"
-// (SelJoystickWinch=2 + toggle IHM). Ne passe PAS par instBucket (pas de CloseReq/OpenReq
-// mémorisé, jogging libre) -- bornes directes ouvert/fermé (mêmes offsets que FB_Bucket,
-// relatifs à la position réelle de M1) + palier 1 (voir instWinchM2 §6 plus bas).
+// Bornes benne pilotées par le seul toggle IHM (TglManualBucketLimits), quel que soit le
+// sélecteur treuil -- protège aussi bien le jog M2 unitaire que le pilotage couplé.
+// Exclut un cycle géré par instBucket (CloseReq/OpenReq mémorisé, bouton confirmé ou séquence
+// automatique) : celui-ci a déjà ses propres bornes via FB_Bucket (IsClosed/IsOpen), un double
+// bornage y recréerait le palier 1 forcé et la coupure avant état franc. Bornes directes
+// ouvert/fermé (mêmes offsets que FB_Bucket, relatifs à la position réelle de M1) + palier 1
+// (voir instWinchM2 §6 plus bas), pour le jog libre uniquement.
 ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits
-    AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2);
+    AND NOT instBucket.Lifecycle.Busy;
 
 ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
 // Ce chemin (pilotage unitaire M2, hors instBucket) applique l'anticipation d'inertie
