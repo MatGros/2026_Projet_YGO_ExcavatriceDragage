@@ -37,6 +37,11 @@ GVL = ROOT / "CODE" / "GVL_PERSISTENT.st"
 WINCHCFG = ROOT / "CODE" / "J_SUPERVISION" / "_TYPES" / "1_TREUILS_BENNE" / "ST_WinchCfg.st"
 COMMUNCFG = ROOT / "CODE" / "J_SUPERVISION" / "_TYPES" / "7_COMMUN_CONFIG" / "ST_CommunCfg.st"
 PRG07 = ROOT / "CODE" / "M_MAIN" / "PRG_07_Supervision.st"
+# T341 : le CORPS de la normalisation a ete extrait de PRG_07 vers ce FB dedie
+# (CODE_QUALITY_STANDARDS §10.2 -- aucune logique metier inline dans un PRG).
+# Le bloc de regles controle par G504-6 / G504-10 est donc balise DANS LE FB ;
+# le cablage du signal de homing (G504-9) reste dans PRG_07, au site d'appel.
+FB_NORMALIZER = ROOT / "CODE" / "J_SUPERVISION" / "FB_CfgT330Normalizer.st"
 CODE = ROOT / "CODE"
 
 # Bornes Q21 (plan v1.3, decision C1 : TOP<=10 et Delta>=1 => FDC<=9)
@@ -155,33 +160,40 @@ def region_body(text: str) -> str | None:
 
 
 def check_region(errors: list[str]) -> None:
-    if missing(PRG07, errors, "PRG_07_Supervision"):
+    """G504-6 / -7 / -10 sur le corps de regles du FB ; G504-9 sur le site d'appel PRG_07."""
+    if missing(PRG07, errors, "PRG_07_Supervision") or missing(FB_NORMALIZER, errors, "FB_CfgT330Normalizer"):
         return
-    text = read(PRG07)
-    body = region_body(text)
-    if body is None:
+    fb_body = region_body(read(FB_NORMALIZER))
+    if fb_body is None:
         errors.append(
-            f"G504-6 region balisee ABSENTE dans PRG_07_Supervision.st — "
+            "G504-6 region balisee ABSENTE dans FB_CfgT330Normalizer.st — "
             "sans balise le perimetre du controle n'est pas decidable (plan v1.3 §3.2)"
         )
         return
-    # G504-6 : aucun clamp muet -> toute ecriture de correction porte un message.
-    lines = body.splitlines()
+    prg_body = region_body(read(PRG07))
+    if prg_body is None:
+        errors.append(
+            "G504-9 region balisee ABSENTE dans PRG_07_Supervision.st — "
+            "le cablage du signal de homing au site d'appel n'est plus localisable"
+        )
+        return
+    # G504-6 : aucun clamp muet -> toute ecriture de correction porte le message du FB.
+    lines = fb_body.splitlines()
     for i, line in enumerate(lines):
         if re.search(r"(CfgCableLimitAscent_M|CfgTopSensorPos_M|WinchSlowdownDistanceTop_M)\s*:=", line):
             window = "\n".join(lines[i:i + 4])
-            if "T330MsgCorrected := TRUE" not in window:
+            if "Corrected := TRUE" not in window:
                 errors.append(
-                    f"G504-6 clamp MUET ligne ~{i + 1} de la region T330 : "
+                    f"G504-6 clamp MUET ligne ~{i + 1} de la region T330 (FB_CfgT330Normalizer) : "
                     f"ecriture sans message associe -> {line.strip()[:60]}"
                 )
     # G504-10 : R0 (clamp absolu) AVANT la regle Delta.
     # Les noms sont distincts par construction : R0 utilise CST_T330FdcMin_M / CST_T330TopMin_M,
     # la regle Delta utilise CST_T330ReserveMinMargin_M. On compare donc leur PREMIERE position.
-    pos_clamp = body.find("CST_T330FdcMin_M")
-    pos_delta = body.find("CST_T330ReserveMinMargin_M")
+    pos_clamp = fb_body.find("CST_T330FdcMin_M")
+    pos_delta = fb_body.find("CST_T330ReserveMinMargin_M")
     if pos_clamp < 0 or pos_delta < 0:
-        errors.append("G504-10 R0 et/ou regle Delta introuvables dans la region T330")
+        errors.append("G504-10 R0 et/ou regle Delta introuvables dans la region T330 du FB")
     elif pos_clamp > pos_delta:
         errors.append(
             "G504-10 le clamp absolu R0 doit etre EN AMONT de la regle Delta (Q21 bis) : "
@@ -194,11 +206,13 @@ def check_region(errors: list[str]) -> None:
     # G504-9 : les 3 exceptions de montee (contrat AC5), chacune dans son VRAI emplacement.
     # ⚠️ Le gating homing s'appuie sur le CYCLE COMPLET (decision C2a) : HomingLifecycle.Busy
     # seul ne couvre que la transaction de preset (~50 ms), ce qui ne satisferait PAS Q22.
+    # ⚠️ Depuis T341 ces deux signaux sont lus au SITE D'APPEL (PRG_07) et passes au FB par
+    # l'entree `InHoming` : c'est la que le controle porte desormais.
     # ⚠️ L'override N1 et le bypass N2 vivent dans PRG_04 (lecture seule ici : ce gate ne fait
     # que LIRE, il n'ecrit jamais dans un fichier d'une autre tache).
-    if not (re.search(r"MachineHoming\.Active", body) and re.search(r"HomingLifecycle\.Busy", body)):
+    if not (re.search(r"MachineHoming\.Active", prg_body) and re.search(r"HomingLifecycle\.Busy", prg_body)):
         errors.append(
-            "G504-9 gating homing ABSENT ou INCOMPLET dans la region T330 : le cycle complet "
+            "G504-9 gating homing ABSENT ou INCOMPLET au site d'appel T330 (PRG_07) : le cycle complet "
             "(MachineHoming.Active) ET la transaction preset (HomingLifecycle.Busy) doivent etre "
             "COMBINES (C2a) — HomingLifecycle.Busy seul (~50 ms) ne suffit pas (AC5)"
         )
