@@ -5436,10 +5436,10 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.5" />
+                <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance de contrôle AX11 après fermeture benne (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance de contrôle AX11 après fermeture benne (m) — T298, reglage fin sur site a prevoir</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
