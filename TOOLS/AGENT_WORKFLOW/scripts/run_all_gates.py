@@ -164,6 +164,24 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     # ces 19 sites. La portee ci-dessous n'est PAS une allowlist : c'est le perimetre du lot T346,
     # rendu VISIBLE ici plutot que masque dans le script.
     ("C", "514", "G514 - Variable locale ecrite et jamais lue (code mort = temoin d'un comportement disparu) (T346)", [sys.executable, f"{S}/G514_check_dead_local_variable.py", ".", "--files", "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st"]),
+    # T262 phase B (A′, arbitrage humain 2026-09-21) : le seuil IHM d'ouverture benne doit
+    # rester une branche ADDITIVE des deux criteres historiques (tolerance matiere 2,0 m et
+    # anticipation de fermeture 1,2 m), qualifiee par la mesure, bornee 0..20 %, et consommee
+    # par les DEUX sites qui contraignent la transition AX10 -> AX10B. Sans le controle des
+    # deux sites, le champ peut redevenir mort comme il l'a ete du 2026-09-15 au 2026-09-21.
+    ("C", "515", "G515 - Seuil IHM d'ouverture benne : branche additive, qualifiee, bornee, consommee par les deux sites (T262-B)", [sys.executable, f"{S}/G515_check_t262_bucket_opening_threshold.py", "."]),
+    # T352 - Cause racine : le service d'auto-acquittement borne T278 etait cable sur 2 booleens de
+    # GVL_Simulation valant FALSE par defaut SANS AUCUN ECRIVAIN dans tout CODE/ : la machine a etats
+    # ne sortait jamais de State=0 sur machine reelle, alors que bundle, G200 et les 21 gates etaient
+    # verts. Le mode BLOQUANT ci-dessous porte l'invariant du lot (autorisations en dur, aucune entree
+    # servie par GVL_Simulation) : zero faux positif, et rouge des que le cablage regresse.
+    # Le detecteur GENERIQUE de la meme classe (« booleen de GVL consomme en argument nomme et jamais
+    # ecrit ») est disponible via --scan-all mais reste NON BLOQUANT, et ce n'est PAS une allowlist :
+    # mesure sur l'arbre avant correctif = 16 sites, dont 14 reglages de banc / bits de bypass dont
+    # l'ecriture est legitimement externe au PLC. Trier « reglage de banc » contre « interrupteur de
+    # production » est une decision HUMAINE (c'est la confusion qui a produit ce bug) : arbitrage
+    # remonte a l'orchestrateur, aucune exemption posee par l'agent.
+    ("C", "516", "G516 - Interrupteur de configuration mort : invariant de cablage T352 (autorisations en dur, aucune entree servie par GVL_Simulation)", [sys.executable, f"{S}/G516_check_dead_config_switch.py", "."]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]

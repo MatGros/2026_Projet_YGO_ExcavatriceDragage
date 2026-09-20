@@ -236,7 +236,13 @@ CycleDepthLowerBound_M := MAX(_CommunCfgPersist.LimitLegalDepthMinAllowed_M,
 IF GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M < CycleDepthLowerBound_M THEN
     GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M := CycleDepthLowerBound_M;
 END_IF;
-GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct := LIMIT(0, GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct, 50);
+// 🎛️ Borne du réglage de seuil d'ouverture benne, plafonnée à 20 %. Avec la géométrie
+// persistée (0,0 / 15,0 m), 20 % limite l'ouverture benne restante au départ de la remontée
+// à 3,0 m.
+// ⚠️ La MÊME borne est répétée dans FB_BucketCloseThreshold (défense en profondeur : le FB
+// est appelé dans la tâche rapide et ne fait pas confiance au seul bornage amont). Le
+// garde-fou G515 vérifie que les deux bornes restent ÉGALES — toute divergence échoue.
+GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct := LIMIT(0, GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct, 20);
 instCfgPersistBridgeCycle(Hmi := GVL_IHM.CycleSemiAuto.Cfg, Persist := _CycleCfgPersist);
 GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S := LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S, 3600);
 IF instCfgPersistBridgeCycle.JustRestored THEN

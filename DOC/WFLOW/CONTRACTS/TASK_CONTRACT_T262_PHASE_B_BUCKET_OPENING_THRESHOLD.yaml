@@ -1,0 +1,275 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T262 PHASE B (câblage du seuil d'ouverture benne)
+# ═══════════════════════════════════════════════════════════════════════════
+# Verrou : TASK_LOCKS.json / T262 / agent DSH16 (2026-09-21)
+# Challenge de conception : DOC/WFLOW/AUDITS/DESIGN/CHALLENGE_T262_PHASE_B_SEUIL_BENNE_2026-09-21.md
+# Contrat parent (phases A/C/D déjà livrées) :
+#   DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml
+# Plan de référence : DOC/WFLOW/CONTRACTS/PLAN_T262_TRANSFERT_AX10_AX11_20260915.md
+#
+# ✅ DÉCISIONS ARBITRÉES PAR L'HUMAIN LE 2026-09-21 :
+#    D1 = A′ — branche ADDITIVE en OR : aucune ligne historique de FB_Bucket ni de
+#              PRG_04 n'est réécrite, CloseAnticipationM et la tolérance 2,0 m
+#              CONSERVENT leur valeur et leur sens. AUCUNE DÉROGATION au plan
+#              T262 lignes 71-74 : le plan dit « ajoute seulement un critère »,
+#              c'est littéralement ce qui est livré.
+#    D2 = 20 % — borne maximale du réglage (mail GCAM + IHM_FREEZE_T262 = 20 %),
+#              resserrée depuis la proposition 50 % du contrat parent.
+#    D3 = minimal — aucune modification de FB_CycleSemiAuto ni de PRG_03.
+#    GO implémentation donné : test CI rouge d'abord, puis FB, câblage, G515,
+#    bundle, G200, palier C. AUCUN COMMIT sans accord explicite distinct.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T262-PHASE-B
+  criticality: C4
+  strategy: patch
+  technical_plan: DOC/WFLOW/AUDITS/DESIGN/CHALLENGE_T262_PHASE_B_SEUIL_BENNE_2026-09-21.md
+  updated_at: '2026-09-21T01:45:00+02:00'
+  objective: >
+    Rendre le réglage IHM ExtractionStartOpening_Pct réellement maître du seuil de
+    transition AX10 vers AX10B, en exprimant ce seuil en pourcentage d'ouverture benne
+    mesurée (0 % fermée, 100 % ouverte), par une branche additive qui n'écrit dans
+    aucune ligne historique : 0 % reproduit exactement le comportement d'aujourd'hui et
+    une valeur positive avance réellement l'instant où la fermeture est considérée
+    atteinte, sans inversion de sens M2 et sans retrait d'une barrière de sécurité.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Le réglage est un entier persistant borné 0..20, valeur initiale 0 ; le bornage
+        PRG_07 et le commentaire de déclaration ST_CycleCfg sont alignés sur 20, et le
+        FB de décision applique la MEME borne, vérifiée identique par le garde-fou G515.
+      verified_by: >
+        lecture de ST_CycleCfg.st:12 et PRG_07_Supervision.st:239 dans le diff, assertion
+        de saturation dans le test CI du FB (entrées -1, 0, 10, 20, 21), et check croise
+        de G515 sur les deux bornes.
+    - id: AC2
+      statement: >
+        À 0 %, la branche additive est inactive par construction : la sortie Reached du FB
+        vaut FALSE et l'expression historique de Benne_IsRoughlyClosed comme la condition
+        d'arrivée de fermeture de FB_Bucket restent le texte d'origine, caractère pour
+        caractère.
+      verified_by: >
+        test CI ST comparant la sortie du FB a l'expression historique recopiee, sur au
+        moins 60 combinaisons Delta x geometry, toutes en Reached FALSE ; et gate G515
+        verifiant que les deux lignes historiques sont presentes telles quelles.
+    - id: AC3
+      statement: >
+        À seuil p strictement positif, Reached devient vrai exactement au point où
+        l'écart mesuré atteint OffsetCloseM moins la distance équivalente, et reste faux
+        au point précédent d'un epsilon de position.
+      verified_by: >
+        test CI ST aux trois points Delta = seuil - 0,01 m, seuil, seuil + 0,01 m pour p
+        parmi 10, 19, 20, avec la distance equivalente calculee depuis la geometrie
+        persistee 0,0 / 15,0 m.
+    - id: AC4
+      statement: >
+        La distance équivalente est croissante en p sur 0..20 et ne remonte jamais le
+        critère historique : à 0 % elle vaut 0,0 m et la branche reste inerte.
+      verified_by: >
+        test CI ST balayant p de 0 a 20 par pas de 1, verifiant la distance attendue
+        p x 0,15 m et Reached faux a 0 % sur toute la plage de Delta.
+    - id: AC5
+      statement: >
+        Une mesure non qualifiée interdit la branche seuil : géométrie invalide,
+        MeasureValid faux ou IsIntermediate faux interdisent toute autorisation de
+        transition, y compris lorsque l'ouverture affichée vaut 0,0 par repli de
+        configuration.
+      verified_by: >
+        tests CI ST avec OffsetOpenM egal ou superieur a OffsetCloseM, MeasureValid faux
+        et IsIntermediate faux, verifiant Reached faux et Active faux dans les trois cas.
+    - id: AC6
+      statement: >
+        La sortie du lot ne fabrique aucun état benne : ni IsClosed, ni IsOpen, ni
+        Lifecycle.Done, ni CloseReq, ni CloseReached ne recoivent une ecriture nouvelle
+        hors des affectations existantes de FB_Bucket.
+      verified_by: >
+        revue du diff sur FB_Bucket.st et PRG_04_Treuils_Benne.st, plus gate G515 qui
+        refuse toute ecriture de ces champs hors des affectations historiques.
+    - id: AC7
+      statement: >
+        AX12 conserve sa règle actuelle : tant que Benne_IsClosed est faux, la consigne de
+        palier reste CST_StepSlow et aucune vitesse de charge n'est atteinte par le seul
+        franchissement du seuil.
+      verified_by: >
+        lecture de FB_CycleSemiAuto.st:1399-1402 dans le diff intact, et rejeu du test
+        existant T262-002 sans modification.
+    - id: AC8
+      statement: >
+        La chaîne AX10, AX10B, AX11, AX12 reste continue : à l'instant où la branche seuil
+        fait basculer la fermeture atteinte, FB_Bucket prend la même branche historique de
+        maintien en montée P1, donc aucune retombée du sens M2 ni du frein.
+      verified_by: >
+        test existant T262-002 rejoue vert, gate G500 vert, et lecture du diff verifiant
+        que la branche HoldAscentP1AfterClose de FB_Bucket est atteinte par le meme
+        CloseReached.
+    - id: AC9
+      statement: >
+        Aucun blocage en AX10 : à l'ouverture réglée, la branche seuil reste vraie à
+        chaque scan tant que la mesure reste dans sa plage, donc un geste absent au scan
+        d'arrivée ne fige pas la sortie AX10.
+      verified_by: >
+        test CI ST avec trois scans consecutifs a Delta constant et Reached vrai a chaque
+        scan, plus test comparatif montrant que la branche seuil ne depend d aucun front.
+    - id: AC10
+      statement: >
+        Un garde-fou automatique G515 refuse toute régression du câblage : constante en
+        dur au lieu du réglage, ligne historique modifiée, borne du FB divergente du
+        bornage PRG_07, ou branche seuil non qualifiée par MeasureValid et
+        IsIntermediate.
+      verified_by: >
+        execution de G515 avec --selftest (vert), puis jeu de mutations volontaires
+        (retrait de la garde de mesure, borne divergente, ligne historique reecrite)
+        verifiant le rejet de chaque mutation.
+    - id: AC11
+      statement: >
+        Le test CI du FB de décision est écrit avant l'implémentation et échoue d'abord,
+        puis passe au vert après implémentation, sur le même fichier de test inchangé.
+      verified_by: >
+        journal du runner CI TOOLS/TEST_AUTO_CI avec le resultat rouge initial puis vert
+        final, et empreinte du fichier de test identique entre les deux executions.
+    - id: AC12
+      statement: >
+        Le bundle PLCopenXML est régénéré et la liaison producteur-consommateur reste
+        sans erreur après la modification.
+      verified_by: >
+        generate_codesys_bundle.py puis G200_check_linkage.py --report colle dans la
+        restitution, plus CODE_XML/CODE_DiffBundle.xml avec la liste des objets.
+    - id: AC13
+      statement: >
+        Pour chaque fichier ST autorisé, le nom de fichier est identique au nom de POU et
+        le suffixe est égal au langage généré dans le bundle.
+      verified_by: >
+        gates structurels du palier C et revue du bundle PLCopenXML livré.
+    - id: AC14
+      statement: >
+        La branche seuil ne contourne aucune barrière : AU, FDC, permis de mouvement,
+        freinage, synchronisme et interlocks finaux restent inchangés et prioritaires, et
+        aucun redémarrage automatique après défaut n'est introduit.
+      verified_by: >
+        revue de flux PRG_03, PRG_04, PRG_06 et FB_Bucket sur le diff, plus gates de
+        securite du palier C verts.
+    - id: AC15
+      statement: >
+        L'interface IHM est alignée : la plage acceptée 0..20 et sa conséquence pratique
+        sont écrites dans la documentation d interface, et le contrat de gel IHM T262 est
+        mis à jour au lieu de laisser une plage 0..50 fausse.
+      verified_by: >
+        lecture du diff de IHM_FREEZE_T262_EXTRACTION_START_OPENING_20260915.md, montrant
+        la plage 0..20 et la mention de l effet inerte du plancher historique.
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/BENNE/FB_BucketCloseThreshold.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G515_check_t262_bucket_opening_threshold.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucketclosethreshold.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T262_PHASE_B_BUCKET_OPENING_THRESHOLD.yaml
+      - DOC/WFLOW/CONTRACTS/IHM_FREEZE_T262_EXTRACTION_START_OPENING_20260915.md
+      - DOC/WFLOW/CONTRACTS/PLAN_T262_TRANSFERT_AX10_AX11_20260915.md
+      - DOC/WFLOW/AUDITS/DESIGN/CHALLENGE_T262_PHASE_B_SEUIL_BENNE_2026-09-21.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/CODE_DiffBundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st
+      - CODE/B_AU_SECURITE/*
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+      - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/L_SIMULATION/*
+    restrictions:
+      - "A′ : la ligne historique d arrivee de fermeture et la ligne historique de tolerance 2,0 m doivent rester presentes a l identique dans le diff ; la branche seuil est une disjonction AJOUTEE."
+      - "Le calcul de BucketOpening_Pct reste produit par FB_Bucket seul : le FB de decision derive une distance depuis le reglage, il ne recalcule jamais un pourcentage."
+      - "ST_CycleCfg : seul le COMMENTAIRE de la ligne 12 est aligne sur la borne 20 ; la position et le type du champ restent inchanges (mapping RETAIN positionnel)."
+      - "PRG_07_Supervision : seule la borne du LIMIT de la ligne 239 est modifiee, en 20."
+      - "Toute sortie du perimetre autorise doit etre annoncee et justifiee avant edition."
+
+  conservation:
+    must_survive:
+      - "Le comportement de la transition AX10 vers AX10B a ExtractionStartOpening_Pct egal a 0."
+      - "La valeur et le sens de CloseAnticipationM (1,2 m) et de la tolerance matiere 2,0 m : aucune des deux expressions historiques n est reecrite."
+      - "La convention 0 % fermee, 100 % ouverte du pourcentage d ouverture benne."
+      - "AX12 au palier lent tant que Benne_IsClosed est faux."
+      - "La branche de maintien en montee P1 de FB_Bucket, atteinte par le meme signal CloseReached."
+      - "Les controles AU, FDC, permis, freins, synchronisme, plafonds de mou de cable et interlocks finaux."
+      - "Les modes manuel et maintenance, le jog benne et la persistance du reglage."
+    dropped_on_purpose:
+      - "La borne maximale 50 % du contrat parent, resserree a 20 % sur decision humaine du 2026-09-21."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Toute incoherence entre le pourcentage mesure, l information de fermeture benne,
+    l etape AX10 et la synchronisation M1/M2 doit etre signalee avant toute
+    implementation. En particulier : remise en cause de la non-regression a 0 %,
+    impossibilite de prouver le rouge initial du test, ou besoin de sortir du perimetre
+    autorise, doivent arreter le lot.
+
+  decisions_taken:
+    - "D1 = A′ : branche additive en OR, lignes historiques intactes, AUCUNE derogation au plan T262."
+    - "D2 = 20 % : borne maximale du reglage, resserree depuis 50 % ; impact IHM documente et trace (AC15)."
+    - "D3 = minimal : FB_CycleSemiAuto et PRG_03 non touches."
+
+  phases:
+    - "A : parametre persistant, borne et visible, sans effet cycle. LIVREE (2026-09-15)."
+    - "B : critere de transition cable sur le reglage, 0 % identique a l historique. CE CONTRAT."
+    - "C : raccordement P1 et transfert Both, livre sous le nom AX10B_RACCORDEMENT_P1 (2026-09-19)."
+    - "D : AX11 cible P2 puis AX12, confirmee fonctionnelle en reel le 2026-09-20."
+
+status: COMPLETED
+
+execution:
+  executed_by: "DSH16"
+  completed_at: '2026-09-21T02:05:00+02:00'
+  status: COMPLETED
+  summary: >
+    Phase B livree selon A′ et la borne 20 %. Test CI ecrit AVANT le code et rouge
+    d abord (FileNotFoundError sur CODE/H_TREUILS_BENNE/BENNE/FB_BucketCloseThreshold.st,
+    conversion moulinette en echec), puis vert apres implementation (16/16) sur le
+    MEME fichier de test. Aucune ligne historique reecrite : la condition d arrivee de
+    FB_Bucket et la tolerance matiere 2,0 m de PRG_04 sont intactes, la branche seuil
+    leur est ajoutee en disjonction (verifie par G515, y compris par mutation).
+    Aucun commit effectue.
+  evidence_submitted:
+    - "CI rouge initial : run_tests.py --fb FB_BucketCloseThreshold --fast --debug -> FAIL (conversion) / FileNotFoundError CODE/H_TREUILS_BENNE/BENNE/FB_BucketCloseThreshold.st"
+    - "CI vert : FB_BucketCloseThreshold 16/16 PASS ; FB_Bucket 38/38 PASS (interface elargie, non-regression)"
+    - "check_task_contract.py : PASS 0 erreur 0 avertissement"
+    - "G515 : PASS ; G515 --selftest : PASS, 8 mutations rejetees, aucun faux positif"
+    - "G200_check_linkage.py --report : PASS 0 erreur ; instCloseThreshold declaree FB_Bucket.st:151, appelee :615"
+    - "Bundle : 261/261 objets, 0 erreur ; diff bundle FB_Bucket, FB_BucketCloseThreshold, PRG_04_Treuils_Benne, PRG_07_Supervision, ST_CycleCfg"
+    - "Gates palier C : 48/53 PASS ; les 5 echecs sont les dettes preexistantes (G300, G340, G408, G430, G483) et le lot n en aggrave AUCUNE (G430 : 115 avant apres nettoyage de mes commentaires ; G340 : 115 -> 114, mon propre lien mort corrige)"
+    - "Branche seuil ADDITIVE : lignes historiques intactes (G515 C1/C4) et consommee par les DEUX sites (G515 C6)"
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Validation finale du comportement mecanique = essai humain dans CODESYS puis sur
+    machine. Recette IHM : plage 0..20, effet observable a partir de 9 %, et essai machine
+    a 10 % propose par le plan avant toute montee de reglage. Aucun commit sans accord
+    explicite distinct du GO d implementation.

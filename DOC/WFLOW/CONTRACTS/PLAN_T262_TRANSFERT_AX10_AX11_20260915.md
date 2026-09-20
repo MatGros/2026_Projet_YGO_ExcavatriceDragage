@@ -303,3 +303,26 @@ ou toute perte de permis. L'essai ne sert pas à « forcer » la transition.
 - Preuves : test compilé `T262-002 PASS`, garde-fou G500 `15/15 PASS`, G200 liaison
   `0 erreur`, bundle PLCopenXML frais. La validation finale du comportement réel
   reste l'essai manuel dans CODESYS.
+
+## 🔄 Phase B — câblage du seuil : décision humaine du 2026-09-21
+
+> Verrou `T262` / agent `DSH16`. Challenge source :
+> `DOC/WFLOW/AUDITS/DESIGN/CHALLENGE_T262_PHASE_B_SEUIL_BENNE_2026-09-21.md`.
+> Contrat : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T262_PHASE_B_BUCKET_OPENING_THRESHOLD.yaml`.
+
+Deux écarts au présent plan ont été **prouvés sur le code réel** avant toute écriture :
+
+| Écart constaté | Preuve | Conséquence |
+|---|---|---|
+| La « condition exacte actuelle » de ce plan (ligne 61) utilise `Benne_Done` ; le code shippé utilise `Benne_CloseReached`. | `FB_CycleSemiAuto.st:1298` vs `PLAN…:61` | La divergence est **nécessaire** : en AX10 `HoldAscentP1AfterClose` est armé (`FB_CycleSemiAuto.st:1295`), donc `FB_Bucket.st:603-611` maintient `Busy` et ne pose **jamais** `Done`. Suivre ce plan à la lettre **bloquerait AX10**. Ligne 61 à corriger par l'orchestrateur. |
+| La ligne 71-74 interdit de modifier l'anticipation et la tolérance, et demande « seulement un critère qui s'ajoute ». Or un critère qui n'agit pas sur l'instant d'arrivée de fermeture est **inerte** : `CloseReached` est conjoncté dans la porte AX10. | `FB_CycleSemiAuto.st:1298` · `FB_Bucket.st:592-602` | **Décision D1 = A′** : la branche est ajoutée **en OR** et agit sur l'arrivée de fermeture. Les deux expressions historiques (`CloseAnticipationM`, tolérance 2,0 m) **restent intactes**. ⇒ **aucune dérogation** aux lignes 71-74 n'est requise. |
+
+| Décision | Valeur retenue |
+|---|---|
+| **D1** | **A′** — branche additive en OR sur l'arrivée de fermeture **et** sur la tolérance matière ; aucune ligne historique réécrite |
+| **D2** | **Borne maximale du réglage = 20 %** (resserrée depuis les 50 % proposés ici) ; plage acceptée IHM 0..20 à tracer |
+| **D3** | Périmètre minimal : `FB_CycleSemiAuto.st` et `PRG_03_Modes_Cycle.st` **non touchés** |
+
+**Plage utile à écrire sur l'IHM** : par construction, `0..8 %` est **inerte** (le plancher
+d'anticipation historique de 1,2 m reste le terme contraignant) ; l'effet réel commence à **9 %**.
+Sans cette mention, un opérateur réglant 5 % conclurait à tort que la fonction ne marche pas.

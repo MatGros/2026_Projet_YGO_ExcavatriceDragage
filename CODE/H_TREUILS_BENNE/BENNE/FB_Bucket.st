@@ -49,6 +49,12 @@ VAR_INPUT
     Config                          : ST_fbBucket_Config;                // --> [CFG] Configuration parametres benne
     CfgTimeoutDuration              : TIME := T#60s;                  // --> [CFG] Timeout de mouvement configurable
     M1SlipToleranceM                : REAL := 1.0;                    // --> [CFG] Tolerance glissement M1 pendant Busy (m)
+    // 🎛️ Seuil d'ouverture benne déclarant la fin de fermeture atteinte.
+    // Ouverture benne RESTANTE (%) au-delà de laquelle la fermeture est considérée terminée.
+    // ⚠️ La branche correspondante est AJOUTÉE en disjonction à la condition d'arrivée de
+    // fermeture ci-dessous : celle-ci garde sa valeur et son rôle de filet anti-blocage.
+    // ⛔ 0 = branche INACTIVE : critère d'arrivée seul.
+    CloseReachedOpening_Pct         : INT := 0;                       // --> [CFG] Ouverture restante [0..20 %] déclarant la fermeture atteinte ; 0 = critère d'arrivée seul
 
     // === BYPASSES ET SIMULATION ===
     BypassGlobal                    : BOOL := FALSE;                  // --> [TST] Force ErrorId=0 global
@@ -138,6 +144,12 @@ VAR
     // Socle défaut
     instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
     instCauses                      : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
+
+    // Seuil de fermeture : FB PUR (aucun état) qui dérive le réglage en distance et en
+    // signal qualifié. Appelé au scan même dans la branche d'arrivée de fermeture, sur la
+    // MESURE de ce scan (§4a).
+    instCloseThreshold              : FB_BucketCloseThreshold;         // * [INST] Seuil d'ouverture benne déclarant la fermeture atteinte
+    ThresholdMeasureValid           : BOOL;                           // . [LOC] Qualification de la mesure pour la branche seuil (références, défauts, référence benne)
 END_VAR
 VAR CONSTANT
     CST_BandStableTime      : TIME := T#200ms;   // Confirmation de bande avant recalage de la cible offset (anti-chatter au bord)
@@ -589,7 +601,28 @@ ELSE
 
         // Arrêt fermeture
         IF CloseReq THEN
-            IF CablePosM2 >= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
+            // 🎛️ Branche AJOUTÉE, jamais substitutive : la condition d'arrivée ci-dessous
+            // (Config.CloseAnticipationM) conserve sa valeur et son rôle de filet
+            // anti-blocage sur matière dense ; la disjonction permet d'atteindre la même
+            // conclusion avec une ouverture benne restante plus grande, sur une mesure
+            // QUALIFIÉE.
+            // Qualification : références M1/M2, absence de défaut latché (géométrie benne
+            // invalide incluse) et référence benne persistante. Le gate d'entrée §2
+            // garantit déjà Enable ET PowerContactorEngaged (RETURN en tête de bloc).
+            ThresholdMeasureValid := ClassCanRun
+                                     AND BucketState.BucketReferenced
+                                     AND NOT Fault.Error;
+            instCloseThreshold(
+                ThresholdPct    := CloseReachedOpening_Pct,
+                OffsetOpenM     := Config.OffsetOpenM,
+                OffsetCloseM    := Config.OffsetCloseM,
+                DeltaPosition_M := DeltaPosition_M,
+                MeasureValid    := ThresholdMeasureValid,
+                IsIntermediate  := BucketState.IsIntermediate
+            );
+
+            IF CablePosM2 >= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM)
+               OR instCloseThreshold.Reached THEN
                 M2_RunRequest := MotionRequestActive AND ReqAscent AND EffectivePermitBucket_Close;
                 M2_ReqAscent := M2_RunRequest;
                 M2_ReqDescend := FALSE;
