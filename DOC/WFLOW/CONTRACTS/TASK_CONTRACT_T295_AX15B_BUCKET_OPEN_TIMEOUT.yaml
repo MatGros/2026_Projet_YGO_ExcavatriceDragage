@@ -3,9 +3,91 @@ contract:
   criticality: C3
   strategy: patch
   objective: >
-    Éliminer les timeouts injustifiés de l’ouverture de benne en AX15B en
-    identifiant leur cause, tout en gardant une détection sûre d’un mouvement
-    réellement bloqué.
+    Éliminer les timeouts injustes de l’ouverture de benne en AX15B comme en AX3 en
+    ne comptant QUE le temps de commande opérateur réellement engagée (temps
+    SUSPENDU, jamais remis à zéro, hors engagement), tout en gardant une détection
+    sûre d’un mouvement réellement bloqué sous commande continue.
+  design_decision_20260920:
+    actee_par: HUM
+    semantique: >
+      a2 — SUSPENSION, PAS REMISE A ZERO. Le temps consommé vers le timeout n’avance
+      que pendant les scans où l’opérateur commande activement ; hors engagement le
+      compteur est GELÉ (il ne repart pas de zéro) ; il reprend à la commande suivante
+      et se cumule jusqu’à CfgTimeoutDuration. Remise à zéro uniquement en fin de
+      manœuvre (Lifecycle.Busy retombe) et sur Reset sur front.
+    inchange: "PT = CfgTimeoutDuration (60 s effectif) ; instCauses[2].Latching := TRUE ; aucun autre élément du mécanisme de faute."
+    hors_scope: "Option (b) « timeout sur progression mesurée » — explicitement écartée par l’humain (lot minimal)."
+    alerte_cc01_signal: >
+      Le signal nommé initialement par l’humain (CloseReq/OpenReq) est INOPÉRANT :
+      ce sont des LATCHES (FB_Bucket.st:424-431, remis à FALSE seulement à l’arrivée
+      :515/:540, en erreur sévère :398-399 ou à l’abandon de contexte :416-417) — ils
+      restent TRUE pendant toute la pause opérateur. Conditionner le TON dessus
+      produirait ZÉRO changement de comportement. Signal retenu : MotionRequestActive
+      (FB_Bucket.st:391), qui suit le joystick en direct en SEMI_AUTO (PRG_04:342-343)
+      et arme déjà le Lifecycle.Busy (:434).
+    risque_residuel: >
+      Un blocage réel HACHÉ par des relâchements opérateur n’atteint pas le cumul de
+      60 s en a2 et n’est pas détecté par ce watchdog. Filets conservés : cause 1
+      (écart max, FB_Bucket.st:186-196), cause 3 (glissement M1, :208-214),
+      non-arrivée à la cible visible par le cycle, et détection immédiate du blocage
+      sous commande continue tenue.
+    implementation_effective_20260920_dsh08:
+      forme: >
+        Composition TON + compteur de temps engage (le TON IEC ne sait pas « pauser »).
+        TonTimeout(IN := TimeoutEngaged AND NOT TimeoutRestart, PT := CfgTimeoutDuration
+        - TimeoutAccumTime) ; le cumul est GELE au relachement (TimeoutAccumTime :=
+        TimeoutAccumTime + dernier ET du segment) et remis a zero quand Lifecycle.Busy
+        retombe ou sur Reset sur front. PT n’est jamais negatif (borne a T#0s) et
+        CfgTimeoutDuration n’est jamais modifie.
+      signal_engagement_confirme: >
+        MotionRequestActive est EFFICACE dans le scenario vise (AX3_OPEN_BUCKET et
+        AX15B_DUMP_OPEN en SEMI_AUTO) : le cycle neutralise WinchM1Cmd/WinchM2Cmd sur ces
+        deux etapes (FB_CycleSemiAuto.st:929-930 et :1438-1439), donc WinchBothReqDescend
+        reste FALSE (PRG_03_Modes_Cycle.st:286 et :311) et ReqDescend suit le JOYSTICK EN
+        DIRECT (PRG_04_Treuils_Benne.st:343). MotionRequestActive (FB_Bucket.st:391)
+        retombe donc bien au relachement — condition de non-neutralisation du correctif.
+      ecart_au_brief: >
+        MotionRequestActive etait calcule en §3, APRES le watchdog §1 : le lire tel quel
+        aurait introduit un lag d’un scan (fatal en test, ou un scan peut sauter 5 s et ou
+        le TON aurait alors compte la pause entiere). Les deux lignes de calcul
+        (MotionRequestConflict / MotionRequestActive) ont donc ete remontees en tete de §1.
+        Calcul identique (ReqAscent/ReqDescend sont des VAR_INPUT jamais reecrites) :
+        valeur identique pour tous les consommateurs, seul l’instant de calcul avance.
+      piege_i_resolu: >
+        « Aucun re-latch immediat apres Reset sur front » : un TON IEC ne retombe PAS quand
+        PT augmente (etat Q figé, ET cloue a PT). Le Reset sur front force donc un SEGMENT
+        NEUF (TimeoutRestart => IN := FALSE sur un seul scan) en plus de la remise a zero du
+        cumul. Sans cela, un Reset pendant une commande encore engagee re-latchait au scan
+        suivant et le Reset restait inoperant pendant toute la manoeuvre.
+      risque_residuel_supplementaire: >
+        Reset martele (< CfgTimeoutDuration) par l’operateur pendant une commande continue
+        reellement bloquee rendrait a chaque front un budget complet : le watchdog peut alors
+        etre contourne par repetitions. Retenu car « remise a zero sur Reset sur front » est
+        la semantique ACTEE ; filets conserves = cause 1 (ecart max), cause 3 (glissement M1),
+        non-arrivee a la cible visible par le cycle, et detection immediate du blocage sous
+        commande continue. Point a contresigner par l’humain.
+      lag_residuel: >
+        TimeoutEngaged evalue en §1 sur Lifecycle.Busy ET MotionRequestActive : les deux sont
+        desormais lus au scan courant (aucun lag sur l’engagement) ; le TON conserve le lag
+        d’un scan de l’armement du Busy, identique a l’avant-correctif.
+  alertes_20260920_dsh08:
+    - >
+      TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE : FB_Bucket etait deja a 24/33 (9 ECHECS
+      PREEXISTANTS) AVANT ce lot — tests obsolete par rapport au code actuel (permis
+      EffectivePermitBucket_* non passes, classification d’etat continue, suppression de la
+      detection d’incoherence boot : StateIncoherent n’est plus pose qu’en :242). L’AC-F du
+      brief (« suite 100% PASS ») est donc INATTEIGNABLE sans un lot dedie de re-alignement
+      des 9 tests. Hors scope T295 : SIGNALE, non corrige (aucun test desactive ni affaibli).
+    - >
+      DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md:219-224 decrit encore l’ANCIENNE
+      semantique du timeout (« maintien sans fin de manoeuvre ») et :283 donne un mapping
+      ErrorId faux (bit0 Timeout) alors que le code porte Timeout = cause 2 (bit 2) — hors
+      scope T295 (seule la racine AF_Partie-10_Fonction_Winch_v2.1.md est autorisee) : SIGNALE.
+    - >
+      E_Mode.AUTO : ReqAscent/ReqDescend ne suivent pas le joystick (PRG_04_Treuils_Benne.st:342-343,
+      clause SEMI_AUTO uniquement) et le cycle neutralise WinchM2Cmd sur AX3/AX15B — donc en AUTO
+      l’armement de Lifecycle.Busy (FB_Bucket.st:434) ne peut pas se produire sur ces etapes : le
+      timeout ErrorID:03 ne peut survenir qu’en SEMI_AUTO. Preexistant, hors scope : SIGNALE.
   acceptance:
     - id: AC1
       statement: "La chaîne AX15B → commande d’ouverture → FB_Bucket → mouvement M2 → position d’ouverture → watchdog/ErrorID:03 est documentée avec ses gardes et son timing exacts."
@@ -28,6 +110,18 @@ contract:
     - id: AC7
       statement: "Le suffixe de fichier est identique au langage déclaré dans le bundle pour tout POU modifié sous CODE/M_MAIN."
       verified_by: "Contrôle du nom de fichier/POU et inspection du PLCopenXML généré."
+    - id: AC8
+      statement: "Une pause opérateur (relâchement de la commande, aucune progression) maintenue au-delà de CfgTimeoutDuration ne produit AUCUN défaut (ni Error, ni Latched, ni bit 2 de ErrorId) — le compteur de timeout est suspendu, pas seulement remis à zéro."
+      verified_by: "Test CI ciblé dans test_fb_bucket.st : rouge avant le correctif, vert après ; sortie brute des deux états."
+    - id: AC9
+      statement: "Le temps de commande engagée se CUMULE d’un engagement à l’autre (suspension) : plusieurs séquences de commande engagée totalisant CfgTimeoutDuration sans progression déclenchent bien le défaut latché."
+      verified_by: "Test CI ciblé (relâchements intermédiaires) prouvant le cumul et non une simple remise à zéro du TON."
+    - id: AC10
+      statement: "Le signal d’engagement effectivement utilisé est tracé fichier:ligne dans la restitution et remonte au consommateur final (bandeau opérateur), avec justification du rejet de CloseReq/OpenReq (latches) et de M2_RunRequest (tombe sous blocage de permis)."
+      verified_by: "Section traçabilité d’impact de la restitution."
+    - id: AC11
+      statement: "Le garde-fou (nouveau gate G507 ou supérieur — G504/G505 réservés T330, G506 pris) est présent ET branché dans PLANS de run_all_gates.py, et échoue si le TON de timeout est de nouveau armé sur le seul Lifecycle.Busy."
+      verified_by: "Ligne PLANS + exécution réelle du gate (REX « garde-fou mort-né » G490/G499)."
   scope:
     allowed:
       - CODE/G_CYCLE/FB_CycleSemiAuto.st
@@ -37,6 +131,7 @@ contract:
       - CODE/L_SIMULATION/FB_SimBench.st
       - CODE/L_SIMULATION/GVL_Simulation.st
       - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/scripts/
       - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
       - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
       - DOC/WFLOW/
@@ -44,17 +139,24 @@ contract:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
       - Suppression ou désactivation du watchdog FB_Bucket sans décision humaine explicite.
       - Modification des temporisations de sécurité, des interlocks ou de la commande manuelle hors besoin démontré.
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st par le lot T295 (T331 en vol sur ce fichier — sérialisation obligatoire).
+      - CfgTimeoutDuration : valeur effective (60 s, GVL_PERSISTENT.st:81) et défauts (FB_Bucket.st:50, ST_BucketCfg.st:7) — l’écart 30 s/60 s est SIGNALÉ, jamais corrigé ici.
+      - CODE/J_SUPERVISION/_TYPES/* (tout nouveau champ IHM = arbitrage orchestrateur).
+      - GVL_PERSISTENT.st, CODE/M_MAIN/PRG_07_Supervision.st, CODE/L_SIMULATION/* par T295.
   conservation:
     must_survive:
-      - "Le watchdog de mouvement protège toujours contre une ouverture réellement bloquée ou sans progression."
+      - "Le watchdog de mouvement protège toujours contre une ouverture réellement bloquée ou sans progression sous commande continue."
       - "Les limites géométriques, permis M2, interlocks, arrêt normal et réarmement conscient restent actifs."
       - "Les autres usages FB_Bucket conservent leur comportement nominal."
+      - "L’acquisition d’un défaut reste bornée et latchée : jamais de redémarrage automatique après défaut."
     dropped_on_purpose: []
   evidence_required:
     - check_linkage
     - run_all_gates
     - bundle
     - "Rapport causal appuyé par traces ou scénario SimBench reproductible."
+    - "Test CI AC8/AC9 (pause opérateur sans défaut ; cumul du temps engagé) rouge avant / vert après."
+    - "Garde-fou G507+ présent ET branché dans PLANS de run_all_gates.py."
   models_allowed:
     - "omni/cc/claude-sonnet-5"
     - "omni/cx/gpt-5.6-terra"
@@ -62,15 +164,44 @@ contract:
     Tout défaut de câblage logique, comportement contradictoire du retour de
     position/permis, ou risque de prolongation d'un mouvement est remonté
     immédiatement. Ne jamais corriger un timeout en supprimant la surveillance.
-status: PENDING
+    Tout signal d’engagement qui ne retombe pas au relâchement (latche) est
+    immédiatement signalé : il rendrait le correctif inopérant.
+status: COMPLETED
+
 execution:
-  executed_by: ""
-  completed_at: ""
-  status: PENDING
-  summary: ""
-  evidence_submitted: []
+  executed_by: "DSH08"
+  completed_at: "2026-09-20T18:25:00+02:00"
+  status: COMPLETED
+  summary: >
+    Correctif T295 livré dans FB_Bucket.st §1 Cause 2 : le budget de CfgTimeoutDuration ne se consomme
+    que pendant une commande opérateur réellement engagée (Lifecycle.Busy AND MotionRequestActive) ;
+    hors engagement le cumul est GELÉ (suspension a2, jamais remis à zéro) et il reprend/se cumule à la
+    commande suivante (PT := CfgTimeoutDuration - cumul, borné à T#0s). Remise à zéro en fin de manœuvre
+    et sur Reset sur front (segment TON neuf forcé un scan). CfgTimeoutDuration, latch et interface FB
+    inchangés. MotionRequestActive est désormais calculé en tête de §1 (sans lag d'un scan).
+  evidence_submitted:
+    - "CI H_TREUILS_BENNE : TC-P10-046.1 (commande continue => défaut latché) PASS ; 046.2 (pause opérateur > PT => aucun défaut) PASS ; 046.3 (cumul de segments < PT => défaut latché) PASS ; 046.4 (arrivée nominale après pause => Done) PASS"
+    - "Rouge avant / vert après prouvé par les runs archivés du 2026-09-20 (18:12 : 046.2 + 046.3 FAIL ; 18:13:51 : PASS ; 18:14:26 : 046.3 FAIL sous mutation a1 puis PASS)"
+    - "Bundle CODE_XML/CODE_Bundle.xml : 258/258 objets, 0 erreur ; DiffBundle = FB_Bucket + fermeture de types ; G200_check_linkage --report : PASS (0 erreur)"
+    - "Gate G507_check_t295_bucket_timeout_engaged.py branché dans PLANS (palier C) : PASS, --selftest rejette 4 mutations"
 validation:
   status: PENDING
-  validated_by: ""
-  validated_at: ""
-  notes: ""
+  validated_by: "CC01 (vérification indépendante) — contresignature humaine attendue"
+  validated_at: "2026-09-20T18:40:00+02:00"
+  notes: >
+    2026-09-20 — design acté par HUM (a2 : suspension, pas remise à zéro ; signal MotionRequestActive,
+    CloseReq/OpenReq étant des latches inopérants). Contrat complété par CC01 (scope scripts/, AC8-AC11).
+    VÉRIFICATION INDÉPENDANTE CC01 (git diff réel, pas le rapport de l'agent) : bundle régénéré 258/258
+    0 erreur ; G200 PASS 0 erreur (instFault FB_Bucket.st:142 -> :294) ; G507 PASS + branché dans PLANS ;
+    comparatif des rapports CI archivés avant/après = 9 échecs IDENTIQUES avant et après, 3 nouveaux tests
+    verts, AUCUNE régression ; gates palier C = 7 rouges / 46, tous préexistants et hors fichiers T295
+    (G300, G340, G408 — message long de FB_CycleSemiAuto.st déjà présent dans HEAD, G420, G430 — 102
+    commentaires REX dans tout le dépôt, G460 — fichiers d'infra absents, G483).
+    POINT À CONTRESIGNER PAR L'HUMAIN : le Reset sur front remet aussi le cumul à zéro. Un Reset martelé
+    (< PT) pendant une commande bloquée peut donc contourner le watchdog, alors que l'ancien code
+    re-latchait immédiatement (ET cloué à PT). Comportement voulu (évite la boucle de re-latch), mais
+    c'est une différence de comportement sur Reset qui doit être assumée explicitement.
+    HORS SCOPE SIGNALÉ (non corrigé) : (1) la fiche DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
+    :219-224 et :283 décrit encore l'ancienne sémantique et un mapping ErrorId erroné ; (2) en E_Mode.AUTO
+    l'ouverture benne ne peut pas armer Lifecycle.Busy (hors SEMI_AUTO) ; (3) 9 tests CI H_TREUILS_BENNE
+    obsolètes (préexistants).

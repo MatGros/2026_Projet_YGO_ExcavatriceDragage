@@ -152,6 +152,7 @@
    - [7.5 Benne partiellement fermée & remontée palier 1](#75-🪣-sécurité-benne-partiellement-fermée-obstruée-remontée-palier-1)
    - [7.6 Synchronisation M1/M2 étagée](#76-️-synchronisation-m1m2-étagée-fb_winchsync)
    - [7.7 Plafond palier sur codeurs non référencés (fail-safe hors homing)](#77--plafond-palier-sur-codeurs-non-référencés-fail-safe-hors-homing)
+   - [7.8 Surveillance de manœuvre benne — temps de commande engagée (T295)](#78--surveillance-de-manœuvre-benne--temps-de-commande-engagée-t295)
 8. [📜 Suivi historique](#8-suivi-historique)
 9. [❓ TBD](#9-tbd)
 10. [📚 Documents liés](#10-documents-liés)
@@ -614,12 +615,46 @@ vitesse = 1** sur **les deux treuils**, en **montée ET en descente**. Posture *
   vitesse (`SpeedGuardEnable`, encore `FALSE` — §7.1/§7.3). Tout bridage futur fondé sur la
   vitesse mesurée reste conditionné à ce garde-fou.
 
+### 7.8 ⏱️ Surveillance de manœuvre benne — temps de commande engagée (T295)
+
+> 📌 **Constat terrain (2026-09-20)** : en ouverture de benne (`AX3_OPEN_BUCKET`, `AX15B_DUMP_OPEN`),
+> une manœuvre **normale** suivie d'une **pause opérateur** (relâchement du joystick pour observer le
+> vidage) finissait en `[BENNE]` **ErrorID:03** (cause 2 — timeout de déplacement benne), **latché**
+> ⇒ `Reset` obligatoire à chaque essai du grafcet. Le temporisateur était armé sur le **seul**
+> `Lifecycle.Busy`, qui reste vrai **pendant toute la manœuvre** (et non pendant la commande) :
+> les pauses étaient donc imputées au budget, en **temps mural**.
+
+- 🎯 **Règle** : le budget de `CfgTimeoutDuration` (60 s effectifs) ne se consomme **que** pendant
+  une commande opérateur **réellement engagée** — `Lifecycle.Busy` **ET** `MotionRequestActive`
+  (intention de mouvement arbitrée ; en `SEMI_AUTO` elle suit le joystick **en direct**).
+  Hors engagement le compteur est **GELÉ** (il n'est **pas** remis à zéro) ; il **reprend et se
+  cumule** à la commande suivante.
+- ♻️ **Remise à zéro du cumul** : **uniquement** en fin de manœuvre (`Lifecycle.Busy` retombe) et
+  sur `Reset` **sur front** (réarmement conscient : budget complet **et** segment de temporisation
+  neuf — sans quoi le défaut se ré-armerait au scan suivant, un `TON` IEC ne retombant pas lorsque
+  `PT` augmente).
+- 🛡️ **Non-neutralisation** : un mouvement **commandé en continu** sans progression latche toujours
+  dans un délai borné (`≤ CfgTimeoutDuration`). Risque résiduel **assumé** : un blocage réel
+  **haché** par des relâchements n'atteint pas le cumul — filets conservés : écart max M1/M2
+  (cause 1), glissement M1 (cause 3), non-arrivée à la cible visible par le cycle.
+- 🔒 **Inchangés** : valeur et défauts de `CfgTimeoutDuration`, `instCauses[2].Latching := TRUE`,
+  interface de `FB_Bucket` (aucun nouveau `VAR_INPUT`), aucune réouverture automatique après défaut.
+- 🧪 **Garde-fou & tests** : gate `G507_check_t295_bucket_timeout_engaged.py` (branché dans `PLANS` de
+  `run_all_gates.py`) ; tests `TC-P10-046.1` (commande continue ⇒ défaut latché), `046.2` (pause
+  opérateur > `PT` ⇒ **aucun** défaut), `046.3` (cumul de segments < `PT` ⇒ défaut latché),
+  `046.4` (arrivée nominale après pause ⇒ `Done`, aucun défaut) dans
+  `TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st`.
+- ⚠️ La fiche `AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md` décrit encore l'**ancienne** sémantique
+  (« maintien sans fin de manœuvre ») et un mapping `ErrorId` erroné : **signalé**, hors périmètre
+  T295 (à réaligner dans un lot doc dédié).
+
 ---
 
 ## 📜 8 · Suivi historique
 
 | Version | Date | Changement |
 |---|---|---|
+| v2.1 (fix) | 2026-09-20 | §7.8 ajouté (T295, C3) : le watchdog de timeout de manœuvre benne ne compte plus que le **temps de commande opérateur réellement engagée** (`Lifecycle.Busy` ET `MotionRequestActive`), suspendu hors engagement et **cumulé** — fin des faux `[BENNE] ErrorID:03` après une pause opérateur. Remise à zéro en fin de manœuvre et sur `Reset` sur front. Code `FB_Bucket.st` §1 Cause 2, garde-fou `G507` branché dans `PLANS`, tests `<nobr><code>TC-P10-046.1</code></nobr>` à `<nobr><code>TC-P10-046.4</code></nobr>`. Sommaire mis à jour. |
 | v2.1 (fix) | 2026-09-03 | §7.7 ajouté (T146, C4 ISO 13849) : plafond palier = 1 (M1+M2, montée+descente) tant que codeurs non `HomedAndReliable` — fail-safe hors homing, CODÉ en interim dans `PRG_04_Treuils_Benne` §5ter, décision de posture à contresigner (`DECISIONS_T146_ARBITRAGE_ISO13849.md`). Sommaire mis à jour. |
 | v2.1 (fix) | 2026-08-26 | Revue de cohérence croisée AF-01→14 (sous-agent) : §5.2 citait encore `instSpeedMonitorM1/M2` comme instance active — retiré (`FB_Encoder_SpeedMonitor` supprimé, TBD signalé par AF-09 §11 mais resté sans effet jusqu'ici) |
 | v2.1 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié (incluant 2bis/2ter et 7.1-7.6), section `🎯 Rôle et périmètre` explicite, Table des fonctions `F10.01`-`F10.09` ajoutée (obligatoire, famille Fonctions métier), diagramme composition HTML/SVG → Mermaid `flowchart TD` stylisé, Suivi historique + TBD ajoutés, renumérotation complète (dont fusion 7.5→7.4/7.6→7.5/7.7→7.6 pour combler le trou 7.4 jamais rempli). **Correctifs de fond** (review sous-agent expert automatisme) : 4 des 9 liens vers les fiches FB (`FB_Winch`, `FB_Safety_Winch`, `FB_WinchOutputInterlock`, `FB_Bucket`) étaient morts — pointaient vers `AF_Partie-10_FB_*_v1.0.md` (racine `DOC/AF/`) alors que les 9 fiches vivent dans `AF_Partie-10_Fonction_Winch/` — corrigés dans la table Composition et le tableau Points de validation ; phrase tronquée en tête de §7 complétée ; §5.1 (organisation de l'exécution `PRG_04_Treuils_Benne`) entièrement fausse — décrivait des régions (`instBucket` en premier, arbitrage M1/M2 séparés, etc.) ne correspondant plus aux 8 régions réelles du code (`§1`-`§8` vérifiées une à une) — corrigée ; références à des tâches inexistantes (T87/T93/T94/T95/T96, jamais créées dans `TASKS.yaml`) retirées de §7.2/§7.3/§9/§10, la seule étude T91 réelle citée à tort ici concerne en fait `FB_Brake` (périmètre distinct depuis le découplage frein §2bis). Code repointé (`CODE/H_TREUILS_BENNE/*` et 3 audits) |
