@@ -1,4 +1,51 @@
 tasks:
+- id: T331
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: CYCLE_SEMIAUTO / AX1_POSTURE / DIAGNOSTIC_IHM / SECURITE_MOUVEMENTS
+  agent: '—'
+  date: '2026-09-20T11:23:23+02:00'
+  updated_at: '2026-09-20T11:26:00+02:00'
+  titre: 'AX1 — diagnostic posture de départ et remise en posture contrôlée (M3, FDC haut M1, benne)'
+  contexte: 'Le message « Posture depart incorrecte (M3, FDC haut M1 ou benne) » est trop global : il peut citer M3 alors que M3 est déjà à P1, ou ne pas distinguer un M1 hors FDC logiciel haut d''une benne non qualifiée. AX1 doit exposer uniquement les causes réellement fausses et l''action associée. Si une remise en posture est autorisée, elle doit rester une manœuvre opérateur contrôlée : geste joystick maintenu + homme-mort, fermeture automatique de la benne si nécessaire puis remontée couplée jusqu''à la position haute ; la translation gauche/droite doit pouvoir rejoindre P1 et s''arrêter automatiquement sur P1.'
+  description: 'Cadrer puis implémenter séparément un diagnostic AX1 par cause et une procédure de remise en posture. La montée de remise en posture conserve le TOP mécanique, AU, permis, FDC/limites et protections existants ; aucun mouvement autonome, aucune confusion d''axe, aucun bypass et aucune nouvelle variable de FDC/position. La condition benne non qualifiée doit être définie avant implémentation (état franc requis et comportement en cas d''ouverture/fermeture non atteinte).'
+  objectifs:
+  - 'Diagnostic AX1 décomposé en trois causes indépendantes et testables : M1 hors FDC logiciel haut, benne non qualifiée selon la précondition explicitée, M3 hors P1 ou position non qualifiée.'
+  - 'Le message et l''action opérateur ne citent que les causes fausses au scan courant ; aucun libellé M3 si M3 est déjà P1 qualifié, et réciproquement.'
+  - 'Sous geste opérateur maintenu et homme-mort valides, une fermeture automatique de benne puis une remontée couplée peuvent être proposées uniquement avec tous les permis, AU, TOP mécanique, FDC/limites et protections existants ; relâchement ou défaut arrête la manœuvre sans reprise automatique.'
+  - 'La translation M3 gauche/droite peut rejoindre P1 sous commande maintenue et s''arrête automatiquement à P1 ; elle ne commande jamais les treuils et ne franchit aucune limite de translation.'
+  - 'Aucune nouvelle variable de fin de course, position figée (8,50 m/7,50 m), paramètre persistant ou bypass n''est créé ; les variables et garde-fous existants sont réutilisés.'
+  - 'Le plan est phasé : diagnostic et matrice de causes ; design validé humainement ; implémentation séparée diagnostic puis remise en posture ; tests unitaires/simulation ; validation CODESYS et essais terrain supervisés.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T331_AX1_POSTURE_DIAGNOSTIC_REMISE.yaml
+  bloque_par:
+  - T255
+  - T255-C
+  - T255-B
+  - T319
+  - T327
+  - T330
+  avancement: 'Création de tâche et contrat C3 : cadrage uniquement, aucun code ni IHM modifié.'
+- id: T330
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: CONFIGURATION_TREUILS / SECURITE_POSITIONNELLE
+  agent: '—'
+  date: '2026-09-20T11:19:48+02:00'
+  updated_at: '2026-09-20T11:19:48+02:00'
+  titre: Cadrer l'invariant entre position homing TOP et FDC logiciel haut
+  contexte: 'Les cotes 8,50 m (position de référencement au capteur TOP) et 7,50 m (FDC logiciel haut) sont des paramètres utilisateur, jamais des constantes métier. Elles doivent conserver une réserve verticale minimale : PositionHomingTop_M >= CableLimitAscent_M + 1,00 m. Le 1,00 m est une règle d ingénierie fixe à vérifier, pas un nouveau réglage IHM. Les gardes à plus ou moins 0,50 m seront dérivées ultérieurement de ces paramètres existants.'
+  description: 'Cadrage et proposition de vérification de configuration uniquement. Identifier les producteurs, consommateurs et modes de validation des deux paramètres existants ; définir la réaction sûre à une configuration invalide sans clamp silencieux ni création de nouvelle variable de fin de course. Ne modifie ni la mesure M2 corrigée ni les FDC dans cette tâche.'
+  objectifs:
+  - 'Nommer les paramètres persistants existants, leurs unités, leurs propriétaires et tous leurs consommateurs de montée/homing.'
+  - 'Prouver la règle PositionHomingTop_M - CableLimitAscent_M >= 1,00 m sur M1 et le repère corrigé M2, sans nouvelle cote configurable.'
+  - 'Proposer la réaction de configuration invalide : arrêt de l armement/mouvement normal, diagnostic explicite et homing explicite seul ; aucune limitation silencieuse.'
+  - 'Définir les contrôles dérivés à ±0,50 m uniquement à partir des deux paramètres existants, sans nouveau champ persistant ou IHM.'
+  - 'Livrer un plan C3 d implementation séparé, soumis à validation humaine avant code.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T330_HOMING_TOP_SOFT_LIMIT_INVARIANT.yaml
+  bloque_par: []
+  avancement: 'Cadrage créé. Aucun code ni réglage ajouté.'
 - id: T329
   parent_id: ''
   statut: ⬜
@@ -944,36 +991,34 @@ tasks:
   bloque_par: []
 - id: T291-B
   parent_id: T291
-  statut: ⏸️
+  statut: ⬜
   criticite: C4
   domaine: SECURITE_LIMITES_HAUTES_TREUILS
   agent: —
-  date: '2026-09-15T12:07:30+02:00'
+  date: '2026-09-20T10:21:46+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
-  avancement: '⏸️ Mise de cote demandee le 2026-09-15. Audit exhaustif conserve : regression logicielle identifiee avec confiance
-    95 %, introduite par f36c4480 puis amplifiee/revelee par 92601d2c ; codeurs et SimBench hors cause. Aucun correctif automate
-    engage.'
-  titre: T291-B — Autorite M1 en Both et filets hauts independants M2 corrige
+  avancement: '⬜ Reouverte le 2026-09-20 apres mise de cote demandee le 2026-09-15. Audit exhaustif conserve : regression logicielle identifiee avec confiance
+    95 %, introduite par f36c4480 puis amplifiee/revelee par 92601d2c ; codeurs et SimBench hors cause. Reouverte sur demande
+    utilisateur le 2026-09-20 apres recurrence terrain AX12. Etape active : confirmer par snapshot frais la divergence P1/P5
+    et WinchBothFinalRequestsCoherent avant toute implementation C4. Aucun correctif automate engage.'
+  titre: T291-B — Position M2 corrigee continue, puis autorite M1 en Both AX12
   contexte: 'Decision utilisateur 2026-09-15 : en M1 seul ou M1+M2 Both, le FDC logiciel nominal et la reduction de vitesse
     sont pilotes par M1. M2 est suiveur et recoit le meme profil de contacteurs. En M2 seul, la position M2 corrigee geometrie
     benne reste la reference. Le capteur TOP mecanique commun reste independant.'
-  description: 'En Both, appliquer aux deux treuils le profil derive de M1 jusqu a l arret nominal H. Conserver M2 corrige
-    comme surveillance independante : SafeStop a H+1 et PowerCutOff a H+2 sans temporisation. Le capteur TOP mecanique provoque
-    le stop commun et son escalade si mouvement ou contacteurs persistent.'
+  description: 'Phasage impose : d abord corriger l algorithme de la position M2 corrigee EXISTANTE pour qu elle soit continue de la benne ouverte a fermee, puis la tester et la valider avant toute modification de FDC ou AX12. Ensuite seulement, M1 devient l autorite nominale Both (profil commun et fin AX12) tandis que M2 corrige reste un garde-fou derive des parametres existants. Aucun nouveau champ de position, de FDC ou de configuration IHM/RETAIN.'
   objectifs:
-  - 'M1 seul : approche et FDC logiciel nominal bases sur M1.'
-  - 'Both : approche, paliers et arret nominal bases sur M1 ; commandes vitesse identiques M1/M2, sans neutralisation silencieuse
-    P1/P5.'
-  - 'M2 seul : limites de position basees sur M2 corrige valide, jamais sur M2 brut.'
-  - M2 corrige >= H+1 declenche SafeStop ; M2 corrige >= H+2 declenche PowerCutOff sans TON.
-  - Capteur TOP mecanique commun conserve son stop commun et son escalade.
-  - Le diagnostic expose le seuil M2 corrige effectif et la cause exacte de neutralisation.
-  - Tests M1 seul, M2 seul, Both, offset benne, ecart M1/M2, H/H+1/H+2 et non-regression descente.
+  - 'La variable M2 corrigee existante evolue continument entre benne ouverte et fermee : aucun saut de l ordre de OffsetCloseM/OffsetOpenM aux etats francs.'
+  - 'La correction utilise une geometrie derivee du pourcentage d ouverture ou une table calibree, bornee et monotone ; elle est validee par traces ouverte, fermee et intermediaire avant tout usage FDC.'
+  - 'M1 seul et Both : approche, palier et FDC logiciel nominal restent pilotes par M1.'
+  - 'Both : le profil de vitesse M1 est impose a M2 en approche haute ; aucun vecteur P1/P5 ne neutralise silencieusement les deux treuils.'
+  - 'M2 corrige ne termine jamais AX12 nominalement ; un franchissement anormal est distingue d une fin de cycle et diagnostique avant toute action de securite.'
+  - 'TOP mecanique, limites tambour M2, mou de cable, synchronisme et AU restent inchanges et independants.'
+  - 'Aucun nouveau champ de position/FDC et aucune nouvelle configuration IHM/RETAIN : marges derivees des parametres existants, apres T330.'
   phases:
-  - B0 ⬜ Spec + correction diagnostic uniquement, sans commande.
-  - B1 ⬜ Autorite M1 et profil commun pour M1/Both ; M2 seul sur reference corrigee.
-  - B2 ⬜ SafeStop M2 corrige a H+1.
-  - B3 ⬜ PowerCutOff M2 corrige a H+2 + qualification capteur TOP commun.
+  - B0 ⬜ Cartographier et corriger la position M2 corrigee EXISTANTE ; aucun changement de FDC, de permis ni de cycle.
+  - B1 ⬜ Tests et recette de continuite : ouverte, fermee, intermediaire, Both, traces sans saut et qualification de la source pourcentage ouverture.
+  - B2 ⬜ Apres validation humaine B1 et invariant T330 : autorite M1 sur profil Both et fin nominale AX12 ; M2 garde-fou derive uniquement.
+  - B3 ⬜ Tests de non-regression M1 seul/M2 seul/Both, AX12, homing, descente, TOP, limites tambour et T327 ; revue independante avant livraison.
   audit_detaille:
     verdict: Regression logicielle identifiee avec confiance 95 % ; logique commune au reel et a la simulation.
     cause: En Both montee AX12, M1 entre seul dans la zone haute et passe P5 vers P1 ; M2 corrige reste P5. La barriere WinchBothFinalRequestsCoherent
@@ -984,8 +1029,9 @@ tasks:
       aucune alarme ni SafeStop.
     trou_de_test: Aucun test ne couvre Both en montee avec positions corrigees M1/M2 differentes et un seul axe dans la zone
       de ralentissement haute.
-    orientation: Ne pas supprimer la barriere finale. Harmoniser en amont le profil Both sous autorite M1 ; conserver les
-      protections independantes M2 corrige H+1/H+2 et le capteur TOP mecanique commun.
+    orientation: Ne pas supprimer la barriere finale. Corriger d abord le repere M2 corrige existant ; apres validation, harmoniser
+      en amont le profil Both sous autorite M1. Conserver les protections independantes M2 et le capteur TOP mecanique commun ;
+      les marges M2 sont derivees des parametres existants, jamais ajoutees comme nouveaux reglages.
     incertitude_residuelle: Les 5 % restants exigent une trace directe de WinchBothFinalRequestsCoherent et des demandes finales
       apres neutralisation, ou un test cible equivalent.
     preuves:

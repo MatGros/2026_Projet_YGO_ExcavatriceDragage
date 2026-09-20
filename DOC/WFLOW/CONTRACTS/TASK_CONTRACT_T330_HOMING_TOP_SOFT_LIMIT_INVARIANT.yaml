@@ -1,0 +1,55 @@
+contract:
+  task_id: T330
+  criticality: C2
+  strategy: patch
+  objective: >
+    Cadrer une vérification sûre de cohérence entre la position de référencement
+    au capteur TOP et la limite logicielle haute, sans créer de paramètre ou de
+    variable de fin de course supplémentaire.
+  acceptance:
+    - id: AC1
+      statement: "Les deux paramètres existants sont tracés de leur persistance à chaque consommateur : PositionHomingTop_M et CableLimitAscent_M."
+      verified_by: "table producteur -> route -> consommateur versionnée"
+    - id: AC2
+      statement: "La règle PositionHomingTop_M >= CableLimitAscent_M + 1.00 m est documentée comme invariant de configuration, non comme valeur figée 8.50/7.50."
+      verified_by: "revue du contrat et cas de valeurs utilisateur modifiées"
+    - id: AC3
+      statement: "Aucune nouvelle cote, variable persistante ou réglage IHM de FDC n'est créé. Les futures marges ±0.50 m sont uniquement dérivées des paramètres existants."
+      verified_by: "diff ciblé et revue des déclarations"
+    - id: AC4
+      statement: "Le comportement à configuration invalide est proposé explicitement sans clamp silencieux et sans autoriser une montée normale non sûre."
+      verified_by: "plan C3 soumis à validation humaine"
+    - id: AC5
+      statement: "Le homing reste la seule exception autorisant une montée vers le TOP mécanique ; hors homing, la limite logicielle empêche la montée et la descente reste possible."
+      verified_by: "matrice de modes proposée et revue humaine"
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T330_HOMING_TOP_SOFT_LIMIT_INVARIANT.yaml
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/J_SUPERVISION/_TYPES/*
+      - CODE/GVL_PERSISTENT.st # pendant le cadrage : aucune nouvelle configuration
+  conservation:
+    must_survive:
+      - "TOP mécanique commun, indépendant de la logique de cycle."
+      - "FDC logiciel nominal et possibilité de descendre après blocage de montée."
+      - "Aucun nouveau réglage IHM ou RETAIN de fin de course."
+      - "Aucun changement de comportement de T291-B pendant ce cadrage."
+    dropped_on_purpose: []
+  evidence_required:
+    - task_contract_check
+    - parameter_consumer_map
+    - human_plan_approval
+  alert_duty: >
+    Toute ambiguïté sur le repère M2 corrigé, le signe des positions ou la
+    réaction hors homing bloque le passage à une implémentation C3.
+status: PENDING
+execution:
+  status: PENDING
+  summary: "Cadrage uniquement ; aucun code ni réglage modifié."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  notes: "Implémentation interdite sans validation humaine du plan C3."
