@@ -1,0 +1,141 @@
+contract:
+  task_id: T347
+  criticality: C2
+  strategy: patch
+  objective: >
+    Remplacer le type TIME par 2 champs INT (minutes entieres illimitees + secondes 0..59)
+    pour les deux durees de cycle exposees a l'operateur (CurrentCycleElapsed_* et
+    LastCycleDuration_*) sur toute la chaine PLC -> IHM, afin que le panel IHM physique
+    affiche une duree lisible (min/sec separees) sans dependre du rendu du type TIME.
+    Le comportement du chronometre est STRICTEMENT inchange : demarre sur Lifecycle.Busy,
+    se fige a l'achevement du cycle (X13/AX18), remis a zero hors cycle et au demarrage/arret
+    du mode SEMI_AUTO — seul le format d'exposition change.
+
+  design_decision_20260920:
+    actee_par: HUM
+    format: >
+      2 champs entiers separes (minutes entieres + secondes 0..59), aucune decimale.
+      Confirme explicitement par l'utilisateur : « pas besoin d'etre precis a la seconde...
+      enfin si, en secondes c'est bien » -> troncature a la seconde, arrondi interdit.
+    nommage: >
+      CurrentCycleElapsed_Min / CurrentCycleElapsed_S / LastCycleDuration_Min /
+      LastCycleDuration_S. NC-030 impose le suffixe d'unite precede d'un underscore ;
+      `_S` est le suffixe seconde deja utilise par DrainTimeElapsed_S (precedent projet).
+      La suggestion du brief (`...Min` / `...Sec` sans underscore) est ECARTEE : elle viole
+      NC-030 (underscore obligatoire) et `Sec` dupliquerait `_S`. Le suffixe `_Min` (minutes)
+      n'existe pas dans la liste NC-030 : il est INTRODUIT par ce lot et SIGNALE a
+      l'orchestrateur pour ratification (risque d'ambiguite avec le qualifier `Min` = Minimum
+      de NAMING_CONVENTION §1bis, juge non ambigu dans un contexte de duree et sans aucune
+      occurrence en suffixe dans CODE/ a la date du lot).
+    hors_scope_acte: >
+      Les 9 autres champs TIME de GVL_IHM (watchdogs 500 ms / 900 ms / 1 s 250, heartbeat IHM
+      et temps depuis dernier front, timeout benne) restent en TIME : diagnostic technique
+      interne, pas des durees metier operateur. Decision deja actee avec l'utilisateur.
+
+  acceptance:
+    - id: AC1
+      statement: "Les deux durees de cycle sont exposees en 4 champs INT (2 par duree : minutes entieres + secondes 0..59) a la place de 2 champs TIME, a toutes les etapes de la chaine GVL_IHM.CycleSemiAuto.State <- PRG_07 <- PRG_03 <- ST_SequencePublicState <- FB_CycleSemiAuto."
+      verified_by: "grep des 4 noms sur CODE/ : aucune occurrence TIME residuelle, aucune occurrence de l'ancien nom nu ; relecture des 5 fichiers du lot avec numero de ligne."
+    - id: AC2
+      statement: "La conversion depuis le chronometre interne (CycleRunTimer.ET, TIME en millisecondes) est exacte : total de secondes = ET/1000 (troncature), minutes = total/60, secondes = total MOD 60 — aucune bibliotheque externe, operateurs CODESYS standard uniquement."
+      verified_by: "Test CI T347-001 (TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st) : 65 s de cycle simulees -> CurrentCycleElapsed_Min = 1 ET CurrentCycleElapsed_S = 5, PASS mesure."
+    - id: AC3
+      statement: "Le figeage de la duree a l'achevement du cycle et la remise a zero du chronometre hors cycle sont conserves : a l'achevement la paire figee egale la paire courante, et des que Lifecycle.Busy retombe le chrono repart de 0/0 alors que la duree figee persiste."
+      verified_by: "Test CI T347-001 (mêmes assertions juste apres le scan AX18 : CurrentCycleElapsed 1/5 figes dans LastCycleDuration, puis 0/0 au scan suivant avec LastCycleDuration toujours 1/5) + assertion d'egalite paire figee / paire courante a X13 dans TC-P04-SCEN-NOM."
+    - id: AC4
+      statement: "Aucun autre champ TIME de GVL_IHM n'est modifie : les watchdogs, le heartbeat IHM et le timeout benne restent declares en TIME, et ST_WinchState / ST_SafetyWinch / ST_TranslationState / ST_CommunHMI ne sont pas touches par le lot."
+      verified_by: "Diff du lot limite aux 6 fichiers autorises ; grep TIME sur les structures sus-citees inchange."
+    - id: AC5
+      statement: "Le bundle complet, le diff bundle, la verification de liaison G200 et les gates palier C sont produits et verts (0 erreur de liaison)."
+      verified_by: "generate_codesys_bundle.py PASS + generate_codesys_diff_bundle.py (5 objets) + G200_check_linkage.py --report PASS 0 erreur + run_all_gates.py --palier C."
+    - id: AC6
+      statement: "Pour tout POU modifie sous CODE/M_MAIN, le nom de fichier est identique au nom de POU."
+      verified_by: "Controle du nom de fichier / POU (PRG_03_Modes_Cycle.st, PRG_07_Supervision.st) et inspection du PLCopenXML genere."
+    - id: AC7
+      statement: "Pour tout POU modifie sous CODE/M_MAIN, le suffixe de fichier correspond au langage reellement genere dans le bundle."
+      verified_by: "Inspection des blocs <ST> du bundle pour PRG_03_Modes_Cycle et PRG_07_Supervision."
+    - id: AC8
+      statement: "Non-regression CI : la suite du FB modifie ne presente AUCUN nouvel echec par rapport a la reference HEAD, les echecs preexistants restant identifies nommement."
+      verified_by: "Comparaison du run CI FB_CycleSemiAuto avec le rapport committe a HEAD (15/20, 5 echecs) : memes 5 echecs preexistants, aucun echec nouveau, 33 tests dont 1 nouveau vert."
+    - id: AC9
+      statement: "La table d'echange IHM est livree avec les 4 nouveaux tags, leur type et leur semantique, prete a etre transmise au collegue IHM (GVL_IHM reste la seule structure de reference)."
+      verified_by: "DOC/WFLOW/AUDITS/TABLE_ECHANGE_IHM_T347_DUREE_CYCLE_2026-09-21.md livree avec chemins GVL_IHM complets."
+
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
+      - DOC/WFLOW/
+      - CODE_XML/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - "Les 9 autres champs TIME de GVL_IHM (watchdogs, heartbeat, timeout benne) : restent en TIME."
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st
+      - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st
+      - "Toute modification du COMPORTEMENT du chronometre (condition d'armement, instant de figeage, remises a zero) : seule l'exposition change."
+      - "Désactivation ou affaiblissement d'une assertion de test existante."
+      - GVL_PERSISTENT.st et toute structure persistee (les 4 champs sont volatils, hors persistance).
+
+  conservation:
+    must_survive:
+      - "Le chronometre demarre sur Lifecycle.Busy et compte la duree du cycle en cours."
+      - "La duree du dernier cycle acheve est figee a l'achevement (X13/AX18) et persiste au cycle suivant."
+      - "Le chrono repart de zero des que le cycle n'est plus actif (Lifecycle.Busy retombe)."
+      - "Les remises a zero explicites du mode SEMI_AUTO (branches ASSIST_MODE et repos de PRG_03) restent effectives."
+      - "Le compteur de prelevements et le totalisateur (T299) conservent leur evenement d'increment unique en AX18."
+    dropped_on_purpose:
+      - "Le type TIME pour ces 2 durees metier cote IHM (decision utilisateur actee : affichage panel peu lisible)."
+      - "La resolution sous-seconde de la duree exposee a l'operateur (troncature a la seconde, demandee)."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "Diff bundle CODE_XML/CODE_DiffBundle.xml avec la liste des objets inclus."
+    - "Test CI T347-001 vert (conversion 65 s -> 1 min / 5 s + figeage + remise a zero hors cycle)."
+    - "Comparatif CI avant/apres sur FB_CycleSemiAuto (echecs preexistants nommes, aucun echec nouveau)."
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout ecart de comportement du chronometre, toute perte de precision au-dela de la seconde,
+    tout champ TIME de diagnostic touche par erreur et tout nouvel echec CI est remonte
+    immediatement a l'orchestrateur. Signaler n'est pas elargir le scope : un test en echec
+    preexistant est SIGNALE, jamais desactive ni affaibli.
+
+status: COMPLETED
+
+execution:
+  executed_by: "DSH14"
+  completed_at: "2026-09-21T00:35:00+02:00"
+  status: COMPLETED
+  summary: >
+    Chaine complete convertie : ST_CycleState.st:37-40 et ST_SequencePublicState.st:26-29 exposent
+    CurrentCycleElapsed_Min/_S et LastCycleDuration_Min/_S en INT (a la place des 2 champs TIME) ;
+    FB_CycleSemiAuto.st VAR_OUTPUT:148-151 publie les 4 champs, calcules au fil de l'eau
+    (CycleElapsedTotal_S := TIME_TO_DINT(CycleRunTimer.ET) / DINT#1000 ; Min := total/60 ;
+    S := total MOD 60, troncature) et figes a l'achevement du cycle (:1583-1584) ; PRG_03 recopie
+    (:359-362) et remet a 0/0 dans les 2 branches de repos (:460-463, :536-539) ; PRG_07 publie vers
+    GVL_IHM.CycleSemiAuto.State (:665-668). Comportement du chrono inchange.
+  evidence_submitted:
+    - "grep CODE/ : 33 occurrences des 4 nouveaux noms, ZERO occurrence residuelle des anciens noms nus (CurrentCycleElapsed / LastCycleDuration seuls)."
+    - "CI FB_CycleSemiAuto : 27/33, nouveau test T347-001 PASS ; echecs = 5 PREEXISTANTS (comparaison avec le rapport committe a HEAD : summary 15/20, memes 5 noms) ; aucun echec nouveau."
+    - "Bundle CODE_XML/CODE_Bundle.xml regenere (frais) ; DiffBundle CODE_XML/CODE_DiffBundle.xml = FB_CycleSemiAuto, PRG_03_Modes_Cycle, PRG_07_Supervision, ST_CycleState, ST_SequencePublicState ; G200_check_linkage --report : PASS (0 erreur, 2034 instances)."
+    - "run_all_gates.py --palier C : resultat reporte dans la restitution du lot."
+    - "Table d'echange IHM T347 livree (4 tags, types, semantique)."
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: "—"
+  notes: >
+    En attente de relecture du git diff reel par l'orchestrateur et de la contresignature humaine
+    sur le suffixe d'unite `_Min` (introduction d'un suffixe hors liste NC-030). Aucun commit
+    effectue par le lot : le recettage machine (affichage panel) reste humain.

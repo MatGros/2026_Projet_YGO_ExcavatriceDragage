@@ -662,8 +662,10 @@ GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 // 🔒 Totalisateur de prélèvements : PUBLICATION LECTURE SEULE — son seul écrivain est
 // l'incrément AX18 de FB_CycleSemiAuto (PRG_03, VAR_IN_OUT).
 GVL_IHM.CycleSemiAuto.State.SampleCountTotal       := _CycleSampleCountTotal;
-GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
-GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
+GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_Min := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed_Min;
+GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_S   := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed_S;
+GVL_IHM.CycleSemiAuto.State.LastCycleDuration_Min   := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration_Min;
+GVL_IHM.CycleSemiAuto.State.LastCycleDuration_S     := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration_S;
 GVL_IHM.CycleSemiAuto.State.DrainTimeElapsed_S     := DINT_TO_INT((TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeRemaining) + DINT#999) / DINT#1000);
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
 // Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit

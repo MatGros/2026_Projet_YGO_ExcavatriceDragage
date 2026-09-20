@@ -1,9 +1,354 @@
-﻿SETUP
+SETUP
 VAR
     FB : FB_CycleSemiAuto;
     SampleCount : INT := 0;
+    SampleCountTotal : UDINT := 0;
 END_VAR
 END_SETUP
+
+TEST 'T262-002 AX10B : transfert Both P1 sans coupure M2 puis AX11 P2'
+    (* Chargement securise de AX10B : forçage au joystick neutre. *)
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 22,
+       CfgForceStepApply := FALSE, CfgCtrlAscentMaxStep := 2,
+       CfgCtrlAscentDistanceM := 2.0, SampleCount := SampleCount);
+    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.ForceStepPrepared, 'AX10B preparee au repos');
+
+    (* Start au neutre : aucun mouvement au scan de chargement. *)
+    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'Chargement AX10B sans mouvement');
+
+    (* Nouveau geste Y+ : M1 et M2 sont publies simultanement a P1. *)
+    FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE,
+       JoystickPull := TRUE, M2_SpeedStepApplied := 1,
+       M1FinalAscentStartReady := TRUE, Benne_CloseReached := TRUE,
+       Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10B_RACCORDEMENT_P1,
+                'Scan transfert execute en AX10B');
+    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest AND FB.WinchM2Cmd.RunRequest,
+                'AX10B publie Both sans trou de commande');
+    ASSERT_TRUE((FB.WinchM1Cmd.StepTgt = 1) AND (FB.WinchM2Cmd.StepTgt = 1),
+                'AX10B publie M1 P1 et M2 P1');
+    ASSERT_TRUE(FB.WinchM1Cmd.ReqAscent AND FB.WinchM2Cmd.ReqAscent,
+                'AX10B conserve le sens montee des deux treuils');
+
+    (* Scan suivant : AX11 reprend avec le plafond commun configure P2. *)
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT,
+                'AX11 prend le relais apres transfert P1/P1');
+    ASSERT_TRUE((FB.WinchM1Cmd.StepTgt = 2) AND (FB.WinchM2Cmd.StepTgt = 2),
+                'AX11 applique le plafond commun P2');
+END_TEST
+
+TEST 'T262-003 AX10B : timeout M1 borne a 2 s puis repli sans redemarrage implicite'
+    (* Preparation AX10B au neutre, comme pour le test nominal. *)
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 22,
+       CfgForceStepApply := FALSE, CfgCtrlAscentMaxStep := 2,
+       CfgCtrlAscentDistanceM := 2.0, SampleCount := SampleCount);
+    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.ForceStepPrepared, 'AX10B preparee pour test timeout');
+    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
+
+    (* M1 indisponible : M2 est tenu en P1 pendant la fenetre bornee. *)
+    FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE,
+       JoystickPull := TRUE, M2_SpeedStepApplied := 1,
+       M1FinalAscentStartReady := FALSE, Benne_CloseReached := TRUE,
+       Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.BucketCmd.ReqHoldAscentP1AfterClose,
+                'Fenetre AX10B : maintien P1 actif avant timeout');
+
+    ADVANCE_TIME(2100000000);
+    FB(SampleCount := SampleCount);
+    ASSERT_FALSE(FB.BucketCmd.ReqHoldAscentP1AfterClose,
+                 'Timeout : maintien M2 libere');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'Timeout : aucun redemarrage pendant arret de repli');
+
+    ADVANCE_TIME(600000000);
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10B_RACCORDEMENT_P1,
+                'Repli : AX10B conserve la main pendant la confirmation arret');
+    ADVANCE_TIME(600000000);
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10B_RACCORDEMENT_P1,
+                'Repli : dernier scan AX10B avant reprise');
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT,
+                'Repli : reprise explicite par AX11');
+    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest AND FB.WinchM2Cmd.RunRequest,
+                'Repli : AX11 reprend les deux treuils ensemble');
+END_TEST
+
+TEST 'T331-001 AX15b repli : ouverture neutralisee puis fermeture benne et remontee couplee M1+M2'
+    SampleCount := 0;
+
+    (* Chargement securise de l etape de vidage au joystick neutre, machine arretee. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_SpeedStepApplied := 1, M2_SpeedStepApplied := 1,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       JoystickPush := FALSE, JoystickPull := FALSE, JoystickRight := FALSE, JoystickLeft := FALSE,
+       StartCycle := FALSE, AbortCycle := FALSE,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := TRUE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_CloseReached := FALSE,
+       Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       RepositionRequest := FALSE, SkipDrainRequest := FALSE, CfgDrainTime := T#0s,
+       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 16, CfgForceStepApply := FALSE,
+       CfgCtrlAscentMaxStep := 1, CfgCtrlAscentDistanceM := 2.0,
+       SampleCount := SampleCount);
+    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.ForceStepPrepared, 'Etape de vidage preparee au repos');
+
+    (* Start au neutre : l etape est chargee sans mouvement. *)
+    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'Chargement du vidage sans mouvement treuils');
+
+    (* Geste nominal maintenu Y- : vidage, treuils neutralises, aucune transition. *)
+    FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE,
+       JoystickPush := TRUE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN, 'Vidage observe');
+    ASSERT_TRUE(FB.BucketCmd.ReqOpen, 'Vidage : ouverture benne commandee');
+    ASSERT_FALSE(FB.BucketCmd.ReqClose, 'Vidage : aucune fermeture benne commandee');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'Vidage : les deux treuils restent neutralises');
+
+    (* Geste INVERSE maintenu Y+ : repli. L ouverture tombe des ce scan. *)
+    FB(JoystickPush := FALSE, JoystickPull := TRUE, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen, 'Repli : ouverture neutralisee au geste inverse');
+    ASSERT_FALSE(FB.BucketCmd.ReqClose, 'Repli : fermeture pas encore engagee (palier d etape)');
+
+    (* Scan suivant : l etape de fermeture benne prend la main. *)
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET,
+                'Repli : entree dans l etape de fermeture benne');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen, 'Repli : ouverture toujours a zero');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'Repli : aucun treuil commande pendant la fermeture benne');
+
+    (* Palier d etape ecoule : fermeture benne engagee, maintien M2 arme. *)
+    FB(SampleCount := SampleCount);
+    ADVANCE_TIME(1200000000);
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.BucketCmd.ReqClose, 'Repli : fermeture benne commandee sous geste maintenu');
+    ASSERT_TRUE(FB.BucketCmd.ReqHoldAscentP1AfterClose,
+                'Repli : maintien P1 arme pour le raccordement sans coupure M2');
+
+    (* Fermeture atteinte : passage au raccordement P1. *)
+    FB(Benne_CloseReached := TRUE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_FALSE(FB.BucketCmd.ReqClose, 'Repli : fermeture relachee une fois atteinte');
+
+    (* Raccordement P1 : M1 et M2 publies ensemble, en montee, meme palier. *)
+    FB(M1FinalAscentStartReady := TRUE, M2_SpeedStepApplied := 1, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10B_RACCORDEMENT_P1,
+                'Repli : raccordement P1 en cours');
+    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest AND FB.WinchM2Cmd.RunRequest,
+                'Repli : les deux treuils sont raccordes sans trou de commande');
+    ASSERT_TRUE(FB.WinchM1Cmd.ReqAscent AND FB.WinchM2Cmd.ReqAscent,
+                'Repli : les deux treuils sont commandes en montee');
+    ASSERT_TRUE((FB.WinchM1Cmd.StepTgt = 1) AND (FB.WinchM2Cmd.StepTgt = 1),
+                'Repli : palier lent symetrique sur les deux treuils');
+
+    (* Montee controlee : plafond commun sous geste maintenu. *)
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT, 'Repli : montee controlee');
+    ASSERT_TRUE(FB.WinchM1Cmd.ReqAscent AND FB.WinchM2Cmd.ReqAscent,
+                'Repli : montee maintenue sur les deux treuils');
+    ASSERT_TRUE((FB.WinchM1Cmd.StepTgt = 1) AND (FB.WinchM2Cmd.StepTgt = 1),
+                'Repli : plafond de montee controle applique');
+
+    (* Distance de controle atteinte : remontee en charge de la benne refermee. *)
+    FB(M1_CablePosM := 9.5, M2_CablePosM := 9.5, SampleCount := SampleCount);
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT,
+                'Repli : remontee en charge de la benne refermee');
+    ASSERT_TRUE(FB.WinchM1Cmd.ReqAscent AND FB.WinchM2Cmd.ReqAscent,
+                'Repli : remontee couplee jusqu a la limite haute');
+    ASSERT_EQ(FB.WinchM1Cmd.StepTgt, FB.WinchM2Cmd.StepTgt,
+              'Repli : meme palier M1/M2 pendant la remontee');
+
+    (* Limite haute atteinte : retour dans la sequence de decharge normale. *)
+    FB(M1TopLimitReached := TRUE, SampleCount := SampleCount);
+    FB(M1TopLimitReached := FALSE, SkipDrainRequest := TRUE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX13_DRAIN_PAUSE,
+                'Repli : egouttage, retour dans la sequence normale du cycle');
+    FB(SkipDrainRequest := FALSE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX14_TRANSLATE_DUMP,
+                'Repli : le cycle reprend vers la tremie');
+END_TEST
+
+TEST 'T331-002 AX15b/AX15c non-regression : vidage nominal et repositionnement inchanges'
+    SampleCount := 0;
+
+    (* Chargement securise de l etape de vidage au joystick neutre. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_SpeedStepApplied := 1, M2_SpeedStepApplied := 1,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       JoystickPush := FALSE, JoystickPull := FALSE, JoystickRight := FALSE, JoystickLeft := FALSE,
+       StartCycle := FALSE, AbortCycle := FALSE,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := TRUE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_CloseReached := FALSE,
+       Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       RepositionRequest := FALSE, SkipDrainRequest := FALSE, CfgDrainTime := T#0s,
+       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 16, CfgForceStepApply := FALSE,
+       CfgCtrlAscentMaxStep := 1, CfgCtrlAscentDistanceM := 2.0,
+       SampleCount := SampleCount);
+    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.ForceStepPrepared, 'Etape de vidage preparee (non-regression)');
+    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
+
+    (* Vidage nominal Y- : ouverture seule, treuils neutralises. *)
+    FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE,
+       JoystickPush := TRUE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN, 'Vidage nominal inchange');
+    ASSERT_TRUE(FB.BucketCmd.ReqOpen, 'Vidage nominal : ouverture commandee');
+    ASSERT_FALSE(FB.BucketCmd.ReqClose, 'Vidage nominal : aucune fermeture');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'Vidage nominal : treuils a l arret');
+
+    (* Option IHM maintenue : repositionnement couple en descente, inchange. *)
+    FB(RepositionRequest := TRUE, SampleCount := SampleCount);
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15C_DUMP_REPOSITION,
+                'Repositionnement inchange : AX15c atteint');
+    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest AND FB.WinchM2Cmd.RunRequest,
+                'Repositionnement : M1 et M2 commandes');
+    ASSERT_TRUE(FB.WinchM1Cmd.ReqDescend AND FB.WinchM2Cmd.ReqDescend,
+                'Repositionnement : descente couplee conservee');
+    ASSERT_FALSE(FB.WinchM1Cmd.ReqAscent OR FB.WinchM2Cmd.ReqAscent,
+                 'Repositionnement : aucune montee commandee');
+    ASSERT_EQ(FB.WinchM1Cmd.StepTgt, FB.WinchM2Cmd.StepTgt,
+              'Repositionnement : meme palier M1/M2');
+
+    (* Relachement de l option : retour au vidage, treuils de nouveau a l arret. *)
+    FB(RepositionRequest := FALSE, SampleCount := SampleCount);
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN,
+                'Retour au vidage inchange au relachement de l option');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'Retour vidage : treuils arretes');
+
+    (* Vidage termine : la benne ouverte amene la fin de passe, inchange. *)
+    FB(Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE,
+       Benne_IsRoughlyClosed := FALSE, SampleCount := SampleCount);
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX18_DONE_SYNC, 'Fin de vidage inchangee');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen, 'Fin de vidage : ouverture relachee');
+    ASSERT_EQ(FB.SampleCount, 1, 'Fin de vidage : compteur incremente une seule fois');
+END_TEST
+
+TEST 'T331-003 AX15b repli : perte du geste, de l homme-mort ou defaut interrompt sans reprise'
+    SampleCount := 0;
+
+    (* Chargement securise de l etape de vidage au joystick neutre. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_SpeedStepApplied := 1, M2_SpeedStepApplied := 1,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       JoystickPush := FALSE, JoystickPull := FALSE, JoystickRight := FALSE, JoystickLeft := FALSE,
+       StartCycle := FALSE, AbortCycle := FALSE,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := TRUE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_CloseReached := FALSE,
+       Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       RepositionRequest := FALSE, SkipDrainRequest := FALSE, CfgDrainTime := T#0s,
+       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 16, CfgForceStepApply := FALSE,
+       CfgCtrlAscentMaxStep := 1, CfgCtrlAscentDistanceM := 2.0,
+       SampleCount := SampleCount);
+    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
+    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
+
+    (* Vidage puis geste inverse maintenu : repli engage jusqu a la fermeture benne. *)
+    FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE,
+       JoystickPush := TRUE, SampleCount := SampleCount);
+    FB(JoystickPush := FALSE, JoystickPull := TRUE, SampleCount := SampleCount);
+    FB(SampleCount := SampleCount);
+    FB(SampleCount := SampleCount);
+    ADVANCE_TIME(1200000000);
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET,
+                'Repli engage : etape de fermeture benne');
+    ASSERT_TRUE(FB.BucketCmd.ReqClose, 'Repli engage : fermeture benne commandee');
+
+    (* Relachement du manche : plus aucune demande, etape conservee. *)
+    FB(JoystickDeflected := FALSE, JoystickPull := FALSE, DeadmanArmed := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_FALSE(FB.BucketCmd.ReqClose, 'Relachement : fermeture benne neutralisee');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'Relachement : treuils neutralises');
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET,
+                'Relachement : etape conservee');
+    ASSERT_FALSE(FB.BucketCmd.ReqClose, 'Relachement : aucune reprise automatique');
+
+    (* Geste repris : la manoeuvre reprend sous commande maintenue. *)
+    FB(JoystickDeflected := TRUE, JoystickPull := TRUE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.BucketCmd.ReqClose, 'Geste repris : fermeture benne reprise');
+
+    (* Perte de l homme-mort : neutralisation complete, etape conservee. *)
+    FB(DeadmanArmed := FALSE, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.BucketCmd.ReqClose OR FB.BucketCmd.ReqOpen
+                 OR FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'Homme-mort perdu : plus aucune demande de mouvement');
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET,
+                'Homme-mort perdu : etape conservee, aucune reprise automatique');
+
+    (* Defaut pendant le repli : repli AX_STAB, sorties neutralisees. *)
+    FB(DeadmanArmed := TRUE, HeartbeatIhmOk := FALSE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX_STAB, 'Defaut : repli AX_STAB');
+    ASSERT_FALSE(FB.BucketCmd.ReqClose OR FB.BucketCmd.ReqOpen
+                 OR FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'Defaut : toutes les demandes neutralisees');
+    ASSERT_FALSE(FB.Lifecycle.Busy, 'Defaut : cycle non actif');
+
+    (* Acquittement conscient : cause disparue puis Reset. *)
+    FB(HeartbeatIhmOk := TRUE, JoystickDeflected := FALSE, JoystickPull := FALSE,
+       DeadmanArmed := FALSE, Reset := TRUE, SampleCount := SampleCount);
+    FB(Reset := FALSE, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.Fault.Latched, 'Acquittement : defaut efface apres cause disparue');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX0_REPOS, 'Acquittement : retour au repos');
+END_TEST
 
 TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
     (* Scan 0 : Enable=FALSE -> Neutralisation *)
@@ -1090,8 +1435,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest, 'X9 : treuil M1 arrete (egouttage)');
     ASSERT_FALSE(FB.WinchM2Cmd.RunRequest, 'X9 : treuil M2 arrete (egouttage)');
 
-    (* Call 18 : egouttage 5s au joystick neutre -> AX14 sans geste cache *)
-    ADVANCE_TIME(5000000000);
+    (* Call 18 : egouttage 5s au joystick neutre ; verifier le decompte avant AX14 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := FALSE, JoystickDeflected := FALSE, JoystickPush := FALSE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
@@ -1104,6 +1448,11 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
        SampleCount := FB.SampleCount);
+    ASSERT_TRUE(FB.DrainTimeRemaining = T#5s, 'AX13 : consigne restante publiee au demarrage du TON');
+    ADVANCE_TIME(2000000000);
+    FB();
+    ASSERT_TRUE(FB.DrainTimeRemaining = T#3s, 'AX13 : temps restant decremente de 5s a 3s');
+    ADVANCE_TIME(3000000000);
 
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 19 : X10 observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©, translation trÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©mie *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -1118,6 +1467,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_Busy := FALSE, Translation_Done := FALSE,
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
        SampleCount := FB.SampleCount);
+    ASSERT_TRUE(FB.DrainTimeRemaining = T#0s, 'AX13 : temps restant remis a zero a expiration TON');
     ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX14_TRANSLATE_DUMP, 'X10 observe : translation vers tremie');
     ASSERT_TRUE(FB.TranslationCmd.ReqStart, 'X10 : translation vers tremie commandee');
 
@@ -1243,7 +1593,11 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX18_DONE_SYNC, 'X13 observe : cycle termine');
     ASSERT_TRUE(FB.Lifecycle.Done, 'X13 : Lifecycle.Done=TRUE');
     ASSERT_EQ(FB.SampleCount, 1, 'X13 : SampleCount incremente UNE fois (1er cycle)');
-    ASSERT_TRUE(FB.LastCycleDuration > T#0s, 'X13 : duree du cycle figee (> 0) - chronometre');
+    ASSERT_TRUE((FB.LastCycleDuration_Min > 0) OR (FB.LastCycleDuration_S > 0),
+                'X13 : duree du cycle figee (> 0) - chronometre min/sec (T347)');
+    ASSERT_TRUE((FB.LastCycleDuration_Min = FB.CurrentCycleElapsed_Min)
+                AND (FB.LastCycleDuration_S = FB.CurrentCycleElapsed_S),
+                'X13 : paire min/sec figee depuis le chrono courant (T347)');
 
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Call 24 : X13 2e scan, garde anti-double *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -1290,4 +1644,318 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        SampleCount := FB.SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX2_TRANSLATE_P1, 'Rebouclage effectif : retour direct AX2 (pas AX0)');
     ASSERT_FALSE(FB.Lifecycle.Done, 'Lifecycle.Done retombe apres rebouclage');
+END_TEST
+
+TEST 'TC-P04-034 T299 : journalier ET totalisateur incrementes au MEME evenement AX18 (1 fois par cycle)'
+    SampleCount := 0;
+    SampleCountTotal := 4;
+
+    (* Chargement securise de l etape de vidage AX15b au joystick neutre, machine arretee. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_SpeedStepApplied := 1, M2_SpeedStepApplied := 1,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       JoystickPush := FALSE, JoystickPull := FALSE, JoystickRight := FALSE, JoystickLeft := FALSE,
+       StartCycle := FALSE, AbortCycle := FALSE, ResetSampleCountRequest := FALSE,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := TRUE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_CloseReached := FALSE,
+       Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       RepositionRequest := FALSE, SkipDrainRequest := FALSE, CfgDrainTime := T#0s,
+       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 16, CfgForceStepApply := FALSE,
+       CfgCtrlAscentMaxStep := 1, CfgCtrlAscentDistanceM := 2.0,
+       CfgSampleCountResetMode := E_CycleSampleCountResetMode.NEVER,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.ForceStepPrepared, 'Etape de vidage preparee au repos');
+    FB(CfgForceStepApply := FALSE, StartCycle := TRUE,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 0, 'Chargement de l etape : journalier non compte');
+    ASSERT_TRUE(SampleCountTotal = 4, 'Chargement de l etape : totalisateur inchange');
+
+    (* Geste Y- maintenu avec benne deja ouverte : AX15b bascule vers AX18 au scan suivant. *)
+    FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN, 'Vidage observe avant bascule AX18');
+
+    (* Scan suivant : AX18 s execute et incremente les DEUX compteurs sur le meme evenement. *)
+    FB(SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX18_DONE_SYNC, 'AX18 execute');
+    ASSERT_TRUE(SampleCount = 1, 'Journalier : +1 sur AX18');
+    ASSERT_TRUE(SampleCountTotal = 5, 'Totalisateur : +1 sur le MEME evenement AX18');
+
+    (* Conditions maintenues : aucun second comptage (garde de front SampleCountDone). *)
+    FB(SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX18_DONE_SYNC, 'AX18 toujours actif');
+    ASSERT_TRUE(SampleCount = 1, 'Journalier : pas de second increment sur le meme cycle');
+    ASSERT_TRUE(SampleCountTotal = 5, 'Totalisateur : pas de second increment sur le meme cycle');
+END_TEST
+
+TEST 'TC-P04-035 T299 : RAZ manuelle IHM du journalier sur FRONT montant, totalisateur intact'
+    SampleCount := 7;
+    SampleCountTotal := 12;
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE, StartCycle := FALSE,
+       ResetSampleCountRequest := FALSE,
+       CfgSampleCountResetMode := E_CycleSampleCountResetMode.NEVER,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 7, 'Aucune RAZ sans appui sur le bouton');
+    ASSERT_TRUE(SampleCountTotal = 12, 'Aucune RAZ sans appui : totalisateur inchange');
+
+    (* Front montant : le journalier passe a zero, le totalisateur ne bouge pas. *)
+    FB(ResetSampleCountRequest := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 0, 'RAZ IHM : journalier remis a zero sur front montant');
+    ASSERT_TRUE(SampleCountTotal = 12, 'RAZ IHM : totalisateur INTACT');
+
+    (* Bouton MAINTENU a l etat haut : aucune RAZ repetee (jamais un niveau, toujours un front). *)
+    SampleCount := 5;
+    FB(ResetSampleCountRequest := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 5, 'Bouton maintenu : aucune RAZ sans nouveau front');
+    ASSERT_TRUE(SampleCountTotal = 12, 'Bouton maintenu : totalisateur toujours intact');
+
+    (* Nouveau front : la RAZ redevient effective. *)
+    FB(ResetSampleCountRequest := FALSE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    FB(ResetSampleCountRequest := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 0, 'Nouveau front : RAZ de nouveau effective');
+    ASSERT_TRUE(SampleCountTotal = 12, 'Totalisateur : jamais ecrit par la RAZ manuelle');
+END_TEST
+
+TEST 'TC-P04-036 T299 : mode NEVER (defaut) — aucun auto-reset au demarrage de cycle'
+    SampleCount := 9;
+    SampleCountTotal := 30;
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       EncoderFaultPresent := FALSE, HeartbeatIhmOk := TRUE,
+       M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       StartCycle := TRUE, ResetSampleCountRequest := FALSE,
+       CfgSampleCountResetMode := E_CycleSampleCountResetMode.NEVER,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.CfgSampleCountResetMode = E_CycleSampleCountResetMode.NEVER, 'Mode configure = NEVER');
+    ASSERT_TRUE(SampleCount = 9, 'Mode NEVER : le demarrage ne remet PAS le journalier a zero');
+    ASSERT_TRUE(SampleCountTotal = 30, 'Mode NEVER : totalisateur inchange');
+END_TEST
+
+TEST 'TC-P04-037 T299 : mode ON_FIRST_START — RAZ au 1er demarrage de cycle, une seule fois'
+    SampleCount := 9;
+    SampleCountTotal := 30;
+
+    (* Scan sans demarrage : aucun armement consomme, aucune RAZ. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       EncoderFaultPresent := FALSE, HeartbeatIhmOk := TRUE,
+       M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       StartCycle := FALSE, ResetSampleCountRequest := FALSE,
+       CfgSampleCountResetMode := E_CycleSampleCountResetMode.ON_FIRST_START,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 9, 'Aucun demarrage : journalier conserve');
+
+    (* Premier demarrage depuis la mise sous tension (instance neuve = boot) : RAZ du journalier. *)
+    FB(StartCycle := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 0, 'ON_FIRST_START : journalier remis a zero au 1er demarrage');
+    ASSERT_TRUE(SampleCountTotal = 30, 'ON_FIRST_START : totalisateur JAMAIS remis a zero');
+
+    (* Demarrages suivants : la RAZ automatique ne se reproduit pas. *)
+    SampleCount := 4;
+    FB(StartCycle := FALSE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    FB(StartCycle := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 4, 'ON_FIRST_START : une seule RAZ auto par mise sous tension');
+    ASSERT_TRUE(SampleCountTotal = 30, 'ON_FIRST_START : totalisateur toujours intact');
+END_TEST
+
+TEST 'TC-P04-038 T299 : mode ON_SAFETY_REARM — RAZ au rearmement AU, sur front'
+    SampleCount := 6;
+    SampleCountTotal := 21;
+
+    (* Chaine AU non rearmee : aucune RAZ. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       EncoderFaultPresent := FALSE, HeartbeatIhmOk := TRUE,
+       M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       StartCycle := FALSE, ResetSampleCountRequest := FALSE, SafetyRearmed := FALSE,
+       CfgSampleCountResetMode := E_CycleSampleCountResetMode.ON_SAFETY_REARM,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 6, 'AU non rearmee : journalier conserve');
+
+    (* Rearmement AU (front montant) : RAZ du journalier seul. *)
+    FB(SafetyRearmed := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 0, 'ON_SAFETY_REARM : journalier remis a zero au rearmement AU');
+    ASSERT_TRUE(SampleCountTotal = 21, 'ON_SAFETY_REARM : totalisateur JAMAIS remis a zero');
+
+    (* Signal de rearmement MAINTENU : aucune RAZ repetee. *)
+    SampleCount := 3;
+    FB(SafetyRearmed := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 3, 'Rearmement maintenu : aucune RAZ sans nouveau front');
+    ASSERT_TRUE(SampleCountTotal = 21, 'Rearmement maintenu : totalisateur intact');
+END_TEST
+
+TEST 'TC-P04-039 T299 : totalisateur — test NEGATIF, aucun chemin ne peut l ecrire (RAZ, reset, mode)'
+    SampleCount := 50;
+    SampleCountTotal := 1000;
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       EncoderFaultPresent := FALSE, HeartbeatIhmOk := TRUE,
+       M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       StartCycle := FALSE, AbortCycle := FALSE, ResetSampleCountRequest := FALSE, SafetyRearmed := FALSE,
+       CfgSampleCountResetMode := E_CycleSampleCountResetMode.NEVER,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 50, 'Etat initial du journalier');
+    ASSERT_TRUE(SampleCountTotal = 1000, 'Etat initial du totalisateur');
+
+    (* Tentative 1 : bouton de RAZ IHM (front) — efface le journalier, jamais le totalisateur.
+       Le journalier est RE-SEME avant chaque tentative suivante : chaque assertion est discriminante. *)
+    FB(ResetSampleCountRequest := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 0, 'RAZ IHM : journalier efface (50 -> 0)');
+    ASSERT_TRUE(SampleCountTotal = 1000, 'RAZ IHM : totalisateur inchange');
+
+    (* Tentative 2 : RAZ automatique par mode ON_FIRST_START + demarrage de cycle. *)
+    SampleCount := 30;
+    FB(ResetSampleCountRequest := FALSE,
+       CfgSampleCountResetMode := E_CycleSampleCountResetMode.ON_FIRST_START,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 30, 'Mode (b) arme : aucune RAZ avant demarrage');
+    FB(StartCycle := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 0, 'Mode (b) : journalier efface au 1er demarrage (30 -> 0)');
+    ASSERT_TRUE(SampleCountTotal = 1000, 'Mode (b) : totalisateur inchange');
+
+    (* Tentative 3 : RAZ automatique par mode ON_SAFETY_REARM (front de rearmement AU). *)
+    SampleCount := 20;
+    FB(StartCycle := FALSE, CfgSampleCountResetMode := E_CycleSampleCountResetMode.ON_SAFETY_REARM,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 20, 'Mode (c) arme : aucune RAZ avant rearmement');
+    FB(SafetyRearmed := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 0, 'Mode (c) : journalier efface au rearmement AU (20 -> 0)');
+    ASSERT_TRUE(SampleCountTotal = 1000, 'Mode (c) : totalisateur inchange');
+
+    (* Tentative 4 : reset machine, abandon, sortie de mode (Enable FALSE) — aucun effet, sur AUCUN
+       des deux compteurs : aucune RAZ parasite ne doit exister hors des chemins volontaires. *)
+    SampleCount := 11;
+    FB(SafetyRearmed := FALSE, Reset := TRUE, AbortCycle := TRUE,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    FB(Reset := FALSE, AbortCycle := FALSE, Enable := FALSE, Mode := E_Mode.MAINT_N1,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 11, 'Reset/Abandon/sortie de mode : journalier non remis a zero');
+    ASSERT_TRUE(SampleCountTotal = 1000, 'Reset/Abandon/sortie de mode : totalisateur inchange');
+
+    (* Contre-preuve : le SEUL chemin d ecriture reste l increment AX18 de fin de cycle. *)
+    FB(Enable := TRUE, Mode := E_Mode.SEMI_AUTO, Reset := FALSE,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 11, 'Totalisateur non ecrit hors AX18 : journalier egalement intact');
+    ASSERT_TRUE(SampleCountTotal = 1000, 'Totalisateur toujours a sa valeur avant la fin de cycle');
+END_TEST
+
+TEST 'TC-P04-040 T299 : mode (b) active EN COURS DE POSTE — aucune RAZ differee (drapeau consomme)'
+    SampleCount := 42;
+    SampleCountTotal := 500;
+
+    (* 1. Premier demarrage du poste, mode NEVER : le drapeau "1er demarrage deja vu" est consomme
+       meme si aucun mode de RAZ automatique n'est actif. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       EncoderFaultPresent := FALSE, HeartbeatIhmOk := TRUE,
+       M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       StartCycle := TRUE, AbortCycle := FALSE, ResetSampleCountRequest := FALSE, SafetyRearmed := FALSE,
+       CfgSampleCountResetMode := E_CycleSampleCountResetMode.NEVER,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 42, 'Mode NEVER au 1er demarrage : journalier conserve');
+
+    (* 2. L operateur active le mode ON_FIRST_START en cours de poste. *)
+    FB(StartCycle := FALSE, CfgSampleCountResetMode := E_CycleSampleCountResetMode.ON_FIRST_START,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 42, 'Bascule de mode : aucune RAZ immediate');
+
+    (* 3. Retour au repos (Abandon) puis NOUVEAU demarrage : le 1er demarrage du poste a deja eu
+       lieu, la RAZ automatique NE doit PAS se declencher -> aucun comptage du poste n est perdu. *)
+    FB(StartCycle := FALSE, AbortCycle := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    FB(AbortCycle := FALSE, StartCycle := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(SampleCount = 42, 'Mode (b) active en cours de poste : aucune RAZ differee');
+    ASSERT_TRUE(SampleCountTotal = 500, 'Totalisateur inchange par la bascule de mode');
+END_TEST
+
+TEST 'T347-001 : duree de cycle exposee en minutes/secondes entieres (chrono, figeage AX18, RAZ hors cycle)'
+    SampleCount := 0;
+    SampleCountTotal := 0;
+
+    (* Chargement securise de l etape de vidage AX15b au joystick neutre, machine arretee
+       (meme montage que TC-P04-034 : le FB n atteint AX18 qu apres un vidage engage). *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_SpeedStepApplied := 1, M2_SpeedStepApplied := 1,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       JoystickPush := FALSE, JoystickPull := FALSE, JoystickRight := FALSE, JoystickLeft := FALSE,
+       StartCycle := FALSE, AbortCycle := FALSE, ResetSampleCountRequest := FALSE,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := TRUE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_CloseReached := FALSE,
+       Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       RepositionRequest := FALSE, SkipDrainRequest := FALSE, CfgDrainTime := T#0s,
+       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 16, CfgForceStepApply := FALSE,
+       CfgCtrlAscentMaxStep := 1, CfgCtrlAscentDistanceM := 2.0,
+       CfgSampleCountResetMode := E_CycleSampleCountResetMode.NEVER,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.ForceStepPrepared, 'T347 : etape de vidage preparee au repos');
+    FB(CfgForceStepApply := FALSE, StartCycle := TRUE,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+
+    (* Scan de stabilisation n°1 : geste Y- maintenu, fin de vidage PAS encore confirmee -> AX15b
+       maintenue, Lifecycle.Busy passe a TRUE. *)
+    FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN, 'T347 : vidage observe avant bascule AX18');
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T347 : chronometre arme des que Lifecycle.Busy est actif');
+
+    (* Scan de stabilisation n°2 : le chrono interne (TON sur Lifecycle.Busy) demarre sur CE scan
+       (IN passe FALSE->TRUE ici). Sans ce scan, l avance de temps qui suit serait perdue : le TON
+       capturerait son origine APRES l avance et resterait a zero. *)
+    FB(SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+
+    (* 65 s de cycle simulees AVANT l observation de AX18 : la conversion TIME -> min/sec devient
+       discriminante (65 s = 1 minute entiere + 5 secondes ; ni 65 dans un champ unique, ni 65000 ms).
+       ADVANCE_TIME avance l horloge simulee, le TON interne l integre au scan suivant. *)
+    ADVANCE_TIME(65000000000);
+    FB(Benne_Done := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN,
+                'T347 : fin de vidage confirmee, bascule AX18 demandee');
+    FB(SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX18_DONE_SYNC, 'T347 : AX18 execute');
+    ASSERT_EQ(FB.CurrentCycleElapsed_Min, 1, 'T347 : chrono 65 s -> 1 minute entiere');
+    ASSERT_EQ(FB.CurrentCycleElapsed_S, 5, 'T347 : chrono 65 s -> 5 secondes (plage 0..59)');
+    ASSERT_EQ(FB.LastCycleDuration_Min, 1, 'T347 : duree figee a AX18 -> minutes');
+    ASSERT_EQ(FB.LastCycleDuration_S, 5, 'T347 : duree figee a AX18 -> secondes');
+
+    (* Scan suivant : le chrono repart de zero (Lifecycle.Busy retombe), la duree figee persiste. *)
+    FB(SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_EQ(FB.CurrentCycleElapsed_Min, 0, 'T347 : chrono remis a zero hors cycle (minutes)');
+    ASSERT_EQ(FB.CurrentCycleElapsed_S, 0, 'T347 : chrono remis a zero hors cycle (secondes)');
+    ASSERT_EQ(FB.LastCycleDuration_Min, 1, 'T347 : duree figee conservee apres retombee de Busy (minutes)');
+    ASSERT_EQ(FB.LastCycleDuration_S, 5, 'T347 : duree figee conservee apres retombee de Busy (secondes)');
 END_TEST

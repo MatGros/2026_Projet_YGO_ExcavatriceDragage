@@ -32,8 +32,12 @@ STRUCT
        mappée par position (aucune occurrence dans GVL_PERSISTENT) — l'ordre des champs y est
        donc libre, contrairement à ST_CycleCfg/ST_CycleCmd dont les ajouts vont en fin. *)
     SampleCountTotal       : UDINT;       (* 🔒 TOTALISATEUR de prélèvements (PERSISTENT) — LECTURE SEULE : jamais remis à zéro, aucune commande d'écriture *)
-    CurrentCycleElapsed    : TIME;        (* ⏱️ Durée écoulée du cycle en cours *)
-    LastCycleDuration      : TIME;        (* ⏱️ Durée du dernier cycle achevé (figée à X13) *)
+    (* ⏱️ Durées de cycle exposées IHM en 2 champs entiers (T347) : minutes illimitées + secondes 0..59.
+       Le type TIME est abandonné côté IHM (affichage panel peu lisible) ; suffixes d'unité NC-030. *)
+    CurrentCycleElapsed_Min : INT;        (* ⏱️ Minutes écoulées du cycle en cours *)
+    CurrentCycleElapsed_S   : INT;        (* ⏱️ Secondes écoulées du cycle en cours (0..59) *)
+    LastCycleDuration_Min   : INT;        (* ⏱️ Minutes du dernier cycle achevé (figées à X13) *)
+    LastCycleDuration_S     : INT;        (* ⏱️ Secondes du dernier cycle achevé (figées à X13, 0..59) *)
     DrainTimeElapsed_S     : INT;         (* Compat IHM : tag historique conserve ; porte le temps restant AX13, secondes entieres ; 0 hors AX13 *)
     CycleChecksInhibited   : BOOL;        (* 🧪 Contrôles procédé cycle inhibés, protections machine actives *)
     IgnoredCycleCheckId    : WORD;        (* 🔎 Contrôles procédé actifs mais ignorés *)

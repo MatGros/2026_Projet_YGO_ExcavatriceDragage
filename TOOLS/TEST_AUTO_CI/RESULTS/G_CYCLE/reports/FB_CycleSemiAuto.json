@@ -3,6 +3,26 @@
   "file": "test_fb_cyclesemiauto.st",
   "results": [
     {
+      "name": "T262-002 AX10B : transfert Both P1 sans coupure M2 puis AX11 P2",
+      "passed": true
+    },
+    {
+      "name": "T262-003 AX10B : timeout M1 borne a 2 s puis repli sans redemarrage implicite",
+      "passed": true
+    },
+    {
+      "name": "T331-001 AX15b repli : ouverture neutralisee puis fermeture benne et remontee couplee M1+M2",
+      "passed": true
+    },
+    {
+      "name": "T331-002 AX15b/AX15c non-regression : vidage nominal et repositionnement inchanges",
+      "passed": true
+    },
+    {
+      "name": "T331-003 AX15b repli : perte du geste, de l homme-mort ou defaut interrompt sans reprise",
+      "passed": true
+    },
+    {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
@@ -65,7 +85,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 353,
+        "line": 698,
         "message": "Etabli en AX4_DESCEND_DIVING"
       }
     },
@@ -76,7 +96,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 501,
+        "line": 846,
         "message": "Etabli en AX4_DESCEND_DIVING"
       }
     },
@@ -87,7 +107,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 589,
+        "line": 934,
         "message": "Etabli en X4"
       }
     },
@@ -98,7 +118,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 680,
+        "line": 1025,
         "message": "Etabli en X4"
       }
     },
@@ -113,14 +133,46 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.TRANSLATIONCMD.REQSTART expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 849,
+        "line": 1194,
         "message": "X2 : translation vers cible commandee"
       }
+    },
+    {
+      "name": "TC-P04-034 T299 : journalier ET totalisateur incrementes au MEME evenement AX18 (1 fois par cycle)",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-035 T299 : RAZ manuelle IHM du journalier sur FRONT montant, totalisateur intact",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-036 T299 : mode NEVER (defaut) \u2014 aucun auto-reset au demarrage de cycle",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-037 T299 : mode ON_FIRST_START \u2014 RAZ au 1er demarrage de cycle, une seule fois",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-038 T299 : mode ON_SAFETY_REARM \u2014 RAZ au rearmement AU, sur front",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-039 T299 : totalisateur \u2014 test NEGATIF, aucun chemin ne peut l ecrire (RAZ, reset, mode)",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-040 T299 : mode (b) active EN COURS DE POSTE \u2014 aucune RAZ differee (drapeau consomme)",
+      "passed": true
+    },
+    {
+      "name": "T347-001 : duree de cycle exposee en minutes/secondes entieres (chrono, figeage AX18, RAZ hors cycle)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 20,
-    "passed": 15,
+    "total": 33,
+    "passed": 28,
     "failed": 5
   }
 }
