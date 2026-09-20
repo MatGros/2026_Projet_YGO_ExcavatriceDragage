@@ -101,7 +101,7 @@ Instance : `PRG_02_Acquisition.instSimBench`, `Enable := GVL_Simulation.Simulati
 
 | Bloc | Instance | Rôle | Fiche |
 |---|---|---|---|
-| `FB_Sim_Encoder` ×2 | `instSimEncoderM1/M2` | Position codeur COD1/COD2, presets, écart synchro | `FB_Sim_Encoder_v1.0.md` |
+| `FB_Sim_Encoder` ×2 | `instSimEncoderM1/M2` | Position codeur COD1/COD2, presets, écart synchro | `FB_Sim_Encoder_v1.1.md` |
 | `FB_Sim_Translation` | `instSimTranslation` | Trajet continu M3, 5 capteurs par mot thermomètre | `FB_Sim_Translation_v1.0.md` |
 | `FB_Sim_Joystick` | `instSimJoystick` | Valeurs Hall brutes + homme-mort forçables | `FB_Sim_Joystick_v1.0.md` |
 | `FB_Sim_Safety` | `instSimSafety` | Chaîne AU, contacteur, réarmement | `FB_Sim_Safety_v1.0.md` |

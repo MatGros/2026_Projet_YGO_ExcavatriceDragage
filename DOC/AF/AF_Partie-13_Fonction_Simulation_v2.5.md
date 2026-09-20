@@ -91,8 +91,8 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F13.03</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Position codeurs M1/M2 simulée, persistance reset froid</b></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Encoder</code></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><a href="AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.0.md"><code>FB_Sim_Encoder_v1.0.md</code></a></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-030..033</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><a href="AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md"><code>FB_Sim_Encoder_v1.1.md</code></a></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-030..038</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
@@ -224,7 +224,7 @@ fiche `FB_Sim_Safety` avant tout diagnostic de blocage AU en simulation** (§4 d
 |---|---|---|
 | [`FB_SimBench_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_SimBench_v1.0.md) | `FB_SimBench` | Enveloppe unique, composition des 4 sous-modèles, décalages 1 scan, REX StatusWord AC600, capteur haut TOP sain par défaut |
 | [`FB_Sim_Safety_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Safety_v1.0.md) | `FB_Sim_Safety` | Chaîne AU/contacteur simulée — ⚠️ piège latches AU non liés à la simulation |
-| [`FB_Sim_Encoder_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.0.md) | `FB_Sim_Encoder` | Position codeur COD1/COD2, persistance reset froid |
+| [`FB_Sim_Encoder_v1.1.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md) | `FB_Sim_Encoder` | Position codeur COD1/COD2, comptage **signé** (0 non borné) + saturation de plage signalée, persistance reset froid |
 | [`FB_Sim_Translation_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md) | `FB_Sim_Translation` | 5 capteurs M3 par progression continue |
 | [`FB_Sim_Joystick_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Joystick_v1.0.md) | `FB_Sim_Joystick` | Entrées brutes joystick, homme-mort jamais contourné |
 

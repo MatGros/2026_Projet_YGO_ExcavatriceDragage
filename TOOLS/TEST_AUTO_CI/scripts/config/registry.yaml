@@ -1555,7 +1555,7 @@ FB_Translation_PositionEstimator:
   report_group: I_TRANSLATION
 FB_Sim_Encoder:
   domain: L_SIMULATION
-  af_doc: DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.0.md
+  af_doc: DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md
   sources:
   - CODE/A_COMMUN/FB_CycleTime.st
   - CODE/L_SIMULATION/FB_Sim_Encoder.st
