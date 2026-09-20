@@ -665,7 +665,7 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Ouverture benne 0..100 % (0 = fermée, 100 = ouverte) — calcul continu sur l'écart mesuré</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Ouverture benne, mise à l'échelle 0..100 % (0 = fermée, 100 = ouverte) — calcul continu sur l'écart mesuré. Non bornée : une valeur négative ou &gt; 100 signale un sur-fermeture/sur-ouverture réel, volontairement visible.</xhtml>
               </documentation>
             </variable>
             <variable name="CloseActive">
