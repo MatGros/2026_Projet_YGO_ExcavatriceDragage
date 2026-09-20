@@ -1,0 +1,97 @@
+contract:
+  task_id: T331
+  criticality: C3
+  strategy: patch
+  objective: >
+    Rendre AX1 explicite par cause réelle et permettre, après validation du design,
+    une remise en posture opérateur contrôlée vers FDC haut M1/benne qualifiée et P1 M3,
+    sans mouvement autonome, bypass ni nouvelle variable de position.
+  acceptance:
+    - id: AC1
+      statement: "Pour chaque combinaison de faits M1_FdcHaut, BenneQualifiee et M3_AtP1, la matrice AX1 produit exactement les causes fausses et l'action associée ; une cause vraie n'est jamais affichée comme bloquante."
+      verified_by: "matrice de vérité versionnée + test scan-par-scan du formateur de message"
+    - id: AC2
+      statement: "M3 déjà P1 qualifié n'est pas cité dans le message ; M3 hors P1 est cité avec l'action de translation vers P1 ; M1 hors FDC haut est cité avec l'action de montée ; la benne non qualifiée est citée avec sa précondition explicite."
+      verified_by: "tests AX1 ciblés sur les trois défauts isolés et leurs combinaisons"
+    - id: AC3
+      statement: "La procédure de remise en posture ne commande une fermeture benne puis une montée couplée que pendant un geste opérateur maintenu avec homme-mort et permis/sécurités existants valides ; toute perte de geste, homme-mort, AU, TOP, FDC, limite ou permis arrête la demande et n'entraîne aucune reprise automatique."
+      verified_by: "tests de perte de geste, homme-mort, AU, FDC/TOP et permis pendant chaque sous-phase"
+    - id: AC4
+      statement: "La translation vers P1 reste indépendante des treuils, obéit aux protections M3 existantes et arrête automatiquement la commande à P1 sans franchissement de la position."
+      verified_by: "test M3 gauche/droite hors P1 puis arrivée P1, observation des sorties et de l'état AtP1"
+    - id: AC5
+      statement: "Aucune nouvelle variable persistante, paramètre de FDC, cote figée 8,50/7,50 m, bypass ou fin de course parallèle n'est introduit ; les positions et garde-fous existants restent les seules références."
+      verified_by: "revue du diff des déclarations et inventaire producteur-route-consommateur"
+    - id: AC6
+      statement: "Le diagnostic est livré avant la remise en posture ; l'implémentation de chaque phase est validée humainement avant la suivante, puis les tests CODESYS et terrain supervisés sont réalisés avant clôture."
+      verified_by: "visa humain de la matrice/design, rapports de tests et compte rendu d'essai terrain"
+    - id: AC7
+      statement: "Tout fichier CODE/MAIN touché conserve une correspondance stricte fichier = nom du POU ; le suffixe de langage ST correspond au langage Structured Text généré dans le bundle PLCopenXML."
+      verified_by: "revue des noms de POU/fichiers et contrôle du bundle PLCopenXML lors de la phase d'implémentation"
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T331_AX1_POSTURE_DIAGNOSTIC_REMISE.yaml
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+  forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Toute nouvelle variable persistante ou paramètre IHM de FDC/position
+      - Toute modification des valeurs utilisateur PositionHomingTop_M/CableLimitAscent_M
+      - Tout bypass AU, TOP mécanique, FDC, limite, homme-mort ou permis existant
+      - Toute commande autonome hors geste opérateur maintenu
+      - Modification de CODE_XML/ avant une phase d'implémentation explicitement validée
+  conservation:
+    must_survive:
+      - "TOP mécanique, AU, homme-mort, permis, FDC/limites et interlocks existants restent prioritaires et inchangés de sens."
+      - "La distinction fonctionnelle des axes M1/benne et M3 est conservée : aucune demande de translation ne déclenche les treuils et inversement."
+      - "La position P1 est la référence existante et reste une barrière d'arrêt, non une valeur recalculée ou dupliquée."
+      - "Les positions de référencement et FDC haut restent des paramètres utilisateur existants ; 8,50 m et 7,50 m ne deviennent jamais des constantes de code."
+      - "Les comportements AX2/AX3 déjà validés et les corrections T327/T330 restent hors régression."
+    dropped_on_purpose: []
+  phases:
+    - id: P1
+      title: Diagnostic
+      deliverables: "Cartographie des producteurs/consommateurs, matrice des trois causes, définition de BenneQualifiee et messages/actions."
+      gate: "Revue humaine de la matrice ; aucune écriture CODE."
+    - id: P2
+      title: Design validé
+      deliverables: "Séquence contrôlée fermeture benne -> montée couplée et translation vers P1, états d'arrêt et priorités de sécurité."
+      gate: "Validation humaine explicite avant implémentation."
+    - id: P3
+      title: Implémentation séparée
+      deliverables: "Lot A diagnostic IHM ; lot B remise en posture, séparés et réversibles."
+      gate: "Revue diff, liaison et validation humaine entre les lots."
+    - id: P4
+      title: Tests
+      deliverables: "Tests unitaires/scan, simulation puis CODESYS et essais terrain supervisés."
+      gate: "Aucun essai réel sans protections validées ; clôture après preuves et non-régression."
+  dependencies:
+    - "T255/T255-C : recouvrement du diagnostic IHM générique ; T331 précise les causes et ajoute la remise en posture."
+    - "T255-B : ancienne piste de qualification benne/M1 ; à auditer, ne pas réutiliser une règle de range M2 sans preuve."
+    - "T319 : continuité AX2 lorsque M3 est déjà P1 ; ne pas dupliquer ni réouvrir son comportement validé."
+    - "T327 : dépendances benne/état franc et séquencement ; confirmer les interfaces sans mélanger le correctif."
+    - "T330 : positions homing/FDC haut paramétrables ; réutiliser les paramètres, aucune cote figée."
+  evidence_required:
+    - task_contract_check
+    - cause_matrix_and_message_review
+    - implementation_diff_review
+    - check_linkage
+    - run_all_gates
+    - codesys_supervised_test_report
+  alert_duty: >
+    Toute ambiguïté sur la qualification de la benne, le sens de la montée,
+    la source de P1, la priorité d'un FDC/TOP/AU ou le comportement après perte
+    du geste bloque la phase suivante et doit être remontée à l'orchestrateur.
+status: PENDING
+execution:
+  status: PENDING
+  summary: "Contrat créé pour cadrage ; aucune implémentation ni génération de bundle."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  notes: "Validation humaine du diagnostic et du design requise avant toute écriture CODE."

@@ -3,30 +3,31 @@ contract:
   criticality: C4
   strategy: patch
   objective: >
-    En M1 seul et en M1+M2 Both, utiliser M1 comme autorite du FDC logiciel
-    nominal et appliquer aux deux treuils un profil de vitesse commun, tout en
-    conservant les protections independantes de M2 sur sa position corrigee.
+    Corriger et valider d'abord la position M2 corrigee existante pour qu'elle
+    soit continue pendant toute la course de benne ; seulement apres recette
+    humaine, utiliser M1 comme autorite nominale Both AX12 et M2 corrige comme
+    surveillance derivee, sans creer de nouvelle position ni nouveau FDC.
   acceptance:
     - id: AC1
-      statement: "M1 seul et Both utilisent M1 pour l approche et l arret logiciel nominal H."
-      verified_by: "tests aux positions H-0.51, H-0.50, H-epsilon et H"
+      statement: "La position M2 corrigee existante ne saute pas lors des passages ouvert/intermediaire/ferme et reste bornee par la geometrie configuree."
+      verified_by: "traces et tests scan-par-scan aux trois etats, sans changement de FDC"
     - id: AC2
-      statement: "En Both, M1 et M2 recoivent le meme palier effectif pendant l approche haute ; aucun vecteur P1/P5 n est neutralise silencieusement."
-      verified_by: "test scan-par-scan avec ecart M1/M2 realiste et inspection des demandes finales"
+      statement: "La source du pourcentage d ouverture et la fonction offset geometrique sont qualifiees avant tout usage de securite ou FDC."
+      verified_by: "cartographie producteur -> calcul -> consommateurs et validation humaine B1"
     - id: AC3
-      statement: "En M2 seul, la limite de position utilise M2 corrige valide et non la position brute."
-      verified_by: "tests avec offsets ouvert/ferme et variation de M1 immobile"
+      statement: "Apres validation B1, M1 seul et Both utilisent M1 pour l approche et l arret logiciel nominal H ; M2 corrige ne termine pas AX12 nominalement."
+      verified_by: "tests aux positions H-0.51, H-0.50, H-epsilon et H"
     - id: AC4
-      statement: "M2 corrige a H+1 declenche SafeStop et a H+2 declenche PowerCutOff sans temporisation."
-      verified_by: "tests aux bornes H+1 et H+2"
+      statement: "En Both, M1 et M2 recoivent le meme palier effectif pendant l approche haute ; aucun vecteur P1/P5 ne neutralise silencieusement les deux treuils."
+      verified_by: "test scan-par-scan avec ecart M1/M2 realiste et inspection des demandes finales"
     - id: AC5
-      statement: "Le capteur TOP mecanique commun arrete M1 et M2 et conserve l escalade temporelle si mouvement ou contacteurs persistent."
-      verified_by: "tests capteur NC, mouvement mesure et retour collectif contacteurs"
+      statement: "Toute marge de surveillance M2 est derivee des positions Homing TOP et FDC logiciel existantes apres T330 ; aucun parametre IHM ou RETAIN n est ajoute."
+      verified_by: "revue de declarations et contrat T330"
     - id: AC6
-      statement: "Le diagnostic M2 publie la reference corrigee et le seuil effectif ; aucun faux blocage n est affiche par comparaison M2 brut/H."
-      verified_by: "snapshot GVL_Troubleshooting et test de projection"
+      statement: "Le TOP mecanique commun, limites tambour M2, mou de cable, synchronisme et AU restent actifs et independants."
+      verified_by: "matrice de non-regression et tests capteur NC/mou de cable"
     - id: AC7
-      statement: "Manuel, maintenance, homing, descente et limites cable propres restent inchanges hors matrice visee."
+      statement: "Manuel, maintenance, homing, descente, limites cable propres et T327 restent inchanges hors matrice visee."
       verified_by: "matrice de non-regression par mode et direction"
     - id: AC8
       statement: "Bundle complet et diff bundle generes ; G200 et gates palier C passent."
@@ -55,6 +56,7 @@ contract:
       - CODE/B_AU_SECURITE/*
   conservation:
     must_survive:
+      - "Une seule variable de position M2 corrigee : l'existante est corrigee, aucun doublon cree."
       - "Capteur TOP mecanique commun et chaine AU independante."
       - "Limites cable propres M1/M2 et deplacement descendant de degagement."
       - "Aucun redemarrage automatique apres defaut."
@@ -67,24 +69,26 @@ contract:
     - bundle
     - diff_bundle
   alert_duty: >
-    La reference M2 corrigee doit etre valide et independante pour servir aux
-    seuils H+1/H+2. Toute ambiguite sur ActiveOffsetM, DisplayOffsetM ou le
-    comportement au capteur mecanique impose un arret avant code.
+    La continuite et le repere de la position M2 corrigee existante doivent etre
+    prouves avant usage FDC. Toute ambiguite sur le pourcentage ouverture, la
+    table geometrie, ActiveOffsetM ou le comportement TOP impose un arret avant code.
   blocking_decisions:
-    - "Definir la reference M2 corrigee independante utilisable pendant une position benne intermediaire ; ActiveOffsetM ne convient pas seul car il peut suivre M2-M1."
-    - "Definir le repli si la reference M2 corrigee est invalide : aucune hypothese autorisee avant validation humaine."
+    - "Valider la source de pourcentage ouverture et la correction geometrique continue de la variable M2 corrigee existante."
+    - "Valider T330 : invariant PositionHomingTop_M >= CableLimitAscent_M + 1.00 m et reaction configuration invalide."
   phases:
-    - "B0 : spec et diagnostic seulement ; corriger la projection M2 sans toucher aux commandes."
-    - "B1 : autorite M1 et profil commun en M1/Both ; M2 seul sur reference corrigee."
-    - "B2 : SafeStop M2 corrige H+1."
-    - "B3 : PowerCutOff M2 corrige H+2 et qualification separee du capteur TOP commun."
-status: PAUSED
+    - "B0 : corriger la variable M2 corrigee existante et son affichage, sans toucher aux commandes/FDC."
+    - "B1 : tests de continuite et validation humaine de la geometrie ouverte/intermediaire/fermee."
+    - "B2 : apres B1/T330, autorite M1 et profil commun en Both ; M2 corrige garde-fou derive."
+    - "B3 : validation C3 et revue independante : AX12, homing, TOP, limites tambour, descente et T327."
+status: OPEN
 validation:
-  status: PAUSED
+  status: OPEN
   validated_by: ""
   validated_at: ""
   notes: >
-    Mise de cote demandee par l utilisateur le 2026-09-15. Audit detaille conserve dans
+    Reouverte a la demande explicite de l utilisateur le 2026-09-20 apres recurrence terrain AX12.
+    La reprise porte d abord uniquement sur une confirmation par snapshot frais ; aucune implementation
+    C4 avant validation des blocking_decisions. Audit detaille conserve dans
     TROUBLESHOOTING_AX12_Arret_737m_20260915.md et REVIEW_T291B_GIT_HISTORY_AX12_20260915.md.
     Regression identifiee a 95 % : f36c4480 introduit la neutralisation Both sur divergence,
     92601d2c rend visible le cas P1/P5 en AX12 ; codeurs et SimBench hors cause. Aucun code avant
