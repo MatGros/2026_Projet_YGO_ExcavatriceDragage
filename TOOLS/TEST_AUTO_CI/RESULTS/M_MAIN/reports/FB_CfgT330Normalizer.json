@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "file": "test_fb_cfgt330normalizer.st",
+  "results": [
+    {
+      "name": "TC-P10-056 R1 \u2014 FDC saisi trop haut : FDC corrige, TOP preserve",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-057 R2 \u2014 TOP saisi trop bas : TOP corrige, FDC preserve",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-058 R1 \u2014 Delta = 0,90 m : correction du champ saisi (FDC)",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-059 R3 \u2014 plancher du ralentissement haut (0,20 -> 0,50)",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-060 config valide (Delta = 2,50) : aucune correction, aucun message",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-061 Q17 \u2014 les DEUX champs changent au meme scan : TOP preserve, FDC corrige",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-062 FDC = 0,00 m (borne basse, Delta valide) : accepte, aucune correction",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-063 Q24 \u2014 idempotence : le 2e scan apres correction ne corrige PLUS",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-064 reserve EXACTEMENT 1,00 m : aucune correction (aucun epsilon)",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-065 pt1 balayage 7,4999 \u2014 Delta = 1,0001 m : FDC conserve",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-065 pt2 balayage 7,5000 \u2014 Delta = 1,00 m exactement : FDC conserve",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-065 pt3 balayage 7,5001 \u2014 Delta = 0,9999 m : FDC corrige, une seule fois",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-066 LIMITE DECLAREE \u2014 guerre d ecriture IHM : correction a CHAQUE scan",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-067 valeur IDENTIQUE re-saisie : aucun front, aucune correction",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-068 changement de page IHM sans modification : aucune correction",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-069 NVRAM valide au demarrage a froid : 0 correction, valeurs preservees",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-070 NVRAM invalide au demarrage a froid : Q17 (TOP preserve, FDC corrige)",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-071 premier scan NOT Initialized : normalisation INHIBEE, aucune ecriture",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-074 ptA restauration NVRAM : AUCUNE correction fantome (defauts DUT -> restaure)",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-074 ptB download/RTS : comportement DETERMINISTE, une seule correction",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-082 Q22/C2 \u2014 homing : gel NVRAM, repli NIVEAU Q17, non-memorisation",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-090 ptA R0 \u2014 FDC = 0,00 m : valeur A LA BORNE, acceptee sans message",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-090 ptB R0 \u2014 FDC = -1,00 m : CLAMPE a 0,00 m + message",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-090 ptC R0 \u2014 TOP = 0,50 m : CLAMPE a 1,00 m + message, R0 observe SEUL",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-091 ptA Q21 bis \u2014 R0 SEUL : Delta >= 1 avant clamp (FDC 9,50 / TOP 12,00)",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-091 ptB Q21 bis \u2014 domaines absurdes : R0 borne AVANT tout usage aval",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-092 ptA C1 \u2014 R0 d abord : TOP 11,00 -> 10,00 et FDC 10,00 -> 9,00, Delta valid",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-092 ptB C1 \u2014 R2 au plus haut de sa plage : TOP = 10,00 m, jamais au-dela",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 28,
+    "passed": 28,
+    "failed": 0
+  }
+}

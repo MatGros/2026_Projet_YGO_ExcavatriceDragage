@@ -20,6 +20,10 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[3]  # tests/ -> AGENT_WORKFLOW/ -> TOOLS/ -> racine
 PRG07 = ROOT / "CODE" / "M_MAIN" / "PRG_07_Supervision.st"
+# T341 : le corps de la normalisation T330 a ete extrait de PRG_07_Supervision.st vers ce FB
+# dedie (CODE_QUALITY_STANDARDS §10.2). Le bloc de regles balise est desormais DANS LE FB ;
+# PRG_07 ne porte plus que le cablage du signal de homing, au site d'appel.
+FB_NORMALIZER = ROOT / "CODE" / "J_SUPERVISION" / "FB_CfgT330Normalizer.st"
 BANNER = ROOT / "CODE" / "J_SUPERVISION" / "FB_Hmi_BannerFormatter.st"
 
 FDC_MIN, FDC_MAX = 0.0, 9.0
@@ -135,36 +139,56 @@ def _prg07() -> str:
     return PRG07.read_text(encoding="utf-8")
 
 
-def _region() -> str:
-    text = _prg07()
+def _fb() -> str:
+    return FB_NORMALIZER.read_text(encoding="utf-8")
+
+
+def _region(text: str) -> str:
     start = text.find('{region "\U0001f527 T330 NORMALISATION"}')
-    assert start >= 0, "region balisee T330 absente de PRG_07_Supervision.st"
+    assert start >= 0, "region balisee T330 absente du fichier controle"
     end = text.find("{endregion}", start)
     assert end > start
     return text[start:end]
 
 
+def _region_fb() -> str:
+    """Corps de regles T330 : balise dans FB_CfgT330Normalizer depuis T341."""
+    return _region(_fb())
+
+
+def _region_prg07() -> str:
+    """Site d'appel T330 : cablage du signal de homing, dans PRG_07."""
+    return _region(_prg07())
+
+
 def test_region_balisee_presente():
-    assert "T330 NORMALISATION" in _prg07()
+    assert "T330 NORMALISATION" in _prg07(), "region T330 absente du site d'appel PRG_07"
+    assert "T330 NORMALISATION" in _fb(), "region T330 absente du corps du FB"
+
+
+def test_regles_portees_par_le_fb_et_non_par_prg07():
+    """§10.2 : aucune logique metier inline dans PRG_07 — le corps des regles vit dans le FB."""
+    assert "CST_T330ReserveMinMargin_M" not in _prg07(), "regle T330 restee inline dans PRG_07"
+    assert "CST_T330ReserveMinMargin_M" in _region_fb()
 
 
 def test_r0_est_en_amont_de_la_regle_delta():
     """Q21 bis : le clamp absolu precede la regle Delta dans le source."""
-    body = _region()
+    body = _region_fb()
     assert 0 <= body.find("CST_T330FdcMin_M") < body.find("CST_T330ReserveMinMargin_M")
 
 
 def test_aucun_clamp_muet():
     """G504-6 : toute ecriture de correction porte un message dans les 4 lignes suivantes."""
-    lines = _region().splitlines()
+    lines = _region_fb().splitlines()
     for i, line in enumerate(lines):
         if re.search(r"(CfgCableLimitAscent_M|CfgTopSensorPos_M|WinchSlowdownDistanceTop_M)\s*:=", line):
-            assert "T330MsgCorrected := TRUE" in "\n".join(lines[i:i + 4]), line.strip()
+            assert "Corrected := TRUE" in "\n".join(lines[i:i + 4]), line.strip()
 
 
 def test_gating_homing_sur_le_cycle_complet():
     """C2a : le cycle COMPLET (MachineHoming.Active) ET la transaction preset doivent etre combines."""
-    body = _region()
+    body = _region_prg07()
     assert "MachineHoming.Active" in body
     assert "HomingLifecycle.Busy" in body
 
@@ -172,13 +196,20 @@ def test_gating_homing_sur_le_cycle_complet():
 def test_aucune_memoire_d_intention_dans_le_homing():
     """Decision 2c : 'rien a memoriser' — aucun latch d'intention ne doit exister."""
     assert "T330R2Pending" not in _prg07()
+    assert "T330R2Pending" not in _fb()
 
 
 def test_aucun_nom_inexistant_dans_le_code():
     """Cadrage section 1 : ces libelles n'existent pas dans le projet."""
-    text = _prg07()
+    text = _prg07() + _fb()
     for name in ("PositionHomingTop_M", "PositionFdcLogicielHaut_M"):
         assert name not in text
+
+
+def test_variable_morte_prev_slowdown_retiree():
+    """T341 : T330PrevSlowdownTopM etait ecrite et jamais lue — elle doit avoir disparu."""
+    text = _prg07() + _fb()
+    assert "T330PrevSlowdownTopM" not in text
 
 
 def test_message_ihm_conforme():

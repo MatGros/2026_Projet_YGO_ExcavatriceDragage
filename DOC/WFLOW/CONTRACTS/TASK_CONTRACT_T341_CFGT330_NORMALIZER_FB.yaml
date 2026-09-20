@@ -1,0 +1,176 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T341 (extraction FB_CfgT330Normalizer + cas ST du plan T330)
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T341_CFGT330_NORMALIZER_FB
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Extraire la region T330 NORMALISATION de PRG_07_Supervision.st en un FB dedie
+    FB_CfgT330Normalizer (CODE_QUALITY_STANDARDS §10.2 — aucune logique metier inline
+    dans un programme d'orchestration) SANS changer le comportement du normalizer, afin
+    de rendre le bloc TESTABLE en ST isole et de rattacher de VRAIS cas de test aux 37
+    cas declares par le plan C3 v1.3. Livrer en plus, comme item distinct, le durcissement
+    du garde-fou G508 aux ecritures INDIRECTES du totalisateur de prelevements (T299).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_CfgT330Normalizer existe comme POU dedie (nom de fichier = nom de POU, langage ST), porte les regles R0/R1/R2/R3, le gel homing, les memoires de front et le maintien IHM, et n'accede a AUCUNE GVL (reglages passes par VAR_IN_OUT)."
+      verified_by: "lecture du fichier CODE/J_SUPERVISION/FB_CfgT330Normalizer.st ; grep 'GVL_' sur le fichier = 0 occurrence ; G315 profil Light (0/5 membres de statut)"
+    - id: AC2
+      statement: "PRG_07_Supervision n'execute plus aucune regle T330 inline : la region balisee ne contient que le cablage du signal de homing et l'appel du FB ; CfgCorrectedT330 est alimentee par la sortie du FB."
+      verified_by: "pytest TOOLS/AGENT_WORKFLOW/tests/test_t330_top_reserve_invariant.py::test_regles_portees_par_le_fb_et_non_par_prg07 ; git diff de PRG_07_Supervision.st"
+    - id: AC3
+      statement: "Le comportement fonctionnel du normalizer est INCHANGE (non-regression stricte) : memes regles, meme ordre (R0 avant Delta), meme arbitrage Q17, meme gel homing, meme fenetre de maintien 500 ms."
+      verified_by: "pytest 27/27 d'origine inchanges + 2 tests structurels ajoutes = 29/29 ; G504 --strict PASS ; G200 --report 0 erreur ; oracle Python du plan rejoue inchange"
+    - id: AC4
+      statement: "Les cas de test ST reellement decidables sur le FB sont ecrits et PASS : 21 TC du plan (056-062, 063-069, 070, 071, 074, 082, 090, 091, 092) repartis en 28 blocs TEST."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_CfgT330Normalizer -> 28/28 PASS"
+    - id: AC5
+      statement: "La suite de tests est NON VACUE : deux mutations du FB (desactivation du clamp haut R0 ; seuil Delta ramene a 0.00) font ECHOUER la suite, et le fichier est restaure a l'identique (SHA256 verifie)."
+      verified_by: "runs CI de mutation M1 (26/28, 2 FAIL) et M2 (26/28, 2 FAIL) + comparaison SHA256 avant/apres egale a A562E6881E51AD0A15FF12D8AF2D036EA912C82497B2965EB8441E86946E6647"
+    - id: AC6
+      statement: "La matrice de tracabilite porte de VRAIS tc_couvrants : F10.10 declare 21 TC couverts par FB_CfgT330Normalizer, et chaque groupe de validation_points porte sa couverture reelle, y compris les cas NON couverts et leur lot de destination."
+      verified_by: "lecture af_traceability_matrix.yaml (F10.10, validation_points AF-10) ; G450 PASS ; G470 sans nouveau recouvrement (informatif)"
+    - id: AC7
+      statement: "G508 detecte les ecritures INDIRECTES du totalisateur T299 : liaison REF= vers le totalisateur, ecriture par dereferencement d'un alias reference, reference nommee d'apres le totalisateur, et toute liaison hors des 3 sites legitimes (alias VAR_IN_OUT, argument d'appel de FB)."
+      verified_by: "G508 --selftest embarque (6 formes violantes detectees, 3 sites legitimes non signales, 1 faux positif de reference innocente ecarte) ; 2 mutations REELLES injectees puis rejetees (REF= : 2 erreurs dont 1 seule du nouveau controle ; alias VAR_IN_OUT a parametre non nomme : 1 erreur, invisible a l'ancien detecteur)"
+    - id: AC8
+      statement: "Les dettes de nettoyage signalees par la revue T330 sont purgees : T330PrevSlowdownTopM supprimee, commentaire 'reference lue sur le PERSISTANT' rectifie, ordre VAR apres VAR CONSTANT corrige, unites NC-030 retablies, comparaison niee inline sur REAL supprimee."
+      verified_by: "pytest ::test_variable_morte_prev_slowdown_retiree ; grep 'T330PrevSlowdownTopM' = 0 ; git diff (commentaire + ordre des blocs + '= ' au lieu de 'NOT (<> )')"
+    - id: AC9
+      statement: "Le lot est livre avec ses preuves mecaniques : bundle complet + diff bundle frais, bloc Auto-verification liaison, gates palier C sans nouvel echec."
+      verified_by: "CODE_XML/CODE_Bundle.xml et CODE_XML/CODE_DiffBundle.xml regeneres ; G200_check_linkage.py --report ; run_all_gates.py --palier C"
+    - id: AC10
+      statement: "Le nom de fichier correspond au nom de POU pour chacun des deux fichiers touches : PRG_07_Supervision porte le PROGRAM PRG_07_Supervision et FB_CfgT330Normalizer porte le FUNCTION_BLOCK FB_CfgT330Normalizer — aucun POU n'est renomme"
+      verified_by: "en-tete de chaque fichier .st compare au nom du fichier ; G300_check_structure.py ; G200_check_linkage.py --report (instances resolues)"
+    - id: AC11
+      statement: "Le suffixe de fichier correspond au langage reellement genere dans le bundle PLCopenXML — aucun suffixe de langage _ST, _CFC ou _LD n'est appose au nom des POU, les deux objets etant exportes en ST"
+      verified_by: "generate_codesys_diff_bundle.py . CODE/M_MAIN/PRG_07_Supervision.st CODE/J_SUPERVISION/FB_CfgT330Normalizer.st -> objets FB_CfgT330Normalizer et PRG_07_Supervision exportes en ST ; aucune exemption de gate demandee"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/FB_CfgT330Normalizer.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G504_check_t330_homing_top_invariant.py
+      - TOOLS/AGENT_WORKFLOW/scripts/G508_check_sample_totalizer_write_protection.py
+      - TOOLS/AGENT_WORKFLOW/tests/test_t330_top_reserve_invariant.py
+      - TOOLS/AGENT_WORKFLOW/config/af_traceability_matrix.yaml
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_fb_cfgt330normalizer.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/reports/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T341_CFGT330_NORMALIZER_FB.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - CODE_XML/
+    forbidden:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st        # verrou T291-B (AGY01)
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st          # perimetre T291-B
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st           # verrou T331 (DSH09)
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st    # verrou T295 (DSH08)
+      - CODE/L_SIMULATION/                         # verrous T300/T328 (DSH03)
+      - TOOLS/COMPILER_ST2C_STruCpp/               # hors scope : defauts outillage signales, non corriges
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - "tout comportement fonctionnel du normalizer (non-regression stricte)"
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "R0 clamp ABSOLU inconditionnel FDC [0;9] / TOP [1;10], EN AMONT de la regle Delta (Q21 bis)"
+      - "R3 plancher du ralentissement haut 0,50 m, evalue SEUL (jamais compare a la reserve — regle G483 AC2b abrogee par Q1)"
+      - "Regle Delta >= 1,00 m avec detection du champ MODIFIE et arbitrage Q17 (preserver le TOP, corriger le FDC)"
+      - "Gel COMPLET des ecritures Cfg pendant le homing (C2/Q22), memoires de front suivies meme pendant le gel"
+      - "Maintien IHM 500 ms du message de correction (fenetre T#500ms inchangee)"
+      - "Amorcage des memoires depuis les valeurs RESTAUREES, jamais depuis les defauts DUT (piege P2)"
+      - "Ordre d'appel AVANT les ponts de persistance (option A / Q23) et miroir M2 evalue APRES la normalisation"
+      - "Totalisateur de prelevements : aucune RAZ, aucun forcage, aucun nouveau chemin d'ecriture"
+    dropped_on_purpose:
+      - "T330PrevSlowdownTopM : ecrite et jamais lue (variable morte, CQS §4)"
+      - "Le commentaire 'OPTION A (Q23) : reference lue sur le PERSISTANT' : inexact, remplace par la reference REELLE (GVL_IHM.*.Cfg, appelee avant les ponts)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+    - ci_full
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "deepseek-v4.1-flash:cloud"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug preexistant,
+    risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur, pas a la fin et
+    jamais silencieusement. Signaler n'est pas elargir le scope.
+
+  # ── 8. Hors scope explicite (arbitrage humain du 2026-09-20) ──────────────
+  out_of_scope:
+    statement: >
+      Sur 37 cas declares par le plan C3 v1.3, seuls 21 sont decidables sur un FB
+      unitaire. Les 16 autres ne portent PAS sur la normalisation : 075/076 (miroir M2
+      de PRG_07 + GVL_PERSISTENT), 077-080 (FB_Winch / FB_Safety_Winch / plafond palier 1),
+      081 (depend de Homed), 083 (HomingSuspect, hors interface du FB), 084-089 (override N1,
+      bypass N2, jog benne, diag Idx321/323/324 dans PRG_04 — verrouille T291-B — et cycle
+      PRG_03), 072 (message rendu par le panneau IHM, hors automate : recette), 073
+      (BtnAckConfigRestored traite HORS de la region T330 dans PRG_07).
+      Decision humaine : ils sortent de T341 et relevent d'un lot d'INTEGRATION dedie
+      (panier existant FB_Main_EndToEnd / harnais PRG_03 + PRG_04). Aucun test vacue n'a
+      ete ecrit pour atteindre un total de 37.
+    arbitration_by: HUM
+    arbitration_date: "2026-09-20"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "CC01 (orchestrateur DSH)"
+  completed_at: "2026-09-20T22:10:00+02:00"
+  status: COMPLETED
+  summary: >
+    FB_CfgT330Normalizer cree (contrat light : Enable/InHoming -> Ready/Corrected,
+    reglages par VAR_IN_OUT, aucune GVL, 6 CST_T330 locales, memoire morte supprimee).
+    Region T330 de PRG_07 remplacee par le cablage du signal de homing + 1 appel.
+    Ancres mises a jour de facon atomique : G504 (corps du FB pour -6/-7/-10, site
+    d'appel PRG_07 pour -9) et pytest (29/29 dont les 27 d'origine inchanges).
+    28 blocs TEST ST / 21 TC enregistres dans le registre CI ; suite NON VACUE prouvee
+    par 2 mutations reelles du FB, fichier restaure au SHA256 pres.
+    DEUX DEFAUTS D'OUTILLAGE decouverts et NON corriges (hors scope, signales) :
+    (1) inject_var_in_out_copyout.py ne fait RIEN sur une VAR locale de TEST (sa regex
+    exige un prefixe 's.' que ce build STruCpp n'emet pas) — d'ou l'emulation explicite
+    du copy-out dans les tests ; (2) STruCpp v0.6.2 SUPPRIME silencieusement les ASSERT_*
+    places dans le corps d'une boucle FOR — les balayages sont donc deroules.
+    Item distinct livre : G508 durci (REF=/REFERENCE TO/dereferencement/liaison hors des
+    3 sites legitimes) avec selftest etendu et 2 mutations REELLES rejetees.
+  evidence_submitted:
+    - "CI FB_CfgT330Normalizer : 28/28 PASS"
+    - "pytest T330 : 29/29 PASS (27 d'origine inchanges)"
+    - "G504 --strict : PASS"
+    - "G508 : PASS (selftest etendu) ; mutations REF= et VAR_IN_OUT aliase rejetees"
+    - "G200 --report : PASS"
+    - "bundle complet + diff bundle regeneres"
+    - "gates palier C : aucune nouvelle defaillance"
+
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: "—"
+  notes: >
+    En attente de validation humaine. AUCUN COMMIT : le lot est livre sur disque,
+    non committe, conformement a la regle 'aucun commit sans validation humaine explicite'.
+    Recette machine restante : P5 du plan T330 (mesurer la distance d'arret au palier 1
+    et confirmer la bande 0,50 m — Q18).

@@ -1234,6 +1234,15 @@ PRG_07_Supervision:
   - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_07.st
   source_prg: CODE/M_MAIN/PRG_07_Supervision.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_07_supervision.st
+FB_CfgT330Normalizer:
+  domain: M_MAIN
+  sources:
+  - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCfg.st
+  - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st
+  - CODE/J_SUPERVISION/FB_CfgT330Normalizer.st
+  source_prg: CODE/M_MAIN/PRG_07_Supervision.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_fb_cfgt330normalizer.st
+  report_group: M_MAIN
 MAIN_GLOBAL:
   domain: M_MAIN
   sources:

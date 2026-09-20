@@ -23,6 +23,14 @@ Controles (analyse textuelle, commentaires neutralises) :
   5. Sur l'artefact EXPORTE (`CODE_XML/CODE_Bundle.xml`, s'il est present) : la liste des
      affectations au totalisateur est EXACTEMENT les 3 memes instructions — preuve que le
      programme reellement telecharge ne contient aucun chemin d'ecriture supplementaire.
+  6. Aucun chemin d'ecriture INDIRECT par REFERENCE : une declaration `REFERENCE TO` /
+     `REF_TO` dont le nom designe le totalisateur, une liaison `X REF= _CycleSampleCountTotal`,
+     ou une ecriture par dereferencement `X^ := ...` sur un alias declare reference -> FAIL.
+  7. Aucune liaison INDIRECTE du totalisateur : toute occurrence de `_CycleSampleCountTotal`
+     hors des 3 sites legitimes (declaration persistante, branchement VAR_IN_OUT PRG_03,
+     publication IHM PRG_07) -> FAIL. Toute nouvelle liaison (alias `VAR_IN_OUT`, argument
+     d'appel de FB, reference) doit etre validee humainement puis ajoutee a la liste blanche :
+     sans cela, une ecriture faite DANS le FB appele serait invisible au controle textuel.
 
 Le gate embarque un auto-test du detecteur (jeux conformes et violants reellement detectes) :
 un garde-fou qui ne sait pas detecter ne prouve rien.
@@ -80,6 +88,23 @@ CMD_FIELD_RE = re.compile(
     re.IGNORECASE,
 )
 
+# ── Controles 6/7 — chemins d'ecriture INDIRECTS ────────────────────────────────────────
+# Une reference (REFERENCE TO / REF_TO) est un pointeur : l'ecriture se fait au
+# dereferencement (`p^ := ...`), donc la cible textuelle du `:=` n'est plus le totalisateur.
+REF_DECL_RE = re.compile(r"(?<![\w.])(\w+)\s*:\s*(?:REFERENCE\s+TO|REF_TO)\b", re.IGNORECASE)
+REF_BIND_RE = re.compile(rf"(?<![\w.])(\w+)\s*REF=\s*{re.escape(TOTAL_GLOBAL)}\b")
+DEREF_WRITE_RE = re.compile(r"(?<![\w.])(\w+)\s*\^\s*:=")
+OCCURRENCE_RE = re.compile(rf"(?<![\w.]){re.escape(TOTAL_GLOBAL)}\b")
+
+# Les 3 seuls sites ou le TOTALISATEUR peut apparaitre, en forme canonique par fichier.
+# Toute autre occurrence = une liaison potentiellement ecrivante (alias VAR_IN_OUT, argument
+# d'appel de FB, reference) : FAIL, avec obligation de validation humaine de la liste blanche.
+ALLOWED_OCCURRENCES = {
+    GVL_PERSISTENT: {f"{TOTAL_GLOBAL} : UDINT := 0"},
+    PRG_03: {f"{TOTAL_FIELD} := {TOTAL_GLOBAL}"},
+    PRG_07: {f"GVL_IHM.CycleSemiAuto.State.{TOTAL_FIELD} := {TOTAL_GLOBAL}"},
+}
+
 
 def read(path: Path) -> str:
     return path.read_text(encoding="utf-8-sig", errors="replace")
@@ -110,6 +135,88 @@ def assignments_to(source: str, target: str) -> list[str]:
 def _index(source: str, needle: str, start: int = 0) -> int:
     """Position de `needle` a partir de `start`, ou -1 : jamais d'exception, l'appelant decide."""
     return source.find(needle, start)
+
+
+def indirect_write_findings(rel: str, src: str) -> list[str]:
+    """(6) chemins d'ecriture INDIRECTS par REFERENCE — commentaires deja neutralises.
+
+    Trois formes violees :
+      a. une liaison `X REF= _CycleSampleCountTotal` : X peut alors ecrire le totalisateur
+         par simple dereferencement, hors de toute cible textuelle nommee ;
+      b. une ecriture par dereferencement `X^ := ...` sur un alias declare reference
+         (REFERENCE TO / REF_TO) : l'ecriture n'est decid able par aucune analyse de cible ;
+      c. une declaration de reference dont le NOM designe le totalisateur (une reference
+         nommee d'apres une donnee en lecture seule est un piege de maintenance).
+    """
+    findings: list[str] = []
+    for m in REF_BIND_RE.finditer(src):
+        findings.append(
+            f"{rel}: le totalisateur est lie a la REFERENCE `{m.group(1)}` (REF=) — "
+            "un dereferencement `^ :=` ecrirait le compteur hors de l'increment AX18"
+        )
+    # Perimetre PRECIS : seules les references REELLEMENT rattachees au totalisateur (liaison
+    # REF=, ou nom designant le totalisateur). Une reference legitime vers une AUTRE donnee
+    # n'est jamais signalee — un gate qui mord sur du code conforme est inutilisable.
+    bound_refs = {m.group(1).upper() for m in REF_BIND_RE.finditer(src)}
+    suspect_refs = {
+        m.group(1).upper()
+        for m in REF_DECL_RE.finditer(src)
+        if TOTAL_FIELD.upper() in m.group(1).upper() or TOTAL_GLOBAL.upper() in m.group(1).upper()
+    }
+    for m in DEREF_WRITE_RE.finditer(src):
+        name = m.group(1).upper()
+        if name in bound_refs or name in suspect_refs:
+            findings.append(
+                f"{rel}: ecriture par dereferencement `{m.group(1)}^ :=` sur une reference "
+                "rattachee au totalisateur — cible d'ecriture non tracable par son nom"
+            )
+    for name in sorted(suspect_refs):
+        findings.append(
+            f"{rel}: declaration d'une reference `{name}` nommee d'apres le totalisateur — "
+            "une reference vers un compteur en LECTURE SEULE ne doit pas exister"
+        )
+    return findings
+
+
+def totalizer_occurrences(src: str) -> list[str]:
+    """Instructions canoniques contenant une occurrence du TOTALISATEUR (commentaires retires)."""
+    found: list[str] = []
+    for line in strip_comments(src).splitlines():
+        if not OCCURRENCE_RE.search(line):
+            continue
+        stmt = normalize(line.rstrip(" \t,;"))
+        if stmt:
+            found.append(stmt)
+    return found
+
+
+def indirect_binding_findings(rel: str, src: str) -> list[str]:
+    """(7) toute liaison du totalisateur hors des 3 sites legitimes -> FAIL.
+
+    Capte les chemins qu'une recherche d'affectation nommee ne voit JAMAIS : alias
+    `VAR_IN_OUT` passe en argument d'appel (`InstX(Tot := _CycleSampleCountTotal)`),
+    affectation a un alias local, reference (controle 6), etc. Le nombre d'occurrences
+    par site legitime est EXACTEMENT 1 : une duplication est aussi un signal.
+    """
+    findings: list[str] = []
+    allowed = ALLOWED_OCCURRENCES.get(rel, set())
+    for stmt in totalizer_occurrences(src):
+        if stmt in allowed:
+            continue
+        findings.append(
+            f"{rel}: liaison INDIRECTE du totalisateur hors des 3 sites legitimes -> {stmt} "
+            "(alias VAR_IN_OUT, argument d'appel de FB ou reference : une ecriture faite DANS "
+            "le POU appele serait invisible au controle textuel — validation humaine requise "
+            "avant toute mise a jour de la liste blanche)"
+        )
+    counts: dict[str, int] = {}
+    for stmt in totalizer_occurrences(src):
+        if stmt in allowed:
+            counts[stmt] = counts.get(stmt, 0) + 1
+    for stmt, count in sorted(counts.items()):
+        if count != 1:
+            findings.append(f"{rel}: site legitime du totalisateur present {count} fois -> {stmt}")
+    return findings
 
 
 def check_fb(errors: list[str], fb_src: str) -> None:
@@ -158,7 +265,8 @@ def check_fb(errors: list[str], fb_src: str) -> None:
 
 
 def check_code_tree(errors: list[str]) -> None:
-    """(2)+(4) aucun site d'ecriture ni champ de commande hors des 3 sites legitimes."""
+    """(2)+(4)+(6)+(7) aucun site d'ecriture, de liaison ni de champ de commande hors des
+    3 sites legitimes."""
     seen: set[tuple[str, str]] = set()
     for path in sorted((ROOT / "CODE").rglob("*.st")):
         rel = path.relative_to(ROOT).as_posix()
@@ -176,6 +284,9 @@ def check_code_tree(errors: list[str]) -> None:
                 f"{rel}: champ nomme comme une commande sur le totalisateur -> {m.group(1)} "
                 "(aucune commande de RAZ ne doit exister)"
             )
+        # (6)+(7) chemins INDIRECTS : reference, dereferencement, alias VAR_IN_OUT.
+        errors.extend(indirect_write_findings(rel, src))
+        errors.extend(indirect_binding_findings(rel, src))
     for rel, statements in sorted(ALLOWED_BY_FILE.items()):
         for stmt in sorted(statements):
             if (rel, stmt) not in seen:
@@ -257,6 +368,43 @@ def selftest() -> list[str]:
             failures.append(f"auto-test champ de commande non detecte ({label})")
     if CMD_FIELD_RE.search("SampleCountResetMode : E_CycleSampleCountResetMode;"):
         failures.append("auto-test : faux positif sur SampleCountResetMode (champ legitime)")
+
+    # ── Controles 6/7 : chemins d'ecriture INDIRECTS ────────────────────────────────────
+    # Chaque forme violante DOIT etre detectee — c'est la seule preuve que le detecteur
+    # n'est pas aveugle a ce qu'il pretend interdire.
+    indirect_cases = {
+        "REFERENCE TO lie au totalisateur (REF=)":
+            f"pTot : REFERENCE TO UDINT;\npTot REF= {TOTAL_GLOBAL};",
+        "ecriture par dereferencement de l'alias":
+            f"pTot : REFERENCE TO UDINT;\npTot REF= {TOTAL_GLOBAL};\npTot^ := 0;",
+        "reference nommee d'apres le totalisateur":
+            f"{TOTAL_FIELD}Ref : REF_TO UDINT;",
+        "alias VAR_IN_OUT en argument d'appel de FB":
+            f"instAutre(Tot := {TOTAL_GLOBAL});",
+        "affectation a un alias local":
+            f"localTot := {TOTAL_GLOBAL};",
+        "second branchement VAR_IN_OUT du global":
+            f"instAutre2(SampleCountTotal := {TOTAL_GLOBAL});",
+    }
+    for label, sample in indirect_cases.items():
+        found = indirect_write_findings("CODE/AUTO_TEST.st", sample) + indirect_binding_findings(
+            "CODE/AUTO_TEST.st", sample
+        )
+        if not found:
+            failures.append(f"auto-test chemin INDIRECT non detecte ({label})")
+
+    # Les 3 sites LEGITIMES ne doivent JAMAIS etre signales (sinon le gate est inutilisable).
+    for rel, legit in ALLOWED_OCCURRENCES.items():
+        for stmt in legit:
+            sample = f"{stmt};"
+            found = indirect_write_findings(rel, sample) + indirect_binding_findings(rel, sample)
+            if found:
+                failures.append(f"auto-test faux positif sur un site legitime -> {rel}: {stmt} -> {found}")
+
+    # Une reference vers une AUTRE donnee, dereferencee en ecriture, ne doit PAS mordre.
+    innocent = "pAutre : REFERENCE TO REAL;\npAutre REF= GVL_Global.BlinkClock;\npAutre^ := 1.0;"
+    if indirect_write_findings("CODE/AUTO_TEST.st", innocent):
+        failures.append("auto-test : faux positif sur une reference vers une AUTRE donnee")
 
     return failures
 

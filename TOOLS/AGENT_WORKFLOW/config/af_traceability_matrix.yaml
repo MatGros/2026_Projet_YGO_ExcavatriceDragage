@@ -1474,17 +1474,46 @@ domains:
         tc_couvrants: []
         statut: ✅
         etat: NV-I
+      F10.10:
+        fonction: Normaliser les réglages haut (FDC logiciel / TOP homing / ralentissement)
+        description: T330 — R0 clamp ABSOLU inconditionnel FDC [0;9] et TOP [1;10] (Q21 bis) puis règle Delta >= 1,00 m (R1/R2 + arbitrage Q17) et plancher ralentissement >= 0,50 m (R3) ; gel complet des écritures Cfg pendant le homing (Q22/C2, aucune mémoire d'intention) ; mémoires de front non persistantes amorcées sur les valeurs RESTAURÉES. Extraite de PRG_07_Supervision §2 en FB dédié par T341 (CODE_QUALITY_STANDARDS §10.2)
+        realisee_par: FB_CfgT330Normalizer
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P10-056
+        - TC-P10-057
+        - TC-P10-058
+        - TC-P10-059
+        - TC-P10-060
+        - TC-P10-061
+        - TC-P10-062
+        - TC-P10-063
+        - TC-P10-064
+        - TC-P10-065
+        - TC-P10-066
+        - TC-P10-067
+        - TC-P10-068
+        - TC-P10-069
+        - TC-P10-070
+        - TC-P10-071
+        - TC-P10-074
+        - TC-P10-082
+        - TC-P10-090
+        - TC-P10-091
+        - TC-P10-092
+        statut: ✅
+        etat: NV-I
     validation_points:
       TC-P10-056, TC-P10-057, TC-P10-058, TC-P10-059, TC-P10-060, TC-P10-061, TC-P10-062:
-        intention: "T330 — NORMALISATION des reglages haut (Q1/Q2, plan C3 v1.3). Etape 0 : FDC/TOP/slowdown coherents. Etape 1 : saisie invalide R1 (FDC trop haut) / R2 (TOP trop bas) / R3 (slowdown < 0,50) / Q17 (deux champs au meme scan). Etape 2 : correction de la valeur SAISIE uniquement, message non alarmant, reglage non modifie preserve. Groupe A — 7 cas."
+        intention: "T330 — NORMALISATION des reglages haut (Q1/Q2, plan C3 v1.3). Etape 0 : FDC/TOP/slowdown coherents. Etape 1 : saisie invalide R1 (FDC trop haut) / R2 (TOP trop bas) / R3 (slowdown < 0,50) / Q17 (deux champs au meme scan). Etape 2 : correction de la valeur SAISIE uniquement, message non alarmant, reglage non modifie preserve. Groupe A — 7 cas. COUVERTURE REELLE (T341, 2026-09-20) : 7/7 en ST unitaire sur FB_CfgT330Normalizer — TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_fb_cfgt330normalizer.st."
       TC-P10-063, TC-P10-064, TC-P10-065, TC-P10-066, TC-P10-067, TC-P10-068:
-        intention: "T330 — IDEMPOTENCE ET NON-REBOND (Q24). Etape 0 : correction appliquee une fois. Etape 1 : rejeu 2 scans sans nouvelle correction ni nouveau message. Etape 2 : cas limite delta = 1,00 exactement (aucun eps, Q27) ; balayage 7,4999/7,5000/7,5001 ; valeur identique re-saisie ; changement de page IHM. Guerre d'ecriture IHM DECLAREE NON COUVERTE (limite du lot, C3). Groupe B — 6 cas."
+        intention: "T330 — IDEMPOTENCE ET NON-REBOND (Q24). Etape 0 : correction appliquee une fois. Etape 1 : rejeu 2 scans sans nouvelle correction ni nouveau message. Etape 2 : cas limite delta = 1,00 exactement (aucun eps, Q27) ; balayage 7,4999/7,5000/7,5001 ; valeur identique re-saisie ; changement de page IHM. Groupe B — 6 cas. COUVERTURE REELLE (T341, 2026-09-20) : 6/6 en ST unitaire. ATTENTION — TC-P10-066 est une CARACTERISATION de la limite ASSUMEE du lot C3 (le message rebondit si le panneau reecrit sa valeur a chaque scan), PAS une exigence : le test est volontairement falsifiable."
       TC-P10-069, TC-P10-070, TC-P10-071, TC-P10-072, TC-P10-073, TC-P10-074:
-        intention: "T330 — BOOT ET RESTAURATION. Etape 0 : NVRAM valide au demarrage a froid, aucune correction. Etape 1 : NVRAM invalide (Q17 applique). Etape 2 : premier scan NOT Initialized (inhibition), memoires initialisees depuis les valeurs RESTAUREES (piege P2 du cadrage), ConfigRestoredFromPersistent sans double message, BtnAckConfigRestored, RTS/download (GVL_IHM non RETAIN). Groupe C — 6 cas."
+        intention: "T330 — BOOT ET RESTAURATION. Etape 0 : NVRAM valide au demarrage a froid, aucune correction. Etape 1 : NVRAM invalide (Q17 applique). Etape 2 : premier scan NOT Initialized (inhibition), memoires initialisees depuis les valeurs RESTAUREES (piege P2 du cadrage), ConfigRestoredFromPersistent sans double message, BtnAckConfigRestored, RTS/download (GVL_IHM non RETAIN). Groupe C — 6 cas. COUVERTURE REELLE (T341, 2026-09-20) : 4/6 en ST unitaire (069, 070, 071, 074 ; la preuve exigee par le plan section 2.2 point 3 — aucun changement detecte a la restauration NVRAM — est portee par TC-P10-074 ptA). NON COUVERTS : TC-P10-072 (le second message est rendu par le panneau IHM, hors automate : recette) et TC-P10-073 (BtnAckConfigRestored n'est pas une entree du FB et son traitement vit HORS de la region T330 dans PRG_07)."
       TC-P10-075, TC-P10-076, TC-P10-077, TC-P10-078, TC-P10-079, TC-P10-080, TC-P10-081:
-        intention: "T330 — MIROIR M2 ET NON-REGRESSION. Etape 0 : correction du TOP M1. Etape 1 : M2 recoit la valeur CORRIGEE des le 1er scan, aucune divergence _WinchM1CfgPersist / _WinchM2CfgPersist. Etape 2 : DescendPermit JAMAIS gate par la validite, montee bloquee hors homing, montee EN COURS pendant la correction, machine non referencee, machine referencee + R2. Groupe D — 7 cas."
+        intention: "T330 — MIROIR M2 ET NON-REGRESSION. Etape 0 : correction du TOP M1. Etape 1 : M2 recoit la valeur CORRIGEE des le 1er scan, aucune divergence _WinchM1CfgPersist / _WinchM2CfgPersist. Etape 2 : DescendPermit JAMAIS gate par la validite, montee bloquee hors homing, montee EN COURS pendant la correction, machine non referencee, machine referencee + R2. Groupe D — 7 cas. AUCUN CAS COUVERT PAR T341 : ces 7 cas ne portent PAS sur le FB de normalisation (075/076 = miroir M2 de PRG_07 + GVL_PERSISTENT ; 077-080 = consommateurs FB_Winch / FB_Safety_Winch / plafond palier 1 ; 081 = depend de Homed). Ils relevent d'un lot d'INTEGRATION dedie : les declarer couverts par un test unitaire du FB serait une fausse couverture."
       TC-P10-082, TC-P10-083, TC-P10-084, TC-P10-085, TC-P10-086, TC-P10-087, TC-P10-088, TC-P10-089, TC-P10-090, TC-P10-091, TC-P10-092:
-        intention: "T330 — MODES, HOMING ET DOMAINES. Etape 0 : normalisation en modes particuliers. Etape 1 : homing en cours (R2 inhibee sur le CYCLE complet, NVRAM gelee, aucune memoire d'intention : repli niveau Q17 a la sortie ; coupure = intention perdue), HomingSuspect, BtnHomingAtZero. Etape 2 : override N1, bypass N2, ManualBucketJogActive, Idx321/323/324, posture SEMI_AUTO. Etape 3 : R0 CLAMP ABSOLU INCONDITIONNEL [0;9]/[1;10] applique AVANT la regle delta (Q21 bis : FDC=9,50 + TOP=12,00 ou delta >= 1 donc aucune regle ne se declenchait), valeurs negatives, absurdes (+/-150 m) sans atteindre TargetOutOfRangeError. Groupe E — 12 cas."
+        intention: "T330 — MODES, HOMING ET DOMAINES. Etape 0 : normalisation en modes particuliers. Etape 1 : homing en cours (R2 inhibee sur le CYCLE complet, NVRAM gelee, aucune memoire d'intention : repli niveau Q17 a la sortie ; coupure = intention perdue), HomingSuspect, BtnHomingAtZero. Etape 2 : override N1, bypass N2, ManualBucketJogActive, Idx321/323/324, posture SEMI_AUTO. Etape 3 : R0 CLAMP ABSOLU INCONDITIONNEL [0;9]/[1;10] applique AVANT la regle delta (Q21 bis : FDC=9,50 + TOP=12,00 ou delta >= 1 donc aucune regle ne se declenchait), valeurs negatives, absurdes (+/-150 m) sans atteindre TargetOutOfRangeError. Groupe E — 12 cas. COUVERTURE REELLE (T341, 2026-09-20) : 4/12 en ST unitaire (082 = test probatoire de Q22/C2, 090 R0 aux bornes, 091 R0 seul Q21 bis, 092 demonstration C1). NON COUVERTS : 083 (HomingSuspect n'est pas une entree du FB) et 084-089 (override N1, bypass N2, jog benne, Idx321/323/324 dans PRG_04 — verrouille T291-B — et posture SEMI_AUTO dans PRG_03) : lot d'INTEGRATION dedie."
       TC-P10-011, 017, 018, 019:
         intention: "\U0001F4A4 Étape 0 : Treuil au repos, contacteurs coupés, frein\
           \ serré \n        \U0001F680 Étape 1 : Consigne opérateur (joystick/boutons)\
