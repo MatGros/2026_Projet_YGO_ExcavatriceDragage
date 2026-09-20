@@ -457,15 +457,20 @@ instJoystick(
     // 🔧 Producteur = PRG_04_Treuils_Benne (combiné interlock benne) via le bus Data.
     //    TRUE = armement autorisé (polarité positive NC-100).
     ArmingPermit              := PRG_04_Treuils_Benne.Data.ArmingPermit,
-    // Autorise l'inversion directe du joystick pendant toute l'extraction.
+    // Autorise l'inversion directe du joystick pendant toute l'extraction et pendant
+    // le vidage (repli benne + treuils).
     // Le deadman reste obligatoire ; seule la remise au neutre est supprimee
-    // aux transitions AX8 -> AX12 pour conserver la commande maintenue.
+    // aux transitions AX8 -> AX12 et a AX15b pour conserver la commande maintenue.
     DirectInversionPermit     :=
         (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET)
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT)
-        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT),
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT)
+        // Repli du vidage : le geste inverse (Y+ apres Y-) doit atteindre l'etape de
+        // fermeture benne sans exiger une remise au neutre, sinon l'homme-mort se
+        // desarme au milieu de l'intervention.
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN),
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,

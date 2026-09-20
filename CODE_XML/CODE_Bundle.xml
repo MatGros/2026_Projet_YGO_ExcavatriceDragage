@@ -18600,6 +18600,46 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisateur timeout de mouvement</xhtml>
               </documentation>
             </variable>
+            <variable name="TimeoutEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Commande operateur REELLEMENT engagee pendant la manoeuvre benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutRestart">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Segment TON neuf force un scan (rearmement conscient sur Reset)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutAccumTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps de commande engagee deja consomme, GELE hors engagement (segments precedents)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutSegmentTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] ET du segment de commande en cours (reporte dans le cumul au relachement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutRemainingTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Budget restant consomme par le TON (CfgTimeoutDuration - cumul)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonBandClosed">
               <type>
                 <derived name="TON" />
@@ -18941,6 +18981,13 @@ END_IF;
 // 🔑 1. FRONTS &amp; REARMEMENT
 ResetEdge(CLK := Reset);
 
+// 🎯 Signal d'engagement benne — calcule AVANT le watchdog de timeout (§1 Cause 2) pour que le
+// relachement de l'operateur soit pris en compte AU SCAN MEME : un TON arme sur un signal lu avec
+// un scan de retard compterait la pause entiere. Meme calcul qu'auparavant (ReqAscent et
+// ReqDescend sont des VAR_INPUT, jamais reecrites) : seul l'instant de calcul avance en tete de §1.
+MotionRequestConflict := ReqAscent AND ReqDescend;
+MotionRequestActive := (ReqAscent OR ReqDescend) AND NOT MotionRequestConflict;
+
 IF ResetEdge.Q OR BypassGlobal THEN
     CfgFaultLatched       := FALSE;
     OffsetMaxFaultLatched := FALSE;
@@ -18986,10 +19033,55 @@ IF NOT BypassGlobal THEN
     instCauses[1].Latching := TRUE;
     instCauses[1].Texte    := 'Depassement ecart maximum autorise benne';
 
-    // Cause 2 : Timeout
-    TonTimeout(IN := Lifecycle.Busy, PT := CfgTimeoutDuration);
+    // Cause 2 : Timeout de manoeuvre benne — budget SUSPENDU hors commande engagee.
+    // ⏱️ Le budget ne se consomme QUE pendant une commande operateur REELLEMENT engagee
+    // (Lifecycle.Busy ET MotionRequestActive). Hors engagement le compteur est GELE — il n'est
+    // PAS remis a zero — et il reprend/se CUMULE a la commande suivante : une pause operateur
+    // legitime (relachement du joystick en AX3_OPEN_BUCKET / AX15B_DUMP_OPEN, cf.
+    // WaitingForOperator FB_CycleSemiAuto.st:1430) ne peut donc plus produire un faux
+    // [BENNE] ErrorID:03, alors qu'un mouvement bloque SOUS COMMANDE CONTINUE latche toujours
+    // en CfgTimeoutDuration (non-neutralisation). Remise a zero du cumul : fin de manoeuvre
+    // (Lifecycle.Busy retombe) et Reset sur front (rearmement conscient).
+    // Signal d'engagement : MotionRequestActive (calcule en tete de §1) — CloseReq/OpenReq sont
+    // des LATCHES (restent TRUE pendant toute la pause) et seraient ici INOPERANTS.
+    TimeoutEngaged := Lifecycle.Busy AND MotionRequestActive;
+
+    // Rearmement conscient : budget complet ET segment TON neuf. Un TON IEC ne retombe PAS quand
+    // PT augmente (ET cloue a PT, Q fige) : sans cette coupure d'un scan, un Reset pendant une
+    // commande encore engagee re-latcherait le defaut au scan suivant.
+    IF ResetEdge.Q THEN
+        TimeoutAccumTime   := T#0s;
+        TimeoutSegmentTime := T#0s;
+        TimeoutRestart     := TRUE;
+    END_IF;
+
+    // Relachement operateur : le segment courant est reporte dans le cumul (GEL, jamais une RAZ).
+    IF NOT TimeoutEngaged THEN
+        TimeoutAccumTime   := TimeoutAccumTime + TimeoutSegmentTime;
+        TimeoutSegmentTime := T#0s;
+    END_IF;
+
+    // Budget restant -&gt; PT du TON (borne a T#0s : un cumul &gt;= PT latche des le premier scan engage).
+    TimeoutRemainingTime := CfgTimeoutDuration - TimeoutAccumTime;
+    IF TimeoutRemainingTime &lt; T#0s THEN
+        TimeoutRemainingTime := T#0s;
+    END_IF;
+
+    TonTimeout(IN := TimeoutEngaged AND NOT TimeoutRestart, PT := TimeoutRemainingTime);
+    TimeoutRestart := FALSE;   // coupure d'un seul scan -&gt; le TON repart d'un segment a ET=0
+
+    IF TimeoutEngaged THEN
+        TimeoutSegmentTime := TonTimeout.ET;
+    END_IF;
+
     IF TonTimeout.Q THEN
         TimeoutFaultLatched := TRUE;
+    END_IF;
+
+    // Fin de manoeuvre : cumul remis a zero (la manoeuvre suivante repart d'un budget neuf).
+    IF NOT Lifecycle.Busy THEN
+        TimeoutAccumTime   := T#0s;
+        TimeoutSegmentTime := T#0s;
     END_IF;
     instCauses[2].Active   := TimeoutFaultLatched;
     instCauses[2].Latching := TRUE;
@@ -19013,6 +19105,9 @@ IF NOT BypassGlobal THEN
     instCauses[4].Texte    := 'Codeurs treuils non references pour sequence benne';
 ELSE
     TonTimeout(IN := FALSE);
+    TimeoutEngaged      := FALSE;   // bypass global : watchdog neutralise ET cumul remis a zero
+    TimeoutAccumTime    := T#0s;
+    TimeoutSegmentTime  := T#0s;
     M1SlipDetected := FALSE;
     instCauses[0].Active := FALSE;
     instCauses[1].Active := FALSE;
@@ -19178,8 +19273,8 @@ ELSE
     BucketState.TooClosed      := FALSE;
 END_IF;
 
-MotionRequestConflict := ReqAscent AND ReqDescend;
-MotionRequestActive := (ReqAscent OR ReqDescend) AND NOT MotionRequestConflict;
+// MotionRequestConflict / MotionRequestActive sont calcules en tete de §1 : le watchdog de timeout
+// doit voir le relachement de l'operateur au scan meme (aucun lag d'un scan).
 
 IF SevereError THEN
     M2_RunRequest := FALSE;
@@ -24508,6 +24603,10 @@ CASE State OF
         // Etape benne seule : les DEUX treuils explicitement neutralises.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        // Demande d'ouverture publiee a 0 par l'etape elle-meme : AX10 est atteignable
+        // depuis un etat ou l'ouverture etait commandee (repli du vidage) et l'etape ne
+        // doit jamais laisser coexister une ouverture et une fermeture benne.
+        BucketCmd.ReqOpen := FALSE;
         BucketCmd.ReqClose := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
         // Arme le maintien avant la fermeture effective : FB_Bucket garde M2 sans trou de commande.
         BucketCmd.ReqHoldAscentP1AfterClose := BucketCmd.ReqClose;
@@ -24713,7 +24812,7 @@ CASE State OF
         WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
         WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#040B;
-        OperatorAction := 'AX15b - Maintenir : ouverture complete, vidage a la tremie.';
+        OperatorAction := 'AX15b - Pousser : vidage. Tirer : fermer et remonter.';
 
         // Config treuil UNIQUE : etape benne seule, les deux treuils neutralises
         // (plus de descente couplee M1+M2 simultanee a l'ouverture benne -&gt; plus
@@ -24725,10 +24824,21 @@ CASE State OF
 
         BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
 
-        // Option operateur (bit IHM) : descendre la benne dans la gueule de tremie
-        // pour aider la vidange -&gt; repositionnement couple M1+M2 (AX15C). Prioritaire
-        // sur la fin de vidage.
-        IF RepositionRequest THEN
+        // 🆘 Repli benne + treuils depuis le vidage : geste INVERSE maintenu (Y+, montee)
+        // sous homme-mort. La benne est REFERMEE puis les treuils remontent couples.
+        // Entree dans l'etape de fermeture existante AX10_CLOSE_BUCKET : la chaine
+        // AX10 -&gt; AX10B -&gt; AX11/AX12 est reutilisee telle quelle, sans duplication de
+        // logique ni nouvelle variable de position. AX10 est aussi l'etape sur laquelle
+        // la commande benne et la surveillance de synchronisme sont deja bornees en aval.
+        // Prioritaire sur l'option de repositionnement (AX15C commande une DESCENTE
+        // couplee : elle contredirait le geste de repli) et sur la fin de vidage.
+        // L'ouverture est neutralisee des ce scan, et AX10 publie lui aussi ReqOpen a 0
+        // sur toute la duree du repli : les deux demandes benne ne doivent jamais etre
+        // vraies sur le meme scan.
+        IF DeadmanArmed AND JoystickPull THEN
+            BucketCmd.ReqOpen := FALSE;
+            State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
+        ELSIF RepositionRequest THEN
             State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
         ELSIF DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
@@ -28537,6 +28647,14 @@ END_IF;
 --&gt; [TST] Bypass global</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgCorrectedT330">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] T330 : correction automatique d'un reglage haut (fenetre de maintien)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassWinchM1Active">
               <type>
                 <BOOL />
@@ -30028,6 +30146,12 @@ ELSIF DirectionBlocked THEN
     ELSE
         OperatorActionCandidate := '[TREUIL] Montée interdite';
     END_IF;
+ELSIF CfgCorrectedT330 THEN
+    // 🔧 T330 — reglage haut corrige automatiquement (Q2). Volontairement place APRES toutes
+    // les branches de SECURITE (AU, puissance, SafeStop, direction) : une correction de reglage
+    // ne doit JAMAIS masquer une alarme de securite. Prefixe [CFG] discriminant pour rester
+    // distinguable de D18, benne non fermee et synchro (cadrage §11bis). Longueur &lt;= 70 car. (G408).
+    OperatorActionCandidate := '[CFG] Reglage corrige : reserve TOP/FDC a 1,00 m';
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // Guidance par étape du cycle (AF-07 §5.1) — ne masque jamais un défaut
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
@@ -30627,7 +30751,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, extraction semi-auto AX8..AX12</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, semi-auto AX8..AX12 et repli du vidage AX15b</xhtml>
               </documentation>
             </variable>
             <variable name="BusCanOpenOP">
@@ -36497,6 +36621,31 @@ alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s, 
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai avant application de la faute frein M3, s</xhtml>
               </documentation>
             </variable>
+            <variable name="SimM3EndStopRecoilMax_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">BUTEE MECANIQUE M3 — recul borne apres arret serre (C5). 0.0 = comportement historique
+(position ET vitesse figees a la butee, decision de review tracee). &gt; 0 autorise la
+reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non calibre.
+--&gt; [CFG][SYNTHETIQUE] Recul borne a la butee M3, m</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3LoadReactionGain_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Gain de reaction de charge M3, m/s2</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimJoystickLeft_Rev_TREMIE_Active">
               <type>
                 <BOOL />
@@ -36869,6 +37018,15 @@ le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Faute frein M3 -- diagnostic seul : confirme que la branche de faute est bien appliquee.
 &lt;-- [DIAG] Faute frein M3 effectivement appliquee ce scan</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3SensorBlipActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Blip court capteurs M3 -- diagnostic seul : observable sur trace pendant un episode court.
+&lt;-- [DIAG] Un capteur M3 publie une excursion courte</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -37745,9 +37903,12 @@ instSimTranslation(
     SensorBlipTransitions := SimM3SensorBlipTransitions,
     SensorBlipDurationS := SimM3SensorBlipDurationS,
     BrakeFaultCloseWhileRunning := SimM3BrakeFaultCloseWhileRunning,
-    BrakeFaultCloseDelay_S := SimM3BrakeFaultCloseDelayS
+    BrakeFaultCloseDelay_S := SimM3BrakeFaultCloseDelayS,
+    EndStopRecoilMax_M := SimM3EndStopRecoilMax_M,
+    LoadReactionGain_Mps2 := SimM3LoadReactionGain_Mps2
 );
 M3BrakeFaultCloseActive := instSimTranslation.BrakeFaultCloseActive;
+M3SensorBlipActive := instSimTranslation.SensorBlipActive;
 
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
 // même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).
@@ -39162,6 +39323,18 @@ Ready := TRUE;
                 <UDINT />
               </type>
             </variable>
+            <variable name="CST_BlipMaxTransitions">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond du nombre de bascules du profil « blip court » : borne la duree de l'episode
+       et interdit tout rebouclage de compteur UDINT (revue du 2026-09-20, F9).</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
@@ -39253,6 +39426,9 @@ IF RawDetected &lt;&gt; PreviousRawDetected THEN
         BlipTimerS := 0.0;
         BlipCount := 0;
         BlipActive := TRUE;
+        (* Ecretage : au-dela de ce plafond, un compteur UDINT pourrait reboucler et rendre
+           le blip non terminant (revue du 2026-09-20, F9). *)
+        BlipTransitions := MIN(BlipTransitions, CST_BlipMaxTransitions);
     END_IF;
 END_IF;
 
@@ -40038,7 +40214,12 @@ Ready := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">BLIP COURT — second profil capteur, independant du train ~1 s ci-dessus.
        BlipTransitions = 0 (defaut) : profil historique strictement inchange.
        Valeurs de trace : Tremie 1 excursion de 0,2 s (2 echantillons a 100 ms),
-       PV 1 excursion de 0,1 s (1 echantillon).</xhtml>
+       PV 1 excursion de 0,1 s (1 echantillon).
+       ⚠️ LIMITE CONNUE (revue 2026-09-20, F11) : UNE SEULE largeur globale est appliquee aux
+       cinq capteurs. Les deux signatures de la trace (Tremie 0,200 s et PV 0,100 s) ne sont
+       donc PAS rejouables dans la meme passe : il faut deux executions avec des valeurs
+       differentes de SensorBlipDurationS. Une largeur par capteur exigerait un
+       ARRAY[1..5] OF REAL, non retenu dans ce lot.</xhtml>
               </documentation>
             </variable>
             <variable name="SensorBlipDurationS">
@@ -40177,8 +40358,12 @@ Ready := TRUE;
        (deceleration libre du variateur) : le sens du dernier ordre valide est conserve tant
        que le variateur retourne de la vitesse, puis purge a l'arret. Sans cette memoire, la
        vitesse du chariot s'effondrait au scan de retrait de commande alors que la frequence
-       retournee decroit encore — ecart mesure sur trace terrain : 1,13 m de roue libre
-       (14,67 -&gt; 16,16 s a 40 Hz) jamais parcourus par le modele.</xhtml>
+       retournee decroit encore.
+       ⚠️ ORDRE DE GRANDEUR NON MESURE : la trace terrain ne contient AUCUNE variable de
+       position (15 TraceVariable : DI, frequences, mots d'etat, erreurs). La distance de
+       roue libre de la fenetre 14,67 -&gt; 16,16 s est donc une ESTIMATION dependante du modele
+       d'echelle, qui vaut approximativement 1,1 a 1,3 m selon la methode d'integration
+       retenue (gain audit 0,0551 m/(Hz.s)). A ne pas citer comme une mesure.</xhtml>
               </documentation>
             </variable>
             <variable name="FrequencyTarget_Hz">
@@ -40215,6 +40400,15 @@ Ready := TRUE;
               <type>
                 <REAL />
               </type>
+            </variable>
+            <variable name="RecoilMax_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Recul de butee ECRETE a la course : une valeur d'entree aberrante ne peut pas
+       autoriser une position hors de [0 ; 30] m (revue du 2026-09-20, F8).</xhtml>
+              </documentation>
             </variable>
             <variable name="SensorNoiseState">
               <type>
@@ -40497,7 +40691,8 @@ IF Enable THEN
         CycleTime_S := CycleTimeS);
     LoadAngle_Rad := instSuspendedLoad.Angle_Rad;
     IF HardStopTremieActive OR HardStopMaintenanceActive THEN
-        IF (EndStopRecoilMax_M &gt; 0.0) AND BrakeMechanicallyOpen THEN
+        RecoilMax_M := MIN(MAX(0.0, EndStopRecoilMax_M), CST_PositionAtMaintenance);
+        IF (RecoilMax_M &gt; 0.0) AND BrakeMechanicallyOpen THEN
             (* Recul autorise UNIQUEMENT en s'eloignant de la butee touchee, borne par
                EndStopRecoilMax_M : jamais plus loin dans la butee, jamais de saut cache. *)
             VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
@@ -40510,10 +40705,10 @@ IF Enable THEN
                 VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps);
                 PositionCandidate_M := LIMIT(CST_PositionAtTremie,
                     PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
-                    CST_PositionAtTremie + EndStopRecoilMax_M);
+                    CST_PositionAtTremie + RecoilMax_M);
             ELSE
                 VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps);
-                PositionCandidate_M := LIMIT(CST_PositionAtMaintenance - EndStopRecoilMax_M,
+                PositionCandidate_M := LIMIT(CST_PositionAtMaintenance - RecoilMax_M,
                     PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
                     CST_PositionAtMaintenance);
             END_IF;
@@ -52022,6 +52217,8 @@ instSimBench(
     SimM3SensorScenarioSeed         := GVL_Simulation.SimM3SensorScenarioSeed,
     SimM3SensorBlipTransitions      := GVL_Simulation.SimM3SensorBlipTransitions,
     SimM3SensorBlipDurationS        := GVL_Simulation.SimM3SensorBlipDurationS,
+    SimM3EndStopRecoilMax_M         := GVL_Simulation.SimM3EndStopRecoilMax_M,
+    SimM3LoadReactionGain_Mps2      := GVL_Simulation.SimM3LoadReactionGain_Mps2,
     SimM3BrakeFaultCloseWhileRunning := GVL_Simulation.SimM3BrakeFaultCloseWhileRunning,
     SimM3BrakeFaultCloseDelayS       := GVL_Simulation.SimM3BrakeFaultCloseDelayS,
     SimJoystickLeft_Rev_TREMIE_Active  := GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active,
@@ -52116,15 +52313,20 @@ instJoystick(
     // 🔧 Producteur = PRG_04_Treuils_Benne (combiné interlock benne) via le bus Data.
     //    TRUE = armement autorisé (polarité positive NC-100).
     ArmingPermit              := PRG_04_Treuils_Benne.Data.ArmingPermit,
-    // Autorise l'inversion directe du joystick pendant toute l'extraction.
+    // Autorise l'inversion directe du joystick pendant toute l'extraction et pendant
+    // le vidage (repli benne + treuils).
     // Le deadman reste obligatoire ; seule la remise au neutre est supprimee
-    // aux transitions AX8 -&gt; AX12 pour conserver la commande maintenue.
+    // aux transitions AX8 -&gt; AX12 et a AX15b pour conserver la commande maintenue.
     DirectInversionPermit     :=
         (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET)
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT)
-        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT),
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT)
+        // Repli du vidage : le geste inverse (Y+ apres Y-) doit atteindre l'etape de
+        // fermeture benne sans exiger une remise au neutre, sinon l'homme-mort se
+        // desarme au milieu de l'intervention.
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN),
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
@@ -58453,6 +58655,131 @@ geles pendant HomingLifecycle.Busy). Affichage seul, aucune decision machine ici
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Borne profondeur cycle : legale et limites descentes M1/M2</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_T330ReserveMinMargin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">═══ T330 (Q1/Q2) — regles d'INGENIERIE, pas des cotes metier ═══════════════
+NON persistantes et NON IHM (AC3) : jamais exposees, jamais RETAIN.
+Reserve minimale FDC logiciel haut / TOP homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_T330SlowdownTopMin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher du ralentissement haut (Q1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_T330FdcMin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse FDC (Q21)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_T330FdcMax_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="9" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute FDC (Q21/C1 : TOP&lt;=10 et Delta&gt;=1 =&gt; FDC&lt;=9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_T330TopMin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse TOP (Q21)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_T330TopMax_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute TOP (Q21)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="T330PrevInit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">═══ T330 — memoires NON persistantes (AC3 : ni IHM, ni RETAIN) ═════════════
+. [LOC] Seed des memoires effectue depuis les valeurs RESTAUREES</xhtml>
+              </documentation>
+            </variable>
+            <variable name="T330PrevTopSensorPosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur precedente TOP (detection front operateur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="T330PrevCableLimitAscentM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur precedente FDC (detection front operateur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="T330PrevSlowdownTopM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur precedente ralentissement haut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="T330InHoming">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Homing en cours (cycle machine complet OU transaction preset)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="T330MsgCorrected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Une correction T330 a eu lieu ce scan (consomme par le bandeau)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="T330MsgHold">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien du message T330 (1 scan = 10 ms serait invisible a l'IHM)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -58518,6 +58845,110 @@ FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
 //   - ensuite : Persist := Hmi (la config IHM est sauvegardée en continu).
 // Le flag commun GVL_IHM.Commun.ConfigRestoredFromPersistent est levé dès qu'au moins
 // un bridge a restauré au boot, pour signaler à l'IHM qu'une config persistante a été rappelée.
+
+{region "🔧 T330 NORMALISATION"}
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🔧 T330 — COHERENCE DES REGLAGES HAUT (Q1/Q2) · plan C3 v1.3
+// ───────────────────────────────────────────────────────────────────────────────
+// ORDRE IMPOSE (Q21 bis) :  (1) R0 clamp ABSOLU inconditionnel, FDC et TOP separement
+//                        puis (2) regle Delta &gt;= 1,00 m / slowdown &gt;= 0,50 m.
+// OPTION A (Q23) : reference lue sur le PERSISTANT ; les ponts ci-dessous ecrivent la
+//                  valeur CORRIGEE dans le MEME scan (aucune fenetre NVRAM).
+// AC3 : AUCUNE variable persistante ni IHM nouvelle — constantes CST_* et memoires
+//       locales uniquement. Jamais de champ de fin de course supplementaire.
+// C2/Q22 : R2 (correction du TOP) est INHIBEE pendant le homing — sur le CYCLE COMPLET
+//          (HX0..HX6), pas seulement la transaction de preset (~50 ms). Aucune memoire
+//          d'intention : au retour, si la config est toujours invalide, le REPLI NIVEAU
+//          ci-dessous applique Q17 (preserver le TOP, corriger le FDC).
+// ═══════════════════════════════════════════════════════════════════════════════
+T330MsgCorrected := FALSE;
+
+// Homing en cours : cycle machine COMPLET OU transaction de preset, sur M1 ET M2.
+T330InHoming := PRG_02_Acquisition.Data.MachineHoming.Active
+                OR PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
+                OR PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy;
+
+// Inhibee tant que les ponts n'ont pas RESTAURE (sinon les defauts DUT seraient pris
+// pour une saisie operateur — piege P2 du cadrage).
+IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.Commun.Cfg.Initialized THEN
+
+    // Seed des memoires depuis les valeurs RESTAUREES (jamais depuis les defauts DUT).
+    IF NOT T330PrevInit THEN
+        T330PrevTopSensorPosM     := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
+        T330PrevCableLimitAscentM := GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M;
+        T330PrevSlowdownTopM      := GVL_IHM.Commun.Cfg.WinchSlowdownDistanceTop_M;
+        T330PrevInit              := TRUE;
+    END_IF;
+
+    // ─── GEL PENDANT LE HOMING (decision C2 b : « NVRAM gelee — AUCUNE ecriture Cfg ») ──
+    // Toutes les ecritures ci-dessous (R0, R3, R1, R2) sont suspendues pendant le homing.
+    // ⚠️ Ce gel couvre R1/R0/R3 AUSSI : une correction pendant un homing deplacerait la CIBLE
+    // de homing (R0/R2) ou detruirait le reglage commissionne (R1) et le persisterait.
+    // ⇒ A la sortie du homing, les memoires ont suivi la saisie (bloc ci-dessous, hors gel) :
+    //    il n'y a plus de FRONT, donc le REPLI NIVEAU applique R1 = Q17 (preserver le TOP). C'est
+    //    exactement la decision 2c : « rien a memoriser, on retombe dans le cas normal Q2 ».
+    IF NOT T330InHoming THEN
+
+    // ─── (1) R0 — CLAMP ABSOLU (Q21 bis) : non conditionne a une violation de Delta ──────
+    // ⚠️ « INCONDITIONNEL » au sens de Q21 bis = non subordonne a la regle Delta. Le gel
+    //    homing ci-dessus reste prioritaire (decision C2 b, motivee securite).
+    IF GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M &lt; CST_T330FdcMin_M THEN
+        GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M := CST_T330FdcMin_M;
+        T330MsgCorrected := TRUE;
+    ELSIF GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M &gt; CST_T330FdcMax_M THEN
+        GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M := CST_T330FdcMax_M;
+        T330MsgCorrected := TRUE;
+    END_IF;
+    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M &lt; CST_T330TopMin_M THEN
+        GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M := CST_T330TopMin_M;
+        T330MsgCorrected := TRUE;
+    ELSIF GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M &gt; CST_T330TopMax_M THEN
+        GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M := CST_T330TopMax_M;
+        T330MsgCorrected := TRUE;
+    END_IF;
+
+    // ─── (2) R3 — plancher du ralentissement haut ───────────────────────────────
+    IF GVL_IHM.Commun.Cfg.WinchSlowdownDistanceTop_M &lt; CST_T330SlowdownTopMin_M THEN
+        GVL_IHM.Commun.Cfg.WinchSlowdownDistanceTop_M := CST_T330SlowdownTopMin_M;
+        T330MsgCorrected := TRUE;
+    END_IF;
+
+    // ─── (3) R1 / R2 — regle Delta &gt;= 1,00 m sur les valeurs CLAMPEES ───────────
+    // Detection du champ MODIFIE : M1 (maitre) et FDC commun uniquement.
+    // ⛔ JAMAIS le champ M2 : il est REEcrit chaque scan par le miroir M1 (ligne suivante).
+    IF (GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M
+        - GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M) &lt; CST_T330ReserveMinMargin_M THEN
+        IF (GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M &lt;&gt; T330PrevTopSensorPosM)
+           AND NOT (GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M &lt;&gt; T330PrevCableLimitAscentM) THEN
+            // R2 — le TOP vient d'etre saisi : corriger le TOP sauf pendant le homing (C2/Q22)
+            IF NOT T330InHoming THEN
+                GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M :=
+                    GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M + CST_T330ReserveMinMargin_M;
+                T330MsgCorrected := TRUE;
+            END_IF;
+        ELSE
+            // R1 (et Q17 : les deux champs ont change, ou aucun) — PRESERVER le TOP,
+            // corriger le FDC. C'est aussi le REPLI NIVEAU a la sortie du homing.
+            GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M :=
+                GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M - CST_T330ReserveMinMargin_M;
+            T330MsgCorrected := TRUE;
+        END_IF;
+    END_IF;   // fin de la regle Delta (R1/R2)
+    END_IF;   // ─── fin du GEL HOMING (decision C2 b) : plus aucune ecriture Cfg pendant le homing
+
+    // ─── Memoires de front (HORS gel : suivies MEME pendant le homing) ──────────
+    // Indispensable : a la sortie du homing la saisie operateur n'est plus un FRONT, donc le
+    // REPLI NIVEAU ci-dessus applique R1 = Q17 (preserver le TOP, corriger le FDC). C'est la
+    // decision 2c : « rien a memoriser, on retombe dans le cas normal Q2 ».
+    T330PrevTopSensorPosM     := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
+    T330PrevCableLimitAscentM := GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M;
+    T330PrevSlowdownTopM      := GVL_IHM.Commun.Cfg.WinchSlowdownDistanceTop_M;
+END_IF;
+
+// Maintien IHM : une correction dure UN scan (10 ms) -&gt; sans maintien le message serait
+// invisible. TOF = conserve Q VRAI pendant PT apres retombee de IN (fenetre de maintien).
+T330MsgHold(IN := T330MsgCorrected, PT := T#500ms);
+{endregion}
 
 instCfgPersistBridgeWinchM1(Hmi := GVL_IHM.M1TreuilRetenue.Cfg, Persist := _WinchM1CfgPersist);
 IF instCfgPersistBridgeWinchM1.JustRestored THEN
@@ -59058,6 +59489,7 @@ instHmiBannerFormatter(
     MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
     MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction,
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
+    CfgCorrectedT330      := T330MsgHold.Q,
     BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassTranslation     := GVL_IHM.M3Translation.Bypass.Global,
@@ -60058,6 +60490,33 @@ PV     : 1 excursion de 0,1 s (reactive 1 echantillon a 14,94 s en deceleration)
           <initialValue>
             <simpleValue value="0.2" />
           </initialValue>
+        </variable>
+        <variable name="SimM3EndStopRecoilMax_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 BUTEE MECANIQUE M3 — recul borne apres arret serre (C5).
+0.0 = behavior historique : position ET vitesse figees a la butee (decision de review
+tracee). &gt; 0 autorise la reaction de charge a ressortir le chariot de la zone capteur.
+Valeur SYNTHETIQUE, non calibree : a mesurer en mise en service.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3LoadReactionGain_Mps2">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.2" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Gain de reaction de charge utilisee par le modele M3 (SYNTHETIQUE).
+0.20 = valeur historique ; un gain plus eleve est necessaire pour rejouer le recul
+post-arret observe sur la trace terrain du 2026-09-04. A calibrer.</xhtml>
+          </documentation>
         </variable>
         <variable name="SimM3BrakeFaultCloseWhileRunning">
           <type>

@@ -1221,6 +1221,10 @@ CASE State OF
         // Etape benne seule : les DEUX treuils explicitement neutralises.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        // Demande d'ouverture publiee a 0 par l'etape elle-meme : AX10 est atteignable
+        // depuis un etat ou l'ouverture etait commandee (repli du vidage) et l'etape ne
+        // doit jamais laisser coexister une ouverture et une fermeture benne.
+        BucketCmd.ReqOpen := FALSE;
         BucketCmd.ReqClose := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
         // Arme le maintien avant la fermeture effective : FB_Bucket garde M2 sans trou de commande.
         BucketCmd.ReqHoldAscentP1AfterClose := BucketCmd.ReqClose;
@@ -1426,7 +1430,7 @@ CASE State OF
         WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
         WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#040B;
-        OperatorAction := 'AX15b - Maintenir : ouverture complete, vidage a la tremie.';
+        OperatorAction := 'AX15b - Pousser : vidage. Tirer : fermer et remonter.';
 
         // Config treuil UNIQUE : etape benne seule, les deux treuils neutralises
         // (plus de descente couplee M1+M2 simultanee a l'ouverture benne -> plus
@@ -1438,10 +1442,21 @@ CASE State OF
 
         BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
 
-        // Option operateur (bit IHM) : descendre la benne dans la gueule de tremie
-        // pour aider la vidange -> repositionnement couple M1+M2 (AX15C). Prioritaire
-        // sur la fin de vidage.
-        IF RepositionRequest THEN
+        // 🆘 Repli benne + treuils depuis le vidage : geste INVERSE maintenu (Y+, montee)
+        // sous homme-mort. La benne est REFERMEE puis les treuils remontent couples.
+        // Entree dans l'etape de fermeture existante AX10_CLOSE_BUCKET : la chaine
+        // AX10 -> AX10B -> AX11/AX12 est reutilisee telle quelle, sans duplication de
+        // logique ni nouvelle variable de position. AX10 est aussi l'etape sur laquelle
+        // la commande benne et la surveillance de synchronisme sont deja bornees en aval.
+        // Prioritaire sur l'option de repositionnement (AX15C commande une DESCENTE
+        // couplee : elle contredirait le geste de repli) et sur la fin de vidage.
+        // L'ouverture est neutralisee des ce scan, et AX10 publie lui aussi ReqOpen a 0
+        // sur toute la duree du repli : les deux demandes benne ne doivent jamais etre
+        // vraies sur le meme scan.
+        IF DeadmanArmed AND JoystickPull THEN
+            BucketCmd.ReqOpen := FALSE;
+            State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
+        ELSIF RepositionRequest THEN
             State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
         ELSIF DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
