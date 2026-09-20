@@ -1,0 +1,82 @@
+{
+  "source": "TOOLS\\PLC_CSV_SNAPSHOT\\RESULTS\\trace\\archives\\Suivi_TranslationM3bug_20260904_27.trace",
+  "variable_count": 15,
+  "sample_count": 352,
+  "variables": [
+    {
+      "name": "M3_PosTremie_DI",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "M3_PosPVP2_DI",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "M3_PosPV_DI",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "M3_PosP1_DI",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "M3_PosMaintenance_DI",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "M3_BrakeIsOpen_DI",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "M3_ActualFrequencyHz",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "M3_StatusWord",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "M3_SetpointFrequencyHz",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "M3_CommandWord",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "M3_ThermalOK_DI",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "TranslationM3.Safety.Error",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "TranslationM3.Safety.ErrorId",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "TranslationM3.State.Error",
+      "type": "System.Double",
+      "samples": 352
+    },
+    {
+      "name": "TranslationM3.State.ErrorId",
+      "type": "System.Double",
+      "samples": 352
+    }
+  ]
+}

@@ -1,4 +1,98 @@
 tasks:
+- id: T335
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: SUPERVISION_IHM / TEST_AUTO_CI
+  agent: '—'
+  date: '2026-09-20T16:05:00+02:00'
+  updated_at: '2026-09-20T16:05:00+02:00'
+  titre: 'Bandeau IHM : 4 TC FB_Hmi_BannerFormatter rouges préexistants (TC-P07-020/006/008/031), invisibles car le registre CI ne pouvait pas les exécuter'
+  contexte: 'Découvert par T255-D le 2026-09-20 : l''entrée officielle du registre TEST_AUTO_CI pour FB_Hmi_BannerFormatter cumulait 13 sources absentes (_TYPES/5_ASSISTANCE_DRAGAGE/) + E_CycleDepthStopMode.st non déclarée -> les TC du bandeau n''étaient jamais exécutés. Une fois rendus exécutables : 15/19 PASS, 4 FAIL avant tout travail T255-D. T255-D répare le registre mais ne corrige pas ces 4 TC.'
+  description: 'Reprendre les 4 TC rouges un par un : test périmé (attendu obsolète, à réviser avec justification) ou régression réelle du bandeau (à corriger). Aucun attendu relâché pour faire passer.'
+  objectifs:
+  - 'Pour chaque TC : verdict test périmé / régression, avec fichier:ligne et trace.'
+  - 'Régressions corrigées avec test vert ; tests périmés révisés avec justification tracée.'
+  - '19/19 PASS FB_Hmi_BannerFormatter dans le registre officiel.'
+  bloque_par:
+  - 'T255-D (réparation du registre CI du bandeau).'
+- id: T334
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: CYCLE_SEMIAUTO / TRANSLATION_M3 / SECURITE_MOUVEMENTS
+  agent: '—'
+  date: '2026-09-20T14:40:00+02:00'
+  updated_at: '2026-09-20T15:45:00+02:00'
+  titre: 'Translation M3 : pourquoi deux chemins de commande (manuel/MAINT vs cycle auto) ? Chaînes complètes, comparatif, et dépassement P1/Trémie en cycle'
+  contexte: 'Constat utilisateur 2026-09-20 : en manuel et en maintenance, M3 s''arrête correctement sur les fins de course (machine en service depuis des semaines). En cycle automatique, à l''arrivée sur P1 ou Trémie, le chariot continue d''avancer. Question de fond posée par l''utilisateur (recadrage 15:45) : en POO, l''axe M3 devrait recevoir UN ordre de marche (vers extrémité / vers Maintenance / vers P1) quel que soit le demandeur ; passer par des voies différentes selon le mode est anormal et explique probablement les comportements différents. Lié à : T287 (défaut frein aux mêmes arrivées, CDX01), T300 (reproduction SimBench de la perte capteur ~1 s), T333 (recalage estimateur), T204 (enforcement permits M3).'
+  description: 'ANALYSE D''ABORD, façon troubleshooting descendant. (1) Chaîne MANUELLE complète, de haut en bas : joystick -> variables intermédiaires -> arbitrage -> FB_Translation -> interlock final -> mots variateur (CommandWord / SetpointFrequency / frein), chaque variable nommée avec producteur et consommateur fichier:ligne. (2) Même chaîne pour le CYCLE AUTO (PRG_03 étapes AX -> PRG_05 -> ...). (3) Tableau comparatif hiérarchique des deux chemins : où ils divergent, où ils convergent, quelles conditions d''arrêt (P1/Trémie) existent sur l''un et pas sur l''autre. (4) Verdict argumenté : la divergence est-elle obligatoire, modifiable, ou une anomalie de conception ? Proposition d''unification (l''axe reçoit un ordre de marche unique, les demandeurs ne font que produire cet ordre). (5) Seulement ensuite : cause du dépassement P1/Trémie en cycle, prouvée par trace. Correctif sous contrat C3 et plan validé. Aucun code avant validation humaine du comparatif.'
+  objectifs:
+  - 'Chaîne MANUELLE documentée de haut en bas (joystick -> ... -> mots variateur), une ligne par variable : nom, producteur fichier:ligne, consommateur fichier:ligne, rôle.'
+  - 'Chaîne CYCLE AUTO documentée au même format et à la même profondeur.'
+  - 'Tableau comparatif hiérarchique des deux chemins : points de divergence, conditions d''arrêt présentes/absentes de chaque côté, FB traversés en plus ou en moins.'
+  - 'Verdict : divergence obligatoire / modifiable / anomalie — argumenté sur AF-02 (architecture), AF-03 (contrats FB), AF-11 (translation), CODE_QUALITY_STANDARDS (producteur unique). Proposition d''unification si anomalie.'
+  - 'Cause du dépassement P1/Trémie en cycle prouvée par trace (réelle ou SimBench T300), signal fautif nommé fichier:ligne.'
+  - 'Correctif (lot séparé, après validation) : arrêt M3 à l''arrivée P1/Trémie en cycle au même scan qu''en manuel ; test CI échoue avant / passe après ; guard: de non-régression.'
+  - 'Jamais de franchissement toléré en auto : le dépassement reste un défaut tracé, pas un comportement admis.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T334_AUTO_CYCLE_M3_OVERSHOOT.yaml
+  bloque_par:
+  - 'T300 P-A (reproduction SimBench de la perte capteur) si aucune trace réelle 10 ms n''est disponible.'
+- id: T255-D
+  parent_id: T255
+  statut: ⏳
+  criticite: C2
+  domaine: SUPERVISION_IHM / SECURITE_LIMITES_TREUILS
+  agent: 'DSH01'
+  date: '2026-09-20T14:10:00+02:00'
+  locked_at: '2026-09-20T13:54:00+02:00'
+  updated_at: '2026-09-20T14:05:00+02:00'
+  titre: 'Défaut silencieux FDC logiciel BAS : AnyFault allumé sans message d''alarme ni texte d''action opérateur'
+  contexte: 'Constat terrain MES (demande utilisateur 2026-09-20, déjà remontée dans la passation du 20/09 sans tâche créée) : à l''arrivée en fin de course logicielle basse, le voyant AnyFault s''active mais le bandeau IHM n''affiche ni alarme ni action autorisée. Besoin transversal : tout SafetyFault, limite basse/légale ou blocage process doit produire une information opérateur avec l''action autorisée.'
+  description: 'Tracer la chaîne producteur (FB qui lève le défaut FDC bas) -> agrégat AnyFaultActive (PRG_07) -> FB_Hmi_BannerFormatter -> IHM, identifier pourquoi le message et l''action ne sont pas émis, corriger, et ajouter un garde-fou (fix: + guard:) qui détecte tout défaut agrégé dans AnyFaultActive sans message associé. Contrat C2 obligatoire avant code.'
+  objectifs:
+  - 'Cause racine sourcée fichier:ligne : le défaut FDC bas est-il dans AnyFaultActive sans entrée bandeau, ou filtré par le formatter ?'
+  - 'À l''arrivée en FDC logiciel bas : message d''alarme explicite (cause + treuil) ET texte d''action autorisée affichés au même scan que AnyFault.'
+  - 'Test CI ciblé (harnais PRG_07 / FB_Hmi_BannerFormatter) qui échoue avant le correctif et passe après.'
+  - 'Gate guard: dans TOOLS/AGENT_WORKFLOW/scripts/ : aucune cause agrégée dans AnyFaultActive sans libellé bandeau.'
+  - 'Inventaire des autres défauts muets rencontrés en passant : signalés (T243/T220), non corrigés dans ce lot.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T255-D_SILENT_LOW_LIMIT_FAULT.yaml
+  avancement: 'DIAGNOSTIC + CONTRAT C2 LIVRES (DSH01, 2026-09-20). Cause racine sourcee : le carrousel d alarmes exclut les causes 5 et 6 de ST_SafetyWinch.ErrorId (FB_Hmi_BannerFormatter.st:812-849), dont le bit 6 = 16#0040 (limite basse cable), alors que cette cause allume AnyFaultActive (PRG_07_Supervision.st:537-547 via FB_WinchStateProjection.st:236-237). Repli OperatorActionText/SpecialCondition inoperant pour cette limite (FB_Hmi_BannerFormatter.st:656-658 imbrique sous DirectionBlocked + CurrentDirection<0 ; aucune branche SpecialCondition :359-382). ARRET en attente de validation humaine du diagnostic et des decisions D1-D4 du contrat. AUCUN fichier CODE/ modifie. Fiche : DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_FdcBasSilencieux_20260920.md. REPRODUCTION PAR EXECUTION (hors CI officiel, RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS) : 4 tests ROUGES (T255D-REPRO-M1/M2 A1+A2) — AlarmBanner.HasAlarm=FALSE et SpecialConditionText vide alors que la cause active allume AnyFaultActive, texte d action reduit au rappel joystick. Baseline de non-regression PRG_07_Supervision : PASS 3/3. OBSTACLE CI REMONTE : l entree de registre FB_Hmi_BannerFormatter est inutilisable (source CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_ChainDredgingAssist.st absente de CODE/) -> les TC-P07-0xx du bandeau ne s executent pas (decision D4).'
+  bloque_par: []
+- id: T333
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: TRANSLATION_M3 / ESTIMATEUR_POSITION
+  agent: DSH02
+  locked_at: '2026-09-20T13:45:00+02:00'
+  date: '2026-09-20T14:10:00+02:00'
+  updated_at: '2026-09-20T14:10:00+02:00'
+  titre: 'Estimateur position M3 : recalage uniquement sur front montant -> aucun recalage dans le sens Maintenance'
+  contexte: 'Constat utilisateur (SimBench) : en arrivant sur un capteur dans un sens la position est bien mise à la valeur du capteur (5 m, 10 m) ; dans l''autre sens non. Cause probable H1/H2 de AUDIT_T300_TRACE_20260904_v1.0.md : FB_Translation_PositionEstimator.st:83-87 recale sur 5 x R_TRIG seulement ; avec le mot thermomètre, le sens Maintenance ne produit que des fronts descendants.'
+  description: 'Confirmer la cause par test CI 2 sens, corriger l''estimateur (recalage sur sortie de zone = position du capteur, sens-dépendant), ajouter un guard:. Hors scope : gain odométrique (T301), simulation (T300).'
+  objectifs:
+  - 'Test CI qui reproduit l''asymétrie (échoue avant correctif) : trajet Trémie->Maintenance sans recalage.'
+  - 'Après correctif : recalage aux 5 capteurs dans les DEUX sens, tolérance à fixer au contrat ; aucun saut > seuil hors front capteur.'
+  - 'Aucun changement de gain, de persistance ni d''interface FB sans décision tracée.'
+  - 'Guard: gate détectant un R_TRIG capteur sans F_TRIG associé dans l''estimateur.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T333_ESTIMATOR_FALLING_EDGE.yaml
+  bloque_par: []
+- id: T332
+  parent_id: ''
+  statut: ⏳
+  criticite: C4
+  domaine: OUTILLAGE / AGENT_WORKFLOW
+  agent: '—'
+  date: '2026-09-20T13:05:00+02:00'
+  updated_at: '2026-09-20T14:10:00+02:00'
+  titre: 'Hooks Claude Code PreToolUse : sortie hookSpecificOutput sans hookEventName -> erreur + latence à chaque appel outil'
+  contexte: 'Observé en session CC01 le 2026-09-20 : chaque appel Bash/Read affiche « Hook JSON output validation failed — hookSpecificOutput is missing required field hookEventName ».'
+  description: 'Localiser les hooks émetteurs (settings projet/utilisateur, TOOLS/AGENT_WORKFLOW/hooks), ajouter hookEventName, mesurer les durées. Aucune suppression de hook (garde-fous AGENTS.md).'
+  objectifs:
+  - 'Zéro erreur de validation hook sur Bash/Read/Edit après correctif.'
+  - 'Tableau hook / durée avant-après ; tout hook > 1 s signalé.'
+  bloque_par: []
 - id: T331
   parent_id: ''
   statut: ⬜
@@ -19,12 +113,8 @@ tasks:
   - 'Le plan est phasé : diagnostic et matrice de causes ; design validé humainement ; implémentation séparée diagnostic puis remise en posture ; tests unitaires/simulation ; validation CODESYS et essais terrain supervisés.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T331_AX1_POSTURE_DIAGNOSTIC_REMISE.yaml
   bloque_par:
-  - T255
-  - T255-C
-  - T255-B
-  - T319
-  - T327
-  - T330
+  - 'Phase 1 (diagnostic + matrice de causes, lecture seule) : LIBRE des le 2026-09-20 (T319 fait, T327 OK visuel). [MAJ CC01]'
+  - 'Phase 2 (remise en posture, code PRG_03/PRG_04) : attend T255-D (bandeau) ; T330 seulement pour la valeur du FDC haut ; T255-B/T255-C sans ecrivain actif.'
   avancement: 'Création de tâche et contrat C3 : cadrage uniquement, aucun code ni IHM modifié.'
 - id: T330
   parent_id: ''
@@ -32,20 +122,21 @@ tasks:
   criticite: C2
   domaine: CONFIGURATION_TREUILS / SECURITE_POSITIONNELLE
   agent: 'DSH01'
-  date: '2026-09-20T11:46:35+02:00'
-  updated_at: '2026-09-20T11:46:35+02:00'
+  date: '2026-09-20T14:05:00+02:00'
+  updated_at: '2026-09-20T14:05:00+02:00'
   titre: Cadrer l'invariant entre position homing TOP et FDC logiciel haut
-  contexte: 'Les cotes 8,50 m (position de référencement au capteur TOP) et 7,50 m (FDC logiciel haut) sont des paramètres utilisateur, jamais des constantes métier. Elles doivent conserver une réserve verticale minimale : PositionHomingTop_M >= CableLimitAscent_M + 1,00 m. Le 1,00 m est une règle d ingénierie fixe à vérifier, pas un nouveau réglage IHM. Les gardes à plus ou moins 0,50 m seront dérivées ultérieurement de ces paramètres existants.'
+  contexte: 'NOMS REELS DU CODE (corriges le 2026-09-20, cf. cadrage section 1) : CfgTopSensorPos_M = position de referencement au capteur TOP mecanique (ST_WinchCfg.st:8, defaut 8,5 m, M1 maitre, M2 miroir impose par PRG_07:154-155) et CfgCableLimitAscent_M = FDC logiciel haut d exploitation (ST_CommunCfg.st:21, defaut 7,5 m, commun M1/M2). Les libelles PositionHomingTop_M / PositionFdcLogicielHaut_M / CableLimitAscent_M n existent PAS dans CODE/ (CableLimitAscent sans prefixe designe un ETAT BOOL). Ces deux parametres sont modifiables IHM, persistants, et ne doivent JAMAIS etre codees en dur. DECISION HUMAINE 2026-09-20 (Q1) : ReserveTop_M = CfgTopSensorPos_M - CfgCableLimitAscent_M >= 1,00 m ET WinchSlowdownDistanceTop_M >= 0,50 m, DEUX regles distinctes ; la regle historique reserve <= ralentissement est ABROGEE.'
   description: 'Cadrage et proposition de vérification de configuration uniquement. Identifier les producteurs, consommateurs et modes de validation des deux paramètres existants ; définir la réaction sûre à une configuration invalide sans clamp silencieux ni création de nouvelle variable de fin de course. Ne modifie ni la mesure M2 corrigée ni les FDC dans cette tâche.'
   objectifs:
   - 'Nommer les paramètres persistants existants, leurs unités, leurs propriétaires et tous leurs consommateurs de montée/homing.'
-  - 'Prouver la règle PositionHomingTop_M - CableLimitAscent_M >= 1,00 m sur M1 et le repère corrigé M2, sans nouvelle cote configurable.'
-  - 'Proposer la réaction de configuration invalide : arrêt de l armement/mouvement normal, diagnostic explicite et homing explicite seul ; aucune limitation silencieuse.'
+  - 'Prouver les DEUX regles sur CfgTopSensorPos_M et CfgCableLimitAscent_M : ReserveTop_M >= 1,00 m ET WinchSlowdownDistanceTop_M >= 0,50 m, sans nouvelle cote configurable.'
+  - 'DECISION Q2 : NORMALISATION de la valeur invalide saisie (correction immediate + message IHM non alarmant), en PRESERVANT le reglage non modifie ; ni refus bloquant, ni etat invalide persistant.'
   - 'Définir les contrôles dérivés à ±0,50 m uniquement à partir des deux paramètres existants, sans nouveau champ persistant ou IHM.'
-  - 'Livrer un plan C3 d implementation séparé, soumis à validation humaine avant code.'
+  - 'Livrer un plan C3 d implementation separe, soumis a validation humaine avant code -> DOC/WFLOW/AUDITS/DESIGN/PLAN_T330_C3_INVARIANT_HAUT_v1.0.md (livre ; maintien T291-B B1 leve le 2026-09-20 ; execution phase par phase sur GO humain).'
+  - 'Q17 (les DEUX champs changent dans le meme scan : lequel preserver ?) et Q18 (borne 0,50 m non adossee a une mesure de distance d arret) restent a trancher avant tout code.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T330_HOMING_TOP_SOFT_LIMIT_INVARIANT.yaml
   bloque_par: []
-  avancement: '⏳ Cadrage LIVRE par DSH01 le 2026-09-20 -> DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T330_INVARIANT_HAUT_v1.0.md. Noms reels du code PROUVES : CfgTopSensorPos_M (ST_WinchCfg.st:8, defaut 8,5 m ; M2 ecrase = M1 chaque scan par PRG_07:154-155) et CfgCableLimitAscent_M (ST_CommunCfg.st:21, defaut 7,5 m, commun M1/M2). Les libelles de la commande (PositionHomingTop_M / PositionFdcLogicielHaut_M) et du contrat (CableLimitAscent_M) NE SONT PAS les noms declares -> AC1 du contrat infalsifiable. Aucune validation croisee des deux parametres n existe dans CODE/. VERDICT : BLOCK pour le passage a C3, motifs : (1) le gate CI G483 AC2b impose delta <= band alors que T330 impose delta >= 1,00 m, les deux n etant vraies qu a delta = 1,00 m exactement, et AUCUN delta ne satisfait les deux si la bande reelle (0,5 m) est lue ; (2) G483 est ROUGE aujourd hui (exit=1 sur AC1, AC2b passant via un champ renomme fantome) : la suite fin de lot ne protege plus l invariant ; (3) delta < 0 (FDC au-dessus de la reference TOP) n est protege par rien et rend le cycle SEMI_AUTO impossible. 16 questions Q1..Q16 a trancher, dont Q1 (quelle regle gouverne, 3 options proposees) et Q2 (reaction a une configuration invalide, OPTION 1 recommandee). ZERO code modifie : CODE/, CODE_XML/, types IHM et Device.export intacts.'
+  avancement: '⏳ Cadrage LIVRE + DECISIONS HUMAINES ACTEES (2026-09-20) par DSH01. Livrables : DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T330_INVARIANT_HAUT_v1.0.md et DOC/WFLOW/AUDITS/DESIGN/PLAN_T330_C3_INVARIANT_HAUT_v1.0.md. Noms reels du code PROUVES : CfgTopSensorPos_M (ST_WinchCfg.st:8, 8,5 m ; M2 ecrase = M1 chaque scan par PRG_07:154-155) et CfgCableLimitAscent_M (ST_CommunCfg.st:21, 7,5 m, commun M1/M2) ; les libelles PositionHomingTop_M / PositionFdcLogicielHaut_M n existent pas dans CODE/. DECISIONS HUMAINES Q1/Q2 du 2026-09-20 : Q1 = DEUX regles distinctes contrôlées SEPAREMENT, ReserveTop_M >= 1,00 m ET WinchSlowdownDistanceTop_M >= 0,50 m, la regle historique reserve <= ralentissement (G483 AC2b) est ABROGEE ; Q2 = NORMALISATION (3e option, ni refus ni etat invalide) : la valeur invalide saisie est corrigee immediatement et l IHM reflete la valeur corrigee, avec message non alarmant, en PRESERVANT le reglage non modifie (FDC trop haut => FDC := TOP - 1,00 m ; TOP trop bas => TOP := FDC + 1,00 m ; slowdown < 0,50 => 0,50 m). Q15 et Q16 RESOLUES ; 2 nouvelles questions bloquantes Q17 (les DEUX champs changent dans le meme scan : lequel preserver ?) et Q18 (la borne 0,50 m n est adossee a AUCUNE mesure de distance d arret). 8 pieges d implementation consignes (section 0ter). Contrat T330 reecrit (AC1..AC7) et valide par check_task_contract.py (PASS). MAINTIEN EXPLICITE : aucun code tant que T291-B B1 reste en cours sur PRG_04/PRG_07 ; verrou 🔒 T330 conserve a la demande de l humain. ZERO code modifie : CODE/, CODE_XML/, types IHM et Device.export intacts. [MAJ CC01 2026-09-20] MAINTIEN LEVE : T291-B B1 remis (commit 55700932). ARBITRAGES HUMAINS Q17-Q28 : Q17 preserver le TOP, corriger le FDC ; Q23 option A pre-bridge (=> Q19/Q20 sans objet) ; Q21 bornes absolues FDC [0 ; 9,00 m] (car TOP <= 10 et TOP-FDC >= 1 ; challenge DSH01 C1 accepte), TOP [1 ; 10 m] (a confronter aux bornes existantes section 2.1) ; Q22 reformulee (challenge C2 accepte) : R2 correction du TOP INHIBEE pendant InReferencingMode, appliquee au scan suivant la sortie du mode avec message ; R1/R3 jamais inhibees ; Q12 guerre d ecriture IHM = LIMITE du lot (C3) ; Q24 ok (sens unique, pas de rebond) ; Q27 AUCUNE tolerance, regle stricte 1,00 m ; Q28 resolu. Phase P1/P2 (spec tests) autorisable, toujours ZERO code ST avant GO P3. [MAJ DSH01 2026-09-20 T330 P1/P2 LIVRE] PLAN C3 revise en v1.2 (remplacement en place, revision interne) : Q17 a Q28 TOUTES FERMEES et tracees avec leur source (section 1), C1/C2/C3 integres (C1 borne FDC corrigee a [0 ; 9,00 m] AVEC demonstration arithmetique FDC <= TOP - 1 et TOP <= 10 => FDC <= 9, et verification que R2 ne peut plus sortir de borne ; C2 R2 INHIBEE pendant InReferencingMode, R1/R3 jamais, avec message de correction differee ; C3 guerre d ecriture IHM tracee comme LIMITE du lot, AUCUN test IHM en P2). MATRICE AC <-> TC <-> ORACLE <-> PREUVE FIGEE (section 4) : 37 cas, bloc TC-P10-052-088, chacun avec oracle NUMERIQUE. DECOUVERTE pendant l integration : mon premier bloc propose TC-P10-035-071 COLLISIONNAIT des familles de variantes existantes (TC-P10-036.1, 037.1, 039.1, 044.1 a 048.1, 051.1 deja presentes dans HEAD) ; mesure exhaustive des numeros AF-10 utilises (1-16, 20-34, 36, 37, 39, 44-48, 51) => premier bloc contigu libre de 37 = 52-399, donc renumero en TC-P10-052-088. G470 : 156 TC uniques et 16 problemes d unicite AVANT et APRES mon edition (identique a HEAD, verifie par comparaison --matrix) => aucun probleme introduit ; mon bloc n apparait dans AUCUN recouvrement. G504 SPECIFIE (7 controles, entrees, sortie, exclusions de faux positifs) et enregistrement PLANS erige en CRITERE D ACCEPTATION (REX garde-fou mort-ne : G490 et G499_check_t291b_top_authority.py existent mais sont absents de PLANS donc ne s executent jamais). G483 : liste EXACTE des lignes a retirer (docstrings 15-16 et 17-18, bloc 164-175, helper value 166-168, lecture GVL_PERSISTENT 165) ; G483 restera ROUGE sur AC1 (Q11 ouverte, independante de T330) -- aucun faux vert annonce. SIGNALEMENTS : AF-07 ne declare AUCUNE fonction dans af_traceability_matrix.yaml alors que la normalisation y appartient logiquement => TC rattaches a AF-10 faute de fonction AF-07 ; restriction de perimetre reconciliee explicitement (af_traceability_matrix.yaml est sous TOOLS/ mais autorise nominativement, sinon AC3 serait inexecutable). check_task_contract.py PASS. ZERO code ST, ZERO CODE_XML, ZERO IHM ecrits. P3 (code) attend un GO DISTINCT et la livraison de T255-D (FB_Hmi_BannerFormatter.st : T255-D se declare seul ecrivain, et PRG_07:140-196 est interdit a T255-D reciprocquement). [MAJ DSH01 2026-09-20 T330 P1/P2 - SECTION 2.7bis AJOUTEE] Deux PIEGES du gating R2 (decision C2/Q22) identifies par l orchestrateur et traites dans le plan : (1) HomingLifecycle.Busy SEUL ne couvrirait que la transaction de preset (~50 ms, CST_PresetVerifyTime) alors que le homing machine dure tout HX0..HX6 => le gating doit combiner PRG_02.Data.MachineHoming.Active OR EncoderM1/M2 HomingLifecycle.Busy, sinon Q22 n est PAS satisfait (fenetre de protection 50 ms au lieu du homing entier) ; (2) la detection quel champ a change est SUR FRONT, donc une R2 inhibee pendant le homing ne se declencherait JAMAIS a la sortie (plus de front) => la correction differee exigee par Q22 serait SILENCIEUSEMENT PERDUE => 1 memoire NON persistante requise (R2PendingTopCorrection, armee pendant le homing, relue et desarmee a la sortie, idempotente), autorisee par AC3 car ce n est ni un reglage IHM ni un RETAIN. TC-P10-078 renforce : il couvre desormais INHIBITION pendant + APPLICATION DIFFEREE a la sortie + IDEMPOTENCE + variante auto-correction operateur. Verifications d integrite : 37 lignes de test, 37 IDs distincts TC-P10-052-088, AUCUN doublon ; bloc contigu, rien hors bloc. Une erreur de ma propre edition a ete detectee et corrigee AVANT livraison (TC-P10-079 etait deja pris par HomingSuspect - le sous-cas a ete replie dans TC-P10-078 sans creer de nouvel ID).'
 - id: T329
   parent_id: ''
   statut: ⬜
@@ -72,7 +163,8 @@ tasks:
   domaine: SIMULATION / TREUILS
   agent: DSH01
   date: '2026-09-20T00:00:00+02:00'
-  updated_at: '2026-09-20T04:40:00+02:00'
+  updated_at: '2026-09-20T15:30:00+02:00'
+  avancement: 'Code livre (commits 73949276, 55700932) et present dans le bundle (verifie). TEST UTILISATEUR 2026-09-20 : ECHEC — ecart residuel ~5 % benne (voyant ferme allume), montee en cycle et en MAINT : aucun rattrapage, attendu 0 %. Retour au developpeur : verifier activation par defaut du modele de couplage, tracer le cas 5 % -> 0 %, lien T327. [MAJ CC01]'
   titre: SimBench - couplage mecanique M1/M2 et rattrapage (anti-blocage des machoires)
   contexte: >-
     En simulation, une fermeture de benne suivie d'une montee directe laisse un ecart residuel (benne autour de 10 % ouverte, dans le trou metier de fermeture 13,8 / 14,0 m traite par T327) ; l'automate plafonne alors la montee au palier 1 (PRG_04_Treuils_Benne.st 1224). En realite l'ecart se resorbe par le couplage mecanique des deux treuils, sauf si les machoires sont bloquees. Le banc modelisait les deux treuils independamment et ne connaissait un couplage qu'en descente (SimM2CoupledDescentModelActive). ARBITRAGE HUMAIN 2026-09-20 : DSH01 est confirme sur T328, l'autre agent travaille sur T327.
@@ -91,10 +183,10 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: TREUILS_BENNE / SYNCHRO / PROCESS
-  agent: CC01
+  agent: '—'
   date: '2026-09-20T03:37:18+02:00'
-  updated_at: '2026-09-20T03:37:18+02:00'
-  locked_at: '2026-09-20T03:37:18+02:00'
+  updated_at: '2026-09-20T15:20:00+02:00'
+  avancement: 'Fix livre (commit ebe12198, bundle 55700932). Test utilisateur 2026-09-20 : difficile a tester, semble OK. Verrou CC01 libere le 2026-09-20T15:20 ; PRG_04 libre. Cloture definitive a la prochaine confirmation terrain. [MAJ CC01]'
   titre: MAINT WinchSel=0 + benne auto - ManualBucketLimits (jog M2) fuit dans la phase JOG automatique (palier 1 force + trou permis/IsClosed)
   diagnostic_20260920: 'CAUSE LOCALISEE (CC01, trace 70 + code) : FB_Modes.st:392 force Auth.JoystickWinchSelectArbitrated := 2 pendant la phase JOG benne-auto (WinchSel operateur = 0). PRG_04_Treuils_Benne.st:749-750 calcule ManualBucketLimitsActive := TglManualBucketLimits AND (Arbitrated = 2) -> les bornes JOG MANUEL M2 s''appliquent a la phase AUTOMATIQUE. Effet 1 : M2MaxStep=1 force pendant toute la fermeture (trace 70 t=50133-55264 : SpeedTgt=100, M2_SpeedContactor_1 seul, 1,25 m/s). Effet 2 : ProcessPermitM2_Ascent (PRG_04:769) coupe a Delta >= OffsetCloseM - CloseAnticipationM = 13,8 m alors que FB_Bucket.st:364 IsClosed exige Delta >= OffsetCloseM - CoherenceLimitM = 14,0 m -> trou de 0,2 m comble par la seule inertie (trace 70 t=56372 Delta=13,89 relais M2=0 joystick tire ; t=57780 Delta=14,22 -> BucketSeqSatisfied -> M1+M2). Sur machine chargee / inertie < 0,2 m = blocage franc (symptome 1). Les 8,75 s M2 seul = 6 s palier 1 + 1,4 s trou + rampes. PAS D18 (DirectionChangePending=0 confirme). Pistes : (1) ManualBucketLimitsActive sur JoystickWinchSelectRequest (selection operateur) et non Arbitrated ; (2) gate config CloseAnticipationM <= CoherenceLimitM et OpenAnticipationM <= CoherenceLimitM (CfgFault FB_Bucket) ; (3) libelle IHM honnete. Le symptome DESCENTE interdite en benne intermediaire reste a tracer separement (probablement le meme trou cote ouverture : OpenAnticipationM 1,3 > CoherenceLimitM 1,0).'
   contexte: 'Signale par Mathieu 2026-09-20 (session MAINT_N1, essais D18) : quand un ecart M1-M2 commence a se creer (benne en position intermediaire, ni IsOpen ni IsClosed francs), la descente peut se retrouver interdite, y compris en mode auto benne -- blocage total. Le contournement observe : piloter un peu la benne pour la ramener a un etat FRANC (ouverte ou fermee) la debloque. Suspicion : un permis process (chaine ProcessPermit_Descend / EffectivePermit, cf. NAMING_CONVENTION.md taxonomie D-P1->D-P11) ou une condition de FB_Bucket (IsOpen/IsClosed/IsIntermediate, FB_Bucket.st ~L369-376) exige un etat franc pour autoriser la descente, ce qui bloque le cas normal ou la benne est temporairement en transition. SECOND SYMPTOME APPARENTE (trace 70, 2026-09-20, MAINT_N1 confirme explicitement -- PAS AX10B/SEMI_AUTO) : en pilotage couple (WinchSel=0, "les deux") avec toggle benne-auto actif (Context.TglEnableCoupledBucketSequencing), une demande de MONTEE mesure M2 seul actif (M2_RelayAscent_Close_RQ=1) pendant 8,75s (t=49028->57780ms) avant que M1 ne rejoigne -- D18 M1/M2 (DirectionChangePending/DelayElapsed) reste a 0 tout du long, confirme hors-D18. Code trouve (FB_BucketCmdArbitration.st:54-58 WinchBothAscentBucketCloseArmed ; PRG_04_Treuils_Benne.st:384 WinchBothMotionBlockedByBucket ne couvre QUE le cas descente/WinchBothDiveBucketOpenArmed ; PRG_04:385-388 BucketNotClosedAscentCapStep1 ne prevoit qu''une DEGRADATION PALIER 1 pour la montee, PAS un blocage total de relais) -- INCOHERENCE NON RESOLUE : le code lu ne devrait pas bloquer totalement M1 en montee (seulement degrader la vitesse), mais la trace montre un blocage total du relais pendant 8,75s. Mecanisme exact du blocage total en montee non localise -- a chercher en priorite a la reprise.'
@@ -997,7 +1089,7 @@ tasks:
   agent: AGY01
   date: '2026-09-20T11:38:00+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
-  avancement: '⏳ En cours AGY01. Phase B0 : analyse de la chaine de calcul M2 corrigee et cadrage de la continuite sans saut.'
+  avancement: '⏳ En cours AGY01. B0+B1 REMIS (validation visuelle utilisateur 2026-09-20, commit 55700932 : M2PositionCorrected continu sans saut). B2 (autorite M1 en Both) attend T330. Input utilisateur 2026-09-20 pour B2 : M2corrected juge utilisable ; reserve contrat : non qualifie en benne intermediaire (Valid=FALSE). A traiter dans le lot B2 : G499_check_t291b_top_authority.py NON branche (ID 499 deja pris par T289 dans run_all_gates.py PLANS) -> renommer G505 + enregistrer. [MAJ CC01 2026-09-20]'
   titre: T291-B — Position M2 corrigee continue, puis autorite M1 en Both AX12
   contexte: 'Decision utilisateur 2026-09-15 : en M1 seul ou M1+M2 Both, le FDC logiciel nominal et la reduction de vitesse
     sont pilotes par M1. M2 est suiveur et recoit le meme profil de contacteurs. En M2 seul, la position M2 corrigee geometrie
@@ -2390,7 +2482,7 @@ tasks:
   - TC CI: atomicite demarrage couple + sequencement selecteur reel
   contrat: ''
   bloque_par: []
-  avancement: 'Terminée et validée CI : gestion bucket auto en MAINT couplé WinchSel=0 (commit e57baacc).'
+  avancement: 'Terminée et validée CI : gestion bucket auto en MAINT couplé WinchSel=0 (commit e57baacc). | Test utilisateur 2026-09-20 : jog CoherenceLimitM (ebe12198) OK, montee en haut correcte en cycle. [MAJ CC01]'
 - id: T250
   parent_id: ''
   statut: ⬜
@@ -2606,7 +2698,7 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: SUPERVISION_IHM
-  agent: AGY01
+  agent: '—'  # MAJ CC01 2026-09-20 : attribution AGY01 du 05/09 perimee, aucun verrou, aucun ecrivain actif ; FB_Hmi_BannerFormatter -> T255-D
   date: '2026-09-05T10:33:00+02:00'
   titre: Dynamisation des messages de conditions et actions opérateur (Bandeau IHM)
   contexte: Les messages affichés lors d'une attente ou d'un blocage sont trop génériques. Nécessité d'exposer la condition

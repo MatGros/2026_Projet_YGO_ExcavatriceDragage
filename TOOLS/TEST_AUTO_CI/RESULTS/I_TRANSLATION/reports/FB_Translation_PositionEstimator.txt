@@ -1,0 +1,18 @@
+Error parsing test_fb_translation_positionestimator.st:
+
+test_fb_translation_positionestimator.st:83:9: error: Expected `END_FOR`, found `ADVANCE_TIME`.
+  83 |         ADVANCE_TIME(10000000);
+     |         ^
+
+test_fb_translation_positionestimator.st:85:5: error: Expected `END_TEST`, found `END_FOR`.
+  85 |     END_FOR;
+     |     ^
+
+test_fb_translation_positionestimator.st:171:9: error: Expected `END_FOR`, found `ADVANCE_TIME`.
+ 171 |         ADVANCE_TIME(10000000);
+     |         ^
+
+test_fb_translation_positionestimator.st:173:5: error: Expected `END_TEST`, found `END_FOR`.
+ 173 |     END_FOR;
+     |     ^
+
