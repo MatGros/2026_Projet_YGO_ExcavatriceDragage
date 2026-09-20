@@ -1,10 +1,6 @@
-Error compiling source files:
-
-FB_SimBench.st:160:34: error: Undefined type 'FB_SIM_WINCHELECTRICAL' in FUNCTION_BLOCK 'FB_SIMBENCH'
- 160 |     instWinchElectricalM1      : FB_Sim_WinchElectrical;   (* * [INST] T317 exploratoire -- electrique+charge M1 *)
-     |                                  ^
-
-FB_SimBench.st:161:34: error: Undefined type 'FB_SIM_WINCHELECTRICAL' in FUNCTION_BLOCK 'FB_SIMBENCH'
- 161 |     instWinchElectricalM2      : FB_Sim_WinchElectrical;   (* * [INST] T317 exploratoire -- electrique+charge M2 *)
-     |                                  ^
+Error: C++ compilation failed:
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_SimBench\5597f537762a\strucpp_job\strucpp-test-VPHn9H\test_main.cpp: In lambda function:
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_SimBench\5597f537762a\strucpp_job\strucpp-test-VPHn9H\test_main.cpp:1143:14: error: 'I' was not declared in this scope
+ 1143 |         for (I = 1; I <= 100; I++) {
+      |              ^
 

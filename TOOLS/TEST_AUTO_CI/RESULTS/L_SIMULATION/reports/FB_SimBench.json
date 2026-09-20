@@ -117,11 +117,47 @@
     {
       "name": "TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO)",
       "passed": true
+    },
+    {
+      "name": "TC-P13-060 T328 montee couplee : rattrapage actif et correction bornee",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-061 T328 arret et jog M2 seul : ecart fige, aucune correction",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-062 T328 machoires bloquees : rattrapage inhibe et charge forcee",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-063 T328 modele desactive : image M2 inchangee (non-masquage T327)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-064 T328 cable mou : rattrapage inhibe (aucun effort transmis)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-065 T328 banc eteint : image reelle repliquee sans correction",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-066 T328 convergence multi-scan du rattrapage vers la bande fermee",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-067 T328 un preset purge l offset de reprise de jeu (image = codeur)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-068 T328 mode OFF apres session active : aucun offset residuel",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 29,
-    "passed": 29,
+    "total": 38,
+    "passed": 38,
     "failed": 0
   }
 }

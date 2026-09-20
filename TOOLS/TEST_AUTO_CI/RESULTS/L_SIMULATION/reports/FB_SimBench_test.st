@@ -434,3 +434,161 @@ TEST 'TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUT
     FB_SimJoy(Enable := TRUE, NeutralRaw := 5000, MaxRaw := 10000, BtnRight_Fwd_MAINT := TRUE);
     ASSERT_TRUE(FB_SimJoy.RawButton, 'bouton actif -> RawButton=TRUE');
 END_TEST
+
+(* =========================================================================
+   AF-13 — FB_SimBench : rattrapage mecanique M1/M2 (T328)
+   Plan : DOC/WFLOW/CONTRACTS/PLAN_T328_SIMBENCH_COUPLAGE_MECANIQUE_M1M2.md
+   ========================================================================= *)
+
+TEST 'TC-P13-060 T328 montee couplee : rattrapage actif et correction bornee'
+    (* Montée couplée réelle (relais M1+M2 même sens, freins desserrés), benne DANS le trou métier
+       T327 : écart 13,5 m < entrée de bande fermée (14,5 m). Le rattrapage agit, borné par la pente. *)
+    RawPosM1 := 1000000; RawPosM2 := 1100000;
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ASSERT_TRUE(FB_Bench.WinchCouplingActive, 'montee couplee -> rattrapage actif');
+    ASSERT_TRUE(FB_Bench.WinchCouplingCorrectionPts > 0, 'ecart sous la bande -> correction non nulle');
+    ASSERT_TRUE(FB_Bench.WinchCouplingCorrectionPts <= 82, 'correction bornee (0,02 m/scan = 82 points)');
+    ASSERT_TRUE(FB_Bench.Winch.COD2_PosValue > RawPosM2, 'correction appliquee a l IMAGE M2 uniquement');
+END_TEST
+
+TEST 'TC-P13-061 T328 arret et jog M2 seul : ecart fige, aucune correction'
+    (* Relais à 0 : aucun mouvement réel -> jamais de rattrapage (AC6). *)
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := FALSE, M2_RelayFwd := FALSE,
+             SimWinchCouplingModelActive := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ASSERT_FALSE(FB_Bench.WinchCouplingActive, 'relais a 0 -> pas de rattrapage');
+    ASSERT_EQ(FB_Bench.WinchCouplingCorrectionPts, 0, 'aucune correction a l arret');
+    ASSERT_EQ(FB_Bench.Winch.COD2_PosValue, RawPosM2, 'image M2 inchangee a l arret');
+    ADVANCE_TIME(10000000);
+    (* Jog M2 seul (un seul treuil actif) -> toujours aucun rattrapage *)
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := FALSE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := FALSE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ASSERT_FALSE(FB_Bench.WinchCouplingActive, 'jog M2 seul -> pas de rattrapage');
+    ASSERT_EQ(FB_Bench.WinchCouplingCorrectionPts, 0, 'jog M2 seul -> aucune correction');
+END_TEST
+
+TEST 'TC-P13-062 T328 machoires bloquees : rattrapage inhibe et charge forcee'
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE,
+             SimBucketJamActive := TRUE,
+             SimWinchElectricalDiagnosticsActive := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ASSERT_FALSE(FB_Bench.WinchCouplingActive, 'blocage machoires -> rattrapage inhibe');
+    ASSERT_EQ(FB_Bench.WinchCouplingCorrectionPts, 0, 'blocage -> aucune correction');
+    ASSERT_TRUE(FB_Bench.MotorTorqueM1_Nm > 0.0, 'blocage -> charge forcee observable (diagnostic)');
+END_TEST
+
+TEST 'TC-P13-063 T328 modele desactive : image M2 inchangee (non-masquage T327)'
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := FALSE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ASSERT_FALSE(FB_Bench.WinchCouplingActive, 'modele OFF -> pas de rattrapage');
+    ASSERT_EQ(FB_Bench.WinchCouplingCorrectionPts, 0, 'modele OFF -> aucune correction');
+    ASSERT_EQ(FB_Bench.Winch.COD2_PosValue, RawPosM2, 'modele OFF -> image M2 identique (trou T327 preserve)');
+END_TEST
+
+TEST 'TC-P13-064 T328 cable mou : rattrapage inhibe (aucun effort transmis)'
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE,
+             SimM2TensionedCableFaultInject := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ASSERT_FALSE(FB_Bench.WinchCouplingActive, 'cable mou -> pas de rattrapage');
+END_TEST
+
+TEST 'TC-P13-065 T328 banc eteint : image reelle repliquee sans correction'
+    FB_Bench(Enable := FALSE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ASSERT_FALSE(FB_Bench.WinchCouplingActive, 'banc desactive -> aucun rattrapage');
+    ASSERT_EQ(FB_Bench.Winch.COD2_PosValue, RawPosM2, 'banc desactive -> image sans correction');
+END_TEST
+
+TEST 'TC-P13-066 T328 convergence multi-scan du rattrapage vers la bande fermee'
+VAR
+    i        : INT;
+    M2_Pos_M : REAL := 0.0;
+END_VAR
+    (* Boucle fermee simulee : la position M2 vue par le metier suit l'image corrigee, comme dans la
+       chaine reelle (HwSim -> HwIn -> codeur). Delta initial 13,5 m = trou metier de fermeture.
+       Chaque appel du FB vaut un scan de 10 ms (le modele utilise CST_SimBenchCycleTimeS, pas le
+       temps du harness) : la boucle n'avance donc pas le temps du harness. *)
+    RawPosM1 := 1000000; RawPosM2 := 1100000;
+    M2_Pos_M := 18.5;   (* Delta = M2 - M1 = 13,5 m *)
+    FOR i := 1 TO 100 DO
+        FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+                 M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+                 M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+                 SimWinchCouplingModelActive := TRUE,
+                 M1_CablePos_M := 5.0, M2_CablePos_M := M2_Pos_M,
+                 BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+        ASSERT_TRUE(FB_Bench.WinchCouplingCorrectionPts <= 82, 'correction bornee a 0,02 m par scan');
+        M2_Pos_M := M2_Pos_M + DINT_TO_REAL(FB_Bench.WinchCouplingCorrectionPts) * (2.0 / 8192.0);
+    END_FOR;
+    ADVANCE_TIME(10000000);
+    ASSERT_TRUE((M2_Pos_M - 5.0) >= 14.0, 'Delta entre dans la bande fermee (>= 14,0 m) en temps borne');
+END_TEST
+
+TEST 'TC-P13-067 T328 un preset purge l offset de reprise de jeu (image = codeur)'
+    RawPosM1 := 1000000; RawPosM2 := 1100000;
+    (* Session active : un offset est bien accumule. *)
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ASSERT_TRUE(FB_Bench.Winch.COD2_PosValue > RawPosM2, 'offset de reprise de jeu accumule');
+    ADVANCE_TIME(10000000);
+    (* Preset M2 (PresetTriggerCmd = 2) : la reference absolue est reecrite -> offset purge. *)
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE, M2_PresetTriggerCmd := 2,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ASSERT_EQ(FB_Bench.Winch.COD2_PosValue, RawPosM2, 'preset -> offset purge, image = codeur');
+END_TEST
+
+TEST 'TC-P13-068 T328 mode OFF apres session active : aucun offset residuel'
+    RawPosM1 := 1000000; RawPosM2 := 1100000;
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ASSERT_TRUE(FB_Bench.Winch.COD2_PosValue > RawPosM2, 'offset accumule en mode actif');
+    ADVANCE_TIME(10000000);
+    (* Bascule mode OFF : l'image doit redevenir strictement celle du codeur (non-masquage). *)
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := FALSE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ASSERT_FALSE(FB_Bench.WinchCouplingActive, 'mode OFF -> rattrapage inactif');
+    ASSERT_EQ(FB_Bench.Winch.COD2_PosValue, RawPosM2, 'mode OFF -> aucun offset residuel sur l image');
+END_TEST

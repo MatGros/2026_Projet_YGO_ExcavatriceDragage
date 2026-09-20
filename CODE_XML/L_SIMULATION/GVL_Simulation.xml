@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T20:50:07.117936" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T20:50:07.117936">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T02:00:15.912782" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T02:00:15.912782">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -482,6 +482,33 @@ FALSE par defaut : comportement historique conserve jusqu a validation.</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Injection safety explicite : TRUE simule le câble non tendu ; FALSE = signal nominal sain.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimWinchCouplingModelActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 RATTRAPAGE MÉCANIQUE M1/M2 — le banc reproduit la reprise de jeu entre les deux treuils.
+En MONTÉE couplée (relais de sens identiques + freins desserrés côté sim), l'écart relatif
+M2-M1 rejoint la bande FERMÉE au lieu de rester bloqué juste en dessous (trou métier de
+fermeture : coupure d'anticipation à 13,8 m alors que l'état fermé exige 14,0 m), ce qui
+laissait la benne « non fermée » et plafonnait la montée au palier 1. Inopérant hors simulation.
+[CFG] TRUE = rattrapage mécanique modélisé (FALSE = rejeu d'avant le lot)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimBucketJamActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">[TST] TRUE = mâchoires bloquées (objet coincé) : pas de rattrapage, charge forcée</xhtml>
           </documentation>
         </variable>
         <variable name="SimM2CoupledDescentModelActive">

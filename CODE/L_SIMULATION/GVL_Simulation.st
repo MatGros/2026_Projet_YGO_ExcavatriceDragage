@@ -88,6 +88,14 @@ VAR_GLOBAL
     // Injection safety explicite : TRUE simule le câble non tendu ; FALSE = signal nominal sain.
     SimM2TensionedCableFaultInject      : BOOL := FALSE;
 
+    // 🔗 RATTRAPAGE MÉCANIQUE M1/M2 — le banc reproduit la reprise de jeu entre les deux treuils.
+    // En MONTÉE couplée (relais de sens identiques + freins desserrés côté sim), l'écart relatif
+    // M2-M1 rejoint la bande FERMÉE au lieu de rester bloqué juste en dessous (trou métier de
+    // fermeture : coupure d'anticipation à 13,8 m alors que l'état fermé exige 14,0 m), ce qui
+    // laissait la benne « non fermée » et plafonnait la montée au palier 1. Inopérant hors simulation.
+    SimWinchCouplingModelActive : BOOL := TRUE;   // [CFG] TRUE = rattrapage mécanique modélisé (FALSE = rejeu d'avant le lot)
+    SimBucketJamActive          : BOOL := FALSE;  // [TST] TRUE = mâchoires bloquées (objet coincé) : pas de rattrapage, charge forcée
+
     // 🪝 MODÈLE M2 / KOBOLD — réglages de banc, actifs exclusivement via FB_SimBench.
     // M2 est calculé depuis M1 pendant une descente BOTH effective. Le coefficient est
     // issu de la trace 2026-09-05 ; TRUE par défaut pour reproduire le comportement mesuré.

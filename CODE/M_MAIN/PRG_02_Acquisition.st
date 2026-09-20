@@ -343,6 +343,12 @@ instSimBench(
     SimWinchBrakeOpenDelayS  := GVL_Simulation.SimWinchBrakeOpenDelayS,
     SimWinchBrakeCloseDelayS := GVL_Simulation.SimWinchBrakeCloseDelayS,
     SimWinchElectricalDiagnosticsActive := GVL_Simulation.SimWinchElectricalDiagnosticsActive,
+    // Rattrapage mecanique M1/M2 : reprise de jeu en montee couplee (banc uniquement).
+    SimWinchCouplingModelActive := GVL_Simulation.SimWinchCouplingModelActive,
+    SimBucketJamActive       := GVL_Simulation.SimBucketJamActive,
+    M2_CablePos_M            := Data.EncoderM2.Measurement.CablePosM,
+    BucketOffsetCloseM       := _BucketCfgPersist.Config.OffsetCloseM,
+    BucketCoherenceLimitM    := _BucketCfgPersist.Config.CoherenceLimitM,
     SimM2TensionedCableFaultInject := GVL_Simulation.SimM2TensionedCableFaultInject,
     SimM3SensorsWordOverrideActive := GVL_Simulation.SimM3SensorsWordOverrideActive,
     SimM3SensorsWord               := GVL_Simulation.SimM3SensorsWord,

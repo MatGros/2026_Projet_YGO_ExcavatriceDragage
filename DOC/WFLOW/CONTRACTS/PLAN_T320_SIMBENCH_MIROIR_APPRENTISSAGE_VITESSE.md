@@ -104,11 +104,11 @@ Mêmes garde-fous que le réel : axe dans 1..2, palier dans 1..5, **conflit de s
 
 ## 7. Fichiers touchés
 
-| Fichier | Nature | Risque |
+| Fichier (créé dans `CODE/L_SIMULATION/`) | Nature | Risque |
 |---|---|---|
-| `CODE/L_SIMULATION/ST_SimWinchSpeedCell.st` | nouveau DUT | nul |
-| `CODE/L_SIMULATION/ST_SimWinchSpeedEnvelope.st` | nouveau DUT | nul |
-| `CODE/L_SIMULATION/FB_Sim_WinchSpeedEnvelope.st` | nouveau FB | faible |
+| `ST_SimWinchSpeedCell.st` | nouveau DUT | nul |
+| `ST_SimWinchSpeedEnvelope.st` | nouveau DUT | nul |
+| `FB_Sim_WinchSpeedEnvelope.st` | nouveau FB | faible |
 | `CODE/L_SIMULATION/FB_Sim_Encoder.st` | +1 `VAR_OUTPUT` (**additif**) | faible |
 | `CODE/L_SIMULATION/FB_SimBench.st` | +2 instances, +1 `VAR_OUTPUT`, + appels | faible |
 | `TOOLS/TEST_AUTO_CI/…/test_fb_sim_winchspeedenvelope.st` | nouveau test | — |

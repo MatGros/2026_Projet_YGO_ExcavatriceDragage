@@ -113,6 +113,13 @@ VAR_INPUT
     M1_CablePos_M              : REAL := 0.0;     (* --> [HW] Position M1 signée, référence homing effective *)
     BtnEmergencyStop           : BOOL := FALSE;    (* --> [TST] Simulation appui coup-de-poing AU *)
 
+    // ── Rattrapage mécanique M1/M2 (reprise de jeu en mouvement couplé) ──
+    SimWinchCouplingModelActive : BOOL := TRUE;    (* --> [CFG] TRUE = rattrapage mécanique modélisé au banc *)
+    SimBucketJamActive          : BOOL := FALSE;   (* --> [TST] TRUE = mâchoires bloquées (objet coincé) *)
+    M2_CablePos_M               : REAL := 0.0;     (* --> [HW] Position M2 recalée (m), issue de la même chaîne que le métier *)
+    BucketOffsetCloseM          : REAL := 15.0;    (* --> [CFG] Butée mécanique benne FERMÉE (m, écart M2-M1) *)
+    BucketCoherenceLimitM       : REAL := 1.0;     (* --> [CFG] Demi-largeur de la bande franc ouvert/fermé (m) *)
+
     // ── Image réelle fallback ────────────────────────────────────────────────
     HwReal                     : ST_HardwareImage;   (* --> [HW] Image réelle fallback *)
 END_VAR
@@ -131,11 +138,16 @@ VAR_OUTPUT
     Machine                    : ST_HwMachine;   (* <-- [DIAG] Image machine simulée *)
 
     // T317 exploratoire -- modele electrique treuil, diagnostic seul, non consomme par le metier.
-    // ResistiveTorque_Nm reste a 0.0 (pas de modele de charge/gravite encore ecrit -- FB_Sim_WinchElectrical).
+    // Charge appliquee = LoadFrictionTorque_Nm + taux x LoadNominalTorque_Nm (FB_Sim_WinchElectrical) ;
+    // le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317).
     MotorTorqueM1_Nm           : REAL;   (* <-- [DIAG] T317 -- Couple electromagnetique simule M1 *)
     MotorTorqueM2_Nm           : REAL;   (* <-- [DIAG] T317 -- Couple electromagnetique simule M2 *)
     MotorIsStalledM1           : BOOL;   (* <-- [DIAG] T317 -- Decrochage predictif simule M1 *)
     MotorIsStalledM2           : BOOL;   (* <-- [DIAG] T317 -- Decrochage predictif simule M2 *)
+
+    // Rattrapage mecanique M1/M2 -- diagnostic seul (aucun consommateur metier).
+    WinchCouplingActive        : BOOL;   (* <-- [DIAG] Rattrapage applique ce scan *)
+    WinchCouplingCorrectionPts : DINT;   (* <-- [DIAG] Correction appliquee a l'image M2 (points codeur) *)
 END_VAR
 
 VAR_IN_OUT
@@ -148,6 +160,11 @@ VAR CONSTANT
     CST_M1EncoderInitialRaw     : UDINT := 1000000; // Comptage absolu plausible du device M1 simulé
     CST_M2EncoderInitialRaw     : UDINT := 1100000; // Comptage absolu propre au device M2 simulé
     CST_SimBenchCycleTimeS      : REAL := 0.010; // Période tâche PLC (s) — MainTask 10 ms
+    // Rattrapage mécanique M1/M2 — valeurs ESTIMÉES (voir REGISTRE_VALEURS_TREUIL_STATUTS_v1.0.md)
+    CST_SimWinchCouplingTauS    : REAL := 1.0;   // [HYPOTHESE] Constante de temps du rattrapage (s)
+    CST_SimWinchCouplingStepMax_M : REAL := 0.02; // [HYPOTHESE] Borne de pente par scan (= 2,0 m/s x 0,010 s)
+    CST_SimWinchCouplingPtsPerM : REAL := 4096.0; // Points codeur par mètre (8192 pts/tour / 2,0 m/tour)
+    CST_SimBucketJamLoadFrac_Ratio : REAL := 1.0; // [HYPOTHESE] Charge forcée quand les mâchoires sont bloquées
 END_VAR
 
 VAR
@@ -187,6 +204,15 @@ VAR
     M2CoupledDescentActive     : BOOL;                (* . [LOC] Ralentissement M2 actif en descente BOTH *)
     M2EffectiveSpeedScaleFactor : REAL;               (* . [LOC] Facteur vitesse du producteur unique M2 *)
     KoboldMeasureEnablePrevious : BOOL;               (* . [LOC] Front alimentation Kobold *)
+
+    // Rattrapage mecanique M1/M2 : reprise de jeu entre les deux treuils
+    WinchCouplingBothSameDir   : BOOL;   (* . [LOC] Les deux relais de sens actifs dans le meme sens *)
+    WinchCouplingGate          : BOOL;   (* . [LOC] Condition complete de rattrapage *)
+    WinchCouplingDelta_M       : REAL;   (* . [LOC] Ecart relatif M2-M1 courant (m) *)
+    WinchCouplingCorrection_M  : REAL;   (* . [LOC] Correction calculee ce scan (m) *)
+    WinchCouplingCorrectionDInt : DINT;  (* . [LOC] Correction convertie en points codeur *)
+    WinchCouplingTarget_M      : REAL;   (* . [LOC] Entree de bande fermee visee (m) *)
+    WinchCouplingAccumPts      : DINT;   (* . [LOC] Reprise de jeu accumulee sur l'image M2 (points) *)
     KoboldAutoEpisodeActive    : BOOL;                (* . [LOC] Mode auto figé pour une plongée *)
     KoboldAutoDepthEpisode_M   : REAL;                (* . [LOC] Fond figé durant une plongée *)
     KoboldPowerUpEpisodeTime   : TIME;                (* . [LOC] Délai sonde figé durant une plongée *)
@@ -292,7 +318,7 @@ instWinchElectricalM1(
     StepCmd               := MAX(1, M1_StepNumber),
     DirectionCmd          := SEL(M1_RelayRev, 1, -1),
     NetworkVoltageAct_V   := 400.0,
-    LoadFrac_Ratio         := SimWinchLoadFrac_Ratio,
+    LoadFrac_Ratio         := SEL(SimBucketJamActive, SimWinchLoadFrac_Ratio, CST_SimBucketJamLoadFrac_Ratio),
     IsBucketGrounded      := KoboldBottomTouchPrev_DI,
     IsCoupledToPeer        := SimWinchCoupledActive,
     PeerTorque_Nm          := PeerTorqueM2Prev_Nm,
@@ -315,7 +341,7 @@ instWinchElectricalM2(
     StepCmd               := MAX(1, M2_StepNumber),
     DirectionCmd          := SEL(M2_RelayRev, 1, -1),
     NetworkVoltageAct_V   := 400.0,
-    LoadFrac_Ratio         := SimWinchLoadFrac_Ratio,
+    LoadFrac_Ratio         := SEL(SimBucketJamActive, SimWinchLoadFrac_Ratio, CST_SimBucketJamLoadFrac_Ratio),
     IsBucketGrounded      := KoboldBottomTouchPrev_DI,
     IsCoupledToPeer        := SimWinchCoupledActive,
     PeerTorque_Nm          := PeerTorqueM1Prev_Nm,
@@ -452,6 +478,63 @@ Winch.COD2_SpdValue            := instSimEncoderM2.RawSpdOut;
 Winch.COD2_Alarms              := 0;
 Winch.COD2_Warnings            := 0;
 Winch.COD2_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING
+
+{region "§2bis Rattrapage mecanique M1/M2"}
+// La benne relie mecaniquement les deux treuils. En MONTEE couplee et sans blocage, le jeu relatif
+// est repris : Delta = PosM2 - PosM1 rejoint la bande FERMEE (OffsetCloseM +/- CoherenceLimitM).
+// Sans ce rattrapage, un ecart residuel (trou metier de fermeture : coupure d'anticipation a 13,8 m
+// alors que l'etat ferme exige 14,0 m) laisse la benne "non fermee" et plafonne la montee au palier 1.
+// 🔒 Le modele n'ecrit QUE l'image publiee (Winch.COD2_PosValue) -- JAMAIS RawPosM2, memoire
+//    persistante du codeur dont FB_Sim_Encoder reste l'unique producteur.
+// 🔒 MONTEE UNIQUEMENT : la descente couplee reste au modele existant SimM2CoupledDescentModelActive
+//    (exclusion mutuelle : les deux modeles ne s'appliquent jamais ensemble).
+// 🔒 Cible = ENTREE de la bande fermee (equilibre elastique reel), jamais la butee theorique.
+WinchCouplingBothSameDir := (M1_RelayFwd AND M2_RelayFwd) OR (M1_RelayRev AND M2_RelayRev);
+WinchCouplingGate := SimWinchCouplingModelActive
+                     AND WinchCouplingBothSameDir
+                     AND M1_RelayFwd AND NOT M1_RelayRev        // montee uniquement
+                     AND M1_BrakeIsOpenState AND M2_BrakeIsOpenState
+                     AND Winch.M2_TensionedCable_DI            // cable tendu : sinon aucun effort transmis
+                     AND NOT KoboldBottomTouchPrev_DI          // benne au fond : aucun mouvement reel
+                     AND NOT (M1_PresetCmd OR M2_PresetCmd)    // jamais pendant un preset/homing
+                     AND NOT SimBucketJamActive;               // mâchoires bloquees : aucun rattrapage
+WinchCouplingActive := WinchCouplingGate;
+WinchCouplingCorrectionPts := 0;
+IF WinchCouplingGate THEN
+    WinchCouplingDelta_M := M2_CablePos_M - M1_CablePos_M;
+    WinchCouplingTarget_M := BucketOffsetCloseM - (0.5 * BucketCoherenceLimitM);
+    IF WinchCouplingDelta_M < WinchCouplingTarget_M THEN
+        WinchCouplingCorrection_M := (WinchCouplingTarget_M - WinchCouplingDelta_M)
+                                     * CST_SimBenchCycleTimeS
+                                     / (CST_SimWinchCouplingTauS + CST_SimBenchCycleTimeS);
+        // Sens unique + bornage (§6) : jamais de saut, jamais au-dela de la cible
+        WinchCouplingCorrection_M := LIMIT(0.0, WinchCouplingCorrection_M,
+                                           MIN(CST_SimWinchCouplingStepMax_M,
+                                               WinchCouplingTarget_M - WinchCouplingDelta_M));
+        WinchCouplingCorrectionDInt := REAL_TO_DINT(WinchCouplingCorrection_M
+                                                    * CST_SimWinchCouplingPtsPerM);
+        IF WinchCouplingCorrectionDInt > 0 THEN
+            WinchCouplingAccumPts := WinchCouplingAccumPts + WinchCouplingCorrectionDInt;
+            WinchCouplingCorrectionPts := WinchCouplingCorrectionDInt;
+        END_IF;
+    END_IF;
+ELSIF M2_RelayRev AND NOT M2_RelayFwd THEN
+    // Ouverture commandee : la reprise de jeu est relachee (le cable de fermeture devide),
+    // sinon l'image M2 masquerait l'ouverture reelle.
+    WinchCouplingCorrectionDInt := REAL_TO_DINT(CST_SimWinchCouplingStepMax_M
+                                                * CST_SimWinchCouplingPtsPerM);
+    WinchCouplingAccumPts := MAX(0, WinchCouplingAccumPts - WinchCouplingCorrectionDInt);
+END_IF;
+// Un preset/homing rend la reference absolue : l'offset de reprise de jeu n'a plus de sens.
+IF M1_PresetCmd OR M2_PresetCmd THEN
+    WinchCouplingAccumPts := 0;
+END_IF;
+// Report sur l'IMAGE uniquement (le raw persistant n'est jamais touche), et seulement quand le
+// modele est actif : en mode desactive, l'image reste strictement celle du codeur.
+IF SimWinchCouplingModelActive AND (WinchCouplingAccumPts > 0) THEN
+    Winch.COD2_PosValue := Winch.COD2_PosValue + DINT_TO_UDINT(WinchCouplingAccumPts);
+END_IF;
+{endregion}
 
 
 {endregion}
