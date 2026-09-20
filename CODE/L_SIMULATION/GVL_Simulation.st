@@ -43,6 +43,29 @@ VAR_GLOBAL
     SimM3SensorHysteresis_M         : REAL := 0.02;
     SimM3SensorLoadAngleTriggerRad  : REAL := 0.01;
     SimM3SensorScenarioSeed         : UDINT := 3001;
+    // ⚡ BLIP COURT — second profil de perte/reprise, independant du train ~1 s ci-dessus
+    // (SimM3SensorStabilizationS). 0 = desactive (profil historique inchange).
+    // Rejoue les excursions courtes de la trace terrain du 2026-09-04 :
+    //   Tremie : 1 excursion de 0,2 s (actif 2 echantillons a 12,24 s en s'eloignant) ;
+    //   PV     : 1 excursion de 0,1 s (reactive 1 echantillon a 14,94 s en deceleration).
+    SimM3SensorBlipTransitions      : UDINT := 0;
+    SimM3SensorBlipDurationS        : REAL := 0.2;
+    // 🧲 BUTEE MECANIQUE M3 — recul borne apres arret serre (C5).
+    // 0.0 = behavior historique : position ET vitesse figees a la butee (decision de review
+    // tracee). > 0 autorise la reaction de charge a ressortir le chariot de la zone capteur.
+    // Valeur SYNTHETIQUE, non calibree : a mesurer en mise en service.
+    SimM3EndStopRecoilMax_M         : REAL := 0.0;
+    // Gain de reaction de charge utilisee par le modele M3 (SYNTHETIQUE).
+    // 0.20 = valeur historique ; un gain plus eleve est necessaire pour rejouer le recul
+    // post-arret observe sur la trace terrain du 2026-09-04. A calibrer.
+    SimM3LoadReactionGain_Mps2      : REAL := 0.20;
+    // 🔥 FAUTE EXPLICITE FREIN M3 — defaut FALSE : comportement nominal strictement inchange.
+    // TRUE rejoue le defaut terrain « cause 6 instantanee » : contact frein ferme alors que le
+    // variateur retourne encore 10,00 Hz (trace 2026-09-04, 26,437 s, State.ErrorId=64).
+    // La garde nominale de fermeture (0,5 Hz) est CONSERVEE : elle est validee par la meme trace
+    // (frein ouvert a 0,60 Hz, ferme a 0,00 Hz). Stimulus de banc, inoperant hors simulation.
+    SimM3BrakeFaultCloseWhileRunning : BOOL := FALSE;
+    SimM3BrakeFaultCloseDelayS       : REAL := 0.0;
 
     // 🕹️ STIMULI OPÉRATEUR — les boutons directionnels imposent 0/5000/10000 ; combinaison = neutre.
     SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE; // Translation M3 Arrière vers Trémie (RawX=0, RawY=5000)

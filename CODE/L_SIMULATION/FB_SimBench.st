@@ -99,6 +99,11 @@ VAR_INPUT
     // alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s, ErrorId=64).
     SimM3BrakeFaultCloseWhileRunning : BOOL := FALSE;  (* --> [TST] TRUE = force la fermeture frein M3 hors vitesse nulle *)
     SimM3BrakeFaultCloseDelayS       : REAL := 0.0;    (* --> [CFG] Delai avant application de la faute frein M3, s *)
+    // BUTEE MECANIQUE M3 — recul borne apres arret serre (C5). 0.0 = comportement historique
+    // (position ET vitesse figees a la butee, decision de review tracee). > 0 autorise la
+    // reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non calibre.
+    SimM3EndStopRecoilMax_M          : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Recul borne a la butee M3, m *)
+    SimM3LoadReactionGain_Mps2       : REAL := 0.20;   (* --> [CFG][SYNTHETIQUE] Gain de reaction de charge M3, m/s2 *)
 
     SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick gauche *)
     SimJoystickRight_Fwd_MAINT_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick droite *)
@@ -157,6 +162,8 @@ VAR_OUTPUT
 
     // Faute frein M3 -- diagnostic seul : confirme que la branche de faute est bien appliquee.
     M3BrakeFaultCloseActive    : BOOL;   (* <-- [DIAG] Faute frein M3 effectivement appliquee ce scan *)
+    // Blip court capteurs M3 -- diagnostic seul : observable sur trace pendant un episode court.
+    M3SensorBlipActive         : BOOL;   (* <-- [DIAG] Un capteur M3 publie une excursion courte *)
 END_VAR
 
 VAR_IN_OUT
@@ -575,9 +582,12 @@ instSimTranslation(
     SensorBlipTransitions := SimM3SensorBlipTransitions,
     SensorBlipDurationS := SimM3SensorBlipDurationS,
     BrakeFaultCloseWhileRunning := SimM3BrakeFaultCloseWhileRunning,
-    BrakeFaultCloseDelay_S := SimM3BrakeFaultCloseDelayS
+    BrakeFaultCloseDelay_S := SimM3BrakeFaultCloseDelayS,
+    EndStopRecoilMax_M := SimM3EndStopRecoilMax_M,
+    LoadReactionGain_Mps2 := SimM3LoadReactionGain_Mps2
 );
 M3BrakeFaultCloseActive := instSimTranslation.BrakeFaultCloseActive;
+M3SensorBlipActive := instSimTranslation.SensorBlipActive;
 
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
 // même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).
