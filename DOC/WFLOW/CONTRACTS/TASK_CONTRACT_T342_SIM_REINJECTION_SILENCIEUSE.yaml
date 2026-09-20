@@ -1,0 +1,176 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T342 : reinjection silencieuse du comptage brut (CR2 de T338)
+# Critique C1 — banc de simulation (FB_SimBench), cause directe du saut post-AU
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+#
+# Contexte : le diagnostic T338 a identifie TROIS causes racines. CR1 (plancher dur RawPos := 0
+# dans FB_Sim_Encoder) a ete corrige et committe (6a5910da, comptage signe 32 bits + garde de
+# plage signalee + G510). CR2, cause DIRECTE du symptome « saut 8,50 -> 204,677 m apres AU »,
+# etait HORS du lot T338 (fichier FB_SimBench.st verrouille DSH03/T328/T300). Il est traite ici.
+#
+# Preuve de mesure deja etablie (T338, snapshot 20260920_174333.csv) : HomingRefRaw M2 = 1 003 744
+# = 1 100 000 - 96 256 — valeur impossible sans un comptage brut valant exactement 1 100 000,
+# c'est-a-dire la constante reinjectee par le banc. Chemin du saut reconstitue :
+# (1 100 000 - R0) / 4096 = 196,177 m, soit 8,50 + 196,177 = 204,677 m.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T342_SIM_REINJECTION_SILENCIEUSE
+  criticality: C1
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Supprimer la reinjection automatique du comptage brut des codeurs simules par le banc
+    (FB_SimBench : « IF RawPosMx = 0 THEN RawPosMx := CST_MxEncoderInitialRaw » au premier scan
+    suivant la reactivation du banc). Le banc ne reecrit plus JAMAIS les memoires de comptage
+    brut M1/M2 (_SimEncoderRawPosM1/M2, GVL_PERSISTENT) : FB_Sim_Encoder en reste le producteur
+    unique (accumulation signee / preset), et l'origine de banc plausible vient de
+    l'initialisation DECLAREE de GVL_PERSISTENT (1 000 000 pts). Le comportement observable
+    change : la reactivation du banc ne peut plus teleporter la position publiee.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        Le saut post-AU est REPRODUIT avant correctif par un test CI (rouge) : memoire codeur M2
+        a 0, banc desactive puis reactive -> la memoire vaut 1 100 000 (mesure exacte du rouge :
+        « RAWPOSM2 expected 0, got 1100000 »).
+      verified_by: >
+        Test ST TC-T342-010 execute par run_tests.py --fb FB_SimBench, capture du rapport JSON
+        (assertType ASSERT_EQ, line 69) AVANT application du correctif.
+    - id: AC2
+      statement: >
+        Apres correctif, la reactivation du banc laisse le comptage brut STRICTEMENT inchange
+        (0 comme toute valeur mid-course) et aucune position publiee n'est teleportee : l'ecart
+        publie est nul, ni sur COD2_PosValue ni sur COD1_PosValue.
+      verified_by: >
+        Tests ST TC-T342-010 (memoire a 0) et TC-T342-011 (memoire mid-course 296 459 pts,
+        valeur R0 reconstituee par T338) — PASS dans run_tests.py --fb FB_SimBench (43/43).
+    - id: AC3
+      statement: >
+        Le banc n'est plus producteur du comptage brut : FB_Sim_Encoder reste le producteur
+        unique des memoires M1/M2 (invariant deja documente dans le meme fichier), et aucun
+        code mort ne subsiste (variable de detection du premier scan et constantes d'origine
+        device retirees).
+      verified_by: >
+        Grep 0 occurrence de SimBenchWasEnabled / CST_MxEncoderInitialRaw dans CODE/ ;
+        garde-fou G513_check_sim_encoder_memory_write.py (regle A « producteur unique ») PASS
+        sur l'arbre courant ET en echec sur le contenu REEL d'avant correctif (git show HEAD).
+    - id: AC4
+      statement: >
+        La correction est couverte par un garde-fou automatique, branche dans la suite de gates :
+        toute ecriture du comptage brut hors de son producteur, et toute reinjection gardee par
+        un test de valeur (IF <comptage> = <litteral>), sont refusees.
+      verified_by: >
+        G513 (TOOLS/AGENT_WORKFLOW/scripts/G513_check_sim_encoder_memory_write.py) : --selftest
+        PASS (2 mutations d'incident detectees, 2 formes conformes non signalees, bloc CR2
+        re-injecte dans le fichier REEL detecte) ; ligne PLANS palier C de run_all_gates.py.
+    - id: AC5
+      statement: >
+        Non-regression stricte du correctif CR1/T338 : aucun fichier de la chaine codeur n'est
+        modifie par ce lot, et la suite du modele codeur reste verte.
+      verified_by: >
+        git status : FB_Sim_Encoder.st non modifie ; run_tests.py --fb FB_Sim_Encoder = 9/9 PASS ;
+        G510 PASS dans le palier C.
+    - id: AC6
+      statement: >
+        Le lot est livrable : bundle PLCopenXML frais, liaison mecanique prouvee, palier C sans
+        echec nouveau.
+      verified_by: >
+        generate_codesys_bundle.py (PASS G390 freshness, 260 objets) ; G200_check_linkage.py
+        --report PASS 0 erreur ; generate_codesys_diff_bundle.py (objet FB_SimBench) ;
+        run_all_gates.py --palier C = 5 FAIL inchanges (dettes pre-existantes G300, G340, G408,
+        G430, G483), G500 11/11 PASS.
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_simbench.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G513_check_sim_encoder_memory_write.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py (1 ligne PLANS palier C)
+      - DOC/WFLOW/ (contrat T342, TASKS.yaml, TASKS_ORCHESTRATOR.yaml)
+      - CODE_XML/ (bundles)
+    forbidden:
+      - CODE/E_CODEURS/ (CR3 en LECTURE SEULE : signale, non corrige ici)
+      - CODE/L_SIMULATION/FB_Sim_Encoder.st (correctif T338 — non-regression stricte)
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/GVL_PERSISTENT.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - IHM (GVL_IHM, PRG_07_Supervision.st)
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Comptage brut = entier SIGNE 32 bits, 0 = point de passage legitime (CR1/T338)"
+      - "Garde de plage + CountSaturated signale (CR1/T338)"
+      - "Preset codeur (PresetCmd/PresetValue) applique par FB_Sim_Encoder apres latence"
+      - "Rattrapage mecanique M1/M2 (T328) : la cible reste la butee benne fermee"
+      - "Persistance du comptage brut a travers un reset froid (GVL_PERSISTENT)"
+    dropped_on_purpose:
+      - "Reinjection CST_M1EncoderInitialRaw / CST_M2EncoderInitialRaw au premier scan du banc"
+      - "Variable locale SimBenchWasEnabled (detection du premier scan, devenue sans emploi)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+    - ci_tests
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "deepseek-v4-flash:cloud"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug preexistant, risque hors
+    scope) est remonte IMMEDIATEMENT a l'orchestrateur, pas a la fin et jamais silencieusement.
+    Signaler n'est pas elargir le scope. Remonte dans ce lot : (a) CR3 — le readback de homing
+    de FB_Encoder_Homing.st est mathematiquement circulaire, un codeur fige est certifie
+    reference (LECTURE SEULE ici, arbitrage a rendre) ; (b) la suite CI FB_SimBench etait ROUGE
+    sur HEAD (41/42) depuis le commit CR1 : sa copie du test TC-P13-032 etait restee sur
+    l'ancienne butee a 0 — non-regression T338 incomplete, realignee ici ; (c) collision de
+    l'ID TC-P13-014 entre l'AF-13 (capteur haut TOP) et le test de reinjection supprime.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "DSH12 (DeepSeek Harness, tag verrou T342)"
+  completed_at: "2026-09-20T21:32:00+02:00"
+  status: COMPLETED
+  summary: >
+    Arbitrage de conception rendu sur preuve : la reinjection est SUPPRIMEE (et non rendue
+    observable). Elle ne pouvait pas distinguer une memoire vierge d'un zero reel (l'init
+    declaree de GVL_PERSISTENT est 1 000 000, jamais 0), elle transformait donc un zero
+    legitime du compteur signe en teleportation de 268,55 m, et elle violait l'invariant
+    « FB_Sim_Encoder = producteur unique » documente dans le meme fichier. Rouge prouve avant
+    correctif (RAWPOSM2 expected 0, got 1100000), vert apres (FB_SimBench 43/43, dont les 2
+    nouveaux tests T342). Garde-fou G513 cree (selftest + refus du contenu reel d'avant
+    correctif) et branche au palier C. Bundle 260 objets frais, G200 PASS 0 erreur, palier C
+    inchange (5 dettes pre-existantes). Non-regression T338 : FB_Sim_Encoder 9/9, G510 PASS,
+    aucun fichier codeur touche. AUCUN COMMIT (validation humaine requise).
+  evidence_submitted:
+    - "CI FB_SimBench : 43/43 PASS (rouge avant : 41/43 dont TC-T342-010 = RAWPOSM2 expected 0, got 1100000)"
+    - "CI FB_Sim_Encoder : 9/9 PASS (non-regression CR1/T338)"
+    - "G513 : --selftest PASS, scan arbre PASS, contenu HEAD (avant correctif) refuse par les 2 regles"
+    - "G200_check_linkage.py --report : PASS, 0 erreur (135 OK L1-L7, 2023 instances)"
+    - "run_all_gates.py --palier C : 45/50, 5 FAIL pre-existants (G300/G340/G408/G430/G483), G500 11/11"
+    - "Bundle CODE_XML/CODE_Bundle.xml frais (G390 PASS) + CODE_XML/CODE_DiffBundle.xml (FB_SimBench)"
+
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: "—"
+  notes: >
+    En attente de recette HUMAINE : import CODESYS des 2 bundles et essai banc
+    (reactivation du banc apres AU -> aucune teleportation de position M2 ; descente M2 ->
+    position qui evolue avec la vitesse, CountSaturated FALSE en usage reel). Aucun commit
+    tant que la recette n'est pas rendue.
