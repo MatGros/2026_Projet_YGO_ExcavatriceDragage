@@ -320,6 +320,50 @@
           </data>
         </addData>
       </dataType>
+      <dataType name="E_CycleSampleCountResetMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NEVER" value="0" />
+              <value name="ON_FIRST_START" value="1" />
+              <value name="ON_SAFETY_REARM" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NEVER</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut : RAZ manuelle IHM uniquement (comportement historique, aucun changement)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ON_FIRST_START</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">RAZ au premier demarrage de cycle apres mise sous tension de l'automate</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ON_SAFETY_REARM</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">RAZ au rearmement de la chaine AU (contacteur puissance reengage)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ea6305ea-87dc-5770-9254-60521a6d4291</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="E_Diag_State">
         <baseType>
           <enum>
@@ -506,6 +550,7 @@
               <value name="HX5_BUCKET_COMMIT" value="7" />
               <value name="HX6_HOMED" value="8" />
               <value name="HXF_FAILED" value="9" />
+              <value name="HX7_LOCKED_REFERENCE" value="10" />
             </values>
           </enum>
         </baseType>
@@ -570,6 +615,17 @@
                 <Name>HXF_FAILED</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement incomplet : rester en N2 et recommencer</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HX7_LOCKED_REFERENCE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape verrouillee : montee vers le capteur haut puis referencement A L ARRET.
+                                  Sorties admises (toutes conscientes) : front Reset, defaut latche, abandon sur
+                                  violation detectee (descente commandee, garde de montee ecoulee, erreur codeur,
+                                  mouvement hors phase), et forcage de step de mise en service. AUCUNE sortie ne
+                                  pose de reference. La valeur 10 est ajoutee APRES HXF pour ne renumeroter
+                                  aucun etat existant.</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -5397,6 +5453,18 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
               </documentation>
             </variable>
+            <variable name="SampleCountResetMode">
+              <type>
+                <derived name="E_CycleSampleCountResetMode" />
+              </type>
+              <initialValue>
+                <simpleValue value="E_CycleSampleCountResetMode.NEVER" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ AJOUT EN FIN DE STRUCT — mapping RETAIN positionnel : jamais d'insertion au milieu.
+🔢 RAZ auto du compteur JOURNALIER : NEVER par defaut = aucune RAZ auto</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -5509,6 +5577,14 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Applique le forçage de step (front) — impulsion ; cible = ST_CycleCfg.ForceStepTarget</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnResetSampleCount">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 RAZ consciente du compteur JOURNALIER de prélèvements (front) — n'agit JAMAIS sur le totalisateur, qui n'a aucune commande</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -5893,6 +5969,18 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur de prélèvements (RETAIN, Q3bis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCountTotal">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Inséré volontairement À CÔTÉ de SampleCount (regroupement sémantique des deux compteurs).
+       ST_CycleState est une structure d'ÉCHANGE IHM volatile : elle n'est ni persistée ni
+       mappée par position (aucune occurrence dans GVL_PERSISTENT) — l'ordre des champs y est
+       donc libre, contrairement à ST_CycleCfg/ST_CycleCmd dont les ajouts vont en fin.
+🔒 TOTALISATEUR de prélèvements (PERSISTENT) — LECTURE SEULE : jamais remis à zéro, aucune commande d'écriture</xhtml>
               </documentation>
             </variable>
             <variable name="CurrentCycleElapsed">
@@ -15399,10 +15487,17 @@ fournie par la configuration persistante de l'appelant.
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#120s0ms" />
+                <simpleValue value="TIME#300s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde HX2 : montée au capteur haut (0 = pas de garde)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde de montee : budget d'une MONTER CONTINUE (un temporisateur remet son temps ecoule a
+zero des que la commande retombe : une pause operateur ou un arret d'urgence ne consomme
+donc rien). Derivation : course maximale de cable = CfgTopSensorPos_M - CfgCableLimitDescent_M
+(8,5 m - (-50 m) = 58,5 m) ; borne haute de vitesse du palier 1 = 0,4 m/s
+(GVL_PERSISTENT._WinchSpeedConfig.SpeedBandMaxMps[1], valeur de banc A MESURER sur site)
+=&gt; 58,5 / 0,4 = 146,3 s ; marge x2 = 292,5 s ; valeur retenue 300 s (arrondie au-dessus).
+A revoir si la course ou la vitesse du palier 1 changent (gate G511).
+Garde de montee au capteur haut (0 = pas de garde)</xhtml>
               </documentation>
             </variable>
             <variable name="CfgTimeoutHomeAxes">
@@ -15413,7 +15508,8 @@ fournie par la configuration persistante de l'appelant.
                 <simpleValue value="TIME#60s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde HX3 : descente jusqu'au front descendant capteur (0 = pas de garde)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde de descente HX3 : meme regle (budget de DESCENTE CONTINUE).
+Garde de descente jusqu'au front descendant capteur (0 = pas de garde)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -20354,6 +20450,327 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_CfgT330Normalizer" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD (Enable) ===
+🟢 Autorise la normalisation (ponts de config RESTAURÉS)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InHoming">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE MACHINE ===
+🎯 Homing en cours : cycle machine COMPLET (HX0..HX6) OU transaction de preset, M1 ou M2</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD (Ready) ===
+🟢 Normalisation armée ce scan (Enable ET mémoires amorcées)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Corrected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC / IHM ===
+🔧 Une correction T330 a eu lieu CE scan (impulsion d'un seul scan)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CorrectedHeld">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Maintien du message T330 (fenêtre IHM — 1 scan serait invisible)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="WinchCfgM1">
+              <type>
+                <derived name="ST_WinchCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RÉGLAGES HAUT À NORMALISER (référence — jamais de copie) ===
+🔧 M1 = MAÎTRE du capteur haut : porte CfgTopSensorPos_M</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommunCfg">
+              <type>
+                <derived name="ST_CommunCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Commun M1/M2 : porte CfgCableLimitAscent_M + WinchSlowdownDistanceTop_M</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <localVars>
+            <variable name="CST_T330ReserveMinMargin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== T330 (Q1/Q2) — RÈGLES D'INGÉNIERIE, PAS DES COTES MÉTIER ===
+NON persistantes et NON IHM (AC3) : jamais exposées, jamais RETAIN.
+Réserve minimale FDC logiciel haut / TOP homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_T330SlowdownTopMin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher du ralentissement haut (Q1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_T330FdcMin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse FDC (Q21)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_T330FdcMax_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="9" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute FDC (Q21/C1 : TOP&lt;=10 et Delta&gt;=1 =&gt; FDC&lt;=9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_T330TopMin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse TOP (Q21)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_T330TopMax_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute TOP (Q21)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="T330PrevInit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== T330 — MÉMOIRES NON PERSISTANTES (AC3 : ni IHM, ni RETAIN) ===
+. [LOC] Seed des mémoires effectué depuis les valeurs RESTAURÉES</xhtml>
+              </documentation>
+            </variable>
+            <variable name="T330PrevTopSensorPos_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur précédente TOP (détection du champ modifié par l'opérateur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="T330PrevCableLimitAscent_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur précédente FDC (détection du champ modifié par l'opérateur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="T330MsgHold">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien du message T330 (un scan de 10 ms serait invisible à l'IHM)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔧 FB_CfgT330Normalizer — Normalisation des réglages HAUT (T330)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : ramener DANS SON DOMAINE le couple de réglages de fin de
+             course HAUT — FDC logiciel (CfgCableLimitAscent_M) et cote
+             TOP homing (CfgTopSensorPos_M) — plus le plancher du
+             ralentissement haut (WinchSlowdownDistanceTop_M), puis
+             signaler la correction à l'IHM.
+   📄 Doc : DOC/WFLOW/AUDITS/DESIGN/PLAN_T330_C3_INVARIANT_HAUT_v1.0.md (plan C3 v1.3, §2/§4)
+            DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T330_INVARIANT_HAUT_v1.0.md
+   🛡️ Sécurité : une valeur de réglage HORS DOMAINE resterait hors domaine
+             indéfiniment sans ce bloc (contre-exemple Q21 bis : FDC=9,50 m +
+             TOP=12,00 m, où Δ=2,50 m ≥ 1,00 m n'active AUCUNE règle Δ).
+             ⇒ R0 (clamp absolu) est INCONDITIONNELLE et EN AMONT de la règle Δ.
+             Ce FB ne commande AUCUN mouvement : il corrige de la configuration.
+   🧩 Dépendances : ST_WinchCfg (CfgTopSensorPos_M) · ST_CommunCfg
+             (CfgCableLimitAscent_M, WinchSlowdownDistanceTop_M).
+   ⚠️ Ordre d'appel : AVANT les ponts de persistance (PRG_07_Supervision §2).
+             Le pont écrit la valeur CORRIGÉE dans le MÊME scan (option A / Q23)
+             ⇒ aucune fenêtre NVRAM. Les mémoires internes sont amorcées depuis
+             ces valeurs RESTAURÉES, jamais depuis les défauts du DUT (piège P2).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🔧 T330 — COHÉRENCE DES RÉGLAGES HAUT (Q1/Q2) · plan C3 v1.3
+// ───────────────────────────────────────────────────────────────────────────────
+// ORDRE IMPOSÉ (Q21 bis) :  (1) R0 clamp ABSOLU inconditionnel, FDC et TOP séparément
+//                        puis (2) règle Delta &gt;= 1,00 m / slowdown &gt;= 0,50 m.
+// OPTION A (Q23) : ce bloc s'exécute AVANT les ponts de persistance, qui écrivent la
+//                  valeur CORRIGÉE dans le MÊME scan (aucune fenêtre NVRAM). La
+//                  référence est donc lue sur GVL_IHM.Cfg — l'état que les ponts
+//                  tiennent à jour, et NON directement la NVRAM.
+// AC3 : AUCUNE variable persistante ni IHM nouvelle — constantes CST_* et mémoires
+//       locales uniquement. Jamais de champ de fin de course supplémentaire.
+// C2/Q22 : R2 (correction du TOP) est INHIBÉE pendant le homing — sur le CYCLE COMPLET
+//          (HX0..HX6), pas seulement la transaction de preset (~50 ms). Aucune mémoire
+//          d'intention : au retour, si la config est toujours invalide, le REPLI NIVEAU
+//          ci-dessous applique Q17 (préserver le TOP, corriger le FDC).
+// ═══════════════════════════════════════════════════════════════════════════════
+{region "🔧 T330 NORMALISATION"}
+Corrected := FALSE;
+Ready := FALSE;
+
+// Inhibée tant que les ponts n'ont pas RESTAURÉ (sinon les défauts DUT seraient pris
+// pour une saisie opérateur — piège P2 du cadrage).
+IF Enable THEN
+
+    // Seed des mémoires depuis les valeurs RESTAURÉES (jamais depuis les défauts DUT).
+    IF NOT T330PrevInit THEN
+        T330PrevTopSensorPos_M     := WinchCfgM1.CfgTopSensorPos_M;
+        T330PrevCableLimitAscent_M := CommunCfg.CfgCableLimitAscent_M;
+        T330PrevInit               := TRUE;
+    END_IF;
+
+    Ready := TRUE;
+
+    // ─── GEL PENDANT LE HOMING (décision C2 b : « NVRAM gelée — AUCUNE écriture Cfg ») ──
+    // Toutes les écritures ci-dessous (R0, R3, R1, R2) sont suspendues pendant le homing.
+    // ⚠️ Ce gel couvre R1/R0/R3 AUSSI : une correction pendant un homing déplacerait la CIBLE
+    // de homing (R0/R2) ou détruirait le réglage commissionné (R1) et le persisterait.
+    // ⇒ À la sortie du homing, les mémoires ont suivi la saisie (bloc ci-dessous, hors gel) :
+    //    il n'y a plus de FRONT, donc le REPLI NIVEAU applique R1 = Q17 (préserver le TOP). C'est
+    //    exactement la décision 2c : « rien à mémoriser, on retombe dans le cas normal Q2 ».
+    IF NOT InHoming THEN
+
+    // ─── (1) R0 — CLAMP ABSOLU (Q21 bis) : non conditionné à une violation de Delta ──────
+    // ⚠️ « INCONDITIONNEL » au sens de Q21 bis = non subordonné à la règle Delta. Le gel
+    //    homing ci-dessus reste prioritaire (décision C2 b, motivée sécurité).
+    IF CommunCfg.CfgCableLimitAscent_M &lt; CST_T330FdcMin_M THEN
+        CommunCfg.CfgCableLimitAscent_M := CST_T330FdcMin_M;
+        Corrected := TRUE;
+    ELSIF CommunCfg.CfgCableLimitAscent_M &gt; CST_T330FdcMax_M THEN
+        CommunCfg.CfgCableLimitAscent_M := CST_T330FdcMax_M;
+        Corrected := TRUE;
+    END_IF;
+    IF WinchCfgM1.CfgTopSensorPos_M &lt; CST_T330TopMin_M THEN
+        WinchCfgM1.CfgTopSensorPos_M := CST_T330TopMin_M;
+        Corrected := TRUE;
+    ELSIF WinchCfgM1.CfgTopSensorPos_M &gt; CST_T330TopMax_M THEN
+        WinchCfgM1.CfgTopSensorPos_M := CST_T330TopMax_M;
+        Corrected := TRUE;
+    END_IF;
+
+    // ─── (2) R3 — plancher du ralentissement haut ───────────────────────────────────────
+    IF CommunCfg.WinchSlowdownDistanceTop_M &lt; CST_T330SlowdownTopMin_M THEN
+        CommunCfg.WinchSlowdownDistanceTop_M := CST_T330SlowdownTopMin_M;
+        Corrected := TRUE;
+    END_IF;
+
+    // ─── (3) R1 / R2 — règle Delta &gt;= 1,00 m sur les valeurs CLAMPÉES ───────────────────
+    // Détection du champ MODIFIÉ : M1 (maître) et FDC commun uniquement.
+    // ⛔ JAMAIS le champ M2 : il est RÉÉCRIT chaque scan par le miroir M1 (PRG_07_Supervision).
+    IF (WinchCfgM1.CfgTopSensorPos_M
+        - CommunCfg.CfgCableLimitAscent_M) &lt; CST_T330ReserveMinMargin_M THEN
+        IF (WinchCfgM1.CfgTopSensorPos_M &lt;&gt; T330PrevTopSensorPos_M)
+           AND (CommunCfg.CfgCableLimitAscent_M = T330PrevCableLimitAscent_M) THEN
+            // R2 — le TOP vient d'être saisi : corriger le TOP, sauf pendant le homing (C2/Q22).
+            // ⚠️ Ce test est structurellement TOUJOURS VRAI ici (le gel homing englobe déjà le
+            //    bloc) : il est CONSERVÉ comme marqueur nommé de la décision C2/Q22, pour qu'un
+            //    déplacement futur du gel ne puisse pas réactiver R2 pendant un homing en silence.
+            IF NOT InHoming THEN
+                WinchCfgM1.CfgTopSensorPos_M :=
+                    CommunCfg.CfgCableLimitAscent_M + CST_T330ReserveMinMargin_M;
+                Corrected := TRUE;
+            END_IF;
+        ELSE
+            // R1 (et Q17 : les deux champs ont changé, ou aucun) — PRÉSERVER le TOP,
+            // corriger le FDC. C'est aussi le REPLI NIVEAU à la sortie du homing.
+            CommunCfg.CfgCableLimitAscent_M :=
+                WinchCfgM1.CfgTopSensorPos_M - CST_T330ReserveMinMargin_M;
+            Corrected := TRUE;
+        END_IF;
+    END_IF;   // fin de la règle Delta (R1/R2)
+    END_IF;   // ─── fin du GEL HOMING (décision C2 b) : plus aucune écriture Cfg pendant le homing
+
+    // ─── Mémoires de front (HORS gel : suivies MÊME pendant le homing) ──────────────────
+    // Indispensable : à la sortie du homing la saisie opérateur n'est plus un FRONT, donc le
+    // REPLI NIVEAU ci-dessus applique R1 = Q17 (préserver le TOP, corriger le FDC). C'est la
+    // décision 2c : « rien à mémoriser, on retombe dans le cas normal Q2 ».
+    T330PrevTopSensorPos_M     := WinchCfgM1.CfgTopSensorPos_M;
+    T330PrevCableLimitAscent_M := CommunCfg.CfgCableLimitAscent_M;
+
+ELSE
+    // Ponts non restaurés : aucune écriture Cfg, aucune mémoire amorcée.
+    Ready := FALSE;
+END_IF;
+
+// Maintien IHM : une correction dure UN scan (10 ms) -&gt; sans maintien le message serait
+// invisible. TOF = conserve Q VRAI pendant PT après retombée de IN (fenêtre de maintien).
+// Appelé à CHAQUE scan, y compris normalisation inhibée (la fenêtre doit pouvoir retomber).
+T330MsgHold(IN := Corrected, PT := T#500ms);
+CorrectedHeld := T330MsgHold.Q;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1905fd7d-e6ee-55a1-9397-6bb750807543</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_ContactorProtector" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -20634,6 +21051,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Lancer le cycle (front) — commande IHM dediee, alternative au motif joystick</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketCloseConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Confirmation operateur benne fermee (front, bouton N2 dedie) — ouvre l'etape verrouillee</xhtml>
+              </documentation>
+            </variable>
             <variable name="CfgCommissioningEnable">
               <type>
                 <BOOL />
@@ -20648,7 +21073,7 @@ END_IF;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Step cible du forcage (0=HX0 .. 9=HXF), borne dans le FB</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Step cible du forcage (0=HX0 .. 9=HXF, borne dans le FB ; l'etape HX7 n'est pas atteignable par forcage)</xhtml>
               </documentation>
             </variable>
             <variable name="CfgForceStepApply">
@@ -21115,7 +21540,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Step GRAFCET qui commande un mouvement treuil (HX2/HX3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Step GRAFCET qui commande un mouvement treuil (HX2/HX3/montee verrouillee)</xhtml>
               </documentation>
             </variable>
             <variable name="AxisHomingError">
@@ -21155,7 +21580,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde HX2 ecoulee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde de montee ecoulee (temps de montee commandee)</xhtml>
               </documentation>
             </variable>
             <variable name="HomeAxesTimedOut">
@@ -21163,7 +21588,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde HX3 ecoulee sans axes homes</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde de descente ecoulee sans axes homes</xhtml>
               </documentation>
             </variable>
             <variable name="TransactionAbort">
@@ -21212,6 +21637,119 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Reference codeurs M1/M2 seule (base de la detection de perte de datum, sans l'offset benne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeIsMaint2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAPE VERROUILLEE HX7 (montee au capteur puis referencement A L'ARRET) ===
+. [LOC] Mode arbitre = MAINT_N2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeIsMaint1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mode arbitre = MAINT_N1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenanceActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mode arbitre = MAINT_N1 ou MAINT_N2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockedStepEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Le cycle est dans l'etape verrouillee HX7</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockedClimbActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] HX7, capteur haut NON atteint : phase de montee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockedClimbCommand">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] HX7 en phase de montee ET en MAINT_N2 : ordre de montee effectivement emis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockedSettleActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] HX7, capteur haut atteint : phase d'arret/capture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockedCaptureAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Prise de reference autorisee (capteur atteint + arret mecanique + neutre)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescentRequestedInLock">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Descente demandee pendant l'etape verrouillee (interdite)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockedDescentRefused">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch local : descente refusee en HX7 (purge sur Reset, alimente la cause defaut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ClimbStepActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Step courant = un step de montee (HX2 ou HX7 phase montee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ClimbCommandActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Montee REELLEMENT commandee : seule condition qui consomme la garde</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescentCommandActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Descente REELLEMENT commandee : seule condition qui consomme la garde HX3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketCloseConfirmedLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation benne fermee memorisee (entree de HX7, purgee sur Reset ou hors maintenance)</xhtml>
               </documentation>
             </variable>
             <variable name="CST_CauseHomingLostInMotion">
@@ -21279,6 +21817,17 @@ Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">HX3 : front descendant capteur non obtenu dans la garde (Latching)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_CauseLockedDescentReq">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="6" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">HX7 : descente demandee pendant le referencement verrouille (Latching)</xhtml>
               </documentation>
             </variable>
             <variable name="CST_ValidationHold">
@@ -21391,8 +21940,29 @@ LatchedEdge(CLK := Fault.Latched);
 TopLostEdge(CLK := TopPositionSensor);
 
 // Miroirs booleens de contexte GRAFCET.
+// Comparaisons de mode NOMMEES une seule fois (std 2quater : jamais de comparaison niee inline).
+ModeIsMaint1 := (Mode = E_Mode.MAINT_N1);
+ModeIsMaint2 := (Mode = E_Mode.MAINT_N2);
+MaintenanceActive := ModeIsMaint1 OR ModeIsMaint2;
+
+// Contexte de l'etape verrouillee HX7 : montee tant que le capteur haut n'est pas atteint,
+// puis arret/capture des que le capteur est reellement atteint (franchissement reel).
+LockedStepEngaged := (SeqStep = E_MachineHomingTxState.HX7_LOCKED_REFERENCE);
+LockedClimbActive := LockedStepEngaged AND NOT TopPositionSensor;
+// HX7 en phase de montee ET reellement en MAINT_N2 : SEULE combinaison ou un ordre de montee
+// est effectivement emis (hors MAINT_N2 l'etape est tenue sans aucun ordre : la garde de
+// montee ne doit donc pas se consommer, sinon un retour en N2 sanctionnerait une montee
+// qui n'a jamais eu lieu).
+LockedClimbCommand := LockedClimbActive AND ModeIsMaint2;
+LockedSettleActive := LockedStepEngaged AND TopPositionSensor;
+
+// Phases de mouvement : montee de homing (HX2, HX3) et montee de l'etape verrouillee. La
+// phase verrouillee est keyee sur l'ORDRE REELLEMENT EMIS (LockedClimbCommand) : pendant la
+// tenue hors MAINT_N2, aucun ordre n'est emis, donc tout mouvement de treuil y est evalue
+// comme un mouvement hors phase (la surveillance n'est pas masquee par le verrou).
 IsInMovePhase := (SeqStep = E_MachineHomingTxState.HX2_CLIMB)
-              OR (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES);
+              OR (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES)
+              OR LockedClimbCommand;
 CycleRunning := (SeqStep &lt;&gt; E_MachineHomingTxState.HX0_REPOS)
              AND (SeqStep &lt;&gt; E_MachineHomingTxState.HX1_CHOICE);
 
@@ -21409,23 +21979,49 @@ BucketPermit        := DeadmanArmed AND JoystickDeflected;
 
 // Fenetre de grace deceleration : armee des qu'on entre un step d'arret depuis une phase mouvement.
 // Fenetre de grace deceleration : armee sur tous les steps a l'arret (HX2N/HX3N +
-// HX4/HX5 ou les treuils doivent rester immobiles).
+// HX4/HX5 ou les treuils doivent rester immobiles), et sur la phase d'arret de l'etape
+// verrouillee HX7 (capteur atteint) : la deceleration apres la fin de la montee n'est pas
+// un mouvement hors phase.
 SettleGraceTimer(IN := (SeqStep = E_MachineHomingTxState.HX2N_NEUTRAL)
                        OR (SeqStep = E_MachineHomingTxState.HX3N_PAUSE)
                        OR (SeqStep = E_MachineHomingTxState.HX4_BUCKET_ADJUST)
-                       OR (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT), PT := CST_SettleGrace);
+                       OR (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT)
+                       OR LockedSettleActive, PT := CST_SettleGrace);
 
 // Conditions d'abandon fail-safe, chacune &lt;= 3 termes (std 2quater).
 AxisHomingError  := M1Status.HomingError OR M2Status.HomingError;
 MotionOutOfPhase := CycleRunning AND NOT IsInMovePhase
                     AND NOT WinchesMechanicallyStopped AND SettleGraceTimer.Q;
-ClimbTimedOut    := (SeqStep = E_MachineHomingTxState.HX2_CLIMB) AND ClimbTimer.Q;
+// Gardes de temps : elles ne mesurent QUE le temps ou le mouvement est reellement commande
+// (une pause operateur, un arret d'urgence ou un arret machine ne consomment pas le budget).
+ClimbStepActive := (SeqStep = E_MachineHomingTxState.HX2_CLIMB) OR LockedClimbCommand;
+ClimbCommandActive := ClimbStepActive AND ClimbPermit;
+DescentCommandActive := (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) AND DescendPermit;
+ClimbTimedOut    := ClimbStepActive AND ClimbTimer.Q;
 HomeAxesTimedOut := (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) AND HomeAxesTimer.Q AND NOT BothAxesHomed;
 // Sortie de MAINT_N2 alors qu'un step mouvement/commit est engage : abandon fail-safe.
-ModeLostDuringCycle := CycleRunning AND (Mode &lt;&gt; E_Mode.MAINT_N2);
+// L'etape verrouillee HX7 est EXCLUE : elle est tenue (aucun mouvement, aucun abandon) tant
+// qu'on n'y revient pas en MAINT_N2 -&gt; le verrou ne peut pas etre contourne par un changement de mode.
+ModeLostDuringCycle := CycleRunning AND NOT LockedStepEngaged AND NOT ModeIsMaint2;
 TransactionAbort := CycleRunning
                     AND (AxisHomingError OR MotionOutOfPhase OR ClimbTimedOut
                          OR HomeAxesTimedOut OR ModeLostDuringCycle);
+
+// Descente interdite pendant l'etape verrouillee : seule la montee est permise (un
+// referencement se fait en montant vers le capteur haut, jamais en descendant a l'aveugle).
+// Une descente n'est retenue que si elle est REELLEMENT commandee (homme-mort + manche
+// pousse) : un effleurement du manche sans homme-mort ne deplace aucun treuil et ne doit
+// donc pas sanctionner le cycle.
+// Limite connue : une commande de descente par BOUTONS IHM (mode boutons) n'est pas
+// observable par ce FB, qui ne recoit que les signaux du joystick.
+DescentRequestedInLock := LockedStepEngaged AND DescendPermit;
+IF DescentRequestedInLock THEN
+    LockedDescentRefused := TRUE;   // latch local : visible jusqu'au Reset conscient
+END_IF;
+
+// La condition de prise de reference A L'ARRET (capteur haut REELLEMENT atteint + arret
+// mecanique confirme + commande relachee) est evaluee AU POINT D'USAGE dans l'etape HX7 :
+// elle doit lire le neutre du scan COURANT, jamais celui du scan precedent (producteur unique).
 
 // Auto-armement HX0-&gt;HX1 : machine non referencee en maintenance (N1 ou N2), le cycle
 // se propose de lui-meme (HX1 = annonce + choix, AUCUN mouvement). Debounce anti-flapping
@@ -21434,7 +22030,7 @@ TransactionAbort := CycleRunning
 AutoArmCandidate := FirstScanDone
                     AND NOT MachineHomed AND NOT MachineHomingFailed
                     AND NOT ReHomingAckRequired AND NOT HomingLossLatched
-                    AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2));
+                    AND MaintenanceActive;
 AutoArmTimer(IN := AutoArmCandidate, PT := CST_ValidationHold);
 
 // --- Motif "3 appuis successifs" -&gt; ExplicitValidationPulse ---
@@ -21520,6 +22116,8 @@ IF ResetEdge.Q THEN
     MachineWasHomed     := FALSE;
     HomingLossLatched   := FALSE;
     ReHomingAckRequired := FALSE;
+    LockedDescentRefused := FALSE;
+    BucketCloseConfirmedLatched := FALSE;
 END_IF;
 {endregion}
 
@@ -21556,6 +22154,20 @@ IF ForceStepApplyEdge.Q
 END_IF;
 {endregion}
 
+{region "§4ter Confirmation operateur benne fermee (entree de l'etape verrouillee)"}
+// === §4ter CONFIRMATION BENNE FERMEE ================================
+// Le front du bouton N2 dedie memorise la confirmation visuelle "benne fermee" donnee par
+// l'operateur AVANT tout mouvement. Elle ouvre l'etape verrouillee HX7 (montee au capteur)
+// et elle est consommee a l'entree de cette etape. Purge : Reset conscient, ou sortie de
+// maintenance (meme regle que la demande de reference benne cote FB_Bucket).
+IF BucketCloseConfirmed THEN
+    BucketCloseConfirmedLatched := TRUE;
+END_IF;
+IF ResetEdge.Q OR NOT MaintenanceActive THEN
+    BucketCloseConfirmedLatched := FALSE;
+END_IF;
+{endregion}
+
 {region "§5 Table des causes &amp; socle defaut"}
 // === §5 TABLE DES CAUSES + SOCLE DEFAUT ==============================
 instCauses[CST_CauseHomingLostInMotion].Active   := HomingLossLatched OR ReHomingAckRequired;
@@ -21581,6 +22193,10 @@ instCauses[CST_CauseHomingErrorM2].Texte    := 'Erreur de homing codeur M2 penda
 instCauses[CST_CauseHomeAxesTimeout].Active   := HomeAxesTimedOut;
 instCauses[CST_CauseHomeAxesTimeout].Latching := TRUE;
 instCauses[CST_CauseHomeAxesTimeout].Texte    := 'Homing des axes non obtenu dans le temps imparti';
+
+instCauses[CST_CauseLockedDescentReq].Active   := LockedDescentRefused;
+instCauses[CST_CauseLockedDescentReq].Latching := TRUE;
+instCauses[CST_CauseLockedDescentReq].Texte    := 'Descente interdite pendant le referencement verrouille';
 
 // Socle defaut : appele AVANT la gate NOT Enable (Reset jamais conditionne, std 9).
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -21627,9 +22243,18 @@ M1Demand.UseDynamicTarget := FALSE;
 M2Demand.UseDynamicTarget := FALSE;
 M2Demand.DynamicTarget_M  := 0.0;
 
-ClimbTimer(IN := (SeqStep = E_MachineHomingTxState.HX2_CLIMB) AND (Cfg.CfgTimeoutClimb &gt; T#0s),
+// Gardes de temps : le budget ne se consomme QUE pendant que le mouvement est reellement
+// commande par l'operateur (permis maintenu). Un arret volontaire, une pause ou un arret
+// d'urgence ne consomment donc aucun budget.
+// Semantique exacte a connaitre : un TON remet son temps ecoule a zero des que sa commande
+// retombe -&gt; le budget est celui d'une montee CONTINUE, et il repart de zero a chaque
+// nouvelle commande. La garde sanctionne donc « je commande une montee et le capteur ne
+// vient pas », jamais un nombre total de manoeuvres.
+// La valeur par defaut est derivee de la course maximale de cable et de la borne haute de
+// vitesse du palier 1 (cf. ST_fbMachineHomingCycle_Cfg, gate G511).
+ClimbTimer(IN := ClimbCommandActive AND (Cfg.CfgTimeoutClimb &gt; T#0s),
            PT := Cfg.CfgTimeoutClimb);
-HomeAxesTimer(IN := (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) AND (Cfg.CfgTimeoutHomeAxes &gt; T#0s),
+HomeAxesTimer(IN := DescentCommandActive AND (Cfg.CfgTimeoutHomeAxes &gt; T#0s),
               PT := Cfg.CfgTimeoutHomeAxes);
 {endregion}
 
@@ -21657,7 +22282,7 @@ CASE SeqStep OF
         IF (StartEdge.Q
             OR ((ExplicitValidationPulse OR AutoArmTimer.Q) AND NOT BothAxesHomed)
             OR (MachineWasHomed AND NOT MachineHomedRaw AND NOT BothAxesHomed))
-           AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) THEN
+           AND MaintenanceActive THEN
             HomeReqDone := FALSE;
             SeqStep     := E_MachineHomingTxState.HX1_CHOICE;
         END_IF;
@@ -21666,13 +22291,29 @@ CASE SeqStep OF
         // Annonce + choix. Aucun ordre mouvement (garanti par la RAZ de tete de scan).
         // Retour HX0 si le datum redevient valide (recuperation transitoire) ou si on
         // quitte la maintenance. Le referencement (mouvement) exige MAINT_N2.
-        IF MachineHomed
-           OR ((Mode &lt;&gt; E_Mode.MAINT_N1) AND (Mode &lt;&gt; E_Mode.MAINT_N2)) THEN
+        IF MachineHomed OR NOT MaintenanceActive THEN
             SeqStep := E_MachineHomingTxState.HX0_REPOS;
-        ELSIF BootReady AND ExplicitValidationPulse AND (Mode = E_Mode.MAINT_N2) THEN
+        ELSIF BootReady AND ExplicitValidationPulse AND ModeIsMaint2 THEN
             CommitPublished := FALSE;   // datum invalide tant qu'il est refait (HT1b, deplace de HX0)
             CommitDone      := FALSE;
-            IF NOT TopPositionSensor THEN
+            IF BucketCloseConfirmedLatched AND NOT TopPositionSensor THEN
+                // Confirmation benne fermee deja donnee ET capteur haut NON atteint : entree dans
+                // l'etape VERROUILLEE. La montee vers le capteur est le SEUL cas ou le
+                // franchissement est prouve : un capteur deja actif a l'entree (colle, force, ou
+                // machine deja en position haute) n'apporte AUCUNE preuve de franchissement et
+                // mene donc au chemin herite, qui exige le front descendant.
+                BucketCloseConfirmedLatched := FALSE;
+                HomeReqDone := FALSE;
+                SeenNeutral := NOT JoystickDeflected;
+                SeqStep     := E_MachineHomingTxState.HX7_LOCKED_REFERENCE;
+            ELSIF BucketCloseConfirmedLatched THEN
+                // Capteur haut deja actif : franchissement NON prouve -&gt; chemin herite
+                // (arret au capteur puis descente jusqu'au front descendant, ou referencement
+                // unitaire manuel). Aucune capture immediate possible.
+                BucketCloseConfirmedLatched := FALSE;
+                SeenNeutral := NOT JoystickDeflected;
+                SeqStep     := E_MachineHomingTxState.HX2N_NEUTRAL;
+            ELSIF NOT TopPositionSensor THEN
                 SeqStep := E_MachineHomingTxState.HX2_CLIMB;
             ELSE
                 SeenNeutral := NOT JoystickDeflected;
@@ -21776,6 +22417,73 @@ CASE SeqStep OF
         // MachineHomed calcule en §9. Retour immediat a l'etape initiale.
         SeqStep := E_MachineHomingTxState.HX0_REPOS;
 
+    E_MachineHomingTxState.HX7_LOCKED_REFERENCE:
+        // Etape VERROUILLEE : montee vers le capteur mecanique haut, puis prise de reference
+        // A L'ARRET (capteur haut reellement atteint, machine arretee, commande relachee).
+        // 🔒 Sorties admises, toutes CONSCIENTES et tracees : front Reset (purge §4), defaut
+        //    latché, et abandon sur violation detectee (descente commandee, garde de montee
+        //    ecoulee, erreur codeur, mouvement hors phase) -&gt; HXF, machine NON referencee.
+        //    Exception declaree : le forcage de step de mise en service (§4bis, case IHM +
+        //    MAINT_N2 + impulsion) peut sortir de cette etape comme de toute autre.
+        //    Aucun chemin de sortie ne pose de reference.
+        // La reference (Homed) n'est JAMAIS ecrite ici : elle reste la propriete de la facade
+        // codeur (FB_Encoder_Homing), posee sur le chemin standard.
+        IF DescentRequestedInLock THEN
+            // Descente reellement commandee pendant le referencement : interdite (on se refere
+            // en montant). Abandon immediat, machine toujours NON referencee.
+            MachineHomingFailed := TRUE;
+            SeqStep := E_MachineHomingTxState.HXF_FAILED;
+        ELSIF NOT ModeIsMaint2 THEN
+            // Verrou : sortir du mode ne fait PAS sortir de l'etape. L'affectation explicite
+            // ci-dessous N'EST PAS un no-op : elle court-circuite la suite de l'echelle
+            // (montee/capture) qui, sinon, resterait atteignable hors MAINT_N2.
+            // Etape tenue, aucun mouvement, aucune reference ; l'operateur doit revenir en
+            // MAINT_N2 pour poursuivre.
+            SeqStep := E_MachineHomingTxState.HX7_LOCKED_REFERENCE;
+        ELSIF AxisHomingError THEN
+            MachineHomingFailed := TRUE;
+            SeqStep := E_MachineHomingTxState.HXF_FAILED;
+        ELSIF ClimbTimedOut THEN
+            MachineHomingFailed := TRUE;
+            SeqStep := E_MachineHomingTxState.HXF_FAILED;
+        ELSIF MotionOutOfPhase THEN
+            MachineHomingFailed := TRUE;
+            SeqStep := E_MachineHomingTxState.HXF_FAILED;
+        ELSIF NOT TopPositionSensor THEN
+            // (1) MONTEE : capteur non atteint. Le cycle emet le MEME ordre (meme sens, meme
+            // palier) sur les deux treuils, uniquement sous permis operateur maintenu.
+            // 🔎 Portee reelle a connaitre : en MAINT_N2, la commande effective des treuils est
+            //    produite par le JOYSTICK de l'operateur via l'arbitrage aval (l'arbitrage ne
+            //    consomme la demande du cycle qu'en SEMI_AUTO). Ces ordres sont donc redondants
+            //    avec la commande manuelle : le palier reellement applique est borne en aval par
+            //    le garde-fou « hors referencement » tant que Homed est FALSE, et le couplage
+            //    M1/M2 depend du selecteur de treuil de l'operateur (non observable ici).
+            SeenNeutral := NOT JoystickDeflected;
+            IF ClimbPermit THEN
+                CmdWinchM1.RunRequest := TRUE; CmdWinchM1.ReqAscent := TRUE; CmdWinchM1.StepTgt := CST_StepSlow;
+                CmdWinchM2.RunRequest := TRUE; CmdWinchM2.ReqAscent := TRUE; CmdWinchM2.StepTgt := CST_StepSlow;
+            END_IF;
+        ELSE
+            // (2) FRANCHISSEMENT REEL ATTEINT : capteur haut actif. Aucun ordre de mouvement
+            // (RAZ de tete de scan), retour au neutre exige, puis impulsion UNIQUE de prise de
+            // reference, conditionnee par l'arret mecanique confirme.
+            // Le neutre est reevalue a CHAQUE scan (pas un latch d'entree) : une commande
+            // maintenue au capteur interdit la capture.
+            SeenNeutral := NOT JoystickDeflected;
+            // Reevaluation a chaud : SeenNeutral vient d'etre mis a jour dans ce step.
+            LockedCaptureAllowed := LockedSettleActive AND WinchesMechanicallyStopped AND SeenNeutral;
+            IF LockedCaptureAllowed AND NOT HomeReqDone THEN
+                M1Demand.HomeReq := TRUE;
+                M2Demand.HomeReq := TRUE;
+                HomeReqDone      := TRUE;
+            END_IF;
+            IF BothAxesHomed THEN
+                SeqStep := E_MachineHomingTxState.HX6_HOMED;
+            END_IF;
+        END_IF;
+        // Une prise de reference refusee par la facade codeur (preset non confirme) remonte en
+        // M1Status/M2Status.HomingError -&gt; abandon ci-dessus : jamais de blocage silencieux.
+
     E_MachineHomingTxState.HXF_FAILED:
         // Sortie uniquement sur front Reset conscient (purge §4).
         ;
@@ -21818,6 +22526,20 @@ ELSIF MachineHomingFailed OR (SeqStep = E_MachineHomingTxState.HXF_FAILED) THEN
 ELSIF MachineHomingLossSafeStop THEN
     MachineHomingStep := E_MachineHomingStep.LOSS_SAFESTOP;
     MachineHomingInstruction := 'Reference perdue - Arret controle';
+ELSIF LockedStepEngaged AND NOT ModeIsMaint2 THEN
+    // Etape verrouillee mais mode perdu : categorie de guide OFFSET_UNKNOWN (l'echelle impose
+    // « passer en MAINT_N2 »), le texte porte la consigne exacte de l'etape.
+    MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
+    MachineHomingInstruction := 'HX7 - RefHoming VERROUILLE : revenir en MAINT_N2 pour continuer';
+ELSIF LockedClimbActive THEN
+    MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
+    MachineHomingInstruction := 'HX7 - RefHoming VERROUILLE : monter JOY palier 1 vers le capteur haut';
+ELSIF LockedSettleActive AND NOT LockedCaptureAllowed THEN
+    MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
+    MachineHomingInstruction := 'HX7 - Capteur haut atteint : relacher le JOY et attendre l arret';
+ELSIF LockedSettleActive THEN
+    MachineHomingStep := E_MachineHomingStep.HOMING_IN_PROGRESS;
+    MachineHomingInstruction := 'HX7 - Referencement a l arret en cours (ne pas manoeuvrer)';
 ELSIF MachineHomed AND NOT CycleRunning THEN
     // Machine referencee et cycle homing a l'arret : AUCUN message homing a l'IHM.
     // (les branches HXn ci-dessous ne s'appliquent qu'a un cycle en cours ou une
@@ -22478,6 +23200,31 @@ FirstScanDone := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Essai T291-A : M2 palier 5 en descente auto AX4..AX7, non persistant</xhtml>
               </documentation>
             </variable>
+            <variable name="ResetSampleCountRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMPTEURS DE PRELEVEMENTS ===
+--&gt; [CMD] RAZ IHM du compteur JOURNALIER (front montant conscient)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgSampleCountResetMode">
+              <type>
+                <derived name="E_CycleSampleCountResetMode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Mode de RAZ AUTOMATIQUE du journalier (NEVER par defaut = aucune RAZ auto)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyRearmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine AU rearmee (contacteur puissance reengage) — consomme par ON_SAFETY_REARM uniquement</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -22790,7 +23537,15 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTURES PARTAGEES &amp; COMPTEURS ===
-&lt;-&gt; [BUS] Compteur de prelevements (RETAIN)</xhtml>
+&lt;-&gt; [BUS] Compteur JOURNALIER de prelevements (RAZ IHM/mode auto possible)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCountTotal">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] TOTALISATEUR de prelevements — JAMAIS remis a zero, ecrit au seul incrément AX18</xhtml>
               </documentation>
             </variable>
           </inOutVars>
@@ -22858,6 +23613,22 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant CfgForceStepApply</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetSampleCountEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant demande de RAZ IHM du compteur journalier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyRearmedEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant rearmement de la chaine AU</xhtml>
               </documentation>
             </variable>
             <variable name="CycleMotionPermit">
@@ -22933,6 +23704,26 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMPTEUR PRELEVEMENTS (garde de front) ===
 . [LOC] F2: front de comptage SampleCount (1 seul increment par cycle)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DayStartResetDone">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMPTEURS PRELEVEMENTS (RAZ journalier) ===
+. [LOC] Mode ON_FIRST_START : un demarrage de cycle a deja ete vu depuis le boot</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCountAutoResetPulse">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Impulsion interne de RAZ automatique issue du mode configure</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -23659,6 +24450,8 @@ SkipDrainEdge(CLK := SkipDrainRequest);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 JoyDeflectedEdge(CLK := JoystickDeflected);
+ResetSampleCountEdge(CLK := ResetSampleCountRequest);
+SafetyRearmedEdge(CLK := SafetyRearmed);
 StateExecutionInhibit := FALSE;
 ForceStepAccepted := FALSE;
 ForceStepRejected := FALSE;
@@ -23912,6 +24705,51 @@ instFault(Enable := Enable,
           Causes := instCauses);
 Fault := instFault.Fault;
 ErrorEdge(CLK := Fault.Error);
+{endregion}
+
+{region "§1bis Compteurs de prelevements"}
+// 🔢 DEUX compteurs DISTINCTS, incrementes au MEME evenement (depose tremie AX18, 1 fois par
+// cycle, garde de front SampleCountDone) :
+//    - SampleCount      : JOURNALIER — RAZ possible (bouton IHM conscient, ou mode AUTO configurable) ;
+//    - SampleCountTotal : TOTALISATEUR — JAMAIS remis a zero, aucun chemin d'ecriture hors l'increment AX18.
+// Cette region est volontairement AVANT le gate securite/mode (§2) : le compteur est une donnee
+// d'exploitation, pas une commande de mouvement — la RAZ reste donc effective hors SEMI_AUTO
+// (ex. remise a zero par le responsable en MAINT_N1). Aucune commande d'actionneur n'est produite ici.
+SampleCountAutoResetPulse := FALSE;
+
+// (b) ON_FIRST_START — premier demarrage de cycle depuis la mise sous tension de l'automate.
+// ⚠️ L'automate n'embarque AUCUNE horloge calendaire (pas de RTC, pas de bibliotheque temps) :
+//    le proxy "jour" retenu est le boot, valable pour une machine arretee entre deux postes.
+//    Conditions calquees sur la transition AX0-&gt;AX1 (§3) + le gate du FB (§2) : une simple
+//    pression de bouton hors conditions normales ne consomme PAS l'armement.
+// 🔒 Le drapeau "1er demarrage deja vu" est consomme par TOUT demarrage de cycle, QUEL QUE SOIT
+//    le mode en vigueur a cet instant : une bascule de mode en cours de poste n'arme donc
+//    JAMAIS une RAZ differee qui effacerait les comptes deja realises.
+IF Enable AND PowerContactorEngaged AND NOT EncoderFaultPresent AND NOT Fault.Latched
+   AND (State = E_AutoCycleStep.AX0_REPOS)
+   AND (StartEdge.Q OR DeadmanArmedEdge.Q) THEN
+    IF NOT DayStartResetDone THEN
+        DayStartResetDone := TRUE;
+        IF CfgSampleCountResetMode = E_CycleSampleCountResetMode.ON_FIRST_START THEN
+            SampleCountAutoResetPulse := TRUE;
+        END_IF;
+    END_IF;
+END_IF;
+
+// (c) ON_SAFETY_REARM — rearmement de la chaine AU (contacteur puissance reengage).
+IF (CfgSampleCountResetMode = E_CycleSampleCountResetMode.ON_SAFETY_REARM)
+   AND SafetyRearmedEdge.Q THEN
+    SampleCountAutoResetPulse := TRUE;
+END_IF;
+
+// (a) NEVER (defaut) : aucune RAZ automatique — seul le bouton IHM remet le journalier a zero.
+// 🔒 La RAZ ci-dessous n'ecrit QUE SampleCount : le totalisateur n'est jamais dans ce chemin.
+// ⚠️ Ordre intra-scan : cette region precede le CASE du Grafcet. Si une RAZ tombe sur le scan ou
+//    l'etape de fin de cycle s'execute, le journalier finit a 1 (remise a zero puis comptage de
+//    la depose en cours) : rien ne se perd.
+IF ResetSampleCountEdge.Q OR SampleCountAutoResetPulse THEN
+    SampleCount := 0;
+END_IF;
 {endregion}
 
 {region "§2 Gate securite &amp; Bascule Mode"}
@@ -24895,7 +25733,8 @@ CASE State OF
 
         // Compteur de prélèvements (RETAIN) + durée du cycle — F2: cadré par front (1 seul par cycle)
         IF NOT SampleCountDone THEN
-            SampleCount := SampleCount + 1;
+            SampleCount := SampleCount + 1;            // JOURNALIER (RAZ IHM/mode auto possible)
+            SampleCountTotal := SampleCountTotal + 1;  // TOTALISATEUR : SEULE ecriture de toute l'application (gate G508)
             LastCycleDuration := CurrentCycleElapsed;   // fige la durée du cycle qui vient de s'achever
             SampleCountDone := TRUE;
         END_IF;
@@ -37036,7 +37875,10 @@ le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Mémoire _SimEncoderRawPosM1 dans GVL_PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 LECTURE SEULE pour le banc : ces mémoires appartiennent au modèle codeur. Le banc les lit
+pour piloter ses modèles et ne les écrit JAMAIS — pas même pour « initialiser » une mémoire
+lue à 0 (un 0 est un point de passage légitime du comptage signé, jamais une mémoire vierge).
+&lt;-&gt; [BUS] Mémoire _SimEncoderRawPosM1 dans GVL_PERSISTENT</xhtml>
               </documentation>
             </variable>
             <variable name="RawPosM2">
@@ -37058,28 +37900,6 @@ le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de Trémie à Maintenance à 100 %, modèle banc uniquement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_M1EncoderInitialRaw">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1000000" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Comptage absolu plausible du device M1 simulé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_M2EncoderInitialRaw">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1100000" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Comptage absolu propre au device M2 simulé</xhtml>
               </documentation>
             </variable>
             <variable name="CST_SimBenchCycleTimeS">
@@ -37460,14 +38280,6 @@ le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Réponse sonde après alimentation</xhtml>
               </documentation>
             </variable>
-            <variable name="SimBenchWasEnabled">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Détection du premier scan de simulation</xhtml>
-              </documentation>
-            </variable>
             <variable name="M1_BrakeIsOpenState">
               <type>
                 <BOOL />
@@ -37576,7 +38388,6 @@ IF NOT Enable THEN
     KoboldMeasureEnablePrevious := FALSE;
     KoboldAutoEpisodeActive := FALSE;
     instKoboldPowerUpTimer(IN := FALSE);
-    SimBenchWasEnabled := FALSE;
     Ready       := FALSE;
     Busy        := FALSE;
     Done        := FALSE;
@@ -37587,20 +38398,15 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-// ▶️ Banc actif : le cycle de simulation démarre pour ce scan
-// Un codeur absolu réel possède déjà un comptage avant le homing. On initialise
-// uniquement une mémoire vierge au premier scan ; une valeur persistante existante
-// n'est jamais remplacée. Le homing conserve ensuite sa transaction normale.
-IF NOT SimBenchWasEnabled THEN
-    IF RawPosM1 = 0 THEN
-        RawPosM1 := CST_M1EncoderInitialRaw;
-    END_IF;
-    IF RawPosM2 = 0 THEN
-        RawPosM2 := CST_M2EncoderInitialRaw;
-    END_IF;
-END_IF;
-SimBenchWasEnabled := TRUE;
-
+// ▶️ Banc actif : le cycle de simulation démarre pour ce scan.
+// 🔒 Le comptage brut M1/M2 (`_SimEncoderRawPosM1`/`M2`, GVL_PERSISTENT) n'est JAMAIS réécrit ici :
+//    `FB_Sim_Encoder` en reste le producteur unique (accumulation signée / preset). L'origine de banc
+//    plausible vient de l'initialisation DÉCLARÉE `GVL_PERSISTENT` (1 000 000 pts), pas d'une
+//    réinjection conditionnelle : un 0 lu ici n'est PAS une mémoire vierge, c'est un point de passage
+//    légitime du compteur SIGNÉ. Le banc ne réécrit donc aucune mémoire codeur, pas même pour
+//    « initialiser » une valeur lue à 0 — une telle réinjection (1 100 000 pts = 268,55 m de position
+//    publiée en un seul scan, sans mouvement ni défaut et référence de homing conservée)
+//    transformerait un zéro réel en téléportation de position.
 Ready := TRUE;
 Busy  := TRUE;
 Done  := FALSE;
@@ -38230,6 +39036,14 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse brute simulée (0x6031:01 en 0.1 RPM)</xhtml>
               </documentation>
             </variable>
+            <variable name="CountSaturated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Comptage en butée de plage du modèle (saturation signalée)</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <inOutVars>
             <variable name="RawPos">
@@ -38338,12 +39152,28 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse rapportee filtree 1er ordre, publiee dans RawSpdOut</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_CountTravelLimitPts">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1073741824" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Plage de comptage du modèle : le compteur brut est un entier SIGNÉ 32 bits (le conteneur
+UDINT n'est qu'un support d'échange, relu en DINT par toute la chaîne aval). La garde reste
+volontairement à la moitié de la plage signée (2^30 pts = 262 144 m de câble) : inatteignable
+en essai, elle interdit tout rebouclage silencieux si le modèle consommait toute sa plage.
+2^30 pts — demi-plage signée</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   📄 Spec composant : DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md
    🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
@@ -38359,6 +39189,10 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
       réelle telle que définie par MinSpeedMps/MaxSpeedMps/PointsPerRev/CableM_PerRev/CycleTimeS.
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
+   🔒 Comptage brut : entier SIGNÉ 32 bits (le conteneur UDINT n'est qu'un support d'échange,
+      relu en DINT par toute la chaîne aval). Il franchit 0 sans jamais s'y figer ; la seule
+      borne est la plage de représentation, signalée par CountSaturated — jamais muette.
+   📤 CountSaturated : comptage en butée de plage du modèle (saturation signalée, vitesse purgée)
    `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
       (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
       `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB. Un vrai codeur absolu physique
@@ -38376,6 +39210,8 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
 {region "§1 Gate"}
 IF NOT Enable THEN
     RawPosOut := RawPos;
+    // Comptage non evalue hors simulation : la saturation ne doit pas rester figee a TRUE.
+    CountSaturated := FALSE;
     RETURN;
 END_IF;
 {endregion}
@@ -38408,7 +39244,13 @@ IF PresetEdge.Q THEN
     PresetCount := PresetLatencyCycles;
 END_IF;
 
-// Pendant l'attente, la position brute est conservee (le codeur n'a pas encore re-reference).
+// 📐 Le comptage brut est un entier SIGNÉ 32 bits : le conteneur UDINT n'est qu'un support
+// d'échange (toute la chaîne aval le relit via UDINT_TO_DINT : FB_Encoder_Scale, FB_Encoder_Homing).
+// Sa valeur 0 n'est donc PAS une butée mécanique — c'est un point de passage comme un autre, et
+// c'est la seule façon de rester fidèle à un codeur absolu, dont le zéro de comptage est arbitraire.
+// Aucune branche de comptage ne borne donc à un littéral : seule la garde de plage §3bis intervient,
+// et elle est signalée (CountSaturated).
+// Pendant l'attente du preset, la position brute est conservee (le codeur n'a pas encore re-reference).
 // Le mouvement est gelé pendant la latence, comme un codeur réel en cours de referencement.
 IF PresetPending THEN
     IF PresetCount &gt; 0 THEN
@@ -38420,16 +39262,12 @@ IF PresetPending THEN
     END_IF;
     TargetSpeedMps := 0.0;
 ELSIF RelayFwd THEN
-    RawPos := RawPos + Increment;
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(Increment));
     MovingDir := 1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
     TargetSpeedMps := SpeedMps;
 ELSIF RelayRev THEN
-    IF RawPos &gt;= Increment THEN
-        RawPos := RawPos - Increment;
-    ELSE
-        RawPos := 0;
-    END_IF;
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Increment));
     MovingDir := -1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
     TargetSpeedMps := -SpeedMps;
@@ -38438,14 +39276,11 @@ ELSE
     // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
     IF (CoastPtsLeft &gt;= 1.0) AND (MovingDir &lt;&gt; 0) THEN
         IF MovingDir = 1 THEN
-            RawPos := RawPos + IncrStep1;
+            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(IncrStep1));
             TargetSpeedMps := MinSpeedMps;
-        ELSIF RawPos &gt;= IncrStep1 THEN
-            RawPos := RawPos - IncrStep1;
-            TargetSpeedMps := -MinSpeedMps;
         ELSE
-            RawPos := 0;
-            TargetSpeedMps := 0.0;
+            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(IncrStep1));
+            TargetSpeedMps := -MinSpeedMps;
         END_IF;
         CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
     ELSE
@@ -38453,6 +39288,23 @@ ELSE
         CoastPtsLeft := 0.0;
         TargetSpeedMps := 0.0;
     END_IF;
+END_IF;
+{endregion}
+
+{region "§3bis Garde de plage de comptage"}
+// 🛑 SEULE borne du comptage : la plage de représentation signée. Elle est SIGNALÉE
+// (CountSaturated) et cohérente — une position bornée ne publie plus de vitesse de mouvement,
+// ce qui interdit la signature « position figée + vitesse non nulle + zéro défaut ».
+CountSaturated := FALSE;
+IF UDINT_TO_DINT(RawPos) &gt; CST_CountTravelLimitPts THEN
+    RawPos := DINT_TO_UDINT(CST_CountTravelLimitPts);
+    CountSaturated := TRUE;
+ELSIF UDINT_TO_DINT(RawPos) &lt; -CST_CountTravelLimitPts THEN
+    RawPos := DINT_TO_UDINT(-CST_CountTravelLimitPts);
+    CountSaturated := TRUE;
+END_IF;
+IF CountSaturated THEN
+    TargetSpeedMps := 0.0;
 END_IF;
 {endregion}
 
@@ -52421,6 +53273,10 @@ instCycleMachineHoming(
     // OU commande IHM dediee (front) pour le lancement direct.
     BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.CycleMachineHoming.Cmd.BtnValidate,
     StartRequest               := GVL_IHM.CycleMachineHoming.Cmd.BtnStart,
+    // Confirmation visuelle "benne fermee" (bouton N2 dedie, front) : ouvre l'etape
+    // verrouillee de referencement (montee au capteur haut puis referencement a l'arret).
+    // Meme front que la demande de reference benne : une seule intention operateur.
+    BucketCloseConfirmed       := BucketReferenceCloseEdge.Q,
     CfgCommissioningEnable     := GVL_IHM.CycleMachineHoming.Cmd.TglCommissioning,
     CfgForceStepTarget         := GVL_IHM.CycleMachineHoming.Cfg.ForceStepTarget,
     CfgForceStepApply          := GVL_IHM.CycleMachineHoming.Cmd.BtnForceStepApply,
@@ -52953,7 +53809,10 @@ instCycleSemiAuto(
     SpeedMismatchTimeout    := T#0ms,   // Désactivé ; protections FB_WinchSync conservées
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
     M1TopLimitReached       := PRG_04_Treuils_Benne.Data.WinchM1Safety.CableLimitAscent,
-    M2TopLimitReached       := PRG_04_Treuils_Benne.Data.WinchM2Safety.CableLimitAscent,
+    // M1 est la seule autorité nominale de fin de montée AX12.
+    // M2TopLimitReached est neutralisé ici pour le séquenceur : M2 reste protégé par ses sécurités
+    // propres (instSafetyWinchM2.AscentPermit) sans provoquer de fin de montée prématurée en cas d'écart.
+    M2TopLimitReached       := FALSE,
     Translation_At_P1       := PRG_05_Translation.Data.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.Data.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.Data.M3_AtMaintenanceStable,
@@ -52988,7 +53847,17 @@ instCycleSemiAuto(
     CfgCtrlAscentDistanceM  := GVL_IHM.CycleSemiAuto.Cfg.ExtractionControlDistance_M, // Distance controle AX11 depuis AX10
     M1_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber, // palier applique (0..5) : garde palier&lt;&gt;4 en plongee (GT-dive-retry) + cause 8 (palier 5)
     M2_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
-    SampleCount            := _CycleSampleCount
+    // 🔢 Compteurs de prélèvements : journalier (RAZ IHM + mode auto configurable) et
+    // totalisateur (jamais remis à zéro, aucune commande). Même événement d'incrément (AX18, FB).
+    SampleCount            := _CycleSampleCount,
+    SampleCountTotal       := _CycleSampleCountTotal,
+    ResetSampleCountRequest := GVL_IHM.CycleSemiAuto.Cmd.BtnResetSampleCount,
+    CfgSampleCountResetMode := GVL_IHM.CycleSemiAuto.Cfg.SampleCountResetMode,
+    // Réarmement AU : contacteur puissance réengagé après armement de la chaîne (consommé
+    // uniquement si Cfg.SampleCountResetMode = ON_SAFETY_REARM). Lecture directe assumée :
+    // le bus Data de PRG_06 n'expose pas cet état ; le FB le consomme sur front (R_TRIG),
+    // donc un éventuel retard de tâche d'un scan est sans effet.
+    SafetyRearmed          := PRG_06_Outputs.EmergencyDone
 );
 
 {endregion}
@@ -55028,6 +55897,11 @@ TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
 IF ManualBucketJogActive THEN
     TopLimitM2_M := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
                      + _BucketCfgPersist.Config.OffsetCloseM + 2.0;
+ELSIF WinchBothMotionActive AND NOT (OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff) THEN
+    // En Both (WinchBothMotionActive), M1 est l'autorité nominale de montée et
+    // d'arrêt haut. M2 devient un garde-fou dérivé avec marge de tolérance +0.50 m sur le FDC
+    // logiciel haut pour éliminer les arrêts prématurés sur benne intermédiaire (réserve TOP &gt;= 1.00 m respectée).
+    TopLimitM2_M := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift + 0.50;
 END_IF;
 
 // --- Usage effectif d'un override/bypass de position → re-homing obligatoire ---------------
@@ -55382,6 +56256,18 @@ END_IF;
 // En couple les 2 treuils sont lies : la limite benne s'applique aux 2.
 IF CoupledBoth AND (BucketNotClosedAscentCapStep1 OR SlackCableAscentCapStep1) THEN
     CommonMaxStepAscent := 1;
+END_IF;
+
+// En pilotage Both (WinchBothMotionActive), M1 est l'unique autorité nominale
+// de vitesse en approche haute. Dès que M1 entre dans sa zone de ralentissement haut,
+// CommonMaxStepAscent est bridé à WinchSlowdownMaxStep (palier 1). Cela garantit que M1 et M2
+// décélèrent de façon synchrone et atomique au palier 1, éliminant la divergence de paliers
+// P1/P5 qui causait une neutralisation brutale sous WinchBothFinalRequestsCoherent.
+IF WinchBothMotionActive
+   AND PRG_02_Acquisition.Data.EncoderM1.Homed
+   AND NOT PRG_02_Acquisition.Data.EncoderM1.HomingSuspect
+   AND (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &gt;= (TopLimitM1_M - _CommunCfgPersist.WinchSlowdownDistanceTop_M)) THEN
+    CommonMaxStepAscent := MIN(CommonMaxStepAscent, _CommunCfgPersist.WinchSlowdownMaxStep);
 END_IF;
 
 // Position Maintenance atteinte : bridage commun M1/M2, montée et descente.
@@ -58326,6 +59212,14 @@ PowerCutOffActive := PowerCutOffReq;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config codeur commune M1/M2</xhtml>
               </documentation>
             </variable>
+            <variable name="instCfgT330Normalizer">
+              <type>
+                <derived name="FB_CfgT330Normalizer" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Normalisation des reglages haut T330 (FDC / TOP / ralentissement)</xhtml>
+              </documentation>
+            </variable>
             <variable name="instDiagIhmHeartbeat">
               <type>
                 <derived name="FB_Diag_IhmHeartbeat" />
@@ -58655,129 +59549,13 @@ geles pendant HomingLifecycle.Busy). Affichage seul, aucune decision machine ici
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Borne profondeur cycle : legale et limites descentes M1/M2</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_T330ReserveMinMargin_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">═══ T330 (Q1/Q2) — regles d'INGENIERIE, pas des cotes metier ═══════════════
-NON persistantes et NON IHM (AC3) : jamais exposees, jamais RETAIN.
-Reserve minimale FDC logiciel haut / TOP homing</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_T330SlowdownTopMin_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher du ralentissement haut (Q1)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_T330FdcMin_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse FDC (Q21)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_T330FdcMax_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="9" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute FDC (Q21/C1 : TOP&lt;=10 et Delta&gt;=1 =&gt; FDC&lt;=9)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_T330TopMin_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse TOP (Q21)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_T330TopMax_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="10" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute TOP (Q21)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="T330PrevInit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">═══ T330 — memoires NON persistantes (AC3 : ni IHM, ni RETAIN) ═════════════
-. [LOC] Seed des memoires effectue depuis les valeurs RESTAUREES</xhtml>
-              </documentation>
-            </variable>
-            <variable name="T330PrevTopSensorPosM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur precedente TOP (detection front operateur)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="T330PrevCableLimitAscentM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur precedente FDC (detection front operateur)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="T330PrevSlowdownTopM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur precedente ralentissement haut</xhtml>
-              </documentation>
-            </variable>
             <variable name="T330InHoming">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Homing en cours (cycle machine complet OU transaction preset)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="T330MsgCorrected">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Une correction T330 a eu lieu ce scan (consomme par le bandeau)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="T330MsgHold">
-              <type>
-                <derived name="TOF" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien du message T330 (1 scan = 10 ms serait invisible a l'IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">═══ T330 — contexte machine (reglages, constantes et memoires portes par instCfgT330Normalizer) ═══
+. [LOC] Homing en cours (cycle machine complet OU transaction preset)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -58852,102 +59630,36 @@ FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
 // ───────────────────────────────────────────────────────────────────────────────
 // ORDRE IMPOSE (Q21 bis) :  (1) R0 clamp ABSOLU inconditionnel, FDC et TOP separement
 //                        puis (2) regle Delta &gt;= 1,00 m / slowdown &gt;= 0,50 m.
-// OPTION A (Q23) : reference lue sur le PERSISTANT ; les ponts ci-dessous ecrivent la
-//                  valeur CORRIGEE dans le MEME scan (aucune fenetre NVRAM).
+// Le CORPS de la normalisation (R0/R1/R2/R3, gel homing, memoires de front, maintien
+// IHM) est porte par FB_CfgT330Normalizer — PRG_07 ne fait que le cabler.
+// REFERENCE REELLE : le FB lit et ecrit GVL_IHM.*.Cfg (et non la NVRAM) — appel place
+//   AVANT les ponts (option A / Q23), donc GVL_IHM.Cfg porte encore l'etat restaure au
+//   scan precedent et les ponts ci-dessous persistent la valeur CORRIGEE dans le MEME
+//   scan (aucune fenetre NVRAM). Les memoires internes du FB sont amorcees depuis ces
+//   valeurs RESTAUREES, jamais depuis les defauts DUT (piege P2 du cadrage).
 // AC3 : AUCUNE variable persistante ni IHM nouvelle — constantes CST_* et memoires
-//       locales uniquement. Jamais de champ de fin de course supplementaire.
+//       locales au FB uniquement. Jamais de champ de fin de course supplementaire.
 // C2/Q22 : R2 (correction du TOP) est INHIBEE pendant le homing — sur le CYCLE COMPLET
 //          (HX0..HX6), pas seulement la transaction de preset (~50 ms). Aucune memoire
 //          d'intention : au retour, si la config est toujours invalide, le REPLI NIVEAU
-//          ci-dessous applique Q17 (preserver le TOP, corriger le FDC).
+//          du FB applique Q17 (preserver le TOP, corriger le FDC).
 // ═══════════════════════════════════════════════════════════════════════════════
-T330MsgCorrected := FALSE;
-
 // Homing en cours : cycle machine COMPLET OU transaction de preset, sur M1 ET M2.
 T330InHoming := PRG_02_Acquisition.Data.MachineHoming.Active
                 OR PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
                 OR PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy;
 
-// Inhibee tant que les ponts n'ont pas RESTAURE (sinon les defauts DUT seraient pris
-// pour une saisie operateur — piege P2 du cadrage).
-IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.Commun.Cfg.Initialized THEN
-
-    // Seed des memoires depuis les valeurs RESTAUREES (jamais depuis les defauts DUT).
-    IF NOT T330PrevInit THEN
-        T330PrevTopSensorPosM     := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
-        T330PrevCableLimitAscentM := GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M;
-        T330PrevSlowdownTopM      := GVL_IHM.Commun.Cfg.WinchSlowdownDistanceTop_M;
-        T330PrevInit              := TRUE;
-    END_IF;
-
-    // ─── GEL PENDANT LE HOMING (decision C2 b : « NVRAM gelee — AUCUNE ecriture Cfg ») ──
-    // Toutes les ecritures ci-dessous (R0, R3, R1, R2) sont suspendues pendant le homing.
-    // ⚠️ Ce gel couvre R1/R0/R3 AUSSI : une correction pendant un homing deplacerait la CIBLE
-    // de homing (R0/R2) ou detruirait le reglage commissionne (R1) et le persisterait.
-    // ⇒ A la sortie du homing, les memoires ont suivi la saisie (bloc ci-dessous, hors gel) :
-    //    il n'y a plus de FRONT, donc le REPLI NIVEAU applique R1 = Q17 (preserver le TOP). C'est
-    //    exactement la decision 2c : « rien a memoriser, on retombe dans le cas normal Q2 ».
-    IF NOT T330InHoming THEN
-
-    // ─── (1) R0 — CLAMP ABSOLU (Q21 bis) : non conditionne a une violation de Delta ──────
-    // ⚠️ « INCONDITIONNEL » au sens de Q21 bis = non subordonne a la regle Delta. Le gel
-    //    homing ci-dessus reste prioritaire (decision C2 b, motivee securite).
-    IF GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M &lt; CST_T330FdcMin_M THEN
-        GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M := CST_T330FdcMin_M;
-        T330MsgCorrected := TRUE;
-    ELSIF GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M &gt; CST_T330FdcMax_M THEN
-        GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M := CST_T330FdcMax_M;
-        T330MsgCorrected := TRUE;
-    END_IF;
-    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M &lt; CST_T330TopMin_M THEN
-        GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M := CST_T330TopMin_M;
-        T330MsgCorrected := TRUE;
-    ELSIF GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M &gt; CST_T330TopMax_M THEN
-        GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M := CST_T330TopMax_M;
-        T330MsgCorrected := TRUE;
-    END_IF;
-
-    // ─── (2) R3 — plancher du ralentissement haut ───────────────────────────────
-    IF GVL_IHM.Commun.Cfg.WinchSlowdownDistanceTop_M &lt; CST_T330SlowdownTopMin_M THEN
-        GVL_IHM.Commun.Cfg.WinchSlowdownDistanceTop_M := CST_T330SlowdownTopMin_M;
-        T330MsgCorrected := TRUE;
-    END_IF;
-
-    // ─── (3) R1 / R2 — regle Delta &gt;= 1,00 m sur les valeurs CLAMPEES ───────────
-    // Detection du champ MODIFIE : M1 (maitre) et FDC commun uniquement.
-    // ⛔ JAMAIS le champ M2 : il est REEcrit chaque scan par le miroir M1 (ligne suivante).
-    IF (GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M
-        - GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M) &lt; CST_T330ReserveMinMargin_M THEN
-        IF (GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M &lt;&gt; T330PrevTopSensorPosM)
-           AND NOT (GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M &lt;&gt; T330PrevCableLimitAscentM) THEN
-            // R2 — le TOP vient d'etre saisi : corriger le TOP sauf pendant le homing (C2/Q22)
-            IF NOT T330InHoming THEN
-                GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M :=
-                    GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M + CST_T330ReserveMinMargin_M;
-                T330MsgCorrected := TRUE;
-            END_IF;
-        ELSE
-            // R1 (et Q17 : les deux champs ont change, ou aucun) — PRESERVER le TOP,
-            // corriger le FDC. C'est aussi le REPLI NIVEAU a la sortie du homing.
-            GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M :=
-                GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M - CST_T330ReserveMinMargin_M;
-            T330MsgCorrected := TRUE;
-        END_IF;
-    END_IF;   // fin de la regle Delta (R1/R2)
-    END_IF;   // ─── fin du GEL HOMING (decision C2 b) : plus aucune ecriture Cfg pendant le homing
-
-    // ─── Memoires de front (HORS gel : suivies MEME pendant le homing) ──────────
-    // Indispensable : a la sortie du homing la saisie operateur n'est plus un FRONT, donc le
-    // REPLI NIVEAU ci-dessus applique R1 = Q17 (preserver le TOP, corriger le FDC). C'est la
-    // decision 2c : « rien a memoriser, on retombe dans le cas normal Q2 ».
-    T330PrevTopSensorPosM     := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
-    T330PrevCableLimitAscentM := GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M;
-    T330PrevSlowdownTopM      := GVL_IHM.Commun.Cfg.WinchSlowdownDistanceTop_M;
-END_IF;
-
-// Maintien IHM : une correction dure UN scan (10 ms) -&gt; sans maintien le message serait
-// invisible. TOF = conserve Q VRAI pendant PT apres retombee de IN (fenetre de maintien).
-T330MsgHold(IN := T330MsgCorrected, PT := T#500ms);
+// La normalisation (R0 clamp absolu, R3 ralentissement, regle Delta R1/R2, gel homing,
+// memoires de front, maintien IHM) vit dans FB_CfgT330Normalizer : PRG_07 n'orchestre
+// plus que l'appel (CODE_QUALITY_STANDARDS §10.2 — aucune logique metier inline).
+// L'appel reste AVANT les ponts ci-dessous (option A / Q23) : le pont ecrit la valeur
+// CORRIGEE dans le MEME scan, donc aucune fenetre NVRAM.
+instCfgT330Normalizer(
+    Enable     := GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.Commun.Cfg.Initialized,
+    InHoming   := T330InHoming,
+    WinchCfgM1 := GVL_IHM.M1TreuilRetenue.Cfg,
+    CommunCfg  := GVL_IHM.Commun.Cfg
+);
 {endregion}
 
 instCfgPersistBridgeWinchM1(Hmi := GVL_IHM.M1TreuilRetenue.Cfg, Persist := _WinchM1CfgPersist);
@@ -59428,6 +60140,9 @@ GVL_IHM.CycleSemiAuto.State.CycleStateStr          := PRG_03_Modes_Cycle.Data.Se
 GVL_IHM.CycleSemiAuto.State.CycleStepAtError       := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;
 GVL_IHM.CycleSemiAuto.State.ResumeAfterFaultAvailable := PRG_03_Modes_Cycle.Data.SequenceState.ResumeAfterFaultAvailable;
 GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
+// 🔒 Totalisateur de prélèvements : PUBLICATION LECTURE SEULE — son seul écrivain est
+// l'incrément AX18 de FB_CycleSemiAuto (PRG_03, VAR_IN_OUT).
+GVL_IHM.CycleSemiAuto.State.SampleCountTotal       := _CycleSampleCountTotal;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
 GVL_IHM.CycleSemiAuto.State.DrainTimeElapsed_S     := DINT_TO_INT((TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeRemaining) + DINT#999) / DINT#1000);
@@ -59489,7 +60204,7 @@ instHmiBannerFormatter(
     MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
     MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction,
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
-    CfgCorrectedT330      := T330MsgHold.Q,
+    CfgCorrectedT330      := instCfgT330Normalizer.CorrectedHeld,
     BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassTranslation     := GVL_IHM.M3Translation.Bypass.Global,
@@ -61170,6 +61885,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             </Folder>
             <Folder Name="3_CYCLE_ET_MODES">
               <Object Name="E_CycleDepthStopMode" ObjectId="a4e533cc-1a07-5fca-8da6-b652a120d4dd" />
+              <Object Name="E_CycleSampleCountResetMode" ObjectId="ea6305ea-87dc-5770-9254-60521a6d4291" />
               <Object Name="E_ProgramSequence" ObjectId="e8e8ebc2-bfbe-517a-8c98-48abc432cba8" />
               <Object Name="ST_ChainCycleSemiAuto" ObjectId="fe0796b0-cbd2-54bf-ac31-2ae52afe32d2" />
               <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
@@ -61282,6 +61998,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             </Folder>
           </Folder>
           <Object Name="FB_AntiFlickerText" ObjectId="c4ab4ebb-976e-5154-b2e7-972371a90d1b" />
+          <Object Name="FB_CfgT330Normalizer" ObjectId="1905fd7d-e6ee-55a1-9397-6bb750807543" />
           <Object Name="FB_Hmi_BannerFormatter" ObjectId="84039c85-4845-567a-8eb6-932818f2daf4" />
           <Object Name="FB_MirrorBypassRetain" ObjectId="6b38f222-bba1-53c3-99fb-b91a23d65b9a" />
           <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />

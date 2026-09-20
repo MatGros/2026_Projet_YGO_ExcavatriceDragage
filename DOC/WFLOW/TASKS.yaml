@@ -1,12 +1,232 @@
 tasks:
+- id: T342
+  parent_id: T338
+  statut: ⏳
+  criticite: C1
+  domaine: TREUILS_BENNE / ENCODEURS / SIMULATION
+  agent: 'DSH12'
+  locked_at: '2026-09-20T21:14:11+02:00'
+  date: '2026-09-20T21:32:00+02:00'
+  updated_at: '2026-09-20T21:14:11+02:00'
+  titre: 'T338 CR2 — reinjection silencieuse RawPosM2=0 -> 1 100 000 pts dans FB_SimBench.st:273-280 (cause directe du saut post-AU)'
+  contexte: 'CR2, cause racine identifiee par T338 mais HORS de son lot (fichier verrouille DSH03/T328/T300 au moment du diagnostic).
+    FB_SimBench.st:273-280 : IF RawPosM2 = 0 THEN RawPosM2 := CST_M2EncoderInitialRaw (1 100 000 pts) — reinjection SILENCIEUSE
+    au premier scan apres reactivation du banc (IF NOT SimBenchWasEnabled), sans aucune trace ni alerte. Preuve par mesure
+    (snapshot 20260920_174333.csv) : HomingRefRaw M2 = 1 003 744 = 1 100 000 - 96 256, valeur impossible sans un raw valant
+    exactement 1 100 000 -> chemin exact du saut 8,50 -> 204,677 m reconstitue. Sans ce correctif, le saut post-AU/reactivation
+    simulation reste reproductible malgre le correctif T338 (plancher RawPos=0) deja committe (6a5910da).'
+  description: 'Corriger la reinjection silencieuse : soit ne plus reinjecter automatiquement (le comptage signe post-T338
+    n a plus besoin d un plancher a eviter), soit signaler explicitement la reinjection (log/diagnostic observable) si elle
+    reste necessaire pour un cas d usage reel. Verifier aussi CR3 (readback homing mathematiquement circulaire,
+    FB_Encoder_Homing.st:230/243/249/263-266) : un codeur fige est aujourd hui CERTIFIE reference (Homed=TRUE,
+    HomingSuspect=FALSE) -- si pertinent de le renforcer ici, sinon tache separee.'
+  objectifs:
+  - 'Reproduire le saut post-AU/reactivation simulation AVANT correctif (test rouge), corriger, prouver apres (test vert).'
+  - 'Si la reinjection reste necessaire : la rendre OBSERVABLE (sortie diagnostic ou log), jamais silencieuse.'
+  - 'Non-regression du correctif T338 (comptage signe, CI 9/9, G510).'
+  - 'Bundle PLCopenXML, G200 liaison, gates applicables PASS.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T342_SIM_REINJECTION_SILENCIEUSE.yaml
+  bloque_par: []
+  avancement: 'PRISE 2026-09-20T21:14:11 par DSH12 (verrou pose, tag DSH12 = premier libre ; libelle du brief
+    "Orchestrateur CC01" non usurpe). ARBITRAGE DE CONCEPTION (fait par l agent, sur preuve) : la reinjection est
+    SUPPRIMEE, pas rendue observable -- (1) son cas d usage annonce ("memoire vierge") est deja couvert par
+    l initialisation declaree GVL_PERSISTENT._SimEncoderRawPosM1/M2 := 1000000 : un 0 lu par le banc n est donc
+    JAMAIS une memoire vierge, c est un point de passage legitime du comptage signe post-T338 ; (2) le declencheur
+    IF RawPos = 0 est donc non discriminant et transforme un zero reel en teleportation de 268,55 m ; (3) la rendre
+    observable ne supprimerait pas ce saut ; (4) la region viole l invariant "FB_Sim_Encoder = producteur unique de
+    RawPosM2" documente 20 lignes plus bas dans le meme fichier (FB_SimBench.st:503). Reste : test rouge -> correctif
+    -> test vert, garde-fou G5xx, bundle + G200 + palier C. HORS SCOPE, REMONTE : (a) CR3 FB_Encoder_Homing.st
+    circulaire (lecture seule, non corrige ici) ; (b) test CI TC-P13-032 de test_fb_simbench.st resté sur l ANCIENNE
+    semantique T338 (suite FB_SimBench ROUGE 41/42 sur HEAD, non-regression T338 incomplete) ; (c) collision d ID
+    TC-P13-014 entre l AF-13 (capteur haut TOP) et le test de reinjection.
+    LIVRE 2026-09-20T21:32 par DSH12 (aucun commit) : reinjection SUPPRIMEE (arbitrage sur preuve, contrat
+    DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T342_SIM_REINJECTION_SILENCIEUSE.yaml, check_task_contract.py PASS 0 erreur).
+    ROUGE PROUVE avant correctif : CI FB_SimBench 41/43 avec TC-T342-010 = "RAWPOSM2 expected 0, got 1100000"
+    (reinjection mesuree par test, plus seulement reconstituee par calcul). VERT APRES : FB_SimBench 43/43
+    (TC-T342-010 memoire 0 conservee + TC-T342-011 memoire mid-course 296 459 inchangee), FB_Sim_Encoder 9/9
+    (non-regression CR1/T338), G510 PASS. Code mort retire (SimBenchWasEnabled, CST_M1/M2EncoderInitialRaw).
+    Garde-fou G513_check_sim_encoder_memory_write.py (regles : producteur unique du comptage brut + interdiction
+    d une auto-correction gardee par un test de valeur) --selftest PASS, branche palier C ; il REFUSE le contenu
+    REEL d avant correctif (git show HEAD, lignes 275/278). Bundle 260 objets frais (G390 PASS) + diff bundle
+    FB_SimBench ; G200 PASS 0 erreur ; palier C 45/50 avec les 5 FAIL PRE-EXISTANTS (G300/G340/G408/G430/G483),
+    G500 11/11.
+    RESTE (recette HUMAINE, hors agent) : import CODESYS des 2 bundles + essai banc -- reactivation apres AU sans
+    teleportation de position M2, descente M2 qui fait evoluer la position. AUCUN COMMIT.'
+- id: T341
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: QUALITE_CODE / TESTS_CI / SECURITE_POSITIONNELLE
+  agent: CC01
+  locked_at: '2026-09-20T21:30:00+02:00'
+  date: '2026-09-20T21:30:00+02:00'
+  updated_at: '2026-09-20T21:30:00+02:00'
+  titre: 'T330 suite — extraire FB_CfgT330Normalizer en vrai FB + ecrire les 37 cas ST TC-P10-056-092'
+  contexte: 'Revue independante T330 (B2, non bloquant pour la cloture) : les 37 cas ST prevus par le plan n existent pas (grep = 0) alors que le harnais FB_TestHarness_PRG_07 le permettait. La matrice les declare en validation_points sans tc_couvrants -> fausse couverture G450/G470, retiree a la cloture T330. Cause racine (dette qualite B7) : ~85 lignes de logique metier inline dans PRG_07_Supervision.st (viole CODE_QUALITY_STANDARDS §10.2), ce qui rendait le bloc non testable en ST isole -- l extraction en FB debloque aussi la testabilite.'
+  description: 'Extraire la region T330 NORMALISATION de PRG_07_Supervision.st en un FB dedie (FB_CfgT330Normalizer), changement atomique (les ancres G504/pytest doivent suivre). Ecrire les 37 cas ST TC-P10-056-092 sur ce FB via le harnais existant. Nettoyer au passage les dettes signalees : T330PrevSlowdownTopM ecrite et jamais lue (variable morte), commentaire "reference lue sur le PERSISTANT" inexact (lit/ecrit GVL_IHM), ordre VAR apres VAR CONSTANT, unites sans _ (NC-030), comparaison niee inline sur REAL.'
+  objectifs:
+  - 'FB_CfgT330Normalizer cree, region PRG_07 remplacee par un appel, comportement identique (non-regression pytest 27/27 + G504 + G200).'
+  - '37 cas ST TC-P10-056-092 ecrits et PASS, matrice af_traceability_matrix.yaml a jour avec de vrais tc_couvrants.'
+  - 'Variable morte T330PrevSlowdownTopM retiree ou justifiee.'
+  - 'HORS T330, item distinct groupe ici (challenger T299 2026-09-20, non bloquant) : renforcer G508_check_sample_totalizer_write_protection.py
+    pour detecter les ecritures INDIRECTES du totalisateur (REF_TO, VAR_IN_OUT aliase), pas seulement les affectations textuelles
+    nommees -- aujourd hui G508 PASS ne prouve que l absence d ecriture DIRECTE.'
+  - 'Bundle + diff bundle + G200 + gates palier C avant restitution.'
+  bloque_par: []
+- id: T340
+  parent_id: T336
+  statut: ⏳
+  criticite: C1
+  domaine: CYCLE_HOMING / SECURITE_REFERENCEMENT
+  agent: CC01
+  locked_at: '2026-09-20T20:48:29+02:00'
+  date: '2026-09-20T20:48:29+02:00'
+  updated_at: '2026-09-20T20:48:29+02:00'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T340_HOMING_LOCKED_ASCENT.yaml
+  titre: 'T336 Phase 3 — REFONTE du homing : reference provisoire a la fermeture benne + palier 1 constant global + vrai Homed uniquement au FDC mecanique haut'
+  contexte: 'ABANDON du design initial (referencement a la descente, option B du challenge). Nouvelle conception VALIDEE par l utilisateur le 2026-09-20, remplace integralement T336 Phase 2 option B :
+    1. Operateur confirme visuellement benne fermee ("je valide") -> M2 se cale par rapport a M1 comme aujourd hui (inchange). Si benne au sol/impossible a fermer : MAINT_N2, treuils synchronises a petite vitesse pour se degager.
+    2. M1 recoit une position PROVISOIRE (ex. 0) a cette confirmation -> permet un mouvement synchronise a petite vitesse. CE N EST PAS Homed. Le vrai Homed n arrive QUE quand le capteur mecanique haut est reellement atteint.
+    3. Palier 1 = CONSTANTE FIXE non reglable (pas un parametre), imposee sur TOUS les mouvements treuils dans les DEUX sens tant que pas vraiment reference -- ET DANS TOUS LES MODES : si M1 ou M2 ou benne n est pas Homed, le cycle automatique ne peut PAS etre lance (on peut entrer dans le mode mais on reste bloque a l init ou equivalent).
+    4. Translation M3 : AUCUN mouvement (pas juste petite vitesse) tant que non referencee -- altimetrie inconnue, risque de collision mecanique. Un interlock de ce type existe potentiellement deja (PRG_05:134-138, M3_HeightInterlockOk) -- A VERIFIER s il couvre exactement ce cas avant d en ecrire un nouveau.
+    5. Sortie du grafcet en cours de route -> reste NON reference, aucune triche possible.
+    PLAN B OBLIGATOIRE (garde-fou, pas une option) : si le referencement "au vol" pendant le mouvement ne fonctionne pas bien sur site, prevoir un referencement A L ARRET -- apres stabilisation par inertie (position d arret legerement apres le capteur), sur un etat de repos confirme (les deux treuils ET la benne stables), pas seulement en mouvement.'
+  description: 'AVANT tout code : un challenger independant (contexte frais) doit verifier cette conception sur le code reel, comme pour l hypothese montee precedente (qui avait revele un piege cache). Points a challenger en priorite : (a) le "faux referencement provisoire" M1:=0 ne doit fuiter NULLE PART comme un vrai Homed (aucun consommateur ne doit le confondre avec un referencement reel) ; (b) l interlock M3 existant (PRG_05:134-138) couvre-t-il reellement "non reference = aucun mouvement", ou seulement un seuil de hauteur minimale differencie ; (c) le palier 1 constant global dans TOUS les modes est-il compatible avec les interlocks existants (MAINT_N1/N2, T249-A, etc.) sans conflit ni trou ; (d) le Plan B (reference a l arret) est-il implementable proprement en complement, pas en remplacement, du referencement au vol.'
+  objectifs:
+  - 'Position provisoire M1 (fermeture benne validee) explicitement distincte de Homed/MachineHomed -- aucun consommateur ne doit traiter les deux comme equivalents.'
+  - 'Palier 1 CONSTANTE non reglable (litteral ou CST_ dedie), active sur tous mouvements treuils tant que non reference, dans tous les modes -- cycle auto bloque a l init si M1/M2/benne non Homed.'
+  - 'Verifier/completer l interlock translation M3 : zero mouvement (pas seulement petite vitesse) tant que non referencee.'
+  - 'Plan B (reference a l arret, apres stabilisation inertie, treuils+benne au repos) implemente en complement du referencement au vol, pas en remplacement.'
+  - 'Confirmation operateur benne fermee toujours prealable ; MAINT_N2 synchronise petite vitesse si benne au sol.'
+  - 'Aucune triche : sortie du grafcet en cours de route = toujours non reference.'
+  - 'Tests CI : position provisoire jamais confondue avec Homed, palier 1 constant verifie dans tous les modes, interlock M3 verifie, Plan B testable independamment.'
+  - 'Bundle PLCopenXML, G200 liaison, gates applicables PASS avant integration CODESYS.'
+  bloque_par: []
+  avancement: 'VERROU PRIS par CC01 le 2026-09-20T20:48:29 (GO direct humain, urgence tests utilisateur imminents). Challenge AVANT code LIVRE : DOC/WFLOW/AUDITS/DESIGN/CHALLENGE_T340_REFONTE_HOMING_2026-09-20.md (1 BLOCK, 2 PASS deja-couvert, 2 MAJOR, 9 constats hors scope). FAITS ACTES : (a) la position provisoire M1 est ABANDONNEE — ST_Encoder_Calib n a qu un booleen Homed, tout etat provisoire fuiterait dans ~20 consommateurs, et le couple M1 provisoire + M2 cale sur M1 rendrait MachineHomed auto-coherent donc indetectable ; (b) le palier 1 global existe deja (PRG_04:1217-1230) et l interlock M3 aussi (PRG_05:134-138) : AUCUN code de plafond ni d interlock a ecrire ; (c) le cycle auto est deja bloque sans datum (FB_Modes:251 expulsion + FB_CycleSemiAuto:834). ECART DANS LE SCOPE : CST_StepSlow est du code mort en MAINT_N2 (l arbitrage ignore ReqWinch hors SEMI_AUTO, FB_WinchCmdArbitrationM1.st:56-104) donc un re-referencement d une machine encore referencee peut se faire a palier 5 et faire echouer la capture preset (10 mm / 50 ms).
+    IMPLEMENTATION LIVREE 2026-09-20T21:15 (NON COMMITEE) : etape HX7_LOCKED_REFERENCE dediee et VERROUILLEE (entree par confirmation operateur benne fermee -> nouvelle entree BucketCloseConfirmed cablee depuis le front existant BucketReferenceCloseEdge.Q ; montee vers le capteur sous permis ; puis prise de reference NOMINALE A L ARRET : capteur reellement atteint + arret mecanique confirme + commande relachee) ; verrou = aucune sortie d etape par changement de mode (etape TENUE sans mouvement), descente reellement commandee en HX7 => abandon avec cause dediee ; A1 CORRIGE (gardes de montee ET de descente consommees UNIQUEMENT si l ordre de mouvement est reellement emis ; garde de montee 120 s en dur -> 300 s DERIVEE : 58,5 m / 0,4 m/s = 146,3 s, x2 = 292,5 s) ; chemin de secours MAINT_N1 hors grafcet NON touche ; FB_Encoder_Homing.st et ST_Encoder_Calib.st NON modifies. DEUX REVUES INDEPENDANTES read-only : (1) NON en l etat (2 MAJOR + 9 MINOR) ; (2) OUI (1 MAJOR + 4 MINOR). Les 3 MAJOR CORRIGES : garde keyee sur l ordre reellement emis (elle se consommait hors MAINT_N2 ou aucun ordre n est emis) ; garde HX3 desormais testee (H210/H211) et declaree dans must_survive ; entree de l etape verrouillee EXIGEANT un capteur haut INACTIF (un capteur deja actif permettait une capture sans franchissement = datum faux). PREUVES FINALES : CI 21 tests / 19 PASS / 2 FAIL (H010/H090 PREEXISTANTS, identiques a l archive 13/09 : 8/6/2 ; cause BootReady jamais pilote) dont 13/13 nouveaux TC-P09-H200..H212 PASS ; G511 PASS + --selftest PASS (8 mutations rejetees) ; G200 --report PASS (0 erreur, 2025 instances) ; bundle frais 259/259 objets 0 erreur + diff bundle 4 objets ; palier C 43/48 PASS avec EXACTEMENT les 5 dettes preexistantes G300/G340/G408/G430/G483 (aucun fichier du lot signale). Persistants : AUCUN ajout. IHM : aucune commande ni champ nouveau. Aucun commit.'
+- id: T339
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: TESTS_CI / DOC (BENNE)
+  agent: DSH11
+  locked_at: '2026-09-20T21:05:00+02:00'
+  date: '2026-09-20T21:05:00+02:00'
+  avancement: 'VERROU PRIS par DSH11 le 2026-09-20T21:05 (DSH11 = premier tag libre, DSH01 contamine / DSH02..DSH10 tous portes). Créée le 2026-09-20 par CC01 sur accord explicite de l''humain, après le lot T295 qui a signalé ces trois dettes sans les corriger.
+    IMPLEMENTATION LIVREE 2026-09-20T21:35 (NON COMMITEE), ZERO fichier CODE/ modifie. (1) TRI DES 9 TESTS : 8 sont des TESTS OBSOLETES prouves fichier:ligne — (a) permis de securite EffectivePermitBucket_Open/Close non passes (FB_Bucket.st:524/:540) => TC-P10-023, 024, 025.2 ; (b) migration d API M2_Direction INT -> M2_ReqAscent/M2_ReqDescend BOOL (:68-69) => TC-P10-029, 029.1 ; (c) etat benne CLASSE EN CONTINU sur la mesure, plus latche (T247, commit 509e0eb1 du 2026-09-04) => TC-P10-030, 047.1, 047.2 ; (d) T181-21 observait StateIncoherent, que le FB n ecrit plus dans ce scenario => reecrit sur 3 champs pre-positionnes a la valeur INVERSEE (preuve de copy-out BEAUCOUP plus forte : l ancienne forme asserait des FALSE deja vrais avant l appel). 1 ECHEC RESIDUEL ESCALADE ET EXCLU DU LOT : TC-P10-029.1 = PERTE DE LA BORNE DE RECUL — les deux branches d arret a M2StartPosM ont ete retirees le 2026-09-05 par le commit 2a307b5b ; LeftStartSinceArm reste AFFECTE (FB_Bucket.st:561) mais n est plus JAMAIS LU (code mort) et la fiche promettait encore la borne. Aucun arbitrage humain trace => SIGNALE, non corrige.
+    (2) PURGE DE L ARGUMENT MORT : 27 sites MotionRequestActive := TRUE retires (le nom ne subsiste qu en commentaires) ; comportement inchange, chaque site portait deja la vraie entree ReqAscent/ReqDescend.
+    (3) GARDE-FOU G512 (TOOLS/AGENT_WORKFLOW/scripts/G512_check_dead_ci_test_arguments.py, ligne PLANS 512) : detecte tout argument nomme hors interface declaree du FB teste, distingue MORT SILENCIEUX (membre interne VAR -> test VACANT, bloquant) de MORT BRUYANT (nom inexistant -> erreur de compilation deja visible, avertissement). AVANT purge : 27 bloquants, tous MOTIONREQUESTACTIVE. APRES : 0 bloquant, 108 avertissements HORS LOT (test_fb_winch, _winchdirectioninterlock, _winch_speed_learning — non traites, perimetre interdit). --selftest PASS (mutation re-injectee dans le VRAI test_fb_bucket.st detectee, aucune forme conforme signalee a tort).
+    (4) FICHE FB_Bucket_v1.0.md REALIGNEE : mapping ErrorId EXACT (bit 0..4 = valeur 1/2/4/8/16 = index de cause, FB_FaultCore.st:49-57 ; timeout = cause 2 = bit 2 = 4), semantique du watchdog de temps de commande ENGAGEE (gel + cumul + RAZ fin de manoeuvre et Reset sur front), interface reelle (ReqAscent/ReqDescend + EffectivePermitBucket_*, MotionRequestActive presentee a tort comme entree = corrige), etat publie continu (T247), TC-P10-025 anti-traversee non cablee (T175) corrige (elle EST cablee :484/:488), TC-P10-029/030/031/046.1/047.1 reecrits, TC-P10-047.2 ajoute, alertes 5 a 8 ajoutees (chap. 4/5 DiveSearch+ExtractionSequence = composants RETIRES du code).
+    PREUVES : CI FB_Bucket 27/36 -> 35/36 (36 tests, 119 -> 150 assertions, AUCUNE supprimee ; les 4 tests T295 TC-P10-046.1 a 046.4 INCHANGES et VERTS) ; bundle frais 260/260 objets 0 erreur ; G200 --report PASS (0 erreur, 2030 instances) ; palier C 45/51 PASS avec G512 PASS, seuls echecs G300/G340/G408/G430/G483 (5 dettes PREEXISTANTES, aucun fichier du lot cite) + G504 (T330 en vol, hors lot) ; G340 : 1 erreur preexistante CORRIGEE (lien mort FB_DiveSearch.st), aucune ajoutee.
+    ARBITRAGES DEMANDES A L ORCHESTRATEUR : (1) restaurer la borne de recul OU acter la perte et purger le temoin mort LeftStartSinceArm ; (2) plus aucune detection d etat contradictoire (StateIncoherent n est pose que sur neutralisation avec manoeuvre engagee, :300-303, alors qu il conditionne ActiveOffsetValid :747 ; un recouvrement de bandes CoherenceLimitM >= (OffsetCloseM-OffsetOpenM)/2 publie IsOpen=IsClosed=TRUE sans signal) ; (3) version/archivage de la fiche (v1.0 editee en place — un bump _vX.Y = decision HUMAINE) ; (4) sort des 3 fichiers de test H_TREUILS_BENNE qui passent des arguments inexistants et ne compilent plus.
+    REX HARNAIS (a diffuser) : STruCpp NE REMET PAS A ZERO les entrees non repassees entre deux appels (instance C++ persistante) — un test peut heriter du scan precedent ; c est ce piege qui a fait echouer le 1er jet de TC-P10-029 (ReqAscent restait TRUE en meme temps que ReqDescend => MotionRequestConflict neutralisait la demande). AUCUN COMMIT.'
+  titre: 'Réalignement tests & doc benne : 9 tests CI obsolètes + fiche FB_Bucket_v1.0.md + purge de l''argument nommé mort MotionRequestActive'
+  contexte: 'Trois dettes mesurées, préexistantes au lot T295. (1) La suite CI H_TREUILS_BENNE est à 27/36 : les 9 échecs sont les MÊMES avant et après T295 (24/33 au run 11:56:34, 27/36 au run 18:34:34, delta T295 = 0) — TC-P10-023, TC-P10-024, TC-P10-025.2, TC-P10-029, TC-P10-029.1, TC-P10-030, TC-P10-047.1, TC-P10-047.2, T181-21. Cause établie : tests désalignés du code actuel (permis EffectivePermitBucket_* non passés, classification d''état continue, StateIncoherent désormais posé à FB_Bucket.st:242 seulement). (2) DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md:219-224 décrit encore l''ancienne sémantique du watchdog de timeout (« maintien sans fin de manœuvre ») et :283 donne un mapping ErrorId faux (bit 0 = Timeout, alors que le code porte Timeout = cause 2 donc bit 2, FB_FaultCore.st:49-57). (3) ~30 sites de TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st passent l''argument nommé MotionRequestActive := TRUE, silencieusement IGNORÉ par le harnais STruCpp (MotionRequestActive est un VAR local de FB_Bucket.st:127, calculé en :162-163 après T295) ⇒ tests potentiellement vacants.'
+  description: 'Trier et traiter les 9 tests en échec (test obsolète à réécrire, ou défaut de code réel à signaler sans le corriger), purger les arguments nommés morts du fichier de test en pilotant les vraies entrées, ajouter un garde-fou automatique détectant tout argument nommé absent de l''interface du FB testé (branché dans PLANS, avec --selftest), et réaligner la fiche FB_Bucket_v1.0.md sur la sémantique réelle (temps de commande engagée) et sur le mapping ErrorId exact. Aucun fichier de CODE/ modifié.'
+  objectifs:
+  - 'Chaque test en échec est trié : nom, cause d''obsolescence sourcée fichier:ligne côté code, verdict (test obsolète / défaut de code réel), action.'
+  - 'La suite FB_Bucket passe à 36/36 PASS, ou tout échec résiduel est escaladé avec sa preuve et exclu explicitement du lot.'
+  - 'Aucun test désactivé, supprimé ou affaibli : nombre d''assertions non décroissant, chaque assertion retirée remplacée et justifiée.'
+  - 'L''argument nommé mort MotionRequestActive est purgé des tests et remplacé par le pilotage des vraies entrées (ReqAscent/ReqDescend).'
+  - 'Garde-fou G508 (ou identifiant libre suivant) : tout argument nommé mort dans un appel de test échoue le gate, branché dans PLANS, --selftest rejetant des mutations.'
+  - 'Fiche FB_Bucket_v1.0.md réalignée : sémantique réelle du watchdog benne + mapping ErrorId exact (timeout = cause 2 = bit 2 = valeur 4).'
+  - 'Aucun fichier de CODE/ touché ; les 4 tests T295 (TC-P10-046.1 à 046.4) restent inchangés et verts.'
+  - 'Bundle frais, G200 liaison et gates palier C avant restitution, avec comparatif avant/après des rapports CI.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T339_BENNE_TESTS_DOC_REALIGN.yaml
+  bloque_par: []
+- id: T338
+  parent_id: ''
+  statut: ⏳
+  criticite: C1
+  domaine: TREUILS_BENNE / ENCODEURS / SECURITE_MESURE
+  agent: DSH10
+  locked_at: '2026-09-20T19:34:00+02:00'
+  avancement: 'PHASE 1 (diagnostic) CLOSE le 2026-09-20T19:37 par DSH10 — read-only CODE/, aucun correctif, aucun commit. Fiche : DOC/WFLOW/TROUBLESHOOTING/TROUBLESHOOTING_T338_PositionM2_Figee_2026-09-20.md.
+    VERDICT TRANCHE = (a) BUG SIMULATEUR SEUL. (b) REFUTE : la valeur publiee par FB_SimBench (0) est celle lue cote HwIn (J_LevageUnitaireM2.Inputs_100.Idx101_EncoderRawPos = HwIn.Winch.COD2_PosValue = 0, snapshot 20260920_172509.csv:27/253) -> routage intact, il transporte une valeur morte. (c) REFUTE : FB_Encoder recopie 0 (FB_Encoder_Abs.st:117) et en deduit 23,5 m avec une precision au point (FB_Encoder_Scale.st:34-38 ; ref M2 deduite = -96256 pts) -> la chaine codeur fait exactement son travail. AUCUNE escalade C0 : le code commun M1/M2 n est PAS la cause du blocage. NOTE : la premisse de (c) est fausse par construction — FB_Encoder n integre JAMAIS la position depuis une frequence, les deux PDO (position absolue / vitesse 0x6031:01) sont independants et sans controle croise.
+    CAUSES RACINES (3) : CR1 FB_Sim_Encoder.st:128-133 (plancher dur RawPos := 0 en branche descente) + :136 (TargetSpeedMps := -SpeedMps non coupe par la butee) => position figee + vitesse pleine -525 (-1,75 m/s) + ZERO defaut = symptome 1 EXACT. CR2 FB_SimBench.st:273-280 + :176-177 (re-injection silencieuse RawPosM2 = 0 => CST_M2EncoderInitialRaw = 1100000 pts, saut de 268,55 m en un scan) = symptome 2, PROUVE PAR MESURE : HomingRefRaw M2 au snapshot 20260920_174333.csv vaut 1003744 = 1100000 - 96256, valeur impossible sans un raw valant exactement 1100000. Chemin du 204,677 m : ref conservee + reinjection => saut (1100000 - R0)/4096 = 196,177 m pour R0 = 296459 pts (8,50 + 196,177 = 204,677, unique inconnu non capture). CR3 FB_Encoder_Homing.st:230/:243/:249/:263-266 : readback de homing MATHEMATIQUEMENT CIRCULAIRE (PendingHomingRefRaw = RawPos - TargetPoints puis CandidateRawDiff = RawPos - PendingHomingRefRaw = TargetPoints quel que soit RawPos) => un codeur fige est CERTIFIE reference (Homed=TRUE, HomingSuspect=FALSE).
+    AVEUGLEMENT : AG1 FB_Encoder_Homing.st:181-190/:285-287/:290 + PRG_02:594/:649 (Enable := TRUE constant => InitDone jamais rearme) : LastKnownRawPos rafraichi en continu depuis le raw => tout saut INTRA-SESSION est structurellement invisible a HomingSuspect. AG2 FB_Safety_Winch.st:437-443 + :247-254 + PRG_04:415-424/:920/:990/:1017 : la Cause 15 (absence de mouvement malgre commande) est INHIBEE pendant toute manipulation benne (NOT RefWindowActive / NOT BenneBusy) => ErrorNoMovement = FALSE au moment du defaut. AG3 aucun controle croise position <-> vitesse (FB_Encoder.st:184-190 + FB_EncoderReliability.st:30).
+    PISTE RETAIN : REFUTEE comme cause du saut (Calib.LastKnownRawPos n est lu QU EN FB_Encoder_Homing.st:183 — il n alimente aucun calcul de position ; la reference qui saute est Calib.HomingRefRaw, ST_Encoder_Calib.st:12) ; CONFIRMEE comme cause d aveuglement (cf. AG1). Nuance : le rafraichissement continu est legitime sur machine reelle (detecter un mouvement hors tension) ; ce qui manque est la detection d un saut intra-session.
+    POURQUOI M2 SEUL : aucune asymetrie de code M1/M2 (etages symetriques ; GVL_PERSISTENT.st:157-158 initialise les DEUX raw a 1000000) ; seule difference = historique de comptage (butee 0 atteinte apres ~244 m de descente nette cumulee) => FAUTE LATENTE SUR M1.
+    120 pourcent ouverture benne : Delta = M2-M1 = -3,0 m dans FB_Bucket.st:650-655 avec OffsetOpenM=0.0 / OffsetCloseM=15.0 (GVL_PERSISTENT.st:64-82) ; non bornage volontaire (FB_Bucket.st:645-648) = signal de diagnostic, pas un defaut propre.
+    RESTE A FAIRE : validation humaine du diagnostic AVANT tout correctif ; 5 questions ouvertes (dont Q2 = test falsifiable : a 204,677 m, FB_Encoder_Safety.st:53/81 doit poser Idx311_ErrorEncoder=TRUE alors que HomingSuspect reste FALSE ; si FALSE, le verdict est faux ; et Q4 = contradiction documentation/code PRG_04:404-405 vs FB_Safety_Winch.st:248-249/:453). Aucun correctif applique, aucun commit.
+
+    ===== PHASE 2 (OPTION 1) — CORRECTIF APPLIQUE le 2026-09-20T20:35 par DSH10 =====
+    GO CC01 recu (Option 1). Contrat C2 : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T338_SIM_ENCODER_FLOOR.yaml (check_task_contract.py PASS 0 erreur / 0 avertissement).
+    CORRECTION (CODE/L_SIMULATION/FB_Sim_Encoder.st) : (1) plancher muet `ELSE RawPos := 0` SUPPRIME en descente ET en roulis arriere — le comptage brut est traite en entier SIGNE 32 bits (idiome DINT_TO_UDINT(UDINT_TO_DINT(...)) deja present dans le meme fichier) : la descente FRANCHIT 0 au lieu de s y figer ; (2) branches de montee alignees sur la meme arithmetique signee explicite (supprime aussi le rebouclage UDINT silencieux a 2^32) ; (3) NOUVELLE garde de plage §3bis : +/-CST_CountTravelLimitPts (2^30 pts = 262 144 m, demi-plage signee) => comptage borne + `CountSaturated := TRUE` au MEME scan + vitesse de mouvement purgee (RawSpdOut = 0) ; (4) CountSaturated remis a FALSE hors Enable ; (5) NOUVELLE VAR_OUTPUT CountSaturated : BOOL. UNE SEULE correction de code couvre M1 ET M2 (meme FB, deux instances instSimEncoderM1/M2 dans FB_SimBench).
+    Q3 TRANCHEE PAR L AGENT (conformement au GO) : conteneur UDINT CONSERVE, aucune VAR_INPUT modifiee — la semantique signee est DEJA celle de toute la chaine aval (FB_Encoder_Scale.st:34, FB_Encoder_Homing.st:183/230/243 via UDINT_TO_DINT, prouve par l incident : ref M2 = -96256 pts). Passer le type en DINT aurait impose de toucher FB_SimBench/GVL_PERSISTENT (verrouilles) sans aucun gain de correction.
+    SPEC REALIGNEE : DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md (nouvelle version) — TC-P13-032 « ne descend jamais sous 0 » REMPLACE par franchissement continu de 0 + saturation signalee ; TC-P13-036/037/038 ajoutes ; TC-P13-031 passe NV -> V-I. ALERTE : TC-P13-032 etait marque NV (non implemente) au catalogue alors que le code l implementait — c est cette exigence qui a produit l incident. Chaine mise a jour : chapo AF-13 (2 liens v1.0 -> v1.1), TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml (af_doc), cartouche ST.
+    TESTS : 5 tests ajoutes/revises dans TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_encoder.st (TC-P13-036 = regression DIRECTE du blocage M2 : comptage a 0 + descente -> -41 pts, ne reste pas a 0). CI FB_Sim_Encoder : 9/9 PASS, 0 FAIL. 1er run 6/9 : deux attentes de test erronees (REAL_TO_UDINT ARRONDIT 40,96 -> 41 ; le harnais re-injecte le VAR_IN_OUT avant chaque appel, donc la memoire doit etre pilotee par le test comme par le caller reel) — corrige, aucune assertion affaiblie.
+    GARDE-FOU (fix: + guard:) : TOOLS/AGENT_WORKFLOW/scripts/G510_check_sim_silent_floor.py — refuse toute butee litterale sur un comptage brut de position (*RawPos*, *PosPts*, *Odom*) sans saturation signalee ni marqueur @floor-ok ; --selftest PASS (motif d incident re-injecte dans le fichier REEL -> detecte ; aucune forme conforme ni marquee signalee a tort) ; branche palier C dans run_all_gates.py (ligne 510).
+    PREUVES : G200 --report PASS (135 OK / 0 KO, 2006 instances) · palier C 41/46 PASS avec les 5 MEMES dettes pre-existantes qu avant le lot (G300/G340/G408/G430/G483) => AUCUN echec introduit, G510 PASS · bundle CODE_XML/CODE_Bundle.xml frais (G390 PASS) + CODE_XML/CODE_DiffBundle.xml (FB_Sim_Encoder) · G340 : aucune erreur ajoutee, 1 seul AVERTISSEMENT D3 attendu (deux versions actives de FB_Sim_Encoder ; archivage de v1.0 = decision HUMAINE, non faite) · G430 : rien releve dans FB_Sim_Encoder.st.
+    HORS LOT (remonte, non traite) : CR2 = re-injection silencieuse RawPosM2 = 0 => 1100000 points dans FB_SimBench.st:273-280 (verrou DSH03) — cause DIRECTE du saut post-AU ; sans CR2 le symptome 2 peut se reproduire. AG1 (InitDone une seule fois par session) = candidat T339/T341, non trivial. AG2 = garde-fou absence de mouvement inhibe en manipulation benne + contradiction documentation/code (Q4) — remontee separement par CC01. Q5 = AUCUNE purge des memoires RETAIN de banc. Q1 = vitesse m/s non exposee, seulement avec accord humain. Observation connexe non corrigee : Increment = 0 (SpeedScaleFactor = 0) fige la position en publiant la vitesse pleine — meme famille, autre chemin, lot dedie.
+    RESTE : recette HUMAINE (integration CODESYS manuelle + essai banc : M2 en descente -> position qui evolue avec la vitesse, CountSaturated FALSE en usage reel) ; test Q2 falsifiable au prochain essai ; CR2. AUCUN COMMIT.'
+  precision_utilisateur_20260920: 'CORRECTION IMPORTANTE : ce n''est PAS un plantage general du simulateur. M1, les
+    contacteurs, homme-mort, contacteurs de direction/vitesse fonctionnaient tous normalement. Le probleme est
+    STRICTEMENT LOCALISE a M2 : sa position (brute ET corrigee) restait figee alors que le reste de la chaine
+    fonctionnait. Le saut a 204,677 m observe apres AU/rearmement est une CONSEQUENCE de ce meme blocage M2, pas un
+    second incident independant. Perimetre du diagnostic a garder etroit : chaine M2 uniquement (FB_Encoder instance
+    M2, HwIn cote M2, FB_SimBench cote M2), ne pas elargir a M1 ni a une hypothese de panne generale simulateur.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T338_SIM_ENCODER_FLOOR.yaml
+  date: '2026-09-20T20:35:00+02:00'
+  updated_at: '2026-09-20T20:35:00+02:00'
+  titre: 'Position M2 (encodeur) figee malgre vitesse non nulle et contacteurs actifs — recurrent, cause non etablie'
+  contexte: 'Constat terrain reproduit 2 fois le 2026-09-20 : commande de descente/ouverture engagee, homme-mort + contacteurs
+    de direction + contacteurs de vitesse tous actifs et synchronises M1/M2, mais la position M2 (Idx102_M2_CablePos_M,
+    confirmee position BRUTE encodeur, pas seulement la position corrigee) ne bouge PAS alors qu''une vitesse non nulle
+    (m/s) est lue ailleurs. Effet de bord observe : le blocage a produit un affichage 120% d''ouverture benne (BucketOpening_Pct
+    non bornee par conception -- signal visible d''un delta M2-M1 devenu incoherent). Snapshot GVL_Troubleshooting
+    Snapshot_Troubleshooting_20260920_172509.csv (536/536, propre) confirme au moment du test : Step=AX3_OPEN_BUCKET,
+    O_MotionM2.RelayRevActive=TRUE, SpeedContactor1Active=TRUE, aucune erreur active. Probleme DEJA RENCONTRE par le passe
+    (mentionne par l''utilisateur, non trace a ce jour dans le catalogue) : "en triturant un peu le programme on se retrouve
+    completement bloque avec le simulateur".
+    SYMPTOME 2 AJOUTE 2026-09-20 (meme investigation) : suite au blocage (M1/M2 references a la meme position, plus aucun
+    mouvement possible), l''utilisateur declenche un arret d''urgence puis rearme. Apres rearmement, M2 saute de 8,50 m a
+    204,677 m (incoherence massive) ALORS QUE Homed reste TRUE (aucune alerte HomingSuspect). Hypothese de travail (non
+    prouvee) : meme famille que la pollution RETAIN deja signalee hors-scope par l''agent T328 le 2026-09-20
+    (FB_Encoder_Homing.st:286, Calib.LastKnownRawPos recopie en continu depuis RawPos, champ RETAIN) -- si un
+    compteur/accumulateur interne continue d''evoluer pendant que la position AFFICHEE est figee (coherent avec le
+    symptome 1 : vitesse non nulle, position figee), le rearmement peut recharger cette valeur polluee sans que
+    Homed/HomingSuspect ne le detecte. A PROUVER, pas a supposer.'
+  description: 'Diagnostic formel (troubleshooting) avant tout correctif. Verifie code CC01 (2026-09-20) : cablage FB_Encoder
+    M1 vs M2 dans PRG_02_Acquisition.st (instEncoderM1/instEncoderM2, lignes ~588-670) STRUCTURELLEMENT SYMETRIQUE, aucune
+    asymetrie de code trouvee entre les deux instances. La position brute M2_CablePos_M (Data.EncoderM2.Measurement.CablePosM)
+    integre une frequence recue via HwIn ; en simulation cette frequence est injectee par FB_SimBench (instWinchElectricalM2).
+    Localiser PRECISEMENT ou la chaine casse : (a) FB_SimBench ne produit pas de frequence simulee valide pour M2 (bug
+    simulateur seul), (b) la frequence SimBench est correcte mais n''atteint pas HwIn cote M2 (routage simulation, meme
+    classe de bug que le REX FB_Sim_Safety cite dans le preambule), ou (c) HwIn recoit bien la frequence mais FB_Encoder
+    n''integre pas la position pour M2 (bug potentiellement present aussi sur machine reelle -- CODE COMMUN M1/M2, gravite
+    maximale si confirme).'
+  objectifs:
+  - 'Reproduire scan par scan (trace ou 2 snapshots espaces de quelques secondes, meme commande active) : preuve formelle
+    que la position M2 est figee alors que la commande et les contacteurs restent actifs.'
+  - 'Localiser le point de rupture exact dans la chaine SimBench -> HwIn -> FB_Encoder pour M2, fichier:ligne, en comparant
+    avec la chaine M1 (qui fonctionne) a chaque etape.'
+  - 'Trancher explicitement : bug simulateur seul (chaine d''injection simulation) ou bug de code commun M1/M2 (FB_Encoder)
+    potentiellement present sur machine reelle. Ne jamais laisser cette question sans reponse.'
+  - 'Si bug simulateur seul : corriger sans toucher FB_Encoder ni la chaine reelle. Si bug commun : escalader en C0 (securite
+    machine reelle) avant tout correctif, avec preuve.'
+  - 'Expliquer et, si necessaire, corriger le debordement BucketOpening_Pct (120%) comme consequence tracee de la position
+    M2 figee, pas comme un defaut independant.'
+  - 'Test de non-regression : M2 et M1 bougent de facon coherente sous commande active, en simulation, avant cloture.'
+  - 'Investiguer le SYMPTOME 2 (saut 8,50 -> 204,677 m apres AU/rearmement, Homed toujours TRUE) : confirmer ou refuter le
+    lien avec la pollution RETAIN FB_Encoder_Homing.st:286 ; si confirme, corriger la source ET renforcer HomingSuspect
+    pour detecter ce cas (aucun saut de position ne doit rester invisible a Homed/HomingSuspect).'
+  recuperation_observee_20260920: 'Utilisateur : le blocage n''a ete leve que par un cycle complet (sortie simulation ->
+    retour simulation -> plusieurs AU) -- pas par une action isolee. Suggere une initialisation de simulation partiellement
+    ratee/etat transitoire non reinitialise proprement, plutot qu''une corruption permanente. Piste a verifier : quel
+    signal precis (SimulationModeActive front, ou un des sous-flags Sim*Active) est cense reinitialiser la chaine encodeur
+    et pourquoi un seul cycle ne suffit pas toujours.'
+  bloque_par: []
 - id: T336
   parent_id: ''
-  statut: ⬜
+  statut: "✅"
   criticite: C2
   domaine: CYCLE_HOMING / SECURITE_REFERENCEMENT
-  agent: '—'
-  date: '2026-09-20T17:15:00+02:00'
-  updated_at: '2026-09-20T17:15:00+02:00'
+  agent: CDX02
+  locked_at: '2026-09-20T17:57:20+02:00'
+  date: '2026-09-20T18:10:00+02:00'
+  updated_at: '2026-09-20T18:10:00+02:00'
+  completed_at: '2026-09-20T18:10:00+02:00'
   titre: 'Cycle homing (Graphe 7) : état des lieux exhaustif — étapes, commandes, transitions — avant refonte du référencement'
   contexte: 'Mail GCAM 15/09 : "Cycle homing : intégration et test complet à faire. Le cycle est actuellement buggué." Sujet resté sans tâche dédiée (numéro T302 du mail réutilisé depuis pour un autre sujet, cf. REGISTRE_MES_PostMiseEnService_20260922.md #17). Relancé par l''utilisateur le 2026-09-20, urgence planning : doute sur le référencement "au vol" par capteur pendant le homing (interdictions suspectées, faisabilité à vérifier), et rappel que la définition "fermé/ouvert" a changé plusieurs fois dans le temps sans qu''un état des lieux à jour existe. PHASAGE VOULU par l''utilisateur : Phase 1 = analyse exhaustive seule (ce lot) ; Phase 2 = définition avec l''utilisateur, PAS dans ce lot.'
   description: 'Phase 1 UNIQUEMENT, read-only CODE/. Cartographier le Graphe 7 (FB_CycleMachineHoming.st, E_MachineHomingTxState.st, FB_Encoder_Homing.st) : chaque étape, chaque commande émise, chaque condition de transition, dans un format clair (tableau ou diagramme d''état). Mettre en relation avec les demandes passées retrouvées dans TASKS.yaml et les contrats existants (chercher toute tâche T2xx/T3xx touchant homing, référencement, cible dynamique benne fermée/ouverte). Identifier explicitement les points où un référencement "au vol" (pendant mouvement, via passage capteur) est utilisé, autorisé ou explicitement interdit dans le code actuel, avec fichier:ligne — sans proposer de correctif. Isolé du reste (G_CYCLE non verrouillé) : peut tourner en parallèle des autres chantiers.'
@@ -16,6 +236,7 @@ tasks:
   - 'Recensement des tâches passées liées au homing/référencement/benne fermée-ouverte (grep TASKS.yaml + CONTRACTS/), avec ce qui a été décidé puis changé, daté.'
   - 'Cartographie précise du référencement "au vol" : où il existe dans le code, sous quelles conditions il est permis/interdit, fichier:ligne — sans trancher si c''est une bonne idée, juste l''état des faits.'
   - 'Aucune proposition de correctif ni de nouvelle conception dans ce lot : réservé à la Phase 2 avec l''utilisateur.'
+  avancement: 'PHASE 1 LIVREE par CDX02 le 2026-09-20 : fiche DOC/WFLOW/TROUBLESHOOTING/TROUBLESHOOTING_T336_CycleHoming_Graphe7_2026-09-20.md. Graphe 7 releve HX0/HX1/HX2/HX2N/HX3/HX3N/HX4/HX5/HX6/HXF, transitions erreur/timeout incluses. Fait central : HX3 demande M1/M2 au vol sur front descendant capteur; confirmation preset ensuite dans FB_Encoder_Homing. Divergence factuelle a arbitrer en Phase 2 : AF-09 documente cible dynamique M2 et variante benne ouverte, tandis que le Graphe 7 force la cible dynamique inactive et publie CommitClose. Aucun CODE/ modifie, aucun correctif propose, aucun commit.'
   bloque_par: []
 - id: T335
   parent_id: ''
@@ -40,9 +261,9 @@ tasks:
   criticite: C3
   domaine: CYCLE_SEMIAUTO / TRANSLATION_M3 / SECURITE_MOUVEMENTS
   agent: 'DSH07'
-  date: '2026-09-20T15:58:30+02:00'
+  date: '2026-09-20T16:47:46+02:00'
   locked_at: '2026-09-20T15:58:00+02:00'
-  updated_at: '2026-09-20T15:58:30+02:00'
+  updated_at: '2026-09-20T19:08:57+02:00'
   titre: 'Translation M3 : pourquoi deux chemins de commande (manuel/MAINT vs cycle auto) ? Chaînes complètes, comparatif, et dépassement P1/Trémie en cycle'
   contexte: 'Constat utilisateur 2026-09-20 : en manuel et en maintenance, M3 s''arrête correctement sur les fins de course (machine en service depuis des semaines). En cycle automatique, à l''arrivée sur P1 ou Trémie, le chariot continue d''avancer. Question de fond posée par l''utilisateur (recadrage 15:45) : en POO, l''axe M3 devrait recevoir UN ordre de marche (vers extrémité / vers Maintenance / vers P1) quel que soit le demandeur ; passer par des voies différentes selon le mode est anormal et explique probablement les comportements différents. Lié à : T287 (défaut frein aux mêmes arrivées, CDX01), T300 (reproduction SimBench de la perte capteur ~1 s), T333 (recalage estimateur), T204 (enforcement permits M3).'
   description: 'ANALYSE D''ABORD, façon troubleshooting descendant. (1) Chaîne MANUELLE complète, de haut en bas : joystick -> variables intermédiaires -> arbitrage -> FB_Translation -> interlock final -> mots variateur (CommandWord / SetpointFrequency / frein), chaque variable nommée avec producteur et consommateur fichier:ligne. (2) Même chaîne pour le CYCLE AUTO (PRG_03 étapes AX -> PRG_05 -> ...). (3) Tableau comparatif hiérarchique des deux chemins : où ils divergent, où ils convergent, quelles conditions d''arrêt (P1/Trémie) existent sur l''un et pas sur l''autre. (4) Verdict argumenté : la divergence est-elle obligatoire, modifiable, ou une anomalie de conception ? Proposition d''unification (l''axe reçoit un ordre de marche unique, les demandeurs ne font que produire cet ordre). (5) Seulement ensuite : cause du dépassement P1/Trémie en cycle, prouvée par trace. Correctif sous contrat C3 et plan validé. Aucun code avant validation humaine du comparatif.'
@@ -57,16 +278,19 @@ tasks:
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T334_AUTO_CYCLE_M3_OVERSHOOT.yaml
   bloque_par:
   - 'T300 P-A (reproduction SimBench de la perte capteur) si aucune trace réelle 10 ms n''est disponible.'
+  avancement_phase2: 'GO CC01 2026-09-20 : verdict de la PHASE 1 ACCEPTE (verifie sur 3 points durs : verrou d arret de l axe, asymetrie AX14, front montant seul du decodeur). Etape en cours = CAMPAGNE DE TRACE 10 ms selon le protocole A/B/C. (1) CONTRAT C3 CREE — le constat A01 de la fiche est leve : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T334_AUTO_CYCLE_M3_OVERSHOOT.yaml, check_task_contract.py PASS (0 erreur, 0 avertissement), 10 criteres AC1-AC10 dont les 2 criteres structurels exiges par le gate T8 pour toute ecriture CODE/M_MAIN, 6 questions Q1-Q6 a trancher avant code, contrat de conservation et interdits des chantiers concurrents. (2) CAMPAGNE DE TRACE RENDUE TURNKEY : DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md — liste des canaux a copier telle quelle (7 groupes A a G), reglage de trace MainTask 10 ms avec repli en 3 sous-traces si buffer limite, 3 scenarios A (cycle nominal) / B (cycle + intermittence capteur ~1 s) / C (MAINT manuel, geste identique), matrice de decision signature vers hypothese, post-traitement trace_to_csv.py, interdits. LE RUN RESTE HUMAIN (CODESYS) : l agent ne peut pas executer une trace PLC. (3) 3 FAITS MESURES integres a la fiche : les internes d instance par chemin pointe, imbriques compris, SONT tracables (releve trace_treuils_charge_v1.txt) donc la preuve de H2 est techniquement possible ; Suivi_Cycle_M3_20260906_49.trace est a dt median 100 ms (77 a 128 ms) avec 15 canaux sans jeton ni interne d axe ; les traces SIMU_MaintMANU_20260919 ne contiennent AUCUNE variable M3, donc la comparaison manuel contre cycle n existe pas au depot. (4) LIEN H1 vers T287 note dans la fiche : meme lieu (arrivees Tremie ET P1), meme signal d entree (rebond capteur ~1 s), meme verrou de preuve (aucune trace 10 ms) ; la campagne trace explicitement les canaux frein et coupure dure pour que le porteur read-only de T287 reutilise la trace. Aucune correction de T287 dans ce lot. (5) PROCHAINE ETAPE : run de trace humain, puis analyse canal par canal (section 9 de la fiche), puis arbitrage Q1-Q6, puis PHASE 2 (conception). ARRET DE L AGENT : zero fichier CODE/, zero test, zero gate, zero commit.'
+  arbitrage_q1_q6: 'ARBITRAGE PHASE 2 RENDU le 2026-09-20 par DSH07, ZERO code — livrables : DOC/WFLOW/CONTRACTS/PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md (7 invariants, lots L0 a L4 sequences, AC11 a AC16, alertes Q7/A13-A18, 5 decisions humaines D1 a D5) + bloc decisions Q1 a Q6 du contrat C3 (check_task_contract.py PASS 0 erreur / 0 avertissement) + 2 citations du contrat parent corrigees. Q1 (autorite de l arret) OUI : le verrou appartient a l AXE (FB_Translation.st:179-183), arme par la SEULE detection d arrivee et JAMAIS leve par la perte de la demande ; relachement inchange (demande de sens inverse seule, :202-204) ; effet = H1 neutralise a la racine, le terme ArrivalLock maintenant la rampe a 0 (:251) meme si le demandeur recree sa demande. Q2 (cible) NON : la cible d etape reste la cible d arrivee en SEMI_AUTO ; la faire suivre le sens en AX2 detruirait le chemin de recuperation de depassement documente (FB_CycleSemiAuto.st:905-906 + branche :1549-1557 WT, jeton P1 arme sur les DEUX fronts de son capteur). Q3 (retrait de demande) OUI option (a) : le demandeur conserve demande ET cible jusqu a ArrivalLock + arret physique confirme ; option « la barriere commande l arret » REJETEE (duplication du producteur d arret, AF_Partie-02:502). Q4 (bypass) OUI : garde de mode au point de CONSOMMATION (PRG_05:468 et :571), doctrine MAINT_N2 (ST_BypassTranslation.st:4-5) ; PRG_07 (interdit au contrat) non touche, la garde rend inoffensive la restauration RETAIN (:336-346). Q5 (escalade butees) HORS LOT : FB_Safety_Translation.st interdit au contrat ; ecart confirme et chiffre — spec AF_Partie-11 v2.4:346-351 (0 / 2,5 s / 5 s) vs code :202 (1,5 s) et :268 (PowerCutOff immediat des que le bit 6 est actif). Q6 (config morte _TranslationAutoSpeedCap_Pct) HORS LOT + recommandation SUPPRIMER (0 lecteur, GVL_PERSISTENT.st:97, alors que le cycle commande 100 % fixe). LOT PHASE 2 « uniformiser AX2/AX14 sur AX3 » DEFINITIVEMENT ARRETE : challenge §10bis MAJOR, mecanisme confirme sur le code — TranslationStopTimer exige 500 ms CONTINUS de jeton d arret (FB_CycleSemiAuto.st:334-338) alors que le re-armement de la demande est IMMEDIAT (:913) par des permis qui n exigent PAS le neutre (:716-717) => sous capteur qui rebondit la transition ne peut JAMAIS s armer et le chariot peut ramer indefiniment : le retour au neutre etait la SEULE soupape. Les gardes :718 (JoystickPushOnly) et :1395 WT (NOT JoystickDeflected) RESTENT EN PLACE (ne pas defaire T319 sans garde equivalente). PREALABLE DE TRACABILITE NON LEVE : FB_CycleSemiAuto.st porte une edition non committee de T331/DSH09 (+4 lignes au-dela de :1224, ecriture 18:13:32) et reste sous VERROU D ECRITURE T331 => le lot sequenceur L2 est BLOQUE et une revision doit etre figee avant le premier diff de CODE/. Ordre impose par la preuve : L0 prouver (trace 10 ms, run humain) -> L1 l axe possede l arret -> L2 le demandeur s aligne -> L3 sort du neutre (optionnel, conditionne a L1+L2 prouves). Decisions humaines ouvertes avant L1/L2 : D1 garde de mode des bypass, D2 config morte supprimer ou reactiver, D3 coupure dure Tremie contre arrivee nominale (nouvelle question Q7, a trancher sur trace), D4 abandon de l uniformisation du neutre, D5 sequencement apres liberation du verrou T331.'
   avancement: 'ETAPE 1 (ANALYSE) LIVREE par DSH07 (tag verifie dans TASK_LOCKS.json : DSH01..DSH06 pris/contamines, DSH07 pris). Fiche DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md. RESULTAT PRINCIPAL : la premisse "deux voies vers l axe" est FAUSSE au niveau de l axe -- FB_Translation est appele une seule fois (PRG_05:537), l arbitre FB_TranslationCmdArbitrationM3 est unique (PRG_05:363), la barriere FB_TranslationOutputInterlock est unique (PRG_06:434-451), les mots variateur sont uniques (PRG_06:457-459) : les deux demandeurs CONVERGENT avant l axe. La divergence reelle porte sur la PROPRIETE DE L ARRET : en manuel l arret est un verrou LATCHE dans l axe (FB_Translation.st:180,192,196 ; relache seulement par demande de sens inverse :202-204) ; en cycle c est le RETRAIT DE LA DEMANDE par le sequenceur (FB_CycleSemiAuto.st:899 AX2, :1386 AX14), donc RE-ARMABLE par un rebond capteur. VERDICT : ANOMALIE PARTIELLE -- separation des sources OBLIGATOIRE et conforme (AF_Partie-04:179, AF_Partie-02:220) ; duplication de la fonction d arret NON conforme (AF_Partie-02:502 "une commande unique par mouvement" ; CODE_QUALITY_STANDARDS §5 producteur unique). 2 chaines relevees fichier:ligne : MANUELLE 66 lignes (M01-M66), CYCLE AUTO 35 lignes (C01-C35). 10 divergences sourcees (dont : cible d arret FIGEE par l etape FB_TranslationCmdArbitrationM3.st:65 au lieu de suivre le sens -- contredit ses propres commentaires FB_CycleSemiAuto.st:905-906 et PRG_05:404-407 ; asymetrie AX2 PositionTgt=3 conserve :900 vs AX14 PositionTgt=0 :1387 ; SpeedPct=100 fixe :74 alors que _TranslationAutoSpeedCap_Pct 40% GVL_PERSISTENT.st:97 n a AUCUN lecteur ; bypass FdC non filtre par le mode PRG_05:571 + restaure au boot PRG_07:230-235, alors que la doctrine dit MAINT_N2 uniquement). CONDITION D ARRET ABSENTE EN CYCLE : la cible capteur + debounce 100 ms n aboutit PAS en AX14 (PositionTgt remis a 0 a l arrivee -> cible FALSE car ReqTremie deja retire, PRG_05:427) => le TON est remis a zero apres 1 scan (10 ms) => ArrivalLock jamais arme par la voie capteur ; et la coupure dure Tremie (PRG_06:431-432, DI brut AND ReqTremieSemantic) est DESARMEE par le cycle lui-meme (semantique retiree :1386). L estimateur de position (FB_Translation_PositionEstimator) n est consomme par AUCUNE des deux chaines (reponse a la coordination T333 : ni interlock ni securite). 6 hypotheses de depassement P1/Tremie classees (H1 rebond capteur efface le jeton -> le cycle RECREE la demande ; H2 aucun verrou d arret arme cote cycle ; H3 vitesse 100% non plafonnee ; H4 mot de commande a 0 = roue libre ; H5 Translation_Busy faux premature ; H6 escalade cause 6 + PowerCutOff = rapprochement direct T287). Liste EXACTE des variables a tracer a 10 ms livree (7 groupes A-G, base PROCEDURE_TRACE_T300_M3_SIMBENCH.md) + protocole 3 scenarios A/B/C + matrice de decision. AUCUNE cause racine affirmee : aucune trace 10 ms M3 n existe au depot (seule trace M3 = dt median 100 ms). 12 constats hors scope signales non corriges, dont 4 morts (M3_PositioningActive PRG_05:45,373 ; TonM3ConfirmedMoving.Q PRG_05:80,201 -- le "mouvement confirme soutenu 1,5 s" revendique en commentaire N EST PAS implemente ; _TranslationAutoSpeedCap_Pct ; FB_CycleSemiAuto.SelTarget:32) et 2 ecarts spec/code (escalade butees 1,5 s au lieu de 2,5/5 s AF_Partie-11 v2.4:346-351 ; arbitrage par priorite specifie AF_Partie-11 v2.4:270 vs aiguillage exclusif par mode implemente). DEVOIR D ALERTE : le contrat DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T334_AUTO_CYCLE_M3_OVERSHOOT.yaml reference ci-dessus N EXISTE PAS (0 fichier) -- tache C3 sans contrat, a produire par l orchestrateur. ARRET EN ATTENTE DE VALIDATION HUMAINE DU COMPARATIF avant toute proposition de code (exigence T334). AUCUN fichier CODE/ modifie.'
 - id: T255-D
   parent_id: T255
-  statut: ⏳
+  statut: "✅"
   criticite: C2
   domaine: SUPERVISION_IHM / SECURITE_LIMITES_TREUILS
   agent: 'DSH05'
   date: '2026-09-20T14:10:00+02:00'
   locked_at: '2026-09-20T13:54:00+02:00'
-  updated_at: '2026-09-20T16:05:00+02:00'
+  updated_at: '2026-09-20T16:30:00+02:00'
+  completed_at: '2026-09-20T16:30:00+02:00'
   titre: 'Défaut silencieux FDC logiciel BAS : AnyFault allumé sans message d''alarme ni texte d''action opérateur'
   contexte: 'Constat terrain MES (demande utilisateur 2026-09-20, déjà remontée dans la passation du 20/09 sans tâche créée) : à l''arrivée en fin de course logicielle basse, le voyant AnyFault s''active mais le bandeau IHM n''affiche ni alarme ni action autorisée. Besoin transversal : tout SafetyFault, limite basse/légale ou blocage process doit produire une information opérateur avec l''action autorisée.'
   description: 'Tracer la chaîne producteur (FB qui lève le défaut FDC bas) -> agrégat AnyFaultActive (PRG_07) -> FB_Hmi_BannerFormatter -> IHM, identifier pourquoi le message et l''action ne sont pas émis, corriger, et ajouter un garde-fou (fix: + guard:) qui détecte tout défaut agrégé dans AnyFaultActive sans message associé. Contrat C2 obligatoire avant code.'
@@ -77,17 +301,21 @@ tasks:
   - 'Gate guard: dans TOOLS/AGENT_WORKFLOW/scripts/ : aucune cause agrégée dans AnyFaultActive sans libellé bandeau.'
   - 'Inventaire des autres défauts muets rencontrés en passant : signalés (T243/T220), non corrigés dans ce lot.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T255-D_SILENT_LOW_LIMIT_FAULT.yaml
-  avancement: 'GO CC01 RECU (D1 = carrousel + action, D2 = AF-07 en place, D3 = AnyFaultActive non touche, D4 = registre repare). IMPLEMENTATION LIVREE (DSH05, 2026-09-20). 1) FB_Hmi_BannerFormatter.st : carrousel 5a-bis/5b-bis = entrees [M1]/[M2] "Fin de course haut capteur atteint" (bit5, constante nommee CST_WinchErrorIdTopLimitSwitch) et "[M1]/[M2] Limite basse cable atteinte" (bit6, champ CableLimitDescent), gardees par EncM1Valid/EncM2Valid ; champ action = branche dediee hors DirectionBlocked -> "[TREUIL] Limite basse cable Mx - remonter" (M1+M2 si les deux), libelle historique "Descente interdite - Limite basse cable" conserve sous commande de descente. 2) Tests : 2 TC officiels harnais PRG_07 (5/5 PASS) + 3 TC bandeau TC-P07-040/041/042 ; fichier bandeau 15/19 -> 18/22 avec les MEMES 4 rouges pre-existants TC-P07-020/006/008/031 (non corriges, ticket T335) ; 4 tests exploratoires passes de 0/4 a 4/4 SANS modification des assertions. 3) Gate G506_check_anyfault_banner_labels.py enregistre dans PLANS palier C : PASS ; preuve par retrait = FAIL cible puis restauration bit-a-bit identique. Exemptions nominatives : bits 2/3 (spec AF-07 §6), bit 10 surchauffe frein (MES-032 -> T220), JOY1 et ModesFault (aucune entree carrousel -> T220). 4) Registre repare : 13 sources mortes du dossier 5_ASSISTANCE_DRAGAGE + E_CycleDepthStopMode.st non declaree -> entree bandeau operationnelle (avant : echec de conversion) ; meme bloc mort present dans FB_TroubleshootingView, repare aussi mais cette entree reste inutilisable pour d autres types manquants (hors lot). 5) AF-07 v2.3 mise a jour EN PLACE + ligne d historique. RESTE : revue read-only du diff, bundle + diff bundle + G200 --report + gates palier C, restitution AC1->AC7. Fiche : DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_FdcBasSilencieux_20260920.md ; dossier exploratoire RESULTS/_TROUBLESHOOTING/DSH05_T255D_FDC_BAS.'
+  avancement: 'GO CC01 RECU (D1 = carrousel + action, D2 = AF-07 en place, D3 = AnyFaultActive non touche, D4 = registre repare). IMPLEMENTATION LIVREE (DSH05, 2026-09-20). 1) FB_Hmi_BannerFormatter.st : carrousel 5a-bis/5b-bis = entrees [M1]/[M2] "Fin de course haut capteur atteint" (bit5, constante nommee CST_WinchErrorIdTopLimitSwitch) et "[M1]/[M2] Limite basse cable atteinte" (bit6, champ CableLimitDescent), gardees par EncM1Valid/EncM2Valid ; champ action = branche dediee hors DirectionBlocked -> "[TREUIL] Limite basse cable Mx - remonter" (M1+M2 si les deux), libelle historique "Descente interdite - Limite basse cable" conserve sous commande de descente. 2) Tests : 2 TC officiels harnais PRG_07 (5/5 PASS) + 3 TC bandeau TC-P07-040/041/042 ; fichier bandeau 15/19 -> 18/22 avec les MEMES 4 rouges pre-existants TC-P07-020/006/008/031 (non corriges, ticket T335) ; 4 tests exploratoires passes de 0/4 a 4/4 SANS modification des assertions. 3) Gate G506_check_anyfault_banner_labels.py enregistre dans PLANS palier C : PASS ; preuve par retrait = FAIL cible puis restauration bit-a-bit identique. Exemptions nominatives : bits 2/3 (spec AF-07 §6), bit 10 surchauffe frein (MES-032 -> T220), JOY1 et ModesFault (aucune entree carrousel -> T220). 4) Registre repare : 13 sources mortes du dossier 5_ASSISTANCE_DRAGAGE + E_CycleDepthStopMode.st non declaree -> entree bandeau operationnelle (avant : echec de conversion) ; meme bloc mort present dans FB_TroubleshootingView, repare aussi mais cette entree reste inutilisable pour d autres types manquants (hors lot). 5) AF-07 v2.3 mise a jour EN PLACE + ligne d historique. RESTE : revue read-only du diff, bundle + diff bundle + G200 --report + gates palier C, restitution AC1->AC7. Fiche : DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_FdcBasSilencieux_20260920.md ; dossier exploratoire RESULTS/_TROUBLESHOOTING/DSH05_T255D_FDC_BAS. REVUE READ-ONLY PASSEE : 3 MAJOR + 9 MINOR. MAJOR-1 etait un defaut INTRODUIT par le lot (champ CableLimitDescent = comparaison brute sans bypass => fausse alarme et consigne erronee sous BypassCableLimitSwitch en MAINT_N2) : corrige, bit 6 lu sur ErrorId, ancre TC-P07-043. MAJOR-2 (G506 raisonnait par source, donc le bug T255-D serait passe) : gate v2 a completude PAR BIT contre FB_Safety_Winch.instCauses, preuve par table privee du bit 6 => FAIL. MAJOR-3 (entree registre FB_TroubleshootingView) : 5 sources ajoutees, cascade de types ensuite => arret borne hors lot. MINOR-1/2 : bit 5 retire du carrousel, exemption nominative motivee (etat normal de fin de course, DI commune M1/M2, action deja publiee). MINOR-3 : branche action deplacee apres les prerequis de mode et d homme-mort, ancre TC-P07-044. MINOR-6/7 : citations et commentaires corriges. RESULTATS FINAUX : PRG_07_Supervision 5/5 ; bandeau 20/24 (5 TC T255-D verts, MEMES 4 rouges pre-existants -> T335) ; exploratoire consumer 4/4 (etait 0/4) et producer 2/2 ; G200 PASS 0 erreur ; G506 PASS. Palier C : 5 rouges TOUS hors perimetre (G300 scratch G390 + prototypes ; G340 = AF-11 v2.4 de T333 ; G408/G430/G483 pre-existants). CLOTURE CC01 2026-09-20 : MINOR-4 tranche = DEROGATION ECRITE au bump de version (correction de bug, pas nouvelle exigence ; ligne ajoutee dans AF-07 section historique) ; G408 et la boucle G300/G390 traites hors lot par CC01 ; import CODESYS autorise.'
   bloque_par: []
 - id: T333
   parent_id: ''
-  statut: ⏳
+  statut: "✅"
   criticite: C2
   domaine: TRANSLATION_M3 / ESTIMATEUR_POSITION
   agent: DSH02
   locked_at: '2026-09-20T13:45:00+02:00'
   date: '2026-09-20T14:10:00+02:00'
   updated_at: '2026-09-20T14:10:00+02:00'
+  test_utilisateur_20260920: 'Test fonctionnel simulation (SANS trace) : deplacement M3 en cycle, arrivee capteur -> arret ->
+    redescente possible. Aucun probleme observe. Signal positif mais NON PROBANT pour le recalage 2 sens (pas de verification
+    de la position affichee ni de continuite au retour) : preuve formelle deja apportee par le test CI (TC-P11-EST-004/005,
+    6/6 PASS). Aucune action requise ; a reconfirmer avec une observation de la position affichee dans les 2 sens si doute.'
   titre: 'Estimateur position M3 : recalage uniquement sur front montant -> aucun recalage dans le sens Maintenance'
   contexte: 'Constat utilisateur (SimBench) : en arrivant sur un capteur dans un sens la position est bien mise à la valeur du capteur (5 m, 10 m) ; dans l''autre sens non. Cause probable H1/H2 de AUDIT_T300_TRACE_20260904_v1.0.md : FB_Translation_PositionEstimator.st:83-87 recale sur 5 x R_TRIG seulement ; avec le mot thermomètre, le sens Maintenance ne produit que des fronts descendants.'
   description: 'Confirmer la cause par test CI 2 sens, corriger l''estimateur (recalage sur sortie de zone = position du capteur, sens-dépendant), ajouter un guard:. Hors scope : gain odométrique (T301), simulation (T300).'
@@ -115,30 +343,36 @@ tasks:
   bloque_par: []
 - id: T331
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: CYCLE_SEMIAUTO / AX1_POSTURE / DIAGNOSTIC_IHM / SECURITE_MOUVEMENTS
-  agent: '—'
-  date: '2026-09-20T11:23:23+02:00'
-  updated_at: '2026-09-20T11:26:00+02:00'
-  titre: 'AX1 — diagnostic posture de départ et remise en posture contrôlée (M3, FDC haut M1, benne)'
-  contexte: 'Le message « Posture depart incorrecte (M3, FDC haut M1 ou benne) » est trop global : il peut citer M3 alors que M3 est déjà à P1, ou ne pas distinguer un M1 hors FDC logiciel haut d''une benne non qualifiée. AX1 doit exposer uniquement les causes réellement fausses et l''action associée. Si une remise en posture est autorisée, elle doit rester une manœuvre opérateur contrôlée : geste joystick maintenu + homme-mort, fermeture automatique de la benne si nécessaire puis remontée couplée jusqu''à la position haute ; la translation gauche/droite doit pouvoir rejoindre P1 et s''arrêter automatiquement sur P1.'
-  description: 'Cadrer puis implémenter séparément un diagnostic AX1 par cause et une procédure de remise en posture. La montée de remise en posture conserve le TOP mécanique, AU, permis, FDC/limites et protections existants ; aucun mouvement autonome, aucune confusion d''axe, aucun bypass et aucune nouvelle variable de FDC/position. La condition benne non qualifiée doit être définie avant implémentation (état franc requis et comportement en cas d''ouverture/fermeture non atteinte).'
+  agent: 'DSH09'
+  date: '2026-09-20T18:47:00+02:00'
+  updated_at: '2026-09-20T18:47:00+02:00'
+  titre: 'Cycle SEMI_AUTO — famille "retour arrière contrôlé" : remise en posture AX1 (départ) ET repli AX15b (vidage, treuils bloqués)'
+  contexte: 'Le message « Posture depart incorrecte (M3, FDC haut M1 ou benne) » est trop global : il peut citer M3 alors que M3 est déjà à P1, ou ne pas distinguer un M1 hors FDC logiciel haut d''une benne non qualifiée. AX1 doit exposer uniquement les causes réellement fausses et l''action associée. Si une remise en posture est autorisée, elle doit rester une manœuvre opérateur contrôlée : geste joystick maintenu + homme-mort, fermeture automatique de la benne si nécessaire puis remontée couplée jusqu''à la position haute ; la translation gauche/droite doit pouvoir rejoindre P1 et s''arrêter automatiquement sur P1.
+    ⚠️ ÉLARGI 2026-09-20 (regroupement demandé par l''utilisateur, même famille de besoin) : à l''étape AX15b (« Vidage : ouverture benne, treuils arretes »), les deux treuils sont AUJOURD''HUI explicitement neutralisés (FB_CycleSemiAuto.st:1434-1435, WinchM1Cmd.RunRequest/WinchM2Cmd.RunRequest := FALSE) — AUCUN moyen de remonter/refermer la benne depuis cette étape. Risque terrain identifié : si le frein glisse et que la benne ne tombe pas (bloquée), l''opérateur ne peut ni interrompre le vidage ni revenir en arrière (fermer + remonter) sans sortir du cycle. Besoin : sous joystick maintenu en sens inverse (montée), pouvoir refermer la benne puis remonter, symétriquement à la descente/ouverture normale d''AX15b — même doctrine de commande maintenue + homme-mort que le reste du cycle, aucun mouvement autonome.'
+  description: 'Cadrer puis implémenter séparément DEUX diagnostics/procédures de la même famille (retour arrière opérateur contrôlé, phase 2 ensemble) :
+    (1) AX1 : diagnostic par cause + remise en posture (M3→P1, FDC haut M1, benne). La montée de remise en posture conserve le TOP mécanique, AU, permis, FDC/limites et protections existants ; aucun mouvement autonome, aucune confusion d''axe, aucun bypass et aucune nouvelle variable de FDC/position. La condition benne non qualifiée doit être définie avant implémentation (état franc requis et comportement en cas d''ouverture/fermeture non atteinte).
+    (2) AX15b : repli treuils (fermer + remonter) sous commande maintenue inverse, pour le cas frein glissant/benne bloquée en vidage. Doit rejoindre une étape cohérente du cycle (retour vers AX10 ou AX14 selon l''état, à définir en phase 2) sans dupliquer la logique de fermeture/remontée déjà écrite ailleurs dans le cycle (cf. AX15C repositionnement, AX10/AX11/AX12).'
   objectifs:
   - 'Diagnostic AX1 décomposé en trois causes indépendantes et testables : M1 hors FDC logiciel haut, benne non qualifiée selon la précondition explicitée, M3 hors P1 ou position non qualifiée.'
   - 'Le message et l''action opérateur ne citent que les causes fausses au scan courant ; aucun libellé M3 si M3 est déjà P1 qualifié, et réciproquement.'
   - 'Sous geste opérateur maintenu et homme-mort valides, une fermeture automatique de benne puis une remontée couplée peuvent être proposées uniquement avec tous les permis, AU, TOP mécanique, FDC/limites et protections existants ; relâchement ou défaut arrête la manœuvre sans reprise automatique.'
   - 'La translation M3 gauche/droite peut rejoindre P1 sous commande maintenue et s''arrête automatiquement à P1 ; elle ne commande jamais les treuils et ne franchit aucune limite de translation.'
   - 'Aucune nouvelle variable de fin de course, position figée (8,50 m/7,50 m), paramètre persistant ou bypass n''est créé ; les variables et garde-fous existants sont réutilisés.'
+  - 'AX15b : sous joystick maintenu en sens inverse (montée) + homme-mort, la benne peut être refermée puis les treuils remontés depuis AX15b, réutilisant la logique existante (AX15C repositionnement, chaînes AX10-AX12) sans la dupliquer.'
+  - 'AX15b : relâchement ou défaut interrompt le repli sans reprise automatique ; aucun bypass frein, aucune nouvelle variable de position figée.'
   - 'Le plan est phasé : diagnostic et matrice de causes ; design validé humainement ; implémentation séparée diagnostic puis remise en posture ; tests unitaires/simulation ; validation CODESYS et essais terrain supervisés.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T331_AX1_POSTURE_DIAGNOSTIC_REMISE.yaml
+  contrat_sous_partie_ax15b: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T331_AX15B_REPLI_TREUILS.yaml
   bloque_par:
   - 'Phase 1 (diagnostic + matrice de causes, lecture seule) : LIBRE des le 2026-09-20 (T319 fait, T327 OK visuel). [MAJ CC01]'
   - 'Phase 2 (remise en posture, code PRG_03/PRG_04) : attend T255-D (bandeau) ; T330 seulement pour la valeur du FDC haut ; T255-B/T255-C sans ecrivain actif.'
-  avancement: 'Création de tâche et contrat C3 : cadrage uniquement, aucun code ni IHM modifié.'
+  avancement: 'AX15b LIVRE 2026-09-20 par DSH09 (contrat C3 DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T331_AX15B_REPLI_TREUILS.yaml, check_task_contract PASS 0/0) : sous geste joystick inverse (Y+) maintenu + homme-mort, AX15b passe en AX10_CLOSE_BUCKET avec neutralisation immediate de l ouverture benne, puis la chaine existante AX10 -> AX10B -> AX11/AX12 referme la benne et remonte les deux treuils couples jusqu a la limite haute avant retour dans la sequence de decharge normale. Aucune variable, etape ou permission nouvelle ; E_AutoCycleStep.st, PRG_03, PRG_04, FB_Joystick et FB_Bucket NON touches. 3 tests CI ajoutes (T331-001 repli complet, T331-002 non-regression AX15b/AX15c, T331-003 interruptions geste/homme-mort/defaut) : 3/3 PASS. ELARGI 2026-09-20 sur arbitrage CC01 (Alerte 2 acceptee) : AX15B ajoute a DirectInversionPermit dans CODE/M_MAIN/PRG_02_Acquisition.st (liste AX8..AX12 conservee, 6 etapes au total) pour que le geste inverse soit atteignable sans remise au neutre prolongee — permis de GESTE uniquement, consomme a un seul endroit (FB_Joystick §4) et toujours conditionne par homme-mort arme ; inversion axe X et toutes les protections inchangees. Non-regression : CI PRG_02_Acquisition 1/1 PASS, PRG_02_Acquisition_Archi 5/5 PASS, G_CYCLE 20/25 PASS (meme jeu d echecs pre-existants). ALERTE : la baseline CI du domaine G_CYCLE etait DEJA rouge avant modification (5 echecs pre-existants TC-P04-020/021/023/026 sur AX4 et TC-P04-SCEN-NOM sur ReqStart AX2) ; jeu d echecs identique apres modification. POINT MINEUR TRANCHE 2026-09-20 (GO CC01) : le commentaire d interface de FB_Joystick.st:28 est aligne sur l etendue reelle du permis (AX8..AX12 + repli AX15b) — une ligne de commentaire, aucune ligne executable ; FB_Winch.st (temporisations moteur/frein/inversion de sens) verifie INTACT. Palier C final apres correctif : 40/45 PASS, 5 FAIL (uniquement les dettes pre-existantes G300/G340/G408/G430/G483, aucune du lot ; la 6e dette exterieure .tmpsandbox a disparu et G345 est repasse PASS ; le total passe de 44 a 45 gates par ajout de G504/T330 et G507/T295, tous deux verts). CI finale : FB_Joystick 29/29 PASS (dont TC-P08-070/071/072 verrou T222), PRG_02_Acquisition 1/1, PRG_02_Acquisition_Archi 5/5, FB_CycleSemiAuto 20/25 (meme jeu d echecs pre-existants). Ax1 (posture de depart) NON TRAITE : sous-partie ouverte, hors du verrou DSH09.'
 - id: T330
   parent_id: ''
-  statut: ⏳
+  statut: "✅"
   criticite: C2
   domaine: CONFIGURATION_TREUILS / SECURITE_POSITIONNELLE
   agent: 'DSH06'
@@ -787,10 +1021,10 @@ tasks:
   bloque_par: []
 - id: T300
   parent_id: ''
-  statut: ⏳
+  statut: "✅"
   criticite: C3
   domaine: SIMULATION / TRANSLATION_M3
-  agent: CDX01
+  agent: DSH03
   date: '2026-09-15T23:40:00+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T300_SIMBENCH_M3_SENSOR_DYNAMICS.md
   avancement: Implémentation principale, tests et gates réalisés par Codex. Le pont IoHw.In.Hardware expose désormais HwIn
@@ -841,26 +1075,65 @@ tasks:
     masse et longueur effective. Des profils synthétiques explicitement identifiés permettent les essais exploratoires.'
 - id: T299
   parent_id: ''
-  statut: ⬜
+  statut: "✅"
   criticite: C2
   domaine: CYCLE_SEMI_AUTO / SUPERVISION
-  agent: —
-  date: '2026-09-15T20:38:00+02:00'
-  avancement: 'Cadré le 2026-09-15 suite demande utilisateur : vérification et fiabilisation du compteur de prélèvements (SampleCount
-    / dépose grille trémie).'
-  titre: Cycle SEMI_AUTO — Fiabiliser et tester le compteur de prélèvements (SampleCount dépose trémie) et ajouter la RAZ
-    IHM
-  contexte: L automate dispose d une variable RETAIN _CycleSampleCount incrémentée en AX18_DONE_SYNC et projetée vers GVL_IHM.CycleSemiAuto.State.SampleCount.
-    Cependant, l incrémentation réelle sur dépose de matière (AX15B) n est pas couverte par un test unitaire complet, et il
-    n existe aucun bouton de remise à zéro (RAZ) sur l IHM.
-  description: Valider le moment exact d incrémentation du compteur de cycles/prélèvements (dépose à la trémie AX15B / fin
-    de cycle AX18), ajouter une commande IHM de remise à zéro consciente protégée (front montant), et rédiger un test unitaire
-    CI vérifiant l incrémentation effective après vidage.
+  agent: CC01
+  date: '2026-09-20T21:10:00+02:00'
+  avancement: 'IMPLÉMENTÉ 2026-09-20 (GO direct humain, urgence, orchestrateur CC01) — NON COMMITÉ, revue indépendante
+    (challenger) à organiser avant clôture. Journalier : bouton RAZ IHM sur front (GVL_IHM.CycleSemiAuto.Cmd.BtnResetSampleCount)
+    + mode d auto-reset CONFIGURABLE (GVL_IHM.CycleSemiAuto.Cfg.SampleCountResetMode, DUT E_CycleSampleCountResetMode :
+    NEVER défaut / ON_FIRST_START / ON_SAFETY_REARM) — le mode est paramétrable IHM, aucun changement de code pour
+    changer de comportement. Totalisateur : NOUVELLE VARIABLE PERSISTENT _CycleSampleCountTotal (UDINT, GVL_PERSISTENT.st,
+    fin de liste — mapping RETAIN positionnel) incrémentée au MÊME événement AX18 que le journalier, jamais remise à zéro,
+    protégée par le gate G508 (3 sites d écriture autorisés dans tout CODE/ + artefact exporté, preuve outillée du même
+    événement, auto-test non tautologique) + test négatif.
+    REVUE INDÉPENDANTE (challenger à contexte frais) : ACCEPTÉ SOUS RÉSERVE, 14 findings — CORRIGÉS et revérifiés :
+    F1/F2 (dépendance de type manquante dans 5 entrées de registre CI, dont 3 que le lot CASSAIT à la compilation —
+    FB_SimBench était vert) ; F3 (bascule du mode (b) en cours de poste = RAZ différée effaçant les comptes du poste —
+    le drapeau « 1er démarrage » est désormais consommé par TOUT démarrage quel que soit le mode, + test de
+    non-régression TC-P04-040) ; F5 (4 angles morts du gate G508) + F6 (auto-test tautologique) ; F7 (assertions non
+    discriminantes de TC-P04-039) ; F8/F9/F11/F12 documentés dans le code ; F14 RÉFUTÉ (BOM identique à HEAD, vérifié
+    octet à octet). F4 (croissance de ST_CycleCfg avec _CycleCfgPersist au milieu de GVL_PERSISTENT) : pattern ÉTABLI
+    du projet — le miroir persistant existe depuis le 2026-07-24 et la struct a déjà gagné des champs sur machine en
+    service (DiveStartMin_M / ImmersionUpper_M / ForceStepTarget le 05/09 ; DrainTime_S / ExtractionStartOpening_Pct le
+    15/09) ; la règle NC porte sur l ordre des déclarations de GVL_PERSISTENT, pas sur la croissance d une struct.
+    Risque résiduel = contrôle de commissioning après le 1er téléchargement. DÉCISION FINALE À L HUMAIN.
+    PREUVES : tests CI TC-P04-034..040 (7/7 PASS, 32 tests / 27 PASS / 5 FAIL préexistants inchangés), G508 PASS
+    (+ 5 preuves de non-cécité : RAZ injectée dans PRG_07 et dans le bundle, incrément déplacé hors AX18, incrément
+    retiré, journalier sorti de la garde), G200 liaison PASS (0 erreur), palier C 48 gates / 5 FAIL = dettes
+    préexistantes (G300/G340/G408/G430/G483), bundle + diff bundle frais. ARBITRAGES CC01 : mode (c) = réengagement
+    contacteur puissance ACCEPTÉ tel quel (désactivé par défaut) ; même scan RAZ + AX18 -> journalier à 1 ACCEPTÉ.
+    POINT DE DESIGN (hors périmètre, non deviné) : l automate n embarque AUCUNE horloge calendaire — le mode (b) « 1er
+    démarrage du jour » est réalisé sur le proxy « premier démarrage de cycle depuis la mise sous tension » (valable
+    machine arrêtée entre deux postes) ; une vraie date exigereait une source temps (RTC ou signal jour IHM). Cadré le
+    2026-09-15 suite demande utilisateur sur le compteur de prélèvements (dépose grille trémie).'
+  titre: 'Cycle SEMI_AUTO — 2 compteurs distincts : journalier (RAZ IHM) + totalisateur PERSISTENT non remettable a zero'
+  contexte: 'Compteur JOURNALIER existant : GVL_PERSISTENT._CycleSampleCount (RETAIN), incrémenté en AX18_DONE_SYNC (FB_CycleSemiAuto.st:1514-1519,
+    1 fois par cycle, protégé par front SampleCountDone), projeté vers GVL_IHM.CycleSemiAuto.State.SampleCount (PRG_07:743,
+    deja mappable IHM). Manque : bouton RAZ IHM (aucun trouvé dans le code), test unitaire de l incrément.
+    NOUVEAU 2026-09-20 : demande d un 2e compteur TOTALISATEUR, distinct du journalier — memoire PERSISTENT (CODESYS, survit
+    aussi a un rechargement programme, pas seulement RETAIN), JAMAIS remis a zero, JAMAIS modifiable (aucun bouton, aucun
+    acces ecriture nulle part, comme un compteur kilometrique voiture). Incremente au meme evenement que le journalier
+    (dépose trémie AX18), mais variable separee, sans aucun chemin de RAZ dans le code.
+    Question ouverte NON TRANCHEE (a soumettre en design, pas a deviner) : le compteur JOURNALIER doit-il se reinitialiser
+    automatiquement (1er demarrage du jour ? rearmement AU ?) en plus du bouton RAZ manuel — idee utilisateur, pas decidee.'
+  description: 'Valider le moment exact d incrémentation (dépose à la trémie AX15B / fin de cycle AX18) pour les DEUX
+    compteurs (meme evenement, increment simultane). Pour le journalier : ajouter une commande IHM de remise à zéro
+    consciente protégée (front montant). Pour le totalisateur : creer la variable PERSISTENT dediee, l incrementer au
+    meme point, et PROUVER par gate/test qu aucun chemin (IHM, code, bypass) ne peut l ecrire hors cet increment — pas
+    de RAZ, pas de forcage possible. Donner l adresse IHM des deux (journalier deja mappable ; totalisateur a publier
+    en lecture SEULE). Rediger un test unitaire CI verifiant l incrementation effective des deux compteurs apres vidage,
+    et l absence de toute voie de remise a zero du totalisateur.'
   objectifs:
-  - 'Vérifier la sémantique de déclenchement : incrémenter dès la dépose effective à la trémie (AX15B_DUMP_OPEN achevé).'
-  - Ajouter un bouton/commande de remise à zéro consciente (front montant) GVL_IHM.CycleSemiAuto.Cmd.BtnResetSampleCount.
-  - Câbler la RAZ dans PRG_03_Modes_Cycle / PRG_07_Supervision vers la variable persistante _CycleSampleCount.
-  - Rédiger le test unitaire CI dédié validant l incrément à la dépose et la RAZ.
+  - 'Vérifier la sémantique de déclenchement : incrémenter dès la dépose effective à la trémie (AX15B_DUMP_OPEN achevé / AX18).'
+  - Ajouter un bouton/commande de remise à zéro consciente (front montant) GVL_IHM.CycleSemiAuto.Cmd.BtnResetSampleCount
+    pour le compteur JOURNALIER uniquement.
+  - Câbler la RAZ dans PRG_03_Modes_Cycle / PRG_07_Supervision vers la variable persistante _CycleSampleCount (journalier).
+  - 'Créer le compteur TOTALISATEUR en memoire PERSISTENT (nouvelle variable dediee), incremente au meme evenement,
+    aucun chemin de RAZ ni de forçage — prouver l absence de toute voie d écriture hors incrément.'
+  - Publier l adresse IHM des deux compteurs (journalier deja fait ; totalisateur en LECTURE SEULE).
+  - Rédiger le test unitaire CI dédié validant l incrément à la dépose (les deux compteurs) et la RAZ (journalier seul).
   - Bundle PLCopenXML, G200 liaison et gates applicables PASS.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T299_CYCLE_SAMPLE_COUNT.yaml
   bloque_par: []
@@ -871,7 +1144,11 @@ tasks:
   domaine: CYCLE_SEMI_AUTO / CONFIGURATION
   agent: —
   date: '2026-09-15T15:48:00+02:00'
-  avancement: 'Terminée et validée : ExtractionControlDistance_M passée de 0.5 m à 1.0 m (Palier 2) dans GVL_PERSISTENT.'
+  avancement: 'Terminée et validée : ExtractionControlDistance_M passée de 0.5 m à 1.0 m (Palier 2) dans GVL_PERSISTENT.
+    ⚠️ ÉCART CONSTATÉ 2026-09-20 (agent T299) : le code source (ST_CycleCfg.st:17 + GVL_PERSISTENT.st:130) porte toujours
+    0.5, pas 1.0. Soit régression de code a corriger, soit la valeur reelle en machine a ete changee via IHM (RETAIN)
+    sans jamais toucher le defaut source (normal, le defaut ne compte qu au 1er demarrage sans NVRAM). A verifier :
+    quelle est la valeur reelle sur l automate aujourd hui avant de conclure. Non tranche, non corrige.'
   titre: Cycle SEMI_AUTO — ExtractionControlDistance_M passé de 0.5 m à 1.0 m (montée contrôlée AX11)
   contexte: 'Retour essai MES : le paramètre GVL_IHM.CycleSemiAuto.Cfg.ExtractionControlDistance_M (distance de montée en
     vitesse contrôlée palier 1 après fermeture benne en AX11) est passé de 0.5 m à 1.0 m.'
@@ -952,12 +1229,29 @@ tasks:
   bloque_par: []
 - id: T295
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: CYCLE_AUTO / BENNE
-  agent: —
-  date: '2026-09-15T13:05:00+02:00'
-  avancement: Demandé le 2026-09-15 ; diagnostic et solution à traiter. Aucun changement de timeout ou de code engagé.
+  agent: DSH08
+  date: '2026-09-20T18:02:24+02:00'
+  avancement: '2026-09-20 : cause racine CONFIRMEE par CC01 (FB_Bucket.st:199 TonTimeout(IN := Lifecycle.Busy) —
+    le relâchement joystick ne sort pas de Busy) + brief émis (DOC/WFLOW/PROMPTS/09_BRIEF_T295_timeout_benne_AX3.md)
+    + verrou DSH08 posé. Sémantique ACTÉE PAR L''HUMAIN : temps de timeout SUSPENDU (jamais remis à zéro) hors commande
+    active, cumulé pendant la commande, PT inchangé (60 s), latch inchangé. ⚠️ ALERTE CC01 : le signal nommé (CloseReq/OpenReq)
+    est INOPÉRANT (ce sont des latches, FB_Bucket.st:424-431) — signal retenu à valider : MotionRequestActive (FB_Bucket.st:391).
+    Implémentation DSH08 TERMINÉE (2026-09-20) : FB_Bucket.st §1 Cause 2 réécrite — le budget ne se consomme que sous
+    engagement opérateur réel (Lifecycle.Busy ET MotionRequestActive), temps GELÉ hors engagement puis CUMULÉ, remise à
+    zéro en fin de manœuvre (Busy retombe) et sur Reset sur front ; MotionRequestConflict/MotionRequestActive remontés en
+    tête de §1 (suppression du lag d''un scan). Preuves : TC-P10-046.2 et TC-P10-046.4 ROUGES avant / VERTS après,
+    TC-P10-046.1 et TC-P10-046.3 verts, et 046.3 ROUGE sous mutation a1 (« reset au relâchement ») => la suspension est
+    réellement testée ; garde-fou G507 (branché dans PLANS) avec selftest rejetant 4 mutations. ⚠️ FB_Bucket 27/36 : les
+    9 échecs sont PRÉEXISTANTS (tests obsolètes vs code actuel) — hors scope, signalés, aucun test désactivé.
+    CfgTimeoutDuration (60 s) et le latch de la cause 2 inchangés. Revue du git diff par CC01 requise avant essai machine.
+    ✅ REVUE INDÉPENDANTE CC01 (2026-09-20, sur le git diff réel) : bundle 258/258 0 erreur + G200 PASS 0 erreur
+    (instFault FB_Bucket.st:142 → :294) + G507 PASS/selftest/branché ; rapports CI archivés AVANT/APRÈS = 9 échecs
+    IDENTIQUES avant et après, 3 nouveaux tests verts, ZÉRO régression ; gates palier C = 7 rouges/46, tous
+    préexistants et hors fichiers T295. Reste à contresigner par l''humain : le Reset sur front remet aussi le cumul
+    à zéro, donc un Reset martelé < PT peut contourner le watchdog (l''ancien code re-latchait immédiatement).'
   titre: AX15B — [BENNE] ErrorID:03 au timeout de la commande d’ouverture
   contexte: En AX15B_DUMP_OPEN (vidage au-dessus de la trémie, libellé IHM AX15 1/1), l’ouverture de benne peut finir en [BENNE]
     ErrorID:03 — Timeout commande déplacement benne. Le timeout FB_Bucket est configuré par CfgTimeoutDuration (défaut déclaré
@@ -980,6 +1274,16 @@ tasks:
   - 'Tester aussi ouverture hors AX15B et fermeture : aucun changement non voulu des autres séquences benne, réarmement conscient
     conservé, aucun redémarrage automatique.'
   - Bundle PLCopenXML, G200 liaison, tests de non-régression et gates applicables PASS avant intégration CODESYS.
+  cause_confirmee_20260920: 'CC01, code verifie : FB_Bucket.st:199 TonTimeout(IN := Lifecycle.Busy, PT := CfgTimeoutDuration).
+    Le temporisateur tourne tant que la manoeuvre est BUSY (non terminee), PAS tant que l operateur commande activement.
+    Constat utilisateur reproduit le 2026-09-20 : timeout ErrorID:03 obtenu apres une commande normale suivie d une longue
+    attente, sans mouvement bloque avere. PRINCIPE DE CONCEPTION DEMANDE PAR L UTILISATEUR (a trancher en design, pas a
+    deviner) : tout timeout de deplacement doit etre conditionne sur une action/engagement operateur continu (joystick
+    maintenu, commande active), jamais sur un simple etat de sequence/graphe Busy qui peut rester vrai pendant des pauses
+    operateur legitimes (relachement, reprise). Deux options a arbitrer : (a) reset du TON a chaque relachement de commande
+    (temps cumule uniquement pendant commande active) ; (b) timeout sur PROGRESSION mesuree (absence d avancee position sur
+    une fenetre glissante) plutot que sur duree totale Busy. Option (b) preferee par principe (detecte un vrai blocage
+    mecanique meme sous commande continue, ex. frein glissant) sans re-ouvrir a chaque relachement operateur.'
   note_utilisateur_20260917: 'Avant tout diagnostic approfondi : questionner l''utilité réelle de ce défaut logiciel. L''opérateur
     constate de toute façon rapidement l''absence de mouvement — la valeur ajoutée du timeout logiciel est peut-être faible.
     Trancher (garder / simplifier / retirer la détection logicielle) avant d''investir du temps de diagnostic dessus.'
@@ -1109,7 +1413,7 @@ tasks:
   agent: AGY01
   date: '2026-09-20T11:38:00+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
-  avancement: '⏳ En cours AGY01. B0+B1 REMIS (validation visuelle utilisateur 2026-09-20, commit 55700932 : M2PositionCorrected continu sans saut). B2 (autorite M1 en Both) attend T330. Input utilisateur 2026-09-20 pour B2 : M2corrected juge utilisable ; reserve contrat : non qualifie en benne intermediaire (Valid=FALSE). A traiter dans le lot B2 : G499_check_t291b_top_authority.py NON branche (ID 499 deja pris par T289 dans run_all_gates.py PLANS) -> renommer G505 + enregistrer. Test utilisateur 2026-09-20 (arret Both au FDC haut, "je m arrete bien au capteur") : VERIFIE CODE CC01 -- arret produit par M1TopLimitReached OR M2TopLimitReached (PRG_04:1338, chacun sur son propre CableLimitAscent, PRG_03:232-233) = l ANCIENNE logique, PAS B2 (M1 seul autorite, non codee). Resultat positif (arret sur, chaque axe protege individuellement) mais ne valide PAS B2 : si M2 derive et declenche son FDC en premier (ecart benne intermediaire), l arret reste premature -- c est precisement ce que B2 doit corriger. [MAJ CC01 2026-09-20]'
+  avancement: '⏳ B0+B1 validés. B2 implémenté et validé mécaniquement par AGY01 (2026-09-20) : autorité M1 en Both sur profil de ralentissement (CommonMaxStepAscent), TopLimitM2_M garde-fou dérivé +0.50 m en Both, M1 autorité nominale fin AX12 (M2TopLimitReached neutralisé vers instCycleSemiAuto). Gate mécanique G505 slot C-505 opérationnel et PASS. G200 Linkage PASS (0 erreur). Bundle et DiffBundle générés. En attente revue/recette utilisateur B3. [AUCUN COMMIT].'
   titre: T291-B — Position M2 corrigee continue, puis autorite M1 en Both AX12
   contexte: 'Decision utilisateur 2026-09-15 : en M1 seul ou M1+M2 Both, le FDC logiciel nominal et la reduction de vitesse
     sont pilotes par M1. M2 est suiveur et recoit le meme profil de contacteurs. En M2 seul, la position M2 corrigee geometrie
@@ -1124,10 +1428,10 @@ tasks:
   - 'TOP mecanique, limites tambour M2, mou de cable, synchronisme et AU restent inchanges et independants.'
   - 'Aucun nouveau champ de position/FDC et aucune nouvelle configuration IHM/RETAIN : marges derivees des parametres existants, apres T330.'
   phases:
-  - B0 ⏳ Cartographier et corriger la position M2 corrigee EXISTANTE ; aucun changement de FDC, de permis ni de cycle.
-  - B1 ⬜ Tests et recette de continuite : ouverte, fermee, intermediaire, Both, traces sans saut et qualification de la source pourcentage ouverture.
-  - B2 ⬜ Apres validation humaine B1 et invariant T330 : autorite M1 sur profil Both et fin nominale AX12 ; M2 garde-fou derive uniquement.
-  - B3 ⬜ Tests de non-regression M1 seul/M2 seul/Both, AX12, homing, descente, TOP, limites tambour et T327 ; revue independante avant livraison.
+  - B0 ✅ Cartographier et corriger la position M2 corrigee EXISTANTE ; aucun changement de FDC, de permis ni de cycle.
+  - B1 ✅ Tests et recette de continuite : ouverte, fermee, intermediaire, Both, traces sans saut et qualification de la source pourcentage ouverture.
+  - B2 ✅ Apres validation humaine B1 et invariant T330 : autorite M1 sur profil Both et fin nominale AX12 ; M2 garde-fou derive (+0.50 m) ; G505 PASS.
+  - B3 ⏳ Tests de non-regression M1 seul/M2 seul/Both, AX12, homing, descente, TOP, limites tambour et T327 ; revue finale avant livraison.
   audit_detaille:
     verdict: Regression logicielle identifiee avec confiance 95 % ; logique commune au reel et a la simulation.
     cause: En Both montee AX12, M1 entre seul dans la zone haute et passe P5 vers P1 ; M2 corrige reste P5. La barriere WinchBothFinalRequestsCoherent

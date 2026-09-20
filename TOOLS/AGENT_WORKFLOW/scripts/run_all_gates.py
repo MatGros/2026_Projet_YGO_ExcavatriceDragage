@@ -147,11 +147,14 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "502", "G502 - Frontiere SimBench M3 HwSim/HwIn (T300 AC4bis/AC14)", [sys.executable, f"{S}/G502_check_simbench_m3_boundary.py", "."]),
     ("C", "503", "G503 - Portee stricte ManualBucketLimitsActive + borne T248 (T327)", [sys.executable, f"{S}/G503_check_manual_bucket_limits_scope.py"]),
     ("C", "504", "G504 - Invariant haut T330 : reserve >= 1,00 m ET ralentissement haut >= 0,50 m (2 regles DISTINCTES, ex-regle inverse G483 AC2b abrogee)", [sys.executable, f"{S}/G504_check_t330_homing_top_invariant.py", "--strict"]),
+    ("C", "505", "G505 - Continuité M2 et autorité M1 en Both AX12 (T291-B)", [sys.executable, f"{S}/G505_check_t291b_top_authority.py", "."]),
     ("C", "506", "G506 - Toute cause agregee dans AnyFaultActive a un libelle bandeau (T255-D)", [sys.executable, f"{S}/G506_check_anyfault_banner_labels.py", "."]),
     ("C", "507", "G507 - Timeout benne : temps de commande engagee seul (T295, suspension a2)", [sys.executable, f"{S}/G507_check_t295_bucket_timeout_engaged.py", "."]),
     ("C", "508", "G508 - Totalisateur prelevements : ecriture unique (increment AX18), aucune RAZ, IHM lecture seule (T299)", [sys.executable, f"{S}/G508_check_sample_totalizer_write_protection.py", "."]),
     ("C", "510", "G510 - Butee silencieuse interdite sur un comptage brut de position (T338)", [sys.executable, f"{S}/G510_check_sim_silent_floor.py", "."]),
     ("C", "511", "G511 - Garde de montee du referencement : realiste (>= course/vitesse palier 1 x marge) ET consommee seulement si la montee est commandee (T340)", [sys.executable, f"{S}/G511_check_homing_climb_guard.py", "."]),
+    ("C", "512", "G512 - Test CI : aucun argument nomme MORT (hors interface declaree du FB teste) dans les appels de test (T339)", [sys.executable, f"{S}/G512_check_dead_ci_test_arguments.py", "."]),
+    ("C", "513", "G513 - Memoire de comptage brut d'un codeur : producteur unique respecte (aucune reinjection muette du banc) et aucune auto-correction sur test de valeur (T342)", [sys.executable, f"{S}/G513_check_sim_encoder_memory_write.py", "."]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]

@@ -230,7 +230,10 @@ instCycleSemiAuto(
     SpeedMismatchTimeout    := T#0ms,   // Désactivé ; protections FB_WinchSync conservées
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
     M1TopLimitReached       := PRG_04_Treuils_Benne.Data.WinchM1Safety.CableLimitAscent,
-    M2TopLimitReached       := PRG_04_Treuils_Benne.Data.WinchM2Safety.CableLimitAscent,
+    // M1 est la seule autorité nominale de fin de montée AX12.
+    // M2TopLimitReached est neutralisé ici pour le séquenceur : M2 reste protégé par ses sécurités
+    // propres (instSafetyWinchM2.AscentPermit) sans provoquer de fin de montée prématurée en cas d'écart.
+    M2TopLimitReached       := FALSE,
     Translation_At_P1       := PRG_05_Translation.Data.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.Data.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.Data.M3_AtMaintenanceStable,
