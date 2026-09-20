@@ -12,10 +12,16 @@ AC1   Tout `Bypass*` / `EncoderFaultBypass` câblé depuis PRG_04 vers
       instSafetyWinchM1/M2, instWinchM1/M2, instBucket est gâté par `MaintN2`.
 AC1b  L'ORIGINE du gate est l'arbitrage FB_Modes (`Auth.Mode`), jamais le sélecteur
       IHM brut (qui autoriserait les bypass dans un mode refusé).
-AC2   `TopLimitM1_M` / `TopLimitM2_M` = MIN(SEL(override, 7,5 m, 8,5 m), bande de
-      ralentissement) — la course supplémentaire reste couverte par le ralentissement.
-AC2b  Invariant de configuration : CfgTopSensorPos_M - CfgCableLimitAscent_M ne doit
-      jamais excéder WinchSlowdownDistance_M (sinon arrivée capteur à pleine vitesse).
+AC2   `TopLimitM1_M` / `TopLimitM2_M` = SEL(override N1 ou bypass N2, 7,5 m, 8,5 m).
+      ⛔ CORRIGE le 2026-09-20 : l'ancien libelle annoncait un `MIN(..., bande de ralentissement)`
+      qui n'existe PAS dans PRG_04 (aucun MIN) — la zone de ralentissement derive du `TopLimitM`
+      ACTIF cote FB_Winch, elle ne borne pas la limite.
+AC2b  ⛔ REGLE ABROGEE le 2026-09-20 (decision humaine Q1, plan C3 T330 v1.3) : l'ancien invariant
+      « CfgTopSensorPos_M - CfgCableLimitAscent_M <= WinchSlowdownDistance_M » etait la regle
+      INVERSE de l'invariant cible, et lisait un champ FANTOME (`WinchSlowdownDistance_M`,
+      renomme en WinchSlowdownDistanceTop_M := 0.5) par repli numerique muet.
+      Les deux regles VALIDES sont portees SEPAREMENT par G504_check_t330_homing_top_invariant.py.
+      ⛔ Ne JAMAIS reintroduire ici de comparaison entre la reserve et la bande de ralentissement.
 AC3   L'override N1 n'ouvre jamais `BypassTopLimitSwitch` (butée capteur dure).
 AC3b  L'override est conditionné à Homed ET NON HomingSuspect (pas de dépassement
       contrôlé sans référence de position).
@@ -161,18 +167,16 @@ def check_top_limit(text: str) -> list[str]:
         if "OverrideTopSoftwareN1" in match.group(1):
             errors.append("AC3 l'override N1 ouvre BypassTopLimitSwitch (butée physique franchissable)")
 
-    # AC2b — invariant de configuration : la course d'override reste couverte par le ralentissement.
-    cfg = read(GVL_PERSISTENT)
-    def value(name: str, default: float) -> float:
-        found = re.search(rf"{name}\s*:=\s*([0-9]*\.?[0-9]+)", cfg)
-        return float(found.group(1)) if found else default
-    delta = value("CfgTopSensorPos_M", 8.5) - value("CfgCableLimitAscent_M", 7.5)
-    band = value("WinchSlowdownDistance_M", 1.0)
-    if delta > band + 1e-6:
-        errors.append(
-            f"AC2b CfgTopSensorPos_M - CfgCableLimitAscent_M = {delta} m > WinchSlowdownDistance_M = {band} m : "
-            "sous override, le treuil arrive sur le capteur physique sans ralentissement"
-        )
+    # ── AC2b : REGLE ABROGEE (decision humaine Q1 du 2026-09-20, plan C3 T330 v1.3) ────────
+    # L'ancien AC2b imposait `reserve <= WinchSlowdownDistance_M` (regle INVERSE de l'invariant)
+    # et lisait un champ FANTOME `WinchSlowdownDistance_M` (renomme en
+    # WinchSlowdownDistanceTop_M := 0.5 / WinchSlowdownDistanceBottom_M := 1.0) : il passait donc
+    # par COINCIDENCE via un repli numerique muet de 1.0.
+    # Les DEUX regles VALIDES sont desormais portees SEPAREMENT par le gate dedie :
+    #   G504_check_t330_homing_top_invariant.py
+    #     (1) reserve = CfgTopSensorPos_M - CfgCableLimitAscent_M >= 1.00 m
+    #     (2) WinchSlowdownDistanceTop_M >= 0.50 m
+    # ⛔ Ne PAS reintroduire ici de comparaison entre la reserve et la bande de ralentissement.
     return errors
 
 

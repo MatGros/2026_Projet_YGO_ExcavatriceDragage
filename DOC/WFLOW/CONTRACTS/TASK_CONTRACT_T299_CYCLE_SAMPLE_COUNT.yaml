@@ -3,66 +3,143 @@ contract:
   criticality: C2
   strategy: patch
   objective: >
-    Valider et fiabiliser l'incrémentation du compteur de prélèvements/cycles
-    SampleCount sur dépose effective de matière à la trémie, ajouter un bouton de
-    remise à zéro sur l'IHM (front montant conscient) et fournir les tests CI associés.
+    Rendre le comptage des prélèvements exploitable côté client : un compteur JOURNALIER
+    remis à zéro à la demande de l'opérateur (ou automatiquement selon un mode CONFIGURABLE
+    par paramétrage IHM, sans modification de code), et un compteur TOTALISATEUR distinct,
+    PERSISTENT, jamais remis à zéro et jamais modifiable, incrémenté au même événement
+    (dépose trémie AX18, une fois par cycle).
   acceptance:
     - id: AC1
-      statement: "SampleCount s'incrémente de 1 exactement une seule fois par cycle lors du vidage complet à la trémie (AX15B)."
-      verified_by: "Test unitaire CI simulant le passage AX15B -> AX18 avec contrôle de l'incrément."
+      statement: >
+        Le compteur JOURNALIER (GVL_PERSISTENT._CycleSampleCount, publié GVL_IHM.CycleSemiAuto.State.SampleCount)
+        s'incrémente de 1 exactement une fois par cycle à l'étape AX18_DONE_SYNC de FB_CycleSemiAuto,
+        et une RAZ consciente sur front montant (GVL_IHM.CycleSemiAuto.Cmd.BtnResetSampleCount) le remet à zéro.
+      verified_by: >
+        Test CI TC-P04-034 (incrément vérifié avant/après le scan AX18, + absence de double comptage)
+        et TC-P04-035 (RAZ sur front, bouton maintenu sans effet, nouvelle impulsion effective).
     - id: AC2
-      statement: "Une commande de RAZ consciente (front montant) GVL_IHM.CycleSemiAuto.Cmd.BtnResetSampleCount remet à 0 le compteur RETAIN _CycleSampleCount."
-      verified_by: "Test unitaire CI sur impulsion BtnResetSampleCount."
+      statement: >
+        Le mode de RAZ automatique du journalier est un paramètre IHM PERSISTANT
+        (GVL_IHM.CycleSemiAuto.Cfg.SampleCountResetMode, DUT E_CycleSampleCountResetMode) :
+        (a) NEVER = RAZ manuelle seule et DÉFAUT — aucun changement de comportement tant que non activé ;
+        (b) ON_FIRST_START = RAZ au premier démarrage de cycle après mise sous tension ;
+        (c) ON_SAFETY_REARM = RAZ au réarmement de la chaîne AU. Aucun mode n'exige de modifier le code.
+      verified_by: >
+        Tests CI TC-P04-036 (mode (a) : aucune RAZ auto), TC-P04-037 (mode (b)), TC-P04-038 (mode (c)),
+        + valeur par défaut NEVER dans ST_CycleCfg et dans l'énumération.
+      alert: >
+        L'automate n'embarque AUCUNE horloge calendaire (aucune bibliothèque RTC/SysTime dans le
+        projet) : le mode (b) « 1er démarrage du jour » est réalisé sur le proxy honnête
+        « premier démarrage de cycle depuis la mise sous tension », valable pour une machine
+        arrêtée entre deux postes. Une vraie date calendaire exigerait une source temps (RTC ou
+        signal jour fourni par l'IHM) — décision à valider par l'humain, hors périmètre T299.
     - id: AC3
-      statement: "La valeur de SampleCount reste persistante (RETAIN) et restaurée après redémarrage automate."
-      verified_by: "Inspection de GVL_PERSISTENT.st et du flux PRG_03 / PRG_07."
+      statement: >
+        Le TOTALISATEUR (GVL_PERSISTENT._CycleSampleCountTotal, UDINT, PERSISTENT) est incrémenté au
+        MÊME événement que le journalier (AX18) et AUCUN chemin (IHM, code, bypass, test) ne peut
+        l'écrire hors de cet incrément : pas de RAZ, pas de forçage, aucune commande IHM.
+      verified_by: >
+        Gate G508 (3 sites d'écriture autorisés dans tout CODE/, RAZ/injection détectée — auto-test
+        du détecteur inclus), test CI TC-P04-039 (test négatif : RAZ IHM, modes (b)/(c), reset
+        machine, abandon, sortie de mode -> totalisateur inchangé) et grep exhaustif de restitution.
     - id: AC4
-      statement: "Le bundle PLCopenXML, la liaison G200 et les gates applicables sont PASS."
-      verified_by: "G200_check_linkage.py et run_all_gates.py."
+      statement: >
+        Les adresses IHM des deux compteurs sont publiées en lecture côté IHM
+        (GVL_IHM.CycleSemiAuto.State.SampleCount et .SampleCountTotal).
+      verified_by: "Restitution (adresses explicites) + inspection de PRG_07_Supervision.st."
     - id: AC5
-      statement: "Le nom de fichier est identique au nom de POU pour tout POU modifié sous CODE/M_MAIN."
-      verified_by: "Contrôle du nom de fichier/POU."
+      statement: >
+        Les persistants/IHM touchés sont déclarés, et la nouvelle variable PERSISTENT (mémoire
+        non-volatile ajoutée) est signalée explicitement.
+      verified_by: "Restitution + G380 (cohérence Cfg/PERSISTENT) + G200 (liaison)."
     - id: AC6
+      statement: "Le bundle PLCopenXML, la liaison G200 et les gates applicables sont PASS."
+      verified_by: "generate_codesys_bundle.py, generate_codesys_diff_bundle.py, G200_check_linkage.py --report, run_all_gates.py --palier C."
+    - id: AC7
+      statement: "Le nom de fichier est identique au nom de POU pour tout POU modifié sous CODE/M_MAIN."
+      verified_by: "Contrôle du nom de fichier/POU (G310/G120) : PRG_03_Modes_Cycle.st et PRG_07_Supervision.st."
+    - id: AC8
       statement: "Le suffixe de fichier est identique au langage déclaré dans le bundle pour tout POU modifié sous CODE/M_MAIN."
       verified_by: "Contrôle du nom de fichier/POU et inspection du PLCopenXML généré."
   scope:
     allowed:
       - CODE/G_CYCLE/FB_CycleSemiAuto.st
-      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st
+      - CODE/GVL_PERSISTENT.st
       - CODE/M_MAIN/PRG_03_Modes_Cycle.st
       - CODE/M_MAIN/PRG_07_Supervision.st
-      - CODE/GVL_PERSISTENT.st
-      - CODE_XML/
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_CycleSampleCountResetMode.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G508_check_sample_totalizer_write_protection.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
       - TOOLS/TEST_AUTO_CI/
+      - CODE_XML/
       - DOC/WFLOW/
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
-      - Remise à zéro automatique sans action opérateur explicite.
+      - CODE/B_AU_SECURITE/**
+      - Tout chemin d'écriture du totalisateur (RAZ, forçage, commande IHM)
+      - Remise à zéro automatique non désactivable (le défaut reste la RAZ manuelle seule)
   conservation:
     must_survive:
-      - "La logique de séquencement du cycle semi-auto reste inchangée."
-      - "Le compteur conserve sa persistance RETAIN."
+      - "La logique de séquencement du cycle semi-auto (Grafcet AX0..AX18/AX_STAB) reste inchangée."
+      - "Le compteur journalier conserve sa persistance et son adresse IHM existante."
+      - "Le comportement par défaut (mode NEVER) est identique à l'existant : aucune RAZ automatique."
     dropped_on_purpose: []
   evidence_required:
     - check_linkage
     - run_all_gates
     - bundle
-    - "Test unitaire CI FB_CycleSemiAuto avec scénario de vidage et vérification de l'incrément."
+    - "Tests CI TC-P04-034..039 (incrément AX18, RAZ manuelle, 3 modes d'auto-reset, test négatif totalisateur)."
+    - "Gate G508 + preuve de non-cécité (injection d'une RAZ -> FAIL)."
   models_allowed:
     - "omni/cc/claude-sonnet-5"
     - "omni/cx/gpt-5.6-terra"
   alert_duty: >
-    Vérifier que la RAZ est strictement sur front montant et ne peut pas être
-    maintenue à l'état haut en continu.
-status: PENDING
+    Signaler immédiatement : (1) l'absence d'horloge calendaire pour le mode (b) ; (2) tout
+    chemin d'écriture du totalisateur découvert ; (3) toute entrée de registre CI laissée
+    rouge par un défaut préexistant (PRG_03_Modes_Cycle / WINCH_INTEG : sources incomplètes).
+status: COMPLETED
 execution:
-  executed_by: ""
-  completed_at: ""
-  status: PENDING
-  summary: ""
-  evidence_submitted: []
+  executed_by: "CC01 (orchestrateur, session DSH)"
+  completed_at: "2026-09-20T21:05:00+02:00"
+  status: COMPLETED
+  summary: >
+    Compteur journalier : bouton RAZ IHM sur front (BtnResetSampleCount) + mode d'auto-reset
+    paramétrable (E_CycleSampleCountResetMode : NEVER/ON_FIRST_START/ON_SAFETY_REARM, défaut
+    NEVER). Totalisateur : nouvelle variable PERSISTENT _CycleSampleCountTotal (UDINT), incrémentée
+    au même événement AX18, protégée par le gate G508 et par un test négatif. Aucun commit.
+    REVUE INDÉPENDANTE (challenger à contexte frais) : verdict ACCEPTÉ SOUS RÉSERVE, 14 findings.
+    CORRIGÉS : F1/F2 (dépendance de type ajoutée à 5 entrées de registre CI, dont 3 que le lot
+    cassait — FB_SimBench était vert), F3 (le drapeau « 1er démarrage » est désormais consommé par
+    TOUT démarrage, quel que soit le mode : plus de RAZ différée après bascule de mode en cours de
+    poste + test de non-régression TC-P04-040), F5 (4 angles morts du gate) + F6 (auto-test
+    tautologique), F7 (assertions discriminantes de TC-P04-039), F8/F9/F11/F12 documentés,
+    F14 réfuté (BOM identique à HEAD). F4 : voir validation.notes.
+  evidence_submitted:
+    - "G200 liaison: PASS (0 erreur, 2012 instances)"
+    - "Gate G508: PASS + 5 preuves de non-cécité (injection RAZ dans PRG_07 / bundle, incrément deplace hors AX18, incrément retire, journalier sorti de la garde)"
+    - "CI FB_CycleSemiAuto: 32 tests / 27 PASS / 5 FAIL (5 rouges PREEXISTANTS, baseline archivee 15/09 et 20/09 18:12)"
+    - "CI FB_SimBench: recompile et tourne (regression T299 fermee) ; 1 seul rouge = TC-P13-032, cause = CODE/L_SIMULATION/FB_Sim_Encoder.st NON COMMITE (lot T338 en vol)"
+    - "CI PRG_03_Modes_Cycle: 0 erreur T299 dans le rapport (13 erreurs preexistantes E_CycleDepthStopMode, defaut de registre anterieur)"
 validation:
   status: PENDING
   validated_by: ""
   validated_at: ""
-  notes: ""
+  notes: >
+    Revue indépendante (challenger) à organiser par l'orchestrateur avant clôture finale.
+    Aucun commit posé : lot livré en working tree, diff bundle + bundle complet fournis.
+    ARBITRAGES CC01 (2026-09-20) : (1) mode (c) = « réengagement contacteur puissance » plutôt
+    que « AU strictement déclenché » — ACCEPTÉ tel quel, mode désactivé par défaut ; (2) même scan
+    RAZ + AX18 -> journalier à 1 — ACCEPTÉ (rien ne se perd).
+    F4 (croissance de ST_CycleCfg alors que _CycleCfgPersist est au milieu de GVL_PERSISTENT) :
+    EVIDENCE — le miroir persistant existe depuis le 2026-07-24 (8f90d891) et ST_CycleCfg a
+    depuis gagné des champs à plusieurs reprises sur machine en service (DiveStartMin_M,
+    ImmersionUpper_M, ForceStepTarget le 2026-09-05 ; DrainTime_S, ExtractionStartOpening_Pct le
+    2026-09-15). La règle NC (NAMING_CONVENTION.md:617) porte sur l'ORDRE des déclarations de
+    GVL_PERSISTENT, pas sur la croissance d'une struct : ajouter un champ de Cfg est le pattern
+    documenté (Cfg IHM + pont). Risque résiduel = même que chaque ajout de champ précédent :
+    contrôle de commissioning après le 1er téléchargement (vérifier
+    GVL_IHM.CycleSemiAuto.Cfg.SampleCountResetMode = NEVER et la config machine). Décision finale
+    à l'humain — aucune donnée du dépôt ne permet de simuler la restauration NVRAM CODESYS.

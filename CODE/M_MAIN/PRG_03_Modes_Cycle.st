@@ -265,7 +265,17 @@ instCycleSemiAuto(
     CfgCtrlAscentDistanceM  := GVL_IHM.CycleSemiAuto.Cfg.ExtractionControlDistance_M, // Distance controle AX11 depuis AX10
     M1_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber, // palier applique (0..5) : garde palier<>4 en plongee (GT-dive-retry) + cause 8 (palier 5)
     M2_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
-    SampleCount            := _CycleSampleCount
+    // 🔢 Compteurs de prélèvements : journalier (RAZ IHM + mode auto configurable) et
+    // totalisateur (jamais remis à zéro, aucune commande). Même événement d'incrément (AX18, FB).
+    SampleCount            := _CycleSampleCount,
+    SampleCountTotal       := _CycleSampleCountTotal,
+    ResetSampleCountRequest := GVL_IHM.CycleSemiAuto.Cmd.BtnResetSampleCount,
+    CfgSampleCountResetMode := GVL_IHM.CycleSemiAuto.Cfg.SampleCountResetMode,
+    // Réarmement AU : contacteur puissance réengagé après armement de la chaîne (consommé
+    // uniquement si Cfg.SampleCountResetMode = ON_SAFETY_REARM). Lecture directe assumée :
+    // le bus Data de PRG_06 n'expose pas cet état ; le FB le consomme sur front (R_TRIG),
+    // donc un éventuel retard de tâche d'un scan est sans effet.
+    SafetyRearmed          := PRG_06_Outputs.EmergencyDone
 );
 
 {endregion}

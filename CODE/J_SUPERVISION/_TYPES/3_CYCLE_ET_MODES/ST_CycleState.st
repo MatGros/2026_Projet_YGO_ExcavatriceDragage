@@ -27,6 +27,11 @@ STRUCT
     JoystickDeflected      : BOOL;        (* 🕹️ Joystick défléchi (non centré) — même signal que JoystickDeflected (FB_Cycle) ; SANS homme-mort *)
     CycleStepAtError       : E_AutoCycleStep; (* 🧊 Étape spécifique au moment du défaut  *)
     SampleCount            : INT;         (* Compteur de prélèvements (RETAIN, Q3bis) *)
+    (* ⚠️ Inséré volontairement À CÔTÉ de SampleCount (regroupement sémantique des deux compteurs).
+       ST_CycleState est une structure d'ÉCHANGE IHM volatile : elle n'est ni persistée ni
+       mappée par position (aucune occurrence dans GVL_PERSISTENT) — l'ordre des champs y est
+       donc libre, contrairement à ST_CycleCfg/ST_CycleCmd dont les ajouts vont en fin. *)
+    SampleCountTotal       : UDINT;       (* 🔒 TOTALISATEUR de prélèvements (PERSISTENT) — LECTURE SEULE : jamais remis à zéro, aucune commande d'écriture *)
     CurrentCycleElapsed    : TIME;        (* ⏱️ Durée écoulée du cycle en cours *)
     LastCycleDuration      : TIME;        (* ⏱️ Durée du dernier cycle achevé (figée à X13) *)
     DrainTimeElapsed_S     : INT;         (* Compat IHM : tag historique conserve ; porte le temps restant AX13, secondes entieres ; 0 hors AX13 *)

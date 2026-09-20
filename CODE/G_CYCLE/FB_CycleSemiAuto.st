@@ -97,6 +97,11 @@ VAR_INPUT
     M1_SpeedStepApplied    : INT;          // --> [HW] Palier vitesse effectivement applique M1 (0 = inconnu ; garde palier <> 4 en diving)
     M2_SpeedStepApplied    : INT;          // --> [HW] Palier vitesse effectivement applique M2 (0 = inconnu)
     CfgAutoDiveM2Step5Trial : BOOL;        // --> [CFG] Essai T291-A : M2 palier 5 en descente auto AX4..AX7, non persistant
+
+    // === COMPTEURS DE PRELEVEMENTS ===
+    ResetSampleCountRequest : BOOL;         // --> [CMD] RAZ IHM du compteur JOURNALIER (front montant conscient)
+    CfgSampleCountResetMode : E_CycleSampleCountResetMode; // --> [CFG] Mode de RAZ AUTOMATIQUE du journalier (NEVER par defaut = aucune RAZ auto)
+    SafetyRearmed            : BOOL;        // --> [SAFE] Chaine AU rearmee (contacteur puissance reengage) — consomme par ON_SAFETY_REARM uniquement
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC & DEFECTUOSITES ===
@@ -147,7 +152,8 @@ VAR_OUTPUT
 END_VAR
 VAR_IN_OUT
     // === STRUCTURES PARTAGEES & COMPTEURS ===
-    SampleCount             : INT;          // <-> [BUS] Compteur de prelevements (RETAIN)
+    SampleCount             : INT;          // <-> [BUS] Compteur JOURNALIER de prelevements (RAZ IHM/mode auto possible)
+    SampleCountTotal        : UDINT;        // <-> [BUS] TOTALISATEUR de prelevements — JAMAIS remis a zero, ecrit au seul incrément AX18
 END_VAR
 VAR
     // === DETECTEURS DE FRONTS ===
@@ -159,6 +165,8 @@ VAR
     ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant Error
     JoyDeflectedEdge        : R_TRIG;       // . [LOC] Front montant JoystickDeflected (relance AX18 sur geste franc, pas maintien)
     ForceStepApplyEdge      : R_TRIG;       // . [LOC] Detecteur front montant CfgForceStepApply
+    ResetSampleCountEdge    : R_TRIG;       // . [LOC] Detecteur front montant demande de RAZ IHM du compteur journalier
+    SafetyRearmedEdge       : R_TRIG;       // . [LOC] Detecteur front montant rearmement de la chaine AU
 
     // === GATE CONTINU HOMME-MORT ===
     CycleMotionPermit       : BOOL; // . [LOC] Permis de mouvement cycle = JoystickDeflected AND DeadmanArmed (manche deflechi + homme-mort arme)
@@ -171,6 +179,10 @@ VAR
 
     // === COMPTEUR PRELEVEMENTS (garde de front) ===
     SampleCountDone         : BOOL := FALSE; // . [LOC] F2: front de comptage SampleCount (1 seul increment par cycle)
+
+    // === COMPTEURS PRELEVEMENTS (RAZ journalier) ===
+    DayStartResetDone       : BOOL := FALSE; // . [LOC] Mode ON_FIRST_START : un demarrage de cycle a deja ete vu depuis le boot
+    SampleCountAutoResetPulse : BOOL;        // . [LOC] Impulsion interne de RAZ automatique issue du mode configure
 
     // === ETATS INTERNES ===
     State                   : E_AutoCycleStep := E_AutoCycleStep.AX0_REPOS; // . [LOC] Etape courante machine d'etat
@@ -277,6 +289,8 @@ SkipDrainEdge(CLK := SkipDrainRequest);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 JoyDeflectedEdge(CLK := JoystickDeflected);
+ResetSampleCountEdge(CLK := ResetSampleCountRequest);
+SafetyRearmedEdge(CLK := SafetyRearmed);
 StateExecutionInhibit := FALSE;
 ForceStepAccepted := FALSE;
 ForceStepRejected := FALSE;
@@ -530,6 +544,51 @@ instFault(Enable := Enable,
           Causes := instCauses);
 Fault := instFault.Fault;
 ErrorEdge(CLK := Fault.Error);
+{endregion}
+
+{region "§1bis Compteurs de prelevements"}
+// 🔢 DEUX compteurs DISTINCTS, incrementes au MEME evenement (depose tremie AX18, 1 fois par
+// cycle, garde de front SampleCountDone) :
+//    - SampleCount      : JOURNALIER — RAZ possible (bouton IHM conscient, ou mode AUTO configurable) ;
+//    - SampleCountTotal : TOTALISATEUR — JAMAIS remis a zero, aucun chemin d'ecriture hors l'increment AX18.
+// Cette region est volontairement AVANT le gate securite/mode (§2) : le compteur est une donnee
+// d'exploitation, pas une commande de mouvement — la RAZ reste donc effective hors SEMI_AUTO
+// (ex. remise a zero par le responsable en MAINT_N1). Aucune commande d'actionneur n'est produite ici.
+SampleCountAutoResetPulse := FALSE;
+
+// (b) ON_FIRST_START — premier demarrage de cycle depuis la mise sous tension de l'automate.
+// ⚠️ L'automate n'embarque AUCUNE horloge calendaire (pas de RTC, pas de bibliotheque temps) :
+//    le proxy "jour" retenu est le boot, valable pour une machine arretee entre deux postes.
+//    Conditions calquees sur la transition AX0->AX1 (§3) + le gate du FB (§2) : une simple
+//    pression de bouton hors conditions normales ne consomme PAS l'armement.
+// 🔒 Le drapeau "1er demarrage deja vu" est consomme par TOUT demarrage de cycle, QUEL QUE SOIT
+//    le mode en vigueur a cet instant : une bascule de mode en cours de poste n'arme donc
+//    JAMAIS une RAZ differee qui effacerait les comptes deja realises.
+IF Enable AND PowerContactorEngaged AND NOT EncoderFaultPresent AND NOT Fault.Latched
+   AND (State = E_AutoCycleStep.AX0_REPOS)
+   AND (StartEdge.Q OR DeadmanArmedEdge.Q) THEN
+    IF NOT DayStartResetDone THEN
+        DayStartResetDone := TRUE;
+        IF CfgSampleCountResetMode = E_CycleSampleCountResetMode.ON_FIRST_START THEN
+            SampleCountAutoResetPulse := TRUE;
+        END_IF;
+    END_IF;
+END_IF;
+
+// (c) ON_SAFETY_REARM — rearmement de la chaine AU (contacteur puissance reengage).
+IF (CfgSampleCountResetMode = E_CycleSampleCountResetMode.ON_SAFETY_REARM)
+   AND SafetyRearmedEdge.Q THEN
+    SampleCountAutoResetPulse := TRUE;
+END_IF;
+
+// (a) NEVER (defaut) : aucune RAZ automatique — seul le bouton IHM remet le journalier a zero.
+// 🔒 La RAZ ci-dessous n'ecrit QUE SampleCount : le totalisateur n'est jamais dans ce chemin.
+// ⚠️ Ordre intra-scan : cette region precede le CASE du Grafcet. Si une RAZ tombe sur le scan ou
+//    l'etape de fin de cycle s'execute, le journalier finit a 1 (remise a zero puis comptage de
+//    la depose en cours) : rien ne se perd.
+IF ResetSampleCountEdge.Q OR SampleCountAutoResetPulse THEN
+    SampleCount := 0;
+END_IF;
 {endregion}
 
 {region "§2 Gate securite & Bascule Mode"}
@@ -1513,7 +1572,8 @@ CASE State OF
 
         // Compteur de prélèvements (RETAIN) + durée du cycle — F2: cadré par front (1 seul par cycle)
         IF NOT SampleCountDone THEN
-            SampleCount := SampleCount + 1;
+            SampleCount := SampleCount + 1;            // JOURNALIER (RAZ IHM/mode auto possible)
+            SampleCountTotal := SampleCountTotal + 1;  // TOTALISATEUR : SEULE ecriture de toute l'application (gate G508)
             LastCycleDuration := CurrentCycleElapsed;   // fige la durée du cycle qui vient de s'achever
             SampleCountDone := TRUE;
         END_IF;

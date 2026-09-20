@@ -182,4 +182,13 @@ VAR_GLOBAL PERSISTENT RETAIN
     _MaintM1HomingRequired : BOOL := FALSE;  // 🧭 M1 : re-homing requis avant tout SEMI_AUTO
     _MaintM2HomingRequired : BOOL := FALSE;  // 🧭 M2 : re-homing requis avant tout SEMI_AUTO
 
+    // 🔢 CYCLE SEMI-AUTO — TOTALISATEUR DE PRÉLÈVEMENTS — AJOUTÉ EN FIN DE LISTE
+    // (mapping RETAIN positionnel : jamais d'insertion au milieu — NAMING_CONVENTION §pont persistant)
+    // Compteur de type kilométrique : incrémenté au MÊME événement que le journalier (dépose
+    // trémie AX18, 1 fois par cycle — FB_CycleSemiAuto.st), JAMAIS remis à zéro, JAMAIS modifiable :
+    // aucune commande IHM, aucun chemin d'écriture hors cet incrément (vérifié par gate G508).
+    // UDINT et non INT : à 200..400 cycles/jour, un INT (32767) déborderait en ~3 mois.
+    // Bloc VAR_GLOBAL PERSISTENT RETAIN : survit à la coupure, au Reset Warm/Cold ET au download.
+    _CycleSampleCountTotal : UDINT := 0;  // 🔒 Totalisateur de prélèvements — LECTURE SEULE, jamais remis à zéro
+
 END_VAR

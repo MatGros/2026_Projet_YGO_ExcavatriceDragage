@@ -16,5 +16,7 @@ STRUCT
     ImmersionLower_M   : REAL := -0.5;  (* 📐 Altimétrie Kobold basse confirmation immersion (AT4, PRG_04) *)
     ExtractionControlDistance_M : REAL := 0.5; (* 📐 Distance de contrôle AX11 après fermeture benne (m) *)
     Initialized        : BOOL := FALSE; (* 🚦 flag restauration boot *)
+    // ⚠️ AJOUT EN FIN DE STRUCT — mapping RETAIN positionnel : jamais d'insertion au milieu.
+    SampleCountResetMode : E_CycleSampleCountResetMode := E_CycleSampleCountResetMode.NEVER; (* 🔢 RAZ auto du compteur JOURNALIER : NEVER par defaut = aucune RAZ auto *)
 END_STRUCT
 END_TYPE

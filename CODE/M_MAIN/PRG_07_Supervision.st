@@ -87,6 +87,28 @@ VAR
     CycleDepthLowerBound_M  : REAL;   // . [LOC] Borne profondeur cycle : legale et limites descentes M1/M2
 END_VAR
 
+VAR CONSTANT
+    // ═══ T330 (Q1/Q2) — regles d'INGENIERIE, pas des cotes metier ═══════════════
+    // NON persistantes et NON IHM (AC3) : jamais exposees, jamais RETAIN.
+    CST_T330ReserveMinMargin_M : REAL := 1.00;   // Reserve minimale FDC logiciel haut / TOP homing
+    CST_T330SlowdownTopMin_M   : REAL := 0.50;   // Plancher du ralentissement haut (Q1)
+    CST_T330FdcMin_M           : REAL := 0.00;   // Borne basse FDC (Q21)
+    CST_T330FdcMax_M           : REAL := 9.00;   // Borne haute FDC (Q21/C1 : TOP<=10 et Delta>=1 => FDC<=9)
+    CST_T330TopMin_M           : REAL := 1.00;   // Borne basse TOP (Q21)
+    CST_T330TopMax_M           : REAL := 10.00;  // Borne haute TOP (Q21)
+END_VAR
+
+VAR
+    // ═══ T330 — memoires NON persistantes (AC3 : ni IHM, ni RETAIN) ═════════════
+    T330PrevInit              : BOOL;  // . [LOC] Seed des memoires effectue depuis les valeurs RESTAUREES
+    T330PrevTopSensorPosM     : REAL;  // . [LOC] Valeur precedente TOP (detection front operateur)
+    T330PrevCableLimitAscentM : REAL;  // . [LOC] Valeur precedente FDC (detection front operateur)
+    T330PrevSlowdownTopM      : REAL;  // . [LOC] Valeur precedente ralentissement haut
+    T330InHoming              : BOOL;  // . [LOC] Homing en cours (cycle machine complet OU transaction preset)
+    T330MsgCorrected          : BOOL;  // . [LOC] Une correction T330 a eu lieu ce scan (consomme par le bandeau)
+    T330MsgHold               : TOF;   // . [LOC] Maintien du message T330 (1 scan = 10 ms serait invisible a l'IHM)
+END_VAR
+
 {region "§1 Horloge, heartbeat et reset machine"}
 // === 🧩 §1 HORLOGE, HEARTBEAT & RESET MACHINE ===
 // Trois fonctions de tête : clignotant global, heartbeat IHM (surveillance lien),
@@ -136,6 +158,110 @@ FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
 //   - ensuite : Persist := Hmi (la config IHM est sauvegardée en continu).
 // Le flag commun GVL_IHM.Commun.ConfigRestoredFromPersistent est levé dès qu'au moins
 // un bridge a restauré au boot, pour signaler à l'IHM qu'une config persistante a été rappelée.
+
+{region "🔧 T330 NORMALISATION"}
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🔧 T330 — COHERENCE DES REGLAGES HAUT (Q1/Q2) · plan C3 v1.3
+// ───────────────────────────────────────────────────────────────────────────────
+// ORDRE IMPOSE (Q21 bis) :  (1) R0 clamp ABSOLU inconditionnel, FDC et TOP separement
+//                        puis (2) regle Delta >= 1,00 m / slowdown >= 0,50 m.
+// OPTION A (Q23) : reference lue sur le PERSISTANT ; les ponts ci-dessous ecrivent la
+//                  valeur CORRIGEE dans le MEME scan (aucune fenetre NVRAM).
+// AC3 : AUCUNE variable persistante ni IHM nouvelle — constantes CST_* et memoires
+//       locales uniquement. Jamais de champ de fin de course supplementaire.
+// C2/Q22 : R2 (correction du TOP) est INHIBEE pendant le homing — sur le CYCLE COMPLET
+//          (HX0..HX6), pas seulement la transaction de preset (~50 ms). Aucune memoire
+//          d'intention : au retour, si la config est toujours invalide, le REPLI NIVEAU
+//          ci-dessous applique Q17 (preserver le TOP, corriger le FDC).
+// ═══════════════════════════════════════════════════════════════════════════════
+T330MsgCorrected := FALSE;
+
+// Homing en cours : cycle machine COMPLET OU transaction de preset, sur M1 ET M2.
+T330InHoming := PRG_02_Acquisition.Data.MachineHoming.Active
+                OR PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
+                OR PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy;
+
+// Inhibee tant que les ponts n'ont pas RESTAURE (sinon les defauts DUT seraient pris
+// pour une saisie operateur — piege P2 du cadrage).
+IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.Commun.Cfg.Initialized THEN
+
+    // Seed des memoires depuis les valeurs RESTAUREES (jamais depuis les defauts DUT).
+    IF NOT T330PrevInit THEN
+        T330PrevTopSensorPosM     := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
+        T330PrevCableLimitAscentM := GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M;
+        T330PrevSlowdownTopM      := GVL_IHM.Commun.Cfg.WinchSlowdownDistanceTop_M;
+        T330PrevInit              := TRUE;
+    END_IF;
+
+    // ─── GEL PENDANT LE HOMING (decision C2 b : « NVRAM gelee — AUCUNE ecriture Cfg ») ──
+    // Toutes les ecritures ci-dessous (R0, R3, R1, R2) sont suspendues pendant le homing.
+    // ⚠️ Ce gel couvre R1/R0/R3 AUSSI : une correction pendant un homing deplacerait la CIBLE
+    // de homing (R0/R2) ou detruirait le reglage commissionne (R1) et le persisterait.
+    // ⇒ A la sortie du homing, les memoires ont suivi la saisie (bloc ci-dessous, hors gel) :
+    //    il n'y a plus de FRONT, donc le REPLI NIVEAU applique R1 = Q17 (preserver le TOP). C'est
+    //    exactement la decision 2c : « rien a memoriser, on retombe dans le cas normal Q2 ».
+    IF NOT T330InHoming THEN
+
+    // ─── (1) R0 — CLAMP ABSOLU (Q21 bis) : non conditionne a une violation de Delta ──────
+    // ⚠️ « INCONDITIONNEL » au sens de Q21 bis = non subordonne a la regle Delta. Le gel
+    //    homing ci-dessus reste prioritaire (decision C2 b, motivee securite).
+    IF GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M < CST_T330FdcMin_M THEN
+        GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M := CST_T330FdcMin_M;
+        T330MsgCorrected := TRUE;
+    ELSIF GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M > CST_T330FdcMax_M THEN
+        GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M := CST_T330FdcMax_M;
+        T330MsgCorrected := TRUE;
+    END_IF;
+    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M < CST_T330TopMin_M THEN
+        GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M := CST_T330TopMin_M;
+        T330MsgCorrected := TRUE;
+    ELSIF GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M > CST_T330TopMax_M THEN
+        GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M := CST_T330TopMax_M;
+        T330MsgCorrected := TRUE;
+    END_IF;
+
+    // ─── (2) R3 — plancher du ralentissement haut ───────────────────────────────
+    IF GVL_IHM.Commun.Cfg.WinchSlowdownDistanceTop_M < CST_T330SlowdownTopMin_M THEN
+        GVL_IHM.Commun.Cfg.WinchSlowdownDistanceTop_M := CST_T330SlowdownTopMin_M;
+        T330MsgCorrected := TRUE;
+    END_IF;
+
+    // ─── (3) R1 / R2 — regle Delta >= 1,00 m sur les valeurs CLAMPEES ───────────
+    // Detection du champ MODIFIE : M1 (maitre) et FDC commun uniquement.
+    // ⛔ JAMAIS le champ M2 : il est REEcrit chaque scan par le miroir M1 (ligne suivante).
+    IF (GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M
+        - GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M) < CST_T330ReserveMinMargin_M THEN
+        IF (GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M <> T330PrevTopSensorPosM)
+           AND NOT (GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M <> T330PrevCableLimitAscentM) THEN
+            // R2 — le TOP vient d'etre saisi : corriger le TOP sauf pendant le homing (C2/Q22)
+            IF NOT T330InHoming THEN
+                GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M :=
+                    GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M + CST_T330ReserveMinMargin_M;
+                T330MsgCorrected := TRUE;
+            END_IF;
+        ELSE
+            // R1 (et Q17 : les deux champs ont change, ou aucun) — PRESERVER le TOP,
+            // corriger le FDC. C'est aussi le REPLI NIVEAU a la sortie du homing.
+            GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M :=
+                GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M - CST_T330ReserveMinMargin_M;
+            T330MsgCorrected := TRUE;
+        END_IF;
+    END_IF;   // fin de la regle Delta (R1/R2)
+    END_IF;   // ─── fin du GEL HOMING (decision C2 b) : plus aucune ecriture Cfg pendant le homing
+
+    // ─── Memoires de front (HORS gel : suivies MEME pendant le homing) ──────────
+    // Indispensable : a la sortie du homing la saisie operateur n'est plus un FRONT, donc le
+    // REPLI NIVEAU ci-dessus applique R1 = Q17 (preserver le TOP, corriger le FDC). C'est la
+    // decision 2c : « rien a memoriser, on retombe dans le cas normal Q2 ».
+    T330PrevTopSensorPosM     := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
+    T330PrevCableLimitAscentM := GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M;
+    T330PrevSlowdownTopM      := GVL_IHM.Commun.Cfg.WinchSlowdownDistanceTop_M;
+END_IF;
+
+// Maintien IHM : une correction dure UN scan (10 ms) -> sans maintien le message serait
+// invisible. TOF = conserve Q VRAI pendant PT apres retombee de IN (fenetre de maintien).
+T330MsgHold(IN := T330MsgCorrected, PT := T#500ms);
+{endregion}
 
 instCfgPersistBridgeWinchM1(Hmi := GVL_IHM.M1TreuilRetenue.Cfg, Persist := _WinchM1CfgPersist);
 IF instCfgPersistBridgeWinchM1.JustRestored THEN
@@ -615,6 +741,9 @@ GVL_IHM.CycleSemiAuto.State.CycleStateStr          := PRG_03_Modes_Cycle.Data.Se
 GVL_IHM.CycleSemiAuto.State.CycleStepAtError       := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;
 GVL_IHM.CycleSemiAuto.State.ResumeAfterFaultAvailable := PRG_03_Modes_Cycle.Data.SequenceState.ResumeAfterFaultAvailable;
 GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
+// 🔒 Totalisateur de prélèvements : PUBLICATION LECTURE SEULE — son seul écrivain est
+// l'incrément AX18 de FB_CycleSemiAuto (PRG_03, VAR_IN_OUT).
+GVL_IHM.CycleSemiAuto.State.SampleCountTotal       := _CycleSampleCountTotal;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
 GVL_IHM.CycleSemiAuto.State.DrainTimeElapsed_S     := DINT_TO_INT((TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeRemaining) + DINT#999) / DINT#1000);
@@ -676,6 +805,7 @@ instHmiBannerFormatter(
     MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
     MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction,
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
+    CfgCorrectedT330      := T330MsgHold.Q,
     BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassTranslation     := GVL_IHM.M3Translation.Bypass.Global,
