@@ -192,6 +192,7 @@ VAR
     // pilotage unitaire M2 "sécurisé" -- bornes ouvert/fermé + palier 1
     ManualBucketLimitsActive : BOOL;
     ManualBucketJogActive    : BOOL; // WinchSel=2 + MAINT : jog benne unitaire M2 (ouv/ferm), indépendant du toggle bornes
+    T248BucketJogActive : BOOL; // Phase JOG du séquencement benne-auto couplé (CoupledBucketPhaseLocked) : borne alignée sur l'état franc IsClosed/IsOpen, caduque dès Arbitrated=0
     M2JogApproachOpen        : BOOL; // M2 dans la zone de ralentissement avant l'arrêt ouverture (palier 1)
     M2JogApproachClose       : BOOL; // M2 dans la zone de ralentissement avant l'arrêt fermeture (palier 1)
     SlackCableAscentCapStep1    : BOOL; // mou de câble en récupération -- bride la montée au Palier 1
@@ -742,26 +743,29 @@ DescendPermitDiveBucketOpen := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.Desc
 
 // Le bypass arrête aussi la descente instantanément, même doctrine que le mécanisme
 // KoboldBottomTouchLatched.
-// Bornes benne pilotées par le seul toggle IHM (TglManualBucketLimits), quel que soit le
-// sélecteur treuil -- protège aussi bien le jog M2 unitaire que le pilotage couplé.
-// Exclut un cycle géré par instBucket (CloseReq/OpenReq mémorisé, bouton confirmé ou séquence
-// automatique) : celui-ci a déjà ses propres bornes via FB_Bucket (IsClosed/IsOpen), un double
-// bornage y recréerait le palier 1 forcé et la coupure avant état franc.
-// Exclut aussi explicitement la phase T248 (CoupledBucketPhaseLocked) : dans cette phase, M2
-// est piloté par le vrai JOG WinchSel=2 (Arbitrated=2) SANS passer par instBucket -- Busy reste
-// FALSE alors que le palier 1 forcé et la coupure avant état franc (trace 70, T327 d'origine)
-// s'y reproduisaient. La sortie de cette phase est pilotée par la transition BucketIsClosed/
-// BucketIsOpen (FB_Modes §BucketSeqSatisfied) -- PAS par une borne géométrique équivalente
-// démontrée ici : si l'état franc n'est jamais atteint, aucune borne dédiée à cette phase
-// n'arrête M2 dans ce fichier (revue T327 2026-09-20, borne dédiée à concevoir séparément).
-// Bornes directes ouvert/fermé (mêmes offsets que FB_Bucket, relatifs à la position réelle de
-// M1) + palier 1 (voir instWinchM2 §6 plus bas), pour le jog libre uniquement (ni instBucket,
-// ni séquencement T248).
+// Mode "pilotage unitaire M2 sécurisé" : bornes du JOG MANUEL, portée STRICTE = sélecteur
+// arbitré sur M2 seul (Arbitrated=2) + toggle IHM, HORS phase JOG du séquencement benne-auto
+// couplé (CoupledBucketPhaseLocked, qui passe aussi par Arbitrated=2 mais possède sa propre
+// borne ci-dessous). Ne s'applique
+// JAMAIS au pilotage couplé (Arbitrated=0, MAINT ou SEMI_AUTO) : ces mouvements ont leurs
+// propres permis process (DescendPermitDiveBucketOpen, séquence auto) et le couplage atomique
+// M1/M2 propagerait toute coupure M2 en blocage total des deux treuils. Ne passe PAS par
+// instBucket (pas de CloseReq/OpenReq mémorisé, jogging libre) -- bornes directes ouvert/fermé
+// (mêmes offsets que FB_Bucket, relatifs à la position réelle de M1) + palier 1 (voir
+// instWinchM2 §6 plus bas).
 ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits
-    AND NOT instBucket.Lifecycle.Busy
+    AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2)
     AND NOT PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked;
 
 ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
+// Phase JOG du séquencement benne-auto couplé (CoupledBucketPhaseLocked ET Arbitrated=2) :
+// borne alignée sur la frontière
+// RÉELLE IsClosed/IsOpen (CoherenceLimitM, même seuil que FB_Bucket), jamais sur l'anticipation
+// -- sans mouvement pour "coaster" le reste du trajet, une coupure à l'anticipation laisse un
+// trou permanent avant l'état franc. Caduque automatiquement dès que Arbitrated repasse à 0
+// (phase couplée) : ne bride jamais le mouvement couplé qui suit.
+T248BucketJogActive := PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked
+    AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2);
 // Ce chemin (pilotage unitaire M2, hors instBucket) applique l'anticipation d'inertie
 // OpenAnticipationM/CloseAnticipationM (mêmes que FB_Bucket, réglables IHM) pour couvrir
 // aussi le jog unitaire. L'ouverture benne (descente M2) est permise soit par le mode Dive
@@ -769,16 +773,19 @@ ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTo
 // (ManualBucketJogActive) — sinon la benne ne pourrait plus s'ouvrir en WinchSel=2.
 ProcessPermitM2_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched)
     AND (DescendPermitDiveBucketOpen OR ManualBucketJogActive)
-    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM <= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
+    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM <= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)))
+    AND NOT (T248BucketJogActive AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM <= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.CoherenceLimitM)));
 
 // Permis process de montee : contrat extraction commun aux deux axes.
 // M2 conserve l'anticipation de fermeture du pilotage benne unitaire, deja appliquee
 // historiquement dans ProcessAndSafetyPermitM2_Ascent (refactor sans changement fonctionnel).
+// Meme doctrine que la descente ci-dessus (T248BucketJogActive, CoherenceLimitM).
 ProcessPermitM1_Ascent := NOT ExtractionAssistActive
     OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit;
 ProcessPermitM2_Ascent := (NOT ExtractionAssistActive
     OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit)
-    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM >= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
+    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM >= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)))
+    AND NOT (T248BucketJogActive AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM >= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CoherenceLimitM)));
 
 // Zone de ralentissement jog unitaire M2 : palier 1 forcé dans les JogSlowdownZoneM
 // derniers mètres AVANT le point d'arrêt anticipé (Offset ± Anticipation). Le "1 m d'avant"

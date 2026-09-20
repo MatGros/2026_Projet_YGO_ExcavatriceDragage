@@ -585,7 +585,7 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Butees relatives benne actives en jog M2 MANUEL (TglManualBucketLimits ET selection operateur WinchSel=2 -- jamais pendant une phase automatique)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Butees relatives benne actives en jog M2 MANUEL (TglManualBucketLimits ET selecteur arbitre = 2, hors phase T248) -- jamais en pilotage couple</xhtml>
               </documentation>
             </variable>
             <variable name="OffsetStateMismatchWarn">
