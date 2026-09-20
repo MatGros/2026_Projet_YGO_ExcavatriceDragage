@@ -1,8 +1,17 @@
 # T332 — Hooks Claude Code : `hookSpecificOutput` sans `hookEventName`
 
 > **Preuve durable de diagnostic** (T279 — routage : `DOC/WFLOW/AUDITS/`).
-> Session T332 · agent `DSH01` · 2026-09-20 · criticité **C4 (outillage)** · domaine `OUTILLAGE / AGENT_WORKFLOW`.
-> Verrou : `DOC/WFLOW/TASK_LOCKS.json` → `work_locks.T332` = `DSH01`.
+> Session T332 · agent **`DSH04`** · 2026-09-20 · criticité **C4 (outillage)** · domaine `OUTILLAGE / AGENT_WORKFLOW`.
+> Verrou : `DOC/WFLOW/TASK_LOCKS.json` → `work_locks.T332` = **`DSH04`**.
+>
+> ⚠️ **Correction de tag (2026-09-20T15:55, arbitrage CC01)** : ce travail a été produit sous le tag
+> `DSH01`, **contaminé** — au moins 6 sessions distinctes journalisaient sous `DSH01`
+> (`T255-D`, `T300-audit-M3-trace`, `T300-PA`, `T330-P1P2`, `T332`, `T333`). CC01 a renommé
+> `T328→DSH03`, `T332→DSH04`, `T255-D→DSH05` ; T333 portait déjà `DSH02`. **Toutes les écritures
+> registre/heartbeat de cette session portent désormais `DSH04`.** Les lignes antérieures du log
+> `status/T332.log` marquées `[DSH01]` sont **mis-taggées et conservées telles quelles** (aucune
+> réécriture automatique d'historique) ; une ligne corrective `[DSH04]` les référence.
+> Signalé, non corrigé : plusieurs autres logs/tâches portent encore des tags `DSH01` hérités.
 > **Aucun fichier hors dépôt n'a été modifié. Aucun commit. Aucun hook retiré. Aucune allowlist.**
 
 ---
@@ -257,12 +266,15 @@ Optimisation séparée possible (appel `G200_check_linkage.py --files` au lieu d
 | 13:48 | Localisation : 0 `hookSpecificOutput` dans le dépôt | `ok` |
 | 13:48 | Diagnostic + preuve par empreinte, durées mesurées | `ok` |
 | 13:48 | Test garde-fou `PreToolUse` (exit 2) | `ok` |
-| 13:49 | Verrou `T332` posé (`TASK_LOCKS.json`, acteur `DSH01`) | `ok` |
+| 13:49 | Verrou `T332` posé (`TASK_LOCKS.json`, acteur `DSH01` — **tag contaminé**, renommé `DSH04` à 15:55) | `ok` |
 | 13:49 | ⛔ **ARRÊT phase 2** — restitution cartographie + durées + correctif | `attente_validation` |
 | — | Arbitrage humain : *ne rien écrire hors dépôt* ; preuve écrite durable | `ok` |
 | — | Rédaction de cette preuve | `ok` |
+| 15:55 | Assainissement nomenclature (CC01) : `T332` → `DSH04`, **adopté** pour toute écriture registre/heartbeat | `ok` |
 
-Checkpoints machine : `TOOLS/AGENT_WORKFLOW/status/T332.log` (`agent_heartbeat.py`, `--agent DSH01`).
+Checkpoints machine : `TOOLS/AGENT_WORKFLOW/status/T332.log` (`agent_heartbeat.py`).
+Les lignes du log antérieures à 15:55 portent `--agent DSH01` (**mis-taggées, conservées telles quelles**) ;
+à partir de 15:55, `--agent DSH04`.
 
 ---
 
@@ -270,7 +282,7 @@ Checkpoints machine : `TOOLS/AGENT_WORKFLOW/status/T332.log` (`agent_heartbeat.p
 
 | Fichier | Nature |
 |---|---|
-| `DOC/WFLOW/TASK_LOCKS.json` | verrou `T332` = `DSH01` (fichier **gitignoré**, `.gitignore:102`) |
+| `DOC/WFLOW/TASK_LOCKS.json` | verrou `T332` = **`DSH04`** (fichier **gitignoré**, `.gitignore:102`) |
 | `DOC/WFLOW/AUDITS/T332_HOOKS_CLAUDE_CODE_20260920.md` | **ce document** (preuve durable) |
 | `TOOLS/AGENT_WORKFLOW/status/T332.log` | checkpoints heartbeat (zone locale dédiée) |
 

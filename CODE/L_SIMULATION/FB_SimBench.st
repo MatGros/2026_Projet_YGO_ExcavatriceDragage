@@ -481,14 +481,19 @@ Winch.COD2_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING
 
 {region "§2bis Rattrapage mecanique M1/M2"}
 // La benne relie mecaniquement les deux treuils. En MONTEE couplee et sans blocage, le jeu relatif
-// est repris : Delta = PosM2 - PosM1 rejoint la bande FERMEE (OffsetCloseM +/- CoherenceLimitM).
+// est repris : Delta = PosM2 - PosM1 rejoint la BUTEE mecanique benne FERMEE (OffsetCloseM).
 // Sans ce rattrapage, un ecart residuel (trou metier de fermeture : coupure d'anticipation a 13,8 m
 // alors que l'etat ferme exige 14,0 m) laisse la benne "non fermee" et plafonne la montee au palier 1.
 // 🔒 Le modele n'ecrit QUE l'image publiee (Winch.COD2_PosValue) -- JAMAIS RawPosM2, memoire
 //    persistante du codeur dont FB_Sim_Encoder reste l'unique producteur.
 // 🔒 MONTEE UNIQUEMENT : la descente couplee reste au modele existant SimM2CoupledDescentModelActive
 //    (exclusion mutuelle : les deux modeles ne s'appliquent jamais ensemble).
-// 🔒 Cible = ENTREE de la bande fermee (equilibre elastique reel), jamais la butee theorique.
+// 🔒 Cible = BUTEE MECANIQUE benne fermee (BucketOffsetCloseM) => ecart relatif 0 % exige par
+//    l'operateur, seule valeur qui fasse converger l'ouverture benne vers 0 % (arbitrage CC01
+//    2026-09-20, D1 : l'hypothese << equilibre elastique >> a OffsetCloseM - 0,5 x CoherenceLimitM
+//    est ABANDONNEE, elle plafonnait l'ecart a 3,4 % et ne satisfaisait pas le besoin reel).
+//    Le sens unique (correction seulement si Delta < cible) et le bornage de pente
+//    (LIMIT + MIN(cible - Delta)) interdisent tout depassement de butee.
 WinchCouplingBothSameDir := (M1_RelayFwd AND M2_RelayFwd) OR (M1_RelayRev AND M2_RelayRev);
 WinchCouplingGate := SimWinchCouplingModelActive
                      AND WinchCouplingBothSameDir
@@ -502,7 +507,10 @@ WinchCouplingActive := WinchCouplingGate;
 WinchCouplingCorrectionPts := 0;
 IF WinchCouplingGate THEN
     WinchCouplingDelta_M := M2_CablePos_M - M1_CablePos_M;
-    WinchCouplingTarget_M := BucketOffsetCloseM - (0.5 * BucketCoherenceLimitM);
+    // Cible = butee mecanique benne FERMEE (ecart relatif 0 %). Une cible intermediaire
+    // (OffsetCloseM - 0,5 x CoherenceLimitM) laissait un ecart plancher de 3,4 % jamais
+    // corrigible : T328, arbitrage CC01 2026-09-20 (D1).
+    WinchCouplingTarget_M := BucketOffsetCloseM;
     IF WinchCouplingDelta_M < WinchCouplingTarget_M THEN
         WinchCouplingCorrection_M := (WinchCouplingTarget_M - WinchCouplingDelta_M)
                                      * CST_SimBenchCycleTimeS

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T02:01:11.923014" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T02:01:11.923014">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T14:14:07.488519" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T14:14:07.488519">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2189,14 +2189,19 @@ Winch.COD2_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING
 
 {region "§2bis Rattrapage mecanique M1/M2"}
 // La benne relie mecaniquement les deux treuils. En MONTEE couplee et sans blocage, le jeu relatif
-// est repris : Delta = PosM2 - PosM1 rejoint la bande FERMEE (OffsetCloseM +/- CoherenceLimitM).
+// est repris : Delta = PosM2 - PosM1 rejoint la BUTEE mecanique benne FERMEE (OffsetCloseM).
 // Sans ce rattrapage, un ecart residuel (trou metier de fermeture : coupure d'anticipation a 13,8 m
 // alors que l'etat ferme exige 14,0 m) laisse la benne "non fermee" et plafonne la montee au palier 1.
 // 🔒 Le modele n'ecrit QUE l'image publiee (Winch.COD2_PosValue) -- JAMAIS RawPosM2, memoire
 //    persistante du codeur dont FB_Sim_Encoder reste l'unique producteur.
 // 🔒 MONTEE UNIQUEMENT : la descente couplee reste au modele existant SimM2CoupledDescentModelActive
 //    (exclusion mutuelle : les deux modeles ne s'appliquent jamais ensemble).
-// 🔒 Cible = ENTREE de la bande fermee (equilibre elastique reel), jamais la butee theorique.
+// 🔒 Cible = BUTEE MECANIQUE benne fermee (BucketOffsetCloseM) =&gt; ecart relatif 0 % exige par
+//    l'operateur, seule valeur qui fasse converger l'ouverture benne vers 0 % (arbitrage CC01
+//    2026-09-20, D1 : l'hypothese &lt;&lt; equilibre elastique &gt;&gt; a OffsetCloseM - 0,5 x CoherenceLimitM
+//    est ABANDONNEE, elle plafonnait l'ecart a 3,4 % et ne satisfaisait pas le besoin reel).
+//    Le sens unique (correction seulement si Delta &lt; cible) et le bornage de pente
+//    (LIMIT + MIN(cible - Delta)) interdisent tout depassement de butee.
 WinchCouplingBothSameDir := (M1_RelayFwd AND M2_RelayFwd) OR (M1_RelayRev AND M2_RelayRev);
 WinchCouplingGate := SimWinchCouplingModelActive
                      AND WinchCouplingBothSameDir
@@ -2210,7 +2215,10 @@ WinchCouplingActive := WinchCouplingGate;
 WinchCouplingCorrectionPts := 0;
 IF WinchCouplingGate THEN
     WinchCouplingDelta_M := M2_CablePos_M - M1_CablePos_M;
-    WinchCouplingTarget_M := BucketOffsetCloseM - (0.5 * BucketCoherenceLimitM);
+    // Cible = butee mecanique benne FERMEE (ecart relatif 0 %). Une cible intermediaire
+    // (OffsetCloseM - 0,5 x CoherenceLimitM) laissait un ecart plancher de 3,4 % jamais
+    // corrigible : T328, arbitrage CC01 2026-09-20 (D1).
+    WinchCouplingTarget_M := BucketOffsetCloseM;
     IF WinchCouplingDelta_M &lt; WinchCouplingTarget_M THEN
         WinchCouplingCorrection_M := (WinchCouplingTarget_M - WinchCouplingDelta_M)
                                      * CST_SimBenchCycleTimeS
@@ -5411,6 +5419,29 @@ Ready := TRUE;
                 <simpleValue value="0.01" />
               </initialValue>
             </variable>
+            <variable name="FaultCloseWhileRunning">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Branche de FAUTE EXPLICITE — defaut FALSE : chemin nominal strictement inchange.
+       Rejoue le defaut terrain « cause 6 instantanee » : contact frein ferme alors que le
+       variateur retourne encore de la vitesse (trace 2026-09-04, 26,437 s, 10,00 Hz,
+       State.ErrorId=64). La garde nominale CST_StopFrequency_Hz est CONSERVEE telle quelle :
+       elle est validee par la meme trace (frein ouvert a 0,60 Hz, ferme a 0,00 Hz).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FaultCloseDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -5433,6 +5464,14 @@ Ready := TRUE;
                 <BOOL />
               </type>
             </variable>
+            <variable name="FaultCloseActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Branche de faute effectivement appliquee ce scan</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="MechanicalTimer_S">
@@ -5441,6 +5480,11 @@ Ready := TRUE;
               </type>
             </variable>
             <variable name="ContactTimer_S">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="FaultTimer_S">
               <type>
                 <REAL />
               </type>
@@ -5468,12 +5512,24 @@ IF NOT Enable THEN
     CoilEnergized := FALSE;
     MechanicallyOpen := FALSE;
     ContactOpen := FALSE;
+    FaultCloseActive := FALSE;
     MechanicalTimer_S := 0.0;
     ContactTimer_S := 0.0;
+    FaultTimer_S := 0.0;
     RETURN;
 END_IF;
 
-CoilEnergized := ReleaseCmd;
+(* Faute explicite : chronometre propre, remis a zero des que le stimulus retombe. *)
+IF FaultCloseWhileRunning THEN
+    FaultTimer_S := FaultTimer_S + CycleTime_S;
+ELSE
+    FaultTimer_S := 0.0;
+END_IF;
+FaultCloseActive := FaultCloseWhileRunning AND (FaultTimer_S &gt;= MAX(0.0, FaultCloseDelay_S));
+
+(* La faute fait retomber la bobine : l'etat electrique publie reste coherent avec la
+   fermeture mecanique observee (jamais « bobine energisee ET frein serre »). *)
+CoilEnergized := ReleaseCmd AND NOT FaultCloseActive;
 IF CoilEnergized THEN
     IF NOT MechanicallyOpen THEN
         MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
@@ -5484,7 +5540,7 @@ IF CoilEnergized THEN
     ELSE
         MechanicalTimer_S := 0.0;
     END_IF;
-ELSIF ActualFrequency_Hz &lt;= CST_StopFrequency_Hz THEN
+ELSIF FaultCloseActive OR (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
     IF MechanicallyOpen THEN
         MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
         IF MechanicalTimer_S &gt;= MAX(0.0, CloseDelay_S) THEN

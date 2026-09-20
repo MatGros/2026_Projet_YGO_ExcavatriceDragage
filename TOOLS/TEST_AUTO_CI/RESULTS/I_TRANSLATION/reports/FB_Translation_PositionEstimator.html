@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Rapport de test — FB_Translation_PositionEstimator [FAIL]</title>
+<title>Rapport de test — FB_Translation_PositionEstimator [PASS]</title>
 <style>
     :root {
         --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
@@ -370,14 +370,14 @@
         <div style="display:flex;align-items:center;gap:12px;">
             <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
-            <span class="badge badge-fail">FAIL</span>
+            <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-20 13:47:55</div>
+    <div class="exec-time">2026-09-20 16:08:20</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (4 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-0">TC-P11-EST-001 Reprise sur ColdStart avec position persistee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-1">TC-P11-EST-002 Recalage absolu instantane sur front montant capteur P1 (20.0m)</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-positionestimator-2">TC-P11-EST-004 Recalage a CHAQUE capteur sur front DESCENDANT (trajet Tremie vers Maintenance)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-3">TC-P11-EST-005 Recalage a CHAQUE capteur sur front MONTANT (trajet Maintenance vers Tremie)</a></li></ul>
+        <summary>📋 Sommaire (6 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-0">TC-P11-EST-001 Reprise sur ColdStart avec position persistee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-1">TC-P11-EST-002 Recalage absolu instantane sur front montant capteur P1 (20.0m)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-2">TC-P11-EST-004 Recalage a CHAQUE capteur sur front DESCENDANT (trajet Tremie vers Maintenance)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-3">TC-P11-EST-005 Recalage a CHAQUE capteur sur front MONTANT (trajet Maintenance vers Tremie)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-4">TC-P11-EST-006 Continuite de la position entre deux fronts (seuil Q3 : |Freq| x Gain x dt + 1 mm)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-5">TC-P11-EST-007 Blip capteur court (1 scan) en s eloignant : comportement defini (decision Q2 = recaler)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -386,7 +386,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            3/4 vérifications validées
+            6/6 vérifications validées
         </div>
     </div>
     
@@ -419,15 +419,15 @@
         <ul><li><code>TC-P11-EST-01</code> — Reprise ColdStart</li><li><code>TC-P11-EST-02</code> — Recalage Came P1</li><li><code>TC-P11-EST-03</code> — Intégration Odométrique</li></ul>
     </div>
     <div class="af-warning-banner">
-        <div class="af-warning-title">⚠️ 4 test(s) present(s) dans ce fichier mais absent(s) du catalogue AF (ID inconnu ou retire)</div>
-        <ul><li><code>TC-P11-EST-001</code></li><li><code>TC-P11-EST-002</code></li><li><code>TC-P11-EST-004</code></li><li><code>TC-P11-EST-005</code></li></ul>
+        <div class="af-warning-title">⚠️ 2 test(s) present(s) dans ce fichier mais absent(s) du catalogue AF (ID inconnu ou retire)</div>
+        <ul><li><code>TC-P11-EST-001</code></li><li><code>TC-P11-EST-002</code></li></ul>
     </div>
     
     <details class="pin-diagram-details" open>
         <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Translation_PositionEstimator</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 18 flux entrants · 4 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigTremie <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigPV <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigP2 <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigP1 <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigMaintenance <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ CycleTimeCalc <span style="color:var(--muted);font-weight:500;">(FB_CycleTime)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ColdStart <span style="color:var(--muted);font-weight:500;">(BOOL := TRUE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ FirstScanDone <span style="color:var(--muted);font-weight:500;">(BOOL := FALSE)</span></span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigTremie <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigPV <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigP2 <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigP1 <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigMaintenance <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigDnTremie <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigDnPV <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigDnP2 <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigDnP1 <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigDnMaintenance <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ CycleTimeCalc <span style="color:var(--muted);font-weight:500;">(FB_CycleTime)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ColdStart <span style="color:var(--muted);font-weight:500;">(BOOL := TRUE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ FirstScanDone <span style="color:var(--muted);font-weight:500;">(BOOL := FALSE)</span></span></div>
         </div>
         
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
@@ -635,8 +635,8 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Translation_PositionEstimator</code></td>
                 <td>18</td><td>4</td>
-                <td>0</td><td>8</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (8 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>13</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (13 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
@@ -649,7 +649,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 4 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 6 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-translation-positionestimator-0" class="test-card test-card-pass test-card-collapsed">
@@ -692,9 +692,9 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-positionestimator-2" class="test-card test-card-fail">
+        <article id="test-fb-translation-positionestimator-2" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-EST-004 Recalage a CHAQUE capteur sur front DESCENDANT (trajet Tremie vers Maintenance) </h3>
                 <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-EST-004 Recalage a CHAQUE capteur sur front DESCENDANT (trajet Tremie vers Maintenance)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
@@ -702,8 +702,8 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (12)</span></summary>
-                <ul class="scenario-list"><li>Trajet vers la Maintenance : les capteurs s&#x27;ETEIGNENT un par un (fronts descendants)</li><li>Mot thermometre au depart : 11111, chariot a la Tremie</li><li>--- Capteur Tremie (cote 0.0 m) : front descendant = depart vers la Maintenance ---</li><li>Roule vers P2 : l&#x27;odometrie fait deriver l&#x27;estimation</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (13)</span></summary>
+                <ul class="scenario-list"><li>Trajet vers la Maintenance : les capteurs s&#x27;ETEIGNENT un par un (fronts descendants)</li><li>gain de production pose explicitement : le test ne depend pas du defaut du FB</li><li>Mot thermometre au depart : 11111, chariot a la Tremie</li><li>--- Capteur Tremie (cote 0.0 m) : front descendant = depart vers la Maintenance ---</li><li>Roule vers P2 : l&#x27;odometrie fait deriver l&#x27;estimation</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
        DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur PV (cote 5.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
        DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur P2 (cote 15.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
        DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur P1 (cote 20.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
@@ -714,7 +714,7 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (17)</span></summary>
                 <ul class="checks-list"><li>TC-P11-EST-004 : capteurs deja actifs au 1er scan -&gt; aucun recalage</li><li>TC-P11-EST-004 : front DESCENDANT Tremie -&gt; Recalibrated TRUE</li><li>TC-P11-EST-004 : front descendant Tremie -&gt; id 4</li><li>TC-P11-EST-004 : front descendant Tremie -&gt; position 0.0 m</li><li>TC-P11-EST-004 : aucun front entre deux capteurs -&gt; pas de recalage</li><li>TC-P11-EST-004 : front DESCENDANT PV -&gt; Recalibrated TRUE</li><li>TC-P11-EST-004 : front descendant PV -&gt; id 3</li><li>TC-P11-EST-004 : front descendant PV -&gt; position 5.0 m</li><li>TC-P11-EST-004 : front DESCENDANT P2 -&gt; Recalibrated TRUE</li><li>TC-P11-EST-004 : front descendant P2 -&gt; id 2</li><li>TC-P11-EST-004 : front descendant P2 -&gt; position 15.0 m</li><li>TC-P11-EST-004 : front DESCENDANT P1 -&gt; Recalibrated TRUE</li><li>TC-P11-EST-004 : front descendant P1 -&gt; id 1</li><li>TC-P11-EST-004 : front descendant P1 -&gt; position 20.0 m</li><li>TC-P11-EST-004 : front DESCENDANT Maintenance -&gt; Recalibrated TRUE</li><li>TC-P11-EST-004 : front descendant Maintenance -&gt; id 0</li><li>TC-P11-EST-004 : front descendant Maintenance -&gt; position 30.0 m</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB.RECALIBRATED expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_translation_positionestimator.st:77</div><div class='failure-msg'>TC-P11-EST-004 : front DESCENDANT Tremie -&gt; Recalibrated TRUE</div></div>
+                
                 
             </div>
         </article>
@@ -728,8 +728,8 @@
             <div class="test-card-body">
                 
             <details class="checks-details">
-                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (11)</span></summary>
-                <ul class="scenario-list"><li>Trajet vers la Tremie : les capteurs s&#x27;ALLUMENT un par un (fronts montants)</li><li>Mot thermometre au depart : 00000, chariot a la Maintenance</li><li>--- Capteur Maintenance (cote 30.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (12)</span></summary>
+                <ul class="scenario-list"><li>Trajet vers la Tremie : les capteurs s&#x27;ALLUMENT un par un (fronts montants)</li><li>gain de production pose explicitement : le test ne depend pas du defaut du FB</li><li>Mot thermometre au depart : 00000, chariot a la Maintenance</li><li>--- Capteur Maintenance (cote 30.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
        DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur P1 (cote 20.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
        DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur P2 (cote 15.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
        DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur PV (cote 5.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
@@ -739,6 +739,58 @@
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (16)</span></summary>
                 <ul class="checks-list"><li>TC-P11-EST-005 : capteurs absents au 1er scan -&gt; aucun recalage</li><li>TC-P11-EST-005 : front MONTANT Maintenance -&gt; Recalibrated TRUE</li><li>TC-P11-EST-005 : front montant Maintenance -&gt; id 0</li><li>TC-P11-EST-005 : front montant Maintenance -&gt; position 30.0 m</li><li>TC-P11-EST-005 : front MONTANT P1 -&gt; Recalibrated TRUE</li><li>TC-P11-EST-005 : front montant P1 -&gt; id 1</li><li>TC-P11-EST-005 : front montant P1 -&gt; position 20.0 m</li><li>TC-P11-EST-005 : front MONTANT P2 -&gt; Recalibrated TRUE</li><li>TC-P11-EST-005 : front montant P2 -&gt; id 2</li><li>TC-P11-EST-005 : front montant P2 -&gt; position 15.0 m</li><li>TC-P11-EST-005 : front MONTANT PV -&gt; Recalibrated TRUE</li><li>TC-P11-EST-005 : front montant PV -&gt; id 3</li><li>TC-P11-EST-005 : front montant PV -&gt; position 5.0 m</li><li>TC-P11-EST-005 : front MONTANT Tremie -&gt; Recalibrated TRUE</li><li>TC-P11-EST-005 : front montant Tremie -&gt; id 4</li><li>TC-P11-EST-005 : front montant Tremie -&gt; position 0.0 m</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-positionestimator-4" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-P11-EST-006 Continuite de la position entre deux fronts (seuil Q3 : |Freq| x Gain x dt + 1 mm) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-EST-006 Continuite de la position entre deux fronts (seuil Q3 : |Freq| x Gain x dt + 1 mm)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (9)</span></summary>
+                <ul class="scenario-list"><li>Regle tranchee en Q3 : hors front capteur, la position ne saute jamais plus que ce que
+       l&#x27;odometrie d&#x27;un scan peut produire ; un saut n&#x27;est admis que sur le scan ou
+       Recalibrated=TRUE (c&#x27;est le recalage lui-meme).</li><li>gain de production pose explicitement : le test ne depend pas du defaut du FB</li><li>scan 2 : front descendant Tremie (recalage attendu, saut autorise)</li><li>scan 3 : aucun front</li><li>scan 4 : aucun front</li><li>scan 5 : aucun front</li><li>scan 6 : front descendant PV (recalage a 5,0 m)</li><li>scan 7 : aucun front</li><li>scan 8 : aucun front</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (14)</span></summary>
+                <ul class="checks-list"><li>TC-P11-EST-006 : scan front Tremie -&gt; saut admis seulement si Recalibrated</li><li>TC-P11-EST-006 : scan 3 sans front -&gt; variation bornee par l odometrie</li><li>TC-P11-EST-006 : scan 3 -&gt; aucun recalage hors front (assertion non vacuant)</li><li>TC-P11-EST-006 : scan 3 -&gt; l odometrie progresse bien (test non tautologique)</li><li>TC-P11-EST-006 : scan 4 sans front -&gt; variation bornee</li><li>TC-P11-EST-006 : scan 4 -&gt; aucun recalage hors front</li><li>TC-P11-EST-006 : scan 5 sans front -&gt; variation bornee</li><li>TC-P11-EST-006 : scan 5 -&gt; aucun recalage hors front</li><li>TC-P11-EST-006 : scan front PV -&gt; Recalibrated TRUE</li><li>TC-P11-EST-006 : front PV -&gt; position 5.0 m</li><li>TC-P11-EST-006 : scan 7 sans front -&gt; variation bornee</li><li>TC-P11-EST-006 : scan 7 -&gt; aucun recalage hors front</li><li>TC-P11-EST-006 : scan 8 sans front -&gt; variation bornee</li><li>TC-P11-EST-006 : scan 8 -&gt; aucun recalage hors front</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-positionestimator-5" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-P11-EST-007 Blip capteur court (1 scan) en s eloignant : comportement defini (decision Q2 = recaler) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-EST-007 Blip capteur court (1 scan) en s eloignant : comportement defini (decision Q2 = recaler)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (7)</span></summary>
+                <ul class="scenario-list"><li>Rejoue le cas terrain de la trace du 2026-09-04 a 12,237 s (200 ms) : la Tremie se
+       reactive brievement alors que le chariot vient de partir vers la Maintenance. Decision Q2 :
+       re-calibrer SANS gate (le gate de plausibilite est inexploitable avant T301, le gain
+       configure etant ÷6,6 trop lent). Comportement attendu et teste : l&#x27;echantillon est ancre a
+       la cote Tremie, la distance parcourue pendant le blip restant de l&#x27;ordre du centimetre, et
+       la position REPART ensuite normalement (aucun blocage a 0 m).
+       Meme code, meme regle en simulation et sur machine reelle : un seul chemin d&#x27;execution.</li><li>gain de production pose explicitement : le test ne depend pas du defaut du FB</li><li>depart de la zone Tremie (front descendant)</li><li>roule vers la Maintenance : ~2 cm parcourus</li><li>BLIP : la Tremie se reactive 1 scan, alors que le chariot s&#x27;eloigne</li><li>fin du blip : nouveau front descendant Tremie, meme cote -&gt; idempotent</li><li>la position repart : aucun ecrasement permanent a 0 m</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (9)</span></summary>
+                <ul class="checks-list"><li>TC-P11-EST-007 : depart Tremie -&gt; recalage</li><li>TC-P11-EST-007 : le chariot s est bien eloigne de la cote Tremie avant le blip</li><li>TC-P11-EST-007 : hors front -&gt; aucun recalage</li><li>TC-P11-EST-007 : blip Tremie -&gt; comportement defini : recaler (Q2)</li><li>TC-P11-EST-007 : blip Tremie -&gt; id 4</li><li>TC-P11-EST-007 : blip Tremie -&gt; ancrage a la cote 0.0 m</li><li>TC-P11-EST-007 : fin de blip -&gt; recalage a la meme cote</li><li>TC-P11-EST-007 : fin de blip -&gt; toujours 0.0 m</li><li>TC-P11-EST-007 : apres le blip la position repart vers la Maintenance</li></ul>
             </details>
                 
                 
@@ -843,10 +895,12 @@ TimeLast := TimeCurrent;
                 <pre>(* ═══════════════════════════════════════════════════════════════
    ⚙️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md §1 (TC-P11-016) et §4
+      (convention de position &amp; cotes M3) ; fiche composant FB_Translation_PositionEstimator_v1.0.md
    🎯 Rôle : Calculer par odométrie (intégration temporelle vitesse/fréquence Hz * sens)
       la position estimée continue en mètres (0.0 m à la Trémie -&gt; +30.0 m à la Maintenance),
-      avec re-calage absolu automatique instantané sur le franchissement des 5 capteurs fixes.
+      avec re-calage absolu automatique instantané sur le franchissement des 5 capteurs fixes,
+      DANS LES DEUX SENS de déplacement (voir §2/§3).
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Translation_PositionEstimator
@@ -889,11 +943,16 @@ VAR_OUTPUT
 END_VAR
 
 VAR
-    TrigTremie           : R_TRIG;   (* . [LOC] Front montant Trémie *)
+    TrigTremie           : R_TRIG;   (* . [LOC] Front montant Trémie (vers la Trémie) *)
     TrigPV                : R_TRIG;   (* . [LOC] Front montant PV *)
     TrigP2                : R_TRIG;   (* . [LOC] Front montant P2 *)
     TrigP1                : R_TRIG;   (* . [LOC] Front montant P1 *)
-    TrigMaintenance       : R_TRIG;   (* . [LOC] Front montant Maintenance *)
+    TrigMaintenance       : R_TRIG;   (* . [LOC] Front montant Maintenance (départ Maintenance) *)
+    TrigDnTremie          : F_TRIG;   (* . [LOC] Front descendant Trémie (départ Trémie) *)
+    TrigDnPV              : F_TRIG;   (* . [LOC] Front descendant PV *)
+    TrigDnP2              : F_TRIG;   (* . [LOC] Front descendant P2 *)
+    TrigDnP1              : F_TRIG;   (* . [LOC] Front descendant P1 *)
+    TrigDnMaintenance     : F_TRIG;   (* . [LOC] Front descendant Maintenance (ARRIVÉE Maintenance) *)
     CycleTimeCalc         : FB_CycleTime;   (* * [INST] Mesure temps de cycle *)
     ColdStart             : BOOL := TRUE;  (* . [LOC] Seed unique depuis Persisted* au premier scan utile *)
     FirstScanDone         : BOOL := FALSE; (* . [LOC] Vrai après le 1er scan utile : les capteurs déjà présents à l&#x27;init ne sont pas des franchissements *)
@@ -921,39 +980,49 @@ Recalibrated := FALSE;
 {endregion}
 
 {region &quot;§2 Fronts capteurs&quot;}
-// 1. Détection des fronts montants sur franchissement des capteurs fixes
-TrigTremie(CLK := SensorTremie);
-TrigPV(CLK := SensorPV);
-TrigP2(CLK := SensorP2);
-TrigP1(CLK := SensorP1);
-TrigMaintenance(CLK := SensorMaintenance);
+// 1. Détection des fronts sur franchissement des capteurs fixes — MONTANT ET DESCENDANT.
+//    Les 5 capteurs forment un mot thermomètre CUMULATIF (FB_Translation_PositionDecoder :
+//    bit_X = TRUE ssi position &lt;= cote_X). Chaque capteur bascule donc à SA cote dans les DEUX
+//    sens : front MONTANT en venant de Maintenance (trajet vers la Trémie), front DESCENDANT en
+//    allant vers la Maintenance. Ne consommer que le front montant ne recalait que le trajet
+//    vers la Trémie — et JAMAIS l&#x27;arrivée en Maintenance, dont le mot 00000 est justement le
+//    front DESCENDANT du capteur Maintenance (front montant = départ de Maintenance).
+TrigTremie(CLK := SensorTremie);              TrigDnTremie(CLK := SensorTremie);
+TrigPV(CLK := SensorPV);                      TrigDnPV(CLK := SensorPV);
+TrigP2(CLK := SensorP2);                      TrigDnP2(CLK := SensorP2);
+TrigP1(CLK := SensorP1);                      TrigDnP1(CLK := SensorP1);
+TrigMaintenance(CLK := SensorMaintenance);    TrigDnMaintenance(CLK := SensorMaintenance);
 {endregion}
 
 {region &quot;§3 Recalage et intégration&quot;}
-// 2. Recalage absolu sur franchissement capteur — UNIQUEMENT après le premier scan utile.
+// 2. Recalage absolu sur franchissement capteur — sur front MONTANT ou DESCENDANT, et
+//    UNIQUEMENT après le premier scan utile.
 //    Au 1er scan, un capteur &quot;déjà présent&quot; à l&#x27;initialisation (sim démarre à la trémie :
 //    5 capteurs actifs) n&#x27;est pas un franchissement réel ; sinon le recalage IF/ELSIF
 //    partirait de Maintenance (premier dans l&#x27;ordre) et écraserait la position à 30 m.
+//    Ordre de priorité inchangé (Maintenance -&gt; P1 -&gt; P2 -&gt; PV -&gt; Trémie) : sur un mot
+//    thermomètre une seule bascule survient par scan, la priorité ne départage donc qu&#x27;un mot
+//    incohérent (capteur collé / parasite), cas déjà surveillé par le décodeur (Incoherent).
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
 ELSE
-    IF TrigMaintenance.Q THEN
+    IF TrigMaintenance.Q OR TrigDnMaintenance.Q THEN
         PositionEstimatedM := PosMaintenanceM;
         Recalibrated := TRUE;
         RecalibratedSensorId := 0;
-    ELSIF TrigP1.Q THEN
+    ELSIF TrigP1.Q OR TrigDnP1.Q THEN
         PositionEstimatedM := PosP1M;
         Recalibrated := TRUE;
         RecalibratedSensorId := 1;
-    ELSIF TrigP2.Q THEN
+    ELSIF TrigP2.Q OR TrigDnP2.Q THEN
         PositionEstimatedM := PosP2M;
         Recalibrated := TRUE;
         RecalibratedSensorId := 2;
-    ELSIF TrigPV.Q THEN
+    ELSIF TrigPV.Q OR TrigDnPV.Q THEN
         PositionEstimatedM := PosPVM;
         Recalibrated := TRUE;
         RecalibratedSensorId := 3;
-    ELSIF TrigTremie.Q THEN
+    ELSIF TrigTremie.Q OR TrigDnTremie.Q THEN
         PositionEstimatedM := PosTremieM;
         Recalibrated := TRUE;
         RecalibratedSensorId := 4;

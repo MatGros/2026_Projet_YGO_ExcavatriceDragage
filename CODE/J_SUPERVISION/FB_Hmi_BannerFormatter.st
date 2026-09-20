@@ -150,11 +150,15 @@ VAR CONSTANT
     CST_BannerHoldTime   : TIME := T#500ms; // . [LOC] Anti-clignotement warnings/états (AF-07 §5.3)
     CST_AbortHoldTime    : TIME := T#5s; // . [LOC] Maintien message d'abandon AU
     CST_NbMaxAlarmes     : INT := 50; // . [LOC] Taille du carrousel d'alarmes (AF-07 §6)
-    // 🔑 Bit 5 de ST_SafetyWinch.ErrorId = cause « Fin de course haut capteur atteint »
-    // (FB_Safety_Winch.st:309-316, vue LIVE, Latching := FALSE). Le DUT ST_SafetyWinch
-    // n'expose AUCUN champ nommé pour cette cause (contrairement à CableLimitDescent) :
-    // le bit est donc nommé ici plutôt qu'écrit en clair dans le carrousel (T255-D).
-    CST_WinchErrorIdTopLimitSwitch : WORD := 16#0020; // . [LOC] Bit 5 ErrorId : FdC haut capteur
+    // 🔑 Bit 6 de ST_SafetyWinch.ErrorId = cause « Limite basse cable atteinte »
+    // (FB_Safety_Winch.st:318-325, vue LIVE, Latching := FALSE). Le DUT ST_SafetyWinch
+    // n'expose AUCUN champ nommé pour cette cause : le bit est nommé ici plutôt qu'écrit
+    // en clair dans le carrousel (T255-D).
+    // ⚠️ Ne JAMAIS lire WinchMxSafety.CableLimitDescent à la place : ce champ est une
+    // comparaison BRUTE de projection, sans bypass ni mode référencement
+    // (FB_WinchStateProjection.st:217-218/230/257) — il resterait vrai sous
+    // BypassCableLimitSwitch (MAINT_N2) alors que la cause est levée (revue 2026-09-20).
+    CST_WinchErrorIdCableLimitDescent : WORD := 16#0040; // . [LOC] Bit 6 ErrorId : limite basse cable
 END_VAR
 
 IF NOT Enable THEN
@@ -685,22 +689,6 @@ ELSIF DirectionBlocked THEN
     ELSE
         OperatorActionCandidate := '[TREUIL] Montée interdite';
     END_IF;
-ELSIF WinchM1Safety.CableLimitDescent OR WinchM2Safety.CableLimitDescent THEN
-    // 🛡️ T255-D (mesure 2026-09-20) : limite basse câble atteinte = descente INTERDITE
-    // (DescendPermit=FALSE, FB_Safety_Winch.st:563-564) et REMONTÉE = seule action
-    // autorisée. Cette branche nomme la cause ET l'action MÊME SANS commande de descente.
-    // La branche historique ':656-658' reste inchangée, mais n'était atteignable que si
-    // DirectionBlocked AND CurrentDirection < 0 : joystick relâché, l'opérateur ne voyait
-    // que le rappel joystick générique. Placée APRÈS le bloc DirectionBlocked (donc sans
-    // masquer « Descente interdite » quand une descente est réellement commandée) et AVANT
-    // la guidance d'étape, pour que la cause prime sur le guidage.
-    IF WinchM1Safety.CableLimitDescent AND WinchM2Safety.CableLimitDescent THEN
-        OperatorActionCandidate := '[TREUIL] Limite basse cable M1+M2 - remonter';
-    ELSIF WinchM1Safety.CableLimitDescent THEN
-        OperatorActionCandidate := '[TREUIL] Limite basse cable M1 - remonter';
-    ELSE
-        OperatorActionCandidate := '[TREUIL] Limite basse cable M2 - remonter';
-    END_IF;
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // Guidance par étape du cycle (AF-07 §5.1) — ne masque jamais un défaut
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
@@ -769,6 +757,25 @@ ELSIF NOT DeadmanArmed THEN
     OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
 ELSIF CurrentMode = E_Mode.DISABLE THEN
     OperatorActionCandidate := '[IHM] Sélectionner un mode';
+ELSIF ((WinchM1Safety.ErrorId OR WinchM2Safety.ErrorId) AND CST_WinchErrorIdCableLimitDescent) <> 16#0000 THEN
+    // 🛡️ T255-D (mesure 2026-09-20) : cause limite basse câble ACTIVE (bit 6) ⇒ descente
+    // INTERDITE (DescendPermit = FALSE, FB_Safety_Winch.st:563-565) et REMONTÉE = seule
+    // action autorisée. Nomme la cause ET l'action même SANS commande de descente : la
+    // branche historique (FB_Hmi_BannerFormatter.st:661-663) restait inatteignable quand
+    // DirectionBlocked = FALSE (joystick relâché) — constat terrain d'origine.
+    // Lue sur ErrorId (cause safety, bypass et mode référencement respectés) et jamais sur
+    // WinchMxSafety.CableLimitDescent, champ de projection brute sans bypass (revue 2026-09-20).
+    // Ordre volontaire : APRÈS « Descente interdite » (une descente réellement commandée
+    // garde son libellé historique) et APRÈS la branche DISABLE (aucune action proposée
+    // hors mode de marche), AVANT les rappels joystick : la cause prime sur le guidage,
+    // jamais sur un prérequis de mode.
+    IF ((WinchM1Safety.ErrorId AND WinchM2Safety.ErrorId) AND CST_WinchErrorIdCableLimitDescent) <> 16#0000 THEN
+        OperatorActionCandidate := '[TREUIL] Limite basse cable M1+M2 - remonter';
+    ELSIF (WinchM1Safety.ErrorId AND CST_WinchErrorIdCableLimitDescent) <> 16#0000 THEN
+        OperatorActionCandidate := '[TREUIL] Limite basse cable M1 - remonter';
+    ELSE
+        OperatorActionCandidate := '[TREUIL] Limite basse cable M2 - remonter';
+    END_IF;
 ELSIF JoystickAtNeutral THEN
     OperatorActionCandidate := '[JOYSTICK] Armé - actionner axe';
 ELSE
@@ -868,17 +875,18 @@ END_IF;
 IF WinchM1Safety.ErrorOverspeed AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] Survitesse treuil detectee (SafeStop)'; AlarmCount := AlarmCount + 1;
 END_IF;
-// 🛡️ 5a-bis. Limites de course VIVES du treuil M1 (T255-D, mesure 2026-09-20) :
-//    ces deux causes sont NON latchées (FB_Safety_Winch.st:315/324) et n'étaient décodées
-//    NULLE PART — ni carrousel actif, ni [HISTO] (jamais dans LatchedId). Elles allument
-//    pourtant AnyFaultActive via Safety.Error (PRG_07:541-542) : voyant allumé, bandeau
-//    muet. Elles sont BLOQUANTES (DescentPermit/AscentPermit, FB_Safety_Winch.st:563-582),
-//    donc publiées ici au titre d'AF-07 §6 (SafeStop / PowerCutOff / interlock).
-//    Gardées par la validité encodeur, comme les autres alarmes filles du treuil.
-IF (WinchM1Safety.ErrorId AND CST_WinchErrorIdTopLimitSwitch) <> 16#0000 AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] Fin de course haut capteur atteint'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF WinchM1Safety.CableLimitDescent AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+// 🛡️ 5a-bis. Limite de course BASSE du treuil M1 (T255-D, mesure 2026-09-20) :
+//    cause 6 = instCauses[6].Active (FB_Safety_Winch.st:318-325), bit 6 = 16#0040, NON
+//    latchée : elle n'était décodée NULLE PART — ni carrousel actif, ni [HISTO] (jamais
+//    dans LatchedId). Elle allume pourtant AnyFaultActive via Safety.Error
+//    (PRG_07:541-542) : voyant allumé, bandeau muet. Elle est BLOQUANTE (DescendPermit,
+//    FB_Safety_Winch.st:563-565) ⇒ publiée au titre d'AF-07 §6 (interlock).
+//    ⚠️ Lue sur ErrorId (la CAUSE safety, qui respecte tous les bypass) et JAMAIS sur
+//    WinchM1Safety.CableLimitDescent, champ de projection brute sans bypass
+//    (FB_WinchStateProjection.st:217-218/230) : le lire produirait une FAUSSE alarme sous
+//    BypassCableLimitSwitch (MAINT_N2) — revue read-only 2026-09-20, MAJOR-1.
+//    Gardée par la validité encodeur, comme les autres alarmes filles du treuil.
+IF (WinchM1Safety.ErrorId AND CST_WinchErrorIdCableLimitDescent) <> 16#0000 AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] Limite basse cable atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;
 
@@ -916,11 +924,8 @@ END_IF;
 IF WinchM2Safety.ErrorOverspeed AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] Survitesse treuil detectee (SafeStop)'; AlarmCount := AlarmCount + 1;
 END_IF;
-// 🛡️ 5b-bis. Limites de course VIVES du treuil M2 — mêmes causes, mêmes raisons que 5a-bis.
-IF (WinchM2Safety.ErrorId AND CST_WinchErrorIdTopLimitSwitch) <> 16#0000 AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] Fin de course haut capteur atteint'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF WinchM2Safety.CableLimitDescent AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+// 🛡️ 5b-bis. Limite de course BASSE du treuil M2 — même cause, mêmes raisons que 5a-bis.
+IF (WinchM2Safety.ErrorId AND CST_WinchErrorIdCableLimitDescent) <> 16#0000 AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] Limite basse cable atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;
 

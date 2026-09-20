@@ -1,10 +1,12 @@
 (* ═══════════════════════════════════════════════════════════════
    ⚙️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md §1 (TC-P11-016) et §4
+      (convention de position & cotes M3) ; fiche composant FB_Translation_PositionEstimator_v1.0.md
    🎯 Rôle : Calculer par odométrie (intégration temporelle vitesse/fréquence Hz * sens)
       la position estimée continue en mètres (0.0 m à la Trémie -> +30.0 m à la Maintenance),
-      avec re-calage absolu automatique instantané sur le franchissement des 5 capteurs fixes.
+      avec re-calage absolu automatique instantané sur le franchissement des 5 capteurs fixes,
+      DANS LES DEUX SENS de déplacement (voir §2/§3).
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Translation_PositionEstimator
@@ -47,11 +49,16 @@ VAR_OUTPUT
 END_VAR
 
 VAR
-    TrigTremie           : R_TRIG;   (* . [LOC] Front montant Trémie *)
+    TrigTremie           : R_TRIG;   (* . [LOC] Front montant Trémie (vers la Trémie) *)
     TrigPV                : R_TRIG;   (* . [LOC] Front montant PV *)
     TrigP2                : R_TRIG;   (* . [LOC] Front montant P2 *)
     TrigP1                : R_TRIG;   (* . [LOC] Front montant P1 *)
-    TrigMaintenance       : R_TRIG;   (* . [LOC] Front montant Maintenance *)
+    TrigMaintenance       : R_TRIG;   (* . [LOC] Front montant Maintenance (départ Maintenance) *)
+    TrigDnTremie          : F_TRIG;   (* . [LOC] Front descendant Trémie (départ Trémie) *)
+    TrigDnPV              : F_TRIG;   (* . [LOC] Front descendant PV *)
+    TrigDnP2              : F_TRIG;   (* . [LOC] Front descendant P2 *)
+    TrigDnP1              : F_TRIG;   (* . [LOC] Front descendant P1 *)
+    TrigDnMaintenance     : F_TRIG;   (* . [LOC] Front descendant Maintenance (ARRIVÉE Maintenance) *)
     CycleTimeCalc         : FB_CycleTime;   (* * [INST] Mesure temps de cycle *)
     ColdStart             : BOOL := TRUE;  (* . [LOC] Seed unique depuis Persisted* au premier scan utile *)
     FirstScanDone         : BOOL := FALSE; (* . [LOC] Vrai après le 1er scan utile : les capteurs déjà présents à l'init ne sont pas des franchissements *)
@@ -79,39 +86,49 @@ Recalibrated := FALSE;
 {endregion}
 
 {region "§2 Fronts capteurs"}
-// 1. Détection des fronts montants sur franchissement des capteurs fixes
-TrigTremie(CLK := SensorTremie);
-TrigPV(CLK := SensorPV);
-TrigP2(CLK := SensorP2);
-TrigP1(CLK := SensorP1);
-TrigMaintenance(CLK := SensorMaintenance);
+// 1. Détection des fronts sur franchissement des capteurs fixes — MONTANT ET DESCENDANT.
+//    Les 5 capteurs forment un mot thermomètre CUMULATIF (FB_Translation_PositionDecoder :
+//    bit_X = TRUE ssi position <= cote_X). Chaque capteur bascule donc à SA cote dans les DEUX
+//    sens : front MONTANT en venant de Maintenance (trajet vers la Trémie), front DESCENDANT en
+//    allant vers la Maintenance. Ne consommer que le front montant ne recalait que le trajet
+//    vers la Trémie — et JAMAIS l'arrivée en Maintenance, dont le mot 00000 est justement le
+//    front DESCENDANT du capteur Maintenance (front montant = départ de Maintenance).
+TrigTremie(CLK := SensorTremie);              TrigDnTremie(CLK := SensorTremie);
+TrigPV(CLK := SensorPV);                      TrigDnPV(CLK := SensorPV);
+TrigP2(CLK := SensorP2);                      TrigDnP2(CLK := SensorP2);
+TrigP1(CLK := SensorP1);                      TrigDnP1(CLK := SensorP1);
+TrigMaintenance(CLK := SensorMaintenance);    TrigDnMaintenance(CLK := SensorMaintenance);
 {endregion}
 
 {region "§3 Recalage et intégration"}
-// 2. Recalage absolu sur franchissement capteur — UNIQUEMENT après le premier scan utile.
+// 2. Recalage absolu sur franchissement capteur — sur front MONTANT ou DESCENDANT, et
+//    UNIQUEMENT après le premier scan utile.
 //    Au 1er scan, un capteur "déjà présent" à l'initialisation (sim démarre à la trémie :
 //    5 capteurs actifs) n'est pas un franchissement réel ; sinon le recalage IF/ELSIF
 //    partirait de Maintenance (premier dans l'ordre) et écraserait la position à 30 m.
+//    Ordre de priorité inchangé (Maintenance -> P1 -> P2 -> PV -> Trémie) : sur un mot
+//    thermomètre une seule bascule survient par scan, la priorité ne départage donc qu'un mot
+//    incohérent (capteur collé / parasite), cas déjà surveillé par le décodeur (Incoherent).
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
 ELSE
-    IF TrigMaintenance.Q THEN
+    IF TrigMaintenance.Q OR TrigDnMaintenance.Q THEN
         PositionEstimatedM := PosMaintenanceM;
         Recalibrated := TRUE;
         RecalibratedSensorId := 0;
-    ELSIF TrigP1.Q THEN
+    ELSIF TrigP1.Q OR TrigDnP1.Q THEN
         PositionEstimatedM := PosP1M;
         Recalibrated := TRUE;
         RecalibratedSensorId := 1;
-    ELSIF TrigP2.Q THEN
+    ELSIF TrigP2.Q OR TrigDnP2.Q THEN
         PositionEstimatedM := PosP2M;
         Recalibrated := TRUE;
         RecalibratedSensorId := 2;
-    ELSIF TrigPV.Q THEN
+    ELSIF TrigPV.Q OR TrigDnPV.Q THEN
         PositionEstimatedM := PosPVM;
         Recalibrated := TRUE;
         RecalibratedSensorId := 3;
-    ELSIF TrigTremie.Q THEN
+    ELSIF TrigTremie.Q OR TrigDnTremie.Q THEN
         PositionEstimatedM := PosTremieM;
         Recalibrated := TRUE;
         RecalibratedSensorId := 4;

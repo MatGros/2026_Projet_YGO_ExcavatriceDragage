@@ -78,7 +78,9 @@ TEST 'PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le 
 END_TEST
 
 TEST 'PRG_07_Supervision : T255-D limite basse cable M1 visible (alarme + action autorisee)'
-    // Etat explicite : les tests precedents ont laisse des defauts dans winchData.
+    // Etat explicite et complet des entrees dont depend l'assertion. (Le harnais regenere
+    // un setup par cas : ce n'est pas une precaution contre une fuite d'etat, mais la
+    // garantie que le scenario teste est entierement pose.)
     winchData.WinchM1Safety.Error := TRUE;            // vu par AnyFaultActive (Safety.Error)
     winchData.WinchM1Safety.ErrorId := 16#0040;       // bit6 = limite basse cable (vue LIVE)
     winchData.WinchM1Safety.CableLimitDescent := TRUE;
@@ -89,7 +91,7 @@ TEST 'PRG_07_Supervision : T255-D limite basse cable M1 visible (alarme + action
     winchData.WinchM1Safety.ErrorEncoder := FALSE;
     winchData.WinchM2Safety.CableLimitDescent := FALSE;
     winchData.WinchM2Safety.AscentPermit := TRUE;
-    acqData.Joystick.DeadmanArmed := FALSE;           // situation terrain : joystick relache
+    acqData.Joystick.DeadmanArmed := TRUE;            // operateur arme, n agit pas
     acqData.Joystick.AtNeutralXY := TRUE;
     modesAuth.Mode := E_Mode.MAINT_N1;
 
@@ -120,6 +122,10 @@ TEST 'PRG_07_Supervision : T255-D limite basse cable M2 visible (alarme + action
     winchData.WinchM2Safety.PowerCutOff := FALSE;
     winchData.WinchM1Safety.CableLimitDescent := FALSE;
     winchData.WinchM1Safety.AscentPermit := TRUE;
+    // Le harnais regenere un setup par cas : chaque entree utilisee est reposee ici.
+    acqData.Joystick.DeadmanArmed := TRUE;            // operateur arme, n agit pas
+    acqData.Joystick.AtNeutralXY := TRUE;
+    modesAuth.Mode := E_Mode.MAINT_N1;
 
     harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
             TranslationData := translationData, PowerContactorEngaged := TRUE,

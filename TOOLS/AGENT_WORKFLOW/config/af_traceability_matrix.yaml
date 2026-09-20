@@ -1475,6 +1475,16 @@ domains:
         statut: ✅
         etat: NV-I
     validation_points:
+      TC-P10-056, TC-P10-057, TC-P10-058, TC-P10-059, TC-P10-060, TC-P10-061, TC-P10-062:
+        intention: "T330 — NORMALISATION des reglages haut (Q1/Q2, plan C3 v1.3). Etape 0 : FDC/TOP/slowdown coherents. Etape 1 : saisie invalide R1 (FDC trop haut) / R2 (TOP trop bas) / R3 (slowdown < 0,50) / Q17 (deux champs au meme scan). Etape 2 : correction de la valeur SAISIE uniquement, message non alarmant, reglage non modifie preserve. Groupe A — 7 cas."
+      TC-P10-063, TC-P10-064, TC-P10-065, TC-P10-066, TC-P10-067, TC-P10-068:
+        intention: "T330 — IDEMPOTENCE ET NON-REBOND (Q24). Etape 0 : correction appliquee une fois. Etape 1 : rejeu 2 scans sans nouvelle correction ni nouveau message. Etape 2 : cas limite delta = 1,00 exactement (aucun eps, Q27) ; balayage 7,4999/7,5000/7,5001 ; valeur identique re-saisie ; changement de page IHM. Guerre d'ecriture IHM DECLAREE NON COUVERTE (limite du lot, C3). Groupe B — 6 cas."
+      TC-P10-069, TC-P10-070, TC-P10-071, TC-P10-072, TC-P10-073, TC-P10-074:
+        intention: "T330 — BOOT ET RESTAURATION. Etape 0 : NVRAM valide au demarrage a froid, aucune correction. Etape 1 : NVRAM invalide (Q17 applique). Etape 2 : premier scan NOT Initialized (inhibition), memoires initialisees depuis les valeurs RESTAUREES (piege P2 du cadrage), ConfigRestoredFromPersistent sans double message, BtnAckConfigRestored, RTS/download (GVL_IHM non RETAIN). Groupe C — 6 cas."
+      TC-P10-075, TC-P10-076, TC-P10-077, TC-P10-078, TC-P10-079, TC-P10-080, TC-P10-081:
+        intention: "T330 — MIROIR M2 ET NON-REGRESSION. Etape 0 : correction du TOP M1. Etape 1 : M2 recoit la valeur CORRIGEE des le 1er scan, aucune divergence _WinchM1CfgPersist / _WinchM2CfgPersist. Etape 2 : DescendPermit JAMAIS gate par la validite, montee bloquee hors homing, montee EN COURS pendant la correction, machine non referencee, machine referencee + R2. Groupe D — 7 cas."
+      TC-P10-082, TC-P10-083, TC-P10-084, TC-P10-085, TC-P10-086, TC-P10-087, TC-P10-088, TC-P10-089, TC-P10-090, TC-P10-091, TC-P10-092:
+        intention: "T330 — MODES, HOMING ET DOMAINES. Etape 0 : normalisation en modes particuliers. Etape 1 : homing en cours (R2 inhibee sur le CYCLE complet, NVRAM gelee, aucune memoire d'intention : repli niveau Q17 a la sortie ; coupure = intention perdue), HomingSuspect, BtnHomingAtZero. Etape 2 : override N1, bypass N2, ManualBucketJogActive, Idx321/323/324, posture SEMI_AUTO. Etape 3 : R0 CLAMP ABSOLU INCONDITIONNEL [0;9]/[1;10] applique AVANT la regle delta (Q21 bis : FDC=9,50 + TOP=12,00 ou delta >= 1 donc aucune regle ne se declenchait), valeurs negatives, absurdes (+/-150 m) sans atteindre TargetOutOfRangeError. Groupe E — 12 cas."
       TC-P10-011, 017, 018, 019:
         intention: "\U0001F4A4 Étape 0 : Treuil au repos, contacteurs coupés, frein\
           \ serré \n        \U0001F680 Étape 1 : Consigne opérateur (joystick/boutons)\
