@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T02:33:06.282582" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T02:33:06.282582">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T03:14:07.114240" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T03:14:07.114240">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6609,11 +6609,17 @@ DescendPermitDiveBucketOpen := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.Desc
 // sélecteur treuil -- protège aussi bien le jog M2 unitaire que le pilotage couplé.
 // Exclut un cycle géré par instBucket (CloseReq/OpenReq mémorisé, bouton confirmé ou séquence
 // automatique) : celui-ci a déjà ses propres bornes via FB_Bucket (IsClosed/IsOpen), un double
-// bornage y recréerait le palier 1 forcé et la coupure avant état franc. Bornes directes
-// ouvert/fermé (mêmes offsets que FB_Bucket, relatifs à la position réelle de M1) + palier 1
-// (voir instWinchM2 §6 plus bas), pour le jog libre uniquement.
+// bornage y recréerait le palier 1 forcé et la coupure avant état franc.
+// Exclut aussi explicitement la phase T248 (CoupledBucketPhaseLocked) : dans cette phase, M2
+// est piloté par le vrai JOG WinchSel=2 (Arbitrated=2) SANS passer par instBucket -- Busy reste
+// FALSE alors que ce mouvement a déjà ses propres bornes via l'architecture T248, sans quoi le
+// palier 1 forcé et la coupure avant état franc (trace 70, T327 d'origine) se reproduisent
+// pendant cette phase précisément. Bornes directes ouvert/fermé (mêmes offsets que FB_Bucket,
+// relatifs à la position réelle de M1) + palier 1 (voir instWinchM2 §6 plus bas), pour le jog
+// libre uniquement (ni instBucket, ni séquencement T248).
 ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits
-    AND NOT instBucket.Lifecycle.Busy;
+    AND NOT instBucket.Lifecycle.Busy
+    AND NOT PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked;
 
 ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
 // Ce chemin (pilotage unitaire M2, hors instBucket) applique l'anticipation d'inertie
