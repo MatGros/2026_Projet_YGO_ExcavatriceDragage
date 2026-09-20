@@ -15,7 +15,11 @@
       "passed": true
     },
     {
-      "name": "TC-P13-014 SimBench initialise les codeurs absolus vierges a son activation",
+      "name": "TC-T342-010 AUCUNE reinjection du comptage brut : un 0 reel du codeur est conserve (pas de saut post-AU)",
+      "passed": true
+    },
+    {
+      "name": "TC-T342-011 Reactivation du banc : le comptage brut conserve sa valeur courante (aucune ecriture du banc)",
       "passed": true
     },
     {
@@ -83,7 +87,7 @@
       "passed": true
     },
     {
-      "name": "TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0",
+      "name": "TC-P13-032 Sim_Encoder le comptage franchit 0 au lieu de s y figer (butee silencieuse supprimee, T338)",
       "passed": true
     },
     {
@@ -153,11 +157,27 @@
     {
       "name": "TC-P13-068 T328 mode OFF apres session active : aucun offset residuel",
       "passed": true
+    },
+    {
+      "name": "TC-P13-070 T328 scenario utilisateur : ecart 5 % (Delta 14,25 m) resorbe vers 0 % en montee couplee",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-071 T328 cible : le point fixe du modele EST la butee mecanique (ecart 0 %)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-072 T328 sur-fermeture (Delta > butee) : ecart FIGE, jamais corrige",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-073 T328 GARDE-FOU : toute la bande de residus post-fermeture converge vers la butee",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 38,
-    "passed": 38,
+    "total": 43,
+    "passed": 43,
     "failed": 0
   }
 }

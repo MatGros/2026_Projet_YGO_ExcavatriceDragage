@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T14:22:24.818961" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T14:22:24.818961">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T19:21:00.785226" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T19:21:00.785226">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1081,6 +1081,31 @@ alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s, 
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai avant application de la faute frein M3, s</xhtml>
               </documentation>
             </variable>
+            <variable name="SimM3EndStopRecoilMax_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">BUTEE MECANIQUE M3 — recul borne apres arret serre (C5). 0.0 = comportement historique
+(position ET vitesse figees a la butee, decision de review tracee). &gt; 0 autorise la
+reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non calibre.
+--&gt; [CFG][SYNTHETIQUE] Recul borne a la butee M3, m</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3LoadReactionGain_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Gain de reaction de charge M3, m/s2</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimJoystickLeft_Rev_TREMIE_Active">
               <type>
                 <BOOL />
@@ -1455,6 +1480,15 @@ le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317
 &lt;-- [DIAG] Faute frein M3 effectivement appliquee ce scan</xhtml>
               </documentation>
             </variable>
+            <variable name="M3SensorBlipActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Blip court capteurs M3 -- diagnostic seul : observable sur trace pendant un episode court.
+&lt;-- [DIAG] Un capteur M3 publie une excursion courte</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <inOutVars>
             <variable name="RawPosM1">
@@ -1462,7 +1496,10 @@ le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Mémoire _SimEncoderRawPosM1 dans GVL_PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 LECTURE SEULE pour le banc : ces mémoires appartiennent au modèle codeur. Le banc les lit
+pour piloter ses modèles et ne les écrit JAMAIS — pas même pour « initialiser » une mémoire
+lue à 0 (un 0 est un point de passage légitime du comptage signé, jamais une mémoire vierge).
+&lt;-&gt; [BUS] Mémoire _SimEncoderRawPosM1 dans GVL_PERSISTENT</xhtml>
               </documentation>
             </variable>
             <variable name="RawPosM2">
@@ -1484,28 +1521,6 @@ le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de Trémie à Maintenance à 100 %, modèle banc uniquement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_M1EncoderInitialRaw">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1000000" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Comptage absolu plausible du device M1 simulé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_M2EncoderInitialRaw">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1100000" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Comptage absolu propre au device M2 simulé</xhtml>
               </documentation>
             </variable>
             <variable name="CST_SimBenchCycleTimeS">
@@ -1886,14 +1901,6 @@ le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Réponse sonde après alimentation</xhtml>
               </documentation>
             </variable>
-            <variable name="SimBenchWasEnabled">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Détection du premier scan de simulation</xhtml>
-              </documentation>
-            </variable>
             <variable name="M1_BrakeIsOpenState">
               <type>
                 <BOOL />
@@ -2002,7 +2009,6 @@ IF NOT Enable THEN
     KoboldMeasureEnablePrevious := FALSE;
     KoboldAutoEpisodeActive := FALSE;
     instKoboldPowerUpTimer(IN := FALSE);
-    SimBenchWasEnabled := FALSE;
     Ready       := FALSE;
     Busy        := FALSE;
     Done        := FALSE;
@@ -2013,20 +2019,15 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-// ▶️ Banc actif : le cycle de simulation démarre pour ce scan
-// Un codeur absolu réel possède déjà un comptage avant le homing. On initialise
-// uniquement une mémoire vierge au premier scan ; une valeur persistante existante
-// n'est jamais remplacée. Le homing conserve ensuite sa transaction normale.
-IF NOT SimBenchWasEnabled THEN
-    IF RawPosM1 = 0 THEN
-        RawPosM1 := CST_M1EncoderInitialRaw;
-    END_IF;
-    IF RawPosM2 = 0 THEN
-        RawPosM2 := CST_M2EncoderInitialRaw;
-    END_IF;
-END_IF;
-SimBenchWasEnabled := TRUE;
-
+// ▶️ Banc actif : le cycle de simulation démarre pour ce scan.
+// 🔒 Le comptage brut M1/M2 (`_SimEncoderRawPosM1`/`M2`, GVL_PERSISTENT) n'est JAMAIS réécrit ici :
+//    `FB_Sim_Encoder` en reste le producteur unique (accumulation signée / preset). L'origine de banc
+//    plausible vient de l'initialisation DÉCLARÉE `GVL_PERSISTENT` (1 000 000 pts), pas d'une
+//    réinjection conditionnelle : un 0 lu ici n'est PAS une mémoire vierge, c'est un point de passage
+//    légitime du compteur SIGNÉ. Le banc ne réécrit donc aucune mémoire codeur, pas même pour
+//    « initialiser » une valeur lue à 0 — une telle réinjection (1 100 000 pts = 268,55 m de position
+//    publiée en un seul scan, sans mouvement ni défaut et référence de homing conservée)
+//    transformerait un zéro réel en téléportation de position.
 Ready := TRUE;
 Busy  := TRUE;
 Done  := FALSE;
@@ -2329,9 +2330,12 @@ instSimTranslation(
     SensorBlipTransitions := SimM3SensorBlipTransitions,
     SensorBlipDurationS := SimM3SensorBlipDurationS,
     BrakeFaultCloseWhileRunning := SimM3BrakeFaultCloseWhileRunning,
-    BrakeFaultCloseDelay_S := SimM3BrakeFaultCloseDelayS
+    BrakeFaultCloseDelay_S := SimM3BrakeFaultCloseDelayS,
+    EndStopRecoilMax_M := SimM3EndStopRecoilMax_M,
+    LoadReactionGain_Mps2 := SimM3LoadReactionGain_Mps2
 );
 M3BrakeFaultCloseActive := instSimTranslation.BrakeFaultCloseActive;
+M3SensorBlipActive := instSimTranslation.SensorBlipActive;
 
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
 // même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).
@@ -2653,6 +2657,14 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse brute simulée (0x6031:01 en 0.1 RPM)</xhtml>
               </documentation>
             </variable>
+            <variable name="CountSaturated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Comptage en butée de plage du modèle (saturation signalée)</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <inOutVars>
             <variable name="RawPos">
@@ -2761,12 +2773,28 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse rapportee filtree 1er ordre, publiee dans RawSpdOut</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_CountTravelLimitPts">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1073741824" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Plage de comptage du modèle : le compteur brut est un entier SIGNÉ 32 bits (le conteneur
+UDINT n'est qu'un support d'échange, relu en DINT par toute la chaîne aval). La garde reste
+volontairement à la moitié de la plage signée (2^30 pts = 262 144 m de câble) : inatteignable
+en essai, elle interdit tout rebouclage silencieux si le modèle consommait toute sa plage.
+2^30 pts — demi-plage signée</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   📄 Spec composant : DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md
    🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
@@ -2782,6 +2810,10 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
       réelle telle que définie par MinSpeedMps/MaxSpeedMps/PointsPerRev/CableM_PerRev/CycleTimeS.
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
+   🔒 Comptage brut : entier SIGNÉ 32 bits (le conteneur UDINT n'est qu'un support d'échange,
+      relu en DINT par toute la chaîne aval). Il franchit 0 sans jamais s'y figer ; la seule
+      borne est la plage de représentation, signalée par CountSaturated — jamais muette.
+   📤 CountSaturated : comptage en butée de plage du modèle (saturation signalée, vitesse purgée)
    `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
       (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
       `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB. Un vrai codeur absolu physique
@@ -2799,6 +2831,8 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
 {region "§1 Gate"}
 IF NOT Enable THEN
     RawPosOut := RawPos;
+    // Comptage non evalue hors simulation : la saturation ne doit pas rester figee a TRUE.
+    CountSaturated := FALSE;
     RETURN;
 END_IF;
 {endregion}
@@ -2831,7 +2865,13 @@ IF PresetEdge.Q THEN
     PresetCount := PresetLatencyCycles;
 END_IF;
 
-// Pendant l'attente, la position brute est conservee (le codeur n'a pas encore re-reference).
+// 📐 Le comptage brut est un entier SIGNÉ 32 bits : le conteneur UDINT n'est qu'un support
+// d'échange (toute la chaîne aval le relit via UDINT_TO_DINT : FB_Encoder_Scale, FB_Encoder_Homing).
+// Sa valeur 0 n'est donc PAS une butée mécanique — c'est un point de passage comme un autre, et
+// c'est la seule façon de rester fidèle à un codeur absolu, dont le zéro de comptage est arbitraire.
+// Aucune branche de comptage ne borne donc à un littéral : seule la garde de plage §3bis intervient,
+// et elle est signalée (CountSaturated).
+// Pendant l'attente du preset, la position brute est conservee (le codeur n'a pas encore re-reference).
 // Le mouvement est gelé pendant la latence, comme un codeur réel en cours de referencement.
 IF PresetPending THEN
     IF PresetCount &gt; 0 THEN
@@ -2843,16 +2883,12 @@ IF PresetPending THEN
     END_IF;
     TargetSpeedMps := 0.0;
 ELSIF RelayFwd THEN
-    RawPos := RawPos + Increment;
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(Increment));
     MovingDir := 1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
     TargetSpeedMps := SpeedMps;
 ELSIF RelayRev THEN
-    IF RawPos &gt;= Increment THEN
-        RawPos := RawPos - Increment;
-    ELSE
-        RawPos := 0;
-    END_IF;
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Increment));
     MovingDir := -1;
     CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
     TargetSpeedMps := -SpeedMps;
@@ -2861,14 +2897,11 @@ ELSE
     // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
     IF (CoastPtsLeft &gt;= 1.0) AND (MovingDir &lt;&gt; 0) THEN
         IF MovingDir = 1 THEN
-            RawPos := RawPos + IncrStep1;
+            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(IncrStep1));
             TargetSpeedMps := MinSpeedMps;
-        ELSIF RawPos &gt;= IncrStep1 THEN
-            RawPos := RawPos - IncrStep1;
-            TargetSpeedMps := -MinSpeedMps;
         ELSE
-            RawPos := 0;
-            TargetSpeedMps := 0.0;
+            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(IncrStep1));
+            TargetSpeedMps := -MinSpeedMps;
         END_IF;
         CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
     ELSE
@@ -2876,6 +2909,23 @@ ELSE
         CoastPtsLeft := 0.0;
         TargetSpeedMps := 0.0;
     END_IF;
+END_IF;
+{endregion}
+
+{region "§3bis Garde de plage de comptage"}
+// 🛑 SEULE borne du comptage : la plage de représentation signée. Elle est SIGNALÉE
+// (CountSaturated) et cohérente — une position bornée ne publie plus de vitesse de mouvement,
+// ce qui interdit la signature « position figée + vitesse non nulle + zéro défaut ».
+CountSaturated := FALSE;
+IF UDINT_TO_DINT(RawPos) &gt; CST_CountTravelLimitPts THEN
+    RawPos := DINT_TO_UDINT(CST_CountTravelLimitPts);
+    CountSaturated := TRUE;
+ELSIF UDINT_TO_DINT(RawPos) &lt; -CST_CountTravelLimitPts THEN
+    RawPos := DINT_TO_UDINT(-CST_CountTravelLimitPts);
+    CountSaturated := TRUE;
+END_IF;
+IF CountSaturated THEN
+    TargetSpeedMps := 0.0;
 END_IF;
 {endregion}
 
@@ -4019,7 +4069,12 @@ SimContactorOk := ContactorLatch;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">BLIP COURT — second profil capteur, independant du train ~1 s ci-dessus.
        BlipTransitions = 0 (defaut) : profil historique strictement inchange.
        Valeurs de trace : Tremie 1 excursion de 0,2 s (2 echantillons a 100 ms),
-       PV 1 excursion de 0,1 s (1 echantillon).</xhtml>
+       PV 1 excursion de 0,1 s (1 echantillon).
+       ⚠️ LIMITE CONNUE (revue 2026-09-20, F11) : UNE SEULE largeur globale est appliquee aux
+       cinq capteurs. Les deux signatures de la trace (Tremie 0,200 s et PV 0,100 s) ne sont
+       donc PAS rejouables dans la meme passe : il faut deux executions avec des valeurs
+       differentes de SensorBlipDurationS. Une largeur par capteur exigerait un
+       ARRAY[1..5] OF REAL, non retenu dans ce lot.</xhtml>
               </documentation>
             </variable>
             <variable name="SensorBlipDurationS">
@@ -4158,8 +4213,12 @@ SimContactorOk := ContactorLatch;
        (deceleration libre du variateur) : le sens du dernier ordre valide est conserve tant
        que le variateur retourne de la vitesse, puis purge a l'arret. Sans cette memoire, la
        vitesse du chariot s'effondrait au scan de retrait de commande alors que la frequence
-       retournee decroit encore — ecart mesure sur trace terrain : 1,13 m de roue libre
-       (14,67 -&gt; 16,16 s a 40 Hz) jamais parcourus par le modele.</xhtml>
+       retournee decroit encore.
+       ⚠️ ORDRE DE GRANDEUR NON MESURE : la trace terrain ne contient AUCUNE variable de
+       position (15 TraceVariable : DI, frequences, mots d'etat, erreurs). La distance de
+       roue libre de la fenetre 14,67 -&gt; 16,16 s est donc une ESTIMATION dependante du modele
+       d'echelle, qui vaut approximativement 1,1 a 1,3 m selon la methode d'integration
+       retenue (gain audit 0,0551 m/(Hz.s)). A ne pas citer comme une mesure.</xhtml>
               </documentation>
             </variable>
             <variable name="FrequencyTarget_Hz">
@@ -4196,6 +4255,15 @@ SimContactorOk := ContactorLatch;
               <type>
                 <REAL />
               </type>
+            </variable>
+            <variable name="RecoilMax_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Recul de butee ECRETE a la course : une valeur d'entree aberrante ne peut pas
+       autoriser une position hors de [0 ; 30] m (revue du 2026-09-20, F8).</xhtml>
+              </documentation>
             </variable>
             <variable name="SensorNoiseState">
               <type>
@@ -4478,7 +4546,8 @@ IF Enable THEN
         CycleTime_S := CycleTimeS);
     LoadAngle_Rad := instSuspendedLoad.Angle_Rad;
     IF HardStopTremieActive OR HardStopMaintenanceActive THEN
-        IF (EndStopRecoilMax_M &gt; 0.0) AND BrakeMechanicallyOpen THEN
+        RecoilMax_M := MIN(MAX(0.0, EndStopRecoilMax_M), CST_PositionAtMaintenance);
+        IF (RecoilMax_M &gt; 0.0) AND BrakeMechanicallyOpen THEN
             (* Recul autorise UNIQUEMENT en s'eloignant de la butee touchee, borne par
                EndStopRecoilMax_M : jamais plus loin dans la butee, jamais de saut cache. *)
             VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
@@ -4491,10 +4560,10 @@ IF Enable THEN
                 VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps);
                 PositionCandidate_M := LIMIT(CST_PositionAtTremie,
                     PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
-                    CST_PositionAtTremie + EndStopRecoilMax_M);
+                    CST_PositionAtTremie + RecoilMax_M);
             ELSE
                 VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps);
-                PositionCandidate_M := LIMIT(CST_PositionAtMaintenance - EndStopRecoilMax_M,
+                PositionCandidate_M := LIMIT(CST_PositionAtMaintenance - RecoilMax_M,
                     PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
                     CST_PositionAtMaintenance);
             END_IF;
@@ -5352,6 +5421,18 @@ TimeLast := TimeCurrent;
                 <UDINT />
               </type>
             </variable>
+            <variable name="CST_BlipMaxTransitions">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond du nombre de bascules du profil « blip court » : borne la duree de l'episode
+       et interdit tout rebouclage de compteur UDINT (revue du 2026-09-20, F9).</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
@@ -5443,6 +5524,9 @@ IF RawDetected &lt;&gt; PreviousRawDetected THEN
         BlipTimerS := 0.0;
         BlipCount := 0;
         BlipActive := TRUE;
+        (* Ecretage : au-dela de ce plafond, un compteur UDINT pourrait reboucler et rendre
+           le blip non terminant (revue du 2026-09-20, F9). *)
+        BlipTransitions := MIN(BlipTransitions, CST_BlipMaxTransitions);
     END_IF;
 END_IF;
 

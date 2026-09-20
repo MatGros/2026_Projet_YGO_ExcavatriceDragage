@@ -167,14 +167,15 @@ VAR_OUTPUT
 END_VAR
 
 VAR_IN_OUT
+    // 🔒 LECTURE SEULE pour le banc : ces mémoires appartiennent au modèle codeur. Le banc les lit
+    //    pour piloter ses modèles et ne les écrit JAMAIS — pas même pour « initialiser » une mémoire
+    //    lue à 0 (un 0 est un point de passage légitime du comptage signé, jamais une mémoire vierge).
     RawPosM1                   : UDINT;            (* <-> [BUS] Mémoire _SimEncoderRawPosM1 dans GVL_PERSISTENT *)
     RawPosM2                   : UDINT;            (* <-> [BUS] Mémoire _SimEncoderRawPosM2 dans GVL_PERSISTENT *)
 END_VAR
 
 VAR CONSTANT
     CST_M3FullTravelTimeS       : REAL := 8.0; // Temps de Trémie à Maintenance à 100 %, modèle banc uniquement
-    CST_M1EncoderInitialRaw     : UDINT := 1000000; // Comptage absolu plausible du device M1 simulé
-    CST_M2EncoderInitialRaw     : UDINT := 1100000; // Comptage absolu propre au device M2 simulé
     CST_SimBenchCycleTimeS      : REAL := 0.010; // Période tâche PLC (s) — MainTask 10 ms
     // Rattrapage mécanique M1/M2 — valeurs ESTIMÉES (voir REGISTRE_VALEURS_TREUIL_STATUTS_v1.0.md)
     CST_SimWinchCouplingTauS    : REAL := 1.0;   // [HYPOTHESE] Constante de temps du rattrapage (s)
@@ -233,7 +234,6 @@ VAR
     KoboldAutoDepthEpisode_M   : REAL;                (* . [LOC] Fond figé durant une plongée *)
     KoboldPowerUpEpisodeTime   : TIME;                (* . [LOC] Délai sonde figé durant une plongée *)
     instKoboldPowerUpTimer     : TON;                 (* . [LOC] Réponse sonde après alimentation *)
-    SimBenchWasEnabled         : BOOL;                (* . [LOC] Détection du premier scan de simulation *)
 
     // Dynamique treuil M1/M2 : delais opt-in — defaut 0.0 = comportement historique
     M1_BrakeIsOpenState        : BOOL;                (* . [LOC] Etat frein M1 filtre par le delai *)
@@ -255,7 +255,6 @@ IF NOT Enable THEN
     KoboldMeasureEnablePrevious := FALSE;
     KoboldAutoEpisodeActive := FALSE;
     instKoboldPowerUpTimer(IN := FALSE);
-    SimBenchWasEnabled := FALSE;
     Ready       := FALSE;
     Busy        := FALSE;
     Done        := FALSE;
@@ -266,20 +265,15 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-// ▶️ Banc actif : le cycle de simulation démarre pour ce scan
-// Un codeur absolu réel possède déjà un comptage avant le homing. On initialise
-// uniquement une mémoire vierge au premier scan ; une valeur persistante existante
-// n'est jamais remplacée. Le homing conserve ensuite sa transaction normale.
-IF NOT SimBenchWasEnabled THEN
-    IF RawPosM1 = 0 THEN
-        RawPosM1 := CST_M1EncoderInitialRaw;
-    END_IF;
-    IF RawPosM2 = 0 THEN
-        RawPosM2 := CST_M2EncoderInitialRaw;
-    END_IF;
-END_IF;
-SimBenchWasEnabled := TRUE;
-
+// ▶️ Banc actif : le cycle de simulation démarre pour ce scan.
+// 🔒 Le comptage brut M1/M2 (`_SimEncoderRawPosM1`/`M2`, GVL_PERSISTENT) n'est JAMAIS réécrit ici :
+//    `FB_Sim_Encoder` en reste le producteur unique (accumulation signée / preset). L'origine de banc
+//    plausible vient de l'initialisation DÉCLARÉE `GVL_PERSISTENT` (1 000 000 pts), pas d'une
+//    réinjection conditionnelle : un 0 lu ici n'est PAS une mémoire vierge, c'est un point de passage
+//    légitime du compteur SIGNÉ. Le banc ne réécrit donc aucune mémoire codeur, pas même pour
+//    « initialiser » une valeur lue à 0 — une telle réinjection (1 100 000 pts = 268,55 m de position
+//    publiée en un seul scan, sans mouvement ni défaut et référence de homing conservée)
+//    transformerait un zéro réel en téléportation de position.
 Ready := TRUE;
 Busy  := TRUE;
 Done  := FALSE;

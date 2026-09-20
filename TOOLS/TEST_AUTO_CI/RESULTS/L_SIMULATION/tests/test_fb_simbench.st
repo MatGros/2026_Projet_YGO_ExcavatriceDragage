@@ -45,14 +45,46 @@ TEST 'TC-P13-010 SimBench Enable=FALSE neutralise tout le banc'
     ASSERT_FALSE(FB_Bench.Done, 'Enable=FALSE -> Done=FALSE');
 END_TEST
 
-TEST 'TC-P13-014 SimBench initialise les codeurs absolus vierges a son activation'
+(* =========================================================================
+   T342 — CR2 : reinjection silencieuse du comptage brut (RawPosM2 = 0 -> 1 100 000 pts)
+   Remplace TC-P13-014 « initialise les codeurs absolus vierges » (ID par ailleurs porte
+   par l'AF-13 pour le capteur haut TOP : collision d'ID levee au passage) : le banc
+   n'initialise PLUS rien, le cas « memoire vierge » est couvert par l'initialisation
+   declaree GVL_PERSISTENT._SimEncoderRawPosM1/M2 := 1000000.
+   ========================================================================= *)
+
+TEST 'TC-T342-010 AUCUNE reinjection du comptage brut : un 0 reel du codeur est conserve (pas de saut post-AU)'
+    (* Etat EXACT de l'incident T338 (saut 8,50 -> 204,677 m apres reactivation du banc) :
+       memoire codeur a 0, banc desactive (Enable=FALSE), puis reactivation du banc
+       (GVL_Simulation.SimulationModeActive FALSE -> TRUE). Le comptage brut est un entier
+       SIGNE dont le zero est arbitraire (correctif T338) : le banc ne doit JAMAIS y
+       substituer une origine device, sous peine d'une teleportation de
+       1 100 000 pts / 4096 pts/m = 268,55 m sur la position publiee, sans mouvement
+       ni defaut, reference de homing conservee. *)
     FB_Bench(Enable := FALSE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     RawPosM1 := 0;
     RawPosM2 := 0;
+    ADVANCE_TIME(10000000);
     FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
-    ASSERT_TRUE(RawPosM1 <> 0, 'M1 vierge recoit un comptage absolu plausible');
-    ASSERT_TRUE(RawPosM2 <> 0, 'M2 vierge recoit un comptage absolu plausible');
-    ASSERT_TRUE(RawPosM1 <> RawPosM2, 'M1 et M2 conservent des origines device independantes');
+    ASSERT_EQ(RawPosM2, 0, 'Reactivation : la memoire codeur M2 reste a 0 (aucune reinjection du banc)');
+    ASSERT_EQ(FB_Bench.Winch.COD2_PosValue, 0, 'Aucun saut publie sur COD2_PosValue (268,55 m si reinjecte)');
+    ASSERT_EQ(RawPosM1, 0, 'Reactivation : la memoire codeur M1 reste a 0 (aucune reinjection du banc)');
+    ASSERT_EQ(FB_Bench.Winch.COD1_PosValue, 0, 'Aucun saut publie sur COD1_PosValue');
+END_TEST
+
+TEST 'TC-T342-011 Reactivation du banc : le comptage brut conserve sa valeur courante (aucune ecriture du banc)'
+    (* Non-regression du meme invariant sur une memoire MID-COURSE (296 459 pts = la valeur
+       R0 reconstituee par le diagnostic T338) : quelle que soit la valeur, la reactivation
+       ne produit aucun ecart, et le banc reste sans ecriture sur la memoire du codeur. *)
+    FB_Bench(Enable := FALSE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    RawPosM1 := 296459;
+    RawPosM2 := 296459;
+    ADVANCE_TIME(10000000);
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_EQ(RawPosM2, 296459, 'Memoire M2 mid-course inchangee par la reactivation du banc');
+    ASSERT_EQ(FB_Bench.Winch.COD2_PosValue, 296459, 'Position publiee = comptage brut, sans ecart');
+    ASSERT_EQ(RawPosM1, 296459, 'Memoire M1 mid-course inchangee par la reactivation du banc');
+    ASSERT_EQ(FB_Bench.Winch.COD1_PosValue, 296459, 'Position publiee = comptage brut, sans ecart');
 END_TEST
 
 TEST 'TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel — stub)'
@@ -346,10 +378,19 @@ TEST 'TC-P13-031 Sim_Encoder PresetCmd charge PresetValue'
     ASSERT_EQ(FB_SimEnc.RawPosOut, 5000, 'Preset applique apres latence');
 END_TEST
 
-TEST 'TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0'
-    RawPosM1 := 0;
+TEST 'TC-P13-032 Sim_Encoder le comptage franchit 0 au lieu de s y figer (butee silencieuse supprimee, T338)'
+    (* Realigne sur la semantique T338 (comptage brut SIGNED 32 bits) : cette copie etait restee
+       sur l'ancienne butee `RawPos := 0`, ce qui rendait la suite FB_SimBench ROUGE (41/42) sur
+       HEAD depuis le commit 6a5910da — non-regression T338 incomplete. *)
+    RawPosM1 := 41; (* 41 pts = exactement un pas de descente au palier 1 (1,0 x 4096 x 0,010) *)
     FB_SimEnc(Enable := TRUE, RelayFwd := FALSE, RelayRev := TRUE, StepNumber := 1, RawPos := RawPosM1);
-    ASSERT_EQ(FB_SimEnc.RawPosOut, 0, 'RawPos=0 + RelayRev -> reste 0 (borne)');
+    RawPosM1 := FB_SimEnc.RawPosOut; (* le caller conserve la memoire persistante du codeur *)
+    ASSERT_EQ(FB_SimEnc.RawPosOut, 0, 'Un pas de descente amene le comptage exactement a 0 (point de passage)');
+    ADVANCE_TIME(10000000);
+    FB_SimEnc(Enable := TRUE, RelayFwd := FALSE, RelayRev := TRUE, StepNumber := 1, RawPos := RawPosM1);
+    RawPosM1 := FB_SimEnc.RawPosOut;
+    ASSERT_TRUE(FB_SimEnc.RawPosOut <> 0, 'Scan suivant : le comptage franchit 0 au lieu de s y figer');
+    ASSERT_EQ(FB_SimEnc.RawPosOut, 4294967255, 'Comptage = -41 pts (aucune borne a 0, 2^32 - 41 en signe)');
 END_TEST
 
 TEST 'TC-P13-033 Sim_Encoder RawPos survit a un reset froid (essai manuel — stub)'
