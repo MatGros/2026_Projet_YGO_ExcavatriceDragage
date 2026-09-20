@@ -1,5 +1,5 @@
 (* =======================================================================
-   🧪 test_fb_bucket.st — FB_Bucket (TC-P10-023..034, 045.1, 046.1, 047.1, 048.1)
+   🧪 test_fb_bucket.st — FB_Bucket (TC-P10-023..034, 045.1, 046.1-046.4, 047.1, 048.1)
    ───────────────────────────────────────────────────────────────
    Fiche : DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
    Conventions : 1 appel fb() = 1 scan ; ADVANCE_TIME(10000000) entre les
@@ -795,6 +795,183 @@ TEST 'TC-P10-046.1 Timeout mouvement pendant BUSY -> defaut timeout + latch'
        Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
     ASSERT_TRUE(FB.Fault.Error, 'Timeout mouvement 1s -> Error');
     ASSERT_TRUE(FB.Fault.Latched, 'Timeout -> defaut latche');
+END_TEST
+
+TEST 'TC-P10-046.2 T295 Pause operateur (relachement > PT, sans progression) -> AUCUN defaut'
+    (* T295 — semantique a2 : le budget de timeout ne se consomme QUE pendant une commande
+       operateur REELLEMENT engagee ; hors engagement il est GELE (pas remis a zero).
+       ⚠️ Le harnais STruCpp IGNORE un argument nomme `MotionRequestActive` (VAR local de
+       FB_Bucket.st:127, calcule en :391) : la commande est donc pilotee par la VRAIE entree
+       ReqAscent, sinon le test serait vacuant (verifie sur le C++ genere). *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+    BucketState.IsClosed := FALSE;
+
+    (* Scans 1-2 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+
+    (* Scan 3 : fermeture armee SOUS COMMANDE ENGAGEE, cible non atteinte *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T295 fermeture engagee -> Busy');
+
+    (* Scan 4 : commande tenue 400 ms, toujours sous PT *)
+    ADVANCE_TIME(400000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+
+    (* Scan 5 : PAUSE OPERATEUR — relachement total maintenu 5 s (> PT), aucune progression.
+       AVANT correctif : 60 s de temps MURAL depuis l'armement -> ErrorID:03 (bit 2) + latch. *)
+    ADVANCE_TIME(5000000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := FALSE, ReqAscent := FALSE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_FALSE(FB.Fault.Error, 'T295 pause operateur > PT -> AUCUN Error');
+    ASSERT_FALSE(FB.Fault.Latched, 'T295 pause operateur > PT -> AUCUN Latched');
+    ASSERT_EQ(FB.Fault.ErrorId, 0, 'T295 pause operateur -> ErrorId bit 2 (timeout) a 0');
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T295 pause -> manoeuvre encore en cours (Busy conserve)');
+END_TEST
+
+TEST 'TC-P10-046.3 T295 Cumul du temps engage : 2 x 600 ms (< PT) + relachements -> defaut latche'
+    (* T295 AC9 — preuve de la SUSPENSION (a2) et non d une remise a zero du TON au relachement :
+       aucune sequence engagee n atteint PT=1s prise isolement (600 ms chacune), mais le CUMUL
+       (600 + 600 = 1200 ms) atteint PT -> le defaut doit latcher. Une implementation « remise a
+       zero a chaque relachement » (a1) resterait verte ici : c est precisement ce que ce TC tue. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+    BucketState.IsClosed := FALSE;
+
+    (* Scans 1-2 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+
+    (* Scan 3 : armement sous commande engagee *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T295 cumul : fermeture engagee -> Busy');
+
+    (* Scan 4 : premier scan engage (front du TON de timeout) *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+
+    (* Scan 5 : segment engage 1 = 600 ms de commande (< PT) *)
+    ADVANCE_TIME(600000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_FALSE(FB.Fault.Error, 'T295 cumul : 600 ms < PT -> pas encore de defaut');
+
+    (* Scan 6 : relachement (le cumul 600 ms est GELE, pas remis a zero) *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := FALSE, ReqAscent := FALSE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_FALSE(FB.Fault.Latched, 'T295 cumul : 600 ms consommes -> aucun defaut');
+
+    (* Scan 7 : re-engagement — budget restant = PT - 600 ms = 400 ms *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+
+    (* Scan 8 : segment engage 2 = 600 ms -> cumul 1200 ms >= PT -> defaut latché *)
+    ADVANCE_TIME(600000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_TRUE(FB.Fault.Error, 'T295 cumul 1200 ms >= PT -> Error');
+    ASSERT_TRUE(FB.Fault.Latched, 'T295 cumul -> defaut latche (suspension, pas remise a zero)');
+    ASSERT_TRUE((FB.Fault.ErrorId AND 4) <> 0, 'T295 cumul -> bit 2 (timeout) arme');
+END_TEST
+
+TEST 'TC-P10-046.4 T295 Arrivee nominale sous commande apres pause -> Done, aucun defaut'
+    (* Non-regression AC8/AC9 : la manoeuvre commencee sous commande, interrompue par une pause
+       operateur > PT puis reprise, doit aboutir normalement (Done) sans aucun defaut. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+    BucketState.IsClosed := FALSE;
+
+    (* Scans 1-2 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+
+    (* Scan 3 : fermeture engagee, benne en mouvement *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 1.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T295 arrivee : fermeture engagee -> Busy');
+
+    (* Scan 4 : premier scan engage (front du TON de timeout) *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 1.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+
+    (* Scan 5 : pause operateur 2 s (> PT) — ne doit produire aucun defaut *)
+    ADVANCE_TIME(2000000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := FALSE, ReqAscent := FALSE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 1.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_FALSE(FB.Fault.Latched, 'T295 arrivee : pause 2 s -> aucun defaut');
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T295 arrivee : pause -> manoeuvre toujours Busy');
+
+    (* Scan 6 : reprise de la commande, le modele atteint la cible *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 2.9,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_TRUE(FB.Lifecycle.Done, 'T295 arrivee nominale sous commande -> Done');
+    ASSERT_FALSE(FB.Fault.Error, 'T295 arrivee nominale -> aucun Error');
+    ASSERT_EQ(FB.Fault.ErrorId, 0, 'T295 arrivee nominale -> ErrorId a 0');
 END_TEST
 
 TEST 'TC-P10-047.1 Incoherence boot : 1er cycle ni IsOpen ni IsClosed -> StateIncoherent, ActiveOffsetValid=FALSE'

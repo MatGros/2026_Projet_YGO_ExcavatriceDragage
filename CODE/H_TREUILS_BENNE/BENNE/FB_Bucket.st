@@ -95,6 +95,11 @@ VAR
     TofReferencePreset              : TOF;                            // . [LOC] Fenetre de grace suivi immediat ActiveOffsetM apres preset IHM (1.5 s)
     ReferencePresetActive           : BOOL;                           // . [LOC] TRUE pendant la fenetre de grace post-confirmation
     TonTimeout                      : TON;                            // . [LOC] Temporisateur timeout de mouvement
+    TimeoutEngaged                  : BOOL;                           // . [LOC] Commande operateur REELLEMENT engagee pendant la manoeuvre benne
+    TimeoutRestart                  : BOOL;                           // . [LOC] Segment TON neuf force un scan (rearmement conscient sur Reset)
+    TimeoutAccumTime                : TIME;                           // . [LOC] Temps de commande engagee deja consomme, GELE hors engagement (segments precedents)
+    TimeoutSegmentTime              : TIME;                           // . [LOC] ET du segment de commande en cours (reporte dans le cumul au relachement)
+    TimeoutRemainingTime            : TIME;                           // . [LOC] Budget restant consomme par le TON (CfgTimeoutDuration - cumul)
     TonBandClosed                   : TON;                            // . [LOC] Debounce court bande "fermee" -> cible offset (anti-chatter au bord de bande)
     TonBandOpen                     : TON;                            // . [LOC] Debounce court bande "ouverte" -> cible offset
     TonOffsetResettle               : TON;                            // . [LOC] Stabilisation apres recalage de ActiveOffsetM (synchro re-autorisee)
@@ -150,6 +155,13 @@ END_VAR
 // 🔑 1. FRONTS & REARMEMENT
 ResetEdge(CLK := Reset);
 
+// 🎯 Signal d'engagement benne — calcule AVANT le watchdog de timeout (§1 Cause 2) pour que le
+// relachement de l'operateur soit pris en compte AU SCAN MEME : un TON arme sur un signal lu avec
+// un scan de retard compterait la pause entiere. Meme calcul qu'auparavant (ReqAscent et
+// ReqDescend sont des VAR_INPUT, jamais reecrites) : seul l'instant de calcul avance en tete de §1.
+MotionRequestConflict := ReqAscent AND ReqDescend;
+MotionRequestActive := (ReqAscent OR ReqDescend) AND NOT MotionRequestConflict;
+
 IF ResetEdge.Q OR BypassGlobal THEN
     CfgFaultLatched       := FALSE;
     OffsetMaxFaultLatched := FALSE;
@@ -195,10 +207,55 @@ IF NOT BypassGlobal THEN
     instCauses[1].Latching := TRUE;
     instCauses[1].Texte    := 'Depassement ecart maximum autorise benne';
 
-    // Cause 2 : Timeout
-    TonTimeout(IN := Lifecycle.Busy, PT := CfgTimeoutDuration);
+    // Cause 2 : Timeout de manoeuvre benne — budget SUSPENDU hors commande engagee.
+    // ⏱️ Le budget ne se consomme QUE pendant une commande operateur REELLEMENT engagee
+    // (Lifecycle.Busy ET MotionRequestActive). Hors engagement le compteur est GELE — il n'est
+    // PAS remis a zero — et il reprend/se CUMULE a la commande suivante : une pause operateur
+    // legitime (relachement du joystick en AX3_OPEN_BUCKET / AX15B_DUMP_OPEN, cf.
+    // WaitingForOperator FB_CycleSemiAuto.st:1430) ne peut donc plus produire un faux
+    // [BENNE] ErrorID:03, alors qu'un mouvement bloque SOUS COMMANDE CONTINUE latche toujours
+    // en CfgTimeoutDuration (non-neutralisation). Remise a zero du cumul : fin de manoeuvre
+    // (Lifecycle.Busy retombe) et Reset sur front (rearmement conscient).
+    // Signal d'engagement : MotionRequestActive (calcule en tete de §1) — CloseReq/OpenReq sont
+    // des LATCHES (restent TRUE pendant toute la pause) et seraient ici INOPERANTS.
+    TimeoutEngaged := Lifecycle.Busy AND MotionRequestActive;
+
+    // Rearmement conscient : budget complet ET segment TON neuf. Un TON IEC ne retombe PAS quand
+    // PT augmente (ET cloue a PT, Q fige) : sans cette coupure d'un scan, un Reset pendant une
+    // commande encore engagee re-latcherait le defaut au scan suivant.
+    IF ResetEdge.Q THEN
+        TimeoutAccumTime   := T#0s;
+        TimeoutSegmentTime := T#0s;
+        TimeoutRestart     := TRUE;
+    END_IF;
+
+    // Relachement operateur : le segment courant est reporte dans le cumul (GEL, jamais une RAZ).
+    IF NOT TimeoutEngaged THEN
+        TimeoutAccumTime   := TimeoutAccumTime + TimeoutSegmentTime;
+        TimeoutSegmentTime := T#0s;
+    END_IF;
+
+    // Budget restant -> PT du TON (borne a T#0s : un cumul >= PT latche des le premier scan engage).
+    TimeoutRemainingTime := CfgTimeoutDuration - TimeoutAccumTime;
+    IF TimeoutRemainingTime < T#0s THEN
+        TimeoutRemainingTime := T#0s;
+    END_IF;
+
+    TonTimeout(IN := TimeoutEngaged AND NOT TimeoutRestart, PT := TimeoutRemainingTime);
+    TimeoutRestart := FALSE;   // coupure d'un seul scan -> le TON repart d'un segment a ET=0
+
+    IF TimeoutEngaged THEN
+        TimeoutSegmentTime := TonTimeout.ET;
+    END_IF;
+
     IF TonTimeout.Q THEN
         TimeoutFaultLatched := TRUE;
+    END_IF;
+
+    // Fin de manoeuvre : cumul remis a zero (la manoeuvre suivante repart d'un budget neuf).
+    IF NOT Lifecycle.Busy THEN
+        TimeoutAccumTime   := T#0s;
+        TimeoutSegmentTime := T#0s;
     END_IF;
     instCauses[2].Active   := TimeoutFaultLatched;
     instCauses[2].Latching := TRUE;
@@ -222,6 +279,9 @@ IF NOT BypassGlobal THEN
     instCauses[4].Texte    := 'Codeurs treuils non references pour sequence benne';
 ELSE
     TonTimeout(IN := FALSE);
+    TimeoutEngaged      := FALSE;   // bypass global : watchdog neutralise ET cumul remis a zero
+    TimeoutAccumTime    := T#0s;
+    TimeoutSegmentTime  := T#0s;
     M1SlipDetected := FALSE;
     instCauses[0].Active := FALSE;
     instCauses[1].Active := FALSE;
@@ -387,8 +447,8 @@ ELSE
     BucketState.TooClosed      := FALSE;
 END_IF;
 
-MotionRequestConflict := ReqAscent AND ReqDescend;
-MotionRequestActive := (ReqAscent OR ReqDescend) AND NOT MotionRequestConflict;
+// MotionRequestConflict / MotionRequestActive sont calcules en tete de §1 : le watchdog de timeout
+// doit voir le relachement de l'operateur au scan meme (aucun lag d'un scan).
 
 IF SevereError THEN
     M2_RunRequest := FALSE;

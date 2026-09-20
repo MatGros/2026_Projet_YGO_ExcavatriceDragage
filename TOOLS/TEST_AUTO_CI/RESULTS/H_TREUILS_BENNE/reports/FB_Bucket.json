@@ -149,13 +149,25 @@
       "passed": true
     },
     {
+      "name": "TC-P10-046.2 T295 Pause operateur (relachement > PT, sans progression) -> AUCUN defaut",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-046.3 T295 Cumul du temps engage : 2 x 600 ms (< PT) + relachements -> defaut latche",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-046.4 T295 Arrivee nominale sous commande apres pause -> Done, aucun defaut",
+      "passed": true
+    },
+    {
       "name": "TC-P10-047.1 Incoherence boot : 1er cycle ni IsOpen ni IsClosed -> StateIncoherent, ActiveOffsetValid=FALSE",
       "passed": false,
       "failure": {
         "assertType": "ASSERT_TRUE",
         "detail": "BUCKETSTATE.STATEINCOHERENT expected TRUE, got FALSE",
         "file": "test_fb_bucket.st",
-        "line": 814,
+        "line": 991,
         "message": "Boot incoherent -> StateIncoherent=TRUE"
       }
     },
@@ -166,7 +178,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "BUCKETSTATE.STATEINCOHERENT expected TRUE, got FALSE",
         "file": "test_fb_bucket.st",
-        "line": 834,
+        "line": 1011,
         "message": "Boot IsOpen ET IsClosed -> StateIncoherent=TRUE"
       }
     },
@@ -181,7 +193,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "BUCKETSTATE.STATEINCOHERENT expected TRUE, got FALSE",
         "file": "test_fb_bucket.st",
-        "line": 875,
+        "line": 1052,
         "message": "Copy-out auto : BucketState.StateIncoherent restitue TRUE"
       }
     },
@@ -203,8 +215,8 @@
     }
   ],
   "summary": {
-    "total": 33,
-    "passed": 24,
+    "total": 36,
+    "passed": 27,
     "failed": 9
   }
 }

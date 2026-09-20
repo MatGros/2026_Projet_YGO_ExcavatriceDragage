@@ -147,6 +147,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "502", "G502 - Frontiere SimBench M3 HwSim/HwIn (T300 AC4bis/AC14)", [sys.executable, f"{S}/G502_check_simbench_m3_boundary.py", "."]),
     ("C", "503", "G503 - Portee stricte ManualBucketLimitsActive + borne T248 (T327)", [sys.executable, f"{S}/G503_check_manual_bucket_limits_scope.py"]),
     ("C", "506", "G506 - Toute cause agregee dans AnyFaultActive a un libelle bandeau (T255-D)", [sys.executable, f"{S}/G506_check_anyfault_banner_labels.py", "."]),
+    ("C", "507", "G507 - Timeout benne : temps de commande engagee seul (T295, suspension a2)", [sys.executable, f"{S}/G507_check_t295_bucket_timeout_engaged.py", "."]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]
