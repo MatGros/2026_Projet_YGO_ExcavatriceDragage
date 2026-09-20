@@ -565,6 +565,10 @@ instCycleMachineHoming(
     // OU commande IHM dediee (front) pour le lancement direct.
     BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.CycleMachineHoming.Cmd.BtnValidate,
     StartRequest               := GVL_IHM.CycleMachineHoming.Cmd.BtnStart,
+    // Confirmation visuelle "benne fermee" (bouton N2 dedie, front) : ouvre l'etape
+    // verrouillee de referencement (montee au capteur haut puis referencement a l'arret).
+    // Meme front que la demande de reference benne : une seule intention operateur.
+    BucketCloseConfirmed       := BucketReferenceCloseEdge.Q,
     CfgCommissioningEnable     := GVL_IHM.CycleMachineHoming.Cmd.TglCommissioning,
     CfgForceStepTarget         := GVL_IHM.CycleMachineHoming.Cfg.ForceStepTarget,
     CfgForceStepApply          := GVL_IHM.CycleMachineHoming.Cmd.BtnForceStepApply,
