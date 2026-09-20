@@ -888,6 +888,11 @@ TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
 IF ManualBucketJogActive THEN
     TopLimitM2_M := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
                      + _BucketCfgPersist.Config.OffsetCloseM + 2.0;
+ELSIF WinchBothMotionActive AND NOT (OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff) THEN
+    // En Both (WinchBothMotionActive), M1 est l'autorité nominale de montée et
+    // d'arrêt haut. M2 devient un garde-fou dérivé avec marge de tolérance +0.50 m sur le FDC
+    // logiciel haut pour éliminer les arrêts prématurés sur benne intermédiaire (réserve TOP >= 1.00 m respectée).
+    TopLimitM2_M := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift + 0.50;
 END_IF;
 
 // --- Usage effectif d'un override/bypass de position → re-homing obligatoire ---------------
@@ -1242,6 +1247,18 @@ END_IF;
 // En couple les 2 treuils sont lies : la limite benne s'applique aux 2.
 IF CoupledBoth AND (BucketNotClosedAscentCapStep1 OR SlackCableAscentCapStep1) THEN
     CommonMaxStepAscent := 1;
+END_IF;
+
+// En pilotage Both (WinchBothMotionActive), M1 est l'unique autorité nominale
+// de vitesse en approche haute. Dès que M1 entre dans sa zone de ralentissement haut,
+// CommonMaxStepAscent est bridé à WinchSlowdownMaxStep (palier 1). Cela garantit que M1 et M2
+// décélèrent de façon synchrone et atomique au palier 1, éliminant la divergence de paliers
+// P1/P5 qui causait une neutralisation brutale sous WinchBothFinalRequestsCoherent.
+IF WinchBothMotionActive
+   AND PRG_02_Acquisition.Data.EncoderM1.Homed
+   AND NOT PRG_02_Acquisition.Data.EncoderM1.HomingSuspect
+   AND (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM >= (TopLimitM1_M - _CommunCfgPersist.WinchSlowdownDistanceTop_M)) THEN
+    CommonMaxStepAscent := MIN(CommonMaxStepAscent, _CommunCfgPersist.WinchSlowdownMaxStep);
 END_IF;
 
 // Position Maintenance atteinte : bridage commun M1/M2, montée et descente.

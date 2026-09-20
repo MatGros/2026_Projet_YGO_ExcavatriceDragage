@@ -49,7 +49,8 @@ contract:
       - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st
       - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st
       - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
-      - TOOLS/AGENT_WORKFLOW/scripts/G499_check_t291b_top_authority.py
+      - TOOLS/AGENT_WORKFLOW/scripts/G505_check_t291b_top_authority.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
       - CODE_XML/CODE_Bundle.xml
       - CODE_XML/CODE_DiffBundle.xml
       - DOC/WFLOW/TASKS.yaml
@@ -87,10 +88,12 @@ status: OPEN
 validation:
   status: IN_PROGRESS
   validated_by: "HUMAN_OPERATOR + AGY01"
-  validated_at: "2026-09-20T12:40:44+02:00"
+  validated_at: "2026-09-20T21:20:00+02:00"
   notes: >
-    Phases B0 et B1 validees visuellement par l'utilisateur le 2026-09-20 :
-    "La mesure M2PositionCorrected est maintenant stable et les sauts ont disparu. B1 est concluante visuellement."
-    Tests CI FB_Bucket 100% PASS et garde-fou mecanique G499 PASS (0 erreur).
-    ARRET STRICT SUR CONSIGNE HUMAINE : ne pas elargir au mouvement, aux FDC, a T248 ou a D18.
-    Les phases B2 (autorite M1 en Both) et B3 restent non abordees dans ce lot.
+    Phase B2 achevee par AGY01 le 2026-09-20 :
+    - Autorite M1 unique sur profil de ralentissement haut en Both (CommonMaxStepAscent bride au palier 1 des l'entree de M1 en zone de ralentissement, eliminant la divergence P1/P5).
+    - M2 garde-fou derive en Both avec marge +0.50 m sur TopLimitM2_M (reserve T330 >= 1.00 m respectee).
+    - M1 autorite nominale unique de fin AX12 dans PRG_03 (M2TopLimitReached := FALSE vers instCycleSemiAuto ; M2 reste protege par instSafetyWinchM2.AscentPermit).
+    - Garde-fou mecanique G505 slot C-505 integre dans run_all_gates.py et valide (PASS 0 erreur).
+    - G200 Linkage : PASS (0 erreur).
+    - Bundle et DiffBundle regeneres et valides. Phase B3 (recette C3 globale) prete pour validation orchestrateur/humain.
