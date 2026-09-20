@@ -632,20 +632,18 @@ END_VAR
     ASSERT_TRUE((M2_Pos_M - 5.0) <= 15.0, 'jamais de depassement de la butee mecanique');
 END_TEST
 
-TEST 'TC-P13-071 T328 cause : point fixe du modele mesure (Delta ~14,49 m, ecart 3,4 %, jamais 0 %)'
+TEST 'TC-P13-071 T328 cible : le point fixe du modele EST la butee mecanique (ecart 0 %)'
 VAR
     i        : INT;
     M2_Pos_M : REAL := 0.0;
 END_VAR
-    (* Meme scenario que TC-P13-070 : on MESURE le point fixe reel du modele.
-       Cible theorique = OffsetCloseM - 0,5 x CoherenceLimitM = 15,0 - 0,5 = 14,50 m.
-       Point fixe mesure = 14,4878 m : le modele s arrete des que l increment 1er ordre
-       devient < 1 point codeur (0,244 mm) -> residuel 1,2 cm sous la cible.
-       => ouverture residuelle = 100 x (15,0 - 14,4878) / 15 = 3,41 % NON CORRIGIBLE.
-       (Caracterisation du defaut : ce test devra etre reecrit apres le correctif.) *)
+    (* Meme scenario que TC-P13-070 : on MESURE le point fixe du modele apres correctif D1.
+       Cible = OffsetCloseM = 15,00 m ; point fixe mesure >= 14,975 m : le modele s arrete des que
+       l increment 1er ordre devient < 1 point codeur (0,244 mm), soit un residu <= 2,5 cm.
+       => ouverture residuelle <= 0,17 %, jamais un plancher de 3,4 %. *)
     RawPosM1 := 1000000; RawPosM2 := 1100000;
     M2_Pos_M := 14.25 + 5.0;
-    FOR i := 1 TO 300 DO
+    FOR i := 1 TO 800 DO
         FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
                  M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
                  M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
@@ -655,32 +653,20 @@ END_VAR
         M2_Pos_M := M2_Pos_M + DINT_TO_REAL(FB_Bench.WinchCouplingCorrectionPts) * (2.0 / 8192.0);
     END_FOR;
     ADVANCE_TIME(10000000);
-    ASSERT_NEAR(M2_Pos_M - 5.0, 14.5, 0.03);
+    ASSERT_NEAR(M2_Pos_M - 5.0, 15.0, 0.03);
+    ASSERT_TRUE((M2_Pos_M - 5.0) <= 15.0, 'point fixe = butee, jamais au-dela');
 END_TEST
 
-TEST 'TC-P13-072 T328 cause : ecart residuel AU-DESSUS de la cible jamais corrige (FIGE)'
+TEST 'TC-P13-072 T328 sur-fermeture (Delta > butee) : ecart FIGE, jamais corrige'
 VAR
     i        : INT;
     M2_Pos_M : REAL := 0.0;
 END_VAR
-    (* (1) Residual encore dans la bande fermee (Delta 14,75 m => ouverture 1,67 %) mais
-       superieur a la cible 14,50 m : le modele est strictement unidirectionnel
-       (FB_SimBench.st:506) => aucun rattrapage, l ecart reste FIGE indefiniment. *)
+    (* Decision CC01 2026-09-20 (D2) : une sur-fermeture (Delta 15,75 m, soit +5 % AU-DELA de la
+       butee 15,0 m, toujours dans la bande fermee 14,0..16,0 m) n est PAS corrigee : le modele
+       reste strictement unidirectionnel -> rouvrir la benne pour resorber une sur-fermeture
+       serait un mouvement non commande. Ecart FIGE : comportement voulu et teste. *)
     RawPosM1 := 1000000; RawPosM2 := 1100000;
-    M2_Pos_M := 14.75 + 5.0;
-    FOR i := 1 TO 100 DO
-        FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
-                 M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
-                 M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
-                 SimWinchCouplingModelActive := TRUE,
-                 M1_CablePos_M := 5.0, M2_CablePos_M := M2_Pos_M,
-                 BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
-        ASSERT_EQ(FB_Bench.WinchCouplingCorrectionPts, 0, 'residuel > cible -> aucune correction');
-        M2_Pos_M := M2_Pos_M + DINT_TO_REAL(FB_Bench.WinchCouplingCorrectionPts) * (2.0 / 8192.0);
-    END_FOR;
-    ADVANCE_TIME(10000000);
-    (* (2) Variante SYMETRIQUE : sur-fermeture de 5 % (Delta 15,75 m, toujours dans la bande
-       fermee 14,0..16,0 m) => meme cause, ecart literalement FIGE a 5 %. *)
     M2_Pos_M := 15.75 + 5.0;
     FOR i := 1 TO 100 DO
         FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
@@ -694,4 +680,65 @@ END_VAR
     END_FOR;
     ADVANCE_TIME(10000000);
     ASSERT_NEAR(M2_Pos_M - 5.0, 15.75, 0.01);
+END_TEST
+
+TEST 'TC-P13-073 T328 GARDE-FOU : toute la bande de residus post-fermeture converge vers la butee'
+VAR
+    i        : INT;
+    M2_Pos_M : REAL := 0.0;
+END_VAR
+    (* Garde-fou du trou de test qui a laisse passer T328 : la suite livree ne testait QUE
+       Delta = 13,5 m. On couvre la bande des residus POST-fermeture reellement produite par la
+       coupure d'anticipation + le roulis : 13,8 m (coupure T327) / 14,25 m (cas utilisateur 5 %) /
+       14,75 m (haut de bande). Les trois doivent rejoindre la butee (ecart 0 %).
+       (3 scenarios deroules : le harnais n accepte pas les boucles FOR imbriquees.) *)
+    RawPosM1 := 1000000; RawPosM2 := 1100000;
+
+    (* --- Residu 13,8 m (coupure d'anticipation T327) --- *)
+    M2_Pos_M := 13.8 + 5.0;
+    FOR i := 1 TO 800 DO
+        FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+                 M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+                 M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+                 SimWinchCouplingModelActive := TRUE,
+                 M1_CablePos_M := 5.0, M2_CablePos_M := M2_Pos_M,
+                 BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+        ASSERT_TRUE(FB_Bench.WinchCouplingCorrectionPts <= 82, 'correction bornee a 0,02 m par scan');
+        M2_Pos_M := M2_Pos_M + DINT_TO_REAL(FB_Bench.WinchCouplingCorrectionPts) * (2.0 / 8192.0);
+    END_FOR;
+    ADVANCE_TIME(10000000);
+    ASSERT_TRUE((M2_Pos_M - 5.0) >= 14.97, 'residu 13,8 m -> butee atteinte (ecart <= 0,2 %)');
+    ASSERT_TRUE((M2_Pos_M - 5.0) <= 15.0, 'residu 13,8 m -> aucun depassement de butee');
+
+    (* --- Residu 14,25 m (cas utilisateur : ecart 5 %, voyant ferme allume) --- *)
+    M2_Pos_M := 14.25 + 5.0;
+    FOR i := 1 TO 800 DO
+        FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+                 M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+                 M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+                 SimWinchCouplingModelActive := TRUE,
+                 M1_CablePos_M := 5.0, M2_CablePos_M := M2_Pos_M,
+                 BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+        ASSERT_TRUE(FB_Bench.WinchCouplingCorrectionPts <= 82, 'correction bornee a 0,02 m par scan');
+        M2_Pos_M := M2_Pos_M + DINT_TO_REAL(FB_Bench.WinchCouplingCorrectionPts) * (2.0 / 8192.0);
+    END_FOR;
+    ADVANCE_TIME(10000000);
+    ASSERT_TRUE((M2_Pos_M - 5.0) >= 14.97, 'residu 14,25 m -> butee atteinte (ecart <= 0,2 %)');
+    ASSERT_TRUE((M2_Pos_M - 5.0) <= 15.0, 'residu 14,25 m -> aucun depassement de butee');
+
+    (* --- Residu 14,75 m (haut de bande fermee) --- *)
+    M2_Pos_M := 14.75 + 5.0;
+    FOR i := 1 TO 800 DO
+        FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+                 M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+                 M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+                 SimWinchCouplingModelActive := TRUE,
+                 M1_CablePos_M := 5.0, M2_CablePos_M := M2_Pos_M,
+                 BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+        ASSERT_TRUE(FB_Bench.WinchCouplingCorrectionPts <= 82, 'correction bornee a 0,02 m par scan');
+        M2_Pos_M := M2_Pos_M + DINT_TO_REAL(FB_Bench.WinchCouplingCorrectionPts) * (2.0 / 8192.0);
+    END_FOR;
+    ADVANCE_TIME(10000000);
+    ASSERT_TRUE((M2_Pos_M - 5.0) >= 14.97, 'residu 14,75 m -> butee atteinte (ecart <= 0,2 %)');
+    ASSERT_TRUE((M2_Pos_M - 5.0) <= 15.0, 'residu 14,75 m -> aucun depassement de butee');
 END_TEST

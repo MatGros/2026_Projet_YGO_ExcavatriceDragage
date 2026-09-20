@@ -29472,14 +29472,13 @@ END_IF;
                 <simpleValue value="16#0040" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Bit 6 de ST_SafetyWinch.ErrorId = cause « Limite basse cable atteinte »
-(FB_Safety_Winch.st:318-325, vue LIVE, Latching := FALSE). Le DUT ST_SafetyWinch
-n'expose AUCUN champ nommé pour cette cause : le bit est nommé ici plutôt qu'écrit
-en clair dans le carrousel (T255-D).
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Bit 6 de ST_SafetyWinch.ErrorId = cause « Limite basse cable atteinte » (vue LIVE,
+Latching := FALSE, FB_Safety_Winch.st:318-325). Le DUT ST_SafetyWinch n'expose aucun
+champ nommé pour cette cause : le bit est nommé ici plutôt qu'écrit en clair.
 ⚠️ Ne JAMAIS lire WinchMxSafety.CableLimitDescent à la place : ce champ est une
-comparaison BRUTE de projection, sans bypass ni mode référencement
+comparaison BRUTE de position, sans bypass ni mode référencement
 (FB_WinchStateProjection.st:217-218/230/257) — il resterait vrai sous
-BypassCableLimitSwitch (MAINT_N2) alors que la cause est levée (revue 2026-09-20).
+BypassCableLimitSwitch (MAINT_N2) alors que la cause safety est levée.
 . [LOC] Bit 6 ErrorId : limite basse cable</xhtml>
               </documentation>
             </variable>
@@ -30098,13 +30097,13 @@ ELSIF NOT DeadmanArmed THEN
 ELSIF CurrentMode = E_Mode.DISABLE THEN
     OperatorActionCandidate := '[IHM] Sélectionner un mode';
 ELSIF ((WinchM1Safety.ErrorId OR WinchM2Safety.ErrorId) AND CST_WinchErrorIdCableLimitDescent) &lt;&gt; 16#0000 THEN
-    // 🛡️ T255-D (mesure 2026-09-20) : cause limite basse câble ACTIVE (bit 6) ⇒ descente
-    // INTERDITE (DescendPermit = FALSE, FB_Safety_Winch.st:563-565) et REMONTÉE = seule
-    // action autorisée. Nomme la cause ET l'action même SANS commande de descente : la
-    // branche historique (FB_Hmi_BannerFormatter.st:661-663) restait inatteignable quand
-    // DirectionBlocked = FALSE (joystick relâché) — constat terrain d'origine.
+    // 🛡️ Cause limite basse câble ACTIVE (bit 6) ⇒ descente INTERDITE
+    // (DescendPermit = FALSE, FB_Safety_Winch.st:563-565) et REMONTÉE = seule action
+    // autorisée. Nomme la cause ET l'action même SANS commande de descente : la branche
+    // « Descente interdite - Limite basse cable » (ligne 661) n'est atteinte que si
+    // DirectionBlocked = TRUE, donc jamais joystick relâché.
     // Lue sur ErrorId (cause safety, bypass et mode référencement respectés) et jamais sur
-    // WinchMxSafety.CableLimitDescent, champ de projection brute sans bypass (revue 2026-09-20).
+    // WinchMxSafety.CableLimitDescent, champ de projection brute sans bypass.
     // Ordre volontaire : APRÈS « Descente interdite » (une descente réellement commandée
     // garde son libellé historique) et APRÈS la branche DISABLE (aucune action proposée
     // hors mode de marche), AVANT les rappels joystick : la cause prime sur le guidage,
@@ -30215,16 +30214,15 @@ END_IF;
 IF WinchM1Safety.ErrorOverspeed AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] Survitesse treuil detectee (SafeStop)'; AlarmCount := AlarmCount + 1;
 END_IF;
-// 🛡️ 5a-bis. Limite de course BASSE du treuil M1 (T255-D, mesure 2026-09-20) :
-//    cause 6 = instCauses[6].Active (FB_Safety_Winch.st:318-325), bit 6 = 16#0040, NON
-//    latchée : elle n'était décodée NULLE PART — ni carrousel actif, ni [HISTO] (jamais
-//    dans LatchedId). Elle allume pourtant AnyFaultActive via Safety.Error
-//    (PRG_07:541-542) : voyant allumé, bandeau muet. Elle est BLOQUANTE (DescendPermit,
-//    FB_Safety_Winch.st:563-565) ⇒ publiée au titre d'AF-07 §6 (interlock).
+// 🛡️ 5a-bis. Limite de course BASSE du treuil M1 : cause BLOQUANTE (DescendPermit,
+//    FB_Safety_Winch.st:563-565), donc publiée au carrousel au titre d'AF-07 §6 (interlock).
+//    Cause 6 = instCauses[6].Active (FB_Safety_Winch.st:318-325), bit 6 = 16#0040, NON
+//    latchée : elle allume AnyFaultActive via Safety.Error (PRG_07:541-542) et n'est
+//    présente ni en vue active sans cette entrée, ni en [HISTO] (jamais dans LatchedId).
 //    ⚠️ Lue sur ErrorId (la CAUSE safety, qui respecte tous les bypass) et JAMAIS sur
 //    WinchM1Safety.CableLimitDescent, champ de projection brute sans bypass
 //    (FB_WinchStateProjection.st:217-218/230) : le lire produirait une FAUSSE alarme sous
-//    BypassCableLimitSwitch (MAINT_N2) — revue read-only 2026-09-20, MAJOR-1.
+//    BypassCableLimitSwitch (MAINT_N2).
 //    Gardée par la validité encodeur, comme les autres alarmes filles du treuil.
 IF (WinchM1Safety.ErrorId AND CST_WinchErrorIdCableLimitDescent) &lt;&gt; 16#0000 AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] Limite basse cable atteinte'; AlarmCount := AlarmCount + 1;
@@ -36453,6 +36451,52 @@ historique inchange tant que non cablee sur un vrai signal amont, cf. registre P
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Graine episode capteurs M3</xhtml>
               </documentation>
             </variable>
+            <variable name="SimM3SensorBlipTransitions">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Excursions electriques courtes par front (0 = profil ~1 s historique seul)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorBlipDurationS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Largeur d'une excursion du blip court, s</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3BrakeFaultCloseWhileRunning">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FAUTE explicite frein M3 — defaut FALSE : reproduit le defaut terrain « frein ferme
+alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s, ErrorId=64).
+--&gt; [TST] TRUE = force la fermeture frein M3 hors vitesse nulle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3BrakeFaultCloseDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai avant application de la faute frein M3, s</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimJoystickLeft_Rev_TREMIE_Active">
               <type>
                 <BOOL />
@@ -36816,6 +36860,15 @@ le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Correction appliquee a l'image M2 (points codeur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3BrakeFaultCloseActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Faute frein M3 -- diagnostic seul : confirme que la branche de faute est bien appliquee.
+&lt;-- [DIAG] Faute frein M3 effectivement appliquee ce scan</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -37614,11 +37667,9 @@ Winch.COD2_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING
 //    persistante du codeur dont FB_Sim_Encoder reste l'unique producteur.
 // 🔒 MONTEE UNIQUEMENT : la descente couplee reste au modele existant SimM2CoupledDescentModelActive
 //    (exclusion mutuelle : les deux modeles ne s'appliquent jamais ensemble).
-// 🔒 Cible = BUTEE MECANIQUE benne fermee (BucketOffsetCloseM) =&gt; ecart relatif 0 % exige par
-//    l'operateur, seule valeur qui fasse converger l'ouverture benne vers 0 % (arbitrage CC01
-//    2026-09-20, D1 : l'hypothese &lt;&lt; equilibre elastique &gt;&gt; a OffsetCloseM - 0,5 x CoherenceLimitM
-//    est ABANDONNEE, elle plafonnait l'ecart a 3,4 % et ne satisfaisait pas le besoin reel).
-//    Le sens unique (correction seulement si Delta &lt; cible) et le bornage de pente
+// 🔒 Cible = BUTEE MECANIQUE benne fermee (BucketOffsetCloseM) : seule valeur qui fasse converger
+//    l'ouverture benne vers 0 % ; une cible intermediaire laisse un ecart plancher jamais
+//    corrigible. Le sens unique (correction seulement si Delta &lt; cible) et le bornage de pente
 //    (LIMIT + MIN(cible - Delta)) interdisent tout depassement de butee.
 WinchCouplingBothSameDir := (M1_RelayFwd AND M2_RelayFwd) OR (M1_RelayRev AND M2_RelayRev);
 WinchCouplingGate := SimWinchCouplingModelActive
@@ -37633,9 +37684,8 @@ WinchCouplingActive := WinchCouplingGate;
 WinchCouplingCorrectionPts := 0;
 IF WinchCouplingGate THEN
     WinchCouplingDelta_M := M2_CablePos_M - M1_CablePos_M;
-    // Cible = butee mecanique benne FERMEE (ecart relatif 0 %). Une cible intermediaire
-    // (OffsetCloseM - 0,5 x CoherenceLimitM) laissait un ecart plancher de 3,4 % jamais
-    // corrigible : T328, arbitrage CC01 2026-09-20 (D1).
+    // Cible = butee mecanique benne FERMEE (ecart relatif 0 %). Le sens unique et le bornage
+    // de pente garantissent qu'aucune correction ne depasse cette butee.
     WinchCouplingTarget_M := BucketOffsetCloseM;
     IF WinchCouplingDelta_M &lt; WinchCouplingTarget_M THEN
         WinchCouplingCorrection_M := (WinchCouplingTarget_M - WinchCouplingDelta_M)
@@ -37691,8 +37741,13 @@ instSimTranslation(
     SensorIntermittencePeriodS := SimM3SensorIntermittencePeriodS,
     SensorHysteresis_M := SimM3SensorHysteresis_M,
     SensorLoadAngleTriggerRad := SimM3SensorLoadAngleTriggerRad,
-    SensorScenarioSeed := SimM3SensorScenarioSeed
+    SensorScenarioSeed := SimM3SensorScenarioSeed,
+    SensorBlipTransitions := SimM3SensorBlipTransitions,
+    SensorBlipDurationS := SimM3SensorBlipDurationS,
+    BrakeFaultCloseWhileRunning := SimM3BrakeFaultCloseWhileRunning,
+    BrakeFaultCloseDelay_S := SimM3BrakeFaultCloseDelayS
 );
+M3BrakeFaultCloseActive := instSimTranslation.BrakeFaultCloseActive;
 
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
 // même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).
@@ -38997,6 +39052,32 @@ Ready := TRUE;
                 <simpleValue value="0.01" />
               </initialValue>
             </variable>
+            <variable name="BlipTransitions">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profil « BLIP COURT » — SECOND profil, independant du train de bascules du profil
+       d'intermittence ci-dessus (dont les parametres restent inchanges).
+       0 = desactive : le comportement historique est strictement conserve.
+       Rejoue les excursions electriques courtes mesurees sur la trace terrain du
+       2026-09-04 : Tremie contradictoire pendant 2 echantillons a 12,24 s (~200 ms) et
+       PV reactive 1 echantillon a 14,94 s (~100 ms).
+         BlipTransitions = nombre de bascules electriques (1 = une excursion puis retour) ;
+         BlipDurationS   = duree de maintien de chaque etat, donc largeur de l'excursion.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlipDurationS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.2" />
+              </initialValue>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawDetected">
@@ -39010,6 +39091,11 @@ Ready := TRUE;
               </type>
             </variable>
             <variable name="EpisodeActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BlipActive">
               <type>
                 <BOOL />
               </type>
@@ -39061,6 +39147,21 @@ Ready := TRUE;
                 <UDINT />
               </type>
             </variable>
+            <variable name="BlipRunning">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BlipTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="BlipCount">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
@@ -39079,6 +39180,10 @@ IF NOT Enable THEN
     ElectricalOutput := FALSE;
     PreviousRawDetected := FALSE;
     EpisodeActive := FALSE;
+    BlipActive := FALSE;
+    BlipRunning := FALSE;
+    BlipTimerS := 0.0;
+    BlipCount := 0;
     DelayTimerS := 0.0;
     EpisodeTimerS := 0.0;
     ToggleTimerS := 0.0;
@@ -39141,9 +39246,45 @@ IF RawDetected &lt;&gt; PreviousRawDetected THEN
             * (0.7 + UDINT_TO_REAL(RandomState MOD 6000) / 10000.0));
         EpisodeActive := IntermittenceActive AND (IntermittenceDurationS &gt; 0.0);
     END_IF;
+    (* Blip court : arme sur le meme front MECANIQUE. Ses propres bascules electriques ne
+       peuvent donc jamais le rearmer — meme protection que l'episode d'intermittence. *)
+    IF (BlipTransitions &gt; 0) AND (BlipDurationS &gt; 0.0) THEN
+        BlipRunning := TRUE;
+        BlipTimerS := 0.0;
+        BlipCount := 0;
+        BlipActive := TRUE;
+    END_IF;
 END_IF;
 
-IF EpisodeActive THEN
+IF BlipRunning THEN
+    (* Protocole du blip court : (0) la sortie rejoint d'abord l'etat MECANIQUE — le
+       comportement nominal reste donc visible ; puis une excursion contradictoire toutes
+       les BlipDurationS, donc de largeur BlipDurationS ; enfin la sortie est rendue a
+       l'etat mecanique. Nombre d'excursions = BlipTransitions. *)
+    BlipTimerS := BlipTimerS + CycleTimeS;
+    IF BlipTimerS &gt;= MAX(CycleTimeS, BlipDurationS) THEN
+        BlipTimerS := 0.0;
+        IF BlipCount = 0 THEN
+            IF ElectricalOutput &lt;&gt; RawDetected THEN
+                ElectricalOutput := RawDetected;
+                TransitionCount := TransitionCount + 1;
+            END_IF;
+            BlipCount := 1;
+        ELSIF BlipCount &lt;= BlipTransitions THEN
+            ElectricalOutput := NOT ElectricalOutput;
+            TransitionCount := TransitionCount + 1;
+            BlipCount := BlipCount + 1;
+        ELSE
+            BlipRunning := FALSE;
+            BlipActive := FALSE;
+            IF ElectricalOutput &lt;&gt; RawDetected THEN
+                ElectricalOutput := RawDetected;
+                TransitionCount := TransitionCount + 1;
+            END_IF;
+            DelayTimerS := 0.0;
+        END_IF;
+    END_IF;
+ELSIF EpisodeActive THEN
     EpisodeTimerS := EpisodeTimerS + CycleTimeS;
     ToggleTimerS := ToggleTimerS + CycleTimeS;
     IF ToggleTimerS &gt;= EpisodeTogglePeriodS THEN
@@ -39752,6 +39893,27 @@ Ready := TRUE;
                 <simpleValue value="0.01" />
               </initialValue>
             </variable>
+            <variable name="BrakeFaultCloseWhileRunning">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FAUTE EXPLICITE frein M3 — defaut FALSE : reproduit le defaut terrain « frein ferme
+       alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s,
+       State.ErrorId=64). La garde nominale 0,5 Hz du frein n'est pas modifiee.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeFaultCloseDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
             <variable name="SuspendedLoadLength_M">
               <type>
                 <REAL />
@@ -39775,6 +39937,23 @@ Ready := TRUE;
               <initialValue>
                 <simpleValue value="0.2" />
               </initialValue>
+            </variable>
+            <variable name="EndStopRecoilMax_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">BUTEE MECANIQUE — recul borne apres arret serre.
+       0.0 (defaut) conserve EXACTEMENT le comportement historique : position ET vitesse
+       figees a la butee (decision de review tracee, correctif « contact rigide »).
+       &gt; 0 : l'inertie du chariot reste absorbee par la butee, MAIS la reaction de la charge
+       peut ressortir le chariot de la zone capteur — comportement observe sur la trace
+       terrain du 2026-09-04 a 26,437 s (Tremie actif 1 echantillon puis perdu
+       definitivement). Valeur SYNTHETIQUE, en attente de mesure terrain.</xhtml>
+              </documentation>
             </variable>
             <variable name="LoadFrequencyDroopGain_Hz">
               <type>
@@ -39848,6 +40027,28 @@ Ready := TRUE;
                 <simpleValue value="0.12" />
               </initialValue>
             </variable>
+            <variable name="SensorBlipTransitions">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">BLIP COURT — second profil capteur, independant du train ~1 s ci-dessus.
+       BlipTransitions = 0 (defaut) : profil historique strictement inchange.
+       Valeurs de trace : Tremie 1 excursion de 0,2 s (2 echantillons a 100 ms),
+       PV 1 excursion de 0,1 s (1 echantillon).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorBlipDurationS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.2" />
+              </initialValue>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="PosTremie">
@@ -39905,6 +40106,11 @@ Ready := TRUE;
                 <BOOL />
               </type>
             </variable>
+            <variable name="BrakeFaultCloseActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
             <variable name="PositionTrue_M">
               <type>
                 <REAL />
@@ -39928,6 +40134,11 @@ Ready := TRUE;
             <variable name="SensorTransitionCount">
               <type>
                 <UDINT />
+              </type>
+            </variable>
+            <variable name="SensorBlipActive">
+              <type>
+                <BOOL />
               </type>
             </variable>
             <variable name="HardStopTremieActive">
@@ -39956,6 +40167,19 @@ Ready := TRUE;
               <type>
                 <REAL />
               </type>
+            </variable>
+            <variable name="TravelDirection">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens de deplacement MEMORISE. La commande peut etre retiree AVANT l'arret physique
+       (deceleration libre du variateur) : le sens du dernier ordre valide est conserve tant
+       que le variateur retourne de la vitesse, puis purge a l'arret. Sans cette memoire, la
+       vitesse du chariot s'effondrait au scan de retrait de commande alors que la frequence
+       retournee decroit encore — ecart mesure sur trace terrain : 1,13 m de roue libre
+       (14,67 -&gt; 16,16 s a 40 Hz) jamais parcourus par le modele.</xhtml>
+              </documentation>
             </variable>
             <variable name="FrequencyTarget_Hz">
               <type>
@@ -40126,6 +40350,18 @@ Ready := TRUE;
                 <simpleValue value="0.001" />
               </initialValue>
             </variable>
+            <variable name="CST_StopFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Meme seuil d'arret que FB_Sim_TranslationBrake.CST_StopFrequency_Hz (0,5 Hz).
+       Valide par la trace terrain du 2026-09-04 : frein ouvert a 0,60 Hz, ferme a 0,00 Hz.</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
@@ -40156,11 +40392,14 @@ IF NOT Enable THEN
     BrakeMechanicallyOpen := FALSE;
     BrakeContactOpen := FALSE;
     BrakeCoilEnergized := FALSE;
+    BrakeFaultCloseActive := FALSE;
     PositionTrue_M := CST_PositionAtP1;
     VelocityTrue_Mps := 0.0;
     PreviousVelocity_Mps := 0.0;
+    TravelDirection := 0.0;
     LoadAngle_Rad := 0.0;
     SensorTransitionCount := 0;
+    SensorBlipActive := FALSE;
     HardStopTremieActive := FALSE;
     HardStopMaintenanceActive := FALSE;
     (* Repli deterministe compatible avec le mot thermometre P1 = 00011. *)
@@ -40178,6 +40417,7 @@ IF NOT Enable THEN
 ELSIF NOT Initialized THEN
     Initialized := TRUE;
     PositionTrue_M := CST_PositionAtP1;
+    TravelDirection := 0.0;
 END_IF;
 
 IF Enable THEN
@@ -40203,15 +40443,34 @@ IF Enable THEN
     instBrake(Enable := TRUE, ReleaseCmd := BrakeReleaseCmd,
         ActualFrequency_Hz := ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
         CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
-        CycleTime_S := CycleTimeS);
+        CycleTime_S := CycleTimeS,
+        FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
+        FaultCloseDelay_S := BrakeFaultCloseDelay_S);
     BrakeCoilEnergized := instBrake.CoilEnergized;
     BrakeMechanicallyOpen := instBrake.MechanicallyOpen;
     BrakeContactOpen := instBrake.ContactOpen;
+    BrakeFaultCloseActive := instBrake.FaultCloseActive;
+
+    (* Sens memorise (C3). Regles, dans cet ordre :
+       1. un ordre simple valide (re)memorise le sens ;
+       2. deux ordres contradictoires neutralisent immediatement le sens — aucune
+          excitation inventee (preserve TC-T300-MEC-030) ;
+       3. commande retiree : le sens est CONSERVE tant que le variateur retourne de la
+          vitesse (deceleration libre), puis purge des que la vitesse est nulle. *)
+    IF ReqTremie AND NOT ReqMaintenance THEN
+        TravelDirection := -1.0;
+    ELSIF ReqMaintenance AND NOT ReqTremie THEN
+        TravelDirection := 1.0;
+    ELSIF ReqTremie AND ReqMaintenance THEN
+        TravelDirection := 0.0;
+    ELSIF ABS(ActualFrequency_Hz) &lt;= CST_StopFrequency_Hz THEN
+        TravelDirection := 0.0;
+    END_IF;
 
     PreviousVelocity_Mps := VelocityTrue_Mps;
     IF (FullTravelTimeS &gt; CST_MinTimeS) AND BrakeMechanicallyOpen THEN
         SpeedAt40Hz_Mps := CST_PositionAtMaintenance / FullTravelTimeS;
-        VelocityTarget_Mps := DirectionSign * SpeedAt40Hz_Mps * ActualFrequency_Hz / CST_NominalFrequency_Hz;
+        VelocityTarget_Mps := TravelDirection * SpeedAt40Hz_Mps * ActualFrequency_Hz / CST_NominalFrequency_Hz;
     ELSE
         VelocityTarget_Mps := 0.0;
     END_IF;
@@ -40238,7 +40497,30 @@ IF Enable THEN
         CycleTime_S := CycleTimeS);
     LoadAngle_Rad := instSuspendedLoad.Angle_Rad;
     IF HardStopTremieActive OR HardStopMaintenanceActive THEN
-        VelocityTrue_Mps := 0.0;
+        IF (EndStopRecoilMax_M &gt; 0.0) AND BrakeMechanicallyOpen THEN
+            (* Recul autorise UNIQUEMENT en s'eloignant de la butee touchee, borne par
+               EndStopRecoilMax_M : jamais plus loin dans la butee, jamais de saut cache. *)
+            VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+            (* Contre une butee, l'entrainement DECROCHE : il ne maintient pas une consigne de
+               vitesse dans l'obstacle. Sans cette purge, la consigne de vitesse ecrasait en
+               permanence la reaction de charge et le chariot ne pouvait jamais ressortir de
+               la zone capteur (recul alors impossible, quelle que soit la charge). *)
+            TravelDirection := 0.0;
+            IF HardStopTremieActive THEN
+                VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps);
+                PositionCandidate_M := LIMIT(CST_PositionAtTremie,
+                    PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
+                    CST_PositionAtTremie + EndStopRecoilMax_M);
+            ELSE
+                VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps);
+                PositionCandidate_M := LIMIT(CST_PositionAtMaintenance - EndStopRecoilMax_M,
+                    PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
+                    CST_PositionAtMaintenance);
+            END_IF;
+            PositionTrue_M := PositionCandidate_M;
+        ELSE
+            VelocityTrue_Mps := 0.0;
+        END_IF;
     ELSE
         VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
         PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
@@ -40275,6 +40557,7 @@ instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 11,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := CST_PositionAtPV, Hysteresis_M := SensorHysteresis_M,
@@ -40282,6 +40565,7 @@ instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 23,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := CST_PositionAtP2, Hysteresis_M := SensorHysteresis_M,
@@ -40289,6 +40573,7 @@ instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 37,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := CST_PositionAtP1, Hysteresis_M := SensorHysteresis_M,
@@ -40296,6 +40581,7 @@ instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 53,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := CST_PositionAtMaintenanceSensor_M, Hysteresis_M := SensorHysteresis_M,
@@ -40303,6 +40589,7 @@ instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 71,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 
 PosTremie := instSensorTremie.ElectricalOutput;
@@ -40313,6 +40600,9 @@ PosMaintenance := instSensorMaintenance.ElectricalOutput;
 SensorTransitionCount := instSensorTremie.TransitionCount + instSensorPV.TransitionCount
     + instSensorP2.TransitionCount + instSensorP1.TransitionCount
     + instSensorMaintenance.TransitionCount;
+SensorBlipActive := instSensorTremie.BlipActive OR instSensorPV.BlipActive
+    OR instSensorP2.BlipActive OR instSensorP1.BlipActive
+    OR instSensorMaintenance.BlipActive;
 </xhtml>
           </ST>
         </body>
@@ -51730,6 +52020,10 @@ instSimBench(
     SimM3SensorHysteresis_M         := GVL_Simulation.SimM3SensorHysteresis_M,
     SimM3SensorLoadAngleTriggerRad  := GVL_Simulation.SimM3SensorLoadAngleTriggerRad,
     SimM3SensorScenarioSeed         := GVL_Simulation.SimM3SensorScenarioSeed,
+    SimM3SensorBlipTransitions      := GVL_Simulation.SimM3SensorBlipTransitions,
+    SimM3SensorBlipDurationS        := GVL_Simulation.SimM3SensorBlipDurationS,
+    SimM3BrakeFaultCloseWhileRunning := GVL_Simulation.SimM3BrakeFaultCloseWhileRunning,
+    SimM3BrakeFaultCloseDelayS       := GVL_Simulation.SimM3BrakeFaultCloseDelayS,
     SimJoystickLeft_Rev_TREMIE_Active  := GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active,
     SimJoystickRight_Fwd_MAINT_Active  := GVL_Simulation.SimJoystickRight_Fwd_MAINT_Active,
     SimJoystickFwd_Up_Close_Active     := GVL_Simulation.SimJoystickFwd_Up_Close_Active,
@@ -59740,6 +60034,52 @@ le decodeur et les fins de course sans ecrire directement dans le metier.</xhtml
           </type>
           <initialValue>
             <simpleValue value="3001" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorBlipTransitions">
+          <type>
+            <UDINT />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ BLIP COURT — second profil de perte/reprise, independant du train ~1 s ci-dessus
+(SimM3SensorStabilizationS). 0 = desactive (profil historique inchange).
+Rejoue les excursions courtes de la trace terrain du 2026-09-04 :
+Tremie : 1 excursion de 0,2 s (actif 2 echantillons a 12,24 s en s'eloignant) ;
+PV     : 1 excursion de 0,1 s (reactive 1 echantillon a 14,94 s en deceleration).</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorBlipDurationS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.2" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3BrakeFaultCloseWhileRunning">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔥 FAUTE EXPLICITE FREIN M3 — defaut FALSE : comportement nominal strictement inchange.
+TRUE rejoue le defaut terrain « cause 6 instantanee » : contact frein ferme alors que le
+variateur retourne encore 10,00 Hz (trace 2026-09-04, 26,437 s, State.ErrorId=64).
+La garde nominale de fermeture (0,5 Hz) est CONSERVEE : elle est validee par la meme trace
+(frein ouvert a 0,60 Hz, ferme a 0,00 Hz). Stimulus de banc, inoperant hors simulation.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3BrakeFaultCloseDelayS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
           </initialValue>
         </variable>
         <variable name="SimJoystickLeft_Rev_TREMIE_Active">
