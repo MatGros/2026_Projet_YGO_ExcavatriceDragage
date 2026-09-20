@@ -7,26 +7,12 @@
       "passed": true
     },
     {
-      "name": "TC-P10-023 Fermeture seulement si MotionDirection=1 ET MotionRequestActive",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.M2_RUNREQUEST expected TRUE, got FALSE",
-        "file": "test_fb_bucket.st",
-        "line": 78,
-        "message": "Fermeture -> M2_StartStop=TRUE"
-      }
+      "name": "TC-P10-023 Fermeture engagee seulement si ReqAscent ET MotionRequestActive ET EffectivePermitBucket_Close",
+      "passed": true
     },
     {
-      "name": "TC-P10-024 Ouverture seulement si MotionDirection=-1 ET MotionRequestActive",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.M2_RUNREQUEST expected TRUE, got FALSE",
-        "file": "test_fb_bucket.st",
-        "line": 108,
-        "message": "Ouverture -> M2_StartStop=TRUE"
-      }
+      "name": "TC-P10-024 Ouverture engagee seulement si ReqDescend ET MotionRequestActive ET EffectivePermitBucket_Open",
+      "passed": true
     },
     {
       "name": "T196-001 Etat ferme publie apres atteinte de l offset",
@@ -66,14 +52,7 @@
     },
     {
       "name": "TC-P10-025.2 Anti-traversee : mouvement deja engage + M2_Busy -> pas d avortement (AC3)",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.M2_RUNREQUEST expected TRUE, got FALSE",
-        "file": "test_fb_bucket.st",
-        "line": 388,
-        "message": "M2_Busy pendant manuvre -> pas d avortement"
-      }
+      "passed": true
     },
     {
       "name": "TC-P10-026 Glissement M1 >1.0m pendant BUSY -> M1SlipDetected + coupe M2",
@@ -88,41 +67,23 @@
       "passed": true
     },
     {
-      "name": "TC-P10-029 Recul (sens inverse) borne a la position de depart, jamais au-dela",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB.M2_REQASCENT expected -1, got 0",
-        "file": "test_fb_bucket.st",
-        "line": 509,
-        "message": "Recul -> M2_Direction=-1",
-        "expected": "-1",
-        "actual": "0"
-      }
+      "name": "TC-P10-029 Recul (sens inverse) sous commande engagee : sens descente commande",
+      "passed": true
     },
     {
       "name": "TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Direction/StartStop)",
       "passed": false,
       "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB.M2_REQASCENT expected -1, got 0",
+        "assertType": "ASSERT_FALSE",
+        "detail": "FB.M2_RUNREQUEST expected FALSE, got TRUE",
         "file": "test_fb_bucket.st",
-        "line": 557,
-        "message": "Recul -> M2_Direction=-1",
-        "expected": "-1",
-        "actual": "0"
+        "line": 626,
+        "message": "Recul a M2StartPosM -> M2_StartStop=FALSE (arret)"
       }
     },
     {
-      "name": "TC-P10-030 ConfirmOpen/ClosePosition reference directement la benne en maintenance",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_FALSE",
-        "detail": "BUCKETSTATE.ISOPEN expected FALSE, got TRUE",
-        "file": "test_fb_bucket.st",
-        "line": 624,
-        "message": "MAINT_N1 + ConfirmOpen -> IsOpen reste FALSE"
-      }
+      "name": "TC-P10-030 ConfirmOpen/ClosePosition reference la benne : MAINT_N2 seul, etat publie par la mesure",
+      "passed": true
     },
     {
       "name": "T323-005 Codeur(s) non reference(s) : statut au repos, defaut live seulement sur mouvement",
@@ -161,26 +122,12 @@
       "passed": true
     },
     {
-      "name": "TC-P10-047.1 Incoherence boot : 1er cycle ni IsOpen ni IsClosed -> StateIncoherent, ActiveOffsetValid=FALSE",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "BUCKETSTATE.STATEINCOHERENT expected TRUE, got FALSE",
-        "file": "test_fb_bucket.st",
-        "line": 991,
-        "message": "Boot incoherent -> StateIncoherent=TRUE"
-      }
+      "name": "TC-P10-047.1 Boot : etat classe en continu sur la mesure, offset invalide sans reference benne",
+      "passed": true
     },
     {
-      "name": "TC-P10-047.2 Boot incoherent IsOpen=TRUE ET IsClosed=TRUE -> StateIncoherent",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "BUCKETSTATE.STATEINCOHERENT expected TRUE, got FALSE",
-        "file": "test_fb_bucket.st",
-        "line": 1011,
-        "message": "Boot IsOpen ET IsClosed -> StateIncoherent=TRUE"
-      }
+      "name": "TC-P10-047.2 Boot : une mesure franche ecrase un etat memorise contradictoire (T247)",
+      "passed": true
     },
     {
       "name": "TC-P10-048.1 Offset RETAIN : OffsetCloseM persiste apres power cycle",
@@ -188,14 +135,7 @@
     },
     {
       "name": "T181-21 Copy-out VAR_IN_OUT : BucketState ecrit par FB_Bucket restitue a la variable de test",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "BUCKETSTATE.STATEINCOHERENT expected TRUE, got FALSE",
-        "file": "test_fb_bucket.st",
-        "line": 1052,
-        "message": "Copy-out auto : BucketState.StateIncoherent restitue TRUE"
-      }
+      "passed": true
     },
     {
       "name": "T291-B Continuit\u00e9 DisplayOffsetM : Ferm\u00e9 -> Interm\u00e9diaire -> Ouvert sans saut",
@@ -216,7 +156,7 @@
   ],
   "summary": {
     "total": 36,
-    "passed": 27,
-    "failed": 9
+    "passed": 35,
+    "failed": 1
   }
 }

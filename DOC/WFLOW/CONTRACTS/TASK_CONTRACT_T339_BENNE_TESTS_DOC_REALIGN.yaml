@@ -1,0 +1,143 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# T339 — Réalignement des tests CI et de la fiche FB_Bucket (dettes signalées par T295)
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T339
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Remettre en accord avec le code RÉEL les trois dettes signalées par T295 : (1) les 9 tests CI
+    FB_Bucket qui échouent alors que le comportement du FB est celui voulu (tests obsolètes, mesurés
+    24/33 avant T295 et 27/36 après — mêmes 9 noms) ; (2) la fiche FB_Bucket_v1.0.md qui décrit encore
+    l'ANCEIENNE sémantique du watchdog de timeout et un mapping ErrorId FAUX ; (3) les ~30 sites de test
+    passant l'argument nommé MORT « MotionRequestActive », silencieusement ignoré par le harnais STruCpp
+    (donc des tests potentiellement vacants qui « passent » sans rien prouver).
+
+  contexte_verifie_20260920: >
+    Mesuré par CC01 sur les rapports CI archivés, avant ET après le lot T295 : la suite H_TREUILS_BENNE
+    est passée de 24/33 (run 11:56:34) à 27/36 (run 18:34:34), soit +3 tests (TC-P10-046.2/.3/.4 livrés
+    par T295) et les MÊMES 9 échecs — aucun n'est imputable à T295 (delta T295 = 0). Ces 9 échecs sont
+    donc une dette de test préexistante, jamais traitée.
+
+  acceptance:
+    - id: AC1
+      statement: "Chacun des 9 tests en échec est TRIÉ et traité : soit réécrit pour décrire le comportement RÉEL du code actuel (le test suit le code), soit escaladé comme défaut de code RÉEL identifié (signalement à l'orchestrateur, aucune correction de code dans ce lot). Aucun des deux cas n'est laissé implicite."
+      verified_by: "Tableau de tri des 9 tests dans la restitution : nom, cause de l'obsolescence fichier:ligne côté code, verdict (test obsolète / défaut code réel), action."
+    - id: AC2
+      statement: "La suite FB_Bucket passe à 36/36 PASS, OU tout échec résiduel est escaladé avec sa preuve (fichier:ligne du code + assertion) et explicitement exclu de ce lot."
+      verified_by: "Sortie brute de `python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Bucket` (avant/après)."
+    - id: AC3
+      statement: "Aucun test n'est désactivé, supprimé, affaibli ni contourné : le nombre d'assertions par test est non décroissant et chaque assertion retirée est remplacée par une assertion équivalente ou plus stricte, avec justification."
+      verified_by: "`git diff` du fichier de test relu par un agent différent de l'implémenteur + comptage ASSERT_* avant/après."
+    - id: AC4
+      statement: "L'argument nommé mort `MotionRequestActive := TRUE` est purgé de TOUS les sites de test_fb_bucket.st où il ne correspond à aucun VAR_INPUT réel de FB_Bucket ; les tests correspondants pilotent désormais les VRAIES entrées (ReqAscent/ReqDescend) ou n'assertent plus rien d'inutile."
+      verified_by: "Recherche mécanique des arguments nommés du fichier de test comparée à l'interface déclarée de FB_Bucket + sortie brute du run CI."
+    - id: AC5
+      statement: "Un garde-fou automatique (G508 ou identifiant libre suivant) détecte tout argument nommé MORT dans les appels de test CI (argument absent de l'interface réelle du FB testé), est branché dans PLANS de run_all_gates.py, et son --selftest rejette des mutations."
+      verified_by: "Ligne PLANS + exécution réelle du gate + --selftest (REX « garde-fou mort-né » G490/G499)."
+    - id: AC6
+      statement: "La fiche DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md décrit la sémantique RÉELLE du watchdog benne (temps de commande engagée, suspension, cumul, remise à zéro en fin de manœuvre et sur Reset sur front) et un mapping ErrorId EXACT (timeout = cause 2 → bit 2, valeur 4)."
+      verified_by: "Inspection de la fiche + confrontation à FB_Bucket.st §1 et à FB_FaultCore.st:49-57 (SHL(WORD#1, i))."
+    - id: AC7
+      statement: "Aucun fichier de CODE/ (production) n'est modifié par ce lot : un test qui révèle un défaut de code est SIGNALÉ, jamais corrigé ici."
+      verified_by: "`git status --short` : aucun chemin CODE/ dans le diff du lot."
+    - id: AC8
+      statement: "Non-régression : les tests des autres domaines ne régressent pas, et la suite complète est comparée au relevé de référence du 2026-09-20 (9 échecs H_TREUILS_BENNE, plus les échecs des autres domaines)."
+      verified_by: "Rapports CI avant/après + bundle frais + G200 + gates palier C."
+
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/reports/
+      - TOOLS/TEST_AUTO_CI/scripts/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - DOC/WFLOW/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Tout fichier de CODE/ (production) — un défaut révélé par un test est SIGNALÉ, pas corrigé ici.
+      - Désactivation, suppression ou affaiblissement d'un test ou d'une assertion pour faire passer la suite.
+      - Réécriture de TC-P10-046.1 à TC-P10-046.4 (sémantique T295) — ces tests sont la référence du lot T295.
+      - Modification de CfgTimeoutDuration, de sa valeur effective ou de ses défauts.
+      - Fichiers des autres domaines de test (G_CYCLE, M_MAIN, L_SIMULATION…) hors simple signalement.
+
+  conservation:
+    must_survive:
+      - "Chaque test continue de prouver ce que son nom annonce : un test réécrit doit échouer si le comportement décrit disparaît."
+      - "Les 4 tests T295 (TC-P10-046.1 à 046.4) restent inchangés et verts."
+      - "La couverture fonctionnelle existante de FB_Bucket n'est pas réduite (aucun test supprimé, aucune assertion retirée sans remplacement)."
+      - "Le harnais STruCpp et le runner CI gardent leur pouvoir discriminant."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "Run CI FB_Bucket : sortie brute avant et après."
+    - "Tableau de tri des 9 tests (AC1) avec verdict test obsolète / défaut code réel."
+    - "Garde-fou G508+ présent ET branché dans PLANS de run_all_gates.py."
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout écart découvert entre un test et le code est remonté immédiatement : la tentation de faire
+    passer la suite en affaiblissant un test est un échec, pas une solution. Un défaut de code réel
+    révélé par un test est signalé à l'orchestrateur et laissé intact dans ce lot.
+
+status: DELIVERED
+
+execution:
+  executed_by: "DSH11"
+  completed_at: "2026-09-20T21:35:00+02:00"
+  status: DELIVERED
+  summary: >
+    Livré sans aucun fichier CODE/ modifié. AC1 : les 9 tests sont triés, 8 sont des tests
+    obsolètes sourcés (permis EffectivePermitBucket_* absents, API M2_Direction INT disparue,
+    classification continue T247, observabilité de T181-21) et 1 est un défaut de code réel
+    ESCALADÉ et EXCLU (TC-P10-029.1, borne de recul retirée par 2a307b5b). AC2 : 35/36 — échec
+    résiduel unique = TC-P10-029.1. AC3 : 36 tests inchangés, 119 -> 150 assertions, aucun test
+    supprimé. AC4 : 27 sites MotionRequestActive purgés. AC5 : G512 créé, branché PLANS 512,
+    --selftest PASS. AC6 : fiche FB_Bucket_v1.0.md réalignée (watchdog + mapping ErrorId
+    bit 0..4 = 1/2/4/8/16). AC7 : git diff = 0 fichier CODE/. AC8 : bundle frais 260/260 +
+    G200 PASS (0 erreur / 2030 instances) + palier C 45/51 (G512 PASS ; échecs = 5 dettes
+    préexistantes + G504 en vol T330).
+  evidence_submitted:
+    - "CI FB_Bucket AVANT : 27/36 (.tmp_t339_ci_before.log) — APRES : 35/36 (.tmp_t339_ci_after2.log)"
+    - "G512 --selftest : SELFTEST PASS (mutation re-injectée dans le vrai test_fb_bucket.st détectée)"
+    - "G512 avant purge : 27 bloquants MOTIONREQUESTACTIVE — après : 0 bloquant, 108 avertissements hors lot"
+    - "Bundle : CODE_XML/CODE_Bundle.xml frais, 260/260 objets, 0 erreur (G390 PASS)"
+    - "G200_check_linkage.py --report : PASS (0 erreur, 1669 avertissements, 2030 instances)"
+    - "run_all_gates.py --palier C : 45/51 PASS, G512 PASS (.tmp_t339_gatesC.log)"
+    - "Assertions : 119 avant / 150 après ; TC-P10-046.1 à .4 inchangés (20 assertions, verts)"
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Créé le 2026-09-20 par CC01 (orchestrateur) sur accord explicite de l'humain, à la suite du lot T295
+    qui a signalé ces trois dettes sans les corriger. Verrou pris par DSH11 le 2026-09-20T21:05, lot
+    livré le 2026-09-20T21:35 — AUCUN COMMIT, validation humaine requise.
+
+    ARBITRAGES DEMANDÉS (hors périmètre C2 « tests + doc ») :
+    (1) 🔴 P1 — borne de recul perdue : les deux branches d'arrêt à M2StartPosM ont été retirées le
+        2026-09-05 (commit 2a307b5b) ; `LeftStartSinceArm` reste affecté (FB_Bucket.st:561) mais n'est
+        plus jamais lu. Sous commande de fermeture engagée, un recul n'est plus borné par FB_Bucket.
+        → restaurer la borne, OU acter la perte + purger le témoin mort. Preuve : TC-P10-029.1 (ROUGE).
+    (2) 🟠 P2 — plus aucune détection d'état contradictoire : `StateIncoherent` n'est posé que sur
+        neutralisation avec manœuvre engagée (:300-303) alors qu'il conditionne `ActiveOffsetValid`
+        (:747) ; un recouvrement de bandes (`CoherenceLimitM >= (OffsetCloseM-OffsetOpenM)/2`) publie
+        `IsOpen=IsClosed=TRUE` sans aucun signal (la cause 0 ne teste que `OffsetOpenM < OffsetCloseM`).
+    (3) Version/archivage de la fiche : `FB_Bucket_v1.0.md` a été éditée EN PLACE (le contrat la nomme
+        explicitement) ; un bump `_vX.Y` + archivage de l'ancienne est une décision HUMAINE (précédent T338).
+    (4) Trois fichiers de test du même domaine passent des arguments INEXISTANTS et ne compilent plus
+        (`test_fb_winch.st`, `test_fb_winchdirectioninterlock.st`, `test_fb_winch_speed_learning.st` —
+        108 avertissements G512) : hors périmètre T339, à router.
+    (5) Aucune purge des mémoires RETAIN de banc n'existe (rappel T338/Q5) — inchangé ici.
+    check_task_contract.py sur ce contrat : PASS (0 erreur).
