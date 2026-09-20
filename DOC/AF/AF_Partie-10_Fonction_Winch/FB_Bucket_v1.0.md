@@ -4,8 +4,14 @@
 > Rôle de **ce** document : ouverture/fermeture benne par désynchronisation M1/M2, protection
 > glissement, assistants maintenance — et **catalogue unique** des `TC-P10-023` à `TC-P10-034`.
 > **Sous-fonction du domaine Treuils** (AF10) — aucune I/O ni programme propre.
-> Source code : `CODE/TREUILS/BENNE/*.st`, `CODE/G_CYCLE/FB_DiveSearch.st`, `FB_ExtractionSequence.st`.
-> Instance unique `instBucket` dans `PRG_04_Treuils_Benne` — fiche FB du domaine Treuils.
+> Source code : `CODE/H_TREUILS_BENNE/BENNE/*.st` (FB + `_TYPES/`) · instance unique `instBucket`
+> dans `PRG_04_Treuils_Benne.st`.
+>
+> ⚠️ **Réaligné T339 (2026-09-20)** sur le code RÉEL, après 9 tests CI hors-sujet : sémantique du
+> watchdog de timeout (§2 / `TC-P10-046.1`), mapping `ErrorId` exact (index de cause,
+> `FB_FaultCore.st:49-57`), interface réelle (`ReqAscent`/`ReqDescend`, `EffectivePermitBucket_*`),
+> et suppression de l'état benne latché (`TC-P10-030`, `TC-P10-047.1/.2`). Les écarts de CODE restants
+> sont escaladés en §8 — **aucun fichier `CODE/` n'a été modifié par ce réalignement**.
 
 ## 🧭 Sommaire
 
@@ -50,9 +56,9 @@
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Fermeture</b><br>conditionnée</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         💤 <b>Étape 0</b> : Benne au repos, <code>State=READY</code><br>
-        🚀 <b>Étape 1</b> : Demande <code>CmdClose</code> avec <code>MotionDirection=1</code> ET <code>MotionRequestActive</code><br>
-        ⚡ <b>Étape 2</b> : Vérification des 2 conditions obligatoires<br>
-        ✅ <b>Étape 3</b> : Fermeture engagée seulement si les 2 conditions réunies
+        🚀 <b>Étape 1</b> : Demande <code>CmdClose_IHM</code> + sens <code>ReqAscent</code><br>
+        ⚡ <b>Étape 2</b> : Permis de fermeture <code>EffectivePermitBucket_Close</code> ABSENT → aucun ordre M2<br>
+        ✅ <b>Étape 3</b> : Ordre M2 émis seulement si <code>MotionRequestActive</code> ET <code>ReqAscent</code> ET <code>EffectivePermitBucket_Close</code> (<code>FB_Bucket.st:524</code>) — vitesse lente P1
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
@@ -63,13 +69,13 @@
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Ouverture</b><br>conditionnée</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         💤 <b>Étape 0</b> : Benne au repos, <code>State=READY</code><br>
-        🚀 <b>Étape 1</b> : Demande <code>CmdOpen</code> avec <code>MotionDirection=-1</code> ET <code>MotionRequestActive</code><br>
-        ⚡ <b>Étape 2</b> : Vérification des 2 conditions obligatoires<br>
-        ✅ <b>Étape 3</b> : Ouverture engagée seulement si les 2 conditions réunies
+        🚀 <b>Étape 1</b> : Demande <code>CmdOpen_IHM</code> + sens <code>ReqDescend</code><br>
+        ⚡ <b>Étape 2</b> : Permis d'ouverture <code>EffectivePermitBucket_Open</code> ABSENT → aucun ordre M2<br>
+        ✅ <b>Étape 3</b> : Ordre M2 émis seulement si <code>MotionRequestActive</code> ET <code>ReqDescend</code> ET <code>EffectivePermitBucket_Open</code> (<code>FB_Bucket.st:540</code>)
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-025</span></td>
@@ -77,12 +83,12 @@
       <td style="padding: 6px 8px; line-height: 1.55;">
         💤 <b>Étape 0</b> : <code>State=READY</code>, entrée manœuvre benne<br>
         🚀 <b>Étape 1</b> : Demande <code>CmdOpen</code>/<code>CmdClose</code> avec <code>M1_Busy</code> OR <code>M2_Busy</code><br>
-        ⚡ <b>Étape 2</b> : Refus de la demande benne<br>
-        ✅ <b>Étape 3</b> : ⚠️ État code : <code>M1_Busy</code>/<code>M2_Busy</code> déclarés (<code>FB_Bucket.st</code>:29-30) mais NON utilisés — anti-traversée non câblée (T175)
+        ⚡ <b>Étape 2</b> : Refus de la demande benne (aucun latch de <code>CloseReq</code>/<code>OpenReq</code>, aucun <code>Busy</code>)<br>
+        ✅ <b>Étape 3</b> : Refus porté par <code>FB_Bucket.st:484</code>/<code>:488</code> — refus à l'ENTRÉE seulement : une manœuvre DÉJÀ engagée n'est jamais avortée par <code>Mx_Busy</code> (le treuil agit alors sous l'ordre benne, <code>:520-558</code>)
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-026</span></td>
@@ -90,12 +96,12 @@
       <td style="padding: 6px 8px; line-height: 1.55;">
         💤 <b>Étape 0</b> : Manœuvre benne (<code>State=BUSY</code>)<br>
         🚀 <b>Étape 1</b> : Glissement M1 &gt;1.0m pendant BUSY<br>
-        ⚡ <b>Étape 2</b> : <code>ErrorId</code> bit4 + <code>M1SlipDetected</code> levés, coupe M2<br>
-        ✅ <b>Étape 3</b> : Protection couche 1 active (dérive M1)
+        ⚡ <b>Étape 2</b> : <code>ErrorId</code> bit 3 (valeur 8) + <code>M1SlipDetected</code> levés, coupe M2<br>
+        ✅ <b>Étape 3</b> : Protection couche 1 active (dérive M1), défaut <b>latché</b>
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-027</span></td>
@@ -125,29 +131,29 @@
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-029</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Recul</b><br>borné</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Recul</b><br>sous commande</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
-        💤 <b>Étape 0</b> : Manœuvre benne, position de départ mémorisée<br>
-        🚀 <b>Étape 1</b> : Recul (sens inverse)<br>
-        ⚡ <b>Étape 2</b> : Calcul du recul max autorisé<br>
-        ✅ <b>Étape 3</b> : Recul borné à la position de départ, jamais au-delà
+        💤 <b>Étape 0</b> : Manœuvre benne engagée (<code>Busy</code>), position de départ mémorisée (<code>M2StartPosM</code>)<br>
+        🚀 <b>Étape 1</b> : Recul (sens inverse : <code>ReqDescend</code> pendant une fermeture) sous commande toujours engagée<br>
+        ⚡ <b>Étape 2</b> : Sens inverse honoré (permis opposé requis, <code>FB_Bucket.st:528</code>) : <code>M2_ReqDescend=TRUE</code>, <code>M2_ReqAscent=FALSE</code>, palier P1<br>
+        ✅ <b>Étape 3</b> : Recul commandé, sans coupure parasite — ⚠️ la borne « jamais au-delà de <code>M2StartPosM</code> » a été RETIRÉE du code le 2026-09-05 (commit <code>2a307b5b</code>) : voir alerte §8 et <code>TC-P10-029.1</code> (rouge)
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-030</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Confirmer</b><br>position</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
-        💤 <b>Étape 0</b> : Machine arrêtée, mode <code>MAINT_N1/N2</code><br>
-        🚀 <b>Étape 1</b> : <code>ConfirmOpen/ClosePosition</code><br>
-        ⚡ <b>Étape 2</b> : Vérification mode MAINT seule acceptée<br>
-        ✅ <b>Étape 3</b> : Effet seulement en <code>MAINT_N1/N2</code> arrêtés
+        💤 <b>Étape 0</b> : Machine arrêtée, mode <code>MAINT_N1</code>/<code>MAINT_N2</code><br>
+        🚀 <b>Étape 1</b> : Front <code>ConfirmOpenPosition</code>/<code>ConfirmClosePosition</code><br>
+        ⚡ <b>Étape 2</b> : Effet <b>durable</b> = référence benne <code>BucketState.BucketReferenced</code>, acceptée en <code>MAINT_N2</code> SEUL et à l'arrêt (<code>FB_Bucket.st:339-357</code>, latch <code>:382-398</code>)<br>
+        ✅ <b>Étape 3</b> : <code>MAINT_N1</code> et <code>SEMI_AUTO</code> → aucune référence ; ⚠️ <code>IsOpen</code>/<code>IsClosed</code> ne sont PAS latchés par la confirmation : depuis T247 ils sont re-classés à chaque scan sur la mesure (voir §2)
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-031</span></td>
@@ -155,12 +161,12 @@
       <td style="padding: 6px 8px; line-height: 1.55;">
         💤 <b>Étape 0</b> : Codeur (M1 ou M2) non référencé (<code>Homed=FALSE</code>)<br>
         🚀 <b>Étape 1</b> : Évaluation des besoins position benne<br>
-        ⚡ <b>Étape 2</b> : <code>ErrorId</code> bit3 levé<br>
-        ✅ <b>Étape 3</b> : bit3 permanent, indépendant de <code>Reset</code>
+        ⚡ <b>Étape 2</b> : <code>ErrorId</code> bit 4 (valeur 16) levé — <b>uniquement sur mouvement demandé</b> (<code>FB_Bucket.st:274-279</code>)<br>
+        ✅ <b>Étape 3</b> : Cause LIVE (non latchée) : retombe sans <code>Reset</code> dès que M1 ET M2 sont référencés
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
-      <td style="padding: 4px 1px; text-align: center;"><small><code>NV</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-032</span></td>
@@ -218,10 +224,10 @@
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-046.1</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Timeout</b><br>mouvement</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
-        💤 <b>Étape 0</b> : Manœuvre benne (<code>State=BUSY</code>)<br>
-        🚀 <b>Étape 1</b> : Maintien sans fin de manœuvre (<code>CfgTimeoutDuration</code>=60s)<br>
-        ⚡ <b>Étape 2</b> : Timeout mouvement déclenché<br>
-        ✅ <b>Étape 3</b> : bit timeout + latch (<code>CfgTimeoutDuration</code>=60s, code réel — corrige le 30s documenté)
+        💤 <b>Étape 0</b> : Manœuvre benne (<code>Lifecycle.Busy</code>) SOUS commande opérateur engagée<br>
+        🚀 <b>Étape 1</b> : Mouvement bloqué, commande maintenue sans progression<br>
+        ⚡ <b>Étape 2</b> : Budget de <code>CfgTimeoutDuration</code> (défaut 60 s) épuisé → <code>ErrorId</code> bit 2 (valeur 4) + latch<br>
+        ✅ <b>Étape 3</b> : Le budget ne compte QUE le <b>temps de commande réellement engagée</b> (<code>Lifecycle.Busy</code> ET <code>MotionRequestActive</code>, <code>FB_Bucket.st:210-259</code>) : il est <b>GELÉ</b> (pas remis à zéro) dès que l'opérateur relâche, puis <b>CUMULÉ</b> — une pause opérateur légitime ne produit donc plus de faux défaut (T295). Remise à zéro du cumul : fin de manœuvre + <code>Reset</code> sur front
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
@@ -229,12 +235,25 @@
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-047.1</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Incoh.</b><br>boot</small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Boot</b><br>classification</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
-        💤 <b>Étape 0</b> : 1er cycle, ni <code>IsOpen</code> ni <code>IsClosed</code><br>
-        🚀 <b>Étape 1</b> : Évaluation état benne<br>
-        ⚡ <b>Étape 2</b> : <code>StateIncoherent=TRUE</code>, <code>ActiveOffsetValid=FALSE</code><br>
-        ✅ <b>Étape 3</b> : Incohérence boot détectée, offset déclaré invalide
+        💤 <b>Étape 0</b> : 1er cycle, benne non référencée (<code>BucketReferenced=FALSE</code>)<br>
+        🚀 <b>Étape 1</b> : Évaluation de l'état par la MESURE <code>Delta = M2 - M1</code><br>
+        ⚡ <b>Étape 2</b> : L'état franc est publié en continu (<code>IsOpen</code>/<code>IsClosed</code>/<code>IsIntermediate</code>, <code>FB_Bucket.st:428-448</code>) et <code>ActiveOffsetValid=FALSE</code> tant que la benne n'est pas référencée (<code>:745-748</code>)<br>
+        ✅ <b>Étape 3</b> : ⚠️ <b>Détection d'incohérence boot RETIRÉE par T247</b> (commit <code>509e0eb1</code>, 2026-09-04) — <code>StateIncoherent</code> ne subsiste QUE pour la neutralisation avec manœuvre engagée (<code>:300-303</code>). Voir alerte §8
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P10-047.2</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Boot</b><br>état écrasé</small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        💤 <b>Étape 0</b> : 1er cycle, état mémorisé CONTRADICTOIRE (<code>IsOpen=TRUE</code> ET <code>IsClosed=TRUE</code>)<br>
+        🚀 <b>Étape 1</b> : Évaluation de l'état par la MESURE<br>
+        ⚡ <b>Étape 2</b> : La mesure franche écrase les deux drapeaux (<code>FB_Bucket.st:428-448</code>)<br>
+        ✅ <b>Étape 3</b> : ⚠️ <b>AUCUN diagnostic</b> n'est publié pour cette contradiction — et avec une <code>CoherenceLimitM</code> ≥ (<code>OffsetCloseM</code> − <code>OffsetOpenM</code>)/2 les deux bandes se recouvrent et <code>IsOpen=IsClosed=TRUE</code> sont publiés simultanément sans aucun signal (la cause 0 ne teste que <code>OffsetOpenM &lt; OffsetCloseM</code>, <code>:176-179</code>). Écart de spec signalé §8
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§2</small></td>
@@ -261,8 +280,11 @@
 ## 1. Rôle et cinématique
 
 Pas de moteur propre — effet de bord de la désynchronisation M1/M2 :
-- **Fermeture** : M2 enroule (monte, `Direction=+1`)
-- **Ouverture** : M2 déroule (descend, `Direction=-1`)
+- **Fermeture** : M2 enroule (monte) → sens demandé `ReqAscent`, ordre `M2_ReqAscent`
+- **Ouverture** : M2 déroule (descend) → sens demandé `ReqDescend`, ordre `M2_ReqDescend`
+- ⚠️ **Plus d'entier de direction** : l'interface porte **deux entrées BOOL** `ReqAscent`/`ReqDescend`
+  (source unique de `MotionRequestActive`, `FB_Bucket.st:162-163`) et **deux sorties BOOL**
+  `M2_ReqAscent`/`M2_ReqDescend` (`:68-69`). `MotionDirection` (INT) et `M2_Direction` n'existent plus.
 - Cible : `CablePosM2 >= CablePosM1 + OffsetCloseM` (fermeture) ou `<= CablePosM1 + OffsetOpenM` (ouverture)
 
 **Offsets réels (RETAIN)** : `OffsetOpenM=0.0` (référence neutre, M2=M1) ; `OffsetCloseM=15.0` (⚠️ doc legacy dit 10.0, non validé en charge — voir §8).
@@ -273,20 +295,39 @@ Pas de moteur propre — effet de bord de la désynchronisation M1/M2 :
 
 | Entrée | Type | Sens |
 |---|---|---|
-| `MotionRequestActive`/`MotionDirection` | BOOL/INT | Intention déjà arbitrée (joystick/IHM, axe Y) |
+| `ReqAscent` / `ReqDescend` | BOOL | Demande de sens **déjà arbitrée** (joystick/IHM, axe Y) — `MotionRequestActive = (ReqAscent OR ReqDescend) AND NOT conflit` est calculé **en interne** (`FB_Bucket.st:162-163`) et **n'est PAS une entrée** : le passer en argument nommé est un argument MORT (garde-fou `G512`) |
+| `EffectivePermitBucket_Open` / `_Close` | BOOL | Permis de sécurité : **sans eux, aucun ordre M2 ne sort** (`:524`, `:540`) |
+| `CmdOpen_IHM` / `CmdClose_IHM` | BOOL | Demande IHM, latcheé à l'entrée si `NOT Busy AND NOT M1_Busy AND NOT M2_Busy` |
 | `CablePosM1/M2`, `HomedM1/M2` | — | Sortie Encodeurs |
-| `M1_Busy`/`M2_Busy` | BOOL | Interlock avant armement demande |
+| `HomedAndReliableM1/M2` | BOOL | Datum fiable — condition de pose de la référence benne |
+| `M1_Busy`/`M2_Busy` | BOOL | Anti-traversée : refuse une **nouvelle** demande (`:484`, `:488`) |
 | `M1SlipToleranceM` :=1.0 | REAL | Tolérance glissement (couche 1) |
-| `ConfirmOpenPosition`/`ClosePosition` | BOOL (front) | Référencement manuel MAINT_N1/N2 |
-| `Config` (ST_fbBucket_Config) | — | `OffsetOpenM`, `OffsetCloseM`, `CoherenceLimitM`(0.05m) |
+| `CfgTimeoutDuration` := `T#60s` | TIME | Budget du watchdog de timeout (§2 / <nobr><code>TC-P10-046.1</code></nobr>) |
+| `ConfirmOpenPosition`/`ConfirmClosePosition` | BOOL (front) | Référencement manuel — **MAINT_N2 seul**, à l'arrêt |
+| `Config` (ST_fbBucket_Config) | — | `OffsetOpenM`, `OffsetCloseM`, `CoherenceLimitM` — ⚠️ **aucun défaut dans le type** : valeurs de production posées par `GVL_PERSISTENT.st:66-70` (`OffsetOpenM=0.0`, `OffsetCloseM=15.0`, `CoherenceLimitM=1.0`) |
 
-**Sorties** : `Ready/ActiveOffsetValid/Busy/Done/Error`, `ErrorId` (bit0 Timeout 60s 🆕 correction 2026-08-29, bit1 incohérence boot, bit2 limites dépassées, bit3 codeur non référencé, bit4 glissement M1), `M1SlipDetected`, `ActiveOffsetM`, `DeltaPosition_M`, `RemainingTravelM`, `M2_StartStop`/`Direction`/`ForceSlowSpeed`.
+**Sorties** : `Ready`, `ActiveOffsetValid`, `Fault` (`ST_Fault` : `Error`/`ErrorId` latches), `Lifecycle` (`Busy`/`Done`), `M1SlipDetected`, `ActiveOffsetM`, `DeltaPosition_M`, `RemainingTravelM`, `M2_RunRequest` (ordre marche M2), `M2_ReqAscent`/`M2_ReqDescend` (sens, BOOL) et `M2_BucketJogLimit` (plafond palier 1).
+
+**`ErrorId` — mapping RÉEL** (bitfield `SHL(WORD#1, i)` sur l'index de cause, `FB_FaultCore.st:49-57` ; causes déclarées `FB_Bucket.st:172-291`) :
+
+| Bit | Valeur | Cause | Latch |
+|---|---|---|---|
+| 0 | 1 | `instCauses[0]` — Configuration géométrie benne invalide (`OffsetOpenM >= OffsetCloseM` ou `< -2.0`) | oui |
+| 1 | 2 | `instCauses[1]` — Dépassement écart maximum autorisé (`M2-M1` hors plage, confirmé 500 ms) | oui |
+| 2 | 4 | `instCauses[2]` — **Timeout de commande de déplacement benne** (temps de commande engagée ; <nobr><code>TC-P10-046.1</code></nobr>) | oui |
+| 3 | 8 | `instCauses[3]` — Glissement treuil M1 pendant manœuvre benne | oui |
+| 4 | 16 | `instCauses[4]` — Codeurs treuils non référencés pour séquence benne (sur mouvement demandé) | **non** (live) |
+
+> ⚠️ Correction T339 : la version précédente de cette fiche annonçait « bit0 Timeout, bit1 incohérence boot, bit2 limites dépassées, bit3 codeur non référencé, bit4 glissement M1 » — **tout était décalé d'un rang** (et « incohérence boot » n'est plus une cause du tout, cf. §8).
 
 **Machine d'état** :
-- **DISABLED** si `NOT Enable OR NOT PowerContactorEngaged` : neutralisation complète (`Ready := FALSE`, `ActiveOffsetValid := FALSE`, `ActiveOffsetM := 0.0` pour comparaison M1/M2 stricte sans fuite d'offset périmé vers Méca E, `DeltaPosition_M := 0.0`, `RemainingTravelM := 0.0`, `M2_StartStop := FALSE`, `M1SlipDetected := FALSE`, réinitialisation des requêtes).
-- **READY** : accepte requête seulement si `NOT M1_Busy AND NOT M2_Busy` (anti-traversée)
-- **BUSY** : pilote M2 seul, vitesse forcée lente ; sens inverse toléré mais **borné** à la position de départ (`M2StartPosM`)
+- **DISABLED** si `NOT Enable OR NOT PowerContactorEngaged` : neutralisation complète (`Ready := FALSE`, `ActiveOffsetValid := FALSE`, `ActiveOffsetM := 0.0` pour comparaison M1/M2 stricte sans fuite d'offset périmé vers Méca E, `DeltaPosition_M := 0.0`, `RemainingTravelM := 0.0`, ordres M2 relâchés, `M1SlipDetected := FALSE`, réinitialisation des requêtes). `StateIncoherent := TRUE` **si et seulement si** une manœuvre était engagée (`Busy`/`CloseReq`/`OpenReq`, `:300-303`).
+- **READY** : accepte une nouvelle requête seulement si `NOT M1_Busy AND NOT M2_Busy` (anti-traversée, `:484`/`:488`)
+- **BUSY** : pilote M2 seul, vitesse forcée lente (P1) ; ordre émis seulement sous `MotionRequestActive` ET sens ET **permis adapté au sens** ; sens inverse (recul) honoré sous le permis opposé — ⚠️ **la borne à la position de départ n'existe PLUS** depuis le 2026-09-05 (commit `2a307b5b`) : `LeftStartSinceArm` est encore affecté (`:561`) mais **jamais lu** (cf. §8, alerte 5)
 - **DONE** : attend relâchement demande pour repasser READY
+- **État publié** (`IsOpen`/`IsClosed`/`IsIntermediate`/`TooOpen`/`TooClosed`) : **classification continue** sur `Delta = M2 - M1` à chaque scan dès que M1 ET M2 sont référencés (`:428-448`) — plus d'état latché depuis T247 (commit `509e0eb1`)
+
+**Watchdog de timeout de manœuvre** (`TC-P10-046.1` à `.4`, T295) : budget `CfgTimeoutDuration` consommé **uniquement** pendant une commande réellement engagée (`TimeoutEngaged := Lifecycle.Busy AND MotionRequestActive`, `:221`) ; **gelé** — jamais remis à zéro — hors engagement (`:233-236`), **cumulé** au réengagement (`:239`), remis à zéro en fin de manœuvre (`Busy` retombe, `:256-259`) et sur `Reset` **sur front** (`:226-230`). Conséquence : une pause opérateur légitime (relâchement du joystick en `AX3_OPEN_BUCKET` / `AX15B_DUMP_OPEN`) ne produit plus de faux `[BENNE] ErrorID:03`.
 
 ---
 
@@ -294,7 +335,7 @@ Pas de moteur propre — effet de bord de la désynchronisation M1/M2 :
 
 | Couche | Condition | Conséquence |
 |---|---|---|
-| **1** (`FB_Bucket`, bit4) | `State=BUSY` ET `\|CablePosM1-M1RefPosM\| > 1.0m` | Coupe M2 (SevereError interne), `M1SlipDetected` exposé — **consommé** par Treuils : force SafeStop M1 |
+| **1** (`FB_Bucket`, bit 3 = valeur 8) | `Lifecycle.Busy` ET `\|CablePosM1-M1RefPosM\| > 1.0m` | Coupe M2 (SevereError interne), `M1SlipDetected` exposé — **consommé** par Treuils : force SafeStop M1 |
 | **2** (`FB_Safety_Winch`, Méca C bit9, AF10) | `BenneHoldStillActive` (M1 seul, câblé sur `instBucket.Busy`) | Dérive M1 > **2.0m** ⇒ **PowerCutOff** |
 
 Défense en profondeur : si couche 1 (SafeStop M2, 1.0m) ne suffit pas à arrêter M1 physiquement (roue libre, contacteur collé), couche 2 coupe la puissance amont à 2.0m.
@@ -302,6 +343,12 @@ Défense en profondeur : si couche 1 (SafeStop M2, 1.0m) ne suffit pas à arrêt
 ---
 
 ## 4. FB_DiveSearch (assistant MAINT_N1/N2)
+
+> ⛔ **COMPOSANT RETIRÉ DU CODE** (constat T339, 2026-09-20) : `FB_DiveSearch.st` et
+> `FB_ExtractionAssist.st` **n'existent plus** dans `CODE/` — « assistants retires (legacy, jamais
+> actives) » (`PRG_03_Modes_Cycle.st:176`, `:413`, `FB_TroubleshootingView.st:371`). Les §4 et §5
+> ci-dessous sont conservés comme **archive de spec** et ne décrivent AUCUN code actif ; le
+> `TC-P10-032` associé ne peut plus être testé en boîte noire (voir alerte §8).
 
 Qualification Kobold avant descente : `WAIT_PRECONDITIONS → READY_TO_DESCEND → SEARCHING_IMMERSION → SEARCHING_BOTTOM → BOTTOM_CONFIRMED`.
 
@@ -313,6 +360,8 @@ Qualification Kobold avant descente : `WAIT_PRECONDITIONS → READY_TO_DESCEND �
 ---
 
 ## 5. FB_ExtractionSequence (assistant MAINT_N1/N2)
+
+> ⛔ **COMPOSANT RETIRÉ DU CODE** — voir l'encadré §4. Archive de spec, aucun code actif.
 
 Fermeture benne puis remontée contrôlée : `WAIT_BOTTOM_CONFIRMATION → READY_TO_CLOSE → CLOSING_BUCKET → CONTROL_ASCENT → NOMINAL_ASCENT`.
 
@@ -334,7 +383,7 @@ Fermeture benne puis remontée contrôlée : `WAIT_BOTTOM_CONFIRMATION → READY
 5. Synchro suspendue pendant `instBucket.Busy`
 6. Butée haute M2 décalée de `OffsetCloseM` si fermé/en fermeture
 
-**Consommateurs `instBucket.Busy/Done`** : Treuils (arbitrage), Safety (`BenneHoldStillActive`, Méca E), `FB_ExtractionSequence`, `FB_Joystick` (désarmement), Supervision (IHM).
+**Consommateurs `instBucket.Busy/Done`** : Treuils (arbitrage), Safety (`BenneHoldStillActive`, Méca E), `FB_Joystick` (désarmement), Supervision (IHM). (L'ancien consommateur `FB_ExtractionSequence` est retiré du code — cf. §5.)
 
 **Homme-mort** : axe Y joystick, même axe que pilotage normal M1/M2 — pas d'axe dédié.
 
@@ -360,9 +409,13 @@ programme/Safety propre (contrairement à Translation qui a son propre programme
 | # | Gravité | Point | Action |
 |---|---|---|---|
 | 1 | P1 | `OffsetCloseM` : doc legacy 10.0, code réel 15.0, non validé en charge (MES-010) | Corrigé ici, terrain à confirmer |
-| 2 | P1 | DiveSearch/ExtractionSequence absents doc v1.4 | Comblé §4/§5 |
+| 2 | P1 | DiveSearch/ExtractionSequence cités §4/§5 mais **retirés du code** (`PRG_03_Modes_Cycle.st:176`) — <nobr><code>TC-P10-032</code></nobr> non testable en boîte noire | Encadrés ⛔ posés §4/§5 ; suppression des sections = décision humaine |
 | 3 | P2 | T57 : possible doublon logique limite haute M2 | Non vérifié en profondeur — TBD |
 | 4 | info | T27/T89 : cinématique/offset jamais essayés en charge réelle | TBD terrain |
+| **5** | 🔴 **P1 (ESCALADÉ T339)** | **Perte de la borne de recul** : les deux branches d'arrêt à `M2StartPosM` ont été retirées le 2026-09-05 (commit `2a307b5b`, « suppression des coupures parasites ») ; `LeftStartSinceArm` reste **affecté** (`FB_Bucket.st:561`) mais n'est **plus jamais lu** (code mort) | ⛔ **Aucune correction dans le lot T339 (C2, zéro fichier `CODE/`)**, aucun arbitrage humain tracé. Conséquence : sous commande de fermeture toujours engagée, un recul (`ReqDescend`) n'est plus borné par `FB_Bucket` — seul le retour à la cible de fermeture l'arrête. **Arbitrage orchestrateur requis : restaurer la borne, ou acter la perte et supprimer le témoin mort + cet écart.** Preuve vivante : <nobr><code>TC-P10-029.1</code></nobr> (ROUGE, assertion `Recul a M2StartPosM -> M2_StartStop=FALSE`) |
+| **6** | 🟠 **P2 (ESCALADÉ T339)** | **Plus aucune détection d'état contradictoire** : depuis T247 (commit `509e0eb1`, 2026-09-04) `StateIncoherent` n'est plus posé que sur neutralisation avec manœuvre engagée (`:300-303`) ; il n'y a plus de garde contre `IsOpen=IsClosed=TRUE` ni contre un recouvrement des bandes (`CoherenceLimitM >= (OffsetCloseM-OffsetOpenM)/2`, la cause 0 ne teste que `OffsetOpenM < OffsetCloseM`, `:176-179`). Or `StateIncoherent` conditionne encore `ActiveOffsetValid` (`:747`) | ⛔ Signalé, non corrigé (lot T339 = tests + doc). Options : restaurer une détection contradictoire (CODE), ou borner `CoherenceLimitM` à la config (cause 0). <nobr><code>TC-P10-047.2</code></nobr> documente le comportement réel |
+| **7** | info (T339) | Mapping `ErrorId` de cette fiche **faux depuis l'origine** (décalage d'un rang) + sémantique du watchdog de timeout, interface (`MotionRequestActive`/`MotionDirection` présentés comme entrées) et état latché (<nobr><code>TC-P10-030</code></nobr>) désalignés du code | ✅ Réaligné dans ce document (§1, §2, catalogue <nobr><code>TC-P10-023</code></nobr> à <nobr><code>TC-P10-031</code></nobr>, <nobr><code>TC-P10-046.1</code></nobr>, <nobr><code>TC-P10-047.1</code></nobr>) ; 9 tests CI réécrits + garde-fou `G512` (arguments nommés morts) |
+| **8** | info (T339) | ⚠️ Le harnais STruCpp **ne remet pas à zéro** les entrées non repassées entre deux appels d'un test (instance C++ persistante) : un test peut hériter du scan précédent | Piège documenté dans `test_fb_bucket.st` (<nobr><code>TC-P10-029</code></nobr> / <nobr><code>TC-P10-029.1</code></nobr>) |
 
 ---
 
@@ -374,5 +427,6 @@ programme/Safety propre (contrairement à Translation qui a son propre programme
 | AF10 / FB_Safety_Winch | Méca C couche 2 (bit9) |
 | AF09 | Encodeurs — position/Homed consommés |
 | AF04 | Cycle SEMI_AUTO — séquence dragage |
-| AF05 | Modes — MAINT_N1/N2 requis pour assistants |
-| Code | `CODE/TREUILS/BENNE/*.st`, `CODE/G_CYCLE/FB_DiveSearch.st`, `FB_ExtractionSequence.st` |
+| AF05 | Modes — MAINT_N2 requis pour le référencement benne |
+| Code | `CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st` + `_TYPES/` · tests `TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st` · garde-fou `TOOLS/AGENT_WORKFLOW/scripts/G512_check_dead_ci_test_arguments.py` |
+| ~~`FB_DiveSearch` / `FB_ExtractionSequence`~~ | ⛔ **retirés du code** (legacy jamais actifs) — voir §4/§5 et alerte 2 |

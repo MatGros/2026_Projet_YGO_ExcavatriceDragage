@@ -4,51 +4,51 @@ FB_CycleSemiAuto.st:34:31: error: Undefined type 'E_CYCLEDEPTHSTOPMODE' in FUNCT
   34 |     DepthStopMode           : E_CycleDepthStopMode; // --> [CFG] Source d'arret AX7
      |                               ^
 
-FB_CycleSemiAuto.st:377:46: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
- 377 | DepthSetpointReachedNow := ((DepthStopMode = E_CycleDepthStopMode.SETPOINT_ONLY)
+FB_CycleSemiAuto.st:423:46: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
+ 423 | DepthSetpointReachedNow := ((DepthStopMode = E_CycleDepthStopMode.SETPOINT_ONLY)
      |                                              ^
 
-FB_CycleSemiAuto.st:378:49: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
- 378 |                             OR (DepthStopMode = E_CycleDepthStopMode.KOBOLD_OR_SETPOINT))
+FB_CycleSemiAuto.st:424:49: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
+ 424 |                             OR (DepthStopMode = E_CycleDepthStopMode.KOBOLD_OR_SETPOINT))
      |                                                 ^
 
-FB_CycleSemiAuto.st:383:46: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
- 383 |                        AND ((DepthStopMode = E_CycleDepthStopMode.SETPOINT_ONLY)
+FB_CycleSemiAuto.st:429:46: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
+ 429 |                        AND ((DepthStopMode = E_CycleDepthStopMode.SETPOINT_ONLY)
      |                                              ^
 
-FB_CycleSemiAuto.st:384:49: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
- 384 |                             OR (DepthStopMode = E_CycleDepthStopMode.KOBOLD_OR_SETPOINT))
+FB_CycleSemiAuto.st:430:49: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
+ 430 |                             OR (DepthStopMode = E_CycleDepthStopMode.KOBOLD_OR_SETPOINT))
      |                                                 ^
 
-FB_CycleSemiAuto.st:476:50: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
- 476 |                            AND (DepthStopMode <> E_CycleDepthStopMode.KOBOLD_ONLY)
+FB_CycleSemiAuto.st:522:50: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
+ 522 |                            AND (DepthStopMode <> E_CycleDepthStopMode.KOBOLD_ONLY)
      |                                                  ^
 
-FB_CycleSemiAuto.st:976:63: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
- 976 |         BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode <> E_CycleDepthStopMode.SETPOINT_ONLY)
+FB_CycleSemiAuto.st:1082:63: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
+1082 |         BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode <> E_CycleDepthStopMode.SETPOINT_ONLY)
      |                                                               ^
 
-FB_CycleSemiAuto.st:1005:63: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
-1005 |         BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode <> E_CycleDepthStopMode.SETPOINT_ONLY)
+FB_CycleSemiAuto.st:1111:63: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
+1111 |         BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode <> E_CycleDepthStopMode.SETPOINT_ONLY)
      |                                                               ^
 
-FB_CycleSemiAuto.st:1010:57: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
-1010 |            AND (KoboldStabTimer.Q OR ((DepthStopMode <> E_CycleDepthStopMode.KOBOLD_ONLY)
+FB_CycleSemiAuto.st:1116:57: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
+1116 |            AND (KoboldStabTimer.Q OR ((DepthStopMode <> E_CycleDepthStopMode.KOBOLD_ONLY)
      |                                                         ^
 
-FB_CycleSemiAuto.st:1036:63: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
-1036 |         BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode <> E_CycleDepthStopMode.SETPOINT_ONLY)
+FB_CycleSemiAuto.st:1142:63: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
+1142 |         BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode <> E_CycleDepthStopMode.SETPOINT_ONLY)
      |                                                               ^
 
-FB_CycleSemiAuto.st:1041:34: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
-1041 |            AND ((DepthStopMode = E_CycleDepthStopMode.KOBOLD_ONLY
+FB_CycleSemiAuto.st:1147:34: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
+1147 |            AND ((DepthStopMode = E_CycleDepthStopMode.KOBOLD_ONLY
      |                                  ^
 
-FB_CycleSemiAuto.st:1043:34: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
-1043 |              OR (DepthStopMode = E_CycleDepthStopMode.SETPOINT_ONLY AND DepthStopBySetpoint)
+FB_CycleSemiAuto.st:1149:34: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
+1149 |              OR (DepthStopMode = E_CycleDepthStopMode.SETPOINT_ONLY AND DepthStopBySetpoint)
      |                                  ^
 
-FB_CycleSemiAuto.st:1044:34: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
-1044 |              OR (DepthStopMode = E_CycleDepthStopMode.KOBOLD_OR_SETPOINT
+FB_CycleSemiAuto.st:1150:34: error: Undeclared variable 'E_CYCLEDEPTHSTOPMODE'
+1150 |              OR (DepthStopMode = E_CycleDepthStopMode.KOBOLD_OR_SETPOINT
      |                                  ^
 
