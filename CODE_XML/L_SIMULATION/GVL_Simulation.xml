@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T02:00:15.912782" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T02:00:15.912782">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T23:30:39.197791" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T23:30:39.197791">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -198,6 +198,79 @@ le decodeur et les fins de course sans ecrire directement dans le metier.</xhtml
           </type>
           <initialValue>
             <simpleValue value="3001" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorBlipTransitions">
+          <type>
+            <UDINT />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ BLIP COURT — second profil de perte/reprise, independant du train ~1 s ci-dessus
+(SimM3SensorStabilizationS). 0 = desactive (profil historique inchange).
+Rejoue les excursions courtes de la trace terrain du 2026-09-04 :
+Tremie : 1 excursion de 0,2 s (actif 2 echantillons a 12,24 s en s'eloignant) ;
+PV     : 1 excursion de 0,1 s (reactive 1 echantillon a 14,94 s en deceleration).</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorBlipDurationS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.2" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3EndStopRecoilMax_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 BUTEE MECANIQUE M3 — recul borne apres arret serre (C5).
+0.0 = behavior historique : position ET vitesse figees a la butee (decision de review
+tracee). &gt; 0 autorise la reaction de charge a ressortir le chariot de la zone capteur.
+Valeur SYNTHETIQUE, non calibree : a mesurer en mise en service.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3LoadReactionGain_Mps2">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.2" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Gain de reaction de charge utilisee par le modele M3 (SYNTHETIQUE).
+0.20 = valeur historique ; un gain plus eleve est necessaire pour rejouer le recul
+post-arret observe sur la trace terrain du 2026-09-04. A calibrer.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3BrakeFaultCloseWhileRunning">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔥 FAUTE EXPLICITE FREIN M3 — defaut FALSE : comportement nominal strictement inchange.
+TRUE rejoue le defaut terrain « cause 6 instantanee » : contact frein ferme alors que le
+variateur retourne encore 10,00 Hz (trace 2026-09-04, 26,437 s, State.ErrorId=64).
+La garde nominale de fermeture (0,5 Hz) est CONSERVEE : elle est validee par la meme trace
+(frein ouvert a 0,60 Hz, ferme a 0,00 Hz). Stimulus de banc, inoperant hors simulation.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3BrakeFaultCloseDelayS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
           </initialValue>
         </variable>
         <variable name="SimJoystickLeft_Rev_TREMIE_Active">
@@ -428,51 +501,6 @@ FALSE = retour historique instantané ; TRUE = applique les trois réglages synt
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic électrique isolé : ne pilote jamais une entrée safety ou une commande moteur.</xhtml>
           </documentation>
         </variable>
-        <variable name="AutoResetTransientDiagAtStartupEnable">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACQUITTEMENT DIAGNOSTIC TRANSITOIRE T278 ===
-Parametres du FB dedie ; aucun effet sur la safety AU ou les mouvements.
-FALSE par defaut : comportement historique conserve jusqu a validation.</xhtml>
-          </documentation>
-        </variable>
-        <variable name="AutoResetTransientDiagAfterRearmEnable">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-        </variable>
-        <variable name="AutoResetTransientDiagMaxAttempts">
-          <type>
-            <USINT />
-          </type>
-          <initialValue>
-            <simpleValue value="1" />
-          </initialValue>
-        </variable>
-        <variable name="AutoResetTransientDiagStabilizationTime">
-          <type>
-            <TIME />
-          </type>
-          <initialValue>
-            <simpleValue value="TIME#1s0ms" />
-          </initialValue>
-        </variable>
-        <variable name="AutoResetTransientDiagInterAttemptTime">
-          <type>
-            <TIME />
-          </type>
-          <initialValue>
-            <simpleValue value="TIME#1s0ms" />
-          </initialValue>
-        </variable>
         <variable name="SimM2TensionedCableFaultInject">
           <type>
             <BOOL />
@@ -481,7 +509,11 @@ FALSE par defaut : comportement historique conserve jusqu a validation.</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Injection safety explicite : TRUE simule le câble non tendu ; FALSE = signal nominal sain.</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACQUITTEMENT DIAGNOSTIC TRANSITOIRE (réseaux EtherCAT / CANopen) ===
+⛔ Aucun réglage de PRODUCTION ici : les 2 autorisations et les 3 temporisations de ce
+service vivent au site d'appel, câblées en dur à TRUE et aux défauts déclarés du FB.
+Cette GVL ne porte que des réglages de BANC (frontière réel/simulé).
+Injection safety explicite : TRUE simule le câble non tendu ; FALSE = signal nominal sain.</xhtml>
           </documentation>
         </variable>
         <variable name="SimWinchCouplingModelActive">

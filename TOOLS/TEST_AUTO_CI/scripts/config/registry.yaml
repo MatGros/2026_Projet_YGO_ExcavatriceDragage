@@ -144,6 +144,15 @@ FB_Diag_IhmHeartbeat:
   sources:
   - CODE/C_DIAG_RESEAUX/FB_Diag_IhmHeartbeat.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_diag_ihmheartbeat.st
+FB_AutoResetTransientDiag:
+  domain: C_DIAG_RESEAUX
+  af_doc: DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
+  prod_instance:
+    file: CODE/M_MAIN/PRG_02_Acquisition.st
+    name: instAutoResetTransientDiag
+  sources:
+  - CODE/C_DIAG_RESEAUX/FB_AutoResetTransientDiag.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_autoresettransientdiag.st
 FB_Modes:
   domain: F_MODES
   sources:
@@ -271,8 +280,16 @@ FB_Bucket:
   - CODE/F_MODES/E_Mode.st
   - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st
   - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st
+  - CODE/H_TREUILS_BENNE/BENNE/FB_BucketCloseThreshold.st
   - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
+  report_group: H_TREUILS_BENNE
+FB_BucketCloseThreshold:
+  domain: H_TREUILS_BENNE
+  source_prg: CODE/M_MAIN/PRG_04_Treuils_Benne.st
+  sources:
+  - CODE/H_TREUILS_BENNE/BENNE/FB_BucketCloseThreshold.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucketclosethreshold.st
   report_group: H_TREUILS_BENNE
 FB_Safety_Winch:
   domain: H_TREUILS_BENNE

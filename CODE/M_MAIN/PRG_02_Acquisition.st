@@ -220,10 +220,15 @@ Data.InputModules.Fault := NOT (Data.InputModules.LocalDigitalIoOk AND Data.Inpu
 // === 🔌 §1ter DIAGNOSTIC RÉSEAUX (CANopen + EtherCAT) ===
 // 🔌 Diagnostics reseau produits ICI (rang 02) car consommes par PRG_02 (joystick,
 // codeurs) et par les PRG 04/05 — producteur avant consommateur (AF02 §4).
+// 🔌 Auto-acquittement borné des diagnostics transitoires (EtherCAT / CANopen).
+// ⚠️ Les 2 autorisations sont ACTIVES PAR DÉFAUT, câblées en dur : le service doit fonctionner
+//    sans réglage ni exposition opérateur. Elles ne dépendent PLUS de GVL_Simulation, dont la
+//    frontière réel/simulé reste seule propriétaire : un booléen de configuration sans écrivain
+//    laissait le service totalement inerte (State figé à 0, Phase et ResetPulse jamais atteints).
 instAutoResetTransientDiag(
     Enable                  := TRUE,
-    StartupEnable           := GVL_Simulation.AutoResetTransientDiagAtStartupEnable,
-    PowerRearmEnable        := GVL_Simulation.AutoResetTransientDiagAfterRearmEnable,
+    StartupEnable           := TRUE,
+    PowerRearmEnable        := TRUE,
     EmergencyChainClosed    := HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged   := HwIn.Machine.PowerContactorEngaged_DI,
     PowerCutOffActive       := PRG_06_Outputs.PowerCutOffActive,
@@ -232,10 +237,10 @@ instAutoResetTransientDiag(
                                   OR PRG_04_Treuils_Benne.Data.WinchM2State.Busy
                                   OR PRG_05_Translation.TranslationState.Busy,
     DiagnosticsStable        := instDiagEthercat.DeviceEthercatMaster.Operational
-                                  AND instDiagCanOpen.DeviceCanOpenMaster.Operational,
-    Cfg_MaxAttempts           := GVL_Simulation.AutoResetTransientDiagMaxAttempts,
-    Cfg_StabilizationTime     := GVL_Simulation.AutoResetTransientDiagStabilizationTime,
-    Cfg_InterAttemptTime      := GVL_Simulation.AutoResetTransientDiagInterAttemptTime
+                                  AND instDiagCanOpen.DeviceCanOpenMaster.Operational
+    // Les 3 réglages Cfg_ ne sont pas câblés : le FB applique ses propres défauts déclarés
+    // (1 tentative, T#1s de stabilisation, T#1s entre tentatives), valeurs identiques à celles
+    // portées auparavant par la GVL de simulation.
 );
 
 instDiagCanOpen(
