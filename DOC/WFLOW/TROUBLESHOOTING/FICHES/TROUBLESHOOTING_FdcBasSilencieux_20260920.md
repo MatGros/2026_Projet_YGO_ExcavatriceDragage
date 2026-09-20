@@ -2,7 +2,7 @@
 
 > 📌 **Emplacement** : `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_FdcBasSilencieux_20260920.md`
 > 📅 Date : 2026-09-20 · 🧊 Situation : **[SITE] MES** (constat opérateur rapporté, aucun snapshot fourni) · 📄 Statut : **[EN COURS]**
-> 🎫 Tâche : **T255-D** (C2, verrou `DSH01`) · 🔒 `DOC/WFLOW/TASK_LOCKS.json` → `work_locks.T255-D`
+> 🎫 Tâche : **T255-D** (C2, verrou `DSH05` — tag renommé le 2026-09-20 sur collision `DSH01`) · 🔒 `DOC/WFLOW/TASK_LOCKS.json` → `work_locks.T255-D`
 > 🧭 Méthode : **[3] Analyse statique** (lecture de code) — **aucun** snapshot PLC (§4bis non disponible sur ce symptôme : aucune variable de décision live n'est requise, la chaîne est entièrement statique).
 
 ---
@@ -107,7 +107,7 @@ DescendPermit := NOT(… CauseCableLimitActive …) = FALSE        (FB_Safety_Wi
 ### 🧪 Reproduction par exécution (PREUVE, 2026-09-20)
 
 Scénario exploratoire **hors CI officiel** (skill `troubleshooting` §4ter) :
-`TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS/`
+`TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/DSH05_T255D_FDC_BAS/`
 (`tests/run.py` = registre éphémère hors dépôt, sources officielles ; lancement **un cas à la fois**,
 le pool multi-processus du runner étant refusé sous sandbox).
 
@@ -136,7 +136,7 @@ mode `MAINT_N1`, joystick relâché, réseau sain.
 | `T255D-REPRO-M2-A1` | idem M1 | **FAIL** — `expected TRUE, got FALSE` |
 | `T255D-REPRO-M2-A2` | idem M1 | **FAIL** — texte = rappel joystick |
 
-`1 FB testé, 0 PASS, 1 FAIL` · rapports dans `…/DSH01_T255D_FDC_BAS/reports/`.
+`1 FB testé, 0 PASS, 1 FAIL` · rapports dans `…/DSH05_T255D_FDC_BAS/reports/`.
 
 ⇒ **RC1 et RC2 prouvées par exécution de bout en bout** : la cause allume le voyant, **aucun canal du
 bandeau ne l'expose**, et le texte d'action reste un **rappel joystick générique** alors que l'action
@@ -290,7 +290,7 @@ il est **signalé**, pas corrigé.
 > ⚠️ **Hand-off humain** : la correction (§8) doit être **validée par l'humain** avant application.
 
 À prouver après GO (mission T255-D, phases 3-6) :
-- **Reproduction déjà acquise (AVANT correctif)** : 4 tests rouges `T255D-REPRO-M1-A1/A2`, `T255D-REPRO-M2-A1/A2` dans `RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS/`, sortie brute citée en §6.
+- **Reproduction déjà acquise (AVANT correctif)** : 4 tests rouges `T255D-REPRO-M1-A1/A2`, `T255D-REPRO-M2-A1/A2` dans `RESULTS/_TROUBLESHOOTING/DSH05_T255D_FDC_BAS/`, sortie brute citée en §6.
 - **AC3** : mêmes 4 tests **verts après** correctif, **sans modification des assertions** ; puis promotion du scénario dans le test enregistré (`RESULTS/M_MAIN/tests/test_prg_07_supervision.st`, harnais `FB_TestHarness_PRG_07`).
 - **AC4** : baseline mesurée le 2026-09-20 — `python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb PRG_07_Supervision` = **PASS 3/3** (les 3 cas existants doivent rester verts). ⛔ Le test unitaire du bandeau (`--fb FB_Hmi_BannerFormatter`) **ne peut pas s'exécuter** (source manquante au registre, cf. §6) ⇒ décision humaine requise pour le réparer.
 - **AC5** : gate présent, enregistré dans `PLANS`, PASS ; **échoue** si l'on retire le libellé limite basse câble (preuve par retrait).
@@ -300,11 +300,12 @@ il est **signalé**, pas corrigé.
 
 ## 10. 📝 Journal (chronologique)
 
-- **2026-09-20 13:53** : prise de session, verrou `T255-D` (`TASK_LOCKS.json` `work_locks.T255-D`, acteur `DSH01`) ; `TASKS.yaml` → `agent: DSH01`, `locked_at`/`updated_at` posés.
+- **2026-09-20 13:53** : prise de session, verrou `T255-D` (`TASK_LOCKS.json` `work_locks.T255-D`, acteur `DSH05` depuis le renommage du 15:55 — `DSH01` était en collision, 4 sessions) ; `TASKS.yaml` → `agent: DSH05`, `locked_at`/`updated_at` posés.
+- **2026-09-20 15:55** : assainissement nomenclature par CC01 (`T328→DSH03`, `T332→DSH04`, `T255-D→DSH05`) ; dossier exploratoire renommé `DSH05_T255D_FDC_BAS`, références corrigées (contrat, fiche, README, `run.py`).
 - **2026-09-20 13:54** : lectures cadrage — `AGENTS.md`, `CODE_QUALITY_STANDARDS §3ter` (`:479-503`), `AF-07 v2.3 §6` (`:287-321`), `TASKS.yaml` (T255-C/T220/T243), `FB_Safety_Winch.st`, `FB_WinchStateProjection.st`, `PRG_07_Supervision.st`, `FB_Hmi_BannerFormatter.st` (1202 lignes), tests CI bandeau.
 - **2026-09-20** : écarts de cadrage constatés — `AnyFaultActive` en `PRG_07:537-547` (et non `:424-427`), POU en `CODE/M_MAIN/` (et non `CODE/J_SUPERVISION/`), `ST_IHM_MANU` inexistant (supprimé 2026-07-19).
 - **2026-09-20** : RC1 + RC2 + RC3 établies, fichier:ligne ; §5i `[HISTO]` **disculpée** (causes non latchées).
-- **2026-09-20 14:0x** : reproduit par exécution (dossier `_TROUBLESHOOTING/DSH01_T255D_FDC_BAS`) — **4/4 tests rouges** ; baseline `PRG_07_Supervision` mesurée **PASS 3/3** ; obstacle registre `FB_Hmi_BannerFormatter` constaté et signalé.
+- **2026-09-20 14:0x** : reproduit par exécution (dossier `_TROUBLESHOOTING/DSH05_T255D_FDC_BAS`) — **4/4 tests rouges** ; baseline `PRG_07_Supervision` mesurée **PASS 3/3** ; obstacle registre `FB_Hmi_BannerFormatter` constaté et signalé.
 - **2026-09-20** : écart de cadrage majeur réfuté (§7 : `.Error` est la vue LIVE, `FB_FaultCore.st:49-57`) — mécanismes A/B du brief écartés, mécanisme **C** prouvé. Fiche consignée. **ARRÊT — validation humaine.**
 
 ---

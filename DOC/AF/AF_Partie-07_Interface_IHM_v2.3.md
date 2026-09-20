@@ -291,6 +291,40 @@ responsabilité. Les **warnings non bloquants** (ex. `[M1] mou de cable`, `[M1] 
 **ne sont pas publiés** dans le carrousel : ils relèvent du bandeau d'information / journal de
 supervision, pas du carrousel de défauts bloquants.
 
+> 🔒 **Invariant de non-silence (T255-D, 2026-09-20)** — *toute cause agrégée dans
+> `GVL_IHM.Modes.State.AnyFaultActive` doit posséder un libellé dans le carrousel* (ou être
+> **exemptée nominativement** avec sa raison et sa tâche de rattachement). Sans cela, le voyant
+> de défaut s'allume sans que l'opérateur puisse en connaître la cause : c'est exactement le
+> constat terrain T255-D (« `AnyFault` allumé, bandeau muet »).
+> Garde-fou **`G506_check_anyfault_banner_labels.py`** (palier C). Ce qu'il vérifie **exactement** :
+> pour chaque source agrégée dans `PRG_07_Supervision`, il relie la cause publiée par le
+> **producteur** (`FB_Safety_Winch.instCauses[i]`) au libellé réellement affecté à `AlarmArray[...]`
+> dans le formateur, **bit par bit** (complétude vérifiée contre le producteur : un bit ajouté côté
+> safety sans libellé — *le cas T255-D* — est refusé), exige la **garde positive** de validité, et
+> affiche en avertissement chaque exemption nominative (bits 2, 3, 5, 10, sources joystick et modes).
+
+> 🛡️ **Limite de course BASSE câble des treuils — publiée (T255-D, 2026-09-20)** : la cause
+> `Limite basse cable atteinte` (bit 6 = `16#0040` de `ST_SafetyWinch.ErrorId`) **bloque le
+> mouvement** (`DescendPermit`, `FB_Safety_Winch.st:563-565`) : c'est un **interlock** au sens du
+> présent paragraphe, donc **publiée au carrousel** — elle était auparavant exclue à tort, alors
+> qu'elle **allume** le voyant (`Safety.Error` agrégé par `AnyFaultActive`) sans aucun libellé.
+> Libellés : `[M1]`/`[M2] Limite basse cable atteinte`, **gardés par la validité de l'encodeur du
+> treuil** (`EncM1Valid`/`EncM2Valid`), comme les autres alarmes filles (masquage « Root Cause
+> Masking » ci-dessous). ⚠️ La cause est lue sur **`ErrorId`** (la cause safety, qui respecte les
+> bypass) et **jamais** sur le champ `CableLimitDescent`, qui est une comparaison brute de position
+> sans bypass (`FB_WinchStateProjection.st:217-218/230`) : le lire produirait une **fausse alarme**
+> sous `BypassCableLimitSwitch` (MAINT_N2) alors que le défaut est levé.
+> Le **champ action** nomme la cause et l'action autorisée **sans exiger de commande en cours** :
+> `[TREUIL] Limite basse cable M1 - remonter` (idem M2, et `M1+M2` si les deux), placé **après** les
+> prérequis de mode (`DISABLE`) et d'homme-mort, **avant** les rappels joystick. Sous commande de
+> descente, le libellé historique « `[TREUIL] Descente interdite - Limite basse cable` » reste
+> prioritaire et inchangé.
+> La cause **bit 5** (`Fin de course haut capteur atteint`) reste, elle, **hors carrousel**
+> (exemption nominative) : c'est un **état normal de fin de course**, la DI haut est **commune
+> M1/M2** (une publication par treuil afficherait deux alarmes pour un capteur), et l'action
+> opérateur est déjà publiée par la branche « Montée interdite - limite haute ».
+
+
 | Champ | Type | Rôle |
 |---|---|---|
 | `HasAlarm` | `BOOL` | `TRUE` = au moins un **défaut actif bloquant** (SafeStop / PowerCutOff / interlock) |
@@ -362,6 +396,7 @@ plus un TBD (voir §9).
 
 | Version | Date | Changement |
 |---|---|---|
+| v2.3 (maj) | 2026-09-20 | **T255-D** : la **limite de course basse câble** des treuils (bit 6 de `ST_SafetyWinch.ErrorId`, interlock bloquant) est **publiée au carrousel**, lue sur `ErrorId` (jamais sur `CableLimitDescent`, champ brut sans bypass), avec garde de validité encodeur ; le champ action nomme la limite basse et la remontée **sans exiger de commande** (`[TREUIL] Limite basse cable Mx - remonter`), après les prérequis de mode et d'homme-mort. Le bit 5 (FdC haut capteur) reste **hors carrousel**, exempté nominativement (état normal de fin de course, DI commune M1/M2). Ajout de l'**invariant de non-silence** sur `AnyFaultActive` et de son garde-fou `G506` (complétude **bit par bit** contre le producteur). Mise à jour **en place** (pas de bump : références croisées multiples), décision orchestrateur D2. |
 | v2.3 | 2026-09-01 | Tri du carrousel : ne publie que les **défauts actifs bloquants** (SafeStop / PowerCutOff / interlock), warnings non bloquants exclus ; sémantique `HasAlarm` restreinte aux bloquants. Marqueur `[HISTO]` pour les défauts latched passés (`LatchedId AND NOT ErrorId`) + vue latched M1/M2/M3 exposée dans les DUT safety. Messages d'alarme avec code `ErrorID` (ex. `ErrorID:08`). |
 | v2.2 | 2026-08-26 | Intégration Root Cause Masking dans `ST_AlarmBanner` (`AlarmArray[0..49]`), 11 alarmes parentes E/S et bus (P1..P11), temporisation démarrage (4s) et debouncing TOF (1.5s). Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié, section `🎯 Rôle et périmètre` explicite, Suivi historique ajouté. |
 | v2.1 | — | Version precedente (voir `ARCHIVES/Doc/`) |

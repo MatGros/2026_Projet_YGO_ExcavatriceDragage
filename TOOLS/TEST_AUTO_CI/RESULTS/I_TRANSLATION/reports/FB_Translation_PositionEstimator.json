@@ -12,23 +12,24 @@
     },
     {
       "name": "TC-P11-EST-004 Recalage a CHAQUE capteur sur front DESCENDANT (trajet Tremie vers Maintenance)",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.RECALIBRATED expected TRUE, got FALSE",
-        "file": "test_fb_translation_positionestimator.st",
-        "line": 77,
-        "message": "TC-P11-EST-004 : front DESCENDANT Tremie -> Recalibrated TRUE"
-      }
+      "passed": true
     },
     {
       "name": "TC-P11-EST-005 Recalage a CHAQUE capteur sur front MONTANT (trajet Maintenance vers Tremie)",
       "passed": true
+    },
+    {
+      "name": "TC-P11-EST-006 Continuite de la position entre deux fronts (seuil Q3 : |Freq| x Gain x dt + 1 mm)",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-EST-007 Blip capteur court (1 scan) en s eloignant : comportement defini (decision Q2 = recaler)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 4,
-    "passed": 3,
-    "failed": 1
+    "total": 6,
+    "passed": 6,
+    "failed": 0
   }
 }

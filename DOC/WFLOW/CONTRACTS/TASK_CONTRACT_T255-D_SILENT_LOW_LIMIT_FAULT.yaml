@@ -50,7 +50,7 @@ contract:
         TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_07_supervision.st ; execution par
         python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb PRG_07_Supervision
         Le meme scenario est d'abord porte par le dossier exploratoire
-        TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS
+        TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/DSH05_T255D_FDC_BAS
         (registre ephemere hors depot, lance par tests/run.py)
     - id: AC3
       statement: >
@@ -60,10 +60,10 @@ contract:
         l'assertion entre les deux. Le cas de reproduction doit aussi prouver que le texte
         d'action ne nomme pas la cause avant correctif.
       verified_by: >
-        Sorties brutes du dossier exploratoire DSH01_T255D_FDC_BAS avant correctif, deja
+        Sorties brutes du dossier exploratoire DSH05_T255D_FDC_BAS avant correctif, deja
         obtenues le 2026-09-20 : 4 tests rouges T255D-REPRO-M1-A1, T255D-REPRO-M1-A2,
         T255D-REPRO-M2-A1 et T255D-REPRO-M2-A2, rapport conserve dans
-        TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS/reports/
+        TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/DSH05_T255D_FDC_BAS/reports/
         puis meme lancement apres correctif (4 verts), et promotion du scenario dans le
         test enregistre test_prg_07_supervision.st
     - id: AC4
@@ -79,7 +79,7 @@ contract:
         doit rester vert : toute entree de carrousel ajoutee pour la limite basse cable
         reste conditionnee par la validite de l'encodeur.
       verified_by: >
-        python TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS/tests/run.py
+        python TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/DSH05_T255D_FDC_BAS/tests/run.py
         --case banner-ref (fichier de test officiel non modifie, registre ephemere repare :
         15 sur 19, 4 rouges nommes) puis meme commande apres correctif, et
         run.py --case consumer plus run_tests.py --fb PRG_07_Supervision pour le harnais
@@ -238,7 +238,7 @@ open_decisions:
 status: PENDING
 
 execution:
-  executed_by: "DSH01 (DeepSeek / DSH, session principale)"
+  executed_by: "DSH05 (DeepSeek / DSH, session T255-D)"
   completed_at: "2026-09-20T13:54:00+02:00"
   status: PENDING
   summary: >
@@ -252,7 +252,7 @@ execution:
     branche nommant la limite (FB_Hmi_BannerFormatter.st:656-658) est imbriquee sous
     DirectionBlocked et CurrentDirection inferieur a zero, et SpecialConditionText n'a aucune
     branche pour cette limite. Reproduction : 4 tests rouges T255D-REPRO-M1-A1, M1-A2, M2-A1,
-    M2-A2 dans RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS (HasAlarm FALSE et
+    M2-A2 dans RESULTS/_TROUBLESHOOTING/DSH05_T255D_FDC_BAS (HasAlarm FALSE et
     SpecialConditionText vide alors que la cause est active ; texte d'action reduit au rappel
     joystick). Preuve amont au producteur : T255D-PROD-1 et PROD-2 VERTS, la limite basse
     cable SEULE produit Fault.Error TRUE, ErrorId 16#0040 et Latched FALSE, ce qui refute
@@ -270,10 +270,10 @@ execution:
   evidence_submitted:
     - "Contrat C2 T255-D redige, check_task_contract.py PASS (0 erreur, 0 avertissement)"
     - "Fiche diagnostic TROUBLESHOOTING_FdcBasSilencieux_20260920.md (cause racine fichier:ligne + inventaire AC6 + hypotheses mesurees)"
-    - "Reproduction par execution : 4 tests rouges consommateur et 2 verts producteur dans RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS"
+    - "Reproduction par execution : 4 tests rouges consommateur et 2 verts producteur dans RESULTS/_TROUBLESHOOTING/DSH05_T255D_FDC_BAS"
     - "Mecanisme A mesure : T255D-HYP-A1 et A2 verts (masquage reel par EncM1Valid, parent ECAT affiche)"
     - "Baselines mesurees : PRG_07_Supervision 3 sur 3 ; bandeau officiel 15 sur 19, 4 rouges pre-existants"
-    - "Verrou T255-D pose : TASK_LOCKS.json work_locks.T255-D acteur DSH01"
+    - "Verrou T255-D pose : TASK_LOCKS.json work_locks.T255-D acteur DSH05 (tag renomme le 2026-09-20 : collision DSH01)"
     - "Obstacle CI remonte : entree de registre FB_Hmi_BannerFormatter inutilisable (13 sources absentes + 1 source manquante non declaree)"
     - "Aucun fichier CODE/ modifie"
 

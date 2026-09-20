@@ -14,6 +14,11 @@ VAR_INPUT
     BrakeOpenDelayS : REAL := 0.10;
     BrakeCloseDelayS : REAL := 0.09;
     BrakeContactDelayS : REAL := 0.01;
+    (* FAUTE EXPLICITE frein M3 — defaut FALSE : reproduit le defaut terrain « frein ferme
+       alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s,
+       State.ErrorId=64). La garde nominale 0,5 Hz du frein n'est pas modifiee. *)
+    BrakeFaultCloseWhileRunning : BOOL := FALSE;
+    BrakeFaultCloseDelay_S : REAL := 0.0;
     SuspendedLoadLength_M : REAL := 1.5;
     SuspendedLoadDamping : REAL := 0.35;
     LoadReactionGain_Mps2 : REAL := 0.20;
@@ -39,6 +44,7 @@ VAR_OUTPUT
     BrakeCoilEnergized : BOOL;
     BrakeMechanicallyOpen : BOOL;
     BrakeContactOpen : BOOL;
+    BrakeFaultCloseActive : BOOL;
     PositionTrue_M : REAL;
     VelocityTrue_Mps : REAL;
     LoadAngle_Rad : REAL;
@@ -106,6 +112,7 @@ IF NOT Enable THEN
     BrakeMechanicallyOpen := FALSE;
     BrakeContactOpen := FALSE;
     BrakeCoilEnergized := FALSE;
+    BrakeFaultCloseActive := FALSE;
     PositionTrue_M := CST_PositionAtP1;
     VelocityTrue_Mps := 0.0;
     PreviousVelocity_Mps := 0.0;
@@ -153,10 +160,13 @@ IF Enable THEN
     instBrake(Enable := TRUE, ReleaseCmd := BrakeReleaseCmd,
         ActualFrequency_Hz := ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
         CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
-        CycleTime_S := CycleTimeS);
+        CycleTime_S := CycleTimeS,
+        FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
+        FaultCloseDelay_S := BrakeFaultCloseDelay_S);
     BrakeCoilEnergized := instBrake.CoilEnergized;
     BrakeMechanicallyOpen := instBrake.MechanicallyOpen;
     BrakeContactOpen := instBrake.ContactOpen;
+    BrakeFaultCloseActive := instBrake.FaultCloseActive;
 
     PreviousVelocity_Mps := VelocityTrue_Mps;
     IF (FullTravelTimeS > CST_MinTimeS) AND BrakeMechanicallyOpen THEN

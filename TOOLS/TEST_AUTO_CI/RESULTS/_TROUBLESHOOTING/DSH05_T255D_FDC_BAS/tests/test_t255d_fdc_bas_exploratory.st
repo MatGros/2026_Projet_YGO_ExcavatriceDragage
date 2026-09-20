@@ -42,7 +42,7 @@ END_VAR
 // alarme parente de module E/S. TonBootInhibit (4 s) protege les 4 tests.
 ModesAuth.Mode := E_Mode.MAINT_N1;
 ModesAuth.JoystickWinchSelectArbitrated := 0;   // treuils couples -> CurrentDirection = WinchBothMotionDirection = 0
-AcqData.Joystick.DeadmanArmed := FALSE;         // situation terrain : joystick relache
+AcqData.Joystick.DeadmanArmed := TRUE;          // scenario terrain : operateur arme, n agit pas
 AcqData.Joystick.AtNeutralXY := TRUE;
 END_SETUP
 
@@ -82,8 +82,8 @@ TEST 'T255D-REPRO-M1-A2 butte basse cable M1 : le texte daction ne nomme pas la 
           TranslationData := TranslationData, EmergencyChainClosed := TRUE,
           PowerContactorEngaged := TRUE, PowerCutOffActive := FALSE, BtnResetMachine := FALSE);
 
-    ASSERT_NEQ(PRG07.Banner.OperatorActionText, '[JOYSTICK] Appuyer homme-mort au neutre',
-               '[T255D-A2] la cause limite basse cable M1 doit etre nommee dans laction');
+    ASSERT_EQ(PRG07.Banner.OperatorActionText, '[TREUIL] Limite basse cable M1 - remonter',
+              '[T255D-A2] action autorisee nommee (remontee) sans commande de descente');
 END_TEST
 
 TEST 'T255D-REPRO-M2-A1 butte basse cable M2 : aucun canal du bandeau nexpose la cause active'
@@ -122,6 +122,6 @@ TEST 'T255D-REPRO-M2-A2 butte basse cable M2 : le texte daction ne nomme pas la 
           TranslationData := TranslationData, EmergencyChainClosed := TRUE,
           PowerContactorEngaged := TRUE, PowerCutOffActive := FALSE, BtnResetMachine := FALSE);
 
-    ASSERT_NEQ(PRG07.Banner.OperatorActionText, '[JOYSTICK] Appuyer homme-mort au neutre',
-               '[T255D-A2] la cause limite basse cable M2 doit etre nommee dans laction');
+    ASSERT_EQ(PRG07.Banner.OperatorActionText, '[TREUIL] Limite basse cable M2 - remonter',
+              '[T255D-A2] action autorisee nommee (remontee) sans commande de descente');
 END_TEST

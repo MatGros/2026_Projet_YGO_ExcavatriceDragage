@@ -46,7 +46,11 @@ CASES = {
     ),
     "banner-hyp": ("FB_Hmi_BannerFormatter", TESTS / "test_t255d_fdc_bas_hypotheses.st"),
 }
-DOMAIN = "_TROUBLESHOOTING/DSH01_T255D_FDC_BAS"
+DOMAIN = "_TROUBLESHOOTING/DSH05_T255D_FDC_BAS"
+# Note D4 (2026-09-20) : le registre OFFICIEL a ete repare pour FB_Hmi_BannerFormatter et
+# FB_TroubleshootingView (13 sources mortes du dossier 5_ASSISTANCE_DRAGAGE + enum
+# E_CycleDepthStopMode.st). Les cas banner-* n'ont donc plus besoin de cet ajustement,
+# conserve en secours si une entree redevenait incomplete.
 # Sources que l'entree officielle oublie alors qu'elle compile des types qui en dependent
 # (constat 2026-09-20 : ST_CycleCfg.st est liste, E_CycleDepthStopMode.st ne l'est pas).
 EXTRA_SOURCES = {
@@ -99,7 +103,7 @@ def main() -> int:
             print(f"  - {src}")
 
     # Registre ephemere hors depot : le fichier systeme est laisse au nettoyage de l'OS.
-    fd, registry_name = tempfile.mkstemp(prefix="dsh01_t255d_registry_", suffix=".yaml")
+    fd, registry_name = tempfile.mkstemp(prefix="dsh05_t255d_registry_", suffix=".yaml")
     pathlib.Path(registry_name).write_text(yaml.safe_dump(entry, sort_keys=False), encoding="utf-8")
     pathlib.Path(registry_name).chmod(0o600)
     run_tests.REGISTRY = pathlib.Path(registry_name)

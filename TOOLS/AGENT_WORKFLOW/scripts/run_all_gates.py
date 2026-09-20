@@ -134,6 +134,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "483", "G483 - Matrice maintenance N1/N2 : bypass gates MAINT_N2, override FDC borne, re-homing (T181-14 AC1-AC12)", [sys.executable, f"{S}/G483_check_bypass_matrix_mode_gated.py"]),
     ("C", "484", "G484 - ContactorStuck proprietaire unique (T181-02/03 AC7)", [sys.executable, f"{S}/G484_check_stuckclosed_single_owner.py"]),
     ("C", "487", "G487 - Initialiseur struct anonyme en appel FB interdit (CODESYS 3.5, REX 2026-08-30 PRG_04/T181-08)", [sys.executable, f"{S}/G487_check_no_inline_struct_literal.py", "."]),
+    ("C", "488", "G488 - Estimateur M3 : R_TRIG ET F_TRIG consommes par capteur (T333)", [sys.executable, f"{S}/G488_check_estimator_sensor_edges.py", "."]),
     ("C", "491", "G491 - Anti-orphelin bypass RETAIN (relais PRG_07, REX 2026-09-01 BypassNetworkGlobal)", [sys.executable, f"{S}/G491_check_bypass_retain_relayed.py"]),
     ("C", "492", "G492 - Verrou inversion joystick inter-scan (T222)", [sys.executable, f"{S}/G492_check_joystick_inversion_lock.py", "."]),
     ("C", "493", "G493 - Table paliers centrale vers joystick (T223)", [sys.executable, f"{S}/G493_check_joystick_speedstep_table_link.py", "."]),
@@ -145,6 +146,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "501", "G501 - Absence mouvement sous commande (T288)", [sys.executable, f"{S}/G501_check_t288_no_movement_feedback.py", "."]),
     ("C", "502", "G502 - Frontiere SimBench M3 HwSim/HwIn (T300 AC4bis/AC14)", [sys.executable, f"{S}/G502_check_simbench_m3_boundary.py", "."]),
     ("C", "503", "G503 - Portee stricte ManualBucketLimitsActive + borne T248 (T327)", [sys.executable, f"{S}/G503_check_manual_bucket_limits_scope.py"]),
+    ("C", "506", "G506 - Toute cause agregee dans AnyFaultActive a un libelle bandeau (T255-D)", [sys.executable, f"{S}/G506_check_anyfault_banner_labels.py", "."]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]

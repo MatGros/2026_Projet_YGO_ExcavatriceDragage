@@ -46,7 +46,7 @@ contract:
         commun M1/M2). Les libellés PositionHomingTop_M / PositionFdcLogicielHaut_M /
         CableLimitAscent_M sont INTERDITS dans tout document de la tâche (ils n'existent pas
         dans CODE/ ; CableLimitAscent sans préfixe désigne un ÉTAT BOOL).
-      verified_by: "gate G504 : grep des noms interdits dans les livrables T330 = 0 occurrence + table producteur -> route -> consommateur versionnée"
+      verified_by: "G504-8 (grep des noms interdits PositionHomingTop_M / PositionFdcLogicielHaut_M / CableLimitAscent_M sans Cfg dans les livrables T330 = 0 occurrence) + G504-3 (tout symbole lu existe, sans repli muet) + table producteur -> route -> consommateur versionnee"
     - id: AC2
       statement: >
         L'invariant est documenté sous forme de DEUX règles distinctes sur les valeurs de
@@ -76,7 +76,7 @@ contract:
         N1 (MAINT_N1, bouton maintenu) ou bypass N2 ; ces TROIS exceptions sont nommées,
         tracées et gatées. Hors de ces cas, la limite logicielle empêche la montée et la
         DESCENTE reste toujours possible (aucun gate de validité sur DescendPermit).
-      verified_by: "matrice de modes + gate G504 sur les 3 exceptions nommées + test ST de descente préservée"
+      verified_by: "G504-9 (les 3 exceptions InReferencingMode-cycle-homing / OverrideTopSoftwareN1 / BypassTopLimitSoftware sont NOMMEES dans le code) + matrice de modes + test ST de descente preservee (TC-P10-077) et des 3 exceptions (TC-P10-082, TC-P10-085, TC-P10-086)"
     - id: AC6
       statement: >
         Le gate G483 AC2b (règle inverse réserve <= bande de ralentissement) est RETIRÉ et

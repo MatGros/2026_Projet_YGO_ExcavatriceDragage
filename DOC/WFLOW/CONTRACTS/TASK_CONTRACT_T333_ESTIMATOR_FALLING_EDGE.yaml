@@ -156,7 +156,9 @@ contract:
         Tremie 0,0 m) recalent la position DANS LES DEUX SENS, chacun avec Recalibrated=TRUE
         pendant un scan et RecalibratedSensorId egal a son identifiant (0=Maint, 1=P1, 2=P2,
         3=PV, 4=Tremie), la position prenant la cote tranchee en Q1 a la tolerance fixee par ce
-        contrat (0,001 m sur des cotes exactes de test). Cas le plus visible corrige : l'ARRIVEE
+        contrat : 0,005 m, qui couvre exactement le pas d'odometrie du scan de front
+        (40 Hz x 0,008333 m/(Hz.s) x 0,010 s = 3,33 mm) sans masquer une cote fausse (les cotes
+        de test sont distantes de 5 m au minimum). Cas le plus visible corrige : l'ARRIVEE
         a la Maintenance (mot 00000, front descendant du capteur Maintenance), qui n'est
         recalée dans aucun sens aujourd'hui, l'est desormais.
       verified_by: >
@@ -284,43 +286,62 @@ contract:
     Signaler n'est pas elargir le perimetre : H3, H5, H6, H7, H8, H9 et le gain odometrique
     (T301) restent hors de ce lot.
 
-status: IN_PROGRESS
+status: COMPLETED
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ✅ GO HUMAIN RECU (2026-09-20) — DECISIONS TRACEES, ETAPE 3 AUTORISEE
+# ═══════════════════════════════════════════════════════════════════════════
+decisions:
+  Q1_position_au_front_descendant: "PosXxx_M identique au front montant (cote unique)"
+  Q2_politique_blip: "Recaler sans gate de sens ni de plausibilite (gate inexploitable avant T301)"
+  Q3_seuil_continuite: "|Delta| par scan <= |DriveActualFreqHz| x GainMetersPerHzSec x dt + 0,001 m hors front"
+  Q4_fdc_maintenance: "CLOS par l'humain — terrain non-probleme (extremes OK en manuel/MAINT depuis des semaines)"
+  Q5_version_fiche: "Mise a jour en place de la fiche v1.0 + ligne de Suivi historique (pas de renommage)"
+  Q6_ordonnancement: "T333 avant T301 ; AC2 se lit 'position exacte aux cotes franchies'"
+  test_rouge: "TC-P11-EST-004 conserve dans le depot, passe au VERT par ce lot"
 
 execution:
   executed_by: "DSH02 (DeepSeek Harness)"
-  completed_at: "2026-09-20T14:05:00+02:00"
-  status: ALERT_RAISED
+  completed_at: "2026-09-20T16:05:00+02:00"
+  status: COMPLETED
   summary: >
-    Etapes 1 et 2 de la mission realisees, AUCUN fichier CODE/ modifie (git diff CODE/ vide).
-    Diagnostic etabli sur le code reel (FAITS 1 a 5) et PROUVE par test CI :
-    TC-P11-EST-004 (fronts descendants) ECHOUE sur le code actuel a sa premiere assertion
-    (Recalibrated reste FALSE au front descendant Tremie), tandis que TC-P11-EST-005 (fronts
-    montants) PASSE dans la meme execution -> asymetrie constatee, pas deduite.
-    Challenge independant read-only effectue (1 sous-agent) : il a confirme la cause, ajoute le
-    FAIT 4 (l'ARRIVEE a la Maintenance n'est recalee dans aucun sens) et le FAIT 5 (la spec
-    prescrit l'asymetrie -> AC8), et corrige la formulation de l'ecart H2 (la magnitude n'est
-    pas decidable sur la trace, seule la premisse "chariot a 5 m" est refutable).
-    ARRET OBLIGATOIRE : Q1 a Q5 exigent un arbitrage humain avant toute ecriture de code.
+    Lot livre. Etapes 1 a 6 realisees. Code : 5 F_TRIG ajoutes (TrigDnMaintenance..TrigDnTremie),
+    chaine de recalage symetrisee (§3 : TrigX.Q OR TrigDnX.Q), interface VAR_INPUT/VAR_OUTPUT
+    inchangee (18 IN / 4 OUT), LOCAL 8 -> 13. Tests CI : 6/6 PASS (TC-P11-EST-004 passe de ROUGE
+    a VERT, TC-001/002/005 non-regression, TC-006 continuite hors front, TC-007 blip court).
+    Gate guard G488 cree et enregistre en palier C : PASS sur le depot, FAIL en variante negative
+    (5 erreurs si la consommation du front descendant est retiree, verifie dans une copie hors
+    depot). Fiche AF-11 mise a jour (recalage 2 sens, 4 TC, Suivi historique, references relevees
+    de _v2.3 a _v2.4 : une erreur G340 de mon perimetre en moins). Bundle complet + diff bundle
+    regeneres, G200 PASS 0 erreur, palier C : 43 gates, 5 echecs PREEXISTANTS identiques a la
+    baseline (G300/G340/G408/G430/G483), aucun echec imputable a ce lot.
   evidence_submitted:
-    - "CI avant : run_tests.py --fb FB_Translation_PositionEstimator = 2/2 PASS (TC-P11-EST-001/002)"
-    - "CI apres ajout du test : 3/4, TC-P11-EST-004 FAIL ligne 77 (ASSERT_TRUE Recalibrated expected TRUE, got FALSE), TC-P11-EST-005 PASS - preuve machine TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/reports/FB_Translation_PositionEstimator.json"
-    - "Code : FB_Translation_PositionEstimator.st:83-87 (5 R_TRIG, aucun F_TRIG), :98-118 (test .Q montant seul), :146 (bornage)"
-    - "Spec : FB_Translation_PositionEstimator_v1.0.md:28,32,154 (recalage prescrit sur front montant)"
-    - "Geometrie : FB_Translation_PositionDecoder.st:10-12,78-88 + fiche v1.1 §3bis:137-141 ; banc FB_Sim_PositionSensor.st:11,53-57,69-81 (ActiveBelowThreshold par defaut TRUE) + FB_Sim_Translation.st:219-221,250-251"
-    - "Trace terrain : transitions CSV wide extraites, PV 1->0 a 14,864 s (sens Maintenance) et PV 0->1 a 18,454 s (sens Tremie), aucune transition P2/P1/Maintenance"
-    - "Chaine d'impact §3ter : PRG_02 HwIn -> instPosDecoderM3 (PRG_05:112-118) -> instPosEstimatorM3 (PRG_05:575-594) -> GVL_PERSISTENT._TranslationPosEstimated_M (PRG_05:596) + TranslationState.EstimatedPosM3_M (PRG_05:710) ; producteur unique verifie par grep, aucun consommateur de securite"
-    - "G390 fraicheur bundle : PASS (bundle frais avant intervention, aucun CODE/ touche)"
+    - "CI avant correctif : 3/4 (TC-P11-EST-004 rouge) ; CI apres correctif : 6/6 PASS"
+    - "G488 : PASS (10 instances d'edge, 5 branches de recalage) ; variante negative : FAIL 5 erreurs"
+    - "G200_check_linkage.py --report : PASS, 0 erreur, 1984 instances (identique a la baseline)"
+    - "run_all_gates.py --palier C : 43 gates, 5 FAIL preexistants (G300/G340/G408/G430/G483), G488 PASS"
+    - "git diff CODE/ : FB_Translation_PositionEstimator.st uniquement (49 lignes)"
+    - "Bundle : CODE_XML/CODE_Bundle.xml frais (G390 PASS) ; diff bundle CODE_XML/CODE_DiffBundle.xml = FB_Translation_PositionEstimator"
 
 validation:
   status: PENDING
   validated_by: "..."
   validated_at: "..."
   notes: >
-    Attente de l'arbitrage humain Q1 a Q5 pour lever l'ARRET de l'etape 2. Le contrat declare
-    AC2 a 0,001 m de tolerance sur des cotes exactes de test ; toute decision Q1 autre que
-    "PosXxx_M aux deux fronts" fera evoluer cette tolerance et l'assertion AC2.
-    Point de vigilance transmis : le test TC-P11-EST-004 est ROUGE dans le depot jusqu'a la
-    livraison du correctif (visible par run_tests.py --fb FB_Translation_PositionEstimator et par
-    la CI du domaine I_TRANSLATION). Il ne rend PAS le palier C de run_all_gates rouge : le gate
-    G460 n'execute pas les tests unitaires par FB (TOOLS/TEST_AUTO_CI/anim_bench/run_ci_gates.py
-    ne lance que FB_Cycle, les tests negatifs et le garde animation).
+    GO humain recu le 2026-09-20 (decisions Q1 a Q6 tracees au bloc `decisions:`), lot execute et
+    livre. Revue independante read-only rendue : PASS (0 BLOCK, 0 MAJOR, 9 MINOR). Durcissements
+    appliques apres revue : gate G488 (trous D2 fermes — un `.Q` cite dans un COMMENTAIRE ne
+    satisfait plus la regle, et toute instance d'edge appelee doit etre consommee : 3 variantes de
+    regression passent au ROUGE, verifiees hors depot), TC-006 (D3 : assertion non vacuant
+    `ASSERT_FALSE(Recalibrated)` sur chaque scan sans front), gain de production pose
+    explicitement dans les tests (D4), tolerance AC2 alignee sur l'assertion reelle a 0,005 m (D1),
+    fiche corrigee sur le bornage (D6) et sur l'etat a froid de RecalibratedSensorId (D9).
+    NON applique et signale : D5 (enregistrement des TC T333 dans
+    TOOLS/AGENT_WORKFLOW/config/af_traceability_matrix.yaml — fichier hors perimetre de la tache,
+    G450 est informatif), D8 (etat du worktree et commits : hors perimetre agent, validation
+    humaine ; 25 fichiers hors T333 sont modifies par des chantiers concurrents).
+    Risque residuel a suivre (T301/T334) : un dropout fugace d'un capteur INTERMEDIAIRE suivi de
+    sa refermeture est un mot thermometre VALIDE (donc Incoherent=FALSE) et ancre desormais la
+    position DEUX fois (ouverture + refermeture) au lieu d'une — sans consommateur de securite,
+    et arbitre sans gate supplementaire par l'humain (Q2), un gate de plausibilite etant
+    inexploitable tant que le gain odometrique est faux.

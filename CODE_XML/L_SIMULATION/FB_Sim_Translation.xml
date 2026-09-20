@@ -1296,6 +1296,29 @@ Ready := TRUE;
                 <simpleValue value="0.01" />
               </initialValue>
             </variable>
+            <variable name="FaultCloseWhileRunning">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Branche de FAUTE EXPLICITE — defaut FALSE : chemin nominal strictement inchange.
+       Rejoue le defaut terrain « cause 6 instantanee » : contact frein ferme alors que le
+       variateur retourne encore de la vitesse (trace 2026-09-04, 26,437 s, 10,00 Hz,
+       State.ErrorId=64). La garde nominale CST_StopFrequency_Hz est CONSERVEE telle quelle :
+       elle est validee par la meme trace (frein ouvert a 0,60 Hz, ferme a 0,00 Hz).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FaultCloseDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -1318,6 +1341,14 @@ Ready := TRUE;
                 <BOOL />
               </type>
             </variable>
+            <variable name="FaultCloseActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Branche de faute effectivement appliquee ce scan</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="MechanicalTimer_S">
@@ -1326,6 +1357,11 @@ Ready := TRUE;
               </type>
             </variable>
             <variable name="ContactTimer_S">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="FaultTimer_S">
               <type>
                 <REAL />
               </type>
@@ -1353,12 +1389,24 @@ IF NOT Enable THEN
     CoilEnergized := FALSE;
     MechanicallyOpen := FALSE;
     ContactOpen := FALSE;
+    FaultCloseActive := FALSE;
     MechanicalTimer_S := 0.0;
     ContactTimer_S := 0.0;
+    FaultTimer_S := 0.0;
     RETURN;
 END_IF;
 
-CoilEnergized := ReleaseCmd;
+(* Faute explicite : chronometre propre, remis a zero des que le stimulus retombe. *)
+IF FaultCloseWhileRunning THEN
+    FaultTimer_S := FaultTimer_S + CycleTime_S;
+ELSE
+    FaultTimer_S := 0.0;
+END_IF;
+FaultCloseActive := FaultCloseWhileRunning AND (FaultTimer_S &gt;= MAX(0.0, FaultCloseDelay_S));
+
+(* La faute fait retomber la bobine : l'etat electrique publie reste coherent avec la
+   fermeture mecanique observee (jamais « bobine energisee ET frein serre »). *)
+CoilEnergized := ReleaseCmd AND NOT FaultCloseActive;
 IF CoilEnergized THEN
     IF NOT MechanicallyOpen THEN
         MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
@@ -1369,7 +1417,7 @@ IF CoilEnergized THEN
     ELSE
         MechanicalTimer_S := 0.0;
     END_IF;
-ELSIF ActualFrequency_Hz &lt;= CST_StopFrequency_Hz THEN
+ELSIF FaultCloseActive OR (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
     IF MechanicallyOpen THEN
         MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
         IF MechanicalTimer_S &gt;= MAX(0.0, CloseDelay_S) THEN

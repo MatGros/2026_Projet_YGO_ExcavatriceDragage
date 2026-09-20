@@ -16,7 +16,7 @@
 |---|---|---|
 | v1.0 | 2026-09-20 | Première rédaction |
 | **v1.1** | 2026-09-20 | **Audit indépendant** (sous-agent `34229875`, verdict `BLOCK`) : **11 erreurs factuelles** relevées, **8 confirmées** après vérification personnelle — dont **1 erreur mathématique de l'orchestrateur**. Journal complet **§11**. |
-| **v1.2** | 2026-09-20 | **Arbitrages CC01/Q17→Q28 intégrés** ; **Q17→Q28 toutes FERMÉES et tracées** (§1) ; **domaines corrigés** (C1) ; **gating R2** (C2) ; **limite du lot tracée** (C3) ; **matrice `AC ↔ TC ↔ oracle ↔ preuve` figée** (§4) ; ids **`TC-P10-069-088`** conformes `G470` ; restriction du périmètre réconciliée (§7). |
+| **v1.2** | 2026-09-20 | **Arbitrages CC01/Q17→Q28 intégrés** ; **Q17→Q28 toutes FERMÉES et tracées** (§1) ; **domaines corrigés** (C1) ; **gating R2** (C2) ; **limite du lot tracée** (C3) ; **matrice `AC ↔ TC ↔ oracle ↔ preuve` figée** (§4) ; ids **`TC-P10-073-088`** conformes `G470` ; restriction du périmètre réconciliée (§7). |
 
 ---
 
@@ -47,9 +47,35 @@
 
 | # | Condition | Action | Gating |
 |---|---|---|---|
-| **R1** | `Δ < 1,00 m` **après modification du FDC** | `CfgCableLimitAscent_M := CfgTopSensorPos_M − 1,00 m` | ❌ **jamais** inhibée |
-| **R2** | `Δ < 1,00 m` **après modification du TOP** | `CfgTopSensorPos_M := CfgCableLimitAscent_M + 1,00 m` | ✅ **INHIBÉE pendant le homing** (Q22/C2) — voir **§2.7bis** |
+| 🔴 **R0** | **CLAMP ABSOLU — INCONDITIONNEL, À CHAQUE SCAN, sur FDC et TOP SÉPARÉMENT** *(Q21 bis, décision CC01 2026-09-20)* | `CfgCableLimitAscent_M := MIN(MAX(FDC, 0,00), 9,00)` et `CfgTopSensorPos_M := MIN(MAX(TOP, 1,00), 10,00)` — **avec le même message non alarmant que Q2** | ❌ **jamais** inhibée |
+| **R1** | `Δ < 1,00 m` **après modification du FDC** *(sur les valeurs **clampées**)* | `CfgCableLimitAscent_M := CfgTopSensorPos_M − 1,00 m` | ❌ **jamais** inhibée |
+| **R2** | `Δ < 1,00 m` **après modification du TOP** *(sur les valeurs **clampées**)* | `CfgTopSensorPos_M := CfgCableLimitAscent_M + 1,00 m` | ✅ **INHIBÉE pendant le homing** (Q22/C2) — voir **§2.7bis** |
 | **R3** | `WinchSlowdownDistanceTop_M < 0,50 m` | `WinchSlowdownDistanceTop_M := 0,50 m` | ❌ **jamais** inhibée |
+
+> ## 🔴 **ORDRE D'EXÉCUTION IMPOSÉ (Q21 bis)** — **R0 d'abord, TOUJOURS**
+>
+> ```
+> 1. CLAMP ABSOLU INDIVIDUEL   (R0, inconditionnel, chaque scan)
+>         FDC → [0 ; 9,00]      TOP → [1 ; 10,00]
+> 2. PUIS règle Δ ≥ 1,00 m / slowdown ≥ 0,50 m   (R1 / R2 / R3)
+>         évaluées SUR LES VALEURS CLAMPÉES
+> ```
+>
+> **Motif (trou réel identifié au challenge, accepté par CC01)** : le contre-exemple
+> `FDC = 9,50` + `TOP = 12,00` donne `Δ = 2,50 ≥ 1,00` ⇒ **aucune règle R1/R2/R3 ne se déclenche**,
+> alors que **les deux valeurs violent DÉJÀ leurs bornes absolues individuelles** ⇒ elles restaient
+> **hors domaine indéfiniment**. Le clamp aval (ex-`R4`, uniquement en aval d'une correction) **ne
+> couvrait pas ce cas**.
+>
+> ### ✅ Preuve d'inutilité du clamp aval (l'ex-`R4` est **absorbé** par `R0`)
+> Avec **R0 en amont**, les entrées de R1/R2 sont **bornées** :
+> - `TOP ∈ [1 ; 10]` ⇒ `R1` donne `FDC := TOP − 1,00 ∈ [0 ; 9,00]` ✅ **dans la borne**
+> - `FDC ∈ [0 ; 9,00]` ⇒ `R2` donne `TOP := FDC + 1,00 ∈ [1 ; 10,00]` ✅ **dans la borne**
+>
+> ⇒ **La correction Q17/Q2 ne peut structurellement JAMAIS produire une valeur hors borne** : le clamp
+> aval est **redondant** et **non testable** (il ne peut pas se déclencher) ⇒ **il est retiré** comme
+> règle distincte. ⛔ **Ne pas le réintroduire** : une garde qu'aucun test ne peut faire échouer est du
+> **code mort**.
 
 - **R2 inhibée** ⇒ message **spécifique** « correction différée » ; la correction est appliquée **au premier
   scan où le homing est terminé**, avec le message nominal.
@@ -83,15 +109,23 @@ la valeur TOP **n'est pas** corrigée, puis **le champ ne change plus** à la so
 front** ⇒ **R2 ne se déclencherait JAMAIS** ⇒ la configuration invalide **resterait violée
 indéfiniment**. ⇒ **La correction différée exigée par Q22 serait silencieusement perdue.**
 
-✅ **Mécanisme requis** — **1 mémoire NON persistante** (autorisée par AC3 : **pas** un réglage IHM/RETAIN) :
+✅ **Règles RETENUES par l'arbitrage CC01 (2026-09-20) — ⛔ AUCUN latch, AUCUNE mémoire nouvelle :**
 
-| Élément | Type | Comportement |
+| # | Exigence actée | Conséquence |
 |---|---|---|
-| `R2PendingTopCorrection` | `BOOL` **local, non persistant** | **armé** si le **TOP** est modifié **ET** `InHomingT330` **ET** `Δ < 1,00 m` |
-| Application | — | à `NOT InHomingT330` **ET** `R2PendingTopCorrection` **ET** `Δ` **toujours** `< 1,00` ⇒ appliquer **R2 une fois**, **désarmer**, message **nominal** |
-| Désarmement | — | aussi si l'opérateur corrige lui-même (`Δ ≥ 1,00`) |
+| **a** | **Gater sur le CYCLE de homing complet**, pas sur `HomingLifecycle.Busy` (~50 ms, **trop étroit**) | signal = `PRG_02.Data.MachineHoming.Active` **OR** `EncoderM1/M2…HomingLifecycle.Busy` (piège 1 ci-dessus) |
+| **b** | 🔴 **NVRAM GELÉE pendant l'inhibition** — **aucune écriture `Cfg`** | ⛔ **annule** la mention « Fenêtre NVRAM : aucune » **pendant le homing** (§2.3) : l'écriture est **suspendue**, ni différée ni corrigée |
+| **c** | 🔴 **Coupure pendant le homing = intention opérateur PERDUE**, jamais appliquée après coup silencieusement | ⇒ **rien à mémoriser** : au retour, si la configuration **restaurée** est **toujours invalide**, on **retombe dans le cas normal Q2** (normalisation + message) |
+| **d** | R1 et R3 **jamais** inhibées | inchangé |
 
-⚠️ **Idempotence** : le latch garantit **une seule** application ⇒ probatoire par `TC-P10-078` (étapes ②③④).
+🔧 **Conséquence de (c) — le piège 2 se résout SANS latch** : sans mémoire d'intention, la correction au
+retour **ne peut pas** dépendre d'un front (le champ ne change plus). ⇒ La normalisation comporte donc un
+**repli NIVEAU** : *si le couple est invalide au scan courant, corriger* — et **le champ à préserver est
+celui de `Q17`** : **on préserve le TOP, on corrige le FDC** (R1), le TOP étant la **cote gravée par le
+homing**. ⚠️ Ce repli **réutilise la règle Q17 déjà arbitrée** ⇒ **aucune question nouvelle**.
+
+> 🧹 **ANNULÉ de la v1.2** : la mémoire `R2PendingTopCorrection` et l'« application différée » qu'elle
+> portait. **Le latch n'existe plus** ; `TC-P10-082` est **réécrit** en conséquence (§4.2).
   n'est JAMAIS touché**.
 
 ### 🔴 Q21 vs R2 — contrôle de cohérence **après** correction de borne (C1)
@@ -104,7 +138,7 @@ Avec `FDC ∈ [0 ; 9]` et `TOP ∈ [1 ; 10]`, **R2 est-elle toujours dans la bor
 `FDC = 10,00` | *impossible* — **hors borne FDC** depuis C1 | ✅ éliminé par la borne |
 `FDC = 0,00` | `TOP := 1,00` | ✅ à la borne basse |
 
-⇒ ✅ **Avec la borne corrigée, R2 ne peut plus produire de valeur hors borne.** **C'est l'objet de `TC-P10-088`.**
+⇒ ✅ **Avec la borne corrigée, R2 ne peut plus produire de valeur hors borne.** **C'est l'objet de `TC-P10-092`.**
 
 ---
 
@@ -137,7 +171,7 @@ Avec `FDC ∈ [0 ; 9]` et `TOP ∈ [1 ; 10]`, **R2 est-elle toujours dans la bor
 le miroir M1 (`PRG_07:154-155`) ⇒ **faux positif garanti**.
 
 ⚠️ `GVL_IHM` **n'est pas RETAIN** (`GVL_IHM.st:7`) ⇒ comportement en **hot restart / download / RTS** à
-**prouver** (`TC-P10-070`).
+**prouver** (`TC-P10-074`).
 
 #### 🔴 `[v1.3]` Exigence **ABSOLUE** oubliée en v1.2 — initialisation des 3 mémoires **depuis les valeurs RESTAURÉES**
 
@@ -151,9 +185,9 @@ un « **changement opérateur** » **FAUX** ⇒ **correction injustifiée → é
    `_CommunCfgPersist`) — **jamais** depuis les défauts du DUT.
 2. La normalisation est **inhibée tant que les ponts n'ont pas restauré** (`NOT Hmi.Initialized`) — critère
    **significatif** en amont des ponts (§2.3).
-3. **Preuve exigée** : `TC-P10-067` (`NOT Initialized`) **et** un test explicite « **aucun changement
+3. **Preuve exigée** : `TC-P10-071` (`NOT Initialized`) **et** un test explicite « **aucun changement
    détecté à la restauration NVRAM** » — le challenge relève qu'**aucun TC ne le couvre** aujourd'hui
-   (`TC-P10-070` ne fait que l'effleurer).
+   (`TC-P10-074` ne fait que l'effleurer).
 
 ### 2.3 Point d'insertion — **AVANT les bridges** (option A, Q23)
 
@@ -193,12 +227,19 @@ s'applique pas partout**. Le rejet de l'`eps` ne repose donc **pas** sur Sterben
 ⇒ ✅ **comparaison stricte** : `(CfgTopSensorPos_M − CfgCableLimitAscent_M) >= CST_T330ReserveMinMargin_M`.
 ⛔ **Ne PAS introduire d'`eps`** : il **relâcherait** l'invariant (`0,9999 m` acceptée **sans correction**).
 
-### 2.5 Seuils dérivés ±0,50 m — **UNE SEULE expression** (Q3)
+### 2.5 Seuils dérivés ±0,50 m — ⛔ **Q3 ABANDONNÉE** *(décision CC01 2026-09-20)*
 
-Quand `Δ = 1,00 m` (état **nominal** après toute correction) et `band = 0,50 m` :
-`FDC + 0,50 = TOP − 0,50 = 8,00 m` ⇒ **les deux seuils COÏNCIDENT**.
-⇒ **Une seule** expression dérivée, jamais deux comparaisons avec des opérateurs `<` / `<=` non alignés
-(risque de **bande morte d'un scan** ou de **double déclenchement**). **Preuve** : `TC-P10-061`.
+**Décision : Q3 est ABANDONNÉE explicitement. Aucune preuve inventée.**
+
+| Point | Décision |
+|---|---|
+| Preuve exigée par le cadrage §4.3 (balayage `CablePosM` `7,999 / 8,000 / 8,001`) | ⛔ **RETIRÉE** — aucun TC ne la porte, et il est **interdit d'inventer** une revendication de couverture |
+| Revendication d'AC associée | ⛔ **RETIRÉE** de §4.1 |
+| Coïncidence des deux seuils quand `Δ = 1,00` exactement | devient un **risque ACCEPTÉ**, **mesuré en recette** — déjà tracé **Q18** |
+| Contrainte « **une seule** expression dérivée » | ✅ **CONSERVÉE** (bonne pratique, coût nul) — mais **sans revendication de test** |
+
+> ⚠️ Le fait technique **demeure** : après toute normalisation, `Δ = 1,00` **exactement**, donc
+> `FDC + 0,50 = TOP − 0,50` **coïncident**. C'est **assumé** et **vérifié en recette P5**, **pas testé en ST**.
 
 ### 2.6 Message IHM (Q25)
 
@@ -210,7 +251,7 @@ Quand `Δ = 1,00 m` (état **nominal** après toute correction) et `band = 0,50 
 | Libellé **R2 différée** | « *Réglage TOP corrigé à la sortie du mode homing.* » |
 | Libellé R3 | « *Réglage corrigé : ralentissement haut ramené à 0,50 m.* » |
 | **Discrimination** | ⛔ doit rester **strictement distinguable** des messages **D18**, **benne non fermée** et **synchro** (exigence cadrage §11bis) |
-| Interaction | Pas de **double message** avec `ConfigRestoredFromPersistent` (`TC-P10-068`) |
+| Interaction | Pas de **double message** avec `ConfigRestoredFromPersistent` (`TC-P10-072`) |
 | Ton | **Non alarmant** (pas de classe alarme) |
 
 #### 🔴 `[v1.3]` Compléments exigés par le challenge v1.2 — la v1.2 était **sous-spécifiée**
@@ -221,7 +262,7 @@ Quand `Δ = 1,00 m` (état **nominal** après toute correction) et `band = 0,50 
 | **2** | **Préfixe `[TAG]`** | ⚠️ **tous** les messages existants en portent un ⇒ le nouveau **doit** en avoir un (proposition : `[CFG]`) |
 | **3** | **Plafond `G408` (70 caractères, palier C)** | à **citer et respecter** — la v1.2 l'ignorait |
 | **4** | 🔴 **Masquage par priorité** | Les branches de priorité **supérieure** (`[JOY]`, `[TREUIL]`, `AbortMsgActive`, `SafeStopActive`…) **peuvent masquer** « Réglage corrigé » ⇒ **à prouver** : le message doit apparaître **malgré** les conditions concurrentes (ou assumer explicitement le masquage) |
-| **5** | 🔴 **Coexistence sur PLUSIEURS scans** | `ConfigRestoredFromPersistent` est **latché jusqu'à `BtnAckConfigRestored`** (`ST_CommunHMI.st:43`, `PRG_07:220-222`) ⇒ les deux messages coexistent **plusieurs scans**, pas un seul ⇒ `TC-P10-068` doit être **requalifié** (il est **non observable en ST** : le second message est **rendu par le panneau IHM**, hors automate) → **à déplacer en recette** |
+| **5** | 🔴 **Coexistence sur PLUSIEURS scans** | `ConfigRestoredFromPersistent` est **latché jusqu'à `BtnAckConfigRestored`** (`ST_CommunHMI.st:43`, `PRG_07:220-222`) ⇒ les deux messages coexistent **plusieurs scans**, pas un seul ⇒ `TC-P10-072` doit être **requalifié** (il est **non observable en ST** : le second message est **rendu par le panneau IHM**, hors automate) → **à déplacer en recette** |
 | **6** | ⚠️ **Sérialisation T255-D sur le CONTENU** | T255-D modifie **la même cascade** (`:812-849`) ⇒ §2.6 est **spécifié mais à REVALIDER** après sa livraison ; « strictement distinguable de D18 / benne / synchro » **n'est pas vérifiable avant** |
 
 ---
@@ -252,7 +293,7 @@ mode) — **Q11 ouverte, indépendante de T330** : **aucun faux vert** n'est ann
 | **Enregistrement** | ligne ajoutée dans `PLANS` (`run_all_gates.py`), **palier C** — ⛔ **critère d'acceptation**, cf. REX §3.3 |
 | **Exclusions (faux positifs)** | `TOOLS/`, `DOC/`, `ARCHIVES/`, `CODE_BACKUP/`, `CODE_XML/`, `**/reports/`, `*.html`, `*.json`, `.claude/` |
 
-**Les 7 contrôles** :
+**Les 10 contrôles** :
 
 | # | Contrôle | Échec si |
 |---|---|---|
@@ -263,6 +304,18 @@ mode) — **Q11 ouverte, indépendante de T330** : **aucun faux vert** n'est ann
 | **G504-5** | **Bornes Q21** : `FDC ∈ [0 ; 9]` et `TOP ∈ [1 ; 10]` sur les valeurs persistées **et** les défauts de type | valeur hors borne |
 | **G504-6** | La normalisation existe ; tout bornage **écrit** la valeur corrigée **ET** émet un message (≥ 1 appel de message dans le même bloc) | clamp **muet** |
 | **G504-7** | Les constantes sont des `CST_` **locales**, **non** persistantes ni IHM | gardes devenues persistantes |
+| **G504-8** 🔧 *(exigé par le contrat AC1)* | **Grep des noms INTERDITS** dans les livrables T330 : `PositionHomingTop_M`, `PositionFdcLogicielHaut_M`, `CableLimitAscent_M` (sans `Cfg`) | ≥ 1 occurrence ⇒ échec |
+| **G504-9** 🔧 *(exigé par le contrat AC5)* | **Les 3 exceptions de montée sont NOMMÉES** dans le code de la normalisation/gating : `InReferencingMode`-cycle-homing · `OverrideTopSoftwareN1` · `BypassTopLimitSoftware` | l'une des 3 absente ⇒ échec |
+| **G504-10** 🔧 *(Q21 bis)* | **`R0` est INCONDITIONNELLE et EN AMONT** : dans le bloc de normalisation, le clamp absolu précède l'évaluation de `Δ` | clamp absent, conditionnel, ou placé **après** le test `Δ` ⇒ échec |
+
+### 🔧 Arbitrages techniques tranchés (arb. 6, délégués par CC01) — **aucun ne touche la sûreté de façon nouvelle**
+
+| Point | Décision retenue | Justification |
+|---|---|---|
+| **`G504-4` — baseline** | ⛔ **Interdit** de comparer l'arbre courant à lui-même. Baseline = **`git diff --name-only`** restreint aux **3 fichiers de déclaration** (`ST_WinchCfg.st`, `ST_CommunCfg.st`, `GVL_PERSISTENT.st`) **+ `GVL_IHM.*.Cfg`** ; échec si un **nouveau nom de champ** apparaît dans le **diff** | sans baseline, les motifs `*Slowdown*`/`*TopSensorPos*` matchent des champs **existants** ⇒ gate **toujours rouge** ou **allowlist** (décision d'agent **interdite**) |
+| **`G504-6` — périmètre décidable** | Le contrôle s'applique **exclusivement à une RÉGION BALISÉE** : `{region "🔧 T330 NORMALISATION"}` … `{endregion}` à créer dans `PRG_07`. Hors région ⇒ **non contrôlé** | « le bloc de normalisation » n'est **pas localisable mécaniquement** sans marqueur ; **sans balise**, le contrôle est **faux-positif garanti** sur `PRG_07:189-197` (`MAX`/`LIMIT` **sans message**, code **légitime**) |
+| **`G504-5` — portée** | S'applique aux **valeurs persistées** *et* aux **défauts de type** ; ⚠️ **il ne remplace pas `R0`** (qui borne au **runtime**) : `G504-5` vérifie la **configuration au repos**, `R0` garantit le **domaine en fonctionnement** | deux niveaux distincts, **complémentaires** |
+| **`G504-3` — non-régression** | Le gate doit **passer** sur la configuration actuelle (`8,50` / `7,50` / `0,50`) — **vérifié compatible** avec les bornes `[0;9]` / `[1;10]` | évite un gate néo-rouge |
 
 > 🔧 **`G504-5` restreint aux littéraux liés à l'invariant** : un contrôle **global** des littéraux
 > `7.5`/`8.0`/`8.5` serait **rouge sur du code légitime** — **vérifié présents** :
@@ -284,7 +337,7 @@ entrée `"499"`, pointant sur **T289**).
 #### 🔴 `[v1.3]` Aggravant — **fausse couverture** si les IDs sont dupliqués
 
 `TOOLS/AGENT_WORKFLOW/scripts/G450_check_af_ci_coverage.py:119` crédite au catalogue TC les tests CI
-**trouvés par identifiant**. ⇒ Un ID **dupliqué** (ex. `TC-P10-052` déjà porté par `test_fb_safety_winch.st:617`)
+**trouvés par identifiant**. ⇒ Un ID **dupliqué** (ex. `TC-P10-056` déjà porté par `test_fb_safety_winch.st:617`)
 fait **créditer un test d'une AUTRE intention** ⇒ **fausse couverture silencieuse**, invisible à la fois
 de `G450` et de `G470` (aveugle à `tc_couvrants`, cf. §4).
 🎯 C'est la raison de fond pour laquelle la **renumérotation du bloc T330 est BLOQUANTE** (§4).
@@ -297,25 +350,27 @@ de `G450` et de `G470` (aveugle à `tc_couvrants`, cf. §4).
 > **Convention d'ID** (AC3) : `TC-P10-<NNN>`, format canonique `TC-P\d+-\d+`
 > (`extract_functions_matrix.py:34`).
 >
-> **Le bloc affiché ci-dessous (`052-088`) est CONSERVÉ POUR LA LECTURE SEULEMENT : il COLLISIONNE.**
-> Deux faits **vérifiés par l'orchestrateur** après le challenge :
-> 1. 🔴 `TC-P10-052`, `053`, `054`, `055` **existent déjà** en CI, avec **d'autres intentions** :
->    `test_fb_safety_winch.st:617` (`052` limite légale) · `:643` (`053` bypass MAINT_N2) ·
->    `:52` et `:91` (`054`/`055` T288 retour collectif) · `test_fb_winch.st:415` (`052.1`) ;
->    la **matrice** ne les listait pas ⇒ ma mesure initiale, **faite sur la seule matrice**, était **incomplète**.
+> ✅ **RENUMÉROTATION APPLIQUÉE EN v1.3 — décision CC01 du 2026-09-20** : le bloc T330 est
+> **`TC-P10-056-092`** (37 cas). ⛔ **Les tests CI `TC-P10-052`…`055` ne sont PAS touchés** (ils
+> appartiennent à **T288**).
+>
+> **Pourquoi la v1.2 était BLOQUÉE — 2 faits vérifiés par l'orchestrateur** :
+> 1. 🔴 **Collision d'IDs** : le bloc v1.2 (`052-088`) réattribuait des IDs **déjà portés** par la CI avec
+>    **d'autres intentions** — `TC-P10-052` (`test_fb_safety_winch.st:617`, limite légale) ·
+>    `TC-P10-053` (`:643`, bypass MAINT_N2) · `TC-P10-054`/`055` (`:52`, `:91`, T288 retour collectif) ·
+>    `TC-P10-052.1` (`test_fb_winch.st:415`). La **matrice** ne les listait pas ⇒ ma mesure initiale,
+>    **faite sur la seule matrice**, était **incomplète**.
 > 2. 🔴 **`G470` est AVEUGLE à `tc_couvrants`** : `quality_report` (`extract_functions_matrix.py:66-70`)
 >    n'itère que **`validation_points`**. Une déclaration en `tc_couvrants` **n'est vue par aucun gate** ⇒
->    ma « preuve d'unicité » en v1.2 était **VIDE** (et le compteur resté à `156` **était le signal**,
->    que j'ai eu tort d'expliquer au lieu de creuser).
+>    ma « preuve d'unicité » v1.2 était **VIDE** (le compteur resté à `156` **était le signal** — que j'ai
+>    eu tort d'expliquer au lieu de creuser).
+> 3. 🔴 **Fausse couverture** : `G450_check_af_ci_coverage.py:119` crédite les tests CI **par identifiant**
+>    ⇒ un ID dupliqué fait créditer **un test d'une autre intention** (cf. §3.3ter).
 >
-> **Mesure corrigée, exhaustive cette fois** — 404 fichiers scannés (`TOOLS/TEST_AUTO_CI/**`, `DOC/AF/**`,
-> matrice) : AF-10 occupe **`1-34, 36, 37, 39, 42, 44-48, 51-55`** ⇒ **premier bloc contigu libre =
-> `56+`** (bloc libre ≥ 48 : `56-599`).
+> **Plage mesurée (exhaustive)** — **404 fichiers** scannés (`TOOLS/TEST_AUTO_CI/**`, `DOC/AF/**`, matrice) :
+> AF-10 occupe **`1-34, 36, 37, 39, 42, 44-48, 51-55`** ⇒ **premier bloc contigu libre = `56+`**
+> (bloc libre ≥ 48 : `56-599`) ⇒ **`056-092` retenu**.
 >
-> ⇒ **Renumérotation cible : `TC-P10-056-…`** — ⛔ **NON APPLIQUÉE** : l'alternative (renuméroter le bloc
-> T330 **ou** renommer les 5 tests CI existants) est une **décision humaine** (les tests `052`/`053`
-> appartiennent à **T288**, pas à T330 : T330 ne doit **pas** renommer les tests d'une autre tâche).
-> **Toutes les références `052-088` du présent document sont à relire après arbitrage.**
 > ⚠️ **La déclaration devra être portée en `validation_points`** (et **non** en `tc_couvrants`) pour être
 > réellement contrôlée — idéalement **une clé par TC**, `tc_tokens()` ne rendant que le **premier** ID
 > canonique d'une clé composée ou d'une plage.
@@ -325,21 +380,22 @@ de `G450` et de `G470` (aveugle à `tc_couvrants`, cf. §4).
 
 | AC du contrat | Contenu | TC couvrants |
 |---|---|---|
-| **AC1** | Noms réels tracés producteur → route → consommateur | `TC-P10-084` (diag) + table §1/§2.1 du cadrage |
-| **AC2** | Deux règles **distinctes**, **aucune** valeur figée | `TC-P10-052`…`058` (R1/R2/R3 + bornes) + `TC-P10-086`, `TC-P10-088` |
-| **AC3** | Aucun champ neuf ; dérivés **locaux** | **`G504-4` / `G504-7`** (gate) + `TC-P10-059` (idempotence, absence de second message) |
-| **AC4** | Normalisation exacte + message + **pas de boucle** | `TC-P10-052`…`058` + `TC-P10-059`…`064` (idempotence / non-rebond) |
-| **AC5** | Montée = **3 exceptions nommées** ; **descente toujours possible** | `TC-P10-073` (descente préservée) · `TC-P10-074` (montée bloquée hors homing) · **`TC-P10-078` (exception **homing**)** · **`TC-P10-081` (exception **override N1**)** · **`TC-P10-082` (exception **bypass N2**)** |
+| **AC1** | Noms réels tracés producteur → route → consommateur | `TC-P10-088` (diag) + table §1/§2.1 du cadrage |
+| **AC2** | Deux règles **distinctes**, **aucune** valeur figée | `TC-P10-056`…`062` (R1/R2/R3 + bornes) + `TC-P10-090`, `TC-P10-092` |
+| **AC3** | Aucun champ neuf ; dérivés **locaux** | **`G504-4` / `G504-7`** (gate) + `TC-P10-063` (idempotence, absence de second message) |
+| **AC4** | Normalisation exacte + message + **pas de boucle** | `TC-P10-056`…`062` + `TC-P10-063`…`068` (idempotence / non-rebond) |
+| **AC5** | Montée = **3 exceptions nommées** ; **descente toujours possible** | `TC-P10-077` (descente préservée) · `TC-P10-078` (montée bloquée hors homing) · **`TC-P10-082` (exception **homing**)** · **`TC-P10-085` (exception **override N1**)** · **`TC-P10-086` (exception **bypass N2**)** |
 | **AC6** | `G483` AC2b **retiré**, remplacé par `G504` **sans repli muet** | `G504-1`…`G504-3` + liste exacte §3.1 |
 | **AC7** | Séquencement respecté (aucun code avant B1 ; pas de garde-fou M2 avant B2) | revue du `git diff` réel par l'orchestrateur |
 
-> 🔧 **CORRECTION v1.2 (auto-détectée avant livraison)** : cette table portait des **IDs en forme abrégée**
-> (`041`, `042`, `057`, `062`, `064`, `065`) **non renumérotés** lors du passage `035-071` → `052-088`
-> — le script de renumérotation ne traitait que la forme complète `TC-P10-0NN`. **Tous les IDs sont
-> désormais canoniques et complets.** ⚠️ **Deux incohérences sémantiques corrigées au passage** :
-> ① **AC5 omettait `TC-P10-078`**, qui est **précisément** l'exception « homing » — l'un des **3 cas
-> nommés** exigés par l'AC ; ② `TC-P10-079` (`HomingSuspect`) était rattaché à AC5 par **approximation** :
-> il est **retiré** de cette ligne (cas de robustesse, **non** une exception de montée).
+> 🔧 **CORRECTION (auto-détectée avant livraison, v1.2)** : cette table portait des **IDs en forme
+> abrégée** — historiquement `041`, `042`, `057`, `062`, `064`, `065` — **non renumérotés** lors des
+> passages successifs `035-071` → `052-088` → **`056-092`** : le script de renumérotation ne traitait que
+> la forme complète `TC-P10-0NN`. **Tous les IDs sont désormais canoniques et complets.**
+> ⚠️ **Deux incohérences sémantiques corrigées au passage** :
+> ① **AC5 omettait l'exception « homing »**, pourtant l'un des **3 cas nommés** exigés par l'AC ;
+> ② `HomingSuspect` était rattaché à AC5 par **approximation** ⇒ **retiré** de cette ligne (cas de
+> robustesse, **non** une exception de montée).
 > ⇒ **AC5 est maintenant couvert par ses 3 exceptions réelles : homing · override N1 · bypass N2.**
 
 ### 4.2 Cas de test — **oracle numérique** et **preuve**
@@ -348,80 +404,80 @@ de `G450` et de `G470` (aveugle à `tc_couvrants`, cf. §4).
 
 | TC | Entrée | **Oracle numérique** | Preuve |
 |---|---|---|---|
-| `TC-P10-052` | FDC saisi `8,70` ; TOP `8,50` | `CfgCableLimitAscent_M = 8,50 − 1,00 = 7,50` ; **TOP = 8,50 inchangé** ; message ×1 | ST : égalité exacte `7.50` |
-| `TC-P10-053` | TOP saisi `7,00` ; FDC `7,50` | `CfgTopSensorPos_M = 7,50 + 1,00 = 8,50` ; **FDC = 7,50 inchangé** ; message ×1 | ST |
-| `TC-P10-054` | FDC saisi `7,60` ; TOP `8,50` (`Δ=0,90`) | `FDC = 7,50` ; TOP inchangé | ST |
-| `TC-P10-055` | slowdown saisi `0,20` | `WinchSlowdownDistanceTop_M = 0,50` ; **autres réglages inchangés** | ST |
-| `TC-P10-056` | TOP saisi `10,00` ; FDC `7,50` (`Δ=2,50`, **valide**) | **aucune** correction, **aucun** message | ST : compteur de messages = 0 |
-| `TC-P10-057` | **Les 3** réglages changent au même scan, FDC `9,50` / TOP `8,00` / slowdown `0,10` | **Q17** : TOP **préservé** ⇒ `FDC = 8,00 − 1,00 = 7,00` ; `slowdown = 0,50` ; **TOP = 8,00** | ST : 3 assertions |
-| `TC-P10-058` | FDC saisi `0,00` ; TOP `8,50` (`Δ=8,50` **valide** mais FDC à la borne basse) | **aucune** correction (valide) ; à la borne ⇒ **accepté** | ST |
+| `TC-P10-056` | FDC saisi `8,70` ; TOP `8,50` | `CfgCableLimitAscent_M = 8,50 − 1,00 = 7,50` ; **TOP = 8,50 inchangé** ; message ×1 | ST : égalité exacte `7.50` |
+| `TC-P10-057` | TOP saisi `7,00` ; FDC `7,50` | `CfgTopSensorPos_M = 7,50 + 1,00 = 8,50` ; **FDC = 7,50 inchangé** ; message ×1 | ST |
+| `TC-P10-058` | FDC saisi `7,60` ; TOP `8,50` (`Δ=0,90`) | `FDC = 7,50` ; TOP inchangé | ST |
+| `TC-P10-059` | slowdown saisi `0,20` | `WinchSlowdownDistanceTop_M = 0,50` ; **autres réglages inchangés** | ST |
+| `TC-P10-060` | TOP saisi `10,00` ; FDC `7,50` (`Δ=2,50`, **valide**) | **aucune** correction, **aucun** message | ST : compteur de messages = 0 |
+| `TC-P10-061` | **Les 3** réglages changent au même scan, FDC `9,50` / TOP `8,00` / slowdown `0,10` | **Q17** : TOP **préservé** ⇒ `FDC = 8,00 − 1,00 = 7,00` ; `slowdown = 0,50` ; **TOP = 8,00** | ST : 3 assertions |
+| `TC-P10-062` | FDC saisi `0,00` ; TOP `8,50` (`Δ=8,50` **valide** mais FDC à la borne basse) | **aucune** correction (valide) ; à la borne ⇒ **accepté** | ST |
 
 #### B · Idempotence et non-rebond (Q24 / Q27 / C3) — 6 cas
 
 | TC | Entrée | **Oracle** | Preuve |
 |---|---|---|---|
-| `TC-P10-059` | après `TC-P10-052`, exécuter **2 scans** (exigence Q24) | scan 2 : **0 correction**, **0 message**, valeur **stable** `7,50` | ST : **le test probatoire de Q24** |
-| `TC-P10-060` | `TOP = 8,50` / `FDC = 7,50` (réserve **exactement** 1,00) | **aucune** correction — `8,50 − 7,50 = 1,00` **exact** (Sterbenz) | ST |
-| `TC-P10-061` | FDC balayé `7,4999` / `7,5000` / `7,5001` | **un seul** franchissement ; **aucune** oscillation ; seuils ±0,50 m issus d'**une seule** expression | ST scan-par-scan + G504-1 |
-| `TC-P10-062` | **Guerre d'écriture IHM** : le panneau réécrit `8,70` à chaque scan | ⚠️ **LIMITE DU LOT (C3)** — **non couvert** en P2. Comportement attendu **non spécifié** : à **tracer**, pas à valider | ⛔ **aucun test** — déclaré comme limite |
-| `TC-P10-063` | valeur **identique** re-saisie (`8,50` → `8,50`) | **aucun front** ⇒ **aucune** correction, **aucun** message | ST |
-| `TC-P10-064` | changement de **page IHM** sans modification | **aucune** correction | ST |
+| `TC-P10-063` | après `TC-P10-056`, exécuter **2 scans** (exigence Q24) | scan 2 : **0 correction**, **0 message**, valeur **stable** `7,50` | ST : **le test probatoire de Q24** |
+| `TC-P10-064` | `TOP = 8,50` / `FDC = 7,50` (réserve **exactement** 1,00) | **aucune** correction — `8,50 − 7,50 = 1,00` **exact** (Sterbenz) | ST |
+| `TC-P10-065` | FDC balayé `7,4999` / `7,5000` / `7,5001` | **un seul** franchissement ; **aucune** oscillation ; seuils ±0,50 m issus d'**une seule** expression | ST scan-par-scan + G504-1 |
+| `TC-P10-066` | **Guerre d'écriture IHM** : le panneau réécrit `8,70` à chaque scan | ⚠️ **LIMITE DU LOT (C3)** — **non couvert** en P2. Comportement attendu **non spécifié** : à **tracer**, pas à valider | ⛔ **aucun test** — déclaré comme limite |
+| `TC-P10-067` | valeur **identique** re-saisie (`8,50` → `8,50`) | **aucun front** ⇒ **aucune** correction, **aucun** message | ST |
+| `TC-P10-068` | changement de **page IHM** sans modification | **aucune** correction | ST |
 
 #### C · Boot, restauration, hot restart — 6 cas
 
 | TC | Entrée | **Oracle** | Preuve |
 |---|---|---|---|
-| `TC-P10-065` | NVRAM **valide** (`8,50` / `7,50` / `0,50`), démarrage à froid | **0 correction**, **0 message**, valeurs **préservées** | ST |
-| `TC-P10-066` | NVRAM **invalide** (`TOP=7,00` / `FDC=7,50`), démarrage à froid | **Q17** : `FDC = 7,00 − 1,00 = 6,00` ; **TOP = 7,00 préservé** ; NVRAM **non corrompue** | ST |
-| `TC-P10-067` | **1ᵉʳ scan**, `Hmi.Initialized = FALSE` | normalisation **INHIBÉE** (critère **significatif** en amont des ponts) ; **aucune** écriture NVRAM | ST |
-| `TC-P10-068` | `ConfigRestoredFromPersistent` **et** normalisation au **même boot** | **un seul** message (pas de doublon) | ST : compteur = 1 |
-| `TC-P10-069` | `BtnAckConfigRestored` actionné **pendant** une correction | **aucune** interférence (l'acquittement n'écrit **aucun** `Cfg`) | ST |
-| `TC-P10-070` | **RTS / download** (`GVL_IHM` **non RETAIN**) | comportement **déterministe** ; **aucune** correction fantôme | ST |
+| `TC-P10-069` | NVRAM **valide** (`8,50` / `7,50` / `0,50`), démarrage à froid | **0 correction**, **0 message**, valeurs **préservées** | ST |
+| `TC-P10-070` | NVRAM **invalide** (`TOP=7,00` / `FDC=7,50`), démarrage à froid | **Q17** : `FDC = 7,00 − 1,00 = 6,00` ; **TOP = 7,00 préservé** ; NVRAM **non corrompue** | ST |
+| `TC-P10-071` | **1ᵉʳ scan**, `Hmi.Initialized = FALSE` | normalisation **INHIBÉE** (critère **significatif** en amont des ponts) ; **aucune** écriture NVRAM | ST |
+| `TC-P10-072` | `ConfigRestoredFromPersistent` **et** normalisation au **même boot** | **un seul** message (pas de doublon) | ST : compteur = 1 |
+| `TC-P10-073` | `BtnAckConfigRestored` actionné **pendant** une correction | **aucune** interférence (l'acquittement n'écrit **aucun** `Cfg`) | ST |
+| `TC-P10-074` | **RTS / download** (`GVL_IHM` **non RETAIN**) | comportement **déterministe** ; **aucune** correction fantôme | ST |
 
 #### D · Miroir M2 et non-régression — 7 cas
 
 | TC | Entrée | **Oracle** | Preuve |
 |---|---|---|---|
-| `TC-P10-071` | correction du TOP M1 (`TC-P10-053`) | `GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M = 8,50` **dès le 1ᵉʳ scan** | ST |
-| `TC-P10-072` | idem | `_WinchM1CfgPersist == _WinchM2CfgPersist` — **aucune divergence**, même sur 1 scan | ST : égalité à chaque scan |
-| `TC-P10-073` | config invalide + demande de **descente** | ✅ `DescendPermit = TRUE` — **jamais** gaté par la validité | ST |
-| `TC-P10-074` | config invalide + **montée** hors homing | montée **bloquée** par le FDC ; **descente possible** | ST |
-| `TC-P10-075` | **montée EN COURS** pendant la correction | pendant **tout** le cycle : `TopLimitM1_M` **jamais au-dessus** de la référence → `AscentPermit` cohérent, **aucune** sortie non sûre | ST + **le vrai test probatoire de Q19** |
-| `TC-P10-076` | machine **non référencée** (`Homed=FALSE`) + correction | FDC logiciel **inerte** (attendu), plafond palier 1 appliqué | ST |
-| `TC-P10-077` | machine **référencée** + R2 déclenchée | **Q22/C2** : correction **différée** si `InReferencingMode` ; sinon appliquée **avec message** | ST |
+| `TC-P10-075` | correction du TOP M1 (`TC-P10-057`) | `GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M = 8,50` **dès le 1ᵉʳ scan** | ST |
+| `TC-P10-076` | idem | `_WinchM1CfgPersist == _WinchM2CfgPersist` — **aucune divergence**, même sur 1 scan | ST : égalité à chaque scan |
+| `TC-P10-077` | config invalide + demande de **descente** | ✅ `DescendPermit = TRUE` — **jamais** gaté par la validité | ST |
+| `TC-P10-078` | config invalide + **montée** hors homing | montée **bloquée** par le FDC ; **descente possible** | ST |
+| `TC-P10-079` | **montée EN COURS** pendant la correction | pendant **tout** le cycle : `TopLimitM1_M` **jamais au-dessus** de la référence → `AscentPermit` cohérent, **aucune** sortie non sûre | ST + **le vrai test probatoire de Q19** |
+| `TC-P10-080` | machine **non référencée** (`Homed=FALSE`) + correction | FDC logiciel **inerte** (attendu), plafond palier 1 appliqué | ST |
+| `TC-P10-081` | machine **référencée** + R2 déclenchée | **Q22/C2** : correction **différée** si `InReferencingMode` ; sinon appliquée **avec message** | ST |
 
 #### E · Modes, homing, domaines — 11 cas
 
 | TC | Entrée | **Oracle** | Preuve |
 |---|---|---|---|
-| `TC-P10-078` | **homing en cours** (`InHomingT330 = TRUE`, cf. §2.7bis) + TOP saisi `7,00` avec FDC `7,50` | ① **pendant** : `CfgTopSensorPos_M` reste **`7,00` INCHANGÉ** (R2 **inhibée**), `R2PendingTopCorrection = TRUE`, message « **correction différée** » ; ② **à la sortie** du homing : `CfgTopSensorPos_M = 7,50 + 1,00 = 8,50`, latch **désarmé**, message **nominal** **une seule fois** ; ③ **scan suivant** : **aucune** seconde correction (idempotence) ; ④ **variante** — si l'opérateur corrige lui-même à `8,50` **avant** la sortie, le latch est **désarmé** par cohérence ⇒ **aucune** correction, **aucun** message | ST — **LE test probatoire de Q22/C2** : couvre **inhibition ET application différée** (§2.7bis piège 2) |
-| `TC-P10-079` | `HomingSuspect = TRUE` + FDC saisi trop haut | R1 **active** (jamais inhibée) ⇒ `FDC = TOP − 1,00` | ST |
-| `TC-P10-080` | `BtnHomingAtZero` + correction | cible forcée `0,0` **respectée**, non écrasée | ST |
-| `TC-P10-081` | **override N1 actif** pendant la correction | `TopLimitM1_M` reflète **immédiatement** la valeur corrigée | ST |
-| `TC-P10-082` | **bypass N2 actif** pendant la correction | idem — `TopLimitM` relevé **cohérent** | ST |
-| `TC-P10-083` | `ManualBucketJogActive` + correction | exemption jog (`PRG_04:888-891`) **préservée** | ST |
-| `TC-P10-084` | après correction | `Idx321_CfgTopLimitM` **cohérent** (⚠️ diag **trompeur** sous override — cadrage §6.3, **signalé**) | ST |
-| `TC-P10-085` | cycle **SEMI_AUTO** après correction | `CycleWinchesAtTopOk` (`PRG_03:161-168`, fenêtre ±0,4 m autour du FDC **corrigé**) **atteignable** | ST |
-| `TC-P10-086` | `FDC = 0,00` / `FDC = −1,00` | **Q21** : `0,00` **accepté** (Δ=8,50 valide) ; `−1,00` ⇒ **rejeté/normalisé** selon arbitrage **Q21** | ST |
-| `TC-P10-087` | valeur **absurde** `±150 m` | **rejetée** par les bornes ; **R2 ne produit jamais** `TOP > 99` ⇒ `TargetOutOfRangeError` **non atteint** | ST |
-| `TC-P10-088` | `TOP = 10,00` et `FDC` saisi `10,00` | FDC **hors borne** (`max 9,00`) ⇒ **R1** : `FDC = 10,00 − 1,00 = 9,00` ✅ **à la borne** — **la démonstration C1** | ST |
+| `TC-P10-082` | **homing en cours** (`InHomingT330 = TRUE`, cf. §2.7bis) + TOP saisi `7,00` avec FDC `7,50` | ① **pendant** : `CfgTopSensorPos_M` reste **`7,00` INCHANGÉ** (R2 **inhibée**) et **aucune écriture NVRAM** (gel, §2.7bis **b**) ; message « **correction différée** » ; ② **à la sortie** du homing : la config est **toujours invalide** ⇒ **repli NIVEAU** = règle **Q17** (préserver le TOP, corriger le FDC) ⇒ `FDC := 7,00 − 1,00 = 6,00`, **TOP reste 7,00**, message **nominal** **une seule fois** ; ③ **scan suivant** : **aucune** seconde correction (idempotence) ; ④ **variante (c)** — **coupure pendant le homing** : l'intention est **PERDUE** ; au redémarrage, la NVRAM restaurée est invalide ⇒ **normalisation Q2 normale** + message (**rien** de spécifique mémorisé) | ST — **LE test probatoire de Q22/C2** : inhibition **+ gel NVRAM + repli niveau + non-mémorisation** |
+| `TC-P10-083` | `HomingSuspect = TRUE` + FDC saisi trop haut | R1 **active** (jamais inhibée) ⇒ `FDC = TOP − 1,00` | ST |
+| `TC-P10-084` | `BtnHomingAtZero` + correction | cible forcée `0,0` **respectée**, non écrasée | ST |
+| `TC-P10-085` | **override N1 actif** pendant la correction | `TopLimitM1_M` reflète **immédiatement** la valeur corrigée | ST |
+| `TC-P10-086` | **bypass N2 actif** pendant la correction | idem — `TopLimitM` relevé **cohérent** | ST |
+| `TC-P10-087` | `ManualBucketJogActive` + correction | exemption jog (`PRG_04:888-891`) **préservée** | ST |
+| `TC-P10-088` | après correction | `Idx321_CfgTopLimitM` **cohérent** (⚠️ diag **trompeur** sous override — cadrage §6.3, **signalé**) | ST |
+| `TC-P10-089` | cycle **SEMI_AUTO** après correction | `CycleWinchesAtTopOk` (`PRG_03:161-168`, fenêtre ±0,4 m autour du FDC **corrigé**) **atteignable** | ST |
+| `TC-P10-090` | `FDC = 0,00` / `FDC = −1,00` / `TOP = 0,50` | **R0 (Q21 bis)** : `0,00` **reste `0,00`** (à la borne) ; `−1,00` ⇒ **clampé à `0,00`** + message ; `TOP = 0,50` ⇒ **clampé à `1,00`** + message. **Aucune valeur hors domaine ne subsiste** | ST |
+| `TC-P10-091` | ① 🔴 **`FDC = 9,50` + `TOP = 12,00`** (⇒ `Δ = 2,50 ≥ 1,00`) — **LE cas Q21 bis** ⇒ **R0 s'applique SEUL** (aucune règle Δ ne se déclenche) ⇒ `FDC := 9,00`, `TOP := 10,00`, **message non alarmant**. ② **Variante domaines absurdes** : `FDC = −150,00` / `TOP = 150,00` ⇒ **R0** clampe ⇒ `0,00` / `10,00` ⇒ `TargetOutOfRangeError` (`FB_Encoder_Homing.st:226`) **NON atteint** (la cible de homing est bornée **avant** d'y arriver — oracle **corrigé** : la v1.2 affirmait à tort que `TOP = 150` passait les bornes) | ST — **le test probatoire de Q21 bis** |
+| `TC-P10-092` | `TOP` clampé à `10,00` et `FDC` saisi `10,00` | **R0** : `FDC := 9,00` (borne) ; puis `Δ = 10,00 − 9,00 = 1,00` ✅ **valide** ⇒ **aucune** correction supplémentaire — **la démonstration C1** | ST |
 
 ### 4.3 Récapitulatif du bloc TC
 
 | Groupe | TC | Nombre | Fonction AF |
 |---|---|---|---|
-A · Normalisation | `TC-P10-052`…`058` | 7 | `F10.02` |
-B · Idempotence | `TC-P10-059`…`064` | 6 | `F10.02` |
-C · Boot | `TC-P10-065`…`070` | 6 | `F10.02` |
-D · Miroir / non-régression | `TC-P10-071`…`077` | 7 | `F10.02` |
-E · Modes / domaines | `TC-P10-078`…`088` | 11 | `F10.02` |
-| **TOTAL** | **`TC-P10-069-088`** | **37** | **`F10.02`** — `FB_Safety_Winch` |
+A · Normalisation | `TC-P10-056`…`062` | 7 | `F10.02` |
+B · Idempotence | `TC-P10-063`…`068` | 6 | `F10.02` |
+C · Boot | `TC-P10-069`…`074` | 6 | `F10.02` |
+D · Miroir / non-régression | `TC-P10-075`…`081` | 7 | `F10.02` |
+E · Modes / domaines | `TC-P10-082`…`092` | 11 | `F10.02` |
+| **TOTAL** | **`TC-P10-073-088`** | **37** | **`F10.02`** — `FB_Safety_Winch` |
 
-> ⚠️ **Déclaration CENTRALISÉE sous `F10.02` — choix délibéré.** Les cas `TC-P10-073` (descente préservée)
-> et `TC-P10-081`/`TC-P10-082` (override/bypass) touchent fonctionnellement `F10.01` (`FB_Winch`), **mais** déclarer le
-> bloc en **deux endroits** ferait **recouvrir** la plage `TC-P10-069-088` de `F10.02` par des clés
+> ⚠️ **Déclaration CENTRALISÉE sous `F10.02` — choix délibéré.** Les cas `TC-P10-077` (descente préservée)
+> et `TC-P10-085`/`TC-P10-086` (override/bypass) touchent fonctionnellement `F10.01` (`FB_Winch`), **mais** déclarer le
+> bloc en **deux endroits** ferait **recouvrir** la plage `TC-P10-073-088` de `F10.02` par des clés
 > simples de `F10.01` ⇒ **`G470` signalerait un « overlap »**. ⇒ Une **seule** entrée
-> `- TC-P10-069-088` dans `F10.02`, **sans recouvrement** avec `TC-P10-001-010`.
+> `- TC-P10-073-088` dans `F10.02`, **sans recouvrement** avec `TC-P10-001-010`.
 
 > ⚠️ **Signalement (devoir d'alerte)** : la **normalisation** vit dans `PRG_07_Supervision`, dont le
 > domaine logique est **AF-07 (Interface IHM)** — or **`AF-07` ne déclare AUCUNE fonction dans
@@ -454,10 +510,10 @@ E · Modes / domaines | `TC-P10-078`…`088` | 11 | `F10.02` |
 | **Q17, Q21, Q22, Q23, Q24, Q27, Q18, Q28** | Arbitrages | ✅ **TOUS FERMÉS** (§1) |
 | **C1, C2, C3** | Challenges orchestrateur | ✅ **TOUS REPRIS ET ACCEPTÉS** |
 | **T291-B B1** | Maintien | ✅ **LEVÉ** |
-| **Q13** | Réaction pendant un homing | ✅ **résolu par (a)** : R2 inhibée pendant `InReferencingMode` (`TC-P10-078`) |
+| **Q13** | Réaction pendant un homing | ✅ **résolu par (a)** : R2 inhibée pendant `InReferencingMode` (`TC-P10-082`) |
 | **Q11** | `Bypass.TopLimitSwitch` tous modes ⇒ `G483` rouge (AC1) | 🔴 **ouvert** — **indépendant de T330** ; bloque la suite « fin de lot » |
 | **Q12** | Guerre d'écriture IHM | 🟠 **tracé comme LIMITE du lot** (C3) — **non couvert**, **pas de test IHM en P2** |
-| **Q5** | `CfgTopSensorPos_M` modifié sur machine **déjà référencée** (valeur **valide**, `TC-P10-056`) : datum **non re-preseté** | 🔴 **ouvert** — **hors du champ de la normalisation** (sûreté complète) |
+| **Q5** | `CfgTopSensorPos_M` modifié sur machine **déjà référencée** (valeur **valide**, `TC-P10-060`) : datum **non re-preseté** | 🔴 **ouvert** — **hors du champ de la normalisation** (sûreté complète) |
 | **Q18** | Bande `0,50 m` non adossée à une mesure | 🟠 **accepté** — mesure en **P5** |
 | **T255-D** | Livraison | 🔴 **bloque P2/P3** (même `PRG_07`) |
 
@@ -526,7 +582,7 @@ python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C --pytest --full-
 
 - **Cadrage** : `DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T330_INVARIANT_HAUT_v1.0.md` (§0bis décisions, §0ter pièges, §11bis périmètre exclu)
 - **Contrat** : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T330_HOMING_TOP_SOFT_LIMIT_INVARIANT.yaml` (AC1→AC7)
-- **Matrice** : `TOOLS/AGENT_WORKFLOW/config/af_traceability_matrix.yaml` — `F10.01`/`F10.02`, `TC-P10-069-088`
+- **Matrice** : `TOOLS/AGENT_WORKFLOW/config/af_traceability_matrix.yaml` — `F10.01`/`F10.02`, `TC-P10-073-088`
 - **Audit v1.0** : sous-agent `34229875` (`BLOCK`, 11 erreurs → journal §11)
 - **Checkpoints** : `agent_heartbeat.py` session **`T330-P1P2`**, agent **`DSH01`**
 - **Verrou** : 🔒 `T330 = DSH01`
@@ -551,10 +607,10 @@ de la matrice · libellé de phase **faux**.
 | Action | Détail |
 |---|---|
 | **Q17→Q28** | **toutes fermées** et **tracées avec leur source** (§1) |
-| **C1** | borne **`FDC ≤ 9,00 m`** (démonstration : `FDC ≤ TOP − 1` et `TOP ≤ 10`) — borne **corrigée** dans le plan **et** vérifiée pour **R2** (§1, `TC-P10-088`) |
-| **C2** | **R2 inhibée** pendant `InReferencingMode` ; **R1/R3 jamais** (§1, `TC-P10-078`) |
-| **C3** | guerre d'écriture **tracée comme limite** ; **pas de test IHM en P2** (`TC-P10-062` **déclaré non couvert**) |
-| **IDs** | `TC-P10-069-088` (bloc contigu, **sans recouvrement** avec `001-034`) |
+| **C1** | borne **`FDC ≤ 9,00 m`** (démonstration : `FDC ≤ TOP − 1` et `TOP ≤ 10`) — borne **corrigée** dans le plan **et** vérifiée pour **R2** (§1, `TC-P10-092`) |
+| **C2** | **R2 inhibée** pendant `InReferencingMode` ; **R1/R3 jamais** (§1, `TC-P10-082`) |
+| **C3** | guerre d'écriture **tracée comme limite** ; **pas de test IHM en P2** (`TC-P10-066` **déclaré non couvert**) |
+| **IDs** | `TC-P10-073-088` (bloc contigu, **sans recouvrement** avec `001-034`) |
 | **Matrice** | `AC ↔ TC ↔ oracle ↔ preuve` **figée** (§4) ; **37 cas** |
 | **Signalement** | **AF-07 sans aucune fonction** dans la matrice ⇒ TC rattachés à AF-10 (§4.3) |
 | **Périmètre** | restriction **réconciliée explicitement** (§7.1) |
@@ -563,22 +619,22 @@ de la matrice · libellé de phase **faux**.
 
 | Motif | Fait **vérifié par l'orchestrateur** | État |
 |---|---|---|
-| **M1 — collision d'IDs** | `TC-P10-052`…`055` **existent en CI** (`test_fb_safety_winch.st:617,643,52,91` · `test_fb_winch.st:415`) ; ma mesure portait **sur la seule matrice** | 🔴 **confirmé** — renumérotation vers `056+` **en attente d'arbitrage** (§4) |
+| **M1 — collision d'IDs** | le bloc **v1.2** `TC-P10-052`…`055` **était déjà porté** par la CI (`test_fb_safety_winch.st:617,643,52,91` · `test_fb_winch.st:415`) ; ma mesure portait **sur la seule matrice** | ✅ **RÉSOLU en v1.3** — renuméroté en **`056-092`** (CC01, 2026-09-20) ; tests CI `052-055` **intacts** |
 | **M2 — preuve d'unicité VIDE** | `quality_report` (`extract_functions_matrix.py:66-70`) n'itère que **`validation_points`** ⇒ déclarer en **`tc_couvrants`** est **invisible à `G470`** | 🔴 **confirmé** — **ma preuve AC3 était vacue** ; le compteur figé à `156` était le signal |
 
 **Corrections appliquées** : §2.4 justification **Sterbenz rectifiée** (le rapport `TOP/FDC` peut atteindre
 **10**, Sterbenz ne s'applique pas partout → conclusion conservée sur **cas calculés**) · référence
-`subagent_preamble.md` **44 → 56** · §4.3 plages **corrigées** (`052…058`, `059…064`, `065…070`,
-`071…077`, `078…088`) · §4.1 **AC5 recâblé** sur ses **3 exceptions réelles** (`078` homing, `081`
-override N1, `082` bypass N2) · IDs en forme abrégée **tous recanonisés** · **matrice RESTAURÉE** à son
-état `HEAD` (aucun état faux laissé dans un fichier lu par la CI).
+`subagent_preamble.md` **44 → 56** · §4.3 plages **corrigées** (v1.2 : `052…058`, `059…064`, `065…070`,
+`071…077`, `078…088` ; **v1.3 : `056…062`, `063…068`, `069…074`, `075…081`, `082…092`**) · §4.1 **AC5
+recâblé** sur ses **3 exceptions réelles** (homing, override N1, bypass N2) · IDs en forme abrégée **tous
+recanonisés** · **matrice RESTAURÉE** à son état `HEAD` (aucun état faux laissé dans un fichier lu par la CI).
 
-**Items NON corrigés — décisions humaines requises** (repris du challenge) :
-1. **Renuméroter** le bloc T330 (`056+`) **ou** renommer les tests CI `052-055` (qui appartiennent à **T288**).
+**Items RÉSOLUS en v1.3** (arbitrages CC01 du 2026-09-20) :
+1. ✅ **Renumérotation** → `TC-P10-056-092` ; tests CI `052-055` (**T288**) **non touchés**.
 2. **C2** : signal de gating = **cycle de homing** (et non `HomingLifecycle.Busy` ~50 ms) — §2.7bis piège 1 ;
    **gel de la NVRAM** pendant l'inhibition ; sort de l'**intention volatile** (coupure pendant le homing).
 3. **Q21** : **aucune règle n'applique les bornes** aujourd'hui (contre-exemples du challenge : `FDC=10` +
-   `TOP` modifié à `5,00` ⇒ `TOP := 11,00` **hors borne**) ⇒ `086`/`087`/`088` **non décidables**.
+   `TOP` modifié à `5,00` ⇒ `TOP := 11,00` **hors borne**) ⇒ `090`/`091`/`092` **non décidables**.
 4. **Q3** : réécrire avec sa **preuve** (balayage `7,999 / 8,000 / 8,001`) ou l'abandonner explicitement —
    aucun TC ne couvre les seuils ±0,50 m.
 5. **Contrat** : ids `TC-P10-T330-*` (hors convention) et « idempotence sur **3** scans » vs Q24 (**2** scans).

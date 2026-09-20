@@ -1,4 +1,7 @@
-# DSH01_T255D_FDC_BAS — reproduction exploratoire (hors CI officiel)
+# DSH05_T255D_FDC_BAS — reproduction exploratoire (hors CI officiel)
+
+> 🏷️ Agent **DSH05** (session T255-D). Dossier renommé le 2026-09-20 : l'ancien tag `DSH01` était en
+> **collision** (4 sessions distinctes — cf. `TASK_LOCKS.json`, `updated_at 2026-09-20T15:55`).
 
 But : **reproduire par exécution** le symptôme T255-D — voyant `AnyFault` allumé, bandeau muet — à
 l'arrivée d'un treuil (M1 puis M2) sur la **butte logicielle basse câble**, **trancher la sémantique de la
@@ -9,7 +12,7 @@ principal. Le runner est lancé avec un **registre éphémère hors dépôt** (v
 fichier officiel n'est modifié. Ils sont **jetables** (skill `troubleshooting` §4ter).
 
 ```text
-DSH01_T255D_FDC_BAS/
+DSH05_T255D_FDC_BAS/
 ├── README.md
 ├── tests/
 │   ├── run.py                             # registre éphémère, 4 cas (--case)

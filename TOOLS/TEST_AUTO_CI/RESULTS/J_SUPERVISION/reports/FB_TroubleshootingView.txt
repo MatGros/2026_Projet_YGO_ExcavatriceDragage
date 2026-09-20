@@ -1,0 +1,78 @@
+Error compiling source files:
+
+GVL_Troubleshooting.st:10:5: error: Symbol 'A_CONTEXTEMACHINEGLOBAL' already defined in scope 'global'
+  10 |     A_ContexteMachineGlobal : ST_ChainContextGlobal; // 🌐 0. Contexte Global Machine (Mode, Simu, Commande, Bypass)
+     |     ^
+
+GVL_Troubleshooting.st:11:5: error: Symbol 'B_INPUTS' already defined in scope 'global'
+  11 |     B_Inputs                : ST_HardwareImage;     // 📥 1. Image complète des entrées réelles / qualifiées / simulées
+     |     ^
+
+GVL_Troubleshooting.st:12:5: error: Symbol 'C_SAFETY' already defined in scope 'global'
+  12 |     C_Safety                : ST_SafetyChecklist;   // 🛡️ 2. Diagnostic chronologique Chaîne de Sécurité & Réarmement AU
+     |     ^
+
+GVL_Troubleshooting.st:13:5: error: Symbol 'D_JOYSTICK' already defined in scope 'global'
+  13 |     D_Joystick              : ST_JoystickChecklist; // 🕹️ 3. Diagnostic chronologique Bus CANopen & Homme-Mort Joystick
+     |     ^
+
+GVL_Troubleshooting.st:14:5: error: Symbol 'E_HOMINGM1' already defined in scope 'global'
+  14 |     E_HomingM1              : ST_HomingChecklist;   // 🎯 4. Diagnostic chronologique Homing M1 (Treuil Retenue)
+     |     ^
+
+GVL_Troubleshooting.st:15:5: error: Symbol 'F_HOMINGM2' already defined in scope 'global'
+  15 |     F_HomingM2              : ST_HomingChecklist;   // 🎯 5. Diagnostic chronologique Homing M2 (Treuil Benne)
+     |     ^
+
+GVL_Troubleshooting.st:16:5: error: Symbol 'G_CYCLESEMIAUTO' already defined in scope 'global'
+  16 |     G_CycleSemiAuto         : ST_ChainCycleSemiAuto;  // 🔄 6. Séquenceur de Cycle Semi-Automatique (X0 à X13)
+     |     ^
+
+GVL_Troubleshooting.st:17:5: error: Symbol 'H_LEVAGESYNCHRONISEM1M2' already defined in scope 'global'
+  17 |     H_LevageSynchroniseM1M2 : ST_ChainWinchSync;     // 🛗 7. Levage Synchronisé M1+M2 (Mode Couplé Nominal)
+     |     ^
+
+GVL_Troubleshooting.st:18:5: error: Symbol 'I_LEVAGEUNITAIREM1' already defined in scope 'global'
+  18 |     I_LevageUnitaireM1      : ST_ChainWinch;         // 🛗 8. Levage Unitaire M1 (Treuil Retenue)
+     |     ^
+
+GVL_Troubleshooting.st:19:5: error: Symbol 'J_LEVAGEUNITAIREM2' already defined in scope 'global'
+  19 |     J_LevageUnitaireM2      : ST_ChainWinch;         // 🛗 9. Levage Unitaire M2 (Treuil Benne)
+     |     ^
+
+GVL_Troubleshooting.st:20:5: error: Symbol 'K_BENNEOUVERTUREFERMETURE' already defined in scope 'global'
+  20 |     K_BenneOuvertureFermeture: ST_ChainBucket;        // 🪣 10. Ouverture / Fermeture Benne
+     |     ^
+
+GVL_Troubleshooting.st:21:5: error: Symbol 'L_TRANSLATIONPONTM3' already defined in scope 'global'
+  21 |     L_TranslationPontM3     : ST_ChainTranslation;   // ↔️ 11. Translation Pont M3 (Variateur AC600)
+     |     ^
+
+GVL_Troubleshooting.st:23:5: error: Symbol 'N_MOTIONM1' already defined in scope 'global'
+  23 |     N_MotionM1              : ST_MotionChecklist;   // ⚙️ 13. Diagnostic chronologique Mouvement M1 (Treuil Retenue)
+     |     ^
+
+GVL_Troubleshooting.st:24:5: error: Symbol 'O_MOTIONM2' already defined in scope 'global'
+  24 |     O_MotionM2              : ST_MotionChecklist;   // ⚙️ 14. Diagnostic chronologique Mouvement M2 (Treuil Benne)
+     |     ^
+
+GVL_Troubleshooting.st:25:5: error: Symbol 'P_MOTIONM3' already defined in scope 'global'
+  25 |     P_MotionM3              : ST_MotionChecklist;   // ⚙️ 15. Diagnostic chronologique Mouvement M3 (Translation)
+     |     ^
+
+GVL_Troubleshooting.st:28:5: error: Symbol 'Q_TRACEWINCHM1' already defined in scope 'global'
+  28 |     Q_TraceWinchM1          : ST_TraceWinch;        // 🕵️ 16. Trace blocage treuil M1 (cause priorisée + horodatage)
+     |     ^
+
+GVL_Troubleshooting.st:29:5: error: Symbol 'R_TRACEWINCHM2' already defined in scope 'global'
+  29 |     R_TraceWinchM2          : ST_TraceWinch;        // 🕵️ 17. Trace blocage treuil M2 (cause priorisée + horodatage)
+     |     ^
+
+GVL_Troubleshooting.st:30:5: error: Symbol 'S_TRACETRANSLATION' already defined in scope 'global'
+  30 |     S_TraceTranslation      : ST_TraceTranslation;  // ↔️ 18. Trace blocage translation M3 (cause priorisée + horodatage)
+     |     ^
+
+GVL_Troubleshooting.st:31:5: error: Symbol 'T_PERMITS' already defined in scope 'global'
+  31 |     T_Permits : ST_PermitVisibilityHMI; // Vue unique IHM/terrain des permis canoniques
+     |     ^
+
