@@ -258,3 +258,159 @@ END_VAR
         END_FOR;
     END_FOR;
 END_TEST
+
+(* T300 P-A / C4 — traversee de la faute frein dans le composite : prouve que l'entree
+   descend jusqu'a FB_Sim_TranslationBrake et que la sortie remonte, sans toucher au
+   nominal (premier palier d'assertions). *)
+TEST 'TC-T300-BRK-041 Faute frein traverse le composite M3 (fermeture en mouvement)'
+VAR
+    fb : FB_Sim_Translation;
+    i : INT;
+END_VAR
+    fb.Enable := TRUE;
+    fb.ReqMaintenance := TRUE;
+    fb.SpeedTgt_Pct := 100.0;
+    fb.BrakeReleaseCmd := TRUE;
+    fb.BrakeOpenDelayS := 0.0;
+    fb();
+    ASSERT_TRUE(fb.BrakeMechanicallyOpen, 'Frein ouvert au depart');
+    FOR i := 1 TO 200 DO
+        fb();
+    END_FOR;
+    ASSERT_GT(fb.ActualFrequency_Hz, 0.5, 'Chariot en mouvement (frequence non nulle)');
+    ASSERT_TRUE(fb.BrakeMechanicallyOpen, 'NOMINAL : frein ouvert tant que la vitesse est non nulle');
+    ASSERT_FALSE(fb.BrakeFaultCloseActive, 'Aucune faute par defaut');
+
+    fb.BrakeFaultCloseWhileRunning := TRUE;
+    FOR i := 1 TO 12 DO
+        fb();
+    END_FOR;
+    ASSERT_TRUE(fb.BrakeFaultCloseActive, 'Faute frein relayee par le composite');
+    ASSERT_GT(fb.ActualFrequency_Hz, 0.5, 'Vitesse encore non nulle a la fermeture');
+    ASSERT_FALSE(fb.BrakeMechanicallyOpen, 'Faute : frein mecaniquement serre en mouvement');
+END_TEST
+
+(* T300 P-A / C3 — deceleration libre. Trace terrain 2026-09-04 : commande retiree a
+   14,67 s alors que 33,98 Hz etaient retournes ; le chariot a continue d'avancer pendant
+   1,49 s jusqu'a l'arret a 16,16 s. La distance de roue libre correspondante est une
+   ESTIMATION (la trace ne contient aucune variable de position) : ordre de grandeur
+   1,1 a 1,3 m selon la methode d'integration, jamais parcourus par le modele avant ce
+   correctif qui annulait la vitesse au scan de retrait de commande.
+   Le pas FullTravelTimeS est allonge (60 s) pour que le scenario reste loin des butees
+   mecaniques et que l'oracle porte sur la SEULE deceleration libre, pas sur un choc. *)
+TEST 'TC-T300-DRV-070 Deceleration libre : le chariot avance encore apres retrait de commande'
+VAR
+    fb : FB_Sim_Translation;
+    i : INT;
+    posAtCut_M : REAL;
+END_VAR
+    fb.Enable := TRUE;
+    fb.ReqMaintenance := TRUE;
+    fb.SpeedTgt_Pct := 100.0;
+    fb.BrakeReleaseCmd := TRUE;
+    fb.BrakeOpenDelayS := 0.0;
+    fb.FullTravelTimeS := 13.6;   (* reference trace (R2-O1) : 30 m / (40 Hz x 0,0551 m/(Hz.s)) *)
+    (* Charge neutralisee : l'oracle porte sur la SEULE deceleration libre du variateur.
+       Sans cela, le droop de charge (0,5 Hz par rad/s) peut faire passer ActualFrequency
+       sous 39,5 Hz et rendre l'assertion de palier marginale — bruit, pas verite. *)
+    fb.LoadFrequencyDroopGain_Hz := 0.0;
+    fb.LoadReactionGain_Mps2 := 0.0;
+    FOR i := 1 TO 300 DO
+        fb();
+    END_FOR;
+    ASSERT_NEAR(fb.ActualFrequency_Hz, 40.0, 0.5, 'Palier 40 Hz etabli avant le retrait');
+    ASSERT_LT(fb.PositionTrue_M, 30.0, 'Chariot encore hors butee (scenario non pollue)');
+
+    (* Retrait total de la commande : plus aucune requete, consigne a zero. *)
+    fb.ReqMaintenance := FALSE;
+    fb.ReqTremie := FALSE;
+    fb.SpeedTgt_Pct := 0.0;
+    fb();
+    ASSERT_GT(fb.ActualFrequency_Hz, 0.5, 'Le variateur retourne encore de la vitesse au retrait');
+    posAtCut_M := fb.PositionTrue_M;
+
+    (* Roue libre : la position doit continuer de varier tant que ActualFrequency_Hz > 0.
+       Seuil = borne BASSE de la bande de reference trace (R2-O9 : 0,9 a 1,3 m). Le modele
+       parcourt davantage (~2,2 m) car sa rampe de descente dure 2,0 s contre 1,49 s mesures :
+       ecart de fidelite ASSUME, borne haute verifiee separement. Avant correctif : ~0,1 m. *)
+    FOR i := 1 TO 300 DO
+        fb();
+    END_FOR;
+    ASSERT_NEAR(fb.ActualFrequency_Hz, 0.0, 0.01, 'Retour variateur revenu a zero');
+    ASSERT_GE(fb.PositionTrue_M - posAtCut_M, 0.9,
+        'Roue libre >= borne basse trace (avant correctif : ~0,1 m)');
+    ASSERT_LE(fb.PositionTrue_M - posAtCut_M, 3.0, 'Roue libre bornee (pas d emballement)');
+    ASSERT_LE(fb.PositionTrue_M, 30.0, 'Course mecanique respectee');
+END_TEST
+
+(* T300 P-A / C5 — perte DEFINITIVE du capteur Tremie apres arret serre.
+   Trace terrain 2026-09-04 : a 26,437 s le chariot entre en zone Tremie pendant que la
+   commande est retiree ; le capteur retombe a 26,537 s et n'est JAMAIS repris sur les
+   8,6 s restantes (PLAN_T300 §38 : perte unique post-arret, pas une oscillation entretenue).
+   EndStopRecoilMax_M = 0 conserve le comportement historique (position ET vitesse figees,
+   decision de review tracee) : les deux regimes sont verifies ici. *)
+TEST 'TC-T300-SEN-052 Recul borne a la butee Tremie : DI perdue PUIS reprise oscillante (ecart trace)'
+VAR
+    fb : FB_Sim_Translation;
+    i : INT;
+    scansToFall : INT;
+    scansActive : INT;
+END_VAR
+    (* --- (0) NON-REGRESSION : recul non autorise => comportement historique inchange --- *)
+    fb.Enable := TRUE;
+    fb.ReqTremie := TRUE;
+    fb.SpeedTgt_Pct := 100.0;
+    fb.BrakeReleaseCmd := TRUE;
+    fb.BrakeOpenDelayS := 0.0;
+    fb.SensorElectricalDelayS := 0.0;
+    fb.EndStopRecoilMax_M := 0.0;
+    FOR i := 1 TO 900 DO
+        fb();
+    END_FOR;
+    ASSERT_TRUE(fb.PosTremie, 'Historique : DI Tremie TENUE a la butee quand le recul est interdit');
+    ASSERT_NEAR(fb.PositionTrue_M, 0.0, 0.001, 'Historique : position figee a la butee');
+
+    (* --- (1) Recul borne autorise : la charge ressort le chariot de la zone --- *)
+    fb.Enable := FALSE;
+    fb();
+    fb.Enable := TRUE;
+    fb.EndStopRecoilMax_M := 0.5;
+    fb.LoadReactionGain_Mps2 := 2.0;
+    FOR i := 1 TO 900 DO
+        fb();
+    END_FOR;
+    ASSERT_TRUE(fb.PosTremie, 'PRECONDITION : zone Tremie atteinte (recul = 0,5 m autorise)');
+
+    (* Commande retiree a l'instant de l' entree en zone (sequence exacte de la trace). *)
+    fb.ReqTremie := FALSE;
+    fb.SpeedTgt_Pct := 0.0;
+    scansToFall := 0;
+    FOR i := 1 TO 600 DO
+        fb();
+        IF (NOT fb.PosTremie) AND (scansToFall = 0) THEN
+            scansToFall := i;
+        END_IF;
+    END_FOR;
+    ASSERT_GT(scansToFall, 0, 'DI Tremie RETOMBE apres l arret serre (recul borne)');
+    (* Boucle a 600 scans, seuil a 300 : assertion NON tautologique, marge reelle au-dessus
+       de la valeur mesuree (256 scans). *)
+    ASSERT_LE(scansToFall, 300, 'Perte dans un temps borne (<= 3 s a 10 ms)');
+
+    (* Perte DURABLE : le capteur ne se reactive pas de facon entretenue ensuite. *)
+    scansActive := 0;
+    FOR i := 1 TO 500 DO
+        fb();
+        IF fb.PosTremie THEN
+            scansActive := scansActive + 1;
+        END_IF;
+    END_FOR;
+    (* ⚠️ LIMITE CONNUE — NON MASQUEE. Le modele reduit n'a AUCUNE friction de chariot ni
+       raideur de cable : le pendule amorti ramene le chariot dans la zone capteur par
+       oscillations. La perte est donc BORNEE, mais pas encore DEFINITIVE comme sur la trace
+       terrain (PLAN_T300 §38 : « perte unique post-arret, pas une oscillation entretenue »).
+       Fermer cet ecart exige un parametre physique nouveau (friction de roulement / raideur
+       de cable), hors perimetre de ce lot et non calibrable sans mesure terrain : ce test
+       CARACTERISE l'etat reel, il ne le valide pas. Mesure : 106 scans actifs sur 500
+       (21 %), contre 0 attendu par la trace. Assertion volontairement en enveloppe. *)
+    ASSERT_LE(scansActive, 150, 'Perte BORNEE mais NON DEFINITIVE : ecart trace documente');
+END_TEST

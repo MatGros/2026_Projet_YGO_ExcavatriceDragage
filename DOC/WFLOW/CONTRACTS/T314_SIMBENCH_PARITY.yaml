@@ -45,7 +45,7 @@ groups:
     status: planned
     safety: "Injection de défauts seulement à la frontière capteurs."
   - id: m3_sensor_scenarios
-    match: ["^SimM3(SensorsWordOverrideActive|SensorsWord|SensorIntermittenceActive|SensorStabilizationS|SensorElectricalDelayS|SensorIntermittencePeriodS|SensorHysteresis_M|SensorLoadAngleTriggerRad|SensorScenarioSeed)$"]
+    match: ["^SimM3(SensorsWordOverrideActive|SensorsWord|SensorIntermittenceActive|SensorStabilizationS|SensorElectricalDelayS|SensorIntermittencePeriodS|SensorHysteresis_M|SensorLoadAngleTriggerRad|SensorScenarioSeed|SensorBlipTransitions|SensorBlipDurationS|EndStopRecoilMax_M|LoadReactionGain_Mps2|BrakeFaultCloseWhileRunning|BrakeFaultCloseDelayS)$"]
     destination: "Scenario.TranslationSensors"
     phase: L1
     status: planned

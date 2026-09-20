@@ -22,6 +22,14 @@ VAR_INPUT
     SuspendedLoadLength_M : REAL := 1.5;
     SuspendedLoadDamping : REAL := 0.35;
     LoadReactionGain_Mps2 : REAL := 0.20;
+    (* BUTEE MECANIQUE — recul borne apres arret serre.
+       0.0 (defaut) conserve EXACTEMENT le comportement historique : position ET vitesse
+       figees a la butee (decision de review tracee, correctif « contact rigide »).
+       > 0 : l'inertie du chariot reste absorbee par la butee, MAIS la reaction de la charge
+       peut ressortir le chariot de la zone capteur — comportement observe sur la trace
+       terrain du 2026-09-04 a 26,437 s (Tremie actif 1 echantillon puis perdu
+       definitivement). Valeur SYNTHETIQUE, en attente de mesure terrain. *)
+    EndStopRecoilMax_M : REAL := 0.0;
     LoadFrequencyDroopGain_Hz : REAL := 0.50;
     SensorJitterAmplitude_M : REAL := 0.01;
     SensorStabilizationS : REAL := 1.0;
@@ -31,6 +39,17 @@ VAR_INPUT
     SensorScenarioSeed : UDINT := 3001;
     SensorHysteresis_M : REAL := 0.02;
     SensorIntermittencePeriodS : REAL := 0.12;
+    (* BLIP COURT — second profil capteur, independant du train ~1 s ci-dessus.
+       BlipTransitions = 0 (defaut) : profil historique strictement inchange.
+       Valeurs de trace : Tremie 1 excursion de 0,2 s (2 echantillons a 100 ms),
+       PV 1 excursion de 0,1 s (1 echantillon).
+       ⚠️ LIMITE CONNUE (revue 2026-09-20, F11) : UNE SEULE largeur globale est appliquee aux
+       cinq capteurs. Les deux signatures de la trace (Tremie 0,200 s et PV 0,100 s) ne sont
+       donc PAS rejouables dans la meme passe : il faut deux executions avec des valeurs
+       differentes de SensorBlipDurationS. Une largeur par capteur exigerait un
+       ARRAY[1..5] OF REAL, non retenu dans ce lot. *)
+    SensorBlipTransitions : UDINT := 0;
+    SensorBlipDurationS : REAL := 0.2;
 END_VAR
 VAR_OUTPUT
     PosTremie : BOOL;
@@ -50,6 +69,7 @@ VAR_OUTPUT
     LoadAngle_Rad : REAL;
     SensorPosition_M : REAL;
     SensorTransitionCount : UDINT;
+    SensorBlipActive : BOOL;
     HardStopTremieActive : BOOL;
     HardStopMaintenanceActive : BOOL;
 END_VAR
@@ -57,6 +77,17 @@ VAR
     instCycleTime : FB_CycleTime;
     Initialized : BOOL;
     DirectionSign : REAL;
+    (* Sens de deplacement MEMORISE. La commande peut etre retiree AVANT l'arret physique
+       (deceleration libre du variateur) : le sens du dernier ordre valide est conserve tant
+       que le variateur retourne de la vitesse, puis purge a l'arret. Sans cette memoire, la
+       vitesse du chariot s'effondrait au scan de retrait de commande alors que la frequence
+       retournee decroit encore.
+       ⚠️ ORDRE DE GRANDEUR NON MESURE : la trace terrain ne contient AUCUNE variable de
+       position (15 TraceVariable : DI, frequences, mots d'etat, erreurs). La distance de
+       roue libre de la fenetre 14,67 -> 16,16 s est donc une ESTIMATION dependante du modele
+       d'echelle, qui vaut approximativement 1,1 a 1,3 m selon la methode d'integration
+       retenue (gain audit 0,0551 m/(Hz.s)). A ne pas citer comme une mesure. *)
+    TravelDirection : REAL;
     FrequencyTarget_Hz : REAL;
     CycleTimeS : REAL;
     SpeedAt40Hz_Mps : REAL;
@@ -64,6 +95,9 @@ VAR
     CartAcceleration_Mps2 : REAL;
     PreviousVelocity_Mps : REAL;
     PositionCandidate_M : REAL;
+    (* Recul de butee ECRETE a la course : une valeur d'entree aberrante ne peut pas
+       autoriser une position hors de [0 ; 30] m (revue du 2026-09-20, F8). *)
+    RecoilMax_M : REAL;
     SensorNoiseState : REAL := 0.371;
     SensorNoise_M : REAL;
     instSensorTremie : FB_Sim_PositionSensor;
@@ -90,6 +124,9 @@ VAR CONSTANT
     CST_PositionAtMaintenanceSensor_M : REAL := 29.95;
     CST_NominalFrequency_Hz : REAL := 40.0;
     CST_MinTimeS : REAL := 0.001;
+    (* Meme seuil d'arret que FB_Sim_TranslationBrake.CST_StopFrequency_Hz (0,5 Hz).
+       Valide par la trace terrain du 2026-09-04 : frein ouvert a 0,60 Hz, ferme a 0,00 Hz. *)
+    CST_StopFrequency_Hz : REAL := 0.5;
 END_VAR
 
 instCycleTime(DefaultValueS := 0.010);
@@ -116,8 +153,10 @@ IF NOT Enable THEN
     PositionTrue_M := CST_PositionAtP1;
     VelocityTrue_Mps := 0.0;
     PreviousVelocity_Mps := 0.0;
+    TravelDirection := 0.0;
     LoadAngle_Rad := 0.0;
     SensorTransitionCount := 0;
+    SensorBlipActive := FALSE;
     HardStopTremieActive := FALSE;
     HardStopMaintenanceActive := FALSE;
     (* Repli deterministe compatible avec le mot thermometre P1 = 00011. *)
@@ -135,6 +174,7 @@ IF NOT Enable THEN
 ELSIF NOT Initialized THEN
     Initialized := TRUE;
     PositionTrue_M := CST_PositionAtP1;
+    TravelDirection := 0.0;
 END_IF;
 
 IF Enable THEN
@@ -168,10 +208,26 @@ IF Enable THEN
     BrakeContactOpen := instBrake.ContactOpen;
     BrakeFaultCloseActive := instBrake.FaultCloseActive;
 
+    (* Sens memorise (C3). Regles, dans cet ordre :
+       1. un ordre simple valide (re)memorise le sens ;
+       2. deux ordres contradictoires neutralisent immediatement le sens — aucune
+          excitation inventee (preserve TC-T300-MEC-030) ;
+       3. commande retiree : le sens est CONSERVE tant que le variateur retourne de la
+          vitesse (deceleration libre), puis purge des que la vitesse est nulle. *)
+    IF ReqTremie AND NOT ReqMaintenance THEN
+        TravelDirection := -1.0;
+    ELSIF ReqMaintenance AND NOT ReqTremie THEN
+        TravelDirection := 1.0;
+    ELSIF ReqTremie AND ReqMaintenance THEN
+        TravelDirection := 0.0;
+    ELSIF ABS(ActualFrequency_Hz) <= CST_StopFrequency_Hz THEN
+        TravelDirection := 0.0;
+    END_IF;
+
     PreviousVelocity_Mps := VelocityTrue_Mps;
     IF (FullTravelTimeS > CST_MinTimeS) AND BrakeMechanicallyOpen THEN
         SpeedAt40Hz_Mps := CST_PositionAtMaintenance / FullTravelTimeS;
-        VelocityTarget_Mps := DirectionSign * SpeedAt40Hz_Mps * ActualFrequency_Hz / CST_NominalFrequency_Hz;
+        VelocityTarget_Mps := TravelDirection * SpeedAt40Hz_Mps * ActualFrequency_Hz / CST_NominalFrequency_Hz;
     ELSE
         VelocityTarget_Mps := 0.0;
     END_IF;
@@ -198,7 +254,31 @@ IF Enable THEN
         CycleTime_S := CycleTimeS);
     LoadAngle_Rad := instSuspendedLoad.Angle_Rad;
     IF HardStopTremieActive OR HardStopMaintenanceActive THEN
-        VelocityTrue_Mps := 0.0;
+        RecoilMax_M := MIN(MAX(0.0, EndStopRecoilMax_M), CST_PositionAtMaintenance);
+        IF (RecoilMax_M > 0.0) AND BrakeMechanicallyOpen THEN
+            (* Recul autorise UNIQUEMENT en s'eloignant de la butee touchee, borne par
+               EndStopRecoilMax_M : jamais plus loin dans la butee, jamais de saut cache. *)
+            VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+            (* Contre une butee, l'entrainement DECROCHE : il ne maintient pas une consigne de
+               vitesse dans l'obstacle. Sans cette purge, la consigne de vitesse ecrasait en
+               permanence la reaction de charge et le chariot ne pouvait jamais ressortir de
+               la zone capteur (recul alors impossible, quelle que soit la charge). *)
+            TravelDirection := 0.0;
+            IF HardStopTremieActive THEN
+                VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps);
+                PositionCandidate_M := LIMIT(CST_PositionAtTremie,
+                    PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
+                    CST_PositionAtTremie + RecoilMax_M);
+            ELSE
+                VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps);
+                PositionCandidate_M := LIMIT(CST_PositionAtMaintenance - RecoilMax_M,
+                    PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
+                    CST_PositionAtMaintenance);
+            END_IF;
+            PositionTrue_M := PositionCandidate_M;
+        ELSE
+            VelocityTrue_Mps := 0.0;
+        END_IF;
     ELSE
         VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
         PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
@@ -235,6 +315,7 @@ instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
         AND (ABS(LoadAngle_Rad) >= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 11,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := CST_PositionAtPV, Hysteresis_M := SensorHysteresis_M,
@@ -242,6 +323,7 @@ instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
         AND (ABS(LoadAngle_Rad) >= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 23,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := CST_PositionAtP2, Hysteresis_M := SensorHysteresis_M,
@@ -249,6 +331,7 @@ instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
         AND (ABS(LoadAngle_Rad) >= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 37,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := CST_PositionAtP1, Hysteresis_M := SensorHysteresis_M,
@@ -256,6 +339,7 @@ instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
         AND (ABS(LoadAngle_Rad) >= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 53,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := CST_PositionAtMaintenanceSensor_M, Hysteresis_M := SensorHysteresis_M,
@@ -263,6 +347,7 @@ instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
         AND (ABS(LoadAngle_Rad) >= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 71,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 
 PosTremie := instSensorTremie.ElectricalOutput;
@@ -273,3 +358,6 @@ PosMaintenance := instSensorMaintenance.ElectricalOutput;
 SensorTransitionCount := instSensorTremie.TransitionCount + instSensorPV.TransitionCount
     + instSensorP2.TransitionCount + instSensorP1.TransitionCount
     + instSensorMaintenance.TransitionCount;
+SensorBlipActive := instSensorTremie.BlipActive OR instSensorPV.BlipActive
+    OR instSensorP2.BlipActive OR instSensorP1.BlipActive
+    OR instSensorMaintenance.BlipActive;
