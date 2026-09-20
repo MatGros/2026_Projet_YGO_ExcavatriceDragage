@@ -93,6 +93,12 @@ VAR_INPUT
     SimM3SensorHysteresis_M         : REAL := 0.02;    (* --> [CFG] Hysteresis seuils capteurs M3, m *)
     SimM3SensorLoadAngleTriggerRad  : REAL := 0.01;    (* --> [CFG] Angle charge minimal episode, rad *)
     SimM3SensorScenarioSeed         : UDINT := 3001;   (* --> [CFG] Graine episode capteurs M3 *)
+    SimM3SensorBlipTransitions      : UDINT := 0;      (* --> [TST] Excursions electriques courtes par front (0 = profil ~1 s historique seul) *)
+    SimM3SensorBlipDurationS        : REAL := 0.2;     (* --> [CFG] Largeur d'une excursion du blip court, s *)
+    // FAUTE explicite frein M3 — defaut FALSE : reproduit le defaut terrain « frein ferme
+    // alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s, ErrorId=64).
+    SimM3BrakeFaultCloseWhileRunning : BOOL := FALSE;  (* --> [TST] TRUE = force la fermeture frein M3 hors vitesse nulle *)
+    SimM3BrakeFaultCloseDelayS       : REAL := 0.0;    (* --> [CFG] Delai avant application de la faute frein M3, s *)
 
     SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick gauche *)
     SimJoystickRight_Fwd_MAINT_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick droite *)
@@ -148,6 +154,9 @@ VAR_OUTPUT
     // Rattrapage mecanique M1/M2 -- diagnostic seul (aucun consommateur metier).
     WinchCouplingActive        : BOOL;   (* <-- [DIAG] Rattrapage applique ce scan *)
     WinchCouplingCorrectionPts : DINT;   (* <-- [DIAG] Correction appliquee a l'image M2 (points codeur) *)
+
+    // Faute frein M3 -- diagnostic seul : confirme que la branche de faute est bien appliquee.
+    M3BrakeFaultCloseActive    : BOOL;   (* <-- [DIAG] Faute frein M3 effectivement appliquee ce scan *)
 END_VAR
 
 VAR_IN_OUT
@@ -488,11 +497,9 @@ Winch.COD2_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING
 //    persistante du codeur dont FB_Sim_Encoder reste l'unique producteur.
 // 🔒 MONTEE UNIQUEMENT : la descente couplee reste au modele existant SimM2CoupledDescentModelActive
 //    (exclusion mutuelle : les deux modeles ne s'appliquent jamais ensemble).
-// 🔒 Cible = BUTEE MECANIQUE benne fermee (BucketOffsetCloseM) => ecart relatif 0 % exige par
-//    l'operateur, seule valeur qui fasse converger l'ouverture benne vers 0 % (arbitrage CC01
-//    2026-09-20, D1 : l'hypothese << equilibre elastique >> a OffsetCloseM - 0,5 x CoherenceLimitM
-//    est ABANDONNEE, elle plafonnait l'ecart a 3,4 % et ne satisfaisait pas le besoin reel).
-//    Le sens unique (correction seulement si Delta < cible) et le bornage de pente
+// 🔒 Cible = BUTEE MECANIQUE benne fermee (BucketOffsetCloseM) : seule valeur qui fasse converger
+//    l'ouverture benne vers 0 % ; une cible intermediaire laisse un ecart plancher jamais
+//    corrigible. Le sens unique (correction seulement si Delta < cible) et le bornage de pente
 //    (LIMIT + MIN(cible - Delta)) interdisent tout depassement de butee.
 WinchCouplingBothSameDir := (M1_RelayFwd AND M2_RelayFwd) OR (M1_RelayRev AND M2_RelayRev);
 WinchCouplingGate := SimWinchCouplingModelActive
@@ -507,9 +514,8 @@ WinchCouplingActive := WinchCouplingGate;
 WinchCouplingCorrectionPts := 0;
 IF WinchCouplingGate THEN
     WinchCouplingDelta_M := M2_CablePos_M - M1_CablePos_M;
-    // Cible = butee mecanique benne FERMEE (ecart relatif 0 %). Une cible intermediaire
-    // (OffsetCloseM - 0,5 x CoherenceLimitM) laissait un ecart plancher de 3,4 % jamais
-    // corrigible : T328, arbitrage CC01 2026-09-20 (D1).
+    // Cible = butee mecanique benne FERMEE (ecart relatif 0 %). Le sens unique et le bornage
+    // de pente garantissent qu'aucune correction ne depasse cette butee.
     WinchCouplingTarget_M := BucketOffsetCloseM;
     IF WinchCouplingDelta_M < WinchCouplingTarget_M THEN
         WinchCouplingCorrection_M := (WinchCouplingTarget_M - WinchCouplingDelta_M)
@@ -565,8 +571,13 @@ instSimTranslation(
     SensorIntermittencePeriodS := SimM3SensorIntermittencePeriodS,
     SensorHysteresis_M := SimM3SensorHysteresis_M,
     SensorLoadAngleTriggerRad := SimM3SensorLoadAngleTriggerRad,
-    SensorScenarioSeed := SimM3SensorScenarioSeed
+    SensorScenarioSeed := SimM3SensorScenarioSeed,
+    SensorBlipTransitions := SimM3SensorBlipTransitions,
+    SensorBlipDurationS := SimM3SensorBlipDurationS,
+    BrakeFaultCloseWhileRunning := SimM3BrakeFaultCloseWhileRunning,
+    BrakeFaultCloseDelay_S := SimM3BrakeFaultCloseDelayS
 );
+M3BrakeFaultCloseActive := instSimTranslation.BrakeFaultCloseActive;
 
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
 // même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).
