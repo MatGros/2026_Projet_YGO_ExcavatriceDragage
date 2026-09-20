@@ -1,0 +1,188 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T352 (parent T278) — Excavatrice Dragage
+# Brief : DOC/WFLOW/CONTRACTS/BRIEF_T352_AUTORESETDIAG_JAMAIS_DECLENCHE.md
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T352_AUTORESETDIAG_ENABLE_DEFAUT
+  criticality: C3
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Rendre la fonction T278 (acquittement borne des diagnostics reseau transitoires au demarrage CPU
+    et apres rearmement puissance) REELLEMENT OPERANTE sur machine reelle, sans aucune action ni
+    reglage operateur. Aujourd'hui le FB existe, est declare et appele, mais ses deux entrees
+    d'autorisation StartupEnable et PowerRearmEnable sont cablees sur deux booléens d'une GVL de
+    simulation valant FALSE par defaut et sans aucun ecrivain : la machine a etats ne quitte donc
+    jamais State=0 et le service est totalement inerte. Le cablage est mis en dur a TRUE au site
+    d'appel et les cinq parametres T278 devenus morts sont retires de GVL_Simulation, ce qui
+    supprime la derniere dependance de production a la frontiere simulation pour ce FB.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        Service actif par defaut : au premier scan apres import, des que Chaine AU fermee, coupure
+        puissance inactive, mouvement inactif et diagnostics reseau stables sont reunis, la machine a
+        etats quitte State 0 et passe a Phase 1 puis Phase 3, sans aucun reglage ni geste operateur.
+      verified_by: >
+        Test CI isole TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_autoresettransientdiag.st
+        execute par python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --domain C_DIAG_RESEAUX
+    - id: AC2
+      statement: >
+        Le pulse est reellement emis : ResetPulse vaut TRUE pendant un scan apres Cfg_StabilizationTime,
+        puis AttemptCount passe a 1 et Lockout a TRUE puisque Cfg_MaxAttempts vaut 1.
+      verified_by: >
+        Test CI TC-P12-061 (meme fichier) qui observe ResetPulse, AttemptCount, Phase et Lockout scan par scan
+    - id: AC3
+      statement: >
+        Aucune garde de securite n'est affaiblie : avec la chaine AU ouverte, la coupure puissance active
+        ou un mouvement actif, ResetPulse reste FALSE et SequenceActive reste FALSE a chaque scan.
+      verified_by: >
+        Test CI TC-P12-062 (3 cas negatifs, un par garde) plus relecture de la garde SafeCommon en
+        CODE/C_DIAG_RESEAUX/FB_AutoResetTransientDiag.st:70
+    - id: AC4
+      statement: >
+        Le FB ne depend plus d'aucune variable de simulation : plus aucune occurrence de GVL_Simulation
+        n'est liee a ce FB dans CODE/, et les cinq declarations T278 ont disparu de GVL_Simulation.st.
+      verified_by: >
+        grep AutoResetTransientDiag sur CODE/ colle en restitution, plus gate G516_check_dead_config_switch.py
+    - id: AC5
+      statement: >
+        Les valeurs de reglage effectives sont identiques a avant le lot : 1 tentative, T#1s de
+        stabilisation et T#1s d'intervalle proviennent desormais des defauts declares du FB.
+      verified_by: >
+        Relecture de CODE/C_DIAG_RESEAUX/FB_AutoResetTransientDiag.st:21-23 et observation des
+        memes valeurs par le test CI TC-P12-061
+    - id: AC6
+      statement: >
+        Le nom de fichier est identique au nom de POU PRG_02_Acquisition pour le fichier de programme modifie.
+      verified_by: "Gate G310 plus objet PRG_02_Acquisition present dans le bundle PLCopenXML"
+    - id: AC7
+      statement: >
+        Le suffixe ST est egal au langage genere dans le bundle PLCopenXML pour PRG_02_Acquisition.
+      verified_by: "Gate G310 plus lecture de l'objet PRG_02_Acquisition dans CODE_XML/CODE_Bundle.xml"
+    - id: AC8
+      statement: >
+        Un garde-fou automatique detecte desormais la classe de bug : un booléen de configuration lu par
+        un chemin executable et jamais ecrit nulle part est signale et fait echouer le gate.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G516_check_dead_config_switch.py . --selftest
+        plus ligne PLANS de run_all_gates.py
+    - id: AC9
+      statement: >
+        La liaison reelle est prouvee sur le bundle frais : la section Auto-verification liaison ne
+        remonte aucune erreur et nomme instAutoResetTransientDiag.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report, bloc colle en restitution"
+    - id: AC10
+      statement: >
+        Le corps du FB de diagnostic reste strictement inchange : aucune ligne du fichier
+        FB_AutoResetTransientDiag.st n'apparait modifiee dans le diff du lot.
+      verified_by: "git diff --stat et git diff sur CODE/C_DIAG_RESEAUX/FB_AutoResetTransientDiag.st, colles en restitution"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_autoresettransientdiag.st
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - TOOLS/AGENT_WORKFLOW/scripts/G516_check_dead_config_switch.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T352_AUTORESETDIAG_ENABLE_DEFAUT.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/
+      - CODE_XML/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/C_DIAG_RESEAUX/FB_AutoResetTransientDiag.st
+      - CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st
+      - CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st
+      - CODE/B_AU_SECURITE/
+      - CODE/E_CODEURS/
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/J_SUPERVISION/
+      - DOC/AF/
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Toutes les gardes de securite internes du FB : SafeCommon, EmergencyChainClosed, PowerCutOffActive, MotionActive, PowerContactorEngaged"
+      - "Le reset operateur sur front des diagnostics reseau, voie distincte du reset transitoire"
+      - "La borne 1 a 3 tentatives et le verrouillage Lockout apres salve epuisee"
+      - "L'absence totale de commande de mouvement, de redemarrage de cycle et d'action sur la chaine AU, les freins ou les contacteurs"
+    dropped_on_purpose:
+      - "Les 5 parametres T278 declares dans GVL_Simulation (2 autorisations plus 3 reglages), sans aucun ecrivain, remplaces par un cablage en dur et par les defauts declares du FB"
+      - "La possibilite de regler en ligne les 3 temporisations depuis une GVL, remplacee par les defauts du FB, un reglage ulterieur devenant une nouvelle tache explicite"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+    - ci_test_isole
+    - diagnostic_cause_historique
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout probleme constate en cours de route est remonte IMMEDIATEMENT, pas a la fin et jamais
+    silencieusement. Signaler n'est pas elargir le scope. Deux constats hors scope sont deja
+    escalades et NE SONT PAS corriges par ce lot : le pulse ResetTransient est structurellement un
+    no-op car les bits de perte de liaison sont auto-effaces des que le lien revient alors que la
+    condition d'entree exige tous les esclaves en ligne, et la moitie IHM de T278 n'a jamais ete
+    implementee.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "DSH17"
+  completed_at: "2026-09-21T03:05:00+02:00"
+  status: ALERT_RAISED
+  summary: >
+    Correctif de cablage livre, NON COMMITE. Cause historique prouvee (fonctionnalite livree NON
+    ACTIVEE, jamais validee) avec 5 preuves fichier:ligne : les FALSE sont ecrits dans le contrat
+    T278 (:95-96), sa validation est restee PENDING avec la mention explicite d'activation
+    differee (:157-160), GVL_Simulation.st est absent de son scope.allowed (:38-45) alors que le
+    commit cb5ae5ea y ajoute 9 lignes, le gate G100 exempte PRG_02 par CHEMIN et non par usage
+    (:69-94), et aucun test unitaire du FB n'existait. Preuve de fonctionnement du FB en isolation
+    AVANT correctif : 6/6 PASS (TC-T352-001 a 006). Correctif : autorisations en dur a TRUE au site
+    d'appel, 5 parametres morts retires de GVL_Simulation, 3 Cfg_ rendus aux defauts declares du FB
+    (valeurs strictement identiques). Garde-fou G516 livre, rouge avant correctif (7 erreurs sur le
+    contenu HEAD) et vert apres (0 erreur). Aucune ligne du FB de diagnostic modifiee.
+  evidence_submitted:
+    - "ci_test_isole: PASS 6/6 FB_AutoResetTransientDiag (TC-T352-001 a 006) AVANT correctif"
+    - "linkage: PASS 0 erreur, L1-L7 138 OK / 0 KO, 2046 instances verifiees"
+    - "bundle: PASS 261/261 objets, 0 erreur ; G390 fraicheur bundle PASS"
+    - "diff_bundle: PASS objets GVL_Simulation + PRG_02_Acquisition (CODE_XML/CODE_DiffBundle.xml)"
+    - "gates_C: 49/54 PASS — G516 PASS ; les 5 FAIL sont EXACTEMENT les dettes preexistantes deja
+       enregistrees a la livraison de T278 (G300/G340/G408/G430/G483,
+       TASK_CONTRACT_T278_...yaml:154) ; T352 n'ajoute AUCUN signalement G430"
+    - "contrat: check_task_contract.py PASS (0 erreur, 0 avertissement)"
+    - "alerte: pulse ResetTransient structurellement NO-OP (bits auto-effaces) et moitie IHM de T278
+       jamais implementee — HORS SCOPE, signale, non corrige"
+
+validation:
+  status: PENDING
+  validated_by: "HUM"
+  validated_at: ""
+  notes: >
+    Recette CODESYS humaine requise : import du bundle, watch de instAutoResetTransientDiag sur
+    machine reelle (State, Phase, ResetPulse, AttemptCount, Lockout). Aucun commit sans accord
+    explicite distinct du GO d'implementation. Deux sujets restent ouverts, arbitrage humain
+    attendu : (1) le pulse est structurellement un no-op tant que DiagnosticsStable exige tous les
+    esclaves en ligne alors que les bits de liaison sont auto-effaces ; (2) la hierarchisation
+    d'alarme IHM de T278 n'a jamais ete implementee.
