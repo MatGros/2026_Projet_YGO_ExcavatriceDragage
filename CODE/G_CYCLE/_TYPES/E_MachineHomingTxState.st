@@ -20,6 +20,12 @@ TYPE E_MachineHomingTxState :
     HX4_BUCKET_ADJUST := 6,   (* Ajustement benne palier 1 sans FDC soft, 2 sens autorises *)
     HX5_BUCKET_COMMIT := 7,   (* Commit atomique etat benne fermee (CommitClose) *)
     HX6_HOMED         := 8,   (* Machine referencee : MachineHomed := TRUE (fugace) *)
-    HXF_FAILED        := 9    (* Referencement incomplet : rester en N2 et recommencer *)
+    HXF_FAILED        := 9,   (* Referencement incomplet : rester en N2 et recommencer *)
+    HX7_LOCKED_REFERENCE := 10 (* Etape verrouillee : montee vers le capteur haut puis referencement A L ARRET.
+                                  Sorties admises (toutes conscientes) : front Reset, defaut latche, abandon sur
+                                  violation detectee (descente commandee, garde de montee ecoulee, erreur codeur,
+                                  mouvement hors phase), et forcage de step de mise en service. AUCUNE sortie ne
+                                  pose de reference. La valeur 10 est ajoutee APRES HXF pour ne renumeroter
+                                  aucun etat existant. *)
 );
 END_TYPE
