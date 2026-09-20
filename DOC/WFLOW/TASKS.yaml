@@ -1,4 +1,38 @@
 tasks:
+- id: T327
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: TREUILS_BENNE / SYNCHRO / PROCESS
+  agent: '—'
+  date: '2026-09-20T00:00:00+02:00'
+  updated_at: '2026-09-20T00:00:00+02:00'
+  titre: Descente interdite en position benne intermediaire (ni franchement ouverte ni fermee)
+  contexte: 'Signale par Mathieu 2026-09-20 (session MAINT_N1, essais D18) : quand un ecart M1-M2 commence a se creer (benne en position intermediaire, ni IsOpen ni IsClosed francs), la descente peut se retrouver interdite, y compris en mode auto benne -- blocage total. Le contournement observe : piloter un peu la benne pour la ramener a un etat FRANC (ouverte ou fermee) la debloque. Suspicion : un permis process (chaine ProcessPermit_Descend / EffectivePermit, cf. NAMING_CONVENTION.md taxonomie D-P1->D-P11) ou une condition de FB_Bucket (IsOpen/IsClosed/IsIntermediate, FB_Bucket.st ~L369-376) exige un etat franc pour autoriser la descente, ce qui bloque le cas normal ou la benne est temporairement en transition.'
+  description: 'Identifier precisement quel permis/interlock exige un etat benne franc pour autoriser la descente, et si cette exigence est justifiee (securite reelle) ou trop stricte (bloque un cas normal de transition). Tracer la chaine complete producteur->consommateur (cf. CODE_QUALITY_STANDARDS.md §3ter) avant tout correctif. Analyse et cadrage uniquement dans un premier temps -- pas de modification de code sans validation.'
+  objectifs:
+  - 'Identifier le permis/interlock exact qui bloque la descente en position benne intermediaire (nom de variable, fichier, ligne).'
+  - 'Determiner si cette exigence "etat franc requis" est une securite documentee/justifiee ou un defaut de conception.'
+  - 'Proposer un correctif cadre si defaut confirme, avec analyse de risque (meme methode que T325) avant toute implementation.'
+  contrat: ''
+  bloque_par: []
+- id: T326
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: TREUILS_BENNE / DIAGNOSTIC / HOMING
+  agent: '—'
+  date: '2026-09-20T00:00:00+02:00'
+  updated_at: '2026-09-20T00:00:00+02:00'
+  titre: ErrorID:02 [BENNE] depassement ecart max declenche pendant le referencement (absurde)
+  contexte: 'Signale par Mathieu 2026-09-20 (session MAINT_N1, essais D18) : alarme "[BENNE] ErrorID:02 - depassement ecart max autorise" visible pendant une phase de referencement (homing), jugee absurde par l''operateur car les mesures ne sont pas encore qualifiees a ce stade. Verifie : FB_Bucket.st (Cause 1, ~L172-190) exclut deja explicitement le homing actif de ce controle (HomingPositionValid := HomedAndReliableM1 AND HomedAndReliableM2 AND NOT MachineHomingActive). Deux hypotheses non tranchees : (1) defaut LATCHE avant le debut du homing, encore affiche pendant le homing faute de Reset (comportement normal d''un latch, pas un bug) ; (2) MachineHomingActive n''etait pas reellement TRUE au moment observe (vrai bug de gating). Aucun snapshot pris au moment de l''alarme -- non tranche, Mathieu est passe a autre chose sans fournir de preuve.'
+  description: 'Obtenir un snapshot ou une trace pris PENDANT l''affichage de l''alarme (Error/ErrorId de FB_Bucket, MachineHomingActive, HomedAndReliableM1/M2, Fault.Latched) pour trancher entre latch anterieur persistant et vrai bug de gating homing. Analyse uniquement tant que la preuve manque -- ne pas corriger a l''aveugle.'
+  objectifs:
+  - 'Preuve (snapshot/trace) capturee pendant l''alarme, avec MachineHomingActive et Fault.Latched au moment precis.'
+  - 'Verdict : latch anterieur persistant (comportement normal, rien a corriger) OU vrai gating errone pendant le homing (defaut confirme).'
+  - 'Si defaut confirme : correctif cadre avant implementation, meme methode que T325.'
+  contrat: ''
+  bloque_par: []
 - id: T325
   parent_id: ''
   statut: ⬜
