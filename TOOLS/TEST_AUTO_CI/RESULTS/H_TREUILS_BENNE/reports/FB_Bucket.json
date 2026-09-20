@@ -71,15 +71,16 @@
       "passed": true
     },
     {
-      "name": "TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Direction/StartStop)",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_FALSE",
-        "detail": "FB.M2_RUNREQUEST expected FALSE, got TRUE",
-        "file": "test_fb_bucket.st",
-        "line": 626,
-        "message": "Recul a M2StartPosM -> M2_StartStop=FALSE (arret)"
-      }
+      "name": "TC-P10-029.1 Recul borne : arret reel a la frontiere PHYSIQUE benne (T346, variante b)",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-T346-N2 Glissement M1 cumule : non contournable par repompage du joystick (D6)",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-T346-N1 Limite de recul : frontiere PHYSIQUE, relache, pas de re-armement (D1)",
+      "passed": true
     },
     {
       "name": "TC-P10-030 ConfirmOpen/ClosePosition reference la benne : MAINT_N2 seul, etat publie par la mesure",
@@ -155,8 +156,8 @@
     }
   ],
   "summary": {
-    "total": 36,
-    "passed": 35,
-    "failed": 1
+    "total": 38,
+    "passed": 38,
+    "failed": 0
   }
 }

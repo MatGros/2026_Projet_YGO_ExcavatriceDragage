@@ -155,6 +155,15 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "511", "G511 - Garde de montee du referencement : realiste (>= course/vitesse palier 1 x marge) ET consommee seulement si la montee est commandee (T340)", [sys.executable, f"{S}/G511_check_homing_climb_guard.py", "."]),
     ("C", "512", "G512 - Test CI : aucun argument nomme MORT (hors interface declaree du FB teste) dans les appels de test (T339)", [sys.executable, f"{S}/G512_check_dead_ci_test_arguments.py", "."]),
     ("C", "513", "G513 - Memoire de comptage brut d'un codeur : producteur unique respecte (aucune reinjection muette du banc) et aucune auto-correction sur test de valeur (T342)", [sys.executable, f"{S}/G513_check_sim_encoder_memory_write.py", "."]),
+    # T346 - Q4 (arbitrage humain 2026-09-20) : gate BLOQUANTE, portee limitee au PERIMETRE DU LOT.
+    # Un balayage de tout CODE/ remonte 19 sites PREEXISTANTS hors perimetre T346 (FB_CycleSemiAuto,
+    # PRG_03 / PRG_04 / PRG_05, FB_Brake, FB_Diag_IhmHeartbeat, FB_Encoder_Abs,
+    # FB_WinchOutputInterlock) : deux d'entre eux sont de vrais temoins de securite morts
+    # (ContactorIncoherentError FB_Brake.st:48, IhmEdgeSeen FB_Diag_IhmHeartbeat.st:30).
+    # Elargir la portee a tout CODE/ est une decision d'orchestrateur, qui suppose de traiter d'abord
+    # ces 19 sites. La portee ci-dessous n'est PAS une allowlist : c'est le perimetre du lot T346,
+    # rendu VISIBLE ici plutot que masque dans le script.
+    ("C", "514", "G514 - Variable locale ecrite et jamais lue (code mort = temoin d'un comportement disparu) (T346)", [sys.executable, f"{S}/G514_check_dead_local_variable.py", ".", "--files", "CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st"]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]

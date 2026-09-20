@@ -102,6 +102,9 @@ VAR
     TimeoutRemainingTime            : TIME;                           // . [LOC] Budget restant consomme par le TON (CfgTimeoutDuration - cumul)
     TonBandClosed                   : TON;                            // . [LOC] Debounce court bande "fermee" -> cible offset (anti-chatter au bord de bande)
     TonBandOpen                     : TON;                            // . [LOC] Debounce court bande "ouverte" -> cible offset
+    TonRecoilLimit                  : TON;                            // . [LOC] Anti-chatter de la limite de recul benne (meme base de temps que TonBand*)
+    RecoilLimitReachedNow           : BOOL;                           // . [LOC] Recul au bord de la frontiere PHYSIQUE benne ce scan (instantane, non confirme)
+    RecoilLimitActive               : BOOL;                           // . [LOC] Limite de recul ACTIVE (confirmee CST_BandStableTime)
     TonOffsetResettle               : TON;                            // . [LOC] Stabilisation apres recalage de ActiveOffsetM (synchro re-autorisee)
     TonOffsetMismatch               : TON;                            // . [LOC] Persistance avant avertissement incoherence offset/mesure
     TonOffsetMaxViol                : TON;                            // . [LOC] Persistance avant latch OffsetMax (anti-pic bruit codeur)
@@ -112,8 +115,6 @@ VAR
     NearOpen                        : BOOL;                           // . [LOC] Mesure dans la bande "ouverte" (instantane)
     NearClosedStable                : BOOL;                           // . [LOC] Bande "fermee" confirmee CST_BandStableTime (cible offset)
     NearOpenStable                  : BOOL;                           // . [LOC] Bande "ouverte" confirmee CST_BandStableTime
-    BandLatchConcord                : BOOL;                           // . [LOC] Etat latche ET bande mesuree concordent -> offset benne fiable
-    StateOffsetM                    : REAL;                           // . [LOC] Offset issu de l'ETAT LATCHE seul (reference du filet §5a, independant du recalage)
     OffsetMaxViolNow                : BOOL;                           // . [LOC] Ecart M2-M1 hors plage plausible ce scan
     HomingPositionValid             : BOOL;
     HomingMotionWithoutReference    : BOOL;
@@ -124,10 +125,6 @@ VAR
     MaxAllowedOffset                : REAL;                           // . [LOC] Borne haute plausible M2-M1 (offset ferme + marge)
     MinAllowedOffset                : REAL;                           // . [LOC] Borne basse plausible M2-M1 (offset ouvert - tolerance coherence)
     M1RefPosM                       : REAL;                           // . [LOC] Position M1 memorisee a l'entree Busy
-    M2StartPosM                     : REAL;                           // . [LOC] Position M2 memorisee a l'entree Busy
-    WasOpenAtStart                  : BOOL;                           // . [LOC] Etat IsOpen memorise a l'entree Busy
-    WasClosedAtStart                : BOOL;                           // . [LOC] Etat IsClosed memorise a l'entree Busy
-    LeftStartSinceArm               : BOOL;                           // . [LOC] Quitte position de depart
     HoldOffsetM                     : REAL;                           // . [LOC] Ecart reel mémorise (gel en position intermediaire)
     MotionRequestActive             : BOOL;                           // . [LOC] Demande valide : un seul sens
     MotionRequestConflict           : BOOL;                           // . [LOC] Deux sens = arrêt sûr
@@ -491,14 +488,16 @@ ELSE
         CloseReached := FALSE;
     END_IF;
 
-    BusyEdge(CLK := (CloseReq OR OpenReq) AND MotionRequestActive);
+    // Armement de la manoeuvre : uniquement HORS manoeuvre deja engagee.
+    // M1RefPosM est la reference de la detection de glissement M1 (§1, cause 3). La recapturer en
+    // cours de manoeuvre re-baselinerait cette reference a chaque relachement puis repompage du
+    // joystick, ce qui rendrait un glissement reel indetectable (derive decoupee en tranches sous
+    // la tolerance). Le front d'armement est preserve : Lifecycle.Busy est pose plus bas dans ce
+    // meme scan, il vaut donc encore FALSE au scan d'armement.
+    BusyEdge(CLK := (CloseReq OR OpenReq) AND MotionRequestActive AND NOT Lifecycle.Busy);
 
     IF BusyEdge.Q THEN
         M1RefPosM := CablePosM1;
-        M2StartPosM := CablePosM2;
-        WasOpenAtStart := BucketState.IsOpen;
-        WasClosedAtStart := BucketState.IsClosed;
-        LeftStartSinceArm := FALSE;
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
     END_IF;
@@ -557,8 +556,35 @@ ELSE
             M2_BucketJogLimit := FALSE;
         END_IF;
 
-        IF (CloseReq AND (CablePosM2 > M2StartPosM)) OR (OpenReq AND (CablePosM2 < M2StartPosM)) THEN
-            LeftStartSinceArm := TRUE;
+        // --- Limite de recul : frontiere PHYSIQUE benne, directionnelle ---------------------------
+        // Sous une commande engagee, un recul (sens OPPOSE a la manoeuvre) ne peut pas franchir la
+        // frontiere physique de la benne : bord de la zone "trop ouvert" pour une fermeture
+        // (Delta <= OffsetOpenM - CoherenceLimitM), bord de la zone "trop ferme" pour une ouverture
+        // (Delta >= OffsetCloseM + CoherenceLimitM). C'est la MEME frontiere que TooOpen/TooClosed
+        // (§4a), MinAllowedOffset et la cause 1 (OffsetMaxViolNow) : aucune constante nouvelle.
+        // Sans cette limite, un recul soutenu franchit la frontiere puis latche la cause 1 en 500 ms
+        // (arret + Reset) ; ici le recul est simplement inhibe, proprement, sans defaut.
+        // Anti-chatter : frontiere FIXE (independante du geste operateur) + confirmation
+        // CST_BandStableTime, la temporisation "anti-chatter au bord" deja utilisee par les bandes.
+        // DIRECTIONNEL : seule la direction de RECUL est inhibee ; le sens allant VERS LA CIBLE reste
+        // servi (HoldAscentP1AfterClose force deja M2_ReqDescend a FALSE : non affecte).
+        // ClassCanRun gate la mesure : sans datum M1/M2 la position relative n'a pas de sens (le
+        // mouvement sans reference est deja couvert par la cause 4, HomingMotionWithoutReference).
+        // CloseReq / OpenReq, Lifecycle et BucketState ne sont PAS touches : la reprise se fait au
+        // joystick sans reappui IHM, et aucun etat n'est falsifie.
+        RecoilLimitReachedNow := ClassCanRun
+                                 AND ((CloseReq AND (DeltaPosition_M <= (Config.OffsetOpenM - Config.CoherenceLimitM)))
+                                      OR (OpenReq AND (DeltaPosition_M >= (Config.OffsetCloseM + Config.CoherenceLimitM))));
+        TonRecoilLimit(IN := RecoilLimitReachedNow, PT := CST_BandStableTime);
+        RecoilLimitActive := TonRecoilLimit.Q;
+
+        IF RecoilLimitActive THEN
+            IF CloseReq THEN
+                M2_ReqDescend := FALSE;                          // recul vers l'ouverture interdit
+            ELSE
+                M2_ReqAscent := FALSE;                           // recul vers la fermeture interdit
+            END_IF;
+            M2_RunRequest := M2_ReqAscent OR M2_ReqDescend;       // le sens VERS LA CIBLE reste servi
         END_IF;
 
         // Arrêt fermeture
