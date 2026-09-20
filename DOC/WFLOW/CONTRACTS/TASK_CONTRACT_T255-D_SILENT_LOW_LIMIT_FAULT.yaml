@@ -1,0 +1,286 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# T255-D — FDC logiciel BAS silencieux (AnyFault allumé, bandeau muet)
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Diagnostic source (ARRET n2 de la mission, validation humaine requise) :
+#   DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_FdcBasSilencieux_20260920.md
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T255-D_SILENT_LOW_LIMIT_FAULT
+  criticality: C2
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    A l'arrivee d'un treuil (M1 ou M2) sur la butte logicielle BASSE, rendre la cause
+    et l'action autorisee visibles a l'operateur au MEME scan que l'allumage du voyant
+    AnyFault : le bandeau doit nommer le treuil concerne et la limite basse cable
+    atteinte, et indiquer que la remontee est l'action autorisee. Le defaut lui-meme
+    (quand il se leve, et sa logique) n'est pas modifie ; seule sa VISIBILITE l'est.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        La chaine producteur -> routeur -> consommateur de la cause limite basse cable
+        est tracee avec fichier:ligne : FB_Safety_Winch.st:319-325 (instCauses[6], bit6
+        de ErrorId) -> FB_WinchStateProjection.st:236-237 -> PRG_07_Supervision.st:441-442
+        et :537-547 (AnyFaultActive) -> FB_Hmi_BannerFormatter.st (carrousel, section 5).
+        Le consommateur final est nomme : l'operateur devant le bandeau IHM.
+      verified_by: >
+        Section 5 (arbre vertical) et section 7 (conclusion) de la fiche
+        DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_FdcBasSilencieux_20260920.md,
+        plus grep des references croisees de CableLimitDescent et ErrorId dans CODE/
+    - id: AC2
+      statement: >
+        Scenario butte basse cable atteinte, teste SEPAREMENT pour M1 et pour M2 :
+        WinchSafety.ErrorId porte le bit 6 (16#0040), WinchSafety.Error vaut TRUE et
+        l'encodeur du treuil est valide ; au scan suivant du formateur le bandeau publie
+        un libelle d'alarme NON VIDE citant le treuil et la limite basse cable, ET un
+        texte d'action operateur NON VIDE nommant la remontee comme action autorisee.
+      verified_by: >
+        Tests CI boite noire par le harnais d'integration FB_TestHarness_PRG_07 :
+        cas M1 et M2 separes injectant WinchData.WinchM1Safety (Error, ErrorId 16#0040,
+        CableLimitDescent, DescendPermit, AscentPermit) et lisant PRG07.Banner, dans
+        TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_07_supervision.st ; execution par
+        python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb PRG_07_Supervision
+        Le meme scenario est d'abord porte par le dossier exploratoire
+        TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS
+        (registre ephemere hors depot, lance par tests/run.py)
+    - id: AC3
+      statement: >
+        Le test AC2 est rouge sur le code actuel, avec un message d'assertion montrant le
+        symptome exact (carrousel vide et SpecialCondition vide alors que la cause limite
+        basse cable est active), et vert apres le correctif, sans modification de
+        l'assertion entre les deux. Le cas de reproduction doit aussi prouver que le texte
+        d'action ne nomme pas la cause avant correctif.
+      verified_by: >
+        Sorties brutes du dossier exploratoire DSH01_T255D_FDC_BAS avant correctif, deja
+        obtenues le 2026-09-20 : 4 tests rouges T255D-REPRO-M1-A1, T255D-REPRO-M1-A2,
+        T255D-REPRO-M2-A1 et T255D-REPRO-M2-A2, rapport conserve dans
+        TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS/reports/
+        puis meme lancement apres correctif (4 verts), et promotion du scenario dans le
+        test enregistre test_prg_07_supervision.st
+    - id: AC4
+      statement: >
+        Aucun cas de test existant ne doit passer de PASS a FAIL : la baseline mesuree le
+        2026-09-20 apres reparation locale du registre est de 15 cas verts sur 19 pour le
+        fichier officiel du bandeau, et de 3 cas verts sur 3 pour le harnais
+        PRG_07_Supervision. Les 4 cas deja rouges avant le lot, TC-P07-020, TC-P07-006,
+        TC-P07-008 et TC-P07-031, sont des dettes pre-existantes : ils restent rouges ou
+        sont repares, mais leur etat final est une decision humaine tracee, jamais une
+        retouche silencieuse d'assertion. En particulier TC-P07-023, qui pose
+        CableLimitDescent a TRUE avec encodeur M1 invalide et attend une seule alarme,
+        doit rester vert : toute entree de carrousel ajoutee pour la limite basse cable
+        reste conditionnee par la validite de l'encodeur.
+      verified_by: >
+        python TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS/tests/run.py
+        --case banner-ref (fichier de test officiel non modifie, registre ephemere repare :
+        15 sur 19, 4 rouges nommes) puis meme commande apres correctif, et
+        run.py --case consumer plus run_tests.py --fb PRG_07_Supervision pour le harnais
+        d'integration ; comparaison des identifiants de cas et de leurs verdicts ; gates
+        G407 et G408. Obstacle remonte, decision D4 : l'entree de registre officielle
+        FB_Hmi_BannerFormatter cumule 13 sources absentes et une source manquante non
+        declaree E_CycleDepthStopMode.st, sans quoi les 19 cas ne s'executent pas du tout
+    - id: AC5
+      statement: >
+        Le garde-fou TOOLS/AGENT_WORKFLOW/scripts/G506_check_anyfault_banner_labels.py
+        verifie que toute cause agregee dans AnyFaultActive possede un libelle bandeau
+        non vide, avec une liste d'exemptions nominative cause vers tache de rattachement
+        T220 ou T243 affichee en avertissement nominatif ; il echoue si l'on retire le
+        libelle de la limite basse cable et il est enregistre dans PLANS de
+        TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G506_check_anyfault_banner_labels.py (PASS),
+        puis preuve par retrait : suppression temporaire du libelle limite basse cable
+        dans FB_Hmi_BannerFormatter.st, relance du gate (FAIL attendu), restauration,
+        et grep de la ligne G506 dans PLANS de run_all_gates.py
+    - id: AC6
+      statement: >
+        Les autres causes agregees dans AnyFaultActive sans libelle bandeau sont
+        inventoriees en tableau cause / fichier:ligne / tache de rattachement (T220 ou
+        T243), signalees a l'orchestrateur et NON corrigees dans ce lot.
+      verified_by: >
+        Tableau d'inventaire en section 7 de la fiche
+        TROUBLESHOOTING_FdcBasSilencieux_20260920.md, chaque ligne portant un
+        fichier:ligne verifie par grep, plus les lignes d'exemption du gate G506
+    - id: AC7
+      statement: >
+        Le lot est livre avec bundle complet regenere, diff bundle listant les objets
+        touches, bloc Auto-verification liaison G200 sans erreur, gates du palier C
+        verts, et aucun fichier modifie hors perimetre dans git status.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
+        puis python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_diff_bundle.py .
+        FB_Hmi_BannerFormatter puis python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
+        puis python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C
+        puis git status --short
+    - id: AC8
+      statement: >
+        Invariant structurel du bundle conserve apres edition : le nom du fichier est
+        identique au nom du POU pour FB_Hmi_BannerFormatter, et le suffixe de fichier
+        est identique au langage du POU genere dans le bundle, soit ST.
+      verified_by: >
+        Comparaison du nom de fichier et du nom de POU declares dans
+        CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st (ligne FUNCTION_BLOCK PUBLIC)
+        puis grep du POU dans CODE_XML/CODE_Bundle.xml apres regeneration
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/tests/test_fb_hmi_bannerformatter.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_07_supervision.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G506_check_anyfault_banner_labels.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T255-D_SILENT_LOW_LIMIT_FAULT.yaml
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_FdcBasSilencieux_20260920.md
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_WinchStateProjection.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/L_SIMULATION
+      - CODE/I_TRANSLATION
+      - CODE/GVL_PERSISTENT.st
+      - CODE/J_SUPERVISION/_TYPES
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Messages et libelles existants du carrousel d'alarmes (TC-P07-020, TC-P07-023, TC-P07-024, TC-P07-006, TC-P07-008, TC-P07-009)"
+      - "Semantique de HasAlarm : le carrousel ne publie que les defauts actifs bloquants (AF-07 v2.3 section 6)"
+      - "Masquage des alarmes filles par l'alarme parente materielle : toute entree enfant reste conditionnee par la validite encodeur"
+      - "Priorite AU / puissance / SafeStop sur les messages metier dans le texte d'action operateur"
+      - "Logique de la limite basse elle-meme : le defaut se leve exactement quand il se levait avant ce lot"
+    dropped_on_purpose: []
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+    - ci_tests_avant_apres
+    - gate_guard_avec_preuve_par_retrait
+    - inventaire_defauts_muets
+    - git_status_avant_apres
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug preexistant,
+    risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur, pas a la fin et
+    jamais silencieusement. Signaler n'est pas elargir le scope. Une allowlist
+    d'exemptions dans le gate n'est jamais une decision d'agent : elle est remontee
+    avec ses faits, son usage reel et sa condition de retrait.
+
+# ── 8. Decisions ouvertes soumises a l'humain AVANT implementation ──────────
+open_decisions:
+  - id: D1
+    question: >
+      Canal de publication du message d'alarme : ajouter la cause limite basse cable au
+      carrousel d'alarmes (section 5 de FB_Hmi_BannerFormatter, aligne sur AF-07 section 6
+      qui definit un interlock comme bloquant) ou la publier uniquement dans les champs 3
+      et 4 (SpecialConditionText et OperatorActionText), ce qui respecte la decision
+      code du 2026-09-01 excluant les limites du carrousel ?
+    recommended: carrousel pour l'alarme plus champs 3 et 4 pour l'action, avec condition de validite encodeur
+    impact: >
+      Le carrousel modifie le sens de la decision 2026-09-01 et exige une mise a jour de
+      AF_Partie-07 section 6 ; les champs 3 et 4 seuls laissent HasAlarm a FALSE alors que
+      le voyant AnyFault est allume.
+  - id: D2
+    question: >
+      Mise a jour de AF_Partie-07 : modification en place de la version v2.3 ou creation
+      d'une version _v2.4 ?
+    recommended: decision humaine, la convention de version n'est pas tranchee par le code
+  - id: D3
+    question: >
+      Le voyant AnyFault doit-il rester allume sur une cause non bloquante non labellisee
+      (par exemple le defaut fonctionnel joystick ou un defaut d'arbitrage de mode), ou
+      la liste AnyFaultActive doit-elle etre restreinte aux causes reellement bloquantes ?
+    recommended: >
+      ne pas toucher AnyFaultActive dans ce lot (inventaire AC6 seulement, rattachement
+      T220 et T243), car restreindre la liste eteindrait un voyant sur un defaut reel
+  - id: D4
+    question: >
+      L'entree de registre FB_Hmi_BannerFormatter est inutilisable : elle cumule 13 sources
+      absentes (tout le dossier CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/, retire)
+      et une source manquante non declaree (E_CycleDepthStopMode.st, requise par
+      ST_CycleCfg.st qu'elle liste). Les 19 cas de test du bandeau ne s'executent donc pas.
+      Reparer cette entree fait-il partie du lot T255-D, ou est-ce une tache d'outillage
+      separee ?
+    recommended: >
+      reparer l'entree dans ce lot : sans elle AC4 n'a aucune ancre sur le carrousel et le
+      correctif du formateur reste sans test unitaire exécutable
+    impact: >
+      touche TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml, hors du perimetre autorise
+      actuel du contrat ; toute modification du registre affecte l'ensemble des agents.
+      Mesure du 2026-09-20 avec registre repare localement : 15 cas verts sur 19, avec
+      4 rouges PRE-EXISTANTS (TC-P07-020, TC-P07-006, TC-P07-008, TC-P07-031). Les reparer
+      ou les accepter est une decision humaine tracee, jamais une retouche d'agent : ils
+      documentent la decision du 2026-09-01 sur le carrousel
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Ou on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "DSH01 (DeepSeek / DSH, session principale)"
+  completed_at: "2026-09-20T13:54:00+02:00"
+  status: PENDING
+  summary: >
+    Phase 1 et phase 2 (diagnostic) terminees, phase 3 (implementation) NON demarree :
+    arret de validation humaine de la mission T255-D. Cause racine etablie, sourcee et
+    REPRODUITE par execution : le carrousel d'alarmes exclut explicitement les causes 5 et 6
+    de ST_SafetyWinch.ErrorId (FB_Hmi_BannerFormatter.st:812-849), dont le bit 6 (16#0040,
+    limite basse cable), alors que cette cause allume AnyFaultActive via Safety.Error
+    (PRG_07_Supervision.st:537-547, FB_WinchStateProjection.st:236). Le repli annonce par la
+    decision du 2026-09-01 (OperatorActionText et SpecialCondition) est inoperant : la seule
+    branche nommant la limite (FB_Hmi_BannerFormatter.st:656-658) est imbriquee sous
+    DirectionBlocked et CurrentDirection inferieur a zero, et SpecialConditionText n'a aucune
+    branche pour cette limite. Reproduction : 4 tests rouges T255D-REPRO-M1-A1, M1-A2, M2-A1,
+    M2-A2 dans RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS (HasAlarm FALSE et
+    SpecialConditionText vide alors que la cause est active ; texte d'action reduit au rappel
+    joystick). Preuve amont au producteur : T255D-PROD-1 et PROD-2 VERTS, la limite basse
+    cable SEULE produit Fault.Error TRUE, ErrorId 16#0040 et Latched FALSE, ce qui refute
+    l'hypothese d'une vue latchee : Error est la vue LIVE (FB_FaultCore.st:49-57).
+    Hypotheses de l'orchestrateur mesurees : mecanisme A reel mais il affiche un parent ECAT
+    (T255D-HYP-A1 et A2 VERTS), mecanisme B reel mais sur le joystick, qui n'a aucune entree
+    dans le formateur ; aucun des deux ne rend compte d'un bandeau totalement vide.
+    Baselines : harnais PRG_07_Supervision PASS 3/3 ; les 19 cas officiels du bandeau, mesures
+    apres reparation LOCALE du registre, donnent 15 verts et 4 rouges pre-existants.
+    Quatre ecarts de cadrage constates : AnyFaultActive est en PRG_07 lignes 537-547 et non
+    424-427 ; le POU est en CODE/M_MAIN/ et non CODE/J_SUPERVISION/ ; ST_IHM_MANU n'existe
+    plus dans CODE/ depuis le 2026-07-19 ; le brief de delegation affirme que Error est une
+    vue latchee, ce que FB_FaultCore.st:49-57 contredit (Error := ErrorId superieur a zero,
+    vue LIVE).
+  evidence_submitted:
+    - "Contrat C2 T255-D redige, check_task_contract.py PASS (0 erreur, 0 avertissement)"
+    - "Fiche diagnostic TROUBLESHOOTING_FdcBasSilencieux_20260920.md (cause racine fichier:ligne + inventaire AC6 + hypotheses mesurees)"
+    - "Reproduction par execution : 4 tests rouges consommateur et 2 verts producteur dans RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS"
+    - "Mecanisme A mesure : T255D-HYP-A1 et A2 verts (masquage reel par EncM1Valid, parent ECAT affiche)"
+    - "Baselines mesurees : PRG_07_Supervision 3 sur 3 ; bandeau officiel 15 sur 19, 4 rouges pre-existants"
+    - "Verrou T255-D pose : TASK_LOCKS.json work_locks.T255-D acteur DSH01"
+    - "Obstacle CI remonte : entree de registre FB_Hmi_BannerFormatter inutilisable (13 sources absentes + 1 source manquante non declaree)"
+    - "Aucun fichier CODE/ modifie"
+
+validation:
+  status: PENDING
+  validated_by: "CC01 (orchestrateur)"
+  validated_at: ""
+  notes: >
+    Arret obligatoire de la mission T255-D : validation du diagnostic et du plan, et
+    arbitrage des decisions ouvertes D1 a D3, avant toute implementation.

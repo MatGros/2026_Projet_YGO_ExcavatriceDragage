@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Rapport de test — FB_Translation_PositionEstimator [PASS]</title>
+<title>Rapport de test — FB_Translation_PositionEstimator [FAIL]</title>
 <style>
     :root {
         --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
@@ -370,14 +370,14 @@
         <div style="display:flex;align-items:center;gap:12px;">
             <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
-            <span class="badge badge-pass">PASS</span>
+            <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-16 02:25:28</div>
+    <div class="exec-time">2026-09-20 13:47:55</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-0">TC-P11-EST-001 Reprise sur ColdStart avec position persistee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-1">TC-P11-EST-002 Recalage absolu instantane sur front montant capteur P1 (20.0m)</a></li></ul>
+        <summary>📋 Sommaire (4 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-0">TC-P11-EST-001 Reprise sur ColdStart avec position persistee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-1">TC-P11-EST-002 Recalage absolu instantane sur front montant capteur P1 (20.0m)</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-positionestimator-2">TC-P11-EST-004 Recalage a CHAQUE capteur sur front DESCENDANT (trajet Tremie vers Maintenance)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-3">TC-P11-EST-005 Recalage a CHAQUE capteur sur front MONTANT (trajet Maintenance vers Tremie)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -386,7 +386,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            3/4 vérifications validées
         </div>
     </div>
     
@@ -419,8 +419,8 @@
         <ul><li><code>TC-P11-EST-01</code> — Reprise ColdStart</li><li><code>TC-P11-EST-02</code> — Recalage Came P1</li><li><code>TC-P11-EST-03</code> — Intégration Odométrique</li></ul>
     </div>
     <div class="af-warning-banner">
-        <div class="af-warning-title">⚠️ 2 test(s) present(s) dans ce fichier mais absent(s) du catalogue AF (ID inconnu ou retire)</div>
-        <ul><li><code>TC-P11-EST-001</code></li><li><code>TC-P11-EST-002</code></li></ul>
+        <div class="af-warning-title">⚠️ 4 test(s) present(s) dans ce fichier mais absent(s) du catalogue AF (ID inconnu ou retire)</div>
+        <ul><li><code>TC-P11-EST-001</code></li><li><code>TC-P11-EST-002</code></li><li><code>TC-P11-EST-004</code></li><li><code>TC-P11-EST-005</code></li></ul>
     </div>
     
     <details class="pin-diagram-details" open>
@@ -649,7 +649,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 4 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-translation-positionestimator-0" class="test-card test-card-pass test-card-collapsed">
@@ -687,6 +687,58 @@
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>Front SensorP1 -&gt; Position recalee a 20.0m</li><li>Recalage actif</li><li>Id capteur P1 = 1</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-positionestimator-2" class="test-card test-card-fail">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-fail">FAIL</span>
+                <h3 style="flex: 1; user-select: text;">TC-P11-EST-004 Recalage a CHAQUE capteur sur front DESCENDANT (trajet Tremie vers Maintenance) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-EST-004 Recalage a CHAQUE capteur sur front DESCENDANT (trajet Tremie vers Maintenance)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (12)</span></summary>
+                <ul class="scenario-list"><li>Trajet vers la Maintenance : les capteurs s&#x27;ETEIGNENT un par un (fronts descendants)</li><li>Mot thermometre au depart : 11111, chariot a la Tremie</li><li>--- Capteur Tremie (cote 0.0 m) : front descendant = depart vers la Maintenance ---</li><li>Roule vers P2 : l&#x27;odometrie fait deriver l&#x27;estimation</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
+       DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur PV (cote 5.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
+       DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur P2 (cote 15.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
+       DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur P1 (cote 20.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
+       DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur Maintenance (cote 30.0 m) : mot thermometre 00000 ---</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (17)</span></summary>
+                <ul class="checks-list"><li>TC-P11-EST-004 : capteurs deja actifs au 1er scan -&gt; aucun recalage</li><li>TC-P11-EST-004 : front DESCENDANT Tremie -&gt; Recalibrated TRUE</li><li>TC-P11-EST-004 : front descendant Tremie -&gt; id 4</li><li>TC-P11-EST-004 : front descendant Tremie -&gt; position 0.0 m</li><li>TC-P11-EST-004 : aucun front entre deux capteurs -&gt; pas de recalage</li><li>TC-P11-EST-004 : front DESCENDANT PV -&gt; Recalibrated TRUE</li><li>TC-P11-EST-004 : front descendant PV -&gt; id 3</li><li>TC-P11-EST-004 : front descendant PV -&gt; position 5.0 m</li><li>TC-P11-EST-004 : front DESCENDANT P2 -&gt; Recalibrated TRUE</li><li>TC-P11-EST-004 : front descendant P2 -&gt; id 2</li><li>TC-P11-EST-004 : front descendant P2 -&gt; position 15.0 m</li><li>TC-P11-EST-004 : front DESCENDANT P1 -&gt; Recalibrated TRUE</li><li>TC-P11-EST-004 : front descendant P1 -&gt; id 1</li><li>TC-P11-EST-004 : front descendant P1 -&gt; position 20.0 m</li><li>TC-P11-EST-004 : front DESCENDANT Maintenance -&gt; Recalibrated TRUE</li><li>TC-P11-EST-004 : front descendant Maintenance -&gt; id 0</li><li>TC-P11-EST-004 : front descendant Maintenance -&gt; position 30.0 m</li></ul>
+            </details>
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB.RECALIBRATED expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_translation_positionestimator.st:77</div><div class='failure-msg'>TC-P11-EST-004 : front DESCENDANT Tremie -&gt; Recalibrated TRUE</div></div>
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-positionestimator-3" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-P11-EST-005 Recalage a CHAQUE capteur sur front MONTANT (trajet Maintenance vers Tremie) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-EST-005 Recalage a CHAQUE capteur sur front MONTANT (trajet Maintenance vers Tremie)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (11)</span></summary>
+                <ul class="scenario-list"><li>Trajet vers la Tremie : les capteurs s&#x27;ALLUMENT un par un (fronts montants)</li><li>Mot thermometre au depart : 00000, chariot a la Maintenance</li><li>--- Capteur Maintenance (cote 30.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
+       DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur P1 (cote 20.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
+       DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur P2 (cote 15.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
+       DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur PV (cote 5.0 m) ---</li><li>roule entre deux capteurs : dt nul entre deux scans -&gt; FB_CycleTime publie
+       DefaultValueS = 0.010 s, odometrie deterministe a 3,33 mm par scan</li><li>--- Capteur Tremie (cote 0.0 m) : mot thermometre 11111 ---</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (16)</span></summary>
+                <ul class="checks-list"><li>TC-P11-EST-005 : capteurs absents au 1er scan -&gt; aucun recalage</li><li>TC-P11-EST-005 : front MONTANT Maintenance -&gt; Recalibrated TRUE</li><li>TC-P11-EST-005 : front montant Maintenance -&gt; id 0</li><li>TC-P11-EST-005 : front montant Maintenance -&gt; position 30.0 m</li><li>TC-P11-EST-005 : front MONTANT P1 -&gt; Recalibrated TRUE</li><li>TC-P11-EST-005 : front montant P1 -&gt; id 1</li><li>TC-P11-EST-005 : front montant P1 -&gt; position 20.0 m</li><li>TC-P11-EST-005 : front MONTANT P2 -&gt; Recalibrated TRUE</li><li>TC-P11-EST-005 : front montant P2 -&gt; id 2</li><li>TC-P11-EST-005 : front montant P2 -&gt; position 15.0 m</li><li>TC-P11-EST-005 : front MONTANT PV -&gt; Recalibrated TRUE</li><li>TC-P11-EST-005 : front montant PV -&gt; id 3</li><li>TC-P11-EST-005 : front montant PV -&gt; position 5.0 m</li><li>TC-P11-EST-005 : front MONTANT Tremie -&gt; Recalibrated TRUE</li><li>TC-P11-EST-005 : front montant Tremie -&gt; id 4</li><li>TC-P11-EST-005 : front montant Tremie -&gt; position 0.0 m</li></ul>
             </details>
                 
                 
@@ -940,14 +992,7 @@ PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenance
     </details>
     <details>
         <summary>Sortie brute strucpp</summary>
-        <pre>STruC++ Test Runner v1.0
-
-test_fb_translation_positionestimator.st
-  [PASS] TC-P11-EST-001 Reprise sur ColdStart avec position persistee
-  [PASS] TC-P11-EST-002 Recalage absolu instantane sur front montant capteur P1 (20.0m)
-
------------------------------------------
-2 tests, 2 passed, 0 failed
+        <pre>Error: C++ compilation failed:
 </pre>
     </details>
 </div>

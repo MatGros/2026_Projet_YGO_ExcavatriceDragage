@@ -453,3 +453,89 @@ TEST 'TC-P07-032 AX_STAB remonte la cause RACINE winch et prime sur le SafeStop 
               'repli AX_STAB : la progression situe lorigine sans laisser croire quon y est encore');
 END_TEST
 
+TEST 'TC-P07-040 T255-D limite basse cable M1 : alarme au carrousel ET action autorisee'
+    // Cause VIVE non latchee (bit6 = 16#0040, FB_Safety_Winch.st:318-325) : elle allume
+    // AnyFaultActive via Safety.Error mais n'etait decodee nulle part avant T255-D.
+    WinchM1Safety.LatchedId := 0; WinchM1Safety.SlackCable := FALSE;
+    WinchM1Safety.CableLimitDescent := TRUE;
+    WinchM1Safety.Error := TRUE;
+    WinchM1Safety.ErrorId := 16#0040;
+    WinchM1Safety.DescendPermit := FALSE;   // interlock : descente interdite
+    WinchM1Safety.AscentPermit := TRUE;     // remontee = action autorisee
+    WinchM2Safety.CableLimitDescent := FALSE;
+    WinchM2Safety.AscentPermit := TRUE;
+
+    // Boot puis scan utile : depasse l'anti-clignotement (500 ms), reseau sain
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ADVANCE_TIME(5000000000);
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+
+    ASSERT_TRUE(FB_Banner.Banner.AlarmBanner.HasAlarm, 'limite basse cable M1 : alarme presente');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Count, 1, 'limite basse cable M1 : une seule alarme');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '1/1 [M1] Limite basse cable atteinte',
+              'libelle alarme citant le treuil M1 et la limite basse');
+    ASSERT_EQ(FB_Banner.Banner.OperatorActionText, '[TREUIL] Limite basse cable M1 - remonter',
+              'action autorisee indiquee sans commande de descente');
+END_TEST
+
+TEST 'TC-P07-041 T255-D limite basse cable M2 : alarme au carrousel ET action autorisee'
+    WinchM2Safety.LatchedId := 0; WinchM2Safety.SlackCable := FALSE;
+    WinchM2Safety.CableLimitDescent := TRUE;
+    WinchM2Safety.Error := TRUE;
+    WinchM2Safety.ErrorId := 16#0040;
+    WinchM2Safety.DescendPermit := FALSE;
+    WinchM2Safety.AscentPermit := TRUE;
+    WinchM1Safety.CableLimitDescent := FALSE;
+    WinchM1Safety.AscentPermit := TRUE;
+
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ADVANCE_TIME(5000000000);
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+
+    ASSERT_TRUE(FB_Banner.Banner.AlarmBanner.HasAlarm, 'limite basse cable M2 : alarme presente');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '1/1 [M2] Limite basse cable atteinte',
+              'libelle alarme citant le treuil M2 et la limite basse');
+    ASSERT_EQ(FB_Banner.Banner.OperatorActionText, '[TREUIL] Limite basse cable M2 - remonter',
+              'action autorisee indiquee pour M2');
+END_TEST
+
+TEST 'TC-P07-042 T255-D ancre : descente commandee conserve le libelle historique'
+    // Non-regression de la branche historique : sous DirectionBlocked ET descente
+    // commandee, le message reste « Descente interdite - Limite basse cable » et la
+    // nouvelle branche d'action ne le remplace pas.
+    WinchM1Safety.CableLimitDescent := TRUE;
+    WinchM1Safety.Error := TRUE;
+    WinchM1Safety.ErrorId := 16#0040;
+    WinchM1Safety.DescendPermit := FALSE;
+    WinchM1Safety.AscentPermit := TRUE;
+
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              BothAxesCoupled := TRUE, WinchBothMotionDirection := -1,
+              DeadmanArmed := TRUE, JoystickAtNeutral := FALSE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ADVANCE_TIME(5000000000);
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              BothAxesCoupled := TRUE, WinchBothMotionDirection := -1,
+              DeadmanArmed := TRUE, JoystickAtNeutral := FALSE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+
+    ASSERT_EQ(FB_Banner.Banner.OperatorActionText, '[TREUIL] Descente interdite - Limite basse cable',
+              'descente commandee : libelle historique inchange');
+END_TEST
+

@@ -9,11 +9,26 @@
     {
       "name": "TC-P11-EST-002 Recalage absolu instantane sur front montant capteur P1 (20.0m)",
       "passed": true
+    },
+    {
+      "name": "TC-P11-EST-004 Recalage a CHAQUE capteur sur front DESCENDANT (trajet Tremie vers Maintenance)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.RECALIBRATED expected TRUE, got FALSE",
+        "file": "test_fb_translation_positionestimator.st",
+        "line": 77,
+        "message": "TC-P11-EST-004 : front DESCENDANT Tremie -> Recalibrated TRUE"
+      }
+    },
+    {
+      "name": "TC-P11-EST-005 Recalage a CHAQUE capteur sur front MONTANT (trajet Maintenance vers Tremie)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
-    "failed": 0
+    "total": 4,
+    "passed": 3,
+    "failed": 1
   }
 }

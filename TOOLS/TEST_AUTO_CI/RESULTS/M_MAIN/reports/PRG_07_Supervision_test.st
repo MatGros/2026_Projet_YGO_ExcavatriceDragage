@@ -77,3 +77,63 @@ TEST 'PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le 
     ASSERT_TRUE(harness.Banner.GlobalContextText <> '', 'Contexte IHM reste renseigne meme en coupure');
 END_TEST
 
+TEST 'PRG_07_Supervision : T255-D limite basse cable M1 visible (alarme + action autorisee)'
+    // Etat explicite : les tests precedents ont laisse des defauts dans winchData.
+    winchData.WinchM1Safety.Error := TRUE;            // vu par AnyFaultActive (Safety.Error)
+    winchData.WinchM1Safety.ErrorId := 16#0040;       // bit6 = limite basse cable (vue LIVE)
+    winchData.WinchM1Safety.CableLimitDescent := TRUE;
+    winchData.WinchM1Safety.DescendPermit := FALSE;   // interlock : descente interdite
+    winchData.WinchM1Safety.AscentPermit := TRUE;     // remontee = action autorisee
+    winchData.WinchM1Safety.SafeStop := FALSE;
+    winchData.WinchM1Safety.PowerCutOff := FALSE;
+    winchData.WinchM1Safety.ErrorEncoder := FALSE;
+    winchData.WinchM2Safety.CableLimitDescent := FALSE;
+    winchData.WinchM2Safety.AscentPermit := TRUE;
+    acqData.Joystick.DeadmanArmed := FALSE;           // situation terrain : joystick relache
+    acqData.Joystick.AtNeutralXY := TRUE;
+    modesAuth.Mode := E_Mode.MAINT_N1;
+
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, PowerContactorEngaged := TRUE,
+            EmergencyChainClosed := TRUE, PowerCutOffActive := FALSE);
+    ADVANCE_TIME(600000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, PowerContactorEngaged := TRUE,
+            EmergencyChainClosed := TRUE, PowerCutOffActive := FALSE);
+
+    // AC2 : au meme scan, la cause est nommee ET l'action autorisee est indiquee
+    ASSERT_TRUE(harness.Banner.AlarmBanner.HasAlarm, 'T255-D : la cause active doit etre au carrousel');
+    ASSERT_EQ(harness.Banner.AlarmBanner.Count, 1, 'T255-D : une seule alarme attendue');
+    ASSERT_EQ(harness.Banner.AlarmBanner.Text, '1/1 [M1] Limite basse cable atteinte',
+              'T255-D : libelle alarme citant le treuil et la limite');
+    ASSERT_EQ(harness.Banner.OperatorActionText, '[TREUIL] Limite basse cable M1 - remonter',
+              'T255-D : action autorisee (remontee) indiquee sans commande de descente');
+END_TEST
+
+TEST 'PRG_07_Supervision : T255-D limite basse cable M2 visible (alarme + action autorisee)'
+    winchData.WinchM2Safety.Error := TRUE;
+    winchData.WinchM2Safety.ErrorId := 16#0040;
+    winchData.WinchM2Safety.CableLimitDescent := TRUE;
+    winchData.WinchM2Safety.DescendPermit := FALSE;
+    winchData.WinchM2Safety.AscentPermit := TRUE;
+    winchData.WinchM2Safety.SafeStop := FALSE;
+    winchData.WinchM2Safety.PowerCutOff := FALSE;
+    winchData.WinchM1Safety.CableLimitDescent := FALSE;
+    winchData.WinchM1Safety.AscentPermit := TRUE;
+
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, PowerContactorEngaged := TRUE,
+            EmergencyChainClosed := TRUE, PowerCutOffActive := FALSE);
+    ADVANCE_TIME(600000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, PowerContactorEngaged := TRUE,
+            EmergencyChainClosed := TRUE, PowerCutOffActive := FALSE);
+
+    ASSERT_TRUE(harness.Banner.AlarmBanner.HasAlarm, 'T255-D : la cause active doit etre au carrousel');
+    ASSERT_EQ(harness.Banner.AlarmBanner.Count, 1, 'T255-D : une seule alarme attendue');
+    ASSERT_EQ(harness.Banner.AlarmBanner.Text, '1/1 [M2] Limite basse cable atteinte',
+              'T255-D : libelle alarme citant le treuil M2 et la limite');
+    ASSERT_EQ(harness.Banner.OperatorActionText, '[TREUIL] Limite basse cable M2 - remonter',
+              'T255-D : action autorisee indiquee pour M2');
+END_TEST
+

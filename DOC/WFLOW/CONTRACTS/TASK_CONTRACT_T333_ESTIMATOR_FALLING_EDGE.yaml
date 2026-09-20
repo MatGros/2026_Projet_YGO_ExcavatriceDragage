@@ -1,0 +1,326 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T333 : FB_Translation_PositionEstimator — recalage dans les DEUX sens
+# ═══════════════════════════════════════════════════════════════════════════
+# Criticite C2 · strategie patch · acteur DSH02 (verrou DOC/WFLOW/TASK_LOCKS.json)
+# Verrou : T333 -> DSH02. Orchestrateur : CC01.
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# ── DIAGNOSTIC (etape 1-2, FAITS verifies sur le code reel, pas hypothese d'audit) ──
+#
+# FAIT 1 — geometrie du mot capteurs (source : FB_Translation_PositionDecoder.st)
+#   En-tete :10-12 et §1 :78-88 : les 5 capteurs forment un code THERMOMETRE CUMULATIF.
+#   Mots valides 11111 (extreme Tremie) -> 01111 -> 00111 -> 00011 -> 00001 -> 00000
+#   (extreme Maintenance). Autrement dit, pour chaque capteur X : bit_X = TRUE ssi
+#   position <= cote_X. Consequence : chaque capteur bascule EXACTEMENT a sa propre cote,
+#   dans les deux sens — front MONTANT en venant de Maintenance (trajet vers la Tremie),
+#   front DESCENDANT en allant vers la Maintenance.
+#   Confirme cote production : PRG_05_Translation.st:550-560 (zones definies par
+#   "capteur PRECEDENT retombe a 0" ET "capteur de la zone encore a 1").
+#
+# FAIT 2 — le code ne recale que sur front MONTANT
+#   FB_Translation_PositionEstimator.st:83-87 : 5 instances R_TRIG uniquement, aucun F_TRIG.
+#   :98-118 : chaine IF/ELSIF testant seulement TrigXxx.Q (montant).
+#   => pendant TOUT trajet vers la Maintenance, aucun recalage n'a lieu : l'erreur
+#      odometrique s'accumule puis est rattrapee d'un coup au premier front montant.
+#
+# FAIT 3 — corroboration trace terrain (Suivi_TranslationM3bug_20260904_27, 352 ech.)
+#   Transitions extraites du CSV wide (lecture seule, colonnes M3_Pos*_DI) :
+#     Tremie : 12,237 s 0->1 (cmd=2 vers Maintenance, 16,29 Hz) ; 12,437 s 1->0 ;
+#              26,438 s 0->1 (cmd=0) ; 26,553 s 1->0
+#     PV     : 14,864 s 1->0 (cmd=0, 29,32 Hz, sens Maintenance) ; 14,965 s 0->1 ;
+#              15,064 s 1->0 ; 18,454 s 0->1 (cmd=1, sens Tremie)
+#     P2 / P1 / Maintenance : AUCUNE transition (le chariot ne depasse pas ~6 m)
+#   => le seul capteur franchi dans les deux sens est PV ; le front descendant (aller) et
+#      le front montant (retour) tombent tous deux a 5,0 m (AUDIT §3.3 : les deux jambes se
+#      referment a 1 % en traitant les DEUX fronts a 5,0 m).
+#   ⚠️ LIMITE : la trace ne prouve PAS le comportement de P1/P2/Maintenance (jamais atteints).
+#      La preuve 5-capteurs est apportee par le test CI (AC1/AC2), pas par la trace.
+#
+# FAIT 4 — l'ARRIVEE a la Maintenance n'est recalée dans AUCUN sens aujourd'hui
+#   bit0 (Maintenance) = "position <= cote_Maintenance" : il vaut TRUE sur presque tout le rail
+#   et ne retombe a 0 que si la position depasse la cote Maintenance (seuil sim
+#   CST_PositionAtMaintenanceSensor_M := 29.95, FB_Sim_Translation.st:84,250-251). Or
+#   LimitSwitchMaintenance n'est confirme que sur le mot 00000, donc sur ce front DESCENDANT.
+#   Consequence : le code actuel recale a 30,0 m sur le front MONTANT — c'est-a-dire au DEPART
+#   de la Maintenance vers la Tremie — et JAMAIS a l'ARRIVEE. A l'arrete en Maintenance,
+#   PositionEstimatedM reste purement odometrique (puis bornee a 30,5 m par le LIMIT :146).
+#   Symetriquement, la Tremie est le seul capteur dont l'ARRIVEE (front montant) est recalee.
+#   C'est le symptome utilisateur exact, et il est plus grave que "un sens sur deux".
+#
+# FAIT 5 — la specification prescrit l'asymetrie : code conforme a sa spec, spec fausse
+#   FB_Translation_PositionEstimator_v1.0.md:28 ("recalage absolu instantane sur fronts
+#   montants"), :32 ("Au front montant (R_TRIG)") et :154 (diagramme "Detection front montant
+#   5 cames fixes"). Le code n'est donc PAS un ecart d'implementation : c'est la spec qui
+#   decrit un comportement incomplet. Un patch de code SEUL creerait une divergence code/spec :
+#   la fiche AF-11 de ce FB (et ses TC) doit evoluer dans le MEME lot (AC8).
+#
+# ECART AUDIT CONSTATE (devoir d'alerte, aucune correction dans ce lot) :
+#   AUDIT_T300_TRACE §3.4 H2 affirme "le chariot est a ~5 m et s'eloigne" au blip Tremie de
+#   12,237 s, d'ou un saut "-P0 (jusqu'a -5,0 m)". Le §3.5 du MEME document donne une position
+#   vraie de ~0,31 m a cet instant (le chariot a quitte la Tremie 0,677 s plus tot), donc la
+#   premisse "a ~5 m" est fausse. En revanche la MAGNITUDE n'est pas decidable sur cette trace :
+#   le saut vaut -(P0 + ~0,04 m) et P0 (position persistee au demarrage, §3.5) n'est pas trace.
+#   Le brief T333 reprend la premisse erronee de H2 en AC4 ("pas d'ecrasement a 0 m si le
+#   chariot s'eloigne") : la nature du blip (recul mecanique reel sous charge, cf. §2 C1, ou
+#   parasite electrique, cf. §2 C2) n'est PAS tranchee par la trace. Question Q2.
+#
+# ── QUESTIONS A TRANCHER PAR L'HUMAIN AVANT CODE (etape 2, ARRET) ──
+#   Q1 (AC2) : position appliquee au front DESCENDANT = PosXxx_M (meme cote qu'au front
+#      montant) ou PosXxx_M +/- demi-largeur de came ? Aucune largeur de came n'est documentee
+#      dans le depot : PLAN_T300_SIMBENCH_M3_SENSOR_DYNAMICS.md:151 la liste explicitement comme
+#      NON MESUREE. Recommandation : PosXxx_M identique aux deux fronts, coherent avec
+#      FB_Translation_PositionDecoder.st:39-51, avec sa fiche v1.1 §3bis:135-141 (le
+#      franchissement de Xi est marque par le front du capteur PROPRE a Xi, montant OU
+#      descendant) et avec l'hysteresis du capteur elle-meme (SensorHysteresis_M := 0.02,
+#      FB_Sim_Translation.st:231) qui place deja les deux fronts a +/- 2 cm autour de la cote.
+#   Q2 (AC4) : politique sur un blip court (1-2 scans, cf. 12,237 s) : recaler quand meme
+#      (simple, erreur bornee par la distance parcourue pendant le blip, ~0,18 m a 16 Hz avec le
+#      gain terrain), refuser le recalage par un gate de COHERENCE DE SENS (front montant alors
+#      que ReqMaintenance est vrai = incoherent -> rejete), ou gate de PLAUSIBILITE
+#      (|PosXxx - estime| <= seuil) ? Le gate de plausibilite est INEXPLOITABLE avant T301 :
+#      avec le gain configure (÷6,6 trop lent, AUDIT §3.2) la derive atteint ~25 m sur un trajet
+#      complet. Le gate de sens est en revanche techniquement possible (les bits ne basculent que
+#      dans un sens par sens de deplacement) mais il rejetterait aussi les fronts legitimes
+#      pendant une deceleration libre (H5) et pendant un recul mecanique reel (C1).
+#   Q3 (AC3) : seuil de continuite hors front (proposition : |Delta| <= |FreqHz| x Gain x dt
+#      + 0,001 m par scan, et saut autorise uniquement sur le scan ou Recalibrated=TRUE).
+#   Q4 (NOUVELLE, challenger) : sur la machine REELLE, le point de commutation de la came
+#      Maintenance est-il atteignable AVANT la butte mecanique ? Le mot 00000 (donc
+#      LimitSwitchMaintenance, et la Tremie via 11111) exige que le bit franchisse sa cote. Le
+#      banc prend une marge explicite de 5 cm (cote 29,95 m vs butee 30,0 m), la config
+#      GVL_PERSISTENT:108 pose 30,0 m. Si la came reelle commute a la butee, le FDC Maintenance
+#      serait inatteignable. Non documente, non mesurable depuis le depot : a confirmer terrain.
+#   Q5 (NOUVELLE, challenger) : la fiche AF-11 du FB porte _v1.0 dans son nom et est referencee
+#      par TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml:1570 (champ af_doc). Bump en _v1.1 +
+#      mise a jour du registre, ou mise a jour en place avec une ligne de Suivi historique,
+#      comme le precedent trace dans AF_Partie-11_v2.3.md:374 ("pas de bump de version,
+#      references croisees multiples") ? Recommandation : mise a jour en place + ligne
+#      d'historique, sans renommage (aucun autre fichier a toucher).
+#   Q6 (NOUVELLE, challenger) : ordonnancement T333 / T301 et perimetre de l'acceptation. T333
+#      repare les POINTS D'ANCRAGE ; entre deux cotes la position reste fausse (gain ÷6,6 et
+#      deceleration libre non integree H5 = 1,13 m par trajet, AUDIT §3.4). AC2 est donc a lire
+#      comme "position exacte AUX cotes franchies", jamais comme "trajectoire exacte". Livrer
+#      T333 avant T301 (recommandation : oui, T333 est autoporteur, aucune dependance au gain) et
+#      ecrire cette limite dans la fiche du composant.
+#
+# ── HORS SCOPE, SIGNALES (non corriges, cf. AUDIT §3.4 et §5) ──
+#   H3 init sur borne haute (:122-129) · H5 deceleration libre non integree (:134-139)
+#   H6 reprise persistee non recohérentee (:71-75 + PRG_05:596) · H7 Reset cable
+#   (PRG_05:577) jamais utilise dans le FB (:13 declare, 0 occurrence dans :60-147)
+#   H9 bornage LIMIT ±0,5 m (:146) · gain odometrique faux (T301, GVL_PERSISTENT:109)
+#   H8 Recalibrated/RecalibratedSensorId sans consommateur : PositionEstimatedM n'est pas une
+#      colonne de la trace terrain (16 colonnes) -> l'asymetrie n'est prouvable qu'en CI, jamais
+#      sur trace reelle. Constat confirme par le challenger.
+#   ECART DOC/CODE SUPPLEMENTAIRE (non releve par l'audit, signale par le challenger) :
+#      FB_Translation_PositionEstimator_v1.0.md:162 annonce "Bornage strict : [0.0m .. 30.0m]"
+#      alors que le code borne a [PosTremieM - 0,5 ; PosMaintenanceM + 0,5] (:146). Divergence
+#      doc/code preexistante, hors perimetre T333, a traiter avec H9.
+#   CHATTER DEJA OBSERVE (risque chiffre du correctif, cf. Q2) : la trace montre PV
+#      1->0->1->0 en 200 ms (14,864 / 14,965 / 15,064 s). Aujourd'hui 1 seul de ces 3 fronts est
+#      consomme (le montant) ; apres correctif les 3 le sont. Impact POSITION : NUL — les trois
+#      fronts appartiennent au MEME capteur PV et recalent donc la MEME cote 5,0 m : l'operation
+#      est idempotente. Impact diagnostic : 3 pulses Recalibrated au lieu d'un (sans consommateur,
+#      H8). Le risque reel n'apparait que sur un parasite d'un capteur ELOIGNE de la position
+#      courante (cote diferente) : c'est l'objet de Q2.
+#   ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T333_ESTIMATOR_FALLING_EDGE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Au franchissement de chacun des 5 capteurs de position M3, la position estimee du chariot
+    doit etre recalee a la cote calibree de ce capteur quel que soit le sens de deplacement
+    (front montant vers la Tremie comme front descendant vers la Maintenance), au lieu du seul
+    front montant actuel qui laisse l'erreur odometrique s'accumuler sur tout le trajet vers la
+    Maintenance puis la rattrape brutalement au premier front montant. L'interface du FB, le gain
+    odometrique et la persistance restent inchanges.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Preuve de la cause, sur le code actuel : un test CI parcourt le trajet Tremie vers
+        Maintenance (mot thermometre 11111 -> 01111 -> 00111 -> 00011 -> 00001 -> 00000, un front
+        descendant par capteur) et ECHOUE parce que Recalibrated reste FALSE et que
+        PositionEstimatedM n'est jamais mise a la cote ; le meme test sur le trajet inverse
+        (fronts montants) passe. L'asymetrie est donc constatee par un test, pas deduite.
+      verified_by: >
+        python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Translation_PositionEstimator :
+        sortie FAIL avec les assertions de TC-P11-EST-004 nommant les 5 fronts descendants non
+        recales, et PASS de TC-P11-EST-005 (fronts montants) dans la meme execution.
+    - id: AC2
+      statement: >
+        Apres correctif : les 5 capteurs (Maintenance 30,0 m, P1 20,0 m, P2 15,0 m, PV 5,0 m,
+        Tremie 0,0 m) recalent la position DANS LES DEUX SENS, chacun avec Recalibrated=TRUE
+        pendant un scan et RecalibratedSensorId egal a son identifiant (0=Maint, 1=P1, 2=P2,
+        3=PV, 4=Tremie), la position prenant la cote tranchee en Q1 a la tolerance fixee par ce
+        contrat (0,001 m sur des cotes exactes de test). Cas le plus visible corrige : l'ARRIVEE
+        a la Maintenance (mot 00000, front descendant du capteur Maintenance), qui n'est
+        recalée dans aucun sens aujourd'hui, l'est desormais.
+      verified_by: >
+        TC-P11-EST-004 (descendants, dont l'arrivee Maintenance mot 00000) et TC-P11-EST-005
+        (montants, dont l'arrivee Tremie mot 11111) PASS dans la meme execution de
+        run_tests.py --fb FB_Translation_PositionEstimator, 10 recalages attendus au total.
+    - id: AC3
+      statement: >
+        Entre deux fronts capteurs CONSECUTIFS, PositionEstimatedM ne saute pas : sur chaque scan
+        sans recalage, sa variation absolue reste bornee par |DriveActualFreqHz| x
+        GainMetersPerHzSec x CycleTimeS + 0,001 m (seuil Q3) ; un saut n'est admis que sur le scan
+        ou Recalibrated=TRUE.
+      verified_by: >
+        TC-P11-EST-006 dans le meme fichier de test : parcours continu des 6 mots du thermometre
+        avec odometrie active, assertion sur la variation par scan hors front.
+    - id: AC4
+      statement: >
+        Un blip capteur de 1 a 2 scans sur la Tremie en cours de trajet vers la Maintenance (cas
+        reel de la trace a 12,237 s, 200 ms) a un comportement defini et teste : la position
+        n'est pas ecrasee a une cote incoherente avec le deplacement, et le comportement retenu
+        en Q2 est identique en simulation et sur machine reelle (meme code, meme regle). Donnee
+        nouvelle a integrer : un chatter d'un MEME capteur (cas PV 1->0->1->0 en 200 ms, trace
+        14,864/14,965/15,064 s) est IDEMPOTENT -- les trois fronts recalent la meme cote 5,0 m,
+        donc la position est inchangee et seul le nombre de pulses Recalibrated augmente (1 -> 3,
+        sans consommateur). Le risque reel est un parasite d'un capteur ELOIGNE (cote diferente
+        de la position courante), cas a couvrir par la decision Q2.
+      verified_by: >
+        TC-P11-EST-007 dans le meme fichier de test, avec la sequence exacte du blip (front
+        montant puis descendant a 1 scan d'ecart) et l'assertion qui encode la decision Q2.
+    - id: AC5
+      statement: >
+        L'interface du FB (VAR_INPUT et VAR_OUTPUT de FB_Translation_PositionEstimator), le gain
+        GainMetersPerHzSec, les cotes PosXxx_M et la persistance
+        GVL_PERSISTENT._TranslationPosEstimated_M / _TranslationPosEstimatedInitialized sont
+        inchanges : le diff de CODE/ ne contient que le corps du FB, et le diff de
+        CODE/GVL_PERSISTENT.st est vide.
+      verified_by: >
+        git diff sur CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st (blocs VAR_INPUT et
+        VAR_OUTPUT absents du diff) et git diff CODE/GVL_PERSISTENT.st vide.
+    - id: AC6
+      statement: >
+        Un gate guard est enregistre dans PLANS de run_all_gates.py et passe : il verifie que
+        chacun des 5 capteurs de l'estimateur possede un R_TRIG ET un F_TRIG dont le .Q est
+        consomme dans le recalage, et il passe au ROUGE si on retire la consommation du front
+        descendant. ID propose : G488 (G480 a G487 et G490 a G499 sont deja pris ;
+        G498_check_t291_auto_dive_step45.py existe, et deux scripts partagent deja G499).
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C : gate PASS ; puis
+        suppression temporaire de la branche descendante dans une copie de travail de la meme
+        session et gate FAIL, la copie etant restauree immediatement apres.
+    - id: AC7
+      statement: >
+        Les preuves de fin de lot sont presentes : bundle complet frais, diff bundle listant les
+        objets touches, bloc Auto-verification liaison produit par G200_check_linkage.py --report
+        avec 0 erreur, gates palier C, et git status --short identique avant et apres le lot pour
+        tout fichier hors perimetre.
+      verified_by: >
+        Sorties de generate_codesys_bundle.py, generate_codesys_diff_bundle.py,
+        G200_check_linkage.py --report, run_all_gates.py --palier C et git status --short
+        collees dans la restitution.
+    - id: AC8
+      statement: >
+        La fiche de specification du composant ne decrit plus un recalage sur front montant
+        seulement : DOC/AF/AF_Partie-11_Fonction_Translation/FB_Translation_PositionEstimator_v1.0.md
+        (lignes 28, 32 et 154 : "fronts montants", "front montant (R_TRIG)", diagramme
+        "detection front montant 5 cames fixes") est mise a jour dans le meme lot que le code,
+        avec une ligne de Suivi historique, et les tests TC-P11-EST-004/005 y sont enregistres
+        avec leur etat. Sans cela le code corrige serait en divergence avec sa propre spec
+        (le code actuel lui est conforme : l'anomalie est specifiee, cf. FAIT 5).
+      verified_by: >
+        Lecture du diff de la fiche AF-11 et de sa section Suivi historique ; recherche des
+        occurrences de "front montant" dans la fiche, aucune ne decrit plus le mecanisme de
+        recalage seul.
+
+  scope:
+    allowed:
+      - CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation_positionestimator.st
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - DOC/AF/AF_Partie-11_Fonction_Translation/FB_Translation_PositionEstimator_v1.0.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T333_ESTIMATOR_FALLING_EDGE.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/GVL_PERSISTENT.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/L_SIMULATION/
+      - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Recalage sur front montant des 5 capteurs (comportement actuel vers la Tremie) : TC-P11-EST-005 doit rester PASS"
+      - "Init a froid depuis PersistedPositionM/PersistedInitialized au premier scan utile (ColdStart) et non-recalage au 1er scan (FirstScanDone) : TC-P11-EST-001 reste PASS"
+      - "Integration odometrique par sens (ReqTremie = negatif, ReqMaintenance = positif) et neutralisation d'une demande contradictoire"
+      - "Sortie PositionEstimatedM et Initialized maintenues hors Enable, pour la recopie persistante de PRG_05:596-597"
+      - "Interface FB inchangee : aucun VAR_INPUT/VAR_OUTPUT ajoute, retire ou renomme"
+    dropped_on_purpose:
+      - "Aucun : le lot ne retire aucun comportement existant, il en ajoute un (front descendant)"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+    - ci_before_after
+
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Tout ecart entre l'audit et les faits, toute cause alternative, tout consommateur aval de
+    PositionEstimatedM decouvert, et toute question de geometrie de came non documentee sont
+    remontes immediatement a l'orchestrateur. Ecarts deja constates et signales dans l'en-tete :
+    (1) la premisse "le chariot est a ~5 m" de H2 (§3.4 de l'audit) est refutee par le §3.5 du
+    meme document (position vraie ~0,31 m), tandis que la MAGNITUDE du saut n'est pas decidable
+    sur la trace (elle vaut -(P0 + ~0,04 m) et P0 n'est pas trace) ; mon premier jet de contrat
+    avait avance un facteur de surestimation, retracte ici faute de fondement ;
+    (2) la fiche du composant annonce un bornage [0,0 ; 30,0] m que le code n'applique pas
+    (LIMIT ±0,5 m, fiche v1.0:162 vs code :146) ;
+    (3) TASKS.yaml porte T333 en statut "a faire" alors que ce contrat est IN_PROGRESS
+    (incoherence de registre a arbitrer par l'orchestrateur, fichier non touche par ce lot car
+    ecrit par un autre agent).
+    Signaler n'est pas elargir le perimetre : H3, H5, H6, H7, H8, H9 et le gain odometrique
+    (T301) restent hors de ce lot.
+
+status: IN_PROGRESS
+
+execution:
+  executed_by: "DSH02 (DeepSeek Harness)"
+  completed_at: "2026-09-20T14:05:00+02:00"
+  status: ALERT_RAISED
+  summary: >
+    Etapes 1 et 2 de la mission realisees, AUCUN fichier CODE/ modifie (git diff CODE/ vide).
+    Diagnostic etabli sur le code reel (FAITS 1 a 5) et PROUVE par test CI :
+    TC-P11-EST-004 (fronts descendants) ECHOUE sur le code actuel a sa premiere assertion
+    (Recalibrated reste FALSE au front descendant Tremie), tandis que TC-P11-EST-005 (fronts
+    montants) PASSE dans la meme execution -> asymetrie constatee, pas deduite.
+    Challenge independant read-only effectue (1 sous-agent) : il a confirme la cause, ajoute le
+    FAIT 4 (l'ARRIVEE a la Maintenance n'est recalee dans aucun sens) et le FAIT 5 (la spec
+    prescrit l'asymetrie -> AC8), et corrige la formulation de l'ecart H2 (la magnitude n'est
+    pas decidable sur la trace, seule la premisse "chariot a 5 m" est refutable).
+    ARRET OBLIGATOIRE : Q1 a Q5 exigent un arbitrage humain avant toute ecriture de code.
+  evidence_submitted:
+    - "CI avant : run_tests.py --fb FB_Translation_PositionEstimator = 2/2 PASS (TC-P11-EST-001/002)"
+    - "CI apres ajout du test : 3/4, TC-P11-EST-004 FAIL ligne 77 (ASSERT_TRUE Recalibrated expected TRUE, got FALSE), TC-P11-EST-005 PASS - preuve machine TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/reports/FB_Translation_PositionEstimator.json"
+    - "Code : FB_Translation_PositionEstimator.st:83-87 (5 R_TRIG, aucun F_TRIG), :98-118 (test .Q montant seul), :146 (bornage)"
+    - "Spec : FB_Translation_PositionEstimator_v1.0.md:28,32,154 (recalage prescrit sur front montant)"
+    - "Geometrie : FB_Translation_PositionDecoder.st:10-12,78-88 + fiche v1.1 §3bis:137-141 ; banc FB_Sim_PositionSensor.st:11,53-57,69-81 (ActiveBelowThreshold par defaut TRUE) + FB_Sim_Translation.st:219-221,250-251"
+    - "Trace terrain : transitions CSV wide extraites, PV 1->0 a 14,864 s (sens Maintenance) et PV 0->1 a 18,454 s (sens Tremie), aucune transition P2/P1/Maintenance"
+    - "Chaine d'impact §3ter : PRG_02 HwIn -> instPosDecoderM3 (PRG_05:112-118) -> instPosEstimatorM3 (PRG_05:575-594) -> GVL_PERSISTENT._TranslationPosEstimated_M (PRG_05:596) + TranslationState.EstimatedPosM3_M (PRG_05:710) ; producteur unique verifie par grep, aucun consommateur de securite"
+    - "G390 fraicheur bundle : PASS (bundle frais avant intervention, aucun CODE/ touche)"
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Attente de l'arbitrage humain Q1 a Q5 pour lever l'ARRET de l'etape 2. Le contrat declare
+    AC2 a 0,001 m de tolerance sur des cotes exactes de test ; toute decision Q1 autre que
+    "PosXxx_M aux deux fronts" fera evoluer cette tolerance et l'assertion AC2.
+    Point de vigilance transmis : le test TC-P11-EST-004 est ROUGE dans le depot jusqu'a la
+    livraison du correctif (visible par run_tests.py --fb FB_Translation_PositionEstimator et par
+    la CI du domaine I_TRANSLATION). Il ne rend PAS le palier C de run_all_gates rouge : le gate
+    G460 n'execute pas les tests unitaires par FB (TOOLS/TEST_AUTO_CI/anim_bench/run_ci_gates.py
+    ne lance que FB_Cycle, les tests negatifs et le garde animation).

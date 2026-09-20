@@ -23,7 +23,174 @@ doit être engagée avant arbitrage humain de **Q1** et **Q2**.
 > 📊 **Reviews indépendantes : 3 × `BLOCK` (automatisme, Safety, orchestrateur) · 1 × `ALERTE` (IHM) · 1 × `ALERTE` (tests/CI)**
 > — 2 motifs de `BLOCK` de reviewers ont été **arbitrés en `ALERTE`** avec argumentation (§10.3, §E.5),
 > et **1 erreur de MON analyse a été démentie par la review Safety puis corrigée** (§3-D, ERRATA).
-> **16 questions** restent à trancher (§9) · **0 fichier `CODE/` modifié**.
+> **18 questions** au total — **Q1, Q2, Q15, Q16 RÉSOLUES** (décisions humaines 2026-09-20) ; **Q17/Q18 NOUVELLES** ; 12 restent à trancher (§9) · **0 fichier `CODE/` modifié**.
+
+---
+
+## ✅ 0bis · DÉCISIONS HUMAINES ACTÉES (2026-09-20) — **prioritaires sur tout le reste du rapport**
+
+> ⚠️ **Ces décisions REMPLACENT la recommandation §5** (OPTION 1). Lire cette section **avant** §5.
+> Aucun code n'est autorisé tant que **T291-B B1** reste en cours sur `PRG_04` / `PRG_07`.
+
+### Q1 — règles retenues (deux règles **distinctes**, contrôlées **séparément**)
+
+```
+ReserveTop_M = CfgTopSensorPos_M − CfgCableLimitAscent_M  >=  1,00 m
+WinchSlowdownDistanceTop_M                                >=  0,50 m
+```
+
+| Point | Décision humaine |
+|---|---|
+| Réserve FDC / TOP homing | **≥ 1,00 m** — maintenue |
+| Ralentissement haut | **peut descendre jusqu'à 0,50 m** — **on ne le force PAS à 1,00 m** |
+| Règle historique `réserve ≤ ralentissement` | ⛔ **ABROGÉE** — le futur gate **ne doit plus l'imposer** |
+| Gate futur | doit contrôler **ces deux règles séparément** |
+
+✅ **Cohérence avec mes constats** : cette décision **résout le conflit bloquant §6** en **abrogeant la règle G483 AC2b**, et **retient l'Option A** de mon §6.2 (conserver `Δ ≥ 1,00 m`) **sans** relever la bande à 1,00 m — c'est-à-dire ma préconisation, mais avec une **borne propre** (0,50 m) sur la bande au lieu d'un alignement sur `Δ`.
+➡️ **Q15 est RÉSOLU** (bande plancher `0,50 m`).
+
+### Q2 — comportement retenu : **NORMALISATION** (3ᵉ option)
+
+**Ni refus bloquant (OPTION 1), ni état invalide persistant (OPTION 2)** : la valeur invalide saisie est
+**immédiatement corrigée** et **l'IHM reflète la valeur corrigée**.
+
+| Cas | Règle de normalisation |
+|---|---|
+| L'opérateur modifie le **FDC** trop près / au-dessus du TOP | `CfgCableLimitAscent_M := CfgTopSensorPos_M − 1,00 m` |
+| L'opérateur modifie la **position TOP** trop bas | `CfgTopSensorPos_M := CfgCableLimitAscent_M + 1,00 m` |
+| Le **ralentissement haut** < 0,50 m | `WinchSlowdownDistanceTop_M := 0,50 m` |
+
+**Message IHM** (non alarmant, immédiat) : « *Réglage corrigé : réserve TOP/FDC maintenue à 1,00 m.* »
+
+**Invariant d'intention** : **préserver le réglage NON modifié**, corriger **celui que l'opérateur vient de saisir** — jamais écraser arbitrairement l'autre réglage.
+
+✅ **Coherence avec mes constats** : cette décision **retient le volet B de mon hybride §5.3** (contrôle
+à la lecture ⇒ couvre la NVRAM déjà invalide) **et abandonne le volet A** (refus à l'écriture).
+➡️ **Q16 est OBSOLÈTE** (plus aucun état invalidé à porter ⇒ plus besoin de `_MaintMxHomingRequired`).
+➡️ **AC3 du contrat est préservé** : la normalisation ne crée **aucun champ IHM ni RETAIN**.
+
+> 🧭 **Note d'honnêteté doctrinale** — la consigne initiale de la mission disait « ❌ Ne pas proposer de
+> `LIMIT()` ou de **clamp silencieux** ». La décision Q2 **est** un bornage, **mais elle n'est PAS
+> silencieuse** : elle **écrit la valeur corrigée** et **affiche un message**. C'est la résolution que
+> proposait la review IHM (« *borner = refuser avec cause* ») appliquée à la lettre AF-07 (« réglage `Cfg`
+> → **bornage PLC obligatoire** »), avec **message** au lieu de **refus**. ⇒ **conforme à l'esprit** de
+> l'interdit initial (qui visait le clamp **muet**), et **conforme à la doctrine AF-07**.
+
+---
+
+## ⚔️ 0ter · Challenge de la décision Q2 — pièges d'implémentation **non couverts** (devoir d'alerte)
+
+> 🎭 Posture : ces points **ne contestent pas** la décision (elle est humaine et j'applique), ils
+> **l'éclairent** : ce sont les endroits où une implémentation naïve de la normalisation **produirait un
+> bug ou détruirait un réglage**. Chacun est **vérifié sur le code réel** ou **dérivé d'un fait vérifié**.
+
+### ⚠️ P1 — 🔴 « Quel champ l'opérateur vient de saisir » **n'est pas détectable en l'état du code**
+
+La règle « préserver le réglage non modifié » **exige** de savoir **lequel** a changé. Or les ponts de
+persistance sont des **miroirs purs**, sans mémoire d'origine :
+
+| Fait | Preuve |
+|---|---|
+Le pont ne connaît **ni front ni origine** : `IF NOT Hmi.Initialized → Hmi := Persist` **sinon `Persist := Hmi`** | `FB_CfgPersistBridge_WinchCfg.st:20-26` · `FB_CfgPersistBridge_CommunCfg.st:20-26` |
+Aucun des deux champs n'a de mémoire « valeur précédente » | `grep` — aucune |
+
+⇒ **Il faut créer 3 mémoires NON persistantes + une détection de front par champ** (autorisé par AC3 :
+ce ne sont **pas** des réglages). **Deux pièges à ne pas rater :**
+
+| Piège | Détail | Parade exigée |
+|---|---|---|
+🔴 **Faux positif M2** | `PRG_07:154-155` **écrit** `GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M` **à chaque scan** (miroir M1) ⇒ un détecteur naïf croirait que **l'opérateur modifie M2 en continu** | **Limiter la détection à 2 champs** : `GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M` + `GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M`. **Jamais** le champ M2 |
+🔴 **Cas NON DÉFINI : les deux champs changent dans le même scan** | Se produit réellement : **restauration au boot**, **download**, restauration RETAIN. La règle « corriger celui que l'opérateur vient de saisir » **n'a alors aucune réponse** | ⛔ **DÉCISION MANQUANTE — à trancher (Q17)** : en cas de changement simultané, **lequel des deux préserve-t-on ?** |
+
+### 🔴 P2 — Piège de BOOT : risque d'**écraser la NVRAM** au premier scan
+
+| Étape | Ce qui se passe |
+|---|---|
+Scan 1 (avant les ponts) | `GVL_IHM.*.Cfg` contient les **défauts du DUT** (8,5 / 7,5), **pas** la NVRAM |
+Scans suivants | Les ponts (`PRG_07:140,145,182`) **restaurent** la NVRAM par-dessus |
+
+⇒ Si les « mémoires de valeur précédente » sont initialisées avec les **défauts** au lieu des valeurs
+**restaurées**, le détecteur verra un « changement opérateur » **faux** au moment de la restauration →
+**correction injustifiée → écriture en NVRAM → perte du réglage réel**.
+
+> ⛔ **Exigence absolue (à porter dans le plan C3)** : les mémoires de détection **doivent être
+> initialisées depuis les valeurs RESTAURÉES**, et la normalisation doit être **inhibée tant que
+> `NOT Initialized`** (le flag `Initialized` existe déjà : `ST_WinchCfg.st:16`, `ST_CommunCfg.st:33`).
+> ⚠️ Corollaire : la normalisation ne peut **pas** être placée « avant `:140` » comme le proposait mon
+> §5.2 — elle doit tourner **après la restauration** des ponts concernés, mais **avant** le miroir M2
+> `:154-155` et **avant** la recopie `Persist := Hmi`. **Fenêtre d'insertion à valider en C3.**
+
+### 🔴 P3 — Tolérance REAL obligatoire, sinon **boucle de correction**
+
+`FDC := TOP − 1,00`, puis test `TOP − FDC >= 1,00` : en flottant, `TOP − (TOP − 1.00)` peut valoir
+`0.9999999` ⇒ l'invariant est lu **violé juste après avoir été corrigé** ⇒ **correction à chaque scan,
+message en boucle, écriture NVRAM permanente**.
+
+> ✅ **Exigence** : une constante de tolérance nommée (`CST_*`, cf. `NAMING_CONVENTION.md:695-714`) **et**
+> une **preuve d'idempotence** : sur 3 scans consécutifs après une correction, **aucune** seconde
+> correction et **aucun** second message.
+
+### 🔴 P4 — La normalisation ramène la réserve **exactement à 1,00 m** ⇒ le point médian devient **nominal**
+
+Mon §4.3 : quand `Δ = 1,00` **et** `band = 0,50`, alors
+`CfgCableLimitAscent_M + 0,50 = CfgTopSensorPos_M − 0,50` — **les deux seuils dérivés COÏNCIDENT**.
+Comme **toute normalisation force `Δ = 1,00`**, cette coïncidence n'est plus un cas limite :
+**elle devient l'état normal après toute correction**, avec la bande actuelle (0,50 m).
+
+> ⛔ **Conséquence** : l'exigence « **une seule** expression dérivée » (§4.3) passe d'**optionnelle** à
+> **OBLIGATOIRE**, et **Q3 devient critique** (risque de bande morte d'un scan ou de double
+> déclenchement au point `8,000 m`).
+
+### 🟠 P5 — `WinchSlowdownDistanceTop_M` : le commentaire du DUT **contredit** la nouvelle borne
+
+| Fait | Preuve |
+|---|---|
+Le DUT documente « **0 = arrêt au seuil** » ⇒ `0` est présenté comme **légal** | `ST_CommunCfg.st:16` |
+La décision Q1 impose **≥ 0,50 m** | décision humaine 2026-09-20 |
+Valeur actuelle : **exactement 0,50 m** (donc **pile sur la borne**) | `GVL_PERSISTENT.st:142` |
+
+⇒ Le commentaire du DUT **doit être corrigé** sinon il documente une valeur que la normalisation
+interdit — incohérence garantie pour le prochain mainteneur.
+
+### 🟠 P6 — Q5 **n'est PAS couverte** par la normalisation (et reste bloquante)
+
+La normalisation ne corrige que **l'incohérence du couple**. Elle **ne voit pas** le cas suivant, **valide
+pour l'invariant** mais **dangereux pour le datum** :
+
+> L'opérateur **relève** `CfgTopSensorPos_M` à une valeur **cohérente** (ex. TOP 10,0 avec FDC 7,5 ⇒ `Δ = 2,5` ✅ valide) sur une machine **déjà référencée**. **Aucune normalisation ne se déclenche** — et pourtant la référence codeur **n'est pas re-presetée** (`FB_Encoder_Homing.st:263`) ⇒ **le datum décrit une machine qui n'existe plus**, et le FDC/ralentissement se décalent **silencieusement** par rapport au capteur réel.
+
+⇒ **Q5 reste ouverte et bloquante** pour la sûreté complète : la normalisation traite la cohérence
+**interne** du couple, pas sa cohérence **avec la machine**.
+
+### 🔴 P7 — Risque RÉSIDUEL ACCEPTÉ par la décision Q1 : **la bande de 0,50 m n'est pas validée par une mesure**
+
+C'est le point safety le plus important de cette section. Sous **override N1 / bypass N2**, la limite
+active devient `CfgTopSensorPos_M` ; avec `Δ = 1,00` (état normalisé) et `band = 0,50` :
+
+```
+course d'override = 1,00 m  (de FDC=7,50 m jusqu'à TOP=8,50 m)
+zone de ralentissement = [TOP − 0,50 ; TOP] = [8,00 ; 8,50]  => SEULS LES 0,50 m FINAUX sont à palier 1
+les 0,50 m INITIAUX (7,50 -> 8,00) sont parcourus à vitesse normale
+```
+
+| Constat | Preuve |
+|---|---|
+La bande est mesurée depuis la limite **ACTIVE** (donc depuis `TOP` sous override) | `FB_Winch.st:173` |
+⛔ **La distance d'arrêt réelle au palier 1 n'est PAS instrumentée** | relevé par la review automatisme (« durée de coast réelle à l'arrêt sur capteur : **non instrumentée** ») |
+⇒ La décision « **le ralentissement peut descendre à 0,50 m** » **repose sur une valeur non mesurée** | — |
+
+> ⚠️ **Ce n'est pas un refus** : la décision est prise, et la bande était **déjà** à 0,50 m avant T330
+> (donc **aucune régression**). Mais **la borne `≥ 0,50 m` n'est pas adossée à une preuve physique**.
+> 🎯 **Recommandation** : avant la recette machine de C3, **mesurer la distance d'arrêt réelle au
+> palier 1** (trace CODESYS : `CablePosM` au front de coupure → `CablePosM` à l'arrêt) et **confirmer
+> que 0,50 m suffit** à ne pas heurter le capteur. Sinon, la borne doit être **relevée à la valeur
+> mesurée + marge** — décision **Safety**, à tracer.
+
+### ⚠️ P8 — Retirer G483 AC2b **ne rend pas G483 vert**
+
+`G483` est **actuellement ROUGE sur AC1** (dérogation MES bypass sans gate de mode) — vérifié par
+**exécution** (`exit=1`, §6.1ter). Abroger AC2b (Q1) **ne corrige pas AC1** ⇒ **G483 reste rouge** et
+**Q11 reste ouverte**. La suite « fin de lot » demeure bloquée **indépendamment** de T330.
 
 ---
 
@@ -476,7 +643,7 @@ P1/Maintenance). « Descente possible » **ne veut donc pas dire** « descente t
 
 | # | Contrainte | Détail | Preuve |
 |---|---|---|---|
-| **C1** 🔴 | **Tolérance de comparaison REAL obligatoire** | La réserve est comparée à `1,00 m` sur des valeurs **saisies par l'utilisateur**. En flottant, `8,49 − 7,49` peut valoir `0,9999999` ⇒ **refus fantôme** sur une configuration voulue valide. Prévoir une **constante de tolérance explicite** (`CST_*`), jamais une comparaison sèche | `NAMING_CONVENTION.md:695-714` (préfixe `CST_`) |
+| **C1** 🔴 | ⛔ **EXIGENCE RETIRÉE — erreur mathématique corrigée (2026-09-20)** | La review IHM affirmait que `8,49 − 7,49` peut valoir `0,9999999` ⇒ tolérance **obligatoire**. **C'EST FAUX** en IEEE-754 simple précision : **lemme de Sterbenz** (`y/2 ≤ x ≤ 2y` ⇒ soustraction **exacte**), les deux champs étant **toujours** dans un rapport `< 2`. **Vérifié par calcul** : `float32(8.49) − float32(7.49) = 1.0` **exactement** ; idem `TOP − (TOP − 1.0) = 1.0`. ⇒ **ne PAS introduire d'`eps`** : il n'est **pas** nécessaire et il **ouvre une faille** (`0,9999 m` acceptée **sans correction** = **relaxation silencieuse** de la règle Q1). Sauf cas IEEE-754 **prouvé** par test unitaire | **Q27** du plan C3 |
 | **C2** 🟠 | **Le `1,00 m` doit être une `CST_` nommée** | `CST_HomingTopMinMargin_M := 1.0` en `VAR CONSTANT`. Ce **n'est pas** une valeur « 8.50/7.50 en dur » interdite par AC3 : c'est une **règle d'ingénierie** | pattern existant : `CST_CycleInitWindowM` (`PRG_03:52`) |
 | **C3** 🟠 | **Tension doctrinale à arbitrer** | `DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md:182` impose « 🔧 `Cfg` → Réglages. **Bornage PLC obligatoire** » — alors que T330 **interdit** `LIMIT()` / clamp silencieux. **Résolution proposée** : *borner = **refuser avec cause***, jamais corriger en silence. ⚠️ Les `LIMIT` existants (`PRG_07:195,197`) sont des clamps **silencieux** ⇒ incohérence **préexistante**, hors périmètre T330 | `AF-07:182` vs `PRG_07:195,197` |
 | **C4** 🟡 | **Ordre de correction à énoncer à l'opérateur** | Le message doit être **impératif et ordonné** (« baisser d'abord le FDC logiciel, puis la position TOP ») : dans un sens le couple est refusé, dans l'autre la montée devient interdite (§E.1) | — |
@@ -592,7 +759,32 @@ telle que je l'avais argumentée. Je les intègre au lieu de les écarter :
 
 ---
 
+### 5.4 ⛔ DÉCISION ACTÉE — les OPTIONS 1 et 2 sont **ABANDONNÉES**
+
+> 🚫 **Lire §0bis EN PRIORITÉ.** La décision humaine du 2026-09-20 retient une **3ᵉ option — la
+> NORMALISATION** : la valeur invalide saisie est **immédiatement corrigée**, l'IHM reflète la valeur
+> corrigée, avec un message **non alarmant** (« *Réglage corrigé : réserve TOP/FDC maintenue à 1,00 m.* »).
+>
+> ⇒ Les OPTIONS 1 (refus) et 2 (état invalide) développées ci-dessus sont conservées **pour mémoire et
+> traçabilité du raisonnement**, mais **NE DOIVENT PAS être implémentées**. Ma recommandation OPTION 1
+> est **remplacée**.
+>
+> ✅ En revanche **les invariants de conception restent valables** et sont **reportés dans le plan C3** :
+> préserver le réglage non modifié · **aucun `DescendPermit` gaté par la validité** · **aucun champ
+> IHM/RETAIN neuf** · point d'insertion cohérent avec la restauration · message **explicite**.
+> ⚔️ Les **8 pièges d'implémentation** du §0ter sont à traiter dans le plan C3.
+
+---
+
 ## 🚨 6 · Conflit bloquant CI ↔ T330 — le gate G483 impose la règle **inverse**
+
+> ✅ **CONFLIT RÉSOLU PAR DÉCISION HUMAINE (2026-09-20, §0bis)** : la règle historique
+> `réserve ≤ ralentissement` (G483 AC2b) est **ABROGÉE**. Le futur gate doit contrôler **séparément**
+> `ReserveTop_M ≥ 1,00 m` **et** `WinchSlowdownDistanceTop_M ≥ 0,50 m`.
+> ⚠️ **Mais** l'abrogation d'AC2b **ne rend pas G483 vert** : il reste **ROUGE sur AC1** (§6.1ter) —
+> **Q11 reste ouverte**, et la suite « fin de lot » reste bloquée **indépendamment de T330**.
+> 📌 Ce qui suit est conservé comme **preuve du raisonnement** et comme spécification de ce qui doit
+> **être retiré/remplacé** dans G483.
 
 **Fait vérifié personnellement** — `TOOLS/AGENT_WORKFLOW/scripts/G483_check_bypass_matrix_mode_gated.py:164-175` :
 
@@ -821,8 +1013,8 @@ Or mon argument d'indépendance repose **entièrement** sur la forme actuelle
 
 | # | Question | Impact si non tranchée |
 |---|---|---|
-| **Q1** 🔴 | **Quelle règle gouverne ?** `Δ ≥ 1,00 m` (T330) **ou** `Δ ≤ band` (G483 AC2b) — et `band` vaut-il `1,0` (fallback accidentel) ou `0,5` (`WinchSlowdownDistanceTop_M`, valeur réelle) ? **3 options d'arbitrage en §6.2 (A/B/C) — recommandation : A** | **Bloque C3.** Aucun `Δ` ne satisfait les deux si `band = 0,5` |
-| **Q2** 🔴 | **Réponse de sécurité au cas `Δ < 0`** (FDC **au-dessus** de la référence TOP) : refus (OPTION 1) ou état invalide (OPTION 2) ? | Le risque n°1 du cadrage reste ouvert ; rend aussi le cycle SEMI_AUTO impossible (§E.1) |
+| **Q1** ✅ | ~~**Quelle règle gouverne ?**~~ **RÉSOLU (2026-09-20)** : `ReserveTop_M ≥ 1,00 m` **ET** `WinchSlowdownDistanceTop_M ≥ 0,50 m`, **deux règles distinctes**, règle `réserve ≤ ralentissement` **abrogée** | — |
+| **Q2** ✅ | ~~**Réponse de sécurité au cas `Δ < 0`** : OPTION 1 ou OPTION 2 ?~~ **RÉSOLU (2026-09-20)** : **NORMALISATION** — correction immédiate de la valeur saisie, message IHM non alarmant, réglage non modifié préservé (§0bis). OPTIONS 1 et 2 **abandonnées** | — ⚔️ **8 pièges d'implémentation** à traiter : §0ter |
 | **Q3** 🟠 | **Le seuil « proximité TOP » (`TOP − 0,50`) fait-il doublon** avec la zone de ralentissement existante (`TopLimitM − WinchSlowdownDistanceTop_M`), qui coïncident à `8,00 m` quand `Δ = 1,00 m` ? Faut-il **un** mécanisme ou **deux** ? | Deux mécanismes concurrents pour le même fait |
 | **Q4** 🟠 | **Quelle est la « position M2 corrigée » de référence ?** Trois offsets coexistent (`DisplayOffsetM` affichage, `ActiveOffsetM` sécurités, `OffsetTargetM` écart). La position **affichée** et la position **jugée par le FDC** diffèrent | Diagnostic opérateur potentiellement trompeur |
 | **Q5** 🟠 | **Changement de `CfgTopSensorPos_M` sur machine DÉJÀ référencée** : faut-il **armer un re-homing obligatoire** ? Aujourd'hui l'armement ne couvre que `PositionLimitOverridden` (`PRG_04:897-899`) | La référence codeur devient silencieusement incohérente |
@@ -835,8 +1027,10 @@ Or mon argument d'indépendance repose **entièrement** sur la forme actuelle
 | **Q12** 🟠 | **Export IHM FRAIS requis** : le projet VISU n'est **pas versionné** ⇒ impossible de savoir en lecture seule si le widget `GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M` est **éditable**. S'il l'est, le « miroir silencieux » (§2.3) est un **piège opérateur** : griser/retirer le widget **ou** documenter M1 comme seul maître | Précondition bloquante de la review IHM : décision d'IHM à prendre sur une base **fraîche**, pas sur `ihm_variables.txt` (périmé, cf. C5) |
 | **Q13** 🟡 | **`PRG_02:529`** recalcule `MachineHomingCfg.CfgTopHomingTarget_M` à **chaque scan** — une modification de `CfgTopSensorPos_M` **pendant** un homing machine peut-elle changer la cible **en cours de séquence** (HX3 / preset M2) ? | ⚠️ **INCERTAIN** : non tranchable en lecture seule par la review IHM. La cible de `FB_Encoder_Homing` est **capturée au déclenchement** (`:216-223`), mais `FB_CycleMachineHoming` a sa **propre** séquence HX0..HX6 → **à prouver avant C3** |
 | **Q14** 🟠 | **Statut safety d'un arrêt sur TOP mécanique hors homing** : la cause 5 est **non latchée** (reprise possible si commande maintenue, §E.4). Faut-il une **cause latchée acquittable** + **retour au neutre / nouvelle demande** obligatoires après un arrêt sur TOP hors homing ? | Le TOP est le **dernier rempart** ; aujourd'hui son franchissement ne laisse **aucune trace latchée** (seul MecaD, à 3 s, latte — §3-D) |
-| **Q15** 🔴 | **`WinchSlowdownDistanceTop_M`** (bande de ralentissement haute, **IHM/RETAIN non borné**, doc autorisant `0`) : la marge de `1,00 m` **n'a de sens que par cette bande** (§E.4). **Plafonner cette bande** (≥ 0,5 m) **ou** la sortir du champ d'action de l'IHM ? | Un réglage à `0` **détruit silencieusement** la justification de l'invariant ; la cohérence est un **triplet**, pas un couple |
-| **Q16** 🟠 | **Réutilisation de `_MaintM1HomingRequired`/`_MaintM2HomingRequired`** (`GVL_PERSISTENT.st:182-183`, existants, déjà audités par G483 AC6/AC7/AC8) pour porter « configuration invalide » **sans champ neuf** ? | Permettrait l'OPTION 2 sans violer AC3, **mais** confondrait deux notions (« re-homing requis » ≠ « config invalide ») ⇒ **NC-090** et diagnostic indiscernable (§5.3) |
+| **Q15** ✅ | ~~**`WinchSlowdownDistanceTop_M`** : plafonner ou sortir de l'IHM ?~~ **RÉSOLU (2026-09-20)** : **plancher `≥ 0,50 m`** via la normalisation. ⚠️ Reste à faire : **corriger le commentaire du DUT** `ST_CommunCfg.st:16` (« 0 = arrêt au seuil ») qui **contredit** la nouvelle borne (§0ter P5) | — |
+| **Q16** ✅ | ~~**Réutilisation de `_MaintMxHomingRequired`** pour porter « configuration invalide » sans champ neuf ?~~ **OBSOLÈTE (2026-09-20)** : la normalisation ne crée **aucun état invalidé persistant** ⇒ plus besoin de ce porteur | — |
+| **Q17** 🔴 | **NOUVELLE — cas non défini par la décision Q2** : quand **les deux champs changent dans le MÊME scan** (restauration au boot, download, restauration RETAIN), « corriger celui que l'opérateur vient de saisir » **n'a aucune réponse**. **Lequel des deux préserve-t-on ?** (§0ter P1) | Bloque le plan C3 : sans règle, la normalisation peut **écraser la NVRAM** au boot (§0ter P2) |
+| **Q18** 🟠 | **NOUVELLE — la borne `≥ 0,50 m` n'est adossée à aucune mesure** : la distance d'arrêt réelle **au palier 1** n'est **pas instrumentée**. Sous override, seuls les 0,50 m **finaux** sont ralentis (§0ter P7) | Risque résiduel **accepté** mais **non prouvé** — mesure à faire avant recette |
 
 ---
 
@@ -853,6 +1047,7 @@ chaque constat retenu a été **revérifié sur les sources** par l'orchestrateu
 | **Safety** | `636d3c02` | **BLOCK** | **A DÉMENTI UNE ERREUR DE MON RAPPORT** : `MecaD` (cause 11) est **conditionnée au TOP** et escalade en `PowerCutOff` à 3 s (§3-D corrigé) · **`WinchSlowdownDistanceTop_M` non borné / `0` autorisé ⇒ la marge de 1,00 m peut perdre sa justification** (§E.4, Q15) · **l'OPTION 2 est réalisable SANS champ neuf** via `_MaintMxHomingRequired` (§5.3, Q16) · **l'OPTION 1 ne couvre pas une NVRAM déjà invalide** (§5.3) · piège du homing qui « sort de l'invalidité sans corriger la cause » · chemin fail-unsafe sur rupture NC (**hypothèse forte, non tracée**) · contrat T268 `PENDING` auto-contradictoire · `BypassPowerCutOff` hors IHM (`PRG_06:498`) |
 | **IHM** | `1feea1a3` | **ALERTE** | M2 miroir non réglable · aucun gel d'édition · aucune validation croisée · G483 périmé · **arbitrage M2 indépendant de T291-B** |
 | **Tests / CI** | `75a80338` | **ALERTE** | **G483 AC2b = règle inverse** 🔴 · **champ fantôme `WinchSlowdownDistance_M`** 🔴 · 3 critères/5 non testables · butée logicielle jamais testée · aucun gate anti-magic-number · collision `G499` |
+| **Plan C3** 🔄 | `34229875` | **BLOCK** *(sur la v1.0 du plan)* | **11 erreurs factuelles du plan**, dont **8 confirmées** et **1 mathématique de MON fait** (§4.5-C1 : le lemme de Sterbenz invalide l'exigence de tolérance REAL) · **19 cas de test manquants** · **8 questions à ajouter** (Q21→Q28) · **renversement du point d'insertion** (pattern pré-bridge `PRG_07:187-196`) · `G460` exclu sans `--full-ci` · format d'ID de test non conforme · `G504-5` inexécutable. **Plan révisé en v1.1** — journal d'audit §11 du plan |
 
 > 🎯 **3 reviewers sur 4 rendent `BLOCK`** (automatisme, Safety, et mon propre constat). Le constat **G483**
 > est **corroboré indépendamment par 3 contextes frais** — c'est le constat le mieux établi de ce cadrage.
@@ -1218,7 +1413,7 @@ implémentation C3 ») :
   *Décision : réécrire le contrat (**Q7**).*
 
 **Fichiers lus** : voir §12 · **Fichiers modifiés** : documentation T330 uniquement (§12) ·
-**Sous-agents** : 4 (lecture seule) · **Divergences entre reviewers** : 4, arbitrées (§10.2) ·
+**Sous-agents** : 4 (lecture seule) · **Divergences entre reviewers** : 4, arbitrées (§10.2) · **Décisions humaines** : Q1/Q2/Q15/Q16 actées (§0bis) ·
 **Errata** : 1 (une erreur **de mon rapport**, démentie par la review Safety — §3-D) ·
 **Flags/locks** : 🔒 `T330`=`DSH01`, 🚩 retiré, `T291-B` intact ·
 **✅ Aucun code automate modifié.**

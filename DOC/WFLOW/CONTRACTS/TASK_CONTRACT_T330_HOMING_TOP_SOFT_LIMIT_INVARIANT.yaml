@@ -3,53 +3,143 @@ contract:
   criticality: C2
   strategy: patch
   objective: >
-    Cadrer une vérification sûre de cohérence entre la position de référencement
-    au capteur TOP et la limite logicielle haute, sans créer de paramètre ou de
-    variable de fin de course supplémentaire.
+    Cadrer une correction automatique et bornée de la cohérence entre la position de
+    référencement au capteur TOP et la limite logicielle haute d'exploitation, sans
+    créer de paramètre ni de variable de fin de course supplémentaire.
+    DÉCISIONS HUMAINES DU 2026-09-20 ACTÉES : voir bloc human_decisions ci-dessous.
+  human_decisions:
+    date: "2026-09-20"
+    Q1_rule:
+      statement: >
+        Deux règles DISTINCTES et contrôlées SÉPARÉMENT :
+        (1) ReserveTop_M = CfgTopSensorPos_M - CfgCableLimitAscent_M >= 1.00 m ;
+        (2) WinchSlowdownDistanceTop_M >= 0.50 m.
+      explicit:
+        - "La réserve entre FDC logiciel haut et position TOP homing reste au minimum de 1,00 m."
+        - "Le ralentissement haut peut descendre jusqu'à 0,50 m ; on ne le force PAS à 1,00 m."
+        - "Le futur gate ne doit PLUS imposer la règle historique erronée : réserve <= ralentissement."
+      supersedes: "G483 AC2b (`delta > band`) — à RETIRER et REMPLACER, pas à corriger en place."
+    Q2_behavior:
+      retained_option: "NORMALISATION (3e option, ni refus bloquant, ni état invalide persistant)"
+      statement: >
+        On ne bloque pas la saisie : la valeur invalide saisie est immédiatement
+        normalisée et l'IHM reflète la valeur corrigée.
+      rules:
+        - "FDC trop haut / trop près du TOP  => CfgCableLimitAscent_M := CfgTopSensorPos_M - 1.00 m"
+        - "Position TOP trop basse          => CfgTopSensorPos_M := CfgCableLimitAscent_M + 1.00 m"
+        - "WinchSlowdownDistanceTop_M < 0.50=> WinchSlowdownDistanceTop_M := 0.50 m"
+      invariant_of_intent: >
+        PRÉSERVER le réglage NON modifié et corriger celui que l'opérateur vient de
+        saisir — jamais écraser arbitrairement l'autre réglage.
+      hmi_message: "Réglage corrigé : réserve TOP/FDC maintenue à 1,00 m."
+      hmi_message_tone: "Non alarmant, immédiat."
+      supersedes: "AC4 d'origine recommandant le REFUS (OPTION 1) ; les OPTIONS 1 et 2 sont ABANDONNÉES."
+    hold:
+      - "AUCUN code tant que T291-B B1 reste en cours sur CODE/M_MAIN/PRG_04_Treuils_Benne.st et CODE/M_MAIN/PRG_07_Supervision.st."
+      - "Conserver le verrou 🔒 T330 (DSH01)."
   acceptance:
     - id: AC1
-      statement: "Les deux paramètres existants sont tracés de leur persistance à chaque consommateur : PositionHomingTop_M et CableLimitAscent_M."
-      verified_by: "table producteur -> route -> consommateur versionnée"
+      statement: >
+        Les deux paramètres EXISTANTS sont tracés de leur persistance à chaque consommateur,
+        sous leurs noms RÉELLEMENT DÉCLARÉS : CfgTopSensorPos_M (ST_WinchCfg.st:8, M1 maître,
+        M2 miroir imposé par PRG_07:154-155) et CfgCableLimitAscent_M (ST_CommunCfg.st:21,
+        commun M1/M2). Les libellés PositionHomingTop_M / PositionFdcLogicielHaut_M /
+        CableLimitAscent_M sont INTERDITS dans tout document de la tâche (ils n'existent pas
+        dans CODE/ ; CableLimitAscent sans préfixe désigne un ÉTAT BOOL).
+      verified_by: "gate G504 : grep des noms interdits dans les livrables T330 = 0 occurrence + table producteur -> route -> consommateur versionnée"
     - id: AC2
-      statement: "La règle PositionHomingTop_M >= CableLimitAscent_M + 1.00 m est documentée comme invariant de configuration, non comme valeur figée 8.50/7.50."
-      verified_by: "revue du contrat et cas de valeurs utilisateur modifiées"
+      statement: >
+        L'invariant est documenté sous forme de DEUX règles distinctes sur les valeurs de
+        configuration, et sur AUCUNE valeur figée :
+        ReserveTop_M = CfgTopSensorPos_M - CfgCableLimitAscent_M >= 1.00 m ;
+        WinchSlowdownDistanceTop_M >= 0.50 m.
+        La règle historique réserve <= ralentissement est explicitement ABROGÉE.
+      verified_by: "gate G504 sur les valeurs persistées ET les défauts de type, avec les deux règles évaluées séparément"
     - id: AC3
-      statement: "Aucune nouvelle cote, variable persistante ou réglage IHM de FDC n'est créé. Les futures marges ±0.50 m sont uniquement dérivées des paramètres existants."
-      verified_by: "diff ciblé et revue des déclarations"
+      statement: >
+        Aucune nouvelle cote, variable persistante ou réglage IHM de FDC n'est créé.
+        Le triplet {CfgTopSensorPos_M, CfgCableLimitAscent_M, WinchSlowdownDistanceTop_M}
+        reste la seule source. Les seuils dérivés ±0.50 m sont des expressions LOCALES
+        (VAR CONSTANT / locale), jamais des champs persistants ou IHM. Les mémoires de
+        détection « valeur précédente » sont NON persistantes et ne sont pas des réglages.
+      verified_by: "gate G504 : aucun nouveau champ *LimitAscent*/*HomingTop*/*Fdc*/*TopSensorPos*/*Slowdown* dans ST_*Cfg.st, GVL_PERSISTENT.st, GVL_IHM.*.Cfg + diff ciblé"
     - id: AC4
-      statement: "Le comportement à configuration invalide est proposé explicitement sans clamp silencieux et sans autoriser une montée normale non sûre."
-      verified_by: "plan C3 soumis à validation humaine"
+      statement: >
+        La normalisation (décision Q2) est implémentée avec les 3 règles exactes, SANS tolérance
+        de comparaison (décision Q27 : comparaison STRICTE, aucun eps), la préservation
+        du réglage NON modifié, et un message IHM non alarmant. Aucune boucle de correction
+        (une seule passe par scan, idempotente), aucun clamp silencieux.
+      verified_by: "tests ST du bloc TC-P10-056 et suivants (plage a arbitrer, cf. plan C3 section 4 : collision avec les tests CI 052-055 appartenant a T288) + revue humaine du plan C3 + preuve d'idempotence sur 2 scans consecutifs (decision Q24)"
     - id: AC5
-      statement: "Le homing reste la seule exception autorisant une montée vers le TOP mécanique ; hors homing, la limite logicielle empêche la montée et la descente reste possible."
-      verified_by: "matrice de modes proposée et revue humaine"
+      statement: >
+        La montée vers le TOP mécanique n'est autorisée QUE sous homing explicite, override
+        N1 (MAINT_N1, bouton maintenu) ou bypass N2 ; ces TROIS exceptions sont nommées,
+        tracées et gatées. Hors de ces cas, la limite logicielle empêche la montée et la
+        DESCENTE reste toujours possible (aucun gate de validité sur DescendPermit).
+      verified_by: "matrice de modes + gate G504 sur les 3 exceptions nommées + test ST de descente préservée"
+    - id: AC6
+      statement: >
+        Le gate G483 AC2b (règle inverse réserve <= bande de ralentissement) est RETIRÉ et
+        remplacé par G504 portant les deux règles séparées. Le contrôle ne doit plus
+        dépendre d'un nom de champ fantôme : tout nom introuvable = ÉCHEC explicite,
+        jamais de repli numérique muet.
+      verified_by: "diff de G483 + exécution de G504 + absence de fallback silencieux dans le code du gate"
+    - id: AC7
+      statement: >
+        Le séquencement est respecté : aucun code n'est écrit avant la remise de T291-B B1.
+        Tout garde-fou codé contre la formule M2 (CfgCableLimitAscent_M + M2_LimitShift)
+        est INTERDIT avant T291-B B2, car cette formule est susceptible de changer.
+      verified_by: "revue du git diff réel + confirmation humaine du jalon T291-B B1"
   scope:
     allowed:
       - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T330_HOMING_TOP_SOFT_LIMIT_INVARIANT.yaml
+      - DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T330_INVARIANT_HAUT_v1.0.md
+      - DOC/WFLOW/AUDITS/DESIGN/PLAN_T330_C3_INVARIANT_HAUT_v1.0.md
       - DOC/WFLOW/TROUBLESHOOTING/FICHES/
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
       - CODE/J_SUPERVISION/_TYPES/*
-      - CODE/GVL_PERSISTENT.st # pendant le cadrage : aucune nouvelle configuration
+      - CODE/GVL_PERSISTENT.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st # pendant T291-B B1
+      - CODE/M_MAIN/PRG_07_Supervision.st # pendant T291-B B1
   conservation:
     must_survive:
       - "TOP mécanique commun, indépendant de la logique de cycle."
       - "FDC logiciel nominal et possibilité de descendre après blocage de montée."
       - "Aucun nouveau réglage IHM ou RETAIN de fin de course."
       - "Aucun changement de comportement de T291-B pendant ce cadrage."
-    dropped_on_purpose: []
+      - "Réglage non modifié préservé lors d'une normalisation (Q2)."
+    dropped_on_purpose:
+      - "G483 AC2b (règle réserve <= ralentissement) — abrogée par décision humaine Q1."
+      - "OPTION 1 (refus du réglage) et OPTION 2 (état invalide persistant) — remplacées par la normalisation."
+      - "Toute marge imposant WinchSlowdownDistanceTop_M >= 1,00 m — jamais requise (Q1)."
   evidence_required:
     - task_contract_check
     - parameter_consumer_map
     - human_plan_approval
+    - plan_c3_document
   alert_duty: >
-    Toute ambiguïté sur le repère M2 corrigé, le signe des positions ou la
-    réaction hors homing bloque le passage à une implémentation C3.
+    Toute ambiguïté sur le repère M2 corrigé, le signe des positions, la détection
+    « quel champ a changé », l'idempotence de la normalisation ou la réaction hors homing
+    bloque le passage à une implémentation C3.
+  open_questions_blocking_c3:
+    - "Q11 — Bypass.TopLimitSwitch effectif dans TOUS les modes (dérogation MES) : G483 est ROUGE sur AC1, non traité par Q1/Q2."
+    - "Q12 — Export IHM FRAIS requis : risque de « guerre d'écriture » entre la correction PLC et le write-back du panneau, non vérifiable aujourd'hui."
+    - "Q5 — Changement de CfgTopSensorPos_M sur machine DÉJÀ référencée : la référence codeur n'est pas re-presetée, aucune normalisation ne couvre ce cas."
+    - "Q3 — Coïncidence systématique des deux seuils ±0,50 m au point médian quand la réserve vaut EXACTEMENT 1,00 m (état atteint après toute normalisation)."
 status: PENDING
 execution:
   status: PENDING
-  summary: "Cadrage uniquement ; aucun code ni réglage modifié."
-  evidence_submitted: []
+  summary: "Cadrage + décisions humaines actées + plan C3 rédigé ; aucun code ni réglage modifié."
+  evidence_submitted:
+    - "DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T330_INVARIANT_HAUT_v1.0.md"
+    - "DOC/WFLOW/AUDITS/DESIGN/PLAN_T330_C3_INVARIANT_HAUT_v1.0.md"
 validation:
   status: PENDING
-  notes: "Implémentation interdite sans validation humaine du plan C3."
+  notes: >
+    Décisions Q1/Q2 VALIDÉES PAR L'HUMAIN le 2026-09-20. Le plan C3 est rédigé mais son
+    EXÉCUTION reste interdite tant que (a) T291-B B1 n'est pas remis, (b) Q11/Q12/Q5/Q3
+    ne sont pas tranchées. Verrou 🔒 T330 conservé à la demande de l'humain.

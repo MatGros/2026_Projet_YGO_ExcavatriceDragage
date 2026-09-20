@@ -13,11 +13,19 @@
     {
       "name": "PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le bandeau",
       "passed": true
+    },
+    {
+      "name": "PRG_07_Supervision : T255-D limite basse cable M1 visible (alarme + action autorisee)",
+      "passed": true
+    },
+    {
+      "name": "PRG_07_Supervision : T255-D limite basse cable M2 visible (alarme + action autorisee)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 5,
+    "passed": 5,
     "failed": 0
   }
 }

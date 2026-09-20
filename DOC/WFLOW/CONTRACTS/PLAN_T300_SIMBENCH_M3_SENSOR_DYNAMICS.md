@@ -18,6 +18,25 @@ Reviews expertes du 2026-09-16 : les corrections d'architecture, ownership, dél
 
 Source : analyse utilisateur d'une trace CODESYS de 351 points, `VISU_TASK`, période observée environ 100 ms, fréquences codées au centième de hertz.
 
+📎 **Fichier de trace (source unique, à ouvrir dans CODESYS)** :
+`TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/archives/Suivi_TranslationM3bug_20260904_27.trace`
+(352 échantillons, 0–35,1 s, 15 variables : 5 DI position, frein, mots variateur, fréquences, `TranslationM3.State/Safety.Error*`). Même trace que le REX MES 2026-09-04 cité dans `FB_Translation.st` (cause 6 instantanée → corrigée).
+
+### Dynamique capteurs observée (relevé 2026-09-20, résolution 100 ms)
+
+| t (s) | Événement | Contexte | Lecture pour le modèle |
+|---:|---|---|---|
+| 11,56 | Départ cmd=2 (s'éloigne de Trémie), frein ouvert même échantillon | mot capteurs 4/5 actifs, Trémie=0 | trolley initialement **juste hors** zone Trémie |
+| 12,24 → 12,44 | **Trémie 0→1→0** (2 échantillons, ~200 ms) | accélération 16→21 Hz, ~0,7 s après départ | activation fugitive **en s'éloignant** : balancement de charge / jeu mécanique tirant le chariot vers l'arrière — cas à reproduire, pas un franchissement |
+| 14,67 | Consigne 40→0 Hz (cmd=0), frein reste ouvert | — | décel libre 40→0 en 1,5 s (16,16 s), frein fermé **après** vitesse nulle |
+| 14,86 → 15,06 | **PV 1→0→1→0** (blink 100 ms) | 29–27 Hz, en décélération | chatter de front au franchissement en vitesse : 1 seule reprise de 100 ms |
+| 18,45 | PV 0→1 propre (cmd=1, retour vers Trémie) | consigne 28→10 Hz immédiate | palier ralenti 10 Hz tenu 8 s jusqu'à Trémie |
+| 26,44 | **Trémie 0→1**, cmd=0, **frein fermé même échantillon**, `ErrorId=64` (cause 6) | fréquence retour encore 10 Hz | frein serré sur chariot en mouvement (ancien bug cause 6 instantanée) |
+| 26,55 | **Trémie 1→0**, jamais repris (jusqu'à 35 s) | fréquence 9→0 Hz en 0,6 s | **perte définitive après arrêt** : recul du chariot par la charge / arrêt hors zone — pas un clignotement |
+| 26,75 / 27,25 | `ErrorId` 64→65→1 | — | cascade frein (cause 0) latchée, cause 6 retombée |
+
+Conséquences pour les oracles T300 : (1) la perte Trémie observée est une **perte unique post-arrêt**, pas une oscillation entretenue ; (2) le seul « clignotement » réel est 1 reprise de 100 ms sur PV en vitesse ; (3) l'activation fugitive Trémie à l'accélération (12,2 s) est le cas « perturbation sous charge en marche » évoqué par l'utilisateur ; (4) la trace ne contient **pas** la reprise capteur ~1 s décrite oralement — à recapturer à 10 ms (procédure `PROCEDURE_TRACE_T300_M3_SIMBENCH.md`).
+
 | Paramètre | Valeur retenue | Incertitude / usage |
 |---|---:|---|
 | Rampe accélération/décélération | 20 Hz/s nominal | plage observée 18–20 Hz/s |
