@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T21:51:53.556923" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T21:51:53.556923">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T23:25:08.794366" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T23:25:08.794366">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -725,6 +725,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Tolerance glissement M1 pendant Busy (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="CloseReachedOpening_Pct">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎛️ Seuil d'ouverture benne déclarant la fin de fermeture atteinte.
+Ouverture benne RESTANTE (%) au-delà de laquelle la fermeture est considérée terminée.
+⚠️ La branche correspondante est AJOUTÉE en disjonction à la condition d'arrivée de
+fermeture ci-dessous : celle-ci garde sa valeur et son rôle de filet anti-blocage.
+⛔ 0 = branche INACTIVE : critère d'arrivée seul.
+--&gt; [CFG] Ouverture restante [0..20 %] déclarant la fermeture atteinte ; 0 = critère d'arrivée seul</xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassGlobal">
               <type>
                 <BOOL />
@@ -1268,6 +1284,25 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
               </documentation>
             </variable>
+            <variable name="instCloseThreshold">
+              <type>
+                <derived name="FB_BucketCloseThreshold" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de fermeture : FB PUR (aucun état) qui dérive le réglage en distance et en
+signal qualifié. Appelé au scan même dans la branche d'arrivée de fermeture, sur la
+MESURE de ce scan (§4a).
+* [INST] Seuil d'ouverture benne déclarant la fermeture atteinte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ThresholdMeasureValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Qualification de la mesure pour la branche seuil (références, défauts, référence benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_BandStableTime">
               <type>
                 <TIME />
@@ -1771,7 +1806,28 @@ ELSE
 
         // Arrêt fermeture
         IF CloseReq THEN
-            IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
+            // 🎛️ Branche AJOUTÉE, jamais substitutive : la condition d'arrivée ci-dessous
+            // (Config.CloseAnticipationM) conserve sa valeur et son rôle de filet
+            // anti-blocage sur matière dense ; la disjonction permet d'atteindre la même
+            // conclusion avec une ouverture benne restante plus grande, sur une mesure
+            // QUALIFIÉE.
+            // Qualification : références M1/M2, absence de défaut latché (géométrie benne
+            // invalide incluse) et référence benne persistante. Le gate d'entrée §2
+            // garantit déjà Enable ET PowerContactorEngaged (RETURN en tête de bloc).
+            ThresholdMeasureValid := ClassCanRun
+                                     AND BucketState.BucketReferenced
+                                     AND NOT Fault.Error;
+            instCloseThreshold(
+                ThresholdPct    := CloseReachedOpening_Pct,
+                OffsetOpenM     := Config.OffsetOpenM,
+                OffsetCloseM    := Config.OffsetCloseM,
+                DeltaPosition_M := DeltaPosition_M,
+                MeasureValid    := ThresholdMeasureValid,
+                IsIntermediate  := BucketState.IsIntermediate
+            );
+
+            IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM)
+               OR instCloseThreshold.Reached THEN
                 M2_RunRequest := MotionRequestActive AND ReqAscent AND EffectivePermitBucket_Close;
                 M2_ReqAscent := M2_RunRequest;
                 M2_ReqDescend := FALSE;
@@ -1992,6 +2048,234 @@ DeltaPositionCorrected_M := DeltaPosition_M - OffsetTargetM;
           </data>
         </addData>
       </pou>
+      <pou name="FB_BucketCloseThreshold" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="ThresholdPct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RÉGLAGE OPÉRATEUR (source : GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct) ===
+🎛️ Ouverture benne restante (%) déclarant la fermeture atteinte ; 0 = branche INACTIVE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OffsetOpenM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GÉOMÉTRIE BENNE (source : _BucketCfgPersist.Config — plage VIVANTE) ===
+📐 Référence benne OUVERTE (m) — Delta = OffsetOpenM à 100 % d'ouverture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OffsetCloseM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Référence benne FERMÉE (m) — Delta = OffsetCloseM à 0 % d'ouverture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaPosition_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE ET QUALIFICATION ===
+📏 Écart mesuré M2 - M1 (m) — MESURE brute de FB_Bucket</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasureValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ instBucket.ActiveOffsetValid : géométrie, références, puissance, absence de défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsIntermediate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ _BucketState.IsIntermediate : mesure dans la bande plausible (hors sur-ouverture/sur-fermeture)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Reached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DÉCISION ===
+🚦 Seuil ATTEINT sur mesure qualifiée ce scan — consommé par FB_Bucket ET PRG_04 (même signal, aucun duplicata)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC / IHM ===
+🎛️ Branche seuil ARMÉE ce scan (réglage &gt; 0 ET mesure qualifiée) — FALSE à 0 %</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Distance_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance de fermeture équivalente au réglage (m) — 0,0 si réglage nul ou géométrie inexploitable</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="CST_MaxThresholdPct">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BORNES DU RÉGLAGE ===
+⚠️ La borne haute est IDENTIQUE à celle du bornage aval de PRG_07_Supervision.
+Elle est RÉPÉTÉE ici en défense en profondeur (ce FB est appelé dans la tâche
+rapide ; il ne fait jamais confiance au seul bornage amont, qui pourrait être
+contourné par un forçage ou un download partiel). Le garde-fou G515 vérifie que
+les DEUX bornes restent égales : toute divergence fait échouer le gate.
+🎛️ Borne haute du réglage (%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_MinSpan_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.001" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Débattement minimal exploitable (m) — MÊME prédicat que FB_Bucket §4a</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_PctToRatio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Conversion pourcentage -&gt; rapport (1 % = 0,01)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ThresholdEffPct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INTERNES (aucune mémoire : le FB est PUR) ===
+. [LOC] Réglage borné 0..CST_MaxThresholdPct</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Span_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Débattement benne = OffsetCloseM - OffsetOpenM (m)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎛️ FB_BucketCloseThreshold — Seuil d'ouverture benne déclarant la fermeture atteinte
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : dériver d'un pourcentage d'ouverture benne restante une DISTANCE de
+             fermeture équivalente (m) et le signal `Reached` qui autorise
+             l'anticipation de la fin de fermeture de benne.
+   📄 Traçabilité : DOC/WFLOW/ (contrat et plan de la phase de câblage du seuil).
+
+   🔬 Conversion pourcentage -&gt; mètres :
+             Distance_M = (ThresholdPct / 100) x (OffsetCloseM - OffsetOpenM)
+             La plage est la géométrie VIVANTE persistée (jamais 15,0 m en dur : les
+             valeurs OffsetOpenM / OffsetCloseM sont réglables à l'IHM et sauvegardées).
+             Convention identique à FB_Bucket.BucketOpening_Pct : 0 % = benne fermée
+             (Delta = OffsetCloseM), 100 % = benne ouverte.
+
+   🛡️ Nature de la branche — ADDITIVE, JAMAIS SUBSTITUTIVE :
+             Ce FB ne remplace ni la tolérance matière de 2,0 m du programme
+             principal, ni l'anticipation de fermeture CloseAnticipationM de
+             FB_Bucket. Ces deux expressions restent la condition de référence ;
+             `Reached` est une DISJONCTION ajoutée à chacune.
+             ⇒ Le réglage ne peut jamais RESSERRER le critère existant : il ne
+             peut que l'avancer.
+
+   🔒 Réglage à 0 : la branche est INACTIVE par CONSTRUCTION (Active = FALSE),
+             donc `Reached` reste FALSE en toutes circonstances et les deux sites
+             consommateurs retrouvent leur comportement d'origine.
+
+   ⚠️ Plage utile : le plancher historique de 1,2 m reste le terme contraignant
+             jusqu'à 8 % ; l'effet du réglage commence à 9 %. Information destinée
+             à l'IHM : un réglage inférieur à 8 % ne produit aucun changement.
+
+   🧩 Dépendances : AUCUNE (FB PUR : sans état, sans timer, sans GVL).
+             Il ne lit ni GVL_IHM, ni FB_Bucket, ni le cycle : la configuration lui
+             est transmise par l'appelant (PRG_04), producteur unique.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+
+{region "🎛️ T262-B SEUIL DE FERMETURE BENNE"}
+// Sorties remises à l'état neutre AVANT toute décision : à 0 %, le FB ne peut
+// RIEN autoriser, quel que soit l'état de ses entrées (AC2).
+Reached    := FALSE;
+Active     := FALSE;
+Distance_M := 0.0;
+
+// ─── Garde de géométrie (AC5) ──────────────────────────────────────────────────────
+// Prédicat IDENTIQUE à celui de FB_Bucket.st §4a (`(Config.OffsetCloseM - Config.OffsetOpenM) &gt; 0.001`).
+// Justification : quand la géométrie est inexploitable, FB_Bucket REPLIE son ouverture
+// affichée à 0,0 % (FB_Bucket.st:676-681) — ce zéro est un ARTEFACT de repli, il ne
+// constitue JAMAIS une preuve de fermeture (PLAN_T262 lignes 120-122). Sans cette
+// garde, un seuil lu sur une configuration invalide autoriserait un transfert.
+Span_M := OffsetCloseM - OffsetOpenM;
+IF Span_M &gt; CST_MinSpan_M THEN
+
+    // Bornage en défense en profondeur, identique au bornage aval.
+    ThresholdEffPct := LIMIT(0, ThresholdPct, CST_MaxThresholdPct);
+
+    // ─── Branche ADDITIVE : inactive à 0 % par construction (AC2) ──────────────────
+    IF ThresholdEffPct &gt; 0 THEN
+        Distance_M := INT_TO_REAL(ThresholdEffPct) * Span_M * CST_PctToRatio;
+
+        // Qualification de la mesure (AC5) : la branche ne peut jamais s'appuyer sur
+        // une mesure non fiable, une puissance absente, un défaut, ou une position
+        // hors de la bande plausible (sur-ouverture / sur-fermeture).
+        IF MeasureValid AND IsIntermediate THEN
+            Active  := TRUE;
+            // Égalité INCLUSE : « atteindre le pourcentage » (contrat parent AC3).
+            Reached := DeltaPosition_M &gt;= (OffsetCloseM - Distance_M);
+        END_IF;
+    END_IF;
+
+END_IF;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1b16f0fa-9c30-5e52-b385-f9f76cf8bc58</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_FaultCore" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -2165,6 +2449,7 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="BENNE">
             <Object Name="FB_Bucket" ObjectId="82efa9a6-05fa-5372-9d4c-1316f7f70a0b" />
+            <Object Name="FB_BucketCloseThreshold" ObjectId="1b16f0fa-9c30-5e52-b385-f9f76cf8bc58" />
             <Folder Name="_TYPES">
               <Object Name="ST_fbBucket_Config" ObjectId="b2af5901-62ea-5239-8b5e-fb6f7afb8a12" />
               <Object Name="ST_fbBucket_State" ObjectId="74e82ca6-a865-5827-ba17-53f56d8b0f29" />

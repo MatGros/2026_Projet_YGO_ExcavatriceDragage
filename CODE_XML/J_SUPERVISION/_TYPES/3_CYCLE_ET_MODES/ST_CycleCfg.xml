@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T20:33:40.411640" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T20:33:40.411640">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T23:25:34.306348" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T23:25:34.306348">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -89,7 +89,7 @@
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Seuil ouverture benne pour préparer AX10→AX11 [0..50 %] ; 0 = critère historique, consommé en phase B</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Ouverture benne restante déclarant la fermeture atteinte [0..20 %] ; 0 = critère d'arrivée seul (branche seuil inactive)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepTarget">

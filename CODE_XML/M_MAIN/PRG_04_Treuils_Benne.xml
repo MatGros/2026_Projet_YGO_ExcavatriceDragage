@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T09:54:59.444714" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T09:54:59.444714">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T23:25:24.093424" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T23:25:24.093424">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -5019,6 +5019,25 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
                 <derived name="FB_Bucket" />
               </type>
             </variable>
+            <variable name="instCloseThreshold">
+              <type>
+                <derived name="FB_BucketCloseThreshold" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil d'ouverture benne déclarant la fermeture atteinte (FB PUR). Instance PROPRE à
+PRG_04 : l'arrivée de fermeture est évaluée DANS FB_Bucket, donc sur la mesure du
+scan même, avant que PRG_04 ne puisse lire ses sorties. Les deux appels portent des
+entrées identiques au même scan -&gt; même décision, aucun critère dupliqué.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ThresholdMeasureValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Qualification de la mesure pour la branche seuil (références M1/M2 + défauts + référence benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="instSafetyWinchM1">
               <type>
                 <derived name="FB_Safety_Winch" />
@@ -6208,6 +6227,11 @@ instBucket(
     Mode                := PRG_03_Modes_Cycle.Data.Auth.Mode,
     CmdOpen_IHM         := instArbBucket.CmdOpen_IHM,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
+    // 🎛️ Seuil d'ouverture benne déclarant la fermeture atteinte. Réglage lu directement sur
+    // GVL_IHM (patron déjà en place dans PRG_04 pour le plafond de montée contrôlée et la
+    // distance de contrôle). Aucune copie locale : le FB clôt lui-même la plage, en défense
+    // en profondeur.
+    CloseReachedOpening_Pct := GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct,
     HoldAscentP1AfterClose := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqHoldAscentP1AfterClose,
     ReqAscent           := WinchBothReqAscent OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_02_Acquisition.Data.Joystick.AxisY.Direction &gt; 0),
     ReqDescend          := WinchBothReqDescend OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_02_Acquisition.Data.Joystick.AxisY.Direction &lt; 0),
@@ -6758,6 +6782,11 @@ TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
 IF ManualBucketJogActive THEN
     TopLimitM2_M := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
                      + _BucketCfgPersist.Config.OffsetCloseM + 2.0;
+ELSIF WinchBothMotionActive AND NOT (OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff) THEN
+    // En Both (WinchBothMotionActive), M1 est l'autorité nominale de montée et
+    // d'arrêt haut. M2 devient un garde-fou dérivé avec marge de tolérance +0.50 m sur le FDC
+    // logiciel haut pour éliminer les arrêts prématurés sur benne intermédiaire (réserve TOP &gt;= 1.00 m respectée).
+    TopLimitM2_M := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift + 0.50;
 END_IF;
 
 // --- Usage effectif d'un override/bypass de position → re-homing obligatoire ---------------
@@ -7112,6 +7141,18 @@ END_IF;
 // En couple les 2 treuils sont lies : la limite benne s'applique aux 2.
 IF CoupledBoth AND (BucketNotClosedAscentCapStep1 OR SlackCableAscentCapStep1) THEN
     CommonMaxStepAscent := 1;
+END_IF;
+
+// En pilotage Both (WinchBothMotionActive), M1 est l'unique autorité nominale
+// de vitesse en approche haute. Dès que M1 entre dans sa zone de ralentissement haut,
+// CommonMaxStepAscent est bridé à WinchSlowdownMaxStep (palier 1). Cela garantit que M1 et M2
+// décélèrent de façon synchrone et atomique au palier 1, éliminant la divergence de paliers
+// P1/P5 qui causait une neutralisation brutale sous WinchBothFinalRequestsCoherent.
+IF WinchBothMotionActive
+   AND PRG_02_Acquisition.Data.EncoderM1.Homed
+   AND NOT PRG_02_Acquisition.Data.EncoderM1.HomingSuspect
+   AND (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &gt;= (TopLimitM1_M - _CommunCfgPersist.WinchSlowdownDistanceTop_M)) THEN
+    CommonMaxStepAscent := MIN(CommonMaxStepAscent, _CommunCfgPersist.WinchSlowdownMaxStep);
 END_IF;
 
 // Position Maintenance atteinte : bridage commun M1/M2, montée et descente.
@@ -7642,9 +7683,30 @@ GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
 // Tolérance matière benne : « à peu près fermée » = fermée OU
 // intermédiaire proche de l'offset fermé (tolérance 2 m). Évite le blocage au fond sur
 // matière dense (galets) qui ne ferme jamais à 100% de la consigne fine.
+// 🎛️ Branche AJOUTÉE, jamais substitutive : la ligne 2 m ci-dessous est INTOUCHÉE (valeur,
+// sens et rôle de filet anti-blocage conservés). La disjonction ajoutée permet d'avancer
+// l'instant où la fermeture est considérée atteinte, via le réglage d'ouverture benne
+// (0 = branche inactive -&gt; critère d'arrivée seul).
+// Mesure QUALIFIÉE identique à celle de FB_Bucket (références M1/M2, absence de défaut
+// latché — géométrie benne invalide incluse — et référence benne persistante) : le même
+// signal des deux côtés, sinon la fenêtre de sortie AX10 pourrait se refermer entre les
+// deux évaluations et figer la séquence.
+ThresholdMeasureValid := PRG_02_Acquisition.Data.EncoderM1.Homed
+                         AND PRG_02_Acquisition.Data.EncoderM2.Homed
+                         AND NOT instBucket.Fault.Error
+                         AND _BucketState.BucketReferenced;
+instCloseThreshold(
+    ThresholdPct    := GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct,
+    OffsetOpenM     := _BucketCfgPersist.Config.OffsetOpenM,
+    OffsetCloseM    := _BucketCfgPersist.Config.OffsetCloseM,
+    DeltaPosition_M := instBucket.DeltaPosition_M,
+    MeasureValid    := ThresholdMeasureValid,
+    IsIntermediate  := _BucketState.IsIntermediate
+);
 Benne_IsRoughlyClosed := _BucketState.IsClosed
     OR (_BucketState.IsIntermediate
-        AND (instBucket.DeltaPosition_M &gt;= (_BucketCfgPersist.Config.OffsetCloseM - 2.0)));
+        AND (instBucket.DeltaPosition_M &gt;= (_BucketCfgPersist.Config.OffsetCloseM - 2.0)))
+    OR instCloseThreshold.Reached;
 
 {region "🕵️ §8bis Trace blocage"}
 // === 🕵️ §8bis TRACE DE BLOCAGE TERRAIN (cause priorisée + horodatage) ===
@@ -8113,6 +8175,22 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Tolerance glissement M1 pendant Busy (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="CloseReachedOpening_Pct">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎛️ Seuil d'ouverture benne déclarant la fin de fermeture atteinte.
+Ouverture benne RESTANTE (%) au-delà de laquelle la fermeture est considérée terminée.
+⚠️ La branche correspondante est AJOUTÉE en disjonction à la condition d'arrivée de
+fermeture ci-dessous : celle-ci garde sa valeur et son rôle de filet anti-blocage.
+⛔ 0 = branche INACTIVE : critère d'arrivée seul.
+--&gt; [CFG] Ouverture restante [0..20 %] déclarant la fermeture atteinte ; 0 = critère d'arrivée seul</xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassGlobal">
               <type>
                 <BOOL />
@@ -8365,6 +8443,46 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisateur timeout de mouvement</xhtml>
               </documentation>
             </variable>
+            <variable name="TimeoutEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Commande operateur REELLEMENT engagee pendant la manoeuvre benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutRestart">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Segment TON neuf force un scan (rearmement conscient sur Reset)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutAccumTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps de commande engagee deja consomme, GELE hors engagement (segments precedents)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutSegmentTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] ET du segment de commande en cours (reporte dans le cumul au relachement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutRemainingTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Budget restant consomme par le TON (CfgTimeoutDuration - cumul)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonBandClosed">
               <type>
                 <derived name="TON" />
@@ -8379,6 +8497,30 @@ Data.BothBlockReason              := BothBlockReason;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce court bande "ouverte" -&gt; cible offset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRecoilLimit">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-chatter de la limite de recul benne (meme base de temps que TonBand*)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RecoilLimitReachedNow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Recul au bord de la frontiere PHYSIQUE benne ce scan (instantane, non confirme)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RecoilLimitActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Limite de recul ACTIVE (confirmee CST_BandStableTime)</xhtml>
               </documentation>
             </variable>
             <variable name="TonOffsetResettle">
@@ -8461,22 +8603,6 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bande "ouverte" confirmee CST_BandStableTime</xhtml>
               </documentation>
             </variable>
-            <variable name="BandLatchConcord">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat latche ET bande mesuree concordent -&gt; offset benne fiable</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateOffsetM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Offset issu de l'ETAT LATCHE seul (reference du filet §5a, independant du recalage)</xhtml>
-              </documentation>
-            </variable>
             <variable name="OffsetMaxViolNow">
               <type>
                 <BOOL />
@@ -8537,38 +8663,6 @@ Data.BothBlockReason              := BothBlockReason;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M1 memorisee a l'entree Busy</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2StartPosM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M2 memorisee a l'entree Busy</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WasOpenAtStart">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat IsOpen memorise a l'entree Busy</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WasClosedAtStart">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat IsClosed memorise a l'entree Busy</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LeftStartSinceArm">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Quitte position de depart</xhtml>
               </documentation>
             </variable>
             <variable name="HoldOffsetM">
@@ -8640,6 +8734,25 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
               </documentation>
             </variable>
+            <variable name="instCloseThreshold">
+              <type>
+                <derived name="FB_BucketCloseThreshold" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de fermeture : FB PUR (aucun état) qui dérive le réglage en distance et en
+signal qualifié. Appelé au scan même dans la branche d'arrivée de fermeture, sur la
+MESURE de ce scan (§4a).
+* [INST] Seuil d'ouverture benne déclarant la fermeture atteinte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ThresholdMeasureValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Qualification de la mesure pour la branche seuil (références, défauts, référence benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_BandStableTime">
               <type>
                 <TIME />
@@ -8706,6 +8819,13 @@ Data.BothBlockReason              := BothBlockReason;
 // 🔑 1. FRONTS &amp; REARMEMENT
 ResetEdge(CLK := Reset);
 
+// 🎯 Signal d'engagement benne — calcule AVANT le watchdog de timeout (§1 Cause 2) pour que le
+// relachement de l'operateur soit pris en compte AU SCAN MEME : un TON arme sur un signal lu avec
+// un scan de retard compterait la pause entiere. Meme calcul qu'auparavant (ReqAscent et
+// ReqDescend sont des VAR_INPUT, jamais reecrites) : seul l'instant de calcul avance en tete de §1.
+MotionRequestConflict := ReqAscent AND ReqDescend;
+MotionRequestActive := (ReqAscent OR ReqDescend) AND NOT MotionRequestConflict;
+
 IF ResetEdge.Q OR BypassGlobal THEN
     CfgFaultLatched       := FALSE;
     OffsetMaxFaultLatched := FALSE;
@@ -8751,10 +8871,55 @@ IF NOT BypassGlobal THEN
     instCauses[1].Latching := TRUE;
     instCauses[1].Texte    := 'Depassement ecart maximum autorise benne';
 
-    // Cause 2 : Timeout
-    TonTimeout(IN := Lifecycle.Busy, PT := CfgTimeoutDuration);
+    // Cause 2 : Timeout de manoeuvre benne — budget SUSPENDU hors commande engagee.
+    // ⏱️ Le budget ne se consomme QUE pendant une commande operateur REELLEMENT engagee
+    // (Lifecycle.Busy ET MotionRequestActive). Hors engagement le compteur est GELE — il n'est
+    // PAS remis a zero — et il reprend/se CUMULE a la commande suivante : une pause operateur
+    // legitime (relachement du joystick en AX3_OPEN_BUCKET / AX15B_DUMP_OPEN, cf.
+    // WaitingForOperator FB_CycleSemiAuto.st:1430) ne peut donc plus produire un faux
+    // [BENNE] ErrorID:03, alors qu'un mouvement bloque SOUS COMMANDE CONTINUE latche toujours
+    // en CfgTimeoutDuration (non-neutralisation). Remise a zero du cumul : fin de manoeuvre
+    // (Lifecycle.Busy retombe) et Reset sur front (rearmement conscient).
+    // Signal d'engagement : MotionRequestActive (calcule en tete de §1) — CloseReq/OpenReq sont
+    // des LATCHES (restent TRUE pendant toute la pause) et seraient ici INOPERANTS.
+    TimeoutEngaged := Lifecycle.Busy AND MotionRequestActive;
+
+    // Rearmement conscient : budget complet ET segment TON neuf. Un TON IEC ne retombe PAS quand
+    // PT augmente (ET cloue a PT, Q fige) : sans cette coupure d'un scan, un Reset pendant une
+    // commande encore engagee re-latcherait le defaut au scan suivant.
+    IF ResetEdge.Q THEN
+        TimeoutAccumTime   := T#0s;
+        TimeoutSegmentTime := T#0s;
+        TimeoutRestart     := TRUE;
+    END_IF;
+
+    // Relachement operateur : le segment courant est reporte dans le cumul (GEL, jamais une RAZ).
+    IF NOT TimeoutEngaged THEN
+        TimeoutAccumTime   := TimeoutAccumTime + TimeoutSegmentTime;
+        TimeoutSegmentTime := T#0s;
+    END_IF;
+
+    // Budget restant -&gt; PT du TON (borne a T#0s : un cumul &gt;= PT latche des le premier scan engage).
+    TimeoutRemainingTime := CfgTimeoutDuration - TimeoutAccumTime;
+    IF TimeoutRemainingTime &lt; T#0s THEN
+        TimeoutRemainingTime := T#0s;
+    END_IF;
+
+    TonTimeout(IN := TimeoutEngaged AND NOT TimeoutRestart, PT := TimeoutRemainingTime);
+    TimeoutRestart := FALSE;   // coupure d'un seul scan -&gt; le TON repart d'un segment a ET=0
+
+    IF TimeoutEngaged THEN
+        TimeoutSegmentTime := TonTimeout.ET;
+    END_IF;
+
     IF TonTimeout.Q THEN
         TimeoutFaultLatched := TRUE;
+    END_IF;
+
+    // Fin de manoeuvre : cumul remis a zero (la manoeuvre suivante repart d'un budget neuf).
+    IF NOT Lifecycle.Busy THEN
+        TimeoutAccumTime   := T#0s;
+        TimeoutSegmentTime := T#0s;
     END_IF;
     instCauses[2].Active   := TimeoutFaultLatched;
     instCauses[2].Latching := TRUE;
@@ -8778,6 +8943,9 @@ IF NOT BypassGlobal THEN
     instCauses[4].Texte    := 'Codeurs treuils non references pour sequence benne';
 ELSE
     TonTimeout(IN := FALSE);
+    TimeoutEngaged      := FALSE;   // bypass global : watchdog neutralise ET cumul remis a zero
+    TimeoutAccumTime    := T#0s;
+    TimeoutSegmentTime  := T#0s;
     M1SlipDetected := FALSE;
     instCauses[0].Active := FALSE;
     instCauses[1].Active := FALSE;
@@ -8943,8 +9111,8 @@ ELSE
     BucketState.TooClosed      := FALSE;
 END_IF;
 
-MotionRequestConflict := ReqAscent AND ReqDescend;
-MotionRequestActive := (ReqAscent OR ReqDescend) AND NOT MotionRequestConflict;
+// MotionRequestConflict / MotionRequestActive sont calcules en tete de §1 : le watchdog de timeout
+// doit voir le relachement de l'operateur au scan meme (aucun lag d'un scan).
 
 IF SevereError THEN
     M2_RunRequest := FALSE;
@@ -8987,14 +9155,16 @@ ELSE
         CloseReached := FALSE;
     END_IF;
 
-    BusyEdge(CLK := (CloseReq OR OpenReq) AND MotionRequestActive);
+    // Armement de la manoeuvre : uniquement HORS manoeuvre deja engagee.
+    // M1RefPosM est la reference de la detection de glissement M1 (§1, cause 3). La recapturer en
+    // cours de manoeuvre re-baselinerait cette reference a chaque relachement puis repompage du
+    // joystick, ce qui rendrait un glissement reel indetectable (derive decoupee en tranches sous
+    // la tolerance). Le front d'armement est preserve : Lifecycle.Busy est pose plus bas dans ce
+    // meme scan, il vaut donc encore FALSE au scan d'armement.
+    BusyEdge(CLK := (CloseReq OR OpenReq) AND MotionRequestActive AND NOT Lifecycle.Busy);
 
     IF BusyEdge.Q THEN
         M1RefPosM := CablePosM1;
-        M2StartPosM := CablePosM2;
-        WasOpenAtStart := BucketState.IsOpen;
-        WasClosedAtStart := BucketState.IsClosed;
-        LeftStartSinceArm := FALSE;
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
     END_IF;
@@ -9053,13 +9223,61 @@ ELSE
             M2_BucketJogLimit := FALSE;
         END_IF;
 
-        IF (CloseReq AND (CablePosM2 &gt; M2StartPosM)) OR (OpenReq AND (CablePosM2 &lt; M2StartPosM)) THEN
-            LeftStartSinceArm := TRUE;
+        // --- Limite de recul : frontiere PHYSIQUE benne, directionnelle ---------------------------
+        // Sous une commande engagee, un recul (sens OPPOSE a la manoeuvre) ne peut pas franchir la
+        // frontiere physique de la benne : bord de la zone "trop ouvert" pour une fermeture
+        // (Delta &lt;= OffsetOpenM - CoherenceLimitM), bord de la zone "trop ferme" pour une ouverture
+        // (Delta &gt;= OffsetCloseM + CoherenceLimitM). C'est la MEME frontiere que TooOpen/TooClosed
+        // (§4a), MinAllowedOffset et la cause 1 (OffsetMaxViolNow) : aucune constante nouvelle.
+        // Sans cette limite, un recul soutenu franchit la frontiere puis latche la cause 1 en 500 ms
+        // (arret + Reset) ; ici le recul est simplement inhibe, proprement, sans defaut.
+        // Anti-chatter : frontiere FIXE (independante du geste operateur) + confirmation
+        // CST_BandStableTime, la temporisation "anti-chatter au bord" deja utilisee par les bandes.
+        // DIRECTIONNEL : seule la direction de RECUL est inhibee ; le sens allant VERS LA CIBLE reste
+        // servi (HoldAscentP1AfterClose force deja M2_ReqDescend a FALSE : non affecte).
+        // ClassCanRun gate la mesure : sans datum M1/M2 la position relative n'a pas de sens (le
+        // mouvement sans reference est deja couvert par la cause 4, HomingMotionWithoutReference).
+        // CloseReq / OpenReq, Lifecycle et BucketState ne sont PAS touches : la reprise se fait au
+        // joystick sans reappui IHM, et aucun etat n'est falsifie.
+        RecoilLimitReachedNow := ClassCanRun
+                                 AND ((CloseReq AND (DeltaPosition_M &lt;= (Config.OffsetOpenM - Config.CoherenceLimitM)))
+                                      OR (OpenReq AND (DeltaPosition_M &gt;= (Config.OffsetCloseM + Config.CoherenceLimitM))));
+        TonRecoilLimit(IN := RecoilLimitReachedNow, PT := CST_BandStableTime);
+        RecoilLimitActive := TonRecoilLimit.Q;
+
+        IF RecoilLimitActive THEN
+            IF CloseReq THEN
+                M2_ReqDescend := FALSE;                          // recul vers l'ouverture interdit
+            ELSE
+                M2_ReqAscent := FALSE;                           // recul vers la fermeture interdit
+            END_IF;
+            M2_RunRequest := M2_ReqAscent OR M2_ReqDescend;       // le sens VERS LA CIBLE reste servi
         END_IF;
 
         // Arrêt fermeture
         IF CloseReq THEN
-            IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
+            // 🎛️ Branche AJOUTÉE, jamais substitutive : la condition d'arrivée ci-dessous
+            // (Config.CloseAnticipationM) conserve sa valeur et son rôle de filet
+            // anti-blocage sur matière dense ; la disjonction permet d'atteindre la même
+            // conclusion avec une ouverture benne restante plus grande, sur une mesure
+            // QUALIFIÉE.
+            // Qualification : références M1/M2, absence de défaut latché (géométrie benne
+            // invalide incluse) et référence benne persistante. Le gate d'entrée §2
+            // garantit déjà Enable ET PowerContactorEngaged (RETURN en tête de bloc).
+            ThresholdMeasureValid := ClassCanRun
+                                     AND BucketState.BucketReferenced
+                                     AND NOT Fault.Error;
+            instCloseThreshold(
+                ThresholdPct    := CloseReachedOpening_Pct,
+                OffsetOpenM     := Config.OffsetOpenM,
+                OffsetCloseM    := Config.OffsetCloseM,
+                DeltaPosition_M := DeltaPosition_M,
+                MeasureValid    := ThresholdMeasureValid,
+                IsIntermediate  := BucketState.IsIntermediate
+            );
+
+            IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM)
+               OR instCloseThreshold.Reached THEN
                 M2_RunRequest := MotionRequestActive AND ReqAscent AND EffectivePermitBucket_Close;
                 M2_ReqAscent := M2_RunRequest;
                 M2_ReqDescend := FALSE;
@@ -9277,6 +9495,234 @@ DeltaPositionCorrected_M := DeltaPosition_M - OffsetTargetM;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>82efa9a6-05fa-5372-9d4c-1316f7f70a0b</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_BucketCloseThreshold" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="ThresholdPct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RÉGLAGE OPÉRATEUR (source : GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct) ===
+🎛️ Ouverture benne restante (%) déclarant la fermeture atteinte ; 0 = branche INACTIVE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OffsetOpenM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GÉOMÉTRIE BENNE (source : _BucketCfgPersist.Config — plage VIVANTE) ===
+📐 Référence benne OUVERTE (m) — Delta = OffsetOpenM à 100 % d'ouverture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OffsetCloseM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Référence benne FERMÉE (m) — Delta = OffsetCloseM à 0 % d'ouverture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaPosition_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE ET QUALIFICATION ===
+📏 Écart mesuré M2 - M1 (m) — MESURE brute de FB_Bucket</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasureValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ instBucket.ActiveOffsetValid : géométrie, références, puissance, absence de défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsIntermediate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ _BucketState.IsIntermediate : mesure dans la bande plausible (hors sur-ouverture/sur-fermeture)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Reached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DÉCISION ===
+🚦 Seuil ATTEINT sur mesure qualifiée ce scan — consommé par FB_Bucket ET PRG_04 (même signal, aucun duplicata)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC / IHM ===
+🎛️ Branche seuil ARMÉE ce scan (réglage &gt; 0 ET mesure qualifiée) — FALSE à 0 %</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Distance_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance de fermeture équivalente au réglage (m) — 0,0 si réglage nul ou géométrie inexploitable</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="CST_MaxThresholdPct">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BORNES DU RÉGLAGE ===
+⚠️ La borne haute est IDENTIQUE à celle du bornage aval de PRG_07_Supervision.
+Elle est RÉPÉTÉE ici en défense en profondeur (ce FB est appelé dans la tâche
+rapide ; il ne fait jamais confiance au seul bornage amont, qui pourrait être
+contourné par un forçage ou un download partiel). Le garde-fou G515 vérifie que
+les DEUX bornes restent égales : toute divergence fait échouer le gate.
+🎛️ Borne haute du réglage (%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_MinSpan_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.001" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Débattement minimal exploitable (m) — MÊME prédicat que FB_Bucket §4a</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_PctToRatio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Conversion pourcentage -&gt; rapport (1 % = 0,01)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ThresholdEffPct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INTERNES (aucune mémoire : le FB est PUR) ===
+. [LOC] Réglage borné 0..CST_MaxThresholdPct</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Span_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Débattement benne = OffsetCloseM - OffsetOpenM (m)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎛️ FB_BucketCloseThreshold — Seuil d'ouverture benne déclarant la fermeture atteinte
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : dériver d'un pourcentage d'ouverture benne restante une DISTANCE de
+             fermeture équivalente (m) et le signal `Reached` qui autorise
+             l'anticipation de la fin de fermeture de benne.
+   📄 Traçabilité : DOC/WFLOW/ (contrat et plan de la phase de câblage du seuil).
+
+   🔬 Conversion pourcentage -&gt; mètres :
+             Distance_M = (ThresholdPct / 100) x (OffsetCloseM - OffsetOpenM)
+             La plage est la géométrie VIVANTE persistée (jamais 15,0 m en dur : les
+             valeurs OffsetOpenM / OffsetCloseM sont réglables à l'IHM et sauvegardées).
+             Convention identique à FB_Bucket.BucketOpening_Pct : 0 % = benne fermée
+             (Delta = OffsetCloseM), 100 % = benne ouverte.
+
+   🛡️ Nature de la branche — ADDITIVE, JAMAIS SUBSTITUTIVE :
+             Ce FB ne remplace ni la tolérance matière de 2,0 m du programme
+             principal, ni l'anticipation de fermeture CloseAnticipationM de
+             FB_Bucket. Ces deux expressions restent la condition de référence ;
+             `Reached` est une DISJONCTION ajoutée à chacune.
+             ⇒ Le réglage ne peut jamais RESSERRER le critère existant : il ne
+             peut que l'avancer.
+
+   🔒 Réglage à 0 : la branche est INACTIVE par CONSTRUCTION (Active = FALSE),
+             donc `Reached` reste FALSE en toutes circonstances et les deux sites
+             consommateurs retrouvent leur comportement d'origine.
+
+   ⚠️ Plage utile : le plancher historique de 1,2 m reste le terme contraignant
+             jusqu'à 8 % ; l'effet du réglage commence à 9 %. Information destinée
+             à l'IHM : un réglage inférieur à 8 % ne produit aucun changement.
+
+   🧩 Dépendances : AUCUNE (FB PUR : sans état, sans timer, sans GVL).
+             Il ne lit ni GVL_IHM, ni FB_Bucket, ni le cycle : la configuration lui
+             est transmise par l'appelant (PRG_04), producteur unique.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+
+{region "🎛️ T262-B SEUIL DE FERMETURE BENNE"}
+// Sorties remises à l'état neutre AVANT toute décision : à 0 %, le FB ne peut
+// RIEN autoriser, quel que soit l'état de ses entrées (AC2).
+Reached    := FALSE;
+Active     := FALSE;
+Distance_M := 0.0;
+
+// ─── Garde de géométrie (AC5) ──────────────────────────────────────────────────────
+// Prédicat IDENTIQUE à celui de FB_Bucket.st §4a (`(Config.OffsetCloseM - Config.OffsetOpenM) &gt; 0.001`).
+// Justification : quand la géométrie est inexploitable, FB_Bucket REPLIE son ouverture
+// affichée à 0,0 % (FB_Bucket.st:676-681) — ce zéro est un ARTEFACT de repli, il ne
+// constitue JAMAIS une preuve de fermeture (PLAN_T262 lignes 120-122). Sans cette
+// garde, un seuil lu sur une configuration invalide autoriserait un transfert.
+Span_M := OffsetCloseM - OffsetOpenM;
+IF Span_M &gt; CST_MinSpan_M THEN
+
+    // Bornage en défense en profondeur, identique au bornage aval.
+    ThresholdEffPct := LIMIT(0, ThresholdPct, CST_MaxThresholdPct);
+
+    // ─── Branche ADDITIVE : inactive à 0 % par construction (AC2) ──────────────────
+    IF ThresholdEffPct &gt; 0 THEN
+        Distance_M := INT_TO_REAL(ThresholdEffPct) * Span_M * CST_PctToRatio;
+
+        // Qualification de la mesure (AC5) : la branche ne peut jamais s'appuyer sur
+        // une mesure non fiable, une puissance absente, un défaut, ou une position
+        // hors de la bande plausible (sur-ouverture / sur-fermeture).
+        IF MeasureValid AND IsIntermediate THEN
+            Active  := TRUE;
+            // Égalité INCLUSE : « atteindre le pourcentage » (contrat parent AC3).
+            Reached := DeltaPosition_M &gt;= (OffsetCloseM - Distance_M);
+        END_IF;
+    END_IF;
+
+END_IF;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1b16f0fa-9c30-5e52-b385-f9f76cf8bc58</ObjectId>
           </data>
         </addData>
       </pou>
@@ -16929,6 +17375,7 @@ END_IF;
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="BENNE">
             <Object Name="FB_Bucket" ObjectId="82efa9a6-05fa-5372-9d4c-1316f7f70a0b" />
+            <Object Name="FB_BucketCloseThreshold" ObjectId="1b16f0fa-9c30-5e52-b385-f9f76cf8bc58" />
             <Folder Name="_TYPES">
               <Object Name="ST_fbBucket_Config" ObjectId="b2af5901-62ea-5239-8b5e-fb6f7afb8a12" />
               <Object Name="ST_fbBucket_State" ObjectId="74e82ca6-a865-5827-ba17-53f56d8b0f29" />

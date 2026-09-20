@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T22:17:39.441391" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T22:17:39.441391">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T23:25:27.127745" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T23:25:27.127745">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -301,7 +301,7 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Seuil ouverture benne pour préparer AX10→AX11 [0..50 %] ; 0 = critère historique, consommé en phase B</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Ouverture benne restante déclarant la fermeture atteinte [0..20 %] ; 0 = critère d'arrivée seul (branche seuil inactive)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepTarget">
@@ -8103,7 +8103,13 @@ CycleDepthLowerBound_M := MAX(_CommunCfgPersist.LimitLegalDepthMinAllowed_M,
 IF GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M &lt; CycleDepthLowerBound_M THEN
     GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M := CycleDepthLowerBound_M;
 END_IF;
-GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct := LIMIT(0, GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct, 50);
+// 🎛️ Borne du réglage de seuil d'ouverture benne, plafonnée à 20 %. Avec la géométrie
+// persistée (0,0 / 15,0 m), 20 % limite l'ouverture benne restante au départ de la remontée
+// à 3,0 m.
+// ⚠️ La MÊME borne est répétée dans FB_BucketCloseThreshold (défense en profondeur : le FB
+// est appelé dans la tâche rapide et ne fait pas confiance au seul bornage amont). Le
+// garde-fou G515 vérifie que les deux bornes restent ÉGALES — toute divergence échoue.
+GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct := LIMIT(0, GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct, 20);
 instCfgPersistBridgeCycle(Hmi := GVL_IHM.CycleSemiAuto.Cfg, Persist := _CycleCfgPersist);
 GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S := LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S, 3600);
 IF instCfgPersistBridgeCycle.JustRestored THEN

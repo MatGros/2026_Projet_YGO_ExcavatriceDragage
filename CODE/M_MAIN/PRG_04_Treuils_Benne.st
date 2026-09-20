@@ -20,6 +20,12 @@ END_VAR
 VAR
     instWinchSync : FB_WinchSync;
     instBucket   : FB_Bucket;
+    // Seuil d'ouverture benne déclarant la fermeture atteinte (FB PUR). Instance PROPRE à
+    // PRG_04 : l'arrivée de fermeture est évaluée DANS FB_Bucket, donc sur la mesure du
+    // scan même, avant que PRG_04 ne puisse lire ses sorties. Les deux appels portent des
+    // entrées identiques au même scan -> même décision, aucun critère dupliqué.
+    instCloseThreshold : FB_BucketCloseThreshold;
+    ThresholdMeasureValid : BOOL;  // Qualification de la mesure pour la branche seuil (références M1/M2 + défauts + référence benne)
     instSafetyWinchM1 : FB_Safety_Winch;   // Sécurité treuil M1 (SafeStop / permits / PowerCutOff)
     instSafetyWinchM2 : FB_Safety_Winch;
     instWinchM1   : FB_Winch;
@@ -338,6 +344,11 @@ instBucket(
     Mode                := PRG_03_Modes_Cycle.Data.Auth.Mode,
     CmdOpen_IHM         := instArbBucket.CmdOpen_IHM,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
+    // 🎛️ Seuil d'ouverture benne déclarant la fermeture atteinte. Réglage lu directement sur
+    // GVL_IHM (patron déjà en place dans PRG_04 pour le plafond de montée contrôlée et la
+    // distance de contrôle). Aucune copie locale : le FB clôt lui-même la plage, en défense
+    // en profondeur.
+    CloseReachedOpening_Pct := GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct,
     HoldAscentP1AfterClose := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqHoldAscentP1AfterClose,
     ReqAscent           := WinchBothReqAscent OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_02_Acquisition.Data.Joystick.AxisY.Direction > 0),
     ReqDescend          := WinchBothReqDescend OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_02_Acquisition.Data.Joystick.AxisY.Direction < 0),
@@ -1789,9 +1800,30 @@ GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
 // Tolérance matière benne : « à peu près fermée » = fermée OU
 // intermédiaire proche de l'offset fermé (tolérance 2 m). Évite le blocage au fond sur
 // matière dense (galets) qui ne ferme jamais à 100% de la consigne fine.
+// 🎛️ Branche AJOUTÉE, jamais substitutive : la ligne 2 m ci-dessous est INTOUCHÉE (valeur,
+// sens et rôle de filet anti-blocage conservés). La disjonction ajoutée permet d'avancer
+// l'instant où la fermeture est considérée atteinte, via le réglage d'ouverture benne
+// (0 = branche inactive -> critère d'arrivée seul).
+// Mesure QUALIFIÉE identique à celle de FB_Bucket (références M1/M2, absence de défaut
+// latché — géométrie benne invalide incluse — et référence benne persistante) : le même
+// signal des deux côtés, sinon la fenêtre de sortie AX10 pourrait se refermer entre les
+// deux évaluations et figer la séquence.
+ThresholdMeasureValid := PRG_02_Acquisition.Data.EncoderM1.Homed
+                         AND PRG_02_Acquisition.Data.EncoderM2.Homed
+                         AND NOT instBucket.Fault.Error
+                         AND _BucketState.BucketReferenced;
+instCloseThreshold(
+    ThresholdPct    := GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct,
+    OffsetOpenM     := _BucketCfgPersist.Config.OffsetOpenM,
+    OffsetCloseM    := _BucketCfgPersist.Config.OffsetCloseM,
+    DeltaPosition_M := instBucket.DeltaPosition_M,
+    MeasureValid    := ThresholdMeasureValid,
+    IsIntermediate  := _BucketState.IsIntermediate
+);
 Benne_IsRoughlyClosed := _BucketState.IsClosed
     OR (_BucketState.IsIntermediate
-        AND (instBucket.DeltaPosition_M >= (_BucketCfgPersist.Config.OffsetCloseM - 2.0)));
+        AND (instBucket.DeltaPosition_M >= (_BucketCfgPersist.Config.OffsetCloseM - 2.0)))
+    OR instCloseThreshold.Reached;
 
 {region "🕵️ §8bis Trace blocage"}
 // === 🕵️ §8bis TRACE DE BLOCAGE TERRAIN (cause priorisée + horodatage) ===
