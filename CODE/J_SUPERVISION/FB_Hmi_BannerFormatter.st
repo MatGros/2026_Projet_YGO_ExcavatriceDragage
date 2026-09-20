@@ -27,6 +27,7 @@ VAR_INPUT
 
     // 🛡️ Dérogations & particularités
     BypassGlobalActive   : BOOL;   // --> [TST] Bypass global
+    CfgCorrectedT330     : BOOL;   // --> [CFG] T330 : correction automatique d'un reglage haut (fenetre de maintien)
     BypassWinchM1Active  : BOOL;   // --> [TST] Bypass treuil M1
     BypassWinchM2Active  : BOOL;   // --> [TST] Bypass treuil M2
     BypassTranslation    : BOOL;   // --> [TST] Bypass translation
@@ -688,6 +689,12 @@ ELSIF DirectionBlocked THEN
     ELSE
         OperatorActionCandidate := '[TREUIL] Montée interdite';
     END_IF;
+ELSIF CfgCorrectedT330 THEN
+    // 🔧 T330 — reglage haut corrige automatiquement (Q2). Volontairement place APRES toutes
+    // les branches de SECURITE (AU, puissance, SafeStop, direction) : une correction de reglage
+    // ne doit JAMAIS masquer une alarme de securite. Prefixe [CFG] discriminant pour rester
+    // distinguable de D18, benne non fermee et synchro (cadrage §11bis). Longueur <= 70 car. (G408).
+    OperatorActionCandidate := '[CFG] Reglage corrige : reserve TOP/FDC a 1,00 m';
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // Guidance par étape du cycle (AF-07 §5.1) — ne masque jamais un défaut
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).

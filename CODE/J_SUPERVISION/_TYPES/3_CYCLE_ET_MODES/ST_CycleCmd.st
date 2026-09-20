@@ -14,5 +14,6 @@ STRUCT
     TglCycleChecksInhibit : BOOL := FALSE; (* 🧪 Mode essai : inhibe uniquement les controles procede autorises. NON persiste. *)
     TglAutoDiveM2Step5Trial : BOOL := FALSE; (* Essai T291-A : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. NON persiste. *)
     BtnForceStepApply : BOOL; (* 🔧 Applique le forçage de step (front) — impulsion ; cible = ST_CycleCfg.ForceStepTarget *)
+    BtnResetSampleCount : BOOL; (* 🔢 RAZ consciente du compteur JOURNALIER de prélèvements (front) — n'agit JAMAIS sur le totalisateur, qui n'a aucune commande *)
 END_STRUCT
 END_TYPE

@@ -90,8 +90,24 @@ contract:
         Tout garde-fou codé contre la formule M2 (CfgCableLimitAscent_M + M2_LimitShift)
         est INTERDIT avant T291-B B2, car cette formule est susceptible de changer.
       verified_by: "revue du git diff réel + confirmation humaine du jalon T291-B B1"
+    - id: AC8
+      statement: >
+        Preuve structurelle exigee des que CODE/M_MAIN entre au perimetre de la tache : le nom de
+        fichier correspond au nom de POU pour tout POU touche, soit PRG_07_Supervision pour le
+        programme de supervision et FB_Hmi_BannerFormatter pour le formateur de bandeau, sans
+        renommage ni duplication de fichier. Le suffixe correspond au langage genere dans le
+        bundle PLCopenXML, soit ST, donc aucun suffixe de langage _CFC ni _LD n est appose, la
+        structure des programmes etant non negociable.
+      verified_by: "lecture du bundle PLCopenXML genere : nom de POU correspondant au nom du fichier source et langage ST declare, sans aucun suffixe de langage"
   scope:
+    # ⚠️ AMENDEMENT P3 — 2026-09-20 (DSH06), autorite : GO P3 explicite de CC01 du 2026-09-20.
+    # Motif : le cadrage/P1/P2 etait DOCUMENTAIRE (scope ci-dessous limite aux .md/.yaml).
+    # La phase P3 (code ST du plan v1.3) exige PRG_07_Supervision.st et le gate G504.
+    # La clause d'interdiction de PRG_07_Supervision.st portait le motif « pendant T291-B B1 » :
+    # ce motif est CADUC depuis la remise de T291-B B1 (decision Q28, commit 55700932), donc la
+    # clause est LEVEE, pas contournee. PRG_04_Treuils_Benne.st RESTE interdit (T291-B B2 en cours).
     allowed:
+      # --- cadrage / pilotage (inchange) ---
       - DOC/WFLOW/TASKS.yaml
       - DOC/WFLOW/TASK_LOCKS.json
       - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
@@ -99,12 +115,20 @@ contract:
       - DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T330_INVARIANT_HAUT_v1.0.md
       - DOC/WFLOW/AUDITS/DESIGN/PLAN_T330_C3_INVARIANT_HAUT_v1.0.md
       - DOC/WFLOW/TROUBLESHOOTING/FICHES/
+      # --- P3 : code ST et outillage (ajoute par l'amendement ci-dessus) ---
+      - CODE/M_MAIN/PRG_07_Supervision.st # normalisation R0/R1/R2/R3 + 3 memoires non persistantes + region balisee T330
+      - CODE/H_TREUILS_BENNE/FB_Hmi_BannerFormatter.st # message non alarmant (T255-D livree, PRG_07 libere)
+      - TOOLS/AGENT_WORKFLOW/scripts/G504_check_t330_homing_top_invariant.py # creation du garde-fou
+      - TOOLS/AGENT_WORKFLOW/scripts/G483_check_bypass_matrix_mode_gated.py # retrait AC2b + docstrings + helper mort
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py # enregistrement G504 dans PLANS
+      - TOOLS/AGENT_WORKFLOW/config/af_traceability_matrix.yaml # declaration TC-P10-056-092 en validation_points
+      - TOOLS/TEST_AUTO_CI/ # tests ST du bloc TC-P10-056-092
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
-      - CODE/J_SUPERVISION/_TYPES/*
-      - CODE/GVL_PERSISTENT.st
-      - CODE/M_MAIN/PRG_04_Treuils_Benne.st # pendant T291-B B1
-      - CODE/M_MAIN/PRG_07_Supervision.st # pendant T291-B B1
+      - CODE/J_SUPERVISION/_TYPES/* # aucun champ IHM nouveau (AC3)
+      - CODE/GVL_PERSISTENT.st # aucun champ RETAIN nouveau (AC3)
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st # T291-B B2 en cours — interdit
+      # CODE/M_MAIN/PRG_07_Supervision.st : LEVE par l'amendement P3 ci-dessus (motif « T291-B B1 » caduc).
   conservation:
     must_survive:
       - "TOP mécanique commun, indépendant de la logique de cycle."
