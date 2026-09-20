@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T20:21:03.210006" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T20:21:03.210006">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T00:51:05.378663" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T00:51:05.378663">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1748,15 +1748,16 @@ IF NOT Lifecycle.Busy AND NOT SevereError THEN
     END_IF;
 END_IF;
 
-// --- Ouverture benne en % (0..100), calcul CONTINU sur l'ecart mesure ------------------
-// 0 % = benne fermee (Delta ~ OffsetCloseM), 100 % = benne ouverte (Delta ~ OffsetOpenM).
-// Independant de l'etat latche : donne toujours la position reelle, meme mi-course / non
-// confirme. Borne [0..100]. (Config invalide OffsetOpenM &gt;= OffsetCloseM -&gt; deja CfgFault.)
+// --- Ouverture benne en % (mise a l'echelle 0..100), calcul CONTINU sur l'ecart mesure -
+// 0 % = benne fermee (Delta = OffsetCloseM), 100 % = benne ouverte (Delta = OffsetOpenM).
+// Mise a l'echelle non bornee volontairement : une valeur negative ou superieure a 100
+// signale un sur-fermeture ou un sur-ouverture reelle (Delta hors [OffsetOpenM..OffsetCloseM])
+// -- l'ecraser a 0/100 masquerait cette information de diagnostic. Independant de l'etat
+// latche : donne toujours la position reelle, meme mi-course / non confirme. (Config invalide
+// OffsetOpenM &gt;= OffsetCloseM -&gt; deja CfgFault.)
 IF (Config.OffsetCloseM - Config.OffsetOpenM) &gt; 0.001 THEN
-    BucketOpening_Pct := LIMIT(0.0,
-        100.0 * (Config.OffsetCloseM - DeltaPosition_M)
-              / (Config.OffsetCloseM - Config.OffsetOpenM),
-        100.0);
+    BucketOpening_Pct := 100.0 * (Config.OffsetCloseM - DeltaPosition_M)
+                                / (Config.OffsetCloseM - Config.OffsetOpenM);
 ELSE
     BucketOpening_Pct := 0.0;
 END_IF;

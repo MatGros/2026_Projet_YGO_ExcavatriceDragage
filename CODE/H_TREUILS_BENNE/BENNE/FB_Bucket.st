@@ -580,15 +580,16 @@ IF NOT Lifecycle.Busy AND NOT SevereError THEN
     END_IF;
 END_IF;
 
-// --- Ouverture benne en % (0..100), calcul CONTINU sur l'ecart mesure ------------------
-// 0 % = benne fermee (Delta ~ OffsetCloseM), 100 % = benne ouverte (Delta ~ OffsetOpenM).
-// Independant de l'etat latche : donne toujours la position reelle, meme mi-course / non
-// confirme. Borne [0..100]. (Config invalide OffsetOpenM >= OffsetCloseM -> deja CfgFault.)
+// --- Ouverture benne en % (mise a l'echelle 0..100), calcul CONTINU sur l'ecart mesure -
+// 0 % = benne fermee (Delta = OffsetCloseM), 100 % = benne ouverte (Delta = OffsetOpenM).
+// Mise a l'echelle non bornee volontairement : une valeur negative ou superieure a 100
+// signale un sur-fermeture ou un sur-ouverture reelle (Delta hors [OffsetOpenM..OffsetCloseM])
+// -- l'ecraser a 0/100 masquerait cette information de diagnostic. Independant de l'etat
+// latche : donne toujours la position reelle, meme mi-course / non confirme. (Config invalide
+// OffsetOpenM >= OffsetCloseM -> deja CfgFault.)
 IF (Config.OffsetCloseM - Config.OffsetOpenM) > 0.001 THEN
-    BucketOpening_Pct := LIMIT(0.0,
-        100.0 * (Config.OffsetCloseM - DeltaPosition_M)
-              / (Config.OffsetCloseM - Config.OffsetOpenM),
-        100.0);
+    BucketOpening_Pct := 100.0 * (Config.OffsetCloseM - DeltaPosition_M)
+                                / (Config.OffsetCloseM - Config.OffsetOpenM);
 ELSE
     BucketOpening_Pct := 0.0;
 END_IF;

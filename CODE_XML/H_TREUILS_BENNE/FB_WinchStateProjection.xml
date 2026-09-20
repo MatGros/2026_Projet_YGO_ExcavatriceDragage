@@ -7325,7 +7325,15 @@ ELSE
     EffectiveDelay := ChangeDelayDescent;
 END_IF;
 MaxDirectionDelay := MAX(ChangeDelayAscent, ChangeDelayDescent);
-RemainingDelay := MAX(EffectiveDelay - CapturedStoppedTime, T#0ms);
+// Comparaison AVANT soustraction : TIME est un DWORD non signe cote CODESYS, une
+// soustraction dont le resultat mathematique serait negatif (ex: T#500ms - T#800ms)
+// deborde silencieusement vers ~T#49j au lieu de saturer a 0 -- MAX(..., T#0ms)
+// APRES une soustraction debordee ne corrige rien (le DWORD deborde reste "positif").
+IF CapturedStoppedTime &gt;= EffectiveDelay THEN
+    RemainingDelay := T#0ms;
+ELSE
+    RemainingDelay := EffectiveDelay - CapturedStoppedTime;
+END_IF;
 
 DirectionChanged := (ReqAscent AND NOT CommandedAscent)
                  OR (ReqDescend AND NOT CommandedDescend)

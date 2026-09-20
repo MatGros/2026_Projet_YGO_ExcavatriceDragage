@@ -1989,7 +1989,7 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Ouverture benne 0..100 % (0 = fermée, 100 = ouverte) — calcul continu sur l'écart mesuré</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Ouverture benne, mise à l'échelle 0..100 % (0 = fermée, 100 = ouverte) — calcul continu sur l'écart mesuré. Non bornée : une valeur négative ou &gt; 100 signale un sur-fermeture/sur-ouverture réel, volontairement visible.</xhtml>
               </documentation>
             </variable>
             <variable name="CloseActive">
@@ -19370,15 +19370,16 @@ IF NOT Lifecycle.Busy AND NOT SevereError THEN
     END_IF;
 END_IF;
 
-// --- Ouverture benne en % (0..100), calcul CONTINU sur l'ecart mesure ------------------
-// 0 % = benne fermee (Delta ~ OffsetCloseM), 100 % = benne ouverte (Delta ~ OffsetOpenM).
-// Independant de l'etat latche : donne toujours la position reelle, meme mi-course / non
-// confirme. Borne [0..100]. (Config invalide OffsetOpenM &gt;= OffsetCloseM -&gt; deja CfgFault.)
+// --- Ouverture benne en % (mise a l'echelle 0..100), calcul CONTINU sur l'ecart mesure -
+// 0 % = benne fermee (Delta = OffsetCloseM), 100 % = benne ouverte (Delta = OffsetOpenM).
+// Mise a l'echelle non bornee volontairement : une valeur negative ou superieure a 100
+// signale un sur-fermeture ou un sur-ouverture reelle (Delta hors [OffsetOpenM..OffsetCloseM])
+// -- l'ecraser a 0/100 masquerait cette information de diagnostic. Independant de l'etat
+// latche : donne toujours la position reelle, meme mi-course / non confirme. (Config invalide
+// OffsetOpenM &gt;= OffsetCloseM -&gt; deja CfgFault.)
 IF (Config.OffsetCloseM - Config.OffsetOpenM) &gt; 0.001 THEN
-    BucketOpening_Pct := LIMIT(0.0,
-        100.0 * (Config.OffsetCloseM - DeltaPosition_M)
-              / (Config.OffsetCloseM - Config.OffsetOpenM),
-        100.0);
+    BucketOpening_Pct := 100.0 * (Config.OffsetCloseM - DeltaPosition_M)
+                                / (Config.OffsetCloseM - Config.OffsetOpenM);
 ELSE
     BucketOpening_Pct := 0.0;
 END_IF;
@@ -47079,7 +47080,15 @@ ELSE
     EffectiveDelay := ChangeDelayDescent;
 END_IF;
 MaxDirectionDelay := MAX(ChangeDelayAscent, ChangeDelayDescent);
-RemainingDelay := MAX(EffectiveDelay - CapturedStoppedTime, T#0ms);
+// Comparaison AVANT soustraction : TIME est un DWORD non signe cote CODESYS, une
+// soustraction dont le resultat mathematique serait negatif (ex: T#500ms - T#800ms)
+// deborde silencieusement vers ~T#49j au lieu de saturer a 0 -- MAX(..., T#0ms)
+// APRES une soustraction debordee ne corrige rien (le DWORD deborde reste "positif").
+IF CapturedStoppedTime &gt;= EffectiveDelay THEN
+    RemainingDelay := T#0ms;
+ELSE
+    RemainingDelay := EffectiveDelay - CapturedStoppedTime;
+END_IF;
 
 DirectionChanged := (ReqAscent AND NOT CommandedAscent)
                  OR (ReqDescend AND NOT CommandedDescend)

@@ -20,7 +20,7 @@ STRUCT
     RemainingTravel_M     : REAL;             (* 📏 Distance restante avant cible (m) *)
     DeltaPosition_M       : REAL;             (* 📏 Écart réel signé M2 - M1 (mètres) — MESURE brute, base de l'état benne *)
     DeltaPositionCorrected_M : REAL;          (* 📏 Écart M1/M2 corrigé de la géométrie benne (Delta - ActiveOffsetM) — ~0 = treuils synchro quel que soit l'état benne. Pour l'opérateur. *)
-    BucketOpening_Pct     : REAL;             (* 📊 Ouverture benne 0..100 % (0 = fermée, 100 = ouverte) — calcul continu sur l'écart mesuré *)
+    BucketOpening_Pct     : REAL;             (* 📊 Ouverture benne, mise à l'échelle 0..100 % (0 = fermée, 100 = ouverte) — calcul continu sur l'écart mesuré. Non bornée : une valeur négative ou > 100 signale un sur-fermeture/sur-ouverture réel, volontairement visible. *)
     CloseActive            : BOOL;             (* Demande de fermeture active (image FB_Bucket) *)
     OpenActive             : BOOL;             (* Demande d'ouverture active (image FB_Bucket) *)
     M2PositionCorrected : REAL;             (* 📊 CablePosM2 - offset benne NOMINAL fige (Config.OffsetClose/OpenM selon l'etat franc) ; affichage bargraphe. Ne bouge que si le tambour M2 tourne. *)
