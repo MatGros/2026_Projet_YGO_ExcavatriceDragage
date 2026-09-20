@@ -9,6 +9,14 @@
                  immediatement (temps mort) ; pas de redemarrage inrush.
                  Le sens IDENTIQUE au dernier sens adopte reste toujours
                  immediat depuis le neutre : seule l'INVERSION est temporisee.
+                 Purge de DeadTimeArmed garantie des que le temps mort est
+                 ecoule (T325 phase 1). Limite residuelle connue (T325
+                 phase 2, non couverte ici) : si la demande redevient le
+                 MEME sens que le dernier commande alors que DeadTimeArmed
+                 vient d'etre arme, DirectionChanged reste FALSE et le
+                 temps mort ne peut jamais etre mesure -- seule sortie
+                 encore possible dans ce cas precis : retour au neutre ou
+                 Reset.
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_WinchDirectionInterlock
@@ -113,15 +121,18 @@ IF NOT RequestActive THEN
     CommandedDescend := FALSE;
     DirectionChangePending := FALSE;
     DeadTimeArmed := FALSE;
-ELSIF DeadTimeArmed THEN
-    // D18 : temps mort au front Enable — pas d'adoption immediate
-    DirectionChangePending := TRUE;
 ELSIF DirectionChangeDelay.Q THEN
-    // Temps mort ecoule : adoption du sens
+    // Temps mort ecoule : adoption du sens, y compris si DeadTimeArmed etait pose
+    // (purge desormais atteignable -- le temps mort minimal a ete respecte, il ne
+    // doit pas rester arme indefiniment une fois le delai reellement ecoule).
     CommandedAscent := ReqAscent;
     CommandedDescend := ReqDescend;
     DirectionChangePending := FALSE;
     DeadTimeArmed := FALSE;
+ELSIF DeadTimeArmed THEN
+    // D18 : temps mort au front Enable — pas d'adoption immediate tant que le
+    // delai (ci-dessus) n'est pas ecoule.
+    DirectionChangePending := TRUE;
 ELSIF NOT (CommandedAscent OR CommandedDescend) THEN
     // Depuis le neutre : depart immediat si reprise du MEME sens (ou premier sens),
     // sinon (sens oppose) pending + delai dedie obligatoire.
