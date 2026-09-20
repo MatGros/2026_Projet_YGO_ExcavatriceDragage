@@ -1,0 +1,307 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T340 : etape de grafcet VERROUILLEE de montee au vrai capteur haut
+# Critique C1 — cycle de referencement machine (FB_CycleMachineHoming)
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+#
+# Contexte : la conception initiale de T340 (position PROVISOIRE M1 := 0 a la confirmation
+# benne) a ete CHALENGEE avant code (2 audits independants + challenge CC01 du 2026-09-20) et
+# ABANDONNEE : ST_Encoder_Calib ne porte qu'un booleen Homed, et le couple « M1 provisoire +
+# M2 cale sur M1 » produit Delta = OffsetCloseM, soit un datum faux AUTO-COHERENT donc
+# indetectable. Ce contrat couvre la conception RETENUE apres arbitrage humain.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T340_HOMING_LOCKED_ASCENT
+  criticality: C1
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Rendre le referencement machine M1/M2 impossible a « tricher » et impossible a perdre en
+    cours de route : apres la confirmation visuelle « benne fermee » par l'operateur, le cycle
+    entre dans une etape de GRAFCET DEDIEE et VERROUILLEE qui monte les deux treuils vers le
+    capteur mecanique haut et n'en sort que par le vrai referencement (Homed pose sur le chemin
+    standard, capteur haut reellement atteint puis machine arretee) ou par un acquittement
+    conscient. Corrige au passage la garde de montee (timeout mural en dur, incompatible avec
+    un trajet reel au palier 1) et ajoute un referencement A L'ARRET de secours, en complement
+    du referencement au vol existant qui reste inchange.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        Le cycle ne provoque JAMAIS une prise de reference avant le franchissement reel du
+        capteur mecanique haut : aucune demande de homing (M1Demand.HomeReq / M2Demand.HomeReq)
+        n'est emise tant que le capteur haut n'a pas ete reellement atteint. Homed reste FALSE
+        pendant toute la montee. Renforcement issu de la revue independante : l'etape
+        verrouillee ne s'OUVRE que si le capteur haut est INACTIF (machine vraisemblablement
+        sous le capteur) — un capteur deja actif (colle, force, ou machine deja en position
+        haute) n'apporte aucune preuve de franchissement et mene au chemin herite, qui exige
+        le front descendant. La classe « impossible a tricher » du chemin herite est donc
+        conservee.
+      verified_by: >
+        (1) trace exhaustive de TOUS les sites d'ecriture de HomeReq dans
+        FB_CycleMachineHoming.st : 2 RAZ (tete de scan, NOT Enable) et 2 seuls sites a TRUE,
+        chacun exigeant une preuve physique du capteur (HX3 : front descendant ; HX7 : capteur
+        actif + arret mecanique + neutre, apres une entree refusee si le capteur etait deja
+        actif) ; (2) test ST « HX7 : aucune HomeReq tant que le capteur haut est inactif » ;
+        (3) test ST « Homed reste FALSE pendant la montee » ; (4) test ST « capteur deja actif
+        a l'entree -> aucune capture sans franchissement » (TC-P09-H212).
+    - id: AC2
+      statement: >
+        Aucune sortie de l'etape verrouillee n'est possible : ni changement d'etape, ni mise en
+        pause, ni retour a l'etape initiale, tant que le vrai referencement n'est pas atteint.
+        Sorties admises, toutes CONSCIENTES et tracees : (a) un front Reset (purge), (b) un
+        defaut latché, (c) une violation detectee de la consigne (descente demandee, garde de
+        montee ecoulee, erreur codeur, mouvement hors phase) -> abandon HXF, machine toujours
+        NON referencee, (d) EXCEPTION DECLAREE : le forcage de step de mise en service
+        (CfgCommissioningEnable + MAINT_N2 + impulsion sur front, mecanisme preexistant qui
+        peut sortir de TOUTE etape, y compris les etapes HX0..HX6 d'avant ce lot). Le forcage
+        n'est PAS un chemin d'entree dans HX7 (la cible est bornee 0..9). Il ne peut pas
+        produire de reference : la sortie laisse la machine non referencee.
+      verified_by: >
+        Test ST « HX7 : une demande de descente pendant l'etape verrouillee fait echouer le
+        cycle (HXF) et ne peut pas produire de reference » + test ST « HX7 : la perte du mode
+        MAINT_N2 ne fait PAS sortir de l'etape (etape maintenue, aucun mouvement, aucun faux
+        Homed) » + revue du CASE §8 (aucune transition de sortie non conditionnee) + revue du
+        §4bis (forcage de step : sortie consciente de mise en service, hors chemin nominal).
+    - id: AC3
+      statement: >
+        L'arret d'urgence fonctionne sans restriction pendant l'etape verrouillee : la chaine AU
+        est materielle et le cycle ne la traverse pas (il ne consomme AUCUN signal de l'AU, et
+        son Enable n'est pas coupe par l'AU). Apres rearmement, la machine reprend proprement
+        l'etape verrouillee : pas de faux Homed, pas de blocage silencieux, pas de perte
+        d'information, et la garde de montee ne s'est pas consommee pendant l'arret.
+      verified_by: >
+        (1) revue statique : le cycle ne consomme AUCUN signal de la chaine AU
+        (grep : aucune entree Emergency/PowerContactor dans FB_CycleMachineHoming) et ses
+        sorties de mouvement sont remises a zero en tete de scan (aucun maintien de mouvement
+        traversant un arret de puissance) ; (2) test ST « HX7 : perte des permis operateur et
+        arret confirme des treuils -> l'etape est CONSERVEE, aucune HomeReq, aucun defaut »
+        (le banc ne peut pas simuler l'AU : le levier testable est la chute des permis et
+        l'arret mecanique, l'AU n'ecrivant ni Enable ni Reset du cycle) ; (3) test ST « la
+        garde de montee ne se consomme pas quand la montee n'est pas commandee » (preuve que
+        l'arret ne consomme aucun budget) ; (4) test ST « HX7 : reprise de la montee apres
+        l'arret -> reference atteinte » (reprise propre).
+    - id: AC4
+      statement: >
+        Le palier 1 est actif automatiquement pendant toute la phase de referencement non
+        reference, sans AUCUN code de plafond vitesse duplique (le garde-fou existant
+        PRG_04:1217-1230 s'applique parce que Homed reste FALSE).
+      verified_by: >
+        (1) grep : aucune ecriture de plafond de palier ajoutee par ce lot (0 occurrence
+        nouvelle dans PRG_04 / FB_Winch / arbitrages) ; (2) rappel du chemin existant
+        PRG_04:1226-1230 -> ReqM1Winch.MaxStepUp/MaxStepDown -> FB_Winch.ActiveMaxStep ->
+        FB_SpeedStep.MaxStepNumber ; (3) test ST « HX7 : les ordres de montee emis par le cycle
+        sont au palier 1 (CST_StepSlow) pour M1 ET M2 ».
+    - id: AC5
+      statement: >
+        A1 corrige : la garde de montee n'est plus un timeout mural en dur inadapte au terrain.
+        Elle (a) ne se consomme QUE lorsque l'ordre de montee est REELLEMENT emis, et (b) porte
+        une duree realiste, derivee de la course maximale et de la borne haute de vitesse du
+        palier 1 (0,4 m/s, hypothese conservatrice de vitesse lente ; valeur de banc encore A
+        MESURER sur site), avec marge, au lieu de 120 s en dur. Extension assumee et testee :
+        la MEME regle est appliquee a la garde de descente HX3 (un temporisateur mural y
+        sanctionnait deja une pause operateur) — c'est le seul comportement d'une etape
+        existante modifie par ce lot, et il est couvert par test.
+      verified_by: >
+        (1) test ST « la garde de montee ne se consomme pas sans commande de montee » (TC-P09-H208) ;
+        (2) test ST « la garde ne se consomme pas hors MAINT_N2, ou aucun ordre n'est emis »
+        (TC-P09-H206, sejour prolonge 700 s) ; (3) test ST « la garde est consommee quand la
+        montee est commandee » (TC-P09-H209) ; (4) tests ST de la garde de descente
+        (TC-P09-H210 sans commande, TC-P09-H211 avec commande) ; (5) gate G511 PASS et
+        --selftest PASS : 8 mutations rejetees (dont le retour a 120 s, la garde keyee sur
+        l'intention au lieu de l'ordre emis, et la capture sans preuve de franchissement) ;
+        (6) derivation documentee dans la constante (146,3 s x 2 = 292,5 s ; valeur retenue 300 s).
+    - id: AC6
+      statement: >
+        Un referencement A L'ARRET est disponible en COMPLEMENT du referencement au vol (qui
+        reste inchange) : a l'issue de la montee, machine arretee (etat de repos confirme :
+        treuils non en mouvement, commande relachee) et capteur haut actif, le cycle demande la
+        prise de reference nominale (cible = position capteur haut). Ce chemin est testable
+        independamment du referencement au vol.
+      verified_by: >
+        (1) test ST « HX7 : la prise de reference n'est demandee qu'a l'arret confirme et
+        capteur haut actif » ; (2) test ST « HX7 : referencement abouti -> MachineHomed TRUE,
+        retour a l'etape initiale » ; (3) test ST « HX3 (au vol) : comportement inchange »
+        (preuve de non-regression du chemin au vol).
+    - id: AC7
+      statement: >
+        Le chemin de secours existant hors grafcet n'est pas regresse : en MAINT_N1/N2, le
+        referencement unitaire manuel (bouton BtnHome, treuils arretes ou capteur haut atteint)
+        reste disponible et sa semantique est inchangee.
+      verified_by: >
+        (1) git diff : aucune modification de PRG_02_Acquisition.st hors LA ligne de cablage
+        declaree, aucune modification de FB_Encoder_Homing.st ni de ST_Encoder_Calib.st ;
+        (2) revue des conditions HomingPermit inchangees (PRG_02:601-604, 654-657) ;
+        (3) non-regression : suite CI du cycle (G_CYCLE) sans nouveau rouge.
+    - id: AC8
+      statement: >
+        Criteres structurels de l'ecriture dans CODE/M_MAIN (une seule ligne de cablage dans
+        PRG_02_Acquisition.st) : le nom de fichier est identique au nom de POU
+        (PRG_02_Acquisition.st porte le PROGRAM PRG_02_Acquisition) et le suffixe de langage est identique au langage genere dans le bundle — aucun suffixe _LD ou _CFC n'est appose puisque le bundle
+        PLCopenXML genere ce POU en ST pur.
+      verified_by: >
+        (1) lecture du fichier : `PROGRAM PRG_02_Acquisition` dans
+        CODE/M_MAIN/PRG_02_Acquisition.st, aucun suffixe de langage au nom de fichier ;
+        (2) bundle PLCopenXML : l'objet PRG_02_Acquisition y est genere en ST
+        (CODE_XML/M_MAIN/PRG_02_Acquisition.xml) ; (3) G310 structure + G200 liaison.
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleMachineHoming.st
+      - CODE/G_CYCLE/_TYPES/E_MachineHomingTxState.st
+      - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_Cfg.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st        # 1 seule ligne : cablage confirmation benne fermee
+      - CODE/E_CODEURS/FB_Encoder_Homing.st      # ecriture seulement si strictement necessaire (a priori NON)
+      - TOOLS/AGENT_WORKFLOW/scripts/G511_check_homing_climb_guard.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py   # 1 ligne : branchement du gate
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclemachinehoming.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T340_HOMING_LOCKED_ASCENT.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - CODE_XML/                               # bundles
+    forbidden:
+      - CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st          # AUCUN champ nouveau, AUCUN etat provisoire
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st               # palier 1 deja correct, aucune duplication
+      - CODE/M_MAIN/PRG_05_Translation.st                 # interlock M3 deja correct
+      - CODE/F_MODES/FB_Modes.st                          # arbitrage de mode hors perimetre
+      - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM1.st  # arbitrage du palier hors perimetre
+      - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM2.st
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/GVL_PERSISTENT.st                             # aucune donnee persistante nouvelle
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st                   # verrous T331/DSH09 et T299/CC01
+      - CODE/M_MAIN/PRG_07_Supervision.st                  # modifications non commitees T330/DSH06
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/AF/**                                          # mise a jour AF = lot documentaire separe
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Comportement des etapes existantes HX0, HX1, HX2, HX2N, HX3, HX3N, HX4, HX5, HX6, HXF (aucun renumerotage : valeurs 0..9 inchangees, nouvel etat = 10)"
+      - "EXCEPTION DECLAREE ET TESTEE sur HX3 : la garde de descente ne se consomme plus pendant une pause operateur (meme regle que la garde de montee, AC5). Seul comportement d'une etape existante modifie par le lot ; couvert par TC-P09-H210 et TC-P09-H211."
+      - "Referencement AU VOL de HX3 (front descendant du capteur) : inchange, non regresse"
+      - "Palier 1 hors referencement (PRG_04:1217-1230) : inchange, non duplique"
+      - "Interlock hauteur M3 (PRG_05:134-138) : inchange"
+      - "Expulsion SEMI_AUTO sans datum (FB_Modes:251) : inchangee"
+      - "Chemin de secours hors grafcet : referencement unitaire BtnHome en MAINT_N1/N2 (PRG_02:601-604, 654-657)"
+      - "Forcage de step de mise en service (CfgForceStep*, MAINT_N2, impulsion sur front)"
+      - "Sonde de perte de datum en mouvement (MachineWasHomed / HomingLossLatched / SafeStop)"
+      - "Reset jamais conditionne (front conscient, purge du cycle)"
+      - "Contrat FB : Enable/Reset en entree, Ready/Fault/Lifecycle en sortie (CODESYS standard)"
+    dropped_on_purpose:
+      - "Position PROVISOIRE M1 (ex. 0) a la confirmation benne : ABANDONNEE sur preuve (challenge T340, point 1 BLOCK)"
+      - "Palier 1 « a ecrire » : deja implemente, aucune ligne ajoutee"
+      - "Interlock M3 « a ecrire » : deja implemente, aucune ligne ajoutee"
+      - "Garde HX2 en dur 120 s : remplacee (AC5)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison" (G200 --report)
+    - run_all_gates          # gates palier C
+    - bundle                 # CODE_XML/CODE_Bundle.xml regenere + diff bundle des fichiers touches
+    - tests_ci               # execution du domaine G_CYCLE (cycle homing) avant/apres
+    - guard_selftest         # G511 --selftest (preuve de non-cecite du garde-fou)
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "deepseek-v4.1-flash:cloud"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug preexistant, risque hors
+    scope) est remonte IMMEDIATEMENT a l'orchestrateur, pas a la fin et jamais silencieusement.
+    Signaler n'est pas elargir le scope. Limites structurelles deja identifiees et a re-declarer
+    dans la restitution : (1) l'arbitrage de mode (FB_Modes) n'est pas dans le perimetre, donc le
+    verrou est enforce cote cycle (etape maintenue, aucune sortie) et non par un veto de mode ;
+    (2) hors SEMI_AUTO l'arbitrage treuil ignore ReqWinch, donc les ordres de montee emis par le
+    cycle sont redondants avec la commande joystick de l'operateur en MAINT_N2 ; (3) le selecteur
+    de treuil (couple / M1 seul / M2 seul) n'est pas une entree du cycle : impossible d'imposer
+    la montee couplee depuis le cycle, a declarer comme risque residuel.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "CC01 (DSH — deepseek-v4.1-flash:cloud)"
+  completed_at: "2026-09-20T21:15:00+02:00"
+  status: COMPLETED
+  summary: >
+    Etape de GRAFCET HX7_LOCKED_REFERENCE livree : entree par la confirmation operateur benne
+    fermee (nouvelle entree BucketCloseConfirmed cablee depuis le front deja existant
+    BucketReferenceCloseEdge.Q), montee vers le capteur mecanique haut sous permis maintenu,
+    puis prise de reference NOMINALE A L'ARRET (capteur reellement atteint + arret mecanique
+    confirme + commande relachee). Verrou : aucune sortie d'etape par changement de mode (etape
+    TENUE sans mouvement), descente reellement commandee = abandon avec cause dediee (nouvelle
+    cause 6), sortie seulement sur reference reelle ou acquittement conscient. A1 corrige : les
+    gardes de montee ET de descente ne se consomment que lorsque l'ordre de mouvement est
+    REELLEMENT emis et la garde de montee passe de 120 s en dur a 300 s DERIVEE (58,5 m /
+    0,4 m/s = 146,3 s, x2 = 292,5 s). Aucune ligne de plafond de palier ni d'interlock M3
+    ajoutee (deja corrects). FB_Encoder_Homing.st et ST_Encoder_Calib.st NON modifies : aucune
+    position provisoire, Homed reste pose par la facade codeur sur le chemin standard.
+    DEUX REVUES INDEPENDANTES (contexte frais, read-only) ont rendu : (1) NON pour une cloture
+    en l'etat, avec 2 MAJOR (garde consommee sans ordre emis ; comportement HX3 modifie hors
+    contrat et sans test) + 9 MINOR ; (2) OUI, avec 1 MAJOR (meme defaut de garde) + 4 MINOR
+    dont une capture possible SANS preuve de franchissement (capteur deja actif). Les 3 defauts
+    MAJOR ont ete CORRIGES : garde keyee sur l'ordre reellement emis (LockedClimbCommand), garde
+    de descente couverte par 2 tests, entree de l'etape verrouillee conditionnee a un capteur
+    haut INACTIF. Les MINOR de redaction ont ete corriges (commentaires faux, derivation
+    chiffree exacte, producteur unique de LockedCaptureAllowed, poussee brute non sanctionnee,
+    auto-affectation documentee comme mecanisme de verrou).
+    PREUVES FINALES : CI FB_CycleMachineHoming 21 tests / 19 PASS / 2 FAIL — les 2 rouges
+    (TC-P09-H010, TC-P09-H090) sont PREEXISTANTS et identiques au rapport archive avant le lot
+    (13/09 : 8 tests, 6 PASS, 2 FAIL, memes IDs ; cause : BootReady jamais pilote par ces tests,
+    hors lot) ; 13/13 des nouveaux cas TC-P09-H200..H212 PASS. G511 PASS + --selftest PASS
+    (8 mutations rejetees). G200 --report PASS (0 erreur, 2025 instances). Bundle frais
+    259/259 objets 0 erreur + diff bundle 4 objets. Palier C 43/48 PASS avec EXACTEMENT les 5
+    dettes preexistantes G300/G340/G408/G430/G483 ; verifie : aucun de ces gates ne signale un
+    fichier du lot. Persistants : AUCUN ajout ni modification. IHM : aucune commande ni champ
+    nouveau (reutilisation du bouton N2 existant ; message via MachineHomingInstruction deja
+    affiche par le bandeau).
+  evidence_submitted:
+    - "CI FB_CycleMachineHoming : 21 tests / 19 PASS / 2 FAIL (2 rouges PREEXISTANTS H010/H090) — 13/13 nouveaux TC-P09-H200..H212 PASS"
+    - "Baseline archivee avant le lot : TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/archive/20260913_231358_FB_CycleMachineHoming.json (8 tests / 6 PASS / 2 FAIL, memes 2 IDs)"
+    - "G511_check_homing_climb_guard.py : PASS + --selftest PASS (8 mutations rejetees, dont retour a 120 s, garde keyee sur l'intention, capture sans franchissement)"
+    - "G200_check_linkage.py --report : PASS (0 erreur, 1669 avertissements preexistants, 2025 instances)"
+    - "generate_codesys_bundle.py : PASS (CODE_XML/CODE_Bundle.xml frais, 259/259 objets, 0 erreur) + HX7_LOCKED_REFERENCE value=10 confirme dans le XML"
+    - "generate_codesys_diff_bundle.py : CODE_XML/CODE_DiffBundle.xml (E_MachineHomingTxState, FB_CycleMachineHoming, PRG_02_Acquisition, ST_fbMachineHomingCycle_Cfg)"
+    - "run_all_gates.py --palier C : 43/48 PASS, 5 FAIL preexistants (aucun fichier du lot signale par G408/G430/G300/G340/G483)"
+    - "check_task_contract.py : PASS"
+    - "2 revues independantes read-only : verdicts et defauts integres (voir summary)"
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Revue independante obligatoire avant cloture (lot C1). AUCUN COMMIT avant validation humaine
+    explicite (AGENTS.md). Limites declarees a l'arbitrage : (1) FB_Modes hors perimetre -> le
+    verrou est enforce cote cycle (etape tenue), pas par un veto de mode ; (2) hors SEMI_AUTO
+    l'arbitrage treuil ignore ReqWinch -> les ordres de montee du cycle sont redondants avec la
+    commande joystick en MAINT_N2, le palier restant borne en aval tant que Homed est FALSE ;
+    (3) le selecteur de treuil n'est pas une entree du cycle -> la montee couplee n'est pas
+    imposable depuis le cycle (risque residuel a traiter par un lot ulterieur si l'arbitrage
+    l'exige) ; (4) la garde de mouvement n'est pas consommee sans permis operateur : un
+    operateur inactif ne declenche aucun timeout (l'etape peut donc stagner sans sanction — comportement
+    voulu, c'est la sanction d'une montee COMMANDEE qui n'aboutit pas) ; (5) la confirmation benne
+    fermee est memorisee et consommee a l'entree du cycle : un appui donne pendant une autre
+    etape est reutilise au prochain lancement (HX7 plus restrictif, jamais moins sur).
+    TROIS REVUES INDEPENDANTES passees (2 completes + 1 verification ciblee des correctifs) ;
+    les 3 defauts MAJOR identifies ont ete corriges puis re-verifies comme REELS, COMPLETS et
+    SANS regression (aucun mouvement altere, aucun chemin de reference sans preuve capteur).
+    🚨 ALERTE INTEGRATION (a arbitrer par l'humain) : le commit 50e57cd6 d'un AUTRE acteur
+    (T330/T299) a inclus dans TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py la ligne de
+    branchement G511 de CE lot, alors que le script G511_check_homing_climb_guard.py n'est pas
+    encore commite (fichier non suivi). Consequence : a HEAD, le palier C est ROUGE sur G511
+    (script absent). Aucun fichier de ce lot n'a ete commite par moi. Action proposee : commiter
+    le script G511 avec le lot T340 apres validation humaine (ou retirer la ligne du PLANS en
+    attendant) — decision humaine, non prise par l'agent.

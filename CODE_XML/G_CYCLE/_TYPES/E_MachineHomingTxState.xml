@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.300852" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.300852">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T19:02:48.976346" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T19:02:48.976346">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -37,6 +37,7 @@
               <value name="HX5_BUCKET_COMMIT" value="7" />
               <value name="HX6_HOMED" value="8" />
               <value name="HXF_FAILED" value="9" />
+              <value name="HX7_LOCKED_REFERENCE" value="10" />
             </values>
           </enum>
         </baseType>
@@ -101,6 +102,17 @@
                 <Name>HXF_FAILED</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement incomplet : rester en N2 et recommencer</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HX7_LOCKED_REFERENCE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape verrouillee : montee vers le capteur haut puis referencement A L ARRET.
+                                  Sorties admises (toutes conscientes) : front Reset, defaut latche, abandon sur
+                                  violation detectee (descente commandee, garde de montee ecoulee, erreur codeur,
+                                  mouvement hors phase), et forcage de step de mise en service. AUCUNE sortie ne
+                                  pose de reference. La valeur 10 est ajoutee APRES HXF pour ne renumeroter
+                                  aucun etat existant.</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

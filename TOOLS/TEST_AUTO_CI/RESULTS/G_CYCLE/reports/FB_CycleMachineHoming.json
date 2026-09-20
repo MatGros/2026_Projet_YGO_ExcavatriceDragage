@@ -17,7 +17,7 @@
         "assertType": "ASSERT_EQ",
         "detail": "FB.MACHINEHOMINGSEQSTEP expected 2, got 1",
         "file": "test_fb_cyclemachinehoming.st",
-        "line": 98,
+        "line": 102,
         "message": "3 appuis -> HX2",
         "expected": "2",
         "actual": "1"
@@ -46,16 +46,68 @@
         "assertType": "ASSERT_EQ",
         "detail": "FB.MACHINEHOMINGSEQSTEP expected 2, got 1",
         "file": "test_fb_cyclemachinehoming.st",
-        "line": 203,
+        "line": 207,
         "message": "3 appuis -> HX2",
         "expected": "2",
         "actual": "1"
       }
+    },
+    {
+      "name": "TC-P09-H200 : confirmation benne fermee -> etape VERROUILLEE HX7 (pas HX2)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H201 : HX7 montee -- AUCUNE HomeReq et Homed reste FALSE (AC1)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H202 : HX7 montee -- ordre IDENTIQUE M1/M2 au palier 1 (AC4)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H203 : HX7 -- capture UNIQUEMENT a l arret confirme, capteur actif (AC6)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H204 : HX7 -- reference atteinte -> HX6 puis HX0 (AC6)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H205 : HX7 -- descente demandee -> abandon, AUCUNE reference (AC2)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H206 : HX7 -- sortie de MAINT_N2 -> etape CONSERVEE, aucun mouvement (AC2)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H207 : HX7 -- perte des permis et arret -> etape CONSERVEE (AC3)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H208 : garde de montee NON consommee sans commande de montee (A1/AC5)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H209 : garde de montee consommee quand la montee EST commandee (A1/AC5)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H212 : capteur haut DEJA actif a l entree -> aucune capture sans franchissement (AC1)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H210 : garde de descente NON consommee sans commande de descente (A1/AC5)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H211 : garde de descente consommee quand la descente EST commandee (A1/AC5)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 8,
-    "passed": 6,
+    "total": 21,
+    "passed": 19,
     "failed": 2
   }
 }

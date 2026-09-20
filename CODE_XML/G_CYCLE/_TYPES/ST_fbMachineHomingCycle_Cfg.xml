@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.306238" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.306238">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T19:03:00.559765" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T19:03:00.559765">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -55,10 +55,17 @@
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#120s0ms" />
+                <simpleValue value="TIME#300s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde HX2 : montée au capteur haut (0 = pas de garde)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde de montee : budget d'une MONTER CONTINUE (un temporisateur remet son temps ecoule a
+zero des que la commande retombe : une pause operateur ou un arret d'urgence ne consomme
+donc rien). Derivation : course maximale de cable = CfgTopSensorPos_M - CfgCableLimitDescent_M
+(8,5 m - (-50 m) = 58,5 m) ; borne haute de vitesse du palier 1 = 0,4 m/s
+(GVL_PERSISTENT._WinchSpeedConfig.SpeedBandMaxMps[1], valeur de banc A MESURER sur site)
+=&gt; 58,5 / 0,4 = 146,3 s ; marge x2 = 292,5 s ; valeur retenue 300 s (arrondie au-dessus).
+A revoir si la course ou la vitesse du palier 1 changent (gate G511).
+Garde de montee au capteur haut (0 = pas de garde)</xhtml>
               </documentation>
             </variable>
             <variable name="CfgTimeoutHomeAxes">
@@ -69,7 +76,8 @@
                 <simpleValue value="TIME#60s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde HX3 : descente jusqu'au front descendant capteur (0 = pas de garde)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde de descente HX3 : meme regle (budget de DESCENTE CONTINUE).
+Garde de descente jusqu'au front descendant capteur (0 = pas de garde)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
