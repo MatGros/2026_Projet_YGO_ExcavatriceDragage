@@ -31,6 +31,83 @@
 # BUG DISTINCT TROUVE EN MARGE (PAS dans ce lot, ouvert separement) : T329 -- dependance
 # circulaire WinchBothAscentBucketCloseArmed/MotionActive, benne franchement ouverte ne demarre
 # jamais en couple. Fichiers hors scope T327 (FB_Modes.st, PRG_03, FB_BucketCmdArbitration.st).
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# AMENDEMENT A+B — Revue orchestrateur + expert senior (2026-09-20) — PLAN SEUL, AUCUN CODE
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# CONSTAT (confirme par trace de code, pas hypothese) : le patch "NOT CoupledBucketPhaseLocked"
+# ci-dessus retire le SEUL frein geometrique sur M2 pendant la phase JOG de T248. Le chemin est
+# le VRAI JOG WinchSel=2 (Arbitrated=2), qui ne passe PAS par instBucket -> instBucket.Fault et
+# EffectivePermitBucket_Open/Close ne s'appliquent pas. Le seul filet restant est
+# SafetyPermitM2_Ascent/Descend (FB_Safety_Winch) : limites BRUTES cable (TopLimitM=7,5 m,
+# CfgCableLimitDescentM=-50 m), sans rapport avec la geometrie benne. Si l'etat franc
+# (IsClosed/IsOpen) n'est jamais atteint (obstacle, calage errone), M2 n'a AUCUNE borne benne
+# et continue (au palier 1, via M2JogApproachOpen/Close) jusqu'a ces limites brutes tres larges.
+#
+# ARBITRAGE RETENU : A (arret nominal deterministe) + B (surveillance defense en profondeur).
+# A = automatisme normal. B = filet de securite, JAMAIS le mecanisme nominal.
+#
+# --- OPTION A --- borne geometrique T248, alignee EXACTEMENT sur l'etat franc :
+#   Fermeture (montee M2) : coupe a Delta >= OffsetCloseM - CoherenceLimitM (= IsClosed)
+#   Ouverture (descente M2) : coupe a Delta <= OffsetOpenM + CoherenceLimitM (= IsOpen)
+#   Active UNIQUEMENT pendant la phase JOG de T248 : CoupledBucketPhaseLocked AND
+#   ManualBucketJogActive (= Arbitrated=2, deja lu en PRG_04 ligne ~298). PAS seulement
+#   CoupledBucketPhaseLocked seul : ce dernier reste TRUE aussi pendant la phase COUPLEE
+#   (Arbitrated=0) qui suit -- y appliquer la borne bloquerait la montee couplee M1+M2.
+#   POINT CRITIQUE SCAN-PAR-SCAN (expert) :
+#     Scan N   : PRG_02 rafraichit CablePosM2 -> Delta atteint IsClosed/IsOpen.
+#     Scan N   : PRG_03/FB_Modes evalue BucketIsClosed=TRUE -> BucketSeqSatisfied:=TRUE ->
+#                Auth.JoystickWinchSelectArbitrated:=0 (bascule phase couplee) CE MEME SCAN.
+#     Scan N   : PRG_04 recoit Arbitrated=0 -> ManualBucketJogActive=FALSE -> la borne A NE
+#                S'APPLIQUE DEJA PLUS ce scan (condition sur Arbitrated=2 auto-caduque) -> pas
+#                de brossage volontaire du transfert vers le mouvement couple.
+#   -> A verifier par test que le meme scan qui voit IsClosed/IsOpen voit aussi la levee de la
+#      borne A (pas un scan de retard qui bloquerait la transition, AF02 §5 retard explicite).
+#
+# --- OPTION B --- timeout de surveillance, defense en profondeur (cas obstacle/bourrage) :
+#   Condition d'armement : CoupledBucketPhaseLocked AND mouvement JOG demande (ReqAscent OU
+#   ReqDescend du contexte T248) AND NOT BucketSeqSatisfied.
+#   Timer en PAUSE (pas reset a 0, PAUSE) au neutre joystick -- une interruption volontaire de
+#   l'operateur ne doit pas etre penalisee ; reinitialise (retour a 0) sur abandon conscient de
+#   la demande (relachement + changement de sens, ou sortie de CoupledBucketPhaseLocked).
+#   A expiration :
+#     - SafeStop du treuil M2 concerne, Categorie 1 EN 60204-1 (rampe rapide couple maintenu
+#       jusqu'a vitesse nulle, puis frein) -- PAS une coupure AU brutale.
+#     - Defaut MEMORISE avec ErrorId dedie (ex. "Fermeture/ouverture benne T248 incomplete --
+#       obstacle ou bourrage probable"), meme doctrine que §9 CODE_QUALITY_STANDARDS (Cause/Ack,
+#       Reset jamais conditionne).
+#     - Aucun redemarrage automatique. Reprise : cause disparue (retour en dessous du seuil
+#       Delta, ou operateur a manoeuvre) ET joystick ramene au neutre ET front Reset -- Reset
+#       seul insuffisant (evite le coup de belier mecanique, exigence expert #2).
+#   Duree du timeout : NON TRANCHEE -- DECISION HUMAINE OBLIGATOIRE AVANT CODE. Recommandation
+#   expert senior (fermeture 8-15 s a vitesse normale en eau profonde >15 m, jusqu'a 25 s au
+#   palier 1) : 20-25 s, idealement reglable IHM maintenance (RETAIN, defaut 20 s). A CONFIRMER
+#   PAR MATHIEU avant toute ecriture.
+#
+# --- CHECK-LIST SECURITE (ISO 13849-1 / EN 60204-1), obligatoire dans le plan avant code ---
+#   1. Neutre joystick pendant JOG -> timer PAUSE (pas penalisation d'une interruption volontaire).
+#   2. Anti-redemarrage : apres defaut B, Reset seul insuffisant, exige aussi retour joystick au
+#      neutre avant de pouvoir rearmer un mouvement.
+#   3. Type d'arret : Categorie 1 EN 60204-1 (rampe rapide, jamais coupure AU brutale).
+#   4. SEMI_AUTO et WinchSel=2 (jog manuel pur) : AUCUN impact -- A+B scopes exclusivement a
+#      CoupledBucketPhaseLocked AND ManualBucketJogActive (Arbitrated=2 en mode non-SEMI_AUTO).
+#
+# --- TESTS OBLIGATOIRES AVANT CODE FINAL (contractuels, ecrits AVANT toute autre modification) ---
+#   - Montee T248 jusqu'a IsClosed, puis transfert effectif vers mouvement couple M1+M2 (meme
+#     scan, pas de brossage -- point critique scan-par-scan ci-dessus).
+#   - Descente T248 symetrique jusqu'a IsOpen, meme verification.
+#   - Relachement joystick pendant le JOG : timer B en pause, pas de defaut intempestif.
+#   - Etat franc jamais atteint (obstacle simule) : le timeout B se declenche, SafeStop Cat1,
+#     ErrorId dedie, aucun redemarrage sans neutre+Reset.
+#   - WinchSel=2 (jog manuel libre) : bornes manuelles existantes strictement inchangees.
+#   - SEMI_AUTO : bit-identique, aucun impact du mecanisme A+B.
+#   - Verification sur les SORTIES FINALES et les permis (EffectivePermitM2_*), pas seulement
+#     les variables internes (ManualBucketLimitsActive, ArbBucketContext...).
+#
+# STATUT : plan amende, PAS d'autorisation d'implementation. Attente validation humaine
+# explicite de : (1) la duree du timeout B (recommandation 20-25 s), (2) le plan ci-dessus dans
+# son ensemble. Garde automatique fix:+guard: a fournir avec l'implementation (AGENTS.md).
 # ═══════════════════════════════════════════════════════════════════════════
 
 contract:
