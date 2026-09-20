@@ -147,6 +147,13 @@ L'orchestrateur qualifie et propose, l'humain valide en 1 mot.
 
 ## Règles générales
 
+- 🎯 **L'orchestrateur reste propriétaire du résultat** : task manager, test manager, phasage,
+  arbitrage des scopes, lecture du `git diff` réel et acceptation finale. Il délègue en priorité
+  les investigations longues/répétitives et les revues indépendantes, pas sa responsabilité.
+- 🛠️ **Un responsable principal et un seul écrivain par scope de fichiers.** Le responsable peut
+  solliciter des spécialistes pour challenger son plan ou relire son diff ; ces reviewers restent
+  read-only. Procédure C3/C4 :
+  `TOOLS/AGENT_WORKFLOW/skills/orchestrator/references/delegation_c3_c4.md`.
 - 📌 **Tout sous-agent (fork Claude Code, Codex, antigravity) reçoit
   `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` en tête de sa tâche.** Un sous-agent
   démarre froid : sans ce préambule il ne connaît ni les règles, ni les cas d'arrêt, ni la

@@ -2014,7 +2014,7 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 CablePosM2 - offset benne NOMINAL fige (Config.OffsetClose/OpenM selon l'etat franc) ; affichage bargraphe. Ne bouge que si le tambour M2 tourne.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 CablePosM2 - offset benne continu (T291-B) ; affichage bargraphe et traces sans saut de 15 m aux franchissements d'états francs.</xhtml>
               </documentation>
             </variable>
             <variable name="M2PositionCorrectedValid">
@@ -2022,7 +2022,7 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 M2PositionCorrected exploitable : benne referencee ET etat FRANC (ouvert OU ferme). FALSE en position intermediaire -&gt; l'IHM masque/grise le bargraphe.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 M2PositionCorrected qualifiée comme mesure indépendante : benne référencée ET état FRANC (ouvert XOR fermé). FALSE en position intermédiaire pour interdire tout usage FDC/safety tant que la mesure absorbe la dérive M2.</xhtml>
               </documentation>
             </variable>
             <variable name="AutoBucketSeqActive">
@@ -18479,7 +18479,7 @@ END_IF;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Offset NOMINAL d'affichage (M2PositionCorrected seul) : Config.OffsetCloseM/OffsetOpenM selon l'etat franc, gele sinon — ne bouge pas si les tambours sont a l'arret, jamais l'ecart mesure live</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Offset d'affichage continu T291-B (M2PositionCorrected) : LIMIT(OffsetOpenM, DeltaPosition_M, OffsetCloseM) — continu pour affichage IHM/traces, sans saut à la transition</xhtml>
               </documentation>
             </variable>
             <variable name="DeltaPosition_M">
@@ -19487,18 +19487,16 @@ TonOffsetMismatch(
     PT := T#2s);
 OffsetStateMismatchWarn := TonOffsetMismatch.Q;
 
-// --- Offset NOMINAL d'affichage (M2PositionCorrected, PRG_04) --------------------------
-// Constante Config selon l'etat franc courant, JAMAIS l'ecart mesure live ni ActiveOffsetM
-// (pente bornee) : la position corrigee ne bouge que si un tambour tourne, et ne derive pas
-// d'une session a l'autre (basculement de mode, fin de jog a l'arret -&gt; aucun saut).
-// Position intermediaire : on GELE la derniere valeur (aucun pas au franchissement de bande).
-// Au franchissement FRANC ouvert&lt;-&gt;ferme, le repere se recale d'un pas : la benne vient de
-// parcourir sa course (tambour M2 a tourne). L'ecart residuel d'inertie a l'arret reste
-// visible sur DeltaPositionCorrected_M (tolere par Config.CoherenceLimitM).
-IF BucketState.IsClosed AND NOT BucketState.IsOpen THEN
-    DisplayOffsetM := Config.OffsetCloseM;
-ELSIF BucketState.IsOpen AND NOT BucketState.IsClosed THEN
-    DisplayOffsetM := Config.OffsetOpenM;
+// --- Offset continu d'affichage (M2PositionCorrected, PRG_04) --------------------------
+// T291-B : Calcul continu de l'offset géométrique d'affichage (OffsetOpenM .. OffsetCloseM).
+// Supprime le saut discontinu de 15 m aux franchissements d'états francs pour l'IHM et les traces.
+// Attention : en position intermédiaire, la mesure absorbe la dérive propre de M2 ;
+// elle n'est donc PAS qualifiée pour un usage de sécurité (M2PositionCorrectedValid reste FALSE).
+IF (Config.OffsetCloseM - Config.OffsetOpenM) &gt; 0.001 THEN
+    DisplayOffsetM := LIMIT(Config.OffsetOpenM, DeltaPosition_M, Config.OffsetCloseM);
+ELSE
+    // Configuration invalide (OffsetOpenM &gt;= OffsetCloseM) -&gt; repli neutre sans masquage
+    DisplayOffsetM := 0.0;
 END_IF;
 
 // --- Ecart M1/M2 CORRIGE de la geometrie benne (operateur, lecture seule) --------------
@@ -55214,14 +55212,13 @@ BucketState.M2ReqDescend := instBucket.M2_ReqDescend;
 BucketState.M2BucketJogLimit := instBucket.M2_BucketJogLimit;
 BucketState.ManualBucketLimitsActive := ManualBucketLimitsActive;
 BucketState.OffsetStateMismatchWarn := instBucket.OffsetStateMismatchWarn;
-// Affichage operateur (bargraphe) : offset NOMINAL fige (DisplayOffsetM = Config.OffsetCloseM/
-// OffsetOpenM selon l'etat franc). Ne bouge que si le tambour M2 tourne -&gt; pas de saut au
-// basculement de mode ni en fin de jog a l'arret, pas de derive inter-session. Ni OffsetTargetM
-// (ecart live) ni ActiveOffsetM (pente de securite).
+// Affichage operateur (bargraphe) et traces (T291-B) : DisplayOffsetM continu
+// (LIMIT OffsetOpenM..OffsetCloseM), pas de saut de 15 m aux transitions d'états francs.
 BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - instBucket.DisplayOffsetM;
-// Exploitable seulement en etat FRANC (ouvert XOR ferme) et benne referencee : en position
-// intermediaire DisplayOffsetM est gele sur le dernier etat franc -&gt; valeur non representative,
-// l'IHM masque/grise le bargraphe.
+// Qualification mesure indépendante : conservateur (T291-B B1). En position intermédiaire,
+// la mesure absorbe la dérive propre de M2 -&gt; M2PositionCorrectedValid reste FALSE pour
+// interdire tout usage FDC/safety. Seuls les états francs stabilisés (IsClosed XOR IsOpen)
+// avec benne référencée sont qualifiés pour la surveillance indépendante.
 BucketState.M2PositionCorrectedValid := _BucketState.BucketReferenced
     AND (_BucketState.IsClosed XOR _BucketState.IsOpen);
 BucketState.Ready := instBucket.Ready;

@@ -80,7 +80,7 @@ travaille et avec quels outils :
    🛡️ Gate G440 (check_skill_stubs.py) = anti-dérive
 
 🧠 MÉTHODE : 1. Lire TASKS.yaml → 2. Verrouiller 🔒 + 🚩 → 3. Contrat (dès C2)
-   → 4. Déléguer en parallèle (subagent_preamble.md) → 5. Revue indépendante R1→R7
+   → 4. Répartir le travail utile (subagent_preamble.md) → 5. Revue indépendante R1→R8
    → 6. G200 liaison + gates → 7. Restituer (bandeau + bloc Auto-vérif liaison)
    ⛔ Règle d'or : tâche + plan validés humainement → GO ; ensuite le lot roule sans arrêt au fil de l'eau
 
@@ -184,7 +184,7 @@ manuel, l'historique est conservé (filtre « ✅ Terminées » pour le relire).
 
 ## 🛠️ Outils disponibles
 
-### Sous-agents (délégation)
+### Sous-agents (délégation sélective)
 
 - `subagent` / `subagent_fork` : déléguer une sous-tâche indépendante. Lancer les délégations
   **indépendantes en parallèle** (une par message) et continuer le travail utile pendant qu'elles
@@ -193,18 +193,22 @@ manuel, l'historique est conservé (filtre « ✅ Terminées » pour le relire).
   tête de chaque tâche déléguée (l'agent distant n'a pas le contexte de la conversation).
 - **Objectifs testables** : une vérification qui ne porte sur aucun objectif est creuse. Rédiger
   le contrat de tâche (obligatoire dès C2) avant toute délégation.
-- **Tout est délégué aux agents** : l'orchestrateur délègue **toute l'analyse** (statique **et**
-  live) et **toute l'implémentation** (lecture de FB, correction de fichiers, constats, écriture
-  de code). Il ne fait **jamais** lui-même l'analyse ni l'implémentation — il lance des agents.
-- **L'orchestrateur garde UNIQUEMENT** :
-  1. la **lecture du `git diff` réel** (jamais la parole de l'agent producteur) ;
-  2. la **validation finale** (décision d'accepter/rejeter un lot) ;
-  3. la **coordination** (lancer les agents, suivre les tâches, lever les blocages).
-- ⚠️ **L'ordre direct de l'utilisateur prime TOUJOURS sur la skill.** La règle « tout déléguer »
-  est la **posture par défaut**, pas une contrainte absolue. Si l'utilisateur donne un ordre
-  direct contraire (ex. « fais-le toi-même », « corrige ça maintenant »), l'orchestrateur **suit
-  l'ordre utilisateur**. La skill est un guide, elle ne s'oppose jamais aux instructions directes
-  de l'utilisateur.
+- **Déléguer ce qui le justifie** : recherches longues/répétitives, audit historique,
+  exploration large, comparaison multi-modèle et revue indépendante. L'orchestrateur conserve
+  le task manager, le test manager, le phasage, les arbitrages de scope et l'acceptation finale.
+- **Un responsable principal par lot** : l'agent chargé d'implémenter peut appeler des agents
+  spécialistes (automatisme, safety, IHM, tests, mise en service) pour challenger ou relire. Il
+  reste garant du code, du rapport, des preuves, du bundle et des gates ; il ne sous-traite pas sa
+  responsabilité.
+- **Un seul écrivain par périmètre de fichiers**. Les challengers et reviewers restent read-only.
+  L'orchestrateur tranche les recouvrements avant lancement.
+- **L'orchestrateur vérifie lui-même** le contrat, le `git diff` réel, les résultats des tests et
+  l'adéquation au besoin utilisateur. Un résumé d'agent n'est jamais une preuve suffisante.
+- Pour une délégation C3/C4 ou multi-agents, appliquer la procédure et le gabarit compact :
+  `references/delegation_c3_c4.md`.
+- ⚠️ **L'ordre direct de l'utilisateur prime TOUJOURS sur la skill.** La délégation reste un
+  moyen d'exécution, jamais une excuse pour perdre le fil, diluer la responsabilité ou élargir le
+  périmètre.
 
 ### Subagent multi-modèle (si l'orchestrateur est un agent DSH)
 
@@ -298,6 +302,7 @@ L'orchestrateur lit le **`git diff` réel** — jamais la seule parole de l'agen
 - Skills : `task-planner` (catalogue & contrats), `troubleshooting` (diagnostic)
 - Workflow multi-agents & criticité C0–C4 : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`
 - Préambule de délégation : `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md`
+- Procédure de délégation C3/C4 : `TOOLS/AGENT_WORKFLOW/skills/orchestrator/references/delegation_c3_c4.md`
 - Gabarit de contrat : `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`
 
 ## ✅ Checklist de restitution
@@ -307,8 +312,9 @@ L'orchestrateur lit le **`git diff` réel** — jamais la seule parole de l'agen
 - [ ] Tâche verrouillée (🔒) et suivie dans `TASKS.yaml`
 - [ ] Action enregistrée / mise à jour dans `TASKS_ORCHESTRATOR.yaml` (statut, verdict, décision)
 - [ ] Contrat de tâche rédigé (obligatoire dès C2) avant délégation
-- [ ] Sous-agents indépendants lancés en parallèle, avec `subagent_preamble.md`
-- [ ] Revue indépendante (R1→R7) par un agent différent de l'implémenteur
+- [ ] Travail réparti sans conflit : un responsable principal, un seul écrivain par scope, reviewers read-only
+- [ ] Sous-agents utiles lancés avec `subagent_preamble.md` et objectifs/preuves explicites
+- [ ] Revue indépendante (R1→R8) par un agent différent de l'implémenteur
 - [ ] `git diff` réel lu par l'orchestrateur
 - [ ] Diff bundle frais généré depuis tous les fichiers `CODE/**/*.st` touchés et objets inclus relevés
 - [ ] Bloc `Auto-vérification liaison` (G200) collé dans la restitution

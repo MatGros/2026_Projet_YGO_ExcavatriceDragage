@@ -1732,14 +1732,13 @@ BucketState.M2ReqDescend := instBucket.M2_ReqDescend;
 BucketState.M2BucketJogLimit := instBucket.M2_BucketJogLimit;
 BucketState.ManualBucketLimitsActive := ManualBucketLimitsActive;
 BucketState.OffsetStateMismatchWarn := instBucket.OffsetStateMismatchWarn;
-// Affichage operateur (bargraphe) : offset NOMINAL fige (DisplayOffsetM = Config.OffsetCloseM/
-// OffsetOpenM selon l'etat franc). Ne bouge que si le tambour M2 tourne -> pas de saut au
-// basculement de mode ni en fin de jog a l'arret, pas de derive inter-session. Ni OffsetTargetM
-// (ecart live) ni ActiveOffsetM (pente de securite).
+// Affichage operateur (bargraphe) et traces (T291-B) : DisplayOffsetM continu
+// (LIMIT OffsetOpenM..OffsetCloseM), pas de saut de 15 m aux transitions d'états francs.
 BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - instBucket.DisplayOffsetM;
-// Exploitable seulement en etat FRANC (ouvert XOR ferme) et benne referencee : en position
-// intermediaire DisplayOffsetM est gele sur le dernier etat franc -> valeur non representative,
-// l'IHM masque/grise le bargraphe.
+// Qualification mesure indépendante : conservateur (T291-B B1). En position intermédiaire,
+// la mesure absorbe la dérive propre de M2 -> M2PositionCorrectedValid reste FALSE pour
+// interdire tout usage FDC/safety. Seuls les états francs stabilisés (IsClosed XOR IsOpen)
+// avec benne référencée sont qualifiés pour la surveillance indépendante.
 BucketState.M2PositionCorrectedValid := _BucketState.BucketReferenced
     AND (_BucketState.IsClosed XOR _BucketState.IsOpen);
 BucketState.Ready := instBucket.Ready;

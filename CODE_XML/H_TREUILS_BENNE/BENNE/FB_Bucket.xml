@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T01:52:58.920545" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T01:52:58.920545">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T09:54:50.906130" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T09:54:50.906130">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -856,7 +856,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Offset NOMINAL d'affichage (M2PositionCorrected seul) : Config.OffsetCloseM/OffsetOpenM selon l'etat franc, gele sinon — ne bouge pas si les tambours sont a l'arret, jamais l'ecart mesure live</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Offset d'affichage continu T291-B (M2PositionCorrected) : LIMIT(OffsetOpenM, DeltaPosition_M, OffsetCloseM) — continu pour affichage IHM/traces, sans saut à la transition</xhtml>
               </documentation>
             </variable>
             <variable name="DeltaPosition_M">
@@ -1864,18 +1864,16 @@ TonOffsetMismatch(
     PT := T#2s);
 OffsetStateMismatchWarn := TonOffsetMismatch.Q;
 
-// --- Offset NOMINAL d'affichage (M2PositionCorrected, PRG_04) --------------------------
-// Constante Config selon l'etat franc courant, JAMAIS l'ecart mesure live ni ActiveOffsetM
-// (pente bornee) : la position corrigee ne bouge que si un tambour tourne, et ne derive pas
-// d'une session a l'autre (basculement de mode, fin de jog a l'arret -&gt; aucun saut).
-// Position intermediaire : on GELE la derniere valeur (aucun pas au franchissement de bande).
-// Au franchissement FRANC ouvert&lt;-&gt;ferme, le repere se recale d'un pas : la benne vient de
-// parcourir sa course (tambour M2 a tourne). L'ecart residuel d'inertie a l'arret reste
-// visible sur DeltaPositionCorrected_M (tolere par Config.CoherenceLimitM).
-IF BucketState.IsClosed AND NOT BucketState.IsOpen THEN
-    DisplayOffsetM := Config.OffsetCloseM;
-ELSIF BucketState.IsOpen AND NOT BucketState.IsClosed THEN
-    DisplayOffsetM := Config.OffsetOpenM;
+// --- Offset continu d'affichage (M2PositionCorrected, PRG_04) --------------------------
+// T291-B : Calcul continu de l'offset géométrique d'affichage (OffsetOpenM .. OffsetCloseM).
+// Supprime le saut discontinu de 15 m aux franchissements d'états francs pour l'IHM et les traces.
+// Attention : en position intermédiaire, la mesure absorbe la dérive propre de M2 ;
+// elle n'est donc PAS qualifiée pour un usage de sécurité (M2PositionCorrectedValid reste FALSE).
+IF (Config.OffsetCloseM - Config.OffsetOpenM) &gt; 0.001 THEN
+    DisplayOffsetM := LIMIT(Config.OffsetOpenM, DeltaPosition_M, Config.OffsetCloseM);
+ELSE
+    // Configuration invalide (OffsetOpenM &gt;= OffsetCloseM) -&gt; repli neutre sans masquage
+    DisplayOffsetM := 0.0;
 END_IF;
 
 // --- Ecart M1/M2 CORRIGE de la geometrie benne (operateur, lecture seule) --------------

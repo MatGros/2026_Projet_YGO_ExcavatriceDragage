@@ -37,6 +37,18 @@ tout critère générique d'acceptation. Ta restitution se juge **contre eux**, 
 - Si aucun contrat n'est fourni sur une tâche de criticité ≥ C2 → **demander**, ne pas commencer.
 - Si le scope touche `CODE/MAIN/`, le contrat doit prouver explicitement : **nom de fichier = nom de POU** et **suffixe de langage = langage généré dans le bundle**. Sans ces deux critères, demander une correction du contrat avant d'écrire.
 
+## 🤝 Responsabilité du principal et usage des agents secondaires
+
+- Si tu es l'agent principal du lot, tu peux solliciter des agents à contexte frais pour challenger
+  le besoin, le plan, les tests ou le diff. Tu implémentes toi-même le lot qui t'est confié et tu
+  restes garant de la restitution, de la qualité et des preuves.
+- Un agent secondaire ne remplace jamais ta lecture du code réel ni ta vérification du diff.
+- Un seul agent écrit dans un même périmètre de fichiers ; les challengers/reviewers sont
+  read-only et rendent un verdict sourcé.
+- Toute anomalie hors scope est signalée à l'orchestrateur ; elle n'est pas corrigée spontanément.
+- Pour une mission C3/C4, utiliser le cadrage compact de
+  `TOOLS/AGENT_WORKFLOW/skills/orchestrator/references/delegation_c3_c4.md`.
+
 ## 🧱 Structure des programmes — non négociable
 
 - Ne jamais créer ou renommer un POU dont le nom diffère du nom de son fichier source.
