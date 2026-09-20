@@ -876,3 +876,151 @@ TEST 'T181-21 Copy-out VAR_IN_OUT : BucketState ecrit par FB_Bucket restitue a l
     ASSERT_FALSE(BucketState.IsOpen, 'Copy-out auto : BucketState.IsOpen reste FALSE');
     ASSERT_FALSE(BucketState.IsClosed, 'Copy-out auto : BucketState.IsClosed reste FALSE');
 END_TEST
+
+(* ═══════════════════════════════════════════════════════════════════════════
+   🧪 T291-B — Tests comportementaux continuité de DisplayOffsetM
+   ───────────────────────────────────────────────────────────────────────────
+   Vérifie :
+   1. Continuité Fermé -> Intermédiaire -> Ouvert (zéro saut de 15 m)
+   2. Continuité Ouvert -> Intermédiaire -> Fermé (monotonicité)
+   3. Clamping rigoureux sur sur-ouverture (<= 0.0) et sur-fermeture (>= 15.0)
+   4. Repli neutre (0.0 m) sous configuration invalide (OffsetOpenM >= OffsetCloseM)
+   ═══════════════════════════════════════════════════════════════════════════ *)
+
+TEST 'T291-B Continuité DisplayOffsetM : Fermé -> Intermédiaire -> Ouvert sans saut'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 15.0;
+    Config.CoherenceLimitM := 1.0;
+    Config.CloseAnticipationM := 1.2;
+    Config.OpenAnticipationM := 1.3;
+    BucketState.IsClosed := TRUE;
+    BucketState.IsOpen := FALSE;
+    BucketState.BucketReferenced := TRUE;
+
+    (* Scan 1 : Benne fermée nominale (M1=5.0, M2=20.0 -> Delta=15.0) *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       CablePosM1 := 5.0, CablePosM2 := 20.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_NEAR(FB.DisplayOffsetM, 15.0, 0.001, 'DisplayOffsetM fermé = 15.0 m');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 2 : Début ouverture (M1=5.0, M2=17.0 -> Delta=12.0) *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       CablePosM1 := 5.0, CablePosM2 := 17.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_NEAR(FB.DisplayOffsetM, 12.0, 0.001, 'DisplayOffsetM intermédiaire 1 = 12.0 m');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 3 : Mi-course ouverture (M1=5.0, M2=12.5 -> Delta=7.5) *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       CablePosM1 := 5.0, CablePosM2 := 12.5,
+       Config := Config, BucketState := BucketState);
+    ASSERT_NEAR(FB.DisplayOffsetM, 7.5, 0.001, 'DisplayOffsetM mi-course 50% = 7.5 m');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 4 : Fin ouverture (M1=5.0, M2=7.0 -> Delta=2.0) *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       CablePosM1 := 5.0, CablePosM2 := 7.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_NEAR(FB.DisplayOffsetM, 2.0, 0.001, 'DisplayOffsetM intermédiaire 2 = 2.0 m');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 5 : Benne complètement ouverte (M1=5.0, M2=5.0 -> Delta=0.0) *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       CablePosM1 := 5.0, CablePosM2 := 5.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_NEAR(FB.DisplayOffsetM, 0.0, 0.001, 'DisplayOffsetM ouvert = 0.0 m');
+END_TEST
+
+TEST 'T291-B Continuité DisplayOffsetM : Ouvert -> Intermédiaire -> Fermé'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 15.0;
+    Config.CoherenceLimitM := 1.0;
+    Config.CloseAnticipationM := 1.2;
+    Config.OpenAnticipationM := 1.3;
+    BucketState.IsClosed := FALSE;
+    BucketState.IsOpen := TRUE;
+    BucketState.BucketReferenced := TRUE;
+
+    (* Scan 1 : Benne ouverte nominale (Delta=0.0) *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       CablePosM1 := 5.0, CablePosM2 := 5.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_NEAR(FB.DisplayOffsetM, 0.0, 0.001, 'Ouvert départ = 0.0 m');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 2 : Fermeture 25% (Delta=3.75) *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       CablePosM1 := 5.0, CablePosM2 := 8.75,
+       Config := Config, BucketState := BucketState);
+    ASSERT_NEAR(FB.DisplayOffsetM, 3.75, 0.001, 'Fermeture 25% = 3.75 m');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 3 : Fermeture 75% (Delta=11.25) *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       CablePosM1 := 5.0, CablePosM2 := 16.25,
+       Config := Config, BucketState := BucketState);
+    ASSERT_NEAR(FB.DisplayOffsetM, 11.25, 0.001, 'Fermeture 75% = 11.25 m');
+
+    ADVANCE_TIME(10000000);
+
+    (* Scan 4 : Benne complètement fermée (Delta=15.0) *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       CablePosM1 := 5.0, CablePosM2 := 20.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_NEAR(FB.DisplayOffsetM, 15.0, 0.001, 'Fermé arrivée = 15.0 m');
+END_TEST
+
+TEST 'T291-B Clamping DisplayOffsetM : Sur-course ouverture et fermeture'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 15.0;
+    Config.CoherenceLimitM := 1.0;
+    BucketState.BucketReferenced := TRUE;
+
+    (* Sur-ouverture : Delta = -2.0 m -> DisplayOffsetM borné à OffsetOpenM = 0.0 *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       CablePosM1 := 5.0, CablePosM2 := 3.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_NEAR(FB.DisplayOffsetM, 0.0, 0.001, 'Sur-ouverture clampée à 0.0 m');
+
+    ADVANCE_TIME(10000000);
+
+    (* Sur-fermeture : Delta = 17.5 m -> DisplayOffsetM borné à OffsetCloseM = 15.0 *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       CablePosM1 := 5.0, CablePosM2 := 22.5,
+       Config := Config, BucketState := BucketState);
+    ASSERT_NEAR(FB.DisplayOffsetM, 15.0, 0.001, 'Sur-fermeture clampée à 15.0 m');
+END_TEST
+
+TEST 'T291-B Repli DisplayOffsetM si configuration invalide (OffsetOpenM >= OffsetCloseM)'
+    (* Configuration aberrante/inversée *)
+    Config.OffsetOpenM := 15.0;
+    Config.OffsetCloseM := 0.0;
+    Config.CoherenceLimitM := 1.0;
+    BucketState.BucketReferenced := TRUE;
+
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       CablePosM1 := 5.0, CablePosM2 := 10.0,
+       Config := Config, BucketState := BucketState);
+    (* Ne doit PAS inverser silencieusement la formule, mais replier à 0.0 *)
+    ASSERT_NEAR(FB.DisplayOffsetM, 0.0, 0.001, 'Config invalide -> DisplayOffsetM replié à 0.0 m');
+END_TEST
+

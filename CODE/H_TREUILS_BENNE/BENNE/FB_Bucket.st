@@ -74,7 +74,7 @@ VAR_OUTPUT
     M1SlipDetected                  : BOOL;                           // <-- [DIAG] Glissement M1 detecte
     ActiveOffsetM                   : REAL;                           // <-- [DIAG] Decalage cible pour FB_WinchSync — PENTE BORNEE (securite : SyncDeviation, MecaE cross-check)
     OffsetTargetM                   : REAL;                           // <-- [DIAG] Cible d'offset INSTANTANEE (avant pente) — reference de convergence ActiveOffsetM + ecart corrige DeltaPositionCorrected_M, jamais pour la logique de securite
-    DisplayOffsetM                  : REAL;                           // <-- [DIAG] Offset NOMINAL d'affichage (M2PositionCorrected seul) : Config.OffsetCloseM/OffsetOpenM selon l'etat franc, gele sinon — ne bouge pas si les tambours sont a l'arret, jamais l'ecart mesure live
+    DisplayOffsetM                  : REAL;                           // <-- [DIAG] Offset d'affichage continu T291-B (M2PositionCorrected) : LIMIT(OffsetOpenM, DeltaPosition_M, OffsetCloseM) — continu pour affichage IHM/traces, sans saut à la transition
     DeltaPosition_M                 : REAL;                           // <-- [DIAG] Ecart reel signe M2 - M1 (m) — MESURE brute, alimente l'etat benne (NearClosed/NearOpen, %, sync)
     DeltaPositionCorrected_M        : REAL;                           // <-- [DIAG] Ecart M1/M2 CORRIGE de la geometrie benne : DeltaPosition_M - OffsetTargetM. ~0 = treuils synchro ; != 0 = derive treuil ou benne pas a l'etat memorise. Pour l'operateur (pas la logique d'etat).
     RemainingTravelM                : REAL;                           // <-- [DIAG] Distance restante avant cible (m)
@@ -696,18 +696,16 @@ TonOffsetMismatch(
     PT := T#2s);
 OffsetStateMismatchWarn := TonOffsetMismatch.Q;
 
-// --- Offset NOMINAL d'affichage (M2PositionCorrected, PRG_04) --------------------------
-// Constante Config selon l'etat franc courant, JAMAIS l'ecart mesure live ni ActiveOffsetM
-// (pente bornee) : la position corrigee ne bouge que si un tambour tourne, et ne derive pas
-// d'une session a l'autre (basculement de mode, fin de jog a l'arret -> aucun saut).
-// Position intermediaire : on GELE la derniere valeur (aucun pas au franchissement de bande).
-// Au franchissement FRANC ouvert<->ferme, le repere se recale d'un pas : la benne vient de
-// parcourir sa course (tambour M2 a tourne). L'ecart residuel d'inertie a l'arret reste
-// visible sur DeltaPositionCorrected_M (tolere par Config.CoherenceLimitM).
-IF BucketState.IsClosed AND NOT BucketState.IsOpen THEN
-    DisplayOffsetM := Config.OffsetCloseM;
-ELSIF BucketState.IsOpen AND NOT BucketState.IsClosed THEN
-    DisplayOffsetM := Config.OffsetOpenM;
+// --- Offset continu d'affichage (M2PositionCorrected, PRG_04) --------------------------
+// T291-B : Calcul continu de l'offset géométrique d'affichage (OffsetOpenM .. OffsetCloseM).
+// Supprime le saut discontinu de 15 m aux franchissements d'états francs pour l'IHM et les traces.
+// Attention : en position intermédiaire, la mesure absorbe la dérive propre de M2 ;
+// elle n'est donc PAS qualifiée pour un usage de sécurité (M2PositionCorrectedValid reste FALSE).
+IF (Config.OffsetCloseM - Config.OffsetOpenM) > 0.001 THEN
+    DisplayOffsetM := LIMIT(Config.OffsetOpenM, DeltaPosition_M, Config.OffsetCloseM);
+ELSE
+    // Configuration invalide (OffsetOpenM >= OffsetCloseM) -> repli neutre sans masquage
+    DisplayOffsetM := 0.0;
 END_IF;
 
 // --- Ecart M1/M2 CORRIGE de la geometrie benne (operateur, lecture seule) --------------

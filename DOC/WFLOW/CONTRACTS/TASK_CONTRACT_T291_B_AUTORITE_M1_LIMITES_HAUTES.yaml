@@ -42,10 +42,13 @@ contract:
       - CODE/H_TREUILS_BENNE/FB_Winch.st
       - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
       - CODE/H_TREUILS_BENNE/FB_WinchStateProjection.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
       - CODE/M_MAIN/PRG_03_Modes_Cycle.st
       - CODE/M_MAIN/PRG_04_Treuils_Benne.st
       - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st
       - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
       - TOOLS/AGENT_WORKFLOW/scripts/G499_check_t291b_top_authority.py
       - CODE_XML/CODE_Bundle.xml
       - CODE_XML/CODE_DiffBundle.xml
@@ -82,14 +85,12 @@ contract:
     - "B3 : validation C3 et revue independante : AX12, homing, TOP, limites tambour, descente et T327."
 status: OPEN
 validation:
-  status: OPEN
-  validated_by: ""
-  validated_at: ""
+  status: IN_PROGRESS
+  validated_by: "HUMAN_OPERATOR + AGY01"
+  validated_at: "2026-09-20T12:40:44+02:00"
   notes: >
-    Reouverte a la demande explicite de l utilisateur le 2026-09-20 apres recurrence terrain AX12.
-    La reprise porte d abord uniquement sur une confirmation par snapshot frais ; aucune implementation
-    C4 avant validation des blocking_decisions. Audit detaille conserve dans
-    TROUBLESHOOTING_AX12_Arret_737m_20260915.md et REVIEW_T291B_GIT_HISTORY_AX12_20260915.md.
-    Regression identifiee a 95 % : f36c4480 introduit la neutralisation Both sur divergence,
-    92601d2c rend visible le cas P1/P5 en AX12 ; codeurs et SimBench hors cause. Aucun code avant
-    demande explicite, validation humaine C4 et resolution des blocking_decisions.
+    Phases B0 et B1 validees visuellement par l'utilisateur le 2026-09-20 :
+    "La mesure M2PositionCorrected est maintenant stable et les sauts ont disparu. B1 est concluante visuellement."
+    Tests CI FB_Bucket 100% PASS et garde-fou mecanique G499 PASS (0 erreur).
+    ARRET STRICT SUR CONSIGNE HUMAINE : ne pas elargir au mouvement, aux FDC, a T248 ou a D18.
+    Les phases B2 (autorite M1 en Both) et B3 restent non abordees dans ce lot.

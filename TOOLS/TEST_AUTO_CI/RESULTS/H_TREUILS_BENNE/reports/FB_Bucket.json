@@ -184,11 +184,27 @@
         "line": 875,
         "message": "Copy-out auto : BucketState.StateIncoherent restitue TRUE"
       }
+    },
+    {
+      "name": "T291-B Continuit\u00e9 DisplayOffsetM : Ferm\u00e9 -> Interm\u00e9diaire -> Ouvert sans saut",
+      "passed": true
+    },
+    {
+      "name": "T291-B Continuit\u00e9 DisplayOffsetM : Ouvert -> Interm\u00e9diaire -> Ferm\u00e9",
+      "passed": true
+    },
+    {
+      "name": "T291-B Clamping DisplayOffsetM : Sur-course ouverture et fermeture",
+      "passed": true
+    },
+    {
+      "name": "T291-B Repli DisplayOffsetM si configuration invalide (OffsetOpenM >= OffsetCloseM)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 29,
-    "passed": 20,
+    "total": 33,
+    "passed": 24,
     "failed": 9
   }
 }

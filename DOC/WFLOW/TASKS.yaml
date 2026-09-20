@@ -28,12 +28,12 @@ tasks:
   avancement: 'Création de tâche et contrat C3 : cadrage uniquement, aucun code ni IHM modifié.'
 - id: T330
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C2
   domaine: CONFIGURATION_TREUILS / SECURITE_POSITIONNELLE
-  agent: '—'
-  date: '2026-09-20T11:19:48+02:00'
-  updated_at: '2026-09-20T11:19:48+02:00'
+  agent: 'DSH01'
+  date: '2026-09-20T11:46:35+02:00'
+  updated_at: '2026-09-20T11:46:35+02:00'
   titre: Cadrer l'invariant entre position homing TOP et FDC logiciel haut
   contexte: 'Les cotes 8,50 m (position de référencement au capteur TOP) et 7,50 m (FDC logiciel haut) sont des paramètres utilisateur, jamais des constantes métier. Elles doivent conserver une réserve verticale minimale : PositionHomingTop_M >= CableLimitAscent_M + 1,00 m. Le 1,00 m est une règle d ingénierie fixe à vérifier, pas un nouveau réglage IHM. Les gardes à plus ou moins 0,50 m seront dérivées ultérieurement de ces paramètres existants.'
   description: 'Cadrage et proposition de vérification de configuration uniquement. Identifier les producteurs, consommateurs et modes de validation des deux paramètres existants ; définir la réaction sûre à une configuration invalide sans clamp silencieux ni création de nouvelle variable de fin de course. Ne modifie ni la mesure M2 corrigée ni les FDC dans cette tâche.'
@@ -45,7 +45,7 @@ tasks:
   - 'Livrer un plan C3 d implementation séparé, soumis à validation humaine avant code.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T330_HOMING_TOP_SOFT_LIMIT_INVARIANT.yaml
   bloque_par: []
-  avancement: 'Cadrage créé. Aucun code ni réglage ajouté.'
+  avancement: '⏳ Cadrage LIVRE par DSH01 le 2026-09-20 -> DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T330_INVARIANT_HAUT_v1.0.md. Noms reels du code PROUVES : CfgTopSensorPos_M (ST_WinchCfg.st:8, defaut 8,5 m ; M2 ecrase = M1 chaque scan par PRG_07:154-155) et CfgCableLimitAscent_M (ST_CommunCfg.st:21, defaut 7,5 m, commun M1/M2). Les libelles de la commande (PositionHomingTop_M / PositionFdcLogicielHaut_M) et du contrat (CableLimitAscent_M) NE SONT PAS les noms declares -> AC1 du contrat infalsifiable. Aucune validation croisee des deux parametres n existe dans CODE/. VERDICT : BLOCK pour le passage a C3, motifs : (1) le gate CI G483 AC2b impose delta <= band alors que T330 impose delta >= 1,00 m, les deux n etant vraies qu a delta = 1,00 m exactement, et AUCUN delta ne satisfait les deux si la bande reelle (0,5 m) est lue ; (2) G483 est ROUGE aujourd hui (exit=1 sur AC1, AC2b passant via un champ renomme fantome) : la suite fin de lot ne protege plus l invariant ; (3) delta < 0 (FDC au-dessus de la reference TOP) n est protege par rien et rend le cycle SEMI_AUTO impossible. 16 questions Q1..Q16 a trancher, dont Q1 (quelle regle gouverne, 3 options proposees) et Q2 (reaction a une configuration invalide, OPTION 1 recommandee). ZERO code modifie : CODE/, CODE_XML/, types IHM et Device.export intacts.'
 - id: T329
   parent_id: ''
   statut: ⬜
@@ -991,16 +991,13 @@ tasks:
   bloque_par: []
 - id: T291-B
   parent_id: T291
-  statut: ⬜
+  statut: ⏳
   criticite: C4
   domaine: SECURITE_LIMITES_HAUTES_TREUILS
-  agent: —
-  date: '2026-09-20T10:21:46+02:00'
+  agent: AGY01
+  date: '2026-09-20T11:38:00+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
-  avancement: '⬜ Reouverte le 2026-09-20 apres mise de cote demandee le 2026-09-15. Audit exhaustif conserve : regression logicielle identifiee avec confiance
-    95 %, introduite par f36c4480 puis amplifiee/revelee par 92601d2c ; codeurs et SimBench hors cause. Reouverte sur demande
-    utilisateur le 2026-09-20 apres recurrence terrain AX12. Etape active : confirmer par snapshot frais la divergence P1/P5
-    et WinchBothFinalRequestsCoherent avant toute implementation C4. Aucun correctif automate engage.'
+  avancement: '⏳ En cours AGY01. Phase B0 : analyse de la chaine de calcul M2 corrigee et cadrage de la continuite sans saut.'
   titre: T291-B — Position M2 corrigee continue, puis autorite M1 en Both AX12
   contexte: 'Decision utilisateur 2026-09-15 : en M1 seul ou M1+M2 Both, le FDC logiciel nominal et la reduction de vitesse
     sont pilotes par M1. M2 est suiveur et recoit le meme profil de contacteurs. En M2 seul, la position M2 corrigee geometrie
@@ -1015,7 +1012,7 @@ tasks:
   - 'TOP mecanique, limites tambour M2, mou de cable, synchronisme et AU restent inchanges et independants.'
   - 'Aucun nouveau champ de position/FDC et aucune nouvelle configuration IHM/RETAIN : marges derivees des parametres existants, apres T330.'
   phases:
-  - B0 ⬜ Cartographier et corriger la position M2 corrigee EXISTANTE ; aucun changement de FDC, de permis ni de cycle.
+  - B0 ⏳ Cartographier et corriger la position M2 corrigee EXISTANTE ; aucun changement de FDC, de permis ni de cycle.
   - B1 ⬜ Tests et recette de continuite : ouverte, fermee, intermediaire, Both, traces sans saut et qualification de la source pourcentage ouverture.
   - B2 ⬜ Apres validation humaine B1 et invariant T330 : autorite M1 sur profil Both et fin nominale AX12 ; M2 garde-fou derive uniquement.
   - B3 ⬜ Tests de non-regression M1 seul/M2 seul/Both, AX12, homing, descente, TOP, limites tambour et T327 ; revue independante avant livraison.
