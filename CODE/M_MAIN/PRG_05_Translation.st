@@ -44,6 +44,7 @@ VAR
     M3_SpeedCmd_Active      : REAL;
     M3_PositioningActive    : BOOL;
     M3_PositionSensorTarget : BOOL;
+    M3_TargetCodeSel        : INT;  // . [LOC] Code de cible M3 mémorisé (1=Trémie, 2=P2, 3=P1, 4=Maintenance) — survit à la perte de la demande
     M3_CycleTranslationStepAuthorized : BOOL; // [SAFE] En SEMI_AUTO, M3 autorise uniquement en AX2/AX14
     SimBtnIHM_Active        : BOOL; // . [LOC] Stimuli boutons IHM M3 actifs (simulation ET JoyMaster inactif)
 
@@ -51,6 +52,7 @@ VAR
 
     M3_SafeStop_Active      : BOOL; // SafeStop sur défaut module d'entrée (InputModuleFault, AF06 §3bis)
     M3_SafeStop_Aggregate   : BOOL; // 🛡️ SafeStop réellement appliqué au mouvement = InputModuleFault OR safety M3 (8 mécanismes)
+    M3_MaintN2              : BOOL; // 🔒 Mode MAINT_N2 arbitré (origine FB_Modes) — garde de consommation des bypass M3
 
     // 🟢 Permis directionnels M3 EFFECTIFS (D1 — Phase 3) : information de POSSIBILITÉ de
     // mouvement dans une direction, donnée AVANT l'ordre. Reflète les conditions physiques/
@@ -405,29 +407,59 @@ M3_SafeStop_Active := PRG_02_Acquisition.Data.InputModules.Fault;
 // arme le verrou anti-rebond §4ter de FB_Translation (DirectionAtArrival). Mot EXACT
 // (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front franc à l'arrivée quel que
 // soit le sens de venue (voir FB_Translation_PositionDecoder.st).
+//
+// 🎯 MÉMOIRE DE CIBLE : le code de cible n'est réécrit QUE tant qu'une demande est présente ;
+// la cible publiée est ensuite le JETON du point mémorisé. La perte de la demande n'efface donc
+// plus une cible déjà qualifiée : le debounce de 100 ms de FB_Translation peut se terminer et
+// armer son verrou d'arrivée même si l'opérateur relâche juste après le capteur. Sans cette
+// mémoire, un relâchement dans la fenêtre de debounce annulait la détection d'arrivée en cours,
+// et la re-demande du même sens repartait au-delà du point. La cible retombe d'elle-même dès que
+// le chariot quitte le point, les jetons M3_AtXxxStable étant uniques et exclusifs.
+// La voie directionnelle reste celle du mode manuel : en SEMI_AUTO la cible d'étape est fournie
+// par SelTarget (1 en AX14, 3 en AX2) et ne dépend d'aucune demande.
 CASE SelTarget OF
-    1: M3_PositionSensorTarget := M3_AtTremieStable;
-    2: M3_PositionSensorTarget := M3_AtP2Stable;
-    3: M3_PositionSensorTarget := M3_AtP1Stable;
-    4: M3_PositionSensorTarget := M3_AtMaintenanceStable;
+    1: M3_TargetCodeSel := 1;
+    2: M3_TargetCodeSel := 2;
+    3: M3_TargetCodeSel := 3;
+    4: M3_TargetCodeSel := 4;
 ELSE
     IF M3_ReqTremie_Active THEN
         // En Marche Avant (+1 vers Trémie) : seule Trémie est le point d'arrêt automatique
-        M3_PositionSensorTarget := M3_AtTremieStable;
+        M3_TargetCodeSel := 1;
     ELSIF M3_ReqMaintenance_Active THEN
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -> arrêt sur Maintenance
         // - Si Maintenance interdite -> arrêt sur P1
         IF PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable THEN
-            M3_PositionSensorTarget := M3_AtMaintenanceStable;
+            M3_TargetCodeSel := 4;
         ELSE
-            M3_PositionSensorTarget := M3_AtP1Stable;
+            M3_TargetCodeSel := 3;
         END_IF;
-    ELSE
-        M3_PositionSensorTarget := FALSE;
     END_IF;
 END_CASE;
 
+CASE M3_TargetCodeSel OF
+    1: M3_PositionSensorTarget := M3_AtTremieStable;
+    2: M3_PositionSensorTarget := M3_AtP2Stable;
+    3: M3_PositionSensorTarget := M3_AtP1Stable;
+    4: M3_PositionSensorTarget := M3_AtMaintenanceStable;
+ELSE
+    M3_PositionSensorTarget := FALSE;
+END_CASE;
+
+{endregion}
+
+{region "§1bis Garde de mode des bypass M3"}
+// 🔒 Les bypass de l'axe M3 sont actionnables UNIQUEMENT en MAINT_N2 (doctrine
+// ST_BypassTranslation.st) : le bit RETAIN restauré au boot est sinon consommé sans aucune
+// garde de mode. Un seul bit de fin de course neutralise TROIS barrières de l'axe — le verrou
+// d'arrivée et la cause 6 de FB_Translation, et la cause 6 de FB_Safety_Translation — soit la
+// neutralisation des sécurités de fin de course depuis un mode de marche nominal.
+// La garde est posée AU POINT DE CONSOMMATION : le stockage RETAIN et sa restauration vers
+// l'IHM ne sont pas touchés, le bit reste donc lisible et actionnable en MAINT_N2.
+// Origine du mode = arbitrage FB_Modes (Auth.Mode), jamais le sélecteur IHM brut — même
+// exigence que la garde des bypass treuils.
+M3_MaintN2 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
 {endregion}
 
 {region "§1bis Securite M3"}
@@ -465,7 +497,7 @@ instSafetyTranslationM3(
     BypassBrakeThermal      := GVL_IHM.M3Translation.Bypass.BrakeThermal,
     BypassMecaB             := GVL_IHM.M3Translation.Bypass.MecaB,
     BypassMecaA             := GVL_IHM.M3Translation.Bypass.MecaA,
-    BypassLimitSwitch       := GVL_IHM.M3Translation.Bypass.LimitSwitch,
+    BypassLimitSwitch       := M3_MaintN2 AND (GVL_IHM.M3Translation.Bypass.LimitSwitch OR GVL_IHM.M3Translation.Bypass.Global),
     BypassSensorIncoherent  := GVL_IHM.M3Translation.Bypass.SensorIncoherent,
     BypassSafety            := GVL_IHM.M3Translation.Bypass.Safety,
     BypassProcess           := GVL_IHM.M3Translation.Bypass.Process
@@ -568,7 +600,7 @@ instTranslationM3(
     Cfg                     := TranslationCfg,
     BrakeFeedback           := SEL(GVL_IHM.M3Translation.Bypass.ContactorFeedback OR GVL_IHM.M3Translation.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BypassContactorCheck    := GVL_IHM.M3Translation.Bypass.Global OR GVL_IHM.M3Translation.Bypass.ContactorFeedback,
-    BypassLimitSwitch       := GVL_IHM.M3Translation.Bypass.Global OR GVL_IHM.M3Translation.Bypass.LimitSwitch
+    BypassLimitSwitch       := M3_MaintN2 AND (GVL_IHM.M3Translation.Bypass.Global OR GVL_IHM.M3Translation.Bypass.LimitSwitch)
 );
 
 // 📐 Estimateur de position continue M3 (odométrie + recalage 5 capteurs)

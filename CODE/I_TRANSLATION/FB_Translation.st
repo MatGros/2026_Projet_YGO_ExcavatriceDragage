@@ -53,6 +53,7 @@ VAR_OUTPUT
     // 🧩 Statut transverse (forme cible ST_Fault)
     Fault                       : ST_Fault;
     TargetReached               : BOOL;       // <-- [STAT] Capteur position cible
+    ArrivalStopConfirmed        : BOOL;   // <-- [STAT] Arrêt confirmé sur la cible : verrou d'arrivée armé ET axe physiquement arrêté (aucune rotation, frein non commandé ouvert)
     RequestedDriveControlWord   : WORD; // <-- [ACT] Demande métier AC600, arbitrée par FB_TranslationOutputInterlock
     RequestedDriveFreqHz        : REAL; // <-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock
     BrakeReleaseRequest         : BOOL; // <-- [ACT] Demande métier desserrage, issue de FB_Brake
@@ -75,6 +76,7 @@ VAR
     ArrivalEdge                 : R_TRIG;   // . [LOC] Front arrivée sur capteur
     ArrivalWasTremie             : BOOL;  // . [LOC] Sens d'arrivée mémorisé
     ArrivalWasMaintenance        : BOOL;  // . [LOC] Sens d'arrivée mémorisé
+    LastMoveDirection           : INT;         // . [LOC] Sens du dernier mouvement commandé (+1 = Trémie, -1 = Maintenance) — mémoire de l'axe, insensible à la perte de la demande
     ArrivalLock                 : BOOL;        // . [LOC] Arrêt exact sur capteur cible
     MovementRequested           : BOOL;         // . [LOC] Pilote FB_Brake
     FirstScanDone               : BOOL;   // . [LOC] Initialisation premier scan
@@ -150,6 +152,8 @@ IF NOT Enable THEN
     ArrivalLock := FALSE;
     ArrivalWasTremie := FALSE;
     ArrivalWasMaintenance := FALSE;
+    LastMoveDirection := 0;
+    ArrivalStopConfirmed := FALSE;
     TargetReached := FALSE;
     DirectionChangeDelay(IN := FALSE);
     CaptorDebounceTon(IN := FALSE);
@@ -176,10 +180,32 @@ CaptorDebounceTon(IN := PositionSensorTarget, PT := Cfg.CaptorDebounce);
 TargetReached := CaptorDebounceTon.Q;
 ArrivalEdge(CLK := TargetReached);
 
+// 🧠 Sens du dernier mouvement réellement commandé : mémoire PROPRE À L'AXE, mise à jour
+// avant la lecture du front d'arrivée (CommandedTremie/CommandedMaintenance portent encore
+// le sens du scan précédent) et jamais remise à zéro par la perte de la demande — contrairement
+// à ces deux locaux, qui retombent dès que la demande disparaît (§4 ci-dessous). C'est cette
+// mémoire qui qualifie le sens d'arrivée quand la demande est retirée avant la fin du debounce.
+IF CommandedTremie THEN
+    LastMoveDirection := 1;
+ELSIF CommandedMaintenance THEN
+    LastMoveDirection := -1;
+END_IF;
+
 IF ArrivalEdge.Q THEN
     ArrivalLock := TRUE;
-    ArrivalWasTremie := CommandedTremie;
-    ArrivalWasMaintenance := CommandedMaintenance;
+    IF CommandedTremie OR CommandedMaintenance THEN
+        ArrivalWasTremie := CommandedTremie;
+        ArrivalWasMaintenance := CommandedMaintenance;
+    ELSE
+        // Demande déjà retombée : le sens d'arrivée est pris sur la mémoire du dernier
+        // mouvement. Sans elle, les deux drapeaux seraient FALSE et la condition de
+        // relâchement ci-dessous accepterait une demande du MÊME sens — le verrou
+        // d'arrivée perdrait toute autorité et le chariot serait relancé au-delà du point
+        // d'arrêt (relance + dépassement). Cas nominal du séquenceur : il retire sa demande
+        // sur le jeton d'arrivée, soit 100 ms avant l'armement de ce verrou.
+        ArrivalWasTremie := (LastMoveDirection = 1);
+        ArrivalWasMaintenance := (LastMoveDirection = -1);
+    END_IF;
 END_IF;
 
 // Verrou d'arrivee extreme M3 : le FdC securite est une preuve d'arret de sens,
@@ -318,6 +344,18 @@ IF Fault.Error THEN
     RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
+
+// 🎯 FAIT PUBLIC D'ARRÊT CONFIRMÉ : vrai quand l'axe a armé son verrou d'arrivée ET qu'il est
+// physiquement arrêté — aucune rotation réelle au variateur (seuil 0,5 Hz, même mesure que
+// Translation_Busy côté programme) et frein non commandé ouvert. Ce n'est donc pas une simple
+// reprise du capteur : c'est la conjonction du verrou de l'axe et de l'arrêt physique, fait
+// consommable par la porte de transition de cycle pour n'avancer qu'après un arrêt acquis.
+// ⚠️ Au banc la fréquence réelle est nulle en permanence : ce fait s'y prouve par injection
+// d'entrée (DriveActualFreqHz), jamais par la seule observation du banc.
+ArrivalStopConfirmed := ArrivalLock
+                        AND NOT Fault.Error
+                        AND (ABS(DriveActualFreqHz) <= 0.5)
+                        AND NOT BrakeReleaseRequest;
 {endregion}
 
 END_FUNCTION_BLOCK
