@@ -6,7 +6,18 @@ VAR_INPUT
     ReqTremie : BOOL;
     ReqMaintenance : BOOL;
     SpeedTgt_Pct : REAL;
-    FullTravelTimeS : REAL := 8.0;
+    (* T361 — ECHELLE ODOMETRIQUE DU BANC, ALIGNEE SUR L'ESTIMATEUR REEL.
+       Le modele integre VelocityTarget = (CST_PositionAtMaintenance / FullTravelTimeS) x f / 40.
+       Le ratio simule vaut donc 30 / (40 x FullTravelTimeS) m/(Hz.s) et DOIT etre egal au gain
+       consomme par FB_Translation_PositionEstimator (GainMetersPerHzSec, cable sur
+       GVL_PERSISTENT._TranslationGainMetersPerHzSec = 0,02 m/(Hz.s), soit 1 m/s a 50 Hz).
+       => 30 / (40 x 37,5) = 0,02 m/(Hz.s). La valeur historique 8,0 s donnait 0,09375 m/(Hz.s),
+       soit 4,7 fois l'echelle reelle : l'estimateur prenait un retard constant et chaque
+       franchissement de capteur produisait un saut de recalage de plusieurs metres
+       (AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md, trace Suivi_74 : sauts de 4,53 a 9,12 m).
+       ⚠️ Toute evolution de _TranslationGainMetersPerHzSec exige de recalculer cette constante :
+       le gate G518 echoue si les deux echelles divergent. *)
+    FullTravelTimeS : REAL := 37.5;
     BrakeReleaseCmd : BOOL := TRUE;
     AccelRate_HzPerS : REAL := 20.0;
     DecelRate_HzPerS : REAL := 20.0;

@@ -1,0 +1,221 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T361 : Alignement du ratio odométrique M3 (banc ↔ estimateur)
+# VOLET A = correctif code ; VOLET B = analyse chiffrée, AUCUN code avant arbitrage humain
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier> --release
+
+contract:
+  task_id: T361_SIMU_RATIO_M3
+  criticality: C3
+  strategy: patch            # alignement d'une constante d'échelle + garde-fou, pas de refonte
+
+  objective: >
+    VOLET A — Rendre la simulation M3 cohérente en interne : l'échelle odométrique du banc
+    SimBench doit être ÉGALE au gain réellement consommé par l'estimateur de position
+    (GVL_PERSISTENT._TranslationGainMetersPerHzSec = 0,02 m/(Hz·s)). Le banc intégrant
+    dx = f × (30 / (40 × FullTravelTimeS)) × dt, l'égalité impose FullTravelTimeS = 37,5 s
+    (au lieu de 8,0 s, ratio 0,09375, soit 4,7× l'échelle réelle). Un gate G518 interdit toute
+    divergence future entre les deux échelles.
+    VOLET B — Chiffrer et comparer les options de recalage M3 (5 capteurs actuels / Trémie seul
+    proposé par l'utilisateur / 3e option à seuil de tolérance) et les présenter à l'utilisateur.
+    AUCUN code du VOLET B n'est écrit avant validation explicite de l'option retenue.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        FullTravelTimeS (défaut du FB ET constante CST_M3FullTravelTimeS réellement passée à
+        instSimTranslation) vaut 37,5 s, de sorte que le ratio du banc
+        30 m / (40 Hz × 37,5 s) = 0,02 m/(Hz·s) égale exactement GVL_PERSISTENT._TranslationGainMetersPerHzSec.
+      verified_by: "CODE/L_SIMULATION/FB_Sim_Translation.st:20 (VAR_INPUT) et FB_SimBench.st:182 (VAR CONSTANT, consommée ligne 571) — gate G518 PASS"
+    - id: AC2
+      statement: >
+        Le ratio odométrique publié par le banc (VelocityTrue_Mps / ActualFrequency_Hz) vaut
+        0,02 m/(Hz·s) au palier 40 Hz, et la distance parcourue en 6 s égale l'intégrale
+        ∫ f × 0,02 × dt à 5 % près (trainee de 1er ordre du modèle de vitesse).
+      verified_by: "TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_translation.st — cas TC-T361-ALIGN-001 et TC-T361-ALIGN-002 (PASS)"
+    - id: AC3
+      statement: >
+        Les cas TC-T361-ALIGN-001/002 sont NON TAUTOLOGIQUES : remettre FullTravelTimeS à 8,0 s
+        fait échouer les deux cas (12/14), la valeur 37,5 s les fait passer (14/14).
+      verified_by: "deux exécutions successives de run_tests.py --fb FB_Sim_Translation (mutation puis restauration)"
+    - id: AC4
+      statement: >
+        Aucune régression du banc : la CI FB_SimBench reste entièrement verte après alignement,
+        avec le seul ajustement de scénario TC-T300-INT-030 (1100 → 1800 scans) documenté comme
+        conséquence mécanique de la nouvelle échelle (trajet P1 → capteur Maintenance ≈ 14 s).
+      verified_by: "run_tests.py --fb FB_SimBench (1 PASS, 0 FAIL)"
+    - id: AC5
+      statement: >
+        Un garde-fou automatique interdit la récidive : G518 échoue si le ratio du banc diverge du
+        gain persistant (> 1 %), si la constante du banc n'atteint plus le modèle (constante morte),
+        si le gain n'est plus injecté dans l'estimateur, ou si les cas de test d'alignement
+        disparaissent ; son --selftest prouve 6 mutations refusées et 0 faux positif.
+      verified_by: "G518_check_m3_odometry_scale.py --selftest (PASS) + ligne PLANS palier C de run_all_gates.py"
+    - id: AC6
+      statement: >
+        VOLET B livré sous forme de tableau comparatif chiffré (dérive maximale, exposition,
+        complexité, risque) pour les 3 options, avec recommandation argumentée — et ZÉRO ligne de
+        code de recalage écrite avant arbitrage humain.
+      verified_by: "DOC/WFLOW/AUDITS/DESIGN/ANALYSE_T361_RECALAGE_M3_OPTIONS_2026-09-21.md + git status --short -- CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st (VIDE — l'estimateur n'est pas touché ; ⚠️ FB_Translation.st, autre fichier du même dossier, est modifié NON COMMITÉ par un autre lot, sans rapport avec ce volet)"
+    - id: AC7
+      statement: >
+        La documentation d'interface du FB reste exacte après le changement de défaut.
+      verified_by: "DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md §2 (défaut 37,5 s et justification)"
+    - id: AC8
+      statement: >
+        VOLET B (décision utilisateur du 2026-09-21) : le recalage reste appliqué SANS CONDITION sur les
+        5 repères absolus — aucun seuil, aucune zone morte, aucun blocage n'entre dans la chaîne de
+        recalage. Un écart de 10,0 m est corrigé comme un écart de 2 cm.
+      verified_by: "TC-T361-ANOM-002 (position recalée à 20,0 m malgré le témoin) + TC-T361-ANOM-004 (blip de 2 cm recalé) + gate G520 (le seuil est interdit DANS le bloc de recalage)"
+    - id: AC9
+      statement: >
+        Un témoin d'anomalie est publié lorsque la correction effectivement appliquée dépasse
+        CST_RecalibrationAnomalyM = 0,50 m (5 % de l'écart maximal entre deux repères), avec l'amplitude
+        mesurée de la correction.
+      verified_by: "TC-T361-ANOM-002 (RecalibrationAnomaly = TRUE, RecalibrationCorrectionM = 10,0 m) + TC-T361-ANOM-001 (correction nominale ~2 mm → témoin NON levé)"
+    - id: AC10
+      statement: >
+        Le témoin est un PULSE (remis à zéro à chaque scan, comme Recalibrated) et l'amplitude de la
+        dernière correction est MAINTENUE, pour rester lisible par une trace à 10 ms ou une IHM.
+      verified_by: "TC-T361-ANOM-003 (témoin retombe au scan suivant, amplitude encore à 10,0 m)"
+    - id: AC11
+      statement: >
+        La décision Q2 du lot T333 (« recaler SANS garde tant que T301 n'a pas calibré le gain ») n'est
+        ni rouverte ni affaiblie : son cas TC-P11-EST-007 est inchangé et reste vert.
+      verified_by: "CI FB_Translation_PositionEstimator 10/10 PASS, TC-P11-EST-007 inchangé (fichier de test : aucune ligne de ce cas modifiée)"
+    - id: AC12
+      statement: >
+        Les cas du témoin sont non tautologiques : porter le seuil à 20,0 m fait échouer ANOM-002 et
+        ANOM-003 ; le retour à 0,50 m les fait passer.
+      verified_by: "deux exécutions successives de run_tests.py --fb FB_Translation_PositionEstimator (8/10 puis 10/10)"
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_Sim_Translation.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st   # VOLET B, ouvert sur décision utilisateur du 2026-09-21
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_translation.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_simbench.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation_positionestimator.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G518_check_m3_odometry_scale.py
+      - TOOLS/AGENT_WORKFLOW/scripts/G520_check_recalage_anomaly_not_blocking.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md
+      - DOC/WFLOW/AUDITS/DESIGN/ANALYSE_T361_RECALAGE_M3_OPTIONS_2026-09-21.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T361_SIMU_RATIO_M3.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - CODE_XML/
+    forbidden:
+      - CODE/GVL_PERSISTENT.st                                   # gain = référence, non modifié par ce lot
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_05_Translation.st                        # SALE : lot T345-L1 en vol
+      - CODE/I_TRANSLATION/FB_Translation.st                     # lot T345-L1 en vol
+      - CODE/L_SIMULATION/FB_Sim_PositionSensor.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st   # lot T345-L1 en vol
+      - DOC/AF/AF_Partie-11_Fonction_Translation/FB_Translation_PositionEstimator_v1.0.md  # SALE : autre lot (interface non régularisée, signalée)
+      - DOC/WFLOW/CONTRACTS/BRIEF_T361_SIMU_RATIO_M3.md         # brief conservé tel quel
+      - DOC/WFLOW/AUDITS/AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md   # preuve figée, non réécrite
+      - tout scratch à la racine du dépôt
+
+  evidence_required:
+    - diff_code_volet_a          # FB_Sim_Translation.st + FB_SimBench.st
+    - run_all_gates_palier_c     # palier C complet
+    - check_linkage              # bloc Auto-vérification liaison (G200 --report)
+    - bundle                     # CODE_XML/CODE_Bundle.xml + CODE_DiffBundle.xml
+    - ci_fb_sim_translation      # 14/14 PASS
+    - ci_fb_simbench             # PASS
+    - selftest_g518              # 6 mutations détectées
+    - tableau_comparatif_volet_b # chiffrage des 3 options
+
+  alert_duty: >
+    Toute incohérence constatée est remontée immédiatement, sans correction spontanée hors scope :
+    écart entre la consigne du brief (30 s) et l'arithmétique réelle (37,5 s) ; défaut déclaré
+    périmé de FB_Translation_PositionEstimator.GainMetersPerHzSec (0,008333 vs 0,02 persistant) ;
+    dérive documentaire de la fiche AF-13 (§3 décrit des variables qui n'existent plus) ;
+    gain persistant modifié NON COMMITÉ dans l'arbre de travail par un autre lot.
+
+status: COMPLETED
+
+execution:
+  executed_by: "DSH25 (DeepSeek/DSH — ex-DSH23, re-tag pour collision de tag avec le lot T345-L1 ; exécution directe du brief par son porteur, préambule sous-agent appliqué à soi-même)"
+  completed_at: "2026-09-21T06:05:00+02:00"
+  status: COMPLETED
+  summary: >
+    VOLET A livré et prouvé. FullTravelTimeS passe de 8,0 s à 37,5 s dans les DEUX sites qui
+    comptent (défaut du FB et constante CST_M3FullTravelTimeS de FB_SimBench, seule valeur
+    réellement transmise au modèle) : 30 / (40 × 37,5) = 0,02 m/(Hz·s), identique au gain
+    persistant consommé par l'estimateur. Deux cas CI d'alignement ajoutés, dont l'un compare la
+    distance parcourue par le banc à l'intégrale exacte de l'estimateur. Mutation de contrôle :
+    retour à 8,0 s => 12/14 (les 2 nouveaux cas échouent), valeur 37,5 s => 14/14.
+    Garde-fou G518 (fix + guard) câblé au palier C.
+    VOLET B : analyse chiffrée livrée, ZÉRO code écrit — décision utilisateur requise.
+    VÉRIFICATIONS MÉCANIQUES : bundle 261/261 objets régénéré (frais, G390 PASS), diff bundle
+    FB_SimBench + FB_Sim_Translation, G200 --report PASS (0 erreur, 2046 instances),
+    palier C = 51/56 gates PASS avec G518 PASS. Les 5 échecs sont HORS PÉRIMÈTRE du lot et
+    identifiés : G300 (`unexpected AGENT_WORKFLOW directory: .tmp` — scratchs `g390_freshness_*`
+    antérieurs à cette session), G340 (122 liens documentaires morts, aucun ne concerne un fichier
+    du lot), G408 (2 messages IHM trop longs : FB_CycleSemiAuto.st:1639 et
+    FB_Hmi_BannerFormatter.st:332 — fichier modifié NON COMMITÉ par un autre lot),
+    G430 (commentaires REX, dont FB_SimBench.st:701 = commentaire T317 préexistant, ligne HEAD 697,
+    décalé de 4 lignes par l'ajout de ce lot), G483 (matrice maintenance N1/N2 / bypass PRG_04).
+    Aucun de ces échecs ne cite un fichier écrit par ce lot (relevé exhaustif du journal de gates).
+    VOLET B IMPLÉMENTÉ sur décision utilisateur du 2026-09-21 (2e tour d'arbitrage) : bande morte
+    RETIRÉE (la décision Q2 du lot T333 et son cas TC-P11-EST-007 restent intacts), et témoin
+    d'anomalie purement observationnel — CST_RecalibrationAnomalyM = 0,50 m, sorties
+    RecalibrationAnomaly (pulse) et RecalibrationCorrectionM (amplitude maintenue). La chaîne de
+    recalage (5 repères, correction inconditionnelle) est INCHANGÉE : la mesure est prise avant le
+    bloc (PositionBeforeM) et le témoin est calculé après, sans jamais conditionner l'affectation.
+    CI FB_Translation_PositionEstimator 10/10 PASS (dont les 6 cas T333 et 4 cas T361-ANOM) ;
+    mutation de contrôle : seuil porté à 20,0 m => 8/10 (ANOM-002 et -003 échouent), retour à 0,50 m
+    => 10/10. Garde-fou G520 (fix + guard) câblé au palier C, --selftest 8 mutations refusées.
+  evidence_submitted:
+    - path: CODE/L_SIMULATION/FB_Sim_Translation.st
+      comment: "défaut FullTravelTimeS = 37,5 s + démonstration de l'échelle en commentaire"
+    - path: CODE/L_SIMULATION/FB_SimBench.st
+      comment: "CST_M3FullTravelTimeS = 37,5 s (constante effectivement consommée ligne 570)"
+    - path: TOOLS/AGENT_WORKFLOW/scripts/G518_check_m3_odometry_scale.py
+      comment: "garde-fou d'échelle partagée, --selftest PASS (6 mutations refusées)"
+    - path: TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_translation.st
+      comment: "TC-T361-ALIGN-001 et TC-T361-ALIGN-002"
+    - path: DOC/WFLOW/AUDITS/DESIGN/ANALYSE_T361_RECALAGE_M3_OPTIONS_2026-09-21.md
+      comment: "VOLET B : tableau comparatif chiffré des 3 options de recalage + décisions 6bis/6ter/6quater"
+    - path: CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st
+      comment: "VOLET B : témoin d'anomalie (2 sorties + 1 constante), chaîne de recalage inchangée"
+    - path: TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation_positionestimator.st
+      comment: "TC-T361-ANOM-001..004 (témoin, pulse, maintien, blip 2 cm) — 10/10 PASS"
+    - path: TOOLS/AGENT_WORKFLOW/scripts/G520_check_recalage_anomaly_not_blocking.py
+      comment: "garde-fou : le témoin ne conditionne jamais la correction, --selftest 8 mutations refusées"
+
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: "—"
+  notes: >
+    ARBITRAGE UTILISATEUR DU 2026-09-21 (rendu et enregistré) : (D1) option de recalage = OPTION A
+    — statu quo 5 capteurs + bande morte + garde de plausibilité ; la proposition initiale « Trémie
+    seule » est ABANDONNÉE (dérive ×3 à ×15 selon le gain réel). (D3) décider l'option MAINTENANT et
+    calibrer le gain ENSUITE — le comportement de recalage ne dépend pas de la valeur exacte du gain.
+    (D4) publication de RecalibratedSensorId : non tranchée.
+    ⛔ LE CODE DU VOLET B N'EST PAS ÉCRIT ET NE LE SERA PAS AVANT L'ARBITRAGE DE 2 POINTS BLOQUANTS
+    remontés le même jour (voir ANALYSE_T361_RECALAGE_M3_OPTIONS_2026-09-21.md §6ter) :
+    (1) la « garde de plausibilité » telle que formulée au §5 de l'analyse est FAUSSE (elle rejetterait
+    TOUS les recalages utiles : le déplacement d'un scan vaut 0,008 m contre une dérive de 0,10 m à
+    1 %) — formulation corrigée proposée : couloir `T` (bande morte, 0,05 m) < |Δ| ≤ `M` (seuil
+    suspect, 0,50 m), la correction étant APPLIQUÉE dans les deux zones hautes et seulement SIGNALÉE
+    au-delà de `M` ;
+    (2) la bande morte entre en CONFLIT avec la décision Q2 du lot T333, verrouillée par le cas CI
+    TC-P11-EST-007 (test_fb_translation_positionestimator.st:318-377) qui EXIGE le recalage d'un blip
+    de 2 cm : avec T = 0,05 m ce cas passe au rouge et il faudrait réécrire une décision prise moins
+    de 24 h avant par un autre lot.
+    🔥 ALERTE MAJEURE associée : deux valeurs incompatibles du gain odométrique coexistent — 0,02
+    (production, GVL_PERSISTENT.st:109, provisoire) contre 0,0551 m/(Hz.s) (déduit de trace, audit
+    T300 :190, cité par le test T333 « ÷6,6 trop lent »). Si 0,0551 est la vraie valeur, l'estimateur
+    ne compte que 36 % de la distance réelle et les sauts de plusieurs mètres PERSISTENT sur la
+    machine réelle : la calibration T301 devient urgente.
+    RECETTE HUMAINE ENCORE REQUISE pour le vol. A : import CODESYS + trace de contrôle à l'échelle 0,02
+    (sauts de recalage attendus en centimètres, plus en mètres).
+    AUCUN COMMIT n'est fait par l'agent — accord humain explicite distinct requis.

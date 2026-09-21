@@ -175,7 +175,11 @@ VAR_IN_OUT
 END_VAR
 
 VAR CONSTANT
-    CST_M3FullTravelTimeS       : REAL := 8.0; // Temps de Trémie à Maintenance à 100 %, modèle banc uniquement
+    // T361 — 37,5 s = 30 m / (40 Hz x 0,02 m/(Hz.s)) : l'echelle du banc est ALIGNEE sur le gain
+    // odometrique reel (GVL_PERSISTENT._TranslationGainMetersPerHzSec). C'est CETTE constante qui
+    // est effectivement passee a instSimTranslation (ligne 567) : changer le seul defaut du FB
+    // n'aurait aucun effet en simulation. Garde-fou : gate G518.
+    CST_M3FullTravelTimeS       : REAL := 37.5;  // Temps de Trémie à Maintenance à 100 %, modèle banc uniquement
     CST_SimBenchCycleTimeS      : REAL := 0.010; // Période tâche PLC (s) — MainTask 10 ms
     // Rattrapage mécanique M1/M2 — valeurs ESTIMÉES (voir REGISTRE_VALEURS_TREUIL_STATUTS_v1.0.md)
     CST_SimWinchCouplingTauS    : REAL := 1.0;   // [HYPOTHESE] Constante de temps du rattrapage (s)

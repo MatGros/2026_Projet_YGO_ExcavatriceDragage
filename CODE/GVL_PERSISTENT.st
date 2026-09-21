@@ -106,7 +106,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     _TranslationPosP2_M             : REAL := 15.0;  // Position P2
     _TranslationPosP1_M             : REAL := 20.0;  // Position P1
     _TranslationPosMaintenance_M    : REAL := 30.0;  // Position Maintenance (Extrême droite)
-    _TranslationGainMetersPerHzSec  : REAL := 0.008333; // Ratio m/s par Hz (ex: 50 Hz = 0.416 m/s)
+    _TranslationGainMetersPerHzSec  : REAL := 0.02; // Ratio m/s par Hz (50 Hz = 1.0 m/s) — valeur PROVISOIRE estimee 2026-09-21 (observation terrain), en attente calibration rigoureuse T301 (chrono + decametre)
     // Reprise odométrie après reboot — recopie continue (PRG_05_Translation).
     _TranslationPosEstimated_M          : REAL := 0.0;   // Dernière position estimée connue (m)
     _TranslationPosEstimatedInitialized : BOOL := FALSE;  // TRUE dès la première calibration sur capteur

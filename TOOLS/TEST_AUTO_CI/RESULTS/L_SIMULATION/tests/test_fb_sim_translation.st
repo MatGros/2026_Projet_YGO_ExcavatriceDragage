@@ -364,6 +364,12 @@ END_VAR
     fb.BrakeOpenDelayS := 0.0;
     fb.SensorElectricalDelayS := 0.0;
     fb.EndStopRecoilMax_M := 0.0;
+    (* T361 — pas de temps PINCE ici : l'oracle de ce cas est le recul a la butee, pas
+       l'echelle odometrique. Le scenario vient de la trace du 2026-09-04 (quelques
+       secondes de trajet) et le defaut du FB est passe de 8,0 s a 37,5 s pour s'aligner
+       sur le gain reel : sans ce pas explicite, 900 scans (9 s) ne suffiraient plus a
+       atteindre la butee Tremie depuis 20 m et le cas testerait autre chose que son objet. *)
+    fb.FullTravelTimeS := 8.0;
     FOR i := 1 TO 900 DO
         fb();
     END_FOR;
@@ -413,4 +419,72 @@ END_VAR
        CARACTERISE l'etat reel, il ne le valide pas. Mesure : 106 scans actifs sur 500
        (21 %), contre 0 attendu par la trace. Assertion volontairement en enveloppe. *)
     ASSERT_LE(scansActive, 150, 'Perte BORNEE mais NON DEFINITIVE : ecart trace documente');
+END_TEST
+
+(* =========================================================================
+   T361 VOLET A — ALIGNEMENT DU RATIO ODOMETRIQUE BANC / ESTIMATEUR
+   =========================================================================
+   Le banc et l'estimateur integrent la MEME frequence retournee, mais avec deux
+   echelles construites separement :
+     - estimateur (CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st:153/155) :
+       dx = f x GainMetersPerHzSec x dt, gain cable en PRG_05_Translation.st:591 sur
+       GVL_PERSISTENT._TranslationGainMetersPerHzSec = 0,02 m/(Hz.s) (1 m/s a 50 Hz) ;
+     - banc (ce FB) : dx = f x (CST_PositionAtMaintenance / (40 x FullTravelTimeS)) x dt.
+   Tant que les deux echelles divergent, la position estimee prend un retard constant et
+   CHAQUE franchissement de capteur produit un saut de recalage — c'est exactement ce que
+   montre la trace Suivi_74 (sauts de 4,53 / 9,12 / 4,59 m, AUDIT_T360). Avec l'echelle
+   historique 8,0 s le rapport valait 0,09375 / 0,02 = 4,7.
+   Les deux cas ci-dessous comparent le banc a l'expression EXACTE de l'estimateur :
+   ils echouent si l'une des deux echelles bouge sans l'autre. *)
+
+TEST 'TC-T361-ALIGN-001 Ratio odometrique du banc = gain reel 0,02 m/(Hz.s)'
+VAR
+    fb : FB_Sim_Translation;
+    i : INT;
+END_VAR
+    fb.Enable := TRUE;
+    fb.ReqMaintenance := TRUE;
+    fb.SpeedTgt_Pct := 100.0;
+    fb.BrakeReleaseCmd := TRUE;
+    fb.BrakeOpenDelayS := 0.0;
+    (* Charge neutralisee : l'oracle porte sur l'ECHELLE seule, pas sur la reaction du pendule. *)
+    fb.LoadReactionGain_Mps2 := 0.0;
+    FOR i := 1 TO 400 DO
+        fb();
+    END_FOR;
+    ASSERT_NEAR(fb.ActualFrequency_Hz, 40.0, 0.5, 'Palier 40 Hz etabli avant lecture du ratio');
+    ASSERT_NEAR(fb.VelocityTrue_Mps / fb.ActualFrequency_Hz, 0.02, 0.0002,
+        'Ratio banc (m/s par Hz) = _TranslationGainMetersPerHzSec (ancien : 0,09375)');
+END_TEST
+
+TEST 'TC-T361-ALIGN-002 Distance banc = integrale f x 0,02 m/(Hz.s) sur 6 s'
+VAR
+    fb : FB_Sim_Translation;
+    i : INT;
+    posStart_M : REAL;
+    integralHzS : REAL;
+END_VAR
+    fb.Enable := TRUE;
+    fb.ReqTremie := TRUE;
+    fb.SpeedTgt_Pct := 100.0;
+    fb.BrakeReleaseCmd := TRUE;
+    fb.BrakeOpenDelayS := 0.0;
+    fb.SensorElectricalDelayS := 0.0;
+    fb.LoadReactionGain_Mps2 := 0.0;
+    (* 2 s pour etablir le palier, puis 6 s de mesure (600 scans a 10 ms) largement
+       a l'ecart des butees : 20 m -> ~15,2 m a 0,8 m/s. *)
+    FOR i := 1 TO 200 DO
+        fb();
+    END_FOR;
+    posStart_M := fb.PositionTrue_M;
+    integralHzS := 0.0;
+    FOR i := 1 TO 600 DO
+        fb();
+        integralHzS := integralHzS + fb.ActualFrequency_Hz * 0.010;
+    END_FOR;
+    (* Tolerance 0,25 m (soit ~5 % de 4,8 m) : elle couvre la seule trainee de 1er ordre du
+       modele de vitesse, pas une erreur d'echelle — un ecart d'echelle de 4,7 ferait
+       diverger les deux membres de plusieurs metres. *)
+    ASSERT_NEAR(posStart_M - fb.PositionTrue_M, integralHzS * 0.02, 0.25,
+        'Distance parcourue par le banc = position reconstituee par l estimateur odometrique');
 END_TEST
