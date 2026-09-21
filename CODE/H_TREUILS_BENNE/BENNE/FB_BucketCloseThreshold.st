@@ -65,7 +65,7 @@ VAR CONSTANT
     //    rapide ; il ne fait jamais confiance au seul bornage amont, qui pourrait être
     //    contourné par un forçage ou un download partiel). Le garde-fou G515 vérifie que
     //    les DEUX bornes restent égales : toute divergence fait échouer le gate.
-    CST_MaxThresholdPct : INT  := 20;     // 🎛️ Borne haute du réglage (%)
+    CST_MaxThresholdPct : INT  := 50;     // 🎛️ Borne haute du réglage (%)
     CST_MinSpan_M       : REAL := 0.001;  // 📐 Débattement minimal exploitable (m) — MÊME prédicat que FB_Bucket §4a
     CST_PctToRatio      : REAL := 0.01;   // 📐 Conversion pourcentage -> rapport (1 % = 0,01)
 END_VAR
