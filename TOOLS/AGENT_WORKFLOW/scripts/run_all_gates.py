@@ -190,6 +190,33 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     # ecrite par le FB et acquittee par PRG_03 par compare-et-efface, reprise consciente
     # preservee, cible non persistee).
     ("C", "517", "G517 - Enveloppe du forcage de step sans garde : placement, plage, table de conversion, acquittement PRG_03, reprise consciente preservee (T358)", [sys.executable, f"{S}/G517_check_force_step_envelope.py", "."]),
+    # T361 - Le banc SimBench et l'estimateur M3 integrent la MEME frequence avec deux echelles
+    # construites separement (30 / (40 x FullTravelTimeS) contre GVL_PERSISTENT._TranslationGain...).
+    # Aucun gate ne les reliait : le banc est reste a 8,0 s (ratio 0,09375) face a un gain reel
+    # passe a 0,02, soit un rapport 4,7 et des sauts de recalage de 4,5 a 9,1 m a chaque capteur
+    # (audit T360, trace Suivi_74). G518 verrouille l'EGALITE des deux echelles, la constante du
+    # banc REELLEMENT passee au modele (anti-constante-morte), le cablage du gain persistant vers
+    # l'estimateur et l'existence des cas de test d'alignement (anti-test-vacuant).
+    ("C", "518", "G518 - Echelle odometrique M3 : banc et estimateur partagent le meme ratio (T361)", [sys.executable, f"{S}/G518_check_m3_odometry_scale.py", "."]),
+    # T345 lot L1 - Le sequenceur retire sa demande sur le jeton d'arrivee, soit ~9 scans AVANT la
+    # fin du debounce de 100 ms : le sens d'arrivee capture sur Commanded* (deja remis a FALSE)
+    # laissait le verrou d'arrivee relachable par une demande du MEME sens. Rebond capteur ->
+    # relance -> Translation_Busy repasse a TRUE -> la confirmation d'arret de 500 ms de la porte
+    # de cycle ne s'arme jamais. Le harnais CI etant un stub miroir (run_tests.py n'execute pas
+    # source_prg), G519 est la seule preuve mecanique portant sur le VRAI PRG_05 : il verrouille la
+    # memoire de sens de l'axe, le fait public d'arret confirme non vacuaire, la memoire de cible de
+    # PRG_05 et la garde MAINT_N2 des deux points de consommation du bypass de fin de course.
+    ("C", "519", "G519 - L'axe possede son arret : verrou d'arrivee non annulable par la demande (T345-L1)", [sys.executable, f"{S}/G519_check_t345_axis_owns_stop.py", ".", "--report"]),
+    # T361 volet B - FAUTE COMMISE PUIS CORRIGEE AVANT CODE, dans l'analyse T361 elle-meme : le seuil
+    # d'anomalie de recalage avait ete ecrit comme une GARDE (« rejeter un ecart superieur au
+    # deplacement d'un scan »). Or ce deplacement vaut 0,008 m alors qu'une derive reelle au
+    # franchissement vaut 0,10 m pour 1 % de gain sur les 10 m entre deux capteurs : cette garde
+    # rejetait TOUS les recalages utiles et laissait une position fausse ET non corrigee. Decision
+    # utilisateur 2026-09-21 : 5 capteurs, recalage TOUJOURS applique, aucune zone morte, temoin
+    # d'anomalie purement observationnel (0,50 m). G520 verrouille cet invariant : le seuil ne peut
+    # pas entrer dans le bloc de recalage, la mesure doit preceder le recalage, les 5 reperes doivent
+    # rester servis, et le cas d'incident doit prouver que la position est RECALEE malgre le temoin.
+    ("C", "520", "G520 - Recalage M3 : le temoin d'anomalie ne conditionne jamais la correction (T361)", [sys.executable, f"{S}/G520_check_recalage_anomaly_not_blocking.py", "."]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]
