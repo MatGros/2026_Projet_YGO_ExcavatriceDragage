@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T23:25:34.306348" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T23:25:34.306348">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T00:59:23.715858" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T00:59:23.715858">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -100,7 +100,7 @@
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=AX0 .. 20=AX_DIVING_RETRY), borné côté FB</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 RESERVE / INERTE depuis T358 — PLUS AUCUN LECTEUR : la cible de forcage est portee par ST_CycleCmd.SetForceStepTgt (zone non persistee). Champ conserve A SA PLACE pour ne pas decaler le mapping RETAIN positionnel des champs suivants (regle : jamais d'insertion ni de retrait au milieu) ; sa suppression releve d'un lot de migration de persistance dedie. L'IHM ne doit PLUS exposer de champ de saisie sur ce tag.</xhtml>
               </documentation>
             </variable>
             <variable name="DiveStartMin_M">

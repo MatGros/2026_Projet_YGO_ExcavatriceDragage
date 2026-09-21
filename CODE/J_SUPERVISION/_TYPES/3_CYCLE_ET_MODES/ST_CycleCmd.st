@@ -13,7 +13,14 @@ STRUCT
     TglCommissioning  : BOOL := FALSE; (* 🔧 Case mise en service : déverrouille le forçage de step (front/impulsion). NON persisté. *)
     TglCycleChecksInhibit : BOOL := FALSE; (* 🧪 Mode essai : inhibe uniquement les controles procede autorises. NON persiste. *)
     TglAutoDiveM2Step5Trial : BOOL := FALSE; (* Essai T291-A : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. NON persiste. *)
-    BtnForceStepApply : BOOL; (* 🔧 Applique le forçage de step (front) — impulsion ; cible = ST_CycleCfg.ForceStepTarget *)
     BtnResetSampleCount : BOOL; (* 🔢 RAZ consciente du compteur JOURNALIER de prélèvements (front) — n'agit JAMAIS sur le totalisateur, qui n'a aucune commande *)
+    // ⚠️ AJOUT EN FIN DE STRUCT (mapping positionnel : jamais d'insertion au milieu).
+    // 🔧 T358 : consigne de forcage de step — VALEUR écrite par l'opérateur, lue ET
+    //    acquittee par FB_CycleSemiAuto (retour à la sentinelle -1). Remplace le couple
+    //    BtnForceStepApply + ST_CycleCfg.ForceStepTarget : plus de bouton, plus de
+    //    confirmation, plus de cible persistée (donc aucun saut d'étape au démarrage).
+    //    Zone Cmd = NON persistée : la consigne ne survit jamais à une coupure.
+    //    -1 = aucune demande ; 0..22 = étape cible (plage E_AutoCycleStep).
+    SetForceStepTgt : INT := -1; (* 🔧 Étape cible du forçage immédiat du cycle ; -1 = aucune demande *)
 END_STRUCT
 END_TYPE

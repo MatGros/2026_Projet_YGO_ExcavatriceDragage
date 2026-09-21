@@ -3355,20 +3355,15 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Causes procede actives mais ignorees</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx221_ForceStepPrepared">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cible preparee, commandes neutres</xhtml>
-              </documentation>
-            </variable>
             <variable name="Idx222_ForceStepResult">
               <type>
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Motif accepte/refuse du forçage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Idx221 (ForceStepPrepared) SUPPRIME par T358 : le mecanisme a deux temps du
+forcage de step n'existe plus (saut immediat sans preparation). L'index reste
+VACANT pour ne renumeroter aucun tag IHM de la chaine de depannage.
+Motif de rejet de la derniere consigne de forcage (T358)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx206_Step">
@@ -5395,7 +5390,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=AX0 .. 20=AX_DIVING_RETRY), borné côté FB</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 RESERVE / INERTE depuis T358 — PLUS AUCUN LECTEUR : la cible de forcage est portee par ST_CycleCmd.SetForceStepTgt (zone non persistee). Champ conserve A SA PLACE pour ne pas decaler le mapping RETAIN positionnel des champs suivants (regle : jamais d'insertion ni de retrait au milieu) ; sa suppression releve d'un lot de migration de persistance dedie. L'IHM ne doit PLUS exposer de champ de saisie sur ce tag.</xhtml>
               </documentation>
             </variable>
             <variable name="DiveStartMin_M">
@@ -5571,20 +5566,30 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. NON persiste.</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnForceStepApply">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Applique le forçage de step (front) — impulsion ; cible = ST_CycleCfg.ForceStepTarget</xhtml>
-              </documentation>
-            </variable>
             <variable name="BtnResetSampleCount">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 RAZ consciente du compteur JOURNALIER de prélèvements (front) — n'agit JAMAIS sur le totalisateur, qui n'a aucune commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetForceStepTgt">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="-1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ AJOUT EN FIN DE STRUCT (mapping positionnel : jamais d'insertion au milieu).
+🔧 T358 : consigne de forcage de step — VALEUR écrite par l'opérateur, lue ET
+acquittee par FB_CycleSemiAuto (retour à la sentinelle -1). Remplace le couple
+BtnForceStepApply + ST_CycleCfg.ForceStepTarget : plus de bouton, plus de
+confirmation, plus de cible persistée (donc aucun saut d'étape au démarrage).
+Zone Cmd = NON persistée : la consigne ne survit jamais à une coupure.
+-1 = aucune demande ; 0..22 = étape cible (plage E_AutoCycleStep).
+🔧 Étape cible du forçage immédiat du cycle ; -1 = aucune demande</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -6041,20 +6046,12 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔎 Contrôles procédé actifs mais ignorés</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceStepPrepared">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step préparé, commandes neutres</xhtml>
-              </documentation>
-            </variable>
             <variable name="ForceStepAccepted">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Impulsion préparation acceptée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Impulsion : consigne de forçage appliquée (saut d'étape effectif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepRejected">
@@ -6062,7 +6059,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Impulsion préparation refusée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Impulsion : consigne écartée (cible hors plage énum, ou cycle inactif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepResult">
@@ -6070,7 +6067,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📝 Motif accepté/refusé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📝 Motif de rejet de la dernière consigne (vide après une consigne appliquée)</xhtml>
               </documentation>
             </variable>
             <variable name="ResumeAfterFaultAvailable">
@@ -11542,20 +11539,12 @@ TRUE = Défaut sécurité actif</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Causes procede actives mais ignorees</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceStepPrepared">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible forcee preparee, commandes neutres</xhtml>
-              </documentation>
-            </variable>
             <variable name="ForceStepAccepted">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion preparation acceptee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion : consigne de forcage appliquee (saut d'etape effectif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepRejected">
@@ -11563,7 +11552,7 @@ TRUE = Défaut sécurité actif</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion preparation refusee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion : consigne ecartee (cible hors plage enum, ou cycle inactif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepResult">
@@ -11571,7 +11560,7 @@ TRUE = Défaut sécurité actif</xhtml>
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Motif accepte/refuse</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Motif de rejet de la derniere consigne (vide apres une consigne appliquee)</xhtml>
               </documentation>
             </variable>
             <variable name="BottomTouchConfirmed">
@@ -23439,7 +23428,11 @@ FirstScanDone := TRUE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Case IHM mise en service : deverrouille le forcage de step</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 T358 : la cible de forcage n'est PLUS une configuration persistee ni une
+impulsion de bouton. Elle est portee par l'argument StepForceTgt ci-dessous
+(champ IHM non persiste) : une valeur oubliee d'une session precedente ne peut
+donc plus provoquer de saut d'etape automatique au demarrage.
+--&gt; [CFG] Case IHM mise en service (reserve : aucun usage interne, cf. note T358)</xhtml>
               </documentation>
             </variable>
             <variable name="CfgCycleChecksInhibit">
@@ -23450,20 +23443,15 @@ FirstScanDone := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Activation controles procede inhibes en mise en service</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgForceStepTarget">
+            <variable name="StepForceTgt">
               <type>
                 <INT />
               </type>
+              <initialValue>
+                <simpleValue value="-1" />
+              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Step cible du forcage (0=AX0 .. 22=AX10B_RACCORDEMENT_P1), borne dans le FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgForceStepApply">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Applique le forcage (front) — impulsion, le GRAFCET reprend ensuite</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Etape cible du forcage ecrit par l'operateur (IHM) ; -1 = aucune demande (sentinelle CST_StepForceNone). Defaut = sentinelle : un cablage absent ou rompu ne peut JAMAIS produire un forcage</xhtml>
               </documentation>
             </variable>
             <variable name="DiveStartMinM">
@@ -23647,20 +23635,12 @@ FirstScanDone := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Causes procede actives mais ignorees</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceStepPrepared">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Cible validee, demandes maintenues neutres avant reprise</xhtml>
-              </documentation>
-            </variable>
             <variable name="ForceStepAccepted">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Impulsion preparation acceptee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Impulsion : consigne de forcage appliquee (saut d'etape effectif au scan suivant)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepRejected">
@@ -23668,7 +23648,7 @@ FirstScanDone := TRUE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Impulsion preparation refusee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Impulsion : consigne ecartee (cible hors plage enum, ou cycle inactif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepResult">
@@ -23676,7 +23656,15 @@ FirstScanDone := TRUE;
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Motif accepte/refuse</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Motif de rejet de la derniere consigne (vide apres une consigne appliquee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepForceTgtTaken">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Impulsion : une consigne de forcage etait presente ce scan (appliquee, rejetee ou ecartee) — PRG_03 l'acquitte sur ce signal</xhtml>
               </documentation>
             </variable>
             <variable name="WinchM1Cmd">
@@ -23946,14 +23934,6 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant JoystickDeflected (relance AX18 sur geste franc, pas maintien)</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceStepApplyEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant CfgForceStepApply</xhtml>
-              </documentation>
-            </variable>
             <variable name="ResetSampleCountEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -24107,7 +24087,26 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <simpleValue value="E_AutoCycleStep.AX0_REPOS" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible locale non publiee avant validation complete</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etape locale issue de la table numero -&gt; etape</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepCandidateValid">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] La table a effectivement trouve une etape (anti-trou d'enum : un membre non traite est un refus, jamais un AX0 silencieux)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepForceConsigne">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Consigne de forcage lue en tete de §2 ; un acquittement (Reset/Abort) du meme scan l'annule</xhtml>
               </documentation>
             </variable>
             <variable name="WaitingResume">
@@ -24119,17 +24118,6 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] En attente de validation consciente pour reprendre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ForceStepWaiting">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distingue attente forçage et reprise apres changement de mode</xhtml>
               </documentation>
             </variable>
             <variable name="TouchPositionM1">
@@ -24195,14 +24183,6 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position de depart AX11 M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BottomContextValid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Positions fond M1/M2 qualifiees</xhtml>
               </documentation>
             </variable>
             <variable name="StopPositionCaptured">
@@ -24768,6 +24748,31 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
                 <simpleValue value="TIME#1s0ms" />
               </initialValue>
             </variable>
+            <variable name="CST_StepForceNone">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="-1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 T358 : forcage de step — sentinelle de consigne et borne haute de plage.
+CST_StepForceMax = dernier membre de E_AutoCycleStep (AX10B_RACCORDEMENT_P1) :
+toute valeur hors [0..22] est refusee, toute valeur de l'enum est acceptee.
+Sentinelle : aucune demande de forcage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_StepForceMax">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="22" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute de la plage d'enum coercible</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -25103,96 +25108,39 @@ END_IF;
 {endregion}
 
 {region "§2 Gate securite &amp; Bascule Mode"}
+// 🔧 T358 — LECTURE DE LA CONSIGNE DE FORCAGE (une seule fois, en tete de §2).
+// La consigne est un ARGUMENT : le FB ne l'ecrit JAMAIS (aucun producteur concurrent
+// du champ IHM). Le FB signale seulement qu'une consigne etait PRESENTE ce scan
+// (StepForceTgtTaken) : PRG_03 l'acquitte en la ramenant a sa sentinelle, par
+// COMPARE-ET-EFFACE (il n'efface que si le champ porte encore la valeur lue ici).
+// Sans acquittement, la meme valeur serait rejouee a chaque scan (boucle) ; avec lui,
+// la MEME valeur redevient immediatement jouable, et une ecriture d'operateur arrivee
+// pendant le corps du FB n'est jamais perdue (elle sera traitee au scan suivant).
+StepForceConsigne := StepForceTgt;
+StepForceTgtTaken := (StepForceTgt &lt;&gt; CST_StepForceNone);
+
 // 🛑 1bis. ABANDON &amp; RESET EXPLICITES (Priorité absolue, même hors mode ou en pause)
 IF AbortEdge.Q THEN
     State := E_AutoCycleStep.AX0_REPOS;
     WaitingResume := FALSE;
     PausedState := E_AutoCycleStep.AX0_REPOS;
-    ForceStepPrepared := FALSE;
-    ForceStepWaiting := FALSE;
+    StepForceConsigne := CST_StepForceNone;   // T358 : un abandon neutralise la consigne du meme scan
 END_IF;
 
-// 🔧 1ter. FORCAGE DE STEP (Mise en service / dérogation)
-// Preparation transactionnelle : machine arretee, joystick neutre, aucune action le meme scan.
-ForceStepApplyEdge(CLK := CfgForceStepApply);
-IF ForceStepApplyEdge.Q AND NOT AbortEdge.Q THEN
-    // Toute nouvelle transaction invalide d'abord la preparation precedente.
-    // Une demande refusee ne doit jamais laisser une cible ancienne executable.
-    IF ForceStepWaiting THEN
-        // Remplace uniquement une transaction de forçage precedente.
-        // Une attente issue d'un changement de mode reste intacte si la nouvelle cible est refusee.
-        WaitingResume := FALSE;
-        PausedState := E_AutoCycleStep.AX0_REPOS;
-    END_IF;
-    ForceStepPrepared := FALSE;
-    ForceStepWaiting := FALSE;
-    ForceStepCandidate := E_AutoCycleStep.AX0_REPOS;
-    IF (Mode = E_Mode.SEMI_AUTO) AND NOT Fault.Latched
-       AND NOT JoystickDeflected AND DiveStartStopped
-       AND (CfgForceStepTarget &gt;= 0) AND (CfgForceStepTarget &lt;= 22)
-       AND (CfgForceStepTarget &lt;&gt; 18) AND (CfgForceStepTarget &lt;&gt; 19) THEN
-        CASE CfgForceStepTarget OF
-            0:  ForceStepCandidate := E_AutoCycleStep.AX0_REPOS;
-            1:  ForceStepCandidate := E_AutoCycleStep.AX1_INIT;
-            2:  ForceStepCandidate := E_AutoCycleStep.AX2_TRANSLATE_P1;
-            3:  ForceStepCandidate := E_AutoCycleStep.AX3_OPEN_BUCKET;
-            4:  ForceStepCandidate := E_AutoCycleStep.AX4_DESCEND_DIVING;
-            5:  ForceStepCandidate := E_AutoCycleStep.AX5_KOBOLD_INIT;
-            6:  ForceStepCandidate := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
-            7:  ForceStepCandidate := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
-            8:  ForceStepCandidate := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
-            9:  ForceStepCandidate := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
-            10: ForceStepCandidate := E_AutoCycleStep.AX10_CLOSE_BUCKET;
-            11: ForceStepCandidate := E_AutoCycleStep.AX11_CTRL_ASCENT;
-            12: ForceStepCandidate := E_AutoCycleStep.AX12_LOADED_ASCENT;
-            13: ForceStepCandidate := E_AutoCycleStep.AX13_DRAIN_PAUSE;
-            14: ForceStepCandidate := E_AutoCycleStep.AX14_TRANSLATE_DUMP;
-            15: ForceStepCandidate := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
-            16: ForceStepCandidate := E_AutoCycleStep.AX15B_DUMP_OPEN;
-            17: ForceStepCandidate := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
-            18: ForceStepCandidate := E_AutoCycleStep.AX18_DONE_SYNC;
-            20: ForceStepCandidate := E_AutoCycleStep.AX_DIVING_RETRY;
-            21: ForceStepCandidate := E_AutoCycleStep.AX3_WAIT_DIVE_START;
-            22: ForceStepCandidate := E_AutoCycleStep.AX10B_RACCORDEMENT_P1;
-        END_CASE;
-        IF (CfgForceStepTarget = 7) AND NOT KoboldImmersionQualified THEN
-            ForceStepRejected := TRUE;
-            ForceStepResult := 'Forçage refuse : immersion Kobold non qualifiee.';
-        ELSIF ((CfgForceStepTarget &gt;= 8) AND (CfgForceStepTarget &lt;= 12)) AND NOT BottomContextValid THEN
-            ForceStepRejected := TRUE;
-            ForceStepResult := 'Forçage refuse : contexte immersion/fond non qualifie.';
-        ELSE
-            PausedState := ForceStepCandidate;
-            ForceStepPrepared := TRUE;
-            ForceStepWaiting := TRUE;
-            ForceStepAccepted := TRUE;
-            WaitingResume := TRUE;
-            ForceStepResult := 'Step prepare : appuyer Start au joystick neutre.';
-        END_IF;
-    ELSE
-        ForceStepRejected := TRUE;
-        ForceStepResult := 'Forçage refuse : conditions, cible ou arret non valides.';
-    END_IF;
-    StateExecutionInhibit := TRUE;
-    WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
-    WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
-    TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
-    BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE; BucketCmd.ReqKoboldMeasureEnable := FALSE;
-END_IF;
+// 🔧 1ter. FORCAGE DE STEP — DEPLACE APRES LA PORTE DE SECURITE (§2bis, plus bas).
+//    T358 : le mecanisme a deux temps (preparation puis confirmation par Start au
+//    joystick neutre) et ses six gardes de contexte ont ete RETIRES. La tracabilite
+//    complete des gardes retirees et de leur role d'origine est portee par
+//    DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T358_FORCESTEP_SANS_GARDE.md.
 
 IF ResetEdge.Q THEN
-    IF ForceStepWaiting THEN
-        WaitingResume := FALSE;
-    END_IF;
-    ForceStepPrepared := FALSE;
-    ForceStepWaiting := FALSE;
+    StepForceConsigne := CST_StepForceNone;   // T358 : un acquittement neutralise la consigne du meme scan
     PausedState := E_AutoCycleStep.AX0_REPOS;
     SavedState := E_AutoCycleStep.AX0_REPOS;
     BottomTouched := FALSE;
     BottomStopByKobold := FALSE;
     BottomStopBySetpoint := FALSE;
     BottomStopSource := '';
-    BottomContextValid := FALSE;
     StopPositionCaptured := FALSE;
     KoboldImmersionQualified := FALSE;
     AutoDiveM2Step5TrialLatched := FALSE;
@@ -25212,16 +25160,18 @@ IF ResumeAfterFaultEdge.Q AND ResumeAfterFaultAvailable AND NOT ResetEdge.Q THEN
     PausedState := CycleStepAtError;
     State := CycleStepAtError;
     WaitingResume := TRUE;
-    ForceStepPrepared := FALSE;
-    ForceStepWaiting := FALSE;
 END_IF;
 
 IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
-    IF ForceStepWaiting THEN
-        WaitingResume := FALSE;
+    // 🔧 T358 : une consigne de forcage ecrite alors que le cycle est INACTIF est
+    //    ECARTEE — motif publie, et la consigne est acquittee par PRG_03 sur
+    //    StepForceTgtTaken. Elle n'est JAMAIS honoree plus tard a la reactivation du
+    //    cycle : ce serait un saut d'etape sans geste nouveau.
+    IF StepForceConsigne &lt;&gt; CST_StepForceNone THEN
+        StepForceConsigne := CST_StepForceNone;
+        ForceStepRejected := TRUE;
+        ForceStepResult := 'Forcage ecarte : cycle inactif (mode, securite ou codeur).';
     END_IF;
-    ForceStepPrepared := FALSE;
-    ForceStepWaiting := FALSE;
     WinchM1Cmd.RunRequest     := FALSE;
     WinchM1Cmd.ReqAscent      := FALSE;
     WinchM1Cmd.ReqDescend     := FALSE;
@@ -25276,6 +25226,74 @@ IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
     RETURN;
 END_IF;
 
+// 🔧 2bis. FORCAGE DE STEP — T358 (mise en service / derogation)
+// 🎯 Une consigne, un scan : l'operateur ecrit l'etape ciblee dans StepForceTgt (champ
+//    IHM NON persiste, sentinelle -1). Le FB la consomme et remplace l'etape courante ;
+//    PRG_03 l'acquitte sur StepForceTgtTaken. La meme valeur est donc immediatement
+//    re-jouable, et aucun rejeu en boucle n'est possible.
+// ⚠️ PLACE VOLONTAIRE — apres la porte §2 (Enable / AU / codeur) et avant le repli
+//    defaut ErrorEdge : un defaut LIVE dont le front tombe sur le meme scan garde la
+//    priorite (repli AX_STAB), mais un defaut DEJA LATCHE ne bloque plus le forcage
+//    (decision exploitant 2026-09-21, risque assume et trace en note d'application).
+// ⚠️ AUCUNE garde de contexte : ni mode, ni joystick, ni arret mecanique des treuils,
+//    ni immersion Kobold, ni contexte fond. La SEULE validation restante est la plage
+//    des valeurs de E_AutoCycleStep [0..22] ; hors plage = rejet, aucune ecriture d'etape.
+// ⚠️ Le scan du forcage n'emet AUCUNE commande : demandes ramenees a zero et CASE
+//    inhibe (StateExecutionInhibit) — l'etape ciblee s'execute au scan suivant, soit
+//    un cycle de tache (10 ms). Un forcage annule aussi une attente de reprise en
+//    cours, sinon le saut resterait gele sans effet.
+IF StepForceConsigne &lt;&gt; CST_StepForceNone THEN
+    ForceStepCandidateValid := FALSE;
+    IF (StepForceConsigne &gt;= 0) AND (StepForceConsigne &lt;= CST_StepForceMax) THEN
+        CASE StepForceConsigne OF
+            0:  ForceStepCandidate := E_AutoCycleStep.AX0_REPOS;             ForceStepCandidateValid := TRUE;
+            1:  ForceStepCandidate := E_AutoCycleStep.AX1_INIT;              ForceStepCandidateValid := TRUE;
+            2:  ForceStepCandidate := E_AutoCycleStep.AX2_TRANSLATE_P1;      ForceStepCandidateValid := TRUE;
+            3:  ForceStepCandidate := E_AutoCycleStep.AX3_OPEN_BUCKET;       ForceStepCandidateValid := TRUE;
+            4:  ForceStepCandidate := E_AutoCycleStep.AX4_DESCEND_DIVING;    ForceStepCandidateValid := TRUE;
+            5:  ForceStepCandidate := E_AutoCycleStep.AX5_KOBOLD_INIT;       ForceStepCandidateValid := TRUE;
+            6:  ForceStepCandidate := E_AutoCycleStep.AX6_SEARCH_IMMERSION;  ForceStepCandidateValid := TRUE;
+            7:  ForceStepCandidate := E_AutoCycleStep.AX7_SEARCH_BOTTOM;     ForceStepCandidateValid := TRUE;
+            8:  ForceStepCandidate := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;  ForceStepCandidateValid := TRUE;
+            9:  ForceStepCandidate := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;  ForceStepCandidateValid := TRUE;
+            10: ForceStepCandidate := E_AutoCycleStep.AX10_CLOSE_BUCKET;     ForceStepCandidateValid := TRUE;
+            11: ForceStepCandidate := E_AutoCycleStep.AX11_CTRL_ASCENT;      ForceStepCandidateValid := TRUE;
+            12: ForceStepCandidate := E_AutoCycleStep.AX12_LOADED_ASCENT;    ForceStepCandidateValid := TRUE;
+            13: ForceStepCandidate := E_AutoCycleStep.AX13_DRAIN_PAUSE;      ForceStepCandidateValid := TRUE;
+            14: ForceStepCandidate := E_AutoCycleStep.AX14_TRANSLATE_DUMP;   ForceStepCandidateValid := TRUE;
+            15: ForceStepCandidate := E_AutoCycleStep.AX15A_DUMP_ARRIVE;     ForceStepCandidateValid := TRUE;
+            16: ForceStepCandidate := E_AutoCycleStep.AX15B_DUMP_OPEN;       ForceStepCandidateValid := TRUE;
+            17: ForceStepCandidate := E_AutoCycleStep.AX15C_DUMP_REPOSITION; ForceStepCandidateValid := TRUE;
+            18: ForceStepCandidate := E_AutoCycleStep.AX18_DONE_SYNC;        ForceStepCandidateValid := TRUE;
+            19: ForceStepCandidate := E_AutoCycleStep.AX_STAB;               ForceStepCandidateValid := TRUE;
+            20: ForceStepCandidate := E_AutoCycleStep.AX_DIVING_RETRY;       ForceStepCandidateValid := TRUE;
+            21: ForceStepCandidate := E_AutoCycleStep.AX3_WAIT_DIVE_START;   ForceStepCandidateValid := TRUE;
+            22: ForceStepCandidate := E_AutoCycleStep.AX10B_RACCORDEMENT_P1; ForceStepCandidateValid := TRUE;
+        END_CASE;
+    END_IF;
+
+    IF ForceStepCandidateValid THEN
+        State := ForceStepCandidate;
+        StateExecutionInhibit := TRUE;   // CASE non execute sur ce scan : saut effectif au scan suivant
+        PausedState := E_AutoCycleStep.AX0_REPOS;
+        WaitingResume := FALSE;          // un forcage annule l'attente de reprise (sinon le saut resterait gele)
+        CycleStep := ForceStepCandidate; // l'IHM affiche l'etape ciblee des le scan du forcage
+        CycleStateStr := 'Forcage de step (mise en service) : etape ciblee chargee';
+        // Scan sans commande : aucune demande d'actionneur n'est publiee.
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
+        BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE; BucketCmd.ReqKoboldMeasureEnable := FALSE;
+        ForceStepAccepted := TRUE;
+        ForceStepResult := '';           // une consigne appliquee efface le motif de rejet precedent
+    ELSE
+        ForceStepRejected := TRUE;
+        ForceStepResult := 'Forcage refuse : cible hors plage E_AutoCycleStep (0..22).';
+    END_IF;
+    // La consigne n'est PAS ecrite par le FB : elle est acquittee par PRG_03 sur
+    // StepForceTgtTaken (invariant verifie par le gate G517).
+END_IF;
+
 Ready := Enable AND NOT Fault.Latched;
 
 // 🛡️ Gate continu homme-mort : le mouvement n'est autorisé que si le manche est
@@ -25288,20 +25306,16 @@ TranslationTremiePermit := DeadmanArmed AND JoystickLeft AND NOT JoystickPush AN
 JoystickPushOnly := JoystickPush AND NOT (JoystickLeft OR JoystickRight);
 
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
+// 🔒 T358 : cette attente est INDEPENDANTE du forcage de step. Elle est ecrite par la
+//    bascule de mode (§2) et par la reprise apres defaut, et consommee ici : elle est
+//    conservee telle quelle (le forcage ne passe plus par ce chemin).
 IF WaitingResume AND NOT StateExecutionInhibit THEN
     // 🔒 Sécurité anti-redémarrage automatique (AF-04 §4.1) : reprise sur StartCycle OU Homme-Mort
     IF AbortEdge.Q THEN
         State := E_AutoCycleStep.AX0_REPOS;
         WaitingResume := FALSE;
         PausedState := E_AutoCycleStep.AX0_REPOS;
-    ELSIF ForceStepPrepared AND StartEdge.Q AND NOT JoystickDeflected THEN
-        State := PausedState;
-        WaitingResume := FALSE;
-        ForceStepPrepared := FALSE;
-        ForceStepWaiting := FALSE;
-        StateExecutionInhibit := TRUE;
-        ForceStepResult := 'Step charge : nouveau geste joystick requis.';
-    ELSIF (NOT ForceStepPrepared) AND (StartEdge.Q OR DeadmanArmedEdge.Q) THEN
+    ELSIF StartEdge.Q OR DeadmanArmedEdge.Q THEN
         State := PausedState;   // reprise consciente : restaure l'étape mémorisée
         WaitingResume := FALSE;
     ELSE
@@ -25360,7 +25374,6 @@ CASE State OF
     E_AutoCycleStep.AX0_REPOS:
         CycleStep := E_AutoCycleStep.AX0_REPOS;
         CycleStateStr := 'AX0 - Verification coherence systeme';
-        BottomContextValid := FALSE;
         StopPositionCaptured := FALSE;
         KoboldImmersionQualified := FALSE;
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -25670,7 +25683,6 @@ CASE State OF
             ELSE
                 BottomStopSource := 'KOBOLD';
             END_IF;
-            BottomContextValid := TRUE;
             StopPositionCaptured := FALSE;
             State := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
         END_IF;
@@ -46712,20 +46724,12 @@ PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenance
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Contrôles procédé ignorés</xhtml>
               </documentation>
             </variable>
-            <variable name="CycleForceStepPrepared">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Step préparé, commandes neutres</xhtml>
-              </documentation>
-            </variable>
             <variable name="CycleForceStepResult">
               <type>
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Motif forçage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Motif de rejet de la consigne de forcage de step (T358)</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStep">
@@ -47566,7 +47570,6 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx217_FaultLatched               := CycleFa
 GVL_Troubleshooting.G_CycleSemiAuto.Idx218_FaultLatchedId             := CycleFaultLatchedId;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx219_CycleChecksInhibited       := CycleChecksInhibited;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx220_IgnoredCycleCheckId        := CycleIgnoredCheckId;
-GVL_Troubleshooting.G_CycleSemiAuto.Idx221_ForceStepPrepared          := CycleForceStepPrepared;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx222_ForceStepResult            := CycleForceStepResult;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step                      := CycleStep;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
@@ -53955,6 +53958,14 @@ Data.DataValid := NOT Data.InputModules.Fault
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Consigne egouttage convertie en TIME pour FB_CycleSemiAuto</xhtml>
               </documentation>
             </variable>
+            <variable name="StepForceTgtCmd">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Consigne de forcage lue AVANT l'appel du FB : base du compare-et-efface (acquittement T358, cf. §3)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_CycleInitWindowM">
               <type>
                 <REAL />
@@ -54122,6 +54133,12 @@ BottomPositionConfirmed := FALSE;
 // 🕹️ JoystickDeflected = manche défléchi (non centré) — D2
 // ⚠️ Entrées consommées sur les bus publics Data (retard N-1 admis AF-02) :
 
+// 🔧 T358 : la consigne de forcage est lue UNE SEULE FOIS ici, AVANT l'appel. C'est cette
+// valeur-là qui sert de référence au compare-et-efface de l'acquittement (§3) : une écriture
+// d'opérateur arrivée PENDANT le corps du FB n'est donc jamais confondue avec celle qui vient
+// d'être traitée, et n'est jamais effacée.
+StepForceTgtCmd := GVL_IHM.CycleSemiAuto.Cmd.SetForceStepTgt;
+
 instCycleSemiAuto(
     Enable                  := (instModes.Auth.Mode = E_Mode.SEMI_AUTO),
     Reset                   := GVL_IHM.CycleSemiAuto.Cmd.BtnReset OR PRG_07_Supervision.FaultMachineReset_IHM,
@@ -54194,8 +54211,10 @@ instCycleSemiAuto(
     CfgCommissioningEnable  := GVL_IHM.CycleSemiAuto.Cmd.TglCommissioning,
     CfgCycleChecksInhibit   := GVL_IHM.CycleSemiAuto.Cmd.TglCycleChecksInhibit,
     CfgAutoDiveM2Step5Trial := GVL_IHM.CycleSemiAuto.Cmd.TglAutoDiveM2Step5Trial,
-    CfgForceStepTarget      := GVL_IHM.CycleSemiAuto.Cfg.ForceStepTarget,
-    CfgForceStepApply       := GVL_IHM.CycleSemiAuto.Cmd.BtnForceStepApply,
+    // 🔧 T358 : forcage de step — consigne A UNE VALEUR (champ IHM non persiste,
+    // sentinelle -1). Aucune confirmation, aucune garde : saut d'etape immediat.
+    // La cible n'est JAMAIS une configuration persistee (aucun saut au demarrage).
+    StepForceTgt            := StepForceTgtCmd,
     // Config diving / extraction (GEL 2026-09-03)
     DiveStartMinM           := GVL_IHM.CycleSemiAuto.Cfg.DiveStartMin_M, // altimetrie lancement Kobold (AT4)
     CfgRaiseOffBottomM      := GVL_IHM.CycleSemiAuto.Cfg.RaiseOffBottom_M,   // GEL Q16 : decollement du fond AX8 (reglable IHM)
@@ -54215,6 +54234,18 @@ instCycleSemiAuto(
     // donc un éventuel retard de tâche d'un scan est sans effet.
     SafetyRearmed          := PRG_06_Outputs.EmergencyDone
 );
+
+// 🔧 T358 : ACQUITTEMENT de la consigne de forcage de step — COMPARE-ET-EFFACE.
+// Le FB signale qu'une consigne etait PRESENTE au scan (StepForceTgtTaken). La consigne n'est
+// ramenee a sa sentinelle -1 que si le champ porte ENCORE EXACTEMENT la valeur que le FB vient
+// de traiter (StepForceTgtCmd). Sans cet acquittement la meme valeur serait rejouee a chaque
+// scan (boucle) ; avec le compare-et-efface, la MEME valeur redevient immediatement jouable ET
+// une ecriture d'operateur arrivee pendant le corps du FB n'est JAMAIS effacee : elle n'a
+// simplement pas ete vue ce scan, et sera traitee au scan suivant. Invariant verrouille par G517.
+IF instCycleSemiAuto.StepForceTgtTaken
+   AND (GVL_IHM.CycleSemiAuto.Cmd.SetForceStepTgt = StepForceTgtCmd) THEN
+    GVL_IHM.CycleSemiAuto.Cmd.SetForceStepTgt := -1;
+END_IF;
 
 {endregion}
 
@@ -54298,7 +54329,6 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.DrainTimeRemaining     := instCycleSemiAuto.DrainTimeRemaining;
     Data.SequenceState.CycleChecksInhibited   := instCycleSemiAuto.CycleChecksInhibited;
     Data.SequenceState.IgnoredCycleCheckId    := instCycleSemiAuto.IgnoredCycleCheckId;
-    Data.SequenceState.ForceStepPrepared      := instCycleSemiAuto.ForceStepPrepared;
     Data.SequenceState.ForceStepAccepted      := instCycleSemiAuto.ForceStepAccepted;
     Data.SequenceState.ForceStepRejected      := instCycleSemiAuto.ForceStepRejected;
     Data.SequenceState.ForceStepResult        := instCycleSemiAuto.ForceStepResult;
@@ -54399,7 +54429,6 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.DrainTimeRemaining     := T#0s;
     Data.SequenceState.CycleChecksInhibited   := FALSE;
     Data.SequenceState.IgnoredCycleCheckId    := 0;
-    Data.SequenceState.ForceStepPrepared      := FALSE;
     Data.SequenceState.ForceStepAccepted      := FALSE;
     Data.SequenceState.ForceStepRejected      := FALSE;
     Data.SequenceState.ForceStepResult        := '';
@@ -54475,7 +54504,6 @@ ELSE
     Data.SequenceState.DrainTimeRemaining      := T#0s;
     Data.SequenceState.CycleChecksInhibited    := FALSE;
     Data.SequenceState.IgnoredCycleCheckId     := 0;
-    Data.SequenceState.ForceStepPrepared       := FALSE;
     Data.SequenceState.ForceStepAccepted       := FALSE;
     Data.SequenceState.ForceStepRejected       := FALSE;
     Data.SequenceState.ForceStepResult         := '';
@@ -60576,7 +60604,6 @@ GVL_IHM.CycleSemiAuto.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.Se
 GVL_IHM.CycleSemiAuto.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
 GVL_IHM.CycleSemiAuto.State.CycleChecksInhibited   := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited;
 GVL_IHM.CycleSemiAuto.State.IgnoredCycleCheckId    := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId;
-GVL_IHM.CycleSemiAuto.State.ForceStepPrepared      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared;
 GVL_IHM.CycleSemiAuto.State.ForceStepAccepted      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepAccepted;
 GVL_IHM.CycleSemiAuto.State.ForceStepRejected      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepRejected;
 GVL_IHM.CycleSemiAuto.State.ForceStepResult        := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepResult;
@@ -60776,7 +60803,6 @@ instTroubleshootingView(
     CycleM2SpeedStepAtFault := PRG_03_Modes_Cycle.Data.SequenceState.M2SpeedStepAtFault,
     CycleChecksInhibited := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
     CycleIgnoredCheckId  := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId,
-    CycleForceStepPrepared := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared,
     CycleForceStepResult := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepResult,
     CycleStep            := PRG_03_Modes_Cycle.Data.SequenceState.Step,
     CycleStepStr         := PRG_03_Modes_Cycle.Data.SequenceState.StepStr,

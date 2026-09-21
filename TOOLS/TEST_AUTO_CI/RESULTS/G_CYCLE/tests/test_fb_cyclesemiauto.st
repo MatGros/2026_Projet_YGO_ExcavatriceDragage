@@ -7,21 +7,21 @@ END_VAR
 END_SETUP
 
 TEST 'T262-002 AX10B : transfert Both P1 sans coupure M2 puis AX11 P2'
-    (* Chargement securise de AX10B : forçage au joystick neutre. *)
+    (* Chargement securise de AX10B : consigne de forcage ecrite par l'operateur (T358). *)
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
        M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
        M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
        M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        JoystickDeflected := FALSE, DeadmanArmed := FALSE,
-       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 22,
-       CfgForceStepApply := FALSE, CfgCtrlAscentMaxStep := 2,
-       CfgCtrlAscentDistanceM := 2.0, SampleCount := SampleCount);
-    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepPrepared, 'AX10B preparee au repos');
+       CfgCommissioningEnable := TRUE, CfgCtrlAscentMaxStep := 2,
+       CfgCtrlAscentDistanceM := 2.0, SampleCount := SampleCount, StepForceTgt := 22);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'AX10B forcee immediatement (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
 
-    (* Start au neutre : aucun mouvement au scan de chargement. *)
-    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
+    (* Scans d acquittement puis d execution : aucun mouvement au chargement. *)
+    FB(StepForceTgt := -1, SampleCount := SampleCount);
+    FB(SampleCount := SampleCount);
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
                  'Chargement AX10B sans mouvement');
 
@@ -49,19 +49,19 @@ TEST 'T262-002 AX10B : transfert Both P1 sans coupure M2 puis AX11 P2'
 END_TEST
 
 TEST 'T262-003 AX10B : timeout M1 borne a 2 s puis repli sans redemarrage implicite'
-    (* Preparation AX10B au neutre, comme pour le test nominal. *)
+    (* Preparation AX10B au neutre, comme pour le test nominal (T358). *)
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
        M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
        M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
        M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        JoystickDeflected := FALSE, DeadmanArmed := FALSE,
-       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 22,
-       CfgForceStepApply := FALSE, CfgCtrlAscentMaxStep := 2,
-       CfgCtrlAscentDistanceM := 2.0, SampleCount := SampleCount);
-    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepPrepared, 'AX10B preparee pour test timeout');
-    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
+       CfgCommissioningEnable := TRUE, CfgCtrlAscentMaxStep := 2,
+       CfgCtrlAscentDistanceM := 2.0, SampleCount := SampleCount, StepForceTgt := 22);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'AX10B forcee pour test timeout (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
+    FB(StepForceTgt := -1, SampleCount := SampleCount);
+    FB(SampleCount := SampleCount);
 
     (* M1 indisponible : M2 est tenu en P1 pendant la fenetre bornee. *)
     FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE,
@@ -116,14 +116,16 @@ TEST 'T331-001 AX15b repli : ouverture neutralisee puis fermeture benne et remon
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_CloseReached := FALSE,
        Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        RepositionRequest := FALSE, SkipDrainRequest := FALSE, CfgDrainTime := T#0s,
-       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 16, CfgForceStepApply := FALSE,
+       CfgCommissioningEnable := TRUE,
        CfgCtrlAscentMaxStep := 1, CfgCtrlAscentDistanceM := 2.0,
        SampleCount := SampleCount);
-    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepPrepared, 'Etape de vidage preparee au repos');
+    FB(StepForceTgt := 16, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'Etape de vidage forcee (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
 
-    (* Start au neutre : l etape est chargee sans mouvement. *)
-    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
+    (* Scans d acquittement puis d execution : l etape est chargee sans mouvement. *)
+    FB(StepForceTgt := -1, SampleCount := SampleCount);
+    FB(SampleCount := SampleCount);
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
                  'Chargement du vidage sans mouvement treuils');
 
@@ -223,12 +225,13 @@ TEST 'T331-002 AX15b/AX15c non-regression : vidage nominal et repositionnement i
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_CloseReached := FALSE,
        Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        RepositionRequest := FALSE, SkipDrainRequest := FALSE, CfgDrainTime := T#0s,
-       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 16, CfgForceStepApply := FALSE,
+       CfgCommissioningEnable := TRUE,
        CfgCtrlAscentMaxStep := 1, CfgCtrlAscentDistanceM := 2.0,
        SampleCount := SampleCount);
-    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepPrepared, 'Etape de vidage preparee (non-regression)');
-    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
+    FB(StepForceTgt := 16, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'Etape de vidage forcee (non-regression T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
+    FB(StepForceTgt := -1, SampleCount := SampleCount);
 
     (* Vidage nominal Y- : ouverture seule, treuils neutralises. *)
     FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE,
@@ -292,11 +295,13 @@ TEST 'T331-003 AX15b repli : perte du geste, de l homme-mort ou defaut interromp
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_CloseReached := FALSE,
        Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        RepositionRequest := FALSE, SkipDrainRequest := FALSE, CfgDrainTime := T#0s,
-       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 16, CfgForceStepApply := FALSE,
+       CfgCommissioningEnable := TRUE,
        CfgCtrlAscentMaxStep := 1, CfgCtrlAscentDistanceM := 2.0,
        SampleCount := SampleCount);
-    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
-    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
+    FB(StepForceTgt := 16, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'Etape de vidage forcee (T331-003)');
+    FB(StepForceTgt := -1, SampleCount := SampleCount);
+    FB(SampleCount := SampleCount);
 
     (* Vidage puis geste inverse maintenu : repli engage jusqu a la fermeture benne. *)
     FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE,
@@ -377,19 +382,22 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
 END_TEST
 
 TEST 'TC-P04-027 T258 : ForÃ§age prepare sans action et reprise sur Start au neutre'
+    (* T358 : consigne unique ecrite par l'operateur — AUCUNE condition de contexte,
+       aucune confirmation. Le joystick est volontairement DEFLECHI pour prouver que la
+       garde « joystick au neutre » a bien disparu, et l'homme-mort reste absent pour
+       verifier que le forcage lui-meme ne cree AUCUN mouvement. *)
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
        M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
        M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
-       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
-       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 4,
-       CfgForceStepApply := FALSE, SampleCount := SampleCount);
-    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepPrepared, 'Cible preparee');
-    ASSERT_TRUE(FB.ForceStepAccepted, 'Preparation acceptee');
-    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Aucune action au scan Apply');
-    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, JoystickDeflected := FALSE, SampleCount := SampleCount);
-    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Aucune action au scan Start');
+       JoystickDeflected := TRUE, DeadmanArmed := FALSE,
+       CfgCommissioningEnable := TRUE, SampleCount := SampleCount, StepForceTgt := 4);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'Saut accepte joystick deflechi, sans aucune condition (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Aucune action au scan du forcage');
+    FB(StepForceTgt := -1, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'AX4 chargee au scan suivant (T358)');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Le forcage ne cree aucun mouvement');
     FB(StartCycle := FALSE, DeadmanArmed := TRUE, JoystickDeflected := TRUE,
        JoystickPull := TRUE, JoystickPush := FALSE, SampleCount := SampleCount);
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Y+ ne commande pas la descente AX4');
@@ -398,16 +406,20 @@ TEST 'TC-P04-027 T258 : ForÃ§age prepare sans action et reprise sur Start au n
 END_TEST
 
 TEST 'TC-P04-028 T258 : ForÃ§age AX_STAB refuse et reste neutre'
+    (* T358 : AX_STAB (19) etait explicitement REFUSE par l ancienne garde « <> 19 »
+       alors que c est une valeur d enum valide : elle est desormais forcable. *)
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
        M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
        M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
-       JoystickDeflected := FALSE, CfgCommissioningEnable := TRUE,
-       CfgForceStepTarget := 19, CfgForceStepApply := FALSE, SampleCount := SampleCount);
-    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepRejected, 'AX_STAB refuse');
-    ASSERT_FALSE(FB.ForceStepPrepared, 'Aucune cible preparee');
-    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Sorties neutres sur refus');
+       JoystickDeflected := FALSE, CfgCommissioningEnable := TRUE, SampleCount := SampleCount,
+       StepForceTgt := 19);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'AX_STAB desormais forcable : 19 est dans la plage enum (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
+    ASSERT_FALSE(FB.ForceStepRejected, 'Aucun rejet d une valeur d enum valide (T358)');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Sorties neutres au scan du forcage');
+    FB(StepForceTgt := -1, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX_STAB, 'AX_STAB chargee au scan suivant (T358)');
 END_TEST
 
 TEST 'TC-P04-029 T258 : Inhibition ne masque pas le desynchronisme'
@@ -426,21 +438,23 @@ TEST 'TC-P04-029 T258 : Inhibition ne masque pas le desynchronisme'
 END_TEST
 
 TEST 'TC-P04-030 T258 : Un forçage refuse invalide une preparation precedente'
+    (* T358 : la SEULE validation restante est la plage de l enum. Hors plage = rejet,
+       etape inchangee, consigne acquittee (donc jamais rejouee en boucle). *)
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
        M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
        M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
        JoystickDeflected := FALSE, CfgCommissioningEnable := TRUE,
-       CfgForceStepTarget := 4, CfgForceStepApply := FALSE, SampleCount := SampleCount);
-    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepPrepared, 'Premiere cible preparee');
-    FB(CfgForceStepApply := FALSE, SampleCount := SampleCount);
-    FB(CfgForceStepTarget := 19, CfgForceStepApply := TRUE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepRejected, 'Seconde cible refusee');
-    ASSERT_FALSE(FB.ForceStepPrepared, 'Preparation precedente invalidee');
-    FB(CfgForceStepApply := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
-    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Start ne peut executer la cible obsolete');
-    ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'Ancienne cible AX4 non chargee');
+       StartCycle := FALSE, SampleCount := SampleCount, StepForceTgt := 40);
+    ASSERT_TRUE(FB.ForceStepRejected, 'Cible hors plage refusee (T358)');
+    ASSERT_FALSE(FB.ForceStepAccepted, 'Aucune consigne appliquee hors plage');
+    ASSERT_TRUE(FB.ForceStepResult <> '', 'Motif de rejet publie (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
+    ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'Aucune etape chargee apres rejet');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Start ne peut executer aucune cible');
+    (* La consigne acquittee, le scan suivant repart de la sentinelle : aucun rejeu. *)
+    FB(StepForceTgt := -1, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.ForceStepRejected, 'Impulsion de rejet d un seul scan (T358)');
     FB(StartCycle := FALSE, DeadmanArmed := TRUE, JoystickDeflected := TRUE,
        JoystickPush := TRUE, SampleCount := SampleCount);
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Nouveau geste Y- sans cible reste neutre');
@@ -449,50 +463,59 @@ TEST 'TC-P04-030 T258 : Un forçage refuse invalide une preparation precedente'
 END_TEST
 
 TEST 'TC-P04-031 T258 : Apply et Start simultanes restent en preparation neutre'
+    (* T358 : AX18_DONE_SYNC (18) etait explicitement REFUSE par l ancienne garde
+       « <> 18 » alors que c est une valeur d enum valide : elle est desormais forcable. *)
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
        M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
        M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
        JoystickDeflected := FALSE, CfgCommissioningEnable := TRUE,
-       CfgForceStepTarget := 4, CfgForceStepApply := FALSE, StartCycle := FALSE,
-       SampleCount := SampleCount);
-    FB(CfgForceStepApply := TRUE, StartCycle := TRUE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepPrepared, 'Apply prepare la cible sans consommer Start');
-    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Aucune action au scan Apply+Start');
-    FB(CfgForceStepApply := FALSE, StartCycle := FALSE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepPrepared, 'Preparation conservee : nouveau front Start requis');
-    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Attente neutre maintenue');
+       StartCycle := FALSE, SampleCount := SampleCount, StepForceTgt := 18);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'AX18 forcee : 18 est dans la plage enum (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
+    ASSERT_FALSE(FB.ForceStepRejected, 'Aucun rejet d une valeur d enum valide (T358)');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'Aucune commande au scan du forcage');
+    FB(StepForceTgt := -1, StartCycle := FALSE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX18_DONE_SYNC, 'AX18 chargee au scan suivant (T358)');
     ASSERT_FALSE(FB.TranslationCmd.ReqStart OR FB.BucketCmd.ReqOpen OR FB.BucketCmd.ReqClose OR FB.BucketCmd.ReqKoboldMeasureEnable,
-                 'Preparation neutre sur tous les actionneurs');
+                 'Aucun autre actionneur commande par le forcage (T358)');
 END_TEST
 
 TEST 'TC-P04-032 T258 : Reset simultane annule le forçage'
+    (* T358 : une consigne ecrite sur le MEME scan qu un Reset est effacee par le Reset
+       (l abandon et l acquittement precedent le bloc de forcage dans l ordre intra-scan) :
+       aucun saut d etape ne peut survivre a un acquittement. *)
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
        M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
        M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
-       JoystickDeflected := FALSE, CfgCommissioningEnable := TRUE,
-       CfgForceStepTarget := 4, CfgForceStepApply := FALSE, Reset := FALSE,
-       SampleCount := SampleCount);
-    FB(CfgForceStepApply := TRUE, Reset := TRUE, SampleCount := SampleCount);
-    ASSERT_FALSE(FB.ForceStepPrepared, 'Reset prioritaire annule la preparation');
-    FB(CfgForceStepApply := FALSE, Reset := FALSE, StartCycle := TRUE, SampleCount := SampleCount);
-    ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'AX4 non charge apres Reset+Apply');
+       JoystickDeflected := FALSE, CfgCommissioningEnable := TRUE, Reset := TRUE,
+       SampleCount := SampleCount, StepForceTgt := 4);
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
+    ASSERT_FALSE(FB.ForceStepAccepted, 'Aucun forcage applique : le Reset du meme scan neutralise la consigne');
+    ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'AX4 non chargee apres Reset + consigne');
+    FB(StepForceTgt := -1, Reset := FALSE, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'Aucun saut differe au scan suivant (T358)');
 END_TEST
 
 TEST 'TC-P04-033 T258 : Forcage semi-auto independant du bit commissioning'
-    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+    (* T358 : une consigne ecrite alors que le CYCLE est inactif (hors SEMI_AUTO) est
+       ECARTEE — acquittee et motif publie. Elle n est JAMAIS honoree plus tard, a la
+       reactivation du cycle : ce serait un saut d etape sans geste nouveau. *)
+    FB(Enable := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
        HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
        M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
        M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
-       JoystickDeflected := FALSE, CfgCommissioningEnable := TRUE,
-       CfgForceStepTarget := 4, CfgForceStepApply := FALSE, SampleCount := SampleCount);
-    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepPrepared, 'Preparation initiale acceptee');
-    FB(CfgForceStepApply := FALSE, CfgCommissioningEnable := FALSE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepPrepared, 'Retrait commissioning ne bloque pas la preparation semi-auto');
-    FB(StartCycle := TRUE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'AX4 charge en semi-auto hors commissioning');
+       JoystickDeflected := FALSE, CfgCommissioningEnable := TRUE, SampleCount := SampleCount,
+       StepForceTgt := 4);
+    ASSERT_TRUE(FB.ForceStepRejected, 'Consigne ecartee : cycle inactif (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
+    ASSERT_TRUE(FB.ForceStepResult <> '', 'Motif d ecart publie (T358)');
+    FB(Enable := TRUE, Mode := E_Mode.SEMI_AUTO, StepForceTgt := -1, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'Aucun saut differe a la reactivation (T358)');
+    (* Le forcage reste possible des que le cycle est actif : meme cible, meme scan. *)
+    FB(StepForceTgt := 4, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'Forcage effectif une fois le cycle actif (T358)');
 END_TEST
 
 TEST 'TC-P04-001 : Relachement manche (JoystickDeflected=FALSE) stoppe les commandes sans perdre l etape'
@@ -737,19 +760,19 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest, 'Aucun redemarrage auto M1');
     ASSERT_FALSE(FB.Fault.Error, 'Pas de defaut (le relache homme-mort n est pas un defaut)');
 
-    (* Pause mode en AX4, puis tentative de forçage invalide : la reprise consciente doit survivre. *)
+    (* T358 : la reprise consciente apres bascule de mode est CONSERVEE — elle ne passe
+       plus par le chemin du forçage, et le scenario « forçage refuse pendant l attente »
+       n existe plus : la consigne 19 (AX_STAB) est desormais ACCEPTEE (test T358 dedie).
+       Ce bloc verifie donc la reprise consciente SANS aucune consigne de forçage. *)
     FB(Enable := FALSE, Mode := E_Mode.MAINT_N1, JoystickDeflected := FALSE,
        DeadmanArmed := FALSE, JoystickPush := FALSE, CfgCommissioningEnable := TRUE,
-       CfgForceStepApply := FALSE, SampleCount := SampleCount);
-    FB(Enable := TRUE, Mode := E_Mode.SEMI_AUTO, JoystickDeflected := TRUE,
-       DeadmanArmed := TRUE, JoystickPush := TRUE,
-       CfgForceStepTarget := 19, CfgForceStepApply := TRUE,
        SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepRejected, 'Forçage interdit refuse pendant attente reprise mode');
-    FB(CfgForceStepApply := FALSE, DeadmanArmed := TRUE, JoystickDeflected := TRUE,
-       JoystickPush := TRUE, SampleCount := SampleCount);
+    FB(Enable := TRUE, Mode := E_Mode.SEMI_AUTO, JoystickDeflected := FALSE,
+       DeadmanArmed := FALSE, JoystickPush := FALSE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING,
+                'Etape X4 memorisee : attente de reprise consciente');
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
-                 'Y- seul reste neutre apres rejet : reprise mode toujours armee');
+                 'Retour en SEMI_AUTO sans geste : aucune remise en mouvement');
     FB(DeadmanArmed := FALSE, JoystickDeflected := FALSE, JoystickPush := FALSE,
        StartCycle := TRUE, SampleCount := SampleCount);
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
@@ -1593,7 +1616,11 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX18_DONE_SYNC, 'X13 observe : cycle termine');
     ASSERT_TRUE(FB.Lifecycle.Done, 'X13 : Lifecycle.Done=TRUE');
     ASSERT_EQ(FB.SampleCount, 1, 'X13 : SampleCount incremente UNE fois (1er cycle)');
-    ASSERT_TRUE(FB.LastCycleDuration > T#0s, 'X13 : duree du cycle figee (> 0) - chronometre');
+    ASSERT_TRUE((FB.LastCycleDuration_Min > 0) OR (FB.LastCycleDuration_S > 0),
+                'X13 : duree du cycle figee (> 0) - chronometre min/sec (T347)');
+    ASSERT_TRUE((FB.LastCycleDuration_Min = FB.CurrentCycleElapsed_Min)
+                AND (FB.LastCycleDuration_S = FB.CurrentCycleElapsed_S),
+                'X13 : paire min/sec figee depuis le chrono courant (T347)');
 
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Call 24 : X13 2e scan, garde anti-double *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -1665,14 +1692,14 @@ TEST 'TC-P04-034 T299 : journalier ET totalisateur incrementes au MEME evenement
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_CloseReached := FALSE,
        Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        RepositionRequest := FALSE, SkipDrainRequest := FALSE, CfgDrainTime := T#0s,
-       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 16, CfgForceStepApply := FALSE,
+       CfgCommissioningEnable := TRUE,
        CfgCtrlAscentMaxStep := 1, CfgCtrlAscentDistanceM := 2.0,
        CfgSampleCountResetMode := E_CycleSampleCountResetMode.NEVER,
        SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
-    FB(CfgForceStepApply := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
-    ASSERT_TRUE(FB.ForceStepPrepared, 'Etape de vidage preparee au repos');
-    FB(CfgForceStepApply := FALSE, StartCycle := TRUE,
-       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    FB(StepForceTgt := 16, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'Etape de vidage forcee (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
+    FB(StepForceTgt := -1, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
     ASSERT_TRUE(SampleCount = 0, 'Chargement de l etape : journalier non compte');
     ASSERT_TRUE(SampleCountTotal = 4, 'Chargement de l etape : totalisateur inchange');
 
@@ -1886,4 +1913,166 @@ TEST 'TC-P04-040 T299 : mode (b) active EN COURS DE POSTE — aucune RAZ differe
     FB(AbortCycle := FALSE, StartCycle := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
     ASSERT_TRUE(SampleCount = 42, 'Mode (b) active en cours de poste : aucune RAZ differee');
     ASSERT_TRUE(SampleCountTotal = 500, 'Totalisateur inchange par la bascule de mode');
+END_TEST
+
+TEST 'T347-001 : duree de cycle exposee en minutes/secondes entieres (chrono, figeage AX18, RAZ hors cycle)'
+    SampleCount := 0;
+    SampleCountTotal := 0;
+
+    (* Chargement securise de l etape de vidage AX15b au joystick neutre, machine arretee
+       (meme montage que TC-P04-034 : le FB n atteint AX18 qu apres un vidage engage). *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_SpeedStepApplied := 1, M2_SpeedStepApplied := 1,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       JoystickPush := FALSE, JoystickPull := FALSE, JoystickRight := FALSE, JoystickLeft := FALSE,
+       StartCycle := FALSE, AbortCycle := FALSE, ResetSampleCountRequest := FALSE,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := TRUE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_CloseReached := FALSE,
+       Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       RepositionRequest := FALSE, SkipDrainRequest := FALSE, CfgDrainTime := T#0s,
+       CfgCommissioningEnable := TRUE,
+       CfgCtrlAscentMaxStep := 1, CfgCtrlAscentDistanceM := 2.0,
+       CfgSampleCountResetMode := E_CycleSampleCountResetMode.NEVER,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    FB(StepForceTgt := 16, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'T347 : etape de vidage forcee (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
+    FB(StepForceTgt := -1, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+
+    (* Scan de stabilisation n°1 : geste Y- maintenu, fin de vidage PAS encore confirmee -> AX15b
+       maintenue, Lifecycle.Busy passe a TRUE. *)
+    FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN, 'T347 : vidage observe avant bascule AX18');
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T347 : chronometre arme des que Lifecycle.Busy est actif');
+
+    (* Scan de stabilisation n°2 : le chrono interne (TON sur Lifecycle.Busy) demarre sur CE scan
+       (IN passe FALSE->TRUE ici). Sans ce scan, l avance de temps qui suit serait perdue : le TON
+       capturerait son origine APRES l avance et resterait a zero. *)
+    FB(SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+
+    (* 65 s de cycle simulees AVANT l observation de AX18 : la conversion TIME -> min/sec devient
+       discriminante (65 s = 1 minute entiere + 5 secondes ; ni 65 dans un champ unique, ni 65000 ms).
+       ADVANCE_TIME avance l horloge simulee, le TON interne l integre au scan suivant. *)
+    ADVANCE_TIME(65000000000);
+    FB(Benne_Done := TRUE, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN,
+                'T347 : fin de vidage confirmee, bascule AX18 demandee');
+    FB(SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX18_DONE_SYNC, 'T347 : AX18 execute');
+    ASSERT_EQ(FB.CurrentCycleElapsed_Min, 1, 'T347 : chrono 65 s -> 1 minute entiere');
+    ASSERT_EQ(FB.CurrentCycleElapsed_S, 5, 'T347 : chrono 65 s -> 5 secondes (plage 0..59)');
+    ASSERT_EQ(FB.LastCycleDuration_Min, 1, 'T347 : duree figee a AX18 -> minutes');
+    ASSERT_EQ(FB.LastCycleDuration_S, 5, 'T347 : duree figee a AX18 -> secondes');
+
+    (* Scan suivant : le chrono repart de zero (Lifecycle.Busy retombe), la duree figee persiste. *)
+    FB(SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_EQ(FB.CurrentCycleElapsed_Min, 0, 'T347 : chrono remis a zero hors cycle (minutes)');
+    ASSERT_EQ(FB.CurrentCycleElapsed_S, 0, 'T347 : chrono remis a zero hors cycle (secondes)');
+    ASSERT_EQ(FB.LastCycleDuration_Min, 1, 'T347 : duree figee conservee apres retombee de Busy (minutes)');
+    ASSERT_EQ(FB.LastCycleDuration_S, 5, 'T347 : duree figee conservee apres retombee de Busy (secondes)');
+END_TEST
+
+(* ═══════════════════════════════════════════════════════════════════════════════
+   T358 — FORCAGE DE STEP SANS GARDE : saut immediat, consigne acquittee par le FB.
+   Les cas ci-dessous verrouillent le contrat TASK_CONTRACT_T358_FORCESTEP_SANS_GARDE :
+   aucune condition de contexte, plage d'enumeration seule validation, acquittement,
+   meme valeur immediatement re-jouable, et aucun forcage sans ecriture d'operateur.
+   ═══════════════════════════════════════════════════════════════════════════════ *)
+
+TEST 'TC-T358-001 : consigne traitee en un scan, meme valeur re-jouable, aucun rejeu en boucle'
+    (* Consigne 4 : saut immediat, un seul scan, aucune confirmation. *)
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       SampleCount := SampleCount, StepForceTgt := 4);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'Consigne 4 appliquee au scan de l ecriture (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
+
+    (* Scan suivant : le test reproduit l acquittement de PRG_03, puis l etape s execute. *)
+    FB(StepForceTgt := -1, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'AX4 active au scan suivant (T358)');
+
+    (* Scans libres : aucun rejeu automatique, le GRAFCET se comporte normalement.
+       (Un declenchement sur « cible <> etape courante » aurait ramene l etape en boucle.) *)
+    FB(JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.ForceStepAccepted, 'Aucun rejeu automatique du forcage (T358)');
+    FB(SampleCount := SampleCount);
+    ASSERT_FALSE(FB.ForceStepAccepted, 'Aucun rejeu automatique au scan suivant (T358)');
+
+    (* La MEME valeur est re-jouable immediatement : la consigne avait ete acquittee. *)
+    FB(StepForceTgt := 4, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'Meme valeur re-jouable sans valeur intermediaire (T358)');
+END_TEST
+
+TEST 'TC-T358-002 : un defaut DEJA LATCHE ne bloque plus le forcage de step'
+    (* Sequence d etablissement et de latch reprise du test TC-P04-003. *)
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
+       StartCycle := TRUE, SampleCount := SampleCount);
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX1_INIT, 'Etabli en AX1 avant injection');
+    FB(StartCycle := FALSE, WinchSyncError := TRUE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.Fault.Error, 'Defaut LIVE actif');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX_STAB, 'Repli AX_STAB sur defaut live');
+
+    (* La cause disparait : le defaut reste LATCHE (socle defaut inchange par T358). *)
+    FB(WinchSyncError := FALSE, DeadmanArmed := FALSE, JoystickDeflected := FALSE,
+       JoystickPush := FALSE, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.Fault.Error, 'Cause disparue : plus de defaut live');
+    ASSERT_TRUE(FB.Fault.Latched, 'Defaut toujours latche : etat de repli maintenu');
+
+    (* T358 : la garde « NOT Fault.Latched » a ete retiree du forcage — le saut a lieu. *)
+    FB(SampleCount := SampleCount, StepForceTgt := 10);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'Forcage accepte malgre un defaut LATCHE (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
+    FB(StepForceTgt := -1, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET,
+                'AX10 chargee avec un defaut latche : sortie de AX_STAB par forcage (T358)');
+END_TEST
+
+TEST 'TC-T358-003 : sans ecriture d operateur, aucun forcage (sentinelle respectee)'
+    (* Aucune consigne n'est passee : l'entree garde sa sentinelle par defaut (-1). *)
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_FALSE(FB.ForceStepAccepted, 'Aucun forcage sans ecriture operateur (T358)');
+    ASSERT_FALSE(FB.StepForceTgtTaken, 'Aucune consigne vue : PRG_03 n a rien a acquitter (T358)');
+    ASSERT_FALSE(FB.ForceStepRejected, 'Sentinelle = aucune demande : aucun rejet publie');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX0_REPOS, 'Cycle au repos : aucun saut (T358)');
+END_TEST
+
+TEST 'TC-T358-004 : un Abandon du meme scan neutralise la consigne de forcage'
+    (* T358 : l Abandon et l acquittement precedent le bloc de forcage dans l ordre
+       intra-scan — la consigne du MEME scan est neutralisee (arbitrage humain : aucun
+       saut d etape ne peut survivre a un abandon). *)
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       SampleCount := SampleCount, AbortCycle := TRUE, StepForceTgt := 10);
+    ASSERT_FALSE(FB.ForceStepAccepted, 'Consigne neutralisee par l Abandon du meme scan (T358)');
+    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue ce scan : PRG_03 l acquitte (T358)');
+    ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET, 'Aucune etape chargee apres Abandon');
+    FB(AbortCycle := FALSE, StepForceTgt := -1, SampleCount := SampleCount);
+    ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET, 'Aucun saut differe au scan suivant (T358)');
 END_TEST

@@ -30,10 +30,9 @@ STRUCT
     DrainTimeRemaining  : TIME;             // Temps restant en AX13 ; remis a zero hors AX13
     CycleChecksInhibited: BOOL;             // Mode essai : controles procede inhibes
     IgnoredCycleCheckId : WORD;             // Causes procede actives mais ignorees
-    ForceStepPrepared   : BOOL;             // Cible forcee preparee, commandes neutres
-    ForceStepAccepted   : BOOL;             // Impulsion preparation acceptee
-    ForceStepRejected   : BOOL;             // Impulsion preparation refusee
-    ForceStepResult     : STRING(120);      // Motif accepte/refuse
+    ForceStepAccepted   : BOOL;             // Impulsion : consigne de forcage appliquee (saut d'etape effectif)
+    ForceStepRejected   : BOOL;             // Impulsion : consigne ecartee (cible hors plage enum, ou cycle inactif)
+    ForceStepResult     : STRING(120);      // Motif de rejet de la derniere consigne (vide apres une consigne appliquee)
     BottomTouchConfirmed        : BOOL;                    // Fond confirmé (Kobold ou consigne)
     BottomStopByKobold          : BOOL;                    // Fond confirmé par contact Kobold
     BottomStopBySetpoint        : BOOL;                    // Fond confirmé par limite de travail/consigne

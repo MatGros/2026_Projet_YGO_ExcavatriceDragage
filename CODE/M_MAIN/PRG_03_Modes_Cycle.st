@@ -46,6 +46,7 @@ VAR
     CycleSetDepthEffective_M      : REAL; // . [LOC] Consigne cycle bornée avant consommation par FB_CycleSemiAuto
     CycleDrainTimeEffective_S     : INT;  // . [LOC] Consigne egouttage bornee [1..3600] avant conversion IEC TIME
     CycleDrainTimeEffective       : TIME; // . [LOC] Consigne egouttage convertie en TIME pour FB_CycleSemiAuto
+    StepForceTgtCmd               : INT;  // . [LOC] Consigne de forcage lue AVANT l'appel du FB : base du compare-et-efface (acquittement T358, cf. §3)
 END_VAR
 
 VAR CONSTANT
@@ -187,6 +188,12 @@ BottomPositionConfirmed := FALSE;
 // 🕹️ JoystickDeflected = manche défléchi (non centré) — D2
 // ⚠️ Entrées consommées sur les bus publics Data (retard N-1 admis AF-02) :
 
+// 🔧 T358 : la consigne de forcage est lue UNE SEULE FOIS ici, AVANT l'appel. C'est cette
+// valeur-là qui sert de référence au compare-et-efface de l'acquittement (§3) : une écriture
+// d'opérateur arrivée PENDANT le corps du FB n'est donc jamais confondue avec celle qui vient
+// d'être traitée, et n'est jamais effacée.
+StepForceTgtCmd := GVL_IHM.CycleSemiAuto.Cmd.SetForceStepTgt;
+
 instCycleSemiAuto(
     Enable                  := (instModes.Auth.Mode = E_Mode.SEMI_AUTO),
     Reset                   := GVL_IHM.CycleSemiAuto.Cmd.BtnReset OR PRG_07_Supervision.FaultMachineReset_IHM,
@@ -259,8 +266,10 @@ instCycleSemiAuto(
     CfgCommissioningEnable  := GVL_IHM.CycleSemiAuto.Cmd.TglCommissioning,
     CfgCycleChecksInhibit   := GVL_IHM.CycleSemiAuto.Cmd.TglCycleChecksInhibit,
     CfgAutoDiveM2Step5Trial := GVL_IHM.CycleSemiAuto.Cmd.TglAutoDiveM2Step5Trial,
-    CfgForceStepTarget      := GVL_IHM.CycleSemiAuto.Cfg.ForceStepTarget,
-    CfgForceStepApply       := GVL_IHM.CycleSemiAuto.Cmd.BtnForceStepApply,
+    // 🔧 T358 : forcage de step — consigne A UNE VALEUR (champ IHM non persiste,
+    // sentinelle -1). Aucune confirmation, aucune garde : saut d'etape immediat.
+    // La cible n'est JAMAIS une configuration persistee (aucun saut au demarrage).
+    StepForceTgt            := StepForceTgtCmd,
     // Config diving / extraction (GEL 2026-09-03)
     DiveStartMinM           := GVL_IHM.CycleSemiAuto.Cfg.DiveStartMin_M, // altimetrie lancement Kobold (AT4)
     CfgRaiseOffBottomM      := GVL_IHM.CycleSemiAuto.Cfg.RaiseOffBottom_M,   // GEL Q16 : decollement du fond AX8 (reglable IHM)
@@ -280,6 +289,18 @@ instCycleSemiAuto(
     // donc un éventuel retard de tâche d'un scan est sans effet.
     SafetyRearmed          := PRG_06_Outputs.EmergencyDone
 );
+
+// 🔧 T358 : ACQUITTEMENT de la consigne de forcage de step — COMPARE-ET-EFFACE.
+// Le FB signale qu'une consigne etait PRESENTE au scan (StepForceTgtTaken). La consigne n'est
+// ramenee a sa sentinelle -1 que si le champ porte ENCORE EXACTEMENT la valeur que le FB vient
+// de traiter (StepForceTgtCmd). Sans cet acquittement la meme valeur serait rejouee a chaque
+// scan (boucle) ; avec le compare-et-efface, la MEME valeur redevient immediatement jouable ET
+// une ecriture d'operateur arrivee pendant le corps du FB n'est JAMAIS effacee : elle n'a
+// simplement pas ete vue ce scan, et sera traitee au scan suivant. Invariant verrouille par G517.
+IF instCycleSemiAuto.StepForceTgtTaken
+   AND (GVL_IHM.CycleSemiAuto.Cmd.SetForceStepTgt = StepForceTgtCmd) THEN
+    GVL_IHM.CycleSemiAuto.Cmd.SetForceStepTgt := -1;
+END_IF;
 
 {endregion}
 
@@ -363,7 +384,6 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.DrainTimeRemaining     := instCycleSemiAuto.DrainTimeRemaining;
     Data.SequenceState.CycleChecksInhibited   := instCycleSemiAuto.CycleChecksInhibited;
     Data.SequenceState.IgnoredCycleCheckId    := instCycleSemiAuto.IgnoredCycleCheckId;
-    Data.SequenceState.ForceStepPrepared      := instCycleSemiAuto.ForceStepPrepared;
     Data.SequenceState.ForceStepAccepted      := instCycleSemiAuto.ForceStepAccepted;
     Data.SequenceState.ForceStepRejected      := instCycleSemiAuto.ForceStepRejected;
     Data.SequenceState.ForceStepResult        := instCycleSemiAuto.ForceStepResult;
@@ -464,7 +484,6 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.DrainTimeRemaining     := T#0s;
     Data.SequenceState.CycleChecksInhibited   := FALSE;
     Data.SequenceState.IgnoredCycleCheckId    := 0;
-    Data.SequenceState.ForceStepPrepared      := FALSE;
     Data.SequenceState.ForceStepAccepted      := FALSE;
     Data.SequenceState.ForceStepRejected      := FALSE;
     Data.SequenceState.ForceStepResult        := '';
@@ -540,7 +559,6 @@ ELSE
     Data.SequenceState.DrainTimeRemaining      := T#0s;
     Data.SequenceState.CycleChecksInhibited    := FALSE;
     Data.SequenceState.IgnoredCycleCheckId     := 0;
-    Data.SequenceState.ForceStepPrepared       := FALSE;
     Data.SequenceState.ForceStepAccepted       := FALSE;
     Data.SequenceState.ForceStepRejected       := FALSE;
     Data.SequenceState.ForceStepResult         := '';

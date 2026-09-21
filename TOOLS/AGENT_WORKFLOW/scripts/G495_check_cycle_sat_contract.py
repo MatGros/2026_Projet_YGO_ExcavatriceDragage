@@ -29,11 +29,12 @@ required_cycle = {
     "mode essai visible": "CycleChecksInhibited",
     "mode essai borne semi-auto": "CycleChecksInhibited := CfgCycleChecksInhibit AND (Mode = E_Mode.SEMI_AUTO)",
     "fin egouttage autonome": "IF DrainingTimer.Q OR SkipDrainEdge.Q THEN",
-    "forcage prepare": "ForceStepPrepared",
-    "cible candidate non publiee": "ForceStepCandidate",
+    "forcage par consigne unique": "StepForceTgt",
+    "table numero vers etape": "ForceStepCandidate",
     "etape attente 21 explicite": "21: ForceStepCandidate := E_AutoCycleStep.AX3_WAIT_DIVE_START",
-    "etape terminale refusee": "(CfgForceStepTarget <> 18) AND (CfgForceStepTarget <> 19)",
-    "attente forcage distinguee": "ForceStepWaiting",
+    "etape de repli AX_STAB forcibly atteignable": "19: ForceStepCandidate := E_AutoCycleStep.AX_STAB",
+    "impulsion d acquittement de la consigne": "StepForceTgtTaken := (StepForceTgt <> CST_StepForceNone)",
+    "table de conversion sans trou": "ForceStepCandidateValid := TRUE",
 }
 errors = [name for name, token in required_cycle.items() if token not in CYCLE]
 
@@ -86,9 +87,22 @@ for token, source, label in (
 for token, label in (
     ("BottomTouchConfirmed   := instCycleSemiAuto.BottomTouched", "fond qualifie non publie"),
     ("Data.SequenceState.CycleChecksInhibited   := FALSE", "neutralisation etat essai hors semi-auto"),
-    ("Data.SequenceState.ForceStepPrepared      := FALSE", "neutralisation forcage hors semi-auto"),
+    ("Data.SequenceState.ForceStepAccepted      := FALSE", "neutralisation forcage hors semi-auto"),
 ):
     if token not in PRG03:
+        errors.append(label)
+
+# 🔧 T358 — invariants du forçage de step simplifie : le mecanisme a deux temps
+# (preparation puis confirmation par Start) et ses gardes de contexte ne doivent
+# JAMAIS revenir par effet de bord. L'enveloppe complete est portee par G517 ; ici
+# on verrouille l'absence des symboles supprimes dans le sequenceur et son cablage.
+for forbidden, label in (
+    ("ForceStepPrepared", "mecanisme de forcage a deux temps reintroduit (preparation)"),
+    ("ForceStepWaiting", "mecanisme de forcage a deux temps reintroduit (attente)"),
+    ("BottomContextValid", "garde de contexte fond reintroduite dans le forcage"),
+    ("CfgForceStepApply", "impulsion de bouton de forcage reintroduite"),
+):
+    if forbidden in CYCLE or forbidden in PRG03:
         errors.append(label)
 
 # REX terrain AX7 : le basculement AX_STAB fait retomber les causes contextuelles

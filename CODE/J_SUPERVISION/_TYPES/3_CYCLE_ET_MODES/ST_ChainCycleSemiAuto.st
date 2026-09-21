@@ -28,8 +28,10 @@ STRUCT
     Idx218_FaultLatchedId            : WORD; // Bitfield fige a l'apparition du defaut latche
     Idx219_CycleChecksInhibited       : BOOL; // 1 = controles procede inhibes, protections actives
     Idx220_IgnoredCycleCheckId        : WORD; // Causes procede actives mais ignorees
-    Idx221_ForceStepPrepared          : BOOL; // 1 = cible preparee, commandes neutres
-    Idx222_ForceStepResult            : STRING(120); // Motif accepte/refuse du forçage
+    // ⚠️ Idx221 (ForceStepPrepared) SUPPRIME par T358 : le mecanisme a deux temps du
+    //    forcage de step n'existe plus (saut immediat sans preparation). L'index reste
+    //    VACANT pour ne renumeroter aucun tag IHM de la chaine de depannage.
+    Idx222_ForceStepResult            : STRING(120); // Motif de rejet de la derniere consigne de forcage (T358)
     Idx206_Step                      : E_AutoCycleStep; // Étape courante (X0 à X13 + AX_STAB)
     Idx207_StepStr                   : STRING(80);  // Libellé explicite de l'étape
     Idx208_StepAtError               : E_AutoCycleStep; // Étape mémorisée lors du dernier défaut
