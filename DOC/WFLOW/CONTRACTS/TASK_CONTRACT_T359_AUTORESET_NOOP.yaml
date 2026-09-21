@@ -1,0 +1,174 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T359 (parent T278) — Excavatrice Dragage
+# Auto-acquittement borne : le pulse ResetTransient est-il operable ?
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T359_AUTORESET_NOOP
+  criticality: C3
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Trancher PAR PREUVE si l'impulsion d'auto-acquittement borne (ResetTransient, produite par
+    FB_AutoResetTransientDiag) peut avoir un effet sur les diagnostics reseau, puis corriger la
+    cause du no-op la ou elle produit un effet visible pour l'operateur. Le besoin client d'origine
+    (mail GCAM : masquer les alarmes parasites au demarrage et au rearmement, sans acquittement
+    manuel repete) reste NON TENU aujourd'hui, meme apres l'activation des autorisations.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        Un test CI execute mesure que, sur une perte de liaison suivie du retour de la liaison,
+        la valeur de fin de scan de ErrorId est identique que l'impulsion ResetTransient soit
+        active ou non, equipement par equipement.
+      verified_by: >
+        TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_diag_ethercat.st, cas TC-T359-001,
+        execute par python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Diag_Ethercat
+    - id: AC2
+      statement: >
+        Un test CI execute mesure le meme resultat au cadrage de production, c'est-a-dire avec
+        l'impulsion emise une seconde apres le retour de liaison, et non au scan du retour.
+      verified_by: "Cas TC-T359-002 du meme fichier, meme commande"
+    - id: AC3
+      statement: >
+        Un test CI execute etablit qu'il n'existe aucun scan ou l'equipement est en ligne alors que
+        son bit de perte de liaison est encore pose, ce qui rend la voie alternative au front de
+        Online sans prise sur le bit.
+      verified_by: "Cas TC-T359-003 du meme fichier, meme commande"
+    - id: AC4
+      statement: >
+        Le test CI observe reellement le bit de perte de liaison a l'etat pose pendant la coupure,
+        puis a l'etat efface sans impulsion apres le retour, ce qui rend la mesure non vacue.
+      verified_by: "Assertions sur 16#0010 a la coupure et 16#0000 au retour, cas TC-T359-001"
+    - id: AC5
+      statement: >
+        La cible du correctif est arbitree par l'humain parmi les options prouvees operables, et
+        aucun fichier CODE/ n'est ecrit avant cet arbitrage.
+      verified_by: "Etat de git status sur CODE/ colle en restitution, plus la decision consignee dans TASK_LOCKS.json"
+    - id: AC6
+      statement: >
+        Aucune ligne des chaines de securite n'est modifiee par ce lot : chaine AU, securites
+        mouvement, codeurs de securite, contacteurs et freins restent hors perimetre.
+      verified_by: "git diff --stat sur CODE/ colle en restitution, restreint aux fichiers autorises"
+    - id: AC7
+      statement: >
+        Le nom de fichier est identique au nom de POU pour tout fichier de programme modifie.
+      verified_by: "Gate G310 plus presence de l'objet correspondant dans le bundle PLCopenXML"
+    - id: AC8
+      statement: >
+        Le suffixe ST est egal au langage genere dans le bundle PLCopenXML pour les fichiers modifiees.
+      verified_by: "Gate G310 plus lecture de l'objet dans CODE_XML/CODE_Bundle.xml"
+    - id: AC9
+      statement: >
+        Un test CI execute mesure qu'une perte de liaison reseau survenue pendant la fenetre
+        transitoire de rearmement puissance ne produit AUCUNE alarme au carrousel du bandeau.
+      verified_by: >
+        TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/tests/test_fb_hmi_bannerformatter.st, cas TC-T359-004,
+        execute par python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Hmi_BannerFormatter.
+        Cas ROUGE sur l'etat avant correctif, VERT apres : la preuve precede le correctif.
+    - id: AC10
+      statement: >
+        Le masquage est borne : un defaut reseau encore present a la fin de la fenetre transitoire
+        est affiche de nouveau, avec son libelle de bus, ce qui interdit un masquage silencieux.
+      verified_by: "Cas TC-T359-005 du meme fichier, vert avant et apres correctif"
+    - id: AC11
+      statement: >
+        La cause de securite AU reste prioritaire et n'est jamais masquee par le masquage reseau.
+      verified_by: "Cas TC-T359-006 du meme fichier, plus les 22 autres cas du fichier dont l'etat est inchange"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_diag_ethercat.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_diag_canopen.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/tests/test_fb_hmi_bannerformatter.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T359_AUTORESET_NOOP.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/B_AU_SECURITE/
+      - CODE/E_CODEURS/
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/C_DIAG_RESEAUX/FB_AutoResetTransientDiag.st
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Les gardes de securite internes de FB_AutoResetTransientDiag : SafeCommon, EmergencyChainClosed, PowerCutOffActive, MotionActive"
+      - "Le reset operateur sur front, voie distincte du reset transitoire"
+      - "L'acquittement operateur obligatoire de la chaine AU et des defauts de securite : ils ne sont jamais auto-acquittes"
+      - "L'effacement automatique des bits de liaison quand l'equipement revient RUNNING : comportement existant, non remis en cause par ce lot"
+    dropped_on_purpose:
+      - "Aucun comportement abandonne : ce lot ne modifie aucun fichier CODE/ avant l'arbitrage humain de la cible du correctif"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - ci_test_isole
+    - git_status_CODE
+    - diagnostic_cible
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout probleme constate en cours de route est remonte IMMEDIATEMENT. Signaler n'est pas elargir
+    le scope. Deux constats sont deja escalades : l'effacement automatique des bits de liaison
+    (FB_Diag_Ethercat.st:131/141/151, FB_Diag_CanOpen.st:100/109) est PREEXISTANT a T278, et
+    l'alarme reellement vue par l'operateur ne provient pas de ces bits mais du bandeau
+    (FB_Hmi_BannerFormatter.st:197-207, Operational plus une tenue de 1,5 s), qu'aucun reset ne
+    peut atteindre.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "DSH22"
+  completed_at: "2026-09-21T04:05:00+02:00"
+  status: ALERT_RAISED
+  summary: >
+    PHASE PREUVE : trois tests CI executables (TC-T359-001 a 003) etablissent que l'impulsion
+    ResetTransient ne modifie pas ErrorId de fin de scan — ordre de scan defavorable (bloc reset
+    103-119 avant l'effacement automatique 131/141/151), effacement automatique PREEXISTANT a T278
+    (git show cb5ae5ea), et absence de tout scan ou l'equipement est en ligne avec son bit encore
+    pose. La voie « declencher sur front Online » est donc sans prise sur le bit.
+    PHASE CORRECTIF (option O1 arbitree par l'humain) : les defauts reseau et modules E/S du bandeau
+    ne sont plus releves pendant les phases ou l'absence de bus est ATTENDUE — garde de demarrage
+    existante (4 s) plus une nouvelle fenetre transitoire bornee de 4 s ouverte sur le front du
+    contacteur de puissance. Un seul point d'application : les 11 entrees de filtrage passent de
+    TonBootInhibit.Q a NetworkSurveillanceActive ; la chaine AU, les securites et les defauts metier
+    ne traversent pas ce point et ne sont donc jamais masques.
+  evidence_submitted:
+    - "preuve avant correctif: TC-T359-004 ROUGE sur l'etat initial (HASALARM attendu FALSE, obtenu TRUE)"
+    - "apres correctif: TC-T359-004 VERT ; TC-T359-005 (borne) et TC-T359-006 (garde safety) VERT avant et apres"
+    - "ci_test_isole: 23/27 FB_Hmi_BannerFormatter (22/27 avant, +1 exactement le cas cible) ; FB_Diag_Ethercat 7/7"
+    - "non-regression: les 4 echecs TC-P07-006/008/020/031 sont INCHANGES avant et apres, et le diff de test est purement additif (109 insertions, 0 suppression)"
+    - "linkage: G200 PASS 0 erreur"
+    - "bundle: 261/261 objets, 0 erreur ; diff bundle sur le seul fichier CODE/ touche"
+
+validation:
+  status: PENDING
+  validated_by: "HUM"
+  validated_at: ""
+  notes: >
+    Recette CODESYS humaine requise : import du bundle et observation du bandeau pendant un
+    rearmerement puissance reel (la cascade d'alarmes reseau doit disparaitre) puis verification
+    qu'un defaut de bus PERSISTANT reste affiche. Aucun commit sans accord explicite. Deux points
+    restent ouverts et signales : (a) les 4 cas de test du bandeau deja ROUGES avant ce lot
+    (TC-P07-006/008/020/031) sont une dette preexistante non traitee ici ; (b) le pulse
+    ResetTransient reste sans effet observable, le correctif livre agissant sur l'affichage et non
+    sur le bit — le cablage des sorties du FB d'auto-reset vers le bandeau reste une option
+    ulterieure, hors perimetre car elle touche PRG_02/PRG_07 et l'interface IHM (AF-07).
