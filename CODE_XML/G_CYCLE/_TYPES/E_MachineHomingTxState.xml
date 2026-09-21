@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T19:02:48.976346" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T19:02:48.976346">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T05:45:40.993666" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T05:45:40.993666">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -28,16 +28,14 @@
           <enum>
             <values>
               <value name="HX0_REPOS" value="0" />
-              <value name="HX1_CHOICE" value="1" />
-              <value name="HX2_CLIMB" value="2" />
-              <value name="HX2N_NEUTRAL" value="3" />
-              <value name="HX3_HOME_AXES" value="4" />
-              <value name="HX3N_PAUSE" value="5" />
-              <value name="HX4_BUCKET_ADJUST" value="6" />
-              <value name="HX5_BUCKET_COMMIT" value="7" />
-              <value name="HX6_HOMED" value="8" />
-              <value name="HXF_FAILED" value="9" />
-              <value name="HX7_LOCKED_REFERENCE" value="10" />
+              <value name="HX1_BUCKET_PREPARE" value="1" />
+              <value name="HX1A_COUPLING_INTERLOCK" value="2" />
+              <value name="HX2_CLIMB_COUPLED" value="3" />
+              <value name="HX3_FLYING_REFERENCE" value="4" />
+              <value name="HX4_STABILIZATION_CHECK" value="5" />
+              <value name="HX5_RELEASE_CLEARANCE" value="6" />
+              <value name="HX6_HOMED_SUCCESS" value="7" />
+              <value name="HX7_FAILED" value="8" />
             </values>
           </enum>
         </baseType>
@@ -47,72 +45,55 @@
               <EnumValue>
                 <Name>HX0_REPOS</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape initiale pure : aucune action, aucune affectation</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape initiale pure : repos, aucune action</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>HX1_CHOICE</Name>
+                <Name>HX1_BUCKET_PREPARE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Annonce + choix operateur : aucun mouvement</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne palier 1 sous FDC off, timer 8s, bouton IHM dedie</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>HX2_CLIMB</Name>
+                <Name>HX1A_COUPLING_INTERLOCK</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Chemin A : montee couplee M1+M2 palier 1 jusqu au capteur haut</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bascule WinchSel=0, FDC benne reactive, interlock couplage bloquant</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>HX2N_NEUTRAL</Name>
+                <Name>HX2_CLIMB_COUPLED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret + inversion de sens (tire -&gt; pousse) : mouvement nul obligatoire</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montee couplee M1+M2 palier 1 MAX vers capteur haut</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>HX3_HOME_AXES</Name>
+                <Name>HX3_FLYING_REFERENCE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing axes M1+M2 au vol sur front descendant capteur, puis descente couplee</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prise de reference a la volee M1+M2 sur position de config persistante (8.5m)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>HX3N_PAUSE</Name>
+                <Name>HX4_STABILIZATION_CHECK</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret avant benne : mouvement nul, retour joystick au neutre</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret mecanique, controle inertie [8.50..8.80m], max 3 retries</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>HX4_BUCKET_ADJUST</Name>
+                <Name>HX5_RELEASE_CLEARANCE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ajustement benne palier 1 sans FDC soft, 2 sens autorises</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Degagement zone haute, verification neutre joystick</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>HX5_BUCKET_COMMIT</Name>
+                <Name>HX6_HOMED_SUCCESS</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Commit atomique etat benne fermee (CommitClose)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Machine qualifiee : MachineHomed := TRUE, commit atomique benne</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>HX6_HOMED</Name>
+                <Name>HX7_FAILED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Machine referencee : MachineHomed := TRUE (fugace)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HXF_FAILED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement incomplet : rester en N2 et recommencer</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HX7_LOCKED_REFERENCE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape verrouillee : montee vers le capteur haut puis referencement A L ARRET.
-                                  Sorties admises (toutes conscientes) : front Reset, defaut latche, abandon sur
-                                  violation detectee (descente commandee, garde de montee ecoulee, erreur codeur,
-                                  mouvement hors phase), et forcage de step de mise en service. AUCUNE sortie ne
-                                  pose de reference. La valeur 10 est ajoutee APRES HXF pour ne renumeroter
-                                  aucun etat existant.</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Echec sequence unifie : Reset conscient requis en MAINT_N2</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

@@ -25,6 +25,9 @@ STRUCT
     CfgTimeoutClimb      : TIME := T#300s; // Garde de montee au capteur haut (0 = pas de garde)
     // Garde de descente HX3 : meme regle (budget de DESCENTE CONTINUE).
     CfgTimeoutHomeAxes   : TIME := T#60s;  // Garde de descente jusqu'au front descendant capteur (0 = pas de garde)
+    CfgTimeoutBucketClose: TIME := T#8s;   // Garde maximale fermeture benne en HX1 sans FDC logiciel
+    CfgStabilizationMinM : REAL := 8.50;   // Seuil bas d'inertie stabilisée après référence (m) - HX4
+    CfgStabilizationMaxM : REAL := 8.80;   // Seuil haut d'inertie stabilisée après référence (m) - HX4
     Initialized          : BOOL := FALSE;  // Drapeau de restauration config au boot (pont persistant)
 END_STRUCT
 END_TYPE
