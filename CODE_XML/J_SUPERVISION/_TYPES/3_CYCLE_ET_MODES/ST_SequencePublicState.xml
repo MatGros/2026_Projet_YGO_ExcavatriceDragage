@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T22:17:31.178778" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T22:17:31.178778">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T00:59:23.769285" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T00:59:23.769285">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -218,20 +218,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Causes procede actives mais ignorees</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceStepPrepared">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible forcee preparee, commandes neutres</xhtml>
-              </documentation>
-            </variable>
             <variable name="ForceStepAccepted">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion preparation acceptee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion : consigne de forcage appliquee (saut d'etape effectif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepRejected">
@@ -239,7 +231,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion preparation refusee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion : consigne ecartee (cible hors plage enum, ou cycle inactif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepResult">
@@ -247,7 +239,7 @@
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Motif accepte/refuse</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Motif de rejet de la derniere consigne (vide apres une consigne appliquee)</xhtml>
               </documentation>
             </variable>
             <variable name="BottomTouchConfirmed">

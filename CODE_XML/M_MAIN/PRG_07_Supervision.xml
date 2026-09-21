@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T23:25:27.127745" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T23:25:27.127745">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T00:59:38.422935" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T00:59:38.422935">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -312,7 +312,7 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=AX0 .. 20=AX_DIVING_RETRY), borné côté FB</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 RESERVE / INERTE depuis T358 — PLUS AUCUN LECTEUR : la cible de forcage est portee par ST_CycleCmd.SetForceStepTgt (zone non persistee). Champ conserve A SA PLACE pour ne pas decaler le mapping RETAIN positionnel des champs suivants (regle : jamais d'insertion ni de retrait au milieu) ; sa suppression releve d'un lot de migration de persistance dedie. L'IHM ne doit PLUS exposer de champ de saisie sur ce tag.</xhtml>
               </documentation>
             </variable>
             <variable name="DiveStartMin_M">
@@ -8555,7 +8555,6 @@ GVL_IHM.CycleSemiAuto.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.Se
 GVL_IHM.CycleSemiAuto.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
 GVL_IHM.CycleSemiAuto.State.CycleChecksInhibited   := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited;
 GVL_IHM.CycleSemiAuto.State.IgnoredCycleCheckId    := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId;
-GVL_IHM.CycleSemiAuto.State.ForceStepPrepared      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared;
 GVL_IHM.CycleSemiAuto.State.ForceStepAccepted      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepAccepted;
 GVL_IHM.CycleSemiAuto.State.ForceStepRejected      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepRejected;
 GVL_IHM.CycleSemiAuto.State.ForceStepResult        := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepResult;
@@ -8755,7 +8754,6 @@ instTroubleshootingView(
     CycleM2SpeedStepAtFault := PRG_03_Modes_Cycle.Data.SequenceState.M2SpeedStepAtFault,
     CycleChecksInhibited := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
     CycleIgnoredCheckId  := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId,
-    CycleForceStepPrepared := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared,
     CycleForceStepResult := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepResult,
     CycleStep            := PRG_03_Modes_Cycle.Data.SequenceState.Step,
     CycleStepStr         := PRG_03_Modes_Cycle.Data.SequenceState.StepStr,
@@ -12790,20 +12788,12 @@ Prev := Hmi;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Contrôles procédé ignorés</xhtml>
               </documentation>
             </variable>
-            <variable name="CycleForceStepPrepared">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Step préparé, commandes neutres</xhtml>
-              </documentation>
-            </variable>
             <variable name="CycleForceStepResult">
               <type>
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Motif forçage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Motif de rejet de la consigne de forcage de step (T358)</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStep">
@@ -13644,7 +13634,6 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx217_FaultLatched               := CycleFa
 GVL_Troubleshooting.G_CycleSemiAuto.Idx218_FaultLatchedId             := CycleFaultLatchedId;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx219_CycleChecksInhibited       := CycleChecksInhibited;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx220_IgnoredCycleCheckId        := CycleIgnoredCheckId;
-GVL_Troubleshooting.G_CycleSemiAuto.Idx221_ForceStepPrepared          := CycleForceStepPrepared;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx222_ForceStepResult            := CycleForceStepResult;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step                      := CycleStep;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;

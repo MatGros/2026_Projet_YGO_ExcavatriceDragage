@@ -85,7 +85,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 698,
+        "line": 721,
         "message": "Etabli en AX4_DESCEND_DIVING"
       }
     },
@@ -96,7 +96,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 846,
+        "line": 869,
         "message": "Etabli en AX4_DESCEND_DIVING"
       }
     },
@@ -107,7 +107,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 934,
+        "line": 957,
         "message": "Etabli en X4"
       }
     },
@@ -118,7 +118,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 1025,
+        "line": 1048,
         "message": "Etabli en X4"
       }
     },
@@ -133,7 +133,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.TRANSLATIONCMD.REQSTART expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 1194,
+        "line": 1217,
         "message": "X2 : translation vers cible commandee"
       }
     },
@@ -168,11 +168,27 @@
     {
       "name": "T347-001 : duree de cycle exposee en minutes/secondes entieres (chrono, figeage AX18, RAZ hors cycle)",
       "passed": true
+    },
+    {
+      "name": "TC-T358-001 : consigne traitee en un scan, meme valeur re-jouable, aucun rejeu en boucle",
+      "passed": true
+    },
+    {
+      "name": "TC-T358-002 : un defaut DEJA LATCHE ne bloque plus le forcage de step",
+      "passed": true
+    },
+    {
+      "name": "TC-T358-003 : sans ecriture d operateur, aucun forcage (sentinelle respectee)",
+      "passed": true
+    },
+    {
+      "name": "TC-T358-004 : un Abandon du meme scan neutralise la consigne de forcage",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 33,
-    "passed": 28,
+    "total": 37,
+    "passed": 32,
     "failed": 5
   }
 }

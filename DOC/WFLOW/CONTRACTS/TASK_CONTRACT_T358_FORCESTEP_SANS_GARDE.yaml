@@ -1,0 +1,322 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T358 « Forcage de step : saut immediat, sans garde »
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# Origine    : DOC/WFLOW/CONTRACTS/BRIEF_T358_FORCESTEP_SIMPLIFICATION_SANS_GARDE.md
+#              (lecture seule ; preambule subagent_preamble.md APPLIQUE par le porteur)
+# Criticite  : C4 — modification directe d'une fonction de COMMANDE de cycle
+#              (saut d'etape du Grafcet semi-auto) sans garde de contexte.
+# ═══════════════════════════════════════════════════════════════════════════
+# ARBITRAGES HUMAINS (2026-09-21, recus AVANT code) :
+#   D2 -> 1 : la cible de forcage quitte la zone PERSISTEE (Cfg) : une valeur
+#             oubliee d'une session precedente ne doit JAMAIS provoquer un saut
+#             automatique au demarrage. Cible portee par la zone Cmd (non persistee).
+#   D3 -> 1 : le forcage est applique APRES la porte §2 du FB (Enable /
+#             PowerContactorEngaged / EncoderFaultPresent), sans y toucher :
+#             la chaine AU et les securites independantes restent intactes (§7 du
+#             brief). Consequence ASSUMEE et documentee : le forcage reste
+#             impossible hors SEMI_AUTO / sous AU coupee / codeur en defaut.
+#   D4 -> 1 : WaitingResume est CONSERVE (il porte la reprise consciente apres
+#             bascule de mode, fonction distincte du forcage) ; seuls
+#             ForceStepPrepared / ForceStepWaiting sont retires.
+#   D5 -> 3/3 : BottomContextValid (devenue write-only) est SUPPRIMEE ; 18 et 19
+#             deviennent forcables (valeurs d'enum valides) ; ForceStepRejected /
+#             ForceStepResult sont CONSERVES comme diagnostic de plage.
+#   D1 (mecanique de la variable unique) : NON REPONDU par l'humain -> option B
+#             appliquee par defaut (mecanique conforme projet, UX identique sans
+#             bouton). Justification et cout de bascule en note d'application.
+# RISQUE SIGNALE ET ASSUME (rappel du brief) : forcer une fermeture benne ou une
+#   remontee chargee peut se faire sans reference terrain valide. La protection
+#   d'acces (mot de passe / niveau utilisateur) est HORS PERIMETRE de ce lot.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T358_FORCESTEP_SANS_GARDE
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Remplacer le mecanisme de forcage d'etape du cycle semi-automatique (deux temps :
+    preparation puis confirmation par Start joystick neutre, entouree de quatre
+    conditions de contexte) par une commande A UNE VALEUR : l'operateur ecrit le
+    numero d'etape cible dans un champ IHM non persiste, le FB remplace l'etape
+    courante au prochain scan sans aucune condition de contexte ni confirmation,
+    puis acquitte la consigne en la ramenant a sa sentinelle. La seule validation
+    restante est la plage des valeurs de l'enumeration E_AutoCycleStep (0..22) :
+    une valeur hors plage est rejetee sans effet ni plantage du FB, et son motif est
+    publie dans ForceStepResult. Le FB reste
+    inerte hors SEMI_AUTO, sous AU coupee ou avec codeur en defaut (porte §2
+    intacte), la reprise consciente apres bascule de mode est preservee, et aucun
+    mouvement n'est cree par le forcage lui-meme : les gestes homme-mort plus
+    joystick restent obligatoires dans chaque etape.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Une consigne de forcage ecrite alors que le cycle est actif fait basculer
+        l'etape active du FB sur l'etape ciblee au scan suivant, SANS aucune
+        confirmation par StartCycle, SANS homme-mort, SANS joystick neutre, SANS
+        condition d'immersion Kobold ni de contexte fond, et meme si un defaut est
+        deja latche. Le scan du forcage n'emet AUCUNE commande d'actionneur
+        (toutes les demandes sont ramenees a zero), l'etape ciblee s'execute au
+        scan d'apres, et CycleStep publie l'etape forcee des le scan du forcage.
+      verified_by: >
+        Test CI isole sur FB_CycleSemiAuto (nouveau cas T358) : consigne ecrite au
+        scan n, assertion CycleStep = etape ciblee et aucune demande non nulle au
+        scan n, assertion CycleStep = etape ciblee et demandes de l'etape cible au
+        scan n+1 ; puis rejeu du meme scenario avec Fault.Latched = TRUE injecte
+        avant la consigne et assertion que le saut a bien lieu.
+
+    - id: AC2
+      statement: >
+        La consigne est ACQUITTEE par PRG_03 sur l'impulsion du FB (StepForceTgtTaken),
+        par COMPARE-ET-EFFACE : le champ IHM n'est ramene a sa sentinelle que s'il porte
+        encore exactement la valeur lue avant l'appel du FB. Le FB n'ecrit jamais la
+        consigne. Cet acquittement rend le meme numero d'etape immediatement re-jouable
+        sans valeur intermediaire, interdit tout rejeu automatique en boucle, et ne peut
+        jamais effacer une ecriture d'operateur arrivee pendant le corps du FB.
+      verified_by: >
+        Gate statique G517 : presence des deux ancres de l'acquittement compare-et-efface
+        dans PRG_03 (lecture unique avant l'appel du FB et effacement conditionne a
+        l'egalite avec la valeur lue) plus interdiction de toute ecriture de la consigne
+        par le FB. Test CI : une consigne ecrite declenche le saut et la consigne est vue
+        (StepForceTgtTaken) ; trois scans supplementaires sans ecriture n'entrainent aucun
+        rejeu (l'etape ne revient pas sur elle-meme) ; une seconde ecriture de la MEME
+        valeur declenche a nouveau un saut.
+
+    - id: AC3
+      statement: >
+        Aucun saut d'etape ne peut se produire sans une ecriture d'operateur : au
+        premier scan du FB, la consigne est a sa sentinelle, aucun forcage n'est
+        applique, et une valeur de consigne presente alors que le cycle est inactif
+        (hors SEMI_AUTO, AU coupee ou codeur en defaut) est ecartee par
+        l'acquittement du FB, avec un motif publie, sans etre honoree plus tard a
+        la reactivation du cycle.
+      verified_by: >
+        Test CI : premier scan avec consigne a la sentinelle et assertion
+        CycleStep = AX0_REPOS et aucun forcage ; second cas avec une consigne
+        ecrite alors que Mode n'est pas SEMI_AUTO, assertion que la consigne est
+        ramenee a la sentinelle, que le motif est publie et que l'etape n'a pas
+        change ; puis passage en SEMI_AUTO et assertion qu'aucun saut differe ne se
+        produit.
+
+    - id: AC4
+      statement: >
+        Le forcage est applique APRES la porte §2 du FB : les lignes du bloc de
+        forcage sont situees apres le RETURN de la porte qui neutralise le cycle
+        sans Enable, sans PowerContactorEngaged ou avec EncoderFaultPresent, et
+        cette porte est inchangee.
+      verified_by: >
+        Gate statique nouveau (G517) : comparaison des numeros de ligne du bloc de
+        forcage et du RETURN de la porte §2 dans FB_CycleSemiAuto.st, plus
+        assertion de la presence litterale de la condition de porte.
+
+    - id: AC5
+      statement: >
+        Le bloc de forcage ne contient plus AUCUNE des gardes de contexte retirees :
+        mode SEMI_AUTO, etat latche du defaut, deflection du joystick, arret
+        mecanique des treuils, qualification d'immersion Kobold et validite du
+        contexte fond n'y apparaissent plus, et seuls l'etape FAULT du Grafcet et
+        la porte §2 conservent leur priorite.
+      verified_by: >
+        Gate statique G517 : extraction textuelle du bloc de forcage entre ses deux
+        ancres de commentaire et recherche des six motifs interdits dans ce seul
+        bloc ; plus grep de non-regression sur les usages conserves de
+        KoboldImmersionQualified et Fault.Latched hors du bloc.
+
+    - id: AC6
+      statement: >
+        La reprise consciente apres bascule de mode est preservee a l'identique :
+        WaitingResume reste ecrit sur changement d'etape vers un mode non
+        semi-automatique, reste consomme par la reprise sur StartCycle ou
+        homme-mort, et le mecanisme a deux temps du forcage a disparu du FB comme
+        de toute la chaine IHM.
+      verified_by: >
+        Gate statique G517 : presence des ancres de la reprise consciente et
+        absence de ForceStepPrepared et ForceStepWaiting dans tout CODE et dans les
+        DUT IHM ; test CI existant de reprise apres bascule de mode rejoue sans
+        modification de ses assertions.
+
+    - id: AC7
+      statement: >
+        La consigne de forcage n'est alimentee par aucune donnee persistante : le
+        champ vit dans la zone de commande non persistee de la structure IHM du
+        cycle, aucun champ persistant ST_CycleCfg ni aucune variable de
+        GVL_PERSISTENT n'alimente l'entree de forcage du FB, et aucun forcage ne
+        peut naitre d'une valeur restauree au demarrage.
+      verified_by: >
+        Gate statique G517 : verification du cablage de l'argument de forcage dans
+        PRG_03 et recherche de toute reference persistante dans cette chaine.
+
+    - id: AC8
+      statement: >
+        Toute valeur hors plage de l'enumeration est rejetee sans exception et sans
+        effet : la consigne est acquittee, le motif de rejet est publie, l'etape
+        active ne change pas, et le FB ne se plante pas. La table de conversion
+        numero vers etape couvre les vingt-trois valeurs de l'enumeration, sans
+        trou.
+      verified_by: >
+        Test CI : injection de la valeur hors plage basse, de la valeur hors plage
+        haute et de la valeur sentinelle, avec assertion de rejet publie et d'etape
+        inchangee ; gate statique G517 : comptage des branches de la table de
+        conversion et egalite a vingt-trois.
+
+    - id: AC9
+      statement: >
+        Les deux valeurs d'enumeration jusqu'ici refusees sont forcables : l'etape
+        de fin de passe AX18_DONE_SYNC et l'etape de repli AX_STAB s'atteignent par
+        la consigne, chacune etant verifiee par une assertion d'etape.
+      verified_by: >
+        Test CI : deux cas dedies, consigne a 18 puis consigne a 19, avec assertion
+        de l'etape active obtenue au scan suivant.
+
+    - id: AC10
+      statement: >
+        La chaine de diagnostic et de supervision reste coherente apres retrait du
+        champ de preparation : les publications IHM, l'etat public du sequenceur et
+        la vue troubleshooting ne referencent plus le champ supprime, et le motif
+        de forcage reste expose jusqu'a la vue troubleshooting.
+      verified_by: >
+        Recherche textuelle de ForceStepPrepared sur tout CODE (resultat vide) ;
+        gates G200 et palier C verts ; bundle PLCopenXML regenere sans erreur.
+
+    - id: AC11
+      statement: >
+        Les deux fichiers de programme modifies respectent la regle structurelle du
+        projet : nom de fichier est identique au nom de POU du bundle pour
+        PRG_03_Modes_Cycle et PRG_07_Supervision, et le suffixe de langage est
+        identique au langage ST genere dans le bundle PLCopenXML pour ces memes
+        POU.
+      verified_by: >
+        Lecture du bundle CODE_XML/CODE_Bundle.xml apres regeneration : les deux
+        POU y figurent en ST pur, sans suffixe de langage ajoute, et leur nom est
+        celui de leur fichier source.
+
+    - id: AC12
+      statement: >
+        Le lot fournit la tracabilite exigee par le brief : la liste exacte des
+        gardes retirees avec leur role d'origine, la preuve que chacune n'etait pas
+        le seul consommateur d'un signal partage, le role nouveau de chaque variable
+        conservee, et la liste des impacts IHM a reprendre par l'exploitant
+        (champ de commande a rebinder, champ de preparation supprime, champ de
+        configuration devenu inerte).
+      verified_by: >
+        Lecture de la note d'application livree avec le contrat ; chaque garde
+        citee avec fichier et ligne, chaque affirmation de non-regression adossee a
+        un grep fourni dans la restitution.
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G495_check_cycle_sat_contract.py
+      - TOOLS/AGENT_WORKFLOW/scripts/G517_check_force_step_envelope.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T358_FORCESTEP_SANS_GARDE.yaml
+      - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T358_FORCESTEP_SANS_GARDE.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - TOOLS/AGENT_WORKFLOW/status/
+      - CODE_XML/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/FB_CycleMachineHoming.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/B_AU_SECURITE/
+      - CODE/H_TREUILS_BENNE/
+      - CODE/GVL_PERSISTENT.st
+      - DOC/AF/
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/CONTRACTS/BRIEF_T358_FORCESTEP_SIMPLIFICATION_SANS_GARDE.md
+      - TOOLS/TEST_AUTO_CI/scripts/
+      - TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py
+
+  conservation:
+    must_survive:
+      - "Reprise consciente apres bascule de mode : WaitingResume ecrit sur changement de mode et consomme par StartCycle ou homme-mort (FB_CycleSemiAuto.st:743-747 et :786-819)."
+      - "Porte §2 du FB inchangee : Enable, PowerContactorEngaged, EncoderFaultPresent neutralisent le cycle et ramenent les demandes a zero (:714-772)."
+      - "Repli defaut AX_STAB sur front de defaut live, prioritaire sur un forcage du meme scan (:823-828)."
+      - "Gating de mouvement par etape : homme-mort et joystick restent obligatoires pour toute commande de mouvement (par exemple :1293, :1298, :1367-1372, :1397-1398)."
+      - "Calcul et usages hors forcage de KoboldImmersionQualified (:423, :1154, :1157, :1161) et de Fault.Latched (:573, :774, :883, :899, :915)."
+      - "Comptage des prelevements et protection du totalisateur (T299, gate G508)."
+    dropped_on_purpose:
+      - "Gardes de contexte du forcage : Mode SEMI_AUTO, Fault.Latched, JoystickDeflected, DiveStartStopped, KoboldImmersionQualified, BottomContextValid (FB_CycleSemiAuto.st:625-626, :653-658) — decision humaine explicite, risque de forcer une fermeture benne ou une remontee chargee sans reference terrain valide, signale et assume."
+      - "Mecanisme a deux temps : preparation puis confirmation par Start joystick neutre (ForceStepPrepared, ForceStepWaiting, ForceStepApplyEdge, et la branche de confirmation :792-798)."
+      - "Variable BottomContextValid, devenue ecrite et jamais lue apres retrait de sa seule garde."
+      - "Ciblage par une configuration persistee : la cible quitte la zone Cfg persistee pour la zone de commande non persistee."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+    - ci_test_fb_cyclesemiauto
+    - gate_G517_self_test
+    - note_application_gardes_retirees
+
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, garde differente
+    de ce que decrit le brief, consommateur inattendu d'un signal partage, risque
+    hors scope) est remonte IMMEDIATEMENT a l'orchestrateur et consigne dans la note
+    d'application, jamais silencieusement et jamais enterre en conclusion. Signaler
+    n'est pas elargir le perimetre : aucune correction spontanee hors des fichiers
+    autorises ci-dessus.
+
+status: COMPLETED
+
+execution:
+  executed_by: "DSH21 (deepseek-v4.1-flash:cloud, porteur du lot — preambule subagent_preamble.md applique par le porteur, brief non retransmis)"
+  completed_at: "2026-09-21T04:40:00+02:00"
+  status: COMPLETED
+  summary: >
+    LOT LIVRE ET COMMITE — commit unique du lot, sur accord humain explicite distinct du GO
+    d'implementation (2026-09-21) ; AUCUN PUSH (accord de push non donne). Le forcage de step devient une consigne A UNE VALEUR : l'operateur ecrit le
+    numero d'etape dans GVL_IHM.CycleSemiAuto.Cmd.SetForceStepTgt (zone Cmd NON persistee, sentinelle -1),
+    le FB remplace l'etape courante au scan suivant sans AUCUNE condition de contexte ni confirmation, puis
+    PRG_03 acquitte la consigne sur l'impulsion StepForceTgtTaken. Six gardes retirees (Mode SEMI_AUTO,
+    Fault.Latched, JoystickDeflected, DiveStartStopped, KoboldImmersionQualified, BottomContextValid) et le
+    mecanisme a deux temps supprime. Seule validation restante : la plage E_AutoCycleStep [0..22] ; 18 et 19
+    deviennent forcables. La porte §2 (Enable / AU / codeur) et la reprise consciente (WaitingResume) sont
+    INTACTES ; le forcage s'applique APRES la porte §2, n'emet aucune commande au scan du forcage et ne cree
+    aucun mouvement. PREUVES : CI FB_CycleSemiAuto 32/37 PASS — les 5 echecs sont EXACTEMENT les 5 dettes
+    preexistantes du rapport committe (zero regression, +4 tests T358) ; bundle frais 9 objets + diff bundle ;
+    G200 PASS 138 OK / 0 KO (2045 instances) ; gates palier C 50/55 avec les 5 FAIL preexistants
+    (G300/G340/G408/G430/G483) ; G517 nouveau 19/19 mutations detectees en --selftest ; G495 reecrit pour
+    pinner le nouveau contrat. REVUE INDEPENDANTE (agent a contexte frais, lecture seule) : verdict MINOR,
+    10/10 affirmations confirmees ligne a ligne ; 3 constats de fond CORRIGES dans le lot — acquittement
+    attribue au FB dans l'AC2 (corrige : c'est PRG_03), affirmation « aucune course d'ecriture IHM/PLC »
+    refutee (corrige : acquittement par COMPARE-ET-EFFACE, plus aucune perte d'ordre operateur), gate G517
+    durci (liste blanche de conditions, table numero -> etape verifiee contre l'enum, neutralisation
+    integrale, ancrage du calcul du signal de securite) ; 1 test ajoute (Abandon du meme scan).
+    LIMITE D'OUTILLAGE DECOUVERTE : le harnais CI ne cable pas un nouveau
+    VAR_IN_OUT (preuve test_main.cpp genere) — mecanique VAR_INPUT + acquittement retenue, aucun fichier
+    TOOLS/TEST_AUTO_CI/scripts/ modifie. D1 (mecanique de la variable unique) non arbitre : option conforme
+    appliquee par defaut, cout de bascule documente en note d'application.
+  evidence_submitted:
+    - "check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T358_FORCESTEP_SANS_GARDE.yaml : PASS 0 erreur / 0 avertissement"
+    - "CI FB_CycleSemiAuto : 32/37 PASS (5 echecs = 5 dettes preexistantes TC-P04-020/021/023/026/SCEN-NOM ; 4 tests T358 verts)"
+    - "CODE_XML/CODE_Bundle.xml frais (9 objets) + CODE_XML/CODE_DiffBundle.xml (9 objets)"
+    - "G200_check_linkage.py --report : PASS, 138 OK / 0 KO, 2045 instances"
+    - "run_all_gates.py --palier C : 50/55 PASS, 5 FAIL preexistants (G300/G340/G408/G430/G483)"
+    - "G517_check_force_step_envelope.py : PASS + --selftest 19/19 mutations detectees"
+    - "Revue independante (contexte frais, lecture seule) : verdict MINOR, 10/10 affirmations confirmees, 3 constats de fond corriges"
+    - "NOTE_APPLICATION_T358_FORCESTEP_SANS_GARDE.md : 8 gardes tracees avec role d'origine + 9 constats hors scope"
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Recette humaine attendue : import CODESYS du bundle, rebinding IHM du champ de commande de forcage et
+    retrait du champ de preparation, essai machine du saut d'etape avec objet coince dans la benne.

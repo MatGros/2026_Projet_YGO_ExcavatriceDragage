@@ -79,8 +79,7 @@ VAR_INPUT
     CycleFaultLatchedId      : WORD;   (* --> [DIAG] Bitfield défaut latché figé *)
     CycleChecksInhibited     : BOOL;   (* --> [TST] Contrôles procédé inhibés *)
     CycleIgnoredCheckId      : WORD;   (* --> [DIAG] Contrôles procédé ignorés *)
-    CycleForceStepPrepared   : BOOL;   (* --> [STAT] Step préparé, commandes neutres *)
-    CycleForceStepResult     : STRING(120); (* --> [DIAG] Motif forçage *)
+    CycleForceStepResult     : STRING(120); (* --> [DIAG] Motif de rejet de la consigne de forcage de step (T358) *)
     CycleStep                : E_AutoCycleStep; (* --> [STAT] Étape courante *)
     CycleStepStr             : STRING(80);  (* --> [STAT] Libellé étape *)
     CycleStepAtError         : E_AutoCycleStep; (* --> [DIAG] Étape au défaut *)
@@ -686,7 +685,6 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx217_FaultLatched               := CycleFa
 GVL_Troubleshooting.G_CycleSemiAuto.Idx218_FaultLatchedId             := CycleFaultLatchedId;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx219_CycleChecksInhibited       := CycleChecksInhibited;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx220_IgnoredCycleCheckId        := CycleIgnoredCheckId;
-GVL_Troubleshooting.G_CycleSemiAuto.Idx221_ForceStepPrepared          := CycleForceStepPrepared;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx222_ForceStepResult            := CycleForceStepResult;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step                      := CycleStep;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;

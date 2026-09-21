@@ -688,7 +688,6 @@ GVL_IHM.CycleSemiAuto.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.Se
 GVL_IHM.CycleSemiAuto.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
 GVL_IHM.CycleSemiAuto.State.CycleChecksInhibited   := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited;
 GVL_IHM.CycleSemiAuto.State.IgnoredCycleCheckId    := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId;
-GVL_IHM.CycleSemiAuto.State.ForceStepPrepared      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared;
 GVL_IHM.CycleSemiAuto.State.ForceStepAccepted      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepAccepted;
 GVL_IHM.CycleSemiAuto.State.ForceStepRejected      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepRejected;
 GVL_IHM.CycleSemiAuto.State.ForceStepResult        := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepResult;
@@ -888,7 +887,6 @@ instTroubleshootingView(
     CycleM2SpeedStepAtFault := PRG_03_Modes_Cycle.Data.SequenceState.M2SpeedStepAtFault,
     CycleChecksInhibited := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
     CycleIgnoredCheckId  := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId,
-    CycleForceStepPrepared := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared,
     CycleForceStepResult := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepResult,
     CycleStep            := PRG_03_Modes_Cycle.Data.SequenceState.Step,
     CycleStepStr         := PRG_03_Modes_Cycle.Data.SequenceState.StepStr,

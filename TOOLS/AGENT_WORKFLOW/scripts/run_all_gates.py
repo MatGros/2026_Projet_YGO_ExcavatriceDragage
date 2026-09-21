@@ -182,6 +182,14 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     # production » est une decision HUMAINE (c'est la confusion qui a produit ce bug) : arbitrage
     # remonte a l'orchestrateur, aucune exemption posee par l'agent.
     ("C", "516", "G516 - Interrupteur de configuration mort : invariant de cablage T352 (autorisations en dur, aucune entree servie par GVL_Simulation)", [sys.executable, f"{S}/G516_check_dead_config_switch.py", "."]),
+    # T358 - Le forcage de step du cycle semi-auto a ete VIDE de ses gardes de contexte
+    # sur decision humaine explicite (objet coince dans la benne, saut d'etape immediat
+    # sans dialogue). Ce que le lot RETIRE, un autre lot peut le remettre par effet de
+    # bord : G517 verrouille l'ENVELOPPE restante du forcage (placement apres la porte
+    # §2, plage d'enum seule validation, table de conversion sans trou, consigne non
+    # ecrite par le FB et acquittee par PRG_03 par compare-et-efface, reprise consciente
+    # preservee, cible non persistee).
+    ("C", "517", "G517 - Enveloppe du forcage de step sans garde : placement, plage, table de conversion, acquittement PRG_03, reprise consciente preservee (T358)", [sys.executable, f"{S}/G517_check_force_step_envelope.py", "."]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]

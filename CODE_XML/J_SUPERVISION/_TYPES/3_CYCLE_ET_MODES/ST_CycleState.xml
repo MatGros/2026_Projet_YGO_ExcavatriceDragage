@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T22:17:31.156582" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T22:17:31.156582">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T00:59:23.741751" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T00:59:23.741751">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -288,20 +288,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔎 Contrôles procédé actifs mais ignorés</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceStepPrepared">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step préparé, commandes neutres</xhtml>
-              </documentation>
-            </variable>
             <variable name="ForceStepAccepted">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Impulsion préparation acceptée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Impulsion : consigne de forçage appliquée (saut d'étape effectif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepRejected">
@@ -309,7 +301,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Impulsion préparation refusée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Impulsion : consigne écartée (cible hors plage énum, ou cycle inactif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepResult">
@@ -317,7 +309,7 @@
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📝 Motif accepté/refusé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📝 Motif de rejet de la dernière consigne (vide après une consigne appliquée)</xhtml>
               </documentation>
             </variable>
             <variable name="ResumeAfterFaultAvailable">

@@ -41,10 +41,9 @@ STRUCT
     DrainTimeElapsed_S     : INT;         (* Compat IHM : tag historique conserve ; porte le temps restant AX13, secondes entieres ; 0 hors AX13 *)
     CycleChecksInhibited   : BOOL;        (* 🧪 Contrôles procédé cycle inhibés, protections machine actives *)
     IgnoredCycleCheckId    : WORD;        (* 🔎 Contrôles procédé actifs mais ignorés *)
-    ForceStepPrepared      : BOOL;        (* 🔧 Step préparé, commandes neutres *)
-    ForceStepAccepted      : BOOL;        (* ✅ Impulsion préparation acceptée *)
-    ForceStepRejected      : BOOL;        (* ❌ Impulsion préparation refusée *)
-    ForceStepResult        : STRING(120); (* 📝 Motif accepté/refusé *)
+    ForceStepAccepted      : BOOL;        (* ✅ Impulsion : consigne de forçage appliquée (saut d'étape effectif) *)
+    ForceStepRejected      : BOOL;        (* ❌ Impulsion : consigne écartée (cible hors plage énum, ou cycle inactif) *)
+    ForceStepResult        : STRING(120); (* 📝 Motif de rejet de la dernière consigne (vide après une consigne appliquée) *)
     ResumeAfterFaultAvailable : BOOL;    (* Reprise AX_STAB disponible apres disparition de la cause *)
 END_STRUCT
 END_TYPE
