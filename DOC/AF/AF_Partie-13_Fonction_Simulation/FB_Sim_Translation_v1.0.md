@@ -87,7 +87,7 @@ stricte entre le modèle dynamique et l'injection ponctuelle opérateur.
 | `Enable` | BOOL | Modèle actif |
 | `Direction` | INT | `+1` = vers Trémie, `-1` = vers Maintenance, `0` = maintien |
 | `SpeedTgt_Pct` | REAL | Magnitude commande 0..100 %, bornée avant calcul |
-| `FullTravelTimeS` | REAL | Temps complet Trémie→Maintenance à 100 % (simulation seulement, défaut 8.0s) |
+| `FullTravelTimeS` | REAL | Temps complet Trémie→Maintenance à 100 % (simulation seulement, défaut **37,5 s** — T361 : échelle alignée sur le gain odométrique réel `GVL_PERSISTENT._TranslationGainMetersPerHzSec` = 0,02 m/(Hz·s), soit 30 m / (40 Hz × 37,5 s) ; l'ancienne valeur 8,0 s donnait 0,09375 m/(Hz·s), d'où des sauts de recalage de plusieurs mètres à chaque capteur, cf. AUDIT_T360 et gate G518) |
 
 | Sortie | Type | Sens |
 |---|---|---|
