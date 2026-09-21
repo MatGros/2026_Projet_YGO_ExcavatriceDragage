@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "file": "test_fb_troubleshootingview.st",
+  "results": [
+    {
+      "name": "TC-P14-TSV-01 Interface : seule sortie Ready, aucune commande (essai d architecture - validation partielle boite noire)",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-02 Chaque champ GVL_Troubleshooting a un producteur documente : init sure (essai d architecture - validation partielle boite noire)",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-03 Champs TBD publies a leur valeur d init (aucune mesure inventee)",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-04 Instance unique appelee dans PRG_07_Supervision (G200) (essai d architecture - validation partielle boite noire)",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-05 Aucune regression gates (essai d architecture - validation partielle boite noire)",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-06 M1/F1 : barriere FAULT + RESTART_INHIBITED, Fault.Error=FALSE -> Step8 PAS vert",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-07 M1/F2 : barriere FAULT + SENSE_DROP_TIMEOUT, Fault.Error=FALSE -> Step8 PAS vert",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-08 M1/F3 : SafeStop/PermitFinalBlocked (State=READY, Reason=NONE) -> Step8 PAS vert",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-09 M1/F4 : RestartRequired/DeadTimePending (WAIT_RESTART_DELAY) -> Step8 PAS vert",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-10 M2/F3 : meme patron sur l axe M2 (State=READY, sortie coupee) -> Step8 PAS vert",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-11 M3 : etat et cause de la barriere M3 publies, defaut = PAS vert",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-12 NON-REGRESSION : barriere nominale au repos -> Step8 reste VERT (pas de faux rouge)",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-13 M2/F1 : barriere FAULT + RESTART_INHIBITED (demande vivante) -> Step8 PAS vert",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-14 M2/F4 : tempos (WAIT_RESTART_DELAY), demande retenue -> Step8 PAS vert",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-15 Gate Enable/AU perdue (DISABLED) -> Step8 PAS vert",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-16 Cause MEMORISEE apres acquittement -> Step8 reste VERT (pas de faux rouge permanent)",
+      "passed": true
+    },
+    {
+      "name": "TC-P14-TSV-17 Vert nominal M2 et M3 -> Step8 VERT (pas de faux rouge sur les autres axes)",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 17,
+    "passed": 17,
+    "failed": 0
+  }
+}

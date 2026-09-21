@@ -1,0 +1,56 @@
+contract:
+  task_id: T374
+  criticality: C4
+  strategy: patch
+  objective: >
+    Etablir sur preuve si les six boutons de mouvement MAINT_N2 IHM pilotent
+    M1 seul, M2 seul et M1+M2 dans les deux sens, puis preparer le plan de
+    correction et de recette sans changer la conduite durant cette phase.
+  acceptance:
+    - id: AC1
+      statement: "Les six boutons sont traces du DUT IHM aux sorties physiques, ou chaque rupture est nommee."
+      verified_by: "Inventaire CODE/ avec references fichier:ligne et graphe producteur-routeur-consommateur."
+    - id: AC2
+      statement: "Le desserrage de frein est distingue de la commande moteur pour M1, M2 et Both."
+      verified_by: "Lecture de PRG_06_Outputs.st et des demandes finales PRG_04_Treuils_Benne.st."
+    - id: AC3
+      statement: "Une matrice de protections et six cas de simulation sont soumis a l'arbitrage humain avant code."
+      verified_by: "Plan documentaire avec conditions initiales, geste maintenu, sortie attendue, relachement et defaut."
+    - id: AC4
+      statement: "La phase A ne modifie aucun fichier CODE/, aucun FB de securite, aucun bundle et aucun test CI."
+      verified_by: "git diff --name-only sur le perimetre et comparaison au statut initial."
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_AUDIT.yaml
+      - DOC/WFLOW/AUDITS/DESIGN/
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - TOOLS/TEST_AUTO_CI/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  evidence_required:
+    - "References fichier:ligne pour les six chaines et les freins"
+    - "Etat git avant/apres, sans changement de CODE/"
+    - "Matrice de tests et risques a arbitrer"
+  models_allowed:
+    - "Codex"
+    - "Antigravity read-only"
+    - "Ollama deepseek-v4-flash:cloud read-only"
+  alert_duty: >
+    Toute contradiction spec/code, protection contournee, collision de scope ou doute
+    de securite est remonte immediatement a l'orchestrateur sans correction spontanee.
+status: VALIDATED
+execution:
+  executed_by: "CDX02"
+  completed_at: "2026-09-22T00:06:10+02:00"
+  status: COMPLETED
+  summary: "Phase A read-only : six boutons moteur sans consommateur de conduite ; boutons frein relies aux sorties."
+  evidence_submitted:
+    - "DOC/WFLOW/AUDITS/DESIGN/AUDIT_T374_MAINT_N2_BOUTONS_MOTEURS_20260922.md"
+validation:
+  status: APPROVED
+  validated_by: "CDX01"
+  validated_at: "2026-09-22T00:06:10+02:00"
+  notes: "Conclusion corroborée par recherche indépendante des six usages dans CODE/. Phase B requiert matrice et GO humains."

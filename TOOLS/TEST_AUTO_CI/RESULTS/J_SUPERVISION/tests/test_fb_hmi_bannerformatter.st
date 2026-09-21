@@ -710,3 +710,47 @@ TEST 'TC-T359-006 Non-regression safety : la cause AU reste prioritaire, jamais 
               'La consigne operateur reste la cause AU malgre le defaut de bus');
 END_TEST
 
+(* ═══════════════════════════════════════════════════════════════════════════════
+   T368 - TEMPS ECOULE DU CYCLE ACCOLE AU BANDEAU MODE (format MMminSSs)
+   Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T368_TEMPS_ECOULE_BANDEAU_AX13.yaml (AC1, AC2).
+   Le suffixe n apparait QUE pendant un cycle reellement en cours (CycleAutoBusy = Lifecycle.Busy
+   du sequenceur, cable PRG_07_Supervision.st:758) : hors cycle, aucune duree figee n est
+   affichee. Les deux valeurs arrivent par VAR_INPUT : le formateur ne lit aucun global.
+   ═══════════════════════════════════════════════════════════════════════════════ *)
+
+TEST 'T368-001 : bandeau mode porteur du temps ecoule, uniquement pendant un cycle en cours'
+    FB_Banner(Enable := TRUE, SimulationModeActive := TRUE, CurrentMode := E_Mode.SEMI_AUTO,
+              CycleAutoBusy := TRUE, CycleElapsed_Min := 0, CycleElapsed_S := 0,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ADVANCE_TIME(5000000000);
+
+    (* Scan 1 : cycle en cours, chrono a zero -> le suffixe zero-padde est present. *)
+    FB_Banner(Enable := TRUE, SimulationModeActive := TRUE, CurrentMode := E_Mode.SEMI_AUTO,
+              CycleAutoBusy := TRUE, CycleElapsed_Min := 0, CycleElapsed_S := 0,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ASSERT_EQ(FB_Banner.Banner.GlobalContextText, '[SIMULATION] [SEMI-AUTO] [CYCLE AUTO] 00min00s',
+              'T368 : cycle en cours -> bandeau mode suivi du chrono MMminSSs');
+
+    (* Scan 2 : 1 min 05 s -> chaque champ garde 2 chiffres (00min05s vs 1min5s : discriminant). *)
+    FB_Banner(Enable := TRUE, SimulationModeActive := TRUE, CurrentMode := E_Mode.SEMI_AUTO,
+              CycleAutoBusy := TRUE, CycleElapsed_Min := 1, CycleElapsed_S := 5,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ASSERT_EQ(FB_Banner.Banner.GlobalContextText, '[SIMULATION] [SEMI-AUTO] [CYCLE AUTO] 01min05s',
+              'T368 : minutes et secondes zero-paddees (01min05s), aucun champ a 1 chiffre');
+
+    (* Scan 3 : cycle termine (Busy retombe) -> bandeau mode STRICTEMENT nu, aucune duree figee. *)
+    FB_Banner(Enable := TRUE, SimulationModeActive := TRUE, CurrentMode := E_Mode.SEMI_AUTO,
+              CycleAutoBusy := FALSE, CycleElapsed_Min := 1, CycleElapsed_S := 5,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ASSERT_EQ(FB_Banner.Banner.GlobalContextText, '[SIMULATION] [SEMI-AUTO] [CYCLE AUTO]',
+              'T368 : hors cycle -> aucune duree affichee, meme si les entrees portent encore 1 min 05 s');
+END_TEST
+

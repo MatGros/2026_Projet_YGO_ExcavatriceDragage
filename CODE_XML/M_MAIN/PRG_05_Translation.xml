@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.406337" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.406337">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T03:41:56.094930" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T03:41:56.094930">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2116,6 +2116,14 @@ M1 : contacteurs retombés</xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="M3_TargetCodeSel">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Code de cible M3 mémorisé (1=Trémie, 2=P2, 3=P1, 4=Maintenance) — survit à la perte de la demande</xhtml>
+              </documentation>
+            </variable>
             <variable name="M3_CycleTranslationStepAuthorized">
               <type>
                 <BOOL />
@@ -2151,6 +2159,14 @@ M1 : contacteurs retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ SafeStop réellement appliqué au mouvement = InputModuleFault OR safety M3 (8 mécanismes)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_MaintN2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Mode MAINT_N2 arbitré (origine FB_Modes) — garde de consommation des bypass M3</xhtml>
               </documentation>
             </variable>
             <variable name="EffectivePermitM3_Tremie">
@@ -2679,29 +2695,59 @@ M3_SafeStop_Active := PRG_02_Acquisition.Data.InputModules.Fault;
 // arme le verrou anti-rebond §4ter de FB_Translation (DirectionAtArrival). Mot EXACT
 // (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front franc à l'arrivée quel que
 // soit le sens de venue (voir FB_Translation_PositionDecoder.st).
+//
+// 🎯 MÉMOIRE DE CIBLE : le code de cible n'est réécrit QUE tant qu'une demande est présente ;
+// la cible publiée est ensuite le JETON du point mémorisé. La perte de la demande n'efface donc
+// plus une cible déjà qualifiée : le debounce de 100 ms de FB_Translation peut se terminer et
+// armer son verrou d'arrivée même si l'opérateur relâche juste après le capteur. Sans cette
+// mémoire, un relâchement dans la fenêtre de debounce annulait la détection d'arrivée en cours,
+// et la re-demande du même sens repartait au-delà du point. La cible retombe d'elle-même dès que
+// le chariot quitte le point, les jetons M3_AtXxxStable étant uniques et exclusifs.
+// La voie directionnelle reste celle du mode manuel : en SEMI_AUTO la cible d'étape est fournie
+// par SelTarget (1 en AX14, 3 en AX2) et ne dépend d'aucune demande.
 CASE SelTarget OF
-    1: M3_PositionSensorTarget := M3_AtTremieStable;
-    2: M3_PositionSensorTarget := M3_AtP2Stable;
-    3: M3_PositionSensorTarget := M3_AtP1Stable;
-    4: M3_PositionSensorTarget := M3_AtMaintenanceStable;
+    1: M3_TargetCodeSel := 1;
+    2: M3_TargetCodeSel := 2;
+    3: M3_TargetCodeSel := 3;
+    4: M3_TargetCodeSel := 4;
 ELSE
     IF M3_ReqTremie_Active THEN
         // En Marche Avant (+1 vers Trémie) : seule Trémie est le point d'arrêt automatique
-        M3_PositionSensorTarget := M3_AtTremieStable;
+        M3_TargetCodeSel := 1;
     ELSIF M3_ReqMaintenance_Active THEN
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -&gt; arrêt sur Maintenance
         // - Si Maintenance interdite -&gt; arrêt sur P1
         IF PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable THEN
-            M3_PositionSensorTarget := M3_AtMaintenanceStable;
+            M3_TargetCodeSel := 4;
         ELSE
-            M3_PositionSensorTarget := M3_AtP1Stable;
+            M3_TargetCodeSel := 3;
         END_IF;
-    ELSE
-        M3_PositionSensorTarget := FALSE;
     END_IF;
 END_CASE;
 
+CASE M3_TargetCodeSel OF
+    1: M3_PositionSensorTarget := M3_AtTremieStable;
+    2: M3_PositionSensorTarget := M3_AtP2Stable;
+    3: M3_PositionSensorTarget := M3_AtP1Stable;
+    4: M3_PositionSensorTarget := M3_AtMaintenanceStable;
+ELSE
+    M3_PositionSensorTarget := FALSE;
+END_CASE;
+
+{endregion}
+
+{region "§1bis Garde de mode des bypass M3"}
+// 🔒 Les bypass de l'axe M3 sont actionnables UNIQUEMENT en MAINT_N2 (doctrine
+// ST_BypassTranslation.st) : le bit RETAIN restauré au boot est sinon consommé sans aucune
+// garde de mode. Un seul bit de fin de course neutralise TROIS barrières de l'axe — le verrou
+// d'arrivée et la cause 6 de FB_Translation, et la cause 6 de FB_Safety_Translation — soit la
+// neutralisation des sécurités de fin de course depuis un mode de marche nominal.
+// La garde est posée AU POINT DE CONSOMMATION : le stockage RETAIN et sa restauration vers
+// l'IHM ne sont pas touchés, le bit reste donc lisible et actionnable en MAINT_N2.
+// Origine du mode = arbitrage FB_Modes (Auth.Mode), jamais le sélecteur IHM brut — même
+// exigence que la garde des bypass treuils.
+M3_MaintN2 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
 {endregion}
 
 {region "§1bis Securite M3"}
@@ -2739,7 +2785,7 @@ instSafetyTranslationM3(
     BypassBrakeThermal      := GVL_IHM.M3Translation.Bypass.BrakeThermal,
     BypassMecaB             := GVL_IHM.M3Translation.Bypass.MecaB,
     BypassMecaA             := GVL_IHM.M3Translation.Bypass.MecaA,
-    BypassLimitSwitch       := GVL_IHM.M3Translation.Bypass.LimitSwitch,
+    BypassLimitSwitch       := M3_MaintN2 AND (GVL_IHM.M3Translation.Bypass.LimitSwitch OR GVL_IHM.M3Translation.Bypass.Global),
     BypassSensorIncoherent  := GVL_IHM.M3Translation.Bypass.SensorIncoherent,
     BypassSafety            := GVL_IHM.M3Translation.Bypass.Safety,
     BypassProcess           := GVL_IHM.M3Translation.Bypass.Process
@@ -2842,7 +2888,7 @@ instTranslationM3(
     Cfg                     := TranslationCfg,
     BrakeFeedback           := SEL(GVL_IHM.M3Translation.Bypass.ContactorFeedback OR GVL_IHM.M3Translation.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BypassContactorCheck    := GVL_IHM.M3Translation.Bypass.Global OR GVL_IHM.M3Translation.Bypass.ContactorFeedback,
-    BypassLimitSwitch       := GVL_IHM.M3Translation.Bypass.Global OR GVL_IHM.M3Translation.Bypass.LimitSwitch
+    BypassLimitSwitch       := M3_MaintN2 AND (GVL_IHM.M3Translation.Bypass.Global OR GVL_IHM.M3Translation.Bypass.LimitSwitch)
 );
 
 // 📐 Estimateur de position continue M3 (odométrie + recalage 5 capteurs)
@@ -4134,6 +4180,14 @@ MaintenanceLimitClear := NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Capteur position cible</xhtml>
               </documentation>
             </variable>
+            <variable name="ArrivalStopConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Arrêt confirmé sur la cible : verrou d'arrivée armé ET axe physiquement arrêté (aucune rotation, frein non commandé ouvert)</xhtml>
+              </documentation>
+            </variable>
             <variable name="RequestedDriveControlWord">
               <type>
                 <WORD />
@@ -4294,6 +4348,14 @@ MaintenanceLimitClear := NOT LimitSwitchMaintenance;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens d'arrivée mémorisé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastMoveDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens du dernier mouvement commandé (+1 = Trémie, -1 = Maintenance) — mémoire de l'axe, insensible à la perte de la demande</xhtml>
               </documentation>
             </variable>
             <variable name="ArrivalLock">
@@ -4463,6 +4525,8 @@ IF NOT Enable THEN
     ArrivalLock := FALSE;
     ArrivalWasTremie := FALSE;
     ArrivalWasMaintenance := FALSE;
+    LastMoveDirection := 0;
+    ArrivalStopConfirmed := FALSE;
     TargetReached := FALSE;
     DirectionChangeDelay(IN := FALSE);
     CaptorDebounceTon(IN := FALSE);
@@ -4489,10 +4553,32 @@ CaptorDebounceTon(IN := PositionSensorTarget, PT := Cfg.CaptorDebounce);
 TargetReached := CaptorDebounceTon.Q;
 ArrivalEdge(CLK := TargetReached);
 
+// 🧠 Sens du dernier mouvement réellement commandé : mémoire PROPRE À L'AXE, mise à jour
+// avant la lecture du front d'arrivée (CommandedTremie/CommandedMaintenance portent encore
+// le sens du scan précédent) et jamais remise à zéro par la perte de la demande — contrairement
+// à ces deux locaux, qui retombent dès que la demande disparaît (§4 ci-dessous). C'est cette
+// mémoire qui qualifie le sens d'arrivée quand la demande est retirée avant la fin du debounce.
+IF CommandedTremie THEN
+    LastMoveDirection := 1;
+ELSIF CommandedMaintenance THEN
+    LastMoveDirection := -1;
+END_IF;
+
 IF ArrivalEdge.Q THEN
     ArrivalLock := TRUE;
-    ArrivalWasTremie := CommandedTremie;
-    ArrivalWasMaintenance := CommandedMaintenance;
+    IF CommandedTremie OR CommandedMaintenance THEN
+        ArrivalWasTremie := CommandedTremie;
+        ArrivalWasMaintenance := CommandedMaintenance;
+    ELSE
+        // Demande déjà retombée : le sens d'arrivée est pris sur la mémoire du dernier
+        // mouvement. Sans elle, les deux drapeaux seraient FALSE et la condition de
+        // relâchement ci-dessous accepterait une demande du MÊME sens — le verrou
+        // d'arrivée perdrait toute autorité et le chariot serait relancé au-delà du point
+        // d'arrêt (relance + dépassement). Cas nominal du séquenceur : il retire sa demande
+        // sur le jeton d'arrivée, soit 100 ms avant l'armement de ce verrou.
+        ArrivalWasTremie := (LastMoveDirection = 1);
+        ArrivalWasMaintenance := (LastMoveDirection = -1);
+    END_IF;
 END_IF;
 
 // Verrou d'arrivee extreme M3 : le FdC securite est une preuve d'arret de sens,
@@ -4631,6 +4717,18 @@ IF Fault.Error THEN
     RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
+
+// 🎯 FAIT PUBLIC D'ARRÊT CONFIRMÉ : vrai quand l'axe a armé son verrou d'arrivée ET qu'il est
+// physiquement arrêté — aucune rotation réelle au variateur (seuil 0,5 Hz, même mesure que
+// Translation_Busy côté programme) et frein non commandé ouvert. Ce n'est donc pas une simple
+// reprise du capteur : c'est la conjonction du verrou de l'axe et de l'arrêt physique, fait
+// consommable par la porte de transition de cycle pour n'avancer qu'après un arrêt acquis.
+// ⚠️ Au banc la fréquence réelle est nulle en permanence : ce fait s'y prouve par injection
+// d'entrée (DriveActualFreqHz), jamais par la seule observation du banc.
+ArrivalStopConfirmed := ArrivalLock
+                        AND NOT Fault.Error
+                        AND (ABS(DriveActualFreqHz) &lt;= 0.5)
+                        AND NOT BrakeReleaseRequest;
 {endregion}
 </xhtml>
           </ST>
@@ -5470,6 +5568,29 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] 0=Maint, 1=P1, 2=P2, 3=PV, 4=Trémie, -1=Aucun</xhtml>
               </documentation>
             </variable>
+            <variable name="RecalibrationAnomaly">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T361 — TÉMOIN D'ANOMALIE DE RECALAGE. Pulse 1 cycle lorsque la correction effectivement
+       appliquée dépasse CST_RecalibrationAnomalyM. La correction est APPLIQUÉE dans tous les cas :
+       ce signal ne conditionne jamais l'affectation de PositionEstimatedM et n'est jamais un
+       verrou (voir §2bis et le gate G520).
+&lt;-- [DIAG] Recalage de ce scan au-delà du seuil de plausibilité</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RecalibrationCorrectionM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Amplitude de la DERNIÈRE correction appliquée (valeur absolue, mètres). Maintenue entre deux
+       recalages pour rester lisible par une IHM ou une trace lente : c'est le pendant mesuré du
+       témoin RecalibrationAnomaly.
+&lt;-- [DIAG] |PositionEstimatedM - position avant recalage|</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="TrigTremie">
@@ -5582,6 +5703,37 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vrai après le 1er scan utile : les capteurs déjà présents à l'init ne sont pas des franchissements</xhtml>
               </documentation>
             </variable>
+            <variable name="PositionBeforeM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T361 — Position AVANT tout recalage de ce scan : sert à MESURER la correction réellement
+       appliquée (§2bis), sans toucher à la chaîne de recalage elle-même.
+. [LOC] Position estimée avant recalage du scan courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_RecalibrationAnomalyM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T361 — SEUIL D'ANOMALIE DE RECALAGE (m). AU-DELÀ : correction appliquée + anomalie publiée.
+       0,50 m = 5 % de l'écart maximal entre deux repères absolus (10,0 m : PV-&gt;P2 et
+       P1-&gt;Maintenance) : au-delà, l'erreur de gain dépasse 5 %, niveau auquel le gain provisoire
+       GVL_PERSISTENT._TranslationGainMetersPerHzSec (0,02 m/(Hz.s), NON CALIBRÉ — T301 en attente)
+       doit être remis en cause. ⚠️ Ce seuil n'est PAS une garde : c'est un témoin.
+       DÉCISION UTILISATEUR 2026-09-21 : 5 capteurs, recalage TOUJOURS appliqué, signal d'anomalie
+       seul — aucune zone morte, aucun blocage (la décision Q2 du lot T333 « recaler SANS garde tant
+       que T301 n'a pas calibré le gain » reste la règle).
+       NE COUVRE PAS l'acquisition de la référence initiale (branche « NOT Initialized ») : c'est une
+       amorce unique, pas la correction d'une dérive odométrique — la signaler ferait apparaître une
+       anomalie à chaque premier démarrage après intervention.</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -5606,6 +5758,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
 IF NOT Enable THEN
     Recalibrated := FALSE;
     RecalibratedSensorId := -1;
+    RecalibrationAnomaly := FALSE;
     // 🔒 Sorties odométriques VOLONTAIREMENT conservées hors Enable (AC3 / persistance continue RETAIN) :
     // - PositionEstimatedM &amp; Initialized : estimation odométrique et référence absolue maintenues pour ne pas perdre la position M3 hors Enable
     RETURN;
@@ -5619,6 +5772,7 @@ END_IF;
 
 CycleTimeCalc(DefaultValueS := 0.010);
 Recalibrated := FALSE;
+RecalibrationAnomaly := FALSE;   (* T361 : témoin à pulse, remis à zéro à chaque scan comme Recalibrated *)
 {endregion}
 
 {region "§2 Fronts capteurs"}
@@ -5645,6 +5799,7 @@ TrigMaintenance(CLK := SensorMaintenance);    TrigDnMaintenance(CLK := SensorMai
 //    Ordre de priorité inchangé (Maintenance -&gt; P1 -&gt; P2 -&gt; PV -&gt; Trémie) : sur un mot
 //    thermomètre une seule bascule survient par scan, la priorité ne départage donc qu'un mot
 //    incohérent (capteur collé / parasite), cas déjà surveillé par le décodeur (Incoherent).
+PositionBeforeM := PositionEstimatedM;   (* T361 : référence de mesure, AVANT tout recalage de ce scan *)
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
 ELSE
@@ -5669,6 +5824,21 @@ ELSE
         Recalibrated := TRUE;
         RecalibratedSensorId := 4;
     END_IF;
+END_IF;
+
+// 2bis. T361 — TÉMOIN D'ANOMALIE DE RECALAGE : OBSERVER, JAMAIS BLOQUER.
+// Le recalage ci-dessus est TOUJOURS appliqué, sans condition : le capteur franchi reste la
+// meilleure référence absolue disponible, et refuser la correction laisserait une position FAUSSE
+// ET NON CORRIGÉE. Ce bloc ne fait que MESURER la correction effectivement appliquée et PUBLIER
+// l'anomalie au-delà de CST_RecalibrationAnomalyM — c'est précisément ce qui a manqué sur la trace
+// Suivi_74 : des sauts de 4,53 à 9,12 m (audit T360) qui n'ont été vus qu'en post-mortem.
+// 🔒 Le seuil ci-dessous ne doit JAMAIS devenir une condition des affectations `PositionEstimatedM`
+// du bloc 2 : ce serait refuser un recalage légitime, l'erreur exacte que le gate G520 interdit.
+// La décision Q2 du lot T333 (recaler sans garde tant que T301 n'a pas calibré le gain) reste la
+// règle — l'anomalie est un témoin de diagnostic, pas un verrou.
+IF Recalibrated THEN
+    RecalibrationCorrectionM := ABS(PositionEstimatedM - PositionBeforeM);
+    RecalibrationAnomaly := RecalibrationCorrectionM &gt; CST_RecalibrationAnomalyM;
 END_IF;
 
 // 3. Initialisation au tout premier démarrage sur le premier capteur actif vu (si non initialisé)

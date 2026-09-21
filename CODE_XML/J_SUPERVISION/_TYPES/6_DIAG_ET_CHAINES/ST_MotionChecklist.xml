@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.555151" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.555151">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T12:59:22.097205" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T12:59:22.097205">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -131,7 +131,7 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Étage de sortie LD débloqué (pas d'interlock actif)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Étage de sortie LD débloqué (pas d'interlock actif).</xhtml>
               </documentation>
             </variable>
             <variable name="AllConditionsMet">
@@ -139,8 +139,7 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Bilan &amp; Exécution Physiques
-🟢 TRUE = TOUTES LES CONDITIONS SONT REMPLIES, LES RELAIS DOIVENT COLLER !</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 TRUE = TOUTES LES CONDITIONS SONT REMPLIES, LES RELAIS DOIVENT COLLER !</xhtml>
               </documentation>
             </variable>
             <variable name="RelayFwdActive">
@@ -167,6 +166,36 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur de vitesse Palier 1 commandé</xhtml>
               </documentation>
             </variable>
+            <variable name="Step8_InterlockState">
+              <type>
+                <derived name="E_WinchFinalInterlockState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">5. Barrière finale — état &amp; cause publiés (T371, LECTURE SEULE)
+⚠️ Ajout en FIN de STRUCT : aucun champ existant n'est décalé (mapping IHM/SCADA + online change).
+       ⚠️ VOCABULAIRE COMMUN aux 3 axes (famille E_WinchFinalInterlock...), choisi parce que ce DUT est
+          PARTAGÉ par M1, M2 et M3 et qu'AUCUNE conversion de type n'est nécessaire :
+          · M1/M2 — recopie DIRECTE de l'énumération publiée par la barrière (aucune projection) ;
+          · M3   — la barrière M3 ne publie qu'un état dérivé du défaut : E_State.READY -&gt; READY et
+                   E_State.ERROR -&gt; FAULT (projection EXPLICITE, cf. FB_TroubleshootingView.st §11),
+                   ses 3 raisons étant identiques (NONE / BRAKE_COMMAND_NOT_CONFIRMED / RESTART_INHIBITED).
+          Le type énuméré (et non INT) évite toute conversion — la conversion explicite de l'énumération
+          d'un membre d'IEC_STRUCT n'est pas supportée par le compilateur de test, et un INT aurait rendu
+          la table de valeurs DÉPENDANTE DE L'AXE. La famille M3 (E_State) n'est volontairement pas
+          réutilisée ici : sa numérotation diffère (READY = 2 vs 1) et rendrait la lecture ambiguë.
+       ⚠️ USAGE DIAGNOSTIC UNIQUEMENT (latence N-1 assumée, projection PRG_04:1688-1696) : aucune ligne
+          de CONDUITE ne doit consommer ces deux champs.
+🛡️ [DIAG/LECTURE] État publié de la barrière</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step8_InterlockReason">
+              <type>
+                <derived name="E_WinchFinalInterlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ [DIAG/LECTURE] Cause MÉMORISÉE publiée par la</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -182,6 +211,129 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="E_WinchFinalInterlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="BRAKE_COMMAND_NOT_CONFIRMED" value="1" />
+              <value name="RESTART_INHIBITED" value="2" />
+              <value name="SENSE_DROP_TIMEOUT" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BRAKE_COMMAND_NOT_CONFIRMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence confirmation ouverture frein &gt; 500ms</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>RESTART_INHIBITED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition redemarrage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SENSE_DROP_TIMEOUT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">T_max §3bis depasse sans confirmation retombee (AC7)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6c58fa53-306e-500d-a9d6-db062ea6d497</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_WinchFinalInterlockState">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLED" value="0" />
+              <value name="READY" value="1" />
+              <value name="WAIT_BRAKE_COMMAND_CONFIRMATION" value="2" />
+              <value name="WAIT_STEP_DELAY" value="3" />
+              <value name="WAIT_RESTART_DELAY" value="4" />
+              <value name="FAULT" value="5" />
+              <value name="WAIT_SENSE_DROP_CONFIRM" value="6" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Desactive / Hors service</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Pret / Etat nominal</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_BRAKE_COMMAND_CONFIRMATION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente confirmation feedback frein</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_STEP_DELAY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation changement de palier</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_RESTART_DELAY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation anti-court-cycle redemarrage</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat de defaut</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_SENSE_DROP_CONFIRM</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien §3bis du contacteur de sens (AC6/AC7)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f4ffbe06-67c2-52e4-817f-cab830f42ec8</ObjectId>
+          </data>
+        </addData>
+      </dataType>
     </dataTypes>
     <pous />
   </types>
@@ -196,6 +348,12 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
             <Folder Name="6_DIAG_ET_CHAINES">
               <Object Name="ST_MotionChecklist" ObjectId="6d9cfeb3-7f24-5c22-8bb6-161cefc2f0eb" />
             </Folder>
+          </Folder>
+        </Folder>
+        <Folder Name="H_TREUILS_BENNE">
+          <Folder Name="_TYPES">
+            <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
+            <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
           </Folder>
         </Folder>
       </ProjectStructure>

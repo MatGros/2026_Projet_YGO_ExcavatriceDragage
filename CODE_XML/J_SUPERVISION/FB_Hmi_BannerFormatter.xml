@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T14:09:44.668975" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T14:09:44.668975">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T07:02:01.291571" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T07:02:01.291571">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1443,6 +1443,14 @@
 --&gt; [TST] Bypass global</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgCorrectedT330">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] T330 : correction automatique d'un reglage haut (fenetre de maintien)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassWinchM1Active">
               <type>
                 <BOOL />
@@ -1642,6 +1650,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Cycle auto actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleElapsed_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Minutes ecoulees du cycle EN COURS (FB_CycleSemiAuto.CurrentCycleElapsed_Min) — affichees seulement si CycleAutoBusy</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleElapsed_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Secondes ecoulees du cycle EN COURS, 0..59 (FB_CycleSemiAuto.CurrentCycleElapsed_S)</xhtml>
               </documentation>
             </variable>
             <variable name="M3AtP1">
@@ -1858,6 +1882,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Libellé couplage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ElapsedSuffixStr">
+              <type>
+                <string length="20" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Suffixe chrono du cycle en cours, format ' MMminSSs' (deux chiffres par champ)</xhtml>
               </documentation>
             </variable>
             <variable name="CurrentDirection">
@@ -2337,6 +2369,38 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 [HISTO] M3 : LatchedId AND NOT ErrorId (défauts latched passés)</xhtml>
               </documentation>
             </variable>
+            <variable name="RearmEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front du réarmement puissance (contacteur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRearmWindow">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fenêtre transitoire post-réarmement (durée bornée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RearmWindowActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fenêtre post-réarmement en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NetworkSurveillanceActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Surveillance réseau/ES armée (hors fenêtre transitoire attendue)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_BannerHoldTime">
               <type>
                 <TIME />
@@ -2370,6 +2434,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Taille du carrousel d'alarmes (AF-07 §6)</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_RearmInhibitTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#4s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée de la fenêtre transitoire post-réarmement, alignée sur la garde de démarrage :
+pendant ce délai les esclaves peuvent légitimement ne pas être encore opérationnels.
+C'est une BORNE : passé ce délai, un défaut réseau réel est de nouveau affiché.
+. [LOC] Fenêtre transitoire post-réarmement puissance</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_WinchErrorIdCableLimitDescent">
               <type>
                 <WORD />
@@ -2378,14 +2456,13 @@
                 <simpleValue value="16#0040" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Bit 6 de ST_SafetyWinch.ErrorId = cause « Limite basse cable atteinte »
-(FB_Safety_Winch.st:318-325, vue LIVE, Latching := FALSE). Le DUT ST_SafetyWinch
-n'expose AUCUN champ nommé pour cette cause : le bit est nommé ici plutôt qu'écrit
-en clair dans le carrousel (T255-D).
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Bit 6 de ST_SafetyWinch.ErrorId = cause « Limite basse cable atteinte » (vue LIVE,
+Latching := FALSE, FB_Safety_Winch.st:318-325). Le DUT ST_SafetyWinch n'expose aucun
+champ nommé pour cette cause : le bit est nommé ici plutôt qu'écrit en clair.
 ⚠️ Ne JAMAIS lire WinchMxSafety.CableLimitDescent à la place : ce champ est une
-comparaison BRUTE de projection, sans bypass ni mode référencement
+comparaison BRUTE de position, sans bypass ni mode référencement
 (FB_WinchStateProjection.st:217-218/230/257) — il resterait vrai sous
-BypassCableLimitSwitch (MAINT_N2) alors que la cause est levée (revue 2026-09-20).
+BypassCableLimitSwitch (MAINT_N2) alors que la cause safety est levée.
 . [LOC] Bit 6 ErrorId : limite basse cable</xhtml>
               </documentation>
             </variable>
@@ -2422,6 +2499,10 @@ IF NOT Enable THEN
     END_FOR;
     TonAlarmBanner(IN := FALSE);
     TonBootInhibit(IN := FALSE);
+    TonRearmWindow(IN := FALSE);
+    RearmEdge(CLK := FALSE);
+    RearmWindowActive := FALSE;
+    NetworkSurveillanceActive := FALSE;
     TofFaultLocalIo(IN := FALSE);
     TofFaultVh0800(IN := FALSE);
     TofFaultVh0808(IN := FALSE);
@@ -2439,18 +2520,35 @@ END_IF;
 // ⏱️ Garde au démarrage (inhibition 4s pendant init des bus et équipements)
 TonBootInhibit(IN := Enable, PT := T#4s);
 
+// ⏱️ Fenêtre transitoire de réarmement puissance : à chaque front du contacteur, les esclaves
+// peuvent légitimement publier une perte de liaison pendant quelques secondes. La fenêtre est
+// BORNÉE (CST_RearmInhibitTime) : hors de celle-ci, un défaut réseau réel reste affiché.
+RearmEdge(CLK := PowerContactorEngaged);
+IF RearmEdge.Q THEN
+    RearmWindowActive := TRUE;
+END_IF;
+TonRearmWindow(IN := RearmWindowActive, PT := CST_RearmInhibitTime);
+IF TonRearmWindow.Q THEN
+    RearmWindowActive := FALSE;
+END_IF;
+
+// 🛡️ Surveillance réseau armée hors des phases où l'absence de bus est ATTENDUE :
+// démarrage CPU (garde ci-dessus) et réarmement puissance (fenêtre ci-dessus).
+// Rien d'autre n'est masqué : la chaîne AU, les sécurités et les défauts métier ne passent pas ici.
+NetworkSurveillanceActive := TonBootInhibit.Q AND NOT RearmWindowActive;
+
 // 🌊 Filtrage anti-bagotement (TOF 1.5s sur perte de validité)
-TofFaultLocalIo(IN := (NOT Network.InputModules.LocalDigitalIoOk) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVh0800(IN := (NOT Network.InputModules.Vh0800EndOk) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVh0808(IN := (NOT Network.InputModules.Vh0808EtpOk) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVh0008Er(IN := (NOT Network.InputModules.Vh0008ErOk) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVh0008Er1(IN := (NOT Network.InputModules.Vh0008Er1Ok) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultCanBus(IN := (NOT Network.BusCanOpen.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultJoy1(IN := (NOT Network.Joystick.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultEcatBus(IN := (NOT Network.BusEthercat.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultEncM1(IN := (NOT Network.EncoderM1.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultEncM2(IN := (NOT Network.EncoderM2.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVarM3(IN := (NOT Network.VariateurM3.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultLocalIo(IN := (NOT Network.InputModules.LocalDigitalIoOk) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVh0800(IN := (NOT Network.InputModules.Vh0800EndOk) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVh0808(IN := (NOT Network.InputModules.Vh0808EtpOk) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVh0008Er(IN := (NOT Network.InputModules.Vh0008ErOk) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVh0008Er1(IN := (NOT Network.InputModules.Vh0008Er1Ok) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultCanBus(IN := (NOT Network.BusCanOpen.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultJoy1(IN := (NOT Network.Joystick.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultEcatBus(IN := (NOT Network.BusEthercat.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultEncM1(IN := (NOT Network.EncoderM1.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultEncM2(IN := (NOT Network.EncoderM2.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVarM3(IN := (NOT Network.VariateurM3.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
 
 LocalIoValid   := NOT TofFaultLocalIo.Q;
 Vh0800Valid    := NOT TofFaultVh0800.Q;
@@ -2495,7 +2593,41 @@ ELSIF WinchSelected = 2 THEN
 ELSE
     CouplingStr := ' [AUCUN AXE]';
 END_IF;
-Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
+// Assemblage par ACCUMULATION sur le champ cible (STRING(120)) plutot que par CONCAT imbrique :
+// le resultat est identique en CODESYS (c'est la taille du champ cible qui gouverne), mais il ne
+// depend plus de la taille declaree des fragments intermediaires. Un CONCAT imbrique de fragments
+// STRING(20)/STRING(30)/STRING(30) est plafonne a 30 caracteres par le compilateur de test, qui
+// fait rendre a CONCAT le maximum de la taille de ses arguments : le mode affiche ressortait
+// ampute ('[SIMULATION] [SEMI-AUTO] [CYCL', 'CYCLE AUTO]' perdu) sur le harnais CI.
+Banner.GlobalContextText := PrefixContext;
+Banner.GlobalContextText := CONCAT(Banner.GlobalContextText, ModeStr);
+Banner.GlobalContextText := CONCAT(Banner.GlobalContextText, CouplingStr);
+
+// ⏱️ Chronomètre du cycle EN COURS, accolé au bandeau mode (format MMminSSs, ex. '09min05s').
+// • Producteur unique de la valeur : FB_CycleSemiAuto (CurrentCycleElapsed_Min/_S) ; le formateur
+//   ne recalcule RIEN et ne lit aucun global : les deux entiers arrivent par VAR_INPUT
+//   (cablés par PRG_07_Supervision.st sur GVL_IHM.CycleSemiAuto.State).
+// • Portillon : CycleAutoBusy = Lifecycle.Busy du séquenceur (PRG_07:758). Hors cycle il est FALSE
+//   (PRG_03_Modes_Cycle.st:471 et :544 hors SEMI_AUTO, FB_CycleSemiAuto.st:1585 en AX18 et :1621 en
+//   AX_STAB) et le chrono est remis à zéro (PRG_03_Modes_Cycle.st:490-494 / :565-569) : aucune durée
+//   figée d'un cycle précédent ne peut donc s'afficher à l'arrêt.
+// • Pire cas borné : 37 car. de base + 1 espace + 3 chiffres de minutes (CycleRunTimer armé PT=T#12h
+//   -&gt; 720 min maximum) + 'min' + 2 chiffres de secondes + 's' = 47 car., contre STRING(120) pour
+//   GlobalContextText (ST_HmiBanner.st:10). Même si les minutes n'étaient pas bornées par le TON
+//   (INT complet, 11 car.), le total resterait à 55 car. : aucune troncature possible.
+IF CycleAutoBusy THEN
+    IF CycleElapsed_Min &lt; 10 THEN
+        ElapsedSuffixStr := CONCAT(' 0', CONCAT(INT_TO_STRING(CycleElapsed_Min), 'min'));
+    ELSE
+        ElapsedSuffixStr := CONCAT(' ', CONCAT(INT_TO_STRING(CycleElapsed_Min), 'min'));
+    END_IF;
+    IF CycleElapsed_S &lt; 10 THEN
+        ElapsedSuffixStr := CONCAT(ElapsedSuffixStr, CONCAT('0', CONCAT(INT_TO_STRING(CycleElapsed_S), 's')));
+    ELSE
+        ElapsedSuffixStr := CONCAT(ElapsedSuffixStr, CONCAT(INT_TO_STRING(CycleElapsed_S), 's'));
+    END_IF;
+    Banner.GlobalContextText := CONCAT(Banner.GlobalContextText, ElapsedSuffixStr);
+END_IF;
 {endregion}
 
 {region "§1bis Repli defaut (etape origine)"}
@@ -2935,6 +3067,12 @@ ELSIF DirectionBlocked THEN
     ELSE
         OperatorActionCandidate := '[TREUIL] Montée interdite';
     END_IF;
+ELSIF CfgCorrectedT330 THEN
+    // 🔧 T330 — reglage haut corrige automatiquement (Q2). Volontairement place APRES toutes
+    // les branches de SECURITE (AU, puissance, SafeStop, direction) : une correction de reglage
+    // ne doit JAMAIS masquer une alarme de securite. Prefixe [CFG] discriminant pour rester
+    // distinguable de D18, benne non fermee et synchro (cadrage §11bis). Longueur &lt;= 70 car. (G408).
+    OperatorActionCandidate := '[CFG] Reglage corrige : reserve TOP/FDC a 1,00 m';
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // Guidance par étape du cycle (AF-07 §5.1) — ne masque jamais un défaut
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
@@ -3004,13 +3142,13 @@ ELSIF NOT DeadmanArmed THEN
 ELSIF CurrentMode = E_Mode.DISABLE THEN
     OperatorActionCandidate := '[IHM] Sélectionner un mode';
 ELSIF ((WinchM1Safety.ErrorId OR WinchM2Safety.ErrorId) AND CST_WinchErrorIdCableLimitDescent) &lt;&gt; 16#0000 THEN
-    // 🛡️ T255-D (mesure 2026-09-20) : cause limite basse câble ACTIVE (bit 6) ⇒ descente
-    // INTERDITE (DescendPermit = FALSE, FB_Safety_Winch.st:563-565) et REMONTÉE = seule
-    // action autorisée. Nomme la cause ET l'action même SANS commande de descente : la
-    // branche historique (FB_Hmi_BannerFormatter.st:661-663) restait inatteignable quand
-    // DirectionBlocked = FALSE (joystick relâché) — constat terrain d'origine.
+    // 🛡️ Cause limite basse câble ACTIVE (bit 6) ⇒ descente INTERDITE
+    // (DescendPermit = FALSE, FB_Safety_Winch.st:563-565) et REMONTÉE = seule action
+    // autorisée. Nomme la cause ET l'action même SANS commande de descente : la branche
+    // « Descente interdite - Limite basse cable » (ligne 661) n'est atteinte que si
+    // DirectionBlocked = TRUE, donc jamais joystick relâché.
     // Lue sur ErrorId (cause safety, bypass et mode référencement respectés) et jamais sur
-    // WinchMxSafety.CableLimitDescent, champ de projection brute sans bypass (revue 2026-09-20).
+    // WinchMxSafety.CableLimitDescent, champ de projection brute sans bypass.
     // Ordre volontaire : APRÈS « Descente interdite » (une descente réellement commandée
     // garde son libellé historique) et APRÈS la branche DISABLE (aucune action proposée
     // hors mode de marche), AVANT les rappels joystick : la cause prime sur le guidage,
@@ -3121,16 +3259,15 @@ END_IF;
 IF WinchM1Safety.ErrorOverspeed AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] Survitesse treuil detectee (SafeStop)'; AlarmCount := AlarmCount + 1;
 END_IF;
-// 🛡️ 5a-bis. Limite de course BASSE du treuil M1 (T255-D, mesure 2026-09-20) :
-//    cause 6 = instCauses[6].Active (FB_Safety_Winch.st:318-325), bit 6 = 16#0040, NON
-//    latchée : elle n'était décodée NULLE PART — ni carrousel actif, ni [HISTO] (jamais
-//    dans LatchedId). Elle allume pourtant AnyFaultActive via Safety.Error
-//    (PRG_07:541-542) : voyant allumé, bandeau muet. Elle est BLOQUANTE (DescendPermit,
-//    FB_Safety_Winch.st:563-565) ⇒ publiée au titre d'AF-07 §6 (interlock).
+// 🛡️ 5a-bis. Limite de course BASSE du treuil M1 : cause BLOQUANTE (DescendPermit,
+//    FB_Safety_Winch.st:563-565), donc publiée au carrousel au titre d'AF-07 §6 (interlock).
+//    Cause 6 = instCauses[6].Active (FB_Safety_Winch.st:318-325), bit 6 = 16#0040, NON
+//    latchée : elle allume AnyFaultActive via Safety.Error (PRG_07:541-542) et n'est
+//    présente ni en vue active sans cette entrée, ni en [HISTO] (jamais dans LatchedId).
 //    ⚠️ Lue sur ErrorId (la CAUSE safety, qui respecte tous les bypass) et JAMAIS sur
 //    WinchM1Safety.CableLimitDescent, champ de projection brute sans bypass
 //    (FB_WinchStateProjection.st:217-218/230) : le lire produirait une FAUSSE alarme sous
-//    BypassCableLimitSwitch (MAINT_N2) — revue read-only 2026-09-20, MAJOR-1.
+//    BypassCableLimitSwitch (MAINT_N2).
 //    Gardée par la validité encodeur, comme les autres alarmes filles du treuil.
 IF (WinchM1Safety.ErrorId AND CST_WinchErrorIdCableLimitDescent) &lt;&gt; 16#0000 AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] Limite basse cable atteinte'; AlarmCount := AlarmCount + 1;

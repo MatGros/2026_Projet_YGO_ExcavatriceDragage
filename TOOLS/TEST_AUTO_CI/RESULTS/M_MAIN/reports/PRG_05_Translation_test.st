@@ -81,7 +81,7 @@ TEST 'PRG_05_Translation : Commande Translation Rev (Joystick X negatif)'
         ModesAuth := modesAuth,
         WinchM1CablePosM := 5.0,
         WinchM2CablePosM := 5.0,
-        M3_PosP1_DI := TRUE,
+        M3_PosP1_DI := FALSE,
         M3_PosMaintenance_DI := TRUE,
         PowerContactorEngaged := TRUE,
         DriveOnline := TRUE,
@@ -93,7 +93,7 @@ TEST 'PRG_05_Translation : Commande Translation Rev (Joystick X negatif)'
         ModesAuth := modesAuth,
         WinchM1CablePosM := 5.0,
         WinchM2CablePosM := 5.0,
-        M3_PosP1_DI := TRUE,
+        M3_PosP1_DI := FALSE,
         M3_PosMaintenance_DI := TRUE,
         PowerContactorEngaged := TRUE,
         DriveOnline := TRUE,
@@ -104,7 +104,7 @@ TEST 'PRG_05_Translation : Commande Translation Rev (Joystick X negatif)'
         ModesAuth := modesAuth,
         WinchM1CablePosM := 5.0,
         WinchM2CablePosM := 5.0,
-        M3_PosP1_DI := TRUE,
+        M3_PosP1_DI := FALSE,
         M3_PosMaintenance_DI := TRUE,
         PowerContactorEngaged := TRUE,
         DriveOnline := TRUE,
@@ -176,4 +176,123 @@ TEST 'PRG_05_Translation : FdC Tremie LATCHE - un rebond capteur ne libere pas (
         M3_PosTremie_DI := FALSE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
         PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
     ASSERT_FALSE(harness.Data.TranslationState.LimitSwitchTremie, 'Commande sens inverse (Maintenance) -> butee Tremie liberee');
+END_TEST
+
+(* ═══════════════════════════════════════════════════════════════════════════
+   T345 lot L1 — PRG_05 : mémoire de cible et garde de mode des bypass M3.
+   ═══════════════════════════════════════════════════════════════════════════ *)
+
+TEST 'TC-P05-T345-01 (T345-L1) La perte de la demande n efface plus la cible deja qualifiee'
+    modesAuth.Mode := E_Mode.MAINT_N1;
+    acqData.Joystick.DeadmanArmed := TRUE;
+    acqData.Joystick.AxisX.Direction := -1;      // demande vers P1/Maintenance
+    acqData.Joystick.AxisX.SpeedTgt := 50.0;
+
+    // Scans 1-3 : commande arriere, capteur P1 atteint (mot 00011) -> jeton P1 -> cible qualifiee
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ASSERT_TRUE(harness.Data.TranslationDone, 'cible P1 qualifiee : debounce 100 ms ecoule');
+
+    // Scan 4 : l operateur relache le joystick (perte de la demande) SANS quitter P1.
+    // La cible doit rester portee : sans memoire de cible, la detection d arrivee en cours
+    // etait effacee et le verrou d arret de l axe ne pouvait plus s armer.
+    acqData.Joystick.AxisX.Direction := 0;
+    acqData.Joystick.AxisX.SpeedTgt := 0.0;
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ASSERT_TRUE(harness.Data.TranslationDone, 'demande retiree : la cible P1 reste qualifiee');
+
+    // Scans 7-9 : le chariot repart vers la Tremie, le capteur P2 se re-arme (mot 00111) -> un
+    // nouveau point est franchi, le jeton P1 retombe et la cible avec lui (elle n est pas collee).
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ASSERT_FALSE(harness.Data.TranslationDone, 'nouveau point franchi : la cible P1 retombe d elle-meme');
+END_TEST
+
+TEST 'TC-P05-T345-02 (T345-L1) Bypass de fin de course M3 consomme uniquement en MAINT_N2'
+    acqData.Joystick.DeadmanArmed := TRUE;
+    acqData.Joystick.AxisX.Direction := 1;       // demande vers la Tremie
+    acqData.Joystick.AxisX.SpeedTgt := 50.0;
+    modesAuth.Mode := E_Mode.MAINT_N1;           // hors MAINT_N2 : la garde doit s opposer au bypass
+
+    // Scans 1-4 (1 s chacun) : butee Tremie atteinte en demandant (mot 11111), bypass IHM a TRUE et
+    // rotation reelle injectee. Hors MAINT_N2 le bypass n est PAS consomme : les deux voies de la
+    // cause 6 (axe et safety) doivent s armer, la butee ne peut plus etre neutralisee.
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := TRUE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        BypassLimitSwitchIHM := TRUE, DriveActualFreqHzOverride := 5.0,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := TRUE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        BypassLimitSwitchIHM := TRUE, DriveActualFreqHzOverride := 5.0,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := TRUE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        BypassLimitSwitchIHM := TRUE, DriveActualFreqHzOverride := 5.0,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := TRUE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        BypassLimitSwitchIHM := TRUE, DriveActualFreqHzOverride := 5.0,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ASSERT_TRUE(harness.Data.TranslationState.Error, 'hors MAINT_N2 : cause 6 de l axe NON neutralisee par le bypass');
+    ASSERT_TRUE(harness.Data.TranslationSafety.PowerCutOff, 'hors MAINT_N2 : cause 6 safety NON neutralisee -> PowerCutOff');
+
+    // Scans 5-9 : retour en MAINT_N2, meme bypass et memes capteurs -> le bypass est consomme.
+    modesAuth.Mode := E_Mode.MAINT_N2;
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := TRUE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        BypassLimitSwitchIHM := TRUE, DriveActualFreqHzOverride := 5.0,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := TRUE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        BypassLimitSwitchIHM := TRUE, DriveActualFreqHzOverride := 5.0,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := TRUE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        BypassLimitSwitchIHM := TRUE, DriveActualFreqHzOverride := 5.0,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := TRUE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        BypassLimitSwitchIHM := TRUE, DriveActualFreqHzOverride := 5.0,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := TRUE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        BypassLimitSwitchIHM := TRUE, DriveActualFreqHzOverride := 5.0,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ASSERT_FALSE(harness.Data.TranslationState.Error, 'en MAINT_N2 : bypass consomme -> cause 6 de l axe neutralisee');
+    ASSERT_FALSE(harness.Data.TranslationSafety.PowerCutOff, 'en MAINT_N2 : bypass consomme -> pas de PowerCutOff');
 END_TEST

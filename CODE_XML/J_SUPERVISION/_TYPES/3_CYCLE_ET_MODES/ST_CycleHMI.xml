@@ -123,10 +123,10 @@
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Seuil ouverture benne pour préparer AX10→AX11 [0..50 %] ; 0 = critère historique, consommé en phase B</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Ouverture benne restante déclarant la fermeture atteinte [0..50 %] ; 0 = critère d'arrivée seul (branche seuil inactive)</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceStepTarget">
+            <variable name="_ReservedInerte_01">
               <type>
                 <INT />
               </type>
@@ -134,7 +134,7 @@
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=AX0 .. 20=AX_DIVING_RETRY), borné côté FB</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 RESERVE / INERTE depuis T358 (ex-ForceStepTarget) — PLUS AUCUN LECTEUR : la cible de forcage est portee par ST_CycleCmd.SetForceStepTgt (zone non persistee). Renomme (pas retire) pour ne pas decaler le mapping RETAIN positionnel des champs suivants (regle : jamais d'insertion ni de retrait au milieu) ; retrait reel = lot de migration de persistance dedie. Aucune exposition IHM sur ce tag.</xhtml>
               </documentation>
             </variable>
             <variable name="DiveStartMin_M">
@@ -175,10 +175,10 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.5" />
+                <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance de contrôle AX11 après fermeture benne (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance de contrôle AX11 après fermeture benne (m) — T298, reglage fin sur site a prevoir</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -190,6 +190,18 @@
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCountResetMode">
+              <type>
+                <derived name="E_CycleSampleCountResetMode" />
+              </type>
+              <initialValue>
+                <simpleValue value="E_CycleSampleCountResetMode.NEVER" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ AJOUT EN FIN DE STRUCT — mapping RETAIN positionnel : jamais d'insertion au milieu.
+🔢 RAZ auto du compteur JOURNALIER : NEVER par defaut = aucune RAZ auto</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -298,12 +310,30 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. NON persiste.</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnForceStepApply">
+            <variable name="BtnResetSampleCount">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Applique le forçage de step (front) — impulsion ; cible = ST_CycleCfg.ForceStepTarget</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 RAZ consciente du compteur JOURNALIER de prélèvements (front) — n'agit JAMAIS sur le totalisateur, qui n'a aucune commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetForceStepTgt">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="-1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ AJOUT EN FIN DE STRUCT (mapping positionnel : jamais d'insertion au milieu).
+🔧 T358 : consigne de forcage de step — VALEUR écrite par l'opérateur, lue ET
+acquittee par FB_CycleSemiAuto (retour à la sentinelle -1). Remplace le couple
+BtnForceStepApply + ST_CycleCfg.ForceStepTarget : plus de bouton, plus de
+confirmation, plus de cible persistée (donc aucun saut d'étape au démarrage).
+Zone Cmd = NON persistée : la consigne ne survit jamais à une coupure.
+-1 = aucune demande ; 0..22 = étape cible (plage E_AutoCycleStep).
+🔧 Étape cible du forçage immédiat du cycle ; -1 = aucune demande</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -514,20 +544,50 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur de prélèvements (RETAIN, Q3bis)</xhtml>
               </documentation>
             </variable>
-            <variable name="CurrentCycleElapsed">
+            <variable name="SampleCountTotal">
               <type>
-                <TIME />
+                <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée écoulée du cycle en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Inséré volontairement À CÔTÉ de SampleCount (regroupement sémantique des deux compteurs).
+       ST_CycleState est une structure d'ÉCHANGE IHM volatile : elle n'est ni persistée ni
+       mappée par position (aucune occurrence dans GVL_PERSISTENT) — l'ordre des champs y est
+       donc libre, contrairement à ST_CycleCfg/ST_CycleCmd dont les ajouts vont en fin.
+🔒 TOTALISATEUR de prélèvements (PERSISTENT) — LECTURE SEULE : jamais remis à zéro, aucune commande d'écriture</xhtml>
               </documentation>
             </variable>
-            <variable name="LastCycleDuration">
+            <variable name="CurrentCycleElapsed_Min">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée du dernier cycle achevé (figée à X13)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durées de cycle exposées IHM en 2 champs entiers (T347) : minutes illimitées + secondes 0..59.
+       Le type TIME est abandonné côté IHM (affichage panel peu lisible) ; suffixes d'unité NC-030.
+⏱️ Minutes écoulées du cycle en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CurrentCycleElapsed_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Secondes écoulées du cycle en cours (0..59)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Minutes du dernier cycle achevé (figées à X13)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Secondes du dernier cycle achevé (figées à X13, 0..59)</xhtml>
               </documentation>
             </variable>
             <variable name="DrainTimeElapsed_S">
@@ -554,20 +614,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔎 Contrôles procédé actifs mais ignorés</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceStepPrepared">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step préparé, commandes neutres</xhtml>
-              </documentation>
-            </variable>
             <variable name="ForceStepAccepted">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Impulsion préparation acceptée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Impulsion : consigne de forçage appliquée (saut d'étape effectif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepRejected">
@@ -575,7 +627,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Impulsion préparation refusée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Impulsion : consigne écartée (cible hors plage énum, ou cycle inactif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepResult">
@@ -583,7 +635,7 @@
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📝 Motif accepté/refusé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📝 Motif de rejet de la dernière consigne (vide après une consigne appliquée)</xhtml>
               </documentation>
             </variable>
             <variable name="ResumeAfterFaultAvailable">
@@ -648,6 +700,50 @@
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>a4e533cc-1a07-5fca-8da6-b652a120d4dd</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_CycleSampleCountResetMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NEVER" value="0" />
+              <value name="ON_FIRST_START" value="1" />
+              <value name="ON_SAFETY_REARM" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NEVER</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut : RAZ manuelle IHM uniquement (comportement historique, aucun changement)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ON_FIRST_START</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">RAZ au premier demarrage de cycle apres mise sous tension de l'automate</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ON_SAFETY_REARM</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">RAZ au rearmement de la chaine AU (contacteur puissance reengage)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ea6305ea-87dc-5770-9254-60521a6d4291</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -856,6 +952,7 @@
               <Object Name="ST_CycleCmd" ObjectId="dac4a7a5-fa3d-5326-bf1a-3202f2fbdc28" />
               <Object Name="ST_CycleState" ObjectId="3316cae9-98ac-5b12-9b8d-a24f1a7445d8" />
               <Object Name="E_CycleDepthStopMode" ObjectId="a4e533cc-1a07-5fca-8da6-b652a120d4dd" />
+              <Object Name="E_CycleSampleCountResetMode" ObjectId="ea6305ea-87dc-5770-9254-60521a6d4291" />
             </Folder>
           </Folder>
         </Folder>

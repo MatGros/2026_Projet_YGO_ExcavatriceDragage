@@ -49,6 +49,81 @@ TEST 'TC-P10-001 Meca A : derive >5.0m a l arret (joystick neutre) -> SafeStop +
     ASSERT_TRUE(fb.Fault.Latched, 'Meca A latchee (defaut a acquitter)');
 END_TEST
 
+TEST 'TC-P10-054 T288 : retour collectif au repos sous commande 3s -> SafeStop seul'
+    (* Cas terrain 14/09 : commande active, frein ouvert, retour collectif
+       tous contacteurs retombes et codeur immobile. *)
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+    (* Attendre la fenetre de reference existante avant d armer la surveillance. *)
+    ADVANCE_TIME(3000000000);
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := TRUE,
+       JoystickYNeutral := FALSE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
+       ReqAscent := TRUE, ReqDescend := FALSE, MovementCommanded := TRUE);
+    ASSERT_FALSE(fb.SafeStop, 'Avant 3s : pas de SafeStop');
+    ADVANCE_TIME(3000000000);
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := TRUE,
+       JoystickYNeutral := FALSE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
+       ReqAscent := TRUE, ReqDescend := FALSE, MovementCommanded := TRUE);
+    ASSERT_TRUE(fb.SafeStop, 'Retour collectif au repos + aucun mouvement 3s -> SafeStop');
+    ASSERT_FALSE(fb.PowerCutOff, 'T288 -> SafeStop seul, sans PowerCutOff');
+    ASSERT_TRUE(fb.Fault.Error, 'T288 -> ErrorID 16 actif');
+END_TEST
+
+TEST 'TC-P10-055 T288 : retour collectif engage sous commande 3s -> SafeStop seul'
+    (* Variante historique : au moins un contacteur confirme mais le codeur reste immobile. *)
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+    ADVANCE_TIME(3000000000);
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := FALSE, BrakeFeedback := TRUE,
+       JoystickYNeutral := FALSE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
+       ReqAscent := TRUE, ReqDescend := FALSE, MovementCommanded := TRUE);
+    ASSERT_FALSE(fb.SafeStop, 'Avant 3s : pas de SafeStop');
+    ADVANCE_TIME(3000000000);
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := FALSE, BrakeFeedback := TRUE,
+       JoystickYNeutral := FALSE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
+       ReqAscent := TRUE, ReqDescend := FALSE, MovementCommanded := TRUE);
+    ASSERT_TRUE(fb.SafeStop, 'Retour collectif engage + aucun mouvement 3s -> SafeStop');
+    ASSERT_FALSE(fb.PowerCutOff, 'T288 historique -> SafeStop seul, sans PowerCutOff');
+END_TEST
+
 TEST 'TC-P10-002 Meca B : non confirmation arret 3s -> SafeStop + PowerCutOff'
     (* Scan 1 : regime nominal *)
     fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,

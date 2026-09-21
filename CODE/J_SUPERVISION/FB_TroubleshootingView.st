@@ -574,7 +574,37 @@ GVL_Troubleshooting.N_MotionM1.RequestedSpeedPct        := WinchM1.State.SpeedCm
 GVL_Troubleshooting.N_MotionM1.Step5_NoSafetyFault      := NOT WinchM1.Safety.SafeStop AND NOT WinchM1.Safety.ThermalFault;
 GVL_Troubleshooting.N_MotionM1.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.N_MotionM1.RequestedDirection = 1, WinchM1.Safety.DescendPermit, WinchM1.Safety.AscentPermit);
 GVL_Troubleshooting.N_MotionM1.Step7_BrakeReleased      := WinchM1.State.BrakeCmd AND WinchM1.State.BrakeCommandOpenConfirmed;
-GVL_Troubleshooting.N_MotionM1.Step8_OutputInterlockOk  := NOT WinchM1.State.FinalInterlockError;
+// 🛡️ T371 — honnêteté du diagnostic (M1). La barrière finale publie DÉJÀ son état et sa cause
+// (FB_WinchOutputInterlock.st:54 State, :56 Reason), déjà routés jusqu'ici par
+// FB_WinchStateProjection.st:112-115. L'ancien `NOT FinalInterlockError` ne lisait QUE le défaut
+// bit0 (timeout confirmation frein, FB_WinchOutputInterlock.st:516-519 -> :528-532) : 4 refus
+// RÉELS restaient affichés en vert — F1 RestartInhibit (:357-363), F2 ContactorStuckLatched
+// (:364-373), F3 SafeStop/PermitFinalBlocked (:393-404, State laissé à READY et Reason à NONE),
+// F4 RestartRequired/DeadTimePending (:424-429). On cesse de TRONQUER un état déjà publié.
+// ⚠️ Latence N-1 assumée : WinchM1.State vient de la projection PRG_04_Treuils_Benne.st:1688-1696,
+// qui lit l'instance de PRG_06_Outputs -> état daté d'un scan (~10 ms). USAGE DIAGNOSTIC UNIQUEMENT :
+// aucune ligne de CONDUITE ne consomme Step8_InterlockState / Step8_InterlockReason.
+// Le dernier terme (« demande moteur vivante SANS ordre de frein validé ») est le SEUL témoin publié
+// qui distingue F3, où la barrière coupe les 6 ordres (:402-403) en laissant State = READY et Reason = NONE.
+// 🔴 REX 2026-09-21 (revue indépendante T371, verdict BLOCK) : ce témoin NE DOIT SURTOUT PAS se
+// construire sur `State.RelayFwd/RelayRev`. Ces champs viennent de FB_Winch
+// (`FB_WinchStateProjection.st:102-103` <- `WinchM1Ref : FB_Winch`), c'est-à-dire de la DEMANDE —
+// exactement le signal transmis à la barrière (`PRG_04_Treuils_Benne.st:1603-1604`
+// `RequestedRelayFwd := instWinchM1.RelayFwd`). Comparer la demande à elle-même rend le terme
+// TAUTOLOGIQUEMENT FAUX : `MotorRequest` implique déjà `RequestedRelayFwd XOR RequestedRelayRev`
+// (`FB_WinchOutputInterlock.st:182`), donc F3 n'aurait JAMAIS été détecté et le test F3 aurait
+// « passé » sur un état impossible en exploitation.
+// ✅ Le seul témoin VALIDÉ publié est `State.BrakeCmd`, recopié de la SORTIE de la barrière
+// (`FB_WinchStateProjection.st:108` <- `InterlockM1.BrakeCmd`, soit `RelayFwd OR RelayRev` VALIDÉS,
+// `FB_WinchOutputInterlock.st:487`). Terme retenu : demande vivante ET aucun ordre validé.
+// Recopie DIRECTE de l'énumération publiée (aucune projection, aucune conversion de type).
+GVL_Troubleshooting.N_MotionM1.Step8_InterlockState  := WinchM1.State.FinalInterlockState;
+GVL_Troubleshooting.N_MotionM1.Step8_InterlockReason := WinchM1.State.FinalInterlockReason;
+GVL_Troubleshooting.N_MotionM1.Step8_OutputInterlockOk := NOT WinchM1.State.FinalInterlockError
+                                                    AND NOT (WinchM1.State.FinalInterlockState = E_WinchFinalInterlockState.FAULT)
+                                                    AND NOT (WinchM1.State.FinalInterlockState = E_WinchFinalInterlockState.DISABLED)
+                                                    AND NOT (WinchM1.State.FinalInterlockState = E_WinchFinalInterlockState.WAIT_RESTART_DELAY)
+                                                    AND NOT (WinchM1.State.FinalMotorRequest AND NOT WinchM1.State.BrakeCmd);
 
 GVL_Troubleshooting.N_MotionM1.AllConditionsMet := GVL_Troubleshooting.N_MotionM1.Step1_PowerEngaged
                                               AND GVL_Troubleshooting.N_MotionM1.Step2_ModeAuthorized
@@ -606,7 +636,18 @@ GVL_Troubleshooting.O_MotionM2.RequestedSpeedPct        := WinchM2.State.SpeedCm
 GVL_Troubleshooting.O_MotionM2.Step5_NoSafetyFault      := NOT WinchM2.Safety.SafeStop AND NOT WinchM2.Safety.ThermalFault AND NOT WinchM2.Safety.SlackCable;
 GVL_Troubleshooting.O_MotionM2.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.O_MotionM2.RequestedDirection = 1, WinchM2.Safety.DescendPermit, WinchM2.Safety.AscentPermit);
 GVL_Troubleshooting.O_MotionM2.Step7_BrakeReleased      := WinchM2.State.BrakeCmd AND WinchM2.State.BrakeCommandOpenConfirmed;
-GVL_Troubleshooting.O_MotionM2.Step8_OutputInterlockOk  := NOT WinchM2.State.FinalInterlockError;
+// 🛡️ T371 — honnêteté du diagnostic (M2), même patron que M1 ci-dessus (source :
+// FB_WinchStateProjection.st:179-182, barrière FB_WinchOutputInterlock.st:54/:56, refus F1-F4
+// aux sites :357-363 / :364-373 / :393-404 / :424-429). Lecture N-1, DIAGNOSTIC UNIQUEMENT.
+// Idem M1 : le témoin F3 est `BrakeCmd` (SORTIE validée, projection :175) et JAMAIS les relais
+// `RelayFwd/RelayRev` de la demande (tautologie — REX revue T371 du 2026-09-21).
+GVL_Troubleshooting.O_MotionM2.Step8_InterlockState  := WinchM2.State.FinalInterlockState;
+GVL_Troubleshooting.O_MotionM2.Step8_InterlockReason := WinchM2.State.FinalInterlockReason;
+GVL_Troubleshooting.O_MotionM2.Step8_OutputInterlockOk := NOT WinchM2.State.FinalInterlockError
+                                                    AND NOT (WinchM2.State.FinalInterlockState = E_WinchFinalInterlockState.FAULT)
+                                                    AND NOT (WinchM2.State.FinalInterlockState = E_WinchFinalInterlockState.DISABLED)
+                                                    AND NOT (WinchM2.State.FinalInterlockState = E_WinchFinalInterlockState.WAIT_RESTART_DELAY)
+                                                    AND NOT (WinchM2.State.FinalMotorRequest AND NOT WinchM2.State.BrakeCmd);
 
 GVL_Troubleshooting.O_MotionM2.AllConditionsMet := GVL_Troubleshooting.O_MotionM2.Step1_PowerEngaged
                                               AND GVL_Troubleshooting.O_MotionM2.Step2_ModeAuthorized
@@ -641,7 +682,33 @@ GVL_Troubleshooting.P_MotionM3.RequestedSpeedPct        := Translation.State.Spe
 GVL_Troubleshooting.P_MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
 GVL_Troubleshooting.P_MotionM3.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.P_MotionM3.RequestedDirection = 1, Translation.Safety.EffectivePermitM3_Maintenance, Translation.Safety.EffectivePermitM3_Tremie); // Permis canoniques M3 — HeightInterlockBlocking reste un blocage séparé
 GVL_Troubleshooting.P_MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;
-GVL_Troubleshooting.P_MotionM3.Step8_OutputInterlockOk  := NOT Translation.State.FinalInterlockError;
+// 🛡️ T371 — axe M3 : état et cause publiés, décision inchangée sur le seul témoin ACTIF disponible.
+// Pourquoi pas plus ici : (1) la barrière finale M3 ne publie AUCUN état machine — PRG_05_Translation.st:749-755
+// dérive FinalInterlockState de Fault.Error seul (READY/ERROR), et ses ordres validés (DriveControlWord,
+// DriveFreqCmd) ne sont PAS publiés vers l'IHM (TranslationState.DriveControlWord :717 recopie la DEMANDE
+// de FB_Translation, pas l'ordre validé de la barrière) -> aucun témoin « ordre réellement délivré » ;
+// (2) `FinalInterlockReason` est MÉMORISÉ et n'est JAMAIS remis à NONE après acquittement
+// (FB_TranslationOutputInterlock.st:123-130 lève RestartInhibit sans toucher Reason ; seul le gate :80
+// le remet à NONE) -> l'utiliser dans la décision créerait un faux ROUGE PERMANENT après un acquittement.
+// Il est donc PUBLIÉ pour le technicien, sans servir de preuve de refus actif.
+// Le rapprochement avec la vérité Control_400 (Idx404/Idx405) devient ainsi lisible dans la checklist.
+// M3 ne publie qu'un état DÉRIVÉ du défaut (PRG_05:751-755) : projection EXPLICITE sur le vocabulaire
+// commun du DUT (E_State.READY -> READY, E_State.ERROR -> FAULT) — aucune donnée inventée, aucune
+// conversion de type. Les 3 raisons M3 sont identiques à celles de la famille commune.
+IF Translation.State.FinalInterlockState = E_State.ERROR THEN
+    GVL_Troubleshooting.P_MotionM3.Step8_InterlockState := E_WinchFinalInterlockState.FAULT;
+ELSE
+    GVL_Troubleshooting.P_MotionM3.Step8_InterlockState := E_WinchFinalInterlockState.READY;
+END_IF;
+IF Translation.State.FinalInterlockReason = E_TranslationFinalInterlockReason.RESTART_INHIBITED THEN
+    GVL_Troubleshooting.P_MotionM3.Step8_InterlockReason := E_WinchFinalInterlockReason.RESTART_INHIBITED;
+ELSIF Translation.State.FinalInterlockReason = E_TranslationFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED THEN
+    GVL_Troubleshooting.P_MotionM3.Step8_InterlockReason := E_WinchFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED;
+ELSE
+    GVL_Troubleshooting.P_MotionM3.Step8_InterlockReason := E_WinchFinalInterlockReason.NONE;
+END_IF;
+GVL_Troubleshooting.P_MotionM3.Step8_OutputInterlockOk := NOT Translation.State.FinalInterlockError
+                                                    AND NOT (Translation.State.FinalInterlockState = E_State.ERROR);
 
 GVL_Troubleshooting.P_MotionM3.AllConditionsMet := GVL_Troubleshooting.P_MotionM3.Step1_PowerEngaged
                                               AND GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized

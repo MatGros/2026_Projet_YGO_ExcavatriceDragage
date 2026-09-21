@@ -3,6 +3,18 @@
 # Structure liste plate pour vue tabulaire & filtres automatiques
 # ==============================================================================
 
+- id: "T374-CADRAGE"
+  date: "2026-09-22"
+  type: "planification"
+  priorite: "haute"
+  agent_id: "CDX01"
+  sujet: "MAINT_N2 : audit des six boutons moteur IHM et matrice de protections"
+  statut: "terminé"
+  livrable: "DOC/WFLOW/AUDITS/DESIGN/AUDIT_T374_MAINT_N2_BOUTONS_MOTEURS_20260922.md"
+  verdict: "Six boutons moteur sans routage vers les sorties ; freins raccordes. Phase A validee."
+  decision: "T374 reste ouverte pour cadrage de la phase B, matrice de protections et GO humain avant code."
+  note: "T259 conserve son statut historique avec contradiction signalee ; T273 reste distinct."
+
 - id: "T188"
   date: "2026-08-31"
   type: "tache"

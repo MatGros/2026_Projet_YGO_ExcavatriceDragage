@@ -1,4 +1,22 @@
 tasks:
+- id: T374
+  parent_id: ''
+  statut: ⏳
+  criticite: C4
+  domaine: MAINTENANCE_N2 / TREUILS / SECURITE
+  agent: '—'
+  date: '2026-09-22T00:06:10+02:00'
+  titre: 'MAINT_N2 : auditer la commande IHM M1, M2 et M1+M2 dans les deux sens avant essais'
+  contexte: 'Demande client pour la mise en service. Les six boutons moteur existent dans ST_MaintenanceN2Cmd.st:9-14, mais la recherche dans CODE/ ne trouve comme consommateur que ActiveForcing dans PRG_07_Supervision.st:705-710 ; les boutons de frein sont, eux, lus par PRG_06_Outputs.st:320-330. T259 reste une livraison historique distincte et T273 une revision de cinematique non demarree. Le comportement moteur actuel ne peut pas etre declare fonctionnel.'
+  description: 'Phase A en lecture seule : tracer les six boutons IHM jusqu aux commandes et sorties physiques, relever les protections appliquees, les trous de cablage et les collisions avec T259/T273. Produire le plan et la matrice de tests avant toute modification de CODE/. Phase B eventuelle sous contrat revise et GO humain explicite.'
+  objectifs:
+  - 'Pour M1 seul, M2 seul et M1+M2, dans chaque sens, fournir la chaine bouton IHM -> arbitrage -> barriere finale -> sortie, avec fichier et ligne ou rupture nommee.'
+  - 'Distinguer commande moteur, desserrage frein, demandes non valides et sorties effectivement validees.'
+  - 'Proposer une matrice de protections MAINT_N2 a arbitrer avec l utilisateur avant code ; aucune interpretation implicite du mot inconditionnellement.'
+  - 'Preparer six essais de simulation puis une recette machine, avec absence de redemarrage automatique et relachement du bouton.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_AUDIT.yaml
+  avancement: 'Phase A lecture seule livree : six boutons moteur sans consommation hors indicateur PRG_07 ActiveForcing ; freins raccordes separement dans PRG_06. Audit durable DOC/WFLOW/AUDITS/DESIGN/AUDIT_T374_MAINT_N2_BOUTONS_MOTEURS_20260922.md. Matrice de protections et plan code en attente de decision humaine ; aucune ligne CODE/ modifiee.'
+  bloque_par: []
 - id: T371
   parent_id: ''
   statut: ⏳

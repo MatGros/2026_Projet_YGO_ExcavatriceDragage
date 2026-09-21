@@ -1,5 +1,17 @@
+# =====================================================================
+# Trace debug CYCLE HOMING MACHINE — 41 variables TRACABLES (verifiées à l'import) 2026-09-21
+#
+# Regles de tracabilite ETABLIES PAR TEST REEL (import CODESYS) :
+#   1) STRING  -> NON tracable dans ce runtime (GVL_IHM..State.Instruction) => exclu.
+#   2) VAR locale [LOC] de PRG/FB (MachineHomingMechanicalStopOk, 10 internes
+#      instCycleMachineHoming.*) -> non exposees sans Symbol Config => exclues.
+#   HomingModeBActive est VAR_OUTPUT => Tracable (conserve).
+#   3) Toutes les autres sont publiees/traçables => liste active ci-dessous.
+# La liste complete (53) est en fin de fichier, exclues prefixees '#'.
+# =====================================================================
 GVL_IHM.CycleMachineHoming.State.SeqStep
-GVL_IHM.CycleMachineHoming.State.Instruction
+# Step GRAFCET ENUM (VAR_OUTPUT, E_MachineHomingTxState -> s'affiche HX0..HX7) — traçable
+PRG_02_Acquisition.instCycleMachineHoming.MachineHomingSeqStep
 GVL_IHM.CycleMachineHoming.State.Failed
 GVL_IHM.CycleMachineHoming.State.Active
 GVL_IHM.CycleMachineHoming.State.Homed
@@ -9,15 +21,7 @@ GVL_IHM.CycleMachineHoming.State.CmdWinchM1.RunRequest
 GVL_IHM.CycleMachineHoming.State.CmdWinchM2.RunRequest
 GVL_IHM.CycleMachineHoming.State.CmdBucketOpen
 GVL_IHM.CycleMachineHoming.State.CmdBucketClose
-PRG_02_Acquisition.instCycleMachineHoming.TransactionAbort
-PRG_02_Acquisition.instCycleMachineHoming.ClimbTimedOut
-PRG_02_Acquisition.instCycleMachineHoming.HomeAxesTimedOut
-PRG_02_Acquisition.instCycleMachineHoming.CouplingInterlockFault
-PRG_02_Acquisition.instCycleMachineHoming.ModeLostDuringCycle
-PRG_02_Acquisition.instCycleMachineHoming.MotionOutOfPhase
-PRG_02_Acquisition.instCycleMachineHoming.AxisHomingError
 PRG_02_Acquisition.instCycleMachineHoming.HomingModeBActive
-PRG_02_Acquisition.instCycleMachineHoming.RetryCount
 GVL_Troubleshooting.E_HomingM1.HwIn_ContactorsReleased_DI
 GVL_Troubleshooting.E_HomingM1.HwIn_BrakeIsOpen_DI
 GVL_Troubleshooting.F_HomingM2.HwIn_ContactorsReleased_DI
@@ -26,12 +30,11 @@ PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps
 PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps
 PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
 PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM
-PRG_02_Acquisition.MachineHomingMechanicalStopOk
 GVL_PERSISTENT._CalibM1.Homed
 GVL_PERSISTENT._CalibM2.Homed
-PRG_04_Treuils_Benne.Data.BucketState.IsOpen
-PRG_04_Treuils_Benne.Data.BucketState.IsClosed
-PRG_04_Treuils_Benne.Data.BucketState.BucketReferenced
+PRG_04_Treuils_Benne.instBucket.BucketState.IsOpen
+PRG_04_Treuils_Benne.instBucket.BucketState.IsClosed
+PRG_04_Treuils_Benne.instBucket.BucketState.BucketReferenced
 PRG_02_Acquisition.Data.Joystick.DeadmanArmed
 PRG_02_Acquisition.Data.Joystick.AtNeutralXY
 PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive
@@ -47,7 +50,19 @@ GVL_Troubleshooting.F_HomingM2.Step5_BrakeApplied
 GVL_Troubleshooting.F_HomingM2.TopPositionSensorActive
 GVL_Troubleshooting.F_HomingM2.AllConditionsMet
 GVL_Troubleshooting.F_HomingM2.RejectErrorMask
-PRG_02_Acquisition.instCycleMachineHoming.StabilizationOk
-PRG_02_Acquisition.instCycleMachineHoming.StabilizationFailed
 GVL_Troubleshooting.E_HomingM1.HomingSuspect
 GVL_Troubleshooting.F_HomingM2.HomingSuspect
+#
+# ---- EXCLUES (non tracables) ----
+# GVL_IHM.CycleMachineHoming.State.Instruction   ## STRING(120) — STRING non traçable dans ce setup CODESYS (Parameter 0x2)
+# PRG_02_Acquisition.instCycleMachineHoming.TransactionAbort   ## Variable interne [LOC] de FB (instCycleMachineHoming) — non exposée sans Symbol Config
+# PRG_02_Acquisition.instCycleMachineHoming.ClimbTimedOut   ## Variable interne [LOC] de FB (instCycleMachineHoming) — non exposée sans Symbol Config
+# PRG_02_Acquisition.instCycleMachineHoming.HomeAxesTimedOut   ## Variable interne [LOC] de FB (instCycleMachineHoming) — non exposée sans Symbol Config
+# PRG_02_Acquisition.instCycleMachineHoming.CouplingInterlockFault   ## Variable interne [LOC] de FB (instCycleMachineHoming) — non exposée sans Symbol Config
+# PRG_02_Acquisition.instCycleMachineHoming.ModeLostDuringCycle   ## Variable interne [LOC] de FB (instCycleMachineHoming) — non exposée sans Symbol Config
+# PRG_02_Acquisition.instCycleMachineHoming.MotionOutOfPhase   ## Variable interne [LOC] de FB (instCycleMachineHoming) — non exposée sans Symbol Config
+# PRG_02_Acquisition.instCycleMachineHoming.AxisHomingError   ## Variable interne [LOC] de FB (instCycleMachineHoming) — non exposée sans Symbol Config
+# PRG_02_Acquisition.instCycleMachineHoming.RetryCount   ## Variable interne [LOC] de FB (instCycleMachineHoming) — non exposée sans Symbol Config
+# PRG_02_Acquisition.MachineHomingMechanicalStopOk   ## VAR locale [LOC] de PRG_02 — non exposée à la trace
+# PRG_02_Acquisition.instCycleMachineHoming.StabilizationOk   ## Variable interne [LOC] de FB (instCycleMachineHoming) — non exposée sans Symbol Config
+# PRG_02_Acquisition.instCycleMachineHoming.StabilizationFailed   ## Variable interne [LOC] de FB (instCycleMachineHoming) — non exposée sans Symbol Config

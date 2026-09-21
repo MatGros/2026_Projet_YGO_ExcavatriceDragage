@@ -1,0 +1,117 @@
+{
+  "source": "TOOLS\\PLC_CSV_SNAPSHOT\\RESULTS\\trace\\Suivi_74_SIMU_MAINTN1_M3_TestSim_20260920.trace",
+  "variable_count": 22,
+  "sample_count": 4612,
+  "variables": [
+    {
+      "name": "M3Translation.State.AtTremie",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "M3Translation.State.AtP2",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "M3Translation.State.AtPV",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "M3Translation.State.AtP1",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "M3Translation.State.AtMaintenance",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "IoHw.In.Hardware.Translation.M3_PosTremie_DI",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "IoHw.In.Hardware.Translation.M3_PosPV_DI",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "IoHw.In.Hardware.Translation.M3_PosPVP2_DI",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "IoHw.In.Hardware.Translation.M3_PosP1_DI",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "M3_BrakeIsOpen_DI",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "PRG_02_Acquisition.HwIn.Translation.M3_ActualFrequencyHz",
+      "type": "System.Double",
+      "samples": 4612
+    },
+    {
+      "name": "M3_StatusWord",
+      "type": "System.Double",
+      "samples": 4612
+    },
+    {
+      "name": "M3_SetpointFrequencyHz",
+      "type": "System.Double",
+      "samples": 4612
+    },
+    {
+      "name": "M3_CommandWord",
+      "type": "System.Double",
+      "samples": 4612
+    },
+    {
+      "name": "M3_ThermalOK_DI",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "M3Translation.Safety.Error",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "M3Translation.Safety.ErrorId",
+      "type": "System.Double",
+      "samples": 4612
+    },
+    {
+      "name": "M3Translation.State.Error",
+      "type": "System.Double",
+      "samples": 4611
+    },
+    {
+      "name": "M3Translation.State.ErrorId",
+      "type": "System.Double",
+      "samples": 4612
+    },
+    {
+      "name": "M3Translation.State.EstimatedPosM3_M",
+      "type": "System.Double",
+      "samples": 4612
+    },
+    {
+      "name": "JOY1Joystick.State.AxisCmdX.Deflection",
+      "type": "System.Double",
+      "samples": 4612
+    },
+    {
+      "name": "JOY1Joystick.State.AxisCmdY.Deflection",
+      "type": "System.Double",
+      "samples": 4612
+    }
+  ]
+}
