@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T01:35:02.909462" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T01:35:02.909462">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T05:48:02.394079" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T05:48:02.394079">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1596,6 +1596,14 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Consigne de forcage lue AVANT l'appel du FB : base du compare-et-efface (acquittement T358, cf. §3)</xhtml>
               </documentation>
             </variable>
+            <variable name="EffectiveWinchSelectRequest">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Selecteur treuil effectif (override cycle homing HX1/HX1a ou IHM)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_CycleInitWindowM">
               <type>
                 <REAL />
@@ -1659,6 +1667,15 @@ ELSIF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage &lt;&gt; PrevActualPag
     END_IF;
 END_IF;
 
+// Arbitrage amont selecteur treuil : le cycle homing machine peut forcer temporairement
+// WinchSel=2 (fermeture benne HX1) ou WinchSel=0 (couplage M1+M2 HX1a..HX6).
+IF PRG_02_Acquisition.Data.MachineHoming.Active
+   AND (PRG_02_Acquisition.Data.MachineHoming.CmdWinchSelect &gt;= 0) THEN
+    EffectiveWinchSelectRequest := PRG_02_Acquisition.Data.MachineHoming.CmdWinchSelect;
+ELSE
+    EffectiveWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch;
+END_IF;
+
 instModes(
     Enable                  := TRUE,
     Reset                   := GVL_IHM.Modes.Cmd.BtnModeReset,
@@ -1669,7 +1686,7 @@ instModes(
     InhibitM2Request        := GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit,
     SelHomingApproachEnable := GVL_IHM.Commun.Cfg.SelHomingApproachEnable,
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState &lt;&gt; DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState &lt;&gt; DEVICE_STATE.RUNNING),
-    JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch,
+    JoystickWinchSelectRequest := EffectiveWinchSelectRequest,
     SelMaintenanceZoneAccess := GVL_IHM.M3Translation.Cmd.TglMaintenanceZoneAccess,
     // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
     CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,
@@ -5360,7 +5377,7 @@ CASE State OF
             WaitingForOperator := NOT JoystickDeflected;
             WaitingForProcess := JoystickDeflected;
             OperatorActionId := 16#0402;
-            OperatorAction := 'AX2 - M3 au-dela de P1 : pousser vers la tremie (gauche) pour retrouver P1.';
+            OperatorAction := 'AX2 - M3 au-dela de P1 : pousser vers tremie (gauche) jusqu a P1.';
             TranslationCmd.PositionTgt := 1;      // sens retour vers Trémie
             TranslationCmd.ReqStart := TranslationTremiePermit;
         ELSE

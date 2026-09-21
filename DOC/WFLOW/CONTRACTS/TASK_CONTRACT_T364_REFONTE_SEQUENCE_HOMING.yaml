@@ -1,0 +1,157 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TÂCHE — T364 : Refonte complète de la séquence de homing machine
+# Criticité C1 — cycle de référencement machine (FB_CycleMachineHoming)
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+#
+# Contexte : Suite à l'audit T364 (16 écarts identifiés, AUDIT_T364_HOMING_4_POINTS_20260921.md),
+# l'exploitant a spécifié le 2026-09-21 une refonte majeure du cycle séquentiel de homing machine.
+# Les 6 questions d'arbitrage Q1-Q6 et les 2 risques physiques (3bis/3ter) ont été formellement
+# arbitrés et validés par l'exploitant le 2026-09-21T07:37.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T364_REFONTE_SEQUENCE_HOMING
+  criticality: C1
+  strategy: patch
+
+  # ── 1. Objectif métier ────────────────────────────────────────────────────
+  objective: >
+    Refondre intégralement le GRAFCET séquentiel du cycle de homing machine
+    (FB_CycleMachineHoming.st) selon la séquence cible validée :
+    (1) HX1 : Décision et fermeture benne à l'aveugle sous sécurités renforcées (palier 1 strict,
+        homme-mort, timeout de garde 8s, FDC logiciel inhibé), validation par un seul appui
+        sur le nouveau bouton IHM dédié BtnConfirmHomingBucket.
+    (2) HX1a : Interlock de couplage absolu — bascule WinchSel := 0, réactivation du FDC benne,
+        vérification bloquante du bouclage aval (JoystickWinchSelectArbitrated = 0) avant
+        d'autoriser tout mouvement. M1 Homed=0 non bloquant si sortie manuelle requise.
+    (3) HX2 : Montée couplée M1+M2 vers le capteur haut au palier 1 MAX strict. Interlock bloquant
+        si WinchSel dévie de 0.
+    (4) HX3 : Détection capteur haut TOP M1/M2 et prise de référence à la volée sur la position
+        de configuration réglable persistante (défaut 8.50 m).
+    (5) HX4 : Arrêt mécanique et stabilisation métrologique — contrôle que la position finale
+        se situe dans la plage d'inertie [8.50 m .. 8.80 m] et vérification de concordance des
+        codeurs. En cas d'échec : retour en HX1 (max 3 tentatives), puis échec définitif.
+    (6) HX5 : Dégagement de la zone haute et retour joystick au neutre vérifié.
+    (7) HX6 : Validation finale, publication de MachineHomed := TRUE, commit atomique benne,
+        puis retour à HX0_REPOS.
+    (8) HX7_FAILED : Échec sécurisé unifié remplaçant l'ancien HX7/HXF, sortie uniquement sur
+        Reset conscient en MAINT_N2.
+
+  # ── 2. Critères testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        Résolution formelle de E1 (Couplage M1/M2) : En HX1a, le cycle commande la bascule
+        WinchSel := 0 et ne transite vers HX2 que si le sélecteur arbitré aval confirme
+        le couplage effectif (JoystickWinchSelectArbitrated = 0) et que les treuils sont à l'arrêt.
+        Pendant toute la montée HX2, si le sélecteur arbitré dévie de 0, tout ordre de montée est
+        immédiatement coupé et aucune impulsion HomeReq ne peut être émise.
+      verified_by: >
+        (1) Revue statique de l'interlock dans FB_CycleMachineHoming.st et son câblage dans
+        PRG_02/PRG_03 ; (2) Test CI unitaire prouvant que HX2 refuse de monter si WinchSel <> 0 ;
+        (3) Test CI d'intégration prouvant que M1 et M2 reçoivent simultanément la commande
+        de montée au palier 1 sous joystick tiré.
+
+    - id: AC2
+      statement: >
+        Sécurisation 3bis (Manoeuvre benne HX1 sans FDC logiciel) : En HX1, WinchSel := 2 est
+        forcé, le FDC benne logiciel est inhibé, la vitesse est strictement plafonnée au palier 1
+        (StepTgt := 1), l'ordre n'est actif que sous DeadmanArmed + JoystickPull, et une temporisation
+        de garde maximale de 8.0 s coupe automatiquement l'ordre si la manoeuvre se prolonge.
+        La transition vers HX1a exige un front montant unique du nouveau bouton dédié IHM
+        BtnConfirmHomingBucket ET le retour du joystick au neutre.
+      verified_by: >
+        (1) Revue statique des gardes de HX1 dans FB_CycleMachineHoming.st ; (2) Test CI unitaire
+        prouvant le plafonnement palier 1 et la coupure sur timeout 8s ; (3) Test CI vérifiant
+        que l'appui sur BtnConfirmHomingBucket valide la transition vers HX1a sans exiger 3 appuis.
+
+    - id: AC3
+      statement: >
+        Référence à la volée en HX3 : Dès détection du capteur haut TopPositionSensor pendant la
+        montée couplée, le cycle émet une impulsion unique HomeReq pour M1 et M2 avec la cible
+        issue du paramètre persistant CfgTopSensorPosM (valeur par défaut 8.50 m).
+      verified_by: >
+        (1) Test CI vérifiant l'émission de HomeReq M1/M2 sur franchissement du capteur ;
+        (2) Preuve que la cible provient de la configuration persistante et non d'un littéral codé en dur.
+
+    - id: AC4
+      statement: >
+        Stabilisation métrologique et retries en HX4 : Après arrêt mécanique des treuils, le cycle
+        vérifie que la position mesurée des deux axes est comprise dans la fenêtre d'inertie
+        [8.50 m .. 8.80 m] et que l'écart entre axes est conforme. Si la condition est satisfaite,
+        transition vers HX5. Si la condition échoue, le cycle incrémente un compteur d'échecs :
+        si compte < 3, retour à HX1 pour repositionnement et nouvelle tentative ; si compte >= 3,
+        bascule en HX7_FAILED.
+      verified_by: >
+        (1) Test CI avec position stabilisée à 8.65 m -> succès vers HX5 ; (2) Test CI avec
+        position hors tolérance (< 8.50 m ou > 8.80 m) -> réitération vers HX1 jusqu'à 3 fois ;
+        (3) Test CI au 3e échec -> bascule directe en HX7_FAILED.
+
+    - id: AC5
+      statement: >
+        Dégagement HX5 et qualification finale HX6 : En HX5, le cycle attend le retour complet du
+        joystick au neutre et l'immobilité des treuils. En HX6, MachineHomed est positionné à TRUE,
+        le commit atomique de fermeture benne est publié (BucketCommit.CommitClose := TRUE),
+        M3Locked est libéré, et le cycle revient au repos HX0_REPOS.
+      verified_by: >
+        Test CI vérifiant le cycle complet nominal de HX0 jusqu'à HX6 et la levée effective de
+        MachineHomed.
+
+    - id: AC6
+      statement: >
+        Unification de l'échec en HX7_FAILED : L'état d'échec terminal du cycle est nommé HX7_FAILED.
+        L'ancien état HX7_LOCKED_REFERENCE (T340) est définitivement retiré. La sortie de HX7_FAILED
+        n'est autorisée que sur front montant Reset conscient sous mode MAINT_N2.
+      verified_by: >
+        (1) Vérification de l'enum E_MachineHomingTxState ; (2) Test CI de réarmement depuis HX7_FAILED.
+
+    - id: AC7
+      statement: >
+        Verrouillage translation M3 et sécurité de mode : M3Locked est actif dès la sortie de HX0_REPOS
+        et reste maintenu pendant toutes les étapes HX1 à HX5. Toute perte du mode MAINT_N2 pendant
+        le cycle entraîne l'abandon immédiat vers HX7_FAILED.
+      verified_by: >
+        Test CI vérifiant la tenue de M3Locked et l'avortement sur perte de MAINT_N2.
+
+    - id: AC8
+      statement: >
+        Conformité structurelle architecture et bundle : Pour tout programme sous CODE/M_MAIN/,
+        le nom de fichier est identique au nom de POU et le suffixe est identique au langage dans le bundle.
+      verified_by: >
+        Vérification par les gates G310_check_code_structure.py et G200_check_linkage.py lors de l'export.
+
+  # ── 3. Périmètre d'écriture ───────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleMachineHoming.st
+      - CODE/G_CYCLE/_TYPES/E_MachineHomingTxState.st
+      - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_Cfg.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCmd.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclemachinehoming.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_REFONTE_SEQUENCE_HOMING.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - CODE_XML/**
+    forbidden:
+      - PRJ_CODESYS/**
+      - Device.export
+      - ARCHIVES/**
+      - CODE/A_INFRA/**
+      - CODE/B_SECURITE/**
+      - Tout commit ou push sans accord explicite distinct
+
+  # ── 4. Preuves attendues ──────────────────────────────────────────────────
+  evidence_required:
+    - rapport de check_task_contract.py vert
+    - rapport d'exécution des tests CI unitaires test_fb_cyclemachinehoming.st (100% PASS)
+    - rapport G200_check_linkage.py --report (0 erreur de liaison)
+    - rapport run_all_gates.py --palier C
+    - export CODE_XML/CODE_Bundle.xml frais et CODE_XML/CODE_DiffBundle.xml

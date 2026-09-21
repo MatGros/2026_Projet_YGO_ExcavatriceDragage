@@ -8,6 +8,7 @@ STRUCT
     BtnReset            : BOOL; (* 🔑 Acquittement défaut benne *)
     BtnConfirmOpenPos   : BOOL; (* Référencement benne position ouverte (mise en service) — confirmation pure, aucun mouvement *)
     BtnConfirmClosePos  : BOOL; (* Référencement benne position fermée (mise en service) — confirmation pure, aucun mouvement *)
+    BtnConfirmHomingBucket : BOOL; (* Confirmation visuelle fermeture benne cycle homing HX1 (bouton dédié IHM) *)
     // Bornes du JOG MANUEL benne -- actif uniquement en pilotage unitaire M2 (sélecteur
     // arbitré = 2), jamais en pilotage couplé (MAINT WinchSel=0 ou SEMI_AUTO) ni pendant la
     // phase T248. Si TRUE : borne le déplacement entre les positions ouvert/fermé configurées

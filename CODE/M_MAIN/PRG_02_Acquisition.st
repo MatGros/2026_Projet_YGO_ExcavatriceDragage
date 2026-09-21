@@ -570,10 +570,13 @@ instCycleMachineHoming(
     // OU commande IHM dediee (front) pour le lancement direct.
     BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.CycleMachineHoming.Cmd.BtnValidate,
     StartRequest               := GVL_IHM.CycleMachineHoming.Cmd.BtnStart,
-    // Confirmation visuelle "benne fermee" (bouton N2 dedie, front) : ouvre l'etape
-    // verrouillee de referencement (montee au capteur haut puis referencement a l'arret).
-    // Meme front que la demande de reference benne : une seule intention operateur.
-    BucketCloseConfirmed       := BucketReferenceCloseEdge.Q,
+    // Confirmation visuelle benne fermee (nouveau bouton dedie IHM HX1)
+    BtnConfirmHomingBucket     := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmHomingBucket,
+    // Interlock couplage E1 et mesures pour controle stabilisation HX4
+    JoystickWinchSelectArbitrated := PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated,
+    CablePosM1                 := Data.EncoderM1.Measurement.CablePosM,
+    CablePosM2                 := Data.EncoderM2.Measurement.CablePosM,
+    CoherenceLimitM            := GVL_PERSISTENT._BucketCfgPersist.Config.CoherenceLimitM,
     CfgCommissioningEnable     := GVL_IHM.CycleMachineHoming.Cmd.TglCommissioning,
     CfgForceStepTarget         := GVL_IHM.CycleMachineHoming.Cfg.ForceStepTarget,
     CfgForceStepApply          := GVL_IHM.CycleMachineHoming.Cmd.BtnForceStepApply,
@@ -593,6 +596,7 @@ Data.MachineHoming.CmdWinchM1       := instCycleMachineHoming.CmdWinchM1;
 Data.MachineHoming.CmdWinchM2       := instCycleMachineHoming.CmdWinchM2;
 Data.MachineHoming.CmdBucketOpen    := instCycleMachineHoming.CmdBucketOpen;
 Data.MachineHoming.CmdBucketClose   := instCycleMachineHoming.CmdBucketClose;
+Data.MachineHoming.CmdWinchSelect   := instCycleMachineHoming.CmdWinchSelect;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwInM1.SpdValueIn        := HwIn.Winch.COD1_SpdValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T19:03:00.559765" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T19:03:00.559765">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T05:46:01.560332" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T05:46:01.560332">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -78,6 +78,39 @@ Garde de montee au capteur haut (0 = pas de garde)</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde de descente HX3 : meme regle (budget de DESCENTE CONTINUE).
 Garde de descente jusqu'au front descendant capteur (0 = pas de garde)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgTimeoutBucketClose">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#8s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde maximale fermeture benne en HX1 sans FDC logiciel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgStabilizationMinM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil bas d'inertie stabilisée après référence (m) - HX4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgStabilizationMaxM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8.8" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil haut d'inertie stabilisée après référence (m) - HX4</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
