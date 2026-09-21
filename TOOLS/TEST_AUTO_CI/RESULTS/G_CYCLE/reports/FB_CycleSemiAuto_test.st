@@ -48,6 +48,171 @@ TEST 'T262-002 AX10B : transfert Both P1 sans coupure M2 puis AX11 P2'
                 'AX11 applique le plafond commun P2');
 END_TEST
 
+(* ============================================================================
+   T345-L2 - AX14->AX15A instantane, neutre obligatoire avant AX15B
+   Contrat : TASK_CONTRACT_T345_L2_AX14_AX15A_INSTANTANEE.yaml
+   ============================================================================ *)
+
+TEST 'T345-L2-001 : arrivee AX14 neutre, puis nouveau push autorise AX15B'
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
+       Translation_At_Tremie := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := FALSE, DeadmanArmed := TRUE,
+       JoystickPush := FALSE, JoystickPull := FALSE, JoystickLeft := FALSE, JoystickRight := FALSE,
+       SampleCount := SampleCount, StepForceTgt := 14);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'T345-L2-001 : AX14 force');
+    FB(StepForceTgt := -1, Translation_At_Tremie := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := FALSE, DeadmanArmed := TRUE, JoystickPush := FALSE,
+       SampleCount := SampleCount);
+    ADVANCE_TIME(600000000);
+    FB(Translation_At_Tremie := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := FALSE, DeadmanArmed := TRUE, JoystickPush := FALSE,
+       SampleCount := SampleCount);
+
+    (* Premier scan AX15A au neutre : le latch s'arme, sans transition dans ce meme scan. *)
+    FB(Translation_At_Tremie := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := FALSE, DeadmanArmed := TRUE, JoystickPush := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15A_DUMP_ARRIVE,
+                'T345-L2-001 : AX15A atteint apres confirmation arret');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen OR FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest OR FB.TranslationCmd.ReqStart,
+                 'T345-L2-001 : aucune commande au scan neutre AX15A');
+    ASSERT_EQ(FB.OperatorAction, 'AX15a - Pousser vers le bas pour ouvrir et vider.',
+              'T345-L2-001 : guide push publie apres neutre');
+
+    (* Nouveau geste : changement d'etat, puis commande seulement au scan AX15B. *)
+    FB(JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15A_DUMP_ARRIVE,
+                'T345-L2-001 : transition demandee depuis AX15A');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen, 'T345-L2-001 : aucune ouverture au scan de transition');
+    FB(JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN,
+                'T345-L2-001 : AX15B execute au scan suivant');
+    ASSERT_TRUE(FB.BucketCmd.ReqOpen, 'T345-L2-001 : ouverture autorisee apres neutre puis nouveau push');
+END_TEST
+
+TEST 'T345-L2-002 : push Y maintenu a l arrivee passe AX15A mais reste bloque avant neutre'
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
+       Translation_At_Tremie := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := TRUE, DeadmanArmed := TRUE,
+       JoystickPush := TRUE, JoystickPull := FALSE, JoystickLeft := FALSE, JoystickRight := FALSE,
+       SampleCount := SampleCount, StepForceTgt := 14);
+    FB(StepForceTgt := -1, Translation_At_Tremie := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       SampleCount := SampleCount);
+    ADVANCE_TIME(600000000);
+    FB(Translation_At_Tremie := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       SampleCount := SampleCount);
+    FB(Translation_At_Tremie := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15A_DUMP_ARRIVE,
+                'T345-L2-002 : transition AX14->AX15A sans attendre neutre');
+    ASSERT_TRUE(FB.WaitingForOperator, 'T345-L2-002 : relachement operateur attendu');
+    ASSERT_EQ(FB.OperatorAction, 'AX15a - Relacher le joystick avant ouverture.',
+              'T345-L2-002 : message de relachement explicite');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen OR FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest OR FB.TranslationCmd.ReqStart,
+                 'T345-L2-002 : Y maintenu ne commande aucun mouvement avant neutre');
+    FB(JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15A_DUMP_ARRIVE,
+                'T345-L2-002 : AX15A maintenu tant que Y reste pousse');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen, 'T345-L2-002 : ReqOpen reste faux avant neutre');
+END_TEST
+
+TEST 'T345-L2-003 : diagonale X plus Y maintenue ne contourne pas le neutre AX15A'
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
+       Translation_At_Tremie := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := TRUE, DeadmanArmed := TRUE,
+       JoystickPush := TRUE, JoystickPull := FALSE, JoystickLeft := TRUE, JoystickRight := FALSE,
+       SampleCount := SampleCount, StepForceTgt := 14);
+    FB(StepForceTgt := -1, Translation_At_Tremie := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickLeft := TRUE,
+       SampleCount := SampleCount);
+    ADVANCE_TIME(600000000);
+    FB(Translation_At_Tremie := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickLeft := TRUE,
+       SampleCount := SampleCount);
+    FB(Translation_At_Tremie := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickLeft := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15A_DUMP_ARRIVE,
+                'T345-L2-003 : diagonale n empeche pas l arrivee AX15A');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen OR FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest OR FB.TranslationCmd.ReqStart,
+                 'T345-L2-003 : diagonale ne produit aucun mouvement avant neutre');
+    FB(JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickLeft := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15A_DUMP_ARRIVE,
+                'T345-L2-003 : diagonale maintenue reste bloquee en AX15A');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen, 'T345-L2-003 : ReqOpen reste faux sous diagonale');
+END_TEST
+
+TEST 'T345-L2-004 : forcage repete cible 15 efface un latch neutre precedent'
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
+       JoystickDeflected := FALSE, DeadmanArmed := TRUE, JoystickPush := FALSE,
+       SampleCount := SampleCount, StepForceTgt := 15);
+    FB(StepForceTgt := -1, JoystickDeflected := FALSE, DeadmanArmed := TRUE, JoystickPush := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15A_DUMP_ARRIVE,
+                'T345-L2-004 : AX15A execute au neutre et latch arme');
+
+    (* Meme cible forcee pendant un push : le reset doit avoir lieu meme sans changement d enum. *)
+    FB(StepForceTgt := 15, JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'T345-L2-004 : forcage repete 15 accepte et neutre en commandes');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen, 'T345-L2-004 : scan de forcage sans ouverture');
+    FB(StepForceTgt := -1, JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       SampleCount := SampleCount);
+    FB(JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15A_DUMP_ARRIVE,
+                'T345-L2-004 : latch perime ne survit pas au forcage repete');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen, 'T345-L2-004 : push deja actif reste bloque sans nouveau neutre');
+END_TEST
+
+TEST 'T345-L2-005 : non regression AX2 vers AX3 conserve le geste PushOnly existant'
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
+       Translation_At_P1 := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := TRUE, DeadmanArmed := TRUE,
+       JoystickPush := TRUE, JoystickPull := FALSE, JoystickLeft := FALSE, JoystickRight := FALSE,
+       SampleCount := SampleCount, StepForceTgt := 2);
+    FB(StepForceTgt := -1, Translation_At_P1 := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       JoystickLeft := FALSE, JoystickRight := FALSE, SampleCount := SampleCount);
+    ADVANCE_TIME(600000000);
+    FB(Translation_At_P1 := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       JoystickLeft := FALSE, JoystickRight := FALSE, SampleCount := SampleCount);
+    FB(Translation_At_P1 := TRUE, Translation_Busy := FALSE,
+       JoystickDeflected := TRUE, DeadmanArmed := TRUE, JoystickPush := TRUE,
+       JoystickLeft := FALSE, JoystickRight := FALSE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX3_OPEN_BUCKET,
+                'T345-L2-005 : AX2->AX3 PushOnly inchange');
+    ASSERT_TRUE(FB.BucketCmd.ReqOpen, 'T345-L2-005 : AX3 ouvre comme avant');
+END_TEST
+
 TEST 'T262-003 AX10B : timeout M1 borne a 2 s puis repli sans redemarrage implicite'
     (* Preparation AX10B au neutre, comme pour le test nominal (T358). *)
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -2075,4 +2240,60 @@ TEST 'TC-T358-004 : un Abandon du meme scan neutralise la consigne de forcage'
     ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET, 'Aucune etape chargee apres Abandon');
     FB(AbortCycle := FALSE, StepForceTgt := -1, SampleCount := SampleCount);
     ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET, 'Aucun saut differe au scan suivant (T358)');
+END_TEST
+
+(* ═══════════════════════════════════════════════════════════════════════════════
+   T368 - DUREE DANS LE MESSAGE D ETAPE AX13 (temps RESTANT d egouttage)
+   Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T368_TEMPS_ECOULE_BANDEAU_AX13.yaml (AC3).
+   Arbitrage : AX13 est une ATTENTE TEMPORISEE - l operateur doit savoir combien de temps
+   il attend ENCORE (et peut couper court via "passer egouttage"). Le temps ECOULE du cycle
+   vit sur le bandeau mode (FB_Hmi_BannerFormatter section 1), jamais duplique ici.
+   Aucun chronometre nouveau : DrainTimeRemaining est la source unique deja publiee a l IHM.
+   ═══════════════════════════════════════════════════════════════════════════════ *)
+
+TEST 'T368-002 : message AX13 porteur du temps restant d egouttage, non fige'
+    SampleCount := 0;
+    SampleCountTotal := 0;
+
+    (* Chargement securise de l etape d egouttage AX13, machine arretee, joystick au neutre
+       (meme montage que T347-001 : forcage de step T358, CfgDrainTime=0 -> defaut interne 5 s). *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
+       M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
+       M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE,
+       M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_SpeedStepApplied := 1, M2_SpeedStepApplied := 1,
+       JoystickDeflected := FALSE, DeadmanArmed := FALSE,
+       JoystickPush := FALSE, JoystickPull := FALSE, JoystickRight := FALSE, JoystickLeft := FALSE,
+       StartCycle := FALSE, AbortCycle := FALSE, ResetSampleCountRequest := FALSE,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := TRUE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_CloseReached := FALSE,
+       Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       RepositionRequest := FALSE, SkipDrainRequest := FALSE, CfgDrainTime := T#0s,
+       CfgCommissioningEnable := TRUE,
+       CfgCtrlAscentMaxStep := 1, CfgCtrlAscentDistanceM := 2.0,
+       CfgSampleCountResetMode := E_CycleSampleCountResetMode.NEVER,
+       SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    FB(StepForceTgt := 13, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.ForceStepAccepted, 'T368 : etape d egouttage forcee (T358)');
+    FB(StepForceTgt := -1, SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+
+    (* Scan d execution de AX13 : consigne pleine, le message doit porter 5 s restantes. *)
+    FB(SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX13_DRAIN_PAUSE, 'T368 : etape egouttage executee');
+    ASSERT_TRUE(FB.DrainTimeRemaining = T#5s, 'T368 : consigne d egouttage pleine au 1er scan AX13');
+    ASSERT_EQ(FB.CycleStateStr, 'AX13 - Egouttage du godet : 5s restantes',
+              'T368 : message AX13 porteur du temps RESTANT (5 s)');
+
+    (* 2 s d horloge simulee : le message suit le decompte, il ne reste pas fige. *)
+    ADVANCE_TIME(2000000000);
+    FB(SampleCount := SampleCount, SampleCountTotal := SampleCountTotal);
+    ASSERT_TRUE(FB.DrainTimeRemaining = T#3s, 'T368 : temps restant decremente (3 s)');
+    ASSERT_EQ(FB.CycleStateStr, 'AX13 - Egouttage du godet : 3s restantes',
+              'T368 : message AX13 suit le decompte (3 s restantes)');
 END_TEST

@@ -236,12 +236,14 @@ VAR
     CycleElapsedTotal_S     : DINT;         // . [LOC] Duree du cycle en cours en secondes entieres (base de la conversion min/sec T347)
     SkipDrainEdge           : R_TRIG;       // . [LOC] Front bouton IHM "passer egouttage"
     DrainTimeEff            : TIME;         // . [LOC] Duree d'egouttage effective (CfgDrainTime bornee au defaut interne)
+    DrainRemaining_S        : INT;          // . [LOC] Temps restant d'egouttage arrondi au superieur (secondes entieres) — porte par CycleStateStr en AX13
     StabilizationTimer      : TON;          // . [LOC] Temporisation maximale de remontee lente
     TranslationStopTimer    : TON;          // . [LOC] Confirmation arret physique M3 sur FDC avant etape benne
     SpeedMismatchTimer      : TON;          // . [LOC] Confirmation temporelle ecart de vitesse
     StepMaxTimer            : TON;          // . [LOC] Tempo max d'etape
     ExtractionStepDelayTimer : TON;
     StateExecutionInhibit   : BOOL;         // . [LOC] Interdit le CASE au scan de forçage
+    SeenNeutralAfterArrival : BOOL;         // . [LOC] Neutre XY observe depuis la derniere entree en AX15A
 
     // === CONSTANTES & CONFIGURATIONS INTERNES ===
     CtrlAscentToleranceM    : REAL := 0.25;     // . [LOC] Ancien seuil local conserve pour compatibilite IHM, non bloquant AX11
@@ -770,6 +772,13 @@ IF StepForceConsigne <> CST_StepForceNone THEN
     END_IF;
 
     IF ForceStepCandidateValid THEN
+        // T345-L2 : un forcage vers AX15A est une nouvelle entree logique, meme si
+        // l'etat courant vaut deja AX15A. Un neutre memorise avant le forcage ne doit
+        // jamais autoriser le push deja actif au scan d'execution suivant.
+        SeenNeutralAfterArrival := SEL(
+            ForceStepCandidate = E_AutoCycleStep.AX15A_DUMP_ARRIVE,
+            SeenNeutralAfterArrival,
+            FALSE);
         State := ForceStepCandidate;
         StateExecutionInhibit := TRUE;   // CASE non execute sur ce scan : saut effectif au scan suivant
         PausedState := E_AutoCycleStep.AX0_REPOS;
@@ -1428,7 +1437,18 @@ CASE State OF
 
     E_AutoCycleStep.AX13_DRAIN_PAUSE:
         CycleStep := E_AutoCycleStep.AX13_DRAIN_PAUSE;
-        CycleStateStr := 'AX13 - Egouttage du godet en cours';
+        // ⏱️ Le message porte le temps RESTANT d'egouttage. AX13 est une ATTENTE TEMPORISEE :
+        // l'operateur doit savoir combien de temps il attend encore (il peut couper court via
+        // "passer egouttage", OperatorAction ci-dessous). Aucun chronometre nouveau : DrainTimeRemaining
+        // (calcule en §1) est la source unique, deja publiee a l'IHM (DrainTimeElapsed_S, PRG_07:675).
+        // Arrondi au SUPERIEUR en secondes, meme conversion que ce tag IHM : l'operateur ne lit jamais
+        // 0 s tant que la tempo n'est pas reellement terminee. Le temps ECOULE du cycle n'est PAS
+        // duplique ici : il est porte par le bandeau mode (FB_Hmi_BannerFormatter §1).
+        // Pire cas : 'AX13 - Egouttage du godet : ' (28) + 4 chiffres (DrainTimeEff borne a 3600 s,
+        // PRG_03:66) + 's restantes' (11) = 43 caracteres sur les 70 autorises par G408.
+        DrainRemaining_S := DINT_TO_INT((TIME_TO_DINT(DrainTimeRemaining) + DINT#999) / DINT#1000);
+        CycleStateStr := CONCAT('AX13 - Egouttage du godet : ',
+                                CONCAT(INT_TO_STRING(DrainRemaining_S), 's restantes'));
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.NONE;
@@ -1471,7 +1491,9 @@ CASE State OF
             WaitingForOperator := JoystickDeflected;
             WaitingForProcess := NOT JoystickDeflected;
             OperatorAction := 'AX14 - Tremie : relacher le joystick avant ouverture.';
-            IF TranslationStopTimer.Q AND NOT JoystickDeflected THEN
+            IF TranslationStopTimer.Q THEN
+                // T345-L2 : entree normale AX15A = nouveau cycle d'armement du geste benne.
+                SeenNeutralAfterArrival := FALSE;
                 State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
             END_IF;
         END_IF;
@@ -1483,10 +1505,10 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT JoystickDeflected;
-        WaitingForProcess := JoystickDeflected;
+        WaitingForOperator := TRUE;
+        WaitingForProcess := FALSE;
         OperatorActionId := 16#040B;
-        OperatorAction := 'AX15a - Deflechir vers le bas pour ouvrir et vider.';
+        OperatorAction := 'AX15a - Relacher le joystick avant ouverture.';
 
         // Config treuil UNIQUE : arret des deux treuils (aucune descente couplee ici).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -1494,9 +1516,19 @@ CASE State OF
         TranslationCmd.ReqStart := FALSE;
         TranslationCmd.PositionTgt := 0;
 
-        // Geste operateur (manche defleci) -> phase d'ouverture benne.
-        IF DeadmanArmed AND JoystickPush THEN
-            State := E_AutoCycleStep.AX15B_DUMP_OPEN;
+        // T345-L2 : vrai latch inter-scan. Le scan qui observe le neutre arme le
+        // geste suivant, mais ne peut pas consommer ce meme armement. AX15B exige
+        // donc toujours un push posterieur a au moins un scan neutre en AX15A.
+        IF SeenNeutralAfterArrival THEN
+            WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
+            WaitingForProcess := DeadmanArmed AND JoystickPush;
+            OperatorAction := 'AX15a - Pousser vers le bas pour ouvrir et vider.';
+            IF DeadmanArmed AND JoystickPush THEN
+                State := E_AutoCycleStep.AX15B_DUMP_OPEN;
+            END_IF;
+        ELSIF NOT JoystickDeflected THEN
+            SeenNeutralAfterArrival := TRUE;
+            OperatorAction := 'AX15a - Pousser vers le bas pour ouvrir et vider.';
         END_IF;
 
     E_AutoCycleStep.AX15B_DUMP_OPEN:
