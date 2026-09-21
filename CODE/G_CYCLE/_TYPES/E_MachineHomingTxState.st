@@ -2,22 +2,30 @@
    ⚙️ E_MachineHomingTxState — Steps du GRAFCET de referencement machine
    ───────────────────────────────────────────────────────────────
    🎯 Role : Machine a etats sequentielle (GRAFCET) du cycle de homing
-             machine M1/M2/benne pilote par FB_CycleMachineHoming (§8).
-             Refonte T364 selon specification exploitant du 2026-09-21.
-   📄 Doc : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_REFONTE_SEQUENCE_HOMING.yaml
+             machine M1/M2/benne pilote par FB_CycleMachineHoming (§4).
+             Distincte de E_MachineHomingStep (echelle de priorite du
+             guide operateur, libelles de diagnostic - §6).
+   📄 Doc : DOC/WFLOW/CONTRACTS/GEL_GRAFCET_HOMING_CYCLE_20260903.md
             + DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
    ======================================================================= *)
 
 TYPE E_MachineHomingTxState :
 (
-    HX0_REPOS               := 0,   (* Etape initiale pure : repos, aucune action *)
-    HX1_BUCKET_PREPARE      := 1,   (* Fermeture benne palier 1 sous FDC off, timer 8s, bouton IHM dedie *)
-    HX1A_COUPLING_INTERLOCK := 2,   (* Bascule WinchSel=0, FDC benne reactive, interlock couplage bloquant *)
-    HX2_CLIMB_COUPLED       := 3,   (* Montee couplee M1+M2 palier 1 MAX vers capteur haut *)
-    HX3_FLYING_REFERENCE    := 4,   (* Prise de reference a la volee M1+M2 sur position de config persistante (8.5m) *)
-    HX4_STABILIZATION_CHECK := 5,   (* Arret mecanique, controle inertie [8.50..8.80m], max 3 retries *)
-    HX5_RELEASE_CLEARANCE   := 6,   (* Degagement zone haute, verification neutre joystick *)
-    HX6_HOMED_SUCCESS       := 7,   (* Machine qualifiee : MachineHomed := TRUE, commit atomique benne *)
-    HX7_FAILED              := 8    (* Echec sequence unifie : Reset conscient requis en MAINT_N2 *)
+    HX0_REPOS         := 0,   (* Etape initiale pure : aucune action, aucune affectation *)
+    HX1_CHOICE        := 1,   (* Annonce + choix operateur : aucun mouvement *)
+    HX2_CLIMB         := 2,   (* Chemin A : montee couplee M1+M2 palier 1 jusqu au capteur haut *)
+    HX2N_NEUTRAL      := 3,   (* Arret + inversion de sens (tire -> pousse) : mouvement nul obligatoire *)
+    HX3_HOME_AXES     := 4,   (* Homing axes M1+M2 au vol sur front descendant capteur, puis descente couplee *)
+    HX3N_PAUSE        := 5,   (* Arret avant benne : mouvement nul, retour joystick au neutre *)
+    HX4_BUCKET_ADJUST := 6,   (* Ajustement benne palier 1 sans FDC soft, 2 sens autorises *)
+    HX5_BUCKET_COMMIT := 7,   (* Commit atomique etat benne fermee (CommitClose) *)
+    HX6_HOMED         := 8,   (* Machine referencee : MachineHomed := TRUE (fugace) *)
+    HXF_FAILED        := 9,   (* Referencement incomplet : rester en N2 et recommencer *)
+    HX7_LOCKED_REFERENCE := 10 (* Etape verrouillee : montee vers le capteur haut puis referencement A L ARRET.
+                                  Sorties admises (toutes conscientes) : front Reset, defaut latche, abandon sur
+                                  violation detectee (descente commandee, garde de montee ecoulee, erreur codeur,
+                                  mouvement hors phase), et forcage de step de mise en service. AUCUNE sortie ne
+                                  pose de reference. La valeur 10 est ajoutee APRES HXF pour ne renumeroter
+                                  aucun etat existant. *)
 );
 END_TYPE
