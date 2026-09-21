@@ -1,0 +1,475 @@
+{
+  "cycle_id": "CYCLE_HOMING",
+  "name": "Cycle de Référencement Machine M1/M2/Benne",
+  "pous": ["FB_CycleMachineHoming.st", "FB_Encoder_Homing.st"],
+  "doc_ref": "DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)",
+  "description": "Coordination du référencement machine en mode MAINT_N2 : montée au FDC haut, référencement des axes M1/M2 au vol (ou à l'arrêt en voie verrouillée HX7), calage et commit atomique de l'état benne.",
+  "modes_permis": ["MAINT_N2"],
+  "variables_cles": {
+    "operateurs": ["DeadmanArmed", "JoystickPull", "JoystickPush", "JoystickDeflected", "BtnValidation", "StartRequest", "BucketCloseConfirmed"],
+    "capteurs_securite": ["TopPositionSensor", "WinchesMechanicallyStopped"],
+    "sorties_plc": ["CmdWinchM1", "CmdWinchM2", "M1Demand.HomeReq", "M2Demand.HomeReq", "CmdBucketOpen", "CmdBucketClose", "BucketCommit.CommitClose", "MachineHomed", "M3Locked"]
+  },
+  "steps": [
+    {
+      "id": "HX0_REPOS",
+      "num": 0,
+      "badge": "INITIAL",
+      "titre": "Étape Initiale & Repos",
+      "emoji": "💤",
+      "consigne_ihm": "Homing disponible : lancer via 3 appuis joystick ou bouton IHM",
+      "guide_step": "BOTH_NOT_HOMED / M1_NOT_HOMED / M2_NOT_HOMED / VALID",
+      "que_faire_operateur": [
+        "Vérifier que la machine est en mode MAINT_N2",
+        "Effectuer 3 appuis brefs sur le bouton joystick (V_EXPLICITE) OU cliquer sur 'Lancer le cycle' sur l'IHM"
+      ],
+      "actions_automates": [
+        {"var": "CmdWinchM1 / CmdWinchM2", "val": "0 (Aucun mouvement)", "statut": "idle"},
+        {"var": "M1Demand / M2Demand", "val": "HomeReq := FALSE", "statut": "idle"},
+        {"var": "BucketCommit", "val": "FALSE", "statut": "idle"},
+        {"var": "M3Locked", "val": "FALSE (Translation autorisée si conditions)", "statut": "ok"}
+      ],
+      "transitions": [
+        {
+          "cible": "HX1_CHOICE",
+          "nom": "HT0 : Lancement Référencement",
+          "type": "nominal",
+          "emoji": "🚀",
+          "condition": "(StartEdge.Q OR ((ExplicitValidation OR AutoArm) AND NOT BothAxesHomed) OR PerteDatum) AND MaintenanceActive",
+          "explication": "Demande opérateur validée en mode maintenance N1/N2."
+        }
+      ],
+      "garde_fous": [
+        "Aucun mouvement treuil possible dans cette étape",
+        "Seul le bouton IHM dédié peut ré-engager un homing si les deux axes sont déjà référencés (anti-déclenchement intempestif)"
+      ],
+      "st_code_snippet": "IF (StartEdge.Q OR ((ExplicitValidationPulse OR AutoArmTimer.Q) AND NOT BothAxesHomed) OR (MachineWasHomed AND NOT MachineHomedRaw AND NOT BothAxesHomed)) AND MaintenanceActive THEN\n    HomeReqDone := FALSE;\n    SeqStep     := E_MachineHomingTxState.HX1_CHOICE;\nEND_IF;"
+    },
+    {
+      "id": "HX1_CHOICE",
+      "num": 1,
+      "badge": "AIGUILLAGE",
+      "titre": "Annonce & Aiguillage Stratégique",
+      "emoji": "🔀",
+      "consigne_ihm": "Passer en MAINT_N2, valider (3 appuis JOY) pour engager la montée",
+      "guide_step": "OFFSET_UNKNOWN / NEED_TOP_POSITION / AWAIT_BUCKET_CONFIRM",
+      "que_faire_operateur": [
+        "S'assurer d'être en MAINT_N2 (mouvements interdits hors N2)",
+        "Optionnel : Si benne déjà fermée, cliquer 'Confirmer Benne Fermée' (active voie verrouillée HX7)",
+        "Effectuer le motif de validation explicite (3 appuis joystick)"
+      ],
+      "actions_automates": [
+        {"var": "CommitPublished / CommitDone", "val": "FALSE (Réinitialisés pour le nouveau cycle)", "statut": "warn"},
+        {"var": "Treuils M1 / M2", "val": "À l'arrêt", "statut": "idle"},
+        {"var": "M3Locked", "val": "FALSE (Cycle pas encore en mouvement)", "statut": "idle"}
+      ],
+      "transitions": [
+        {
+          "cible": "HX7_LOCKED_REFERENCE",
+          "nom": "HT1c : Voie Verrouillée Sécurisée (T340)",
+          "type": "special",
+          "emoji": "🔒",
+          "condition": "BucketCloseConfirmedLatched AND NOT TopPositionSensor",
+          "explication": "Benne déjà confirmée fermée + capteur haut inactif -> Montée directe puis calage à l'arrêt complet."
+        },
+        {
+          "cible": "HX2_CLIMB",
+          "nom": "HT1b : Montée Nominale vers FDC Haut",
+          "type": "nominal",
+          "emoji": "⬆️",
+          "condition": "BootReady AND ExplicitValidationPulse AND ModeIsMaint2 AND NOT TopPositionSensor",
+          "explication": "Codeurs prêts, validation 3 appuis reçue, départ de position basse."
+        },
+        {
+          "cible": "HX2N_NEUTRAL",
+          "nom": "HT1b-Bis : Machine Déjà en Position Haute",
+          "type": "nominal",
+          "emoji": "⏹️",
+          "condition": "BootReady AND ExplicitValidationPulse AND ModeIsMaint2 AND TopPositionSensor",
+          "explication": "Le capteur haut est déjà actif au départ -> passage direct à la phase d'arrêt."
+        },
+        {
+          "cible": "HX0_REPOS",
+          "nom": "HT1a : Abandon ou Sortie Maintenance",
+          "type": "abort",
+          "emoji": "↩️",
+          "condition": "MachineHomed OR NOT MaintenanceActive OR Front Reset",
+          "explication": "Datum redevenu valide ou opérateur quitte le mode maintenance."
+        }
+      ],
+      "garde_fous": [
+        "BootReady obligatoire (acquisition codeurs stabilisée)",
+        "MAINT_N2 strictement requis pour amorcer le mouvement"
+      ],
+      "st_code_snippet": "IF MachineHomed OR NOT MaintenanceActive THEN\n    SeqStep := E_MachineHomingTxState.HX0_REPOS;\nELSIF BootReady AND ExplicitValidationPulse AND ModeIsMaint2 THEN\n    CommitPublished := FALSE; CommitDone := FALSE;\n    IF BucketCloseConfirmedLatched AND NOT TopPositionSensor THEN\n        SeqStep := E_MachineHomingTxState.HX7_LOCKED_REFERENCE;\n    ELSIF NOT TopPositionSensor THEN\n        SeqStep := E_MachineHomingTxState.HX2_CLIMB;\n    ELSE\n        SeqStep := E_MachineHomingTxState.HX2N_NEUTRAL;\n    END_IF;\nEND_IF;"
+    },
+    {
+      "id": "HX2_CLIMB",
+      "num": 2,
+      "badge": "MOUVEMENT",
+      "titre": "Montée Couplée M1+M2 vers FDC Haut",
+      "emoji": "🧗",
+      "consigne_ihm": "Tirer le joystick vers soi au palier 1 vers le FDC haut",
+      "guide_step": "NEED_TOP_POSITION",
+      "que_faire_operateur": [
+        "Maintenir le bouton homme-mort enfoncé",
+        "Tirer le manche du joystick vers soi (sens montée)"
+      ],
+      "actions_automates": [
+        {"var": "CmdWinchM1", "val": "RunRequest := TRUE, ReqAscent := TRUE, StepTgt := 1 (Lent)", "statut": "active"},
+        {"var": "CmdWinchM2", "val": "RunRequest := TRUE, ReqAscent := TRUE, StepTgt := 1 (Lent)", "statut": "active"},
+        {"var": "M3Locked", "val": "TRUE (Translation strictement bloquée)", "statut": "warn"},
+        {"var": "ClimbTimer", "val": "Décompte actif (Consomme budget 120s sous permis)", "statut": "warn"}
+      ],
+      "transitions": [
+        {
+          "cible": "HX2N_NEUTRAL",
+          "nom": "HT2 : Capteur Haut Franchi",
+          "type": "nominal",
+          "emoji": "🎯",
+          "condition": "TopPositionSensor = TRUE",
+          "explication": "Le capteur de position haute bascule à 1. Fin de la montée."
+        },
+        {
+          "cible": "HXF_FAILED",
+          "nom": "HT2-Fail : Avortement Mouvement",
+          "type": "abort",
+          "emoji": "🚨",
+          "condition": "TransactionAbort (Timeout 120s, sortie N2, défaut axe, etc.)",
+          "explication": "La garde de temps a expiré ou une anomalie de sécurité est survenue."
+        }
+      ],
+      "garde_fous": [
+        "Garde de temps ClimbTimer (120 s max de commande continue)",
+        "Vitesse bridée en palier 1 (CST_StepSlow)",
+        "Arrêt instantané si l'opérateur relâche le joystick ou l'homme-mort"
+      ],
+      "st_code_snippet": "IF ClimbPermit THEN\n    CmdWinchM1.RunRequest := TRUE; CmdWinchM1.ReqAscent := TRUE; CmdWinchM1.StepTgt := CST_StepSlow;\n    CmdWinchM2.RunRequest := TRUE; CmdWinchM2.ReqAscent := TRUE; CmdWinchM2.StepTgt := CST_StepSlow;\nEND_IF;\nIF TransactionAbort THEN\n    MachineHomingFailed := TRUE; SeqStep := E_MachineHomingTxState.HXF_FAILED;\nELSIF TopPositionSensor THEN\n    SeenNeutral := NOT JoystickDeflected; SeqStep := E_MachineHomingTxState.HX2N_NEUTRAL;\nEND_IF;"
+    },
+    {
+      "id": "HX2N_NEUTRAL",
+      "num": 3,
+      "badge": "PAUSE / NEUTRE",
+      "titre": "Arrêt Haut & Passage Obligatoire au Neutre",
+      "emoji": "⏸️",
+      "consigne_ihm": "Joystick au neutre puis attendre l'arrêt complet avant descente",
+      "guide_step": "NEED_MECHANICAL_STOP",
+      "que_faire_operateur": [
+        "Lâcher complètement le joystick (retour au zéro mécanique)",
+        "Attendre que les treuils soient totalement arrêtés",
+        "Puis pousser le joystick vers l'avant (Push) avec homme-mort pour lancer la descente"
+      ],
+      "actions_automates": [
+        {"var": "CmdWinchM1 / CmdWinchM2", "val": "Commandes coupées à 0 (RAZ tête de scan)", "statut": "idle"},
+        {"var": "SeenNeutral", "val": "Passe à TRUE dès que le joystick revient à 0", "statut": "ok"},
+        {"var": "SettleGraceTimer", "val": "Fenêtre de grâce de décélération (3s)", "statut": "ok"}
+      ],
+      "transitions": [
+        {
+          "cible": "HX3_HOME_AXES",
+          "nom": "HT2N : Autorisation Descente Couplée",
+          "type": "nominal",
+          "emoji": "⬇️",
+          "condition": "WinchesMechanicallyStopped AND SeenNeutral AND DescendPermit AND TopPositionSensor",
+          "explication": "Arrêt mécanique confirmé + neutre vu + commande descente engagée."
+        },
+        {
+          "cible": "HXF_FAILED",
+          "nom": "HT2N-Fail : Abandon",
+          "type": "abort",
+          "emoji": "🚨",
+          "condition": "TransactionAbort",
+          "explication": "Perte de mode ou anomalie."
+        }
+      ],
+      "garde_fous": [
+        "Interdiction formelle d'inverser le mouvement sans arrêt mécanique confirmé",
+        "Anti-inversion de sens brutale (latch SeenNeutral réévalué)"
+      ],
+      "st_code_snippet": "IF NOT JoystickDeflected THEN\n    SeenNeutral := TRUE;\nEND_IF;\nIF TransactionAbort THEN\n    MachineHomingFailed := TRUE; SeqStep := E_MachineHomingTxState.HXF_FAILED;\nELSIF WinchesMechanicallyStopped AND SeenNeutral AND DescendPermit AND TopPositionSensor THEN\n    HomeReqDone := FALSE; SeqStep := E_MachineHomingTxState.HX3_HOME_AXES;\nEND_IF;"
+    },
+    {
+      "id": "HX3_HOME_AXES",
+      "num": 4,
+      "badge": "HOMING AU VOL",
+      "titre": "Descente M1+M2 & Référencement au Vol",
+      "emoji": "⚡",
+      "consigne_ihm": "Pousser le joystick en descente palier 1 (homing M1/M2 au vol)",
+      "guide_step": "HOMING_IN_PROGRESS",
+      "que_faire_operateur": [
+        "Maintenir l'homme-mort armé",
+        "Pousser le joystick vers l'avant (sens descente)"
+      ],
+      "actions_automates": [
+        {"var": "CmdWinchM1 / M2", "val": "RunRequest := TRUE, ReqDescend := TRUE, StepTgt := 1", "statut": "active"},
+        {"var": "Sur front descendant capteur", "val": "M1Demand.HomeReq := TRUE, M2Demand.HomeReq := TRUE (1 scan)", "statut": "warn"},
+        {"var": "HomeAxesTimer", "val": "Garde active (60s max sous permis)", "statut": "warn"}
+      ],
+      "transitions": [
+        {
+          "cible": "HX3N_PAUSE",
+          "nom": "HT3 : Axes M1 et M2 Calibrés avec Succès",
+          "type": "nominal",
+          "emoji": "✅",
+          "condition": "NOT TopPositionSensor AND M1Status.HomedAndReliable AND M2Status.HomedAndReliable",
+          "explication": "Capteur libéré et transactions de calage validées sur les deux codeurs."
+        },
+        {
+          "cible": "HXF_FAILED",
+          "nom": "HT3-Fail : Échec Calibration",
+          "type": "abort",
+          "emoji": "🚨",
+          "condition": "TransactionAbort (HomeAxesTimedOut > 60s, HomingErrorM1/M2)",
+          "explication": "Le calage n'a pas pu être confirmé ou le temps est écoulé."
+        }
+      ],
+      "garde_fous": [
+        "Impulsion HomeReq strictement unique sur le front descendant (TopLostEdge.Q)",
+        "Contrôle de conformité de calage par readback FB_Encoder_Homing",
+        "Garde de descente HomeAxesTimer (60 s)"
+      ],
+      "st_code_snippet": "IF DescendPermit THEN\n    CmdWinchM1.RunRequest := TRUE; CmdWinchM1.ReqDescend := TRUE; CmdWinchM1.StepTgt := CST_StepSlow;\n    CmdWinchM2.RunRequest := TRUE; CmdWinchM2.ReqDescend := TRUE; CmdWinchM2.StepTgt := CST_StepSlow;\nEND_IF;\nIF TopLostEdge.Q AND NOT HomeReqDone THEN\n    M1Demand.HomeReq := TRUE; M2Demand.HomeReq := TRUE; HomeReqDone := TRUE;\nEND_IF;\nIF TransactionAbort THEN\n    MachineHomingFailed := TRUE; SeqStep := E_MachineHomingTxState.HXF_FAILED;\nELSIF NOT TopPositionSensor AND M1Status.HomedAndReliable AND M2Status.HomedAndReliable THEN\n    SeenNeutral := NOT JoystickDeflected; SeqStep := E_MachineHomingTxState.HX3N_PAUSE;\nEND_IF;"
+    },
+    {
+      "id": "HX3N_PAUSE",
+      "num": 5,
+      "badge": "PAUSE / ARRET",
+      "titre": "Arrêt Avant Ajustement Benne",
+      "emoji": "🛑",
+      "consigne_ihm": "Relâcher le joystick au neutre (stabilisation treuils avant benne)",
+      "guide_step": "NEED_MECHANICAL_STOP",
+      "que_faire_operateur": [
+        "Relâcher le joystick au neutre",
+        "Attendre l'arrêt complet des treuils M1 et M2"
+      ],
+      "actions_automates": [
+        {"var": "CmdWinchM1 / CmdWinchM2", "val": "0 (Arrêt)", "statut": "idle"},
+        {"var": "SeenNeutral", "val": "Détecte le retour au zéro joystick", "statut": "ok"}
+      ],
+      "transitions": [
+        {
+          "cible": "HX4_BUCKET_ADJUST",
+          "nom": "HT3N : Treuils Fixes et Neutre Validé",
+          "type": "nominal",
+          "emoji": "🆗",
+          "condition": "WinchesMechanicallyStopped AND SeenNeutral",
+          "explication": "Machine totalement immobile, prête pour la manœuvre benne seule."
+        },
+        {
+          "cible": "HXF_FAILED",
+          "nom": "HT3N-Fail : Abandon",
+          "type": "abort",
+          "emoji": "🚨",
+          "condition": "TransactionAbort",
+          "explication": "Mouvement intempestif ou perte de mode."
+        }
+      ],
+      "garde_fous": [
+        "Vérification impérative de l'arrêt mécanique WinchesMechanicallyStopped",
+        "Fenêtre de grâce décélération active"
+      ],
+      "st_code_snippet": "IF NOT JoystickDeflected THEN\n    SeenNeutral := TRUE;\nEND_IF;\nIF TransactionAbort THEN\n    MachineHomingFailed := TRUE; SeqStep := E_MachineHomingTxState.HXF_FAILED;\nELSIF WinchesMechanicallyStopped AND SeenNeutral THEN\n    SeqStep := E_MachineHomingTxState.HX4_BUCKET_ADJUST;\nEND_IF;"
+    },
+    {
+      "id": "HX4_BUCKET_ADJUST",
+      "num": 6,
+      "badge": "CALAGE BENNE",
+      "titre": "Manœuvre & Fermeture Complète Benne",
+      "emoji": "🚜",
+      "consigne_ihm": "Fermer la benne complètement, puis valider (3 appuis JOY)",
+      "guide_step": "AWAIT_BUCKET_CONFIRM",
+      "que_faire_operateur": [
+        "Actionner le joystick en fermeture benne (Tirer avec homme-mort)",
+        "Observer visuellement la fermeture mécanique complète",
+        "Relâcher le joystick au neutre",
+        "Effectuer la validation explicite (3 appuis sur le bouton joystick)"
+      ],
+      "actions_automates": [
+        {"var": "CmdBucketClose", "val": "TRUE si joystick tiré sous permis", "statut": "active"},
+        {"var": "CmdBucketOpen", "val": "TRUE si joystick poussé sous permis", "statut": "active"},
+        {"var": "Treuils M1/M2", "val": "Strictement à 0", "statut": "idle"}
+      ],
+      "transitions": [
+        {
+          "cible": "HX5_BUCKET_COMMIT",
+          "nom": "HT4 : Confirmation Opérateur Reçue",
+          "type": "nominal",
+          "emoji": "🤝",
+          "condition": "ExplicitValidationPulse AND NOT JoystickDeflected AND WinchesMechanicallyStopped",
+          "explication": "3 appuis validés, joystick relâché au neutre, machine immobile."
+        },
+        {
+          "cible": "HXF_FAILED",
+          "nom": "HT4-Fail : Défaut Détecté",
+          "type": "abort",
+          "emoji": "🚨",
+          "condition": "AxisHomingError OR MotionOutOfPhase OR ModeLostDuringCycle",
+          "explication": "Fluage d'un treuil ou sortie du mode MAINT_N2."
+        }
+      ],
+      "garde_fous": [
+        "Mouvement de benne au palier 1 sans FDC logiciel",
+        "Treuils M1 et M2 sous surveillance de mouvement hors phase (MotionOutOfPhase)"
+      ],
+      "st_code_snippet": "IF BucketPermit AND JoystickPull THEN\n    CmdBucketClose := TRUE;\nELSIF BucketPermit AND JoystickPush THEN\n    CmdBucketOpen := TRUE;\nEND_IF;\nIF AxisHomingError OR MotionOutOfPhase OR ModeLostDuringCycle THEN\n    MachineHomingFailed := TRUE; SeqStep := E_MachineHomingTxState.HXF_FAILED;\nELSIF ExplicitValidationPulse AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN\n    PendingClose := TRUE; CommitDone := FALSE; SeqStep := E_MachineHomingTxState.HX5_BUCKET_COMMIT;\nEND_IF;"
+    },
+    {
+      "id": "HX5_BUCKET_COMMIT",
+      "num": 7,
+      "badge": "COMMIT ATOMIQUE",
+      "titre": "Publication Atomique du Datum Benne",
+      "emoji": "💾",
+      "consigne_ihm": "Enregistrement du datum benne fermée en cours...",
+      "guide_step": "VALID",
+      "que_faire_operateur": [
+        "Ne toucher à aucune commande (étape automatique de 1 scan)"
+      ],
+      "actions_automates": [
+        {"var": "BucketCommit.CommitClose", "val": "TRUE (Impulsion garantie 1 scan)", "statut": "active"},
+        {"var": "CommitPublished", "val": "TRUE", "statut": "ok"},
+        {"var": "CommitDone", "val": "TRUE (Bloque toute répétition)", "statut": "ok"}
+      ],
+      "transitions": [
+        {
+          "cible": "HX6_HOMED",
+          "nom": "HT5 : Publication Réalisée",
+          "type": "nominal",
+          "emoji": "🎉",
+          "condition": "CommitDone = TRUE",
+          "explication": "L'impulsion a été émise, le FB_Bucket a consommé le calage."
+        },
+        {
+          "cible": "HXF_FAILED",
+          "nom": "HT5-Fail : Défaut de Cohérence",
+          "type": "abort",
+          "emoji": "🚨",
+          "condition": "AxisHomingError OR NOT BothAxesHomed OR MotionOutOfPhase OR ModeLostDuringCycle",
+          "explication": "Perte de datum codeur pendant l'écriture."
+        }
+      ],
+      "garde_fous": [
+        "Écriture atomique sur un seul scan automate (impulsion garantie via CommitDone)",
+        "BothAxesHomed impérativement maintenu"
+      ],
+      "st_code_snippet": "IF AxisHomingError OR NOT BothAxesHomed OR MotionOutOfPhase OR ModeLostDuringCycle THEN\n    MachineHomingFailed := TRUE; SeqStep := E_MachineHomingTxState.HXF_FAILED;\nELSIF NOT CommitDone THEN\n    BucketCommit.CommitClose := PendingClose;\n    CommitPublished          := TRUE;\n    CommitDone               := TRUE;\nELSE\n    PendingClose := FALSE;\n    SeqStep      := E_MachineHomingTxState.HX6_HOMED;\nEND_IF;"
+    },
+    {
+      "id": "HX6_HOMED",
+      "num": 8,
+      "badge": "MACHINE HOMED",
+      "titre": "Qualification Machine Valide",
+      "emoji": "🏆",
+      "consigne_ihm": "Référencement machine validé ! Prêt pour le mode nominal.",
+      "guide_step": "VALID",
+      "que_faire_operateur": [
+        "Le cycle de homing est terminé avec succès",
+        "Vous pouvez maintenant basculer en mode SEMI_AUTO ou MANUEL"
+      ],
+      "actions_automates": [
+        {"var": "MachineHomed", "val": "TRUE (Calculé en §9)", "statut": "ok"},
+        {"var": "Lifecycle.Done", "val": "TRUE", "statut": "ok"},
+        {"var": "M3Locked", "val": "FALSE (Translation libérée)", "statut": "ok"}
+      ],
+      "transitions": [
+        {
+          "cible": "HX0_REPOS",
+          "nom": "HT6 : Retour Repos Automatique",
+          "type": "nominal",
+          "emoji": "🔄",
+          "condition": "Scan suivant (Inconditionnel)",
+          "explication": "L'automate revient à l'étape initiale tout en conservant MachineHomed=TRUE."
+        }
+      ],
+      "garde_fous": [
+        "MachineHomed reste maintenu jusqu'à éventuelle perte physique ou défaut latché"
+      ],
+      "st_code_snippet": "SeqStep := E_MachineHomingTxState.HX0_REPOS;"
+    },
+    {
+      "id": "HX7_LOCKED_REFERENCE",
+      "num": 10,
+      "badge": "VOIE VERROUILLEE",
+      "titre": "Voie Verrouillée : Montée & Calage à l'Arrêt (T340)",
+      "emoji": "🛡️",
+      "consigne_ihm": "Monter au capteur haut, relâcher au neutre et attendre l'arrêt",
+      "guide_step": "NEED_TOP_POSITION / NEED_MECHANICAL_STOP / HOMING_IN_PROGRESS",
+      "que_faire_operateur": [
+        "Phase 1 : Tirer le joystick sous permis pour monter vers le capteur",
+        "Phase 2 : Dès que le capteur haut s'allume, lâcher le joystick au neutre",
+        "Attendre l'arrêt mécanique complet (la prise de référence se fait sans bouger)"
+      ],
+      "actions_automates": [
+        {"var": "Tant que capteur inactif", "val": "CmdWinchM1/M2.ReqAscent := TRUE (Palier 1)", "statut": "active"},
+        {"var": "Dès capteur actif", "val": "Commandes à 0. Prise de référence à l'arrêt complet", "statut": "ok"},
+        {"var": "Impulsion unitaire", "val": "M1Demand.HomeReq / M2Demand.HomeReq (1 scan)", "statut": "warn"}
+      ],
+      "transitions": [
+        {
+          "cible": "HX6_HOMED",
+          "nom": "HT7 : Calage Confirmé à l'Arrêt",
+          "type": "nominal",
+          "emoji": "🌟",
+          "condition": "BothAxesHomed = TRUE",
+          "explication": "Les deux axes sont déclarés calés par les contrôleurs codeurs."
+        },
+        {
+          "cible": "HXF_FAILED",
+          "nom": "HT7-Fail : Violation Sécurité",
+          "type": "abort",
+          "emoji": "🚨",
+          "condition": "DescentRequestedInLock OR ClimbTimedOut OR AxisHomingError OR MotionOutOfPhase",
+          "explication": "Descente interdite pendant la montée de calage ou timeout."
+        }
+      ],
+      "garde_fous": [
+        "Sortie du mode MAINT_N2 gèle l'étape sans autoriser aucun mouvement",
+        "La descente est formellement interdite (DescentRequestedInLock entraîne abandon immédiat)",
+        "Aucun calage au vol : référence uniquement à l'arrêt mécanique avéré"
+      ],
+      "st_code_snippet": "IF DescentRequestedInLock THEN\n    MachineHomingFailed := TRUE; SeqStep := E_MachineHomingTxState.HXF_FAILED;\nELSIF NOT ModeIsMaint2 THEN\n    SeqStep := E_MachineHomingTxState.HX7_LOCKED_REFERENCE;\nELSIF NOT TopPositionSensor THEN\n    IF ClimbPermit THEN\n        CmdWinchM1.RunRequest := TRUE; CmdWinchM1.ReqAscent := TRUE; CmdWinchM1.StepTgt := CST_StepSlow;\n        CmdWinchM2.RunRequest := TRUE; CmdWinchM2.ReqAscent := TRUE; CmdWinchM2.StepTgt := CST_StepSlow;\n    END_IF;\nELSE\n    LockedCaptureAllowed := LockedSettleActive AND WinchesMechanicallyStopped AND SeenNeutral;\n    IF LockedCaptureAllowed AND NOT HomeReqDone THEN\n        M1Demand.HomeReq := TRUE; M2Demand.HomeReq := TRUE; HomeReqDone := TRUE;\n    END_IF;\n    IF BothAxesHomed THEN\n        SeqStep := E_MachineHomingTxState.HX6_HOMED;\n    END_IF;\nEND_IF;"
+    },
+    {
+      "id": "HXF_FAILED",
+      "num": 9,
+      "badge": "SECURITE / REPLI",
+      "titre": "Séquence Abandonnée / Défaut Homing",
+      "emoji": "💥",
+      "consigne_ihm": "HXF - Homing incomplet - Corriger la cause et appuyer sur Reset",
+      "guide_step": "FAILED",
+      "que_faire_operateur": [
+        "Consulter l'alarme ou la cause de défaut sur l'écran IHM",
+        "Relâcher toutes les commandes joystick",
+        "Appuyer consciemment sur le bouton Reset d'acquittement"
+      ],
+      "actions_automates": [
+        {"var": "Toutes sorties mouvement", "val": "0 (Arrêt d'urgence contrôlé)", "statut": "idle"},
+        {"var": "MachineHomingFailed", "val": "TRUE", "statut": "warn"},
+        {"var": "MachineHomed", "val": "FALSE", "statut": "warn"}
+      ],
+      "transitions": [
+        {
+          "cible": "HX0_REPOS",
+          "nom": "HTF : Acquittement Opérateur Conscient",
+          "type": "nominal",
+          "emoji": "🔄",
+          "condition": "ResetEdge.Q (Front montant Reset)",
+          "explication": "L'opérateur a acquitté le défaut de manière explicite."
+        }
+      ],
+      "garde_fous": [
+        "Verrouillage strict : aucun réarmement automatique possible après défaut",
+        "Purge complète des états intermédiaires uniquement sur Reset"
+      ],
+      "st_code_snippet": "// Sortie uniquement sur front Reset conscient (purge §4)\nIF ResetEdge.Q THEN\n    SeqStep := E_MachineHomingTxState.HX0_REPOS;\nEND_IF;"
+    }
+  ],
+  "causes_defauts": [
+    {"code": 0, "texte": "Perte de datum machine en mouvement : re-référencer", "latching": true},
+    {"code": 1, "texte": "Montée au capteur haut non aboutie dans le temps imparti (Timeout 120s)", "latching": true},
+    {"code": 2, "texte": "Mouvement treuil détecté hors phase autorisée du cycle", "latching": true},
+    {"code": 3, "texte": "Erreur de homing codeur M1 pendant le référencement conjoint", "latching": true},
+    {"code": 4, "texte": "Erreur de homing codeur M2 pendant le référencement conjoint", "latching": true},
+    {"code": 5, "texte": "Homing des axes non obtenu dans le temps imparti (Timeout 60s)", "latching": true},
+    {"code": 6, "texte": "Descente interdite pendant le référencement verrouillé HX7", "latching": true}
+  ]
+}

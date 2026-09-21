@@ -1,0 +1,23 @@
+# Liste de variables HOMING MACHINE (T372) — chemins complets traçables
+# Source des chemins : ST_MachineHoming + ihm_variables.txt (GVL_IHM) — confirmés
+# réels dans le projet (pas inventés). Une ligne par variable ; # = commentaire.
+#
+# Image publiée du cycle de homing machine (GVL_IHM.CycleMachineHoming.State)
+GVL_IHM.CycleMachineHoming.State.Homed
+GVL_IHM.CycleMachineHoming.State.Active
+GVL_IHM.CycleMachineHoming.State.Failed
+GVL_IHM.CycleMachineHoming.State.HomingLoss
+GVL_IHM.CycleMachineHoming.State.M3Locked
+GVL_IHM.CycleMachineHoming.State.Step
+GVL_IHM.CycleMachineHoming.State.SeqStep
+GVL_IHM.CycleMachineHoming.State.Instruction
+#
+# Encoder M1 (treuil retenue) — état homing
+GVL_IHM.M1TreuilRetenue.State.Encoder.HomingBusy
+GVL_IHM.M1TreuilRetenue.State.Encoder.HomingDone
+GVL_IHM.M1TreuilRetenue.State.Encoder.HomingState
+#
+# Encoder M2 (treuil benne) — état homing
+GVL_IHM.M2TreuilBenne.State.Encoder.HomingBusy
+GVL_IHM.M2TreuilBenne.State.Encoder.HomingDone
+GVL_IHM.M2TreuilBenne.State.Encoder.HomingState

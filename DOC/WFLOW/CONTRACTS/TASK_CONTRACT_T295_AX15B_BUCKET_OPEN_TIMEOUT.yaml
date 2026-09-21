@@ -185,9 +185,9 @@ execution:
     - "Bundle CODE_XML/CODE_Bundle.xml : 258/258 objets, 0 erreur ; DiffBundle = FB_Bucket + fermeture de types ; G200_check_linkage --report : PASS (0 erreur)"
     - "Gate G507_check_t295_bucket_timeout_engaged.py branché dans PLANS (palier C) : PASS, --selftest rejette 4 mutations"
 validation:
-  status: PENDING
-  validated_by: "CC01 (vérification indépendante) — contresignature humaine attendue"
-  validated_at: "2026-09-20T18:40:00+02:00"
+  status: APPROVED
+  validated_by: "CC01 (orchestrateur) — visa sur git diff réel ; contresignature humaine obtenue le 2026-09-20"
+  validated_at: "2026-09-20T18:45:00+02:00"
   notes: >
     2026-09-20 — design acté par HUM (a2 : suspension, pas remise à zéro ; signal MotionRequestActive,
     CloseReq/OpenReq étant des latches inopérants). Contrat complété par CC01 (scope scripts/, AC8-AC11).
@@ -197,11 +197,14 @@ validation:
     verts, AUCUNE régression ; gates palier C = 7 rouges / 46, tous préexistants et hors fichiers T295
     (G300, G340, G408 — message long de FB_CycleSemiAuto.st déjà présent dans HEAD, G420, G430 — 102
     commentaires REX dans tout le dépôt, G460 — fichiers d'infra absents, G483).
-    POINT À CONTRESIGNER PAR L'HUMAIN : le Reset sur front remet aussi le cumul à zéro. Un Reset martelé
-    (< PT) pendant une commande bloquée peut donc contourner le watchdog, alors que l'ancien code
-    re-latchait immédiatement (ET cloué à PT). Comportement voulu (évite la boucle de re-latch), mais
-    c'est une différence de comportement sur Reset qui doit être assumée explicitement.
+    CONTRESIGNÉ PAR L'HUMAIN (2026-09-20) : le Reset sur front remet aussi le cumul à zéro. Un Reset
+    martelé (< PT) pendant une commande bloquée peut donc contourner le watchdog, alors que l'ancien code
+    re-latchait immédiatement (ET cloué à PT). Comportement ACTÉ (évite la boucle de re-latch) — risque
+    résiduel assumé explicitement, pas subi.
     HORS SCOPE SIGNALÉ (non corrigé) : (1) la fiche DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
     :219-224 et :283 décrit encore l'ancienne sémantique et un mapping ErrorId erroné ; (2) en E_Mode.AUTO
     l'ouverture benne ne peut pas armer Lifecycle.Busy (hors SEMI_AUTO) ; (3) 9 tests CI H_TREUILS_BENNE
-    obsolètes (préexistants).
+    obsolètes (préexistants) ; (4) le harnais passe `MotionRequestActive` en argument nommé MORT sur ~30 sites
+    de test_fb_bucket.st (STruCpp l'ignore) — nettoyage à prévoir dans un lot test dédié.
+    LIMITE DU VISA : ce visa porte sur le code, le câblage, les tests et les preuves mécaniques. Le RECETTAGE
+    MACHINE reste à faire (T295 reste ⏳ dans TASKS.yaml jusqu'à l'essai en AX3/AX15B).

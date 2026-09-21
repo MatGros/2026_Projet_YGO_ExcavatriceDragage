@@ -1,0 +1,293 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T354 « Asymetrie de garde M1/M2 : NOT BucketBusy present
+# au gate M1 (branche manuelle) et absent du gate M2 »
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# Origine    : DOC/WFLOW/CONTRACTS/BRIEF_T354_ASYMETRIE_GARDE_M1_M2.md (lecture seule)
+# Cadrage    : ajouts R0-R6 de l'orchestrateur (2026-09-21), non negociables
+# Parent     : T328 (couplage mecanique M1/M2) ; fiche amont : T351 (DSH18)
+# Nature     : ANALYSE SEULE — ZERO ligne de CODE/ ecrite, ZERO commit
+# Revision figee a l'ecriture : HEAD = c9e1fbfe (arbre de travail CODE/ PROPRE
+#   vs HEAD a la prise : git status --short -- CODE/ vide, git diff HEAD -- CODE/
+#   vide — verifie par le porteur, et re-verifie avant chaque ecriture).
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T354_ASYMETRIE_GARDE_M1_M2
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Repondre par preuve (et non par deduction) a une seule question de securite
+    machine : le scenario « benne occupee (BucketBusy=TRUE) et M2 commande seul
+    alors que M1 est gele » est-il ATTEIGNABLE en exploitation reelle, et par
+    quel chemin de commande exact ? Le livrable doit rendre la reponse
+    verifiable ligne a ligne par un relecteur qui n'a pas lu le code : table de
+    verite prouvee, statut de chaque garde traversee en fichier:ligne, verdict
+    d'atteignabilite tranche pour les 3 chemins de commande M2, verdict sur le
+    mode MAINTENANCE N2 (inhibition d'un treuil, cas d'usage reel de
+    l'exploitant), verdict sur le verrou d'atomicite de demarrage couple, et
+    doctrine M1 vs M2 SOURCEE ou declaree NON SOURCEE. Aucune ligne de CODE/
+    n'est ecrite : les options de correction eventuelles sont documentaires.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Le livrable contient une table de verite au format demande
+        {Mode, BucketBusy, M1 etat, M2 commande possible ?, garde traversee
+        fichier:ligne, verdict atteignable OUI/NON}, avec AU MOINS une ligne par
+        mode atteignable dans le code (MANU_N1, AUTO_N1, MAINT_N1, MAINT_N2,
+        SEMI_AUTO) et une ligne par chemin de commande M2 (joystick-select,
+        boutons IHM directs, chemin benne), chacune citant au moins un
+        fichier:ligne reel. Les combinaisons non tranchables sont declarees NON
+        TRACEES, jamais remplies par deduction.
+      verified_by: >
+        Lecture du livrable ; recomptage des lignes du tableau ; Select-String de
+        chaque fichier:ligne cite sur un echantillon d'au moins 20 references,
+        chaque motif devant se trouver a la ligne citee.
+
+    - id: AC2
+      statement: >
+        Le livrable porte en tete un bloc d'ancrage de revision donnant le commit
+        HEAD (git rev-parse HEAD) et le blob SHA (git hash-object) de CHAQUE
+        fichier de CODE/ cite, avec horodatage ISO 8601 de la lecture ; aucun
+        numero de ligne n'est presente comme valable pour un autre blob.
+      verified_by: >
+        Recalcul independant par l'orchestrateur : git hash-object sur chaque
+        fichier cite doit rendre le blob annonce, et git rev-parse HEAD le commit
+        annonce. Tout ecart est un echec.
+
+    - id: AC3
+      statement: >
+        L'asymetrie est etablie avec precision, en refutant si besoin la
+        formulation du brief : la garde « AND NOT Context.BucketBusy » existe au
+        gate de FB_WinchCmdArbitrationM1 UNIQUEMENT dans la branche manuelle
+        (ELSE du test de mode), et le gate de FB_WinchCmdArbitrationM2 n'en porte
+        aucune ; le livrable prouve en outre que M1 n'a AUCUNE garde BucketBusy
+        dans sa branche SEMI_AUTO, donc que l'enonce « M1 protege partout / M2
+        jamais protege » est faux.
+      verified_by: >
+        Lecture croisee des deux FB : les lignes citees par le livrable doivent
+        contenir l'expression exacte de la garde (gate M1), son absence (gate
+        M2) et la ligne du test de mode qui borne la portee de la garde M1.
+        Chaque ligne verifiee par Select-String.
+
+    - id: AC4
+      statement: >
+        Les TROIS chemins de commande M2 identifies sont traces physiquement
+        jusqu'a la barriere finale : (a) joystick-select, (b) boutons IHM directs
+        BtnAscentM2/BtnDescentM2, (c) chemin benne. Pour chacun, le livrable donne
+        la condition d'entree dans le chemin, la ligne de selection de source, le
+        gate final et la chaine aval jusqu'a la publication physique vers les
+        contacteurs (FB_Winch M2, WinchM2FinalInterlockRequest, barriere finale
+        PRG_06). Un chemin non trace rend la conclusion invalide.
+      verified_by: >
+        Select-String des trois conditions d'entree et de la chaine aval sur les
+        fichiers cites ; presence obligatoire des 4 etapes aval
+        (assembly ReqM2Winch, appel instWinchM2, publication
+        WinchM2FinalInterlockRequest, barriere PRG_06) avec fichier:ligne.
+
+    - id: AC5
+      statement: >
+        Le mode MAINTENANCE NIVEAU 2 avec inhibition d'un ou plusieurs treuils est
+        trace comme mecanisme REEL du code (et non comme hypothese) : variable
+        d'etat, ecrivain, ecritoire IHM, condition de mode, exclusion mutuelle,
+        et effet de l'inhibition sur les FB du treuil concerne. Le livrable
+        tranche explicitement si BucketBusy peut etre TRUE pendant que cette
+        inhibition est active, avec la preuve. Si aucun mecanisme d'inhibition
+        n'existait dans le code, le livrable devrait le declarer comme constat
+        majeur — il doit donc dire lequel des deux cas il a trouve.
+      verified_by: >
+        Select-String de la variable d'inhibition, de ses ecrivains, de son
+        ecritoire IHM et de la ligne qui conserve/enleve l'activation du FB benne
+        pendant l'inhibition ; chaque reference citee presente dans le livrable.
+
+    - id: AC6
+      statement: >
+        Le verrou d'atomicite de demarrage couple est tranche par preuve : le
+        livrable dit s'il COUVRE ou NON le scenario « M2 seul commande, benne
+        occupee, M1 gele », en citant le gate exact de chaque volet du verrou et
+        en prouvant que ces volets sont inactifs dans la configuration du
+        scenario. Une reponse « couvre » ou « ne couvre pas » sans cette preuve
+        de portee est un echec du critere.
+      verified_by: >
+        Select-String des gates du verrou (gel des requetes M1/M2 et barriere de
+        coherence finale) et de la variable d'intention couplee dont ils
+        dependent ; le livrable doit citer la ligne qui rend le verrou inerte
+        dans la configuration du scenario.
+
+    - id: AC7
+      statement: >
+        La garde compensatoire WinchBothMotionBlockedByBucket est reverifiee sur
+        le code actuel : le livrable donne sa definition reelle, sa source
+        d'armement, et tranche son SENS reel dans le cas du brief (couvre ou ne
+        couvre pas le cas BucketBusy=TRUE). Une conclusion qui reprend la
+        formulation du brief sans revérifier la logique de la definition est un
+        echec.
+      verified_by: >
+        Select-String de la definition de la variable et de sa source ; le
+        livrable doit expliciter la valeur de la variable pour BucketBusy=TRUE et
+        pour BucketBusy=FALSE.
+
+    - id: AC8
+      statement: >
+        La doctrine M1 vs M2 est etablie avec sa source documentaire (spec AF,
+        contrat de tache, ou commentaire de code cite fichier:ligne), OU declaree
+        explicitement NON SOURCEE si aucune source ne la porte. Aucune
+        justification n'est inventee ; toute source citee existe reellement et
+        est verifiable.
+      verified_by: >
+        Lecture du livrable (section doctrine) ; verification par l'orchestrateur
+        que chaque source citee existe (chemin de fichier + extrait retrouve par
+        Select-String).
+
+    - id: AC9
+      statement: >
+        Si le scenario est declare atteignable, la chaine de valeurs booleennes
+        qui y mene est donnee maillon par maillon avec fichier:ligne, de
+        l'armement de BucketBusy jusqu'a la requete de marche M2, en incluant le
+        point ou BucketM2RunRequest retombe a FALSE alors que Busy reste TRUE, et
+        les gardes qui ne bloquent pas (avec la raison).
+      verified_by: >
+        Relecture independante des lignes de la chaine par l'orchestrateur
+        (au moins 8 references) ; toute garde oubliee qui bloquerait en realite
+        invalide le verdict.
+
+    - id: AC10
+      statement: >
+        Si le scenario est atteignable, le livrable propose 2 a 3 options de
+        correction comparees et chiffrees en impact (quels modes/chemins
+        supplementaires seraient bloques par chaque option, et quel usage reel
+        serait perdu), SANS implementer : aucune ligne de code, aucun diff, aucun
+        patch pret a coller, aucune modification de CODE/.
+      verified_by: >
+        Lecture du livrable (presence des options et du chiffrage par mode) et
+        git status --short -- CODE/ vide a la livraison.
+
+    - id: AC11
+      statement: >
+        Le livrable porte un comptage explicite de ses references fichier:ligne :
+        nombre total de references, nombre conformes apres contre-verification,
+        nombre hors-borne, et la methode utilisee ; le comptage ne peut pas etre
+        nul ni approximatif.
+      verified_by: >
+        Recomptage independant par l'orchestrateur sur un echantillon d'au moins
+        25 references tirees du livrable ; le nombre de references du livrable
+        doit etre coherent avec le nombre d'occurrences de motifs fichier:ligne.
+
+    - id: AC12
+      statement: >
+        Tout ecart entre les references du brief et le code reel est refute par
+        preuve et signale comme constat, sans reecrire le brief : au minimum la
+        reference du brief annoncant les boutons IHM M2 au fichier PRG_04 lignes
+        104-111 (qui portent en realite un bloc de declarations) doit etre
+        confrontee a l'emplacement reel.
+      verified_by: >
+        Select-String sur les lignes du brief et sur les lignes reelles ; le
+        livrable doit citer les deux (annonce vs reel) et l'ecart doit apparaitre
+        dans la synthese des constats.
+
+    - id: AC13
+      statement: >
+        Le livrable contient une section dediee aux limites de la preuve : chaque
+        combinaison ou chemin juge non tranchable y est declare NON TRACE avec la
+        question ouverte et ce qui manque pour la trancher (ex. cycle de homing
+        machine en MAINT_N2, ou variante non balayee). La section n'est pas
+        muette et ne masque aucun doute residuel.
+      verified_by: >
+        Lecture du livrable : section presente, non vide, chaque entree enoncant
+        la question ouverte et la preuve manquante.
+
+    - id: AC14
+      statement: >
+        Aucun fichier de CODE/ n'est modifie et aucun artefact mecanique n'est
+        produit par ce lot : la restitution declare explicitement que le bundle,
+        le diff bundle, la verification de liaison G200 et la suite de gates sont
+        NON APPLICABLES (et non « oublies »), avec la preuve correspondante.
+      verified_by: >
+        git status --short -- CODE/ et git diff HEAD --stat -- CODE/ vides avant
+        et apres le lot ; aucun CODE_XML/ ni bundle regenere ; la restitution du
+        porteur contient la mention de non-applicabilite.
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T354_ASYMETRIE_GARDE_M1_M2_20260921.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T354_ASYMETRIE_GARDE_M1_M2.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - TOOLS/AGENT_WORKFLOW/status/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - DOC/AF/
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/CONTRACTS/BRIEF_T354_ASYMETRIE_GARDE_M1_M2.md
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_TREUILS_JoystickContacteur_20260921.md
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T351_ANNEXE_M3_TrousT334_20260921.md
+
+  evidence_required:
+    - git_status_code_clean
+    - blob_sha_anchoring
+    - reference_count_and_crosscheck
+
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug
+    preexistant, risque hors scope, garde differente de ce que decrit le brief)
+    est remonte IMMEDIATEMENT a l'orchestrateur et consigne dans le livrable,
+    pas a la fin et jamais silencieusement. Signaler n'est pas elargir le scope :
+    aucune correction spontanee de CODE/ dans ce lot.
+
+status: IN_PROGRESS
+
+execution:
+  executed_by: "DSH20 (deepseek-v4.1-flash:cloud, sous-agent T354)"
+  completed_at: "2026-09-21T02:45:00+02:00"
+  status: COMPLETED
+  summary: >
+    ANALYSE SEULE LIVREE, ZERO ligne de CODE/ ecrite. AC1 : table de verite
+    publiee (7 lignes R1..R7, chaque ligne citant la garde traversee en
+    fichier:ligne). AC2 : bloc d'ancrage HEAD c9e1fbfe + 20 blobs SHA horodates.
+    AC3 : asymetrie etablie ET bornee (garde M1:117 dans la branche manuelle
+    ELSE ligne 62 seulement ; branche SEMI_AUTO M1:56-61 sans garde ; gate M2
+    :143-151 sans terme BucketBusy). AC4 : les 3 chemins M2 traces jusqu'aux
+    sorties physiques %Q (PRG_06:378-379). AC5 : mecanisme MAINT N2
+    d'inhibition TREUVE et trace (FB_Modes:315-341, PRG_03:92-93,
+    ST_WinchCmd.st:13-14, AF-05 v2.1:153-165) et BucketBusy possible pendant
+    l'inhibition prouve par PRG_04:341. AC6 : verrou d'atomicite couple =
+    NE COUVRE PAS (3 volets gates par WinchBothMotionActive : PRG_04:1407,
+    :1499, :1661). AC7 : WinchBothMotionBlockedByBucket FAUSSE quand Busy=TRUE
+    (PRG_04:396). AC8 : doctrine M1 vs M2 declaree NON SOURCEE (aucune spec
+    DOC/AF ne porte BucketBusy cote arbitre). AC9 : chaine d'atteignabilite
+    donnee en 18 maillons avec fichier:ligne. AC10 : 3 options documentaires
+    comparees et chiffrees par mode bloque, zero patch. AC11 : comptage mesure
+    (179 references, 178 conformes automatiquement + 1 a la main, 0 hors-borne ;
+    107 assertions de contenu). AC12 : challenge du brief — 9 references
+    confirmees, 1 refutee (PRG_04:104-111 vs 492-497), 2 corrections de fond
+    (aucun mode MANU/AUTO ; inhibition a exclusion mutuelle). AC13 : 5 limites
+    declarees NON TRACE (U1..U5). AC14 : bundle / diff bundle / G200 / gates
+    declares NON APPLICABLES, git status --short -- CODE/ vide avant et apres.
+    VERDICT : ATTEIGNABLE OUI, unitairement M2, en MAINT_N1/MAINT_N2, avec M1
+    physiquement gele en MAINT_N2 + InhibitM1. 4 constats hors scope remontes
+    (dont un risque d'etat Lifecycle.Busy collable a traiter AVANT toute
+    implementation de l'option O1).
+  evidence_submitted:
+    - "check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T354_ASYMETRIE_GARDE_M1_M2.yaml : PASS 0 erreur / 0 avertissement"
+    - "git status --short -- CODE/ : vide avant et apres le lot"
+    - "git diff HEAD --stat -- CODE/ : vide"
+    - "179 references fichier:ligne comptees, 0 hors-borne (verification mecanique)"
+    - "107 assertions de contenu sur les references portant le verdict : 104 exactes, 3 expliquees"
+    - "bundle / diff bundle / G200 / run_all_gates : NON APPLICABLES (aucun CODE/ modifie)"
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Analyse seule : la recette humaine porte sur la lecture du verdict
+    d'atteignabilite et sur l'arbitrage des options de correction, pas sur un
+    import CODESYS (aucun CODE/ modifie).

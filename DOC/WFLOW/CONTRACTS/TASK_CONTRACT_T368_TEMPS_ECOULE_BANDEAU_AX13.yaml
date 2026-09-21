@@ -1,0 +1,170 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T368 : temps ecoule au bandeau mode + temps restant AX13
+# Agent porteur : DSH27 | Criticite C2 | Strategie patch
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T368_TEMPS_ECOULE_BANDEAU_AX13
+  criticality: C2
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    L'operateur voit la duree du cycle en cours (format MMminSSs, ex. 09min05s) accollee au
+    bandeau mode [SIMULATION/REEL] [MODE] [COUPLAGE], et uniquement pendant un cycle
+    reellement en cours ; le message de l'etape AX13 (egouttage du godet) porte en plus le
+    temps RESTANT d'egouttage en secondes entieres. Les deux valeurs existent deja
+    (CurrentCycleElapsed_Min/_S calcule par FB_CycleSemiAuto, DrainTimeRemaining publie a
+    l'IHM) : aucune n'est recalculee, aucun nouveau chronometre n'est introduit.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        Pendant un cycle en cours (CycleAutoBusy=TRUE, mode SEMI_AUTO), le champ
+        Banner.GlobalContextText porte le suffixe MMminSSs zero-padde : avec CycleElapsed_Min=0
+        et CycleElapsed_S=5 il vaut exactement '[SIMULATION] [SEMI-AUTO] [CYCLE AUTO] 00min05s',
+        et avec CycleElapsed_Min=1 et CycleElapsed_S=5 il porte '01min05s' (deux chiffres
+        toujours presents, aucune troncature a 1 chiffre).
+      verified_by: >
+        python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Hmi_BannerFormatter, cas
+        T368-001 : deux ASSERT_EQ sur FB_Banner.Banner.GlobalContextText (etat rouge mesure
+        AVANT implementation, puis vert APRES).
+    - id: AC2
+      statement: >
+        Hors cycle (CycleAutoBusy=FALSE), Banner.GlobalContextText vaut exactement
+        '[SIMULATION] [SEMI-AUTO] [CYCLE AUTO]' meme si CycleElapsed_Min=1 et CycleElapsed_S=5 :
+        aucune duree figee n'est affichee a l'arret, ni une vieille valeur de cycle precedent.
+      verified_by: >
+        meme suite, cas T368-001 troisieme scan (ASSERT_EQ), adosse a la preuve statique que
+        Lifecycle.Busy est force a FALSE hors cycle (PRG_03_Modes_Cycle.st:471 et :544,
+        FB_CycleSemiAuto.st:1585 en AX18 et :1621 en AX_STAB) et que le chrono est remis a zero
+        (PRG_03_Modes_Cycle.st:490-494 et :565-569).
+    - id: AC3
+      statement: >
+        En AX13_DRAIN_PAUSE, FB_CycleSemiAuto.CycleStateStr vaut exactement
+        'AX13 - Egouttage du godet : 5s restantes' au premier scan de l'etape (consigne
+        d'egouttage pleine), puis 'AX13 - Egouttage du godet : 3s restantes' apres 2 s d'horloge
+        simulee : le message d'etape porte le temps RESTANT d'egouttage, arrondi au superieur,
+        et il suit le decompte reel du temporisateur.
+      verified_by: >
+        python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_CycleSemiAuto, cas T368-002 :
+        deux ASSERT_EQ sur FB.CycleStateStr apres StepForceTgt=13, plus les ASSERT_TRUE
+        existants sur DrainTimeRemaining (5s puis 3s) qui prouvent la source unique.
+    - id: AC4
+      statement: >
+        Le pire cas du bandeau est chiffre et reste sous la taille du champ : 37 caracteres de
+        base plus 1 espace plus les chiffres de minutes plus 'min' plus les secondes plus 's' =
+        49 caracteres au maximum, contre 120 caracteres declares pour GlobalContextText
+        (ST_HmiBanner.st:10), qui n'est PAS couvert par le gate G408 et doit donc etre borne ici.
+      verified_by: >
+        calcul sur les bornes reelles du projet : CycleRunTimer est arme avec PT=T#12h
+        (FB_CycleSemiAuto.st:342) soit 720 minutes maximum, et les secondes sont bornees 0..59 ;
+        lecture de CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st:10.
+    - id: AC5
+      statement: >
+        Aucun message IHM ne depasse 70 caracteres apres modification : G408 reste PASS avec
+        0 violation et 0 exemption ajoutee, le pire cas calcule a la main du message AX13 valant
+        43 caracteres (28 de libelle, 4 chiffres au maximum, 11 de suffixe), soit 50 caracteres
+        une fois le prefixe 'Cycle: ' ajoute par le formateur (FB_Hmi_BannerFormatter.st:341).
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G408_check_ihm_message_length.py . avant et apres
+        (exit code et texte integral, bloc INFO inclus), et calcul du pire cas repris dans la
+        restitution.
+    - id: AC6
+      statement: >
+        Le nom du fichier est identique au nom du POU, et le suffixe est egal au langage genere
+        dans le bundle : le POU PRG_07_Supervision est produit depuis le fichier
+        CODE/M_MAIN/PRG_07_Supervision.st sans suffixe de langage ajoute, langage ST, et aucun
+        POU n'est renomme ni cree par ce lot.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . puis lecture du nom
+        d'objet POU PRG_07_Supervision dans CODE_XML/PRG_07_Supervision.xml.
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/tests/test_fb_hmi_bannerformatter.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T368_TEMPS_ECOULE_BANDEAU_AX13.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - TOOLS/AGENT_WORKFLOW/status/
+      - CODE_XML/CODE_DiffBundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/FB_CycleMachineHoming.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md
+      - TOOLS/AGENT_WORKFLOW/scripts/G408_check_ihm_message_length.py
+      - DOC/WFLOW/TASKS.yaml hors entree T368
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml hors entree T368
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_task_contract (PASS 0 erreur 0 avertissement, ecrit AVANT le code)
+    - ci_rouge_avant_vert_apres (FB_Hmi_BannerFormatter + FB_CycleSemiAuto)
+    - g408_avant_apres (exit code + texte integral + bloc INFO)
+    - bundle_frais et diff_bundle avec liste des objets
+    - bloc Auto-verification liaison (G200_check_linkage.py --report)
+    - run_all_gates palier C avec delta de rouges nomme
+    - trace d impact producteur vers routeur vers consommateur final
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud (DSH27)"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug preexistant, risque
+    hors scope) est remonte IMMEDIATEMENT a l'orchestrateur, pas a la fin et jamais
+    silencieusement. Signaler n'est pas elargir le scope : aucune correction spontanee hors
+    des fichiers autorises ci-dessus.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "deepseek-v4.1-flash:cloud (DSH27)"
+  completed_at: "2026-09-21T09:12:00+02:00"
+  status: COMPLETED
+  summary: >
+    Criteres AC1..AC6 atteints. Volet 1 (bandeau) : FB_Hmi_BannerFormatter recoit
+    CycleElapsed_Min/_S par VAR_INPUT (cables PRG_07_Supervision.st:759-760 sur
+    GVL_IHM.CycleSemiAuto.State) et accole ' MMminSSs' au contexte global, uniquement si
+    CycleAutoBusy. Volet 2 (AX13) : CycleStateStr porte le temps RESTANT d'egouttage en
+    secondes entieres, arrondi au superieur, depuis DrainTimeRemaining (source unique deja
+    publiee a l'IHM). Aucun chronometre recalcule ; une seule variable locale ajoutee au
+    cycle : DrainRemaining_S. DECOUVERTE HORS SCOPE : le CONCAT imbrique
+    PrefixContext/ModeStr/CouplingStr plafonnait le bandeau a 30 caracteres sur le harnais
+    CI (CONCAT rend max(taille des arguments)) : l'assemblage a ete converti en accumulation
+    sur le champ cible STRING(120), semantique identique en CODESYS.
+  evidence_submitted:
+    - "check_task_contract: PASS (0 erreur, 0 avertissement) ecrit AVANT le code"
+    - "CI rouge AVANT : T368-001 et T368-002 FAIL sur le code initial (preuve en restitution)"
+    - "CI vert APRES : T368-002 PASS (FB_CycleSemiAuto), T368-001 PASS (FB_Hmi_BannerFormatter), T347-001 PASS"
+    - "delta de rouges CI = 0 : FB_CycleSemiAuto 5 rouges preexistants et FB_Hmi_BannerFormatter 4 rouges preexistants, identiques au baseline mesure avant le lot"
+    - "PRG_07_Supervision (consommateur du formateur) : PASS 1/1"
+    - "G408 : PASS exit 0 avant ET apres (bloc INFO x3 restitue, pire cas calcule a la main)"
+    - "G407 : PASS exit 0 (WARN fragments non resolus seulement)"
+    - "bundle : 261/261 objets, 0 erreur ; G200 liaison PASS 0 erreur (2052 instances)"
+    - "palier C : 4 rouges = G300/G340/G430/G483, exactement les dettes preexistantes (delta 0)"
+    - "diff bundle : CODE_XML/CODE_DiffBundle.xml -- FB_CycleSemiAuto, FB_Hmi_BannerFormatter, PRG_07_Supervision"
+    - "REPRISE apres deux commits tiers (T364 reapplique + seuil benne 8742eb4e) : bundle regenere, G200 liaison PASS 0 erreur, T368-001 et T368-002 toujours PASS, delta de rouges CI toujours 0, palier C toujours 4 rouges preexistants (G300/G340/G430/G483), diff bundle regenere en derniere action"
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Visa orchestrateur attendu. Aucun commit sans accord humain explicite, distinct du GO.

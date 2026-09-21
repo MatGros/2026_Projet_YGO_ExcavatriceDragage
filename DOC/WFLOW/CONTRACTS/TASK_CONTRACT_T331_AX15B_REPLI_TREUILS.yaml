@@ -1,0 +1,164 @@
+contract:
+  task_id: T331
+  criticality: C3
+  strategy: patch
+  objective: >
+    Depuis l'étape de vidage à la trémie (AX15b, treuils volontairement neutralisés),
+    rendre possible un repli opérateur : sous geste joystick INVERSE maintenu (Y+, montée)
+    et homme-mort armé, la benne est refermée puis les deux treuils remontent couplés,
+    afin que l'opérateur puisse interrompre un vidage bloqué (frein qui glisse, benne qui
+    ne tombe pas) sans sortir du cycle et sans mouvement autonome. Le geste inverse doit
+    être atteignable en une manœuvre continue, sans exiger une remise au neutre prolongée
+    qui désarmerait l'homme-mort au milieu de l'intervention.
+  acceptance:
+    - id: AC1
+      statement: "À AX15B, un geste Y+ maintenu avec homme-mort armé fait quitter AX15B vers AX10_CLOSE_BUCKET, et la demande d'ouverture benne est publiée à FALSE dès le scan du geste inverse : ReqOpen et ReqClose ne sont jamais vrais simultanément."
+      verified_by: "tests STruCpp T331-001 et T331-003 : observation de BucketCmd.ReqOpen/ReqClose au scan de transition, plus invariant d'exclusion mutuelle"
+    - id: AC2
+      statement: "Le repli réutilise la chaîne existante AX10 -> AX10B -> AX11 -> AX12 : fermeture benne par BucketCmd.ReqClose avec maintien M2 (ReqHoldAscentP1AfterClose), puis remontée couplée M1+M2 symétrique (mêmes paliers, ReqAscent sur les deux voies) gated par CycleMotionPermit, sans dupliquer la logique de fermeture ou de montée."
+      verified_by: "tests STruCpp T331-001 : suite observée AX10 (fermeture) -> AX10B (raccordement P1 symétrique) -> AX11 (montée contrôlée) -> AX12 (remontée en charge) -> AX13/AX14 (reprise du cycle)"
+    - id: AC3
+      statement: "Le relâchement du geste ou la perte de l'homme-mort pendant le repli neutralise toute demande (ReqClose, ReqOpen, RunRequest M1/M2) sans reprise automatique, tout en conservant l'étape courante ; un nouveau geste maintenu reprend la manœuvre."
+      verified_by: "tests STruCpp T331-003 : relâchement du manche, perte homme-mort, reprise du geste, puis défaut"
+    - id: AC4
+      statement: "Un défaut pendant le repli replie le cycle en AX_STAB avec toutes les demandes neutralisées, et l'acquittement conscient (cause disparue puis Reset) est requis : aucun redémarrage automatique du repli."
+      verified_by: "test STruCpp T331-003 : perte du bit de vie IHM en cours de repli, observation AX_STAB, sorties à zéro, puis acquittement"
+    - id: AC5
+      statement: "Le vidage nominal est inchangé : à AX15B, Y- maintenu commande l'ouverture benne, laisse les deux treuils neutralisés, et la fin de vidage (Benne_Done et Benne_IsOpen) mène toujours à AX18 avec un seul incrément de compteur."
+      verified_by: "test STruCpp T331-002 : assertions AX15B nominal puis AX18, plus test T262-002/T262-003 (chaîne AX10B) restés verts"
+    - id: AC6
+      statement: "Le repositionnement AX15C est inchangé : l'option IHM maintenue amène AX15C en descente couplée M1+M2 symétrique au palier lent, sans aucune commande de montée, et le relâchement de l'option ramène AX15B treuils arrêtés."
+      verified_by: "test STruCpp T331-002 : assertions AX15C (RunRequest, ReqDescend, paliers égaux, ReqAscent faux) puis retour AX15B"
+    - id: AC7
+      statement: "Aucune variable nouvelle (position, fin de course, drapeau mémorisé), aucune étape d'énumération nouvelle, aucun bypass frein/AU/homme-mort/permission, et aucune modification de la chaîne aval PRG_04 : le repli n'emploie que les variables, étapes et demandes existantes."
+      verified_by: "revue du diff de FB_CycleSemiAuto.st et de E_AutoCycleStep.st ; diff nul sur PRG_03/PRG_04/FB_Bucket ; gates G495 (invariants cycle) et G310 (structure) verts"
+    - id: AC8
+      statement: "Le nom du fichier de POU est identique au nom du POU PRG_02_Acquisition : aucune divergence de nommage n'est toleree."
+      verified_by: "revue du nom de fichier et du nom de POU déclaré, plus gate G310 (structure CODE, POU et suffixe) vert"
+    - id: AC9
+      statement: "Le suffixe du fichier de POU est egal au langage genere dans le bundle PLCopenXML : aucun suffixe de langage parasite, le POU reste du Structured Text."
+      verified_by: "revue du nom de fichier et du langage déclaré dans le bundle PLCopenXML généré, plus gate G400 (syntaxe ST du bundle) vert"
+    - id: AC10
+      statement: "À AX15b, une inversion directe du manche (Y- puis Y+, sans échantillon neutre) sous homme-mort armé ne pose plus le verrou d'inversion et ne désarme plus l'homme-mort : le repli est atteignable en une seule manœuvre maintenue, sans relâcher puis réarmer l'homme-mort."
+      verified_by: "revue de la liste DirectInversionPermit (AX15b présent) + vérification que ce permis n'est consommé qu'à un seul endroit (FB_Joystick §4 armement) + gate G492 (verrou inversion T222) vert"
+    - id: AC11
+      statement: "L'extension du permis d'inversion ne modifie pas les étapes AX8 à AX12 (mêmes cinq étapes couvertes) et ne relâche rien d'autre : l'inversion sur l'axe X reste verrouillée et l'homme-mort reste obligatoire pour tout mouvement."
+      verified_by: "diff de la liste limité à une entrée ajoutée + tests FB_Joystick et PRG_02 verts après modification"
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/D_JOYSTICK/FB_Joystick.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T331_AX15B_REPLI_TREUILS.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/CODE_DiffBundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - La sous-partie T331 AX1 / posture de depart (traitee separement)
+      - Tout bypass frein, AU, TOP mecanique, FDC, homme-mort ou permis existant
+      - Toute nouvelle variable de position, de fin de course ou persistante
+      - Toute commande de mouvement hors geste operateur maintenu
+      - Toute modification de la politique D'INVERSION DE L'AXE X
+      - "Toute modification du CODE de FB_Joystick.st, hors mise a jour du commentaire d'interface du permis d'inversion Y (aucune ligne executable, aucune temporisation touchee)"
+  conservation:
+    must_survive:
+      - "AX15B reste une etape a treuils neutralises : hors repli, aucune descente couplee M1+M2 n'est commandee pendant le vidage."
+      - "La doctrine de geste qualifie est conservee : toute demande reste conditionnee par DeadmanArmed et par le sens Y qualifie, relue a chaque scan."
+      - "L'etape AX10 reste la seule etape de fermeture benne : sa logique (ReqClose, ReqHoldAscentP1AfterClose, transfert P1/P1 en AX10B) n'est pas dupliquee."
+      - "Le repositionnement AX15C et son retour AX15B au relachement de l'option restent inchanges dans leur sens et leur palier."
+      - "Les protections aval (frein, AU, TOP, FDC, synchronisme M1/M2, timeout benne) restent les seules autorites : aucune n'est contournee ni adoucie."
+      - "La sequence de decharge AX13/AX14/AX15A/AX15B/AX18 reste le chemin normal apres remontee : le repli y revient sans etape parallele."
+      - "Le verrou d'inversion d'axe X et l'exigence d'homme-mort arme pour tout mouvement restent inchanges : seul le retour au neutre de l'axe Y est supprime a AX15b, comme il l'est deja d'AX8 a AX12."
+      - "Le permis d'inversion reste un permis de GESTE : il ne remplace ni le bouton homme-mort, ni les permis de mouvement M1/M2, ni les protections frein/AU/TOP/FDC."
+    dropped_on_purpose: []
+  phases:
+    - id: P1
+      title: Design d'entree
+      deliverables: "Choix du point d'entree du repli (AX10_CLOSE_BUCKET) et justification par les bornages aval deja portes par cette etape."
+      gate: "Argumentation tracee dans le contrat et la restitution, validee par l'orchestrateur."
+    - id: P2
+      title: Implementation
+      deliverables: "Transition AX15B -> AX10 sur geste inverse qualifie, neutralisation de l'ouverture au scan de transition, publication deterministe de ReqOpen par AX10, message operateur AX15b."
+      gate: "Revue du diff et liaison G200 vertes avant livraison."
+    - id: P3
+      title: Tests
+      deliverables: "Tests STruCpp du repli complet, de la non-regression AX15B/AX15C et des interruptions (geste, homme-mort, defaut)."
+      gate: "Suite CI FB_CycleSemiAuto sans nouvelle regression par rapport a la baseline relevee avant modification."
+  dependencies:
+    - "T262 : chaine de fermeture et de raccordement P1 (AX10 -> AX10B -> AX11) reutilisee telle quelle ; ses tests doivent rester verts."
+    - "T295 : diagnostic du timeout d'ouverture benne AX3/AX15B ; perimetre distinct mais meme fichier, a serialiser (ne pas modifier FB_CycleSemiAuto.st en parallele)."
+    - "T331 AX1 : sous-partie posture de depart, hors perimetre de ce contrat."
+    - "T328/T300 : etat de la simulation et du banc, sans effet sur le sequenceur ; la baseline CI du domaine G_CYCLE est relevee avant modification."
+  evidence_required:
+    - task_contract_check
+    - ci_test_report_fb_cyclesemiauto
+    - baseline_ci_comparison
+    - check_linkage
+    - run_all_gates_palier_c
+    - diff_bundle
+    - implementation_diff_review
+  alert_duty: >
+    Tout doute sur le sens de montee, la priorite d'un permis, le comportement apres
+    relachement, la compatibilite du repli avec la surveillance de synchronisme M1/M2
+    ou avec le timeout benne, ainsi que toute anomalie constatee hors perimetre
+    (baseline CI rouge, incoherence d'une etape voisine), est remonte immediatement a
+    l'orchestrateur. Signaler n'est pas elargir le perimetre.
+status: PENDING
+execution:
+  executed_by: "DSH08"
+  completed_at: "2026-09-20T18:12:00+02:00"
+  status: COMPLETED
+  summary: >
+    Repli implemente dans FB_CycleSemiAuto.st : a AX15B, un geste Y+ maintenu sous
+    homme-mort fait passer l'etape a AX10_CLOSE_BUCKET, neutralise ReqOpen des le scan
+    de transition, puis laisse la chaine existante AX10 -> AX10B -> AX11/AX12 refermer
+    la benne et remonter les deux treuils couples jusqu'a la limite haute, avant retour
+    dans la sequence de decharge normale. AX10 publie desormais ReqOpen a FALSE de facon
+    deterministe. Perimetre elargi sur arbitrage de l'orchestrateur : AX15B est ajoute a
+    DirectInversionPermit dans PRG_02_Acquisition.st (liste AX8..AX12 conservee) pour que
+    le geste inverse soit atteignable sans remise au neutre prolongee, qui desarmerait
+    l'homme-mort au milieu de l'intervention. Aucune variable, etape ou permission
+    nouvelle ; PRG_03/PRG_04/FB_Joystick/FB_Bucket non touches. Trois tests STruCpp
+    ajoutes (T331-001 repli complet, T331-002 non-regression AX15B/AX15C, T331-003
+    interruptions) : les trois passent ; CI PRG_02 verte (1/1 et 5/5). La baseline du
+    domaine G_CYCLE etait deja rouge avant modification (5 echecs pre-existants
+    TC-P04-020/021/023/026 sur AX4 et TC-P04-SCEN-NOM sur ReqStart AX2) ; le jeu d'echecs
+    est identique apres modification. Mise a jour finale : le commentaire d'interface du
+    permis d'inversion (FB_Joystick.st:28) est aligne sur l'etendue reelle du permis
+    (AX8..AX12 + repli AX15b) — une ligne de commentaire, aucune ligne executable, et
+    FB_Winch.st (temporisations moteur/frein/inversion de sens) est intact. Reserves
+    restantes : aucune dans le perimetre du lot ; le palier C ne porte que les 5 dettes
+    pre-existantes hors perimetre, et le chemin PERMIS du permis d'inversion (AX8..AX12 et
+    desormais AX15b) n'est pas couvert par un test unitaire de FB_Joystick — couverture
+    absente avant ce lot, non etendue ici.
+  evidence_submitted:
+    - "task_contract_check: PASS (0 erreur, 0 avertissement) — scope CODE/M_MAIN declare, AC8/AC9 structurels T8 satisfaits"
+    - "ci FB_CycleSemiAuto: 20/25 PASS — T331-001, T331-002, T331-003 PASS ; 5 echecs PRE-EXISTANTS identiques a la baseline relevee avant modification (TC-P04-020/021/023/026 sur AX4, TC-P04-SCEN-NOM sur ReqStart AX2)"
+    - "ci FB_Joystick: 29/29 PASS apres mise a jour du seul commentaire d'interface du permis (dont TC-P08-070 inversion X verrouillee, TC-P08-071 inversion Y verrouillee hors permis, TC-P08-072 non-regression sans inversion)"
+    - "ci PRG_02_Acquisition: 1/1 PASS ; ci PRG_02_Acquisition_Archi: 5/5 PASS (chaine de 18 FB compilee, scenario de qualification joystick vert)"
+    - "DirectInversionPermit: liste verifiee statiquement a 6 entrees (AX8, AX9, AX10, AX11, AX12, AX15B) et consommee a UN SEUL endroit (FB_Joystick.st:216) — l'inversion d'axe X reste verrouillee par FlipX"
+    - "bundle exporte verifie: PRG_02_Acquisition.xml contient la liste a 6 entrees ; FB_CycleSemiAuto.xml contient la branche de repli, la neutralisation ReqOpen d'AX10 et le message AX15b"
+    - "G200_check_linkage.py --report: PASS (0 erreur, 2006 instances verifiees, L8 0 KO, L13 86 OK)"
+    - "bundle: CODE_XML/CODE_Bundle.xml regenere, 258/258 objets, 0 erreur"
+    - "diff bundle: CODE_XML/CODE_DiffBundle.xml — objets FB_CycleSemiAuto, FB_Joystick et PRG_02_Acquisition"
+    - "run_all_gates.py --palier C: 40/45 PASS — 5 FAIL, AUCUN dans le perimetre du lot, EXACTEMENT les memes dettes pre-existantes qu'avant le lot (G300 .tmp + prototypes, G340 liens doc, G408 message AX2 75 car., G430 commentaires REX d autres fichiers, G483 matrice bypass PRG_03/PRG_04). La 6e dette exterieure de la passe precedente (G345 / .tmpsandbox d une session tierce) a disparu et G345 est repasse PASS. Le nombre de gates est passe de 44 a 45 par ajout de deux gates d autres sessions (G504 T330, G507 T295), tous deux verts."
+    - "G310, G345, G390, G400, G405, G406, G407, G461, G492, G494, G495, G496: PASS"
+validation:
+  status: PENDING
+  notes: >
+    En attente de revue du diff par l'orchestrateur, de l'import CODESYS et de l'essai
+    machine supervise. Arbitrages deja rendus par l'orchestrateur : porte a sens unique
+    AX10 (volontaire, confirme), AX15A sans repli (hors brief, a reevaluer si le cas se
+    manifeste), priorite du geste Y+ sur l'option AX15C (accepte), extension de
+    DirectInversionPermit a AX15b (acceptee, avec verification utilisateur que les
+    temporisations moteur/frein/inversion de sens vivent dans FB_Winch.st, intact).
+    Reste ouvert : couverture unitaire du chemin PERMIS du permis d'inversion (AX8..AX12
+    et AX15b) — aucune preuve dynamique n'existe, ni avant ni apres ce lot.

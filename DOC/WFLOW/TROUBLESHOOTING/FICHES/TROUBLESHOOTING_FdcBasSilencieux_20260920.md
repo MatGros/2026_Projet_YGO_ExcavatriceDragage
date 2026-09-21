@@ -180,6 +180,34 @@ Cas ajoutés : `tests/run.py --case banner-hyp` (registre éphémère) et `--cas
 
 **Réparation locale du registre (constat pour D4)** : l'entrée `FB_Hmi_BannerFormatter` cumule **13 sources absentes** (tout le dossier `CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/`, retiré) **et** une source manquante non déclarée (`E_CycleDepthStopMode.st`, requise par `ST_CycleCfg.st` qu'elle liste). Sans ces deux réparations, les 19 TC du bandeau sont **morts** — aucune exécution possible, donc aucune détection des 4 rouges.
 
+### 🔍 Revue indépendante read-only (2026-09-20) — constats et suites
+
+| Constat | Disposition |
+|---|---|
+| **MAJOR-1** `CableLimitDescent` = comparaison **brute de projection**, sans bypass (`FB_WinchStateProjection.st:217-218/230`) ⇒ **fausse alarme** sous `BypassCableLimitSwitch` et action « remonter » alors que la descente est autorisée | ✅ **CORRIGÉ** : lecture du **bit 6 sur `ErrorId`** (`CST_WinchErrorIdCableLimitDescent := 16#0040`) dans le carrousel **et** dans l'action ; ancre de non-régression `TC-P07-043` (champ brut seul ⇒ **aucune** alarme) |
+| **MAJOR-2** G506 raisonnait par **source** : un nouveau bit muet sur une source connue passait, et supprimer une ligne de table supprimait l'exigence (faux PASS reproduit par le relecteur) | ✅ **CORRIGÉ** : complétude **par bit**, vérifiée contre le **producteur** (`FB_Safety_Winch.instCauses[i].Texte`, 16 causes) ; preuve : table privée du bit 6 ⇒ **FAIL « BIT NON CARTOGRAPHIE … c'est exactement le bug T255-D »** |
+| **MAJOR-3** entrée registre `FB_TroubleshootingView` toujours inutilisable | 🟡 **PARTIELLE** : 5 sources ajoutées (enum + 4 DUT IHM) ; cascade de 10+ types manquants ensuite ⇒ **arrêt borné**, hors périmètre T255-D (0 source morte dans tout le registre) |
+| **MINOR-1/2** bit 5 : DI **commune** M1/M2 (2 alarmes pour 1 capteur) et état **normal** de fin de course (fatigue d'alarme) | ✅ **CORRIGÉ** : bit 5 **retiré du carrousel**, désormais **exemption nominative** motivée dans G506 (état normal, DI commune, action déjà publiée par « Montée interdite - limite haute ») |
+| **MINOR-3** branche d'action court-circuitant `DISABLE` (action inexécutable) | ✅ **CORRIGÉ** : branche placée **après** les prérequis (mode `DISABLE`, homme-mort) ; ancre `TC-P07-044` (`DISABLE` ⇒ « Sélectionner un mode ») |
+| **MINOR-6** citations périmées | ✅ **CORRIGÉ** (commentaires) |
+| **MINOR-7** commentaires faux sur une « fuite d'état entre tests » | ✅ **CORRIGÉ** — et **confirmé par les faits** : le TC M2 échouait justement parce qu'il dépendait de l'état posé par M1 (setup régénéré par cas) ; entrées reposées explicitement |
+| **MINOR-4** bump AF vs `CODE_QUALITY_STANDARDS.md:26` | ⏳ **remonté** : D2 = mise à jour en place sans dérogation écrite au standard ⇒ **arbitrage** (dérogation ou `_v2.4`) |
+| **MINOR-5/8/9** 4 TC rouges (T335), G408 pré-existant, suppressions de renommage | ⏳ **remontés** (hors périmètre ; G408 non exempté : une allowlist n'est pas une décision d'agent) |
+| INFO : `G430` relevait mes commentaires de dev-dans-le-code | ✅ **CORRIGÉ** : historique retiré des commentaires (§2ter), comportement seul décrit |
+
+**Conformités confirmées par la revue** : aucun masquage d'un message safety par la nouvelle branche · gardes `EncMxValid` cohérentes · littéraux ≤ 40 car. (plafond G408 70) · **aucune variable** nouvelle (1 `VAR CONSTANT` locale) · bundle plus récent que tous les `.st`.
+
+### 📈 Résultats après revue et corrections
+
+| Suite | Avant lot | Après lot | Après revue |
+|---|---|---|---|
+| `PRG_07_Supervision` (harnais officiel) | 3/3 | 5/5 | **5/5** |
+| `FB_Hmi_BannerFormatter` (fichier officiel) | 15/19 | 18/22 | **20/24** (5 TC T255-D verts, mêmes 4 rouges) |
+| Exploratoire `--case consumer` (assertions d'origine) | 0/4 | 4/4 | **4/4** |
+| Exploratoire `--case producer` | 2/2 | 2/2 | **2/2** |
+| `G506` | (n'existait pas) | PASS | **PASS** (16 causes/bit, 7 exemptions) |
+| `G200` liaison | PASS | PASS | **PASS** (0 erreur) |
+
 ### Chronogramme (événements × signaux — séquence rapportée 🟡, non mesurée)
 | <nobr>Événement</nobr> | `CablePosM` vs `CfgCableLimitDescentM` | `ErrorId` bit6 | `DescendPermit` | `AnyFaultActive` | `AlarmBanner.HasAlarm` | `OperatorActionText` |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -306,6 +334,7 @@ il est **signalé**, pas corrigé.
 - **2026-09-20** : écarts de cadrage constatés — `AnyFaultActive` en `PRG_07:537-547` (et non `:424-427`), POU en `CODE/M_MAIN/` (et non `CODE/J_SUPERVISION/`), `ST_IHM_MANU` inexistant (supprimé 2026-07-19).
 - **2026-09-20** : RC1 + RC2 + RC3 établies, fichier:ligne ; §5i `[HISTO]` **disculpée** (causes non latchées).
 - **2026-09-20 14:0x** : reproduit par exécution (dossier `_TROUBLESHOOTING/DSH05_T255D_FDC_BAS`) — **4/4 tests rouges** ; baseline `PRG_07_Supervision` mesurée **PASS 3/3** ; obstacle registre `FB_Hmi_BannerFormatter` constaté et signalé.
+- **2026-09-20 16:0x** : revue indépendante read-only → 3 MAJOR / 9 MINOR ; **MAJOR-1 était un défaut introduit par mon lot** (faux positif sous bypass) : corrigé, bit 6 lu sur `ErrorId` ; G506 durci (complétude par bit contre le producteur, preuve de fermeture) ; bit 5 retiré du carrousel (exemption nominative) ; branche d'action déplacée après les prérequis (mode/homme-mort) ; commentaires nettoyés (§2ter). Résultats finaux : PRG_07 **5/5**, bandeau **20/24** (mêmes 4 rouges), exploratoire **4/4** et **2/2**, G200 **PASS**, G506 **PASS** ; palier C : 5 rouges **hors périmètre** (G300 scratch G390 + `prototypes`, G340 = AF-11 v2.4 de T333, G408 pré-existant, G430 pré-existant, G483 pré-existant).
 - **2026-09-20** : écart de cadrage majeur réfuté (§7 : `.Error` est la vue LIVE, `FB_FaultCore.st:49-57`) — mécanismes A/B du brief écartés, mécanisme **C** prouvé. Fiche consignée. **ARRÊT — validation humaine.**
 
 ---

@@ -344,4 +344,9 @@ validation:
     sa refermeture est un mot thermometre VALIDE (donc Incoherent=FALSE) et ancre desormais la
     position DEUX fois (ouverture + refermeture) au lieu d'une — sans consommateur de securite,
     et arbitre sans gate supplementaire par l'humain (Q2), un gate de plausibilite etant
-    inexploitable tant que le gain odometrique est faux.
+    inexploitable tant que le gain odometrique est faux. Le FB ne consomme pas `Incoherent` :
+    ce constat est desormais ecrit dans la fiche AF-11 (§1, bloc "Risque residuel T333 / Q2").
+    ARBITRAGES FINAUX ORCHESTRATEUR CC01 (2026-09-20) : (D6/D9) les corrections factuelles de doc
+    sur la fiche sont GARDEES ; (risque Q2) les 2 lignes de risque residuel SONT AJOUTEES a la
+    fiche ; (D5) l'enregistrement des TC-P11-EST-004..007 dans af_traceability_matrix.yaml est
+    LAISSE a la lane T330 (fichier ecrit en parallele, hors perimetre de ce lot).

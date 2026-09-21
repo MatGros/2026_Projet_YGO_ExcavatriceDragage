@@ -1,9 +1,10 @@
 # 🕵️ Troubleshooting T334 — Translation M3 : deux chemins de commande (manuel/MAINT vs cycle auto) ?
 
 > 📌 Emplacement : `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md`
-> 📅 Date : 2026-09-20 · 🧊 Situation : [SITE] constat opérateur (machine en service) + hypothèses vérifiables [SIMULATION BANC] · 📄 Statut : **EN COURS — analyse livrée, en attente de validation humaine du comparatif**
+> 📅 Date : 2026-09-20 · 🧊 Situation : [SITE] constat opérateur (machine en service) + hypothèses vérifiables [SIMULATION BANC] · 📄 Statut : **PHASE 1 ACCEPTÉE PAR CC01 — campagne de trace 10 ms prête à exécuter (run humain), contrat C3 créé, phase 2 (conception) en attente des traces**
 > 🎫 Tâche : `T334` (C3) · 🏷️ Acteur : **DSH07** (verrou posé `DOC/WFLOW/TASK_LOCKS.json`, tag vérifié 2026-09-20) · 🔒 Verrou orchestration : CC01
 > 🚫 **Analyse read-only `CODE/`.** Aucun fichier `CODE/`, aucun test CI, aucun gate, aucun `CODE_XML/`, aucun `Device.export`, aucune IHM touchés. Aucun correctif proposé (§5 est « en principe »). Aucun commit.
+> 📦 **Livrables de la phase 2 préparatoire** : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T334_AUTO_CYCLE_M3_OVERSHOOT.yaml` (contrat C3, `check_task_contract.py` PASS) · `DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md` (mode opératoire de la trace).
 
 ---
 
@@ -309,12 +310,27 @@ Mode couvert : `SEMI_AUTO` (`FB_TranslationCmdArbitrationM3.st:63-83`). Étapes 
 **Résumé une ligne (chaîne causale la plus probable) :**
 `[capteur 0↔1 au point d'arrivée] → [jeton AtXxx=FALSE : PRG_05:275-277 ou exclusion mutuelle :265-274] → [cycle RecStart=TRUE : FB_CycleSemiAuto:913/1383] → [Verrou d'arrêt absent : ArrivalLock=FALSE] → [chariot repart] → [dépassement P1] → [cause 6 + PowerCutOff + frein fermé en mouvement]`
 
+### 🔗 Lien avec T287 — noté sur GO CC01 (2026-09-20)
+
+**H1 rejoint potentiellement la cause de T287** (« Régression M3 sur butées — escalade graduée sans toucher `FB_Brake` », `DOC/WFLOW/TASKS.yaml:1247`, porteur CDX01) : T287 documente une **récidive du défaut séquence/retour frein M3 aux arrivées Trémie ET P1**, avec une trace réelle montrant des **commutations capteur `0↔1` rapides pendant environ 1 s** (`TASKS.yaml:1248-1250`) et une cause exacte « encore à prouver par la trace réelle » (`TASKS.yaml:1261`).
+
+| Élément | T334 (H1) | T287 | Recouvrement |
+|---|---|---|---|
+| Lieu | arrivées P1 (AX2) et Trémie (AX14) | arrivées Trémie **et P1** | ✅ identique |
+| Signal | jeton d'arrivée effacé par rebond capteur → demande recréée | commutations capteur `0↔1` ≈ 1 s | ✅ même signal d'entrée |
+| Effet | dépassement + `CommandWord := 0` (roue libre) + frein fermé sur chariot en mouvement | défaut séquence / **retour frein** | ✅ la chaîne H1 → **H4/H6** produit exactement ce défaut |
+| Statut | hypothèses H1-H6, **non prouvées** (aucune trace 10 ms) | cause exacte non prouvée (trace à 100 ms) | ⚠️ **même verrou de preuve** |
+
+➡️ **Conséquence pratique** : la campagne du §9 (procédure `PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md`) trace **explicitement** les canaux dont T287 a besoin — `instTranslationM3.Brake.BrakeCmd`, `M3_BrakeIsOpen_DI`, `PRG_06_Outputs.M3_TremieHardStopActive`, `instTranslationOutputInterlockM3.BrakeTimeoutElapsed`, `instTranslationM3.ArrivalLock`, plus les 5 DI et les fronts du décodeur. **Une seule campagne sert les deux tâches** ; le porteur read-only de T287 réutilise la trace telle quelle. Le scénario B (intermittence ≈ 1 s) est précisément le stimulus que T287 cherche à reproduire. **Aucune correction de T287 n'est faite dans ce lot** (devoir d'alerte, pas d'élargissement).
+
 ---
 
 ## 9. 📊 Variables EXACTES à tracer à 10 ms (preuve de H1→H6)
 
 > Base : `DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_T300_M3_SIMBENCH.md:9` (trace **tâche 10 ms** obligatoire : « une trace à 100 ms ne peut pas qualifier un délai de frein de 90 ms »), `:28-42` (étages de preuve), `:44-56` (variables minimales). Les ajouts **T334** sont les lignes marquées 🆕 — sans elles, aucune des 6 hypothèses n'est discriminable.
-> ⚠️ Les chemins `instXxx.<interne>` sont des **internes de FB** : traçables par symbole CODESYS, mais **jamais** lus par du code (`CODE_QUALITY_STANDARDS.md:526-527`, « internes privés »). Si l'outil de trace ne les expose pas, la preuve doit passer par les équivalents publiés (`Data.*`, `TranslationState.*`) — signaler alors la variable manquante au diagnostic au lieu de conclure.
+> 🚀 **Campagne prête à exécuter (GO CC01 2026-09-20)** : `DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md` — liste des canaux à copier telle quelle (groupes A à G), réglage de la trace, les 3 scénarios A/B/C, la matrice de décision signature → hypothèse, et le post-traitement `trace_to_csv.py`. La présente section en est le **résumé décisionnel** ; la procédure est le mode opératoire.
+> ✅ **Faisabilité des internes VÉRIFIÉE** (ne plus la supposer) : les traces existantes du dépôt enregistrent déjà des internes d'instance par chemin pointé, y compris imbriqués — `PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt`, `PRG_02_Acquisition.instJoystick.ArmingPermit`, `PRG_04_Treuils_Benne.Data.WinchM1State.DirectionChangePending`, `PRG_02_Acquisition.instSimBench.instWinchElectricalM1.Slip_Ratio` (relevé dans `TOOLS/PLC_CSV_SNAPSHOT/variable_lists/trace_treuils_charge_v1.txt:25,29,84,105`). Les chemins `PRG_05_Translation.instTranslationM3.*` et `instArbM3.*` sont donc traçables. ⚠️ Ces internes restent **interdits à la lecture par du code** (`CODE_QUALITY_STANDARDS.md:526-527`) : ils ne servent qu'à la preuve de diagnostic.
+> 📉 **Ce que les traces existantes ne peuvent PAS donner** (mesuré, pas supposé) : `Suivi_Cycle_M3_20260906_49.trace` = 15 canaux, 367 échantillons, **dt min 77 ms / médian 100 ms / max 128 ms** (39 valeurs distinctes), sans aucun jeton ni interne d'axe ; les 5 traces `Suivi_66..70_SIMU_MaintMANU_20260919.trace` = 54 à 58 canaux **exclusivement treuils + joystick Y**, **aucune variable M3**. Aucune des trois expériences du protocole n'existe donc dans le dépôt, et la comparaison manuel ↔ cycle n'a **jamais** été tracée.
 
 ### A. Ordre demandé et mode (discrimine H1)
 | Variable | Rôle dans la preuve |
@@ -423,7 +439,7 @@ Mode couvert : `SEMI_AUTO` (`FB_TranslationCmdArbitrationM3.st:63-83`). Étapes 
 
 | # | Constat | Emplacement | Impact |
 |---|---|---|---|
-| A01 | **Contrat de tâche T334 inexistant** alors que `TASKS.yaml:38` le référence | `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T334_AUTO_CYCLE_M3_OVERSHOOT.yaml` (absent) | Tâche C3 sans contrat → cas d'arrêt du préambule ; à produire par l'orchestrateur |
+| A01 | **Contrat de tâche T334 inexistant** alors que `TASKS.yaml:38` le référençait | `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T334_AUTO_CYCLE_M3_OVERSHOOT.yaml` (absent en phase 1) | ✅ **CONSTAT LEVÉ le 2026-09-20 sur GO CC01** : contrat C3 créé par DSH07, `check_task_contract.py` → **PASS (0 erreur, 0 avertissement)**. La phase 1 avait été menée sur les critères AC1-AC5 du brief d'origine |
 | A02 | `M3_PositioningActive` écrite, **jamais lue** | `PRG_05_Translation.st:45,373` | Variable morte (`CODE_QUALITY_STANDARDS.md:507-513`) |
 | A03 | `TonM3ConfirmedMoving.Q` **jamais lu** : le « mouvement confirmé soutenu ≥ 1,5 s » **affirmé en commentaire** (`PRG_05_Translation.st:76-79,198-199`) n'est **pas implémenté** (seul le niveau instantané `:200` est utilisé) | `PRG_05_Translation.st:80,201` vs `:217,239,295,301` | Écart commentaire/implémentation sur une garde anti-rebond **revendiquée** |
 | A04 | `_TranslationAutoSpeedCap_Pct = 40 %` (« Plafond vitesse SEMI_AUTO ») **jamais consommé** | `GVL_PERSISTENT.st:97` | Config morte ; le cycle tourne à 100 % (`FB_TranslationCmdArbitrationM3.st:74`) |
@@ -436,13 +452,87 @@ Mode couvert : `SEMI_AUTO` (`FB_TranslationCmdArbitrationM3.st:63-83`). Étapes 
 | A11 | Horloges de session **désynchronisées** (des entrées du registre portent des horodatages 3-4 min en avance sur l'horloge locale de cette session) | `DOC/WFLOW/TASK_LOCKS.json` `updated_at` vs `Get-Date` local | Ordre chronologique du registre non fiable au-delà de la minute |
 | A12 | `git status --short` contient des artefacts **hors T334** : `M CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st` (mtime 15:56:18 — périmètre **verrouillé T333/DSH02**, confirmé par le guard `TOOLS/AGENT_WORKFLOW/scripts/G488_check_estimator_sensor_edges.py` non suivi), `M CODE_XML/*`, `M TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py` + `M TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml` + `?? G506_check_anyfault_banner_labels.py` (T255-D/DSH05), `M TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_simbench.st` (T328/DSH03), scratchs racine (`.tmp_t255d_banner_backup.st`, `.tmp_t255d_proof.py`, `.tmp_t278_bundle.log`, `.tmp_t278_g200.log`, `.tmp_t330_orig.yaml`, `.tmp_trace63_ax10_ax11.csv`, `codex-session-*.md`) | arbre de travail | ⛔ **rien de DSH07 dans `CODE/`** : la seule modification `CODE/` appartient au chantier concurrent verrouillé T333. **Suppressions à signaler pour tri humain** (règle `AGENTS.md` : un agent ne supprime/déplace jamais un fichier qu'il n'a pas créé) : `D TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/DSH01_T255D_FDC_BAS/{README.md,tests/run.bat,tests/run.py,tests/test_t255d_fdc_bas_*.st}` (renommage du dossier jetable par son propriétaire T255-D vers `?? .../DSH05_T255D_FDC_BAS/`) et `D 2026-09-19-132035-help-me-fix-these-claude-code-settings-issues.txt`. Aucun de ces chemins n'est touché, restauré, déplacé ni indexé par cette session |
 
+## 9bis. 🔬 Analyse des traces terrain 71/72/73 (Session 2026-09-20)
+
+> 📅 Date d'analyse : 2026-09-20 · 🎯 Objectif : confrontation formelle des hypothèses H1→H6 contre les 3 traces réelles capturées en simulation CODESYS (`Suivi_71`, `Suivi_72`, `Suivi_73`).
+> 📄 Matrice de référence : `PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md §5`.
+> 🚫 Analyse read-only : aucun fichier de `CODE/` modifié, aucun commit.
+
+### A. Récapitulatif technique des fichiers de trace capturés
+
+| Fichier | Objet principal | Échantillons | Période effective | Plage temporelle | Variables tracées |
+|---|---|---|---|---|---|
+| `Suivi_71_SIMU_M1M2_CycleMD_Bug_20260920.trace` | Treuils M1 / M2, synchro, benne, contacteurs, joystick Y | 10 000 | **10.5 ms** (dt ∈ [9 .. 16] ms, médiane 10 ms) | t ∈ [75 831 .. 181 353] ms (105,5 s) | 61 variables |
+| `Suivi_72_SIMU_M3_CycleMD_Bug_20260920.trace` | Translation M3, capteurs Trémie/PV/P2/P1, consigne variateur, mot de commande | 10 000 | **10.5 ms** (dt ∈ [9 .. 16] ms, médiane 10 ms) | t ∈ [83 056 .. 188 566] ms (105,5 s) | 19 variables |
+| `Suivi_73_SIMU_CYCLE_CycleMD_Bug_20260920.trace` | Chaîne AU, homing machine, position M1/M2 cycle | 10 000 | **10.5 ms** (dt ∈ [9 .. 16] ms, médiane 10 ms) | t ∈ [80 296 .. 185 813] ms (105,5 s) | 20 variables |
+
+> ⏱️ **Synchronisation confirmée** : les trois traces partagent la même base temporelle de la `MainTask` (recouvrement complet de t ≈ 83 s à t ≈ 181 s).
+
+---
+
+### B. Confrontation formelle des hypothèses H1 à H6 (Matrice §5)
+
+| Hypothèse | Signature attendue (§5) | Relevé factuel sur les traces (horodatage & canaux) | Verdict |
+|---|---|---|---|
+| **H1** (Recréation demande après perte de jeton) | `ReqTranslation.ReqStart` 0→1 après arrivée, corrélé à `AtXxxStable` 1→0 ou `M3_SensorsWordChanged` | • À la Trémie (t=84 864 ms) : `AtTremie` passe à 1 et reste à 1 stable (aucune intermittence injectée). `M3_CommandWord` tombe à 0 et reste à 0 jusqu'à t=131 920 ms.<br>• À P1 (t=139 546 ms) : `AtP1` passe à 1 et reste à 1 stable. `M3_CommandWord` tombe à 0 et reste à 0 jusqu'à t=188 566 ms.<br>• Canal `ReqStart` absent de la capture Suivi_72. | 🟡 **NON OBSERVABLE en dynamique dégradée** (aucun rebond capteur injecté au banc lors du test) / 🟢 **RÉFUTÉE en condition nominale stable** (aucun redémarrage intempestif sans perte de capteur). |
+| **H2** (Verrou `ArrivalLock` absent / debounce avorté AX14) | `ArrivalLock` reste à 0 alors que `AtXxxStable` = 1 ; `CaptorDebounceTon.ET` ≤ 20 ms en AX14 | • Canaux internes de `FB_Translation` (`instTranslationM3.ArrivalLock`, `.CaptorDebounceTon.ET`) **absents** des 19 canaux enregistrés dans Suivi_72.<br>• Déduction mécanique : le retrait instantané de consigne à t=84 864 ms (H4) est cohérent avec l'effondrement amont de la demande. | 🟡 **NON OBSERVABLE directement** sur ces traces (canaux privés non capturés) ; reste **PROUVÉE STATIQUEMENT** par l'asymétrie de code (`PositionTgt := 0` en AX14, `:1387`). |
+| **H3** (Vitesse d'arrivée excessive en cycle) | `SpeedCmd_Pct` = 100 et `SetpointFrequencyHz` > vitesse d'approche dans zone P2→P1 ou PV | • À l'approche Trémie (t=83 056..84 864 ms) : `M3_SetpointFrequencyHz` est stabilisé à **1000.0** (10,0 Hz = vitesse d'approche nominale `ApproachSpeedTremieHz`).<br>• En transit vers P1 (t=131 920..139 546 ms) : rampe jusqu'à 5000.0 (50 Hz). Au franchissement de P2 (t=137 340 ms, `PosPVP2_DI` = 1), la consigne chute immédiatement de 5000.0 à **1000.0** (10,0 Hz = `ApproachSpeedP1Hz`). L'approche se fait à 10 Hz pendant 2 206 ms avant l'arrêt. | 🔴 **RÉFUTÉE** : la réduction de vitesse d'approche est parfaitement active et appliquée dans les deux sens (10 Hz). Le chariot n'arrive pas à pleine vitesse. |
+| **H4** (Mot de commande variateur 2→0 / 1→0 roue libre au scan d'arrivée) | `CommandedMaintenance`/`Tremie` 1→0 au scan d'arrivée et `M3_CommandWord` 2→0 (roue libre) au lieu d'une consigne d'arrêt avec rampe | • **Trémie** (t=84 864 ms, éch. 172) : à t=84 854 ms, `CmdWord = 1`, `SetFreq = 1000`. Au scan exact t=84 864 ms (`AtTremie = 1`), `M3_CommandWord` bascule instantanément de **1 à 0** et `M3_SetpointFrequencyHz` de **1000 à 0** en un seul scan (10 ms).<br>• **P1** (t=139 546 ms, éch. 5354) : à t=139 530 ms, `CmdWord = 2`, `SetFreq = 1000`. Au scan exact t=139 546 ms (`AtP1 = 1`), `M3_CommandWord` bascule instantanément de **2 à 0** et `M3_SetpointFrequencyHz` de **1000 à 0** en un seul scan (10 ms). | 🟢 **CONFIRMÉE** : le mot de commande variateur tombe instantanément à 0 (roue libre côté variateur AC600) dès la retombée de la demande cycle, au lieu d'exécuter une rampe de décélération pilotée avec mot de sens maintenu. |
+| **H5** (Arrêt confirmé prématurément / saut d'étape) | `Data.TranslationBusy` = 0 alors que `fAct` > 0,5 Hz → étape suivante avance prématurément | • `M3_ActualFrequencyHz` = 0 constamment (simulation sans recopie dynamique).<br>• Aucune avance prématurée : M3 reste arrêté pendant **47,0 s** à la Trémie (jusqu'au départ AX2 à 131,9 s) et pendant plus de **49,0 s** à P1 sans aucun redémarrage intempestif. | 🔴 **RÉFUTÉE** sur ce profil : l'étape n'avance pas prématurément. |
+| **H6** (Défaut cause 6 / escalade sécurité intempestive) | `ErrorLimitSwitch` ou `PowerCutOff` actif sur une arrivée nominale | • Sur les 10 000 échantillons de Suivi_72 (t ∈ [83 056 .. 188 566] ms) :<br>`M3Translation.Safety.Error` = 0<br>`M3Translation.Safety.ErrorId` = 0<br>`M3Translation.State.Error` = 0<br>`M3Translation.State.ErrorId` = 0 | 🔴 **RÉFUTÉE sur arrivée nominale** : aucune alarme ni arrêt d'urgence déclenché en l'absence de dépassement physique. |
+
+---
+
+### C. Point d'attention 1 : Caractérisation scan par scan du blocage AX12 (Remontée en charge) sur Suivi_71
+
+#### 1. Constat dynamique
+Dans `Suivi_71` :
+- De t=75 831 ms à t=100 167 ms, `PRG_04_Treuils_Benne.Data.WinchM1State.CommandedAscent` et `WinchM2State.CommandedAscent` sont à **1**.
+- Pourtant, `M1_RelayAscent_RQ` et `M2_RelayAscent_Close_RQ` restent à **0** constamment.
+- De t=106 449 ms à t=110 417 ms (3 968 ms), l'opérateur tire vigoureusement sur le joystick Y en montée (`JOY1Joystick.State.RawY` atteint **10 000**, `DeadmanArmed = 1`), mais `CommandedAscent` reste à **0**, les contacteurs de vitesse restent à **0**, et aucun relais de montée ne s'enclenche.
+
+#### 2. Cause racine établie (traçage inverse scan par scan)
+1. **Position physique initiale** : Dès t=75 842 ms, la mesure encodeur de M1 est figée à `M1TreuilRetenue.State.Position_M = 7.8596 m` (et M2 à 22.801 m).
+2. **Seuil de limite haute logicielle** : `_CommunCfgPersist.CfgCableLimitAscent_M` est configuré à **7.50 m** (`PRG_04_Treuils_Benne.st:867`).
+3. **Activation du verrou de sûreté** :
+   - `EncoderM1.Measurement.CablePosM (7.86 m) >= CfgCableLimitAscent_M (7.50 m)` entraîne `CableLimitAscentM1Reached := TRUE` (`FB_WinchStateProjection.st:220`).
+   - `FB_Safety_Winch.st:581` coupe immédiatement le permis de montée : `AscentPermit := FALSE`.
+   - Dans `FB_Winch.st:216`, l'absence de permis active `EffectiveSafeStop := TRUE` en montée, ce qui force `RampTargetStep := 0`, puis `StepNumber := 0`.
+   - Dans `FB_Winch.st:284`, la commande des relais de sens impose `IF StepNumber > 0 AND CommandedAscent THEN RelayFwd := TRUE ELSE RelayFwd := FALSE`. Avec `StepNumber = 0`, `RelayFwd` est **strictement neutralisé**.
+4. **Comportement dans le séquenceur AX12** :
+   - Dans `PRG_03_Modes_Cycle.st:232`, `M1TopLimitReached := WinchM1Safety.CableLimitAscent` (= TRUE).
+   - Dans `FB_CycleSemiAuto.st:1338` (AX12) :
+     ```pascal
+     IF M1TopLimitReached OR M2TopLimitReached THEN
+         WinchM1Cmd.RunRequest := FALSE;
+         WinchM2Cmd.RunRequest := FALSE;
+         State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
+     END_IF;
+     ```
+   - Dès que le cycle tente d'entrer dans AX12, `M1TopLimitReached` est DÉJÀ vrai : `RunRequest` est annulé instantanément.
+5. **Verdict** : Ce blocage n'est **pas une régression d'exécution des contacteurs**, mais la conséquence normale d'une précondition géométrique non satisfaite : **le tambour M1 se trouvait déjà au-dessus de sa limite haute d'exploitation (7.86 m ≥ 7.50 m)**, verrouillant physiquement et logiquement toute montée.
+
+---
+
+### D. Point d'attention 2 : Asymétrie de transition AX2 / AX14 vs AX3 sous joystick maintenu
+
+L'examen comparé du code de transition dans `FB_CycleSemiAuto.st` met en évidence une **asymétrie structurelle majeure de conception ergonomique** :
+
+| Étape | Geste opérateur en cours | Condition de transition vers l'étape suivante | Comportement sous geste maintenu |
+|---|---|---|---|
+| **AX14** (Translation vers Trémie) | Maintien joystick X à gauche (`JoystickLeft`, `JoystickDeflected = TRUE`) | `IF TranslationStopTimer.Q AND NOT JoystickDeflected THEN State := AX15A;` (`:1395`) | ⛔ **NE BASCULE PAS** : exige le **retour physique au neutre complet** du joystick (`NOT JoystickDeflected`). Message IHM explicite : `'AX14 - Tremie : relacher le joystick avant ouverture.'`. |
+| **AX2** (Translation vers P1) | Maintien joystick X à droite (`JoystickRight`, `JoystickDeflected = TRUE`) | `IF TranslationStopTimer.Q AND DeadmanArmed AND JoystickPushOnly THEN State := AX3;` (`:901`) | ⛔ **NE BASCULE PAS** : `JoystickPushOnly` est défini par `JoystickPush AND NOT (JoystickLeft OR JoystickRight)` (`:718`). Tant que l'opérateur tient X à droite, `JoystickRight = TRUE`, donc `JoystickPushOnly = FALSE`. Le cycle reste figé à l'étape AX2 jusqu'au relâchement de X. |
+| **AX3** (Ouverture benne) | Maintien joystick Y en poussant (`JoystickPush = TRUE`) | `IF Benne_IsOpen AND NOT Benne_Busy THEN State := AX3_WAIT_DIVE_START;` (`:943`) puis `IF DiveStartStopTimer.Q AND DeadmanArmed AND JoystickPush THEN State := AX4_DESCEND_DIVING;` (`:968`) | ✅ **ENCHAÎNEMENT AUTOMATIQUE CONTINU** : le cycle passe d'AX3 à AX3_WAIT puis à AX4 sous `JoystickPush` maintenu continu, **sans aucun retour au neutre**. |
+
+➡️ **Conclusion sur l'asymétrie** : À AX14 et AX2, l'automatisme exige impérativement une rupture intentionnelle de geste (relâchement de l'axe X) pour sécuriser l'arrivée au point avant d'autoriser la manœuvre suivante. À AX3, la transition vers la plongée AX4 est fluide et continue sous maintien du même axe Y. Cette disparité est intentionnelle dans le code existant mais doit être documentée pour l'opérateur afin d'éviter la sensation d'un « automate bloqué » à l'arrivée P1/Trémie.
+
 ---
 
 ## 11. 🏁 Conclusion
 
 - **Cause racine : NON PRONONCÉE** (exigence `AC4` : hypothèse + preuve, pas d'inférence). Hypothèse principale **H1** (le cycle recrée sa demande de marche quand le jeton d'arrivée est effacé par un rebond/perte capteur, faute de verrou d'arrêt latché côté cycle = **H2**), aggravée par **H3/H4**, avec l'escalade **H6** comme conséquence observable (rapprochement direct avec `T287`).
 - **Question de conception : TRANCHÉE** → **ANOMALIE partielle** (§7.1) : sources séparées = obligatoire et conforme ; **arrêt non possédé par l'axe** = anomalie modifiable.
-- **Statut** : `[EN COURS]` — analyse livrée ; **arrêt en attente de validation humaine du comparatif** avant toute proposition de code (`TASKS.yaml:29`).
+- **Statut** : `[PHASE 1 ACCEPTÉE]` — verdict validé par CC01 le 2026-09-20 sur 3 points durs ; contrat C3 créé (`check_task_contract.py` PASS) ; campagne de trace 10 ms prête (`PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md`). **Prochaine étape : le run de trace, qui est HUMAIN (CODESYS)** — l'agent ne peut pas exécuter une trace PLC. La phase 2 (conception du correctif) démarre au retour des traces **et** après arbitrage de Q1→Q6 ; aucune ligne de `CODE/` n'est écrite avant (`TASKS.yaml:29`).
 
 ## 12. 🛠️ Proposition de correction (au sens de la mission)
 
@@ -467,8 +557,233 @@ Mode couvert : `SEMI_AUTO` (`FB_TranslationCmdArbitrationM3.st:63-83`). Étapes 
 - 2026-09-20 : constat clé trouvé par lecture : **l'axe est déjà unifié** (arbitre + FB de mouvement + barrière + mots variateur uniques) ; la divergence réelle porte sur **la propriété de l'arrêt** et sur l'asymétrie AX2/AX14 (`FB_CycleSemiAuto.st:900` vs `:1387`).
 - 2026-09-20 : 12 constats hors scope remontés (§10 A01-A12), dont 4 variables/configs mortes, un écart spec/code d'escalade de sûreté, un bypass non gated par mode, et la désynchronisation des horloges du registre.
 - 2026-09-20 : fiche écrite ; `DOC/WFLOW/TASKS.yaml` mis à jour (T334) puis 🚩 d'édition retiré ; `git status --short` vérifié (aucun `CODE/`).
+- 2026-09-20 (**GO CC01**) : verdict de la phase 1 **accepté**, vérifié sur 3 points durs (verrou d'arrêt de l'axe, asymétrie AX14, front montant seul du décodeur). Étapes autorisées : campagne de trace 10 ms selon le protocole A/B/C, et création du contrat C3 avant la phase 2. Hors scope transmis, non corrigé. Lien H1 ↔ T287 noté dans la fiche (§8).
+- 2026-09-20 : **contrat C3 créé** — `TASK_CONTRACT_T334_AUTO_CYCLE_M3_OVERSHOOT.yaml`, `check_task_contract.py` **PASS (0 erreur, 0 avertissement)**, 10 critères d'acceptation AC1→AC10 (dont les deux critères structurels exigés par le gate T8 pour toute écriture `CODE/M_MAIN/`), 6 questions Q1→Q6 à trancher avant le code, conservation et interdits des chantiers concurrents. Constat A01 levé.
+- 2026-09-20 : **campagne de trace rendue turnkey** — `PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md` : liste des canaux à copier (groupes A à G, ~88 symboles), réglage de trace MainTask 10 ms avec repli en 3 sous-traces si buffer limité, 3 scénarios A/B/C au geste identique, matrice de décision signature → hypothèse, post-traitement `trace_to_csv.py`, interdits. **Le run reste humain (CODESYS)** : l'agent ne peut pas exécuter la trace.
+- 2026-09-20 : 3 faits nouveaux **mesurés** intégrés à la fiche (et non supposés) — (1) les internes d'instance par chemin pointé, **imbriqués compris**, sont bel et bien traçables (relevé dans `trace_treuils_charge_v1.txt`) ⇒ la preuve de H2 est techniquement possible ; (2) `Suivi_Cycle_M3_20260906_49.trace` est à **dt médian 100 ms** (77-128 ms) avec 15 canaux sans jeton ni interne d'axe ; (3) les traces `SIMU_MaintMANU_20260919` ne contiennent **aucune** variable M3 ⇒ la comparaison manuel ↔ cycle n'existe pas dans le dépôt.
+- 2026-09-20 : **arrêt de l'agent** — la phase 2 (conception) ne peut pas démarrer sans le retour des traces et l'arbitrage de Q1→Q6. Aucun `CODE/` écrit, aucun commit.
+- 2026-09-20 18:41 (session **T334 bis**, tag **DSH10**, read-only, contexte frais) : **challenge indépendant livré en §10bis** — verdict **MAJOR**. Les 5 affirmations du brief ont été revérifiées **fichier:ligne** sans recopie ; 3 écarts de fond (H4 mal attribuée à la Trémie, lien H4→T287 trop fort, asymétrie AX2/AX14 en réalité **décidée** par T319/fiche 2026-09-05 avec garde mécanique à 6 faits), 2 configs mortes nouvelles (A13 délai de collage frein jamais appliqué, A14 timeout du modèle AX3 désactivé), 4 erreurs de citation (dont `PRG_07:230-235` → `:331-341`) et le décalage **+4** des références AX14 après l'édition concurrente T331/DSH09 de 18:13:32. **Aucun `CODE/` écrit, aucun test, aucun gate, aucun bundle, aucun commit.**
 
 ---
 
 📖 Méthode : `TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md` · Gabarit : `DOC/WFLOW/TROUBLESHOOTING/TEMPLATE_Troubleshooting.md`
 🔗 Tâches liées : `T287` (défaut frein aux mêmes arrivées), `T300` (banc + perte capteur ~1 s), `T333` (estimateur — **non consommé** par les deux chaînes), `T319` (continuité AX2→AX3), `T204` (permits directionnels), `T327` (verrou descente benne).
+
+---
+
+## 10bis. 🔍 Challenge indépendant avant Phase 2 (T334 bis — revue read-only, contexte frais)
+
+> 📅 2026-09-20 · 🏷️ Acteur : session **T334 bis**, tag **DSH10** (`TASK_LOCKS.json` vérifié : DSH07=T334, DSH08=T295, DSH09=T331 ⇒ DSH10 = premier libre). **Aucun verrou pris** : mission read-only, zéro écriture `CODE/`, zéro test, zéro gate, zéro bundle, zéro commit.
+> 🎯 Objet : vérifier **fichier:ligne** les affirmations de la phase 1 (§1-§9bis) **sans rien recopier**, chercher ce que les analyses ont manqué, et proposer des options — **sans trancher à la place de l'orchestrateur**.
+> 🔢 **Révision de travail** : `git rev-parse HEAD` = `fd12dc0` **+ arbre de travail modifié** (voir §A.0 : le fichier porteur de la preuve H2 a bougé **après** l'écriture de la fiche).
+
+---
+
+### A.0 ⚠️ Préalable bloquant pour la Phase 2 : la fiche a été écrite AVANT une édition concurrente du fichier qui porte la preuve H2
+
+| Fait mesuré | Preuve |
+|---|---|
+| `CODE/G_CYCLE/FB_CycleSemiAuto.st` est **modifié non commité** (`M`) | `git status --short` |
+| Dernière écriture du fichier : **20/09/2026 18:13:32** — la fiche : **20/09/2026 18:07:20** | `LastWriteTime` des deux fichiers |
+| Édition **+20 / −5** lignes : ajout `BucketCmd.ReqOpen := FALSE` en AX10 et **réécriture du repli AX15B → AX10** | `git diff CODE/G_CYCLE/FB_CycleSemiAuto.st` |
+| Propriétaire identifié : **T331 / DSH09** (verrou d'écriture sur ce fichier depuis 17:57) | `TASK_LOCKS.json` clé `T331`, `TASKS.yaml:215` |
+
+➡️ **Conséquence vérifiée** : toutes les références **postérieures à la ligne 1221** sont décalées de **+4**. Les citations AX14 de la fiche sont donc **périmées de 4 lignes** (`:1382→:1386`, `:1383→:1387`, `:1386→:1390`, `:1387→:1391`, `:1391→:1395`) ; les citations AX2 (avant 1221) restent exactes. Aucune conclusion n'est invalidée par ce décalage, mais **la Phase 2 doit figer une révision** avant de coder, sinon chaque `fichier:ligne` du contrat redevient faux à la prochaine édition concurrente.
+
+---
+
+### A.1 ✅ Vérification affirmation par affirmation (les 5 points du brief)
+
+| # | Affirmation à challenger | Verdict | Preuve relue (références **courantes**) |
+|---|---|---|---|
+| 1 | H1/H2 non observables sur les traces mais **H2 prouvée statiquement** (`PositionTgt := 0` en AX14) | 🟢 **CONFIRMÉE** | `FB_CycleSemiAuto.st:1391` `TranslationCmd.PositionTgt := 0;` (cité `:1387` = +4) → `FB_TranslationCmdArbitrationM3.st:65` `SelTarget := ReqTranslation.PositionTgt` → `PRG_05_Translation.st:408-429` : `SelTarget=0` tombe en `ELSE` → `:414` `IF M3_ReqTremie_Active` — or la demande vient d'être retirée (`:1390` `ReqStart := FALSE` ⇒ arbitre `:48-50`, `:72-83` remettent `ReqTremie := FALSE`) ⇒ `:427` `M3_PositionSensorTarget := FALSE`. Debounce `FB_Translation.st:175-177`, `PT = Cfg.CaptorDebounce = T#100ms` (`ST_fbTranslation_Cfg.st:31`) ⇒ **le TON ne peut pas atteindre 100 ms** ⇒ `ArrivalEdge` ⇒ `ArrivalLock` jamais armé par la voie capteur en AX14. **Asymétrie confirmée** : en AX2 `:900` `PositionTgt := 3` est **conservé** ⇒ `SelTarget=3` ⇒ `PRG_05:411` `M3_PositionSensorTarget := M3_AtP1Stable` = **le jeton latché, indépendant de `ReqTremie`** ⇒ le debounce aboutit. |
+| 2 | H3 / H5 / H6 **réfutées** ; H4 **confirmée** (coupure nette du mot de commande au lieu d'une rampe) | 🟡 **PARTIELLEMENT CONFIRMÉE — voir §B.2** | H3 : `FB_TranslationCmdArbitrationM3.st:74` `SpeedPct := 100.0` ✔ et `_TranslationAutoSpeedCap_Pct` (`GVL_PERSISTENT.st:97`) a **0 lecteur** (grep sur `CODE/` : la seule occurrence est la déclaration) ✔. H5 : `PRG_05:817` `TranslationBusy := (|fAct| > 0.5)` ✔. H6 : `FB_Safety_Translation.st:199-203` (1,5 s) + `:268` `PowerCutOff := (Fault.ErrorId AND 16#00F8) <> 0` ✔ ⇒ bit 6 ∈ `16#00F8` ⇒ H6 est **une conséquence atteignable**, pas une cause. **H4 est confirmée comme OBSERVATION, mais son mécanisme attribué est faux à la Trémie** (§B.2). |
+| 3 | **AX12 « bloqué » = sécurité géométrique légitime, pas un bug** | 🟢 **CONFIRMÉE** (chaîne exacte, libellé d'un maillon à corriger) | `PRG_04_Treuils_Benne.st:867-876` `TopLimitM1_M := SEL(override, CfgCableLimitAscent_M, …)` ; valeur `7.5` en `GVL_PERSISTENT.st:145` et `ST_CommunCfg.st:21` ; fait public `FB_WinchStateProjection.st:219-222` `CableLimitAscentM1Reached := Homed AND NOT HomingSuspect AND NOT Busy AND (CablePosM >= CfgCableLimitAscent_M)` ⇒ à 7,86 m c'est `TRUE` ; sortie d'étape `FB_CycleSemiAuto.st:1342-1346` (cité `:1338` = +4) ⇒ AX12 → AX13 au premier scan ; permis de montée coupé en `FB_Safety_Winch.st:574-582` (le terme fautif est bien **`:581`**, mais l'affectation commence `:574`). ⚠️ Nuance : `:581` lit **`TopLimitM`**, pas `CfgCableLimitAscent_M` directement — la chaîne tient parce que `TopLimitM1_M = CfgCableLimitAscent_M` en nominal, mais les deux seuils sont distincts (relaxation 7,5 → 8,5 m documentée `:578-580`). |
+| 4 | **Asymétrie** : AX2 (`:901`) et AX14 (`:1395`) exigent le retour au neutre ; AX3→AX4 enchaîne sans neutre | 🟢 **CONFIRMÉE sur le fait — 🔴 RÉFUTÉE sur la qualification « anomalie »** | Fait : `FB_CycleSemiAuto.st:901` `IF TranslationStopTimer.Q AND DeadmanArmed AND JoystickPushOnly` avec `:718` `JoystickPushOnly := JoystickPush AND NOT (JoystickLeft OR JoystickRight)` ; `:1395` `IF TranslationStopTimer.Q AND NOT JoystickDeflected` ; AX3 `:943` puis `:968` `IF DiveStartStopTimer.Q AND DeadmanArmed AND JoystickPush` ⇒ enchaînement sous le **même** geste Y, sans neutre, ✔. **Mais la « disparité non documentée » est fausse** → voir §B.1 (décision T319 + fiche 2026-09-05 **et** garde mécanique à 6 faits). |
+| 5 | « Conflit AF-09 (T336) : la spec prévoit une cible dynamique M2 + variante benne ouverte, le code force cette cible à FALSE » | 🔴 **NON VÉRIFIABLE DANS CETTE FICHE + cadrage incomplet** | (a) **Le claim n'existe nulle part dans la fiche T334** : grep `AF-09\|AF_Partie-09\|T336\|cible` ⇒ **0 occurrence** (`M2` n'apparaît qu'en `M19`, `:465-508`). Il vit dans `DOC/WFLOW/TROUBLESHOOTING/TROUBLESHOOTING_T336_CycleHoming_Graphe7_2026-09-20.md:74,100,105`. ⇒ **mauvaise attribution** : ce point n'appartient pas au périmètre T334. (b) Le code **porte son propre REX** : `FB_CycleMachineHoming.st:418-420` `M1Demand.UseDynamicTarget := FALSE; M2Demand.UseDynamicTarget := FALSE;` précédé de `:412-417` — *« Cible dynamique (top + offset ~23 m) supprimée ici : elle créait un écart apparent M1/M2 de ~15 m au preset → FB_WinchSync SafeStop → Fault.Latched »*. ⇒ ce n'est **pas** un forçage arbitraire : c'est la séquelle documentée d'un incident de synchronisme. Réactiver la cible dynamique **exige de résoudre cet incident d'abord**. |
+
+---
+
+### B. 🔎 Ce que les analyses précédentes ont manqué (5 trouvailles sourcees)
+
+#### B.1 🟢 La raison du neutre à AX2/AX14 **est écrite**, et AX3 n'est pas « plus permissif » : il a une garde différente
+
+**Trois sources, jamais citées par la fiche :**
+
+1. `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_ContinuiteJoystick_AX3_AX4_20260905.md` — analyse complète de la transition AX3→AX4 :
+   - `:67` « **Cause de l'obligation de relâcher** : front `JoyDeflectedEdge.Q` explicitement exigé en AX3. »
+   - `:68-70` « **Cause du risque lors de sa suppression** : aucune preuve d'arrêt mécanique M2 entre la manœuvre benne et le départ couplé ; le verrou aval `DirectionChangePending` ne couvre pas une reprise dans le même sens. »
+   - `:76-82` recommandation : « **Conserver `DeadmanArmed` et la déflexion joystick sans demander de retour au neutre** » **+ insérer une phase explicite** (commandes à zéro, attente d'arrêt mécanique M1/M2 confirmé stable) **+ timeout de repli**.
+2. Cette recommandation **est implémentée** : étape dédiée `AX3_WAIT_DIVE_START` (`FB_CycleSemiAuto.st:948-971`), garde à **6 faits physiques** `DiveStartStopped` (`:284-288` : vitesses valides, contacteurs retombés, freins appliqués, 2 vitesses < 0,02 m/s), TON `DiveStartStopTimer` (`:289`, `PT = T#300ms`, `:259`), transition sous **même geste** (`:968`). Le `JoyDeflectedEdge` n'est plus utilisé que pour AX18 (`:160`, `:279`).
+3. **T319 est une tâche C3 CLOSE** (`TASKS.yaml:405-425`, `statut: ✅`, contrat `TASK_CONTRACT_T319_AX2_P1_CONTINUITY.yaml`) qui arbitre explicitement le sujet : *« AX2 enchaîne vers AX3 sous le même geste joystick maintenu »* **mais** son objectif `:420` borne la portée : *« **Hors P1 ou position non qualifiée**, AX2 **conserve la mise en position et ses autorisations actuelles** »*. ⇒ le relâchement à l'arrivée **en cours de jog** est **conservé par décision**, pas par oubli.
+4. Cadre normatif : `AF_Partie-04 v2.3:180` (intention maintenue requise tant qu'un mouvement est commandé) et `:181` (« Relâchement manche ⇒ `StartStop=FALSE`, **étape conservée**, pas de reprise automatique ») ; doctrine de l'arrêt dans l'axe : `AF_Partie-11/FB_Translation_v1.1.md:190` (« un retour au neutre seul ne lève plus le verrou »).
+
+**Et la raison technique, plus forte que l'ergonomie** : en cycle, la demande M3 **dérive du permis joystick** — `FB_CycleSemiAuto.st:716-717` (`TranslationP1Permit` / `TranslationTremiePermit` = `DeadmanArmed AND JoystickLeft/Right AND NOT Push/Pull`) → `:913` / `:1387` `TranslationCmd.ReqStart := <permis>`. **Relâcher X est aujourd'hui le seul geste qui retire réellement la demande M3 du séquenceur.** Le neutre n'est donc pas un confort opérateur : c'est **la protection qui empêche H1 de produire son effet**, et celle qui évite d'entrer dans l'étape suivante (où M3 est veté par `PRG_05:389-395` et où la barrière force frein + mots à 0 en `PRG_05:656-662`) avec une demande de translation encore vivante.
+
+#### B.2 🔴 H4 est **mal attribuée à la Trémie** : la coupure en 1 scan est la **coupure dure**, pas le retrait de demande
+
+Ordre d'exécution des tâches : `PRG_02 → PRG_03 → PRG_05 → PRG_06` (skill troubleshooting, « Ordre d'exécution »). Donc **le cycle lit les jetons de `PRG_05` avec un scan de retard**.
+
+| Scan | Ce qui se passe réellement (Trémie, `SEMI_AUTO`) |
+|---|---|
+| **N** (le DI Trémie monte) | `PRG_03` lit le jeton **du scan précédent** (`FALSE`) ⇒ `:1387` `ReqStart := TRUE` ⇒ `PRG_05` : jeton `M3_AtTremieStable := TRUE` (`:266`), `M3_ReqTremie_Active := TRUE` ⇒ `FB_Translation` : mot **1**, fréquence ≈ **10 Hz** (approche `:308-313`) ⇒ **`PRG_06:431-432` `M3_TremieHardStopActive := M3_PosTremie_DI(1) AND ReqTremieSemantic(TRUE) = TRUE`** ⇒ `:442-450` **`BrakeReleaseRequest := FALSE`, mot `:= 0`, fréquence `:= 0.0` au MÊME scan** ⇒ `:457-459`. **C'est exactement la signature relevée en §9bis (CmdWord 1→0 ET SetFreq 1000→0 en un seul scan).** |
+| **N+1** | Le cycle voit enfin `Translation_At_Tremie=TRUE` ⇒ `:1390-1391` `ReqStart := FALSE`, `PositionTgt := 0` ⇒ `ReqTremie := FALSE` ⇒ `ReqTremieSemantic := FALSE` ⇒ la coupure dure **se désarme** ; le mot reste à 0 par disparition de la demande. |
+| **À P1** | `ReqTremieSemantic = FALSE` (sens = Maintenance) ⇒ la coupure dure **n'existe pas** ⇒ la bascule 2→0 vient bien du retrait de demande (`:899`, arbitre `:48-50`/`:83`, `FB_Translation.st:229-233`, `:297-303`). Et la **fréquence tombe en 1 scan** parce que la barrière dérive sa propre notion de mouvement **du mot de commande lui-même** : `FB_TranslationOutputInterlock.st:84` `MovementRequested := (W=1) OR (W=2)` puis `:133-151` n'affecte `DriveFreqCmd_Hz` que dans la branche `MovementRequested AND NOT PermitFinalBlocked` ⇒ mot 0 ⇒ fréquence 0 **au même scan** (`:154`). |
+
+➡️ **Correction exigée** : H4 décrit correctement le **symptôme** (coupure nette au lieu d'une rampe) et le mécanisme **à P1**, mais **pas** à la Trémie, où la coupure dure — protection **voulue** (`PRG_06:428-430`) — agit **un scan avant** le cycle. La preuve §9bis « H4 CONFIRMÉE » à la Trémie ne discriminera donc **jamais** H4 de la coupure dure telle qu'elle est listée : la matrice §5 doit ajouter la ligne `M3_TremieHardStopActive` comme **signature concurrente** (le canal est d'ailleurs prévu §9-E, il suffit de l'exploiter).
+
+#### B.3 🟠 H4 **ne ferme pas le frein** : l'implication « frein fermé sur chariot en mouvement » n'est pas produite par H4
+
+- `FB_Translation.st:271-272` : `MovementRequested := (|SpeedRamp.Current| > 0.1) OR ((|fAct| > 0.5) AND NOT TonBrakeRealFreqTimeout.Q)` ⇒ **le frein reste desserré pendant la roue libre** tant que la vitesse réelle est mesurée > 0,5 Hz (fenêtre 2 s, `:266-269`). Le mot de commande à 0 (roue libre) **ne commande pas** le frein.
+- Donc la ligne H4 de §8 (« frein fermé sur chariot en mouvement ») **n'est pas soutenue par le code**, et le rapprochement T287 qu'elle porte est **circulaire**. Voir §D.
+
+#### B.4 🟠 Le défaut frein de T287 a un **mécanisme propre, documenté et déjà partiellement corrigé** — le challenge l'identifie
+
+`FB_Brake.st` : `:100-105` fermeture **immédiate** dès que `MovementRequested` retombe ; `:114` `TonFeedback(IN := (BrakeCmd <> ContactorFeedback), PT := FeedbackTimeout)` ⇒ `:115-121` `StuckClosed`/`StuckOpen` ⇒ `:126-128` cause **latchée** ⇒ `:136-138` `BrakeCmd := FALSE` **définitif** jusqu'au `Reset`. **C'est le « latch définitif dans FB_Brake »** de T287.
+
+Historique MES de ce mécanisme, **tous datés**, retrouvés dans le code :
+
+| Source | Contenu |
+|---|---|
+| `FB_Translation.st:114-129` (REX MES 2026-09-04) | La cause 6 se déclenchait **à chaque arrivée nominale** → `§6` forçait `BrakeReleaseRequest := FALSE` « pendant que `FB_Brake` pense toujours commander l'ouverture (son `MovementRequested` reste vrai le temps du coast ~600 ms) → **incohérence commande/retour frein → latch définitif** ». Correctif : n'exiger la cause 6 que sur un **dépassement réel soutenu 1,5 s**. |
+| `ST_fbTranslation_Cfg.st:35` | `BrakeFeedbackTimeout` **300 ms → 800 ms** : « 300ms trop court pour un **arrêt dur au FdC** (coast réel ~600 ms) → **latch spurieux** ». |
+| `ST_fbTranslation_Cfg.st:34` | `BrakeDelayMotorDecel` **500 ms → 2 s** « confirmé opérateur » — **mais ce délai n'est jamais appliqué** (voir B.5). |
+
+➡️ **Les producteurs vivants qui forcent `BrakeReleaseRequest := FALSE` EN AVAL de `FB_Brake`** (et reproduisent donc la faute déjà corrigée une fois) sont au nombre de deux, tous deux **aux arrivées** :
+1. `PRG_06:442-443` `M3_TremieHardStopActive` (coupure dure Trémie, **voulue**) — armée dès que `M3_PosTremie_DI = 1` **et** la sémantique Trémie est présente, donc **pendant tout rebond haut** où le cycle recrée sa demande (H1) ;
+2. `PRG_05:658` (veto SEMI_AUTO hors AX2/AX14) — se déclenche **au changement d'étape**, exactement là où T287 situe la récidive (P1 → AX3).
+
+**Chaîne discriminante proposée (à prouver par la trace, pas affirmée)** : `H1 (jeton perdu → ReqStart recréé, geste maintenu) + H2 (ArrivalLock absent) → ReqTremie vrai alors que le FdC Trémie est haut → coupure dure armée ≥ 800 ms → BrakeCmd interne (TRUE, rampe encore non nulle) ≠ retour physique (FALSE) → latch FB_Brake` = **T287**. Elle exige **H1 ET H2** et un FdC **haut** pendant ≥ 800 ms.
+
+#### B.5 🟠 Config morte **non signalée** : le délai de collage du frein n'est jamais appliqué
+
+`FB_Brake.st:72,93,103` instancient `TonDecel(IN := …, PT := DelayMotorDecel)` et **`.Q` n'est jamais lu** (grep `TonDecel\.Q` sur `CODE/` : **0 résultat**) : en `:104`, `BrakeCmd := FALSE` **immédiatement**. La configuration `BrakeDelayMotorDecel = T#2s` (`ST_fbTranslation_Cfg.st:34`, alimentée en `FB_Translation.st:282`) est donc **sans effet** → le commentaire `FB_Brake.st:23` (« Délai deceleration avant collage frein ») et la valeur « confirmée opérateur » décrivent un comportement **absent**. C'est le **même défaut de forme que A03** (garde revendiquée en commentaire, non implémentée) sur la chaîne frein — donc **directement dans le périmètre de T287**, et **hors** de celui de T334.
+
+#### B.6 🟠 La « cible figée à P1 en AX2 » a une raison documentée — et l'uniformiser **casse la reprise de dépassement**
+
+- Le commentaire du code porte la raison, mot pour mot : `FB_CycleSemiAuto.st:905-906` — *« AX2 accepte les deux sens ; la cible effective suit le sens du joystick. **Si Maintenance=1 et P1=0, cela permet de se dégager d'un dépassement.** »* ⇒ l'intention invoquée est **la reprise après franchissement de P1**.
+- La branche de récupération existe et la décrit : `FB_CycleSemiAuto.st:1549-1557` — *« chariot déjà au-delà de P1 … **Le retour gauche traverse P1 ; le front P1 réarme AtP1** et la branche précédente termine AX2 normalement. »* ⇒ le retour se fait **vers la Trémie** et l'arrêt est attendu **à P1**.
+- Or `SelTarget = 3` force `M3_PositionSensorTarget := M3_AtP1Stable` (`PRG_05:411`), et `M3_AtP1Stable` est armé **sur les deux fronts de son propre capteur** (`FB_Translation_PositionDecoder.st:116`) ⇒ le retour gauche depuis 00001 arme le jeton dès la retombée de P1 et **stoppe le chariot à P1**, conformément au commentaire.
+- ⚠️ **Risque caché de §7.2-2** (« la cible doit suivre le sens commandé ») : en AX2, un jog vers la Trémie rendrait la cible = `M3_AtTremieStable` ⇒ le chariot **ne s'arrêterait plus à P1** et partirait vers la Trémie **dans l'étape AX2**, alors que `:879-884` revendique un « jog bidirectionnel » et que la branche de reprise ci-dessus suppose l'arrêt à P1. **L'uniformisation proposée détruit un chemin de récupération existant**, sauf à rendre la cible dépendante de l'étape (ce que §7.2-2 cherche précisément à supprimer).
+- Nuance de citation : la fiche appuie la « contradiction interne » de D02 sur `PRG_05_Translation.st:404-407` ; ce commentaire dit **« En mode manuel (SelTarget=0), n'importe quel des 3 points d'arrêt … »** — il décrit le **manuel**, pas le cycle. La contradiction n'existe donc qu'entre `FB_CycleSemiAuto.st:905-906` et l'arbitre, lequel porte **lui aussi son commentaire** (`FB_TranslationCmdArbitrationM3.st:66-67` : *« PositionTgt=3 (P1) en AX2 : jog bidirectionnel autorisé, **mais la cible d'arrêt reste P1 dans FB_Translation** »*). D02 reste une anomalie de cohérence de commentaires, **pas** un code non documenté.
+
+---
+
+### C. 🎯 Réponse à la question 2 — « uniformiser sur le modèle AX3 est-il sûr ? »
+
+**Non, pas en l'état — et le risque n'est pas celui deviné.**
+
+| Question posée | Réponse sourcée |
+|---|---|
+| Le neutre évite-t-il « une commande M3 non désirée pendant que l'opérateur redirige son attention » ? | 🟡 **En partie, mais le vrai contenu est plus fort** : le neutre est le **mécanisme de retrait de la demande M3** (§B.1-4). Sans lui, `ReqStart` reste vrai tant que X est défléchi, donc **toute** perte de jeton (rebond T287/T300, exclusion mutuelle `PRG_05:265-277`) recrée instantanément la demande — c'est **H1**, déjà décrit par la fiche. |
+| Le modèle AX3 est-il « plus sûr » ou seulement plus fluide ? | 🔴 **Ni l'un ni l'autre : il est plus sûr *parce qu'il a une garde dédiée*.** AX3→AX4 ne demande pas le neutre **parce que** T319 a ajouté `AX3_WAIT_DIVE_START` + `DiveStartStopped` (6 faits mécaniques, `:284-288`) + `DiveStartStopTimer` 300 ms. M3 **n'a pas d'équivalent** : sa « confirmation d'arrêt » est `TranslationStopTimer` (`:334-338`) dont l'entrée est `NOT Translation_Busy` = `|fAct| ≤ 0,5 Hz` (`PRG_05:817`) — donc **une donnée variateur**, et **nulle au banc** (`M3_ActualFrequencyHz = 0` constamment dans Suivi_72, §9bis) ⇒ au banc la « preuve d'arrêt » est **vacuitaire**. |
+| Uniformiser sans rien d'autre, que se passe-t-il ? | 🔴 Le geste X maintenu + changement d'étape ⇒ le veto `PRG_05:389-395` neutralise M3 et `:658` **force le frein fermé** ; combiné à `FB_Translation.st:271-272` (frein maintenu tant que `|fAct| > 0,5`) on entre dans la classe de faute de §B.4. **Et** l'opérateur perd le seul geste qui arrêtait le chariot. |
+| Faut-il donc garder les deux modèles ? | ➖ **Décision d'orchestrateur, pas de challenger.** Ce qui est prouvé : les deux modèles **ne sont pas équivalents** (garde mécanique vs garde gestuelle) ; les rendre équivalents **exige d'abord** que l'axe possède l'arrêt (§7.2-1/2), donc l'option « uniformiser » **dépend** de l'option « l'axe possède l'arrêt » — elle ne peut pas être menée seule. |
+
+---
+
+### D. 🔗 Réponse à la question 3 — H4 et le défaut frein de T287 : **même mécanisme ou coïncidence de timing ?**
+
+**Verdict : mécanismes DIFFÉRENTS, co-localisés — la fiche fait un raccourci.**
+
+| | H4 (fiche) | Défaut frein T287 (reconstruit, §B.4) |
+|---|---|---|
+| Grandeur fautive | **mot de commande variateur** `M3_CommandWord` → 0 (« roue libre ») + fréquence en 1 scan | **`BrakeReleaseRequest` forcé à FALSE en aval de `FB_Brake`** ⇒ `BrakeCmd` interne ≠ retour physique |
+| Producteur | retrait de la demande (`FB_CycleSemiAuto:1390`, arbitre `:83`, `FB_Translation:229-233/297-303`) **et** coupure dure à la Trémie | `PRG_06:442-443` (coupure dure) **et** `PRG_05:658` (veto d'étape) |
+| Ferme-t-il le frein ? | **NON** — `FB_Translation.st:271-272` maintient le frein desserré tant que `|fAct| > 0,5` (fenêtre 2 s) | **OUI** — c'est sa définition |
+| Seuil de latch | aucun (pas de latch : le mot revient dès une nouvelle demande) | **800 ms de désaccord continu** (`ST_fbTranslation_Cfg.st:35`) puis latch définitif `FB_Brake.st:126-138` |
+| Statut | observation **prouvée** sur Suivi_72 | **non prouvé** : exige une trace avec les canaux frein **et** `≥ 800 ms` continus |
+
+➡️ **Conclusion** : le lien affirmé « H1 → H4/H6 produit exactement le défaut T287 » (`§8`, tableau de rapprochement) est **trop fort**. Ce qui tient : (1) **même lieu** (arrivées Trémie et P1) ✔, (2) **même signal d'entrée** (rebond capteur ≈ 1 s) ✔, (3) **même verrou de preuve** (aucune trace 10 ms avec les canaux frein) ✔, (4) et un **producteur commun plausible** : la coupure dure Trémie + le veto d'étape, **activés par H1** (§B.4). En revanche **H4 n'est pas le vecteur du défaut frein** : il ne touche pas la commande de frein. Le rapprochement doit être **réécrit** sur cette base, sinon T287 risque de chercher sa cause au mauvais endroit (et de conclure à une coïncidence).
+
+---
+
+### E. 🛠️ Trois options pour la Phase 2 — risques et efforts (**aucune n'est tranchée ici**)
+
+| | Option 1 — **Uniformiser sur le modèle AX3** (AX2/AX14 avancent sans neutre) | Option 2 — **Ne pas toucher au séquenceur ni à l'axe** : instrumenter et prouver d'abord | Option 3 — **Intermédiaire : corriger la cible AX14 + gater les bypass, laisser le neutre** |
+|---|---|---|---|
+| Contenu | Relaxer l'exigence de relâchement (`:901`, `:1395`) pour aligner sur AX3 ; M3 serait arrêté par la garde du cycle | Exécuter la campagne `PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md` (§9-A→G) **en y ajoutant les signatures concurrentes** (§B.2 : `M3_TremieHardStopActive` ; §B.4 : `BrakeCmd` interne vs `M3_BrakeIsOpen_DI`, `BrakeTimeoutElapsed`) et trancher Q1→Q6 | (a) AX14 : `:1391` `PositionTgt := 0` → conserver la cible comme AX2 conserve la sienne ⇒ le debounce 100 ms peut aboutir à la Trémie ; (b) `PRG_05:571` : neutraliser `Bypass.*` hors `MAINT_N1/N2` (doctrine `ST_BypassTranslation.st:4-5`) et/ou ne pas restaurer `Bypass.Global` au passage en SEMI_AUTO (`PRG_07:331-341`) |
+| Ce que ça règle | La fluidité opérateur / la symétrie apparente | **Rien ne change** ; lève le verrou de preuve actuel (H1/H2 aujourd'hui « non observables », §9bis) | H2 (verrou d'arrêt réellement armable à la Trémie) et A06/D09 (bypass non gated) — les deux causes **les plus citées** du diagnostic |
+| Risque | 🔴 **Élevé** : supprime la seule protection qui empêche H1 de relancer le chariot ; entre dans l'étape suivante avec une demande M3 vivante ⇒ veto `PRG_05:658` + frein ⇒ classe de faute T287 ; la garde de remplacement (arrêt mécanique prouvé) **n'existe pas pour M3** et est **vacuitaire au banc** (`fAct = 0`) | 🟢 **Faible** (read-only côté code) ; ⚠️ mais **le run est humain** (CODESYS) et **le banc est structurellement incapable** de reproduire le défaut frein (`AUDIT_T300_TRACE_20260904:244`) ⇒ un PASS banc ne vaut pas non-régression terrain | 🟡 **Moyen** : change la cible présentée à l'axe en AX14 ⇒ à tester (AC4) et à tracer ; le point (b) retire des capacités de mise en service (bypass) ⇒ **décision humaine**, et il ne corrige **pas** le retrait de demande (H1) |
+| Ce que ça NE règle PAS | Tout le reste (H4 à P1, la propriété de l'arrêt, les bypass, le défaut frein) | Rien n'est corrigé — c'est un choix de méthode, pas un correctif | H1 (le cycle recrée encore sa demande sur perte de jeton) et la propriété de l'arrêt : **un rebond peut encore relancer le chariot** |
+| Effort | **L** (interface + garde à concevoir pour M3 + tests + gates + AF-11) | **S** (procédure déjà écrite) + 1 run humain + analyse | **S/M** (2 fichiers : `FB_CycleSemiAuto.st` **verrouillé T331/DSH09** + `PRG_05_Translation.st`), + 1 test CI + gates palier C |
+| Dépendance | ⛔ **Dépend de l'option « l'axe possède l'arrêt » (§7.2-1/2)** : ne peut pas être menée seule | Aucune | ⛔ `FB_CycleSemiAuto.st` est **sous verrou d'écriture T331/DSH09** ⇒ séquencer les lots |
+
+**Ordre logique que le challenge met en évidence (à arbitrer)** : *prouver* (O2) → *l'axe possède l'arrêt* (§7.2-1/2, sur preuve) → *alors seulement* relâcher le neutre (O1). L'option 3 n'est pas un préalable à O1 : elle **réduit** le risque de H2 sans lever la dépendance.
+
+---
+
+### F. 🏁 Verdict sur le diagnostic existant
+
+# **MAJOR**
+
+Le socle est **solide et non recopié** : l'axe est bien unique, la divergence porte bien sur la **propriété de l'arrêt**, la preuve statique de **H2 est exacte** (`:1391` + `PRG_05:414-427`), l'AX12 est bien une **sécurité géométrique**, les réfutations H3/H5/H6 tiennent, et les constats A04 (config morte) et A06/D09 (bypass non gated) sont exacts. Aucune conclusion structurelle ne tombe.
+
+**MAJOR** parce que trois affirmations **porteuses pour la Phase 2** sont fausses ou incomplètes et orienteraient le lot dans la mauvaise direction :
+
+1. 🔴 **H4 mal attribuée à la Trémie** (§B.2) : la coupure en 1 scan y est produite par la **coupure dure** (`PRG_06:431-450`), **un scan avant** le retrait de demande. La matrice de décision §5 ne peut donc pas discriminer H4 de la coupure dure telle qu'elle est écrite.
+2. 🔴 **H4 → T287 est un raccourci** (§D) : H4 **ne touche pas la commande de frein** (`FB_Translation.st:271-272`) ; le défaut frein a un mécanisme propre (latch commande/retour, seuil 800 ms) déjà corrigé **deux fois** en MES (`FB_Translation.st:114-129`, `ST_fbTranslation_Cfg.st:35`) — le rapprochement doit être réécrit.
+3. 🔴 **L'asymétrie AX2/AX14 ⇄ AX3 n'est pas une disparité non documentée** (§B.1) et **l'uniformisation de la cible (§7.2-2) casse un chemin de récupération existant** (§B.6). En l'état, « uniformiser » supprime la seule protection active contre H1.
+
+**Corrections exigées avant d'ouvrir la Phase 2 (conception)** :
+- [ ] Re-référencer **toutes** les lignes de la fiche sur une **révision figée** (§A.0 : +4 après 1221 ; `FB_CycleSemiAuto.st` est sous verrou T331).
+- [ ] Corriger `PRG_07_Supervision.st:230-235` → **`:331-341`** (restauration boot des bypass) : la référence actuelle pointe la logique **T330 TOP/FdC**, sans rapport. *(Substance de A06/D09 confirmée : `:336-341` restaure bien `Bypass.Global` depuis le RETAIN, et `PRG_05:571` le consomme sans garde de mode.)*
+- [ ] Ajouter dans la matrice §5 la signature **coupure dure** (`PRG_06.M3_TremieHardStopActive`) comme concurrente de H4 (§B.2).
+- [ ] Requalifier le lien T287 sur le mécanisme de §B.4 (frein), **pas** sur H4.
+- [ ] Intégrer T319 (`TASKS.yaml:405-425`) et `TROUBLESHOOTING_ContinuiteJoystick_AX3_AX4_20260905.md:67-82` comme **sources** de §D (l'asymétrie) — la conclusion « à documenter pour l'opérateur » devient « **déjà décidée, à ne pas défaire sans garde équivalente** ».
+- [ ] Vérifier la **faisabilité au banc** de tout critère d'acceptation fondé sur `Translation_Busy`/`|fAct|` (au banc `fAct = 0` constant ⇒ `Translation_Busy = FALSE` permanent).
+
+---
+
+### G. 🚨 Devoir d'alerte — constats hors périmètre T334 (signalés, **non corrigés**)
+
+| # | Constat | Emplacement | Impact |
+|---|---|---|---|
+| A13 | **Le délai de collage du frein n'est jamais appliqué** : `TonDecel.Q` jamais lu (0 résultat au grep sur `CODE/`), `BrakeCmd := FALSE` immédiat, alors que `BrakeDelayMotorDecel = T#2s` est « confirmé opérateur » et commenté « Délai deceleration avant collage frein » | `FB_Brake.st:23,72,93,103-104` ; `ST_fbTranslation_Cfg.st:34` ; `FB_Translation.st:282` | Config **morte** sur la chaîne frein, **périmètre T287**, hors T334. Même classe que A03 |
+| A14 | **Le timeout de repli du modèle AX3 est désactivé** : `DiveStartTimeoutTimer(IN := FALSE, …)` avec `CST_DiveStartStopTimeout = T#5s` déclaré — alors que la fiche 2026-09-05 §8 exigeait « un timeout de transition vers repli sûr, **jamais un départ au terme d'un timer seul** » | `FB_CycleSemiAuto.st:262,300` (commentaire `:298-300`) | Le modèle que la §D propose de généraliser porte **lui-même** une garde non armée ⇒ à vérifier avant d'en faire la référence |
+| A15 | **Commentaire FAUX sur la libération des jetons** : `PRG_05:197-199` affirme que les jetons sont libérés « UNIQUEMENT sur mouvement CONFIRMÉ soutenu ≥1,5s — pas un rebond capteur » ; l'implémentation les RAZ sur **changement du mot capteurs** (`:275-277`) et `TonM3ConfirmedMoving.Q` n'est **jamais lu** | `PRG_05:197-201,275-277` | Prolonge A03 : c'est **exactement** la bascule de H1, et le commentaire laisse croire l'inverse ⇒ un lecteur futur conclurait à tort que H1 est impossible |
+| A16 | **Conflit AF-09 / Graphe 7 mal cadré** : `TROUBLESHOOTING_T336_…:74,100,105` présente le `UseDynamicTarget := FALSE` comme un forçage à arbitrer, alors que le code **porte le REX de l'incident** (écart apparent M1/M2 ~15 m → `FB_WinchSync` SafeStop → `Fault.Latched`) | `FB_CycleMachineHoming.st:412-420` vs fiche T336 | La question n'est pas « quelle source est décisionnelle ? » mais « comment réactiver la cible dynamique **sans** réintroduire l'incident ». **Hors T334** (voir §A.1-5) |
+| A17 | **Collision de tag à nouveau** : cette session a d'abord journalisé sous `DSH08` (**déjà pris par T295 depuis 18:02:24**) puis s'est re-taggée `DSH10`. Même motif que T330→DSH06 et T331→DSH09 : le registre s'attribue par « premier libre » **sans pose atomique** | `TASK_LOCKS.json` (`T295` DSH08, `T331` DSH09) ; `TOOLS/AGENT_WORKFLOW/status/T334bis.log` (18:41:28 **mis-taggé**, corrigé 18:41:34) | Traçabilité. **Aucune réécriture automatique** ; tri à l'orchestrateur |
+| A18 | **Conflit de verrou à venir** : l'option 3 touche `CODE/G_CYCLE/FB_CycleSemiAuto.st`, **sous verrou d'écriture T331/DSH09** depuis 17:57, et `PRG_05_Translation.st` (libre) | `TASK_LOCKS.json` clé `T331` | Un lot T334 sur ce fichier **casserait** la règle « un seul agent écrit dans un même périmètre » ⇒ séquencement obligatoire |
+
+---
+
+### H. 📝 Journal de la session T334 bis (read-only)
+
+- 2026-09-20 18:41 : briefing chargé (`subagent_preamble.md`, skill `troubleshooting` canonique). Tag **DSH10** (après correction d'un premier log mis-taggé `DSH08`, cf. A17). **Aucun verrou pris.**
+- Relevé `git rev-parse HEAD` = `fd12dc0` **+ arbre modifié** ; détection du décalage **+4** sur `FB_CycleSemiAuto.st` (édition T331/DSH09 à **18:13:32**, postérieure à la fiche **18:07:20**).
+- Vérification **fichier:ligne** des 5 affirmations ; relecture directe de `FB_CycleSemiAuto.st`, `PRG_05_Translation.st`, `FB_Translation.st`, `FB_TranslationCmdArbitrationM3.st`, `FB_TranslationOutputInterlock.st`, `FB_Translation_PositionDecoder.st`, `FB_Brake.st`, `FB_Safety_Translation.st`, `FB_Safety_Winch.st`, `FB_Winch.st`, `FB_WinchStateProjection.st`, `FB_CycleMachineHoming.st`, `FB_Modes.st`, `PRG_06_Outputs.st`, `PRG_07_Supervision.st`, `ST_*` de types, `GVL_PERSISTENT.st`, `TASK_LOCKS.json`, `TASKS.yaml`, `AF_Partie-04/11`.
+- Trouvailles : 3 écarts de **fond** (§B.1, §B.2, §B.4/§B.6) + 2 configs mortes (§B.5, A13) + 4 erreurs/imprécisions de **citation** (§F) + 1 claim **hors fiche** (§A.1-5).
+- **Aucun fichier de `CODE/` écrit, aucun test, aucun gate, aucun bundle, aucune IHM, aucun commit.** Seul livrable : la présente section.
+
+---
+
+## 11. 🧭 Suivi de l'arbitrage Phase 2 (DSH07, 2026-09-20 — ZÉRO code)
+
+> 📌 Livrables : `DOC/WFLOW/CONTRACTS/PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md` (arbitrage + modèle cible + lots séquencés) et le bloc `decisions` Q1→Q6 du contrat C3 — `check_task_contract.py` **PASS (0 erreur, 0 avertissement)**, y compris en `--release`.
+
+| Question | Verdict retenu | Porté par |
+|---|---|---|
+| **Q1** autorité de l'arrêt | 🟢 **OUI** — l'axe arme son verrou sur la **seule** détection d'arrivée, **jamais** levé par la perte de la demande ; relâchement = demande de sens inverse seule (inchangé). **C'est la correction qui neutralise H1 à la racine** (`FB_Translation.st:251`) | L1 |
+| **Q2** cible / sens | 🔴 **NON** — la cible d'étape reste la cible d'arrivée en SEMI_AUTO ; l'uniformiser en AX2 détruirait le chemin de récupération de dépassement (§B.6) | L1 (commentaires) |
+| **Q3** retrait de la demande | 🟢 **OUI, option (a)** — demande et cible conservées jusqu'à `ArrivalLock` + arrêt confirmé ; « la barrière commande l'arrêt » **rejetée** (duplication du producteur) | L2 *(verrou T331)* |
+| **Q4** bypass | 🟡 **OUI** — garde de mode au point de **consommation** (`PRG_05:468`, `:571`), doctrine MAINT_N2 ; `PRG_07` non touché | L1 |
+| **Q5** escalade butées | ⛔ **HORS LOT** — `FB_Safety_Translation.st` interdit au contrat ; écart spec/code confirmé et chiffré | contrat dédié |
+| **Q6** config morte | ⛔ **HORS LOT** — recommandation **supprimer** `_TranslationAutoSpeedCap_Pct` | contrat dédié |
+
+**Ce que l'arbitrage ajoute au diagnostic :**
+- 🆕 **Q7 (ouverte)** : à la Trémie, la **coupure dure** (`PRG_06:431-432` : `M3_PosTremie_DI AND ReqTremieSemantic`) arme frein fermé + mot 0 **au même scan** ⇒ conserver la demande jusqu'à l'arrêt (Q3) **prolonge** cette exposition (classe de faute frein T287, §B.4). À trancher **sur trace en L0** — décision humaine **D3**.
+- Le levier exact de **H4 à P1** est nommé : `FB_Translation.st:229-233` + `:297-303` (mot 0 = **roue libre en mouvement**), neutralisé par Q3/§I2 (mot non nul pendant toute la décélération).
+
+**Corrections exigées par §F — état :**
+
+| Exigence §F | État |
+|---|---|
+| Re-référencer la fiche sur une **révision figée** | 🟡 **non levé** — `FB_CycleSemiAuto.st` toujours modifié non commité (T331) ; convention `WT`/`HEAD` documentée au **plan §0.1** ; à figer avant tout diff de `CODE/` |
+| Corriger `PRG_07:230-235` → `:331-341` | ✅ **fait** — valeur exacte relevée directement : **`:336-346`** (bloc Translation `:341-346`) |
+| Ajouter la signature **coupure dure** comme concurrente de H4 (§B.2) | 🟡 reporté en **L0** (enrichissement de la procédure de trace) |
+| Requalifier le lien T287 sur le mécanisme de §B.4 (frein) | ✅ **intégré** — plan §6 (A13) et contrat (`lien_T287`) |
+| Intégrer T319 + fiche 2026-09-05 comme **sources** de §D | ✅ **intégré** — c'est la base de la décision « le neutre reste en place » (invariant I4) |
+| Vérifier la **faisabilité au banc** des AC fondés sur `Translation_Busy` | ✅ **intégré** — AC15 exige l'injection de `Translation_Busy := TRUE` (sinon l'assertion est vacuaire) |
+
+- 2026-09-20 19:09 (DSH07) : arbitrage rédigé, **zéro `CODE/`**, aucun test, aucun gate, aucun bundle, aucun commit. Toutes les références du plan et du contrat ont été relues **directement dans les sources**.

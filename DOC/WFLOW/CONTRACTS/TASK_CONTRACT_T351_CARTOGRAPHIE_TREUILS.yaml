@@ -1,0 +1,135 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T351 « Cartographie exhaustive joystick -> contacteur,
+# treuils M1/M2, chaines MANU/MAINTENANCE et AUTO/SEMI_AUTO »
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# Origine : DOC/WFLOW/CONTRACTS/BRIEF_T351_CARTOGRAPHIE_JOYSTICK_TREUILS.md
+#           (brief non suivi, non modifie par ce lot)
+# Parent : T334 (DSH07) — cartographie M3 deja produite, NON modifiee par ce lot
+# Revision figee a l'ecriture : HEAD = d6e54377
+#   arbre de travail SALE au 2026-09-21 : CODE/M_MAIN/PRG_04_Treuils_Benne.st
+#   (blob disque e8551c3a80f6) et CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+#   sont modifies non committes par d'autres lots (T291-B/AGY01, T295/T346).
+#   C'est la raison du critere AC2 : tout numero de ligne du livrable est
+#   ancre sur le blob disque, jamais sur HEAD.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T351_CARTOGRAPHIE_TREUILS
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Un lecteur qui ouvre un seul document peut suivre le chemin complet d'une
+    commande de treuil, de la source du geste jusqu'au contacteur physique, pour
+    M1 et pour M2, dans les deux regimes de conduite (MANU/MAINTENANCE et
+    AUTO/SEMI_AUTO), sans relire le code : chaque variable intermediaire est
+    nommee avec son producteur et son consommateur en fichier:ligne, ce qui
+    permet de diagnostiquer un blocage en localisant la premiere variable qui
+    diverge de la valeur attendue.
+
+  acceptance:
+    - id: AC1
+      statement: "Le livrable DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_TREUILS_JoystickContacteur_20260921.md existe et contient deux tableaux de chaine distincts, l'un MANU/MAINTENANCE (codes M01, M02, et suivants), l'autre AUTO/SEMI_AUTO (codes C01, C02, et suivants), chacun avec une ligne par variable et une ligne en une phrase resumant le chemin complet."
+      verified_by: "Lecture du fichier : presence des deux tableaux, codes M01.. et C01.. strictement croissants et sans doublon, et une phrase 'chaine en une ligne' par tableau."
+    - id: AC2
+      statement: "Chaque reference fichier:ligne citee dans le livrable est reelle a l'etat disque ancre par le lot, et non un numero derive de HEAD ni d'une memoire : le livrable porte en tete un bloc d'ancrage donnant le commit HEAD et le blob SHA (git hash-object) de chaque fichier de CODE/ cite, avec horodatage ISO."
+      verified_by: "Contre-verification independante de l'orchestrateur par Select-String sur un echantillon d'au moins 20 references tirees des deux chaines : chaque motif cite doit se trouver a la ligne citee. Tout ecart est un echec du critere."
+    - id: AC3
+      statement: "La question 'l'axe possede-t-il un seul contrat d'ordre ou deux ?' est tranchee pour M1 et M2 par preuve fichier:ligne, et non par analogie avec la translation M3 : le livrable nomme et trace les deux FB d'arbitrage (FB_WinchCmdArbitrationM1 et FB_WinchCmdArbitrationM2), leur point d'appel, leur point de consommation, et le point de selection de source unique en aval s'il existe."
+      verified_by: "Lecture croisee du livrable et du code : les references des instances d'arbitrage et du point de convergence aval (barriere finale vers les contacteurs) doivent pointer sur les lignes reelles ; l'orchestrateur verifie chacune par Select-String."
+    - id: AC4
+      statement: "Les quatre familles de sources de demande d'un treuil sont tracees avec fichier:ligne et distinctement identifiables dans le livrable : geste joystick, boutons IHM, actions de la benne M2, et demande du sequenceur de cycle."
+      verified_by: "Lecture du livrable : chaque famille apparait au moins une fois avec son fichier:ligne de production, et le livrable dit explicitement laquelle est retenue dans chaque regime de conduite."
+    - id: AC5
+      statement: "Le mecanisme D18 (FB_WinchDirectionInterlock) est documente comme un mecanisme CORRIGE ET COMMITTE, non teste machine, avec ses trois commits et son insertion precise dans les deux chaines ; il n'est pas presente comme un ecart ouvert ni comme un comportement d'origine."
+      verified_by: "Comparaison du livrable avec git log et git diff : les trois commits de correction doivent etre cites, la mention 'non teste machine' presente, et le livrable doit dire a quel point de chaque chaine D18 agit."
+    - id: AC6
+      statement: "La garde croisee M1/M2 est documentee aux lignes REELLES de l'etat disque, et l'ecart avec les numeros cites par le brief est signale explicitement : le brief annoncait PRG_04_Treuils_Benne.st:1360-1361 et :1452-1453, qui portent en realite des arguments d'appels d'estimateurs, alors que la garde croisee effective est ailleurs."
+      verified_by: "Select-String sur PRG_04_Treuils_Benne.st de l'etat disque : les lignes citees par le livrable contiennent bien l'expression de gel croise des deux treuils, et le livrable signale l'ecart avec le brief comme un constat, sans modifier le brief."
+    - id: AC7
+      statement: "La securite geometrique de limite haute est documentee dans les deux regimes de conduite, y compris le chemin d'override qui change le seuil, avec la variable de configuration, le FB qui la consomme et le fichier:ligne ou le permis est coupe."
+      verified_by: "Lecture du livrable et Select-String sur le FB de securite treuil : la variable de limite, sa declaration, son consommateur et la ligne de coupure du permis doivent etre presentes pour chaque regime."
+    - id: AC8
+      statement: "Les branches MAINTENANCE (MAINT_N1 / MAINT_N2) sont tracees comme branches distinctes du chemin nominal, y compris tout chemin court qui court-circuite une etape de la chaine nominale ; aucune branche de maintenance connue du code n'est omise silencieusement."
+      verified_by: "Lecture du livrable : section dediee aux branches MAINT, avec fichier:ligne pour chaque porte de mode ; si une branche n'existe pas, le livrable le dit explicitement plutot que de l'omettre."
+    - id: AC9
+      statement: "Le complement de la chaine M3 (verification du niveau d'exhaustivite de T334) est livre dans une ANNEXE SEPAREE, et la fiche T334 existante n'est pas modifiee : le verrou d'ecriture T334 appartient a un autre acteur en vol."
+      verified_by: "git status --short : la fiche TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md ne doit pas porter de modification attribuable a ce lot ; l'annexe existe comme fichier distinct et liste les trous releves avec fichier:ligne, ou declare explicitement qu'aucun trou n'a ete trouve."
+    - id: AC10
+      statement: "Aucun fichier de CODE/ n'est modifie, aucun artefact de build n'est regenere et aucun commit n'est cree par ce lot : la mission est strictement read-only sur le code."
+      verified_by: "Comparaison de git status --short -- CODE/ avant et apres le lot : le jeu de fichiers doit etre identique. Aucun CODE_XML/, aucun bundle, aucun test CI, aucun gate lance."
+    - id: AC11
+      statement: "Tout point reste ambigu apres lecture est liste dans une section dediee du livrable, avec la question precise et ce qui manque pour la trancher ; aucun point ambigu n'est comble par une supposition, et toute chaine jugee incomplete est declaree incomplete."
+      verified_by: "Lecture du livrable : presence d'une section de trous et incertitudes ; chaque entree enonce la question ouverte et la preuve manquante. Une section vide doit etre justifiee par une phrase, pas laissee muette."
+    - id: AC12
+      statement: "Le livrable est utilisable comme reference permanente et non comme une note de session : il porte le contexte fige du besoin, la date, l'ancrage de revision, et il est reference depuis le catalogue de suivi des taches."
+      verified_by: "Lecture du livrable (bloc contexte et en-tete) et de DOC/WFLOW/TASKS.yaml : l'entree T351 doit porter le chemin du livrable et un horodatage ISO 8601 a jour."
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_TREUILS_JoystickContacteur_20260921.md
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T351_ANNEXE_M3_TrousT334_20260921.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T351_CARTOGRAPHIE_TREUILS.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - TOOLS/AGENT_WORKFLOW/status/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md
+      - DOC/WFLOW/CONTRACTS/BRIEF_T351_CARTOGRAPHIE_JOYSTICK_TREUILS.md
+      - DOC/WFLOW/CONTRACTS/PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md
+      - DOC/AF/
+      - le contenu des lots concurrents non committes de l'arbre de travail
+      - tout outil web interactif de la phase 2 : hors perimetre, non commence
+
+  evidence_required:
+    - anchored_blob_hashes
+    - select_string_spotcheck
+    - git_status_code_unchanged
+    - contract_check
+
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Trois points doivent etre remontes et non tranches silencieusement pendant ce lot.
+    Premier point : le brief T351 affirme que D18 a ete corrige et que T325 est clos, alors que
+    TASKS.yaml decrit encore T325 comme une tache d'analyse et de cadrage sans modification de
+    code. Le correctif existe bien dans l'historique, mais le catalogue est perime sur ce point :
+    c'est un ecart de documentation a corriger par l'orchestrateur, jamais reecrit par ce lot.
+    Second point : PRG_04_Treuils_Benne.st porte des modifications non committes d'un autre lot
+    (perimetre T291-B / AGY01) et est en outre le coeur de la chaine a tracer. Toute reference de
+    ligne doit etre prise sur l'etat disque du moment et ancree par hash, et un changement de blob
+    en cours de lot invalide les references deja ecrites.
+    Troisieme point : le brief omet des maillons reels de la chaine (les deux FB d'arbitrage, la
+    synchronisation M1/M2, la projection d'etat, les deux estimateurs de charge et d'apprentissage
+    de palier, et la benne M2 comme demandeur du treuil M2). Ces maillons sont documentes parce
+    qu'ils sont traverses, et le fait que le brief les ait omis est signale comme constat, sans
+    elargir le lot a une correction.
+
+status: IN_PROGRESS
+
+execution:
+  executed_by: "—"
+  completed_at: "—"
+  status: PENDING
+  summary: >
+    En attente de restitution. Ce lot ne produit aucun code et ne corrige aucun defaut : il produit
+    une cartographie verifiee, dont la valeur tient entierement a l'exactitude des references
+    fichier:ligne. Un critere AC2 faux rend le document dangereux, car il ferait perdre du temps
+    la ou il doit en faire gagner.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: "—"
+  notes: >
+    Le lot est read-only sur CODE/ : il ne demande aucun gel, aucun bundle et aucune levee.
+    La validation de l'orchestrateur porte sur la contre-verification AC2, qui est la seule
+    preuve capable de distinguer une cartographie reelle d'une reconstitution plausible.

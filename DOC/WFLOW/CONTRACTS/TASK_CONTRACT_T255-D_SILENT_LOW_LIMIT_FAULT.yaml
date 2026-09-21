@@ -239,8 +239,8 @@ status: PENDING
 
 execution:
   executed_by: "DSH05 (DeepSeek / DSH, session T255-D)"
-  completed_at: "2026-09-20T13:54:00+02:00"
-  status: PENDING
+  completed_at: "2026-09-20T16:30:00+02:00"
+  status: COMPLETED
   summary: >
     Phase 1 et phase 2 (diagnostic) terminees, phase 3 (implementation) NON demarree :
     arret de validation humaine de la mission T255-D. Cause racine etablie, sourcee et
@@ -276,11 +276,22 @@ execution:
     - "Verrou T255-D pose : TASK_LOCKS.json work_locks.T255-D acteur DSH05 (tag renomme le 2026-09-20 : collision DSH01)"
     - "Obstacle CI remonte : entree de registre FB_Hmi_BannerFormatter inutilisable (13 sources absentes + 1 source manquante non declaree)"
     - "Aucun fichier CODE/ modifie"
+    - "Revue independante read-only : 3 MAJOR (dont 1 defaut introduit par le lot, corrige) et 9 MINOR ; dispositions tracees dans la fiche"
+    - "MAJOR-1 corrige : bit 6 lu sur ErrorId (le champ CableLimitDescent est une comparaison brute sans bypass) + ancre TC-P07-043"
+    - "MAJOR-2 ferme : G506 verifie la completude PAR BIT contre FB_Safety_Winch.instCauses (preuve : table privee du bit 6 => FAIL BIT NON CARTOGRAPHIE)"
+    - "MINOR-3 corrige : action placee apres les prerequis de mode et d'homme-mort + ancre TC-P07-044 ; bit 5 retire du carrousel (exemption nominative motivee)"
+    - "Resultats finaux : PRG_07_Supervision 5/5 ; FB_Hmi_BannerFormatter 20/24 (memes 4 rouges pre-existants) ; exploratoire consumer 4/4 et producer 2/2 ; G200 PASS ; G506 PASS"
+    - "Palier C : 5 rouges hors perimetre T255-D (G300 scratch G390 + prototypes, G340 = AF-11 v2.4 de T333, G408/G430/G483 pre-existants)"
 
 validation:
-  status: PENDING
+  status: APPROVED
   validated_by: "CC01 (orchestrateur)"
-  validated_at: ""
+  validated_at: "2026-09-20T18:10:00+02:00"
   notes: >
-    Arret obligatoire de la mission T255-D : validation du diagnostic et du plan, et
-    arbitrage des decisions ouvertes D1 a D3, avant toute implementation.
+    Cloture CC01 du 2026-09-20 : T255-D EST CLOS, import CODESYS autorise (bundle complet +
+    diff bundle FB_Hmi_BannerFormatter). Arbitrages tranches : D1 = carrousel + champ action,
+    D2 = AF-07 v2.3 mise a jour en place, D3 = AnyFaultActive non touche, D4 = registre de
+    tests repare. MINOR-4 tranche par CC01 : DEROGATION ECRITE au bump de version (correction
+    de bug, pas nouvelle exigence AF-07), ligne ajoutee dans AF-07 section historique ; G408
+    (cle OUT_OF_SCOPE perimee) et la boucle outillage G300/G390 sont traites par CC01 hors de
+    ce lot. Scratchs .tmp_t255d_* conserves volontairement (nettoyage humain, regle projet).

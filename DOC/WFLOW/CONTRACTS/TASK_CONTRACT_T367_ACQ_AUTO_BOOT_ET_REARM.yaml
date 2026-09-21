@@ -1,0 +1,274 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# T367 — Acquittement AUTOMATIQUE des défauts latchés : au démarrage à froid, et après réarmement AU
+#
+# GO humani explicite : 2026-09-21 (périmètre strict dicté, voir objective).
+# Périmètre dicté par l'exploitant, verbatim :
+#   « au boot, le défaut (quel qu'il soit) doit être acquitté automatiquement, sans que j'aie besoin
+#     d'appuyer sur le bouton acquittement séparément. Rien d'autre ne change — aucun nouveau champ,
+#     aucune touche à GVL_IHM/ses types (table figée en ce moment pour livraison collègue).
+#     Si ta correction nécessite de toucher GVL_IHM ou un type associé, STOP et demande-moi avant. »
+#   + « oui GO mais il faut aussi l'implémenter après le réarmement AU contacteur de puissance »
+#
+# ⛔ CAS D'ARRÊT ABSOLU : si l'implémentation exige de modifier GVL_IHM, un type IHM (ST_*),
+#    ou d'ajouter un champ quelconque → L'AGENT S'ARRÊTE ET DEMANDE, sans exception.
+#
+# Contexte de conception (preuves vérifiées, cf. fiche T369) :
+#   - PRG_07_Supervision.st:123-127 est LA porte unique d'acquittement (5 boutons existants).
+#   - FB_FaultCore.st : §1 effacement sur Reset (:37-43) AVANT §3 armement (:60-69) dans le MÊME
+#     scan ⇒ un acquittement automatique est un NO-OP sur une cause encore ACTIVE : il ne peut
+#     PAS masquer un défaut persistant. C'est la propriété de sécurité qui autorise ce lot.
+#   - PRG_02_Acquisition.st:216 Data.InputModules.Fault = signal EXISTANT de « transitoire d'E/S
+#     terminé » (les 5 modules RUNNING) — réutilisé, aucun champ créé.
+#   - PRG_06_Outputs.EmergencyState (ST_Safety_Emergency_State) expose déjà Step / ArmingBusy /
+#     ContactorOk ⇒ la preuve « geste opérateur » s'obtient SANS lire GVL_IHM.
+#   - Le contacteur PEUT s'engager sans geste opérateur (chaîne refermée + maintien, relâchement
+#     d'un AU, bypass MES) ⇒ le front brut de PowerContactorEngaged est INSUFFISANT comme
+#     déclencheur : il DOIT être gaté par le fait qu'une séquence d'armement a réellement tourné.
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T367_ACQ_AUTO_BOOT_ET_REARM
+  criticality: C2
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Supprimer l'appui manuel sur le bouton d'acquittement des défauts dans DEUX situations
+    bornées : (a) au DÉMARRAGE À FROID, une fois le transitoire d'E/S terminé ; (b) après un
+    RÉARMEMENT AU réellement initié par l'opérateur et confirmé par le contacteur de puissance.
+    Dans les deux cas l'acquittement est injecté dans la porte unique existante
+    FaultMachineReset_IHM, sous forme de campagnes BORNÉES (au plus 3 impulsions espacées d'environ
+    1 s, puis arrêt définitif), avec ZÉRO nouveau champ, ZÉRO modification de GVL_IHM et de ses
+    types, et ZÉRO modification des 5 sources d'acquittement existantes. Aucun acquittement
+    automatique n'existe en dehors de ces deux campagnes.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Au démarrage à froid, une fois le transitoire d'E/S terminé, le PLC émet automatiquement une campagne d'au plus 3 impulsions FaultMachineReset_IHM espacées d'environ 1 s, puis s'arrête DÉFINITIVEMENT."
+      verified_by: "test CI TC-T367-101/102 sur FB_TestHarness_PRG_07 : impulsions comptées = 1..3 sous le transitoire d'E/S, 0 après la 3e, compteur figé"
+
+    - id: AC2
+      statement: "Aucune impulsion automatique n'est émise tant que le transitoire d'E/S n'est pas terminé (tous les modules RUNNING)."
+      verified_by: "test CI TC-T367-105 : Data.InputModules.Fault = TRUE sur toute la fenêtre ⇒ compteur d'impulsions = 0"
+
+    - id: AC3
+      statement: "Après un réarmement AU initié par l'opérateur et confirmé par le contacteur de puissance, une campagne d'au plus 3 impulsions est émise, puis s'arrête."
+      verified_by: "test CI TC-T367-106 : séquence observée (EmergencyState.Step <> 0) PUIS front ContactorOk ⇒ impulsions 1..3 puis arrêt"
+
+    - id: AC4
+      statement: "Un front du contacteur de puissance SANS séquence d'armement opérateur préalable n'émet AUCUNE impulsion automatique."
+      verified_by: "test CI TC-T367-107 : front ContactorOk seul (démarrage à chaîne fermée, maintien repris, bypass) ⇒ compteur d'impulsions = 0 hors campagne de boot"
+
+    - id: AC5
+      statement: "PROPRIÉTÉ DE SÉCURITÉ : un défaut dont la cause est ENCORE ACTIVE n'est JAMAIS masqué — son latch est ré-armé dans le scan même de l'impulsion."
+      verified_by: "test CI TC-T367-103 : cause Active + Latching, campagne d'acquittement jouée ⇒ Fault.Latched reste TRUE après la campagne (preuve de non-masquage)"
+
+    - id: AC6
+      statement: "Aucun acquittement automatique n'existe en dehors des deux campagnes : en fonctionnement établi, seule une action opérateur (une des 5 sources existantes) produit une impulsion."
+      verified_by: "test CI TC-T367-104 : après les campagnes, N scans sans aucun front des 5 boutons ⇒ aucune impulsion"
+
+    - id: AC7
+      statement: "Les 5 sources d'acquittement existantes conservent un comportement inchangé (BtnFaultReset, BtnReset M1/M2/Benne/Cycle)."
+      verified_by: "test CI : chacune des 5 sources produit toujours son impulsion ; diff git limité à l'ajout de l'OR"
+
+    - id: AC8
+      statement: "AUCUN champ nouveau et AUCUNE modification de GVL_IHM ni d'un type associé : git diff VIDE sur GVL_IHM.st et sur tous les ST_* IHM."
+      verified_by: "git diff --stat -- CODE/J_SUPERVISION/GVL_IHM.st CODE/J_SUPERVISION/_TYPES : sortie VIDE ; lecture du diff réel par l'orchestrateur"
+
+    - id: AC9
+      statement: "Aucune entrée matérielle ne déclenche directement un acquittement : le trigger de la campagne « réarmement » est conditionné par une séquence d'armement (donc un geste opérateur) et jamais par le seul état du contacteur."
+      verified_by: "gate G5xx_check_fault_reset_not_hw_triggered.py (existante ou étendue) PASS + test TC-T367-107"
+
+    - id: AC10
+      statement: "La chaîne de sécurité AU est intacte : aucun fichier de CODE/B_AU_SECURITE/ n'est modifié."
+      verified_by: "git diff --stat -- CODE/B_AU_SECURITE : sortie VIDE"
+
+    - id: AC11
+      statement: "Les hunks NON COMMITÉS d'autres acteurs dans PRG_07_Supervision.st restent INTACTS (édition chirurgicale d'une région disjointe)."
+      verified_by: "git diff de PRG_07_Supervision.st relu ligne à ligne : seules les lignes de la région §1c et la déclaration des VAR locales apparaissent, les hunks tiers sont inchangés"
+
+    - id: AC12
+      statement: "Preuve CI ROUGE AVANT correctif : les cas TC-T367-10x sont écrits et exécutés sur l'état initial avant toute implémentation, et au moins un cas échoue."
+      verified_by: "sortie du runner CI avant/après implémentation"
+
+    - id: AC13
+      statement: "Structure CODE/M_MAIN : le nom de fichier correspond au nom de POU — aucun renommage, aucun POU créé ni déplacé dans CODE/M_MAIN."
+      verified_by: "git diff --stat : seules des lignes de corps et la déclaration des VAR locales de PRG_07_Supervision.st changent"
+
+    - id: AC14
+      statement: "Bundle : le suffixe correspond au langage généré dans le bundle — les POU ST touchés restent exportés en ST dans CODE_Bundle.xml (aucun passage en LD/CFC)."
+      verified_by: "relevé des objets du bundle après régénération + G390 fraîcheur bundle PASS"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_07_Supervision.st                 # SEUL fichier CODE/ modifié (région §1c + VAR locales)
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/           # cas TC-T367-10x
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_07.st  # RATIFIÉ PAR L'ORCHESTRATEUR a posteriori : véhicule désigné par ce contrat (via FB_TestHarness_PRG_07), POU de TEST et non code de production — sans sa modification les 8 cas ne peuvent pas exister (run_tests.py n'exécute pas source_prg)
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/reports/
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml    # si un fichier de test est ajouté
+      - TOOLS/AGENT_WORKFLOW/scripts/                      # garde-fou G5xx (fix: + guard:) si nécessaire
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py      # ligne PLANS si le garde-fou est ajouté
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T367_ACQ_AUTO_BOOT_ET_REARM.yaml
+      - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T367_ACQ_AUTO_BOOT_ET_REARM.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T369_DEADLOCK_REARMEMENT_SIMU_20260921.md
+      - CODE_XML/                                          # bundle + diff bundle
+
+    forbidden:
+      - CODE/J_SUPERVISION/GVL_IHM.st                      # ⛔ FIGÉ (livraison collègue) — lecture seule
+      - CODE/J_SUPERVISION/_TYPES/**                       # ⛔ aucun type IHM modifié (ST_ModesCmd, ST_EmergencyCmd, ST_EmergencyState…)
+      - CODE/B_AU_SECURITE/**                              # ⛔ chaîne de sécurité AU
+      - CODE/M_MAIN/PRG_06_Outputs.st                      # lecture seule (EmergencyState)
+      - CODE/M_MAIN/PRG_02_Acquisition.st                  # lecture seule (InputModules.Fault)
+      - CODE/H_TREUILS_BENNE/** · CODE/I_TRANSLATION/** · CODE/E_CODEURS/** · CODE/G_CYCLE/** · CODE/D_JOYSTICK/**
+      - CODE/L_SIMULATION/**                               # aucun besoin : le lot ne touche pas le banc
+      - DOC/AF/**                                          # ⛔ doctrine non modifiée (l'écart est TRACÉ dans la note d'application)
+      - DOC/STDS/**
+      - PRJ_CODESYS/**
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - "tout NOUVEAU champ dans une GVL ou un DUT — les 4 états de la campagne sont des VAR LOCALES au PROGRAM"
+      - "toute modification des 5 sources existantes de FaultMachineReset_IHM"
+      - "tout acquittement automatique hors des 2 campagnes bornées (aucun reset périodique, aucun reset en fonctionnement)"
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Un défaut dont la cause est encore présente reste latché et visible : l'acquittement automatique ne masque rien (FB_FaultCore §1 avant §3)."
+      - "Les préconditions d'armement (Armable) restent la SEULE autorisation d'armer : un contacteur collé, une chaîne ouverte ou un lockout bloquent toujours."
+      - "Aucun acquittement automatique en fonctionnement établi : les 2 campagnes sont bornées et meurent."
+      - "Les 5 boutons d'acquittement existants gardent leur comportement bit-identique."
+      - "GVL_IHM et ses types restent strictement inchangés (table figée pour la livraison collègue)."
+      - "Le cycle de la campagne de boot ne peut pas se relancer sans un nouveau démarrage à froid (état local non-RETAIN)."
+    dropped_on_purpose:
+      - "L'obligation d'un appui manuel sur le bouton d'acquittement au boot et après un réarmement AU (c'est l'objet de la tâche, décidé par l'exploitant)."
+      - "La règle « appui conscient » (AGENTS.md) et l'ordre AF-01 §7.4 « acquitter PUIS réarmer » sont AMENDÉS pour ces 2 cas seulement — écart ASSUMÉ par l'exploitant, TRACÉ dans NOTE_APPLICATION (jamais silencieux)."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison" (G200 --report)
+    - run_all_gates          # palier C + garde-fou G5xx (avec --selftest)
+    - bundle                 # CODE_XML/CODE_Bundle.xml + CODE_XML/CODE_DiffBundle.xml
+    - "preuve CI ROUGE AVANT correctif (AC12)"
+    - "git diff --stat VIDE sur GVL_IHM.st et CODE/J_SUPERVISION/_TYPES/ (AC8) et sur CODE/B_AU_SECURITE/ (AC10)"
+    - "git diff complet de PRG_07_Supervision.st relu ligne à ligne, hunks tiers intacts (AC11)"
+    - "relevé des objets du diff bundle"
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    ⛔ CAS D'ARRÊT PRIORITAIRE : si la moindre ligne du lot exige de modifier GVL_IHM, un type associé
+    (ST_*), ou d'ajouter un champ dans une GVL ou un DUT, L'AGENT S'ARRÊTE IMMÉDIATEMENT et remonte à
+    l'orchestrateur — il ne cherche pas de contournement. Tout autre problème (incohérence de spec, bug
+    préexistant, hunk tiers menacé dans PRG_07, risque hors scope) est remonté sans attendre la fin du
+    lot, et jamais silencieusement. Signaler n'est pas élargir le scope.
+
+  # ── 8. Points ouverts remontes a l'humain ─────────────────────────────────
+  open_points:
+    - "Q1 : la campagne « réarmement » est gatée par une séquence d'armement réellement exécutée (EmergencyState.Step <> 0), et NON par le seul front du contacteur. Motif sécurité vérifié : le contacteur peut s'engager SANS geste opérateur (relâchement d'un AU avec maintien repris, démarrage à chaîne fermée, bypass MES) — l'écart est explicitement TRACÉ, jamais silencieux."
+    - "Q2 : l'acquittement automatique est SILENCIEUX (aucun compteur, aucun voyant) — conséquence directe de la contrainte « aucun nouveau champ ». Risque résiduel assumé : un défaut réel mais DÉJÀ DISPARU au moment du boot est effacé sans appui conscient."
+    - "Q3 : les 2 valeurs à confirmer — nombre d'impulsions par campagne (3 retenu) et intervalle (~1 s retenu)."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: "DSH01"
+  completed_at: "2026-09-21T09:55:00+02:00"
+  status: COMPLETED            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Implemente dans le SEUL fichier autorise CODE/M_MAIN/PRG_07_Supervision.st : VAR/VAR CONSTANT
+    locales (94-128) + region §1c-1 (162-235) + porte unique §1c-2 (237-243, ajout du seul
+    `OR BootAckPulse OR RearmAckPulse`). AUCUN champ nouveau, GVL_IHM et ses types intacts,
+    chaine AU intacte, FB_FaultCore et FB de securite non modifies. CI ROUGE prouvee AVANT
+    correctif (6/13, 7 des 8 cas TC-T367-10x en echec), CI VERTE apres (13/13). Garde-fou G521
+    cree (PASS + --selftest : 11 mutations refusees) et enregistre au palier C. Bundle + diff
+    bundle regeneres, G200 PASS (0 erreur). Palier C : 55/59, 4 rouges PREEXISTANTS nommes
+    (G300, G340, G430, G483), 0 nouveau rouge. Note d'application ecrite et ecart de doctrine
+    TRACE. ALERTES remontees : (1) valeurs CST_AckBootWindow=T#30s / CST_AckBootSettle=T#3s non
+    chiffrees par le contrat ; (2) FB_TestHarness_PRG_07.st (vehicule des cas, hors CODE/)
+    modifie sans etre liste litteralement dans scope.allowed ; (3) le harnais CI est un stub
+    miroir, la preuve sur le VRAI PRG_07 repose sur G521 (statique) ; (4) armement de la memoire
+    du geste par FRONT de sequence (et non par NIVEAU, cf. design) pour fermer un acquittement
+    sans geste operateur.
+  evidence_submitted:
+    - "CI ROUGE avant correctif : PRG_07_Supervision 6/13 (TC-T367-101..106, 108 en echec)"
+    - "CI verte apres correctif : PRG_07_Supervision 13/13 PASS (reports/PRG_07_Supervision.html)"
+    - "CODE_XML/CODE_Bundle.xml (261/261 objets, 0 erreur) + CODE_XML/CODE_DiffBundle.xml (PRG_07_Supervision)"
+    - "G200_check_linkage.py --report : PASS (0 erreur, 1680 avertissements dont 3 nouveaux L10 intra-POU)"
+    - "run_all_gates.py --palier C : 55/59, 0 nouveau rouge ; G521 PASS (20/20 famille G500)"
+    - "G521_check_fault_reset_not_hw_triggered.py . --selftest : PASS (11 mutations refusees)"
+    - "git diff --stat VIDE sur GVL_IHM.st, CODE/J_SUPERVISION/_TYPES/ (AC8) et CODE/B_AU_SECURITE/ (AC10)"
+    - "git diff PRG_07_Supervision.st : 3 hunks (VAR locales, §1c-1 + OR, hunk tiers CycleElapsed_* intact)"
+    - "DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T367_ACQ_AUTO_BOOT_ET_REARM.md"
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: "DSH26 (orchestrateur)"
+  validated_at: "2026-09-21T09:20:00+02:00"
+  notes: >
+    Contrat rédigé après GO explicite de l'exploitant (2026-09-21), périmètre strict dicté et
+    reproduit verbatim en tête de fichier. Conformité de périmètre vérifiée AVANT rédaction : le
+    design n'exige NI champ nouveau NI modification de GVL_IHM/types — les 4 états de campagne sont
+    des VAR LOCALES au PROGRAM PRG_07_Supervision, et la preuve « geste opérateur » s'obtient via
+    PRG_06_Outputs.EmergencyState (déjà public) sans lire GVL_IHM. Le cas d'arrêt « toucher GVL_IHM »
+    reste néanmoins inscrit comme interdit absolu et comme devoir d'alerte prioritaire.
+
+    ═══ REVUE INDÉPENDANTE DE L'ORCHESTRATEUR (2026-09-21T09:45) — aucune preuve prise sur déclaration ═══
+    1. git diff RÉEL de CODE/M_MAIN/PRG_07_Supervision.st lu ligne à ligne : 3 hunks — (a) VAR + VAR
+       CONSTANT locales, (b) §1c-1 campagnes + §1c-2 porte unique, (c) le hunk TIERS CycleElapsed_Min/S
+       de instHmiBannerFormatter, resté INTACT.
+    2. Les 5 sources de FaultMachineReset_IHM sont bit-identiques (seul le ';' de la dernière ligne
+       s'est déplacé, son commentaire repris verbatim) — constaté dans le diff, pas déclaré.
+    3. AC8/AC10 REVÉRIFIÉS PAR MOI : git diff --stat VIDE sur GVL_IHM.st, _TYPES/ et B_AU_SECURITE/.
+       CODE/ ne contient que le fichier du lot plus les 3 hunks tiers préexistants.
+    4. G200_check_linkage.py --report REJOUÉ PAR MOI : PASS, 138 OK / 0 KO. G521 et --selftest REJOUÉS
+       PAR MOI : PASS, 11 mutations refusées, 0 faux positif.
+    5. ÉCARTS RATIFIÉS APRÈS VÉRIFICATION DU RAISONNEMENT :
+       (a) mémoire du geste armée par FRONT de séquence et non par niveau — vérifié exact : la forme
+           niveau se serait ré-armée pendant la séquence encore en cours et aurait rouvert un
+           acquittement sur un front machine ultérieur ; la forme front est STRICTEMENT plus
+           restrictive (elle ne peut que RETIRER des acquittements, jamais en ajouter) ;
+       (b) la fenêtre de démarrage à froid clôt la campagne SANS impulsion si le transitoire d'E/S
+           n'aboutit jamais — vérifié nécessaire : sans elle, un module revenu tardivement
+           déclencherait un acquittement en fonctionnement établi, interdit par AC6.
+    6. FINDING DE LA REVUE, NON VU PAR L'IMPLÉMENTEUR : RearmSeqSeen n'est armé qu'en :188 et effacé
+       QU'UNIQUEMENT au déclenchement (:193). Conséquence : après un ARMEMENT ÉCHOUÉ (séquence
+       démarrée, contacteur jamais confirmé), la mémoire du geste reste TRUE INDÉFINIMENT — un front
+       du contacteur survenant PLUS TARD, même purement machine (relâchement d'un AU avec maintien
+       repris), consommera ce geste périmé et déclenchera une campagne. AC4 est donc satisfait dans le
+       cas testé (TC-107 : aucune tentative préalable) mais PAS dans le cas « tentative échouée puis
+       front tardif », couvert par AUCUN test. Gravité limitée (campagne bornée à 3 impulsions et
+       acquittement toujours no-op sur une cause encore Active) mais l'intention d'AC4 est affaiblie.
+       CORRECTIF MINIMAL PROPOSÉ (même région, aucun champ GVL/DUT donc hors cas d'arrêt) : durée de
+       vie du geste — effacer RearmSeqSeen si aucun front du contacteur n'est survenu dans les
+       CST_RearmGestureTtl (environ T#10s) suivant le front de séquence, plus 1 cas CI TC-T367-109.
+       ARBITRAGE HUMAIN EN ATTENTE : visa maintenu PENDING tant que ce point n'est pas tranché.
+    7. LIMITE DE PORTÉE DE LA PREUVE CI, ÉNONCÉE SANS EMBELLISSEMENT : run_tests.py n'exécute pas
+       source_prg — les 8 cas prouvent le MIROIR du §1c-1 dans FB_TestHarness_PRG_07.st, PAS le POU
+       réel. La preuve portant sur le fichier RÉEL est G521 (statique, 11 mutations refusées) plus la
+       lecture du diff par l'orchestrateur. La preuve comportementale DÉFINITIVE reste l'import
+       CODESYS et l'essai machine par l'exploitant.
+    8. DETTE MINEURE, cosmétique, aucun impact fonctionnel : 5 instances TON/R_TRIG déclarées sans le
+       préfixe inst (NC-010 dit inst<Rôle>). À noter que 2 R_TRIG non préfixés (SimBypassRise/Fall)
+       préexistent dans le même fichier et qu'un BLINK l'est (instBlink1Hz) : le style local est déjà
+       mixte et aucun gate ne le signale. Signalé, non corrigé.
+    9. ÉTAT : lot LIVRÉ, NON COMMITÉ. Visa PENDING en attente de l'arbitrage du point 6 et de la
+       confirmation des 4 valeurs (fenêtre de boot 30 s, stabilisation 3 s, 3 impulsions, intervalle 1 s).

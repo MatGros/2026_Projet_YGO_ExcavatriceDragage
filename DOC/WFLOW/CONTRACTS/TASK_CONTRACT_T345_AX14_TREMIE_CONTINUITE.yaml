@@ -1,0 +1,147 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T345 « AX14 vers AX15A : continuite sans a-coup »
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# Diagnostic complet : DOC/WFLOW/CONTRACTS/PLAN_T345_AX14_TREMIE_L3_CANDIDAT.md
+# Plan parent (prioritaire) : DOC/WFLOW/CONTRACTS/PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md
+# ⚠️ ETAT : BLOQUE. Ce contrat fige les objectifs et les criteres AVANT tout code, pour que le
+#    jour ou L3 sera rouvert le lot ne puisse pas etre livre sur une simple lecture statique.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T345_AX14_TREMIE_CONTINUITE
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Un operateur qui maintient un geste sur le joystick depuis la mise en position P1 jusqu'a
+    l'arrivee a la tremie traverse cette arrivee sans temps mort et sans a-coup, parce que la
+    transition AX14 vers AX15A s'arme sur un fait d'arret confirme publie par l'axe, et non sur un
+    relachement du joystick exige de l'operateur. Le comportement observable change : a l'arrivee a
+    la tremie, l'etape suivante peut s'enchainer sous le geste maintenu, tout en conservant une
+    preuve d'arret avant toute ouverture de benne.
+
+  acceptance:
+    - id: AC1
+      statement: "Geste maintenu de la mise en position P1 jusqu'a l'arrivee tremie : aucun front montant de M3_CommandWord ni de M3_SetpointFrequencyHz n'apparait pendant la fenetre de confirmation d'arret."
+      verified_by: "Trace 10 ms, scenarios A et B du protocole PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md, colonnes mot de commande, consigne de frequence, frequence reelle, verrou d'arrivee de l'axe"
+    - id: AC2
+      statement: "Le mot de commande reste non nul pendant toute la deceleration d'arrivee : aucun passage a zero avant confirmation que la frequence reelle est inferieure ou egale a 0,5 Hz."
+      verified_by: "Trace 10 ms, comparaison de M3_CommandWord et M3_ActualFrequencyHz ; le rapport du banc porte une frequence reelle constamment nulle, donc l'assertion doit aussi etre jouee en CI avec les entrees injectees"
+    - id: AC3
+      statement: "La transition AX14 vers AX15A s'arme uniquement sur un fait d'arret confirme publie par l'axe, jamais sur le seul jeton de position M3_AtTremieStable, qui est un latch persistant."
+      verified_by: "Test CI du domaine G_CYCLE avec Translation_At_Tremie injecte a TRUE et sans fait d'arret : la transition ne doit pas se produire ; le test doit echouer si la garde revient sur le seul jeton"
+    - id: AC4
+      statement: "La transition n'exige aucun retour au neutre : le geste de translation maintenu suffit, et l'enchainement vers l'ouverture de benne se fait sous le meme geste sans temps mort."
+      verified_by: "Test CI neuf, rouge avant correctif et vert apres, assertion sur l'etape courante sur des scans consecutifs"
+    - id: AC5
+      statement: "L'attente d'arret a l'arrivee tremie est bornee : un timeout provoque un repli sur AX_STAB avec defaut latche, jamais un maintien indefini."
+      verified_by: "Test CI d'injection de timeout ; reference de la lecon A14 du plan parent, ou le modele AX3 porte lui-meme un timeout desarme"
+    - id: AC6
+      statement: "Au scan de bascule vers AX15A, les demandes benne et treuils sont a zero : aucune demande de mouvement ne survit au changement d'etape."
+      verified_by: "Test CI capturant WinchM1Cmd, WinchM2Cmd, TranslationCmd et BucketCmd au scan de transition"
+    - id: AC7
+      statement: "Le message adresse a l'operateur en AX14 correspond au geste reellement exige par la porte : plus d'instruction de relachement si la porte ne l'exige plus."
+      verified_by: "Relecture de OperatorAction de la branche d'arrivee AX14 contre l'expression de la porte, apres correctif"
+    - id: AC8
+      statement: "La mesure precedant ce lot existe : la trace 10 ms a ete produite et depouillee, et elle etablit si la confirmation d'arret de 500 ms est atteignable sous intermittence du capteur."
+      verified_by: "Livrables de T348, contrat TASK_CONTRACT_T348_TRACE_M3_10MS_L0.yaml : CSV des scenarios A, B et C plus conclusion chiffree sur D3 et D4. Sans ces livrables, ce contrat ne peut pas passer en IN_PROGRESS"
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/
+      - DOC/WFLOW/CONTRACTS/PLAN_T345_AX14_TREMIE_L3_CANDIDAT.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/CODE_DiffBundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - la porte de transition AX2 vers AX3, garde de T319 : ne pas defaire sans garde equivalente
+      - la porte de sortie AX15A vers AX15B
+      - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/GVL_PERSISTENT.st
+      - la variable TranslationStopTimer et son temporisateur : elle sert aussi a la porte AX2 et ne doit pas etre retiree
+      - tout fichier des perimetres T347, T348, T349, T334, T331, T295 et T346
+      - toute levee de gel de la porte AX14 sans decision humaine D4 tracee
+
+  conservation:
+    must_survive:
+      - "Le verrou d'arret dans l'axe, arme par la seule detection d'arrivee"
+      - "La confirmation d'arret avant toute ouverture de benne a la tremie"
+      - "Le temporisateur TranslationStopTimer et son usage par la porte AX2"
+      - "Le retrait de la demande de translation au changement d'etape, exigence du veto SEMI_AUTO"
+      - "Le jeton de position M3_AtTremieStable tel quel, y compris sa restauration persistante au demarrage"
+    dropped_on_purpose:
+      - "L'exigence de relachement du joystick a l'arrivee tremie, uniquement si la decision humaine D4 la leve explicitement"
+
+  evidence_required:
+    - trace_10ms_analyse
+    - ci_before_after
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Ce contrat est BLOQUE et le reste tant que les jalons du plan parent ne sont pas franchis.
+    Toute tentative de le faire passer en cours avant ces jalons est une alerte a remonter, pas une
+    initiative a prendre. Les blocages sont nommes dans le bloc blockers ci-dessous, avec leur
+    source : aucune n'est une appreciation d'agent.
+
+  blockers:
+    - id: B1
+      statement: "Le lot L1 de code du plan parent n'est pas ouvert : la decision humaine D1 n'a jamais ete donnee."
+      source: "PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md section 8, ligne D1 ; section 3, ligne du lot L1"
+    - id: B2
+      statement: "Le lot L2 de code n'est pas ouvert : il exige L1 prouve, le verrou T331 libere et la decision humaine D5. Aucun des trois n'est acquis."
+      source: "PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md section 3, ligne du lot L2 ; section 8, ligne D5 ; alerte A18"
+    - id: B3
+      statement: "La decision humaine D3 sur l'arrivee nominale a la tremie n'est pas tranchee : elle conditionne l'exposition du frein pendant le maintien de la demande."
+      source: "PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md section 6, question Q7 ; section 8, ligne D3"
+    - id: B4
+      statement: "La decision humaine D4 n'est pas prise. La recommandation du plan parent est d'ABANDONNER l'uniformisation du neutre et de documenter l'asymetrie pour l'operateur."
+      source: "PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md section 8, ligne D4"
+    - id: B5
+      statement: "La mesure manque : les trois experiences du protocole de trace 10 ms n'existent pas dans le depot, et les traces M3 existantes ont un pas median de 100 ms, donc aveugles a l'echelle de un a dix scans."
+      source: "PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md section 1 ; tache T348 creee pour ce prealable"
+    - id: B6
+      statement: "Le lot jumeau est deja arrete sous le nom uniformiser AX2 et AX14 sur le modele AX3, sur verdict de challenge independant."
+      source: "TASKS_ORCHESTRATOR.yaml entrees T334 Phase 2 et section 10bis ; PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md section 9"
+
+status: BLOCKED
+
+execution:
+  executed_by: "DSH15"
+  completed_at: "—"
+  status: BLOCKED
+  summary: >
+    Aucun code ecrit. Le brief T345 a ete challenge avant implementation. Verdict : la porte de
+    transition AX14 vers AX15A est gelee par un arbitrage humain du meme jour, que le brief ignorait.
+    Le correctif propose retire par ailleurs la confirmation d'arret de 500 ms, alors que le pattern
+    de reference qu'il invoque, la porte AX2 issue de T319, la conserve. Livrables de ce lot :
+    requalification de T345 en candidat L3 avec diagnostic complet source, contrat du prealable de
+    trace 10 ms, et tracage de la trouvaille d'affichage AX15A en tache distincte.
+  evidence_submitted:
+    - "PLAN_T345_AX14_TREMIE_L3_CANDIDAT.md : diagnostic et requalification"
+    - "TASK_CONTRACT_T348_TRACE_M3_10MS_L0.yaml : prealable de mesure"
+    - "TASK_CONTRACT_T349_AX15A_AFFICHAGE_GESTE.yaml : trouvaille annexe tracee"
+    - "check_task_contract.py : PASS 0 erreur 0 avertissement sur les trois contrats"
+
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: "—"
+  notes: >
+    Le deblocage de ce contrat releve d'une decision humaine, pas d'un arbitrage d'agent. Ordre
+    impose par la preuve : mesurer, puis faire posseder l'arret par l'axe, puis aligner le demandeur,
+    et seulement alors reevaluer le neutre de cette porte.

@@ -217,6 +217,23 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     # pas entrer dans le bloc de recalage, la mesure doit preceder le recalage, les 5 reperes doivent
     # rester servis, et le cas d'incident doit prouver que la position est RECALEE malgre le temoin.
     ("C", "520", "G520 - Recalage M3 : le temoin d'anomalie ne conditionne jamais la correction (T361)", [sys.executable, f"{S}/G520_check_recalage_anomaly_not_blocking.py", "."]),
+    # T367 - L'acquittement AUTOMATIQUE des defauts latches est un geste SANS appui operateur : il
+    # n'est admissible que dans 2 situations bornees (demarrage a froid apres transitoire d'E/S, et
+    # rearmement AU reellement initie par l'operateur). Le contacteur de puissance PEUT s'engager
+    # sans geste (relachement d'un AU avec maintien repris, chaine fermee, bypass de mise en
+    # service) : le declencheur doit rester une SEQUENCE D'ARMEMENT demarree (front de Step), et la
+    # memoire du geste ne doit JAMAIS etre re-armee par un niveau de sequence. G521 verrouille cet
+    # invariant, le bornage des campagnes (3 impulsions, fenetre de boot) et les 3 preuves CI
+    # (comptage exact, non-masquage d'une cause encore Active, front brut du contacteur sans effet).
+    ("C", "521", "G521 - Acquittement automatique borne, jamais declenche par une entree materielle (T367)", [sys.executable, f"{S}/G521_check_fault_reset_not_hw_triggered.py", "."]),
+    # T371 : le diagnostic mouvement (ST_MotionChecklist) doit refleter le refus REEL de la barriere
+    # finale. `Step8_OutputInterlockOk` ne doit JAMAIS etre derive du seul `FinalInterlockError`
+    # (alimente par une seule cause, ErrorId bit0 = timeout frein). 4 modes de refus laissaient le
+    # voyant vert : F1 RestartInhibit, F2 ContactorStuckLatched, F3 SafeStop/PermitFinalBlocked (ou
+    # State reste READY), F4 RestartRequired/DeadTimePending (ou Reason reste NONE). G522 verrouille la
+    # lecture de l'ETAT publie sur les 3 axes, la conservation de `Step8_OutputInterlockOk`, la
+    # publication etat/cause et l'interdiction de toute consommation de CONDUITE (latence N-1).
+    ("C", "522", "G522 - Diagnostic mouvement : Step8 ne lit jamais le seul FinalInterlockError (T371)", [sys.executable, f"{S}/G522_check_step8_interlock_not_truncated.py", "."]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]

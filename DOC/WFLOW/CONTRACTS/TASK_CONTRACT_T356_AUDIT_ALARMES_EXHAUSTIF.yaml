@@ -1,0 +1,122 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T356 : audit exhaustif de la chaine alarmes (process + safety)
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+
+contract:
+  task_id: T356_AUDIT_ALARMES_EXHAUSTIF
+  criticality: C2
+  strategy: patch            # audit pur : aucune ligne de CODE/ ecrite dans ce lot
+
+  objective: >
+    Etablir l'etat des lieux chiffre et prouve de la chaine alarme de l'automate : pour chaque defaut
+    process et safety identifiable dans CODE/, determiner par lecture du code source s'il remonte au
+    carrousel d'alarme de l'IHM (FB_Hmi_BannerFormatter.st / AlarmArray), s'il porte un message
+    utilisateur, et s'il est silencieux — afin que l'humain puisse decider des corrections dans des
+    taches separees, sans qu'aucune ligne de CODE/ ne soit modifiee dans ce lot.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Un script Python d'inventaire existe sous TOOLS/AGENT_WORKFLOW/scripts/T356_scan_alarm_candidates.py,
+        parcourt les 262 fichiers CODE/*.st et produit un CSV de candidats brut (un nom de variable par
+        ligne, avec fichier:ligne de declaration), verifiable en relancant la commande et en comparant
+        le nombre de lignes du CSV produit.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/T356_scan_alarm_candidates.py . --out <dossier> ; le script affiche le nombre de fichiers scannes et de lignes ecrites"
+    - id: AC2
+      statement: >
+        Chaque ligne du CSV brut est qualifiee dans un tableau unique portant les 9 colonnes demandees
+        par le brief (Domaine, Nom du defaut, declaration, ecriture du bit, remontee banniere, message
+        utilisateur, silencieuse, categorie securite, remarque), chaque cellule « OUI » etant adossee a
+        une preuve fichier:ligne verifiable par grep.
+      verified_by: "DOC/WFLOW/AUDITS/T356_ALARMES_20260921/T356_qualification_defauts.csv (119 lignes) + DOC/WFLOW/AUDITS/AUDIT_T356_ALARMES_EXHAUSTIF_20260921.md section 6 ; chaque preuve citee est relisible par grep sur CODE/"
+    - id: AC3
+      statement: >
+        La synthese en tete du document donne le nombre total de candidats scannes, le nombre de defauts
+        silencieux, le nombre de defauts safety silencieux et le taux de couverture du script, avec la
+        liste des cas atypiques manques par le premier passage du script.
+      verified_by: "DOC/WFLOW/AUDITS/AUDIT_T356_ALARMES_EXHAUSTIF_20260921.md section 1 (tableau de synthese + tableau de taux de couverture)"
+    - id: AC4
+      statement: >
+        Le sens inverse est verifie : chaque affectation AlarmArray du carrousel est reliee a un
+        producteur reel, et les entrees qui ne peuvent jamais s'allumer sont listees avec leur preuve.
+      verified_by: "DOC/WFLOW/AUDITS/AUDIT_T356_ALARMES_EXHAUSTIF_20260921.md section 4 (7 entrees [DIVE] et 4 entrees [EXTRACTION]) + PRG_07_Supervision.st:772-773"
+    - id: AC5
+      statement: >
+        Le document declare explicitement si la notion de « message d'action utilisateur » existe comme
+        mecanisme dans le code, au lieu de forcer un rapprochement avec les textes d'etape du bandeau.
+      verified_by: "DOC/WFLOW/AUDITS/AUDIT_T356_ALARMES_EXHAUSTIF_20260921.md section 5"
+    - id: AC6
+      statement: >
+        Aucun fichier de CODE/ n'est modifie par le lot : la commande git status --short -- CODE/ ne
+        retourne aucune ligne.
+      verified_by: "git status --short -- CODE/ (sortie vide, collee dans la restitution)"
+    - id: AC7
+      statement: >
+        Le script d'inventaire n'est pas branche comme gate bloquant dans run_all_gates.py (audit
+        ponctuel) et reste reutilisable pour une re-verification apres correctifs.
+      verified_by: "grep de T356_scan_alarm_candidates dans TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py (aucune occurrence)"
+
+  scope:
+    allowed:
+      - TOOLS/AGENT_WORKFLOW/scripts/T356_scan_alarm_candidates.py
+      - DOC/WFLOW/AUDITS/AUDIT_T356_ALARMES_EXHAUSTIF_20260921.md
+      - DOC/WFLOW/AUDITS/T356_ALARMES_20260921/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T356_AUDIT_ALARMES_EXHAUSTIF.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - TOOLS/AGENT_WORKFLOW/status/
+    forbidden:
+      - TOUT fichier de CODE/ (lecture seule stricte — audit pur)
+      - CODE_XML/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/CONTRACTS/BRIEF_T356_AUDIT_EXHAUSTIF_ALARMES.md
+      - DOC/AF/
+      - tout scratch a la racine du depot
+
+  evidence_required:
+    - script_inventaire            # T356_scan_alarm_candidates.py + CSV produits
+    - tableau_qualifie             # 9 colonnes, 119 lignes, preuves fichier:ligne
+    - synthese_chiffree            # total / silencieux / safety silencieux / taux de couverture
+    - verification_inverse         # entrees de carrousel sans producteur
+    - git_status_code_vide         # preuve zero modification de CODE/
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, defaut safety silencieux, risque hors
+    scope) est remonte IMMEDIATEMENT, en tete de synthese pour les defauts safety silencieux, jamais
+    enterre dans un paragraphe de conclusion et jamais corrige spontanement dans ce lot.
+
+status: COMPLETED
+
+execution:
+  executed_by: "DSH21 (DeepSeek/DSH — session T356)"
+  completed_at: "2026-09-21T02:46:35+02:00"
+  status: COMPLETED
+  summary: >
+    AUDIT LIVRE, ZERO LIGNE DE CODE/ ECRITE (git status --short -- CODE/ vide, HEAD c9e1fbfe). Script
+    d'inventaire a 7 etages ecrit et execute (262 fichiers, 572 candidats declarations, 82 causes reelles,
+    30 bits ErrorId ad hoc, 116 libelles de carrousel, 2676 references). Qualification de 119 defauts
+    traces fichier:ligne. CHIFFRES CLES : 25 defauts totalement silencieux dont 16 safety (15 safety nets
+    apres retrait des 4 slots volontairement inertes documentes), 54 defauts muets au carrousel, 35 sans
+    aucun message utilisateur, 15 visibilites partielles dont 14 safety, 11 entrees de carrousel fantomes.
+    ECART CRITIQUE : la bande d'ecart de synchronisation M1/M2 entre 6,0 m (seuil du bit 2 FB_WinchSync,
+    LATCHE) et 7,0 m (seuil de Meca E, seul libelle) est totalement muette pour l'operateur. Taux de
+    couverture du script : 7 causes atypiques (index symboliques CST_Cause* de FB_CycleMachineHoming)
+    manquees au premier passage, recuperees par lecture puis mecanisees — trou prouve, pas suppose.
+    Le script n'est PAS branche dans run_all_gates.py (audit ponctuel) et reste reutilisable.
+  evidence_submitted:
+    - "T356_scan_alarm_candidates.py : 262 fichiers scannes, 8 CSV + 1 JSON produits"
+    - "T356_qualification_defauts.csv : 119 lignes qualifiees, 9 colonnes + preuves fichier:ligne"
+    - "AUDIT_T356_ALARMES_EXHAUSTIF_20260921.md : synthese chiffree, 10 ecarts classes par gravite, tableau exhaustif par domaine, verification inverse, limites"
+    - "git status --short -- CODE/ : VIDE (preuve de non-modification)"
+
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: "—"
+  notes: >
+    En attente de validation humaine. Aucun commit effectue. Les 8 lots de correction proposes au
+    paragraphe 10 du rapport ne sont PAS implementes : chacun fera l'objet d'un contrat separe.

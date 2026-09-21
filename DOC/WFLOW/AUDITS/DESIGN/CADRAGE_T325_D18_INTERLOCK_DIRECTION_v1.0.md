@@ -1,5 +1,102 @@
 # 🔀 Cadrage T325 — Interlock direction treuils (D18) : 3 défauts, correctifs proposés
 
+---
+
+## 🔄 MISE À JOUR 2026-09-21 — ÉTAT RÉEL DU CODE (AJOUT SEUL)
+
+> **Nature de ce bloc** : **AJOUT en tête du document**. Rien n'est supprimé, rien n'est réécrit, aucune
+> section n'est renumérotée : **toute l'analyse d'origine ci-dessous reste dans son état v1.0**. Ce bloc
+> n'existe que pour empêcher la fiche de servir de **source d'erreur** : deux de ses constats sont
+> **périmés**, et ses renvois de lignes ont **dérivé**.
+> **Ancrage** : vérifié à `HEAD = 25101c0b` par **DSH28** (mission T224, lecture seule).
+> **Source** : `DOC/WFLOW/AUDITS/DESIGN/DIAGNOSTIC_T224_ARMINGPERMIT_20260921.md` (§C34, §4.3).
+
+### 1. ✅ **Défaut 2 — CORRIGÉ à HEAD** (tableau §2 et §3 PÉRIMÉS sur ce point)
+
+**La purge de `DeadTimeArmed` est désormais ATTEIGNABLE.** L'ordre des branches a été inversé :
+
+| Position | Branche | État |
+|---|---|---|
+| `CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st:132` | `ELSIF DirectionChangeDelay.Q THEN` → `DirectionChangePending := FALSE; DeadTimeArmed := FALSE;` | **atteignable — évaluée EN PREMIER** |
+| `CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st:140` | `ELSIF DeadTimeArmed THEN` → `DirectionChangePending := TRUE;` | **n'est plus prioritaire** |
+
+- Le commentaire du code le dit lui-même (`:133-135`) : *« purge desormais atteignable — le temps mort
+  minimal a ete respecte, il ne doit pas rester arme indefiniment une fois le delai reellement ecoule »*.
+- Commit : **`657be973`** (2026-09-20), *« wip(treuils): purge DeadTimeArmed atteignable des que le delai
+  est ecoule (D18, T325 phase 1) [NON TESTE] »*. **Vérifié** :
+  `git merge-base --is-ancestor 657be973 HEAD` → **0** (ancêtre de HEAD confirmé).
+- ⚠️ **Inutile de re-scoper le correctif proposé en §3** (inversion `DirectionChangeDelay.Q` avant
+  `DeadTimeArmed`) : **il est appliqué**. La question ouverte en fin de §3 (*« le `DeadTimeArmed` doit-il
+  imposer un délai minimum incompressible ? »*) **reste posée**, mais elle n'est plus un blocage : le
+  comportement livré est celui du correctif proposé.
+- ⚠️ **Marqué `[NON TESTE]`** : corrigé dans le code, **jamais validé machine**. La distinction
+  « corrigé » / « validé » doit rester explicite.
+- 🚨 **Conséquence documentaire** : la ligne *« purge inatteignable »* du tableau **§2** (Défaut 2) et
+  **l'intégralité de la §3** décrivent un état de code **qui n'existe plus** — à lire comme un
+  historique, pas comme un constat. Dette déjà cataloguée (`DOC/WFLOW/TASKS.yaml:316`, relevée par T351
+  §10/§14).
+
+### 2. ⚠️ **Défaut 1 — corrigé (`6f708b22`) mais TOUJOURS NON TESTÉ CODESYS**
+
+Inchangé depuis la rédaction. Corroboration trace inchangée (trace 62/63 ≈ **805 ms** ≈ `T#800ms` ;
+trace 65 après correctif ≈ **100 ms**). Complément de datation relevé par T224 : **`e638308f`**
+(*« corrige debordement TIME D18 + deborne affichage ouverture benne »*) est également ancêtre de HEAD
+(`git merge-base --is-ancestor e638308f HEAD` → 0).
+
+### 3. 🔴 **Défaut 3 — TOUJOURS OUVERT à HEAD**, et **lignes citées DÉCALÉES**
+
+**Verdict : le mécanisme est toujours présent.** Mais les renvois du tableau §2
+(`PRG_04_Treuils_Benne.st:1360-1361` et `:1452-1453`) **ne pointent plus sur la garde croisée** à HEAD —
+vérifié : `:1452-1453` = `M1WinchCfg.DirectionInterlockDelayAscent := T#800ms;` /
+`…Descent := T#500ms;`, et `:1360-1361` = des arguments de l'appel `instWinchLoadEstimatorM1`.
+**Lignes réelles de la garde à HEAD :**
+
+| Ligne HEAD | Rôle |
+|---|---|
+| `PRG_04_Treuils_Benne.st:1405-1406` | `WinchBothMotionReady := NOT (instWinchM1.DirectionChangePending OR instWinchM2.DirectionChangePending) AND NOT instWinchM1.Fault.Latched AND NOT instWinchM2.Fault.Latched;` — **le verrou d'atomicité de démarrage couplé** |
+| `PRG_04_Treuils_Benne.st:1407-1409` | **Gel de M1** si M2 est en `DirectionChangePending` ou latche : `ReqM1Winch.RunRequest/ReqAscent/ReqDescend := FALSE; SpeedStepReq := 0` |
+| `PRG_04_Treuils_Benne.st:1499-1501` | **Gel réciproque de M2** si M1 est en pending/latche (cas symétrique du REX, commentaire `:1496-1498`) |
+| `PRG_04_Treuils_Benne.st:1541` | **2ᵉ calcul** de `WinchBothMotionReady` |
+| `PRG_04_Treuils_Benne.st:1663` | Consommation : `AND (NOT WinchBothMotionReady OR NOT WinchBothFinalRequestsCoherent)` |
+| `PRG_04_Treuils_Benne.st:396` | **Garde compensatoire** `WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;` ⚠️ **FAUSSE quand `Busy = TRUE`** ⇒ **inerte dans précisément le cas où on l'attend** (instruit par **T354**, `TROUBLESHOOTING_T354_ASYMETRIE_GARDE_M1_M2_20260921.md:22`, `:36-37`) |
+
+**Ce qui reste à instruire** : la règle du code est de *« figer UNIQUEMENT le treuil PRÊT, jamais celui
+qui purge son dead-time »* (`:1400-1404`) — le gel est donc conçu pour **ne pas** créer d'interblocage.
+Le risque résiduel est le cas où **les deux** sont en `DirectionChangePending` au même scan : `:1407` gèle
+M1 et `:1499` gèle M2 ⇒ les **deux** demandes sont zerotées, ce qui **efface leur propre `DeadTimeArmed`**
+(`NOT RequestActive`). Le §2 concluait déjà *« pas encore observé en trace, à vérifier par Watch »* :
+**c'est toujours le cas à HEAD — ni confirmé, ni réfuté.** ⇒ À instrumenter, pas à trancher sur lecture :
+`RampTargetStep`, `instWinchM1/M2.DirectionChangePending` et `DirectionInterlock.DeadTimeArmed` sont
+désormais dans la procédure `DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_T224_ARMINGPERMIT_10MS.md` (groupes **B**/**C**).
+
+### 4. ⚠️ **AC1 (§1) — le quiproquo des valeurs de tempo est maintenant EXPLIQUÉ, pas seulement constaté**
+
+La §1 relevait trois sources divergentes (`AF-10 v2.1` : `900/400 ms` + `RestartDelay 1500 ms` ; fiche
+`FB_WinchOutputInterlock_v1.0` : 1 s ; code : `800/500 ms` + `RestartDelay` **500 ms** +
+`DeadTimeSameDir/OppositeDir` **500/700 ms**). **Ajout de fait** : le `1500 ms` **n'est pas une coquille
+documentaire** — il correspond exactement à la valeur portée par le **lot T228**, aujourd'hui **annulé** :
+`git show 72ce5eec:CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st:227` → `RestartDelay(…, PT := T#1500ms)`,
+alors que HEAD porte **`T#500ms`** (`:224`, et `:151`). Le revert `263fae18` a restauré `500 ms` **sans
+réaligner** les documents ⇒ les valeurs de `AF-08:384`, du contrat T224 (`l.76`) et du contrat T228
+(`l.87`) sont des **reliquats du lot annulé**. **Référence de fait à HEAD : le code** (les fiches AF
+devront être réalignées *après* validation machine, jamais l'inverse — principe déjà posé en §1).
+
+### 5. 🧭 Distinction des 2 familles avec T224 (inchangée, désormais instrumentée)
+
+| Famille | Mécanisme | Où | Preuve à HEAD |
+|---|---|---|---|
+| **1 — aval (T224)** | commande **émise**, puis refusée par un interlock aval | `FB_WinchOutputInterlock` / `FB_TranslationOutputInterlock` (dans `PRG_06`) | `FB_WinchOutputInterlock.st:393-404` (coupure muette), `:424-430` (tempo) ; `PRG_06:439-440` (M3) |
+| **2 — amont (T325/D18)** | commande **jamais formée** | `FB_WinchDirectionInterlock` → `FB_Winch` | `FB_Winch.st:216-217` : `IF DirectionChangePending OR … THEN RampTargetStep := 0;` |
+
+Le diagnostic T224 a établi que ces deux familles **ne sont pas mesurables** avec les traces existantes
+(`RampTargetStep` n'était tracé **nulle part**) et que la famille 2 est **minoritaire** sur la trace 67
+(45 échantillons sur 368) — corroboré par `TROUBLESHOOTING_MAINT_COUPLE_INTERLOCK_TRACE64_20260920.md:35`/`:42`
+qui **écarte D18 seul**.
+➡️ **Suite** : appliquer `DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_T224_ARMINGPERMIT_10MS.md`, puis arbitrer le
+périmètre correctif (Étape B) **sur la mesure** — pas sur cette fiche.
+
+---
+
 > 📌 Livrable T325 (contrat `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T325_D18_NEUTRE_ANALYSE_RISQUE.yaml`).
 > **Aucune ligne de code ST modifiée par cette fiche** — un seul correctif (Défaut 1) est déjà
 > committé et non testé (`6f708b22`), les deux autres (Défauts 2 et 3) sont proposés ici pour

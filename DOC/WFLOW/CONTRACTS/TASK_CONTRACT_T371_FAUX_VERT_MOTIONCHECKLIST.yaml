@@ -1,0 +1,304 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# T371 — Faux vert du diagnostic mouvement (ST_MotionChecklist / FB_TroubleshootingView)
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Genese : brief utilisateur BRIEF_T371_FAUX_VERT_MOTIONCHECKLIST.md (87 l., JAMAIS transmis).
+# CHALLENGE AVANT TRANSMISSION : DOC/WFLOW/AUDITS/DESIGN/CHALLENGE_T371_FAUX_VERT_20260921.md
+#   -> borne v1 REFUTEE (les sorties Reason/State existent deja et sont deja routees) ;
+#   -> brief corrige en BRIEF_T371_FAUX_VERT_MOTIONCHECKLIST_v2_TRANSMISSION.md (preambule inline §0).
+# ARBITRAGES HUMAINS 2026-09-21 (rendus sur le challenge) : correctif COTE CONSOMMATEUR SEUL ;
+#   FB_WinchOutputInterlock.st INTOUCHE (git diff VIDE = preuve) ; 3 AXES M1/M2/M3 ;
+#   latence N-1 documentee, usage DIAGNOSTIC UNIQUEMENT ; bloque_par laisse VIDE
+#   (T371 est independant de la trace T224 : le faux vert se prouve en CI isolee).
+#
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T371_FAUX_VERT_MOTIONCHECKLIST
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Rendre le diagnostic de mouvement (MotionM1 / MotionM2 / MotionM3 publies par
+    FB_TroubleshootingView dans GVL_Troubleshooting) fidele au refus reel de la barriere finale
+    (FB_WinchOutputInterlock) : Step8_OutputInterlockOk cesse d'afficher « interlock OK » alors que
+    la barriere coupe effectivement la commande. PORTEE EXACTE, SANS EMBELLISSEMENT : decision
+    corrigee sur M1 et M2 ; sur M3, publication de l'etat et de la cause seulement, la decision
+    restant inchangee (angle mort declare, tache T373). Ce lot ne change AUCUN comportement machine :
+    il ne touche ni la conduite ni la securite, il cesse de TRONQUER un etat deja publie. NB : le
+    bilan global AllConditionsMet n'etait PAS faux-vert (Step7_BrakeReleased etait deja FALSE dans
+    les 4 modes de refus) — le defaut reel est un INDICATEUR QUI MENT, pas un bilan trompeur.
+
+  acceptance:
+    - id: AC1
+      statement: "Les 4 modes de refus (F1 RestartInhibit, F2 ContactorStuckLatched, F3 SafeStop/PermitFinalBlocked, F4 RestartRequired/DeadTimePending) sont reproduits en CI et Step8_OutputInterlockOk y vaut TRUE AVANT correctif. PORTEE CORRIGEE PAR L'ORCHESTRATEUR 2026-09-21T15:50 : AllConditionsMet n'est PAS vise par cet AC — il etait DEJA FALSE dans les 4 modes, le terme Step7_BrakeReleased etant faux (RelayFwd/RelayRev forces a FALSE en FB_WinchOutputInterlock.st:347-348 -> BrakeCmd :487 FALSE). Le defaut reel est un INDICATEUR QUI MENT, pas un bilan global faux."
+      verified_by: "execution CI du fichier TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/tests/test_fb_troubleshootingview.st AVANT correctif, sortie ROUGE collee = 5 echecs d'ASSERTION FONCTIONNELLE (TC-P14-TSV-06..10 : 'expected FALSE, got TRUE'), cas construits sur Fault.Error = FALSE + demande VIVANTE + sortie VALIDEE coupee. JAMAIS une erreur de compilation."
+    - id: AC2
+      statement: "Apres correctif, aucun des 4 modes F1-F4 ne produit Step8 = TRUE, ET aucun cas nominal ne produit de faux rouge (cause memorisee, verts nominaux M1/M2/M3)."
+      verified_by: "meme fichier CI, sortie VERTE collee : 17/17 PASS, dont TC-P14-TSV-16 (cause memorisee apres acquittement -> Step8 reste VERT) et TC-P14-TSV-17 (nominaux M2/M3)"
+    - id: AC3
+      statement: "FB_WinchOutputInterlock.st n'est pas modifie d'une seule ligne (ni code, ni commentaire, ni VAR_OUTPUT)."
+      verified_by: "git diff --stat -- CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st => VIDE ; git diff --numstat idem => 0 0"
+    - id: AC4
+      statement: "Non-regression des 3 causes de la barriere et de la remise a NONE : State, Reason, ErrorId, Fault.Error, RelayFwd, RelayRev, BrakeCmd, AuthorizedStep sont IDENTIQUES avant/apres."
+      verified_by: "cas CI pilotes sur FB_WinchOutputInterlock seul (RESTART_INHIBITED l.362, SENSE_DROP_TIMEOUT l.372, BRAKE_COMMAND_NOT_CONFIRMED l.508, NONE l.210), comparaison valeur a valeur avant/apres"
+    - id: AC5
+      statement: "Perimetre reel des 3 axes, ENONCE SANS EMBELLISSEMENT (reformule par l'orchestrateur 2026-09-21T16:20 apres finding F1 de la revue independante) : M1 et M2 = DECISION corrigee (predicat complet) ; M3 = PUBLICATION SEULE, la decision reste inchangee. Pour M3, `NOT (State = E_State.ERROR)` se reduit ALGEBRIQUEMENT a `NOT FinalInterlockError` puisque PRG_05_Translation.st:751-757 derive State de Fault.Error seul : le predicat M3 est bit-a-bit identique a l'avant-T371. Les refus M3 non-defaut (permis bloque, SafeStop, tempos) restent donc INVISIBLES — angle mort DECLARE et reporte a la tache T373."
+      verified_by: "diff de FB_TroubleshootingView.st montrant les 3 sites (M1, M2, M3) ; reduction booleenne verifiee sur PRG_05_Translation.st:751-757 ; la limite M3 est reprise dans ac_status.AC5, dans la note d'application section 2.5 et dans T373"
+    - id: AC6
+      statement: "Step8_OutputInterlockOk est CONSERVE (aucun renommage, aucune suppression) ; seuls 2 champs de LECTURE sont ajoutes au DUT : Step8_InterlockState et Step8_InterlockReason."
+      verified_by: "diff de CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_MotionChecklist.st + grep 'Step8_OutputInterlockOk' sur CODE/ (au moins les 3 affectations)"
+    - id: AC7
+      statement: "Aucune ligne de CONDUITE ne consomme les nouveaux champs : usage DIAGNOSTIC uniquement, la chaine producteur -> routeur -> consommateur final est nommee dans la restitution."
+      verified_by: "grep des nouveaux champs sur CODE/ : seuls ST_MotionChecklist.st et FB_TroubleshootingView.st apparaissent ; CODE/M_MAIN/* et toutes les GVL de commande absentes (CODE_QUALITY_STANDARDS.md 3ter)"
+    - id: AC8
+      statement: "Le contrat C4 existe AVANT toute ecriture de code et passe le controle automatique."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T371_FAUX_VERT_MOTIONCHECKLIST.yaml => PASS 0 erreur"
+    - id: AC9
+      statement: "Un garde-fou automatique empeche la reintroduction du faux vert (regle fix: + guard:)."
+      verified_by: "nouveau gate G5xx dans TOOLS/AGENT_WORKFLOW/scripts/ + ligne PLANS de run_all_gates.py + --selftest PASS (la mutation d'incident 'Step8 derive du seul FinalInterlockError' est rejetee)"
+    - id: AC10
+      statement: "La liaison reelle est prouvee mecaniquement et aucun gate n'est introduit en echec."
+      verified_by: "generate_codesys_bundle.py . + generate_codesys_diff_bundle.py . <fichiers touches> + G200_check_linkage.py --report (PASS 0 erreur, bloc colle) + run_all_gates.py --palier C (compte d'echecs PREEXISTANTS distingue des echecs introduits)"
+    - id: AC11
+      statement: "Aucun commit, aucun push, et aucun chemin hors table dans l'arbre de travail."
+      verified_by: "git status --short colle ; aucun commit dans git log -1"
+    - id: AC12
+      statement: "La latence N-1 de lecture (WinchMx.State.* projete en PRG_04 depuis l'instance PRG_06) est documentee dans le livrable et n'est jamais presentee comme une mesure temps reel."
+      verified_by: "lecture du livrable ; mention explicite de FB_WinchStateProjection appele PRG_04_Treuils_Benne.st:1688-1696"
+    - id: AC13
+      statement: "L'ouverture de compile du harnais CI (8 types manquants dans registry.yaml, echec PREEXISTANT a HEAD) est prouvee AVANT/APRES et ne peut jamais etre presentee comme la preuve ROUGE d'AC1."
+      verified_by: "git show HEAD:TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/reports/FB_TroubleshootingView.txt (8 erreurs 'Undefined type' + cascade 'Undeclared variable GVL_TROUBLESHOOTING' ; puis 8 -> 0 'Undefined type' apres correctif du registre) ; le ROUGE d'AC1 est une ASSERTION FONCTIONNELLE en echec, JAMAIS une erreur de compilation"
+    - id: AC14
+      statement: "Le correctif de registry.yaml est PUREMENT ADDITIF, sans reordonnancement, et strictement cantonne a l'entree FB_TroubleshootingView."
+      verified_by: "git diff --numstat -- TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml => 12 0, attribue par hunks : 10 lignes de CE lot dans l'entree FB_TroubleshootingView (8 types + 2 declarations de mock) + 2 lignes TIERCES (E_CycleDepthStopMode dans les entrees PRG_03_Modes_Cycle et WINCH_INTEG, dette T299 preexistante) ; aucune autre entree touchee par le lot ; les chemins pointent vers des fichiers existants"
+    - id: AC15
+      statement: "L'extension CI (2 mocks GVL miroir + leurs 2 lignes de registre) est RATIFIEE par l'orchestrateur, tracee, et strictement test-only."
+      verified_by: "decision orchestrateur 2026-09-21T15:55 (arbitrage humain Q1) ; TOOLS/TEST_AUTO_CI/MOCKS/MOCK_GVL_IHM.st et MOCK_GVL_Troubleshooting.st presents ; jamais compiles dans CODESYS (MOCKS/ exclu du bundle) ; dette tracee = miroir a maintenir, une derive casse la COMPILATION, jamais un resultat vert"
+
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_MotionChecklist.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/tests/test_fb_troubleshootingview.st
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml   # ELARGI PAR L'ORCHESTRATEUR 2026-09-21 : lignes ADDITIVES dans l'entree FB_TroubleshootingView uniquement (8 types manquants + 2 declarations de mock ; echec de compilation PREEXISTANT a HEAD). Aucune autre entree touchee. Voir AC13/AC14.
+      - TOOLS/TEST_AUTO_CI/MOCKS/MOCK_GVL_IHM.st             # ELARGI 2026-09-21T15:55 — RATIFIE (arbitrage humain Q1). Test-only, jamais compile dans CODESYS. Voir AC15.
+      - TOOLS/TEST_AUTO_CI/MOCKS/MOCK_GVL_Troubleshooting.st # idem.
+      - TOOLS/AGENT_WORKFLOW/scripts/             # 1 gate guard G5xx + ligne PLANS de run_all_gates.py
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T371_FAUX_VERT_MOTIONCHECKLIST.yaml
+      - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T371_FAUX_VERT_MOTIONCHECKLIST.md
+      - DOC/WFLOW/TASKS.yaml                       # entree T371 UNIQUEMENT
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml          # entree T371 UNIQUEMENT
+      - TASK_LOCKS.json                            # verrou T371 uniquement
+      - TOOLS/AGENT_WORKFLOW/status/               # heartbeats
+      - CODE_XML/                                  # bundle + diff bundle
+    forbidden:
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st   # INTERDIT ABSOLU — git diff doit rester VIDE
+      - CODE/H_TREUILS_BENNE/FB_WinchStateProjection.st
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st       # verrous vifs T364/AGY01 et T291-B
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/**
+      - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/**
+      - CODE/B_AU_SECURITE/**
+      - CODE/L_SIMULATION/**
+      - CODE/GVL_PERSISTENT.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/AF/**
+      - DOC/STDS/**
+      - toute exemption/allowlist ajoutee a un gate
+      - tout scratch racine (.tmp_*, .dsh_tmp, tmp, .tmpsandbox, scratch, CODE_XML.freshness)
+      - toute ligne de CONDUITE consommant FinalInterlockState / FinalInterlockReason
+
+  conservation:
+    must_survive:
+      - "Les 3 causes de la barriere finale et leurs sites : RESTART_INHIBITED (FB_WinchOutputInterlock.st:362), SENSE_DROP_TIMEOUT (:372), BRAKE_COMMAND_NOT_CONFIRMED (:508), remise a NONE (:210)"
+      - "L'unique cause alimentant Fault.Error : ErrorId bit0 = timeout confirmation frein (:516-519, :528-532)"
+      - "Les 4 etats de refus F1-F4 et leur priorite dans la machine d'etat §5"
+      - "Step8_OutputInterlockOk conserve a l'identique pour l'IHM (aucun renommage)"
+      - "Les 8 etapes de ST_MotionChecklist et Step1..Step7 inchanges"
+      - "L'interface du DUT ST_MotionChecklist : aucun champ retire"
+    dropped_on_purpose:
+      - "La lecture tronquee Step8 := NOT FinalInterlockError (elle est la cause du faux vert, remplacee par une lecture honnete ; le booleen reste publie mais devient derive de State+Reason)"
+
+  evidence_required:
+    - "execution CI AVANT correctif (ROUGE) sur les 4 modes F1-F4"
+    - "execution CI APRES correctif (VERT) sur les memes 4 cas"
+    - "non-regression des 3 causes + NONE (valeurs avant/apres)"
+    - "git diff --numstat VIDE sur FB_WinchOutputInterlock.st"
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "diff bundle CODE_XML/CODE_DiffBundle.xml avec la liste des objets inclus"
+
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug preexistant, risque hors
+    scope) est remonte IMMEDIATEMENT a l'orchestrateur, pas a la fin et jamais silencieusement.
+    Signaler n'est pas elargir le scope. Cas d'arret immediat : un 5e mode de refus non couvert
+    par F1-F4, une sortie reellement manquante a la source, une dependance d'encapsulation,
+    un besoin d'elargir le perimetre, une divergence avec le challenge T371.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "DSH29"
+  model_used: "deepseek-v4.1-flash:cloud"
+  completed_at: "2026-09-21T15:10:00+02:00"
+  status: COMPLETED
+  summary: >
+    AC1 et AC2 ATTEINTS PAR EXECUTION apres levée des 2 murs CI preexistants (voir AC13) :
+    ROUGE = 5 FAIL FONCTIONNELS mesures avant correctif (TC-P14-TSV-06 F1, -07 F2, -08 F3, -09 F4,
+    -10 M2/F3 : 'ASSERT_FALSE Step8 expected FALSE, got TRUE'), VERT = 12/12 PASS apres correctif,
+    baseline TC-P14-TSV-01..05 preservee. L'erreur de compilation n'a jamais ete presentee comme
+    preuve rouge. AC3 (FB_WinchOutputInterlock.st git diff VIDE, blob identique a HEAD
+    14aa2c20aaae8a5890e20584041df4d7817c3617), AC4 (chaine de compilation de la barriere
+    IDENTIQUE a HEAD - 6 fichiers du registry.yaml:310-317, aucun des miens dedans - suite CI
+    barriere 7/11 PASS avec 4 FAIL PREEXISTANTS inchanges : TC-P10-013/-021/-022/-023a),
+    AC5 (3 axes traites), AC6 (Step8_OutputInterlockOk CONSERVE + 2 champs de LECTURE ajoutes au DUT
+    en FIN de STRUCT, types enumeres en vocabulaire commun = aucune conversion), AC7 (usage
+    diagnostic seul, verifie par G522), AC8 (contrat C4 PASS 0 erreur), AC9 (G522 + ligne PLANS
+    palier C + --selftest PASS : 12 mutations refusees), AC10 (bundle + diff bundle + G200 PASS +
+    palier C), AC11 (aucun commit, aucun push), AC12 (latence N-1 documentee, note section 4),
+    AC13 (les 2 murs levés : 8 types manquants + namespace GVL via 2 mocks miroirs ; le harnais
+    compile, 0 erreur), AC14 (PASS avec ecart declare : 10 lignes de moi + 2 fichiers de mock).
+    REVUE INDEPENDANTE read-only (agent distinct) : verdict BLOCK, 2 incidents REELS trouves puis
+    CORRIGES - (1) le temoin F3 de la 1re version etait TAUTOLOGIQUE (il comparait la DEMANDE
+    RelayFwd/RelayRev a elle-meme : State.RelayFwd/RelayRev viennent de FB_Winch,
+    FB_WinchStateProjection.st:102-103, et sont exactement les signaux envoyes a la barriere,
+    PRG_04:1603-1604, or MotorRequest implique deja XOR, FB_WinchOutputInterlock.st:182) donc F3
+    n'etait JAMAIS detecte et le cas de test 'passait' sur un etat impossible ; corrige en
+    s'appuyant sur la SORTIE VALIDEE BrakeCmd (FB_WinchStateProjection.st:108/:175 <- :487) et le
+    cas F3 a ete rendu realiste (RelayFwd := TRUE + BrakeCmd := FALSE) ; (2) G522 v1 etait un
+    overfit dont le --selftest devenait ROUGE au reformatage (mutations a ancres litterales +
+    _re_sub sans re.DOTALL) ; v2 = ancres regex + DOTALL + 2 controles nouveaux (anti-tautologie,
+    anti-etat-impossible), 12 mutations.
+    DECOUVERTES REMONTEES (devoir d'alerte, hors scope) : (a) le challenge pre-transmission est
+    INEXACT sur un point - AllConditionsMet n'etait PAS faux-vert, Step7_BrakeReleased etait DEJA
+    FALSE dans les 4 modes (BrakeCmd := RelayFwd OR RelayRev, FB_WinchOutputInterlock.st:487,
+    coupe en :347-348 et :402-403) ; le defaut reel est un indicateur Step8 qui MENT ; (b) A2
+    ('lire State ET Reason') est INSUFFISANT pour F3 (State=READY + Reason=NONE) : un temoin publie
+    supplementaire a ete ajoute (FinalMotorRequest ET PAS BrakeCmd) ; (c) l'axe M3 garde un angle
+    mort : son ordre VALIDE est bien publie (PRG_06:458 -> PRG_07:576 GVL_IHM.IoHw.Out.M3_CommandWord)
+    mais n'est PAS une entree de FB_TroubleshootingView, l'atteindre exige d'ajouter IoHw en
+    VAR_INPUT + un argument dans PRG_07_Supervision.st (hors perimetre, fichier edite par un autre
+    lot) -> limite declaree, arbitrage demande ; (d) le fichier de test porterait 5 references a des
+    membres de GVL INEXISTANTS (invisible tant que le harnais ne compilait pas) : corrige ;
+    (e) staleness possible du meme genre sur d'autres entrees de registry.yaml, cataloguee a part
+    en T372 par l'orchestrateur.
+  evidence_submitted:
+    - "ROUGE (avant correctif, 3 sites temporairement remis dans leur etat HEAD) : 5 FAIL FONCTIONNELS - TC-P14-TSV-06 (F1), -07 (F2), -08 (F3), -09 (F4), -10 (M2/F3) : 'ASSERT_FALSE: GVL_TROUBLESHOOTING.N_MOTIONM1.STEP8_OUTPUTINTERLOCKOK expected FALSE, got TRUE'. Baseline TC-P14-TSV-01..05 PASS, -11/-12 PASS. JAMAIS une erreur de compilation."
+    - "VERT (apres correctif restaure) : 12/12 PASS, exit=0, baseline identique (01..05 PASS, 11-12 PASS)"
+    - "git diff --numstat -- CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st => VIDE (borne A1)"
+    - "blob barriere = HEAD : 14aa2c20aaae8a5890e20584041df4d7817c3617 (hash-object == rev-parse HEAD:)"
+    - "suite CI FB_WinchOutputInterlock : 7/11 PASS, 4 FAIL preexistants, chaine identique a HEAD"
+    - "G522_check_step8_interlock_not_truncated.py . => PASS ; --selftest => PASS (12 mutations refusees dont la T AUTOLOGIE du temoin F3 et le cas de test piote sur un etat impossible)"
+    - "compilation harnais FB_TroubleshootingView : 0 erreur de compilation (2 murs preexistants leves : 8 types manquants + namespace GVL)"
+    - "sondes compilateur STruCpp : namespace GVL non supporte (VAR_GLOBAL Foo + GVL_T.Foo => Undeclared variable) ; GVL_T comme VARIABLE de STRUCT miroir => OK ; TO_INT(<membre d'enum d'IEC_STRUCT>) => ECHEC (invalid static_cast from IEC_ENUM_Var) ; assignation d'enum sans conversion => OK"
+    - "git show HEAD:TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/reports/FB_TroubleshootingView.txt => 8 'Undefined type' + cascade GVL (preuve de preexistence)"
+    - "documents : DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T371_FAUX_VERT_MOTIONCHECKLIST.md (sections 2.2 et 5bis = les 2 incidents de revue)"
+    - "bundle CODE_XML/CODE_Bundle.xml + diff bundle CODE_XML/CODE_DiffBundle.xml (2 objets : FB_TroubleshootingView, ST_MotionChecklist) + G200 --report => PASS 0 erreur / 2048 instances"
+    - "palier C : 5 gates en echec sur 60, TOUS preexistants (G300, G340, G430, G483, G521) ; G522 PASS ; 0 occurrence de mes fichiers dans les echecs"
+    - "REVUE INDEPENDANTE read-only (agent distinct, verdict BLOCK) : 2 incidents reels trouves et CORRIGES - (1) temoin F3 tautologique (demande RelayFwd/RelayRev comparee a elle-meme), (2) garde-fou G522 overfit / selftest inerte"
+  ac_status:
+    AC1: "PASS - 5 FAIL fonctionnels mesures AVANT correctif (assertion Step8 = TRUE alors que la barriere refuse), sur les 4 modes F1-F4 + M2/F3"
+    AC2: "PASS - 17/17 PASS APRES correctif (couverture etendue apres revue : M1 F1-F4, M2 F3/F1/F4, gate DISABLED, verts nominaux M1/M2/M3, et 'cause memorisee apres acquittement -> reste VERT'), baseline preservee. PRECISION DE PERIMETRE (traitee en note section 2.7) : aucun mode F1-F4 ne produit Step8 = TRUE ; en revanche, une fois la demande RETIREE par FB_Winch (EffectiveSafeStop, FB_Winch.st:169 -> shaper :216 -> StepNumber = 0), la barriere n'est plus dans la branche F3 mais dans 'NOT MotorRequest' (:417-423) ou Step8 = TRUE est HONNETE (aucune demande a delivrer) et ou SafeStop/permis sont portes par Step5/Step6. Alternative 'AND NOT Safety.SafeStop' laissee a l'arbitrage (dupliquerait Step5)."
+    AC3: "PASS"
+    AC4: "PASS"
+    AC5: "PASS - 3 axes traites (M1/M2 predicat complet + publication ; M3 publication + projection explicite, decision equivalente a NOT FinalInterlockError : limite declaree)"
+    AC6: "PASS - Step8_OutputInterlockOk CONSERVE ; 2 champs de LECTURE ajoutes en FIN de STRUCT, types enumeres (vocabulaire commun, aucune conversion)"
+    AC7: "PASS - grep : seuls ST_MotionChecklist.st et FB_TroubleshootingView.st ; verrouille par G522 (mutation 'consommation de conduite' refusee)"
+    AC8: "PASS - check_task_contract.py : 0 erreur / 0 avertissement"
+    AC9: "PASS - G522 v3 + ligne PLANS palier C + --selftest 14 mutations refusees (dont les 2 incidents reellement survenus ET les 3 trous releves par la revue : terme DISABLED non protege, Reason injectable dans la decision, ancres fragiles) ; G522 PASS dans le palier C"
+    AC10: "PASS - bundle + diff bundle (2 objets) + G200 --report (0 erreur / 2048 instances) + palier C : 5 gates en echec sur 60, TOUS preexistants (G300, G340, G430, G483, G521) ; 0 occurrence de mes fichiers dans les echecs"
+    AC11: "PASS - aucun commit/push de moi (HEAD a avance par un commit T364 d'un AUTRE agent)"
+    AC12: "PASS - note section 4 + code (projection PRG_04:1688-1696, diagnostic uniquement)"
+    AC13: "PASS - 8 'Undefined type' supprimees, preexistence prouvee ; le harnais COMPILE desormais (0 erreur) et le ROUGE est bien une assertion fonctionnelle"
+    AC14: "PASS AVEC ECART DECLARE - git diff --numstat rend 12 0 : 10 lignes DE MOI (8 types + 2 mocks GVL) + 2 lignes E_CycleDepthStopMode preexistantes d'un autre agent ; + 2 fichiers NEUFS de mock (TOOLS/TEST_AUTO_CI/MOCKS/MOCK_GVL_*.st). Extension de scope a ratifier : sans elle AC1/AC2 restaient non executables."
+
+validation:
+  status: PENDING
+  validated_by: "Orchestrateur DSH29"
+  validated_at: "2026-09-21T15:55:00+02:00"
+  notes: >
+    Contrat C4 redige par l'orchestrateur AVANT delegation, apres challenge du brief v1 et apres
+    arbitrages humains A1-A4 (correctif cote consommateur seul, FB_WinchOutputInterlock.st
+    intouche, 3 axes, latence N-1 documentee, bloque_par laisse vide). Le perimetre interdit
+    porte la borne de contrat NON NEGOCIABLE : toute ligne ecrite dans
+    CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st invalide le lot.
+    REVUE INDEPENDANTE DE L'ORCHESTRATEUR 2026-09-21T15:55, rejouee en premiere main, aucun commit :
+    (1) borne A1 TENUE — git diff --numstat sur FB_WinchOutputInterlock.st = VIDE ;
+    (2) CI FB_TroubleshootingView RELANCEE par l'orchestrateur : le harnais compile et rend 17/17 PASS
+        (rapport JSON frais ; le .txt du meme dossier est un ARTEFACT D'ECHEC PERIME, voir reserve R1) ;
+    (3) G200 --report rejoue = PASS 0 erreur / 1681 avertissements / 2048 instances ;
+    (4) run_all_gates.py --palier C rejoue = 60 gates, 5 FAIL identiques (G300, G340, G430, G483, G521),
+        G522 PASS, 0 echec introduit ;
+    (5) G522 --selftest rejoue = PASS, 14 mutations refusees, 0 faux positif ;
+    (6) registry.yaml : 12 0 attribue par hunks (10 du lot + 2 tierces E_CycleDepthStopMode) ;
+    (7) les 2 mocks GVL existent et sont bien des fichiers neufs.
+    RATIFICATIONS ET ARBITRAGES HUMAINS 2026-09-21T15:55 : (Q1) extension CI RATIFIEE — 2 mocks GVL
+    miroir + leurs lignes de registre, test-only, jamais compiles dans CODESYS, dette tracee = miroir a
+    maintenir (une derive casse la COMPILATION, jamais un resultat vert) ; (Q2) angle mort M3 RENVOYE A
+    UNE TACHE DEDIEE (hors T371) — la barriere M3 ne publie aucun etat (PRG_05:749-755 derive
+    FinalInterlockState du seul Fault.Error) et l'atteindre exigerait IoHw en VAR_INPUT + un argument
+    dans PRG_07_Supervision.st, fichier sous edit d'un autre lot ; (Q3) AUCUN COMMIT — le GO n'est
+    jamais un accord de commit, accord explicite distinct requis apres relecture du diff final.
+    CORRECTIONS QUE L'ORCHESTRATEUR A APPORTEES A SON PROPRE CHALLENGE (l'agent porteur les a etablies,
+    l'orchestrateur les a verifiees puis corrigees) : AC1 ne vise PAS AllConditionsMet (il etait DEJA
+    FALSE, RelayFwd/RelayRev forces a FALSE en FB_WinchOutputInterlock.st:347-348 -> BrakeCmd :487) ;
+    et Reason ne peut pas entrer dans la DECISION (memorise, jamais remis a NONE apres acquittement,
+    :513) — il se publie, il ne decide pas.
+    RESERVES RESIDUELLES A TRAITER AVANT COMMIT : (R1) le rapport
+    TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/reports/FB_TroubleshootingView.txt est un artefact
+    d'ECHEC non regenere au succes (contenu perime : 475 erreurs GVL) alors que l'entree PASSE —
+    decision humaine requise (suppression ou regenere par un correctif du runner, jamais une
+    suppression automatique d'agent) ; (R2) G521 est untracked (lot T367 non commite) : son echec
+    n'est pas imputable a T371, mais « preexistant a HEAD » serait inexact ; (R3) une sonde jetable
+    (_probe_encoding.py) a ete creee puis supprimee par l'agent porteur — violation mineure du
+    preambule, annoncee spontanement ; (R4) le CI signale une ecriture externe non declaree vers
+    GVL_Troubleshooting (encapsulation) — preexistant, par design (FB de publication), pas une
+    regression T371 ; (R5) revue independante FINALE du diff courant a faire, l'agent ayant modifie
+    le lot APRES la revue qui avait rendu BLOCK.
+    ARBITRAGE 3 DES ARBITRAGES OUVERTS DU PORTEUR — TRANCHE PAR L'ORCHESTRATEUR 2026-09-21T16:05 :
+    l'ajout de « AND NOT Safety.SafeStop » dans le predicat Step8 est NON RETENU, DEFINITIVEMENT.
+    Motif : lorsque la demande a ete retiree par FB_Winch (EffectiveSafeStop, FB_Winch.st:169 ->
+    shaper :216 -> StepNumber = 0), la barriere n'est plus dans la branche F3 mais dans
+    « NOT MotorRequest » (:417-423), ou Step8 = TRUE est HONNETE puisqu'il n'y a plus aucune demande
+    a delivrer ; ajouter ce terme rendrait Step8 FALSE SANS DEMANDE, c'est-a-dire creerait un
+    FAUX ROUGE — exactement le defaut que TC-P14-TSV-16 et TC-P14-TSV-17 verrouillent. SafeStop et
+    les permis restent portes par Step5_NoSafetyFault et Step6_DirectionAllowed, sans duplication.
+    Le point est CONSERVE comme residu documente (note d'application section 2.7) avec sa condition de
+    reexamen : uniquement si le TERRAIN juge le comportement ambigu pendant un essai machine — ce n'est
+    pas une arbitrage ouvert, c'est une observation a confirmer par mesure.
+    RATIFICATIONS DEJA RENDUES (rappel, pour eviter qu'elles restent listees comme ouvertes) :
+    Q1 extension CI = RATIFIEE (AC15) ; Q2 angle mort M3 = renvoye a la tache T373 creee au catalogue.
+    REVUE INDEPENDANTE FINALE (agent distinct, read-only, 2026-09-21T16:15) — VERDICT : MINOR, aucun
+    BLOCK ni MAJOR. Elle a relu en entier FB_WinchOutputInterlock.st, FB_WinchStateProjection.st,
+    FB_TroubleshootingView.st, ST_MotionChecklist.st, les 17 cas, G522 (508 l.), le contrat et la note.
+    5 findings, tous mineurs, AUCUN cache : F1 M3 decision NON corrigee (reduction algebrique
+    NOT(State=ERROR) = NOT Fault.Error verifiee sur PRG_05:751-757) -> a provoque la REFORMULATION
+    D'AC5 ET DE L'OBJECTIF par l'orchestrateur ; F2 rapport .txt perime CONFIRME ; F3 G521 untracked
+    CONFIRME (dire preexistant a HEAD serait inexact) ; F4 artefacts non suivis a trancher avant
+    commit (dont 3 issus de la CI T371 : reports/FB_TroubleshootingView.html/.json/_test.st — les
+    .tmp_* racine et snapshots/traces appartiennent a d'AUTRES lots) ; F5 INFO aucun cas F2 sur M2.
+    CONFIRMATIONS SANS RESERVE : temoin F3 reellement de-tautologise (demande MotorRequest comparee a
+    la SORTIE VALIDEE BrakeCmd, refus atteignable) ; G522 NON VACUE (echouerait sur la forme d'origine
+    Step8 := NOT FinalInterlockError, 14 mutations dont les 2 incidents survenus, ligne PLANS palier C
+    :236) ; borne respectee (numstat VIDE + aucun fichier du perimetre interdit touche) ; encapsulation
+    respectee (aucun canal cache) ; retro-compat DUT OK (champs en fin de STRUCT, aucun decalage) ;
+    faux verts ET faux rouges couverts ; mes 3 corrections verifiees exactes dans le code
+    (:347-348, :487, :513). LIMITES DECLAREES PAR LE REVIEWER : execution non rejouee (interdite par sa
+    mission — l'orchestrateur l'a rejouee), attribution par auteur des 2 lignes E_CycleDepthStopMode non
+    prouvable depuis un seul git diff, compilation CODESYS reelle non verifiee.
