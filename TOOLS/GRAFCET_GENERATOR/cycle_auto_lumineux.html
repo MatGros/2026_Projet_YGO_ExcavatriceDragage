@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRAFCET Lumineux & Animé — Cycle Automatique de Dragage</title>
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-subtle: #f1f5f9;
+      --border-color: #e2e8f0;
+      --border-active: #0284c7;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --primary: #0284c7;
+      --primary-glow: rgba(2, 132, 199, 0.2);
+      --phase1: #0ea5e9;
+      --phase2: #2563eb;
+      --phase3: #7c3aed;
+      --phase4: #d97706;
+      --danger: #ef4444;
+      --success: #10b981;
+      --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.07);
+      --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Dark mode toggle support */
+    body.dark-theme {
+      --bg-page: #0b0f19;
+      --bg-card: #131b2e;
+      --bg-card-subtle: #1a233a;
+      --border-color: #24304f;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Top Navigation */
+    header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 8px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #38bdf8, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    .brand-title h1 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+    }
+
+    .brand-title p {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .cycle-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-tab {
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      background: var(--bg-card-subtle);
+      transition: all 0.2s;
+    }
+
+    .nav-tab.active {
+      background: #0284c7;
+      color: white;
+      border-color: #0284c7;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+    }
+
+    .theme-toggle-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 7px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    /* Main Layout */
+    .container {
+      max-width: 1560px;
+      margin: 0 auto;
+      padding: 8px 16px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* Dual-Panel Viewport: SVG Machine & Step Cockpit */
+    .machine-cockpit-grid {
+      display: grid;
+      grid-template-columns: 1.18fr 0.82fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    /* Synoptic SVG Box */
+    .synoptic-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .synoptic-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .synoptic-title {
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .auto-play-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 3px 8px rgba(16, 185, 129, 0.25);
+      transition: all 0.2s;
+    }
+
+    .auto-play-btn:hover {
+      transform: scale(1.02);
+    }
+
+    /* SVG Canvas */
+    .svg-canvas-box {
+      width: 100%;
+      height: 235px;
+      background: linear-gradient(to bottom, #e0f2fe 0%, #bae6fd 38%, #38bdf8 42%, #0284c7 70%, #0369a1 100%);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #93c5fd;
+      position: relative;
+    }
+
+    body.dark-theme .svg-canvas-box {
+      background: linear-gradient(to bottom, #0f172a 0%, #1e293b 38%, #0369a1 42%, #075985 70%, #0c4a6e 100%);
+      border-color: #1e3a8a;
+    }
+
+    /* Live Telemetry Overlay */
+    .telemetry-badges {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .tele-badge {
+      flex: 1;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      padding: 4px 6px;
+      border-radius: 6px;
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tele-badge span {
+      font-size: 9px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .tele-badge strong {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--primary);
+    }
+
+    .tele-badge span {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .tele-badge strong {
+      font-size: 14px;
+      font-family: var(--font-mono);
+      color: var(--primary);
+    }
+
+    /* Active Step Focus Card */
+    .active-step-focus {
+      background: var(--bg-card);
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      position: relative;
+    }
+
+    .step-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .step-tag-pill {
+      background: rgba(2, 132, 199, 0.1);
+      color: var(--primary);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(2, 132, 199, 0.25);
+    }
+
+    .step-phase-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .step-headline h2 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .step-explanation-box {
+      background: var(--bg-card-subtle);
+      border-radius: 8px;
+      padding: 8px 10px;
+      border-left: 3px solid var(--primary);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .exp-item {
+      font-size: 11.5px;
+      line-height: 1.35;
+    }
+
+    .exp-item strong {
+      color: var(--text-main);
+    }
+
+    /* Next Action / Transition Card */
+    .next-step-prompt {
+      background: linear-gradient(135deg, rgba(2, 132, 199, 0.08), rgba(124, 58, 237, 0.08));
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .prompt-header {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-advance-step {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+      transition: all 0.2s;
+    }
+
+    .btn-advance-step:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.5);
+    }
+
+    /* Interactive Steps Linear Carousel / Timeline */
+    .timeline-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 8px 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .timeline-header {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .timeline-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+
+    .timeline-node {
+      flex: 0 0 142px;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 6px 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .timeline-node:hover {
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .timeline-node.active {
+      background: #ffffff;
+      border-color: var(--primary);
+      border-width: 2px;
+      box-shadow: 0 3px 10px var(--primary-glow);
+    }
+
+    body.dark-theme .timeline-node.active {
+      background: #1e293b;
+    }
+
+    .node-num {
+      font-size: 9px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .node-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .node-cond {
+      font-size: 9.5px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Bypassed Step Node */
+    .timeline-node.bypassed-node {
+      opacity: 0.6;
+      border-style: dashed !important;
+      border-color: #cbd5e1 !important;
+      background: rgba(100, 116, 139, 0.05) !important;
+    }
+
+    /* Configuration Toolbar Buttons */
+    .cfg-toggle-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .cfg-toggle-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 2px 6px var(--primary-glow);
+    }
+
+    /* Mini-Sequences Compact Bar */
+    .phases-bar-compact {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .phase-compact-btn {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .phase-compact-btn:hover {
+      border-color: var(--primary);
+    }
+
+    .phase-compact-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 2px 6px var(--primary-glow);
+    }
+
+    /* Footer Toolbar for Chantier Setting */
+    .chantier-footer-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 3px 10px;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 6px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">✨</div>
+      <div class="brand-title">
+        <h1>GRAFCET INTERACTIF & ANIMÉ</h1>
+        <p>Excavatrice de Dragage — Mode Automatique / Semi-Auto (FB_CycleSemiAuto)</p>
+      </div>
+    </div>
+
+    <div class="cycle-links">
+      <a href="cycle_homing_lumineux.html" class="nav-tab" title="Ouvrir le cycle Homing animé avec double vue et zoom capteur">
+        <span>🧭</span> Cycle Homing (Double Vue & Zoom)
+      </a>
+      <a href="cycle_auto_lumineux.html" class="nav-tab active">
+        <span>✨</span> Cycle Auto Dragage (Lumineux)
+      </a>
+      <a href="index.html" class="nav-tab" title="Ouvrir la console Homing mode sombre">
+        <span>💻</span> Console Homing (Sombre)
+      </a>
+      <button class="theme-toggle-btn" onclick="toggleTheme()" title="Basculer Thème Clair / Sombre">🌓</button>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <div class="container">
+
+    <!-- Synoptic SVG Animation + Focus Step Cockpit -->
+    <div class="machine-cockpit-grid">
+
+      <!-- Left Column: Animated Machine Synoptic (SVG) -->
+      <div class="synoptic-card">
+        <div class="synoptic-header">
+          <div class="synoptic-title">
+            <span>🏗️ Synoptique Animé en Temps Réel</span>
+          </div>
+          <button class="auto-play-btn" id="btn-auto-play" onclick="toggleAutoPlay()">
+            <span id="play-icon">▶</span> <span id="play-text">Lecture Démo Automatique</span>
+          </button>
+        </div>
+
+        <!-- Dynamic SVG Machine Canvas -->
+        <div class="svg-canvas-box">
+          <svg id="machine-svg" viewBox="0 0 600 380" width="100%" height="100%">
+            <!-- Sky & Atmosphere -->
+            <rect x="0" y="0" width="600" height="150" fill="none" />
+
+            <!-- Pier / Quai on the Left -->
+            <rect x="0" y="140" width="130" height="240" fill="#64748b" />
+            <rect x="0" y="140" width="130" height="12" fill="#475569" />
+
+            <!-- Hopper / Trémie on Pier -->
+            <polygon points="20,138 90,138 75,70 35,70" fill="#f59e0b" stroke="#b45309" stroke-width="2" />
+            <rect x="45" y="138" width="20" height="30" fill="#78350f" />
+            <text x="55" y="105" fill="#78350f" font-size="10" font-weight="bold" text-anchor="middle">TRÉMIE</text>
+
+            <!-- Water Body -->
+            <rect x="130" y="150" width="470" height="190" fill="#0284c7" fill-opacity="0.65" />
+            <path d="M 130,150 Q 150,146 170,150 T 210,150 T 250,150 T 290,150 T 330,150 T 370,150 T 410,150 T 450,150 T 490,150 T 530,150 T 570,150 T 600,150 L 600,155 L 130,155 Z" fill="#38bdf8" />
+
+            <!-- Water Level Marker -->
+            <text x="140" y="165" fill="#e0f2fe" font-size="10" font-weight="bold">🌊 SURFACE EAU (0 m)</text>
+            <line x1="130" y1="150" x2="600" y2="150" stroke="#7dd3fc" stroke-dasharray="4,4" stroke-width="1.5" />
+
+            <!-- Sediment Bottom -->
+            <rect x="130" y="340" width="470" height="40" fill="#78350f" />
+            <path d="M 130,340 Q 200,335 300,342 T 500,338 L 600,340 L 600,380 L 130,380 Z" fill="#92400e" />
+            <text x="365" y="365" fill="#fef3c7" font-size="11" font-weight="bold">⚓ FOND DE FOSSE SÉDIMENTAIRE (-15 m)</text>
+
+            <!-- P1 Marker Target -->
+            <line x1="430" y1="20" x2="430" y2="340" stroke="#fcd34d" stroke-dasharray="3,3" stroke-width="1.5" />
+            <rect x="410" y="22" width="40" height="16" rx="4" fill="#f59e0b" />
+            <text x="430" y="34" fill="#78350f" font-size="9" font-weight="bold" text-anchor="middle">POINT P1</text>
+
+            <!-- Gantry Overhead Rail (M3) -->
+            <rect x="20" y="10" width="560" height="10" fill="#334155" />
+            <line x1="20" y1="20" x2="580" y2="20" stroke="#94a3b8" stroke-width="2" />
+
+            <!-- Moving Gantry Trolley M3 Group -->
+            <g id="gantry-group" transform="translate(430, 8)">
+              <!-- Trolley Frame -->
+              <rect x="-35" y="0" width="70" height="24" rx="4" fill="#0284c7" stroke="#0369a1" stroke-width="2" />
+              <!-- Wheels -->
+              <circle cx="-25" cy="0" r="4" fill="#64748b" />
+              <circle cx="25" cy="0" r="4" fill="#64748b" />
+              <!-- Winch M1 & M2 Drum -->
+              <circle cx="-12" cy="12" r="7" fill="#0f172a" />
+              <circle cx="12" cy="12" r="7" fill="#0f172a" />
+              <text x="0" y="16" fill="#ffffff" font-size="8" font-weight="bold" text-anchor="middle">M1/M2</text>
+
+              <!-- Suspension Cables -->
+              <line id="cable-m1" x1="-12" y1="18" x2="-8" y2="60" stroke="#0f172a" stroke-width="2" />
+              <line id="cable-m2" x1="12" y1="18" x2="8" y2="60" stroke="#0f172a" stroke-width="2" />
+
+              <!-- Dredging Bucket (Benne) Assembly -->
+              <g id="bucket-assembly" transform="translate(0, 60)">
+                <!-- Bucket Head / Spreader -->
+                <rect x="-14" y="0" width="28" height="8" rx="2" fill="#334155" />
+
+                <!-- Left Jaw (Mâchoire gauche) -->
+                <path id="jaw-left" d="M -12,8 Q -24,20 -14,35 L 0,35 Z" fill="#475569" stroke="#1e293b" stroke-width="1.5" />
+
+                <!-- Right Jaw (Mâchoire droite) -->
+                <path id="jaw-right" d="M 12,8 Q 24,20 14,35 L 0,35 Z" fill="#64748b" stroke="#1e293b" stroke-width="1.5" />
+
+                <!-- Payload (Gravier) inside closed bucket -->
+                <ellipse id="bucket-payload" cx="0" cy="24" rx="10" ry="8" fill="#d97706" style="display: none;" />
+
+                <!-- Kobold Sensor probe -->
+                <g id="kobold-sensor" transform="translate(18, 12)">
+                  <rect x="0" y="0" width="4" height="16" fill="#facc15" />
+                  <circle id="kobold-led" cx="2" cy="18" r="3" fill="#10b981" />
+                </g>
+
+                <!-- Dripping water particles for AX13 -->
+                <g id="water-drops" style="display: none;">
+                  <circle cx="-4" cy="42" r="2.5" fill="#38bdf8" />
+                  <circle cx="4" cy="48" r="2" fill="#38bdf8" />
+                  <circle cx="0" cy="54" r="2" fill="#38bdf8" />
+                </g>
+
+                <!-- Dumping stones for AX15B -->
+                <g id="dump-stones" style="display: none;">
+                  <circle cx="-5" cy="42" r="3" fill="#b45309" />
+                  <circle cx="5" cy="46" r="3.5" fill="#d97706" />
+                  <circle cx="0" cy="52" r="4" fill="#92400e" />
+                </g>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Telemetry Live Badges -->
+        <div class="telemetry-badges">
+          <div class="tele-badge">
+            <span>Pont Roulant (M3)</span>
+            <strong id="tele-pos-m3">Au point P1 (430 mm)</strong>
+          </div>
+          <div class="tele-badge">
+            <span>Treuils M1 / M2</span>
+            <strong id="tele-winch-step">Arrêt (0 m/s)</strong>
+          </div>
+          <div class="tele-badge">
+            <span>Benne</span>
+            <strong id="tele-bucket-state">Grande Ouverte (40°)</strong>
+          </div>
+          <div class="tele-badge">
+            <span>Sonde Kobold</span>
+            <strong id="tele-kobold-state">Inactive</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Active Step Focus Card (Cockpit épuré) -->
+      <div class="active-step-focus" id="active-step-card">
+        <div>
+          <div class="step-badge-row">
+            <span class="step-tag-pill" id="focus-step-id">AX0_REPOS</span>
+            <span class="step-phase-badge" id="focus-phase-name">1. Préparation & P1</span>
+          </div>
+
+          <div class="step-headline">
+            <h2 id="focus-title">💤 Machine au Repos</h2>
+          </div>
+
+          <div class="step-explanation-box" style="margin-top: 14px;">
+            <div class="exp-item">
+              <strong>❓ Pourquoi cette étape ?</strong>
+              <p id="focus-pourquoi" style="color: var(--text-muted); margin-top: 2px;">
+                Étape initiale pure. La machine attend l'ordre de démarrage.
+              </p>
+            </div>
+            <div class="exp-item" style="margin-top: 6px;">
+              <strong>⚙️ Action mécanique en cours :</strong>
+              <p id="focus-action" style="color: var(--primary); font-weight: 600; margin-top: 2px;">
+                Toutes les commandes sont à 0.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Big Transition Action Button -->
+        <div class="next-step-prompt">
+          <div class="prompt-header">
+            <span>⚡ Pourquoi & Comment passer à la suite ?</span>
+          </div>
+          <div style="font-size: 13px; color: var(--text-main); font-weight: 600;" id="focus-cond-titre">
+            Condition : Lancement du cycle (Start IHM)
+          </div>
+          <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted);" id="focus-cond-tech">
+            StartCycle AND Mode = SEMI_AUTO
+          </div>
+
+          <button class="btn-advance-step" onclick="advanceStep()">
+            <span id="btn-advance-label">Passer à l'étape suivante</span>
+            <span>➔</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: Interactive Horizontal Flow Stepper -->
+    <div class="timeline-section">
+      <div class="timeline-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 14px; font-weight: 800;">🗺️ Séquence Complète du Cycle</span>
+          <span style="font-size: 11px; color: var(--text-muted);" id="step-count-badge">Étape 1 sur 21</span>
+        </div>
+
+        <!-- 4 Mini-Sequences Filter Tabs in Bottom Header -->
+        <div class="phases-bar-compact">
+          <button class="phase-compact-btn active" id="phase-pill-1" style="--phase-color: #0ea5e9;" onclick="jumpToPhase('1_PREP')">
+            🏁 1. Déplacement & P1
+          </button>
+          <button class="phase-compact-btn" id="phase-pill-2" style="--phase-color: #2563eb;" onclick="jumpToPhase('2_DIVING')">
+            🌊 2. Plongée & Fond
+          </button>
+          <button class="phase-compact-btn" id="phase-pill-3" style="--phase-color: #7c3aed;" onclick="jumpToPhase('3_EXTRACTION')">
+            🗜️ 3. Extraction
+          </button>
+          <button class="phase-compact-btn" id="phase-pill-4" style="--phase-color: #d97706;" onclick="jumpToPhase('4_DECHARGE')">
+            🚛 4. Égouttage & Trémie
+          </button>
+        </div>
+      </div>
+
+      <div class="timeline-scroll" id="timeline-scroll">
+        <!-- Generated nodes -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer with Embedded Chantier Toolbar -->
+  <footer>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span>🏗️ Excavatrice de Dragage • Cycle Automatique</span>
+      <span style="opacity: 0.4;">|</span>
+      <span>CODESYS 3.5 (FB_CycleSemiAuto.st)</span>
+    </div>
+
+    <!-- Chantier Configuration Toolbar (Gestion AX9) moved COMPLETELY to bottom footer -->
+    <div class="chantier-footer-toolbar">
+      <span style="font-size: 10.5px; font-weight: 700; color: var(--text-main);">
+        ⚙️ Paramètre Chantier CfgRaiseOffBottomM (Décollage AX9) :
+      </span>
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <button id="btn-cfg-0m" class="cfg-toggle-btn active" onclick="setCfgRaise(0.0)" title="Réglage actuel de votre machine sur site (0.0 m)">
+          ✅ 0.0 m (Standard Chantier : AX9 Sautée)
+        </button>
+        <button id="btn-cfg-03m" class="cfg-toggle-btn" onclick="setCfgRaise(0.3)" title="Tester avec décollage fond AX9 actif (0.3 m)">
+          0.3 m (Optionnel : AX9 Active)
+        </button>
+      </div>
+    </div>
+
+    <div style="font-family: var(--font-mono); font-size: 11px;">
+      DOC/AF/AF_Partie-04 & E_AutoCycleStep.st
+    </div>
+  </footer>
+
+  <script>
+    // Cycle Data Embedded
+    const AUTO_DATA = {"cycle_id": "CYCLE_AUTO_DRAGAGE", "name": "Cycle Automatique de Dragage en Carrière", "pous": ["FB_CycleSemiAuto.st", "E_AutoCycleStep.st"], "doc_ref": "DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md", "description": "Séquenceur automatique complet de dragage : préparation à quai, positionnement en P1, ouverture, plongée rapide et détection eau/fond par sonde Kobold, fermeture benne en profondeur, remontée en charge, égouttage et décharge dans la trémie.", "steps": [{"id": "AX0_REPOS", "num": 0, "phase": "1_PREP", "phase_nom": "1. Préparation & Positionnement", "phase_color": "#0ea5e9", "titre": "Repos / Machine au Park", "emoji": "💤", "pourquoi": "Étape initiale pure. La machine est en attente, aucune commande n'est active.", "action_mouvement": "Toutes commandes à 0 (Treuils, Pont M3, Benne arrêtés).", "svg_state": {"gantry": "MID", "depth": 0, "bucket_open": false, "payload": false, "kobold": false, "dripping": false}, "transition": {"cible": "AX1_INIT", "condition_titre": "Lancement du cycle (Start IHM ou validation)", "condition_technique": "StartCycle AND Mode = SEMI_AUTO AND Enable", "pourquoi_avance": "L'opérateur enclenche le cycle semi-auto depuis l'IHM."}, "repli": {"cible": "AX_STAB", "condition": "Défaut général / Arrêt d'Urgence"}}, {"id": "AX1_INIT", "num": 1, "phase": "1_PREP", "phase_nom": "1. Préparation & Positionnement", "phase_color": "#0ea5e9", "titre": "Contrôle des Conditions Initiales", "emoji": "📋", "pourquoi": "Vérifier que la machine est prête physiquement (codeurs calés, benne en haut, pont M3 dans la zone autorisée) avant d'autoriser tout mouvement.", "action_mouvement": "Aucun mouvement physique pendant ce test statique.", "svg_state": {"gantry": "MID", "depth": 0, "bucket_open": false, "payload": false, "kobold": false, "dripping": false}, "transition": {"cible": "AX2_TRANSLATE_P1", "condition_titre": "Conditions initiales validées (Homed + Benne en haut)", "condition_technique": "InitPositionOk AND HomedM1 AND HomedM2 AND DeadmanArmed", "pourquoi_avance": "Tous les voyants sont au vert, l'automate engage l'approche vers le point de plongée P1."}, "repli": {"cible": "AX_STAB", "condition": "Codeur non référencé ou benne hors zone"}}, {"id": "AX2_TRANSLATE_P1", "num": 2, "phase": "1_PREP", "phase_nom": "1. Préparation & Positionnement", "phase_color": "#0ea5e9", "titre": "Translation du Pont vers P1", "emoji": "🚜", "pourquoi": "Amener le chariot au-dessus de la fosse de dragage au point géographique P1 défini pour la passe.", "action_mouvement": "Translation M3 vers la droite. Les treuils M1/M2 sont maintenus verrouillés au FDC haut.", "svg_state": {"gantry": "P1", "depth": 0, "bucket_open": false, "payload": false, "kobold": false, "dripping": false}, "transition": {"cible": "AX3_OPEN_BUCKET", "condition_titre": "Capteur P1 atteint", "condition_technique": "Translation_At_P1 = TRUE AND Translation_Done", "pourquoi_avance": "Le pont roulant est exactement à l'aplomb du point de dragage P1."}, "repli": {"cible": "AX_STAB", "condition": "Défaut translation ou relâchement homme-mort"}}, {"id": "AX3_OPEN_BUCKET", "num": 3, "phase": "1_PREP", "phase_nom": "1. Préparation & Positionnement", "phase_color": "#0ea5e9", "titre": "Ouverture Complète de la Benne", "emoji": "👐", "pourquoi": "Ouvrir les mâchoires de la benne avant de plonger. La benne doit obligatoirement être grande ouverte pour pénétrer dans les sédiments.", "action_mouvement": "Commande d'ouverture benne (mâchoires s'écartent). Treuils et pont à l'arrêt.", "svg_state": {"gantry": "P1", "depth": 0, "bucket_open": true, "payload": false, "kobold": false, "dripping": false}, "transition": {"cible": "AX3_WAIT_DIVE_START", "condition_titre": "FDC Fin d'ouverture benne atteint", "condition_technique": "Benne_IsOpen = TRUE AND Benne_Done", "pourquoi_avance": "Les mâchoires sont en butée ouverte, prêtes pour la plongée."}, "repli": {"cible": "AX_STAB", "condition": "Blocage mécanique mâchoires"}}, {"id": "AX3_WAIT_DIVE_START", "num": 21, "phase": "1_PREP", "phase_nom": "1. Préparation & Positionnement", "phase_color": "#0ea5e9", "titre": "Attente & Stabilisation Plongée", "emoji": "⏱️", "pourquoi": "Vérifier que les treuils sont à l'arrêt complet avant de lancer la descente couplée à pleine vitesse.", "action_mouvement": "Sorties neutres, attente arrêt mécanique complet M1 et M2.", "svg_state": {"gantry": "P1", "depth": 0, "bucket_open": true, "payload": false, "kobold": false, "dripping": false}, "transition": {"cible": "AX4_DESCEND_DIVING", "condition_titre": "Treuils immobiles + Joystick poussé", "condition_technique": "M1_ContactorsReleased AND M2_ContactorsReleased AND JoystickPush", "pourquoi_avance": "Machine stabilisée et intention de descente confirmée par l'opérateur."}, "repli": {"cible": "AX_STAB", "condition": "Relâchement homme-mort"}}, {"id": "AX4_DESCEND_DIVING", "num": 4, "phase": "2_DIVING", "phase_nom": "2. Plongée & Détection du Fond", "phase_color": "#2563eb", "titre": "Descente Rapide dans l'Air (Palier 4)", "emoji": "⬇️", "pourquoi": "Faire descendre la benne ouverte à vitesse maximale (palier 4) depuis la position haute jusqu'au voisinage de la surface de l'eau (DiveStartMin_M).", "action_mouvement": "Descente synchronisée M1+M2 au palier 4 (rapide). La sonde Kobold n'est pas encore alimentée.", "svg_state": {"gantry": "P1", "depth": 1, "bucket_open": true, "payload": false, "kobold": false, "dripping": false}, "transition": {"cible": "AX5_KOBOLD_INIT", "condition_titre": "Altitude d'approche eau atteinte (DiveStartMin_M)", "condition_technique": "M1_CablePosM >= DiveStartMinM (ex: 3.5 m)", "pourquoi_avance": "La benne arrive juste au-dessus de l'eau, on prépare l'allumage de la sonde de détection."}, "repli": {"cible": "AX_DIVING_RETRY", "condition": "Désynchronisme M1/M2 ou arrêt intempestif"}}, {"id": "AX5_KOBOLD_INIT", "num": 5, "phase": "2_DIVING", "phase_nom": "2. Plongée & Détection du Fond", "phase_color": "#2563eb", "titre": "Enclenchement Sonde Kobold « au vol »", "emoji": "⚡", "pourquoi": "Alimenter le contacteur de la sonde de niveau Kobold pendant le mouvement sans arrêter la descente pour gagner du temps de cycle.", "action_mouvement": "Descente palier 4 maintenue. Contacteur Kobold enclenché.", "svg_state": {"gantry": "P1", "depth": 1, "bucket_open": true, "payload": false, "kobold": true, "dripping": false}, "transition": {"cible": "AX6_SEARCH_IMMERSION", "condition_titre": "Retour contacteur Kobold confirmé", "condition_technique": "KoboldContactorFeedback = TRUE", "pourquoi_avance": "La sonde est sous tension et opérationnelle pour détecter l'entrée dans l'eau."}, "repli": {"cible": "AX_DIVING_RETRY", "condition": "Défaut d'enclenchement contacteur Kobold"}}, {"id": "AX6_SEARCH_IMMERSION", "num": 6, "phase": "2_DIVING", "phase_nom": "2. Plongée & Détection du Fond", "phase_color": "#2563eb", "titre": "Recherche Entrée dans l'Eau", "emoji": "🌊", "pourquoi": "Traverser la surface de l'eau. La sonde Kobold fixée sur la benne passe de l'air (0) à l'eau (1).", "action_mouvement": "Poursuite de la plongée au palier 4. Surveillance continue du front capteur.", "svg_state": {"gantry": "P1", "depth": 2, "bucket_open": true, "payload": false, "kobold": true, "dripping": false}, "transition": {"cible": "AX7_SEARCH_BOTTOM", "condition_titre": "Front d'immersion détecté (0 ➔ 1)", "condition_technique": "R_TRIG(KoboldImmersed).Q = TRUE", "pourquoi_avance": "La benne est officiellement immergée. On bascule en phase de recherche du fond."}, "repli": {"cible": "AX_DIVING_RETRY", "condition": "Eau non trouvée avant la limite de sécurité"}}, {"id": "AX7_SEARCH_BOTTOM", "num": 7, "phase": "2_DIVING", "phase_nom": "2. Plongée & Détection du Fond", "phase_color": "#2563eb", "titre": "Descente Profonde & Recherche du Fond", "emoji": "⚓", "pourquoi": "Descendre dans l'eau jusqu'à ce que la benne touche le lit de sédiments ou atteigne la consigne de profondeur.", "action_mouvement": "Descente sous l'eau palier 4. Quand la benne touche le fond, la sonde se détend ou bascule (1 ➔ 0).", "svg_state": {"gantry": "P1", "depth": 3, "bucket_open": true, "payload": false, "kobold": true, "dripping": false}, "transition": {"cible": "AX8_BOTTOM_CONFIRMED", "condition_titre": "Fond détecté (Sonde 1 ➔ 0 ou consigne atteinte)", "condition_technique": "F_TRIG(KoboldImmersed).Q OR CablePos >= SetDepthM", "pourquoi_avance": "La benne a touché le fond sédimentaire !"}, "repli": {"cible": "AX_STAB", "condition": "Atteinte limite légale ou anomalie câble"}}, {"id": "AX8_BOTTOM_CONFIRMED", "num": 8, "phase": "2_DIVING", "phase_nom": "2. Plongée & Détection du Fond", "phase_color": "#2563eb", "titre": "Arrêt Immédiat au Fond & Mémorisation", "emoji": "🛑", "pourquoi": "Couper instantanément les moteurs des treuils pour éviter que les câbles ne se déroulent au fond et ne s'emmêlent (mou de câble).", "action_mouvement": "Coupure immédiate des treuils M1 et M2. Enregistrement de la cote de touche (TouchPositionM).", "svg_state": {"gantry": "P1", "depth": 3, "bucket_open": true, "payload": false, "kobold": false, "dripping": false}, "transition": {"cible": "AX9_RAISE_OFF_BOTTOM", "condition_titre": "Coupure confirmée + Consigne décollage", "condition_technique": "WinchesStopped AND (CfgRaiseOffBottomM > 0)", "pourquoi_avance": "Treuils immobiles, prêt pour retendre les câbles avant fermeture."}, "repli": {"cible": "AX_STAB", "condition": "Défaut de freinage"}}, {"id": "AX9_RAISE_OFF_BOTTOM", "num": 9, "phase": "3_EXTRACTION", "phase_nom": "3. Dragage & Extraction", "phase_color": "#8b5cf6", "titre": "Tension des Câbles (Décollage Fond)", "emoji": "🧵", "pourquoi": "Remonter légèrement les treuils de quelques centimètres pour retendre les câbles sans soulever la benne plantée dans le sédiment.", "action_mouvement": "Montée très lente M1+M2 sur une course définie (CfgRaiseOffBottomM).", "svg_state": {"gantry": "P1", "depth": 3, "bucket_open": true, "payload": false, "kobold": false, "dripping": false}, "transition": {"cible": "AX10_CLOSE_BUCKET", "condition_titre": "Câbles tendus", "condition_technique": "DeltaPos >= CfgRaiseOffBottomM OR Timeout", "pourquoi_avance": "Les câbles sont droits et tendus, la fermeture de la benne peut commencer."}, "repli": {"cible": "AX_STAB", "condition": "Surtension anormale câble"}}, {"id": "AX10_CLOSE_BUCKET", "num": 10, "phase": "3_EXTRACTION", "phase_nom": "3. Dragage & Extraction", "phase_color": "#8b5cf6", "titre": "Fermeture & Prélèvement des Sédiments", "emoji": "🗜️", "pourquoi": "Actionner le treuil de fermeture M2 pour refermer les mâchoires de la benne dans le gravier et capturer la charge utile.", "action_mouvement": "Traction sur le câble de fermeture M2. Les mâchoires mordent le fond et se referment.", "svg_state": {"gantry": "P1", "depth": 3, "bucket_open": false, "payload": true, "kobold": false, "dripping": false}, "transition": {"cible": "AX11_CTRL_ASCENT", "condition_titre": "Fermeture mécanique confirmée", "condition_technique": "Benne_IsClosed = TRUE OR Benne_CloseReached", "pourquoi_avance": "La benne est fermée, le godet est plein de matériaux."}, "repli": {"cible": "AX_STAB", "condition": "Blocage fermeture ou intensité excessive"}}, {"id": "AX11_CTRL_ASCENT", "num": 11, "phase": "3_EXTRACTION", "phase_nom": "3. Dragage & Extraction", "phase_color": "#8b5cf6", "titre": "Montée Contrôlée (Arrachement du Fond)", "emoji": "🏋️", "pourquoi": "Arracher délicatement la charge du fond sous-marin à vitesse lente (palier 1 ou 2) pour maîtriser la tension et surveiller le synchronisme.", "action_mouvement": "Montée M1+M2 en vitesse lente (palier 1-2) sur une distance paramétrée (ex: 2 mètres).", "svg_state": {"gantry": "P1", "depth": 2, "bucket_open": false, "payload": true, "kobold": false, "dripping": false}, "transition": {"cible": "AX12_LOADED_ASCENT", "condition_titre": "Distance d'arrachement franchie", "condition_technique": "AscentDistance >= CfgCtrlAscentDistanceM", "pourquoi_avance": "La benne est libérée de l'effet ventouse du fond, on peut accélérer la remontée."}, "repli": {"cible": "AX_STAB", "condition": "Désynchronisme M1/M2 au décollage"}}, {"id": "AX12_LOADED_ASCENT", "num": 12, "phase": "3_EXTRACTION", "phase_nom": "3. Dragage & Extraction", "phase_color": "#8b5cf6", "titre": "Remontée en Charge Rapide (Palier 4)", "emoji": "🚀", "pourquoi": "Remonter la benne chargée le plus vite possible (palier 4) jusqu'au-dessus de la surface de l'eau.", "action_mouvement": "Montée M1+M2 à grande vitesse jusqu'au seuil d'arrêt haut.", "svg_state": {"gantry": "P1", "depth": 0, "bucket_open": false, "payload": true, "kobold": false, "dripping": false}, "transition": {"cible": "AX13_DRAIN_PAUSE", "condition_titre": "Benne sortie de l'eau en position haute", "condition_technique": "M1TopLimitReached AND M2TopLimitReached", "pourquoi_avance": "La benne est hors d'eau, stabilisée en position d'égouttage."}, "repli": {"cible": "AX_STAB", "condition": "Dépassement FDC haut logiciel"}}, {"id": "AX13_DRAIN_PAUSE", "num": 13, "phase": "4_DECHARGE", "phase_nom": "4. Égouttage & Trémie", "phase_color": "#f59e0b", "titre": "Égouttage des Boues & Eau", "emoji": "💧", "pourquoi": "Laisser l'eau s'évacuer de la benne pendant quelques secondes au-dessus du plan d'eau pour ne pas déverser de boue liquide dans la trémie.", "action_mouvement": "Machine immobile au-dessus de l'eau. Chronomètre d'égouttage actif.", "svg_state": {"gantry": "P1", "depth": 0, "bucket_open": false, "payload": true, "kobold": false, "dripping": true}, "transition": {"cible": "AX14_TRANSLATE_DUMP", "condition_titre": "Temps d'égouttage écoulé (ou Skip IHM)", "condition_technique": "DrainTimer.Q OR SkipDrainRequest", "pourquoi_avance": "Le matériau est égoutté, le transfert vers la trémie peut commencer."}, "repli": {"cible": "AX_STAB", "condition": "Perte de mode"}}, {"id": "AX14_TRANSLATE_DUMP", "num": 14, "phase": "4_DECHARGE", "phase_nom": "4. Égouttage & Trémie", "phase_color": "#f59e0b", "titre": "Translation du Pont vers la Trémie", "emoji": "🚋", "pourquoi": "Déplacer le pont roulant horizontalement depuis P1 vers la trémie de déchargement sur le quai.", "action_mouvement": "Translation M3 vers la gauche. Benne fermée maintenue en position haute.", "svg_state": {"gantry": "TREMIE", "depth": 0, "bucket_open": false, "payload": true, "kobold": false, "dripping": false}, "transition": {"cible": "AX15A_DUMP_ARRIVE", "condition_titre": "Arrivée au capteur Trémie", "condition_technique": "Translation_At_Tremie = TRUE AND Translation_Done", "pourquoi_avance": "Le chariot est parfaitement positionné au-dessus de la trémie."}, "repli": {"cible": "AX_STAB", "condition": "Défaut course translation"}}, {"id": "AX15A_DUMP_ARRIVE", "num": 15, "phase": "4_DECHARGE", "phase_nom": "4. Égouttage & Trémie", "phase_color": "#f59e0b", "titre": "Arrivée & Arrêt au-dessus Trémie", "emoji": "🎯", "pourquoi": "Stabiliser le balancement de la benne avant d'ouvrir les mâchoires au-dessus de la trémie.", "action_mouvement": "Tous actionneurs à l'arrêt complet.", "svg_state": {"gantry": "TREMIE", "depth": 0, "bucket_open": false, "payload": true, "kobold": false, "dripping": false}, "transition": {"cible": "AX15B_DUMP_OPEN", "condition_titre": "Arrêt confirmé + Ordre de vidage", "condition_technique": "WinchesStopped AND TranslationStopped", "pourquoi_avance": "Machine immobile et stable, ouverture sécurisée possible."}, "repli": {"cible": "AX_STAB", "condition": "Mouvement anormal"}}, {"id": "AX15B_DUMP_OPEN", "num": 16, "phase": "4_DECHARGE", "phase_nom": "4. Égouttage & Trémie", "phase_color": "#f59e0b", "titre": "Vidage : Ouverture Benne dans Trémie", "emoji": "🪨", "pourquoi": "Ouvrir les mâchoires de la benne pour vider les tonnes de graviers extraits dans la trémie d'alimentation.", "action_mouvement": "Ouverture benne. Les graviers tombent dans la trémie. Treuils immobiles.", "svg_state": {"gantry": "TREMIE", "depth": 0, "bucket_open": true, "payload": false, "kobold": false, "dripping": false}, "transition": {"cible": "AX18_DONE_SYNC", "condition_titre": "Benne totalement vide et ouverte", "condition_technique": "Benne_IsOpen = TRUE AND Benne_Done", "pourquoi_avance": "La charge est vidée dans la trémie. Le godet est prêt pour une nouvelle passe !"}, "repli": {"cible": "AX_STAB", "condition": "Blocage à l'ouverture"}}, {"id": "AX18_DONE_SYNC", "num": 18, "phase": "4_DECHARGE", "phase_nom": "4. Égouttage & Trémie", "phase_color": "#f59e0b", "titre": "Fin de Passe & Incrément Compteur", "emoji": "🏆", "pourquoi": "Clôturer le cycle de dragage réussi : incrémenter le compteur de godets extraits, enregistrer le temps de cycle, et repartir pour le cycle suivant.", "action_mouvement": "Incrément compteur journalier. Rebouclage automatique direct vers le point P1 (AX2).", "svg_state": {"gantry": "TREMIE", "depth": 0, "bucket_open": true, "payload": false, "kobold": false, "dripping": false}, "transition": {"cible": "AX2_TRANSLATE_P1", "condition_titre": "Rebouclage automatique pour passe suivante", "condition_technique": "AutoReplayEnabled OR StartCycle", "pourquoi_avance": "Le portique repart immédiatement vers P1 pour la passe suivante !"}, "repli": {"cible": "AX0_REPOS", "condition": "Fin de poste / Arrêt cycle demandé"}}, {"id": "AX_DIVING_RETRY", "num": 20, "phase": "SPECIAL", "phase_nom": "Voie de Reprise / Spécial", "phase_color": "#ec4899", "titre": "Reprise Plongée Assistée (Retry)", "emoji": "🔄", "pourquoi": "Si la sonde Kobold a été perturbée ou si l'opérateur a relâché le joystick en pleine plongée, la machine remonte en douceur au FDC haut pour ré-aligner la passe sans planter l'automate.", "action_mouvement": "Remontée lente sécurisée M1+M2 jusqu'au FDC haut.", "svg_state": {"gantry": "P1", "depth": 1, "bucket_open": true, "payload": false, "kobold": false, "dripping": false}, "transition": {"cible": "AX4_DESCEND_DIVING", "condition_titre": "FDC haut réatteint, prêt pour nouvelle plongée", "condition_technique": "M1TopLimitReached AND DeadmanArmed", "pourquoi_avance": "La benne est revenue en haut, la descente peut reprendre en toute sécurité."}, "repli": {"cible": "AX_STAB", "condition": "Défaut persistant"}}, {"id": "AX_STAB", "num": 19, "phase": "SPECIAL", "phase_nom": "Repli Défaut & Sécurité", "phase_color": "#ef4444", "titre": "Repli Sécurisé / Stabilisation", "emoji": "🛡️", "pourquoi": "État de repli automatique en cas de défaut ou d'interruption : figer les mouvements, serrer les freins et attendre l'arbitrage humain.", "action_mouvement": "Freins mécaniques serrés. Tous mouvements coupés sans à-coup.", "svg_state": {"gantry": "MID", "depth": 1, "bucket_open": false, "payload": false, "kobold": false, "dripping": false}, "transition": {"cible": "AX0_REPOS", "condition_titre": "Acquittement défaut (Reset)", "condition_technique": "ResetEdge.Q", "pourquoi_avance": "Défaut acquitté par l'opérateur, retour à l'état initial sécurisé."}, "repli": {"cible": "AX0_REPOS", "condition": "Acquittement Reset"}}]};
+    let currentStepIndex = 0;
+    let autoPlayInterval = null;
+
+    // Load Data (Direct Offline Safe)
+    function loadData() {
+      initApp();
+    }
+
+    function initApp() {
+      renderTimeline();
+      updateView(0);
+    }
+
+    function renderTimeline() {
+      const container = document.getElementById("timeline-scroll");
+      container.innerHTML = "";
+
+      AUTO_DATA.steps.forEach((step, idx) => {
+        const isAx9Bypassed = (step.id === "AX9_RAISE_OFF_BOTTOM" && cfgRaiseOffBottomM <= 0.0);
+        const node = document.createElement("div");
+        node.className = `timeline-node ${idx === currentStepIndex ? 'active' : ''} ${isAx9Bypassed ? 'bypassed-node' : ''}`;
+        node.id = `node-${step.id}`;
+        node.onclick = () => updateView(idx);
+
+        let badgeExtra = "";
+        let subText = `👉 ${step.transition.condition_titre}`;
+        if (isAx9Bypassed) {
+          badgeExtra = `<span style="background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 2px 5px; border-radius: 4px; font-size: 9px; font-weight: bold; margin-left: 4px;">SAUTÉE (0 m)</span>`;
+          subText = `⚡ Contournée : AX8 va direct à AX10`;
+        }
+
+        node.innerHTML = `
+          <div class="node-num">${step.id} ${badgeExtra}</div>
+          <div class="node-title"><span>${step.emoji}</span> <span>${step.titre.split('(')[0]}</span></div>
+          <div class="node-cond" title="${step.transition.condition_titre}">${subText}</div>
+        `;
+
+        container.appendChild(node);
+      });
+    }
+
+    function updateView(stepIdx) {
+      currentStepIndex = stepIdx;
+      const step = AUTO_DATA.steps[stepIdx];
+
+      // Update Focus Panel
+      document.getElementById("focus-step-id").textContent = step.id;
+      document.getElementById("focus-phase-name").textContent = step.phase_nom;
+      document.getElementById("focus-title").innerHTML = `${step.emoji} ${step.titre}`;
+      document.getElementById("focus-pourquoi").textContent = step.pourquoi;
+      document.getElementById("focus-action").textContent = step.action_mouvement;
+
+      // Adaptation dynamique de la transition selon réglage CfgRaiseOffBottomM
+      if (step.id === "AX8_BOTTOM_CONFIRMED") {
+        if (cfgRaiseOffBottomM <= 0.0) {
+          document.getElementById("focus-cond-titre").textContent = `👉 Réglage chantier 0 m : Passage DIRECT à AX10 (AX9 contournée)`;
+          document.getElementById("focus-cond-tech").textContent = `Code PLC : BottomTouchStabTimer.Q AND (RaiseOffBottomEff <= 0.0) -> AX10_CLOSE_BUCKET`;
+          document.getElementById("btn-advance-label").textContent = `Passer à AX10_CLOSE_BUCKET (Bypass AX9)`;
+        } else {
+          document.getElementById("focus-cond-titre").textContent = `👉 Réglage décollage > 0 m : Décollage et tension câbles (AX9)`;
+          document.getElementById("focus-cond-tech").textContent = `Code PLC : BottomTouchStabTimer.Q AND (RaiseOffBottomEff > 0.0) -> AX9_RAISE_OFF_BOTTOM`;
+          document.getElementById("btn-advance-label").textContent = `Passer à AX9_RAISE_OFF_BOTTOM (Décollage ${cfgRaiseOffBottomM}m)`;
+        }
+      } else if (step.id === "AX9_RAISE_OFF_BOTTOM" && cfgRaiseOffBottomM <= 0.0) {
+        document.getElementById("focus-cond-titre").textContent = `⚠️ ÉTAPE DÉSACTIVÉE SUR CHANTIER (CfgRaiseOffBottomM = 0.0 m)`;
+        document.getElementById("focus-cond-tech").textContent = `L'automate ne s'arrête pas dans cette étape avec vos réglages actuels.`;
+        document.getElementById("btn-advance-label").textContent = `Passer à AX10_CLOSE_BUCKET`;
+      } else {
+        document.getElementById("focus-cond-titre").textContent = `👉 ${step.transition.condition_titre}`;
+        document.getElementById("focus-cond-tech").textContent = `Code PLC : ${step.transition.condition_technique}`;
+        document.getElementById("btn-advance-label").textContent = `Aller à ${step.transition.cible} (${step.transition.condition_titre.substring(0, 32)}...)`;
+      }
+
+      document.getElementById("step-count-badge").textContent = `Étape ${stepIdx + 1} sur ${AUTO_DATA.steps.length}`;
+
+      // Update Phase Pills
+      document.querySelectorAll(".phase-pill").forEach(p => p.classList.remove("active"));
+      if (step.phase.startsWith("1")) document.getElementById("phase-pill-1").classList.add("active");
+      else if (step.phase.startsWith("2")) document.getElementById("phase-pill-2").classList.add("active");
+      else if (step.phase.startsWith("3")) document.getElementById("phase-pill-3").classList.add("active");
+      else if (step.phase.startsWith("4")) document.getElementById("phase-pill-4").classList.add("active");
+
+      // Update Timeline Active Node (défilement horizontal SANS faire sauter la page verticale)
+      document.querySelectorAll(".timeline-node").forEach(n => n.classList.remove("active"));
+      const activeNode = document.getElementById(`node-${step.id}`);
+      if (activeNode) {
+        activeNode.classList.add("active");
+        const timelineScroll = document.getElementById("timeline-scroll");
+        if (timelineScroll) {
+          const scrollTarget = activeNode.offsetLeft - (timelineScroll.clientWidth / 2) + (activeNode.clientWidth / 2);
+          timelineScroll.scrollTo({ left: Math.max(0, scrollTarget), behavior: "smooth" });
+        }
+      }
+
+      // Animate SVG Machine !
+      animateSvg(step.svg_state, step.id);
+    }
+
+    function animateSvg(state, stepId) {
+      const gantry = document.getElementById("gantry-group");
+      const cable1 = document.getElementById("cable-m1");
+      const cable2 = document.getElementById("cable-m2");
+      const bucket = document.getElementById("bucket-assembly");
+      const jawLeft = document.getElementById("jaw-left");
+      const jawRight = document.getElementById("jaw-right");
+      const payload = document.getElementById("bucket-payload");
+      const koboldLed = document.getElementById("kobold-led");
+      const waterDrops = document.getElementById("water-drops");
+      const dumpStones = document.getElementById("dump-stones");
+
+      // 1. Gantry Position (M3)
+      let gantryX = 430; // Default P1
+      let teleM3 = "Au point P1 (430 mm)";
+      if (state.gantry === "TREMIE") {
+        gantryX = 55;
+        teleM3 = "Au-dessus de la Trémie (55 mm)";
+      } else if (state.gantry === "MID") {
+        gantryX = 240;
+        teleM3 = "En transit intermédiaire (240 mm)";
+      }
+      gantry.style.transition = "transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
+      gantry.setAttribute("transform", `translate(${gantryX}, 8)`);
+      document.getElementById("tele-pos-m3").textContent = teleM3;
+
+      // 2. Bucket Depth (Cables Length)
+      let depthY = 60; // top / surface
+      let teleWinch = "Arrêt (0 m/s)";
+      if (state.depth === 1) {
+        depthY = 135; // Air descent
+        teleWinch = "Descente Palier 4 (1.2 m/s)";
+      } else if (state.depth === 2) {
+        depthY = 220; // In water
+        teleWinch = "Plongée Eau (0.9 m/s)";
+      } else if (state.depth === 3) {
+        depthY = 300; // Bottom touch
+        teleWinch = "Au contact du fond";
+      } else if (stepId.includes("ASCENT")) {
+        teleWinch = "Montée Palier 4 (1.2 m/s)";
+      }
+
+      cable1.style.transition = "y2 0.8s ease-out";
+      cable2.style.transition = "y2 0.8s ease-out";
+      bucket.style.transition = "transform 0.8s ease-out";
+
+      cable1.setAttribute("y2", depthY);
+      cable2.setAttribute("y2", depthY);
+      bucket.setAttribute("transform", `translate(0, ${depthY})`);
+      document.getElementById("tele-winch-step").textContent = teleWinch;
+
+      // 3. Bucket Jaws Open/Close (Correction cinématique : rotation externe pour ouvrir)
+      jawLeft.style.transition = "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+      jawRight.style.transition = "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+      if (state.bucket_open) {
+        // Rotation externe : la mâchoire gauche s'écarte vers la gauche (+40°), la droite vers la droite (-40°)
+        jawLeft.setAttribute("transform", "rotate(40 -12 8)");
+        jawRight.setAttribute("transform", "rotate(-40 12 8)");
+        document.getElementById("tele-bucket-state").textContent = "Grande Ouverte (40°)";
+      } else {
+        // Mâchoires fermées jointives au centre (0, 35)
+        jawLeft.setAttribute("transform", "rotate(0 -12 8)");
+        jawRight.setAttribute("transform", "rotate(0 12 8)");
+        document.getElementById("tele-bucket-state").textContent = "Complètement Fermée";
+      }
+
+      // 4. Payload in bucket
+      payload.style.display = state.payload ? "block" : "none";
+
+      // 5. Kobold Sensor
+      if (state.kobold) {
+        koboldLed.setAttribute("fill", state.depth >= 2 ? "#38bdf8" : "#facc15");
+        document.getElementById("tele-kobold-state").textContent = state.depth >= 2 ? "Dans l'eau (Active)" : "Sous tension (Air)";
+      } else {
+        koboldLed.setAttribute("fill", "#64748b");
+        document.getElementById("tele-kobold-state").textContent = "Inactive / Hors tension";
+      }
+
+      // 6. Water Drops or Dump Animation
+      waterDrops.style.display = state.dripping ? "block" : "none";
+      dumpStones.style.display = (stepId === "AX15B_DUMP_OPEN") ? "block" : "none";
+    }
+
+    // Réglage Chantier pour AX9 (0.0 m par défaut = AX9 sautée)
+    let cfgRaiseOffBottomM = 0.0;
+
+    function setCfgRaise(val) {
+      cfgRaiseOffBottomM = val;
+      const btn0 = document.getElementById("btn-cfg-0m");
+      const btn03 = document.getElementById("btn-cfg-03m");
+      if (btn0) btn0.classList.toggle("active", val <= 0);
+      if (btn03) btn03.classList.toggle("active", val > 0);
+      renderTimeline();
+      updateView(currentStepIndex);
+    }
+
+    function advanceStep() {
+      const current = AUTO_DATA.steps[currentStepIndex];
+      let targetId = current.transition.cible;
+
+      // Gestion de la bifurcation AX8 -> AX9 ou AX10 selon consigne utilisateur CfgRaiseOffBottomM
+      if (current.id === "AX8_BOTTOM_CONFIRMED") {
+        if (cfgRaiseOffBottomM <= 0.0) {
+          targetId = "AX10_CLOSE_BUCKET"; // Bypass chantier direct à AX10
+        } else {
+          targetId = "AX9_RAISE_OFF_BOTTOM"; // Optionnel : décollage fond
+        }
+      }
+
+      const targetIdx = AUTO_DATA.steps.findIndex(s => s.id === targetId);
+      if (targetIdx !== -1) {
+        updateView(targetIdx);
+      } else {
+        updateView((currentStepIndex + 1) % AUTO_DATA.steps.length);
+      }
+    }
+
+    function jumpToPhase(phaseCode) {
+      const idx = AUTO_DATA.steps.findIndex(s => s.phase === phaseCode);
+      if (idx !== -1) updateView(idx);
+    }
+
+    function toggleAutoPlay() {
+      const btnText = document.getElementById("play-text");
+      const icon = document.getElementById("play-icon");
+
+      if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+        btnText.textContent = "Lecture Démo Automatique";
+        icon.textContent = "▶";
+      } else {
+        btnText.textContent = "Pause Démo";
+        icon.textContent = "⏸";
+        autoPlayInterval = setInterval(() => {
+          advanceStep();
+          if (currentStepIndex === AUTO_DATA.steps.length - 1) {
+            clearInterval(autoPlayInterval);
+            autoPlayInterval = null;
+            btnText.textContent = "Lecture Démo Automatique";
+            icon.textContent = "▶";
+          }
+        }, 1800);
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark-theme");
+    }
+
+    window.addEventListener("DOMContentLoaded", loadData);
+  </script>
+</body>
+</html>

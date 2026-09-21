@@ -1,0 +1,116 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T349 « AX15A : affichage du geste operateur »
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# Origine : trouvaille annexe de T345, DOC/WFLOW/CONTRACTS/PLAN_T345_AX14_TREMIE_L3_CANDIDAT.md section 8
+# Revision figee a l'ecriture : HEAD = 6cbb0a8d + arbre de travail (FB_CycleSemiAuto.st modifie par T347/DSH14)
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T349_AX15A_AFFICHAGE_GESTE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    A l'etape AX15A de la sequence semi-automatique, les deux indicateurs publies vers la
+    supervision decrivent le geste que l'operateur doit reellement fournir pour franchir la porte
+    de sortie, a savoir homme-mort arme et poussee sur l'axe Y, au lieu de decrire une deflection
+    quelconque sur n'importe quel axe. Aujourd'hui l'operateur qui tient le joystick pousse vers la
+    gauche se voit annoncer qu'il n'est plus en attente alors que l'etape ne peut pas avancer.
+
+  acceptance:
+    - id: AC1
+      statement: "En AX15A, WaitingForOperator vaut TRUE tant que le geste exige par la porte de sortie est absent, et FALSE exactement quand ce geste est present."
+      verified_by: "Test CI sur G_CYCLE : balayage des combinaisons DeadmanArmed croise JoystickPush croise JoystickPull croise JoystickLeft croise JoystickRight, assertion de WaitingForOperator contre l'expression litterale de la porte de sortie ; le test doit echouer si la garde generique JoystickDeflected est reintroduite"
+    - id: AC2
+      statement: "En AX15A, WaitingForOperator et WaitingForProcess ne peuvent pas etre simultanement TRUE ni simultanement FALSE : les deux indicateurs sont le complement l'un de l'autre."
+      verified_by: "Test CI parcourant le meme balayage de combinaisons ; assertion d'inegalite logique entre les deux champs a chaque scan teste"
+    - id: AC3
+      statement: "Joystick pousse vers la gauche seul, homme-mort arme, en AX15A : l'etape ne progresse pas et WaitingForOperator vaut TRUE."
+      verified_by: "Test CI nomme, entree JoystickLeft TRUE avec JoystickPush FALSE ; assertion State reste AX15A et WaitingForOperator TRUE. C'est le cas ou l'ancien affichage mentait"
+    - id: AC4
+      statement: "Joystick pousse vers le bas avec homme-mort arme, en AX15A : l'etape progresse vers AX15B et WaitingForOperator vaut FALSE."
+      verified_by: "Test CI nomme, entrees DeadmanArmed TRUE et JoystickPush TRUE ; assertion State devient AX15B et WaitingForOperator FALSE"
+    - id: AC5
+      statement: "Les indicateurs affiches en AX15A sont coherents avec l'axe et le sens annonces par l'etape : axe Y et sens moins un."
+      verified_by: "Test CI comparant ExpectedAxis et ExpectedDirection de l'etape AX15A avec le geste que traduisent WaitingForOperator et WaitingForProcess"
+    - id: AC6
+      statement: "Aucune autre etape de la sequence n'a vu ses indicateurs d'attente changer : le correctif est confine a l'etape AX15A."
+      verified_by: "Test CI comparant les valeurs de WaitingForOperator et WaitingForProcess sur toutes les autres etapes du graphe avant et apres le correctif, plus les tests existants du domaine G_CYCLE"
+    - id: AC7
+      statement: "Aucune commande de mouvement n'a change : en AX15A et en AX15B les demandes treuils et translation restent a zero a chaque scan, comme avant le correctif."
+      verified_by: "Test CI capturant WinchM1Cmd, WinchM2Cmd et TranslationCmd au scan d'entree dans AX15A et sur les scans suivants ; valeurs attendues RunRequest ReqAscent ReqDescend a FALSE et StepTgt a zero, ReqStart a FALSE, PositionTgt a zero"
+    - id: AC8
+      statement: "Le message texte adresse a l'operateur en AX15A decrit le meme geste que la porte de sortie, et ne mentionne plus une deflection generique."
+      verified_by: "Relecture de OperatorAction de l'etape AX15A contre l'expression de sa porte de sortie ; le libelle doit nommer l'appui vers le bas et l'homme-mort"
+    - id: AC9
+      statement: "Le bundle PLCopenXML est regenere, la liaison est verifiee et les gates applicables passent sans nouvel echec introduit par ce lot."
+      verified_by: "generate_codesys_bundle.py, generate_codesys_diff_bundle.py, G200_check_linkage.py avec report, run_all_gates.py en palier C ; comparaison du jeu d'echecs avec le jeu preexistant (CI FB_CycleSemiAuto deja rouge a HEAD sur TC-P04-020, TC-P04-021, TC-P04-023, TC-P04-026 et TC-P04-SCEN-NOM)"
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T349_AX15A_AFFICHAGE_GESTE.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/CODE_DiffBundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/I_TRANSLATION/
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/D_JOYSTICK/FB_Joystick.st
+      - la porte de sortie AX15A vers AX15B : son expression est FIGEE par ce contrat
+      - la porte de transition AX14 vers AX15A : geler par le plan T334, hors perimetre
+      - tout fichier des perimetres T347, T334, T331, T295 et T346
+      - toute suppression ou affaiblissement d'assertion dans les tests existants
+
+  evidence_required:
+    - ci_before_after
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Deux points doivent etre remontes et non tranches silencieusement pendant ce lot.
+    Premier point : la porte de sortie AX15A utilise JoystickPush, qui n'exclut pas une
+    deflexion simultanee de l'axe X, alors que la garde stricte JoystickPushOnly existe deja
+    et est utilisee par la porte AX2. Resserrer la porte changerait le comportement de
+    franchissement et touche la semantique du repli benne etudie par T331 : c'est une decision
+    d'un autre niveau, elle est SIGNALEE avec son chiffrage, jamais appliquee ici.
+    Second point : le fichier FB_CycleSemiAuto.st porte un lot concurrent non commite a l'ecriture
+    de ce contrat. Toute ecriture exige la verification du verrou en cours et un diff strictement
+    confine a l'etape AX15A.
+
+status: PENDING
+
+execution:
+  executed_by: "—"
+  completed_at: "—"
+  status: PENDING
+  summary: >
+    En attente. Ce correctif est un correctif d'affichage : il ne change aucune commande de
+    mouvement. Il est neanmoins ecrit comme un contrat C2 parce qu'il touche un fichier de
+    sequenceur et que sa preuve doit etre rouge avant et verte apres.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: "—"
+  notes: >
+    Le lot est independant du plan T334 Phase 3 : il ne demande aucune levee de gel et ne touche
+    ni la porte AX14 vers AX15A ni la porte AX2 vers AX3. Il peut etre planifie des que le verrou
+    d'ecriture sur FB_CycleSemiAuto.st est libre.

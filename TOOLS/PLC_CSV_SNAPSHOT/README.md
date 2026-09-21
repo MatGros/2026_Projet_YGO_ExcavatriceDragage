@@ -25,10 +25,38 @@ PLC_CSV_SNAPSHOT/
 │                           export Symbol Configuration source (.xml) +
 │                           troubleshooting_variables.txt / ihm_variables.txt (listes generees,
 │                           input des scripts codesys_console)
+├── scripts/                 generateurs "pur python" (hors console CODESYS) — voir § Générateur .trace
+├── docs/                     documentation de l'outil (format .trace, etc.)
 └── RESULTS/                 CSV produits (sortie)
     ├── snapshot/            un instant T, sur declenchement manuel
     └── acquisition/         serie periodique (plusieurs instants dans un seul CSV)
 ```
+
+### 🎯 Générateur de trace CODESYS (`.trace`) — T372
+
+`scripts/generate_trace_template.py` génère un fichier `.trace` **importable dans CODESYS** à partir
+d'une liste de variables (+ éventuel trigger), en **transformant un `.trace` réel** (la base garantit
+la validité) — pas un générateur XML from-scratch.
+
+```powershell
+python TOOLS\PLC_CSV_SNAPSHOT\scripts\generate_trace_template.py `
+  --template TOOLS\PLC_CSV_SNAPSHOT\RESULTS\trace\Suivi_Cycle_M3_20260906_49.trace `
+  --var-file  TOOLS\PLC_CSV_SNAPSHOT\variable_lists\trace_cyclehoming_debug_v1.txt `
+  --record-name CycleHoming_Debug `
+  --output    tools_example.trace
+```
+
+- **Structure du format `.trace`** (config `<TraceConfiguration>` + `<TraceData>`, champs, ordre,
+  GUID d'archivage) : `docs/TRACE_FORMAT_T372.md` — preuve par lecture de 81 fichiers réels.
+- **Listes type** : `variable_lists/trace_cyclehoming_debug_v1.txt` (debug cycle homing),
+  `scripts/examples/homing_machine_variables.txt`.
+- **Exemples générés** : `scripts/examples/Example_Homing_Machine.trace`,
+  `scripts/examples/Example_CycleHoming_Debug.trace`.
+- 🎨 **Couleurs auto** : chaque variable reçoit une couleur distincte, par thème (hue différente par
+  groupe, teintes voisines dans le même groupe). Déterministe.
+- ✅ **Import CODESYS confirmé** (test réel 2026-09-21) : import sans erreur d'un `.trace` généré.
+- ⚠️ **Reste non prouvé** : encodage d'un **trigger actif** (aucun `.trace` du dépôt n'en a).
+  `--selftest` vérifie l'identité byte-à-byte de la config.
 
 ⚠️ Les CSV de `RESULTS/snapshot/` et `RESULTS/acquisition/` sont **trackés en Git** (historisation) —
 sans tri, ils s'accumulent indéfiniment. À la clôture d'une fiche de troubleshooting, la skill

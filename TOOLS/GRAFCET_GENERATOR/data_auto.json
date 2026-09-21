@@ -1,0 +1,408 @@
+{
+  "cycle_id": "CYCLE_AUTO_DRAGAGE",
+  "name": "Cycle Automatique de Dragage en Carrière",
+  "pous": ["FB_CycleSemiAuto.st", "E_AutoCycleStep.st"],
+  "doc_ref": "DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md",
+  "description": "Séquenceur automatique complet de dragage : préparation à quai, positionnement en P1, ouverture, plongée rapide et détection eau/fond par sonde Kobold, fermeture benne en profondeur, remontée en charge, égouttage et décharge dans la trémie.",
+  "steps": [
+    {
+      "id": "AX0_REPOS",
+      "num": 0,
+      "phase": "1_PREP",
+      "phase_nom": "1. Préparation & Positionnement",
+      "phase_color": "#0ea5e9",
+      "titre": "Repos / Machine au Park",
+      "emoji": "💤",
+      "pourquoi": "Étape initiale pure. La machine est en attente, aucune commande n'est active.",
+      "action_mouvement": "Toutes commandes à 0 (Treuils, Pont M3, Benne arrêtés).",
+      "svg_state": { "gantry": "MID", "depth": 0, "bucket_open": false, "payload": false, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX1_INIT",
+        "condition_titre": "Lancement du cycle (Start IHM ou validation)",
+        "condition_technique": "StartCycle AND Mode = SEMI_AUTO AND Enable",
+        "pourquoi_avance": "L'opérateur enclenche le cycle semi-auto depuis l'IHM."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Défaut général / Arrêt d'Urgence" }
+    },
+    {
+      "id": "AX1_INIT",
+      "num": 1,
+      "phase": "1_PREP",
+      "phase_nom": "1. Préparation & Positionnement",
+      "phase_color": "#0ea5e9",
+      "titre": "Contrôle des Conditions Initiales",
+      "emoji": "📋",
+      "pourquoi": "Vérifier que la machine est prête physiquement (codeurs calés, benne en haut, pont M3 dans la zone autorisée) avant d'autoriser tout mouvement.",
+      "action_mouvement": "Aucun mouvement physique pendant ce test statique.",
+      "svg_state": { "gantry": "MID", "depth": 0, "bucket_open": false, "payload": false, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX2_TRANSLATE_P1",
+        "condition_titre": "Conditions initiales validées (Homed + Benne en haut)",
+        "condition_technique": "InitPositionOk AND HomedM1 AND HomedM2 AND DeadmanArmed",
+        "pourquoi_avance": "Tous les voyants sont au vert, l'automate engage l'approche vers le point de plongée P1."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Codeur non référencé ou benne hors zone" }
+    },
+    {
+      "id": "AX2_TRANSLATE_P1",
+      "num": 2,
+      "phase": "1_PREP",
+      "phase_nom": "1. Préparation & Positionnement",
+      "phase_color": "#0ea5e9",
+      "titre": "Translation du Pont vers P1",
+      "emoji": "🚜",
+      "pourquoi": "Amener le chariot au-dessus de la fosse de dragage au point géographique P1 défini pour la passe.",
+      "action_mouvement": "Translation M3 vers la droite. Les treuils M1/M2 sont maintenus verrouillés au FDC haut.",
+      "svg_state": { "gantry": "P1", "depth": 0, "bucket_open": false, "payload": false, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX3_OPEN_BUCKET",
+        "condition_titre": "Capteur P1 atteint",
+        "condition_technique": "Translation_At_P1 = TRUE AND Translation_Done",
+        "pourquoi_avance": "Le pont roulant est exactement à l'aplomb du point de dragage P1."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Défaut translation ou relâchement homme-mort" }
+    },
+    {
+      "id": "AX3_OPEN_BUCKET",
+      "num": 3,
+      "phase": "1_PREP",
+      "phase_nom": "1. Préparation & Positionnement",
+      "phase_color": "#0ea5e9",
+      "titre": "Ouverture Complète de la Benne",
+      "emoji": "👐",
+      "pourquoi": "Ouvrir les mâchoires de la benne avant de plonger. La benne doit obligatoirement être grande ouverte pour pénétrer dans les sédiments.",
+      "action_mouvement": "Commande d'ouverture benne (mâchoires s'écartent). Treuils et pont à l'arrêt.",
+      "svg_state": { "gantry": "P1", "depth": 0, "bucket_open": true, "payload": false, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX3_WAIT_DIVE_START",
+        "condition_titre": "FDC Fin d'ouverture benne atteint",
+        "condition_technique": "Benne_IsOpen = TRUE AND Benne_Done",
+        "pourquoi_avance": "Les mâchoires sont en butée ouverte, prêtes pour la plongée."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Blocage mécanique mâchoires" }
+    },
+    {
+      "id": "AX3_WAIT_DIVE_START",
+      "num": 21,
+      "phase": "1_PREP",
+      "phase_nom": "1. Préparation & Positionnement",
+      "phase_color": "#0ea5e9",
+      "titre": "Attente & Stabilisation Plongée",
+      "emoji": "⏱️",
+      "pourquoi": "Vérifier que les treuils sont à l'arrêt complet avant de lancer la descente couplée à pleine vitesse.",
+      "action_mouvement": "Sorties neutres, attente arrêt mécanique complet M1 et M2.",
+      "svg_state": { "gantry": "P1", "depth": 0, "bucket_open": true, "payload": false, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX4_DESCEND_DIVING",
+        "condition_titre": "Treuils immobiles + Joystick poussé",
+        "condition_technique": "M1_ContactorsReleased AND M2_ContactorsReleased AND JoystickPush",
+        "pourquoi_avance": "Machine stabilisée et intention de descente confirmée par l'opérateur."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Relâchement homme-mort" }
+    },
+    {
+      "id": "AX4_DESCEND_DIVING",
+      "num": 4,
+      "phase": "2_DIVING",
+      "phase_nom": "2. Plongée & Détection du Fond",
+      "phase_color": "#2563eb",
+      "titre": "Descente Rapide dans l'Air (Palier 4)",
+      "emoji": "⬇️",
+      "pourquoi": "Faire descendre la benne ouverte à vitesse maximale (palier 4) depuis la position haute jusqu'au voisinage de la surface de l'eau (DiveStartMin_M).",
+      "action_mouvement": "Descente synchronisée M1+M2 au palier 4 (rapide). La sonde Kobold n'est pas encore alimentée.",
+      "svg_state": { "gantry": "P1", "depth": 1, "bucket_open": true, "payload": false, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX5_KOBOLD_INIT",
+        "condition_titre": "Altitude d'approche eau atteinte (DiveStartMin_M)",
+        "condition_technique": "M1_CablePosM >= DiveStartMinM (ex: 3.5 m)",
+        "pourquoi_avance": "La benne arrive juste au-dessus de l'eau, on prépare l'allumage de la sonde de détection."
+      },
+      "repli": { "cible": "AX_DIVING_RETRY", "condition": "Désynchronisme M1/M2 ou arrêt intempestif" }
+    },
+    {
+      "id": "AX5_KOBOLD_INIT",
+      "num": 5,
+      "phase": "2_DIVING",
+      "phase_nom": "2. Plongée & Détection du Fond",
+      "phase_color": "#2563eb",
+      "titre": "Enclenchement Sonde Kobold « au vol »",
+      "emoji": "⚡",
+      "pourquoi": "Alimenter le contacteur de la sonde de niveau Kobold pendant le mouvement sans arrêter la descente pour gagner du temps de cycle.",
+      "action_mouvement": "Descente palier 4 maintenue. Contacteur Kobold enclenché.",
+      "svg_state": { "gantry": "P1", "depth": 1, "bucket_open": true, "payload": false, "kobold": true, "dripping": false },
+      "transition": {
+        "cible": "AX6_SEARCH_IMMERSION",
+        "condition_titre": "Retour contacteur Kobold confirmé",
+        "condition_technique": "KoboldContactorFeedback = TRUE",
+        "pourquoi_avance": "La sonde est sous tension et opérationnelle pour détecter l'entrée dans l'eau."
+      },
+      "repli": { "cible": "AX_DIVING_RETRY", "condition": "Défaut d'enclenchement contacteur Kobold" }
+    },
+    {
+      "id": "AX6_SEARCH_IMMERSION",
+      "num": 6,
+      "phase": "2_DIVING",
+      "phase_nom": "2. Plongée & Détection du Fond",
+      "phase_color": "#2563eb",
+      "titre": "Recherche Entrée dans l'Eau",
+      "emoji": "🌊",
+      "pourquoi": "Traverser la surface de l'eau. La sonde Kobold fixée sur la benne passe de l'air (0) à l'eau (1).",
+      "action_mouvement": "Poursuite de la plongée au palier 4. Surveillance continue du front capteur.",
+      "svg_state": { "gantry": "P1", "depth": 2, "bucket_open": true, "payload": false, "kobold": true, "dripping": false },
+      "transition": {
+        "cible": "AX7_SEARCH_BOTTOM",
+        "condition_titre": "Front d'immersion détecté (0 ➔ 1)",
+        "condition_technique": "R_TRIG(KoboldImmersed).Q = TRUE",
+        "pourquoi_avance": "La benne est officiellement immergée. On bascule en phase de recherche du fond."
+      },
+      "repli": { "cible": "AX_DIVING_RETRY", "condition": "Eau non trouvée avant la limite de sécurité" }
+    },
+    {
+      "id": "AX7_SEARCH_BOTTOM",
+      "num": 7,
+      "phase": "2_DIVING",
+      "phase_nom": "2. Plongée & Détection du Fond",
+      "phase_color": "#2563eb",
+      "titre": "Descente Profonde & Recherche du Fond",
+      "emoji": "⚓",
+      "pourquoi": "Descendre dans l'eau jusqu'à ce que la benne touche le lit de sédiments ou atteigne la consigne de profondeur.",
+      "action_mouvement": "Descente sous l'eau palier 4. Quand la benne touche le fond, la sonde se détend ou bascule (1 ➔ 0).",
+      "svg_state": { "gantry": "P1", "depth": 3, "bucket_open": true, "payload": false, "kobold": true, "dripping": false },
+      "transition": {
+        "cible": "AX8_BOTTOM_CONFIRMED",
+        "condition_titre": "Fond détecté (Sonde 1 ➔ 0 ou consigne atteinte)",
+        "condition_technique": "F_TRIG(KoboldImmersed).Q OR CablePos >= SetDepthM",
+        "pourquoi_avance": "La benne a touché le fond sédimentaire !"
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Atteinte limite légale ou anomalie câble" }
+    },
+    {
+      "id": "AX8_BOTTOM_CONFIRMED",
+      "num": 8,
+      "phase": "2_DIVING",
+      "phase_nom": "2. Plongée & Détection du Fond",
+      "phase_color": "#2563eb",
+      "titre": "Arrêt Immédiat au Fond & Mémorisation",
+      "emoji": "🛑",
+      "pourquoi": "Couper instantanément les moteurs des treuils pour éviter que les câbles ne se déroulent au fond et ne fassent du mou.",
+      "action_mouvement": "Coupure immédiate des treuils M1 et M2. Mémorisation position de touche.",
+      "svg_state": { "gantry": "P1", "depth": 3, "bucket_open": true, "payload": false, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX10_CLOSE_BUCKET",
+        "condition_titre": "Chantier CfgRaiseOffBottomM = 0 m : Direct AX10 (AX9 contournée)",
+        "condition_technique": "BottomTouchStabTimer.Q AND (RaiseOffBottomEff <= 0 -> AX10)",
+        "pourquoi_avance": "Avec CfgRaiseOffBottomM réglé à 0.0 m, l'automate passe directement à la fermeture AX10 (AX9 est désactivée)."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Défaut de freinage" }
+    },
+    {
+      "id": "AX9_RAISE_OFF_BOTTOM",
+      "num": 9,
+      "phase": "3_EXTRACTION",
+      "phase_nom": "3. Dragage & Extraction",
+      "phase_color": "#8b5cf6",
+      "titre": "Tension Câbles (Étape Optionnelle — Inactive à 0 m)",
+      "emoji": "🧵",
+      "pourquoi": "Étape de retension câbles. Configurée à 0 mètre sur votre machine, donc automatiquement sautée en exploitation nominale.",
+      "action_mouvement": "Sautée si CfgRaiseOffBottomM = 0.0 m. Si > 0 m : légère montée synchronisée.",
+      "svg_state": { "gantry": "P1", "depth": 3, "bucket_open": true, "payload": false, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX10_CLOSE_BUCKET",
+        "condition_titre": "Câbles tendus (ou bypass 0 m)",
+        "condition_technique": "DeltaPos >= CfgRaiseOffBottomM OR Cfg <= 0m",
+        "pourquoi_avance": "Enchaînement vers la fermeture de la benne."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Surtension anormale câble" }
+    },
+    {
+      "id": "AX10_CLOSE_BUCKET",
+      "num": 10,
+      "phase": "3_EXTRACTION",
+      "phase_nom": "3. Dragage & Extraction",
+      "phase_color": "#8b5cf6",
+      "titre": "Fermeture & Prélèvement des Sédiments",
+      "emoji": "🗜️",
+      "pourquoi": "Actionner le treuil de fermeture M2 pour refermer les mâchoires de la benne dans le gravier et capturer la charge utile.",
+      "action_mouvement": "Traction sur le câble de fermeture M2. Les mâchoires mordent le fond et se referment.",
+      "svg_state": { "gantry": "P1", "depth": 3, "bucket_open": false, "payload": true, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX11_CTRL_ASCENT",
+        "condition_titre": "Fermeture mécanique confirmée",
+        "condition_technique": "Benne_IsClosed = TRUE OR Benne_CloseReached",
+        "pourquoi_avance": "La benne est fermée, le godet est plein de matériaux."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Blocage fermeture ou intensité excessive" }
+    },
+    {
+      "id": "AX11_CTRL_ASCENT",
+      "num": 11,
+      "phase": "3_EXTRACTION",
+      "phase_nom": "3. Dragage & Extraction",
+      "phase_color": "#8b5cf6",
+      "titre": "Montée Contrôlée (Arrachement du Fond)",
+      "emoji": "🏋️",
+      "pourquoi": "Arracher délicatement la charge du fond sous-marin à vitesse lente (palier 1 ou 2) pour maîtriser la tension et surveiller le synchronisme.",
+      "action_mouvement": "Montée M1+M2 en vitesse lente (palier 1-2) sur une distance paramétrée (ex: 2 mètres).",
+      "svg_state": { "gantry": "P1", "depth": 2, "bucket_open": false, "payload": true, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX12_LOADED_ASCENT",
+        "condition_titre": "Distance d'arrachement franchie",
+        "condition_technique": "AscentDistance >= CfgCtrlAscentDistanceM",
+        "pourquoi_avance": "La benne est libérée de l'effet ventouse du fond, on peut accélérer la remontée."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Désynchronisme M1/M2 au décollage" }
+    },
+    {
+      "id": "AX12_LOADED_ASCENT",
+      "num": 12,
+      "phase": "3_EXTRACTION",
+      "phase_nom": "3. Dragage & Extraction",
+      "phase_color": "#8b5cf6",
+      "titre": "Remontée en Charge Rapide (Palier 4)",
+      "emoji": "🚀",
+      "pourquoi": "Remonter la benne chargée le plus vite possible (palier 4) jusqu'au-dessus de la surface de l'eau.",
+      "action_mouvement": "Montée M1+M2 à grande vitesse jusqu'au seuil d'arrêt haut.",
+      "svg_state": { "gantry": "P1", "depth": 0, "bucket_open": false, "payload": true, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX13_DRAIN_PAUSE",
+        "condition_titre": "Benne sortie de l'eau en position haute",
+        "condition_technique": "M1TopLimitReached AND M2TopLimitReached",
+        "pourquoi_avance": "La benne est hors d'eau, stabilisée en position d'égouttage."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Dépassement FDC haut logiciel" }
+    },
+    {
+      "id": "AX13_DRAIN_PAUSE",
+      "num": 13,
+      "phase": "4_DECHARGE",
+      "phase_nom": "4. Égouttage & Trémie",
+      "phase_color": "#f59e0b",
+      "titre": "Égouttage des Boues & Eau",
+      "emoji": "💧",
+      "pourquoi": "Laisser l'eau s'évacuer de la benne pendant quelques secondes au-dessus du plan d'eau pour ne pas déverser de boue liquide dans la trémie.",
+      "action_mouvement": "Machine immobile au-dessus de l'eau. Chronomètre d'égouttage actif.",
+      "svg_state": { "gantry": "P1", "depth": 0, "bucket_open": false, "payload": true, "kobold": false, "dripping": true },
+      "transition": {
+        "cible": "AX14_TRANSLATE_DUMP",
+        "condition_titre": "Temps d'égouttage écoulé (ou Skip IHM)",
+        "condition_technique": "DrainTimer.Q OR SkipDrainRequest",
+        "pourquoi_avance": "Le matériau est égoutté, le transfert vers la trémie peut commencer."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Perte de mode" }
+    },
+    {
+      "id": "AX14_TRANSLATE_DUMP",
+      "num": 14,
+      "phase": "4_DECHARGE",
+      "phase_nom": "4. Égouttage & Trémie",
+      "phase_color": "#f59e0b",
+      "titre": "Translation du Pont vers la Trémie",
+      "emoji": "🚋",
+      "pourquoi": "Déplacer le pont roulant horizontalement depuis P1 vers la trémie de déchargement sur le quai.",
+      "action_mouvement": "Translation M3 vers la gauche. Benne fermée maintenue en position haute.",
+      "svg_state": { "gantry": "TREMIE", "depth": 0, "bucket_open": false, "payload": true, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX15A_DUMP_ARRIVE",
+        "condition_titre": "Arrivée au capteur Trémie",
+        "condition_technique": "Translation_At_Tremie = TRUE AND Translation_Done",
+        "pourquoi_avance": "Le chariot est parfaitement positionné au-dessus de la trémie."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Défaut course translation" }
+    },
+    {
+      "id": "AX15A_DUMP_ARRIVE",
+      "num": 15,
+      "phase": "4_DECHARGE",
+      "phase_nom": "4. Égouttage & Trémie",
+      "phase_color": "#f59e0b",
+      "titre": "Arrivée & Arrêt au-dessus Trémie",
+      "emoji": "🎯",
+      "pourquoi": "Stabiliser le balancement de la benne avant d'ouvrir les mâchoires au-dessus de la trémie.",
+      "action_mouvement": "Tous actionneurs à l'arrêt complet.",
+      "svg_state": { "gantry": "TREMIE", "depth": 0, "bucket_open": false, "payload": true, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX15B_DUMP_OPEN",
+        "condition_titre": "Arrêt confirmé + Ordre de vidage",
+        "condition_technique": "WinchesStopped AND TranslationStopped",
+        "pourquoi_avance": "Machine immobile et stable, ouverture sécurisée possible."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Mouvement anormal" }
+    },
+    {
+      "id": "AX15B_DUMP_OPEN",
+      "num": 16,
+      "phase": "4_DECHARGE",
+      "phase_nom": "4. Égouttage & Trémie",
+      "phase_color": "#f59e0b",
+      "titre": "Vidage : Ouverture Benne dans Trémie",
+      "emoji": "🪨",
+      "pourquoi": "Ouvrir les mâchoires de la benne pour vider les tonnes de graviers extraits dans la trémie d'alimentation.",
+      "action_mouvement": "Ouverture benne. Les graviers tombent dans la trémie. Treuils immobiles.",
+      "svg_state": { "gantry": "TREMIE", "depth": 0, "bucket_open": true, "payload": false, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX18_DONE_SYNC",
+        "condition_titre": "Benne totalement vide et ouverte",
+        "condition_technique": "Benne_IsOpen = TRUE AND Benne_Done",
+        "pourquoi_avance": "La charge est vidée dans la trémie. Le godet est prêt pour une nouvelle passe !"
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Blocage à l'ouverture" }
+    },
+    {
+      "id": "AX18_DONE_SYNC",
+      "num": 18,
+      "phase": "4_DECHARGE",
+      "phase_nom": "4. Égouttage & Trémie",
+      "phase_color": "#f59e0b",
+      "titre": "Fin de Passe & Incrément Compteur",
+      "emoji": "🏆",
+      "pourquoi": "Clôturer le cycle de dragage réussi : incrémenter le compteur de godets extraits, enregistrer le temps de cycle, et repartir pour le cycle suivant.",
+      "action_mouvement": "Incrément compteur journalier. Rebouclage automatique direct vers le point P1 (AX2).",
+      "svg_state": { "gantry": "TREMIE", "depth": 0, "bucket_open": true, "payload": false, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX2_TRANSLATE_P1",
+        "condition_titre": "Rebouclage automatique pour passe suivante",
+        "condition_technique": "AutoReplayEnabled OR StartCycle",
+        "pourquoi_avance": "Le portique repart immédiatement vers P1 pour la passe suivante !"
+      },
+      "repli": { "cible": "AX0_REPOS", "condition": "Fin de poste / Arrêt cycle demandé" }
+    },
+    {
+      "id": "AX_DIVING_RETRY",
+      "num": 20,
+      "phase": "SPECIAL",
+      "phase_nom": "Voie de Reprise / Spécial",
+      "phase_color": "#ec4899",
+      "titre": "Reprise Plongée Assistée (Retry)",
+      "emoji": "🔄",
+      "pourquoi": "Si la sonde Kobold a été perturbée ou si l'opérateur a relâché le joystick en pleine plongée, la machine remonte en douceur au FDC haut pour ré-aligner la passe sans planter l'automate.",
+      "action_mouvement": "Remontée lente sécurisée M1+M2 jusqu'au FDC haut.",
+      "svg_state": { "gantry": "P1", "depth": 1, "bucket_open": true, "payload": false, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX4_DESCEND_DIVING",
+        "condition_titre": "FDC haut réatteint, prêt pour nouvelle plongée",
+        "condition_technique": "M1TopLimitReached AND DeadmanArmed",
+        "pourquoi_avance": "La benne est revenue en haut, la descente peut reprendre en toute sécurité."
+      },
+      "repli": { "cible": "AX_STAB", "condition": "Défaut persistant" }
+    },
+    {
+      "id": "AX_STAB",
+      "num": 19,
+      "phase": "SPECIAL",
+      "phase_nom": "Repli Défaut & Sécurité",
+      "phase_color": "#ef4444",
+      "titre": "Repli Sécurisé / Stabilisation",
+      "emoji": "🛡️",
+      "pourquoi": "État de repli automatique en cas de défaut ou d'interruption : figer les mouvements, serrer les freins et attendre l'arbitrage humain.",
+      "action_mouvement": "Freins mécaniques serrés. Tous mouvements coupés sans à-coup.",
+      "svg_state": { "gantry": "MID", "depth": 1, "bucket_open": false, "payload": false, "kobold": false, "dripping": false },
+      "transition": {
+        "cible": "AX0_REPOS",
+        "condition_titre": "Acquittement défaut (Reset)",
+        "condition_technique": "ResetEdge.Q",
+        "pourquoi_avance": "Défaut acquitté par l'opérateur, retour à l'état initial sécurisé."
+      },
+      "repli": { "cible": "AX0_REPOS", "condition": "Acquittement Reset" }
+    }
+  ]
+}

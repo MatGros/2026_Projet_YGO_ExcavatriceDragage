@@ -1,0 +1,38 @@
+{
+  "fichiers_st": 262,
+  "candidats_declarations": 572,
+  "candidats_par_tier": {
+    "T1(brief)": 492,
+    "T2(elargi)": 80
+  },
+  "causes_producteurs": 82,
+  "causes_index_symbolique": 7,
+  "bits_errorid_ad_hoc": 30,
+  "causes_texte_vide": 1,
+  "causes_texte_reserve": 2,
+  "libelles_carrousel": 116,
+  "libelles_formateur": 116,
+  "termes_aggregation": 11,
+  "references_scannees": 2676,
+  "causes_par_producteur": {
+    "FB_Brake": 1,
+    "FB_Safety_EmergencyManagement": 4,
+    "FB_Joystick": 3,
+    "FB_Encoder": 3,
+    "FB_Encoder_Abs": 2,
+    "FB_Encoder_Homing": 4,
+    "FB_Encoder_Safety": 2,
+    "FB_Modes": 4,
+    "FB_CycleMachineHoming": 7,
+    "FB_CycleSemiAuto": 12,
+    "FB_Bucket": 5,
+    "FB_Safety_Winch": 16,
+    "FB_Winch": 2,
+    "FB_WinchLoadEstimator": 1,
+    "FB_WinchOutputInterlock": 1,
+    "FB_WinchSync": 3,
+    "FB_Safety_Translation": 8,
+    "FB_Translation": 3,
+    "FB_TranslationOutputInterlock": 1
+  }
+}

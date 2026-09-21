@@ -1,0 +1,117 @@
+fichier,ligne,index,libelle,garde,est_formateur
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,175,i,'',NOT Enable THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,813,AlarmCount,'[IO] Defaut module Local IO (DI8/DO8)',NOT LocalIoValid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,816,AlarmCount,'[IO] Defaut module VH0800END (DI8)',NOT Vh0800Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,819,AlarmCount,'[IO] Defaut module VH0808ETP (DI8/DO8)',NOT Vh0808Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,822,AlarmCount,'[IO] Defaut module VH0008ER (DO8 Relais)',NOT Vh0008ErValid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,825,AlarmCount,'[IO] Defaut module VH0008ER_1 (DO8 Relais)',NOT Vh0008Er1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,828,AlarmCount,'[CAN] Defaut bus CANopen',NOT CanBusValid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,831,AlarmCount,'[CAN] Joystick JOY1 non detecte',CanBusValid AND NOT Joy1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,834,AlarmCount,'[ECAT] Defaut bus EtherCAT',NOT EcatBusValid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,837,AlarmCount,'[M1] Codeur absolu COD1 non detecte (ECAT)',EcatBusValid AND NOT EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,840,AlarmCount,'[M2] Codeur absolu COD2 non detecte (ECAT)',EcatBusValid AND NOT EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,843,AlarmCount,'[M3] Variateur AC600 non detecte (ECAT)',EcatBusValid AND NOT VarM3Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,852,AlarmCount,'[M1] ErrorID:01 - perte com operateur',WinchM1Safety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,855,AlarmCount,'[M1] ErrorID:02 - perte codeur',WinchM1Safety.ErrorEncoder AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,858,AlarmCount,'[M1] ErrorID:05 - rotation phases',WinchM1Safety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,861,AlarmCount,'[M1] ErrorID:08 - MecaA - deplacement sans commande',WinchM1Safety.ErrorMecaA AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,864,AlarmCount,'[M1] ErrorID:09 - MecaB - arret non confirme apres stop',WinchM1Safety.ErrorMecaB AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,867,AlarmCount,'[M1] ErrorID:10 - MecaC - glissement pendant benne figee',WinchM1Safety.ErrorMecaC AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,870,AlarmCount,'[M1] ErrorID:12 - MecaD - non-arret au capteur haut',WinchM1Safety.ErrorMecaD AND LocalIoValid AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,873,AlarmCount,'[M1] ErrorID:13 - MecaE - ecart synchro M1/M2 critique',WinchM1Safety.ErrorMecaE AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,876,AlarmCount,'[M1] ErrorID:15 - sens oppose',WinchM1Safety.ErrorOppositeDir AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,879,AlarmCount,'[M1] ErrorID:16 - discordance commande/retour/mouvement',WinchM1Safety.ErrorNoMovement AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,882,AlarmCount,'[M1] Survitesse treuil detectee (SafeStop)',WinchM1Safety.ErrorOverspeed AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,895,AlarmCount,'[M1] Limite basse cable atteinte',(WinchM1Safety.ErrorId AND CST_WinchErrorIdCableLimitDescent) <> 16#0000 AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,900,AlarmCount,'[M2] ErrorID:01 - perte com operateur',WinchM2Safety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,903,AlarmCount,'[M2] ErrorID:02 - perte codeur',WinchM2Safety.ErrorEncoder AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,906,AlarmCount,'[M2] ErrorID:05 - rotation phases',WinchM2Safety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,909,AlarmCount,'[M2] ErrorID:08 - MecaA - deplacement sans commande',WinchM2Safety.ErrorMecaA AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,912,AlarmCount,'[M2] ErrorID:09 - MecaB - arret non confirme apres stop',WinchM2Safety.ErrorMecaB AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,915,AlarmCount,'[M2] ErrorID:10 - MecaC - glissement pendant benne figee',WinchM2Safety.ErrorMecaC AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,918,AlarmCount,'[M2] ErrorID:12 - MecaD - non-arret au capteur haut',WinchM2Safety.ErrorMecaD AND LocalIoValid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,921,AlarmCount,'[M2] ErrorID:13 - MecaE - ecart synchro M1/M2 critique',WinchM2Safety.ErrorMecaE AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,924,AlarmCount,'[M2] ErrorID:15 - sens oppose',WinchM2Safety.ErrorOppositeDir AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,927,AlarmCount,'[M2] ErrorID:16 - discordance commande/retour/mouvement',WinchM2Safety.ErrorNoMovement AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,930,AlarmCount,'[M2] Survitesse treuil detectee (SafeStop)',WinchM2Safety.ErrorOverspeed AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,934,AlarmCount,'[M2] Limite basse cable atteinte',(WinchM2Safety.ErrorId AND CST_WinchErrorIdCableLimitDescent) <> 16#0000 AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,939,AlarmCount,'[M3] ErrorID:01 - perte com operateur',TranslationSafety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,942,AlarmCount,'[M3] ErrorID:02 - perte EtherCAT',TranslationSafety.ErrorDriveComm AND VarM3Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,945,AlarmCount,'[M3] ErrorID:03 - rotation phases',TranslationSafety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,948,AlarmCount,'[M3] ErrorID:05 - MecaB - arret non confirme apres stop',TranslationSafety.ErrorMecaB AND VarM3Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,951,AlarmCount,'[M3] ErrorID:06 - MecaA - deplacement sans commande',TranslationSafety.ErrorMecaA AND VarM3Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,954,AlarmCount,'[M3] ErrorID:07 - butee extreme',TranslationSafety.ErrorLimitSwitch AND Vh0808Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,957,AlarmCount,'[M3] ErrorID:08 - capteurs incoherents',TranslationSafety.ErrorSensorIncoherent AND Vh0808Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,964,AlarmCount,'[M3] Defaut sequence / retour frein translation',((TranslationMotionErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,967,AlarmCount,'[M3] Defaut variateur translation AC600',((TranslationMotionErrorId AND 16#0008) <> 16#0000) AND VarM3Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,970,AlarmCount,'[M3] Limite extreme translation atteinte',((TranslationMotionErrorId AND 16#0040) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,973,AlarmCount,'[M3] Barriere finale translation (frein / redemarrage) - Reset',(TranslationFinalInterlockErrorId <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,980,AlarmCount,'[BENNE] ErrorID:01 - configuration geometrie invalide',((BucketErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,983,AlarmCount,'[BENNE] ErrorID:02 - depassement ecart max autorise',((BucketErrorId AND 16#0002) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,986,AlarmCount,'[BENNE] ErrorID:03 - timeout commande deplacement',((BucketErrorId AND 16#0004) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,989,AlarmCount,'[BENNE] ErrorID:04 - glissement treuil M1',((BucketErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,992,AlarmCount,'[BENNE] ErrorID:05 - codeurs treuils non references',((BucketErrorId AND 16#0010) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,997,AlarmCount,'[SYNC] ErrorID:01 - ecart M1/M2',((SyncErrorId AND 16#0001) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1000,AlarmCount,'[SYNC] ErrorID:02 - incoherence commande',((SyncErrorId AND 16#0002) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1013,AlarmCount,"CONCAT('[SYNC] discordance M1/M2 persistante -> coupure : ', BannerSyncContactorWhich)",SyncContactorDiag.MismatchLevel >= 2 THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1015,AlarmCount,"CONCAT('[SYNC] discordance contacteurs M1/M2 -> arret : ', BannerSyncContactorWhich)",SyncContactorDiag.MismatchLevel >= 2 THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1022,AlarmCount,'[DIVE] ErrorID:01 - timeout immersion',((DiveErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1025,AlarmCount,'[DIVE] ErrorID:02 - timeout fond',((DiveErrorId AND 16#0002) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1028,AlarmCount,'[DIVE] ErrorID:03 - limite basse atteinte',((DiveErrorId AND 16#0004) <> 16#0000) AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1031,AlarmCount,'[DIVE] ErrorID:04 - contact fond perdu',((DiveErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1034,AlarmCount,'[DIVE] ErrorID:05 - perte tension cable',((DiveErrorId AND 16#0010) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1037,AlarmCount,'[DIVE] ErrorID:06 - anomalie vitesse',((DiveErrorId AND 16#0020) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1040,AlarmCount,'[DIVE] ErrorID:07 - config invalide',((DiveErrorId AND 16#0040) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1043,AlarmCount,'[EXTRACTION] ErrorID:01 - fond',((ExtractionErrorId AND 16#0001) <> 16#0000) AND LocalIoValid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1046,AlarmCount,'[EXTRACTION] ErrorID:02 - fermeture',((ExtractionErrorId AND 16#0002) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1049,AlarmCount,'[EXTRACTION] ErrorID:03 - controle',((ExtractionErrorId AND 16#0004) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1052,AlarmCount,'[EXTRACTION] ErrorID:04 - config',((ExtractionErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1057,AlarmCount,'[AU] ErrorID:01 - redondance contacteurs',((EmergencyErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1060,AlarmCount,'[AU] ErrorID:02 - echec confirmation armement',((EmergencyErrorId AND 16#0002) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1063,AlarmCount,'[AU] ErrorID:04 - echec autotest demarrage',((EmergencyErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1068,AlarmCount,'[CYCLE] ErrorID:01 - limite legale atteinte',((CycleErrorId AND 16#0001) <> 16#0000) AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1071,AlarmCount,'[CYCLE] ErrorID:02 - defaut synchro treuils',((CycleErrorId AND 16#0002) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1074,AlarmCount,'[CYCLE] ErrorID:04 - ecart codeurs remontee',((CycleErrorId AND 16#0008) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1077,AlarmCount,'[CYCLE] ErrorID:05 - ecart vitesse confirme',((CycleErrorId AND 16#0010) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1080,AlarmCount,'[CYCLE] ErrorID:06 - perte communication IHM',((CycleErrorId AND 16#0020) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1083,AlarmCount,'[CYCLE] ErrorID:07 - timeout etape',((CycleErrorId AND 16#0040) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1086,AlarmCount,'[CYCLE] ErrorID:03 - ecart vitesse montee',((CycleErrorId AND 16#0004) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1089,AlarmCount,'[CYCLE] ErrorID:08 - hors FDC haut translation P1',((CycleErrorId AND 16#0080) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1092,AlarmCount,'[CYCLE] ErrorID:09 - palier 5 interdit en plongee',((CycleErrorId AND 16#0100) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1095,AlarmCount,'[CYCLE] ErrorID:10 - palier 4 non confirme Kobold',((CycleErrorId AND 16#0200) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1098,AlarmCount,'[CYCLE] ErrorID:12 - consigne profondeur invalide',((CycleErrorId AND 16#0800) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1113,AlarmCount,'[HISTO] [M1] ErrorID:01 - perte com operateur',(HistoM1 AND 16#0001) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1116,AlarmCount,'[HISTO] [M1] ErrorID:02 - perte codeur',(HistoM1 AND 16#0002) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1119,AlarmCount,'[HISTO] [M1] ErrorID:03 - surchauffe moteur',(HistoM1 AND 16#0004) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1122,AlarmCount,'[HISTO] [M1] ErrorID:04 - mou de cable',(HistoM1 AND 16#0008) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1125,AlarmCount,'[HISTO] [M1] ErrorID:05 - rotation phases',(HistoM1 AND 16#0010) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1128,AlarmCount,'[HISTO] [M1] ErrorID:08 - MecaA - deplacement sans commande',(HistoM1 AND 16#0080) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1131,AlarmCount,'[HISTO] [M1] ErrorID:09 - MecaB - arret non confirme apres stop',(HistoM1 AND 16#0100) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1134,AlarmCount,'[HISTO] [M1] ErrorID:10 - MecaC - glissement pendant benne figee',(HistoM1 AND 16#0200) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1137,AlarmCount,'[HISTO] [M1] ErrorID:11 - surchauffe frein',(HistoM1 AND 16#0400) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1140,AlarmCount,'[HISTO] [M1] ErrorID:12 - MecaD - non-arret au capteur haut',(HistoM1 AND 16#0800) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1143,AlarmCount,'[HISTO] [M1] ErrorID:13 - MecaE - ecart synchro M1/M2 critique',(HistoM1 AND 16#1000) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1146,AlarmCount,'[HISTO] [M1] ErrorID:15 - sens oppose',(HistoM1 AND 16#4000) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1149,AlarmCount,'[HISTO] [M1] ErrorID:16 - absence mouvement',(HistoM1 AND 16#8000) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1154,AlarmCount,'[HISTO] [M2] ErrorID:01 - perte com operateur',(HistoM2 AND 16#0001) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1157,AlarmCount,'[HISTO] [M2] ErrorID:02 - perte codeur',(HistoM2 AND 16#0002) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1160,AlarmCount,'[HISTO] [M2] ErrorID:03 - surchauffe moteur',(HistoM2 AND 16#0004) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1163,AlarmCount,'[HISTO] [M2] ErrorID:04 - mou de cable',(HistoM2 AND 16#0008) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1166,AlarmCount,'[HISTO] [M2] ErrorID:05 - rotation phases',(HistoM2 AND 16#0010) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1169,AlarmCount,'[HISTO] [M2] ErrorID:08 - MecaA - deplacement sans commande',(HistoM2 AND 16#0080) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1172,AlarmCount,'[HISTO] [M2] ErrorID:09 - MecaB - arret non confirme apres stop',(HistoM2 AND 16#0100) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1175,AlarmCount,'[HISTO] [M2] ErrorID:10 - MecaC - glissement pendant benne figee',(HistoM2 AND 16#0200) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1178,AlarmCount,'[HISTO] [M2] ErrorID:11 - surchauffe frein',(HistoM2 AND 16#0400) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1181,AlarmCount,'[HISTO] [M2] ErrorID:12 - MecaD - non-arret au capteur haut',(HistoM2 AND 16#0800) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1184,AlarmCount,'[HISTO] [M2] ErrorID:13 - MecaE - ecart synchro M1/M2 critique',(HistoM2 AND 16#1000) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1187,AlarmCount,'[HISTO] [M2] ErrorID:15 - sens oppose',(HistoM2 AND 16#4000) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1190,AlarmCount,'[HISTO] [M2] ErrorID:16 - absence mouvement',(HistoM2 AND 16#8000) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1195,AlarmCount,'[HISTO] [M3] ErrorID:01 - perte com operateur',(HistoM3 AND 16#0001) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1198,AlarmCount,'[HISTO] [M3] ErrorID:02 - perte EtherCAT',(HistoM3 AND 16#0002) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1201,AlarmCount,'[HISTO] [M3] ErrorID:03 - rotation phases',(HistoM3 AND 16#0004) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1204,AlarmCount,'[HISTO] [M3] ErrorID:04 - surchauffe frein',(HistoM3 AND 16#0008) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1207,AlarmCount,'[HISTO] [M3] ErrorID:05 - MecaB - arret non confirme apres stop',(HistoM3 AND 16#0010) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1210,AlarmCount,'[HISTO] [M3] ErrorID:06 - MecaA - deplacement sans commande',(HistoM3 AND 16#0020) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1213,AlarmCount,'[HISTO] [M3] ErrorID:07 - butee extreme',(HistoM3 AND 16#0040) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1216,AlarmCount,'[HISTO] [M3] ErrorID:08 - capteurs incoherents',(HistoM3 AND 16#0080) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui
+CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,1222,i,'',(HistoM3 AND 16#0080) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN,oui

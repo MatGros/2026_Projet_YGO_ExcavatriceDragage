@@ -1,0 +1,442 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T334 : Translation M3 — arrêt à l'arrivée P1/Trémie en cycle
+# ═══════════════════════════════════════════════════════════════════════════
+# Criticite C3 · strategie patch · acteur DSH07 (verrou DOC/WFLOW/TASK_LOCKS.json)
+# Verrou : T334 -> DSH07. Orchestrateur : CC01.
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# ── POURQUOI CE FICHIER EXISTE MAINTENANT (devoir d'alerte leve) ──
+# DOC/WFLOW/TASKS.yaml:38 referencait ce contrat alors qu'il N'EXISTAIT PAS : la tache C3
+# etait menee sans contrat de tache, cas d'arret du preambule sous-agent. La phase 1
+# (analyse) a donc ete menee sur les criteres AC1-AC5 du brief d'origine. Ce fichier est
+# cree sur GO explicite de l'orchestrateur CC01 (2026-09-20), AVANT la phase 2 de conception.
+#
+# ── FAITS ETABLIS (phase 1, lecture seule du code, fichier:ligne) ──
+# FAIT 1 — L'AXE EST DEJA UNIFIE (la premisse "deux voies vers l'axe" est fausse).
+#   Un seul FB de mouvement : FB_Translation, appele une seule fois (PRG_05_Translation.st:537).
+#   Un seul arbitre : FB_TranslationCmdArbitrationM3 (declare PRG_05_Translation.st:27,
+#   appele :363). Une seule barriere finale : FB_TranslationOutputInterlock (PRG_06_Outputs.st:434).
+#   Un seul jeu de mots variateur : PRG_06_Outputs.st:457-459. Les deux demandeurs CONVERGENT.
+#
+# FAIT 2 — LA DIVERGENCE PORTE SUR LA PROPRIETE DE L'ARRET.
+#   Manuel/MAINT : l'arret est un VERROU LATCHE dans l'axe (FB_Translation.st:180, :192, :196),
+#   relache uniquement par une demande explicite de sens INVERSE (:202-204) : un rebond capteur
+#   ne peut ni le relacher ni relancer le mouvement.
+#   Cycle SEMI_AUTO : l'arret est le RETRAIT DE LA DEMANDE par le sequenceur
+#   (FB_CycleSemiAuto.st:899 en AX2, :1386 en AX14), donc RE-ARMABLE des que le jeton retombe
+#   (:913 et :1383 re-assertent ReqStart). Le jeton d'arrivee est la SOURCE de la demande.
+#
+# FAIT 3 — LA CIBLE D'ARRET EST FIGEE PAR L'ETAPE AU LIEU DE SUIVRE LE SENS COMMANDE.
+#   FB_TranslationCmdArbitrationM3.st:65 (SelTarget := ReqTranslation.PositionTgt) puis
+#   PRG_05_Translation.st:408-429 (CASE SelTarget) : en AX2 la cible est P1 quel que soit le sens
+#   du geste, alors que les commentaires FB_CycleSemiAuto.st:905-906 et PRG_05_Translation.st:404-407
+#   affirment que "la cible effective suit le sens du joystick" : contradiction interne.
+#
+# FAIT 4 — ASYMETRIE AX2 / AX14, sans source ni commentaire.
+#   AX2 conserve PositionTgt := 3 apres l'arrivee (FB_CycleSemiAuto.st:900).
+#   AX14 remet PositionTgt := 0 (FB_CycleSemiAuto.st:1387) => SelTarget = 0 => la cible
+#   PositionSensorTarget retombe a FALSE car la demande vient d'etre retiree
+#   (PRG_05_Translation.st:414-427) => le debounce capteur de 100 ms
+#   (ST_fbTranslation_Cfg.st:31) est remis a zero apres UN SEUL scan de 10 ms => le front
+#   ArrivalEdge (FB_Translation.st:177) ne se produit jamais => ArrivalLock n'est JAMAIS arme
+#   par la voie capteur en AX14. Seule reste la voie FdC (:190-200).
+#
+# FAIT 5 — LE DERNIER VERROU DISPONIBLE EN CYCLE PEUT ETRE DESACTIVE SANS GARDE DE MODE.
+#   FB_Translation.st:190 est conditionne par NOT BypassLimitSwitch, alimente par
+#   PRG_05_Translation.st:571 (GVL_IHM.M3Translation.Bypass.LimitSwitch OR .Global) SANS garde
+#   de mode, alors que la doctrine du DUT dit "actionnable UNIQUEMENT en MAINT_N2"
+#   (ST_BypassTranslation.st:4-5) et que le bypass Global est RESTAURE AU BOOT depuis le RETAIN
+#   (PRG_07_Supervision.st:336-346 ; citation d'origine ":230-235" FAUSSE, elle pointe la logique T330 TOP/FdC).
+#   De plus la coupure dure Tremie (PRG_06_Outputs.st:431-432) exige ReqTremieSemantic, que le
+#   cycle vient precisement de retirer (:1386) : elle est desarmee a l'arrivee.
+#
+# FAIT 6 — AUCUNE PREUVE DYNAMIQUE DISPONIBLE A CE JOUR.
+#   La seule trace M3 du depot (archives/Suivi_TranslationM3bug_20260904_27.trace et
+#   Suivi_Cycle_M3_20260906_49.trace) est echantillonnee a dt median 100 ms (mesure : dt min 77 ms,
+#   max 128 ms, 39 valeurs distinctes, 367 echantillons) avec 15 canaux, AUCUN jeton ni interne de
+#   FB. Les traces SIMU_MaintMANU_20260919 (66 a 70) ne contiennent QUE des variables treuils et
+#   joystick Y (54 a 58 canaux), aucune variable M3. Aucune des trois experiences du protocole
+#   n'existe donc dans le depot : la phase 1 conclut par des HYPOTHESES SOURCEES (H1 a H6), pas par
+#   une cause racine.
+#
+# FAIT 7 — LE BANC NE PEUT PAS SERVIR DE JUGEMENT EN DERNIER RESSORT.
+#   AUDIT_T300_TRACE_20260904_v1.0.md:244 : le banc est structurellement incapable de reproduire
+#   le defaut frein/cause 6 (cas C4). Un PASS banc ne vaut donc PAS non-regression terrain.
+#
+# ── LIEN AVEC T287 (a suivre, hors perimetre de ce lot) ──
+#   H1 (le cycle recree la demande quand le jeton d'arrivee est efface) explique mecaniquement le
+#   symptome de T287 ("recidive du defaut sequence/retour frein M3 aux arrivees Tremie ET P1",
+#   TASKS.yaml:1248-1250, avec commutations capteur 0<->1 pendant environ 1 s). La trace produite
+#   par ce lot doit etre reutilisable telle quelle par le porteur read-only de T287 : les canaux
+#   Brake.BrakeCmd, M3_BrakeIsOpen_DI, M3_TremieHardStopActive et ArrivalLock y figurent
+#   explicitement pour cette raison. Aucune correction de T287 n'est faite ici.
+#
+# ── QUESTIONS A TRANCHER AVANT LA PHASE 3 (code) ──
+#   Q1 (autorite de l'arret) : l'arret d'arrivee doit-il etre arme par la SEULE detection
+#      d'arrivee, independamment de la presence d'une demande (recommandation du comparatif,
+#      fiche §7.2) ? Si oui, le relachement reste-t-il "demande de sens inverse" uniquement ?
+#   Q2 (cible) : PositionSensorTarget doit-il suivre le SENS COMMANDE dans tous les modes, la cible
+#      d'etape ne servant qu'a autoriser/interdire ? Cela rend AX2, AX14 et le manuel equivalents.
+#   Q3 (retrait de demande) : le sequenceur doit-il attendre la confirmation d'arret de l'axe
+#      (Data.TranslationDone / TranslationBusy, PRG_05_Translation.st:817-818) avant de retirer sa
+#      demande, ou la barriere doit-elle COMMANDER l'arret plutot que mettre le mot de commande a 0
+#      (mot 0 = roue libre cote variateur, FB_Translation.st:297-303) ?
+#   Q4 (bypass) : neutraliser les bypass FdC consommes par l'axe hors MAINT_N1/N2, et/ou ne pas les
+#      restaurer au passage en SEMI_AUTO (FAIT 5) ?
+#   Q5 (perimetre du lot) : corriger aussi l'ecart spec/code de l'escalade aux butees
+#      (AF_Partie-11 v2.4:346-351 : 0 / 2,5 s / 5 s vs code 1,5 s + PowerCutOff immediat,
+#      FB_Safety_Translation.st:200-203 et :268) ou le laisser hors lot ? Recommandation : HORS LOT
+#      (touche la surete, merite son propre contrat).
+#   Q6 (config morte) : reactiver ou supprimer _TranslationAutoSpeedCap_Pct (GVL_PERSISTENT.st:97,
+#      0 lecteur) alors que le cycle commande 100 % (FB_TranslationCmdArbitrationM3.st:74) ?
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# PHASE 2 — ARBITRAGE Q1 A Q6 RENDU LE 2026-09-20 (CONCEPTION SEULE, ZERO CODE)
+# Detail complet, preuves par question et lots : DOC/WFLOW/CONTRACTS/PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md
+#   Q1 autorite de l'arret : OUI — l'axe arme son verrou d'arrivee sur la SEULE detection
+#      d'arrivee, independamment de la presence d'une demande ; relachement INCHANGE (demande
+#      explicite de sens inverse, FB_Translation.st:202-204). Corrige H1 a la racine : meme si
+#      le demandeur recree sa demande, ArrivalLock maintient RampTargetPct a 0 (:251).
+#   Q2 cible / sens : NON — la cible d'etape reste la cible d'arrivee en SEMI_AUTO. Rendre la
+#      cible dependante du sens en AX2 detruirait le chemin de recuperation de depassement
+#      documente (FB_CycleSemiAuto.st:905-906 + branche :1549-1557 WT, jeton P1 arme sur les
+#      DEUX fronts de son capteur). Le defaut reel n'est pas QUELLE cible est selectionnee mais
+#      que la perte de la demande efface la detection (PRG_05:427) : corrige par Q1 + Q3.
+#   Q3 retrait de la demande : OUI — le demandeur CONSERVE demande ET cible jusqu'a
+#      ArrivalLock + arret physique confirme, puis retire. Motifs verifies : mot 0 = roue libre
+#      en mouvement (H4 a P1) ; les DEUX voies de la cause 6 lisent la demande
+#      (FB_Translation.st:123-124, FB_Safety_Translation.st:200-201) ; la coupure dure Tremie
+#      exige ReqTremieSemantic (PRG_06:431-432) ; les verrous bistables FdC ne se liberent que
+#      sur demande de sens inverse (PRG_05:162-190) ; le veto d'etape force frein + mot a 0 au
+#      changement d'etape (PRG_05:656-662). Option "la barriere COMMANDE l'arret" REJETEE
+#      (duplication du producteur d'arret : AF_Partie-02:502, CODE_QUALITY_STANDARDS sec.5).
+#      Timeout d'attente d'arret ARME obligatoire (jamais un maintien indefini).
+#   Q4 bypass : OUI — garde de mode au point de CONSOMMATION (PRG_05:468 et :571), doctrine
+#      MAINT_N2 (ST_BypassTranslation.st:4-5). PRG_07 n'est PAS touche (interdit au contrat) :
+#      la garde suffit a rendre inoffensive la restauration RETAIN (PRG_07:336-346).
+#      Decision humaine D1 requise (retire des capacites de mise en service hors N2).
+#   Q5 escalade aux butees : HORS LOT (confirme). FB_Safety_Translation.st est INTERDIT au
+#      present contrat ; ecart reel et chiffre — spec AF_Partie-11 v2.4:346-351 (0 / 2,5 s /
+#      5 s) vs code :202 (1,5 s) et :268 (PowerCutOff immediat, sans gradation). Contrat dedie.
+#   Q6 config morte _TranslationAutoSpeedCap_Pct : HORS LOT. GVL_PERSISTENT.st et
+#      CODE/J_SUPERVISION/ sont interdits ici. Recommandation : SUPPRIMER (0 lecteur,
+#      GVL_PERSISTENT.st:97, alors que le cycle commande 100 % fixe : information IHM fausse).
+#      Decision humaine D2 : retenir le plafond comme mitigation ELARGIT le perimetre du lot.
+#
+# LOT PHASE 2 "UNIFORMISER AX2/AX14 SUR AX3" : ARRETE (verdict challenger fiche sec. 10bis,
+#   confirme sur le code par le porteur). Mecanisme verifie : TranslationStopTimer exige 500 ms
+#   CONTINUS de (AX2 ET At_P1) ou (AX14 ET At_Tremie) ET NOT Translation_Busy
+#   (FB_CycleSemiAuto.st:334-338) tandis que le re-armement de la demande est IMMEDIAT
+#   (:913 / :1387 WT) par des permis qui n'exigent PAS le neutre (:716-717) => sous capteur qui
+#   rebondit la transition ne peut jamais s'armer et la demande se re-arme a chaque rebond :
+#   le retour au neutre etait la SEULE soupape. Les gardes :718 (JoystickPushOnly) et
+#   :1395 WT (NOT JoystickDeflected) RESTENT EN PLACE — ne pas defaire T319 sans garde
+#   equivalente. Toute uniformisation est reportee APRES obtention d'un arret possede par l'axe.
+#
+# PREALABLE DE TRACABILITE (a lever AVANT tout diff de CODE/) : FB_CycleSemiAuto.st porte une
+#   edition NON COMMITEE de T331/DSH09 (+20/-5, ecriture 2026-09-20 18:13:32) qui decale de +4
+#   toute ligne posterieure a :1224. Lire en version WT (+4) ou HEAD. Ce fichier est sous
+#   VERROU D'ECRITURE T331 : le lot sequenceur (L2) est BLOQUE jusqu'a liberation.
+#
+# ── ECARTS SPEC/CODE CONSTATES, HORS PERIMETRE (signales, non corriges) ──
+#   E1 arbitrage par priorite specifie (AF_Partie-11 v2.4:270 "AU > Defaut > Cycle > Joystick >
+#      Boutons IHM MAINT") vs aiguillage exclusif par mode implemente
+#      (FB_TranslationCmdArbitrationM3.st:63, :84, :114).
+#   E2 escalade aux butees : voir Q5.
+#   E3 variables mortes : M3_PositioningActive (PRG_05_Translation.st:45, :373),
+#      TonM3ConfirmedMoving.Q (PRG_05_Translation.st:80, :201) alors que le "mouvement confirme
+#      soutenu 1,5 s" est revendique en commentaire (:76-79, :198-199),
+#      instCycleSemiAuto.SelTarget (FB_CycleSemiAuto.st:32, cable PRG_03_Modes_Cycle.st:209).
+#   ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T334_AUTO_CYCLE_M3_OVERSHOOT
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    En mode SEMI_AUTO, l'axe de translation M3 doit s'arreter a son point d'arrivee (P1 en AX2,
+    Tremie en AX14) avec la meme autorite qu'en manuel et en maintenance : la decision d'arret
+    appartient a l'axe, reste valide malgre un rebond ou une perte du capteur d'arrivee, et la
+    demande du sequenceur ne peut ni annuler ni recreer un mouvement une fois le point atteint.
+    Aucun franchissement du point d'arrivee n'est tolere en automatique. Les sources de commande
+    restent separees (operateur / cycle), conformement a AF_Partie-04:179 et AF_Partie-02:220.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        La cause du depassement est nommee sur une trace echantillonnee a 10 ms, ou refutee :
+        pour chaque arrivee (P1 en AX2, Tremie en AX14), la trace identifie laquelle des
+        hypotheses H1 a H6 la fiche T334 est active, avec la variable fautive nommee et son
+        producteur fichier:ligne, ou bien demontre qu'aucune ne l'est. Un resultat negatif
+        (aucune hypothese confirmee) est un resultat acceptable et doit etre livre comme tel,
+        jamais transforme en conclusion positive.
+      verified_by: >
+        Les 3 fichiers de trace du protocole PLUS leur conversion en CSV wide obtenue par
+        python TOOLS/PLC_CSV_SNAPSHOT/external_python/trace_to_csv.py PLUS une section d'analyse
+        dans la fiche T334 qui nomme, pour chaque arrivee, la premiere variable dont la valeur
+        contredit le comportement attendu et le fichier:ligne qui la produit.
+    - id: AC2
+      statement: >
+        Apres correctif, sur une arrivee en AX14 et sur une arrivee en AX2 avec intermittence du
+        capteur d'arrivee d'environ 1 s, le chariot ne repart pas : aucun front montant de
+        M3_CommandWord ni de M3_SetpointFrequencyHz ne survient apres l'atteinte du point
+        d'arret, et le verrou d'arret de l'axe est arme dans les 150 ms suivant le premier front
+        du capteur d'arrivee. Le comportement ne depend ni du mode ni de l'etape.
+      verified_by: >
+        Rejeu du scenario B du protocole apres correctif, colonnes M3_CommandWord,
+        M3_SetpointFrequencyHz et le verrou d'arret : 0 front de mot de commande apres l'arrivee
+        et verrou a TRUE dans les 15 echantillons suivant le front capteur, sur les deux etapes.
+    - id: AC3
+      statement: >
+        Parite manuel / cycle : sur la meme arrivee, le temps entre le premier front du capteur
+        d'arrivee et l'extinction du mot de commande ne differe pas de plus d'un echantillon de
+        10 ms entre le scenario C (jog MAINT) et les scenarios A/B (SEMI_AUTO), et le meme verrou
+        d'arret est arme dans les trois cas.
+      verified_by: >
+        Comparaison directe des trois CSV wide : ecart du nombre d'echantillons entre le front
+        capteur et la retombee du mot de commande, plus etat du verrou d'arret a l'arrivee.
+    - id: AC4
+      statement: >
+        Un test automatise reproduit la perte du capteur d'arrivee et echoue sur le code actuel,
+        puis passe apres correctif ; il porte sur la sortie publique de l'axe (mot de commande et
+        verrou d'arret), jamais sur une variable interne lue par un appelant.
+      verified_by: >
+        python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Translation (ou le FB retenu en
+        phase 2) : sortie FAIL avec l'assertion nommee avant correctif, PASS de la meme assertion
+        apres correctif, les deux sorties collees dans la restitution.
+    - id: AC5
+      statement: >
+        Un garde-fou automatique empeche la regression : il detecte une re-creation de la demande
+        de translation sur perte du jeton d'arrivee, ou un armement du verrou d'arret conditionne
+        a la presence de la demande. Il passe au ROUGE si l'on retire l'armement du verrou dans une
+        copie de travail, et au VERT sur le depot corrige.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C : gate PASS apres
+        enregistrement dans PLANS ; puis variante negative sur copie hors depot : gate FAIL,
+        copie restauree immediatement apres.
+    - id: AC6
+      statement: >
+        Le comportement manuel et maintenance est inchange : en MAINT_N1/N2, l'arrivee sur P1, sur
+        Maintenance et sur Tremie conserve son arret sur fin de course, son temps d'arret et son
+        relachement par demande de sens inverse.
+      verified_by: >
+        Rejeu du scenario C avant et apres correctif (meme geste) : temps d'arret identiques a un
+        echantillon pres et aucun changement du comportement de relachement.
+    - id: AC7
+      statement: >
+        Les protections de surete M3 restent actives et atteignables : un depassement reel et
+        soutenu d'une butee allume toujours la cause 6, l'escalade vers l'arret de securite puis
+        la coupure de puissance reste possible, et les permis directionnels ainsi que le veto hors
+        etape de translation sont inchanges.
+      verified_by: >
+        Rejeu du scenario B avec depassement force (capteur d'arrivee neutralise) : la cause 6
+        apparait, l'escalade est atteinte ; les colonnes des permis directionnels restent
+        identiques a la baseline des scenarios A et C.
+    - id: AC8
+      statement: >
+        Pour tout fichier de CODE/M_MAIN modifie par ce lot, le nom du fichier est identique au nom
+        de POU declare dans ce fichier : aucun POU n'est renomme et aucun fichier n'est cree sous
+        un nom different de son POU.
+      verified_by: >
+        git diff --name-only sur CODE/M_MAIN/ : chaque chemin porte un POU du meme nom, verifie
+        par relevé des declarations PROGRAM et par le gate de structure du palier applicable.
+    - id: AC9
+      statement: >
+        Le suffixe de langage de chaque fichier modifie est egal au langage genere dans le bundle
+        pour ce POU : aucun suffixe de langage n'est ajoute ou retire sans que le bundle ne
+        produise reellement ce langage.
+      verified_by: >
+        Relevé du langage de chaque objet dans CODE_XML/CODE_Bundle.xml regenere, compare au
+        suffixe du fichier source modifie, plus le gate de bundle du palier applicable.
+    - id: AC10
+      statement: >
+        La decision d'unification est tracee avant tout code : le comparatif, le verdict et la
+        liste des questions Q1 a Q6 sont valides par l'humain et l'orchestrateur, et la
+        specification AF-11 decrit l'autorite d'arret retenue si la semantique change.
+      verified_by: >
+        Contrat portant la section decisions remplie (Q1 a Q6) avant le premier diff de CODE/,
+        plus la ligne de Suivi historique de DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md en
+        cas de changement de semantique.
+
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - CODE/I_TRANSLATION/FB_TranslationCmdArbitrationM3.st
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/
+      - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T334_AUTO_CYCLE_M3_OVERSHOOT.yaml
+      - DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/GVL_PERSISTENT.st
+      - CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st
+      - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st
+      - CODE/I_TRANSLATION/FB_Safety_Translation.st
+      - CODE/L_SIMULATION/
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/J_SUPERVISION/
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Arret sur les fins de course en manuel et maintenance (verrou latche FB_Translation.st:180, :192, :196) et son relachement par demande de sens inverse uniquement (:202-204)"
+      - "Substitut de coupure dure P1 en SEMI_AUTO (mot 00001, PRG_05_Translation.st:152-154) et verrous bistables de fin de course (PRG_05_Translation.st:163, :187)"
+      - "Coupure dure Tremie sur DI brut avec frein ferme au meme scan (PRG_06_Outputs.st:431-432)"
+      - "Escalade de securite cause 6 et coupure de puissance par masque (FB_Safety_Translation.st:200-203, :268)"
+      - "Permis directionnels M3 (EffectivePermitM3_Tremie / _Maintenance) et veto hors etape de translation (PRG_05_Translation.st:385-395, :656-662)"
+      - "Textes et actions operateur du sequenceur, et continuite AX2 vers AX3 sous geste maintenu (T319)"
+      - "Interface de FB_Translation (VAR_INPUT et VAR_OUTPUT) sauf ajout decide en phase 2 et trace au contrat"
+    dropped_on_purpose:
+      - "Aucun comportement existant n'est retire par principe : toute suppression (par exemple un veto devenu redondant) doit etre decidee en phase 2 et justifiee dans le plan valide"
+
+  evidence_required:
+    - trace_10ms_analyse
+    - ci_before_after
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Tout ecart entre les hypotheses de la phase 1 et les faits mesures est remonte immediatement a
+    l'orchestrateur, pas a la fin et jamais silencieusement. Cas particulier a signaler sans delai :
+    une trace qui contredit la lecture statique du code (par exemple un verrou d'arret arme alors que
+    le code montre que le debounce ne peut pas aboutir), un depassement observe sans aucune des
+    hypotheses H1 a H6 active, un consommateur de surete decouvert pour une variable annoncee comme
+    sans consommateur, et tout effet de bord constate sur les treuils, la benne ou la chaine AU.
+    Signaler n'est pas elargir le perimetre : T287, T300, T301, T333, T204, la config morte et
+    l'ecart d'escalade aux butees restent hors de ce lot.
+
+status: IN_PROGRESS
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 DECISIONS ET SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+decisions:
+  GO_CC01_2026-09-20: >
+    Verdict de la phase 1 ACCEPTE par l'orchestrateur CC01, verifie sur 3 points durs
+    (verrou d'arret de l'axe, asymetrie AX14, front montant seul du decodeur). Etapes autorisees :
+    (a) campagnes de trace 10 ms selon le protocole A/B/C ; (b) creation de ce contrat C3 avant la
+    phase 2 de conception. Toujours zero code. Hors scope (variables mortes, escalade aux butees)
+    transmis, non corriges ici.
+  lien_T287: >
+    H1 rejoint potentiellement la cause de T287 (defaut frein M3 aux arrivees). Le porteur
+    read-only de T287 pourra reutiliser la trace produite : les canaux frein et coupure dure y sont
+    traces explicitement. Aucune correction de T287 dans ce lot.
+  Q1_autorite_arret: >
+    ARBITRE 2026-09-20 — OUI. L'axe arme son verrou d'arrivee sur la SEULE detection d'arrivee
+    qualifiee, independamment de la presence d'une demande (FB_Translation.st:179-183), et ce
+    verrou n'est JAMAIS leve par la disparition de la demande. Relachement inchange : demande
+    explicite de sens inverse uniquement (:202-204), acquis manuel conserve. Effet : un rebond
+    de capteur ne peut plus produire de mouvement, le terme ArrivalLock maintenant la rampe a 0
+    (:251) => H1 neutralise a la racine, et non par le retour au neutre. Lot L1.
+  Q2_cible_sens: >
+    ARBITRE 2026-09-20 — NON. La cible d'arrivee reste celle de l'etape en SEMI_AUTO
+    (FB_TranslationCmdArbitrationM3.st:65 -> PRG_05:408-412) ; la selection par sens commande
+    reste la voie du mode manuel (SelTarget = 0). Motif : en AX2, rendre la cible dependante du
+    sens supprimerait l'arret a P1 lors du retour de degagement et detruirait un chemin de
+    recuperation existant (FB_CycleSemiAuto.st:905-906 et :1549-1557 WT ; jeton P1 arme sur les
+    DEUX fronts de son capteur, FB_Translation_PositionDecoder.st:116). La contradiction de
+    commentaires (D02) se corrige en commentaire, pas en comportement.
+  Q3_retrait_demande: >
+    ARBITRE 2026-09-20 — OUI, option (a) : le demandeur conserve demande ET cible jusqu'a ce que
+    l'axe ait arme ArrivalLock ET confirme l'arret physique, puis retire. Option (b) "la barriere
+    commande l'arret au lieu de mettre le mot de commande a 0" REJETEE : elle duplique le
+    producteur d'arret (AF_Partie-02:502, CODE_QUALITY_STANDARDS sec.5) et ne restaure pas les
+    escalades, qui lisent la demande. Motifs verifies : mot 0 = roue libre en mouvement (H4 a P1,
+    :229-233 + :297-303) ; les deux voies de la cause 6 dependent de la demande (:123-124 et
+    FB_Safety_Translation.st:200-201) ; la coupure dure Tremie depend de ReqTremieSemantic
+    (PRG_06:431-432) ; les verrous bistables FdC ne se liberent que sur demande de sens inverse
+    (PRG_05:162-190) ; le veto d'etape force frein et mot a 0 au changement d'etape
+    (PRG_05:656-662). Obligation associee : timeout d'attente d'arret ARME (repli AX_STAB +
+    defaut latche), jamais un maintien indefini. Lot L2, bloque par le verrou T331.
+  Q4_bypass_mode: >
+    ARBITRE 2026-09-20 — OUI, garde de mode au point de CONSOMMATION (PRG_05:468 et :571),
+    doctrine MAINT_N2 (ST_BypassTranslation.st:4-5). Un seul bypass neutralise trois barrieres
+    (FB_Translation.st:190 et :123 ; FB_Safety_Translation.st:199). PRG_07 n'est PAS touche
+    (interdit au contrat) : la garde rend inoffensive la restauration RETAIN (PRG_07:336-346).
+    Decision humaine D1 requise avant L1 : la garde retire des capacites de mise en service hors
+    MAINT_N2.
+  Q5_escalade_butees: >
+    ARBITRE 2026-09-20 — HORS LOT (recommandation du comparatif confirmee). FB_Safety_Translation.st
+    est INTERDIT au present contrat : la correction est structurellement impossible ici. Ecart
+    confirme et chiffre : spec AF_Partie-11 v2.4:346-351 (0 / 2,5 s / 5 s, section deja titree
+    T287) vs code FB_Safety_Translation.st:202 (PT = T#1S500MS) et :268 (PowerCutOff immediat des
+    que le bit 6 est actif, sans gradation). Contrat dedie, porteur T287 ou nouveau lot surete.
+  Q6_config_morte: >
+    ARBITRE 2026-09-20 — HORS LOT, recommandation SUPPRIMER. _TranslationAutoSpeedCap_Pct
+    (GVL_PERSISTENT.st:97) a 0 lecteur alors que le cycle commande SpeedPct := 100.0 fixe
+    (FB_TranslationCmdArbitrationM3.st:74) : l'IHM expose un plafond inexistant. GVL_PERSISTENT.st
+    et CODE/J_SUPERVISION/ sont INTERDITS ici => tache dediee. Decision humaine D2 : si le plafond
+    est retenu comme mitigation du depassement (H3, distance d'arret croissant en v carre), le
+    perimetre du lot doit etre elargi et un AC dedie ajoute.
+  PLAN_PHASE3: >
+    DOC/WFLOW/CONTRACTS/PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md — modele cible (7 invariants),
+    lots L0 (prouver par trace) puis L1 (l'axe possede l'arret) puis L2 (le demandeur s'aligne,
+    bloque par le verrou T331) puis L3 (sort du neutre : optionnel, conditionne a L1+L2 prouves),
+    AC11 a AC16, preuves, alertes (Q7 coupure dure Tremie contre arrivee nominale, A13 a A16),
+    et les 5 decisions humaines D1 a D5 a trancher avant L1/L2.
+
+execution:
+  executed_by: "DSH07 (DeepSeek Harness)"
+  completed_at: "2026-09-20T16:10:00+02:00"
+  status: IN_PROGRESS
+  summary: >
+    PHASE 1 (analyse) LIVREE. Comparatif complet des deux chaines : 66 lignes pour la chaine
+    manuelle, 35 lignes pour la chaine cycle, une ligne par variable avec producteur et
+    consommateur fichier:ligne. 10 divergences sourcees, dont la propriete de l'arret, la cible
+    figee par l'etape et l'asymetrie AX2/AX14. Verdict : ANOMALIE partielle — separation des
+    sources obligatoire et conforme, duplication de la fonction d'arret non conforme a
+    AF_Partie-02:502, AF_Partie-03:303/305/341 et CODE_QUALITY_STANDARDS 522-523. 6 hypotheses de
+    depassement classees (H1 a H6) et liste exacte des variables a tracer a 10 ms sur 7 groupes,
+    avec protocole 3 scenarios et matrice de decision. PHASE 2 (conception) NON COMMENCEE : elle
+    attend le retour des traces et l'arbitrage des questions Q1 a Q6. AUCUN fichier de CODE/
+    modifie, aucun test, aucun gate, aucun bundle, aucune IHM.
+  summary_phase2: >
+    PHASE 2 (conception) LIVREE SOUS FORME D'ARBITRAGE, ZERO CODE. Les 6 questions Q1 a Q6 sont
+    tranchees dans le bloc decisions ci-dessus, chaque preuve etant relevee directement dans les
+    sources (jamais recopiee d'une analyse anterieure). Deux corrections de citation : FAIT 5
+    PRG_07_Supervision.st:230-235 -> :336-346 (releve direct ; le challenger citait :331-341),
+    valeur exacte du bloc de restauration RETAIN des bypass. Le lot "uniformiser AX2/AX14 sur
+    AX3" est ARRETE : le challenge independant (fiche sec. 10bis, verdict MAJOR, acteur DSH10)
+    a montre que l'absence de neutre est la seule soupape du scenario H1, et le porteur a
+    confirme le mecanisme sur le code — TranslationStopTimer exige 500 ms CONTINUS de jeton
+    d'arrivee ET NOT Translation_Busy, alors que le re-armement de la demande est immediat par
+    des permis qui n'exigent pas le neutre. Livrable : PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md
+    (7 invariants, lots L0 a L4 sequences, AC11 a AC16, alertes Q7 et A13 a A16, 5 decisions
+    humaines D1 a D5). PREALABLE NON LEVE : FB_CycleSemiAuto.st porte une edition non committee
+    de T331/DSH09 (+4 lignes au-dela de :1224) et reste sous verrou d'ecriture T331 => le lot
+    sequenceur L2 est BLOQUE et une revision doit etre figee avant le premier diff de CODE/.
+    Aucun fichier de CODE/ modifie, aucun test, aucun gate, aucun bundle, aucun commit.
+  evidence_submitted:
+    - "Fiche DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md (14 sections, 472 lignes)"
+    - "Ce contrat cree sous GO CC01 : la reference TASKS.yaml:38 pointait un fichier inexistant (devoir d'alerte leve)"
+    - "Preuve de faisabilite de la trace : les traces existantes enregistrent bien des internes d'instance par chemin pointe (par exemple PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedTgt, PRG_02_Acquisition.instSimBench.instWinchElectricalM1.Slip_Ratio) : les internes de FB_Translation sont donc traçables"
+    - "Mesure des traces existantes : dt median 100 ms (77 a 128 ms, 39 valeurs distinctes), 15 canaux pour les traces M3, aucune variable de jeton ni d'arrete : aucune trace 10 ms M3 n'existe dans le depot"
+    - "git status --short sur CODE/ : aucun fichier ecrit par la session T334/DSH07. Les modifications presentes appartiennent aux chantiers concurrents (FB_CycleSemiAuto.st = T331/DSH09, FB_Bucket.st = T295, FB_Hmi_BannerFormatter.st et PRG_02/PRG_07 = T255-D)"
+    - "PHASE 2 — PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md : arbitrage Q1 a Q6, modele cible a 7 invariants, lots L0 a L4 sequences, AC11 a AC16, alertes Q7/A13/A14/A15/A16/A18, 5 decisions humaines D1 a D5 (DSH07, 2026-09-20, zero code)"
+    - "PHASE 2 — releves directs de verification des citations (tous lus, aucun recopie) : FB_Translation.st:123-124, :179-183, :190-200, :202-204, :229-233, :251, :271-272, :297-303 ; FB_Safety_Translation.st:199-203, :268 ; PRG_05_Translation.st:162-190, :408-429, :468, :571, :656-662, :817 ; PRG_06_Outputs.st:431-450 ; PRG_07_Supervision.st:336-346 ; ST_BypassTranslation.st:4-5 ; AF_Partie-11 v2.4:346-351 ; GVL_PERSISTENT.st:97 ; FB_Translation_Cfg CaptorDebounce T#100ms"
+    - "PHASE 2 — challenge independant (fiche sec. 10bis, acteur DSH10, read-only) : verdict MAJOR. Uniformiser AX2/AX14 est DANGEREUX (le neutre est la seule soupape de H1), l'asymetrie AX2/AX3 est une decision DELIBEREE de T319, et le lien H4 vers T287 est une coincidence de timing (H4 ne touche pas la commande de frein, FB_Translation.st:271-272)"
+    - "PHASE 2 — baseline CI du domaine G_CYCLE mesuree par le porteur (run_tests.py --fb FB_CycleSemiAuto --fast) : 20/25 PASS, 5 FAIL pre-existants et identiques a ceux documentes par T331 (TC-P04-020, TC-P04-021, TC-P04-023, TC-P04-026 sur AX4 et TC-P04-SCEN-NOM). Constat annexe : TC-P04-SCEN-NOM s'arrete a sa premiere assertion (ReqStart en AX2) car le test ne pose jamais JoystickRight, exige par TranslationP1Permit : tout le parcours nominal n'est donc jamais execute"
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Phase 1 acceptee par CC01 le 2026-09-20 (3 points durs verifies). Le present contrat est soumis
+    a validation : il conditionne la phase 2 (conception) puis la phase 3 (code, lot separe apres GO).

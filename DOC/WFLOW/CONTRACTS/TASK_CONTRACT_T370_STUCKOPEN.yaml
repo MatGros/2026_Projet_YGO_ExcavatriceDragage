@@ -1,0 +1,172 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T370_STUCKOPEN_ACTIVATION
+  criticality: C4            # FB de mouvement C4 (FB_Winch), meme si diagnostic-only
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Reactiver le comparateur commande/retour DEJA CABLE (Phase 0 neutralisee) dans
+    FB_Winch.ContactorsCheck pour produire un diagnostic StuckOpen (commande ON, retour
+    contacteur absent > 500 ms) visible par la maintenance, SANS creer de coupure de
+    puissance ni d'interlock de mouvement — diagnostic seul, decision utilisateur actee.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        TonContactorsDropped demarre (IN passe TRUE) exactement quand
+        ContactorsCheck.Command <> ContactorsCheck.Feedback, et s'arrete (IN repasse
+        FALSE, ET donc Q retombe sans attendre PT) des que les deux se realignent —
+        pas de latch, pas d'attente du timeout pour lever le mismatch.
+      verified_by: >
+        Nouveau cas TC-P10-0xx dans TOOLS/TEST_AUTO_CI (harnais FB_Winch) : force
+        Command=TRUE/Feedback=FALSE, verifie TonContactorsDropped.ET progresse ; force
+        Feedback=TRUE avant PT, verifie TonContactorsDropped.Q reste FALSE et ET revient
+        a T#0.
+    - id: AC2
+      statement: >
+        ContactorsCheck.StuckOpen = TonContactorsDropped.Q AND ContactorsCheck.Command
+        AND NOT ContactorsCheck.Feedback AND NOT BypassContactorCheck — exactement cette
+        formule (voir AC6 pour la justification du dernier terme).
+      verified_by: "Lecture code FB_Winch.st (ligne exacte) + test ci-dessous (AC3/AC6)."
+    - id: AC3
+      statement: >
+        ContactorsCheck.StuckClosed reste inchange (force FALSE, commentaire Phase 0
+        conserve tel quel) — hors scope de ce lot, propriete de FB_Safety_Winch.
+      verified_by: "Diff : aucune ligne touchant StuckClosed."
+    - id: AC4
+      statement: >
+        Aucun faux StuckOpen pendant le maintien transitoire de sens (§5bis
+        SenseHoldActiveInt, fenetre <= 400 ms bornee par SenseHoldTimer PT:=T#400ms,
+        FB_Winch.st:343) : durant ce transitoire, RelayFwd/RelayRev/Contactor1..4 (donc
+        ContactorsCheck.Command, calcule ligne 306-314) retombent a FALSE alors que le
+        contacteur physique reste reellement ferme (Feedback=TRUE) — mismatch
+        Command=FALSE / Feedback=TRUE. La formule AC2 exige Command=TRUE pour armer
+        StuckOpen : ce cas ne doit donc JAMAIS produire StuckOpen quel que soit le temps
+        ecoule.
+      verified_by: >
+        Nouveau cas TC-P10-0xx : simuler StepNumber retombant a 0 avec sens encore
+        commande (PrevStepNumber>0, StepNumber=0), Feedback reste TRUE (contacteur
+        physique toujours ferme) pendant 400 ms puis le vrai palier reprend — assert
+        StuckOpen = FALSE sur toute la sequence.
+    - id: AC5
+      statement: >
+        Aucun faux StuckOpen lors d'un changement de palier a sens constant (P2<->P5,
+        Contactor1..4 varie mais RelayFwd/RelayRev et au moins un Contactor restent
+        actifs en continu) : Command reste TRUE en continu, Feedback (collectif) doit
+        rester TRUE en continu si au moins un contacteur physique reste engage sans
+        interruption reelle — pas de coupure logicielle introduite par ce lot sur ce
+        chemin.
+      verified_by: >
+        Nouveau cas TC-P10-0xx : sequence palier 2->3->4->5 sans repasser par 0,
+        Feedback=TRUE en continu (simulateur), assert StuckOpen=FALSE sur toute la
+        sequence + assert TonContactorsDropped.ET reste a T#0 (jamais arme).
+    - id: AC6
+      statement: >
+        ContactorsCheck.StuckOpen est desactivable par le bypass IHM existant
+        GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback / M2TreuilBenne (deja cable
+        jusqu'a l'entree FB_Winch.BypassContactorCheck depuis PRG_04:1468/1534, mais
+        JAMAIS LU dans le corps de FB_Winch avant ce lot — cf. preuve fichier:ligne
+        ci-dessous). Meme patron que FB_Brake.st:126, qui combine deja
+        NOT BypassContactorCheck avec un OR de StuckClosed / StuckOpen / TonFeedback.Q.
+      verified_by: >
+        Nouveau cas TC-P10-0xx : BypassContactorCheck=TRUE, Command=TRUE, Feedback=FALSE
+        maintenu > 500 ms, assert StuckOpen reste FALSE.
+    - id: AC7
+      statement: >
+        ContactorsCheck (incluant StuckOpen) atteint un technicien reel, pas seulement
+        un champ de structure mort. Chaine verifiee : FB_Winch.ContactorsCheck (deja
+        VAR_OUTPUT) -> FB_WinchStateProjection.st:111/178 (deja route vers
+        WinchM1State/WinchM2State.ContactorsCheck, ST_WinchState.st:56 — CE MAILLON
+        EXISTE DEJA, ne pas le recreer) -> AU MOINS UN consommateur hors
+        FB_WinchStateProjection (bandeau FB_Hmi_BannerFormatter ou
+        GVL_Troubleshooting), a ajouter dans ce lot car AUCUN consommateur n'existe
+        aujourd'hui (grep ".ContactorsCheck" sur CODE/ = uniquement les 2 lignes
+        d'ecriture dans FB_WinchStateProjection.st).
+      verified_by: >
+        grep ".ContactorsCheck" post-lot sur CODE/ montre >= 1 lecture hors
+        FB_WinchStateProjection.st + G200_check_linkage.py PASS sur ce nouveau lien.
+    - id: AC8
+      statement: >
+        Aucune ecriture de StuckOpen/TonContactorsDropped dans une chaine SafeStop,
+        PowerCutOff, interlock de mouvement ou bitfield FB_Safety_Winch — diagnostic
+        pur (decision utilisateur brief §2). Aucune modification de FB_Safety_Winch.st,
+        FB_WinchOutputInterlock.st (barriere), PRG_06_Outputs.st dans ce lot.
+      verified_by: "Diff limite au scope (§3) ; grep StuckOpen sur les fichiers interdits = 0."
+    - id: AC9
+      statement: >
+        Non-regression : TC-P10-054/055 (T288 phase 1, absence de mouvement / retour
+        collectif) restent PASS ; ErrorID:16 et sa garde codeur ne sont pas modifies.
+      verified_by: "run_all_gates.py --palier C ; suite FB_Safety_Winch existante = 100% des cas deja verts avant lot."
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Winch.st                      # cablage TonContactorsDropped/StuckOpen + lecture BypassContactorCheck (AC1/AC2/AC6)
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st           # OU FB_Hmi_BannerFormatter.st — un seul des deux, au choix du plan technique valide (AC7)
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winch.st   # nouveaux cas AC1/AC4/AC5/AC6 (chemin exact a confirmer sur l'arbre du harnais existant)
+    forbidden:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st                 # bitfield sature (16/16), FB de securite — hors scope diagnostic
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st          # barriere finale — hors scope
+      - CODE/M_MAIN/PRG_06_Outputs.st                            # sorties finales — hors scope
+      - CODE/H_TREUILS_BENNE/FB_SyncContactor.st                 # responsabilite distincte (symetrie M1/M2), ne pas fusionner (T370 diagnostic §8.b)
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "ContactorsCheck.StuckClosed reste FALSE force, commentaire Phase 0 conserve mot pour mot (propriete FB_Safety_Winch)."
+      - "ErrorID:16 (absence de mouvement, garde codeur) inchange — ne pas fusionner les 2 causes (Revue T288 phase 2, contrainte ligne 14)."
+      - "TC-P10-054/055 restent verts."
+      - "SenseHoldActiveInt / §5bis (maintien transitoire de sens) inchange dans son comportement observable."
+    dropped_on_purpose:
+      - "Aucune coupure de puissance automatique sur StuckOpen — decision utilisateur explicite (brief §2), a rappeler dans le commentaire de code."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug preexistant,
+    risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur, pas a la fin et
+    jamais silencieusement. Signaler n'est pas elargir le scope. En particulier :
+    l'ambiguite AF_Partie-06 (Mx_ContactorsReleased_DI = "contacteurs sens" seuls
+    dans la spec vs "sens + C1..C4" dans le code/simulateur, cf. TROUBLESHOOTING_T370
+    §8.a) reste NON TRANCHEE et affecte directement la portee reelle de StuckOpen —
+    a signaler explicitement dans la restitution du plan technique, ne pas trancher
+    seul.
+
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    (a remplir par l'agent qui implementera le lot — ce contrat est livre AVANT
+    toute ecriture de code, conformement au brief BRIEF_T370_C4_ACTIVATION_STUCKOPEN.md)
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >

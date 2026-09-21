@@ -1,0 +1,104 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T360 : Confrontation trace Suivi_74, recalage T333 et ratio M3
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier> --release
+
+contract:
+  task_id: T360_TRACE_RATIO_ESTIMATEUR_M3
+  criticality: C2
+  strategy: patch            # audit pur : aucune ligne de CODE/ ecrite dans ce lot
+
+  objective: >
+    Realiser l'analyse independante et formelle de la trace Suivi_74_SIMU_MAINTN1_M3_TestSim_20260920.trace.
+    Verifier par calcul direct sur les signaux bruts le bon fonctionnement du recalage bidirectionnel de T333
+    (fronts montants aller, fronts descendants retour) dans FB_Translation_PositionEstimator.st, tracer l'historique
+    git de GVL_PERSISTENT._TranslationGainMetersPerHzSec, expliquer l'origine des sauts de position observes
+    (decalage cinematique entre le modele de simulation FB_Sim_Translation.st et le gain automate), et chiffrer
+    la derive odometrique pour 1% d'erreur de ratio, avec zero modification de CODE/.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        La trace Suivi_74_SIMU_MAINTN1_M3_TestSim_20260920.trace est convertie en CSV large et analysee :
+        4612 echantillons sur 48.818 s, pas d'echantillonnage moyen dt = 10.59 ms correspondant a la tache MainTask 10 ms.
+      verified_by: "TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/Suivi_74_wide_fresh.csv et Suivi_74_meta.json generes par trace_to_csv.py"
+    - id: AC2
+      statement: >
+        Le fonctionnement de T333 (recalage bidirectionnel) est demontre sur piece : fronts montants (TrigP2, TrigPV, TrigTremie)
+        sur le trajet Aller vers Tremie, et fronts descendants (TrigDnTremie, TrigDnPV, TrigDnP2, TrigDnP1) sur le trajet Retour
+        vers Maintenance/P1 avec horodatages, positions avant/apres et amplitudes exactes.
+      verified_by: "DOC/WFLOW/AUDITS/AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md section 2 (tableaux complets Aller et Retour)"
+    - id: AC3
+      statement: >
+        La cause des sauts de position (4.53 m a 9.11 m) a chaque capteur est formellement demontree par la cinematique du simulateur :
+        FB_Sim_Translation.st:228-230 impose SpeedAt40Hz_Mps = 30.0 / 8.0 = 3.75 m/s, soit un ratio simulation de 0.09375 m/(Hz.s),
+        exactement 11.25 fois superieur au ratio automate 0.008333 m/(Hz.s) dimensionne pour la machine reelle (0.416 m/s a 50 Hz).
+      verified_by: "DOC/WFLOW/AUDITS/AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md section 3 et FB_Sim_Translation.st:9,228-230"
+    - id: AC4
+      statement: >
+        L'historique git de GVL_PERSISTENT._TranslationGainMetersPerHzSec est trace de maniere exhaustive : commit de creation eb40478a
+        du 05/08/2026 (Mathieu Gros), et verification qu'aucune modification de cette constante n'est intervenue depuis dans le depot.
+      verified_by: "git log -L \"/_TranslationGainMetersPerHzSec/,+1:CODE/GVL_PERSISTENT.st\" (1 seul commit eb40478a)"
+    - id: AC5
+      statement: >
+        La derive odometrique theorique est calculee avec precision : 0.200 m (200 mm) de derive sur la course Tremie->P1 (20 m)
+        pour 1% d'ecart de gain, et necessite de 10.0 m de roulement continu sans capteur pour deriver de 10 cm.
+      verified_by: "DOC/WFLOW/AUDITS/AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md section 5"
+    - id: AC6
+      statement: >
+        Aucun fichier du dossier CODE/ n'est modifie dans le cadre de ce lot (audit et documentation purs).
+      verified_by: "git status --short -- CODE/ (sortie vide)"
+
+  scope:
+    allowed:
+      - DOC/WFLOW/AUDITS/AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T360_TRACE_RATIO_ESTIMATEUR_M3.yaml
+      - TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/Suivi_74_wide_fresh.csv
+      - TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/Suivi_74_meta.json
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - TOUT fichier de CODE/ (lecture seule stricte — audit pur)
+      - CODE_XML/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/CONTRACTS/BRIEF_T360_TRACE_RATIO_ESTIMATEUR_M3.md
+      - DOC/AF/
+      - tout scratch a la racine du depot
+
+  evidence_required:
+    - audit_document               # AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md
+    - analyse_cinematique_trace    # Donnees chiffrees issues de Suivi_74_wide_fresh.csv
+    - historique_git_ratio         # Preuve git log eb40478a
+    - calcul_derive_theorique      # Formules mathematiques et resultats
+    - git_status_code_vide         # Preuve zero modification de CODE/
+
+  alert_duty: >
+    Si une incoherence physique, une defaillance de recalage ou une hypothese prealable erronee est detectee,
+    l'agent doit l'exposer sans complaisance avec les preuves chiffrees correspondantes (devoir d'alerte et anti-yes-man).
+
+status: COMPLETED
+
+execution:
+  executed_by: "AGY01 (Antigravity Senior Industrial Automation & Safety Engineer)"
+  completed_at: "2026-09-21T04:45:00+02:00"
+  status: COMPLETED
+  summary: >
+    Audit T360 livre avec succes, zero ligne de CODE/ modifiee.
+    1. Validation experimentale de T333 : le recalage fonctionne parfaitement dans les 2 sens (fronts montants a l'aller,
+       fronts descendants au retour avec TrigDn*).
+    2. Recalcul et rectification de l'hypothese initiale : les sauts de position sur Suivi_74 ne sont pas de 1 a 3 mm,
+       mais de 4.53 m a 9.11 m. La cause racine est demontree mathematiquement : le modele de simulation FB_Sim_Translation.st
+       utilise FullTravelTimeS = 8.0 s (vitesse 3.75 m/s a 40 Hz, ratio 0.09375 m/(Hz.s)), soit 11.25 fois plus vite que
+       le ratio odométrique automate GVL_PERSISTENT._TranslationGainMetersPerHzSec = 0.008333 m/(Hz.s) (calibre pour 0.416 m/s a 50 Hz).
+    3. Historique git : _TranslationGainMetersPerHzSec cree le 05/08/2026 par Mathieu Gros (commit eb40478a), inchange depuis.
+    4. Calcul de derive : 1% d'erreur de gain entraine une derive de 200 mm sur 20 m de course, et 10 cm apres 10 m.
+  evidence_submitted:
+    - path: DOC/WFLOW/AUDITS/AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md
+      comment: "Rapport d'audit exhaustif et chiffre avec toutes les preuves de trace et de code"
+    - path: TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/Suivi_74_wide_fresh.csv
+      comment: "Conversion 4612 echantillons de la trace binaire CODESYS Suivi_74"
+    - path: TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/Suivi_74_meta.json
+      comment: "Metadonnees de la trace (duree, canaux, echantillonnage)"

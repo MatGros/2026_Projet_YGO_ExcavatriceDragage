@@ -1,0 +1,115 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T348 « run de trace 10 ms M3 / Trémie »
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# Plan parent : DOC/WFLOW/CONTRACTS/PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md (lots L0 a L4, decisions D1 a D5)
+# Procedure : DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md (scenarios A / B / C)
+# Requalification : DOC/WFLOW/CONTRACTS/PLAN_T345_AX14_TREMIE_L3_CANDIDAT.md
+# NOTE DE VOCABULAIRE : le plan parent nomme ce lot L0 (preuve). Le brief T345 l'appelait « L1 ».
+#   Il s'agit du MEME lot : le run de trace qui doit preceder le lot L1 de code.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T348_TRACE_M3_10MS_L0
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Produire la mesure dynamique qui manque au projet : une trace a 10 ms des canaux de l'axe M3
+    (mot de commande, consigne de frequence, frequence reelle, retour frein, jeton capteur,
+    coupure dure Tremie, verrou d'arrivee) sur les trois scenarios A (cycle nominal),
+    B (cycle avec intermittence capteur d'environ une seconde) et C (maintenance manuelle, geste
+    identique), afin que les decisions humaines D3 (arrivee nominale Tremie contre coupure dure)
+    et D4 (sort du neutre AX2/AX14) soient tranchees sur des faits mesures et non sur une lecture
+    statique du code. Aucune des trois experiences du protocole n'existe dans le depot a ce jour.
+
+  acceptance:
+    - id: AC1
+      statement: "Les trois scenarios A, B et C sont traces sur la tache MainTask, et l'ecart median entre echantillons successifs de chaque trace vaut 10 ms."
+      verified_by: "Fichiers .trace archives dans TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/ ; ecart median calcule apres conversion CSV, valeur attendue 10 ms et non 100 ms"
+    - id: AC2
+      statement: "La periode effective de chaque trace est relevee et archivee, et le mode d'essai (banc de simulation ou site) est nomme pour chaque trace."
+      verified_by: "En-tete du CSV de chaque scenario : periode effective, nombre d'echantillons, mode banc ou site ; une periode non relevee rend la trace inexploitable"
+    - id: AC3
+      statement: "Chaque trace contient les canaux permettant de discriminer le verrou d'axe de la coupure dure : mot de commande, consigne de frequence, frequence reelle, M3_TremieHardStopActive, l'interne ArrivalLock de l'axe, le temporisateur de debounce capteur, la commande de frein interne, le retour physique de frein et les deux jetons de position M3 stables."
+      verified_by: "Liste des canaux lue dans chaque CSV : M3_CommandWord, M3_SetpointFrequencyHz, M3_ActualFrequencyHz, PRG_06_Outputs.M3_TremieHardStopActive, PRG_05_Translation.instTranslationM3.ArrivalLock, PRG_05_Translation.instTranslationM3.CaptorDebounceTon.ET, PRG_05_Translation.instTranslationM3.Brake.BrakeCmd, M3_BrakeIsOpen_DI, PRG_05_Translation.Data.M3_AtTremieStable, PRG_05_Translation.Data.M3_AtP1Stable"
+    - id: AC4
+      statement: "Chaque trace couvre au moins 1000 echantillons par canal avec 300 echantillons d'avant declenchement, soit au moins 10 secondes a 10 ms."
+      verified_by: "Nombre d'echantillons par canal lu dans chaque CSV ; reglage de trace conforme au tableau de PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md section 2"
+    - id: AC5
+      statement: "Les CSV sont produits par l'outil du depot et non par un export manuel, et le scenario C (maintenance manuelle) contient les memes canaux M3 que les scenarios A et B."
+      verified_by: "Execution de TOOLS/PLC_CSV_SNAPSHOT/external_python/trace_to_csv.py sur les .trace ; comparaison des listes de canaux A contre B contre C. Constat de depart a confirmer ou infirmer : les traces SIMU_MaintMANU_20260919 ne contiennent aucune variable M3"
+    - id: AC6
+      statement: "La mesure tranche la question D3 : sur le scenario B, la duree pendant laquelle la coupure dure Tremie reste armee avec une demande de translation vivante est chiffree en millisecondes, et comparee au seuil de desaccord commande contre retour du frein."
+      verified_by: "Depouillement du CSV scenario B : duree cumulee de M3_TremieHardStopActive a 1 avec mot de commande non nul ; comparaison chiffree au BrakeFeedbackTimeout de ST_fbTranslation_Cfg.st. Le seuil attendu est 800 ms"
+    - id: AC7
+      statement: "La mesure tranche la faisabilite de D4 : sur le scenario B, il est etabli si la confirmation d'arret de 500 ms de la porte AX2/AX14 est atteinte au moins une fois, ou si un rearmement de la demande l'interrompt a chaque intermittence du capteur."
+      verified_by: "Depouillement du CSV scenario B : duree maximale de la fenetre continue ou le jeton de position est vrai et la translation n'est pas occupee ; valeur comparee a CST_TranslationStopConfirmTime, soit 500 ms. Reponse binaire attendue : atteinte ou jamais atteinte"
+    - id: AC8
+      statement: "La parite manuel contre cycle est chiffree : l'ecart entre le front du capteur de position et l'extinction du mot de commande est mesure sur les scenarios A, B et C, et l'ecart cycle contre manuel est exprime en nombre d'echantillons de 10 ms."
+      verified_by: "Comparaison des CSV des trois scenarios, colonnes jeton capteur et M3_CommandWord ; ecart exprime en echantillons, l'objectif de reference du plan parent etant un ecart maximal d'un echantillon"
+    - id: AC9
+      statement: "La conclusion ecrit explicitement quel mode a ete utilise et rappelle qu'un resultat obtenu au banc ne vaut pas preuve terrain pour le defaut frein et la cause 6."
+      verified_by: "Section conclusion du document de depouillement ; le rapport du banc porte M3_ActualFrequencyHz egal a 0 en permanence, ce qui rend toute assertion fondee sur la vitesse reelle vacuaire au banc"
+    - id: AC10
+      statement: "Aucune ligne de CODE a ete ecrite et aucune variable de logique a ete forcee pendant le run : seuls les reglages de simulation listes par la procedure ont ete utilises."
+      verified_by: "git status --short CODE/ avant et apres le run, identique ; liste des reglages de simulation utilises jointe au depouillement, conforme a PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md section 4"
+
+  scope:
+    allowed:
+      - TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/
+      - TOOLS/PLC_CSV_SNAPSHOT/RESULTS/
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md
+      - DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_T334_M3_DEUX_CHEMINS.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T348_TRACE_M3_10MS_L0.yaml
+      - DOC/WFLOW/CONTRACTS/PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/I_TRANSLATION/
+      - CODE/M_MAIN/
+      - CODE/G_CYCLE/
+      - CODE/H_TREUILS_BENNE/
+      - CODE/B_AU_SECURITE/
+      - CODE/GVL_PERSISTENT.st
+      - CODE_XML/
+      - DOC/AF/
+      - tout forcage de variable de logique pendant le run
+
+  evidence_required:
+    - trace_10ms_analyse
+    - csv_par_scenario
+    - git_status_before_after
+    - conclusion_mode_banc_ou_site
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "HUM"
+
+  alert_duty: >
+    Tout fait mesure qui contredit une affirmation du plan parent ou de la fiche T334 est remonte
+    IMMEDIATEMENT et nomme, jamais lisse pour preserver la conclusion attendue. Un scenario qui ne
+    peut pas etre joue (banc incapable de reproduire le defaut frein) est declare NON MESURE, jamais
+    remplace par une extrapolation. Signaler n'est pas elargir le scope : aucun correctif n'est
+    propose pendant ce lot.
+
+status: PENDING
+
+execution:
+  executed_by: "—"
+  completed_at: "—"
+  status: PENDING
+  summary: >
+    En attente. Le run de trace est HUMAIN : CODESYS n'est pas pilotable par un agent, et le projet
+    interdit de lire un Device.export present dans le depot. Ce contrat est ecrit AVANT le run pour
+    que le depouillement porte sur des criteres fixes d'avance et non sur une lecture orientee.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: "—"
+  notes: >
+    Ce lot conditionne la decision D3 et la faisabilite de D4, donc le deblocage eventuel de T345.
+    Il ne debloque pas a lui seul L1 de code : la decision D1 reste requise et n'a jamais ete donnee.

@@ -1,0 +1,200 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# T367 — Fusion UX du réarmement AU et de l'acquittement des défauts (geste unique)
+# Variante retenue par l'humain 2026-09-21 : V2 — séquenceur PLC dédié + bouton IHM dédié.
+# Verdict doctrinal préalable : DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T367_REARMEMENT_ACQUITTEMENT_20260921.md
+#
+# ⛔⛔ PLAN V2 ABANDONNÉ — REJETÉ PAR L'HUMAIN LE 2026-09-21, AVANT TOUTE ÉCRITURE DE CODE ⛔⛔
+# Le besoin a été REFORMULÉ par l'exploitant : « Aucun bouton ne change, aucune fonction ne
+# change. Le seul besoin : à la mise sous tension, ne pas avoir à appuyer sur le bouton
+# acquittement/reset défaut séparément. Rien d'autre. »
+# => Un NOUVEAU bouton et un séquenceur PLC sont donc HORS BESOIN. Ce document est conservé
+#    comme trace du plan écarté et des preuves techniques qu'il a produites (notamment :
+#    le FB AU ne mémorise pas la demande d'armement — FB_Safety_EmergencyManagement.st:299).
+#    La tâche repart en phase de DIAGNOSTIC : quelle(s) cause(s) latée(s) impose(nt)
+#    aujourd'hui un appui manuel sur le reset AU DÉMARRAGE À FROID, et quel est le
+#    changement MINIMAL qui supprime ce 2ᵉ geste sans affaiblir « jamais de redémarrage
+#    automatique après défaut ».
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T367_REARMEMENT_ACQUITTEMENT
+  criticality: C2
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Remplacer les DEUX gestes physiques du réarmement (armer la chaîne AU, puis acquitter les
+    défauts) par UN SEUL geste opérateur explicite : un bouton IHM dédié dont l'appui déclenche,
+    dans cet ordre imposé par AF-01 §7.4, l'acquittement des défauts PUIS la demande de
+    réarmement. La séquence est garantie par le code PLC (versionné, testable en CI) ; la chaîne
+    de sécurité AU, ses FB et la doctrine (AF-01 §7.3/§7.4, STD §9) ne sont PAS modifiés.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Sur front montant de BtnRearmAndFaultReset, le PLC émet exactement UNE impulsion FaultMachineReset_IHM d'un seul scan."
+      verified_by: "test CI test_fb_rearmandresetsequencer.st (cas TC-T367-001 : AckPulse TRUE 1 scan, FALSE au scan suivant)"
+
+    - id: AC2
+      statement: "L'impulsion d'acquittement est émise AVANT toute impulsion de demande d'armement (ordre acquitter -> réarmer, AF-01 §7.4)."
+      verified_by: "test CI TC-T367-002 : sur la même séquence, AckPulse est observé au scan N et ArmRequestPulse au scan >= N+1, jamais l'inverse"
+
+    - id: AC3
+      statement: "La demande d'armement séquencée n'est émise QUE si la chaîne AU se déclare Armable ; sinon le geste est refusé de façon BORNÉE et VISIBLE, sans impulsion d'armement."
+      verified_by: "test CI TC-T367-003/004 : Armable=FALSE -> aucune impulsion ArmRequestPulse, Refused=TRUE après Cfg_TimeoutArmable ; Armable qui devient TRUE pendant l'attente -> une impulsion, jamais deux"
+
+    - id: AC4
+      statement: "Aucun réessai automatique : une séquence donnée émet au plus une impulsion d'armement ; rejouer le geste exige un NOUVEAU front opérateur."
+      verified_by: "test CI TC-T367-005 : après Refused, aucune nouvelle tentative tant que BtnRearmAndFaultReset n'a pas été relâché puis réappuyé"
+
+    - id: AC5
+      statement: "La retombée du bouton pendant la phase d'attente n'annule pas la séquence déjà acquise (le geste opérateur est mémorisé jusqu'à l'échéance bornée)."
+      verified_by: "test CI TC-T367-006 : front puis retour à FALSE, Armable passe TRUE dans la fenêtre -> impulsion d'armement émise"
+
+    - id: AC6
+      statement: "Enable=FALSE annule toute séquence en cours et force les deux sorties impulsionnelles à FALSE (fail-safe, cohérent avec le patron des FB du projet)."
+      verified_by: "test CI TC-T367-007"
+
+    - id: AC7
+      statement: "Les 5 boutons de reset existants conservent EXACTEMENT leur comportement (FaultMachineReset_IHM inchangé pour chacun) — aucune régression, aucune suppression."
+      verified_by: "test d'intégration PRG_07 (FB_TestHarness_PRG_07) : chacune des 5 sources produit toujours l'impulsion ; diff git limité à l'ajout d'un OR"
+
+    - id: AC8
+      statement: "Aucune dépendance de FaultMachineReset_IHM à une entrée MATÉRIELLE (retour contacteur, boucle AU, *_DI) : la doctrine 'appui conscient' est verrouillée mécaniquement."
+      verified_by: "nouveau gate G5xx_check_fault_reset_not_hw_triggered.py (+ --selftest) branché dans run_all_gates.py, PASS sur l'arbre après lot et ROUGE sur un cas de mutation de démonstration"
+
+    - id: AC9
+      statement: "La chaîne de sécurité AU est intacte : FB_Safety_EmergencyManagement et tous les FB de CODE/B_AU_SECURITE/ sont inchangés (git diff vide sur ce périmètre)."
+      verified_by: "git diff --stat limité aux fichiers du scope ; lecture du diff réel par l'orchestrateur (R1/R5)"
+
+    - id: AC10
+      statement: "Le nouveau bouton est documenté dans l'interface IHM (AF-07) et l'IHM externe est prévenu ; AF-01 et le STD §9 restent INCHANGÉS (doctrine préservée)."
+      verified_by: "git diff sur DOC/AF : AF_Partie-07 modifiée, AF_Partie-01 non modifiée"
+
+    - id: AC11
+      statement: "Preuve CI ROUGE AVANT correctif : les cas TC-T367-00x sont écrits et exécutés sur l'état initial, et au moins un cas échoue avant implémentation."
+      verified_by: "sortie du runner CI avant/après (exigence explicite du brief : 'Preuve CI avant correctif')"
+
+    - id: AC12
+      statement: "Structure CODE/M_MAIN : le nom de fichier correspond au nom de POU — aucun renommage, aucun POU créé ou déplacé dans CODE/M_MAIN."
+      verified_by: "git diff --stat : seules des lignes de corps changent dans PRG_06_Outputs.st et PRG_07_Supervision.st, aucune ligne de déclaration PROGRAM modifiée"
+
+    - id: AC13
+      statement: "Bundle : le suffixe correspond au langage généré dans le bundle — les POU ST touchés restent exportés en ST dans CODE_Bundle.xml (aucun passage en LD/CFC)."
+      verified_by: "relevé des objets du bundle après régénération (PRG_06_Outputs, PRG_07_Supervision, FB_RearmAndResetSequencer) + G390 fraîcheur bundle PASS"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/FB_RearmAndResetSequencer.st                 # NOUVEAU — séquenceur geste unique
+      - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_EmergencyCmd.st  # + BtnRearmAndFaultReset
+      - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_EmergencyState.st # + Busy / Refused (retour IHM)
+      - CODE/M_MAIN/PRG_07_Supervision.st                              # appel du séquenceur + OR dans FaultMachineReset_IHM + VAR_OUTPUT
+      - CODE/M_MAIN/PRG_06_Outputs.st                                  # 1 SEULE ligne : ArmRequest := ... OR PRG_07.SeqArmRequest_IHM
+      - TOOLS/AGENT_WORKFLOW/scripts/G5xx_check_fault_reset_not_hw_triggered.py  # NOUVEAU garde-fou doctrine
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py                  # 1 ligne PLANS (palier C)
+      - TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/tests/test_fb_rearmandresetsequencer.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/reports/              # rapports du runner
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/                       # test d'intégration PRG_07 via FB_TestHarness_PRG_07
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml                # entrée CI du nouveau FB
+      - DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md                     # ajout du bouton (interface)
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T367_REARMEMENT_ACQUITTEMENT.yaml
+      - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T367_REARMEMENT_ACQUITTEMENT.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - CODE_XML/                                                      # bundle + diff bundle
+
+    forbidden:
+      - CODE/B_AU_SECURITE/**                 # ⛔ chaîne de sécurité AU : FB_Safety_*, ST_Safety_* — INTERDIT
+      - CODE/H_TREUILS_BENNE/**
+      - CODE/I_TRANSLATION/**
+      - CODE/E_CODEURS/**
+      - CODE/G_CYCLE/**
+      - CODE/D_JOYSTICK/**
+      - CODE/L_SIMULATION/**                  # aucun besoin de simulation : le séquenceur est testable en CI
+      - DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md   # ⛔ la doctrine ne bouge PAS (décision humaine)
+      - DOC/STDS/CODE_QUALITY_STANDARDS.md                  # ⛔ §9 inchangé
+      - DOC/STDS/NAMING_CONVENTION.md
+      - PRJ_CODESYS/**
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - "suppression ou modification d'un des 5 boutons de reset existants (PRG_07 :123-127)"
+      - "toute écriture PLC dans GVL_IHM.Emergency.Cmd.* (les commandes IHM sont produites par l'IHM)"
+      - "tout déclenchement de FaultMachineReset_IHM par une entrée matérielle (PowerContactorEngaged, EmergencyChainClosed, *_DI)"
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "FaultMachineReset_IHM reste une impulsion sur front, JAMAIS conditionnée par un état externe (STD §9)."
+      - "Les 5 sources existantes de FaultMachineReset_IHM (BtnFaultReset, M1/M2/Benne/Cycle BtnReset) gardent un comportement bit-identique."
+      - "Le FB AU reste SEUL décideur du réarmement et de ses préconditions (Armable) : le séquenceur ne fait que RELAYER un front opérateur, il n'arme rien lui-même."
+      - "L'ordre acquitter -> réarmer (AF-01 §7.4) : le séquenceur ne peut pas armer avant d'avoir acquitté."
+      - "Aucun réarmement automatique : la séquence entière est déclenchée par un front opérateur explicite et borné (AF-01 §7.3)."
+      - "Le séquenceur est une fonction d'AGRÉMENT opérateur, PAS une fonction de sécurité : il ne doit jamais devenir une condition d'arrêt ou d'autorisation de mouvement."
+    dropped_on_purpose:
+      - "L'obligation de deux gestes physiques distincts pour l'opérateur (c'est l'objet de la tâche) — les deux ACTIONS restent distinctes et séquencées dans le code."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison" (G200 --report)
+    - run_all_gates          # palier C + garde-fou G5xx (avec --selftest)
+    - bundle                 # CODE_XML/CODE_Bundle.xml + CODE_XML/CODE_DiffBundle.xml
+    - "preuve CI ROUGE AVANT correctif (AC11)"
+    - "git diff réel du périmètre, avec relevé du nombre de lignes touchées par fichier"
+    - "relevé des objets du diff bundle"
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout problème constaté en cours de route (incohérence de spec, bug préexistant, risque hors
+    scope, nécessité de toucher la chaîne de sécurité) est remonté IMMÉDIATEMENT à l'orchestrateur,
+    pas à la fin et jamais silencieusement. Signaler n'est pas élargir le scope. ⛔ Si le travail
+    semble exiger une modification de CODE/B_AU_SECURITE/ ou de DOC/AF/AF_Partie-01, l'agent
+    S'ARRÊTE : c'est un arbitrage humain, pas une décision d'implémentation.
+
+  # ── 8. Points ouverts remontes a l'humain AVANT implementation ────────────
+  open_points:
+    - "Q1 (IHM) : le nouveau bouton REMPLACE-t-il le bouton « Armer » à l'écran, ou s'y AJOUTE-t-il ? Le visu n'étant pas versionné (PRJ_CODESYS/visu vide), le libellé et la disposition relèvent de l'humain. La tâche ne modifie AUCUN bouton existant."
+    - "Q2 (borne d'attente) : Cfg_TimeoutArmable = T#6s (proposition de l'orchestrateur, justifiée par le code) — la garde ArmPulseInhibitActive tient la chaîne NON Armable pendant CST_ArmingLockout = 5 s après tout départ de séquence d'armement (FB_Safety_EmergencyManagement.st:538-552) : un timeout de 3 s refuserait un geste opérateur parfaitement légitime émis juste après une tentative. T#6s = 5 s de garde + 1 s de marge. À confirmer ou amender par l'humain."
+    - "Q3 (traçabilité) : faut-il ajouter une ligne à AF-01 §7.4 (« geste combiné disponible ») ? PROPOSITION : NON (doctrine inchangée) — la ligne est signalée ici pour décision humaine."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: "—"
+  completed_at: "—"
+  status: PENDING            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Non démarré : contrat en attente de validation humaine (GO explicite requis avant toute écriture).
+  evidence_submitted: []
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: REJECTED           # PENDING | APPROVED | REJECTED
+  validated_by: "DSH26 (orchestrateur)"
+  validated_at: "2026-09-21T08:30:00+02:00"
+  notes: >
+    Contrat rédigé le 2026-09-21 après arbitrage de variante (V2 : séquenceur PLC dédié + bouton
+    IHM dédié) et après verdict doctrinal de la fiche T367. Aucune ligne de CODE/ n'a été écrite.
+    ⛔ REJETÉ le 2026-09-21 par l'humain, sur reformulation du besoin : « Aucun bouton ne change,
+    aucune fonction ne change. Le seul besoin : à la mise sous tension, ne pas avoir à appuyer sur
+    le bouton acquittement/reset défaut séparément. Rien d'autre. » — le périmètre V2 (nouveau
+    bouton + séquenceur) excède donc le besoin réel. Motif du rejet : RÉDUCTION DE PÉRIMÈTRE.
+    ⚠️ Ce que ce rejet NE dit PAS : il ne valide pas le brief littéral initial (front de
+    PowerContactorEngaged -> FaultMachineReset_IHM), toujours refusé pour les 3 non-conformités
+    documentées dans la fiche. La tâche repart en DIAGNOSTIC à froid, sans contrat actif.
+    Règle d'or maintenue : aucun code avant contrat conforme au besoin reformulé + GO humain.
