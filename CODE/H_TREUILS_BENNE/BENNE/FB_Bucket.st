@@ -54,7 +54,7 @@ VAR_INPUT
     // ⚠️ La branche correspondante est AJOUTÉE en disjonction à la condition d'arrivée de
     // fermeture ci-dessous : celle-ci garde sa valeur et son rôle de filet anti-blocage.
     // ⛔ 0 = branche INACTIVE : critère d'arrivée seul.
-    CloseReachedOpening_Pct         : INT := 0;                       // --> [CFG] Ouverture restante [0..20 %] déclarant la fermeture atteinte ; 0 = critère d'arrivée seul
+    CloseReachedOpening_Pct         : INT := 0;                       // --> [CFG] Ouverture restante [0..50 %] déclarant la fermeture atteinte ; 0 = critère d'arrivée seul
 
     // === BYPASSES ET SIMULATION ===
     BypassGlobal                    : BOOL := FALSE;                  // --> [TST] Force ErrorId=0 global

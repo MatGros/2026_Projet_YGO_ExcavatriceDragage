@@ -242,7 +242,7 @@ END_IF;
 // ⚠️ La MÊME borne est répétée dans FB_BucketCloseThreshold (défense en profondeur : le FB
 // est appelé dans la tâche rapide et ne fait pas confiance au seul bornage amont). Le
 // garde-fou G515 vérifie que les deux bornes restent ÉGALES — toute divergence échoue.
-GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct := LIMIT(0, GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct, 20);
+GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct := LIMIT(0, GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct, 50);
 instCfgPersistBridgeCycle(Hmi := GVL_IHM.CycleSemiAuto.Cfg, Persist := _CycleCfgPersist);
 GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S := LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S, 3600);
 IF instCfgPersistBridgeCycle.JustRestored THEN
