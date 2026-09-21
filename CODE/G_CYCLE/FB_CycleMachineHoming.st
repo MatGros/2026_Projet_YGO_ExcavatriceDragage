@@ -791,13 +791,13 @@ ELSIF LockedStepEngaged AND NOT ModeIsMaint2 THEN
     // Etape verrouillee mais mode perdu : categorie de guide OFFSET_UNKNOWN (l'echelle impose
     // « passer en MAINT_N2 »), le texte porte la consigne exacte de l'etape.
     MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
-    MachineHomingInstruction := 'HX7 - RefHoming VERROUILLE : revenir en MAINT_N2 pour continuer';
+    MachineHomingInstruction := 'HX7 - RefHoming VERROUILLE : revenir en MAINT_N2';
 ELSIF LockedClimbActive THEN
     MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
-    MachineHomingInstruction := 'HX7 - RefHoming VERROUILLE : monter JOY palier 1 vers le capteur haut';
+    MachineHomingInstruction := 'HX7 - RefHoming VERROUILLE : monter JOY palier 1, capteur haut';
 ELSIF LockedSettleActive AND NOT LockedCaptureAllowed THEN
     MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
-    MachineHomingInstruction := 'HX7 - Capteur haut atteint : relacher le JOY et attendre l arret';
+    MachineHomingInstruction := 'HX7 - Capteur haut atteint : relacher JOY et attendre l arret';
 ELSIF LockedSettleActive THEN
     MachineHomingStep := E_MachineHomingStep.HOMING_IN_PROGRESS;
     MachineHomingInstruction := 'HX7 - Referencement a l arret en cours (ne pas manoeuvrer)';
@@ -828,7 +828,7 @@ ELSIF (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT)
     MachineHomingInstruction := 'HX5 - RefHoming Etat benne enregistre - fin homing';
 ELSIF (SeqStep = E_MachineHomingTxState.HX1_CHOICE) AND NOT BootReady THEN
     MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
-    MachineHomingInstruction := 'HX1 - Homing inhibe : attendre boot codeurs puis passer en MAINT_N2';
+    MachineHomingInstruction := 'HX1 - Homing inhibe : attendre boot codeurs puis MAINT_N2';
 ELSIF (SeqStep = E_MachineHomingTxState.HX1_CHOICE) THEN
     IF Mode <> E_Mode.MAINT_N2 THEN
         MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
