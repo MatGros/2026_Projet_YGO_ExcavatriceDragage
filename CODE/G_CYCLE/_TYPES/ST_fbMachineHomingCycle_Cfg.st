@@ -24,7 +24,8 @@ STRUCT
     // A revoir si la course ou la vitesse du palier 1 changent (gate G511).
     CfgTimeoutClimb      : TIME := T#300s; // Garde de montee au capteur haut (0 = pas de garde)
     // Garde de descente HX3 : meme regle (budget de DESCENTE CONTINUE).
-    CfgTimeoutHomeAxes   : TIME := T#60s;  // Garde de descente jusqu'au front descendant capteur (0 = pas de garde)
+    CfgTimeoutHomeAxes   : TIME := T#60s;  // Garde globale prise de référence (0 = pas de garde)
+    CfgTimeoutFlyingHoming : TIME := T#3s; // Garde essai prise de référence au vol (Mode A) avant repli automatique à l'arrêt (Mode B)
     CfgStabilizationMinM : REAL := 7.50;   // Seuil bas d'inertie stabilisée après référence (m) - HX4 (constante volontaire, valeur a risque, pas d'IHM)
     CfgStabilizationMaxM : REAL := 9.50;   // Seuil haut d'inertie stabilisée après référence (m) - HX4 (constante volontaire, valeur a risque, pas d'IHM)
     Initialized          : BOOL := FALSE;  // Drapeau de restauration config au boot (pont persistant)

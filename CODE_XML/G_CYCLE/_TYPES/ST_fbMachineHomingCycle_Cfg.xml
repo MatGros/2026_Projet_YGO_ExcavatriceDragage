@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T10:40:21.660679" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T10:40:21.660679">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T10:51:52.197445" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T10:51:52.197445">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -77,7 +77,18 @@ Garde de montee au capteur haut (0 = pas de garde)</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde de descente HX3 : meme regle (budget de DESCENTE CONTINUE).
-Garde de descente jusqu'au front descendant capteur (0 = pas de garde)</xhtml>
+Garde globale prise de référence (0 = pas de garde)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgTimeoutFlyingHoming">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#3s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde essai prise de référence au vol (Mode A) avant repli automatique à l'arrêt (Mode B)</xhtml>
               </documentation>
             </variable>
             <variable name="CfgStabilizationMinM">
