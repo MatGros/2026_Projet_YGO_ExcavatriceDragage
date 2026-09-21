@@ -47,7 +47,6 @@ VAR
     CycleDrainTimeEffective_S     : INT;  // . [LOC] Consigne egouttage bornee [1..3600] avant conversion IEC TIME
     CycleDrainTimeEffective       : TIME; // . [LOC] Consigne egouttage convertie en TIME pour FB_CycleSemiAuto
     StepForceTgtCmd               : INT;  // . [LOC] Consigne de forcage lue AVANT l'appel du FB : base du compare-et-efface (acquittement T358, cf. §3)
-    EffectiveWinchSelectRequest   : INT;  // . [LOC] Selecteur treuil effectif (override cycle homing HX1/HX1a ou IHM)
 END_VAR
 
 VAR CONSTANT
@@ -85,15 +84,6 @@ ELSIF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage <> PrevActualPage THEN
     END_IF;
 END_IF;
 
-// Arbitrage amont selecteur treuil : le cycle homing machine peut forcer temporairement
-// WinchSel=2 (fermeture benne HX1) ou WinchSel=0 (couplage M1+M2 HX1a..HX6).
-IF PRG_02_Acquisition.Data.MachineHoming.Active
-   AND (PRG_02_Acquisition.Data.MachineHoming.CmdWinchSelect >= 0) THEN
-    EffectiveWinchSelectRequest := PRG_02_Acquisition.Data.MachineHoming.CmdWinchSelect;
-ELSE
-    EffectiveWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch;
-END_IF;
-
 instModes(
     Enable                  := TRUE,
     Reset                   := GVL_IHM.Modes.Cmd.BtnModeReset,
@@ -104,7 +94,7 @@ instModes(
     InhibitM2Request        := GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit,
     SelHomingApproachEnable := GVL_IHM.Commun.Cfg.SelHomingApproachEnable,
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState <> DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState <> DEVICE_STATE.RUNNING),
-    JoystickWinchSelectRequest := EffectiveWinchSelectRequest,
+    JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch,
     SelMaintenanceZoneAccess := GVL_IHM.M3Translation.Cmd.TglMaintenanceZoneAccess,
     // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
     CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,

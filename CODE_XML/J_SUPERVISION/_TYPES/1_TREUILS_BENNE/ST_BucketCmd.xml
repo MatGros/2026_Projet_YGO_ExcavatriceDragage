@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T05:45:49.890566" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T05:45:49.890566">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T04:27:50.587414" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T04:27:50.587414">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -64,14 +64,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Référencement benne position fermée (mise en service) — confirmation pure, aucun mouvement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnConfirmHomingBucket">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation visuelle fermeture benne cycle homing HX1 (bouton dédié IHM)</xhtml>
               </documentation>
             </variable>
             <variable name="TglManualBucketLimits">

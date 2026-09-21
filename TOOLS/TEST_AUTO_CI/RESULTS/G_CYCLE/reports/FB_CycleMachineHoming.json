@@ -7,57 +7,107 @@
       "passed": true
     },
     {
-      "name": "TC-P09-H002 : auto-armement HX0 -> HX1 en maintenance non-homed",
+      "name": "TC-P09-H002 : auto-armement HX0 -> HX1 en maintenance (N1) non-homed",
       "passed": true
     },
     {
-      "name": "TC-P09-H003 : HX1 fermeture benne sous permis et timeout 8s",
+      "name": "TC-P09-H010 : validation 3 appuis HX1 -> HX2 en MAINT_N2 (pas sur capteur)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "FB.MACHINEHOMINGSEQSTEP expected 2, got 1",
+        "file": "test_fb_cyclemachinehoming.st",
+        "line": 102,
+        "message": "3 appuis -> HX2",
+        "expected": "2",
+        "actual": "1"
+      }
+    },
+    {
+      "name": "TC-P09-H012 : entree cycle sur front commande IHM StartRequest, en MAINT_N2",
       "passed": true
     },
     {
-      "name": "TC-P09-H004 : Confirmation benne -> HX1a et attente interlock couplage",
+      "name": "TC-P09-H011 : hors maintenance, ni auto ni motif ni StartRequest n arment",
       "passed": true
     },
     {
-      "name": "TC-P09-H005 : Interlock E1 valide dwell 300ms -> HX2, et securite couplage en HX2",
+      "name": "TC-P09-H080 : NOT Enable -> sorties sures + MachineHomed FALSE + HX0",
       "passed": true
     },
     {
-      "name": "TC-P09-H006 : HX2 montee couplee palier 1 sous permis",
+      "name": "TC-P09-H082 : perte de datum EN MOUVEMENT -> SafeStop latche jusqu a arret + Reset",
       "passed": true
     },
     {
-      "name": "TC-P09-H007 : Franchissement capteur haut -> HX3 HomeReq a la volee",
+      "name": "TC-P09-H090 : guide BOTH_NOT_HOMED, entree cycle, AC4, HomingError -> FAILED",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "FB.MACHINEHOMINGSEQSTEP expected 2, got 1",
+        "file": "test_fb_cyclemachinehoming.st",
+        "line": 207,
+        "message": "3 appuis -> HX2",
+        "expected": "2",
+        "actual": "1"
+      }
+    },
+    {
+      "name": "TC-P09-H200 : confirmation benne fermee -> etape VERROUILLEE HX7 (pas HX2)",
       "passed": true
     },
     {
-      "name": "TC-P09-H008 : HX4 controle arret et inertie [8.50..8.80m] conforme -> HX5",
+      "name": "TC-P09-H201 : HX7 montee -- AUCUNE HomeReq et Homed reste FALSE (AC1)",
       "passed": true
     },
     {
-      "name": "TC-P09-H009 : HX4 inertie hors plage -> retry vers HX1 puis echec HX7",
+      "name": "TC-P09-H202 : HX7 montee -- ordre IDENTIQUE M1/M2 au palier 1 (AC4)",
       "passed": true
     },
     {
-      "name": "TC-P09-H010 : HX5 neutre -> HX6 MachineHomed et commit benne atomique",
+      "name": "TC-P09-H203 : HX7 -- capture UNIQUEMENT a l arret confirme, capteur actif (AC6)",
       "passed": true
     },
     {
-      "name": "TC-P09-H011 : NOT Enable -> sorties sures + MachineHomed FALSE + HX0",
+      "name": "TC-P09-H204 : HX7 -- reference atteinte -> HX6 puis HX0 (AC6)",
       "passed": true
     },
     {
-      "name": "TC-P09-H012 : perte de datum EN MOUVEMENT -> SafeStop latche jusqu a arret + Reset",
+      "name": "TC-P09-H205 : HX7 -- descente demandee -> abandon, AUCUNE reference (AC2)",
       "passed": true
     },
     {
-      "name": "TC-P09-H013 : HomingError axe -> HX7_FAILED et sortie uniquement sur Reset en MAINT_N2",
+      "name": "TC-P09-H206 : HX7 -- sortie de MAINT_N2 -> etape CONSERVEE, aucun mouvement (AC2)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H207 : HX7 -- perte des permis et arret -> etape CONSERVEE (AC3)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H208 : garde de montee NON consommee sans commande de montee (A1/AC5)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H209 : garde de montee consommee quand la montee EST commandee (A1/AC5)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H212 : capteur haut DEJA actif a l entree -> aucune capture sans franchissement (AC1)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H210 : garde de descente NON consommee sans commande de descente (A1/AC5)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H211 : garde de descente consommee quand la descente EST commandee (A1/AC5)",
       "passed": true
     }
   ],
   "summary": {
-    "total": 13,
-    "passed": 13,
-    "failed": 0
+    "total": 21,
+    "passed": 19,
+    "failed": 2
   }
 }

@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
-"""G511 - Garde de montee du cycle de referencement : realiste ET non consommee a vide (T364).
+"""G511 - Garde de montee du cycle de referencement : realiste ET non consommee a vide.
 
 Ce gate ECHOUE si :
   1. la garde de montee (CfgTimeoutClimb) est inferieure au temps de montee physique
      minimal requis (course maximale de cable / borne haute de vitesse du palier 1,
      avec marge) -> un cycle echouerait par timeout sans aucun defaut machine ;
-  2. la garde n'est pas conditionnee par la MONTEE COMMANDEE (compteur « temps mural »
+  2. la garde n'est pas conditionnee par la MONTER COMMANDEE (compteur « temps mural »
      qui se consomme pendant un arret operateur ou un arret d'urgence) ;
-  3. la montee couplee HX2 ou l'interlock de couplage E1 a disparu ;
+  3. l'etape verrouillee de referencement (HX7) ou ses conditions de capture a l'arret
+     (capteur atteint + arret mecanique + commande relachee) ont disparu ;
   4. les cas de test portant ces exigences ont disparu du fichier de test (anti-test-vacuant).
 
-Regles couvertes : TASK_CONTRACT_T364_REFONTE_SEQUENCE_HOMING.yaml (AC1..AC8).
+Regle couverte : TASK_CONTRACT_T340_HOMING_LOCKED_ASCENT.yaml (AC1, AC2, AC5, AC6).
+Origine : constat A1 du challenge T340 -- garde HX2 = timeout mural de 120 s en dur alors
+qu'un trajet reel au palier 1 demande ~146 s (58,5 m a 0,4 m/s), donc echec du cycle
+(HXF_FAILED) sans aucun defaut machine.
+
 Usage :
     python TOOLS/AGENT_WORKFLOW/scripts/G511_check_homing_climb_guard.py [racine]
     python TOOLS/AGENT_WORKFLOW/scripts/G511_check_homing_climb_guard.py . --selftest
@@ -32,8 +37,22 @@ CIBLE_TESTS = "TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclemachinehomi
 # Marge de securite sur le temps de montee physique minimal (rampes, charge, usure).
 MARGE_GARDE = 2.0
 
-# Cas de test qui portent les exigences de la refonte T364.
-TESTS_REQUIS = tuple(f"TC-P09-H{i:03d}" for i in range(1, 14))
+# Cas de test qui portent les exigences du lot T340 (etape verrouillee + garde de montee).
+TESTS_REQUIS = (
+    "TC-P09-H200",
+    "TC-P09-H201",
+    "TC-P09-H202",
+    "TC-P09-H203",
+    "TC-P09-H204",
+    "TC-P09-H205",
+    "TC-P09-H206",
+    "TC-P09-H207",
+    "TC-P09-H208",
+    "TC-P09-H209",
+    "TC-P09-H210",
+    "TC-P09-H211",
+    "TC-P09-H212",
+)
 
 
 def read(root: Path, relative: str) -> str:
@@ -110,30 +129,48 @@ def check_invariant(fb: str, cfg: str, enum: str, persist: str, prg02: str) -> l
     # --- 2. Garde consommee UNIQUEMENT pendant le mouvement commande ---
     if "ClimbTimer(IN := ClimbCommandActive" not in fb:
         errors.append("garde de montee non conditionnee par ClimbCommandActive (compteur temps mural)")
+    if "HomeAxesTimer(IN := DescentCommandActive" not in fb:
+        errors.append("garde de descente non conditionnee par DescentCommandActive (compteur temps mural)")
     if re.search(r"ClimbTimer\(\s*IN\s*:=\s*\(\s*SeqStep", fb):
         errors.append("garde de montee encore armee sur le seul step (forme historiquement fautive)")
     if "ClimbCommandActive := ClimbStepActive AND ClimbPermit" not in fb:
         errors.append("ClimbCommandActive ne depend plus du permis operateur de montee")
-    if "ClimbStepActive := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED);" not in fb:
-        errors.append("ClimbStepActive non lie a HX2_CLIMB_COUPLED")
+    # La garde doit refleter l'ORDRE EMIS, jamais la seule intention : dans l'etape verrouillee,
+    # un ordre de montee n'est emis qu'en MAINT_N2 (hors MAINT_N2 l'etape est TENUE sans ordre).
+    if "LockedClimbCommand := LockedClimbActive AND ModeIsMaint2" not in fb:
+        errors.append(
+            "LockedClimbCommand absent : la garde de montee se consommerait sans aucun ordre emis "
+            "(etape verrouillee tenue hors MAINT_N2)"
+        )
+    if "ClimbStepActive := (SeqStep = E_MachineHomingTxState.HX2_CLIMB) OR LockedClimbCommand;" not in fb:
+        errors.append("la garde de montee n'est pas keyee sur l'ordre reellement emis (LockedClimbCommand)")
 
-    # --- 3. Sequence T364 : etats, interlock E1, prise au vol HX3 ---
-    for state in (
-        "HX0_REPOS", "HX1_BUCKET_PREPARE", "HX1A_COUPLING_INTERLOCK",
-        "HX2_CLIMB_COUPLED", "HX3_FLYING_REFERENCE", "HX4_STABILIZATION_CHECK",
-        "HX5_RELEASE_CLEARANCE", "HX6_HOMED_SUCCESS", "HX7_FAILED"
-    ):
-        if state not in enum:
-            errors.append(f"etat {state} absent de {CIBLE_ENUM}")
-        if f"E_MachineHomingTxState.{state}:" not in fb:
-            errors.append(f"etape {state} non implementee dans le CASE du GRAFCET")
-
-    if "CouplingInterlockFault := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED)" not in fb:
-        errors.append("interlock E1 couplage M1/M2 manquant en HX2_CLIMB_COUPLED")
-
+    # --- 3. Etape verrouillee presente, et capture a l'arret conditionnee ---
+    if "HX7_LOCKED_REFERENCE" not in enum:
+        errors.append("etat HX7_LOCKED_REFERENCE absent de " + CIBLE_ENUM)
+    if "E_MachineHomingTxState.HX7_LOCKED_REFERENCE:" not in fb:
+        errors.append("etape HX7_LOCKED_REFERENCE non implementee dans le CASE du GRAFCET")
+    # Preuve de franchissement : l'etape verrouillee ne s'ouvre que si le capteur haut n'est PAS
+    # deja actif (un capteur colle/force ou une machine deja en position haute mene au chemin herite,
+    # sinon la capture immediate poserait un datum faux).
+    if "IF BucketCloseConfirmedLatched AND NOT TopPositionSensor THEN" not in fb:
+        errors.append(
+            "entree de l'etape verrouillee non conditionnee a un capteur haut INACTIF : "
+            "un capteur deja actif permettrait une capture sans franchissement (datum faux)"
+        )
+    capture = re.search(r"LockedCaptureAllowed\s*:=\s*LockedSettleActive AND ([^\n]+)", fb)
+    if capture is None:
+        errors.append("condition de capture LockedCaptureAllowed introuvable")
+    else:
+        termes = capture.group(1)
+        if "WinchesMechanicallyStopped" not in termes:
+            errors.append("capture a l'arret non conditionnee par l'arret mecanique confirme")
+        if "SeenNeutral" not in termes:
+            errors.append("capture a l'arret non conditionnee par le retour au neutre de la commande")
     if 'M1Demand.HomeReq := TRUE' not in fb or 'M2Demand.HomeReq := TRUE' not in fb:
         errors.append("demande de reference conjointe M1/M2 absente")
 
+    # --- 4. Anti-test-vacuant : les cas portant ces exigences existent ---
     return errors
 
 
@@ -146,9 +183,15 @@ MUTATIONS = (
      lambda src: src.replace("CfgTimeoutClimb      : TIME := T#300s;", "CfgTimeoutClimb      : TIME := T#120s;")),
     ("garde de montee non conditionnee par la commande",
      lambda src: src.replace("ClimbTimer(IN := ClimbCommandActive", "ClimbTimer(IN := ClimbStepActive")),
-    ("interlock de couplage E1 supprime",
-     lambda src: src.replace("CouplingInterlockFault := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED)",
-                             "CouplingInterlockFault := FALSE")),
+    ("garde de montee keyee sur l'intention au lieu de l'ordre emis",
+     lambda src: src.replace("ClimbStepActive := (SeqStep = E_MachineHomingTxState.HX2_CLIMB) OR LockedClimbCommand;",
+                             "ClimbStepActive := (SeqStep = E_MachineHomingTxState.HX2_CLIMB) OR LockedClimbActive;")),
+    ("capture a l'arret sans condition d'arret mecanique",
+     lambda src: src.replace("LockedCaptureAllowed := LockedSettleActive AND WinchesMechanicallyStopped AND SeenNeutral",
+                             "LockedCaptureAllowed := LockedSettleActive AND SeenNeutral")),
+    ("capture a l'arret sans condition de retour au neutre",
+     lambda src: src.replace("LockedCaptureAllowed := LockedSettleActive AND WinchesMechanicallyStopped AND SeenNeutral",
+                             "LockedCaptureAllowed := LockedSettleActive AND WinchesMechanicallyStopped")),
 )
 
 
@@ -168,8 +211,15 @@ def selftest(cfg: str, fb: str, enum: str, persist: str, prg02: str, tests: str)
             failures.append(f"mutation non appliquee (motif absent) : {label}")
         elif not detecte:
             failures.append(f"mutation NON detectee : {label}")
-
-    for ident in ("TC-P09-H001", "TC-P09-H005", "TC-P09-H013"):
+    # Mutation sur l'entree de l'etape verrouillee : capteur haut deja actif accepte (datum faux).
+    mut_entry = fb.replace("IF BucketCloseConfirmedLatched AND NOT TopPositionSensor THEN",
+                           "IF BucketCloseConfirmedLatched THEN")
+    if mut_entry == fb:
+        failures.append("mutation non appliquee (motif absent) : entree HX7 acceptant un capteur deja actif")
+    elif not check_invariant(mut_entry, cfg, enum, persist, prg02):
+        failures.append("mutation NON detectee : entree HX7 acceptant un capteur deja actif")
+    # Mutation sur le fichier de test (anti-test-vacuant).
+    for ident in ("TC-P09-H209", "TC-P09-H212"):
         mut_tests = tests.replace(ident, "TC-P09-HXXX")
         if mut_tests == tests:
             failures.append(f"mutation non appliquee (motif absent) : cas de test {ident}")
@@ -213,7 +263,7 @@ def main() -> int:
         f"{garde:.0f} s >= minimum physique {course / vitesse * MARGE_GARDE:.1f} s "
         f"(course {course:.1f} m, {vitesse:.2f} m/s, marge {MARGE_GARDE:.0f}) ; "
         "consommee uniquement pendant la montee commandee ; "
-        "sequence T364 complete (HX0..HX6 + HX7_FAILED), interlock E1 et "
+        "etape verrouillee HX7 et capture a l'arret conditionnee presentes ; "
         f"{len(TESTS_REQUIS)} cas de test presents."
     )
     return 0
