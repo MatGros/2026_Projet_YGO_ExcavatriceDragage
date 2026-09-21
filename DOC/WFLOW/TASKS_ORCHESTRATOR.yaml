@@ -3,6 +3,30 @@
 # Structure liste plate pour vue tabulaire & filtres automatiques
 # ==============================================================================
 
+- id: "T370-MATRICE-DISCORDANCES"
+  date: "2026-09-22"
+  type: "etude"
+  priorite: "haute"
+  agent_id: "CDX03"
+  sujet: "Contacteurs M1/M2 : matrice exhaustive et choix bits/messages"
+  statut: "en_cours"
+  livrable: "DOC/WFLOW/AUDITS/DESIGN/AUDIT_T370_MATRICE_DISCORDANCES_20260922.md"
+  verdict: "—"
+  decision: "Analyse C4 read-only avant arbitrage humain et code."
+  note: "T288 phase 1 conservee ; T370 initiale etendue au besoin client actuel."
+
+- id: "T374-DSH-CONDITIONS"
+  date: "2026-09-22"
+  type: "etude"
+  priorite: "haute"
+  agent_id: "DSH30"
+  sujet: "MAINT_N2 : conditions deja appliquees dans le code et points de raccordement"
+  statut: "en_attente"
+  livrable: "DOC/WFLOW/AUDITS/DESIGN/AUDIT_T374_DSH_CONDITIONS_EXISTANTES_20260922.md"
+  verdict: "—"
+  decision: "Lecture seule ; aucune garde nouvelle avant revue du code et validation humaine du plan."
+  note: "Brief et contrat transmis par l'utilisateur a DSH30 ; verrou T374 reserve."
+
 - id: "T374-CADRAGE"
   date: "2026-09-22"
   type: "planification"

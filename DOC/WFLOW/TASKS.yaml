@@ -4,8 +4,9 @@ tasks:
   statut: ⏳
   criticite: C4
   domaine: MAINTENANCE_N2 / TREUILS / SECURITE
-  agent: '—'
-  date: '2026-09-22T00:06:10+02:00'
+  agent: DSH30
+  locked_at: '2026-09-22T00:17:35+02:00'
+  date: '2026-09-22T00:17:35+02:00'
   titre: 'MAINT_N2 : auditer la commande IHM M1, M2 et M1+M2 dans les deux sens avant essais'
   contexte: 'Demande client pour la mise en service. Les six boutons moteur existent dans ST_MaintenanceN2Cmd.st:9-14, mais la recherche dans CODE/ ne trouve comme consommateur que ActiveForcing dans PRG_07_Supervision.st:705-710 ; les boutons de frein sont, eux, lus par PRG_06_Outputs.st:320-330. T259 reste une livraison historique distincte et T273 une revision de cinematique non demarree. Le comportement moteur actuel ne peut pas etre declare fonctionnel.'
   description: 'Phase A en lecture seule : tracer les six boutons IHM jusqu aux commandes et sorties physiques, relever les protections appliquees, les trous de cablage et les collisions avec T259/T273. Produire le plan et la matrice de tests avant toute modification de CODE/. Phase B eventuelle sous contrat revise et GO humain explicite.'
@@ -15,7 +16,8 @@ tasks:
   - 'Proposer une matrice de protections MAINT_N2 a arbitrer avec l utilisateur avant code ; aucune interpretation implicite du mot inconditionnellement.'
   - 'Preparer six essais de simulation puis une recette machine, avec absence de redemarrage automatique et relachement du bouton.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_AUDIT.yaml
-  avancement: 'Phase A lecture seule livree : six boutons moteur sans consommation hors indicateur PRG_07 ActiveForcing ; freins raccordes separement dans PRG_06. Audit durable DOC/WFLOW/AUDITS/DESIGN/AUDIT_T374_MAINT_N2_BOUTONS_MOTEURS_20260922.md. Matrice de protections et plan code en attente de decision humaine ; aucune ligne CODE/ modifiee.'
+  contrat_analyse_conditions: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_DSH_CONDITIONS_EXISTANTES.yaml
+  avancement: 'Phase A lecture seule livree : six boutons moteur sans consommation hors indicateur PRG_07 ActiveForcing ; freins raccordes separement dans PRG_06. Audit durable DOC/WFLOW/AUDITS/DESIGN/AUDIT_T374_MAINT_N2_BOUTONS_MOTEURS_20260922.md. Phase suivante confiee a DSH30 : analyse des conditions EXISTANTES selon BRIEF_T374_DSH_CONDITIONS_EXISTANTES.md, read-only, sans ajout de garde ni code. Plan code en attente de validation humaine.'
   bloque_par: []
 - id: T371
   parent_id: ''
@@ -98,20 +100,23 @@ tasks:
   avancement: '[ORCHESTRATEUR DSH01 2026-09-21T10:54 — ENTREE CREEE, CONTRAT ORPHELIN REGULARISE, SUR GO HUMAIN EXPLICITE (question 2 du pilotage T224). AUCUN FICHIER CODE/ TOUCHE par cette operation, uniquement le catalogue.] HISTORIQUE PROUVE A NE PAS PERDRE (git log) : le lot a ete implemente en 6 commits — c9665355, 44187804, b96a8988, e2f5b9dc, 67972e1d, 72ce5eec — TOUS marques [NON TESTE], puis INTEGRALEMENT ANNULE par le revert 263fae18 (2026-09-02 19:03). MOTIF DU REVERT, cite verbatim : Regression : impossible de monter, ArmingPermit quasi toujours a 1 (inutile), et des blocages banc lies au chemin rapide NoMovement (M1_ContactorsReleased_DI fige TRUE sans DI reel). 3 rounds de correctifs sur des FB SECURITE -> retour a la baseline stable pre-T228 (7e46d6d7), demande operateur. 12 fichiers CODE restaures a 7e46d6d7 : MovementInhibited retire des 2 FB OutputInterlock, M1/M2/M3MovementInhibited retires de ST_OutputsInterPrg, publications PRG_06 retirees, PRG_04 revenu a ArmingPermit T224 pur (AND ArmAnyAxisAvail, sans terme tempo), MOVEMENT_TEMPO retire de E_ArmingBlockReason, TonNoMoveContactor et NoMovementContactorSuspect retires de FB_Safety_Winch (FB DE SECURITE), Idx310-318 retires de ST_ChainWinchSync, remontee decodee sync-contacteur retiree de FB_Hmi_BannerFormatter et PRG_07. T224 et le reste de la session CONSERVES. G200 ETAIT PASS AVANT LE REVERT (1766 instances = niveau pre-T228) : la preuve mecanique navait donc PAS vu la regression fonctionnelle, cest le BANC qui la vue. 3 LECONS INSCRITES COMME CONTRAINTES DE TOUTE REPRISE : (1) ne pas patcher les FB de SECURITE pour obtenir une information de disponibilite ; (2) ne jamais fonder une logique sur un DI potentiellement fige (chemin rapide NoMovement) ; (3) une disponibilite qui rend ArmingPermit quasi toujours a 1 est un ECHEC equivalent a un faux TRUE de depart. ETAT CONTRAT : status PENDING, execution PENDING, validation PENDING. AUCUN COMMIT.'
 - id: T370
   parent_id: T288
-  statut: ⬜
-  criticite: C2
+  statut: ⏳
+  criticite: C4
   domaine: SECURITE_ET_AU / TREUILS_M1_M2
-  agent: '—'
-  locked_at: '2026-09-21T11:00:00+02:00'
-  date: '2026-09-21T11:00:00+02:00'
-  updated_at: '2026-09-21T11:00:00+02:00'
-  titre: 'Investigation seule (zero code) - Etat actuel discordance commande/retour contacteurs puissance'
+  agent: CDX03
+  locked_at: '2026-09-22T00:23:05+02:00'
+  date: '2026-09-22T00:23:05+02:00'
+  updated_at: '2026-09-22T00:23:05+02:00'
+  titre: 'Cartographie exhaustive des discordances contacteurs M1/M2 et choix de codage alarmes/messages'
   contexte: 'Mail client GCAM 2026-09-15 : detection de discordance commande/retour contacteurs deja validee en simulation (alarme + SafeStop apres 3s), causes multiples a detailler pour la maintenance. Contexte terrain rappele par l utilisateur 2026-09-21 : probleme deja rencontre avec des contacteurs de marche puissance -- l automate envoie une commande, mais les contacteurs ne bougent pas physiquement. Des modules de synchronisme/controle contacteurs existent deja dans le code.'
-  description: 'Investigation lecture seule stricte, aucune modification de CODE/. Cartographier ce qui existe deja cote detection de discordance (modules de synchronisme, controles contacteurs deja presents), ce qui manque par rapport au besoin du mail (detail des causes multiples pour la maintenance), et si le cas concret "commande envoyee, contacteur immobile" est deja couvert ou non. Rapport ecrit avant toute proposition de code.'
+  description: 'Phase 1 reduite T288 deja implementee ; fiche de diagnostic T370 existante. Nouvelle mission C4 en lecture seule : matrice exhaustive des discordances observables et indiscernables avec les E/S reelles, puis comparatif 1 bit par discordance/1 message contre 1 bit agrege/plusieurs messages codes. Aucun code avant choix humain et plan valide.'
   objectifs:
-  - 'Cartographie complete de la detection de discordance existante (fichier:ligne, quels contacteurs, quelles causes deja distinguees).'
-  - 'Verdict explicite : le cas "commande sans retour contacteur" est-il deja detecte, ou est-ce un trou reel ?'
+  - 'Table de verite exhaustive ordre final/retour collectif M1 et M2, cas normaux, faux positifs et impossibilites de discrimination.'
+  - 'Inventaire de tous les detecteurs, temporisations, latchs, bypass, effets SafeStop/PowerCutOff, ErrorID et messages deja presents.'
+  - 'Comparatif testable des deux architectures bits/messages, avec cas simultanes, priorites et capacite des structures.'
   - 'Aucune ligne de CODE/ modifiee dans ce lot.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T370_CARTOGRAPHIE_DISCORDANCES.yaml
+  avancement: 'Diagnostic statique initial deja rendu dans TROUBLESHOOTING_T370_DISCORDANCE_CONTACTEURS_20260921.md. Mission complementaire exhaustive confiee a CDX03, read-only ; choix bits/messages puis plan code a valider avec l humain.'
   bloque_par: []
 - id: T369
   parent_id: T364
