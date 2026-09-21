@@ -1,15 +1,16 @@
 (* =======================================================================
    🎯 FB_CycleMachineHoming — Cycle de referencement machine M1/M2/benne
    ───────────────────────────────────────────────────────────────
-   Role : GRAFCET sequentiel (HX0..HX6 + HXF) qui coordonne le homing
-             machine : montee au capteur haut, homing des axes M1/M2 au
-             vol sur le front descendant du capteur, mise en position
-             fermee de la benne et commit atomique de l'etat benne, jusqu'a
-             MachineHomed. Emet les ordres treuil (CmdWinchM1/CmdWinchM2)
-             consommes par PRG_03 -> PRG_04. Producteur UNIQUE de la
-             qualification machine ; ne relit jamais un ActiveOffsetValid
-             aval. Aucun mouvement sans permis operateur maintenu.
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+   Role : GRAFCET sequentiel (HX0..HX6 + HX7_FAILED) qui coordonne
+             le homing machine selon la specification exploitant du 2026-09-21 :
+             fermeture benne palier 1 en HX1, bascule et interlock couplage
+             M1+M2 en HX1a (résolution E1), montee palier 1 en HX2, prise
+             de reference a la volee sur capteur haut en HX3, controle
+             stabilisation/inertie [8.50..8.80m] en HX4 avec max 3 retries,
+             degagement zone haute en HX5, qualification MachineHomed en HX6,
+             et etat d'echec unifie HX7_FAILED.
+   Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+                + DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_REFONTE_SEQUENCE_HOMING.yaml
    ======================================================================= *)
 FUNCTION_BLOCK PUBLIC FB_CycleMachineHoming
 VAR_INPUT
@@ -22,7 +23,7 @@ VAR_INPUT
     BootReady                   : BOOL;                                      // --> [HW] Acquisition + codeurs valides apres boot
 
     // === PERMIS SECURITE ===
-    TopPositionSensor           : BOOL;                                      // --> [SAFE] Capteur haut (FDC logiciel) commun M1/M2
+    TopPositionSensor           : BOOL;                                      // --> [SAFE] Capteur haut commun M1/M2
     WinchesMechanicallyStopped  : BOOL;                                      // --> [SAFE] M1 ET M2 arret mecanique confirme
 
     // === ACQUISITION HOMING (M1 / M2) ===
@@ -35,21 +36,29 @@ VAR_INPUT
     // === PERMIS OPERATEUR (joystick + homme-mort) ===
     DeadmanArmed                : BOOL;                                      // --> [CMD] Homme-mort arme
     JoystickDeflected           : BOOL;                                      // --> [CMD] Joystick defléchi (un axe quelconque) — sert au latch SeenNeutral
-    JoystickPull                : BOOL;                                      // --> [CMD] Manche tire vers soi = sens montee treuils
-    JoystickPush                : BOOL;                                      // --> [CMD] Manche pousse = sens descente treuils
+    JoystickPull                : BOOL;                                      // --> [CMD] Manche tire vers soi = sens montee treuils / fermeture benne
+    JoystickPush                : BOOL;                                      // --> [CMD] Manche pousse = sens descente treuils / ouverture benne
 
-    // === VALIDATION OPERATEUR (mecanisme homogene machine) ===
-    BtnValidation               : BOOL;                                      // --> [CMD] BP joystick (homme-mort) — motif 3 appuis successifs (V_EXPLICITE)
-    StartRequest                : BOOL;                                      // --> [CMD] Lancer le cycle (front) — commande IHM dediee, alternative au motif joystick
-    BucketCloseConfirmed        : BOOL;                                      // --> [CMD] Confirmation operateur benne fermee (front, bouton N2 dedie) — ouvre l'etape verrouillee
+    // === VALIDATION OPERATEUR ===
+    BtnValidation               : BOOL;                                      // --> [CMD] BP joystick (homme-mort)
+    StartRequest                : BOOL;                                      // --> [CMD] Lancer le cycle (front) — commande IHM dediee
+    BtnConfirmHomingBucket      : BOOL;                                      // --> [CMD] Confirmation visuelle fermeture benne cycle homing HX1 (bouton dédié IHM)
+
+    // === INTERLOCK COUPLAGE E1 & RETOUR ARBITRAGE ===
+    JoystickWinchSelectArbitrated : INT;                                     // --> [CMD] Selecteur treuil arbitre aval (0=both, 1=M1, 2=M2) pour interlock E1
+
+    // === MESURES POSITIONS POUR CONTROLE STABILISATION HX4 ===
+    CablePosM1                  : REAL;                                      // --> [MEAS] Position reelle cable M1 (m)
+    CablePosM2                  : REAL;                                      // --> [MEAS] Position reelle cable M2 (m)
+    CoherenceLimitM             : REAL := 1.0;                               // --> [CFG] Ecart max autorise entre treuils en stabilisation
 
     // === MISE EN SERVICE : forcage de step (encadre) ===
     CfgCommissioningEnable      : BOOL;                                      // --> [CFG] Case IHM mise en service homing : deverrouille le forcage de step
-    CfgForceStepTarget          : INT;                                       // --> [CFG] Step cible du forcage (0=HX0 .. 9=HXF, borne dans le FB ; l'etape HX7 n'est pas atteignable par forcage)
-    CfgForceStepApply           : BOOL;                                      // --> [CMD] Applique le forcage (front) — impulsion, le GRAFCET reprend ensuite
+    CfgForceStepTarget          : INT;                                       // --> [CFG] Step cible du forcage (0=HX0 .. 8=HX7)
+    CfgForceStepApply           : BOOL;                                      // --> [CMD] Applique le forcage (front) — impulsion
 
     // === REGLAGES & CONFIGURATION ===
-    Cfg                         : ST_fbMachineHomingCycle_Cfg;              // --> [CFG] Reglages geometriques + temporisations de garde
+    Cfg                         : ST_fbMachineHomingCycle_Cfg;               // --> [CFG] Reglages geometriques + temporisations de garde
 END_VAR
 VAR_OUTPUT
     // === CONTRAT STANDARD (Ready + Fault) ===
@@ -62,129 +71,122 @@ VAR_OUTPUT
     MachineHomingStep           : E_MachineHomingStep := E_MachineHomingStep.IDLE;   // <-- [STAT] Etape du guide (echelle de priorite)
     MachineHomingStepAtError    : E_MachineHomingStep := E_MachineHomingStep.IDLE;   // <-- [DIAG] Etape figee a l'apparition du defaut (R9)
     MachineHomingSeqStep        : E_MachineHomingTxState := E_MachineHomingTxState.HX0_REPOS; // <-- [DIAG] Step GRAFCET courant
-    MachineHomingInstruction    : STRING(120);                              // <-- [DIAG] Consigne operateur en clair (ASCII)
+    MachineHomingInstruction    : STRING(120);                               // <-- [DIAG] Consigne operateur en clair (ASCII)
     MachineHomingActive         : BOOL;                                      // <-- [STAT] Cycle en cours (= Lifecycle.Busy)
     MachineHomingLossSafeStop   : BOOL;                                      // <-- [STAT] Demande d'arret controle suite perte de datum en mouvement
     MachineHomingFailed         : BOOL;                                      // <-- [STAT] Derniere sequence abandonnee
 
     // === DEMANDES HOMING (M1 / M2) ===
-    M1Demand                    : ST_fbMachineHomingCycle_HomingDemand;      // <-- [ACT] Demande de homing conjoint axe M1
-    M2Demand                    : ST_fbMachineHomingCycle_HomingDemand;      // <-- [ACT] Demande de homing conjoint axe M2 (cible dynamique)
+    M1Demand                    : ST_fbMachineHomingCycle_HomingDemand;       // <-- [ACT] Demande de homing conjoint axe M1
+    M2Demand                    : ST_fbMachineHomingCycle_HomingDemand;       // <-- [ACT] Demande de homing conjoint axe M2
 
     // === ORDRES MOUVEMENT TREUIL (vers PRG_03 -> PRG_04) ===
-    CmdWinchM1                  : ST_ProgramWinchRequest;                    // <-- [ACT] Ordre treuil M1 (montee/descente palier 1)
-    CmdWinchM2                  : ST_ProgramWinchRequest;                    // <-- [ACT] Ordre treuil M2 (montee/descente palier 1)
+    CmdWinchM1                  : ST_ProgramWinchRequest;                     // <-- [ACT] Ordre treuil M1 (montee palier 1)
+    CmdWinchM2                  : ST_ProgramWinchRequest;                     // <-- [ACT] Ordre treuil M2 (montee palier 1)
 
-    // === ORDRES BENNE (palier 1, sans FDC logiciel — HX4) ===
+    // === ORDRES BENNE (palier 1, sans FDC logiciel — HX1) ===
     CmdBucketOpen               : BOOL;                                      // <-- [ACT] Ordre ouverture benne palier 1 sans FDC soft
     CmdBucketClose              : BOOL;                                      // <-- [ACT] Ordre fermeture benne palier 1 sans FDC soft
 
+    // === OVERRIDE SELECTEUR TREUIL CYCLE ===
+    CmdWinchSelect              : INT := -1;                                 // <-- [ACT] Override selecteur treuil cycle (-1=neutre, 0=forcer couple, 2=forcer benne)
+
     // === COMMIT BENNE ===
-    BucketCommit                : ST_fbMachineHomingCycle_BucketCommit;      // <-- [ACT] Publication atomique de l'etat benne (vers FB_Bucket)
+    BucketCommit                : ST_fbMachineHomingCycle_BucketCommit;       // <-- [ACT] Publication atomique de l'etat benne (vers FB_Bucket)
 
     // === VERROU TRANSLATION ===
     M3Locked                    : BOOL;                                      // <-- [STAT] Translation M3 interdite tant que le cycle homing n'est pas en HX0
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
-    instFault                   : FB_FaultCore;                             // * [INST] Socle defaut transverse
-    ResetEdge                   : R_TRIG;                                   // . [LOC] Front montant Reset
-    LatchedEdge                 : R_TRIG;                                   // . [LOC] Front montant Fault.Latched (capture R9)
-    TopLostEdge                 : F_TRIG;                                   // . [LOC] Front DESCENDANT TopPositionSensor (sortie capteur = homing axes au vol)
+    instFault                   : FB_FaultCore;                              // * [INST] Socle defaut transverse
+    ResetEdge                   : R_TRIG;                                    // . [LOC] Front montant Reset
+    LatchedEdge                 : R_TRIG;                                    // . [LOC] Front montant Fault.Latched (capture R9)
+    TopLostEdge                 : F_TRIG;                                    // . [LOC] Front descendant TopPositionSensor
 
     // === TABLE DES CAUSES DE DEFAUT ===
-    instCauses                  : ARRAY[0..15] OF ST_FaultCause;            // . [LOC] Causes en clair pour FB_FaultCore
+    instCauses                  : ARRAY[0..15] OF ST_FaultCause;             // . [LOC] Causes en clair pour FB_FaultCore
 
     // === GRAFCET ===
     SeqStep                     : E_MachineHomingTxState := E_MachineHomingTxState.HX0_REPOS; // . [LOC] Step GRAFCET courant
-    PendingClose                : BOOL;                                     // . [LOC] Confirmation "benne fermee" en attente de commit (pose en HT4)
-    CommitPublished             : BOOL;                                     // . [LOC] Commit benne deja publie sur ce datum
-    CommitDone                  : BOOL;                                     // . [LOC] Commit CommitClose deja emis (impulsion 1 scan garantie en HX5)
-    CycleRunning                : BOOL;                                     // . [LOC] Miroir de (SeqStep hors HX0/HX1) — cycle mouvement engage
-    HomeReqDone                 : BOOL;                                     // . [LOC] Impulsion HomeReq M1+M2 deja emise sur ce passage HX3
-    SeenNeutral                 : BOOL;                                     // . [LOC] Joystick repasse au neutre depuis l'entree du step d'arret
+    CommitPublished             : BOOL;                                      // . [LOC] Commit benne deja publie sur ce datum
+    CommitDone                  : BOOL;                                      // . [LOC] Commit CommitClose deja emis (impulsion 1 scan)
+    PendingClose                : BOOL;                                      // . [LOC] Fermeture benne confirmee en attente de commit final en HX6
+    CycleRunning                : BOOL;                                      // . [LOC] Miroir de (SeqStep <> HX0_REPOS) — cycle engage
+    HomeReqDone                 : BOOL;                                      // . [LOC] Impulsion HomeReq M1+M2 deja emise sur ce passage HX3
+    SeenNeutral                 : BOOL;                                      // . [LOC] Joystick repasse au neutre depuis l'entree du step d'arret
 
     // === TEMPORISATIONS DE GARDE ===
-    ClimbTimer                  : TON;                                      // . [LOC] Garde HX2 (montee au capteur)
-    HomeAxesTimer               : TON;                                      // . [LOC] Garde HX3 (descente jusqu'au front descendant)
-    SettleGraceTimer            : TON;                                      // . [LOC] Fenetre de grace decelaration a l'entree d'un step d'arret
-    AutoArmTimer                : TON;                                      // . [LOC] Debounce de l'auto-armement HX0->HX1 (anti-flapping MachineHomed)
-    FirstScanDone               : BOOL;                                     // . [LOC] Garde 1er scan : statuts codeurs pas encore stables au boot
+    ClimbTimer                  : TON;                                       // . [LOC] Garde HX2 (montee au capteur)
+    HomeAxesTimer               : TON;                                       // . [LOC] Garde HX3 (prise de reference)
+    BucketCloseTimer            : TON;                                       // . [LOC] Garde fermeture benne HX1 (8s max)
+    CouplingSettleTimer         : TON;                                       // . [LOC] Temporisation dwell de bascule selecteur HX1a (300 ms)
+    SettleGraceTimer            : TON;                                       // . [LOC] Fenetre de grace deceleration
+    AutoArmTimer                : TON;                                       // . [LOC] Debounce de l'auto-armement HX0->HX1 (anti-flapping MachineHomed)
+    FirstScanDone               : BOOL;                                      // . [LOC] Garde 1er scan : statuts codeurs pas encore stables au boot
 
-    // === MOTIF DE VALIDATION "3 APPUIS" (V_EXPLICITE) ===
-    ValidationBtnEdgeR          : R_TRIG;                                   // . [LOC] Front montant BtnValidation
-    ValidationBtnEdgeF          : F_TRIG;                                   // . [LOC] Front descendant BtnValidation
-    StartEdge                   : R_TRIG;                                   // . [LOC] Front montant StartRequest (commande IHM lancer cycle)
-    ForceStepApplyEdge          : R_TRIG;                                   // . [LOC] Front montant CfgForceStepApply (forcage step mise en service)
-    ForceStepClamped            : INT;                                      // . [LOC] CfgForceStepTarget borne [0..9] (selecteur CASE)
-    ValidationHoldTimer         : TON;                                     // . [LOC] Maintien >= 150 ms d'un appui
-    ValidationGapTimer          : TON;                                     // . [LOC] Fenetre <= 2 s entre appuis
-    ValidationPressCount        : INT;                                     // . [LOC] Compteur d'appuis valides (0..3)
-    ValidationHeldOk            : BOOL;                                     // . [LOC] Appui courant maintenu >= 150 ms (latch, lu au relachement)
-    ExplicitValidationPulse     : BOOL;                                    // . [LOC] Validation explicite acquise ce scan (impulsion 1 scan)
+    // === FRONTS OPERATEUR ===
+    StartEdge                   : R_TRIG;                                    // . [LOC] Front montant StartRequest
+    HomingBucketConfirmEdge     : R_TRIG;                                    // . [LOC] Front montant BtnConfirmHomingBucket
+    ForceStepApplyEdge          : R_TRIG;                                    // . [LOC] Front montant CfgForceStepApply
+    ForceStepClamped            : INT;                                       // . [LOC] CfgForceStepTarget borne [0..8]
 
-    // === CONDITIONS INTERMEDIAIRES NOMMEES (std 2quater : <= 3 termes) ===
-    BothAxesHomed               : BOOL;                                    // . [LOC] M1 ET M2 references et fiables
-    CommitOrOffsetValid         : BOOL;                                    // . [LOC] Datum benne connu (commit publie OU offset valide)
-    ClimbPermit                 : BOOL;                                    // . [LOC] Permis operateur maintenu, sens montee
-    DescendPermit               : BOOL;                                    // . [LOC] Permis operateur maintenu, sens descente
-    BucketPermit                : BOOL;                                    // . [LOC] Permis operateur maintenu, benne (2 sens)
-    IsInMovePhase               : BOOL;                                    // . [LOC] Step GRAFCET qui commande un mouvement treuil (HX2/HX3/montee verrouillee)
-    AxisHomingError             : BOOL;                                    // . [LOC] Erreur de homing M1 ou M2
-    MotionOutOfPhase            : BOOL;                                    // . [LOC] Treuil bouge hors phase mouvement, grace decel ecoulee
-    ModeLostDuringCycle         : BOOL;                                    // . [LOC] Sortie de MAINT_N2 alors que le cycle est engage (HX2..HX6)
-    AutoArmCandidate            : BOOL;                                    // . [LOC] Machine non referencee en maintenance : le cycle se propose
-    ClimbTimedOut               : BOOL;                                    // . [LOC] Garde de montee ecoulee (temps de montee commandee)
-    HomeAxesTimedOut            : BOOL;                                    // . [LOC] Garde de descente ecoulee sans axes homes
-    TransactionAbort            : BOOL;                                    // . [LOC] Condition d'abandon fail-safe pendant une phase mouvement
-    ReHomingAckRequired         : BOOL;                                    // . [LOC] C-1 : bloque MachineHomed jusqu'a un Reset conscient
-    MachineWasHomed             : BOOL;                                    // . [LOC] Memorise un datum valide (detection de perte)
-    HomingLossLatched           : BOOL;                                    // . [LOC] Perte de datum en mouvement latchee jusqu'a l'arret
-    MachineHomedRaw             : BOOL;                                    // . [LOC] Qualification hors Fault (detection de perte, evite circularite)
-    AxesDatumRaw                : BOOL;                                    // . [LOC] Reference codeurs M1/M2 seule (base de la detection de perte de datum, sans l'offset benne)
+    // === CONDITIONS INTERMEDIAIRES NOMMEES ===
+    BothAxesHomed               : BOOL;                                      // . [LOC] M1 ET M2 references et fiables
+    CommitOrOffsetValid         : BOOL;                                      // . [LOC] Datum benne connu (commit publie OU offset valide)
+    ClimbPermit                 : BOOL;                                      // . [LOC] Permis operateur maintenu, sens montee
+    DescendPermit               : BOOL;                                      // . [LOC] Permis operateur maintenu, sens descente
+    BucketPermit                : BOOL;                                      // . [LOC] Permis operateur maintenu, benne
+    IsInMovePhase               : BOOL;                                      // . [LOC] Step GRAFCET qui commande un mouvement treuil (HX2)
+    AxisHomingError             : BOOL;                                      // . [LOC] Erreur de homing M1 ou M2
+    MotionOutOfPhase            : BOOL;                                      // . [LOC] Treuil bouge hors phase mouvement, grace decel ecoulee
+    ModeLostDuringCycle         : BOOL;                                      // . [LOC] Sortie de MAINT_N2 alors que le cycle est engage
+    AutoArmCandidate            : BOOL;                                      // . [LOC] Machine non referencee en maintenance : le cycle se propose
+    ClimbTimedOut               : BOOL;                                      // . [LOC] Garde de montee ecoulee
+    HomeAxesTimedOut            : BOOL;                                      // . [LOC] Garde de homing axes ecoulee sans axes homes
+    BucketCloseTimedOut         : BOOL;                                      // . [LOC] Garde fermeture benne HX1 ecoulee (8s max)
+    TransactionAbort            : BOOL;                                      // . [LOC] Condition d'abandon fail-safe pendant une phase mouvement
+    ReHomingAckRequired         : BOOL;                                      // . [LOC] Bloque MachineHomed jusqu'a un Reset conscient
+    MachineWasHomed             : BOOL;                                      // . [LOC] Memorise un datum valide (detection de perte)
+    HomingLossLatched           : BOOL;                                      // . [LOC] Perte de datum en mouvement latchee jusqu'a l'arret
+    MachineHomedRaw             : BOOL;                                      // . [LOC] Qualification hors Fault
+    AxesDatumRaw                : BOOL;                                      // . [LOC] Reference codeurs M1/M2 seule
 
-    // === ETAPE VERROUILLEE HX7 (montee au capteur puis referencement A L'ARRET) ===
-    ModeIsMaint2                : BOOL;                                    // . [LOC] Mode arbitre = MAINT_N2
-    ModeIsMaint1                : BOOL;                                    // . [LOC] Mode arbitre = MAINT_N1
-    MaintenanceActive           : BOOL;                                    // . [LOC] Mode arbitre = MAINT_N1 ou MAINT_N2
-    LockedStepEngaged           : BOOL;                                    // . [LOC] Le cycle est dans l'etape verrouillee HX7
-    LockedClimbActive           : BOOL;                                    // . [LOC] HX7, capteur haut NON atteint : phase de montee
-    LockedClimbCommand          : BOOL;                                    // . [LOC] HX7 en phase de montee ET en MAINT_N2 : ordre de montee effectivement emis
-    LockedSettleActive          : BOOL;                                    // . [LOC] HX7, capteur haut atteint : phase d'arret/capture
-    LockedCaptureAllowed        : BOOL;                                    // . [LOC] Prise de reference autorisee (capteur atteint + arret mecanique + neutre)
-    DescentRequestedInLock      : BOOL;                                    // . [LOC] Descente demandee pendant l'etape verrouillee (interdite)
-    LockedDescentRefused        : BOOL;                                    // . [LOC] Latch local : descente refusee en HX7 (purge sur Reset, alimente la cause defaut)
-    ClimbStepActive             : BOOL;                                    // . [LOC] Step courant = un step de montee (HX2 ou HX7 phase montee)
-    ClimbCommandActive          : BOOL;                                    // . [LOC] Montee REELLEMENT commandee : seule condition qui consomme la garde
-    DescentCommandActive        : BOOL;                                    // . [LOC] Descente REELLEMENT commandee : seule condition qui consomme la garde HX3
-    BucketCloseConfirmedLatched : BOOL;                                    // . [LOC] Confirmation benne fermee memorisee (entree de HX7, purgee sur Reset ou hors maintenance)
+    // === CONTEXTE MODES & INTERLOCKS ===
+    ModeIsMaint2                : BOOL;                                      // . [LOC] Mode arbitre = MAINT_N2
+    ModeIsMaint1                : BOOL;                                      // . [LOC] Mode arbitre = MAINT_N1
+    MaintenanceActive           : BOOL;                                      // . [LOC] Mode arbitre = MAINT_N1 ou MAINT_N2
+    ClimbStepActive             : BOOL;                                      // . [LOC] Step courant = montee couplee (HX2)
+    ClimbCommandActive          : BOOL;                                      // . [LOC] Montee REELLEMENT commandee : seule condition qui consomme la garde
+    CouplingInterlockFault      : BOOL;                                      // . [LOC] Violation couplage pendant la montee HX2 (WinchSel <> 0)
+
+    // === CONTROLE STABILISATION HX4 ===
+    RetryCount                  : INT := 0;                                  // . [LOC] Compteur de tentatives HX4 -> HX1 (max 3)
+    StabilizationOk             : BOOL;                                      // . [LOC] Stabilisation inertie conforme [8.50..8.80m]
+    StabilizationFailed         : BOOL;                                      // . [LOC] Stabilisation inertie hors plage
 END_VAR
 VAR CONSTANT
     // === INDICES DE CAUSES (instCauses[]) ===
-    CST_CauseHomingLostInMotion : INT := 0;                                // Perte d'un datum valide pendant un mouvement (Latching)
-    CST_CauseClimbTimeout       : INT := 1;                                // HX2 : capteur haut non atteint dans la garde (Latching)
-    CST_CauseMotionOutOfPhase   : INT := 2;                                // Treuil bouge hors phase mouvement autorisee (Latching)
-    CST_CauseHomingErrorM1      : INT := 3;                                // FB_Encoder M1 signale une erreur de homing (Latching)
-    CST_CauseHomingErrorM2      : INT := 4;                                // FB_Encoder M2 signale une erreur de homing (Latching)
-    CST_CauseHomeAxesTimeout    : INT := 5;                                // HX3 : front descendant capteur non obtenu dans la garde (Latching)
-    CST_CauseLockedDescentReq   : INT := 6;                                // HX7 : descente demandee pendant le referencement verrouille (Latching)
+    CST_CauseHomingLostInMotion : INT := 0;                                  // Perte d'un datum valide pendant un mouvement (Latching)
+    CST_CauseClimbTimeout       : INT := 1;                                  // HX2 : capteur haut non atteint dans la garde (Latching)
+    CST_CauseMotionOutOfPhase   : INT := 2;                                  // Treuil bouge hors phase mouvement autorisee (Latching)
+    CST_CauseHomingErrorM1      : INT := 3;                                  // FB_Encoder M1 signale une erreur de homing (Latching)
+    CST_CauseHomingErrorM2      : INT := 4;                                  // FB_Encoder M2 signale une erreur de homing (Latching)
+    CST_CauseHomeAxesTimeout    : INT := 5;                                  // HX3 : prise de reference non obtenue dans la garde (Latching)
+    CST_CauseBucketCloseTimeout : INT := 6;                                  // HX1 : fermeture benne non terminee dans la garde (8s) (Latching)
+    CST_CauseCouplingFault      : INT := 7;                                  // HX2 : selecteur treuil non couple (WinchSel <> 0) pendant la montee (Latching)
+    CST_CauseStabilizationFault : INT := 8;                                  // HX4 : echec persistant stabilisation apres 3 retries (Latching)
 
-    // === MOTIF 3 APPUIS ===
-    CST_ValidationHold     : TIME := T#300ms;   // Debounce anti-flapping de l'auto-armement HX0->HX1
-    CST_ValidationPressHold : TIME := T#150ms;  // Duree minimale d'un appui du motif 3 appuis
-    CST_ValidationGap      : TIME := T#2s;       // Fenetre maximale entre deux appuis
-    CST_ValidationCount : INT  := 3;         // Nombre d'appuis requis
-
-    // === DIVERS ===
-    CST_SettleGrace : TIME := T#3s;          // Grace deceleration a l'entree d'un step d'arret
-    CST_StepSlow    : INT  := 1;             // Palier de vitesse lent (montee / descente couplee homing)
+    // === TEMPORISATIONS & DIVERS ===
+    CST_ValidationHold     : TIME := T#300ms;                                // Debounce anti-flapping de l'auto-armement HX0->HX1
+    CST_SettleGrace        : TIME := T#3s;                                   // Grace deceleration a l'entree d'un step d'arret
+    CST_StepSlow           : INT  := 1;                                      // Palier de vitesse lent (palier 1 MAX strict)
 END_VAR
 
 {region "§1 Fronts, remises a zero de tete de scan, verrou M3"}
 // === §1 FRONTS + RAZ TETE DE SCAN + VERROU M3 =========================
 
 // Sorties impulsionnelles / mouvement : remises a FALSE en tete de scan.
-// Seul un step actif les remonte -> HX0 (etape initiale pure) n'ecrit rien.
 M1Demand.HomeReq := FALSE;
 M2Demand.HomeReq := FALSE;
 BucketCommit.CommitOpen  := FALSE;
@@ -193,239 +195,123 @@ CmdBucketOpen  := FALSE;
 CmdBucketClose := FALSE;
 CmdWinchM1.RunRequest := FALSE; CmdWinchM1.ReqAscent := FALSE; CmdWinchM1.ReqDescend := FALSE; CmdWinchM1.StepTgt := 0;
 CmdWinchM2.RunRequest := FALSE; CmdWinchM2.ReqAscent := FALSE; CmdWinchM2.ReqDescend := FALSE; CmdWinchM2.StepTgt := 0;
-ExplicitValidationPulse := FALSE;
+CmdWinchSelect := -1; // Par defaut pas d'override
 
-// Detection de fronts.
 ResetEdge(CLK := Reset);
 LatchedEdge(CLK := Fault.Latched);
 TopLostEdge(CLK := TopPositionSensor);
+StartEdge(CLK := StartRequest);
+HomingBucketConfirmEdge(CLK := BtnConfirmHomingBucket);
 
 // Miroirs booleens de contexte GRAFCET.
-// Comparaisons de mode NOMMEES une seule fois (std 2quater : jamais de comparaison niee inline).
 ModeIsMaint1 := (Mode = E_Mode.MAINT_N1);
 ModeIsMaint2 := (Mode = E_Mode.MAINT_N2);
 MaintenanceActive := ModeIsMaint1 OR ModeIsMaint2;
 
-// Contexte de l'etape verrouillee HX7 : montee tant que le capteur haut n'est pas atteint,
-// puis arret/capture des que le capteur est reellement atteint (franchissement reel).
-LockedStepEngaged := (SeqStep = E_MachineHomingTxState.HX7_LOCKED_REFERENCE);
-LockedClimbActive := LockedStepEngaged AND NOT TopPositionSensor;
-// HX7 en phase de montee ET reellement en MAINT_N2 : SEULE combinaison ou un ordre de montee
-// est effectivement emis (hors MAINT_N2 l'etape est tenue sans aucun ordre : la garde de
-// montee ne doit donc pas se consommer, sinon un retour en N2 sanctionnerait une montee
-// qui n'a jamais eu lieu).
-LockedClimbCommand := LockedClimbActive AND ModeIsMaint2;
-LockedSettleActive := LockedStepEngaged AND TopPositionSensor;
+// Phases de mouvement treuils
+IsInMovePhase := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED);
+CycleRunning  := (SeqStep <> E_MachineHomingTxState.HX0_REPOS);
 
-// Phases de mouvement : montee de homing (HX2, HX3) et montee de l'etape verrouillee. La
-// phase verrouillee est keyee sur l'ORDRE REELLEMENT EMIS (LockedClimbCommand) : pendant la
-// tenue hors MAINT_N2, aucun ordre n'est emis, donc tout mouvement de treuil y est evalue
-// comme un mouvement hors phase (la surveillance n'est pas masquee par le verrou).
-IsInMovePhase := (SeqStep = E_MachineHomingTxState.HX2_CLIMB)
-              OR (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES)
-              OR LockedClimbCommand;
-CycleRunning := (SeqStep <> E_MachineHomingTxState.HX0_REPOS)
-             AND (SeqStep <> E_MachineHomingTxState.HX1_CHOICE);
-
-// M3Locked est calcule en §9 (apres le CASE) pour verrouiller des le scan d'entree en cycle.
+// M3Locked est calcule en §9 pour verrouiller des le scan d'entree en cycle.
 {endregion}
 
-{region "§2 Conditions intermediaires & motif de validation 3 appuis"}
-// === §2 CONDITIONS NOMMEES + VALIDATION EXPLICITE =====================
+{region "§2 Conditions intermediaires"}
+// === §2 CONDITIONS NOMMEES ============================================
 BothAxesHomed       := M1Status.HomedAndReliable AND M2Status.HomedAndReliable;
 CommitOrOffsetValid := CommitPublished OR BucketOffsetValid;
 ClimbPermit         := DeadmanArmed AND JoystickPull;
 DescendPermit       := DeadmanArmed AND JoystickPush;
-BucketPermit        := DeadmanArmed AND JoystickDeflected;
+BucketPermit        := DeadmanArmed AND JoystickPull; // HX1 : fermeture uniquement par manche tire
 
-// Fenetre de grace deceleration : armee des qu'on entre un step d'arret depuis une phase mouvement.
-// Fenetre de grace deceleration : armee sur tous les steps a l'arret (HX2N/HX3N +
-// HX4/HX5 ou les treuils doivent rester immobiles), et sur la phase d'arret de l'etape
-// verrouillee HX7 (capteur atteint) : la deceleration apres la fin de la montee n'est pas
-// un mouvement hors phase.
-SettleGraceTimer(IN := (SeqStep = E_MachineHomingTxState.HX2N_NEUTRAL)
-                       OR (SeqStep = E_MachineHomingTxState.HX3N_PAUSE)
-                       OR (SeqStep = E_MachineHomingTxState.HX4_BUCKET_ADJUST)
-                       OR (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT)
-                       OR LockedSettleActive, PT := CST_SettleGrace);
+// Fenetre de grace deceleration
+SettleGraceTimer(IN := (SeqStep = E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK)
+                       OR (SeqStep = E_MachineHomingTxState.HX4_STABILIZATION_CHECK)
+                       OR (SeqStep = E_MachineHomingTxState.HX5_RELEASE_CLEARANCE), PT := CST_SettleGrace);
 
-// Conditions d'abandon fail-safe, chacune <= 3 termes (std 2quater).
+// Conditions d'abandon fail-safe
 AxisHomingError  := M1Status.HomingError OR M2Status.HomingError;
 MotionOutOfPhase := CycleRunning AND NOT IsInMovePhase
                     AND NOT WinchesMechanicallyStopped AND SettleGraceTimer.Q;
-// Gardes de temps : elles ne mesurent QUE le temps ou le mouvement est reellement commande
-// (une pause operateur, un arret d'urgence ou un arret machine ne consomment pas le budget).
-ClimbStepActive := (SeqStep = E_MachineHomingTxState.HX2_CLIMB) OR LockedClimbCommand;
+
+// Garde de montee HX2
+ClimbStepActive := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED);
 ClimbCommandActive := ClimbStepActive AND ClimbPermit;
-DescentCommandActive := (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) AND DescendPermit;
-ClimbTimedOut    := ClimbStepActive AND ClimbTimer.Q;
-HomeAxesTimedOut := (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) AND HomeAxesTimer.Q AND NOT BothAxesHomed;
-// Sortie de MAINT_N2 alors qu'un step mouvement/commit est engage : abandon fail-safe.
-// L'etape verrouillee HX7 est EXCLUE : elle est tenue (aucun mouvement, aucun abandon) tant
-// qu'on n'y revient pas en MAINT_N2 -> le verrou ne peut pas etre contourne par un changement de mode.
-ModeLostDuringCycle := CycleRunning AND NOT LockedStepEngaged AND NOT ModeIsMaint2;
+ClimbTimer(IN := ClimbCommandActive, PT := Cfg.CfgTimeoutClimb);
+ClimbTimedOut := ClimbStepActive AND ClimbTimer.Q;
+
+// Garde prise de reference HX3
+HomeAxesTimer(IN := (SeqStep = E_MachineHomingTxState.HX3_FLYING_REFERENCE), PT := Cfg.CfgTimeoutHomeAxes);
+HomeAxesTimedOut := (SeqStep = E_MachineHomingTxState.HX3_FLYING_REFERENCE) AND HomeAxesTimer.Q AND NOT BothAxesHomed;
+
+// Garde fermeture benne HX1
+BucketCloseTimer(IN := (SeqStep = E_MachineHomingTxState.HX1_BUCKET_PREPARE) AND BucketPermit, PT := Cfg.CfgTimeoutBucketClose);
+BucketCloseTimedOut := (SeqStep = E_MachineHomingTxState.HX1_BUCKET_PREPARE) AND BucketCloseTimer.Q;
+
+// Violation couplage E1
+CouplingInterlockFault := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED)
+                          AND (JoystickWinchSelectArbitrated <> 0);
+
+// Sortie de MAINT_N2 alors qu'un step mouvement/cycle est engage : abandon fail-safe.
+ModeLostDuringCycle := CycleRunning AND NOT ModeIsMaint2;
 TransactionAbort := CycleRunning
                     AND (AxisHomingError OR MotionOutOfPhase OR ClimbTimedOut
-                         OR HomeAxesTimedOut OR ModeLostDuringCycle);
-
-// Descente interdite pendant l'etape verrouillee : seule la montee est permise (un
-// referencement se fait en montant vers le capteur haut, jamais en descendant a l'aveugle).
-// Une descente n'est retenue que si elle est REELLEMENT commandee (homme-mort + manche
-// pousse) : un effleurement du manche sans homme-mort ne deplace aucun treuil et ne doit
-// donc pas sanctionner le cycle.
-// Limite connue : une commande de descente par BOUTONS IHM (mode boutons) n'est pas
-// observable par ce FB, qui ne recoit que les signaux du joystick.
-DescentRequestedInLock := LockedStepEngaged AND DescendPermit;
-IF DescentRequestedInLock THEN
-    LockedDescentRefused := TRUE;   // latch local : visible jusqu'au Reset conscient
-END_IF;
-
-// La condition de prise de reference A L'ARRET (capteur haut REELLEMENT atteint + arret
-// mecanique confirme + commande relachee) est evaluee AU POINT D'USAGE dans l'etape HX7 :
-// elle doit lire le neutre du scan COURANT, jamais celui du scan precedent (producteur unique).
-
-// Auto-armement HX0->HX1 : machine non referencee en maintenance (N1 ou N2), le cycle
-// se propose de lui-meme (HX1 = annonce + choix, AUCUN mouvement). Debounce anti-flapping
-// sur MachineHomed + garde 1er scan (statuts codeurs non stables au boot). Jamais apres
-// defaut non acquitte (regle C : Reset conscient).
-AutoArmCandidate := FirstScanDone
-                    AND NOT MachineHomed AND NOT MachineHomingFailed
-                    AND NOT ReHomingAckRequired AND NOT HomingLossLatched
-                    AND MaintenanceActive;
-AutoArmTimer(IN := AutoArmCandidate, PT := CST_ValidationHold);
-
-// --- Motif "3 appuis successifs" -> ExplicitValidationPulse ---
-// Pre-conditions permanentes : joystick centre + aucun mouvement + homme-mort arme.
-ValidationBtnEdgeR(CLK := BtnValidation);
-ValidationBtnEdgeF(CLK := BtnValidation);
-StartEdge(CLK := StartRequest);
-ValidationHoldTimer(IN := BtnValidation, PT := CST_ValidationPressHold);
-ValidationGapTimer(IN := (ValidationPressCount > 0) AND NOT BtnValidation, PT := CST_ValidationGap);
-
-// Latch "appui maintenu assez longtemps" : lu au relachement (le TON retombe le meme
-// scan que la chute de BtnValidation, donc on ne peut pas tester holdTimer.Q sur le front F).
-IF BtnValidation AND ValidationHoldTimer.Q THEN
-    ValidationHeldOk := TRUE;
-END_IF;
-
-// Motif = geste STANDALONE (3 appuis courts sur le BP joystick, joystick centre,
-// treuils arretes). Ne PAS exiger DeadmanArmed : le BP joystick EST le bouton
-// homme-mort ; on ne peut pas le maintenir arme ET faire des appuis courts.
-IF JoystickDeflected OR NOT WinchesMechanicallyStopped THEN
-    ValidationPressCount := 0;
-    ValidationHeldOk     := FALSE;
-ELSIF ValidationGapTimer.Q THEN
-    ValidationPressCount := 0;                       // fenetre entre appuis depassee
-    ValidationHeldOk     := FALSE;
-ELSIF ValidationBtnEdgeF.Q AND ValidationHeldOk THEN
-    ValidationPressCount := ValidationPressCount + 1; // appui maintenu >= 300 ms puis relache -> compte
-    ValidationHeldOk     := FALSE;
-END_IF;
-
-IF ValidationPressCount >= CST_ValidationCount THEN
-    ExplicitValidationPulse := TRUE;                 // impulsion 1 scan
-    ValidationPressCount    := 0;
-END_IF;
+                         OR HomeAxesTimedOut OR BucketCloseTimedOut
+                         OR CouplingInterlockFault OR ModeLostDuringCycle);
 {endregion}
 
-{region "§3 Detection de perte de datum (independante de Fault)"}
-// === §3 DETECTION DE PERTE DE DATUM ==================================
-MachineHomedRaw := BothAxesHomed AND CommitOrOffsetValid
-                   AND NOT MachineHomingFailed AND NOT ReHomingAckRequired;
+{region "§3 Detection perte de datum"}
+// === §3 PERTE DE DATUM ================================================
+AxesDatumRaw    := BothAxesHomed;
+MachineHomedRaw := AxesDatumRaw AND CommitOrOffsetValid AND NOT ReHomingAckRequired;
 
-// La PERTE DE DATUM (SafeStop + acquittement conscient) ne concerne QUE la reference
-// des codeurs M1/M2. Un offset benne devenu invalide (benne mi-course pendant une
-// ouverture/fermeture) N'EST PAS une perte de reference machine : il se traite par une
-// reconfirmation position benne, pas par un arret controle + re-homing.
-AxesDatumRaw := BothAxesHomed
-                AND NOT MachineHomingFailed AND NOT ReHomingAckRequired;
-
-IF AxesDatumRaw THEN
-    MachineWasHomed := TRUE;
-END_IF;
-IF MachineWasHomed AND NOT AxesDatumRaw AND NOT WinchesMechanicallyStopped THEN
-    HomingLossLatched := TRUE;
-END_IF;
-IF NOT AxesDatumRaw AND WinchesMechanicallyStopped THEN
-    MachineWasHomed := FALSE;
-END_IF;
-IF HomingLossLatched AND WinchesMechanicallyStopped THEN
-    HomingLossLatched := FALSE;
-END_IF;
-
-(* C : pas de redemarrage automatique. Une perte de datum en mouvement exige un
-   acquittement conscient (front Reset) avant que MachineHomed puisse revenir. *)
-IF HomingLossLatched AND NOT ReHomingAckRequired THEN
+IF FirstScanDone AND NOT MachineHomedRaw AND MachineWasHomed THEN
+    IF NOT WinchesMechanicallyStopped THEN
+        HomingLossLatched := TRUE;
+    END_IF;
     ReHomingAckRequired := TRUE;
 END_IF;
 
-MachineHomingLossSafeStop := HomingLossLatched;
-{endregion}
+MachineWasHomed := MachineHomedRaw;
 
-{region "§4 Purge sur front Reset (abandon cycle / acquittement)"}
-// === §4 PURGE SUR FRONT RESET =======================================
-IF ResetEdge.Q THEN
-    SeqStep             := E_MachineHomingTxState.HX0_REPOS;
-    PendingClose        := FALSE;
-    CommitPublished     := FALSE;
-    CommitDone          := FALSE;
-    HomeReqDone         := FALSE;
-    SeenNeutral         := FALSE;
-    ValidationPressCount := 0;
-    ValidationHeldOk    := FALSE;
-    MachineHomingFailed := FALSE;
-    MachineWasHomed     := FALSE;
+MachineHomingLossSafeStop := HomingLossLatched AND NOT WinchesMechanicallyStopped;
+
+IF ResetEdge.Q AND WinchesMechanicallyStopped THEN
     HomingLossLatched   := FALSE;
     ReHomingAckRequired := FALSE;
-    LockedDescentRefused := FALSE;
-    BucketCloseConfirmedLatched := FALSE;
 END_IF;
 {endregion}
 
-{region "§4bis MISE EN SERVICE : forcage de step (encadre, impulsion sur front)"}
-// === §4bis FORCAGE DE STEP (aide mise en service) ====================
-// Deverrouille UNIQUEMENT si : case IHM mise en service ET MAINT_N2. Autorise MEME
-// sur defaut latche (le forcage est justement l'action de recuperation : on sort du
-// step bloque puis on acquitte). Impulsion sur front (pas un force continu) : on pose
-// SeqStep + on purge les latches incoherents, le GRAFCET reprend au scan suivant.
+{region "§4 Purge sur Reset & Forcage mise en service"}
+// === §4 PURGE SUR RESET ===============================================
+IF ResetEdge.Q THEN
+    MachineHomingFailed  := FALSE;
+    PendingClose         := FALSE;
+    CommitDone           := FALSE;
+    HomeReqDone          := FALSE;
+    RetryCount           := 0;
+    SeqStep              := E_MachineHomingTxState.HX0_REPOS;
+    MachineHomingSeqStep := E_MachineHomingTxState.HX0_REPOS;
+END_IF;
+
+// §4bis Forcage de step de mise en service (encadre)
 ForceStepApplyEdge(CLK := CfgForceStepApply);
-IF ForceStepApplyEdge.Q
-   AND CfgCommissioningEnable
-   AND (Mode = E_Mode.MAINT_N2) THEN
-    ForceStepClamped := LIMIT(0, CfgForceStepTarget, 9);
+IF CfgCommissioningEnable AND ModeIsMaint2 AND ForceStepApplyEdge.Q THEN
+    ForceStepClamped := LIMIT(0, CfgForceStepTarget, 8);
     CASE ForceStepClamped OF
         0: SeqStep := E_MachineHomingTxState.HX0_REPOS;
-        1: SeqStep := E_MachineHomingTxState.HX1_CHOICE;
-        2: SeqStep := E_MachineHomingTxState.HX2_CLIMB;
-        3: SeqStep := E_MachineHomingTxState.HX2N_NEUTRAL;
-        4: SeqStep := E_MachineHomingTxState.HX3_HOME_AXES;
-        5: SeqStep := E_MachineHomingTxState.HX3N_PAUSE;
-        6: SeqStep := E_MachineHomingTxState.HX4_BUCKET_ADJUST;
-        7: SeqStep := E_MachineHomingTxState.HX5_BUCKET_COMMIT;
-        8: SeqStep := E_MachineHomingTxState.HX6_HOMED;
-        9: SeqStep := E_MachineHomingTxState.HXF_FAILED;
+        1: SeqStep := E_MachineHomingTxState.HX1_BUCKET_PREPARE;
+        2: SeqStep := E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK;
+        3: SeqStep := E_MachineHomingTxState.HX2_CLIMB_COUPLED;
+        4: SeqStep := E_MachineHomingTxState.HX3_FLYING_REFERENCE;
+        5: SeqStep := E_MachineHomingTxState.HX4_STABILIZATION_CHECK;
+        6: SeqStep := E_MachineHomingTxState.HX5_RELEASE_CLEARANCE;
+        7: SeqStep := E_MachineHomingTxState.HX6_HOMED_SUCCESS;
+        8: SeqStep := E_MachineHomingTxState.HX7_FAILED;
     END_CASE;
-    HomeReqDone  := FALSE;
-    SeenNeutral  := FALSE;
-    CommitDone   := FALSE;
-    PendingClose := FALSE;
-    ValidationPressCount := 0;
-    ValidationHeldOk     := FALSE;
-    MachineHomingFailed  := FALSE;   // le forcage annule l'etat "sequence abandonnee"
-END_IF;
-{endregion}
-
-{region "§4ter Confirmation operateur benne fermee (entree de l'etape verrouillee)"}
-// === §4ter CONFIRMATION BENNE FERMEE ================================
-// Le front du bouton N2 dedie memorise la confirmation visuelle "benne fermee" donnee par
-// l'operateur AVANT tout mouvement. Elle ouvre l'etape verrouillee HX7 (montee au capteur)
-// et elle est consommee a l'entree de cette etape. Purge : Reset conscient, ou sortie de
-// maintenance (meme regle que la demande de reference benne cote FB_Bucket).
-IF BucketCloseConfirmed THEN
-    BucketCloseConfirmedLatched := TRUE;
-END_IF;
-IF ResetEdge.Q OR NOT MaintenanceActive THEN
-    BucketCloseConfirmedLatched := FALSE;
+    HomeReqDone         := FALSE;
+    PendingClose        := FALSE;
+    CommitDone          := FALSE;
+    MachineHomingFailed := FALSE;
 END_IF;
 {endregion}
 
@@ -453,300 +339,194 @@ instCauses[CST_CauseHomingErrorM2].Texte    := 'Erreur de homing codeur M2 penda
 
 instCauses[CST_CauseHomeAxesTimeout].Active   := HomeAxesTimedOut;
 instCauses[CST_CauseHomeAxesTimeout].Latching := TRUE;
-instCauses[CST_CauseHomeAxesTimeout].Texte    := 'Homing des axes non obtenu dans le temps imparti';
+instCauses[CST_CauseHomeAxesTimeout].Texte    := 'Prise de reference capteur haut non obtenue dans le temps';
 
-instCauses[CST_CauseLockedDescentReq].Active   := LockedDescentRefused;
-instCauses[CST_CauseLockedDescentReq].Latching := TRUE;
-instCauses[CST_CauseLockedDescentReq].Texte    := 'Descente interdite pendant le referencement verrouille';
+instCauses[CST_CauseBucketCloseTimeout].Active   := BucketCloseTimedOut;
+instCauses[CST_CauseBucketCloseTimeout].Latching := TRUE;
+instCauses[CST_CauseBucketCloseTimeout].Texte    := 'Fermeture benne non obtenue dans le temps imparti (8s)';
 
-// Socle defaut : appele AVANT la gate NOT Enable (Reset jamais conditionne, std 9).
+instCauses[CST_CauseCouplingFault].Active   := CouplingInterlockFault;
+instCauses[CST_CauseCouplingFault].Latching := TRUE;
+instCauses[CST_CauseCouplingFault].Texte    := 'Defaut de couplage treuils M1+M2 en phase montee';
+
+instCauses[CST_CauseStabilizationFault].Active   := (SeqStep = E_MachineHomingTxState.HX7_FAILED) AND (RetryCount >= 3);
+instCauses[CST_CauseStabilizationFault].Latching := TRUE;
+instCauses[CST_CauseStabilizationFault].Texte    := 'Stabilisation inertie treuils hors plage apres 3 tentatives';
+
+// Socle defaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
 {endregion}
 
-{region "§6 Gate initialisation (NOT Enable)"}
-// === §6 GATE NOT ENABLE : SORTIES SURES + RETURN =====================
+{region "§6 Auto-armement"}
+// === §6 AUTO-ARMEMENT =================================================
+AutoArmCandidate := FirstScanDone AND NOT BothAxesHomed
+                    AND NOT CycleRunning AND NOT MachineHomingFailed
+                    AND NOT ReHomingAckRequired
+                    AND MaintenanceActive;
+AutoArmTimer(IN := AutoArmCandidate, PT := CST_ValidationHold);
+{endregion}
+
+{region "§7 Gate Enable"}
+// === §7 GATE ENABLE ===================================================
 IF NOT Enable THEN
-    SeqStep                  := E_MachineHomingTxState.HX0_REPOS;
-    MachineHomingStep        := E_MachineHomingStep.IDLE;
-    MachineHomingSeqStep     := E_MachineHomingTxState.HX0_REPOS;
-    MachineHomingInstruction := 'Homing indisponible';
-    MachineHomed             := FALSE;
-    MachineHomingActive      := FALSE;
-    M1Demand.HomeReq          := FALSE; M1Demand.UseDynamicTarget := FALSE;
-    M2Demand.HomeReq          := FALSE; M2Demand.UseDynamicTarget := FALSE;
-    CmdWinchM1.RunRequest := FALSE; CmdWinchM1.ReqAscent := FALSE; CmdWinchM1.ReqDescend := FALSE; CmdWinchM1.StepTgt := 0;
-    CmdWinchM2.RunRequest := FALSE; CmdWinchM2.ReqAscent := FALSE; CmdWinchM2.ReqDescend := FALSE; CmdWinchM2.StepTgt := 0;
-    CmdBucketOpen  := FALSE;
-    CmdBucketClose := FALSE;
+    M1Demand.HomeReq         := FALSE;
+    M2Demand.HomeReq         := FALSE;
     BucketCommit.CommitOpen  := FALSE;
     BucketCommit.CommitClose := FALSE;
+    CmdBucketOpen            := FALSE;
+    CmdBucketClose           := FALSE;
+    CmdWinchM1.RunRequest    := FALSE; CmdWinchM1.ReqAscent := FALSE; CmdWinchM1.ReqDescend := FALSE; CmdWinchM1.StepTgt := 0;
+    CmdWinchM2.RunRequest    := FALSE; CmdWinchM2.ReqAscent := FALSE; CmdWinchM2.ReqDescend := FALSE; CmdWinchM2.StepTgt := 0;
+    CmdWinchSelect           := -1;
+    Ready                    := FALSE;
     Lifecycle.Busy           := FALSE;
     Lifecycle.Done           := FALSE;
-    Ready                    := FALSE;
+    MachineHomingActive      := FALSE;
     M3Locked                 := FALSE;
-    CycleRunning             := FALSE;
-    HomeReqDone              := FALSE;
-    SeenNeutral              := FALSE;
+    MachineHomed             := FALSE;
+    MachineHomingLossSafeStop := FALSE;
+    CommitPublished          := FALSE;
+    CommitDone               := FALSE;
+    PendingClose             := FALSE;
+    RetryCount               := 0;
+    SeqStep                  := E_MachineHomingTxState.HX0_REPOS;
+    MachineHomingSeqStep     := E_MachineHomingTxState.HX0_REPOS;
+    MachineHomingStep        := E_MachineHomingStep.IDLE;
+    MachineHomingInstruction := 'Cycle homing desactive';
     RETURN;
 END_IF;
 {endregion}
 
-{region "§7 Cible M2 & temporisations de garde"}
-// === §7 CIBLE HOMING M2 + GARDES ====================================
-// HX3 = referencement des AXES M1/M2 au vol, PAS la benne (GEL homing) : M1 et M2
-// montent lies au meme capteur haut -> M2 se reference a la MEME position que M1
-// (cible nominale = CfgTopHomingTarget_M). L'offset geometrique benne fermee
-// (CfgOffsetClose_M) est applique par le COMMIT benne (HX5 -> FB_Bucket), pas au
-// datum de l'axe. Cible dynamique (top + offset ~23 m) supprimee ici : elle creait
-// un ecart apparent M1/M2 de ~15 m au preset -> FB_WinchSync SafeStop -> Fault.Latched.
-M1Demand.UseDynamicTarget := FALSE;
-M2Demand.UseDynamicTarget := FALSE;
-M2Demand.DynamicTarget_M  := 0.0;
-
-// Gardes de temps : le budget ne se consomme QUE pendant que le mouvement est reellement
-// commande par l'operateur (permis maintenu). Un arret volontaire, une pause ou un arret
-// d'urgence ne consomment donc aucun budget.
-// Semantique exacte a connaitre : un TON remet son temps ecoule a zero des que sa commande
-// retombe -> le budget est celui d'une montee CONTINUE, et il repart de zero a chaque
-// nouvelle commande. La garde sanctionne donc « je commande une montee et le capteur ne
-// vient pas », jamais un nombre total de manoeuvres.
-// La valeur par defaut est derivee de la course maximale de cable et de la borne haute de
-// vitesse du palier 1 (cf. ST_fbMachineHomingCycle_Cfg, gate G511).
-ClimbTimer(IN := ClimbCommandActive AND (Cfg.CfgTimeoutClimb > T#0s),
-           PT := Cfg.CfgTimeoutClimb);
-HomeAxesTimer(IN := DescentCommandActive AND (Cfg.CfgTimeoutHomeAxes > T#0s),
-              PT := Cfg.CfgTimeoutHomeAxes);
-{endregion}
-
 {region "§8 GRAFCET de referencement machine (CASE SeqStep)"}
 // === §8 GRAFCET (CASE SeqStep) ======================================
-// Carte des steps HX0..HX6 + HXF, actions et receptivites : voir
-//   DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08 - cycle de homing machine).
-// Chaque arme du CASE porte 1 ligne de rappel ; la source de verite reste l'AF.
-// ====================================================================
 CASE SeqStep OF
 
     E_MachineHomingTxState.HX0_REPOS:
-        // Etape initiale pure : aucune action de sortie ici.
-        // HT0 : lancement explicite (commande IHM / motif 3 appuis) OU perte de datum OU
-        // auto (machine non referencee en maintenance N1/N2). Vers HX1 = annonce + choix,
-        // AUCUN mouvement. CommitPublished N'est PAS efface ici (fait a HT1b, cf. glitch).
-        // Garde MES : seul le bouton IHM dedie (StartEdge) peut RE-referencer une machine
-        // deja homed. Les gestes indirects (3 appuis BP joystick, auto-armement) sont
-        // ignores si M1 ET M2 sont deja references -> evite le passage en homing pendant
-        // un travail benne en MAINT (appuis repetes du BP homme-mort).
-        // D : la perte de datum ne RELANCE le cycle que si un CODEUR a reellement perdu sa
-        // reference (NOT BothAxesHomed). Une simple invalidation de l'offset benne
-        // (ActiveOffsetValid -> MachineHomed FALSE) ne doit PAS reproposer le homing : elle
-        // se traite par une reconfirmation position benne, pas par un cycle machine.
-        IF (StartEdge.Q
-            OR ((ExplicitValidationPulse OR AutoArmTimer.Q) AND NOT BothAxesHomed)
-            OR (MachineWasHomed AND NOT MachineHomedRaw AND NOT BothAxesHomed))
-           AND MaintenanceActive THEN
+        // Etape initiale pure : aucune action.
+        CmdWinchSelect := -1;
+        IF (StartEdge.Q OR AutoArmTimer.Q) AND MaintenanceActive THEN
             HomeReqDone := FALSE;
-            SeqStep     := E_MachineHomingTxState.HX1_CHOICE;
+            RetryCount  := 0;
+            SeqStep     := E_MachineHomingTxState.HX1_BUCKET_PREPARE;
         END_IF;
 
-    E_MachineHomingTxState.HX1_CHOICE:
-        // Annonce + choix. Aucun ordre mouvement (garanti par la RAZ de tete de scan).
-        // Retour HX0 si le datum redevient valide (recuperation transitoire) ou si on
-        // quitte la maintenance. Le referencement (mouvement) exige MAINT_N2.
-        IF MachineHomed OR NOT MaintenanceActive THEN
-            SeqStep := E_MachineHomingTxState.HX0_REPOS;
-        ELSIF BootReady AND ExplicitValidationPulse AND ModeIsMaint2 THEN
-            CommitPublished := FALSE;   // datum invalide tant qu'il est refait (HT1b, deplace de HX0)
-            CommitDone      := FALSE;
-            IF BucketCloseConfirmedLatched AND NOT TopPositionSensor THEN
-                // Confirmation benne fermee deja donnee ET capteur haut NON atteint : entree dans
-                // l'etape VERROUILLEE. La montee vers le capteur est le SEUL cas ou le
-                // franchissement est prouve : un capteur deja actif a l'entree (colle, force, ou
-                // machine deja en position haute) n'apporte AUCUNE preuve de franchissement et
-                // mene donc au chemin herite, qui exige le front descendant.
-                BucketCloseConfirmedLatched := FALSE;
-                HomeReqDone := FALSE;
-                SeenNeutral := NOT JoystickDeflected;
-                SeqStep     := E_MachineHomingTxState.HX7_LOCKED_REFERENCE;
-            ELSIF BucketCloseConfirmedLatched THEN
-                // Capteur haut deja actif : franchissement NON prouve -> chemin herite
-                // (arret au capteur puis descente jusqu'au front descendant, ou referencement
-                // unitaire manuel). Aucune capture immediate possible.
-                BucketCloseConfirmedLatched := FALSE;
-                SeenNeutral := NOT JoystickDeflected;
-                SeqStep     := E_MachineHomingTxState.HX2N_NEUTRAL;
-            ELSIF NOT TopPositionSensor THEN
-                SeqStep := E_MachineHomingTxState.HX2_CLIMB;
-            ELSE
-                SeenNeutral := NOT JoystickDeflected;
-                SeqStep     := E_MachineHomingTxState.HX2N_NEUTRAL;
-            END_IF;
+    E_MachineHomingTxState.HX1_BUCKET_PREPARE:
+        // Decision & Fermeture benne operateur :
+        // WinchSel=2 force, FDC benne logiciel inhibe, vitesse plafonnee palier 1.
+        CmdWinchSelect := 2;
+        IF BucketPermit AND JoystickPull THEN
+            CmdBucketClose := TRUE;
         END_IF;
-        // HT1a (abandon) traite par la purge §4 sur front Reset.
 
-    E_MachineHomingTxState.HX2_CLIMB:
-        // Montee couplee M1+M2 palier 1, uniquement sous permis maintenu (manche tire).
-        IF ClimbPermit THEN
+        IF TransactionAbort THEN
+            MachineHomingFailed := TRUE;
+            SeqStep := E_MachineHomingTxState.HX7_FAILED;
+        ELSIF HomingBucketConfirmEdge.Q AND NOT JoystickDeflected THEN
+            // Validation par 1 seul appui bouton dedie IHM, manche au neutre
+            PendingClose := TRUE;
+            CommitDone   := FALSE;
+            SeqStep      := E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK;
+        END_IF;
+
+    E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK:
+        // Bascule WinchSel=0, reactivation FDC benne.
+        // Interlock bloquant E1 : attente confirmation couplage aval effectif.
+        CmdWinchSelect := 0;
+        CouplingSettleTimer(IN := (JoystickWinchSelectArbitrated = 0), PT := T#300ms);
+
+        IF ModeLostDuringCycle OR AxisHomingError THEN
+            MachineHomingFailed := TRUE;
+            SeqStep := E_MachineHomingTxState.HX7_FAILED;
+        ELSIF (JoystickWinchSelectArbitrated = 0) AND CouplingSettleTimer.Q AND WinchesMechanicallyStopped THEN
+            SeenNeutral := NOT JoystickDeflected;
+            SeqStep     := E_MachineHomingTxState.HX2_CLIMB_COUPLED;
+        END_IF;
+
+    E_MachineHomingTxState.HX2_CLIMB_COUPLED:
+        // Montee couplee M1+M2 palier 1 MAX vers capteur haut.
+        CmdWinchSelect := 0;
+        IF ClimbPermit AND (JoystickWinchSelectArbitrated = 0) THEN
             CmdWinchM1.RunRequest := TRUE; CmdWinchM1.ReqAscent := TRUE; CmdWinchM1.StepTgt := CST_StepSlow;
             CmdWinchM2.RunRequest := TRUE; CmdWinchM2.ReqAscent := TRUE; CmdWinchM2.StepTgt := CST_StepSlow;
         END_IF;
+
         IF TransactionAbort THEN
             MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HXF_FAILED;
+            SeqStep := E_MachineHomingTxState.HX7_FAILED;
         ELSIF TopPositionSensor THEN
-            SeenNeutral := NOT JoystickDeflected;
-            SeqStep     := E_MachineHomingTxState.HX2N_NEUTRAL;
-        END_IF;
-
-    E_MachineHomingTxState.HX2N_NEUTRAL:
-        // Mouvement nul obligatoire entre montee (tire) et descente (pousse).
-        IF NOT JoystickDeflected THEN
-            SeenNeutral := TRUE;
-        END_IF;
-        IF TransactionAbort THEN
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HXF_FAILED;
-        ELSIF WinchesMechanicallyStopped AND SeenNeutral AND DescendPermit
-              AND TopPositionSensor THEN
-            HomeReqDone := FALSE;
-            SeqStep     := E_MachineHomingTxState.HX3_HOME_AXES;
-        END_IF;
-
-    E_MachineHomingTxState.HX3_HOME_AXES:
-        // Descente couplee M1+M2 palier 1 sous permis maintenu (manche pousse).
-        IF DescendPermit THEN
-            CmdWinchM1.RunRequest := TRUE; CmdWinchM1.ReqDescend := TRUE; CmdWinchM1.StepTgt := CST_StepSlow;
-            CmdWinchM2.RunRequest := TRUE; CmdWinchM2.ReqDescend := TRUE; CmdWinchM2.StepTgt := CST_StepSlow;
-        END_IF;
-        // Homing des AXES seulement, au vol, sur le front DESCENDANT du capteur.
-        IF TopLostEdge.Q AND NOT HomeReqDone THEN
             M1Demand.HomeReq := TRUE;
             M2Demand.HomeReq := TRUE;
-            HomeReqDone      := TRUE;
+            HomeReqDone := TRUE;
+            SeqStep     := E_MachineHomingTxState.HX3_FLYING_REFERENCE;
         END_IF;
+
+    E_MachineHomingTxState.HX3_FLYING_REFERENCE:
+        // Detection capteur haut TOP M1+M2 : prise de reference a la volee sur position config.
+        CmdWinchSelect := 0;
+        IF NOT HomeReqDone THEN
+            M1Demand.HomeReq   := TRUE;
+            M2Demand.HomeReq   := TRUE;
+            HomeReqDone        := TRUE;
+        END_IF;
+
         IF TransactionAbort THEN
             MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HXF_FAILED;
-        ELSIF NOT TopPositionSensor AND M1Status.HomedAndReliable AND M2Status.HomedAndReliable THEN
-            SeenNeutral := NOT JoystickDeflected;
-            SeqStep     := E_MachineHomingTxState.HX3N_PAUSE;
+            SeqStep := E_MachineHomingTxState.HX7_FAILED;
+        ELSIF BothAxesHomed THEN
+            SeqStep := E_MachineHomingTxState.HX4_STABILIZATION_CHECK;
         END_IF;
 
-    E_MachineHomingTxState.HX3N_PAUSE:
-        // Arret avant benne : treuils + benne a 0 (RAZ tete de scan), retour au neutre.
-        IF NOT JoystickDeflected THEN
-            SeenNeutral := TRUE;
-        END_IF;
-        IF TransactionAbort THEN
+    E_MachineHomingTxState.HX4_STABILIZATION_CHECK:
+        // Arret treuils, controle inertie [8.50..8.80m] et concordance codeurs.
+        CmdWinchSelect := 0;
+        SeenNeutral := NOT JoystickDeflected;
+
+        StabilizationOk := WinchesMechanicallyStopped AND SeenNeutral
+                           AND (CablePosM1 >= Cfg.CfgStabilizationMinM) AND (CablePosM1 <= Cfg.CfgStabilizationMaxM)
+                           AND (CablePosM2 >= Cfg.CfgStabilizationMinM) AND (CablePosM2 <= Cfg.CfgStabilizationMaxM)
+                           AND (ABS(CablePosM1 - CablePosM2) <= CoherenceLimitM);
+
+        StabilizationFailed := WinchesMechanicallyStopped AND SeenNeutral AND NOT StabilizationOk;
+
+        IF ModeLostDuringCycle OR AxisHomingError THEN
             MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HXF_FAILED;
-        ELSIF WinchesMechanicallyStopped AND SeenNeutral THEN
-            SeqStep := E_MachineHomingTxState.HX4_BUCKET_ADJUST;
+            SeqStep := E_MachineHomingTxState.HX7_FAILED;
+        ELSIF StabilizationOk THEN
+            SeqStep := E_MachineHomingTxState.HX5_RELEASE_CLEARANCE;
+        ELSIF StabilizationFailed THEN
+            RetryCount := RetryCount + 1;
+            IF RetryCount >= 3 THEN
+                MachineHomingFailed := TRUE;
+                SeqStep := E_MachineHomingTxState.HX7_FAILED;
+            ELSE
+                // Repositionnement et nouvelle tentative : retour en preparation benne
+                SeqStep := E_MachineHomingTxState.HX1_BUCKET_PREPARE;
+            END_IF;
         END_IF;
 
-    E_MachineHomingTxState.HX4_BUCKET_ADJUST:
-        // Benne palier 1 SANS FDC soft, 2 sens ; treuils a 0.
-        IF BucketPermit AND JoystickPull THEN
-            CmdBucketClose := TRUE;
-        ELSIF BucketPermit AND JoystickPush THEN
-            CmdBucketOpen := TRUE;
-        END_IF;
-        // Fail-safe : erreur codeur OU treuil qui flue hors phase OU sortie de MAINT_N2.
-        IF AxisHomingError OR MotionOutOfPhase OR ModeLostDuringCycle THEN
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HXF_FAILED;
-        ELSIF ExplicitValidationPulse AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
-            PendingClose := TRUE;
-            CommitDone   := FALSE;
-            SeqStep      := E_MachineHomingTxState.HX5_BUCKET_COMMIT;
+    E_MachineHomingTxState.HX5_RELEASE_CLEARANCE:
+        // Degagement zone haute, confirmation joystick au neutre.
+        CmdWinchSelect := 0;
+        IF NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
+            SeqStep := E_MachineHomingTxState.HX6_HOMED_SUCCESS;
         END_IF;
 
-    E_MachineHomingTxState.HX5_BUCKET_COMMIT:
-        // Commit atomique de l'etat benne : impulsion 1 scan garantie via CommitDone.
-        IF AxisHomingError OR NOT BothAxesHomed OR MotionOutOfPhase OR ModeLostDuringCycle THEN
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HXF_FAILED;
-        ELSIF NOT CommitDone THEN
+    E_MachineHomingTxState.HX6_HOMED_SUCCESS:
+        // Validation finale : MachineHomed := TRUE, commit atomique benne.
+        CmdWinchSelect := 0;
+        IF NOT CommitDone THEN
             BucketCommit.CommitClose := PendingClose;
             CommitPublished          := TRUE;
             CommitDone               := TRUE;
         ELSE
             PendingClose := FALSE;
-            SeqStep      := E_MachineHomingTxState.HX6_HOMED;
+            SeqStep      := E_MachineHomingTxState.HX0_REPOS;
         END_IF;
 
-    E_MachineHomingTxState.HX6_HOMED:
-        // MachineHomed calcule en §9. Retour immediat a l'etape initiale.
-        SeqStep := E_MachineHomingTxState.HX0_REPOS;
-
-    E_MachineHomingTxState.HX7_LOCKED_REFERENCE:
-        // Etape VERROUILLEE : montee vers le capteur mecanique haut, puis prise de reference
-        // A L'ARRET (capteur haut reellement atteint, machine arretee, commande relachee).
-        // 🔒 Sorties admises, toutes CONSCIENTES et tracees : front Reset (purge §4), defaut
-        //    latché, et abandon sur violation detectee (descente commandee, garde de montee
-        //    ecoulee, erreur codeur, mouvement hors phase) -> HXF, machine NON referencee.
-        //    Exception declaree : le forcage de step de mise en service (§4bis, case IHM +
-        //    MAINT_N2 + impulsion) peut sortir de cette etape comme de toute autre.
-        //    Aucun chemin de sortie ne pose de reference.
-        // La reference (Homed) n'est JAMAIS ecrite ici : elle reste la propriete de la facade
-        // codeur (FB_Encoder_Homing), posee sur le chemin standard.
-        IF DescentRequestedInLock THEN
-            // Descente reellement commandee pendant le referencement : interdite (on se refere
-            // en montant). Abandon immediat, machine toujours NON referencee.
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HXF_FAILED;
-        ELSIF NOT ModeIsMaint2 THEN
-            // Verrou : sortir du mode ne fait PAS sortir de l'etape. L'affectation explicite
-            // ci-dessous N'EST PAS un no-op : elle court-circuite la suite de l'echelle
-            // (montee/capture) qui, sinon, resterait atteignable hors MAINT_N2.
-            // Etape tenue, aucun mouvement, aucune reference ; l'operateur doit revenir en
-            // MAINT_N2 pour poursuivre.
-            SeqStep := E_MachineHomingTxState.HX7_LOCKED_REFERENCE;
-        ELSIF AxisHomingError THEN
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HXF_FAILED;
-        ELSIF ClimbTimedOut THEN
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HXF_FAILED;
-        ELSIF MotionOutOfPhase THEN
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HXF_FAILED;
-        ELSIF NOT TopPositionSensor THEN
-            // (1) MONTEE : capteur non atteint. Le cycle emet le MEME ordre (meme sens, meme
-            // palier) sur les deux treuils, uniquement sous permis operateur maintenu.
-            // 🔎 Portee reelle a connaitre : en MAINT_N2, la commande effective des treuils est
-            //    produite par le JOYSTICK de l'operateur via l'arbitrage aval (l'arbitrage ne
-            //    consomme la demande du cycle qu'en SEMI_AUTO). Ces ordres sont donc redondants
-            //    avec la commande manuelle : le palier reellement applique est borne en aval par
-            //    le garde-fou « hors referencement » tant que Homed est FALSE, et le couplage
-            //    M1/M2 depend du selecteur de treuil de l'operateur (non observable ici).
-            SeenNeutral := NOT JoystickDeflected;
-            IF ClimbPermit THEN
-                CmdWinchM1.RunRequest := TRUE; CmdWinchM1.ReqAscent := TRUE; CmdWinchM1.StepTgt := CST_StepSlow;
-                CmdWinchM2.RunRequest := TRUE; CmdWinchM2.ReqAscent := TRUE; CmdWinchM2.StepTgt := CST_StepSlow;
-            END_IF;
-        ELSE
-            // (2) FRANCHISSEMENT REEL ATTEINT : capteur haut actif. Aucun ordre de mouvement
-            // (RAZ de tete de scan), retour au neutre exige, puis impulsion UNIQUE de prise de
-            // reference, conditionnee par l'arret mecanique confirme.
-            // Le neutre est reevalue a CHAQUE scan (pas un latch d'entree) : une commande
-            // maintenue au capteur interdit la capture.
-            SeenNeutral := NOT JoystickDeflected;
-            // Reevaluation a chaud : SeenNeutral vient d'etre mis a jour dans ce step.
-            LockedCaptureAllowed := LockedSettleActive AND WinchesMechanicallyStopped AND SeenNeutral;
-            IF LockedCaptureAllowed AND NOT HomeReqDone THEN
-                M1Demand.HomeReq := TRUE;
-                M2Demand.HomeReq := TRUE;
-                HomeReqDone      := TRUE;
-            END_IF;
-            IF BothAxesHomed THEN
-                SeqStep := E_MachineHomingTxState.HX6_HOMED;
-            END_IF;
-        END_IF;
-        // Une prise de reference refusee par la facade codeur (preset non confirme) remonte en
-        // M1Status/M2Status.HomingError -> abandon ci-dessus : jamais de blocage silencieux.
-
-    E_MachineHomingTxState.HXF_FAILED:
-        // Sortie uniquement sur front Reset conscient (purge §4).
+    E_MachineHomingTxState.HX7_FAILED:
+        // Echec sequence unifie : sorties a 0, attente Reset conscient en MAINT_N2.
+        CmdWinchSelect := -1;
         ;
 
 END_CASE;
@@ -754,101 +534,79 @@ END_CASE;
 
 {region "§9 Cycle de vie & qualification de sortie"}
 // === §9 CYCLE DE VIE + QUALIFICATION ================================
-CycleRunning := (SeqStep <> E_MachineHomingTxState.HX0_REPOS)
-             AND (SeqStep <> E_MachineHomingTxState.HX1_CHOICE);
-// Verrou translation : interdite des qu'on quitte l'etape initiale (calcul post-CASE : sans retard).
-// Verrou translation : actif uniquement quand le cycle est reellement engage
-// (HX2..HX6), pas en HX1 (annonce + choix, aucun mouvement) qui peut s'armer seul
-// apres une perte de datum. Consomme par PRG_05 (M3_SafeStop_Aggregate).
+CycleRunning := (SeqStep <> E_MachineHomingTxState.HX0_REPOS);
+
+// Selection treuil demandee par le cycle
+IF (SeqStep = E_MachineHomingTxState.HX1_BUCKET_PREPARE) THEN
+    CmdWinchSelect := 2;
+ELSIF (SeqStep = E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK)
+   OR (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED)
+   OR (SeqStep = E_MachineHomingTxState.HX3_FLYING_REFERENCE)
+   OR (SeqStep = E_MachineHomingTxState.HX4_STABILIZATION_CHECK)
+   OR (SeqStep = E_MachineHomingTxState.HX5_RELEASE_CLEARANCE)
+   OR (SeqStep = E_MachineHomingTxState.HX6_HOMED_SUCCESS) THEN
+    CmdWinchSelect := 0;
+ELSE
+    CmdWinchSelect := -1;
+END_IF;
+
 M3Locked             := CycleRunning;
 MachineHomingActive  := CycleRunning;
 Lifecycle.Busy       := CycleRunning;
 Lifecycle.Done       := CommitPublished AND (SeqStep = E_MachineHomingTxState.HX0_REPOS);
 MachineHomingSeqStep := SeqStep;
 
-// Qualification de sortie — calcul UNIQUE, apres le deroule GRAFCET (§8).
 CommitOrOffsetValid := CommitPublished OR BucketOffsetValid;
 MachineHomed := BothAxesHomed AND CommitOrOffsetValid
+                AND (SeqStep <> E_MachineHomingTxState.HX7_FAILED)
                 AND NOT MachineHomingFailed AND NOT ReHomingAckRequired
                 AND NOT Fault.Latched;
 {endregion}
 
-{region "§10 Guide operateur — echelle de priorite (IF/ELSIF, pas un dispatch d'etat)"}
+{region "§10 Guide operateur — echelle de priorite"}
 // === §10 GUIDE OPERATEUR (echelle de priorite) ======================
-// MachineHomingStep est RECALCULE chaque scan a partir des conditions courantes :
-// l'etape est le resultat, pas l'etat ou l'on dispatche. La vraie machine a etats
-// est le GRAFCET (§8, CASE SeqStep). Precedent : FB_Modes.st (echelle IF/ELSIF).
 IF Fault.Latched THEN
     MachineHomingStep := E_MachineHomingStep.FAILED;
     MachineHomingInstruction := 'Erreur ou Echec homing - Acquitter (Reset)';
-ELSIF MachineHomingFailed OR (SeqStep = E_MachineHomingTxState.HXF_FAILED) THEN
+ELSIF MachineHomingFailed OR (SeqStep = E_MachineHomingTxState.HX7_FAILED) THEN
     MachineHomingStep := E_MachineHomingStep.FAILED;
-    MachineHomingInstruction := 'HXF - Homing incomplet - Recommencer en N2';
+    MachineHomingInstruction := 'HX7 - Homing incomplet - Acquitter Reset N2';
 ELSIF MachineHomingLossSafeStop THEN
     MachineHomingStep := E_MachineHomingStep.LOSS_SAFESTOP;
     MachineHomingInstruction := 'Reference perdue - Arret controle';
-ELSIF LockedStepEngaged AND NOT ModeIsMaint2 THEN
-    // Etape verrouillee mais mode perdu : categorie de guide OFFSET_UNKNOWN (l'echelle impose
-    // « passer en MAINT_N2 »), le texte porte la consigne exacte de l'etape.
-    MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
-    MachineHomingInstruction := 'HX7 - RefHoming VERROUILLE : revenir en MAINT_N2';
-ELSIF LockedClimbActive THEN
-    MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
-    MachineHomingInstruction := 'HX7 - RefHoming VERROUILLE : monter JOY palier 1, capteur haut';
-ELSIF LockedSettleActive AND NOT LockedCaptureAllowed THEN
-    MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
-    MachineHomingInstruction := 'HX7 - Capteur haut atteint : relacher JOY et attendre l arret';
-ELSIF LockedSettleActive THEN
-    MachineHomingStep := E_MachineHomingStep.HOMING_IN_PROGRESS;
-    MachineHomingInstruction := 'HX7 - Referencement a l arret en cours (ne pas manoeuvrer)';
 ELSIF MachineHomed AND NOT CycleRunning THEN
-    // Machine referencee et cycle homing a l'arret : AUCUN message homing a l'IHM.
-    // (les branches HXn ci-dessous ne s'appliquent qu'a un cycle en cours ou une
-    //  reference absente / incomplete). Un defaut latche reste prioritaire (ci-dessus).
     MachineHomingStep := E_MachineHomingStep.VALID;
     MachineHomingInstruction := '';
-ELSIF (SeqStep = E_MachineHomingTxState.HX2_CLIMB) THEN
-    MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
-    MachineHomingInstruction := 'HX2 - RefHoming Tirer JOY palier 1 vers FDC haut';
-ELSIF (SeqStep = E_MachineHomingTxState.HX2N_NEUTRAL) THEN
-    MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
-    MachineHomingInstruction := 'HX2N - RefHoming JOY au neutre puis pousser (descente)';
-ELSIF (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) THEN
-    MachineHomingStep := E_MachineHomingStep.HOMING_IN_PROGRESS;
-    MachineHomingInstruction := 'HX3 - RefHoming Pousser JOY palier 1, homing M1/M2 au vol';
-ELSIF (SeqStep = E_MachineHomingTxState.HX3N_PAUSE) THEN
-    MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
-    MachineHomingInstruction := 'HX3N - RefHoming JOY au neutre (arret avant benne)';
-ELSIF (SeqStep = E_MachineHomingTxState.HX4_BUCKET_ADJUST) THEN
+ELSIF (SeqStep = E_MachineHomingTxState.HX1_BUCKET_PREPARE) THEN
     MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
-    MachineHomingInstruction := 'HX4 - RefHoming Fermer benne puis valider (3 appuis JOY)';
-ELSIF (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT)
-      OR (SeqStep = E_MachineHomingTxState.HX6_HOMED) THEN
+    MachineHomingInstruction := 'HX1 - RefHoming Fermer benne, valider sur IHM';
+ELSIF (SeqStep = E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK) THEN
+    MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
+    MachineHomingInstruction := 'HX1a - RefHoming Verif couplage M1+M2';
+ELSIF (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED) THEN
+    MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
+    MachineHomingInstruction := 'HX2 - RefHoming Tirer JOY palier 1 vers haut';
+ELSIF (SeqStep = E_MachineHomingTxState.HX3_FLYING_REFERENCE) THEN
+    MachineHomingStep := E_MachineHomingStep.HOMING_IN_PROGRESS;
+    MachineHomingInstruction := 'HX3 - RefHoming Prise de reference au vol';
+ELSIF (SeqStep = E_MachineHomingTxState.HX4_STABILIZATION_CHECK) THEN
+    MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
+    MachineHomingInstruction := 'HX4 - RefHoming Arret et controle inertie';
+ELSIF (SeqStep = E_MachineHomingTxState.HX5_RELEASE_CLEARANCE) THEN
+    MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
+    MachineHomingInstruction := 'HX5 - RefHoming Relacher JOY au neutre';
+ELSIF (SeqStep = E_MachineHomingTxState.HX6_HOMED_SUCCESS) THEN
     MachineHomingStep := E_MachineHomingStep.VALID;
-    MachineHomingInstruction := 'HX5 - RefHoming Etat benne enregistre - fin homing';
-ELSIF (SeqStep = E_MachineHomingTxState.HX1_CHOICE) AND NOT BootReady THEN
-    MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
-    MachineHomingInstruction := 'HX1 - Homing inhibe : attendre boot codeurs puis MAINT_N2';
-ELSIF (SeqStep = E_MachineHomingTxState.HX1_CHOICE) THEN
-    IF Mode <> E_Mode.MAINT_N2 THEN
-        MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
-        MachineHomingInstruction := 'HX1 - RefHoming Passer en MAINT_N2 pour referencer';
-    ELSIF NOT TopPositionSensor THEN
-        MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
-        MachineHomingInstruction := 'HX1 - RefHoming Valider (3 appuis JOY) pour lancer';
-    ELSE
-        MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
-        MachineHomingInstruction := 'HX1 - RefHoming Sur FDC haut - valider (3 appuis JOY)';
-    END_IF;
+    MachineHomingInstruction := 'HX6 - RefHoming Machine referencee';
 ELSIF NOT M1Status.HomedAndReliable AND NOT M2Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.BOTH_NOT_HOMED;
-    MachineHomingInstruction := 'HX0 - RefHoming M1+M2 non ref - lancer (3 appuis JOY ou IHM)';
+    MachineHomingInstruction := 'HX0 - RefHoming M1+M2 non ref - Lancer sur IHM';
 ELSIF NOT M1Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.M1_NOT_HOMED;
-    MachineHomingInstruction := 'HX0 - RefHoming M1 non ref - relancer le homing';
+    MachineHomingInstruction := 'HX0 - RefHoming M1 non ref - Lancer sur IHM';
 ELSIF NOT M2Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.M2_NOT_HOMED;
-    MachineHomingInstruction := 'HX0 - RefHoming M2 non ref - relancer le homing';
+    MachineHomingInstruction := 'HX0 - RefHoming M2 non ref - Lancer sur IHM';
 ELSIF NOT (CommitPublished OR BucketOffsetValid) THEN
     IF Mode <> E_Mode.MAINT_N2 THEN
         MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
@@ -862,14 +620,12 @@ ELSE
     MachineHomingInstruction := 'Reference machine valide';
 END_IF;
 
-// R9 : capture de l'etape APRES recalcul du guide, au front d'apparition du defaut latche.
+// Capture R9 de l'etape a l'apparition du defaut latche
 IF LatchedEdge.Q THEN
     MachineHomingStepAtError := MachineHomingStep;
 END_IF;
 
 Ready := Enable AND NOT Fault.Latched;
-
-// Garde 1er scan : bloque l'auto-armement tant que les statuts codeurs ne sont pas stables.
 FirstScanDone := TRUE;
 {endregion}
 

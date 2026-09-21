@@ -21,7 +21,8 @@ STRUCT
     M3Locked         : BOOL;          (* Translation M3 interdite pendant le cycle de homing machine *)
     CmdWinchM1       : ST_ProgramWinchRequest; (* Ordre treuil M1 couple palier 1 (HX2 montee / HX3 descente) *)
     CmdWinchM2       : ST_ProgramWinchRequest; (* Ordre treuil M2 couple palier 1 (HX2 montee / HX3 descente) *)
-    CmdBucketOpen    : BOOL;          (* Ordre ouverture benne palier 1 sans FDC soft (HX4) *)
-    CmdBucketClose   : BOOL;          (* Ordre fermeture benne palier 1 sans FDC soft (HX4) *)
+    CmdBucketOpen    : BOOL;          (* Ordre ouverture benne palier 1 sans FDC soft *)
+    CmdBucketClose   : BOOL;          (* Ordre fermeture benne palier 1 sans FDC soft (HX1) *)
+    CmdWinchSelect   : INT;           (* Override selecteur treuil cycle homing (-1=neutre, 0=couple, 2=benne) *)
 END_STRUCT
 END_TYPE
