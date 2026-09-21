@@ -305,6 +305,7 @@ Pas de moteur propre — effet de bord de la désynchronisation M1/M2 :
 | `CfgTimeoutDuration` := `T#60s` | TIME | Budget du watchdog de timeout (§2 / <nobr><code>TC-P10-046.1</code></nobr>) |
 | `ConfirmOpenPosition`/`ConfirmClosePosition` | BOOL (front) | Référencement manuel — **MAINT_N2 seul**, à l'arrêt |
 | `Config` (ST_fbBucket_Config) | — | `OffsetOpenM`, `OffsetCloseM`, `CoherenceLimitM` — ⚠️ **aucun défaut dans le type** : valeurs de production posées par `GVL_PERSISTENT.st:66-70` (`OffsetOpenM=0.0`, `OffsetCloseM=15.0`, `CoherenceLimitM=1.0`) |
+| `CloseReachedOpening_Pct` := 0 | INT | Seuil d'ouverture benne **restante** `[0..20 %]` déclarant la fin de fermeture atteinte. **Branche AJOUTÉE en disjonction** à la condition d'arrivée historique (`CablePosM2 >= CablePosM1 + OffsetCloseM - CloseAnticipationM`), jamais substituée : le filet anti-blocage sur matière dense garde sa valeur. `0` = branche **inactive** ⇒ condition d'arrivée seule. Décision prise par <nobr><code>FB_BucketCloseThreshold</code></nobr> (FB **pur**, sans état), appelé au scan même sur la mesure de `§4a` ; qualification = `ClassCanRun` ET `BucketState.BucketReferenced` ET `NOT Fault.Error` |
 
 **Sorties** : `Ready`, `ActiveOffsetValid`, `Fault` (`ST_Fault` : `Error`/`ErrorId` latches), `Lifecycle` (`Busy`/`Done`), `M1SlipDetected`, `ActiveOffsetM`, `DeltaPosition_M`, `RemainingTravelM`, `M2_RunRequest` (ordre marche M2), `M2_ReqAscent`/`M2_ReqDescend` (sens, BOOL) et `M2_BucketJogLimit` (plafond palier 1).
 
