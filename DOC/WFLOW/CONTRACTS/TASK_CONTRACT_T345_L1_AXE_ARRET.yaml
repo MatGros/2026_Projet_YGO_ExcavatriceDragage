@@ -1,0 +1,183 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T345 lot L1 « l'axe possede son arret »
+# Parent : DOC/WFLOW/CONTRACTS/PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md §3 (lot L1)
+# Brief  : DOC/WFLOW/CONTRACTS/BRIEF_T345_L1_AXE_POSSEDE_SON_ARRET.md
+# Acteur : DSH23 · Prise de verrou 2026-09-21T05:22+02:00 · HEAD 276fc11e
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T345_L1_AXE_ARRET
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Le chariot M3 possede desormais son arret : une arrivee sur capteur cible est
+    verrouillee par l'axe lui-meme, avec le SENS du dernier mouvement memorise, de sorte
+    qu'une demande re-armee par le sequenceur ni un rebond du capteur ne puissent plus
+    annuler un arret deja confirme ni relancer le chariot ; l'axe publie ce fait d'arret
+    confirme en VAR_OUTPUT pour que la porte de cycle puisse s'y conformer (lot L2), et les
+    bypass de fin de course M3 ne sont plus consommables hors MAINT_N2.
+
+  context: >
+    Blocage reproduit sur machine reelle (AX2, translation M3, arrivee P1) et confirme sur
+    le code. Deux defauts racines, tous deux dans le perimetre de ce lot :
+    (1) FB_Translation capture le sens d'arrivee sur CommandedTremie/CommandedMaintenance
+        (FB_Translation.st:181-182), or ces deux locaux sont remis a FALSE des que la
+        demande retombe (:229-233). En cycle, la demande tombe environ un scan apres l'arrivee
+        du jeton alors que le debounce d'arrivee dure 100 ms (:175-183) : le verrou s'arme
+        donc avec ArrivalWasTremie=FALSE et ArrivalWasMaintenance=FALSE, et la condition de
+        relachement (:202) le rend liberable par une demande du MEME sens -> aucune autorite
+        d'arret, relance possible, depassement.
+    (2) En jog manuel (SelTarget=0), la cible est effacee par la seule perte de la demande
+        (PRG_05_Translation.st:427), ce qui interrompt le debounce de 100 ms et empeche
+        l'armement du verrou.
+    Effet mesure sur la porte de cycle : TranslationStopTimer (FB_CycleSemiAuto.st:361-365)
+    exige 500 ms continus de At_Xxx AND NOT Busy ; chaque relance remet Busy a TRUE et la
+    transition ne s'arme jamais.
+
+  # ── 1. Critères testables ────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Capteur d'arrivee P1 intermittent avec la demande du cycle re-armee : apres l'armement du verrou, ArrivalStopConfirmed reste TRUE et aucun front montant n'apparait sur RequestedDriveControlWord ni sur RequestedDriveFreqHz (freq reste 0.0)."
+      verified_by: "test CI TC-P11-036 dans TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st, execute par python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Translation ; 45 scans avec PositionSensorTarget oscillant et ReqTremie/ReqMaintenance re-arrmes"
+    - id: AC2
+      statement: "Demande retiree pendant les 100 ms de debounce : le verrou d'arrivee est encore arme et le sens d'arrivee memorise est celui du dernier mouvement, donc une demande du meme sens ne le relache pas."
+      verified_by: "test CI TC-P11-037 : mouvement CommandedMaintenance puis ReqMaintenance=FALSE avant la fin du debounce, puis re-demande ReqMaintenance=TRUE -> RequestedDriveControlWord reste 0"
+    - id: AC3
+      statement: "Une demande explicite de sens inverse relache le verrou : le mot de commande passe dans l'autre sens et la frequence cible redevient non nulle."
+      verified_by: "test CI TC-P11-038 : apres armement du verrou en sens Tremie, application de ReqMaintenance=TRUE seul -> RequestedDriveControlWord vaut 2 et RequestedDriveFreqHz est superieure a 0.0"
+    - id: AC4
+      statement: "ArrivalStopConfirmed n'est pas vacuaire : elle est FALSE si la frequence reelle du variateur depasse 0.5 Hz, si le frein est commande ouvert, ou si l'axe est en defaut."
+      verified_by: "test CI TC-P11-039 : injection DriveActualFreqHz=5.0 puis frein ouvert puis defaut variateur (DriveStatusWord bit 4) sur un axe dont le verrou est arme"
+    - id: AC5
+      statement: "En jog manuel, la perte de la demande n'efface plus la cible : M3_PositionSensorTarget reste TRUE tant que le jeton du dernier point atteint est vrai, et retombe quand le chariot quitte ce point."
+      verified_by: "test M_MAIN PRG_05_Translation : demande retiree alors que le jeton P1 est arme -> le harnais publie une cible encore TRUE, puis un franchissement de capteur -> cible FALSE"
+    - id: AC6
+      statement: "Le bypass de fin de course M3 n'est plus consommable hors MAINT_N2 : en SEMI_AUTO ou MAINT_N1, un bypass LimitSwitch ou Global a TRUE n'ouvre ni FB_Translation.BypassLimitSwitch ni FB_Safety_Translation.BypassLimitSwitch, et en MAINT_N2 il les ouvre encore."
+      verified_by: "test M_MAIN PRG_05_Translation avec le harnais : meme bypass a TRUE, mesure de la sortie BypassLimitSwitch consommee pour les deux modes"
+    - id: AC7
+      statement: "Le nom de fichier correspond au nom de POU : PRG_05_Translation.st ne contient que le PROGRAM PRG_05_Translation et aucun POU n'est renomme par ce lot."
+      verified_by: "controle mecanique : python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py et lecture du diff (aucune ligne FUNCTION_BLOCK ni PROGRAM ajoutee)"
+    - id: AC8
+      statement: "Le suffixe de langage correspond au langage genere dans le bundle : aucun suffixe _CFC ni _LD n'est ajoute et le POU reste en ST dans CODE_XML/CODE_Bundle.xml."
+      verified_by: "controle mecanique : python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py puis lecture de CODE_XML/CODE_Bundle.xml (implementation ST du POU PRG_05_Translation)"
+    - id: AC9
+      statement: "Le comportement manuel de reference est conserve : une arrivee sur le capteur cible avec la demande maintenue arme toujours le verrou et coupe la rampe, et la liberation par sens inverse reste le seul chemin de degagement."
+      verified_by: "test CI existant TC-P11-018 (arrivee sur capteur cible, debounce 100 ms, arret exact) conserve vert, plus TC-P11-038 pour la liberation par sens inverse"
+
+  # ── 2. Périmètre ─────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_05.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_05_translation.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T345_L1_AXE_ARRET.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - DOC/WFLOW/AUDITS/DESIGN/
+      - TOOLS/AGENT_WORKFLOW/status/
+      - TOOLS/AGENT_WORKFLOW/scripts/G519_check_t345_axis_owns_stop.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - CODE_XML/
+    forbidden:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/I_TRANSLATION/FB_Safety_Translation.st
+      - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st
+      - CODE/I_TRANSLATION/FB_TranslationCmdArbitrationM3.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/L_SIMULATION/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/AF/
+      - ARCHIVES/
+
+  # ── 3. Contrat de conservation ───────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Relachement du verrou d'arrivee par une demande explicite de sens inverse uniquement (FB_Translation.st:202-204)"
+      - "Armement du verrou par la seule detection d'arrivee qualifiee et par le front de fin de course extreme (FB_Translation.st:179-183 et :190-200)"
+      - "Liberation des verrous bistables de fin de course par la seule commande de sens inverse (PRG_05_Translation.st:162-166)"
+      - "Semantique de la coupure dure de fin de course (FB_Translation.st:190-200) et de la cause 6 de la safety, non touchees dans ce lot"
+      - "Resturation RETAIN des bypass M3 vers l'IHM par PRG_07, non touchee : la garde est posee a la consommation, pas au stockage"
+    dropped_on_purpose:
+      - "Aucun comportement abandonne : le lot restreint la consomabilite des bypass de fin de course hors MAINT_N2 (decision humaine D1 du plan T334 Phase 3, reponse oui)"
+
+  # ── 4. Preuves attendues en restitution ──────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+    - ci_before_after
+    - git_diff
+
+  # ── 5. Écarts de prémisse du brief, vérifiés avant écriture ──────────────
+  deviations:
+    - id: E1_verrou_T331
+      fact: "Le brief annoncait le verrou T331/DSH09 sur FB_CycleSemiAuto.st TOUJOURS ACTIF : il est LIBERE depuis 2026-09-21T05:14:00+02:00 (TASK_LOCKS.json, entree T331, released_by DSH09)."
+      action: "Alerte remontee. AUCUNE extension de perimetre vers le lot L2 : le brief l'interdit explicitement. FB_CycleSemiAuto.st reste non touche par ce lot."
+    - id: E2_collision_T361
+      fact: "Le brief annoncait PRG_05_Translation.st actif dans le perimetre T361. Verifie FAUX a la prise : aucune entree T361 dans TASK_LOCKS.json (grep sans resultat), statut T361 ⬜ et agent '—' ; le perimetre declare de T361 vise le simulateur et l'estimateur (FB_Sim_Translation.st, GVL_PERSISTENT._TranslationGainMetersPerHzSec)."
+      action: "Aucune collision : PRG_05_Translation.st et FB_Translation.st etaient PROPRES vis-a-vis de HEAD 276fc11e (git status --short -- CODE/ ne listait que 4 fichiers hors perimetre)."
+    - id: E3_mecanisme_plan
+      fact: "Le plan fonde la correction sur PRG_05:427 (cible effacee par la perte de la demande). Ce chemin est celui du jog manuel (SelTarget=0) : en SEMI_AUTO SelTarget vaut 1 ou 3 (FB_TranslationCmdArbitrationM3.st:65, alimente par PRG_03 AX2/AX14), donc la cible est le jeton AtXxxStable et non la demande."
+      action: "Le lot traite les DEUX chemins : memoire de sens du verrou dans FB_Translation (chemin cycle) et maintien de la cible dans PRG_05 (chemin jog). Le mecanisme reel du blocage AX2 est prouve fichier:ligne dans la restitution."
+    - id: E4_references_de_lignes
+      fact: "Les references du plan ont derive : TranslationStopTimer est en FB_CycleSemiAuto.st:361-365 (le plan citait :334-338, qui porte desormais le repli de configuration du plongement). Les references du brief (:361-365) sont exactes."
+      action: "Toutes les references utilisees par ce lot ont ete relues physiquement sur l'arbre de travail (HEAD 276fc11e)."
+    - id: E5_ajout_outillage_gate
+      fact: "Le perimetre du brief ne nomme que CODE/ et les tests. La regle projet fix: + guard: (AGENTS.md) impose, pour tout bug corrige, un garde-fou automatique dans TOOLS/AGENT_WORKFLOW/scripts/."
+      action: "Ajout declare de G519_check_t345_axis_owns_stop.py et de sa ligne PLANS dans run_all_gates.py. Necessite double : le harnais CI ne compile PAS PRG_05_Translation.st (run_tests.py n'utilise source_prg que pour le rapport), donc G519 est la seule preuve mecanique portant sur le vrai fichier PRG_05."
+    - id: E6_collision_numerotation_gate
+      fact: "Le numero G518 etait deja pris par le chantier concurrent T361 (G518_check_m3_odometry_scale.py deja present dans TOOLS/AGENT_WORKFLOW/scripts/ et cable dans run_all_gates.py), alors que T361 n'a AUCUN verrou dans TASK_LOCKS.json et que son entree TASKS.yaml porte statut ⬜ et agent '—'."
+      action: "Le garde-fou de ce lot est numerote G519 (premier numero libre verifie). La collision de numerotation et l'absence de verrou du chantier T361 sont remontees a l'orchestrateur."
+    - id: E7_test_ecriture_du_site_droite
+      fact: "En rendant le harnais M_MAIN fidèle au PRG_05 reel, le test preexistant « Commande Translation Rev » armait la cible P1 (mot 00011) tout en attendant un frein desserre : il validait un comportement que le vrai PRG_05 ne produit pas (verrou d'arrivee arme a P1)."
+      action: "Mot capteurs du cas preexistant corrige en 00001 (zone P1 -> Maintenance, aucune arrivee sur cible) : l'intention du test (commande arriere nominale) est conservee, la situation decrite devient atteignable. Aucune assertion affaiblie ni supprimee."
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug preexistant, risque
+    hors scope) est remonte IMMEDIATEMENT a l'orchestrateur, pas a la fin et jamais
+    silencieusement. Signaler n'est pas elargir le scope : ce lot n'ouvre ni L2, ni D3, ni
+    la question de la coupure dure a la Tremie, ni l'ecart d'escalade du lot Q5.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "DSH23 (deepseek-v4.1-flash:cloud, DSH)"
+  completed_at: "2026-09-21T05:58:00+02:00"
+  status: COMPLETED
+  summary: >
+    Contrat ecrit AVANT toute ligne de code. Challenge prealable livre : 7 ecarts ou alertes
+    (E1 verrou T331 libere, E2 collision T361 inexistante mais chantier actif sans verrou et numero
+    G518 deja pris, E3 mecanisme reel different du chemin cite par le plan, E4 derive des references
+    de lignes du plan, E5 garde-fou ajoute hors perimetre litteral du brief, E6 assertion du cas
+    M_MAIN preexistant portant sur un artefact du harnais, E7 suppression G499 presente avant le lot).
+    Perimetre L1 strictement tenu, aucun commit. Preuve du mecanisme consignee dans
+    DOC/WFLOW/AUDITS/DESIGN/PREUVE_T345_L1_MECANISME_ARRET_AXE_2026-09-21.md.
+  evidence_submitted:
+    - "ci_before : run_tests.py --fb FB_Translation = 39/41 (TC-P11-036 RESTARTSEEN expected FALSE got TRUE, TC-P11-037 ARRIVALSTOPCONFIRMED expected TRUE got FALSE), rouge obtenu par mutation controlee"
+    - "ci_after : run_tests.py --fb FB_Translation = 41/41 PASS ; --fb PRG_05_Translation = 6/6 PASS"
+    - "guard : G519_check_t345_axis_owns_stop.py PASS + --selftest 7/7 mutations rejetees, cable au palier C"
+    - "check_linkage : G200_check_linkage.py --report = PASS 0 erreur, 138 OK / 0 KO, 2046 instances"
+    - "bundle : CODE_XML/CODE_Bundle.xml 261/261 objets 0 erreur ; diff bundle CODE_XML/CODE_DiffBundle.xml (FB_Translation, PRG_05_Translation)"
+    - "run_all_gates : palier C 53/57, 4 echecs PREEXISTANTS (G300, G340, G430, G483), aucun echec introduit, G430 compte identique avant/apres = 136"
+    - "git_diff : diff reel disponible, NON commité (accord humain distinct requis)"
+
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: "—"
+  notes: >
+    Recette humaine requise : import CODESYS du bundle (ou du diff bundle), puis essai sur machine
+    reelle (arrivee P1 en AX2 avec geste maintenu, capteur qui rebondit). Un PASS au banc ne vaut pas
+    preuve terrain : la frequence reelle du variateur est nulle en simulation, donc AC4 se prouve par
+    injection d'entree et doit etre confirme par trace 10 ms. Aucun commit sans accord explicite
+    DISTINCT du GO d'implementation.

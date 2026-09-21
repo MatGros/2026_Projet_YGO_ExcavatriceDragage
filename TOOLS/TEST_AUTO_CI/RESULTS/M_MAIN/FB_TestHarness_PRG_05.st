@@ -36,6 +36,13 @@ VAR_INPUT
     M3_PosPVP2_DI           : BOOL := FALSE;
     M3_PosP1_DI             : BOOL := FALSE;
     M3_PosMaintenance_DI    : BOOL := FALSE;
+
+    // === 🔒 Bypass IHM M3 (valeurs brutes : la garde de mode MAINT_N2 est appliquée par le harnais) ===
+    BypassLimitSwitchIHM    : BOOL := FALSE;
+    BypassGlobalIHM         : BOOL := FALSE;
+
+    // === 🔌 Retour variateur M3 (injectable : au banc la fréquence réelle est nulle en permanence) ===
+    DriveActualFreqHzOverride : REAL := 0.0;
 END_VAR
 
 VAR_OUTPUT
@@ -57,6 +64,13 @@ VAR
     m3HeightOk              : BOOL;
     initDone                : BOOL := FALSE;
     m3LimitSwitchTremieStable : BOOL;   // §0ter PRG_05 (guard REX MES 2026-09-04) : FdC latche, rebond capteur ne libere rien
+    m3MaintN2               : BOOL;     // §1bis PRG_05 : mode MAINT_N2 arbitré (garde de consommation des bypass M3)
+    m3PositionSensorTarget  : BOOL;     // §1 PRG_05 : cible d'arrêt publiée vers FB_Translation
+    m3TargetCodeSel         : INT;      // §1 PRG_05 : code de cible mémorisé (1 = Trémie, 3 = P1)
+    m3AtP1Stable            : BOOL;     // §0quater PRG_05 : jeton de point atteint P1
+    m3AtTremieStable        : BOOL;     // §0quater PRG_05 : jeton de point atteint Trémie
+    m3SensorsWordPrev       : BYTE;     // §0quater PRG_05 : mot capteurs du scan précédent
+    m3SensorsWordChanged    : BOOL;     // §0quater PRG_05 : franchissement (mot capteurs changé)
 END_VAR
 
 {region "Corps d'exécution PRG_05 encapsulé"}
@@ -107,6 +121,46 @@ ELSE
     m3SpeedTgt       := 0.0;
 END_IF;
 
+// 2bis. Miroir réduit de PRG_05 §0quater, §1 et §1bis (T345/L1) — les trois faits touchés par le lot :
+//   (a) jetons de point atteint Trémie/P1 armés sur le front du capteur propre et remis à zéro par
+//       tout autre franchissement (miroir de PRG_05 §0quater) ;
+//   (b) mémoire de cible : le code de cible n'est réécrit que tant qu'une demande est présente, la
+//       cible publiée étant le jeton du point mémorisé (miroir de PRG_05 §1) ;
+//   (c) garde de mode des bypass de fin de course : consommés uniquement en MAINT_N2 (miroir §1bis).
+m3MaintN2 := (ModesAuth.Mode = E_Mode.MAINT_N2);
+
+m3SensorsWordChanged := (instPosDecoderM3.SensorsWord <> m3SensorsWordPrev);
+m3SensorsWordPrev := instPosDecoderM3.SensorsWord;
+
+IF instPosDecoderM3.TranslationAtP1 THEN
+    m3AtP1Stable := TRUE;
+ELSIF instPosDecoderM3.TranslationAtTremie OR instPosDecoderM3.TranslationAtPV
+      OR instPosDecoderM3.TranslationAtP2 OR instPosDecoderM3.TranslationAtMaintenance
+      OR m3SensorsWordChanged THEN
+    m3AtP1Stable := FALSE;
+END_IF;
+
+IF instPosDecoderM3.TranslationAtTremie THEN
+    m3AtTremieStable := TRUE;
+ELSIF instPosDecoderM3.TranslationAtPV OR instPosDecoderM3.TranslationAtP2
+      OR instPosDecoderM3.TranslationAtP1 OR instPosDecoderM3.TranslationAtMaintenance
+      OR m3SensorsWordChanged THEN
+    m3AtTremieStable := FALSE;
+END_IF;
+
+IF m3ReqTremie THEN
+    m3TargetCodeSel := 1;
+ELSIF m3ReqMaintenance THEN
+    m3TargetCodeSel := 3;
+END_IF;
+
+CASE m3TargetCodeSel OF
+    1: m3PositionSensorTarget := m3AtTremieStable;
+    3: m3PositionSensorTarget := m3AtP1Stable;
+ELSE
+    m3PositionSensorTarget := FALSE;
+END_CASE;
+
 // 3. Sécurité Translation M3
 instSafetyTranslationM3(
     Enable                  := (ModesAuth.Mode <> E_Mode.DISABLE),
@@ -121,7 +175,7 @@ instSafetyTranslationM3(
     DriveOnline             := DriveOnline,
     DriveOperational        := DriveOperational,
     DriveStatusWord         := 16#0000,
-    DriveActualFreqHz       := 0.0,
+    DriveActualFreqHz       := DriveActualFreqHzOverride,
     BrakeFeedback           := BrakeFeedbackOpen,
     BrakeCmd                := FALSE,
     RunRequest              := m3RunRequest,
@@ -129,7 +183,8 @@ instSafetyTranslationM3(
     ReqMaintenance          := m3ReqMaintenance,
     LimitSwitchTremie       := instPosDecoderM3.LimitSwitchTremie,
     LimitSwitchMaintenance  := instPosDecoderM3.LimitSwitchMaintenance,
-    SensorWordIncoherent    := instPosDecoderM3.Incoherent
+    SensorWordIncoherent    := instPosDecoderM3.Incoherent,
+    BypassLimitSwitch       := m3MaintN2 AND (BypassLimitSwitchIHM OR BypassGlobalIHM)
 );
 
 Data.TranslationSafety.SafeStop    := instSafetyTranslationM3.SafeStop;
@@ -146,7 +201,7 @@ instTranslationM3(
     ReqTremie                  := m3ReqTremie,
     ReqMaintenance             := m3ReqMaintenance,
     SpeedTgt_Pct               := m3SpeedTgt,
-    PositionSensorTarget       := FALSE,
+    PositionSensorTarget       := m3PositionSensorTarget,
     SlowdownSensorTremie       := instPosDecoderM3.TranslationPosPV,
     SlowdownSensorMaintenance  := instPosDecoderM3.TranslationPosP1,
     SlowdownSensorP1           := instPosDecoderM3.TranslationPosP2,
@@ -155,8 +210,9 @@ instTranslationM3(
     EffectivePermitM3_Tremie   := instSafetyTranslationM3.TremieLimitClear,
     EffectivePermitM3_Maintenance := instSafetyTranslationM3.MaintenanceLimitClear,
     DriveStatusWord            := 16#0081,
-    DriveActualFreqHz          := 0.0,
+    DriveActualFreqHz          := DriveActualFreqHzOverride,
     BrakeFeedback              := BrakeFeedbackOpen,
+    BypassLimitSwitch          := m3MaintN2 AND (BypassLimitSwitchIHM OR BypassGlobalIHM),
     Cfg                        := m3Cfg
 );
 
@@ -184,6 +240,10 @@ Data.TranslationState.ActiveMaintenance := (m3Direction = -1);
 Data.TranslationState.SpeedCmd_Pct                             := m3SpeedTgt;
 Data.TranslationState.Busy                                     := (instTranslationM3.RequestedDriveControlWord <> 0);
 Data.TranslationState.Ready                                    := instTranslationM3.Ready;
+// Publication des faits observés par la porte de cycle (mêmes champs que PRG_05) :
+// la cible qualifiée de l'axe et son défaut propre.
+Data.TranslationDone                                           := instTranslationM3.TargetReached;
+Data.TranslationState.Error                                    := instTranslationM3.Fault.Error;
 {endregion}
 END_FUNCTION_BLOCK
 

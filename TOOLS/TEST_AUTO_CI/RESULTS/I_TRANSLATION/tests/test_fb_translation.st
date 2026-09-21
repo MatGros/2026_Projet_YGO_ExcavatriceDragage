@@ -5,6 +5,7 @@ VAR
     FB_IL : FB_TranslationOutputInterlock;
     FB_Decoder : FB_Translation_PositionDecoder;
     CfgFast : ST_fbTranslation_Cfg;
+    RestartSeen : BOOL;
 END_VAR
 END_SETUP
 
@@ -1235,4 +1236,640 @@ TEST 'TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -> mouvement
          Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ASSERT_EQ(FB_T.RequestedDriveControlWord, 2, 'MaintenancePermit=TRUE -> mot 2 (REV)');
     ASSERT_GT(FB_T.RequestedDriveFreqHz, 0.0, 'MaintenancePermit=TRUE -> freq > 0');
+END_TEST
+
+(* ═══════════════════════════════════════════════════════════════════════════
+   T345 lot L1 — l'axe possede son arret (plan T334 Phase 3, §L1)
+   Chronologie reproduite : scans de 10 ms, debounce capteur 100 ms, et surtout
+   le RETRAIT DE LA DEMANDE PAR LE SEQUENCEUR sur le jeton d'arrivee, soit
+   100 ms AVANT l'armement du verrou d'arrivee de l'axe (AX2/AX14).
+   ═══════════════════════════════════════════════════════════════════════════ *)
+
+TEST 'TC-P11-036 T345-L1 Arret de l axe : rebond capteur + demande re-armee -> aucun redemarrage'
+    (* Config rapide : ni la rampe ni le frein ne doivent masquer un defaut de verrou d'arrete *)
+    CfgFast.CfgRampAccelRate := 1000.0;
+    CfgFast.CfgRampDecelNormalRate := 1000.0;
+    CfgFast.DriveFreqScaleMaxHz := 60.0;
+    CfgFast.CaptorDebounce := T#100ms;
+    CfgFast.BrakeDelayMagnetise := T#0ms;
+    CfgFast.BrakeDelayContactClose := T#0ms;
+    RestartSeen := FALSE;
+
+    (* Scans 1-4 (10 ms) : montee vers la cible, demande vivante *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 1, 'mouvement etabli vers la cible');
+    ASSERT_FALSE(FB_T.ArrivalStopConfirmed, 'aucun arret confirme avant l arrivee sur la cible');
+    ADVANCE_TIME(10000000);
+
+    (* Scan 5 : capteur cible actif -> debounce 100 ms engage *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_FALSE(FB_T.TargetReached, 'debounce 100 ms non ecoule');
+    ADVANCE_TIME(10000000);
+
+    (* Scans 6-17 : le sequenceur retire sa demande (jeton d'arrivee) 100 ms avant l armement du
+       verrou ; la cible reste portee par l axe (memoire de cible de PRG_05) *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+
+    (* Scan 18 : arret de l axe -> mot et consigne a 0, arret confirme publie *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'arret sur cible : mot de commande a 0');
+    ASSERT_EQ(FB_T.RequestedDriveFreqHz, 0.0, 'arret sur cible : consigne de frequence a 0');
+    ASSERT_TRUE(FB_T.ArrivalStopConfirmed, 'l axe publie son propre arret confirme');
+    ADVANCE_TIME(50000000);
+
+    (* Scans 19-40 (50 ms, soit ~1 s de rebond) : le sequenceur re-arme sa demande sur le jeton
+       relance, et le capteur cible rebondit. L axe doit rester arme : aucun front montant du mot
+       de commande ni de la consigne de frequence ne doit apparaitre. *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := FALSE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := FALSE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := FALSE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := FALSE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := FALSE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := FALSE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := FALSE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := FALSE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    IF FB_T.RequestedDriveControlWord <> 0 THEN RestartSeen := TRUE; END_IF;
+    IF FB_T.RequestedDriveFreqHz > 0.0 THEN RestartSeen := TRUE; END_IF;
+    ADVANCE_TIME(50000000);
+
+    ASSERT_FALSE(RestartSeen, 'aucun front montant mot/frequence apres l armement du verrou');
+    ASSERT_TRUE(FB_T.ArrivalStopConfirmed, 'l arret confirme resiste au rebond et a la re-demande');
+END_TEST
+
+TEST 'TC-P11-037 T345-L1 Le fait d arret confirme n est ni constant ni efface par la demande'
+    CfgFast.CfgRampAccelRate := 1000.0;
+    CfgFast.CfgRampDecelNormalRate := 1000.0;
+    CfgFast.CaptorDebounce := T#100ms;
+    CfgFast.BrakeDelayMagnetise := T#0ms;
+    CfgFast.BrakeDelayContactClose := T#0ms;
+
+    (* Scan 1 : au repos, aucun arret confirme (le fait n est pas constant) *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, Cfg := CfgFast,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_FALSE(FB_T.ArrivalStopConfirmed, 'au repos : aucun arret confirme (fait non constant)');
+    ADVANCE_TIME(10000000);
+
+    (* Scans 2-5 : mouvement vers la cible *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, Cfg := CfgFast,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, Cfg := CfgFast,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, Cfg := CfgFast,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, Cfg := CfgFast,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_FALSE(FB_T.ArrivalStopConfirmed, 'en mouvement : aucun arret confirme');
+    ADVANCE_TIME(10000000);
+
+    (* Scans 6-20 : capteur cible, puis demande retiree avant la fin du debounce *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    ASSERT_TRUE(FB_T.ArrivalStopConfirmed, 'demande retiree avant le debounce : arret confirme');
+
+    (* Scans 21-24 : la demande du MEME sens est re-armee, cible stable -> le fait doit tenir *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_TRUE(FB_T.ArrivalStopConfirmed, 're-demande du meme sens : arret confirme conserve');
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 're-demande du meme sens : mot de commande reste a 0');
+END_TEST
+
+TEST 'TC-P11-038 T345-L1 Une demande de SENS INVERSE relache le verrou et autorise le degagement'
+    CfgFast.CfgRampAccelRate := 1000.0;
+    CfgFast.CfgRampDecelNormalRate := 1000.0;
+    CfgFast.BrakeDelayMagnetise := T#0ms;
+    CfgFast.BrakeDelayContactClose := T#0ms;
+
+    (* Scans 1-4 : mouvement vers la cible puis capteur cible + demande retiree *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, Cfg := CfgFast,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, Cfg := CfgFast,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, Cfg := CfgFast,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_TRUE(FB_T.ArrivalStopConfirmed, 'verrou d arret arme avec le sens du mouvement');
+    ADVANCE_TIME(10000000);
+
+    (* Scans 15-18 : demande explicite de SENS INVERSE (Maintenance) -> degagement autorise *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := TRUE, EffectivePermitM3_Maintenance := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := TRUE, EffectivePermitM3_Maintenance := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := TRUE, EffectivePermitM3_Maintenance := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := TRUE, EffectivePermitM3_Maintenance := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 2, 'sens inverse : mot de commande REV');
+    ASSERT_GT(FB_T.RequestedDriveFreqHz, 0.0, 'sens inverse : consigne de frequence non nulle');
+    ASSERT_FALSE(FB_T.ArrivalStopConfirmed, 'axe en mouvement : plus d arret confirme');
+END_TEST
+
+TEST 'TC-P11-039 T345-L1 Non-vacuite : rotation reelle au variateur -> aucun arret confirme'
+    CfgFast.CfgRampAccelRate := 1000.0;
+    CfgFast.CfgRampDecelNormalRate := 1000.0;
+    CfgFast.BrakeDelayMagnetise := T#0ms;
+    CfgFast.BrakeDelayContactClose := T#0ms;
+
+    (* Scans 1-4 : mouvement vers la cible *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, Cfg := CfgFast,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, Cfg := CfgFast,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, Cfg := CfgFast,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, EffectivePermitM3_Tremie := TRUE,
+         SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+
+    (* Scans 5-18 : demande retiree, cible tenue -> arret confirme *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE, DriveActualFreqHz := 0.0,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_TRUE(FB_T.ArrivalStopConfirmed, 'arret au repos : fait publie');
+    ADVANCE_TIME(10000000);
+
+    (* Scan 19 : le variateur tourne encore (5,0 Hz) -> l arret n est PAS confirme *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE, DriveActualFreqHz := 5.0,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_FALSE(FB_T.ArrivalStopConfirmed, 'rotation reelle 5,0 Hz : aucun arret confirme');
+    ADVANCE_TIME(10000000);
+
+    (* Scan 20 : retour au repos reel -> fait de nouveau publie *)
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, PositionSensorTarget := TRUE, DriveActualFreqHz := 0.0,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_TRUE(FB_T.ArrivalStopConfirmed, 'retour au repos : arret confirme publie');
 END_TEST
