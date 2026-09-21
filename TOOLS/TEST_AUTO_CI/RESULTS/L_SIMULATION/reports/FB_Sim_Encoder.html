@@ -373,7 +373,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-20 20:16:37</div>
+    <div class="exec-time">2026-09-20 21:23:58</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (9 tests)</summary>
@@ -415,8 +415,12 @@
     </details>
     
     <div class="af-warning-banner">
-        <div class="af-warning-title">⚠️ 5 test(s) present(s) dans ce fichier mais absent(s) du catalogue AF (ID inconnu ou retire)</div>
-        <ul><li><code>TC-P13-036</code></li><li><code>TC-P13-037</code></li><li><code>TC-P13-038</code></li><li><code>TC-P13-ENC-001</code></li><li><code>TC-P13-ENC-002</code></li></ul>
+        <div class="af-warning-title">⚠️ 1 test(s) attendu(s) par l'AF (type AUTO) mais absent(s) de ce fichier de test</div>
+        <ul><li><code>TC-P13-030</code> — RelayFwd/RelayRev font compter RawPos de SpeedTgt_Pct * 0.1 * SpeedScaleFactor par scan</li></ul>
+    </div>
+    <div class="af-warning-banner">
+        <div class="af-warning-title">⚠️ 2 test(s) present(s) dans ce fichier mais absent(s) du catalogue AF (ID inconnu ou retire)</div>
+        <ul><li><code>TC-P13-ENC-001</code></li><li><code>TC-P13-ENC-002</code></li></ul>
     </div>
     
     <details class="pin-diagram-details" open>
@@ -956,6 +960,7 @@ TimeLast := TimeCurrent;
    🧪 FB_Sim_Encoder — Simulation physique d&#x27;un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   📄 Spec composant : DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md
    🧩 Brique réduite (Partie3 §1bis, &quot;briques E/S &amp; diagnostics&quot;) : pas de contrat
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.

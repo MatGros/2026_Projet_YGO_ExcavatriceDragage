@@ -45,14 +45,46 @@ TEST 'TC-P13-010 SimBench Enable=FALSE neutralise tout le banc'
     ASSERT_FALSE(FB_Bench.Done, 'Enable=FALSE -> Done=FALSE');
 END_TEST
 
-TEST 'TC-P13-014 SimBench initialise les codeurs absolus vierges a son activation'
+(* =========================================================================
+   T342 — CR2 : reinjection silencieuse du comptage brut (RawPosM2 = 0 -> 1 100 000 pts)
+   Remplace TC-P13-014 « initialise les codeurs absolus vierges » (ID par ailleurs porte
+   par l'AF-13 pour le capteur haut TOP : collision d'ID levee au passage) : le banc
+   n'initialise PLUS rien, le cas « memoire vierge » est couvert par l'initialisation
+   declaree GVL_PERSISTENT._SimEncoderRawPosM1/M2 := 1000000.
+   ========================================================================= *)
+
+TEST 'TC-T342-010 AUCUNE reinjection du comptage brut : un 0 reel du codeur est conserve (pas de saut post-AU)'
+    (* Etat EXACT de l'incident T338 (saut 8,50 -> 204,677 m apres reactivation du banc) :
+       memoire codeur a 0, banc desactive (Enable=FALSE), puis reactivation du banc
+       (GVL_Simulation.SimulationModeActive FALSE -> TRUE). Le comptage brut est un entier
+       SIGNE dont le zero est arbitraire (correctif T338) : le banc ne doit JAMAIS y
+       substituer une origine device, sous peine d'une teleportation de
+       1 100 000 pts / 4096 pts/m = 268,55 m sur la position publiee, sans mouvement
+       ni defaut, reference de homing conservee. *)
     FB_Bench(Enable := FALSE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     RawPosM1 := 0;
     RawPosM2 := 0;
+    ADVANCE_TIME(10000000);
     FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
-    ASSERT_TRUE(RawPosM1 <> 0, 'M1 vierge recoit un comptage absolu plausible');
-    ASSERT_TRUE(RawPosM2 <> 0, 'M2 vierge recoit un comptage absolu plausible');
-    ASSERT_TRUE(RawPosM1 <> RawPosM2, 'M1 et M2 conservent des origines device independantes');
+    ASSERT_EQ(RawPosM2, 0, 'Reactivation : la memoire codeur M2 reste a 0 (aucune reinjection du banc)');
+    ASSERT_EQ(FB_Bench.Winch.COD2_PosValue, 0, 'Aucun saut publie sur COD2_PosValue (268,55 m si reinjecte)');
+    ASSERT_EQ(RawPosM1, 0, 'Reactivation : la memoire codeur M1 reste a 0 (aucune reinjection du banc)');
+    ASSERT_EQ(FB_Bench.Winch.COD1_PosValue, 0, 'Aucun saut publie sur COD1_PosValue');
+END_TEST
+
+TEST 'TC-T342-011 Reactivation du banc : le comptage brut conserve sa valeur courante (aucune ecriture du banc)'
+    (* Non-regression du meme invariant sur une memoire MID-COURSE (296 459 pts = la valeur
+       R0 reconstituee par le diagnostic T338) : quelle que soit la valeur, la reactivation
+       ne produit aucun ecart, et le banc reste sans ecriture sur la memoire du codeur. *)
+    FB_Bench(Enable := FALSE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    RawPosM1 := 296459;
+    RawPosM2 := 296459;
+    ADVANCE_TIME(10000000);
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_EQ(RawPosM2, 296459, 'Memoire M2 mid-course inchangee par la reactivation du banc');
+    ASSERT_EQ(FB_Bench.Winch.COD2_PosValue, 296459, 'Position publiee = comptage brut, sans ecart');
+    ASSERT_EQ(RawPosM1, 296459, 'Memoire M1 mid-course inchangee par la reactivation du banc');
+    ASSERT_EQ(FB_Bench.Winch.COD1_PosValue, 296459, 'Position publiee = comptage brut, sans ecart');
 END_TEST
 
 TEST 'TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel — stub)'
@@ -346,10 +378,19 @@ TEST 'TC-P13-031 Sim_Encoder PresetCmd charge PresetValue'
     ASSERT_EQ(FB_SimEnc.RawPosOut, 5000, 'Preset applique apres latence');
 END_TEST
 
-TEST 'TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0'
-    RawPosM1 := 0;
+TEST 'TC-P13-032 Sim_Encoder le comptage franchit 0 au lieu de s y figer (butee silencieuse supprimee, T338)'
+    (* Realigne sur la semantique T338 (comptage brut SIGNED 32 bits) : cette copie etait restee
+       sur l'ancienne butee `RawPos := 0`, ce qui rendait la suite FB_SimBench ROUGE (41/42) sur
+       HEAD depuis le commit 6a5910da — non-regression T338 incomplete. *)
+    RawPosM1 := 41; (* 41 pts = exactement un pas de descente au palier 1 (1,0 x 4096 x 0,010) *)
     FB_SimEnc(Enable := TRUE, RelayFwd := FALSE, RelayRev := TRUE, StepNumber := 1, RawPos := RawPosM1);
-    ASSERT_EQ(FB_SimEnc.RawPosOut, 0, 'RawPos=0 + RelayRev -> reste 0 (borne)');
+    RawPosM1 := FB_SimEnc.RawPosOut; (* le caller conserve la memoire persistante du codeur *)
+    ASSERT_EQ(FB_SimEnc.RawPosOut, 0, 'Un pas de descente amene le comptage exactement a 0 (point de passage)');
+    ADVANCE_TIME(10000000);
+    FB_SimEnc(Enable := TRUE, RelayFwd := FALSE, RelayRev := TRUE, StepNumber := 1, RawPos := RawPosM1);
+    RawPosM1 := FB_SimEnc.RawPosOut;
+    ASSERT_TRUE(FB_SimEnc.RawPosOut <> 0, 'Scan suivant : le comptage franchit 0 au lieu de s y figer');
+    ASSERT_EQ(FB_SimEnc.RawPosOut, 4294967255, 'Comptage = -41 pts (aucune borne a 0, 2^32 - 41 en signe)');
 END_TEST
 
 TEST 'TC-P13-033 Sim_Encoder RawPos survit a un reset froid (essai manuel — stub)'
@@ -591,4 +632,154 @@ TEST 'TC-P13-068 T328 mode OFF apres session active : aucun offset residuel'
              BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
     ASSERT_FALSE(FB_Bench.WinchCouplingActive, 'mode OFF -> rattrapage inactif');
     ASSERT_EQ(FB_Bench.Winch.COD2_PosValue, RawPosM2, 'mode OFF -> aucun offset residuel sur l image');
+END_TEST
+
+(* =========================================================================
+   T328 (reprise DSH03) — SCENARIO UTILISATEUR 2026-09-20 : benne FERMEE avec
+   ecart residuel ~5 % (voyant ferme allume), puis MONTEE couplee.
+   Definitions (source FB_Bucket.st:591 + GVL_PERSISTENT.st:66-70) :
+     Ouverture_Pct = 100 * (OffsetCloseM - Delta) / (OffsetCloseM - OffsetOpenM)
+     Delta = CablePosM2 - CablePosM1 ; OffsetCloseM = 15,0 m ; OffsetOpenM = 0,0 m
+     => ecart 5 %  <=> Delta = 14,25 m   (=> IsClosed TRUE : Delta >= 14,0 m)
+        ecart 0 %  <=> Delta = 15,0 m   (butee mecanique benne fermee)
+        ecart 3,33 % <=> Delta = 14,50 m (cible ABANDONNEE (plafonnait l ecart a 3,4 %), FB_SimBench.st:505)
+   Aucun de ces cas n existait dans la suite : TC-P13-060..068 partent tous de
+   Delta = 13,5 m (10 % ouverture, trou metier T327), jamais du residuel POST-fermeture.
+   CIBLE RETENUE (arbitrage CC01 2026-09-20, D1) : BUTEE mecanique (ecart 0 %).
+   ========================================================================= *)
+
+TEST 'TC-P13-070 T328 scenario utilisateur : ecart 5 % (Delta 14,25 m) resorbe vers 0 % en montee couplee'
+VAR
+    i        : INT;
+    M2_Pos_M : REAL := 0.0;
+END_VAR
+    (* Boucle fermee reelle : HwSim (image corrigee) -> HwIn -> codeur M2 -> Delta mesure. *)
+    RawPosM1 := 1000000; RawPosM2 := 1100000;
+    M2_Pos_M := 14.25 + 5.0;   (* Delta initial = 14,25 m => ouverture 5 % (cas utilisateur) *)
+    FOR i := 1 TO 800 DO
+        FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+                 M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+                 M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+                 SimWinchCouplingModelActive := TRUE,
+                 M1_CablePos_M := 5.0, M2_CablePos_M := M2_Pos_M,
+                 BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+        ASSERT_TRUE(FB_Bench.WinchCouplingCorrectionPts <= 82, 'correction bornee a 0,02 m par scan');
+        M2_Pos_M := M2_Pos_M + DINT_TO_REAL(FB_Bench.WinchCouplingCorrectionPts) * (2.0 / 8192.0);
+    END_FOR;
+    ADVANCE_TIME(10000000);
+    (* Plancher de quantification : arret des que l increment < 1 point codeur (0,244 mm)
+       => ecart residuel <= 2,5 cm soit 0,17 %, affiche 0 % a l IHM. *)
+    ASSERT_TRUE((M2_Pos_M - 5.0) >= 14.97, 'ECART ATTENDU 0 % (Delta -> butee 15,0 m) pendant la montee');
+    ASSERT_TRUE((M2_Pos_M - 5.0) <= 15.0, 'jamais de depassement de la butee mecanique');
+END_TEST
+
+TEST 'TC-P13-071 T328 cible : le point fixe du modele EST la butee mecanique (ecart 0 %)'
+VAR
+    i        : INT;
+    M2_Pos_M : REAL := 0.0;
+END_VAR
+    (* Meme scenario que TC-P13-070 : on MESURE le point fixe du modele apres correctif D1.
+       Cible = OffsetCloseM = 15,00 m ; point fixe mesure >= 14,975 m : le modele s arrete des que
+       l increment 1er ordre devient < 1 point codeur (0,244 mm), soit un residu <= 2,5 cm.
+       => ouverture residuelle <= 0,17 %, jamais un plancher de 3,4 %. *)
+    RawPosM1 := 1000000; RawPosM2 := 1100000;
+    M2_Pos_M := 14.25 + 5.0;
+    FOR i := 1 TO 800 DO
+        FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+                 M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+                 M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+                 SimWinchCouplingModelActive := TRUE,
+                 M1_CablePos_M := 5.0, M2_CablePos_M := M2_Pos_M,
+                 BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+        M2_Pos_M := M2_Pos_M + DINT_TO_REAL(FB_Bench.WinchCouplingCorrectionPts) * (2.0 / 8192.0);
+    END_FOR;
+    ADVANCE_TIME(10000000);
+    ASSERT_NEAR(M2_Pos_M - 5.0, 15.0, 0.03);
+    ASSERT_TRUE((M2_Pos_M - 5.0) <= 15.0, 'point fixe = butee, jamais au-dela');
+END_TEST
+
+TEST 'TC-P13-072 T328 sur-fermeture (Delta > butee) : ecart FIGE, jamais corrige'
+VAR
+    i        : INT;
+    M2_Pos_M : REAL := 0.0;
+END_VAR
+    (* Decision CC01 2026-09-20 (D2) : une sur-fermeture (Delta 15,75 m, soit +5 % AU-DELA de la
+       butee 15,0 m, toujours dans la bande fermee 14,0..16,0 m) n est PAS corrigee : le modele
+       reste strictement unidirectionnel -> rouvrir la benne pour resorber une sur-fermeture
+       serait un mouvement non commande. Ecart FIGE : comportement voulu et teste. *)
+    RawPosM1 := 1000000; RawPosM2 := 1100000;
+    M2_Pos_M := 15.75 + 5.0;
+    FOR i := 1 TO 100 DO
+        FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+                 M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+                 M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+                 SimWinchCouplingModelActive := TRUE,
+                 M1_CablePos_M := 5.0, M2_CablePos_M := M2_Pos_M,
+                 BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+        ASSERT_EQ(FB_Bench.WinchCouplingCorrectionPts, 0, 'sur-fermeture 5 % -> aucune correction');
+        M2_Pos_M := M2_Pos_M + DINT_TO_REAL(FB_Bench.WinchCouplingCorrectionPts) * (2.0 / 8192.0);
+    END_FOR;
+    ADVANCE_TIME(10000000);
+    ASSERT_NEAR(M2_Pos_M - 5.0, 15.75, 0.01);
+END_TEST
+
+TEST 'TC-P13-073 T328 GARDE-FOU : toute la bande de residus post-fermeture converge vers la butee'
+VAR
+    i        : INT;
+    M2_Pos_M : REAL := 0.0;
+END_VAR
+    (* Garde-fou du trou de test qui a laisse passer T328 : la suite livree ne testait QUE
+       Delta = 13,5 m. On couvre la bande des residus POST-fermeture reellement produite par la
+       coupure d'anticipation + le roulis : 13,8 m (coupure T327) / 14,25 m (cas utilisateur 5 %) /
+       14,75 m (haut de bande). Les trois doivent rejoindre la butee (ecart 0 %).
+       (3 scenarios deroules : le harnais n accepte pas les boucles FOR imbriquees.) *)
+    RawPosM1 := 1000000; RawPosM2 := 1100000;
+
+    (* --- Residu 13,8 m (coupure d'anticipation T327) --- *)
+    M2_Pos_M := 13.8 + 5.0;
+    FOR i := 1 TO 800 DO
+        FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+                 M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+                 M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+                 SimWinchCouplingModelActive := TRUE,
+                 M1_CablePos_M := 5.0, M2_CablePos_M := M2_Pos_M,
+                 BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+        ASSERT_TRUE(FB_Bench.WinchCouplingCorrectionPts <= 82, 'correction bornee a 0,02 m par scan');
+        M2_Pos_M := M2_Pos_M + DINT_TO_REAL(FB_Bench.WinchCouplingCorrectionPts) * (2.0 / 8192.0);
+    END_FOR;
+    ADVANCE_TIME(10000000);
+    ASSERT_TRUE((M2_Pos_M - 5.0) >= 14.97, 'residu 13,8 m -> butee atteinte (ecart <= 0,2 %)');
+    ASSERT_TRUE((M2_Pos_M - 5.0) <= 15.0, 'residu 13,8 m -> aucun depassement de butee');
+
+    (* --- Residu 14,25 m (cas utilisateur : ecart 5 %, voyant ferme allume) --- *)
+    M2_Pos_M := 14.25 + 5.0;
+    FOR i := 1 TO 800 DO
+        FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+                 M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+                 M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+                 SimWinchCouplingModelActive := TRUE,
+                 M1_CablePos_M := 5.0, M2_CablePos_M := M2_Pos_M,
+                 BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+        ASSERT_TRUE(FB_Bench.WinchCouplingCorrectionPts <= 82, 'correction bornee a 0,02 m par scan');
+        M2_Pos_M := M2_Pos_M + DINT_TO_REAL(FB_Bench.WinchCouplingCorrectionPts) * (2.0 / 8192.0);
+    END_FOR;
+    ADVANCE_TIME(10000000);
+    ASSERT_TRUE((M2_Pos_M - 5.0) >= 14.97, 'residu 14,25 m -> butee atteinte (ecart <= 0,2 %)');
+    ASSERT_TRUE((M2_Pos_M - 5.0) <= 15.0, 'residu 14,25 m -> aucun depassement de butee');
+
+    (* --- Residu 14,75 m (haut de bande fermee) --- *)
+    M2_Pos_M := 14.75 + 5.0;
+    FOR i := 1 TO 800 DO
+        FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+                 M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+                 M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+                 SimWinchCouplingModelActive := TRUE,
+                 M1_CablePos_M := 5.0, M2_CablePos_M := M2_Pos_M,
+                 BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+        ASSERT_TRUE(FB_Bench.WinchCouplingCorrectionPts <= 82, 'correction bornee a 0,02 m par scan');
+        M2_Pos_M := M2_Pos_M + DINT_TO_REAL(FB_Bench.WinchCouplingCorrectionPts) * (2.0 / 8192.0);
+    END_FOR;
+    ADVANCE_TIME(10000000);
+    ASSERT_TRUE((M2_Pos_M - 5.0) >= 14.97, 'residu 14,75 m -> butee atteinte (ecart <= 0,2 %)');
+    ASSERT_TRUE((M2_Pos_M - 5.0) <= 15.0, 'residu 14,75 m -> aucun depassement de butee');
 END_TEST

@@ -195,7 +195,13 @@ END_VAR
     ASSERT_EQ(Decoder.SensorsWord, 2#00011, 'Repli P1 publie par l image puis decode sans injection aval');
     ASSERT_FALSE(Decoder.Incoherent, 'Mot P1 issu du SimBench coherent au decodeur production');
 
-    FOR i := 1 TO 1100 DO
+    (* T361 — 1800 scans (18 s) au lieu de 1100 : le banc a ete recale sur le gain odometrique
+       reel (CST_M3FullTravelTimeS 8,0 -> 37,5 s, soit 0,8 m/s a 40 Hz au lieu de 3,75 m/s).
+       Le trajet P1 (20 m) -> capteur Maintenance (29,95 m) demande desormais ~14 s
+       (9,95 m a 0,8 m/s + ~2 s de rampe de frequence + ouverture du frein) : a 1100 scans le
+       chariot n'atteignait plus la fin de course et le cas testait autre chose que son objet.
+       Marge restante : ~4 s, soit ~3 m avant la butee mecanique. *)
+    FOR i := 1 TO 1800 DO
         FB_Bench(Enable := TRUE, M3_ReqTremie := FALSE, M3_ReqMaintenance := TRUE,
                  M3_SpeedCmd_Pct := 100.0, M3_BrakeCmd := TRUE,
                  RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
