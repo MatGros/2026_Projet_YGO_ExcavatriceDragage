@@ -1,0 +1,18 @@
+Error compiling source files:
+
+FB_CycleMachineHoming.st:541:51: error: Expected `Assign`, found `,`.
+ 541 |     E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK,
+     |                                                   ^
+
+FB_CycleMachineHoming.st:542:45: error: Expected `Assign`, found `,`.
+ 542 |     E_MachineHomingTxState.HX2_CLIMB_COUPLED,
+     |                                             ^
+
+FB_CycleMachineHoming.st:543:48: error: Expected `Assign`, found `,`.
+ 543 |     E_MachineHomingTxState.HX3_FLYING_REFERENCE,
+     |                                                ^
+
+FB_CycleMachineHoming.st:544:51: error: Expected `Assign`, found `,`.
+ 544 |     E_MachineHomingTxState.HX4_STABILIZATION_CHECK,
+     |                                                   ^
+
