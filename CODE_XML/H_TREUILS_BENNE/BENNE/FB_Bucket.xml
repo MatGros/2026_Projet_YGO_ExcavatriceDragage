@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T23:25:08.794366" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T23:25:08.794366">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T06:17:54.398468" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T06:17:54.398468">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -738,7 +738,7 @@ Ouverture benne RESTANTE (%) au-delà de laquelle la fermeture est considérée 
 ⚠️ La branche correspondante est AJOUTÉE en disjonction à la condition d'arrivée de
 fermeture ci-dessous : celle-ci garde sa valeur et son rôle de filet anti-blocage.
 ⛔ 0 = branche INACTIVE : critère d'arrivée seul.
---&gt; [CFG] Ouverture restante [0..20 %] déclarant la fermeture atteinte ; 0 = critère d'arrivée seul</xhtml>
+--&gt; [CFG] Ouverture restante [0..50 %] déclarant la fermeture atteinte ; 0 = critère d'arrivée seul</xhtml>
               </documentation>
             </variable>
             <variable name="BypassGlobal">
@@ -2137,7 +2137,7 @@ DeltaPositionCorrected_M := DeltaPosition_M - OffsetTargetM;
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="20" />
+                <simpleValue value="50" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BORNES DU RÉGLAGE ===

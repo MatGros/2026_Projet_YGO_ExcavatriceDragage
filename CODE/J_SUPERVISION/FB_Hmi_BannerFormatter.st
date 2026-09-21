@@ -55,6 +55,8 @@ VAR_INPUT
     DeadmanArmed         : BOOL;   // --> [SAFE] Homme-mort armé
     JoystickAtNeutral    : BOOL;   // --> [HW] Joystick au neutre
     CycleAutoBusy        : BOOL;   // --> [HW] Cycle auto actif
+    CycleElapsed_Min     : INT;   // --> [DIAG] Minutes ecoulees du cycle EN COURS (FB_CycleSemiAuto.CurrentCycleElapsed_Min) — affichees seulement si CycleAutoBusy
+    CycleElapsed_S       : INT;   // --> [DIAG] Secondes ecoulees du cycle EN COURS, 0..59 (FB_CycleSemiAuto.CurrentCycleElapsed_S)
     M3AtP1               : BOOL;   // --> [STAT] M3 positionné stable au Point 1 (conservé, compat)
     M3StatusText         : STRING(80);   // --> [STAT] T249-B : texte statut position M3 (PRG_05) — "M3 a P1", "M3 entre P2 et P1 -> Maintenance"...
     TranslationMotionErrorId       : WORD;   // --> [DIAG] Code défaut MOUVEMENT M3 (FB_Translation.Fault.ErrorId) : bit0 frein, bit3 variateur AC600, bit6 limite extrême
@@ -87,6 +89,7 @@ VAR
     PrefixContext        : STRING(20);   // . [LOC] Préfixe RÉEL/SIMU
     ModeStr              : STRING(30);   // . [LOC] Libellé mode
     CouplingStr          : STRING(30);   // . [LOC] Libellé couplage
+    ElapsedSuffixStr     : STRING(20);  // . [LOC] Suffixe chrono du cycle en cours, format ' MMminSSs' (deux chiffres par champ)
     CurrentDirection     : INT;   // . [LOC] Direction courante
     DirectionBlocked     : BOOL; // . [LOC] Interlock métier : mouvement demandé mais permit absent
     AnyBypassActive      : BOOL;   // . [LOC] Au moins un bypass actif
@@ -278,7 +281,41 @@ ELSIF WinchSelected = 2 THEN
 ELSE
     CouplingStr := ' [AUCUN AXE]';
 END_IF;
-Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
+// Assemblage par ACCUMULATION sur le champ cible (STRING(120)) plutot que par CONCAT imbrique :
+// le resultat est identique en CODESYS (c'est la taille du champ cible qui gouverne), mais il ne
+// depend plus de la taille declaree des fragments intermediaires. Un CONCAT imbrique de fragments
+// STRING(20)/STRING(30)/STRING(30) est plafonne a 30 caracteres par le compilateur de test, qui
+// fait rendre a CONCAT le maximum de la taille de ses arguments : le mode affiche ressortait
+// ampute ('[SIMULATION] [SEMI-AUTO] [CYCL', 'CYCLE AUTO]' perdu) sur le harnais CI.
+Banner.GlobalContextText := PrefixContext;
+Banner.GlobalContextText := CONCAT(Banner.GlobalContextText, ModeStr);
+Banner.GlobalContextText := CONCAT(Banner.GlobalContextText, CouplingStr);
+
+// ⏱️ Chronomètre du cycle EN COURS, accolé au bandeau mode (format MMminSSs, ex. '09min05s').
+// • Producteur unique de la valeur : FB_CycleSemiAuto (CurrentCycleElapsed_Min/_S) ; le formateur
+//   ne recalcule RIEN et ne lit aucun global : les deux entiers arrivent par VAR_INPUT
+//   (cablés par PRG_07_Supervision.st sur GVL_IHM.CycleSemiAuto.State).
+// • Portillon : CycleAutoBusy = Lifecycle.Busy du séquenceur (PRG_07:758). Hors cycle il est FALSE
+//   (PRG_03_Modes_Cycle.st:471 et :544 hors SEMI_AUTO, FB_CycleSemiAuto.st:1585 en AX18 et :1621 en
+//   AX_STAB) et le chrono est remis à zéro (PRG_03_Modes_Cycle.st:490-494 / :565-569) : aucune durée
+//   figée d'un cycle précédent ne peut donc s'afficher à l'arrêt.
+// • Pire cas borné : 37 car. de base + 1 espace + 3 chiffres de minutes (CycleRunTimer armé PT=T#12h
+//   -> 720 min maximum) + 'min' + 2 chiffres de secondes + 's' = 47 car., contre STRING(120) pour
+//   GlobalContextText (ST_HmiBanner.st:10). Même si les minutes n'étaient pas bornées par le TON
+//   (INT complet, 11 car.), le total resterait à 55 car. : aucune troncature possible.
+IF CycleAutoBusy THEN
+    IF CycleElapsed_Min < 10 THEN
+        ElapsedSuffixStr := CONCAT(' 0', CONCAT(INT_TO_STRING(CycleElapsed_Min), 'min'));
+    ELSE
+        ElapsedSuffixStr := CONCAT(' ', CONCAT(INT_TO_STRING(CycleElapsed_Min), 'min'));
+    END_IF;
+    IF CycleElapsed_S < 10 THEN
+        ElapsedSuffixStr := CONCAT(ElapsedSuffixStr, CONCAT('0', CONCAT(INT_TO_STRING(CycleElapsed_S), 's')));
+    ELSE
+        ElapsedSuffixStr := CONCAT(ElapsedSuffixStr, CONCAT(INT_TO_STRING(CycleElapsed_S), 's'));
+    END_IF;
+    Banner.GlobalContextText := CONCAT(Banner.GlobalContextText, ElapsedSuffixStr);
+END_IF;
 {endregion}
 
 {region "§1bis Repli defaut (etape origine)"}

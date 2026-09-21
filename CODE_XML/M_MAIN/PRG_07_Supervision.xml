@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T00:59:38.422935" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T00:59:38.422935">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T08:44:53.451754" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T08:44:53.451754">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -301,10 +301,10 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Ouverture benne restante déclarant la fermeture atteinte [0..20 %] ; 0 = critère d'arrivée seul (branche seuil inactive)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Ouverture benne restante déclarant la fermeture atteinte [0..50 %] ; 0 = critère d'arrivée seul (branche seuil inactive)</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceStepTarget">
+            <variable name="_ReservedInerte_01">
               <type>
                 <INT />
               </type>
@@ -312,7 +312,7 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 RESERVE / INERTE depuis T358 — PLUS AUCUN LECTEUR : la cible de forcage est portee par ST_CycleCmd.SetForceStepTgt (zone non persistee). Champ conserve A SA PLACE pour ne pas decaler le mapping RETAIN positionnel des champs suivants (regle : jamais d'insertion ni de retrait au milieu) ; sa suppression releve d'un lot de migration de persistance dedie. L'IHM ne doit PLUS exposer de champ de saisie sur ce tag.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 RESERVE / INERTE depuis T358 (ex-ForceStepTarget) — PLUS AUCUN LECTEUR : la cible de forcage est portee par ST_CycleCmd.SetForceStepTgt (zone non persistee). Renomme (pas retire) pour ne pas decaler le mapping RETAIN positionnel des champs suivants (regle : jamais d'insertion ni de retrait au milieu) ; retrait reel = lot de migration de persistance dedie. Aucune exposition IHM sur ce tag.</xhtml>
               </documentation>
             </variable>
             <variable name="DiveStartMin_M">
@@ -6745,6 +6745,14 @@ jeton "dernier capteur franchi" (front + libération sur mouvement confirmé) �
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Référencement benne position fermée (mise en service) — confirmation pure, aucun mouvement</xhtml>
               </documentation>
             </variable>
+            <variable name="BtnConfirmHomingBucket">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation visuelle fermeture benne cycle homing HX1 (bouton dédié IHM)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TglManualBucketLimits">
               <type>
                 <BOOL />
@@ -8109,7 +8117,7 @@ END_IF;
 // ⚠️ La MÊME borne est répétée dans FB_BucketCloseThreshold (défense en profondeur : le FB
 // est appelé dans la tâche rapide et ne fait pas confiance au seul bornage amont). Le
 // garde-fou G515 vérifie que les deux bornes restent ÉGALES — toute divergence échoue.
-GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct := LIMIT(0, GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct, 20);
+GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct := LIMIT(0, GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct, 50);
 instCfgPersistBridgeCycle(Hmi := GVL_IHM.CycleSemiAuto.Cfg, Persist := _CycleCfgPersist);
 GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S := LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S, 3600);
 IF instCfgPersistBridgeCycle.JustRestored THEN
@@ -10485,6 +10493,22 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Cycle auto actif</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleElapsed_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Minutes ecoulees du cycle EN COURS (FB_CycleSemiAuto.CurrentCycleElapsed_Min) — affichees seulement si CycleAutoBusy</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleElapsed_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Secondes ecoulees du cycle EN COURS, 0..59 (FB_CycleSemiAuto.CurrentCycleElapsed_S)</xhtml>
+              </documentation>
+            </variable>
             <variable name="M3AtP1">
               <type>
                 <BOOL />
@@ -10699,6 +10723,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Libellé couplage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ElapsedSuffixStr">
+              <type>
+                <string length="20" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Suffixe chrono du cycle en cours, format ' MMminSSs' (deux chiffres par champ)</xhtml>
               </documentation>
             </variable>
             <variable name="CurrentDirection">
@@ -11178,6 +11210,38 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 [HISTO] M3 : LatchedId AND NOT ErrorId (défauts latched passés)</xhtml>
               </documentation>
             </variable>
+            <variable name="RearmEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front du réarmement puissance (contacteur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRearmWindow">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fenêtre transitoire post-réarmement (durée bornée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RearmWindowActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fenêtre post-réarmement en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NetworkSurveillanceActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Surveillance réseau/ES armée (hors fenêtre transitoire attendue)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_BannerHoldTime">
               <type>
                 <TIME />
@@ -11209,6 +11273,20 @@ END_IF;
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Taille du carrousel d'alarmes (AF-07 §6)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_RearmInhibitTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#4s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée de la fenêtre transitoire post-réarmement, alignée sur la garde de démarrage :
+pendant ce délai les esclaves peuvent légitimement ne pas être encore opérationnels.
+C'est une BORNE : passé ce délai, un défaut réseau réel est de nouveau affiché.
+. [LOC] Fenêtre transitoire post-réarmement puissance</xhtml>
               </documentation>
             </variable>
             <variable name="CST_WinchErrorIdCableLimitDescent">
@@ -11262,6 +11340,10 @@ IF NOT Enable THEN
     END_FOR;
     TonAlarmBanner(IN := FALSE);
     TonBootInhibit(IN := FALSE);
+    TonRearmWindow(IN := FALSE);
+    RearmEdge(CLK := FALSE);
+    RearmWindowActive := FALSE;
+    NetworkSurveillanceActive := FALSE;
     TofFaultLocalIo(IN := FALSE);
     TofFaultVh0800(IN := FALSE);
     TofFaultVh0808(IN := FALSE);
@@ -11279,18 +11361,35 @@ END_IF;
 // ⏱️ Garde au démarrage (inhibition 4s pendant init des bus et équipements)
 TonBootInhibit(IN := Enable, PT := T#4s);
 
+// ⏱️ Fenêtre transitoire de réarmement puissance : à chaque front du contacteur, les esclaves
+// peuvent légitimement publier une perte de liaison pendant quelques secondes. La fenêtre est
+// BORNÉE (CST_RearmInhibitTime) : hors de celle-ci, un défaut réseau réel reste affiché.
+RearmEdge(CLK := PowerContactorEngaged);
+IF RearmEdge.Q THEN
+    RearmWindowActive := TRUE;
+END_IF;
+TonRearmWindow(IN := RearmWindowActive, PT := CST_RearmInhibitTime);
+IF TonRearmWindow.Q THEN
+    RearmWindowActive := FALSE;
+END_IF;
+
+// 🛡️ Surveillance réseau armée hors des phases où l'absence de bus est ATTENDUE :
+// démarrage CPU (garde ci-dessus) et réarmement puissance (fenêtre ci-dessus).
+// Rien d'autre n'est masqué : la chaîne AU, les sécurités et les défauts métier ne passent pas ici.
+NetworkSurveillanceActive := TonBootInhibit.Q AND NOT RearmWindowActive;
+
 // 🌊 Filtrage anti-bagotement (TOF 1.5s sur perte de validité)
-TofFaultLocalIo(IN := (NOT Network.InputModules.LocalDigitalIoOk) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVh0800(IN := (NOT Network.InputModules.Vh0800EndOk) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVh0808(IN := (NOT Network.InputModules.Vh0808EtpOk) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVh0008Er(IN := (NOT Network.InputModules.Vh0008ErOk) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVh0008Er1(IN := (NOT Network.InputModules.Vh0008Er1Ok) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultCanBus(IN := (NOT Network.BusCanOpen.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultJoy1(IN := (NOT Network.Joystick.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultEcatBus(IN := (NOT Network.BusEthercat.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultEncM1(IN := (NOT Network.EncoderM1.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultEncM2(IN := (NOT Network.EncoderM2.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVarM3(IN := (NOT Network.VariateurM3.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultLocalIo(IN := (NOT Network.InputModules.LocalDigitalIoOk) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVh0800(IN := (NOT Network.InputModules.Vh0800EndOk) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVh0808(IN := (NOT Network.InputModules.Vh0808EtpOk) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVh0008Er(IN := (NOT Network.InputModules.Vh0008ErOk) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVh0008Er1(IN := (NOT Network.InputModules.Vh0008Er1Ok) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultCanBus(IN := (NOT Network.BusCanOpen.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultJoy1(IN := (NOT Network.Joystick.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultEcatBus(IN := (NOT Network.BusEthercat.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultEncM1(IN := (NOT Network.EncoderM1.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultEncM2(IN := (NOT Network.EncoderM2.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVarM3(IN := (NOT Network.VariateurM3.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
 
 LocalIoValid   := NOT TofFaultLocalIo.Q;
 Vh0800Valid    := NOT TofFaultVh0800.Q;
@@ -11335,7 +11434,41 @@ ELSIF WinchSelected = 2 THEN
 ELSE
     CouplingStr := ' [AUCUN AXE]';
 END_IF;
-Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
+// Assemblage par ACCUMULATION sur le champ cible (STRING(120)) plutot que par CONCAT imbrique :
+// le resultat est identique en CODESYS (c'est la taille du champ cible qui gouverne), mais il ne
+// depend plus de la taille declaree des fragments intermediaires. Un CONCAT imbrique de fragments
+// STRING(20)/STRING(30)/STRING(30) est plafonne a 30 caracteres par le compilateur de test, qui
+// fait rendre a CONCAT le maximum de la taille de ses arguments : le mode affiche ressortait
+// ampute ('[SIMULATION] [SEMI-AUTO] [CYCL', 'CYCLE AUTO]' perdu) sur le harnais CI.
+Banner.GlobalContextText := PrefixContext;
+Banner.GlobalContextText := CONCAT(Banner.GlobalContextText, ModeStr);
+Banner.GlobalContextText := CONCAT(Banner.GlobalContextText, CouplingStr);
+
+// ⏱️ Chronomètre du cycle EN COURS, accolé au bandeau mode (format MMminSSs, ex. '09min05s').
+// • Producteur unique de la valeur : FB_CycleSemiAuto (CurrentCycleElapsed_Min/_S) ; le formateur
+//   ne recalcule RIEN et ne lit aucun global : les deux entiers arrivent par VAR_INPUT
+//   (cablés par PRG_07_Supervision.st sur GVL_IHM.CycleSemiAuto.State).
+// • Portillon : CycleAutoBusy = Lifecycle.Busy du séquenceur (PRG_07:758). Hors cycle il est FALSE
+//   (PRG_03_Modes_Cycle.st:471 et :544 hors SEMI_AUTO, FB_CycleSemiAuto.st:1585 en AX18 et :1621 en
+//   AX_STAB) et le chrono est remis à zéro (PRG_03_Modes_Cycle.st:490-494 / :565-569) : aucune durée
+//   figée d'un cycle précédent ne peut donc s'afficher à l'arrêt.
+// • Pire cas borné : 37 car. de base + 1 espace + 3 chiffres de minutes (CycleRunTimer armé PT=T#12h
+//   -&gt; 720 min maximum) + 'min' + 2 chiffres de secondes + 's' = 47 car., contre STRING(120) pour
+//   GlobalContextText (ST_HmiBanner.st:10). Même si les minutes n'étaient pas bornées par le TON
+//   (INT complet, 11 car.), le total resterait à 55 car. : aucune troncature possible.
+IF CycleAutoBusy THEN
+    IF CycleElapsed_Min &lt; 10 THEN
+        ElapsedSuffixStr := CONCAT(' 0', CONCAT(INT_TO_STRING(CycleElapsed_Min), 'min'));
+    ELSE
+        ElapsedSuffixStr := CONCAT(' ', CONCAT(INT_TO_STRING(CycleElapsed_Min), 'min'));
+    END_IF;
+    IF CycleElapsed_S &lt; 10 THEN
+        ElapsedSuffixStr := CONCAT(ElapsedSuffixStr, CONCAT('0', CONCAT(INT_TO_STRING(CycleElapsed_S), 's')));
+    ELSE
+        ElapsedSuffixStr := CONCAT(ElapsedSuffixStr, CONCAT(INT_TO_STRING(CycleElapsed_S), 's'));
+    END_IF;
+    Banner.GlobalContextText := CONCAT(Banner.GlobalContextText, ElapsedSuffixStr);
+END_IF;
 {endregion}
 
 {region "§1bis Repli defaut (etape origine)"}
@@ -13523,7 +13656,37 @@ GVL_Troubleshooting.N_MotionM1.RequestedSpeedPct        := WinchM1.State.SpeedCm
 GVL_Troubleshooting.N_MotionM1.Step5_NoSafetyFault      := NOT WinchM1.Safety.SafeStop AND NOT WinchM1.Safety.ThermalFault;
 GVL_Troubleshooting.N_MotionM1.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.N_MotionM1.RequestedDirection = 1, WinchM1.Safety.DescendPermit, WinchM1.Safety.AscentPermit);
 GVL_Troubleshooting.N_MotionM1.Step7_BrakeReleased      := WinchM1.State.BrakeCmd AND WinchM1.State.BrakeCommandOpenConfirmed;
-GVL_Troubleshooting.N_MotionM1.Step8_OutputInterlockOk  := NOT WinchM1.State.FinalInterlockError;
+// 🛡️ T371 — honnêteté du diagnostic (M1). La barrière finale publie DÉJÀ son état et sa cause
+// (FB_WinchOutputInterlock.st:54 State, :56 Reason), déjà routés jusqu'ici par
+// FB_WinchStateProjection.st:112-115. L'ancien `NOT FinalInterlockError` ne lisait QUE le défaut
+// bit0 (timeout confirmation frein, FB_WinchOutputInterlock.st:516-519 -&gt; :528-532) : 4 refus
+// RÉELS restaient affichés en vert — F1 RestartInhibit (:357-363), F2 ContactorStuckLatched
+// (:364-373), F3 SafeStop/PermitFinalBlocked (:393-404, State laissé à READY et Reason à NONE),
+// F4 RestartRequired/DeadTimePending (:424-429). On cesse de TRONQUER un état déjà publié.
+// ⚠️ Latence N-1 assumée : WinchM1.State vient de la projection PRG_04_Treuils_Benne.st:1688-1696,
+// qui lit l'instance de PRG_06_Outputs -&gt; état daté d'un scan (~10 ms). USAGE DIAGNOSTIC UNIQUEMENT :
+// aucune ligne de CONDUITE ne consomme Step8_InterlockState / Step8_InterlockReason.
+// Le dernier terme (« demande moteur vivante SANS ordre de frein validé ») est le SEUL témoin publié
+// qui distingue F3, où la barrière coupe les 6 ordres (:402-403) en laissant State = READY et Reason = NONE.
+// 🔴 REX 2026-09-21 (revue indépendante T371, verdict BLOCK) : ce témoin NE DOIT SURTOUT PAS se
+// construire sur `State.RelayFwd/RelayRev`. Ces champs viennent de FB_Winch
+// (`FB_WinchStateProjection.st:102-103` &lt;- `WinchM1Ref : FB_Winch`), c'est-à-dire de la DEMANDE —
+// exactement le signal transmis à la barrière (`PRG_04_Treuils_Benne.st:1603-1604`
+// `RequestedRelayFwd := instWinchM1.RelayFwd`). Comparer la demande à elle-même rend le terme
+// TAUTOLOGIQUEMENT FAUX : `MotorRequest` implique déjà `RequestedRelayFwd XOR RequestedRelayRev`
+// (`FB_WinchOutputInterlock.st:182`), donc F3 n'aurait JAMAIS été détecté et le test F3 aurait
+// « passé » sur un état impossible en exploitation.
+// ✅ Le seul témoin VALIDÉ publié est `State.BrakeCmd`, recopié de la SORTIE de la barrière
+// (`FB_WinchStateProjection.st:108` &lt;- `InterlockM1.BrakeCmd`, soit `RelayFwd OR RelayRev` VALIDÉS,
+// `FB_WinchOutputInterlock.st:487`). Terme retenu : demande vivante ET aucun ordre validé.
+// Recopie DIRECTE de l'énumération publiée (aucune projection, aucune conversion de type).
+GVL_Troubleshooting.N_MotionM1.Step8_InterlockState  := WinchM1.State.FinalInterlockState;
+GVL_Troubleshooting.N_MotionM1.Step8_InterlockReason := WinchM1.State.FinalInterlockReason;
+GVL_Troubleshooting.N_MotionM1.Step8_OutputInterlockOk := NOT WinchM1.State.FinalInterlockError
+                                                    AND NOT (WinchM1.State.FinalInterlockState = E_WinchFinalInterlockState.FAULT)
+                                                    AND NOT (WinchM1.State.FinalInterlockState = E_WinchFinalInterlockState.DISABLED)
+                                                    AND NOT (WinchM1.State.FinalInterlockState = E_WinchFinalInterlockState.WAIT_RESTART_DELAY)
+                                                    AND NOT (WinchM1.State.FinalMotorRequest AND NOT WinchM1.State.BrakeCmd);
 
 GVL_Troubleshooting.N_MotionM1.AllConditionsMet := GVL_Troubleshooting.N_MotionM1.Step1_PowerEngaged
                                               AND GVL_Troubleshooting.N_MotionM1.Step2_ModeAuthorized
@@ -13555,7 +13718,18 @@ GVL_Troubleshooting.O_MotionM2.RequestedSpeedPct        := WinchM2.State.SpeedCm
 GVL_Troubleshooting.O_MotionM2.Step5_NoSafetyFault      := NOT WinchM2.Safety.SafeStop AND NOT WinchM2.Safety.ThermalFault AND NOT WinchM2.Safety.SlackCable;
 GVL_Troubleshooting.O_MotionM2.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.O_MotionM2.RequestedDirection = 1, WinchM2.Safety.DescendPermit, WinchM2.Safety.AscentPermit);
 GVL_Troubleshooting.O_MotionM2.Step7_BrakeReleased      := WinchM2.State.BrakeCmd AND WinchM2.State.BrakeCommandOpenConfirmed;
-GVL_Troubleshooting.O_MotionM2.Step8_OutputInterlockOk  := NOT WinchM2.State.FinalInterlockError;
+// 🛡️ T371 — honnêteté du diagnostic (M2), même patron que M1 ci-dessus (source :
+// FB_WinchStateProjection.st:179-182, barrière FB_WinchOutputInterlock.st:54/:56, refus F1-F4
+// aux sites :357-363 / :364-373 / :393-404 / :424-429). Lecture N-1, DIAGNOSTIC UNIQUEMENT.
+// Idem M1 : le témoin F3 est `BrakeCmd` (SORTIE validée, projection :175) et JAMAIS les relais
+// `RelayFwd/RelayRev` de la demande (tautologie — REX revue T371 du 2026-09-21).
+GVL_Troubleshooting.O_MotionM2.Step8_InterlockState  := WinchM2.State.FinalInterlockState;
+GVL_Troubleshooting.O_MotionM2.Step8_InterlockReason := WinchM2.State.FinalInterlockReason;
+GVL_Troubleshooting.O_MotionM2.Step8_OutputInterlockOk := NOT WinchM2.State.FinalInterlockError
+                                                    AND NOT (WinchM2.State.FinalInterlockState = E_WinchFinalInterlockState.FAULT)
+                                                    AND NOT (WinchM2.State.FinalInterlockState = E_WinchFinalInterlockState.DISABLED)
+                                                    AND NOT (WinchM2.State.FinalInterlockState = E_WinchFinalInterlockState.WAIT_RESTART_DELAY)
+                                                    AND NOT (WinchM2.State.FinalMotorRequest AND NOT WinchM2.State.BrakeCmd);
 
 GVL_Troubleshooting.O_MotionM2.AllConditionsMet := GVL_Troubleshooting.O_MotionM2.Step1_PowerEngaged
                                               AND GVL_Troubleshooting.O_MotionM2.Step2_ModeAuthorized
@@ -13590,7 +13764,33 @@ GVL_Troubleshooting.P_MotionM3.RequestedSpeedPct        := Translation.State.Spe
 GVL_Troubleshooting.P_MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
 GVL_Troubleshooting.P_MotionM3.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.P_MotionM3.RequestedDirection = 1, Translation.Safety.EffectivePermitM3_Maintenance, Translation.Safety.EffectivePermitM3_Tremie); // Permis canoniques M3 — HeightInterlockBlocking reste un blocage séparé
 GVL_Troubleshooting.P_MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;
-GVL_Troubleshooting.P_MotionM3.Step8_OutputInterlockOk  := NOT Translation.State.FinalInterlockError;
+// 🛡️ T371 — axe M3 : état et cause publiés, décision inchangée sur le seul témoin ACTIF disponible.
+// Pourquoi pas plus ici : (1) la barrière finale M3 ne publie AUCUN état machine — PRG_05_Translation.st:749-755
+// dérive FinalInterlockState de Fault.Error seul (READY/ERROR), et ses ordres validés (DriveControlWord,
+// DriveFreqCmd) ne sont PAS publiés vers l'IHM (TranslationState.DriveControlWord :717 recopie la DEMANDE
+// de FB_Translation, pas l'ordre validé de la barrière) -&gt; aucun témoin « ordre réellement délivré » ;
+// (2) `FinalInterlockReason` est MÉMORISÉ et n'est JAMAIS remis à NONE après acquittement
+// (FB_TranslationOutputInterlock.st:123-130 lève RestartInhibit sans toucher Reason ; seul le gate :80
+// le remet à NONE) -&gt; l'utiliser dans la décision créerait un faux ROUGE PERMANENT après un acquittement.
+// Il est donc PUBLIÉ pour le technicien, sans servir de preuve de refus actif.
+// Le rapprochement avec la vérité Control_400 (Idx404/Idx405) devient ainsi lisible dans la checklist.
+// M3 ne publie qu'un état DÉRIVÉ du défaut (PRG_05:751-755) : projection EXPLICITE sur le vocabulaire
+// commun du DUT (E_State.READY -&gt; READY, E_State.ERROR -&gt; FAULT) — aucune donnée inventée, aucune
+// conversion de type. Les 3 raisons M3 sont identiques à celles de la famille commune.
+IF Translation.State.FinalInterlockState = E_State.ERROR THEN
+    GVL_Troubleshooting.P_MotionM3.Step8_InterlockState := E_WinchFinalInterlockState.FAULT;
+ELSE
+    GVL_Troubleshooting.P_MotionM3.Step8_InterlockState := E_WinchFinalInterlockState.READY;
+END_IF;
+IF Translation.State.FinalInterlockReason = E_TranslationFinalInterlockReason.RESTART_INHIBITED THEN
+    GVL_Troubleshooting.P_MotionM3.Step8_InterlockReason := E_WinchFinalInterlockReason.RESTART_INHIBITED;
+ELSIF Translation.State.FinalInterlockReason = E_TranslationFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED THEN
+    GVL_Troubleshooting.P_MotionM3.Step8_InterlockReason := E_WinchFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED;
+ELSE
+    GVL_Troubleshooting.P_MotionM3.Step8_InterlockReason := E_WinchFinalInterlockReason.NONE;
+END_IF;
+GVL_Troubleshooting.P_MotionM3.Step8_OutputInterlockOk := NOT Translation.State.FinalInterlockError
+                                                    AND NOT (Translation.State.FinalInterlockState = E_State.ERROR);
 
 GVL_Troubleshooting.P_MotionM3.AllConditionsMet := GVL_Troubleshooting.P_MotionM3.Step1_PowerEngaged
                                               AND GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized

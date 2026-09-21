@@ -650,32 +650,41 @@ ELSIF (SeqStep = E_MachineHomingTxState.HX6_HOMED_SUCCESS) THEN
     MachineHomingInstruction := 'HX6 - RefHoming Machine referencee';
 ELSIF NOT M1Status.HomedAndReliable AND NOT M2Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.BOTH_NOT_HOMED;
-    IF Mode <> E_Mode.MAINT_N2 THEN
-        MachineHomingInstruction := 'HX0 - RefHoming M1+M2 non ref - Passer en N2';
-    ELSE
+    IF Mode = E_Mode.MAINT_N2 THEN
         MachineHomingInstruction := 'HX0 - RefHoming M1+M2 non ref - Lancer sur IHM';
+    ELSIF Mode = E_Mode.MAINT_N1 THEN
+        MachineHomingInstruction := 'HX0 - M1+M2 non ref - Homing unitaire possible';
+    ELSE
+        MachineHomingInstruction := 'HX0 - M1+M2 non referencies';
     END_IF;
 ELSIF NOT M1Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.M1_NOT_HOMED;
-    IF Mode <> E_Mode.MAINT_N2 THEN
-        MachineHomingInstruction := 'HX0 - RefHoming M1 non ref - Passer en N2';
-    ELSE
+    IF Mode = E_Mode.MAINT_N2 THEN
         MachineHomingInstruction := 'HX0 - RefHoming M1 non ref - Lancer sur IHM';
+    ELSIF Mode = E_Mode.MAINT_N1 THEN
+        MachineHomingInstruction := 'HX0 - M1 non ref - Homing unitaire possible';
+    ELSE
+        MachineHomingInstruction := 'HX0 - M1 non reference';
     END_IF;
 ELSIF NOT M2Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.M2_NOT_HOMED;
-    IF Mode <> E_Mode.MAINT_N2 THEN
-        MachineHomingInstruction := 'HX0 - RefHoming M2 non ref - Passer en N2';
-    ELSE
+    IF Mode = E_Mode.MAINT_N2 THEN
         MachineHomingInstruction := 'HX0 - RefHoming M2 non ref - Lancer sur IHM';
+    ELSIF Mode = E_Mode.MAINT_N1 THEN
+        MachineHomingInstruction := 'HX0 - M2 non ref - Homing unitaire possible';
+    ELSE
+        MachineHomingInstruction := 'HX0 - M2 non reference';
     END_IF;
 ELSIF NOT (CommitPublished OR BucketOffsetValid) THEN
-    IF Mode <> E_Mode.MAINT_N2 THEN
-        MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
-        MachineHomingInstruction := 'HX0 - RefHoming Offset benne inconnu - passer en N2';
-    ELSE
+    IF Mode = E_Mode.MAINT_N2 THEN
         MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
         MachineHomingInstruction := 'HX0 - RefHoming Lancer le homing (etat benne)';
+    ELSIF Mode = E_Mode.MAINT_N1 THEN
+        MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
+        MachineHomingInstruction := 'HX0 - Offset benne inconnu';
+    ELSE
+        MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
+        MachineHomingInstruction := 'HX0 - Offset benne inconnu';
     END_IF;
 ELSE
     MachineHomingStep := E_MachineHomingStep.VALID;

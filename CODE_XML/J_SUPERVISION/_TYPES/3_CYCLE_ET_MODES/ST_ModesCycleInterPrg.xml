@@ -531,20 +531,36 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart vitesse confirmé pendant timeout</xhtml>
               </documentation>
             </variable>
-            <variable name="CurrentCycleElapsed">
+            <variable name="CurrentCycleElapsed_Min">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée écoulée du cycle SEMI_AUTO en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Minutes écoulées du cycle SEMI_AUTO en cours</xhtml>
               </documentation>
             </variable>
-            <variable name="LastCycleDuration">
+            <variable name="CurrentCycleElapsed_S">
               <type>
-                <TIME />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée du dernier cycle SEMI_AUTO achevé (figée à X13)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Secondes écoulées du cycle SEMI_AUTO en cours (0..59)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Minutes du dernier cycle SEMI_AUTO achevé (figées à X13)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Secondes du dernier cycle SEMI_AUTO achevé (figées à X13, 0..59)</xhtml>
               </documentation>
             </variable>
             <variable name="DrainTimeRemaining">
@@ -571,20 +587,12 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Causes procede actives mais ignorees</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceStepPrepared">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible forcee preparee, commandes neutres</xhtml>
-              </documentation>
-            </variable>
             <variable name="ForceStepAccepted">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion preparation acceptee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion : consigne de forcage appliquee (saut d'etape effectif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepRejected">
@@ -592,7 +600,7 @@ M1 : contacteurs retombés</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion preparation refusee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion : consigne ecartee (cible hors plage enum, ou cycle inactif)</xhtml>
               </documentation>
             </variable>
             <variable name="ForceStepResult">
@@ -600,7 +608,7 @@ M1 : contacteurs retombés</xhtml>
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Motif accepte/refuse</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Motif de rejet de la derniere consigne (vide apres une consigne appliquee)</xhtml>
               </documentation>
             </variable>
             <variable name="BottomTouchConfirmed">

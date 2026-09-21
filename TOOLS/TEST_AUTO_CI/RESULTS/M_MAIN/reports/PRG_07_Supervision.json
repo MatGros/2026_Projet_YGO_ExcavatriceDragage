@@ -21,11 +21,47 @@
     {
       "name": "PRG_07_Supervision : T255-D limite basse cable M2 visible (alarme + action autorisee)",
       "passed": true
+    },
+    {
+      "name": "TC-T367-101 Demarrage a froid : campagne automatique une fois le transitoire E/S termine",
+      "passed": true
+    },
+    {
+      "name": "TC-T367-102 Campagne bornee : aucune quatrieme impulsion, arret definitif",
+      "passed": true
+    },
+    {
+      "name": "TC-T367-103 SECURITE : une cause encore Active reste latchee apres la campagne",
+      "passed": true
+    },
+    {
+      "name": "TC-T367-104 Fonctionnement etabli : aucune impulsion automatique",
+      "passed": true
+    },
+    {
+      "name": "TC-T367-105 Transitoire E/S non termine : aucune impulsion",
+      "passed": true
+    },
+    {
+      "name": "TC-T367-106 Rearmement AU : sequence observee puis front contacteur => campagne",
+      "passed": true
+    },
+    {
+      "name": "TC-T367-107 SECURITE : front du contacteur SANS sequence operateur => aucune impulsion",
+      "passed": true
+    },
+    {
+      "name": "TC-T367-108 Apres une campagne, une nouvelle campagne exige un nouveau geste operateur",
+      "passed": true
+    },
+    {
+      "name": "TC-T367-109 SECURITE : geste perime apres un armement echoue => aucune impulsion sur un front machine tardif",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 5,
-    "passed": 5,
+    "total": 14,
+    "passed": 14,
     "failed": 0
   }
 }

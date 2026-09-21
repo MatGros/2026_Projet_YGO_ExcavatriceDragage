@@ -40,23 +40,26 @@ la validité) — pas un générateur XML from-scratch.
 
 ```powershell
 python TOOLS\PLC_CSV_SNAPSHOT\scripts\generate_trace_template.py `
-  --template TOOLS\PLC_CSV_SNAPSHOT\RESULTS\trace\Suivi_Cycle_M3_20260906_49.trace `
   --var-file  TOOLS\PLC_CSV_SNAPSHOT\variable_lists\trace_cyclehoming_debug_v1.txt `
-  --record-name CycleHoming_Debug `
+  --record-name CycleHoming_Debug --no-trace-data `
   --output    tools_example.trace
 ```
+> Le modèle par défaut est un `.trace` **récent** (→ utiliser un modèle du même runtime que la cible).
+> Ajoute `--template <fichier.trace>` pour le choisir.
 
-- **Structure du format `.trace`** (config `<TraceConfiguration>` + `<TraceData>`, champs, ordre,
-  GUID d'archivage) : `docs/TRACE_FORMAT_T372.md` — preuve par lecture de 81 fichiers réels.
-- **Listes type** : `variable_lists/trace_cyclehoming_debug_v1.txt` (debug cycle homing),
+- **Structure du format `.trace`** + **règles de traçabilité** (STRING ❌, `[LOC]` ❌, ENUM/publies ✅) :
+  `docs/TRACE_FORMAT_T372.md` — le guide à lire.
+- **Liste type (42 variables traçables)** : `variable_lists/trace_cyclehoming_debug_v1.txt`
+  (debug cycle homing — symboles non traçables commentés `#`+raison). Autre liste :
   `scripts/examples/homing_machine_variables.txt`.
-- **Exemples générés** : `scripts/examples/Example_Homing_Machine.trace`,
-  `scripts/examples/Example_CycleHoming_Debug.trace`.
-- 🎨 **Couleurs auto** : chaque variable reçoit une couleur distincte, par thème (hue différente par
-  groupe, teintes voisines dans le même groupe). Déterministe.
-- ✅ **Import CODESYS confirmé** (test réel 2026-09-21) : import sans erreur d'un `.trace` généré.
-- ⚠️ **Reste non prouvé** : encodage d'un **trigger actif** (aucun `.trace` du dépôt n'en a).
-  `--selftest` vérifie l'identité byte-à-byte de la config.
+- **Exemples générés** : `scripts/examples/Example_CycleHoming_Debug.trace` (42 var., **import
+  confirmé**), `scripts/examples/Example_Homing_Machine.trace`.
+- 🎨 **Couleurs auto par thème** : hue par groupe, teintes voisines dans le groupe — déterministe.
+- ✅ **Import CODESYS confirmé** (test réel 2026-09-21) : une trace 42 var. (sans STRING ni locaux)
+  s'importe et s'enregistre sans erreur.
+- ⚠️ **`--selftest`** : vérifie l'identité byte-à-byte de la config. **Trigger actif** : non prouvé
+  (aucun `.trace` du dépôt n'en a) — best-effort. Ne PAS mettre de `STRING` ni de variable interne
+  `[LOC]` non publiée dans la liste (ils font échouer toute l'application, `Parameter 0x2`).
 
 ⚠️ Les CSV de `RESULTS/snapshot/` et `RESULTS/acquisition/` sont **trackés en Git** (historisation) —
 sans tri, ils s'accumulent indéfiniment. À la clôture d'une fiche de troubleshooting, la skill

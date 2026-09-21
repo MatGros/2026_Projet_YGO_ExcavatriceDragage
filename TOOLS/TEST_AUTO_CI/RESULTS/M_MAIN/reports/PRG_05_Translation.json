@@ -17,11 +17,19 @@
     {
       "name": "PRG_05_Translation : FdC Tremie LATCHE - un rebond capteur ne libere pas (guard REX MES 2026-09-04)",
       "passed": true
+    },
+    {
+      "name": "TC-P05-T345-01 (T345-L1) La perte de la demande n efface plus la cible deja qualifiee",
+      "passed": true
+    },
+    {
+      "name": "TC-P05-T345-02 (T345-L1) Bypass de fin de course M3 consomme uniquement en MAINT_N2",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 4,
-    "passed": 4,
+    "total": 6,
+    "passed": 6,
     "failed": 0
   }
 }

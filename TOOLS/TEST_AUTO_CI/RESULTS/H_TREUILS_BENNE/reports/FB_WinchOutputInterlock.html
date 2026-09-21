@@ -373,7 +373,7 @@
             <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-13 23:14:13</div>
+    <div class="exec-time">2026-09-20 21:24:57</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (11 tests)</summary>
@@ -2317,35 +2317,7 @@ END_IF;
     </details>
     <details>
         <summary>Sortie brute strucpp</summary>
-        <pre>STruC++ Test Runner v1.0
-
-test_fb_winchoutputinterlock.st
-  [PASS] TC-P10-012 Watchdog frein : BrakeCmd sans confirmation 500ms -&gt; bit0, RestartInhibit, FAULT ; pas de faux defaut au RestartRequired
-  [PASS] TC-P10-012bis Pas de faux defaut au RestartRequired : BrakeCmd retenu ne doit pas armer le watchdog
-         ASSERT_TRUE failed: FB.RELAYFWD expected TRUE, got FALSE
-         at test_fb_winchoutputinterlock.st:211
-         Message: Reautorisation -&gt; mouvement autorise
-  [FAIL] TC-P10-013 Defaut frein : latches preserves hors Enable, reautorisation complete
-  [PASS] TC-P10-020 Watchdog frein reel terrain : temps/contacteur/bobine
-         ASSERT_TRUE failed: FB.RELAYFWD expected TRUE, got FALSE
-         at test_fb_winchoutputinterlock.st:278
-         Message: Mouvement autorise -&gt; RelayFwd
-  [FAIL] TC-P10-021 Temps mort meme sens : 1s apres arret -&gt; nouvelle demande (DeadTimeSameDir)
-         ASSERT_TRUE failed: FB.RELAYFWD expected TRUE, got FALSE
-         at test_fb_winchoutputinterlock.st:336
-         Message: Mouvement montee -&gt; RelayFwd
-  [FAIL] TC-P10-022 Temps mort inversion : 1s apres arret + inversion sens (DeadTimeOppositeDir)
-  [PASS] TC-P10-039.1 Frein couple direct : BrakeCmd = RelayFwd OR RelayRev dans tous les etats
-         ASSERT_FALSE failed: FB.RELAYFWD expected FALSE, got TRUE
-         at test_fb_winchoutputinterlock.st:477
-         Message: Confirmation retombee -&gt; chute du sens (§3bis)
-  [FAIL] TC-P10-023a §3bis : sens maintenu apres chute de palier a 0 tant que contacteurs non confirmes, puis chute sur DropConfirmDelay
-  [PASS] TC-P10-023b §3bis : T_max atteint sans confirmation -&gt; chute du sens FORCEE + latch ContactorStuck
-  [PASS] TC-P10-023c §3bis : coupure dure (Enable=FALSE) pendant le maintien -&gt; RelayFwd=FALSE immediat
-  [PASS] TC-T216-FINAL-PERMIT Direction refusee coupe la barriere finale, direction autorisee passe
-
------------------------------------------
-11 tests, 7 passed, 4 failed
+        <pre>Error: C++ compilation failed:
 </pre>
     </details>
 </div>

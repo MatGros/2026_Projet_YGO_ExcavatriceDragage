@@ -24,15 +24,15 @@
      <TraceConfiguration> ... config des variables / trigger / axes ...
      <TraceData Version="1.0.0.0"> ... échantillons enregistrés (optionnel)
 
- NON PROUVÉ (signalé, pas deviné) :
-   - l'encodage d'un TRIGGER ACTIF (variable+condition+mode) : aucun des
-     81 .trace du dépôt n'a de trigger configuré (TriggerVariable vide,
-     TriggerEdge=None, TriggerFlags=Undefined partout). Un trigger demandé
-     est écrit en best-effort avec un avertissement — à valider contre un
-     fichier réel avec trigger avant utilisation en production.
-   - l'import CODESYS d'un <TraceData> vide : à vérifier humainement dans
-     l'IDE (agent sans accès CODESYS). Par défaut on émet un TraceData
-     vide ; `--keep-data` réutilise celui du modèle.
+ NON PROUVÉ / LIMITES (voir docs/TRACE_FORMAT_T372.md) :
+   - l'encodage d'un TRIGGER ACTIF (variable+condition+mode) : aucun des 81
+     .trace du dépôt n'a de trigger configuré -> écrit en best-effort avec
+     avertissement. À valider contre un .trace réel avec trigger.
+   - IMPORT RÉEL CONFIRMÉ (2026-09-21) : TraceData vide + config générée
+     s'importent. Non traçables (fait échouer toute l'application, Parameter
+     0x2) : les STRING et les variables internes [LOC] non publiées. Le
+     générateur ne filtre PAS la liste : c'est au fichier de liste de n'en
+     contenir que des traces (règles dans docs/TRACE_FORMAT_T372.md §4).
 
  Hors périmètre PLC : ne modifie AUCUN fichier CODE/.
 ==========================================================================
@@ -45,9 +45,11 @@ REF_SINGLE = '{8d42fb88-c20c-44ee-9563-111d64032744}'
 VAR_OPENER = '<Single Type="' + VAR_SINGLE + '"'   # ouverture complète du bloc variable
 REF_OPENER = '<Single Type="' + REF_SINGLE + '"'    # ouverture complète du bloc ReferencedVarGuid
 
+# Modèle par défaut : un .trace RÉCENT du même runtime que la cible —
+# leçon T372 (un vieux modèle peut être rejeté à l'application pour >1 var.).
 DEFAULT_TEMPLATE = os.path.join(
     os.path.dirname(__file__), '..', 'RESULTS', 'trace',
-    'Suivi_Cycle_M3_20260906_49.trace')
+    'Suivi_71_SIMU_M1M2_CycleMD_Bug_20260920.trace')
 
 
 # ------------------------------------------------------- couleurs par thème
@@ -235,7 +237,7 @@ def apply_trigger(cfg: str, args) -> str:
 
 # ---------------------------------------------------------------- core
 def generate(template_path: str, variables: list[str], record_name: str,
-             trigger=None, keep_data: bool = False) -> str:
+             trigger=None, keep_data: bool = False, no_trace_data: bool = False) -> str:
     txt = read_trace(template_path)
     ci = txt.find('<TraceConfiguration>')
     co = txt.find('</TraceConfiguration>')
@@ -313,8 +315,9 @@ def generate(template_path: str, variables: list[str], record_name: str,
     if trigger:
         new_cfg = apply_trigger(new_cfg, trigger)
 
-    # TraceData : par défaut on émet un TraceData vide ; --keep-data réutilise
-    # celui du modèle (config seule => import non vérifié, cf. docstring).
+    # TraceData : --keep-data réutilise celui du modèle ; par défaut un
+    # TraceData vide ; --no-trace-data l'OMET totalement (format du POC qui
+    # importait avec 12 var.). Config seule => cas d'import réels à tracer.
     after = suffix                      # suffix commence à '</TraceConfiguration>'
     if keep_data:
         new_txt = prefix + new_cfg + suffix
@@ -327,8 +330,11 @@ def generate(template_path: str, variables: list[str], record_name: str,
             head = after[:td]                                    # '</TraceConfiguration>' + blancs
             td_close = balanced_close(after, td)                 # après '</TraceData>' du modèle
             tail = after[td_close:]
-            new_txt = (prefix + new_cfg + head
-                       + '<TraceData Version="1.0.0.0"></TraceData>' + tail)
+            if no_trace_data:
+                new_txt = prefix + new_cfg + head + tail         # sans aucun TraceData
+            else:
+                new_txt = (prefix + new_cfg + head
+                           + '<TraceData Version="1.0.0.0"></TraceData>' + tail)
     return new_txt
 
 
@@ -364,6 +370,8 @@ def main():
     p.add_argument('--output', '-o', default=None, help='fichier .trace de sortie')
     p.add_argument('--keep-data', action='store_true',
                    help='réutilise les échantillons (TraceData) du modèle (défaut: vide)')
+    p.add_argument('--no-trace-data', action='store_true',
+                   help='omet totalement <TraceData> (format du POC 12 var. — test d\'import)')
     p.add_argument('--selftest', action='store_true',
                    help='régénère le modèle avec sa propre liste et vérifie '
                         'l\'identité byte-à-byte de la <TraceConfiguration>')
@@ -419,7 +427,8 @@ def main():
         trigger = args
 
     out = generate(args.template, variables, args.record_name,
-                   trigger=trigger, keep_data=args.keep_data)
+                   trigger=trigger, keep_data=args.keep_data,
+                   no_trace_data=args.no_trace_data)
 
     if args.output:
         write_trace(args.output, out)

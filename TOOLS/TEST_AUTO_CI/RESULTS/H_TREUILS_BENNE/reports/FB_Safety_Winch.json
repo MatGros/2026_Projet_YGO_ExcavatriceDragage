@@ -14,6 +14,14 @@
       }
     },
     {
+      "name": "TC-P10-054 T288 : retour collectif au repos sous commande 3s -> SafeStop seul",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-055 T288 : retour collectif engage sous commande 3s -> SafeStop seul",
+      "passed": true
+    },
+    {
       "name": "TC-P10-002 Meca B : non confirmation arret 3s -> SafeStop + PowerCutOff",
       "passed": true
     },
@@ -36,7 +44,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.SAFESTOP expected TRUE, got FALSE",
         "file": "test_fb_safety_winch.st",
-        "line": 202,
+        "line": 277,
         "message": "Ecart critique -> SafeStop (bit12 dans masque SafeStop)"
       }
     },
@@ -47,7 +55,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.POWERCUTOFF expected TRUE, got FALSE",
         "file": "test_fb_safety_winch.st",
-        "line": 239,
+        "line": 314,
         "message": "Escalade bit13 -> PowerCutOff (bit13 dans masque 16#2F84)"
       }
     },
@@ -58,7 +66,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.SAFESTOP expected TRUE, got FALSE",
         "file": "test_fb_safety_winch.st",
-        "line": 272,
+        "line": 347,
         "message": "Sens oppose 500ms -> SafeStop (bit14 dans masque)"
       }
     },
@@ -69,7 +77,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.SAFESTOP expected TRUE, got FALSE",
         "file": "test_fb_safety_winch.st",
-        "line": 306,
+        "line": 381,
         "message": "Absence mouvement 3s -> SafeStop (bit15 dans masque)"
       }
     },
@@ -80,7 +88,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.SAFESTOP expected TRUE, got FALSE",
         "file": "test_fb_safety_winch.st",
-        "line": 366,
+        "line": 441,
         "message": "Sens oppose -> SafeStop"
       }
     },
@@ -99,7 +107,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.FAULT.ERROR expected TRUE, got FALSE",
         "file": "test_fb_safety_winch.st",
-        "line": 448,
+        "line": 523,
         "message": "Precondition : Meca A latchee"
       }
     },
@@ -114,7 +122,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.POWERCUTOFF expected TRUE, got FALSE",
         "file": "test_fb_safety_winch.st",
-        "line": 538,
+        "line": 613,
         "message": "Cause masque 16#2F84 -> PowerCutOff produit (brique amont de la chaine)"
       }
     },
@@ -128,8 +136,8 @@
     }
   ],
   "summary": {
-    "total": 17,
-    "passed": 9,
+    "total": 19,
+    "passed": 11,
     "failed": 8
   }
 }

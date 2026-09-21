@@ -647,7 +647,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre ouverture benne palier 1 sans FDC soft (HX4)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre ouverture benne palier 1 sans FDC soft</xhtml>
               </documentation>
             </variable>
             <variable name="CmdBucketClose">
@@ -655,7 +655,15 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre fermeture benne palier 1 sans FDC soft (HX4)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre fermeture benne palier 1 sans FDC soft (HX1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdWinchSelect">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Override selecteur treuil cycle homing (-1=neutre, 0=couple, 2=benne)</xhtml>
               </documentation>
             </variable>
           </struct>

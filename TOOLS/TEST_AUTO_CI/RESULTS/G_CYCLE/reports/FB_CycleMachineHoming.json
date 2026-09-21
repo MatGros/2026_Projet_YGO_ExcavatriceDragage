@@ -7,11 +7,11 @@
       "passed": true
     },
     {
-      "name": "TC-P09-H002 : auto-armement HX0 -> HX1 en maintenance non-homed",
+      "name": "TC-P09-H002 : maintien repos au boot, refus hors N2, et initiation HX0 -> HX1 sur StartRequest en N2",
       "passed": true
     },
     {
-      "name": "TC-P09-H003 : HX1 fermeture benne sous permis et timeout 8s",
+      "name": "TC-P09-H003 : HX1 fermeture benne sans timeout intempestif et abandon sur perte mode N2",
       "passed": true
     },
     {
@@ -53,11 +53,19 @@
     {
       "name": "TC-P09-H013 : HomingError axe -> HX7_FAILED et sortie uniquement sur Reset en MAINT_N2",
       "passed": true
+    },
+    {
+      "name": "TC-P09-H014 : Echec Mode A au vol -> repli automatique Mode B a l arret -> reference valide",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H015 : HX5 joystick maintenu >30s -> pas d echec HX7, validation nominale au retour neutre",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 13,
-    "passed": 13,
+    "total": 15,
+    "passed": 15,
     "failed": 0
   }
 }

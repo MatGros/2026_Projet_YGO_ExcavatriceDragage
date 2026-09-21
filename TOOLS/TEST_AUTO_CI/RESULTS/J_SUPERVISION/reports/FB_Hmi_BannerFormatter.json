@@ -127,11 +127,27 @@
     {
       "name": "TC-P07-044 T255-D ancre : hors mode de marche, le prerequis de mode prime sur la remontee",
       "passed": true
+    },
+    {
+      "name": "TC-T359-004 Fenetre de rearmement : les pertes de liaison transitoires ne sont PAS affichees",
+      "passed": true
+    },
+    {
+      "name": "TC-T359-005 Borne du masquage : un defaut reseau durable EST affiche des la fin de la fenetre",
+      "passed": true
+    },
+    {
+      "name": "TC-T359-006 Non-regression safety : la cause AU reste prioritaire, jamais masquee",
+      "passed": true
+    },
+    {
+      "name": "T368-001 : bandeau mode porteur du temps ecoule, uniquement pendant un cycle en cours",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 24,
-    "passed": 20,
+    "total": 28,
+    "passed": 24,
     "failed": 4
   }
 }
