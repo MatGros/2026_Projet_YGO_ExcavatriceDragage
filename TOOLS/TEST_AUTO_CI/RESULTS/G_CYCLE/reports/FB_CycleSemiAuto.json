@@ -7,6 +7,26 @@
       "passed": true
     },
     {
+      "name": "T345-L2-001 : arrivee AX14 neutre, puis nouveau push autorise AX15B",
+      "passed": true
+    },
+    {
+      "name": "T345-L2-002 : push Y maintenu a l arrivee passe AX15A mais reste bloque avant neutre",
+      "passed": true
+    },
+    {
+      "name": "T345-L2-003 : diagonale X plus Y maintenue ne contourne pas le neutre AX15A",
+      "passed": true
+    },
+    {
+      "name": "T345-L2-004 : forcage repete cible 15 efface un latch neutre precedent",
+      "passed": true
+    },
+    {
+      "name": "T345-L2-005 : non regression AX2 vers AX3 conserve le geste PushOnly existant",
+      "passed": true
+    },
+    {
       "name": "T262-003 AX10B : timeout M1 borne a 2 s puis repli sans redemarrage implicite",
       "passed": true
     },
@@ -85,7 +105,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 721,
+        "line": 886,
         "message": "Etabli en AX4_DESCEND_DIVING"
       }
     },
@@ -96,7 +116,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 869,
+        "line": 1034,
         "message": "Etabli en AX4_DESCEND_DIVING"
       }
     },
@@ -107,7 +127,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 957,
+        "line": 1122,
         "message": "Etabli en X4"
       }
     },
@@ -118,7 +138,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 1048,
+        "line": 1213,
         "message": "Etabli en X4"
       }
     },
@@ -133,7 +153,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.TRANSLATIONCMD.REQSTART expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 1217,
+        "line": 1382,
         "message": "X2 : translation vers cible commandee"
       }
     },
@@ -184,11 +204,15 @@
     {
       "name": "TC-T358-004 : un Abandon du meme scan neutralise la consigne de forcage",
       "passed": true
+    },
+    {
+      "name": "T368-002 : message AX13 porteur du temps restant d egouttage, non fige",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 37,
-    "passed": 32,
+    "total": 43,
+    "passed": 38,
     "failed": 5
   }
 }

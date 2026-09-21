@@ -1,0 +1,137 @@
+contract:
+  task_id: T345_L2_AX14_AX15A_INSTANTANEE
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    A l'arrivee tremie confirmee, AX14 passe immediatement en AX15A sans attendre
+    le retour du joystick au neutre, tandis qu'un verrou inter-scan interdit AX15B
+    et toute ouverture de benne jusqu'a l'observation d'un neutre reel en AX15A,
+    suivie d'un nouveau geste pousse sous homme-mort.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        En AX14, Translation_At_Tremie=TRUE et TranslationStopTimer.Q=TRUE font
+        passer l'etat a AX15A meme si JoystickDeflected=TRUE.
+      verified_by: >
+        Test PLC T345-L2-001 avec Translation_Busy=FALSE et horloge avancee au-dela
+        des 500 ms du TON; rouge avant correctif, vert apres.
+    - id: AC2
+      statement: >
+        Toute entree normale dans AX15A remet SeenNeutralAfterArrival a FALSE;
+        tant qu'aucun scan AX15A n'a vu NOT JoystickDeflected, l'etat reste AX15A
+        et BucketCmd.ReqOpen, les deux RunRequest treuils et TranslationCmd.ReqStart
+        restent FALSE, y compris avec Y pousse ou diagonale X+Y maintenue.
+      verified_by: >
+        Tests PLC T345-L2-002 et T345-L2-003, assertions scan par scan sur CycleStep,
+        BucketCmd, WinchM1Cmd, WinchM2Cmd et TranslationCmd.
+    - id: AC3
+      statement: >
+        Un scan neutre en AX15A memorise SeenNeutralAfterArrival sans autoriser AX15B
+        dans ce meme scan; un push ulterieur sous homme-mort autorise AX15B, puis
+        ReqOpen apparait uniquement au scan d'execution AX15B.
+      verified_by: >
+        Test PLC T345-L2-001, sequence entree AX15A, scan neutre, nouveau push,
+        puis scan AX15B.
+    - id: AC4
+      statement: >
+        Un forçage accepte vers la cible 15 remet SeenNeutralAfterArrival a FALSE,
+        y compris lors d'une reentree depuis AX15B ou d'un forçage repete; un push
+        deja actif ne peut donc pas enchainer AX15B sans neutre intermediaire.
+      verified_by: >
+        Test PLC T345-L2-004 avec StepForceTgt=15, push actif avant et apres le
+        scan de forçage, puis neutre et nouveau push.
+    - id: AC5
+      statement: >
+        Tant que SeenNeutralAfterArrival=FALSE, AX15A publie une attente explicite
+        de relachement; apres neutre observe, le guide operateur demande de pousser
+        pour ouvrir.
+      verified_by: >
+        Assertions PLC sur WaitingForOperator et OperatorAction dans les cas
+        T345-L2-001 a T345-L2-004.
+    - id: AC6
+      statement: >
+        AX2 vers AX3, TranslationStopTimer et ArrivalStopConfirmed ne sont pas
+        modifies par ce lot.
+      verified_by: >
+        Test PLC T345-L2-005 et diff cible; occurrences du timer et d'AX2 comparees
+        au baseline. ArrivalStopConfirmed reste absent du diff.
+    - id: AC7
+      statement: >
+        Le nom du fichier reste identique au POU FB_CycleSemiAuto et le bundle le
+        genere en langage ST, sans renommage ni nouveau POU.
+      verified_by: >
+        Bundle frais, diff bundle FB_CycleSemiAuto et G200_check_linkage.py --report.
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FB_CycleSemiAuto.html
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FB_CycleSemiAuto.json
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FB_CycleSemiAuto_test.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T345_L2_AX14_AX15A_INSTANTANEE.yaml
+      - TOOLS/AGENT_WORKFLOW/status/
+      - CODE_XML/
+    forbidden:
+      - CODE/G_CYCLE/FB_CycleMachineHoming.st
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - TOOLS/AGENT_WORKFLOW/scripts/
+
+  conservation:
+    must_survive:
+      - "Delta T368 preexistant dans FB_CycleSemiAuto.st lignes AX13 et son test CI, preserve a l'octet fonctionnel et jamais attribue a T345-L2."
+      - "TranslationStopTimer et sa temporisation de 500 ms restent inchanges."
+      - "AX2/AX3 restent inchanges."
+      - "Le mapping, la validation, l'inhibition et la neutralisation du forçage de step restent inchanges; seul le reset du nouveau verrou est ajoute pour la cible 15 acceptee."
+      - "ArrivalStopConfirmed reste intact et hors lot."
+    dropped_on_purpose:
+      - "L'exigence NOT JoystickDeflected sur la transition AX14 vers AX15A est retiree volontairement."
+
+  evidence_required:
+    - check_task_contract PASS avant code
+    - CI rouge avant puis vert apres sur T345-L2-001 a T345-L2-005
+    - diff reel distinguant T368 preexistant et T345-L2
+    - bundle complet frais et diff bundle FB_CycleSemiAuto
+    - G200_check_linkage.py --report
+    - gates palier C avec tout rouge hors lot nomme
+
+  models_allowed:
+    - "gpt-5.6-terra (CDX01)"
+
+  alert_duty: >
+    Toute collision, derive de scope ou regression de securite est signalee avant
+    correction. Aucun fichier hors scope n'est modifie et aucun commit ou push n'est execute.
+
+status: IMPLEMENTED_WITH_ALERTS
+
+execution:
+  executed_by: "gpt-5.6-terra (CDX01)"
+  completed_at: "2026-09-21T14:22:37+02:00"
+  status: PASS_WITH_BASELINE_FAILURES
+  summary: >
+    Correctif et tests T345-L2 implementes sans commit. Les cinq tests T345-L2
+    passent; la suite FB_CycleSemiAuto reste a 38/43 avec les cinq memes echecs
+    historiques qu'avant le correctif. Le palier C termine a 54/59, avec cinq
+    gates globaux hors perimetre encore rouges.
+  evidence_submitted:
+    - "check_task_contract: PASS (0 erreur, 0 avertissement)"
+    - "CI avant: 34/43; T345-L2-001 a -004 rouges, -005 vert; cinq echecs historiques"
+    - "CI apres: 38/43; T345-L2-001 a -005 verts; memes cinq echecs historiques"
+    - "G517 et son selftest: PASS (19/19 mutations)"
+    - "Bundle complet: 261/261 objets, 0 erreur; G390 frais"
+    - "Diff bundle: FB_CycleSemiAuto uniquement; inclut aussi le delta T368 preexistant du meme POU"
+    - "G200: PASS, 0 erreur, 1681 avertissements, 2048 instances verifiees"
+    - "Palier C: 54/59; echecs hors lot G300, G340, G430, G483 et G521"
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Validation orchestrateur et recette humaine requises."
