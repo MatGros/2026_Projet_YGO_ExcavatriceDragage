@@ -375,3 +375,143 @@ END_VAR
     END_FOR;
     ASSERT_GT(fb.PositionEstimatedM, 0.005, 'TC-P11-EST-007 : apres le blip la position repart vers la Maintenance');
 END_TEST
+
+(* =========================================================================
+   T361 VOLET B — TEMOIN D'ANOMALIE DE RECALAGE (observer, JAMAIS bloquer)
+   =========================================================================
+   DECISION UTILISATEUR 2026-09-21 : 5 capteurs conserves, recalage TOUJOURS applique,
+   AUCUNE zone morte (la decision Q2 du lot T333 reste la regle : recaler sans garde tant
+   que T301 n'a pas calibre le gain), et un simple TEMOIN lorsque la correction depasse
+   CST_RecalibrationAnomalyM = 0,50 m.
+   Ces cas verrouillent les DEUX moities de l'invariant :
+     - le temoin se leve quand la correction est grande (ANOM-002) ;
+     - la correction est APPLIQUEE malgre le temoin (ANOM-002, position recalee) ;
+     - le temoin est un PULSE, pas un latch (ANOM-003) ;
+     - un petit ecart reste recale SANS temoin (ANOM-004 = scenario du blip de 2 cm,
+       exactement ce qu'une bande morte aurait casse).
+   Le gate G520 interdit statiquement que ce seuil devienne une condition du recalage. *)
+
+TEST 'TC-T361-ANOM-001 Correction ordinaire sous le seuil : temoin NON leve'
+VAR
+    fb : FB_Translation_PositionEstimator;
+    i  : INT;
+END_VAR
+    fb.Enable := TRUE;
+    fb.PersistedInitialized := TRUE;
+    fb.PersistedPositionM := 0.0;
+    fb.ReqMaintenance := TRUE;
+    fb.DriveActualFreqHz := 40.0;
+    fb.GainMetersPerHzSec := 0.008333;   (* gain pose explicitement : le cas ne depend pas du defaut *)
+    fb.PosPVM := 5.0;
+    fb.SensorTremie := TRUE;
+    fb.SensorPV := TRUE;
+    fb.SensorP2 := TRUE;
+    fb.SensorP1 := TRUE;
+    fb.SensorMaintenance := TRUE;
+    ADVANCE_TIME(10000000);
+    fb();                                 (* 1er scan utile : aucun recalage *)
+    fb.SensorTremie := FALSE;             (* depart Tremie : recalage a la cote 0,0 m *)
+    ADVANCE_TIME(10000000);
+    fb();
+    ASSERT_TRUE(fb.Recalibrated, 'TC-T361-ANOM-001 : recalage au depart Tremie');
+    ASSERT_FALSE(fb.RecalibrationAnomaly, 'TC-T361-ANOM-001 : ecart nul -> aucun temoin');
+
+    (* Roule jusqu'a la cote PV : 1500 scans a 3,33 mm = 4,9998 m -> l'odometrie est
+       quasiment JUSTE au franchissement, c'est le regime nominal. *)
+    FOR i := 1 TO 1500 DO
+        fb();
+    END_FOR;
+    ASSERT_FALSE(fb.Recalibrated, 'TC-T361-ANOM-001 : hors front -> aucun recalage');
+    fb.SensorPV := FALSE;                 (* front descendant PV : cote 5,0 m *)
+    ADVANCE_TIME(10000000);
+    fb();
+    ASSERT_TRUE(fb.Recalibrated, 'TC-T361-ANOM-001 : recalage au franchissement PV');
+    ASSERT_NEAR(fb.PositionEstimatedM, 5.0, 0.005, 'TC-T361-ANOM-001 : position recalee a 5,0 m');
+    ASSERT_FALSE(fb.RecalibrationAnomaly, 'TC-T361-ANOM-001 : correction < 0,50 m -> temoin NON leve');
+    ASSERT_LT(fb.RecalibrationCorrectionM, 0.05, 'TC-T361-ANOM-001 : correction nominale ~2 mm');
+END_TEST
+
+TEST 'TC-T361-ANOM-002 Correction ANORMALE : temoin leve ET correction quand meme APPLIQUEE'
+VAR
+    fb : FB_Translation_PositionEstimator;
+END_VAR
+    (* Scenario d'incident : le gain configure est faux (cas 0,02 vs 0,0551, alerte T361), la
+       position persistee est 10,0 m alors que le chariot franchit reellement P1 a 20,0 m.
+       La correction vaut 10,0 m : elle doit etre APPLIQUEE (le capteur est la meilleure
+       reference absolue disponible) ET SIGNALEE. Refuser la correction laisserait une
+       position fausse ET non corrigee — c'est l'erreur que ce cas interdit. *)
+    fb.Enable := TRUE;
+    fb.PersistedInitialized := TRUE;
+    fb.PersistedPositionM := 10.0;
+    fb.PosP1M := 20.0;
+    ADVANCE_TIME(10000000);
+    fb();
+    ASSERT_FALSE(fb.Recalibrated, 'TC-T361-ANOM-002 : 1er scan utile -> aucun recalage');
+    fb.SensorP1 := TRUE;                  (* front montant P1 *)
+    ADVANCE_TIME(10000000);
+    fb();
+    ASSERT_TRUE(fb.Recalibrated, 'TC-T361-ANOM-002 : recalage sur P1');
+    ASSERT_NEAR(fb.PositionEstimatedM, 20.0, 0.005,
+        'TC-T361-ANOM-002 : CORRECTION APPLIQUEE malgre le temoin (invariant du lot)');
+    ASSERT_TRUE(fb.RecalibrationAnomaly, 'TC-T361-ANOM-002 : ecart de 10,0 m > 0,50 m -> temoin leve');
+    ASSERT_NEAR(fb.RecalibrationCorrectionM, 10.0, 0.005, 'TC-T361-ANOM-002 : amplitude publiee 10,0 m');
+END_TEST
+
+TEST 'TC-T361-ANOM-003 Le temoin est un PULSE, l amplitude est MAINTENUE'
+VAR
+    fb : FB_Translation_PositionEstimator;
+END_VAR
+    fb.Enable := TRUE;
+    fb.PersistedInitialized := TRUE;
+    fb.PersistedPositionM := 10.0;
+    fb.PosP1M := 20.0;
+    ADVANCE_TIME(10000000);
+    fb();
+    fb.SensorP1 := TRUE;
+    ADVANCE_TIME(10000000);
+    fb();
+    ASSERT_TRUE(fb.RecalibrationAnomaly, 'TC-T361-ANOM-003 : precondition : temoin leve au recalage');
+
+    ADVANCE_TIME(10000000);
+    fb();                                  (* scan suivant : aucun front *)
+    ASSERT_FALSE(fb.Recalibrated, 'TC-T361-ANOM-003 : hors front -> aucun recalage');
+    ASSERT_FALSE(fb.RecalibrationAnomaly, 'TC-T361-ANOM-003 : temoin a PULSE -> retombe au scan suivant');
+    ASSERT_NEAR(fb.RecalibrationCorrectionM, 10.0, 0.005,
+        'TC-T361-ANOM-003 : l amplitude de la derniere correction est MAINTENUE (lecture trace/IHM)');
+END_TEST
+
+TEST 'TC-T361-ANOM-004 Blip de 2 cm : recale SANS temoin (aucune zone morte)'
+VAR
+    fb : FB_Translation_PositionEstimator;
+    i  : INT;
+END_VAR
+    (* Rejoue le scenario du blip Tremie de TC-P11-EST-007 : un ecart de ~2 cm est RECALE.
+       C'est la preuve qu'aucune bande morte n'a ete introduite — une bande morte a 0,05 m
+       aurait supprime ce recalage et fait echouer la decision Q2 du lot T333. *)
+    fb.Enable := TRUE;
+    fb.PersistedInitialized := TRUE;
+    fb.PersistedPositionM := 0.0;
+    fb.ReqMaintenance := TRUE;
+    fb.DriveActualFreqHz := 40.0;
+    fb.GainMetersPerHzSec := 0.008333;
+    fb.SensorTremie := TRUE;
+    fb.SensorPV := TRUE;
+    fb.SensorP2 := TRUE;
+    fb.SensorP1 := TRUE;
+    fb.SensorMaintenance := TRUE;
+    ADVANCE_TIME(10000000);
+    fb();
+    fb.SensorTremie := FALSE;              (* depart Tremie *)
+    ADVANCE_TIME(10000000);
+    fb();
+    FOR i := 1 TO 5 DO
+        fb();
+    END_FOR;
+    ASSERT_GT(fb.PositionEstimatedM, 0.005, 'TC-T361-ANOM-004 : le chariot s est eloigne avant le blip');
+    fb.SensorTremie := TRUE;               (* BLIP : la Tremie se reactive 1 scan *)
+    ADVANCE_TIME(10000000);
+    fb();
+    ASSERT_TRUE(fb.Recalibrated, 'TC-T361-ANOM-004 : blip -> recalage APPLIQUE (aucune zone morte)');
+    ASSERT_NEAR(fb.PositionEstimatedM, 0.0, 0.005, 'TC-T361-ANOM-004 : ancrage a la cote Tremie');
+    ASSERT_FALSE(fb.RecalibrationAnomaly, 'TC-T361-ANOM-004 : 2 cm < 0,50 m -> aucun temoin');
+END_TEST

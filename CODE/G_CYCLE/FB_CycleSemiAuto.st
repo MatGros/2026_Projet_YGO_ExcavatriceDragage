@@ -1636,7 +1636,7 @@ CASE State OF
             WaitingForOperator := NOT JoystickDeflected;
             WaitingForProcess := JoystickDeflected;
             OperatorActionId := 16#0402;
-            OperatorAction := 'AX2 - M3 au-dela de P1 : pousser vers la tremie (gauche) pour retrouver P1.';
+            OperatorAction := 'AX2 - M3 au-dela de P1 : pousser vers tremie (gauche) jusqu a P1.';
             TranslationCmd.PositionTgt := 1;      // sens retour vers Trémie
             TranslationCmd.ReqStart := TranslationTremiePermit;
         ELSE

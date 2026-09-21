@@ -46,6 +46,15 @@ VAR_OUTPUT
     Initialized          : BOOL;   (* <-- [STAT] Exposé pour recopie persistante côté appelant *)
     Recalibrated         : BOOL;   (* <-- [STAT] Pulse 1 cycle lors d'un recalage sur capteur *)
     RecalibratedSensorId : INT;    (* <-- [DIAG] 0=Maint, 1=P1, 2=P2, 3=PV, 4=Trémie, -1=Aucun *)
+    (* T361 — TÉMOIN D'ANOMALIE DE RECALAGE. Pulse 1 cycle lorsque la correction effectivement
+       appliquée dépasse CST_RecalibrationAnomalyM. La correction est APPLIQUÉE dans tous les cas :
+       ce signal ne conditionne jamais l'affectation de PositionEstimatedM et n'est jamais un
+       verrou (voir §2bis et le gate G520). *)
+    RecalibrationAnomaly : BOOL;   (* <-- [DIAG] Recalage de ce scan au-delà du seuil de plausibilité *)
+    (* Amplitude de la DERNIÈRE correction appliquée (valeur absolue, mètres). Maintenue entre deux
+       recalages pour rester lisible par une IHM ou une trace lente : c'est le pendant mesuré du
+       témoin RecalibrationAnomaly. *)
+    RecalibrationCorrectionM : REAL;   (* <-- [DIAG] |PositionEstimatedM - position avant recalage| *)
 END_VAR
 
 VAR
@@ -62,6 +71,24 @@ VAR
     CycleTimeCalc         : FB_CycleTime;   (* * [INST] Mesure temps de cycle *)
     ColdStart             : BOOL := TRUE;  (* . [LOC] Seed unique depuis Persisted* au premier scan utile *)
     FirstScanDone         : BOOL := FALSE; (* . [LOC] Vrai après le 1er scan utile : les capteurs déjà présents à l'init ne sont pas des franchissements *)
+    (* T361 — Position AVANT tout recalage de ce scan : sert à MESURER la correction réellement
+       appliquée (§2bis), sans toucher à la chaîne de recalage elle-même. *)
+    PositionBeforeM       : REAL;          (* . [LOC] Position estimée avant recalage du scan courant *)
+END_VAR
+
+VAR CONSTANT
+    (* T361 — SEUIL D'ANOMALIE DE RECALAGE (m). AU-DELÀ : correction appliquée + anomalie publiée.
+       0,50 m = 5 % de l'écart maximal entre deux repères absolus (10,0 m : PV->P2 et
+       P1->Maintenance) : au-delà, l'erreur de gain dépasse 5 %, niveau auquel le gain provisoire
+       GVL_PERSISTENT._TranslationGainMetersPerHzSec (0,02 m/(Hz.s), NON CALIBRÉ — T301 en attente)
+       doit être remis en cause. ⚠️ Ce seuil n'est PAS une garde : c'est un témoin.
+       DÉCISION UTILISATEUR 2026-09-21 : 5 capteurs, recalage TOUJOURS appliqué, signal d'anomalie
+       seul — aucune zone morte, aucun blocage (la décision Q2 du lot T333 « recaler SANS garde tant
+       que T301 n'a pas calibré le gain » reste la règle).
+       NE COUVRE PAS l'acquisition de la référence initiale (branche « NOT Initialized ») : c'est une
+       amorce unique, pas la correction d'une dérive odométrique — la signaler ferait apparaître une
+       anomalie à chaque premier démarrage après intervention. *)
+    CST_RecalibrationAnomalyM : REAL := 0.50;
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -70,6 +97,7 @@ END_VAR
 IF NOT Enable THEN
     Recalibrated := FALSE;
     RecalibratedSensorId := -1;
+    RecalibrationAnomaly := FALSE;
     // 🔒 Sorties odométriques VOLONTAIREMENT conservées hors Enable (AC3 / persistance continue RETAIN) :
     // - PositionEstimatedM & Initialized : estimation odométrique et référence absolue maintenues pour ne pas perdre la position M3 hors Enable
     RETURN;
@@ -83,6 +111,7 @@ END_IF;
 
 CycleTimeCalc(DefaultValueS := 0.010);
 Recalibrated := FALSE;
+RecalibrationAnomaly := FALSE;   (* T361 : témoin à pulse, remis à zéro à chaque scan comme Recalibrated *)
 {endregion}
 
 {region "§2 Fronts capteurs"}
@@ -109,6 +138,7 @@ TrigMaintenance(CLK := SensorMaintenance);    TrigDnMaintenance(CLK := SensorMai
 //    Ordre de priorité inchangé (Maintenance -> P1 -> P2 -> PV -> Trémie) : sur un mot
 //    thermomètre une seule bascule survient par scan, la priorité ne départage donc qu'un mot
 //    incohérent (capteur collé / parasite), cas déjà surveillé par le décodeur (Incoherent).
+PositionBeforeM := PositionEstimatedM;   (* T361 : référence de mesure, AVANT tout recalage de ce scan *)
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
 ELSE
@@ -133,6 +163,21 @@ ELSE
         Recalibrated := TRUE;
         RecalibratedSensorId := 4;
     END_IF;
+END_IF;
+
+// 2bis. T361 — TÉMOIN D'ANOMALIE DE RECALAGE : OBSERVER, JAMAIS BLOQUER.
+// Le recalage ci-dessus est TOUJOURS appliqué, sans condition : le capteur franchi reste la
+// meilleure référence absolue disponible, et refuser la correction laisserait une position FAUSSE
+// ET NON CORRIGÉE. Ce bloc ne fait que MESURER la correction effectivement appliquée et PUBLIER
+// l'anomalie au-delà de CST_RecalibrationAnomalyM — c'est précisément ce qui a manqué sur la trace
+// Suivi_74 : des sauts de 4,53 à 9,12 m (audit T360) qui n'ont été vus qu'en post-mortem.
+// 🔒 Le seuil ci-dessous ne doit JAMAIS devenir une condition des affectations `PositionEstimatedM`
+// du bloc 2 : ce serait refuser un recalage légitime, l'erreur exacte que le gate G520 interdit.
+// La décision Q2 du lot T333 (recaler sans garde tant que T301 n'a pas calibré le gain) reste la
+// règle — l'anomalie est un témoin de diagnostic, pas un verrou.
+IF Recalibrated THEN
+    RecalibrationCorrectionM := ABS(PositionEstimatedM - PositionBeforeM);
+    RecalibrationAnomaly := RecalibrationCorrectionM > CST_RecalibrationAnomalyM;
 END_IF;
 
 // 3. Initialisation au tout premier démarrage sur le premier capteur actif vu (si non initialisé)
