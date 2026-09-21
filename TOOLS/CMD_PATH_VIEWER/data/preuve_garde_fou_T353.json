@@ -1,0 +1,67 @@
+{
+ "horodatage": "2026-09-21T03:25:49+02:00",
+ "head": "c9e1fbfeff460a4bb6065f37efb80d5e574d8772",
+ "perimetre_ecriture": "TOOLS/CMD_PATH_VIEWER/ uniquement (contrat T353)",
+ "fichiers_cites_modifies_dans_le_depot": false,
+ "volets": {
+  "A_memoire_fichiers_reels": [
+   {
+    "fichier": "TOOLS/AGENT_WORKFLOW/config/Device_IO_20260918.csv",
+    "blob_consigne": "18c75783a18856a1d4450c82624ceccbefe4f324",
+    "avant": "18c75783a18856a1d4450c82624ceccbefe4f324",
+    "pendant": "1e2a0bc0801bfcce96ee1f0f5843968fc8b1f9b9",
+    "apres": "18c75783a18856a1d4450c82624ceccbefe4f324",
+    "brut_pendant": "130402cf2506b3eaad08c944cce70db1ac4b112a",
+    "crlf_pendant": 571,
+    "etat_avant": "VERT",
+    "etat_pendant": "ROUGE",
+    "etat_apres": "VERT",
+    "git_hash_object_avant": "18c75783a18856a1d4450c82624ceccbefe4f324",
+    "git_hash_object_apres": "18c75783a18856a1d4450c82624ceccbefe4f324",
+    "fichier_reel_intact": true
+   },
+   {
+    "fichier": "CODE/M_MAIN/PRG_04_Treuils_Benne.st",
+    "blob_consigne": "31760d59b4e09b03a8e91b2358f8804a6b1985ad",
+    "avant": "31760d59b4e09b03a8e91b2358f8804a6b1985ad",
+    "pendant": "fa6e6134293add37feaeb348cc303278d8765106",
+    "apres": "31760d59b4e09b03a8e91b2358f8804a6b1985ad",
+    "brut_pendant": "2daf0e8e16b28d6f992ba8c4ecf75a39d637ba5e",
+    "crlf_pendant": 1982,
+    "etat_avant": "VERT",
+    "etat_pendant": "ROUGE",
+    "etat_apres": "VERT",
+    "git_hash_object_avant": "31760d59b4e09b03a8e91b2358f8804a6b1985ad",
+    "git_hash_object_apres": "31760d59b4e09b03a8e91b2358f8804a6b1985ad",
+    "fichier_reel_intact": true
+   }
+  ],
+  "B_sur_disque": {
+   "cible": "TOOLS/CMD_PATH_VIEWER/git-blob-sha1.js",
+   "blob_consigne": "7b1b1d730f34a994610b25ec18e7bc9ba2319c1c",
+   "etats": [
+    {
+     "etat": "AVANT",
+     "blob_outil": "7b1b1d730f34a994610b25ec18e7bc9ba2319c1c",
+     "blob_git": "7b1b1d730f34a994610b25ec18e7bc9ba2319c1c",
+     "verdict": "VERT"
+    },
+    {
+     "etat": "PENDANT",
+     "blob_outil": "3a92a4300d309a20c3c4203425bcf35052508ab5",
+     "blob_git": "3a92a4300d309a20c3c4203425bcf35052508ab5",
+     "verdict": "ROUGE"
+    },
+    {
+     "etat": "APRÈS",
+     "blob_outil": "7b1b1d730f34a994610b25ec18e7bc9ba2319c1c",
+     "blob_git": "7b1b1d730f34a994610b25ec18e7bc9ba2319c1c",
+     "verdict": "VERT"
+    }
+   ],
+   "restauration_complete": true,
+   "blob_final_egal_initial": true
+  }
+ },
+ "verdict": "PASS"
+}

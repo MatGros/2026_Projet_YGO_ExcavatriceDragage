@@ -1,0 +1,370 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T353 « Outil web interactif : choisir un geste joystick
+# et voir le chemin exact parcouru dans le code (PRG, FB, variables) »
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# Origine : DOC/WFLOW/CONTRACTS/BRIEF_T353_OUTIL_WEB_CARTOGRAPHIE_INTERACTIVE.md
+#           (brief non suivi, NON modifie par ce lot)
+# Parent : T351 (DSH18) — cartographie statique M1/M2, lue en LECTURE SEULE
+# Sources de donnees (LECTURE SEULE, blob a l'ecriture du contrat) :
+#   DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_TREUILS_JoystickContacteur_20260921.md
+#     blob aeaac5dd285618f80a0479dbb3ba81a0e6fe7001 — 786 l — non suivi dans Git
+#   DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md
+#     blob 2ea84800602ea530698c4a220f88ad48e3b7fd8f — 789 l — modifie non committe
+#   DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T351_ANNEXE_M3_TrousT334_20260921.md
+#     blob 20bfada06fc56a9fa10f432cd48272f203ed3b95 — 606 l — non suivi dans Git
+# Revision figee a l'ecriture : HEAD = c9e1fbfe
+#   ⚠️ Les blocs d'ancrage de T351 et de l'annexe declarent HEAD 065591fb : HEAD
+#   a bouge DEPUIS, ce qui n'invalide PAS leurs ancrages (ils sont par blob, pas
+#   par commit). C'est precisement le principe que l'outil doit implementer.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T353_OUTIL_WEB_CARTOGRAPHIE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Au lieu de relire a chaque diagnostic deux fiches Markdown de plusieurs
+    centaines de lignes, l'utilisateur ouvre un outil web local, choisit une
+    chaine de commande (treuils M1/M2 manuel, treuils M1/M2 cycle, translation
+    M3 manuel, translation M3 cycle) et un sens de geste, et voit s'afficher le
+    chemin exact parcouru — variable par variable, dans l'ordre chronologique,
+    avec le producteur et le consommateur en fichier:ligne — sachant a chaque
+    instant si ces numeros de ligne sont encore valides, car l'outil compare le
+    blob SHA de chaque fichier cite a celui consigne par le document source et
+    signale en rouge tout fichier dont le contenu a bouge.
+
+  acceptance:
+    - id: AC1
+      statement: "Le parseur TOOLS/CMD_PATH_VIEWER/parse_cartographies.py lit les 3 documents source et produit un format pivot JSON ; les 202 lignes de chaine reellement definies par les documents (66 codes M + 35 codes C dans la fiche treuils, idem dans T334) sont toutes parsees, ou chaque ligne non parsable est listee avec son code, son document d'origine et le motif de rejet. Le taux est chiffre (lignes parsees / lignes totales), jamais estime."
+      verified_by: "Execution du parseur, puis lecture du rapport de taux et comptage independant dans le JSON produit : nombre de maillons par document et par chaine. Un rejet silencieux est un echec du critere."
+
+    - id: AC2
+      statement: "Chaque reference fichier:ligne extraite est resolue vers un chemin de fichier REEL, ou classee NON_RESOLUE avec son texte brut conserve : les 4 formes rencontrees dans les sources sont traitees (chemin complet code/M_MAIN/PRG_04_Treuils_Benne.st:1405, forme abregee PRG_02:492, continuation :492 apres un fichier nomme, et liste :29,36,43,49). Aucune reference n'est devinee : toute resolution passe par un index construit a partir des fichiers reellement presents (git ls-files), et les cas ambigus sont isoles, jamais tranches par supposition. Le taux de resolution est chiffre par categorie."
+      verified_by: "Rapport de resolution par categorie (resolues / non resolues / ambigues, avec exemples) + relecture par l'orchestrateur d'un echantillon d'au moins 20 references tirees du JSON, verifiees une par une contre le disque."
+
+    - id: AC3
+      statement: "Les tableaux d'audit de l'annexe (§2.1 et §2.2, 4 colonnes : Ref. T334 / Ligne citee par T334 / Contenu reel sur disque / Verdict) ne sont PAS injectes dans le graphe : ce ne sont pas des chaines mais des lignes de contre-verification, et leurs codes M/C ne partagent pas la semantique de ceux de T334. Le graphe ne contient donc que les maillons issus des tableaux de chaine a 5 colonnes, plus les complements explicitement declares comme tels."
+      verified_by: "Comptage des maillons par document dans le JSON + test automatise verifiant qu'aucun maillon ne provient d'une ligne a 4 colonnes. L'annexe doit apparaitre UNIQUEMENT comme source d'ancrage de blob et comme source de complements non fusionnes."
+
+    - id: AC4
+      statement: "Le format pivot porte l'ancrage complet : pour chaque fichier cite, le blob SHA consigne ET la SOURCE de cet ancrage, etiquetee (bloc d'ancrage de la fiche treuils, ou §1.3 de l'annexe), plus le HEAD mesure au moment de la generation et un horodatage ISO 8601. Les fichiers cites par T334 sont explicitement etiquetes comme reposant sur un ancrage DERIVE de l'annexe, car T334 ne porte AUCUN bloc d'ancrage (trou numero 1 releve par l'annexe elle-meme) : l'outil ne presente jamais cet ancrage comme provenant de T334."
+      verified_by: "Lecture du JSON et de l'affichage de l'outil : presence des deux etiquettes de source, du HEAD mesure, de l'horodatage, et de la mention du trou d'ancrage de T334."
+
+    - id: AC5
+      statement: "Le garde-fou blob est PROUVE par un test volontaire, pas par un commentaire : un fichier cite est modifie intentionnellement, l'outil signale ce fichier en rouge avec le blob attendu et le blob mesure, puis le fichier est restaure et l'outil repasse au vert. La preuve porte les trois etats (blob avant / blob pendant / blob apres), horodates, et demontre que la restauration est complete."
+      verified_by: "Log ou transcription horodatee du test dans le dossier de preuves, corroboré par git hash-object avant, pendant et apres, et par git status prouvant qu'aucune modification ne subsiste."
+
+    - id: AC6
+      statement: "Le recalcul de blob cote navigateur est exactement equivalent a git hash-object : le SHA-1 affiche par l'outil en mode live est identique au SHA-1 rendu par la commande git hash-object pour au moins 5 fichiers de controle. Un algorithme approximatif (hash du seul contenu, sans l'en-tete blob) est un echec du critere."
+      verified_by: "Table de comparaison produite dans le dossier de preuves : pour chaque fichier de controle, SHA-1 affiche par l'outil et SHA-1 rendu par git hash-object, cote a cote, strictement egaux."
+
+    - id: AC7
+      statement: "L'interface affiche, pour la selection courante (chaine + mode + sens), le chemin complet dans l'ordre chronologique : chaque maillon porte son code (Mnn / Cnn), le nom exact de la variable, le producteur fichier:ligne, le consommateur fichier:ligne et le role. Aucun maillon ne peut etre affiche sans ses references fichier:ligne."
+      verified_by: "Lecture du rendu et du JSON source du rendu : presence des cinq champs pour chaque maillon affiche ; verification que l'ordre affiche suit l'ordre des codes du document."
+
+    - id: AC8
+      statement: "Les branches NON empruntees sont affichees, pas masquees : pour chaque selection, l'outil montre la chaine non retenue (par exemple la chaine cycle quand on interroge le mode manuel) et remonte les lignes marquees comme dissymetriques ou incertaines par les documents, avec leur origine. C'est le besoin de diagnostic exprime par l'utilisateur."
+      verified_by: "Lecture de l'interface pour au moins 2 selections differentes : la chaine non retenue est visible et les marqueurs de dissymetrie portes par les documents sont restitues."
+
+    - id: AC9
+      statement: "Le selecteur de geste est honnete sur sa propre limite : les documents ne decrivent PAS un arbre de decision par geste mais des chaines lineaires, donc chaque geste propose est une entree curee qui CITE sa source (code M/C et document d'origine), et tout geste que les documents ne permettent pas de separer est affiche comme NON SEPARABLE avec la raison. Aucun geste n'est invente, aucune entree curee n'est anonyme."
+      verified_by: "Audit de la table de gestes : chaque entree porte une source verifiable ; presence d'au moins une entree NON SEPARABLE si les documents ne permettent pas la separation."
+
+    - id: AC10
+      statement: "Le lot n'ecrit AUCUN fichier de CODE/, ne regenere aucun CODE_XML, ne lance aucun test CI ni aucun gate, et ne cree aucun commit. Tous les livrables sont sous TOOLS/CMD_PATH_VIEWER/ et dans DOC/WFLOW/ (contrat, catalogue, verrou, registre). Aucun fichier temporaire a la racine du depot."
+      verified_by: "git status --short avant et apres le lot : aucun fichier de CODE/ ni de CODE_XML/ apparait ; arborescence des livrables conforme a TOOLS/AGENT_WORKFLOW/docs/STRUCTURE_AND_CLEANUP.md."
+
+    - id: AC11
+      statement: "Les 3 documents source sont INTACTS : leurs blobs SHA sont strictement identiques avant et apres le lot (aeaac5dd285618f80a0479dbb3ba81a0e6fe7001, 2ea84800602ea530698c4a220f88ad48e3b7fd8f, 20bfada06fc56a9fa10f432cd48272f203ed3b95)."
+      verified_by: "git hash-object des 3 fichiers avant et apres, valeurs cote a cote."
+
+    - id: AC12
+      statement: "L'outil est autonome et utilisable sans serveur applicatif : le mode statique fonctionne en file:// sans aucune requete reseau ni CDN, et le mode live n'utilise qu'un serveur de FICHIERS statique (python -m http.server lance par un fichier .bat), aucune logique metier cote serveur. Une note courte documente la structure, les deux modes, et les limites connues de l'outil."
+      verified_by: "Lecture du README et du lanceur, et verification qu'aucune dependance externe n'est chargee (aucune URL distante dans le HTML/JS). Les limites connues (T334 sans bloc d'ancrage, gestes non separables, references non resolues) y figurent explicitement."
+
+  scope:
+    allowed:
+      - TOOLS/CMD_PATH_VIEWER/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T353_OUTIL_WEB_CARTOGRAPHIE.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - TOOLS/AGENT_WORKFLOW/status/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - DOC/AF/
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_TREUILS_JoystickContacteur_20260921.md
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T351_ANNEXE_M3_TrousT334_20260921.md
+      - DOC/WFLOW/CONTRACTS/BRIEF_T353_OUTIL_WEB_CARTOGRAPHIE_INTERACTIVE.md
+      - tout autre emplacement a la racine du depot
+      - la reecriture des documents source, meme pour corriger une reference perimee : un ecart se SIGNALE, il ne se corrige pas ici
+
+  evidence_required:
+    - parsing_rate_report
+    - reference_resolution_report
+    - blob_guard_test_log
+    - js_vs_git_hashobject_table
+    - git_status_no_code_touched
+    - source_docs_blobs_unchanged
+    - contract_check
+
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud"
+
+  alert_duty: >
+    Six points doivent etre remontes et non tranches silencieusement pendant ce lot.
+    Premier point, bloquant pour la promesse du brief : la fiche T334 ne porte AUCUN bloc
+    d'ancrage de revision (c'est le trou numero 1 releve par l'annexe elle-meme, section 3).
+    La verification de fraicheur des references M3 ne peut donc pas s'ancrer sur T334 : elle
+    repose sur la table de blobs du paragraphe 1.3 de l'annexe, mesuree a 2026-09-21T01:31:44.
+    Cet ancrage DERIVE doit etre etiquete comme tel dans l'outil et dans la preuve, jamais
+    presente comme un ancrage de T334.
+    Second point, limitation de fond : le besoin exprime est un choix de GESTE (« joystick M1
+    monte »), alors que les documents livrent des chaines LINEAIRES, pas un arbre de decision
+    par geste. Separer un geste impose une surcouche curee, dont chaque entree doit citer sa
+    source ; tout ce que les documents ne permettent pas de separer est declare NON SEPARABLE.
+    Inventer une granularite de geste que les sources ne portent pas serait la faute la plus
+    grave de ce lot.
+    Troisieme point : un document HTML ouvert en file:// ne peut pas executer git hash-object.
+    La fraicheur n'est donc verifiee en direct que si la page est servie par un serveur de
+    fichiers statique local ; sans lui, les badges de fraicheur sont FIGES et doivent afficher
+    leur horodatage et leur caractere non recalcule, jamais un vert trompeur.
+    Quatrieme point : les codes Mnn/Cnn ne sont PAS un espace de noms partage entre documents.
+    Dans l'annexe, C02 et C03 designent des objets de PRG_03 qui ne correspondent pas aux codes
+    C02 et C03 de T334. Un code n'a de sens qu'accompagne de son document d'origine, et le
+    format pivot doit le porter.
+    Cinquieme point : les references courtes et les listes de lignes sont nombreuses et parfois
+    ambiguës. Une reference non resolue est affichee comme telle ; elle n'est jamais remplacee
+    par une supposition, et l'outil ne doit jamais afficher un chemin avec assurance quand sa
+    reference n'a pas ete resolue.
+    Sixieme point : les documents source sont eux-memes encore en mouvement (T334 est modifie
+    non committe, et l'annexe signale que HEAD a bouge pendant son propre audit). Toute mesure
+    d'ancrage vieillit en minutes : les blobs doivent etre re-mesures juste avant l'ecriture du
+    JSON, et l'horodatage affiche dans l'outil est celui de cette mesure.
+
+status: IN_PROGRESS
+
+execution:
+  executed_by: "DSH19"
+  completed_at: "2026-09-21T02:45:00+02:00"
+  status: DELIVERED
+  summary: >
+    LOT LIVRE, NON COMMITE, EN ATTENTE DE REVUE INDEPENDANTE. Livraison complete sous
+    TOOLS/CMD_PATH_VIEWER/ (front statique vanilla zero CDN, parseur Python, verificateur de blobs,
+    module de hash partage navigateur/Node, lanceur .bat en mode live, README avec 9 limites
+    declarees, PREUVE_T353.md). Mesures : 202/202 lignes de chaine parsees (101 fiche treuils +
+    101 T334), codes contigus sans doublon ni trou ; 97 lignes des tableaux d'audit 4 colonnes
+    REJETEES avec motif (jamais injectees) ; 8 complements de l'annexe conserves NON FUSIONNES ;
+    736 references -> 719 resolues / 0 ambigues / 15 NON RESOLUES par refus explicite (jamais
+    devinees) / 2 CONTESTEES_HORS_BORNES (couple fichier:ligne impossible, jamais presente comme
+    resolu) / 1 reroutee par la regle nommee E_CONTINUATION_HORS_BORNES_AUTRE_FICHIER_CELLULE ;
+    garde-fou blob prouve VERT -> ROUGE -> VERT sur 2 fichiers cites reels et sur disque, PUIS
+    4 fichiers cites passes ROUGE EN DIRECT pendant le lot (drift concurrent : comportement attendu) ;
+    8/8 egalite stricte entre le SHA-1 du JS execute sous Node et `git hash-object` ;
+    git status --short -- CODE/ VIDE (aucune ecriture de ce lot) et blobs des 3 sources inchanges
+    (aeaac5dd / 2ea84800 / 20bfada0) ; HEAD c9e1fbfe inchange, aucun commit.
+  evidence_submitted:
+    - parsing_rate_report
+    - reference_resolution_report
+    - blob_guard_test_log
+    - js_vs_git_hashobject_table
+    - git_status_no_code_touched
+    - source_docs_blobs_unchanged
+    - contract_check
+  ecarts_assumes:
+    - >
+      ECART 1 (assume, motive) : la baseline de l'orchestrateur attendait « 0 ambigu, 0 introuvable ».
+      Mesure : 0 ambigu et 0 introuvable AU NIVEAU DES NOMS DE FICHIERS (500/500), mais 18 references
+      COURTES sur 736 refusent volontairement l'heritage du « dernier fichier nomme dans la cellule » :
+      7 parce qu'un mot designe un AUTRE objet (« arbitres M1 :121 », « decodeur :73-74 »), 3 parce que
+      la ligne heritee sort du fichier (l'heritage serait donc faux), 8 parce que la cellule ne nomme
+      aucun fichier. AC2 interdit la supposition : ces 18 sont affichees NON RESOLUES avec leur motif.
+    - >
+      ECART 2 (limite de perimetre signalee) : la variante du test P3 qui modifie SUR DISQUE un fichier
+      cite par les documents est HORS du perimetre d'ecriture du lot (CODE/ interdit, 3 sources en
+      lecture seule). Le test a donc ete conduit en deux volets : octets reels des fichiers cites
+      modifies EN MEMOIRE (VERT -> ROUGE -> VERT, depot jamais touche), plus un volet SUR DISQUE sur un
+      fichier du perimetre autorise. Une extension explicite du perimetre, ou une action humaine sur
+      arbre gele, est necessaire pour la variante litterale.
+    - >
+      CONSTAT 7 (remonte, integre) : `core.autocrlf = true` sur ce depot. Le hash exact est
+      SHA1("blob " + taille_APRES_normalisation_CRLF + "\0" + contenu normalise CRLF) — soit
+      `git hash-object <chemin>`. La formule naive sur les octets bruts rendrait a50024aa au lieu de
+      31760d59 sur PRG_04_Treuils_Benne.st et ferait sortir ~47 fichiers en FAUX ROUGE. Corollaire
+      mesure : `git hash-object --stdin` n'applique PAS le filtre CRLF.
+    - >
+      CONSTAT 8 (remonte, integre) : un index de resolution naif sur tout le depot rendrait ~90 % des
+      references ambigues (CODE_BACKUP/** contient 6 copies de chaque POU, FB_Joystick.st 7
+      emplacements, FB_Winch.st 7). Index scope sur CODE/** hors CODE_BACKUP, plus les chemins
+      declares par les blocs d'ancrage, plus DOC/** hors ARCHIVES (1968 chemins exclus au total),
+      plus un 4e tier PRESENT_NON_SUIVI pour les fichiers presents mais non suivis par Git.
+    - >
+      REVUE ORCHESTRATEUR D1/D2 (traitee) : D1 — 28 references classees AMBIGU alors qu'un seul
+      candidat existait (tier ANCRAGE_DECLARE vide car la collecte des chemins declares etait
+      sensible a la casse) : CORRIGE, mesure APRES = ANCRAGE_DECLARE 1 fichier, AMBIGUE 0,
+      ambigues_detail vide, 29 references du CSV d E/S resolues par C_BASENAME_UNIQUE_ANCRAGE_DECLARE.
+      D2 — 5 continuations resolues vers une ligne inexistante : M37 :1499/:1541 deja corriges
+      (antecedent pris PAR POSITION) ; les 3 autres traites par (1) une CATEGORIE DEDIEE
+      CONTESTEE_HORS_BORNES, (2) la REGLE NOMMEE E_CONTINUATION_HORS_BORNES_AUTRE_FICHIER_CELLULE
+      (reroutage accepte seulement si EXACTEMENT UN autre fichier de la cellule contient la ligne :
+      1 cas, M63 :1602), (3) un AFFICHAGE DISTINCT dans l UI, (4) la tracabilite
+      refs_hors_bornes / refs_contestees_detail / refs_reroutees_detail + section P2ter de la preuve.
+    - >
+      CONSTAT 9 (remonte, integre) : 4e FORME DE REFERENCE = ABREVIATION de POU (`PRG_04`, `FB_Winch`,
+      `M1`) + troncature de prose (`M2.st`). Audit GLOBAL toutes zones publie separement du graphe
+      (2 276 occurrences) : 334 prefixes uniques, 4 prefixes ambigus listes et jamais tranches,
+      70 alias M1/M2 resolus par table curee a 2 entrees (provenance citee ET verifiee, 4
+      corroborations independantes), 1 troncature retrouvee (M2.st:85), 0 chemin invente.
+    - >
+      DRIFT REEL DETECTE PENDANT LE LOT (preuve en direct du garde-fou, section P3bis) : 47 VERT /
+      0 ROUGE au constat fige de 02:39:08, puis 43 VERT / 4 ROUGE au 03:01:01 — un lot concurrent a
+      reecrit la chaine cycle/modes (FB_CycleSemiAuto.st 1652 -> 1659 lignes, ST_CycleCfg.st,
+      PRG_03_Modes_Cycle.st, PRG_07_Supervision.st). Aucune correction de document par ce lot
+      (lecture seule) : les fiches doivent etre re-ancrces par leurs auteurs.
+    - >
+      ARBITRAGE ORCHESTRATEUR (2026-09-21) — test volontaire P3 : la variante a DEUX VOLETS est
+      ACCEPTEE comme satisfaisant le brief §5 (volet A sur les octets reels de deux fichiers
+      REELLEMENT cites : contenu modifie, blob recalcule != blob consigne, ROUGE observe, retour au
+      VERT ; volet B sur disque, dans le perimetre du lot, restauration a l'octet pres). La variante
+      LITTERALE (ecrire sur disque dans un fichier cite CODE/**) est REFUSEE et assume par
+      l'orchestrateur : sur un depot partage ou d'autres lots tournent, une modification transitoire
+      de CODE/ peut etre lue par un tiers et polluer un artefact d'un autre lot, le risque n'etant
+      pas justifie par le gain des lors que la detection est prouvee sur le contenu reel des memes
+      fichiers. Texte integral dans PREUVE_T353.md (P3, « Constat de perimetre ») et README.md L9.
+      Consequence : perimetre d'ecriture NON elargi, .bat NON modifie, volet B conserve tel quel.
+      Si l'humain veut la variante litterale : sur arbre gele, par lui, hors de ce lot.
+    - >
+      TROUVAILLE SIGNALEE, NON CORRIGEE (fiches en lecture seule) : les continuations de la fiche
+      T351 sont redigees de facon relachee ; C32 :1441 et :1509 ne correspondaient a AUCUNE ligne du
+      fichier designe (corrige par reroutage verifiable vers PRG_04_Treuils_Benne.st), et la fiche
+      T334 (ligne 214, row D07) cite PRG_06_Outputs.st:431-432,650 alors que ce fichier a 549 lignes
+      (reference scindee, numero 650 classe CONTESTEE_HORS_BORNES). Limites L14 et L15 du README.
+
+validation:
+  status: PENDING
+  validated_by: "DSH (orchestrateur)"
+  validated_at: "2026-09-21T03:37:00+02:00"
+  notes: >
+    Le lot est read-only sur CODE/ et sur les 3 documents source : il ne demande aucun gel,
+    aucun bundle et aucune levee. La validation de l'orchestrateur porte sur trois preuves
+    non negociables : le rapport de resolution des references (AC2), le test volontaire du
+    garde-fou blob (AC5) et l'egalite stricte entre le hash du navigateur et git hash-object
+    (AC6). Le reste du lot est juge sur pieces, par lecture du diff reel.
+
+  revue_orchestrateur:
+    statut: "REVUE TERMINEE — PASS TECHNIQUE. Tous les livrables du brief section 7 sont presents
+      (TOOLS/CMD_PATH_VIEWER/) et le socle est prouve par execution de l'orchestrateur, y compris le
+      test volontaire du garde-fou blob. Les 3 ecarts que j'avais ouverts (AC1 comptabilite, AC2
+      reference hors bornes, heritage des continuations) sont FERMES et verifies, et le controle
+      d'invariant a ete elargi de 862 a 3 319 references (graphe + audit toutes zones + corrections
+      section 4.10) apres ma revue. Le VISA FORMEL reste PENDING : il demande l'acceptation humaine
+      des 3 etiquetages residuels listes ci-dessous (non bloquants) et la decision de commit."
+    date_derniere_mesure: "2026-09-21T03:37:00+02:00"
+    head_mesure: c9e1fbfeff460a4bb6065f37efb80d5e574d8772
+    arbitrage_test_P3: >
+      Le brief section 5 exige « modifier un fichier cite, voir l'alerte s'afficher ». L'agent a livre
+      DEUX volets : (A) modification EN MEMOIRE des octets reels de 2 fichiers REELLEMENT cites
+      (Device_IO_20260918.csv, PRG_04_Treuils_Benne.st) -> VERT / ROUGE / VERT, corroboration
+      git hash-object, octets relus identiques ; (B) modification SUR DISQUE dans le perimetre
+      d'ecriture du lot (git-blob-sha1.js), restauration a l'octet pres, retour au VERT. DECISION DE
+      L'ORCHESTRATEUR : A+B ACCEPTES comme satisfaisant le brief ; la variante LITTERALE (ecrire sur
+      disque dans un fichier cite de CODE/) est REFUSEE — sur un depot PARTAGE ou d'autres lots
+      generent des bundles et lancent des gates, une modification transitoire de CODE/ peut etre lue
+      par un tiers et polluer un artefact d'un autre lot, pour un gain nul puisque la detection est
+      deja prouvee sur le contenu reel des memes fichiers. Si l'humain veut la variante litterale,
+      elle se fait sur un ARBRE GELE, hors du lot.
+    reserves_residuelles:
+      - "R1 (etiquetage) — CLOSE le 2026-09-21T03:39, verifiee par l'orchestrateur. Cause racine
+        trouvee par l'agent : 11 lignes des tableaux d'audit dont la 1re cellule ne porte AUCUN code
+        (references de section et identifiants d'affirmation : 6.1, 6.5, 10bis B.2, 10bis B.4/B.5,
+        H6, A03, A06/D09/7.1, A06/D09/7.1/H2) gonflaient le denominateur. Corrige : une ligne n'est
+        candidate que si sa 1re cellule commence par un code Mnn/Cnn ; les 11 sont comptees a part
+        (lignes_non_candidates_hors_audit). DEUX GRANDEURS DESORMAIS PUBLIEES ET ETIQUETEES :
+        lignes_candidates_Mnn_Cnn = 319 (101 + 101 + 117) et codes_candidats_occurrences = 339
+        (101 + 101 + 137), avec unite_par_defaut = LIGNES DE TABLEAU et le comptage par occurrence
+        rendu uniforme (l'espacement autour du / n'a plus d'effet). Rejets 109 = 86 audit 4 col + 23
+        correction 3 col. CES DEUX VALEURS SONT EXACTEMENT CELLES QUE MA MESURE INDEPENDANTE AVAIT
+        PREDITES (117 lignes ou 137 codes) : la criticite etait fondee, le correctif est conforme."
+      - "R2 (etiquetage) — CLOSE le 2026-09-21T03:43, verifiee par l'orchestrateur. Cause racine
+        trouvee par l'agent : la branche divergences/asymetries appelait extraire_refs SANS le
+        parametre alias_actifs, donc les alias n'etaient pas resolus alors que la fiche treuils les
+        DEFNIT (lignes 21 et 28). Mesure APRES : AMBIGUE 25 -> 8 et surtout 0 AMBIGUE SANS CANDIDATS
+        (les 17 ex-ambiguës sont passees RESOLUE par E_ALIAS_DOCUMENTE_CITE vers
+        FB_WinchCmdArbitrationM2.st, ce qui est PLUS informatif qu'un AMBIGUE puisque l'alias etait
+        determinable). Pour le residuel indeterminable, deux regles NOMMEES interdisent desormais la
+        liste vide silencieuse : ALIAS_CONTEXTE_CANDIDATS_DOCUMENTES_HORS_DOCUMENT (AMBIGUE +
+        candidats avec provenance) et ALIAS_NON_DETERMINABLE_SANS_SECTION (refus explicite motive).
+        Table curee portee a 3 entrees avec 3 citations verifiees (M1/M2 fiche treuils l.21/28,
+        M3 -> FB_TranslationCmdArbitrationM3.st, fiche T334 l.64)."
+      - "R3 (coherence interne, OUVERTE) : refs_controlees_toutes_zones annonce encore 862 alors que
+        controle_invariants.refs_controlees en couvre 3 319 : deux compteurs, deux perimetres, dont un
+        perime depuis l'elargissement du controle. NON TRANSMISE A L'AGENT avant sa remise (omission de
+        l'orchestrateur) : a fermer par une consigne courte, ou a accepter comme reserve documentee."
+      - "R4 (menage humain) : TOOLS/CMD_PATH_VIEWER/__pycache__/ (112 Ko, bytecode contenant 3 CRLF) et
+        les 4 captures data/.sortie_*.txt — traitement par l'humain uniquement, aucune suppression
+        automatique (regle projet). Les 4 captures sont des PREUVES citees par PREUVE_T353.md."
+    verifie_par_execution_reelle:
+      - "AC1 : 202 lignes de chaine exactement (66 M + 35 C x 2 fiches), codes contigus M01..M66 /
+        C01..C35, 0 doublon, 0 trou, chaque ligne portant au moins une reference — mesure
+        independante de l'orchestrateur, concordante."
+      - "AC3 : maillons = 202, aucune ligne des tableaux d'audit 4 colonnes de l'annexe injectee
+        (97 lignes rejetees, motif TABLE_AUDIT_4_COLONNES_NON_INJECTEE) ; aucun chemin resolu
+        n'est absent du disque."
+      - "AC4 : ancrage par blob avec source etiquetee ; head_documents.t334 = None (trou no 1 de
+        l'annexe respecte) ; ancrage de l'annexe marque DERIVE (20 fichiers derives) ; 48 fichiers
+        dont 1 sans_ancrage (DOC/AF/AF_Partie-04...) jamais vert ; 0 conflit entre les 2 ancrages."
+      - "AC5 : test volontaire du garde-fou execute par l'orchestrateur — volet A en MEMOIRE sur 2
+        fichiers reellement cites (Device_IO_20260918.csv, PRG_04_Treuils_Benne.st) : VERT -> ROUGE
+        -> VERT avec corroboration git hash-object et octets relus identiques ; volet B SUR DISQUE
+        dans le perimetre du lot (git-blob-sha1.js) : VERT -> ROUGE -> VERT, restauration a l'octet
+        pres. Verdict PASS. Controle post-test : git status -- CODE/ vide, blobs des 2 fichiers
+        cites intacts."
+      - "AC6 : git-blob-sha1.js execute sous Node v24.18.0 par l'orchestrateur -> 6/6 egaux a
+        git hash-object (dont graph.json, 36 666 CRLF) ; mode --preuve-p4 -> 8/8 conformes ;
+        auto-test interne PASS sur 4 vecteurs dont les constantes git canoniques. Piege du depot
+        (core.autocrlf=true : CRLF->LF avant calcul, en-tete sur la taille APRES normalisation)
+        integre et documente : sans lui, les 47 fichiers CODE/ sortaient en faux ROUGE."
+      - "AC7 / AC8 / AC9 : smoke test UI execute par l'orchestrateur (node smoke_test_ui.js) ->
+        26/26 PASS : 66 cartes M01->M66 avec les 5 champs exiges, 244 pastilles fichier:ligne,
+        branche NON empruntee affichee avec citation verifiee, geste NON SEPARABLE selectionnable
+        avec son motif, geste cure G03 (M3 manuel) selectionnant t334/M, 12 gestes tous pourvus
+        d'une source {document, ligne, motif_attendu, section}, complements de l'annexe en
+        NON FUSIONNES (74 = 66 + 8), 7 limites, ancrage DERIVE mentionne, 0 maillon sans reference."
+      - "AC10 : git status --short -- CODE/ VIDE a chaque controle (aucun fichier de CODE/ modifie
+        par le lot, y compris pendant le test volontaire)."
+      - "AC11 : blobs des 3 documents source IDENTIQUES avant et apres (aeaac5dd, 2ea84800,
+        20bfada0) — aucune ecriture sur les sources."
+      - "AC12 : aucune ressource distante dans index.html / app.js / style.css (ressources
+        relatives) ; verificateur n'ecrivant que sous TOOLS/CMD_PATH_VIEWER/data/."
+    reserve_formelle_sur_AC12: "CLOSE le 2026-09-21T02:47 — le lanceur OPEN_CMD_PATH_VIEWER.bat est
+      livre et verifie par l'orchestrateur : pushd sur la racine du depot (les fetch vers CODE/
+      resolvent), python -m http.server --bind 127.0.0.1 (localhost = contexte securise), zero
+      logique metier cote serveur, mode statique documente dans le meme fichier."
+    ecarts_ouverts_a_la_date: 
+      - "AC1 (partiel) : le taux de parsing est annonce sur 307 lignes candidates alors que 330
+        lignes de tableau commencent par un code Mnn/Cnn ; 23 lignes de la table 3 colonnes de
+        l'annexe (section 4.10, corrections de references perimees) ne sont comptabilisees ni en
+        rejets ni en complements. Aucune ligne de chaine perdue (toutes sont 3 colonnes)."
+      - "AC2 (partiel) : invariant exige 'aucune reference RESOLUE dont la ligne sort des bornes du
+        fichier' — il reste 1 cas : PRG_06_Outputs.st:431-432,650 alors que le fichier fait 549
+        lignes (citation de la fiche sans ligne correspondante, a exposer comme telle)."
+      - "AC2 (partiel) : heritages de continuations depuis un antecedent abrege (PRG_04:1462-1463)
+        ou aliase (M1) partiellement restaures (707 -> 718 resolues) ; 6 valeurs attendues fournies
+        par l'orchestrateur, preuve fiche a l'appui, restant a confirmer."
+    verdict_provisoire: "MAJOR — TOUS les livrables du brief section 7 sont presents et le socle
+      technique est PROUVE par execution de l'orchestrateur (hash 6/6 puis 8/8 egal a git hash-object,
+      ancrage par blob avec source etiquetee et ancrage DERIVE honnete, integrite du graphe 202
+      maillons sans injection des tableaux d'audit, garde-fou blob VERT->ROUGE->VERT avec depot intact,
+      interface 26/26, 0 CODE/ touche, 3 sources intactes, HEAD inchange, aucun commit). Restent 2
+      ecarts PARTIELS a fermer ou a accepter : (1) AC1 comptabilite — 23 lignes 3 colonnes de l'annexe
+      non listees et denominateur annonce 307 au lieu de 330 ; (2) AC2 invariant — 1 reference encore
+      annoncee RESOLUE alors que sa ligne (650) sort des 549 lignes du fichier cite, ce qui est
+      exactement le 'chemin faux affiche avec assurance' que l'outil existe pour empecher. L'ecart 2
+      est le seul BLOQUANT pour un visa sans reserve : les 18 references volontairement NON RESOLUES
+      (ecart 1 de l'agent) sont, elles, un comportement CORRECT et valide."

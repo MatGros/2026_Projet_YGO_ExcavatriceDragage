@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T353 — CMD_PATH_VIEWER · choisir un geste, voir le chemin réel</title>
+<!-- ZÉRO CDN · ZÉRO requête distante. Toutes les ressources sont locales et relatives. -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="entete">
+  <div class="titre">
+    <h1>CMD_PATH_VIEWER <span class="tag">T353</span></h1>
+    <p class="sous-titre">
+      Chemin exact parcouru par une commande, variable par variable, du geste jusqu'à la sortie physique —
+      avec l'état de fraîcheur <strong>par blob SHA</strong> de chaque fichier cité.
+    </p>
+  </div>
+  <div class="mode">
+    <span id="badge-mode" class="badge badge-mode">…</span>
+    <span id="badge-head" class="badge">HEAD …</span>
+  </div>
+</header>
+
+<div id="bandeau-fraicheur" class="bandeau"></div>
+
+<nav class="barre">
+  <label>Chaîne
+    <select id="sel-chaine"></select>
+  </label>
+  <label>Geste / source
+    <select id="sel-geste"></select>
+  </label>
+  <label>Filtrer (variable, code, fichier, rôle)
+    <input id="recherche" type="search" placeholder="ex. StepTgt, M2, FB_Winch, ASYM">
+  </label>
+  <label class="case"><input id="chk-non-resolues" type="checkbox"> ne montrer que les maillons à référence non résolue</label>
+</nav>
+
+<main>
+  <section id="zone-maillons">
+    <div id="resume-chaine" class="carte resume"></div>
+    <div id="liste-maillons"></div>
+  </section>
+
+  <aside>
+    <section class="carte">
+      <h2>Branche NON empruntée</h2>
+      <div id="branche-non-empruntee"></div>
+    </section>
+
+    <section class="carte">
+      <h2>Marqueurs, dissymétries et divergences</h2>
+      <div id="marqueurs"></div>
+    </section>
+
+    <section class="carte">
+      <h2>Ancrage &amp; fraîcheur</h2>
+      <div id="panneau-ancrage"></div>
+    </section>
+
+    <section class="carte">
+      <h2>Auto-test du calcul de hash</h2>
+      <div id="autotest"></div>
+    </section>
+
+    <section class="carte">
+      <h2>Références contestées <span class="mini">(couple fichier:ligne impossible)</span></h2>
+      <div id="refs-contestees"></div>
+    </section>
+
+    <section class="carte">
+      <h2>Corrections de références périmées <span class="mini">(annexe §4.10 — non fusionné)</span></h2>
+      <div id="corrections-perimees"></div>
+    </section>
+
+    <section class="carte">
+      <h2>Audit global des références (toutes zones)</h2>
+      <div id="audit-references"></div>
+    </section>
+
+    <section class="carte">
+      <h2>Limites déclarées de l'outil</h2>
+      <div id="limites"></div>
+    </section>
+  </aside>
+</main>
+
+<footer>
+  <p>
+    Sources (LECTURE SEULE) : fiche treuils T351 · fiche T334 · annexe T351. Aucun fichier de <code>CODE/</code>
+    n'est modifié. Aucun commit. Ancrage par <strong>blob SHA</strong> — jamais par numéro de ligne seul.
+  </p>
+</footer>
+
+<script src="git-blob-sha1.js"></script>
+<script src="data/graph.js"></script>
+<script src="data/freshness.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
