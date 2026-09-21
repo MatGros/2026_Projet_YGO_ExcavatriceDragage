@@ -601,3 +601,112 @@ TEST 'TC-P07-044 T255-D ancre : hors mode de marche, le prerequis de mode prime 
               'hors mode de marche : consigne de mode, jamais une action inexécutable');
 END_TEST
 
+(* =========================================================================
+   T359 / T278 — MASQUAGE BORNE DES ALARMES RESEAU PARASITES (option O1)
+   =========================================================================
+   BESOIN CLIENT (mail GCAM, T278) : a chaque ouverture d'AU, demarrage CPU et
+   rearmement puissance, les esclaves publient des pertes de liaison de quelques
+   scans. Aujourd'hui le bandeau les affiche : le TOF anti-bagotement
+   (FB_Hmi_BannerFormatter.st:197-207, PT := T#1.5s) MAINTIENT l'alarme 1,5 s,
+   d'ou une cascade de faux positifs que l'operateur doit acquitter.
+
+   CIBLE : masquer les defauts RESEAU/ES uniquement pendant une fenetre transitoire
+   ou leur absence est ATTENDUE (AU ouverte, rearmement puissance, boot), et
+   l'afficher normalement hors de cette fenetre. Un defaut persistant reste donc
+   affiche des la fin de la fenetre : le masquage est BORNE, jamais silencieux.
+
+   TC-T359-004 est la PREUVE AVANT CORRECTIF : elle est ROUGE sur l'etat actuel.
+   TC-T359-005 verrouille la BORNE (le masque ne peut pas cacher un defaut durable).
+   TC-T359-006 verrouille la non-regression safety (la cause AU reste prioritaire).
+   ========================================================================= *)
+
+TEST 'TC-T359-004 Fenetre de rearmement : les pertes de liaison transitoires ne sont PAS affichees'
+    (* Scan 0 : AU fermee, contacteur AU REPOS -> garde de demarrage lancee *)
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := FALSE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ASSERT_FALSE(FB_Banner.Banner.AlarmBanner.HasAlarm, 'Depart : aucune alarme');
+
+    (* Sortie de la garde de demarrage : 4 s ecoulees, contacteur toujours au repos *)
+    ADVANCE_TIME(5000000000);
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := FALSE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ASSERT_FALSE(FB_Banner.Banner.AlarmBanner.HasAlarm, 'Garde de demarrage ecoulee, reseau sain');
+
+    (* REARMEMENT PUISSANCE : front du contacteur -> fenetre transitoire bornee ouverte *)
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+
+    (* Les esclaves ne sont PAS encore operationnels : c'est le transitoire reel machine *)
+    NetDiag.BusEthercat.Operational := FALSE;
+    NetDiag.EncoderM1.Operational := FALSE;
+    NetDiag.EncoderM2.Operational := FALSE;
+
+    ADVANCE_TIME(100000000); // 100 ms : largement au-dela d'un scan, tres en deca de 1,5 s
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+
+    (* CIBLE T278 : aucune alarme parasite pendant la fenetre de rearmement *)
+    ASSERT_FALSE(FB_Banner.Banner.AlarmBanner.HasAlarm,
+                 'Fenetre de rearmement : aucune alarme reseau parasite (cible T278)');
+END_TEST
+
+TEST 'TC-T359-005 Borne du masquage : un defaut reseau durable EST affiche des la fin de la fenetre'
+    (* Meme sequence que TC-T359-004 : rearmement puis perte de liaison *)
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := FALSE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ADVANCE_TIME(5000000000);
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+
+    NetDiag.BusEthercat.Operational := FALSE;
+    ADVANCE_TIME(100000000);
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+
+    (* La fenetre se referme : le defaut TOUJOURS present doit reapparaitre.
+       Sans cette borne, le masquage cacherait une panne reelle de facon permanente. *)
+    ADVANCE_TIME(10000000000); // 10 s : bien au-dela de toute fenetre transitoire
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+
+    ASSERT_TRUE(FB_Banner.Banner.AlarmBanner.HasAlarm,
+                'Apres la fenetre : un defaut reseau PERSISTANT est affiche');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '1/1 [ECAT] Defaut bus EtherCAT',
+              'Le defaut durable affiche est bien celui du bus EtherCAT');
+END_TEST
+
+TEST 'TC-T359-006 Non-regression safety : la cause AU reste prioritaire, jamais masquee'
+    (* AU ouverte + defaut de bus : le masquage reseau ne doit JAMAIS toucher la cause safety *)
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ADVANCE_TIME(5000000000);
+
+    NetDiag.BusEthercat.Operational := FALSE;
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := FALSE, // AU ouverte : cause safety
+              PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+
+    ASSERT_EQ(FB_Banner.Banner.OperatorActionText, '[PUPITRE] Boucle urgence ouverte - réarmer',
+              'La consigne operateur reste la cause AU malgre le defaut de bus');
+END_TEST
+

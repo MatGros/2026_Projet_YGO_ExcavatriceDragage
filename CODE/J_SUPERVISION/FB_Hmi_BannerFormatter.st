@@ -146,11 +146,19 @@ VAR
     HistoM1              : WORD; // . [LOC] §5 [HISTO] M1 : LatchedId AND NOT ErrorId (défauts latched passés)
     HistoM2              : WORD; // . [LOC] §5 [HISTO] M2 : LatchedId AND NOT ErrorId (défauts latched passés)
     HistoM3              : WORD; // . [LOC] §5 [HISTO] M3 : LatchedId AND NOT ErrorId (défauts latched passés)
+    RearmEdge            : R_TRIG; // . [LOC] Front du réarmement puissance (contacteur)
+    TonRearmWindow       : TON;    // . [LOC] Fenêtre transitoire post-réarmement (durée bornée)
+    RearmWindowActive    : BOOL;   // . [LOC] Fenêtre post-réarmement en cours
+    NetworkSurveillanceActive : BOOL; // . [LOC] Surveillance réseau/ES armée (hors fenêtre transitoire attendue)
 END_VAR
 VAR CONSTANT
     CST_BannerHoldTime   : TIME := T#500ms; // . [LOC] Anti-clignotement warnings/états (AF-07 §5.3)
     CST_AbortHoldTime    : TIME := T#5s; // . [LOC] Maintien message d'abandon AU
     CST_NbMaxAlarmes     : INT := 50; // . [LOC] Taille du carrousel d'alarmes (AF-07 §6)
+    // ⏱️ Durée de la fenêtre transitoire post-réarmement, alignée sur la garde de démarrage :
+    // pendant ce délai les esclaves peuvent légitimement ne pas être encore opérationnels.
+    // C'est une BORNE : passé ce délai, un défaut réseau réel est de nouveau affiché.
+    CST_RearmInhibitTime : TIME := T#4s; // . [LOC] Fenêtre transitoire post-réarmement puissance
     // 🔑 Bit 6 de ST_SafetyWinch.ErrorId = cause « Limite basse cable atteinte » (vue LIVE,
     // Latching := FALSE, FB_Safety_Winch.st:318-325). Le DUT ST_SafetyWinch n'expose aucun
     // champ nommé pour cette cause : le bit est nommé ici plutôt qu'écrit en clair.
@@ -176,6 +184,10 @@ IF NOT Enable THEN
     END_FOR;
     TonAlarmBanner(IN := FALSE);
     TonBootInhibit(IN := FALSE);
+    TonRearmWindow(IN := FALSE);
+    RearmEdge(CLK := FALSE);
+    RearmWindowActive := FALSE;
+    NetworkSurveillanceActive := FALSE;
     TofFaultLocalIo(IN := FALSE);
     TofFaultVh0800(IN := FALSE);
     TofFaultVh0808(IN := FALSE);
@@ -193,18 +205,35 @@ END_IF;
 // ⏱️ Garde au démarrage (inhibition 4s pendant init des bus et équipements)
 TonBootInhibit(IN := Enable, PT := T#4s);
 
+// ⏱️ Fenêtre transitoire de réarmement puissance : à chaque front du contacteur, les esclaves
+// peuvent légitimement publier une perte de liaison pendant quelques secondes. La fenêtre est
+// BORNÉE (CST_RearmInhibitTime) : hors de celle-ci, un défaut réseau réel reste affiché.
+RearmEdge(CLK := PowerContactorEngaged);
+IF RearmEdge.Q THEN
+    RearmWindowActive := TRUE;
+END_IF;
+TonRearmWindow(IN := RearmWindowActive, PT := CST_RearmInhibitTime);
+IF TonRearmWindow.Q THEN
+    RearmWindowActive := FALSE;
+END_IF;
+
+// 🛡️ Surveillance réseau armée hors des phases où l'absence de bus est ATTENDUE :
+// démarrage CPU (garde ci-dessus) et réarmement puissance (fenêtre ci-dessus).
+// Rien d'autre n'est masqué : la chaîne AU, les sécurités et les défauts métier ne passent pas ici.
+NetworkSurveillanceActive := TonBootInhibit.Q AND NOT RearmWindowActive;
+
 // 🌊 Filtrage anti-bagotement (TOF 1.5s sur perte de validité)
-TofFaultLocalIo(IN := (NOT Network.InputModules.LocalDigitalIoOk) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVh0800(IN := (NOT Network.InputModules.Vh0800EndOk) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVh0808(IN := (NOT Network.InputModules.Vh0808EtpOk) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVh0008Er(IN := (NOT Network.InputModules.Vh0008ErOk) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVh0008Er1(IN := (NOT Network.InputModules.Vh0008Er1Ok) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultCanBus(IN := (NOT Network.BusCanOpen.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultJoy1(IN := (NOT Network.Joystick.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultEcatBus(IN := (NOT Network.BusEthercat.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultEncM1(IN := (NOT Network.EncoderM1.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultEncM2(IN := (NOT Network.EncoderM2.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
-TofFaultVarM3(IN := (NOT Network.VariateurM3.Operational) AND TonBootInhibit.Q, PT := T#1.5s);
+TofFaultLocalIo(IN := (NOT Network.InputModules.LocalDigitalIoOk) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVh0800(IN := (NOT Network.InputModules.Vh0800EndOk) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVh0808(IN := (NOT Network.InputModules.Vh0808EtpOk) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVh0008Er(IN := (NOT Network.InputModules.Vh0008ErOk) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVh0008Er1(IN := (NOT Network.InputModules.Vh0008Er1Ok) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultCanBus(IN := (NOT Network.BusCanOpen.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultJoy1(IN := (NOT Network.Joystick.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultEcatBus(IN := (NOT Network.BusEthercat.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultEncM1(IN := (NOT Network.EncoderM1.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultEncM2(IN := (NOT Network.EncoderM2.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
+TofFaultVarM3(IN := (NOT Network.VariateurM3.Operational) AND NetworkSurveillanceActive, PT := T#1.5s);
 
 LocalIoValid   := NOT TofFaultLocalIo.Q;
 Vh0800Valid    := NOT TofFaultVh0800.Q;

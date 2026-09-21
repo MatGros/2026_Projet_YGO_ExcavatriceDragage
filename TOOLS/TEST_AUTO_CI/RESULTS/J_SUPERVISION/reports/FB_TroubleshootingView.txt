@@ -1,78 +1,1914 @@
 Error compiling source files:
 
-GVL_Troubleshooting.st:10:5: error: Symbol 'A_CONTEXTEMACHINEGLOBAL' already defined in scope 'global'
-  10 |     A_ContexteMachineGlobal : ST_ChainContextGlobal; // 🌐 0. Contexte Global Machine (Mode, Simu, Commande, Bypass)
+ST_CycleMachineHomingHMI.st:9:13: error: Undefined type 'ST_CYCLEMACHINEHOMINGCMD' in STRUCT 'ST_CYCLEMACHINEHOMINGHMI'
+   9 |     Cmd   : ST_CycleMachineHomingCmd;
+     |             ^
+
+ST_CycleMachineHomingHMI.st:11:13: error: Undefined type 'ST_CYCLEMACHINEHOMINGCFG' in STRUCT 'ST_CYCLEMACHINEHOMINGHMI'
+  11 |     Cfg   : ST_CycleMachineHomingCfg;
+     |             ^
+
+ST_MaintenanceN2HMI.st:8:13: error: Undefined type 'ST_MAINTENANCEN2CMD' in STRUCT 'ST_MAINTENANCEN2HMI'
+   8 |     Cmd   : ST_MaintenanceN2Cmd;
+     |             ^
+
+ST_MaintenanceN2HMI.st:9:13: error: Undefined type 'ST_MAINTENANCEN2STATE' in STRUCT 'ST_MAINTENANCEN2HMI'
+   9 |     State : ST_MaintenanceN2State;
+     |             ^
+
+ST_LocalIHM.st:9:19: error: Undefined type 'ST_LOCALIHM_CTRLBLOCK' in STRUCT 'ST_LOCALIHM'
+   9 |     CtrlBlock   : ST_LocalIHM_CtrlBlock;   // IHM→PLC : commandes cycliques locales
+     |                   ^
+
+ST_LocalIHM.st:10:19: error: Undefined type 'ST_LOCALIHM_STATUSBLOCK' in STRUCT 'ST_LOCALIHM'
+  10 |     StatusBlock : ST_LocalIHM_StatusBlock; // PLC→IHM : états cycliques locaux
+     |                   ^
+
+ST_IoHw.st:10:11: error: Undefined type 'ST_IOHW_IN' in STRUCT 'ST_IOHW'
+  10 |     In  : ST_IoHw_In;  // Entrées, états bus et diagnostics hardware
+     |           ^
+
+ST_IoHw.st:11:11: error: Undefined type 'ST_IOHW_OUT' in STRUCT 'ST_IOHW'
+  11 |     Out : ST_IoHw_Out; // Sorties produites observées, pas un port de commande
+     |           ^
+
+FB_TroubleshootingView.st:132:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 132 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx101_ModeActive        := Auth.Mode;
+     | ^
+
+FB_TroubleshootingView.st:133:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 133 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx102_SimulationEnabled := SimulationModeActive;
+     | ^
+
+FB_TroubleshootingView.st:134:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 134 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx103_JoystickCommOk    := Network.Joystick.Operational;
+     | ^
+
+FB_TroubleshootingView.st:135:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 135 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx201_JoystickSelected  := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+     | ^
+
+FB_TroubleshootingView.st:135:73: error: Undeclared variable 'GVL_IHM'
+ 135 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx201_JoystickSelected  := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+     |                                                                         ^
+
+FB_TroubleshootingView.st:136:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 136 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx202_BypassNetworkGlobal := Network.Bypass.Global;
+     | ^
+
+FB_TroubleshootingView.st:137:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 137 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx203_BypassSensorsGlobal := FALSE; // TBD non câblé - voir fiche §6 (agrégat multi-domaine à définir)
+     | ^
+
+FB_TroubleshootingView.st:138:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 138 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+     | ^
+
+FB_TroubleshootingView.st:139:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 139 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx302_PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
+     | ^
+
+FB_TroubleshootingView.st:141:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 141 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx303_SafeStopActiveAny := WinchM1.Safety.SafeStop OR WinchM2.Safety.SafeStop OR Translation.Safety.SafeStop;
+     | ^
+
+FB_TroubleshootingView.st:142:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 142 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx304_PowerCutOffActiveAny := WinchM1.Safety.PowerCutOff OR WinchM2.Safety.PowerCutOff OR Translation.Safety.PowerCutOff;
+     | ^
+
+FB_TroubleshootingView.st:143:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 143 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx401_HmiHeartbeatOk    := Commun.HeartbeatIhmOk;
+     | ^
+
+FB_TroubleshootingView.st:144:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 144 | GVL_Troubleshooting.A_ContexteMachineGlobal.Idx402_CycleAutoBusy     := CycleAutoBusy;
+     | ^
+
+FB_TroubleshootingView.st:150:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 150 | GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx101_M1_CablePos_M  := WinchM1.State.Position_M;
+     | ^
+
+FB_TroubleshootingView.st:151:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 151 | GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx102_M2_CablePos_M  := WinchM2.State.Position_M;
+     | ^
+
+FB_TroubleshootingView.st:152:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 152 | GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx103_SyncDelta_M    := Sync.State.DeltaPos_M;
+     | ^
+
+FB_TroubleshootingView.st:153:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 153 | GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx202_SyncEnabled_IHM := Sync.Cmd.SelSyncEnable;
+     | ^
+
+FB_TroubleshootingView.st:154:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 154 | GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+     | ^
+
+FB_TroubleshootingView.st:155:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 155 | GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx302_SyncFaultActive := Sync.State.Error;
+     | ^
+
+FB_TroubleshootingView.st:156:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 156 | GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx303_M1_AscentPermit := WinchM1.Safety.AscentPermit;
+     | ^
+
+FB_TroubleshootingView.st:157:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 157 | GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx304_M2_AscentPermit := WinchM2.Safety.AscentPermit;
+     | ^
+
+FB_TroubleshootingView.st:158:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 158 | GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx501_M1_CmdRelayFwd_DQ := WinchM1.State.RelayFwd;
+     | ^
+
+FB_TroubleshootingView.st:159:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 159 | GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ := WinchM2.State.RelayFwd;
+     | ^
+
+FB_TroubleshootingView.st:169:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 169 | GVL_Troubleshooting.I_LevageUnitaireM1.Inputs_100.Idx101_EncoderRawPos := UDINT_TO_DINT(HwIn.Winch.COD1_PosValue);
+     | ^
+
+FB_TroubleshootingView.st:170:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 170 | GVL_Troubleshooting.I_LevageUnitaireM1.Inputs_100.Idx102_CablePos_M := WinchM1.State.Position_M;
+     | ^
+
+FB_TroubleshootingView.st:171:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 171 | GVL_Troubleshooting.I_LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI := HwIn.Winch.M1_ContactorsReleased_DI;
+     | ^
+
+FB_TroubleshootingView.st:172:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 172 | GVL_Troubleshooting.I_LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied := NOT HwIn.Winch.M1_BrakeIsOpen_DI;
+     | ^
+
+FB_TroubleshootingView.st:173:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 173 | GVL_Troubleshooting.I_LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winch.M1_ThermalOk_DI;
+     | ^
+
+FB_TroubleshootingView.st:175:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 175 | GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA := HwIn.Operator.JoyYRaw_ANA2;
+     | ^
+
+FB_TroubleshootingView.st:176:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 176 | GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.Deflection;
+     | ^
+
+FB_TroubleshootingView.st:177:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 177 | GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx203_HmiManualCmd_BtnAscent := WinchM1.Cmd.BtnAscent;
+     | ^
+
+FB_TroubleshootingView.st:178:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 178 | GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDescent := WinchM1.Cmd.BtnDescent;
+     | ^
+
+FB_TroubleshootingView.st:179:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 179 | GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM1SpeedTgt_Pct;
+     | ^
+
+FB_TroubleshootingView.st:180:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 180 | GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx206_ModeActive := Auth.Mode;
+     | ^
+
+FB_TroubleshootingView.st:181:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 181 | GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm := WinchM1.Bypass.OperatorComm;
+     | ^
+
+FB_TroubleshootingView.st:182:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 182 | GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct := M1LogicRequestSpeedCmd_Pct;
+     | ^
+
+FB_TroubleshootingView.st:183:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 183 | GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection := M1LogicRequestDirection;
+     | ^
+
+FB_TroubleshootingView.st:184:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 184 | GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx210_CoupledUserRequestDirection := WinchBothMotionDirection;
+     | ^
+
+FB_TroubleshootingView.st:185:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 185 | GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx211_CoupledUserRequestActive := WinchBothMotionActive;
+     | ^
+
+FB_TroubleshootingView.st:187:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 187 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+     | ^
+
+FB_TroubleshootingView.st:188:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 188 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx302_SafeStopActive := WinchM1.Safety.SafeStop;
+     | ^
+
+FB_TroubleshootingView.st:189:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 189 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive := WinchM1.Safety.PowerCutOff;
+     | ^
+
+FB_TroubleshootingView.st:190:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 190 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
+     | ^
+
+FB_TroubleshootingView.st:191:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 191 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive := Commun.SimTopSensorBypassActive;
+     | ^
+
+FB_TroubleshootingView.st:192:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 192 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx306_AscentPermitEffective := WinchM1.Safety.AscentPermit;
+     | ^
+
+FB_TroubleshootingView.st:193:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 193 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI := FALSE; // TBD non câblé - voir fiche §6 (capteur mou de câble présent uniquement côté M2 dans ST_HwWinch)
+     | ^
+
+FB_TroubleshootingView.st:194:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 194 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
+     | ^
+
+FB_TroubleshootingView.st:195:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 195 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx309_DescendPermitEffective := WinchM1.Safety.DescendPermit;
+     | ^
+
+FB_TroubleshootingView.st:196:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 196 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx310_ErrorOperatorComm := WinchM1.Safety.ErrorOperatorComm;
+     | ^
+
+FB_TroubleshootingView.st:197:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 197 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx311_ErrorEncoder      := WinchM1.Safety.ErrorEncoder;
+     | ^
+
+FB_TroubleshootingView.st:198:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 198 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx312_ErrorPhaseRotation:= WinchM1.Safety.ErrorPhaseRotation;
+     | ^
+
+FB_TroubleshootingView.st:199:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 199 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx313_ErrorMecaA        := WinchM1.Safety.ErrorMecaA;
+     | ^
+
+FB_TroubleshootingView.st:200:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 200 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx314_ErrorMecaB        := WinchM1.Safety.ErrorMecaB;
+     | ^
+
+FB_TroubleshootingView.st:201:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 201 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx315_ErrorMecaC        := WinchM1.Safety.ErrorMecaC;
+     | ^
+
+FB_TroubleshootingView.st:202:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 202 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx316_ErrorMecaD        := WinchM1.Safety.ErrorMecaD;
+     | ^
+
+FB_TroubleshootingView.st:203:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 203 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx317_ErrorMecaE        := WinchM1.Safety.ErrorMecaE;
+     | ^
+
+FB_TroubleshootingView.st:204:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 204 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx318_ErrorBrakeThermal := WinchM1.Safety.ErrorBrakeThermal;
+     | ^
+
+FB_TroubleshootingView.st:205:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 205 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx319_ErrorOppositeDir  := WinchM1.Safety.ErrorOppositeDir;
+     | ^
+
+FB_TroubleshootingView.st:206:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 206 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx320_ErrorNoMovement   := WinchM1.Safety.ErrorNoMovement;
+     | ^
+
+FB_TroubleshootingView.st:208:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 208 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx321_CfgTopLimitM               := CfgTopLimitM;
+     | ^
+
+FB_TroubleshootingView.st:209:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 209 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx322_CablePosM                  := WinchM1.State.Position_M;
+     | ^
+
+FB_TroubleshootingView.st:210:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 210 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx323_TopLimitReached            := (WinchM1.State.Position_M >= CfgTopLimitM) AND NOT WinchM1.State.Encoder.HomingBusy;
+     | ^
+
+FB_TroubleshootingView.st:211:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 211 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx324_AscentBlockedByTopLimit    := (WinchM1.State.Position_M >= CfgTopLimitM) AND NOT WinchM1.State.Encoder.HomingBusy AND NOT (WinchM1.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
+     | ^
+
+FB_TroubleshootingView.st:212:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 212 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx325_BypassTopLimitSoftware     := WinchM1.Bypass.TopLimitSoftware;
+     | ^
+
+FB_TroubleshootingView.st:213:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 213 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx326_BypassTopLimitSoftCommun   := Commun.Bypass.TopLimitSoftware;
+     | ^
+
+FB_TroubleshootingView.st:214:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 214 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx327_BypassTopLimitSwitch       := WinchM1.Bypass.TopLimitSwitch;
+     | ^
+
+FB_TroubleshootingView.st:215:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 215 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx328_BypassTopLimitSwitchCommun := Commun.Bypass.TopLimitSwitch;
+     | ^
+
+FB_TroubleshootingView.st:216:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 216 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx329_BypassGlobal               := WinchM1.Bypass.Global;
+     | ^
+
+FB_TroubleshootingView.st:217:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 217 | GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx330_BypassGlobalCommun         := Commun.Bypass.Global;
+     | ^
+
+FB_TroubleshootingView.st:219:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 219 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx401_MotionAllowed := WinchM1.State.Ready;
+     | ^
+
+FB_TroubleshootingView.st:220:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 220 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx402_SpeedStepCalculated := WinchM1.State.StepNumber;
+     | ^
+
+FB_TroubleshootingView.st:221:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 221 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx403_SpeedRamp_Pct := WinchM1.State.SpeedCmd_Pct;
+     | ^
+
+FB_TroubleshootingView.st:222:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 222 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx404_BrakeReleaseAuthorized := WinchM1.State.BrakeCmd;
+     | ^
+
+FB_TroubleshootingView.st:223:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 223 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx405_FinalInterlockState := WinchM1.State.FinalInterlockState;
+     | ^
+
+FB_TroubleshootingView.st:224:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 224 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx406_FinalInterlockReason := WinchM1.State.FinalInterlockReason;
+     | ^
+
+FB_TroubleshootingView.st:225:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 225 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx407_FinalAuthorizedStep := WinchM1.State.FinalAuthorizedStep;
+     | ^
+
+FB_TroubleshootingView.st:226:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 226 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx408_BrakeCommandOpenConfirmed := WinchM1.State.BrakeCommandOpenConfirmed;
+     | ^
+
+FB_TroubleshootingView.st:227:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 227 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx409_BrakeTimeoutElapsed := WinchM1.State.FinalBrakeTimeoutElapsed;
+     | ^
+
+FB_TroubleshootingView.st:228:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 228 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx410_RestartDelayElapsed := WinchM1.State.FinalRestartDelayElapsed;
+     | ^
+
+FB_TroubleshootingView.st:229:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 229 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx411_StepDelayElapsed := WinchM1.State.FinalStepDelayElapsed;
+     | ^
+
+FB_TroubleshootingView.st:230:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 230 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx412_InTopSlowdownZone := WinchM1.State.InTopSlowdownZone;
+     | ^
+
+FB_TroubleshootingView.st:231:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 231 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx413_InBottomSlowdownZone := WinchM1.State.InBottomSlowdownZone;
+     | ^
+
+FB_TroubleshootingView.st:232:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 232 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx414_BottomLimitActiveM := WinchM1.State.BottomLimitActiveM;
+     | ^
+
+FB_TroubleshootingView.st:233:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 233 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx415_MotorRequest := WinchM1.State.FinalMotorRequest;
+     | ^
+
+FB_TroubleshootingView.st:234:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 234 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx416_RestartRequired := WinchM1.State.FinalRestartRequired;
+     | ^
+
+FB_TroubleshootingView.st:235:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 235 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx417_RestartInhibit := WinchM1.State.FinalRestartInhibit;
+     | ^
+
+FB_TroubleshootingView.st:236:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 236 | GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx418_NeutralRequestSeen := WinchM1.State.FinalNeutralRequestSeen;
+     | ^
+
+FB_TroubleshootingView.st:238:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 238 | GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ := WinchM1.State.RelayFwd;
+     | ^
+
+FB_TroubleshootingView.st:239:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 239 | GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_RQ := WinchM1.State.RelayRev;
+     | ^
+
+FB_TroubleshootingView.st:240:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 240 | GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM1.State.Contactor1;
+     | ^
+
+FB_TroubleshootingView.st:241:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 241 | GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM1.State.Contactor4;
+     | ^
+
+FB_TroubleshootingView.st:242:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 242 | GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM1.State.BrakeCmd;
+     | ^
+
+FB_TroubleshootingView.st:245:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 245 | GVL_Troubleshooting.J_LevageUnitaireM2.Inputs_100.Idx101_EncoderRawPos := UDINT_TO_DINT(HwIn.Winch.COD2_PosValue);
+     | ^
+
+FB_TroubleshootingView.st:246:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 246 | GVL_Troubleshooting.J_LevageUnitaireM2.Inputs_100.Idx102_CablePos_M := WinchM2.State.Position_M;
+     | ^
+
+FB_TroubleshootingView.st:247:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 247 | GVL_Troubleshooting.J_LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI := HwIn.Winch.M2_ContactorsReleased_DI;
+     | ^
+
+FB_TroubleshootingView.st:248:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 248 | GVL_Troubleshooting.J_LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied := NOT HwIn.Winch.M2_BrakeIsOpen_DI;
+     | ^
+
+FB_TroubleshootingView.st:249:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 249 | GVL_Troubleshooting.J_LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winch.M2_ThermalOk_DI;
+     | ^
+
+FB_TroubleshootingView.st:251:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 251 | GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA := HwIn.Operator.JoyYRaw_ANA2;
+     | ^
+
+FB_TroubleshootingView.st:252:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 252 | GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.Deflection;
+     | ^
+
+FB_TroubleshootingView.st:253:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 253 | GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx203_HmiManualCmd_BtnAscent := WinchM2.Cmd.BtnAscent;
+     | ^
+
+FB_TroubleshootingView.st:254:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 254 | GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx204_HmiManualCmd_BtnDescent := WinchM2.Cmd.BtnDescent;
+     | ^
+
+FB_TroubleshootingView.st:255:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 255 | GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM2SpeedTgt_Pct;
+     | ^
+
+FB_TroubleshootingView.st:256:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 256 | GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx206_ModeActive := Auth.Mode;
+     | ^
+
+FB_TroubleshootingView.st:257:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 257 | GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx207_BypassOperatorComm := WinchM2.Bypass.OperatorComm;
+     | ^
+
+FB_TroubleshootingView.st:258:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 258 | GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct := M2LogicRequestSpeedCmd_Pct;
+     | ^
+
+FB_TroubleshootingView.st:259:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 259 | GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection := M2LogicRequestDirection;
+     | ^
+
+FB_TroubleshootingView.st:260:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 260 | GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx210_CoupledUserRequestDirection := WinchBothMotionDirection;
+     | ^
+
+FB_TroubleshootingView.st:261:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 261 | GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx211_CoupledUserRequestActive := WinchBothMotionActive;
+     | ^
+
+FB_TroubleshootingView.st:263:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 263 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+     | ^
+
+FB_TroubleshootingView.st:264:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 264 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx302_SafeStopActive := WinchM2.Safety.SafeStop;
+     | ^
+
+FB_TroubleshootingView.st:265:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 265 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive := WinchM2.Safety.PowerCutOff;
+     | ^
+
+FB_TroubleshootingView.st:266:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 266 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
+     | ^
+
+FB_TroubleshootingView.st:267:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 267 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive := Commun.SimTopSensorBypassActive;
+     | ^
+
+FB_TroubleshootingView.st:268:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 268 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx306_AscentPermitEffective := WinchM2.Safety.AscentPermit;
+     | ^
+
+FB_TroubleshootingView.st:272:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 272 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI := NOT HwIn.Winch.M2_TensionedCable_DI;
+     | ^
+
+FB_TroubleshootingView.st:273:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 273 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
+     | ^
+
+FB_TroubleshootingView.st:274:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 274 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx309_DescendPermitEffective := WinchM2.Safety.DescendPermit;
+     | ^
+
+FB_TroubleshootingView.st:275:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 275 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx310_ErrorOperatorComm := WinchM2.Safety.ErrorOperatorComm;
+     | ^
+
+FB_TroubleshootingView.st:276:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 276 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx311_ErrorEncoder      := WinchM2.Safety.ErrorEncoder;
+     | ^
+
+FB_TroubleshootingView.st:277:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 277 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx312_ErrorPhaseRotation:= WinchM2.Safety.ErrorPhaseRotation;
+     | ^
+
+FB_TroubleshootingView.st:278:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 278 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx313_ErrorMecaA        := WinchM2.Safety.ErrorMecaA;
+     | ^
+
+FB_TroubleshootingView.st:279:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 279 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx314_ErrorMecaB        := WinchM2.Safety.ErrorMecaB;
+     | ^
+
+FB_TroubleshootingView.st:280:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 280 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx315_ErrorMecaC        := WinchM2.Safety.ErrorMecaC;
+     | ^
+
+FB_TroubleshootingView.st:281:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 281 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx316_ErrorMecaD        := WinchM2.Safety.ErrorMecaD;
+     | ^
+
+FB_TroubleshootingView.st:282:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 282 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx317_ErrorMecaE        := WinchM2.Safety.ErrorMecaE;
+     | ^
+
+FB_TroubleshootingView.st:283:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 283 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx318_ErrorBrakeThermal := WinchM2.Safety.ErrorBrakeThermal;
+     | ^
+
+FB_TroubleshootingView.st:284:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 284 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx319_ErrorOppositeDir  := WinchM2.Safety.ErrorOppositeDir;
+     | ^
+
+FB_TroubleshootingView.st:285:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 285 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx320_ErrorNoMovement   := WinchM2.Safety.ErrorNoMovement;
+     | ^
+
+FB_TroubleshootingView.st:287:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 287 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx321_CfgTopLimitM               := CfgTopLimitM;
+     | ^
+
+FB_TroubleshootingView.st:288:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 288 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx322_CablePosM                  := WinchM2.State.Position_M;
+     | ^
+
+FB_TroubleshootingView.st:289:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 289 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx323_TopLimitReached            := (WinchM2.State.Position_M >= CfgTopLimitM) AND NOT WinchM2.State.Encoder.HomingBusy;
+     | ^
+
+FB_TroubleshootingView.st:290:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 290 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx324_AscentBlockedByTopLimit    := (WinchM2.State.Position_M >= CfgTopLimitM) AND NOT WinchM2.State.Encoder.HomingBusy AND NOT (WinchM2.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
+     | ^
+
+FB_TroubleshootingView.st:291:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 291 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx325_BypassTopLimitSoftware     := WinchM2.Bypass.TopLimitSoftware;
+     | ^
+
+FB_TroubleshootingView.st:292:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 292 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx326_BypassTopLimitSoftCommun   := Commun.Bypass.TopLimitSoftware;
+     | ^
+
+FB_TroubleshootingView.st:293:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 293 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx327_BypassTopLimitSwitch       := WinchM2.Bypass.TopLimitSwitch;
+     | ^
+
+FB_TroubleshootingView.st:294:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 294 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx328_BypassTopLimitSwitchCommun := Commun.Bypass.TopLimitSwitch;
+     | ^
+
+FB_TroubleshootingView.st:295:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 295 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx329_BypassGlobal               := WinchM2.Bypass.Global;
+     | ^
+
+FB_TroubleshootingView.st:296:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 296 | GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx330_BypassGlobalCommun         := Commun.Bypass.Global;
+     | ^
+
+FB_TroubleshootingView.st:298:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 298 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx401_MotionAllowed := WinchM2.State.Ready;
+     | ^
+
+FB_TroubleshootingView.st:299:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 299 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx402_SpeedStepCalculated := WinchM2.State.StepNumber;
+     | ^
+
+FB_TroubleshootingView.st:300:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 300 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx403_SpeedRamp_Pct := WinchM2.State.SpeedCmd_Pct;
+     | ^
+
+FB_TroubleshootingView.st:301:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 301 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx404_BrakeReleaseAuthorized := WinchM2.State.BrakeCmd;
+     | ^
+
+FB_TroubleshootingView.st:302:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 302 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx405_FinalInterlockState := WinchM2.State.FinalInterlockState;
+     | ^
+
+FB_TroubleshootingView.st:303:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 303 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason := WinchM2.State.FinalInterlockReason;
+     | ^
+
+FB_TroubleshootingView.st:304:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 304 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx407_FinalAuthorizedStep := WinchM2.State.FinalAuthorizedStep;
+     | ^
+
+FB_TroubleshootingView.st:305:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 305 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx408_BrakeCommandOpenConfirmed := WinchM2.State.BrakeCommandOpenConfirmed;
+     | ^
+
+FB_TroubleshootingView.st:306:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 306 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx409_BrakeTimeoutElapsed := WinchM2.State.FinalBrakeTimeoutElapsed;
+     | ^
+
+FB_TroubleshootingView.st:307:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 307 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx410_RestartDelayElapsed := WinchM2.State.FinalRestartDelayElapsed;
+     | ^
+
+FB_TroubleshootingView.st:308:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 308 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx411_StepDelayElapsed := WinchM2.State.FinalStepDelayElapsed;
+     | ^
+
+FB_TroubleshootingView.st:309:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 309 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx412_InTopSlowdownZone := WinchM2.State.InTopSlowdownZone;
+     | ^
+
+FB_TroubleshootingView.st:310:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 310 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx413_InBottomSlowdownZone := WinchM2.State.InBottomSlowdownZone;
+     | ^
+
+FB_TroubleshootingView.st:311:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 311 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx414_BottomLimitActiveM := WinchM2.State.BottomLimitActiveM;
+     | ^
+
+FB_TroubleshootingView.st:312:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 312 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx415_MotorRequest := WinchM2.State.FinalMotorRequest;
+     | ^
+
+FB_TroubleshootingView.st:313:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 313 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx416_RestartRequired := WinchM2.State.FinalRestartRequired;
+     | ^
+
+FB_TroubleshootingView.st:314:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 314 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx417_RestartInhibit := WinchM2.State.FinalRestartInhibit;
+     | ^
+
+FB_TroubleshootingView.st:315:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 315 | GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx418_NeutralRequestSeen := WinchM2.State.FinalNeutralRequestSeen;
+     | ^
+
+FB_TroubleshootingView.st:317:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 317 | GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ := WinchM2.State.RelayFwd;
+     | ^
+
+FB_TroubleshootingView.st:318:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 318 | GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_RQ := WinchM2.State.RelayRev;
+     | ^
+
+FB_TroubleshootingView.st:319:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 319 | GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM2.State.Contactor1;
+     | ^
+
+FB_TroubleshootingView.st:320:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 320 | GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM2.State.Contactor4;
+     | ^
+
+FB_TroubleshootingView.st:321:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 321 | GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM2.State.BrakeCmd;
+     | ^
+
+FB_TroubleshootingView.st:327:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 327 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx101_BucketIsOpen := WinchM2.Bucket.State.MechState.IsOpen;
+     | ^
+
+FB_TroubleshootingView.st:328:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 328 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx102_BucketIsClosed := WinchM2.Bucket.State.MechState.IsClosed;
+     | ^
+
+FB_TroubleshootingView.st:329:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 329 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx103_OffsetPos_M := WinchM2.Bucket.State.ActiveOffset_M;
+     | ^
+
+FB_TroubleshootingView.st:330:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 330 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx104_AutoSeqActive := WinchM2.Bucket.State.AutoBucketSeqActive;
+     | ^
+
+FB_TroubleshootingView.st:331:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 331 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx105_StateIncoherent := WinchM2.Bucket.State.MechState.StateIncoherent;
+     | ^
+
+FB_TroubleshootingView.st:332:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 332 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx106_FBState := WinchM2.Bucket.State.FBState;
+     | ^
+
+FB_TroubleshootingView.st:333:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 333 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx107_LastPosM2Open_M := WinchM2.Bucket.State.MechState.LastPosM2Open;
+     | ^
+
+FB_TroubleshootingView.st:334:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 334 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx108_LastPosM2Close_M := WinchM2.Bucket.State.MechState.LastPosM2Close;
+     | ^
+
+FB_TroubleshootingView.st:335:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 335 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx109_BucketTooOpen := WinchM2.Bucket.State.MechState.TooOpen;
+     | ^
+
+FB_TroubleshootingView.st:336:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 336 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx110_BucketTooClosed := WinchM2.Bucket.State.MechState.TooClosed;
+     | ^
+
+FB_TroubleshootingView.st:337:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 337 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx111_BucketIsIntermediate := WinchM2.Bucket.State.MechState.IsIntermediate;
+     | ^
+
+FB_TroubleshootingView.st:338:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 338 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx112_DeltaPosition_M := WinchM2.Bucket.State.DeltaPosition_M;
+     | ^
+
+FB_TroubleshootingView.st:339:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 339 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx113_MachineHomed := WinchM2.Bucket.State.MachineHomed;
+     | ^
+
+FB_TroubleshootingView.st:340:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 340 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx114_MachineHomingStep := WinchM2.Bucket.State.MachineHomingStep;
+     | ^
+
+FB_TroubleshootingView.st:341:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 341 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx115_MachineHomingFailed := WinchM2.Bucket.State.MachineHomingFailed;
+     | ^
+
+FB_TroubleshootingView.st:342:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 342 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx116_M1ReferenceMissing := NOT WinchM1.State.Encoder.Homed OR WinchM1.State.Encoder.HomingSuspect;
+     | ^
+
+FB_TroubleshootingView.st:343:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 343 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx117_M2ReferenceMissing := NOT WinchM2.State.Encoder.Homed OR WinchM2.State.Encoder.HomingSuspect;
+     | ^
+
+FB_TroubleshootingView.st:344:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 344 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx118_BucketOffsetUnknown := NOT WinchM2.Bucket.State.MechState.ActiveOffsetValid;
+     | ^
+
+FB_TroubleshootingView.st:345:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 345 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx119_ReferenceTransaction := WinchM2.Bucket.State.MachineHomingActive;
+     | ^
+
+FB_TroubleshootingView.st:346:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 346 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx120_MachineHomingLossSafeStop := WinchM2.Bucket.State.MachineHomingLossSafeStop;
+     | ^
+
+FB_TroubleshootingView.st:347:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 347 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen := WinchM2.Bucket.Cmd.BtnOpen;
+     | ^
+
+FB_TroubleshootingView.st:348:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 348 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose := WinchM2.Bucket.Cmd.BtnClose;
+     | ^
+
+FB_TroubleshootingView.st:349:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 349 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx203_CycleCmd_Open := CycleBucketOpen;
+     | ^
+
+FB_TroubleshootingView.st:350:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 350 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx204_CoupledDiveOpenArmed := WinchM2.Bucket.State.CoupledDiveOpenArmed;
+     | ^
+
+FB_TroubleshootingView.st:351:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 351 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx205_CoupledAscentCloseArmed := WinchM2.Bucket.State.CoupledAscentCloseArmed;
+     | ^
+
+FB_TroubleshootingView.st:352:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 352 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx206_CloseReqActive := WinchM2.Bucket.State.CloseActive;
+     | ^
+
+FB_TroubleshootingView.st:353:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 353 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx207_OpenReqActive := WinchM2.Bucket.State.OpenActive;
+     | ^
+
+FB_TroubleshootingView.st:354:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 354 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx208_MotionBlockedByBucket := WinchM2.Bucket.State.CoupledMotionBlockedByBucket;
+     | ^
+
+FB_TroubleshootingView.st:355:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 355 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+     | ^
+
+FB_TroubleshootingView.st:356:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 356 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx302_BucketFaultActive := WinchM2.Bucket.State.Error;
+     | ^
+
+FB_TroubleshootingView.st:357:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 357 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx303_KoboldAutoStopEnabled := Commun.Cfg.TglEnableKoboldAutoStopDescent;
+     | ^
+
+FB_TroubleshootingView.st:358:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 358 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx304_KoboldImmersionConfirmed := Commun.KoboldImmersionConfirmed;
+     | ^
+
+FB_TroubleshootingView.st:359:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 359 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx305_KoboldBottomTouchLatched := Commun.KoboldBottomTouchLatched;
+     | ^
+
+FB_TroubleshootingView.st:360:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 360 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx306_ErrorIdRaw := WinchM2.Bucket.State.ErrorId;
+     | ^
+
+FB_TroubleshootingView.st:361:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 361 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx307_EffectivePermit_Open := Permits.EffectivePermitBucket_Open;
+     | ^
+
+FB_TroubleshootingView.st:362:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 362 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx308_EffectivePermit_Close := Permits.EffectivePermitBucket_Close;
+     | ^
+
+FB_TroubleshootingView.st:363:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 363 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
+     | ^
+
+FB_TroubleshootingView.st:364:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 364 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
+     | ^
+
+FB_TroubleshootingView.st:365:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 365 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx403_ExtractionControlActive := WinchM2.Bucket.State.ExtractionControlActive;
+     | ^
+
+FB_TroubleshootingView.st:366:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 366 | GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD non câblé - voir fiche §6 (pas de DQ relais benne dédié publié, benne pilote M2_StartStop/M2_Direction, pas un relais propre)
+     | ^
+
+FB_TroubleshootingView.st:375:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 375 | GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx101_PosTremie_DI := Translation.State.PositionTremie;
+     | ^
+
+FB_TroubleshootingView.st:376:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 376 | GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx102_PosPV_DI := Translation.State.PositionPV;
+     | ^
+
+FB_TroubleshootingView.st:377:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 377 | GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx103_PosP2_DI := Translation.State.PositionP2;
+     | ^
+
+FB_TroubleshootingView.st:378:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 378 | GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx104_PosP1_DI := Translation.State.PositionP1;
+     | ^
+
+FB_TroubleshootingView.st:379:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 379 | GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx105_PosMaintenance_DI := Translation.State.PositionMaintenance;
+     | ^
+
+FB_TroubleshootingView.st:380:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 380 | GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz := Translation.State.DriveActualFreq_Hz;
+     | ^
+
+FB_TroubleshootingView.st:381:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 381 | GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx107_DriveStatusWord := HwIn.Translation.M3_StatusWord;
+     | ^
+
+FB_TroubleshootingView.st:382:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 382 | GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx108_BrakeApplied := NOT Translation.State.BrakeFeedback;
+     | ^
+
+FB_TroubleshootingView.st:383:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 383 | GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx109_DriveThermalOk := Translation.State.DriveThermalOk;
+     | ^
+
+FB_TroubleshootingView.st:385:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 385 | GVL_Troubleshooting.L_TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA := HwIn.Operator.JoyXRaw_ANA1;
+     | ^
+
+FB_TroubleshootingView.st:386:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 386 | GVL_Troubleshooting.L_TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct := GVL_IHM.JOY1Joystick.State.AxisCmdX.Deflection;
+     | ^
+
+FB_TroubleshootingView.st:386:79: error: Undeclared variable 'GVL_IHM'
+ 386 | GVL_Troubleshooting.L_TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct := GVL_IHM.JOY1Joystick.State.AxisCmdX.Deflection;
+     |                                                                               ^
+
+FB_TroubleshootingView.st:387:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 387 | GVL_Troubleshooting.L_TranslationPontM3.Demandes_200.Idx203_HmiCmd_BtnTremie := Translation.Cmd.BtnTremie;
+     | ^
+
+FB_TroubleshootingView.st:388:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 388 | GVL_Troubleshooting.L_TranslationPontM3.Demandes_200.Idx204_HmiCmd_BtnMaintenance := Translation.Cmd.BtnMaintenance;
+     | ^
+
+FB_TroubleshootingView.st:389:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 389 | GVL_Troubleshooting.L_TranslationPontM3.Demandes_200.Idx205_HmiTargetPosition := Translation.Cmd.SelTarget;
+     | ^
+
+FB_TroubleshootingView.st:390:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 390 | GVL_Troubleshooting.L_TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition := CycleTargetPosition;
+     | ^
+
+FB_TroubleshootingView.st:391:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 391 | GVL_Troubleshooting.L_TranslationPontM3.Demandes_200.Idx207_ModeActive := Auth.Mode;
+     | ^
+
+FB_TroubleshootingView.st:392:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 392 | GVL_Troubleshooting.L_TranslationPontM3.Demandes_200.Idx208_BypassNetworkActive := Translation.Bypass.Global;
+     | ^
+
+FB_TroubleshootingView.st:393:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 393 | GVL_Troubleshooting.L_TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct := Translation.State.SpeedCmd_Pct;
+     | ^
+
+FB_TroubleshootingView.st:395:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 395 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+     | ^
+
+FB_TroubleshootingView.st:396:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 396 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx302_SafeStopActive := Translation.Safety.SafeStop;
+     | ^
+
+FB_TroubleshootingView.st:397:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 397 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx303_PowerCutOffActive := Translation.Safety.PowerCutOff;
+     | ^
+
+FB_TroubleshootingView.st:398:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 398 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx304_LimitSwitchTremieActive := Translation.State.LimitSwitchTremie;
+     | ^
+
+FB_TroubleshootingView.st:399:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 399 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx305_LimitSwitchMaintenanceActive := Translation.State.LimitSwitchMaintenance;
+     | ^
+
+FB_TroubleshootingView.st:400:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 400 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx306_BypassLimitSwitch := Translation.Bypass.LimitSwitch;
+     | ^
+
+FB_TroubleshootingView.st:401:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 401 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx307_PositionDecoderIncoherent := Translation.State.SensorWordIncoherent;
+     | ^
+
+FB_TroubleshootingView.st:402:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 402 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx308_HeightInterlockBlocking := Translation.State.HeightInterlockBlocking;
+     | ^
+
+FB_TroubleshootingView.st:403:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 403 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx309_ErrorOperatorComm := Translation.Safety.ErrorOperatorComm;
+     | ^
+
+FB_TroubleshootingView.st:404:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 404 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx310_ErrorDriveComm    := Translation.Safety.ErrorDriveComm;
+     | ^
+
+FB_TroubleshootingView.st:405:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 405 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx311_ErrorPhaseRotation:= Translation.Safety.ErrorPhaseRotation;
+     | ^
+
+FB_TroubleshootingView.st:406:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 406 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx312_ErrorBrakeThermal := Translation.Safety.ErrorBrakeThermal;
+     | ^
+
+FB_TroubleshootingView.st:407:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 407 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx313_ErrorMecaB        := Translation.Safety.ErrorMecaB;
+     | ^
+
+FB_TroubleshootingView.st:408:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 408 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx314_ErrorMecaA        := Translation.Safety.ErrorMecaA;
+     | ^
+
+FB_TroubleshootingView.st:409:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 409 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx315_ErrorLimitSwitch  := Translation.Safety.ErrorLimitSwitch;
+     | ^
+
+FB_TroubleshootingView.st:410:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 410 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx316_ErrorSensorIncoherent := Translation.Safety.ErrorSensorIncoherent;
+     | ^
+
+FB_TroubleshootingView.st:411:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 411 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx317_ErrorId := Translation.Safety.ErrorId; // Masque brut complet (latch cause, source d'arbitrage PowerCutOff)
+     | ^
+
+FB_TroubleshootingView.st:412:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 412 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx318_EffectivePermitM3_Tremie := Translation.Safety.EffectivePermitM3_Tremie; // 🟢 Permis canonique vers Trémie
+     | ^
+
+FB_TroubleshootingView.st:413:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 413 | GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx319_EffectivePermitM3_Maintenance := Translation.Safety.EffectivePermitM3_Maintenance; // 🟢 Permis canonique vers Maintenance/P1
+     | ^
+
+FB_TroubleshootingView.st:415:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 415 | GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
+     | ^
+
+FB_TroubleshootingView.st:416:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 416 | GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqCmd_Hz;
+     | ^
+
+FB_TroubleshootingView.st:417:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 417 | GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx403_DriveControlWord := Translation.State.DriveControlWord;
+     | ^
+
+FB_TroubleshootingView.st:418:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 418 | GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx404_FinalInterlockState := Translation.State.FinalInterlockState;
+     | ^
+
+FB_TroubleshootingView.st:419:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 419 | GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx405_FinalInterlockReason := Translation.State.FinalInterlockReason;
+     | ^
+
+FB_TroubleshootingView.st:420:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 420 | GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx406_BrakeCommandOpenConfirmed := Translation.State.BrakeCommandOpenConfirmed;
+     | ^
+
+FB_TroubleshootingView.st:421:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 421 | GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed := Translation.State.FinalBrakeTimeoutElapsed;
+     | ^
+
+FB_TroubleshootingView.st:423:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 423 | GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord := Translation.State.DriveControlWord;
+     | ^
+
+FB_TroubleshootingView.st:424:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 424 | GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz := 0; // TBD non câblé - voir fiche §6 (format UINT 0.01Hz non exposé, seul DriveFreqCmd_Hz en REAL Hz existe)
+     | ^
+
+FB_TroubleshootingView.st:425:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 425 | GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ := Translation.State.BrakeCmd;
+     | ^
+
+FB_TroubleshootingView.st:432:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 432 | GVL_Troubleshooting.E_HomingM1.Step1_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2);
+     | ^
+
+FB_TroubleshootingView.st:433:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 433 | GVL_Troubleshooting.E_HomingM1.Step2_WinchSelected      := (Auth.Mode <> E_Mode.MAINT_N2) OR (Auth.JoystickWinchSelectArbitrated = 1);
+     | ^
+
+FB_TroubleshootingView.st:434:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 434 | GVL_Troubleshooting.E_HomingM1.Step3_EncoderAvailable   := Network.EncoderM1.Operational AND NOT InputModuleFault;
+     | ^
+
+FB_TroubleshootingView.st:436:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 436 | GVL_Troubleshooting.E_HomingM1.HwIn_ContactorsReleased_DI := HwIn.Winch.M1_ContactorsReleased_DI;
+     | ^
+
+FB_TroubleshootingView.st:437:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 437 | GVL_Troubleshooting.E_HomingM1.HwIn_BrakeIsOpen_DI        := HwIn.Winch.M1_BrakeIsOpen_DI;
+     | ^
+
+FB_TroubleshootingView.st:438:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 438 | GVL_Troubleshooting.E_HomingM1.HwIn_TopPositionFree_DI    := HwIn.Winch.M1M2_TopPositionFree_DI;
+     | ^
+
+FB_TroubleshootingView.st:440:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 440 | GVL_Troubleshooting.E_HomingM1.Step4_ContactorsReleased := HwIn.Winch.M1_ContactorsReleased_DI;
+     | ^
+
+FB_TroubleshootingView.st:441:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 441 | GVL_Troubleshooting.E_HomingM1.Step5_BrakeApplied       := NOT HwIn.Winch.M1_BrakeIsOpen_DI;
+     | ^
+
+FB_TroubleshootingView.st:442:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 442 | GVL_Troubleshooting.E_HomingM1.TopPositionSensorActive  := Commun.TopPositionSensorActive;
+     | ^
+
+FB_TroubleshootingView.st:443:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 443 | GVL_Troubleshooting.E_HomingM1.BucketIsOpen             := WinchM2.Bucket.State.MechState.IsOpen;
+     | ^
+
+FB_TroubleshootingView.st:445:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 445 | GVL_Troubleshooting.E_HomingM1.AllConditionsMet := GVL_Troubleshooting.E_HomingM1.Step1_ModeAuthorized
+     | ^
+
+FB_TroubleshootingView.st:445:52: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 445 | GVL_Troubleshooting.E_HomingM1.AllConditionsMet := GVL_Troubleshooting.E_HomingM1.Step1_ModeAuthorized
+     |                                                    ^
+
+FB_TroubleshootingView.st:446:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 446 |                                               AND GVL_Troubleshooting.E_HomingM1.Step2_WinchSelected
+     |                                                   ^
+
+FB_TroubleshootingView.st:447:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 447 |                                               AND GVL_Troubleshooting.E_HomingM1.Step3_EncoderAvailable
+     |                                                   ^
+
+FB_TroubleshootingView.st:448:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 448 |                                               AND GVL_Troubleshooting.E_HomingM1.Step4_ContactorsReleased
+     |                                                   ^
+
+FB_TroubleshootingView.st:449:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 449 |                                               AND GVL_Troubleshooting.E_HomingM1.Step5_BrakeApplied;
+     |                                                   ^
+
+FB_TroubleshootingView.st:451:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 451 | GVL_Troubleshooting.E_HomingM1.HomingBusy      := WinchM1.State.Encoder.HomingBusy;
+     | ^
+
+FB_TroubleshootingView.st:452:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 452 | GVL_Troubleshooting.E_HomingM1.HomingDone      := WinchM1.State.Encoder.HomingDone;
+     | ^
+
+FB_TroubleshootingView.st:453:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 453 | GVL_Troubleshooting.E_HomingM1.HomingHomed     := WinchM1.State.Encoder.Homed;
+     | ^
+
+FB_TroubleshootingView.st:454:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 454 | GVL_Troubleshooting.E_HomingM1.HomingSuspect   := WinchM1.State.Encoder.HomingSuspect;
+     | ^
+
+FB_TroubleshootingView.st:455:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 455 | GVL_Troubleshooting.E_HomingM1.RejectErrorMask := WinchM1.State.Encoder.HomingErrorId;
+     | ^
+
+FB_TroubleshootingView.st:458:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 458 | GVL_Troubleshooting.F_HomingM2.Step1_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2);
+     | ^
+
+FB_TroubleshootingView.st:459:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 459 | GVL_Troubleshooting.F_HomingM2.Step2_WinchSelected      := (Auth.Mode <> E_Mode.MAINT_N2) OR (Auth.JoystickWinchSelectArbitrated = 2);
+     | ^
+
+FB_TroubleshootingView.st:460:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 460 | GVL_Troubleshooting.F_HomingM2.Step3_EncoderAvailable   := Network.EncoderM2.Operational AND NOT InputModuleFault;
+     | ^
+
+FB_TroubleshootingView.st:462:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 462 | GVL_Troubleshooting.F_HomingM2.HwIn_ContactorsReleased_DI := HwIn.Winch.M2_ContactorsReleased_DI;
+     | ^
+
+FB_TroubleshootingView.st:463:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 463 | GVL_Troubleshooting.F_HomingM2.HwIn_BrakeIsOpen_DI        := HwIn.Winch.M2_BrakeIsOpen_DI;
+     | ^
+
+FB_TroubleshootingView.st:464:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 464 | GVL_Troubleshooting.F_HomingM2.HwIn_TopPositionFree_DI    := HwIn.Winch.M1M2_TopPositionFree_DI;
+     | ^
+
+FB_TroubleshootingView.st:466:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 466 | GVL_Troubleshooting.F_HomingM2.Step4_ContactorsReleased := HwIn.Winch.M2_ContactorsReleased_DI;
+     | ^
+
+FB_TroubleshootingView.st:467:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 467 | GVL_Troubleshooting.F_HomingM2.Step5_BrakeApplied       := NOT HwIn.Winch.M2_BrakeIsOpen_DI;
+     | ^
+
+FB_TroubleshootingView.st:468:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 468 | GVL_Troubleshooting.F_HomingM2.TopPositionSensorActive  := Commun.TopPositionSensorActive;
+     | ^
+
+FB_TroubleshootingView.st:469:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 469 | GVL_Troubleshooting.F_HomingM2.BucketIsOpen             := WinchM2.Bucket.State.MechState.IsOpen;
+     | ^
+
+FB_TroubleshootingView.st:471:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 471 | GVL_Troubleshooting.F_HomingM2.AllConditionsMet := GVL_Troubleshooting.F_HomingM2.Step1_ModeAuthorized
+     | ^
+
+FB_TroubleshootingView.st:471:52: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 471 | GVL_Troubleshooting.F_HomingM2.AllConditionsMet := GVL_Troubleshooting.F_HomingM2.Step1_ModeAuthorized
+     |                                                    ^
+
+FB_TroubleshootingView.st:472:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 472 |                                               AND GVL_Troubleshooting.F_HomingM2.Step2_WinchSelected
+     |                                                   ^
+
+FB_TroubleshootingView.st:473:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 473 |                                               AND GVL_Troubleshooting.F_HomingM2.Step3_EncoderAvailable
+     |                                                   ^
+
+FB_TroubleshootingView.st:474:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 474 |                                               AND GVL_Troubleshooting.F_HomingM2.Step4_ContactorsReleased
+     |                                                   ^
+
+FB_TroubleshootingView.st:475:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 475 |                                               AND GVL_Troubleshooting.F_HomingM2.Step5_BrakeApplied;
+     |                                                   ^
+
+FB_TroubleshootingView.st:477:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 477 | GVL_Troubleshooting.F_HomingM2.HomingBusy      := WinchM2.State.Encoder.HomingBusy;
+     | ^
+
+FB_TroubleshootingView.st:478:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 478 | GVL_Troubleshooting.F_HomingM2.HomingDone      := WinchM2.State.Encoder.HomingDone;
+     | ^
+
+FB_TroubleshootingView.st:479:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 479 | GVL_Troubleshooting.F_HomingM2.HomingHomed     := WinchM2.State.Encoder.Homed;
+     | ^
+
+FB_TroubleshootingView.st:480:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 480 | GVL_Troubleshooting.F_HomingM2.HomingSuspect   := WinchM2.State.Encoder.HomingSuspect;
+     | ^
+
+FB_TroubleshootingView.st:481:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 481 | GVL_Troubleshooting.F_HomingM2.RejectErrorMask := WinchM2.State.Encoder.HomingErrorId;
+     | ^
+
+FB_TroubleshootingView.st:487:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 487 | GVL_Troubleshooting.C_Safety.SimulationModeActive       := SimulationModeActive;
+     | ^
+
+FB_TroubleshootingView.st:488:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 488 | GVL_Troubleshooting.C_Safety.SimSafetyActive            := SimSafetyActive;
+     | ^
+
+FB_TroubleshootingView.st:490:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 490 | GVL_Troubleshooting.C_Safety.HwIn_EmergencyChainClosed_DI  := HwIn.Machine.EmergencyChainClosed_DI;
+     | ^
+
+FB_TroubleshootingView.st:491:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 491 | GVL_Troubleshooting.C_Safety.HwIn_PowerContactorEngaged_DI := HwIn.Machine.PowerContactorEngaged_DI;
+     | ^
+
+FB_TroubleshootingView.st:492:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 492 | GVL_Troubleshooting.C_Safety.HwIn_EmergencyBtnCut_HMI      := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff;
+     | ^
+
+FB_TroubleshootingView.st:492:63: error: Undeclared variable 'GVL_IHM'
+ 492 | GVL_Troubleshooting.C_Safety.HwIn_EmergencyBtnCut_HMI      := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff;
+     |                                                               ^
+
+FB_TroubleshootingView.st:494:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 494 | GVL_Troubleshooting.C_Safety.Step1_InputModulesOk       := NOT InputModuleFault;
+     | ^
+
+FB_TroubleshootingView.st:495:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 495 | GVL_Troubleshooting.C_Safety.Step2_EmergencyBtnNotCut   := NOT GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff;
+     | ^
+
+FB_TroubleshootingView.st:495:64: error: Undeclared variable 'GVL_IHM'
+ 495 | GVL_Troubleshooting.C_Safety.Step2_EmergencyBtnNotCut   := NOT GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff;
+     |                                                                ^
+
+FB_TroubleshootingView.st:496:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 496 | GVL_Troubleshooting.C_Safety.Step3_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+     | ^
+
+FB_TroubleshootingView.st:497:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 497 | GVL_Troubleshooting.C_Safety.Step4_ContactorReleased     := NOT HwIn.Machine.PowerContactorEngaged_DI;
+     | ^
+
+FB_TroubleshootingView.st:498:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 498 | GVL_Troubleshooting.C_Safety.Step5_ArmingAllowed        := EmergencyState.Armable;
+     | ^
+
+FB_TroubleshootingView.st:500:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 500 | GVL_Troubleshooting.C_Safety.ArmingStep            := EmergencyState.Step;
+     | ^
+
+FB_TroubleshootingView.st:501:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 501 | GVL_Troubleshooting.C_Safety.ArmingPulseActive    := ArmingPulseActive;
+     | ^
+
+FB_TroubleshootingView.st:502:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 502 | GVL_Troubleshooting.C_Safety.ArmingBusy           := EmergencyState.ArmingBusy;
+     | ^
+
+FB_TroubleshootingView.st:503:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 503 | GVL_Troubleshooting.C_Safety.LockoutActive        := EmergencyDiag.LockoutActive;
+     | ^
+
+FB_TroubleshootingView.st:504:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 504 | GVL_Troubleshooting.C_Safety.PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
+     | ^
+
+FB_TroubleshootingView.st:505:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 505 | GVL_Troubleshooting.C_Safety.PowerCutOffActive    := PowerCutOffActive;
+     | ^
+
+FB_TroubleshootingView.st:506:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 506 | GVL_Troubleshooting.C_Safety.PowerCutOffRequest   := PowerCutOffActive;
+     | ^
+
+FB_TroubleshootingView.st:507:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 507 | GVL_Troubleshooting.C_Safety.MaintainAActive      := MaintainAActive;
+     | ^
+
+FB_TroubleshootingView.st:508:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 508 | GVL_Troubleshooting.C_Safety.MaintainBActive      := MaintainBActive;
+     | ^
+
+FB_TroubleshootingView.st:511:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 511 | GVL_Troubleshooting.C_Safety.AllConditionsMet := HwIn.Machine.EmergencyChainClosed_DI
+     | ^
+
+FB_TroubleshootingView.st:513:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 513 | GVL_Troubleshooting.C_Safety.SafetyError          := EmergencyDiag.Error;
+     | ^
+
+FB_TroubleshootingView.st:514:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 514 | GVL_Troubleshooting.C_Safety.ArmingErrorId       := EmergencyDiag.ErrorId;
+     | ^
+
+FB_TroubleshootingView.st:515:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 515 | GVL_Troubleshooting.C_Safety.RedundancyTestFailed := EmergencyDiag.RedundancyTestFailed;
+     | ^
+
+FB_TroubleshootingView.st:516:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 516 | GVL_Troubleshooting.C_Safety.ArmingFailed         := EmergencyDiag.ArmFailed;
+     | ^
+
+FB_TroubleshootingView.st:517:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 517 | GVL_Troubleshooting.C_Safety.WasArmed             := EmergencyDiag.WasArmed;
+     | ^
+
+FB_TroubleshootingView.st:518:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 518 | GVL_Troubleshooting.C_Safety.LastAbortStep        := EmergencyDiag.LastAbortStep;
+     | ^
+
+FB_TroubleshootingView.st:519:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 519 | GVL_Troubleshooting.C_Safety.LastAbortCause       := EmergencyDiag.LastAbortCause;
+     | ^
+
+FB_TroubleshootingView.st:525:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 525 | GVL_Troubleshooting.D_Joystick.Step1_CanBusActive        := Network.BusCanOpen.Operational;
+     | ^
+
+FB_TroubleshootingView.st:526:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 526 | GVL_Troubleshooting.D_Joystick.Step2_JoystickOperational := Network.Joystick.Operational;
+     | ^
+
+FB_TroubleshootingView.st:527:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 527 | GVL_Troubleshooting.D_Joystick.HwIn_JoyBtnRaw_DI         := HwIn.Operator.JoyBtnRaw;
+     | ^
+
+FB_TroubleshootingView.st:528:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 528 | GVL_Troubleshooting.D_Joystick.NeutralXAct               := (HwIn.Operator.JoyXRaw_ANA1 >= 4800 AND HwIn.Operator.JoyXRaw_ANA1 <= 5200);
+     | ^
+
+FB_TroubleshootingView.st:529:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 529 | GVL_Troubleshooting.D_Joystick.NeutralYAct               := (HwIn.Operator.JoyYRaw_ANA2 >= 4800 AND HwIn.Operator.JoyYRaw_ANA2 <= 5200);
+     | ^
+
+FB_TroubleshootingView.st:530:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 530 | GVL_Troubleshooting.D_Joystick.Step3_DeadmanPressed      := HwIn.Operator.JoyBtnRaw;
+     | ^
+
+FB_TroubleshootingView.st:531:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 531 | GVL_Troubleshooting.D_Joystick.Step4_NeutralAcquired     := JoystickHMI.State.AtNeutral;
+     | ^
+
+FB_TroubleshootingView.st:532:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 532 | GVL_Troubleshooting.D_Joystick.DeadmanArmed             := JoystickHMI.State.DeadmanArmed;
+     | ^
+
+FB_TroubleshootingView.st:534:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 534 | GVL_Troubleshooting.D_Joystick.AllConditionsMet := GVL_Troubleshooting.D_Joystick.Step1_CanBusActive
+     | ^
+
+FB_TroubleshootingView.st:534:52: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 534 | GVL_Troubleshooting.D_Joystick.AllConditionsMet := GVL_Troubleshooting.D_Joystick.Step1_CanBusActive
+     |                                                    ^
+
+FB_TroubleshootingView.st:535:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 535 |                                               AND GVL_Troubleshooting.D_Joystick.Step2_JoystickOperational
+     |                                                   ^
+
+FB_TroubleshootingView.st:536:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 536 |                                               AND GVL_Troubleshooting.D_Joystick.DeadmanArmed;
+     |                                                   ^
+
+FB_TroubleshootingView.st:538:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 538 | GVL_Troubleshooting.D_Joystick.JoystickSelected := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+     | ^
+
+FB_TroubleshootingView.st:538:52: error: Undeclared variable 'GVL_IHM'
+ 538 | GVL_Troubleshooting.D_Joystick.JoystickSelected := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+     |                                                    ^
+
+FB_TroubleshootingView.st:539:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 539 | GVL_Troubleshooting.D_Joystick.SelJoystickWinch := GVL_IHM.Modes.Cmd.SelJoystickWinch;
+     | ^
+
+FB_TroubleshootingView.st:539:52: error: Undeclared variable 'GVL_IHM'
+ 539 | GVL_Troubleshooting.D_Joystick.SelJoystickWinch := GVL_IHM.Modes.Cmd.SelJoystickWinch;
+     |                                                    ^
+
+FB_TroubleshootingView.st:540:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 540 | GVL_Troubleshooting.D_Joystick.RawX             := HwIn.Operator.JoyXRaw_ANA1;
+     | ^
+
+FB_TroubleshootingView.st:541:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 541 | GVL_Troubleshooting.D_Joystick.RawY             := HwIn.Operator.JoyYRaw_ANA2;
+     | ^
+
+FB_TroubleshootingView.st:542:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 542 | GVL_Troubleshooting.D_Joystick.DeflectionX_Pct  := JoystickHMI.State.AxisCmdX.Deflection;
+     | ^
+
+FB_TroubleshootingView.st:543:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 543 | GVL_Troubleshooting.D_Joystick.DeflectionY_Pct  := JoystickHMI.State.AxisCmdY.Deflection;
+     | ^
+
+FB_TroubleshootingView.st:547:5: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 547 |     GVL_Troubleshooting.D_Joystick.DirectionX := 1;
      |     ^
 
-GVL_Troubleshooting.st:11:5: error: Symbol 'B_INPUTS' already defined in scope 'global'
-  11 |     B_Inputs                : ST_HardwareImage;     // 📥 1. Image complète des entrées réelles / qualifiées / simulées
+FB_TroubleshootingView.st:549:5: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 549 |     GVL_Troubleshooting.D_Joystick.DirectionX := -1;
      |     ^
 
-GVL_Troubleshooting.st:12:5: error: Symbol 'C_SAFETY' already defined in scope 'global'
-  12 |     C_Safety                : ST_SafetyChecklist;   // 🛡️ 2. Diagnostic chronologique Chaîne de Sécurité & Réarmement AU
+FB_TroubleshootingView.st:551:5: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 551 |     GVL_Troubleshooting.D_Joystick.DirectionX := 0;
      |     ^
 
-GVL_Troubleshooting.st:13:5: error: Symbol 'D_JOYSTICK' already defined in scope 'global'
-  13 |     D_Joystick              : ST_JoystickChecklist; // 🕹️ 3. Diagnostic chronologique Bus CANopen & Homme-Mort Joystick
+FB_TroubleshootingView.st:554:5: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 554 |     GVL_Troubleshooting.D_Joystick.DirectionY := 1;
      |     ^
 
-GVL_Troubleshooting.st:14:5: error: Symbol 'E_HOMINGM1' already defined in scope 'global'
-  14 |     E_HomingM1              : ST_HomingChecklist;   // 🎯 4. Diagnostic chronologique Homing M1 (Treuil Retenue)
+FB_TroubleshootingView.st:556:5: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 556 |     GVL_Troubleshooting.D_Joystick.DirectionY := -1;
      |     ^
 
-GVL_Troubleshooting.st:15:5: error: Symbol 'F_HOMINGM2' already defined in scope 'global'
-  15 |     F_HomingM2              : ST_HomingChecklist;   // 🎯 5. Diagnostic chronologique Homing M2 (Treuil Benne)
+FB_TroubleshootingView.st:558:5: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 558 |     GVL_Troubleshooting.D_Joystick.DirectionY := 0;
      |     ^
 
-GVL_Troubleshooting.st:16:5: error: Symbol 'G_CYCLESEMIAUTO' already defined in scope 'global'
-  16 |     G_CycleSemiAuto         : ST_ChainCycleSemiAuto;  // 🔄 6. Séquenceur de Cycle Semi-Automatique (X0 à X13)
-     |     ^
+FB_TroubleshootingView.st:565:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 565 | GVL_Troubleshooting.N_MotionM1.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
+     | ^
 
-GVL_Troubleshooting.st:17:5: error: Symbol 'H_LEVAGESYNCHRONISEM1M2' already defined in scope 'global'
-  17 |     H_LevageSynchroniseM1M2 : ST_ChainWinchSync;     // 🛗 7. Levage Synchronisé M1+M2 (Mode Couplé Nominal)
-     |     ^
+FB_TroubleshootingView.st:566:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 566 | GVL_Troubleshooting.N_MotionM1.HwIn_PowerContactorEngaged_DI := HwIn.Machine.PowerContactorEngaged_DI;
+     | ^
 
-GVL_Troubleshooting.st:18:5: error: Symbol 'I_LEVAGEUNITAIREM1' already defined in scope 'global'
-  18 |     I_LevageUnitaireM1      : ST_ChainWinch;         // 🛗 8. Levage Unitaire M1 (Treuil Retenue)
-     |     ^
+FB_TroubleshootingView.st:567:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 567 | GVL_Troubleshooting.N_MotionM1.HwIn_BrakeIsOpen_DI      := HwIn.Winch.M1_BrakeIsOpen_DI;
+     | ^
 
-GVL_Troubleshooting.st:19:5: error: Symbol 'J_LEVAGEUNITAIREM2' already defined in scope 'global'
-  19 |     J_LevageUnitaireM2      : ST_ChainWinch;         // 🛗 9. Levage Unitaire M2 (Treuil Benne)
-     |     ^
+FB_TroubleshootingView.st:568:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 568 | GVL_Troubleshooting.N_MotionM1.Cmd_BrakeRelease         := WinchM1.State.BrakeCmd;
+     | ^
 
-GVL_Troubleshooting.st:20:5: error: Symbol 'K_BENNEOUVERTUREFERMETURE' already defined in scope 'global'
-  20 |     K_BenneOuvertureFermeture: ST_ChainBucket;        // 🪣 10. Ouverture / Fermeture Benne
-     |     ^
+FB_TroubleshootingView.st:570:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 570 | GVL_Troubleshooting.N_MotionM1.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+     | ^
 
-GVL_Troubleshooting.st:21:5: error: Symbol 'L_TRANSLATIONPONTM3' already defined in scope 'global'
-  21 |     L_TranslationPontM3     : ST_ChainTranslation;   // ↔️ 11. Translation Pont M3 (Variateur AC600)
-     |     ^
+FB_TroubleshootingView.st:571:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 571 | GVL_Troubleshooting.N_MotionM1.Step3_NotBusyOtherTask   := NOT WinchM1.State.Encoder.HomingBusy AND NOT (WinchM2.Bucket.State.FBState = E_State.BUSY);
+     | ^
 
-GVL_Troubleshooting.st:23:5: error: Symbol 'N_MOTIONM1' already defined in scope 'global'
-  23 |     N_MotionM1              : ST_MotionChecklist;   // ⚙️ 13. Diagnostic chronologique Mouvement M1 (Treuil Retenue)
-     |     ^
+FB_TroubleshootingView.st:572:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 572 | GVL_Troubleshooting.N_MotionM1.Step4_MotionRequested    := WinchM1.State.Busy OR (WinchM1.State.SpeedCmd_Pct > 0.0);
+     | ^
 
-GVL_Troubleshooting.st:24:5: error: Symbol 'O_MOTIONM2' already defined in scope 'global'
-  24 |     O_MotionM2              : ST_MotionChecklist;   // ⚙️ 14. Diagnostic chronologique Mouvement M2 (Treuil Benne)
-     |     ^
+FB_TroubleshootingView.st:573:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 573 | GVL_Troubleshooting.N_MotionM1.RequestedDirection       := SEL(WinchM1.State.RelayFwd, SEL(WinchM1.State.RelayRev, 0, -1), 1);
+     | ^
 
-GVL_Troubleshooting.st:25:5: error: Symbol 'P_MOTIONM3' already defined in scope 'global'
-  25 |     P_MotionM3              : ST_MotionChecklist;   // ⚙️ 15. Diagnostic chronologique Mouvement M3 (Translation)
-     |     ^
+FB_TroubleshootingView.st:574:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 574 | GVL_Troubleshooting.N_MotionM1.RequestedSpeedPct        := WinchM1.State.SpeedCmd_Pct;
+     | ^
 
-GVL_Troubleshooting.st:28:5: error: Symbol 'Q_TRACEWINCHM1' already defined in scope 'global'
-  28 |     Q_TraceWinchM1          : ST_TraceWinch;        // 🕵️ 16. Trace blocage treuil M1 (cause priorisée + horodatage)
-     |     ^
+FB_TroubleshootingView.st:575:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 575 | GVL_Troubleshooting.N_MotionM1.Step5_NoSafetyFault      := NOT WinchM1.Safety.SafeStop AND NOT WinchM1.Safety.ThermalFault;
+     | ^
 
-GVL_Troubleshooting.st:29:5: error: Symbol 'R_TRACEWINCHM2' already defined in scope 'global'
-  29 |     R_TraceWinchM2          : ST_TraceWinch;        // 🕵️ 17. Trace blocage treuil M2 (cause priorisée + horodatage)
-     |     ^
+FB_TroubleshootingView.st:576:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 576 | GVL_Troubleshooting.N_MotionM1.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.N_MotionM1.RequestedDirection = 1, WinchM1.Safety.DescendPermit, WinchM1.Safety.AscentPermit);
+     | ^
 
-GVL_Troubleshooting.st:30:5: error: Symbol 'S_TRACETRANSLATION' already defined in scope 'global'
-  30 |     S_TraceTranslation      : ST_TraceTranslation;  // ↔️ 18. Trace blocage translation M3 (cause priorisée + horodatage)
-     |     ^
+FB_TroubleshootingView.st:576:64: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 576 | GVL_Troubleshooting.N_MotionM1.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.N_MotionM1.RequestedDirection = 1, WinchM1.Safety.DescendPermit, WinchM1.Safety.AscentPermit);
+     |                                                                ^
 
-GVL_Troubleshooting.st:31:5: error: Symbol 'T_PERMITS' already defined in scope 'global'
-  31 |     T_Permits : ST_PermitVisibilityHMI; // Vue unique IHM/terrain des permis canoniques
-     |     ^
+FB_TroubleshootingView.st:577:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 577 | GVL_Troubleshooting.N_MotionM1.Step7_BrakeReleased      := WinchM1.State.BrakeCmd AND WinchM1.State.BrakeCommandOpenConfirmed;
+     | ^
+
+FB_TroubleshootingView.st:578:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 578 | GVL_Troubleshooting.N_MotionM1.Step8_OutputInterlockOk  := NOT WinchM1.State.FinalInterlockError;
+     | ^
+
+FB_TroubleshootingView.st:580:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 580 | GVL_Troubleshooting.N_MotionM1.AllConditionsMet := GVL_Troubleshooting.N_MotionM1.Step1_PowerEngaged
+     | ^
+
+FB_TroubleshootingView.st:580:52: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 580 | GVL_Troubleshooting.N_MotionM1.AllConditionsMet := GVL_Troubleshooting.N_MotionM1.Step1_PowerEngaged
+     |                                                    ^
+
+FB_TroubleshootingView.st:581:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 581 |                                               AND GVL_Troubleshooting.N_MotionM1.Step2_ModeAuthorized
+     |                                                   ^
+
+FB_TroubleshootingView.st:582:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 582 |                                               AND GVL_Troubleshooting.N_MotionM1.Step3_NotBusyOtherTask
+     |                                                   ^
+
+FB_TroubleshootingView.st:583:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 583 |                                               AND GVL_Troubleshooting.N_MotionM1.Step4_MotionRequested
+     |                                                   ^
+
+FB_TroubleshootingView.st:584:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 584 |                                               AND GVL_Troubleshooting.N_MotionM1.Step5_NoSafetyFault
+     |                                                   ^
+
+FB_TroubleshootingView.st:585:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 585 |                                               AND GVL_Troubleshooting.N_MotionM1.Step6_DirectionAllowed
+     |                                                   ^
+
+FB_TroubleshootingView.st:586:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 586 |                                               AND GVL_Troubleshooting.N_MotionM1.Step7_BrakeReleased
+     |                                                   ^
+
+FB_TroubleshootingView.st:587:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 587 |                                               AND GVL_Troubleshooting.N_MotionM1.Step8_OutputInterlockOk;
+     |                                                   ^
+
+FB_TroubleshootingView.st:589:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 589 | GVL_Troubleshooting.N_MotionM1.RelayFwdActive        := WinchM1.State.RelayFwd;
+     | ^
+
+FB_TroubleshootingView.st:590:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 590 | GVL_Troubleshooting.N_MotionM1.RelayRevActive        := WinchM1.State.RelayRev;
+     | ^
+
+FB_TroubleshootingView.st:591:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 591 | GVL_Troubleshooting.N_MotionM1.SpeedContactor1Active := WinchM1.State.Contactor1;
+     | ^
+
+FB_TroubleshootingView.st:597:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 597 | GVL_Troubleshooting.O_MotionM2.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
+     | ^
+
+FB_TroubleshootingView.st:598:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 598 | GVL_Troubleshooting.O_MotionM2.HwIn_PowerContactorEngaged_DI := HwIn.Machine.PowerContactorEngaged_DI;
+     | ^
+
+FB_TroubleshootingView.st:599:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 599 | GVL_Troubleshooting.O_MotionM2.HwIn_BrakeIsOpen_DI      := HwIn.Winch.M2_BrakeIsOpen_DI;
+     | ^
+
+FB_TroubleshootingView.st:600:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 600 | GVL_Troubleshooting.O_MotionM2.Cmd_BrakeRelease         := WinchM2.State.BrakeCmd;
+     | ^
+
+FB_TroubleshootingView.st:602:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 602 | GVL_Troubleshooting.O_MotionM2.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+     | ^
+
+FB_TroubleshootingView.st:603:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 603 | GVL_Troubleshooting.O_MotionM2.Step3_NotBusyOtherTask   := NOT WinchM2.State.Encoder.HomingBusy;
+     | ^
+
+FB_TroubleshootingView.st:604:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 604 | GVL_Troubleshooting.O_MotionM2.Step4_MotionRequested    := WinchM2.State.Busy OR (WinchM2.State.SpeedCmd_Pct > 0.0);
+     | ^
+
+FB_TroubleshootingView.st:605:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 605 | GVL_Troubleshooting.O_MotionM2.RequestedDirection       := SEL(WinchM2.State.RelayFwd, SEL(WinchM2.State.RelayRev, 0, -1), 1);
+     | ^
+
+FB_TroubleshootingView.st:606:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 606 | GVL_Troubleshooting.O_MotionM2.RequestedSpeedPct        := WinchM2.State.SpeedCmd_Pct;
+     | ^
+
+FB_TroubleshootingView.st:607:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 607 | GVL_Troubleshooting.O_MotionM2.Step5_NoSafetyFault      := NOT WinchM2.Safety.SafeStop AND NOT WinchM2.Safety.ThermalFault AND NOT WinchM2.Safety.SlackCable;
+     | ^
+
+FB_TroubleshootingView.st:608:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 608 | GVL_Troubleshooting.O_MotionM2.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.O_MotionM2.RequestedDirection = 1, WinchM2.Safety.DescendPermit, WinchM2.Safety.AscentPermit);
+     | ^
+
+FB_TroubleshootingView.st:608:64: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 608 | GVL_Troubleshooting.O_MotionM2.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.O_MotionM2.RequestedDirection = 1, WinchM2.Safety.DescendPermit, WinchM2.Safety.AscentPermit);
+     |                                                                ^
+
+FB_TroubleshootingView.st:609:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 609 | GVL_Troubleshooting.O_MotionM2.Step7_BrakeReleased      := WinchM2.State.BrakeCmd AND WinchM2.State.BrakeCommandOpenConfirmed;
+     | ^
+
+FB_TroubleshootingView.st:610:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 610 | GVL_Troubleshooting.O_MotionM2.Step8_OutputInterlockOk  := NOT WinchM2.State.FinalInterlockError;
+     | ^
+
+FB_TroubleshootingView.st:612:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 612 | GVL_Troubleshooting.O_MotionM2.AllConditionsMet := GVL_Troubleshooting.O_MotionM2.Step1_PowerEngaged
+     | ^
+
+FB_TroubleshootingView.st:612:52: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 612 | GVL_Troubleshooting.O_MotionM2.AllConditionsMet := GVL_Troubleshooting.O_MotionM2.Step1_PowerEngaged
+     |                                                    ^
+
+FB_TroubleshootingView.st:613:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 613 |                                               AND GVL_Troubleshooting.O_MotionM2.Step2_ModeAuthorized
+     |                                                   ^
+
+FB_TroubleshootingView.st:614:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 614 |                                               AND GVL_Troubleshooting.O_MotionM2.Step3_NotBusyOtherTask
+     |                                                   ^
+
+FB_TroubleshootingView.st:615:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 615 |                                               AND GVL_Troubleshooting.O_MotionM2.Step4_MotionRequested
+     |                                                   ^
+
+FB_TroubleshootingView.st:616:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 616 |                                               AND GVL_Troubleshooting.O_MotionM2.Step5_NoSafetyFault
+     |                                                   ^
+
+FB_TroubleshootingView.st:617:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 617 |                                               AND GVL_Troubleshooting.O_MotionM2.Step6_DirectionAllowed
+     |                                                   ^
+
+FB_TroubleshootingView.st:618:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 618 |                                               AND GVL_Troubleshooting.O_MotionM2.Step7_BrakeReleased
+     |                                                   ^
+
+FB_TroubleshootingView.st:619:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 619 |                                               AND GVL_Troubleshooting.O_MotionM2.Step8_OutputInterlockOk;
+     |                                                   ^
+
+FB_TroubleshootingView.st:621:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 621 | GVL_Troubleshooting.O_MotionM2.RelayFwdActive        := WinchM2.State.RelayFwd;
+     | ^
+
+FB_TroubleshootingView.st:622:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 622 | GVL_Troubleshooting.O_MotionM2.RelayRevActive        := WinchM2.State.RelayRev;
+     | ^
+
+FB_TroubleshootingView.st:623:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 623 | GVL_Troubleshooting.O_MotionM2.SpeedContactor1Active := WinchM2.State.Contactor1;
+     | ^
+
+FB_TroubleshootingView.st:629:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 629 | GVL_Troubleshooting.P_MotionM3.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
+     | ^
+
+FB_TroubleshootingView.st:630:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 630 | GVL_Troubleshooting.P_MotionM3.HwIn_PowerContactorEngaged_DI := HwIn.Machine.PowerContactorEngaged_DI;
+     | ^
+
+FB_TroubleshootingView.st:631:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 631 | GVL_Troubleshooting.P_MotionM3.HwIn_BrakeIsOpen_DI      := HwIn.Translation.M3_BrakeIsOpen_DI;
+     | ^
+
+FB_TroubleshootingView.st:632:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 632 | GVL_Troubleshooting.P_MotionM3.Cmd_BrakeRelease         := Translation.State.BrakeCmd;
+     | ^
+
+FB_TroubleshootingView.st:634:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 634 | GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+     | ^
+
+FB_TroubleshootingView.st:635:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 635 | GVL_Troubleshooting.P_MotionM3.Step3_NotBusyOtherTask   := TRUE; // Aucune tâche exclusive connue bloquant M3 (pas de homing translation)
+     | ^
+
+FB_TroubleshootingView.st:636:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 636 | GVL_Troubleshooting.P_MotionM3.Step4_MotionRequested    := Translation.State.Busy OR (Translation.State.SpeedCmd_Pct > 0.0);
+     | ^
+
+FB_TroubleshootingView.st:639:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 639 | GVL_Troubleshooting.P_MotionM3.RequestedDirection       := SEL(Translation.State.ActiveTremie,
+     | ^
+
+FB_TroubleshootingView.st:641:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 641 | GVL_Troubleshooting.P_MotionM3.RequestedSpeedPct        := Translation.State.SpeedCmd_Pct;
+     | ^
+
+FB_TroubleshootingView.st:642:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 642 | GVL_Troubleshooting.P_MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
+     | ^
+
+FB_TroubleshootingView.st:643:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 643 | GVL_Troubleshooting.P_MotionM3.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.P_MotionM3.RequestedDirection = 1, Translation.Safety.EffectivePermitM3_Maintenance, Translation.Safety.EffectivePermitM3_Tremie); // Permis canoniques M3 — HeightInterlockBlocking reste un blocage séparé
+     | ^
+
+FB_TroubleshootingView.st:643:64: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 643 | GVL_Troubleshooting.P_MotionM3.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.P_MotionM3.RequestedDirection = 1, Translation.Safety.EffectivePermitM3_Maintenance, Translation.Safety.EffectivePermitM3_Tremie); // Permis canoniques M3 — HeightInterlockBlocking reste un blocage séparé
+     |                                                                ^
+
+FB_TroubleshootingView.st:644:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 644 | GVL_Troubleshooting.P_MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;
+     | ^
+
+FB_TroubleshootingView.st:645:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 645 | GVL_Troubleshooting.P_MotionM3.Step8_OutputInterlockOk  := NOT Translation.State.FinalInterlockError;
+     | ^
+
+FB_TroubleshootingView.st:647:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 647 | GVL_Troubleshooting.P_MotionM3.AllConditionsMet := GVL_Troubleshooting.P_MotionM3.Step1_PowerEngaged
+     | ^
+
+FB_TroubleshootingView.st:647:52: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 647 | GVL_Troubleshooting.P_MotionM3.AllConditionsMet := GVL_Troubleshooting.P_MotionM3.Step1_PowerEngaged
+     |                                                    ^
+
+FB_TroubleshootingView.st:648:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 648 |                                               AND GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized
+     |                                                   ^
+
+FB_TroubleshootingView.st:649:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 649 |                                               AND GVL_Troubleshooting.P_MotionM3.Step3_NotBusyOtherTask
+     |                                                   ^
+
+FB_TroubleshootingView.st:650:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 650 |                                               AND GVL_Troubleshooting.P_MotionM3.Step4_MotionRequested
+     |                                                   ^
+
+FB_TroubleshootingView.st:651:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 651 |                                               AND GVL_Troubleshooting.P_MotionM3.Step5_NoSafetyFault
+     |                                                   ^
+
+FB_TroubleshootingView.st:652:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 652 |                                               AND GVL_Troubleshooting.P_MotionM3.Step6_DirectionAllowed
+     |                                                   ^
+
+FB_TroubleshootingView.st:653:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 653 |                                               AND GVL_Troubleshooting.P_MotionM3.Step7_BrakeReleased
+     |                                                   ^
+
+FB_TroubleshootingView.st:654:51: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 654 |                                               AND GVL_Troubleshooting.P_MotionM3.Step8_OutputInterlockOk;
+     |                                                   ^
+
+FB_TroubleshootingView.st:658:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 658 | GVL_Troubleshooting.P_MotionM3.RelayFwdActive        := Translation.State.ActiveTremie AND Translation.State.Busy;
+     | ^
+
+FB_TroubleshootingView.st:659:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 659 | GVL_Troubleshooting.P_MotionM3.RelayRevActive        := Translation.State.ActiveMaintenance AND Translation.State.Busy;
+     | ^
+
+FB_TroubleshootingView.st:660:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 660 | GVL_Troubleshooting.P_MotionM3.SpeedContactor1Active := FALSE; // Non applicable — M3 n'a pas de contacteur de vitesse par palier
+     | ^
+
+FB_TroubleshootingView.st:666:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 666 | GVL_Troubleshooting.B_Inputs := HwIn;
+     | ^
+
+FB_TroubleshootingView.st:671:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 671 | GVL_Troubleshooting.G_CycleSemiAuto.Idx101_ModeSemiAutoActive        := (Auth.Mode = E_Mode.SEMI_AUTO);
+     | ^
+
+FB_TroubleshootingView.st:672:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 672 | GVL_Troubleshooting.G_CycleSemiAuto.Idx102_PowerAndSafetyOk          := HwIn.Machine.PowerContactorEngaged_DI;
+     | ^
+
+FB_TroubleshootingView.st:673:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 673 | GVL_Troubleshooting.G_CycleSemiAuto.Idx103_HeartbeatIhmOk            := Commun.HeartbeatIhmOk;
+     | ^
+
+FB_TroubleshootingView.st:674:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 674 | GVL_Troubleshooting.G_CycleSemiAuto.Idx104_DeadmanArmed              := JoystickDeadmanArmed;
+     | ^
+
+FB_TroubleshootingView.st:675:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 675 | GVL_Troubleshooting.G_CycleSemiAuto.Idx105_MancheDeflechi            := NOT JoystickAtNeutral;
+     | ^
+
+FB_TroubleshootingView.st:676:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 676 | GVL_Troubleshooting.G_CycleSemiAuto.Idx106_HomedM1M2                 := HomedM1 AND HomedM2;
+     | ^
+
+FB_TroubleshootingView.st:677:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 677 | GVL_Troubleshooting.G_CycleSemiAuto.Idx107_StartCycleRequest         := CycleStartRequest;
+     | ^
+
+FB_TroubleshootingView.st:678:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 678 | GVL_Troubleshooting.G_CycleSemiAuto.Idx108_AbortCycleRequest         := CycleAbortRequest;
+     | ^
+
+FB_TroubleshootingView.st:680:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 680 | GVL_Troubleshooting.G_CycleSemiAuto.Idx201_Ready                     := CycleReady;
+     | ^
+
+FB_TroubleshootingView.st:681:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 681 | GVL_Troubleshooting.G_CycleSemiAuto.Idx202_Busy                      := CycleAutoBusy;
+     | ^
+
+FB_TroubleshootingView.st:682:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 682 | GVL_Troubleshooting.G_CycleSemiAuto.Idx203_Done                      := CycleDone;
+     | ^
+
+FB_TroubleshootingView.st:683:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 683 | GVL_Troubleshooting.G_CycleSemiAuto.Idx204_Error                     := CycleError;
+     | ^
+
+FB_TroubleshootingView.st:684:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 684 | GVL_Troubleshooting.G_CycleSemiAuto.Idx205_ErrorId                   := CycleErrorId;
+     | ^
+
+FB_TroubleshootingView.st:685:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 685 | GVL_Troubleshooting.G_CycleSemiAuto.Idx217_FaultLatched               := CycleFaultLatched;
+     | ^
+
+FB_TroubleshootingView.st:686:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 686 | GVL_Troubleshooting.G_CycleSemiAuto.Idx218_FaultLatchedId             := CycleFaultLatchedId;
+     | ^
+
+FB_TroubleshootingView.st:687:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 687 | GVL_Troubleshooting.G_CycleSemiAuto.Idx219_CycleChecksInhibited       := CycleChecksInhibited;
+     | ^
+
+FB_TroubleshootingView.st:688:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 688 | GVL_Troubleshooting.G_CycleSemiAuto.Idx220_IgnoredCycleCheckId        := CycleIgnoredCheckId;
+     | ^
+
+FB_TroubleshootingView.st:689:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 689 | GVL_Troubleshooting.G_CycleSemiAuto.Idx221_ForceStepPrepared          := CycleForceStepPrepared;
+     | ^
+
+FB_TroubleshootingView.st:690:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 690 | GVL_Troubleshooting.G_CycleSemiAuto.Idx222_ForceStepResult            := CycleForceStepResult;
+     | ^
+
+FB_TroubleshootingView.st:691:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 691 | GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step                      := CycleStep;
+     | ^
+
+FB_TroubleshootingView.st:692:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 692 | GVL_Troubleshooting.G_CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
+     | ^
+
+FB_TroubleshootingView.st:693:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 693 | GVL_Troubleshooting.G_CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;
+     | ^
+
+FB_TroubleshootingView.st:694:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 694 | GVL_Troubleshooting.G_CycleSemiAuto.Idx209_WaitingForOperator        := CycleWaitingForOperator;
+     | ^
+
+FB_TroubleshootingView.st:695:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 695 | GVL_Troubleshooting.G_CycleSemiAuto.Idx210_WaitingForProcess         := CycleWaitingForProcess;
+     | ^
+
+FB_TroubleshootingView.st:696:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 696 | GVL_Troubleshooting.G_CycleSemiAuto.Idx211_OperatorActionId          := CycleOperatorActionId;
+     | ^
+
+FB_TroubleshootingView.st:697:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 697 | GVL_Troubleshooting.G_CycleSemiAuto.Idx212_OperatorAction            := CycleOperatorAction;
+     | ^
+
+FB_TroubleshootingView.st:698:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 698 | GVL_Troubleshooting.G_CycleSemiAuto.Idx213_ExpectedAxis              := CycleExpectedAxis;
+     | ^
+
+FB_TroubleshootingView.st:699:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 699 | GVL_Troubleshooting.G_CycleSemiAuto.Idx214_ExpectedDirection         := CycleExpectedDirection;
+     | ^
+
+FB_TroubleshootingView.st:700:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 700 | GVL_Troubleshooting.G_CycleSemiAuto.Idx215_WaitingResume             := (Auth.Mode <> E_Mode.SEMI_AUTO) AND (CycleStep <> E_AutoCycleStep.AX0_REPOS) AND (CycleStep <> E_AutoCycleStep.AX18_DONE_SYNC) AND (CycleStep <> E_AutoCycleStep.AX_STAB);
+     | ^
+
+FB_TroubleshootingView.st:701:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 701 | GVL_Troubleshooting.G_CycleSemiAuto.Idx216_PausedState               := CycleStep;
+     | ^
+
+FB_TroubleshootingView.st:703:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 703 | GVL_Troubleshooting.G_CycleSemiAuto.Idx301_TargetPosition            := CycleTargetPosition;
+     | ^
+
+FB_TroubleshootingView.st:704:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 704 | GVL_Troubleshooting.G_CycleSemiAuto.Idx302_TargetDepth_M             := CycleTargetDepth_M;
+     | ^
+
+FB_TroubleshootingView.st:705:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 705 | GVL_Troubleshooting.G_CycleSemiAuto.Idx303_KoboldBottomTouch         := CycleKoboldBottomTouch;
+     | ^
+
+FB_TroubleshootingView.st:706:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 706 | GVL_Troubleshooting.G_CycleSemiAuto.Idx304_SpeedMismatchActive       := CycleSpeedMismatchActive;
+     | ^
+
+FB_TroubleshootingView.st:707:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 707 | GVL_Troubleshooting.G_CycleSemiAuto.Idx305_LimitLegalReached         := CycleLimitLegalReached;
+     | ^
+
+FB_TroubleshootingView.st:708:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 708 | GVL_Troubleshooting.G_CycleSemiAuto.Idx306_WinchSyncError            := CycleWinchSyncError;
+     | ^
+
+FB_TroubleshootingView.st:709:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 709 | GVL_Troubleshooting.G_CycleSemiAuto.Idx307_M1SpeedStepApplied        := CycleM1SpeedStepApplied;
+     | ^
+
+FB_TroubleshootingView.st:710:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 710 | GVL_Troubleshooting.G_CycleSemiAuto.Idx308_M2SpeedStepApplied        := CycleM2SpeedStepApplied;
+     | ^
+
+FB_TroubleshootingView.st:711:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 711 | GVL_Troubleshooting.G_CycleSemiAuto.Idx309_AutoDiveM2Step5Active     := CycleAutoDiveM2Step5Active;
+     | ^
+
+FB_TroubleshootingView.st:712:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 712 | GVL_Troubleshooting.G_CycleSemiAuto.Idx310_M1SpeedStepAtFault        := CycleM1SpeedStepAtFault;
+     | ^
+
+FB_TroubleshootingView.st:713:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 713 | GVL_Troubleshooting.G_CycleSemiAuto.Idx311_M2SpeedStepAtFault        := CycleM2SpeedStepAtFault;
+     | ^
+
+FB_TroubleshootingView.st:719:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 719 | GVL_Troubleshooting.Q_TraceWinchM1     := WinchM1Trace;
+     | ^
+
+FB_TroubleshootingView.st:720:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 720 | GVL_Troubleshooting.R_TraceWinchM2     := WinchM2Trace;
+     | ^
+
+FB_TroubleshootingView.st:721:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 721 | GVL_Troubleshooting.S_TraceTranslation := TranslationTrace;
+     | ^
+
+FB_TroubleshootingView.st:722:1: error: Undeclared variable 'GVL_TROUBLESHOOTING'
+ 722 | GVL_Troubleshooting.T_Permits           := Permits;
+     | ^
 

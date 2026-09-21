@@ -466,13 +466,16 @@ TEST 'TC-P07-040 T255-D limite basse cable M1 : alarme au carrousel ET action au
     WinchM2Safety.AscentPermit := TRUE;
 
     // Boot puis scan utile : depasse l'anti-clignotement (500 ms), reseau sain
+    // (operateur ARME et au neutre : le prerequis homme-mort ne doit pas primer ici)
     FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
               EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              DeadmanArmed := TRUE, JoystickAtNeutral := TRUE,
               WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
               Network := NetDiag);
     ADVANCE_TIME(5000000000);
     FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
               EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              DeadmanArmed := TRUE, JoystickAtNeutral := TRUE,
               WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
               Network := NetDiag);
 
@@ -496,11 +499,13 @@ TEST 'TC-P07-041 T255-D limite basse cable M2 : alarme au carrousel ET action au
 
     FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
               EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              DeadmanArmed := TRUE, JoystickAtNeutral := TRUE,
               WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
               Network := NetDiag);
     ADVANCE_TIME(5000000000);
     FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
               EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              DeadmanArmed := TRUE, JoystickAtNeutral := TRUE,
               WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
               Network := NetDiag);
 
@@ -537,5 +542,62 @@ TEST 'TC-P07-042 T255-D ancre : descente commandee conserve le libelle historiqu
 
     ASSERT_EQ(FB_Banner.Banner.OperatorActionText, '[TREUIL] Descente interdite - Limite basse cable',
               'descente commandee : libelle historique inchange');
+END_TEST
+
+TEST 'TC-P07-043 T255-D ancre : champ CableLimitDescent seul NE DOIT PAS produire d alarme'
+    // Le champ publie par FB_WinchStateProjection est une comparaison BRUTE de position,
+    // SANS bypass ni mode referencement (FB_WinchStateProjection.st:217-218/230) : sous
+    // BypassCableLimitSwitch (MAINT_N2) il reste TRUE alors que la cause safety est LEVEE
+    // (ErrorId bit6 = 0) et que DescendPermit est rendu (FB_Safety_Winch.st:563-565).
+    // Le carrousel doit donc lire ErrorId, jamais ce champ (revue read-only 2026-09-20).
+    WinchM1Safety.LatchedId := 0; WinchM1Safety.SlackCable := FALSE;
+    WinchM1Safety.CableLimitDescent := TRUE;   // etat brut de projection (bypass actif)
+    WinchM1Safety.Error := FALSE;              // aucun defaut safety
+    WinchM1Safety.ErrorId := 16#0000;          // bit6 leve
+    WinchM1Safety.DescendPermit := TRUE;       // descente autorisee
+    WinchM1Safety.AscentPermit := TRUE;
+    WinchM2Safety.CableLimitDescent := FALSE;
+
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N2,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              DeadmanArmed := TRUE, JoystickAtNeutral := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ADVANCE_TIME(5000000000);
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N2,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              DeadmanArmed := TRUE, JoystickAtNeutral := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+
+    ASSERT_FALSE(FB_Banner.Banner.AlarmBanner.HasAlarm,
+                 'champ de projection seul : aucune alarme ne doit apparaitre (faux positif bypass)');
+    ASSERT_EQ(FB_Banner.Banner.OperatorActionText, '[JOYSTICK] Armé - actionner axe',
+              'aucune consigne de remontee alors que la descente est autorisee');
+END_TEST
+
+TEST 'TC-P07-044 T255-D ancre : hors mode de marche, le prerequis de mode prime sur la remontee'
+    WinchM1Safety.LatchedId := 0; WinchM1Safety.SlackCable := FALSE;
+    WinchM1Safety.CableLimitDescent := TRUE;
+    WinchM1Safety.Error := TRUE;
+    WinchM1Safety.ErrorId := 16#0040;          // cause 6 REELLEMENT active
+    WinchM1Safety.DescendPermit := FALSE;
+    WinchM1Safety.AscentPermit := TRUE;
+
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.DISABLE,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              DeadmanArmed := TRUE, JoystickAtNeutral := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ADVANCE_TIME(5000000000);
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.DISABLE,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              DeadmanArmed := TRUE, JoystickAtNeutral := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+
+    ASSERT_TRUE(FB_Banner.Banner.AlarmBanner.HasAlarm, 'la cause reste visible au carrousel en DISABLE');
+    ASSERT_EQ(FB_Banner.Banner.OperatorActionText, '[IHM] Sélectionner un mode',
+              'hors mode de marche : consigne de mode, jamais une action inexécutable');
 END_TEST
 

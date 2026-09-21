@@ -119,11 +119,19 @@
     {
       "name": "TC-P07-042 T255-D ancre : descente commandee conserve le libelle historique",
       "passed": true
+    },
+    {
+      "name": "TC-P07-043 T255-D ancre : champ CableLimitDescent seul NE DOIT PAS produire d alarme",
+      "passed": true
+    },
+    {
+      "name": "TC-P07-044 T255-D ancre : hors mode de marche, le prerequis de mode prime sur la remontee",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 22,
-    "passed": 18,
+    "total": 24,
+    "passed": 20,
     "failed": 4
   }
 }
