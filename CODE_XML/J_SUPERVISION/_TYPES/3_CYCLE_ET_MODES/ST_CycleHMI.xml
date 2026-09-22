@@ -774,6 +774,7 @@ Zone Cmd = NON persistée : la consigne ne survit jamais à une coupure.
               <value name="AX_DIVING_RETRY" value="20" />
               <value name="AX3_WAIT_DIVE_START" value="21" />
               <value name="AX10B_RACCORDEMENT_P1" value="22" />
+              <value name="AX15D_DUMP_BUCKET_JOG" value="23" />
             </values>
           </enum>
         </baseType>
@@ -920,6 +921,12 @@ Zone Cmd = NON persistée : la consigne ne survit jamais à une coupure.
                 <Name>AX10B_RACCORDEMENT_P1</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Raccordement continu P1 fermeture benne -&gt; montee controlee</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX15D_DUMP_BUCKET_JOG</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Module benne sur place a la tremie (T383) : le geste ouvre, l'inverse ferme, neutre = stop ; retour AX15B au relachement</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
