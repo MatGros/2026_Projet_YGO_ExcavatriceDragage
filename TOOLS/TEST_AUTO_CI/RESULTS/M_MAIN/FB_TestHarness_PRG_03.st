@@ -93,7 +93,11 @@ instCycleSemiAuto(
     AbortCycle              := BtnAbortCycle,
     SelTarget               := 1,
     SetDepthM               := -12.0,
-    SetOffsetM              := 1.5,
+    // SetOffsetM SUPPRIME (2026-09-22) : la VAR_INPUT n'existe plus sur FB_CycleSemiAuto
+    // (retiree par le commit ffc811c1, audit CYCLE : « jamais utilisee »). Cet argument
+    // mort bloquait la compilation g++ des entrees WINCH_INTEG, MAIN_GLOBAL et
+    // PRG_03_Modes_Cycle (erreur « FB_CYCLESEMIAUTO has no member named SETOFFSETM »).
+    // Preuve : TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/reports/WINCH_INTEG.txt.
     LimitLegalReached       := FALSE,
     LimitLegalDepthM        := -15.0,
     WinchSyncError          := FALSE,
