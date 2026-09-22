@@ -1,5 +1,8 @@
 # 📋 BRIEF — LOT « MESSAGES DE BLOCAGE SILENCIEUX » (T375 + T365)
 ## v1.1 — PRÊT À TRANSMETTRE (groupement T365 → T375 acté)
+> ℹ️ Le **nom de fichier reste `..._v1.md`** alors que le contenu est en **v1.1** : ce choix est
+> volontaire — le chemin est **déjà référencé** (catalogue, contrat T375, registre) et le renommer
+> casserait ces renvois. La **révision est donc déclarée dans le contenu** (ci-dessous), pas dans le nom.
 
 > 📅 2026-09-22 · 🏷️ Rédacteur : **DSH01** (orchestrateur) · 🎯 **Lots groupés** : **T375** (C3) + **T365** (C2, **désormais rattachée à T375** — groupement du 2026-09-22)
 > 📄 Faits techniques **vérifiés de première main** par l'orchestrateur (§2) · 🚫 **Aucune logique de sécurité à toucher**
