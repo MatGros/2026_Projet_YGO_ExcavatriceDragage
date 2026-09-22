@@ -251,12 +251,12 @@ tasks:
   bloque_par: []
 - id: T381
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: CYCLE_SEMI_AUTO / MOUVEMENT / IHM
-  agent: —
-  date: '2026-09-22T08:46:28+02:00'
-  updated_at: '2026-09-22T08:46:28+02:00'
+  agent: AGY01
+  date: '2026-09-22T12:17:00+02:00'
+  updated_at: '2026-09-22T12:17:00+02:00'
   titre: 'Rapide — passer le defaut de TglAutoDiveM2Step5Trial a TRUE (1) : profil de plongee M2 palier 5 en AX4..AX7 arme
     au demarrage a froid'
   contexte: 'DEMANDE EXPLOITANT 2026-09-22 : « CycleSemiAuto.Cmd.TglAutoDiveM2Step5Trial = 1 par defaut ». ETAT ACTUEL MESURE
@@ -290,7 +290,7 @@ tasks:
   - 'AC6 : la decision est TRACEE : note d application ecrite, commentaire du DUT aligne, et mention explicite du fait que
     l essai T291-A devient un DEFAUT DE PRODUCTION (ou refus ecrit de l exploitant).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T381_AUTODIVE_M2_STEP5_DEFAUT.yaml
-  avancement: '[CADRAGE DSH01 2026-09-22T08:46 — TACHE C3 CREEE AVEC CONTRAT, AUCUNE LIGNE ECRITE.] QUATRE ALERTES PORTEES
+  avancement: '[EXECUTION AGY01 2026-09-22T12:22] TglAutoDiveM2Step5Trial passe a TRUE par defaut dans ST_CycleCmd.st:15. Profil de plongee M2 palier 5 arme au demarrage a froid, debrayable IHM a tout moment. Note d application redigee. Bundle complet et DiffBundle regeneres, G200 PASS 0 erreur, Palier C 56/60 PASS. En attente de validation humaine pour commit. RAPPEL CADRAGE : [CADRAGE DSH01 2026-09-22T08:46 — TACHE C3 CREEE AVEC CONTRAT, AUCUNE LIGNE ECRITE.] QUATRE ALERTES PORTEES
     AU CONTRAT, A TRANCHER AVANT TOUTE ECRITURE : (1) ST_CycleCmd.st est un DUT partage par l IHM (GVL_IHM.CycleSemiAuto :
     ST_CycleHMI) : changer un defaut change la valeur de depart pour TOUTE machine, pas seulement celle du banc — et un gel
     de la table IHM a ete impose au lot T367 le 2026-09-21 (« aucune touche a GVL_IHM ni a ses types ») : ce gel doit etre
@@ -1048,7 +1048,7 @@ tasks:
   - 'Si absent : cause racine identifiee avant tout correctif.'
   bloque_par: []
 - id: T365
-  parent_id: T356
+  parent_id: T375
   statut: ⬜
   criticite: C2
   domaine: SUPERVISION / IHM / ALARMES
@@ -1069,6 +1069,7 @@ tasks:
   - ModesFault visible au bandeau quand actif, plus d ecart AnyFault=1 sans message.
   - Messages operateur reformules, zero jargon technique (datum).
   - Test CI de non-regression, aucun commit sans accord explicite.
+  avancement: ' [GROUPEMENT DECIDE PAR L ORCHESTRATEUR LE 2026-09-22, SUR ACCORD EXPLOITANT : T365 REJOINT LE LOT T375 (une seule campagne d essais, un seul contrat, un seul brief).] Motif : meme classe de defaut (cause latchee / refus publies SANS message operateur) et meme fichier de correction (FB_Hmi_BannerFormatter + DUT de messages). BRIEF DE TRANSMISSION COMMUN : DOC/WFLOW/CONTRACTS/BRIEF_T375_T365_MESSAGES_SILENCIEUX_v1.md (4 voies silencieuses, contrainte IHM FB_Safety_Winch INTERDIT, preuve ROUGE/VERT avec revision epinglee). CONTRAT A AMENDER : TASK_CONTRACT_T375_MESSAGES_BLOCAGES_SILENCIEUX.yaml. AUCUN COMMIT, AUCUN PUSH DE CODE.'
   bloque_par: []
 - id: T364
   parent_id: T340

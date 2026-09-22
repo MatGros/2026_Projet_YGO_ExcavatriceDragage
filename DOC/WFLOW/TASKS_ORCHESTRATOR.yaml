@@ -1,3 +1,14 @@
+- id: "GROUPEMENT-T365-T375"
+  date: "2026-09-22"
+  type: "pilotage"
+  priorite: "moyenne"
+  agent_id: "DSH01"
+  sujet: "Groupement T365 dans le lot T375 (messages de blocage silencieux) sur accord exploitant, avec mise a jour OBLIGATOIRE des documents que les agents lisent (brief + contrat)."
+  statut: "termine"
+  livrable: "TASKS.yaml (T365.parent_id := T375 + note de groupement) ; brief passe en v1.1 (BRIEF_T375_T365_MESSAGES_SILENCIEUX_v1.md, en-tete corrige + bloc MISE A JOUR) ; contrat T375 amende (4 voies au lieu de 3, contrainte IHM, alerte collision)."
+  verdict: "Regle retenue : tout changement de catalogue qui modifie le perimetre dun lot DOIT etre repercute dans le brief ET le contrat du lot, sinon les agents travaillent sur un referentiel perime."
+  decision: "Applique : brief v1.1 + contrat amende + catalogue + registre, le tout dans un seul commit pour que la coherence soit atomique."
+  note: "Sauvegardes locales : TASKS.yaml.bak_groupement et BRIEF...v1.md.bak_v1 (non commitees). Aucun code touche."
 # ==============================================================================
 # REGISTRE DES TÂCHES ET AGENTS DSH
 # Structure liste plate pour vue tabulaire & filtres automatiques
