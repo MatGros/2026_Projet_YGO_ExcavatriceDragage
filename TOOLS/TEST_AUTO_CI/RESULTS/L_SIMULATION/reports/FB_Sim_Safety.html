@@ -373,11 +373,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-13 23:14:49</div>
+    <div class="exec-time">2026-09-22 11:38:41</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-sim-safety-0">TC-P13-SAF-001 Enable FALSE -&gt; boucle AU ouverte</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-safety-1">TC-P13-SAF-002 Pilotage boucle AU saine par SimChainOkBit et armement contacteur</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-sim-safety-0">TC-P13-SAF-001 Enable FALSE -&gt; boucle AU ouverte</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-safety-1">TC-P13-SAF-002 Pilotage boucle AU saine par SimChainOkBit et armement contacteur</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-safety-2">TC-T306-SAF-003 Injection defaut rotation de phases par SimPhaseRotationOkBit</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -386,7 +386,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
@@ -412,7 +412,7 @@
     </div>
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Sim_Safety</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 8 flux entrants · 2 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Sim_Safety</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 9 flux entrants · 3 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonChainOpen <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonChainClose <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonContactorEngage <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonContactorDrop <span style="color:var(--muted);font-weight:500;">(TON)</span></span></div>
@@ -423,7 +423,7 @@
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_ChainOpenDelay</b> : TIME := T#50ms</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_ChainCloseDelay</b> : TIME := T#50ms</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_ContactorEngageDelay</b> : TIME := T#100ms</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_ContactorDropDelay</b> : TIME := T#50ms</span></div>
         </div>
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimChainOkBit <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerCutOff_A <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerCutOff_B <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerCutOffRequest <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyArming <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnEmergencyStop <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TestCutActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimChainOkBit <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimPhaseRotationOkBit <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerCutOff_A <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerCutOff_B <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerCutOffRequest <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyArming <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnEmergencyStop <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TestCutActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div></div>
             <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Sim_Safety</span>
                 
@@ -432,15 +432,15 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">8</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">9</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">2</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">3</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">0</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">8 IN</b> / <b style="color:#ffffff;">2 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">9 IN</b> / <b style="color:#ffffff;">3 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -459,15 +459,19 @@
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>SimContactorOk</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>SimPhaseRotationOk</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div></div>
         </div>
     </details>
     
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 10 écarts</span></summary>
+        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 12 écarts</span></summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 10 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>BTNEMERGENCYSTOP</code> jamais câblé en production</li><li>Pin <code>EMERGENCYARMING</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>POWERCUTOFFREQUEST</code> jamais câblé en production</li><li>Pin <code>POWERCUTOFF_A</code> jamais câblé en production</li><li>Pin <code>POWERCUTOFF_B</code> jamais câblé en production</li><li>Pin <code>SIMCHAINOK</code> jamais câblé en production</li><li>Pin <code>SIMCHAINOKBIT</code> jamais câblé en production</li><li>Pin <code>SIMCONTACTOROK</code> jamais câblé en production</li><li>Pin <code>TESTCUTACTIVE</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 12 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>BTNEMERGENCYSTOP</code> jamais câblé en production</li><li>Pin <code>EMERGENCYARMING</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>POWERCUTOFFREQUEST</code> jamais câblé en production</li><li>Pin <code>POWERCUTOFF_A</code> jamais câblé en production</li><li>Pin <code>POWERCUTOFF_B</code> jamais câblé en production</li><li>Pin <code>SIMCHAINOK</code> jamais câblé en production</li><li>Pin <code>SIMCHAINOKBIT</code> jamais câblé en production</li><li>Pin <code>SIMCONTACTOROK</code> jamais câblé en production</li><li>Pin <code>SIMPHASEROTATIONOK</code> jamais câblé en production</li><li>Pin <code>SIMPHASEROTATIONOKBIT</code> jamais câblé en production</li><li>Pin <code>TESTCUTACTIVE</code> jamais câblé en production</li></ul>
         </div>
         <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
@@ -477,6 +481,9 @@
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
             <div class="pin-name">IN SIMCHAINOKBIT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMPHASEROTATIONOKBIT <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
             <div class="pin-name">IN POWERCUTOFF_A <span class="pin-type">IEC_BOOL</span></div>
@@ -502,6 +509,9 @@
             <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">OUT SIMCONTACTOROK <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">OUT SIMPHASEROTATIONOK <span class="pin-type">IEC_BOOL</span></div>
             <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div></div>
         </div>
@@ -575,7 +585,7 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Sim_Safety</code></td>
-                <td>8</td><td>2</td>
+                <td>9</td><td>3</td>
                 <td>0</td><td>12</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (12 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
@@ -590,7 +600,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-sim-safety-0" class="test-card test-card-pass test-card-collapsed">
@@ -628,6 +638,28 @@
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>SimChainOkBit TRUE -&gt; SimChainOk TRUE apres tempo relais</li><li>EmergencyArming soutenu -&gt; SimContactorOk TRUE (engage)</li><li>Fin pulse -&gt; Auto-maintien contacteur maintenu</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-sim-safety-2" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T306-SAF-003 Injection defaut rotation de phases par SimPhaseRotationOkBit </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T306-SAF-003 Injection defaut rotation de phases par SimPhaseRotationOkBit')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Phases saines : SimPhaseRotationOkBit=TRUE -&gt; sortie TRUE (aucun defaut)</li><li>Defaut injecte : SimPhaseRotationOkBit=FALSE -&gt; sortie FALSE (PhaseRotationOk_DI tombe)</li><li>Retour a sain : nouveau passage a TRUE -&gt; sortie TRUE</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>SimPhaseRotationOkBit TRUE -&gt; SimPhaseRotationOk TRUE (phases saines)</li><li>SimPhaseRotationOkBit FALSE -&gt; SimPhaseRotationOk FALSE (defaut rotation de phases)</li><li>SimPhaseRotationOkBit TRUE apres FALSE -&gt; SimPhaseRotationOk TRUE</li></ul>
             </details>
                 
                 
@@ -686,6 +718,7 @@ FUNCTION_BLOCK FB_Sim_Safety
 VAR_INPUT
     Enable            : BOOL; // --&gt; [CMD] Activation de la simulation
     SimChainOkBit     : BOOL; // --&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée
+    SimPhaseRotationOkBit : BOOL; // --&gt; [TST] Bit opérateur : TRUE = phases réseau OK simulées ; FALSE = défaut rotation de phases injecté
     PowerCutOff_A     : BOOL; // --&gt; [SAFE] Commande coupure canal A (TRUE = OK/fermé)
     PowerCutOff_B     : BOOL; // --&gt; [SAFE] Commande coupure canal B (TRUE = OK/fermé)
     PowerCutOffRequest: BOOL; // --&gt; [SAFE] Requête coupure métier (TRUE = arrêt d&#x27;urgence)
@@ -696,6 +729,7 @@ END_VAR
 VAR_OUTPUT
     SimChainOk      : BOOL; // &lt;-- [STAT] Boucle AU simulée saine
     SimContactorOk  : BOOL; // &lt;-- [STAT] Contacteur simulé engagé
+    SimPhaseRotationOk : BOOL; // &lt;-- [STAT] Contrôleur de phases simulé : TRUE = phases saines (aucun défaut)
 END_VAR
 VAR
     ContactorLatch  : BOOL; // . [LOC] Mémorisation de l&#x27;auto-maintien du contacteur
@@ -723,6 +757,7 @@ END_VAR
 IF NOT Enable THEN
     SimChainOk     := FALSE;
     SimContactorOk := FALSE;
+    SimPhaseRotationOk := FALSE;
     ContactorLatch := FALSE;
     ChainOpen      := TRUE; // Chaîne ouverte par défaut à la ré-entrée (on n&#x27;a pas armé)
     ChainOpenReq   := FALSE;
@@ -799,6 +834,10 @@ END_IF;
 
 // Recopie vers la sortie
 SimContactorOk := ContactorLatch;
+
+// Contrôleur de phases : simple propagation du bit opérateur (TRUE = sain).
+// Inopérant hors simulation (le banc ne publie l&#x27;image machine que sous Enable).
+SimPhaseRotationOk := SimPhaseRotationOkBit;
 {endregion}
 </pre>
             </details>
@@ -810,9 +849,10 @@ SimContactorOk := ContactorLatch;
 test_fb_sim_safety.st
   [PASS] TC-P13-SAF-001 Enable FALSE -&gt; boucle AU ouverte
   [PASS] TC-P13-SAF-002 Pilotage boucle AU saine par SimChainOkBit et armement contacteur
+  [PASS] TC-T306-SAF-003 Injection defaut rotation de phases par SimPhaseRotationOkBit
 
 -----------------------------------------
-2 tests, 2 passed, 0 failed
+3 tests, 3 passed, 0 failed
 </pre>
     </details>
 </div>

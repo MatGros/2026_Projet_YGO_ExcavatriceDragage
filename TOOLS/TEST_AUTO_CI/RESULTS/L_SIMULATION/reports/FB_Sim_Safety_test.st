@@ -39,3 +39,24 @@ END_VAR
     fb();
     ASSERT_TRUE(fb.SimContactorOk, 'Fin pulse -> Auto-maintien contacteur maintenu');
 END_TEST
+
+TEST 'TC-T306-SAF-003 Injection defaut rotation de phases par SimPhaseRotationOkBit'
+VAR
+    fb : FB_Sim_Safety;
+END_VAR
+    (* Phases saines : SimPhaseRotationOkBit=TRUE -> sortie TRUE (aucun defaut) *)
+    fb.Enable := TRUE;
+    fb.SimPhaseRotationOkBit := TRUE;
+    fb();
+    ASSERT_TRUE(fb.SimPhaseRotationOk, 'SimPhaseRotationOkBit TRUE -> SimPhaseRotationOk TRUE (phases saines)');
+
+    (* Defaut injecte : SimPhaseRotationOkBit=FALSE -> sortie FALSE (PhaseRotationOk_DI tombe) *)
+    fb.SimPhaseRotationOkBit := FALSE;
+    fb();
+    ASSERT_FALSE(fb.SimPhaseRotationOk, 'SimPhaseRotationOkBit FALSE -> SimPhaseRotationOk FALSE (defaut rotation de phases)');
+
+    (* Retour a sain : nouveau passage a TRUE -> sortie TRUE *)
+    fb.SimPhaseRotationOkBit := TRUE;
+    fb();
+    ASSERT_TRUE(fb.SimPhaseRotationOk, 'SimPhaseRotationOkBit TRUE apres FALSE -> SimPhaseRotationOk TRUE');
+END_TEST
