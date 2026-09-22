@@ -1,4 +1,25 @@
 tasks:
+- id: T388
+  parent_id: T364
+  statut: ⬜
+  criticite: C3
+  domaine: TREUILS_BENNE / BORNES / HOMING / MAINT
+  agent: '—'
+  date: '2026-09-22T13:00:00+02:00'
+  updated_at: '2026-09-22T13:00:00+02:00'
+  titre: 'Benne - bornes RELATIVES appliquees avec un datum INVALIDE : au boot (HX0, M1/M2 non references) le jog benne est bride'
+  contexte: 'CONSTAT EXPLOITANT EN SESSION 2026-09-22 (homing repris sur T364) : au boot HX0 - M1+M2 non references, le homing unitaire est possible et la benne se deplace au joystick, MAIS avec M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits = 1 et WinchSel = 2 la benne est BRIDEE alors que M1/M2 ne sont pas homed. MESURE DSH01 DE PREMIERE MAIN, LA CONDITION D ACTIVATION NE VERIFIE PAS LA VALIDITE DU DATUM : PRG_04_Treuils_Benne.st:787-789 ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2) AND NOT PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked - aucun terme de referencement/fiabilite. Or les bornes appliquees aux lignes 807 et 818 sont RELATIVES a M1 : EncoderM2.CablePosM <= EncoderM1.CablePosM + Cfg.OffsetOpenM + Cfg.OpenAnticipationM (ouverture) et >= OffsetCloseM - CloseAnticipationM (fermeture) : elles supposent donc un datum valide. Au boot les positions ne sont pas referencees, les bornes calculees sont denuees de sens et peuvent refuser tout mouvement de benne. Les notions de validite EXISTENT DEJA et doivent etre reutilisees : FB_Bucket.st:34/35 HomedM1/HomedM2, :36/37 HomedAndReliableM1/M2, :206-207 HomingPositionValid, :419-420 BucketState.BucketReferenced. POINT DE SECURITE DU LOT : la limite PHYSIQUE (FB_Bucket.st:114-115 RecoilLimitReachedNow/RecoilLimitActive) doit RESTER ACTIVE en toutes circonstances - un jog non reference reste borne par la mecanique.'
+  description: 'Gater la SEULE activation des bornes RELATIVES par la validite du datum (reutiliser HomedAndReliableM1 AND HomedAndReliableM2 et/ou BucketState.BucketReferenced, sans creer de nouvelle variable d etat), laisser la protection PHYSIQUE intacte, et publier un message operateur nomme si un geste benne est refuse (pas de refus silencieux - cf. T375). Aucune modification des seuils OffsetOpenM/OffsetCloseM/anticipations, des permis, des temporisations moteur/frein. Phasage : phase 0 mesurer (avec et sans datum, relever les comparaisons :807/:818 et les positions reelles), arret humain, phase 1 corriger, phase 2 prouver (ROUGE/VERT + mutation : datum retire => le cas echoue), phase 3 recette machine au boot HX0.'
+  objectifs:
+  - 'AC1 : ManualBucketLimitsActive est FALSE (ou inopérant) quand M1/M2 ne sont pas référencés/fiables => le jog benne n est plus bridé par une borne relative.'
+  - 'AC2 : quand le datum est valide, les bornes relatives restent ACTIVES (zéro régression du jog borné normal).'
+  - 'AC3 : la limite PHYSIQUE de recul (RecoilLimitActive) reste ACTIVE dans les DEUX cas — preuve explicite, c est la condition de sécurité du lot.'
+  - 'AC4 : aucune nouvelle variable d état, aucun paramètre persistant nouveau, aucun bypass — réutilisation des notions existantes.'
+  - 'AC5 : un refus de mouvement benne est NOMMÉ à l IHM (≤ 70 caractères), jamais silencieux.'
+  - 'AC6 : ROUGE avant / VERT après + test de MUTATION ; révision ÉPINGLÉE (git hash-object) ; G200 --report collé ; palier C sans rouge nouveau.'
+  contrat: 'A ECRIRE avant toute ecriture (C3, obligatoire)'
+  avancement: '[CADRAGE DSH01 2026-09-22T13:00 - TACHE CREEE SUR CONSTAT EXPLOITANT, AUCUNE LIGNE DE CODE ECRITE.] BRIEF PRET A TRANSMETTRE : DOC/WFLOW/CONTRACTS/BRIEF_T388_BENNE_BORNES_SANS_DATUM_v1.md (8 sections, preambule inline, faits verifies fichier:ligne, 6 AC, phasage 0..3, interdits, preuve epinglee). PARENT T364 (refonte homing) car le defaut a ete revele par la reprise du homing ; LIENS : T377 (HOMING N1 manuel : rendre obligatoire le homing non reference - sujet voisin mais DISTINCT : T377 force le homing, T388 empeche des bornes relatives d utiliser un datum invalide), T375 (messages de refus silencieux), T326 (defauts benne pendant le referencement), T250 (consommateurs M2 offset-aware). COLLISION : PRG_04_Treuils_Benne.st est partage avec les lots T387/T381/T386-B en cours - UN SEUL ECRIVAIN. AUCUN COMMIT, AUCUN PUSH.'
+  bloque_par: []
 - id: T386
   parent_id: T306
   statut: ⬜
