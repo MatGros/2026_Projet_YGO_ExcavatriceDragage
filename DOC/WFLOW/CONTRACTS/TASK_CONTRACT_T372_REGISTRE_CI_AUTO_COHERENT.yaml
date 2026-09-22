@@ -55,6 +55,7 @@ contract:
     forbidden:
       - CODE/**
       - TOOLS/TEST_AUTO_CI/RESULTS/*/tests/**
+      - TOOLS/TEST_AUTO_CI/RESULTS/*/FB_TestHarness_*.st
       - TOOLS/TEST_AUTO_CI/MOCKS/**  (sauf ajout strictement necessaire, alors DECLARE et justifie dans la note)
       - DOC/AF/**
       - DOC/STDS/**
@@ -96,14 +97,23 @@ contract:
 status: PENDING
 
 execution:
-  executed_by: "DSH01 (orchestrateur) pour le HOTFIX AC1/AC2 — 2 lignes additives dans l'entree WINCH_INTEG, autorise explicitement par l'exploitant le 2026-09-22"
+  executed_by: "DSH01 (orchestrateur) pour le HOTFIX couche 1 — 2 lignes additives dans l'entree WINCH_INTEG, autorise explicitement par l'exploitant le 2026-09-22"
   completed_at: ""
-  status: PENDING
+  status: BLOCKED
   summary: >
-    HOTFIX AC1/AC2 applique par l'orchestrateur (autorisation explicite de l'exploitant :
-    « tu peux realiser les modifications ou par agent »), sous la regle imposee par
-    l'exploitant : CHALLENGE + REVUE INDEPENDANTE obligatoires sur le travail, quel que
-    soit l'auteur. AC3/AC4/AC6 restent a produire (perimetre outillage complet de T372).
+    ETAT REEL, CORRIGE APRES REVUE INDEPENDANTE (l'orchestrateur avait d'abord ecrit a tort
+    « AC1/AC2 applique » : c'etait inexact). AC1 N'EST PAS ATTEINT : apres le hotfix,
+    WINCH_INTEG reste FAIL 0/1 — la couche 1 (2 « Undefined type ») est levee, mais une
+    2e couche apparait : argument nomme mort « SetOffsetM » dans
+    TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st:96 (VAR_INPUT supprime par
+    T202 ; 0 occurrence dans CODE/). AC2 EST ATTEINT (diff +5/0, strictement additif).
+    MESURES DU CHALLENGE INDEPENDANT (relances reelles, 2026-09-22) :
+      - WINCH_INTEG ......... FAIL (SETOFFSETM via le harnais stale)
+      - MAIN_GLOBAL ......... FAIL (meme SETOFFSETM)
+      - PRG_04_Treuils_Benne  FAIL — « FB_Bucket.st:151 Undefined type FB_BucketCloseThreshold » :
+        la MEME dependance manquante n'y a PAS ete corrigee. Le domaine treuils/benne reste AVEUGLE.
+    AC3/AC4/AC6 restent a produire. AC1 est INATTEIGNABLE dans le scope actuel (voir forbidden).
+    Aucune ligne de CODE/ ecrite par l'orchestrateur.
   evidence_submitted: []
 
 validation:

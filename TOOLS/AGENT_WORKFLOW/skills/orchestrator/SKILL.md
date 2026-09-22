@@ -293,6 +293,37 @@ L'orchestrateur lit le **`git diff` réel** — jamais la seule parole de l'agen
 
 ---
 
+## 🎬 Campagnes d'essais CODESYS — REGROUPEMENT OBLIGATOIRE
+
+> 🎯 **Pourquoi** : l'import CODESYS et les essais machine sont **LONGS et coûteux pour l'humain**.
+> Solliciter l'exploitant pour **un petit correctif isolé** gaspille sa session d'essai : c'est
+> l'orchestrateur qui doit **regrouper** et **optimiser** (retour exploitant 2026-09-22).
+
+| ❌ Interdit | ✅ Attendu |
+|---|---|
+| Demander un GO + un import pour **un seul** petit changement | **Accumuler** les lots terminés et les présenter en **UNE campagne** |
+| Une question d'arbitrage par micro-sujet | **Regrouper les arbitrages** en une seule salve, décidés en un tour |
+| Un protocole d'essai par correctif | **UN protocole ordonné** couvrant tous les changements de la campagne |
+| Relancer l'exploitant « pour vérifier » un détail | Vérifier soi-même tout ce qui est **vérifiable mécaniquement** (CI, gates, G200, diff, snapshot) |
+
+**Constitution d'une campagne — checklist de l'orchestrateur :**
+
+1. **Inventaire des lots TERMINÉS** (contrat `COMPLETED`, preuves rejouées) **et non encore recettés**.
+2. **Fusion des artefacts** : **UN** bundle complet + **UN** diff bundle listant **tous** les objets de la campagne (jamais un import par objet).
+3. **Protocole unique et ordonné** : par objet — ce qu'on regarde, la valeur attendue, le cas d'échec, et **l'ordre** (séquencer les vérifications qui se gênent).
+4. **Une seule restitution** : bandeau de campagne + bloc `Auto-vérification liaison` + liste des objets + **les arbitrages groupés**.
+5. **Ce qui ne peut PAS être fait par un agent** (recette CODESYS, essai machine, export frais) est **explicitement listé comme action humaine**, jamais noyé dans le lot.
+
+**Anti-patterns constatés (à ne pas reproduire)** : demander la recette d'un lot alors qu'un
+deuxième lot du **même fichier** est à 90 % ; faire importer deux fois le même objet ; demander à
+l'exploitant de relever une valeur que la **CI ou un snapshot** aurait pu fournir.
+
+> ⛔ **Cette règle ne dispense d'AUCUNE validation** : le contenu de la campagne (tâches + plans)
+> est validé **une fois, en bloc**, avant exécution. C'est le **regroupement** qui est exigé, pas la
+> suppression du contrôle humain (`AGENTS.md` § contrat de tâche et § commit/push restent entiers).
+
+---
+
 ## 📚 Références
 
 - Catalogue des tâches : `DOC/WFLOW/TASKS.yaml`
