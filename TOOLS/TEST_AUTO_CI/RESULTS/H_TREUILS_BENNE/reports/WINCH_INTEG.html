@@ -373,7 +373,7 @@
             <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-22 11:08:52</div>
+    <div class="exec-time">2026-09-22 14:27:34</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (32 tests)</summary>
@@ -1982,9 +1982,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Bucket</code></td>
-                <td>37</td><td>21</td>
-                <td>1</td><td>50</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (50 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>37</td><td>22</td>
+                <td>1</td><td>51</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (51 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -2010,7 +2010,7 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Safety_Winch</code></td>
-                <td>62</td><td>11</td>
+                <td>63</td><td>11</td>
                 <td>0</td><td>58</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (58 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
@@ -8617,6 +8617,7 @@ VAR_OUTPUT
     M2_ReqDescend                   : BOOL;                           // &lt;-- [ACT] Ordre descente vers Winch M2
     M2_BucketJogLimit               : BOOL;                           // &lt;-- [ACT] Plafond palier 1 du jog benne M2
     CloseReached                    : BOOL;                           // &lt;-- [STAT] Fermeture atteinte, maintien AX10B eventuel en cours
+    WaitingForOperator              : BOOL;                           // &lt;-- [STAT] Fermeture engagee mais PERMIS NUL -&gt; budget timeout gele (attente de permis), consigne jamais servie
 
     // === DIAGNOSTICS ET MESURES ===
     M1SlipDetected                  : BOOL;                           // &lt;-- [DIAG] Glissement M1 detecte
@@ -8648,6 +8649,7 @@ VAR
     TimeoutAccumTime                : TIME;                           // . [LOC] Temps de commande engagee deja consomme, GELE hors engagement (segments precedents)
     TimeoutSegmentTime              : TIME;                           // . [LOC] ET du segment de commande en cours (reporte dans le cumul au relachement)
     TimeoutRemainingTime            : TIME;                           // . [LOC] Budget restant consomme par le TON (CfgTimeoutDuration - cumul)
+    ClosePermitDeniedWhileRequested : BOOL;                           // . [LOC] Fermeture demendee (CloseReq) mais permis nul -&gt; attente de permis, budget gele
     TonBandClosed                   : TON;                            // . [LOC] Debounce court bande &quot;fermee&quot; -&gt; cible offset (anti-chatter au bord de bande)
     TonBandOpen                     : TON;                            // . [LOC] Debounce court bande &quot;ouverte&quot; -&gt; cible offset
     TonRecoilLimit                  : TON;                            // . [LOC] Anti-chatter de la limite de recul benne (meme base de temps que TonBand*)
@@ -8770,6 +8772,14 @@ IF NOT BypassGlobal THEN
     // Signal d&#x27;engagement : MotionRequestActive (calcule en tete de §1) — CloseReq/OpenReq sont
     // des LATCHES (restent TRUE pendant toute la pause) et seraient ici INOPERANTS.
     TimeoutEngaged := Lifecycle.Busy AND MotionRequestActive;
+    // Fenetre benne : une FERMETURE demandee (CloseReq) mais dont le permis est NUL -&gt; la consigne
+    // M2 n&#x27;est pas servie (M2_RunRequest ne part pas) : c&#x27;est une ATTENTE DE PERMIS, pas un
+    // grippage. On gele le budget dans cette sous-fenetre STRICTE ; le vrai grippage (permis OK,
+    // aucun mouvement) conserve TimeoutEngaged -&gt; ErrorID:03 toujours latche (non-vacuite).
+    ClosePermitDeniedWhileRequested := CloseReq AND (NOT EffectivePermitBucket_Close);
+    IF ClosePermitDeniedWhileRequested THEN
+        TimeoutEngaged := FALSE;
+    END_IF;
 
     // Rearmement conscient : budget complet ET segment TON neuf. Un TON IEC ne retombe PAS quand
     // PT augmente (ET cloue a PT, Q fige) : sans cette coupure d&#x27;un scan, un Reset pendant une
@@ -8821,7 +8831,7 @@ IF NOT BypassGlobal THEN
     instCauses[3].Latching := TRUE;
     instCauses[3].Texte    := &#x27;Glissement treuil M1 pendant manoeuvre benne&#x27;;
 
-    // Cause 4 : Non référencé
+    // Cause 4 : Non référencé (alarme d&#x27;information non latchante, ne bloque pas le mouvement)
     HomingMotionWithoutReference := (ReqAscent OR ReqDescend OR CmdOpen_IHM OR CmdClose_IHM OR ProgramBucketDriveActive)
                                   AND NOT MachineHomingActive
                                   AND NOT (HomedM1 AND HomedM2);
@@ -8840,6 +8850,10 @@ ELSE
     instCauses[3].Active := FALSE;
     instCauses[4].Active := FALSE;
 END_IF;
+
+// Etat « en attente de permis » publie (consomme par PRG_04 / IHM) — fermeture engagee
+// mais permis nul. Calcule a chaque scan (independant du bypass global).
+WaitingForOperator := Lifecycle.Busy AND CloseReq AND (NOT EffectivePermitBucket_Close);
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -8871,6 +8885,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     CloseReached := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
+    WaitingForOperator := FALSE;
     RETURN;
 END_IF;
 
@@ -10337,6 +10352,12 @@ VAR_INPUT
     BenneHoldStillActive            : BOOL;                           // --&gt; [HW] Maintien fixe M1 actif pendant benne
     BenneBusy                       : BOOL;                           // --&gt; [HW] Cycle benne actif sur l&#x27;autre treuil
     OtherWinchInhibited             : BOOL;                           // --&gt; [HW] Autre treuil inhibe (maintenance)
+    // Fenetre benne : relaxation ÉTROITE de la butée haute MATÉRIELLE de ce treuil pendant
+    // la fermeture benne sur place (M1 FIXE). Calculé dans PRG_04 sous 4 verrous (benne active,
+    // M1 maintenu/vérifié, M1 hors montée, avant CloseReached). Câblé FALSE sur l&#x27;instance M1
+    // (jamais relaxé) et à la vraie valeur sur M2 -&gt; le FdC matériel haut M1 reste la barrière
+    // absolue. Ne relaxe QUE la barrière matérielle, jamais le bypass logique.
+    BucketCloseAscentGrant          : BOOL := FALSE;                  // --&gt; [SAFE] Relaxe la butée haut MATÉRIELLE M2 sous fenêtre benne (4 verrous)
 
     // === REGLAGES ET LIMITES SÉCURITÉ ===
     InReferencingMode               : BOOL;                           // --&gt; [CFG] Treuil en cours de homing
@@ -10640,7 +10661,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 8 : Méca B absence confirmation arrêt (latched)
     IF NOT (BypassSafety OR BypassMecaB) THEN
-        UncommandedActiveB := JoystickYNeutral AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
+        UncommandedActiveB := NOT MovementCommanded AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
         TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
         IF TonMecaB.Q THEN MecaBFaultLatched := TRUE; END_IF;
     ELSE
@@ -10874,9 +10895,16 @@ DescendPermit := NOT (
 );
 
 AscentPermit := NOT (
+    // Fenetre benne : la barrier MATERIELLE (FdC haut capteur) du treuil qui bouge la
+    // benne (M2) est relachee STRICTEMENT pendant la fermeture benne sur place (M1 FIXE, pas
+    // d&#x27;altitude) : BucketCloseAscentGrant, calcule PRG_04 sous 4 verrous, cable FALSE sur M1.
+    // Hors fenetre (grant=FALSE) la barrier reprend immediatement ; le FdC materiel haut M1 est
+    // JAMAIS relache (grant toujours FALSE sur l&#x27;instance M1). Le bypass logique (BypassTopLimitSwitch)
+    // conserve sa fonction TST et n&#x27;est pas altere.
     ((CauseTopLimitSwitchActive
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
-    AND NOT BypassTopLimitSwitch)
+    AND NOT BypassTopLimitSwitch
+    AND NOT BucketCloseAscentGrant)
     // TopLimitM porte la relaxation 7,5-&gt;8,5 m en override N1 / bypass N2 : la butee
     // logicielle reste active a la valeur relevee. Bypasser le logiciel releve la butee,
     // il ne la supprime pas ; le FDC haut materiel reste une barriere independante.
@@ -15850,7 +15878,13 @@ IF ((BucketErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMax
     AlarmArray[AlarmCount] := &#x27;[BENNE] ErrorID:04 - glissement treuil M1&#x27;; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0010) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := &#x27;[BENNE] ErrorID:05 - codeurs treuils non references&#x27;; AlarmCount := AlarmCount + 1;
+    IF (CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 OR MachineHomingStep &gt; 0)
+        AND EncM1Valid AND EncM2Valid THEN
+        AlarmArray[AlarmCount] := &#x27;[BENNE] Referencement en cours - codeurs non references (normal)&#x27;;
+    ELSE
+        AlarmArray[AlarmCount] := &#x27;[BENNE] ErrorID:05 - codeurs treuils non references&#x27;;
+    END_IF;
+    AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5e. Collecte — synchro M1/M2 (FB_WinchSync.ErrorId)
@@ -17825,7 +17859,125 @@ END_FUNCTION_BLOCK
     </details>
     <details>
         <summary>Sortie brute strucpp</summary>
-        <pre>Error: C++ compilation failed:
+        <pre>STruC++ Test Runner v1.0
+
+test_winch_integ.st
+         ASSERT_TRUE failed: MACHINE.BUSWINCH.WINCHM1FINALINTERLOCKREQUEST.REQUESTEDSTEP &gt; 0 expected TRUE, got FALSE
+         at test_winch_integ.st:122
+         Message: HARN-10: la demande doit atteindre FB_Winch M1
+  [FAIL] HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 1, got 0
+         at test_winch_integ.st:170
+         Message: HARN-11: M1 plafonne palier 1 (ExtractionControlActive)
+  [FAIL] HARN-11 : Extraction montee ExtractionControlActive -&gt; plafond palier 1 M1 ET M2
+         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE
+         at test_winch_integ.st:220
+         Message: HARN-12: precondition - montee en zone haute engagee M1
+  [FAIL] HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 2, got 0
+         at test_winch_integ.st:269
+         Message: HARN-13a: 20 pourcent -&gt; palier 2 (table reference)
+  [FAIL] HARN-13a : Table de verite etape remontee 20 pourcent -&gt; palier 2
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 3, got 0
+         at test_winch_integ.st:313
+         Message: HARN-13b: 70 pourcent descendu au clamp descente 3
+  [FAIL] HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective)
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 5, got 0
+         at test_winch_integ.st:356
+         Message: HARN-13c: 90 pourcent -&gt; palier 5 (table reference)
+  [FAIL] HARN-13c : Table de verite etape remontee 90 pourcent -&gt; palier 5
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 4, got 1
+         at test_winch_integ.st:402
+         Message: HARN-20: 75 pourcent -&gt; palier 4 (table reference)
+  [FAIL] HARN-20 : Rampe deflexion 0 a 100 pourcent -&gt; paliers monotones, jamais de saut brutal
+  [PASS] HARN-21 : Rampe retour 100 a 0 -&gt; decroissance propre, neutre -&gt; palier 0
+  [PASS] HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -&gt; palier 1 stable, pas de plancher
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 0, got 1
+         at test_winch_integ.st:493
+         Message: HARN-23: homme-mort relache -&gt; palier 0
+  [FAIL] HARN-23 : Homme-mort relache en mouvement -&gt; arret immediat, frein retombe
+         ASSERT_TRUE failed: MACHINE.KOBOLDIMMERSIONCONFIRMED expected TRUE, got FALSE
+         at test_winch_integ.st:528
+         Message: HARN-30: immersion confirmee au front montant en fenetre
+  [FAIL] HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -&gt; immersion confirmee puis arret latche
+         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE
+         at test_winch_integ.st:563
+         Message: HARN-31: la plongee Kobold est reellement exercee (StepNumber &gt;= 1)
+  [FAIL] HARN-31 : Interdiction palier 5 en Kobold (D12) -&gt; plafond 4 (CIBLE T181-12/16, ROUGE baseline)
+         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE
+         at test_winch_integ.st:590
+         Message: HARN-32: precondition - descente active en plongee
+  [FAIL] HARN-32 : Relache joystick en contexte plongee -&gt; palier 0 immediat, pas de plancher residuel
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 1, got 0
+         at test_winch_integ.st:626
+         Message: HARN-33: plafond zone basse gagne sur plancher plongee (amendement B)
+  [FAIL] HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amendement B, CIBLE T181-12, ROUGE baseline)
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 4, got 1
+         at test_winch_integ.st:657
+         Message: HARN-40: precondition - M1 au palier 4
+  [FAIL] HARN-40 : Jog benne -&gt; M2 bride palier 1, treuils coupes pendant Busy (anti-traversee amont)
+         ASSERT_TRUE failed: MACHINE.BUSWINCH.SYNCSTATE.SYNCDEVIATIONWARN expected TRUE, got FALSE
+         at test_winch_integ.st:693
+         Message: HARN-41: SyncDeviationWarn actif (ecart 0.3 &gt; 0.10)
+  [FAIL] HARN-41 : SyncDeviationWarn -&gt; plafond palier 1 sur M1 ET M2 (bornes communes identiques)
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 5, got 1
+         at test_winch_integ.st:726
+         Message: HARN-42: M1 libre jusqu au plafond general (5)
+  [FAIL] HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre
+         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
+         at test_winch_integ.st:755
+         Message: HARN-50: precondition - montee couplee M1 etablie
+  [FAIL] HARN-50 : Nominal filet passif -&gt; FinalInterlockGoverned FALSE sur toute la montee couplee
+         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
+         at test_winch_integ.st:788
+         Message: HARN-51: precondition - montee nominale M1 etablie
+  [FAIL] HARN-51 : Injection cadence hors instance FB_Winch -&gt; barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline)
+         ASSERT_TRUE failed: MACHINE.FINALINTERLOCKGOVERNEDM1 = FALSE expected TRUE, got FALSE
+         at test_winch_integ.st:827
+         Message: HARN-52: pas de coupure non voulue
+  [FAIL] HARN-52 : Pas de double-freinage -&gt; barriere PRG_06 passive en marge interne FB_Winch
+         ASSERT_TRUE failed: MACHINE.SYNCDEVIATIONM_MODEL &gt; 0.10 expected TRUE, got FALSE
+         at test_winch_integ.st:857
+         Message: HARN-60: ecart modelise a depasse le seuil warn
+  [FAIL] HARN-60 : Deviation croissante -&gt; warn plafond 1 puis critique SafeStop des 2
+         ASSERT_TRUE failed: MACHINE.SYNCDEVIATIONM_MODEL &lt; 0.10 expected TRUE, got FALSE
+         at test_winch_integ.st:895
+         Message: HARN-61: re-alignement dans la tolerance
+  [FAIL] HARN-61 : Retour dans la tolerance -&gt; plafond relache, pas de latch intempestif
+         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
+         at test_winch_integ.st:923
+         Message: HARN-70: precondition - montee couplee active
+  [FAIL] HARN-70 : Chute chaine AU en mouvement couple -&gt; relais FALSE immediat, freins retombent
+         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD = FALSE expected TRUE, got FALSE
+         at test_winch_integ.st:969
+         Message: HARN-71: pas de redemarrage auto au re-Enable (cible D18)
+  [FAIL] HARN-71 : Enable=FALSE sur FB_Winch en marche -&gt; sorties sures ; re-Enable sans relache
+  [PASS] HARN-72 : Watchdog frein (retour frein ne suit pas) -&gt; barriere coupe apres timeout
+         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYREV = FALSE expected TRUE, got FALSE
+         at test_winch_integ.st:1033
+         Message: HARN-73: temps mort directionnel respecte (cible T175)
+  [FAIL] HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -&gt; RelayRev retenu (CIBLE T175/T181-05)
+  [PASS] HARN-74a : Coast-down apres relache lourd -&gt; PAS de faux PowerCutOff pendant la fenetre contacteurs (T178)
+  [PASS] HARN-74b : Coast-down prolonge -&gt; Meca B arme a 3 s (CIBLE T178, ROUGE baseline)
+         ASSERT_TRUE failed: MACHINE.BUSWINCH.WINCHM1STATE.DIRECTIONCHANGEPENDING OR MACHINE.BUSWINCH.WINCHM1STATE.FINALRESTARTINHIBIT expected TRUE, got FALSE
+         at test_winch_integ.st:1128
+         Message: HARN-75: temps mort applique au hot-restart (D18, cible T181-05)
+  [FAIL] HARN-75 : Redemarrage a chaud (FirstScanDone) -&gt; temps mort directionnel NON bypassse (D18, ROUGE baseline)
+         ASSERT_TRUE failed: MACHINE.BUSWINCH.WINCHM1SAFETY.ERROR expected TRUE, got FALSE
+         at test_winch_integ.st:1162
+         Message: HARN-80: CAS-001 detecte (defaut Error, cible T180)
+  [FAIL] HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -&gt; defaut + neutralisation (CIBLE T180)
+         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt; 0 expected TRUE, got FALSE
+         at test_winch_integ.st:1186
+         Message: HARN-81: precondition - treuils en mouvement
+  [FAIL] HARN-81 : CAS-012 demande benne pendant mouvement treuil -&gt; demande REFUSEE (CIBLE T175 AC3)
+         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
+         at test_winch_integ.st:1223
+         Message: HARN-82: precondition - mouvement semi-auto
+  [FAIL] HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement
+
+-----------------------------------------
+32 tests, 5 passed, 27 failed
 </pre>
     </details>
 </div>

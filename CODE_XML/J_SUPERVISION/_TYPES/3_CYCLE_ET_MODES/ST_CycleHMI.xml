@@ -304,10 +304,10 @@
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="FALSE" />
+                <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. NON persiste.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T381 (ex T291-A) : en SEMI_AUTO AX4..AX7, profil nominal avec M1 palier 4 et M2 palier 5. Debrayable IHM. NON persiste.</xhtml>
               </documentation>
             </variable>
             <variable name="BtnResetSampleCount">

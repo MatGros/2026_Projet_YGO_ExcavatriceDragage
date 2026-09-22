@@ -4,42 +4,112 @@ tasks:
   statut: ❌
   criticite: C3
   domaine: TREUILS_BENNE / BORNES / HOMING / MAINT
-  agent: '—'
+  agent: —
   date: '2026-09-22T13:00:00+02:00'
   updated_at: '2026-09-22T13:00:00+02:00'
-  titre: 'Benne - bornes RELATIVES appliquees avec un datum INVALIDE : au boot (HX0, M1/M2 non references) le jog benne est bride'
-  contexte: 'CONSTAT EXPLOITANT EN SESSION 2026-09-22 (homing repris sur T364) : au boot HX0 - M1+M2 non references, le homing unitaire est possible et la benne se deplace au joystick, MAIS avec M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits = 1 et WinchSel = 2 la benne est BRIDEE alors que M1/M2 ne sont pas homed. MESURE DSH01 DE PREMIERE MAIN, LA CONDITION D ACTIVATION NE VERIFIE PAS LA VALIDITE DU DATUM : PRG_04_Treuils_Benne.st:787-789 ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2) AND NOT PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked - aucun terme de referencement/fiabilite. Or les bornes appliquees aux lignes 807 et 818 sont RELATIVES a M1 : EncoderM2.CablePosM <= EncoderM1.CablePosM + Cfg.OffsetOpenM + Cfg.OpenAnticipationM (ouverture) et >= OffsetCloseM - CloseAnticipationM (fermeture) : elles supposent donc un datum valide. Au boot les positions ne sont pas referencees, les bornes calculees sont denuees de sens et peuvent refuser tout mouvement de benne. Les notions de validite EXISTENT DEJA et doivent etre reutilisees : FB_Bucket.st:34/35 HomedM1/HomedM2, :36/37 HomedAndReliableM1/M2, :206-207 HomingPositionValid, :419-420 BucketState.BucketReferenced. POINT DE SECURITE DU LOT : la limite PHYSIQUE (FB_Bucket.st:114-115 RecoilLimitReachedNow/RecoilLimitActive) doit RESTER ACTIVE en toutes circonstances - un jog non reference reste borne par la mecanique.'
-  description: 'Gater la SEULE activation des bornes RELATIVES par la validite du datum (reutiliser HomedAndReliableM1 AND HomedAndReliableM2 et/ou BucketState.BucketReferenced, sans creer de nouvelle variable d etat), laisser la protection PHYSIQUE intacte, et publier un message operateur nomme si un geste benne est refuse (pas de refus silencieux - cf. T375). Aucune modification des seuils OffsetOpenM/OffsetCloseM/anticipations, des permis, des temporisations moteur/frein. Phasage : phase 0 mesurer (avec et sans datum, relever les comparaisons :807/:818 et les positions reelles), arret humain, phase 1 corriger, phase 2 prouver (ROUGE/VERT + mutation : datum retire => le cas echoue), phase 3 recette machine au boot HX0.'
+  titre: 'Benne - bornes RELATIVES appliquees avec un datum INVALIDE : au boot (HX0, M1/M2 non references) le jog benne est
+    bride'
+  contexte: 'CONSTAT EXPLOITANT EN SESSION 2026-09-22 (homing repris sur T364) : au boot HX0 - M1+M2 non references, le homing
+    unitaire est possible et la benne se deplace au joystick, MAIS avec M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits = 1
+    et WinchSel = 2 la benne est BRIDEE alors que M1/M2 ne sont pas homed. MESURE DSH01 DE PREMIERE MAIN, LA CONDITION D ACTIVATION
+    NE VERIFIE PAS LA VALIDITE DU DATUM : PRG_04_Treuils_Benne.st:787-789 ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits
+    AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2) AND NOT PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked
+    - aucun terme de referencement/fiabilite. Or les bornes appliquees aux lignes 807 et 818 sont RELATIVES a M1 : EncoderM2.CablePosM
+    <= EncoderM1.CablePosM + Cfg.OffsetOpenM + Cfg.OpenAnticipationM (ouverture) et >= OffsetCloseM - CloseAnticipationM (fermeture)
+    : elles supposent donc un datum valide. Au boot les positions ne sont pas referencees, les bornes calculees sont denuees
+    de sens et peuvent refuser tout mouvement de benne. Les notions de validite EXISTENT DEJA et doivent etre reutilisees
+    : FB_Bucket.st:34/35 HomedM1/HomedM2, :36/37 HomedAndReliableM1/M2, :206-207 HomingPositionValid, :419-420 BucketState.BucketReferenced.
+    POINT DE SECURITE DU LOT : la limite PHYSIQUE (FB_Bucket.st:114-115 RecoilLimitReachedNow/RecoilLimitActive) doit RESTER
+    ACTIVE en toutes circonstances - un jog non reference reste borne par la mecanique.'
+  description: 'Gater la SEULE activation des bornes RELATIVES par la validite du datum (reutiliser HomedAndReliableM1 AND
+    HomedAndReliableM2 et/ou BucketState.BucketReferenced, sans creer de nouvelle variable d etat), laisser la protection
+    PHYSIQUE intacte, et publier un message operateur nomme si un geste benne est refuse (pas de refus silencieux - cf. T375).
+    Aucune modification des seuils OffsetOpenM/OffsetCloseM/anticipations, des permis, des temporisations moteur/frein. Phasage
+    : phase 0 mesurer (avec et sans datum, relever les comparaisons :807/:818 et les positions reelles), arret humain, phase
+    1 corriger, phase 2 prouver (ROUGE/VERT + mutation : datum retire => le cas echoue), phase 3 recette machine au boot HX0.'
   objectifs:
-  - 'AC1 : ManualBucketLimitsActive est FALSE (ou inopérant) quand M1/M2 ne sont pas référencés/fiables => le jog benne n est plus bridé par une borne relative.'
+  - 'AC1 : ManualBucketLimitsActive est FALSE (ou inopérant) quand M1/M2 ne sont pas référencés/fiables => le jog benne n
+    est plus bridé par une borne relative.'
   - 'AC2 : quand le datum est valide, les bornes relatives restent ACTIVES (zéro régression du jog borné normal).'
-  - 'AC3 : la limite PHYSIQUE de recul (RecoilLimitActive) reste ACTIVE dans les DEUX cas — preuve explicite, c est la condition de sécurité du lot.'
+  - 'AC3 : la limite PHYSIQUE de recul (RecoilLimitActive) reste ACTIVE dans les DEUX cas — preuve explicite, c est la condition
+    de sécurité du lot.'
   - 'AC4 : aucune nouvelle variable d état, aucun paramètre persistant nouveau, aucun bypass — réutilisation des notions existantes.'
   - 'AC5 : un refus de mouvement benne est NOMMÉ à l IHM (≤ 70 caractères), jamais silencieux.'
-  - 'AC6 : ROUGE avant / VERT après + test de MUTATION ; révision ÉPINGLÉE (git hash-object) ; G200 --report collé ; palier C sans rouge nouveau.'
-  contrat: 'A ECRIRE avant toute ecriture (C3, obligatoire)'
-  avancement: '[CADRAGE DSH01 2026-09-22T13:00 - TACHE CREEE SUR CONSTAT EXPLOITANT, AUCUNE LIGNE DE CODE ECRITE.] BRIEF PRET A TRANSMETTRE : DOC/WFLOW/CONTRACTS/BRIEF_T388_BENNE_BORNES_SANS_DATUM_v1.md (8 sections, preambule inline, faits verifies fichier:ligne, 6 AC, phasage 0..3, interdits, preuve epinglee). PARENT T364 (refonte homing) car le defaut a ete revele par la reprise du homing ; LIENS : T377 (HOMING N1 manuel : rendre obligatoire le homing non reference - sujet voisin mais DISTINCT : T377 force le homing, T388 empeche des bornes relatives d utiliser un datum invalide), T375 (messages de refus silencieux), T326 (defauts benne pendant le referencement), T250 (consommateurs M2 offset-aware). COLLISION : PRG_04_Treuils_Benne.st est partage avec les lots T387/T381/T386-B en cours - UN SEUL ECRIVAIN. AUCUN COMMIT, AUCUN PUSH. [TACHE ABSORBEE DANS T387 LE 2026-09-22 SUR CONSIGNE EXPLOITANT.] Le perimetre (bornes relatives benne appliquees avec un datum invalide au boot) est traite dans T387, avec les deux autres defauts benne de la meme session. NE PAS ouvrir T388 comme lot separe. Le brief reste valable et integre a T387 : DOC/WFLOW/CONTRACTS/BRIEF_T388_BENNE_BORNES_SANS_DATUM_v1.md'
+  - 'AC6 : ROUGE avant / VERT après + test de MUTATION ; révision ÉPINGLÉE (git hash-object) ; G200 --report collé ; palier
+    C sans rouge nouveau.'
+  contrat: A ECRIRE avant toute ecriture (C3, obligatoire)
+  avancement: '[CADRAGE DSH01 2026-09-22T13:00 - TACHE CREEE SUR CONSTAT EXPLOITANT, AUCUNE LIGNE DE CODE ECRITE.] BRIEF PRET
+    A TRANSMETTRE : DOC/WFLOW/CONTRACTS/BRIEF_T388_BENNE_BORNES_SANS_DATUM_v1.md (8 sections, preambule inline, faits verifies
+    fichier:ligne, 6 AC, phasage 0..3, interdits, preuve epinglee). PARENT T364 (refonte homing) car le defaut a ete revele
+    par la reprise du homing ; LIENS : T377 (HOMING N1 manuel : rendre obligatoire le homing non reference - sujet voisin
+    mais DISTINCT : T377 force le homing, T388 empeche des bornes relatives d utiliser un datum invalide), T375 (messages
+    de refus silencieux), T326 (defauts benne pendant le referencement), T250 (consommateurs M2 offset-aware). COLLISION :
+    PRG_04_Treuils_Benne.st est partage avec les lots T387/T381/T386-B en cours - UN SEUL ECRIVAIN. AUCUN COMMIT, AUCUN PUSH.
+    [TACHE ABSORBEE DANS T387 LE 2026-09-22 SUR CONSIGNE EXPLOITANT.] Le perimetre (bornes relatives benne appliquees avec
+    un datum invalide au boot) est traite dans T387, avec les deux autres defauts benne de la meme session. NE PAS ouvrir
+    T388 comme lot separe. Le brief reste valable et integre a T387 : DOC/WFLOW/CONTRACTS/BRIEF_T388_BENNE_BORNES_SANS_DATUM_v1.md'
   bloque_par: []
 - id: T386
   parent_id: T306
   statut: ⬜
   criticite: C4
   domaine: SECURITE / TREUILS / TRANSLATION / BYPASS / BARRIERE_FINALE
-  agent: '—'
+  agent: —
   date: '2026-09-22T11:30:00+02:00'
   updated_at: '2026-09-22T11:30:00+02:00'
-  titre: 'T306 phase 2 - CORRECTIFS SECURITE (1 seul lot C4) : bypass PhaseRotation NON GATE MAINT_N2 sur 3 axes + masquage par BypassProcess [BLOCK], puis SafeStop INERTE a la barriere finale M3 [MAJOR]'
-  contexte: 'ISSU DU CHALLENGE EXPERT (orchestrate, run 2026-09-22, 3 audits + 2 revues). ECART B = BLOCK, gravite la plus elevee : BypassPhaseRotation est cable BRUT sur GVL_IHM en PRG_04_Treuils_Benne.st:984 (M1) et :1050 (M2) - commentaire :970 « SANS gate de mode (derogation MES 2026, tous modes) » - et en PRG_05_Translation.st:496 (M3) alors que le bypass VOISIN est gate : PRG_05:500 BypassLimitSwitch := M3_MaintN2 AND (...) avec M3_MaintN2 defini :462 = (Auth.Mode = E_Mode.MAINT_N2). CONSEQUENCE PHYSIQUE : un defaut de rotation de phases (inversion ou perte de phase => sens/vitesse errones => charge non maitrisee sur un axe porteur) est TOTALEMENT MASQUE en PRODUCTION (SEMI_AUTO/AUTO) - aucun arret exige. FINDING SUPPLÉMENTAIRE DU CHALLENGE, que ni la phase 0 ni l orchestrateur n avaient vu : gater le seul BypassPhaseRotation serait INCOMPLET et creerait une FAUSSE ASSURANCE, car FB_Safety_Winch.st:302 et FB_Safety_Translation.st:140 ecrivent IF NOT (BypassProcess OR BypassPhaseRotation) AND NOT PhaseRotationOk THEN - donc BypassProcess SEUL leve aussi la protection de phase (et BypassProcess inclut le bypass commun SlackCable, PRG_04:974/:1042). DEROGATION MES 2026 : REELLE et VERIFIEE (commit cac7387d du 2026-09-02 « feat(safety): DEROGATION MES - bypass treuil M1/M2+benne sans gate de mode [NON TESTE] », documentee DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md:179-192 : « ecart assume vis-a-vis de la Directive Machines / ISO 13849 ... A revoir une fois la MES stabilisee »), TEMPORAIRE, [NON TESTE], non conforme ISO 13849, et de perimetre etroit (bypass comm/position non critiques) - elle NE JUSTIFIE PAS de laisser la protection ROTATION DE PHASES neutralisable en production. Le gate G483_check_bypass_matrix_mode_gated.py est ROUGE a ce jour. ECART A = MAJOR (nuance importante du challenge, plus juste que « aucun arret ») : SafeStop est declare en VAR_INPUT de CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st:15 et JAMAIS lu dans le corps (:69-156), alors qu il est cable en entree (PRG_06_Outputs.st:438). M3 s arrete TOUJOURS via la rampe de FB_Translation (PRG_05:575 instTranslationM3.SafeStop := M3_SafeStop_Aggregate, agregation :511-512, permis effectifs retires :541-547) : le defaut n est donc PAS « aucun arret » mais une PERTE DE DEFENSE EN PROFONDEUR - la barriere finale ne force ni BrakeCmd := FALSE ni le blocage du mouvement si FB_Translation defaillait de facon coincidente. Inventaire de classe realise : AUCUN autre SafeStop declare-non-lu dans CODE/ (FB_TranslationOutputInterlock:15 est l unique cas).'
-  description: 'UN SEUL LOT, dans cet ordre : (B) gater BypassPhaseRotation sur MAINT_N2 pour les 3 axes (PRG_04_Treuils_Benne.st:984 et :1050 via (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2), PRG_05_Translation.st:496 via M3_MaintN2) ET desolidariser la cause rotation de phases de BypassProcess dans FB_Safety_Winch.st:302 et FB_Safety_Translation.st:140 — sans casser le bypass commun SlackCable conserve (PRG_04:508/:520, :974/:1042) ; puis (A) consommer SafeStop dans FB_TranslationOutputInterlock.st au bloc de decision finale (environ :137 et :146) : forcer BrakeCmd := FALSE et bloquer le mouvement quand SafeStop = TRUE, SANS toucher a Reset / Enable / FaultCore / watchdog / PDO. Validation commune : bundle complet + diff bundle des fichiers touches + G200_check_linkage.py --report (PASS 0 erreur) + run_all_gates.py (G483 redevenu VERT) + le test d injection du defaut rotation de phases (issu de T306 phase 1) VERT sur M1, M2 ET M3 avec redondance finale verifiee sur M3 et bypass inoperant hors MAINT_N2. Aucune temporisation moteur/frein modifiee hors du point de correction arbitre. Recette machine : action HUMAINE (coupure/inversion de phase sur armoire).'
+  titre: 'T306 phase 2 - CORRECTIFS SECURITE (1 seul lot C4) : bypass PhaseRotation NON GATE MAINT_N2 sur 3 axes + masquage
+    par BypassProcess [BLOCK], puis SafeStop INERTE a la barriere finale M3 [MAJOR]'
+  contexte: 'ISSU DU CHALLENGE EXPERT (orchestrate, run 2026-09-22, 3 audits + 2 revues). ECART B = BLOCK, gravite la plus
+    elevee : BypassPhaseRotation est cable BRUT sur GVL_IHM en PRG_04_Treuils_Benne.st:984 (M1) et :1050 (M2) - commentaire
+    :970 « SANS gate de mode (derogation MES 2026, tous modes) » - et en PRG_05_Translation.st:496 (M3) alors que le bypass
+    VOISIN est gate : PRG_05:500 BypassLimitSwitch := M3_MaintN2 AND (...) avec M3_MaintN2 defini :462 = (Auth.Mode = E_Mode.MAINT_N2).
+    CONSEQUENCE PHYSIQUE : un defaut de rotation de phases (inversion ou perte de phase => sens/vitesse errones => charge
+    non maitrisee sur un axe porteur) est TOTALEMENT MASQUE en PRODUCTION (SEMI_AUTO/AUTO) - aucun arret exige. FINDING SUPPLÉMENTAIRE
+    DU CHALLENGE, que ni la phase 0 ni l orchestrateur n avaient vu : gater le seul BypassPhaseRotation serait INCOMPLET et
+    creerait une FAUSSE ASSURANCE, car FB_Safety_Winch.st:302 et FB_Safety_Translation.st:140 ecrivent IF NOT (BypassProcess
+    OR BypassPhaseRotation) AND NOT PhaseRotationOk THEN - donc BypassProcess SEUL leve aussi la protection de phase (et BypassProcess
+    inclut le bypass commun SlackCable, PRG_04:974/:1042). DEROGATION MES 2026 : REELLE et VERIFIEE (commit cac7387d du 2026-09-02
+    « feat(safety): DEROGATION MES - bypass treuil M1/M2+benne sans gate de mode [NON TESTE] », documentee DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md:179-192
+    : « ecart assume vis-a-vis de la Directive Machines / ISO 13849 ... A revoir une fois la MES stabilisee »), TEMPORAIRE,
+    [NON TESTE], non conforme ISO 13849, et de perimetre etroit (bypass comm/position non critiques) - elle NE JUSTIFIE PAS
+    de laisser la protection ROTATION DE PHASES neutralisable en production. Le gate G483_check_bypass_matrix_mode_gated.py
+    est ROUGE a ce jour. ECART A = MAJOR (nuance importante du challenge, plus juste que « aucun arret ») : SafeStop est declare
+    en VAR_INPUT de CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st:15 et JAMAIS lu dans le corps (:69-156), alors qu
+    il est cable en entree (PRG_06_Outputs.st:438). M3 s arrete TOUJOURS via la rampe de FB_Translation (PRG_05:575 instTranslationM3.SafeStop
+    := M3_SafeStop_Aggregate, agregation :511-512, permis effectifs retires :541-547) : le defaut n est donc PAS « aucun arret
+    » mais une PERTE DE DEFENSE EN PROFONDEUR - la barriere finale ne force ni BrakeCmd := FALSE ni le blocage du mouvement
+    si FB_Translation defaillait de facon coincidente. Inventaire de classe realise : AUCUN autre SafeStop declare-non-lu
+    dans CODE/ (FB_TranslationOutputInterlock:15 est l unique cas).'
+  description: 'UN SEUL LOT, dans cet ordre : (B) gater BypassPhaseRotation sur MAINT_N2 pour les 3 axes (PRG_04_Treuils_Benne.st:984
+    et :1050 via (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2), PRG_05_Translation.st:496 via M3_MaintN2) ET desolidariser
+    la cause rotation de phases de BypassProcess dans FB_Safety_Winch.st:302 et FB_Safety_Translation.st:140 — sans casser
+    le bypass commun SlackCable conserve (PRG_04:508/:520, :974/:1042) ; puis (A) consommer SafeStop dans FB_TranslationOutputInterlock.st
+    au bloc de decision finale (environ :137 et :146) : forcer BrakeCmd := FALSE et bloquer le mouvement quand SafeStop =
+    TRUE, SANS toucher a Reset / Enable / FaultCore / watchdog / PDO. Validation commune : bundle complet + diff bundle des
+    fichiers touches + G200_check_linkage.py --report (PASS 0 erreur) + run_all_gates.py (G483 redevenu VERT) + le test d
+    injection du defaut rotation de phases (issu de T306 phase 1) VERT sur M1, M2 ET M3 avec redondance finale verifiee sur
+    M3 et bypass inoperant hors MAINT_N2. Aucune temporisation moteur/frein modifiee hors du point de correction arbitre.
+    Recette machine : action HUMAINE (coupure/inversion de phase sur armoire).'
   objectifs:
-  - 'AC1 : BypassPhaseRotation est inoperant hors MAINT_N2 sur les 3 axes (M1, M2, M3) — preuve : code + test qui tente le bypass en SEMI_AUTO et constate que la protection reste active.'
-  - 'AC2 : la cause rotation de phases n est PLUS levee par BypassProcess seul (desolidarisation dans FB_Safety_Winch et FB_Safety_Translation) — preuve : test avec BypassProcess = TRUE et PhaseRotationOk = FALSE => le defaut est TOUJOURS active.'
-  - 'AC3 : SafeStop est CONSOMME par FB_TranslationOutputInterlock (BrakeCmd := FALSE + blocage du mouvement) — preuve : test unitaire safe-stop sur cet interlock (ROUGE avant / VERT apres).'
-  - 'AC4 : gate G483 (matrice bypass MAINT_N2) redevient VERT et la derogation MES 2026 est soit cloturee soit re-formalisee avec un perimetre etroit EXPLICITE excluant la rotation de phases.'
-  - 'AC5 : G200 PASS 0 erreur + palier C sans rouge nouveau, et diff VIDE sur B_AU_SECURITE/** hors du point de correction arbitre.'
-  - 'AC6 : recette machine listee comme action HUMAINE : phases coupees/inversees => arret des 3 axes, acquittement sur FRONT, AUCUN redemarrage automatique.'
+  - 'AC1 : BypassPhaseRotation est inoperant hors MAINT_N2 sur les 3 axes (M1, M2, M3) — preuve : code + test qui tente le
+    bypass en SEMI_AUTO et constate que la protection reste active.'
+  - 'AC2 : la cause rotation de phases n est PLUS levee par BypassProcess seul (desolidarisation dans FB_Safety_Winch et FB_Safety_Translation)
+    — preuve : test avec BypassProcess = TRUE et PhaseRotationOk = FALSE => le defaut est TOUJOURS active.'
+  - 'AC3 : SafeStop est CONSOMME par FB_TranslationOutputInterlock (BrakeCmd := FALSE + blocage du mouvement) — preuve : test
+    unitaire safe-stop sur cet interlock (ROUGE avant / VERT apres).'
+  - 'AC4 : gate G483 (matrice bypass MAINT_N2) redevient VERT et la derogation MES 2026 est soit cloturee soit re-formalisee
+    avec un perimetre etroit EXPLICITE excluant la rotation de phases.'
+  - 'AC5 : G200 PASS 0 erreur + palier C sans rouge nouveau, et diff VIDE sur B_AU_SECURITE/** hors du point de correction
+    arbitre.'
+  - 'AC6 : recette machine listee comme action HUMAINE : phases coupees/inversees => arret des 3 axes, acquittement sur FRONT,
+    AUCUN redemarrage automatique.'
   contrat: 'A ECRIRE avant toute ecriture (C4 : plan humain obligatoire + double revue parallele)'
-  avancement: '[CADRAGE 2026-09-22 — TACHE CREEE SUR VERDICT DU CHALLENGE EXPERT, AUCUNE LIGNE DE CODE ECRITE.] ORIGINE : challenge independant du lot T306 phase 1 (orchestrate : 3 audits parallels + 2 revues) qui a rendu un verdict de gravite BLOCK pour l ECART B et MAJOR pour l ECART A, avec un finding supplementaire determinant (BypassProcess masque aussi la rotation de phases). Le challenge a par ailleurs REFUTE l orchestration sur un point : la preuve ROUGE/VERT du lot phase 1 est quasi-tautologique (voir annotation T306). DECISION D ORCHESTRATION : UN seul lot C4 (B puis A) et non deux, pour rester dans UNE campagne d essais (regle exploitant). AUCUN COMMIT, AUCUN PUSH.'
+  avancement: '[CADRAGE 2026-09-22 — TACHE CREEE SUR VERDICT DU CHALLENGE EXPERT, AUCUNE LIGNE DE CODE ECRITE.] ORIGINE :
+    challenge independant du lot T306 phase 1 (orchestrate : 3 audits parallels + 2 revues) qui a rendu un verdict de gravite
+    BLOCK pour l ECART B et MAJOR pour l ECART A, avec un finding supplementaire determinant (BypassProcess masque aussi la
+    rotation de phases). Le challenge a par ailleurs REFUTE l orchestration sur un point : la preuve ROUGE/VERT du lot phase
+    1 est quasi-tautologique (voir annotation T306). DECISION D ORCHESTRATION : UN seul lot C4 (B puis A) et non deux, pour
+    rester dans UNE campagne d essais (regle exploitant). AUCUN COMMIT, AUCUN PUSH.'
   bloque_par: []
 - id: T385
   parent_id: ''
@@ -216,7 +286,26 @@ tasks:
     vers la chaine de remontee) et ajoute un step de mouvement ; C4 = plan humain obligatoire et Ponytail interdit, double
     revue parallele exigee par la regle C4 (WORKFLOW.md). LIENS : T331 (famille retour arriere controle, origine de la deviation)
     ; T324 (steps speciaux hors GEL) ; T348 (trace 10 ms M3/Tremie, mesure de recette) ; T375 (messages operateur, si harmonisation
-    necessaire). AUCUN COMMIT, AUCUN PUSH. [ETAT VERIFIE DU LOT AU 2026-09-22 - MESURES EPINGLEES PAR HASH.] Mon alerte initiale (2 nouveaux tests rouges) etait un FAUX POSITIF : la CI avait ete lancee pendant que le fichier de test etait en cours d edition. RE-MESURE SUR ARBRE STABLE : hash test_fb_cyclesemiauto.st = 766A3E9E122A IDENTIQUE avant et apres le run -> CI FB_CycleSemiAuto = 43 tests, 38 PASS, 5 FAIL, et ces 5 sont EXACTEMENT les dettes pre-existantes (TC-P04-020/021/023/026 sur AX4 + TC-P04-SCEN-NOM) : LE LOT N AJOUTE AUCUN ECHEC. Confirme par le diagnostic independant : T331-001 et T331-003 PASSENT ; l echec d origine etait un DEFAUT DE HARNAIS (assertion sans scan de rattrapage), corrige par l auteur - CycleStep est calcule en tete du CASE et ne reflete State qu au scan suivant. VERIFIE BON : aucun ordre de treuil en AX15D (FB_CycleSemiAuto.st:1588-1591), sorties deterministes (1601-1609, IF/ELSIF exclusifs, la perte d homme-mort ne sort pas du step), message 66 car <= 70 (G408 PASS), table de forcage 0..23 sans trou (CST_StepForceMax = 23), G517 24 branches PASS, G500 compilation CODESYS 21/21 PASS. VERDICT DE LA REVUE C4 INDEPENDANTE : A CORRIGER (aucun BLOCK de securite en production). A CORRIGER, par gravite : (1) MAJOR l extension de DirectInversionPermit (PRG_02_Acquisition.st:479-480) n est PAS tracee dans l amendement alors qu une entree [SAFE] est touchee -> decision safety a ECRIRE ; (2) MINOR a MAJOR l amendement affirme qu AX15D est exclue de la surveillance de synchronisme comme AX10 (code:472) alors que la liste d exclusion cause-1 (FB_CycleSemiAuto.st:467-473) NE CONTIENT PAS AX15D : trace FAUSSE a corriger (soit ajouter l exclusion au code, soit corriger l amendement) ; (3) MINOR message de rejet du forcage perime (FB_CycleSemiAuto.st:798 dit 0..22 alors que la borne est 23) ; (4) MINOR commentaire FB_Joystick.st:28 qui ne mentionne pas AX15D ; (5) MINOR tests manquants (assert StepTgt := 0, et cas de priorite relachement vs done). NON VERIFIE par la revue, a instruire : la reaction AVAL de PRG_04 / FB_WinchOutputInterlock a un ReqClose pendant le jog, et l interpretation materielle d une inversion benne repetee sans neutre. GARDE-FOU PROPOSE (fix + guard) : G527 - toute mesure CI doit EPINGLER la revision qu elle decrit (hash des sources et du fichier de test), sinon un rapport peut decrire un etat qui n existe plus (meme classe que l AC6 de T372).'
+    necessaire). AUCUN COMMIT, AUCUN PUSH. [ETAT VERIFIE DU LOT AU 2026-09-22 - MESURES EPINGLEES PAR HASH.] Mon alerte initiale
+    (2 nouveaux tests rouges) etait un FAUX POSITIF : la CI avait ete lancee pendant que le fichier de test etait en cours
+    d edition. RE-MESURE SUR ARBRE STABLE : hash test_fb_cyclesemiauto.st = 766A3E9E122A IDENTIQUE avant et apres le run ->
+    CI FB_CycleSemiAuto = 43 tests, 38 PASS, 5 FAIL, et ces 5 sont EXACTEMENT les dettes pre-existantes (TC-P04-020/021/023/026
+    sur AX4 + TC-P04-SCEN-NOM) : LE LOT N AJOUTE AUCUN ECHEC. Confirme par le diagnostic independant : T331-001 et T331-003
+    PASSENT ; l echec d origine etait un DEFAUT DE HARNAIS (assertion sans scan de rattrapage), corrige par l auteur - CycleStep
+    est calcule en tete du CASE et ne reflete State qu au scan suivant. VERIFIE BON : aucun ordre de treuil en AX15D (FB_CycleSemiAuto.st:1588-1591),
+    sorties deterministes (1601-1609, IF/ELSIF exclusifs, la perte d homme-mort ne sort pas du step), message 66 car <= 70
+    (G408 PASS), table de forcage 0..23 sans trou (CST_StepForceMax = 23), G517 24 branches PASS, G500 compilation CODESYS
+    21/21 PASS. VERDICT DE LA REVUE C4 INDEPENDANTE : A CORRIGER (aucun BLOCK de securite en production). A CORRIGER, par
+    gravite : (1) MAJOR l extension de DirectInversionPermit (PRG_02_Acquisition.st:479-480) n est PAS tracee dans l amendement
+    alors qu une entree [SAFE] est touchee -> decision safety a ECRIRE ; (2) MINOR a MAJOR l amendement affirme qu AX15D est
+    exclue de la surveillance de synchronisme comme AX10 (code:472) alors que la liste d exclusion cause-1 (FB_CycleSemiAuto.st:467-473)
+    NE CONTIENT PAS AX15D : trace FAUSSE a corriger (soit ajouter l exclusion au code, soit corriger l amendement) ; (3) MINOR
+    message de rejet du forcage perime (FB_CycleSemiAuto.st:798 dit 0..22 alors que la borne est 23) ; (4) MINOR commentaire
+    FB_Joystick.st:28 qui ne mentionne pas AX15D ; (5) MINOR tests manquants (assert StepTgt := 0, et cas de priorite relachement
+    vs done). NON VERIFIE par la revue, a instruire : la reaction AVAL de PRG_04 / FB_WinchOutputInterlock a un ReqClose pendant
+    le jog, et l interpretation materielle d une inversion benne repetee sans neutre. GARDE-FOU PROPOSE (fix + guard) : G527
+    - toute mesure CI doit EPINGLER la revision qu elle decrit (hash des sources et du fichier de test), sinon un rapport
+    peut decrire un etat qui n existe plus (meme classe que l AC6 de T372).'
   bloque_par: []
 - id: T382
   parent_id: ''
@@ -311,7 +400,10 @@ tasks:
   - 'AC6 : la decision est TRACEE : note d application ecrite, commentaire du DUT aligne, et mention explicite du fait que
     l essai T291-A devient un DEFAUT DE PRODUCTION (ou refus ecrit de l exploitant).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T381_AUTODIVE_M2_STEP5_DEFAUT.yaml
-  avancement: '[EXECUTION AGY01 2026-09-22T12:22] TglAutoDiveM2Step5Trial passe a TRUE par defaut dans ST_CycleCmd.st:15. Profil de plongee M2 palier 5 arme au demarrage a froid, debrayable IHM a tout moment. Note d application redigee. Bundle complet et DiffBundle regeneres, G200 PASS 0 erreur, Palier C 56/60 PASS. En attente de validation humaine pour commit. RAPPEL CADRAGE : [CADRAGE DSH01 2026-09-22T08:46 — TACHE C3 CREEE AVEC CONTRAT, AUCUNE LIGNE ECRITE.] QUATRE ALERTES PORTEES
+  avancement: '[EXECUTION AGY01 2026-09-22T12:22] TglAutoDiveM2Step5Trial passe a TRUE par defaut dans ST_CycleCmd.st:15.
+    Profil de plongee M2 palier 5 arme au demarrage a froid, debrayable IHM a tout moment. Note d application redigee. Bundle
+    complet et DiffBundle regeneres, G200 PASS 0 erreur, Palier C 56/60 PASS. En attente de validation humaine pour commit.
+    RAPPEL CADRAGE : [CADRAGE DSH01 2026-09-22T08:46 — TACHE C3 CREEE AVEC CONTRAT, AUCUNE LIGNE ECRITE.] QUATRE ALERTES PORTEES
     AU CONTRAT, A TRANCHER AVANT TOUTE ECRITURE : (1) ST_CycleCmd.st est un DUT partage par l IHM (GVL_IHM.CycleSemiAuto :
     ST_CycleHMI) : changer un defaut change la valeur de depart pour TOUTE machine, pas seulement celle du banc — et un gel
     de la table IHM a ete impose au lot T367 le 2026-09-21 (« aucune touche a GVL_IHM ni a ses types ») : ce gel doit etre
@@ -546,7 +638,25 @@ tasks:
     a verifie la chaine sur source et identifie le masquage par temoin de validite. GO EXPLICITE DE L EXPLOITANT sur le couple
     fix: + guard:. PERIMETRE : IHM/diagnostic + outillage uniquement, logique de securite INTERDITE (AC8). Aucune ligne de
     CODE/ ecrite par l orchestrateur (read-only). CRITICITE C3 PROPOSEE (aucune modification de logique safety, mais visibilite
-    d etat de securite) — a confirmer en un mot, ou a elever en C4 si la visibilite safety est jugee critique.] [EXTENSION 2026-09-22 - MESSAGE MecaB NON QUALIFIE, GAP CONFIRME PAR MESURE DSH01.] Le message publie en FB_Hmi_BannerFormatter.st:554 (M3) et :560 (M1/M2) est IDENTIQUE pour les 3 axes et NE DIT PAS laquelle des conditions n est pas confirmee : « MecaB (arret non confirme) - Reset puis rearmer ». Or FB_Safety_Winch.st:341 CONFLUE trois sous-conditions dans un seul booleen : UncommandedActiveB := JoystickYNeutral AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback). L operateur ne peut donc pas savoir s il doit verifier les CONTACTEURS (non retombes) ou le FREIN (encore ouvert), ni depuis combien de temps (TonMecaB / MecaBElapsedTime, FB_Safety_Winch.st:98/:342/:347). C est la meme classe que les voies silencieuses deja traitees par cette tache (AC1/AC2) et c est DOCUMENTE : DOC/WFLOW/TROUBLESHOOTING/TROUBLESHOOTING_EscaladeMecaM1M2_20260915.md (« les mesures existent ... mais il n existe pas de seuil warning ni message avant le PowerCutOff »). EXTENSION : ajouter un AC de QUALIFICATION du message MecaB (nommer le retour fautif + le temps ecoule), en reutilisant les retours DEJA publies (ST_HwWinch.st:8/10 M1_ContactorsReleased_DI, M1_BrakeIsOpen_DI ; miroir diagnostic Idx103_ContactorsReleased_DI). CONTRAINTE IMPERATIVE ARBITREE PAR L ORCHESTRATEUR : la qualification DOIT etre calculee dans la couche IHM (FB_Hmi_BannerFormatter) a partir des retours deja publies -> FB_Safety_Winch.st reste INTERDIT (interdiction de scinder le booleen de securite). Si la qualification s avere impossible hors du FB de securite, le lot change de nature (C4, perimetre FB_Safety_*) et repasse par un arbitrage humain explicite. PAS DE PREREQUIS TRACE : la trace 10 ms n est PAS un prerequis pour CADRER le message - le message doit couvrir LES DEUX sous-causes par construction ; la trace sert a CONFIRMER le cas terrain et a valider le libelle (preuve d AC). Libelles proposes (<= 70 car., G408) : « [M1] MecaB - arret non confirme : contacteurs engages (Xs) » et « [M1] MecaB - arret non confirme : frein encore ouvert (Xs) ». PRECISION DE TRACABILITE : le document cite par le retour d analyse est une FICHE TROUBLESHOOTING, pas un AUDIT (chemin exact ci-dessus).'
+    d etat de securite) — a confirmer en un mot, ou a elever en C4 si la visibilite safety est jugee critique.] [EXTENSION
+    2026-09-22 - MESSAGE MecaB NON QUALIFIE, GAP CONFIRME PAR MESURE DSH01.] Le message publie en FB_Hmi_BannerFormatter.st:554
+    (M3) et :560 (M1/M2) est IDENTIQUE pour les 3 axes et NE DIT PAS laquelle des conditions n est pas confirmee : « MecaB
+    (arret non confirme) - Reset puis rearmer ». Or FB_Safety_Winch.st:341 CONFLUE trois sous-conditions dans un seul booleen
+    : UncommandedActiveB := JoystickYNeutral AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback).
+    L operateur ne peut donc pas savoir s il doit verifier les CONTACTEURS (non retombes) ou le FREIN (encore ouvert), ni
+    depuis combien de temps (TonMecaB / MecaBElapsedTime, FB_Safety_Winch.st:98/:342/:347). C est la meme classe que les voies
+    silencieuses deja traitees par cette tache (AC1/AC2) et c est DOCUMENTE : DOC/WFLOW/TROUBLESHOOTING/TROUBLESHOOTING_EscaladeMecaM1M2_20260915.md
+    (« les mesures existent ... mais il n existe pas de seuil warning ni message avant le PowerCutOff »). EXTENSION : ajouter
+    un AC de QUALIFICATION du message MecaB (nommer le retour fautif + le temps ecoule), en reutilisant les retours DEJA publies
+    (ST_HwWinch.st:8/10 M1_ContactorsReleased_DI, M1_BrakeIsOpen_DI ; miroir diagnostic Idx103_ContactorsReleased_DI). CONTRAINTE
+    IMPERATIVE ARBITREE PAR L ORCHESTRATEUR : la qualification DOIT etre calculee dans la couche IHM (FB_Hmi_BannerFormatter)
+    a partir des retours deja publies -> FB_Safety_Winch.st reste INTERDIT (interdiction de scinder le booleen de securite).
+    Si la qualification s avere impossible hors du FB de securite, le lot change de nature (C4, perimetre FB_Safety_*) et
+    repasse par un arbitrage humain explicite. PAS DE PREREQUIS TRACE : la trace 10 ms n est PAS un prerequis pour CADRER
+    le message - le message doit couvrir LES DEUX sous-causes par construction ; la trace sert a CONFIRMER le cas terrain
+    et a valider le libelle (preuve d AC). Libelles proposes (<= 70 car., G408) : « [M1] MecaB - arret non confirme : contacteurs
+    engages (Xs) » et « [M1] MecaB - arret non confirme : frein encore ouvert (Xs) ». PRECISION DE TRACABILITE : le document
+    cite par le retour d analyse est une FICHE TROUBLESHOOTING, pas un AUDIT (chemin exact ci-dessus).'
   bloque_par: []
 - id: T374
   parent_id: ''
@@ -556,7 +666,8 @@ tasks:
   agent: DSH30
   locked_at: '2026-09-22T00:17:35+02:00'
   date: '2026-09-22T00:17:35+02:00'
-  titre: 'MAINT_N2 : restreindre la commande manuelle des treuils par boutons IHM a MAINT_N2 uniquement (inactive en MAINT_N1 + message op ; joystick inchange)'
+  titre: 'MAINT_N2 : restreindre la commande manuelle des treuils par boutons IHM a MAINT_N2 uniquement (inactive en MAINT_N1
+    + message op ; joystick inchange)'
   contexte: Demande client pour la mise en service. Les six boutons moteur existent dans ST_MaintenanceN2Cmd.st:9-14, mais
     la recherche dans CODE/ ne trouve comme consommateur que ActiveForcing dans PRG_07_Supervision.st:705-710 ; les boutons
     de frein sont, eux, lus par PRG_06_Outputs.st:320-330. T259 reste une livraison historique distincte et T273 une revision
@@ -572,19 +683,32 @@ tasks:
     du mot inconditionnellement.
   - Preparer six essais de simulation puis une recette machine, avec absence de redemarrage automatique et relachement du
     bouton.
-  - 'BC1 : en MAINT_N1, un bouton treuil IHM (M1/M2 unitaires ou Both) ne produit AUCUN mouvement ; preuve test CI + observation (bouton inert, RunRequest=FALSE).'
-  - 'BC2 : en MAINT_N1, l appui d un bouton treuil affiche un MESSAGE IHM explicite « Commande treuil non disponible en MAINT_N1 — passer en MAINT_N2 ».'
-  - 'BC3 : en MAINT_N2, la commande manuelle existante par boutons fonctionne normalement (comportement actuel conserve, aucun changement de la chaine de mouvement).'
-  - 'BC4 : le JOYSTICK reste inchange et commande les treuils en MAINT_N1 ET MAINT_N2 (nominal, homme-mort + toutes securites) — preuve CI cas joystick N1.'
+  - 'BC1 : en MAINT_N1, un bouton treuil IHM (M1/M2 unitaires ou Both) ne produit AUCUN mouvement ; preuve test CI + observation
+    (bouton inert, RunRequest=FALSE).'
+  - 'BC2 : en MAINT_N1, l appui d un bouton treuil affiche un MESSAGE IHM explicite « Commande treuil non disponible en MAINT_N1
+    — passer en MAINT_N2 ».'
+  - 'BC3 : en MAINT_N2, la commande manuelle existante par boutons fonctionne normalement (comportement actuel conserve, aucun
+    changement de la chaine de mouvement).'
+  - 'BC4 : le JOYSTICK reste inchange et commande les treuils en MAINT_N1 ET MAINT_N2 (nominal, homme-mort + toutes securites)
+    — preuve CI cas joystick N1.'
   - 'BC5 : AF_Partie-05 (_vX.Y) est mis a jour pour documenter la restriction N1 (spec = code), sinon derogation ecrite.'
-  - 'BC6 : non-regression : git diff VIDE sur FB_Safety_Winch.st, FB_WinchOutputInterlock.st, CODE/B_AU_SECURITE/ ; bundle frais + diff bundle + G200 --report PASS 0 erreur + palier C sans rouge nouveau.'
-  - 'BC7 : modification minimale de la commande EXISTANTE ; aucun nouveau bouton, aucun FB de securite touche, aucun refactor de matrice de protections.'
+  - 'BC6 : non-regression : git diff VIDE sur FB_Safety_Winch.st, FB_WinchOutputInterlock.st, CODE/B_AU_SECURITE/ ; bundle
+    frais + diff bundle + G200 --report PASS 0 erreur + palier C sans rouge nouveau.'
+  - 'BC7 : modification minimale de la commande EXISTANTE ; aucun nouveau bouton, aucun FB de securite touche, aucun refactor
+    de matrice de protections.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_AUDIT.yaml
   contrat_analyse_conditions: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_DSH_CONDITIONS_EXISTANTES.yaml
   contrat_boutons_code: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_BOUTONS_CODE.yaml
   updated_at: '2026-09-22T10:41:00+02:00'
-  avancement: '[PERIMETRE REVISE PAR L EXPLOITANT 2026-09-22 (CHALLENGE ACCEPTE) : NE PLUS CABLER LES 6 BOUTONS MAINT_N2 — ABANDON de l ancien perimetre « rendre fonctionnels les 6 boutons » (redondant : les boutons manuels existants M1TreuilRetenue/M2TreuilBenne/Commun Both commandent DEJA les treuils en N1/N2 via la branche Mode Boutons, FB_WinchCmdArbitrationM1:68-87). NOUVEAU SCOPE : RESTREINDRE la commande manuelle des treuils par boutons IHM a MAINT_N2 uniquement — en MAINT_N1 les boutons sont INACTIFS (aucun mouvement) avec MESSAGE IHM explicite ; le JOYSTICK reste actif en N1 et N2 ; AF-05 mis a jour. DECISIONS EXPLOITANT 2026-09-22 : (D1) boutons treuil inactifs en N1 ; (D2) joystick reste actif en N1 ; (D3) message operateur explicite si appui bouton en N1 ; (D4) pas de nouveaux boutons, corriger ce qui existe ; (D5) aucun FB de securite modifie. VERROU DSH30 conserve.] Phase A lecture seule livree : six boutons moteur sans consommation hors indicateur
-    PRG_07 ActiveForcing ; freins raccordes separement dans PRG_06. Audit durable DOC/WFLOW/AUDITS/DESIGN/AUDIT_T374_MAINT_N2_BOUTONS_MOTEURS_20260922.md.
+  avancement: '[PERIMETRE REVISE PAR L EXPLOITANT 2026-09-22 (CHALLENGE ACCEPTE) : NE PLUS CABLER LES 6 BOUTONS MAINT_N2 —
+    ABANDON de l ancien perimetre « rendre fonctionnels les 6 boutons » (redondant : les boutons manuels existants M1TreuilRetenue/M2TreuilBenne/Commun
+    Both commandent DEJA les treuils en N1/N2 via la branche Mode Boutons, FB_WinchCmdArbitrationM1:68-87). NOUVEAU SCOPE
+    : RESTREINDRE la commande manuelle des treuils par boutons IHM a MAINT_N2 uniquement — en MAINT_N1 les boutons sont INACTIFS
+    (aucun mouvement) avec MESSAGE IHM explicite ; le JOYSTICK reste actif en N1 et N2 ; AF-05 mis a jour. DECISIONS EXPLOITANT
+    2026-09-22 : (D1) boutons treuil inactifs en N1 ; (D2) joystick reste actif en N1 ; (D3) message operateur explicite si
+    appui bouton en N1 ; (D4) pas de nouveaux boutons, corriger ce qui existe ; (D5) aucun FB de securite modifie. VERROU
+    DSH30 conserve.] Phase A lecture seule livree : six boutons moteur sans consommation hors indicateur PRG_07 ActiveForcing
+    ; freins raccordes separement dans PRG_06. Audit durable DOC/WFLOW/AUDITS/DESIGN/AUDIT_T374_MAINT_N2_BOUTONS_MOTEURS_20260922.md.
     Phase suivante confiee a DSH30 : analyse des conditions EXISTANTES selon BRIEF_T374_DSH_CONDITIONS_EXISTANTES.md, read-only,
     sans ajout de garde ni code. Plan code en attente de validation humaine. [MAJ DSH01 2026-09-22T06:27 — EXIGENCE DE MISE
     EN SERVICE ENREGISTREE, PRIORITE QUALIFIEE PAR L EXPLOITANT.] VERBATIM : « A la fin de la mise en service il faut que
@@ -1090,7 +1214,12 @@ tasks:
   - ModesFault visible au bandeau quand actif, plus d ecart AnyFault=1 sans message.
   - Messages operateur reformules, zero jargon technique (datum).
   - Test CI de non-regression, aucun commit sans accord explicite.
-  avancement: ' [GROUPEMENT DECIDE PAR L ORCHESTRATEUR LE 2026-09-22, SUR ACCORD EXPLOITANT : T365 REJOINT LE LOT T375 (une seule campagne d essais, un seul contrat, un seul brief).] Motif : meme classe de defaut (cause latchee / refus publies SANS message operateur) et meme fichier de correction (FB_Hmi_BannerFormatter + DUT de messages). BRIEF DE TRANSMISSION COMMUN : DOC/WFLOW/CONTRACTS/BRIEF_T375_T365_MESSAGES_SILENCIEUX_v1.md (4 voies silencieuses, contrainte IHM FB_Safety_Winch INTERDIT, preuve ROUGE/VERT avec revision epinglee). CONTRAT A AMENDER : TASK_CONTRACT_T375_MESSAGES_BLOCAGES_SILENCIEUX.yaml. AUCUN COMMIT, AUCUN PUSH DE CODE.'
+  avancement: ' [GROUPEMENT DECIDE PAR L ORCHESTRATEUR LE 2026-09-22, SUR ACCORD EXPLOITANT : T365 REJOINT LE LOT T375 (une
+    seule campagne d essais, un seul contrat, un seul brief).] Motif : meme classe de defaut (cause latchee / refus publies
+    SANS message operateur) et meme fichier de correction (FB_Hmi_BannerFormatter + DUT de messages). BRIEF DE TRANSMISSION
+    COMMUN : DOC/WFLOW/CONTRACTS/BRIEF_T375_T365_MESSAGES_SILENCIEUX_v1.md (4 voies silencieuses, contrainte IHM FB_Safety_Winch
+    INTERDIT, preuve ROUGE/VERT avec revision epinglee). CONTRAT A AMENDER : TASK_CONTRACT_T375_MESSAGES_BLOCAGES_SILENCIEUX.yaml.
+    AUCUN COMMIT, AUCUN PUSH DE CODE.'
   bloque_par: []
 - id: T364
   parent_id: T340
@@ -1142,7 +1271,19 @@ tasks:
     la seule protection du perimetre prepare ci-dessus ; a trancher par l humain (le liberer, ou ouvrir une tache dediee qui
     portera le nouveau lot et son propre verrou). (3) CORRECTION DE L AVANCEMENT CI-DESSUS : il annonce NON COMMITE, or le
     lot est commite a HEAD (bb9436e1, feat(homing) T364 phases 0-4, 2026-09-21T13:07). ARBITRAGE HUMAIN REQUIS : id, criticite,
-    agent et verrou du nouveau lot homing N1. [REFERENCE DE VERITE AJOUTEE 2026-09-22 - DECISION EXPLOITANT : DOC/WFLOW/CONTRACTS/BRIEF_T364_REFONTE_COMPLETE_SEQUENCE_HOMING.md EST LE document de verite operationnelle du homing (redige d apres la specification de terrain du 2026-09-21, etat par etat HX0..HX7). A LIRE AVANT TOUTE DECISION SUR LE HOMING OU LA BENNE EN REFERENCEMENT. CE QUE CE BRIEF TRANCHE POUR LE LOT BENNE : HX1 = tirer le joystick pour fermer la benne (WinchSel=2) avec le FDC benne DESACTIVE pendant l action ; HX1a = bascule WinchSel=0 et FDC benne REACTIVE, puis referencement M1+M2. Or le code ne desactive qu a HX4_BUCKET_ADJUST (FB_Bucket.st environ :647) : le code desactive DONC TROP TARD pour le cas constate en session. CORRECTIF CONFORME A LA SPEC : agir par l ETAT DU SEQUENCEUR (desactive a HX1, reactive a HX1a), et NON par un gating sur le datum - la voie proposee par l agent phase 0 donne le meme resultat mais n est pas la spec. DIVERGENCE A TRANCHER PAR L AGENT : le brouillon GEL_GRAFCET_HOMING_CYCLE_20260903.md exige un motif 3 APPUIS (V_EXPLICITE) alors que le brief (plus recent) exige UN SEUL appui bouton IHM a HX1 -> SUIVRE LE BRIEF. POINT DE SECURITE OUVERT (brief section 3bis), A TRANCHER PAR L EXPLOITANT : a HX1 la benne est manoeuvree A L AVEUGLE (sans FDC logiciel ET sans position encodeur fiable) -> il faut VERIFIER qu une butee mecanique independante du logiciel protege la benne dans cette phase ; sinon le risque n est pas acceptable. COMPLEMENT : le brief exige que le couplage M1/M2 (E1) soit RESOLU et PROUVE par test CI, pas seulement documente.'
+    agent et verrou du nouveau lot homing N1. [REFERENCE DE VERITE AJOUTEE 2026-09-22 - DECISION EXPLOITANT : DOC/WFLOW/CONTRACTS/BRIEF_T364_REFONTE_COMPLETE_SEQUENCE_HOMING.md
+    EST LE document de verite operationnelle du homing (redige d apres la specification de terrain du 2026-09-21, etat par
+    etat HX0..HX7). A LIRE AVANT TOUTE DECISION SUR LE HOMING OU LA BENNE EN REFERENCEMENT. CE QUE CE BRIEF TRANCHE POUR LE
+    LOT BENNE : HX1 = tirer le joystick pour fermer la benne (WinchSel=2) avec le FDC benne DESACTIVE pendant l action ; HX1a
+    = bascule WinchSel=0 et FDC benne REACTIVE, puis referencement M1+M2. Or le code ne desactive qu a HX4_BUCKET_ADJUST (FB_Bucket.st
+    environ :647) : le code desactive DONC TROP TARD pour le cas constate en session. CORRECTIF CONFORME A LA SPEC : agir
+    par l ETAT DU SEQUENCEUR (desactive a HX1, reactive a HX1a), et NON par un gating sur le datum - la voie proposee par
+    l agent phase 0 donne le meme resultat mais n est pas la spec. DIVERGENCE A TRANCHER PAR L AGENT : le brouillon GEL_GRAFCET_HOMING_CYCLE_20260903.md
+    exige un motif 3 APPUIS (V_EXPLICITE) alors que le brief (plus recent) exige UN SEUL appui bouton IHM a HX1 -> SUIVRE
+    LE BRIEF. POINT DE SECURITE OUVERT (brief section 3bis), A TRANCHER PAR L EXPLOITANT : a HX1 la benne est manoeuvree A
+    L AVEUGLE (sans FDC logiciel ET sans position encodeur fiable) -> il faut VERIFIER qu une butee mecanique independante
+    du logiciel protege la benne dans cette phase ; sinon le risque n est pas acceptable. COMPLEMENT : le brief exige que
+    le couplage M1/M2 (E1) soit RESOLU et PROUVE par test CI, pas seulement documente.'
   bloque_par: []
 - id: T363
   parent_id: T278
@@ -2167,13 +2308,10 @@ tasks:
     des references perimees de T334.'
 - id: T350
   parent_id: T300
-  statut: ⬜
+  statut: ❌
   criticite: C3
-  domaine: SIMULATION / TRANSLATION_M3
+  domaine: ''
   agent: —
-  locked_at: '2026-09-21T00:00:00+02:00'
-  date: '2026-09-21T00:00:00+02:00'
-  updated_at: '2026-09-21T00:00:00+02:00'
   titre: SimBench M3 — largeur de rebond capteur PAR CAPTEUR (limite F11 connue de T300)
   contexte: 'T300 (livre, DSH03) a modelise le profil "BLIP COURT" de rebond capteur M3 (FB_Sim_Translation.st:42-52), avec
     les valeurs EXACTES de la trace terrain reelle du 2026-09-04 (Suivi_TranslationM3bug_20260904_27) : Tremie 1 excursion
@@ -2194,6 +2332,8 @@ tasks:
     et PASS.
   - 'Non-regression : profil historique (BlipTransitions=0) et les autres scenarios T300 (P0-P5, Q01-Q14) inchanges.'
   - Bundle + diff bundle + G200 + gates palier C avant restitution.
+  contrat: ''
+  date: '2026-09-22T12:55:08'
   bloque_par: []
 - id: T349
   parent_id: T331
@@ -4264,7 +4404,50 @@ tasks:
     le defaut injectable en simu et en CI, sans changer le comportement de production, avec test ROUGE avant / VERT apres).
     CRITICITE : verification en phase 0 = C2 (inchangee) ; DES QU UNE CORRECTION TOUCHE LA CHAINE DE SECURITE (phases 1-2),
     LA CRITICITE PASSE A C4 avec plan humain obligatoire et double revue. PERSONNE NE L A PRISE a ce jour (agent = tiret).
-    AUCUN COMMIT, AUCUN PUSH. [RETOUR PHASE 0 2026-09-22, recu et VERIFIE PAR DSH01.] Rapport : DOC/WFLOW/REX/REX_T306_PHASE0_VERIFICATION_ROTATION_PHASE_20260922.md (145 l., AC1..AC8). MESURES DE PREMIERE MAIN : (1) CONFIRME — FB_TranslationOutputInterlock.st ne contient qu UNE occurrence de SafeStop (la declaration ligne 15), JAMAIS lue dans le corps, contre 10 occurrences dans FB_WinchOutputInterlock.st : M3 n a PAS de defense en profondeur sur la voie SafeStop ; (2) CONFIRME — BypassPhaseRotation cable BRUT (PRG_04_Treuils_Benne.st:984 M1, :1050 M2, PRG_05_Translation.st:496 M3), une « derogation MES 2026 » citee devant etre RE-CONFIRMEE avant tout gating. Q1 chaine cablee M1/M2 jusqu aux sorties physiques mais 1 ecart majeur M3 ; Q2 NON injectable (FB_SimBench.st:690) et aucun test CI M1/M2 ; Q3 CONFORME (SafeStop cat.1, pas de PowerCutOff brutale, Enable maintenu) ; Q4 VERIFIE (latch SET seul, Reset sur front, re-verrouillage si cause persistante) ; Q5 EN PARTIE (non persistance au boot = garde-fou reel ; mais bypass sans gate et silencieux IHM). DEUX CORRECTIFS A ARBITRER (phase 2, C4, non implementes) : (a) consommer SafeStop dans FB_TranslationOutputInterlock (DriveControlWord := 0, BrakeCmd := FALSE) pour restaurer la redondance M3 ; (b) gate MAINT_N2 sur BypassPhaseRotation des 3 axes, aligne sur ST_BypassWinch.st:7, + signal IHM du bypass ; BypassProcess peut masquer la cause 4. MES 2 ERREURS DE BRIEF, ASSUMEES ET CORRIGEES (commit f84c1c0f) : annotations DSH01 presentees comme citations du code, et PRG_02:190 presente comme declaration d entree alors que c est une AFFECTATION depuis GVL_Device_IO.st:53. PHASE 1 : contrat TASK_CONTRACT_T306_PHASE1_INJECTION_SIM.yaml amende le 2026-09-22 (regle T8 : UNE SEULE ligne de cablage autorisee dans CODE/M_MAIN/PRG_02_Acquisition.st, chainon PROUVE indispensable sinon stimulus orphelin et AC2 impossible, FB_SimBench etant une brique a 0 lecture GVL) ; nom canonique FIGE GVL_Simulation.SimPhaseRotationOk (patron SimChainOkBit ; variante SimPhaseRotationFault REFUSEE) ; check_task_contract PASS 0/0 (commit 54b1f0b9). GARDE-FOU PROPOSE (fix + guard) : G526 « entree SAFE declaree jamais consommee », FAIL nomme + --selftest par mutation — c est exactement l erreur qui a produit le trou SafeStop M3. ALERTE COLLISION : le lot T383 (AX15D, C4) modifie AUSSI PRG_02_Acquisition.st (~l.475) et n est PAS committe : un seul ecrivain par fichier. [CHALLENGE EXPERT 2026-09-22 — VERDICT : NUANCE, ET L ORCHESTRATEUR A ETE PARTIELLEMENT REFUTE.] Mode supervisor (3 audits independants + 2 revues), revision epinglee par hash git BLOB des 5 fichiers non committes (GVL_Simulation 30e376fc, FB_Sim_Safety b102b0dc, FB_SimBench 8c94038b, PRG_02 2573f446, test_fb_sim_safety c294737b). CONFIRME (point fort du lot) : le stimulus est REELLEMENT INERTE EN PRODUCTION — double garde prouvee (PRG_02:289 Enable := GVL_Simulation.SimulationModeActive ; PRG_02:448 HwIn.Machine := SEL(MachineInputSourceSimulated, HwReal.Machine, HwSim.Machine) ; FB_SimBench:258 IF NOT Enable THEN ... Machine := HwReal.Machine; RETURN) ; le scenario « Enable force » est explicitement REFUTE. CONFIRME AUSSI : point d injection via FB_Sim_Safety = bonne couche, polarite TRUE=sain coherente avec le fail-safe de PhaseRotationOk_DI, producteur unique, aucune lecture GVL ajoutee (gate encapsulation preserve), aucune regression sur les tests existants. REFUTE / MAJOR — MON ACCEPTATION ETAIT TROP GENEReuse : la preuve ROUGE/VERT est QUASI-TAUTOLOGIQUE. TC-T306-SAF-003 instancie FB_Sim_Safety SEUL et assert fb.SimPhaseRotationOk : le test lit EXACTEMENT la sortie du code mute (dependance circulaire) et PASSERAIT MEME SI le cablage GVL -> PRG_02 -> FB_SimBench -> HwIn etait casse. => AC2 (« forcer le stimulus a FALSE rend PhaseRotationOk_DI = FALSE ») n est PAS prouve par execution, seulement DEDUIT du cablage + G200. Le commentaire du test (l.54) affirmant « PhaseRotationOk_DI tombe » est TROMPEUR : l assertion porte sur fb.SimPhaseRotationOk. NUANCE (MINOR) : la note d application sur-declare « injectable et verifie » de bout en bout -> A CORRIGER. NUANCE (MINOR) : FB_Sim_Safety:82 SimPhaseRotationOk := FALSE dans la branche NOT Enable (semantique inverse pour un stimulus ; dormant) et le stimulus n est pas remis a sa valeur par defaut en sortie de simulation -> valeur stale a la re-entree en sim. MAJOR — manque de test : l OBJECTIF METIER de T306 (arret sur de M1/M2/M3 via la chaine de securite) RESTE NON PROUVE. Tests a ajouter : (1) integration bout en bout (GVL_Simulation.SimPhaseRotationOk = FALSE => HwIn.Machine.PhaseRotationOk_DI = FALSE) ; (2) reaction 3 axes (cause 4 bit 16#0010 en M1/M2, cause 2 bit 16#0004 en M3, SafeStop, permis annules, freins serres, relais/contacteurs/BrakeCmd a FALSE) ; (3) latch sans rearmement automatique et Reset sur FRONT. CLOSURE : lot NON CLOS (5 AC verifies, AC3 et AC4/AC5 a rejouer, essai machine = action humaine ; contrat PENDING -> COMPLETED apres). VERDICT DU CHALLENGE sur les questions posees : pas de diff hunk par hunk (bruit) ; cadrage du lot C4 MAINTENANT ; commit du lot phase 1 IMMEDIAT mais SELECTIF et ISOLE (jamais git add . : l arbre contient du bruit non lie) — sous GO humain explicite (AGENTS.md). LOT SECURITE : cree en T386 (C4, un seul lot : ecart BypassPhaseRotation/BypassProcess puis ecart SafeStop M3).'
+    AUCUN COMMIT, AUCUN PUSH. [RETOUR PHASE 0 2026-09-22, recu et VERIFIE PAR DSH01.] Rapport : DOC/WFLOW/REX/REX_T306_PHASE0_VERIFICATION_ROTATION_PHASE_20260922.md
+    (145 l., AC1..AC8). MESURES DE PREMIERE MAIN : (1) CONFIRME — FB_TranslationOutputInterlock.st ne contient qu UNE occurrence
+    de SafeStop (la declaration ligne 15), JAMAIS lue dans le corps, contre 10 occurrences dans FB_WinchOutputInterlock.st
+    : M3 n a PAS de defense en profondeur sur la voie SafeStop ; (2) CONFIRME — BypassPhaseRotation cable BRUT (PRG_04_Treuils_Benne.st:984
+    M1, :1050 M2, PRG_05_Translation.st:496 M3), une « derogation MES 2026 » citee devant etre RE-CONFIRMEE avant tout gating.
+    Q1 chaine cablee M1/M2 jusqu aux sorties physiques mais 1 ecart majeur M3 ; Q2 NON injectable (FB_SimBench.st:690) et
+    aucun test CI M1/M2 ; Q3 CONFORME (SafeStop cat.1, pas de PowerCutOff brutale, Enable maintenu) ; Q4 VERIFIE (latch SET
+    seul, Reset sur front, re-verrouillage si cause persistante) ; Q5 EN PARTIE (non persistance au boot = garde-fou reel
+    ; mais bypass sans gate et silencieux IHM). DEUX CORRECTIFS A ARBITRER (phase 2, C4, non implementes) : (a) consommer
+    SafeStop dans FB_TranslationOutputInterlock (DriveControlWord := 0, BrakeCmd := FALSE) pour restaurer la redondance M3
+    ; (b) gate MAINT_N2 sur BypassPhaseRotation des 3 axes, aligne sur ST_BypassWinch.st:7, + signal IHM du bypass ; BypassProcess
+    peut masquer la cause 4. MES 2 ERREURS DE BRIEF, ASSUMEES ET CORRIGEES (commit f84c1c0f) : annotations DSH01 presentees
+    comme citations du code, et PRG_02:190 presente comme declaration d entree alors que c est une AFFECTATION depuis GVL_Device_IO.st:53.
+    PHASE 1 : contrat TASK_CONTRACT_T306_PHASE1_INJECTION_SIM.yaml amende le 2026-09-22 (regle T8 : UNE SEULE ligne de cablage
+    autorisee dans CODE/M_MAIN/PRG_02_Acquisition.st, chainon PROUVE indispensable sinon stimulus orphelin et AC2 impossible,
+    FB_SimBench etant une brique a 0 lecture GVL) ; nom canonique FIGE GVL_Simulation.SimPhaseRotationOk (patron SimChainOkBit
+    ; variante SimPhaseRotationFault REFUSEE) ; check_task_contract PASS 0/0 (commit 54b1f0b9). GARDE-FOU PROPOSE (fix + guard)
+    : G526 « entree SAFE declaree jamais consommee », FAIL nomme + --selftest par mutation — c est exactement l erreur qui
+    a produit le trou SafeStop M3. ALERTE COLLISION : le lot T383 (AX15D, C4) modifie AUSSI PRG_02_Acquisition.st (~l.475)
+    et n est PAS committe : un seul ecrivain par fichier. [CHALLENGE EXPERT 2026-09-22 — VERDICT : NUANCE, ET L ORCHESTRATEUR
+    A ETE PARTIELLEMENT REFUTE.] Mode supervisor (3 audits independants + 2 revues), revision epinglee par hash git BLOB des
+    5 fichiers non committes (GVL_Simulation 30e376fc, FB_Sim_Safety b102b0dc, FB_SimBench 8c94038b, PRG_02 2573f446, test_fb_sim_safety
+    c294737b). CONFIRME (point fort du lot) : le stimulus est REELLEMENT INERTE EN PRODUCTION — double garde prouvee (PRG_02:289
+    Enable := GVL_Simulation.SimulationModeActive ; PRG_02:448 HwIn.Machine := SEL(MachineInputSourceSimulated, HwReal.Machine,
+    HwSim.Machine) ; FB_SimBench:258 IF NOT Enable THEN ... Machine := HwReal.Machine; RETURN) ; le scenario « Enable force
+    » est explicitement REFUTE. CONFIRME AUSSI : point d injection via FB_Sim_Safety = bonne couche, polarite TRUE=sain coherente
+    avec le fail-safe de PhaseRotationOk_DI, producteur unique, aucune lecture GVL ajoutee (gate encapsulation preserve),
+    aucune regression sur les tests existants. REFUTE / MAJOR — MON ACCEPTATION ETAIT TROP GENEReuse : la preuve ROUGE/VERT
+    est QUASI-TAUTOLOGIQUE. TC-T306-SAF-003 instancie FB_Sim_Safety SEUL et assert fb.SimPhaseRotationOk : le test lit EXACTEMENT
+    la sortie du code mute (dependance circulaire) et PASSERAIT MEME SI le cablage GVL -> PRG_02 -> FB_SimBench -> HwIn etait
+    casse. => AC2 (« forcer le stimulus a FALSE rend PhaseRotationOk_DI = FALSE ») n est PAS prouve par execution, seulement
+    DEDUIT du cablage + G200. Le commentaire du test (l.54) affirmant « PhaseRotationOk_DI tombe » est TROMPEUR : l assertion
+    porte sur fb.SimPhaseRotationOk. NUANCE (MINOR) : la note d application sur-declare « injectable et verifie » de bout
+    en bout -> A CORRIGER. NUANCE (MINOR) : FB_Sim_Safety:82 SimPhaseRotationOk := FALSE dans la branche NOT Enable (semantique
+    inverse pour un stimulus ; dormant) et le stimulus n est pas remis a sa valeur par defaut en sortie de simulation -> valeur
+    stale a la re-entree en sim. MAJOR — manque de test : l OBJECTIF METIER de T306 (arret sur de M1/M2/M3 via la chaine de
+    securite) RESTE NON PROUVE. Tests a ajouter : (1) integration bout en bout (GVL_Simulation.SimPhaseRotationOk = FALSE
+    => HwIn.Machine.PhaseRotationOk_DI = FALSE) ; (2) reaction 3 axes (cause 4 bit 16#0010 en M1/M2, cause 2 bit 16#0004 en
+    M3, SafeStop, permis annules, freins serres, relais/contacteurs/BrakeCmd a FALSE) ; (3) latch sans rearmement automatique
+    et Reset sur FRONT. CLOSURE : lot NON CLOS (5 AC verifies, AC3 et AC4/AC5 a rejouer, essai machine = action humaine ;
+    contrat PENDING -> COMPLETED apres). VERDICT DU CHALLENGE sur les questions posees : pas de diff hunk par hunk (bruit)
+    ; cadrage du lot C4 MAINTENANT ; commit du lot phase 1 IMMEDIAT mais SELECTIF et ISOLE (jamais git add . : l arbre contient
+    du bruit non lie) — sous GO humain explicite (AGENTS.md). LOT SECURITE : cree en T386 (C4, un seul lot : ecart BypassPhaseRotation/BypassProcess
+    puis ecart SafeStop M3).'
   titre: Sécurité Machine — Vérifier en simulation le défaut de rotation de phase et l'interdiction totale de fonctionnement
   contexte: 'L''automate acquiert l''ordre des phases réseau via PhaseRotationOk_DI (HwIn.Machine.PhaseRotationOk_DI). En
     cas d''ordre incorrect des phases, les moteurs asynchrones tourneraient en sens inverse, risquant la chute brutale de
@@ -6852,7 +7035,26 @@ tasks:
   - Aucun bypass, aucune modification des sorties physiques et aucune suppression de la surveillance FdC.
   - G497, bundle PLCopenXML, G200 et gates Palier C sont exécutés; test CODESYS sans bypass requis avant machine réelle.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T269_MECAD_BUCKET_TOP.yaml
-  avancement: ' [EXTENSION DE PERIMETRE 2026-09-22 - DECISION EXPLOITANT (GO donne) : LE LOT FENETRE BENNE EST CETTE TACHE, PAS UN NOUVEAU LOT.] Demande relayee par l agent T383 : « peut-on preparer le lot separe fenetre benne (correction de FB_Safety_Winch) pour debloquer la fermeture ? » - reponse OUI, et le lot est T269 (contrat deja ecrit, AUCUN VERROU : tache LIBRE). LIEN DE CAUSE RACINE, mesure DSH01 : au FDC haut, CauseMecaDActive (bit 11, LATCHE) declenche le SafeStop pendant une manoeuvre benne -> plus aucun mouvement n est autorise, DONC LA FERMETURE DE LA BENNE EST IMPOSSIBLE en position haute. Le perimetre de T269 s etend donc de « faux MecaD pendant l OUVERTURE » a « fenetre benne complete : l escalade MecaD ne doit pas bloquer la manoeuvre benne (ouverture ET fermeture) quand BenneBusy ou BenneHoldStillActive est actif ». PIVOT TECHNIQUE CONFIRME : FB_Safety_Winch.st:248 RefWindowActive := InReferencingMode OR BenneBusy OR PosStepDetected OR NOT TonRefSettle.Q ; la garde MecaA utilise deja NOT BenneHoldStillActive AND NOT RefWindowActive (:329) alors que l escalade MecaD (:144 CauseMecaDActive, TonMecaD :110) n a pas cette fenetre -> c est l ecart a corriger. GARDE-FOUS IMPOSES PAR L ORCHESTRATEUR (FB de SECURITE ; C3 maintenu SAUF si la logique d escalade ou l AU est touchee, auquel cas C4 avec plan humain et double revue) : (1) le FDC haut DOIT continuer a INTERDIRE la montee (exigence explicite de cette tache) ; (2) la protection NE DOIT PAS etre affaiblie : le test doit prouver LES DEUX SENS - la fermeture devient POSSIBLE pendant la manoeuvre benne au FDC haut, ET l escalade MecaD declenche TOUJOURS hors manoeuvre benne ; (3) PREUVE EXIGEE : test CI ROUGE avant / VERT apres (un SNAPSHOT avant/apres est un COMPLEMENT, PAS une preuve - lecon du challenge expert T306) ; revision EPINGLEE (hash git blob des fichiers touches) dans la restitution ; (4) INTERDITS : ne pas desactiver l escalade MecaD en general, ne rien changer a BypassProcess ni a BypassPhaseRotation (piege demontre : NOT (BypassProcess OR BypassPhaseRotation) masque plusieurs protections), aucune nouvelle temporisation moteur/frein, aucun bypass nouveau, Reset toujours sur front. TACHE VOISINE (ne pas fusionner sans arbitrage) : T376 (MecaB ErrorID:09 sur M2 en simulation) partage le meme pivot BenneHoldStillActive. AUCUN COMMIT, AUCUN PUSH.'
+  avancement: ' [EXTENSION DE PERIMETRE 2026-09-22 - DECISION EXPLOITANT (GO donne) : LE LOT FENETRE BENNE EST CETTE TACHE,
+    PAS UN NOUVEAU LOT.] Demande relayee par l agent T383 : « peut-on preparer le lot separe fenetre benne (correction de
+    FB_Safety_Winch) pour debloquer la fermeture ? » - reponse OUI, et le lot est T269 (contrat deja ecrit, AUCUN VERROU :
+    tache LIBRE). LIEN DE CAUSE RACINE, mesure DSH01 : au FDC haut, CauseMecaDActive (bit 11, LATCHE) declenche le SafeStop
+    pendant une manoeuvre benne -> plus aucun mouvement n est autorise, DONC LA FERMETURE DE LA BENNE EST IMPOSSIBLE en position
+    haute. Le perimetre de T269 s etend donc de « faux MecaD pendant l OUVERTURE » a « fenetre benne complete : l escalade
+    MecaD ne doit pas bloquer la manoeuvre benne (ouverture ET fermeture) quand BenneBusy ou BenneHoldStillActive est actif
+    ». PIVOT TECHNIQUE CONFIRME : FB_Safety_Winch.st:248 RefWindowActive := InReferencingMode OR BenneBusy OR PosStepDetected
+    OR NOT TonRefSettle.Q ; la garde MecaA utilise deja NOT BenneHoldStillActive AND NOT RefWindowActive (:329) alors que
+    l escalade MecaD (:144 CauseMecaDActive, TonMecaD :110) n a pas cette fenetre -> c est l ecart a corriger. GARDE-FOUS
+    IMPOSES PAR L ORCHESTRATEUR (FB de SECURITE ; C3 maintenu SAUF si la logique d escalade ou l AU est touchee, auquel cas
+    C4 avec plan humain et double revue) : (1) le FDC haut DOIT continuer a INTERDIRE la montee (exigence explicite de cette
+    tache) ; (2) la protection NE DOIT PAS etre affaiblie : le test doit prouver LES DEUX SENS - la fermeture devient POSSIBLE
+    pendant la manoeuvre benne au FDC haut, ET l escalade MecaD declenche TOUJOURS hors manoeuvre benne ; (3) PREUVE EXIGEE
+    : test CI ROUGE avant / VERT apres (un SNAPSHOT avant/apres est un COMPLEMENT, PAS une preuve - lecon du challenge expert
+    T306) ; revision EPINGLEE (hash git blob des fichiers touches) dans la restitution ; (4) INTERDITS : ne pas desactiver
+    l escalade MecaD en general, ne rien changer a BypassProcess ni a BypassPhaseRotation (piege demontre : NOT (BypassProcess
+    OR BypassPhaseRotation) masque plusieurs protections), aucune nouvelle temporisation moteur/frein, aucun bypass nouveau,
+    Reset toujours sur front. TACHE VOISINE (ne pas fusionner sans arbitrage) : T376 (MecaB ErrorID:09 sur M2 en simulation)
+    partage le meme pivot BenneHoldStillActive. AUCUN COMMIT, AUCUN PUSH.'
   bloque_par: []
 - id: T270
   parent_id: ''
@@ -7053,11 +7255,25 @@ tasks:
   statut: ⬜
   criticite: C4
   domaine: SECURITE / TREUILS_M1_M2 / DIAGNOSTIC
-  agent: '—'
+  agent: —
   date: '2026-09-22T11:50:00+02:00'
-  titre: 'FB_Safety_Winch : rendre la confirmation d''arret MecaB independante de la source de commande (JoystickYNeutral -> MovementCommanded) — faux ErrorID:09 en mode boutons MAINT_N2'
-  contexte: 'DIAGNOSTIC CONFIRME 2026-09-22 (mode boutons MAINT_N2 en simu, commande Both) : MecaB se declenche FAUSSEMENT car il base son critere sur JoystickYNeutral, TOUJOURS TRUE quand on commande par boutons (joystick jamais touche), au lieu de MovementCommanded (etat de commande reel). FB_Safety_Winch.st:341 UncommandedActiveB := JoystickYNeutral AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback) -> TonMecaB PT=PostRampTimeout 3s -> latch bit8 = ErrorID:09 « arret non confirme apres stop ». MovementCommanded deja cable (:19, PRG_04:955 := instWinchM1.RelayFwd OR instWinchM1.RelayRev) mais inutilise par MecaB. MecaA (:329) utilise lui l etat physique (pas JoystickYNeutral) : MecaB incoherent avec sa jumelle. CONSÉQUENCE EN CHAINE : ce faux MecaB -> PowerCutOff -> coupe l AU -> deadlock rearmement AU en simu (famille T369, defaut SEPARE). H2 (simulation fausse) ecartee : FB_SimBench renvoie contacteurs/frein en <10ms (FB_SimBench.st:449-451, :437-446, GVL_Simulation.st:100-103).'
-  description: 'Correctif C4 sur FB de securite, UNE ligne : remplacer JoystickYNeutral par NOT MovementCommanded dans FB_Safety_Winch.st:341. Semantique preservee : MecaB = veritable « arret non confirme APRES arret de commande » (NOT MovementCommanded), plus jamais pendule par le geste. Ne PAS toucher PostRampTimeout, WinchStandstill (:263-265, :394-395 qui utilise JoystickYNeutral pour desarmer MecaE), branches SafeStop/PowerCutOff. Test CI ROUGE avant / VERT apres reproduisant le mode boutons MAINT_N2 (Both commande 3s). Non-regression : MecaA et autres causes identiques. SEPARE DE T369 (deadlock rearmement AU simu) : ne pas fusionner.'
+  titre: 'FB_Safety_Winch : rendre la confirmation d''arret MecaB independante de la source de commande (JoystickYNeutral
+    -> MovementCommanded) — faux ErrorID:09 en mode boutons MAINT_N2'
+  contexte: 'DIAGNOSTIC CONFIRME 2026-09-22 (mode boutons MAINT_N2 en simu, commande Both) : MecaB se declenche FAUSSEMENT
+    car il base son critere sur JoystickYNeutral, TOUJOURS TRUE quand on commande par boutons (joystick jamais touche), au
+    lieu de MovementCommanded (etat de commande reel). FB_Safety_Winch.st:341 UncommandedActiveB := JoystickYNeutral AND NOT
+    BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback) -> TonMecaB PT=PostRampTimeout 3s -> latch
+    bit8 = ErrorID:09 « arret non confirme apres stop ». MovementCommanded deja cable (:19, PRG_04:955 := instWinchM1.RelayFwd
+    OR instWinchM1.RelayRev) mais inutilise par MecaB. MecaA (:329) utilise lui l etat physique (pas JoystickYNeutral) : MecaB
+    incoherent avec sa jumelle. CONSÉQUENCE EN CHAINE : ce faux MecaB -> PowerCutOff -> coupe l AU -> deadlock rearmement
+    AU en simu (famille T369, defaut SEPARE). H2 (simulation fausse) ecartee : FB_SimBench renvoie contacteurs/frein en <10ms
+    (FB_SimBench.st:449-451, :437-446, GVL_Simulation.st:100-103).'
+  description: 'Correctif C4 sur FB de securite, UNE ligne : remplacer JoystickYNeutral par NOT MovementCommanded dans FB_Safety_Winch.st:341.
+    Semantique preservee : MecaB = veritable « arret non confirme APRES arret de commande » (NOT MovementCommanded), plus
+    jamais pendule par le geste. Ne PAS toucher PostRampTimeout, WinchStandstill (:263-265, :394-395 qui utilise JoystickYNeutral
+    pour desarmer MecaE), branches SafeStop/PowerCutOff. Test CI ROUGE avant / VERT apres reproduisant le mode boutons MAINT_N2
+    (Both commande 3s). Non-regression : MecaA et autres causes identiques. SEPARE DE T369 (deadlock rearmement AU simu) :
+    ne pas fusionner.'
   objectifs:
   - 'AC1 : le faux ErrorID:09 MecaB (mode boutons MAINT_N2, Both 3s) se reproduit en ROUGE avant correction.'
   - 'AC2 : apres correctif, le meme scenario passe au VERT (aucun faux MecaB pendant commande legitime).'
@@ -7067,5 +7283,43 @@ tasks:
   - 'AC6 : bundle frais + diff bundle (FB_Safety_Winch) + G200 --report PASS 0 erreur + palier C sans rouge nouveau.'
   - 'AC7 : non-regression : WinchStandstill/MecaE conserves (JoystickYNeutral reste consomme a :264).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T387_MECAB_SOURCE_COMMANDE.yaml
-  avancement: '[CADRAGE DSH01 2026-09-22T11:50 — CONTRAT C4 ECRIT ET VALIDE (check_task_contract.py PASS 0/0), AUCUNE LIGNE DE CODE. DIAGNOSTIC CONFIRME PAR TRAVAIL D EQUIPE ORCHESTRE (H1 confirme sur source, H2 simulation ecartee, consequence AU = T369 distinct). Cause racine : MecaB base sur JoystickYNeutral (geste) au lieu de MovementCommanded (commande reelle). C4-safety : plan/test ROUGE-VERT a valider humainement AVANT tout code. NE PAS TOUCHER aux FB de securite sans GO. SEPARE DE T369.] [RATTACHEMENT 2026-09-22 - CONSIGNE EXPLOITANT : T388 EST CETTE TACHE, PAS UNE TACHE SEPAREE.] Le lot T387 couvre donc TROIS defauts benne constates en session, tous dans le meme chemin : (1) la benne ne se ferme pas au FDC haut (fenetre benne / MecaB / AscentPermit) ; (2) BORNES RELATIVES appliquees avec un DATUM INVALIDE : PRG_04_Treuils_Benne.st:787-789 active ManualBucketLimitsActive sur TglManualBucketLimits AND (Arbitrated = 2) AND NOT CoupledBucketPhaseLocked SANS verifier le referencement, alors que les bornes des lignes 807/818 sont RELATIVES a M1_CablePosM (<= OffsetOpenM + anticipation / >= OffsetCloseM - anticipation) -> au boot HX0 (M1/M2 non references) le jog benne est bride. La limite PHYSIQUE (FB_Bucket.st:114-115 RecoilLimitActive) DOIT rester active. (3) FAUX DEFAUT PENDANT LE HOMING : [BENNE] ErrorID:05 - codeurs treuils non references (FB_Hmi_BannerFormatter.st:1059) alors que l operateur EST en train de referencer. CAUSE MESUREE : FB_Bucket.st:291-296 HomingMotionWithoutReference := (ReqAscent OR ReqDescend OR CmdOpen_IHM OR CmdClose_IHM OR ProgramBucketDriveActive) AND NOT MachineHomingActive AND NOT (HomedM1 AND HomedM2) -> LA GARDE D INHIBITION EXISTE DEJA (NOT MachineHomingActive) : le defaut est donc que MachineHomingActive est FAUX pendant le homing UNITAIRE (WinchSel = 2, HX0). La cause 4 est NON LATCHANTE (Latching := FALSE) : elle disparait d elle-meme quand la condition tombe, elle ne bloque pas la session. BRIEF DETAILLE : DOC/WFLOW/CONTRACTS/BRIEF_T388_BENNE_BORNES_SANS_DATUM_v1.md (a lire comme partie de ce lot). [REFERENCE DE VERITE AJOUTEE 2026-09-22 - DECISION EXPLOITANT : DOC/WFLOW/CONTRACTS/BRIEF_T364_REFONTE_COMPLETE_SEQUENCE_HOMING.md EST LE document de verite operationnelle du homing (redige d apres la specification de terrain du 2026-09-21, etat par etat HX0..HX7). A LIRE AVANT TOUTE DECISION SUR LE HOMING OU LA BENNE EN REFERENCEMENT. CE QUE CE BRIEF TRANCHE POUR LE LOT BENNE : HX1 = tirer le joystick pour fermer la benne (WinchSel=2) avec le FDC benne DESACTIVE pendant l action ; HX1a = bascule WinchSel=0 et FDC benne REACTIVE, puis referencement M1+M2. Or le code ne desactive qu a HX4_BUCKET_ADJUST (FB_Bucket.st environ :647) : le code desactive DONC TROP TARD pour le cas constate en session. CORRECTIF CONFORME A LA SPEC : agir par l ETAT DU SEQUENCEUR (desactive a HX1, reactive a HX1a), et NON par un gating sur le datum - la voie proposee par l agent phase 0 donne le meme resultat mais n est pas la spec. DIVERGENCE A TRANCHER PAR L AGENT : le brouillon GEL_GRAFCET_HOMING_CYCLE_20260903.md exige un motif 3 APPUIS (V_EXPLICITE) alors que le brief (plus recent) exige UN SEUL appui bouton IHM a HX1 -> SUIVRE LE BRIEF. POINT DE SECURITE OUVERT (brief section 3bis), A TRANCHER PAR L EXPLOITANT : a HX1 la benne est manoeuvree A L AVEUGLE (sans FDC logiciel ET sans position encodeur fiable) -> il faut VERIFIER qu une butee mecanique independante du logiciel protege la benne dans cette phase ; sinon le risque n est pas acceptable. COMPLEMENT : le brief exige que le couplage M1/M2 (E1) soit RESOLU et PROUVE par test CI, pas seulement documente. [REGLE PRODUIT EXPLOITANT 2026-09-22, ARBITRAGE DEFINITIF : ON NE BORNE JAMAIS LA BENNE SI M1 OU M2 N EST PAS HOMED.] Cette regle remplace toute lecture par etape (HX1/HX1a) : elle est GENERALE. CONSEQUENCES : (1) le correctif du defaut 2 est celui de la phase 0 de l agent : gater ManualBucketLimitsActive (PRG_04_Treuils_Benne.st:787-789) par le referencement effectif (HomedM1 AND HomedM2, et/ou HomedAndReliable + BucketReferenced) - AUCUNE borne benne si le datum n est pas valide ; (2) la question de l orchestreur « faut-il borner le jog benne en HX1 ? » est TRANCHEE : NON, on ne borne pas - c est l operateur en maintenance qui limite le mouvement ; (3) en revanche l ALARME cause 4 de FB_Bucket (Codeurs treuils non references) RESTE ACTIVE : elle INFORME et ne borne pas - retirer le terme AND NOT (Mode = MAINT_N1 OR Mode = MAINT_N2) ajoute par erreur d orchestration ; (4) le message IHM doit etre contextualise (Referencement en cours - codeurs non references NORMAL) au lieu d etre supprime. AUCUN COMMIT, AUCUN PUSH.'
+  avancement: '[CADRAGE DSH01 2026-09-22T11:50 — CONTRAT C4 ECRIT ET VALIDE (check_task_contract.py PASS 0/0), AUCUNE LIGNE
+    DE CODE. DIAGNOSTIC CONFIRME PAR TRAVAIL D EQUIPE ORCHESTRE (H1 confirme sur source, H2 simulation ecartee, consequence
+    AU = T369 distinct). Cause racine : MecaB base sur JoystickYNeutral (geste) au lieu de MovementCommanded (commande reelle).
+    C4-safety : plan/test ROUGE-VERT a valider humainement AVANT tout code. NE PAS TOUCHER aux FB de securite sans GO. SEPARE
+    DE T369.] [RATTACHEMENT 2026-09-22 - CONSIGNE EXPLOITANT : T388 EST CETTE TACHE, PAS UNE TACHE SEPAREE.] Le lot T387 couvre
+    donc TROIS defauts benne constates en session, tous dans le meme chemin : (1) la benne ne se ferme pas au FDC haut (fenetre
+    benne / MecaB / AscentPermit) ; (2) BORNES RELATIVES appliquees avec un DATUM INVALIDE : PRG_04_Treuils_Benne.st:787-789
+    active ManualBucketLimitsActive sur TglManualBucketLimits AND (Arbitrated = 2) AND NOT CoupledBucketPhaseLocked SANS verifier
+    le referencement, alors que les bornes des lignes 807/818 sont RELATIVES a M1_CablePosM (<= OffsetOpenM + anticipation
+    / >= OffsetCloseM - anticipation) -> au boot HX0 (M1/M2 non references) le jog benne est bride. La limite PHYSIQUE (FB_Bucket.st:114-115
+    RecoilLimitActive) DOIT rester active. (3) FAUX DEFAUT PENDANT LE HOMING : [BENNE] ErrorID:05 - codeurs treuils non references
+    (FB_Hmi_BannerFormatter.st:1059) alors que l operateur EST en train de referencer. CAUSE MESUREE : FB_Bucket.st:291-296
+    HomingMotionWithoutReference := (ReqAscent OR ReqDescend OR CmdOpen_IHM OR CmdClose_IHM OR ProgramBucketDriveActive) AND
+    NOT MachineHomingActive AND NOT (HomedM1 AND HomedM2) -> LA GARDE D INHIBITION EXISTE DEJA (NOT MachineHomingActive) :
+    le defaut est donc que MachineHomingActive est FAUX pendant le homing UNITAIRE (WinchSel = 2, HX0). La cause 4 est NON
+    LATCHANTE (Latching := FALSE) : elle disparait d elle-meme quand la condition tombe, elle ne bloque pas la session. BRIEF
+    DETAILLE : DOC/WFLOW/CONTRACTS/BRIEF_T388_BENNE_BORNES_SANS_DATUM_v1.md (a lire comme partie de ce lot). [REFERENCE DE
+    VERITE AJOUTEE 2026-09-22 - DECISION EXPLOITANT : DOC/WFLOW/CONTRACTS/BRIEF_T364_REFONTE_COMPLETE_SEQUENCE_HOMING.md EST
+    LE document de verite operationnelle du homing (redige d apres la specification de terrain du 2026-09-21, etat par etat
+    HX0..HX7). A LIRE AVANT TOUTE DECISION SUR LE HOMING OU LA BENNE EN REFERENCEMENT. CE QUE CE BRIEF TRANCHE POUR LE LOT
+    BENNE : HX1 = tirer le joystick pour fermer la benne (WinchSel=2) avec le FDC benne DESACTIVE pendant l action ; HX1a
+    = bascule WinchSel=0 et FDC benne REACTIVE, puis referencement M1+M2. Or le code ne desactive qu a HX4_BUCKET_ADJUST (FB_Bucket.st
+    environ :647) : le code desactive DONC TROP TARD pour le cas constate en session. CORRECTIF CONFORME A LA SPEC : agir
+    par l ETAT DU SEQUENCEUR (desactive a HX1, reactive a HX1a), et NON par un gating sur le datum - la voie proposee par
+    l agent phase 0 donne le meme resultat mais n est pas la spec. DIVERGENCE A TRANCHER PAR L AGENT : le brouillon GEL_GRAFCET_HOMING_CYCLE_20260903.md
+    exige un motif 3 APPUIS (V_EXPLICITE) alors que le brief (plus recent) exige UN SEUL appui bouton IHM a HX1 -> SUIVRE
+    LE BRIEF. POINT DE SECURITE OUVERT (brief section 3bis), A TRANCHER PAR L EXPLOITANT : a HX1 la benne est manoeuvree A
+    L AVEUGLE (sans FDC logiciel ET sans position encodeur fiable) -> il faut VERIFIER qu une butee mecanique independante
+    du logiciel protege la benne dans cette phase ; sinon le risque n est pas acceptable. COMPLEMENT : le brief exige que
+    le couplage M1/M2 (E1) soit RESOLU et PROUVE par test CI, pas seulement documente. [REGLE PRODUIT EXPLOITANT 2026-09-22,
+    ARBITRAGE DEFINITIF : ON NE BORNE JAMAIS LA BENNE SI M1 OU M2 N EST PAS HOMED.] Cette regle remplace toute lecture par
+    etape (HX1/HX1a) : elle est GENERALE. CONSEQUENCES : (1) le correctif du defaut 2 est celui de la phase 0 de l agent :
+    gater ManualBucketLimitsActive (PRG_04_Treuils_Benne.st:787-789) par le referencement effectif (HomedM1 AND HomedM2, et/ou
+    HomedAndReliable + BucketReferenced) - AUCUNE borne benne si le datum n est pas valide ; (2) la question de l orchestreur
+    « faut-il borner le jog benne en HX1 ? » est TRANCHEE : NON, on ne borne pas - c est l operateur en maintenance qui limite
+    le mouvement ; (3) en revanche l ALARME cause 4 de FB_Bucket (Codeurs treuils non references) RESTE ACTIVE : elle INFORME
+    et ne borne pas - retirer le terme AND NOT (Mode = MAINT_N1 OR Mode = MAINT_N2) ajoute par erreur d orchestration ; (4)
+    le message IHM doit etre contextualise (Referencement en cours - codeurs non references NORMAL) au lieu d etre supprime.
+    AUCUN COMMIT, AUCUN PUSH.'
   bloque_par: []
