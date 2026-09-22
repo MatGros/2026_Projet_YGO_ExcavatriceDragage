@@ -1,0 +1,85 @@
+contract:
+  task_id: T364_HOMING_N1_MANUAL_TOP
+  criticality: C3
+  strategy: rebuild
+  objective: >
+    Rendre obligatoire le homing machine non reference en MAINT_N1 : preparation benne
+    sous homme-mort, approche manuelle couplee M1/M2 au palier 1 sans montee automatique
+    au capteur haut, validation visuelle explicite de la position, puis referencement atomique.
+  acceptance:
+    - id: AC1
+      statement: "MachineHomed faux conduit au cycle HX en MAINT_N1 ; aucune commande de cycle normal n'est autorisee."
+      verified_by: "test FB + test integration PRG_02/PRG_03"
+    - id: AC2
+      statement: "HX1 ferme la benne uniquement sous homme-mort et joystick maintenu, au palier 1 ; N2 reste une recuperation explicite."
+      verified_by: "test FB des sorties HX1 et absence de reprise automatique N1/N2"
+    - id: AC3
+      statement: "HX2 ne commande M1/M2 que sous homme-mort, couplage confirme et joystick montee ; TopPositionSensor ne declenche jamais HomeReq."
+      verified_by: "test FB: capteur haut sans validation -> zero HomeReq et sorties nulles"
+    - id: AC4
+      statement: "Seul le front BtnValidateTopPosition, a l'arret, capteur haut non atteint et codeurs prets, emet exactement une impulsion HomeReq M1/M2 sur la cote calibree."
+      verified_by: "test FB de la receptivite et de l'impulsion unique"
+    - id: AC5
+      statement: "Capteur haut atteint avant validation -> echec memorise, aucune reference, consigne IHM de descente N2 puis nouveau cycle."
+      verified_by: "test FB et test message IHM"
+    - id: AC6
+      statement: "AU, perte de mode ou relachement joystick suppriment les sorties ; aucun redemarrage ni HomeReq automatique apres rearmement."
+      verified_by: "tests FB de rupture puis reprise explicite"
+    - id: AC7
+      statement: "La simulation CODESYS valide le nominal et le depassement capteur, avec trace des etapes HX et sorties."
+      verified_by: "recette humaine CODESYS horodatee dans le rapport T364"
+    - id: AC8
+      statement: "Pour chaque programme modifie sous CODE/M_MAIN, le nom de fichier est identique au nom de POU et le suffixe est identique au langage du bundle."
+      verified_by: "G310 structure et bundle frais"
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleMachineHoming.st
+      - CODE/G_CYCLE/_TYPES/E_MachineHomingTxState.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleMachineHomingCmd.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclemachinehoming.st
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.4.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_HOMING_N1_MANUAL_TOP.yaml
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/CODE_DiffBundle.xml
+    forbidden:
+      - PRJ_CODESYS/
+      - Device.export
+      - ARCHIVES/
+      - Tout commit ou push sans accord explicite distinct
+  conservation:
+    must_survive:
+      - "AU physique et PowerCutOff restent independants."
+      - "Aucune reprise automatique apres AU, perte de mode ou defaut."
+      - "La reference utilise la cote calibree existante, jamais la mesure instantanee."
+      - "N2 ne cree aucun mouvement automatique."
+    dropped_on_purpose:
+      - "Ancien HX2: montee automatique au capteur puis HomeReq a la volee."
+      - "Ancien routage homing limite a MAINT_N2."
+  evidence_required:
+    - "check_task_contract: PASS"
+    - "tests FB_CycleMachineHoming: PASS"
+    - "bundle frais et diff bundle"
+    - "G200 liaison: PASS"
+    - "gates palier C: PASS ou ecarts preexistants documentes"
+    - "recette simulation CODESYS humaine: nominal + depassement"
+  models_allowed:
+    - "CDX01"
+  alert_duty: >
+    Toute impossibilite de routage N1, conflit de commande ou incoherence de capteur
+    est remontee avant modification de la commande mouvement.
+status: IN_PROGRESS
+execution:
+  executed_by: "CDX01"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Contrat C3 de la refonte T364 cree ; implementation et tests en preparation."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: "HUM"
+  validated_at: ""
+  notes: "Valider AF-04 v2.4, surtout la receptivite BtnValidateTopPosition et la cote calibree, avant ecriture ST."

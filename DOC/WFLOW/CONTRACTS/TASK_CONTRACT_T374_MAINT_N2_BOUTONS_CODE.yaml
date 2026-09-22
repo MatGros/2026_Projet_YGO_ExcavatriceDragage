@@ -1,0 +1,100 @@
+contract:
+  task_id: T374_RESTRICTION_N2
+  criticality: C4
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Restreindre la commande manuelle des treuils par BOUTONS IHM au mode
+    MAINT_N2 uniquement : en MAINT_N1, l appui d un bouton treuil ne produit
+    AUCUN mouvement et affiche un message operateur explicite ; le JOYSTICK
+    reste inchange et commande les treuils en N1 et N2. C est un correctif de
+    la commande EXISTANTE (aucun nouveau bouton), aligne sur le principe N1 =
+    toutes securites actives (AF-05).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: BC1
+      statement: "en MAINT_N1, un bouton treuil IHM (M1/M2 unitaires ou Both) ne produit aucun mouvement."
+      verified_by: "cas de test CI (MAINT_N1, Master=FALSE, bouton appuye) : RunRequest=FALSE pour M1/M2/Both ; observation IHM bouton inerte."
+    - id: BC2
+      statement: "en MAINT_N1, l appui d un bouton treuil affiche un message operateur explicite « Commande treuil non disponible en MAINT_N1 — passer en MAINT_N2 »."
+      verified_by: "cas de test CI bandeau (formatage du message) + longueur <= 70 car. (G408)."
+    - id: BC3
+      statement: "en MAINT_N2, la commande manuelle EXISTANTE par boutons fonctionne normalement (aucun changement de la chaine de mouvement)."
+      verified_by: "cas de test CI (MAINT_N2, bouton appuye) : RunRequest TRUE et sorties identiques a l etat avant le lot."
+    - id: BC4
+      statement: "le joystick reste inchange et commande les treuils en MAINT_N1 et MAINT_N2 (homme-mort + toutes securites)."
+      verified_by: "cas de test CI joystick N1 : RunRequest TRUE ; aucun terme joystick modifie."
+    - id: BC5
+      statement: "AF_Partie-05 (version _vX.Y la plus elevee a la racine de DOC/AF/) documente la restriction N1, sinon derogation ecrite."
+      verified_by: "grep de la restriction dans AF-05 + G340 rejoue sans erreur nouvelle."
+    - id: BC6
+      statement: "non-regression : aucun FB de securite modifie et comportement N2 boutons identique a l etat avant."
+      verified_by: "git diff --numstat VIDE sur FB_Safety_Winch.st, FB_WinchOutputInterlock.st, CODE/B_AU_SECURITE/ ; bundle frais + diff bundle + G200 --report PASS 0 erreur + palier C sans rouge nouveau."
+    - id: BC7
+      statement: "modification minimale de la commande existe ; aucun nouveau bouton, aucun refactor de matrice de protections."
+      verified_by: "git diff --numstat : uniquement les fichiers de scope.allowed, diff borne (quelques lignes)."
+    - id: BC8
+      statement: "garde-fou : la restriction N1 est presente (porte MAINT_N2) sur le chemin boutons M1, M2 et Both, sans etre appliquee au chemin joystick."
+      verified_by: "revue des points d injection + cas de test CI (N1 bouton bloque / N1 joystick autorise / N2 bouton autorise)."
+    - id: BC9
+      statement: "critere structurel : le nom de chaque fichier est egal au nom du POU ; et le suffixe de fichier est egal au langage genere dans le bundle."
+      verified_by: "revue des fichiers touches : nom de fichier egal au nom du POU et suffixe egal au langage du bundle PLCopenXML."
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM1.st
+      - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM2.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st            # branche boutons WinchBothMotionDirection (N2)
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st # message operateur N1 (optionnel selon point d injection)
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/
+      - DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md (ou _vX.Y la plus elevee)
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_BOUTONS_CODE.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - CODE_XML/
+    forbidden:
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/B_AU_SECURITE/**
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+      - CODE/D_JOYSTICK/FB_Joystick.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_MaintenanceN2Cmd.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/AGENT_WORKFLOW/
+
+  # ── 4. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison" G200 --report
+    - run_all_gates          # palier C
+    - bundle                 # CODE_XML/CODE_Bundle.xml regenere
+    - diff_bundle            # CODE_XML/CODE_DiffBundle.xml avec liste des objets
+
+  # ── 5. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "DSH"
+    - "Codex"
+
+  # ── 6. Contrainte de cadrage (decisions exploitant 2026-09-22) ────────────
+  alert_duty: >
+    SCOPE ACTE : boutons treuil IHM INACTIFS en MAINT_N1 (aucun mouvement + message operateur),
+    JOYSTICK inchange (actif N1 et N2), AF-05 mis a jour, AUCUN nouveau bouton, AUCUN FB de securite
+    modifie, AUCUN refactor. La restriction est PUREMENT RESTRICTIVE (retirer une capacite en N1 =
+    plus sur) et jamais un affaiblissement de securite. Tout doute sur le point d injection minimal
+    ou toute derive de perimetre est remonte a l orchestrateur, jamais invente.
+
+status: PENDING
+execution:
+  executed_by: "—"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: ""
+  notes: "C4-safety : plan technique a valider humainement avant toute ligne de CODE/. Perimetre revise 2026-09-22 (restriction N2). Verrou T374/DSH30 conserve."
