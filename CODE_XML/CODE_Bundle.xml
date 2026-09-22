@@ -115,6 +115,7 @@
               <value name="AX_DIVING_RETRY" value="20" />
               <value name="AX3_WAIT_DIVE_START" value="21" />
               <value name="AX10B_RACCORDEMENT_P1" value="22" />
+              <value name="AX15D_DUMP_BUCKET_JOG" value="23" />
             </values>
           </enum>
         </baseType>
@@ -261,6 +262,12 @@
                 <Name>AX10B_RACCORDEMENT_P1</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Raccordement continu P1 fermeture benne -&gt; montee controlee</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX15D_DUMP_BUCKET_JOG</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Module benne sur place a la tremie (T383) : le geste ouvre, l'inverse ferme, neutre = stop ; retour AX15B au relachement</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -24614,8 +24621,8 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 T358 : forcage de step — sentinelle de consigne et borne haute de plage.
-CST_StepForceMax = dernier membre de E_AutoCycleStep (AX10B_RACCORDEMENT_P1) :
-toute valeur hors [0..22] est refusee, toute valeur de l'enum est acceptee.
+CST_StepForceMax = dernier membre de E_AutoCycleStep (AX15D_DUMP_BUCKET_JOG, T383) :
+toute valeur hors [0..23] est refusee, toute valeur de l'enum est acceptee.
 Sentinelle : aucune demande de forcage</xhtml>
               </documentation>
             </variable>
@@ -24624,7 +24631,7 @@ Sentinelle : aucune demande de forcage</xhtml>
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="22" />
+                <simpleValue value="23" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute de la plage d'enum coercible</xhtml>
@@ -24828,7 +24835,10 @@ instCauses[1].Active   := WinchSyncError
                           AND (State &lt;&gt; E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
                           AND (State &lt;&gt; E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
                           AND (State &lt;&gt; E_AutoCycleStep.AX10_CLOSE_BUCKET)
-                          AND (State &lt;&gt; E_AutoCycleStep.AX11_CTRL_ASCENT);
+                          AND (State &lt;&gt; E_AutoCycleStep.AX11_CTRL_ASCENT)
+                          // AX15D (T383) : module benne sur place a la tremie, meme fenetre de vidage
+                          // que AX15B — exclusion sync identique a AX10 (decision safety arbitrage 5).
+                          AND (State &lt;&gt; E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG);
 instCauses[1].Latching := TRUE;
 instCauses[1].Texte    := 'Desynchronisme treuils M1/M2 bloquant';
 
@@ -25094,7 +25104,7 @@ END_IF;
 //    (decision exploitant 2026-09-21, risque assume et trace en note d'application).
 // ⚠️ AUCUNE garde de contexte : ni mode, ni joystick, ni arret mecanique des treuils,
 //    ni immersion Kobold, ni contexte fond. La SEULE validation restante est la plage
-//    des valeurs de E_AutoCycleStep [0..22] ; hors plage = rejet, aucune ecriture d'etape.
+//    des valeurs de E_AutoCycleStep [0..23] ; hors plage = rejet, aucune ecriture d'etape.
 // ⚠️ Le scan du forcage n'emet AUCUNE commande : demandes ramenees a zero et CASE
 //    inhibe (StateExecutionInhibit) — l'etape ciblee s'execute au scan suivant, soit
 //    un cycle de tache (10 ms). Un forcage annule aussi une attente de reprise en
@@ -25126,6 +25136,7 @@ IF StepForceConsigne &lt;&gt; CST_StepForceNone THEN
             20: ForceStepCandidate := E_AutoCycleStep.AX_DIVING_RETRY;       ForceStepCandidateValid := TRUE;
             21: ForceStepCandidate := E_AutoCycleStep.AX3_WAIT_DIVE_START;   ForceStepCandidateValid := TRUE;
             22: ForceStepCandidate := E_AutoCycleStep.AX10B_RACCORDEMENT_P1; ForceStepCandidateValid := TRUE;
+            23: ForceStepCandidate := E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG;  ForceStepCandidateValid := TRUE;
         END_CASE;
     END_IF;
 
@@ -25152,7 +25163,7 @@ IF StepForceConsigne &lt;&gt; CST_StepForceNone THEN
         ForceStepResult := '';           // une consigne appliquee efface le motif de rejet precedent
     ELSE
         ForceStepRejected := TRUE;
-        ForceStepResult := 'Forcage refuse : cible hors plage E_AutoCycleStep (0..22).';
+        ForceStepResult := 'Forcage refuse : cible hors plage E_AutoCycleStep (0..23).';
     END_IF;
     // La consigne n'est PAS ecrite par le FB : elle est acquittee par PRG_03 sur
     // StepForceTgtTaken (invariant verifie par le gate G517).
@@ -25899,7 +25910,7 @@ CASE State OF
         WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
         WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#040B;
-        OperatorAction := 'AX15b - Pousser : vidage. Tirer : fermer et remonter.';
+        OperatorAction := 'AX15b - Pousser : vidage. Tirer : fermer sur place (micro-step).';
 
         // Config treuil UNIQUE : etape benne seule, les deux treuils neutralises
         // (plus de descente couplee M1+M2 simultanee a l'ouverture benne -&gt; plus
@@ -25911,24 +25922,57 @@ CASE State OF
 
         BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
 
-        // 🆘 Repli benne + treuils depuis le vidage : geste INVERSE maintenu (Y+, montee)
-        // sous homme-mort. La benne est REFERMEE puis les treuils remontent couples.
-        // Entree dans l'etape de fermeture existante AX10_CLOSE_BUCKET : la chaine
-        // AX10 -&gt; AX10B -&gt; AX11/AX12 est reutilisee telle quelle, sans duplication de
-        // logique ni nouvelle variable de position. AX10 est aussi l'etape sur laquelle
-        // la commande benne et la surveillance de synchronisme sont deja bornees en aval.
-        // Prioritaire sur l'option de repositionnement (AX15C commande une DESCENTE
-        // couplee : elle contredirait le geste de repli) et sur la fin de vidage.
-        // L'ouverture est neutralisee des ce scan, et AX10 publie lui aussi ReqOpen a 0
-        // sur toute la duree du repli : les deux demandes benne ne doivent jamais etre
-        // vraies sur le meme scan.
+        // 🔄 T383 (amendement GEL 2026-09-22) : le tirer n'effectue PLUS de saut AX15B -&gt; AX10
+        // (saut arriere non declare, GEL ne le connait pas). Le tirer entre dans le micro-step
+        // AX15D_DUMP_BUCKET_JOG qui permet d'ouvrir/refermer la benne SUR PLACE a la tremie, sans
+        // quitter la phase de vidage et sans mouvement de treuil ni de translation. Retour AX15B
+        // au relachement (centre mort) ; la fin de vidage reste AX18 (AT15B inchange). Aucune
+        // echappatoire vers AX10 (decision exploitant arbitrage 3, confirmee par les 2 revues C4).
         IF DeadmanArmed AND JoystickPull THEN
             BucketCmd.ReqOpen := FALSE;
-            State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
+            State := E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG;
         ELSIF RepositionRequest THEN
             State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
         ELSIF DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
+            State := E_AutoCycleStep.AX18_DONE_SYNC;
+        END_IF;
+
+    E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG:
+        CycleStep := E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG;
+        CycleStateStr := 'AX15d - Module benne a la tremie';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT (DeadmanArmed AND (JoystickPush OR JoystickPull));
+        WaitingForProcess := DeadmanArmed AND (JoystickPush OR JoystickPull);
+        OperatorActionId := 16#040D;
+        OperatorAction := 'AX15d - Pousser : ouvrir benne. Tirer : fermer. Relacher : retour.';
+
+        // Module benne SUR PLACE a la tremie : treuils M1+M2 a 0, translation 0,
+        // aucun mouvement de treuil. Le geste ouvre (ReqOpen), l'inverse ferme
+        // (ReqClose), neutre = les deux FALSE (la benne se module sur place).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        TranslationCmd.ReqStart := FALSE;
+        TranslationCmd.PositionTgt := 0;
+        BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
+        BucketCmd.ReqClose := DeadmanArmed AND JoystickPull;
+
+        // Sorties TOUTES declarees au GEL (amendement T383) :
+        //  - retour au centre mort (relachement du manche) -&gt; AX15B (reprendre le vidage)
+        //  - Benne_Done AND Benne_IsOpen (contenu vide) -&gt; AX18
+        // La perte de l'homme-mort NE sort PAS d'AX15D : le gate §4 (Lifecycle.Busy AND NOT
+        // CycleMotionPermit) neutralise les commandes benne/treuils en conservant l'etape
+        // (doctrine identique a AX15B / AX10). Seul le relachement du manche ramene a AX15B.
+        IF NOT JoystickDeflected THEN
+            BucketCmd.ReqOpen := FALSE;
+            BucketCmd.ReqClose := FALSE;
+            State := E_AutoCycleStep.AX15B_DUMP_OPEN;
+        ELSIF DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen THEN
+            BucketCmd.ReqOpen := FALSE;
+            BucketCmd.ReqClose := FALSE;
             State := E_AutoCycleStep.AX18_DONE_SYNC;
         END_IF;
 
@@ -30955,6 +30999,7 @@ IF CycleFaultActive THEN
         E_AutoCycleStep.AX15A_DUMP_ARRIVE: StepAtErrorStr := 'AX15a';
         E_AutoCycleStep.AX15B_DUMP_OPEN: StepAtErrorStr := 'AX15b';
         E_AutoCycleStep.AX15C_DUMP_REPOSITION: StepAtErrorStr := 'AX15c';
+        E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG: StepAtErrorStr := 'AX15d';
         E_AutoCycleStep.AX18_DONE_SYNC: StepAtErrorStr := 'AX18';
         E_AutoCycleStep.AX_STAB: StepAtErrorStr := 'STAB';
         ELSE
@@ -31001,7 +31046,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_AutoCycleStep.AX13_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
             E_AutoCycleStep.AX14_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
             E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
-            E_AutoCycleStep.AX15C_DUMP_REPOSITION: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
+            E_AutoCycleStep.AX15C_DUMP_REPOSITION, E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
             E_AutoCycleStep.AX18_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ - ALLER P1';
             E_AutoCycleStep.AX_STAB: Banner.SequenceProgressText := 'Cycle: STABILISATION';
         ELSE
@@ -31965,7 +32010,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, semi-auto AX8..AX12 et repli du vidage AX15b</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, semi-auto AX8..AX12, repli du vidage AX15b et micro-step benne AX15d (T383)</xhtml>
               </documentation>
             </variable>
             <variable name="BusCanOpenOP">
@@ -37500,6 +37545,14 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée</xhtml>
               </documentation>
             </variable>
+            <variable name="SimPhaseRotationOkBit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = phases réseau OK ; FALSE = défaut rotation de phases</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimEncoderSpeedFactor">
               <type>
                 <REAL />
@@ -39185,6 +39238,7 @@ Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 instSimSafety(
     Enable            := TRUE,
     SimChainOkBit     := SimChainOkBit,
+    SimPhaseRotationOkBit := SimPhaseRotationOkBit,
     PowerCutOff_A     := PowerKeepAlive_A,
     PowerCutOff_B     := PowerKeepAlive_B,
     PowerCutOffRequest:= PowerCutOffRequest,
@@ -39195,7 +39249,7 @@ instSimSafety(
 
 Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
 Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
-Machine.PhaseRotationOk_DI             := TRUE;
+Machine.PhaseRotationOk_DI          := instSimSafety.SimPhaseRotationOk;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
 instKoboldPowerUpTimer(IN := KoboldAutoEpisodeActive AND KoboldMeasureEnable
                         AND (M1_CablePos_M &gt; KoboldAutoDepthEpisode_M),
@@ -40745,6 +40799,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée</xhtml>
               </documentation>
             </variable>
+            <variable name="SimPhaseRotationOkBit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = phases réseau OK simulées ; FALSE = défaut rotation de phases injecté</xhtml>
+              </documentation>
+            </variable>
             <variable name="PowerCutOff_A">
               <type>
                 <BOOL />
@@ -40809,6 +40871,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contacteur simulé engagé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimPhaseRotationOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contrôleur de phases simulé : TRUE = phases saines (aucun défaut)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -40975,6 +41045,7 @@ Temps de retombée relais AU (ouverture chaîne)</xhtml>
 IF NOT Enable THEN
     SimChainOk     := FALSE;
     SimContactorOk := FALSE;
+    SimPhaseRotationOk := FALSE;
     ContactorLatch := FALSE;
     ChainOpen      := TRUE; // Chaîne ouverte par défaut à la ré-entrée (on n'a pas armé)
     ChainOpenReq   := FALSE;
@@ -41051,6 +41122,10 @@ END_IF;
 
 // Recopie vers la sortie
 SimContactorOk := ContactorLatch;
+
+// Contrôleur de phases : simple propagation du bit opérateur (TRUE = sain).
+// Inopérant hors simulation (le banc ne publie l'image machine que sous Enable).
+SimPhaseRotationOk := SimPhaseRotationOkBit;
 {endregion}
 </xhtml>
           </ST>
@@ -53615,6 +53690,8 @@ instSimBench(
     PowerCutOffRequest       := PRG_06_Outputs.Data.PowerCutOffRequest,
     // 🧪 Contrôle granulaire de la chaîne AU : bit opérateur (GVL_Simulation.SimChainOk).
     SimChainOkBit            := GVL_Simulation.SimChainOk,
+    // 🧪 Stimulus défaut rotation de phases : TRUE = phases saines, FALSE = défaut.
+    SimPhaseRotationOkBit    := GVL_Simulation.SimPhaseRotationOk,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     SimWinchCoast_M          := GVL_Simulation.SimWinchCoast_M,
     SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
@@ -53756,8 +53833,10 @@ instJoystick(
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT)
         // Repli du vidage : le geste inverse (Y+ apres Y-) doit atteindre l'etape de
         // fermeture benne sans exiger une remise au neutre, sinon l'homme-mort se
-        // desarme au milieu de l'intervention.
-        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN),
+        // desarme au milieu de l'intervention. AX15D (T383) : module benne sur place,
+        // l'operateur alterne pousser (ouvrir) / tirer (fermer) sans retour neutre.
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG),
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
@@ -61826,6 +61905,19 @@ TRUE = capteur haut actif; FALSE = position libre. Inopérant hors simulation.</
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimPhaseRotationOk">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Stimulus défaut rotation de phases : TRUE = phases réseau saines (comportement
+nominal, identique au codage en dur d'avant ce lot) ; FALSE = inverse/coupe les phases
+(PhaseRotationOk_DI = FALSE dans l'image machine simulée). Inopérant hors simulation.</xhtml>
           </documentation>
         </variable>
         <variable name="SimM3SensorsWordOverrideActive">
