@@ -75,6 +75,7 @@ VAR_OUTPUT
     M2_ReqDescend                   : BOOL;                           // <-- [ACT] Ordre descente vers Winch M2
     M2_BucketJogLimit               : BOOL;                           // <-- [ACT] Plafond palier 1 du jog benne M2
     CloseReached                    : BOOL;                           // <-- [STAT] Fermeture atteinte, maintien AX10B eventuel en cours
+    WaitingForOperator              : BOOL;                           // <-- [STAT] Fermeture engagee mais PERMIS NUL -> budget timeout gele (attente de permis), consigne jamais servie
 
     // === DIAGNOSTICS ET MESURES ===
     M1SlipDetected                  : BOOL;                           // <-- [DIAG] Glissement M1 detecte
@@ -106,6 +107,7 @@ VAR
     TimeoutAccumTime                : TIME;                           // . [LOC] Temps de commande engagee deja consomme, GELE hors engagement (segments precedents)
     TimeoutSegmentTime              : TIME;                           // . [LOC] ET du segment de commande en cours (reporte dans le cumul au relachement)
     TimeoutRemainingTime            : TIME;                           // . [LOC] Budget restant consomme par le TON (CfgTimeoutDuration - cumul)
+    ClosePermitDeniedWhileRequested : BOOL;                           // . [LOC] Fermeture demendee (CloseReq) mais permis nul -> attente de permis, budget gele
     TonBandClosed                   : TON;                            // . [LOC] Debounce court bande "fermee" -> cible offset (anti-chatter au bord de bande)
     TonBandOpen                     : TON;                            // . [LOC] Debounce court bande "ouverte" -> cible offset
     TonRecoilLimit                  : TON;                            // . [LOC] Anti-chatter de la limite de recul benne (meme base de temps que TonBand*)
@@ -228,6 +230,14 @@ IF NOT BypassGlobal THEN
     // Signal d'engagement : MotionRequestActive (calcule en tete de §1) — CloseReq/OpenReq sont
     // des LATCHES (restent TRUE pendant toute la pause) et seraient ici INOPERANTS.
     TimeoutEngaged := Lifecycle.Busy AND MotionRequestActive;
+    // Fenetre benne : une FERMETURE demandee (CloseReq) mais dont le permis est NUL -> la consigne
+    // M2 n'est pas servie (M2_RunRequest ne part pas) : c'est une ATTENTE DE PERMIS, pas un
+    // grippage. On gele le budget dans cette sous-fenetre STRICTE ; le vrai grippage (permis OK,
+    // aucun mouvement) conserve TimeoutEngaged -> ErrorID:03 toujours latche (non-vacuite).
+    ClosePermitDeniedWhileRequested := CloseReq AND (NOT EffectivePermitBucket_Close);
+    IF ClosePermitDeniedWhileRequested THEN
+        TimeoutEngaged := FALSE;
+    END_IF;
 
     // Rearmement conscient : budget complet ET segment TON neuf. Un TON IEC ne retombe PAS quand
     // PT augmente (ET cloue a PT, Q fige) : sans cette coupure d'un scan, un Reset pendant une
@@ -279,7 +289,7 @@ IF NOT BypassGlobal THEN
     instCauses[3].Latching := TRUE;
     instCauses[3].Texte    := 'Glissement treuil M1 pendant manoeuvre benne';
 
-    // Cause 4 : Non référencé
+    // Cause 4 : Non référencé (alarme d'information non latchante, ne bloque pas le mouvement)
     HomingMotionWithoutReference := (ReqAscent OR ReqDescend OR CmdOpen_IHM OR CmdClose_IHM OR ProgramBucketDriveActive)
                                   AND NOT MachineHomingActive
                                   AND NOT (HomedM1 AND HomedM2);
@@ -298,6 +308,10 @@ ELSE
     instCauses[3].Active := FALSE;
     instCauses[4].Active := FALSE;
 END_IF;
+
+// Etat « en attente de permis » publie (consomme par PRG_04 / IHM) — fermeture engagee
+// mais permis nul. Calcule a chaque scan (independant du bypass global).
+WaitingForOperator := Lifecycle.Busy AND CloseReq AND (NOT EffectivePermitBucket_Close);
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -329,6 +343,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     CloseReached := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
+    WaitingForOperator := FALSE;
     RETURN;
 END_IF;
 

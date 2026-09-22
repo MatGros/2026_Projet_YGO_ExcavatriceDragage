@@ -52,6 +52,13 @@ def main() -> int:
             errors.append("ManualBucketLimitsActive gate sur instBucket.Lifecycle.Busy (elargissement interdit)")
         if "SelJoystickWinch" in flat:
             errors.append("ManualBucketLimitsActive lit le selecteur brut IHM au lieu de l'arbitre")
+        if not re.search(r"EncoderM1\.HomedAndReliable", flat) or not re.search(r"EncoderM2\.HomedAndReliable", flat):
+            errors.append("ManualBucketLimitsActive doit etre gate par EncoderM1.HomedAndReliable AND EncoderM2.HomedAndReliable (T387/T388)")
+
+    # T387/T388 : TopLimitM2_M sous ManualBucketJogActive doit être gâté par HomedAndReliable
+    m_top = re.search(r"IF\s*\((?:ManualBucketJogActive\s+OR\s+AutoBucketCloseActiveForTopLimit|AutoBucketCloseActiveForTopLimit\s+OR\s+ManualBucketJogActive)\)(.*?)THEN\s+TopLimitM2_M\s*:=", text, re.S)
+    if not m_top or "HomedAndReliable" not in m_top.group(1):
+        errors.append("TopLimitM2_M (exemption jog benne) doit etre gate par HomedAndReliable (T387/T388)")
 
     t248 = _assignment(text, "T248BucketJogActive")
     if not t248:

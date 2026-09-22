@@ -35,6 +35,12 @@ VAR_INPUT
     BenneHoldStillActive            : BOOL;                           // --> [HW] Maintien fixe M1 actif pendant benne
     BenneBusy                       : BOOL;                           // --> [HW] Cycle benne actif sur l'autre treuil
     OtherWinchInhibited             : BOOL;                           // --> [HW] Autre treuil inhibe (maintenance)
+    // Fenetre benne : relaxation ÉTROITE de la butée haute MATÉRIELLE de ce treuil pendant
+    // la fermeture benne sur place (M1 FIXE). Calculé dans PRG_04 sous 4 verrous (benne active,
+    // M1 maintenu/vérifié, M1 hors montée, avant CloseReached). Câblé FALSE sur l'instance M1
+    // (jamais relaxé) et à la vraie valeur sur M2 -> le FdC matériel haut M1 reste la barrière
+    // absolue. Ne relaxe QUE la barrière matérielle, jamais le bypass logique.
+    BucketCloseAscentGrant          : BOOL := FALSE;                  // --> [SAFE] Relaxe la butée haut MATÉRIELLE M2 sous fenêtre benne (4 verrous)
 
     // === REGLAGES ET LIMITES SÉCURITÉ ===
     InReferencingMode               : BOOL;                           // --> [CFG] Treuil en cours de homing
@@ -338,7 +344,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 8 : Méca B absence confirmation arrêt (latched)
     IF NOT (BypassSafety OR BypassMecaB) THEN
-        UncommandedActiveB := JoystickYNeutral AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
+        UncommandedActiveB := NOT MovementCommanded AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
         TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
         IF TonMecaB.Q THEN MecaBFaultLatched := TRUE; END_IF;
     ELSE
@@ -572,9 +578,16 @@ DescendPermit := NOT (
 );
 
 AscentPermit := NOT (
+    // Fenetre benne : la barrier MATERIELLE (FdC haut capteur) du treuil qui bouge la
+    // benne (M2) est relachee STRICTEMENT pendant la fermeture benne sur place (M1 FIXE, pas
+    // d'altitude) : BucketCloseAscentGrant, calcule PRG_04 sous 4 verrous, cable FALSE sur M1.
+    // Hors fenetre (grant=FALSE) la barrier reprend immediatement ; le FdC materiel haut M1 est
+    // JAMAIS relache (grant toujours FALSE sur l'instance M1). Le bypass logique (BypassTopLimitSwitch)
+    // conserve sa fonction TST et n'est pas altere.
     ((CauseTopLimitSwitchActive
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
-    AND NOT BypassTopLimitSwitch)
+    AND NOT BypassTopLimitSwitch
+    AND NOT BucketCloseAscentGrant)
     // TopLimitM porte la relaxation 7,5->8,5 m en override N1 / bypass N2 : la butee
     // logicielle reste active a la valeur relevee. Bypasser le logiciel releve la butee,
     // il ne la supprime pas ; le FDC haut materiel reste une barriere independante.

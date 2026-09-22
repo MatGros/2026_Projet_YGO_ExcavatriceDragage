@@ -951,6 +951,7 @@ TEST 'T323-005 Codeur(s) non reference(s) : statut au repos, defaut live seuleme
     ASSERT_FALSE(FB.Fault.Error, 'Codeur M1 non reference au repos -> statut seul');
 
     (* Scan 2 : une demande normale sans reference produit un defaut live *)
+
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
        ReqAscent := TRUE,
@@ -1034,7 +1035,12 @@ TEST 'TC-P10-045.1 Benne partiellement fermee -> remontee palier 1 seul'
 END_TEST
 
 TEST 'TC-P10-046.1 Timeout mouvement pendant BUSY -> defaut timeout + latch'
-    (* CfgTimeoutDuration force a 1s pour rendre le test rapide (code reel = 60s). *)
+    (* CfgTimeoutDuration force a 1s pour rendre le test rapide (code reel = 60s).
+       ⚠️ T387 (arbitrage exploitant 2026-09-22, AC4) : le cas « fermeture engagee MAIS permis NUL »
+       devient une ATTENTE DE PERMIS (budget gele), PAS un timeout. Ce TC cible donc le VRAI
+       GRIPPAGE : permis de fermeture OK (EffectivePermitBucket_Close=TRUE) mais aucun mouvement
+       -> ErrorID:03 doit TOUJOURS latcher (non-vacuite). AVANT fix ce test passait par omission
+       du permis (= cas devenu attente) ; on l'aligne sur la nouvelle semantique. *)
     Config.OffsetOpenM := 0.0;
     Config.OffsetCloseM := 3.0;
     Config.CoherenceLimitM := 5.0;
@@ -1051,10 +1057,10 @@ TEST 'TC-P10-046.1 Timeout mouvement pendant BUSY -> defaut timeout + latch'
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
 
-    (* Scan 2 : demarrage fermeture, cible non atteinte -> BUSY maintenu *)
+    (* Scan 2 : demarrage fermeture, cible non atteinte -> BUSY maintenu (permis OK = vrai gripage) *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, ReqAscent := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
@@ -1063,19 +1069,19 @@ TEST 'TC-P10-046.1 Timeout mouvement pendant BUSY -> defaut timeout + latch'
     (* Scan 3 : le TON lit Lifecycle.Busy au scan suivant son armement. *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, ReqAscent := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
 
-    (* Scan 4 : apres 1s de BUSY sans atteindre la cible -> timeout. *)
+    (* Scan 4 : apres 1s de BUSY sans atteindre la cible -> timeout (permis OK, vrai gripage). *)
     ADVANCE_TIME(1000000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
-       CmdClose_IHM := TRUE, ReqAscent := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := TRUE,
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
-    ASSERT_TRUE(FB.Fault.Error, 'Timeout mouvement 1s -> Error');
+    ASSERT_TRUE(FB.Fault.Error, 'Timeout mouvement 1s (permis OK) -> Error');
     ASSERT_TRUE(FB.Fault.Latched, 'Timeout -> defaut latche');
 END_TEST
 
@@ -1548,4 +1554,103 @@ TEST 'T291-B Repli DisplayOffsetM si configuration invalide (OffsetOpenM >= Offs
     (* Ne doit PAS inverser silencieusement la formule, mais replier à 0.0 *)
     ASSERT_NEAR(FB.DisplayOffsetM, 0.0, 0.001, 'Config invalide -> DisplayOffsetM replié à 0.0 m');
 END_TEST
+
+TEST 'T387-FB-003 Fermeture engagee, PERMIS NUL -> budget timeout GELÉ (attente de permis), pas de ErrorID:03'
+    (* T387 fenetre benne (AC4, arbitrage exploitant 2026-09-22) : quand la fermeture est refusee
+       par un PERMIS NUL (ici EffectivePermitBucket_Close=FALSE, cas AX15D benne en position haute),
+       la consigne M2 n'est jamais servie -> ce n'est PAS un grippage mecanique mais une attente de
+       permis. Le budget timeout doit etre GELE (pas de ErrorID:03) et un signal d'attente leve.
+       ⛔ CRITIQUE non-vacuite : le vrai grippage (permis OK mais aucun mouvement) DOIT encore latcher
+       03 -- verifie par TC-P10-046.1 (completer avec EffectivePermitBucket_Close := TRUE). *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    (* Scans 1-2 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+
+    (* Scan 3 : fermeture engagee, permis de fermeture NUL -> M2 jamais servi, Busy maintenu *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := FALSE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T387 Permis nul : fermeture engagee -> Busy');
+    ASSERT_FALSE(FB.M2_RunRequest, 'T387 Permis nul : aucun ordre M2 (consigne non servie)');
+
+    (* Scan 4 : premier scan engage (front du TON de timeout sous l'ancien comportement) *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := FALSE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+
+    (* Scan 5 : commande tenue 1.5 s (> CfgTimeoutDuration) sous permis NUL -> AUCUN timeout 03.
+       AVANT fix : timeout 03 latche a 1 s = ROUGE. Apres fix : budget gele = VERT. *)
+    ADVANCE_TIME(1500000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, ReqAscent := TRUE, EffectivePermitBucket_Close := FALSE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState, CfgTimeoutDuration := T#1s);
+    ASSERT_EQ(FB.Fault.ErrorId, 0, 'T387 Permis nul -> ErrorId a 0 (aucun timeout 03)');
+    ASSERT_FALSE(FB.Fault.Latched, 'T387 Permis nul -> AUCUN latch (le budget a ete gele)');
+    ASSERT_TRUE(FB.WaitingForOperator, 'T387 Permis nul -> signal etat « en attente de permis » leve (AC4)');
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T387 Permis nul -> manoeuvre toujours en attente (Busy conserve)');
+END_TEST
+
+TEST 'T387-004 Commande benne sans reference : Cause 4 (ErrorID:05) active et non latchante'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 1.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+
+    (* Commande sans reference -> Cause 4 active (non-latchante) *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ReqAscent := TRUE, CmdClose_IHM := TRUE,
+       HomedM1 := FALSE, HomedM2 := FALSE,
+       MachineHomingActive := FALSE,
+       EffectivePermitBucket_Close := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Fault.Error, 'Commande sans reference -> alarme live active');
+    ASSERT_TRUE((FB.Fault.ErrorId AND 16#0010) <> 0, 'Cause 4 (ErrorID:05) presente');
+    ASSERT_FALSE(FB.Fault.Latched, 'Cause 4 non latchante -> retombe des arret sans Reset');
+END_TEST
+
+TEST 'T387-005 Referencement acquis : Cause 4 (ErrorID:05) retombe spontanement sans Reset'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 1.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+
+    (* Scan 1 : Commande sans reference -> Cause 4 active *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ReqAscent := TRUE, CmdClose_IHM := TRUE,
+       HomedM1 := FALSE, HomedM2 := FALSE,
+       MachineHomingActive := FALSE,
+       EffectivePermitBucket_Close := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Fault.Error, 'Scan 1 sans reference -> Cause 4 active');
+
+    (* Scan 2 : Referencement acquis -> Cause 4 retombe immediatement *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       ReqAscent := TRUE, CmdClose_IHM := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       MachineHomingActive := FALSE,
+       EffectivePermitBucket_Close := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_FALSE((FB.Fault.ErrorId AND 16#0010) <> 0, 'Scan 2 homed -> Cause 4 retombee');
+END_TEST
+
 
