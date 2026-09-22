@@ -259,7 +259,7 @@ TEST 'T262-003 AX10B : timeout M1 borne a 2 s puis repli sans redemarrage implic
                 'Repli : AX11 reprend les deux treuils ensemble');
 END_TEST
 
-TEST 'T331-001 AX15b repli : ouverture neutralisee puis fermeture benne et remontee couplee M1+M2'
+TEST 'T331-001 AX15d micro-step benne : tirer ouvre le module, pousser ouvrir, relacher retour AX15B'
     SampleCount := 0;
 
     (* Chargement securise de l etape de vidage au joystick neutre, machine arretee. *)
@@ -285,14 +285,9 @@ TEST 'T331-001 AX15b repli : ouverture neutralisee puis fermeture benne et remon
        CfgCtrlAscentMaxStep := 1, CfgCtrlAscentDistanceM := 2.0,
        SampleCount := SampleCount);
     FB(StepForceTgt := 16, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.ForceStepAccepted, 'Etape de vidage forcee (T358)');
-    ASSERT_TRUE(FB.StepForceTgtTaken, 'Consigne vue par le FB : PRG_03 l acquitte (T358)');
-
-    (* Scans d acquittement puis d execution : l etape est chargee sans mouvement. *)
+    ASSERT_TRUE(FB.ForceStepAccepted, 'Etape de vidage forcee (T331-001)');
     FB(StepForceTgt := -1, SampleCount := SampleCount);
     FB(SampleCount := SampleCount);
-    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
-                 'Chargement du vidage sans mouvement treuils');
 
     (* Geste nominal maintenu Y- : vidage, treuils neutralises, aucune transition. *)
     FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE,
@@ -303,69 +298,46 @@ TEST 'T331-001 AX15b repli : ouverture neutralisee puis fermeture benne et remon
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
                  'Vidage : les deux treuils restent neutralises');
 
-    (* Geste INVERSE maintenu Y+ : repli. L ouverture tombe des ce scan. *)
+    (* T383 : tirer ne fait PLUS de saut AX15B -> AX10. Il entre dans le micro-step AX15D. *)
     FB(JoystickPush := FALSE, JoystickPull := TRUE, SampleCount := SampleCount);
-    ASSERT_FALSE(FB.BucketCmd.ReqOpen, 'Repli : ouverture neutralisee au geste inverse');
-    ASSERT_FALSE(FB.BucketCmd.ReqClose, 'Repli : fermeture pas encore engagee (palier d etape)');
-
-    (* Scan suivant : l etape de fermeture benne prend la main. *)
     FB(SampleCount := SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET,
-                'Repli : entree dans l etape de fermeture benne');
-    ASSERT_FALSE(FB.BucketCmd.ReqOpen, 'Repli : ouverture toujours a zero');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG,
+                'T383 : tirer entre dans le micro-step benne AX15D');
+    ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET,
+                 'T383 : AUCUN saut vers AX10 (decharge non declaree retiree)');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen, 'AX15D : ouverture neutralisee au tirer');
+    ASSERT_TRUE(FB.BucketCmd.ReqClose, 'AX15D : tirer ferme la benne');
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
-                 'Repli : aucun treuil commande pendant la fermeture benne');
+                 'AX15D : les deux treuils restent a 0 (aucun mouvement)');
 
-    (* Palier d etape ecoule : fermeture benne engagee, maintien M2 arme. *)
-    FB(SampleCount := SampleCount);
-    ADVANCE_TIME(1200000000);
-    FB(SampleCount := SampleCount);
-    ASSERT_TRUE(FB.BucketCmd.ReqClose, 'Repli : fermeture benne commandee sous geste maintenu');
-    ASSERT_TRUE(FB.BucketCmd.ReqHoldAscentP1AfterClose,
-                'Repli : maintien P1 arme pour le raccordement sans coupure M2');
+    (* Module : pousser dans AX15D rouvre la benne, treuils toujours 0. *)
+    FB(JoystickPush := TRUE, JoystickPull := FALSE, SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG,
+                'AX15D : on reste dans le micro-step pendant la manipulation');
+    ASSERT_TRUE(FB.BucketCmd.ReqOpen, 'AX15D : pousser ouvre la benne');
+    ASSERT_FALSE(FB.BucketCmd.ReqClose, 'AX15D : aucune fermeture simultanee');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'AX15D : treuils neutralises pendant le module');
 
-    (* Fermeture atteinte : passage au raccordement P1. *)
-    FB(Benne_CloseReached := TRUE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+    (* Retour au centre mort : on reprend le vidage (AX15B) sans remontee. *)
+    FB(JoystickPush := FALSE, JoystickPull := FALSE, JoystickDeflected := FALSE,
        SampleCount := SampleCount);
-    ASSERT_FALSE(FB.BucketCmd.ReqClose, 'Repli : fermeture relachee une fois atteinte');
+    FB(SampleCount := SampleCount);   // AX15D assigne State:=AX15B -> CycleStep au scan suivant
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN,
+                'AX15D : relachement -> retour au vidage AX15B');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen OR FB.BucketCmd.ReqClose,
+                 'AX15D : neutre = les deux demandes benne a zero');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
+                 'AX15D : aucun treuil commande au relachement');
 
-    (* Raccordement P1 : M1 et M2 publies ensemble, en montee, meme palier. *)
-    FB(M1FinalAscentStartReady := TRUE, M2_SpeedStepApplied := 1, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10B_RACCORDEMENT_P1,
-                'Repli : raccordement P1 en cours');
-    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest AND FB.WinchM2Cmd.RunRequest,
-                'Repli : les deux treuils sont raccordes sans trou de commande');
-    ASSERT_TRUE(FB.WinchM1Cmd.ReqAscent AND FB.WinchM2Cmd.ReqAscent,
-                'Repli : les deux treuils sont commandes en montee');
-    ASSERT_TRUE((FB.WinchM1Cmd.StepTgt = 1) AND (FB.WinchM2Cmd.StepTgt = 1),
-                'Repli : palier lent symetrique sur les deux treuils');
-
-    (* Montee controlee : plafond commun sous geste maintenu. *)
+    (* Fin de vidage : la benne ouverte amene AX18 sur geste pousse, inchange. *)
+    FB(Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE,
+       Benne_IsRoughlyClosed := FALSE, JoystickDeflected := TRUE, JoystickPush := TRUE,
+       SampleCount := SampleCount);
     FB(SampleCount := SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT, 'Repli : montee controlee');
-    ASSERT_TRUE(FB.WinchM1Cmd.ReqAscent AND FB.WinchM2Cmd.ReqAscent,
-                'Repli : montee maintenue sur les deux treuils');
-    ASSERT_TRUE((FB.WinchM1Cmd.StepTgt = 1) AND (FB.WinchM2Cmd.StepTgt = 1),
-                'Repli : plafond de montee controle applique');
-
-    (* Distance de controle atteinte : remontee en charge de la benne refermee. *)
-    FB(M1_CablePosM := 9.5, M2_CablePosM := 9.5, SampleCount := SampleCount);
-    FB(SampleCount := SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT,
-                'Repli : remontee en charge de la benne refermee');
-    ASSERT_TRUE(FB.WinchM1Cmd.ReqAscent AND FB.WinchM2Cmd.ReqAscent,
-                'Repli : remontee couplee jusqu a la limite haute');
-    ASSERT_EQ(FB.WinchM1Cmd.StepTgt, FB.WinchM2Cmd.StepTgt,
-              'Repli : meme palier M1/M2 pendant la remontee');
-
-    (* Limite haute atteinte : retour dans la sequence de decharge normale. *)
-    FB(M1TopLimitReached := TRUE, SampleCount := SampleCount);
-    FB(M1TopLimitReached := FALSE, SkipDrainRequest := TRUE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX13_DRAIN_PAUSE,
-                'Repli : egouttage, retour dans la sequence normale du cycle');
-    FB(SkipDrainRequest := FALSE, SampleCount := SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX14_TRANSLATE_DUMP,
-                'Repli : le cycle reprend vers la tremie');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX18_DONE_SYNC,
+                'Fin de vidage apres module : AX18 inchange');
+    ASSERT_FALSE(FB.BucketCmd.ReqOpen, 'Fin de vidage : ouverture relachee');
 END_TEST
 
 TEST 'T331-002 AX15b/AX15c non-regression : vidage nominal et repositionnement inchanges'
@@ -438,7 +410,7 @@ TEST 'T331-002 AX15b/AX15c non-regression : vidage nominal et repositionnement i
     ASSERT_EQ(FB.SampleCount, 1, 'Fin de vidage : compteur incremente une seule fois');
 END_TEST
 
-TEST 'T331-003 AX15b repli : perte du geste, de l homme-mort ou defaut interrompt sans reprise'
+TEST 'T331-003 AX15d micro-step : perte du geste, de l homme-mort ou defaut neutralise sans reprise'
     SampleCount := 0;
 
     (* Chargement securise de l etape de vidage au joystick neutre. *)
@@ -468,31 +440,31 @@ TEST 'T331-003 AX15b repli : perte du geste, de l homme-mort ou defaut interromp
     FB(StepForceTgt := -1, SampleCount := SampleCount);
     FB(SampleCount := SampleCount);
 
-    (* Vidage puis geste inverse maintenu : repli engage jusqu a la fermeture benne. *)
+    (* Vidage puis tirer maintenu : entre dans le micro-step AX15D, fermeture commandee. *)
     FB(StartCycle := FALSE, JoystickDeflected := TRUE, DeadmanArmed := TRUE,
        JoystickPush := TRUE, SampleCount := SampleCount);
     FB(JoystickPush := FALSE, JoystickPull := TRUE, SampleCount := SampleCount);
     FB(SampleCount := SampleCount);
-    FB(SampleCount := SampleCount);
-    ADVANCE_TIME(1200000000);
-    FB(SampleCount := SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET,
-                'Repli engage : etape de fermeture benne');
-    ASSERT_TRUE(FB.BucketCmd.ReqClose, 'Repli engage : fermeture benne commandee');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG,
+                'Micro-step : entree dans AX15D au tirer');
+    ASSERT_TRUE(FB.BucketCmd.ReqClose, 'Micro-step : fermeture benne commandee au tirer');
 
-    (* Relachement du manche : plus aucune demande, etape conservee. *)
+    (* Relachement du manche : plus aucune demande, retour au vidage AX15B. *)
     FB(JoystickDeflected := FALSE, JoystickPull := FALSE, DeadmanArmed := TRUE,
        SampleCount := SampleCount);
     ASSERT_FALSE(FB.BucketCmd.ReqClose, 'Relachement : fermeture benne neutralisee');
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
                  'Relachement : treuils neutralises');
     FB(SampleCount := SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET,
-                'Relachement : etape conservee');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN,
+                'Relachement : retour a AX15B (reprendre le vidage)');
     ASSERT_FALSE(FB.BucketCmd.ReqClose, 'Relachement : aucune reprise automatique');
 
-    (* Geste repris : la manoeuvre reprend sous commande maintenue. *)
+    (* Geste repris (tirer) : retour dans le micro-step sous commande maintenue. *)
     FB(JoystickDeflected := TRUE, JoystickPull := TRUE, SampleCount := SampleCount);
+    FB(SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG,
+                'Geste repris : retour dans AX15D');
     ASSERT_TRUE(FB.BucketCmd.ReqClose, 'Geste repris : fermeture benne reprise');
 
     (* Perte de l homme-mort : neutralisation complete, etape conservee. *)
@@ -501,10 +473,10 @@ TEST 'T331-003 AX15b repli : perte du geste, de l homme-mort ou defaut interromp
                  OR FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest,
                  'Homme-mort perdu : plus aucune demande de mouvement');
     FB(SampleCount := SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET,
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG,
                 'Homme-mort perdu : etape conservee, aucune reprise automatique');
 
-    (* Defaut pendant le repli : repli AX_STAB, sorties neutralisees. *)
+    (* Defaut pendant le micro-step : repli AX_STAB, sorties neutralisees. *)
     FB(DeadmanArmed := TRUE, HeartbeatIhmOk := FALSE, SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX_STAB, 'Defaut : repli AX_STAB');
     ASSERT_FALSE(FB.BucketCmd.ReqClose OR FB.BucketCmd.ReqOpen

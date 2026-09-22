@@ -474,8 +474,10 @@ instJoystick(
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT)
         // Repli du vidage : le geste inverse (Y+ apres Y-) doit atteindre l'etape de
         // fermeture benne sans exiger une remise au neutre, sinon l'homme-mort se
-        // desarme au milieu de l'intervention.
-        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN),
+        // desarme au milieu de l'intervention. AX15D (T383) : module benne sur place,
+        // l'operateur alterne pousser (ouvrir) / tirer (fermer) sans retour neutre.
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG),
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,

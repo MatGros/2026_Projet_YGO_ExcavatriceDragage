@@ -350,6 +350,7 @@ IF CycleFaultActive THEN
         E_AutoCycleStep.AX15A_DUMP_ARRIVE: StepAtErrorStr := 'AX15a';
         E_AutoCycleStep.AX15B_DUMP_OPEN: StepAtErrorStr := 'AX15b';
         E_AutoCycleStep.AX15C_DUMP_REPOSITION: StepAtErrorStr := 'AX15c';
+        E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG: StepAtErrorStr := 'AX15d';
         E_AutoCycleStep.AX18_DONE_SYNC: StepAtErrorStr := 'AX18';
         E_AutoCycleStep.AX_STAB: StepAtErrorStr := 'STAB';
         ELSE
@@ -396,7 +397,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_AutoCycleStep.AX13_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
             E_AutoCycleStep.AX14_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
             E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
-            E_AutoCycleStep.AX15C_DUMP_REPOSITION: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
+            E_AutoCycleStep.AX15C_DUMP_REPOSITION, E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
             E_AutoCycleStep.AX18_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ - ALLER P1';
             E_AutoCycleStep.AX_STAB: Banner.SequenceProgressText := 'Cycle: STABILISATION';
         ELSE
