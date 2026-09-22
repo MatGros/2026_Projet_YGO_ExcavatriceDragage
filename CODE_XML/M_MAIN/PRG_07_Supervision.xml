@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T08:44:53.451754" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T08:44:53.451754">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-22T02:19:28.407392" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-22T02:19:28.407392">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -8631,6 +8631,8 @@ instHmiBannerFormatter(
     DeadmanArmed                := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
+    CycleElapsed_Min             := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_Min,
+    CycleElapsed_S               := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_S,
     M3AtP1                      := GVL_IHM.M3Translation.State.AtP1,
     M3StatusText                := GVL_IHM.M3Translation.State.M3StatusText,
     TranslationMotionErrorId    := GVL_IHM.M3Translation.State.ErrorId,
