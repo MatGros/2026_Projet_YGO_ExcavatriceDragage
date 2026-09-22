@@ -99,19 +99,28 @@ contract:
 # ═══════════════════════════════════════════════════════════════════════════
 # SUIVI DE L'ETAT D'AVANCEMENT
 # ═══════════════════════════════════════════════════════════════════════════
-status: PENDING
+status: COMPLETED
 
 execution:
-  executed_by: ""
-  completed_at: ""
-  status: PENDING
+  executed_by: "AGY01"
+  completed_at: "2026-09-22T12:22:00+02:00"
+  status: COMPLETED
   summary: >
-    (a remplir par l'agent principal)
-  evidence_submitted: []
+    TglAutoDiveM2Step5Trial passe a TRUE par defaut dans ST_CycleCmd.st:15.
+    Profil de plongee M2 palier 5 arme au demarrage a froid (nominal), debrayable IHM.
+    Note d'application redigee (NOTE_APPLICATION_T381_AUTODIVE_M2_STEP5_DEFAUT.md).
+    Bundle complet et DiffBundle regeneres, G200 PASS 0 erreur, Palier C 56/60 PASS (0 regression).
+  evidence_submitted:
+    - "ST_CycleCmd.st:15 TglAutoDiveM2Step5Trial : BOOL := TRUE;"
+    - "NOTE_APPLICATION_T381_AUTODIVE_M2_STEP5_DEFAUT.md"
+    - "CODE_XML/CODE_Bundle.xml et CODE_XML/CODE_DiffBundle.xml"
+    - "G200_check_linkage.py --report : PASS (0 erreur)"
+    - "run_all_gates.py --palier C : 56 PASS / 4 FAIL (dettes connues preexistantes G300/G340/G430/G483, 0 nouveau rouge)"
 
 validation:
   status: PENDING
   validated_by: ""
   validated_at: ""
   notes: >
-    (a remplir par l'orchestrateur apres lecture du git diff reel et rejeu des preuves)
+    En attente de revue finale du git diff reel et accord explicite de commit.
+

@@ -135,3 +135,38 @@ END_VAR
     ASSERT_EQ(fb.Fault.ErrorId, 16#0040, 'Cause 6 seule = ErrorId 64');
     ASSERT_TRUE(fb.PowerCutOff, 'Escalade FDC est une coupure puissance');
 END_TEST
+
+TEST 'TC-T386-M3-001 Defaut rotation de phase M3 => PowerCutOff (ROUGE avant / VERT apres)'
+VAR
+    fb : FB_Safety_Translation;
+    i  : INT;
+END_VAR
+    fb.Enable := TRUE;
+    fb.PowerContactorEngaged := TRUE;
+    fb.HeartbeatIhmOk := TRUE;
+    fb.JoystickOnline := TRUE;
+    fb.JoystickOperational := TRUE;
+    fb.PhaseRotationOk := TRUE;
+    fb.DriveOnline := TRUE;
+    fb.DriveOperational := TRUE;
+    FOR i := 1 TO 350 DO
+        fb();
+    END_FOR;
+    (* Etat nominal stable : aucun defaut *)
+    ASSERT_FALSE(fb.Fault.Latched, 'Nominal -> pas de defaut latche');
+    ASSERT_FALSE(fb.PowerCutOff, 'Nominal -> PowerCutOff FALSE');
+    (* Defaut rotation de phase : comportement CIBLE (lot T386) : coupure de puissance *)
+    fb.PhaseRotationOk := FALSE;
+    fb();
+    fb();
+    ASSERT_TRUE(fb.SafeStop, 'Defaut rotation phases -> SafeStop TRUE');
+    ASSERT_TRUE(fb.PowerCutOff, 'Defaut rotation phases -> PowerCutOff TRUE (cible T386)');
+    ASSERT_TRUE(fb.ErrorPhaseRotation, 'Defaut rotation phases -> ErrorPhaseRotation TRUE');
+    (* Verrouillage : retour a TRUE sans front Reset => le defaut reste verrouille *)
+    fb.PhaseRotationOk := TRUE;
+    fb();
+    fb();
+    ASSERT_FALSE(fb.Reset, 'Pas de Reset');
+    ASSERT_TRUE(fb.Fault.Latched, 'Retour phase OK sans Reset -> reste verrouille (pas de rearmement auto)');
+END_TEST
+

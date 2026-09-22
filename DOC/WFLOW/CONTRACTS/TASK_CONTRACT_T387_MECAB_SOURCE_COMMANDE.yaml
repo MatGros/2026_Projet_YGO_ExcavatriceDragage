@@ -1,0 +1,104 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE C4 — T387 — FB_Safety_Winch : confirmation d'arret MecaB
+# independante de la source de commande
+# ═══════════════════════════════════════════════════════════════════════════
+# Contexte (cause racine confirmee) : en mode boutons MAINT_N2, la commande
+# manuelle des treuils se fait par boutons mais MecaB base son critere sur
+# JoystickYNeutral (toujours TRUE hors joystick) au lieu de MovementCommanded
+# (etat de commande reel). Resultat : faux [M1/M2] ErrorID:09 MecaB pendant une
+# commande legitime. Diagnostic 2026-09-22 (H1 confirme, H2 simu ecarte).
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+contract:
+  task_id: T387_MECAB_SOURCE_COMMANDE
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Rendre la confirmation d'arret mecanique MecaB de FB_Safety_Winch
+    independante de la source de commande : remplacer le critere JoystickYNeutral
+    par NOT MovementCommanded, pour que, en mode boutons MAINT_N2 (et tout mode
+    hors joystick), un arret commande ne genere plus de faux [M1/M2] ErrorID:09
+    MecaB, tout en conservant la detection de mouvement non commande dans les
+    modes joystick.
+
+  acceptance:
+    - id: AC1
+      statement: "en mode boutons MAINT_N2, le faux ErrorID:09 MecaB se reproduit en ROUGE avant correction (JoystickYNeutral toujours TRUE hors joystick => cause armee pendant la commande)."
+      verified_by: "test CI FB_Safety_Winch (mode boutons MAINT_N2, Both commande 3s) : ASSERT_FALSE(fb.Fault.Error) echoue sur le bundle AVANT."
+    - id: AC2
+      statement: "apres remplacement de JoystickYNeutral par NOT MovementCommanded, le meme scenario mode boutons MAINT_N2 passe au VERT : aucun faux MecaB quand la commande de mouvement est active."
+      verified_by: "re-lancement test CI FB_Safety_Winch apres modification : MecaB/bit ErrorID:09 PASS en mode boutons MAINT_N2."
+    - id: AC3
+      statement: "la confirmation d'arret MecaB devient fonction de la seule absence de commande : MecaB actif quand MovementCommanded=FALSE, inactif quand TRUE, sans elargir le declenchement."
+      verified_by: "matrice test MovementCommanded x JoystickYNeutral sur FB_Safety_Winch : bit MecaB = NOT MovementCommanded sur chaque ligne."
+    - id: AC4
+      statement: "non-regression : MecaA et toutes les autres causes du masque conservent un comportement identique avant/apres."
+      verified_by: "diff des resultats du test CI FB_Safety_Winch : seules les lignes MecaB changent, les autres causes gardent leur verdict."
+    - id: AC5
+      statement: "aucun changement de PostRampTimeout ni de la logique d'escalade SafeStop/PowerCutOff."
+      verified_by: "git diff du lot : seul FB_Safety_Winch.st:341 et le test CI associe sont modifies ; PostRampTimeout et branches SafeStop/PowerCutOff intouches."
+    - id: AC6
+      statement: "criteres structurels : le nom de chaque fichier est egal au nom du POU ; et le suffixe de fichier est egal au langage genere dans le bundle."
+      verified_by: "revue fichiers touches : nom egal au nom du POU et suffixe egal au langage du bundle PLCopenXML."
+    - id: AC7
+      statement: "lot pret pour integration : bundle complet regenere et valide, liaison prouvee, gates palier C au vert, diff bundle cible."
+      verified_by: "generate_codesys_bundle.py . ; G200_check_linkage.py --report PASS 0 erreur ; run_all_gates.py --palier C ; generate_codesys_diff_bundle.py . CODE/H_TREUILS_BENNE/FB_Safety_Winch.st."
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_safety_winch.st
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T387_MECAB_SOURCE_COMMANDE.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - CODE_XML/
+    forbidden:
+      - CODE/B_AU_SECURITE/**
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/L_SIMULATION/FB_Sim_Safety.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/GVL_PERSISTENT.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/AGENT_WORKFLOW/
+
+  conservation:
+    must_survive:
+      - "Detection de mouvement non commande en mode joystick (UncommandedActive reste arme quand joystick non commande)"
+      - "Confirmation d'arret MecaB sur arret reel (NOT MovementCommanded) et plus jamais pendant une commande legitime"
+      - "Toutes les autres causes du masque (MecaA et autres) et leurs seuils"
+      - "Aucun affaiblissement de la chaine SafeStop/PowerCutOff"
+    dropped_on_purpose:
+      - "JoystickYNeutral comme critere de confirmation d'arret MecaB (cause du faux positif en mode boutons)"
+
+  evidence_required:
+    - test_rouge_vert        # test CI FB_Safety_Winch : ROUGE avant / VERT apres
+    - check_linkage          # G200_check_linkage.py --report
+    - run_all_gates          # palier C
+    - bundle                 # CODE_XML/CODE_Bundle.xml regenere
+    - diff_bundle            # CODE_XML/CODE_DiffBundle.xml (objet FB_Safety_Winch)
+
+  models_allowed:
+    - "DSH"
+    - "Codex"
+
+  alert_duty: >
+    FB de SECURITE : ne JAMAIS affaiblir le critere de confirmation d'arret ni la
+    chaine de securite. Test ROUGE/VERT obligatoire avant et apres le correctif.
+    Ne pas toucher a PostRampTimeout, WinchStandstill (:263-265, :394-395), ni aux
+    branches SafeStop/PowerCutOff. Ne pas etendre le scope. Separate de T369
+    (defaut AU rearmement simu, distinct).
+
+status: PENDING
+execution:
+  executed_by: "—"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: ""
+  notes: "C4-safety : plan/test ROUGE-VERT a valider avant code. A ne PAS fusionner avec T369 (defaut AU rearmement simu, distinct)."

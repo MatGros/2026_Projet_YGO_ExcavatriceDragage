@@ -21,11 +21,22 @@
     {
       "name": "TC-T300-SAF-061 Requete persistante au FDC escalade meme frequence nulle",
       "passed": true
+    },
+    {
+      "name": "TC-T386-M3-001 Defaut rotation de phase M3 => PowerCutOff (ROUGE avant / VERT apres)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.POWERCUTOFF expected TRUE, got FALSE",
+        "file": "test_fb_safety_translation.st",
+        "line": 163,
+        "message": "Defaut rotation phases -> PowerCutOff TRUE (cible T386)"
+      }
     }
   ],
   "summary": {
-    "total": 5,
+    "total": 6,
     "passed": 5,
-    "failed": 0
+    "failed": 1
   }
 }
