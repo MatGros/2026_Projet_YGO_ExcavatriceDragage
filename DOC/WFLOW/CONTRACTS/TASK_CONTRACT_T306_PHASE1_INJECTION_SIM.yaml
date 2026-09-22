@@ -1,0 +1,76 @@
+contract:
+  task_id: T306-PHASE1-INJECTION-SIM-ROTATION-PHASE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Rendre le defaut de rotation de phase (PhaseRotationOk_DI = FALSE) INJECTABLE depuis le banc de
+    simulation, afin que la verification T306 (arret sur sous defaut de rotation de phase) devienne
+    MATERIELLEMENT POSSIBLE. Aujourd hui le banc ecrit ce DI EN DUR a TRUE (FB_SimBench.st:690), ce
+    qui ecrase tout forcage operateur : la verification demandee par l exploitant est IMPOSSIBLE.
+    Zero impact production : le banc n ecrit l image machine que sous
+    GVL_Simulation.SimulationModeActive AND SimSafetyActive (PRG_02_Acquisition.st:138).
+
+  acceptance:
+    - id: AC1
+      statement: "Le stimulus de simulation existe avec un defaut a TRUE : au demarrage, le comportement est IDENTIQUE a aujourd hui (le banc simule toujours des phases saines, aucune regression)."
+      verified_by: "Lecture du defaut declare + non-regression du domaine simulation (meme jeu de resultats CI avant/apres)."
+    - id: AC2
+      statement: "Forcer le stimulus a FALSE rend PhaseRotationOk_DI = FALSE dans l image machine simulee, et le retour a TRUE le rend sain a nouveau."
+      verified_by: "Test CI ou trace montrant HwIn.Machine.PhaseRotationOk_DI suivant le stimulus."
+    - id: AC3
+      statement: "Hors SimulationModeActive AND SimSafetyActive, la modification n a AUCUN effet (aucune ecriture de l image machine)."
+      verified_by: "Citation de PRG_02_Acquisition.st:138 + verification que le stimulus n est lu que dans le bloc de simulation du banc."
+    - id: AC4
+      statement: "Bundle complet + diff bundle (objets listes) + G200_check_linkage.py --report PASS (bloc Auto-verification liaison colle) + run_all_gates.py --palier C sans rouge nouveau."
+      verified_by: "Execution des 4 commandes, sorties collees."
+    - id: AC5
+      statement: "Le caractere INJECTABLE est PROUVE par un test ROUGE avant / VERT apres : le test echoue si l injection est debranchee."
+      verified_by: "Test CI (ou test FB sur PhaseRotationOk := FALSE) execute avant et apres modification."
+    - id: AC6
+      statement: "git diff --numstat VIDE sur tout le perimetre forbidden."
+      verified_by: "git diff --numstat."
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/L_SIMULATION/FB_Sim_Safety.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - DOC/WFLOW/ (note d application du lot)
+    forbidden:
+      - CODE/B_AU_SECURITE/**
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/I_TRANSLATION/FB_Safety_Translation.st
+      - CODE/M_MAIN/**
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/**
+      - DOC/AF/**
+      - DOC/STDS/**
+      - PRJ_CODESYS/**
+      - TOOLS/TEST_AUTO_CI/RESULTS/*/tests/**
+
+  conservation:
+    must_survive:
+      - "La logique de securite, les permis, les temporisations moteur/frein et la chaine AU physique restent INTACTS."
+      - "Le comportement par defaut du banc (phases saines) est inchange."
+      - "Le gating SimulationModeActive AND SimSafetyActive reste la seule condition d ecriture de l image machine."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Signaler IMMEDIATEMENT, sans elargir le scope : (1) FB_SimBench.st:691
+    M1_M2_M3_BrakeThermalOk_DI := TRUE est le MEME defaut (defaut thermique freins non injectable
+    en simulation) — le traiter dans un lot dedie ou en extension EXPLICITE, jamais en silence ;
+    (2) toute autre donnee machine ecrite EN DUR dans le banc (rechercher les affectations
+    Machine.<champ>_DI := TRUE/FALSE litterales) ; (3) toute correction qui sortirait du triangle
+    FB_SimBench / FB_Sim_Safety / GVL_Simulation, qui est INTERDITE sans contrat dedie.
+
+status: PENDING
