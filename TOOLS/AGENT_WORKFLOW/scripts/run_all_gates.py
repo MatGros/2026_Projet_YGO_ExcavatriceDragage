@@ -217,15 +217,14 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     # pas entrer dans le bloc de recalage, la mesure doit preceder le recalage, les 5 reperes doivent
     # rester servis, et le cas d'incident doit prouver que la position est RECALEE malgre le temoin.
     ("C", "520", "G520 - Recalage M3 : le temoin d'anomalie ne conditionne jamais la correction (T361)", [sys.executable, f"{S}/G520_check_recalage_anomaly_not_blocking.py", "."]),
-    # T367 - L'acquittement AUTOMATIQUE des defauts latches est un geste SANS appui operateur : il
-    # n'est admissible que dans 2 situations bornees (demarrage a froid apres transitoire d'E/S, et
-    # rearmement AU reellement initie par l'operateur). Le contacteur de puissance PEUT s'engager
-    # sans geste (relachement d'un AU avec maintien repris, chaine fermee, bypass de mise en
-    # service) : le declencheur doit rester une SEQUENCE D'ARMEMENT demarree (front de Step), et la
-    # memoire du geste ne doit JAMAIS etre re-armee par un niveau de sequence. G521 verrouille cet
-    # invariant, le bornage des campagnes (3 impulsions, fenetre de boot) et les 3 preuves CI
-    # (comptage exact, non-masquage d'une cause encore Active, front brut du contacteur sans effet).
-    ("C", "521", "G521 - Acquittement automatique borne, jamais declenche par une entree materielle (T367)", [sys.executable, f"{S}/G521_check_fault_reset_not_hw_triggered.py", "."]),
+    # G521 (acquittement automatique borne et gate, T367) RETIRE DE LA SUITE le 2026-09-22 par
+    # arbitrage humain explicite : le lot T367 qu'il gardait a ete ANNULE ET REVERTE par
+    # l'exploitant le 2026-09-21 (« c'est pas le bon sujet »), donc le bloc des campagnes est
+    # absent du code par DECISION et le gate ne pouvait plus jamais passer — 5e rouge permanent
+    # du palier C (mesure DSH01 : FAIL « l'acquittement automatique n'est plus borne ni gate :
+    # bloc des campagnes introuvable »). Un gate rouge a demeure masquerait un futur vrai rouge.
+    # Le script G521_check_fault_reset_not_hw_triggered.py est CONSERVE sur disque (aucune
+    # suppression) : il redevient pertinent si le sujet est rouvert (cf. T367, phase diagnostic).
     # T371 : le diagnostic mouvement (ST_MotionChecklist) doit refleter le refus REEL de la barriere
     # finale. `Step8_OutputInterlockOk` ne doit JAMAIS etre derive du seul `FinalInterlockError`
     # (alimente par une seule cause, ErrorId bit0 = timeout frein). 4 modes de refus laissaient le
@@ -234,6 +233,15 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     # lecture de l'ETAT publie sur les 3 axes, la conservation de `Step8_OutputInterlockOk`, la
     # publication etat/cause et l'interdiction de toute consommation de CONDUITE (latence N-1).
     ("C", "522", "G522 - Diagnostic mouvement : Step8 ne lit jamais le seul FinalInterlockError (T371)", [sys.executable, f"{S}/G522_check_step8_interlock_not_truncated.py", "."]),
+    # G523 - Un orchestrateur a conclu A TORT a un effacement accidentel en se fondant sur deux
+    # snapshots du gate G390 (marqueurs presents a 10:14, absents a 10:44) SANS lire le catalogue :
+    # or DOC/WFLOW/TASKS.yaml portait, dans le `contexte` de T367, « ENTIEREMENT ANNULEE ET
+    # REVERTEE ... 125 lignes de code non commitees supprimees (git checkout) ». Classe d'erreur
+    # interdite : AGIR (restaurer/ecraser) sur la base de snapshots sans confronter le catalogue et
+    # le registre d'orchestration. G523 verrouille (a) le controle prealable `--task <ID>` qui s'arrete
+    # si un retrait est documente, et (b) le mode gate `--scan` qui refuse d'ecrire dans un fichier
+    # CODE/ modifie dont le catalogue documente un retrait. Aucune ecriture, lecture d'arbres seules.
+    ("C", "523", "G523 - Restauration depuis snapshot : arrete si retrait documente dans le catalogue (REX 2026-09-22)", [sys.executable, f"{S}/G523_check_snapshot_recovery_justified.py", ".", "--scan"]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]
