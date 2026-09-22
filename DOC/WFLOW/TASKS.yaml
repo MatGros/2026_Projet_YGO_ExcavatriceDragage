@@ -514,8 +514,7 @@ tasks:
   agent: DSH30
   locked_at: '2026-09-22T00:17:35+02:00'
   date: '2026-09-22T00:17:35+02:00'
-  titre: 'MAINT_N2 : auditer puis rendre fonctionnels les 6 boutons moteur M1/M2/Both dans les deux sens (patch limite, interlock
-    minimum)'
+  titre: 'MAINT_N2 : restreindre la commande manuelle des treuils par boutons IHM a MAINT_N2 uniquement (inactive en MAINT_N1 + message op ; joystick inchange)'
   contexte: Demande client pour la mise en service. Les six boutons moteur existent dans ST_MaintenanceN2Cmd.st:9-14, mais
     la recherche dans CODE/ ne trouve comme consommateur que ActiveForcing dans PRG_07_Supervision.st:705-710 ; les boutons
     de frein sont, eux, lus par PRG_06_Outputs.st:320-330. T259 reste une livraison historique distincte et T273 une revision
@@ -531,29 +530,18 @@ tasks:
     du mot inconditionnellement.
   - Preparer six essais de simulation puis une recette machine, avec absence de redemarrage automatique et relachement du
     bouton.
-  - 'BC1 : chacun des 6 boutons (BtnM1/BtnM2/BtnBoth Ascent) commande reelement son moteur/sens jusqu a la sortie physique
-    — preuve fichier:ligne de la chaine bouton -> arbitrage -> barriere finale -> sortie pour chaque cas.'
-  - 'BC2 : plancher de securite ACTE par l exploitant le 2026-09-22 : gate mode MAINT_N2 + chaine AU fermee + barriere finale
-    existante — AUCUN ajout homme-mort ni garde frein-seul supplementaire (decision explicite « interlock minimum »).'
-  - 'BC3 : modification LIMITEE, patch chirurgical sur la chaine existante (aucun refactor de matrice de protections) ; git
-    diff --numstat borne sur les seuls fichiers touches, ZERO fichier d architecture refondu.'
-  - 'BC4 : absence de redemarrage automatique apres defaut et relachement du bouton = arret (aucune reprise spontanee).'
-  - 'BC5 : les 6 cas de simulation (M1+, M1-, M2+, M2-, Both+, Both-) + recette machine, avec retour bouton neutre et perte
-    de communication testes.'
-  - 'BC6 : non-regression mecanique : bundle frais + diff bundle + G200 --report PASS 0 erreur + palier C sans rouge nouveau.'
+  - 'BC1 : en MAINT_N1, un bouton treuil IHM (M1/M2 unitaires ou Both) ne produit AUCUN mouvement ; preuve test CI + observation (bouton inert, RunRequest=FALSE).'
+  - 'BC2 : en MAINT_N1, l appui d un bouton treuil affiche un MESSAGE IHM explicite « Commande treuil non disponible en MAINT_N1 — passer en MAINT_N2 ».'
+  - 'BC3 : en MAINT_N2, la commande manuelle existante par boutons fonctionne normalement (comportement actuel conserve, aucun changement de la chaine de mouvement).'
+  - 'BC4 : le JOYSTICK reste inchange et commande les treuils en MAINT_N1 ET MAINT_N2 (nominal, homme-mort + toutes securites) — preuve CI cas joystick N1.'
+  - 'BC5 : AF_Partie-05 (_vX.Y) est mis a jour pour documenter la restriction N1 (spec = code), sinon derogation ecrite.'
+  - 'BC6 : non-regression : git diff VIDE sur FB_Safety_Winch.st, FB_WinchOutputInterlock.st, CODE/B_AU_SECURITE/ ; bundle frais + diff bundle + G200 --report PASS 0 erreur + palier C sans rouge nouveau.'
+  - 'BC7 : modification minimale de la commande EXISTANTE ; aucun nouveau bouton, aucun FB de securite touche, aucun refactor de matrice de protections.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_AUDIT.yaml
   contrat_analyse_conditions: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_DSH_CONDITIONS_EXISTANTES.yaml
   contrat_boutons_code: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_BOUTONS_CODE.yaml
-  updated_at: '2026-09-22T09:22:41+02:00'
-  avancement: '[CADRAGE DSH01 2026-09-22T09:22 — PERIMETRE ELARGI AU LOT CODE SUR ARBITRAGE EXPLOITANT EXPLICITE : « rendre
-    fonctionnels les 6 boutons moteur MAINT_N2 », patch LIMITE, interlock MINIMUM. VERIFICATION HISTORIQUE GIT REALISEE :
-    git log -S "BtnM1Ascent" -> un SEUL commit 3de7547f (preparation structure « sans toucher aux sorties ») : les 6 boutons
-    n ont JAMAIS commande un moteur DANS CE DEPOT — ce n est pas une regression locale mais une commande manuelle jamais cablee
-    ; le souvenir « ils fonctionnaient avant » renvoie a une autre machine/version hors git. PLANCHE DE SECURITE ACTEE : gate
-    MAINT_N2 + chaine AU fermee + barriere finale existante, AUCUN homme-mort ni garde frein-seul supplementaire, AUCUN zero-interlock.
-    Contrat code TASK_CONTRACT_T374_MAINT_N2_BOUTONS_CODE.yaml a ecrire (check_task_contract.py doit PASS). Aucune ligne de
-    CODE/ ecrite par l orchestrateur (read-only). C4-safety : plan technique valide humainement AVANT tout code. VERROU DSH30
-    conserve, agent et statut inchangees.] Phase A lecture seule livree : six boutons moteur sans consommation hors indicateur
+  updated_at: '2026-09-22T10:41:00+02:00'
+  avancement: '[PERIMETRE REVISE PAR L EXPLOITANT 2026-09-22 (CHALLENGE ACCEPTE) : NE PLUS CABLER LES 6 BOUTONS MAINT_N2 — ABANDON de l ancien perimetre « rendre fonctionnels les 6 boutons » (redondant : les boutons manuels existants M1TreuilRetenue/M2TreuilBenne/Commun Both commandent DEJA les treuils en N1/N2 via la branche Mode Boutons, FB_WinchCmdArbitrationM1:68-87). NOUVEAU SCOPE : RESTREINDRE la commande manuelle des treuils par boutons IHM a MAINT_N2 uniquement — en MAINT_N1 les boutons sont INACTIFS (aucun mouvement) avec MESSAGE IHM explicite ; le JOYSTICK reste actif en N1 et N2 ; AF-05 mis a jour. DECISIONS EXPLOITANT 2026-09-22 : (D1) boutons treuil inactifs en N1 ; (D2) joystick reste actif en N1 ; (D3) message operateur explicite si appui bouton en N1 ; (D4) pas de nouveaux boutons, corriger ce qui existe ; (D5) aucun FB de securite modifie. VERROU DSH30 conserve.] Phase A lecture seule livree : six boutons moteur sans consommation hors indicateur
     PRG_07 ActiveForcing ; freins raccordes separement dans PRG_06. Audit durable DOC/WFLOW/AUDITS/DESIGN/AUDIT_T374_MAINT_N2_BOUTONS_MOTEURS_20260922.md.
     Phase suivante confiee a DSH30 : analyse des conditions EXISTANTES selon BRIEF_T374_DSH_CONDITIONS_EXISTANTES.md, read-only,
     sans ajout de garde ni code. Plan code en attente de validation humaine. [MAJ DSH01 2026-09-22T06:27 — EXIGENCE DE MISE
