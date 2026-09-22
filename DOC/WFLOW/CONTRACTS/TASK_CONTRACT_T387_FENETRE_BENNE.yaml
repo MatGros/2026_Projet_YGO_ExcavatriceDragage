@@ -1,0 +1,121 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T387_FENETRE_BENNE
+  criticality: C4            # safety critique, plan humain obligatoire, double revue parallele
+  strategy: patch
+
+  objective: >
+    A la tremie (et partout ou la benne seule bouge avec M1 FIXE), la FERMETURE benne sur place
+    ne doit plus etre bloquee par la butee haute du treuil M2 : fermer la benne = M2 qui se deplace
+    RELATIVEMENT a M1 immobile, sans AUCUN changement d'altimetrie de l'ensemble. Le permis de
+    montee M2 (AscentPermit) doit donc permettre la fermeture benne en position haute, de maniere
+    STRICTEMENT bornee a la manipulation benne (jamais une montee de charge/extraction), en
+    generalisant la butee geometrique relative deja utilisee en jog benne manuel, et en relaxant
+    etroitement le FdC materiel M2 sous 4 verrous. Le timeout [BENNE] ErrorID:03 ne doit plus etre
+    consomme quand la fermeture est refusee par un permis : passage en etat « en attente de permis »
+    (WaitingForOperator) au lieu d'un budget 60 s brule.
+
+  acceptance:
+    - id: AC1
+      statement: "la fermeture benne sur place (tremie/P1, M1 maintenu) ne part plus en timeout ErrorID:03."
+      verified_by: "snapshot pendant fermeture => EffectivePermitBucket_Close = TRUE et M2_RunRequest = TRUE ; OU test CI d'injection du cas."
+    - id: AC2
+      statement: "AscentPermit M2 est relaxe de la butee haute UNIQUEMENT pendant manipulation benne (benne active ET M1 maintenu verifie ET M1 hors montee ET avant CloseReached), jamais en montee de charge/extraction ni en HoldAscentP1AfterClose."
+      verified_by: "code (4 verrous) + test CI qui maintient la butee haute active hors fenetre benne."
+    - id: AC3
+      statement: "le FdC haut MATERIEL sur M1 n'est JAMAIS relaxe (il reste la barriere absolue de M1 epringle au sommet)."
+      verified_by: "code : relaxation M2 only, M1 inchange."
+    - id: AC4
+      statement: "le timeout ErrorID:03 est conserve pour un vrai grippage (permis OK mais aucun mouvement), mais un refus de permis en fermeture benne passe en WaitingForOperator (gel du budget, flag IHM) au lieu de bruler les 60 s."
+      verified_by: "test CI : cas 'permis nul en fermeture' => pas de 03 + signal en attente ; cas 'permis OK, aucun mouvement' => 03 toujours."
+    - id: AC5
+      statement: "aucune regression sur AX10 (fermeture bas), AX11/AX12 (montees en charge), ouverture benne, translation M3, jog benne manuel."
+      verified_by: "CI + gates palier C sans rouge nouveau."
+    - id: AC6
+      statement: "G200 liaison PASS 0 erreur sur le bundle regenere + diff bundle liste les objets touches + palier C sans rouge introduit."
+      verified_by: "generate_codesys_bundle.py + generate_codesys_diff_bundle.py + G200_check_linkage.py --report + run_all_gates.py"
+    - id: AC7
+      statement: "la decision safety (fenetre benne = manipulation seule, M1 fixe, pas d'altimetrie) est TRACEE dans la note d'application et le contrat (revue C4 + arbitrage exploitant 2026-09-22)."
+      verified_by: "DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T387_*.md"
+    - id: AC8
+      statement: "le nom de fichier est egal au nom de POU pour chaque objet CODE/MAIN modifie."
+      verified_by: "PRG_04_Treuils_Benne.st contient PROGRAM PRG_04_Treuils_Benne."
+    - id: AC9
+      statement: "le suffixe du fichier correspond au langage genere dans le bundle."
+      verified_by: "suffixe .st = langage ST lu par le generateur de bundle (G100/G390)."
+    - id: AC10
+      statement: "fix MecaB (T387-001) TACE : 'UncommandedActiveB' ne s'arme plus sur le seul JoystickYNeutral mais sur NOT MovementCommanded (FB_Safety_Winch.st, cause 8) -> plus de faux arret non confirme quand la commande vient des boutons IHM (joystick au neutre). Changement SAFETY explicite du lot, avec non-regression MecaB reelle (un vrai non-arret commande latche toujours)."
+      verified_by: "code FB_Safety_Winch.st cause 8 + test CI T387-001 (ROUGE avant / VERT apres) + non-regression des causes MecaB existantes (TC-P10-002 MecaB)."
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st            # AscentPermit : relaxation etroite M2 sous 4 verrous + fix MecaB T387-001 (cause 8) (SEUL FB de securite touche)
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st                # butee geometrique relative -> AUTO ; calcul+cablage des 4 verrous
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st            # s'assurer relaxation eteinte a CloseReached / pas en HoldAscent
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_safety_winch.st   # test CI du grant (ROUGE avant / VERT apres)
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st          # test CI non-regression fermeture AX15D
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st         # test CI timeout/waiting si necessaire
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T387_FENETRE_BENNE.yaml
+      - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T387_FENETRE_BENNE.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - CODE_XML/
+    forbidden:
+      - CODE/B_AU_SECURITE/**                                # hors FB_Safety_Winch.st (scope allowed ci-dessus)
+      - CODE/H_TREUILS_BENNE/BENNE/FB_WinchOutputInterlock.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Winch.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_BucketCloseThreshold.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/**
+      - CODE/I_TRANSLATION/**                                # translation M3 inchangee
+      - CODE/H_TREUILS_BENNE/FB_Safety_Translation.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Tout Bypass* reutilise comme canal de production (le canal BypassTopLimitSwitch est INTERDIT pour cette fonction)
+
+  conservation:
+    must_survive:
+      - "la butee haute (FdC materiel + logiciel) reste ACTIVE pour M1 pendant toute montee de charge/extraction"
+      - "la butee haute reste active pour M2 HORS manipulation benne"
+      - "le FdC haut materiel M1 reste inchange et non relaxe"
+      - "le timeout ErrorID:03 reste un vrai detecteur de grippage (permis OK + aucun mouvement)"
+      - "AX10/AX11/AX12, ouverture benne, translation M3, jog benne manuel : non regressifs"
+      - "le fix MecaB (T387-001) : MecaB ne s'arme PAS sur un joystick neutre en commande bouton, mais un vrai non-arret COMMANDE latche toujours (non-vacuite)"
+      - "aucun redemarrage automatique apres defaut"
+    dropped_on_purpose:
+      - "le timeout ErrorID:03 ne s'applique plus quand la fermeture est refuse par un PERMIS nul (remplace par WaitingForOperator) - decision exploitant 2026-09-22, borne aux refus de permis, jamais au grippage"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "snapshot ou test CI du cas de fermeture en position haute (preuve AC1)"
+    - "ROUGE avant / VERT apres sur le grant (AC2)"
+
+  models_allowed: []
+
+  alert_duty: >
+    FB_Safety_Winch.st est un fichier de SECURITE : toute ambiguite sur la porte de la fenetre benne,
+    sur le calcul d'AscentPermit, sur le Cablage des 4 verrous ou sur la distinction manipulation benne
+    vs montee de charge est remontee IMMEDIATEMENT a l'orchestrateur, pas a la fin. Signaler n'est pas
+    elargir le scope.
+
+status: PENDING
+
+execution:
+  executed_by: "DSH01"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Plan humain obligatoire (C4) : validation exploitant des 3 arbitrages safety 2026-09-22 (butee geometrique AUTO, FdC M2 sous 4 verrous, WaitingForOperator sur refus de permis) requise avant implementation."

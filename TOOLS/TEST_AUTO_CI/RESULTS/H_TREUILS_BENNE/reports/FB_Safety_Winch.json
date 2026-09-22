@@ -50,14 +50,7 @@
     },
     {
       "name": "TC-P10-006 Meca E bit13 : bit12 non confirme 3s -> escalade PowerCutOff",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.POWERCUTOFF expected TRUE, got FALSE",
-        "file": "test_fb_safety_winch.st",
-        "line": 314,
-        "message": "Escalade bit13 -> PowerCutOff (bit13 dans masque 16#2F84)"
-      }
+      "passed": true
     },
     {
       "name": "TC-P10-007 Meca F : sens mesure oppose a la commande 500ms -> SafeStop SEUL",
@@ -133,11 +126,26 @@
     {
       "name": "TC-P10-053 Limite legale : bypass dedie explicite autorise uniquement le test MAINT_N2",
       "passed": true
+    },
+    {
+      "name": "T387-001 Meca B mode boutons MAINT_N2 : commande bouton (joystick neutre) -> PAS de faux arr\u00eat non confirm\u00e9",
+      "passed": true
+    },
+    {
+      "name": "T387-FB-002 Grant fenetre benne : BucketCloseAscentGrant relaxe ETROITEMENT la butee haute MATERIELLE M2",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_FALSE",
+        "detail": "FB.FAULT.ERROR expected FALSE, got TRUE",
+        "file": "test_fb_safety_winch.st",
+        "line": 747,
+        "message": "Fenetre benne : relaxation du permis uniquement, aucun defaut (grant ne bypass pas les causes)"
+      }
     }
   ],
   "summary": {
-    "total": 19,
-    "passed": 11,
+    "total": 21,
+    "passed": 13,
     "failed": 8
   }
 }

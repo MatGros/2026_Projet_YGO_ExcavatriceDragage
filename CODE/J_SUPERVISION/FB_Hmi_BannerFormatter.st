@@ -1056,7 +1056,13 @@ IF ((BucketErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) 
     AlarmArray[AlarmCount] := '[BENNE] ErrorID:04 - glissement treuil M1'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0010) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] ErrorID:05 - codeurs treuils non references'; AlarmCount := AlarmCount + 1;
+    IF (CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 OR MachineHomingStep > 0)
+        AND EncM1Valid AND EncM2Valid THEN
+        AlarmArray[AlarmCount] := '[BENNE] Referencement en cours - codeurs non references (normal)';
+    ELSE
+        AlarmArray[AlarmCount] := '[BENNE] ErrorID:05 - codeurs treuils non references';
+    END_IF;
+    AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5e. Collecte — synchro M1/M2 (FB_WinchSync.ErrorId)
