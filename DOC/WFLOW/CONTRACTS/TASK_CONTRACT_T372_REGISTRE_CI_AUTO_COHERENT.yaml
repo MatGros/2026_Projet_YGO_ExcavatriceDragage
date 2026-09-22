@@ -1,0 +1,114 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T372 : registre CI auto-coherent (entrees qui ne compilent
+# pas) + rapport .txt ecrit seulement en echec
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Origine : decouverte pendant T371 (verifiee en premiere main par l'orchestrateur DSH29),
+# ravivee le 2026-09-22 par la mesure DSH01 : l'entree WINCH_INTEG (domaine H_TREUILS_BENNE)
+# NE COMPILE PAS sur l'arbre courant -> le domaine treuils est AVEUGLE en CI.
+#
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T372_REGISTRE_CI_AUTO_COHERENT
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Aucune entree du registre CI ne doit pouvoir rester silencieusement
+    non compilable : toute entree en echec doit etre COMPLETEE (ajout des
+    dependances de type manquantes) et un garde-fou doit NOMMER automatiquement
+    toute entree qui ne compile pas, avec les fichiers manquants.
+
+  acceptance:
+    - id: AC1
+      statement: "L'entree WINCH_INTEG compile et rend un resultat de tests (plus d'erreur 'Undefined type'), sur l'arbre courant."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb WINCH_INTEG (exit 0) + rapport frais TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/reports/WINCH_INTEG.txt sans 'Error compiling source files'"
+    - id: AC2
+      statement: "La completion est STRICTEMENT ADDITIVE et cantonnee aux entrees concernees : aucun autre fichier source, aucune suppression, aucun autre contenu d'entree modifie."
+      verified_by: "git diff --numstat TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml (attendu : additions seules, 0 suppression) + git diff detaille"
+    - id: AC3
+      statement: "Scan EXHAUSTIF mesure : chaque entree du registre est testee et la liste des entrees qui ne compilent pas est produite avec, pour chacune, l'entree et les fichiers/types manquants."
+      verified_by: "execution reelle par entree + rapport ecrit sous DOC/WFLOW/ (liste nominative, aucune allowlist, aucune exemption)"
+    - id: AC4
+      statement: "Un garde-fou detecte toute entree registry.yaml qui ne compile pas et NOMME l'entree + les fichiers manquants ; il est non vacue (mutation : retirer une ligne de type d'une entree => FAIL nomme)."
+      verified_by: "gate --selftest avec mutation refusee + PASS sur l'arbre reel ; preuve de non-vacuite exigee"
+    - id: AC5
+      statement: "Aucune modification de CODE/ ni d'un test metier par ce lot."
+      verified_by: "git diff --numstat CODE/ = VIDE + git diff sur TOOLS/TEST_AUTO_CI/RESULTS/*/tests/ = VIDE"
+    - id: AC6
+      statement: "Le rapport .txt d'une entree est ecrit ou clos dans les DEUX cas (succes et echec) : un rapport d'echec perime ne doit plus pouvoir mentir sur une entree qui passe."
+      verified_by: "constat de contenu apres un run vert sur une entree precedemment en echec + test du cas (regeneration ou clôture), sans supprimer l'historique"
+    - id: AC7
+      statement: "Non-regression outillage : liaison G200 --report 0 erreur et palier C sans rouge nouveau (hors dettes preexistantes connues G300/G340/G430/G483)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report + python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - TOOLS/TEST_AUTO_CI/scripts/run_tests.py
+      - TOOLS/TEST_AUTO_CI/scripts/html_report.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - DOC/WFLOW/AUDITS/
+      - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T372_REGISTRE_CI_AUTO_COHERENT.md
+    forbidden:
+      - CODE/**
+      - TOOLS/TEST_AUTO_CI/RESULTS/*/tests/**
+      - TOOLS/TEST_AUTO_CI/MOCKS/**  (sauf ajout strictement necessaire, alors DECLARE et justifie dans la note)
+      - DOC/AF/**
+      - DOC/STDS/**
+      - PRJ_CODESYS/  et  Device.export
+      - ARCHIVES/
+      - Tout commit ou push sans accord explicite
+
+  conservation:
+    must_survive:
+      - "Aucun test metier n'est modifie, desactive ou allege pour faire passer une entree."
+      - "Aucun masquage : pas d'allowlist, pas d'exemption, pas de suppression d'entree du registre."
+      - "L'historique des rapports existants est conserve (aucune suppression automatique d'artefact)."
+      - "Les entrees qui compilent deja restent strictement inchangees."
+    dropped_on_purpose:
+      - "Le silence sur une entree non compilable : une entree qui ne compile plus doit etre visible et nommee."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - "run_tests.py --fb WINCH_INTEG : exit 0 + rapport frais colle"
+    - "liste nominative des entrees en echec (AC3) avec fichiers manquants"
+    - "gate : PASS + --selftest avec mutation refusee (AC4)"
+    - "git diff --numstat : CODE/ VIDE + registry.yaml additif seul (AC2/AC5)"
+
+  models_allowed:
+    - "DSH02 (sous-agent DSH)"
+    - "CDX01"
+    - "AGY01"
+
+  alert_duty: >
+    Tout autre domaine CI aveugle decouvert pendant le lot est SIGNALE immediatement
+    avec sa preuve, sans correction spontanee hors perimetre. Toute entree dont la
+    completion exigerait d'ajouter un MOCK ou de modifier un test metier est remontee
+    a l'orchestrateur AVANT d'agir : ce serait un elargissement de perimetre.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "DSH01 (orchestrateur) pour le HOTFIX AC1/AC2 — 2 lignes additives dans l'entree WINCH_INTEG, autorise explicitement par l'exploitant le 2026-09-22"
+  completed_at: ""
+  status: PENDING
+  summary: >
+    HOTFIX AC1/AC2 applique par l'orchestrateur (autorisation explicite de l'exploitant :
+    « tu peux realiser les modifications ou par agent »), sous la regle imposee par
+    l'exploitant : CHALLENGE + REVUE INDEPENDANTE obligatoires sur le travail, quel que
+    soit l'auteur. AC3/AC4/AC6 restent a produire (perimetre outillage complet de T372).
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    (a remplir apres lecture du git diff reel + rejeu des preuves + synthese des 2 avis independants)

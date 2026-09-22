@@ -1,0 +1,134 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Origine : session de depannage 2026-09-22 (boutons IHM « both » M1+M2 inertes,
+# puis defaut M2 ErrorID:09 MecaB sans message). Diagnostic read-only de
+# l'orchestrateur DSH01, fiche TROUBLESHOOTING_ManuelBoth_Impossible_20260922.md.
+# GO EXPLICITE DE L'EXPLOITANT 2026-09-22 sur le couple fix: + guard:.
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T375_MESSAGES_BLOCAGES_SILENCIEUX
+  criticality: C3
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Aucun refus de mouvement et aucune cause de securite latchee ne doit rester
+    SILENCIEUX pour l'operateur : chaque voie qui bloque un mouvement doit avoir
+    un message nomme, et la validite d'un temoin d'entree doit QUALIFIER une
+    cause (elle ne doit jamais la FAIRE DISPARAITRE).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Un refus du mouvement « both » par le sequencement benne couple publie un message operateur nomme et explicite, et non plus un bouton inerte sans explication."
+      verified_by: "test unitaire FB_Hmi_BannerFormatter (cas : WinchBothMotionBlockedByBucket=TRUE -> message present) + lecture IHM"
+    - id: AC2
+      statement: "Une cause latchee (ex. ErrorMecaB, ErrorID:09) est TOUJOURS publiee dans AlarmArray, meme lorsque le temoin de validite correspondant est FALSE (EncM1Valid/EncM2Valid/LocalIoValid/VarM3Valid) : la validite qualifie le libelle, elle ne supprime pas le message."
+      verified_by: "CI FB_Hmi_BannerFormatter : 2 cas (valid=TRUE et valid=FALSE) ROUGE avant / VERT apres, meme cause nommee"
+    - id: AC3
+      statement: "Aucune regression des messages existants : la liste AlarmArray du cas nominal est identique a la baseline (memes libelles, meme ordre de priorite, meme comptage)."
+      verified_by: "releve de baseline AVANT correctif + comparaison apres (CI + lecture du diff)"
+    - id: AC4
+      statement: "Un garde-fou mecanique nomme G524 refuse tout TERME BLOQUANT du predicat RunRequest (M1 et M2) qui ne serait declare dans aucune table de couverture (message nomme OU derogation documentee), et nomme le terme fautif."
+      verified_by: "G524 --selftest : mutation = ajout d'un terme factice -> FAIL nomme ; arbre reel -> PASS"
+    - id: AC5
+      statement: "Le garde-fou G524 refuse aussi la forme interdite « message nomme masque par un temoin de validite » (motif AND <Valid> dans les conditions d'alarme)."
+      verified_by: "G524 --selftest : mutation = ajout de AND EncM1Valid sur un message -> FAIL nomme"
+    - id: AC6
+      statement: "Aucun rouge nouveau : palier C = les 4 dettes preexistantes connues (G300, G340, G430, G483) et rien d'autre."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+    - id: AC7
+      statement: "Liaison et bundle restent valides : bundle frais, diff bundle des objets touches, G200 --report 0 erreur."
+      verified_by: "generate_codesys_bundle.py + generate_codesys_diff_bundle.py + G200_check_linkage.py --report"
+    - id: AC8
+      statement: "Aucune logique de securite n'est modifiee : git diff --numstat VIDE sur les fichiers de securite et la chaine AU."
+      verified_by: "git diff --numstat CODE/H_TREUILS_BENNE/FB_Safety_Winch.st CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st CODE/H_TREUILS_BENNE/FB_Winch.st CODE/B_AU_SECURITE/ = vide"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G524_check_no_silent_motion_block.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/tests/test_fb_hmi_bannerformatter.st
+      - TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_variables.txt
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/CODE_DiffBundle.xml
+      - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T375_MESSAGES_BLOCAGES_SILENCIEUX.md
+    forbidden:
+      - PRJ_CODESYS/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/B_AU_SECURITE/**
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/**
+      - DOC/AF/**
+      - DOC/STDS/**
+      - ARCHIVES/
+      - Tout commit ou push sans accord explicite distinct du GO
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "L'ordre de priorite des messages existants (AU/puissance > SafeStop > direction > metier) est inchange."
+      - "Aucun champ nouveau dans GVL_IHM ni dans un type associe (IHM figee pour livraison collegue)."
+      - "Aucune modification de la logique de securite, des permis, des interlocks ni de la chaine AU."
+      - "Les messages existants (ErrorID, MecaA..E, Descente/Montee interdite, Acquitter SafeStop, AU) gardent leur libelle."
+      - "La validite des temoins reste EVALUEE et VISIBLE (elle informe), elle ne masque plus."
+    dropped_on_purpose:
+      - "Le masquage silencieux d'une cause latchee par un temoin de validite (comportement actuel : FB_Hmi_BannerFormatter.st:929-930 / :977-978)."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "ROUGE AVANT / VERT APRES sur les cas AC1 et AC2 (assertions fonctionnelles CI, jamais une erreur de compilation presentee comme preuve)"
+    - "G524 --selftest avec mutations refusees + G524 PASS sur l'arbre reel"
+    - "git diff --numstat VIDE sur le perimetre interdit (AC8)"
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "DSH02 (sous-agent DSH, agent principal du lot)"
+    - "AGY01"
+    - "CDX01"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug preexistant,
+    risque hors scope, doute de securite) est remonte IMMEDIATEMENT a
+    l'orchestrateur, pas a la fin et jamais silencieusement. Signaler n'est pas
+    elargir le scope. En particulier : toute AUTRE voie de blocage silencieuse
+    decouverte pendant le lot est SIGNALEE (pas corrigee spontanement).
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Ou on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+# ── 1. Rapport d'execution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    (a remplir par l'agent principal en fin de lot)
+  evidence_submitted: []
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    (a remplir par l'orchestrateur apres lecture du git diff reel et rejeu des preuves)
