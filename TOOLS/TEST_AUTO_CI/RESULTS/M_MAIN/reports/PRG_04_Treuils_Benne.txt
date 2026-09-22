@@ -1,0 +1,6 @@
+Error compiling source files:
+
+FB_Bucket.st:151:39: error: Undefined type 'FB_BUCKETCLOSETHRESHOLD' in FUNCTION_BLOCK 'FB_BUCKET'
+ 151 |     instCloseThreshold              : FB_BucketCloseThreshold;         // * [INST] Seuil d'ouverture benne déclarant la fermeture atteinte
+     |                                       ^
+

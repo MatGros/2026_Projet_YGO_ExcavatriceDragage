@@ -1,7 +1,7 @@
 SETUP
 VAR
     mainMachine : FB_Main_EndToEnd;
-    stepBefore  : E_CycleStep;   // mémoire étape séquenceur pour test relâchement homme-mort
+    stepBefore  : E_AutoCycleStep;   // mémoire étape séquenceur pour test relâchement homme-mort
 END_VAR
 END_SETUP
 
@@ -127,7 +127,7 @@ TEST 'MAIN_GLOBAL : Relachement homme-mort en contexte cycle -> etape sequencage
     );
 
     // 2. Le séquenceur est observé actif (diag e2e) et le mode arbitre est SEMI_AUTO
-    ASSERT_TRUE(mainMachine.CycleStep <> E_CycleStep.X0_PREPARATION, 'Sequenceur sorti de X0 en Semi-Auto');
+    ASSERT_TRUE(mainMachine.CycleStep <> E_AutoCycleStep.AX0_REPOS, 'Sequenceur sorti de X0 en Semi-Auto');
     ASSERT_TRUE(mainMachine.CycleBusy, 'Sequenceur actif (CycleBusy) en Semi-Auto');
     ASSERT_TRUE(mainMachine.BusModes.Mode = E_Mode.SEMI_AUTO, 'Mode SEMI_AUTO arbitre');
     stepBefore := mainMachine.CycleStep;   // mémorise l'étape avant relâchement
@@ -148,7 +148,7 @@ TEST 'MAIN_GLOBAL : Relachement homme-mort en contexte cycle -> etape sequencage
     );
 
     // 4. Pas de retour X0 ni de redémarrage auto au relâchement : l'étape reste « active »
-    ASSERT_TRUE(mainMachine.CycleStep <> E_CycleStep.X0_PREPARATION, 'Pas de retour X0 au relache (pas de redemarrage auto)');
-    ASSERT_TRUE(mainMachine.CycleStep <> E_CycleStep.X1_HOMING OR stepBefore = E_CycleStep.X0_PREPARATION,
+    ASSERT_TRUE(mainMachine.CycleStep <> E_AutoCycleStep.AX0_REPOS, 'Pas de retour X0 au relache (pas de redemarrage auto)');
+    ASSERT_TRUE(mainMachine.CycleStep <> E_AutoCycleStep.AX1_INIT OR stepBefore = E_AutoCycleStep.AX0_REPOS,
                 'Pas de regression vers le demarrage de cycle');
 END_TEST

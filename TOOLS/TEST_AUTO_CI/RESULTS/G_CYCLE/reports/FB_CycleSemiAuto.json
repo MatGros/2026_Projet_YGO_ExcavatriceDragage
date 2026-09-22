@@ -31,7 +31,7 @@
       "passed": true
     },
     {
-      "name": "T331-001 AX15b repli : ouverture neutralisee puis fermeture benne et remontee couplee M1+M2",
+      "name": "T331-001 AX15d micro-step benne : tirer ouvre le module, pousser ouvrir, relacher retour AX15B",
       "passed": true
     },
     {
@@ -39,7 +39,7 @@
       "passed": true
     },
     {
-      "name": "T331-003 AX15b repli : perte du geste, de l homme-mort ou defaut interrompt sans reprise",
+      "name": "T331-003 AX15d micro-step : perte du geste, de l homme-mort ou defaut neutralise sans reprise",
       "passed": true
     },
     {
@@ -105,7 +105,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 886,
+        "line": 858,
         "message": "Etabli en AX4_DESCEND_DIVING"
       }
     },
@@ -116,7 +116,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 1034,
+        "line": 1006,
         "message": "Etabli en AX4_DESCEND_DIVING"
       }
     },
@@ -127,7 +127,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 1122,
+        "line": 1094,
         "message": "Etabli en X4"
       }
     },
@@ -138,7 +138,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 1213,
+        "line": 1185,
         "message": "Etabli en X4"
       }
     },
@@ -153,7 +153,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.TRANSLATIONCMD.REQSTART expected TRUE, got FALSE",
         "file": "test_fb_cyclesemiauto.st",
-        "line": 1382,
+        "line": 1354,
         "message": "X2 : translation vers cible commandee"
       }
     },

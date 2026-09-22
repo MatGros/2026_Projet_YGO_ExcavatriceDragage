@@ -1,10 +1,10 @@
 Error compiling source files:
 
-FB_Bucket.st:151:39: error: Undefined type 'FB_BUCKETCLOSETHRESHOLD' in FUNCTION_BLOCK 'FB_BUCKET'
- 151 |     instCloseThreshold              : FB_BucketCloseThreshold;         // * [INST] Seuil d'ouverture benne déclarant la fermeture atteinte
-     |                                       ^
+E_AutoCycleStep.st:47:3: error: Expected `RParen`, found identifier `AX15D_DUMP_BUCKET_JOG`.
+  47 |   AX15D_DUMP_BUCKET_JOG := 23  (* Module benne sur place a la tremie (T383) : le geste ouvre, l'inverse ferme, neutre = stop ; retour AX15B au relachement *)
+     |   ^
 
-FB_TestHarness_PRG_07.st:26:31: error: Undefined type 'ST_SAFETY_EMERGENCY_STATE' in FUNCTION_BLOCK 'FB_TESTHARNESS_PRG_07'
-  26 |     EmergencyState          : ST_Safety_Emergency_State;
-     |                               ^
+E_AutoCycleStep.st:47:25: error: Expected `Colon`, found `:=`.
+  47 |   AX15D_DUMP_BUCKET_JOG := 23  (* Module benne sur place a la tremie (T383) : le geste ouvre, l'inverse ferme, neutre = stop ; retour AX15B au relachement *)
+     |                         ^
 
