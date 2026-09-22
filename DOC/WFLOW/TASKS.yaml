@@ -1,4 +1,25 @@
 tasks:
+- id: T384
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: PILOTAGE / CATALOGUE / TRACABILITE
+  agent: '—'
+  date: '2026-09-22T09:39:32+02:00'
+  updated_at: '2026-09-22T09:39:32+02:00'
+  titre: 'Pilotage — RECONCILIER le catalogue et les contrats : 91 contrats sur disque SANS entree au catalogue (dont T169-A C4 VALIDATED, T180, T175, T181-xx)'
+  contexte: 'MESURE DSH01 2026-09-22 : DOC/WFLOW/CONTRACTS contient 238 fichiers de contrat (213 identifiants distincts) ; 122 identifiants ONT une entree dans DOC/WFLOW/TASKS.yaml et 91 N EN ONT PAS. Echantillon des orphelins : T084, T086, T088, T089, T090, T119, T121, T122, T127, T129, T138, T140, T147, T148, T164-4, T166, T167, T168, T168-C, T168-D, ... et surtout la famille TREUILS/T181 : T169-A (contrat TASK_CONTRACT_T169-A_HARNESS_TESTS_CYCLES_CI.yaml, criticality C4, status VALIDATED), T175 (TASK_CONTRACT_T175.yaml + T175-01/02), T180, T181-00/00b/01/02_03/05/06/07/08/09/10/11/12/13/14/15/16/19/20/21/23. CONSEQUENCE MESUREE, ET C EST LA RAISON DE CETTE TACHE : le harnais CI WINCH_INTEG reference des cibles qui N EXISTENT PLUS au catalogue — messages du harnais : « HARN-74b (Meca B 3 s -> T178), HARN-80/81 (T180 CAS-001/012 -> T181-01/T175) », assertion « HARN-80: CAS-001 detecte (defaut Error, cible T180) », et le cas convergent « T169-A S3 ». Impossible donc de trancher si une attente du harnais est encore EXIGEE (contrat C4 VALIDATED sur disque) ou PERIMEE, sans passer par les contrats orphelins. Le fait que T169/T175/T180/T181-xx apparaissent dans DOC/WFLOW/ARCHIVES/TASKS_SNAPSHOT_20260915/TASKS_20260915_234600.yaml (T180 ligne 3197, T181-00b ligne 3312, T181-01 ligne 3332) mais PLUS dans le catalogue courant montre une PERTE D ENTREES lors d un refactor/renumerotation, pas une suppression volontaire documentee. REGLE DU PROJET EN JEU : le catalogue est presente partout comme LA source de verite du pilotage (AGENTS.md, skill task-planner) — il est ici INCOMPLET d environ 43 pour cent des contrats existants.'
+  description: 'Reconcilier les deux sources, dans les DEUX sens, sans rien supprimer : (1) pour chacun des 91 identifiants orphelins, produire une ligne de diagnostic — contrat present, entree catalogue absente : tache encore OUVERTE (a recreer au catalogue avec son statut/criticite/agent lus DANS le contrat) ou tache CLOSE/ABANDONNEE (a tracer comme telle, avec le motif) ; (2) dans l autre sens, lister les entrees de catalogue qui declarent un contrat ABSENT du disque ; (3) verifier que les identifiants cites par les harnais CI (T169-A, T175, T180, T181-xx) ont une trace de leur etat reel, car ils conditionnent le triage des echecs de WINCH_INTEG. AUCUNE suppression, AUCUN deplacement de contrat : c est un travail de RECONCILIATION et de trace, pas de nettoyage. Ne pas fusionner avec T378 (qui traite l abandon de 4 artefacts T367) ni avec T379 (validite des registres et criticite inversee) : sujets voisins, perimetres distincts.'
+  objectifs:
+  - 'AC1 : la liste des 91 identifiants orphelins est produite avec, pour chacun, son etat reel (OUVERT / CLOS / ABANDONNE) et la source de cet etat (champ du contrat ou mention explicite).'
+  - 'AC2 : toute tache encore ouverte retrouve une entree au catalogue, avec son statut, sa criticite et son agent lus dans son contrat — rien n est invente.'
+  - 'AC3 : les entrees de catalogue declarant un contrat absent du disque sont listees (sens inverse), avec fichier:ligne.'
+  - 'AC4 : aucun contrat supprime, deplace ou renomme ; la reconciliation est purement additive et documentaire.'
+  - 'AC5 : le cas T169-A / T180 (CAS-001) est explicitement tranche : l exigence est-elle encore en vigueur (contrat C4 VALIDATED) ou perimee ? Conclusion tracee, car elle conditionne le triage du harnais WINCH_INTEG.'
+  - 'AC6 : un garde-fou est propose (detecter tout contrat sans entree catalogue et toute entree catalogue sans contrat) — regle fix: + guard: — sans l implementer dans ce lot si l arbitrage le reporte.'
+  contrat: 'A ECRIRE avant toute ecriture (C2, obligatoire)'
+  avancement: '[CADRAGE DSH01 2026-09-22T09:39 — TACHE CREEE SUR MESURE, AUCUNE ECRITURE DE RECONCILIATION FAITE.] ORIGINE : le triage des 27 echecs WINCH_INTEG a bute sur des cibles introuvables au catalogue (T180 CAS-001, T181-01, T175, T169-A S3) ; la mesure des contrats a revele 91 orphelins. PREUVE INDEPENDANTE QUI CORROBORE LE TRIAGE : le snapshot du 2026-09-15 (ARCHIVES/TASKS_SNAPSHOT_20260915/TASKS_20260915_234600.yaml:3320) porte deja « Audit T181-00b : oracles durcis a 32/32 rouges, mais rouges majoritairement causes par le banc » — les echecs de WINCH_INTEG etaient donc CONNUS et attribues au BANC depuis le 15/09 ; l entree ne compilant plus, ils etaient simplement INVISIBLES. AUCUN COMMIT, AUCUN PUSH.'
+  bloque_par: []
 - id: T383
   parent_id: T331
   statut: ⬜
