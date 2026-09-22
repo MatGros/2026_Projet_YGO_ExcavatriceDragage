@@ -1,4 +1,24 @@
 tasks:
+- id: T375
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: TRANSLATION / VARIATEUR AC600 / BUS
+  agent: DSH31
+  locked_at: '2026-09-22T19:56:19+02:00'
+  date: '2026-09-22T19:56:19+02:00'
+  titre: 'Emettre le mot 7 (reset AC600) par le bus EtherCAT - acquittement du defaut variateur translation M3'
+  contexte: 'Ecart spec-vs-code trouve le 2026-09-22 en audit de la chaine d acquittement : le mot 7 (reset AC600, registre PDO 0x3101) est DOCUMENTE dans AF_Partie-11_Fonction_Translation/FB_Translation_v1.1.md §7 (valeur 7 = Reset) et dans FB_TranslationOutputInterlock_v1.1.md §5-6, MAIS n est JAMAIS EMIS par le code : CODE/I_TRANSLATION/FB_Translation.st:323-329 ne produit que 0/1/2 (IF PhysicalTremie / ELSIF PhysicalMaintenance / ELSE 0), jamais 7. FB_TranslationOutputInterlock.st:142-143 fait un pass-through (ELSIF RequestedDriveControlWord = 7 THEN DriveControlWord := 7) mais ne recoit jamais 7. Consequence machine : si le variateur AC600 se met en defaut (DriveStatusWord.4 = 1), le PLC efface son propre latch applicatif mais le variateur RESTE en defaut car le reset physique par bus n est jamais envoye -> reset manuel au variateur ou coupure alim obligatoires. Blocage terrain non acquittable par bus.'
+  description: 'Ajouter l emission du mot 7 (reset AC600) dans FB_Translation.st : sur front Reset (ResetEdge.Q), emettre RequestedDriveControlWord := 7 QUASI SANS CONDITION (decision humaine 2026-09-22 : meme sans defaut AC600 actif), pendant une impulsion temporisee ~100 ms puis retomber a 0. Seule regle de non-regression : jamais pendant un mouvement 1/2 et frequence nulle. Le mot 7 traverse ensuite naturellement FB_TranslationOutputInterlock (pass-through existant) et sort sur EtherCAT via PRG_06_Outputs.st:458 (M3_CommandWord). Aucun changement de conduite motrice nominale 0/1/2, jamais de redemarrage automatique. MAPPING PDO AC600 (source Device_IO_*.csv) : OUT 0x3101 Command=%QW6 M3_CommandWord (0/1/2/7), OUT 0x3100 Frequency=%QW7 M3_SetpointFrequencyHz (x100), IN 0x3102 Drive Status=%IW8 M3_StatusWord (bits lus bit0/bit4), IN C00.01 Output Frequency=%IW9 M3_ActualFrequencyHz (x100). Aucune modif du mapping CODESYS (geste manuel hors scope).'
+  objectifs:
+  - 'FB_Translation.st emet RequestedDriveControlWord := 7 sur front Reset (ResetEdge.Q), quasi sans condition (meme sans defaut AC600), temporise ~100 ms puis retour a 0.'
+  - 'Le mot 7 traverse la barriere FB_TranslationOutputInterlock (pass-through) et sort sur M3_CommandWord / PDO 0x3101.'
+  - 'Non-regression : mouvement nominal 0/1/2 et Reset applicatif inchange (git diff montre uniquement la region d emission du 7).'
+  - 'Aucun redemarrage automatique, frequence nulle pendant/apres le 7, et jamais de bascule 7->1/2 pendant l impulsion.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T375_MOT7_RESET_AC600.yaml
+  avancement: 'Aucun fichier CODE/ touche a cet instant. Contrat C2 en cours de redaction.'
+  bloque_par:
+  - ''
 - id: T374
   parent_id: ''
   statut: ⏳

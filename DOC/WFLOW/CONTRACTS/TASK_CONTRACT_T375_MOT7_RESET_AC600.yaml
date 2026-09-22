@@ -1,0 +1,146 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+# T375 — Emission du mot 7 (reset AC600) par le bus EtherCAT
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T375_MOT7_RESET_AC600
+  criticality: C2            # C0 | C1 | C2 | C3 | C4
+  strategy: patch            # patch | rebuild   (axe independant de la criticite)
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Permettre l'acquittement du defaut du variateur AC600 de la translation M3
+    par le bus EtherCAT : le PLC doit emettre le mot 7 (reset AC600, PDO 0x3101)
+    quasiment sans condition sur un front Reset (ResetEdge.Q), afin de lever un
+    defaut cote variateur, au lieu de n'effacer que son propre latch applicatif
+    et de laisser le variateur bloque. Le 7 est emis meme sans defaut AC600 actif
+    (decision humaine), en impulsion temporisee ~100 ms puis retour a 0.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  # Decision humaine 2026-09-22 (DSH31/T375) : le mot 7 est emis QUASI SANS
+  # CONDITION sur front Reset (ResetEdge.Q), independamment de la presence d'un
+  # defaut AC600 actif. Seule regle de non-regression : jamais en mouvement 1/2.
+  acceptance:
+    - id: AC1
+      statement: "Sur front montant de Reset (ResetEdge.Q), FB_Translation emet RequestedDriveControlWord := 7, sans condition sur DriveStatusWord.4 ni DriveFaultLatching (reset quasiment inconditionnel)."
+      verified_by: "Test CI FB_Translation (harnais I_TRANSLATION) : injecter front Reset sans et avec defaut variateur, relever RequestedDriveControlWord = 7 dans les deux cas."
+    - id: AC2
+      statement: "L'emission du 7 est temporisee (~100 ms) puis retombe a 0 (impulsion, jamais un niveau maintenu)."
+      verified_by: "Test CI : compter les scans ou RequestedDriveControlWord = 7 (duree cible) puis retour a 0 apres la fenetre d'impulsion."
+    - id: AC3
+      statement: "Le mot 7 traverse la barriere FB_TranslationOutputInterlock (pass-through existant : .st:142-143) et sort sur M3_CommandWord / PDO 0x3101 via PRG_06_Outputs.st:458."
+      verified_by: "G200_check_linkage.py --report + test CI interlock (RequestedDriveControlWord = 7 -> DriveControlWord = 7)."
+    - id: AC4
+      statement: "Non-regression stricte du mouvement nominal : RequestedDriveControlWord reste limite a 0/1/2 hors impulsion de reset (aucun changement des branches PhysicalTremie / PhysicalMaintenance)."
+      verified_by: "git diff de FB_Translation.st limite a la region d'emission du 7 + CI existante I_TRANSLATION toujours verte."
+    - id: AC5
+      statement: "Aucun redemarrage automatique apres un defaut et frequence nulle (RequestedDriveFreqHz = 0.0) pendant et apres l'emission du 7. Le 7 ne leve jamais BrakeReleaseRequest et ne produit jamais un mot de mouvement 1/2 seul."
+      verified_by: "Test CI : verifier que le 7 n'autorise aucune commande de mouvement et que la frequence reste nulle."
+    - id: AC6
+      statement: "Si un mouvement est commande pendant la fenetre du 7, la priorite reset tient : tant que l'impulsion du 7 est active, RequestedDriveControlWord reste 7 (ne bascule pas a 1/2), puis le mouvement reprend apres retour a 0."
+      verified_by: "Test CI : front Reset suivi immediatement d'une consigne mouvement -> 7 pendant la fenetre puis bascule a 1/2 apres."
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:                 # fichiers que la tache PEUT modifier
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T375_MOT7_RESET_AC600.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - DOC/AF/AF_Partie-11_Fonction_Translation/FB_Translation_v1.1.md
+      - CODE_XML/
+    forbidden:               # explicitement hors scope — ne pas y toucher
+      - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st   # pass-through 7 deja present, aucune modif
+      - CODE/M_MAIN/PRG_06_Outputs.st                          # sortie M3_CommandWord deja cablee :458
+      - CODE/M_MAIN/PRG_05_Translation.st                      # publication demande non touchee
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+      - toute IHM / GVL_IHM / GVL_PERSISTENT / nouvelle variable de position
+
+  # ── 3bis. Reference materielle — mots PDO variateur AC600 (source : Device_IO_*.csv) ──
+  # Mapping physique EtherCAT de l'AC600 translation M3. Le mot 0x3101 (command)
+  # est le seul ecrit par ce lot (valeur 7 = reset). La SEMANTIQUE des bits du
+  # StatusWord (0x3102) n'est PAS documentee dans le projet (T110/T300/T369).
+  pdo_mapping:
+    command_mot:              # OUT / commande — le seul modifie par T375
+      - {registre: "0x3101 Command", variable: "M3_CommandWord", pdo: "%QW6", sens: OUT, role: "Mot de commande (0=None,1=Fwd,2=Rev,7=Reset)"}
+    consigne_freq:
+      - {registre: "0x3100 Frequency", variable: "M3_SetpointFrequencyHz", pdo: "%QW7", sens: OUT, role: "Consigne frequence variateur, echelle x100"}
+    mot_etat:
+      - {registre: "0x3102 Drive Status", variable: "M3_StatusWord", pdo: "%IW8", sens: IN, role: "Mot d'etat retourne par le variateur (bits lus uniquement : bit0 et bit4 documentes usage, sémantique a confirmer)"}
+    freq_reelle:
+      - {registre: "C00.01 Output Frequency", variable: "M3_ActualFrequencyHz", pdo: "%IW9", sens: IN, role: "Frequence reelle mesuree (lecture, a diviser par 100 en Hz)"}
+  pdo_notes: >
+    Bits 0-15 de chaque mot mappes bit a bit dans CODESYS (Command: %QX12-QX13 /
+    %QW6, Frequency: %QX14-QX15 / %QW7, Drive Status: %IX16-IX17 / %IW8, Output
+    Frequency: %IX18-IX19 / %IW9 — cf. ARCHIVES/Tools/AGENT_WORKFLOW/config/
+    Device_IO_20260917.csv). Aucune modification du mapping CODESYS dans ce lot
+    (geste manuel I/O mapping hors scope).
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  # OBLIGATOIRE si strategy = rebuild. Ecrit AVANT toute suppression de lien.
+  conservation:
+    must_survive:            # comportements/donnees a preserver imperativement
+      - "Mouvement nominal 0/1/2 (FWD/REV) de FB_Translation inchange."
+      - "Comportement du Reset applicatif (front ResetEdge.Q efface DriveFaultLatching et BrakeTimeoutAck)."
+      - "Frequence nulle pendant tout reset variateur et jamais de redemarrage auto."
+    dropped_on_purpose:      # abandonne sciemment — decision humaine, tracee
+      - "Aucun abandon ; on AJOUTE l'emission du 7 (comportement manquant, jamais presente)."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison"
+    - run_all_gates          # resultat des gates
+    - bundle                 # CODE_XML/CODE_Bundle.xml regenere
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    ALERTE OUVERTE 2026-09-22 (decision humaine) : (a) la duree d'impulsion du
+    mot 7 (~100 ms) est un DEFAULT PROVISOIRE non valide constructeur ; (b) le
+    reset est envoye QUASI SANS CONDITION (meme sans defaut AC600 actif), ce qui
+    envoie une commande de reset a un variateur potentiellement sain a chaque
+    front Reset machine ; a valider constructeur / terrain que cela est sans
+    consequence (n'a pas d'effet destructeur sur les parametres, pas de coupure
+    moteur parasite). La semantique reelle du reset AC600 n'est pas documentee
+    dans le projet (T110, T300, T369). Ces inconnues ne bloquent pas
+    l'implementation logicielle (bornee par test CI) mais interdisent une
+    declaration de fidelite terrain. Tout autre ecart constate en cours de route
+    est remonte IMMEDIATEMENT a l'orchestrateur, jamais silencieusement.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: "..."         # Ex: sonnet-5 (antigravity)
+  completed_at: "..."        # Timestamp ISO (ex: 2026-08-12T06:27:00+02:00)
+  status: PENDING            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []     # Preuves clés (ex: "run_all_gates: PASS", "linkage: PASS")
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: "..."        # Ex: Claude Code (Orchestrateur)
+  validated_at: "..."        # Timestamp ISO
+  notes: >
+    Contrat C2 actualise le 2026-09-22 (DSH31) : decision humaine modifiee — le
+    reset est envoye QUASI SANS CONDITION sur front Reset (ResetEdge.Q), meme
+    sans defaut AC600 actif, en impulsion temporisee ~100 ms puis retour a 0.
+    Seule regle de non-regression : jamais en mouvement 1/2, frequence nulle.
+    Aucun fichier CODE/ touche. Validation humaine du plan technique obligatoire
+    avant la premiere ligne de code (workflow standard).
