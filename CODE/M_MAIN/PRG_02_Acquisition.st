@@ -333,6 +333,8 @@ instSimBench(
     PowerCutOffRequest       := PRG_06_Outputs.Data.PowerCutOffRequest,
     // 🧪 Contrôle granulaire de la chaîne AU : bit opérateur (GVL_Simulation.SimChainOk).
     SimChainOkBit            := GVL_Simulation.SimChainOk,
+    // 🧪 Stimulus défaut rotation de phases : TRUE = phases saines, FALSE = défaut.
+    SimPhaseRotationOkBit    := GVL_Simulation.SimPhaseRotationOk,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     SimWinchCoast_M          := GVL_Simulation.SimWinchCoast_M,
     SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,

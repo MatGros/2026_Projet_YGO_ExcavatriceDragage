@@ -28,6 +28,10 @@ VAR_GLOBAL
     SimTranslationActive        : BOOL := FALSE; // M3 : AC600, fréquence, 5 capteurs et frein
     SimOperatorActive           : BOOL := FALSE; // Joystick : bus CANopen, axes RawX/RawY et homme-mort brut
     SimSafetyActive             : BOOL := FALSE; // AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs
+    // 🧪 Stimulus défaut rotation de phases : TRUE = phases réseau saines (comportement
+    // nominal, identique au codage en dur d'avant ce lot) ; FALSE = inverse/coupe les phases
+    // (PhaseRotationOk_DI = FALSE dans l'image machine simulée). Inopérant hors simulation.
+    SimPhaseRotationOk          : BOOL := TRUE;
 
     // ↔️ STIMULI TRANSLATION M3 — override manuel du mot capteurs, sinon modèle dynamique.
     // Bit4=Trémie, bit3=PV, bit2=PVP2, bit1=P1, bit0=Maintenance ; 16#07 = position P2 (00111).
