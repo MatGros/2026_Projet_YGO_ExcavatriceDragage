@@ -1,4 +1,133 @@
 tasks:
+- id: T381
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: CYCLE_SEMI_AUTO / MOUVEMENT / IHM
+  agent: '—'
+  date: '2026-09-22T08:46:28+02:00'
+  updated_at: '2026-09-22T08:46:28+02:00'
+  titre: 'Rapide — passer le defaut de TglAutoDiveM2Step5Trial a TRUE (1) : profil de plongee M2 palier 5 en AX4..AX7 arme au demarrage a froid'
+  contexte: 'DEMANDE EXPLOITANT 2026-09-22 : « CycleSemiAuto.Cmd.TglAutoDiveM2Step5Trial = 1 par defaut ». ETAT ACTUEL MESURE : CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st:15 TglAutoDiveM2Step5Trial : BOOL := FALSE; (commentaire du DUT : « Essai T291-A : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. NON persiste. »). CHAINE COMPLETE TRACEE : producteur = COMMANDE IHM GVL_IHM.CycleSemiAuto.Cmd (un seul ecrivain du champ, aucun bridge PERSISTENT ne le restaure — verifie par grep) -> PRG_03_Modes_Cycle.st:278 CfgAutoDiveM2Step5Trial := GVL_IHM.CycleSemiAuto.Cmd.TglAutoDiveM2Step5Trial -> FB_CycleSemiAuto.st:102 (VAR_INPUT Cfg) -> :1058 AutoDiveM2Step5TrialLatched := CfgAutoDiveM2Step5Trial (CAPTURE AU DEPART DE PLONGEE, figee jusqu a la sortie AX4..AX7) -> :418 DiveM2StepTgt := SEL(AutoDiveM2Step5TrialLatched, CST_StepDive, CST_StepDiveM2Trial) avec CST_StepDive := 4 (:274, « M1 reste palier 4 ») et CST_StepDiveM2Trial := 5 (:275, « M2 seul peut viser le palier 5 ») -> :419 AutoDiveM1Step4M2Step5Active -> PRG_04:669 DescentStep45Permit et PRG_06_Outputs.st:360 -> PRG_07:887 CycleAutoDiveM2Step5Active + GVL_Troubleshooting.G_CycleSemiAuto.Idx309_AutoDiveM2Step5Active. EFFET FONCTIONNEL DU PASSAGE A TRUE : en SEMI_AUTO, pendant la plongee AX4..AX7, M2 vise le PALIER 5 au lieu du palier 4, M1 restant au palier 4 (profil asymetrique de l essai T291-A).'
+  description: 'Changement MINIMAL : passer le defaut du champ a TRUE dans ST_CycleCmd.st:15, mettre a jour le commentaire du DUT (il ne doit plus dire « Essai » si ce n est plus un essai), ecrire la note d application qui trace la decision, et prouver le comportement par la CI existante FB_CycleSemiAuto + une preuve de valeur au demarrage a froid. AUCUN autre champ de ST_CycleCmd ne doit bouger (diff attendu : 1 ligne de code + le commentaire). Aucune ligne de FB_CycleSemiAuto.st (la logique de selection existe deja), aucune ligne de GVL_IHM.st.'
+  objectifs:
+  - 'AC1 : ST_CycleCmd.st porte TglAutoDiveM2Step5Trial : BOOL := TRUE ; preuve : grep + git diff --numstat (1 ligne modifiee, aucun autre defaut du DUT touche).'
+  - 'AC2 : au demarrage a froid, GVL_IHM.CycleSemiAuto.Cmd.TglAutoDiveM2Step5Trial vaut TRUE ; preuve : lecture en ligne CODESYS ou snapshot (aucune restauration PERSISTENT ne doit l ecraser).'
+  - 'AC3 : en SEMI_AUTO AX4..AX7 avec le flag arme, DiveM2StepTgt = 5 (CST_StepDiveM2Trial) et AutoDiveM1Step4M2Step5Active = TRUE ; M1 reste au palier 4 ; preuve CI FB_CycleSemiAuto (cas de test) avec ROUGE avant / VERT apres si un cas est ajoute.'
+  - 'AC4 : l operateur peut DESACTIVER le flag a l IHM et le comportement revient au profil historique (DiveM2StepTgt = 4) ; le champ reste une COMMANDE IHM, jamais un forcage automate.'
+  - 'AC5 : non-regression mecanique : bundle frais + diff bundle + G200 --report PASS 0 erreur + palier C sans nouveau rouge (seules les dettes connues).'
+  - 'AC6 : la decision est TRACEE : note d application ecrite, commentaire du DUT aligne, et mention explicite du fait que l essai T291-A devient un DEFAUT DE PRODUCTION (ou refus ecrit de l exploitant).'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T381_AUTODIVE_M2_STEP5_DEFAUT.yaml
+  avancement: '[CADRAGE DSH01 2026-09-22T08:46 — TACHE C3 CREEE AVEC CONTRAT, AUCUNE LIGNE ECRITE.] QUATRE ALERTES PORTEES AU CONTRAT, A TRANCHER AVANT TOUTE ECRITURE : (1) ST_CycleCmd.st est un DUT partage par l IHM (GVL_IHM.CycleSemiAuto : ST_CycleHMI) : changer un defaut change la valeur de depart pour TOUTE machine, pas seulement celle du banc — et un gel de la table IHM a ete impose au lot T367 le 2026-09-21 (« aucune touche a GVL_IHM ni a ses types ») : ce gel doit etre explicitement DECONFIRME par l exploitant, ou le lot est arrete. (2) Sémantique : le champ est NON persiste et AUCUN bridge PERSISTENT ne le restaure (verifie par grep) ⇒ le defaut vaut a CHAQUE demarrage a froid et l operateur peut le desactiver ; a confirmer que l intention est « arme par defaut » et non « toujours actif ». (3) Le commentaire du DUT dit « Essai T291-A » : passer le defaut a TRUE TRANSFORME UN ESSAI EN COMPORTEMENT DE PRODUCTION — decision a assumer et a tracer, pas a glisser en une ligne. (4) Effet DIFFERE : AutoDiveM2Step5TrialLatched est capture au DEPART de plongee (FB_CycleSemiAuto:1058) et fige jusqu a la sortie AX4..AX7 ⇒ le changement s applique au PROCHAIN cycle de plongee, jamais en cours de plongee. LIEN : T291-B (⏳ C4, AGY01, « Position M2 corrigee continue, puis autorite M1 en Both AX12 ») appartient a la meme famille d essai — verifier qu aucune decision deja prise la-bas ne contredit ce defaut.'
+  bloque_par: []
+- id: T376
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: SECURITE / TREUILS / DIAGNOSTIC / SIMULATION
+  agent: '—'
+  date: '2026-09-22T06:22:09+02:00'
+  updated_at: '2026-09-22T06:22:09+02:00'
+  titre: 'MecaB ErrorID:09 (arret non confirme) sur M2 en SIMULATION apres manoeuvre : instrumenter et trancher ARTEFACT DE BANC vs DEFAUT REEL'
+  contexte: 'Symptome exploitant 2026-09-22 : « quelques secondes apres montee pour descente [M2] ErrorID:09 - MecaB - arret non confirme apres stop », en simulation. CONDITION EXACTE, lue sur source : FB_Safety_Winch.st:341-350 UncommandedActiveB := JoystickYNeutral AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback) ; TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout) ; PostRampTimeout := T#3s (FB_Safety_Winch.st:49) ; instCauses[8] = ErrorID 09 = Absence confirmation arret contacteurs/frein (Meca B). Le latch tombe donc quand, manche au neutre, l arret n est PAS confirme pendant 3 s : soit FwdRevSpeedFeedbackOff=FALSE (retour de vitesse encore present), soit BrakeFeedback=TRUE (frein encore desserre). SUSPECTS COTES BANC, A MESURER ET NON TRANCHES : FB_SimBench.st:77 SimWinchBrakeCloseDelayS := 0.0 par defaut, mais :251/:295 WinchBrakeCloseDelayEffectiveS := SEL(SimWinchDynamicsActive, 0.0, SimWinchBrakeCloseDelayS) et :438/:465 la fermeture du frein M1/M2 est TEMPORISEE ; GVL_Simulation.st:99 SimWinchBrakeCloseDelayS := 0.09 ; le retour contacteurs est INSTANTANE au banc (FB_SimBench.st:448-450 NOT (RelayFwd OR RelayRev OR SpeedContactor_1..4)). Un desaccord entre ces delais de banc et le PostRampTimeout de 3 s produirait un MecaB FAUX en simulation. Ne pas confondre avec T375 : T375 traite le MASQUAGE du message (EncM2Valid) ; ici on cherche POURQUOI la cause est apparue.'
+  description: 'Phase 1 READ-ONLY obligatoire : instrumenter et mesurer, ne rien corriger. Rejouer la sequence (manoeuvre M2 puis arret au neutre) en relevant SIMULTANEMENT MecaBElapsedTime (FB_Safety_Winch.st:98/:347 — ecoule du TON, LE temoin decisif), FwdRevSpeedFeedbackOff, BrakeFeedback, M2_ContactorsReleased_DI, M2_BrakeIsOpen_DI, WinchBrakeCloseDelayEffectiveS et SimWinchDynamicsActive. Comparer MecaBElapsedTime a PostRampTimeout (3 s) : si l ecoule atteint 3 s alors que le frein se ferme JUSTE APRES, c est un ARTEFACT DE BANC ; si l arret ne se confirme JAMAIS, c est un defaut REEL (valable aussi sur machine). Phase 2 selon verdict, sous contrat revise et GO humain explicite : soit rendre le modele de banc fidele (delais coherents avec le temps de retombee reel), soit corriger la cause reelle. INTERDIT : affaiblir le controle MecaB (cause de securite latchee) ou contourner la confirmation d arret.'
+  objectifs:
+  - 'Relever MecaBElapsedTime, FwdRevSpeedFeedbackOff, BrakeFeedback et les retours M2 pendant et apres une manoeuvre M2 en simulation.'
+  - 'Trancher par preuve : artefact de banc (fermeture frein plus lente que PostRampTimeout) ou defaut reel (arret non confirme sans cause de banc).'
+  - 'Rendre le verdict avec fichier:ligne et valeurs mesurees, sans modifier une seule ligne de CODE/ en phase 1.'
+  - 'Si artefact de banc : proposer le correctif du modele de banc sous contrat revise, jamais un contournement du controle de securite.'
+  bloque_par: []
+- id: T377
+  parent_id: T364
+  statut: ⬜
+  criticite: C3
+  domaine: CYCLE_HOMING / SECURITE_REFERENCEMENT
+  agent: '—'
+  date: '2026-09-22T06:22:09+02:00'
+  updated_at: '2026-09-22T06:22:09+02:00'
+  titre: 'HOMING N1 MANUEL : rendre obligatoire le homing non reference en MAINT_N1 (lot PREPARE mais INVISIBLE au catalogue — 2 contrats deja ecrits)'
+  contexte: 'DEUX contrats existent sur disque depuis le 2026-09-22 mais AUCUNE entree de catalogue ne les portait : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_SPEC_AF04_HOMING.yaml (01:04) et DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_HOMING_N1_MANUAL_TOP.yaml (C3, strategy rebuild, AC1..AC8, 02:22). Ce dernier declarent au scope CODE/G_CYCLE/FB_CycleMachineHoming.st, CODE/G_CYCLE/_TYPES/E_MachineHomingTxState.st, CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleMachineHomingCmd.st, CODE/M_MAIN/PRG_02_Acquisition.st, PRG_03_Modes_Cycle.st, PRG_07_Supervision.st, CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st, le test CI test_fb_cyclemachinehoming.st et DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.4.md ; models_allowed CDX01. Son AC1 : « MachineHomed faux conduit au cycle HX en MAINT_N1 ; aucune commande de cycle normal n est autorisee ». Objectif fonctionnel : preparation benne sous homme-mort, approche manuelle COUPLEE M1/M2 au palier 1 SANS montee automatique au capteur haut, validation visuelle explicite par BtnValidateTopPosition, puis referencement atomique. ETAT ACTUEL DU CODE : le homing machine est accessible en MAINT_N2 UNIQUEMENT (PRG_03_Modes_Cycle.st:427, :431, :455) ; la montée HX2 exige DeadmanArmed AND JoystickPull (FB_CycleMachineHoming.st:233-235) ; BtnValidateTopPosition n existe pas encore. Ce lot est donc un CHANTIER PREPARE mais NON IMPLEMENTE, et le verrou T364/AGY01 (pose 2026-09-21T07:38) est la seule protection de ce perimetre : il a ete laisse EN PLACE volontairement par l orchestrateur.'
+  description: 'Prendre en charge le lot prepare : verifier que les 2 contrats sont COMPLETS et non contradictoires, arbitrer avec l exploitant ce qui releve de T364 (refonte deja livree, commit bb9436e1) et de ce nouveau lot, fixer id/criticite/agent/verrou, puis ecrire le contrat definitif (check_task_contract.py doit PASSER) AVANT toute ligne de code. Ne rien fusionner avec T364 sans accord : T364 est clos (statut ✅) et son verrou AGY01 est vif. AUCUNE ecriture CODE/ avant GO humain explicite sur le plan.'
+  objectifs:
+  - 'Les 2 contrats existants sont lus, leur perimetre compare a l etat reel du code, et toute contradiction ou recouvrement est nomme avec fichier:ligne.'
+  - 'Un contrat definitif unique est valide par check_task_contract.py (PASS 0 erreur) avant toute implementation.'
+  - 'id, criticite, agent et verrou du lot sont tranches avec l humain ; le sort du verrou T364/AGY01 est explicite (conserve ou libere).'
+  - 'Aucune ligne de CODE/ ecrite avant le GO humain sur le plan.'
+  bloque_par: []
+- id: T378
+  parent_id: ''
+  statut: ⬜
+  criticite: C1
+  domaine: DOC / WFLOW / TRAÇABILITE
+  agent: '—'
+  date: '2026-09-22T06:22:09+02:00'
+  updated_at: '2026-09-22T06:22:09+02:00'
+  titre: 'Hygiene doc : marquer l ABANDON des 4 artefacts du lot T367 annule (aucune suppression) + requalifier l entree T367-ARBITRAGE-DOCTRINE'
+  contexte: 'Le lot T367 (acquittement automatique des defauts latches) a ete ANNULE ET REVERTE sur decision humaine du 2026-09-21 (cf. contexte de T367 dans ce catalogue). Quatre artefacts de ce lot RESTENT sur disque SANS AUCUNE MARQUE D ABANDON : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T367_ACQ_AUTO_BOOT_ET_REARM.yaml, DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T367_REARMEMENT_ACQUITTEMENT.yaml, DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T367_ACQ_AUTO_BOOT_ET_REARM.md, DOC/WFLOW/CONTRACTS/BRIEF_T367_DIAGNOSTIC_DEFAUTS_BOOT.md. Le catalogue les declare abandonnes, les fichiers ne le disent pas : un agent qui les ouvre aujourd hui peut croire le contrat vivant (c est la classe d erreur qui a produit la fausse alerte de perte de lot du 2026-09-22). Par ailleurs l entree de registre T367-ARBITRAGE-DOCTRINE (statut termine) reste valide sur le fond (separation acquitter/rearmer = doctrine ecrite) mais son arbitrage « canal V2 sequenceur PLC » est TOMBE avec la fusion annulee : a requalifier ou archiver. REGLE APPLICABLE : AUCUNE SUPPRESSION AUTOMATIQUE — un agent detecte et signale, il n efface pas ; toute suppression est une decision humaine explicite.'
+  description: 'Ajouter une marque d abandon EN TETE de chacun des 4 artefacts (bandeau d avertissement daté, motif humain verbatim, renvoi vers l entree T367 du catalogue) sans supprimer ni deplacer aucun fichier. Requalifier l entree T367-ARBITRAGE-DOCTRINE (mention d abandon partiel + motif) dans le registre. Verifier ensuite qu aucun lien documentaire ne pointe vers ces artefacts comme vivants (G340).'
+  objectifs:
+  - 'Les 4 artefacts portent une marque d abandon lisible, datée, motivee, avec renvoi vers le catalogue — texte ajoute en tete, aucune suppression.'
+  - 'Aucun fichier supprime, deplace ou desindexe par ce lot.'
+  - 'L entree T367-ARBITRAGE-DOCTRINE est requalifiee ou sa requalification est refusee avec un motif ecrit par l humain.'
+  - 'G340 rejoue : aucune erreur nouvelle imputable a ce lot.'
+  bloque_par: []
+- id: T379
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: OUTILLAGE / PILOTAGE / QUALITE
+  agent: '—'
+  date: '2026-09-22T06:22:09+02:00'
+  updated_at: '2026-09-22T06:22:09+02:00'
+  titre: 'Pilotage : le registre des VERROUS TASK_LOCKS.json n est PAS versionne (gitignore) + table de criticite INVERSEE dans la skill orchestrator — fix + guard'
+  contexte: 'DEUX DEFAUTS DU PILOTAGE, mesures le 2026-09-22. (1) DOC/WFLOW/TASK_LOCKS.json est ignore par Git (.gitignore:102) : le registre qui porte l AUTORITE D ECRITURE des agents sur les fichiers n est ni relisible en revue de diff, ni reconstituable, ni auditable apres coup. Consequence vecue : des verrous perimes survivent des jours (T367/DSH26 est reste vif sur un lot annule depuis 20 h, libere a la main le 2026-09-22) et 7 verrous sont detenus par un acteur em-dash donc SANS PROPRIETAIRE (T358, T262, T331, T347, T345, T352, T361). ARBITRAGE REQUIS, aucune supposition : soit versionner le fichier (et gerer les conflits d ecriture multi-acteurs), soit documenter explicitement pourquoi il reste local et comment il est sauvegarde. (2) La table de criticite de TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md:124 ecrit « C0 = critique, C4 = mineure », INVERSE de la source canonique TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md:142-146 et :236-240 (« C4 = safety critique, plan humain obligatoire, Ponytail interdit »). Le defaut est signale depuis le 2026-09-21 (alerte A1 de T224) et TOUJOURS PAS CORRIGE : une criticite mal lue fausse le phasage et le niveau de preuve exige. REGLE fix: + guard: : une correction documentaire sans garde-fou est insuffisante.'
+  description: 'A1 corriger la table de criticite de la skill orchestrator pour la rendre conforme a la source canonique (WORKFLOW.md), avec renvoi explicite vers cette source au lieu d une recopie. A2 garde-fou automatique : un controle mecanique compare l echelle de criticite de la skill a celle de WORKFLOW.md et ECHOUE en cas de divergence (plus toute divergence future du meme type), avec --selftest. A3 arbitrer et executer le sort de TASK_LOCKS.json (versionner ou documenter + proceder de sauvegarde), sans jamais masquer un chemin par .gitignore. Aucune modification de CODE/ ni d un gate metier par ce lot.'
+  objectifs:
+  - 'La table de criticite de la skill orchestrator est identique a la source canonique, ou pointe dessus sans la recopier ; preuve : les 2 references citees ligne a ligne.'
+  - 'Un garde-fou refuse mecaniquement toute divergence ulterieure entre la skill et WORKFLOW.md ; preuve : --selftest avec mutation (echelle inversee volontaire) = FAIL nomme.'
+  - 'Le sort de TASK_LOCKS.json est tranche par l humain et execute (versionne, ou motif ecrit + procedure de sauvegarde) ; aucun chemin masque par .gitignore.'
+  - 'Inventaire nominatif des verrous sans proprietaire (acteur em-dash) et des verrous poses sur des taches deja ✅, avec proposition de liberation — sans toucher aux verrous vifs dont le proprietaire est identifie.'
+  bloque_par: []
+- id: T380
+  parent_id: ''
+  statut: ⬜
+  criticite: C1
+  domaine: OUTILLAGE / DIAGNOSTIC
+  agent: '—'
+  date: '2026-09-22T06:22:09+02:00'
+  updated_at: '2026-09-22T06:22:09+02:00'
+  titre: 'Snapshot troubleshooting : l outil annonce « 1 KO » SANS JAMAIS NOMMER la variable — rendre les chemins KO nominatifs + rapport'
+  contexte: 'Mesure du 2026-09-22 : le snapshot troubleshooting a rendu « Variables lues : 535 / 536 · Variables en KO : 1 (chemins perimes ou non trouves dans CODESYS) · Repli individuel : 1 lot(s), 100 variable(s) reevaluee(s) » MAIS SANS NOMMER LA VARIABLE. Controle independant de l orchestrateur sur le CSV final : 536 valeurs pour 536 variables declarees, 0 ligne vide, 0 separateur manquant, 0 doublon — le CSV est donc COMPLET et le KO etait TRANSITOIRE, resolu par le repli individuel. Le defaut reel est dans l OUTIL : il affiche un compteur d echec sans jamais donner le nom du chemin fautif, ce qui rend l action demandee par son propre message (« verifier les chemins KO apres Clean & Rebuild CODESYS ») IMPOSSIBLE a executer. Consequence : un KO permanent et legitime (chemin vraiment perime dans la liste) resterait invisible indefiniment, et l exploitant ne peut pas distinguer un KO transitoire d un chemin casse.'
+  description: 'Rendre le diagnostic nominatif : lister explicitement les chemins KO (nom complet de la variable), les distinguer TRANSITOIRE (resolu par le repli) de PERMANENT (jamais resolu), et ecrire ces informations dans un rapport horodate a cote du CSV (sans ecraser l historique). Aucune modification du contenu des listes de variables par ce lot (la liste troubleshooting_variables.txt reste du ressort de T375 pour les temoins de validite).'
+  objectifs:
+  - 'La sortie de l outil NOMME chaque variable en KO (chemin complet), et distingue transitoire de permanent.'
+  - 'Un rapport horodate est ecrit a cote du CSV et ne remplace aucun artefact existant.'
+  - 'Cas de repli : un KO transitoire resolu par le repli n est plus compte comme echec sans explication.'
+  - 'Non-regression : le compte « variables lues / declarees » reste exact et aucune variable n est perdue du CSV.'
+  bloque_par: []
+- id: T375
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: SUPERVISION / IHM / DIAGNOSTIC / SECURITE
+  agent: '—'
+  date: '2026-09-22T06:10:20+02:00'
+  updated_at: '2026-09-22T06:10:20+02:00'
+  titre: 'Defauts et refus SILENCIEUX : 3 voies de blocage sans message operateur (sequencement benne couple, causes latchees masquees par un temoin de validite, SafeStop de demande) + garde-fou anti-silence'
+  contexte: 'Diagnostic DSH01 2026-09-22 (session : boutons IHM both M1+M2 inertes, puis defaut M2 ErrorID:09 MecaB sans message). TROIS voies silencieuses prouvees sur source. (1) SEQUENCEMENT BENNE COUPLE : ST_CommunCfg.st:29 TglEnableCoupledBucketSequencing := TRUE par defaut -> FB_BucketCmdArbitration.st:49-53 WinchBothDiveBucketOpenArmed -> PRG_04:396 WinchBothMotionBlockedByBucket := ... AND NOT instBucket.Lifecycle.Busy -> PRG_04:510 -> FB_WinchCmdArbitrationM1.st:118 (et M2:144) RunRequest := FALSE. Le bandeau n a AUCUN message pour ce refus : la famille [TREUIL] Descente/Montee interdite (FB_Hmi_BannerFormatter.st:727-756) ne couvre que les refus de PERMIS. Bouton inerte, zero explication (cas vecu par l exploitant). (2) MASQUAGE PAR TEMOIN DE VALIDITE (le plus grave) : les messages NOMMES sont conditionnes a un temoin de validite : FB_Hmi_BannerFormatter.st:929-930 (M1) et :977-978 (M2) IF ...ErrorMecaB AND EncM2Valid THEN AlarmArray[...] := ErrorID:09 MecaB ; idem MecaD (:935/:983) avec LocalIoValid, MecaC/MecaE avec EncM1Valid AND EncM2Valid, et M3 avec VarM3Valid (:1003+). Or EncM2Valid := NOT TofFaultEncM2.Q (:250) alimente par NOT Network.EncoderM2.Operational AND NetworkSurveillanceActive (TOF 1,5 s, :238). CONSEQUENCE : quand un codeur n est pas Operational, la cause latchee MecaB DISPARAIT du bandeau — exactement le cas ou l exploitant en a le plus besoin (T338 et T342 sont des dossiers codeur M2 ouverts). (3) SAFESTOP DE DEMANDE : le bandeau agrege les DEFAUTS (PRG_07:587-597 AnyFaultActive = .Safety.Error / .State.Error) et non l etat SafeStopActive ; un refus « demande de mouvement sans permis » (FB_Winch EffectiveSafeStop inclut ReqX AND NOT XPermit) n a qu un message generique (FB_Hmi_BannerFormatter.st:717-721 Acquitter SafeStop). CONSTAT DE DIAGNOSTIC JOINT : les temoins qui masquent (Network.EncoderMx.Operational, EncMxValid) NE SONT PAS dans la liste de snapshot TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_variables.txt (verifie : 0 occurrence) — l exploitant ne peut donc meme pas voir le masque.'
+  description: 'Trois axes, un seul lot (meme famille : information operateur d un blocage). A1 correctif du MASQUAGE (prioritaire) : une cause latchee doit TOUJOURS etre publiee ; la validite du temoin QUALIFIE le libelle (ex. cause non confirmee : codeur M2 non valide) au lieu de supprimer le message. A2 message operateur nomme pour le refus par sequencement benne couple, avec l action a faire (desactiver le sequencement benne couple, ou mettre la benne dans l etat exige). A3 GARDE-FOU mecanique G524 : tout terme bloquant du predicat RunRequest (M1 et M2), le bloqueur benne et SafeStop doivent etre declares dans une table de couverture (message nomme OU derogation documentee) ; un terme non declare = FAIL nomme. Le gate refuse AUSSI la forme interdite « message nomme masque par un temoin de validite ». Aucune modification de logique de securite : le lot touche l IHM et l outillage seulement.'
+  objectifs:
+  - 'AC1 : le refus par sequencement benne couple publie un message operateur nomme (test unitaire + observation IHM).'
+  - 'AC2 : une cause latchee (MecaB ErrorID:09) est publiee MEME si EncM2Valid/LocalIoValid/VarM3Valid est FALSE ; 2 cas de test (valid TRUE et FALSE), ROUGE avant / VERT apres.'
+  - 'AC3 : zero regression des messages existants (baseline AlarmArray identique : libelles, ordre de priorite).'
+  - 'AC4 : G524 refuse tout terme bloquant non declare (nomme le terme fautif) ; --selftest avec mutation.'
+  - 'AC5 : G524 refuse la forme « message nomme masque par un temoin de validite » ; --selftest avec mutation.'
+  - 'AC6 : palier C sans aucun rouge nouveau (seules les 4 dettes G300/G340/G430/G483).'
+  - 'AC7 : bundle frais + diff bundle + G200 --report PASS 0 erreur.'
+  - 'AC8 : git diff --numstat VIDE sur FB_Safety_Winch.st, FB_WinchOutputInterlock.st, FB_Winch.st et CODE/B_AU_SECURITE/ (aucune logique de securite modifiee).'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T375_MESSAGES_BLOCAGES_SILENCIEUX.yaml
+  avancement: '[CADRAGE DSH01 2026-09-22T06:10 — CONTRAT ECRIT ET VALIDE AVANT TOUTE DELEGATION : check_task_contract.py PASS 0 erreur / 0 avertissement (criticite C3, strategie patch). ORIGINE : session de depannage du meme jour, fiche DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_ManuelBoth_Impossible_20260922.md — c est l exploitant qui a trouve la condition du refus both (desactiver le sequencement benne auto) ; l orchestrateur a verifie la chaine sur source et identifie le masquage par temoin de validite. GO EXPLICITE DE L EXPLOITANT sur le couple fix: + guard:. PERIMETRE : IHM/diagnostic + outillage uniquement, logique de securite INTERDITE (AC8). Aucune ligne de CODE/ ecrite par l orchestrateur (read-only). CRITICITE C3 PROPOSEE (aucune modification de logique safety, mais visibilite d etat de securite) — a confirmer en un mot, ou a elever en C4 si la visibilite safety est jugee critique.]'
+  bloque_par: []
 - id: T374
   parent_id: ''
   statut: ⏳
@@ -17,7 +146,8 @@ tasks:
   - 'Preparer six essais de simulation puis une recette machine, avec absence de redemarrage automatique et relachement du bouton.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_AUDIT.yaml
   contrat_analyse_conditions: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_DSH_CONDITIONS_EXISTANTES.yaml
-  avancement: 'Phase A lecture seule livree : six boutons moteur sans consommation hors indicateur PRG_07 ActiveForcing ; freins raccordes separement dans PRG_06. Audit durable DOC/WFLOW/AUDITS/DESIGN/AUDIT_T374_MAINT_N2_BOUTONS_MOTEURS_20260922.md. Phase suivante confiee a DSH30 : analyse des conditions EXISTANTES selon BRIEF_T374_DSH_CONDITIONS_EXISTANTES.md, read-only, sans ajout de garde ni code. Plan code en attente de validation humaine.'
+  updated_at: '2026-09-22T06:27:00+02:00'
+  avancement: 'Phase A lecture seule livree : six boutons moteur sans consommation hors indicateur PRG_07 ActiveForcing ; freins raccordes separement dans PRG_06. Audit durable DOC/WFLOW/AUDITS/DESIGN/AUDIT_T374_MAINT_N2_BOUTONS_MOTEURS_20260922.md. Phase suivante confiee a DSH30 : analyse des conditions EXISTANTES selon BRIEF_T374_DSH_CONDITIONS_EXISTANTES.md, read-only, sans ajout de garde ni code. Plan code en attente de validation humaine. [MAJ DSH01 2026-09-22T06:27 — EXIGENCE DE MISE EN SERVICE ENREGISTREE, PRIORITE QUALIFIEE PAR L EXPLOITANT.] VERBATIM : « A la fin de la mise en service il faut que les commandes manuelles fonctionnent mais ce n est pas la priorite absolue du jour ... c etait pour voir vite fait. » CONSEQUENCE DE PLANIFICATION : l exigence est FERME (les commandes manuelles DOIVENT fonctionner a la fin de la MES) mais elle n est PAS la priorite du jour — la session de depannage du 2026-09-22 etait un ESSAI EXPLORATOIRE, pas l ouverture du lot. AUCUN lot code ne doit donc etre ouvert sur T374 sans arbitrage explicite de priorite. CE QUE CETTE EXIGENCE ENGAGE, DEJA PROUVE : (a) les SIX boutons moteur MAINT_N2 ne commandent AUCUN moteur aujourd hui (audit Phase A du meme jour : seul lecteur ActiveForcing, PRG_07_Supervision.st:705-710) — l exigence est donc AUJOURD HUI NON SATISFAITE par construction ; (b) les boutons de frein, eux, SONT raccordes et proteges (PRG_06_Outputs.st:320-331, gate MAINT_N2 + chaine AU fermee + contacteur engage) ; (c) la commande manuelle COUPLEE en N1/N2 est refusee SANS MESSAGE quand le sequencement benne automatique est actif et la benne pas dans l etat exige (ST_CommunCfg.st:29 -> FB_BucketCmdArbitration.st:49-53 -> PRG_04:396 -> FB_WinchCmdArbitrationM1.st:118) : c est le defaut traite par T375, et cela explique une partie du « ca ne marche pas » ressenti en essai ; (d) la manoeuvre a finalement FONCTIONNE via la simulation du joystick, ce qui confirme que la chaine de mouvement est saine et que le point ouvert est l IHM/les conditions, pas la mecanique. QUESTION DE SPEC A TRANCHER AVANT LA RECETTE : avec le sequencement benne auto ACTIF (defaut TRUE), quel est le comportement EXIGE du bouton both — refus explicite accompagne d un message et d une action a faire (option T375), ou fonctionnement inconditionnel du bouton ? La reponse change la matrice de tests MAINT_N2.'
   bloque_par: []
 - id: T371
   parent_id: ''

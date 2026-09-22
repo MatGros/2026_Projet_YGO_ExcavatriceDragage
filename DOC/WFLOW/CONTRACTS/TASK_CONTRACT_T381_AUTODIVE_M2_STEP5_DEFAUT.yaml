@@ -1,0 +1,117 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Demande exploitant 2026-09-22 : « CycleSemiAuto.Cmd.TglAutoDiveM2Step5Trial = 1 par defaut ».
+# Tache qualifiee RAPIDE par l'exploitant, mais C3 (MOUVEMENT : palier de descente en cycle auto)
+# donc contrat OBLIGATOIRE avant toute ecriture.
+#
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T381_AUTODIVE_M2_STEP5_DEFAUT
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Au demarrage a froid, le profil de plongee de l'essai T291-A est ARME par defaut :
+    en SEMI_AUTO, pendant la plongee AX4..AX7, M2 vise le palier 5 (au lieu du palier 4)
+    tandis que M1 reste au palier 4. Le champ reste une COMMANDE IHM que l'operateur
+    peut desactiver a tout moment.
+
+  acceptance:
+    - id: AC1
+      statement: "ST_CycleCmd.st porte TglAutoDiveM2Step5Trial : BOOL := TRUE, et AUCUN autre defaut du DUT n'est modifie."
+      verified_by: "grep du champ + git diff --numstat (attendu : 1 ligne de code + le commentaire)"
+    - id: AC2
+      statement: "Au demarrage a froid, GVL_IHM.CycleSemiAuto.Cmd.TglAutoDiveM2Step5Trial vaut TRUE."
+      verified_by: "lecture en ligne CODESYS ou snapshot apres demarrage a froid ; verifier qu'aucune restauration PERSISTENT ne l'ecrase"
+    - id: AC3
+      statement: "En SEMI_AUTO AX4..AX7 avec le flag arme : DiveM2StepTgt = 5 (CST_StepDiveM2Trial) et AutoDiveM1Step4M2Step5Active = TRUE ; M1 reste au palier 4 (CST_StepDive)."
+      verified_by: "CI FB_CycleSemiAuto (cas de test) + relevé de GVL_Troubleshooting.G_CycleSemiAuto.Idx309_AutoDiveM2Step5Active ; ROUGE avant / VERT apres si un cas est ajoute"
+    - id: AC4
+      statement: "L'operateur peut DESACTIVER le flag a l'IHM et le comportement revient au profil historique : DiveM2StepTgt = 4. Le champ reste une commande IHM, jamais un forcage automate."
+      verified_by: "cas de test avec CfgAutoDiveM2Step5Trial = FALSE + observation IHM"
+    - id: AC5
+      statement: "Aucune regression : bundle frais + diff bundle + G200 --report 0 erreur + palier C sans rouge nouveau (hors dettes preexistantes connues G300/G340/G430/G483)."
+      verified_by: "generate_codesys_bundle.py + generate_codesys_diff_bundle.py + G200_check_linkage.py --report + run_all_gates.py --palier C"
+    - id: AC6
+      statement: "La decision est TRACEE : note d'application ecrite, commentaire du DUT aligne sur la realite (le mot « Essai » disparait ou est justifie), et le passage ESSAI -> DEFAUT DE PRODUCTION est explicite."
+      verified_by: "lecture de la note + du commentaire ; verification qu'une decision de refus eventuelle de l'exploitant est aussi ecrite"
+
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/CODE_DiffBundle.xml
+      - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T381_AUTODIVE_M2_STEP5_DEFAUT.md
+    forbidden:
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/  (tout AUTRE DUT IHM ; seul ST_CycleCmd.st est autorise)
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st   (la logique de selection existe deja : aucune ligne)
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/B_AU_SECURITE/**
+      - DOC/AF/**
+      - DOC/STDS/**
+      - PRJ_CODESYS/  et  Device.export
+      - ARCHIVES/
+      - Tout commit ou push sans accord explicite
+
+  conservation:
+    must_survive:
+      - "Le champ reste une COMMANDE IHM : l'operateur doit pouvoir le desactiver, et sa desactivation doit rendre le profil historique (palier 4)."
+      - "Le profil historique par defaut du cycle est connu et restaurable : CST_StepDive = 4 (FB_CycleSemiAuto.st:274)."
+      - "M1 reste au palier 4 pendant AX4..AX7 quel que soit l'etat du flag (l'asymetrie est voulue : seul M2 monte au palier 5)."
+      - "La capture du profil reste FAITE AU DEPART de plongee et FIGEE jusqu'a la sortie AX4..AX7 (FB_CycleSemiAuto.st:1058) : aucun changement de palier en cours de plongee."
+      - "Aucun autre champ de ST_CycleCmd ne change de valeur par defaut."
+    dropped_on_purpose:
+      - "Le statut d'ESSAI du profil T291-A : il devient le defaut de production — decision exploitant du 2026-09-22, a tracer explicitement."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "git diff --numstat : 1 seule ligne de code modifiee dans ST_CycleCmd.st"
+    - "preuve de valeur au demarrage a froid (AC2)"
+    - "ROUGE avant / VERT apres sur AC3 si un cas CI est ajoute"
+
+  models_allowed:
+    - "DSH02 (sous-agent DSH, agent principal du lot)"
+    - "CDX01"
+    - "AGY01"
+
+  alert_duty: >
+    A REMONTER AVANT TOUTE ECRITURE, ET A TRANCHER PAR L'EXPLOITANT — quatre points identifies
+    par l'orchestrateur : (1) GEL IHM. ST_CycleCmd.st est le DUT porte par GVL_IHM.CycleSemiAuto
+    (GVL_IHM.st:15) : changer un defaut change la valeur de depart pour TOUTE machine. Un gel de
+    la table IHM a ete impose au lot T367 le 2026-09-21 (« aucune touche a GVL_IHM ni a ses
+    types ») : ce gel doit etre explicitement DECONFIRME, sinon le lot s'arrete. (2) SEMANTIQUE.
+    Le champ est NON persiste et aucun bridge PERSISTENT ne le restaure : le defaut vaut a chaque
+    demarrage a froid et l'operateur peut le desactiver — confirmer « arme par defaut » et non
+    « toujours actif ». (3) NATURE DU CHANGEMENT. Le commentaire dit « Essai T291-A » : passer le
+    defaut a TRUE transforme un essai en comportement de PRODUCTION ; c'est une decision a
+    assumer, pas une ligne a glisser. (4) EFFET DIFFERE. Le profil est capture au depart de
+    plongee : le changement s'applique au PROCHAIN cycle, jamais en cours de plongee.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    (a remplir par l'agent principal)
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    (a remplir par l'orchestrateur apres lecture du git diff reel et rejeu des preuves)
