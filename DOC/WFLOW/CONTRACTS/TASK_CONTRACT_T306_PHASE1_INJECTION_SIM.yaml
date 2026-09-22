@@ -26,7 +26,10 @@ contract:
       verified_by: "Execution des 4 commandes, sorties collees."
     - id: AC5
       statement: "Le caractere INJECTABLE est PROUVE par un test ROUGE avant / VERT apres : le test echoue si l injection est debranchee."
-      verified_by: "Test CI (ou test FB sur PhaseRotationOk := FALSE) execute avant et apres modification."
+      verified_by: "Test CI (ou test FB sur PhaseRotationOk := FALSE) execute avant et apres modification. MUTATION OBLIGATOIRE pour la preuve : relancer avec l injection NEUTRALISEE et montrer l ECHEC du nouveau cas, puis avec l injection CABLEE et montrer son SUCCES."
+    - id: AC8
+      statement: "Le fichier de test autorise exceptionnellement (TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_safety.st) est modifie de facon STRICTEMENT ADDITIVE : aucune assertion pre-existante modifiee ni supprimee, et la liste PASS/FAIL des cas pre-existants reste IDENTIQUE."
+      verified_by: "git diff --numstat sur ce fichier : uniquement des ajouts (0 suppression) ; comparaison de la liste des cas PASS/FAIL avant/apres, hors le nouveau cas."
     - id: AC6
       statement: "git diff --numstat VIDE sur tout le perimetre forbidden."
       verified_by: "git diff --numstat."
@@ -40,6 +43,7 @@ contract:
       - CODE/L_SIMULATION/FB_Sim_Safety.st
       - CODE/L_SIMULATION/GVL_Simulation.st
       - "CODE/M_MAIN/PRG_02_Acquisition.st : UNE SEULE ligne de cablage ajoutee, immediatement a cote du cablage existant du patron (SimChainOkBit := GVL_Simulation.SimChainOk, ~ligne 335) — extension de perimetre DOCUMENTEE du 2026-09-22 apres arret et question de l'agent d'implementation. Justification PROUVEE : sans ce chainon, le stimulus GVL_Simulation reste ORPHELIN (aucun lecteur) et l'AC2 est MATERIELLEMENT impossible ; FB_SimBench est une brique reduite a 0 lecture GVL (gate encapsulation_check), il ne peut donc pas lire la GVL lui-meme."
+      - "TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_safety.st : extension de perimetre DOCUMENTEE du 2026-09-22 (arbitrage orchestrateur) pour couvrir l'AC5 (preuve ROUGE/VERT de l'injectabilite). Ce fichier est le SEUL lu par le runner pour l'entree FB_Sim_Safety. GARDE-FOUS IMPERATIFS : (a) modification STRICTEMENT ADDITIVE — aucune assertion existante modifiee ni supprimee (le diff sur ce fichier ne doit comporter QUE des lignes ajoutees) ; (b) un cas de test NOUVEAU dedie a l'injection du defaut (TC SimPhaseRotationOkBit) ; (c) preuve ROUGE/VERT par MUTATION : injection neutralisee => le nouveau cas ECHOUE, injection cablee => il PASSE ; (d) la liste PASS/FAIL des cas pre-existants doit rester IDENTIQUE (aucun affaiblissement). Option ECARTEE : un test jetable hors RESULTS (preuve non perenne, non rejouable) et le report de l'AC5 en phase 3 (reviendrait a accepter une injection non prouvee, soit la classe de defaut meme que T306 corrige)."
       - DOC/WFLOW/ (note d application du lot)
     forbidden:
       - CODE/B_AU_SECURITE/**
@@ -51,7 +55,7 @@ contract:
       - DOC/AF/**
       - DOC/STDS/**
       - PRJ_CODESYS/**
-      - TOOLS/TEST_AUTO_CI/RESULTS/*/tests/**
+      - "TOOLS/TEST_AUTO_CI/RESULTS/*/tests/** (HORS TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_safety.st, seule exception autorisee ci-dessus, strictement additive)"
 
   conservation:
     must_survive:
