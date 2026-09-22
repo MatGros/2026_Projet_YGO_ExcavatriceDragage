@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T08:44:53.451754" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T08:44:53.451754">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-22T16:13:20.415721" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-22T16:13:20.415721">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -9763,10 +9763,10 @@ Réserve minimale FDC logiciel haut / TOP homing</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0" />
+                <simpleValue value="-25" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse FDC (Q21)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse FDC</xhtml>
               </documentation>
             </variable>
             <variable name="CST_T330FdcMax_M">
@@ -9774,10 +9774,10 @@ Réserve minimale FDC logiciel haut / TOP homing</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="9" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute FDC (Q21/C1 : TOP&lt;=10 et Delta&gt;=1 =&gt; FDC&lt;=9)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute FDC</xhtml>
               </documentation>
             </variable>
             <variable name="CST_T330TopMin_M">
@@ -9785,10 +9785,10 @@ Réserve minimale FDC logiciel haut / TOP homing</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="1" />
+                <simpleValue value="-20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse TOP (Q21)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse TOP</xhtml>
               </documentation>
             </variable>
             <variable name="CST_T330TopMax_M">
@@ -9796,10 +9796,10 @@ Réserve minimale FDC logiciel haut / TOP homing</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="25" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute TOP (Q21)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute TOP (marge 1m au dessus de FDC 20m)</xhtml>
               </documentation>
             </variable>
             <variable name="T330PrevInit">

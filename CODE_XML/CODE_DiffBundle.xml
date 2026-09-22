@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T14:41:33.343610" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T14:41:33.343610">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-22T16:30:26.693778" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-22T16:30:26.693778">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,609 +23,99 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="E_MachineHomingStep">
-        <baseType>
-          <enum>
-            <values>
-              <value name="IDLE" value="0" />
-              <value name="LOSS_SAFESTOP" value="5" />
-              <value name="BOTH_NOT_HOMED" value="10" />
-              <value name="M1_NOT_HOMED" value="11" />
-              <value name="M2_NOT_HOMED" value="12" />
-              <value name="OFFSET_UNKNOWN" value="20" />
-              <value name="NEED_TOP_POSITION" value="30" />
-              <value name="NEED_MECHANICAL_STOP" value="40" />
-              <value name="AWAIT_BUCKET_CONFIRM" value="45" />
-              <value name="HOMING_IN_PROGRESS" value="50" />
-              <value name="VALID" value="60" />
-              <value name="FAILED" value="70" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>IDLE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement indisponible (Enable=FALSE)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>LOSS_SAFESTOP</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Perte de datum en mouvement : arret controle en cours</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>BOTH_NOT_HOMED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeurs M1 et M2 non references : passer en MAINT_N2</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>M1_NOT_HOMED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur M1 non reference ou mesure douteuse : homer M1</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>M2_NOT_HOMED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur M2 non reference ou mesure douteuse : homer M2</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>OFFSET_UNKNOWN</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Offset benne inconnu : passer en MAINT_N2</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>NEED_TOP_POSITION</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Monter Both a vitesse lente jusqu au capteur haut</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>NEED_MECHANICAL_STOP</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur haut atteint : relacher la commande et attendre l arret</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>AWAIT_BUCKET_CONFIRM</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmer visuellement la benne : Fermee ou Ouverte</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HOMING_IN_PROGRESS</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement conjoint M1/M2 en cours : ne pas manoeuvrer</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>VALID</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement machine valide : mode nominal disponible</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>FAILED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement incomplet : rester en N2 et recommencer</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>91b3da89-8226-5d1f-92ee-cf29483801dd</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_MachineHomingTxState">
-        <baseType>
-          <enum>
-            <values>
-              <value name="HX0_REPOS" value="0" />
-              <value name="HX1_BUCKET_PREPARE" value="1" />
-              <value name="HX1A_COUPLING_INTERLOCK" value="2" />
-              <value name="HX2_CLIMB_COUPLED" value="3" />
-              <value name="HX3_FLYING_REFERENCE" value="4" />
-              <value name="HX4_STABILIZATION_CHECK" value="5" />
-              <value name="HX5_RELEASE_CLEARANCE" value="6" />
-              <value name="HX6_HOMED_SUCCESS" value="7" />
-              <value name="HX7_FAILED" value="8" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>HX0_REPOS</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape initiale pure : repos, aucune action</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HX1_BUCKET_PREPARE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne palier 1 sous FDC off, timer 8s, bouton IHM dedie</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HX1A_COUPLING_INTERLOCK</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bascule WinchSel=0, FDC benne reactive, interlock couplage bloquant</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HX2_CLIMB_COUPLED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montee couplee M1+M2 palier 1 MAX vers capteur haut</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HX3_FLYING_REFERENCE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prise de reference a la volee M1+M2 sur position de config persistante (8.5m)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HX4_STABILIZATION_CHECK</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret mecanique, controle inertie [8.50..8.80m], max 3 retries</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HX5_RELEASE_CLEARANCE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Degagement zone haute, verification neutre joystick</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HX6_HOMED_SUCCESS</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Machine qualifiee : MachineHomed := TRUE, commit atomique benne</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HX7_FAILED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Echec sequence unifie : Reset conscient requis en MAINT_N2</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>74e41b9c-4f86-5300-8b05-c49be09e5fcb</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_Mode">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLE" value="0" />
-              <value name="MAINT_N1" value="1" />
-              <value name="MAINT_N2" value="2" />
-              <value name="SEMI_AUTO" value="3" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N1</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N2</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SEMI_AUTO</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="ST_Fault">
+      <dataType name="ST_CommunCfg">
         <baseType>
           <struct>
-            <variable name="Error">
+            <variable name="LimitLegalDepthMinAllowed_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-30" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Blocage instantané à 0m : sans défaut explicite,
+ce champ vaut 0.0 tant qu'il n'a pas été réglé côté IHM -- "CablePosM &lt;= 0.0" se déclenche
+dès la position de référence, avant tout réglage réel de la cote légale. Défaut -999.0
+(jamais atteint en pratique) : LimitLegalEnabled=TRUE sans réglage ne bloque plus rien par
+erreur -- il faut régler la vraie cote pour que la protection devienne active.
+📐 Cote min de dragage autorisée (m, négatif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitLegalEnabled">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Activation de la limite légale</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Latched">
+            <variable name="SelHomingApproachEnable">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu'au front Reset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2)</xhtml>
               </documentation>
             </variable>
-            <variable name="LatchedId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] ErrorId figé à l'apparition du défaut, effacé au Reset</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>ffe904a3-501c-5aac-bc38-202f178a61f2</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : porter l'état défaut d'un composant, applicable dans TOUS les cas
-      (acquittable ou non), sans brique warning séparée.
-        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
-        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu'au front Reset.
-      Le choix acquittable / non-acquittable se fait PAR CAUSE
-      (ST_FaultCause.Latching), jamais par bloc.
-   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
-      sur l'acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
-   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
-      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_FaultCause">
-        <baseType>
-          <struct>
-            <variable name="Active">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause présente maintenant (interlock sur cette valeur)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Latching">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause à acquitter (arme Latched) ; 0 = live seulement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Texte">
-              <type>
-                <derived name="STRING" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>dafea4e6-0b73-5895-8c57-ef302142ebf7</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
-      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
-      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
-   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
-      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
-      Latching = FALSE → la cause n'alimente que la vue live (retombe seule).
-      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
-      pour la rendre acquittable, il faut le déclarer explicitement.
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_Lifecycle">
-        <baseType>
-          <struct>
-            <variable name="Busy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action terminée avec succès</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b6983c9c-4d76-5d4e-899b-e996cbf34849</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_Lifecycle — Brique socle cycle d'exécution
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : porter l'avancement d'une action à cycle (organe, séquenceur).
-      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
-      ne la porte pas.
-   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_ProgramWinchRequest">
-        <baseType>
-          <struct>
-            <variable name="RunRequest">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche demandé par le programme</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ReqAscent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande montée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ReqDescend">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande descente</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepTgt">
+            <variable name="WinchMaxStepDescent">
               <type>
                 <INT />
               </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier de vitesse cible demandé (1 à 5, 0 = arrêt)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Plafond palier descente nominal (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>edbf7141-2109-5344-bf49-1cd29f4686cd</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 ST_ProgramWinchRequest — Demande de mouvement treuil par le programme
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupe les demandes logiques de treuil formulées par le séquenceur
-   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_fbMachineHomingCycle_AxisHomingStatus">
-        <baseType>
-          <struct>
-            <variable name="HomedAndReliable">
+            <variable name="WinchMaxStepAscent">
               <type>
-                <BOOL />
+                <INT />
               </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur reference ET mesure jugee fiable (gate strict)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Limitation palier vitesse en montée (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingBusy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sequence de homing en cours sur l'axe</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingDone">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing termine avec succes (HomingLifecycle.Done cote FB_Encoder)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingError">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing en erreur sur l'axe (HomingFault.Error)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>796b0dad-a243-58d0-a47d-362338c07aeb</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 ST_fbMachineHomingCycle_AxisHomingStatus — Statut homing d'un axe treuil
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupe l'etat de homing d'un axe (M1 ou M2) consomme par
-             FB_CycleMachineHoming pour piloter le guide et la transaction.
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_fbMachineHomingCycle_BucketCommit">
-        <baseType>
-          <struct>
-            <variable name="CommitOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Publier "benne ouverte" (impulsion 1 scan)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CommitClose">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Publier "benne fermee" (impulsion 1 scan)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>8bbe6b1c-b915-5c25-90f5-ca9c8b430b97</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 ST_fbMachineHomingCycle_BucketCommit — Commit atomique de l'etat benne
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Impulsion 1 scan emise par FB_CycleMachineHoming vers FB_Bucket
-             apres succes des DEUX homings. FB_Bucket reste seul proprietaire
-             de IsOpen / IsClosed.
-   🔒 Sécurité : CommitOpen et CommitClose mutuellement exclusifs (garanti
-                 par le corps du FB — rejet du double-confirm, cf. C-2).
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_fbMachineHomingCycle_Cfg">
-        <baseType>
-          <struct>
-            <variable name="CfgTopHomingTarget_M">
+            <variable name="WinchSlowdownDistanceTop_M">
               <type>
                 <REAL />
               </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position capteur haut M2/benne (m) — sert UNIQUEMENT a la cible dynamique M2 du cycle (HX3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite haute : 0 = arrêt au seuil (m), commun M1/M2</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgOffsetOpen_M">
+            <variable name="WinchSlowdownDistanceBottom_M">
               <type>
                 <REAL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart géométrique benne ouverte (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgOffsetClose_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart géométrique benne fermée (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgTimeoutClimb">
-              <type>
-                <TIME />
-              </type>
               <initialValue>
-                <simpleValue value="TIME#300s0ms" />
+                <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde de montee : budget d'une MONTER CONTINUE (un temporisateur remet son temps ecoule a
-zero des que la commande retombe : une pause operateur ou un arret d'urgence ne consomme
-donc rien). Derivation : course maximale de cable = CfgTopSensorPos_M - CfgCableLimitDescent_M
-(8,5 m - (-50 m) = 58,5 m) ; borne haute de vitesse du palier 1 = 0,4 m/s
-(GVL_PERSISTENT._WinchSpeedConfig.SpeedBandMaxMps[1], valeur de banc A MESURER sur site)
-=&gt; 58,5 / 0,4 = 146,3 s ; marge x2 = 292,5 s ; valeur retenue 300 s (arrondie au-dessus).
-A revoir si la course ou la vitesse du palier 1 changent (gate G511).
-Garde de montee au capteur haut (0 = pas de garde)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite basse pour ralentir (m), commun M1/M2</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgTimeoutHomeAxes">
+            <variable name="WinchSlowdownMaxStep">
               <type>
-                <TIME />
+                <INT />
               </type>
               <initialValue>
-                <simpleValue value="TIME#60s0ms" />
+                <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde de descente HX3 : meme regle (budget de DESCENTE CONTINUE).
-Garde globale prise de référence (0 = pas de garde)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
+pas une vitesse continue.
+: Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgTimeoutFlyingHoming">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#3s0ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde essai prise de référence au vol (Mode A) avant repli automatique à l'arrêt (Mode B)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgStabilizationMinM">
+            <variable name="CfgCableLimitAscent_M">
               <type>
                 <REAL />
               </type>
@@ -633,18 +123,46 @@ Garde globale prise de référence (0 = pas de garde)</xhtml>
                 <simpleValue value="7.5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil bas d'inertie stabilisée après référence (m) - HX4 (constante volontaire, valeur a risque, pas d'IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgStabilizationMaxM">
+            <variable name="TglEnableKoboldAutoStopDescent">
               <type>
-                <REAL />
+                <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="9.5" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil haut d'inertie stabilisée après référence (m) - HX4 (constante volontaire, valeur a risque, pas d'IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglEnableCoupledBucketSequencing">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquencement auto benne en pilotage couplé (WinchSel=0, MAINT_N1/N2) :
+pousser le joystick benne pas ouverte -&gt; ouvre d'abord puis descend couplé ;
+tirer benne pas fermée -&gt; ferme d'abord puis remonte couplé.
+Défaut TRUE (activé) ; 1 bouton IHM pour désactiver -&gt; comportement brut
+(2 treuils sans condition). OFF = jamais gouverné par instBucket.Busy hors
+action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglEnableWinchDescentLock_M3">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Verrouillage descente treuil M1/M2 en mode MAINT si le pont M3 n'est pas à P1/Maintenance :
+Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils partout).</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -655,79 +173,121 @@ Garde globale prise de référence (0 = pas de garde)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Drapeau de restauration config au boot (pont persistant)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>9864af20-d1ca-5866-b87e-61641e2f5961</ObjectId>
+            <ObjectId>a78d6264-59a9-5814-98b4-1f4ebf760abf</ObjectId>
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_fbMachineHomingCycle_Cfg — Réglages de FB_CycleMachineHoming
-   ───────────────────────────────────────────────────────────────────────
-   🎯 Rôle : Réglages géométriques du référencement machine (cible haute
-             M2/benne + écarts benne) + temporisations de garde du GRAFCET
-             de homing (montée, homing axes).
-   🔒 Ownership : produit par PRG_02_Acquisition depuis _WinchM2CfgPersist
-             (cible haute) et _BucketCfgPersist (écarts, GVL_PERSISTENT).
-             Initialized : drapeau de restauration boot (pont persistant).
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
-   =======================================================================</xhtml>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ST_CommunCfg — Configuration des paramètres communs machine
+   ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_fbMachineHomingCycle_HomingDemand">
+      <dataType name="ST_WinchCfg">
         <baseType>
           <struct>
-            <variable name="HomeReq">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de prise d'origine pour cet axe (vocab reserve Homing)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="UseDynamicTarget">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE =&gt; cible = DynamicTarget_M (M2 uniquement)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DynamicTarget_M">
+            <variable name="CfgTopSensorPos_M">
               <type>
                 <REAL />
               </type>
+              <initialValue>
+                <simpleValue value="8.5" />
+              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible geometrique benne (m) : CfgTopHomingTargetM + offset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Position cible du capteur haut (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgHomingTarget_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgRampAccelRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="50" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Rampe d'accélération (%/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgRampDecelNormalRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="150" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📉 Rampe de décélération normale (%/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgRampDecelFastRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="400" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Rampe de décélération rapide / SafeStop (%/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgCableLimitDescent_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-50" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite basse physique de descente (m, négatif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot — défaut FALSE non ambigu
+🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>a0819120-1e85-5b22-8a6d-414f9c7d9a11</ObjectId>
+            <ObjectId>239338a1-0092-5a3b-aef0-6597a3358ff4</ObjectId>
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 ST_fbMachineHomingCycle_HomingDemand — Demande de homing conjoint vers un axe
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Ordre de prise d'origine emis par FB_CycleMachineHoming vers
-             une facade FB_Encoder. M1 : cible configuree. M2 : cible
-             geometrique dynamique (top M1 configure +/- offset benne),
-             jamais une position M1 live.
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
-   =======================================================================</xhtml>
+   🎨 Destiné au paramétrage et calibration depuis l'IHM (RETAIN).
+   ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
     <pous>
-      <pou name="FB_CycleMachineHoming" pouType="functionBlock">
+      <pou name="FB_CfgT330Normalizer" pouType="functionBlock">
         <interface>
           <inputVars>
             <variable name="Enable">
@@ -735,205 +295,17 @@ Garde globale prise de référence (0 = pas de garde)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD (Enable + Reset) ===
---&gt; [CMD] Autorisation generale (FALSE =&gt; sorties sures, retour HX0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD (Enable) ===
+🟢 Autorise la normalisation (ponts de config RESTAURÉS)</xhtml>
               </documentation>
             </variable>
-            <variable name="Reset">
+            <variable name="InHoming">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut / abandon cycle (front, jamais conditionne)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MODE ARBITRE ===
---&gt; [CMD] Mode machine (referencement : MAINT_N2 seul)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BootReady">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Acquisition + codeurs valides apres boot</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TopPositionSensor">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PERMIS SECURITE ===
---&gt; [SAFE] Capteur haut commun M1/M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchesMechanicallyStopped">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] M1 ET M2 arret mecanique confirme</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1Status">
-              <type>
-                <derived name="ST_fbMachineHomingCycle_AxisHomingStatus" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACQUISITION HOMING (M1 / M2) ===
---&gt; [HW] Statut homing axe M1 (Retenue)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2Status">
-              <type>
-                <derived name="ST_fbMachineHomingCycle_AxisHomingStatus" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Statut homing axe M2 (Benne)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BucketOffsetValid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAT BENNE ===
---&gt; [HW] Offset benne actif valide (FB_Bucket) — bootstrap datum seulement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeadmanArmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PERMIS OPERATEUR (joystick + homme-mort) ===
---&gt; [CMD] Homme-mort arme</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickDeflected">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Joystick defléchi (un axe quelconque) — sert au latch SeenNeutral</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickPull">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Manche tire vers soi = sens montee treuils / fermeture benne</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickPush">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Manche pousse = sens descente treuils / ouverture benne</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnValidation">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VALIDATION OPERATEUR ===
---&gt; [CMD] BP joystick (homme-mort)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StartRequest">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Lancer le cycle (front) — commande IHM dediee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnConfirmHomingBucket">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Confirmation visuelle fermeture benne cycle homing HX1 (bouton dédié IHM)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickWinchSelectArbitrated">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INTERLOCK COUPLAGE E1 &amp; RETOUR ARBITRAGE ===
---&gt; [CMD] Selecteur treuil arbitre aval (0=both, 1=M1, 2=M2) pour interlock E1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CablePosM1">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES POSITIONS POUR CONTROLE STABILISATION HX4 ===
---&gt; [MEAS] Position reelle cable M1 (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CablePosM2">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [MEAS] Position reelle cable M2 (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CoherenceLimitM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Ecart max autorise entre treuils en stabilisation</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgCommissioningEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MISE EN SERVICE : forcage de step (encadre) ===
---&gt; [CFG] Case IHM mise en service homing : deverrouille le forcage de step</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgForceStepTarget">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Step cible du forcage (0=HX0 .. 8=HX7)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgForceStepApply">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Applique le forcage (front) — impulsion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Cfg">
-              <type>
-                <derived name="ST_fbMachineHomingCycle_Cfg" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES &amp; CONFIGURATION ===
---&gt; [CFG] Reglages geometriques + temporisations de garde</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE MACHINE ===
+🎯 Homing en cours : cycle machine COMPLET (HX0..HX6) OU transaction de preset, M1 ou M2</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -943,1430 +315,296 @@ Garde globale prise de référence (0 = pas de garde)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD (Ready + Fault) ===
-&lt;-- [STAT] FB actif (Enable ET NOT Fault.Latched)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD (Ready) ===
+🟢 Normalisation armée ce scan (Enable ET mémoires amorcées)</xhtml>
               </documentation>
             </variable>
-            <variable name="Fault">
-              <type>
-                <derived name="ST_Fault" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Socle defaut (rempli par FB_FaultCore)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Lifecycle">
-              <type>
-                <derived name="ST_Lifecycle" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Cycle GRAFCET (Busy = cycle de homing en cours)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MachineHomed">
+            <variable name="Corrected">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== QUALIFICATION MACHINE ===
-&lt;-- [SAFE] Datum machine valide (gate SEMI_AUTO)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC / IHM ===
+🔧 Une correction T330 a eu lieu CE scan (impulsion d'un seul scan)</xhtml>
               </documentation>
             </variable>
-            <variable name="MachineHomingStep">
-              <type>
-                <derived name="E_MachineHomingStep" />
-              </type>
-              <initialValue>
-                <simpleValue value="E_MachineHomingStep.IDLE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etape du guide (echelle de priorite)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MachineHomingStepAtError">
-              <type>
-                <derived name="E_MachineHomingStep" />
-              </type>
-              <initialValue>
-                <simpleValue value="E_MachineHomingStep.IDLE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etape figee a l'apparition du defaut (R9)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MachineHomingSeqStep">
-              <type>
-                <derived name="E_MachineHomingTxState" />
-              </type>
-              <initialValue>
-                <simpleValue value="E_MachineHomingTxState.HX0_REPOS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Step GRAFCET courant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MachineHomingInstruction">
-              <type>
-                <string length="120" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Consigne operateur en clair (ASCII)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MachineHomingActive">
+            <variable name="CorrectedHeld">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Cycle en cours (= Lifecycle.Busy)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MachineHomingLossSafeStop">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Demande d'arret controle suite perte de datum en mouvement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MachineHomingFailed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Derniere sequence abandonnee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingModeBActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Repli automatique reference a l'arret (Mode B) engage</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1Demand">
-              <type>
-                <derived name="ST_fbMachineHomingCycle_HomingDemand" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DEMANDES HOMING (M1 / M2) ===
-&lt;-- [ACT] Demande de homing conjoint axe M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2Demand">
-              <type>
-                <derived name="ST_fbMachineHomingCycle_HomingDemand" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande de homing conjoint axe M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CmdWinchM1">
-              <type>
-                <derived name="ST_ProgramWinchRequest" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRES MOUVEMENT TREUIL (vers PRG_03 -&gt; PRG_04) ===
-&lt;-- [ACT] Ordre treuil M1 (montee palier 1)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CmdWinchM2">
-              <type>
-                <derived name="ST_ProgramWinchRequest" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre treuil M2 (montee palier 1)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CmdBucketOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRES BENNE (palier 1, sans FDC logiciel — HX1) ===
-&lt;-- [ACT] Ordre ouverture benne palier 1 sans FDC soft</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CmdBucketClose">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre fermeture benne palier 1 sans FDC soft</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CmdWinchSelect">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="-1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== OVERRIDE SELECTEUR TREUIL CYCLE ===
-&lt;-- [ACT] Override selecteur treuil cycle (-1=neutre, 0=forcer couple, 2=forcer benne)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BucketCommit">
-              <type>
-                <derived name="ST_fbMachineHomingCycle_BucketCommit" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMIT BENNE ===
-&lt;-- [ACT] Publication atomique de l'etat benne (vers FB_Bucket)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3Locked">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VERROU TRANSLATION ===
-&lt;-- [STAT] Translation M3 interdite tant que le cycle homing n'est pas en HX0</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Maintien du message T330 (fenêtre IHM — 1 scan serait invisible)</xhtml>
               </documentation>
             </variable>
           </outputVars>
+          <inOutVars>
+            <variable name="WinchCfgM1">
+              <type>
+                <derived name="ST_WinchCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RÉGLAGES HAUT À NORMALISER (référence — jamais de copie) ===
+🔧 M1 = MAÎTRE du capteur haut : porte CfgTopSensorPos_M</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommunCfg">
+              <type>
+                <derived name="ST_CommunCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Commun M1/M2 : porte CfgCableLimitAscent_M + WinchSlowdownDistanceTop_M</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
           <localVars>
-            <variable name="instFault">
+            <variable name="CST_T330ReserveMinMargin_M">
               <type>
-                <derived name="FB_FaultCore" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
-* [INST] Socle defaut transverse</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ResetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Reset</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LatchedEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Fault.Latched (capture R9)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TopLostEdge">
-              <type>
-                <derived name="F_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant TopPositionSensor</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instCauses">
-              <type>
-                <array>
-                  <dimension lower="0" upper="15" />
-                  <baseType>
-                    <derived name="ST_FaultCause" />
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TABLE DES CAUSES DE DEFAUT ===
-. [LOC] Causes en clair pour FB_FaultCore</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SeqStep">
-              <type>
-                <derived name="E_MachineHomingTxState" />
-              </type>
-              <initialValue>
-                <simpleValue value="E_MachineHomingTxState.HX0_REPOS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GRAFCET ===
-. [LOC] Step GRAFCET courant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CommitPublished">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Commit benne deja publie sur ce datum</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CommitDone">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Commit CommitClose deja emis (impulsion 1 scan)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PendingClose">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fermeture benne confirmee en attente de commit final en HX6</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CycleRunning">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Miroir de (SeqStep &lt;&gt; HX0_REPOS) — cycle engage</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomeReqDone">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Impulsion HomeReq M1+M2 deja emise sur ce passage HX3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SeenNeutral">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Joystick repasse au neutre depuis l'entree du step d'arret</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ClimbTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS DE GARDE ===
-. [LOC] Garde HX2 (montee au capteur)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomeAxesTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde globale HX3 (prise de reference)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FlyingHomingTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde essai reference au vol (Mode A) avant bascule Mode B</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StandstillHomeReqDone">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Impulsion HomeReq emise a l'arret mecanique (Mode B)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CouplingSettleTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation dwell de bascule selecteur HX1a (300 ms)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SettleGraceTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fenetre de grace deceleration</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FirstScanDone">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde 1er scan : statuts codeurs pas encore stables au boot</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StartEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FRONTS OPERATEUR ===
-. [LOC] Front montant StartRequest</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnValidationEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant BtnValidation (lancement joystick N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingBucketConfirmEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant BtnConfirmHomingBucket</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ForceStepApplyEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant CfgForceStepApply</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ForceStepClamped">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CfgForceStepTarget borne [0..8]</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BothAxesHomed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONDITIONS INTERMEDIAIRES NOMMEES ===
-. [LOC] M1 ET M2 references et fiables</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CommitOrOffsetValid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Datum benne connu (commit publie OU offset valide)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ClimbPermit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis operateur maintenu, sens montee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DescendPermit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis operateur maintenu, sens descente</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BucketPermit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis operateur maintenu, benne</xhtml>
-              </documentation>
-            </variable>
-            <variable name="IsInMovePhase">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Step GRAFCET qui commande un mouvement treuil (HX2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AxisHomingError">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Erreur de homing M1 ou M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MotionOutOfPhase">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Treuil bouge hors phase mouvement, grace decel ecoulee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ModeLostDuringCycle">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sortie de MAINT_N2 alors que le cycle est engage</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ClimbTimedOut">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde de montee ecoulee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomeAxesTimedOut">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde de homing axes ecoulee sans axes homes</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TransactionAbort">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition d'abandon fail-safe pendant une phase mouvement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ReHomingAckRequired">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bloque MachineHomed jusqu'a un Reset conscient</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MachineWasHomed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memorise un datum valide (detection de perte)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingLossLatched">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Perte de datum en mouvement latchee jusqu'a l'arret</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MachineHomedRaw">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Qualification hors Fault</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AxesDatumRaw">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Reference codeurs M1/M2 seule</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ModeIsMaint2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE MODES &amp; INTERLOCKS ===
-. [LOC] Mode arbitre = MAINT_N2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ModeIsMaint1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mode arbitre = MAINT_N1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintenanceActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mode arbitre = MAINT_N1 ou MAINT_N2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ClimbStepActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Step courant = montee couplee (HX2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ClimbCommandActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Montee REELLEMENT commandee : seule condition qui consomme la garde</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CouplingInterlockFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Violation couplage pendant la montee HX2 (WinchSel &lt;&gt; 0)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RetryCount">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTROLE STABILISATION HX4 ===
-. [LOC] Compteur de tentatives HX4 -&gt; HX1 (max 3)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StabilizationOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation inertie conforme [8.50..8.80m]</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StabilizationFailed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation inertie hors plage</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_CauseHomingLostInMotion">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INDICES DE CAUSES (instCauses[]) ===
-Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_CauseClimbTimeout">
-              <type>
-                <INT />
+                <REAL />
               </type>
               <initialValue>
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">HX2 : capteur haut non atteint dans la garde (Latching)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== T330 (Q1/Q2) — RÈGLES D'INGÉNIERIE, PAS DES COTES MÉTIER ===
+NON persistantes et NON IHM (AC3) : jamais exposées, jamais RETAIN.
+Réserve minimale FDC logiciel haut / TOP homing</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_CauseMotionOutOfPhase">
+            <variable name="CST_T330SlowdownTopMin_M">
               <type>
-                <INT />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="0.5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Treuil bouge hors phase mouvement autorisee (Latching)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher du ralentissement haut (Q1)</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_CauseHomingErrorM1">
+            <variable name="CST_T330FdcMin_M">
               <type>
-                <INT />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="3" />
+                <simpleValue value="-25" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Encoder M1 signale une erreur de homing (Latching)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse FDC</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_CauseHomingErrorM2">
+            <variable name="CST_T330FdcMax_M">
               <type>
-                <INT />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="4" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Encoder M2 signale une erreur de homing (Latching)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute FDC</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_CauseHomeAxesTimeout">
+            <variable name="CST_T330TopMin_M">
               <type>
-                <INT />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="5" />
+                <simpleValue value="-20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">HX3 : prise de reference non obtenue dans la garde (Latching)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse TOP</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_CauseCouplingFault">
+            <variable name="CST_T330TopMax_M">
               <type>
-                <INT />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="6" />
+                <simpleValue value="25" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">HX2 : selecteur treuil non couple (WinchSel &lt;&gt; 0) pendant la montee (Latching)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute TOP (marge 1m au dessus de FDC 20m)</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_CauseStabilizationFault">
+            <variable name="T330PrevInit">
               <type>
-                <INT />
+                <BOOL />
               </type>
-              <initialValue>
-                <simpleValue value="7" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">HX4 : echec persistant stabilisation apres 3 retries (Latching)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== T330 — MÉMOIRES NON PERSISTANTES (AC3 : ni IHM, ni RETAIN) ===
+. [LOC] Seed des mémoires effectué depuis les valeurs RESTAURÉES</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_SettleGrace">
+            <variable name="T330PrevTopSensorPos_M">
               <type>
-                <TIME />
+                <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="TIME#3s0ms" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS &amp; DIVERS ===
-Grace deceleration a l'entree d'un step d'arret</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur précédente TOP (détection du champ modifié par l'opérateur)</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_StepSlow">
+            <variable name="T330PrevCableLimitAscent_M">
               <type>
-                <INT />
+                <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier de vitesse lent (palier 1 MAX strict)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur précédente FDC (détection du champ modifié par l'opérateur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="T330MsgHold">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien du message T330 (un scan de 10 ms serait invisible à l'IHM)</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🎯 FB_CycleMachineHoming — Cycle de referencement machine M1/M2/benne
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔧 FB_CfgT330Normalizer — Normalisation des réglages HAUT (T330)
    ───────────────────────────────────────────────────────────────
-   Role : GRAFCET sequentiel (HX0..HX6 + HX7_FAILED) qui coordonne
-             le homing machine selon la specification exploitant du 2026-09-21 :
-             fermeture benne palier 1 en HX1, bascule et interlock couplage
-             M1+M2 en HX1a (résolution E1), montee palier 1 en HX2, prise
-             de reference a la volee sur capteur haut en HX3, controle
-             stabilisation/inertie [8.50..8.80m] en HX4 avec max 3 retries,
-             degagement zone haute en HX5, qualification MachineHomed en HX6,
-             et etat d'echec unifie HX7_FAILED.
-   Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
-                + DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_REFONTE_SEQUENCE_HOMING.yaml
-   =======================================================================</xhtml>
+   🎯 Rôle : ramener DANS SON DOMAINE le couple de réglages de fin de
+             course HAUT — FDC logiciel (CfgCableLimitAscent_M) et cote
+             TOP homing (CfgTopSensorPos_M) — plus le plancher du
+             ralentissement haut (WinchSlowdownDistanceTop_M), puis
+             signaler la correction à l'IHM.
+   📄 Doc : DOC/WFLOW/AUDITS/DESIGN/PLAN_T330_C3_INVARIANT_HAUT_v1.0.md (plan C3 v1.3, §2/§4)
+            DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T330_INVARIANT_HAUT_v1.0.md
+   🛡️ Sécurité : une valeur de réglage HORS DOMAINE resterait hors domaine
+             indéfiniment sans ce bloc (contre-exemple Q21 bis : FDC=9,50 m +
+             TOP=12,00 m, où Δ=2,50 m ≥ 1,00 m n'active AUCUNE règle Δ).
+             ⇒ R0 (clamp absolu) est INCONDITIONNELLE et EN AMONT de la règle Δ.
+             Ce FB ne commande AUCUN mouvement : il corrige de la configuration.
+   🧩 Dépendances : ST_WinchCfg (CfgTopSensorPos_M) · ST_CommunCfg
+             (CfgCableLimitAscent_M, WinchSlowdownDistanceTop_M).
+   ⚠️ Ordre d'appel : AVANT les ponts de persistance (PRG_07_Supervision §2).
+             Le pont écrit la valeur CORRIGÉE dans le MÊME scan (option A / Q23)
+             ⇒ aucune fenêtre NVRAM. Les mémoires internes sont amorcées depuis
+             ces valeurs RESTAURÉES, jamais depuis les défauts du DUT (piège P2).
+   ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "§1 Fronts, remises a zero de tete de scan, verrou M3"}
-// === §1 FRONTS + RAZ TETE DE SCAN + VERROU M3 =========================
 
-// Protection premier scan : forcer repos et etat propre
-IF NOT FirstScanDone THEN
-    SeqStep              := E_MachineHomingTxState.HX0_REPOS;
-    MachineHomingSeqStep := E_MachineHomingTxState.HX0_REPOS;
-    MachineHomingFailed  := FALSE;
-    HomingModeBActive    := FALSE;
-    StandstillHomeReqDone:= FALSE;
-    RetryCount           := 0;
-    HomeReqDone          := FALSE;
-    PendingClose         := FALSE;
-END_IF;
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🔧 T330 — COHÉRENCE DES RÉGLAGES HAUT (Q1/Q2) · plan C3 v1.3
+// ───────────────────────────────────────────────────────────────────────────────
+// ORDRE IMPOSÉ (Q21 bis) :  (1) R0 clamp ABSOLU inconditionnel, FDC et TOP séparément
+//                        puis (2) règle Delta &gt;= 1,00 m / slowdown &gt;= 0,50 m.
+// OPTION A (Q23) : ce bloc s'exécute AVANT les ponts de persistance, qui écrivent la
+//                  valeur CORRIGÉE dans le MÊME scan (aucune fenêtre NVRAM). La
+//                  référence est donc lue sur GVL_IHM.Cfg — l'état que les ponts
+//                  tiennent à jour, et NON directement la NVRAM.
+// AC3 : AUCUNE variable persistante ni IHM nouvelle — constantes CST_* et mémoires
+//       locales uniquement. Jamais de champ de fin de course supplémentaire.
+// C2/Q22 : R2 (correction du TOP) est INHIBÉE pendant le homing — sur le CYCLE COMPLET
+//          (HX0..HX6), pas seulement la transaction de preset (~50 ms). Aucune mémoire
+//          d'intention : au retour, si la config est toujours invalide, le REPLI NIVEAU
+//          ci-dessous applique Q17 (préserver le TOP, corriger le FDC).
+// ═══════════════════════════════════════════════════════════════════════════════
+{region "🔧 T330 NORMALISATION"}
+Corrected := FALSE;
+Ready := FALSE;
 
-// Sorties impulsionnelles / mouvement : remises a FALSE en tete de scan.
-M1Demand.HomeReq := FALSE;
-M2Demand.HomeReq := FALSE;
-BucketCommit.CommitOpen  := FALSE;
-BucketCommit.CommitClose := FALSE;
-CmdBucketOpen  := FALSE;
-CmdBucketClose := FALSE;
-CmdWinchM1.RunRequest := FALSE; CmdWinchM1.ReqAscent := FALSE; CmdWinchM1.ReqDescend := FALSE; CmdWinchM1.StepTgt := 0;
-CmdWinchM2.RunRequest := FALSE; CmdWinchM2.ReqAscent := FALSE; CmdWinchM2.ReqDescend := FALSE; CmdWinchM2.StepTgt := 0;
-CmdWinchSelect := -1; // Par defaut pas d'override
+// Inhibée tant que les ponts n'ont pas RESTAURÉ (sinon les défauts DUT seraient pris
+// pour une saisie opérateur — piège P2 du cadrage).
+IF Enable THEN
 
-ResetEdge(CLK := Reset);
-LatchedEdge(CLK := Fault.Latched);
-TopLostEdge(CLK := TopPositionSensor);
-StartEdge(CLK := StartRequest);
-BtnValidationEdge(CLK := BtnValidation);
-HomingBucketConfirmEdge(CLK := BtnConfirmHomingBucket);
-
-// Miroirs booleens de contexte GRAFCET.
-ModeIsMaint1 := (Mode = E_Mode.MAINT_N1);
-ModeIsMaint2 := (Mode = E_Mode.MAINT_N2);
-MaintenanceActive := ModeIsMaint1 OR ModeIsMaint2;
-
-// Phases de mouvement treuils
-IsInMovePhase := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED);
-CycleRunning  := (SeqStep &lt;&gt; E_MachineHomingTxState.HX0_REPOS);
-
-// M3Locked est calcule en §9 pour verrouiller des le scan d'entree en cycle.
-{endregion}
-
-{region "§2 Conditions intermediaires"}
-// === §2 CONDITIONS NOMMEES ============================================
-BothAxesHomed       := M1Status.HomedAndReliable AND M2Status.HomedAndReliable;
-CommitOrOffsetValid := CommitPublished OR BucketOffsetValid;
-ClimbPermit         := DeadmanArmed AND JoystickPull;
-DescendPermit       := DeadmanArmed AND JoystickPush;
-BucketPermit        := DeadmanArmed AND JoystickPull; // HX1 : fermeture uniquement par manche tire
-
-// Fenetre de grace deceleration
-SettleGraceTimer(IN := (SeqStep = E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK)
-                       OR (SeqStep = E_MachineHomingTxState.HX4_STABILIZATION_CHECK)
-                       OR (SeqStep = E_MachineHomingTxState.HX5_RELEASE_CLEARANCE), PT := CST_SettleGrace);
-
-// Conditions d'abandon fail-safe
-AxisHomingError  := M1Status.HomingError OR M2Status.HomingError;
-MotionOutOfPhase := CycleRunning AND NOT IsInMovePhase
-                    AND NOT WinchesMechanicallyStopped AND SettleGraceTimer.Q;
-
-// Garde de montee HX2
-ClimbStepActive := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED);
-ClimbCommandActive := ClimbStepActive AND ClimbPermit;
-ClimbTimer(IN := ClimbCommandActive, PT := Cfg.CfgTimeoutClimb);
-ClimbTimedOut := ClimbStepActive AND ClimbTimer.Q;
-
-// Garde prise de reference HX3
-HomeAxesTimer(IN := (SeqStep = E_MachineHomingTxState.HX3_FLYING_REFERENCE), PT := Cfg.CfgTimeoutHomeAxes);
-HomeAxesTimedOut := (SeqStep = E_MachineHomingTxState.HX3_FLYING_REFERENCE) AND HomeAxesTimer.Q AND NOT BothAxesHomed;
-FlyingHomingTimer(IN := (SeqStep = E_MachineHomingTxState.HX3_FLYING_REFERENCE) AND NOT HomingModeBActive, PT := Cfg.CfgTimeoutFlyingHoming);
-
-// Violation couplage E1
-CouplingInterlockFault := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED)
-                          AND (JoystickWinchSelectArbitrated &lt;&gt; 0);
-
-// Sortie de MAINT_N2 alors qu'un step mouvement/cycle est engage : abandon fail-safe.
-ModeLostDuringCycle := CycleRunning AND NOT ModeIsMaint2;
-TransactionAbort := CycleRunning
-                    AND (AxisHomingError OR MotionOutOfPhase OR ClimbTimedOut
-                         OR HomeAxesTimedOut
-                         OR CouplingInterlockFault OR ModeLostDuringCycle);
-{endregion}
-
-{region "§3 Detection perte de datum"}
-// === §3 PERTE DE DATUM ================================================
-AxesDatumRaw    := BothAxesHomed;
-MachineHomedRaw := AxesDatumRaw AND CommitOrOffsetValid AND NOT ReHomingAckRequired;
-
-IF FirstScanDone AND NOT MachineHomedRaw AND MachineWasHomed THEN
-    IF NOT WinchesMechanicallyStopped THEN
-        HomingLossLatched := TRUE;
+    // Seed des mémoires depuis les valeurs RESTAURÉES (jamais depuis les défauts DUT).
+    IF NOT T330PrevInit THEN
+        T330PrevTopSensorPos_M     := WinchCfgM1.CfgTopSensorPos_M;
+        T330PrevCableLimitAscent_M := CommunCfg.CfgCableLimitAscent_M;
+        T330PrevInit               := TRUE;
     END_IF;
-    ReHomingAckRequired := TRUE;
-END_IF;
 
-MachineWasHomed := MachineHomedRaw;
+    Ready := TRUE;
 
-MachineHomingLossSafeStop := HomingLossLatched AND NOT WinchesMechanicallyStopped;
+    // ─── GEL PENDANT LE HOMING (décision C2 b : « NVRAM gelée — AUCUNE écriture Cfg ») ──
+    // Toutes les écritures ci-dessous (R0, R3, R1, R2) sont suspendues pendant le homing.
+    // ⚠️ Ce gel couvre R1/R0/R3 AUSSI : une correction pendant un homing déplacerait la CIBLE
+    // de homing (R0/R2) ou détruirait le réglage commissionné (R1) et le persisterait.
+    // ⇒ À la sortie du homing, les mémoires ont suivi la saisie (bloc ci-dessous, hors gel) :
+    //    il n'y a plus de FRONT, donc le REPLI NIVEAU applique R1 = Q17 (préserver le TOP). C'est
+    //    exactement la décision 2c : « rien à mémoriser, on retombe dans le cas normal Q2 ».
+    IF NOT InHoming THEN
 
-IF ResetEdge.Q AND WinchesMechanicallyStopped THEN
-    HomingLossLatched   := FALSE;
-    ReHomingAckRequired := FALSE;
-END_IF;
-{endregion}
+    // ─── (1) R0 — CLAMP ABSOLU (Q21 bis) : non conditionné à une violation de Delta ──────
+    // ⚠️ « INCONDITIONNEL » au sens de Q21 bis = non subordonné à la règle Delta. Le gel
+    //    homing ci-dessus reste prioritaire (décision C2 b, motivée sécurité).
+    IF CommunCfg.CfgCableLimitAscent_M &lt; CST_T330FdcMin_M THEN
+        CommunCfg.CfgCableLimitAscent_M := CST_T330FdcMin_M;
+        Corrected := TRUE;
+    ELSIF CommunCfg.CfgCableLimitAscent_M &gt; CST_T330FdcMax_M THEN
+        CommunCfg.CfgCableLimitAscent_M := CST_T330FdcMax_M;
+        Corrected := TRUE;
+    END_IF;
+    IF WinchCfgM1.CfgTopSensorPos_M &lt; CST_T330TopMin_M THEN
+        WinchCfgM1.CfgTopSensorPos_M := CST_T330TopMin_M;
+        Corrected := TRUE;
+    ELSIF WinchCfgM1.CfgTopSensorPos_M &gt; CST_T330TopMax_M THEN
+        WinchCfgM1.CfgTopSensorPos_M := CST_T330TopMax_M;
+        Corrected := TRUE;
+    END_IF;
 
-{region "§4 Purge sur Reset &amp; Forcage mise en service"}
-// === §4 PURGE SUR RESET ===============================================
-IF ResetEdge.Q THEN
-    MachineHomingFailed  := FALSE;
-    HomingModeBActive    := FALSE;
-    StandstillHomeReqDone:= FALSE;
-    PendingClose         := FALSE;
-    CommitDone           := FALSE;
-    HomeReqDone          := FALSE;
-    RetryCount           := 0;
-    SeqStep              := E_MachineHomingTxState.HX0_REPOS;
-    MachineHomingSeqStep := E_MachineHomingTxState.HX0_REPOS;
-END_IF;
+    // ─── (2) R3 — plancher du ralentissement haut ───────────────────────────────────────
+    IF CommunCfg.WinchSlowdownDistanceTop_M &lt; CST_T330SlowdownTopMin_M THEN
+        CommunCfg.WinchSlowdownDistanceTop_M := CST_T330SlowdownTopMin_M;
+        Corrected := TRUE;
+    END_IF;
 
-// §4bis Forcage de step de mise en service (encadre)
-ForceStepApplyEdge(CLK := CfgForceStepApply);
-IF CfgCommissioningEnable AND ModeIsMaint2 AND ForceStepApplyEdge.Q THEN
-    ForceStepClamped := LIMIT(0, CfgForceStepTarget, 8);
-    CASE ForceStepClamped OF
-        0: SeqStep := E_MachineHomingTxState.HX0_REPOS;
-        1: SeqStep := E_MachineHomingTxState.HX1_BUCKET_PREPARE;
-        2: SeqStep := E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK;
-        3: SeqStep := E_MachineHomingTxState.HX2_CLIMB_COUPLED;
-        4: SeqStep := E_MachineHomingTxState.HX3_FLYING_REFERENCE;
-        5: SeqStep := E_MachineHomingTxState.HX4_STABILIZATION_CHECK;
-        6: SeqStep := E_MachineHomingTxState.HX5_RELEASE_CLEARANCE;
-        7: SeqStep := E_MachineHomingTxState.HX6_HOMED_SUCCESS;
-        8: SeqStep := E_MachineHomingTxState.HX7_FAILED;
-    END_CASE;
-    HomeReqDone         := FALSE;
-    PendingClose        := FALSE;
-    CommitDone          := FALSE;
-    MachineHomingFailed := FALSE;
-END_IF;
-{endregion}
-
-{region "§5 Table des causes &amp; socle defaut"}
-// === §5 TABLE DES CAUSES + SOCLE DEFAUT ==============================
-instCauses[CST_CauseHomingLostInMotion].Active   := HomingLossLatched OR ReHomingAckRequired;
-instCauses[CST_CauseHomingLostInMotion].Latching := TRUE;
-instCauses[CST_CauseHomingLostInMotion].Texte    := 'Perte de datum machine en mouvement : re-referencer';
-
-instCauses[CST_CauseClimbTimeout].Active   := ClimbTimedOut;
-instCauses[CST_CauseClimbTimeout].Latching := TRUE;
-instCauses[CST_CauseClimbTimeout].Texte    := 'Montee au capteur haut non aboutie dans le temps imparti';
-
-instCauses[CST_CauseMotionOutOfPhase].Active   := MotionOutOfPhase;
-instCauses[CST_CauseMotionOutOfPhase].Latching := TRUE;
-instCauses[CST_CauseMotionOutOfPhase].Texte    := 'Mouvement treuil detecte hors phase autorisee du cycle';
-
-instCauses[CST_CauseHomingErrorM1].Active   := CycleRunning AND M1Status.HomingError;
-instCauses[CST_CauseHomingErrorM1].Latching := TRUE;
-instCauses[CST_CauseHomingErrorM1].Texte    := 'Erreur de homing codeur M1 pendant le referencement conjoint';
-
-instCauses[CST_CauseHomingErrorM2].Active   := CycleRunning AND M2Status.HomingError;
-instCauses[CST_CauseHomingErrorM2].Latching := TRUE;
-instCauses[CST_CauseHomingErrorM2].Texte    := 'Erreur de homing codeur M2 pendant le referencement conjoint';
-
-instCauses[CST_CauseHomeAxesTimeout].Active   := HomeAxesTimedOut;
-instCauses[CST_CauseHomeAxesTimeout].Latching := TRUE;
-instCauses[CST_CauseHomeAxesTimeout].Texte    := 'Prise de reference capteur haut non obtenue dans le temps';
-
-instCauses[CST_CauseCouplingFault].Active   := CouplingInterlockFault;
-instCauses[CST_CauseCouplingFault].Latching := TRUE;
-instCauses[CST_CauseCouplingFault].Texte    := 'Defaut de couplage treuils M1+M2 en phase montee';
-
-instCauses[CST_CauseStabilizationFault].Active   := (SeqStep = E_MachineHomingTxState.HX7_FAILED) AND (RetryCount &gt;= 3);
-instCauses[CST_CauseStabilizationFault].Latching := TRUE;
-instCauses[CST_CauseStabilizationFault].Texte    := 'Stabilisation inertie treuils hors plage apres 3 tentatives';
-
-// Socle defaut
-instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
-Fault := instFault.Fault;
-{endregion}
-
-{region "§6 Initiation du cycle"}
-// === §6 INITIATION DU CYCLE ===========================================
-// Le cycle ne s'auto-arme JAMAIS spontanement (securite machine, actionneurs
-// sollicites des HX1). L'initiation exige une action consciente de l'operateur
-// en mode MAINT_N2 (StartRequest sur IHM ou BtnValidation sur joystick).
-{endregion}
-
-{region "§7 Gate Enable"}
-// === §7 GATE ENABLE ===================================================
-IF NOT Enable THEN
-    M1Demand.HomeReq         := FALSE;
-    M2Demand.HomeReq         := FALSE;
-    BucketCommit.CommitOpen  := FALSE;
-    BucketCommit.CommitClose := FALSE;
-    CmdBucketOpen            := FALSE;
-    CmdBucketClose           := FALSE;
-    CmdWinchM1.RunRequest    := FALSE; CmdWinchM1.ReqAscent := FALSE; CmdWinchM1.ReqDescend := FALSE; CmdWinchM1.StepTgt := 0;
-    CmdWinchM2.RunRequest    := FALSE; CmdWinchM2.ReqAscent := FALSE; CmdWinchM2.ReqDescend := FALSE; CmdWinchM2.StepTgt := 0;
-    CmdWinchSelect           := -1;
-    Ready                    := FALSE;
-    Lifecycle.Busy           := FALSE;
-    Lifecycle.Done           := FALSE;
-    MachineHomingActive      := FALSE;
-    M3Locked                 := FALSE;
-    MachineHomed             := FALSE;
-    MachineHomingLossSafeStop := FALSE;
-    CommitPublished          := FALSE;
-    CommitDone               := FALSE;
-    PendingClose             := FALSE;
-    HomingModeBActive        := FALSE;
-    StandstillHomeReqDone    := FALSE;
-    RetryCount               := 0;
-    SeqStep                  := E_MachineHomingTxState.HX0_REPOS;
-    MachineHomingSeqStep     := E_MachineHomingTxState.HX0_REPOS;
-    MachineHomingStep        := E_MachineHomingStep.IDLE;
-    MachineHomingInstruction := 'Cycle homing desactive';
-    RETURN;
-END_IF;
-{endregion}
-
-{region "§8 GRAFCET de referencement machine (CASE SeqStep)"}
-// === §8 GRAFCET (CASE SeqStep) ======================================
-CASE SeqStep OF
-
-    E_MachineHomingTxState.HX0_REPOS:
-        // Etape initiale pure : aucune action.
-        CmdWinchSelect := -1;
-        IF (StartEdge.Q OR BtnValidationEdge.Q) AND ModeIsMaint2 THEN
-            HomeReqDone := FALSE;
-            RetryCount  := 0;
-            SeqStep     := E_MachineHomingTxState.HX1_BUCKET_PREPARE;
-        END_IF;
-
-    E_MachineHomingTxState.HX1_BUCKET_PREPARE:
-        // Decision &amp; Fermeture benne operateur :
-        // WinchSel=2 force, FDC benne logiciel inhibe, vitesse plafonnee palier 1.
-        CmdWinchSelect := 2;
-        IF BucketPermit AND JoystickPull THEN
-            CmdBucketClose := TRUE;
-        END_IF;
-
-        IF ModeLostDuringCycle OR MotionOutOfPhase THEN
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HX7_FAILED;
-        ELSIF HomingBucketConfirmEdge.Q AND NOT JoystickDeflected THEN
-            // Validation par 1 seul appui bouton dedie IHM, manche au neutre
-            PendingClose := TRUE;
-            CommitDone   := FALSE;
-            SeqStep      := E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK;
-        END_IF;
-
-    E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK:
-        // Bascule WinchSel=0, reactivation FDC benne.
-        // Interlock bloquant E1 : attente confirmation couplage aval effectif.
-        CmdWinchSelect := 0;
-        CouplingSettleTimer(IN := (JoystickWinchSelectArbitrated = 0), PT := T#300ms);
-
-        IF ModeLostDuringCycle OR AxisHomingError THEN
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HX7_FAILED;
-        ELSIF (JoystickWinchSelectArbitrated = 0) AND CouplingSettleTimer.Q AND WinchesMechanicallyStopped THEN
-            SeenNeutral := NOT JoystickDeflected;
-            SeqStep     := E_MachineHomingTxState.HX2_CLIMB_COUPLED;
-        END_IF;
-
-    E_MachineHomingTxState.HX2_CLIMB_COUPLED:
-        // Montee couplee M1+M2 palier 1 MAX vers capteur haut.
-        CmdWinchSelect := 0;
-        IF ClimbPermit AND (JoystickWinchSelectArbitrated = 0) THEN
-            CmdWinchM1.RunRequest := TRUE; CmdWinchM1.ReqAscent := TRUE; CmdWinchM1.StepTgt := CST_StepSlow;
-            CmdWinchM2.RunRequest := TRUE; CmdWinchM2.ReqAscent := TRUE; CmdWinchM2.StepTgt := CST_StepSlow;
-        END_IF;
-
-        IF TransactionAbort THEN
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HX7_FAILED;
-        ELSIF TopPositionSensor THEN
-            M1Demand.HomeReq      := TRUE;
-            M2Demand.HomeReq      := TRUE;
-            HomeReqDone           := TRUE;
-            HomingModeBActive     := FALSE;
-            StandstillHomeReqDone := FALSE;
-            SeqStep               := E_MachineHomingTxState.HX3_FLYING_REFERENCE;
-        END_IF;
-
-    E_MachineHomingTxState.HX3_FLYING_REFERENCE:
-        // Referencement conjoint M1+M2 sur capteur haut :
-        // Mode A "a la volee" prioritaire, avec repli automatique en Mode B "a l'arret".
-        CmdWinchSelect := 0;
-
-        // --- MODE A : PRISE DE REFERENCE A LA VOLEE ---
-        IF NOT HomingModeBActive THEN
-            // Impulsion initiale de homing au vol si pas encore emise au franchissement
-            IF NOT HomeReqDone THEN
-                M1Demand.HomeReq := TRUE;
-                M2Demand.HomeReq := TRUE;
-                HomeReqDone      := TRUE;
+    // ─── (3) R1 / R2 — règle Delta &gt;= 1,00 m sur les valeurs CLAMPÉES ───────────────────
+    // Détection du champ MODIFIÉ : M1 (maître) et FDC commun uniquement.
+    // ⛔ JAMAIS le champ M2 : il est RÉÉCRIT chaque scan par le miroir M1 (PRG_07_Supervision).
+    IF (WinchCfgM1.CfgTopSensorPos_M
+        - CommunCfg.CfgCableLimitAscent_M) &lt; CST_T330ReserveMinMargin_M THEN
+        IF (WinchCfgM1.CfgTopSensorPos_M &lt;&gt; T330PrevTopSensorPos_M)
+           AND (CommunCfg.CfgCableLimitAscent_M = T330PrevCableLimitAscent_M) THEN
+            // R2 — le TOP vient d'être saisi : corriger le TOP, sauf pendant le homing (C2/Q22).
+            // ⚠️ Ce test est structurellement TOUJOURS VRAI ici (le gel homing englobe déjà le
+            //    bloc) : il est CONSERVÉ comme marqueur nommé de la décision C2/Q22, pour qu'un
+            //    déplacement futur du gel ne puisse pas réactiver R2 pendant un homing en silence.
+            IF NOT InHoming THEN
+                WinchCfgM1.CfgTopSensorPos_M :=
+                    CommunCfg.CfgCableLimitAscent_M + CST_T330ReserveMinMargin_M;
+                Corrected := TRUE;
             END_IF;
-
-            // En vol, si les codeurs confirment -&gt; succes immediat Mode A
-            IF BothAxesHomed THEN
-                SeqStep := E_MachineHomingTxState.HX4_STABILIZATION_CHECK;
-            // Repli automatique Mode B si le preset ne se confirme pas dans le temps imparti (3s)
-            // OU si les treuils s'arretent ou si le manche est relache
-            ELSIF FlyingHomingTimer.Q OR WinchesMechanicallyStopped OR NOT JoystickDeflected THEN
-                HomingModeBActive     := TRUE;
-                StandstillHomeReqDone := FALSE;
-            END_IF;
-
-        // --- MODE B : REPLI AUTOMATIQUE A L'ARRET ---
         ELSE
-            // En repli Mode B : aucun ordre de mouvement emis, arret mecanique confirme attendu
-            IF WinchesMechanicallyStopped THEN
-                // A l'arret physique complet, re-emission impulsionnelle de HomeReq
-                IF NOT StandstillHomeReqDone THEN
-                    M1Demand.HomeReq      := TRUE;
-                    M2Demand.HomeReq      := TRUE;
-                    StandstillHomeReqDone := TRUE;
-                END_IF;
-
-                // Validation prise de reference a l'arret
-                IF BothAxesHomed THEN
-                    SeqStep := E_MachineHomingTxState.HX4_STABILIZATION_CHECK;
-                END_IF;
-            END_IF;
+            // R1 (et Q17 : les deux champs ont changé, ou aucun) — PRÉSERVER le TOP,
+            // corriger le FDC. C'est aussi le REPLI NIVEAU à la sortie du homing.
+            CommunCfg.CfgCableLimitAscent_M :=
+                WinchCfgM1.CfgTopSensorPos_M - CST_T330ReserveMinMargin_M;
+            Corrected := TRUE;
         END_IF;
+    END_IF;   // fin de la règle Delta (R1/R2)
+    END_IF;   // ─── fin du GEL HOMING (décision C2 b) : plus aucune écriture Cfg pendant le homing
 
-        IF TransactionAbort THEN
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HX7_FAILED;
-        END_IF;
+    // ─── Mémoires de front (HORS gel : suivies MÊME pendant le homing) ──────────────────
+    // Indispensable : à la sortie du homing la saisie opérateur n'est plus un FRONT, donc le
+    // REPLI NIVEAU ci-dessus applique R1 = Q17 (préserver le TOP, corriger le FDC). C'est la
+    // décision 2c : « rien à mémoriser, on retombe dans le cas normal Q2 ».
+    T330PrevTopSensorPos_M     := WinchCfgM1.CfgTopSensorPos_M;
+    T330PrevCableLimitAscent_M := CommunCfg.CfgCableLimitAscent_M;
 
-    E_MachineHomingTxState.HX4_STABILIZATION_CHECK:
-        // Arret treuils, controle inertie [8.50..8.80m] et concordance codeurs.
-        CmdWinchSelect := 0;
-        SeenNeutral := NOT JoystickDeflected;
-
-        StabilizationOk := WinchesMechanicallyStopped AND SeenNeutral
-                           AND (CablePosM1 &gt;= Cfg.CfgStabilizationMinM) AND (CablePosM1 &lt;= Cfg.CfgStabilizationMaxM)
-                           AND (CablePosM2 &gt;= Cfg.CfgStabilizationMinM) AND (CablePosM2 &lt;= Cfg.CfgStabilizationMaxM)
-                           AND (ABS(CablePosM1 - CablePosM2) &lt;= CoherenceLimitM);
-
-        StabilizationFailed := WinchesMechanicallyStopped AND SeenNeutral AND NOT StabilizationOk;
-
-        IF ModeLostDuringCycle OR AxisHomingError THEN
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HX7_FAILED;
-        ELSIF StabilizationOk THEN
-            SeqStep := E_MachineHomingTxState.HX5_RELEASE_CLEARANCE;
-        ELSIF StabilizationFailed THEN
-            RetryCount := RetryCount + 1;
-            IF RetryCount &gt;= 3 THEN
-                MachineHomingFailed := TRUE;
-                SeqStep := E_MachineHomingTxState.HX7_FAILED;
-            ELSE
-                // Repositionnement et nouvelle tentative : retour en preparation benne
-                SeqStep := E_MachineHomingTxState.HX1_BUCKET_PREPARE;
-            END_IF;
-        END_IF;
-
-    E_MachineHomingTxState.HX5_RELEASE_CLEARANCE:
-        // Degagement zone haute, confirmation joystick au neutre.
-        CmdWinchSelect := 0;
-        IF ModeLostDuringCycle OR AxisHomingError THEN
-            MachineHomingFailed := TRUE;
-            SeqStep := E_MachineHomingTxState.HX7_FAILED;
-        ELSIF NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
-            SeqStep := E_MachineHomingTxState.HX6_HOMED_SUCCESS;
-        END_IF;
-
-    E_MachineHomingTxState.HX6_HOMED_SUCCESS:
-        // Validation finale : MachineHomed := TRUE, commit atomique benne.
-        CmdWinchSelect := 0;
-        IF NOT CommitDone THEN
-            BucketCommit.CommitClose := PendingClose;
-            CommitPublished          := TRUE;
-            CommitDone               := TRUE;
-        ELSE
-            PendingClose := FALSE;
-            SeqStep      := E_MachineHomingTxState.HX0_REPOS;
-        END_IF;
-
-    E_MachineHomingTxState.HX7_FAILED:
-        // Echec sequence unifie : sorties a 0, attente Reset conscient en MAINT_N2.
-        CmdWinchSelect := -1;
-        ;
-
-END_CASE;
-{endregion}
-
-{region "§9 Cycle de vie &amp; qualification de sortie"}
-// === §9 CYCLE DE VIE + QUALIFICATION ================================
-CycleRunning := (SeqStep &lt;&gt; E_MachineHomingTxState.HX0_REPOS);
-
-// Selection treuil demandee par le cycle
-IF (SeqStep = E_MachineHomingTxState.HX1_BUCKET_PREPARE) THEN
-    CmdWinchSelect := 2;
-ELSIF (SeqStep = E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK)
-   OR (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED)
-   OR (SeqStep = E_MachineHomingTxState.HX3_FLYING_REFERENCE)
-   OR (SeqStep = E_MachineHomingTxState.HX4_STABILIZATION_CHECK)
-   OR (SeqStep = E_MachineHomingTxState.HX5_RELEASE_CLEARANCE)
-   OR (SeqStep = E_MachineHomingTxState.HX6_HOMED_SUCCESS) THEN
-    CmdWinchSelect := 0;
 ELSE
-    CmdWinchSelect := -1;
+    // Ponts non restaurés : aucune écriture Cfg, aucune mémoire amorcée.
+    Ready := FALSE;
 END_IF;
 
-M3Locked             := CycleRunning;
-MachineHomingActive  := CycleRunning;
-Lifecycle.Busy       := CycleRunning;
-Lifecycle.Done       := CommitPublished AND (SeqStep = E_MachineHomingTxState.HX0_REPOS);
-MachineHomingSeqStep := SeqStep;
-
-CommitOrOffsetValid := CommitPublished OR BucketOffsetValid;
-MachineHomed := BothAxesHomed AND CommitOrOffsetValid
-                AND (SeqStep &lt;&gt; E_MachineHomingTxState.HX7_FAILED)
-                AND NOT MachineHomingFailed AND NOT ReHomingAckRequired
-                AND NOT Fault.Latched;
-{endregion}
-
-{region "§10 Guide operateur — echelle de priorite"}
-// === §10 GUIDE OPERATEUR (echelle de priorite) ======================
-IF Fault.Latched THEN
-    MachineHomingStep := E_MachineHomingStep.FAILED;
-    MachineHomingInstruction := 'Erreur ou Echec homing - Acquitter (Reset)';
-ELSIF MachineHomingFailed OR (SeqStep = E_MachineHomingTxState.HX7_FAILED) THEN
-    MachineHomingStep := E_MachineHomingStep.FAILED;
-    MachineHomingInstruction := 'HX7 - Homing incomplet - Acquitter Reset N2';
-ELSIF MachineHomingLossSafeStop THEN
-    MachineHomingStep := E_MachineHomingStep.LOSS_SAFESTOP;
-    MachineHomingInstruction := 'Reference perdue - Arret controle';
-ELSIF MachineHomed AND NOT CycleRunning THEN
-    MachineHomingStep := E_MachineHomingStep.VALID;
-    MachineHomingInstruction := '';
-ELSIF (SeqStep = E_MachineHomingTxState.HX1_BUCKET_PREPARE) THEN
-    MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
-    MachineHomingInstruction := 'HX1 - RefHoming Fermer benne, valider sur IHM';
-ELSIF (SeqStep = E_MachineHomingTxState.HX1A_COUPLING_INTERLOCK) THEN
-    MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
-    MachineHomingInstruction := 'HX1a - RefHoming Verif couplage M1+M2';
-ELSIF (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED) THEN
-    MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
-    MachineHomingInstruction := 'HX2 - RefHoming Tirer JOY palier 1 vers haut';
-ELSIF (SeqStep = E_MachineHomingTxState.HX3_FLYING_REFERENCE) THEN
-    MachineHomingStep := E_MachineHomingStep.HOMING_IN_PROGRESS;
-    IF HomingModeBActive THEN
-        IF NOT WinchesMechanicallyStopped THEN
-            MachineHomingInstruction := 'HX3 - Repli arret (Mode B) : attente arret treuils';
-        ELSE
-            MachineHomingInstruction := 'HX3 - Repli arret (Mode B) : reference conjointement';
-        END_IF;
-    ELSE
-        MachineHomingInstruction := 'HX3 - RefHoming Prise de reference au vol';
-    END_IF;
-ELSIF (SeqStep = E_MachineHomingTxState.HX4_STABILIZATION_CHECK) THEN
-    MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
-    MachineHomingInstruction := 'HX4 - RefHoming Arret et controle inertie';
-ELSIF (SeqStep = E_MachineHomingTxState.HX5_RELEASE_CLEARANCE) THEN
-    MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
-    MachineHomingInstruction := 'HX5 - RefHoming Relacher JOY au neutre';
-ELSIF (SeqStep = E_MachineHomingTxState.HX6_HOMED_SUCCESS) THEN
-    MachineHomingStep := E_MachineHomingStep.VALID;
-    MachineHomingInstruction := 'HX6 - RefHoming Machine referencee';
-ELSIF NOT M1Status.HomedAndReliable AND NOT M2Status.HomedAndReliable THEN
-    MachineHomingStep := E_MachineHomingStep.BOTH_NOT_HOMED;
-    IF Mode = E_Mode.MAINT_N2 THEN
-        MachineHomingInstruction := 'HX0 - RefHoming M1+M2 non ref - Lancer sur IHM';
-    ELSIF Mode = E_Mode.MAINT_N1 THEN
-        MachineHomingInstruction := 'HX0 - M1+M2 non ref - Homing unitaire possible';
-    ELSE
-        MachineHomingInstruction := 'HX0 - M1+M2 non referencies';
-    END_IF;
-ELSIF NOT M1Status.HomedAndReliable THEN
-    MachineHomingStep := E_MachineHomingStep.M1_NOT_HOMED;
-    IF Mode = E_Mode.MAINT_N2 THEN
-        MachineHomingInstruction := 'HX0 - RefHoming M1 non ref - Lancer sur IHM';
-    ELSIF Mode = E_Mode.MAINT_N1 THEN
-        MachineHomingInstruction := 'HX0 - M1 non ref - Homing unitaire possible';
-    ELSE
-        MachineHomingInstruction := 'HX0 - M1 non reference';
-    END_IF;
-ELSIF NOT M2Status.HomedAndReliable THEN
-    MachineHomingStep := E_MachineHomingStep.M2_NOT_HOMED;
-    IF Mode = E_Mode.MAINT_N2 THEN
-        MachineHomingInstruction := 'HX0 - RefHoming M2 non ref - Lancer sur IHM';
-    ELSIF Mode = E_Mode.MAINT_N1 THEN
-        MachineHomingInstruction := 'HX0 - M2 non ref - Homing unitaire possible';
-    ELSE
-        MachineHomingInstruction := 'HX0 - M2 non reference';
-    END_IF;
-ELSIF NOT (CommitPublished OR BucketOffsetValid) THEN
-    IF Mode = E_Mode.MAINT_N2 THEN
-        MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
-        MachineHomingInstruction := 'HX0 - RefHoming Lancer le homing (etat benne)';
-    ELSIF Mode = E_Mode.MAINT_N1 THEN
-        MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
-        MachineHomingInstruction := 'HX0 - Offset benne inconnu';
-    ELSE
-        MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
-        MachineHomingInstruction := 'HX0 - Offset benne inconnu';
-    END_IF;
-ELSE
-    MachineHomingStep := E_MachineHomingStep.VALID;
-    MachineHomingInstruction := 'Reference machine valide';
-END_IF;
-
-// Capture R9 de l'etape a l'apparition du defaut latche
-IF LatchedEdge.Q THEN
-    MachineHomingStepAtError := MachineHomingStep;
-END_IF;
-
-Ready := Enable AND NOT Fault.Latched;
-FirstScanDone := TRUE;
+// Maintien IHM : une correction dure UN scan (10 ms) -&gt; sans maintien le message serait
+// invisible. TOF = conserve Q VRAI pendant PT après retombée de IN (fenêtre de maintien).
+// Appelé à CHAQUE scan, y compris normalisation inhibée (la fenêtre doit pouvoir retomber).
+T330MsgHold(IN := Corrected, PT := T#500ms);
+CorrectedHeld := T330MsgHold.Q;
 {endregion}
 </xhtml>
           </ST>
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b5c9dd36-3240-54e6-ad41-55265cc042b2</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_FaultCore" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation générale du FB porteur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Reset">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement (jamais conditionné, §9)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Causes">
-              <type>
-                <array>
-                  <dimension lower="0" upper="15" />
-                  <baseType>
-                    <derived name="ST_FaultCause" />
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="Ready">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB porteur autorisé (= Enable)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Fault">
-              <type>
-                <derived name="ST_Fault" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="ResetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Reset</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Latch">
-              <type>
-                <array>
-                  <dimension lower="0" upper="15" />
-                  <baseType>
-                    <BOOL />
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bit laté par cause, jusqu'au Reset</xhtml>
-              </documentation>
-            </variable>
-            <variable name="i">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de parcours de la liste</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : à partir d'une LISTE de causes en clair (ARRAY[0..15] OF
-      ST_FaultCause), produire la brique ST_Fault :
-        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
-        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l'apparition d'une
-          cause `Active AND Latching`, conservé jusqu'au front Reset.
-   🔒 Sécurité :
-      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
-      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
-      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
-      - un défaut laté non acquitté reste publié même FB désactivé (pas d'effacement
-        silencieux sur bascule Enable OFF→ON sans Reset).
-      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
-   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
-      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
-   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
-   =======================================================================</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-{region "§1 Reset (front, toujours effectif)"}
-// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
-Ready := Enable;
-ResetEdge(CLK := Reset);
-IF ResetEdge.Q THEN
-    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
-END_IF;
-{endregion}
-
-{region "§2 Vue LIVE — Error / ErrorId"}
-// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
-// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
-Fault.ErrorId := 0;
-IF Enable THEN
-    FOR i := 0 TO 15 DO
-        IF Causes[i].Active THEN
-            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
-        END_IF;
-    END_FOR;
-END_IF;
-Fault.Error := (Fault.ErrorId &lt;&gt; 0);
-{endregion}
-
-{region "§3 Armement des latches (causes à acquitter)"}
-// Une cause Active ET Latching arme son bit ; le bit reste jusqu'au front Reset (§1),
-// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
-IF Enable THEN
-    FOR i := 0 TO 15 DO
-        IF Causes[i].Active AND Causes[i].Latching THEN
-            Latch[i] := TRUE;
-        END_IF;
-    END_FOR;
-END_IF;
-{endregion}
-
-{region "§4 Vue LATCHÉE — Latched / LatchedId"}
-// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
-Fault.LatchedId := 0;
-FOR i := 0 TO 15 DO
-    IF Latch[i] THEN
-        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
-    END_IF;
-END_FOR;
-Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
-{endregion}
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>182a55ac-4f1f-5204-b2e2-869f3904964e</ObjectId>
+            <ObjectId>1905fd7d-e6ee-55a1-9397-6bb750807543</ObjectId>
           </data>
         </addData>
       </pou>
@@ -2378,32 +616,14 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
   <addData>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
-        <Folder Name="G_CYCLE">
-          <Object Name="FB_CycleMachineHoming" ObjectId="b5c9dd36-3240-54e6-ad41-55265cc042b2" />
-          <Folder Name="_TYPES">
-            <Object Name="E_MachineHomingStep" ObjectId="91b3da89-8226-5d1f-92ee-cf29483801dd" />
-            <Object Name="E_MachineHomingTxState" ObjectId="74e41b9c-4f86-5300-8b05-c49be09e5fcb" />
-            <Object Name="ST_fbMachineHomingCycle_AxisHomingStatus" ObjectId="796b0dad-a243-58d0-a47d-362338c07aeb" />
-            <Object Name="ST_fbMachineHomingCycle_BucketCommit" ObjectId="8bbe6b1c-b915-5c25-90f5-ca9c8b430b97" />
-            <Object Name="ST_fbMachineHomingCycle_Cfg" ObjectId="9864af20-d1ca-5866-b87e-61641e2f5961" />
-            <Object Name="ST_fbMachineHomingCycle_HomingDemand" ObjectId="a0819120-1e85-5b22-8a6d-414f9c7d9a11" />
-          </Folder>
-        </Folder>
-        <Folder Name="F_MODES">
-          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
-        </Folder>
-        <Folder Name="A_COMMUN">
-          <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
-          <Folder Name="_TYPES">
-            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
-            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
-            <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
-          </Folder>
-        </Folder>
         <Folder Name="J_SUPERVISION">
+          <Object Name="FB_CfgT330Normalizer" ObjectId="1905fd7d-e6ee-55a1-9397-6bb750807543" />
           <Folder Name="_TYPES">
-            <Folder Name="3_CYCLE_ET_MODES">
-              <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
+            </Folder>
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
             </Folder>
           </Folder>
         </Folder>

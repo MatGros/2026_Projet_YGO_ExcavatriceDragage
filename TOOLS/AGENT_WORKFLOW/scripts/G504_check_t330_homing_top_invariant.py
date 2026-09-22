@@ -44,9 +44,9 @@ PRG07 = ROOT / "CODE" / "M_MAIN" / "PRG_07_Supervision.st"
 FB_NORMALIZER = ROOT / "CODE" / "J_SUPERVISION" / "FB_CfgT330Normalizer.st"
 CODE = ROOT / "CODE"
 
-# Bornes Q21 (plan v1.3, decision C1 : TOP<=10 et Delta>=1 => FDC<=9)
-FDC_MIN, FDC_MAX = 0.00, 9.00
-TOP_MIN, TOP_MAX = 1.00, 10.00
+# Bornes Q21 (plan v1.3, decision C1 : TOP dans [-20 ; 25] et FDC dans [-25 ; 20])
+FDC_MIN, FDC_MAX = -25.00, 20.00
+TOP_MIN, TOP_MAX = -20.00, 25.00
 RESERVE_MIN = 1.00
 SLOWDOWN_MIN = 0.50
 

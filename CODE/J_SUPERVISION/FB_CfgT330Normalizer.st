@@ -50,10 +50,10 @@ VAR CONSTANT
     // NON persistantes et NON IHM (AC3) : jamais exposées, jamais RETAIN.
     CST_T330ReserveMinMargin_M : REAL := 1.00;   // Réserve minimale FDC logiciel haut / TOP homing
     CST_T330SlowdownTopMin_M   : REAL := 0.50;   // Plancher du ralentissement haut (Q1)
-    CST_T330FdcMin_M           : REAL := 0.00;   // Borne basse FDC (Q21)
-    CST_T330FdcMax_M           : REAL := 9.00;   // Borne haute FDC (Q21/C1 : TOP<=10 et Delta>=1 => FDC<=9)
-    CST_T330TopMin_M           : REAL := 1.00;   // Borne basse TOP (Q21)
-    CST_T330TopMax_M           : REAL := 10.00;  // Borne haute TOP (Q21)
+    CST_T330FdcMin_M           : REAL := -25.00; // Borne basse FDC
+    CST_T330FdcMax_M           : REAL := 20.00;  // Borne haute FDC
+    CST_T330TopMin_M           : REAL := -20.00; // Borne basse TOP
+    CST_T330TopMax_M           : REAL := 25.00;  // Borne haute TOP (marge 1m au dessus de FDC 20m)
 END_VAR
 
 VAR
