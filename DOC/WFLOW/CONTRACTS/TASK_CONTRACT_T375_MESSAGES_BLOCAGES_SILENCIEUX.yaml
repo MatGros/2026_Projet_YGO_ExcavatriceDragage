@@ -15,6 +15,7 @@ contract:
   task_id: T375_MESSAGES_BLOCAGES_SILENCIEUX
   criticality: C3
   strategy: patch
+  groupement: "2026-09-22 - ce lot couvre T375 ET T365 (4 voies silencieuses) ; brief commun DOC/WFLOW/CONTRACTS/BRIEF_T375_T365_MESSAGES_SILENCIEUX_v1.md"
 
   # ── 1. Objectif metier ────────────────────────────────────────────────────
   objective: >
@@ -49,6 +50,15 @@ contract:
     - id: AC8
       statement: "Aucune logique de securite n'est modifiee : git diff --numstat VIDE sur les fichiers de securite et la chaine AU."
       verified_by: "git diff --numstat CODE/H_TREUILS_BENNE/FB_Safety_Winch.st CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st CODE/H_TREUILS_BENNE/FB_Winch.st CODE/B_AU_SECURITE/ = vide"
+    - id: AC5
+      statement: "4e voie (T365) : tout agregat de defauts qui met AnyFault a 1 publie AU MOINS une ligne NOMMEE dans le bandeau (ModesFault), et le message datum de referencement est LISIBLE (mots entiers, <= 70 caracteres)."
+      verified_by: "2 tests (AnyFault=1 avec et sans porte de validite) + observation du bandeau ; le cas echoue si la ligne nommee disparait."
+    - id: AC6
+      statement: "Qualification du message MecaB : le message NOMME la sous-condition fautive (contacteurs non retombes vs frein encore ouvert) ET le temps ecoule, calcule DANS LA COUCHE IHM depuis les retours DEJA publies (M1_ContactorsReleased_DI, M1_BrakeIsOpen_DI)."
+      verified_by: "Test ROUGE avant / VERT apres + test de MUTATION (qualification retiree => echec). FB_Safety_Winch.st reste INTERDIT."
+    - id: AC7
+      statement: "Toute mesure porte sa REVISION (hash git blob des fichiers touches) ; bloc Auto-verification liaison (G200 --report) colle ; palier C sans rouge nouveau."
+      verified_by: "git hash-object + G200_check_linkage.py --report + run_all_gates.py --palier C."
 
   # ── 3. Perimetre ──────────────────────────────────────────────────────────
   scope:

@@ -1,11 +1,19 @@
 # 📋 BRIEF — LOT « MESSAGES DE BLOCAGE SILENCIEUX » (T375 + T365)
-## v1 — PRÊT À TRANSMETTRE
+## v1.1 — PRÊT À TRANSMETTRE (groupement T365 → T375 acté)
 
-> 📅 2026-09-22 · 🏷️ Rédacteur : **DSH01** (orchestrateur) · 🎯 **Lots groupés** : **T375** (C3) + **T365** (C2, parent T356)
+> 📅 2026-09-22 · 🏷️ Rédacteur : **DSH01** (orchestrateur) · 🎯 **Lots groupés** : **T375** (C3) + **T365** (C2, **désormais rattachée à T375** — groupement du 2026-09-22)
 > 📄 Faits techniques **vérifiés de première main** par l'orchestrateur (§2) · 🚫 **Aucune logique de sécurité à toucher**
 > 🧩 Principe directeur : **un défaut qui n'est pas NOMMÉ à l'IHM est un défaut qui n'existe pas pour l'opérateur**
 
 ---
+
+> 🔄 **MISE À JOUR v1.1 (2026-09-22) — GROUPEMENT ACTÉ.** `T365` n'est plus une tâche indépendante
+> (`parent T356`) : elle est **rattachée à `T375`** et traitée **dans ce brief**, comme **voie 4**.
+> Pourquoi ce document est mis à jour : un changement de catalogue **sans** mise à jour du brief ferait
+> travailler les agents sur un **référentiel périmé**. Ce qui change concrètement pour eux :
+> **AC6** couvre désormais `T365` (`ModesFault` + message datum), et le **contrat**
+> `TASK_CONTRACT_T375_MESSAGES_BLOCAGES_SILENCIEUX.yaml` porte les **4 voies** au lieu de 3.
+> Traçabilité : catalogue `TASKS.yaml` (`T365.parent_id := T375`) · registre `TASKS_ORCHESTRATOR.yaml`.
 
 ## 0. PRÉAMBULE OBLIGATOIRE (source : `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` — à lire en entier)
 
