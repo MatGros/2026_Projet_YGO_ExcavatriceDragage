@@ -324,6 +324,38 @@ l'exploitant de relever une valeur que la **CI ou un snapshot** aurait pu fourni
 
 ---
 
+## 🧰 QUAND UTILISER `orchestrate` (plugin dsh-ha-orchestrator) — habitude inscrite 2026-09-22
+
+> 🎯 **Décision de l'exploitant** : « prends l'habitude de l'utiliser, ou conseille-moi de l'utiliser ».
+> Ce n'est pas un outil de plus : c'est **la** voie pour trois mécanismes qui manquaient.
+
+**Règle de choix (à appliquer sans réfléchir) :**
+
+| Situation | Outil |
+|---|---|
+| 1 délégation ciblée, résultat court attendu | `subagent` (simple) |
+| **≥ 2 sous-tâches indépendantes** (audits, multi-fichiers, multi-objets, comparaisons) | **`orchestrate` mode `fanout`** |
+| **Revue / challenge obligatoire** (règle projet : toujours challenger + revoir) | **`orchestrate` mode `supervisor`** + `reviewers` (`reviewer`) + `reviewRounds` |
+| Étapes dépendantes (cadrage → implémentation → preuve) | **`orchestrate` mode `pipeline`** |
+| Recherche multi-objets documentée (URL source, date d'observation, preuves conservées) | **`orchestrate`** + agents **`researcher`** puis **`research-merger`** |
+| Un seul lot à écrire, périmètre unique | `subagent` (un écrivain par fichier — voir la règle de collision) |
+
+**Les 3 mécanismes à exiger SYSTÉMATIQUEMENT dans les tâches déléguées :**
+
+1. 📄 **Artefact durable** — un run doit laisser une trace sur disque (le plugin écrit un Markdown par run). *Sans ça, un rapport d'agent peut disparaître avec la conversation (2 occurrences constatées le 2026-09-22).*
+2. 🔒 **`outputSchema` avec la RÉVISION épinglée** — chaque constat délégué doit porter `{fichier, ligne, hash_revision, preuve, gravite}`. *4 incidents le 2026-09-22 venaient d'une mesure non épinglée (fausse alerte, verdict périmé, rapport CI menteur). Ce schéma rend `G527` mécanique au lieu de souhaité.*
+3. 🧑⚖️ **`supervisor` + 2 `reviewers`** — la règle « toujours challenger + revoir » devient **un run**, plus une discipline manuelle.
+
+**Conseiller l'outil à l'exploitant** quand : la tâche se découpe en ≥ 2 sujets indépendants · une revue indépendante est requise · on veut un rapport **archivé** plutôt qu'un message de chat · plusieurs modèles doivent être comparés.
+
+**Limites à ne jamais oublier (anti-Yes-Man) :**
+- ❌ **Un artefact de run reste un RAPPORT, pas une preuve** : l'orchestrateur lit **toujours** le `git diff` réel et rejoue les preuves. Un rapport peut mentir ou vieillir.
+- ❌ **Ne règle AUCUNE collision d'écriture** (plusieurs écrivains sur un même fichier) : c'est un problème de **protocole** (locks/drapeaux, un écrivain par fichier), pas d'orchestration.
+- ⚠️ **Vérifier que le schéma n'a pas été retiré silencieusement** par le provider (le plugin élague les champs non supportés) : lire `runs.jsonl` au 1er run — un schéma ignoré donne un **faux sentiment de structure**.
+- ⚠️ Les sous-agents restent **génériques** : coller `subagent_preamble.md` dans **chaque** prompt de tâche, sans exception.
+
+---
+
 ## 📚 Références
 
 - Catalogue des tâches : `DOC/WFLOW/TASKS.yaml`
