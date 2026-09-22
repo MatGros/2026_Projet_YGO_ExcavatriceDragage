@@ -24,6 +24,11 @@ Ce gate ECHOUE si :
 Marqueurs de retrait documente (insensibles a la casse ET aux accents) : `revert`, `reverte`,
 `annul`, `abandonn`, `on oublie`, `supprim`, `git checkout`, `plus le bon sujet`.
 
+⚠️ Affinage `supprim` (faux positif 2026-09-22) : une occurrence `supprim` introduite par une
+negation (« aucune suppression », « aucune assertion supprimée », « ne pas supprimer ») est une
+mention NEUTRE, PAS un retrait documente — le code n'est pas retire. Seul un retrait reel
+(« 125 lignes supprimees (git checkout) », REX T367) demeure bloquant.
+
 Trois modes :
   python G523_check_snapshot_recovery_justified.py [racine]            (usage)
   python G523_check_snapshot_recovery_justified.py [racine] --task <ID> [--file <chemin>]
@@ -108,13 +113,53 @@ def sans_accent(texte: str) -> str:
     return "".join(c for c in nfkd if not unicodedata.combining(c))
 
 
+# Négations qui annulent la portée d'un marqueur "supprim" : « aucune suppression »,
+# « aucune assertion supprimée », « ne pas supprimer » sont des mentions NEUTRES
+# (le code n'est PAS retiré), pas un retrait documenté. Un vrai retrait (REX T367 :
+# « 125 lignes ... supprimées (git checkout) ») n'est jamais introduit par une négation.
+NEGATIONS_SUPPRIM = ("aucun", "aucune", "rien", "ne pas", "n est pas", "jamais", "pas ")
+# Fenêtre de contexte (caractères) avant une occurrence "supprim" pour chercher la négation.
+FENETRE_NEGATION = 22
+# Fenêtre (caractères) APRES une occurrence du nom de fichier, pour chercher un marqueur de
+# retrait documenté à proximité (correction faux positif 2026-09-22).
+FENETRE_MARQUEUR = 200
+
+
+def _supprim_est_neutre(norme: str, m: re.Match | None = None, pos: int | None = None) -> bool:
+    """Vrai si l'occurrence `supprim` est introduite par une negation.
+
+    Peut recevoir soit un match `m` (position relative a `norme`), soit une position ABSOLUE
+    `pos` dans `norme`. Ex. « aucune suppression » / « aucune assertion supprimee » =>
+    neutre (PASS). Ex. « 125 lignes supprimees (git checkout) » => retrait reel (FAIL).
+    """
+    if m is not None:
+        pos = m.start()
+    if pos is None:
+        return False
+    debut = max(0, pos - FENETRE_NEGATION)
+    contexte = norme[debut:pos]
+    return any(n in contexte for n in NEGATIONS_SUPPRIM)
+
+
 def marqueurs_trouves(texte: str) -> list[str]:
     """Marqueurs de retrait presents dans `texte` (insensible casse/accent).
 
-    Sous-chaines : simple recherche de sous-chaine. Famille `revers` : motif regex (voir
-    ci-dessus) applique sur le texte normalise (sans accent, minuscules)."""
+    Sous-chaines : simple recherche de sous-chaine. La sous-chaine `supprim` est affinee :
+    une occurrence introduite par une negation (« aucune suppression », « aucune assertion
+    supprimee ») est une mention NEUTRE et ne constitue PAS un retrait documente (faux
+    positif G523, REX 2026-09-22 : le gate attrapait « AUCUNE suppression »). Famille
+    `revers` : motif regex (voir ci-dessus) applique sur le texte normalise."""
     norme = sans_accent(texte).lower()
-    trouves = [m for m in SOUS_CHAINES if m in norme]
+    trouves: list[str] = []
+    for m in SOUS_CHAINES:
+        if m == "supprim":
+            # Occurrences de la sous-chaine, en excluant celles introduites par une negation.
+            for occ in re.finditer(re.escape("supprim"), norme):
+                if not _supprim_est_neutre(norme, occ):
+                    trouves.append(m)
+                    break
+        elif m in norme:
+            trouves.append(m)
     if REVERS_FAMILLE.search(norme):
         trouves.append(MARQUEUR_REVERS)
     return trouves
@@ -296,7 +341,14 @@ def analyser_scan(
     tasks: list[dict] | None,
     tasks_brut: str | None,
 ) -> list[dict]:
-    """Contradictions : fichier modifie ET retrait documente le concernant. Rien n'est ecrit."""
+    """Contradictions : fichier modifie ET retrait documente le concernant. Rien n'est ecrit.
+
+    Proximite fichier <-> marqueur (correction orchestrateur 2026-09-22, faux positif) : un
+    marqueur ne constitue une contradiction QUE s'il est proche (FENETRE_MARQUEUR caracteres)
+    d'une occurrence du fichier modifie dans le texte de la tache. Sans ce lien de proximite,
+    le marqueur apparait dans une phrase sans rapport (ex. « supprime les recaptures » / « rien
+    n a ete supprime » dans l'avancement de T346/T347 qui listent aussi d'autres fichiers).
+    """
     contradictions: list[dict] = []
     for entree in (tasks or []):
         eid = str(entree.get("id", ""))
@@ -305,10 +357,14 @@ def analyser_scan(
         )
         if not texte:
             continue
-        nom = " / ".join(sorted({m for m in modifies if m in texte}))
-        if not nom:
+        norme = sans_accent(texte).lower()
+        presentes = sorted({m for m in modifies if m in texte})
+        if not presentes:
             continue
-        for m in marqueurs_trouves(texte):
+        for fichier in presentes:
+            nom_brut = fichier.split("/")[-1]
+            if not _marqueur_proche_fichier(norme, fichier, nom_brut):
+                continue
             # Correction orchestrateur D1-scan (meme defaut que D1 dans le chemin --task) : citer la
             # ligne du BLOC de la tache concernee, jamais la 1re occurrence `contexte:` du fichier.
             # On cite le champ qui PORTE reellement le marqueur (le marqueur peut venir de
@@ -319,9 +375,41 @@ def analyser_scan(
                 if valeur_champ and marqueurs_trouves(valeur_champ):
                     ligne = _ligne_champ_bloc(tasks_brut, eid, champ)
                     break
-            contradictions.append({"fichier": nom, "tache": eid, "ligne": ligne, "marqueur": m})
+            contradictions.append({"fichier": fichier, "tache": eid, "ligne": ligne,
+                                  "marqueur": "supprim", "extrait": texte[:140]})
             break  # une seule contradiction par entree/fichier suffit
     return contradictions
+
+
+def _marqueur_proche_fichier(norme: str, fichier: str, nom_brut: str) -> bool:
+    """Vrai si un marqueur de retrait non nie est A PROXIMITE d'une occurrence du fichier.
+
+    Fait la recherche sur chaque occurrence du nom de fichier (chemin complet puis basename) :
+    on regarde la fenetre [FENETRE_MARQUEUR] caracteres AVANT ET APRES chaque occurrence (la
+    mention du fichier peut venir avant ou apres l'action documentee, ex. REX T367 :
+    « 125 lignes supprimees (git checkout) » precede le nom du fichier). Un marqueur nie (ex.
+    « rien n a ete supprime ») ou situe sans rapport (ex. « supprime les recaptures » d'un autre
+    sujet) n'est PAS retenu — c'est la correction du faux positif 2026-09-22.
+    """
+    for cible in (fichier.lower(), nom_brut.lower()):
+        for occ in re.finditer(re.escape(cible), norme):
+            debut = max(0, occ.start() - FENETRE_MARQUEUR)
+            fin = min(len(norme), occ.end() + FENETRE_MARQUEUR)
+            contexte = norme[debut:fin]
+            if REVERS_FAMILLE.search(contexte):
+                return True
+            for m in SOUS_CHAINES:
+                if m == "supprim" and m in contexte:
+                    # Position ABSOLUE de l'occ. supprim (pas la tranche) : la negation peut
+                    # tomber juste avant les bornes de la fenetre, elle serait coupee si on
+                    # cherchait seulement sur la tranche (faux positif 2026-09-22).
+                    for occ_m in re.finditer(re.escape(m), contexte):
+                        abs_pos = debut + occ_m.start()
+                        if not _supprim_est_neutre(norme, None, abs_pos):
+                            return True
+                elif m != "supprim" and m in contexte:
+                    return True
+    return False
 
 
 # ── Selftest ──────────────────────────────────────────────────────────────────
@@ -401,6 +489,24 @@ def selftest() -> int:
         verifier(not ack_est_valide(""), "(d) acknowledgement vide refuse")
         verifier(not ack_est_valide("   "), "(d) acknowledgement blanc refuse")
         verifier(ack_est_valide("raison valide"), "(d) acknowledgement non vide accepte")
+
+        # (d2) faux positif `supprim` (REX 2026-09-22) : une mention NEGATIVE ne porte aucun
+        # retrait documente. « AUCUNE suppression » et « aucune assertion supprimee » doivent
+        # PASSER ; « 125 lignes supprimees (git checkout) » doit rester FAIL.
+        tasks_d2, brut_d2 = document([
+            ("T401", "⏳", "AUCUNE suppression, aucun deplacement : tache de reconciliation."),
+            ("T402", "⬜", "Aucune assertion supprimee ni affaiblie."),
+            ("T403", "⬜", "Lot reverte : 125 lignes supprimees (git checkout)."),
+        ])
+        m401, _, _, _ = analyser_tache("T401", tasks_d2, brut_d2, [], None)
+        verifier(not m401,
+                 "(d2) 'AUCUNE suppression' detecte comme un retrait (faux positif)")
+        m402, _, _, _ = analyser_tache("T402", tasks_d2, brut_d2, [], None)
+        verifier(not m402,
+                 "(d2) 'aucune assertion supprimee' detecte comme un retrait (faux positif)")
+        m403, _, _, _ = analyser_tache("T403", tasks_d2, brut_d2, [], None)
+        verifier(bool(any(m == "supprim" for m in m403)),
+                 "(d2) '125 lignes supprimees (git checkout)' n'est plus detecte (regression)")
 
         # (e) --scan avec contradiction -> FAIL, ET la ligne citee est celle du BLOC de la tache
         # concernee. Le cas comporte VOLONTAIREMENT une tache neutre AVANT la tache en retrait :

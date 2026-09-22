@@ -25,7 +25,7 @@ VAR_INPUT
 
     // === PERMIS SECURITE ===
     ArmingPermit              : BOOL;       // --> [SAFE] Permission d'armement homme-mort ; FALSE = armement bloqué
-    DirectInversionPermit     : BOOL;       // --> [SAFE] Inversion Y sans neutre, semi-auto AX8..AX12 et repli du vidage AX15b
+    DirectInversionPermit     : BOOL;       // --> [SAFE] Inversion Y sans neutre, semi-auto AX8..AX12, repli du vidage AX15b et micro-step benne AX15d (T383)
 
     // === ACQUISITION MATERIELLE & DIAGNOSTIC ===
     BusCanOpenOP              : ST_Diag_Device; // --> [HW]   Etat presence noeud CAN

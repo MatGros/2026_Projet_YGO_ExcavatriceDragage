@@ -282,10 +282,10 @@ VAR CONSTANT
     CST_DiveStartSpeedThresholdMps : REAL := 0.02; // Vitesse quasi nulle, alignee FB_Modes
     CST_ExtractionStepDelay    : TIME := T#1s;
     // 🔧 T358 : forcage de step — sentinelle de consigne et borne haute de plage.
-    // CST_StepForceMax = dernier membre de E_AutoCycleStep (AX10B_RACCORDEMENT_P1) :
-    // toute valeur hors [0..22] est refusee, toute valeur de l'enum est acceptee.
+    // CST_StepForceMax = dernier membre de E_AutoCycleStep (AX15D_DUMP_BUCKET_JOG, T383) :
+    // toute valeur hors [0..23] est refusee, toute valeur de l'enum est acceptee.
     CST_StepForceNone          : INT := -1;   // Sentinelle : aucune demande de forcage
-    CST_StepForceMax           : INT := 22;   // Borne haute de la plage d'enum coercible
+    CST_StepForceMax           : INT := 23;   // Borne haute de la plage d'enum coercible
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -470,7 +470,10 @@ instCauses[1].Active   := WinchSyncError
                           AND (State <> E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
                           AND (State <> E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
                           AND (State <> E_AutoCycleStep.AX10_CLOSE_BUCKET)
-                          AND (State <> E_AutoCycleStep.AX11_CTRL_ASCENT);
+                          AND (State <> E_AutoCycleStep.AX11_CTRL_ASCENT)
+                          // AX15D (T383) : module benne sur place a la tremie, meme fenetre de vidage
+                          // que AX15B — exclusion sync identique a AX10 (decision safety arbitrage 5).
+                          AND (State <> E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG);
 instCauses[1].Latching := TRUE;
 instCauses[1].Texte    := 'Desynchronisme treuils M1/M2 bloquant';
 
@@ -736,7 +739,7 @@ END_IF;
 //    (decision exploitant 2026-09-21, risque assume et trace en note d'application).
 // ⚠️ AUCUNE garde de contexte : ni mode, ni joystick, ni arret mecanique des treuils,
 //    ni immersion Kobold, ni contexte fond. La SEULE validation restante est la plage
-//    des valeurs de E_AutoCycleStep [0..22] ; hors plage = rejet, aucune ecriture d'etape.
+//    des valeurs de E_AutoCycleStep [0..23] ; hors plage = rejet, aucune ecriture d'etape.
 // ⚠️ Le scan du forcage n'emet AUCUNE commande : demandes ramenees a zero et CASE
 //    inhibe (StateExecutionInhibit) — l'etape ciblee s'execute au scan suivant, soit
 //    un cycle de tache (10 ms). Un forcage annule aussi une attente de reprise en
@@ -768,6 +771,7 @@ IF StepForceConsigne <> CST_StepForceNone THEN
             20: ForceStepCandidate := E_AutoCycleStep.AX_DIVING_RETRY;       ForceStepCandidateValid := TRUE;
             21: ForceStepCandidate := E_AutoCycleStep.AX3_WAIT_DIVE_START;   ForceStepCandidateValid := TRUE;
             22: ForceStepCandidate := E_AutoCycleStep.AX10B_RACCORDEMENT_P1; ForceStepCandidateValid := TRUE;
+            23: ForceStepCandidate := E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG;  ForceStepCandidateValid := TRUE;
         END_CASE;
     END_IF;
 
@@ -794,7 +798,7 @@ IF StepForceConsigne <> CST_StepForceNone THEN
         ForceStepResult := '';           // une consigne appliquee efface le motif de rejet precedent
     ELSE
         ForceStepRejected := TRUE;
-        ForceStepResult := 'Forcage refuse : cible hors plage E_AutoCycleStep (0..22).';
+        ForceStepResult := 'Forcage refuse : cible hors plage E_AutoCycleStep (0..23).';
     END_IF;
     // La consigne n'est PAS ecrite par le FB : elle est acquittee par PRG_03 sur
     // StepForceTgtTaken (invariant verifie par le gate G517).
@@ -1541,7 +1545,7 @@ CASE State OF
         WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
         WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#040B;
-        OperatorAction := 'AX15b - Pousser : vidage. Tirer : fermer et remonter.';
+        OperatorAction := 'AX15b - Pousser : vidage. Tirer : fermer sur place (micro-step).';
 
         // Config treuil UNIQUE : etape benne seule, les deux treuils neutralises
         // (plus de descente couplee M1+M2 simultanee a l'ouverture benne -> plus
@@ -1553,24 +1557,57 @@ CASE State OF
 
         BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
 
-        // 🆘 Repli benne + treuils depuis le vidage : geste INVERSE maintenu (Y+, montee)
-        // sous homme-mort. La benne est REFERMEE puis les treuils remontent couples.
-        // Entree dans l'etape de fermeture existante AX10_CLOSE_BUCKET : la chaine
-        // AX10 -> AX10B -> AX11/AX12 est reutilisee telle quelle, sans duplication de
-        // logique ni nouvelle variable de position. AX10 est aussi l'etape sur laquelle
-        // la commande benne et la surveillance de synchronisme sont deja bornees en aval.
-        // Prioritaire sur l'option de repositionnement (AX15C commande une DESCENTE
-        // couplee : elle contredirait le geste de repli) et sur la fin de vidage.
-        // L'ouverture est neutralisee des ce scan, et AX10 publie lui aussi ReqOpen a 0
-        // sur toute la duree du repli : les deux demandes benne ne doivent jamais etre
-        // vraies sur le meme scan.
+        // 🔄 T383 (amendement GEL 2026-09-22) : le tirer n'effectue PLUS de saut AX15B -> AX10
+        // (saut arriere non declare, GEL ne le connait pas). Le tirer entre dans le micro-step
+        // AX15D_DUMP_BUCKET_JOG qui permet d'ouvrir/refermer la benne SUR PLACE a la tremie, sans
+        // quitter la phase de vidage et sans mouvement de treuil ni de translation. Retour AX15B
+        // au relachement (centre mort) ; la fin de vidage reste AX18 (AT15B inchange). Aucune
+        // echappatoire vers AX10 (decision exploitant arbitrage 3, confirmee par les 2 revues C4).
         IF DeadmanArmed AND JoystickPull THEN
             BucketCmd.ReqOpen := FALSE;
-            State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
+            State := E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG;
         ELSIF RepositionRequest THEN
             State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
         ELSIF DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
+            State := E_AutoCycleStep.AX18_DONE_SYNC;
+        END_IF;
+
+    E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG:
+        CycleStep := E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG;
+        CycleStateStr := 'AX15d - Module benne a la tremie';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT (DeadmanArmed AND (JoystickPush OR JoystickPull));
+        WaitingForProcess := DeadmanArmed AND (JoystickPush OR JoystickPull);
+        OperatorActionId := 16#040D;
+        OperatorAction := 'AX15d - Pousser : ouvrir benne. Tirer : fermer. Relacher : retour.';
+
+        // Module benne SUR PLACE a la tremie : treuils M1+M2 a 0, translation 0,
+        // aucun mouvement de treuil. Le geste ouvre (ReqOpen), l'inverse ferme
+        // (ReqClose), neutre = les deux FALSE (la benne se module sur place).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        TranslationCmd.ReqStart := FALSE;
+        TranslationCmd.PositionTgt := 0;
+        BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
+        BucketCmd.ReqClose := DeadmanArmed AND JoystickPull;
+
+        // Sorties TOUTES declarees au GEL (amendement T383) :
+        //  - retour au centre mort (relachement du manche) -> AX15B (reprendre le vidage)
+        //  - Benne_Done AND Benne_IsOpen (contenu vide) -> AX18
+        // La perte de l'homme-mort NE sort PAS d'AX15D : le gate §4 (Lifecycle.Busy AND NOT
+        // CycleMotionPermit) neutralise les commandes benne/treuils en conservant l'etape
+        // (doctrine identique a AX15B / AX10). Seul le relachement du manche ramene a AX15B.
+        IF NOT JoystickDeflected THEN
+            BucketCmd.ReqOpen := FALSE;
+            BucketCmd.ReqClose := FALSE;
+            State := E_AutoCycleStep.AX15B_DUMP_OPEN;
+        ELSIF DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen THEN
+            BucketCmd.ReqOpen := FALSE;
+            BucketCmd.ReqClose := FALSE;
             State := E_AutoCycleStep.AX18_DONE_SYNC;
         END_IF;
 
