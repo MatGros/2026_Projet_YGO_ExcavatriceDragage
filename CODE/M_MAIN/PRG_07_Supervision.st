@@ -756,6 +756,8 @@ instHmiBannerFormatter(
     DeadmanArmed                := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
+    CycleElapsed_Min             := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_Min,
+    CycleElapsed_S               := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_S,
     M3AtP1                      := GVL_IHM.M3Translation.State.AtP1,
     M3StatusText                := GVL_IHM.M3Translation.State.M3StatusText,
     TranslationMotionErrorId    := GVL_IHM.M3Translation.State.ErrorId,
