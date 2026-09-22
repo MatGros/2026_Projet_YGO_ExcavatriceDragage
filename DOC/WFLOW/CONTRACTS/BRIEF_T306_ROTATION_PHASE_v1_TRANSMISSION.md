@@ -81,9 +81,12 @@ FB_Safety_Translation.st:143  instCauses[2].Active := PhaseRotationFault;    (* 
 
 ### 2.5 🚨 **LE BLOCAGE CONNU — le défaut n'est PAS injectable en simulation** — ✅ **VÉRIFIÉ**
 ```text
-FB_SimBench.st:690   Machine.PhaseRotationOk_DI := TRUE;     (* ecrit a CHAQUE scan -> ecrase tout forcage operateur *)
+FB_SimBench.st:690   Machine.PhaseRotationOk_DI := TRUE;
 ```
+**⚠️ Annotation DSH01 (PAS un commentaire du code — correction de brief du 2026-09-22, relevée par la revue phase 0)** : cette écriture a lieu **à chaque scan**, elle **écrase donc tout forçage opérateur**. Le code réel ne porte **aucun** commentaire à cet endroit ; la rédaction initiale laissait croire à une citation. **Erreur corrigée ici.**
 ➡️ **Conséquence** : en simu, le défaut de phase **ne peut pas être déclenché** — donc **T306 est aujourd'hui intestable**, et `PhaseRotationOk_DI` reste figé `TRUE`. **C'est l'objet de la phase 1 du phasage.**
+
+> 📌 **Précision apportée par la revue phase 0** (`DOC/WFLOW/REX/REX_T306_PHASE0_VERIFICATION_ROTATION_PHASE_20260922.md`) : `PRG_02_Acquisition.st:190` est une **affectation** (`HwReal.Machine.PhaseRotationOk_DI := PhaseRotationOk_DI;`) dont la **source est la variable d'E/S globale** (`GVL_Device_IO.st:53`) — ce n'est **pas** une déclaration `VAR_INPUT`. La polarité fail-safe (`TRUE` = OK) est documentée **côté FB** (`FB_Safety_Translation.st:22`), pas à `PRG_02:190`. **Producteur unique confirmé** : `PRG_02:446 SEL(...)` → tous les consommateurs lisent `HwIn.Machine.PhaseRotationOk_DI`.
 
 ---
 
