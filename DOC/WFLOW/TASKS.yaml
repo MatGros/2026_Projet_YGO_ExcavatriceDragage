@@ -7026,3 +7026,24 @@ tasks:
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T279_WORKSPACE_HYGIENE.yaml
   bloque_par: []
   avancement: 'Terminée : hygiène workspace agents et CI cadrée (STRUCTURE_AND_CLEANUP.md).'
+- id: T387
+  parent_id: ''
+  statut: ⬜
+  criticite: C4
+  domaine: SECURITE / TREUILS_M1_M2 / DIAGNOSTIC
+  agent: '—'
+  date: '2026-09-22T11:50:00+02:00'
+  titre: 'FB_Safety_Winch : rendre la confirmation d''arret MecaB independante de la source de commande (JoystickYNeutral -> MovementCommanded) — faux ErrorID:09 en mode boutons MAINT_N2'
+  contexte: 'DIAGNOSTIC CONFIRME 2026-09-22 (mode boutons MAINT_N2 en simu, commande Both) : MecaB se declenche FAUSSEMENT car il base son critere sur JoystickYNeutral, TOUJOURS TRUE quand on commande par boutons (joystick jamais touche), au lieu de MovementCommanded (etat de commande reel). FB_Safety_Winch.st:341 UncommandedActiveB := JoystickYNeutral AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback) -> TonMecaB PT=PostRampTimeout 3s -> latch bit8 = ErrorID:09 « arret non confirme apres stop ». MovementCommanded deja cable (:19, PRG_04:955 := instWinchM1.RelayFwd OR instWinchM1.RelayRev) mais inutilise par MecaB. MecaA (:329) utilise lui l etat physique (pas JoystickYNeutral) : MecaB incoherent avec sa jumelle. CONSÉQUENCE EN CHAINE : ce faux MecaB -> PowerCutOff -> coupe l AU -> deadlock rearmement AU en simu (famille T369, defaut SEPARE). H2 (simulation fausse) ecartee : FB_SimBench renvoie contacteurs/frein en <10ms (FB_SimBench.st:449-451, :437-446, GVL_Simulation.st:100-103).'
+  description: 'Correctif C4 sur FB de securite, UNE ligne : remplacer JoystickYNeutral par NOT MovementCommanded dans FB_Safety_Winch.st:341. Semantique preservee : MecaB = veritable « arret non confirme APRES arret de commande » (NOT MovementCommanded), plus jamais pendule par le geste. Ne PAS toucher PostRampTimeout, WinchStandstill (:263-265, :394-395 qui utilise JoystickYNeutral pour desarmer MecaE), branches SafeStop/PowerCutOff. Test CI ROUGE avant / VERT apres reproduisant le mode boutons MAINT_N2 (Both commande 3s). Non-regression : MecaA et autres causes identiques. SEPARE DE T369 (deadlock rearmement AU simu) : ne pas fusionner.'
+  objectifs:
+  - 'AC1 : le faux ErrorID:09 MecaB (mode boutons MAINT_N2, Both 3s) se reproduit en ROUGE avant correction.'
+  - 'AC2 : apres correctif, le meme scenario passe au VERT (aucun faux MecaB pendant commande legitime).'
+  - 'AC3 : MecaB = NOT MovementCommanded (matrice MovementCommanded x JoystickYNeutral), declenchement non elargi.'
+  - 'AC4 : non-regression MecaA et autres causes du masque (verdicts avant/apres identiques).'
+  - 'AC5 : PostRampTimeout et escalade SafeStop/PowerCutOff intouches (git diff borne sur :341 + test).'
+  - 'AC6 : bundle frais + diff bundle (FB_Safety_Winch) + G200 --report PASS 0 erreur + palier C sans rouge nouveau.'
+  - 'AC7 : non-regression : WinchStandstill/MecaE conserves (JoystickYNeutral reste consomme a :264).'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T387_MECAB_SOURCE_COMMANDE.yaml
+  avancement: '[CADRAGE DSH01 2026-09-22T11:50 — CONTRAT C4 ECRIT ET VALIDE (check_task_contract.py PASS 0/0), AUCUNE LIGNE DE CODE. DIAGNOSTIC CONFIRME PAR TRAVAIL D EQUIPE ORCHESTRE (H1 confirme sur source, H2 simulation ecartee, consequence AU = T369 distinct). Cause racine : MecaB base sur JoystickYNeutral (geste) au lieu de MovementCommanded (commande reelle). C4-safety : plan/test ROUGE-VERT a valider humainement AVANT tout code. NE PAS TOUCHER aux FB de securite sans GO. SEPARE DE T369.]'
+  bloque_par: []
