@@ -353,6 +353,7 @@ l'exploitant de relever une valeur que la **CI ou un snapshot** aurait pu fourni
 - ❌ **Ne règle AUCUNE collision d'écriture** (plusieurs écrivains sur un même fichier) : c'est un problème de **protocole** (locks/drapeaux, un écrivain par fichier), pas d'orchestration.
 - ⚠️ **Vérifier que le schéma n'a pas été retiré silencieusement** par le provider (le plugin élague les champs non supportés) : lire `runs.jsonl` au 1er run — un schéma ignoré donne un **faux sentiment de structure**.
 - ⚠️ Les sous-agents restent **génériques** : coller `subagent_preamble.md` dans **chaque** prompt de tâche, sans exception.
+- 📍 **Le plugin écrit ses rapports À LA RACINE du dépôt** (`dsh-ha-orchestrator.run-*.md`) — ce qui **viole la règle de routage T279** (« aucun scratch à la racine »). Réflexe imposé : **copier ces rapports dans `DOC/WFLOW/ORCHESTRATION_RAPPORTS/`** et les committer **là** ; ⛔ **ne jamais déplacer `dsh-ha-orchestrator.runs.jsonl`** (c'est l'**état** du plugin, pas un rapport — le déplacer casserait `/orchestrate runs`) ; les originaux restent visibles à la racine, **signalés, jamais masqués par `.gitignore`**.
 
 ---
 
