@@ -142,11 +142,12 @@ MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_S
 // === 📥 §1 ACQUISITION BRUTE MATÉRIELLE (HwReal) ===
 
 // Winch M1 / M2 et codeurs
-HwReal.Winch.M1_ContactorsReleased_DI := M1_ContactorsReleased_DI;
+// Inversion des retours contacteurs physiques (compensation cablage terrain DI M1 <-> M2)
+HwReal.Winch.M1_ContactorsReleased_DI := M2_ContactorsReleased_DI;
 HwReal.Winch.M1_ThermalOk_DI          := M1_ThermalOk_DI;
 HwReal.Winch.M1_BrakeIsOpen_DI        := M1_BrakeIsOpen_DI;
 
-HwReal.Winch.M2_ContactorsReleased_DI := M2_ContactorsReleased_DI;
+HwReal.Winch.M2_ContactorsReleased_DI := M1_ContactorsReleased_DI;
 HwReal.Winch.M2_ThermalOk_DI          := M2_ThermalOk_DI;
 HwReal.Winch.M2_BrakeIsOpen_DI        := M2_BrakeIsOpen_DI;
 
@@ -547,7 +548,7 @@ MachineHomingCfg.CfgOffsetOpen_M      := _BucketCfgPersist.Config.OffsetOpenM;
 MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 MachineHomingCfg.Initialized          := TRUE;
 instCycleMachineHoming(
-    Enable                     := FALSE, // ⛔ Inhibé à la demande opérateur (cycle homing désactivé au démarrage)
+    Enable                     := TRUE,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM OR GVL_IHM.CycleMachineHoming.Cmd.BtnAbort,
     Mode                       := PRG_03_Modes_Cycle.Data.Auth.Mode,
     // Garde boot : aucun homing/G7 tant que acquisition + codeurs ne sont pas valides.
@@ -582,7 +583,7 @@ instCycleMachineHoming(
     CfgForceStepApply          := GVL_IHM.CycleMachineHoming.Cmd.BtnForceStepApply,
     Cfg                        := MachineHomingCfg
 );
-Data.MachineHoming.Homed            := (Data.EncoderM1.HomedAndReliable AND Data.EncoderM2.HomedAndReliable);
+Data.MachineHoming.Homed            := instCycleMachineHoming.MachineHomed;
 Data.MachineHoming.SetPosBucketOpen := instCycleMachineHoming.BucketCommit.CommitOpen;
 Data.MachineHoming.SetPosBucketClose := instCycleMachineHoming.BucketCommit.CommitClose;
 Data.MachineHoming.Active           := instCycleMachineHoming.MachineHomingActive;

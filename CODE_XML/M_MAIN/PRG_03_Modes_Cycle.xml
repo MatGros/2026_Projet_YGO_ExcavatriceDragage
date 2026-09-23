@@ -5308,21 +5308,8 @@ CASE State OF
 
         BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
 
-        // 🆘 Repli benne + treuils depuis le vidage : geste INVERSE maintenu (Y+, montee)
-        // sous homme-mort. La benne est REFERMEE puis les treuils remontent couples.
-        // Entree dans l'etape de fermeture existante AX10_CLOSE_BUCKET : la chaine
-        // AX10 -&gt; AX10B -&gt; AX11/AX12 est reutilisee telle quelle, sans duplication de
-        // logique ni nouvelle variable de position. AX10 est aussi l'etape sur laquelle
-        // la commande benne et la surveillance de synchronisme sont deja bornees en aval.
-        // Prioritaire sur l'option de repositionnement (AX15C commande une DESCENTE
-        // couplee : elle contredirait le geste de repli) et sur la fin de vidage.
-        // L'ouverture est neutralisee des ce scan, et AX10 publie lui aussi ReqOpen a 0
-        // sur toute la duree du repli : les deux demandes benne ne doivent jamais etre
-        // vraies sur le meme scan.
-        IF DeadmanArmed AND JoystickPull THEN
-            BucketCmd.ReqOpen := FALSE;
-            State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
-        ELSIF RepositionRequest THEN
+        // Vidage benne en AX15B
+        IF RepositionRequest THEN
             State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
         ELSIF DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;

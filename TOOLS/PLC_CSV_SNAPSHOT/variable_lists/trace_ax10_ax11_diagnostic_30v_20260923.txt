@@ -1,0 +1,41 @@
+# AX10 -> AX11 : trace unique de diagnostic, 30 voies (CODESYS Trace).
+# Chaîne couverte : cycle -> demande -> D18 -> départ couplé -> DI -> barrière finale.
+# Exclut volontairement tout bypass et toute commande de forçage.
+
+# Contexte cycle et demande opérateur
+PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStep
+PRG_03_Modes_Cycle.instCycleSemiAuto.WaitingForOperator
+PRG_03_Modes_Cycle.instCycleSemiAuto.WaitingForProcess
+PRG_02_Acquisition.Data.Joystick.DeadmanArmed
+PRG_02_Acquisition.Data.Joystick.AxisY.Deflection
+PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
+PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM
+GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct
+GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct
+GVL_Troubleshooting.G_CycleSemiAuto.Idx306_WinchSyncError
+
+# Interlock directionnel D18 et garde de départ couplé
+PRG_04_Treuils_Benne.Data.WinchM1State.DirectionChangePending
+PRG_04_Treuils_Benne.Data.WinchM1State.DirectionChangeDelayElapsed
+PRG_04_Treuils_Benne.Data.WinchM2State.DirectionChangePending
+PRG_04_Treuils_Benne.Data.WinchM2State.DirectionChangeDelayElapsed
+GVL_Troubleshooting.T_Permits.BothBlocked
+GVL_Troubleshooting.T_Permits.BothBlockReason
+
+# Preuve d'arrêt physique demandée par D18
+GVL_Troubleshooting.I_LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI
+GVL_Troubleshooting.J_LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI
+GVL_Troubleshooting.I_LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied
+GVL_Troubleshooting.J_LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied
+
+# Barrière finale sorties et demande moteur effective
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx405_FinalInterlockState
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx405_FinalInterlockState
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx406_FinalInterlockReason
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx407_FinalAuthorizedStep
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx407_FinalAuthorizedStep
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx415_MotorRequest
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx415_MotorRequest
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx410_RestartDelayElapsed
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx410_RestartDelayElapsed

@@ -1,0 +1,87 @@
+contract:
+  task_id: DIAG_AX11_PAUSE_800MS_20260922
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Identifier par preuves la source de la disparition simultanee des demandes moteur M1/M2
+    pendant environ 800 ms a l'entree AX11 sur machine reelle, et etablir si la position benne,
+    l'anticipation d'ouverture/fermeture ou l'interlock de direction participe a la sequence.
+
+  acceptance:
+    - id: AC1
+      statement: "La chaine exacte entre AX10, AX11, les demandes PRG_04, MotorRequest PRG_06 et les relais physiques est tracee dans le code source."
+      verified_by: "references fichier:ligne et arbre vertical dans la fiche de troubleshooting"
+    - id: AC2
+      statement: "La trace reelle la plus recente est comparee a une trace simulation sans trou, avec chronologie et duree mesurees."
+      verified_by: "lecture des fichiers trace 83/84 ou de leurs exports CSV"
+    - id: AC3
+      statement: "Le lien avec OpenAnticipationM=1.3 m, CloseAnticipationM=1.2 m et la position 8.5 m est confirme ou refute par une variable de decision."
+      verified_by: "DeltaPosition_M, demandes benne, step cycle et demandes finales autour de l'evenement"
+    - id: AC4
+      statement: "Chaque branche est classee FAIT, HYPOTHESE ou ELIMINEE; aucune cause racine n'est annoncee sans valeur lue."
+      verified_by: "fiche TROUBLESHOOTING_TrouAX10_AX11_SiteVsBureau_20260922.md mise a jour"
+    - id: AC5
+      statement: "Aucun code de conduite ou de securite n'est modifie pendant le diagnostic."
+      verified_by: "git diff -- CODE avant/apres diagnostic"
+
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_DIAG_AX11_PAUSE_800MS_20260922.yaml
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_TrouAX10_AX11_SiteVsBureau_20260922.md
+      - TOOLS/AGENT_WORKFLOW/status/
+    forbidden:
+      - CODE/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - toute variable forcee sur le PLC
+      - tout commit ou push
+
+  conservation:
+    must_survive:
+      - "Protection anti-inversion et temporisations de securite"
+      - "Anticipation benne tant que son implication dans AX11 n'est pas prouvee"
+      - "Homing machine et limites de course"
+    dropped_on_purpose: []
+
+  evidence_required:
+    - "trace machine reelle"
+    - "trace simulation de comparaison"
+    - "tracage inverse code source"
+    - "git diff CODE vide pendant le diagnostic"
+
+  models_allowed:
+    - "plateforme"
+
+  alert_duty: >
+    Toute ambiguite entre position absolue du treuil, ecart relatif de benne et seuil de course
+    doit etre signalee immediatement. Aucune neutralisation d'une protection n'est proposee sans
+    preuve de la cause et validation humaine.
+
+status: COMPLETED
+
+execution:
+  executed_by: "CDX01"
+  model_used: "plateforme"
+  status: COMPLETED
+  summary: >
+    Trace reelle : le mouvement M2 seul fait tomber la DI M1 au lieu de la DI M2. Le credit
+    d'arret M1 est remis a zero, D18 M1 applique 800 ms, puis la garde d'atomicite coupe M2.
+    La simulation conserve les DI par axe et ne presente pas le trou. Le seuil 13,8 m fixe le
+    moment du transfert mais ne produit pas la pause. Aucun fichier CODE modifie.
+  evidence_submitted:
+    - "Suivi_83_BonEnSimu_Mais pas en reelAX10_11_ARRET_20260922.trace"
+    - "Suivi_83_AX10_11_ARRET_20260922.trace"
+    - "Suivi_84_AX10_11_ARRET_20260922.trace"
+    - "Fiche TROUBLESHOOTING_TrouAX10_AX11_SiteVsBureau_20260922.md section 11"
+  ac_status:
+    AC1: "PASS"
+    AC2: "PASS"
+    AC3: "PASS"
+    AC4: "PASS"
+    AC5: "PASS"
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Investigation demandee explicitement par l'utilisateur le 2026-09-22."

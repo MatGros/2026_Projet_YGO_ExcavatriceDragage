@@ -1,4 +1,22 @@
 tasks:
+- id: T376
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: SAFETY / ALARMES / IHM
+  agent: —
+  date: '2026-09-23T00:00:00+02:00'
+  titre: 'Defaut mou de cable silencieux : la coupure fonctionne mais aucune banniere alarme ni indication IHM'
+  contexte: 'Constat terrain 2026-09-23 (a confirmer/detailler) : sur defaut "mou de cable", la fonction de securite semble couper correctement le mouvement, mais le defaut est SILENCIEUX cote IHM - pas de banniere alarme, pas d indication visible pour l operateur. Tache differee (pas urgent immediat), a creuser plus tard.'
+  description: 'A investiguer : identifier la chaine mou de cable (capteur/entree, FB de detection, latch eventuel) et verifier pourquoi aucune remontee alarme/banniere/message IHM n est produite alors que la coupure physique a bien lieu. Corriger pour rendre le defaut visible (banniere + message), sans toucher a la logique de coupure elle-meme (deja fonctionnelle).'
+  objectifs:
+  - 'Identifier la chaine logicielle du defaut mou de cable (detection -> coupure) et confirmer que la coupure est bien la cause du constat terrain.'
+  - 'Expliquer pourquoi aucune banniere alarme ni indication IHM n est emise pour ce defaut.'
+  - 'Ajouter la remontee IHM (banniere + message) sans modifier la logique de securite/coupure existante.'
+  contrat: ''
+  avancement: 'Non demarre. Tache creee sur signalement utilisateur 2026-09-23, priorite differee.'
+  bloque_par:
+  - ''
 - id: T375
   parent_id: ''
   statut: ⏳
@@ -9,7 +27,7 @@ tasks:
   date: '2026-09-22T19:56:19+02:00'
   titre: 'Emettre le mot 7 (reset AC600) par le bus EtherCAT - acquittement du defaut variateur translation M3'
   contexte: 'Ecart spec-vs-code trouve le 2026-09-22 en audit de la chaine d acquittement : le mot 7 (reset AC600, registre PDO 0x3101) est DOCUMENTE dans AF_Partie-11_Fonction_Translation/FB_Translation_v1.1.md §7 (valeur 7 = Reset) et dans FB_TranslationOutputInterlock_v1.1.md §5-6, MAIS n est JAMAIS EMIS par le code : CODE/I_TRANSLATION/FB_Translation.st:323-329 ne produit que 0/1/2 (IF PhysicalTremie / ELSIF PhysicalMaintenance / ELSE 0), jamais 7. FB_TranslationOutputInterlock.st:142-143 fait un pass-through (ELSIF RequestedDriveControlWord = 7 THEN DriveControlWord := 7) mais ne recoit jamais 7. Consequence machine : si le variateur AC600 se met en defaut (DriveStatusWord.4 = 1), le PLC efface son propre latch applicatif mais le variateur RESTE en defaut car le reset physique par bus n est jamais envoye -> reset manuel au variateur ou coupure alim obligatoires. Blocage terrain non acquittable par bus.'
-  description: 'Ajouter l emission du mot 7 (reset AC600) dans FB_Translation.st : sur front Reset (ResetEdge.Q), emettre RequestedDriveControlWord := 7 QUASI SANS CONDITION (decision humaine 2026-09-22 : meme sans defaut AC600 actif), pendant une impulsion temporisee ~100 ms puis retomber a 0. Seule regle de non-regression : jamais pendant un mouvement 1/2 et frequence nulle. Le mot 7 traverse ensuite naturellement FB_TranslationOutputInterlock (pass-through existant) et sort sur EtherCAT via PRG_06_Outputs.st:458 (M3_CommandWord). Aucun changement de conduite motrice nominale 0/1/2, jamais de redemarrage automatique. MAPPING PDO AC600 (source Device_IO_*.csv) : OUT 0x3101 Command=%QW6 M3_CommandWord (0/1/2/7), OUT 0x3100 Frequency=%QW7 M3_SetpointFrequencyHz (x100), IN 0x3102 Drive Status=%IW8 M3_StatusWord (bits lus bit0/bit4), IN C00.01 Output Frequency=%IW9 M3_ActualFrequencyHz (x100). Aucune modif du mapping CODESYS (geste manuel hors scope).'
+  description: 'Ajouter l emission du mot 7 (reset AC600) dans FB_Translation.st : sur front Reset (ResetEdge.Q), emettre RequestedDriveControlWord := 7 QUASI SANS CONDITION (decision humaine 2026-09-22 : meme sans defaut AC600 actif), pendant une impulsion temporisee ~100 ms puis retomber a 0. Seule regle de non-regression : jamais pendant un mouvement 1/2 et frequence nulle. Le mot 7 traverse ensuite naturellement FB_TranslationOutputInterlock (pass-through existant) et sort sur EtherCAT via PRG_06_Outputs.st:458 (M3_CommandWord). Aucun changement de conduite motrice nominale 0/1/2, jamais de redemarrage automatique. MAPPING PDO AC600 (source Device_IO_*.csv) : OUT 0x3101 Command=%QW6 M3_CommandWord (0/1/2/7), OUT 0x3100 Frequency=%QW7 M3_SetpointFrequencyHz (x100), IN 0x3102 Drive Status=%IW8 M3_StatusWord (bits lus bit0/bit4), IN C00.01 Output Frequency=%IW9 M3_ActualFrequencyHz (x100). BORNIER (TOR cablees, signaux equivalents au bus, lecture seule hors scope) : M3_PosTremie_DI, M3_PosPV_DI, M3_PosPVP2_DI, M3_PosP1_DI, M3_PosMaintenance_DI, M3_BrakeIsOpen_DI, M3_ThermalOK_DI (ST_HwTranslation.st:8-17, acquis PRG_02:169-178). Aucune modif du mapping CODESYS ni des TOR (gestes manuels hors scope).'
   objectifs:
   - 'FB_Translation.st emet RequestedDriveControlWord := 7 sur front Reset (ResetEdge.Q), quasi sans condition (meme sans defaut AC600), temporise ~100 ms puis retour a 0.'
   - 'Le mot 7 traverse la barriere FB_TranslationOutputInterlock (pass-through) et sort sur M3_CommandWord / PDO 0x3101.'

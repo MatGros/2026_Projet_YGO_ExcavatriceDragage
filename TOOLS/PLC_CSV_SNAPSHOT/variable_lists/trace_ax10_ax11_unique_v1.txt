@@ -1,0 +1,52 @@
+# =====================================================================
+# TRACE UNIQUE TOUT-EN-UN — AX10 / AX10b / AX11 (Trou M1+M2)
+# 26 variables TRACABLES (Causes + Physique fusionnées sur 1 seule feuille)
+#
+# But : Avoir sur UN SEUL graphe :
+#   - L'étape de cycle (10, 22, 11)
+#   - Les positions et vitesses réelles M1/M2
+#   - Les ordres et relais de montée M1/M2
+#   - Le coupable exact si coupure (D18, MotorRequest, SafeStop, ContactorMismatch)
+# =====================================================================
+
+# --- 1. Séquence de cycle & Opérateur ---
+GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step
+GVL_Troubleshooting.G_CycleSemiAuto.Idx104_DeadmanArmed
+
+# --- 2. Positions et Vitesses réelles M1 / M2 ---
+PRG_04_Treuils_Benne.Data.WinchM1State.Position_M
+PRG_04_Treuils_Benne.Data.WinchM2State.Position_M
+PRG_04_Treuils_Benne.Data.BucketState.M2PositionCorrected
+PRG_04_Treuils_Benne.Data.BucketState.DeltaPositionCorrected_M
+PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps
+PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps
+
+# --- 3. Paliers de vitesse et Demandes arbitrées ---
+GVL_Troubleshooting.G_CycleSemiAuto.Idx307_M1SpeedStepApplied
+GVL_Troubleshooting.G_CycleSemiAuto.Idx308_M2SpeedStepApplied
+GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection
+GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection
+
+# --- 4. Interlock D18 (La tempo 800 ms d'inversion) ---
+PRG_04_Treuils_Benne.Data.WinchM1State.DirectionChangePending
+PRG_04_Treuils_Benne.Data.WinchM1State.DirectionChangeDelayElapsed
+PRG_04_Treuils_Benne.Data.WinchM2State.DirectionChangePending
+PRG_04_Treuils_Benne.Data.WinchM2State.DirectionChangeDelayElapsed
+
+# --- 5. Barrière finale & Sécurités (« Qui coupe ? ») ---
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx415_MotorRequest
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx415_MotorRequest
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx416_RestartRequired
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx406_FinalInterlockReason
+GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx302_SafeStopActive
+GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx324_AscentBlockedByTopLimit
+PRG_06_Outputs.Data.ContactorMismatch
+PRG_04_Treuils_Benne.SyncState.SyncDeviationWarn
+
+# --- 6. Sorties Physiques réelles (Relais de montée, freins, retours contacteurs) ---
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ
+GVL_Troubleshooting.I_LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI
+GVL_Troubleshooting.J_LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI

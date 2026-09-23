@@ -1,0 +1,73 @@
+# =====================================================================
+# TRACE EXPERT TOUT-EN-UN — TRANSITION AX10 / AX10b / AX11 (T308)
+# 38 variables TRAÇABLES pour diagnostic chirurgical CODESYS
+#
+# OBJECTIFS D'OBSERVATION :
+#   1. Séquence : Étape précise du Grafcet (CycleStep) + Commandes opérateur
+#   2. Raccordement AX10b : M2_SpeedStepApplied, M1FinalReady, Maintien P1,
+#      Bascule sur Fallback 800 ms (Ax10bFallbackStopActive) et tempos (.ET)
+#   3. Benne & Décalage : Fin fermeture, État franc IsClosed, % ouverture,
+#      Offset actif appliqué (0 m vs 15 m)
+#   4. Positions & Vitesses : Câbles bruts, M2PositionCorrected, Delta corrigé,
+#      Vitesses mesurées M1/M2
+#   5. Paliers & Interlocks : Paliers appliqués, Inversion D18 (800 ms),
+#      Sens arbitrés
+#   6. Sécurités & Blocages : Butée haute M2, Permis montée M2, Mismatch,
+#      Verrou RestartRequired
+#   7. Actionneurs réels : Bobines relais montée, Commandes défreinage,
+#      Retours contacteurs repos
+# =====================================================================
+
+# --- 1. Séquence Grafcet & Opérateur ---
+PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStep
+GVL_Troubleshooting.G_CycleSemiAuto.Idx104_DeadmanArmed
+PRG_03_Modes_Cycle.instCycleSemiAuto.JoystickPull
+
+# --- 2. Conditions de Handoff AX10b & Repli 800 ms ---
+PRG_03_Modes_Cycle.instCycleSemiAuto.M1FinalAscentStartReady
+PRG_03_Modes_Cycle.instCycleSemiAuto.M2_SpeedStepApplied
+PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.ReqHoldAscentP1AfterClose
+PRG_03_Modes_Cycle.instCycleSemiAuto.Ax10bFallbackStopActive
+PRG_03_Modes_Cycle.instCycleSemiAuto.AscentStartStopTimer.ET
+PRG_03_Modes_Cycle.instCycleSemiAuto.Ax10bHandoffWaitTimer.ET
+
+# --- 3. État Benne & Décalage Actif ---
+PRG_04_Treuils_Benne.Data.BucketCloseReached
+PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed
+PRG_04_Treuils_Benne.Data.BucketState.BucketOpening_Pct
+PRG_04_Treuils_Benne.Data.BucketState.ActiveOffset_M
+
+# --- 4. Positions et Vitesses réelles M1 / M2 ---
+PRG_04_Treuils_Benne.Data.WinchM1State.Position_M
+PRG_04_Treuils_Benne.Data.WinchM2State.Position_M
+PRG_04_Treuils_Benne.Data.BucketState.M2PositionCorrected
+PRG_04_Treuils_Benne.Data.BucketState.DeltaPositionCorrected_M
+PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps
+PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps
+
+# --- 5. Paliers de vitesse et Demandes arbitrées ---
+GVL_Troubleshooting.G_CycleSemiAuto.Idx307_M1SpeedStepApplied
+GVL_Troubleshooting.G_CycleSemiAuto.Idx308_M2SpeedStepApplied
+GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection
+GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection
+
+# --- 6. Interlocks D18 (Inversion 800 ms) ---
+PRG_04_Treuils_Benne.Data.WinchM1State.DirectionChangePending
+PRG_04_Treuils_Benne.Data.WinchM2State.DirectionChangePending
+
+# --- 7. Barrière de sécurité & Blocages ---
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx415_MotorRequest
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx415_MotorRequest
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx416_RestartRequired
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx416_RestartRequired
+PRG_04_Treuils_Benne.Data.WinchM2Safety.AscentPermit
+PRG_04_Treuils_Benne.Data.WinchM2Safety.CableLimitAscent
+PRG_06_Outputs.Data.ContactorMismatch
+
+# --- 8. Sorties Physiques réelles (Relais montée, freins, retours contacteurs) ---
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ
+GVL_Troubleshooting.I_LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI
+GVL_Troubleshooting.J_LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI
