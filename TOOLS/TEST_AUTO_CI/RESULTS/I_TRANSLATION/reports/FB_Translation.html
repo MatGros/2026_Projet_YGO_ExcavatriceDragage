@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Rapport de test — FB_Translation [PASS]</title>
+<title>Rapport de test — FB_Translation [FAIL]</title>
 <style>
     :root {
         --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
@@ -370,14 +370,14 @@
         <div style="display:flex;align-items:center;gap:12px;">
             <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
-            <span class="badge badge-pass">PASS</span>
+            <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-16 02:25:30</div>
+    <div class="exec-time">2026-09-23 11:53:35</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (37 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-1">TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-2">TC-P11-010 Translation : commande variateur nominale</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-3">TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -&gt; Incoherent</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-4">TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-5">TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-6">TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-7">TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-8">TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-9">TC-P11-006 Watchdog frein 500ms : frontiere 499/500</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-10">TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-11">TC-P11-008 Gate final : mot/freq nuls sans confirmation frein simultanee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-12">TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-13">TC-P11-011 Meca B : incohérence arret &gt;3s -&gt; SafeStop+PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-14">TC-P11-011.1 Meca B variante perte IHM : condition elargie</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-15">TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-16">TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-17">TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-18">TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-19">TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-20">TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-21">TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-22">TC-P11-021 Translation : StartStop=FALSE -&gt; rampe normale (décélération normale)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-23">TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-24">TC-P11-023 Safety : perte comm opérateur (bit0) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-25">TC-P11-024 Safety : défaut rotation de phases (bit2) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-26">TC-P11-025 Safety : surchauffe thermique frein (bit3) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-27">TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-28">TC-P11-027 Safety : escalade fin de course (bit6) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-29">TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-30">TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-31">TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-32">TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-33">TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-34">TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-35">TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-36">TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise</a></li></ul>
+        <summary>📋 Sommaire (43 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-1">TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-2">TC-P11-010 Translation : commande variateur nominale</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-3">TC-P11-040 Reset FB Translation emet le mot 7 sans mouvement</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-4">TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -&gt; Incoherent</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-5">TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-6">TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-7">TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-8">TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-9">TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-10">TC-P11-006 Watchdog frein 500ms : frontiere 499/500</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-11">TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-12">TC-P11-008 Gate final : mot/freq nuls sans confirmation frein simultanee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-13">TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-14">TC-P11-041 Mot 7 traverse la barriere pendant son defaut propre</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-15">TC-P11-011 Meca B : incohérence arret &gt;3s -&gt; SafeStop+PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-16">TC-P11-011.1 Meca B variante perte IHM : condition elargie</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-17">TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-18">TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-19">TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-20">TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-21">TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-22">TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-23">TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-24">TC-P11-021 Translation : StartStop=FALSE -&gt; rampe normale (décélération normale)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-25">TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-26">TC-P11-023 Safety : perte comm opérateur (bit0) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-27">TC-P11-024 Safety : défaut rotation de phases (bit2) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-28">TC-P11-025 Safety : surchauffe thermique frein (bit3) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-29">TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-30">TC-P11-027 Safety : escalade fin de course (bit6) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-31">TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-32">TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-33">TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-34">TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-35">TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-36">TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-37">TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-38">TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-39">TC-P11-036 T345-L1 Arret de l axe : rebond capteur + demande re-armee -&gt; aucun redemarrage</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-40">TC-P11-037 T345-L1 Le fait d arret confirme n est ni constant ni efface par la demande</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-41">TC-P11-038 T345-L1 Une demande de SENS INVERSE relache le verrou et autorise le degagement</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-42">TC-P11-039 T345-L1 Non-vacuite : rotation reelle au variateur -&gt; aucun arret confirme</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -386,7 +386,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            37/37 vérifications validées
+            42/43 vérifications validées
         </div>
     </div>
     
@@ -520,14 +520,31 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Translation</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 24 flux entrants · 9 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Translation</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 25 flux entrants · 10 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ Brake <span style="color:var(--muted);font-weight:500;">(FB_Brake)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ CycleTimeCalc <span style="color:var(--muted);font-weight:500;">(FB_CycleTime)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SpeedRamp <span style="color:var(--muted);font-weight:500;">(FB_Ramp)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ DirectionChangeDelay <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ CaptorDebounceTon <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ArrivalEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonBrakeRealFreqTimeout <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonLimitSwitchOverrun <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instFault <span style="color:var(--muted);font-weight:500;">(FB_FaultCore)</span></span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ Brake <span style="color:var(--muted);font-weight:500;">(FB_Brake)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ CycleTimeCalc <span style="color:var(--muted);font-weight:500;">(FB_CycleTime)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SpeedRamp <span style="color:var(--muted);font-weight:500;">(FB_Ramp)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ DirectionChangeDelay <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ CaptorDebounceTon <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ArrivalEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonBrakeRealFreqTimeout <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonLimitSwitchOverrun <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ DriveResetPulseTimer <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instFault <span style="color:var(--muted);font-weight:500;">(FB_FaultCore)</span></span></div>
         </div>
         
+        <div style="margin:6px 0;font-size:13px;color:var(--muted);">
+            <b>Constantes internes (VAR CONSTANT) :</b><br>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_DriveResetPulseTime</b> : TIME := T#100ms</span></div>
+        </div>
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Mode <span class="pin-type" style="color:var(--muted);">E_Mode</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">RunRequest <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SafeStop <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedTgt_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PositionSensorTarget <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownSensorTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownSensorMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownSensorP1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitSwitchTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitSwitchMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EffectivePermitM3_Tremie <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EffectivePermitM3_Maintenance <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveStatusWord <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveActualFreqHz <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassContactorCheck <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassLimitSwitch <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeFeedback <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InvertDriveDirection <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Cfg <span class="pin-type" style="color:var(--muted);">ST_fbTranslation_Cfg</span></div></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Mode <span class="pin-type" style="color:var(--muted);">E_Mode</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">RunRequest <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SafeStop <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedTgt_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PositionSensorTarget <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownSensorTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownSensorMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownSensorP1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitSwitchTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitSwitchMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EffectivePermitM3_Tremie <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EffectivePermitM3_Maintenance <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveStatusWord <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveActualFreqHz <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassContactorCheck <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassLimitSwitch <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeFeedback <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InvertDriveDirection <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Cfg <span class="pin-type" style="color:var(--muted);">ST_fbTranslation_Cfg</span></div></div>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(225,29,72,0.18);border:1px solid #9f1239;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#fecdd3;font-weight:700;font-size:12px;">❓ Inconnues / Non Déclarées</span> <span style="font-size:11px;color:#fda4af;">(1 identifiants ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.3);color:#ffe4e6;">Alerte</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #e11d48;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">WORD</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.25);color:#fecdd3;font-size:10px;">❓ Non Déclaré</span></div>
+            </div></div>
+        </details></div>
             <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Translation</span>
                 
@@ -541,10 +558,10 @@
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">8</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">9</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">2</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">24 IN</b> / <b style="color:#ffffff;">9 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">25 IN</b> / <b style="color:#ffffff;">10 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -566,6 +583,10 @@
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>TargetReached</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ArrivalStopConfirmed</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
@@ -605,10 +626,10 @@
     </details>
     
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 32 écarts</span></summary>
+        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 33 écarts</span></summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 32 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>BRAKECOMMANDOPENCONFIRMED</code> jamais câblé en production</li><li>Pin <code>BRAKECONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BRAKEFEEDBACK</code> jamais câblé en production</li><li>Pin <code>BRAKERELEASEREQUEST</code> jamais câblé en production</li><li>Pin <code>BYPASSCONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BYPASSLIMITSWITCH</code> jamais câblé en production</li><li>Pin <code>CFG</code> jamais câblé en production</li><li>Pin <code>DRIVEACTUALFREQHZ</code> jamais câblé en production</li><li>Pin <code>DRIVESTATUSWORD</code> jamais câblé en production</li><li>Pin <code>EFFECTIVEPERMITM3_MAINTENANCE</code> jamais câblé en production</li><li>Pin <code>EFFECTIVEPERMITM3_TREMIE</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>INVERTDRIVEDIRECTION</code> jamais câblé en production</li><li>Pin <code>LIMITSWITCHMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>LIMITSWITCHTREMIE</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>POSITIONSENSORTARGET</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>REQMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>REQTREMIE</code> jamais câblé en production</li><li>Pin <code>REQUESTEDDRIVECONTROLWORD</code> jamais câblé en production</li><li>Pin <code>REQUESTEDDRIVEFREQHZ</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>RUNREQUEST</code> jamais câblé en production</li><li>Pin <code>SAFESTOP</code> jamais câblé en production</li><li>Pin <code>SLOWDOWNSENSORMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>SLOWDOWNSENSORP1</code> jamais câblé en production</li><li>Pin <code>SLOWDOWNSENSORTREMIE</code> jamais câblé en production</li><li>Pin <code>SPEEDTGT_PCT</code> jamais câblé en production</li><li>Pin <code>TARGETREACHED</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 33 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>ARRIVALSTOPCONFIRMED</code> jamais câblé en production</li><li>Pin <code>BRAKECOMMANDOPENCONFIRMED</code> jamais câblé en production</li><li>Pin <code>BRAKECONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BRAKEFEEDBACK</code> jamais câblé en production</li><li>Pin <code>BRAKERELEASEREQUEST</code> jamais câblé en production</li><li>Pin <code>BYPASSCONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BYPASSLIMITSWITCH</code> jamais câblé en production</li><li>Pin <code>CFG</code> jamais câblé en production</li><li>Pin <code>DRIVEACTUALFREQHZ</code> jamais câblé en production</li><li>Pin <code>DRIVESTATUSWORD</code> jamais câblé en production</li><li>Pin <code>EFFECTIVEPERMITM3_MAINTENANCE</code> jamais câblé en production</li><li>Pin <code>EFFECTIVEPERMITM3_TREMIE</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>INVERTDRIVEDIRECTION</code> jamais câblé en production</li><li>Pin <code>LIMITSWITCHMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>LIMITSWITCHTREMIE</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>POSITIONSENSORTARGET</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>REQMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>REQTREMIE</code> jamais câblé en production</li><li>Pin <code>REQUESTEDDRIVECONTROLWORD</code> jamais câblé en production</li><li>Pin <code>REQUESTEDDRIVEFREQHZ</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>RUNREQUEST</code> jamais câblé en production</li><li>Pin <code>SAFESTOP</code> jamais câblé en production</li><li>Pin <code>SLOWDOWNSENSORMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>SLOWDOWNSENSORP1</code> jamais câblé en production</li><li>Pin <code>SLOWDOWNSENSORTREMIE</code> jamais câblé en production</li><li>Pin <code>SPEEDTGT_PCT</code> jamais câblé en production</li><li>Pin <code>TARGETREACHED</code> jamais câblé en production</li></ul>
         </div>
         <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
@@ -694,6 +715,9 @@
             <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">OUT TARGETREACHED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">OUT ARRIVALSTOPCONFIRMED <span class="pin-type">IEC_BOOL</span></div>
             <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">OUT REQUESTEDDRIVECONTROLWORD <span class="pin-type">IEC_WORD</span></div>
@@ -825,15 +849,15 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Safety_Translation</code></td>
                 <td>32</td><td>14</td>
-                <td>0</td><td>19</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (19 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>20</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (20 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Translation</code></td>
-                <td>24</td><td>8</td>
-                <td>0</td><td>25</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (25 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>24</td><td>9</td>
+                <td>0</td><td>29</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (29 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
@@ -868,7 +892,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 36 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 42 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-translation-1" class="test-card test-card-pass test-card-collapsed">
@@ -914,6 +938,24 @@
         <article id="test-fb-translation-3" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-P11-040 Reset FB Translation emet le mot 7 sans mouvement </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-040 Reset FB Translation emet le mot 7 sans mouvement')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary>
+                <ul class="checks-list"><li>front Reset : mot 7 AC600 meme si le defaut est encore actif</li><li>mot 7 : frequence nulle</li><li>mot 7 : frein non desserre</li><li>demande de mouvement pendant reset : priorite mot 7</li><li>demande de mouvement pendant reset : frequence nulle</li><li>demande de mouvement pendant reset : frein non desserre</li><li>fin impulsion : le mot 7 retombe</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-4" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -&gt; Incoherent </h3>
                 <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -&gt; Incoherent')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
@@ -933,7 +975,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-4" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-5" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff </h3>
@@ -955,7 +997,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-5" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-6" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop </h3>
@@ -977,7 +1019,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-6" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-7" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie) </h3>
@@ -999,7 +1041,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-7" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-8" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate) </h3>
@@ -1021,7 +1063,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-8" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-9" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub) </h3>
@@ -1045,7 +1087,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-9" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-10" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-006 Watchdog frein 500ms : frontiere 499/500 </h3>
@@ -1067,7 +1109,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-10" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-11" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation </h3>
@@ -1089,7 +1131,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-11" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-12" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-008 Gate final : mot/freq nuls sans confirmation frein simultanee </h3>
@@ -1111,7 +1153,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-12" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-13" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit </h3>
@@ -1133,7 +1175,25 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-13" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-14" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-P11-041 Mot 7 traverse la barriere pendant son defaut propre </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-041 Mot 7 traverse la barriere pendant son defaut propre')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>timeout frein : defaut propre barriere actif</li><li>defaut barriere actif : mot 7 transmis</li><li>mot 7 : frequence forcee nulle</li><li>mot 7 : frein non desserre</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-15" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-011 Meca B : incohérence arret &gt;3s -&gt; SafeStop+PowerCutOff </h3>
@@ -1155,7 +1215,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-14" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-16" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-011.1 Meca B variante perte IHM : condition elargie </h3>
@@ -1177,7 +1237,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-15" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-17" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut </h3>
@@ -1199,7 +1259,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-16" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-18" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub) </h3>
@@ -1225,7 +1285,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-17" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-19" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence) </h3>
@@ -1247,7 +1307,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-18" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-20" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine </h3>
@@ -1269,7 +1329,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-19" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-21" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé </h3>
@@ -1291,7 +1351,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-20" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-22" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle) </h3>
@@ -1313,7 +1373,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-21" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-23" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide) </h3>
@@ -1335,7 +1395,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-22" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-24" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-021 Translation : StartStop=FALSE -&gt; rampe normale (décélération normale) </h3>
@@ -1357,7 +1417,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-23" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-25" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -&gt; SafeStop seul, pas de PowerCutOff </h3>
@@ -1379,7 +1439,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-24" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-26" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-023 Safety : perte comm opérateur (bit0) -&gt; SafeStop seul, pas de PowerCutOff </h3>
@@ -1401,7 +1461,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-25" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-27" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-024 Safety : défaut rotation de phases (bit2) -&gt; SafeStop seul, pas de PowerCutOff </h3>
@@ -1419,7 +1479,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-26" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-28" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-025 Safety : surchauffe thermique frein (bit3) -&gt; SafeStop + PowerCutOff </h3>
@@ -1437,9 +1497,9 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-27" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-29" class="test-card test-card-fail">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
+                <span class="badge badge-fail">FAIL</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff </h3>
                 <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
@@ -1455,11 +1515,11 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>mouvement non commandé -&gt; bit5</li><li>SafeStop</li><li>bit5 -&gt; PowerCutOff</li></ul>
             </details>
-                
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB_SAFETY.ERRORMECAA expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_translation.st:1050</div><div class='failure-msg'>mouvement non commandé -&gt; bit5</div></div>
                 
             </div>
         </article>
-        <article id="test-fb-translation-28" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-30" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-027 Safety : escalade fin de course (bit6) -&gt; SafeStop + PowerCutOff </h3>
@@ -1481,7 +1541,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-29" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-31" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe) </h3>
@@ -1503,7 +1563,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-30" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-32" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop </h3>
@@ -1521,7 +1581,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-31" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-33" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal) </h3>
@@ -1543,7 +1603,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-32" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-34" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6) </h3>
@@ -1565,7 +1625,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-33" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-35" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0) </h3>
@@ -1587,7 +1647,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-34" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-36" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe) </h3>
@@ -1605,7 +1665,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-35" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-37" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise </h3>
@@ -1627,7 +1687,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-36" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-38" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1; user-select: text;">TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise </h3>
@@ -1644,6 +1704,97 @@
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
                 <ul class="checks-list"><li>MaintenancePermit=TRUE -&gt; mot 2 (REV)</li><li>MaintenancePermit=TRUE -&gt; freq &gt; 0</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-39" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-P11-036 T345-L1 Arret de l axe : rebond capteur + demande re-armee -&gt; aucun redemarrage </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-036 T345-L1 Arret de l axe : rebond capteur + demande re-armee -&gt; aucun redemarrage')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (6)</span></summary>
+                <ul class="scenario-list"><li>Config rapide : ni la rampe ni le frein ne doivent masquer un defaut de verrou d&#x27;arrete</li><li>Scans 1-4 (10 ms) : montee vers la cible, demande vivante</li><li>Scan 5 : capteur cible actif -&gt; debounce 100 ms engage</li><li>Scans 6-17 : le sequenceur retire sa demande (jeton d&#x27;arrivee) 100 ms avant l armement du
+       verrou ; la cible reste portee par l axe (memoire de cible de PRG_05)</li><li>Scan 18 : arret de l axe -&gt; mot et consigne a 0, arret confirme publie</li><li>Scans 19-40 (50 ms, soit ~1 s de rebond) : le sequenceur re-arme sa demande sur le jeton
+       relance, et le capteur cible rebondit. L axe doit rester arme : aucun front montant du mot
+       de commande ni de la consigne de frequence ne doit apparaitre.</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (8)</span></summary>
+                <ul class="checks-list"><li>mouvement etabli vers la cible</li><li>aucun arret confirme avant l arrivee sur la cible</li><li>debounce 100 ms non ecoule</li><li>arret sur cible : mot de commande a 0</li><li>arret sur cible : consigne de frequence a 0</li><li>l axe publie son propre arret confirme</li><li>aucun front montant mot/frequence apres l armement du verrou</li><li>l arret confirme resiste au rebond et a la re-demande</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-40" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-P11-037 T345-L1 Le fait d arret confirme n est ni constant ni efface par la demande </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-037 T345-L1 Le fait d arret confirme n est ni constant ni efface par la demande')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>Scan 1 : au repos, aucun arret confirme (le fait n est pas constant)</li><li>Scans 2-5 : mouvement vers la cible</li><li>Scans 6-20 : capteur cible, puis demande retiree avant la fin du debounce</li><li>Scans 21-24 : la demande du MEME sens est re-armee, cible stable -&gt; le fait doit tenir</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
+                <ul class="checks-list"><li>au repos : aucun arret confirme (fait non constant)</li><li>en mouvement : aucun arret confirme</li><li>demande retiree avant le debounce : arret confirme</li><li>re-demande du meme sens : arret confirme conserve</li><li>re-demande du meme sens : mot de commande reste a 0</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-41" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-P11-038 T345-L1 Une demande de SENS INVERSE relache le verrou et autorise le degagement </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-038 T345-L1 Une demande de SENS INVERSE relache le verrou et autorise le degagement')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Scans 1-4 : mouvement vers la cible puis capteur cible + demande retiree</li><li>Scans 15-18 : demande explicite de SENS INVERSE (Maintenance) -&gt; degagement autorise</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>verrou d arret arme avec le sens du mouvement</li><li>sens inverse : mot de commande REV</li><li>sens inverse : consigne de frequence non nulle</li><li>axe en mouvement : plus d arret confirme</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-42" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-P11-039 T345-L1 Non-vacuite : rotation reelle au variateur -&gt; aucun arret confirme </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-039 T345-L1 Non-vacuite : rotation reelle au variateur -&gt; aucun arret confirme')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>Scans 1-4 : mouvement vers la cible</li><li>Scans 5-18 : demande retiree, cible tenue -&gt; arret confirme</li><li>Scan 19 : le variateur tourne encore (5,0 Hz) -&gt; l arret n est PAS confirme</li><li>Scan 20 : retour au repos reel -&gt; fait de nouveau publie</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>arret au repos : fait publie</li><li>rotation reelle 5,0 Hz : aucun arret confirme</li><li>retour au repos : arret confirme publie</li></ul>
             </details>
                 
                 
@@ -2471,10 +2622,11 @@ DriveFreqCmdWord := 0;
 BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
 Ready := NOT Fault.Error AND NOT RestartInhibit;
 
-IF Fault.Error THEN
+IF RequestedDriveControlWord = 7 THEN
     BrakeCmd := FALSE;
-ELSIF RequestedDriveControlWord = 7 THEN
     DriveControlWord := 7;
+ELSIF Fault.Error THEN
+    BrakeCmd := FALSE;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
 ELSIF MovementRequested AND NOT PermitFinalBlocked THEN
@@ -2567,6 +2719,7 @@ VAR
     TonLimitSwitchOverrun : TON;       // . [LOC] Surveillance poussée anormale / escalade fin de course
     OverrunCondition    : BOOL;   // . [LOC] Condition escalade fin de course
     PostRampTimeout     : TIME := T#3S;   // . [LOC] Délai Méca B
+    PostRampTimeoutMecaA : TIME := T#7S;  // . [LOC] Délai Méca A — couvre le glissement roue/chariot sur butée mécanique
     CST_StopFreqThresholdHz : REAL := 0.5; // . [LOC] Seuil |fréquence sortie| au-dessus duquel le moteur est considéré en rotation (Méca A/B)
     UncommandedActiveB  : BOOL;   // . [LOC] Méca B active
     UncommandedActiveA  : BOOL;   // . [LOC] Méca A active
@@ -2677,7 +2830,7 @@ IF NOT BypassGlobal THEN
         ELSE
             UncommandedActiveA := FALSE;
         END_IF;
-        TonMecaA(IN := UncommandedActiveA, PT := T#1S);
+        TonMecaA(IN := UncommandedActiveA, PT := PostRampTimeoutMecaA);
         IF TonMecaA.Q THEN MecaAFault := TRUE; END_IF;
     ELSE
         TonMecaA(IN := FALSE);
@@ -2844,6 +2997,7 @@ VAR_OUTPUT
     // 🧩 Statut transverse (forme cible ST_Fault)
     Fault                       : ST_Fault;
     TargetReached               : BOOL;       // &lt;-- [STAT] Capteur position cible
+    ArrivalStopConfirmed        : BOOL;   // &lt;-- [STAT] Arrêt confirmé sur la cible : verrou d&#x27;arrivée armé ET axe physiquement arrêté (aucune rotation, frein non commandé ouvert)
     RequestedDriveControlWord   : WORD; // &lt;-- [ACT] Demande métier AC600, arbitrée par FB_TranslationOutputInterlock
     RequestedDriveFreqHz        : REAL; // &lt;-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock
     BrakeReleaseRequest         : BOOL; // &lt;-- [ACT] Demande métier desserrage, issue de FB_Brake
@@ -2866,6 +3020,7 @@ VAR
     ArrivalEdge                 : R_TRIG;   // . [LOC] Front arrivée sur capteur
     ArrivalWasTremie             : BOOL;  // . [LOC] Sens d&#x27;arrivée mémorisé
     ArrivalWasMaintenance        : BOOL;  // . [LOC] Sens d&#x27;arrivée mémorisé
+    LastMoveDirection           : INT;         // . [LOC] Sens du dernier mouvement commandé (+1 = Trémie, -1 = Maintenance) — mémoire de l&#x27;axe, insensible à la perte de la demande
     ArrivalLock                 : BOOL;        // . [LOC] Arrêt exact sur capteur cible
     MovementRequested           : BOOL;         // . [LOC] Pilote FB_Brake
     FirstScanDone               : BOOL;   // . [LOC] Initialisation premier scan
@@ -2873,11 +3028,16 @@ VAR
     EffectiveSafeStop           : BOOL;   // . [LOC] SafeStop effectif = SafeStop OR sens non permis (gate de sens)
     OverrunLimitSwitch          : BOOL;   // . [LOC] Depassement reel FdC (mouvement soutenu), pas juste arrivee normale
     TonLimitSwitchOverrun       : TON;    // . [LOC] Persistance avant fault Cause 6 (evite le faux defaut sur arrivee nominale)
+    DriveResetPulseTimer        : TON;    // . [LOC] Duree bornee de la commande reset AC600
+    DriveResetPulseActive       : BOOL;   // . [LOC] Impulsion reset AC600 en cours
 
     // Défauts
     DriveFaultLatching          : BOOL;   // . [LOC] Latch défaut variateur
     instFault                   : FB_FaultCore;                  // * [INST] Socle défaut transverse
     instCauses                  : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
+END_VAR
+VAR CONSTANT
+    CST_DriveResetPulseTime     : TIME := T#100ms; // . [CFG] Impulsion reset AC600
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -2888,6 +3048,12 @@ ResetEdge(CLK := Reset);
 
 IF ResetEdge.Q THEN
     DriveFaultLatching := FALSE;
+    DriveResetPulseActive := Enable;
+END_IF;
+
+DriveResetPulseTimer(IN := DriveResetPulseActive, PT := CST_DriveResetPulseTime);
+IF DriveResetPulseTimer.Q OR NOT Enable THEN
+    DriveResetPulseActive := FALSE;
 END_IF;
 
 IF DriveStatusWord.4 THEN
@@ -2941,6 +3107,8 @@ IF NOT Enable THEN
     ArrivalLock := FALSE;
     ArrivalWasTremie := FALSE;
     ArrivalWasMaintenance := FALSE;
+    LastMoveDirection := 0;
+    ArrivalStopConfirmed := FALSE;
     TargetReached := FALSE;
     DirectionChangeDelay(IN := FALSE);
     CaptorDebounceTon(IN := FALSE);
@@ -2967,10 +3135,32 @@ CaptorDebounceTon(IN := PositionSensorTarget, PT := Cfg.CaptorDebounce);
 TargetReached := CaptorDebounceTon.Q;
 ArrivalEdge(CLK := TargetReached);
 
+// 🧠 Sens du dernier mouvement réellement commandé : mémoire PROPRE À L&#x27;AXE, mise à jour
+// avant la lecture du front d&#x27;arrivée (CommandedTremie/CommandedMaintenance portent encore
+// le sens du scan précédent) et jamais remise à zéro par la perte de la demande — contrairement
+// à ces deux locaux, qui retombent dès que la demande disparaît (§4 ci-dessous). C&#x27;est cette
+// mémoire qui qualifie le sens d&#x27;arrivée quand la demande est retirée avant la fin du debounce.
+IF CommandedTremie THEN
+    LastMoveDirection := 1;
+ELSIF CommandedMaintenance THEN
+    LastMoveDirection := -1;
+END_IF;
+
 IF ArrivalEdge.Q THEN
     ArrivalLock := TRUE;
-    ArrivalWasTremie := CommandedTremie;
-    ArrivalWasMaintenance := CommandedMaintenance;
+    IF CommandedTremie OR CommandedMaintenance THEN
+        ArrivalWasTremie := CommandedTremie;
+        ArrivalWasMaintenance := CommandedMaintenance;
+    ELSE
+        // Demande déjà retombée : le sens d&#x27;arrivée est pris sur la mémoire du dernier
+        // mouvement. Sans elle, les deux drapeaux seraient FALSE et la condition de
+        // relâchement ci-dessous accepterait une demande du MÊME sens — le verrou
+        // d&#x27;arrivée perdrait toute autorité et le chariot serait relancé au-delà du point
+        // d&#x27;arrêt (relance + dépassement). Cas nominal du séquenceur : il retire sa demande
+        // sur le jeton d&#x27;arrivée, soit 100 ms avant l&#x27;armement de ce verrou.
+        ArrivalWasTremie := (LastMoveDirection = 1);
+        ArrivalWasMaintenance := (LastMoveDirection = -1);
+    END_IF;
 END_IF;
 
 // Verrou d&#x27;arrivee extreme M3 : le FdC securite est une preuve d&#x27;arret de sens,
@@ -3109,6 +3299,24 @@ IF Fault.Error THEN
     RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
+
+IF DriveResetPulseActive THEN
+    RequestedDriveControlWord := WORD#7;
+    RequestedDriveFreqHz := 0.0;
+    BrakeReleaseRequest := FALSE;
+END_IF;
+
+// 🎯 FAIT PUBLIC D&#x27;ARRÊT CONFIRMÉ : vrai quand l&#x27;axe a armé son verrou d&#x27;arrivée ET qu&#x27;il est
+// physiquement arrêté — aucune rotation réelle au variateur (seuil 0,5 Hz, même mesure que
+// Translation_Busy côté programme) et frein non commandé ouvert. Ce n&#x27;est donc pas une simple
+// reprise du capteur : c&#x27;est la conjonction du verrou de l&#x27;axe et de l&#x27;arrêt physique, fait
+// consommable par la porte de transition de cycle pour n&#x27;avancer qu&#x27;après un arrêt acquis.
+// ⚠️ Au banc la fréquence réelle est nulle en permanence : ce fait s&#x27;y prouve par injection
+// d&#x27;entrée (DriveActualFreqHz), jamais par la seule observation du banc.
+ArrivalStopConfirmed := ArrivalLock
+                        AND NOT Fault.Error
+                        AND (ABS(DriveActualFreqHz) &lt;= 0.5)
+                        AND NOT BrakeReleaseRequest;
 {endregion}
 
 END_FUNCTION_BLOCK
@@ -3117,49 +3325,7 @@ END_FUNCTION_BLOCK
     </details>
     <details>
         <summary>Sortie brute strucpp</summary>
-        <pre>STruC++ Test Runner v1.0
-
-test_fb_translation.st
-  [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
-  [PASS] TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations
-  [PASS] TC-P11-010 Translation : commande variateur nominale
-  [PASS] TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -&gt; Incoherent
-  [PASS] TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff
-  [PASS] TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop
-  [PASS] TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie)
-  [PASS] TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)
-  [PASS] TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub)
-  [PASS] TC-P11-006 Watchdog frein 500ms : frontiere 499/500
-  [PASS] TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation
-  [PASS] TC-P11-008 Gate final : mot/freq nuls sans confirmation frein simultanee
-  [PASS] TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit
-  [PASS] TC-P11-011 Meca B : incohérence arret &gt;3s -&gt; SafeStop+PowerCutOff
-  [PASS] TC-P11-011.1 Meca B variante perte IHM : condition elargie
-  [PASS] TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut
-  [PASS] TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub)
-  [PASS] TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence)
-  [PASS] TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine
-  [PASS] TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé
-  [PASS] TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle)
-  [PASS] TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide)
-  [PASS] TC-P11-021 Translation : StartStop=FALSE -&gt; rampe normale (décélération normale)
-  [PASS] TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -&gt; SafeStop seul, pas de PowerCutOff
-  [PASS] TC-P11-023 Safety : perte comm opérateur (bit0) -&gt; SafeStop seul, pas de PowerCutOff
-  [PASS] TC-P11-024 Safety : défaut rotation de phases (bit2) -&gt; SafeStop seul, pas de PowerCutOff
-  [PASS] TC-P11-025 Safety : surchauffe thermique frein (bit3) -&gt; SafeStop + PowerCutOff
-  [PASS] TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff
-  [PASS] TC-P11-027 Safety : escalade fin de course (bit6) -&gt; SafeStop + PowerCutOff
-  [PASS] TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe)
-  [PASS] TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop
-  [PASS] TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal)
-  [PASS] TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6)
-  [PASS] TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0)
-  [PASS] TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe)
-  [PASS] TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise
-  [PASS] TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise
-
------------------------------------------
-37 tests, 37 passed, 0 failed
+        <pre>Error: C++ compilation failed:
 </pre>
     </details>
 </div>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T18:32:35.760814" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T18:32:35.760814">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T13:10:00.891303" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T13:10:00.891303">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -240,6 +240,14 @@ Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ↔️ Ordre actionneur final translation M3 ===
 🔓 Demande frein M3 arbitree</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3CommandWordActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Mot de commande variateur M3 non nul (marche reelle demandee, hors reset AC600) — compteur horaire</xhtml>
               </documentation>
             </variable>
             <variable name="PowerKeepAliveACmd">
@@ -1967,6 +1975,7 @@ M3_SetpointFrequencyHz       := instTranslationOutputInterlockM3.DriveFreqCmdWor
 
 // ── Bus inter-PRG M3 ──
 Data.TranslationBrakeCmd   := TranslationBrakeCmd;
+Data.M3CommandWordActive   := (M3_CommandWord &lt;&gt; WORD#0);
 
 // ═══════════════════════════════════════════════════════════════
 // 🪝 §4 KOBOLD (capteur fond) — commande + sortie
@@ -4199,10 +4208,11 @@ DriveFreqCmdWord := 0;
 BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
 Ready := NOT Fault.Error AND NOT RestartInhibit;
 
-IF Fault.Error THEN
+IF RequestedDriveControlWord = 7 THEN
     BrakeCmd := FALSE;
-ELSIF RequestedDriveControlWord = 7 THEN
     DriveControlWord := 7;
+ELSIF Fault.Error THEN
+    BrakeCmd := FALSE;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
 ELSIF MovementRequested AND NOT PermitFinalBlocked THEN

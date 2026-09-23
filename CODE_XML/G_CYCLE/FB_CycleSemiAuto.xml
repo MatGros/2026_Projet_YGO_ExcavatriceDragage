@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T08:24:42.644492" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T08:24:42.644492">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T12:49:59.639141" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T12:49:59.639141">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2643,10 +2643,12 @@ RaiseOffBottomEff := SEL(CfgRaiseOffBottomM &lt;= 0.0, 0.0, CfgRaiseOffBottomM);
 CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 CtrlAscentDistEffM := SEL(CfgCtrlAscentDistanceM &lt;= 0.0, CtrlAscentDistM, CfgCtrlAscentDistanceM);
 
-// ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
-// .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration_Min/_S à l'achèvement (X13).
+// ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy) OU
+// en pause consciente (WaitingResume, homme-mort relâché entre deux étapes) — une pause
+// normale entre étapes ne doit jamais remettre le chrono à zéro, seul un repos réel (AX0)
+// ou un passage termine (AX18, qui fige LastCycleDuration_Min/_S juste avant) le remet.
 // Conversion TIME -&gt; minutes/secondes (T347) : troncature à la seconde, aucun arrondi.
-CycleRunTimer(IN := Lifecycle.Busy, PT := T#12h);
+CycleRunTimer(IN := Lifecycle.Busy OR WaitingResume, PT := T#12h);
 CycleElapsedTotal_S := TIME_TO_DINT(CycleRunTimer.ET) / DINT#1000;
 CurrentCycleElapsed_Min := DINT_TO_INT(CycleElapsedTotal_S / DINT#60);
 CurrentCycleElapsed_S   := DINT_TO_INT(CycleElapsedTotal_S MOD DINT#60);

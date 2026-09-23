@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T02:59:56.311085" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T02:59:56.311085">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T13:09:25.225130" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T13:09:25.225130">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -298,10 +298,10 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="0" />
+                <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Ouverture benne restante déclarant la fermeture atteinte [0..50 %] ; 0 = critère d'arrivée seul (branche seuil inactive)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Ouverture benne restante déclarant la fermeture atteinte [0..50 %] ; 0 = critère d'arrivée seul (branche seuil inactive), 10 = reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="_ReservedInerte_01">
@@ -759,10 +759,10 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1 — reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="CfgApproachSpeedMaintenance_Hz">
@@ -770,10 +770,10 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1 — reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="CfgApproachSpeedP1_Hz">
@@ -781,10 +781,10 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1 — reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">

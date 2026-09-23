@@ -120,10 +120,10 @@
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="0" />
+                <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Ouverture benne restante déclarant la fermeture atteinte [0..50 %] ; 0 = critère d'arrivée seul (branche seuil inactive)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Ouverture benne restante déclarant la fermeture atteinte [0..50 %] ; 0 = critère d'arrivée seul (branche seuil inactive), 10 = reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="_ReservedInerte_01">
@@ -304,10 +304,10 @@
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="FALSE" />
+                <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. NON persiste.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profil nominal : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. Debrayable IHM, non persiste.</xhtml>
               </documentation>
             </variable>
             <variable name="BtnResetSampleCount">

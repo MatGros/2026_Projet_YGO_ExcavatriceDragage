@@ -440,6 +440,14 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (ProcessPermitM1/M2_Descend)</xhtml>
               </documentation>
             </variable>
+            <variable name="RunningHours">
+              <type>
+                <derived name="ST_RunningHoursHMI" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Compteurs horaires maintenance — Machine (PLC sous tension) + M1/M2/M3 (marche reelle)</xhtml>
+              </documentation>
+            </variable>
             <variable name="EncoderCfg">
               <type>
                 <derived name="ST_fbEncoder_Cfg" />
@@ -2006,6 +2014,83 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
             <ObjectId>92d0a9ce-c2c2-58b4-a581-46eda63b86d7</ObjectId>
           </data>
         </addData>
+      </dataType>
+      <dataType name="ST_RunningHoursHMI">
+        <baseType>
+          <struct>
+            <variable name="MachineHours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, PLC sous tension</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHours_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Minutes 0..59</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Hours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, treuil M1 en marche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Hours_Min">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M2Hours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, treuil M2 en marche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Hours_Min">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M3Hours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, translation M3 en marche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3Hours_Min">
+              <type>
+                <INT />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>36aacd48-8376-561b-a2fe-3f75f892c28a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⏱️ ST_RunningHoursHMI — Compteurs horaires maintenance (PLC→IHM)
+   ───────────────────────────────────────────────────────────────
+   🎯 Role : totalisateurs de marche pour planification maintenance,
+      independants du chrono de cycle (qui se remet a zero par passe).
+   🔌 Machine = duree sous tension PLC (toujours active des le boot).
+      M1/M2/M3 = duree contacteur marche reel actif (preuve physique).
+   💾 Source RETAIN : GVL_PERSISTENT (secondes), converties ici en H:Min.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
       </dataType>
       <dataType name="ST_WinchSymmetryHMI">
         <baseType>
@@ -3786,10 +3871,10 @@ fournie par la configuration persistante de l'appelant.
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1 — reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="CfgApproachSpeedMaintenance_Hz">
@@ -3797,10 +3882,10 @@ fournie par la configuration persistante de l'appelant.
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1 — reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="CfgApproachSpeedP1_Hz">
@@ -3808,10 +3893,10 @@ fournie par la configuration persistante de l'appelant.
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1 — reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -8179,6 +8264,7 @@ GVL_Troubleshooting.T_Permits           := Permits;
               <Object Name="ST_SyncHMI" ObjectId="50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a" />
               <Object Name="ST_BypassCommun" ObjectId="2553c0a8-2717-5217-9345-551661085587" />
               <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
+              <Object Name="ST_RunningHoursHMI" ObjectId="36aacd48-8376-561b-a2fe-3f75f892c28a" />
               <Object Name="ST_BypassNetwork" ObjectId="b983f7fc-8c50-586b-bda1-7708d152c981" />
               <Object Name="ST_BypassSync" ObjectId="f65a7185-61a7-56a0-8f9e-37d0e97f5130" />
               <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />

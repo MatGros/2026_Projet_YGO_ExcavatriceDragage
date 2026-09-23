@@ -137,10 +137,11 @@ DriveFreqCmdWord := 0;
 BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
 Ready := NOT Fault.Error AND NOT RestartInhibit;
 
-IF Fault.Error THEN
+IF RequestedDriveControlWord = 7 THEN
     BrakeCmd := FALSE;
-ELSIF RequestedDriveControlWord = 7 THEN
     DriveControlWord := 7;
+ELSIF Fault.Error THEN
+    BrakeCmd := FALSE;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
 ELSIF MovementRequested AND NOT PermitFinalBlocked THEN

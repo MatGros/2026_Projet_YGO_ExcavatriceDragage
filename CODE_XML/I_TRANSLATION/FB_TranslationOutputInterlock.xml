@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.453068" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.453068">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T09:52:47.229015" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T09:52:47.229015">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -531,10 +531,11 @@ DriveFreqCmdWord := 0;
 BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
 Ready := NOT Fault.Error AND NOT RestartInhibit;
 
-IF Fault.Error THEN
+IF RequestedDriveControlWord = 7 THEN
     BrakeCmd := FALSE;
-ELSIF RequestedDriveControlWord = 7 THEN
     DriveControlWord := 7;
+ELSIF Fault.Error THEN
+    BrakeCmd := FALSE;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
 ELSIF MovementRequested AND NOT PermitFinalBlocked THEN

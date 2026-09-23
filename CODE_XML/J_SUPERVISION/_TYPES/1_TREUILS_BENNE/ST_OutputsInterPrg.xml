@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-19T18:19:30.891151" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-19T18:19:30.891151">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T13:09:51.636412" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T13:09:51.636412">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -180,6 +180,14 @@ Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ↔️ Ordre actionneur final translation M3 ===
 🔓 Demande frein M3 arbitree</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3CommandWordActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Mot de commande variateur M3 non nul (marche reelle demandee, hors reset AC600) — compteur horaire</xhtml>
               </documentation>
             </variable>
             <variable name="PowerKeepAliveACmd">

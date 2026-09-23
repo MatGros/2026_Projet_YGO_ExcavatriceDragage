@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.564331" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.564331">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T13:09:03.521478" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T13:09:03.521478">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -199,6 +199,14 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (ProcessPermitM1/M2_Descend)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RunningHours">
+              <type>
+                <derived name="ST_RunningHoursHMI" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Compteurs horaires maintenance — Machine (PLC sous tension) + M1/M2/M3 (marche reelle)</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderCfg">
@@ -534,6 +542,83 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
           </data>
         </addData>
       </dataType>
+      <dataType name="ST_RunningHoursHMI">
+        <baseType>
+          <struct>
+            <variable name="MachineHours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, PLC sous tension</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHours_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Minutes 0..59</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Hours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, treuil M1 en marche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Hours_Min">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M2Hours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, treuil M2 en marche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Hours_Min">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M3Hours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, translation M3 en marche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3Hours_Min">
+              <type>
+                <INT />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>36aacd48-8376-561b-a2fe-3f75f892c28a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⏱️ ST_RunningHoursHMI — Compteurs horaires maintenance (PLC→IHM)
+   ───────────────────────────────────────────────────────────────
+   🎯 Role : totalisateurs de marche pour planification maintenance,
+      independants du chrono de cycle (qui se remet a zero par passe).
+   🔌 Machine = duree sous tension PLC (toujours active des le boot).
+      M1/M2/M3 = duree contacteur marche reel actif (preuve physique).
+   💾 Source RETAIN : GVL_PERSISTENT (secondes), converties ici en H:Min.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_WinchSymmetryHMI">
         <baseType>
           <struct>
@@ -691,6 +776,7 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
               <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
               <Object Name="ST_BypassCommun" ObjectId="2553c0a8-2717-5217-9345-551661085587" />
               <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
+              <Object Name="ST_RunningHoursHMI" ObjectId="36aacd48-8376-561b-a2fe-3f75f892c28a" />
             </Folder>
             <Folder Name="8_BANDEAU_ET_IHM">
               <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />

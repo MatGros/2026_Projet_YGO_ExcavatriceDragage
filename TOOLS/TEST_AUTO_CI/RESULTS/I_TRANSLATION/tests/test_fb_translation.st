@@ -49,6 +49,38 @@ TEST 'TC-P11-010 Translation : commande variateur nominale'
     ASSERT_TRUE(FB_T.Ready, 'Translation active et prete');
 END_TEST
 
+TEST 'TC-P11-040 Reset FB Translation emet le mot 7 sans mouvement'
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 0.0,
+         PowerContactorEngaged := TRUE, DriveStatusWord := WORD#16,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := FALSE);
+    ADVANCE_TIME(10000000);
+
+    FB_T(Enable := TRUE, Reset := TRUE, RunRequest := FALSE, SafeStop := FALSE,
+         ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 0.0,
+         PowerContactorEngaged := TRUE, DriveStatusWord := WORD#16,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := FALSE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, WORD#7, 'front Reset : mot 7 AC600 meme si le defaut est encore actif');
+    ASSERT_EQ(FB_T.RequestedDriveFreqHz, 0.0, 'mot 7 : frequence nulle');
+    ASSERT_FALSE(FB_T.BrakeReleaseRequest, 'mot 7 : frein non desserre');
+
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, DriveStatusWord := WORD#0,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := FALSE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, WORD#7, 'demande de mouvement pendant reset : priorite mot 7');
+    ASSERT_EQ(FB_T.RequestedDriveFreqHz, 0.0, 'demande de mouvement pendant reset : frequence nulle');
+    ASSERT_FALSE(FB_T.BrakeReleaseRequest, 'demande de mouvement pendant reset : frein non desserre');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, RunRequest := TRUE, SafeStop := FALSE,
+         ReqTremie := TRUE, ReqMaintenance := FALSE, SpeedTgt_Pct := 50.0,
+         PowerContactorEngaged := TRUE, DriveStatusWord := WORD#0,
+         Cfg := CfgFast, BypassContactorCheck := TRUE, BrakeFeedback := FALSE);
+    ASSERT_TRUE(FB_T.RequestedDriveControlWord <> WORD#7, 'fin impulsion : le mot 7 retombe');
+END_TEST
+
 (* =========================================================================
    AF-11 — TC manquants (BILAN_TC_COVERAGE_v1.0) — FB_Translation_PositionDecoder
    ========================================================================= *)
@@ -325,6 +357,25 @@ TEST 'TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit'
     ASSERT_EQ(FB_IL.DriveControlWord, 7, 'mot 7 autorise pendant RestartInhibit');
     ASSERT_EQ(FB_IL.DriveFreqCmd_Hz, 0.0, 'mot 7 -> freq nulle');
     ASSERT_TRUE(FB_IL.RestartInhibit, 'mot 7 ne leve pas RestartInhibit');
+END_TEST
+
+TEST 'TC-P11-041 Mot 7 traverse la barriere pendant son defaut propre'
+    FB_IL(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+          BrakeReleaseRequest := TRUE, BrakeCommandOpenConfirmed := FALSE,
+          RequestedDriveControlWord := 1, RequestedDriveFreqHz := 30.0);
+    ADVANCE_TIME(500000000);
+    FB_IL(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+          BrakeReleaseRequest := TRUE, BrakeCommandOpenConfirmed := FALSE,
+          RequestedDriveControlWord := 1, RequestedDriveFreqHz := 30.0);
+    ASSERT_TRUE(FB_IL.Fault.Error, 'timeout frein : defaut propre barriere actif');
+
+    ADVANCE_TIME(10000000);
+    FB_IL(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+          BrakeReleaseRequest := FALSE, BrakeCommandOpenConfirmed := FALSE,
+          RequestedDriveControlWord := 7, RequestedDriveFreqHz := 30.0);
+    ASSERT_EQ(FB_IL.DriveControlWord, 7, 'defaut barriere actif : mot 7 transmis');
+    ASSERT_EQ(FB_IL.DriveFreqCmd_Hz, 0.0, 'mot 7 : frequence forcee nulle');
+    ASSERT_FALSE(FB_IL.BrakeCmd, 'mot 7 : frein non desserre');
 END_TEST
 
 (* =========================================================================

@@ -1233,10 +1233,10 @@ jeton "dernier capteur franchi" (front + libération sur mouvement confirmé) �
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#800ms" />
+                <simpleValue value="TIME#1000ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] MES 2026-09-04 : 300ms trop court pour un arret dur au FdC (coast reel ~600ms) -&gt; latch spurieux. Monte a 800ms (confirme operateur).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai de confirmation retour contacteur frein avant defaut sequence. Doit couvrir le coast reel d'un arret dur en butee extreme (confirme operateur).</xhtml>
               </documentation>
             </variable>
           </struct>

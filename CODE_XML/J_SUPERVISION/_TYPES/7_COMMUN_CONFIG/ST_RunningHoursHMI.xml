@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T12:01:01.984454" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T12:01:01.984454">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T13:08:56.110292" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T13:08:56.110292">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,67 +23,80 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_TranslationCfg">
+      <dataType name="ST_RunningHoursHMI">
         <baseType>
           <struct>
-            <variable name="CfgApproachSpeedTremie_Hz">
+            <variable name="MachineHours_H">
               <type>
-                <REAL />
+                <DINT />
               </type>
-              <initialValue>
-                <simpleValue value="20" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1 — reglage nominal confirme operateur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, PLC sous tension</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgApproachSpeedMaintenance_Hz">
+            <variable name="MachineHours_Min">
               <type>
-                <REAL />
+                <INT />
               </type>
-              <initialValue>
-                <simpleValue value="20" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1 — reglage nominal confirme operateur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Minutes 0..59</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgApproachSpeedP1_Hz">
+            <variable name="M1Hours_H">
               <type>
-                <REAL />
+                <DINT />
               </type>
-              <initialValue>
-                <simpleValue value="20" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1 — reglage nominal confirme operateur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, treuil M1 en marche</xhtml>
               </documentation>
             </variable>
-            <variable name="Initialized">
+            <variable name="M1Hours_Min">
               <type>
-                <BOOL />
+                <INT />
               </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
+            </variable>
+            <variable name="M2Hours_H">
+              <type>
+                <DINT />
+              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg
-🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, treuil M2 en marche</xhtml>
               </documentation>
+            </variable>
+            <variable name="M2Hours_Min">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M3Hours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, translation M3 en marche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3Hours_Min">
+              <type>
+                <INT />
+              </type>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>2d4e63ef-38b4-5f0c-b42d-ccf25658d58a</ObjectId>
+            <ObjectId>36aacd48-8376-561b-a2fe-3f75f892c28a</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
+   ⏱️ ST_RunningHoursHMI — Compteurs horaires maintenance (PLC→IHM)
    ───────────────────────────────────────────────────────────────
-   🎨 Destiné au paramétrage depuis l'IHM (RETAIN) — même patron que ST_WinchCfg.
-   📄 Vitesses de ralentissement d'approche réglables depuis l'IHM (RETAIN), même patron que ST_WinchCfg.
+   🎯 Role : totalisateurs de marche pour planification maintenance,
+      independants du chrono de cycle (qui se remet a zero par passe).
+   🔌 Machine = duree sous tension PLC (toujours active des le boot).
+      M1/M2/M3 = duree contacteur marche reel actif (preuve physique).
+   💾 Source RETAIN : GVL_PERSISTENT (secondes), converties ici en H:Min.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -98,8 +111,8 @@
       <ProjectStructure>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Folder Name="2_TRANSLATION">
-              <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_RunningHoursHMI" ObjectId="36aacd48-8376-561b-a2fe-3f75f892c28a" />
             </Folder>
           </Folder>
         </Folder>

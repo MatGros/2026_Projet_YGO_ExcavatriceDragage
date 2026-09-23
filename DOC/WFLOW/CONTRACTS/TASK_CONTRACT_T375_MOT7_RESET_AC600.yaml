@@ -47,6 +47,7 @@ contract:
   scope:
     allowed:                 # fichiers que la tache PEUT modifier
       - CODE/I_TRANSLATION/FB_Translation.st
+      - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
       - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T375_MOT7_RESET_AC600.yaml
       - DOC/WFLOW/TASKS.yaml
@@ -55,7 +56,6 @@ contract:
       - DOC/AF/AF_Partie-11_Fonction_Translation/FB_Translation_v1.1.md
       - CODE_XML/
     forbidden:               # explicitement hors scope — ne pas y toucher
-      - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st   # pass-through 7 deja present, aucune modif
       - CODE/M_MAIN/PRG_06_Outputs.st                          # sortie M3_CommandWord deja cablee :458
       - CODE/M_MAIN/PRG_05_Translation.st                      # publication demande non touchee
       - CODE/M_MAIN/PRG_02_Acquisition.st
