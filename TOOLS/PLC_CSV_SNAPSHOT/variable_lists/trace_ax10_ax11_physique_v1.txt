@@ -1,0 +1,38 @@
+# =====================================================================
+# FEUILLE B — "COMMENT CA BOUGE ?" — chronologie physique AX10 / AX10b / AX11
+# 16 variables TRACABLES · a lancer EN MEME TEMPS que la feuille A
+#
+# 🎯 But : mesurer avec la MEME base de temps que la feuille A :
+#    - l'instant exact ou M1 et M2 s'arretent (position + vitesse) ;
+#    - la duree REELLE d'arret avant reprise (pour comparer au 800 ms de D18) ;
+#    - la chronologie frein / palier / sens (qui tombe en premier ?) ;
+#    - le desynchronisme M1/M2 pendant le trou.
+#
+# Regles : idem feuille A (aucun STRING, aucun [LOC]).
+# =====================================================================
+
+# --- A. Position et vitesse (l'arret reel et sa duree) ---
+PRG_04_Treuils_Benne.Data.WinchM1State.Position_M
+PRG_04_Treuils_Benne.Data.WinchM2State.Position_M
+PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps
+PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx103_SyncDelta_M
+
+# --- B. Sorties physiques : frein + premier contacteur de vitesse ---
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ
+
+# --- C. Retours physiques frein (confirmation mecanique) ---
+GVL_Troubleshooting.I_LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied
+GVL_Troubleshooting.J_LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied
+
+# --- D. M2 : meme chaine finale que M1 (pour prouver la coupure couplee) ---
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx405_FinalInterlockState
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx407_FinalAuthorizedStep
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx415_MotorRequest
+
+# --- E. Horodatage de la cause priorisee (ms depuis demarrage PLC) ---
+PRG_04_Treuils_Benne.Data.TraceM1.BlockReasonTimestamp
+PRG_04_Treuils_Benne.Data.TraceM2.BlockReasonTimestamp

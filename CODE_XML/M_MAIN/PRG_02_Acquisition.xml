@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-22T16:39:59.430732" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-22T16:39:59.430732">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-22T18:05:44.764512" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-22T18:05:44.764512">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3602,7 +3602,7 @@ MachineHomingCfg.CfgOffsetOpen_M      := _BucketCfgPersist.Config.OffsetOpenM;
 MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 MachineHomingCfg.Initialized          := TRUE;
 instCycleMachineHoming(
-    Enable                     := FALSE, // ⛔ Inhibé à la demande opérateur (cycle homing désactivé au démarrage)
+    Enable                     := TRUE,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM OR GVL_IHM.CycleMachineHoming.Cmd.BtnAbort,
     Mode                       := PRG_03_Modes_Cycle.Data.Auth.Mode,
     // Garde boot : aucun homing/G7 tant que acquisition + codeurs ne sont pas valides.
@@ -3637,7 +3637,7 @@ instCycleMachineHoming(
     CfgForceStepApply          := GVL_IHM.CycleMachineHoming.Cmd.BtnForceStepApply,
     Cfg                        := MachineHomingCfg
 );
-Data.MachineHoming.Homed            := (Data.EncoderM1.HomedAndReliable AND Data.EncoderM2.HomedAndReliable);
+Data.MachineHoming.Homed            := instCycleMachineHoming.MachineHomed;
 Data.MachineHoming.SetPosBucketOpen := instCycleMachineHoming.BucketCommit.CommitOpen;
 Data.MachineHoming.SetPosBucketClose := instCycleMachineHoming.BucketCommit.CommitClose;
 Data.MachineHoming.Active           := instCycleMachineHoming.MachineHomingActive;
