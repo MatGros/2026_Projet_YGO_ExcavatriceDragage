@@ -1,0 +1,64 @@
+# =====================================================================
+# TRACE EXPERT V3 — FERMETURE (AX10) -> MONTEE (AX11/AX12) -> TREMIE (AX14)
+# 42 variables scalaires optimisées pour diagnostic arrêt 3m & translation
+# =====================================================================
+
+# --- 1. Séquence Grafcet & Opérateur ---
+PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStep
+PRG_03_Modes_Cycle.instCycleSemiAuto.JoystickPull
+GVL_Troubleshooting.G_CycleSemiAuto.Idx104_DeadmanArmed
+
+# --- 2. Joystick Physique & Analogique (X & Y) ---
+PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1
+PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2
+PRG_02_Acquisition.Data.Joystick.AxisX.Direction
+PRG_02_Acquisition.Data.Joystick.AxisX.Deflection
+PRG_02_Acquisition.Data.Joystick.AxisY.Deflection
+PRG_02_Acquisition.Data.Joystick.AtNeutralXY
+
+# --- 3. État Benne & Décalage Actif ---
+PRG_04_Treuils_Benne.Data.BucketCloseReached
+PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed
+PRG_04_Treuils_Benne.Data.BucketState.BucketOpening_Pct
+PRG_04_Treuils_Benne.Data.BucketState.ActiveOffset_M
+
+# --- 4. Positions et Vitesses réelles M1 / M2 ---
+PRG_04_Treuils_Benne.Data.WinchM1State.Position_M
+PRG_04_Treuils_Benne.Data.WinchM2State.Position_M
+PRG_04_Treuils_Benne.Data.BucketState.M2PositionCorrected
+PRG_04_Treuils_Benne.Data.BucketState.DeltaPositionCorrected_M
+PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps
+PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps
+
+# --- 5. Paliers de vitesse et Demandes couplées ---
+GVL_Troubleshooting.G_CycleSemiAuto.Idx307_M1SpeedStepApplied
+GVL_Troubleshooting.G_CycleSemiAuto.Idx308_M2SpeedStepApplied
+PRG_04_Treuils_Benne.WinchBothMotionActive
+
+# --- 6. Sécurités, Synchro & Permis Montée Treuils ---
+PRG_04_Treuils_Benne.SafeStopM1_Active
+PRG_04_Treuils_Benne.Data.WinchSyncError
+PRG_04_Treuils_Benne.Data.WinchM1Safety.AscentPermit
+PRG_04_Treuils_Benne.Data.WinchM2Safety.AscentPermit
+PRG_04_Treuils_Benne.Data.WinchM1Safety.CableLimitAscent
+PRG_04_Treuils_Benne.Data.WinchM2Safety.CableLimitAscent
+
+# --- 7. Barrière finale sorties & Verrous ---
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx415_MotorRequest
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx415_MotorRequest
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx416_RestartRequired
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx416_RestartRequired
+PRG_06_Outputs.Data.ContactorMismatch
+
+# --- 8. Sorties physiques (Relais montée, freins, retours contacteurs) ---
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ
+GVL_Troubleshooting.I_LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI
+GVL_Troubleshooting.J_LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI
+
+# --- 9. Translation M3 & Autorisations Trémie ---
+PRG_05_Translation.M3_HeightInterlockOk
+PRG_05_Translation.EffectivePermitM3_Tremie
+PRG_05_Translation.M3_ReqTremie_Active

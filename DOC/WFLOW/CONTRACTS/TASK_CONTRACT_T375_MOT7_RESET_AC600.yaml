@@ -83,6 +83,27 @@ contract:
     Device_IO_20260917.csv). Aucune modification du mapping CODESYS dans ce lot
     (geste manuel I/O mapping hors scope).
 
+  # ── 3ter. Bornier (entrees TOR cablees) — signaux equivalents au bus ──
+  # Ces entrees arrivent PAR LE BORNIER (non via le bus PDO) mais portent les
+  # memes infos metier : position courante du chariot + retour frein + thermal.
+  # Sources : PRG_02_Acquisition.st:169-178 -> ST_HwTranslation.st:8-17.
+  # Aucun de ces signaux n'est modifie par T375 (lecture seule hors scope) ;
+  # on les documente pour la completude du bornier AC600 translation M3.
+  bornier_tor:
+    - {signal: "M3_PosTremie_DI",   type: "BOOL DI", role: "Capteur position TREMie (chariot arrive a la tremi)"}
+    - {signal: "M3_PosPV_DI",       type: "BOOL DI", role: "Capteur point de VITESSE (pre-ralentissement avant TreMie)"}
+    - {signal: "M3_PosPVP2_DI",     type: "BOOL DI", role: "Capteur P2 / petite vitesse avant P1"}
+    - {signal: "M3_PosP1_DI",       type: "BOOL DI", role: "Capteur position P1"}
+    - {signal: "M3_PosMaintenance_DI", type: "BOOL DI", role: "Capteur position MAINTENANCE"}
+    - {signal: "M3_BrakeIsOpen_DI", type: "BOOL DI", role: "Retour frein M3 (TRUE = ouvert/desserre) — 1 = ouvert"}
+    - {signal: "M3_ThermalOK_DI",   type: "BOOL DI", role: "Retour disjoncteur thermique moteur/variateur AC600 (1 = OK) — diagnostic seul, l'AC600 se protege lui-meme"}
+  bornier_notes: >
+    E/S physiques cablees (TOR) lues dans PRG_02_Acquisition.st:169-178 vers
+    ST_HwTranslation. Elles ne transitent PAS par les PDO du variateur. T375 ne
+    lit/quecrit AUCUN de ces TOR (hors scope) ; mention documentaire uniquement
+    pour la completude du bornier AC600 translation M3. Le seul signal ecrit par
+    ce lot reste M3_CommandWord (PDO 0x3101 = 7 pour le reset).
+
   # ── 4. Contrat de conservation ────────────────────────────────────────────
   # OBLIGATOIRE si strategy = rebuild. Ecrit AVANT toute suppression de lien.
   conservation:

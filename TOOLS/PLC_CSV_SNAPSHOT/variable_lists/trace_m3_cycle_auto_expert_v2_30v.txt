@@ -1,0 +1,42 @@
+# M3 + cycle auto — V2 : discrimination du trou entre cycle, FB_Translation et PRG_06.
+# 30 voies publiques/traçables. Aucun local [LOC], aucune commande, aucun bypass.
+
+# Cycle : ordre opérateur et demande effectivement publiée
+PRG_03_Modes_Cycle.Data.SequenceState.Step
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.ReqStart
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt
+PRG_02_Acquisition.Data.Joystick.DeadmanArmed
+PRG_02_Acquisition.Data.Joystick.AxisX.DirectionPositive
+PRG_02_Acquisition.Data.Joystick.AxisX.DirectionNegative
+PRG_02_Acquisition.Data.Joystick.AxisY.AtNeutral
+
+# Réalité terrain M3 : position, frein et mouvement observé
+PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI
+PRG_02_Acquisition.HwIn.Translation.M3_PosP1_DI
+PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI
+PRG_02_Acquisition.Data.M3.ActualFrequencyHz
+
+# Etats publics FB_Translation : arrivée, direction et décision avant PRG_06
+PRG_05_Translation.Data.TranslationState.Error
+PRG_05_Translation.Data.TranslationState.PositionReached
+PRG_05_Translation.Data.TranslationState.AtTremie
+PRG_05_Translation.Data.TranslationState.AtP1
+PRG_05_Translation.Data.TranslationState.ActiveTremie
+PRG_05_Translation.Data.TranslationState.ActiveMaintenance
+PRG_05_Translation.Data.TranslationState.SpeedCmd_Pct
+PRG_05_Translation.Data.TranslationState.BrakeCmd
+PRG_05_Translation.Data.TranslationState.BrakeCommandOpenConfirmed
+
+# Demande brute de PRG_05 vers la barrière finale
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqTremieSemantic
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz
+
+# Ordre réellement validé par PRG_06 avant écriture AC600
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveControlWord
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqCmd_Hz

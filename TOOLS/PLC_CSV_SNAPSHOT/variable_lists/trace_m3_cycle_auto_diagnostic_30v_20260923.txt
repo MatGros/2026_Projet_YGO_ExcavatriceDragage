@@ -1,0 +1,42 @@
+# M3 + cycle automatique : trace unique de discrimination AX14 -> PRG_05 -> PRG_06 -> AC600.
+# 30 voies. Aucune commande, aucun bypass : observation seulement.
+
+# Cycle et geste opérateur
+PRG_03_Modes_Cycle.Data.SequenceState.Step
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.ReqStart
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt
+PRG_02_Acquisition.Data.Joystick.DeadmanArmed
+PRG_02_Acquisition.Data.Joystick.AxisX.DirectionPositive
+PRG_02_Acquisition.Data.Joystick.AxisX.DirectionNegative
+PRG_02_Acquisition.Data.Joystick.AxisY.AtNeutral
+
+# Entrées physiques M3 indispensables au départ
+PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI
+PRG_02_Acquisition.HwIn.Translation.M3_PosP1_DI
+PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI
+PRG_02_Acquisition.Data.M3.ActualFrequencyHz
+
+# Décision FB_Translation publiée par PRG_05
+PRG_05_Translation.Data.TranslationState.Busy
+PRG_05_Translation.Data.TranslationState.ActiveTremie
+PRG_05_Translation.Data.TranslationState.ActiveMaintenance
+PRG_05_Translation.Data.TranslationState.SpeedCmd_Pct
+PRG_05_Translation.Data.TranslationState.BrakeCmd
+PRG_05_Translation.Data.TranslationState.BrakeCommandOpenConfirmed
+
+# Demande brute PRG_05 vers la barrière finale PRG_06
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.Enable
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqTremieSemantic
+
+# Ordres effectivement validés par la barrière finale AC600
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveControlWord
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqCmd_Hz
+PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeCmd

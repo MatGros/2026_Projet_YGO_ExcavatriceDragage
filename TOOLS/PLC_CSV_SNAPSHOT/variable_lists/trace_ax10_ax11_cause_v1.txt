@@ -1,0 +1,75 @@
+# =====================================================================
+# FEUILLE A — "QUI COUPE ?" — AX10 / AX10b / AX11 (trou M1+M2)
+# 30 variables TRACABLES · base : symboles PUBLIES uniquement
+# (GVL_Troubleshooting.* = GVL · PRG_04_Treuils_Benne.Data.* = VAR_OUTPUT de PRG)
+#
+# 🎯 But : discriminer, pour chaque trou, LAQUELLE des 3 causes agit :
+#    (C1) D18 — inversion de sens, 800 ms non creditees   -> lignes G3/G4/C3/C4
+#    (C2) garde d'atomicite couplee PRG_04:1405-1409/1499-1501 -> lignes C3/D3
+#    (C3) barriere finale PRG_06 (RestartRequired / DeadTime / permis) -> lignes E
+#
+# Regles de tracabilite ETABLIES PAR TEST REEL (import CODESYS, cf.
+# docs/TRACE_FORMAT_T372.md §4) :
+#   - STRING(...)                       -> NON tracable (Parameter 0x2, toute la trace echoue)
+#   - VAR interne [LOC] de PRG ou de FB-> NON tracable sans Symbol Configuration
+#   - VAR_OUTPUT / champ de GVL / ENUM  -> tracable (ENUM affiche par son NOM)
+#
+# ⛔ NON TRACABLE (ne pas ajouter, cela ferait echouer TOUTE la trace) :
+#   PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.StoppedTimer.ET      [LOC]
+#   PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.CapturedStoppedTime  [LOC]
+#   PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.RemainingDelay       [LOC]
+#   PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.DeadTimeArmed        [LOC]
+#   PRG_04_Treuils_Benne.WinchBothMotionReady                                [LOC] PRG_04:82
+#   PRG_03_Modes_Cycle.instCycleSemiAuto.Ax10bFallbackStopActive             [LOC]
+#   PRG_03_Modes_Cycle.instCycleSemiAuto.Ax10bHandoffWaitTimer.ET            [LOC]
+#   -> ces 3 faits sont DEDUITS : credit d'arret = f(DI contacteurs) ;
+#      garde couplee = f(DirectionChangePending M1 ET M2) ; repli AX10b =
+#      f(duree de l'etape 22 sans M1AscentStartReady).
+# =====================================================================
+
+# --- A. Sequence et demande operateur (le cycle attend-il, et quoi ?) ---
+GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step
+GVL_Troubleshooting.G_CycleSemiAuto.Idx209_WaitingForOperator
+GVL_Troubleshooting.G_CycleSemiAuto.Idx210_WaitingForProcess
+GVL_Troubleshooting.G_CycleSemiAuto.Idx104_DeadmanArmed
+GVL_Troubleshooting.G_CycleSemiAuto.Idx105_MancheDeflechi
+# Idx307_M1SpeedStepApplied RETIRE (redondant : palier M1 deja lisible par
+# FinalAuthorizedStep + relais). Idx308 (M2) CONSERVE : c'est l'un des deux
+# termes de la condition de transfert AX10b -> AX11 (FB_CycleSemiAuto.st:1353).
+GVL_Troubleshooting.G_CycleSemiAuto.Idx308_M2SpeedStepApplied
+# Condition de transfert AX10b -> AX11 cote axe M1 (barriere finale PRG_06 purgee).
+# C'est LE signal qui fait attendre le cycle (FB_CycleSemiAuto.st:1335 et :1354).
+PRG_06_Outputs.Data.M1AscentStartReady
+
+# --- B. Demande arbitree publiee vers les axes (est-ce que M1 est demande ?) ---
+GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection
+GVL_Troubleshooting.I_LevageUnitaireM1.Demandes_200.Idx211_CoupledUserRequestActive
+GVL_Troubleshooting.J_LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection
+
+# --- C. M1 : D18 (inversion) + sortie + credit d'arret (coeur du sujet) ---
+PRG_04_Treuils_Benne.Data.WinchM1State.DirectionChangePending
+PRG_04_Treuils_Benne.Data.WinchM1State.DirectionChangeDelayElapsed
+PRG_04_Treuils_Benne.Data.WinchM1State.CommandedDescend
+GVL_Troubleshooting.I_LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_RQ
+
+# --- D. M2 : meme chose + garde couplee (M2 coupe si M1 est en dead-time) ---
+PRG_04_Treuils_Benne.Data.WinchM2State.DirectionChangePending
+PRG_04_Treuils_Benne.Data.WinchM2State.DirectionChangeDelayElapsed
+GVL_Troubleshooting.J_LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ
+
+# --- E. Barriere finale M1/M2 : ce qui force AuthorizedStep a 0 ---
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx405_FinalInterlockState
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx406_FinalInterlockReason
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx407_FinalAuthorizedStep
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx415_MotorRequest
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx416_RestartRequired
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason
+
+# --- F. Permis directionnels, coupures et cause priorisee (nomenclature) ---
+GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx306_AscentPermitEffective
+GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx302_SafeStopActive
+GVL_Troubleshooting.Q_TraceWinchM1.BlockReason
+GVL_Troubleshooting.T_Permits.BothBlocked
