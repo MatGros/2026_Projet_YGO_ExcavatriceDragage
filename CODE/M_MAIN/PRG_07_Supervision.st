@@ -86,6 +86,16 @@ VAR
     M1PosDisplayFrozen      : BOOL;   // . [LOC] Gel affichage position M1 actif
     M2PosDisplayFrozen      : BOOL;   // . [LOC] Gel affichage position M2 actif
     CycleDepthLowerBound_M  : REAL;   // . [LOC] Borne profondeur cycle : legale et limites descentes M1/M2
+
+    // === ⏱️ COMPTEURS HORAIRES MAINTENANCE — sous-accumulateurs ms (non persistants, report <1s tolere) ===
+    RunningHoursMsMachine   : DINT;   // . [LOC] Sous-accumulateur ms compteur horaire machine
+    RunningHoursMsM1        : DINT;   // . [LOC] Sous-accumulateur ms compteur horaire M1
+    RunningHoursMsM2        : DINT;   // . [LOC] Sous-accumulateur ms compteur horaire M2
+    RunningHoursMsM3        : DINT;   // . [LOC] Sous-accumulateur ms compteur horaire M3
+END_VAR
+
+VAR CONSTANT
+    CST_MainTaskCycleTime_Ms : DINT := 10; // Cycle MainTask fixe (AF02) — base d'incrementation des compteurs horaires
 END_VAR
 
 VAR
@@ -673,6 +683,49 @@ GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_S   := PRG_03_Modes_Cycle.Data.S
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration_Min   := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration_Min;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration_S     := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration_S;
 GVL_IHM.CycleSemiAuto.State.DrainTimeElapsed_S     := DINT_TO_INT((TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeRemaining) + DINT#999) / DINT#1000);
+
+// === ⏱️ COMPTEURS HORAIRES MAINTENANCE — Machine (PLC sous tension, inconditionnel) + M1/M2/M3
+// (marche contacteur/variateur reelle). Accumulateur manuel (pas un TON) : doit survivre
+// aux coupures d'alimentation (RETAIN GVL_PERSISTENT) sans limite de duree ni remise a zero
+// intempestive sur une pause/absence de commande momentanee.
+RunningHoursMsMachine := RunningHoursMsMachine + CST_MainTaskCycleTime_Ms;
+IF RunningHoursMsMachine >= 1000 THEN
+    GVL_PERSISTENT._RunningHoursMachine_S := GVL_PERSISTENT._RunningHoursMachine_S + 1;
+    RunningHoursMsMachine := RunningHoursMsMachine - 1000;
+END_IF;
+
+IF PRG_06_Outputs.Data.M1RelayFwd OR PRG_06_Outputs.Data.M1RelayRev THEN
+    RunningHoursMsM1 := RunningHoursMsM1 + CST_MainTaskCycleTime_Ms;
+    IF RunningHoursMsM1 >= 1000 THEN
+        GVL_PERSISTENT._RunningHoursM1_S := GVL_PERSISTENT._RunningHoursM1_S + 1;
+        RunningHoursMsM1 := RunningHoursMsM1 - 1000;
+    END_IF;
+END_IF;
+
+IF PRG_06_Outputs.Data.M2RelayFwd OR PRG_06_Outputs.Data.M2RelayRev THEN
+    RunningHoursMsM2 := RunningHoursMsM2 + CST_MainTaskCycleTime_Ms;
+    IF RunningHoursMsM2 >= 1000 THEN
+        GVL_PERSISTENT._RunningHoursM2_S := GVL_PERSISTENT._RunningHoursM2_S + 1;
+        RunningHoursMsM2 := RunningHoursMsM2 - 1000;
+    END_IF;
+END_IF;
+
+IF PRG_06_Outputs.Data.M3CommandWordActive THEN
+    RunningHoursMsM3 := RunningHoursMsM3 + CST_MainTaskCycleTime_Ms;
+    IF RunningHoursMsM3 >= 1000 THEN
+        GVL_PERSISTENT._RunningHoursM3_S := GVL_PERSISTENT._RunningHoursM3_S + 1;
+        RunningHoursMsM3 := RunningHoursMsM3 - 1000;
+    END_IF;
+END_IF;
+
+GVL_IHM.Commun.RunningHours.MachineHours_H   := GVL_PERSISTENT._RunningHoursMachine_S / DINT#3600;
+GVL_IHM.Commun.RunningHours.MachineHours_Min := DINT_TO_INT((GVL_PERSISTENT._RunningHoursMachine_S MOD DINT#3600) / DINT#60);
+GVL_IHM.Commun.RunningHours.M1Hours_H        := GVL_PERSISTENT._RunningHoursM1_S / DINT#3600;
+GVL_IHM.Commun.RunningHours.M1Hours_Min      := DINT_TO_INT((GVL_PERSISTENT._RunningHoursM1_S MOD DINT#3600) / DINT#60);
+GVL_IHM.Commun.RunningHours.M2Hours_H        := GVL_PERSISTENT._RunningHoursM2_S / DINT#3600;
+GVL_IHM.Commun.RunningHours.M2Hours_Min      := DINT_TO_INT((GVL_PERSISTENT._RunningHoursM2_S MOD DINT#3600) / DINT#60);
+GVL_IHM.Commun.RunningHours.M3Hours_H        := GVL_PERSISTENT._RunningHoursM3_S / DINT#3600;
+GVL_IHM.Commun.RunningHours.M3Hours_Min      := DINT_TO_INT((GVL_PERSISTENT._RunningHoursM3_S MOD DINT#3600) / DINT#60);
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
 // Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit
 // pas être présenté comme un contact Kobold.
@@ -724,6 +777,8 @@ instHmiBannerFormatter(
     WinchSelected         := GVL_IHM.Modes.Cmd.SelJoystickWinch,
     CycleStep             := GVL_IHM.CycleSemiAuto.State.CycleStep,
     CycleStateStr         := GVL_IHM.CycleSemiAuto.State.CycleStateStr,
+    CycleElapsed_Min      := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_Min,
+    CycleElapsed_S        := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_S,
     CycleErrorId          := GVL_IHM.CycleSemiAuto.State.ErrorId,
     CycleStepAtError      := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
     CycleChecksInhibited  := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,

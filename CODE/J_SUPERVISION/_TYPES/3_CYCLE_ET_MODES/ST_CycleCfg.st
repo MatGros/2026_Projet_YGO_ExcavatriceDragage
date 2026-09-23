@@ -9,7 +9,7 @@ STRUCT
     DrainTime_S        : INT := 5;      (* ⏱️ Durée d'égouttage du godet en AX13 (configurable IHM, secondes entières [1..3600]) *)
     RaiseOffBottom_M   : REAL := 0.0;   (* 📐 0 = passage direct AX10 ; >0 = distance de décollement AX9 *)
     CtrlAscentMaxStep  : INT  := 2;     (* 🚀 Palier max montée contrôle AX11, borné [1..2] côté FB (GEL Q16) *)
-    ExtractionStartOpening_Pct : INT := 0; (* 📐 Ouverture benne restante déclarant la fermeture atteinte [0..50 %] ; 0 = critère d'arrivée seul (branche seuil inactive) *)
+    ExtractionStartOpening_Pct : INT := 10; (* 📐 Ouverture benne restante déclarant la fermeture atteinte [0..50 %] ; 0 = critère d'arrivée seul (branche seuil inactive), 10 = reglage nominal confirme operateur *)
     _ReservedInerte_01 : INT  := 0;     (* 🔧 RESERVE / INERTE depuis T358 (ex-ForceStepTarget) — PLUS AUCUN LECTEUR : la cible de forcage est portee par ST_CycleCmd.SetForceStepTgt (zone non persistee). Renomme (pas retire) pour ne pas decaler le mapping RETAIN positionnel des champs suivants (regle : jamais d'insertion ni de retrait au milieu) ; retrait reel = lot de migration de persistance dedie. Aucune exposition IHM sur ce tag. *)
     DiveStartMin_M     : REAL := 4.0;   (* 📐 Altimétrie lancement Kobold (AT4, PRG_03) *)
     ImmersionUpper_M   : REAL := 0.5;   (* 📐 Altimétrie Kobold haute confirmation immersion (AT4, PRG_04) *)

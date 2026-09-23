@@ -6,9 +6,9 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_TranslationCfg :
 STRUCT
-    CfgApproachSpeedTremie_Hz      : REAL := 10.0; (* 🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1 *)
-    CfgApproachSpeedMaintenance_Hz : REAL := 10.0; (* 🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1 *)
-    CfgApproachSpeedP1_Hz          : REAL := 10.0; (* 🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1 *)
+    CfgApproachSpeedTremie_Hz      : REAL := 20.0; (* 🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1 — reglage nominal confirme operateur *)
+    CfgApproachSpeedMaintenance_Hz : REAL := 20.0; (* 🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1 — reglage nominal confirme operateur *)
+    CfgApproachSpeedP1_Hz          : REAL := 20.0; (* 🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1 — reglage nominal confirme operateur *)
 
     (* Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg *)
     Initialized                    : BOOL := FALSE; (* 🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot *)
