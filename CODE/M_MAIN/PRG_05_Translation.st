@@ -276,7 +276,19 @@ ELSIF NOT M3_BootPositionLock AND NOT M3_BootRestoreApplied AND instPosDecoderM3
     M3_AtMaintenanceStable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE;
 ELSIF NOT M3_BootPositionLock AND NOT M3_BootRestoreApplied AND M3_SensorsWordChanged THEN
     // Le mot capteurs a change sans que ce soit une arrivee -> on a quitte le dernier point.
-    M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
+    // Tremie/Maintenance EXCLUS ICI (rebond capteur) : ils suivent desormais la regle
+    // bistable ci-dessous, identique et deja prouvee sur LimitSwitchTremie/MaintenanceStable §0ter.
+    M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE;
+END_IF;
+
+// Bistable Tremie/Maintenance : jamais efface par un rebond capteur (mot capteurs),
+// uniquement par une commande franche dans le sens inverse — meme regle, deja prouvee
+// sans regression depuis 2026-09-04, que M3_LimitSwitchTremieStable/MaintenanceStable §0ter.
+IF M3_ReqMaintenance_Active THEN
+    M3_AtTremieStable := FALSE;
+END_IF;
+IF M3_ReqTremie_Active THEN
+    M3_AtMaintenanceStable := FALSE;
 END_IF;
 
 // --- M3 a une position de travail : STATIQUE (mot capteurs), pas un jeton de franchissement ---
