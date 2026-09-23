@@ -31,10 +31,10 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1 — reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="CfgApproachSpeedMaintenance_Hz">
@@ -42,10 +42,10 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1 — reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="CfgApproachSpeedP1_Hz">
@@ -53,10 +53,10 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1 — reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">

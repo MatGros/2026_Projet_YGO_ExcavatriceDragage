@@ -15,6 +15,10 @@
       "passed": true
     },
     {
+      "name": "TC-P11-040 Reset FB Translation emet le mot 7 sans mouvement",
+      "passed": true
+    },
+    {
       "name": "TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -> Incoherent",
       "passed": true
     },
@@ -52,6 +56,10 @@
     },
     {
       "name": "TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-041 Mot 7 traverse la barriere pendant son defaut propre",
       "passed": true
     },
     {
@@ -112,7 +120,14 @@
     },
     {
       "name": "TC-P11-026 Safety : mouvement non command\u00e9 (Meca A, bit5) -> SafeStop + PowerCutOff",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB_SAFETY.ERRORMECAA expected TRUE, got FALSE",
+        "file": "test_fb_translation.st",
+        "line": 1050,
+        "message": "mouvement non command\u00e9 -> bit5"
+      }
     },
     {
       "name": "TC-P11-027 Safety : escalade fin de course (bit6) -> SafeStop + PowerCutOff",
@@ -149,11 +164,27 @@
     {
       "name": "TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -> mouvement autorise",
       "passed": true
+    },
+    {
+      "name": "TC-P11-036 T345-L1 Arret de l axe : rebond capteur + demande re-armee -> aucun redemarrage",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-037 T345-L1 Le fait d arret confirme n est ni constant ni efface par la demande",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-038 T345-L1 Une demande de SENS INVERSE relache le verrou et autorise le degagement",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-039 T345-L1 Non-vacuite : rotation reelle au variateur -> aucun arret confirme",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 37,
-    "passed": 37,
-    "failed": 0
+    "total": 43,
+    "passed": 42,
+    "failed": 1
   }
 }

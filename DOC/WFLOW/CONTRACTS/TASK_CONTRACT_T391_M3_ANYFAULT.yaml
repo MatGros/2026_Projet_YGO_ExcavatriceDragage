@@ -1,0 +1,53 @@
+contract:
+  task_id: T391_M3_ANYFAULT
+  criticality: C2
+  strategy: patch
+  objective: >
+    Faire remonter dans AnyFaultActive les defauts mouvement chariot M3 et
+    barriere finale M3, sans modifier les commandes, la safety ni les sorties.
+  acceptance:
+    - id: AC1
+      statement: "TranslationState.Error alimente AnyFaultActive."
+      verified_by: "Test PRG_07 avec TranslationData.TranslationState.Error = TRUE."
+    - id: AC2
+      statement: "TranslationState.FinalInterlockError alimente AnyFaultActive."
+      verified_by: "Test PRG_07 avec TranslationData.TranslationState.FinalInterlockError = TRUE."
+    - id: AC3
+      statement: "Aucun ordre M3, permit, SafeStop ou PowerCutOff n est ecrit par le lot."
+      verified_by: "Diff limite a l aggregation IHM et au harnais de test."
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_07.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_07_supervision.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T391_M3_ANYFAULT.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - CODE_XML/
+    forbidden:
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/I_TRANSLATION/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "AnyFaultActive reste une vue IHM read-only produite par PRG_07."
+      - "Les commandes et protections M3 existantes restent inchangees."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - bundle
+    - run_all_gates
+  alert_duty: "Le changement est diagnostique seulement : tout effet sur une commande M3 bloque la livraison."
+status: IN_PROGRESS
+execution:
+  executed_by: CDX03
+  completed_at: ''
+  status: IN_PROGRESS
+  summary: 'Demande humaine explicite du 2026-09-23 : defauts chariot M3 visibles dans AnyFaultActive.'
+  evidence_submitted: []
+validation:
+  status: APPROVED
+  validated_by: HUM
+  validated_at: '2026-09-23T11:30:00+02:00'
+  notes: 'GO explicite utilisateur : corriger la remontée AnyFault des defauts M3/chariot.'

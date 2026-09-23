@@ -32,7 +32,14 @@
     },
     {
       "name": "T331-001 AX15b repli : ouverture neutralisee puis fermeture benne et remontee couplee M1+M2",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX10_CLOSE_BUCKET expected TRUE, got FALSE",
+        "file": "test_fb_cyclesemiauto.st",
+        "line": 313,
+        "message": "Repli : entree dans l etape de fermeture benne"
+      }
     },
     {
       "name": "T331-002 AX15b/AX15c non-regression : vidage nominal et repositionnement inchanges",
@@ -40,7 +47,14 @@
     },
     {
       "name": "T331-003 AX15b repli : perte du geste, de l homme-mort ou defaut interrompt sans reprise",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX10_CLOSE_BUCKET expected TRUE, got FALSE",
+        "file": "test_fb_cyclesemiauto.st",
+        "line": 479,
+        "message": "Repli engage : etape de fermeture benne"
+      }
     },
     {
       "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
@@ -212,7 +226,7 @@
   ],
   "summary": {
     "total": 43,
-    "passed": 38,
-    "failed": 5
+    "passed": 36,
+    "failed": 7
   }
 }

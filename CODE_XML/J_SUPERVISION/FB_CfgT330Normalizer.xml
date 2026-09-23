@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-22T18:05:44.763202" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-22T18:05:44.763202">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T11:49:40.199739" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T11:49:40.199739">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -362,12 +362,12 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="1" />
+                <simpleValue value="0.4" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== T330 (Q1/Q2) — RÈGLES D'INGÉNIERIE, PAS DES COTES MÉTIER ===
 NON persistantes et NON IHM (AC3) : jamais exposées, jamais RETAIN.
-Réserve minimale FDC logiciel haut / TOP homing</xhtml>
+Réserve minimale FDC logiciel haut / TOP homing (decision humaine, ex-1.00m)</xhtml>
               </documentation>
             </variable>
             <variable name="CST_T330SlowdownTopMin_M">
@@ -397,10 +397,10 @@ Réserve minimale FDC logiciel haut / TOP homing</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="9" />
+                <simpleValue value="9.6" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute FDC (Q21/C1 : TOP&lt;=10 et Delta&gt;=1 =&gt; FDC&lt;=9)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute FDC (Q21/C1 : TOP&lt;=10 et Delta&gt;=0.4 =&gt; FDC&lt;=9.6)</xhtml>
               </documentation>
             </variable>
             <variable name="CST_T330TopMin_M">

@@ -5140,6 +5140,14 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (ProcessPermitM1/M2_Descend)</xhtml>
               </documentation>
             </variable>
+            <variable name="RunningHours">
+              <type>
+                <derived name="ST_RunningHoursHMI" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Compteurs horaires maintenance — Machine (PLC sous tension) + M1/M2/M3 (marche reelle)</xhtml>
+              </documentation>
+            </variable>
             <variable name="EncoderCfg">
               <type>
                 <derived name="ST_fbEncoder_Cfg" />
@@ -5365,10 +5373,10 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="0" />
+                <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Ouverture benne restante déclarant la fermeture atteinte [0..50 %] ; 0 = critère d'arrivée seul (branche seuil inactive)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Ouverture benne restante déclarant la fermeture atteinte [0..50 %] ; 0 = critère d'arrivée seul (branche seuil inactive), 10 = reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="_ReservedInerte_01">
@@ -5549,10 +5557,10 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="FALSE" />
+                <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. NON persiste.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profil nominal : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. Debrayable IHM, non persiste.</xhtml>
               </documentation>
             </variable>
             <variable name="BtnResetSampleCount">
@@ -9918,6 +9926,14 @@ Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-
 🔓 Demande frein M3 arbitree</xhtml>
               </documentation>
             </variable>
+            <variable name="M3CommandWordActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Mot de commande variateur M3 non nul (marche reelle demandee, hors reset AC600) — compteur horaire</xhtml>
+              </documentation>
+            </variable>
             <variable name="PowerKeepAliveACmd">
               <type>
                 <BOOL />
@@ -10418,6 +10434,83 @@ Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-
    🎯 Rôle : Regroupe les demandes logiques de treuil formulées par le séquenceur
    📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
    =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_RunningHoursHMI">
+        <baseType>
+          <struct>
+            <variable name="MachineHours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, PLC sous tension</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHours_Min">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Minutes 0..59</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Hours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, treuil M1 en marche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Hours_Min">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M2Hours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, treuil M2 en marche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Hours_Min">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M3Hours_H">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Heures entieres, translation M3 en marche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3Hours_Min">
+              <type>
+                <INT />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>36aacd48-8376-561b-a2fe-3f75f892c28a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⏱️ ST_RunningHoursHMI — Compteurs horaires maintenance (PLC→IHM)
+   ───────────────────────────────────────────────────────────────
+   🎯 Role : totalisateurs de marche pour planification maintenance,
+      independants du chrono de cycle (qui se remet a zero par passe).
+   🔌 Machine = duree sous tension PLC (toujours active des le boot).
+      M1/M2/M3 = duree contacteur marche reel actif (preuve physique).
+   💾 Source RETAIN : GVL_PERSISTENT (secondes), converties ici en H:Min.
+   ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_SafetyChecklist">
@@ -12551,10 +12644,10 @@ Cause de blocage prioritaire</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1 — reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="CfgApproachSpeedMaintenance_Hz">
@@ -12562,10 +12655,10 @@ Cause de blocage prioritaire</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1 — reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="CfgApproachSpeedP1_Hz">
@@ -12573,10 +12666,10 @@ Cause de blocage prioritaire</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="10" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1 — reglage nominal confirme operateur</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -15941,10 +16034,10 @@ Garde globale prise de référence (0 = pas de garde)</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#800ms" />
+                <simpleValue value="TIME#1000ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] MES 2026-09-04 : 300ms trop court pour un arret dur au FdC (coast reel ~600ms) -&gt; latch spurieux. Monte a 800ms (confirme operateur).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai de confirmation retour contacteur frein avant defaut sequence. Doit couvrir le coast reel d'un arret dur en butee extreme (confirme operateur).</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -20896,12 +20989,12 @@ END_IF;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="1" />
+                <simpleValue value="0.4" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== T330 (Q1/Q2) — RÈGLES D'INGÉNIERIE, PAS DES COTES MÉTIER ===
 NON persistantes et NON IHM (AC3) : jamais exposées, jamais RETAIN.
-Réserve minimale FDC logiciel haut / TOP homing</xhtml>
+Réserve minimale FDC logiciel haut / TOP homing (decision humaine, ex-1.00m)</xhtml>
               </documentation>
             </variable>
             <variable name="CST_T330SlowdownTopMin_M">
@@ -20931,10 +21024,10 @@ Réserve minimale FDC logiciel haut / TOP homing</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="9" />
+                <simpleValue value="9.6" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute FDC (Q21/C1 : TOP&lt;=10 et Delta&gt;=1 =&gt; FDC&lt;=9)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute FDC (Q21/C1 : TOP&lt;=10 et Delta&gt;=0.4 =&gt; FDC&lt;=9.6)</xhtml>
               </documentation>
             </variable>
             <variable name="CST_T330TopMin_M">
@@ -24696,10 +24789,12 @@ RaiseOffBottomEff := SEL(CfgRaiseOffBottomM &lt;= 0.0, 0.0, CfgRaiseOffBottomM);
 CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 CtrlAscentDistEffM := SEL(CfgCtrlAscentDistanceM &lt;= 0.0, CtrlAscentDistM, CfgCtrlAscentDistanceM);
 
-// ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
-// .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration_Min/_S à l'achèvement (X13).
+// ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy) OU
+// en pause consciente (WaitingResume, homme-mort relâché entre deux étapes) — une pause
+// normale entre étapes ne doit jamais remettre le chrono à zéro, seul un repos réel (AX0)
+// ou un passage termine (AX18, qui fige LastCycleDuration_Min/_S juste avant) le remet.
 // Conversion TIME -&gt; minutes/secondes (T347) : troncature à la seconde, aucun arrondi.
-CycleRunTimer(IN := Lifecycle.Busy, PT := T#12h);
+CycleRunTimer(IN := Lifecycle.Busy OR WaitingResume, PT := T#12h);
 CycleElapsedTotal_S := TIME_TO_DINT(CycleRunTimer.ET) / DINT#1000;
 CurrentCycleElapsed_Min := DINT_TO_INT(CycleElapsedTotal_S / DINT#60);
 CurrentCycleElapsed_S   := DINT_TO_INT(CycleElapsedTotal_S MOD DINT#60);
@@ -35319,6 +35414,17 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Délai Méca B</xhtml>
               </documentation>
             </variable>
+            <variable name="PostRampTimeoutMecaA">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#7S" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Délai Méca A — couvre le glissement roue/chariot sur butée mécanique</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_StopFreqThresholdHz">
               <type>
                 <REAL />
@@ -35543,7 +35649,7 @@ IF NOT BypassGlobal THEN
         ELSE
             UncommandedActiveA := FALSE;
         END_IF;
-        TonMecaA(IN := UncommandedActiveA, PT := T#1S);
+        TonMecaA(IN := UncommandedActiveA, PT := PostRampTimeoutMecaA);
         IF TonMecaA.Q THEN MecaAFault := TRUE; END_IF;
     ELSE
         TonMecaA(IN := FALSE);
@@ -44577,6 +44683,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Arrêt exact sur capteur cible</xhtml>
               </documentation>
             </variable>
+            <variable name="ArrivalIsExtreme">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Arrivée sur une extrémité réelle (Trémie/Maintenance), jamais un point intermédiaire (P1/P2/PV)</xhtml>
+              </documentation>
+            </variable>
             <variable name="MovementRequested">
               <type>
                 <BOOL />
@@ -44622,6 +44736,22 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Persistance avant fault Cause 6 (evite le faux defaut sur arrivee nominale)</xhtml>
               </documentation>
             </variable>
+            <variable name="DriveResetPulseTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Duree bornee de la commande reset AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveResetPulseActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Impulsion reset AC600 en cours</xhtml>
+              </documentation>
+            </variable>
             <variable name="DriveFaultLatching">
               <type>
                 <BOOL />
@@ -44650,6 +44780,17 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DriveResetPulseTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Impulsion reset AC600</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -44683,6 +44824,12 @@ ResetEdge(CLK := Reset);
 
 IF ResetEdge.Q THEN
     DriveFaultLatching := FALSE;
+    DriveResetPulseActive := Enable;
+END_IF;
+
+DriveResetPulseTimer(IN := DriveResetPulseActive, PT := CST_DriveResetPulseTime);
+IF DriveResetPulseTimer.Q OR NOT Enable THEN
+    DriveResetPulseActive := FALSE;
 END_IF;
 
 IF DriveStatusWord.4 THEN
@@ -44734,6 +44881,7 @@ IF NOT Enable THEN
     CommandedMaintenance := FALSE;
     DirectionChangePending := FALSE;
     ArrivalLock := FALSE;
+    ArrivalIsExtreme := FALSE;
     ArrivalWasTremie := FALSE;
     ArrivalWasMaintenance := FALSE;
     LastMoveDirection := 0;
@@ -44775,7 +44923,14 @@ ELSIF CommandedMaintenance THEN
     LastMoveDirection := -1;
 END_IF;
 
-IF ArrivalEdge.Q THEN
+// Arrivée sur une extrémité réelle uniquement (Trémie/Maintenance), jamais un point
+// intermédiaire (P1/P2/PV) : LimitSwitchMaintenance porte déjà la règle métier "P1 compte
+// comme extrémité quand Maintenance est interdite comme cible" (PRG_05_Translation §0ter),
+// donc aucune redondance de logique ici, juste sa consommation.
+ArrivalIsExtreme := ((LastMoveDirection = 1) AND LimitSwitchTremie)
+                  OR ((LastMoveDirection = -1) AND LimitSwitchMaintenance);
+
+IF ArrivalEdge.Q AND ArrivalIsExtreme THEN
     ArrivalLock := TRUE;
     IF CommandedTremie OR CommandedMaintenance THEN
         ArrivalWasTremie := CommandedTremie;
@@ -44925,6 +45080,12 @@ END_IF;
 
 IF Fault.Error THEN
     RequestedDriveControlWord := 0;
+    RequestedDriveFreqHz := 0.0;
+    BrakeReleaseRequest := FALSE;
+END_IF;
+
+IF DriveResetPulseActive THEN
+    RequestedDriveControlWord := WORD#7;
     RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
@@ -45609,10 +45770,11 @@ DriveFreqCmdWord := 0;
 BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
 Ready := NOT Fault.Error AND NOT RestartInhibit;
 
-IF Fault.Error THEN
+IF RequestedDriveControlWord = 7 THEN
     BrakeCmd := FALSE;
-ELSIF RequestedDriveControlWord = 7 THEN
     DriveControlWord := 7;
+ELSIF Fault.Error THEN
+    BrakeCmd := FALSE;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
 ELSIF MovementRequested AND NOT PermitFinalBlocked THEN
@@ -58216,7 +58378,19 @@ ELSIF NOT M3_BootPositionLock AND NOT M3_BootRestoreApplied AND instPosDecoderM3
     M3_AtMaintenanceStable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE;
 ELSIF NOT M3_BootPositionLock AND NOT M3_BootRestoreApplied AND M3_SensorsWordChanged THEN
     // Le mot capteurs a change sans que ce soit une arrivee -&gt; on a quitte le dernier point.
-    M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
+    // Tremie/Maintenance EXCLUS ICI (rebond capteur) : ils suivent desormais la regle
+    // bistable ci-dessous, identique et deja prouvee sur LimitSwitchTremie/MaintenanceStable §0ter.
+    M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE;
+END_IF;
+
+// Bistable Tremie/Maintenance : jamais efface par un rebond capteur (mot capteurs),
+// uniquement par une commande franche dans le sens inverse — meme regle, deja prouvee
+// sans regression depuis 2026-09-04, que M3_LimitSwitchTremieStable/MaintenanceStable §0ter.
+IF M3_ReqMaintenance_Active THEN
+    M3_AtTremieStable := FALSE;
+END_IF;
+IF M3_ReqTremie_Active THEN
+    M3_AtMaintenanceStable := FALSE;
 END_IF;
 
 // --- M3 a une position de travail : STATIQUE (mot capteurs), pas un jeton de franchissement ---
@@ -59716,6 +59890,7 @@ M3_SetpointFrequencyHz       := instTranslationOutputInterlockM3.DriveFreqCmdWor
 
 // ── Bus inter-PRG M3 ──
 Data.TranslationBrakeCmd   := TranslationBrakeCmd;
+Data.M3CommandWordActive   := (M3_CommandWord &lt;&gt; WORD#0);
 
 // ═══════════════════════════════════════════════════════════════
 // 🪝 §4 KOBOLD (capteur fond) — commande + sortie
@@ -60257,6 +60432,75 @@ geles pendant HomingLifecycle.Busy). Affichage seul, aucune decision machine ici
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Borne profondeur cycle : legale et limites descentes M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonSecondMachine">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⏱️ COMPTEURS HORAIRES MAINTENANCE — tops seconde reels (horloge CODESYS, pas un nombre
+de scans suppose) : chaque TON pulse exactement 1 fois par seconde REELLE ecoulee, tant
+que son IN reste vrai, independamment du temps de cycle MainTask reel (jamais suppose).
+. [LOC] Top seconde reel compteur horaire machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonSecondM1">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Top seconde reel compteur horaire M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonSecondM2">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Top seconde reel compteur horaire M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonSecondM3">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Top seconde reel compteur horaire M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonSecondMachineEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front montant explicite du top seconde — incremente une seule fois par pulse,
+insensible a une eventuelle duree de Q etalee sur plusieurs scans.
+. [LOC] Front top seconde machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonSecondM1Edge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front top seconde M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonSecondM2Edge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front top seconde M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonSecondM3Edge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front top seconde M3</xhtml>
               </documentation>
             </variable>
             <variable name="T330InHoming">
@@ -60864,6 +61108,46 @@ GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_S   := PRG_03_Modes_Cycle.Data.S
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration_Min   := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration_Min;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration_S     := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration_S;
 GVL_IHM.CycleSemiAuto.State.DrainTimeElapsed_S     := DINT_TO_INT((TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeRemaining) + DINT#999) / DINT#1000);
+
+// === ⏱️ COMPTEURS HORAIRES MAINTENANCE — Machine (PLC sous tension, inconditionnel) + M1/M2/M3
+// (marche contacteur/variateur reelle). Top seconde REEL (TON auto-redemarrant sur horloge
+// CODESYS), PAS un compte de scans a duree supposee : aucune hypothese sur le temps de cycle
+// MainTask, donc aucune derive systematique si ce temps de cycle reel differe de la valeur
+// nominale documentee. Motif : une hypothese fausse sur la duree de scan biaiserait TOUS les
+// totaux de façon permanente et invisible (ex. scan reel 2x plus court -&gt; compteur 2x trop vite).
+// RETAIN GVL_PERSISTENT : survit aux coupures ; aucune remise a zero sur pause/absence de commande.
+TonSecondMachine(IN := NOT TonSecondMachine.Q, PT := T#1s);
+TonSecondMachineEdge(CLK := TonSecondMachine.Q);
+IF TonSecondMachineEdge.Q THEN
+    GVL_PERSISTENT._RunningHoursMachine_S := GVL_PERSISTENT._RunningHoursMachine_S + 1;
+END_IF;
+
+TonSecondM1(IN := (PRG_06_Outputs.Data.M1RelayFwd OR PRG_06_Outputs.Data.M1RelayRev) AND NOT TonSecondM1.Q, PT := T#1s);
+TonSecondM1Edge(CLK := TonSecondM1.Q);
+IF TonSecondM1Edge.Q THEN
+    GVL_PERSISTENT._RunningHoursM1_S := GVL_PERSISTENT._RunningHoursM1_S + 1;
+END_IF;
+
+TonSecondM2(IN := (PRG_06_Outputs.Data.M2RelayFwd OR PRG_06_Outputs.Data.M2RelayRev) AND NOT TonSecondM2.Q, PT := T#1s);
+TonSecondM2Edge(CLK := TonSecondM2.Q);
+IF TonSecondM2Edge.Q THEN
+    GVL_PERSISTENT._RunningHoursM2_S := GVL_PERSISTENT._RunningHoursM2_S + 1;
+END_IF;
+
+TonSecondM3(IN := PRG_06_Outputs.Data.M3CommandWordActive AND NOT TonSecondM3.Q, PT := T#1s);
+TonSecondM3Edge(CLK := TonSecondM3.Q);
+IF TonSecondM3Edge.Q THEN
+    GVL_PERSISTENT._RunningHoursM3_S := GVL_PERSISTENT._RunningHoursM3_S + 1;
+END_IF;
+
+GVL_IHM.Commun.RunningHours.MachineHours_H   := GVL_PERSISTENT._RunningHoursMachine_S / DINT#3600;
+GVL_IHM.Commun.RunningHours.MachineHours_Min := DINT_TO_INT((GVL_PERSISTENT._RunningHoursMachine_S MOD DINT#3600) / DINT#60);
+GVL_IHM.Commun.RunningHours.M1Hours_H        := GVL_PERSISTENT._RunningHoursM1_S / DINT#3600;
+GVL_IHM.Commun.RunningHours.M1Hours_Min      := DINT_TO_INT((GVL_PERSISTENT._RunningHoursM1_S MOD DINT#3600) / DINT#60);
+GVL_IHM.Commun.RunningHours.M2Hours_H        := GVL_PERSISTENT._RunningHoursM2_S / DINT#3600;
+GVL_IHM.Commun.RunningHours.M2Hours_Min      := DINT_TO_INT((GVL_PERSISTENT._RunningHoursM2_S MOD DINT#3600) / DINT#60);
+GVL_IHM.Commun.RunningHours.M3Hours_H        := GVL_PERSISTENT._RunningHoursM3_S / DINT#3600;
+GVL_IHM.Commun.RunningHours.M3Hours_Min      := DINT_TO_INT((GVL_PERSISTENT._RunningHoursM3_S MOD DINT#3600) / DINT#60);
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
 // Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit
 // pas être présenté comme un contact Kobold.
@@ -60915,6 +61199,8 @@ instHmiBannerFormatter(
     WinchSelected         := GVL_IHM.Modes.Cmd.SelJoystickWinch,
     CycleStep             := GVL_IHM.CycleSemiAuto.State.CycleStep,
     CycleStateStr         := GVL_IHM.CycleSemiAuto.State.CycleStateStr,
+    CycleElapsed_Min      := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_Min,
+    CycleElapsed_S        := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_S,
     CycleErrorId          := GVL_IHM.CycleSemiAuto.State.ErrorId,
     CycleStepAtError      := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
     CycleChecksInhibited  := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
@@ -62651,6 +62937,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
               <Object Name="ST_LocalIHM" ObjectId="b39b9fb0-0aad-5e68-8c80-2b6c913309a3" />
               <Object Name="ST_LocalIHM_CtrlBlock" ObjectId="a6ea7b24-19db-57a2-a2a6-8b27b9bf5f8a" />
               <Object Name="ST_LocalIHM_StatusBlock" ObjectId="01fb5de3-730c-545b-bd73-11889b8d40b9" />
+              <Object Name="ST_RunningHoursHMI" ObjectId="36aacd48-8376-561b-a2fe-3f75f892c28a" />
               <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
               <Object Name="ST_SyncCmd" ObjectId="c4516adb-d5c4-5442-aed3-fe5c7a9333fa" />
               <Object Name="ST_SyncHMI" ObjectId="50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a" />
