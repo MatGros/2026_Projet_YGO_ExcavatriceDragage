@@ -95,6 +95,55 @@ def main(output: Path) -> int:
         print("ERROR: aucun champ top-level trouve dans GVL_Troubleshooting", file=sys.stderr)
         return 1
 
+    # Ajout des variables GVL_BypassRetain (bypasses RETAIN actifs/inactifs)
+    gvl_bypass_path = CODE_DIR / "L_SIMULATION" / "GVL_BypassRetain.st"
+    if gvl_bypass_path.is_file():
+        bypass_text = strip_comments(gvl_bypass_path.read_text(encoding="utf-8", errors="replace"))
+        for line in bypass_text.splitlines():
+            m = FIELD_RE.match(line)
+            if m:
+                out.append(f"GVL_BypassRetain.{m.group(1)}")
+
+    # Ajout des variables cles de diagnostic AU / Contacteur de securite (PRG_06_Outputs)
+    emergency_diag_vars = [
+        "PRG_06_Outputs.instSafetyEmergencyManagement.Status.Ready",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.Status.Done",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.Status.State.ChainOk",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.Status.State.ContactorOk",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.Status.State.Step",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.Status.Diag.Error",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.Status.Diag.LastAbortStep",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.Status.Diag.LastAbortCause",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.ArmingSeqStep",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.Cmd.MaintainA_Cmd",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.Cmd.MaintainB_Cmd",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.ForceTestA",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.ForceTestB",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.BypassTestA",
+        "PRG_06_Outputs.instSafetyEmergencyManagement.BypassTestB",
+    ]
+    out.extend(emergency_diag_vars)
+
+    # Ajout des variables cles de diagnostic Interlocks / Treuils
+    winch_diag_vars = [
+        "PRG_06_Outputs.instWinchOutputInterlockM1.State",
+        "PRG_06_Outputs.instWinchOutputInterlockM1.Reason",
+        "PRG_06_Outputs.instWinchOutputInterlockM1.RestartRequired",
+        "PRG_06_Outputs.instWinchOutputInterlockM1.BrakeCmd",
+        "PRG_06_Outputs.instWinchOutputInterlockM1.AuthorizedStep",
+        "PRG_06_Outputs.instWinchOutputInterlockM2.State",
+        "PRG_06_Outputs.instWinchOutputInterlockM2.Reason",
+        "PRG_06_Outputs.instWinchOutputInterlockM2.RestartRequired",
+        "PRG_06_Outputs.instWinchOutputInterlockM2.BrakeCmd",
+        "PRG_06_Outputs.instWinchOutputInterlockM2.AuthorizedStep",
+        "PRG_04_Treuils_Benne.Data.WinchM1State.DirectionChangePending",
+        "PRG_04_Treuils_Benne.Data.WinchM2State.DirectionChangePending",
+        "PRG_06_Outputs.Data.M1AscentStartReady",
+        "PRG_06_Outputs.Data.ContactorMismatch",
+    ]
+    out.extend(winch_diag_vars)
+
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text("\n".join(out) + "\n", encoding="ascii")
     print(f"{len(out)} variables ecrites dans {output}")
