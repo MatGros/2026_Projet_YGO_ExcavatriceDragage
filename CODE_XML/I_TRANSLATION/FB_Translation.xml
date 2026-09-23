@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T03:35:08.654030" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T03:35:08.654030">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T10:45:11.163535" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T10:45:11.163535">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -823,6 +823,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Arrêt exact sur capteur cible</xhtml>
               </documentation>
             </variable>
+            <variable name="ArrivalIsExtreme">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Arrivée sur une extrémité réelle (Trémie/Maintenance), jamais un point intermédiaire (P1/P2/PV)</xhtml>
+              </documentation>
+            </variable>
             <variable name="MovementRequested">
               <type>
                 <BOOL />
@@ -868,6 +876,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Persistance avant fault Cause 6 (evite le faux defaut sur arrivee nominale)</xhtml>
               </documentation>
             </variable>
+            <variable name="DriveResetPulseTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Duree bornee de la commande reset AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveResetPulseActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Impulsion reset AC600 en cours</xhtml>
+              </documentation>
+            </variable>
             <variable name="DriveFaultLatching">
               <type>
                 <BOOL />
@@ -896,6 +920,17 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DriveResetPulseTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Impulsion reset AC600</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -929,6 +964,12 @@ ResetEdge(CLK := Reset);
 
 IF ResetEdge.Q THEN
     DriveFaultLatching := FALSE;
+    DriveResetPulseActive := Enable;
+END_IF;
+
+DriveResetPulseTimer(IN := DriveResetPulseActive, PT := CST_DriveResetPulseTime);
+IF DriveResetPulseTimer.Q OR NOT Enable THEN
+    DriveResetPulseActive := FALSE;
 END_IF;
 
 IF DriveStatusWord.4 THEN
@@ -980,6 +1021,7 @@ IF NOT Enable THEN
     CommandedMaintenance := FALSE;
     DirectionChangePending := FALSE;
     ArrivalLock := FALSE;
+    ArrivalIsExtreme := FALSE;
     ArrivalWasTremie := FALSE;
     ArrivalWasMaintenance := FALSE;
     LastMoveDirection := 0;
@@ -1021,7 +1063,14 @@ ELSIF CommandedMaintenance THEN
     LastMoveDirection := -1;
 END_IF;
 
-IF ArrivalEdge.Q THEN
+// Arrivée sur une extrémité réelle uniquement (Trémie/Maintenance), jamais un point
+// intermédiaire (P1/P2/PV) : LimitSwitchMaintenance porte déjà la règle métier "P1 compte
+// comme extrémité quand Maintenance est interdite comme cible" (PRG_05_Translation §0ter),
+// donc aucune redondance de logique ici, juste sa consommation.
+ArrivalIsExtreme := ((LastMoveDirection = 1) AND LimitSwitchTremie)
+                  OR ((LastMoveDirection = -1) AND LimitSwitchMaintenance);
+
+IF ArrivalEdge.Q AND ArrivalIsExtreme THEN
     ArrivalLock := TRUE;
     IF CommandedTremie OR CommandedMaintenance THEN
         ArrivalWasTremie := CommandedTremie;
@@ -1171,6 +1220,12 @@ END_IF;
 
 IF Fault.Error THEN
     RequestedDriveControlWord := 0;
+    RequestedDriveFreqHz := 0.0;
+    BrakeReleaseRequest := FALSE;
+END_IF;
+
+IF DriveResetPulseActive THEN
+    RequestedDriveControlWord := WORD#7;
     RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
