@@ -1,10 +1,10 @@
 tasks:
 - id: T392
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C1
   domaine: SAFETY / TRANSLATION M3 / SEQUENCEUR
-  agent: —
+  agent: CC01
   date: '2026-09-23T00:00:00+02:00'
   titre: 'M3 SEMI_AUTO bloque en boucle : ArrivalLock ne se leve pas P1->Tremie, mapping SelTarget=3 fausse ArrivalWasTremie'
   contexte: 'URGENCE TERRAIN 2026-09-23 : chariot M3 bloque a AX14_TRANSLATE_DUMP (SEMI_AUTO), toute la chaine de permis est verte (Step4-6/8 OK, FinalInterlockState=READY, EffectivePermitM3_Tremie=TRUE, HeightInterlock OK) mais RampTargetPct reste a 0. Cause confirmee en live (watch CODESYS avec l operateur) : instTranslationM3.ArrivalLock reste TRUE malgre ReqTremie=1 et CommandedTremie=1 (P1 -> Tremie), alors que FB_Translation.st:239 devrait le liberer des que le sens demande est oppose au dernier sens memorise (ArrivalWasTremie=FALSE attendu). CAUSE RACINE SUSPECTEE : FB_TranslationCmdArbitrationM3.st lignes ~68-80, pour SelTarget=3 (P1), le code choisit ReqTremie:=TRUE des que Joystick.AxisX.DirectionPositive est vrai (meme convention que pour la cible Tremie), au lieu de traiter l arrivee a P1 comme un arret intermediaire neutre. Consequence : une arrivee a P1 en approchant en sens positif est enregistree par FB_Translation.st (ArrivalEdge, CommandedTremie a ce moment-la) comme ArrivalWasTremie:=TRUE a tort, ce qui bloque ensuite TOUTE liberation ulterieure du verrou en direction Tremie -> deadlock structurel : en SEMI_AUTO/AX14 la cible est figee a 1 (Tremie), le joystick ne peut jamais generer ReqMaintenance pour satisfaire la condition de liberation FB_Translation.st:239. Deblocage terrain fait via bascule MAINT_N1/N2 + jog bref sens Maintenance (branche MAINT independante du mapping fautif), qui satisfait ReqMaintenance AND NOT ArrivalWasMaintenance et leve le verrou.'
@@ -15,7 +15,7 @@ tasks:
   - 'Non-regression : les verrous anti-rebond a la Tremie et a Maintenance (arrets extremes reels) restent inchanges - seule la qualification de l arret intermediaire P1 est corrigee.'
   - 'Aucun changement du comportement de securite (SafeStop, FDC extremes, PowerCutOff) - correctif de qualification de sens uniquement.'
   contrat: ''
-  avancement: 'Non demarre. Diagnostic live termine et confirme sur machine reelle 2026-09-23 (session troubleshooting avec operateur). Deblocage terrain fait via MAINT_N1/N2 (contournement, pas un correctif). Trace CODESYS live disponible : ArrivalLock/ReqTremie/CommandedTremie/RampTargetPct observes en direct.'
+  avancement: 'CORRECTIF LIVRE ET COMMITE (15ff306b) : cause racine reelle differente de la suspicion initiale - pas le mapping SelTarget=3 de FB_TranslationCmdArbitrationM3.st, mais ArrivalLock (FB_Translation.st) qui armait sur N IMPORTE quel point cible atteint (y compris P1/P2/PV intermediaires) au lieu des 2 seules vraies extremites. Nouvelle variable locale ArrivalIsExtreme, reutilise LimitSwitchTremie/LimitSwitchMaintenance deja cables (encodent deja la regle P1=extreme uniquement si Maintenance interdite, PRG_05 §0ter). Zero nouvelle entree, 1 seul fichier touche. Revue independante (agent tiers, posture automaticien/securite) : GO SANS RESERVE sur ce changement - cablage verifie, pas de desync scan possible, renfort FDC physique confirme redondant. G200 PASS 0 erreur. Bundle + diff bundle frais. RESTE A FAIRE : test operateur sur machine reelle apres import CODESYS (le deblocage terrain du jour a ete fait par contournement MAINT_N1/N2, pas par ce correctif).'
   bloque_par:
   - ''
 - id: T391
