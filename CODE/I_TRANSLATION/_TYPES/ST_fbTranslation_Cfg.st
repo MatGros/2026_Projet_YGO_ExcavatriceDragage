@@ -32,6 +32,6 @@ STRUCT
     BrakeDelayContactClose      : TIME := T#100ms; // --> [CFG] Voir FB_Brake
     BrakeDelayMagnetise         : TIME := T#100ms; // --> [CFG] Voir FB_Brake
     BrakeDelayMotorDecel        : TIME := T#2s;    // --> [CFG] Voir FB_Brake - MES 2026-09-04 : monte 500ms -> 2s (confirme operateur)
-    BrakeFeedbackTimeout        : TIME := T#800ms; // --> [CFG] MES 2026-09-04 : 300ms trop court pour un arret dur au FdC (coast reel ~600ms) -> latch spurieux. Monte a 800ms (confirme operateur).
+    BrakeFeedbackTimeout        : TIME := T#1000ms; // --> [CFG] Delai de confirmation retour contacteur frein avant defaut sequence. Doit couvrir le coast reel d'un arret dur en butee extreme (confirme operateur).
 END_STRUCT
 END_TYPE

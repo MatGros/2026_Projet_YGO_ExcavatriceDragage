@@ -460,6 +460,7 @@ M3_SetpointFrequencyHz       := instTranslationOutputInterlockM3.DriveFreqCmdWor
 
 // ── Bus inter-PRG M3 ──
 Data.TranslationBrakeCmd   := TranslationBrakeCmd;
+Data.M3CommandWordActive   := (M3_CommandWord <> WORD#0);
 
 // ═══════════════════════════════════════════════════════════════
 // 🪝 §4 KOBOLD (capteur fond) — commande + sortie

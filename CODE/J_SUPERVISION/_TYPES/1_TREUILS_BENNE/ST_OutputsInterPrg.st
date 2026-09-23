@@ -38,6 +38,7 @@ STRUCT
 
     // === ↔️ Ordre actionneur final translation M3 ===
     TranslationBrakeCmd   : BOOL; // 🔓 Demande frein M3 arbitree
+    M3CommandWordActive   : BOOL; // 🛗 Mot de commande variateur M3 non nul (marche reelle demandee, hors reset AC600) — compteur horaire
 
     // === 🚨 Chaîne réarmement puissance AU ===
     PowerKeepAliveACmd    : BOOL; // 🔒 Maintien puissance voie A (1=Maintenu)

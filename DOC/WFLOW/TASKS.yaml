@@ -57,7 +57,7 @@ tasks:
   - ''
 - id: T390
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C1
   domaine: SAFETY / TRANSLATION M3 / AC600
   agent: —
@@ -70,7 +70,7 @@ tasks:
   - 'Determiner si le delai TonMecaA (1s fixe) est compatible avec le temps de rampe de decel reel de l AC600 sur M3.'
   - 'Si correctif necessaire : ne pas affaiblir la detection Meca A pour un vrai mouvement non commande (regle transverse Safety) - distinguer decel commandee de mouvement non commande.'
   contrat: ''
-  avancement: 'Non demarre. Tache creee sur signalement operateur 2026-09-23, C1 (defaut de securite suspecte intempestif). Trace terrain requise avant toute modification de FB_Safety_Translation.st.'
+  avancement: 'Delai TonMecaA (FB_Safety_Translation.st) monte 1s->7s sur GO humain 2026-09-23 (constante nommee PostRampTimeoutMecaA, revue independante GO avec reserve non chiffree terrain - voir details plus bas). EN PARALLELE, constat operateur supplementaire 2026-09-23 : monter les 3 vitesses d approche M3 (CfgApproachSpeedTremie/Maintenance/P1_Hz, ST_TranslationCfg.st) de 10Hz a 20Hz reduit BEAUCOUP le nombre de defauts M3 (confirme terrain, corrige plutot que masque - hypothese : a 10Hz le variateur tournait trop pres du seuil de detection CST_StopFreqThresholdHz=0.5Hz pendant l approche, marge de decel plus etroite -> plus de faux Meca A/B). Les 2 leviers (delai + vitesse approche) sont desormais en test terrain conjoint, non commites.'
   bloque_par:
   - ''
 - id: T389
