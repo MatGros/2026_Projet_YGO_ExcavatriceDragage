@@ -73,6 +73,7 @@ VAR
     TonLimitSwitchOverrun : TON;       // . [LOC] Surveillance poussée anormale / escalade fin de course
     OverrunCondition    : BOOL;   // . [LOC] Condition escalade fin de course
     PostRampTimeout     : TIME := T#3S;   // . [LOC] Délai Méca B
+    PostRampTimeoutMecaA : TIME := T#7S;  // . [LOC] Délai Méca A — couvre le glissement roue/chariot sur butée mécanique
     CST_StopFreqThresholdHz : REAL := 0.5; // . [LOC] Seuil |fréquence sortie| au-dessus duquel le moteur est considéré en rotation (Méca A/B)
     UncommandedActiveB  : BOOL;   // . [LOC] Méca B active
     UncommandedActiveA  : BOOL;   // . [LOC] Méca A active
@@ -183,7 +184,7 @@ IF NOT BypassGlobal THEN
         ELSE
             UncommandedActiveA := FALSE;
         END_IF;
-        TonMecaA(IN := UncommandedActiveA, PT := T#1S);
+        TonMecaA(IN := UncommandedActiveA, PT := PostRampTimeoutMecaA);
         IF TonMecaA.Q THEN MecaAFault := TRUE; END_IF;
     ELSE
         TonMecaA(IN := FALSE);

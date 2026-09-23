@@ -1,4 +1,96 @@
 tasks:
+- id: T392
+  parent_id: ''
+  statut: ⬜
+  criticite: C1
+  domaine: SAFETY / TRANSLATION M3 / SEQUENCEUR
+  agent: —
+  date: '2026-09-23T00:00:00+02:00'
+  titre: 'M3 SEMI_AUTO bloque en boucle : ArrivalLock ne se leve pas P1->Tremie, mapping SelTarget=3 fausse ArrivalWasTremie'
+  contexte: 'URGENCE TERRAIN 2026-09-23 : chariot M3 bloque a AX14_TRANSLATE_DUMP (SEMI_AUTO), toute la chaine de permis est verte (Step4-6/8 OK, FinalInterlockState=READY, EffectivePermitM3_Tremie=TRUE, HeightInterlock OK) mais RampTargetPct reste a 0. Cause confirmee en live (watch CODESYS avec l operateur) : instTranslationM3.ArrivalLock reste TRUE malgre ReqTremie=1 et CommandedTremie=1 (P1 -> Tremie), alors que FB_Translation.st:239 devrait le liberer des que le sens demande est oppose au dernier sens memorise (ArrivalWasTremie=FALSE attendu). CAUSE RACINE SUSPECTEE : FB_TranslationCmdArbitrationM3.st lignes ~68-80, pour SelTarget=3 (P1), le code choisit ReqTremie:=TRUE des que Joystick.AxisX.DirectionPositive est vrai (meme convention que pour la cible Tremie), au lieu de traiter l arrivee a P1 comme un arret intermediaire neutre. Consequence : une arrivee a P1 en approchant en sens positif est enregistree par FB_Translation.st (ArrivalEdge, CommandedTremie a ce moment-la) comme ArrivalWasTremie:=TRUE a tort, ce qui bloque ensuite TOUTE liberation ulterieure du verrou en direction Tremie -> deadlock structurel : en SEMI_AUTO/AX14 la cible est figee a 1 (Tremie), le joystick ne peut jamais generer ReqMaintenance pour satisfaire la condition de liberation FB_Translation.st:239. Deblocage terrain fait via bascule MAINT_N1/N2 + jog bref sens Maintenance (branche MAINT independante du mapping fautif), qui satisfait ReqMaintenance AND NOT ArrivalWasMaintenance et leve le verrou.'
+  description: 'Corriger le mapping ReqTremie/ReqMaintenance pour SelTarget=3 (P1) dans FB_TranslationCmdArbitrationM3.st afin qu une arrivee a P1 ne soit plus taguee comme "arrivee sens Tremie" dans FB_Translation.st (ArrivalWasTremie). Etudier si P1 doit produire un troisieme etat neutre (ni ArrivalWasTremie ni ArrivalWasMaintenance forcementTRUE) ou si le sens reel de deplacement (physique, pas seulement le signe du joystick) doit qualifier l arrivee. Fichier FB_Translation.st (verrou anti-rebond, C4 securite mouvement) et FB_TranslationCmdArbitrationM3.st concernes : contrat obligatoire, preuve ROUGE/VERT, revue independante avant tout changement.'
+  objectifs:
+  - 'Reproduire en CI (test banc) : arrivee a P1 en approchant sens positif (depuis Maintenance), puis demande Tremie -> ArrivalLock doit se liberer immediatement (ROUGE avant correctif, VERT apres).'
+  - 'Corriger le mapping SelTarget=3 pour ne plus assimiler une arrivee P1 a une arrivee Tremie du point de vue du verrou anti-rebond.'
+  - 'Non-regression : les verrous anti-rebond a la Tremie et a Maintenance (arrets extremes reels) restent inchanges - seule la qualification de l arret intermediaire P1 est corrigee.'
+  - 'Aucun changement du comportement de securite (SafeStop, FDC extremes, PowerCutOff) - correctif de qualification de sens uniquement.'
+  contrat: ''
+  avancement: 'Non demarre. Diagnostic live termine et confirme sur machine reelle 2026-09-23 (session troubleshooting avec operateur). Deblocage terrain fait via MAINT_N1/N2 (contournement, pas un correctif). Trace CODESYS live disponible : ArrivalLock/ReqTremie/CommandedTremie/RampTargetPct observes en direct.'
+  bloque_par:
+  - ''
+- id: T391
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: SUPERVISION / IHM / TRANSLATION M3
+  agent: CDX03
+  locked_at: '2026-09-23T11:30:00+02:00'
+  date: '2026-09-23T11:30:00+02:00'
+  titre: 'Remonter les defauts chariot M3 dans AnyFaultActive'
+  contexte: 'Constat utilisateur : defaut mouvement chariot et defaut barriere M3 visibles mais exclus de AnyFaultActive.'
+  description: 'Etendre seulement l OR de supervision avec TranslationState.Error et TranslationState.FinalInterlockError.'
+  objectifs:
+  - 'Les deux defauts M3 rendent AnyFaultActive TRUE.'
+  - 'Aucune commande ni protection M3 ne change.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T391_M3_ANYFAULT.yaml
+  avancement: 'En cours CDX03, GO humain explicite.'
+  bloque_par:
+  - ''
+- id: T381
+  parent_id: ''
+  statut: ⏳
+  criticite: C3
+  domaine: CYCLE / SEMI-AUTO / TREUILS M1-M2
+  agent: CDX03
+  locked_at: '2026-09-23T11:12:00+02:00'
+  date: '2026-09-23T11:12:00+02:00'
+  titre: 'Restaurer au boot le profil plongee M1 palier 4 / M2 palier 5'
+  contexte: 'Le revert recent a remis TglAutoDiveM2Step5Trial a FALSE. Demande humaine explicite : profil actif au boot PLC, mais toujours desactivable depuis l IHM.'
+  description: 'Restaurer uniquement l initialiseur TRUE de ST_CycleCmd. Le flux existant vers FB_CycleSemiAuto et la capture a AX4 restent inchanges.'
+  objectifs:
+  - 'Au boot, TglAutoDiveM2Step5Trial vaut TRUE.'
+  - 'L IHM peut ecrire FALSE avant la prochaine entree AX4.'
+  - 'Le profil reste capture a AX4 et non persistant.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T381_AUTODIVE_M2_STEP5_DEFAUT.yaml
+  avancement: 'Reprise CDX03 autorisee explicitement le 2026-09-23 ; implementation et revue experte demandees.'
+  bloque_par:
+  - ''
+- id: T390
+  parent_id: ''
+  statut: ⬜
+  criticite: C1
+  domaine: SAFETY / TRANSLATION M3 / AC600
+  agent: —
+  date: '2026-09-23T00:00:00+02:00'
+  titre: 'M3 en cycle auto sur butee : faux defaut MecaA (deplacement sans commande) -> PowerCutOff intempestif suspecte'
+  contexte: 'Constat operateur 2026-09-23 (TRES IMPORTANT) : M3 en cycle auto arrivant sur butee s arrete et ne semble PAS deborder significativement, MAIS declenche parfois un defaut grave -> coupure (cutoff), message du type "[M3] ErrorID:06 - MecaA - deplacement sans commande" (FB_Hmi_BannerFormatter.st:1017, libelle exact retrouve par grep, non confirme verbatim par l operateur). Analyse code CODE/I_TRANSLATION/FB_Safety_Translation.st Cause 5 "Meca A" (l.179-193) : des que RunRequest=FALSE et BrakeCmd=FALSE, si ABS(DriveActualFreqHz) > 0.5 Hz pendant TonMecaA.PT := T#1S (delai FIXE, non parametrable), le defaut se latch -> PowerCutOff NON-resettable par Reset simple (defaut physique bit5, cf invariant fichier l.8-10). HYPOTHESE PRIORITAIRE A VERIFIER : a l arrivee sur butee, le variateur AC600 est encore en RAMPE DE DECELERATION naturelle au moment ou RunRequest retombe (fin de commande auto) ; si cette rampe dure plus que 1 s, Meca A se declenche a tort alors qu il n y a aucun mouvement non commande, juste une decel normale pas terminee. Non confirme par trace terrain a ce stade.'
+  description: 'Recueillir une trace terrain (DriveActualFreqHz, RunRequest, BrakeCmd, TonMecaA.Q, ErrorMecaA) au moment exact d un arret sur butee en cycle auto pour confirmer ou infirmer l hypothese de rampe de decel > 1s. Si confirmee : etudier un ajustement du delai TonMecaA et/ou une garde sur la phase de decel commandee (ex. ne pas armer la surveillance tant que le variateur est reconnu en rampe d arret suite a une commande, sans affaiblir la detection d un VRAI mouvement non commande). Toute modification de FB_Safety_Translation.st reste C1 (fichier de securite) : contrat obligatoire, preuve ROUGE/VERT, revue independante.'
+  objectifs:
+  - 'Obtenir une trace terrain qui capture DriveActualFreqHz/RunRequest/BrakeCmd/TonMecaA autour d un evenement de coupure sur butee, pour confirmer la cause reelle.'
+  - 'Determiner si le delai TonMecaA (1s fixe) est compatible avec le temps de rampe de decel reel de l AC600 sur M3.'
+  - 'Si correctif necessaire : ne pas affaiblir la detection Meca A pour un vrai mouvement non commande (regle transverse Safety) - distinguer decel commandee de mouvement non commande.'
+  contrat: ''
+  avancement: 'Non demarre. Tache creee sur signalement operateur 2026-09-23, C1 (defaut de securite suspecte intempestif). Trace terrain requise avant toute modification de FB_Safety_Translation.st.'
+  bloque_par:
+  - ''
+- id: T389
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: CYCLE / SEMI-AUTO / BENNE / TREUILS
+  agent: —
+  date: '2026-09-23T00:00:00+02:00'
+  titre: 'AX15B (vidage benne) : aucune echappatoire fermeture benne + remontee treuils si besoin operateur'
+  contexte: 'Constat operateur 2026-09-23 : en etape AX15B_DUMP_OPEN (vidage benne), impossible de fermer la benne et de remonter au FDC si besoin (ex. situation anormale, besoin de securiser rapidement). Analyse code CODE/G_CYCLE/FB_CycleSemiAuto.st:1534-1562 : (1) WinchM1Cmd.RunRequest et WinchM2Cmd.RunRequest sont forces a FALSE SANS CONDITION toute la duree de AX15B (l.1549-1550) -> aucune remontee possible depuis cette etape, meme si necessaire ; (2) BucketCmd.ReqOpen est la SEULE commande benne de l etape (l.1554, sur push+deadman) -> aucune commande de fermeture n existe a AX15B ; (3) la seule bifurcation possible est RepositionRequest -> AX15C_DUMP_REPOSITION (l.1557-1558, l.1564-1595) qui force une DESCENTE couplee M1+M2 (jamais une montee) et ne ferme pas non plus la benne. Ressenti operateur "pas les permits" coherent avec cette neutralisation structurelle, pas un defaut de permit isole.'
+  description: 'Etudier avec exploitant si une echappatoire operateur doit etre ajoutee a AX15B (et/ou AX15C) : fermeture benne sur tir joystick oppose et/ou remontee treuils autorisee sous conditions de securite explicites (homme-mort, position benne connue, etc.). Ne pas modifier la logique de securite/interlock (FB_Safety_Winch, FB_WinchOutputInterlock) - seule la sequence FB_CycleSemiAuto.st est visee. Cadrage humain requis avant toute ecriture (quelle direction, quelles conditions, quel geste operateur).'
+  objectifs:
+  - 'Confirmer avec l exploitant le besoin exact : fermeture benne depuis AX15B, remontee treuils depuis AX15B, ou les deux, et sous quelles conditions.'
+  - 'Cadrer la modification de sequence (nouvel etat ou extension AX15B/AX15C) sans toucher aux FB de securite.'
+  - 'Ne jamais permettre une remontee/fermeture hors homme-mort ni sans les permits de securite existants.'
+  contrat: ''
+  avancement: 'Non demarre. Tache creee sur signalement operateur 2026-09-23 (session AX15B, permit ressenti manquant).'
+  bloque_par:
+  - ''
 - id: T376
   parent_id: ''
   statut: ⬜
@@ -22,8 +114,8 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: TRANSLATION / VARIATEUR AC600 / BUS
-  agent: DSH31
-  locked_at: '2026-09-22T19:56:19+02:00'
+  agent: CDX03
+  locked_at: '2026-09-23T11:12:00+02:00'
   date: '2026-09-22T19:56:19+02:00'
   titre: 'Emettre le mot 7 (reset AC600) par le bus EtherCAT - acquittement du defaut variateur translation M3'
   contexte: 'Ecart spec-vs-code trouve le 2026-09-22 en audit de la chaine d acquittement : le mot 7 (reset AC600, registre PDO 0x3101) est DOCUMENTE dans AF_Partie-11_Fonction_Translation/FB_Translation_v1.1.md §7 (valeur 7 = Reset) et dans FB_TranslationOutputInterlock_v1.1.md §5-6, MAIS n est JAMAIS EMIS par le code : CODE/I_TRANSLATION/FB_Translation.st:323-329 ne produit que 0/1/2 (IF PhysicalTremie / ELSIF PhysicalMaintenance / ELSE 0), jamais 7. FB_TranslationOutputInterlock.st:142-143 fait un pass-through (ELSIF RequestedDriveControlWord = 7 THEN DriveControlWord := 7) mais ne recoit jamais 7. Consequence machine : si le variateur AC600 se met en defaut (DriveStatusWord.4 = 1), le PLC efface son propre latch applicatif mais le variateur RESTE en defaut car le reset physique par bus n est jamais envoye -> reset manuel au variateur ou coupure alim obligatoires. Blocage terrain non acquittable par bus.'
@@ -34,7 +126,7 @@ tasks:
   - 'Non-regression : mouvement nominal 0/1/2 et Reset applicatif inchange (git diff montre uniquement la region d emission du 7).'
   - 'Aucun redemarrage automatique, frequence nulle pendant/apres le 7, et jamais de bascule 7->1/2 pendant l impulsion.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T375_MOT7_RESET_AC600.yaml
-  avancement: 'Aucun fichier CODE/ touche a cet instant. Contrat C2 en cours de redaction.'
+  avancement: 'Reprise CDX03 autorisee explicitement le 2026-09-23 ; implementation et revue experte demandees.'
   bloque_par:
   - ''
 - id: T374
