@@ -2,7 +2,8 @@
 
 > **Date :** 2026-09-22  
 > **Branche / Commits :** `main`  
-> **Contexte :** Passage sur l'alimentation électrique définitive du réseau. Campagne d'essais en cycle semi-auto et recherche des blocages réels en conditions de dragage.
+> **Contexte :** Passage sur l'alimentation électrique définitive du réseau. Campagne d'essais en cycle semi-auto et recherche des blocages réels en conditions de dragage.  
+> **Retour alimentation électrique :** Raccordement réseau électrique définitif validé. Une légère chute de tension est ressentie sous charge, mais elle n'impacte pas significativement la dynamique des entraînements (notamment les temps d'arrêt et l'inertie constatés). Les réglages de consigne, rampes et temporisations restent constants.
 
 ---
 
