@@ -115,6 +115,7 @@
               <value name="AX_DIVING_RETRY" value="20" />
               <value name="AX3_WAIT_DIVE_START" value="21" />
               <value name="AX10B_RACCORDEMENT_P1" value="22" />
+              <value name="AX15D_DUMP_BUCKET_JOG" value="23" />
             </values>
           </enum>
         </baseType>
@@ -261,6 +262,12 @@
                 <Name>AX10B_RACCORDEMENT_P1</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Raccordement continu P1 fermeture benne -&gt; montee controlee</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX15D_DUMP_BUCKET_JOG</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Module benne sur place a la tremie (T383) : le geste ouvre, l'inverse ferme, neutre = stop ; retour AX15B au relachement</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -5560,7 +5567,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profil nominal : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. Debrayable IHM, non persiste.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T381 (ex T291-A) : en SEMI_AUTO AX4..AX7, profil nominal avec M1 palier 4 et M2 palier 5. Debrayable IHM. NON persiste.</xhtml>
               </documentation>
             </variable>
             <variable name="BtnResetSampleCount">
@@ -18736,6 +18743,14 @@ fermeture ci-dessous : celle-ci garde sa valeur et son rôle de filet anti-bloca
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fermeture atteinte, maintien AX10B eventuel en cours</xhtml>
               </documentation>
             </variable>
+            <variable name="WaitingForOperator">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fermeture engagee mais PERMIS NUL -&gt; budget timeout gele (attente de permis), consigne jamais servie</xhtml>
+              </documentation>
+            </variable>
             <variable name="M1SlipDetected">
               <type>
                 <BOOL />
@@ -18925,6 +18940,14 @@ fermeture ci-dessous : celle-ci garde sa valeur et son rôle de filet anti-bloca
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Budget restant consomme par le TON (CfgTimeoutDuration - cumul)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ClosePermitDeniedWhileRequested">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fermeture demendee (CloseReq) mais permis nul -&gt; attente de permis, budget gele</xhtml>
               </documentation>
             </variable>
             <variable name="TonBandClosed">
@@ -19327,6 +19350,14 @@ IF NOT BypassGlobal THEN
     // Signal d'engagement : MotionRequestActive (calcule en tete de §1) — CloseReq/OpenReq sont
     // des LATCHES (restent TRUE pendant toute la pause) et seraient ici INOPERANTS.
     TimeoutEngaged := Lifecycle.Busy AND MotionRequestActive;
+    // Fenetre benne : une FERMETURE demandee (CloseReq) mais dont le permis est NUL -&gt; la consigne
+    // M2 n'est pas servie (M2_RunRequest ne part pas) : c'est une ATTENTE DE PERMIS, pas un
+    // grippage. On gele le budget dans cette sous-fenetre STRICTE ; le vrai grippage (permis OK,
+    // aucun mouvement) conserve TimeoutEngaged -&gt; ErrorID:03 toujours latche (non-vacuite).
+    ClosePermitDeniedWhileRequested := CloseReq AND (NOT EffectivePermitBucket_Close);
+    IF ClosePermitDeniedWhileRequested THEN
+        TimeoutEngaged := FALSE;
+    END_IF;
 
     // Rearmement conscient : budget complet ET segment TON neuf. Un TON IEC ne retombe PAS quand
     // PT augmente (ET cloue a PT, Q fige) : sans cette coupure d'un scan, un Reset pendant une
@@ -19378,7 +19409,7 @@ IF NOT BypassGlobal THEN
     instCauses[3].Latching := TRUE;
     instCauses[3].Texte    := 'Glissement treuil M1 pendant manoeuvre benne';
 
-    // Cause 4 : Non référencé
+    // Cause 4 : Non référencé (alarme d'information non latchante, ne bloque pas le mouvement)
     HomingMotionWithoutReference := (ReqAscent OR ReqDescend OR CmdOpen_IHM OR CmdClose_IHM OR ProgramBucketDriveActive)
                                   AND NOT MachineHomingActive
                                   AND NOT (HomedM1 AND HomedM2);
@@ -19397,6 +19428,10 @@ ELSE
     instCauses[3].Active := FALSE;
     instCauses[4].Active := FALSE;
 END_IF;
+
+// Etat « en attente de permis » publie (consomme par PRG_04 / IHM) — fermeture engagee
+// mais permis nul. Calcule a chaque scan (independant du bypass global).
+WaitingForOperator := Lifecycle.Busy AND CloseReq AND (NOT EffectivePermitBucket_Close);
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -19428,6 +19463,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     CloseReached := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
+    WaitingForOperator := FALSE;
     RETURN;
 END_IF;
 
@@ -24707,8 +24743,8 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 T358 : forcage de step — sentinelle de consigne et borne haute de plage.
-CST_StepForceMax = dernier membre de E_AutoCycleStep (AX10B_RACCORDEMENT_P1) :
-toute valeur hors [0..22] est refusee, toute valeur de l'enum est acceptee.
+CST_StepForceMax = dernier membre de E_AutoCycleStep (AX15D_DUMP_BUCKET_JOG, T383) :
+toute valeur hors [0..23] est refusee, toute valeur de l'enum est acceptee.
 Sentinelle : aucune demande de forcage</xhtml>
               </documentation>
             </variable>
@@ -24717,7 +24753,7 @@ Sentinelle : aucune demande de forcage</xhtml>
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="22" />
+                <simpleValue value="23" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute de la plage d'enum coercible</xhtml>
@@ -24923,7 +24959,10 @@ instCauses[1].Active   := WinchSyncError
                           AND (State &lt;&gt; E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
                           AND (State &lt;&gt; E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
                           AND (State &lt;&gt; E_AutoCycleStep.AX10_CLOSE_BUCKET)
-                          AND (State &lt;&gt; E_AutoCycleStep.AX11_CTRL_ASCENT);
+                          AND (State &lt;&gt; E_AutoCycleStep.AX11_CTRL_ASCENT)
+                          // AX15D (T383) : module benne sur place a la tremie, meme fenetre de vidage
+                          // que AX15B — exclusion sync identique a AX10 (decision safety arbitrage 5).
+                          AND (State &lt;&gt; E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG);
 instCauses[1].Latching := TRUE;
 instCauses[1].Texte    := 'Desynchronisme treuils M1/M2 bloquant';
 
@@ -25189,7 +25228,7 @@ END_IF;
 //    (decision exploitant 2026-09-21, risque assume et trace en note d'application).
 // ⚠️ AUCUNE garde de contexte : ni mode, ni joystick, ni arret mecanique des treuils,
 //    ni immersion Kobold, ni contexte fond. La SEULE validation restante est la plage
-//    des valeurs de E_AutoCycleStep [0..22] ; hors plage = rejet, aucune ecriture d'etape.
+//    des valeurs de E_AutoCycleStep [0..23] ; hors plage = rejet, aucune ecriture d'etape.
 // ⚠️ Le scan du forcage n'emet AUCUNE commande : demandes ramenees a zero et CASE
 //    inhibe (StateExecutionInhibit) — l'etape ciblee s'execute au scan suivant, soit
 //    un cycle de tache (10 ms). Un forcage annule aussi une attente de reprise en
@@ -25221,6 +25260,7 @@ IF StepForceConsigne &lt;&gt; CST_StepForceNone THEN
             20: ForceStepCandidate := E_AutoCycleStep.AX_DIVING_RETRY;       ForceStepCandidateValid := TRUE;
             21: ForceStepCandidate := E_AutoCycleStep.AX3_WAIT_DIVE_START;   ForceStepCandidateValid := TRUE;
             22: ForceStepCandidate := E_AutoCycleStep.AX10B_RACCORDEMENT_P1; ForceStepCandidateValid := TRUE;
+            23: ForceStepCandidate := E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG;  ForceStepCandidateValid := TRUE;
         END_CASE;
     END_IF;
 
@@ -25247,7 +25287,7 @@ IF StepForceConsigne &lt;&gt; CST_StepForceNone THEN
         ForceStepResult := '';           // une consigne appliquee efface le motif de rejet precedent
     ELSE
         ForceStepRejected := TRUE;
-        ForceStepResult := 'Forcage refuse : cible hors plage E_AutoCycleStep (0..22).';
+        ForceStepResult := 'Forcage refuse : cible hors plage E_AutoCycleStep (0..23).';
     END_IF;
     // La consigne n'est PAS ecrite par le FB : elle est acquittee par PRG_03 sur
     // StepForceTgtTaken (invariant verifie par le gate G517).
@@ -25994,7 +26034,7 @@ CASE State OF
         WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
         WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#040B;
-        OperatorAction := 'AX15b - Pousser : vidage. Tirer : fermer et remonter.';
+        OperatorAction := 'AX15b - Pousser : vidage. Tirer : fermer sur place (micro-step).';
 
         // Config treuil UNIQUE : etape benne seule, les deux treuils neutralises
         // (plus de descente couplee M1+M2 simultanee a l'ouverture benne -&gt; plus
@@ -26006,11 +26046,57 @@ CASE State OF
 
         BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
 
-        // Vidage benne en AX15B
-        IF RepositionRequest THEN
+        // 🔄 T383 (amendement GEL 2026-09-22) : le tirer n'effectue PLUS de saut AX15B -&gt; AX10
+        // (saut arriere non declare, GEL ne le connait pas). Le tirer entre dans le micro-step
+        // AX15D_DUMP_BUCKET_JOG qui permet d'ouvrir/refermer la benne SUR PLACE a la tremie, sans
+        // quitter la phase de vidage et sans mouvement de treuil ni de translation. Retour AX15B
+        // au relachement (centre mort) ; la fin de vidage reste AX18 (AT15B inchange). Aucune
+        // echappatoire vers AX10 (decision exploitant arbitrage 3, confirmee par les 2 revues C4).
+        IF DeadmanArmed AND JoystickPull THEN
+            BucketCmd.ReqOpen := FALSE;
+            State := E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG;
+        ELSIF RepositionRequest THEN
             State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
         ELSIF DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
+            State := E_AutoCycleStep.AX18_DONE_SYNC;
+        END_IF;
+
+    E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG:
+        CycleStep := E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG;
+        CycleStateStr := 'AX15d - Module benne a la tremie';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT (DeadmanArmed AND (JoystickPush OR JoystickPull));
+        WaitingForProcess := DeadmanArmed AND (JoystickPush OR JoystickPull);
+        OperatorActionId := 16#040D;
+        OperatorAction := 'AX15d - Pousser : ouvrir benne. Tirer : fermer. Relacher : retour.';
+
+        // Module benne SUR PLACE a la tremie : treuils M1+M2 a 0, translation 0,
+        // aucun mouvement de treuil. Le geste ouvre (ReqOpen), l'inverse ferme
+        // (ReqClose), neutre = les deux FALSE (la benne se module sur place).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        TranslationCmd.ReqStart := FALSE;
+        TranslationCmd.PositionTgt := 0;
+        BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
+        BucketCmd.ReqClose := DeadmanArmed AND JoystickPull;
+
+        // Sorties TOUTES declarees au GEL (amendement T383) :
+        //  - retour au centre mort (relachement du manche) -&gt; AX15B (reprendre le vidage)
+        //  - Benne_Done AND Benne_IsOpen (contenu vide) -&gt; AX18
+        // La perte de l'homme-mort NE sort PAS d'AX15D : le gate §4 (Lifecycle.Busy AND NOT
+        // CycleMotionPermit) neutralise les commandes benne/treuils en conservant l'etape
+        // (doctrine identique a AX15B / AX10). Seul le relachement du manche ramene a AX15B.
+        IF NOT JoystickDeflected THEN
+            BucketCmd.ReqOpen := FALSE;
+            BucketCmd.ReqClose := FALSE;
+            State := E_AutoCycleStep.AX15B_DUMP_OPEN;
+        ELSIF DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen THEN
+            BucketCmd.ReqOpen := FALSE;
+            BucketCmd.ReqClose := FALSE;
             State := E_AutoCycleStep.AX18_DONE_SYNC;
         END_IF;
 
@@ -31037,6 +31123,7 @@ IF CycleFaultActive THEN
         E_AutoCycleStep.AX15A_DUMP_ARRIVE: StepAtErrorStr := 'AX15a';
         E_AutoCycleStep.AX15B_DUMP_OPEN: StepAtErrorStr := 'AX15b';
         E_AutoCycleStep.AX15C_DUMP_REPOSITION: StepAtErrorStr := 'AX15c';
+        E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG: StepAtErrorStr := 'AX15d';
         E_AutoCycleStep.AX18_DONE_SYNC: StepAtErrorStr := 'AX18';
         E_AutoCycleStep.AX_STAB: StepAtErrorStr := 'STAB';
         ELSE
@@ -31083,7 +31170,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_AutoCycleStep.AX13_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
             E_AutoCycleStep.AX14_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
             E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
-            E_AutoCycleStep.AX15C_DUMP_REPOSITION: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
+            E_AutoCycleStep.AX15C_DUMP_REPOSITION, E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
             E_AutoCycleStep.AX18_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ - ALLER P1';
             E_AutoCycleStep.AX_STAB: Banner.SequenceProgressText := 'Cycle: STABILISATION';
         ELSE
@@ -31742,7 +31829,13 @@ IF ((BucketErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMax
     AlarmArray[AlarmCount] := '[BENNE] ErrorID:04 - glissement treuil M1'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0010) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] ErrorID:05 - codeurs treuils non references'; AlarmCount := AlarmCount + 1;
+    IF (CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 OR MachineHomingStep &gt; 0)
+        AND EncM1Valid AND EncM2Valid THEN
+        AlarmArray[AlarmCount] := '[BENNE] Referencement en cours - codeurs non references (normal)';
+    ELSE
+        AlarmArray[AlarmCount] := '[BENNE] ErrorID:05 - codeurs treuils non references';
+    END_IF;
+    AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5e. Collecte — synchro M1/M2 (FB_WinchSync.ErrorId)
@@ -32047,7 +32140,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, semi-auto AX8..AX12 et repli du vidage AX15b</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, semi-auto AX8..AX12, repli du vidage AX15b et micro-step benne AX15d (T383)</xhtml>
               </documentation>
             </variable>
             <variable name="BusCanOpenOP">
@@ -35964,6 +36057,22 @@ MaintenanceLimitClear := NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Autre treuil inhibe (maintenance)</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketCloseAscentGrant">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fenetre benne : relaxation ÉTROITE de la butée haute MATÉRIELLE de ce treuil pendant
+la fermeture benne sur place (M1 FIXE). Calculé dans PRG_04 sous 4 verrous (benne active,
+M1 maintenu/vérifié, M1 hors montée, avant CloseReached). Câblé FALSE sur l'instance M1
+(jamais relaxé) et à la vraie valeur sur M2 -&gt; le FdC matériel haut M1 reste la barrière
+absolue. Ne relaxe QUE la barrière matérielle, jamais le bypass logique.
+--&gt; [SAFE] Relaxe la butée haut MATÉRIELLE M2 sous fenêtre benne (4 verrous)</xhtml>
+              </documentation>
+            </variable>
             <variable name="InReferencingMode">
               <type>
                 <BOOL />
@@ -37068,7 +37177,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 8 : Méca B absence confirmation arrêt (latched)
     IF NOT (BypassSafety OR BypassMecaB) THEN
-        UncommandedActiveB := JoystickYNeutral AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
+        UncommandedActiveB := NOT MovementCommanded AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
         TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
         IF TonMecaB.Q THEN MecaBFaultLatched := TRUE; END_IF;
     ELSE
@@ -37302,9 +37411,16 @@ DescendPermit := NOT (
 );
 
 AscentPermit := NOT (
+    // Fenetre benne : la barrier MATERIELLE (FdC haut capteur) du treuil qui bouge la
+    // benne (M2) est relachee STRICTEMENT pendant la fermeture benne sur place (M1 FIXE, pas
+    // d'altitude) : BucketCloseAscentGrant, calcule PRG_04 sous 4 verrous, cable FALSE sur M1.
+    // Hors fenetre (grant=FALSE) la barrier reprend immediatement ; le FdC materiel haut M1 est
+    // JAMAIS relache (grant toujours FALSE sur l'instance M1). Le bypass logique (BypassTopLimitSwitch)
+    // conserve sa fonction TST et n'est pas altere.
     ((CauseTopLimitSwitchActive
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
-    AND NOT BypassTopLimitSwitch)
+    AND NOT BypassTopLimitSwitch
+    AND NOT BucketCloseAscentGrant)
     // TopLimitM porte la relaxation 7,5-&gt;8,5 m en override N1 / bypass N2 : la butee
     // logicielle reste active a la valeur relevee. Bypasser le logiciel releve la butee,
     // il ne la supprime pas ; le FDC haut materiel reste une barriere independante.
@@ -37591,6 +37707,14 @@ palier est encore engagé (fausse condition d'armement Méca A).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimPhaseRotationOkBit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = phases réseau OK ; FALSE = défaut rotation de phases</xhtml>
               </documentation>
             </variable>
             <variable name="SimEncoderSpeedFactor">
@@ -39278,6 +39402,7 @@ Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 instSimSafety(
     Enable            := TRUE,
     SimChainOkBit     := SimChainOkBit,
+    SimPhaseRotationOkBit := SimPhaseRotationOkBit,
     PowerCutOff_A     := PowerKeepAlive_A,
     PowerCutOff_B     := PowerKeepAlive_B,
     PowerCutOffRequest:= PowerCutOffRequest,
@@ -39288,7 +39413,7 @@ instSimSafety(
 
 Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
 Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
-Machine.PhaseRotationOk_DI             := TRUE;
+Machine.PhaseRotationOk_DI          := instSimSafety.SimPhaseRotationOk;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
 instKoboldPowerUpTimer(IN := KoboldAutoEpisodeActive AND KoboldMeasureEnable
                         AND (M1_CablePos_M &gt; KoboldAutoDepthEpisode_M),
@@ -40838,6 +40963,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée</xhtml>
               </documentation>
             </variable>
+            <variable name="SimPhaseRotationOkBit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = phases réseau OK simulées ; FALSE = défaut rotation de phases injecté</xhtml>
+              </documentation>
+            </variable>
             <variable name="PowerCutOff_A">
               <type>
                 <BOOL />
@@ -40902,6 +41035,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contacteur simulé engagé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimPhaseRotationOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contrôleur de phases simulé : TRUE = phases saines (aucun défaut)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -41068,6 +41209,7 @@ Temps de retombée relais AU (ouverture chaîne)</xhtml>
 IF NOT Enable THEN
     SimChainOk     := FALSE;
     SimContactorOk := FALSE;
+    SimPhaseRotationOk := FALSE;
     ContactorLatch := FALSE;
     ChainOpen      := TRUE; // Chaîne ouverte par défaut à la ré-entrée (on n'a pas armé)
     ChainOpenReq   := FALSE;
@@ -41144,6 +41286,10 @@ END_IF;
 
 // Recopie vers la sortie
 SimContactorOk := ContactorLatch;
+
+// Contrôleur de phases : simple propagation du bit opérateur (TRUE = sain).
+// Inopérant hors simulation (le banc ne publie l'image machine que sous Enable).
+SimPhaseRotationOk := SimPhaseRotationOkBit;
 {endregion}
 </xhtml>
           </ST>
@@ -53765,6 +53911,8 @@ instSimBench(
     PowerCutOffRequest       := PRG_06_Outputs.Data.PowerCutOffRequest,
     // 🧪 Contrôle granulaire de la chaîne AU : bit opérateur (GVL_Simulation.SimChainOk).
     SimChainOkBit            := GVL_Simulation.SimChainOk,
+    // 🧪 Stimulus défaut rotation de phases : TRUE = phases saines, FALSE = défaut.
+    SimPhaseRotationOkBit    := GVL_Simulation.SimPhaseRotationOk,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     SimWinchCoast_M          := GVL_Simulation.SimWinchCoast_M,
     SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
@@ -53906,8 +54054,10 @@ instJoystick(
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT)
         // Repli du vidage : le geste inverse (Y+ apres Y-) doit atteindre l'etape de
         // fermeture benne sans exiger une remise au neutre, sinon l'homme-mort se
-        // desarme au milieu de l'intervention.
-        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN),
+        // desarme au milieu de l'intervention. AX15D (T383) : module benne sur place,
+        // l'operateur alterne pousser (ouvrir) / tirer (fermer) sans retour neutre.
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG),
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
@@ -54927,6 +55077,19 @@ END_IF;
 &lt;-- [BUS] Demandes finales, états, sécurités, synchro, benne</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketWaitingForOperator">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚦 Diagnostic fenêtre benne (observable IHM / dépannage) ===
+Ré-agrégation de instBucket.WaitingForOperator : fermeture benne demandée mais permis nul
+(budget timeout gelé, en attente de permis). Sortie ré-agrégée consommable en mapping IHM
+SANS toucher aux _TYPES IHM ; l'affichage dans la page « Ouverture/Fermeture Benne »
+(ST_ChainBucket) reste un câblage IHM de suivi (exige un champ _TYPES, hors périmètre).
+&lt;-- [STAT] Fermeture benne en attente de permis (NC-100 : TRUE = attente active, budget timeout gele)</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="instWinchSync">
@@ -55802,6 +55965,61 @@ treuil bloque alors l'autre : départ jamais isolé.</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">benne non fermée à 100% à la montée -- bride la montée au Palier 1</xhtml>
               </documentation>
             </variable>
+            <variable name="AutoBucketCloseActiveForTopLimit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FENÊTRE BENNE — relaxation étroite de la butée haute M2 ===
+Fermer la benne = M2 monte RELATIVEMENT à M1 FIXE -&gt; l'ensemble M1/M2 ne change pas
+d'altitude. En position haute la butée haute M2 (logicielle ET matérielle) ne doit donc pas
+bloquer la fermeture sur place. Signal « fermeture AUTO active » = demande programme ReqClose
+RÉELLEMENT engagée ET FB_Bucket.pilotant la manoeuvre (Lifecycle.Busy). Ce signal s'auto-exclut
+du raccordement (ReqClose=FALSE en AX10B) où M1+M2 montent couplés.
+. [LOC] Fermeture AUTO benne vers la cible (butée géométrique relative)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketFenetreWindow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les 4 verrous du grant M2, TOUS requis (l'un ne supplée pas l'autre).
+. [LOC] v1 : fenêtre benne (Lifecycle.Busy ET fermeture AUTO ReqClose)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketM1HeldCheck">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] v2 : M1 réellement maintenu (benne active = M1 épinglé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketM1NotAscent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] v3 : M1 HORS montée/charge</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketCloseNotReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] v4 : relaxation éteinte dès CloseReached (avant HoldAscentP1AfterClose)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketCloseAscentGrant">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Grant M2 : relâche la butée MATÉRIELLE haute M2 (input FB_Safety_Winch)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassKoboldFallEdge">
               <type>
                 <derived name="F_TRIG" />
@@ -56569,7 +56787,9 @@ DescendPermitDiveBucketOpen := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.Desc
 // instWinchM2 §6 plus bas).
 ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits
     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2)
-    AND NOT PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked;
+    AND NOT PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked
+    AND PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
+    AND PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable;
 
 ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
 // Phase JOG du séquencement benne-auto couplé (CoupledBucketPhaseLocked ET Arbitrated=2) :
@@ -56604,13 +56824,13 @@ ProcessPermitM2_Ascent := (NOT ExtractionAssistActive
 // Zone de ralentissement jog unitaire M2 : palier 1 forcé dans les JogSlowdownZoneM
 // derniers mètres AVANT le point d'arrêt anticipé (Offset ± Anticipation). Le "1 m d'avant"
 // est donc calculé sur la cible anticipée, pas sur l'offset brut, et suit tout réglage IHM.
-M2JogApproachOpen := ManualBucketJogActive
+M2JogApproachOpen := ManualBucketJogActive AND ManualBucketLimitsActive
     AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM
          &lt;= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
              + _BucketCfgPersist.Config.OffsetOpenM
              + _BucketCfgPersist.Config.OpenAnticipationM
              + _BucketCfgPersist.Config.JogSlowdownZoneM));
-M2JogApproachClose := ManualBucketJogActive
+M2JogApproachClose := ManualBucketJogActive AND ManualBucketLimitsActive
     AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM
          &gt;= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
              + _BucketCfgPersist.Config.OffsetCloseM
@@ -56689,17 +56909,25 @@ TopLimitM1_M := SEL(OverrideTopSoftwareN1M1 OR BypassM1TopLimitSoftwareEff,
 TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
                     _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
                     _WinchM2CfgPersist.CfgTopSensorPos_M + M2_LimitShift);
-// EXEMPTION jog benne seule (WinchSel=2) : la formule ci-dessus, une fois M2_LimitShift
-// applique, revient exactement a tester la position REELLE de M1 (M2_raw - ActiveOffsetM
-// = M1). Resultat : quand M1 est deja au-dessus de CfgCableLimitAscent_M, fermer/ouvrir
-// la benne (M2 seul, M1 IMMOBILE) est bloque par la meme limite que la montee de M1,
-// alors que manipuler la benne ne fait jamais monter l'ensemble plus haut que M1 courant
-// (REX MES 2026-09-04 : "le treuil ne change pas d'altimetrie en mvt benne"). En jog
-// benne pur, on remplace donc la butee ALTITUDE ABSOLUE par une butee GEOMETRIQUE relative
-// a M1 courant (OffsetCloseM + marge) : c'est deja le vrai limiteur mecanique de la benne
-// (ManualBucketLimitsActive/anticipation, PRG_04 ~710-735). Le FdC haut MATERIEL
-// (TopPositionSensor, FB_Safety_Winch) reste une barriere INDEPENDANTE et non affectee.
-IF ManualBucketJogActive THEN
+// EXEMPTION maniement benne seule (WinchSel=2 jog manuel) ou FERMETURE AUTO sur place :
+// la formule ci-dessus, une fois M2_LimitShift applique, revient exactement a tester la position
+// REELLE de M1 (M2_raw - ActiveOffsetM = M1). Resultat : quand M1 est deja au-dessus de
+// CfgCableLimitAscent_M, fermer la benne (M2 seul, M1 IMMOBILE) est bloque par la meme limite
+// que la montee de M1, alors que manipuler/fermer la benne ne fait jamais monter l'ensemble plus
+// haut que M1 courant ("le treuil ne change pas d'altimetrie en mvt benne"). L'arbitrage
+// exploitant a etendu ce principe (deja utilise en jog) a la FERMETURE AUTO. On remplace donc
+// la butee ALTITUDE ABSOLUE par une butee GEOMETRIQUE relative a M1 courant (OffsetCloseM + marge)
+// : c'est deja le vrai limiteur mecanique de la benne (ManualBucketLimitsActive/anticipation).
+// Le FdC haut MATERIEL (TopPositionSensor, FB_Safety_Winch) reste une barriere INDEPENDANTE,
+// relachee ETROITEMENT pour M2 seulement via BucketCloseAscentGrant (4 verrous) -- jamais pour M1.
+// ⚠️ AutoBucketCloseActiveForTopLimit s'EXCLUT du raccordement (ReqClose=FALSE en AX10B,
+// FB_CycleSemiAuto.st:1348) : quand M1+M2 montent couplees, la butee haute redevient l'authorite
+// absolute (ELSIF WinchBothMotionActive), jamais neutralisee.
+AutoBucketCloseActiveForTopLimit := instBucket.Lifecycle.Busy
+    AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;
+IF (ManualBucketJogActive OR AutoBucketCloseActiveForTopLimit)
+    AND PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
+    AND PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable THEN
     TopLimitM2_M := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
                      + _BucketCfgPersist.Config.OffsetCloseM + 2.0;
 ELSIF WinchBothMotionActive AND NOT (OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff) THEN
@@ -56722,6 +56950,32 @@ PositionLimitOverriddenM2 := OverrideTopSoftwareN1M2 OR BypassM2TopLimitSwitchEf
 {endregion}
 
 {region "🛡️ §5bis Sécurité M1/M2"}
+
+// ── GRANT RELAXATION BUTÉE HAUTE M2 (fenêtre benne) ────────────────────────────────
+// Fermer la benne = M2 monte RELATIVEMENT à M1 FIXE -&gt; l'ensemble M1/M2 ne change pas d'altitude.
+// En position haute, la butée haute MATÉRIELLE M2 (CauseTopLimitSwitchActive / TopPositionSensor,
+// FB_Safety_Winch §3) ne doit donc pas bloquer la fermeture sur place. BucketCloseAscentGrant
+// relâche CETTE barrière, de manière STRICTEMENT BORNÉE par 4 verrous TOUS requis (l'un ne
+// supplée pas l'autre) — il NE relaxe JAMAIS M1 (câblé FALSE sur instSafetyWinchM1, barrière
+// M1 inchangée) et ne réutilise AUCUN Bypass*. La butée haute M2 HORS manipulation benne
+// (grant=FALSE) reste active.
+// Les 4 verrous :
+//   v1 fenêtre benne     : benne active ET fermeture AUTO ReqClose (fermeture uniquement — le
+//                          jog benne MANUEL est HORS périmètre contractuel validé, à arbitrer
+//                          séparément ; le grant ne relâche donc pas le FdC matériel M2 en jog)
+//   v2 M1 réellement fixé : benne active (= M1 épinglé par FB_Bucket pendant la manoeuvre)
+//   v3 M1 hors montée    : NOT M1LogicReqAscent (jamais une montée de charge/extraction de M1)
+//   v4 avant l'arrivée   : NOT instBucket.CloseReached (relaxation éteinte dès CloseReached,
+//                          AVANT HoldAscentP1AfterClose / raccordement AX10B)
+// Le signal « fermeture AUTO » = ReqProgram.ReqBucket.ReqClose (FALSE en AX10B, FB_CycleSemiAuto
+// :1348) ET Lifecycle.Busy : il s'auto-exclut donc du raccordement/transfert de montée couplé.
+BucketFenetreWindow   := instBucket.Lifecycle.Busy
+    AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;   // v1 (fermeture AUTO seule)
+BucketM1HeldCheck     := instBucket.Lifecycle.Busy;                                          // v2
+BucketM1NotAscent     := NOT M1LogicReqAscent;                                               // v3
+BucketCloseNotReached := NOT instBucket.CloseReached;                                        // v4
+BucketCloseAscentGrant := BucketFenetreWindow AND BucketM1HeldCheck
+    AND BucketM1NotAscent AND BucketCloseNotReached;
 
 // FB_Safety_Winch M1/M2.
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
@@ -56793,7 +57047,11 @@ instSafetyWinchM1(
     BypassMecaD            := BypassM1MecaDEff,
     BypassMecaE            := GVL_IHM.M1TreuilRetenue.Bypass.MecaE,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
-    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated
+    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated,
+    // Fenetre benne : le FdC haut MATERIEL de M1 n'est JAMAIS relâché (grant câblé FALSE). M1 reste
+    // la barrière absolue épinglée au sommet pendant TOUTE la montée de charge/extraction.
+    // La butée matérielle M2 seule est relaxée par BucketCloseAscentGrant (4 verrous).
+    BucketCloseAscentGrant := FALSE
 );
 
 instSafetyWinchM2(
@@ -56859,7 +57117,11 @@ instSafetyWinchM2(
     BypassMecaD            := BypassM2MecaDEff,
     BypassMecaE            := GVL_IHM.M2TreuilBenne.Bypass.MecaE,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
-    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated
+    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated,
+    // Fenetre benne : relaxation de la butée MATÉRIELLE haute M2 STRICTEMENT sous fenêtre benne
+    // (4 verrous). FALSE hors fenêtre (montée de charge, extraction, hors manipulation benne) -&gt;
+    // la butée M2 redevient active.
+    BucketCloseAscentGrant := BucketCloseAscentGrant
 );
 
 SafeStopM1_Raw := SafeStopM1_Raw OR instSafetyWinchM1.SafeStop;
@@ -57044,6 +57306,12 @@ MaintenanceMaxStepDescent := 1;
 // plus tard sur capteur haut actif (position redevenue connue).
 IF NOT (PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
         AND PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable) THEN
+    CommonMaxStepAscent  := 1;
+    CommonMaxStepDescent := 1;
+END_IF;
+
+// Cycle homing machine : palier 1 MAX strict en permanence
+IF PRG_02_Acquisition.Data.MachineHoming.Active THEN
     CommonMaxStepAscent  := 1;
     CommonMaxStepDescent := 1;
 END_IF;
@@ -57576,6 +57844,8 @@ BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Lifecycle.Busy;
 BucketState.Done := instBucket.Lifecycle.Done;
 Data.BucketCloseReached := instBucket.CloseReached;
+// Fenêtre benne : fermeture demandée en attente de permis (budget timeout gelé) — observée IHM.
+BucketWaitingForOperator := instBucket.WaitingForOperator;
 BucketState.Error := instBucket.Fault.Error;
 BucketState.ErrorId := instBucket.Fault.ErrorId;
 BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
@@ -61233,6 +61503,8 @@ instHmiBannerFormatter(
     DeadmanArmed                := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
+    CycleElapsed_Min             := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_Min,
+    CycleElapsed_S               := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_S,
     M3AtP1                      := GVL_IHM.M3Translation.State.AtP1,
     M3StatusText                := GVL_IHM.M3Translation.State.M3StatusText,
     TranslationMotionErrorId    := GVL_IHM.M3Translation.State.ErrorId,
@@ -62098,6 +62370,19 @@ TRUE = capteur haut actif; FALSE = position libre. Inopérant hors simulation.</
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimPhaseRotationOk">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Stimulus défaut rotation de phases : TRUE = phases réseau saines (comportement
+nominal, identique au codage en dur d'avant ce lot) ; FALSE = inverse/coupe les phases
+(PhaseRotationOk_DI = FALSE dans l'image machine simulée). Inopérant hors simulation.</xhtml>
           </documentation>
         </variable>
         <variable name="SimM3SensorsWordOverrideActive">

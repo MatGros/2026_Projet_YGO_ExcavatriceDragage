@@ -311,7 +311,7 @@ la totalité de la CI est verte. Au moindre échec, tous les scratchs de ce lanc
 Toutes les specs dans **`DOC/`** — index complet et rôle de chaque document : [DOC/README.md](DOC/README.md).
 
 - [VERSION_HISTORY](DOC/VERSION_HISTORY.md) — historique CODESYS ↔ DOC (une ligne par jalon)
-- [DSH_PROVIDERS](TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md) — 🔌 providers `omniroute` + `opencode-go` (glm-5.2, etc.) + Ollama local · délégation multi-modèles (workflow `provider`/`model`)
+- [DSH_PROVIDERS](TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md) — 🔌 providers `omniroute` + `opencode-go` (glm-5.2, etc.) + Ollama local · délégation multi-modèles (workflow `provider`/`model`) · 🔄 redémarrage DSH après installation de plugin (`Stop-Process node`)
 - [PLAN_TASK](DOC/WFLOW/TASKS.yaml) & [TASKS.yaml](DOC/WFLOW/TASKS.yaml) — 🗂️ **pilotage des tâches & contrats** : skill `.claude/skills/task-planner/SKILL.md` (bannière `WORKFLOW TÂCHES / TASK-PLANNER ACTIF` au lancement, horodatage ISO 8601 `locked_at`/`updated_at`/`completed_at` obligatoire, nomenclature stricte du champ `agent` : `CC01`, `AGY01`, `CDX01`, `DSH01`, `OPC01`, `HUM` ou `—` — zéro libellé long, isolation `git worktree` et anti-destruction Git).
 - [TROUBLESHOOTING](DOC/WFLOW/TROUBLESHOOTING/README.md) — 🕵️ **recherche de blocage / diagnostic** : skill
   `.dsh/skills/troubleshooting/SKILL.md` (DSH) & `.claude/skills/troubleshooting/SKILL.md` (Claude Code),

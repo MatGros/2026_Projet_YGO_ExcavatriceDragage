@@ -1,6 +1,6 @@
-Error compiling source files:
-
-FB_Bucket.st:151:39: error: Undefined type 'FB_BUCKETCLOSETHRESHOLD' in FUNCTION_BLOCK 'FB_BUCKET'
- 151 |     instCloseThreshold              : FB_BucketCloseThreshold;         // * [INST] Seuil d'ouverture benne déclarant la fermeture atteinte
-     |                                       ^
+Error: C++ compilation failed:
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\MAIN_GLOBAL\0ed3900bd7da\strucpp_job\strucpp-test-HTYVpE\generated.cpp: In member function 'void strucpp::FB_TESTHARNESS_PRG_03::operator()()':
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\MAIN_GLOBAL\0ed3900bd7da\strucpp_job\strucpp-test-HTYVpE\generated.cpp:19469:23: error: 'class strucpp::FB_CYCLESEMIAUTO' has no member named 'SETOFFSETM'
+19469 |     INSTCYCLESEMIAUTO.SETOFFSETM = 1.5;
+      |                       ^~~~~~~~~~
 

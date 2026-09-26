@@ -153,11 +153,23 @@
     {
       "name": "T291-B Repli DisplayOffsetM si configuration invalide (OffsetOpenM >= OffsetCloseM)",
       "passed": true
+    },
+    {
+      "name": "T387-FB-003 Fermeture engagee, PERMIS NUL -> budget timeout GEL\u00c9 (attente de permis), pas de ErrorID:03",
+      "passed": true
+    },
+    {
+      "name": "T387-004 Commande benne sans reference : Cause 4 (ErrorID:05) active et non latchante",
+      "passed": true
+    },
+    {
+      "name": "T387-005 Referencement acquis : Cause 4 (ErrorID:05) retombe spontanement sans Reset",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 38,
-    "passed": 38,
+    "total": 41,
+    "passed": 41,
     "failed": 0
   }
 }

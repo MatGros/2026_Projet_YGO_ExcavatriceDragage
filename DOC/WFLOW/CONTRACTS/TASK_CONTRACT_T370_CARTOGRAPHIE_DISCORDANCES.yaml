@@ -1,0 +1,62 @@
+contract:
+  task_id: T370
+  criticality: C4
+  strategy: patch
+  objective: >
+    Inventorier exhaustivement les discordances des commandes et retours
+    des contacteurs M1/M2 observables avec les E/S actuelles, puis comparer
+    deux architectures d'alarme et de message avant tout code.
+  acceptance:
+    - id: AC1
+      statement: "Chaque combinaison pertinente demande de sens/palier, sortie finale et retour collectif M1/M2 est classee nominale, transitoire, discordance prouvable ou indiscernable."
+      verified_by: "Table de verite et references CODE/ et mapping E/S fichier:ligne, incluant sens ON/retour repos et ordre OFF/retour engage."
+    - id: AC2
+      statement: "Les detecteurs actuels sont inventories avec temporisation, action, latch, Reset, bypass, publication IHM et angles morts."
+      verified_by: "Trace producteur -> routeur -> consommateur pour T288 phase 1, FB_SyncContactor, FB_Safety_Winch, FB_Winch et barriere finale."
+    - id: AC3
+      statement: "Les cas normaux qui peuvent ressembler a une discordance sont testes sur papier : changement de sens, palier, coast frein, Both, commande unitaire, homing, arret de securite, demarrage et perte d'E/S."
+      verified_by: "Matrice de scenarios avec condition initiale, evolution temporelle, signal attendu et risque de faux positif."
+    - id: AC4
+      statement: "Deux options sont comparees : un bit par discordance et un message correspondant ; ou un bit agregat et plusieurs messages/codes causes."
+      verified_by: "Table avantages/limites : diagnostic simultane, priorite, latch/Reset, capacite bitfield, retrocompatibilite IHM, tests et cout de cablage."
+    - id: AC5
+      statement: "Aucune cause individuelle de contacteur n'est affirme discernable depuis le seul retour collectif."
+      verified_by: "Confrontation avec le schema/mapping et liste des hypotheses terrain a confirmer au bornier."
+    - id: AC6
+      statement: "Aucun CODE/, outil, test, bundle, gate, statut catalogue ou verrou n'est modifie par l'agent."
+      verified_by: "git status --short avant/apres et git diff --name-only du perimetre."
+  scope:
+    allowed:
+      - DOC/WFLOW/AUDITS/DESIGN/AUDIT_T370_MATRICE_DISCORDANCES_20260922.md
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - TOOLS/
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  evidence_required:
+    - "Table de verite des discordances observables et indiscernables"
+    - "Matrice des detecteurs et faux positifs"
+    - "Comparatif un bit par cause vs bit agrege avec messages multiples"
+    - "Questions de cablage terrain et plan de tests, sans code"
+  models_allowed:
+    - "Codex"
+    - "Antigravity read-only"
+    - "DSH read-only"
+  alert_duty: >
+    Signaler immediatement toute hypothese de retour individuel non prouvee,
+    tout contournement safety, saturation bitfield ou collision de scope.
+    Ne pas modifier le code et ne pas assimiler diagnostic a protection.
+status: PENDING
+execution:
+  executed_by: "—"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: ""
+  notes: "Analyse C4 seule ; choix de conception et plan code soumis ensuite a l'humain."

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T09:01:36.176632" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T09:01:36.176632">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T14:39:44.789918" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T14:39:44.789918">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -113,6 +113,19 @@ TRUE = capteur haut actif; FALSE = position libre. Inopérant hors simulation.</
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimPhaseRotationOk">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Stimulus défaut rotation de phases : TRUE = phases réseau saines (comportement
+nominal, identique au codage en dur d'avant ce lot) ; FALSE = inverse/coupe les phases
+(PhaseRotationOk_DI = FALSE dans l'image machine simulée). Inopérant hors simulation.</xhtml>
           </documentation>
         </variable>
         <variable name="SimM3SensorsWordOverrideActive">

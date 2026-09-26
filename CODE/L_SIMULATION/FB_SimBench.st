@@ -61,6 +61,7 @@ VAR_INPUT
     TestCutActive              : BOOL;             (* --> [SAFE] Test de redondance AU en cours (canal A ou B coupé) *)
     PowerCutOffRequest         : BOOL;             (* --> [SAFE] Requête coupure métier (TRUE = arrêt d'urgence) *)
     SimChainOkBit              : BOOL;             (* --> [TST] Bit opérateur : TRUE = simuler chaîne AU fermée *)
+    SimPhaseRotationOkBit      : BOOL;             (* --> [TST] Bit opérateur : TRUE = phases réseau OK ; FALSE = défaut rotation de phases *)
 
     // ── Stimuli & Paramètres de banc ─────────────────────────────────────────
     SimEncoderSpeedFactor      : REAL := 1.0;   (* --> [CFG] Facteur vitesse codeur *)
@@ -677,6 +678,7 @@ Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 instSimSafety(
     Enable            := TRUE,
     SimChainOkBit     := SimChainOkBit,
+    SimPhaseRotationOkBit := SimPhaseRotationOkBit,
     PowerCutOff_A     := PowerKeepAlive_A,
     PowerCutOff_B     := PowerKeepAlive_B,
     PowerCutOffRequest:= PowerCutOffRequest,
@@ -687,7 +689,7 @@ instSimSafety(
 
 Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
 Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
-Machine.PhaseRotationOk_DI             := TRUE;
+Machine.PhaseRotationOk_DI          := instSimSafety.SimPhaseRotationOk;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
 instKoboldPowerUpTimer(IN := KoboldAutoEpisodeActive AND KoboldMeasureEnable
                         AND (M1_CablePos_M > KoboldAutoDepthEpisode_M),

@@ -664,3 +664,98 @@ TEST 'TC-P10-053 Limite legale : bypass dedie explicite autorise uniquement le t
        BypassProcess := TRUE, BypassLimitLegal := TRUE);
     ASSERT_TRUE(fb.DescendPermit, 'BypassLimitLegal explicite autorise le test de descente');
 END_TEST
+
+TEST 'T387-001 Meca B mode boutons MAINT_N2 : commande bouton (joystick neutre) -> PAS de faux arrêt non confirmé'
+    (* T387 - Repro faux positif : commande PAR BOUTON IHM. Le joystick reste au
+       neutre (JoystickYNeutral=TRUE) pendant que la commande de mouvement est
+       active (MovementCommanded=TRUE, ReqAscent=TRUE, contacteurs engages +
+       frein ouvert, vitesse valide vers le haut). MecaB ne doit PAS se
+       declencher : le treuil est commande (avant fix T387 : MecaB latche = ROUGE). *)
+    (* RAZ des latches partages venant des tests precedents (instance fb unique) *)
+    fb(Enable := TRUE, Reset := TRUE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := FALSE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+    ADVANCE_TIME(10000000);
+    (* Scan nominal reference *)
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := FALSE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+    ADVANCE_TIME(3000000000);
+    (* Commande bouton active : joystick neutre (boutons) + mouvement commande *)
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := FALSE, FwdRevSpeedFeedbackOff := FALSE, BrakeFeedback := TRUE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
+       MeasuredSpeedValid := TRUE, MeasuredSpeedMps := 0.5, MeasuredSpeedSignedMps := 0.5,
+       ReqAscent := TRUE, ReqDescend := FALSE, MovementCommanded := TRUE);
+    ADVANCE_TIME(3000000000);
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := FALSE, FwdRevSpeedFeedbackOff := FALSE, BrakeFeedback := TRUE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
+       MeasuredSpeedValid := TRUE, MeasuredSpeedMps := 0.5, MeasuredSpeedSignedMps := 0.5,
+       ReqAscent := TRUE, ReqDescend := FALSE, MovementCommanded := TRUE);
+    ASSERT_TRUE(fb.MecaBElapsedTime < T#3s, 'Mode boutons MAINT_N2 (commande bouton) : MecaB ne doit PAS armer -> MecaBElapsedTime < 3s. ROUGE avant fix / VERT apres (T387).');
+    ASSERT_FALSE((fb.Fault.LatchedId AND 16#0100) <> 0, 'Mode boutons MAINT_N2 : pas de cause MecaB (bit 0x100) pendant commande bouton');
+END_TEST
+
+TEST 'T387-FB-002 Grant fenetre benne : BucketCloseAscentGrant relaxe ETROITEMENT la butee haute MATERIELLE M2'
+    (* T387 Fenetre benne (AC1/AC2) : fermer la benne = M2 monte relatif a M1 FIXE -> l'ensemble M1/M2
+       ne change PAS d'altitude, donc en position haute la butee materielle M2 ne doit PAS bloquer la
+       fermeture sur place. Le grant (calcule dans PRG_04 sous 4 verrous) est cable TRUE uniquement
+       sur l'instance M2 et FALSE sur M1 (AC3 : le FdC materiel haut M1 reste la barriere absolue).
+       Boite noire FB : grant=TRUE -> AscentPermit relaxe ; grant=FALSE -> barriere active.
+       ⛔ ROUGE avant fix (AscentPermit ignore encore le grant) / VERT apres. *)
+    (* RAZ latches de l'instance partagee. *)
+    fb(Enable := TRUE, Reset := TRUE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := FALSE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
+       BucketCloseAscentGrant := FALSE);
+    ADVANCE_TIME(10000000);
+    (* Capture : FdC haut atteint + grant=FALSE -> barriere active. *)
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := FALSE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
+       BucketCloseAscentGrant := FALSE);
+    ASSERT_FALSE(fb.AscentPermit, 'FdC haut atteint + grant=FALSE -> AscentPermit FALSE (barriere active)');
+    (* Scan : grant=TRUE (fenetre benne active) -> barriere MATERIELLE relaxee ETROITEMENT. *)
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := FALSE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
+       BucketCloseAscentGrant := TRUE);
+    ASSERT_TRUE(fb.AscentPermit, 'Fenetre benne grant=TRUE -> AscentPermit relaxe malgre le FdC haut (M2, AC2)');
+    // Le grant ne BYPASSE pas la cause : le FdC haut (cause 5, bit 16#0020) reste VIVANT et
+    // informe (seul le PERMIS est relaxe). Erreur live bit5 attendue -> jamais un bypass total.
+    ASSERT_TRUE((fb.Fault.ErrorId AND 16#0020) <> 0, 'Fenetre benne : cause 5 (FdC haut) reste vive (grant relaxe le permis, pas la cause)');
+    ASSERT_FALSE(fb.Fault.Latched, 'Fenetre benne : cause live non latchable (Latching=FALSE) -> aucun defaut a acquitter');
+    (* Scan : retour grant=FALSE (hors fenetre) -> la barriere reprend immediatement. *)
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := FALSE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
+       CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
+       BucketCloseAscentGrant := FALSE);
+    ASSERT_FALSE(fb.AscentPermit, 'grant=FALSE (hors fenetre) -> barriere M2 active immediatement (AC2 bornee)');
+END_TEST

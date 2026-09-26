@@ -1,0 +1,99 @@
+contract:
+  task_id: T306-PHASE1-INJECTION-SIM-ROTATION-PHASE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Rendre le defaut de rotation de phase (PhaseRotationOk_DI = FALSE) INJECTABLE depuis le banc de
+    simulation, afin que la verification T306 (arret sur sous defaut de rotation de phase) devienne
+    MATERIELLEMENT POSSIBLE. Aujourd hui le banc ecrit ce DI EN DUR a TRUE (FB_SimBench.st:690), ce
+    qui ecrase tout forcage operateur : la verification demandee par l exploitant est IMPOSSIBLE.
+    Zero impact production : le banc n ecrit l image machine que sous
+    GVL_Simulation.SimulationModeActive AND SimSafetyActive (PRG_02_Acquisition.st:138).
+
+  acceptance:
+    - id: AC1
+      statement: "Le stimulus de simulation existe avec un defaut a TRUE : au demarrage, le comportement est IDENTIQUE a aujourd hui (le banc simule toujours des phases saines, aucune regression)."
+      verified_by: "Lecture du defaut declare + non-regression du domaine simulation (meme jeu de resultats CI avant/apres)."
+    - id: AC2
+      statement: "Forcer le stimulus a FALSE rend PhaseRotationOk_DI = FALSE dans l image machine simulee, et le retour a TRUE le rend sain a nouveau."
+      verified_by: "Test CI ou trace montrant HwIn.Machine.PhaseRotationOk_DI suivant le stimulus."
+    - id: AC3
+      statement: "Hors SimulationModeActive AND SimSafetyActive, la modification n a AUCUN effet (aucune ecriture de l image machine)."
+      verified_by: "Citation de PRG_02_Acquisition.st:138 + verification que le stimulus n est lu que dans le bloc de simulation du banc."
+    - id: AC4
+      statement: "Bundle complet + diff bundle (objets listes) + G200_check_linkage.py --report PASS (bloc Auto-verification liaison colle) + run_all_gates.py --palier C sans rouge nouveau."
+      verified_by: "Execution des 4 commandes, sorties collees."
+    - id: AC5
+      statement: "Le caractere INJECTABLE est PROUVE par un test ROUGE avant / VERT apres : le test echoue si l injection est debranchee."
+      verified_by: "Test CI (ou test FB sur PhaseRotationOk := FALSE) execute avant et apres modification. MUTATION OBLIGATOIRE pour la preuve : relancer avec l injection NEUTRALISEE et montrer l ECHEC du nouveau cas, puis avec l injection CABLEE et montrer son SUCCES."
+    - id: AC8
+      statement: "Le fichier de test autorise exceptionnellement (TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_safety.st) est modifie de facon STRICTEMENT ADDITIVE : aucune assertion pre-existante modifiee ni supprimee, et la liste PASS/FAIL des cas pre-existants reste IDENTIQUE."
+      verified_by: "git diff --numstat sur ce fichier : uniquement des ajouts (0 suppression) ; comparaison de la liste des cas PASS/FAIL avant/apres, hors le nouveau cas."
+    - id: AC6
+      statement: "git diff --numstat VIDE sur tout le perimetre forbidden."
+      verified_by: "git diff --numstat."
+    - id: AC7
+      statement: "Preuves structurelles obligatoires pour l'unique ecriture autorisee dans CODE/M_MAIN : le nom de fichier correspond au nom de POU (PRG_02_Acquisition.st porte le PROGRAM PRG_02_Acquisition) et le suffixe correspond au langage du bundle (le fichier porte le suffixe .st, langue ST du bundle PLCopenXML)."
+      verified_by: "Lecture du fichier et du bundle : nom de fichier et nom de POU identiques ; suffixe .st coherent avec le langage du bundle. Aucun POU renomme, aucun suffixe de langage introduit."
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/L_SIMULATION/FB_Sim_Safety.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - "CODE/M_MAIN/PRG_02_Acquisition.st : UNE SEULE ligne de cablage ajoutee, immediatement a cote du cablage existant du patron (SimChainOkBit := GVL_Simulation.SimChainOk, ~ligne 335) — extension de perimetre DOCUMENTEE du 2026-09-22 apres arret et question de l'agent d'implementation. Justification PROUVEE : sans ce chainon, le stimulus GVL_Simulation reste ORPHELIN (aucun lecteur) et l'AC2 est MATERIELLEMENT impossible ; FB_SimBench est une brique reduite a 0 lecture GVL (gate encapsulation_check), il ne peut donc pas lire la GVL lui-meme."
+      - "TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_safety.st : extension de perimetre DOCUMENTEE du 2026-09-22 (arbitrage orchestrateur) pour couvrir l'AC5 (preuve ROUGE/VERT de l'injectabilite). Ce fichier est le SEUL lu par le runner pour l'entree FB_Sim_Safety. GARDE-FOUS IMPERATIFS : (a) modification STRICTEMENT ADDITIVE — aucune assertion existante modifiee ni supprimee (le diff sur ce fichier ne doit comporter QUE des lignes ajoutees) ; (b) un cas de test NOUVEAU dedie a l'injection du defaut (TC SimPhaseRotationOkBit) ; (c) preuve ROUGE/VERT par MUTATION : injection neutralisee => le nouveau cas ECHOUE, injection cablee => il PASSE ; (d) la liste PASS/FAIL des cas pre-existants doit rester IDENTIQUE (aucun affaiblissement). Option ECARTEE : un test jetable hors RESULTS (preuve non perenne, non rejouable) et le report de l'AC5 en phase 3 (reviendrait a accepter une injection non prouvee, soit la classe de defaut meme que T306 corrige)."
+      - DOC/WFLOW/ (note d application du lot)
+    forbidden:
+      - CODE/B_AU_SECURITE/**
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/I_TRANSLATION/FB_Safety_Translation.st
+      - "CODE/M_MAIN/** (HORS la seule ligne de cablage autorisee ci-dessus : toute autre modification de PRG_02 — notamment la logique d'acquisition, les permis, les modes — reste INTERDITE)"
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/**
+      - DOC/AF/**
+      - DOC/STDS/**
+      - PRJ_CODESYS/**
+      - "TOOLS/TEST_AUTO_CI/RESULTS/*/tests/** (HORS TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_safety.st, seule exception autorisee ci-dessus, strictement additive)"
+
+  conservation:
+    must_survive:
+      - "La logique de securite, les permis, les temporisations moteur/frein et la chaine AU physique restent INTACTS."
+      - "Le comportement par defaut du banc (phases saines) est inchange."
+      - "Le gating SimulationModeActive AND SimSafetyActive reste la seule condition d ecriture de l image machine."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Signaler IMMEDIATEMENT, sans elargir le scope : (1) FB_SimBench.st:691
+    M1_M2_M3_BrakeThermalOk_DI := TRUE est le MEME defaut (defaut thermique freins non injectable
+    en simulation) — le traiter dans un lot dedie ou en extension EXPLICITE, jamais en silence ;
+    (2) toute autre donnee machine ecrite EN DUR dans le banc (rechercher les affectations
+    Machine.<champ>_DI := TRUE/FALSE litterales) ; (3) toute correction qui sortirait du triangle
+    FB_SimBench / FB_Sim_Safety / GVL_Simulation + la ligne de cablage PRG_02 autorisee, qui est
+    INTERDITE sans contrat dedie ; (4) RISQUE DE COLLISION DE FICHIER — au 2026-09-22 le lot T383
+    (AX15D, C4) modifie AUSSI CODE/M_MAIN/PRG_02_Acquisition.st (~ligne 475, DirectInversionPermit)
+    en NON COMMITTE : le present lot ne doit JAMAIS ecraser cette modification. Un seul ecrivain par
+    fichier : coordonner AVANT d'editer PRG_02 (relire le fichier juste avant, verifier que
+    l'edition AX15D est toujours presente, et ne jamais reecrire le fichier en bloc).
+
+  chaine_prouvee:
+    - "GVL_Simulation.SimPhaseRotationOk (nouveau, a cote de SimSafetyActive ~ligne 30)"
+    - "PRG_02_Acquisition.st — UNE ligne de cablage, patron identique a SimChainOkBit (~ligne 335) : SimPhaseRotationOkBit := GVL_Simulation.SimPhaseRotationOk"
+    - "FB_SimBench.st — nouveau VAR_INPUT SimPhaseRotationOkBit (patron : SimChainOkBit ligne 63) + passage a instSimSafety (~lignes 677-686)"
+    - "FB_Sim_Safety.st — nouveau VAR_INPUT SimPhaseRotationOkBit + nouveau VAR_OUTPUT SimPhaseRotationOk"
+    - "FB_SimBench.st:690 — Machine.PhaseRotationOk_DI := instSimSafety.SimPhaseRotationOk (remplace le TRUE en dur)"
+    # NOM CANONIQUE FIGE : GVL_Simulation.SimPhaseRotationOk (TRUE = phases saines simulees,
+    # FALSE = defaut injecte). Toute variante (ex. SimPhaseRotationFault) est REFUSEE pour
+    # eviter deux implementations concurrentes du meme stimulus.
+
+status: PENDING

@@ -1,0 +1,57 @@
+contract:
+  task_id: T374
+  criticality: C4
+  strategy: patch
+  objective: >
+    Etablir la matrice des conditions DEJA appliquees dans le code actuel
+    a la conduite M1/M2 et aux freins en MAINT_N2, puis proposer un plan
+    de raccordement des six boutons IHM sans ajouter de protection supposee.
+  acceptance:
+    - id: AC1
+      statement: "Chaque bouton M1/M2/Both, dans les deux sens, est trace jusqu'a la premiere rupture du flux vers la sortie physique."
+      verified_by: "References CODE/ fichier:ligne, producteur -> arbitre -> FB moteur -> interlock final -> DQ."
+    - id: AC2
+      statement: "La matrice des gardes existantes distingue chaque niveau : mode, geste, arbitrage, FB_Winch, safety, interlock final, PRG_06 et materiel."
+      verified_by: "Pour chaque garde : expression exacte, source, effet sur les six cas, et preuve fichier:ligne."
+    - id: AC3
+      statement: "Les protections proposees par l'utilisateur sont classees presentes, absentes ou non prouvees ; aucune garde nouvelle n'est presentee comme fait acquis."
+      verified_by: "Table AU/PowerCutOff, variateur, sens, frein/contacteur, maintien, reprise auto avec preuves ou lacunes."
+    - id: AC4
+      statement: "Le plan expose au moins deux points de raccordement possibles et leurs effets sur joystick, homing, cycle et M1+M2 couple."
+      verified_by: "Comparaison sourcée, impact producteur-routeur-consommateur et conflits T259/T273/T364/T345."
+    - id: AC5
+      statement: "Aucun fichier CODE/, test, bundle, gate ou configuration n'est modifie pendant cette analyse."
+      verified_by: "git status --short avant/apres et git diff --name-only du perimetre."
+  scope:
+    allowed:
+      - DOC/WFLOW/AUDITS/DESIGN/AUDIT_T374_DSH_CONDITIONS_EXISTANTES_20260922.md
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - TOOLS/
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  evidence_required:
+    - "Matrice des gardes actuelles avec fichier:ligne"
+    - "Six chemins de signal et points de rupture"
+    - "Comparaison des options de raccordement et risque inter-lots"
+    - "Statut Git avant/apres ; aucune mutation"
+  models_allowed:
+    - "DSH"
+  alert_duty: >
+    Toute incoherence de safety, demande simultanee contradictoire, bypass
+    non documente ou conflit de scope est remonte immediatement. Ne pas
+    corriger ni inventer de nouvelles conditions. Le plan attend le GO humain.
+status: PENDING
+execution:
+  executed_by: "—"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: ""
+  notes: "Analyse DSH read-only avant toute proposition de nouvelle garde."

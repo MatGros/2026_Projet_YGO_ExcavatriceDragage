@@ -136,6 +136,26 @@ Timeout via `OMNIROUTE_TIMEOUT_S` (défaut 300). Injecte `subagent_preamble.md` 
 
 ---
 
+## 🔄 Exploitation locale — redémarrer DSH (post-installation de plugin)
+
+> 🎯 **Quand** : après une **installation / mise à jour de plugin** (ou tout changement exigeant un
+> redémarrage du harness), des instances DSH restent vivantes et **bloquent la relance**.
+
+```powershell
+Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force
+```
+
+| Point | Détail |
+|---|---|
+| Effet | Tue les processus **`node`** — donc les instances DSH restées bloquées |
+| Cas d'usage | Installation d'un plugin, puis redémarrage du harness / de `dsh web` |
+| ⚠️ **Portée réelle** | La commande tue **TOUS** les processus `node` de la machine (serveurs de dev, watchers, autres outils Node en cours), **pas seulement DSH** — la lancer en connaissance de cause |
+| Après | Vérifier qu'il ne reste plus de `node` en vie, puis relancer le harness |
+
+*Source : retour exploitant, 2026-09-22.*
+
+---
+
 ## 📌 Règles de délégation (rappel AGENTS.md)
 
 - Coller `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` en tête de chaque tâche déléguée (automatique via `ollama_subagent.py`).

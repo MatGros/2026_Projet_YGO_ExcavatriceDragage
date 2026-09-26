@@ -1,3 +1,14 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Demande exploitant 2026-09-22 : « CycleSemiAuto.Cmd.TglAutoDiveM2Step5Trial = 1 par defaut ».
+# Tache qualifiee RAPIDE par l'exploitant, mais C3 (MOUVEMENT : palier de descente en cycle auto)
+# donc contrat OBLIGATOIRE avant toute ecriture.
+#
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
 contract:
   task_id: T381_AUTODIVE_M2_STEP5_DEFAUT
   criticality: C3

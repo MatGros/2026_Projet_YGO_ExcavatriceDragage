@@ -350,6 +350,7 @@ IF CycleFaultActive THEN
         E_AutoCycleStep.AX15A_DUMP_ARRIVE: StepAtErrorStr := 'AX15a';
         E_AutoCycleStep.AX15B_DUMP_OPEN: StepAtErrorStr := 'AX15b';
         E_AutoCycleStep.AX15C_DUMP_REPOSITION: StepAtErrorStr := 'AX15c';
+        E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG: StepAtErrorStr := 'AX15d';
         E_AutoCycleStep.AX18_DONE_SYNC: StepAtErrorStr := 'AX18';
         E_AutoCycleStep.AX_STAB: StepAtErrorStr := 'STAB';
         ELSE
@@ -396,7 +397,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_AutoCycleStep.AX13_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
             E_AutoCycleStep.AX14_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
             E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
-            E_AutoCycleStep.AX15C_DUMP_REPOSITION: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
+            E_AutoCycleStep.AX15C_DUMP_REPOSITION, E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
             E_AutoCycleStep.AX18_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ - ALLER P1';
             E_AutoCycleStep.AX_STAB: Banner.SequenceProgressText := 'Cycle: STABILISATION';
         ELSE
@@ -1055,7 +1056,13 @@ IF ((BucketErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) 
     AlarmArray[AlarmCount] := '[BENNE] ErrorID:04 - glissement treuil M1'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0010) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] ErrorID:05 - codeurs treuils non references'; AlarmCount := AlarmCount + 1;
+    IF (CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 OR MachineHomingStep > 0)
+        AND EncM1Valid AND EncM2Valid THEN
+        AlarmArray[AlarmCount] := '[BENNE] Referencement en cours - codeurs non references (normal)';
+    ELSE
+        AlarmArray[AlarmCount] := '[BENNE] ErrorID:05 - codeurs treuils non references';
+    END_IF;
+    AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5e. Collecte — synchro M1/M2 (FB_WinchSync.ErrorId)

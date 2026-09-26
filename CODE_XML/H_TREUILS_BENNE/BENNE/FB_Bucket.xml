@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T09:01:36.168224" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T09:01:36.168224">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T14:39:44.782357" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T14:39:44.782357">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -842,6 +842,14 @@ fermeture ci-dessous : celle-ci garde sa valeur et son rôle de filet anti-bloca
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fermeture atteinte, maintien AX10B eventuel en cours</xhtml>
               </documentation>
             </variable>
+            <variable name="WaitingForOperator">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fermeture engagee mais PERMIS NUL -&gt; budget timeout gele (attente de permis), consigne jamais servie</xhtml>
+              </documentation>
+            </variable>
             <variable name="M1SlipDetected">
               <type>
                 <BOOL />
@@ -1031,6 +1039,14 @@ fermeture ci-dessous : celle-ci garde sa valeur et son rôle de filet anti-bloca
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Budget restant consomme par le TON (CfgTimeoutDuration - cumul)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ClosePermitDeniedWhileRequested">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fermeture demendee (CloseReq) mais permis nul -&gt; attente de permis, budget gele</xhtml>
               </documentation>
             </variable>
             <variable name="TonBandClosed">
@@ -1433,6 +1449,14 @@ IF NOT BypassGlobal THEN
     // Signal d'engagement : MotionRequestActive (calcule en tete de §1) — CloseReq/OpenReq sont
     // des LATCHES (restent TRUE pendant toute la pause) et seraient ici INOPERANTS.
     TimeoutEngaged := Lifecycle.Busy AND MotionRequestActive;
+    // Fenetre benne : une FERMETURE demandee (CloseReq) mais dont le permis est NUL -&gt; la consigne
+    // M2 n'est pas servie (M2_RunRequest ne part pas) : c'est une ATTENTE DE PERMIS, pas un
+    // grippage. On gele le budget dans cette sous-fenetre STRICTE ; le vrai grippage (permis OK,
+    // aucun mouvement) conserve TimeoutEngaged -&gt; ErrorID:03 toujours latche (non-vacuite).
+    ClosePermitDeniedWhileRequested := CloseReq AND (NOT EffectivePermitBucket_Close);
+    IF ClosePermitDeniedWhileRequested THEN
+        TimeoutEngaged := FALSE;
+    END_IF;
 
     // Rearmement conscient : budget complet ET segment TON neuf. Un TON IEC ne retombe PAS quand
     // PT augmente (ET cloue a PT, Q fige) : sans cette coupure d'un scan, un Reset pendant une
@@ -1484,7 +1508,7 @@ IF NOT BypassGlobal THEN
     instCauses[3].Latching := TRUE;
     instCauses[3].Texte    := 'Glissement treuil M1 pendant manoeuvre benne';
 
-    // Cause 4 : Non référencé
+    // Cause 4 : Non référencé (alarme d'information non latchante, ne bloque pas le mouvement)
     HomingMotionWithoutReference := (ReqAscent OR ReqDescend OR CmdOpen_IHM OR CmdClose_IHM OR ProgramBucketDriveActive)
                                   AND NOT MachineHomingActive
                                   AND NOT (HomedM1 AND HomedM2);
@@ -1503,6 +1527,10 @@ ELSE
     instCauses[3].Active := FALSE;
     instCauses[4].Active := FALSE;
 END_IF;
+
+// Etat « en attente de permis » publie (consomme par PRG_04 / IHM) — fermeture engagee
+// mais permis nul. Calcule a chaque scan (independant du bypass global).
+WaitingForOperator := Lifecycle.Busy AND CloseReq AND (NOT EffectivePermitBucket_Close);
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -1534,6 +1562,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     CloseReached := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
+    WaitingForOperator := FALSE;
     RETURN;
 END_IF;
 
