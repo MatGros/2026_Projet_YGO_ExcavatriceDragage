@@ -25,6 +25,17 @@
     - *Atténuation du risque :* Les codeurs absolus M1/M2 sont surveillés en permanence en dérive/plage et la butée logicielle haute n'est pas modifiée, ce qui réduit la probabilité de surcourse.
     - *Danger résiduel :* Le risque n'est pas nul (perte de la coupure matérielle redondante indépendante du soft en cas de défaillance codeur ou mouflage).
 
+### ⚠️ Régression constatée — Translation M3 : Arrêt très au-delà des capteurs (P1 & Trémie)
+- **Constat d'exploitation :**
+  - Alors qu'en début de mise en service l'arrêt du chariot M3 était net et propre à l'arrivée sur capteur, une régression flagrante a été relevée le 25/09 : **le chariot s'arrête bien au-delà du capteur physique P1**.
+  - Une suspicion analogue avait été perçue en fin de journée de MES côté Trémie (impression d'aller trop loin).
+  - Ce dépassement est critique : il décale la position de travail par rapport à la géométrie de la carrière et de la trémie, et sollicite anormalement les limites mécaniques.
+- **Pistes causales à investiguer (sans modifier le code) :**
+  1. *Modification des vitesses d'approche du 23/09* : passage de la fréquence d'approche de 10 Hz à 20 Hz (qui augmente l'énergie cinétique au moment du freinage par 4).
+  2. *Retard/temporisation de freinage* : augmentation du délai retour frein (800 ➔ 1000 ms).
+  3. *Chaîne d'arrêt cycle vs manuel (sujet de la tâche T334)* : retrait de commande par le séquenceur au lieu d'un verrou d'arrêt franc dans l'axe.
+- **Rattachement tâche :** Réactivation et mise à jour de la tâche **T334** (`Translation M3 : dépassement P1/Trémie en cycle`).
+
 ---
 
 ## 2. 📝 Nouvelles Demandes d'Évolution & Robustesse
@@ -49,15 +60,18 @@
 | # | Sujet | Constat ou Risque identifié | Surveillance / Mesures à prévoir en essai | Priorité |
 |---|---|---|---|---|
 | 1 | Remplacement capteur Top M1/M2 | Capteur shunté électriquement par le client (provisoire). | Exiger le remplacement physique par un capteur neuf certifié sécurité avant clôture définitive de la réception. | P0 |
-| 2 | Réglages RETAIN / NVRAM | Après import en ligne, certains paramètres IHM restent en cache mémoire. | Faire un reset RETAIN à froid au prochain arrêt machine pour vérifier que les défauts code (ex. 10%, 20Hz) s'appliquent bien. | P1 |
-| 3 | Chute de tension réseau électrique | Réseau définitif : légère chute de tension sous forte charge. | Dynamique et inertie stables ; confirmer en dragage intensif continu. | P2 |
+| 2 | Régression arrêt M3 (T334) | Arrêt très au-delà des capteurs Trémie et P1 constaté le 25/09 (alors que propre auparavant). | Analyser l'impact de la fréquence d'approche (20Hz vs 10Hz) et du délai frein, corréler avec la chaîne d'arrêt T334. | P0 |
+| 3 | Réglages RETAIN / NVRAM | Après import en ligne, certains paramètres IHM restent en cache mémoire. | Faire un reset RETAIN à froid au prochain arrêt machine pour vérifier que les défauts code (ex. 10%, 20Hz) s'appliquent bien. | P1 |
+| 4 | Chute de tension réseau électrique | Réseau définitif : légère chute de tension sous forte charge. | Dynamique et inertie stables ; confirmer en dragage intensif continu. | P2 |
 
 ---
 
 ## 4. 🚀 Plan de Travail Préparatoire
 
-1. **Inscrire T394 et T395 dans [`TASKS.yaml`](../TASKS.yaml)** avec leurs critères d'acceptation et niveaux de criticité (C3/C4).
-2. **Rédiger les contrats de tâche** :
+1. **Traiter en priorité la régression d'arrêt M3 (T334)** : réactiver la tâche, qualifier la cause de l'allongement de distance d'arrêt (vitesse d'approche 20Hz vs 10Hz, temporisation frein 1000ms vs 800ms, ou logique de coupure de cycle), sans modification de code précipitée.
+2. **Cadrer T394 et T395 dans [`TASKS.yaml`](../TASKS.yaml)** avec leurs critères d'acceptation et niveaux de criticité (C2/C4).
+3. **Rédiger les contrats de tâche** :
+   - `TASK_CONTRACT_T334_M3_OVERSHOOT_REGRESSION.yaml`
    - `TASK_CONTRACT_T394_P1_REBOOT_ET_PERMIS_M3.yaml`
    - `TASK_CONTRACT_T395_MAINT_N2_FREINS_ET_SECOURS.yaml`
-3. **Auditer le code de `PRG_06_Outputs.st`** (condition `PowerContactorEngaged_DI` sur les freins) et **`PRG_03_Modes_Cycle.st`** (`WinchDescentAuth_M3` et `TglEnableWinchDescentLock_M3`).
+4. **Audits ciblés de sûreté machine** avant toute proposition d'édition logicielle.
