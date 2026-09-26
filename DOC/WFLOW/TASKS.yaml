@@ -76,11 +76,13 @@ tasks:
   bloque_par: []
 - id: T392
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C1
   domaine: SAFETY / TRANSLATION M3 / SEQUENCEUR
   agent: CC01
   date: '2026-09-23T00:00:00+02:00'
+  updated_at: '2026-09-26T23:53:00+02:00'
+  completed_at: '2026-09-26T23:53:00+02:00'
   titre: 'M3 SEMI_AUTO bloque en boucle : ArrivalLock ne se leve pas P1->Tremie, mapping SelTarget=3 fausse ArrivalWasTremie'
   contexte: 'URGENCE TERRAIN 2026-09-23 : chariot M3 bloque a AX14_TRANSLATE_DUMP (SEMI_AUTO), toute la chaine de permis est verte (Step4-6/8 OK, FinalInterlockState=READY, EffectivePermitM3_Tremie=TRUE, HeightInterlock OK) mais RampTargetPct reste a 0. Cause confirmee en live (watch CODESYS avec l operateur) : instTranslationM3.ArrivalLock reste TRUE malgre ReqTremie=1 et CommandedTremie=1 (P1 -> Tremie), alors que FB_Translation.st:239 devrait le liberer des que le sens demande est oppose au dernier sens memorise (ArrivalWasTremie=FALSE attendu). CAUSE RACINE SUSPECTEE : FB_TranslationCmdArbitrationM3.st lignes ~68-80, pour SelTarget=3 (P1), le code choisit ReqTremie:=TRUE des que Joystick.AxisX.DirectionPositive est vrai (meme convention que pour la cible Tremie), au lieu de traiter l arrivee a P1 comme un arret intermediaire neutre. Consequence : une arrivee a P1 en approchant en sens positif est enregistree par FB_Translation.st (ArrivalEdge, CommandedTremie a ce moment-la) comme ArrivalWasTremie:=TRUE a tort, ce qui bloque ensuite TOUTE liberation ulterieure du verrou en direction Tremie -> deadlock structurel : en SEMI_AUTO/AX14 la cible est figee a 1 (Tremie), le joystick ne peut jamais generer ReqMaintenance pour satisfaire la condition de liberation FB_Translation.st:239. Deblocage terrain fait via bascule MAINT_N1/N2 + jog bref sens Maintenance (branche MAINT independante du mapping fautif), qui satisfait ReqMaintenance AND NOT ArrivalWasMaintenance et leve le verrou.'
   description: 'Corriger le mapping ReqTremie/ReqMaintenance pour SelTarget=3 (P1) dans FB_TranslationCmdArbitrationM3.st afin qu une arrivee a P1 ne soit plus taguee comme "arrivee sens Tremie" dans FB_Translation.st (ArrivalWasTremie). Etudier si P1 doit produire un troisieme etat neutre (ni ArrivalWasTremie ni ArrivalWasMaintenance forcementTRUE) ou si le sens reel de deplacement (physique, pas seulement le signe du joystick) doit qualifier l arrivee. Fichier FB_Translation.st (verrou anti-rebond, C4 securite mouvement) et FB_TranslationCmdArbitrationM3.st concernes : contrat obligatoire, preuve ROUGE/VERT, revue independante avant tout changement.'
@@ -90,7 +92,7 @@ tasks:
   - 'Non-regression : les verrous anti-rebond a la Tremie et a Maintenance (arrets extremes reels) restent inchanges - seule la qualification de l arret intermediaire P1 est corrigee.'
   - 'Aucun changement du comportement de securite (SafeStop, FDC extremes, PowerCutOff) - correctif de qualification de sens uniquement.'
   contrat: ''
-  avancement: 'CORRECTIF LIVRE ET COMMITE (15ff306b) : cause racine reelle differente de la suspicion initiale - pas le mapping SelTarget=3 de FB_TranslationCmdArbitrationM3.st, mais ArrivalLock (FB_Translation.st) qui armait sur N IMPORTE quel point cible atteint (y compris P1/P2/PV intermediaires) au lieu des 2 seules vraies extremites. Nouvelle variable locale ArrivalIsExtreme, reutilise LimitSwitchTremie/LimitSwitchMaintenance deja cables (encodent deja la regle P1=extreme uniquement si Maintenance interdite, PRG_05 §0ter). Zero nouvelle entree, 1 seul fichier touche. Revue independante (agent tiers, posture automaticien/securite) : GO SANS RESERVE sur ce changement - cablage verifie, pas de desync scan possible, renfort FDC physique confirme redondant. G200 PASS 0 erreur. Bundle + diff bundle frais. RESTE A FAIRE : test operateur sur machine reelle apres import CODESYS (le deblocage terrain du jour a ete fait par contournement MAINT_N1/N2, pas par ce correctif).'
+  avancement: 'CLÔTURÉE PAR FUSION DANS T334 le 2026-09-26 (accord exploitant) : le correctif d urgence terrain 15ff306b (ArrivalIsExtreme) est livre et commite. L adoption de l architecture unifiee SelTarget=0 de l etude T334 elimine definitivement le besoin de mapping specifique pour SelTarget=3 et garantit la levee saine du verrou d arrivee dans tous les modes.'
   bloque_par:
   - ''
 - id: T391
@@ -112,11 +114,13 @@ tasks:
   bloque_par:
 - id: T390
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C1
   domaine: SAFETY / TRANSLATION M3 / AC600
   agent: —
   date: '2026-09-23T00:00:00+02:00'
+  updated_at: '2026-09-26T23:53:00+02:00'
+  completed_at: '2026-09-26T23:53:00+02:00'
   titre: 'M3 en cycle auto sur butee : faux defaut MecaA (deplacement sans commande) -> PowerCutOff intempestif suspecte'
   contexte: 'Constat operateur 2026-09-23 (TRES IMPORTANT) : M3 en cycle auto arrivant sur butee s arrete et ne semble PAS deborder significativement, MAIS declenche parfois un defaut grave -> coupure (cutoff), message du type "[M3] ErrorID:06 - MecaA - deplacement sans commande" (FB_Hmi_BannerFormatter.st:1017, libelle exact retrouve par grep, non confirme verbatim par l operateur). Analyse code CODE/I_TRANSLATION/FB_Safety_Translation.st Cause 5 "Meca A" (l.179-193) : des que RunRequest=FALSE et BrakeCmd=FALSE, si ABS(DriveActualFreqHz) > 0.5 Hz pendant TonMecaA.PT := T#1S (delai FIXE, non parametrable), le defaut se latch -> PowerCutOff NON-resettable par Reset simple (defaut physique bit5, cf invariant fichier l.8-10). HYPOTHESE PRIORITAIRE A VERIFIER : a l arrivee sur butee, le variateur AC600 est encore en RAMPE DE DECELERATION naturelle au moment ou RunRequest retombe (fin de commande auto) ; si cette rampe dure plus que 1 s, Meca A se declenche a tort alors qu il n y a aucun mouvement non commande, juste une decel normale pas terminee. Non confirme par trace terrain a ce stade.'
   description: 'Recueillir une trace terrain (DriveActualFreqHz, RunRequest, BrakeCmd, TonMecaA.Q, ErrorMecaA) au moment exact d un arret sur butee en cycle auto pour confirmer ou infirmer l hypothese de rampe de decel > 1s. Si confirmee : etudier un ajustement du delai TonMecaA et/ou une garde sur la phase de decel commandee (ex. ne pas armer la surveillance tant que le variateur est reconnu en rampe d arret suite a une commande, sans affaiblir la detection d un VRAI mouvement non commande). Toute modification de FB_Safety_Translation.st reste C1 (fichier de securite) : contrat obligatoire, preuve ROUGE/VERT, revue independante.'
@@ -125,7 +129,7 @@ tasks:
   - 'Determiner si le delai TonMecaA (1s fixe) est compatible avec le temps de rampe de decel reel de l AC600 sur M3.'
   - 'Si correctif necessaire : ne pas affaiblir la detection Meca A pour un vrai mouvement non commande (regle transverse Safety) - distinguer decel commandee de mouvement non commande.'
   contrat: ''
-  avancement: 'Delai TonMecaA (FB_Safety_Translation.st) monte 1s->7s sur GO humain 2026-09-23 (constante nommee PostRampTimeoutMecaA, revue independante GO avec reserve non chiffree terrain - voir details plus bas). EN PARALLELE, constat operateur supplementaire 2026-09-23 : monter les 3 vitesses d approche M3 (CfgApproachSpeedTremie/Maintenance/P1_Hz, ST_TranslationCfg.st) de 10Hz a 20Hz reduit BEAUCOUP le nombre de defauts M3 (confirme terrain, corrige plutot que masque - hypothese : a 10Hz le variateur tournait trop pres du seuil de detection CST_StopFreqThresholdHz=0.5Hz pendant l approche, marge de decel plus etroite -> plus de faux Meca A/B). Les 2 leviers (delai + vitesse approche) sont desormais en test terrain conjoint, non commites.'
+  avancement: 'CLÔTURÉE PAR FUSION DANS T334 le 2026-09-26 (accord exploitant) : la cause racine a ete demontree par la comparaison des traces 2026-09-26 (Suivi_91). La retombee prematuree de RunRequest des le contact capteur laissait la machine en roue libre, declenchant la surveillance de deplacement sans commande. La solution validee dans l etude T334 maintient RunRequest actif jusqu a l arret physique complet confirme de l axe, supprimant structurellement la cause du faux defaut Meca A.'
   bloque_par:
   - ''
 - id: T389
@@ -2530,12 +2534,13 @@ tasks:
     mouvement. Contrat C2 ecrit et valide AVANT tout code : check_task_contract.py PASS, 0 erreur, 0 avertissement. NON DEMARREE.'
 - id: T348
   parent_id: T334
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: TRANSLATION / DIAGNOSTIC
   agent: HUM
   date: '2026-09-21T00:45:00+02:00'
-  updated_at: '2026-09-21T00:45:00+02:00'
+  updated_at: '2026-09-26T23:53:00+02:00'
+  completed_at: '2026-09-26T23:53:00+02:00'
   titre: Run de trace 10 ms M3 / Tremie, scenarios A-B-C — prealable de mesure du plan T334 Phase 3 (lot L0), RUN HUMAIN
   contexte: 'Le plan T334 Phase 3 exige une mesure avant toute decision sur l arret de l axe M3. Aucune des 3 experiences
     du protocole de trace n existe dans le depot : les traces M3 existantes ont un pas MEDIAN de 100 ms, structurellement
@@ -2561,11 +2566,7 @@ tasks:
     et rappelle qu un resultat de banc ne vaut pas preuve terrain.
   bloque_par: []
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T348_TRACE_M3_10MS_L0.yaml
-  avancement: 'CREEE le 2026-09-21 par DSH15 (lot hors-code, aucun fichier CODE/ touche, aucun commit). Contrat C3 ecrit AVANT
-    le run et valide : check_task_contract.py PASS, 0 erreur, 0 avertissement. Le RUN est HUMAIN et hors perimetre agent :
-    CODESYS n est pas pilotable par un agent et le projet interdit de lire un Device.export present dans le depot. Cette tache
-    conditionne la decision D3 et la faisabilite de D4, donc le deblocage eventuel de T345 ; elle ne debloque PAS a elle seule
-    le lot L1 de code, qui reste suspendu a la decision D1.'
+  avancement: 'CLÔTURÉE ✅ le 2026-09-26 : les traces de reference ont ete acquises par l exploitant (Suivi_91_SIMU_M3_20260926.trace en cycle et Suivi_91_SIMU_M3_MAINTn1_20260926.trace en manuel) et depouillees integralement. Elles ont apporte la preuve formelle du comportement reel (freinage electrique regeneratif actif maintenu en manuel vs roue libre et bond de consigne a 48.6 Hz en auto), permettant la validation de la solution d unification dans l etude T334.'
 - id: T347
   parent_id: ''
   statut: ⏳
@@ -2822,15 +2823,15 @@ tasks:
   bloque_par: []
 - id: T345
   parent_id: T334
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: CYCLE_AUTO / TRANSLATION
   agent: DSH23
   locked_at: '2026-09-21T05:22:00+02:00'
   date: '2026-09-21T05:22:00+02:00'
-  updated_at: '2026-09-21T05:52:00+02:00'
-  titre: 'AX14 vers AX15A : supprimer le relachement joystick exige a l arrivee Tremie (continuite sans a-coup) — REQUALIFIEE
-    CANDIDAT L3, BLOQUEE · LOT L1 « L AXE POSSEDE SON ARRET » IMPLEMENTE, TESTE, NON COMMITE (DSH23)'
+  updated_at: '2026-09-26T23:53:00+02:00'
+  completed_at: '2026-09-26T23:53:00+02:00'
+  titre: 'AX14 vers AX15A : supprimer le relachement joystick exige a l arrivee Tremie (continuite sans a-coup) — FUSIONNÉE DANS T334'
   contexte: 'Le grafcet semi-auto gele le 2026-09-03 (DOC/WFLOW/AUDITS/GEL_GRAFCET_SEMIAUTO_20260903.md, table AT14) prevoit
     JoystickDeflected AND Translation_At_Tremie vers AX15A : un MAINTIEN, pas un relachement. Le code exige un relachement
     du joystick. Le brief T345 demandait d aligner le code sur la spec en RETIRANT aussi le temporisateur de confirmation
@@ -2913,7 +2914,7 @@ tasks:
     presente dans l arbre de travail AVANT ce lot (renommage G499 vers G505 du chantier T291-B) — constatee, signalee, NON
     touchee. NON FAIT, HORS PERIMETRE : L2, D3 (trace 10 ms requise), Q5, Q6, la documentation d interface FB_Translation_v1.1.md
     (nouvelle VAR_OUTPUT a documenter), et le transit du fait d arret vers le lot L2 (champ ST_TranslationInterPrg + cablage
-    PRG_03) qui est le premier geste d ouverture de L2. AUCUN COMMIT sans accord explicite DISTINCT du GO.'
+    PRG_03) qui est le premier geste d ouverture de L2. AUCUN COMMIT sans accord explicite DISTINCT du GO. [MAJ 2026-09-26] : FUSIONNÉE DANS T334 — la solution d unification globale SelTarget=0 et fiabilisation ArrivalStopConfirmed couvrant a la fois AX14 et AX2 etant validee dans l etude T334, cette tache sous-lot est close par absorption.'
 - id: T344
   parent_id: T341
   statut: ⬜
@@ -3452,7 +3453,7 @@ tasks:
   agent: DSH07
   date: '2026-09-20T16:47:46+02:00'
   locked_at: '2026-09-20T15:58:00+02:00'
-  updated_at: '2026-09-20T19:08:57+02:00'
+  updated_at: '2026-09-26T23:22:00+02:00'
   titre: 'Translation M3 : pourquoi deux chemins de commande (manuel/MAINT vs cycle auto) ? Chaînes complètes, comparatif,
     et dépassement P1/Trémie en cycle'
   contexte: 'Constat utilisateur 2026-09-20 : en manuel et en maintenance, M3 s''arrête correctement sur les fins de course
@@ -3493,7 +3494,12 @@ tasks:
     -> energie cinetique quadruplee au freinage ; (2) delai retour frein etendu de 800 a 1000 ms -> glissement accru sur l inertie
     ; (3) chaine de coupure du cycle qui retire la commande sans verrouillage mecanique franc dans l axe. TACHE PRIORITAIRE P0 :
     ne rien modifier dans le code avant d avoir compare la trace d arret 10 Hz vs 20 Hz et la sequence de coupure. ETAPE 1 (ANALYSE)
-    LIVREE par DSH07 (fiche TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md). Verrou d arret arme cote axe a re-synchroniser.'
+    LIVREE par DSH07 (fiche TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md). ETAPE 2 (CADRAGE DES SOLUTIONS) LIVREE le 2026-09-26
+    (document DOC/WFLOW/AUDITS/DESIGN/ETUDE_ARRET_M3_UNIFICATION_MANU_CYCLE_T334.md) : validation exploitant de l unification SelTarget=0,
+    maintien ReqStart jusqu a confirmation d arret complet de l axe, fiabilisation ArrivalStopConfirmed (tempo zero speed 250ms + frein mecanique retombe),
+    et verrouillage zone Maintenance en cycle auto.
+    [FUSION FORMELLE 2026-09-26] : absorption validee des taches T348 (traces depouillees), T345 (arret axe Tremie), T390 (faux defaut Meca A)
+    et T392 (ArrivalLock & mapping SelTarget=3), desormais traitees et resolues au sein de cette tache directrice unique T334. Pret pour contrat et implementation.'
 - id: T255-D
   parent_id: T255
   statut: ✅
