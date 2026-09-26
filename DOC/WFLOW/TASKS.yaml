@@ -1,4 +1,43 @@
 tasks:
+- id: T397
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: DIAGNOSTIC / RESEAUX / OBSERVABILITE
+  agent: —
+  date: '2026-09-26T20:50:00+02:00'
+  titre: 'Calibration et prolongation de la durée d impulsion ResetPulse dans FB_AutoResetTransientDiag'
+  contexte: 'REX atelier/MES 2026-09-26 : lors du réarmement pupitre, instAutoResetTransientDiag entre bien en Phase=2 (attente stabilisation 1s) mais ResetPulse n est jamais observable dans la table de variables / watch CODESYS ni sur l IHM. Dans le code existant (FB_AutoResetTransientDiag.st:46-48), ResetPulse est remis à FALSE systématiquement à chaque scan et n est mis à TRUE que pendant 1 seul scan automate (20 ms), alors que le rafraîchissement d affichage CODESYS s effectue toutes les 100 à 200 ms. L exploitant demande une impulsion calibrée et observable d au moins 500 ms à 1 s.'
+  description: 'Ajouter une configuration de durée d impulsion (Cfg_PulseDuration : TIME := T#500ms ou T#1s) et un timer de maintien (PulseTimer : TP ou TON) dans FB_AutoResetTransientDiag.st afin de maintenir ResetPulse à TRUE pendant la durée configurée lors de chaque tentative. Vérifier la non-régression sur les blocs récepteurs FB_Diag_Ethercat et FB_Diag_CanOpen (qui fonctionnent sur front R_TRIG) et l ordonnancement des transitions Phase/State (passage à Lockout après expiration de l impulsion).'
+  objectifs:
+  - 'Intégrer Cfg_PulseDuration : TIME := T#500ms (ou paramétrable de T#100ms à T#2s) dans FB_AutoResetTransientDiag.st.'
+  - 'Garantir le maintien de ResetPulse à TRUE pendant toute la durée Cfg_PulseDuration lors de chaque émission.'
+  - 'Vérifier que les récepteurs FB_Diag_Ethercat et FB_Diag_CanOpen acquittent immédiatement sur le front montant au scan 1 sans régression.'
+  - 'Valider la machine d état interne : State et Phase reflètent l impulsion en cours puis basculent en Lockout (Phase 3) à l issue de l impulsion.'
+  - 'Valider en CI (tests unitaires C_DIAG_RESEAUX) et vérifier la suite complète des gates mécaniques.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T397_CALIBRATION_RESET_PULSE_DIAG.yaml
+  avancement: 'Tâche cadrée le 2026-09-26 suite au constat exploitant en watch CODESYS.'
+  bloque_par: []
+- id: T396
+  parent_id: ''
+  statut: ⏳
+  criticite: C1
+  domaine: SUPERVISION / COMPTEURS_HORAIRES / PERSISTENCE
+  agent: —
+  date: '2026-09-26T20:10:00+02:00'
+  updated_at: '2026-09-26T20:28:00+02:00'
+  titre: 'Compteurs horaires de fonctionnement totaliseurs (M1, M2, M3 et automate allume)'
+  contexte: 'Demande client formalisee en fin de MES 2026-09-23 : disposer des temps de fonctionnement reels pour chaque actionneur principal (M1 Treuil Levage, M2 Treuil Benne, M3 Translation) et du temps total de mise sous tension de l automate. Architecture confirmee le 2026-09-26 : comptage imperatif de TOUTES les secondes de marche reelle mémorisees en persistance NVRAM, conversion interne pour incrementer des compteurs Heures et Minutes, et diffusion sur GVL_IHM STRICTEMENT en Heures et Minutes (sans exposer les secondes a l ecran). Inviolabilite : aucune commande de remise a zero depuis l IHM, seule une purge explicite de la NVRAM / RETAIN est autorisee. Code ST deja implemente au commit d95904ae (GVL_PERSISTENT, PRG_07_Supervision, ST_RunningHoursHMI) mais non encore telecharge dans le PLC ni valide sur coupure secteur.'
+  description: 'Totaliser chaque seconde de fonctionnement reel dans GVL_PERSISTENT (_RunningHoursMachine_S, _M1_S, _M2_S, _M3_S). Calculer et diffuser vers GVL_IHM.Commun.RunningHours (type ST_RunningHoursHMI) UNIQUEMENT les heures entieres (Hours_H : DINT) et les minutes residuelles (Hours_Min : INT de 0 a 59), sans exposer les secondes. S assurer qu aucun bouton ni controle IHM ne permette de RAZ. Valider le deploiement sur l automate reel CODESYS et la retention apres coupure electrique.'
+  objectifs:
+  - 'Comptage seconde reel : chaque seconde de commande/relais actif M1, M2, M3 et PLC ON incremente la memoire persistante interne.'
+  - 'Diffusion IHM filtree : seules les grandeurs Hours_H et Hours_Min sont transmises a GVL_IHM, les secondes restent internes a l automate.'
+  - 'Telecharger et instancier les variables GVL_PERSISTENT dans le PLC cible.'
+  - 'Valider l affichage IHM sans bouton de reinitialisation.'
+  - 'Valider la retention NVRAM apres coupure et remise sous tension de l automate.'
+  contrat: ''
+  avancement: 'Code source ST conforme a l exigence deja ecrit et versionne (commit d95904ae). En attente de deploiement en ligne et de validation NVRAM.'
+  bloque_par: []
 - id: T395
   parent_id: ''
   statut: ⬜
@@ -583,38 +622,24 @@ tasks:
   bloque_par: []
 - id: T377
   parent_id: T364
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: CYCLE_HOMING / SECURITE_REFERENCEMENT
   agent: —
   date: '2026-09-22T06:22:09+02:00'
-  updated_at: '2026-09-22T06:22:09+02:00'
-  titre: 'HOMING N1 MANUEL : rendre obligatoire le homing non reference en MAINT_N1 (lot PREPARE mais INVISIBLE au catalogue
-    — 2 contrats deja ecrits)'
-  contexte: 'DEUX contrats existent sur disque depuis le 2026-09-22 mais AUCUNE entree de catalogue ne les portait : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_SPEC_AF04_HOMING.yaml
-    (01:04) et DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_HOMING_N1_MANUAL_TOP.yaml (C3, strategy rebuild, AC1..AC8, 02:22). Ce
-    dernier declarent au scope CODE/G_CYCLE/FB_CycleMachineHoming.st, CODE/G_CYCLE/_TYPES/E_MachineHomingTxState.st, CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleMachineHomingCmd.st,
-    CODE/M_MAIN/PRG_02_Acquisition.st, PRG_03_Modes_Cycle.st, PRG_07_Supervision.st, CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st,
-    le test CI test_fb_cyclemachinehoming.st et DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.4.md ; models_allowed CDX01.
-    Son AC1 : « MachineHomed faux conduit au cycle HX en MAINT_N1 ; aucune commande de cycle normal n est autorisee ». Objectif
-    fonctionnel : preparation benne sous homme-mort, approche manuelle COUPLEE M1/M2 au palier 1 SANS montee automatique au
-    capteur haut, validation visuelle explicite par BtnValidateTopPosition, puis referencement atomique. ETAT ACTUEL DU CODE
-    : le homing machine est accessible en MAINT_N2 UNIQUEMENT (PRG_03_Modes_Cycle.st:427, :431, :455) ; la montée HX2 exige
-    DeadmanArmed AND JoystickPull (FB_CycleMachineHoming.st:233-235) ; BtnValidateTopPosition n existe pas encore. Ce lot
-    est donc un CHANTIER PREPARE mais NON IMPLEMENTE, et le verrou T364/AGY01 (pose 2026-09-21T07:38) est la seule protection
-    de ce perimetre : il a ete laisse EN PLACE volontairement par l orchestrateur.'
-  description: 'Prendre en charge le lot prepare : verifier que les 2 contrats sont COMPLETS et non contradictoires, arbitrer
-    avec l exploitant ce qui releve de T364 (refonte deja livree, commit bb9436e1) et de ce nouveau lot, fixer id/criticite/agent/verrou,
-    puis ecrire le contrat definitif (check_task_contract.py doit PASSER) AVANT toute ligne de code. Ne rien fusionner avec
-    T364 sans accord : T364 est clos (statut ✅) et son verrou AGY01 est vif. AUCUNE ecriture CODE/ avant GO humain explicite
-    sur le plan.'
+  updated_at: '2026-09-26T20:15:00+02:00'
+  titre: 'HOMING N1 MANUEL SANS CONTACT TOP : approche prudente sans heurter le capteur haut TOP, validation visuelle operateur et securisation contact'
+  contexte: 'REX terrain MES 2026-09-23 et avarie du 2026-09-25 (capteur fin de course mecanique Top M1/M2 casse par contrainte physique). Aller heurter physiquement le capteur haut pour se referencer presente un risque majeur de depassement et de casse materielle. Nouvelle doctrine validee avec l exploitant le 2026-09-26 : remplacement de la montee automatique au capteur par une approche manuelle prudente sous joystick a proximite immediate du capteur TOP SANS le toucher, validation visuelle de la position par l operateur via le bouton de confirmation existant du Grafcet (BtnValidation / BtnConfirmHomingBucket, sans nouveau bouton), et logique de securite en cas de contact fortuit (coupure montee, descente forcee, et PowerCutOff reserve a la persistance anormale de montee).'
+  description: 'Refondre l etape de montee du homing M1/M2 : 1) Guider l operateur pour monter prudemment a proximite du capteur haut sans aller le toucher. 2) Utiliser le bouton de confirmation existant du homing pour valider visuellement l alignement haut et declencher le referencement atomique (HomeReq). 3) En cas de contact fortuit sur le capteur Top mecanique : NE PAS declencher de PowerCutOff immediat, couper immediatement la commande de montee (SafetyPermit_Ascent := FALSE), forcer le degagement en descente, et ne declencher le PowerCutOff d arret d urgence que si un mouvement de montee persiste malgre la consigne automate coupee (ex. contacteur colle ou force mecaniquement dans l armoire).'
   objectifs:
-  - Les 2 contrats existants sont lus, leur perimetre compare a l etat reel du code, et toute contradiction ou recouvrement
-    est nomme avec fichier:ligne.
-  - Un contrat definitif unique est valide par check_task_contract.py (PASS 0 erreur) avant toute implementation.
-  - id, criticite, agent et verrou du lot sont tranches avec l humain ; le sort du verrou T364/AGY01 est explicite (conserve
-    ou libere).
-  - Aucune ligne de CODE/ ecrite avant le GO humain sur le plan.
+  - 'Remplacer la step de montee automatique au capteur par une etape d approche manuelle joystick a vitesse d approche sous homme-mort.'
+  - 'Valider la position haute sur appui du bouton de confirmation existant du G7 de homing (sans creation de nouveau bouton).'
+  - 'Interdire strictement la montee (SafetyPermit_Ascent := FALSE) des que le capteur Top mecanique est franchi, sans couper brutalement la puissance (pas de PowerCutOff immediat).'
+  - 'Obliger l operateur a descendre pour liberer le capteur Top avant toute reprise.'
+  - 'Declencher un PowerCutOff / arret d urgence uniquement si un mouvement de montee effectif est detecte (via codeurs) alors que la commande automate est a zero.'
+  - 'Mettre a jour le contrat TASK_CONTRACT_T364_HOMING_N1_MANUAL_TOP.yaml (ou dedier un contrat T377) et valider sans regression.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_HOMING_N1_MANUAL_TOP.yaml
+  avancement: 'Doctrine exploitant integree le 2026-09-26 suite a la casse du capteur Top le 25/09. Tache reactivee en cours de cadrage avant edition ST.'
   bloque_par: []
 - id: T378
   parent_id: ''

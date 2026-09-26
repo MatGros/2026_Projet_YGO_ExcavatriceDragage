@@ -1,0 +1,95 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T397
+  criticality: C2
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Maintenir la sortie ResetPulse de FB_AutoResetTransientDiag a TRUE pendant
+    une duree calibree (500 ms a 1 s) au lieu d un seul scan automate (20 ms),
+    afin de rendre l impulsion d auto-acquittement observable dans le watch
+    CODESYS et sur l IHM, sans regression sur les detecteurs de front des blocs recepteurs.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_AutoResetTransientDiag expose un parametre Cfg_PulseDuration de type TIME avec une valeur par defaut de T#500ms ou T#1s."
+      verified_by: "Verification de la declaration VAR_INPUT dans CODE/C_DIAG_RESEAUX/FB_AutoResetTransientDiag.st"
+    - id: AC2
+      statement: "Lors de la transition apres stabilisation (State 1 ou 2), ResetPulse reste a TRUE pendant exactement Cfg_PulseDuration."
+      verified_by: "Test unitaire CI verifiant la persistance de ResetPulse = TRUE sur plusieurs scans temporels"
+    - id: AC3
+      statement: "A l expiration de Cfg_PulseDuration, ResetPulse retombe a FALSE et la machine d etat bascule vers State=4 (Lockout) ou State=3 (Intervalle)."
+      verified_by: "Test unitaire CI verifiant la retombee de ResetPulse et le passage en Phase=3 (Lockout)"
+    - id: AC4
+      statement: "Toute condition safety rompue (SafeCommon = FALSE) pendant l impulsion coupe immediatement ResetPulse et annule la sequence."
+      verified_by: "Test unitaire CI injectant une ouverture de chaine AU ou mouvement pendant l impulsion"
+    - id: AC5
+      statement: "Non-regression sur FB_Diag_Ethercat et FB_Diag_CanOpen : l impulsion allongee est consommee sur front montant sans perturbation ni blocage."
+      verified_by: "Tests unitaires CI existants de FB_Diag_Ethercat et FB_Diag_CanOpen 100% PASS"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/C_DIAG_RESEAUX/FB_AutoResetTransientDiag.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_autoresettransientdiag.st
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T397_CALIBRATION_RESET_PULSE_DIAG.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/M_MAIN/**
+      - CODE/B_AU_SECURITE/**
+      - CODE/H_TREUILS_BENNE/**
+      - CODE/I_TRANSLATION/**
+      - GVL_PERSISTENT.st
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Comportement safety de SafeCommon (EmergencyChainClosed, NOT PowerCutOffActive, NOT MotionActive)"
+      - "Gestion du front contacteur PowerRearmEdge et memorisation RearmPending"
+      - "Nombre maximal de tentatives borne (Cfg_MaxAttempts)"
+    dropped_on_purpose:
+      - "Comportement monostable strict d un seul scan pour ResetPulse (remplace par impulsion calibree observable)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "inherit"
+    - "omni/cc/claude-sonnet-5"
+    - "gemini-3.8-flash"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout impact imprevu sur l ordonnancement des diagnostics ou les
+    gardes de securite communes doit etre immediatement signale avant implementation.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L ETAT D AVANCEMENT & LISEUR HUMAIN
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "AGY01"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""
