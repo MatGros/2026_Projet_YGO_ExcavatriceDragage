@@ -1,4 +1,40 @@
 tasks:
+- id: T395
+  parent_id: ''
+  statut: ⬜
+  criticite: C4
+  domaine: MAINTENANCE_N2 / SECURITE / FREINS / TREUILS
+  agent: —
+  date: '2026-09-26T19:30:00+02:00'
+  titre: 'MAINT_N2 secours ultime : commande freins inconditionnelle et mouvements treuils/translation degrades sous defaut (sauf Top M1/M2 meca)'
+  contexte: 'REX terrain 2026-09-25 : en situation d avarie ou de defaut puissance, l exploitant doit pouvoir manoeuvrer pour remonter ou deplacer la machine en Maintenance N2. Actuellement, le forcage freins M1/M2 (PRG_06:320-331) exige PowerContactorEngaged_DI, ce qui interdit tout desserrage si la puissance est tombee.'
+  description: 'En mode MAINT_N2, rendre le forcage des freins M1/M2 possible inconditionnellement (avec chaine AU fermee et homme-mort, meme si le contacteur de puissance est retombe pour permettre une descente gravitaire controlee). Permettre en MAINT_N2 les mouvements de secours treuils et translation malgre des defauts process ou interdictions, a l EXCEPTION STRICTE du capteur mecanique FDC haut Top M1/M2 (butee de securite ultime preservee).'
+  objectifs:
+  - 'Relaxer la condition PowerContactorEngaged_DI sur MaintenanceN2BrakeForceM1/M2 dans PRG_06_Outputs.st.'
+  - 'Definir la matrice de bypasses automatiques actifs en MAINT_N2 pour les mouvements treuils et translation.'
+  - 'Garantir le maintien absolu de la protection FDC mecanique TopPositionFree_DI sur toute commande de montee.'
+  - 'Contrat C4 obligatoire avec double revue de surete machine.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T395_MAINT_N2_FREINS_ET_SECOURS.yaml
+  avancement: 'Tache cadree le 2026-09-26 suite a la demande exploitant.'
+  bloque_par: []
+- id: T394
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: CYCLE / TRANSLATION M3 / INTERLOCKS
+  agent: —
+  date: '2026-09-26T19:30:00+02:00'
+  titre: 'Robustesse position P1 apres reboot sous l eau : qualification AtP1, translation PV/P2 et etude TglEnableWinchDescentLock_M3'
+  contexte: 'REX terrain 2026-09-25 : suite au blocage a -6m, l equipe a suspecte la perte de l etat AtP1 apres coupure/reboot PLC. Si le PLC reboote alors que la benne est descendue (ou si la position intermediaire P1 n est plus qualifiee), verifier les conditions de reprise, l autorisation de translation vers PV/P2 et la mise a disposition de Commun.Cfg.TglEnableWinchDescentLock_M3.'
+  description: 'Etudier la possibilite de forcer ou requalifier l etat AtP1 pour eviter les blocages de descente au reboot sous l eau. Verifier les permis de translation M3 vers PV et P2. Etudier l exposition IHM de TglEnableWinchDescentLock_M3 pour debrayer le verrou de descente treuil lie au pont M3.'
+  objectifs:
+  - 'Analyser le comportement au reboot du PLC benne descendue : perte de jeton AtP1, persistence NVRAM et impact sur WinchDescentAuth_M3.'
+  - 'Etudier une commande securisee IHM de requalification AtP1 ou de levee du verrou descente.'
+  - 'Verifier que la translation M3 jusqu a PV et P2 reste possible en mode degrade.'
+  - 'Evaluer les risques machine avant toute modification logicielle.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T394_P1_REBOOT_ET_PERMIS_M3.yaml
+  avancement: 'Tache cadree le 2026-09-26 suite au retour d exploitation terrain.'
+  bloque_par: []
 - id: T392
   parent_id: ''
   statut: ⏳
