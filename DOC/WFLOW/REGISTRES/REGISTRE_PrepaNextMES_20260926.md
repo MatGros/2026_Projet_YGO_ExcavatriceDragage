@@ -53,6 +53,28 @@
   1. **Commande des freins inconditionnelle en MAINT_N2 :** Débloquer le forçage des freins M1/M2 même si le retour contacteur de puissance `PowerContactorEngaged_DI` est retombé (ouverture par gravité ou secours), sous réserve stricte du maintien de la chaîne AU fermée et de l'homme-mort.
   2. **Mouvements treuils et translation dégradés en MAINT_N2 :** Permettre les déplacements manuels lents en N2 malgré des défauts/interdictions process ou logiques (bypasses automatiques sous N2), **à l'exception absolue du capteur Top mécanique M1/M2** (sécurité ultime préservée).
 
+### T396 — Compteur horaire de fonctionnement totaliseur (M1, M2, M3 et automate/machine)
+- **Origine & Demande client (MES 23/09, confirmée 26/09) :**
+  - Mesurer le temps de fonctionnement pour chaque actionneur principal : **M1** (Treuil Levage), **M2** (Treuil Benne/Fermeture), **M3** (Translation chariot), ainsi que le temps total sous tension de l'automate.
+  - **Mécanisme de comptage & persistance :** Compter **toutes les secondes** de fonctionnement réel et les mémoriser en mémoire persistante NVRAM (`_RunningHoursMachine_S`, `_M1_S`, `_M2_S`, `_M3_S` dans `GVL_PERSISTENT`).
+  - **Diffusion IHM filtrée (H et Min uniquement) :** Seules les grandeurs en **Heures** et **Minutes** sont calculées et diffusées vers la supervision (`GVL_IHM.Commun.RunningHours` de type `ST_RunningHoursHMI`), les secondes restant strictement internes pour éviter tout encombrement et scintillement à l'écran.
+  - **Inviolabilité & Zéro RAZ IHM :** Aucun bouton ni commande de remise à zéro sur l'IHM. La seule RAZ possible relève d'une réinitialisation formelle des variables persistantes (NVRAM / RETAIN) en maintenance.
+- **État d'implémentation :**
+  - Logique déjà entièrement conforme et codée sous commit `d95904ae` (`GVL_PERSISTENT`, incrémentation seconde par `TON` 1s + `R_TRIG` dans `PRG_07_Supervision`, division modulo vers `ST_RunningHoursHMI`).
+  - Reste à déployer en ligne dans le PLC CODESYS, vérifier la persistance NVRAM après redémarrage électrique et raccorder l'affichage sur le synoptique IHM.
+
+### T377 — Homing M1/M2 manuel sans contact TOP : approche prudente, validation visuelle et sécurité anti-casse
+- **Origine & Problématique (MES 23/09 & Incident du 25/09) :**
+  - Faire le homing en montant automatiquement heurter le capteur fin de course mécanique haut (Top M1/M2) est dangereux : risque de dépassement, de contrainte mécanique excessive et de casse physique (survenue le 25/09).
+- **Nouvelle doctrine opérationnelle validée :**
+  1. **Approche prudente sans contact :** Remplacement de l'étape de montée automatique jusqu'au capteur par une étape où l'opérateur monte manuellement avec prudence (joystick sous homme-mort) à proximité du capteur haut TOP, **sans aller le toucher**.
+  2. **Validation visuelle opérateur :** L'opérateur s'arrête visuellement à la position haute d'alignement et appuie sur le bouton de confirmation existant du Grafcet homing (`BtnValidation` / `BtnConfirmHomingBucket`). Zéro nouveau bouton créé : réutilisation de l'existant.
+  3. **Sécurisation en cas de contact fortuit sur le capteur TOP :**
+     - **Pas de PowerCutOff immédiat au contact :** Évite une coupure brutale au moindre effleurement.
+     - **Coupure immédiate de la commande montée :** Interdiction stricte de continuer à monter (`SafetyPermit_Ascent := FALSE`).
+     - **Sens descente obligatoire :** Seule la descente manuelle est autorisée pour dégager le capteur.
+     - **PowerCutOff conditionnel si persistance de mouvement montant :** Le PowerCutOff (AU / arrêt d'urgence matériel) n'est déclenché que si un mouvement de montée effectif persiste alors que la consigne automate est coupée (ex. contacteur de puissance resté collé ou forcé manuellement dans l'armoire — détecté via vitesse/codeur ou défaut MECA).
+
 ---
 
 ## 3. 🔍 Événements, Comportements & Points de Vigilance à Suivre
@@ -61,17 +83,20 @@
 |---|---|---|---|---|
 | 1 | Remplacement capteur Top M1/M2 | Capteur shunté électriquement par le client (provisoire). | Exiger le remplacement physique par un capteur neuf certifié sécurité avant clôture définitive de la réception. | P0 |
 | 2 | Régression arrêt M3 (T334) | Arrêt très au-delà des capteurs Trémie et P1 constaté le 25/09 (alors que propre auparavant). | Analyser l'impact de la fréquence d'approche (20Hz vs 10Hz) et du délai frein, corréler avec la chaîne d'arrêt T334. | P0 |
-| 3 | Réglages RETAIN / NVRAM | Après import en ligne, certains paramètres IHM restent en cache mémoire. | Faire un reset RETAIN à froid au prochain arrêt machine pour vérifier que les défauts code (ex. 10%, 20Hz) s'appliquent bien. | P1 |
-| 4 | Chute de tension réseau électrique | Réseau définitif : légère chute de tension sous forte charge. | Dynamique et inertie stables ; confirmer en dragage intensif continu. | P2 |
+| 3 | Homing sans contact TOP (T377) | Risque de heurt mécanique sur capteur TOP lors du référencement. | Vérifier la coupure montée sur contact TOP, le dégagement obligatoire en descente, et le PowerCutOff sur persistance montée. | P1 |
+| 4 | Compteurs horaires NVRAM (T396) | Persistance des heures M1/M2/M3 et automate après coupure électrique. | Vérifier lors du prochain arrêt/démarrage secteur que les compteurs ne sont pas remis à zéro et qu'aucun bouton IHM ne permet de RAZ. | P1 |
+| 5 | Réglages RETAIN / NVRAM | Après import en ligne, certains paramètres IHM restent en cache mémoire. | Faire un reset RETAIN à froid au prochain arrêt machine pour vérifier que les défauts code (ex. 10%, 20Hz) s'appliquent bien. | P1 |
+| 6 | Chute de tension réseau électrique | Réseau définitif : légère chute de tension sous forte charge. | Dynamique et inertie stables ; confirmer en dragage intensif continu. | P2 |
 
 ---
 
 ## 4. 🚀 Plan de Travail Préparatoire
 
 1. **Traiter en priorité la régression d'arrêt M3 (T334)** : réactiver la tâche, qualifier la cause de l'allongement de distance d'arrêt (vitesse d'approche 20Hz vs 10Hz, temporisation frein 1000ms vs 800ms, ou logique de coupure de cycle), sans modification de code précipitée.
-2. **Cadrer T394 et T395 dans [`TASKS.yaml`](../TASKS.yaml)** avec leurs critères d'acceptation et niveaux de criticité (C2/C4).
-3. **Rédiger les contrats de tâche** :
+2. **Cadrer T394, T395, T396 et T377 dans [`TASKS.yaml`](../TASKS.yaml)** avec leurs critères d'acceptation et niveaux de criticité (C1..C4).
+3. **Rédiger/mettre à jour les contrats de tâche** :
    - `TASK_CONTRACT_T334_M3_OVERSHOOT_REGRESSION.yaml`
+   - `TASK_CONTRACT_T377_HOMING_MANUEL_SANS_CONTACT_TOP.yaml`
    - `TASK_CONTRACT_T394_P1_REBOOT_ET_PERMIS_M3.yaml`
    - `TASK_CONTRACT_T395_MAINT_N2_FREINS_ET_SECOURS.yaml`
 4. **Audits ciblés de sûreté machine** avant toute proposition d'édition logicielle.
