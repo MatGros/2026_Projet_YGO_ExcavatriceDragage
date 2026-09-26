@@ -373,7 +373,7 @@
             <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-22 14:27:34</div>
+    <div class="exec-time">2026-09-26 19:00:40</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (32 tests)</summary>
@@ -2095,15 +2095,15 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Safety_Translation</code></td>
                 <td>32</td><td>14</td>
-                <td>0</td><td>19</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (19 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>20</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (20 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Translation</code></td>
                 <td>24</td><td>9</td>
-                <td>0</td><td>26</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (26 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>30</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (30 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -3434,7 +3434,7 @@ STRUCT
     BrakeDelayContactClose      : TIME := T#100ms; // --&gt; [CFG] Voir FB_Brake
     BrakeDelayMagnetise         : TIME := T#100ms; // --&gt; [CFG] Voir FB_Brake
     BrakeDelayMotorDecel        : TIME := T#2s;    // --&gt; [CFG] Voir FB_Brake - MES 2026-09-04 : monte 500ms -&gt; 2s (confirme operateur)
-    BrakeFeedbackTimeout        : TIME := T#800ms; // --&gt; [CFG] MES 2026-09-04 : 300ms trop court pour un arret dur au FdC (coast reel ~600ms) -&gt; latch spurieux. Monte a 800ms (confirme operateur).
+    BrakeFeedbackTimeout        : TIME := T#1000ms; // --&gt; [CFG] Delai de confirmation retour contacteur frein avant defaut sequence. Doit couvrir le coast reel d&#x27;un arret dur en butee extreme (confirme operateur).
 END_STRUCT
 END_TYPE
 </pre>
@@ -7117,10 +7117,12 @@ RaiseOffBottomEff := SEL(CfgRaiseOffBottomM &lt;= 0.0, 0.0, CfgRaiseOffBottomM);
 CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 CtrlAscentDistEffM := SEL(CfgCtrlAscentDistanceM &lt;= 0.0, CtrlAscentDistM, CfgCtrlAscentDistanceM);
 
-// ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
-// .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration_Min/_S à l&#x27;achèvement (X13).
+// ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy) OU
+// en pause consciente (WaitingResume, homme-mort relâché entre deux étapes) — une pause
+// normale entre étapes ne doit jamais remettre le chrono à zéro, seul un repos réel (AX0)
+// ou un passage termine (AX18, qui fige LastCycleDuration_Min/_S juste avant) le remet.
 // Conversion TIME -&gt; minutes/secondes (T347) : troncature à la seconde, aucun arrondi.
-CycleRunTimer(IN := Lifecycle.Busy, PT := T#12h);
+CycleRunTimer(IN := Lifecycle.Busy OR WaitingResume, PT := T#12h);
 CycleElapsedTotal_S := TIME_TO_DINT(CycleRunTimer.ET) / DINT#1000;
 CurrentCycleElapsed_Min := DINT_TO_INT(CycleElapsedTotal_S / DINT#60);
 CurrentCycleElapsed_S   := DINT_TO_INT(CycleElapsedTotal_S MOD DINT#60);
@@ -12758,10 +12760,11 @@ DriveFreqCmdWord := 0;
 BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
 Ready := NOT Fault.Error AND NOT RestartInhibit;
 
-IF Fault.Error THEN
+IF RequestedDriveControlWord = 7 THEN
     BrakeCmd := FALSE;
-ELSIF RequestedDriveControlWord = 7 THEN
     DriveControlWord := 7;
+ELSIF Fault.Error THEN
+    BrakeCmd := FALSE;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
 ELSIF MovementRequested AND NOT PermitFinalBlocked THEN
@@ -12854,6 +12857,7 @@ VAR
     TonLimitSwitchOverrun : TON;       // . [LOC] Surveillance poussée anormale / escalade fin de course
     OverrunCondition    : BOOL;   // . [LOC] Condition escalade fin de course
     PostRampTimeout     : TIME := T#3S;   // . [LOC] Délai Méca B
+    PostRampTimeoutMecaA : TIME := T#7S;  // . [LOC] Délai Méca A — couvre le glissement roue/chariot sur butée mécanique
     CST_StopFreqThresholdHz : REAL := 0.5; // . [LOC] Seuil |fréquence sortie| au-dessus duquel le moteur est considéré en rotation (Méca A/B)
     UncommandedActiveB  : BOOL;   // . [LOC] Méca B active
     UncommandedActiveA  : BOOL;   // . [LOC] Méca A active
@@ -12964,7 +12968,7 @@ IF NOT BypassGlobal THEN
         ELSE
             UncommandedActiveA := FALSE;
         END_IF;
-        TonMecaA(IN := UncommandedActiveA, PT := T#1S);
+        TonMecaA(IN := UncommandedActiveA, PT := PostRampTimeoutMecaA);
         IF TonMecaA.Q THEN MecaAFault := TRUE; END_IF;
     ELSE
         TonMecaA(IN := FALSE);
@@ -13156,17 +13160,23 @@ VAR
     ArrivalWasMaintenance        : BOOL;  // . [LOC] Sens d&#x27;arrivée mémorisé
     LastMoveDirection           : INT;         // . [LOC] Sens du dernier mouvement commandé (+1 = Trémie, -1 = Maintenance) — mémoire de l&#x27;axe, insensible à la perte de la demande
     ArrivalLock                 : BOOL;        // . [LOC] Arrêt exact sur capteur cible
+    ArrivalIsExtreme             : BOOL;  // . [LOC] Arrivée sur une extrémité réelle (Trémie/Maintenance), jamais un point intermédiaire (P1/P2/PV)
     MovementRequested           : BOOL;         // . [LOC] Pilote FB_Brake
     FirstScanDone               : BOOL;   // . [LOC] Initialisation premier scan
     TonBrakeRealFreqTimeout     : TON;
     EffectiveSafeStop           : BOOL;   // . [LOC] SafeStop effectif = SafeStop OR sens non permis (gate de sens)
     OverrunLimitSwitch          : BOOL;   // . [LOC] Depassement reel FdC (mouvement soutenu), pas juste arrivee normale
     TonLimitSwitchOverrun       : TON;    // . [LOC] Persistance avant fault Cause 6 (evite le faux defaut sur arrivee nominale)
+    DriveResetPulseTimer        : TON;    // . [LOC] Duree bornee de la commande reset AC600
+    DriveResetPulseActive       : BOOL;   // . [LOC] Impulsion reset AC600 en cours
 
     // Défauts
     DriveFaultLatching          : BOOL;   // . [LOC] Latch défaut variateur
     instFault                   : FB_FaultCore;                  // * [INST] Socle défaut transverse
     instCauses                  : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
+END_VAR
+VAR CONSTANT
+    CST_DriveResetPulseTime     : TIME := T#100ms; // . [CFG] Impulsion reset AC600
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -13177,6 +13187,12 @@ ResetEdge(CLK := Reset);
 
 IF ResetEdge.Q THEN
     DriveFaultLatching := FALSE;
+    DriveResetPulseActive := Enable;
+END_IF;
+
+DriveResetPulseTimer(IN := DriveResetPulseActive, PT := CST_DriveResetPulseTime);
+IF DriveResetPulseTimer.Q OR NOT Enable THEN
+    DriveResetPulseActive := FALSE;
 END_IF;
 
 IF DriveStatusWord.4 THEN
@@ -13228,6 +13244,7 @@ IF NOT Enable THEN
     CommandedMaintenance := FALSE;
     DirectionChangePending := FALSE;
     ArrivalLock := FALSE;
+    ArrivalIsExtreme := FALSE;
     ArrivalWasTremie := FALSE;
     ArrivalWasMaintenance := FALSE;
     LastMoveDirection := 0;
@@ -13269,7 +13286,14 @@ ELSIF CommandedMaintenance THEN
     LastMoveDirection := -1;
 END_IF;
 
-IF ArrivalEdge.Q THEN
+// Arrivée sur une extrémité réelle uniquement (Trémie/Maintenance), jamais un point
+// intermédiaire (P1/P2/PV) : LimitSwitchMaintenance porte déjà la règle métier &quot;P1 compte
+// comme extrémité quand Maintenance est interdite comme cible&quot; (PRG_05_Translation §0ter),
+// donc aucune redondance de logique ici, juste sa consommation.
+ArrivalIsExtreme := ((LastMoveDirection = 1) AND LimitSwitchTremie)
+                  OR ((LastMoveDirection = -1) AND LimitSwitchMaintenance);
+
+IF ArrivalEdge.Q AND ArrivalIsExtreme THEN
     ArrivalLock := TRUE;
     IF CommandedTremie OR CommandedMaintenance THEN
         ArrivalWasTremie := CommandedTremie;
@@ -13419,6 +13443,12 @@ END_IF;
 
 IF Fault.Error THEN
     RequestedDriveControlWord := 0;
+    RequestedDriveFreqHz := 0.0;
+    BrakeReleaseRequest := FALSE;
+END_IF;
+
+IF DriveResetPulseActive THEN
+    RequestedDriveControlWord := WORD#7;
     RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
@@ -14665,6 +14695,7 @@ STRUCT
 
     // === ↔️ Ordre actionneur final translation M3 ===
     TranslationBrakeCmd   : BOOL; // 🔓 Demande frein M3 arbitree
+    M3CommandWordActive   : BOOL; // 🛗 Mot de commande variateur M3 non nul (marche reelle demandee, hors reset AC600) — compteur horaire
 
     // === 🚨 Chaîne réarmement puissance AU ===
     PowerKeepAliveACmd    : BOOL; // 🔒 Maintien puissance voie A (1=Maintenu)
