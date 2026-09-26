@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "file": "test_main_end_to_end.st",
+  "results": [
+    {
+      "name": "MAIN_GLOBAL : Chaine Complete - Qualification Neutre vers Montee Treuils Couples",
+      "passed": true
+    },
+    {
+      "name": "MAIN_GLOBAL : Coupure Puissance AU Propagee a tous les Actionneurs",
+      "passed": true
+    },
+    {
+      "name": "MAIN_GLOBAL : Relachement homme-mort en contexte cycle -> etape sequencage maintenue (T169-A S3, diag e2e)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MAINMACHINE.CYCLESTEP <> E_AUTOCYCLESTEP.AX1_INIT OR STEPBEFORE = E_AUTOCYCLESTEP.AX0_REPOS expected TRUE, got FALSE",
+        "file": "test_main_end_to_end.st",
+        "line": 152,
+        "message": "Pas de regression vers le demarrage de cycle"
+      }
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 2,
+    "failed": 1
+  }
+}

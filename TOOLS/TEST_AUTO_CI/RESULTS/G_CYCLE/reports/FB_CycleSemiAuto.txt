@@ -1,1 +1,10 @@
-Error: C++ compilation failed:
+Error compiling source files:
+
+E_AutoCycleStep.st:47:3: error: Expected `RParen`, found identifier `AX15D_DUMP_BUCKET_JOG`.
+  47 |   AX15D_DUMP_BUCKET_JOG := 23  (* Module benne sur place a la tremie (T383) : le geste ouvre, l'inverse ferme, neutre = stop ; retour AX15B au relachement *)
+     |   ^
+
+E_AutoCycleStep.st:47:25: error: Expected `Colon`, found `:=`.
+  47 |   AX15D_DUMP_BUCKET_JOG := 23  (* Module benne sur place a la tremie (T383) : le geste ouvre, l'inverse ferme, neutre = stop ; retour AX15B au relachement *)
+     |                         ^
+

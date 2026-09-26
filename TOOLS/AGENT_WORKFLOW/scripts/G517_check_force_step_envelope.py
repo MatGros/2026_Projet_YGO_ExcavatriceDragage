@@ -54,7 +54,9 @@ FORCE_ANCHOR = "2bis. FORCAGE DE STEP"
 FORCE_END_ANCHOR = "Ready := Enable AND NOT Fault.Latched;"
 GATE_CONDITION = "IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN"
 CONV_BRANCH = "ForceStepCandidateValid := TRUE;"
-EXPECTED_CONV_BRANCHES = 23
+# T383 (2026-09-22) : ajout d'AX15D_DUMP_BUCKET_JOG := 23 -> l'enum passe de 23 a 24 membres
+# contigus 0..23, la table numero -> etape du forcage aussi. Le gate SUIT l'enum (lien T324).
+EXPECTED_CONV_BRANCHES = 24
 RANGE_CHECK = "(StepForceConsigne >= 0) AND (StepForceConsigne <= CST_StepForceMax)"
 # Acquittement COMPARE-ET-EFFACE (PRG_03) : la consigne n'est effacee que si le champ porte
 # encore exactement la valeur lue AVANT l'appel du FB.
@@ -168,7 +170,7 @@ def check(root: Path, cycle_text: str | None = None, prg03_text: str | None = No
     if len(members) != EXPECTED_CONV_BRANCHES:
         errors.append(
             f"C4: enumeration E_AutoCycleStep de {len(members)} membres (attendu {EXPECTED_CONV_BRANCHES}) "
-            "— le contrat T358 suppose 23 valeurs contigues 0..22"
+            "— le contrat T358 + T383 suppose 24 valeurs contigues 0..23"
         )
     for value, name in sorted(members.items()):
         pattern = rf"^\s*{value}:\s*ForceStepCandidate := E_AutoCycleStep\.{name};"
@@ -327,7 +329,7 @@ def _move_force_before_gate(cycle: str) -> str:
 def _swap_targets(cycle: str) -> str:
     """Permute les cibles 18 et 19 dans le bloc de forcage : mutation C4.
 
-    Le NOMBRE de branches reste 23 : seul le controle de la table EXACTE (valeur -> membre)
+    Le NOMBRE de branches reste inchange (24) : seul le controle de la table EXACTE (valeur -> membre)
     peut detecter cette mutation, c'est precisement la limite que ce test verrouille.
     """
     start = cycle.find(FORCE_ANCHOR)

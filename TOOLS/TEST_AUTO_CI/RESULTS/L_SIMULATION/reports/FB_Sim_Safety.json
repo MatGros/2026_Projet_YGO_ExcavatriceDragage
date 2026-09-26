@@ -9,11 +9,15 @@
     {
       "name": "TC-P13-SAF-002 Pilotage boucle AU saine par SimChainOkBit et armement contacteur",
       "passed": true
+    },
+    {
+      "name": "TC-T306-SAF-003 Injection defaut rotation de phases par SimPhaseRotationOkBit",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 3,
+    "passed": 3,
     "failed": 0
   }
 }

@@ -1,0 +1,161 @@
+contract:
+  task_id: T386
+  parent_id: T306
+  criticality: C4
+  strategy: patch
+  domain: SECURITE / TREUILS / TRANSLATION / ROTATION_PHASE / POWER_CUTOFF
+
+  objective: >
+    Faire en sorte qu'un défaut de rotation de phase (PhaseRotationOk_DI = FALSE) entraîne une
+    COUPURE DE PUISSANCE (PowerCutOff) immédiate — et non plus seulement un SafeStop — aligné sur le
+    comportement des défauts mécaniques des treuils (MecaA/B/C/D, thermiques). Cette coupure doit être
+    effective dans TOUS les modes, y compris DISABLE, dès le premier scan où l'entrée qualifiée est
+    lue. Le retour à TRUE ne doit JAMAIS commander de réarmement automatique.
+
+  invariant: >
+    PhaseRotationOk_DI = FALSE  =>  demande de coupure AU active, armement interdit et maintien
+    puissance A/B retiré, dans tous les modes, dès le premier scan où l'entrée qualifiée est lue.
+    Le retour à TRUE ne commande jamais un réarmement automatique.
+
+  # ⛔ CONDITIONS DE PRÉ-GO (aucune écriture code tant que non levées)
+  pre_go:
+    - id: PREG1
+      question: >
+        Confirmer SUR SCHÉMA que le relais de contrôle de phases (PhaseRotationOk_DI) est alimenté
+        et fournit une information valable contacteur de puissance ouvert. Sans cette confirmation,
+        « interdire l'armement sur ce signal » peut créer une impasse ou lire un état non significatif.
+      statut: EN_ATTENTE   # à la charge de l'exploitant / électrotechnicien — ne peut être vérifié par un agent
+    - id: PREG2
+      question: >
+        Décision bypass aval AU lors d'un défaut phase : BypassAuPowerCutOff et
+        BypassAuArmingPreconditions (FB_Safety_EmergencyManagement.st:217) sont-ils inopérants sur ce
+        défaut (coupure SANS exception) ?
+      decision: Coupure sans exception — les bypass AU ne lèvent PAS le PowerCutOff de rotation de phase
+      statut: ARBITREE
+
+  phases:
+    - id: P0
+      nom: Contrat et décisions bloquantes
+      livrable: present_contract
+    - id: P1
+      nom: Tests ROUGES avant modification
+      detail: >
+        Créer des tests distincts, sans assimiler une sortie LOGIQUE (PowerCutOffReq, commandes
+        AU) à un contacteur PHYSIQUE retombé : la retombée matérielle ne pourra être vérifiée que par
+        l'essai machine (SAT), jamais par la CI.
+        (a) FB_Safety_Winch PhaseRotationOk:=FALSE => SafeStop=TRUE ET PowerCutOff=TRUE pour M1/M2,
+        retour TRUE sans front Reset => défaut toujours verrouillé ;
+        (b) FB_Safety_Translation mêmes assertions M3 ;
+        (c) Intégration AU défaut avant armement en DISABLE => PowerCutOffReq=TRUE, Armable=FALSE,
+        MaintainA_Cmd=FALSE, MaintainB_Cmd=FALSE, ArmPulse_Cmd=FALSE ;
+        (d) défaut puissance engagée => mêmes demandes de coupure au scan attendu ; retour sain sans
+        nouvelle action => pas de commande spontanée ;
+        (e) [nouveau] retour PhaseRotationOk=TRUE ALORS QUE les bypass RETAIN AU restent actifs
+        (BypassAuPowerCutOff=TRUE, BypassAuArmingPreconditions=TRUE) => la coupure phase reste
+        effective et l'armement reste interdit (les bypass aval sont masqués quand phase non OK).
+        Chaque test porte les 3 modes testés explicitement (DISABLE, MAINT_N2, SEMI_AUTO).
+        Épingler les résultats ROUGES attendus AVANT correction (révision par hash git blob).
+    - id: P2
+      nom: Patch métier M1/M2 et M3
+      detail: >
+        M1/M2 : CODE/H_TREUILS_BENNE/FB_Safety_Winch.st:529 ajouter CausePhaseRotationActive à
+        CausesPowerCutOffActive.
+        M3 : CODE/I_TRANSLATION/FB_Safety_Translation.st:268 PowerCutOff := (Fault.ErrorId AND
+        16#00FC) <> 0 (bits 2..7 ; comm bits 0/1 exclus). Ne pas lire ErrorPhaseRotation (affecté APRES
+        PowerCutOff). Corriger le commentaire (bit2 = rotation de phase, pas communication).
+    - id: P3
+      nom: Barrière globale avant armement (y compris DISABLE + masquage bypass AU)
+      detail: >
+        CODE/M_MAIN/PRG_06_Outputs.st — TROIS modifications INSEPARABLES (à livrer ensemble,
+        sinon l'invariant est incomplet) :
+        (1) UNE SEULE affectation canonique de PowerCutOffReq calculée à la ligne 317 et supprimer
+        l'affectation redondante ligne 480 (sinon PRG_06 peut consommer une valeur différente de celle
+        envoyée à l'AU) ;
+        (2) lui ajouter : OR NOT PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI (phase contrôlée
+        indépendamment de Enable des FB d'axe, donc aussi en DISABLE) ;
+        (3) masquer les deux bypass AU effectifs (BypassAuPowerCutOff et BypassAuArmingPreconditions)
+        LORSQUE la phase est non OK : la coupure phase ne doit être levée par AUCUN bypass aval
+        (décision PREG2 = coupure sans exception). Ce masquage se fait dans PRG_06 à l'appel de
+        instSafetyEmergencyManagement (forcer ces deux bypass à FALSE quand PhaseRotationOk_DI = FALSE),
+        en NE modifiant PAS FB_Safety_EmergencyManagement (B_AU_SECURITE interdit).
+        NE PAS modifier FB_TranslationOutputInterlock pour ce lot (coupure AU globale, pas un arrêt par
+        rampe M3).
+    - id: P4
+      nom: Bypass, validation et SAT
+      detail: >
+        Tester séparément les bypass amont (BypassPhaseRotation, BypassProcess, BypassGlobal) et aval
+        (BypassAuPowerCutOff, BypassAuArmingPreconditions). La barrière globale phase contourne les
+        bypass d'axe ; et (P3-3) les bypass aval AU sont MASQUÉS quand la phase est non OK (PREG2 =
+        coupure sans exception). Un test spécifique P1e vérifie que le retour phase OK AVEC bypass RETAIN
+        actifs maintient la coupure et l'interdiction d'armement. Puis tests VERTS, non-régression des
+        autres causes, bundle complet + diff, G200 --report, gates. Le test « mouvement chargé » reste
+        un essai SAT machine encadré avec mesure de la retombée réelle des contacteurs et comportement
+        des freins ; il ne peut pas être clos par la CI.
+
+  acceptance:
+    - id: AC1
+      statement: "Défaut phase injecté AVANT armement (simu SimPhaseRotationOk=FALSE) => PowerCutOffReq=TRUE, MaintainA_Cmd=FALSE, MaintainB_Cmd=FALSE, Armable=FALSE, aucune armement."
+      verified_by: "Test d'intégration AU (P1c) ROUGE avant / VERT après."
+    - id: AC2
+      statement: "Défaut phase EN MARCHE (M1, M2, M3) => commandes logiques de coupure immédiates : PowerCutOff=TRUE pour chaque axe et PowerCutOffReq=TRUE. (Le retombée des CONTACTEURS PHYSIQUES est validée par l'essai machine SAT, pas par la CI.)"
+      verified_by: "Tests FB Safety Winch/Translation (P1a-b) + intégration AU (P1d) : assertions sur les sorties LOGIQUES."
+    - id: AC3
+      statement: "Coupe effective dans TOUS les modes testés explicitement : DISABLE, MAINT_N2 et SEMI_AUTO. Chacun de ces 3 modes est couvert par un cas de test nommé."
+      verified_by: "Test en DISABLE (P1c) + essais MAINT_N2/SEMI_AUTO (3 cas distincts nommés)."
+    - id: AC4
+      statement: "Retour PhaseRotationOk_DI=TRUE sans front Reset => AUCUN redémarrage auto ; réarmement uniquement par action consciente après cause levée."
+      verified_by: "Test latch sans réarmement (P1a-b) + essai machine."
+    - id: AC5
+      statement: "Les bypass aval AU (BypassAuPowerCutOff, BypassAuArmingPreconditions) sont MASQUÉS quand la phase est non OK : la coupure phase n'est levée par AUCUN bypass aval (PREG2 = coupure sans exception). Le retour phase OK alors que ces bypass RETAIN restent actifs NE rétablit PAS une coupure/armement illégitime."
+      verified_by: "Test P1e (retour phase OK avec bypass RETAIN actifs) + Test P4 bypass aval."
+    - id: AC6
+      statement: "G200 --report PASS + bundle complet + diff bundle + palier C sans rouge nouveau ; commentaire bit2 M3 corrigé."
+      verified_by: "Exécution des 4 commandes, sorties collées."
+    - id: AC7
+      statement: "git diff --numstat VIDE sur le périmètre forbidden ; AU physique et temporisations intactes."
+      verified_by: "git diff --numstat."
+    - id: AC8
+      statement: "Preuves structurelles T8 pour l'unique ecriture CODE/MAIN : nom de fichier egal nom de POU et le suffixe est egal au langage genere dans le bundle PLCopenXML"
+      verified_by: "Lecture fichier et bundle : fichier egal POU ; suffixe egal langage bundle"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st                 # P2 ligne 529 (une seule cause ajoutée)
+      - CODE/I_TRANSLATION/FB_Safety_Translation.st            # P2 ligne 268 (masque + commentaire)
+      - CODE/M_MAIN/PRG_06_Outputs.st                           # P3 (3 modifs indissociables : une seule affectation PowerCutOffReq + NOT PhaseRotationOk_DI + masquage bypass AU si phase non OK)
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_safety_winch.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_safety_translation.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/   # test d'intégration AU (PRG_06)
+      - DOC/WFLOW/
+    forbidden:
+      - CODE/B_AU_SECURITE/**                       # AU PHYSIQUE — jamais modifié logiciellement ici
+      - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st   # hors périmètre pour ce lot (P3)
+      - "toute modification de temporisation moteur/frein sauf contrat dédié"
+      - "toute modification de la séquence d'arrêt / rampe délibérée hors SafeStop existant"
+      - DOC/AF/**
+      - DOC/STDS/**
+      - PRJ_CODESYS/**
+
+  conservation:
+    must_survive:
+      - "La séquence de réarmement AU et BypassPowerCutOff restent intacts hors défaut phase."
+      - "Le verrou de réarmement AU existant (CST_ArmingLockout 5s, FB_Safety_EmergencyManagement) est DISTINCT de la protection phase : non modifié par ce lot."
+      - "Les défauts mécaniques (MecaA/B/C/D), thermiques et l'AU physique conservent leur comportement PowerCutOff actuel."
+      - "Aucun réarmement automatique après retour de phase."
+    dropped_on_purpose:
+      - "Le SafeStop M3 inerte à la barrière finale (FB_TranslationOutputInterlock) est TRAITÉ HORS de ce lot (objet d'un correctif distinct)."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    Signaler immédiatement, sans élargir le scope : (1) la double affectation de PowerCutOffReq
+    (PRG_06:317 vs :480) créant une possible incohérence entre les valeurs consommées par PRG_06 et
+    celles envoyées à l'AU — à uniformiser en UNE expression canonique ; (2) tout écart de polarité ou
+    de fiabilité du relais de phases (attendu PREG1) ; (3) tout impact sur la synchro M1/M2 (un seul
+    axe coupeur désaligné) ; (4) le masquage croisé BypassProcess/BypassPhaseRotation dans la cause 4.
+
+status: PENDING

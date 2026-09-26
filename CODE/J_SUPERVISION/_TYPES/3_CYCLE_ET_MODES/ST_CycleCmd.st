@@ -12,7 +12,7 @@ STRUCT
     BtnReposition     : BOOL; (* ⬇️ Option maintenue : repositionnement couplé M1+M2 pendant le vidage trémie (X11b <-> X11c) *)
     TglCommissioning  : BOOL := FALSE; (* 🔧 Case mise en service : déverrouille le forçage de step (front/impulsion). NON persisté. *)
     TglCycleChecksInhibit : BOOL := FALSE; (* 🧪 Mode essai : inhibe uniquement les controles procede autorises. NON persiste. *)
-    TglAutoDiveM2Step5Trial : BOOL := TRUE; (* Profil nominal : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. Debrayable IHM, non persiste. *)
+    TglAutoDiveM2Step5Trial : BOOL := TRUE; (* T381 (ex T291-A) : en SEMI_AUTO AX4..AX7, profil nominal avec M1 palier 4 et M2 palier 5. Debrayable IHM. NON persiste. *)
     BtnResetSampleCount : BOOL; (* 🔢 RAZ consciente du compteur JOURNALIER de prélèvements (front) — n'agit JAMAIS sur le totalisateur, qui n'a aucune commande *)
     // ⚠️ AJOUT EN FIN DE STRUCT (mapping positionnel : jamais d'insertion au milieu).
     // 🔧 T358 : consigne de forcage de step — VALEUR écrite par l'opérateur, lue ET

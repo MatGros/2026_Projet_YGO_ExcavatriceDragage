@@ -334,6 +334,8 @@ instSimBench(
     PowerCutOffRequest       := PRG_06_Outputs.Data.PowerCutOffRequest,
     // 🧪 Contrôle granulaire de la chaîne AU : bit opérateur (GVL_Simulation.SimChainOk).
     SimChainOkBit            := GVL_Simulation.SimChainOk,
+    // 🧪 Stimulus défaut rotation de phases : TRUE = phases saines, FALSE = défaut.
+    SimPhaseRotationOkBit    := GVL_Simulation.SimPhaseRotationOk,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     SimWinchCoast_M          := GVL_Simulation.SimWinchCoast_M,
     SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
@@ -475,8 +477,10 @@ instJoystick(
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT)
         // Repli du vidage : le geste inverse (Y+ apres Y-) doit atteindre l'etape de
         // fermeture benne sans exiger une remise au neutre, sinon l'homme-mort se
-        // desarme au milieu de l'intervention.
-        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN),
+        // desarme au milieu de l'intervention. AX15D (T383) : module benne sur place,
+        // l'operateur alterne pousser (ouvrir) / tirer (fermer) sans retour neutre.
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG),
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T09:16:17.527832" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T09:16:17.527832">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T14:40:11.917859" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T14:40:11.917859">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -112,7 +112,7 @@
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profil nominal : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. Debrayable IHM, non persiste.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T381 (ex T291-A) : en SEMI_AUTO AX4..AX7, profil nominal avec M1 palier 4 et M2 palier 5. Debrayable IHM. NON persiste.</xhtml>
               </documentation>
             </variable>
             <variable name="BtnResetSampleCount">

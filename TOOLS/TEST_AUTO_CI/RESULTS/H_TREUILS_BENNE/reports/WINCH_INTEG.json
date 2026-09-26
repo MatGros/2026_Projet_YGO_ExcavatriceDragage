@@ -1,0 +1,346 @@
+{
+  "version": 1,
+  "file": "test_winch_integ.st",
+  "results": [
+    {
+      "name": "HARN-10 : Cycle semi-auto descente 50 pourcent -> palier 3 M1 ET M2, RelayRev",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.BUSWINCH.WINCHM1FINALINTERLOCKREQUEST.REQUESTEDSTEP > 0 expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 122,
+        "message": "HARN-10: la demande doit atteindre FB_Winch M1"
+      }
+    },
+    {
+      "name": "HARN-11 : Extraction montee ExtractionControlActive -> plafond palier 1 M1 ET M2",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "MACHINE.M1_STEPNUMBER expected 1, got 0",
+        "file": "test_winch_integ.st",
+        "line": 170,
+        "message": "HARN-11: M1 plafonne palier 1 (ExtractionControlActive)",
+        "expected": "1",
+        "actual": "0"
+      }
+    },
+    {
+      "name": "HARN-12 : Zone ralentissement bordure haute -> plafond palier 1, jamais au-dela de 7.5 m",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.M1_STEPNUMBER >= 1 expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 220,
+        "message": "HARN-12: precondition - montee en zone haute engagee M1"
+      }
+    },
+    {
+      "name": "HARN-13a : Table de verite etape remontee 20 pourcent -> palier 2",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "MACHINE.M1_STEPNUMBER expected 2, got 0",
+        "file": "test_winch_integ.st",
+        "line": 269,
+        "message": "HARN-13a: 20 pourcent -> palier 2 (table reference)",
+        "expected": "2",
+        "actual": "0"
+      }
+    },
+    {
+      "name": "HARN-13b : Table de verite etape descente 70 pourcent -> palier 3 (clamp descente effective)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "MACHINE.M1_STEPNUMBER expected 3, got 0",
+        "file": "test_winch_integ.st",
+        "line": 313,
+        "message": "HARN-13b: 70 pourcent descendu au clamp descente 3",
+        "expected": "3",
+        "actual": "0"
+      }
+    },
+    {
+      "name": "HARN-13c : Table de verite etape remontee 90 pourcent -> palier 5",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "MACHINE.M1_STEPNUMBER expected 5, got 0",
+        "file": "test_winch_integ.st",
+        "line": 356,
+        "message": "HARN-13c: 90 pourcent -> palier 5 (table reference)",
+        "expected": "5",
+        "actual": "0"
+      }
+    },
+    {
+      "name": "HARN-20 : Rampe deflexion 0 a 100 pourcent -> paliers monotones, jamais de saut brutal",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "MACHINE.M1_STEPNUMBER expected 4, got 1",
+        "file": "test_winch_integ.st",
+        "line": 402,
+        "message": "HARN-20: 75 pourcent -> palier 4 (table reference)",
+        "expected": "4",
+        "actual": "1"
+      }
+    },
+    {
+      "name": "HARN-21 : Rampe retour 100 a 0 -> decroissance propre, neutre -> palier 0",
+      "passed": true
+    },
+    {
+      "name": "HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -> palier 1 stable, pas de plancher",
+      "passed": true
+    },
+    {
+      "name": "HARN-23 : Homme-mort relache en mouvement -> arret immediat, frein retombe",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "MACHINE.M1_STEPNUMBER expected 0, got 1",
+        "file": "test_winch_integ.st",
+        "line": 493,
+        "message": "HARN-23: homme-mort relache -> palier 0",
+        "expected": "0",
+        "actual": "1"
+      }
+    },
+    {
+      "name": "HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -> immersion confirmee puis arret latche",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.KOBOLDIMMERSIONCONFIRMED expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 528,
+        "message": "HARN-30: immersion confirmee au front montant en fenetre"
+      }
+    },
+    {
+      "name": "HARN-31 : Interdiction palier 5 en Kobold (D12) -> plafond 4 (CIBLE T181-12/16, ROUGE baseline)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.M1_STEPNUMBER >= 1 expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 563,
+        "message": "HARN-31: la plongee Kobold est reellement exercee (StepNumber >= 1)"
+      }
+    },
+    {
+      "name": "HARN-32 : Relache joystick en contexte plongee -> palier 0 immediat, pas de plancher residuel",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.M1_STEPNUMBER >= 1 expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 590,
+        "message": "HARN-32: precondition - descente active en plongee"
+      }
+    },
+    {
+      "name": "HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amendement B, CIBLE T181-12, ROUGE baseline)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "MACHINE.M1_STEPNUMBER expected 1, got 0",
+        "file": "test_winch_integ.st",
+        "line": 626,
+        "message": "HARN-33: plafond zone basse gagne sur plancher plongee (amendement B)",
+        "expected": "1",
+        "actual": "0"
+      }
+    },
+    {
+      "name": "HARN-40 : Jog benne -> M2 bride palier 1, treuils coupes pendant Busy (anti-traversee amont)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "MACHINE.M1_STEPNUMBER expected 4, got 1",
+        "file": "test_winch_integ.st",
+        "line": 657,
+        "message": "HARN-40: precondition - M1 au palier 4",
+        "expected": "4",
+        "actual": "1"
+      }
+    },
+    {
+      "name": "HARN-41 : SyncDeviationWarn -> plafond palier 1 sur M1 ET M2 (bornes communes identiques)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.BUSWINCH.SYNCSTATE.SYNCDEVIATIONWARN expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 693,
+        "message": "HARN-41: SyncDeviationWarn actif (ecart 0.3 > 0.10)"
+      }
+    },
+    {
+      "name": "HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "MACHINE.M1_STEPNUMBER expected 5, got 1",
+        "file": "test_winch_integ.st",
+        "line": 726,
+        "message": "HARN-42: M1 libre jusqu au plafond general (5)",
+        "expected": "5",
+        "actual": "1"
+      }
+    },
+    {
+      "name": "HARN-50 : Nominal filet passif -> FinalInterlockGoverned FALSE sur toute la montee couplee",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 755,
+        "message": "HARN-50: precondition - montee couplee M1 etablie"
+      }
+    },
+    {
+      "name": "HARN-51 : Injection cadence hors instance FB_Winch -> barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 788,
+        "message": "HARN-51: precondition - montee nominale M1 etablie"
+      }
+    },
+    {
+      "name": "HARN-52 : Pas de double-freinage -> barriere PRG_06 passive en marge interne FB_Winch",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.FINALINTERLOCKGOVERNEDM1 = FALSE expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 827,
+        "message": "HARN-52: pas de coupure non voulue"
+      }
+    },
+    {
+      "name": "HARN-60 : Deviation croissante -> warn plafond 1 puis critique SafeStop des 2",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.SYNCDEVIATIONM_MODEL > 0.10 expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 857,
+        "message": "HARN-60: ecart modelise a depasse le seuil warn"
+      }
+    },
+    {
+      "name": "HARN-61 : Retour dans la tolerance -> plafond relache, pas de latch intempestif",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.SYNCDEVIATIONM_MODEL < 0.10 expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 895,
+        "message": "HARN-61: re-alignement dans la tolerance"
+      }
+    },
+    {
+      "name": "HARN-70 : Chute chaine AU en mouvement couple -> relais FALSE immediat, freins retombent",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 923,
+        "message": "HARN-70: precondition - montee couplee active"
+      }
+    },
+    {
+      "name": "HARN-71 : Enable=FALSE sur FB_Winch en marche -> sorties sures ; re-Enable sans relache",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.BUSOUTPUTS.M1RELAYFWD = FALSE expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 969,
+        "message": "HARN-71: pas de redemarrage auto au re-Enable (cible D18)"
+      }
+    },
+    {
+      "name": "HARN-72 : Watchdog frein (retour frein ne suit pas) -> barriere coupe apres timeout",
+      "passed": true
+    },
+    {
+      "name": "HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -> RelayRev retenu (CIBLE T175/T181-05)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.BUSOUTPUTS.M1RELAYREV = FALSE expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 1033,
+        "message": "HARN-73: temps mort directionnel respecte (cible T175)"
+      }
+    },
+    {
+      "name": "HARN-74a : Coast-down apres relache lourd -> PAS de faux PowerCutOff pendant la fenetre contacteurs (T178)",
+      "passed": true
+    },
+    {
+      "name": "HARN-74b : Coast-down prolonge -> Meca B arme a 3 s (CIBLE T178, ROUGE baseline)",
+      "passed": true
+    },
+    {
+      "name": "HARN-75 : Redemarrage a chaud (FirstScanDone) -> temps mort directionnel NON bypassse (D18, ROUGE baseline)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.BUSWINCH.WINCHM1STATE.DIRECTIONCHANGEPENDING OR MACHINE.BUSWINCH.WINCHM1STATE.FINALRESTARTINHIBIT expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 1128,
+        "message": "HARN-75: temps mort applique au hot-restart (D18, cible T181-05)"
+      }
+    },
+    {
+      "name": "HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -> defaut + neutralisation (CIBLE T180)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.BUSWINCH.WINCHM1SAFETY.ERROR expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 1162,
+        "message": "HARN-80: CAS-001 detecte (defaut Error, cible T180)"
+      }
+    },
+    {
+      "name": "HARN-81 : CAS-012 demande benne pendant mouvement treuil -> demande REFUSEE (CIBLE T175 AC3)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.M1_STEPNUMBER > 0 expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 1186,
+        "message": "HARN-81: precondition - treuils en mouvement"
+      }
+    },
+    {
+      "name": "HARN-82 : CAS-002 AU pendant transition d etape -> coupure propre, pas d etat incoherent au rearmement",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE",
+        "file": "test_winch_integ.st",
+        "line": 1223,
+        "message": "HARN-82: precondition - mouvement semi-auto"
+      }
+    }
+  ],
+  "summary": {
+    "total": 32,
+    "passed": 5,
+    "failed": 27
+  }
+}

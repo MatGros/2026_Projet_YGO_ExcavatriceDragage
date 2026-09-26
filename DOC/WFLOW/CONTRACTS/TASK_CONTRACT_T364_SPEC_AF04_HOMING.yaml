@@ -1,0 +1,64 @@
+contract:
+  task_id: T364_SPEC_AF04_HOMING
+  criticality: C2
+  strategy: patch
+  objective: >
+    Etablir dans AF_Partie-04 la specification unique et validable du cycle de
+    referencement machine M1/M2/benne, depuis la mise sous tension jusqu'au
+    retour au fonctionnement Semi-Auto, avant toute nouvelle ecriture de code.
+  acceptance:
+    - id: AC1
+      statement: "La specification distingue boot, AU/rearmement, MAINT_N1, MAINT_N2, SEMI_AUTO et chaque etat HX0 a HX7."
+      verified_by: "Relecture humaine de la table cycle de vie et du GRAFCET AF-04 section 4bis."
+    - id: AC2
+      statement: "Chaque etat HX publie ses actions, sa consigne IHM, ses receptivites d'entree et sortie, et sa reaction de defaut."
+      verified_by: "Relecture humaine ligne par ligne de la table d'etats AF-04 section 4bis."
+    - id: AC3
+      statement: "Les contradictions des briefs T364 precedents sont arbitrees explicitement ou marquees DECISION HUMAINE REQUISE sans etre codees."
+      verified_by: "Table de reconciliation versionnee dans AF-04 avec source, verdict et decision."
+    - id: AC4
+      statement: "AF-09 ne porte que le contrat de prise de reference codeur et renvoie au cycle machine AF-04 sans dupliquer les transitions HX."
+      verified_by: "Liens croises AF-04 vers AF-09 et absence de deux GRAFCETs decisionnels."
+    - id: AC5
+      statement: "Aucun fichier CODE, bundle, test ou configuration CODESYS n'est modifie dans le lot de specification."
+      verified_by: "git diff --name-only limite aux documents autorises."
+  scope:
+    allowed:
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.4.md
+      - DOC/VERSION_HISTORY.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_SPEC_AF04_HOMING.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - TOOLS/
+      - PRJ_CODESYS/
+      - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
+  conservation:
+    must_survive:
+      - "AF-04 v2.3 demeure l'historique du cycle Semi-Auto existant."
+      - "AF-09 v2.4 demeure la specification technique des codeurs et presets."
+      - "Aucun comportement machine n'est declare valide sans visa humain du GRAFCET AF-04."
+    dropped_on_purpose: []
+  evidence_required:
+    - "check_task_contract: PASS"
+    - "git diff --check: PASS"
+    - "visa humain du GRAFCET avant contrat d'implementation C4"
+  models_allowed:
+    - "orchestrateur CDX01"
+  alert_duty: >
+    Toute divergence entre code, briefs historiques, essais simulation ou
+    demande exploitant est tracee comme decision a arbitrer. Elle ne doit pas
+    etre masquee par une interpretation d'agent.
+
+status: IN_PROGRESS
+execution:
+  executed_by: "CDX01"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Contrat de specification cree ; reconciliation des sources T364 en cours."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Aucun code homing autorise par ce contrat."
