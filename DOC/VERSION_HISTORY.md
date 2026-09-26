@@ -4,6 +4,16 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `MES_FIN_20260923` — 2026-09-23 — fin de mise en service, levée blocages treuils & translation M3
+- **Branche** : `main` (commit `4968a541`).
+- **Faits marquants & Validations terrain** :
+  - **Inversion matérielle DI M1/M2 (`PRG_02_Acquisition.st`)** : compensation du croisement physique des contacts de retombée contacteurs M1 ↔ M2. Élimination du faux défaut de concordance et du décrochage de 800 ms lors de la bascule AX10 ➔ AX10b ➔ AX11 (passage fluide en 21 ms sans mou de câble).
+  - **Sécurisation Grafcet Semi-Auto AX15B (`FB_CycleSemiAuto.st`)** : suppression formelle du saut pirate vers `AX10_CLOSE_BUCKET` depuis la trémie. Intégration du micro-step `AX15D_DUMP_BUCKET_JOG` permettant de moduler l'ouverture/fermeture benne sur place sans aucun mouvement de treuil.
+  - **Déblocage verrou translation M3 (T392, `FB_Translation.st`)** : correction de l'armement d'`ArrivalLock` sur les cibles intermédiaires (P1 ➔ Trémie) restaurant le franchissement automatique en cycle semi-auto.
+  - **Filtrage anti-rebond FDC translation M3 (`PRG_05_Translation.st`)** : verrouillage d'état insensible au rebond physique des capteurs AtTremie / AtMaintenance.
+  - **Compteurs horaires & chronomètres (`PRG_07_Supervision.st`)** : enregistrement des temps de fonctionnement moteurs et machine.
+  - **Validation mécanique & Outillage** : Bundle complet PLCopenXML (`CODE_XML/CODE_Bundle.xml`) et diff bundle (`CODE_XML/CODE_DiffBundle.xml`) synchronisés, liaison `G200_check_linkage.py` PASS (0 erreur sur 2070 instances).
+
 ### `MES_055_SEANCE_20260907` — 2026-09-07 — fiabilisation benne, synchro IHM/Modes, bypass AU boot & FdC haut
 - **Branche** : `backup/mes-septembre-20260902`.
 - **Faits marquants** :
