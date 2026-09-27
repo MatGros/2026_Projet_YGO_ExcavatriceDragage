@@ -1,0 +1,88 @@
+contract:
+  task_id: T404
+  criticality: C2
+  strategy: patch
+  objective: >
+    Prouver qu un projet CODESYS choisi par l utilisateur peut etre copie dans
+    un espace TwinBench isole, compile puis deploye sans interface graphique
+    vers CODESYS Control Win, avant d ouvrir exactement cette copie pour la
+    visualisation en ligne, sans modifier le projet source ni joindre le PLC reel.
+  acceptance:
+    - id: AC1
+      statement: "Le lanceur demande explicitement un fichier .project ou .projectarchive et ne travaille jamais directement dessus."
+      verified_by: "Selection Windows, empreinte SHA-256 avant/apres et revue du chemin transmis a CODESYS."
+    - id: AC2
+      statement: "Chaque import cree une copie horodatee et une copie de travail dans un dossier TwinBench dedie."
+      verified_by: "Recette locale et journal manifest.json."
+    - id: AC3
+      statement: "Le mode diagnostic ouvre et compile la copie avec CODESYS 3.5.19.10 en mode --noUI sans telechargement."
+      verified_by: "Journal headless avec nombre d erreurs et code retour."
+    - id: AC4
+      statement: "Le deploiement refuse toute cible dont le nom n est pas CODESYS Control Win V3 x64 et n utilise aucune adresse du PLC reel."
+      verified_by: "Garde de cible dans le script CODESYS et controle automatique du code source."
+    - id: AC5
+      statement: "Le projet ouvert pour la visualisation est la meme copie que celle compilee et deployee."
+      verified_by: "Commande Ouvrir la copie et concordance chemin/empreinte dans le manifeste."
+    - id: AC6
+      statement: "Le premier essai s arrete proprement sur les incompatibilites materiel ou E/S sans modifier automatiquement la logique PLC."
+      verified_by: "Rapport de compilation et absence de modification sous CODE/ et PRJ_CODESYS/."
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/controlwin_runner/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T404_CONTROL_WIN_RUNNER_ISOLE.yaml
+      - DOC/WFLOW/REX/NOTE_APPLICATION_T404_CONTROL_WIN_RUNNER_20260927.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - automate_reel
+      - modification_silencieuse_des_IO
+      - commit
+      - push
+  conservation:
+    must_survive:
+      - "Le projet selectionne reste byte-identique avant et apres le POC."
+      - "Le projet automate reel et sa reference de device restent inchanges."
+      - "Aucun deploiement n est autorise tant que la cible Control Win n est pas prouvee."
+      - "Les erreurs de compilation sont restituees, jamais masquees par un stub implicite."
+    dropped_on_purpose:
+      - "Compatibilite universelle avec tout projet CODESYS."
+      - "Adaptation automatique des E/S materielles lors du premier POC."
+      - "Couplage OpenModelica et benchmark UDP."
+  evidence_required:
+    - "check_task_contract.py PASS."
+    - "Autotest des gardes source/copie/cible PASS."
+    - "Empreinte du projet source inchangee."
+    - "Compilation headless de la copie documentee."
+    - "Recette humaine d ouverture de la copie et connexion en visualisation."
+  models_allowed:
+    - "omni/cx/gpt-6-sol"
+  alert_duty: >
+    La copie ne garantit pas a elle seule la compatibilite Control Win : les
+    symboles produits par le device et les mappings E/S peuvent manquer. Le POC
+    doit s arreter et presenter ces ecarts avant toute proposition de shim HW_SIM.
+
+status: IN_PROGRESS
+execution:
+  executed_by: "CDX01"
+  completed_at: "2026-09-27T16:11:30+02:00"
+  status: ALERT_RAISED
+  summary: >
+    Copie, confinement, creation d un projet Control Win neuf et import natif de
+    l Application valides. Compilation bloquee correctement sur 293 erreurs liees
+    aux symboles et objets produits par l arbre materiel absent. Aucun deploiement.
+  evidence_submitted:
+    - "Autotest runner : 14/14 PASS."
+    - "SHA-256 source avant/apres identique : c6e12a7a8a09da7981c82ad26d79d8409f4f27ae8f75aa366b8cf5e0805b7ab5."
+    - "Device Control Win derive : type 4096, ID 0000 0004, version 3.5.19.10."
+    - "Compilation refusee : 293 erreurs, 1 avertissement."
+    - "Etat runtime PREPARE_FAILED ; service Control Win arrete."
+    - "NOTE_APPLICATION_T404_CONTROL_WIN_RUNNER_20260927.md."
+validation:
+  status: APPROVED
+  validated_by: "HUM"
+  validated_at: "2026-09-27T15:43:21+02:00"
+  notes: "GO utilisateur : tester ce mecanisme en premier car il conditionne la suite."
