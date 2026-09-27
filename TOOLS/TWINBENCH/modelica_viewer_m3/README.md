@@ -1,67 +1,76 @@
-# Modelica M3 Viewer — atelier expérimental
+# TwinBench M3 — Viewer Modelica + simulateur autonome
 
-Viewer/éditeur local pour les modèles OpenModelica `.mo`, première cible : **axe de translation M3 seul**.
+Atelier hors ligne pour l'axe de translation M3.
 
-## Objectif
+## Deux moteurs, une même frontière machine
 
-L'outil fournit un atelier léger autour d'OpenModelica :
+### 1. Viewer OpenModelica
 
-- ouverture et sauvegarde d'un fichier `.mo` ;
-- découverte des packages/classes/modèles ;
-- vue blocs simplifiée à partir de la structure Modelica ;
-- inspection des ports `input` / `output` / `parameter` ;
-- édition textuelle du modèle ;
-- `checkModel()` avant simulation ;
-- simulation via `omc` avec sortie CSV ;
-- lecture des résultats et tracé natif sans dépendance Python externe ;
-- sélection d'une variable et affichage de sa valeur min/max/finale ;
-- affichage du journal OpenModelica en cas d'erreur.
+`Lancer_M3Viewer.bat`
 
-Le moteur physique reste **OpenModelica**. Le viewer ne recalcule pas la physique en Python.
+- ouvre/édite les `.mo` ;
+- visualise classes, ports, composants et connexions ;
+- `checkModel()` et simulation via `omc.exe` ;
+- lit et trace les résultats CSV.
 
-## Lancement Windows
+OpenModelica reste le moteur de référence pour Modelica complet.
+
+### 2. TwinBench M3 autonome
+
+`Lancer_M3Autonome.bat`
+
+Aucune installation OpenModelica requise. Le moteur Python ne remplace pas Modelica : il fournit un équipement virtuel M3 limité, déterministe et testable.
+
+La frontière est alignée sur `CODE/`, qui est la vérité machine :
+
+PLC -> Twin :
+- `M3_CommandWord` : `0=stop`, `1=Trémie`, `2=Maintenance` ;
+- `M3_SetpointFrequencyHz` : fréquence codée x100 ;
+- `M3_BrakeRelease_RQ` ;
+- état thermique/device pour injection de défaut hors ligne.
+
+Twin -> PLC / viewer :
+- `M3_StatusWord` ;
+- `M3_ActualFrequencyHz` codée x100 ;
+- `M3_BrakeIsOpen_DI` ;
+- cinq capteurs TOR cumulés : Trémie, PV, P2 (`M3_PosPVP2_DI` dans l'image matérielle), P1, Maintenance ;
+- position/vitesse physiques internes au jumeau pour diagnostic et comparaison.
+
+Le mot capteurs respecte le contrat actif de `FB_Translation_PositionDecoder` :
+
+`11111 -> 01111 -> 00111 -> 00011 -> 00001 -> 00000`
+
+Toute autre combinaison est signalée incohérente.
+
+## Lancement
 
 Depuis la racine du dépôt :
 
 ```bat
-TOOLS\\TWINBENCH\\modelica_viewer_m3\\Lancer_M3Viewer.bat
+TOOLS\TWINBENCH\modelica_viewer_m3\Lancer_M3Autonome.bat
 ```
 
-Ou :
+ou :
 
 ```powershell
-python TOOLS/TWINBENCH/modelica_viewer_m3/modelica_viewer_m3.py
+python TOOLS/TWINBENCH/modelica_viewer_m3/m3_native_viewer.py
 ```
 
-Le programme cherche `omc.exe` dans `OPENMODELICAHOME`, dans le PATH et dans `C:\\Program Files\\OpenModelica*`.
+Tests :
 
-## Modèle de départ
+```powershell
+cd TOOLS/TWINBENCH/modelica_viewer_m3
+python -m unittest -v test_m3_native.py
+```
 
-Le bouton **Ouvrir Dredge M3** charge :
+## Règles de sûreté
 
-`TOOLS/TWINBENCH/modelica_atelier/Dredge.mo`
+- outil strictement hors ligne ;
+- aucune connexion PLC ni écriture E/S machine ;
+- aucune logique safety/interlock PLC recopiée dans la plante ;
+- les commandes consommées sont les commandes finales post-interlock ;
+- la position continue du Twin est une vérité de simulation, pas un capteur ajouté artificiellement au PLC.
 
-et sélectionne :
+## Paramètres physiques
 
-`Dredge.Examples.M3ContractCycle`
-
-Ce modèle reprend le contrat actuel de la plante M3 :
-
-`commandes finales -> plante physique -> mesures / retours TOR / état variateur / diagnostics`.
-
-## Limites volontairement assumées
-
-Cette V0 n'est pas un remplacement d'OMEdit et ne prétend pas éditer graphiquement toutes les annotations Modelica.
-
-La vue graphique V0 est une **vue structurelle** générée depuis le texte Modelica. L'édition graphique des connexions sera ajoutée après validation du flux M3.
-
-Aucune connexion PLC, aucune sortie physique, aucun pilotage machine réelle et aucune logique safety n'est implémentée.
-
-## Évolution prévue
-
-1. M3 : moteur électrique + variateur + frein + mécanique + rail + capteurs.
-2. M3 : édition graphique des connexions.
-3. M1/M2.
-4. Benne et cinématique couplée.
-5. Chaîne complète hors ligne.
-6. éventuellement interface FMU/PLC virtuelle, uniquement avec un contrat séparé et les mêmes frontières de sûreté.
+Les positions et constantes dynamiques du moteur autonome sont des paramètres de simulation éditables. Elles ne sont pas présentées comme métrologie machine tant qu'elles ne sont pas confirmées terrain. Les futures briques physiques détaillées doivent rester traçables vers les composants/méthodes officiels Modelica Standard Library ; un composant non supporté doit basculer vers OpenModelica plutôt qu'être approximé silencieusement.
