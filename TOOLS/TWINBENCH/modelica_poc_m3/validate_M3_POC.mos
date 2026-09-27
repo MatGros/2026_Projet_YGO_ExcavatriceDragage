@@ -1,0 +1,27 @@
+loadModel(Modelica, {"4.1.0"});
+getErrorString();
+loadFile("M3_POC.mo");
+getErrorString();
+checkModel(M3_POC.Examples.AllerRetour);
+getErrorString();
+checkModel(M3_POC.Examples.BoucleLocale);
+getErrorString();
+simulate(M3_POC.Examples.AllerRetour,
+  startTime=0, stopTime=70, numberOfIntervals=7000, tolerance=1e-6,
+  method="dassl", outputFormat="csv", fileNamePrefix="M3_AllerRetour");
+getErrorString();
+simulate(M3_POC.Examples.BoucleLocale,
+  startTime=0, stopTime=160, numberOfIntervals=16000, tolerance=1e-6,
+  method="dassl", outputFormat="csv", fileNamePrefix="M3_Boucle40Hz_2Cycles",
+  simflags="-override=loopFrequency_Hz=40,cycleCount=2");
+getErrorString();
+simulate(M3_POC.Examples.BoucleLocale,
+  startTime=0, stopTime=180, numberOfIntervals=18000, tolerance=1e-6,
+  method="dassl", outputFormat="csv", fileNamePrefix="M3_Boucle20Hz_1Cycle",
+  simflags="-override=loopFrequency_Hz=20,cycleCount=1");
+getErrorString();
+simulate(M3_POC.Examples.BoucleLocale,
+  startTime=0, stopTime=70, numberOfIntervals=7000, tolerance=1e-6,
+  method="dassl", outputFormat="csv", fileNamePrefix="M3_BoucleIllimitee",
+  simflags="-override=loopFrequency_Hz=40,cycleCount=0");
+getErrorString();

@@ -1,0 +1,118 @@
+contract:
+  task_id: T401
+  criticality: C2
+  strategy: rebuild
+  objective: >
+    Produire un POC M3 autonome, volontairement simplifié, que l'utilisateur
+    ouvre directement dans OMEdit et simule sans PLC, Python, serveur web, FMU
+    ni configuration externe.
+  acceptance:
+    - id: AC0
+      statement: "L'ancien TwinBench complet est déplacé sans suppression dans une archive datée avant création du POC."
+      verified_by: "Comparaison de l'inventaire Git avant/après et présence de ARCHIVES/Tools/TWINBENCH/twinbench_pre_T401_20260927/."
+    - id: AC1
+      statement: "Un fichier Modelica autonome M3_POC.mo s'ouvre dans OMEdit 1.27.1 avec la Modelica Standard Library disponible."
+      verified_by: "Chargement par omc.exe puis ouverture humaine dans OMEdit.exe."
+    - id: AC2
+      statement: "Un exemple prêt à simuler exécute automatiquement un trajet vers Maintenance puis un retour vers Trémie."
+      verified_by: "Simulation de M3_POC.Examples.AllerRetour sans modification manuelle du modèle."
+    - id: AC3
+      statement: "Les courbes position, vitesse, consigne Hz, fréquence simulée, frein et cinq capteurs sont disponibles."
+      verified_by: "Contrôle du fichier résultat OpenModelica et recette dans le navigateur de variables OMEdit."
+    - id: AC4
+      statement: "La géométrie utilise les capteurs 0/5/15/20/30 m et représente séparément les butées hypothétiques -0,30/30,30 m."
+      verified_by: "Assertions Modelica et inspection des paramètres du modèle."
+    - id: AC5
+      statement: "Le gain provisoire 0,02 m/(Hz.s), la limite 50 Hz et le pas de sortie 10 ms sont explicites."
+      verified_by: "Inspection des paramètres et résultat de simulation."
+    - id: AC6
+      statement: "Le modèle est étiqueté POC non fidèle et ne contient aucune logique PLC, connexion réseau ou sortie machine."
+      verified_by: "Revue du fichier et recherche d'API de communication."
+    - id: AC7
+      statement: "Une commande unique lance OMEdit sur le POC et un guide de cinq étapes maximum explique la simulation."
+      verified_by: "Recette humaine Windows du lanceur et du guide."
+    - id: AC8
+      statement: "La plante M3 ne publie aucune variable plate et expose uniquement commands, configuration, measurements, feedback, deviceState et diagnostics conformément au standard TwinBench."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_twinbench_m3_poc_structure.py"
+    - id: AC9
+      statement: "La vue Diagramme de TranslationM3 montre la chaîne commandes-variateur-frein-mouvement-capteurs avec des blocs Modelica reliés."
+      verified_by: "Garde-fou structurel puis recette visuelle humaine dans OMEdit."
+    - id: AC10
+      statement: "Le package Examples contient de nouveau un scénario AllerRetour directement simulable."
+      verified_by: "checkModel et simulation omc.exe de M3_POC.Examples.AllerRetour."
+    - id: AC11
+      statement: "Un contrôleur de banc séparé boucle automatiquement entre les capteurs Trémie et Maintenance sans être intégré à TranslationM3."
+      verified_by: "Inspection de LocalLoopController et simulation de M3_POC.Examples.BoucleLocale."
+    - id: AC12
+      statement: "La boucle permet de configurer fréquence, pauses aux extrémités, nombre de cycles et durée maximale sans communication externe."
+      verified_by: "Deux simulations omc.exe à fréquences différentes et contrôle du compteur de cycles."
+    - id: AC13
+      statement: "La boucle illimitée est représentée par cycleCount=0 et reste bornée par le StopTime de la simulation."
+      verified_by: "Garde-fou structurel et simulation courte de BoucleLocale."
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/
+      - TOOLS/TWINBENCH/modelica_poc_m3/M3_POC.mo
+      - TOOLS/TWINBENCH/modelica_poc_m3/README.md
+      - TOOLS/TWINBENCH/Lancer_POC_M3.bat
+      - ARCHIVES/Tools/TWINBENCH/twinbench_pre_T401_20260927/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T401_POC_OPENMODELICA_M3_MINIMAL.yaml
+      - DOC/WFLOW/CONTRACTS/T401_M3_POC_SIGNAL_CATALOG.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - TOOLS/AGENT_WORKFLOW/scripts/check_twinbench_m3_poc_structure.py
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - pilotage_machine_reelle
+      - communication_PLC
+  conservation:
+    must_survive:
+      - "Dredge.mo et tous les artefacts de l'ancien TwinBench restent intacts dans l'archive datée."
+      - "Le nouveau dossier actif TOOLS/TWINBENCH ne contient que le POC T401 et son lancement."
+      - "La physique ne dépend jamais de la fréquence de rafraîchissement d'une interface."
+      - "Toutes les valeurs non mesurées restent marquées comme hypothèses."
+      - "Aucun calcul de sécurité ou d'autorisation PLC n'est ajouté au modèle."
+    dropped_on_purpose:
+      - "Moteur asynchrone détaillé, rotor bobiné, réseau électrique et modèle AC600."
+      - "Communication CODESYS, OPC UA, PySide6/QML, joystick interactif et rejeu de traces."
+      - "M1, M2, benne, charge suspendue détaillée et défauts avancés."
+  evidence_required:
+    - "check_task_contract.py PASS."
+    - "Inventaire de l'ancien TwinBench conservé dans l'archive datée."
+    - "checkModel et simulate via omc.exe PASS."
+    - "Résultats position/vitesse/fréquence/capteurs cohérents et bornés."
+    - "Recette humaine OMEdit avant promotion vers le modèle principal."
+  alert_duty: >
+    Le POC valide seulement la chaîne ouvrir-modifier-simuler-observer. Il ne
+    valide ni la fidélité mécanique, ni les temps de frein, ni la communication
+    PLC. Tout écart de compilation ou de dynamique est signalé avant extension.
+
+status: READY_FOR_HUMAN_REVIEW
+execution:
+  executed_by: "CDX01"
+  completed_at: "2026-09-27T22:23:16+02:00"
+  status: READY_FOR_HUMAN_REVIEW
+  summary: "Examples régénéré et banc autonome en boucle fermée locale ajouté puis validé avec OpenModelica 1.27.1."
+  evidence_submitted:
+    - "26/26 fichiers suivis de l'ancien TOOLS/TWINBENCH retrouvés dans l'archive datée"
+    - "ARCHIVE_NOTE.md ajouté"
+    - "checkModel: 25 équations / 25 variables, succès"
+    - "simulate 0..70 s, DASSL, intervalle 10 ms: succès"
+    - "Position [-0,30 ; 30,30] m, fréquence [0 ; 39,999] Hz, vitesse [-0,79998 ; 0,79998] m/s"
+    - "Fin de scénario: position -0,30 m, mot capteurs 31 (11111), frein fermé"
+    - "Garde-fou T401: 6 groupes, 32 signaux catalogués, 11 connexions et 5 familles de blocs standards"
+    - "Après refonte graphique: checkModel 54 équations / 54 variables, simulation DASSL 0..70 s réussie"
+    - "Après refonte graphique: position [-0,30 ; 30,30] m, fréquence [0 ; 40] Hz, vitesse [-0,80 ; 0,80] m/s"
+    - "Extension : checkModel AllerRetour 52/52 et BoucleLocale 72/72 PASS."
+    - "AllerRetour 70 s : deux butées mécaniques atteintes, rampe initialisée à 0 Hz."
+    - "BoucleLocale 40 Hz : 2 cycles terminés puis phase 5, position bornée aux capteurs 0..30 m."
+    - "BoucleLocale 20 Hz : 1 cycle terminé puis phase 5, vitesse maximale 0,40 m/s."
+    - "BoucleLocale cycleCount=0 : toujours active après 70 s et au moins un cycle terminé."
+    - "Garde-fous structure et résultats numériques PASS."
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Recette visuelle humaine requise dans OMEdit : paramètres et courbes de Examples.BoucleLocale."

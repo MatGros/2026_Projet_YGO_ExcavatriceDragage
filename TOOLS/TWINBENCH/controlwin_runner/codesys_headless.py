@@ -13,6 +13,93 @@ CONTROL_WIN_TYPE_NAME = "CODESYS Control Win V3 x64"
 CONTROL_WIN_DEVICE_NAME = "PC-Z-VICTUS"
 
 
+HW_SIM_BOOL_SYMBOLS = (
+    "ConveyorInfeedReady_DI",
+    "EmergencyArming_RQ",
+    "EmergencyChainClosed_DI",
+    "HydraulicThermalOk_DI",
+    "JoyBtnRaw",
+    "M1_BrakeIsOpen_DI",
+    "M1_BrakeRelease_RQ",
+    "M1_ContactorsReleased_DI",
+    "M1_M2_KoboldBottomTouch_DI",
+    "M1_M2_KoboldMeasureEnable_RQ",
+    "M1_M2_M3_BrakeThermalOk_DI",
+    "M1_RelayAscent_RQ",
+    "M1_RelayDescent_RQ",
+    "M1_SpeedContactor_1_DQ",
+    "M1_SpeedContactor_2_DQ",
+    "M1_SpeedContactor_3_DQ",
+    "M1_SpeedContactor_4_DQ",
+    "M1_ThermalOk_DI",
+    "M1M2_TopPositionFree_DI",
+    "M2_BrakeIsOpen_DI",
+    "M2_BrakeRelease_RQ",
+    "M2_ContactorsReleased_DI",
+    "M2_RelayAscent_Close_RQ",
+    "M2_RelayDescent_Open_RQ",
+    "M2_SpeedContactor_1_DQ",
+    "M2_SpeedContactor_2_DQ",
+    "M2_SpeedContactor_3_DQ",
+    "M2_SpeedContactor_4_DQ",
+    "M2_TensionedCable_DI",
+    "M2_ThermalOk_DI",
+    "M3_BrakeIsOpen_DI",
+    "M3_BrakeRelease_RQ",
+    "M3_PosMaintenance_DI",
+    "M3_PosP1_DI",
+    "M3_PosPV_DI",
+    "M3_PosPVP2_DI",
+    "M3_PosTremie_DI",
+    "M3_ThermalOK_DI",
+    "PhaseRotationOk_DI",
+    "PowerContactorEngaged_DI",
+    "PowerKeepAlive_A_RQ",
+    "PowerKeepAlive_B_RQ",
+    "TremieFull_OR_GateRaised_DI",
+)
+
+HW_SIM_TYPED_SYMBOLS = (
+    ("COD1_AccValue", "INT", "INT#0"),
+    ("COD1_Alarms", "UINT", "UINT#0"),
+    ("COD1_CodeSeqTrigCmd", "WORD", "WORD#0"),
+    ("COD1_PosValue", "UDINT", "UDINT#0"),
+    ("COD1_PresettTrigCmd", "WORD", "WORD#0"),
+    ("COD1_PresetValue", "UDINT", "UDINT#0"),
+    ("COD1_SpdValue", "DINT", "DINT#0"),
+    ("COD1_Warnings", "UINT", "UINT#0"),
+    ("COD2_AccValue", "INT", "INT#0"),
+    ("COD2_Alarms", "UINT", "UINT#0"),
+    ("COD2_CodeSeqTrigCmd", "WORD", "WORD#0"),
+    ("COD2_PosValue", "UDINT", "UDINT#0"),
+    ("COD2_PresettTrigCmd", "WORD", "WORD#0"),
+    ("COD2_PresetValue", "UDINT", "UDINT#0"),
+    ("COD2_SpdValue", "DINT", "DINT#0"),
+    ("COD2_Warnings", "UINT", "UINT#0"),
+    ("JoyXRaw_ANA1", "INT", "INT#5000"),
+    ("JoyYRaw_ANA2", "INT", "INT#5000"),
+    ("joyANA3", "INT", "INT#0"),
+    ("joyANA4", "INT", "INT#0"),
+    ("M3_ActualFrequencyHz", "UINT", "UINT#0"),
+    ("M3_CommandWord", "WORD", "WORD#0"),
+    ("M3_SetpointFrequencyHz", "WORD", "WORD#0"),
+    ("M3_StatusWord", "WORD", "WORD#0"),
+)
+
+HW_SIM_DEVICE_CALLS = (
+    ("AC600_ECAT_Drive.GetDeviceState()", "DEVICE_STATE.RUNNING"),
+    ("COD1_CODEUR.GetDeviceState()", "DEVICE_STATE.RUNNING"),
+    ("COD2_CODEUR.GetDeviceState()", "DEVICE_STATE.RUNNING"),
+    ("JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState()", "DEVICE_STATE.RUNNING"),
+    ("Local_Digital_IO.GetDeviceState()", "DEVICE_STATE.RUNNING"),
+    ("VH_0800END.GetDeviceState()", "DEVICE_STATE.RUNNING"),
+    ("VH_0808ETP.GetDeviceState()", "DEVICE_STATE.RUNNING"),
+    ("VH_0008ER.GetDeviceState()", "DEVICE_STATE.RUNNING"),
+    ("VH_0008ER_1.GetDeviceState()", "DEVICE_STATE.RUNNING"),
+    ("CANbus.GetBusState()", "2"),
+)
+
+
 def env(name, required=True):
     value = os.environ.get(name, "")
     if required and not value:
@@ -37,6 +124,15 @@ def object_name(obj):
             return str(obj.name)
         except:
             return str(obj)
+
+
+def public_members(obj):
+    names = []
+    for name in dir(obj):
+        if not str(name).startswith("_"):
+            names.append(str(name))
+    names.sort()
+    return names
 
 
 def find_root_device(project):
@@ -130,6 +226,74 @@ def extract_archive(archive_path, project_path):
     project.close()
 
 
+def apply_hw_sim_compat(native_path, result):
+    """Adapt only the disposable native export used by the Control Win copy."""
+    handle = open(native_path, "r")
+    try:
+        text = handle.read()
+    finally:
+        handle.close()
+
+    original = text
+    substitutions = []
+    for source, replacement in HW_SIM_DEVICE_CALLS:
+        count = text.count(source)
+        if count:
+            text = text.replace(source, replacement)
+            substitutions.append({"source": source, "replacement": replacement,
+                                  "count": count})
+
+    define = "VISU_USEPROPERTYINFO, "
+    define_count = text.count(define)
+    if define_count:
+        text = text.replace(define, "")
+
+    name_marker = '<Single Name="Name" Type="string">GVL_Global</Single>'
+    name_at = text.find(name_marker)
+    if name_at < 0:
+        raise Exception("Adaptateur HW_SIM: GVL_Global introuvable dans l export natif.")
+    blob_marker = '<Single Name="TextBlobForSerialisation" Type="string">'
+    blob_at = text.find(blob_marker, name_at)
+    blob_end = text.find("</Single>", blob_at)
+    if blob_at < 0 or blob_end < 0:
+        raise Exception("Adaptateur HW_SIM: declaration GVL_Global illisible.")
+
+    content_at = blob_at + len(blob_marker)
+    declaration = text[content_at:blob_end]
+    qualified = "{attribute 'qualified_only' := ''}"
+    if qualified not in declaration:
+        raise Exception("Adaptateur HW_SIM: garde qualified_only GVL_Global absente.")
+    if declaration.count("END_VAR") != 1:
+        raise Exception("Adaptateur HW_SIM: structure GVL_Global inattendue.")
+
+    lines = [
+        "",
+        "\t/// TwinBench HW_SIM - genere uniquement dans la copie Control Win",
+    ]
+    for symbol in HW_SIM_BOOL_SYMBOLS:
+        lines.append("\t%s : BOOL := FALSE;" % symbol)
+    for symbol, type_name, initial_value in HW_SIM_TYPED_SYMBOLS:
+        lines.append("\t%s : %s := %s;" % (symbol, type_name, initial_value))
+    declaration = declaration.replace(qualified + "\n", "", 1)
+    declaration = declaration.replace("END_VAR", "\n".join(lines) + "\nEND_VAR", 1)
+    text = text[:content_at] + declaration + text[blob_end:]
+
+    if text == original:
+        raise Exception("Adaptateur HW_SIM: aucune modification appliquee.")
+    handle = open(native_path, "w")
+    try:
+        handle.write(text)
+    finally:
+        handle.close()
+    result["hw_sim_compat"] = {
+        "scope": "derived_native_export_only",
+        "bool_symbols": len(HW_SIM_BOOL_SYMBOLS),
+        "typed_symbols": len(HW_SIM_TYPED_SYMBOLS),
+        "device_call_substitutions": substitutions,
+        "visualization_define_removed": define_count,
+    }
+
+
 def prepare_from_import(source_path, destination_path, result):
     source = open_project(source_path)
     native_path = os.path.join(os.path.dirname(destination_path),
@@ -146,6 +310,8 @@ def prepare_from_import(source_path, destination_path, result):
                              one_file_per_subtree=False)
     finally:
         source.close()
+
+    apply_hw_sim_compat(native_path, result)
 
     target_id = device_repository.create_device_identification(
         CONTROL_WIN_TYPE, CONTROL_WIN_ID, CONTROL_WIN_VERSION)
@@ -178,7 +344,7 @@ def prepare_from_import(source_path, destination_path, result):
     application, errors, warnings, messages = build_project(project)
     result["error_count"] = errors
     result["warning_count"] = warnings
-    result["messages"] = messages[:200]
+    result["messages"] = messages
     if errors:
         raise Exception("Compilation Control Win refusee: %s erreur(s)." % errors)
 
@@ -278,6 +444,12 @@ def main():
             result["device_identification"] = identification
             result["communication"] = communication
             if action == "inspect":
+                result["success"] = True
+            elif action == "introspect":
+                application = project.active_application
+                result["application_members"] = public_members(application)
+                result["application_parent_members"] = public_members(application.parent)
+                result["project_members"] = public_members(project)
                 result["success"] = True
             elif action == "deploy":
                 deploy(project, result)

@@ -1,0 +1,51 @@
+version: 1
+scope: M3_POC.TranslationM3
+purpose: "Contrat des variables publiques du POC graphique M3."
+roles:
+  CMD: "Commande appliquée à la plante ; aucune autorité de sécurité."
+  CFG: "Paramètre de modèle ; valeur confirmée, simplifiée ou hypothétique."
+  HW: "Mesure ou retour matériel simulé."
+  DIAG: "Diagnostic de cohérence ; aucune autorité de mouvement."
+role_profiles:
+  CMD: {kind: Command, access: write, authority: Adapter, source_stage: Cmd}
+  CFG: {kind: Configuration, access: parameter, authority: ModelOwner, calibration_status: assumed}
+  HW: {kind: Measurement, access: read, authority: Model, source_stage: Act}
+  DIAG: {kind: Diagnostic, access: read, authority: Model}
+signals:
+  - {name: commands.cmdMoveToTremie, direction: input, role: CMD, data_type: Boolean, unit: bool, label: "Commande vers Trémie", polarity: "TRUE = mouvement demandé"}
+  - {name: commands.cmdMoveToMaintenance, direction: input, role: CMD, data_type: Boolean, unit: bool, label: "Commande vers Maintenance", polarity: "TRUE = mouvement demandé"}
+  - {name: commands.cmdBrakeRelease, direction: input, role: CMD, data_type: Boolean, unit: bool, label: "Demande desserrage frein", polarity: "TRUE = desserrage demandé"}
+  - {name: commands.cmdFrequency_Hz, direction: input, role: CMD, data_type: Real, unit: Hz, label: "Consigne fréquence"}
+
+  - {name: configuration.frequencyMax_Hz, direction: parameter, role: CFG, data_type: Real, unit: Hz, label: "Fréquence maximale", status: CODE_PLC}
+  - {name: configuration.gain_MpsPerHz, direction: parameter, role: CFG, data_type: Real, unit: "m/(s.Hz)", label: "Gain vitesse/fréquence", status: HYPOTHESE}
+  - {name: configuration.acceleration_HzPerS, direction: parameter, role: CFG, data_type: Real, unit: "Hz/s", label: "Rampe accélération", status: CODE_PLC}
+  - {name: configuration.deceleration_HzPerS, direction: parameter, role: CFG, data_type: Real, unit: "Hz/s", label: "Rampe décélération", status: CODE_PLC}
+  - {name: configuration.brakeOpenTime_S, direction: parameter, role: CFG, data_type: Real, unit: s, label: "Temps ouverture frein", status: SIMPLIFIE}
+  - {name: configuration.brakeCloseTime_S, direction: parameter, role: CFG, data_type: Real, unit: s, label: "Temps fermeture frein", status: HYPOTHESE}
+  - {name: configuration.tremieSensor_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Position capteur Trémie", status: CODE_PLC}
+  - {name: configuration.pvSensor_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Position capteur PV", status: CODE_PLC}
+  - {name: configuration.p2Sensor_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Position capteur P2", status: CODE_PLC}
+  - {name: configuration.p1Sensor_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Position capteur P1", status: CODE_PLC}
+  - {name: configuration.maintenanceSensor_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Position capteur Maintenance", status: CODE_PLC}
+  - {name: configuration.tremieMechanicalStop_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Butée mécanique Trémie", status: HYPOTHESE}
+  - {name: configuration.maintenanceMechanicalStop_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Butée mécanique Maintenance", status: HYPOTHESE}
+
+  - {name: measurements.positionAct_M, direction: output, role: HW, kind: Measurement, data_type: Real, unit: m, label: "Position chariot"}
+  - {name: measurements.velocityAct_Mps, direction: output, role: HW, kind: Measurement, data_type: Real, unit: "m/s", label: "Vitesse chariot"}
+  - {name: measurements.frequencyCmd_Hz, direction: output, role: HW, kind: Measurement, data_type: Real, unit: Hz, label: "Consigne fréquence bornée"}
+  - {name: measurements.frequencyAct_Hz, direction: output, role: HW, kind: Measurement, data_type: Real, unit: Hz, label: "Fréquence variateur simulée"}
+
+  - {name: feedback.brakeIsOpen, direction: output, role: HW, kind: DiscreteFeedback, data_type: Boolean, unit: bool, label: "Frein ouvert", polarity: "TRUE = frein ouvert"}
+  - {name: feedback.tremiePositionIsActive, direction: output, role: HW, kind: DiscreteFeedback, data_type: Boolean, unit: bool, label: "Capteur Trémie", polarity: "TRUE = actif"}
+  - {name: feedback.pvPositionIsActive, direction: output, role: HW, kind: DiscreteFeedback, data_type: Boolean, unit: bool, label: "Capteur PV", polarity: "TRUE = actif"}
+  - {name: feedback.p2PositionIsActive, direction: output, role: HW, kind: DiscreteFeedback, data_type: Boolean, unit: bool, label: "Capteur P2", polarity: "TRUE = actif"}
+  - {name: feedback.p1PositionIsActive, direction: output, role: HW, kind: DiscreteFeedback, data_type: Boolean, unit: bool, label: "Capteur P1", polarity: "TRUE = actif"}
+  - {name: feedback.maintenancePositionIsActive, direction: output, role: HW, kind: DiscreteFeedback, data_type: Boolean, unit: bool, label: "Capteur Maintenance", polarity: "TRUE = actif"}
+
+  - {name: deviceState.driveStatusWord, direction: output, role: HW, kind: DeviceState, data_type: Integer, unit: word, label: "StatusWord AC600 simplifié"}
+  - {name: deviceState.sensorsWord, direction: output, role: HW, kind: DeviceState, data_type: Integer, unit: word, label: "Mot capteurs cumulatif"}
+
+  - {name: diagnostics.commandConflict, direction: output, role: DIAG, data_type: Boolean, unit: bool, label: "Conflit commandes de sens"}
+  - {name: diagnostics.hardStopTremieActive, direction: output, role: DIAG, data_type: Boolean, unit: bool, label: "Commande contre butée Trémie"}
+  - {name: diagnostics.hardStopMaintenanceActive, direction: output, role: DIAG, data_type: Boolean, unit: bool, label: "Commande contre butée Maintenance"}

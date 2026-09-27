@@ -1,0 +1,82 @@
+contract:
+  task_id: T402
+  criticality: C2
+  strategy: patch
+  objective: >
+    Prouver un échange aller-retour avec l'application actuellement exécutée
+    dans le simulateur intégré CODESYS, sur un périmètre M3 minimal, sans OPC UA,
+    sans Modelica et sans modification du code PLC.
+  acceptance:
+    - id: AC1
+      statement: "Le POC utilise exclusivement l'API ScriptEngine installée avec CODESYS 3.5.19.10."
+      verified_by: "Revue du script et références ScriptOnline.pyi/ScriptDeviceObject.pyi."
+    - id: AC2
+      statement: "Le mode lecture affiche les commandes finales M3 et les retours simulés M3 réellement lus dans l'application en ligne."
+      verified_by: "Recette dans Tools > Scripting avec POC_ACTION=probe."
+    - id: AC3
+      statement: "Le mode pulse_maintenance refuse toute écriture si le Device CODESYS n'est pas en mode Simulation IDE."
+      verified_by: "Contrôle obligatoire get_simulation_mode() avant set_prepared_value()."
+    - id: AC4
+      statement: "Le test écrit SimBtnMaintenance sans forçage, relit les commandes/retours puis restaure FALSE dans un finally."
+      verified_by: "Revue mécanique du script et recette humaine CODESYS."
+    - id: AC5
+      statement: "Aucun CODE/, CODE_XML/, PRJ_CODESYS/ ou réglage de runtime n'est modifié."
+      verified_by: "git status ciblé et revue du périmètre."
+    - id: AC6
+      statement: "Un garde-fou automatique détecte l'absence des contrôles simulation, du finally de restauration ou l'usage du forçage."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_codesys_m3_roundtrip_poc.py"
+  scope:
+    allowed:
+      - TOOLS/PLC_CSV_SNAPSHOT/codesys_console/codesys_m3_roundtrip_poc.py
+      - TOOLS/PLC_CSV_SNAPSHOT/codesys_console/codesys_m3_roundtrip_pulse_maintenance.py
+      - TOOLS/PLC_CSV_SNAPSHOT/docs/M3_ROUNDTRIP_POC.md
+      - TOOLS/AGENT_WORKFLOW/scripts/check_codesys_m3_roundtrip_poc.py
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T402_POC_COMMUNICATION_CODESYS_SIM_M3.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - Device.export
+      - force_prepared_values
+      - runtime_reel
+      - OPC_UA
+      - OpenModelica
+  conservation:
+    must_survive:
+      - "Le mode par défaut est probe, strictement en lecture seule."
+      - "L'écriture est limitée à GVL_Simulation.SimBtnMaintenance et toujours annulée."
+      - "Le POC refuse le mode pulse si SimulationModeActive ou SimTranslationActive ne sont pas TRUE."
+      - "Aucun login ne télécharge ni ne change l'application."
+    dropped_on_purpose:
+      - "Communication continue temps réel."
+      - "Couplage OpenModelica."
+      - "Injection des retours frein, fréquence et capteurs depuis une plante externe."
+  evidence_required:
+    - "check_task_contract.py PASS."
+    - "Garde-fou POC PASS."
+    - "Recette humaine probe dans CODESYS Simulation."
+    - "Recette humaine pulse_maintenance puis preuve de restauration FALSE."
+  alert_duty: >
+    Ce POC ne prouve qu'un échange ponctuel avec le simulateur intégré à l'IDE.
+    Il ne valide ni cadence temps réel, ni OPC UA, ni liaison Modelica, ni sécurité
+    d'une cible réelle. Toute détection d'un Device hors mode Simulation interdit l'écriture.
+
+status: IN_PROGRESS
+execution:
+  executed_by: "CDX01"
+  completed_at: "2026-09-27T11:30:24+02:00"
+  status: COMPLETED
+  summary: "POC ScriptEngine M3 créé et contrôlé statiquement ; recette CODESYS encore requise."
+  evidence_submitted:
+    - "check_task_contract.py PASS."
+    - "check_codesys_m3_roundtrip_poc.py PASS."
+    - "python -m py_compile du script CODESYS PASS."
+    - "Lanceur pulse_maintenance sans paramètre ajouté et contrôlé."
+    - "Périmètre limité aux outils ScriptEngine et documentation ; aucun CODE/ modifié."
+validation:
+  status: APPROVED
+  validated_by: "HUM"
+  validated_at: "2026-09-27T11:05:58+02:00"
+  notes: "GO utilisateur explicite : attaquer le POC communication avec le simulateur CODESYS."

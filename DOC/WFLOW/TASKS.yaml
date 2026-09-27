@@ -1,4 +1,141 @@
 tasks:
+- id: T405
+  parent_id: T399
+  statut: ⏳
+  criticite: C2
+  domaine: OUTILLAGE / SIMULATION / OPENMODELICA / INTERFACE LIVE
+  agent: CDX01
+  date: '2026-09-27T23:57:33+02:00'
+  titre: 'POC M3 live — joystick PySide6/QML et FMU OpenModelica à pas de 10 ms'
+  contexte: 'La simulation OMEdit par lot et ses graphes ne permettent pas de comprendre facilement les entrées/sorties des blocs ni de modifier une commande pendant l exécution. Un POC isolé doit prouver une interaction directe avec la même plante M3 compilée par OpenModelica.'
+  description: 'Compiler une façade scalaire de TranslationM3 en FMU FMI 2.0 Co-Simulation, la piloter localement avec OMSimulator par pas de communication de 10 ms et fournir une interface PySide6/QML montrant joystick, consigne, fréquence, frein, position, vitesse, capteurs et trace courte.'
+  objectifs:
+  - 'Modifier direction et fréquence pendant que la simulation tourne.'
+  - 'Avancer la FMU par pas de communication déterministes de 10 ms.'
+  - 'Afficher les entrées et sorties instantanées sans dépendre des graphes OMEdit.'
+  - 'Séparer la cadence physique 10 ms du rafraîchissement graphique plus lent.'
+  - 'Rester entièrement local, hors PLC, CODESYS, réseau et machine réelle.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T405_POC_M3_LIVE_FMU_QML.yaml
+  avancement: 'Tâche cadrée et verrouillée après validation humaine du principe. Implémentation en cours.'
+  bloque_par: []
+- id: T404
+  parent_id: T399
+  statut: ⏳
+  criticite: C2
+  domaine: OUTILLAGE / SIMULATION / CODESYS CONTROL WIN
+  agent: CDX01
+  date: '2026-09-27T15:43:21+02:00'
+  titre: 'Control Win Runner isole — copier, deployer et ouvrir le projet simule'
+  contexte: 'Le changement manuel de device dans le projet reel a supprime les mappings E/S et provoque une regression. Avant le couplage OM ou le benchmark UDP, il faut prouver une chaine reproductible qui ne manipule qu une copie et ne peut pas contacter le PLC reel.'
+  description: 'Construire un lanceur qui demande un projet, l archive et cree une copie de travail fixe, compile cette copie en CODESYS headless, n autorise qu une cible Control Win puis permet d ouvrir la meme copie dans l IDE pour la visualisation en ligne.'
+  objectifs:
+  - 'Garantir par empreinte que le projet selectionne reste inchange.'
+  - 'Conserver une copie horodatee et une copie de travail stable.'
+  - 'Compiler la copie en mode headless avant tout deploiement.'
+  - 'Interdire toute cible autre que CODESYS Control Win V3 x64.'
+  - 'Ouvrir exactement la copie deployee pour Watch, Trace et visu en ligne.'
+  - 'Rapporter les incompatibilites E/S sans modifier la logique PLC.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T404_CONTROL_WIN_RUNNER_ISOLE.yaml
+  avancement: 'Runner et adaptateur HW_SIM dérivé testés : original garanti inchangé par SHA-256, projet Control Win neuf créé, Application native importée. Les 293 erreurs matérielles initiales sont corrigées uniquement dans la copie ; compilation = 0 erreur/1 avertissement. État PREPARED, aucun déploiement effectué.'
+  bloque_par: []
+- id: T403
+  parent_id: T399
+  statut: ⏳
+  criticite: C2
+  domaine: OUTILLAGE / SIMULATION / OPENMODELICA / CODESYS
+  agent: CDX01
+  date: '2026-09-27T12:15:00+02:00'
+  titre: 'Aiguillage M3 SimBench entre modele ST et interface OpenModelica'
+  contexte: 'Le FB_SimBench doit rester l enveloppe unique de simulation. OpenModelica doit pouvoir fournir la meme image ST_HwTranslation que le modele ST interne, sans modifier la logique metier PLC.'
+  description: 'Ajouter un bit de selection M3 et une image de retours OpenModelica dans GVL_Simulation, puis aiguiller uniquement la sortie Translation du FB_SimBench. SimulationModeActive reste le verrou maitre et le modele ST reste le repli.'
+  objectifs:
+  - 'Conserver FB_SimBench, HwReal, HwSim et HwIn sans suppression.'
+  - 'Desactiver tout effet OM lorsque SimulationModeActive est FALSE.'
+  - 'Selectionner le modele ST M3 ou l image OpenModelica par un seul bit.'
+  - 'Ne modifier ni la logique metier M3 ni les sorties physiques PRG_06.'
+  - 'Fournir une interface ST_HwTranslation publique pour le futur pont om.exe.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T403_AIGUILLAGE_M3_OPENMODELICA.yaml
+  avancement: 'Aiguillage implemente dans FB_SimBench : SimM3OpenModelicaActive selectionne le modele ST ou l image ST_HwTranslation OM. Bundle 262/262 sans erreur, G200 PASS 0 erreur. NOTE_APPLICATION_T403 trace les tests et limites. Recette CODESYS et raccordement om.exe restent a valider.'
+  bloque_par: []
+- id: T402
+  parent_id: T399
+  statut: ⏳
+  criticite: C2
+  domaine: OUTILLAGE / SIMULATION / COMMUNICATION CODESYS
+  agent: CDX01
+  date: '2026-09-27T11:34:44+02:00'
+  titre: 'POC aller-retour M3 avec le simulateur intégré CODESYS'
+  contexte: 'Le POC Modelica utilisait un scénario implicite à la place des commandes et retours PLC. Avant de coupler OpenModelica, il faut prouver une lecture et une écriture contrôlée dans la simulation intégrée à l IDE CODESYS.'
+  description: 'Créer un script ScriptEngine exécuté dans Tools Scripting. Le mode probe lit les commandes finales et retours M3. Le mode pulse_maintenance écrit brièvement SimBtnMaintenance puis restaure FALSE. Toute écriture est interdite hors Simulation IDE.'
+  objectifs:
+  - 'Utiliser exclusivement l API ScriptEngine installée avec CODESYS 3.5.19.10.'
+  - 'Lire les commandes finales M3 et les retours de la plante simulée.'
+  - 'Prouver une écriture ponctuelle sans forçage et avec restauration garantie.'
+  - 'Refuser automatiquement l écriture hors mode Simulation IDE.'
+  - 'Ne modifier ni CODE, ni le projet CODESYS, ni le modèle OpenModelica.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T402_POC_COMMUNICATION_CODESYS_SIM_M3.yaml
+  avancement: 'POC ScriptEngine créé : probe lecture seule et lanceur pulse_maintenance Python 3 sans paramètre. Correction appliquée : propagation de la portée CODESYS (projects/online) vers le lanceur. Simulation-only avec restauration garantie ; contrat, syntaxe Python et garde-fou PASS. En attente de recette dans Tools > Scripting CODESYS.'
+  bloque_par: []
+- id: T401
+  parent_id: T399
+  statut: ⏳
+  criticite: C2
+  domaine: OUTILLAGE / SIMULATION / POC OPENMODELICA
+  agent: CDX01
+  date: '2026-09-27T22:23:16+02:00'
+  titre: 'POC rapide M3 — fichier OpenModelica autonome ouvrable et simulable dans OMEdit'
+  contexte: 'Avant l application Windows, la communication PLC et le modèle électromécanique détaillé, l utilisateur demande une preuve simple et rapide de la chaîne ouvrir, simuler et observer dans OpenModelica.'
+  description: 'Créer un modèle M3 isolé avec un scénario aller-retour automatique, les cinq capteurs, les deux butées hypothétiques, une rampe fréquence simplifiée et un frein simplifié. Le POC doit fonctionner directement dans OMEdit sans PLC, Python, serveur web ni FMU.'
+  objectifs:
+  - 'Ouvrir M3_POC.mo directement avec OMEdit 1.27.1.'
+  - 'Simuler un aller vers Maintenance puis un retour vers Trémie en un clic.'
+  - 'Tracer position, vitesse, consigne Hz, fréquence, frein et cinq capteurs.'
+  - 'Utiliser 50 Hz = 1 m/s comme hypothèse provisoire clairement marquée.'
+  - 'Valider compilation et simulation avec omc.exe avant recette humaine.'
+  - 'Ne modifier ni Dredge.mo, ni le PLC, ni le prototype web.'
+  - 'Régénérer Examples.AllerRetour et ajouter une boucle locale configurable séparée de la plante.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T401_POC_OPENMODELICA_M3_MINIMAL.yaml
+  avancement: 'Extension générée et validée par omc.exe 1.27.1 : Examples.AllerRetour restauré ; Examples.BoucleLocale configurable ajouté avec contrôleur séparé, retours capteurs, pauses et cycles bornés ou illimités. Tests 40 Hz/2 cycles, 20 Hz/1 cycle et cycleCount=0 PASS. En attente de recette visuelle OMEdit.'
+  bloque_par: []
+- id: T400
+  parent_id: T399
+  statut: ⏳
+  criticite: C2
+  domaine: OUTILLAGE / SIMULATION / MODELISATION M3
+  agent: CDX01
+  date: '2026-09-27T10:07:52+02:00'
+  titre: 'Translation M3 — fiche récapitulative des données de modélisation'
+  contexte: 'La modélisation OpenModelica de M3 nécessite une référence courte distinguant les faits du code PLC, les données de plaque moteur, les hypothèses utilisateur, les écarts du SimBench actuel et les mesures encore nécessaires.'
+  description: 'Consolider la géométrie, les capteurs, la motorisation, les rampes, le frein, l interface du modèle et les inconnues mécaniques sur une fiche unique, sans modification du PLC ni du TwinBench.'
+  objectifs:
+  - 'Recenser les valeurs réellement câblées dans le code, pas seulement les valeurs par défaut des types.'
+  - 'Tracer les données de la plaque HELMKE sans inventer le réducteur ni la position du frein.'
+  - 'Identifier explicitement les hypothèses de butées et les écarts du SimBench actuel.'
+  - 'Définir la chaîne physique Modelica et l interface minimale PLC/plante.'
+  - 'Lister les mesures indispensables avant toute revendication de fidélité terrain.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T400_FICHE_MODELISATION_M3.yaml
+  avancement: 'Fiche rédigée le 2026-09-27 ; en attente de relecture humaine des hypothèses physiques et des données plaque.'
+  bloque_par: []
+- id: T399
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: OUTILLAGE / SIMULATION / ARCHITECTURE HYBRIDE
+  agent: CDX01
+  date: '2026-09-27T09:57:46+02:00'
+  titre: 'TwinBench hybride — feuille de route CODESYS, OpenModelica et application Windows'
+  contexte: 'La reprise TwinBench doit utiliser OpenModelica comme source physique, une application PySide6/QML comme interface et une communication locale avec le runtime CODESYS pour accéder aux variables réelles. Le protocole disponible, les droits, la charge de communication et la séparation machine réelle/banc virtuel ne sont pas encore vérifiés. Le prototype web autonome est conservé hors chemin critique.'
+  description: 'Structurer le projet en phases avec lots obligatoires, conditionnels et hypothétiques. Définir les responsabilités PLC/passerelle/OpenModelica/IHM, les jalons GO/NO-GO, l ordre de réalisation, les mesures manquantes et les conditions minimales avant toute lecture ou écriture dans le runtime CODESYS.'
+  objectifs:
+  - 'Inventorier la communication réellement disponible dans le runtime CODESYS avant de choisir OPC UA ou une solution de repli.'
+  - 'Figer un contrat de signaux typé, horodaté et atomique par domaine.'
+  - 'Construire et valider M3 hors ligne avant toute intégration PLC.'
+  - 'Limiter la première connexion PLC à la lecture seule puis décider séparément du mode shadow et de la boucle virtuelle.'
+  - 'Reporter M1/M2 et la benne après obtention des mesures mécaniques minimales.'
+  - 'Interdire tout calcul physique dans l IHM et tout pilotage de la machine réelle par OpenModelica.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T399_TWINBENCH_HYBRID_ROADMAP.yaml
+  avancement: 'Feuille de route rédigée le 2026-09-27. En attente de validation humaine avant activation du premier lot P0.1.'
+  bloque_par: []
 - id: T397
   parent_id: ''
   statut: ⬜

@@ -1,0 +1,73 @@
+contract:
+  task_id: T399
+  criticality: C2
+  strategy: rebuild
+  objective: >
+    Organiser la reprise de TwinBench autour d'OpenModelica, d'une application
+    Windows et d'une communication locale avec le runtime CODESYS, en séparant
+    les étapes obligatoires des intégrations conditionnelles et en interdisant
+    tout pilotage involontaire de la machine réelle.
+  acceptance:
+    - id: AC1
+      statement: "La feuille de route découpe le projet en phases ordonnées avec critères d'entrée et de sortie."
+      verified_by: "Revue de PLAN_T399_TWINBENCH_HYBRID_PLC_OPENMODELICA.md."
+    - id: AC2
+      statement: "Chaque lot est marqué OBLIGATOIRE, CONDITIONNEL ou HYPOTHESE et possède un niveau de criticité prévisionnel."
+      verified_by: "Tableau des lots de la feuille de route."
+    - id: AC3
+      statement: "La frontière PLC, passerelle, OpenModelica et interface opérateur attribue un propriétaire unique à chaque calcul."
+      verified_by: "Diagramme d'architecture et matrice de responsabilités."
+    - id: AC4
+      statement: "La connexion initiale au runtime CODESYS est strictement en lecture seule et tout retour HwSim reste conditionné à un banc virtualisé dont les sorties physiques sont neutralisées et prouvées."
+      verified_by: "Garde-fous et jalons GO/NO-GO de la feuille de route."
+    - id: AC5
+      statement: "Les dépendances avec T304 et T314 sont explicites et aucun prototype web ne porte de calcul physique."
+      verified_by: "Section héritage et décisions de la feuille de route."
+    - id: AC6
+      statement: "Aucun fichier CODE/, CODE_XML/, PRJ_CODESYS/ ou TOOLS/TWINBENCH/ n'est modifié pendant le cadrage."
+      verified_by: "git diff --name-only limité aux documents de pilotage autorisés."
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T399_TWINBENCH_HYBRID_ROADMAP.yaml
+      - DOC/WFLOW/CONTRACTS/PLAN_T399_TWINBENCH_HYBRID_PLC_OPENMODELICA.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - TOOLS/TWINBENCH/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "T314 reste le socle OpenModelica Windows et n'est pas réécrit par ce cadrage."
+      - "FB_SimBench et l'aiguillage atomique HwReal/HwSim/HwIn restent la référence PLC actuelle."
+      - "Le PLC reste propriétaire des sécurités, interlocks, réarmements et sorties physiques."
+      - "La branche feature/twinbench-m3-native reste conservée comme prototype historique séparé."
+    dropped_on_purpose:
+      - "Le simulateur web autonome n'est plus une source de physique ni le chemin principal du projet."
+  evidence_required:
+    - "Contrat T399 contrôlé sans erreur."
+    - "Feuille de route relue avec phases, dépendances, décisions et critères GO/NO-GO."
+    - "Diff documentaire uniquement."
+  alert_duty: >
+    Toute capacité supposée du runtime CODESYS (OPC UA, Symbol Configuration,
+    licence ou droits d'écriture) reste une hypothèse tant qu'elle n'est pas
+    vérifiée sur l'installation cible. Aucune écriture PLC ne peut être déduite
+    de la seule disponibilité d'une connexion locale.
+
+status: COMPLETED
+execution:
+  executed_by: "CDX01"
+  completed_at: "2026-09-27T09:57:46+02:00"
+  status: COMPLETED
+  summary: "Feuille de route structurée en six phases, avec lots obligatoires, conditionnels et hypothétiques, jalons GO/NO-GO et données manquantes."
+  evidence_submitted:
+    - "check_task_contract.py: PASS (0 erreur, 0 avertissement)"
+    - "PLAN_T399_TWINBENCH_HYBRID_PLC_OPENMODELICA.md rédigé"
+    - "Aucune modification de CODE/, CODE_XML/, PRJ_CODESYS/ ou TOOLS/TWINBENCH/"
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Validation humaine requise avant activation d'un lot d'implémentation."

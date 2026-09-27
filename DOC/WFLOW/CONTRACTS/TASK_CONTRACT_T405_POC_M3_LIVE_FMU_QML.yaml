@@ -1,0 +1,80 @@
+contract:
+  task_id: T405
+  criticality: C2
+  strategy: rebuild
+  objective: >
+    Prouver qu une interface locale PySide6/QML peut modifier en direct les
+    commandes de la plante M3 compilée par OpenModelica et observer ses sorties
+    en avançant une FMU par pas de communication de 10 ms.
+  acceptance:
+    - id: AC1
+      statement: "Une façade FMU expose des entrées et sorties M3 scalaires, sans modifier le modèle T401 validé."
+      verified_by: "Inspection du modelDescription.xml et garde-fou Python dédié."
+    - id: AC2
+      statement: "La FMU FMI 2.0 Co-Simulation est générée avec omc.exe 1.27.1 depuis les sources Modelica."
+      verified_by: "Script de construction puis présence et inspection de M3_LiveFMU.fmu."
+    - id: AC3
+      statement: "Le moteur OMSimulator applique les commandes puis avance la FMU par pas de 0,01 s."
+      verified_by: "Test headless avec comptage des pas, temps simulé et valeurs de sortie."
+    - id: AC4
+      statement: "Direction et fréquence peuvent changer pendant une exécution sans recompilation ni resimulation complète."
+      verified_by: "Scénario automatisé changeant les entrées au cours d une même instance FMU."
+    - id: AC5
+      statement: "L interface montre au minimum joystick, fréquence commandée/mesurée, frein, vitesse, position et cinq capteurs."
+      verified_by: "Recette visuelle humaine et inventaire des propriétés QML."
+    - id: AC6
+      statement: "La cadence graphique ne modifie jamais le temps ni la physique de la FMU."
+      verified_by: "Revue de séparation SimulationEngine/QML et test headless sans interface."
+    - id: AC7
+      statement: "Un lanceur unique vérifie OpenModelica, prépare un environnement Python isolé et démarre le POC."
+      verified_by: "Autotest du lanceur ; aucune installation globale Python."
+    - id: AC8
+      statement: "Le POC ne contient aucune communication PLC, CODESYS, réseau ou sortie machine."
+      verified_by: "Recherche mécanique des API interdites et revue du périmètre."
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/modelica_poc_m3/live_poc/
+      - TOOLS/TWINBENCH/Lancer_POC_M3_Live.bat
+      - TOOLS/AGENT_WORKFLOW/scripts/check_twinbench_m3_live_poc.py
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T405_POC_M3_LIVE_FMU_QML.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - TOOLS/TWINBENCH/modelica_poc_m3/M3_POC.mo
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - communication_PLC
+      - pilotage_machine_reelle
+  conservation:
+    must_survive:
+      - "Le POC T401 OMEdit reste inchangé et directement simulable."
+      - "La physique M3 provient de M3_POC.TranslationM3, sans duplication de ses équations."
+      - "Le pas FMU vaut 10 ms ; le rafraîchissement UI peut être plus lent."
+      - "Les hypothèses physiques T401 restent identifiées comme telles."
+    dropped_on_purpose:
+      - "Communication PLC et synchronisation temps réel dur."
+      - "Fidélité mécanique terrain et validation sécurité machine."
+      - "Édition graphique générique de modèles Modelica."
+  evidence_required:
+    - "check_task_contract.py PASS."
+    - "Construction FMU par omc.exe PASS."
+    - "Scénario headless interactif PASS."
+    - "Garde-fou T405 PASS."
+    - "Recette visuelle humaine PySide6/QML en attente ou validée."
+  alert_duty: >
+    Le pas FMI de 10 ms est un pas de communication logiciel sous Windows et ne
+    constitue pas une garantie temps réel. Toute dérive de cadence ou différence
+    entre temps simulé et temps mural doit être affichée, jamais masquée.
+status: IN_PROGRESS
+execution:
+  executed_by: "CDX01"
+  completed_at: ""
+  status: PENDING
+  summary: "Implémentation en cours."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Recette humaine de l interface live requise."
