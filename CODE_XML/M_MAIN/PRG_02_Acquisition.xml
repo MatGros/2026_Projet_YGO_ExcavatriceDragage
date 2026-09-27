@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T14:39:44.792036" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T14:39:44.792036">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-27T10:02:05.556229" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-27T10:02:05.556229">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3376,6 +3376,8 @@ instSimBench(
                                       / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
                                       100.0),
     M3_BrakeCmd              := PRG_06_Outputs.Data.TranslationBrakeCmd,
+    M3_OpenModelicaActive    := GVL_Simulation.SimM3OpenModelicaActive,
+    M3_OpenModelica          := GVL_Simulation.SimM3OpenModelica,
     PowerKeepAlive_A         := PRG_06_Outputs.Data.PowerKeepAliveACmd,
     PowerKeepAlive_B         := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie
@@ -7782,6 +7784,23 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = commande desserrage frein M3</xhtml>
               </documentation>
             </variable>
+            <variable name="M3_OpenModelicaActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Interface périphérique OpenModelica M3 ─────────────────────────────
+--&gt; [TST] TRUE = image OM sélectionnée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_OpenModelica">
+              <type>
+                <derived name="ST_HwTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Retours M3 fournis par om.exe</xhtml>
+              </documentation>
+            </variable>
             <variable name="PowerKeepAlive_A">
               <type>
                 <BOOL />
@@ -9410,7 +9429,7 @@ M3_RelayFwd := M3_ReqTremie AND NOT M3_ReqMaintenance;
 M3_RelayRev := M3_ReqMaintenance AND NOT M3_ReqTremie;
 
 instSimTranslation(
-    Enable          := TRUE,
+    Enable          := NOT M3_OpenModelicaActive,
     ReqTremie       := M3_RelayFwd,
     ReqMaintenance  := M3_RelayRev,
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
@@ -9471,6 +9490,12 @@ M3_ActualFreqHz := REAL_TO_UINT(instSimTranslation.ActualFrequency_Hz * 100.0);
 Translation.M3_StatusWord        := M3_StatusWordSim;
 Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
 Translation.AC600_DeviceState    := DEVICE_STATE.RUNNING; // État device RUNNING
+
+// 🔀 Aiguillage périphérique M3 : OM remplace uniquement l'image de retours du modèle ST.
+// La logique PLC continue de produire les commandes et reste inchangée.
+IF M3_OpenModelicaActive THEN
+    Translation := M3_OpenModelica;
+END_IF;
 
 
 {endregion}

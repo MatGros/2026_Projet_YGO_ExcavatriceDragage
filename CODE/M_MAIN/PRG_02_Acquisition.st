@@ -321,6 +321,8 @@ instSimBench(
                                       / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
                                       100.0),
     M3_BrakeCmd              := PRG_06_Outputs.Data.TranslationBrakeCmd,
+    M3_OpenModelicaActive    := GVL_Simulation.SimM3OpenModelicaActive,
+    M3_OpenModelica          := GVL_Simulation.SimM3OpenModelica,
     PowerKeepAlive_A         := PRG_06_Outputs.Data.PowerKeepAliveACmd,
     PowerKeepAlive_B         := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie

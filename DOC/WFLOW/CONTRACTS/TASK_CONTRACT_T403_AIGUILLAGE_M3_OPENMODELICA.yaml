@@ -1,0 +1,78 @@
+contract:
+  task_id: T403
+  criticality: C2
+  strategy: patch
+  objective: >
+    Ajouter dans l enveloppe FB_SimBench un aiguillage reversible entre le modele
+    ST M3 existant et une image ST_HwTranslation fournie par OpenModelica,
+    sans modifier la logique metier PLC et sans effet hors SimulationModeActive.
+  acceptance:
+    - id: AC1
+      statement: "SimulationModeActive=FALSE conserve le chemin HwReal et ignore toute image OM."
+      verified_by: "test statique du repli FB_SimBench et revue du branchement PRG_02"
+    - id: AC2
+      statement: "SimulationModeActive=TRUE et SimM3SourceOMActive=FALSE conserve le modele ST M3 actuel."
+      verified_by: "test statique du chemin modele interne et recette CODESYS"
+    - id: AC3
+      statement: "SimulationModeActive=TRUE et SimM3SourceOMActive=TRUE publie l image ST_HwTranslation OM dans HwSim.Translation."
+      verified_by: "test statique de l aiguillage et recette CODESYS"
+    - id: AC4
+      statement: "Les commandes PLC restent les entrees du SimBench et aucune variable de decision/metier n est ecrite par OM."
+      verified_by: "revue des interfaces FB_SimBench et PRG_02_Acquisition"
+    - id: AC5
+      statement: "Le modele ST M3 reste disponible comme repli reversible et aucun fichier existant n est supprime."
+      verified_by: "git diff --name-status et controle de conservation"
+    - id: AC6
+      statement: "Les trois fichiers ST modifies conservent leur declaration POU : le nom de fichier est identique au nom de POU et le suffixe correspond au langage du bundle ; leur liaison d instance reste conforme au bundle PLCopenXML."
+      verified_by: "G200_check_linkage.py --report et run_all_gates.py --palier C"
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T403_AIGUILLAGE_M3_OPENMODELICA.yaml
+      - DOC/WFLOW/REX/NOTE_APPLICATION_T403_AIGUILLAGE_M3_OPENMODELICA_20260927.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - CODE/I_TRANSLATION/*
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - ARCHIVES/*
+  conservation:
+    must_survive:
+      - "FB_SimBench reste instancie et produit HwSim"
+      - "HwReal, HwSim et HwIn conservent leur routage actuel"
+      - "SimulationModeActive reste le verrou maitre"
+      - "Le modele FB_Sim_Translation reste present et selectionnable"
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-sol"
+  alert_duty: >
+    Tout conflit d interface, de producteur unique ou de communication OM non
+    definie doit etre signale avant extension du perimetre.
+status: COMPLETED
+execution:
+  executed_by: "CDX01"
+  completed_at: "2026-09-27T12:15:00+02:00"
+  status: COMPLETED
+  summary: >
+    Aiguillage M3 ajoute dans FB_SimBench : le bit SimM3OpenModelicaActive
+    selectionne le modele ST interne ou l image ST_HwTranslation fournie par
+    GVL_Simulation. SimulationModeActive conserve la priorite et le repli HwReal.
+  evidence_submitted:
+    - "check_task_contract.py: PASS"
+    - "generate_codesys_bundle.py: 262/262 objets, 0 erreur"
+    - "G200_check_linkage.py --report: PASS, 0 erreur"
+    - "run_all_gates.py --palier C: 12/14 gates PASS ; G300/G340/G430 preexistants"
+    - "NOTE_APPLICATION_T403_AIGUILLAGE_M3_OPENMODELICA_20260927.md: tests, preuves et limites tracés"
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

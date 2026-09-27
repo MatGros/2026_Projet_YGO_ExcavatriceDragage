@@ -37661,6 +37661,23 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = commande desserrage frein M3</xhtml>
               </documentation>
             </variable>
+            <variable name="M3_OpenModelicaActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Interface périphérique OpenModelica M3 ─────────────────────────────
+--&gt; [TST] TRUE = image OM sélectionnée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_OpenModelica">
+              <type>
+                <derived name="ST_HwTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Retours M3 fournis par om.exe</xhtml>
+              </documentation>
+            </variable>
             <variable name="PowerKeepAlive_A">
               <type>
                 <BOOL />
@@ -39289,7 +39306,7 @@ M3_RelayFwd := M3_ReqTremie AND NOT M3_ReqMaintenance;
 M3_RelayRev := M3_ReqMaintenance AND NOT M3_ReqTremie;
 
 instSimTranslation(
-    Enable          := TRUE,
+    Enable          := NOT M3_OpenModelicaActive,
     ReqTremie       := M3_RelayFwd,
     ReqMaintenance  := M3_RelayRev,
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
@@ -39350,6 +39367,12 @@ M3_ActualFreqHz := REAL_TO_UINT(instSimTranslation.ActualFrequency_Hz * 100.0);
 Translation.M3_StatusWord        := M3_StatusWordSim;
 Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
 Translation.AC600_DeviceState    := DEVICE_STATE.RUNNING; // État device RUNNING
+
+// 🔀 Aiguillage périphérique M3 : OM remplace uniquement l'image de retours du modèle ST.
+// La logique PLC continue de produire les commandes et reste inchangée.
+IF M3_OpenModelicaActive THEN
+    Translation := M3_OpenModelica;
+END_IF;
 
 
 {endregion}
@@ -53898,6 +53921,8 @@ instSimBench(
                                       / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
                                       100.0),
     M3_BrakeCmd              := PRG_06_Outputs.Data.TranslationBrakeCmd,
+    M3_OpenModelicaActive    := GVL_Simulation.SimM3OpenModelicaActive,
+    M3_OpenModelica          := GVL_Simulation.SimM3OpenModelica,
     PowerKeepAlive_A         := PRG_06_Outputs.Data.PowerKeepAliveACmd,
     PowerKeepAlive_B         := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie
@@ -62348,6 +62373,26 @@ TRUE = capteur haut actif; FALSE = position libre. Inopérant hors simulation.</
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">M3 : AC600, fréquence, 5 capteurs et frein</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3OpenModelicaActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Source de l'image M3 dans FB_SimBench : FALSE = modèle ST interne, TRUE = image OM.
+Inopérant hors SimulationModeActive ; l'image réelle reste prioritaire dans ce cas.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3OpenModelica">
+          <type>
+            <derived name="ST_HwTranslation" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Interface de retours M3 fournie par om.exe</xhtml>
           </documentation>
         </variable>
         <variable name="SimOperatorActive">
