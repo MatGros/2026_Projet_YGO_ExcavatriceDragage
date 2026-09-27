@@ -84,7 +84,7 @@ def parse_ports(source: str) -> list[dict]:
     # Captures input/output declarations with primitive/record types.
     rx = re.compile(
         r"\b(input|output)\s+([A-Za-z_][\w.]*)\s+([A-Za-z_]\w*)"
-        r"(?:\s*\([^;]*\))?\s*(?:"[^"]*")?\s*;",
+        r'(?:\s*\([^;]*\))?\s*(?:"[^"]*")?\s*;',
         re.MULTILINE,
     )
     for m in rx.finditer(source):
