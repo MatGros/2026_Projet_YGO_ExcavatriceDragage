@@ -1,0 +1,41 @@
+name: Deploy TwinBench M3 to Pages
+
+on:
+  push:
+    branches:
+      - feature/twinbench-m3-native
+    paths:
+      - 'TOOLS/TWINBENCH/modelica_viewer_m3/web/**'
+      - '.github/workflows/twinbench-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload TwinBench Web
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: TOOLS/TWINBENCH/modelica_viewer_m3/web
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
