@@ -154,7 +154,10 @@
       "Bash(python TOOLS/AGENT_WORKFLOW/prototypes/sim_treuil_electrique.py --load 0.7 --compare --gradin-times 0,0.4,0.8,1.2 --t-end 8)",
       "Bash(python TOOLS/AGENT_WORKFLOW/prototypes/sim_treuil_electrique.py --scenario deux_treuils --t-end 6)",
       "Bash(python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report)",
-      "PowerShell(*)"
+      "PowerShell(*)",
+      "WebFetch(domain:techcrunch.com)",
+      "WebFetch(domain:www.datacamp.com)",
+      "WebFetch(domain:en.wikipedia.org)"
     ],
     "ask": [
       "Bash(git push --force*)",

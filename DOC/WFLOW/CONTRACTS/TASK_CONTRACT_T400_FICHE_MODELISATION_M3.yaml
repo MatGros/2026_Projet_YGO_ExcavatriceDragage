@@ -1,0 +1,70 @@
+contract:
+  task_id: T400
+  criticality: C2
+  strategy: patch
+  objective: >
+    Consolider sur une page les faits, paramètres, écarts et inconnues nécessaires
+    à la modélisation OpenModelica de la translation M3, sans modifier le PLC ni
+    présenter une hypothèse comme une mesure terrain.
+  acceptance:
+    - id: AC1
+      statement: "La fiche sépare visuellement PLAQUE, CODE PLC, HYPOTHESE, ECART et A MESURER."
+      verified_by: "Revue de FICHE_T400_MODELISATION_TRANSLATION_M3.md."
+    - id: AC2
+      statement: "La géométrie, les cinq capteurs, les butées proposées, le gain vitesse/fréquence et le temps de cycle sont recensés."
+      verified_by: "Confrontation avec GVL_PERSISTENT, FB_Sim_Translation et AF-11."
+    - id: AC3
+      statement: "La plaque moteur fournie par l'utilisateur est transcrite sans extrapolation du réducteur ni du frein."
+      verified_by: "Comparaison avec la transcription utilisateur du 2026-09-27."
+    - id: AC4
+      statement: "Les rampes réellement câblées, les temporisations frein et le paramètre DelayMotorDecel sans effet sont explicités."
+      verified_by: "Lecture de PRG_05_Translation, ST_fbTranslation_Cfg et FB_Brake."
+    - id: AC5
+      statement: "La chaîne de composants Modelica proposée attribue la physique à OpenModelica et aucun calcul à l'IHM."
+      verified_by: "Revue du schéma cible de la fiche."
+    - id: AC6
+      statement: "Aucun fichier CODE/, CODE_XML/, PRJ_CODESYS/ ou TOOLS/TWINBENCH/ n'est modifié."
+      verified_by: "git status ciblé."
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T400_FICHE_MODELISATION_M3.yaml
+      - DOC/WFLOW/CONTRACTS/FICHE_T400_MODELISATION_TRANSLATION_M3.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - TOOLS/TWINBENCH/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "La source de vérité PLC reste CODE/*.st."
+      - "Le gain 0,02 m/(Hz.s) reste marqué provisoire jusqu'à la calibration T301."
+      - "Les butées à 0,30 m au-delà des capteurs restent des hypothèses utilisateur."
+      - "Le délai frein moteur de 2 s n'est pas présenté comme actif puisque FB_Brake ne le consomme pas à l'arrêt."
+    dropped_on_purpose: []
+  evidence_required:
+    - "check_task_contract.py PASS."
+    - "Fiche synthétique relue contre les sources actives."
+    - "Diff limité aux documents de pilotage."
+  alert_duty: >
+    Tout conflit entre valeur par défaut de type, valeur persistante réellement
+    câblée et hypothèse de simulation est affiché dans la fiche. La fidélité au
+    réel ne peut pas être revendiquée avant les mesures mécaniques et la calibration T301.
+
+status: COMPLETED
+execution:
+  executed_by: "CDX01"
+  completed_at: "2026-09-27T10:07:52+02:00"
+  status: COMPLETED
+  summary: "Fiche M3 consolidée avec géométrie, plaque moteur, dynamique PLC active, frein, interface du modèle et mesures manquantes."
+  evidence_submitted:
+    - "check_task_contract.py: PASS (0 erreur, 0 avertissement)"
+    - "Valeurs confrontées aux sources CODE/*.st actives"
+    - "Aucune modification de CODE/, CODE_XML/, PRJ_CODESYS/ ou TOOLS/TWINBENCH/"
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

@@ -26,6 +26,9 @@ contract:
     - id: AC6
       statement: "Le premier essai s arrete proprement sur les incompatibilites materiel ou E/S sans modifier automatiquement la logique PLC."
       verified_by: "Rapport de compilation et absence de modification sous CODE/ et PRJ_CODESYS/."
+    - id: AC7
+      statement: "L adaptateur HW_SIM agit uniquement sur l export natif derive de la copie Control Win et rend l Application compilable sans masquer les diagnostics."
+      verified_by: "Rapport prepare 0 erreur, liste des substitutions HW_SIM et empreinte source inchangee."
   scope:
     allowed:
       - TOOLS/TWINBENCH/controlwin_runner/
@@ -47,10 +50,9 @@ contract:
       - "Le projet selectionne reste byte-identique avant et apres le POC."
       - "Le projet automate reel et sa reference de device restent inchanges."
       - "Aucun deploiement n est autorise tant que la cible Control Win n est pas prouvee."
-      - "Les erreurs de compilation sont restituees, jamais masquees par un stub implicite."
+      - "Les erreurs de compilation sont restituees integralement ; l adaptateur HW_SIM est explicite et journalise."
     dropped_on_purpose:
       - "Compatibilite universelle avec tout projet CODESYS."
-      - "Adaptation automatique des E/S materielles lors du premier POC."
       - "Couplage OpenModelica et benchmark UDP."
   evidence_required:
     - "check_task_contract.py PASS."
@@ -69,17 +71,17 @@ status: IN_PROGRESS
 execution:
   executed_by: "CDX01"
   completed_at: "2026-09-27T16:11:30+02:00"
-  status: ALERT_RAISED
+  status: PREPARED_NOT_DEPLOYED
   summary: >
-    Copie, confinement, creation d un projet Control Win neuf et import natif de
-    l Application valides. Compilation bloquee correctement sur 293 erreurs liees
-    aux symboles et objets produits par l arbre materiel absent. Aucun deploiement.
+    Copie, confinement, creation d un projet Control Win neuf, import natif et
+    adaptateur HW_SIM derive valides. Compilation Control Win a 0 erreur et
+    1 avertissement. Aucun deploiement.
   evidence_submitted:
-    - "Autotest runner : 14/14 PASS."
+    - "Autotest runner : 46/46 PASS."
     - "SHA-256 source avant/apres identique : c6e12a7a8a09da7981c82ad26d79d8409f4f27ae8f75aa366b8cf5e0805b7ab5."
     - "Device Control Win derive : type 4096, ID 0000 0004, version 3.5.19.10."
-    - "Compilation refusee : 293 erreurs, 1 avertissement."
-    - "Etat runtime PREPARE_FAILED ; service Control Win arrete."
+    - "Compilation initiale : 293 erreurs ; apres adaptateur : 0 erreur, 1 avertissement."
+    - "Etat runner PREPARED ; aucun deploiement effectue."
     - "NOTE_APPLICATION_T404_CONTROL_WIN_RUNNER_20260927.md."
 validation:
   status: APPROVED
