@@ -54,6 +54,9 @@ VAR_INPUT
     M3_ReqMaintenance          : BOOL;             (* --> [CMD] Demande explicite vers Maintenance *)
     M3_SpeedCmd_Pct            : REAL;   (* --> [CMD] Consigne vitesse M3 *)
     M3_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M3 *)
+    // ── Interface périphérique OpenModelica M3 ─────────────────────────────
+    M3_OpenModelicaActive      : BOOL;             (* --> [TST] TRUE = image OM sélectionnée *)
+    M3_OpenModelica            : ST_HwTranslation; (* --> [HW] Retours M3 fournis par om.exe *)
 
     PowerKeepAlive_A           : BOOL;             (* --> [SAFE] TRUE = relais A maintenu sagement par le PLC *)
     PowerKeepAlive_B           : BOOL;             (* --> [SAFE] TRUE = relais B maintenu sagement par le PLC *)
@@ -565,7 +568,7 @@ M3_RelayFwd := M3_ReqTremie AND NOT M3_ReqMaintenance;
 M3_RelayRev := M3_ReqMaintenance AND NOT M3_ReqTremie;
 
 instSimTranslation(
-    Enable          := TRUE,
+    Enable          := NOT M3_OpenModelicaActive,
     ReqTremie       := M3_RelayFwd,
     ReqMaintenance  := M3_RelayRev,
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
@@ -626,6 +629,12 @@ M3_ActualFreqHz := REAL_TO_UINT(instSimTranslation.ActualFrequency_Hz * 100.0);
 Translation.M3_StatusWord        := M3_StatusWordSim;
 Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
 Translation.AC600_DeviceState    := DEVICE_STATE.RUNNING; // État device RUNNING
+
+// 🔀 Aiguillage périphérique M3 : OM remplace uniquement l'image de retours du modèle ST.
+// La logique PLC continue de produire les commandes et reste inchangée.
+IF M3_OpenModelicaActive THEN
+    Translation := M3_OpenModelica;
+END_IF;
 
 
 {endregion}

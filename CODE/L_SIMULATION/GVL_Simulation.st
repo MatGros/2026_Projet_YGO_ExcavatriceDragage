@@ -26,6 +26,10 @@ VAR_GLOBAL
     // TRUE = capteur haut actif; FALSE = position libre. Inopérant hors simulation.
     SimTopPositionActive        : BOOL := FALSE;
     SimTranslationActive        : BOOL := FALSE; // M3 : AC600, fréquence, 5 capteurs et frein
+    // 🔀 Source de l'image M3 dans FB_SimBench : FALSE = modèle ST interne, TRUE = image OM.
+    // Inopérant hors SimulationModeActive ; l'image réelle reste prioritaire dans ce cas.
+    SimM3OpenModelicaActive     : BOOL := FALSE;
+    SimM3OpenModelica            : ST_HwTranslation; // Interface de retours M3 fournie par om.exe
     SimOperatorActive           : BOOL := FALSE; // Joystick : bus CANopen, axes RawX/RawY et homme-mort brut
     SimSafetyActive             : BOOL := FALSE; // AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs
     // 🧪 Stimulus défaut rotation de phases : TRUE = phases réseau saines (comportement
