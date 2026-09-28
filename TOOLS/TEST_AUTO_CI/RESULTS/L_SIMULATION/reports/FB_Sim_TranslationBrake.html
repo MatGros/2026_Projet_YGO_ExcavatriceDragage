@@ -373,11 +373,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-16 02:16:23</div>
+    <div class="exec-time">2026-09-28 08:32:36</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-sim-translationbrake-0">TC-T300-BRK-010 Bobine mecanique et contact restent distincts</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-translationbrake-1">TC-T300-BRK-020 Serrage attend vitesse nulle</a></li></ul>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-sim-translationbrake-0">TC-T300-BRK-010 Bobine mecanique et contact restent distincts</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-translationbrake-1">TC-T300-BRK-020 Serrage attend vitesse nulle</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-translationbrake-2">TC-T300-BRK-040 Faute explicite : frein M3 se ferme a 10 Hz (rejeu trace 26,437 s)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -386,7 +386,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            3/3 vérifications validées
         </div>
     </div>
     
@@ -408,7 +408,7 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Sim_TranslationBrake</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 7 flux entrants · 4 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Sim_TranslationBrake</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 9 flux entrants · 5 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;">(aucune)</div>
@@ -419,7 +419,7 @@
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_StopFrequency_Hz</b> : REAL := 0.5</span></div>
         </div>
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReleaseCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ActualFrequency_Hz <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">OpenDelay_S <span class="pin-type" style="color:var(--muted);">REAL := 0.10</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CloseDelay_S <span class="pin-type" style="color:var(--muted);">REAL := 0.09</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ContactDelay_S <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CycleTime_S <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReleaseCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ActualFrequency_Hz <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">OpenDelay_S <span class="pin-type" style="color:var(--muted);">REAL := 0.10</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CloseDelay_S <span class="pin-type" style="color:var(--muted);">REAL := 0.09</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ContactDelay_S <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CycleTime_S <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">FaultCloseWhileRunning <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">FaultCloseDelay_S <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div></div>
             <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Sim_TranslationBrake</span>
                 
@@ -428,15 +428,15 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">7</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">9</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">4</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">5</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">0</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">7 IN</b> / <b style="color:#ffffff;">4 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">9 IN</b> / <b style="color:#ffffff;">5 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -463,15 +463,19 @@
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>ContactOpen</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>FaultCloseActive</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div></div>
         </div>
     </details>
     
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 11 écarts</span></summary>
+        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 14 écarts</span></summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 11 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ACTUALFREQUENCY_HZ</code> jamais câblé en production</li><li>Pin <code>CLOSEDELAY_S</code> jamais câblé en production</li><li>Pin <code>COILENERGIZED</code> jamais câblé en production</li><li>Pin <code>CONTACTDELAY_S</code> jamais câblé en production</li><li>Pin <code>CONTACTOPEN</code> jamais câblé en production</li><li>Pin <code>CYCLETIME_S</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>MECHANICALLYOPEN</code> jamais câblé en production</li><li>Pin <code>OPENDELAY_S</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RELEASECMD</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 14 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>ACTUALFREQUENCY_HZ</code> jamais câblé en production</li><li>Pin <code>CLOSEDELAY_S</code> jamais câblé en production</li><li>Pin <code>COILENERGIZED</code> jamais câblé en production</li><li>Pin <code>CONTACTDELAY_S</code> jamais câblé en production</li><li>Pin <code>CONTACTOPEN</code> jamais câblé en production</li><li>Pin <code>CYCLETIME_S</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULTCLOSEACTIVE</code> jamais câblé en production</li><li>Pin <code>FAULTCLOSEDELAY_S</code> jamais câblé en production</li><li>Pin <code>FAULTCLOSEWHILERUNNING</code> jamais câblé en production</li><li>Pin <code>MECHANICALLYOPEN</code> jamais câblé en production</li><li>Pin <code>OPENDELAY_S</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RELEASECMD</code> jamais câblé en production</li></ul>
         </div>
         <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
@@ -496,6 +500,12 @@
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
             <div class="pin-name">IN CYCLETIME_S <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN FAULTCLOSEWHILERUNNING <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN FAULTCLOSEDELAY_S <span class="pin-type">IEC_REAL</span></div>
         </div></div>
             <div class="pin-block">FB_Sim_TranslationBrake</div>
             <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
@@ -509,6 +519,9 @@
             <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">OUT CONTACTOPEN <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">OUT FAULTCLOSEACTIVE <span class="pin-type">IEC_BOOL</span></div>
             <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div></div>
         </div>
@@ -582,9 +595,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Sim_TranslationBrake</code></td>
-                <td>7</td><td>4</td>
-                <td>0</td><td>3</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>9</td><td>5</td>
+                <td>0</td><td>4</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
@@ -597,7 +610,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-sim-translationbrake-0" class="test-card test-card-pass test-card-collapsed">
@@ -636,6 +649,30 @@
                 
             </div>
         </article>
+        <article id="test-fb-sim-translationbrake-2" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T300-BRK-040 Faute explicite : frein M3 se ferme a 10 Hz (rejeu trace 26,437 s) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T300-BRK-040 Faute explicite : frein M3 se ferme a 10 Hz (rejeu trace 26,437 s)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Scenario terrain : commande retiree ET variateur retournant encore 10,00 Hz.</li><li>Injection explicite : fermeture hors vitesse nulle, APRES le delai de faute.
+       Oracle discriminateur : si le delai de faute etait ignore, la faute serait appliquee
+       des le 1er scan et l&#x27;assertion ci-dessous echouerait.</li><li>Retrait du stimulus : retour au chemin nominal, sans etat residuel.</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (12)</span></summary>
+                <ul class="checks-list"><li>Frein ouvert par la commande de desserrage</li><li>Faute inactive par defaut</li><li>Aucune faute injectee</li><li>NOMINAL conserve : frein OUVERT a 10,00 Hz (garde 0,5 Hz)</li><li>NOMINAL conserve : contact toujours ouvert a 10,00 Hz</li><li>Faute NON appliquee avant FaultCloseDelay_S</li><li>Frein encore ouvert pendant le delai de faute</li><li>Branche de faute appliquee apres le delai</li><li>Faute : bobine retombee (etat electrique coherent)</li><li>Faute : frein MECANIQUEMENT serre a 10,00 Hz</li><li>Faute : contact frein ferme publie a 10,00 Hz</li><li>Retrait du stimulus : faute retombee</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
         </div>
     </details>
     <details>
@@ -658,16 +695,25 @@ VAR_INPUT
     CloseDelay_S : REAL := 0.09;
     ContactDelay_S : REAL := 0.01;
     CycleTime_S : REAL := 0.01;
+    (* Branche de FAUTE EXPLICITE — defaut FALSE : chemin nominal strictement inchange.
+       Rejoue le defaut terrain « cause 6 instantanee » : contact frein ferme alors que le
+       variateur retourne encore de la vitesse (trace 2026-09-04, 26,437 s, 10,00 Hz,
+       State.ErrorId=64). La garde nominale CST_StopFrequency_Hz est CONSERVEE telle quelle :
+       elle est validee par la meme trace (frein ouvert a 0,60 Hz, ferme a 0,00 Hz). *)
+    FaultCloseWhileRunning : BOOL := FALSE;
+    FaultCloseDelay_S : REAL := 0.0;
 END_VAR
 VAR_OUTPUT
     Ready : BOOL;
     CoilEnergized : BOOL;
     MechanicallyOpen : BOOL;
     ContactOpen : BOOL;
+    FaultCloseActive : BOOL;   (* &lt;-- [DIAG] Branche de faute effectivement appliquee ce scan *)
 END_VAR
 VAR
     MechanicalTimer_S : REAL;
     ContactTimer_S : REAL;
+    FaultTimer_S : REAL;
 END_VAR
 VAR CONSTANT
     CST_StopFrequency_Hz : REAL := 0.5;
@@ -678,12 +724,24 @@ IF NOT Enable THEN
     CoilEnergized := FALSE;
     MechanicallyOpen := FALSE;
     ContactOpen := FALSE;
+    FaultCloseActive := FALSE;
     MechanicalTimer_S := 0.0;
     ContactTimer_S := 0.0;
+    FaultTimer_S := 0.0;
     RETURN;
 END_IF;
 
-CoilEnergized := ReleaseCmd;
+(* Faute explicite : chronometre propre, remis a zero des que le stimulus retombe. *)
+IF FaultCloseWhileRunning THEN
+    FaultTimer_S := FaultTimer_S + CycleTime_S;
+ELSE
+    FaultTimer_S := 0.0;
+END_IF;
+FaultCloseActive := FaultCloseWhileRunning AND (FaultTimer_S &gt;= MAX(0.0, FaultCloseDelay_S));
+
+(* La faute fait retomber la bobine : l&#x27;etat electrique publie reste coherent avec la
+   fermeture mecanique observee (jamais « bobine energisee ET frein serre »). *)
+CoilEnergized := ReleaseCmd AND NOT FaultCloseActive;
 IF CoilEnergized THEN
     IF NOT MechanicallyOpen THEN
         MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
@@ -694,7 +752,7 @@ IF CoilEnergized THEN
     ELSE
         MechanicalTimer_S := 0.0;
     END_IF;
-ELSIF ActualFrequency_Hz &lt;= CST_StopFrequency_Hz THEN
+ELSIF FaultCloseActive OR (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
     IF MechanicallyOpen THEN
         MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
         IF MechanicalTimer_S &gt;= MAX(0.0, CloseDelay_S) THEN
@@ -722,7 +780,15 @@ Ready := TRUE;
     </details>
     <details>
         <summary>Sortie brute strucpp</summary>
-        <pre>Error: C++ compilation failed:
+        <pre>STruC++ Test Runner v1.0
+
+test_fb_sim_translation_brake.st
+  [PASS] TC-T300-BRK-010 Bobine mecanique et contact restent distincts
+  [PASS] TC-T300-BRK-020 Serrage attend vitesse nulle
+  [PASS] TC-T300-BRK-040 Faute explicite : frein M3 se ferme a 10 Hz (rejeu trace 26,437 s)
+
+-----------------------------------------
+3 tests, 3 passed, 0 failed
 </pre>
     </details>
 </div>

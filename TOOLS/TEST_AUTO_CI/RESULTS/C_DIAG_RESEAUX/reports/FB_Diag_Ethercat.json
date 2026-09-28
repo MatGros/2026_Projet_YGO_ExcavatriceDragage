@@ -17,11 +17,23 @@
     {
       "name": "TC-P12-040 EtherCAT : bypass sim/reseau vs etat reel (READY/SIMULATED/DISABLED)",
       "passed": true
+    },
+    {
+      "name": "TC-T359-001 Invariance : une perte de liaison puis retour, pulse actif vs temoin sans pulse",
+      "passed": true
+    },
+    {
+      "name": "TC-T359-002 Invariance au timing de production : pulse 1 s APRES le retour de liaison",
+      "passed": true
+    },
+    {
+      "name": "TC-T359-003 La voie alternative \u00ab front Online \u00bb ne peut pas davantage agir sur le bit",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 4,
-    "passed": 4,
+    "total": 7,
+    "passed": 7,
     "failed": 0
   }
 }

@@ -373,11 +373,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-16 02:15:39</div>
+    <div class="exec-time">2026-09-28 08:32:33</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (4 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-sim-positionsensor-0">TC-T300-SEN-010 Hysteresis cumulative conserve le mot thermometre</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-positionsensor-1">TC-T300-SEN-030 Episode intermittent est borne et rejoint la position</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-positionsensor-2">TC-T300-SEN-031 Recroisements mecaniques ne reinitialisent pas episode</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-positionsensor-3">TC-T300-SEN-040 Cent graines deterministes bornent la stabilisation</a></li></ul>
+        <summary>📋 Sommaire (5 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-sim-positionsensor-0">TC-T300-SEN-010 Hysteresis cumulative conserve le mot thermometre</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-positionsensor-1">TC-T300-SEN-030 Episode intermittent est borne et rejoint la position</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-positionsensor-2">TC-T300-SEN-031 Recroisements mecaniques ne reinitialisent pas episode</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-positionsensor-3">TC-T300-SEN-040 Cent graines deterministes bornent la stabilisation</a></li><li class="toc-item toc-pass"><a href="#test-fb-sim-positionsensor-4">TC-T300-SEN-050 Blip court : largeur parametrable, deux sens, profil 1 s intact</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -386,7 +386,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            4/4 vérifications validées
+            5/5 vérifications validées
         </div>
     </div>
     
@@ -408,14 +408,18 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Sim_PositionSensor</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 11 flux entrants · 5 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Sim_PositionSensor</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 13 flux entrants · 6 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;">(aucune)</div>
         </div>
         
+        <div style="margin:6px 0;font-size:13px;color:var(--muted);">
+            <b>Constantes internes (VAR CONSTANT) :</b><br>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_BlipMaxTransitions</b> : UDINT := 1000</span></div>
+        </div>
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Position_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Threshold_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Hysteresis_M <span class="pin-type" style="color:var(--muted);">REAL := 0.02</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ActiveBelowThreshold <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ElectricalDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">IntermittenceActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">IntermittenceDurationS <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">IntermittencePeriodS <span class="pin-type" style="color:var(--muted);">REAL := 0.12</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ScenarioSeed <span class="pin-type" style="color:var(--muted);">UDINT := 1</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CycleTimeS <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Position_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Threshold_M <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Hysteresis_M <span class="pin-type" style="color:var(--muted);">REAL := 0.02</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ActiveBelowThreshold <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ElectricalDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">IntermittenceActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">IntermittenceDurationS <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">IntermittencePeriodS <span class="pin-type" style="color:var(--muted);">REAL := 0.12</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ScenarioSeed <span class="pin-type" style="color:var(--muted);">UDINT := 1</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CycleTimeS <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BlipTransitions <span class="pin-type" style="color:var(--muted);">UDINT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BlipDurationS <span class="pin-type" style="color:var(--muted);">REAL := 0.2</span></div></div></div>
             <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Sim_PositionSensor</span>
                 
@@ -424,15 +428,15 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">11</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">13</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">5</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">6</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">0</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">11 IN</b> / <b style="color:#ffffff;">5 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">13 IN</b> / <b style="color:#ffffff;">6 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -457,6 +461,10 @@
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>BlipActive</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>TransitionCount</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">UDINT</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>
@@ -468,10 +476,10 @@
     </details>
     
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 16 écarts</span></summary>
+        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 19 écarts</span></summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 16 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ACTIVEBELOWTHRESHOLD</code> jamais câblé en production</li><li>Pin <code>CYCLETIMES</code> jamais câblé en production</li><li>Pin <code>ELECTRICALDELAYS</code> jamais câblé en production</li><li>Pin <code>ELECTRICALOUTPUT</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>EPISODEACTIVE</code> jamais câblé en production</li><li>Pin <code>EPISODETOGGLEPERIODS</code> jamais câblé en production</li><li>Pin <code>HYSTERESIS_M</code> jamais câblé en production</li><li>Pin <code>INTERMITTENCEACTIVE</code> jamais câblé en production</li><li>Pin <code>INTERMITTENCEDURATIONS</code> jamais câblé en production</li><li>Pin <code>INTERMITTENCEPERIODS</code> jamais câblé en production</li><li>Pin <code>POSITION_M</code> jamais câblé en production</li><li>Pin <code>RAWDETECTED</code> jamais câblé en production</li><li>Pin <code>SCENARIOSEED</code> jamais câblé en production</li><li>Pin <code>THRESHOLD_M</code> jamais câblé en production</li><li>Pin <code>TRANSITIONCOUNT</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 19 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>ACTIVEBELOWTHRESHOLD</code> jamais câblé en production</li><li>Pin <code>BLIPACTIVE</code> jamais câblé en production</li><li>Pin <code>BLIPDURATIONS</code> jamais câblé en production</li><li>Pin <code>BLIPTRANSITIONS</code> jamais câblé en production</li><li>Pin <code>CYCLETIMES</code> jamais câblé en production</li><li>Pin <code>ELECTRICALDELAYS</code> jamais câblé en production</li><li>Pin <code>ELECTRICALOUTPUT</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>EPISODEACTIVE</code> jamais câblé en production</li><li>Pin <code>EPISODETOGGLEPERIODS</code> jamais câblé en production</li><li>Pin <code>HYSTERESIS_M</code> jamais câblé en production</li><li>Pin <code>INTERMITTENCEACTIVE</code> jamais câblé en production</li><li>Pin <code>INTERMITTENCEDURATIONS</code> jamais câblé en production</li><li>Pin <code>INTERMITTENCEPERIODS</code> jamais câblé en production</li><li>Pin <code>POSITION_M</code> jamais câblé en production</li><li>Pin <code>RAWDETECTED</code> jamais câblé en production</li><li>Pin <code>SCENARIOSEED</code> jamais câblé en production</li><li>Pin <code>THRESHOLD_M</code> jamais câblé en production</li><li>Pin <code>TRANSITIONCOUNT</code> jamais câblé en production</li></ul>
         </div>
         <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
@@ -508,6 +516,12 @@
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
             <div class="pin-name">IN CYCLETIMES <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN BLIPTRANSITIONS <span class="pin-type">IEC_UDINT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN BLIPDURATIONS <span class="pin-type">IEC_REAL</span></div>
         </div></div>
             <div class="pin-block">FB_Sim_PositionSensor</div>
             <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
@@ -518,6 +532,9 @@
             <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">OUT EPISODEACTIVE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">OUT BLIPACTIVE <span class="pin-type">IEC_BOOL</span></div>
             <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">OUT TRANSITIONCOUNT <span class="pin-type">IEC_UDINT</span></div>
@@ -597,9 +614,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Sim_PositionSensor</code></td>
-                <td>11</td><td>5</td>
-                <td>0</td><td>7</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (7 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>13</td><td>6</td>
+                <td>0</td><td>11</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (11 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
@@ -612,7 +629,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 4 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-sim-positionsensor-0" class="test-card test-card-pass test-card-collapsed">
@@ -687,6 +704,28 @@
                 
             </div>
         </article>
+        <article id="test-fb-sim-positionsensor-4" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T300-SEN-050 Blip court : largeur parametrable, deux sens, profil 1 s intact </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T300-SEN-050 Blip court : largeur parametrable, deux sens, profil 1 s intact')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>---- (1) Sortie de zone, excursion 0,1 s =&gt; 1 echantillon (signature PV) ----</li><li>---- (2) Meme sens, excursion 0,2 s =&gt; 2 echantillons (signature Tremie) ----</li><li>---- (3) Sens INVERSE : entree en zone (front montant) — symetrie AC5 ----</li><li>---- (4) Blip DESACTIVE : le profil historique reste strictement inchange ----</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (12)</span></summary>
+                <ul class="checks-list"><li>Depart : dans la zone capteur</li><li>Blip 0,1 s a 100 ms = 1 echantillon contradictoire</li><li>1 front nominal + 2 fronts du blip</li><li>Blip borne et termine</li><li>Sortie rendue a l etat mecanique final</li><li>Blip 0,2 s a 100 ms = 2 echantillons contradictoires</li><li>Sortie rendue a l etat mecanique final</li><li>Depart : hors zone capteur</li><li>Symetrie : excursion equivalente a l entree en zone</li><li>Sortie rendue a l etat mecanique final (dans la zone)</li><li>Blip desactive : aucune excursion inventee</li><li>Blip desactive : seul le front nominal</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
         </div>
     </details>
     <details>
@@ -715,11 +754,22 @@ VAR_INPUT
     IntermittencePeriodS : REAL := 0.12;
     ScenarioSeed : UDINT := 1;
     CycleTimeS : REAL := 0.01;
+    (* Profil « BLIP COURT » — SECOND profil, independant du train de bascules du profil
+       d&#x27;intermittence ci-dessus (dont les parametres restent inchanges).
+       0 = desactive : le comportement historique est strictement conserve.
+       Rejoue les excursions electriques courtes mesurees sur la trace terrain du
+       2026-09-04 : Tremie contradictoire pendant 2 echantillons a 12,24 s (~200 ms) et
+       PV reactive 1 echantillon a 14,94 s (~100 ms).
+         BlipTransitions = nombre de bascules electriques (1 = une excursion puis retour) ;
+         BlipDurationS   = duree de maintien de chaque etat, donc largeur de l&#x27;excursion. *)
+    BlipTransitions : UDINT := 0;
+    BlipDurationS : REAL := 0.2;
 END_VAR
 VAR_OUTPUT
     RawDetected : BOOL;
     ElectricalOutput : BOOL;
     EpisodeActive : BOOL;
+    BlipActive : BOOL;
     TransitionCount : UDINT;
     EpisodeTogglePeriodS : REAL;
 END_VAR
@@ -731,6 +781,14 @@ VAR
     EpisodeTimerS : REAL;
     ToggleTimerS : REAL;
     RandomState : UDINT;
+    BlipRunning : BOOL;
+    BlipTimerS : REAL;
+    BlipCount : UDINT;
+END_VAR
+VAR CONSTANT
+    (* Plafond du nombre de bascules du profil « blip court » : borne la duree de l&#x27;episode
+       et interdit tout rebouclage de compteur UDINT (revue du 2026-09-20, F9). *)
+    CST_BlipMaxTransitions : UDINT := 1000;
 END_VAR
 
 IF NOT Enable THEN
@@ -739,6 +797,10 @@ IF NOT Enable THEN
     ElectricalOutput := FALSE;
     PreviousRawDetected := FALSE;
     EpisodeActive := FALSE;
+    BlipActive := FALSE;
+    BlipRunning := FALSE;
+    BlipTimerS := 0.0;
+    BlipCount := 0;
     DelayTimerS := 0.0;
     EpisodeTimerS := 0.0;
     ToggleTimerS := 0.0;
@@ -801,9 +863,48 @@ IF RawDetected &lt;&gt; PreviousRawDetected THEN
             * (0.7 + UDINT_TO_REAL(RandomState MOD 6000) / 10000.0));
         EpisodeActive := IntermittenceActive AND (IntermittenceDurationS &gt; 0.0);
     END_IF;
+    (* Blip court : arme sur le meme front MECANIQUE. Ses propres bascules electriques ne
+       peuvent donc jamais le rearmer — meme protection que l&#x27;episode d&#x27;intermittence. *)
+    IF (BlipTransitions &gt; 0) AND (BlipDurationS &gt; 0.0) THEN
+        BlipRunning := TRUE;
+        BlipTimerS := 0.0;
+        BlipCount := 0;
+        BlipActive := TRUE;
+        (* Ecretage : au-dela de ce plafond, un compteur UDINT pourrait reboucler et rendre
+           le blip non terminant (revue du 2026-09-20, F9). *)
+        BlipTransitions := MIN(BlipTransitions, CST_BlipMaxTransitions);
+    END_IF;
 END_IF;
 
-IF EpisodeActive THEN
+IF BlipRunning THEN
+    (* Protocole du blip court : (0) la sortie rejoint d&#x27;abord l&#x27;etat MECANIQUE — le
+       comportement nominal reste donc visible ; puis une excursion contradictoire toutes
+       les BlipDurationS, donc de largeur BlipDurationS ; enfin la sortie est rendue a
+       l&#x27;etat mecanique. Nombre d&#x27;excursions = BlipTransitions. *)
+    BlipTimerS := BlipTimerS + CycleTimeS;
+    IF BlipTimerS &gt;= MAX(CycleTimeS, BlipDurationS) THEN
+        BlipTimerS := 0.0;
+        IF BlipCount = 0 THEN
+            IF ElectricalOutput &lt;&gt; RawDetected THEN
+                ElectricalOutput := RawDetected;
+                TransitionCount := TransitionCount + 1;
+            END_IF;
+            BlipCount := 1;
+        ELSIF BlipCount &lt;= BlipTransitions THEN
+            ElectricalOutput := NOT ElectricalOutput;
+            TransitionCount := TransitionCount + 1;
+            BlipCount := BlipCount + 1;
+        ELSE
+            BlipRunning := FALSE;
+            BlipActive := FALSE;
+            IF ElectricalOutput &lt;&gt; RawDetected THEN
+                ElectricalOutput := RawDetected;
+                TransitionCount := TransitionCount + 1;
+            END_IF;
+            DelayTimerS := 0.0;
+        END_IF;
+    END_IF;
+ELSIF EpisodeActive THEN
     EpisodeTimerS := EpisodeTimerS + CycleTimeS;
     ToggleTimerS := ToggleTimerS + CycleTimeS;
     IF ToggleTimerS &gt;= EpisodeTogglePeriodS THEN
@@ -834,7 +935,17 @@ END_IF;
     </details>
     <details>
         <summary>Sortie brute strucpp</summary>
-        <pre>Error: C++ compilation failed:
+        <pre>STruC++ Test Runner v1.0
+
+test_fb_sim_position_sensor.st
+  [PASS] TC-T300-SEN-010 Hysteresis cumulative conserve le mot thermometre
+  [PASS] TC-T300-SEN-030 Episode intermittent est borne et rejoint la position
+  [PASS] TC-T300-SEN-031 Recroisements mecaniques ne reinitialisent pas episode
+  [PASS] TC-T300-SEN-040 Cent graines deterministes bornent la stabilisation
+  [PASS] TC-T300-SEN-050 Blip court : largeur parametrable, deux sens, profil 1 s intact
+
+-----------------------------------------
+5 tests, 5 passed, 0 failed
 </pre>
     </details>
 </div>

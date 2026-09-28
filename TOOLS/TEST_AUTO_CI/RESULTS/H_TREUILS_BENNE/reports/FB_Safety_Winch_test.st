@@ -744,7 +744,10 @@ TEST 'T387-FB-002 Grant fenetre benne : BucketCloseAscentGrant relaxe ETROITEMEN
        CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
        BucketCloseAscentGrant := TRUE);
     ASSERT_TRUE(fb.AscentPermit, 'Fenetre benne grant=TRUE -> AscentPermit relaxe malgre le FdC haut (M2, AC2)');
-    ASSERT_FALSE(fb.Fault.Error, 'Fenetre benne : relaxation du permis uniquement, aucun defaut (grant ne bypass pas les causes)');
+    // Le grant ne BYPASSE pas la cause : le FdC haut (cause 5, bit 16#0020) reste VIVANT et
+    // informe (seul le PERMIS est relaxe). Erreur live bit5 attendue -> jamais un bypass total.
+    ASSERT_TRUE((fb.Fault.ErrorId AND 16#0020) <> 0, 'Fenetre benne : cause 5 (FdC haut) reste vive (grant relaxe le permis, pas la cause)');
+    ASSERT_FALSE(fb.Fault.Latched, 'Fenetre benne : cause live non latchable (Latching=FALSE) -> aucun defaut a acquitter');
     (* Scan : retour grant=FALSE (hors fenetre) -> la barriere reprend immediatement. *)
     ADVANCE_TIME(10000000);
     fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,

@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "file": "test_fb_autoresettransientdiag.st",
+  "results": [
+    {
+      "name": "TC-T352-001 Demarrage par defaut : Phase 1, impulsion apres stabilisation, verrouillage",
+      "passed": true
+    },
+    {
+      "name": "TC-T352-002 Post-rearmement : Phase 2 sur front contacteur, impulsion puis verrouillage",
+      "passed": true
+    },
+    {
+      "name": "TC-T352-003 Gardes safety : chaine AU ouverte, coupure puissance, mouvement actif",
+      "passed": true
+    },
+    {
+      "name": "TC-T352-004 Annulation : chute de la garde pendant la sequence -> Cancelled + Lockout",
+      "passed": true
+    },
+    {
+      "name": "TC-T352-005 Borne haute : 3 impulsions espacees puis verrouillage definitif",
+      "passed": true
+    },
+    {
+      "name": "TC-T352-006 Neutralisation : Enable=FALSE -> service remis au repos",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0
+  }
+}
