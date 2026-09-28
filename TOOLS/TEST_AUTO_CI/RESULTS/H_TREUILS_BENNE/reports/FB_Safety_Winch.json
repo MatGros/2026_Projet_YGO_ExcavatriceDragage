@@ -133,19 +133,12 @@
     },
     {
       "name": "T387-FB-002 Grant fenetre benne : BucketCloseAscentGrant relaxe ETROITEMENT la butee haute MATERIELLE M2",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_FALSE",
-        "detail": "FB.FAULT.ERROR expected FALSE, got TRUE",
-        "file": "test_fb_safety_winch.st",
-        "line": 747,
-        "message": "Fenetre benne : relaxation du permis uniquement, aucun defaut (grant ne bypass pas les causes)"
-      }
+      "passed": true
     }
   ],
   "summary": {
     "total": 21,
-    "passed": 13,
-    "failed": 8
+    "passed": 14,
+    "failed": 7
   }
 }

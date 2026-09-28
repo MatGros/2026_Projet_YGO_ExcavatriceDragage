@@ -17,11 +17,15 @@
     {
       "name": "TC-T300-SEN-040 Cent graines deterministes bornent la stabilisation",
       "passed": true
+    },
+    {
+      "name": "TC-T300-SEN-050 Blip court : largeur parametrable, deux sens, profil 1 s intact",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 4,
-    "passed": 4,
+    "total": 5,
+    "passed": 5,
     "failed": 0
   }
 }

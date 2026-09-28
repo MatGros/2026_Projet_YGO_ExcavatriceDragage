@@ -4,15 +4,42 @@
   "results": [
     {
       "name": "TC-P10-056 R1 \u2014 FDC saisi trop haut : FDC corrige, TOP preserve",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "COMMUNCFG.CFGCABLELIMITASCENT_M expected 7.5 +/- 1e-06, got 8.1",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 62,
+        "message": "R1 : FDC ramene a TOP - 1,00 m = 7,50",
+        "expected": "7.5",
+        "actual": "8.1"
+      }
     },
     {
       "name": "TC-P10-057 R2 \u2014 TOP saisi trop bas : TOP corrige, FDC preserve",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "WINCHCFG.CFGTOPSENSORPOS_M expected 8.5 +/- 1e-06, got 7.9",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 85,
+        "message": "R2 : TOP ramene a FDC + 1,00 m = 8,50 (le champ saisi est corrige)",
+        "expected": "8.5",
+        "actual": "7.9"
+      }
     },
     {
       "name": "TC-P10-058 R1 \u2014 Delta = 0,90 m : correction du champ saisi (FDC)",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "COMMUNCFG.CFGCABLELIMITASCENT_M expected 7.5 +/- 1e-06, got 7.6",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 108,
+        "message": "Delta < 1,00 m : FDC ramene a 7,50",
+        "expected": "7.5",
+        "actual": "7.6"
+      }
     },
     {
       "name": "TC-P10-059 R3 \u2014 plancher du ralentissement haut (0,20 -> 0,50)",
@@ -24,7 +51,16 @@
     },
     {
       "name": "TC-P10-061 Q17 \u2014 les DEUX champs changent au meme scan : TOP preserve, FDC corrige",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "COMMUNCFG.CFGCABLELIMITASCENT_M expected 7 +/- 1e-06, got 7.6",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 179,
+        "message": "Q17 : FDC = TOP - 1,00 m = 7,00 (R0 a d abord ramene 9,50 a 9,00)",
+        "expected": "7",
+        "actual": "7.6"
+      }
     },
     {
       "name": "TC-P10-062 FDC = 0,00 m (borne basse, Delta valide) : accepte, aucune correction",
@@ -32,7 +68,16 @@
     },
     {
       "name": "TC-P10-063 Q24 \u2014 idempotence : le 2e scan apres correction ne corrige PLUS",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "COMMUNCFG.CFGCABLELIMITASCENT_M expected 7.5 +/- 1e-06, got 8.1",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 228,
+        "message": "Scan 2 : FDC corrige a 7,50",
+        "expected": "7.5",
+        "actual": "8.1"
+      }
     },
     {
       "name": "TC-P10-064 reserve EXACTEMENT 1,00 m : aucune correction (aucun epsilon)",
@@ -48,11 +93,29 @@
     },
     {
       "name": "TC-P10-065 pt3 balayage 7,5001 \u2014 Delta = 0,9999 m : FDC corrige, une seule fois",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "COMMUNCFG.CFGCABLELIMITASCENT_M expected 7.5 +/- 1e-06, got 7.5001",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 317,
+        "message": "Delta < 1,00 m : FDC ramene a 7,50",
+        "expected": "7.5",
+        "actual": "7.5001"
+      }
     },
     {
       "name": "TC-P10-066 LIMITE DECLAREE \u2014 guerre d ecriture IHM : correction a CHAQUE scan",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "COMMUNCFG.CFGCABLELIMITASCENT_M expected 7.5 +/- 1e-06, got 8.1",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 350,
+        "message": "Scan 2 : correction reappliquee",
+        "expected": "7.5",
+        "actual": "8.1"
+      }
     },
     {
       "name": "TC-P10-067 valeur IDENTIQUE re-saisie : aucun front, aucune correction",
@@ -68,7 +131,16 @@
     },
     {
       "name": "TC-P10-070 NVRAM invalide au demarrage a froid : Q17 (TOP preserve, FDC corrige)",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "COMMUNCFG.CFGCABLELIMITASCENT_M expected 6 +/- 1e-06, got 6.6",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 455,
+        "message": "Q17 : FDC = TOP - 1,00 m = 6,00",
+        "expected": "6",
+        "actual": "6.6"
+      }
     },
     {
       "name": "TC-P10-071 premier scan NOT Initialized : normalisation INHIBEE, aucune ecriture",
@@ -80,11 +152,29 @@
     },
     {
       "name": "TC-P10-074 ptB download/RTS : comportement DETERMINISTE, une seule correction",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "COMMUNCFG.CFGCABLELIMITASCENT_M expected 6 +/- 1e-06, got 6.6",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 520,
+        "message": "NVRAM invalide : FDC = 6,00 (Q17)",
+        "expected": "6",
+        "actual": "6.6"
+      }
     },
     {
       "name": "TC-P10-082 Q22/C2 \u2014 homing : gel NVRAM, repli NIVEAU Q17, non-memorisation",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "COMMUNCFG.CFGCABLELIMITASCENT_M expected 6 +/- 1e-06, got 6.6",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 563,
+        "message": "Sortie de homing : FDC = 7,00 - 1,00 = 6,00 (repli NIVEAU)",
+        "expected": "6",
+        "actual": "6.6"
+      }
     },
     {
       "name": "TC-P10-090 ptA R0 \u2014 FDC = 0,00 m : valeur A LA BORNE, acceptee sans message",
@@ -100,7 +190,16 @@
     },
     {
       "name": "TC-P10-091 ptA Q21 bis \u2014 R0 SEUL : Delta >= 1 avant clamp (FDC 9,50 / TOP 12,00)",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "COMMUNCFG.CFGCABLELIMITASCENT_M expected 9 +/- 1e-06, got 9.5",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 655,
+        "message": "Q21 bis : FDC ramene a la borne haute 9,00 m",
+        "expected": "9",
+        "actual": "9.5"
+      }
     },
     {
       "name": "TC-P10-091 ptB Q21 bis \u2014 domaines absurdes : R0 borne AVANT tout usage aval",
@@ -108,16 +207,34 @@
     },
     {
       "name": "TC-P10-092 ptA C1 \u2014 R0 d abord : TOP 11,00 -> 10,00 et FDC 10,00 -> 9,00, Delta valid",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "COMMUNCFG.CFGCABLELIMITASCENT_M expected 9 +/- 1e-06, got 9.6",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 696,
+        "message": "C1 : FDC 10,00 m ramene a la borne 9,00 m",
+        "expected": "9",
+        "actual": "9.6"
+      }
     },
     {
       "name": "TC-P10-092 ptB C1 \u2014 R2 au plus haut de sa plage : TOP = 10,00 m, jamais au-dela",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "WINCHCFG.CFGTOPSENSORPOS_M expected 10 +/- 1e-06, got 9.4",
+        "file": "test_fb_cfgt330normalizer.st",
+        "line": 722,
+        "message": "C1 : R2 redonne exactement TOP = 10,00 m (jamais > 10,00)",
+        "expected": "10",
+        "actual": "9.4"
+      }
     }
   ],
   "summary": {
     "total": 28,
-    "passed": 28,
-    "failed": 0
+    "passed": 15,
+    "failed": 13
   }
 }

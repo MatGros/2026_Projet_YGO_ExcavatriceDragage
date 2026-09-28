@@ -373,11 +373,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-20 16:08:20</div>
+    <div class="exec-time">2026-09-28 08:32:20</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (6 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-0">TC-P11-EST-001 Reprise sur ColdStart avec position persistee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-1">TC-P11-EST-002 Recalage absolu instantane sur front montant capteur P1 (20.0m)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-2">TC-P11-EST-004 Recalage a CHAQUE capteur sur front DESCENDANT (trajet Tremie vers Maintenance)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-3">TC-P11-EST-005 Recalage a CHAQUE capteur sur front MONTANT (trajet Maintenance vers Tremie)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-4">TC-P11-EST-006 Continuite de la position entre deux fronts (seuil Q3 : |Freq| x Gain x dt + 1 mm)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-5">TC-P11-EST-007 Blip capteur court (1 scan) en s eloignant : comportement defini (decision Q2 = recaler)</a></li></ul>
+        <summary>📋 Sommaire (10 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-0">TC-P11-EST-001 Reprise sur ColdStart avec position persistee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-1">TC-P11-EST-002 Recalage absolu instantane sur front montant capteur P1 (20.0m)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-2">TC-P11-EST-004 Recalage a CHAQUE capteur sur front DESCENDANT (trajet Tremie vers Maintenance)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-3">TC-P11-EST-005 Recalage a CHAQUE capteur sur front MONTANT (trajet Maintenance vers Tremie)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-4">TC-P11-EST-006 Continuite de la position entre deux fronts (seuil Q3 : |Freq| x Gain x dt + 1 mm)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-5">TC-P11-EST-007 Blip capteur court (1 scan) en s eloignant : comportement defini (decision Q2 = recaler)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-6">TC-T361-ANOM-001 Correction ordinaire sous le seuil : temoin NON leve</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-7">TC-T361-ANOM-002 Correction ANORMALE : temoin leve ET correction quand meme APPLIQUEE</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-8">TC-T361-ANOM-003 Le temoin est un PULSE, l amplitude est MAINTENUE</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-positionestimator-9">TC-T361-ANOM-004 Blip de 2 cm : recale SANS temoin (aucune zone morte)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -386,7 +386,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            6/6 vérifications validées
+            10/10 vérifications validées
         </div>
     </div>
     
@@ -424,12 +424,16 @@
     </div>
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Translation_PositionEstimator</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 18 flux entrants · 4 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Translation_PositionEstimator</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 18 flux entrants · 6 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigTremie <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigPV <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigP2 <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigP1 <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigMaintenance <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigDnTremie <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigDnPV <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigDnP2 <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigDnP1 <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TrigDnMaintenance <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ CycleTimeCalc <span style="color:var(--muted);font-weight:500;">(FB_CycleTime)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ColdStart <span style="color:var(--muted);font-weight:500;">(BOOL := TRUE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ FirstScanDone <span style="color:var(--muted);font-weight:500;">(BOOL := FALSE)</span></span></div>
         </div>
         
+        <div style="margin:6px 0;font-size:13px;color:var(--muted);">
+            <b>Constantes internes (VAR CONSTANT) :</b><br>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_RecalibrationAnomalyM</b> : REAL := 0.50</span></div>
+        </div>
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveActualFreqHz <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorP1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorP2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorPV <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PosMaintenanceM <span class="pin-type" style="color:var(--muted);">REAL := 30.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PosP1M <span class="pin-type" style="color:var(--muted);">REAL := 20.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PosP2M <span class="pin-type" style="color:var(--muted);">REAL := 15.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PosPVM <span class="pin-type" style="color:var(--muted);">REAL := 5.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PosTremieM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">GainMetersPerHzSec <span class="pin-type" style="color:var(--muted);">REAL := 0.008333</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PersistedPositionM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PersistedInitialized <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div></div>
             <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
@@ -445,10 +449,10 @@
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">4</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">6</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">0</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">18 IN</b> / <b style="color:#ffffff;">4 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">18 IN</b> / <b style="color:#ffffff;">6 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -475,15 +479,23 @@
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>RecalibratedSensorId</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">INT</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>RecalibrationAnomaly</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>RecalibrationCorrectionM</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div></div>
         </div>
     </details>
     
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 22 écarts</span></summary>
+        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 24 écarts</span></summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 22 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>DRIVEACTUALFREQHZ</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>GAINMETERSPERHZSEC</code> jamais câblé en production</li><li>Pin <code>INITIALIZED</code> jamais câblé en production</li><li>Pin <code>PERSISTEDINITIALIZED</code> jamais câblé en production</li><li>Pin <code>PERSISTEDPOSITIONM</code> jamais câblé en production</li><li>Pin <code>POSITIONESTIMATEDM</code> jamais câblé en production</li><li>Pin <code>POSMAINTENANCEM</code> jamais câblé en production</li><li>Pin <code>POSP1M</code> jamais câblé en production</li><li>Pin <code>POSP2M</code> jamais câblé en production</li><li>Pin <code>POSPVM</code> jamais câblé en production</li><li>Pin <code>POSTREMIEM</code> jamais câblé en production</li><li>Pin <code>RECALIBRATED</code> jamais câblé en production</li><li>Pin <code>RECALIBRATEDSENSORID</code> jamais câblé en production</li><li>Pin <code>REQMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>REQTREMIE</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>SENSORMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>SENSORP1</code> jamais câblé en production</li><li>Pin <code>SENSORP2</code> jamais câblé en production</li><li>Pin <code>SENSORPV</code> jamais câblé en production</li><li>Pin <code>SENSORTREMIE</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 24 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>DRIVEACTUALFREQHZ</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>GAINMETERSPERHZSEC</code> jamais câblé en production</li><li>Pin <code>INITIALIZED</code> jamais câblé en production</li><li>Pin <code>PERSISTEDINITIALIZED</code> jamais câblé en production</li><li>Pin <code>PERSISTEDPOSITIONM</code> jamais câblé en production</li><li>Pin <code>POSITIONESTIMATEDM</code> jamais câblé en production</li><li>Pin <code>POSMAINTENANCEM</code> jamais câblé en production</li><li>Pin <code>POSP1M</code> jamais câblé en production</li><li>Pin <code>POSP2M</code> jamais câblé en production</li><li>Pin <code>POSPVM</code> jamais câblé en production</li><li>Pin <code>POSTREMIEM</code> jamais câblé en production</li><li>Pin <code>RECALIBRATED</code> jamais câblé en production</li><li>Pin <code>RECALIBRATEDSENSORID</code> jamais câblé en production</li><li>Pin <code>RECALIBRATIONANOMALY</code> jamais câblé en production</li><li>Pin <code>RECALIBRATIONCORRECTIONM</code> jamais câblé en production</li><li>Pin <code>REQMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>REQTREMIE</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>SENSORMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>SENSORP1</code> jamais câblé en production</li><li>Pin <code>SENSORP2</code> jamais câblé en production</li><li>Pin <code>SENSORPV</code> jamais câblé en production</li><li>Pin <code>SENSORTREMIE</code> jamais câblé en production</li></ul>
         </div>
         <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
@@ -554,6 +566,12 @@
             <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
             <div class="pin-name">OUT RECALIBRATEDSENSORID <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">OUT RECALIBRATIONANOMALY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">OUT RECALIBRATIONCORRECTIONM <span class="pin-type">IEC_REAL</span></div>
             <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div></div>
         </div>
@@ -634,9 +652,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Translation_PositionEstimator</code></td>
-                <td>18</td><td>4</td>
-                <td>0</td><td>13</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (13 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>18</td><td>6</td>
+                <td>0</td><td>15</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (15 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
@@ -649,7 +667,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 6 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 10 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-translation-positionestimator-0" class="test-card test-card-pass test-card-collapsed">
@@ -791,6 +809,101 @@
             <details class="checks-details">
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (9)</span></summary>
                 <ul class="checks-list"><li>TC-P11-EST-007 : depart Tremie -&gt; recalage</li><li>TC-P11-EST-007 : le chariot s est bien eloigne de la cote Tremie avant le blip</li><li>TC-P11-EST-007 : hors front -&gt; aucun recalage</li><li>TC-P11-EST-007 : blip Tremie -&gt; comportement defini : recaler (Q2)</li><li>TC-P11-EST-007 : blip Tremie -&gt; id 4</li><li>TC-P11-EST-007 : blip Tremie -&gt; ancrage a la cote 0.0 m</li><li>TC-P11-EST-007 : fin de blip -&gt; recalage a la meme cote</li><li>TC-P11-EST-007 : fin de blip -&gt; toujours 0.0 m</li><li>TC-P11-EST-007 : apres le blip la position repart vers la Maintenance</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-positionestimator-6" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T361-ANOM-001 Correction ordinaire sous le seuil : temoin NON leve </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T361-ANOM-001 Correction ordinaire sous le seuil : temoin NON leve')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
+                <ul class="scenario-list"><li>gain pose explicitement : le cas ne depend pas du defaut</li><li>1er scan utile : aucun recalage</li><li>depart Tremie : recalage a la cote 0,0 m</li><li>Roule jusqu&#x27;a la cote PV : 1500 scans a 3,33 mm = 4,9998 m -&gt; l&#x27;odometrie est
+       quasiment JUSTE au franchissement, c&#x27;est le regime nominal.</li><li>front descendant PV : cote 5,0 m</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary>
+                <ul class="checks-list"><li>TC-T361-ANOM-001 : recalage au depart Tremie</li><li>TC-T361-ANOM-001 : ecart nul -&gt; aucun temoin</li><li>TC-T361-ANOM-001 : hors front -&gt; aucun recalage</li><li>TC-T361-ANOM-001 : recalage au franchissement PV</li><li>TC-T361-ANOM-001 : position recalee a 5,0 m</li><li>TC-T361-ANOM-001 : correction &lt; 0,50 m -&gt; temoin NON leve</li><li>TC-T361-ANOM-001 : correction nominale ~2 mm</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-positionestimator-7" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T361-ANOM-002 Correction ANORMALE : temoin leve ET correction quand meme APPLIQUEE </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T361-ANOM-002 Correction ANORMALE : temoin leve ET correction quand meme APPLIQUEE')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Scenario d&#x27;incident : le gain configure est faux (cas 0,02 vs 0,0551, alerte T361), la
+       position persistee est 10,0 m alors que le chariot franchit reellement P1 a 20,0 m.
+       La correction vaut 10,0 m : elle doit etre APPLIQUEE (le capteur est la meilleure
+       reference absolue disponible) ET SIGNALEE. Refuser la correction laisserait une
+       position fausse ET non corrigee — c&#x27;est l&#x27;erreur que ce cas interdit.</li><li>front montant P1</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
+                <ul class="checks-list"><li>TC-T361-ANOM-002 : 1er scan utile -&gt; aucun recalage</li><li>TC-T361-ANOM-002 : recalage sur P1</li><li>TC-T361-ANOM-002 : CORRECTION APPLIQUEE malgre le temoin (invariant du lot)</li><li>TC-T361-ANOM-002 : ecart de 10,0 m &gt; 0,50 m -&gt; temoin leve</li><li>TC-T361-ANOM-002 : amplitude publiee 10,0 m</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-positionestimator-8" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T361-ANOM-003 Le temoin est un PULSE, l amplitude est MAINTENUE </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T361-ANOM-003 Le temoin est un PULSE, l amplitude est MAINTENUE')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>scan suivant : aucun front</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>TC-T361-ANOM-003 : precondition : temoin leve au recalage</li><li>TC-T361-ANOM-003 : hors front -&gt; aucun recalage</li><li>TC-T361-ANOM-003 : temoin a PULSE -&gt; retombe au scan suivant</li><li>TC-T361-ANOM-003 : l amplitude de la derniere correction est MAINTENUE (lecture trace/IHM)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-positionestimator-9" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T361-ANOM-004 Blip de 2 cm : recale SANS temoin (aucune zone morte) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T361-ANOM-004 Blip de 2 cm : recale SANS temoin (aucune zone morte)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Rejoue le scenario du blip Tremie de TC-P11-EST-007 : un ecart de ~2 cm est RECALE.
+       C&#x27;est la preuve qu&#x27;aucune bande morte n&#x27;a ete introduite — une bande morte a 0,05 m
+       aurait supprime ce recalage et fait echouer la decision Q2 du lot T333.</li><li>depart Tremie</li><li>BLIP : la Tremie se reactive 1 scan</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>TC-T361-ANOM-004 : le chariot s est eloigne avant le blip</li><li>TC-T361-ANOM-004 : blip -&gt; recalage APPLIQUE (aucune zone morte)</li><li>TC-T361-ANOM-004 : ancrage a la cote Tremie</li><li>TC-T361-ANOM-004 : 2 cm &lt; 0,50 m -&gt; aucun temoin</li></ul>
             </details>
                 
                 
@@ -940,6 +1053,15 @@ VAR_OUTPUT
     Initialized          : BOOL;   (* &lt;-- [STAT] Exposé pour recopie persistante côté appelant *)
     Recalibrated         : BOOL;   (* &lt;-- [STAT] Pulse 1 cycle lors d&#x27;un recalage sur capteur *)
     RecalibratedSensorId : INT;    (* &lt;-- [DIAG] 0=Maint, 1=P1, 2=P2, 3=PV, 4=Trémie, -1=Aucun *)
+    (* T361 — TÉMOIN D&#x27;ANOMALIE DE RECALAGE. Pulse 1 cycle lorsque la correction effectivement
+       appliquée dépasse CST_RecalibrationAnomalyM. La correction est APPLIQUÉE dans tous les cas :
+       ce signal ne conditionne jamais l&#x27;affectation de PositionEstimatedM et n&#x27;est jamais un
+       verrou (voir §2bis et le gate G520). *)
+    RecalibrationAnomaly : BOOL;   (* &lt;-- [DIAG] Recalage de ce scan au-delà du seuil de plausibilité *)
+    (* Amplitude de la DERNIÈRE correction appliquée (valeur absolue, mètres). Maintenue entre deux
+       recalages pour rester lisible par une IHM ou une trace lente : c&#x27;est le pendant mesuré du
+       témoin RecalibrationAnomaly. *)
+    RecalibrationCorrectionM : REAL;   (* &lt;-- [DIAG] |PositionEstimatedM - position avant recalage| *)
 END_VAR
 
 VAR
@@ -956,6 +1078,24 @@ VAR
     CycleTimeCalc         : FB_CycleTime;   (* * [INST] Mesure temps de cycle *)
     ColdStart             : BOOL := TRUE;  (* . [LOC] Seed unique depuis Persisted* au premier scan utile *)
     FirstScanDone         : BOOL := FALSE; (* . [LOC] Vrai après le 1er scan utile : les capteurs déjà présents à l&#x27;init ne sont pas des franchissements *)
+    (* T361 — Position AVANT tout recalage de ce scan : sert à MESURER la correction réellement
+       appliquée (§2bis), sans toucher à la chaîne de recalage elle-même. *)
+    PositionBeforeM       : REAL;          (* . [LOC] Position estimée avant recalage du scan courant *)
+END_VAR
+
+VAR CONSTANT
+    (* T361 — SEUIL D&#x27;ANOMALIE DE RECALAGE (m). AU-DELÀ : correction appliquée + anomalie publiée.
+       0,50 m = 5 % de l&#x27;écart maximal entre deux repères absolus (10,0 m : PV-&gt;P2 et
+       P1-&gt;Maintenance) : au-delà, l&#x27;erreur de gain dépasse 5 %, niveau auquel le gain provisoire
+       GVL_PERSISTENT._TranslationGainMetersPerHzSec (0,02 m/(Hz.s), NON CALIBRÉ — T301 en attente)
+       doit être remis en cause. ⚠️ Ce seuil n&#x27;est PAS une garde : c&#x27;est un témoin.
+       DÉCISION UTILISATEUR 2026-09-21 : 5 capteurs, recalage TOUJOURS appliqué, signal d&#x27;anomalie
+       seul — aucune zone morte, aucun blocage (la décision Q2 du lot T333 « recaler SANS garde tant
+       que T301 n&#x27;a pas calibré le gain » reste la règle).
+       NE COUVRE PAS l&#x27;acquisition de la référence initiale (branche « NOT Initialized ») : c&#x27;est une
+       amorce unique, pas la correction d&#x27;une dérive odométrique — la signaler ferait apparaître une
+       anomalie à chaque premier démarrage après intervention. *)
+    CST_RecalibrationAnomalyM : REAL := 0.50;
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -964,6 +1104,7 @@ END_VAR
 IF NOT Enable THEN
     Recalibrated := FALSE;
     RecalibratedSensorId := -1;
+    RecalibrationAnomaly := FALSE;
     // 🔒 Sorties odométriques VOLONTAIREMENT conservées hors Enable (AC3 / persistance continue RETAIN) :
     // - PositionEstimatedM &amp; Initialized : estimation odométrique et référence absolue maintenues pour ne pas perdre la position M3 hors Enable
     RETURN;
@@ -977,6 +1118,7 @@ END_IF;
 
 CycleTimeCalc(DefaultValueS := 0.010);
 Recalibrated := FALSE;
+RecalibrationAnomaly := FALSE;   (* T361 : témoin à pulse, remis à zéro à chaque scan comme Recalibrated *)
 {endregion}
 
 {region &quot;§2 Fronts capteurs&quot;}
@@ -1003,6 +1145,7 @@ TrigMaintenance(CLK := SensorMaintenance);    TrigDnMaintenance(CLK := SensorMai
 //    Ordre de priorité inchangé (Maintenance -&gt; P1 -&gt; P2 -&gt; PV -&gt; Trémie) : sur un mot
 //    thermomètre une seule bascule survient par scan, la priorité ne départage donc qu&#x27;un mot
 //    incohérent (capteur collé / parasite), cas déjà surveillé par le décodeur (Incoherent).
+PositionBeforeM := PositionEstimatedM;   (* T361 : référence de mesure, AVANT tout recalage de ce scan *)
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
 ELSE
@@ -1027,6 +1170,21 @@ ELSE
         Recalibrated := TRUE;
         RecalibratedSensorId := 4;
     END_IF;
+END_IF;
+
+// 2bis. T361 — TÉMOIN D&#x27;ANOMALIE DE RECALAGE : OBSERVER, JAMAIS BLOQUER.
+// Le recalage ci-dessus est TOUJOURS appliqué, sans condition : le capteur franchi reste la
+// meilleure référence absolue disponible, et refuser la correction laisserait une position FAUSSE
+// ET NON CORRIGÉE. Ce bloc ne fait que MESURER la correction effectivement appliquée et PUBLIER
+// l&#x27;anomalie au-delà de CST_RecalibrationAnomalyM — c&#x27;est précisément ce qui a manqué sur la trace
+// Suivi_74 : des sauts de 4,53 à 9,12 m (audit T360) qui n&#x27;ont été vus qu&#x27;en post-mortem.
+// 🔒 Le seuil ci-dessous ne doit JAMAIS devenir une condition des affectations `PositionEstimatedM`
+// du bloc 2 : ce serait refuser un recalage légitime, l&#x27;erreur exacte que le gate G520 interdit.
+// La décision Q2 du lot T333 (recaler sans garde tant que T301 n&#x27;a pas calibré le gain) reste la
+// règle — l&#x27;anomalie est un témoin de diagnostic, pas un verrou.
+IF Recalibrated THEN
+    RecalibrationCorrectionM := ABS(PositionEstimatedM - PositionBeforeM);
+    RecalibrationAnomaly := RecalibrationCorrectionM &gt; CST_RecalibrationAnomalyM;
 END_IF;
 
 // 3. Initialisation au tout premier démarrage sur le premier capteur actif vu (si non initialisé)
@@ -1061,7 +1219,22 @@ PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenance
     </details>
     <details>
         <summary>Sortie brute strucpp</summary>
-        <pre>Error: C++ compilation failed:
+        <pre>STruC++ Test Runner v1.0
+
+test_fb_translation_positionestimator.st
+  [PASS] TC-P11-EST-001 Reprise sur ColdStart avec position persistee
+  [PASS] TC-P11-EST-002 Recalage absolu instantane sur front montant capteur P1 (20.0m)
+  [PASS] TC-P11-EST-004 Recalage a CHAQUE capteur sur front DESCENDANT (trajet Tremie vers Maintenance)
+  [PASS] TC-P11-EST-005 Recalage a CHAQUE capteur sur front MONTANT (trajet Maintenance vers Tremie)
+  [PASS] TC-P11-EST-006 Continuite de la position entre deux fronts (seuil Q3 : |Freq| x Gain x dt + 1 mm)
+  [PASS] TC-P11-EST-007 Blip capteur court (1 scan) en s eloignant : comportement defini (decision Q2 = recaler)
+  [PASS] TC-T361-ANOM-001 Correction ordinaire sous le seuil : temoin NON leve
+  [PASS] TC-T361-ANOM-002 Correction ANORMALE : temoin leve ET correction quand meme APPLIQUEE
+  [PASS] TC-T361-ANOM-003 Le temoin est un PULSE, l amplitude est MAINTENUE
+  [PASS] TC-T361-ANOM-004 Blip de 2 cm : recale SANS temoin (aucune zone morte)
+
+-----------------------------------------
+10 tests, 10 passed, 0 failed
 </pre>
     </details>
 </div>

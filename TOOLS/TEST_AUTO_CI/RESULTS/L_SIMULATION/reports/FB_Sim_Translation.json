@@ -37,11 +37,31 @@
     {
       "name": "TC-T300-CAM-100 Matrice 48 scenarios par 100 graines respecte invariants",
       "passed": true
+    },
+    {
+      "name": "TC-T300-BRK-041 Faute frein traverse le composite M3 (fermeture en mouvement)",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-DRV-070 Deceleration libre : le chariot avance encore apres retrait de commande",
+      "passed": true
+    },
+    {
+      "name": "TC-T300-SEN-052 Recul borne a la butee Tremie : DI perdue PUIS reprise oscillante (ecart trace)",
+      "passed": true
+    },
+    {
+      "name": "TC-T361-ALIGN-001 Ratio odometrique du banc = gain reel 0,02 m/(Hz.s)",
+      "passed": true
+    },
+    {
+      "name": "TC-T361-ALIGN-002 Distance banc = integrale f x 0,02 m/(Hz.s) sur 6 s",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 9,
-    "passed": 9,
+    "total": 14,
+    "passed": 14,
     "failed": 0
   }
 }

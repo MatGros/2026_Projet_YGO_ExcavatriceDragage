@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "file": "test_fb_bucketclosethreshold.st",
+  "results": [
+    {
+      "name": "TC-T262B-001 seuil 0 % : Reached FAUX sur toute la table Delta x geometrie",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-002 distance equivalente : 0,15 m par pourcent (geometrie persistee)",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-003 borne basse : seuil negatif ramene a 0 (branche INACTIVE)",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-004 borne haute : seuil 21 ramene a 20 (jamais au-dela)",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "FB.DISTANCE_M expected 3 +/- 1e-06, got 3.15",
+        "file": "test_fb_bucketclosethreshold.st",
+        "line": 124,
+        "message": "Seuil 21 % : distance CLAMPEE a 3,00 m (borne 20 %)",
+        "expected": "3",
+        "actual": "3.15"
+      }
+    },
+    {
+      "name": "TC-T262B-005 seuil 50 (ancienne borne du contrat parent) : ramene a 20",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "FB.DISTANCE_M expected 3 +/- 1e-06, got 7.5",
+        "file": "test_fb_bucketclosethreshold.st",
+        "line": 136,
+        "message": "Seuil 50 % : distance CLAMPEE a 3,00 m (regression de borne refusee)",
+        "expected": "3",
+        "actual": "7.5"
+      }
+    },
+    {
+      "name": "TC-T262B-006 p=10 : bascule exactement a Delta = 13,50 m (faux / vrai / vrai)",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-007 p=19 : bascule exactement a Delta = 12,15 m",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-008 p=20 (borne) : bascule exactement a Delta = 12,00 m",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-009 geometrie INVALIDE (OffsetOpenM >= OffsetCloseM) : jamais d autorisation",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-010 geometrie INVALIDE (OffsetOpenM > OffsetCloseM) : jamais d autorisation",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-011 MeasureValid FAUX (ActiveOffsetValid) : jamais d autorisation",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-012 IsIntermediate FAUX (mesure hors bande plausible) : jamais d autorisation",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-013 p=20 : Reached reste VRAI sur 3 scans consecutifs a Delta constant",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-014 p=20 : sortie puis retour dans la zone -> Reached de nouveau VRAI",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-015 monotonie : Delta fixe, Reached VRAI pour p = seuil .. 20",
+      "passed": true
+    },
+    {
+      "name": "TC-T262B-016 monotonie : Reached VRAI a p est encore VRAI a p+1 pour un Delta donne",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 16,
+    "passed": 14,
+    "failed": 2
+  }
+}

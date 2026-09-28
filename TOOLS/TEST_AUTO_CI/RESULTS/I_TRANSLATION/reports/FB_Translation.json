@@ -88,7 +88,16 @@
     },
     {
       "name": "TC-P11-018 Translation : arriv\u00e9e sur capteur cible (debounce 100ms) + arr\u00eat exact + frein coll\u00e9",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "FB_T.REQUESTEDDRIVECONTROLWORD expected 0, got 1",
+        "file": "test_fb_translation.st",
+        "line": 683,
+        "message": "arr\u00eat sur capteur -> frein coll\u00e9, mot 0",
+        "expected": "0",
+        "actual": "1"
+      }
     },
     {
       "name": "TC-P11-019 Translation : interlock sens complet Fwd->Rev (d\u00e9lai 200ms \u00e0 vitesse nulle)",
@@ -167,24 +176,52 @@
     },
     {
       "name": "TC-P11-036 T345-L1 Arret de l axe : rebond capteur + demande re-armee -> aucun redemarrage",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB_T.ARRIVALSTOPCONFIRMED expected TRUE, got FALSE",
+        "file": "test_fb_translation.st",
+        "line": 1416,
+        "message": "l axe publie son propre arret confirme"
+      }
     },
     {
       "name": "TC-P11-037 T345-L1 Le fait d arret confirme n est ni constant ni efface par la demande",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB_T.ARRIVALSTOPCONFIRMED expected TRUE, got FALSE",
+        "file": "test_fb_translation.st",
+        "line": 1681,
+        "message": "demande retiree avant le debounce : arret confirme"
+      }
     },
     {
       "name": "TC-P11-038 T345-L1 Une demande de SENS INVERSE relache le verrou et autorise le degagement",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB_T.ARRIVALSTOPCONFIRMED expected TRUE, got FALSE",
+        "file": "test_fb_translation.st",
+        "line": 1783,
+        "message": "verrou d arret arme avec le sens du mouvement"
+      }
     },
     {
       "name": "TC-P11-039 T345-L1 Non-vacuite : rotation reelle au variateur -> aucun arret confirme",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB_T.ARRIVALSTOPCONFIRMED expected TRUE, got FALSE",
+        "file": "test_fb_translation.st",
+        "line": 1909,
+        "message": "arret au repos : fait publie"
+      }
     }
   ],
   "summary": {
     "total": 43,
-    "passed": 42,
-    "failed": 1
+    "passed": 37,
+    "failed": 6
   }
 }

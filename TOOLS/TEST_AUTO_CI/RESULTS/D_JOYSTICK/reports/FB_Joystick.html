@@ -373,7 +373,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-13 23:13:51</div>
+    <div class="exec-time">2026-09-28 08:31:00</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (29 tests)</summary>
@@ -692,11 +692,23 @@
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET)
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT)
-        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT)" onclick="copyPinExpr(this)">(GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT)
+        
+        
+        
+        
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG)" onclick="copyPinExpr(this)">(GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET)
         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT)
-        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT)</code> <span style="color:var(--muted);">→</span></div>
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT)
+        
+        
+        
+        
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG)</code> <span style="color:var(--muted);">→</span></div>
             <div class="pin-name">IN DIRECTINVERSIONPERMIT <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-wired">
             <div class="pin-expr"><span style="color:var(--muted);font-size:10px;margin-right:4px;">Source production :</span><code title="instDiagCanOpen.DeviceCanOpenMaster" onclick="copyPinExpr(this)">instDiagCanOpen.DeviceCanOpenMaster</code> <span style="color:var(--muted);">→</span></div>
@@ -3070,7 +3082,7 @@ VAR_INPUT
 
     // === PERMIS SECURITE ===
     ArmingPermit              : BOOL;       // --&gt; [SAFE] Permission d&#x27;armement homme-mort ; FALSE = armement bloqué
-    DirectInversionPermit     : BOOL;       // --&gt; [SAFE] Inversion Y sans neutre, extraction semi-auto AX8..AX12
+    DirectInversionPermit     : BOOL;       // --&gt; [SAFE] Inversion Y sans neutre, semi-auto AX8..AX12, repli du vidage AX15b et micro-step benne AX15d (T383)
 
     // === ACQUISITION MATERIELLE &amp; DIAGNOSTIC ===
     BusCanOpenOP              : ST_Diag_Device; // --&gt; [HW]   Etat presence noeud CAN

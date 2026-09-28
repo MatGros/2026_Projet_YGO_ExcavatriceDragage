@@ -25,11 +25,27 @@
     {
       "name": "TC-P11-EST-007 Blip capteur court (1 scan) en s eloignant : comportement defini (decision Q2 = recaler)",
       "passed": true
+    },
+    {
+      "name": "TC-T361-ANOM-001 Correction ordinaire sous le seuil : temoin NON leve",
+      "passed": true
+    },
+    {
+      "name": "TC-T361-ANOM-002 Correction ANORMALE : temoin leve ET correction quand meme APPLIQUEE",
+      "passed": true
+    },
+    {
+      "name": "TC-T361-ANOM-003 Le temoin est un PULSE, l amplitude est MAINTENUE",
+      "passed": true
+    },
+    {
+      "name": "TC-T361-ANOM-004 Blip de 2 cm : recale SANS temoin (aucune zone morte)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 6,
-    "passed": 6,
+    "total": 10,
+    "passed": 10,
     "failed": 0
   }
 }

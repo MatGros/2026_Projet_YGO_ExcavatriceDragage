@@ -1,0 +1,6 @@
+Error compiling source files:
+
+ST_CommunHMI.st:54:20: error: Undefined type 'ST_RUNNINGHOURSHMI' in STRUCT 'ST_COMMUNHMI'
+  54 |     RunningHours : ST_RunningHoursHMI;
+     |                    ^
+

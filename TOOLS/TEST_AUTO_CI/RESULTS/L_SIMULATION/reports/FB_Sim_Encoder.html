@@ -373,7 +373,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-20 21:23:58</div>
+    <div class="exec-time">2026-09-28 08:32:22</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (9 tests)</summary>
@@ -1167,7 +1167,21 @@ END_FUNCTION_BLOCK
     </details>
     <details>
         <summary>Sortie brute strucpp</summary>
-        <pre>Error: C++ compilation failed:
+        <pre>STruC++ Test Runner v1.0
+
+test_fb_sim_encoder.st
+  [PASS] TC-P13-ENC-001 Enable FALSE conserve la valeur passee par VAR_IN_OUT
+  [PASS] TC-P13-ENC-002 Simulation incrementation comptage en montee
+  [PASS] TC-P13-034 SpeedReportTauS=0.0 conserve le saut instantane historique (non-regression)
+  [PASS] TC-P13-035 SpeedReportTauS&gt;0 fait decroitre RawSpdOut sur plusieurs scans (fidelite AX10, T316)
+  [PASS] TC-P13-031 PresetCmd applique PresetValue apres PresetLatencyCycles, mouvement gele pendant la latence
+  [PASS] TC-P13-032 Le comptage descend de facon continue et franchit 0 sans se figer (butee silencieuse supprimee)
+  [PASS] TC-P13-036 Comptage a 0 sous commande de descente : le scan suivant ne maintient pas 0
+  [PASS] TC-P13-037 Garde de plage : saturation signalee, comptage borne, aucune vitesse publiee
+  [PASS] TC-P13-038 Comptage negatif : la montee ramene vers 0 puis au-dela (continuite bidirectionnelle)
+
+-----------------------------------------
+9 tests, 9 passed, 0 failed
 </pre>
     </details>
 </div>
