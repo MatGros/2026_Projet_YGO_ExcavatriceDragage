@@ -1,0 +1,75 @@
+contract:
+  task_id: T406
+  criticality: C3
+  strategy: patch
+  objective: >
+    Figer, avant toute connexion entre CODESYS et OpenModelica, un contrat de
+    signaux M3 et une politique de surete de liaison qui evitent tout echange
+    ambigu, perime ou silencieusement maintenu.
+  acceptance:
+    - id: AC1
+      statement: "Chaque signal M3 possède un sens, un producteur unique, un type, une unité et une cadence cible."
+      verified_by: "Matrice PLC/plante dans PLAN_T406_TWINBENCH_CONTRAT_LIAISON.md."
+    - id: AC2
+      statement: "Les echanges rapides, cycliques et evenementiels sont distingués sans promettre de temps reel Windows."
+      verified_by: "Tableau des groupes d echange et budgets de cadence."
+    - id: AC3
+      statement: "Chaque image de domaine porte sequence, horodatage, validite et origine explicites."
+      verified_by: "Contrat atomique de snapshot et exemple de validation."
+    - id: AC4
+      statement: "Une liaison perdue, perimee ou incoherente produit un etat neutre explicite et journalise, jamais un maintien silencieux de la derniere valeur."
+      verified_by: "Matrice etats/timeout/reconnexion."
+    - id: AC5
+      statement: "Aucune ecriture PLC, aucun deploiement Control Win, aucune connexion runtime ni modification du programme automate ne sont realises par cette tache."
+      verified_by: "Revue du diff limite au contrat, au plan et au catalogue."
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T406_TWINBENCH_CONTRAT_LIAISON.yaml
+      - DOC/WFLOW/CONTRACTS/PLAN_T406_TWINBENCH_CONTRAT_LIAISON.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - TOOLS/TWINBENCH/
+      - automate_reel
+      - runtime_Codesys
+      - reseau
+      - deploiement_Control_Win
+      - commit
+      - push
+  conservation:
+    must_survive:
+      - "Le PLC reste seul proprietaire des securites, interlocks, rampes logiques et sorties physiques."
+      - "OpenModelica reste seul proprietaire de la physique simulee."
+      - "FB_SimBench et l aiguillage HwReal/HwSim/HwIn existants ne sont pas modifies."
+      - "Le runner Control Win T404 reste non deploye tant que son verrou loopback n est pas renforce et revu."
+    dropped_on_purpose:
+      - "Toute implementation de passerelle, OPC UA, UDP, memoire partagee ou ecriture PLC."
+  evidence_required:
+    - "check_task_contract.py PASS."
+    - "Revue experte read-only du plan et integration de ses blocages."
+    - "Diff documentaire limite au scope autorise."
+  models_allowed:
+    - "omni/cx/gpt-6-sol"
+  alert_duty: >
+    Une capacite de communication, de licence, de cadence ou de droits CODESYS
+    est une hypothese tant qu elle n est pas mesuree sur le banc Control Win.
+    Tout doute de cible, de sortie physique ou de validite de donnees impose un
+    NO-GO immediat et ne peut pas etre contourne par un maintien de valeur.
+status: COMPLETED
+execution:
+  executed_by: "CDX01"
+  completed_at: "2026-09-28T00:31:23+02:00"
+  status: COMPLETED
+  summary: "Contrat de signaux et surete de liaison redige apres revue experte ; aucun runtime, PLC ou deploiement contacte."
+  evidence_submitted:
+    - "check_task_contract.py: PASS (0 erreur, 0 avertissement)."
+    - "Revue experte read-only : BLOCK integration PLC/OM ; recommandations integrees."
+    - "Diff de lot limite aux documents T406 et au catalogue de taches."
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "GO humain requis avant toute phase B, C ou D qui modifie un outil ou contacte un runtime."

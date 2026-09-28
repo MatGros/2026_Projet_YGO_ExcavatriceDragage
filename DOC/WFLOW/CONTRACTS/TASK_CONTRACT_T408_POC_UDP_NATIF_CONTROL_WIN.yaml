@@ -1,0 +1,81 @@
+contract:
+  task_id: T408
+  criticality: C3
+  strategy: patch
+  objective: >
+    Mesurer un ping UDP non bloquant execute nativement dans une tache 10 ms de
+    la seule copie CODESYS Control Win, afin de separer la performance runtime
+    PLC de la limite ScriptEngine observee dans T407.
+  acceptance:
+    - id: AC1
+      statement: "Le POC n est importable que dans la copie TwinBench Control Win et n ecrit ni commande M3, ni image SimBench, ni sortie physique."
+      verified_by: "Revue des objets PLCopen et verification de l absence de references aux GVL et sorties de production."
+    - id: AC2
+      statement: "Chaque cycle 10 ms execute au plus un envoi et une lecture UDP non bloquante sur 127.0.0.1 et refuse toute autre adresse."
+      verified_by: "Revue ST et trace des compteurs emission, reception, timeout et rejet."
+    - id: AC3
+      statement: "Les paquets portent sequence et horodatage, et les statistiques exposent cadence reelle, pertes, doublons, p50/p95/p99/max."
+      verified_by: "Serveur echo local et trace Control Win de charge d au moins 60 secondes."
+    - id: AC4
+      statement: "Un arret explicite ferme le socket ; aucun appel socket ne bloque la tache PLC."
+      verified_by: "Revue de la machine d etat et essai stop/start Control Win sans changement de port."
+    - id: AC5
+      statement: "Un resultat p99 ou max incompatible avec le budget 50 ms est declare NO-GO pour une future injection plante."
+      verified_by: "Note de resultat avec seuils et verdict explicite."
+    - id: AC6
+      statement: "Les flux rapide, cyclique et evenementiel sont testes separement puis ensemble ; le flux lent ne degrade pas les mesures du flux rapide."
+      verified_by: "Scenario de charge multi-flux avec ports distincts et comparaison avant/apres du p99 rapide."
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/native_udp_poc/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T408_POC_UDP_NATIF_CONTROL_WIN.yaml
+      - DOC/WFLOW/CONTRACTS/PLAN_T408_POC_UDP_NATIF_CONTROL_WIN.md
+      - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T408_POC_UDP_NATIF_CONTROL_WIN.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - automate_reel
+      - reseau_hors_loopback
+      - GVL_Simulation
+      - HwReal
+      - HwSim
+      - HwIn
+      - sortie_physique
+      - commit
+      - push
+  conservation:
+    must_survive:
+      - "Le projet source reste inchange et le POC reste hors du repertoire CODE/."
+      - "La copie Control Win est l unique cible de recette humaine."
+      - "Le POC est observe par ses propres compteurs et ne depend pas de ScriptEngine pendant la mesure."
+      - "Une erreur socket, une trame invalide ou une adresse non loopback ne produit aucun ordre PLC."
+    dropped_on_purpose:
+      - "Toute injection M3 ou integration avec FB_SimBench."
+      - "Toute promesse de temps reel dur sous Windows."
+  evidence_required:
+    - "check_task_contract.py PASS."
+    - "Verification syntaxique et garde-fou source loopback/non-blocking."
+    - "Compilation humaine dans la copie Control Win avec SysSocket systeme."
+    - "Trace de charge 60 s mono-flux puis multi-flux et verdict 50 ms."
+  models_allowed:
+    - "omni/cx/gpt-6-sol"
+  alert_duty: >
+    Une bibliotheque absente, un appel bloquant, une adresse autre que 127.0.0.1,
+    une ecriture dans une GVL de production ou un resultat hors budget impose un
+    NO-GO. Aucune adaptation de la logique automate ne sera faite pour contourner
+    un echec de communication.
+status: IN_PROGRESS
+execution:
+  executed_by: "CDX01"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Contrat et plan avant implementation du POC UDP natif."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Le POC ne devient pas une liaison M3 avant un contrat distinct d injection."

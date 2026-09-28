@@ -11,6 +11,7 @@ CONTROL_WIN_ID = "0000 0004"
 CONTROL_WIN_VERSION = "3.5.19.10"
 CONTROL_WIN_TYPE_NAME = "CODESYS Control Win V3 x64"
 CONTROL_WIN_DEVICE_NAME = "PC-Z-VICTUS"
+LOOPBACK_TARGET_ADDRESSES = ("127.0.0.1", "::1", "[::1]")
 
 
 HW_SIM_BOOL_SYMBOLS = (
@@ -363,17 +364,19 @@ def find_local_control_win():
             seen.append("gateway %s: %s" % (str(gateway.name), str(exc)))
             continue
         for target in targets:
+            target_address = str(target.address).strip()
             description = "%s | %s | %s | %s" % (
                 str(target.device_name), str(target.type_name),
-                str(target.device_id), str(target.address))
+                str(target.device_id), target_address)
             seen.append(description)
             if (str(target.device_name) == CONTROL_WIN_DEVICE_NAME and
                     str(target.type_name) == CONTROL_WIN_TYPE_NAME and
-                    CONTROL_WIN_ID.replace(" ", "") in str(target.device_id).replace(" ", "")):
+                    CONTROL_WIN_ID.replace(" ", "") in str(target.device_id).replace(" ", "") and
+                    target_address in LOOPBACK_TARGET_ADDRESSES):
                 matches.append((gateway, target))
     if len(matches) != 1:
         raise Exception(
-            "Cible Control Win locale unique introuvable. Trouvees: " + " ; ".join(seen))
+            "Cible Control Win loopback unique introuvable. Toute adresse non locale est refusee. Trouvees: " + " ; ".join(seen))
     return matches[0]
 
 

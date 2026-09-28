@@ -14,8 +14,17 @@ if (-not (Test-Path -LiteralPath $VenvPython)) {
     if ($LASTEXITCODE -ne 0) { throw 'Creation environnement Python impossible.' }
 }
 
-$PySideReady = & $VenvPython -c "import PySide6" 2>$null
-if ($LASTEXITCODE -ne 0) {
+$previousNativeErrorPreference = $PSNativeCommandUseErrorActionPreference
+$PSNativeCommandUseErrorActionPreference = $false
+try {
+    & $VenvPython -c "import importlib.util, sys; sys.exit(0 if importlib.util.find_spec('PySide6') else 1)" 2>$null
+    $PySideReady = ($LASTEXITCODE -eq 0)
+}
+finally {
+    $PSNativeCommandUseErrorActionPreference = $previousNativeErrorPreference
+}
+
+if (-not $PySideReady) {
     Write-Host '[EN COURS] Installation de PySide6 dans l environnement TwinBench...'
     & $VenvPython -m pip install --disable-pip-version-check 'PySide6>=6.10,<7'
     if ($LASTEXITCODE -ne 0) { throw 'Installation PySide6 impossible.' }

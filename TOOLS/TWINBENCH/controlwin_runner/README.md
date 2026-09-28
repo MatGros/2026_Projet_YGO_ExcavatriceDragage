@@ -17,9 +17,10 @@ Le lanceur travaille dans un dossier local fixe :
 
 ## Utilisation
 
-Double-cliquer sur `Lancer_TwinBench_ControlWin.cmd`, puis utiliser le menu :
+Double-cliquer sur `Lancer_TwinBench_ControlWin.cmd`, puis appuyer sur Entrée :
 
-1. **Importer** : choisir un `.project` ou `.projectarchive`. L'original est
+1. **Continuer** : le lanceur détermine lui-même la prochaine étape. Au premier
+   lancement, choisir un `.project` ou `.projectarchive`. L'original est
    contrôlé par SHA-256 avant/après et n'est jamais ouvert par CODESYS.
 2. **Préparer** : un nouveau projet Control Win est créé et l'`Application`
    complète de la copie source y est importée. Un adaptateur `HW_SIM` remplace
@@ -30,11 +31,14 @@ Double-cliquer sur `Lancer_TwinBench_ControlWin.cmd`, puis utiliser le menu :
    exacte, puis la copie est téléchargée et lancée. Le PLC réel est exclu.
 4. **Ouvrir la copie** : CODESYS ouvre exactement la copie déployée pour le
    monitoring, les Watch et les Traces.
-5. **État** : affiche le manifeste et le dernier rapport.
+La seule confirmation demandée est `DEPLOYER` avant le téléchargement Control
+Win local, ou `REPARER` avant d'archiver une copie isolée en échec.
 
 ## Garde-fous
 
-- adresse réseau imposée à `127.0.0.1` lors de la préparation ;
+- adresse réseau imposée à `127.0.0.1` lors de la préparation ; le scan de
+  déploiement refuse aussi toute cible dont l'adresse n'est pas `127.0.0.1`,
+  `::1` ou `[::1]` ;
 - cible exigée au scan : `PC-Z-VICTUS` / `CODESYS Control Win V3 x64` ;
 - Target ID exigé : type `4096`, ID `0000 0004`, version `3.5.19.10` ;
 - aucun accès à `CODE/`, `PRJ_CODESYS/` ou au projet source après copie ;

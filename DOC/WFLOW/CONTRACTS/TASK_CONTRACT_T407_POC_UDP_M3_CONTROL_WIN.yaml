@@ -1,0 +1,79 @@
+contract:
+  task_id: T407
+  criticality: C3
+  strategy: patch
+  objective: >
+    Prouver sur le seul runtime CODESYS Control Win local qu une image de commandes
+    M3 peut etre serialisee, transmise en UDP loopback, validee par une plante M3
+    locale et mesuree, sans modifier ni la logique PLC ni l image SimBench.
+  acceptance:
+    - id: AC1
+      statement: "Le bridge refuse toute adresse UDP autre que la boucle locale et n accepte que le port fixe documente."
+      verified_by: "Tests unitaires du protocole et constantes loopback explicites."
+    - id: AC2
+      statement: "Le script CODESYS lit exclusivement les trois commandes M3 publiques et ne contient aucun appel d ecriture PLC en phase 1."
+      verified_by: "Revue statique et test guard no-write."
+    - id: AC3
+      statement: "Chaque trame porte schema, sequence, horodatage, origine et image complete ; les trames invalides, hors ordre ou perimees sont comptees et rejetees."
+      verified_by: "Tests de serialisation, mutations et rapport final de la passerelle."
+    - id: AC4
+      statement: "La plante locale retourne une image M3 simulee coherente pour chaque commande valide sans se connecter a un runtime PLC ni ecrire dans celui-ci."
+      verified_by: "Test UDP local de bout en bout avec compteur requetes/reponses et latences."
+    - id: AC5
+      statement: "Le rapport fournit nombre de trames, pertes, doublons, rejets et latences p50/p95/p99/max ; il ne promet pas de temps reel Windows."
+      verified_by: "Scenario de charge local reproductible."
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/udp_m3_link/
+      - TOOLS/PLC_CSV_SNAPSHOT/codesys_console/codesys_m3_udp_shadow.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_t407_udp_m3_link.py
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T407_POC_UDP_M3_CONTROL_WIN.yaml
+      - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T407_POC_UDP_M3_CONTROL_WIN.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - automate_reel
+      - reseau_hors_loopback
+      - ecriture_GVL_Simulation.SimM3OpenModelica
+      - SimM3OpenModelicaActive
+      - commit
+      - push
+  conservation:
+    must_survive:
+      - "Le PLC reste proprietaire de la commande, des rampes, interlocks, securites et sorties."
+      - "FB_SimBench, HwReal, HwSim, HwIn et l aiguillage T403 restent intacts."
+      - "Control Win est la seule cible humaine autorisee ; le PLC reel n est jamais cible ni decouvert."
+      - "Toute absence ou invalidite de trame reste sans ecriture PLC et est journalisee."
+    dropped_on_purpose:
+      - "Injection de l image ST_HwTranslation dans GVL_Simulation.SimM3OpenModelica."
+      - "OPC UA, EtherCAT, memoire partagee et toute promesse de cycle 10 ms Windows."
+  evidence_required:
+    - "check_task_contract.py PASS."
+    - "Tests unitaires protocole et guard no-write PASS."
+    - "Test UDP local charge avec rapport de latence et pertes."
+    - "Revue du diff : aucun fichier CODE/, PRJ_CODESYS/ ou CODE_XML touche."
+  models_allowed:
+    - "omni/cx/gpt-6-sol"
+  alert_duty: >
+    Toute cible non-loopback, perte de lien, trame invalide, besoin d ecriture PLC
+    ou doute sur les bits variateur est un NO-GO. Le script s arrete et journalise ;
+    il ne bascule jamais vers le PLC reel ni vers une image plante par defaut.
+status: COMPLETED
+execution:
+  executed_by: "CDX01"
+  completed_at: "2026-09-28T01:45:00+02:00"
+  status: COMPLETED
+  summary: "Phase 1 validee : protocole loopback, plante M3 FMU et shadow Control Win sans ecriture PLC. ScriptEngine prouve le transport, mais sa cadence observee ne convient pas a une boucle 50 ms."
+  evidence_submitted:
+    - "check_task_contract.py: PASS (0 erreur, 0 avertissement)."
+    - "check_t407_udp_m3_link.py: PASS (loopback fixe, shadow sans ecriture PLC)."
+    - "Test local UDP : M3_CommandImage -> FMU OpenModelica -> M3_PlantImage, 1 accepte, 0 rejet."
+    - "Recette humaine Control Win : 138 envoyees, 138 reponses, 0 timeout, 0 rejet ; RTT p50 3.777 ms, p99 25.040 ms, max 519.836 ms."
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "T407 ne valide pas une boucle 50 ms : ScriptEngine est reserve au diagnostic. Un GO et un contrat distincts restent requis avant toute ecriture de l image OpenModelica dans Control Win."

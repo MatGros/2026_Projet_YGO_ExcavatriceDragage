@@ -263,23 +263,23 @@ ApplicationWindow {
                                 }
                                 var pts = backend.tracePoints
                                 if (pts.length < 2) return
-                                var tMax = pts[pts.length-1].t
+                                var tMax = pts[pts.length-1][0]
                                 var tMin = Math.max(0, tMax-2.0)
                                 function px(t) { return left + (t-tMin)/2.0*(w-left-right) }
-                                function py(v) { return top + (50-Math.max(0,Math.min(50,v)))/50*(h-top-bottom) }
+                                function py(v) { return top + (50-Math.max(0,Math.min(50,v)))/50*(h-top-bottom-2) }
                                 ctx.strokeStyle = root.warning; ctx.lineWidth = 1.5; ctx.beginPath()
                                 var started = false
-                                for (var i=0; i<pts.length; ++i) if (pts[i].t >= tMin) {
-                                    if (!started) { ctx.moveTo(px(pts[i].t),py(pts[i].cmd)); started=true } else ctx.lineTo(px(pts[i].t),py(pts[i].cmd))
+                                for (var i=0; i<pts.length; ++i) if (pts[i][0] >= tMin) {
+                                    if (!started) { ctx.moveTo(px(pts[i][0]),py(pts[i][1])); started=true } else ctx.lineTo(px(pts[i][0]),py(pts[i][1]))
                                 }
                                 ctx.stroke()
                                 ctx.strokeStyle = root.accent; ctx.fillStyle = root.accent; ctx.lineWidth = 1.2; ctx.beginPath(); started=false
-                                for (i=0; i<pts.length; ++i) if (pts[i].t >= tMin) {
-                                    var xx=px(pts[i].t), yy=py(pts[i].act)
+                                for (i=0; i<pts.length; ++i) if (pts[i][0] >= tMin) {
+                                    var xx=px(pts[i][0]), yy=py(pts[i][2])
                                     if (!started) { ctx.moveTo(xx,yy); started=true } else ctx.lineTo(xx,yy)
                                 }
                                 ctx.stroke()
-                                for (i=0; i<pts.length; ++i) if (pts[i].t >= tMin) { ctx.beginPath(); ctx.arc(px(pts[i].t),py(pts[i].act),1.5,0,Math.PI*2); ctx.fill() }
+                                for (i=0; i<pts.length; ++i) if (pts[i][0] >= tMin) { ctx.beginPath(); ctx.arc(px(pts[i][0]),py(pts[i][2]),1.5,0,Math.PI*2); ctx.fill() }
                                 ctx.fillStyle = "#7e8792"; ctx.font = "10px Consolas"; ctx.fillText(tMin.toFixed(2)+" s", left, h-8); ctx.fillText(tMax.toFixed(2)+" s", w-right-42, h-8)
                             }
                         }

@@ -1,11 +1,85 @@
 tasks:
+- id: T409
+  parent_id: T399
+  statut: ⏳
+  criticite: C3
+  domaine: OUTILLAGE / SIMULATION / FMU / CONTROL WIN / SIMBENCH
+  agent: CDX01
+  date: '2026-09-28T02:45:00+02:00'
+  titre: 'POC FMU M3 fonctionnel avec injection reversible dans SimBench Control Win'
+  contexte: 'T408 a valide le transport UDP natif 10 ms dans la copie Control Win. Il faut maintenant relier une plante FMU M3 a l image SimM3OpenModelica deja prevue par T403.'
+  description: 'Construire une passerelle binaire locale, valider les trames et alimenter GVL_Simulation.SimM3OpenModelica uniquement sous les deux verrous de simulation, sans modifier le PLC reel ni le code source production.'
+  objectifs:
+  - 'Recevoir les commandes M3 de Control Win et avancer la FMU OpenModelica.'
+  - 'Publier une image M3 complete vers SimM3OpenModelica.'
+  - 'Neutraliser sur timeout, trame invalide ou verrou de simulation absent.'
+  - 'Mesurer pertes, sequences et reprise apres coupure.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T409_FMU_CONTROL_WIN_INJECTION.yaml
+  avancement: 'Contrat, plan, protocole binaire et gateway FMU créés ; POU passerelle fourni pour compilation dans la copie Control Win.'
+  bloque_par:
+  - 'Recette humaine de compilation et de téléchargement dans la copie Control Win.'
+- id: T408
+  parent_id: T399
+  statut: ⏳
+  criticite: C3
+  domaine: OUTILLAGE / SIMULATION / UDP NATIF / CONTROL WIN
+  agent: CDX01
+  date: '2026-09-28T01:50:00+02:00'
+  titre: 'POC UDP natif — mesure 10 ms dans la copie Control Win'
+  contexte: 'T407 valide le loopback mais mesure ~217 ms/echange via ScriptEngine. Il faut mesurer le transport depuis une tache PLC native non bloquante avant toute liaison M3.'
+  description: 'POC ping isole, boucle locale uniquement, sans M3 ni SimBench. Le code est importe seulement dans la copie Control Win et expose ses propres compteurs de charge.'
+  objectifs:
+  - 'Executer UDP non bloquant dans une tache 10 ms de la copie Control Win.'
+  - 'Mesurer cadence, pertes et p50/p95/p99/max sur 60 s.'
+  - 'Fermer explicitement le socket au stop et verifier la reprise sans changer de port.'
+  - 'Refuser toute integration M3 si le budget 50 ms n est pas respecte.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T408_POC_UDP_NATIF_CONTROL_WIN.yaml
+  avancement: 'Sources mono et multi-flux, echo local et garde-fou construits. Recette humaine a jouer dans une nouvelle tache 10 ms de la copie Control Win ; aucun code production ni image M3 touche.'
+  bloque_par: []
+- id: T407
+  parent_id: T399
+  statut: ✅
+  criticite: C3
+  domaine: OUTILLAGE / SIMULATION / UDP / CONTROL WIN
+  agent: CDX01
+  date: '2026-09-28T01:45:00+02:00'
+  titre: 'POC liaison UDP M3 — Control Win local et plante OpenModelica'
+  contexte: 'Le POC T402 a prouve ScriptEngine ponctuel et T404 a prouve Control Win local. Il faut maintenant mesurer un echange continu isole, sans OPC UA et sans aucune ecriture PLC.'
+  description: 'Phase 1 en lecture seule : le script CODESYS envoie les commandes M3 publiques a une plante locale par UDP loopback ; les retours sont controles et traces, mais jamais injectes dans le PLC.'
+  objectifs:
+  - 'Limiter strictement le transport a 127.0.0.1 et au runtime Control Win ouvert par l humain.'
+  - 'Porter des images atomiques sequencees, horodatees et validees.'
+  - 'Mesurer charge, pertes, doublons, rejets et percentiles de latence.'
+  - 'Conserver le PLC et FB_SimBench sans aucune ecriture pendant cette phase.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T407_POC_UDP_M3_CONTROL_WIN.yaml
+  avancement: 'Recette humaine shadow Control Win OK : 138/138, 0 timeout, 0 rejet. RTT p99 25.040 ms mais cadence effective ~217 ms/echange et pic 519.836 ms : ScriptEngine valide la connectivite, pas une boucle cible 50 ms. Aucune image OM ecrite.'
+  bloque_par: []
+- id: T406
+  parent_id: T399
+  statut: ⏳
+  criticite: C3
+  domaine: OUTILLAGE / SIMULATION / CONTRAT LIAISON / SURETE
+  agent: CDX01
+  date: '2026-09-28T00:31:23+02:00'
+  titre: 'TwinBench M3 — contrat de signaux et surete de liaison PLC/plante'
+  contexte: 'La revue experte bloque toute integration PLC/OpenModelica tant que les images de donnees, leur validite, les timeouts, la neutralisation et les proprietaires ne sont pas definis et relus.'
+  description: 'Cadrer les images atomiques PLC/plante, les groupes rapide/cyclique/evenementiel, les sequences, horodatages, origins, validation, timeout et reconnexion, sans connecter aucun runtime ni modifier le PLC.'
+  objectifs:
+  - 'Definir le producteur unique, le sens, le type et l unite de chaque signal M3 initial.'
+  - 'Distinguer cadence rapide, cyclique, evenementielle et graphique sans promettre de temps reel Windows.'
+  - 'Interdire toute image partielle, perimee ou de provenance ambiguë.'
+  - 'Definir les etats de liaison et le rejet explicite sans hold-last-value silencieux.'
+  - 'Exiger une revue humaine avant toute implementation de passerelle ou connexion Control Win.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T406_TWINBENCH_CONTRAT_LIAISON.yaml
+  avancement: 'Contrat des images atomiques, cadences, validite, timeout et reconnexion redige et verifie. Revue humaine requise : aucun GO phase B/C/D tant que les bits variateur, timeouts, neutralisation et origins ne sont pas arbitres.'
+  bloque_par: []
 - id: T405
   parent_id: T399
   statut: ⏳
   criticite: C2
   domaine: OUTILLAGE / SIMULATION / OPENMODELICA / INTERFACE LIVE
   agent: CDX01
-  date: '2026-09-27T23:57:33+02:00'
+  date: '2026-09-28T00:07:34+02:00'
   titre: 'POC M3 live — joystick PySide6/QML et FMU OpenModelica à pas de 10 ms'
   contexte: 'La simulation OMEdit par lot et ses graphes ne permettent pas de comprendre facilement les entrées/sorties des blocs ni de modifier une commande pendant l exécution. Un POC isolé doit prouver une interaction directe avec la même plante M3 compilée par OpenModelica.'
   description: 'Compiler une façade scalaire de TranslationM3 en FMU FMI 2.0 Co-Simulation, la piloter localement avec OMSimulator par pas de communication de 10 ms et fournir une interface PySide6/QML montrant joystick, consigne, fréquence, frein, position, vitesse, capteurs et trace courte.'
@@ -16,15 +90,15 @@ tasks:
   - 'Séparer la cadence physique 10 ms du rafraîchissement graphique plus lent.'
   - 'Rester entièrement local, hors PLC, CODESYS, réseau et machine réelle.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T405_POC_M3_LIVE_FMU_QML.yaml
-  avancement: 'Tâche cadrée et verrouillée après validation humaine du principe. Implémentation en cours.'
+  avancement: 'FMU Co-Simulation construite avec omc 1.27.1 ; injection live et pas 10 ms validés sur 500 pas. Interface PySide6/QML chargée sans erreur après correction du conflit DLL Qt. En attente de recette visuelle humaine.'
   bloque_par: []
 - id: T404
   parent_id: T399
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: OUTILLAGE / SIMULATION / CODESYS CONTROL WIN
   agent: CDX01
-  date: '2026-09-27T15:43:21+02:00'
+  date: '2026-09-28T01:19:19+02:00'
   titre: 'Control Win Runner isole — copier, deployer et ouvrir le projet simule'
   contexte: 'Le changement manuel de device dans le projet reel a supprime les mappings E/S et provoque une regression. Avant le couplage OM ou le benchmark UDP, il faut prouver une chaine reproductible qui ne manipule qu une copie et ne peut pas contacter le PLC reel.'
   description: 'Construire un lanceur qui demande un projet, l archive et cree une copie de travail fixe, compile cette copie en CODESYS headless, n autorise qu une cible Control Win puis permet d ouvrir la meme copie dans l IDE pour la visualisation en ligne.'
@@ -36,7 +110,7 @@ tasks:
   - 'Ouvrir exactement la copie deployee pour Watch, Trace et visu en ligne.'
   - 'Rapporter les incompatibilites E/S sans modifier la logique PLC.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T404_CONTROL_WIN_RUNNER_ISOLE.yaml
-  avancement: 'Runner et adaptateur HW_SIM dérivé testés : original garanti inchangé par SHA-256, projet Control Win neuf créé, Application native importée. Les 293 erreurs matérielles initiales sont corrigées uniquement dans la copie ; compilation = 0 erreur/1 avertissement. État PREPARED, aucun déploiement effectué.'
+  avancement: 'Recette humaine 2026-09-28 : copie TwinBench déployée sur CODESYS Control Win V3 x64 local, connexion ONLINE et lecture de variable réussies. Original inchangé par SHA-256 ; compilation Control Win 0 erreur/1 avertissement ; scan loopback obligatoire, assistant simplifié et archivage confirmé.'
   bloque_par: []
 - id: T403
   parent_id: T399
