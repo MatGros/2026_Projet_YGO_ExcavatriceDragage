@@ -14,10 +14,11 @@ STEP_S = 0.01
 def _load_omsimulator():
     om_root = find_omc().parents[1]
     package_root = om_root / "lib" / "omc"
-    bin_dir = om_root / "bin"
     if str(package_root) not in sys.path:
         sys.path.insert(0, str(package_root))
-    os.environ["PATH"] = str(bin_dir) + os.pathsep + os.environ.get("PATH", "")
+    # Ne pas ajouter OpenModelica/bin au PATH : il contient ses propres DLL Qt6,
+    # incompatibles avec celles de PySide6. Le binding OMSimulator ouvre déjà
+    # temporairement son répertoire DLL avec os.add_dll_directory().
     import OMSimulator  # type: ignore
 
     return OMSimulator
@@ -68,7 +69,7 @@ class M3FmuEngine:
 
         self._generation += 1
         STATE_DIR.mkdir(parents=True, exist_ok=True)
-        temp_dir = STATE_DIR / "Runtime"
+        temp_dir = STATE_DIR / f"Runtime_{os.getpid()}_{self._generation}"
         temp_dir.mkdir(parents=True, exist_ok=True)
         self.oms.setTempDirectory(str(temp_dir))
         self.oms.setWorkingDirectory(str(temp_dir))

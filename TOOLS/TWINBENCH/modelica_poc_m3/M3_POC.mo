@@ -22,6 +22,7 @@ package M3_POC "POC graphique de translation M3 — sans logique PLC"
     Real maintenanceSensor_M=30 "[CODE PLC] Capteur Maintenance";
     Real tremieMechanicalStop_M=-0.30 "[HYPOTHESE] Butée 30 cm après capteur";
     Real maintenanceMechanicalStop_M=30.30 "[HYPOTHESE] Butée 30 cm après capteur";
+    Real initialPosition_M=20 "[CONFIG] Position initiale FMU ; doit être référencée par le scénario";
   end M3Configuration;
 
   record M3Measurements "Mesures analogiques de la plante"
@@ -121,6 +122,9 @@ package M3_POC "POC graphique de translation M3 — sans logique PLC"
   equation
     assert(configuration.frequency_Hz >= 0,
       "M3 loop: frequency_Hz doit être positive ou nulle");
+    assert(configuration.initialPosition_M >= configuration.tremieMechanicalStop_M and
+      configuration.initialPosition_M <= configuration.maintenanceMechanicalStop_M,
+      "M3: initialPosition_M hors des butées mécaniques");
     assert(configuration.pauseAtTremie_S >= 0 and configuration.pauseAtMaintenance_S >= 0,
       "M3 loop: les pauses doivent être positives ou nulles");
     assert(configuration.cycleCount >= 0,
@@ -211,7 +215,7 @@ package M3_POC "POC graphique de translation M3 — sans logique PLC"
       outMin=configuration.tremieMechanicalStop_M,
       outMax=configuration.maintenanceMechanicalStop_M,
       initType=Modelica.Blocks.Types.Init.InitialOutput,
-      y_start=20)
+      y_start=configuration.initialPosition_M)
       annotation(Placement(transformation(extent={{45,-35},{65,-15}})));
     SensorBank sensors(
       tremie_M=configuration.tremieSensor_M,

@@ -203,7 +203,10 @@ class LiveBackend(QObject):
 
     @Property("QVariantList", notify=traceChanged)
     def tracePoints(self):
-        return list(self._trace)
+        return [
+            [point["t"], point["cmd"], point["act"], point["velocity"]]
+            for point in self._trace
+        ]
 
     @Property(str, notify=errorChanged)
     def errorText(self) -> str:
@@ -211,7 +214,25 @@ class LiveBackend(QObject):
 
 
 def main() -> int:
-    application = QGuiApplication(sys.argv)
+    smoke_test = "--smoke-test" in sys.argv
+    screenshot_path = None
+    if "--screenshot" in sys.argv:
+        screenshot_index = sys.argv.index("--screenshot")
+        if screenshot_index + 1 >= len(sys.argv):
+            raise SystemExit("--screenshot exige un chemin de sortie")
+        screenshot_path = sys.argv[screenshot_index + 1]
+    qt_args = []
+    skip_next = False
+    for argument in sys.argv:
+        if skip_next:
+            skip_next = False
+            continue
+        if argument == "--screenshot":
+            skip_next = True
+            continue
+        if argument != "--smoke-test":
+            qt_args.append(argument)
+    application = QGuiApplication(qt_args)
     application.setApplicationName("TwinBench M3 Live")
     backend = LiveBackend()
     application.aboutToQuit.connect(backend.close)
@@ -222,6 +243,21 @@ def main() -> int:
     if not qml_engine.rootObjects():
         backend.close()
         return 2
+    if screenshot_path:
+        backend.direction = 1.0
+        backend.start()
+
+        def save_screenshot() -> None:
+            window = qml_engine.rootObjects()[0]
+            image = window.screen().grabWindow(window.winId())
+            if not image.save(screenshot_path):
+                print(f"Capture impossible : {screenshot_path}", file=sys.stderr)
+            application.quit()
+
+        QTimer.singleShot(1500, save_screenshot)
+    elif smoke_test:
+        backend.start()
+        QTimer.singleShot(1200, application.quit)
     return application.exec()
 
 

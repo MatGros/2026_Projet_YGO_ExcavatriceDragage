@@ -66,13 +66,19 @@ contract:
     Le pas FMI de 10 ms est un pas de communication logiciel sous Windows et ne
     constitue pas une garantie temps réel. Toute dérive de cadence ou différence
     entre temps simulé et temps mural doit être affichée, jamais masquée.
-status: IN_PROGRESS
+status: COMPLETED
 execution:
   executed_by: "CDX01"
-  completed_at: ""
-  status: PENDING
-  summary: "Implémentation en cours."
-  evidence_submitted: []
+  completed_at: "2026-09-28T00:07:34+02:00"
+  status: COMPLETED
+  summary: "POC M3 live construit et validé automatiquement ; recette visuelle humaine encore requise."
+  evidence_submitted:
+    - "FMU FMI 2.0 Co-Simulation construite par omc.exe 1.27.1."
+    - "modelDescription.xml : entrées/sorties scalaires et causalités FMI présentes."
+    - "Scénario headless : 5,000 s, 501 événements discrets, avance/arrêt/inversion dans la même instance."
+    - "Chargement QML PySide6 6.11.2 hors écran : PASS."
+    - "Garde-fou conflit DLL Qt : ajout d OpenModelica au PATH interdit."
+    - "Environnement Python isolé sous LocalAppData ; aucun paquet global modifié."
 validation:
   status: PENDING
   validated_by: ""

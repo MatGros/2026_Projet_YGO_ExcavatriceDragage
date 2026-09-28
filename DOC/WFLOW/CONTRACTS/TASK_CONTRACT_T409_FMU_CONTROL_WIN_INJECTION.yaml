@@ -1,0 +1,71 @@
+contract:
+  task_id: T409
+  criticality: C3
+  strategy: patch
+  objective: >
+    Faire fonctionner une plante FMU OpenModelica avec la logique PLC de la
+    copie Control Win en alimentant l image M3 SimBench par UDP natif,
+    reversible et borne.
+  acceptance:
+    - id: AC1
+      statement: "La plante FMU reçoit les commandes M3 produites par Control Win et renvoie une image binaire complète."
+      verified_by: "rapport gateway avec séquences, trames acceptées et rejets"
+    - id: AC2
+      statement: "Le POU Control Win n écrit GVL_Simulation.SimM3OpenModelica que si SimulationModeActive et SimM3OpenModelicaActive sont vrais."
+      verified_by: "revue ST et test Watch des deux verrous"
+    - id: AC3
+      statement: "Une trame absente, périmée, invalide ou hors bornes neutralise l image OM et ne conserve pas silencieusement la dernière valeur."
+      verified_by: "test de coupure gateway et compteurs LinkInvalid/Timeout"
+    - id: AC4
+      statement: "La perte de la liaison ne modifie ni HwReal, ni la logique métier, ni le PLC réel."
+      verified_by: "diff limité aux outils/documents et essai dans la copie Control Win"
+    - id: AC5
+      statement: "Le flux natif respecte le budget mesuré T408 : zéro perte et p99 rapide inférieur ou égal à 50 ms dans la copie."
+      verified_by: "journal T408/T409 et compteurs PLC"
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/udp_m3_link/
+      - TOOLS/TWINBENCH/native_udp_poc/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T409_FMU_CONTROL_WIN_INJECTION.yaml
+      - DOC/WFLOW/CONTRACTS/PLAN_T409_FMU_CONTROL_WIN_INJECTION.md
+      - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T409_FMU_CONTROL_WIN_INJECTION.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - automate_reel
+      - runtime_Codesys_reel
+      - commit
+      - push
+  conservation:
+    must_survive:
+      - "FB_SimBench reste l enveloppe unique et son aiguillage existant reste inchangé."
+      - "SimulationModeActive reste le verrou maître."
+      - "Le modèle ST M3 reste le repli lorsque le bit OM est faux ou lorsque la liaison est invalide."
+      - "Le projet source et le PLC réel ne sont jamais contactés."
+    dropped_on_purpose: []
+  evidence_required:
+    - "check_task_contract.py PASS"
+    - "garde-fou statique protocole et bornes PASS"
+    - "rapport FMU gateway"
+    - "recette humaine Control Win copie"
+  models_allowed:
+    - "omni/cx/gpt-6-sol"
+  alert_duty: >
+    Toute ambiguïté de structure ST_HwTranslation, timeout ou origine bloque
+    l injection et doit être signalée ; aucune valeur par défaut ne doit être
+    inventée pour un bit variateur ou une sécurité.
+status: IN_PROGRESS
+execution:
+  executed_by: CDX01
+  completed_at: ""
+  status: PENDING
+  summary: "Contrat créé avant implémentation ; T408 fournit la preuve de transport natif."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Implémentation limitée à la copie Control Win et aux outils."

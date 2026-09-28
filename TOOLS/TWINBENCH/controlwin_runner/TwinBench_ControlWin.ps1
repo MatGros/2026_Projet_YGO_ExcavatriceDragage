@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('Menu', 'Import', 'Prepare', 'Deploy', 'Open', 'Status', 'SelfTest')]
+    [ValidateSet('Menu', 'Import', 'Prepare', 'Deploy', 'Open', 'Status', 'SelfTest', 'Assistant')]
     [string]$Action = 'Menu',
     [string]$ProjectPath = ''
 )
@@ -91,17 +91,29 @@ function Add-ActionHistory(
 
 function Get-AllowedChoices([string]$State) {
     switch ($State) {
-        'EMPTY' { return @('1', '5', '6', '8', '0') }
-        'IMPORTED' { return @('1', '2', '5', '6', '8', '9', '0') }
-        'PREPARE_FAILED' { return @('1', '4', '5', '6', '7', '9', '0') }
-        'PREPARED' { return @('1', '2', '3', '4', '5', '6', '8', '9', '0') }
-        'DEPLOYED' { return @('1', '4', '5', '6', '8', '0') }
-        default { return @('1', '5', '6', '8', '0') }
+        'EMPTY' { return @('1', '5', '6', '8', '10', '0') }
+        'IMPORTED' { return @('1', '2', '5', '6', '8', '9', '10', '0') }
+        'PREPARE_FAILED' { return @('1', '4', '5', '6', '7', '9', '10', '0') }
+        'PREPARED' { return @('1', '2', '3', '4', '5', '6', '8', '9', '10', '0') }
+        'DEPLOYED' { return @('1', '4', '5', '6', '8', '10', '0') }
+        default { return @('1', '5', '6', '8', '10', '0') }
     }
 }
 
 function Write-WorkflowLine([string]$Marker, [string]$Text, [ConsoleColor]$Color) {
     Write-Host ("[{0}] {1}" -f $Marker, $Text) -ForegroundColor $Color
+}
+
+function Write-FileLink([string]$Label, [string]$Path) {
+    if (-not (Test-Path -LiteralPath $Path)) {
+        Write-Host ("[INFO] {0} : fichier indisponible ({1})" -f $Label, $Path) -ForegroundColor Yellow
+        return
+    }
+    $absolutePath = (Resolve-Path -LiteralPath $Path).Path
+    $uri = [Uri]::new($absolutePath).AbsoluteUri
+    $escape = [char]27
+    Write-Host ("{0}]8;;{1}{0}\{2}{0}]8;;{0}\" -f $escape, $uri, $Label) -ForegroundColor Cyan
+    Write-Host ("  {0}" -f $absolutePath) -ForegroundColor DarkGray
 }
 
 function Show-WorkflowStatus {
@@ -296,11 +308,18 @@ function Stop-TrackedTwinBenchProcess {
     }
 }
 
-function Recover-TwinBenchWorkspace {
+function Recover-TwinBenchWorkspace([switch]$Confirmed) {
     Initialize-Workspace
     Assert-SourceUnchanged
     $state = Get-WorkflowState
     if ($state -eq 'EMPTY') { throw 'Aucun workspace TwinBench a recuperer.' }
+    if (-not $Confirmed) {
+        $confirmation = Read-Host 'Tape ARCHIVER pour liberer la copie et archiver ses restes, ou ENTREE pour annuler'
+        if ($confirmation -cne 'ARCHIVER') {
+            Write-Host '[INFO] Recuperation annulee. Aucun fichier ni processus n est touche.' -ForegroundColor Yellow
+            return
+        }
+    }
     Stop-TrackedTwinBenchProcess
     Start-Sleep -Milliseconds 500
     $stamp = (Get-Date).ToString('yyyyMMdd_HHmmss')
@@ -324,6 +343,89 @@ function Recover-TwinBenchWorkspace {
     }
     Write-Host ("[PASS] Workspace libere. Restes archives dans : {0}" -f $recoveryDir) -ForegroundColor Green
     Write-Host '[PASS] Projet source conserve. Une nouvelle preparation propre est autorisee.' -ForegroundColor Green
+}
+
+function Invoke-WorkspaceAssistant {
+    Initialize-Workspace
+    $manifest = Read-Manifest
+    $state = Get-WorkflowState
+    Write-Host '=== ASSISTANT TWINBENCH : DIAGNOSTIC SANS RISQUE ===' -ForegroundColor Cyan
+    Write-Host ("Manifest lu : {0}" -f $ManifestPath)
+    Write-Host ("Etat reel : {0}" -f $state)
+    if ($null -eq $manifest) {
+        Write-Host '[ACTION] Aucun projet importe : choisir 1.' -ForegroundColor Yellow
+        return
+    }
+    if ($state -eq 'PREPARED') {
+        if (-not (Test-Path -LiteralPath $CurrentProject)) {
+            Write-Host '[ECHEC] La copie preparee est absente. Choisir 9 puis ARCHIVER pour repartir proprement.' -ForegroundColor Red
+            return
+        }
+        $actualHash = Get-FileHashHex $CurrentProject
+        if ($actualHash -ne [string]$manifest.prepared_sha256) {
+            Write-Host '[ECHEC] La copie a change depuis preparation. Choisir 9 puis ARCHIVER ; ne pas deployer.' -ForegroundColor Red
+            return
+        }
+        Write-Host '[PASS] Copie preparee saine : aucune liberation necessaire.' -ForegroundColor Green
+        Write-Host '[ACTION] Le seul prochain essai est 3 : deployer Control Win local.' -ForegroundColor Yellow
+        return
+    }
+    if ($state -eq 'PREPARE_FAILED') {
+        Write-Host '[BLOQUE] Preparation en echec : ne pas recommencer au hasard.' -ForegroundColor Red
+        Write-Host '[ACTION] Ouvrir 4 pour diagnostic, puis 9 et ARCHIVER seulement apres correction prouvee.' -ForegroundColor Yellow
+        return
+    }
+    if ($state -eq 'DEPLOYED') {
+        Write-Host '[PASS] Control Win est deja deploye ; choisir 4 pour ouvrir la copie.' -ForegroundColor Green
+        return
+    }
+    Write-Host '[ACTION] Suivre l etape recommandee affichee par le menu.' -ForegroundColor Yellow
+}
+
+function Invoke-SimpleWorkflow {
+    while ($true) {
+        $state = Get-WorkflowState
+        switch ($state) {
+            'EMPTY' {
+                Write-Host '[EN COURS] Choisis le projet a charger dans Control Win.' -ForegroundColor Cyan
+                Import-Project ''
+                continue
+            }
+            'IMPORTED' {
+                Write-Host '[EN COURS] Preparation et compilation de la copie Control Win.' -ForegroundColor Cyan
+                Prepare-ControlWinCopy
+                continue
+            }
+            'PREPARE_FAILED' {
+                Write-Host '[ACTION REQUISE] Une ancienne copie a echoue. Je peux archiver uniquement cette copie et relancer proprement.' -ForegroundColor Yellow
+                $repair = Read-Host 'Tape REPARER pour continuer, ou ENTREE pour annuler'
+                if ($repair -cne 'REPARER') {
+                    Write-Host '[INFO] Rien n est modifie.' -ForegroundColor Yellow
+                    return
+                }
+                Recover-TwinBenchWorkspace -Confirmed
+                continue
+            }
+            'PREPARED' {
+                Write-Host '[ACTION REQUISE] Copie compilee. Tape DEPLOYER pour la charger sur Control Win local, ou ENTREE pour annuler.' -ForegroundColor Yellow
+                $deploy = Read-Host 'Confirmation'
+                if ($deploy -cne 'DEPLOYER') {
+                    Write-Host '[INFO] Deploiement annule. Le PLC reel n a pas ete contacte.' -ForegroundColor Yellow
+                    return
+                }
+                Deploy-ControlWinCopy
+                continue
+            }
+            'DEPLOYED' {
+                Write-Host '[EN COURS] Ouverture de la copie Control Win deployee.' -ForegroundColor Cyan
+                Open-CurrentCopy
+                return
+            }
+            default {
+                throw ("Etat TwinBench inconnu : {0}. Utilise l action Assistant pour le diagnostic." -f $state)
+            }
+        }
+    }
 }
 
 function Import-Project([string]$SourcePath) {
@@ -382,7 +484,7 @@ function Import-Project([string]$SourcePath) {
         state = 'IMPORTED'
     }
     Write-Host '[PASS] Original inchange. Copie TwinBench creee.' -ForegroundColor Green
-    Write-Host "Copie source : $ImportedProject"
+    Write-FileLink 'Ouvrir la copie source' $ImportedProject
     $result = Invoke-CodesysHeadless -Mode 'inspect' -WorkingProject $ImportedProject
     Write-Host ("Device actuel : {0}" -f $result.device_identification)
 }
@@ -431,6 +533,7 @@ function Prepare-ControlWinCopy {
     }
     Write-Host ("[PASS] Copie ciblee Control Win. Erreurs={0}, avertissements={1}" -f $result.error_count, $result.warning_count) -ForegroundColor Green
     Write-Host ("[HW_SIM] {0} BOOL + {1} valeurs typees adaptees uniquement dans la copie." -f $result.hw_sim_compat.bool_symbols, $result.hw_sim_compat.typed_symbols) -ForegroundColor Green
+    Write-FileLink 'Ouvrir la copie Control Win' $CurrentProject
 }
 
 function Start-ControlWin {
@@ -482,8 +585,15 @@ function Deploy-ControlWinCopy {
         state = 'DEPLOYED'
         deploy_report = $result.report_path
         deployed_target = $result.scanned_target
+        deployed_application_state = $result.application_state
+        deployed_local_user = $result.logged_user
     }
     Write-Host '[PASS] Copie deployee et demarree sur Control Win local.' -ForegroundColor Green
+    Write-Host '[PREUVE] Copie chargee (lien ci-dessous) :' -ForegroundColor Green
+    Write-FileLink 'Ouvrir la copie Control Win deployee' $CurrentProject
+    Write-Host ("[PREUVE] Cible : {0}" -f $result.scanned_target) -ForegroundColor Green
+    Write-Host ("[PREUVE] Etat application : {0}" -f $result.application_state) -ForegroundColor Green
+    Write-Host ("[PREUVE] Utilisateur local : {0}" -f $result.logged_user) -ForegroundColor Green
 }
 
 function Open-CurrentCopy {
@@ -507,9 +617,15 @@ function Show-Status {
     Write-Host ("Derniere mise a jour : {0}" -f $manifest.updated_at)
     if (Test-Path -LiteralPath $CurrentProject) {
         Write-Host ("SHA-256 actuel : {0}" -f (Get-FileHashHex $CurrentProject))
+        Write-FileLink 'Ouvrir la copie Control Win' $CurrentProject
     }
     if ($manifest.PSObject.Properties.Name -contains 'hw_sim_bool_symbols') {
         Write-Host ("Adaptateur HW_SIM : {0} BOOL + {1} valeurs typees (copie uniquement)" -f $manifest.hw_sim_bool_symbols, $manifest.hw_sim_typed_symbols)
+    }
+    if ($manifest.PSObject.Properties.Name -contains 'deployed_target') {
+        Write-Host ("Cible deployee : {0}" -f $manifest.deployed_target)
+        Write-Host ("Etat application : {0}" -f $manifest.deployed_application_state)
+        Write-Host ("Utilisateur local : {0}" -f $manifest.deployed_local_user)
     }
     if ($manifest.PSObject.Properties.Name -contains 'history') {
         Write-Host 'Dernieres actions :'
@@ -630,73 +746,22 @@ function Show-Menu {
         Clear-Host
         Write-Host ''
         Write-Host '=== TWINBENCH CONTROL WIN - COPIE ISOLEE ===' -ForegroundColor Cyan
-        $stateBefore = Get-WorkflowState
-        $allowedChoices = @(Get-AllowedChoices $stateBefore)
-        Show-WorkflowStatus
-        Show-RecentEvents
-        Show-NextRecommendedAction
-        Write-Host '1. Choisir/copier un projet source'
-        Write-Host '2. Preparer/compiler la copie Control Win'
-        Write-Host '3. Deployer/demarrer Control Win local'
-        Write-Host '4. Ouvrir la copie dans CODESYS'
-        Write-Host '5. Afficher l etat'
-        Write-Host '6. Autotest des garde-fous'
-        if ($stateBefore -eq 'PREPARE_FAILED') {
-            Write-Host '7. Rearmer une tentative APRES correction de la cause'
-        }
-        Write-Host '8. Mode guide : executer les etapes dans l ordre'
-        if ('9' -in $allowedChoices) {
-            Write-Host '9. Recuperer/liberer la copie isolee et archiver les restes'
-        }
-        Write-Host '0. Quitter'
-        Write-Host ("Choix autorises : {0}" -f ($allowedChoices -join ', ')) -ForegroundColor Cyan
-        $choice = Read-Host 'Choix'
-        if ($choice -notin $allowedChoices) {
-            Write-Host ("[REFUS] Choix {0} verrouille dans l etat {1}." -f $choice, $stateBefore) -ForegroundColor Red
+        $state = Get-WorkflowState
+        Write-Host ("Etat reel : {0}" -f $state) -ForegroundColor Cyan
+        Write-Host ''
+        Write-Host 'ENTREE  Continuer : charger le projet dans Control Win' -ForegroundColor Green
+        Write-Host '0       Quitter' -ForegroundColor DarkGray
+        $choice = Read-Host 'Action'
+        if ($choice -eq '0') { return }
+        if (-not [string]::IsNullOrWhiteSpace($choice)) {
+            Write-Host '[INFO] Utilise simplement ENTREE pour continuer.' -ForegroundColor Yellow
             continue
         }
         try {
-            switch ($choice) {
-                '1' { Import-Project '' }
-                '2' { Prepare-ControlWinCopy }
-                '3' { Deploy-ControlWinCopy }
-                '4' { Open-CurrentCopy }
-                '5' { Show-Status }
-                '6' { Invoke-SelfTest }
-                '7' { Unlock-PrepareRetry }
-                '8' { Invoke-GuidedWorkflow }
-                '9' { Recover-TwinBenchWorkspace }
-                '0' { return }
-                default { Write-Host 'Choix invalide.' -ForegroundColor Yellow }
-            }
-            $stateAfter = Get-WorkflowState
-            if ($choice -in @('1', '2', '3', '4', '5', '6', '7', '8', '9')) {
-                $outcome = 'PASS'
-                $actionLabel = 'ACTION TERMINEE'
-                $detail = 'Action terminee sans exception.'
-                if ($choice -eq '1' -and $stateBefore -eq $stateAfter) {
-                    $outcome = 'NOOP'
-                    $actionLabel = 'SANS CHANGEMENT'
-                    $detail = 'Projet deja importe ; etat conserve.'
-                }
-                elseif ($choice -eq '5') {
-                    $outcome = 'INFO'
-                    $actionLabel = 'CONSULTATION'
-                    $detail = 'Etat affiche sans modification.'
-                }
-                Add-ActionHistory -ActionName $choice -Outcome $outcome -StateBefore $stateBefore -StateAfter $stateAfter -Detail $detail
-                Write-Host ("[{0}] Choix {1} : {2} -> {3}" -f $actionLabel, $choice, $stateBefore, $stateAfter) -ForegroundColor Green
-            }
-            if ($choice -in @('1', '2', '3', '4', '5', '6', '7', '8', '9')) {
-                Write-Host ''
-                Show-NextRecommendedAction
-            }
+            Invoke-SimpleWorkflow
         }
         catch {
-            $stateAfter = Get-WorkflowState
-            Add-ActionHistory -ActionName $choice -Outcome 'FAIL' -StateBefore $stateBefore -StateAfter $stateAfter -Detail $_.Exception.Message
             Write-Host ("[REFUS/ERREUR] {0}" -f $_.Exception.Message) -ForegroundColor Red
-            Write-Host ("[ACTION ECHOUEE] Choix {0} : {1} -> {2}" -f $choice, $stateBefore, $stateAfter) -ForegroundColor Red
         }
     }
 }
@@ -710,4 +775,5 @@ switch ($Action) {
     'Open' { Open-CurrentCopy }
     'Status' { Show-Status }
     'SelfTest' { Invoke-SelfTest }
+    'Assistant' { Invoke-WorkspaceAssistant }
 }

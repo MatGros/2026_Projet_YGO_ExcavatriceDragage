@@ -43,6 +43,7 @@ def main() -> None:
     modelica = (LIVE / "M3_LiveFMU.mo").read_text(encoding="utf-8")
     engine = (LIVE / "engine.py").read_text(encoding="utf-8")
     qml = (LIVE / "Main.qml").read_text(encoding="utf-8")
+    launcher = (LIVE / "Start_M3_Live.ps1").read_text(encoding="utf-8")
     required_model_tokens = [
         "input Real directionCmd",
         "input Real frequencyCmd_Hz",
@@ -55,6 +56,16 @@ def main() -> None:
             fail(f"contrat Modelica absent : {token}")
     if not re.search(r"STEP_S\s*=\s*0\.01", engine):
         fail("pas FMI de 10 ms absent du moteur")
+    if 'os.environ["PATH"]' in engine or "os.environ['PATH']" in engine:
+        fail("OpenModelica ne doit pas être ajouté au PATH : conflit DLL Qt avec PySide6")
+    if 'f"Runtime_{os.getpid()}_{self._generation}"' not in engine:
+        fail("chaque instance OMSimulator doit avoir son répertoire runtime unique")
+    if "find_spec('PySide6')" not in launcher:
+        fail("le lanceur doit sonder PySide6 sans provoquer de traceback Python")
+    if "PSNativeCommandUseErrorActionPreference = $false" not in launcher:
+        fail("le lanceur doit tolerer un code retour PySide6 absent au premier lancement")
+    if '-c "import PySide6"' in launcher:
+        fail("le lanceur ne doit pas importer PySide6 pour tester sa presence")
     for token in ["backend.direction", "frequencyActual", "scanCounter", "brakeOpen", "tracePoints"]:
         if token not in qml:
             fail(f"observation QML absente : {token}")
