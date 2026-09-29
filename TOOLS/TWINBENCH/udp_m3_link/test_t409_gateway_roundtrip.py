@@ -25,7 +25,9 @@ def main() -> int:
         time.sleep(3.0)  # chargement FMU/OMSimulator avant l'envoi UDP
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.bind((HOST, 0))
-            sock.settimeout(0.25)
+            # La première étape OMSimulator peut dépasser 250 ms sur Windows ;
+            # le test mesure ensuite la cadence d'envoi à 10 ms sans faux timeout.
+            sock.settimeout(1.0)
             for seq in range(100):
                 sock.sendto(pack_command(seq, 1, 40.0, True, time.time_ns()), (HOST, PORT))
                 try:

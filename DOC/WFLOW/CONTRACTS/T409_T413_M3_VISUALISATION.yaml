@@ -1,0 +1,86 @@
+contract:
+  task_id: T409_T413_M3_VISUALISATION
+  criticality: C2
+  strategy: patch
+  objective: >
+    Fournir une plante M3 FMU et une visualisation commune capable d'afficher
+    les retours FMU ou PLC en lecture seule avec capteurs, frein, Hz et butées.
+  acceptance:
+    - id: AC1
+      statement: "La cinématique FMU respecte les butées -0.30 m et 30.30 m."
+      verified_by: "python TOOLS/TWINBENCH/udp_m3_link/test_t409_fmu_scenarios.py"
+    - id: AC2
+      statement: "Le frein fermé interdit tout déplacement."
+      verified_by: "test_t409_fmu_scenarios.py: brake_closed_no_motion"
+    - id: AC3
+      statement: "Le protocole UDP 10 ms et la reprise sont validés."
+      verified_by: "powershell TOOLS/TWINBENCH/udp_m3_link/Run_T409_Verification.ps1"
+    - id: AC4
+      statement: "Le mode PLC lecture démarre sans action Démarrer."
+      verified_by: "python test_readonly_backend.py"
+    - id: AC5
+      statement: "Une perte de télémétrie est affichée comme données perdues."
+      verified_by: "test_plc_readonly_adapter.py"
+    - id: AC6
+      statement: "Aucune écriture PLC n'existe dans le miroir CODESYS."
+      verified_by: "python check_t412_mirror_static.py"
+    - id: AC7
+      statement: "Le démarrage FMU est théorique à P1 : 20.000 m et mot capteurs 00011."
+      verified_by: "python TOOLS/TWINBENCH/udp_m3_link/test_t409_fmu_scenarios.py"
+    - id: AC8
+      statement: "AUTO-CYCLE exécute un trajet P1-Trémie-P1 ; il anticipe la décélération, confirme frein fermé et capteur actif, marque une pause d'au moins 1 s, puis termine immobile à P1 entre 19,97 et 20,00 m. Un redémarrage est explicite ; le joystick interrompt le cycle."
+      verified_by: "python TOOLS/TWINBENCH/udp_m3_link/test_auto_cycle.py ; python TOOLS/TWINBENCH/modelica_poc_m3/live_poc/test_auto_cycle_backend.py"
+    - id: AC9
+      statement: "Le modèle et la gateway n'ont pas de limite de fonctionnement à 24 h ou 5 min."
+      verified_by: "python TOOLS/TWINBENCH/udp_m3_link/test_t409_long_horizon.py"
+    - id: AC10
+      statement: "Les séquences UDP reprennent après stale et franchissent FFFFFFFF vers 0."
+      verified_by: "python TOOLS/TWINBENCH/udp_m3_link/test_t409_sequence_wrap.py"
+    - id: AC11
+      statement: "Au front de contact d'une butée mécanique, l'interface conserve 1 s avant et 1 s après, fige la capture, garde le tracé live accessible et permet de parcourir les échantillons avec un curseur affichant les valeurs synchronisées."
+      verified_by: "python TOOLS/TWINBENCH/modelica_poc_m3/live_poc/test_frozen_stop_trace.py ; TwinBenchM3Live/Python/Scripts/python.exe TOOLS/TWINBENCH/modelica_poc_m3/live_poc/app.py --smoke-test"
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/**
+      - TOOLS/PLC_CSV_SNAPSHOT/codesys_console/codesys_m3_*.py
+      - DOC/WFLOW/CONTRACTS/T409_T413_M3_VISUALISATION.yaml
+      - DOC/WFLOW/CONTRACTS/T409_CONTROLWIN_TEST_RECIPE.md
+      - DOC/WFLOW/T409_RAPPORT_ETAT.md
+    forbidden:
+      - CODE/**
+      - PRJ_CODESYS/**
+      - DOC/WFLOW/TASKS.yaml
+      - PLC réel
+  conservation:
+    must_survive:
+      - "Logique PLC existante et noms GVL inchangés"
+      - "Chaîne capteurs cumulative 11111 vers 00000"
+      - "Simulation FMU sans sortie machine"
+    dropped_on_purpose: []
+  evidence_required:
+    - "test_t409_fmu_scenarios.py"
+    - "Run_T409_Verification.ps1"
+    - "test_readonly_backend.py"
+    - "test_plc_readonly_adapter.py"
+    - "check_t412_mirror_static.py"
+    - "test_auto_cycle.py"
+    - "test_t409_long_horizon.py"
+    - "test_t409_sequence_wrap.py"
+    - "test_frozen_stop_trace.py"
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute incohérence de protocole, de capteur ou de sécurité est signalée
+    immédiatement et ne doit pas être masquée par un test synthétique.
+status: IN_PROGRESS
+execution:
+  executed_by: "CDX01"
+  completed_at: "2026-09-28T00:00:00+02:00"
+  status: IN_PROGRESS
+  summary: "GO humain : départ P1 théorique 20.000 m et AUTO-CYCLE autonome ; bloc A puis B."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Validation Control Win réelle encore requise."

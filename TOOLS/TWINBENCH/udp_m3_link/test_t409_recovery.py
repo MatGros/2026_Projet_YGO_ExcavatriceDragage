@@ -33,11 +33,15 @@ def main() -> int:
             for seq in range(1, 101):
                 latest = exchange(sock, seq)
                 time.sleep(0.01)
+            time.sleep(1.2)
+            exchange(sock, 0xFFFFFFFE)
+            exchange(sock, 0xFFFFFFFF)
+            wrapped = exchange(sock, 0)
         # response[3] is the gateway sequence; response[4] echoes command sequence.
         # Mot 1 = Trémie : la cote doit décroître après ouverture du frein (AF-P11).
-        ok = (recovered[3] == 0 and recovered[4] == 0 and recovered[6] <= 5000
-              and latest[15] < first[15])
-        print(f"[T409] recovery first_seq={first[3]} recovered_seq={recovered[3]} position_mm={first[15]}->{latest[15]} measured_x100={latest[6]}")
+        ok = (recovered[3] == 0 and recovered[4] == 0 and wrapped[3] == 0
+              and wrapped[4] == 0 and recovered[6] <= 5000 and latest[15] < first[15])
+        print(f"[T409] recovery first_seq={first[3]} recovered_seq={recovered[3]} wrap_seq={wrapped[3]} position_mm={first[15]}->{latest[15]} measured_x100={latest[6]}")
         print("[PASS] T409 reconnect sequence reset" if ok else "[FAIL] T409 reconnect sequence reset")
         return 0 if ok else 1
     finally:

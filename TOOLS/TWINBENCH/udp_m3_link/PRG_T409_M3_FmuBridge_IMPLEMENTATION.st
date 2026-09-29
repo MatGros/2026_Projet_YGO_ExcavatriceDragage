@@ -42,7 +42,12 @@ IF Bytes = 39 THEN
     IF (Rx[0] = 16#4D) AND (Rx[1] = 16#33) AND (Rx[2] = 16#42) AND (Rx[3] = 16#31) AND (Rx[4] = 1) AND (Rx[5] = 2) THEN
         RxSequence := BYTE_TO_UDINT(Rx[6]) OR SHL(BYTE_TO_UDINT(Rx[7]), 8) OR SHL(BYTE_TO_UDINT(Rx[8]), 16) OR SHL(BYTE_TO_UDINT(Rx[9]), 24);
         RxCommandSequence := BYTE_TO_UDINT(Rx[10]) OR SHL(BYTE_TO_UDINT(Rx[11]), 8) OR SHL(BYTE_TO_UDINT(Rx[12]), 16) OR SHL(BYTE_TO_UDINT(Rx[13]), 24);
-        IF (RxCount > 0) AND ((RxCommandSequence <= LastRxSequence) OR (RxSequence <= LastRxSequence)) THEN
+        RxSequenceNewer := (RxCommandSequence > LastRxSequence) AND (RxSequence > LastRxSequence);
+        // UDINT : FFFFFFFF -> 0 est la progression normale après wrap.
+        IF (LastRxSequence = 16#FFFFFFFF) AND (RxCommandSequence = 0) AND (RxSequence = 0) THEN
+            RxSequenceNewer := TRUE;
+        END_IF;
+        IF (RxCount > 0) AND NOT RxSequenceNewer THEN
             LinkInvalid := TRUE;
             RejectCount := RejectCount + 1;
         ELSE
@@ -55,6 +60,7 @@ IF Bytes = 39 THEN
             RxPosition_x1000 := BYTE_TO_DINT(Rx[27]) OR SHL(BYTE_TO_DINT(Rx[28]), 8) OR SHL(BYTE_TO_DINT(Rx[29]), 16) OR SHL(BYTE_TO_DINT(Rx[30]), 24);
             RxHardStop := Rx[35] <> 0;
             RxVelocity_x1000 := BYTE_TO_DINT(Rx[18]) OR SHL(BYTE_TO_DINT(Rx[19]), 8);
+            IF RxVelocity_x1000 >= 32768 THEN RxVelocity_x1000 := RxVelocity_x1000 - 65536; END_IF;
             // Chaîne terrain admissible : 11111 -> 01111 -> 00111 -> 00011 -> 00001 -> 00000.
             // Une rupture false->true vers la droite est incohérente.
             SensorWordIncoherent := (NOT RxSensors[0] AND RxSensors[1]) OR (NOT RxSensors[1] AND RxSensors[2]) OR (NOT RxSensors[2] AND RxSensors[3]) OR (NOT RxSensors[3] AND RxSensors[4]);

@@ -16,6 +16,9 @@ def main() -> None:
     try:
         initial = engine.snapshot()
         assert 19.99 <= initial.position_m <= 20.01, initial
+        assert initial.sensors_word == 3, initial
+        assert not initial.tremie and not initial.pv and not initial.p2, initial
+        assert initial.p1 and initial.maintenance, initial
 
         moving = run_steps(engine, 200, 1.0, 40.0)
         assert abs(moving.time_s - 2.0) < STEP_S / 2, moving
@@ -33,6 +36,7 @@ def main() -> None:
         assert reverse.position_m < stopped.position_m, reverse
 
         print("PASS T405 HEADLESS")
+        print("  demarrage P1 : position=20.000 m, capteurs=00011")
         print(f"  temps={reverse.time_s:.3f} s, scans={reverse.scan_counter}")
         print(f"  position={reverse.position_m:.3f} m, vitesse={reverse.velocity_mps:.3f} m/s")
         print(f"  fréquence={reverse.frequency_act_hz:.3f} Hz, frein_ouvert={reverse.brake_is_open}")

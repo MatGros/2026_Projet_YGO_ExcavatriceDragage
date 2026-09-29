@@ -9,6 +9,7 @@ from build_fmu import STATE_DIR, build_fmu, find_omc
 
 
 STEP_S = 0.01
+LONG_HORIZON_S = 1_000_000_000.0
 
 
 def _load_omsimulator():
@@ -48,9 +49,13 @@ class M3Snapshot:
 
 
 class M3FmuEngine:
-    def __init__(self) -> None:
+    def __init__(self, step_s: float = STEP_S, start_time_s: float = 0.0) -> None:
         self.oms = _load_omsimulator()
         self.fmu_path = build_fmu()
+        self._step_s = float(step_s)
+        self._start_time_s = float(start_time_s)
+        if self._step_s <= 0:
+            raise ValueError("step_s doit être positif")
         self._generation = 0
         self.model = None
         self.plant = None
@@ -79,9 +84,11 @@ class M3FmuEngine:
         self.model = self.oms.newModel(name)
         root = self.model.addSystem("root", self.oms.Types.System.WC)
         self.plant = root.addSubModel("plant", str(self.fmu_path))
-        self.model.startTime = 0.0
-        self.model.stopTime = 86400.0
-        self.model.fixedStepSize = STEP_S
+        self.model.startTime = self._start_time_s
+        # 31,7 ans : précision IEEE-754 très supérieure au pas de 10 ms.
+        # Le POC reste arrêtable explicitement, sans échéance cachée à 24 h.
+        self.model.stopTime = max(LONG_HORIZON_S, self._start_time_s + 3600.0)
+        self.model.fixedStepSize = self._step_s
         self.model.resultFile = str(temp_dir / "M3_Live_result.mat")
         self.model.instantiate()
         self._write_inputs(0.0, 0.0, False)

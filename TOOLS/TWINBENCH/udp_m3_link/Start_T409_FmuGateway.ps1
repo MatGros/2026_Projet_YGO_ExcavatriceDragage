@@ -1,3 +1,5 @@
+param([double]$DurationSeconds = 0)
+
 $ErrorActionPreference = 'Stop'
 $ToolDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Python = (Get-Command python -ErrorAction Stop).Source
@@ -16,9 +18,13 @@ if ($null -ne $existing) {
     return
 }
 $script = Join-Path $ToolDir 'udp_m3_fmu_gateway.py'
-$p = Start-Process -FilePath $Python -ArgumentList @($script, '--duration-s', '300', '--trace-file', $Trace) -WindowStyle Hidden -RedirectStandardOutput $Out -RedirectStandardError $Err -PassThru
+$p = Start-Process -FilePath $Python -ArgumentList @($script, '--duration-s', $DurationSeconds, '--trace-file', $Trace) -WindowStyle Hidden -RedirectStandardOutput $Out -RedirectStandardError $Err -PassThru
 Start-Sleep -Seconds 5
 if ($p.HasExited) { throw "Gateway FMU arrete. Journal : $Err" }
-Write-Host '[OK] Gateway FMU actif pour 5 min.' -ForegroundColor Green
+if ($DurationSeconds -le 0) {
+    Write-Host '[OK] Gateway FMU actif sans limite. Arret : Ctrl+C ou fermeture du processus.' -ForegroundColor Green
+} else {
+    Write-Host "[OK] Gateway FMU actif pour $DurationSeconds s." -ForegroundColor Green
+}
 Write-Host "Journal : $Out"
 Write-Host "Trace  : $Trace"

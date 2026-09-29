@@ -1,0 +1,66 @@
+contract:
+  task_id: T415_M3_LAUNCHER_RESTART
+  criticality: C2
+  strategy: patch
+  objective: >
+    Relancer la vue TwinBench M3 en fermant proprement uniquement son instance
+    existante, afin de charger les fichiers d'interface actualisés sans toucher
+    aux processus CODESYS ou PLC.
+  acceptance:
+    - id: AC1
+      statement: "Le lanceur identifie une instance uniquement si elle utilise le Python TwinBench dédié et le app.py de ce POC."
+      verified_by: "revue du filtre Win32_Process dans Start_M3_Live.ps1"
+    - id: AC2
+      statement: "L'instance identifiée reçoit une demande de fermeture normale avant le démarrage de la nouvelle vue."
+      verified_by: "revue CloseMainWindow et ordre d'appel du lanceur"
+    - id: AC3
+      statement: "Si l'ancienne fenêtre ne se ferme pas dans le délai, le lanceur s'arrête sans fermeture forcée et n'ouvre pas une seconde vue."
+      verified_by: "revue du timeout et test de syntaxe PowerShell"
+    - id: AC4
+      statement: "Le mode PLC lecture seule reste sélectionné quand le lanceur PLC lecture est utilisé."
+      verified_by: "test statique Start_M3_Live.ps1 et Lancer_M3_Live_PLC_Lecture.cmd"
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/modelica_poc_m3/live_poc/Start_M3_Live.ps1
+      - DOC/WFLOW/CONTRACTS/T415_M3_LAUNCHER_RESTART.yaml
+    forbidden:
+      - CODE/**
+      - PRJ_CODESYS/**
+      - PLC réel
+  conservation:
+    must_survive:
+      - "Le PLC et CODESYS ne sont jamais fermés ni modifiés par le lanceur M3."
+      - "Le choix du mode FMU ou PLC lecture seule est conservé par le raccourci utilisé."
+      - "Aucun processus n'est tué de force."
+    dropped_on_purpose: []
+  evidence_required:
+    - "Analyse syntaxique PowerShell du lanceur"
+    - "Revue du périmètre du filtre de processus et du chemin de fermeture normale"
+    - "Test statique du raccourci PLC lecture seule"
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Si l'identité du processus TwinBench ne peut pas être vérifiée ou si la fenêtre
+    ne se ferme pas proprement, arrêter le relancement et demander une fermeture
+    manuelle, sans toucher à un processus externe.
+status: COMPLETED
+execution:
+  executed_by: "CDX01"
+  completed_at: "2026-09-29T07:57:50+02:00"
+  status: COMPLETED
+  summary: >
+    Le lanceur détecte uniquement app.py lancé par le Python TwinBench dédié,
+    demande une fermeture normale et refuse de relancer si la fenêtre ne se
+    ferme pas en 10 s. Aucun arrêt forcé n'est utilisé. Le test de relancement
+    réel est laissé à l'utilisateur pour préserver sa session ouverte.
+  evidence_submitted:
+    - "Parser PowerShell : PASS"
+    - "Garde-fous : exécutable et app.py exacts ; aucune fermeture forcée"
+    - "Lanceur PLC lecture seule conserve -PlcReadonly"
+    - "Contrat de tâche : PASS, 0 erreur, 0 avertissement"
+    - "Instance active détectée en lecture seule : Python TwinBench dédié + live_poc/app.py"
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""
