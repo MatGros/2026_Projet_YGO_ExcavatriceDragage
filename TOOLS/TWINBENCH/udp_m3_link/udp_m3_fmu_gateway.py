@@ -13,13 +13,14 @@ if str(LIVE) not in sys.path:
     sys.path.insert(0, str(LIVE))
 from engine import M3FmuEngine
 from m3_binary_protocol import HOST, PORT, pack_plant, unpack_command
+from sequence_rules import is_acceptable
 
 def run(duration_s: float, trace_file: str | None = None) -> int:
     engine = M3FmuEngine()
     accepted = rejected = 0
     previous = None
     previous_received_at = None
-    started = time.time()
+    started = time.monotonic()
     last_report = started
     last_snapshot = None
     print(f"[T409] FMU M3 prete : udp://{HOST}:{PORT} (loopback seulement)", flush=True)
@@ -36,26 +37,23 @@ def run(duration_s: float, trace_file: str | None = None) -> int:
     sock.bind((HOST, PORT))
     sock.settimeout(0.20)
     try:
-        while time.time() - started < duration_s:
+        while duration_s <= 0 or time.monotonic() - started < duration_s:
             try:
                 payload, address = sock.recvfrom(128)
             except socket.timeout:
-                if time.time() - last_report >= 5.0:
+                if time.monotonic() - last_report >= 5.0:
                     print(f"[T409] ETAT gateway : accepte={accepted} rejete={rejected} derniere_sequence={previous if previous is not None else 'aucune'}", flush=True)
-                    last_report = time.time()
+                    last_report = time.monotonic()
                 continue
             if address[0] != HOST:
                 rejected += 1
                 continue
             try:
                 seq, word, hz, brake, _timestamp = unpack_command(payload)
-                now = time.time()
-                # Une coupure/reconnexion du POU peut remettre son compteur a
-                # zero. On n accepte ce reset qu apres une interruption > 1 s.
-                if previous is not None and seq <= previous:
-                    if previous_received_at is None or now - previous_received_at <= 1.0:
-                        raise ValueError("sequence")
-                    previous = None
+                now = time.monotonic()
+                stale = previous_received_at is None or now - previous_received_at > 1.0
+                if not is_acceptable(previous, seq, stale):
+                    raise ValueError("sequence")
                 previous = seq
                 previous_received_at = now
                 # Convention AF-P11 : mot 1 = Trémie (cote décroissante),
@@ -74,15 +72,15 @@ def run(duration_s: float, trace_file: str | None = None) -> int:
                     sensors_word = sum((int(bool(v)) << shift) for shift, v in zip(
                         (4, 3, 2, 1, 0), (snapshot.tremie, snapshot.pv, snapshot.p2,
                                            snapshot.p1, snapshot.maintenance)))
-                    writer.writerow((time.time(), seq, word, hz, snapshot.frequency_act_hz,
+                    writer.writerow((time.monotonic(), seq, word, hz, snapshot.frequency_act_hz,
                                      snapshot.velocity_mps, snapshot.position_m,
                                      int(snapshot.brake_is_open), snapshot.drive_status_word,
                                      sensors_word, int(snapshot.hard_stop_tremie or snapshot.hard_stop_maintenance)))
                     trace.flush()
                 accepted += 1
-                if time.time() - last_report >= 5.0:
+                if time.monotonic() - last_report >= 5.0:
                     print(f"[T409] ETAT gateway : accepte={accepted} rejete={rejected} derniere_sequence={previous} pos={snapshot.position_m:.3f}m vel={snapshot.velocity_mps:.3f}mps hz={snapshot.frequency_act_hz:.2f} frein={int(snapshot.brake_is_open)} capteurs={int(snapshot.tremie)}{int(snapshot.pv)}{int(snapshot.p2)}{int(snapshot.p1)}{int(snapshot.maintenance)}", flush=True)
-                    last_report = time.time()
+                    last_report = time.monotonic()
             except (ValueError, OSError) as exc:
                 rejected += 1
                 print(f"[T409] rejet : {exc}", flush=True)
@@ -96,7 +94,8 @@ def run(duration_s: float, trace_file: str | None = None) -> int:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--duration-s", type=float, default=300.0)
+    parser.add_argument("--duration-s", type=float, default=0.0,
+                        help="0 = fonctionnement illimité (Ctrl+C pour arrêter)")
     parser.add_argument("--trace-file", default=None)
     args = parser.parse_args()
     raise SystemExit(run(args.duration_s, args.trace_file))

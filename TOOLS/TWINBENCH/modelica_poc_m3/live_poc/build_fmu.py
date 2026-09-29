@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -9,7 +10,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 MODEL_DIR = HERE.parent
 STATE_DIR = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local")) / "TwinBenchM3Live"
-BUILD_DIR = STATE_DIR / "Build"
+BUILD_DIR = STATE_DIR.parent / "TBM3Live" / "Build"
 FMU_PATH = BUILD_DIR / "M3_LiveFMU.fmu"
 OMC_DEFAULT = Path(r"C:\Program Files\OpenModelica1.27.1-64bit\bin\omc.exe")
 
@@ -64,7 +65,8 @@ def build_fmu(force: bool = False) -> Path:
     )
     log_path = BUILD_DIR / "build_M3_LiveFMU.log"
     log_path.write_text(process.stdout + "\n" + process.stderr, encoding="utf-8")
-    if process.returncode != 0 or not FMU_PATH.exists():
+    compiler_errors = re.search(r"(?m)^.*\bError:\s", process.stdout + "\n" + process.stderr)
+    if process.returncode != 0 or compiler_errors or not FMU_PATH.exists():
         raise RuntimeError(
             f"Construction FMU échouée (code {process.returncode}). Journal : {log_path}"
         )

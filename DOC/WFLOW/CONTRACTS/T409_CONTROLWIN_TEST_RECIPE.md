@@ -1,77 +1,41 @@
-# T409 — recette Control Win de validation M3
+# T409 — Recette Control Win CW-00 : départ P1 par mémoire
 
-Précondition unique : copie TwinBench Control Win en ligne, `SimulationModeActive=TRUE`, `SimM3OpenModelicaActive=TRUE`, gateway FMU sur `127.0.0.1:29061`. Ne jamais exécuter sur le PLC réel.
+## But
 
-## Variables à surveiller
+Prouver sur la copie Control Win que la FMU démarre à la position théorique P1 :
+20,000 m et mot capteurs physique cumulatif 00011. La preuve PLC attendue est
+M3_AtP1Stable à TRUE après la restauration de démarrage.
 
-```text
-PRG_T409_M3_FmuBridge.LinkReady
-PRG_T409_M3_FmuBridge.Timeout
-PRG_T409_M3_FmuBridge.LinkInvalid
-PRG_T409_M3_FmuBridge.SensorWordIncoherent
-PRG_T409_M3_FmuBridge.FmuPosition_M
-PRG_T409_M3_FmuBridge.FmuVelocity_Mps
-PRG_T409_M3_FmuBridge.FmuFrequency_Hz
-GVL_Simulation.SimM3OpenModelica.M3_ActualFrequencyHz
-GVL_Simulation.SimM3OpenModelica.M3_BrakeIsOpen_DI
-GVL_Simulation.SimM3OpenModelica.M3_PosTremie_DI .. M3_PosMaintenance_DI
-```
+## CW-00 — ordre obligatoire
 
-## Séquence minimale
+1. Lancer Start_T409_FmuGateway.ps1 et attendre le message FMU prête.
+2. Dans la copie Control Win, faire Login puis Stop.
+3. L'humain active manuellement SimulationModeActive, SimM3OpenModelicaActive
+   et Enable du bridge. Aucun script ne les écrit.
+4. Démarrer Run sans Reset intermédiaire.
+5. Attendre 3 s puis lancer codesys_m3_t409_acceptance.py depuis Tools > Scripting.
+6. Conserver la sortie console complète.
 
-| Test | Action | Résultat attendu |
-|---|---|---|
-| CW-01 | Gateway arrêté, verrous simulation vrais | `LinkReady=FALSE`, `Timeout=TRUE` après délai, image M3 neutralisée |
-| CW-02 | Gateway lancé, aucune commande | `LinkReady=TRUE`, frein fermé, Hz mesure nul, position stable |
-| CW-03 | Demande frein seule | frein s’ouvre après délai, position inchangée |
-| CW-04 | Commande Maintenance 40 Hz (`DriveControlWord=2`) | vitesse/position augmentent, mot capteurs reste thermomètre |
-| CW-05 | Retour neutre | fréquence décroît par rampe, puis frein se ferme |
-| CW-06 | Commande Trémie 40 Hz (`DriveControlWord=1`) | vitesse/position diminuent, capteurs passent `00011→00111→01111→11111` |
-| CW-07 | Maintien sur butée | position reste dans `[-0,30;30,30]`, sens poussé interdit |
-| CW-08 | Rebond manuel autour d’un capteur | aucun mot incohérent, aucune téléportation de position |
-| CW-09 | Arrêt puis relance gateway | nouvelle séquence acceptée, reprise sans saut de position |
-| CW-10 | `SimulationModeActive=FALSE` | aucune écriture utile de la passerelle, image nominale conservée |
+## Verdicts
 
-## Verdict
+| Verdict | Sens |
+|---|---|
+| PASS_MEMOIRE | LinkReady stable 2 s, candidat=3, mot=3, AtP1=TRUE, AtMaintenance=FALSE, persistance P1=TRUE. |
+| PASS_FRONT_ORDRE_KO | État final P1 correct, mais la restauration mémoire n'a pas été prouvée. Rejouer CW-00 après un arrêt propre. |
+| FAIL | Liaison, bits simulation, chemins symboles ou état P1 non conformes. Ne pas conclure. |
 
-Un test est PASS uniquement si les variables de liaison, les retours FMU et l’image `GVL_Simulation` concordent. Une courbe seule ou `LinkReady=TRUE` ne suffit pas.
+## Hypothèse à vérifier humainement
 
-## Preuve passerelle locale
+Un Reset peut remettre les flags simulation et les variables de boot à leur valeur
+par défaut. Ce comportement doit être observé dans la copie Control Win ; il n'est
+pas supposé par cette recette.
 
-```text
-python TOOLS/TWINBENCH/udp_m3_link/test_t409_gateway_roundtrip.py
-[T409] roundtrip responses=100 timeouts=0 sensor_words=[1, 3]
-[PASS] T409 gateway round-trip 10 ms
-```
+## Option C3 à décider, sans code dans ce lot
 
-Cette preuve couvre le transport et la FMU, mais ne remplace pas les essais CW-01 à CW-10 dans Control Win.
+Modifier PRG_05_Translation afin de ne pas restaurer AtPosition tant que la
+simulation M3 OpenModelica est active et que LinkReady est FALSE.
 
-Test de reprise exécuté :
-
-```text
-python TOOLS/TWINBENCH/udp_m3_link/test_t409_recovery.py
-[T409] recovery first_seq=100 recovered_seq=0 measured_x100=40
-[PASS] T409 reconnect sequence reset
-```
-
-Un reset de séquence n'est accepté qu'après une interruption supérieure à une seconde ; une trame ancienne pendant une liaison active reste rejetée.
-
-## Lancement groupé
-
-Pour rejouer toutes les preuves FMU locales :
-
-```powershell
-& 'C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TWINBENCH\udp_m3_link\Run_T409_Verification.ps1'
-```
-
-Le verdict groupé est bloquant : un seul test en échec invalide la recette FMU locale.
-
-## Trace détaillée
-
-La passerelle accepte aussi :
-
-```text
-python TOOLS/TWINBENCH/udp_m3_link/udp_m3_fmu_gateway.py --trace-file C:\Temp\m3_t409_trace.csv
-```
-
-Le CSV contient, pour chaque trame, le mot de commande, Hz demandés, Hz mesurés, vitesse, position, état frein, statut, mot capteurs et butée. Il permet de comparer la plante FMU à l’image PLC sans interprétation visuelle.
+- Impact : évite qu'un mot 00000 de liaison absente soit interprété comme Maintenance.
+- Risque : modifie une logique de positionnement C3 et son démarrage.
+- Pré-requis : nouvelle tâche, contrat C3, analyse AF-11 et validation humaine.
+- Décision : non prise ; aucun fichier CODE n'est modifié ici.

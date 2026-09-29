@@ -25,8 +25,8 @@ VAR
     Bytes               : __XINT := 0;
     RxSequence          : UDINT := 0;
     RxCommandSequence   : UDINT := 0;
+    RxSequenceNewer     : BOOL := FALSE;
     RxFrequency_x100    : UINT := 0;
-    RxVelocity_x1000    : DINT := 0;
     RxPosition_x1000    : DINT := 0;
     RxVelocity_x1000    : DINT := 0;
     RxBrakeOpen         : BOOL := FALSE;

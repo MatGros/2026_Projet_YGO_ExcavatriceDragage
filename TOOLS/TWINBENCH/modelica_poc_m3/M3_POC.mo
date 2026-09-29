@@ -180,12 +180,17 @@ package M3_POC "POC graphique de translation M3 — sans logique PLC"
     output M3Diagnostics diagnostics;
 
   protected
+    Real positionClamped_M;
+    discrete Real directionSign(start=0, fixed=true)
+      "Sens moteur mémorisé pendant la rampe de décélération";
     Modelica.Blocks.Sources.RealExpression direction(
       y=if commands.cmdMoveToTremie and not commands.cmdMoveToMaintenance then -1 else
         if commands.cmdMoveToMaintenance and not commands.cmdMoveToTremie then 1 else 0)
       annotation(Placement(transformation(extent={{-90,48},{-70,68}})));
     Modelica.Blocks.Sources.RealExpression requestedFrequency(
-      y=if abs(direction.y) > 0.5 then commands.cmdFrequency_Hz else 0)
+      y=if abs(direction.y) > 0.5 and
+          (abs(directionSign) < 0.5 or direction.y * directionSign > 0.5) then
+          commands.cmdFrequency_Hz else 0)
       annotation(Placement(transformation(extent={{-90,10},{-70,30}})));
     Modelica.Blocks.Nonlinear.Limiter frequencyLimiter(
       uMax=configuration.frequencyMax_Hz, uMin=0)
@@ -232,8 +237,7 @@ package M3_POC "POC graphique de translation M3 — sans logique PLC"
       annotation(Line(points={{-39,20},{-32,20}}, color={0,0,127}));
     connect(driveRamp.y, signedFrequency.u1)
       annotation(Line(points={{-9,20},{-2,20},{-2,48},{3,48}}, color={0,0,127}));
-    connect(direction.y, signedFrequency.u2)
-      annotation(Line(points={{-69,58},{-5,58},{-5,36},{3,36}}, color={0,0,127}));
+    signedFrequency.u2 = directionSign;
     connect(signedFrequency.y, frequencyToVelocity.u)
       annotation(Line(points={{26,42},{33,42}}, color={0,0,127}));
     connect(brakeRequest.y, brake.releaseRequest)
@@ -246,13 +250,15 @@ package M3_POC "POC graphique de translation M3 — sans logique PLC"
       annotation(Line(points={{-1,-30},{55,-30},{55,19},{63,19}}, color={0,0,127}));
     connect(gatedVelocity.y, carriagePosition.u)
       annotation(Line(points={{86,25},{90,25},{90,-5},{35,-5},{35,-25},{43,-25}}, color={0,0,127}));
-    connect(carriagePosition.y, sensors.position_M)
-      annotation(Line(points={{66,-25},{70,-25},{70,-45},{73,-45}}, color={0,0,127}));
+    positionClamped_M = min(max(carriagePosition.y,
+      configuration.tremieMechanicalStop_M),
+      configuration.maintenanceMechanicalStop_M);
+    sensors.position_M = positionClamped_M;
 
     measurements.frequencyCmd_Hz = frequencyLimiter.y;
     measurements.frequencyAct_Hz = driveRamp.y;
     measurements.velocityAct_Mps = gatedVelocity.y;
-    measurements.positionAct_M = carriagePosition.y;
+    measurements.positionAct_M = positionClamped_M;
     feedback.brakeIsOpen = brake.isOpen;
     feedback.tremiePositionIsActive = sensors.tremie;
     feedback.pvPositionIsActive = sensors.pv;
@@ -262,8 +268,18 @@ package M3_POC "POC graphique de translation M3 — sans logique PLC"
     deviceState.sensorsWord = sensors.sensorsWord;
     deviceState.driveStatusWord = if abs(driveRamp.y) > 0.5 and brake.isOpen then 135 else 128;
     diagnostics.commandConflict = commands.cmdMoveToTremie and commands.cmdMoveToMaintenance;
-    diagnostics.hardStopTremieActive = carriagePosition.y <= configuration.tremieMechanicalStop_M + 0.0001 and direction.y < 0;
-    diagnostics.hardStopMaintenanceActive = carriagePosition.y >= configuration.maintenanceMechanicalStop_M - 0.0001 and direction.y > 0;
+    diagnostics.hardStopTremieActive = positionClamped_M <= configuration.tremieMechanicalStop_M + 0.0001 and direction.y < 0;
+    diagnostics.hardStopMaintenanceActive = positionClamped_M >= configuration.maintenanceMechanicalStop_M - 0.0001 and direction.y > 0;
+
+  algorithm
+    // Neutral arrête la consigne Hz, pas le sens moteur : la rampe de
+    // décélération reste visible jusqu'à vitesse nulle. Un ordre inverse
+    // attend également la fin de rampe avant de changer de sens.
+    when initial() then
+      directionSign := 0;
+    elsewhen abs(driveRamp.y) <= 0.5 and abs(direction.y) > 0.5 then
+      directionSign := direction.y;
+    end when;
 
     annotation(
       Diagram(coordinateSystem(extent={{-100,-70},{100,80}}, preserveAspectRatio=false), graphics={

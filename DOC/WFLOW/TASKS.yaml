@@ -1,4 +1,27 @@
 tasks:
+- id: T414
+  parent_id: T399
+  statut: ⬜
+  criticite: C3
+  domaine: OUTILLAGE / TWINBENCH / IHM / MATERIEL REEL / LECTURE SEULE
+  agent: —
+  date: '2026-09-29T01:10:00+02:00'
+  titre: 'Interface simulateur M3 utilisable sur le materiel reel en lecture seule'
+  contexte: 'Revue orchestrateur T409-T413 (2026-09-28/29) : le miroir codesys_m3_telemetry_mirror.py ne lit que des variables de simulation (PRG_T409_M3_FmuBridge.Fmu*, figees a 0 hors simu IMPL:1-14, et GVL_Simulation.SimM3OpenModelica.*). Sur la machine reelle, l interface afficherait des zeros. Besoin utilisateur : utiliser l interface graphique du simulateur avec le materiel hardware. Reporte apres T409-T413 par decision humaine.'
+  description: 'Rendre l interface M3 live utilisable en visualisation pure sur le PLC reel : lecture source-agnostique, protocole sans notion FMU, bandeau reel/simu, aucune commande. Aucun codeur M3 sur la machine : toute position continue est une estimation PC.'
+  objectifs:
+  - 'Lire PRG_02_Acquisition.HwIn.Translation.* (5 capteurs, frein, thermique, StatusWord, ActualFrequencyHz x100), consigne Idx402, instPosDecoderM3.LimitSwitchTremie/Maintenance et GVL_Simulation.SimulationModeActive ; meme jeu de chemins en simu et en reel.'
+  - 'Protocole versionne sans butee FMU : fins de course + bit simulation_mode + bit position_estimated.'
+  - 'IHM mode materiel : bandeau permanent MACHINE REELLE / LECTURE SEULE (ou SIMULATION PLC), toutes commandes desactivees (test automatique), DONNEES PERDUES visible, IHM machine = seule reference.'
+  - 'Miroir IDE conserve pour mise en service ponctuelle uniquement (duree bornee, cadence reelle mesuree ; T407 ~217 ms/echange).'
+  decisions_humaines_requises:
+  - 'Transport cible : OPC UA lecture seule (recommande orchestrateur) / POU UDP emission seule (CODE/) / miroir IDE seul.'
+  - 'Position : chariot anime ESTIMEE (zone capteurs + integration Hz recalee sur fronts, hypothese 50 Hz = 1 m/s) ou affichage de la zone seule.'
+  contrat: 'A rediger (TASK_CONTRACT_T414_*.yaml) apres decisions humaines.'
+  avancement: 'Non demarre. Constats de revue disponibles dans la conversation orchestrateur du 2026-09-29.'
+  bloque_par:
+  - 'Cloture T409-T413 (lot simulation en cours, CDX01).'
+  - 'Decisions humaines transport et position.'
 - id: T409
   parent_id: T399
   statut: ⏳

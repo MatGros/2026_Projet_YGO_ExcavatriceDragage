@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
-"""T409 Control Win acceptance probe, read-only.
+"""CW-00 T409 : preuve lecture seule du départ P1 par mémoire ou par front.
 
-Run inside CODESYS Tools > Scripting while ONLINE on the TwinBench copy.
-No PLC variable is written by this script.
+À lancer dans Tools > Scripting, ONLINE sur la copie TwinBench Control Win.
+Ce script ne possède aucune API d'écriture, de force ou de téléchargement.
 """
+import time
 
-DEFAULT_PATHS = (
+
+PATHS = (
     "PRG_T409_M3_FmuBridge.LinkReady",
     "PRG_T409_M3_FmuBridge.Timeout",
     "PRG_T409_M3_FmuBridge.LinkInvalid",
-    "PRG_T409_M3_FmuBridge.SensorWordIncoherent",
-    "PRG_T409_M3_FmuBridge.FmuPosition_M",
-    "PRG_T409_M3_FmuBridge.FmuVelocity_Mps",
-    "PRG_T409_M3_FmuBridge.FmuFrequency_Hz",
-    "GVL_Simulation.SimM3OpenModelica.M3_BrakeIsOpen_DI",
-    "GVL_Simulation.SimM3OpenModelica.M3_PosTremie_DI",
-    "GVL_Simulation.SimM3OpenModelica.M3_PosPV_DI",
-    "GVL_Simulation.SimM3OpenModelica.M3_PosPVP2_DI",
-    "GVL_Simulation.SimM3OpenModelica.M3_PosP1_DI",
-    "GVL_Simulation.SimM3OpenModelica.M3_PosMaintenance_DI",
+    "GVL_Simulation.SimulationModeActive",
+    "GVL_Simulation.SimM3OpenModelicaActive",
+    "PRG_05_Translation.M3_AtPositionBootRestored",
+    "PRG_05_Translation.M3_BootSensorsWordCandidate",
+    "PRG_05_Translation.instPosDecoderM3.SensorsWord",
+    "PRG_05_Translation.M3_AtP1Stable",
+    "PRG_05_Translation.M3_AtMaintenanceStable",
+    "GVL_PERSISTENT._TranslationAtP1Persisted",
+    "GVL_PERSISTENT._TranslationAtMaintenancePersisted",
 )
 
 
@@ -26,25 +27,75 @@ def _bool(value):
     return str(value).strip().upper() in ("TRUE", "1")
 
 
+def _integer(value):
+    text = str(value).strip().upper()
+    if "#" in text:
+        prefix, text = text.split("#", 1)
+        if prefix == "2":
+            return int(text, 2)
+    return int(float(text))
+
+
+def _read_with_fallback(online_app):
+    try:
+        values = list(online_app.read_values(PATHS))
+        if len(values) == len(PATHS):
+            return dict(zip(PATHS, values))
+    except Exception:
+        pass
+    values = {}
+    for path in PATHS:
+        try:
+            one = list(online_app.read_values((path,)))
+            values[path] = one[0] if len(one) == 1 else "INVALID_READ"
+        except Exception as exc:
+            values[path] = "INVALID_EXPRESSION: {}".format(exc)
+    return values
+
+
+def _show(label, values):
+    print("--- {} ---".format(label))
+    for path in PATHS:
+        print("{} = {}".format(path, values[path]))
+
+
 application = projects.primary.active_application
 online_app = online.create_online_application(application)
 with online_app:
     if not online_app.is_logged_in:
-        raise RuntimeError("Faire Login sur la copie Control Win avant le test")
-    values = list(online_app.read_values(DEFAULT_PATHS))
-    if len(values) != len(DEFAULT_PATHS):
-        raise RuntimeError("Lecture T409 incomplete: {} / {}".format(len(values), len(DEFAULT_PATHS)))
-    print("=== T409 CONTROL WIN — ACCEPTATION LECTURE SEULE ===")
-    print("[SECURITE] Aucune ecriture PLC. Copie Control Win uniquement.")
-    for path, value in zip(DEFAULT_PATHS, values):
-        print("{} = {}".format(path, value))
-    ready = _bool(values[0])
-    timeout = _bool(values[1])
-    invalid = _bool(values[2])
-    incoherent = _bool(values[3])
-    brake = _bool(values[7])
-    if ready and not timeout and not invalid and not incoherent:
-        print("PASS T409: liaison et image capteurs coherentes")
+        raise RuntimeError("Faire Login sur la copie Control Win avant CW-00")
+
+    first = _read_with_fallback(online_app)
+    _show("LECTURE 1", first)
+    time.sleep(2.0)
+    second = _read_with_fallback(online_app)
+    _show("LECTURE 2", second)
+
+    invalid = [path for path in PATHS if str(first[path]).startswith("INVALID_")
+               or str(second[path]).startswith("INVALID_")]
+    if invalid:
+        print("VERDICT: FAIL — chemins CODESYS non exposés : {}".format(", ".join(invalid)))
     else:
-        print("DIAGNOSTIC T409: LinkReady={} Timeout={} LinkInvalid={} SensorWordIncoherent={} BrakeOpen={}".format(
-            ready, timeout, invalid, incoherent, brake))
+        ready_twice = (_bool(first[PATHS[0]]) and _bool(second[PATHS[0]])
+                       and not _bool(first[PATHS[1]]) and not _bool(second[PATHS[1]])
+                       and not _bool(first[PATHS[2]]) and not _bool(second[PATHS[2]]))
+        simulation_ready = (_bool(second[PATHS[3]]) and _bool(second[PATHS[4]]))
+        boot_restored = _bool(second[PATHS[5]])
+        candidate = _integer(second[PATHS[6]])
+        sensors_word = _integer(second[PATHS[7]])
+        at_p1 = _bool(second[PATHS[8]])
+        at_maintenance = _bool(second[PATHS[9]])
+        p1_persisted = _bool(second[PATHS[10]])
+        maintenance_persisted = _bool(second[PATHS[11]])
+
+        if (ready_twice and simulation_ready and boot_restored and candidate == 3
+                and sensors_word == 3 and at_p1 and not at_maintenance
+                and p1_persisted and not maintenance_persisted):
+            print("VERDICT: PASS_MEMOIRE — 00011 stable, P1 restauré par mémoire")
+        elif (ready_twice and simulation_ready and sensors_word == 3
+              and at_p1 and not at_maintenance and candidate != 3):
+            print("VERDICT: PASS_FRONT_ORDRE_KO — P1 obtenu par front capteur, mémoire NON testée")
+        else:
+            print("VERDICT: FAIL — LinkReady2s={} Sim={} Boot={} Candidate={} Sensors={} AtP1={} AtMaint={} P1Persist={} MaintPersist={}".format(
+                ready_twice, simulation_ready, boot_restored, candidate, sensors_word,
+                at_p1, at_maintenance, p1_persisted, maintenance_persisted))
