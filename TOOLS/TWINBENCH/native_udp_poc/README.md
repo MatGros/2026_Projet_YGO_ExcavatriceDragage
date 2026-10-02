@@ -29,3 +29,22 @@ La mesure utilise le serveur echo `127.0.0.1:29031`.
 Le flux rapide tourne a 10 ms, le cyclique a 50 ms et l evenementiel est emis
 sur front de `EventTrigger`. Faire une premiere mesure sans front, puis actionner
 `EventTrigger` plusieurs fois pendant la seconde mesure.
+
+## Résultat de référence — recette humaine 2026-09-28
+
+> Cette mesure est conservée comme preuve de capacité du **transport UDP local**.
+> Elle ne qualifie ni la plante M3, ni SimBench, ni la fidélité mécanique.
+
+Configuration : copie CODESYS Control Win locale, `PRG_TwinBenchNativeUdpMulti` dans une
+tâche dédiée de 10 ms, serveur echo loopback `127.0.0.1`.
+
+| Flux | Trames | Perdues | p50 | p95 | p99 | Max |
+|---|---:|---:|---:|---:|---:|---:|
+| Rapide | 9 837 | 0 | 10,339 ms | 11,128 ms | 11,495 ms | 12,490 ms |
+| Cyclique | 1 967 | 0 | 51,904 ms | 53,323 ms | 53,964 ms | 55,680 ms |
+| Événementiel | 3 | 0 | 3 308,061 ms | 3 360,846 ms | 3 360,846 ms | 3 360,846 ms |
+
+Interprétation : le flux rapide respecte le cycle observé de 10 ms dans cette copie locale ;
+le flux cyclique tient environ 50 ms. Le troisième résultat exprime l'espacement manuel des
+fronts, **pas une latence de transport**. Cette preuve doit être rejouée après toute évolution
+du POU, de la bibliothèque `SysSocket`, de la tâche ou de la cible Control Win.

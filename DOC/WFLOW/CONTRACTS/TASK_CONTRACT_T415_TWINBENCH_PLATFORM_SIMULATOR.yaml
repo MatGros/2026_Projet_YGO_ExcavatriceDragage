@@ -1,0 +1,60 @@
+contract:
+  task_id: T415
+  criticality: C3
+  strategy: rebuild
+  objective: >
+    Organiser et qualifier TwinBench comme plateforme generale CODESYS, SimBench
+    et OpenModelica, avec M3 comme premier cas metier, sans injection vers le CPU reel.
+  acceptance:
+    - id: AC1
+      statement: "Les briques TwinBench existantes et les nouveaux lots sont visibles sous une unique tache mere avec leurs dependances."
+      verified_by: "Revue de DOC/WFLOW/TASKS.yaml."
+    - id: AC2
+      statement: "Le parcours utilisateur est assaini avant toute evolution de la plante ou de l'interface."
+      verified_by: "Cloture approuvee de T415-A."
+    - id: AC3
+      statement: "M3 est qualifie comme premier cas metier par scenarios et verdicts PLC observes dans Control Win."
+      verified_by: "Cloture approuvee de T415-B a T415-E3."
+    - id: AC4
+      statement: "Le calage physique n'est declare fiable que lorsque les traces terrain correspondantes sont comparees."
+      verified_by: "Tache de calage terrain creee et cloturee apres T415-E3."
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/
+      - TOOLS/TWINBENCH/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - automate_reel
+      - runtime_Codesys_reel
+      - commit
+      - push
+  conservation:
+    must_survive:
+      - "FB_SimBench reste l'enveloppe PLC existante tant qu'une tache PLC dediee n'est pas approuvee."
+      - "Le PLC reel ne recoit aucune image simulee."
+      - "Les POC et leurs preuves restent disponibles jusqu'a une decision humaine d'archivage."
+    dropped_on_purpose:
+      - "Aucun nouveau lancement utilisateur n'est ajoute pendant T415-A."
+  evidence_required:
+    - "Arbre T415 lisible dans TASKS.yaml."
+    - "Contrats enfants C3 avant leur activation."
+    - "Recette Control Win avant toute affirmation de simulation PLC fiable."
+  alert_duty: >
+    Toute confusion entre le runtime Control Win, le CPU reel et une visualisation
+    shadow bloque le lot concerne. Une hypothese mecanique ne devient jamais un fait
+    par repetition dans un script ou une IHM.
+status: IN_PROGRESS
+execution:
+  executed_by: CDX01
+  completed_at: ''
+  status: IN_PROGRESS
+  summary: "Tache mere stable creee ; T415-A est le seul enfant actif."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ''
+  validated_at: ''
+  notes: "Validation humaine requise a chaque jalon enfant."
