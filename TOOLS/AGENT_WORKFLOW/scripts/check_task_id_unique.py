@@ -36,10 +36,10 @@ RESERVATION_DIRS = [
     REPO / "DOC" / "WFLOW" / "AUDITS",
 ]
 
-TASK_ID_RE = re.compile(r"\bT(\d{3,4})\b")
-CATALOG_ID_RE = re.compile(r"^- id:\s*(T\d{3,4})\s*$", re.MULTILINE)
+TASK_ID_RE = re.compile(r"\b(T\d{3,4}(?:-[A-Z](?:\d+)?)?)\b")
+CATALOG_ID_RE = re.compile(r"^- id:\s*(T\d{3,4}(?:-[A-Z](?:\d+)?)?)\s*$", re.MULTILINE)
 # "(a creer)" / "(à créer)" a moins de 80 caracteres apres l'identifiant.
-RESERVED_RE = re.compile(r"\bT(\d{3,4})\b[^\n]{0,80}?\(\s*[àa]\s*cr[ée]er\s*\)", re.IGNORECASE)
+RESERVED_RE = re.compile(r"\b(T\d{3,4}(?:-[A-Z](?:\d+)?)?)\b[^\n]{0,80}?\(\s*[àa]\s*cr[ée]er\s*\)", re.IGNORECASE)
 
 
 def catalog_ids(text: str) -> list[str]:
@@ -58,8 +58,7 @@ def reserved_ids(dirs: list[Path]) -> dict[str, str]:
             except OSError:
                 continue
             for n, line in enumerate(lines, 1):
-                for num in RESERVED_RE.findall(line):
-                    tid = f"T{num}"
+                for tid in RESERVED_RE.findall(line):
                     found.setdefault(tid, f"{path.relative_to(REPO)}:{n}")
     return found
 
@@ -75,7 +74,7 @@ def all_mentioned_ids() -> set[str]:
             paths = [TASKS] + sorted(root.glob("*.md"))
         for path in paths:
             try:
-                seen.update(f"T{n}" for n in TASK_ID_RE.findall(
+                seen.update(TASK_ID_RE.findall(
                     path.read_text(encoding="utf-8", errors="replace")))
             except OSError:
                 continue

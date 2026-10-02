@@ -1,4 +1,153 @@
 tasks:
+- id: T415
+  parent_id: T399
+  statut: ⏳
+  criticite: C3
+  domaine: OUTILLAGE / TWINBENCH / SIMULATEUR INDUSTRIEL / PLATEFORME
+  agent: CDX01
+  date: '2026-10-02T00:00:00+02:00'
+  titre: 'TwinBench — plateforme generale de simulation industrielle'
+  contexte: 'Le projet doit disposer d un simulateur general integre autour de CODESYS, SimBench et OpenModelica. M3 est son premier cas metier, avant M1, M2 et la benne.'
+  description: 'Piloter une plateforme ou CODESYS garde la logique et les securites, SimBench reste la frontiere de stimuli, OpenModelica porte la physique et l IHM observe sans calculer ni piloter la machine reelle.'
+  objectifs:
+  - 'Rendre le parcours TwinBench lisible avant toute nouvelle integration.'
+  - 'Definir et faire respecter la frontiere entre PLC, SimBench, simulateur externe et IHM.'
+  - 'Qualifier M3 comme premier cas metier par scenarios reproductibles et verdicts PLC.'
+  - 'Preparer l extension aux treuils et a la benne sans melanger composant physique et logique PLC.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T415_TWINBENCH_PLATFORM_SIMULATOR.yaml
+  enfants:
+  - T415-A
+  - T415-B
+  - T415-C
+  - T415-D
+  - T415-E
+  - T415-F
+  bloque_par: []
+- id: T415-A
+  parent_id: T415
+  statut: ⏳
+  criticite: C2
+  domaine: OUTILLAGE / TWINBENCH / GOUVERNANCE
+  agent: CDX01
+  date: '2026-10-02T00:00:00+02:00'
+  titre: 'TwinBench — gouvernance, inventaire et parcours utilisateur'
+  contexte: 'Avant toute evolution, clarifier les POC, les roles et les points d entree sans supprimer ni deplacer de fichiers.'
+  description: 'Produire l inventaire et proposer un seul parcours par usage : copie Control Win, simulation locale et diagnostic. Les scripts techniques restent internes.'
+  objectifs:
+  - 'Classifier les POC historiques T400 a T409 et T414 comme references, actifs ou a archiver.'
+  - 'Proposer un point d entree utilisateur unique par usage sans creer de nouveau lanceur.'
+  - 'Soumettre tout archivage ou suppression a decision humaine explicite.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T415-A_TWINBENCH_ASSAINISSEMENT.yaml
+  avancement: 'Inventaire documentaire produit le 2026-10-02. Attente validation humaine du classement et du parcours avant toute operation sur les fichiers.'
+  bloque_par: []
+- id: T415-B
+  parent_id: T415
+  statut: ⬜
+  criticite: C3
+  domaine: OUTILLAGE / TWINBENCH / CONTRAT DE LIAISON
+  agent: —
+  date: '2026-10-02T00:00:00+02:00'
+  titre: 'TwinBench — frontiere PLC, SimBench et simulateur externe'
+  contexte: 'Definir un contrat unique avant toute nouvelle injection.'
+  description: 'Le simulateur lit les commandes publiees et ecrit uniquement une image materielle complete a la frontiere SimBench, sous verrou de simulation.'
+  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-B_*.yaml).'
+  bloque_par:
+  - 'Cloture approuvee de T415-A.'
+- id: T415-C
+  parent_id: T415
+  statut: ⬜
+  criticite: C3
+  domaine: OUTILLAGE / TWINBENCH / OPENMODELICA / FMU
+  agent: —
+  date: '2026-10-02T00:00:00+02:00'
+  titre: 'TwinBench — runtime OpenModelica/FMU deterministe'
+  contexte: 'Le modele physique doit etre testable sans PLC et sans IHM.'
+  description: 'Qualifier le pas, les etats, les butees, les reprises et les traces du runtime physique avant integration PLC.'
+  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-C_*.yaml).'
+  bloque_par:
+  - 'Contrat T415-B approuve.'
+- id: T415-D
+  parent_id: T415
+  statut: ⬜
+  criticite: C3
+  domaine: OUTILLAGE / TWINBENCH / CODESYS / SIMBENCH / CONTROL WIN
+  agent: —
+  date: '2026-10-02T00:00:00+02:00'
+  titre: 'TwinBench — integration CODESYS, SimBench et Control Win'
+  contexte: 'Control Win sert uniquement a qualifier une copie isolee ; le CPU reel reste hors injection.'
+  description: 'Integrer le contrat approuve dans la copie Control Win et mesurer la robustesse sans modifier la logique metier PLC.'
+  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-D_*.yaml).'
+  bloque_par:
+  - 'Qualification T415-B et T415-C.'
+- id: T415-E
+  parent_id: T415
+  statut: ⬜
+  criticite: C3
+  domaine: OUTILLAGE / TWINBENCH / M3 / RECETTE
+  agent: —
+  date: '2026-10-02T00:00:00+02:00'
+  titre: 'M3 — premier cas metier qualifie'
+  contexte: 'M3 sert de vertical slice avant extension aux treuils et a la benne.'
+  description: 'Modeliser, tester puis recetter M3 avec des cas d utilisation observables et des verdicts PLC.'
+  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-E_*.yaml).'
+  enfants:
+  - T415-E1
+  - T415-E2
+  - T415-E3
+  bloque_par:
+  - 'Qualification T415-B, T415-C et T415-D.'
+- id: T415-E1
+  parent_id: T415-E
+  statut: ⬜
+  criticite: C3
+  domaine: OUTILLAGE / TWINBENCH / M3 / MODELE PHYSIQUE
+  agent: —
+  date: '2026-10-02T00:00:00+02:00'
+  titre: 'M3 — modele variateur, frein, mecanique, capteurs et butees'
+  contexte: 'Reprendre les faits PLC et terrain ; marquer toute hypothese mecanique.'
+  description: 'Composer le modele physique M3 sans reproduire la logique PLC dans OpenModelica.'
+  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-E1_*.yaml).'
+  bloque_par:
+  - 'Qualification T415-C.'
+- id: T415-E2
+  parent_id: T415-E
+  statut: ⬜
+  criticite: C3
+  domaine: OUTILLAGE / TWINBENCH / M3 / TESTS
+  agent: —
+  date: '2026-10-02T00:00:00+02:00'
+  titre: 'M3 — scenarios, defauts et preuves automatisees'
+  contexte: 'Les comportements reellement utiles doivent etre reproductibles et mesurables.'
+  description: 'Definir les sequences nominales, capteurs, butees, pertes de liaison et verdicts attendus.'
+  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-E2_*.yaml).'
+  bloque_par:
+  - 'Modele T415-E1 approuve.'
+- id: T415-E3
+  parent_id: T415-E
+  statut: ⬜
+  criticite: C3
+  domaine: OUTILLAGE / TWINBENCH / M3 / CONTROL WIN
+  agent: —
+  date: '2026-10-02T00:00:00+02:00'
+  titre: 'M3 — recette integree dans Control Win'
+  contexte: 'Verifier la chaine complete sur copie PLC isolee, jamais sur le CPU reel.'
+  description: 'Executer les scenarios qualifies, observer les verdicts PLC et documenter les limites de fidelite.'
+  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-E3_*.yaml).'
+  bloque_par:
+  - 'Scenarios T415-E2 approuves.'
+- id: T415-F
+  parent_id: T415
+  statut: ⬜
+  criticite: C3
+  domaine: OUTILLAGE / TWINBENCH / CPU REEL / LECTURE SEULE
+  agent: —
+  date: '2026-10-02T00:00:00+02:00'
+  titre: 'CPU reel — shadow lecture seule et decision de surete'
+  contexte: 'Reprise eventuelle de la reference historique T414, hors urgence et apres qualification Control Win.'
+  description: 'Cadrer une visualisation strictement en lecture seule des donnees reelles ; aucune injection de stimuli simules vers le CPU reel.'
+  contrat: 'A rediger apres decision humaine sur le transport et la position estimee.'
+  bloque_par:
+  - 'Qualification T415-E3 et decision humaine explicite.'
 - id: T414
   parent_id: T399
   statut: ⬜

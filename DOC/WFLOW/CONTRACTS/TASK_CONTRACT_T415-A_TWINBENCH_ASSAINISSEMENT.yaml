@@ -1,0 +1,60 @@
+contract:
+  task_id: T415-A
+  criticality: C2
+  strategy: rebuild
+  objective: >
+    Rendre TwinBench lisible et utilisable en classant les POC et en definissant
+    un seul parcours utilisateur par usage, sans modifier la simulation ni le PLC.
+  acceptance:
+    - id: AC1
+      statement: "Chaque tache T400 a T409 et chaque lanceur TwinBench est classe avec un role et un statut proposes."
+      verified_by: "Inventaire T415-A relu."
+    - id: AC2
+      statement: "Le futur point d'entree Control Win reutilise le runner T404 existant au lieu de creer un second runner."
+      verified_by: "Carte de parcours T415-A."
+    - id: AC3
+      statement: "Le futur point d'entree M3 est separe des scripts internes, tests et diagnostics."
+      verified_by: "Carte de parcours T415-A."
+    - id: AC4
+      statement: "Aucun fichier n'est deplace, supprime ou archive sans une decision humaine explicite sur sa cible."
+      verified_by: "Git diff limite aux documents de pilotage avant approbation humaine."
+    - id: AC5
+      statement: "Aucun fichier CODE, projet CODESYS, modele Modelica ou passerelle n'est modifie pendant l'inventaire."
+      verified_by: "Git diff --name-only."
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/
+      - DOC/WFLOW/REX/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - TOOLS/TWINBENCH/
+      - commit
+      - push
+  conservation:
+    must_survive:
+      - "Tous les POC et journaux existants restent intacts pendant l'inventaire."
+      - "T404 reste le seul socle envisage pour la copie Control Win."
+      - "T414 reste distinct : lecture seule CPU reel, non prerequisite de la simulation Control Win."
+    dropped_on_purpose: []
+  evidence_required:
+    - "Inventaire des taches, scripts et dossiers TwinBench."
+    - "Proposition de classement soumise a validation humaine."
+    - "check_task_contract.py PASS."
+  alert_duty: >
+    Toute dependance inconnue, fichier dont le role est ambigu, ou script pouvant
+    contacter un runtime non isole est signale et conserve jusqu'a une decision humaine.
+status: IN_PROGRESS
+execution:
+  executed_by: CDX01
+  completed_at: ''
+  status: IN_PROGRESS
+  summary: "Cadrage du menage cree ; inventaire documentaire a produire avant toute action sur les fichiers."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ''
+  validated_at: ''
+  notes: "Aucun archivage ou suppression sans approbation humaine explicite."
