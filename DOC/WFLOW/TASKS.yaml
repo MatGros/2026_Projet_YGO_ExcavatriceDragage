@@ -25,20 +25,20 @@ tasks:
   bloque_par: []
 - id: T415-A
   parent_id: T415
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: OUTILLAGE / TWINBENCH / GOUVERNANCE
   agent: CDX01
   date: '2026-10-02T00:00:00+02:00'
   titre: 'TwinBench — gouvernance, inventaire et parcours utilisateur'
-  contexte: 'Avant toute evolution, clarifier les POC, les roles et les points d entree sans supprimer ni deplacer de fichiers.'
-  description: 'Produire l inventaire et proposer un seul parcours par usage : copie Control Win, simulation locale et diagnostic. Les scripts techniques restent internes.'
+  contexte: 'Avant toute evolution, clarifier les POC, les roles et les points d entree, puis ranger les fichiers sans supprimer de contenu.'
+  description: 'Produire l inventaire, organiser les outils par usage et fournir un point d entree maitre avec des parcours separes : copie Control Win et simulation locale. Les scripts techniques restent internes.'
   objectifs:
   - 'Classifier les POC historiques T400 a T409 et T414 comme references, actifs ou a archiver.'
   - 'Proposer un point d entree utilisateur unique par usage sans creer de nouveau lanceur.'
   - 'Soumettre tout archivage ou suppression a decision humaine explicite.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T415-A_TWINBENCH_ASSAINISSEMENT.yaml
-  avancement: 'Inventaire documentaire produit le 2026-10-02. Attente validation humaine du classement et du parcours avant toute operation sur les fichiers.'
+  avancement: 'Arborescence, lanceurs et textes anglais implementes. Recette non destructive, auto-verifications et revue externe MINOR terminees. Pret pour recette humaine Windows; aucune integration PLC n est revendiquee.'
   bloque_par: []
 - id: T415-B
   parent_id: T415

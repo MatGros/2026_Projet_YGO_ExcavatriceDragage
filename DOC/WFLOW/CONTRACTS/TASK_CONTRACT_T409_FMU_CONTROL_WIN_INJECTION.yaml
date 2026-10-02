@@ -22,10 +22,35 @@ contract:
     - id: AC5
       statement: "Le flux natif respecte le budget mesuré T408 : zéro perte et p99 rapide inférieur ou égal à 50 ms dans la copie."
       verified_by: "journal T408/T409 et compteurs PLC"
+    - id: AC6
+      statement: "Dans la copie POC uniquement, SimulationModeActive est la seule activation manuelle ; le bridge et le sélecteur M3 OM suivent automatiquement."
+      verified_by: "garde-fou statique POU et recette Control Win"
+    - id: AC7
+      statement: "Après perte ou redémarrage de la passerelle, l'image est neutralisée au timeout puis le lien reprend sur la première réponse FMU valide sans intervention opérateur."
+      verified_by: "test recovery, revue de séquence ST et recette Control Win"
+    - id: AC8
+      statement: "Le lanceur démarre le gateway et la vue ; le gateway duplique en lecture seule vers la vue la réponse FMU déjà envoyée au Control Win, sans login ni script CODESYS supplémentaire."
+      verified_by: "test d'égalité des datagrammes gateway/écran et recette Control Win"
+    - id: AC9
+      statement: "Sans trame PLC valide, la vue indique l'attente ou la perte de données et ne place jamais le chariot ni les capteurs à une position par défaut."
+      verified_by: "test backend lecture seule et vérification QML sans télémétrie"
+    - id: AC10
+      statement: "Avec une trame fraîche, la vue reflète position et capteurs reçus ; si le flux devient périmé, elle cesse de présenter ces valeurs comme actuelles."
+      verified_by: "test backend réception, expiration et reprise"
+    - id: AC11
+      statement: "Les tests gateway utilisent des ports dédiés et ne perturbent pas une instance utilisateur sur les ports 29061/29072."
+      verified_by: "revue des ports des tests round-trip/recovery"
+    - id: AC12
+      statement: "Le lanceur d'intégration repart d'un état FMU neuf à P1 et n'arrête que le processus gateway T409 identifié ; un propriétaire inconnu bloque sans action destructive."
+      verified_by: "revue du garde-fou PowerShell, test statique et recette Control Win"
   scope:
     allowed:
-      - TOOLS/TWINBENCH/udp_m3_link/
-      - TOOLS/TWINBENCH/native_udp_poc/
+      - TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/
+      - TOOLS/TWINBENCH/02_SIM/modelica/live_poc/Start_M3_Live.ps1
+      - TOOLS/TWINBENCH/02_SIM/modelica/live_poc/app.py
+      - TOOLS/TWINBENCH/02_SIM/modelica/live_poc/Main.qml
+      - TOOLS/TWINBENCH/02_SIM/modelica/live_poc/test_readonly_backend.py
+      - TOOLS/TWINBENCH/03_TRANSPORT/udp_native/
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T409_FMU_CONTROL_WIN_INJECTION.yaml
       - DOC/WFLOW/CONTRACTS/PLAN_T409_FMU_CONTROL_WIN_INJECTION.md
       - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T409_FMU_CONTROL_WIN_INJECTION.md

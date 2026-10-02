@@ -18,7 +18,7 @@
 ## Preuve locale
 
 ```text
-python TOOLS/TWINBENCH/udp_m3_link/test_t409_protocol.py
+python TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/test_t409_protocol.py
 [PASS] T409 frame sizes, requested/measured Hz and bounds
 [PASS] T409 admissible cumulative sensor words: 11111..00000
 ```

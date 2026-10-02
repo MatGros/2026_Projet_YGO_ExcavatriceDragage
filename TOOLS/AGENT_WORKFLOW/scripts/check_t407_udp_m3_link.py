@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 SHADOW = ROOT / "TOOLS/PLC_CSV_SNAPSHOT/codesys_console/codesys_m3_udp_shadow.py"
-PROTOCOL = ROOT / "TOOLS/TWINBENCH/udp_m3_link/protocol.py"
+PROTOCOL = ROOT / "TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/protocol.py"
 
 
 def main() -> int:

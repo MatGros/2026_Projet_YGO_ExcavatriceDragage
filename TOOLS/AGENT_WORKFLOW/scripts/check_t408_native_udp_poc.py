@@ -8,9 +8,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-SOURCE = ROOT / "TOOLS/TWINBENCH/native_udp_poc/PRG_TwinBenchNativeUdp.st"
-MULTI_SOURCE = ROOT / "TOOLS/TWINBENCH/native_udp_poc/PRG_TwinBenchNativeUdpMulti.st"
-ECHO = ROOT / "TOOLS/TWINBENCH/native_udp_poc/udp_echo_t408.py"
+SOURCE = ROOT / "TOOLS/TWINBENCH/03_TRANSPORT/udp_native/PRG_TwinBenchNativeUdp.st"
+MULTI_SOURCE = ROOT / "TOOLS/TWINBENCH/03_TRANSPORT/udp_native/PRG_TwinBenchNativeUdpMulti.st"
+ECHO = ROOT / "TOOLS/TWINBENCH/03_TRANSPORT/udp_native/udp_echo_t408.py"
 
 
 def main() -> int:

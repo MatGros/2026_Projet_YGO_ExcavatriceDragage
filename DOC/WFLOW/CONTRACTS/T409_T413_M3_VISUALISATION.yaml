@@ -8,13 +8,13 @@ contract:
   acceptance:
     - id: AC1
       statement: "La cinématique FMU respecte les butées -0.30 m et 30.30 m."
-      verified_by: "python TOOLS/TWINBENCH/udp_m3_link/test_t409_fmu_scenarios.py"
+      verified_by: "python TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/test_t409_fmu_scenarios.py"
     - id: AC2
       statement: "Le frein fermé interdit tout déplacement."
       verified_by: "test_t409_fmu_scenarios.py: brake_closed_no_motion"
     - id: AC3
       statement: "Le protocole UDP 10 ms et la reprise sont validés."
-      verified_by: "powershell TOOLS/TWINBENCH/udp_m3_link/Run_T409_Verification.ps1"
+      verified_by: "powershell TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/Run_T409_Verification.ps1"
     - id: AC4
       statement: "Le mode PLC lecture démarre sans action Démarrer."
       verified_by: "python test_readonly_backend.py"
@@ -26,19 +26,19 @@ contract:
       verified_by: "python check_t412_mirror_static.py"
     - id: AC7
       statement: "Le démarrage FMU est théorique à P1 : 20.000 m et mot capteurs 00011."
-      verified_by: "python TOOLS/TWINBENCH/udp_m3_link/test_t409_fmu_scenarios.py"
+      verified_by: "python TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/test_t409_fmu_scenarios.py"
     - id: AC8
       statement: "AUTO-CYCLE exécute un trajet P1-Trémie-P1 ; il anticipe la décélération, confirme frein fermé et capteur actif, marque une pause d'au moins 1 s, puis termine immobile à P1 entre 19,97 et 20,00 m. Un redémarrage est explicite ; le joystick interrompt le cycle."
-      verified_by: "python TOOLS/TWINBENCH/udp_m3_link/test_auto_cycle.py ; python TOOLS/TWINBENCH/modelica_poc_m3/live_poc/test_auto_cycle_backend.py"
+      verified_by: "python TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/test_auto_cycle.py ; python TOOLS/TWINBENCH/02_SIM/modelica/live_poc/test_auto_cycle_backend.py"
     - id: AC9
       statement: "Le modèle et la gateway n'ont pas de limite de fonctionnement à 24 h ou 5 min."
-      verified_by: "python TOOLS/TWINBENCH/udp_m3_link/test_t409_long_horizon.py"
+      verified_by: "python TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/test_t409_long_horizon.py"
     - id: AC10
       statement: "Les séquences UDP reprennent après stale et franchissent FFFFFFFF vers 0."
-      verified_by: "python TOOLS/TWINBENCH/udp_m3_link/test_t409_sequence_wrap.py"
+      verified_by: "python TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/test_t409_sequence_wrap.py"
     - id: AC11
       statement: "Au front de contact d'une butée mécanique, l'interface conserve 1 s avant et 1 s après, fige la capture, garde le tracé live accessible et permet de parcourir les échantillons avec un curseur affichant les valeurs synchronisées."
-      verified_by: "python TOOLS/TWINBENCH/modelica_poc_m3/live_poc/test_frozen_stop_trace.py ; TwinBenchM3Live/Python/Scripts/python.exe TOOLS/TWINBENCH/modelica_poc_m3/live_poc/app.py --smoke-test"
+      verified_by: "python TOOLS/TWINBENCH/02_SIM/modelica/live_poc/test_frozen_stop_trace.py ; TwinBenchM3Live/Python/Scripts/python.exe TOOLS/TWINBENCH/02_SIM/modelica/live_poc/app.py --smoke-test"
   scope:
     allowed:
       - TOOLS/TWINBENCH/**

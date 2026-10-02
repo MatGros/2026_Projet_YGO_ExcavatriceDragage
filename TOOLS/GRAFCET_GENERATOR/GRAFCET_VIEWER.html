@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cockpit GRAFCET Automatique — Séquenceurs Industriels</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #070a13;
+      --bg-card: rgba(18, 24, 38, 0.85);
+      --bg-card-hover: rgba(28, 40, 68, 0.95);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --primary: #00e5ff;
+      --primary-glow: rgba(0, 229, 255, 0.35);
+      --accent: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+      --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(0, 229, 255, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
+        linear-gradient(to bottom, #070a13, #0b1120);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(11, 17, 32, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      font-size: 26px;
+    }
+
+    .brand-title h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .brand-title p {
+      font-size: 11px;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .cycle-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .cycle-tab {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cycle-tab.active {
+      background: var(--primary);
+      color: #000;
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    main {
+      flex: 1;
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 20px;
+    }
+
+    .graph-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .meta-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .mermaid-container {
+      flex: 1;
+      overflow: auto;
+      background: #0a0f1d;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 500px;
+    }
+
+    /* SURCHARGES HAUT CONTRASTE — Thème sombre ultra-lisible */
+    .mermaid-container svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Liens et flèches en Cyan électrique éclatant (#00e5ff) */
+    .mermaid-container .edgePath path,
+    .mermaid-container path.flowchart-link,
+    .mermaid-container .edge-thickness-normal,
+    .mermaid-container path.path {
+      stroke: #00e5ff !important;
+      stroke-width: 2.5px !important;
+      stroke-opacity: 1 !important;
+      filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.5));
+    }
+
+    /* Pointes de flèches */
+    .mermaid-container marker path,
+    .mermaid-container .arrowheadPath,
+    .mermaid-container #flowchart-pointEnd path,
+    .mermaid-container [id*="pointEnd"] path {
+      fill: #00e5ff !important;
+      stroke: #00e5ff !important;
+      stroke-width: 1.5px !important;
+    }
+
+    /* Boîtes de texte des réceptivités / transitions */
+    .mermaid-container .edgeLabel {
+      background-color: #080e1e !important;
+      fill: #080e1e !important;
+      color: #ffffff !important;
+    }
+
+    .mermaid-container .edgeLabel rect,
+    .mermaid-container .labelBox {
+      fill: #080e1e !important;
+      stroke: #00e5ff !important;
+      stroke-width: 1.2px !important;
+      rx: 4px;
+      ry: 4px;
+    }
+
+    .mermaid-container .edgeLabel span,
+    .mermaid-container .edgeLabel p,
+    .mermaid-container .edgeLabel div,
+    .mermaid-container .edgeLabel foreignObject {
+      color: #ffffff !important;
+      background-color: #080e1e !important;
+      font-weight: 700 !important;
+      font-size: 11.5px !important;
+      line-height: 1.35 !important;
+      padding: 3px 6px !important;
+      border-radius: 4px !important;
+      border: 1px solid rgba(0, 229, 255, 0.6) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
+    }
+
+    /* Nœuds d'étapes */
+    .mermaid-container .node rect,
+    .mermaid-container .node polygon {
+      stroke-width: 2.5px !important;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+    }
+
+    .mermaid-container .node .label {
+      color: #ffffff !important;
+      font-family: var(--font-mono) !important;
+      font-weight: 700 !important;
+    }
+
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .search-box {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .step-list {
+      max-height: 480px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .step-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .step-item:hover, .step-item.active {
+      border-color: var(--primary);
+      background: var(--bg-card-hover);
+    }
+
+    .step-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .step-name {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .step-line {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--primary);
+    }
+
+    .step-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .trans-pill {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 2px 6px;
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--primary);
+    }
+
+    .detail-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .detail-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .code-box {
+      background: #050811;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #38bdf8;
+      overflow-x: auto;
+      max-height: 200px;
+    }
+
+    footer {
+      padding: 12px 24px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-subtle);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-icon">🧭</span>
+      <div class="brand-title">
+        <h1>GRAFCET INDUSTRIEL — PARSEUR ST AUTOMATIQUE</h1>
+        <p>100% Mécanique & Déterministe · Sans LLM · CEI 60848</p>
+      </div>
+    </div>
+    <div class="cycle-tabs" id="cycleTabs"></div>
+  </header>
+
+  <main>
+    <section class="graph-panel">
+      <div class="panel-header">
+        <div class="panel-title" id="panelTitle">Graphe Fonctionnel de Commande</div>
+        <div class="meta-badge" id="metaBadge">Source: ST</div>
+      </div>
+      <div class="mermaid-container" id="mermaidContainer">
+        <div class="mermaid" id="mermaidGraph"></div>
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <div class="card">
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Filtrer étape ou condition...">
+        <div class="step-list" id="stepList"></div>
+      </div>
+
+      <div class="detail-card" id="detailCard">
+        <div class="detail-title">Détails de l'étape sélectionnée</div>
+        <div id="detailContent" style="font-size: 13px; color: var(--text-muted);">
+          Sélectionnez une étape dans la liste ou le diagramme pour voir ses actions et conditions exactes.
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    Généré automatiquement par <code>TOOLS/GRAFCET_GENERATOR/generate_grafcet_from_st.py</code> à partir du code Structured Text réel.
+  </footer>
+
+  <script>
+    const CYCLES = [{"file_name": "FB_CycleMachineHoming.st", "file_path": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\G_CYCLE\\FB_CycleMachineHoming.st", "state_variable": "SeqStep", "enum_name": "E_MachineHomingTxState", "line_start": 409, "line_end": 574, "total_steps": 9, "total_transitions": 17, "steps": [{"name": "HX0_REPOS", "line": 412, "description": "", "actions": ["CmdWinchSelect := -1;", "HomeReqDone := FALSE;", "RetryCount  := 0;"], "transitions": [{"from": "HX0_REPOS", "to": "HX1_BUCKET_PREPARE", "condition": "((StartEdge.Q OR BtnValidationEdge.Q) AND ModeIsMaint2)", "condition_short": "((StartEdge.Q OR BtnValidationEdge.Q) AND ModeIsMaint2)", "line": 418}]}, {"name": "HX1_BUCKET_PREPARE", "line": 421, "description": "Etape initiale pure : aucune action.", "actions": ["CmdWinchSelect := 2;", "CmdBucketClose := TRUE;", "MachineHomingFailed := TRUE;", "PendingClose := TRUE;", "CommitDone   := FALSE;"], "transitions": [{"from": "HX1_BUCKET_PREPARE", "to": "HX7_FAILED", "condition": "(ModeLostDuringCycle OR MotionOutOfPhase)", "condition_short": "(ModeLostDuringCycle OR MotionOutOfPhase)", "line": 431}, {"from": "HX1_BUCKET_PREPARE", "to": "HX1A_COUPLING_INTERLOCK", "condition": "(HomingBucketConfirmEdge.Q AND NOT JoystickDeflected)", "condition_short": "(HomingBucketConfirmEdge.Q AND NOT JoystickDeflected)", "line": 436}]}, {"name": "HX1A_COUPLING_INTERLOCK", "line": 439, "description": "Decision & Fermeture benne operateur : WinchSel=2 force, FDC benne logiciel inhibe, vitesse plafonnee palier 1. Validation par 1 seul appui bouton dedie IHM, manche au neutre", "actions": ["CmdWinchSelect := 0;", "CouplingSettleTimer(IN := (JoystickWinchSelectArbitrated = 0), PT := T#300ms);", "MachineHomingFailed := TRUE;", "SeenNeutral := NOT JoystickDeflected;"], "transitions": [{"from": "HX1A_COUPLING_INTERLOCK", "to": "HX7_FAILED", "condition": "(ModeLostDuringCycle OR AxisHomingError)", "condition_short": "(ModeLostDuringCycle OR AxisHomingError)", "line": 447}, {"from": "HX1A_COUPLING_INTERLOCK", "to": "HX2_CLIMB_COUPLED", "condition": "((JoystickWinchSelectArbitrated = 0) AND CouplingSettleTimer.Q AND WinchesMechanicallyStopped)", "condition_short": "((JoystickWinchSelectArbitrated = 0)<br/>AND CouplingSettleTimer.Q<br/>AND WinchesMechanicallyStopped)", "line": 450}]}, {"name": "HX2_CLIMB_COUPLED", "line": 453, "description": "Bascule WinchSel=0, reactivation FDC benne. Interlock bloquant E1 : attente confirmation couplage aval effectif.", "actions": ["CmdWinchSelect := 0;", "CmdWinchM1.RunRequest := TRUE; CmdWinchM1.ReqAscent := TRUE; CmdWinchM1.StepTgt := CST_StepSlow;", "CmdWinchM2.RunRequest := TRUE; CmdWinchM2.ReqAscent := TRUE; CmdWinchM2.StepTgt := CST_StepSlow;", "MachineHomingFailed := TRUE;", "M1Demand.HomeReq      := TRUE;", "M2Demand.HomeReq      := TRUE;"], "transitions": [{"from": "HX2_CLIMB_COUPLED", "to": "HX7_FAILED", "condition": "(TransactionAbort)", "condition_short": "(TransactionAbort)", "line": 463}, {"from": "HX2_CLIMB_COUPLED", "to": "HX3_FLYING_REFERENCE", "condition": "(TopPositionSensor)", "condition_short": "(TopPositionSensor)", "line": 470}]}, {"name": "HX3_FLYING_REFERENCE", "line": 473, "description": "Montee couplee M1+M2 palier 1 MAX vers capteur haut.", "actions": ["CmdWinchSelect := 0;", "M1Demand.HomeReq := TRUE;", "M2Demand.HomeReq := TRUE;", "HomeReqDone      := TRUE;", "HomingModeBActive     := TRUE;", "StandstillHomeReqDone := FALSE;"], "transitions": [{"from": "HX3_FLYING_REFERENCE", "to": "HX4_STABILIZATION_CHECK", "condition": "(NOT HomingModeBActive) AND (BothAxesHomed)", "condition_short": "(NOT HomingModeBActive) AND (BothAxesHomed)", "line": 489}, {"from": "HX3_FLYING_REFERENCE", "to": "HX4_STABILIZATION_CHECK", "condition": "(ELSE) AND (WinchesMechanicallyStopped) AND (BothAxesHomed)", "condition_short": "(ELSE)<br/>AND (WinchesMechanicallyStopped)<br/>AND (BothAxesHomed)", "line": 510}, {"from": "HX3_FLYING_REFERENCE", "to": "HX7_FAILED", "condition": "(TransactionAbort)", "condition_short": "(TransactionAbort)", "line": 517}]}, {"name": "HX4_STABILIZATION_CHECK", "line": 520, "description": "En repli Mode B : aucun ordre de mouvement emis, arret mecanique confirme attendu A l'arret physique complet, re-emission impulsionnelle de HomeReq Validation prise de reference a l'arret", "actions": ["CmdWinchSelect := 0;", "SeenNeutral := NOT JoystickDeflected;", "StabilizationOk := WinchesMechanicallyStopped AND SeenNeutral", "StabilizationFailed := WinchesMechanicallyStopped AND SeenNeutral AND NOT StabilizationOk;", "MachineHomingFailed := TRUE;", "RetryCount := RetryCount + 1;"], "transitions": [{"from": "HX4_STABILIZATION_CHECK", "to": "HX7_FAILED", "condition": "(ModeLostDuringCycle OR AxisHomingError)", "condition_short": "(ModeLostDuringCycle OR AxisHomingError)", "line": 534}, {"from": "HX4_STABILIZATION_CHECK", "to": "HX5_RELEASE_CLEARANCE", "condition": "(StabilizationOk)", "condition_short": "(StabilizationOk)", "line": 536}, {"from": "HX4_STABILIZATION_CHECK", "to": "HX7_FAILED", "condition": "(StabilizationFailed) AND (RetryCount >= 3)", "condition_short": "(StabilizationFailed) AND (RetryCount &gt;= 3)", "line": 541}, {"from": "HX4_STABILIZATION_CHECK", "to": "HX1_BUCKET_PREPARE", "condition": "(StabilizationFailed) AND (ELSE)", "condition_short": "(StabilizationFailed) AND (ELSE)", "line": 544}]}, {"name": "HX5_RELEASE_CLEARANCE", "line": 548, "description": "Arret treuils, controle inertie [8.50..8.80m] et concordance codeurs. Repositionnement et nouvelle tentative : retour en preparation benne", "actions": ["CmdWinchSelect := 0;", "MachineHomingFailed := TRUE;"], "transitions": [{"from": "HX5_RELEASE_CLEARANCE", "to": "HX7_FAILED", "condition": "(ModeLostDuringCycle OR AxisHomingError)", "condition_short": "(ModeLostDuringCycle OR AxisHomingError)", "line": 553}, {"from": "HX5_RELEASE_CLEARANCE", "to": "HX6_HOMED_SUCCESS", "condition": "(NOT JoystickDeflected AND WinchesMechanicallyStopped)", "condition_short": "(NOT JoystickDeflected AND WinchesMechanicallyStopped)", "line": 555}]}, {"name": "HX6_HOMED_SUCCESS", "line": 558, "description": "Degagement zone haute, confirmation joystick au neutre.", "actions": ["CmdWinchSelect := 0;", "BucketCommit.CommitClose := PendingClose;", "CommitPublished          := TRUE;", "CommitDone               := TRUE;", "PendingClose := FALSE;"], "transitions": [{"from": "HX6_HOMED_SUCCESS", "to": "HX0_REPOS", "condition": "(ELSE)", "condition_short": "(ELSE)", "line": 567}]}, {"name": "HX7_FAILED", "line": 570, "description": "Validation finale : MachineHomed := TRUE, commit atomique benne.", "actions": ["CmdWinchSelect := -1;"], "transitions": []}], "id": "homing", "name": "Cycle Homing Machine"}, {"file_name": "FB_CycleSemiAuto.st", "file_path": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\G_CYCLE\\FB_CycleSemiAuto.st", "state_variable": "State", "enum_name": "E_AutoCycleStep", "line_start": 884, "line_end": 1717, "total_steps": 24, "total_transitions": 30, "steps": [{"name": "AX0_REPOS", "line": 887, "description": "", "actions": ["CycleStep := E_AutoCycleStep.AX0_REPOS;", "CycleStateStr := 'AX0 - Verification coherence systeme';", "StopPositionCaptured := FALSE;", "KoboldImmersionQualified := FALSE;", "WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;", "WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;"], "transitions": [{"from": "AX0_REPOS", "to": "AX1_INIT", "condition": "((StartEdge.Q OR DeadmanArmedEdge.Q) AND NOT Fault.Latched)", "condition_short": "((StartEdge.Q OR DeadmanArmedEdge.Q)<br/>AND NOT Fault.Latched)", "line": 916}]}, {"name": "AX1_INIT", "line": 919, "description": "Transition si système sain et réarmé (front reset ou démarrage). 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick", "actions": ["CycleStep := E_AutoCycleStep.AX1_INIT;", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedDirection := 0;", "InitConditionsOk := HomedM1 AND HomedM2 AND NOT Fault.Latched AND InitPositionOk;", "CycleStateStr := 'AX1 - Conditions initiales OK';"], "transitions": [{"from": "AX1_INIT", "to": "AX2_TRANSLATE_P1", "condition": "(InitConditionsOk)", "condition_short": "(InitConditionsOk)", "line": 938}]}, {"name": "AX2_TRANSLATE_P1", "line": 969, "description": "FB_CycleMachineHoming). Conditions : codeurs M1/M2 references, aucun defaut latche, et posture de depart OK (InitPositionOk : chariot M3 PAS a droite de P1 + treuil M1 au FDC logiciel haut + benne qualifiee IsClosed ou IsOpen ; positionnement fin P1 = AX2).", "actions": ["CycleStep := E_AutoCycleStep.AX2_TRANSLATE_P1;", "CycleStateStr := 'AX2 - Mise en position P1 (translation)';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_X;", "WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;"], "transitions": [{"from": "AX2_TRANSLATE_P1", "to": "AX3_OPEN_BUCKET", "condition": "(Translation_At_P1) AND (TranslationStopTimer.Q AND DeadmanArmed AND JoystickPushOnly)", "condition_short": "(Translation_At_P1)<br/>AND (TranslationStopTimer.Q<br/>AND DeadmanArmed<br/>AND JoystickPushOnly)", "line": 998}]}, {"name": "AX3_OPEN_BUCKET", "line": 1012, "description": "maintient Y- avec homme-mort, il enchaine directement AX3 puis AX4. AX2 accepte les deux sens ; la cible effective suit le sens du joystick. Si Maintenance=1 et P1=0, cela permet de se dégager d'un dépassement.", "actions": ["CycleStep := E_AutoCycleStep.AX3_OPEN_BUCKET;", "CycleStateStr := 'AX3 - Ouverture benne';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := -1;"], "transitions": [{"from": "AX3_OPEN_BUCKET", "to": "AX3_WAIT_DIVE_START", "condition": "(Benne_IsOpen AND NOT Benne_Busy)", "condition_short": "(Benne_IsOpen AND NOT Benne_Busy)", "line": 1041}]}, {"name": "AX3_WAIT_DIVE_START", "line": 1044, "description": "Pilotage benne 2 sens : pousse (Y-) -> ouvre, tire (Y+) -> ferme Benne ouverte atteinte : seul l'etat mecanique IsOpen autorise la transition. Done seul est insuffisant (fin de manoeuvre sans preuve d'ouverture).", "actions": ["CycleStep := E_AutoCycleStep.AX3_WAIT_DIVE_START;", "CycleStateStr := 'AX3 - Arret mecanique avant plongee';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := -1;"], "transitions": [{"from": "AX3_WAIT_DIVE_START", "to": "AX4_DESCEND_DIVING", "condition": "(DiveStartStopTimer.Q AND DeadmanArmed AND JoystickPush)", "condition_short": "(DiveStartStopTimer.Q<br/>AND DeadmanArmed<br/>AND JoystickPush)", "line": 1066}]}, {"name": "AX4_DESCEND_DIVING", "line": 1071, "description": "Continuation normale uniquement si le geste n'a jamais ete interrompu et si l'arret est confirme. Une perte d'homme-mort desarme FB_Joystick et exige son nouveau front physique avant que DeadmanArmed puisse redevenir vrai.", "actions": ["CycleStep := E_AutoCycleStep.AX4_DESCEND_DIVING;", "CycleStateStr := 'AX4 - Plongee couplee palier 4 jusqu a l altimetrie';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := -1;"], "transitions": [{"from": "AX4_DESCEND_DIVING", "to": "AX5_KOBOLD_INIT", "condition": "TRUE (inconditionnel)", "condition_short": "TRUE (inconditionnel)", "line": 1097}]}, {"name": "AX5_KOBOLD_INIT", "line": 1100, "description": "T291-A a ete capture avant AX4. Sequencement contacteurs conserve en aval. Contacteur Kobold PAS enclenche a cette etape. AT4 : altimetrie de lancement atteinte (M1 <= DiveStartMinEff).", "actions": ["CycleStep := E_AutoCycleStep.AX5_KOBOLD_INIT;", "CycleStateStr := 'AX5 - Activation contacteur Kobold au vol';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := -1;"], "transitions": [{"from": "AX5_KOBOLD_INIT", "to": "AX6_SEARCH_IMMERSION", "condition": "(DeadmanArmed AND JoystickPush AND KoboldInitTimer.Q)", "condition_short": "(DeadmanArmed AND JoystickPush AND KoboldInitTimer.Q)", "line": 1127}]}, {"name": "AX6_SEARCH_IMMERSION", "line": 1130, "description": "Palier 4 M1/M2 non atteint = cause de defaut (instCauses[9]), pas un blocage silencieux de la transition. (echec init / joystick relache / palier <> 4 -> AX_DIVING_RETRY via GT-dive-retry §1)", "actions": ["CycleStep := E_AutoCycleStep.AX6_SEARCH_IMMERSION;", "CycleStateStr := 'AX6 - Stabilisation mesure Kobold et immersion';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := -1;"], "transitions": [{"from": "AX6_SEARCH_IMMERSION", "to": "AX7_SEARCH_BOTTOM", "condition": "TRUE (inconditionnel)", "condition_short": "TRUE (inconditionnel)", "line": 1158}]}, {"name": "AX7_SEARCH_BOTTOM", "line": 1161, "description": "AT6 : signal Kobold sous tension confirme haut (DI=1) pendant 500ms -> recherche du fond.", "actions": ["CycleStep := E_AutoCycleStep.AX7_SEARCH_BOTTOM;", "CycleStateStr := 'AX7 - Recherche du fond (Kobold ou consigne)';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := -1;"], "transitions": [{"from": "AX7_SEARCH_BOTTOM", "to": "AX8_BOTTOM_CONFIRMED", "condition": "TRUE (inconditionnel)", "condition_short": "TRUE (inconditionnel)", "line": 1200}]}, {"name": "AX8_BOTTOM_CONFIRMED", "line": 1203, "description": "AT7 : DI basse stable apres immersion haute qualifiee = fond touche.", "actions": ["CycleStep := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;", "AutoDiveM2Step5TrialLatched := FALSE;", "CycleStateStr := CONCAT('AX8 - Fond confirme par ', BottomStopSource);", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.NONE;"], "transitions": [{"from": "AX8_BOTTOM_CONFIRMED", "to": "AX10_CLOSE_BUCKET", "condition": "(BottomTouchStabTimer.Q AND DiveStartStopped AND StopPositionCaptured) AND (RaiseOffBottomEff <= 0.0)", "condition_short": "(BottomTouchStabTimer.Q<br/>AND DiveStartStopped<br/>AND StopPositionCaptured)<br/>AND (RaiseOffBottomEff &lt;= 0.0)", "line": 1241}, {"from": "AX8_BOTTOM_CONFIRMED", "to": "AX9_RAISE_OFF_BOTTOM", "condition": "(BottomTouchStabTimer.Q AND DiveStartStopped AND StopPositionCaptured) AND (ELSE)", "condition_short": "(BottomTouchStabTimer.Q<br/>AND DiveStartStopped<br/>AND StopPositionCaptured)<br/>AND (ELSE)", "line": 1243}]}, {"name": "AX_DIVING_RETRY", "line": 1247, "description": "Coupure INSTANTANEE de toutes les commandes treuils + Kobold coupe. Apres stabilisation a l arret (freins serres), 0 m signifie fermeture benne immediate (AX10). Une valeur > 0 passe par AX9 pour decoller/retendre.", "actions": ["CycleStep := E_AutoCycleStep.AX_DIVING_RETRY;", "CycleStateStr := 'AX_DIVING_RETRY - Reprise plongee : remonter au FDC haut';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := 1;"], "transitions": [{"from": "AX_DIVING_RETRY", "to": "AX4_DESCEND_DIVING", "condition": "(JoystickDeflected AND WinchesAtTopWindow)", "condition_short": "(JoystickDeflected AND WinchesAtTopWindow)", "line": 1272}]}, {"name": "AX9_RAISE_OFF_BOTTOM", "line": 1277, "description": "Remontee assistee palier lent, Kobold coupe. AT-retry : treuils revenus au FDC haut -> nouvelle tentative de plongee.", "actions": ["CycleStep := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;", "CycleStateStr := 'AX9 - Montee synchronisee : retendre les cables';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := 1;"], "transitions": [{"from": "AX9_RAISE_OFF_BOTTOM", "to": "AX10_CLOSE_BUCKET", "condition": "(DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q AND (M1_CablePosM >= RaiseTargetM1) AND (M2_CablePosM >= RaiseTargetM2))", "condition_short": "(DeadmanArmed<br/>AND JoystickPull<br/>AND ExtractionStepDelayTimer.Q<br/>AND (M1_CablePosM &gt;= RaiseTargetM1)<br/>AND (M2_CablePosM &gt;= RaiseTargetM2))", "line": 1301}]}, {"name": "AX10_CLOSE_BUCKET", "line": 1304, "description": "Palier 1 (doux). Selecteur couplage BOTH/M1/M2 = garde cote PRG_04 (GEL Q15), le sequenceur commande toujours les deux treuils symetriquement.", "actions": ["CycleStep := E_AutoCycleStep.AX10_CLOSE_BUCKET;", "CycleStateStr := 'AX10 - Fermeture benne (tolerance a peu pres ferme)';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := 1;"], "transitions": [{"from": "AX10_CLOSE_BUCKET", "to": "AX10B_RACCORDEMENT_P1", "condition": "(DeadmanArmed AND JoystickPull AND Benne_CloseReached AND (Benne_IsClosed OR Benne_IsRoughlyClosed))", "condition_short": "(DeadmanArmed<br/>AND JoystickPull<br/>AND Benne_CloseReached<br/>AND (Benne_IsClosed OR Benne_IsRoughlyClosed))", "line": 1331}]}, {"name": "AX10B_RACCORDEMENT_P1", "line": 1334, "description": "doit jamais laisser coexister une ouverture et une fermeture benne. Arme le maintien avant la fermeture effective : FB_Bucket garde M2 sans trou de commande. M2 est deja maintenu a P1 par FB_Bucket ; AX10B prepare le transfert couple.", "actions": ["CycleStep := E_AutoCycleStep.AX10B_RACCORDEMENT_P1;", "CycleStateStr := 'AX10b - Raccordement P1 avant montee controlee';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := 1;"], "transitions": [{"from": "AX10B_RACCORDEMENT_P1", "to": "AX12_LOADED_ASCENT", "condition": "(CfgCtrlAscentDistanceM <= 0.0)", "condition_short": "(CfgCtrlAscentDistanceM &lt;= 0.0)", "line": 1370}, {"from": "AX10B_RACCORDEMENT_P1", "to": "AX11_CTRL_ASCENT", "condition": "(ELSE)", "condition_short": "(ELSE)", "line": 1372}, {"from": "AX10B_RACCORDEMENT_P1", "to": "AX12_LOADED_ASCENT", "condition": "(Ax10bFallbackStopActive AND AscentStartStopTimer.Q AND DeadmanArmed AND JoystickPull) AND (CfgCtrlAscentDistanceM <= 0.0)", "condition_short": "(Ax10bFallbackStopActive<br/>AND AscentStartStopTimer.Q<br/>AND DeadmanArmed<br/>AND JoystickPull)<br/>AND (CfgCtrlAscentDistanceM &lt;= 0.0)", "line": 1378}, {"from": "AX10B_RACCORDEMENT_P1", "to": "AX11_CTRL_ASCENT", "condition": "(Ax10bFallbackStopActive AND AscentStartStopTimer.Q AND DeadmanArmed AND JoystickPull) AND (ELSE)", "condition_short": "(Ax10bFallbackStopActive<br/>AND AscentStartStopTimer.Q<br/>AND DeadmanArmed<br/>AND JoystickPull)<br/>AND (ELSE)", "line": 1380}]}, {"name": "AX11_CTRL_ASCENT", "line": 1384, "description": "M1 non disponible dans la fenetre bornee : repli sur l'arret historique. Transfert atomique : M2 est encore tenu par la benne P1 ce scan ; M1/M2 recoivent simultanement P1, puis AX11 poursuit avec son plafond commun P1..P2.", "actions": ["CycleStep := E_AutoCycleStep.AX11_CTRL_ASCENT;", "CycleStateStr := 'AX11 - Montee controlee : surveillance visuelle M1/M2';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := 1;"], "transitions": [{"from": "AX11_CTRL_ASCENT", "to": "AX12_LOADED_ASCENT", "condition": "TRUE (inconditionnel)", "condition_short": "TRUE (inconditionnel)", "line": 1410}]}, {"name": "AX12_LOADED_ASCENT", "line": 1413, "description": "Transition strictement sur la distance CFG (2 m par defaut) et le synchronisme FB_WinchSync. Les commandes AX12 restent protegees par homme-mort + joystick.", "actions": ["CycleStep := E_AutoCycleStep.AX12_LOADED_ASCENT;", "CycleStateStr := 'AX12 - Remontee en charge';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := 1;"], "transitions": [{"from": "AX12_LOADED_ASCENT", "to": "AX13_DRAIN_PAUSE", "condition": "(M1TopLimitReached OR M2TopLimitReached)", "condition_short": "(M1TopLimitReached OR M2TopLimitReached)", "line": 1440}]}, {"name": "AX13_DRAIN_PAUSE", "line": 1445, "description": "Arrivee au FDC haut LOGICIEL = evenement procede, jamais une nouvelle action operateur. PRG04 est l'unique producteur du fait de limite (7,5 m nominal, geometrique pour M2) : G7 ne recalcule aucune cote.", "actions": ["CycleStep := E_AutoCycleStep.AX13_DRAIN_PAUSE;", "DrainRemaining_S := DINT_TO_INT((TIME_TO_DINT(DrainTimeRemaining) + DINT#999) / DINT#1000);", "CycleStateStr := CONCAT('AX13 - Egouttage du godet : ',", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.NONE;"], "transitions": [{"from": "AX13_DRAIN_PAUSE", "to": "AX14_TRANSLATE_DUMP", "condition": "(DrainingTimer.Q OR SkipDrainEdge.Q)", "condition_short": "(DrainingTimer.Q OR SkipDrainEdge.Q)", "line": 1477}]}, {"name": "AX14_TRANSLATE_DUMP", "line": 1480, "description": "ensuite l'attente operateur pour commander M3 vers la tremie. Important aussi apres forcage : aucun geste joystick cache ne doit maintenir AX13 une fois la temporisation terminee.", "actions": ["CycleStep := E_AutoCycleStep.AX14_TRANSLATE_DUMP;", "CycleStateStr := 'AX14 - Deplacement vers tremie (grille/crible libres)';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_X;", "ExpectedDirection := -1;"], "transitions": [{"from": "AX14_TRANSLATE_DUMP", "to": "AX15A_DUMP_ARRIVE", "condition": "(Translation_At_Tremie) AND (TranslationStopTimer.Q)", "condition_short": "(Translation_At_Tremie) AND (TranslationStopTimer.Q)", "line": 1504}]}, {"name": "AX15A_DUMP_ARRIVE", "line": 1508, "description": "T345-L2 : entree normale AX15A = nouveau cycle d'armement du geste benne.", "actions": ["CycleStep := E_AutoCycleStep.AX15A_DUMP_ARRIVE;", "CycleStateStr := 'AX15a - Arrivee tremie : treuils arretes, attente ouverture';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := -1;"], "transitions": [{"from": "AX15A_DUMP_ARRIVE", "to": "AX15B_DUMP_OPEN", "condition": "(SeenNeutralAfterArrival) AND (DeadmanArmed AND JoystickPush)", "condition_short": "(SeenNeutralAfterArrival)<br/>AND (DeadmanArmed<br/>AND JoystickPush)", "line": 1534}]}, {"name": "AX15B_DUMP_OPEN", "line": 1541, "description": "T345-L2 : vrai latch inter-scan. Le scan qui observe le neutre arme le geste suivant, mais ne peut pas consommer ce meme armement. AX15B exige donc toujours un push posterieur a au moins un scan neutre en AX15A.", "actions": ["CycleStep := E_AutoCycleStep.AX15B_DUMP_OPEN;", "CycleStateStr := 'AX15b - Vidage : ouverture benne, treuils arretes';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := -1;"], "transitions": [{"from": "AX15B_DUMP_OPEN", "to": "AX15D_DUMP_BUCKET_JOG", "condition": "(DeadmanArmed AND JoystickPull)", "condition_short": "(DeadmanArmed AND JoystickPull)", "line": 1571}, {"from": "AX15B_DUMP_OPEN", "to": "AX15C_DUMP_REPOSITION", "condition": "(RepositionRequest)", "condition_short": "(RepositionRequest)", "line": 1573}, {"from": "AX15B_DUMP_OPEN", "to": "AX18_DONE_SYNC", "condition": "(DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen)", "condition_short": "(DeadmanArmed<br/>AND JoystickPush<br/>AND Benne_Done<br/>AND Benne_IsOpen)", "line": 1576}]}, {"name": "AX15D_DUMP_BUCKET_JOG", "line": 1579, "description": "quitter la phase de vidage et sans mouvement de treuil ni de translation. Retour AX15B au relachement (centre mort) ; la fin de vidage reste AX18 (AT15B inchange). Aucune echappatoire vers AX10 (decision exploitant arbitrage 3, confirmee par les 2 revues C4).", "actions": ["CycleStep := E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG;", "CycleStateStr := 'AX15d - Module benne a la tremie';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := -1;"], "transitions": [{"from": "AX15D_DUMP_BUCKET_JOG", "to": "AX15B_DUMP_OPEN", "condition": "(NOT JoystickDeflected)", "condition_short": "(NOT JoystickDeflected)", "line": 1610}, {"from": "AX15D_DUMP_BUCKET_JOG", "to": "AX18_DONE_SYNC", "condition": "(DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen)", "condition_short": "(DeadmanArmed<br/>AND JoystickPush<br/>AND Benne_Done<br/>AND Benne_IsOpen)", "line": 1614}]}, {"name": "AX15C_DUMP_REPOSITION", "line": 1617, "description": "La perte de l'homme-mort NE sort PAS d'AX15D : le gate §4 (Lifecycle.Busy AND NOT CycleMotionPermit) neutralise les commandes benne/treuils en conservant l'etape (doctrine identique a AX15B / AX10). Seul le relachement du manche ramene a AX15B.", "actions": ["CycleStep := E_AutoCycleStep.AX15C_DUMP_REPOSITION;", "CycleStateStr := 'AX15c - Repositionnement couple M1+M2 (aide vidange tremie)';", "Lifecycle.Busy := TRUE;", "Lifecycle.Done := FALSE;", "ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;", "ExpectedDirection := -1;"], "transitions": [{"from": "AX15C_DUMP_REPOSITION", "to": "AX15B_DUMP_OPEN", "condition": "(NOT RepositionRequest)", "condition_short": "(NOT RepositionRequest)", "line": 1647}]}, {"name": "AX18_DONE_SYNC", "line": 1650, "description": "(meme sens, meme palier) -> FB_SyncDeviation actif, pas d'ecart volontaire. La benne reste ouverte pendant le repositionnement (on finit l'ouverture si besoin). Retour a AX15B des que l'operateur relache l'option de repositionnement.", "actions": ["CycleStep := E_AutoCycleStep.AX18_DONE_SYNC;", "CycleStateStr := 'AX18 - Passe terminee : aller en P1 pour recommencer';", "WinchM1Cmd.RunRequest := FALSE;", "WinchM2Cmd.RunRequest := FALSE;", "TranslationCmd.ReqStart := FALSE;", "Lifecycle.Done := TRUE;"], "transitions": [{"from": "AX18_DONE_SYNC", "to": "AX2_TRANSLATE_P1", "condition": "(StartEdge.Q OR (DeadmanArmed AND JoystickRight))", "condition_short": "(StartEdge.Q OR (DeadmanArmed AND JoystickRight))", "line": 1681}]}, {"name": "AX_STAB", "line": 1684, "description": "referencee, la passe suivante enchaine sur la translation P1 (pas de retour AX0). Relance sur StartCycle OU FRONT joystick (geste franc) - pas sur simple maintien, pour que AX18 (Lifecycle.Done + msg) soit reellement observable / tracable.", "actions": ["CycleStep := E_AutoCycleStep.AX_STAB;", "CycleStateStr := 'STABILISATION - defaut cycle';", "WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE;", "WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE;", "TranslationCmd.ReqStart := FALSE;", "BucketCmd.ReqOpen := FALSE;"], "transitions": []}], "id": "semiauto", "name": "Cycle Semi-Automatique de Dragage"}];
+    let currentCycleIdx = 0;
+    let selectedStep = null;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: {
+        darkMode: true,
+        background: '#0a0f1d',
+        primaryColor: '#1e293b',
+        primaryTextColor: '#ffffff',
+        primaryBorderColor: '#00e5ff',
+        lineColor: '#00e5ff',
+        secondaryColor: '#0f172a',
+        tertiaryColor: '#1e293b',
+        edgeLabelBackground: '#080e1e',
+        textColor: '#ffffff',
+        fontSize: '12px'
+      },
+      flowchart: {
+        curve: 'basis',
+        nodeSpacing: 45,
+        rankSpacing: 45,
+        useMaxWidth: false
+      }
+    });
+
+    function init() {
+      const tabsContainer = document.getElementById('cycleTabs');
+      tabsContainer.innerHTML = '';
+      CYCLES.forEach((c, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `cycle-tab ${idx === currentCycleIdx ? 'active' : ''}`;
+        btn.innerHTML = `${c.id === 'homing' ? '🧭' : '✨'} ${c.name}`;
+        btn.onclick = () => switchCycle(idx);
+        tabsContainer.appendChild(btn);
+      });
+
+      renderCurrentCycle();
+
+      document.getElementById('searchBox').addEventListener('input', (e) => {
+        filterSteps(e.target.value.toLowerCase());
+      });
+    }
+
+    function switchCycle(idx) {
+      currentCycleIdx = idx;
+      selectedStep = null;
+      document.querySelectorAll('.cycle-tab').forEach((t, i) => {
+        t.classList.toggle('active', i === idx);
+      });
+      renderCurrentCycle();
+    }
+
+    async function renderCurrentCycle() {
+      const cycle = CYCLES[currentCycleIdx];
+      document.getElementById('panelTitle').innerHTML = `${cycle.name} (<code>${cycle.state_variable}</code>)`;
+      document.getElementById('metaBadge').innerText = `${cycle.file_name} · L${cycle.line_start}..L${cycle.line_end} · ${cycle.total_steps} étapes`;
+
+      renderStepList(cycle.steps);
+      await renderMermaid(cycle);
+    }
+
+    function renderStepList(steps) {
+      const listEl = document.getElementById('stepList');
+      listEl.innerHTML = '';
+      steps.forEach((s) => {
+        const item = document.createElement('div');
+        item.className = 'step-item';
+        item.id = `step-item-${s.name}`;
+        item.onclick = () => showStepDetail(s);
+
+        const transCount = s.transitions ? s.transitions.length : 0;
+        item.innerHTML = `
+          <div class="step-head">
+            <span class="step-name">${s.name}</span>
+            <span class="step-line">L${s.line}</span>
+          </div>
+          <div class="step-desc">${s.description || 'Étape fonctionnelle'}</div>
+          <div class="trans-pill">${transCount} transition(s) sortante(s)</div>
+        `;
+        listEl.appendChild(item);
+      });
+    }
+
+    function filterSteps(query) {
+      const cycle = CYCLES[currentCycleIdx];
+      const filtered = cycle.steps.filter(s => {
+        const inName = s.name.toLowerCase().includes(query);
+        const inDesc = (s.description || '').toLowerCase().includes(query);
+        const inTrans = s.transitions.some(t => t.to.toLowerCase().includes(query) || t.condition.toLowerCase().includes(query));
+        return inName || inDesc || inTrans;
+      });
+      renderStepList(filtered);
+    }
+
+    function showStepDetail(s) {
+      selectedStep = s;
+      document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`step-item-${s.name}`);
+      if (activeEl) activeEl.classList.add('active');
+
+      const detailEl = document.getElementById('detailContent');
+      let transHtml = '';
+      if (s.transitions && s.transitions.length > 0) {
+        transHtml = '<ul style="margin-left: 16px; margin-top: 6px; display: flex; flex-direction: column; gap: 6px;">';
+        s.transitions.forEach(t => {
+          transHtml += `<li><b>➔ ${t.to}</b> (L${t.line}) :<br/><span style="color:#00e5ff; font-family:monospace; font-size:11px;">${t.condition}</span></li>`;
+        });
+        transHtml += '</ul>';
+      } else {
+        transHtml = '<em>Étape terminale ou attente d\'événement externe.</em>';
+      }
+
+      let actHtml = '';
+      if (s.actions && s.actions.length > 0) {
+        actHtml = `<div class="code-box" style="margin-top: 8px;">${s.actions.join('<br/>')}</div>`;
+      }
+
+      detailEl.innerHTML = `
+        <div style="margin-bottom: 8px;">
+          <strong style="color:#fff; font-size:15px; font-family:monospace;">${s.name}</strong>
+          <span style="color:var(--primary); font-family:monospace; margin-left:8px;">Ligne ST : L${s.line}</span>
+        </div>
+        <p style="margin-bottom: 8px; color:#cbd5e1;">${s.description || 'Aucun commentaire préfixé dans le code ST.'}</p>
+        <div style="font-weight:600; color:#fff; margin-top:10px;">Transitions sortantes :</div>
+        ${transHtml}
+        ${s.actions && s.actions.length > 0 ? '<div style="font-weight:600; color:#fff; margin-top:10px;">Actions notables :</div>' + actHtml : ''}
+      `;
+    }
+
+    async function renderMermaid(cycle) {
+      const container = document.getElementById('mermaidContainer');
+      container.innerHTML = '<div class="mermaid" id="mermaidGraph"></div>';
+      const graphEl = document.getElementById('mermaidGraph');
+
+      let mLines = [
+        'flowchart TD',
+        '    classDef stepClass fill:#1e293b,stroke:#00e5ff,stroke-width:2.5px,color:#ffffff;',
+        '    classDef initialStep fill:#0f172a,stroke:#38bdf8,stroke-width:4px,color:#38bdf8;',
+        '    classDef failStep fill:#450a0a,stroke:#ef4444,stroke-width:2.5px,color:#fca5a5;',
+        '    classDef completeStep fill:#064e3b,stroke:#10b981,stroke-width:2.5px,color:#6ee7b7;'
+      ];
+
+      cycle.steps.forEach((s, idx) => {
+        const label = `<b>${s.name}</b><br/>L${s.line}`;
+        if (idx === 0 || s.name.endsWith('_REPOS') || s.name.endsWith('_READY') || s.name === 'HX0_REPOS' || s.name === 'AX0_REPOS') {
+          mLines.push(`    ${s.name}[["${label}"]]:::initialStep`);
+        } else if (s.name.includes('FAIL') || s.name.includes('ERR')) {
+          mLines.push(`    ${s.name}["${label}"]:::failStep`);
+        } else if (s.name.includes('HOMED') || s.name.includes('COMPLETE')) {
+          mLines.push(`    ${s.name}["${label}"]:::completeStep`);
+        } else {
+          mLines.push(`    ${s.name}["${label}"]:::stepClass`);
+        }
+      });
+
+      cycle.steps.forEach(s => {
+        s.transitions.forEach(t => {
+          const shortCond = t.condition_short.replace(/"/g, "'");
+          mLines.push(`    ${s.name} -->|"L${t.line}: ${shortCond}"| ${t.to}`);
+        });
+      });
+
+      mLines.push('    linkStyle default stroke:#00e5ff,stroke-width:2.5px,color:#ffffff,fill:none;');
+
+      const graphDefinition = mLines.join('\n');
+      try {
+        const { svg } = await mermaid.render('mermaid-svg-render', graphDefinition);
+        container.innerHTML = svg;
+      } catch (err) {
+        console.error('Erreur rendu Mermaid:', err);
+        container.innerHTML = `<pre style="color:var(--danger); font-family:monospace;">Erreur rendu diagramme : ${err.message}</pre>`;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

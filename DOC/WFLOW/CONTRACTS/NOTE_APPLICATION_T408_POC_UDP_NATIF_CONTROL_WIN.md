@@ -40,10 +40,10 @@ réouverts sur les mêmes ports.
 
 | Fichier | Fonction |
 |---|---|
-| `TOOLS/TWINBENCH/native_udp_poc/PRG_TwinBenchNativeUdpMulti_DECLARATION.st` | déclaration à remplacer intégralement dans le POU Control Win |
-| `TOOLS/TWINBENCH/native_udp_poc/PRG_TwinBenchNativeUdpMulti_IMPLEMENTATION.st` | implémentation à remplacer intégralement dans le POU Control Win |
-| `TOOLS/TWINBENCH/native_udp_poc/Start_T408_UdpEcho.ps1` | démarre l écho Python local en arrière-plan, 120 s |
-| `TOOLS/TWINBENCH/native_udp_poc/udp_echo_t408.py` | écho et calcul des percentiles des trois flux |
+| `TOOLS/TWINBENCH/03_TRANSPORT/udp_native/PRG_TwinBenchNativeUdpMulti_DECLARATION.st` | déclaration à remplacer intégralement dans le POU Control Win |
+| `TOOLS/TWINBENCH/03_TRANSPORT/udp_native/PRG_TwinBenchNativeUdpMulti_IMPLEMENTATION.st` | implémentation à remplacer intégralement dans le POU Control Win |
+| `TOOLS/TWINBENCH/03_TRANSPORT/udp_native/Start_T408_UdpEcho.ps1` | démarre l écho Python local en arrière-plan, 120 s |
+| `TOOLS/TWINBENCH/03_TRANSPORT/udp_native/udp_echo_t408.py` | écho et calcul des percentiles des trois flux |
 | `TOOLS/AGENT_WORKFLOW/scripts/check_t408_native_udp_poc.py` | garde-fou statique : loopback, non-blocage, fermeture et absence de M3/production |
 
 Empreintes SHA-256 de la version fonctionnelle : déclaration
@@ -62,7 +62,7 @@ ne doivent pas être importés dans le projet source ni dans le PLC réel.
    et **SysTypes2 Interfaces**. `CmpErrors2 Interfaces` peut rester installee,
    mais ce POC n en depend plus.
 3. Ajouter le programme ST
-   `TOOLS/TWINBENCH/native_udp_poc/PRG_TwinBenchNativeUdpMulti.st`.
+   `TOOLS/TWINBENCH/03_TRANSPORT/udp_native/PRG_TwinBenchNativeUdpMulti.st`.
 4. Creer une nouvelle tache `TwinBenchUdpTask`, intervalle **10 ms**, et y
    attacher uniquement ce programme. Ne pas le placer dans le `MainTask`.
 5. Telecharger vers **Control Win local** seulement apres compilation verte.
@@ -71,7 +71,7 @@ ne doivent pas être importés dans le projet source ni dans le PLC réel.
 7. Lancer :
 
    ```powershell
-   & 'C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TWINBENCH\native_udp_poc\Start_T408_UdpEcho.ps1'
+   & 'C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TWINBENCH\03_TRANSPORT\udp_native\Start_T408_UdpEcho.ps1'
    ```
 
 8. Attendre 120 s. Faire plusieurs impulsions `FALSE -> TRUE -> FALSE` sur

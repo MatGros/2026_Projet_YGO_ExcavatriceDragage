@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[3]
-LIVE = ROOT / "TOOLS" / "TWINBENCH" / "modelica_poc_m3" / "live_poc"
+LIVE = ROOT / "TOOLS" / "TWINBENCH" / "02_SIM" / "modelica" / "live_poc"
 EXPECTED = [
     "M3_LiveFMU.mo",
     "build_fmu.py",

@@ -9,7 +9,7 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[3]
-MODEL = ROOT / "TOOLS/TWINBENCH/modelica_poc_m3/M3_POC.mo"
+MODEL = ROOT / "TOOLS/TWINBENCH/02_SIM/modelica/M3_POC.mo"
 CATALOG = ROOT / "DOC/WFLOW/CONTRACTS/T401_M3_POC_SIGNAL_CATALOG.yaml"
 
 EXPECTED_GROUPS = {

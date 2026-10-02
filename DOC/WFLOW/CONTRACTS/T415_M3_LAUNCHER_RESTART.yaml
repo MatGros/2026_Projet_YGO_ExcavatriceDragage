@@ -18,10 +18,10 @@ contract:
       verified_by: "revue du timeout et test de syntaxe PowerShell"
     - id: AC4
       statement: "Le mode PLC lecture seule reste sélectionné quand le lanceur PLC lecture est utilisé."
-      verified_by: "test statique Start_M3_Live.ps1 et Lancer_M3_Live_PLC_Lecture.cmd"
+      verified_by: "test statique Start_M3_Live.ps1 et Start_M3_PLC_ReadOnly_View.cmd"
   scope:
     allowed:
-      - TOOLS/TWINBENCH/modelica_poc_m3/live_poc/Start_M3_Live.ps1
+      - TOOLS/TWINBENCH/02_SIM/modelica/live_poc/Start_M3_Live.ps1
       - DOC/WFLOW/CONTRACTS/T415_M3_LAUNCHER_RESTART.yaml
     forbidden:
       - CODE/**

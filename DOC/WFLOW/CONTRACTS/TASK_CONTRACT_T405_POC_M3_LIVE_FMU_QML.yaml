@@ -33,14 +33,14 @@ contract:
       verified_by: "Recherche mécanique des API interdites et revue du périmètre."
   scope:
     allowed:
-      - TOOLS/TWINBENCH/modelica_poc_m3/live_poc/
-      - TOOLS/TWINBENCH/Lancer_POC_M3_Live.bat
+      - TOOLS/TWINBENCH/02_SIM/modelica/live_poc/
+      - TOOLS/TWINBENCH/02_SIM/modelica/Start_M3_Live.cmd
       - TOOLS/AGENT_WORKFLOW/scripts/check_twinbench_m3_live_poc.py
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T405_POC_M3_LIVE_FMU_QML.yaml
       - DOC/WFLOW/TASKS.yaml
       - DOC/WFLOW/TASK_LOCKS.json
     forbidden:
-      - TOOLS/TWINBENCH/modelica_poc_m3/M3_POC.mo
+      - TOOLS/TWINBENCH/02_SIM/modelica/M3_POC.mo
       - CODE/
       - CODE_XML/
       - PRJ_CODESYS/
