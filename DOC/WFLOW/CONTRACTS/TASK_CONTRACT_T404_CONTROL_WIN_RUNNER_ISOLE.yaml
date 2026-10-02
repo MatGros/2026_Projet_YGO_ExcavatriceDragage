@@ -31,7 +31,7 @@ contract:
       verified_by: "Rapport prepare 0 erreur, liste des substitutions HW_SIM et empreinte source inchangee."
   scope:
     allowed:
-      - TOOLS/TWINBENCH/controlwin_runner/
+      - TOOLS/TWINBENCH/01_PROJECT/controlwin_runner/
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T404_CONTROL_WIN_RUNNER_ISOLE.yaml
       - DOC/WFLOW/REX/NOTE_APPLICATION_T404_CONTROL_WIN_RUNNER_20260927.md
       - DOC/WFLOW/TASKS.yaml

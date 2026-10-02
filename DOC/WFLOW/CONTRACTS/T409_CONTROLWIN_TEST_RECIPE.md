@@ -8,13 +8,24 @@ M3_AtP1Stable à TRUE après la restauration de démarrage.
 
 ## CW-00 — ordre obligatoire
 
-1. Lancer Start_T409_FmuGateway.ps1 et attendre le message FMU prête.
-2. Dans la copie Control Win, faire Login puis Stop.
-3. L'humain active manuellement SimulationModeActive, SimM3OpenModelicaActive
-   et Enable du bridge. Aucun script ne les écrit.
-4. Démarrer Run sans Reset intermédiaire.
-5. Attendre 3 s puis lancer codesys_m3_t409_acceptance.py depuis Tools > Scripting.
-6. Conserver la sortie console complète.
+1. Dans la copie Control Win, faire Login puis Stop.
+2. Démarrer Run, puis mettre manuellement uniquement `SimulationModeActive=TRUE`.
+   `SimM3OpenModelicaActive` et `Enable` du bridge sont automatiques dans le POC isolé.
+3. Lancer `Start_T409_M3_Integration.cmd` pour ouvrir la FMU et la vue.
+4. Vérifier que l'écran affiche `P1`, `20,000 m`, capteurs `00011`, puis que les mesures
+   évoluent lorsque le joystick de l'IHM PLC commande un mouvement.
+5. Attendre 3 s puis lancer `codesys_m3_t409_acceptance.py` depuis Tools > Scripting.
+6. Conserver la sortie console complète. Aucun script miroir n'est nécessaire pour la vue.
+
+## CW-01 — reprise communication
+
+1. Pendant le fonctionnement, arrêter la passerelle FMU : `Timeout=TRUE`, `LinkReady=FALSE`
+   et image M3 OM neutralisée sont attendus.
+2. Relancer `Start_T409_M3_Integration.cmd` (une passerelle existante est réutilisée ; sinon
+   elle redémarre). Ne retoucher ni `SimulationModeActive`, ni le pont.
+3. Vérifier que `LinkReady=TRUE`, `Timeout=FALSE`, puis que position, fréquence et capteurs
+   reprennent. Répéter après fermeture/redémarrage complet de la passerelle pour couvrir le
+   compteur de séquence remis à zéro.
 
 ## Verdicts
 

@@ -24,7 +24,7 @@ contract:
       verified_by: "Scenario de charge local reproductible."
   scope:
     allowed:
-      - TOOLS/TWINBENCH/udp_m3_link/
+      - TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/
       - TOOLS/PLC_CSV_SNAPSHOT/codesys_console/codesys_m3_udp_shadow.py
       - TOOLS/AGENT_WORKFLOW/scripts/check_t407_udp_m3_link.py
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T407_POC_UDP_M3_CONTROL_WIN.yaml

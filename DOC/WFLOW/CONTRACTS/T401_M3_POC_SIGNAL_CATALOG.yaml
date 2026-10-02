@@ -30,6 +30,7 @@ signals:
   - {name: configuration.maintenanceSensor_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Position capteur Maintenance", status: CODE_PLC}
   - {name: configuration.tremieMechanicalStop_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Butée mécanique Trémie", status: HYPOTHESE}
   - {name: configuration.maintenanceMechanicalStop_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Butée mécanique Maintenance", status: HYPOTHESE}
+  - {name: configuration.initialPosition_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Position initiale chariot", status: CONFIG}
 
   - {name: measurements.positionAct_M, direction: output, role: HW, kind: Measurement, data_type: Real, unit: m, label: "Position chariot"}
   - {name: measurements.velocityAct_Mps, direction: output, role: HW, kind: Measurement, data_type: Real, unit: "m/s", label: "Vitesse chariot"}

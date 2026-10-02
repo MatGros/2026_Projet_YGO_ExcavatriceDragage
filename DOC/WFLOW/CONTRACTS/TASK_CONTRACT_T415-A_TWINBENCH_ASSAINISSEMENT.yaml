@@ -3,21 +3,22 @@ contract:
   criticality: C2
   strategy: rebuild
   objective: >
-    Rendre TwinBench lisible et utilisable en classant les POC et en definissant
-    un seul parcours utilisateur par usage, sans modifier la simulation ni le PLC.
+    Rendre TwinBench lisible et utilisable en classant les POC, en organisant
+    les dossiers et en fournissant un lanceur maitre avec des parcours separes
+    pour le runner Control Win et la simulation locale, sans modifier le PLC.
   acceptance:
     - id: AC1
       statement: "Chaque tache T400 a T409 et chaque lanceur TwinBench est classe avec un role et un statut proposes."
       verified_by: "Inventaire T415-A relu."
     - id: AC2
-      statement: "Le futur point d'entree Control Win reutilise le runner T404 existant au lieu de creer un second runner."
-      verified_by: "Carte de parcours T415-A."
+      statement: "Le lanceur maitre puis le lanceur projet conduisent au runner T404 existant, sans second runner."
+      verified_by: "Inspection des cibles des fichiers .cmd et recette manuelle."
     - id: AC3
-      statement: "Le futur point d'entree M3 est separe des scripts internes, tests et diagnostics."
-      verified_by: "Carte de parcours T415-A."
+      statement: "Le lanceur maitre propose un parcours de simulation locale distinct du runner Control Win et des prototypes de liaison PLC."
+      verified_by: "Inspection des menus et tests de chemins internes."
     - id: AC4
-      statement: "Aucun fichier n'est deplace, supprime ou archive sans une decision humaine explicite sur sa cible."
-      verified_by: "Git diff limite aux documents de pilotage avant approbation humaine."
+      statement: "Les outils sont organises par usage sans suppression de contenu ; les prototypes non qualifies restent identifies comme prototypes."
+      verified_by: "Inventaire des fichiers avant/apres et git diff --summary."
     - id: AC5
       statement: "Aucun fichier CODE, projet CODESYS, modele Modelica ou passerelle n'est modifie pendant l'inventaire."
       verified_by: "Git diff --name-only."
@@ -26,33 +27,40 @@ contract:
       - DOC/WFLOW/TASKS.yaml
       - DOC/WFLOW/CONTRACTS/
       - DOC/WFLOW/REX/
+      - TOOLS/TWINBENCH/
+      - TOOLS/AGENT_WORKFLOW/scripts/check_twinbench_m3_live_poc.py
     forbidden:
       - CODE/
       - CODE_XML/
       - PRJ_CODESYS/
-      - TOOLS/TWINBENCH/
       - commit
       - push
   conservation:
     must_survive:
-      - "Tous les POC et journaux existants restent intacts pendant l'inventaire."
+      - "Tous les contenus existants, y compris les modifications locales preexistantes, sont conserves lors des deplacements."
       - "T404 reste le seul socle envisage pour la copie Control Win."
       - "T414 reste distinct : lecture seule CPU reel, non prerequisite de la simulation Control Win."
     dropped_on_purpose: []
   evidence_required:
     - "Inventaire des taches, scripts et dossiers TwinBench."
-    - "Proposition de classement soumise a validation humaine."
+    - "Arborescence et lanceur maitre crees; parcours projet et simulation separes."
+    - "Revue externe read-only du diff et des chemins."
     - "check_task_contract.py PASS."
   alert_duty: >
     Toute dependance inconnue, fichier dont le role est ambigu, ou script pouvant
     contacter un runtime non isole est signale et conserve jusqu'a une decision humaine.
-status: IN_PROGRESS
+status: IMPLEMENTED_PENDING_HUMAN_REVIEW
 execution:
   executed_by: CDX01
-  completed_at: ''
-  status: IN_PROGRESS
-  summary: "Cadrage du menage cree ; inventaire documentaire a produire avant toute action sur les fichiers."
-  evidence_submitted: []
+  completed_at: '2026-10-02T12:40:00+02:00'
+  status: IMPLEMENTED_PENDING_HUMAN_REVIEW
+  summary: "Arborescence et lanceurs implementes; controles automatiques et revue externe termines."
+  evidence_submitted:
+    - "T401, T405, T407 et T408 : PASS."
+    - "Runner Control Win : 55/55 PASS."
+    - "FMU headless : depart P1 20.000 m, capteurs 00011, mouvement et retour PASS."
+    - "Auto-cycle FMU et priorite joystick : PASS."
+    - "Revue externe read-only : MINOR, aucun fichier manquant."
 validation:
   status: PENDING
   validated_by: ''

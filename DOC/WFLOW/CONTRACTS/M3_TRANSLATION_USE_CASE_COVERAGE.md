@@ -58,7 +58,7 @@ La simulation ne sera déclarée aboutie que lorsque chaque ligne aura :
 Commande :
 
 ```text
-python TOOLS/TWINBENCH/udp_m3_link/test_t409_fmu_scenarios.py
+python TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/test_t409_fmu_scenarios.py
 ```
 
 Résultat : `PASS` pour frein fermé sans mouvement, marche avant/arrière, vitesse bornée et mots capteurs admissibles. La campagne a atteint les deux butées (`-0,30 m` et `30,30 m`) et a observé les six mots `31, 15, 7, 3, 1, 0` au retour vers la Trémie. Cette preuve valide la plante FMU seule ; elle ne valide pas encore les réactions de la logique PLC.

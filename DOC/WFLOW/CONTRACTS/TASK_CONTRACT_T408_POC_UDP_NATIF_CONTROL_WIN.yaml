@@ -27,7 +27,7 @@ contract:
       verified_by: "Scenario de charge multi-flux avec ports distincts et comparaison avant/apres du p99 rapide."
   scope:
     allowed:
-      - TOOLS/TWINBENCH/native_udp_poc/
+      - TOOLS/TWINBENCH/03_TRANSPORT/udp_native/
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T408_POC_UDP_NATIF_CONTROL_WIN.yaml
       - DOC/WFLOW/CONTRACTS/PLAN_T408_POC_UDP_NATIF_CONTROL_WIN.md
       - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T408_POC_UDP_NATIF_CONTROL_WIN.md

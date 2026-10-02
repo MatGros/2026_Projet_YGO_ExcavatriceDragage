@@ -42,7 +42,7 @@ Control Win local**, jamais sur le PLC reel.
 1. Dans PowerShell, lancer :
 
    ```powershell
-   & 'C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TWINBENCH\udp_m3_link\Start_T407_UdpPlant.ps1'
+   & 'C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TWINBENCH\90_PROTOTYPES\m3_link\Start_T407_UdpPlant.ps1'
    ```
 
    Le lanceur attend la confirmation puis rend automatiquement la main. La

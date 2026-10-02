@@ -52,9 +52,9 @@ contract:
   scope:
     allowed:
       - TOOLS/TWINBENCH/
-      - TOOLS/TWINBENCH/modelica_poc_m3/M3_POC.mo
-      - TOOLS/TWINBENCH/modelica_poc_m3/README.md
-      - TOOLS/TWINBENCH/Lancer_POC_M3.bat
+      - TOOLS/TWINBENCH/02_SIM/modelica/M3_POC.mo
+      - TOOLS/TWINBENCH/02_SIM/modelica/README.md
+      - TOOLS/TWINBENCH/02_SIM/modelica/Open_M3_Model.cmd
       - ARCHIVES/Tools/TWINBENCH/twinbench_pre_T401_20260927/
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T401_POC_OPENMODELICA_M3_MINIMAL.yaml
       - DOC/WFLOW/CONTRACTS/T401_M3_POC_SIGNAL_CATALOG.yaml

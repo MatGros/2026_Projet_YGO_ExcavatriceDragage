@@ -48,19 +48,19 @@ donc obligatoirement lire LinkInvalid ou Timeout.
 
 | Point | Commande | Exit | Sortie clé |
 |---|---|---:|---|
-| FMU, butées, protocole, horizon, wrap, reprise | `powershell -ExecutionPolicy Bypass -File TOOLS/TWINBENCH/udp_m3_link/Run_T409_Verification.ps1` | 0 | 100/100 UDP, butées -0,30 / 30,30 m, horizon 1 000 000 000 s, 50 cycles. |
-| Endurance AUTO-CYCLE FMU | `& "$env:LOCALAPPDATA\TwinBenchM3Live\Python\Scripts\python.exe" TOOLS/TWINBENCH/udp_m3_link/test_auto_cycle.py` | à relancer | 50 trajets P1→Trémie→P1 ; vérifie arrêts, frein, capteurs, pauses et immobilisation finale P1. |
-| AUTO-CYCLE interface + joystick prioritaire | `& "$env:LOCALAPPDATA\TwinBenchM3Live\Python\Scripts\python.exe" TOOLS/TWINBENCH/modelica_poc_m3/live_poc/test_auto_cycle_backend.py` | 0 | AUTO-CYCLE limité au mode FMU ; joystick l'interrompt ; inactif en mode PLC lecture. |
-| Trace interface bornée | `& "$env:LOCALAPPDATA\TwinBenchM3Live\Python\Scripts\python.exe" TOOLS/TWINBENCH/modelica_poc_m3/live_poc/test_trace_bounded.py` | 0 | 201 points après 1 000 pas. |
-| Sonde CW-00 : garde-fous verdicts | `python TOOLS/TWINBENCH/udp_m3_link/check_t409_probe_static.py` | 0 | PASS_FRONT contrôle le mot capteurs 00011 ; LinkInvalid est vérifié aux deux lectures. |
-| Suite T409 complète | `TOOLS/TWINBENCH/udp_m3_link/Run_T409_Verification.ps1` | 0 | Toutes les vérifications protocole, cinématique, 50 cycles, UDP 10 ms et reprise passent. |
+| FMU, butées, protocole, horizon, wrap, reprise | `powershell -ExecutionPolicy Bypass -File TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/Run_T409_Verification.ps1` | 0 | 100/100 UDP, butées -0,30 / 30,30 m, horizon 1 000 000 000 s, 50 cycles. |
+| Endurance AUTO-CYCLE FMU | `& "$env:LOCALAPPDATA\TwinBenchM3Live\Python\Scripts\python.exe" TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/test_auto_cycle.py` | à relancer | 50 trajets P1→Trémie→P1 ; vérifie arrêts, frein, capteurs, pauses et immobilisation finale P1. |
+| AUTO-CYCLE interface + joystick prioritaire | `& "$env:LOCALAPPDATA\TwinBenchM3Live\Python\Scripts\python.exe" TOOLS/TWINBENCH/02_SIM/modelica/live_poc/test_auto_cycle_backend.py` | 0 | AUTO-CYCLE limité au mode FMU ; joystick l'interrompt ; inactif en mode PLC lecture. |
+| Trace interface bornée | `& "$env:LOCALAPPDATA\TwinBenchM3Live\Python\Scripts\python.exe" TOOLS/TWINBENCH/02_SIM/modelica/live_poc/test_trace_bounded.py` | 0 | 201 points après 1 000 pas. |
+| Sonde CW-00 : garde-fous verdicts | `python TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/check_t409_probe_static.py` | 0 | PASS_FRONT contrôle le mot capteurs 00011 ; LinkInvalid est vérifié aux deux lectures. |
+| Suite T409 complète | `TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/Run_T409_Verification.ps1` | 0 | Toutes les vérifications protocole, cinématique, 50 cycles, UDP 10 ms et reprise passent. |
 | Soak loopback court | `python test_t409_gateway_soak.py --duration-s 5` | 0 | 500/500 réponses, 0 timeout. |
 | Contrat C2 | `python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/T409_T413_M3_VISUALISATION.yaml` | 0 | 0 erreur ; 1 avertissement informatif : PyYAML absent, vérification en mode texte dégradé. |
 
 ## ⏳ À prouver Control Win
 
 - CW-00 départ P1 par mémoire : suivre [T409_CONTROLWIN_TEST_RECIPE.md](CONTRACTS/T409_CONTROLWIN_TEST_RECIPE.md). La sonde est lecture seule et rend exactement PASS_MEMOIRE, PASS_FRONT_ORDRE_KO ou FAIL.
-- Soak réseau 30 min : `python TOOLS/TWINBENCH/udp_m3_link/test_t409_gateway_soak.py --duration-s 1800`. Non exécuté dans ce lot.
+- Soak réseau 30 min : `python TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/test_t409_gateway_soak.py --duration-s 1800`. Non exécuté dans ce lot.
 - Tenue visuelle 1 h : la deque est structurellement bornée et testée localement ; l'essai longue durée de l'IHM reste à effectuer humainement.
 
 ## 🧭 Décisions et besoins fonctionnels
