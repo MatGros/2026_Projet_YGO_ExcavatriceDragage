@@ -12,7 +12,8 @@ LIVE = HERE.parents[1] / "02_SIM" / "modelica" / "live_poc"
 if str(LIVE) not in sys.path:
     sys.path.insert(0, str(LIVE))
 from engine import M3FmuEngine
-from m3_binary_protocol import HOST, PORT, pack_plant, unpack_command
+from m3_binary_protocol import (ECHO_UI, ECHO_UI_MAGIC, HOST, PORT, decode_plc_echo, echo_bytes,
+                                pack_plant, plc_echo_summary, unpack_command)
 from sequence_rules import is_acceptable
 
 def run(duration_s: float, trace_file: str | None = None,
@@ -24,6 +25,7 @@ def run(duration_s: float, trace_file: str | None = None,
     started = time.monotonic()
     last_report = started
     last_snapshot = None
+    last_echo_summary = None
     print(f"[T409] FMU M3 prete : udp://{HOST}:{listen_port} (loopback seulement)", flush=True)
     trace = None
     writer = None
@@ -32,7 +34,12 @@ def run(duration_s: float, trace_file: str | None = None,
         writer = csv.writer(trace)
         writer.writerow(("wall_time_s", "sequence", "command_word", "requested_hz",
                          "measured_hz", "velocity_mps", "position_m", "brake_open",
-                         "status_word", "sensors_word", "hard_stop"))
+                         "status_word", "sensors_word", "hard_stop",
+                         "plc_mode", "plc_maint_target_enable", "plc_maint_zone_access",
+                         "plc_fb_state", "plc_block_reason", "plc_active_tremie",
+                         "plc_active_maintenance", "plc_last_point", "plc_limit_tremie",
+                         "plc_limit_maintenance", "plc_estimated_pos_m", "plc_safe_stop",
+                         "plc_power_cutoff", "plc_safety_error_id", "plc_link_ready"))
         trace.flush()
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((HOST, listen_port))
@@ -52,6 +59,20 @@ def run(duration_s: float, trace_file: str | None = None,
                 continue
             try:
                 seq, word, hz, brake, _timestamp = unpack_command(payload)
+                raw_echo = echo_bytes(payload)
+                echo = decode_plc_echo(raw_echo)
+                # Journal sur changement d'état seulement : la position estimée varie en continu
+                # et n'est pas un critère de changement (elle reste dans la ligne et dans la trace).
+                state_key = None if echo is None else tuple(v for k, v in sorted(echo.items())
+                                                            if k != "estimated_pos_m")
+                if state_key != last_echo_summary:
+                    print(f"[PLC] {plc_echo_summary(echo)}", flush=True)
+                    last_echo_summary = state_key
+                if ui_sock is not None and echo is not None:
+                    try:
+                        ui_sock.sendto(ECHO_UI.pack(ECHO_UI_MAGIC, seq & 0xFFFFFFFF, raw_echo), (HOST, ui_port))
+                    except OSError:
+                        pass
                 now = time.monotonic()
                 stale = previous_received_at is None or now - previous_received_at > 1.0
                 if not is_acceptable(previous, seq, stale):
@@ -81,10 +102,22 @@ def run(duration_s: float, trace_file: str | None = None,
                     sensors_word = sum((int(bool(v)) << shift) for shift, v in zip(
                         (4, 3, 2, 1, 0), (snapshot.tremie, snapshot.pv, snapshot.p2,
                                            snapshot.p1, snapshot.maintenance)))
+                    if echo is None:
+                        echo_cols = ("",) * 15
+                    else:
+                        last_point = next((label for key, label in (("at_tremie", "TREMIE"), ("at_pv", "PV"),
+                                           ("at_p2", "P2"), ("at_p1", "P1"), ("at_maintenance", "MAINT"))
+                                           if echo[key]), "")
+                        echo_cols = (echo["mode"], int(echo["maint_target_enable"]), int(echo["maint_zone_access"]),
+                                     echo["fb_state"], echo["block_reason"], int(echo["active_tremie"]),
+                                     int(echo["active_maintenance"]), last_point, int(echo["limit_tremie"]),
+                                     int(echo["limit_maintenance"]), echo["estimated_pos_m"], int(echo["safe_stop"]),
+                                     int(echo["power_cutoff"]), echo["safety_error_id"], int(echo["link_ready"]))
                     writer.writerow((time.monotonic(), seq, word, hz, snapshot.frequency_act_hz,
                                      snapshot.velocity_mps, snapshot.position_m,
                                      int(snapshot.brake_is_open), snapshot.drive_status_word,
-                                     sensors_word, int(snapshot.hard_stop_tremie or snapshot.hard_stop_maintenance)))
+                                     sensors_word, int(snapshot.hard_stop_tremie or snapshot.hard_stop_maintenance))
+                                    + echo_cols)
                     trace.flush()
                 accepted += 1
                 if time.monotonic() - last_report >= 5.0:

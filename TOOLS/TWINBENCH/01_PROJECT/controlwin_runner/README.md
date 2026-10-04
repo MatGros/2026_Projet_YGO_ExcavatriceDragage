@@ -32,8 +32,8 @@ For direct access, run `Start_ControlWin.cmd`, then press Enter:
    exacte, puis la copie est téléchargée et lancée. Le PLC réel est exclu.
 4. **Ouvrir la copie** : CODESYS ouvre exactement la copie déployée pour le
    monitoring, les Watch et les Traces.
-La seule confirmation demandée est `DEPLOYER` avant le téléchargement Control
-Win local, ou `REPARER` avant d'archiver une copie isolée en échec.
+Chaque confirmation se fait en tapant `1` (Entrée seule = annuler) : avant le
+téléchargement Control Win local, ou avant d'archiver une copie isolée en échec.
 
 ## Garde-fous
 

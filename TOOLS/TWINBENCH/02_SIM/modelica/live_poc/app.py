@@ -320,6 +320,47 @@ class LiveBackend(QObject):
             return "N/D"
         return f"{self._snapshot.position_m:.3f}"
 
+    @Property(bool, notify=stateChanged)
+    def plcEchoAvailable(self) -> bool:
+        if self._readonly is None:
+            return False
+        echo, _stale = self._readonly.plc_echo()
+        return echo is not None
+
+    @Property("QVariantList", notify=stateChanged)
+    def plcEchoRows(self) -> list:
+        """Lignes [libellé, valeur, alerte] de l'état PLC renvoyé dans les trames (lecture seule)."""
+        if self._readonly is None:
+            return []
+        echo, stale = self._readonly.plc_echo()
+        if echo is None:
+            return [["État PLC", "aucun écho reçu", True]]
+        last_point = next((label for key, label in (("at_tremie", "Trémie"), ("at_pv", "PV"), ("at_p2", "P2"),
+                                                    ("at_p1", "P1"), ("at_maintenance", "Maintenance"))
+                           if echo[key]), "—")
+        sens = "Trémie" if echo["active_tremie"] else ("Maintenance" if echo["active_maintenance"] else "arrêt")
+        fdc = " + ".join(label for key, label in (("limit_tremie", "Trémie"), ("limit_maintenance", "Maint./P1"))
+                         if echo[key]) or "libres"
+        acces = "OUI" if echo["maint_target_enable"] else ("NON (bouton=1, mode non MAINT)"
+                                                           if echo["maint_zone_access"] else "NON (bouton=0)")
+        rows = [
+            ["Mode", echo["mode"], False],
+            ["Accès zone Maintenance", acces, not echo["maint_target_enable"]],
+            ["État FB translation", echo["fb_state"], echo["fb_state"] == "ERROR"],
+            ["Cause de blocage", echo["block_reason"], echo["block_reason"] != "NONE"],
+            ["Sens commandé", sens, False],
+            ["Dernier point franchi", last_point, False],
+            ["Fins de course", fdc, fdc != "libres"],
+            ["Position estimée PLC", f"{echo['estimated_pos_m']:.2f} m", False],
+            ["SafeStop / Coupure", f"{int(echo['safe_stop'])} / {int(echo['power_cutoff'])}",
+             echo["safe_stop"] or echo["power_cutoff"]],
+            ["Défauts safety M3", f"0x{echo['safety_error_id']:02X}", echo["safety_error_id"] != 0],
+            ["Lien vu par le PLC", "OK" if echo["link_ready"] else "PERDU", not echo["link_ready"]],
+        ]
+        if stale:
+            rows.insert(0, ["État PLC", "PÉRIMÉ (plus de trame)", True])
+        return rows
+
     @Property(str, notify=stateChanged)
     def telemetryStatus(self) -> str:
         if self._readonly is None:

@@ -246,6 +246,21 @@ ApplicationWindow {
                     anchors.fill: parent
                     anchors.margins: 15
                     spacing: 10
+                    // État décisionnel PLC renvoyé dans chaque trame (lecture seule, mode relié au PLC).
+                    ColumnLayout {
+                        visible: backend.source !== "SIMULATION"
+                        Layout.fillWidth: true
+                        spacing: 3
+                        Text { text: "ÉTAT PLC (lecture seule)"; color: root.textMuted; font.pixelSize: 12; font.weight: Font.DemiBold }
+                        Repeater {
+                            model: backend.plcEchoRows
+                            delegate: RowLayout {
+                                Layout.fillWidth: true
+                                Text { text: modelData[0]; color: root.textMuted; font.pixelSize: 11; Layout.preferredWidth: 130 }
+                                Text { text: modelData[1]; color: modelData[2] ? root.warning : root.textMain; font.pixelSize: 11; font.bold: modelData[2]; Layout.fillWidth: true; elide: Text.ElideRight }
+                            }
+                        }
+                    }
                     Text { text: "COMMANDE LIVE"; color: root.textMuted; font.pixelSize: 12; font.weight: Font.DemiBold }
                     Item {
                         id: joystick

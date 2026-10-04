@@ -26,10 +26,15 @@ VAR_GLOBAL
     // TRUE = capteur haut actif; FALSE = position libre. Inopérant hors simulation.
     SimTopPositionActive        : BOOL := FALSE;
     SimTranslationActive        : BOOL := FALSE; // M3 : AC600, fréquence, 5 capteurs et frein
-    // 🔀 Source de l'image M3 dans FB_SimBench : FALSE = modèle ST interne, TRUE = image OM.
-    // Inopérant hors SimulationModeActive ; l'image réelle reste prioritaire dans ce cas.
+    // 🔀 Source de l'image M3 dans FB_SimBench : FALSE = modèle ST interne, TRUE = simulateur
+    // externe (lien UDP FB_Sim_Translation_ExtLink, FMU OpenModelica). Posé par l'opérateur.
+    // Inopérant hors SimulationModeActive ET SimTranslationActive ; l'image réelle reste prioritaire.
     SimM3OpenModelicaActive     : BOOL := FALSE;
-    SimM3OpenModelica            : ST_HwTranslation; // Interface de retours M3 fournie par om.exe
+    // 📊 État du lien externe M3 (lecture seule, produit par PRG_02 depuis FB_SimBench).
+    SimM3LinkReady              : BOOL := FALSE; // TRUE = trame valide reçue et lien non expiré
+    SimM3LinkTimeout            : BOOL := FALSE; // TRUE = aucune trame valide depuis 1 s
+    SimM3LinkInvalid            : BOOL := FALSE; // TRUE = trame rejetée ou lien expiré
+    SimM3LinkAge_Ms             : UDINT := 0;    // Durée sans trame valide, ms
     SimOperatorActive           : BOOL := FALSE; // Joystick : bus CANopen, axes RawX/RawY et homme-mort brut
     SimSafetyActive             : BOOL := FALSE; // AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs
     // 🧪 Stimulus défaut rotation de phases : TRUE = phases réseau saines (comportement

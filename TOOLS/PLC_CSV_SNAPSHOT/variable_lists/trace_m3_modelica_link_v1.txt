@@ -1,0 +1,53 @@
+# T415-B/G - Premier test Modelica sous Control Win (Device_CtrlWinSim), 2026-10-02.
+# A correler avec la trace passerelle %LOCALAPPDATA%\TwinBenchT409\fmu_*.trace.csv
+# (memes grandeurs cote plante : commande, Hz, frein, capteurs, position FMU).
+# Observation seulement. Aucun STRING, aucun VAR interne [LOC].
+
+# Lien simulateur externe
+GVL_Simulation.SimulationModeActive
+GVL_Simulation.SimM3OpenModelicaActive
+GVL_Simulation.SimM3LinkReady
+GVL_Simulation.SimM3LinkTimeout
+GVL_Simulation.SimM3LinkInvalid
+GVL_Simulation.SimM3LinkAge_Ms
+
+# Stimuli operateur simules
+GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active
+GVL_Simulation.SimJoystickRight_Fwd_MAINT_Active
+GVL_Simulation.SimBtnTremie
+GVL_Simulation.SimBtnMaintenance
+
+# Retours plante tels que vus par le PLC (HwIn)
+PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI
+PRG_02_Acquisition.HwIn.Translation.M3_PosPV_DI
+PRG_02_Acquisition.HwIn.Translation.M3_PosPVP2_DI
+PRG_02_Acquisition.HwIn.Translation.M3_PosP1_DI
+PRG_02_Acquisition.HwIn.Translation.M3_PosMaintenance_DI
+PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI
+PRG_02_Acquisition.HwIn.Translation.M3_ActualFrequencyHz
+PRG_02_Acquisition.HwIn.Translation.M3_StatusWord
+
+# Commandes envoyees a la plante (barriere finale)
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveControlWord
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqCmd_Hz
+PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeCmd
+
+# Decodage position et decision PLC
+PRG_05_Translation.Data.TranslationState.SensorsWord
+PRG_05_Translation.Data.TranslationState.SensorWordIncoherent
+PRG_05_Translation.Data.TranslationState.EstimatedPosM3_M
+PRG_05_Translation.Data.TranslationState.AtTremie
+PRG_05_Translation.Data.TranslationState.AtPV
+PRG_05_Translation.Data.TranslationState.AtP2
+PRG_05_Translation.Data.TranslationState.AtP1
+PRG_05_Translation.Data.TranslationState.AtMaintenance
+PRG_05_Translation.Data.M3_AtP1Stable
+PRG_05_Translation.Data.TranslationState.PositionReached
+PRG_05_Translation.Data.TranslationState.LimitSwitchTremie
+PRG_05_Translation.Data.TranslationState.LimitSwitchMaintenance
+PRG_05_Translation.Data.TranslationState.MaintenanceTargetEnable
+PRG_05_Translation.Data.TranslationState.ActiveTremie
+PRG_05_Translation.Data.TranslationState.ActiveMaintenance
+PRG_05_Translation.Data.TranslationState.SpeedCmd_Pct
+PRG_05_Translation.Data.TranslationState.FBState
+PRG_05_Translation.Data.TranslationState.AxisBlockReason

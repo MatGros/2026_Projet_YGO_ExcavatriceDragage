@@ -22,6 +22,7 @@ tasks:
   - T415-D
   - T415-E
   - T415-F
+  - T415-G
   bloque_par: []
 - id: T415-A
   parent_id: T415
@@ -42,17 +43,17 @@ tasks:
   bloque_par: []
 - id: T415-B
   parent_id: T415
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: OUTILLAGE / TWINBENCH / CONTRAT DE LIAISON
-  agent: —
-  date: '2026-10-02T00:00:00+02:00'
+  agent: CC01
+  date: '2026-10-02T22:08:43'
   titre: 'TwinBench — frontiere PLC, SimBench et simulateur externe'
   contexte: 'Definir un contrat unique avant toute nouvelle injection.'
   description: 'Le simulateur lit les commandes publiees et ecrit uniquement une image materielle complete a la frontiere SimBench, sous verrou de simulation.'
-  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-B_*.yaml).'
-  bloque_par:
-  - 'Cloture approuvee de T415-A.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T415-B_M3_LIEN_EXTERNE_SIMBENCH.yaml
+  avancement: 'L1 livre non commite. 2026-10-02 COMMUNICATION VALIDEE dans Control Win (Device_CtrlWinSim) : PLC <-> passerelle FMU ~96 trames/s, 0 rejet, reprise auto apres redemarrage passerelle ; le PLC pilote la plante (sens, frequence, frein) et recoit les capteurs. Correctifs livres : adresse loopback litterale (constante STRING videe par le generateur), types RTS_IEC sans prefixe, handle 0 factice, P02/P05/P06. Restent non testes : gel image sur coupure (AC5), etat initial P1 / CW-00 (AC6). Defauts constates hors lien (modele FMU, vue) reportes : T415-E1 et T415-G lot G4.'
+  bloque_par: []
 - id: T415-C
   parent_id: T415
   statut: ⬜
@@ -148,6 +149,28 @@ tasks:
   contrat: 'A rediger apres decision humaine sur le transport et la position estimee.'
   bloque_par:
   - 'Qualification T415-E3 et decision humaine explicite.'
+- id: T415-G
+  parent_id: T415
+  statut: ⬜
+  criticite: C3
+  domaine: OUTILLAGE / TWINBENCH / LANCEUR / CONTROL WIN / ERGONOMIE
+  agent: —
+  date: '2026-10-02T17:20:10'
+  titre: 'TwinBench v2 — lancer la simulation (projet unique Device + Device_CtrlWinSim)'
+  contexte: 'Decision humaine 2026-10-02 : un seul projet CODESYS avec Device (CPU reel, simulation IDE) et Device_CtrlWinSim (Control Win). La copie reecrite HW_SIM du lanceur v1 n est plus le chemin nominal. Simulation IDE sans sockets (lien Modelica impossible), Control Win requis pour le lien UDP.'
+  description: 'Refondre TwinBench en outil de lancement/arret/surveillance de la partie PC (passerelle FMU, vue M3), corriger le lien PLC ExtLink selon le challenge expert (P01..P21), documenter la creation de Device_CtrlWinSim et outiller la recette Control Win jusqu au chariot qui bouge pilote par le PLC.'
+  objectifs:
+  - 'Parcours E2E en 6 actions max, reponses numeriques uniquement, fenetres au premier plan.'
+  - 'Etat de liaison lisible cote PLC (SimM3Link*) et cote vue (echo PLC).'
+  - 'Zero confusion reel/simule, zero bus terrain demarre par Control Win, zero processus tue a tort.'
+  - 'Recette tracee LN/GW/EL/BS/CW/E2E.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T415-G_TWINBENCH_V2.yaml
+  sources:
+  - DOC/WFLOW/ORCHESTRATION_RAPPORTS/PROPOSITION_TWINBENCH_V2_2026-10-02.md
+  - DOC/WFLOW/ORCHESTRATION_RAPPORTS/CHALLENGE_TWINBENCH_V2_2026-10-02.md
+  avancement: 'Proposition + challenge expert (GO avec reserves) + contrat rediges. Aucun lot demarre.'
+  bloque_par:
+  - 'Decisions humaines G0 Q1..Q7 (contrat).'
 - id: T414
   parent_id: T399
   statut: ⬜

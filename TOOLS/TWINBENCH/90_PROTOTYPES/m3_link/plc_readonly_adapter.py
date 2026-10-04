@@ -10,7 +10,7 @@ import socket
 import time
 from dataclasses import dataclass
 
-from m3_binary_protocol import HOST, PLANT, unpack_plant
+from m3_binary_protocol import ECHO_UI, ECHO_UI_MAGIC, HOST, PLANT, decode_plc_echo, unpack_plant
 from sequence_rules import is_acceptable
 
 
@@ -42,6 +42,9 @@ class UdpPlantReadOnlyAdapter:
         self._last: ReadOnlyM3State | None = None
         self._last_received = 0.0
         self._last_sequence = None
+        # Écho de l'état PLC relayé par la passerelle (datagramme M3E1), lecture seule.
+        self._echo: dict | None = None
+        self._echo_received = 0.0
 
     @property
     def has_data(self) -> bool:
@@ -54,7 +57,14 @@ class UdpPlantReadOnlyAdapter:
                 payload, address = self._socket.recvfrom(128)
             except (BlockingIOError, socket.timeout, OSError):
                 break
-            if address[0] != HOST or len(payload) != PLANT.size:
+            if address[0] != HOST:
+                continue
+            if len(payload) == ECHO_UI.size and payload[:4] == ECHO_UI_MAGIC:
+                _magic, _seq, raw = ECHO_UI.unpack(payload)
+                self._echo = decode_plc_echo(raw)
+                self._echo_received = time.monotonic()
+                continue
+            if len(payload) != PLANT.size:
                 continue
             try:
                 fields = unpack_plant(payload)
@@ -89,6 +99,12 @@ class UdpPlantReadOnlyAdapter:
                 received_monotonic_s=self._last_received,
             )
         return self.state()
+
+    def plc_echo(self) -> tuple[dict | None, bool]:
+        """Dernier écho PLC et indicateur de péremption (même seuil que la télémétrie)."""
+        stale = (self._echo_received == 0.0 or
+                 time.monotonic() - self._echo_received > self._stale_after_s)
+        return self._echo, stale
 
     def state(self) -> ReadOnlyM3State:
         if self._last is None:
