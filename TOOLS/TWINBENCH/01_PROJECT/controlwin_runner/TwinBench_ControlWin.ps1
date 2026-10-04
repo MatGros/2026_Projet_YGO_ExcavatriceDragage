@@ -180,7 +180,18 @@ function Select-ProjectFile {
     $dialog.Title = 'Select the CODESYS project to COPY for TwinBench'
     $dialog.Filter = 'CODESYS project (*.project;*.projectarchive)|*.project;*.projectarchive'
     $dialog.Multiselect = $false
-    if ($dialog.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK) {
+    # Owner TopMost : sans lui, la fenêtre s'ouvre derrière la console et semble ne jamais apparaître.
+    $owner = New-Object System.Windows.Forms.Form
+    $owner.TopMost = $true
+    $owner.ShowInTaskbar = $false
+    Write-Host '[ACTION REQUIRED] A file selection window is open. Select the .project to copy.' -ForegroundColor Yellow
+    try {
+        $result = $dialog.ShowDialog($owner)
+    }
+    finally {
+        $owner.Dispose()
+    }
+    if ($result -ne [System.Windows.Forms.DialogResult]::OK) {
         throw 'Selection cancelled. No file was changed.'
     }
     return $dialog.FileName
@@ -314,8 +325,8 @@ function Recover-TwinBenchWorkspace([switch]$Confirmed) {
     $state = Get-WorkflowState
     if ($state -eq 'EMPTY') { throw 'There is no TwinBench workspace to recover.' }
     if (-not $Confirmed) {
-        $confirmation = Read-Host 'Type ARCHIVE to release the copy and archive its leftovers, or press ENTER to cancel'
-        if ($confirmation -cne 'ARCHIVE' -and $confirmation -cne 'ARCHIVER') {
+        $confirmation = Read-Host 'Type 1 to release the copy and archive its leftovers, or press ENTER to cancel'
+        if ($confirmation -cnotin @('1', 'ARCHIVE', 'ARCHIVER')) {
             Write-Host '[INFO] Recovery cancelled. No files or processes were touched.' -ForegroundColor Yellow
             return
         }
@@ -398,8 +409,8 @@ function Invoke-SimpleWorkflow {
             }
             'PREPARE_FAILED' {
                 Write-Host '[ACTION REQUIRED] A previous copy failed. I can archive that copy and retry cleanly.' -ForegroundColor Yellow
-                $repair = Read-Host 'Type REPAIR to continue, or press ENTER to cancel'
-                if ($repair -cne 'REPAIR' -and $repair -cne 'REPARER') {
+                $repair = Read-Host 'Type 1 to continue, or press ENTER to cancel'
+                if ($repair -cnotin @('1', 'REPAIR', 'REPARER')) {
                     Write-Host '[INFO] Nothing was changed.' -ForegroundColor Yellow
                     return
                 }
@@ -407,9 +418,9 @@ function Invoke-SimpleWorkflow {
                 continue
             }
             'PREPARED' {
-                Write-Host '[ACTION REQUIRED] Copy compiled. Type DEPLOY to load it on local Control Win, or press ENTER to cancel.' -ForegroundColor Yellow
+                Write-Host '[ACTION REQUIRED] Copy compiled. Type 1 to load it on local Control Win, or press ENTER to cancel.' -ForegroundColor Yellow
                 $deploy = Read-Host 'Confirmation'
-                if ($deploy -cne 'DEPLOY' -and $deploy -cne 'DEPLOYER') {
+                if ($deploy -cnotin @('1', 'DEPLOY', 'DEPLOYER')) {
                     Write-Host '[INFO] Deployment cancelled. The real PLC was not contacted.' -ForegroundColor Yellow
                     return
                 }
@@ -657,8 +668,8 @@ function Unlock-PrepareRetry {
     if ((Get-WorkflowState) -ne 'PREPARE_FAILED') {
         throw 'Retry is only available after a preparation failure.'
     }
-    $confirmation = Read-Host 'Type RETRY only after fixing the cause of the failure'
-    if ($confirmation -cnotin @('RETRY', 'REESSAYER')) {
+    $confirmation = Read-Host 'Type 1 only after fixing the cause of the failure'
+    if ($confirmation -cnotin @('1', 'RETRY', 'REESSAYER')) {
         throw 'Retry cancelled. PREPARE_FAILED state preserved.'
     }
     Write-Manifest @{
@@ -700,8 +711,8 @@ function Invoke-GuidedWorkflow {
 
     if ($state -eq 'PREPARED') {
         Write-Host '[GUIDE 3/4] Preparation validated.' -ForegroundColor Green
-        $confirmation = Read-Host 'Type DEPLOY to start local Control Win, or press ENTER to stop here'
-        if ($confirmation -cnotin @('DEPLOY', 'DEPLOYER')) {
+        $confirmation = Read-Host 'Type 1 to start local Control Win, or press ENTER to stop here'
+        if ($confirmation -cnotin @('1', 'DEPLOY', 'DEPLOYER')) {
             Write-Host '[GUIDE] Stopped before deployment. PREPARED state preserved.' -ForegroundColor Yellow
             return
         }
@@ -749,20 +760,18 @@ function Show-Menu {
         $state = Get-WorkflowState
         Write-Host ("Current state: {0}" -f $state) -ForegroundColor Cyan
         Write-Host ''
-        Write-Host 'ENTER   Continue: load the project into Control Win' -ForegroundColor Green
-        Write-Host '0       Exit' -ForegroundColor DarkGray
-        $choice = Read-Host 'Action'
-        if ($choice -eq '0') { return }
-        if (-not [string]::IsNullOrWhiteSpace($choice)) {
-            Write-Host '[INFO] Press ENTER to continue.' -ForegroundColor Yellow
-            continue
-        }
+        Write-Host ''
+        # Sélection directe : la fenêtre de choix du projet s'ouvre sans question préalable.
+        # Même projet et même empreinte : la copie existante est conservée (aucune re-préparation).
         try {
+            Import-Project ''
             Invoke-SimpleWorkflow
         }
         catch {
             Write-Host ("[REFUSED/ERROR] {0}" -f $_.Exception.Message) -ForegroundColor Red
         }
+        Read-Host 'Press ENTER to close' | Out-Null
+        return
     }
 }
 

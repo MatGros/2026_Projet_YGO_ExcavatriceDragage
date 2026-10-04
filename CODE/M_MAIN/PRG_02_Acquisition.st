@@ -66,6 +66,7 @@ VAR
     SimulationModeFall                : F_TRIG; // . [LOC] Front descendant desactivation simulation
     SimulationSemiAutoActive          : BOOL;   // . [LOC] Simulation et mode SEMI_AUTO simultanés
     SimulationSemiAutoPrevious        : BOOL;   // . [LOC] Mémoire transition SEMI_AUTO simulé
+    SimM3PlcEcho                      : ST_fbSim_Translation_ExtLink_Echo; // . [LOC] Etat M3 renvoye au simulateur externe (N-1, diagnostic)
 END_VAR
 
 VAR CONSTANT
@@ -286,6 +287,29 @@ Data.Network.DriveM3         := instDiagEthercat.DeviceVariateur;
 {region "§2 Simulation et aiguillage — HwIn"}
 // === 🎭 §2 SIMULATION & AIGUILLAGE (HwIn) ===
 
+// 📊 Écho diagnostic vers le simulateur externe M3 : copie en lecture seule des états
+// publiés au scan précédent (N-1) par PRG_03 et PRG_05. Aucune décision n'en dépend.
+SimM3PlcEcho.Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode;
+SimM3PlcEcho.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable;
+SimM3PlcEcho.MaintenanceZoneAccess   := GVL_IHM.M3Translation.Cmd.TglMaintenanceZoneAccess;
+SimM3PlcEcho.FBState                 := PRG_05_Translation.Data.TranslationState.FBState;
+SimM3PlcEcho.AxisBlockReason         := PRG_05_Translation.Data.TranslationState.AxisBlockReason;
+SimM3PlcEcho.SafeStop                := PRG_05_Translation.Data.TranslationSafety.SafeStop;
+SimM3PlcEcho.PowerCutOff             := PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
+SimM3PlcEcho.SafetyErrorId           := PRG_05_Translation.Data.TranslationSafety.ErrorId;
+SimM3PlcEcho.LimitSwitchTremie       := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie;
+SimM3PlcEcho.LimitSwitchMaintenance  := PRG_05_Translation.Data.TranslationState.LimitSwitchMaintenance;
+SimM3PlcEcho.PositionReached         := PRG_05_Translation.Data.TranslationState.PositionReached;
+SimM3PlcEcho.ActiveTremie            := PRG_05_Translation.Data.TranslationState.ActiveTremie;
+SimM3PlcEcho.ActiveMaintenance       := PRG_05_Translation.Data.TranslationState.ActiveMaintenance;
+SimM3PlcEcho.AtTremie                := PRG_05_Translation.Data.TranslationState.AtTremie;
+SimM3PlcEcho.AtPV                    := PRG_05_Translation.Data.TranslationState.AtPV;
+SimM3PlcEcho.AtP2                    := PRG_05_Translation.Data.TranslationState.AtP2;
+SimM3PlcEcho.AtP1                    := PRG_05_Translation.Data.TranslationState.AtP1;
+SimM3PlcEcho.AtMaintenance           := PRG_05_Translation.Data.TranslationState.AtMaintenance;
+SimM3PlcEcho.SensorWordIncoherent    := PRG_05_Translation.Data.TranslationState.SensorWordIncoherent;
+SimM3PlcEcho.EstimatedPos_M          := PRG_05_Translation.Data.TranslationState.EstimatedPosM3_M;
+
 instSimBench(
     Enable                   := GVL_Simulation.SimulationModeActive,
     M1_RelayFwd              := PRG_06_Outputs.Data.M1RelayFwd,
@@ -321,8 +345,10 @@ instSimBench(
                                       / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
                                       100.0),
     M3_BrakeCmd              := PRG_06_Outputs.Data.TranslationBrakeCmd,
-    M3_OpenModelicaActive    := GVL_Simulation.SimM3OpenModelicaActive,
-    M3_OpenModelica          := GVL_Simulation.SimM3OpenModelica,
+    M3_SetpointFrequencyHz   := M3_SetpointFrequencyHz,
+    // 🔌 Source externe M3 : sélectionnée seulement si le domaine translation est simulé.
+    M3_OpenModelicaActive    := GVL_Simulation.SimM3OpenModelicaActive AND GVL_Simulation.SimTranslationActive,
+    M3_PlcEcho               := SimM3PlcEcho,
     PowerKeepAlive_A         := PRG_06_Outputs.Data.PowerKeepAliveACmd,
     PowerKeepAlive_B         := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie
@@ -402,6 +428,12 @@ HwSim.Winch       := instSimBench.Winch;
 HwSim.Translation := instSimBench.Translation;
 HwSim.Operator    := instSimBench.Operator;
 HwSim.Machine     := instSimBench.Machine;
+
+// 📊 État du lien simulateur externe M3 (frontière simulation, lecture seule côté IHM/diagnostic).
+GVL_Simulation.SimM3LinkReady   := instSimBench.M3LinkReady;
+GVL_Simulation.SimM3LinkTimeout := instSimBench.M3LinkTimeout;
+GVL_Simulation.SimM3LinkInvalid := instSimBench.M3LinkInvalid;
+GVL_Simulation.SimM3LinkAge_Ms  := instSimBench.M3LinkAge_Ms;
 
 // 🔀 Détection de bascule de source (réel/simu) par domaine — impulsion 1 cycle.
 // Même pattern que Winch : mémoire Previous*InputSourceSimulated + comparaison.

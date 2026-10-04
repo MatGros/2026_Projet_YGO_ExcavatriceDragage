@@ -3,9 +3,10 @@
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
 
-   🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
+   🎯 Rôle : Compose les blocs de modèle de simulation :
       - FB_Sim_Encoder (instM1, instM2)
-      - FB_Sim_Translation (instTranslation)
+      - FB_Sim_Translation (instTranslation) ou, si M3_OpenModelicaActive,
+        FB_Sim_Translation_ExtLink (lien UDP simulateur externe)
       - FB_Sim_Joystick (instJoystick)
       - FB_Sim_Safety (instSafety)
 
@@ -54,9 +55,10 @@ VAR_INPUT
     M3_ReqMaintenance          : BOOL;             (* --> [CMD] Demande explicite vers Maintenance *)
     M3_SpeedCmd_Pct            : REAL;   (* --> [CMD] Consigne vitesse M3 *)
     M3_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M3 *)
-    // ── Interface périphérique OpenModelica M3 ─────────────────────────────
-    M3_OpenModelicaActive      : BOOL;             (* --> [TST] TRUE = image OM sélectionnée *)
-    M3_OpenModelica            : ST_HwTranslation; (* --> [HW] Retours M3 fournis par om.exe *)
+    // ── Source externe OpenModelica M3 (lien UDP FB_Sim_Translation_ExtLink) ──
+    M3_SetpointFrequencyHz     : WORD;             (* --> [CMD] Consigne fréquence variateur M3, Hz x100 (sortie finale PRG_06) *)
+    M3_OpenModelicaActive      : BOOL;             (* --> [TST] TRUE = image M3 fournie par le simulateur externe *)
+    M3_PlcEcho                 : ST_fbSim_Translation_ExtLink_Echo; (* --> [TST] Etat decisionnel M3 renvoye au simulateur (diagnostic) *)
 
     PowerKeepAlive_A           : BOOL;             (* --> [SAFE] TRUE = relais A maintenu sagement par le PLC *)
     PowerKeepAlive_B           : BOOL;             (* --> [SAFE] TRUE = relais B maintenu sagement par le PLC *)
@@ -168,6 +170,12 @@ VAR_OUTPUT
     M3BrakeFaultCloseActive    : BOOL;   (* <-- [DIAG] Faute frein M3 effectivement appliquee ce scan *)
     // Blip court capteurs M3 -- diagnostic seul : observable sur trace pendant un episode court.
     M3SensorBlipActive         : BOOL;   (* <-- [DIAG] Un capteur M3 publie une excursion courte *)
+
+    // Lien simulateur externe M3 -- diagnostic seul, publié par PRG_02 vers GVL_Simulation.
+    M3LinkReady                : BOOL;   (* <-- [STAT] Lien externe M3 établi (trame valide, non expiré) *)
+    M3LinkTimeout              : BOOL;   (* <-- [DIAG] Lien externe M3 expiré *)
+    M3LinkInvalid              : BOOL;   (* <-- [DIAG] Trame externe M3 rejetée ou lien expiré *)
+    M3LinkAge_Ms               : UDINT;  (* <-- [DIAG] Durée sans trame valide, ms *)
 END_VAR
 
 VAR_IN_OUT
@@ -197,6 +205,7 @@ VAR
     instSimEncoderM1           : FB_Sim_Encoder;   (* * [INST] Modèle codeur M1 *)
     instSimEncoderM2           : FB_Sim_Encoder;   (* * [INST] Modèle codeur M2 *)
     instSimTranslation         : FB_Sim_Translation;   (* * [INST] Modèle translation M3 *)
+    instSimTranslationExtLink  : FB_Sim_Translation_ExtLink; (* * [INST] Lien simulateur externe M3 *)
     instSimJoystick            : FB_Sim_Joystick;   (* * [INST] Modèle joystick *)
     instSimSafety              : FB_Sim_Safety;   (* * [INST] Modèle sécurité *)
     instWinchElectricalM1      : FB_Sim_WinchElectrical;   (* * [INST] T317 exploratoire -- electrique+charge M1 *)
@@ -270,6 +279,12 @@ IF NOT Enable THEN
     Translation := HwReal.Translation;
     Operator    := HwReal.Operator;
     Machine     := HwReal.Machine;
+    // 🔌 Lien externe M3 coupé explicitement : socket fermé, état de liaison retombé.
+    instSimTranslationExtLink(Enable := FALSE);
+    M3LinkReady   := FALSE;
+    M3LinkTimeout := FALSE;
+    M3LinkInvalid := FALSE;
+    M3LinkAge_Ms  := 0;
     RETURN;
 END_IF;
 
@@ -591,6 +606,20 @@ instSimTranslation(
 M3BrakeFaultCloseActive := instSimTranslation.BrakeFaultCloseActive;
 M3SensorBlipActive := instSimTranslation.SensorBlipActive;
 
+// 🔌 Lien externe : actif uniquement si la source externe est sélectionnée (modèle ST sinon).
+instSimTranslationExtLink(
+    Enable              := M3_OpenModelicaActive,
+    ReqTremie           := M3_RelayFwd,
+    ReqMaintenance      := M3_RelayRev,
+    SetpointFrequencyHz := M3_SetpointFrequencyHz,
+    BrakeReleaseCmd     := M3_BrakeCmd,
+    PlcEcho             := M3_PlcEcho
+);
+M3LinkReady   := instSimTranslationExtLink.LinkReady;
+M3LinkTimeout := instSimTranslationExtLink.LinkTimeout;
+M3LinkInvalid := instSimTranslationExtLink.LinkInvalid;
+M3LinkAge_Ms  := instSimTranslationExtLink.LinkAge_Ms;
+
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
 // même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).
 IF SimM3SensorsWordOverrideActive THEN
@@ -630,10 +659,10 @@ Translation.M3_StatusWord        := M3_StatusWordSim;
 Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
 Translation.AC600_DeviceState    := DEVICE_STATE.RUNNING; // État device RUNNING
 
-// 🔀 Aiguillage périphérique M3 : OM remplace uniquement l'image de retours du modèle ST.
+// 🔀 Aiguillage source M3 : le simulateur externe remplace uniquement l'image de retours du modèle ST.
 // La logique PLC continue de produire les commandes et reste inchangée.
 IF M3_OpenModelicaActive THEN
-    Translation := M3_OpenModelica;
+    Translation := instSimTranslationExtLink.Translation;
 END_IF;
 
 

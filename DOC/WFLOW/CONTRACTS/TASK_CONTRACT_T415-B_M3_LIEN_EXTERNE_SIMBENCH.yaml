@@ -1,0 +1,92 @@
+# Contrat C3 (POC) — lien externe M3 integre au SimBench (T415-B / lot L1)
+# Decision humaine 2026-10-02 : un seul code (CODE/), aiguillage par bits dans L_SIMULATION,
+# plus de PRG de test parallele. Specs AF-13 tracees APRES validation du POC.
+
+contract:
+  task_id: T415-B_L1_M3_LIEN_EXTERNE_SIMBENCH
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Tester le chariot M3 du programme automate versionne (CODE/) dans Control Win avec la
+    FMU OpenModelica, sans PRG de test separe : le lien UDP devient une brique inerte du
+    SimBench, activee par bits de simulation.
+
+  acceptance:
+    - id: AC1
+      statement: "Les 3 bits SimulationModeActive, SimTranslationActive, SimM3OpenModelicaActive a FALSE : aucun socket ouvert, aucune ecriture dans GVL_Simulation.SimM3OpenModelica, comportement M3 strictement inchange."
+      verified_by: "Relecture ST (garde unique en tete de FB) + test TEST_AUTO_CI M3 existants PASS sans modification"
+    - id: AC2
+      statement: "Le FB lit les commandes M3 depuis les entrees deja presentes de FB_SimBench (M3_ReqTremie, M3_ReqMaintenance, M3_SpeedCmd_Pct, M3_BrakeCmd), pas depuis GVL_Troubleshooting."
+      verified_by: "Relecture ST + grep GVL_Troubleshooting dans CODE/L_SIMULATION = 0"
+    - id: AC3
+      statement: "SimM3OpenModelicaActive reste un bit pose par l'operateur ; le FB ne l'ecrit jamais."
+      verified_by: "grep ':= .*SimM3OpenModelicaActive' dans CODE/ = 0 hors declaration"
+    - id: AC4
+      statement: "Le FB publie un etat de lien (LinkReady, Timeout, LinkInvalid, age) lisible dans GVL_Simulation pour le bandeau IHM."
+      verified_by: "Variables presentes + G200_check_linkage PASS"
+    - id: AC5
+      statement: "Perte de liaison ou trame invalide : derniere image valide gelee, defaut de lien leve. Aucun retour au mot 00000 (ambigu avec Maintenance), aucun saut de position."
+      verified_by: "Test sur copie Control Win : couper la passerelle en cours de trajet, capteurs inchanges, Timeout=TRUE"
+    - id: AC6
+      statement: "Avant la premiere trame valide, l'image publiee est la zone P1 (00011) sans AtPositionP1 force : le PLC doit voir un front en bougeant."
+      verified_by: "Recette CW-00 humaine : demarrage, AtPositionP1 reste FALSE jusqu'au front capteur"
+    - id: AC7
+      statement: "Le bundle complet et le diff bundle se generent ; G200 liaison PASS ; tous gates PASS."
+      verified_by: "generate_codesys_bundle.py + G200_check_linkage.py --report + run_all_gates.py"
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_Sim_M3ExternalLink.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - TOOLS/TWINBENCH/**
+      - DOC/WFLOW/**
+    forbidden:
+      - CODE/I_TRANSLATION/**
+      - CODE/M_MAIN/PRG_02_Acquisition.st   # sauf si G200 prouve qu'un cablage manque (alerte d'abord)
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/AF/**                            # specs tracees apres POC, decision humaine 2026-10-02
+
+  conservation:
+    must_survive:
+      - "Bascule modele ST interne / image OM dans FB_SimBench (lignes 571 et 635)"
+      - "Cadence 10 ms et protocole binaire M3B1 valides par T408/T409"
+      - "Loopback 127.0.0.1 impose"
+    dropped_on_purpose:
+      - "PRG_T409_M3_FmuBridge comme PRG separe : archive hors CODE/ apres validation CW-00 (decision humaine)"
+      - "Ecriture du bit SimM3OpenModelicaActive par le pont"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "claude-sonnet-5-5"
+    - "claude-opus-5-5"
+
+  alert_duty: >
+    Toute incoherence constatee (spec, bug preexistant comme la memorisation AtPositionP1,
+    risque hors scope) est remontee immediatement. Signaler n'est pas elargir le scope.
+
+  open_points:
+    - "Impact SysSocket sur CPU reel : test Login a blanc sur copie jetable (modele de CPU a fournir)."
+    - "Memorisation AtPositionP1 : bug PLC separe, a traiter en troubleshooting."
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    A remplir apres implementation.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    En attente du GO d'implementation humain.

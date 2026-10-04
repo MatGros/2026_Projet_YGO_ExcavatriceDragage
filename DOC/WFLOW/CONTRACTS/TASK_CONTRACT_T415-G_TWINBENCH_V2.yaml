@@ -1,0 +1,260 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT T415-G — TwinBench v2 : lancer la simulation (fin de la copie réécrite)
+# ═══════════════════════════════════════════════════════════════════════════
+# Sources :
+#   - Proposition : DOC/WFLOW/ORCHESTRATION_RAPPORTS/PROPOSITION_TWINBENCH_V2_2026-10-02.md
+#   - Challenge expert : DOC/WFLOW/ORCHESTRATION_RAPPORTS/CHALLENGE_TWINBENCH_V2_2026-10-02.md (P01..P21)
+#   - Lot précédent : TASK_CONTRACT_T415-B_M3_LIEN_EXTERNE_SIMBENCH.yaml (FB_Sim_Translation_ExtLink)
+# Faits établis 2026-10-02 (preuves en conversation CC01) :
+#   F1 Simulation intégrée IDE : SysSocket factice (handle 0, résultat 0) -> aucun lien UDP possible.
+#   F2 Projet unique : Device (CPU réel) + Device_CtrlWinSim (Update Device -> Control Win V3 x64).
+#   F3 Update Device conserve EtherCAT, CANopen, VH_* ; perd Local_Digital_IO (E/S intégrées CPU),
+#      recréé par l'utilisateur avec une carte VH_0808ETP renommée Local_Digital_IO (mêmes variables).
+#   F4 Device_CtrlWinSim compile, se charge dans Control Win et simule avec le banc ST interne.
+#   F5 Lien UDP Modelica sous Control Win : NON ENCORE TESTÉ.
+#   F6 Le générateur de bundle (TOOLS/CONVERTER_ST2XML_PLCopenXML) ne doit PAS être modifié
+#      (décision humaine 2026-10-02) ; il ignore les types préfixés par namespace.
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T415-G_TWINBENCH_V2
+  criticality: C3
+  strategy: rebuild
+
+  objective: >
+    Permettre à l'automaticien, en 6 actions au plus et sans procédure à deviner, de voir le
+    chariot M3 simulé par Modelica bouger sous la commande du programme automate versionné
+    chargé dans Control Win (Device_CtrlWinSim), avec un état de liaison lisible des deux côtés,
+    sans jamais pouvoir confondre réel et simulé ni piloter un équipement réel.
+
+  # ── Lots (ordre d'exécution ; chaque lot = GO humain distinct, aucun commit sans validation) ──
+  lots:
+    - id: G0
+      title: "Décisions humaines préalables"
+      content:
+        - "Q1 PC de simulation câblable au réseau EtherCAT/CAN machine ? (conditionne P01)"
+        - "Q2 Bascule ST<->Modelica autorisée seulement à l'arrêt, sur front ? (P03)"
+        - "Q3 Protocole M3B1 schéma 2 (écho PLC + ID session plante + status word 16 bits) ? (P04, P10, P14)"
+        - "Q4 Control Win sous licence ou démo 2 h ? (CW-03)"
+        - "Q5 Garder controlwin_runner jusqu'à E2E-01 vert ? (plan de retour arrière)"
+        - "Q6 Double copie du code (Device / Device_CtrlWinSim) : import x2 accepté, ou chantier code partagé niveau projet ?"
+        - "Q7 Empreinte de divergence entre Applications : script séparé autorisé (générateur intouchable) ?"
+    - id: G1
+      title: "Correctifs PLC FB_Sim_Translation_ExtLink / FB_SimBench (CODE/)"
+      criticality: C3
+      content:
+        - "P05 : FB_SimBench §1 (SimulationModeActive=FALSE) appelle instSimTranslationExtLink(Enable:=FALSE) avant RETURN ; les 4 sorties M3Link* retombent à FALSE."
+        - "P06 : si SysSockIoctl(FIONBIO) retourne un résultat non OK, fermer le socket, SocketIsOpen=FALSE, Ready=FALSE, retenter au scan suivant ; jamais d'appel RecvFrom sur socket bloquant."
+        - "P02 : boucle de lecture bornée (CST_MaxRxPerScan, ex. 8) vidant la file UDP ; seule la dernière trame valide met à jour l'image ; compteur de trames écartées."
+        - "P03 (si Q2=OK) : la sélection de source M3 est mémorisée sur front et n'est acceptée qu'à l'arrêt (ActualFrequency=0 ET frein fermé) ; demande refusée en mouvement -> diagnostic SimM3SourceSwitchRefused, source inchangée."
+        - "P04 (si Q3=oui) : contrôle de l'ID de session plante ; changement d'ID -> LinkInvalid latché, image gelée, réarmement par SimM3OpenModelicaActive 0->1."
+        - "P10 (si Q3=oui) : écho PLC dans la trame commande (octets 15..31) : RxCount, LinkReady, LinkInvalid."
+        - "P16 : diagnostic SimM3SensorsOverrideIgnored quand SimM3SensorsWordOverrideActive=TRUE en source externe."
+        - "Maintien : types RTS_IEC_* SANS préfixe namespace (F6) ; handle 0 = socket factice (F1)."
+    - id: G2
+      title: "Passerelle FMU et protocole (TOOLS/TWINBENCH)"
+      criticality: C2
+      content:
+        - "P07 : readiness réelle (port 29061 lié par le processus lancé + ligne 'FMU M3 prete' lue), timeout 30 s, sinon [ECHEC] cause -> action."
+        - "P04/P10/P14 (si Q3=oui) : schéma 2 M3B1 ; ID session plante tiré à chaque démarrage/reset ; lecture de l'écho PLC ; status word 16 bits ; rétrocompatibilité schéma 1 refusée explicitement (pas de mélange silencieux)."
+        - "P09 : mesure dérive temps plante (trames x 10 ms) / temps réel ; publiée vers la vue et la page État."
+        - "P15 : un seul seuil de péremption (1 s) partagé PLC / passerelle / vue, documenté."
+        - "P19 : sortie résultat OMSimulator désactivée ou bornée ; nettoyage des dossiers Runtime_<pid> de la passerelle qu'elle a créés elle-même uniquement."
+        - "P13 : vérification et documentation des ports (Get-NetUDPEndpoint 29061/29062 sous Control Win) ; correction si collision."
+    - id: G3
+      title: "Lanceur unique TwinBench.cmd / TwinBench.ps1 (français, chiffres uniquement)"
+      criticality: C2
+      content:
+        - "En-tête live au-dessus du menu : Control Win (service), passerelle (PID, âge), PLC relié (écho PLC si G2/Q3, sinon trames reçues), vue M3, dérive temps."
+        - "1 Simulation M3 reliée au PLC : démarre le service Control Win s'il est arrêté (aucun download), puis passerelle (readiness G2), puis vue en mode PILOTÉE PAR PLC ; attend la 1re trame PLC et affiche [OK] PLC relié ou [ATTENTE] cause -> action."
+        - "Si passerelle déjà active : 1 = redémarrer la plante (avertissement : le PLC verra LinkInvalid et devra réarmer), 2 = garder."
+        - "2 Simulation M3 seule : vue en mode SANS PLC — joystick écran."
+        - "3 Outils : 1 OMEdit, 2 dossier des traces, 3 diagnostic versions (Python, PySide6, OMSimulator, omc), 0 retour."
+        - "4 Arrêter la simulation PC (CODESYS et Control Win non touchés)."
+        - "0 Quitter."
+        - "P08 : identification des processus TwinBench par argument marqueur --twinbench-id <guid> + fichier PID dans %LOCALAPPDATA%\\TwinBench + port ; aucun processus non identifié n'est arrêté ; message [REFUS] avec PID et ligne de commande."
+        - "Toutes les questions : réponse numérique, Entrée = annuler ; toute fenêtre de dialogue au premier plan (owner TopMost)."
+        - "Chaque action se termine par [OK] ou [ECHEC] cause -> action chiffrée ; pas de 'Press ENTER' en boucle."
+    - id: G4
+      title: "Vue M3 (PySide6/QML)"
+      criticality: C2
+      content:
+        - "Bandeau permanent de mode : PILOTÉE PAR PLC (Control Win) / SANS PLC — joystick écran ; couleurs distinctes, jamais masquable."
+        - "Bandeau liaison (P10) : PLC RELIÉ / PLC MUET / TRAMES REJETÉES / PASSERELLE ARRÊTÉE, alimenté par l'écho PLC (G2) ; seuil unique 1 s (P15)."
+        - "Signalement visible du gel d'image côté PLC (LinkTimeout, incohérence capteurs)."
+        - "Affichage dérive temps (P09) et ID session plante."
+        - "Textes en français (P21)."
+    - id: G5
+      title: "Restructuration dossiers et environnement Python"
+      criticality: C2
+      content:
+        - "TwinBench.cmd unique à la racine ; 00_START.cmd, 10_PROJECT.cmd, 20_SIM.cmd retirés après G3 validé."
+        - "90_PROTOTYPES/m3_link -> 02_SIM/m3_link (chemin nominal) ; références mises à jour (app.py, test_readonly_backend.py, scripts check_*) (P17)."
+        - "03_TRANSPORT/udp_native -> 90_PROTOTYPES/udp_native."
+        - "01_PROJECT/controlwin_runner : conservé jusqu'à E2E-01 vert (Q5), puis ARCHIVES/ sur décision humaine ; savoir HW_SIM transféré dans le guide G6."
+        - "Venv unique %LOCALAPPDATA%\\TwinBench\\Python (PySide6 + OMSimulator), créé/vérifié par le lanceur ; diagnostic de compatibilité versions (P18)."
+        - "Dossier de travail des runtimes hors dépôt ; dossiers vides PlcLogic/, visu/, _cnc/ signalés à l'humain, jamais supprimés automatiquement (P20)."
+    - id: G6
+      title: "Documentation et guide CODESYS"
+      criticality: C2
+      content:
+        - "TOOLS/TWINBENCH/README.md réécrit en français : 3 modes (réel / simulation IDE / Control Win), menu, tableau 'symptôme -> cause -> action'."
+        - "TOOLS/TWINBENCH/GUIDE_DEVICE_CTRLWINSIM.md : copier Device -> Update Device Control Win V3 x64 -> remplacer Local_Digital_IO (VH_0808ETP renommée, mêmes variables) -> librairies SysSocket + SysTypes2 Interfaces -> DÉSACTIVER les masters EtherCAT/CANopen (P01) -> renommer l'application (ex. App_SIM_CtrlWin) -> Communication Settings localhost -> Build -> Set Active Application -> Login -> Run."
+        - "Règles du guide : import XML dans les DEUX Applications ; report manuel des modifs matérielles ; persistants (GVL_PERSISTENT) distincts entre Control Win et CPU ; licence/version Control Win ; ne jamais importer de bundle réécrit HW_SIM."
+        - "Watch list livrée TB_M3_START (P12) : SimulationModeActive (front OFF->ON), SimChainOk, SimM3OpenModelicaActive, stimuli joystick, SimM3Link* ; procédure Ctrl+F7."
+        - "AF-13 : fiche POC FB_Sim_Translation_ExtLink (rôle, interface, gel, état initial P1, limites) (P11) — décision 2026-10-02 : spec détaillée après validation POC."
+        - "Notes T404/T409 marquées historiques avec renvoi vers v2."
+    - id: G7
+      title: "Garde-fous et tests automatiques"
+      criticality: C2
+      content:
+        - "Mise à jour ou retrait coordonné de check_t407_udp_m3_link.py, check_t408_native_udp_poc.py, check_twinbench_m3_live_poc.py, check_twinbench_m3_poc_structure.py, check_twinbench_m3_poc_results.py, check_dredge_signal_catalog.py (P17)."
+        - "Autotest du lanceur : simulation de frappes sur le vrai code (pattern 2026-10-02 : extraction AST + Read-Host simulé) pour chaque choix de menu."
+        - "Test fenêtre de dialogue au premier plan (EnumWindows + GetForegroundWindow, pattern 2026-10-02)."
+        - "Tests passerelle : readiness, port occupé par processus étranger, schéma 2, ID session, écho PLC, dérive temps."
+        - "Si Q7=oui : script séparé (hors générateur) produisant une constante d'empreinte du code, lue en ligne dans les deux Applications (CW-04)."
+    - id: G8
+      title: "Recette Control Win (humaine, outillée)"
+      criticality: C3
+      content:
+        - "Exécution de la matrice acceptance_tests ci-dessous ; verdicts consignés dans DOC/WFLOW/T415-G_RECETTE_<date>.md."
+
+  # ── Critères d'acceptation (objectifs testables) ──
+  acceptance:
+    - id: AC1
+      statement: "Depuis TwinBench.cmd, le parcours complet jusqu'au chariot qui bouge piloté par le PLC tient en 6 actions humaines au plus, sans saisie de texte."
+      verified_by: "E2E-01 chronométré et compté par l'humain ; capture console + vue."
+    - id: AC2
+      statement: "Aucune question du lanceur n'exige un mot ; toute fenêtre de dialogue s'ouvre au premier plan."
+      verified_by: "Autotest frappes simulées LN-* + test EnumWindows/GetForegroundWindow."
+    - id: AC3
+      statement: "La vue M3 affiche en permanence le mode (PILOTÉE PAR PLC / SANS PLC) et l'état de liaison issu de l'écho PLC."
+      verified_by: "Captures LN-01 et choix 2 ; test unitaire du bandeau sur trames simulées."
+    - id: AC4
+      statement: "Aucun processus non identifié TwinBench n'est jamais arrêté par le lanceur."
+      verified_by: "LN-03, LN-06."
+    - id: AC5
+      statement: "SimulationModeActive=FALSE ferme le socket et met SimM3LinkReady/Timeout/Invalid à FALSE au scan suivant."
+      verified_by: "EL-05 sous Control Win (lecture GVL + Get-NetUDPEndpoint)."
+    - id: AC6
+      statement: "Un échec FIONBIO ne gèle jamais la MainTask."
+      verified_by: "EL-09 (revue de code + essai forcé)."
+    - id: AC7
+      statement: "Après une rafale de 50 trames en retard, la latence revient sous 2 scans."
+      verified_by: "EL-06 avec injecteur Python."
+    - id: AC8
+      statement: "Aucun saut silencieux d'image capteurs : bascule de source refusée en mouvement (si Q2), redémarrage de plante détecté par ID de session (si Q3)."
+      verified_by: "BS-01, BS-02, EL-04."
+    - id: AC9
+      statement: "Avec Device_CtrlWinSim chargé, aucun bus de terrain réel n'est démarré, même PC câblé."
+      verified_by: "CW-02 (statut onglets EtherCAT/CANopen) — obligatoire si Q1=oui."
+    - id: AC10
+      statement: "Un Login croisé (Device_CtrlWinSim -> CPU réel, Device -> Control Win) est refusé."
+      verified_by: "CW-01, capture du message CODESYS."
+    - id: AC11
+      statement: "Le guide permet à un tiers de créer Device_CtrlWinSim depuis un projet neuf sans aide."
+      verified_by: "Relecture humaine + exécution pas à pas sur une copie."
+    - id: AC12
+      statement: "Bundle complet + G200 PASS ; gates sans nouvel échec imputable au lot ; autotests TwinBench PASS."
+      verified_by: "generate_codesys_bundle.py, G200_check_linkage.py --report, run_all_gates.py, self-tests."
+
+  acceptance_tests:
+    - {id: LN-01, pre: "Rien de lancé", action: "Choix 1", expected: "Passerelle + vue ; [OK] seulement si port lié et ligne prête lue", auto: O}
+    - {id: LN-02, pre: "Passerelle active", action: "Choix 1 puis 2 (garder)", expected: "Aucun 2e processus", auto: O}
+    - {id: LN-03, pre: "Port 29061 tenu par un programme étranger", action: "Choix 1", expected: "[ECHEC] PID étranger affiché, rien n'est tué", auto: O}
+    - {id: LN-04, pre: "OpenModelica/OMSimulator absent", action: "Choix 1 et 2", expected: "[ECHEC] OpenModelica absent -> action", auto: O}
+    - {id: LN-05, pre: "Service Control Win arrêté", action: "Lecture en-tête / choix 1", expected: "KO affiché puis service démarré par choix 1, aucun download", auto: O}
+    - {id: LN-06, pre: "Un app.py étranger tourne", action: "Choix 4", expected: "Processus étranger intact", auto: O}
+    - {id: LN-07, pre: "Construction FMU > 5 s", action: "Choix 1", expected: "Pas de faux [OK]", auto: O}
+    - {id: GW-01, pre: "Passerelle", action: "Trames : mauvaise taille / en-tête / fréquence > 5000", expected: "Rejet + compteur", auto: O}
+    - {id: GW-02, pre: "Passerelle", action: "Séquence dupliquée, rebouclage FFFFFFFF->0", expected: "Rejet / acceptation", auto: O}
+    - {id: GW-03, pre: "Passerelle", action: "Endurance 2 h", expected: "Latence stable, disque borné", auto: P}
+    - {id: EL-01, pre: "Simulation intégrée IDE (handle 0)", action: "SimM3OpenModelicaActive=1", expected: "Ready=FALSE, aucun gel", auto: N}
+    - {id: EL-02, pre: "Control Win, passerelle absente", action: "SimM3OpenModelicaActive=1", expected: "Image initiale P1 (00011), LinkTimeout après 1 s, aucun gel", auto: N}
+    - {id: EL-03, pre: "Lien OK", action: "Tuer la passerelle", expected: "Image gelée, LinkTimeout + LinkInvalid", auto: N}
+    - {id: EL-04, pre: "EL-03", action: "Relancer passerelle avec reset P1", expected: "LinkInvalid 'plante réinitialisée', pas de saut silencieux", auto: N}
+    - {id: EL-05, pre: "Lien OK", action: "SimulationModeActive=0", expected: "SimM3Link*=FALSE, socket fermé", auto: N}
+    - {id: EL-06, pre: "Lien OK", action: "Rafale 50 trames", expected: "Latence < 2 scans", auto: P}
+    - {id: EL-07, pre: "Démarrage", action: "Comparer 1re trame FMU et image initiale", expected: "Identiques (00011)", auto: P}
+    - {id: EL-08, pre: "Lien OK", action: "Injecter mot capteurs 10100", expected: "Rejet, image gelée, signalé dans la vue", auto: P}
+    - {id: EL-09, pre: "Lien OK", action: "FIONBIO forcé en échec", expected: "Pas de gel de tâche", auto: N}
+    - {id: BS-01, pre: "M3 en mouvement", action: "Interne -> externe", expected: "Refus + diagnostic (si Q2)", auto: N}
+    - {id: BS-02, pre: "M3 à l'arrêt", action: "Interne <-> externe", expected: "Pas de saut d'image hors transition valide", auto: N}
+    - {id: CW-01, pre: "Deux devices", action: "Login croisé", expected: "Refus des deux côtés", auto: N}
+    - {id: CW-02, pre: "PC câblé au réseau terrain", action: "Run Device_CtrlWinSim", expected: "Aucun bus en OP", auto: N}
+    - {id: CW-03, pre: "Control Win démo", action: "> 2 h", expected: "Arrêt détecté et affiché", auto: P}
+    - {id: CW-04, pre: "Deux Applications", action: "Comparer empreintes", expected: "Identiques (si Q7)", auto: P}
+    - {id: E2E-01, pre: "Parcours complet", action: "Joystick simulé vers Trémie", expected: "Chariot qui bouge dans la vue, capteurs 00011 -> 00111 -> 01111 -> 11111", auto: N}
+
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/**
+      - TOOLS/AGENT_WORKFLOW/scripts/check_t40*.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_twinbench_*.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_dredge_signal_catalog.py
+      - CODE/L_SIMULATION/FB_Sim_Translation_ExtLink.st      # G1 seulement
+      - CODE/L_SIMULATION/FB_SimBench.st                     # G1 seulement
+      - CODE/L_SIMULATION/GVL_Simulation.st                  # G1 seulement (diagnostics)
+      - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md      # G6 fiche POC, nouvelle version selon §0 CODE_QUALITY_STANDARDS
+      - DOC/WFLOW/**
+    forbidden:
+      - TOOLS/CONVERTER_ST2XML_PLCopenXML/**                 # F6 décision humaine
+      - TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py
+      - CODE/M_MAIN/**                                       # sauf alerte préalable et GO humain
+      - CODE/I_TRANSLATION/**
+      - PRJ_CODESYS/**                                        # projet CODESYS = humain uniquement
+      - automate_reel
+      - suppression_automatique_de_fichiers
+      - commit_sans_validation
+      - push
+
+  conservation:
+    must_survive:
+      - "Bascule modèle ST interne / simulateur externe dans FB_SimBench ; le banc ST interne reste la source par défaut."
+      - "SimM3OpenModelicaActive reste un bit opérateur, jamais écrit par le code."
+      - "Loopback 127.0.0.1 uniquement ; aucun contact avec le CPU réel ; aucun download par le lanceur."
+      - "Gel de l'image sur perte de liaison ; état initial zone P1 sans AtPositionP1 forcé."
+      - "Tests T409 existants (protocole, cinématique, reprise) restent verts ou sont migrés à l'identique."
+      - "controlwin_runner disponible jusqu'à E2E-01 vert (plan de retour arrière)."
+    dropped_on_purpose:
+      - "Copie réécrite HW_SIM comme chemin nominal (remplacée par Device_CtrlWinSim) — décision humaine 2026-10-02."
+      - "Lanceurs 00_START / 10_PROJECT / 20_SIM (remplacés par TwinBench.cmd)."
+      - "Textes anglais du lanceur et de la vue."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "self-tests TwinBench (lanceur, passerelle, vue) PASS"
+    - "fiche de recette DOC/WFLOW/T415-G_RECETTE_<date>.md avec verdict par cas"
+
+  models_allowed:
+    - "claude-opus-5-5"
+    - "claude-sonnet-5-5"
+
+  alert_duty: >
+    Toute incohérence (spec, bug préexistant, risque sécurité, hypothèse non vérifiée présentée
+    comme un fait) est remontée immédiatement, avant écriture. Un essai non exécuté n'est jamais
+    déclaré réussi. Signaler n'est pas élargir le scope.
+
+  open_points:
+    - "G0 Q1..Q7 : décisions humaines requises avant G1/G2/G3."
+    - "Mémorisation AtPositionP1 (bug PLC réel) : hors scope, troubleshooting séparé."
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Contrat rédigé par CC01 après proposition + challenge expert. Aucun lot démarré.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    En attente des réponses G0 et du GO humain par lot.
