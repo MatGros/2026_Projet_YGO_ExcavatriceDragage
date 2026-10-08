@@ -40,8 +40,8 @@ equation
   plant.commands.cmdMoveToTremie = directionCmd < -0.05;
   plant.commands.cmdMoveToMaintenance = directionCmd > 0.05;
   plant.commands.cmdBrakeRelease = brakeReleaseCmd;
-  plant.commands.cmdFrequency_Hz = if abs(directionCmd) > 0.05 then
-    min(max(frequencyCmd_Hz, 0), plant.configuration.frequencyMax_Hz) else 0;
+  // Bornage 0..frequencyMax_Hz fait dans la plante (pas discret).
+  plant.commands.cmdFrequency_Hz = frequencyCmd_Hz;
 
   positionAct_M = plant.measurements.positionAct_M;
   velocityAct_Mps = plant.measurements.velocityAct_Mps;

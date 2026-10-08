@@ -261,82 +261,88 @@ ApplicationWindow {
                             }
                         }
                     }
-                    Text { text: "COMMANDE LIVE"; color: root.textMuted; font.pixelSize: 12; font.weight: Font.DemiBold }
-                    Item {
-                        id: joystick
-                        Layout.alignment: Qt.AlignHCenter
-                        Layout.preferredWidth: 240
-                        Layout.preferredHeight: 102
-                        Rectangle { anchors.centerIn: parent; width: 224; height: 58; radius: 29; color: "#171a1f"; border.color: "#444c56" }
-                        Rectangle { x: parent.width/2-1; y: 30; width: 2; height: 42; color: "#59616b" }
-                        Rectangle {
-                            id: stick
-                            width: 50; height: 50; radius: 25
-                            x: (parent.width-width)/2 + backend.direction * 82
-                            y: 26
-                            color: root.accent
-                            border.color: "#b8dcf3"
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            enabled: backend.source === "SIMULATION"
-                            onPressed: updateAxis(mouse.x)
-                            onPositionChanged: if (pressed) updateAxis(mouse.x)
-                            onReleased: backend.manualJoystick(0)
-                            function updateAxis(mouseX) { backend.manualJoystick(Math.max(-1, Math.min(1, (mouseX - width/2) / 82))) }
-                        }
-                        Text { anchors.left: parent.left; anchors.bottom: parent.bottom; text: "◀ TRÉMIE"; color: root.textMuted; font.pixelSize: 11 }
-                        Text { anchors.right: parent.right; anchors.bottom: parent.bottom; text: "MAINT. ▶"; color: root.textMuted; font.pixelSize: 11 }
-                    }
-                    Text { text: "Consigne fréquence  " + Math.round(freqSlider.value) + " Hz"; color: root.textMain; font.pixelSize: 13 }
-                    Slider {
-                        id: freqSlider
+                    // Commandes écran : utiles seulement en simulation locale (neutralisées en mode relié au PLC).
+                    ColumnLayout {
+                        visible: backend.source === "SIMULATION"
                         Layout.fillWidth: true
-                        enabled: backend.source === "SIMULATION"
-                        from: 0; to: 50; stepSize: 1; value: 40
-                        onMoved: backend.frequencyRequest = value
-                    }
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Button { text: backend.running ? "Pause" : "Démarrer"; Layout.fillWidth: true; enabled: backend.source === "SIMULATION"; onClicked: backend.running ? backend.pause() : backend.start() }
-                        Button { text: "Reset P1"; enabled: backend.source === "SIMULATION"; onClicked: backend.reset() }
-                    }
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Button {
-                            text: backend.autoCycleActive ? "AUTO-CYCLE : STOP" : (backend.autoCycleCount > 0 ? "REJOUER AUTO-CYCLE" : "AUTO-CYCLE")
-                            Layout.preferredWidth: 158
-                            enabled: backend.source === "SIMULATION"
-                            onClicked: backend.toggleAutoCycle()
-                            background: Rectangle {
-                                radius: 5
-                                color: backend.autoCycleActive ? "#d7a95b" : "#63a7d8"
-                                border.color: backend.autoCycleActive ? "#f0d6a7" : "#b8dcf3"
+                        spacing: 10
+                        Text { text: "COMMANDE LIVE"; color: root.textMuted; font.pixelSize: 12; font.weight: Font.DemiBold }
+                        Item {
+                            id: joystick
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredWidth: 240
+                            Layout.preferredHeight: 102
+                            Rectangle { anchors.centerIn: parent; width: 224; height: 58; radius: 29; color: "#171a1f"; border.color: "#444c56" }
+                            Rectangle { x: parent.width/2-1; y: 30; width: 2; height: 42; color: "#59616b" }
+                            Rectangle {
+                                id: stick
+                                width: 50; height: 50; radius: 25
+                                x: (parent.width-width)/2 + backend.direction * 82
+                                y: 26
+                                color: root.accent
+                                border.color: "#b8dcf3"
                             }
-                            contentItem: Text {
-                                text: parent.text
-                                color: "#15181d"
-                                font.pixelSize: 12
-                                font.weight: Font.DemiBold
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
-                            }
-                        }
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 34
-                            radius: 5
-                            color: backend.autoCycleActive ? "#304a3b" : (backend.autoCycleCount > 0 ? "#263442" : "transparent")
-                            border.color: backend.autoCycleActive ? "#77ae8b" : (backend.autoCycleCount > 0 ? "#63a7d8" : "transparent")
-                            Text {
+                            MouseArea {
                                 anchors.fill: parent
-                                anchors.margins: 5
-                                text: backend.autoCycleActive ? backend.autoCyclePhaseText + " · " + backend.autoCycleCount + " cycle(s)" : (backend.autoCycleCount > 0 ? backend.autoCyclePhaseText + " · " + backend.autoCycleCount + " terminé(s)" : "Simulation seule")
-                                color: "#edf0f3"
-                                font.pixelSize: 11
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
+                                enabled: backend.source === "SIMULATION"
+                                onPressed: updateAxis(mouse.x)
+                                onPositionChanged: if (pressed) updateAxis(mouse.x)
+                                onReleased: backend.manualJoystick(0)
+                                function updateAxis(mouseX) { backend.manualJoystick(Math.max(-1, Math.min(1, (mouseX - width/2) / 82))) }
+                            }
+                            Text { anchors.left: parent.left; anchors.bottom: parent.bottom; text: "◀ TRÉMIE"; color: root.textMuted; font.pixelSize: 11 }
+                            Text { anchors.right: parent.right; anchors.bottom: parent.bottom; text: "MAINT. ▶"; color: root.textMuted; font.pixelSize: 11 }
+                        }
+                        Text { text: "Consigne fréquence  " + Math.round(freqSlider.value) + " Hz"; color: root.textMain; font.pixelSize: 13 }
+                        Slider {
+                            id: freqSlider
+                            Layout.fillWidth: true
+                            enabled: backend.source === "SIMULATION"
+                            from: 0; to: 50; stepSize: 1; value: 40
+                            onMoved: backend.frequencyRequest = value
+                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Button { text: backend.running ? "Pause" : "Démarrer"; Layout.fillWidth: true; enabled: backend.source === "SIMULATION"; onClicked: backend.running ? backend.pause() : backend.start() }
+                            Button { text: "Reset P1"; enabled: backend.source === "SIMULATION"; onClicked: backend.reset() }
+                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Button {
+                                text: backend.autoCycleActive ? "AUTO-CYCLE : STOP" : (backend.autoCycleCount > 0 ? "REJOUER AUTO-CYCLE" : "AUTO-CYCLE")
+                                Layout.preferredWidth: 158
+                                enabled: backend.source === "SIMULATION"
+                                onClicked: backend.toggleAutoCycle()
+                                background: Rectangle {
+                                    radius: 5
+                                    color: backend.autoCycleActive ? "#d7a95b" : "#63a7d8"
+                                    border.color: backend.autoCycleActive ? "#f0d6a7" : "#b8dcf3"
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: "#15181d"
+                                    font.pixelSize: 12
+                                    font.weight: Font.DemiBold
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                    elide: Text.ElideRight
+                                }
+                            }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 34
+                                radius: 5
+                                color: backend.autoCycleActive ? "#304a3b" : (backend.autoCycleCount > 0 ? "#263442" : "transparent")
+                                border.color: backend.autoCycleActive ? "#77ae8b" : (backend.autoCycleCount > 0 ? "#63a7d8" : "transparent")
+                                Text {
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    text: backend.autoCycleActive ? backend.autoCyclePhaseText + " · " + backend.autoCycleCount + " cycle(s)" : (backend.autoCycleCount > 0 ? backend.autoCyclePhaseText + " · " + backend.autoCycleCount + " terminé(s)" : "Simulation seule")
+                                    color: "#edf0f3"
+                                    font.pixelSize: 11
+                                    verticalAlignment: Text.AlignVCenter
+                                    elide: Text.ElideRight
+                                }
                             }
                         }
                     }
@@ -354,7 +360,7 @@ ApplicationWindow {
                         Text { text: backend.hardStop ? "ACTIVE" : "libre"; color: backend.hardStop ? root.warning : root.textMain; font.pixelSize: 12; font.bold: true }
                     }
                     Item { Layout.fillHeight: true }
-                    Text { text: "Joystick prioritaire : il coupe AUTO-CYCLE au prochain pas de 10 ms."; color: root.textMuted; wrapMode: Text.WordWrap; Layout.fillWidth: true; font.pixelSize: 11 }
+                    Text { visible: backend.source === "SIMULATION"; text: "Joystick prioritaire : il coupe AUTO-CYCLE au prochain pas de 10 ms."; color: root.textMuted; wrapMode: Text.WordWrap; Layout.fillWidth: true; font.pixelSize: 11 }
                 }
             }
 
@@ -381,7 +387,7 @@ ApplicationWindow {
                         spacing: 4
                         RowLayout {
                             Layout.fillWidth: true
-                            Text { text: root.showFrozenCapture ? "ACCOSTAGE BUTÉE — TRACE FIGÉE" : (backend.dataAvailable ? "TRACE LIVE — 2 SECONDES" : backend.telemetryStatus); color: root.textMuted; font.pixelSize: 12; font.weight: Font.DemiBold }
+                            Text { text: root.showFrozenCapture ? "ACCOSTAGE BUTÉE — TRACE FIGÉE" : (backend.dataAvailable ? "TRACE LIVE — " + backend.liveWindowSeconds.toFixed(0) + " SECONDES" : backend.telemetryStatus); color: root.textMuted; font.pixelSize: 12; font.weight: Font.DemiBold }
                             Button {
                                 text: "LIVE"
                                 onClicked: root.showFrozenCapture = false
@@ -400,6 +406,8 @@ ApplicationWindow {
                             Text { text: "Hz mesurés"; color: root.textMuted; font.pixelSize: 11 }
                             Rectangle { width: 16; height: 2; color: root.warning }
                             Text { text: "Hz consigne"; color: root.textMuted; font.pixelSize: 11 }
+                            Rectangle { width: 16; height: 2; color: root.ok; visible: !root.showFrozenCapture }
+                            Text { text: "Position (m, axe droit)"; color: root.textMuted; font.pixelSize: 11; visible: !root.showFrozenCapture }
                             Text { text: root.showFrozenCapture ? backend.captureStatus : backend.tracePointLabel; color: root.showFrozenCapture ? root.warning : root.textMuted; font.pixelSize: 11 }
                         }
                         Canvas {
@@ -438,8 +446,9 @@ ApplicationWindow {
                                 if (pts.length < 2) return
                                 var frozen = root.showFrozenCapture
                                 var tMax = pts[pts.length-1][0]
-                                var tMin = frozen ? backend.captureTriggerTime - 1.0 : Math.max(0, tMax-2.0)
-                                var timeSpan = frozen ? 2.0 : 2.0
+                                var liveSpan = backend.liveWindowSeconds
+                                var tMin = frozen ? backend.captureTriggerTime - 1.0 : Math.max(0, tMax-liveSpan)
+                                var timeSpan = frozen ? 2.0 : liveSpan
                                 function timeToX(t) { return left + (t-tMin)/timeSpan*(w-left-right) }
                                 function valueToY(v) { return top + (50-Math.max(0,Math.min(50,v)))/50*(h-top-bottom-2) }
                                 ctx.strokeStyle = root.warning; ctx.lineWidth = 1.5; ctx.beginPath()
@@ -466,7 +475,26 @@ ApplicationWindow {
                                     ctx.fillStyle = "#7e8792"; ctx.font = "10px Consolas"
                                     ctx.fillText("−1 s",left,h-8); ctx.fillText("0 · BUTÉE",Math.max(left,triggerX+3),h-8); ctx.fillText("+1 s",w-right-35,h-8)
                                 } else {
-                                    ctx.fillStyle = "#7e8792"; ctx.font = "10px Consolas"; ctx.fillText(tMin.toFixed(2)+" s", left, h-8); ctx.fillText(tMax.toFixed(2)+" s", w-right-42, h-8)
+                                    // Position (axe droit 0..30,3 m) : c'est elle qui montre l'accostage.
+                                    var posMax = 30.3
+                                    function posToY(p) { return top + (posMax-Math.max(0,Math.min(posMax,p)))/posMax*(h-top-bottom-2) }
+                                    ctx.strokeStyle = root.ok; ctx.lineWidth = 1.5; ctx.beginPath(); started = false
+                                    for (i=0; i<pts.length; ++i) if (pts[i][0] >= tMin) {
+                                        if (!started) { ctx.moveTo(timeToX(pts[i][0]),posToY(pts[i][4])); started=true } else ctx.lineTo(timeToX(pts[i][0]),posToY(pts[i][4]))
+                                    }
+                                    ctx.stroke()
+                                    ctx.fillStyle = root.ok; ctx.font = "10px Consolas"
+                                    for (var m=0; m<=3; ++m) { var pm = m*10; ctx.fillText(pm+" m", w-right-30, posToY(pm)-2) }
+                                    // Fronts capteurs : trait vertical pointillé + libellé (P1↓, Trémie↑…).
+                                    var marks = backend.traceMarkers
+                                    ctx.setLineDash([3,3]); ctx.strokeStyle = "#8f98a3"; ctx.lineWidth = 1
+                                    for (var k=0; k<marks.length; ++k) if (marks[k][0] >= tMin) {
+                                        var mx = timeToX(marks[k][0])
+                                        ctx.beginPath(); ctx.moveTo(mx,top); ctx.lineTo(mx,h-bottom); ctx.stroke()
+                                        ctx.fillStyle = "#edf0f3"; ctx.fillText(marks[k][1], mx+2, top+10+(k%3)*11)
+                                    }
+                                    ctx.setLineDash([])
+                                    ctx.fillStyle = "#7e8792"; ctx.font = "10px Consolas"; ctx.fillText(tMin.toFixed(1)+" s", left, h-8); ctx.fillText(tMax.toFixed(1)+" s", w-right-42, h-8)
                                 }
                             }
                         }

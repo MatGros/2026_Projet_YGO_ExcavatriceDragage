@@ -43,11 +43,9 @@ def check_loop(rows: list[dict[str, str]], cycles: int, frequency_hz: float) -> 
         errors.append(f"vitesse incohérente: {max(velocities):.4f} m/s")
     if abs(frequencies[0]) > 1e-9:
         errors.append(f"rampe non nulle à t=0: {frequencies[0]:.4f} Hz")
-    for diagnostic in (
-        "plant.diagnostics.commandConflict",
-        "plant.diagnostics.hardStopMaintenanceActive",
-        "plant.diagnostics.hardStopTremieActive",
-    ):
+    # Butées autorisées : en parité FB_Sim_Translation, la boucle locale (sans petite
+    # vitesse) finit en butée après la came. Seul le conflit de commande est interdit.
+    for diagnostic in ("plant.diagnostics.commandConflict",):
         if any(round(number(row, diagnostic)) != 0 for row in rows):
             errors.append(f"diagnostic actif pendant la boucle: {diagnostic}")
     return errors
@@ -73,7 +71,7 @@ def main() -> int:
 
     scripted = load(args.results / "M3_AllerRetour_res.csv")
     scripted_positions = [number(row, "plant.measurements.positionAct_M") for row in scripted]
-    if min(scripted_positions) > -0.299 or max(scripted_positions) < 30.299:
+    if min(scripted_positions) > 0.001 or max(scripted_positions) < 29.999:
         errors.append(
             "AllerRetour ne rejoint pas les deux butées mécaniques: "
             f"min={min(scripted_positions):.4f}, max={max(scripted_positions):.4f}"

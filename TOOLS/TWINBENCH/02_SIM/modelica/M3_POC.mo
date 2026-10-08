@@ -8,21 +8,28 @@ package M3_POC "POC graphique de translation M3 — sans logique PLC"
     Real cmdFrequency_Hz "Consigne variateur";
   end M3Commands;
 
-  record M3Configuration "Paramètres physiques et hypothèses du POC"
-    Real frequencyMax_Hz=50 "[CODE PLC] Fréquence maximale";
-    Real gain_MpsPerHz=0.02 "[HYPOTHESE] 50 Hz = 1 m/s";
-    Real acceleration_HzPerS=20 "[CODE PLC] Rampe montée 40 %/s";
-    Real deceleration_HzPerS=25 "[CODE PLC] Rampe descente 50 %/s";
-    Real brakeOpenTime_S=0.20 "[SIMPLIFIE] 100 ms contacteur + 100 ms magnétisation";
-    Real brakeCloseTime_S=0.10 "[HYPOTHESE] À mesurer";
-    Real tremieSensor_M=0 "[CODE PLC] Capteur Trémie";
+  record M3Configuration
+    "Paramètres de la plante — PARITÉ avec FB_Sim_Translation (CODE/L_SIMULATION)"
+    Real samplePeriod_S=0.01 "[PARITE] Pas discret = cycle du modèle ST";
+    Real frequencyMax_Hz=50 "[CODE PLC] Fréquence maximale (consigne PLC réelle, Q2)";
+    Real gain_MpsPerHz=0.02 "[PARITE] 30 m / (40 Hz x 37,5 s) = estimateur PLC";
+    Real acceleration_HzPerS=20 "[PARITE] FB_Sim_Translation.AccelRate_HzPerS";
+    Real deceleration_HzPerS=20 "[PARITE] FB_Sim_Translation.DecelRate_HzPerS";
+    Real driveTimeConstant_S=0.15 "[PARITE] Réponse variateur 1er ordre";
+    Real brakeOpenTime_S=0.10 "[PARITE] Délai mécanique d'ouverture";
+    Real brakeCloseTime_S=0.09 "[PARITE] Délai mécanique de fermeture";
+    Real brakeContactDelay_S=0.01 "[PARITE] Contact auxiliaire après la mécanique";
+    Real brakeStopFrequency_Hz=0.5 "[PARITE] Le frein ne retombe que sous ce seuil";
+    Real tremieSensor_M=0.05 "[PARITE] Came Trémie avant butée";
     Real pvSensor_M=5 "[CODE PLC] Capteur PV";
     Real p2Sensor_M=15 "[CODE PLC] Capteur P2";
     Real p1Sensor_M=20 "[CODE PLC] Capteur P1";
-    Real maintenanceSensor_M=30 "[CODE PLC] Capteur Maintenance";
-    Real tremieMechanicalStop_M=-0.30 "[HYPOTHESE] Butée 30 cm après capteur";
-    Real maintenanceMechanicalStop_M=30.30 "[HYPOTHESE] Butée 30 cm après capteur";
-    Real initialPosition_M=20 "[CONFIG] Position initiale FMU ; doit être référencée par le scénario";
+    Real maintenanceSensor_M=29.95 "[PARITE] Came Maintenance avant butée";
+    Real sensorHysteresis_M=0.02 "[PARITE] Hystérésis des cames";
+    Real sensorElectricalDelay_S=0.01 "[PARITE] Retard électrique DI";
+    Real tremieMechanicalStop_M=0 "[PARITE] Butée Trémie";
+    Real maintenanceMechanicalStop_M=30 "[PARITE] Butée Maintenance";
+    Real initialPosition_M=20 "[PARITE] Départ en P1 (mot 00011)";
   end M3Configuration;
 
   record M3Measurements "Mesures analogiques de la plante"
@@ -67,47 +74,284 @@ package M3_POC "POC graphique de translation M3 — sans logique PLC"
     Real phaseElapsed_S "Temps écoulé dans la phase courante";
   end M3LoopState;
 
-  block BrakeActuator "Actionneur de frein simplifié à temps ouverture/fermeture distincts"
-    parameter Real openTime_S=0.20;
-    parameter Real closeTime_S=0.10;
-    Modelica.Blocks.Interfaces.BooleanInput releaseRequest;
-    Modelica.Blocks.Interfaces.BooleanOutput isOpen;
-  protected
-    Real openingRatio(start=0, fixed=true);
-  equation
-    der(openingRatio) = ((if releaseRequest then 1 else 0) - openingRatio) /
-      (if releaseRequest then openTime_S else closeTime_S);
-    isOpen = openingRatio >= 0.95;
-    annotation(
-      Icon(graphics={Rectangle(extent={{-100,100},{100,-100}}, lineColor={80,80,80}, fillColor={230,230,230}, fillPattern=FillPattern.Solid), Ellipse(extent={{-55,55},{55,-55}}, lineColor={160,60,20}, lineThickness=1), Text(extent={{-90,25},{90,-25}}, textString="FREIN")}),
-      Documentation(info="<html><p>Modèle physique simplifié, sans logique PLC. Les délais sont visibles et paramétrables.</p></html>"));
-  end BrakeActuator;
+  record M3PlantState "État interne discret de la plante (non publié)"
+    Real frequencyCmd_Hz "Sortie de rampe";
+    Real electricalFrequency_Hz;
+    Real actualFrequency_Hz;
+    Real travelDirection "Sens mémorisé pendant la décélération";
+    Real velocity_Mps;
+    Real position_M;
+    Boolean brakeMechanicallyOpen;
+    Boolean brakeContactOpen;
+    Real brakeTimer_S;
+    Real contactTimer_S;
+    Boolean hardStopTremie;
+    Boolean hardStopMaintenance;
+    Boolean rawTremie;
+    Boolean outTremie "Came Tremie (DI vers le PLC)";
+    Real timerTremie_S;
+    Boolean rawPv;
+    Boolean outPv "Came Pv (DI vers le PLC)";
+    Real timerPv_S;
+    Boolean rawP2;
+    Boolean outP2 "Came P2 (DI vers le PLC)";
+    Real timerP2_S;
+    Boolean rawP1;
+    Boolean outP1 "Came P1 (DI vers le PLC)";
+    Real timerP1_S;
+    Boolean rawMaintenance;
+    Boolean outMaintenance "Came Maintenance (DI vers le PLC)";
+    Real timerMaintenance_S;
+  end M3PlantState;
 
-  block SensorBank "Cinq capteurs de position cumulatifs"
-    parameter Real tremie_M=0;
-    parameter Real pv_M=5;
-    parameter Real p2_M=15;
-    parameter Real p1_M=20;
-    parameter Real maintenance_M=30;
-    Modelica.Blocks.Interfaces.RealInput position_M;
-    Modelica.Blocks.Interfaces.BooleanOutput tremie;
-    Modelica.Blocks.Interfaces.BooleanOutput pv;
-    Modelica.Blocks.Interfaces.BooleanOutput p2;
-    Modelica.Blocks.Interfaces.BooleanOutput p1;
-    Modelica.Blocks.Interfaces.BooleanOutput maintenance;
-    output Integer sensorsWord;
-  equation
-    tremie = position_M <= tremie_M;
-    pv = position_M <= pv_M;
-    p2 = position_M <= p2_M;
-    p1 = position_M <= p1_M;
-    maintenance = position_M < maintenance_M;
-    sensorsWord = (if tremie then 16 else 0) + (if pv then 8 else 0) +
-      (if p2 then 4 else 0) + (if p1 then 2 else 0) + (if maintenance then 1 else 0);
-    annotation(
-      Icon(graphics={Rectangle(extent={{-100,100},{100,-100}}, lineColor={80,80,80}, fillColor={235,245,235}, fillPattern=FillPattern.Solid), Text(extent={{-90,25},{90,-25}}, textString="CAPTEURS")}),
-      Documentation(info="<html><p>Encode la chaîne cumulative terrain en mot 11111 → 00000.</p></html>"));
-  end SensorBank;
+  function camStep "Une came cumulative : hystérésis puis retard électrique (FB_Sim_PositionSensor)"
+    input Boolean rawPrev;
+    input Boolean outPrev;
+    input Real timerPrev_S;
+    input Real position_M;
+    input Real threshold_M;
+    input Real hysteresis_M;
+    input Real delay_S;
+    input Real ts;
+    output Boolean raw;
+    output Boolean out;
+    output Real timer_S;
+  algorithm
+    raw := if rawPrev then position_M <= threshold_M + hysteresis_M
+      else position_M <= threshold_M - hysteresis_M;
+    out := outPrev;
+    timer_S := timerPrev_S;
+    if out <> raw then
+      timer_S := timer_S + ts;
+      if timer_S >= delay_S - 1e-6 then
+        out := raw;
+        timer_S := 0;
+      end if;
+    else
+      timer_S := 0;
+    end if;
+  end camStep;
+
+  function plantStep
+    "Un pas de 10 ms, même ordre que FB_Sim_Translation : variateur, frein, sens, mouvement, cames"
+    input M3Commands cmd;
+    input M3Configuration c;
+    input M3PlantState p "État au pas précédent";
+    output M3PlantState s;
+  protected
+    Real ts = c.samplePeriod_S;
+    Real alpha = c.samplePeriod_S / (c.driveTimeConstant_S + c.samplePeriod_S)
+      "Identique à FB_Sim_TranslationDrive.ResponseAlpha";
+    Real direction;
+    Real frequencyTarget_Hz;
+    Real frequencyDelta_Hz;
+    Real frequencyStep_Hz;
+    Real velocityTarget_Mps;
+    Real positionCandidate_M;
+  algorithm
+    s := p;
+    // 1. Variateur : rampe puis réponse 1er ordre (FB_Sim_TranslationDrive).
+    direction := if cmd.cmdMoveToTremie and not cmd.cmdMoveToMaintenance then -1
+      elseif cmd.cmdMoveToMaintenance and not cmd.cmdMoveToTremie then 1 else 0;
+    frequencyTarget_Hz := if abs(direction) > 0.5 then
+      min(max(cmd.cmdFrequency_Hz, 0), c.frequencyMax_Hz) else 0;
+    frequencyDelta_Hz := frequencyTarget_Hz - s.frequencyCmd_Hz;
+    frequencyStep_Hz := (if frequencyDelta_Hz >= 0 then c.acceleration_HzPerS
+      else c.deceleration_HzPerS) * ts;
+    s.frequencyCmd_Hz := s.frequencyCmd_Hz + min(max(frequencyDelta_Hz, -frequencyStep_Hz), frequencyStep_Hz);
+    s.electricalFrequency_Hz := s.electricalFrequency_Hz + alpha * (s.frequencyCmd_Hz - s.electricalFrequency_Hz);
+    s.actualFrequency_Hz := if s.electricalFrequency_Hz < 0.005 then 0 else s.electricalFrequency_Hz;
+
+    // 2. Frein (FB_Sim_TranslationBrake) : il ne retombe que sous le seuil d'arrêt.
+    if cmd.cmdBrakeRelease then
+      if not s.brakeMechanicallyOpen then
+        s.brakeTimer_S := s.brakeTimer_S + ts;
+        if s.brakeTimer_S >= c.brakeOpenTime_S - 1e-6 then
+          s.brakeMechanicallyOpen := true;
+          s.brakeTimer_S := 0;
+        end if;
+      else
+        s.brakeTimer_S := 0;
+      end if;
+    elseif s.actualFrequency_Hz <= c.brakeStopFrequency_Hz then
+      if s.brakeMechanicallyOpen then
+        s.brakeTimer_S := s.brakeTimer_S + ts;
+        if s.brakeTimer_S >= c.brakeCloseTime_S - 1e-6 then
+          s.brakeMechanicallyOpen := false;
+          s.brakeTimer_S := 0;
+        end if;
+      else
+        s.brakeTimer_S := 0;
+      end if;
+    else
+      s.brakeTimer_S := 0;
+    end if;
+    if s.brakeMechanicallyOpen <> s.brakeContactOpen then
+      s.contactTimer_S := s.contactTimer_S + ts;
+      if s.contactTimer_S >= c.brakeContactDelay_S - 1e-6 then
+        s.brakeContactOpen := s.brakeMechanicallyOpen;
+        s.contactTimer_S := 0;
+      end if;
+    else
+      s.contactTimer_S := 0;
+    end if;
+
+    // 3. Sens mémorisé : conservé pendant la décélération libre, purgé à l'arrêt.
+    if abs(direction) > 0.5 then
+      s.travelDirection := direction;
+    elseif cmd.cmdMoveToTremie and cmd.cmdMoveToMaintenance then
+      s.travelDirection := 0;
+    elseif s.actualFrequency_Hz <= c.brakeStopFrequency_Hz then
+      s.travelDirection := 0;
+    end if;
+
+    // 4. Mouvement : frein serré = vitesse nulle ; butées rigides.
+    velocityTarget_Mps := if s.brakeMechanicallyOpen then
+      s.travelDirection * c.gain_MpsPerHz * s.actualFrequency_Hz else 0;
+    s.velocity_Mps := s.velocity_Mps + alpha * (velocityTarget_Mps - s.velocity_Mps);
+    if not s.brakeMechanicallyOpen then
+      s.velocity_Mps := 0;
+    end if;
+    positionCandidate_M := s.position_M + s.velocity_Mps * ts;
+    s.hardStopTremie := false;
+    s.hardStopMaintenance := false;
+    if positionCandidate_M < c.tremieMechanicalStop_M then
+      s.position_M := c.tremieMechanicalStop_M;
+      s.velocity_Mps := 0;
+      s.hardStopTremie := true;
+    elseif positionCandidate_M > c.maintenanceMechanicalStop_M then
+      s.position_M := c.maintenanceMechanicalStop_M;
+      s.velocity_Mps := 0;
+      s.hardStopMaintenance := true;
+    else
+      s.position_M := positionCandidate_M;
+    end if;
+
+    // 5. Cames cumulatives (FB_Sim_PositionSensor).
+    (s.rawTremie, s.outTremie, s.timerTremie_S) := camStep(s.rawTremie, s.outTremie, s.timerTremie_S,
+      s.position_M, c.tremieSensor_M, c.sensorHysteresis_M, c.sensorElectricalDelay_S, ts);
+    (s.rawPv, s.outPv, s.timerPv_S) := camStep(s.rawPv, s.outPv, s.timerPv_S,
+      s.position_M, c.pvSensor_M, c.sensorHysteresis_M, c.sensorElectricalDelay_S, ts);
+    (s.rawP2, s.outP2, s.timerP2_S) := camStep(s.rawP2, s.outP2, s.timerP2_S,
+      s.position_M, c.p2Sensor_M, c.sensorHysteresis_M, c.sensorElectricalDelay_S, ts);
+    (s.rawP1, s.outP1, s.timerP1_S) := camStep(s.rawP1, s.outP1, s.timerP1_S,
+      s.position_M, c.p1Sensor_M, c.sensorHysteresis_M, c.sensorElectricalDelay_S, ts);
+    (s.rawMaintenance, s.outMaintenance, s.timerMaintenance_S) := camStep(s.rawMaintenance, s.outMaintenance, s.timerMaintenance_S,
+      s.position_M, c.maintenanceSensor_M, c.sensorHysteresis_M, c.sensorElectricalDelay_S, ts);
+  end plantStep;
+
+  constant Integer stateSize = 27 "Taille de l'état empaqueté";
+
+  function packState "Record -> vecteur Real (contournement export FMU OpenModelica 1.27)"
+    input M3PlantState s;
+    output Real x[stateSize];
+  algorithm
+    x := {s.frequencyCmd_Hz,
+      s.electricalFrequency_Hz,
+      s.actualFrequency_Hz,
+      s.travelDirection,
+      s.velocity_Mps,
+      s.position_M,
+      if s.brakeMechanicallyOpen then 1 else 0,
+      if s.brakeContactOpen then 1 else 0,
+      s.brakeTimer_S,
+      s.contactTimer_S,
+      if s.hardStopTremie then 1 else 0,
+      if s.hardStopMaintenance then 1 else 0,
+      if s.rawTremie then 1 else 0,
+      if s.outTremie then 1 else 0,
+      s.timerTremie_S,
+      if s.rawPv then 1 else 0,
+      if s.outPv then 1 else 0,
+      s.timerPv_S,
+      if s.rawP2 then 1 else 0,
+      if s.outP2 then 1 else 0,
+      s.timerP2_S,
+      if s.rawP1 then 1 else 0,
+      if s.outP1 then 1 else 0,
+      s.timerP1_S,
+      if s.rawMaintenance then 1 else 0,
+      if s.outMaintenance then 1 else 0,
+      s.timerMaintenance_S};
+  end packState;
+
+  function unpackState "Vecteur Real -> record"
+    input Real x[stateSize];
+    output M3PlantState s;
+  algorithm
+    s.frequencyCmd_Hz := x[1];
+    s.electricalFrequency_Hz := x[2];
+    s.actualFrequency_Hz := x[3];
+    s.travelDirection := x[4];
+    s.velocity_Mps := x[5];
+    s.position_M := x[6];
+    s.brakeMechanicallyOpen := x[7] > 0.5;
+    s.brakeContactOpen := x[8] > 0.5;
+    s.brakeTimer_S := x[9];
+    s.contactTimer_S := x[10];
+    s.hardStopTremie := x[11] > 0.5;
+    s.hardStopMaintenance := x[12] > 0.5;
+    s.rawTremie := x[13] > 0.5;
+    s.outTremie := x[14] > 0.5;
+    s.timerTremie_S := x[15];
+    s.rawPv := x[16] > 0.5;
+    s.outPv := x[17] > 0.5;
+    s.timerPv_S := x[18];
+    s.rawP2 := x[19] > 0.5;
+    s.outP2 := x[20] > 0.5;
+    s.timerP2_S := x[21];
+    s.rawP1 := x[22] > 0.5;
+    s.outP1 := x[23] > 0.5;
+    s.timerP1_S := x[24];
+    s.rawMaintenance := x[25] > 0.5;
+    s.outMaintenance := x[26] > 0.5;
+    s.timerMaintenance_S := x[27];
+  end unpackState;
+
+  function initialState "Démarrage : chariot immobile, frein serré, cames calculées à la position initiale"
+    input M3Configuration c;
+    output Real x[stateSize];
+  protected
+    M3PlantState s;
+  algorithm
+    s.frequencyCmd_Hz := 0;
+    s.electricalFrequency_Hz := 0;
+    s.actualFrequency_Hz := 0;
+    s.travelDirection := 0;
+    s.velocity_Mps := 0;
+    s.position_M := c.initialPosition_M;
+    s.brakeMechanicallyOpen := false;
+    s.brakeContactOpen := false;
+    s.brakeTimer_S := 0;
+    s.contactTimer_S := 0;
+    s.hardStopTremie := false;
+    s.hardStopMaintenance := false;
+    s.rawTremie := c.initialPosition_M <= c.tremieSensor_M;
+    s.outTremie := s.rawTremie;
+    s.timerTremie_S := 0;
+    s.rawPv := c.initialPosition_M <= c.pvSensor_M;
+    s.outPv := s.rawPv;
+    s.timerPv_S := 0;
+    s.rawP2 := c.initialPosition_M <= c.p2Sensor_M;
+    s.outP2 := s.rawP2;
+    s.timerP2_S := 0;
+    s.rawP1 := c.initialPosition_M <= c.p1Sensor_M;
+    s.outP1 := s.rawP1;
+    s.timerP1_S := 0;
+    s.rawMaintenance := c.initialPosition_M <= c.maintenanceSensor_M;
+    s.outMaintenance := s.rawMaintenance;
+    s.timerMaintenance_S := 0;
+    x := packState(s);
+  end initialState;
+
+  function plantStepPacked "Pas de plante sur l'état empaqueté"
+    input M3Commands cmd;
+    input M3Configuration c;
+    input Real p[stateSize];
+    output Real x[stateSize];
+  algorithm
+    x := packState(plantStep(cmd, c, unpackState(p)));
+  end plantStepPacked;
 
   block LocalLoopController
     "Générateur de stimuli fermé sur les capteurs — banc uniquement, aucune logique PLC"
@@ -122,9 +366,6 @@ package M3_POC "POC graphique de translation M3 — sans logique PLC"
   equation
     assert(configuration.frequency_Hz >= 0,
       "M3 loop: frequency_Hz doit être positive ou nulle");
-    assert(configuration.initialPosition_M >= configuration.tremieMechanicalStop_M and
-      configuration.initialPosition_M <= configuration.maintenanceMechanicalStop_M,
-      "M3: initialPosition_M hors des butées mécaniques");
     assert(configuration.pauseAtTremie_S >= 0 and configuration.pauseAtMaintenance_S >= 0,
       "M3 loop: les pauses doivent être positives ou nulles");
     assert(configuration.cycleCount >= 0,
@@ -171,7 +412,8 @@ package M3_POC "POC graphique de translation M3 — sans logique PLC"
       Documentation(info="<html><p>Contrôleur de <b>banc d'essai</b> autonome. Il produit seulement des stimuli pour la plante et ne représente pas le PLC. Il inverse le sens sur les retours capteurs Trémie/Maintenance et peut boucler sans limite lorsque <code>cycleCount=0</code>.</p></html>"));
   end LocalLoopController;
 
-  model TranslationM3 "Chaîne M3 visible dans la vue Diagramme OMEdit"
+  model TranslationM3
+    "Plante M3 discrète (10 ms) — transposition du chemin nominal de FB_Sim_Translation"
     input M3Commands commands;
     parameter M3Configuration configuration;
     output M3Measurements measurements;
@@ -180,113 +422,46 @@ package M3_POC "POC graphique de translation M3 — sans logique PLC"
     output M3Diagnostics diagnostics;
 
   protected
-    Real positionClamped_M;
-    discrete Real directionSign(start=0, fixed=true)
-      "Sens moteur mémorisé pendant la rampe de décélération";
-    Modelica.Blocks.Sources.RealExpression direction(
-      y=if commands.cmdMoveToTremie and not commands.cmdMoveToMaintenance then -1 else
-        if commands.cmdMoveToMaintenance and not commands.cmdMoveToTremie then 1 else 0)
-      annotation(Placement(transformation(extent={{-90,48},{-70,68}})));
-    Modelica.Blocks.Sources.RealExpression requestedFrequency(
-      y=if abs(direction.y) > 0.5 and
-          (abs(directionSign) < 0.5 or direction.y * directionSign > 0.5) then
-          commands.cmdFrequency_Hz else 0)
-      annotation(Placement(transformation(extent={{-90,10},{-70,30}})));
-    Modelica.Blocks.Nonlinear.Limiter frequencyLimiter(
-      uMax=configuration.frequencyMax_Hz, uMin=0)
-      annotation(Placement(transformation(extent={{-60,10},{-40,30}})));
-    Modelica.Blocks.Nonlinear.SlewRateLimiter driveRamp(
-      Rising=configuration.acceleration_HzPerS,
-      Falling=-configuration.deceleration_HzPerS,
-      initType=Modelica.Blocks.Types.Init.InitialOutput,
-      y_start=0)
-      annotation(Placement(transformation(extent={{-30,10},{-10,30}})));
-    Modelica.Blocks.Math.Product signedFrequency
-      annotation(Placement(transformation(extent={{5,32},{25,52}})));
-    Modelica.Blocks.Math.Gain frequencyToVelocity(k=configuration.gain_MpsPerHz)
-      annotation(Placement(transformation(extent={{35,32},{55,52}})));
-    Modelica.Blocks.Sources.BooleanExpression brakeRequest(y=commands.cmdBrakeRelease)
-      annotation(Placement(transformation(extent={{-90,-35},{-70,-15}})));
-    BrakeActuator brake(
-      openTime_S=configuration.brakeOpenTime_S,
-      closeTime_S=configuration.brakeCloseTime_S)
-      annotation(Placement(transformation(extent={{-55,-40},{-35,-20}})));
-    Modelica.Blocks.Math.BooleanToReal brakeGate(realTrue=1, realFalse=0)
-      annotation(Placement(transformation(extent={{-22,-40},{-2,-20}})));
-    Modelica.Blocks.Math.Product gatedVelocity
-      annotation(Placement(transformation(extent={{65,15},{85,35}})));
-    Modelica.Blocks.Continuous.LimIntegrator carriagePosition(
-      k=1,
-      outMin=configuration.tremieMechanicalStop_M,
-      outMax=configuration.maintenanceMechanicalStop_M,
-      initType=Modelica.Blocks.Types.Init.InitialOutput,
-      y_start=configuration.initialPosition_M)
-      annotation(Placement(transformation(extent={{45,-35},{65,-15}})));
-    SensorBank sensors(
-      tremie_M=configuration.tremieSensor_M,
-      pv_M=configuration.pvSensor_M,
-      p2_M=configuration.p2Sensor_M,
-      p1_M=configuration.p1Sensor_M,
-      maintenance_M=configuration.maintenanceSensor_M)
-      annotation(Placement(transformation(extent={{75,-55},{95,-35}})));
+    // Calcul dans des fonctions appelées par une équation when : OpenModelica 1.27
+    // n'exporte pas en FMU un algorithme when qui affecte des Real (bug reproduit).
+    discrete Real stateVector[stateSize](start=initialState(configuration), each fixed=true);
 
   equation
-    connect(requestedFrequency.y, frequencyLimiter.u)
-      annotation(Line(points={{-69,20},{-62,20}}, color={0,0,127}));
-    connect(frequencyLimiter.y, driveRamp.u)
-      annotation(Line(points={{-39,20},{-32,20}}, color={0,0,127}));
-    connect(driveRamp.y, signedFrequency.u1)
-      annotation(Line(points={{-9,20},{-2,20},{-2,48},{3,48}}, color={0,0,127}));
-    signedFrequency.u2 = directionSign;
-    connect(signedFrequency.y, frequencyToVelocity.u)
-      annotation(Line(points={{26,42},{33,42}}, color={0,0,127}));
-    connect(brakeRequest.y, brake.releaseRequest)
-      annotation(Line(points={{-69,-25},{-57,-25}}, color={255,0,255}));
-    connect(brake.isOpen, brakeGate.u)
-      annotation(Line(points={{-34,-30},{-24,-30}}, color={255,0,255}));
-    connect(frequencyToVelocity.y, gatedVelocity.u1)
-      annotation(Line(points={{56,42},{60,42},{60,31},{63,31}}, color={0,0,127}));
-    connect(brakeGate.y, gatedVelocity.u2)
-      annotation(Line(points={{-1,-30},{55,-30},{55,19},{63,19}}, color={0,0,127}));
-    connect(gatedVelocity.y, carriagePosition.u)
-      annotation(Line(points={{86,25},{90,25},{90,-5},{35,-5},{35,-25},{43,-25}}, color={0,0,127}));
-    positionClamped_M = min(max(carriagePosition.y,
-      configuration.tremieMechanicalStop_M),
-      configuration.maintenanceMechanicalStop_M);
-    sensors.position_M = positionClamped_M;
-
-    measurements.frequencyCmd_Hz = frequencyLimiter.y;
-    measurements.frequencyAct_Hz = driveRamp.y;
-    measurements.velocityAct_Mps = gatedVelocity.y;
-    measurements.positionAct_M = positionClamped_M;
-    feedback.brakeIsOpen = brake.isOpen;
-    feedback.tremiePositionIsActive = sensors.tremie;
-    feedback.pvPositionIsActive = sensors.pv;
-    feedback.p2PositionIsActive = sensors.p2;
-    feedback.p1PositionIsActive = sensors.p1;
-    feedback.maintenancePositionIsActive = sensors.maintenance;
-    deviceState.sensorsWord = sensors.sensorsWord;
-    deviceState.driveStatusWord = if abs(driveRamp.y) > 0.5 and brake.isOpen then 135 else 128;
-    diagnostics.commandConflict = commands.cmdMoveToTremie and commands.cmdMoveToMaintenance;
-    diagnostics.hardStopTremieActive = positionClamped_M <= configuration.tremieMechanicalStop_M + 0.0001 and direction.y < 0;
-    diagnostics.hardStopMaintenanceActive = positionClamped_M >= configuration.maintenanceMechanicalStop_M - 0.0001 and direction.y > 0;
-
-  algorithm
-    // Neutral arrête la consigne Hz, pas le sens moteur : la rampe de
-    // décélération reste visible jusqu'à vitesse nulle. Un ordre inverse
-    // attend également la fin de rampe avant de changer de sens.
-    when initial() then
-      directionSign := 0;
-    elsewhen abs(driveRamp.y) <= 0.5 and abs(direction.y) > 0.5 then
-      directionSign := direction.y;
+    assert(configuration.initialPosition_M >= configuration.tremieMechanicalStop_M and
+      configuration.initialPosition_M <= configuration.maintenanceMechanicalStop_M,
+      "M3: initialPosition_M hors des butées mécaniques");
+    when sample(0, configuration.samplePeriod_S) then
+      // pre() casse la boucle commande <-> capteurs du banc autonome ; en FMU les entrées
+      // sont figées pendant le pas, pre(commande) = commande appliquée.
+      stateVector = plantStepPacked(M3Commands(
+        cmdMoveToTremie=pre(commands.cmdMoveToTremie),
+        cmdMoveToMaintenance=pre(commands.cmdMoveToMaintenance),
+        cmdBrakeRelease=pre(commands.cmdBrakeRelease),
+        cmdFrequency_Hz=pre(commands.cmdFrequency_Hz)), configuration, pre(stateVector));
     end when;
 
+    measurements.frequencyCmd_Hz = stateVector[1];
+    measurements.frequencyAct_Hz = stateVector[3];
+    measurements.velocityAct_Mps = stateVector[5];
+    measurements.positionAct_M = stateVector[6];
+    // Retour vers le PLC = contact auxiliaire, comme M3_BrakeIsOpen_DI du SimBench interne.
+    feedback.brakeIsOpen = (stateVector[8] > 0.5);
+    feedback.tremiePositionIsActive = (stateVector[14] > 0.5);
+    feedback.pvPositionIsActive = (stateVector[17] > 0.5);
+    feedback.p2PositionIsActive = (stateVector[20] > 0.5);
+    feedback.p1PositionIsActive = (stateVector[23] > 0.5);
+    feedback.maintenancePositionIsActive = (stateVector[26] > 0.5);
+    deviceState.sensorsWord = (if (stateVector[14] > 0.5) then 16 else 0) + (if (stateVector[17] > 0.5) then 8 else 0)
+      + (if (stateVector[20] > 0.5) then 4 else 0) + (if (stateVector[23] > 0.5) then 2 else 0)
+      + (if (stateVector[26] > 0.5) then 1 else 0);
+    // Même règle que FB_SimBench : 16#87 dès que le variateur tourne, 16#80 à l'arrêt.
+    deviceState.driveStatusWord = if stateVector[3] > 0.5 then 135 else 128;
+    diagnostics.commandConflict = commands.cmdMoveToTremie and commands.cmdMoveToMaintenance;
+    diagnostics.hardStopTremieActive = (stateVector[11] > 0.5);
+    diagnostics.hardStopMaintenanceActive = (stateVector[12] > 0.5);
+
     annotation(
-      Diagram(coordinateSystem(extent={{-100,-70},{100,80}}, preserveAspectRatio=false), graphics={
-        Text(extent={{-94,76},{-50,70}}, textString="COMMANDES & VARIATEUR", textColor={70,70,70}),
-        Text(extent={{-57,-52},{-5,-58}}, textString="FREIN PHYSIQUE SIMPLIFIÉ", textColor={70,70,70}),
-        Text(extent={{36,-58},{98,-64}}, textString="MOUVEMENT, BUTÉES & CAPTEURS", textColor={70,70,70})}),
-      Documentation(info="<html><p><b>POC graphique.</b> Ouvrir l'onglet Diagramme : les blocs standards Modelica montrent la chaîne de calcul. Le frein et la banque de capteurs sont des composants M3 dédiés. Aucune permission ni logique PLC n'est modélisée ici.</p></html>"));
+      Documentation(info="<html><p><b>Plante M3 en parité avec FB_Sim_Translation</b> (chemin nominal : pas de charge suspendue, ni bruit, ni intermittence capteur). Modèle discret au pas <code>samplePeriod_S</code>, même ordre de calcul que le ST : variateur, frein, sens mémorisé, mouvement/butées, cames. Aucune permission ni logique PLC.</p></html>"));
   end TranslationM3;
 
   package Examples "Scénarios prêts à simuler dans OMEdit"
