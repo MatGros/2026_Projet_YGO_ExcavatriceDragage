@@ -368,7 +368,7 @@ Une pression sur **`BtnBothDescend` maintient le manche au neutre** (`JoystickPu
 
 ## supervisor [via researcher] [completed]
 
-J'ai vérifié les faits critiques directement dans la source active, puis fusionné les 3 rapports. Livrable persiste : `DOC/WFLOW/PLAN_CABLAGE_MAINT_N2_Boutons_Moteurs.md`.
+J'ai vérifié les faits critiques directement dans la source active, puis fusionné les 3 rapports. Livrable persiste : `DOC/WFLOW/ELEC/PLAN_CABLAGE_MAINT_N2_Boutons_Moteurs.md`.
 
 ## Synthèse — Plan unique de câblage des 6 boutons moteur MAINT_N2
 
@@ -397,7 +397,7 @@ Je suis un sous-agent en portée **lecture seule** : le plan décrit le câblage
 
 ## summary
 
-supervisor 结论：J'ai vérifié les faits critiques directement dans la source active, puis fusionné les 3 rapports. Livrable persiste : `DOC/WFLOW/PLAN_CABLAGE_MAINT_N2_Boutons_Moteurs.md`.
+supervisor 结论：J'ai vérifié les faits critiques directement dans la source active, puis fusionné les 3 rapports. Livrable persiste : `DOC/WFLOW/ELEC/PLAN_CABLAGE_MAINT_N2_Boutons_Moteurs.md`.
 
 ## Synthèse — Plan unique de câblage des 6 boutons moteur MAINT_N2
 
