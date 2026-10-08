@@ -15,10 +15,11 @@ class AutoCycleController:
     COMPLETE_P1 = "CYCLE TERMINÉ · ARRÊT P1"
 
     def __init__(self, dwell_s: float = 1.0, stopped_threshold_mps: float = 0.005,
-                 deceleration_mps2: float = 0.5) -> None:
+                 deceleration_mps2: float = 0.4, lag_s: float = 0.30) -> None:
         self.dwell_s = float(dwell_s)
         self.stopped_threshold_mps = float(stopped_threshold_mps)
         self.deceleration_mps2 = float(deceleration_mps2)
+        self.lag_s = float(lag_s)
         if self.deceleration_mps2 <= 0:
             raise ValueError("deceleration_mps2 doit être strictement positif")
         self.active = False
@@ -55,17 +56,17 @@ class AutoCycleController:
         moves = {
             # Atterrissage de 5 mm côté actif du capteur, pour garder son
             # retour vrai malgré l'intégration numérique et l'inertie FMU.
-            self.MOVE_TREMIE: (-1.0, -0.005, self.STOP_TREMIE),
+            self.MOVE_TREMIE: (-1.0, 0.01, self.STOP_TREMIE),
             self.MOVE_P1_FROM_TREMIE: (1.0, 19.985, self.STOP_P1_FROM_TREMIE),
         }
         if self.phase in moves:
             direction, target, stop_phase = moves[self.phase]
-            # Anticipe la rampe de décélération réelle du modèle (25 Hz/s ×
-            # 0,02 m/s/Hz = 0,5 m/s²). Sans cette distance de freinage, la
-            # position dépasse les postes avant que vitesse nulle soit atteinte.
+            # Anticipe la décélération de la plante en parité FB_Sim_Translation
+            # (20 Hz/s × 0,02 m/s/Hz = 0,4 m/s²) et ses deux retards 1er ordre
+            # (variateur + vitesse, 2 × 0,15 s) ; came Trémie 0,05 m − hystérésis 0,02 m.
             distance_to_target_m = (target - position_m) * direction
             stopping_distance_m = ((velocity_mps * velocity_mps) / (2.0 * self.deceleration_mps2)
-                                   + abs(velocity_mps) * sample_period_s)
+                                   + abs(velocity_mps) * (sample_period_s + self.lag_s))
             reached = distance_to_target_m <= stopping_distance_m
             if reached:
                 self.phase = stop_phase

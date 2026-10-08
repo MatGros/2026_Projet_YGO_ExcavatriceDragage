@@ -8,6 +8,7 @@ from pathlib import Path
 from PySide6.QtCore import QObject, Property, QTimer, Qt, Signal, Slot
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
+from PySide6.QtQuickControls2 import QQuickStyle
 
 UDP_LINK = Path(__file__).parents[3] / "90_PROTOTYPES" / "m3_link"
 if str(UDP_LINK) not in sys.path:
@@ -15,6 +16,11 @@ if str(UDP_LINK) not in sys.path:
 from engine import M3FmuEngine, M3Snapshot, STEP_S
 from auto_cycle import AutoCycleController
 from plc_readonly_adapter import UdpPlantReadOnlyAdapter
+
+LIVE_WINDOW_S = 20.0               # fenêtre live : un trajet complet de ralentissement
+LIVE_WINDOW_POINTS = 2001          # 20 s à 10 ms
+LIVE_DRAW_POINTS = 600             # points tracés au maximum (décimation d'affichage)
+SENSOR_BITS = ((4, "Trémie"), (3, "PV"), (2, "P2"), (1, "P1"), (0, "Maint"))
 
 
 class LiveBackend(QObject):
@@ -39,7 +45,7 @@ class LiveBackend(QObject):
             0.0, 0, 0.0, 0.0, False, 0.0, 0.0, 0.0, 0.0, False, 0, 0,
             False, False, False, False, False, False, False)
         self._error = ""
-        self._trace: deque[dict[str, float]] = deque(maxlen=201)
+        self._trace: deque[dict[str, float]] = deque(maxlen=LIVE_WINDOW_POINTS)
         self._frozen_trace: list[dict[str, float]] = []
         self._capture_trigger_time: float | None = None
         self._capture_trigger_index = 0
@@ -434,10 +440,30 @@ class LiveBackend(QObject):
 
     @Property("QVariantList", notify=traceChanged)
     def tracePoints(self):
-        return [
-            self._point_values(point)
-            for point in self._trace
-        ]
+        # Décimation d'affichage seulement : le tampon garde tous les échantillons à 10 ms.
+        points = list(self._trace)
+        step = max(1, -(-len(points) // LIVE_DRAW_POINTS))   # arrondi supérieur : jamais plus de LIVE_DRAW_POINTS
+        return [self._point_values(point) for point in points[::step]]
+
+    @Property("QVariantList", notify=traceChanged)
+    def traceMarkers(self):
+        """Fronts capteurs de la fenêtre live : [t, libellé] (ex. « P1↓ »)."""
+        return self._sensor_edges(list(self._trace))
+
+    @Property(float, constant=True)
+    def liveWindowSeconds(self) -> float:
+        return LIVE_WINDOW_S
+
+    @staticmethod
+    def _sensor_edges(samples: list[dict[str, float]]) -> list[list]:
+        edges = []
+        for previous, current in zip(samples, samples[1:]):
+            changed = int(previous["sensors"]) ^ int(current["sensors"])
+            for bit, name in SENSOR_BITS:
+                if changed >> bit & 1:
+                    arrow = "↑" if int(current["sensors"]) >> bit & 1 else "↓"
+                    edges.append([current["t"], f"{name}{arrow}"])
+        return edges
 
     @staticmethod
     def _point_values(point: dict[str, float]) -> list[float]:
@@ -589,6 +615,9 @@ def main() -> int:
             qt_args.append(argument)
     application = QGuiApplication(qt_args)
     application.setApplicationName("TwinBench M3 Live")
+    # Style Fusion : le style natif Windows ignore les fonds personnalisés des contrôles
+    # (avertissements « does not support customization » à chaque lancement).
+    QQuickStyle.setStyle("Fusion")
     source_mode = ("gateway-readonly" if "--gateway-readonly" in sys.argv else
                    ("plc-readonly" if "--plc-readonly" in sys.argv else "fmu"))
     backend = LiveBackend(source_mode, telemetry_port=telemetry_port)

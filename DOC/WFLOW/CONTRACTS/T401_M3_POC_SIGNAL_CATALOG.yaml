@@ -31,6 +31,12 @@ signals:
   - {name: configuration.tremieMechanicalStop_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Butée mécanique Trémie", status: HYPOTHESE}
   - {name: configuration.maintenanceMechanicalStop_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Butée mécanique Maintenance", status: HYPOTHESE}
   - {name: configuration.initialPosition_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Position initiale chariot", status: CONFIG}
+  - {name: configuration.samplePeriod_S, direction: parameter, role: CFG, data_type: Real, unit: s, label: "Pas discret de la plante", status: PARITE}
+  - {name: configuration.driveTimeConstant_S, direction: parameter, role: CFG, data_type: Real, unit: s, label: "Constante de temps variateur", status: PARITE}
+  - {name: configuration.brakeContactDelay_S, direction: parameter, role: CFG, data_type: Real, unit: s, label: "Retard contact auxiliaire frein", status: PARITE}
+  - {name: configuration.brakeStopFrequency_Hz, direction: parameter, role: CFG, data_type: Real, unit: Hz, label: "Seuil de retombée frein", status: PARITE}
+  - {name: configuration.sensorHysteresis_M, direction: parameter, role: CFG, data_type: Real, unit: m, label: "Hystérésis cames", status: PARITE}
+  - {name: configuration.sensorElectricalDelay_S, direction: parameter, role: CFG, data_type: Real, unit: s, label: "Retard électrique cames", status: PARITE}
 
   - {name: measurements.positionAct_M, direction: output, role: HW, kind: Measurement, data_type: Real, unit: m, label: "Position chariot"}
   - {name: measurements.velocityAct_Mps, direction: output, role: HW, kind: Measurement, data_type: Real, unit: "m/s", label: "Vitesse chariot"}

@@ -21,12 +21,24 @@ EXPECTED_GROUPS = {
     ("output", "M3Diagnostics", "diagnostics"),
 }
 
-REQUIRED_STANDARD_BLOCKS = {
-    "Modelica.Blocks.Nonlinear.Limiter",
-    "Modelica.Blocks.Nonlinear.SlewRateLimiter",
-    "Modelica.Blocks.Math.Product",
-    "Modelica.Blocks.Math.Gain",
-    "Modelica.Blocks.Continuous.LimIntegrator",
+# Valeurs tenues égales à CODE/L_SIMULATION/FB_Sim_Translation* (chemin nominal).
+PARITY_VALUES = {
+    "samplePeriod_S": 0.01,
+    "gain_MpsPerHz": 0.02,
+    "acceleration_HzPerS": 20,
+    "deceleration_HzPerS": 20,
+    "driveTimeConstant_S": 0.15,
+    "brakeOpenTime_S": 0.10,
+    "brakeCloseTime_S": 0.09,
+    "brakeContactDelay_S": 0.01,
+    "brakeStopFrequency_Hz": 0.5,
+    "tremieSensor_M": 0.05,
+    "maintenanceSensor_M": 29.95,
+    "sensorHysteresis_M": 0.02,
+    "sensorElectricalDelay_S": 0.01,
+    "tremieMechanicalStop_M": 0,
+    "maintenanceMechanicalStop_M": 30,
+    "initialPosition_M": 20,
 }
 
 
@@ -97,14 +109,16 @@ def main() -> None:
     if invalid:
         errors.append(f"métadonnées incomplètes={invalid}")
 
-    absent_blocks = sorted(block for block in REQUIRED_STANDARD_BLOCKS if block not in model)
-    if absent_blocks:
-        errors.append(f"blocs standards absents du diagramme={absent_blocks}")
-    connection_count = len(re.findall(r"\bconnect\s*\(", model))
-    if connection_count < 8:
-        errors.append(f"diagramme insuffisamment câblé: {connection_count} connexions")
-    if "Diagram(" not in model:
-        errors.append("annotation Diagram manquante")
+    # T415-E1 : le diagramme de blocs continus est remplacé par un pas discret en parité
+    # avec FB_Sim_Translation. On impose les valeurs de parité au lieu des blocs.
+    for field, value in PARITY_VALUES.items():
+        found = re.search(rf"^\s*Real\s+{field}\s*=\s*([-\d.]+)", text, re.M)
+        if not found or abs(float(found.group(1)) - value) > 1e-9:
+            errors.append(f"parité FB_Sim_Translation: {field} attendu={value} lu={found and found.group(1)}")
+    for fragment in ("when sample(0, configuration.samplePeriod_S)", "function plantStep"):
+        if fragment not in model and fragment not in text:
+            errors.append(f"pas discret absent: {fragment}")
+    connection_count = 0
 
     required_loop_fragments = {
         "contrôleur LocalLoopController": "block LocalLoopController",
@@ -128,7 +142,7 @@ def main() -> None:
         fail(errors)
     print(
         f"PASS: 6 groupes, {len(declared)} signaux catalogués, "
-        f"{connection_count} connexions, {len(REQUIRED_STANDARD_BLOCKS)} familles de blocs standards, "
+        f"{len(PARITY_VALUES)} paramètres en parité FB_Sim_Translation, "
         "Examples et boucle locale présents."
     )
 
