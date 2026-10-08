@@ -1,4 +1,26 @@
 tasks:
+- id: T416
+  parent_id: null
+  statut: ⏳
+  criticite: C2
+  domaine: ELECTROTECHNIQUE / SCHEMAS / CARTOGRAPHIE IO
+  agent: AGY01
+  date: '2026-10-08T13:17:01.606200+02:00'
+  titre: Dossier électrotechnique — matrice E/S, borniers et schémas électriques
+  contexte: Préparation de la réalisation des schémas électriques d armoire et de terrain à partir des E/S réelles CODESYS,
+    modules d extension VEICHI et bus de terrain (EtherCAT, CANopen).
+  description: Structurer le carnet de câblage E/S complet reliant chaque voie automate aux composants électrotechniques (borniers,
+    numéros de fils, repères appareils -KM/-Q/-B, bornes A1/A2, références matériel) et arbitrer les écarts de câblage terrain
+    (inversion contacteurs M1/M2, boucle AU).
+  objectifs:
+  - Établir la cohérence 100% entre les exports CODESYS et le matériel physique.
+  - Produire la matrice de câblage E/S complète sous formats CSV et Excel (.xlsx).
+  - Qualifier et arbitrer les anomalies de câblage chantier (croisement contacteurs M1/M2, réserves).
+  - Préparer les données pour l import CAO ou la saisie des schémas électriques.
+  bloque_par: []
+  contrat: DOC/WFLOW/ELEC/MATRICE_CABLAGE_IO_SCHEMA_ELECTRIQUE.xlsx
+  avancement: Matrice E/S CODESYS vs materiel generee sous DOC/WFLOW/ELEC/MATRICE_CABLAGE_IO_SCHEMA_ELECTRIQUE.xlsx. Dossier
+    ELEC/ cree pour rassembler les documents electrotechniques.
 - id: T415
   parent_id: T399
   statut: ⏳
@@ -6,14 +28,16 @@ tasks:
   domaine: OUTILLAGE / TWINBENCH / SIMULATEUR INDUSTRIEL / PLATEFORME
   agent: CDX01
   date: '2026-10-02T00:00:00+02:00'
-  titre: 'TwinBench — plateforme generale de simulation industrielle'
-  contexte: 'Le projet doit disposer d un simulateur general integre autour de CODESYS, SimBench et OpenModelica. M3 est son premier cas metier, avant M1, M2 et la benne.'
-  description: 'Piloter une plateforme ou CODESYS garde la logique et les securites, SimBench reste la frontiere de stimuli, OpenModelica porte la physique et l IHM observe sans calculer ni piloter la machine reelle.'
+  titre: TwinBench — plateforme generale de simulation industrielle
+  contexte: Le projet doit disposer d un simulateur general integre autour de CODESYS, SimBench et OpenModelica. M3 est son
+    premier cas metier, avant M1, M2 et la benne.
+  description: Piloter une plateforme ou CODESYS garde la logique et les securites, SimBench reste la frontiere de stimuli,
+    OpenModelica porte la physique et l IHM observe sans calculer ni piloter la machine reelle.
   objectifs:
-  - 'Rendre le parcours TwinBench lisible avant toute nouvelle integration.'
-  - 'Definir et faire respecter la frontiere entre PLC, SimBench, simulateur externe et IHM.'
-  - 'Qualifier M3 comme premier cas metier par scenarios reproductibles et verdicts PLC.'
-  - 'Preparer l extension aux treuils et a la benne sans melanger composant physique et logique PLC.'
+  - Rendre le parcours TwinBench lisible avant toute nouvelle integration.
+  - Definir et faire respecter la frontiere entre PLC, SimBench, simulateur externe et IHM.
+  - Qualifier M3 comme premier cas metier par scenarios reproductibles et verdicts PLC.
+  - Preparer l extension aux treuils et a la benne sans melanger composant physique et logique PLC.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T415_TWINBENCH_PLATFORM_SIMULATOR.yaml
   enfants:
   - T415-A
@@ -31,15 +55,18 @@ tasks:
   domaine: OUTILLAGE / TWINBENCH / GOUVERNANCE
   agent: CDX01
   date: '2026-10-02T00:00:00+02:00'
-  titre: 'TwinBench — gouvernance, inventaire et parcours utilisateur'
-  contexte: 'Avant toute evolution, clarifier les POC, les roles et les points d entree, puis ranger les fichiers sans supprimer de contenu.'
-  description: 'Produire l inventaire, organiser les outils par usage et fournir un point d entree maitre avec des parcours separes : copie Control Win et simulation locale. Les scripts techniques restent internes.'
+  titre: TwinBench — gouvernance, inventaire et parcours utilisateur
+  contexte: Avant toute evolution, clarifier les POC, les roles et les points d entree, puis ranger les fichiers sans supprimer
+    de contenu.
+  description: 'Produire l inventaire, organiser les outils par usage et fournir un point d entree maitre avec des parcours
+    separes : copie Control Win et simulation locale. Les scripts techniques restent internes.'
   objectifs:
-  - 'Classifier les POC historiques T400 a T409 et T414 comme references, actifs ou a archiver.'
-  - 'Proposer un point d entree utilisateur unique par usage sans creer de nouveau lanceur.'
-  - 'Soumettre tout archivage ou suppression a decision humaine explicite.'
+  - Classifier les POC historiques T400 a T409 et T414 comme references, actifs ou a archiver.
+  - Proposer un point d entree utilisateur unique par usage sans creer de nouveau lanceur.
+  - Soumettre tout archivage ou suppression a decision humaine explicite.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T415-A_TWINBENCH_ASSAINISSEMENT.yaml
-  avancement: 'Arborescence, lanceurs et textes anglais implementes. Recette non destructive, auto-verifications et revue externe MINOR terminees. Pret pour recette humaine Windows; aucune integration PLC n est revendiquee.'
+  avancement: Arborescence, lanceurs et textes anglais implementes. Recette non destructive, auto-verifications et revue externe
+    MINOR terminees. Pret pour recette humaine Windows; aucune integration PLC n est revendiquee.
   bloque_par: []
 - id: T415-B
   parent_id: T415
@@ -48,11 +75,16 @@ tasks:
   domaine: OUTILLAGE / TWINBENCH / CONTRAT DE LIAISON
   agent: CC01
   date: '2026-10-02T22:08:43'
-  titre: 'TwinBench — frontiere PLC, SimBench et simulateur externe'
-  contexte: 'Definir un contrat unique avant toute nouvelle injection.'
-  description: 'Le simulateur lit les commandes publiees et ecrit uniquement une image materielle complete a la frontiere SimBench, sous verrou de simulation.'
+  titre: TwinBench — frontiere PLC, SimBench et simulateur externe
+  contexte: Definir un contrat unique avant toute nouvelle injection.
+  description: Le simulateur lit les commandes publiees et ecrit uniquement une image materielle complete a la frontiere SimBench,
+    sous verrou de simulation.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T415-B_M3_LIEN_EXTERNE_SIMBENCH.yaml
-  avancement: 'L1 livre non commite. 2026-10-02 COMMUNICATION VALIDEE dans Control Win (Device_CtrlWinSim) : PLC <-> passerelle FMU ~96 trames/s, 0 rejet, reprise auto apres redemarrage passerelle ; le PLC pilote la plante (sens, frequence, frein) et recoit les capteurs. Correctifs livres : adresse loopback litterale (constante STRING videe par le generateur), types RTS_IEC sans prefixe, handle 0 factice, P02/P05/P06. Restent non testes : gel image sur coupure (AC5), etat initial P1 / CW-00 (AC6). Defauts constates hors lien (modele FMU, vue) reportes : T415-E1 et T415-G lot G4.'
+  avancement: 'L1 livre non commite. 2026-10-02 COMMUNICATION VALIDEE dans Control Win (Device_CtrlWinSim) : PLC <-> passerelle
+    FMU ~96 trames/s, 0 rejet, reprise auto apres redemarrage passerelle ; le PLC pilote la plante (sens, frequence, frein)
+    et recoit les capteurs. Correctifs livres : adresse loopback litterale (constante STRING videe par le generateur), types
+    RTS_IEC sans prefixe, handle 0 factice, P02/P05/P06. Restent non testes : gel image sur coupure (AC5), etat initial P1
+    / CW-00 (AC6). Defauts constates hors lien (modele FMU, vue) reportes : T415-E1 et T415-G lot G4.'
   bloque_par: []
 - id: T415-C
   parent_id: T415
@@ -61,12 +93,12 @@ tasks:
   domaine: OUTILLAGE / TWINBENCH / OPENMODELICA / FMU
   agent: —
   date: '2026-10-02T00:00:00+02:00'
-  titre: 'TwinBench — runtime OpenModelica/FMU deterministe'
-  contexte: 'Le modele physique doit etre testable sans PLC et sans IHM.'
-  description: 'Qualifier le pas, les etats, les butees, les reprises et les traces du runtime physique avant integration PLC.'
-  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-C_*.yaml).'
+  titre: TwinBench — runtime OpenModelica/FMU deterministe
+  contexte: Le modele physique doit etre testable sans PLC et sans IHM.
+  description: Qualifier le pas, les etats, les butees, les reprises et les traces du runtime physique avant integration PLC.
+  contrat: A rediger avant activation (TASK_CONTRACT_T415-C_*.yaml).
   bloque_par:
-  - 'Contrat T415-B approuve.'
+  - Contrat T415-B approuve.
 - id: T415-D
   parent_id: T415
   statut: ⬜
@@ -74,12 +106,13 @@ tasks:
   domaine: OUTILLAGE / TWINBENCH / CODESYS / SIMBENCH / CONTROL WIN
   agent: —
   date: '2026-10-02T00:00:00+02:00'
-  titre: 'TwinBench — integration CODESYS, SimBench et Control Win'
-  contexte: 'Control Win sert uniquement a qualifier une copie isolee ; le CPU reel reste hors injection.'
-  description: 'Integrer le contrat approuve dans la copie Control Win et mesurer la robustesse sans modifier la logique metier PLC.'
-  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-D_*.yaml).'
+  titre: TwinBench — integration CODESYS, SimBench et Control Win
+  contexte: Control Win sert uniquement a qualifier une copie isolee ; le CPU reel reste hors injection.
+  description: Integrer le contrat approuve dans la copie Control Win et mesurer la robustesse sans modifier la logique metier
+    PLC.
+  contrat: A rediger avant activation (TASK_CONTRACT_T415-D_*.yaml).
   bloque_par:
-  - 'Qualification T415-B et T415-C.'
+  - Qualification T415-B et T415-C.
 - id: T415-E
   parent_id: T415
   statut: ⬜
@@ -87,16 +120,16 @@ tasks:
   domaine: OUTILLAGE / TWINBENCH / M3 / RECETTE
   agent: —
   date: '2026-10-02T00:00:00+02:00'
-  titre: 'M3 — premier cas metier qualifie'
-  contexte: 'M3 sert de vertical slice avant extension aux treuils et a la benne.'
-  description: 'Modeliser, tester puis recetter M3 avec des cas d utilisation observables et des verdicts PLC.'
-  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-E_*.yaml).'
+  titre: M3 — premier cas metier qualifie
+  contexte: M3 sert de vertical slice avant extension aux treuils et a la benne.
+  description: Modeliser, tester puis recetter M3 avec des cas d utilisation observables et des verdicts PLC.
+  contrat: A rediger avant activation (TASK_CONTRACT_T415-E_*.yaml).
   enfants:
   - T415-E1
   - T415-E2
   - T415-E3
   bloque_par:
-  - 'Qualification T415-B, T415-C et T415-D.'
+  - Qualification T415-B, T415-C et T415-D.
 - id: T415-E1
   parent_id: T415-E
   statut: ⬜
@@ -104,12 +137,12 @@ tasks:
   domaine: OUTILLAGE / TWINBENCH / M3 / MODELE PHYSIQUE
   agent: —
   date: '2026-10-02T00:00:00+02:00'
-  titre: 'M3 — modele variateur, frein, mecanique, capteurs et butees'
-  contexte: 'Reprendre les faits PLC et terrain ; marquer toute hypothese mecanique.'
-  description: 'Composer le modele physique M3 sans reproduire la logique PLC dans OpenModelica.'
-  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-E1_*.yaml).'
+  titre: M3 — modele variateur, frein, mecanique, capteurs et butees
+  contexte: Reprendre les faits PLC et terrain ; marquer toute hypothese mecanique.
+  description: Composer le modele physique M3 sans reproduire la logique PLC dans OpenModelica.
+  contrat: A rediger avant activation (TASK_CONTRACT_T415-E1_*.yaml).
   bloque_par:
-  - 'Qualification T415-C.'
+  - Qualification T415-C.
 - id: T415-E2
   parent_id: T415-E
   statut: ⬜
@@ -117,12 +150,12 @@ tasks:
   domaine: OUTILLAGE / TWINBENCH / M3 / TESTS
   agent: —
   date: '2026-10-02T00:00:00+02:00'
-  titre: 'M3 — scenarios, defauts et preuves automatisees'
-  contexte: 'Les comportements reellement utiles doivent etre reproductibles et mesurables.'
-  description: 'Definir les sequences nominales, capteurs, butees, pertes de liaison et verdicts attendus.'
-  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-E2_*.yaml).'
+  titre: M3 — scenarios, defauts et preuves automatisees
+  contexte: Les comportements reellement utiles doivent etre reproductibles et mesurables.
+  description: Definir les sequences nominales, capteurs, butees, pertes de liaison et verdicts attendus.
+  contrat: A rediger avant activation (TASK_CONTRACT_T415-E2_*.yaml).
   bloque_par:
-  - 'Modele T415-E1 approuve.'
+  - Modele T415-E1 approuve.
 - id: T415-E3
   parent_id: T415-E
   statut: ⬜
@@ -130,12 +163,12 @@ tasks:
   domaine: OUTILLAGE / TWINBENCH / M3 / CONTROL WIN
   agent: —
   date: '2026-10-02T00:00:00+02:00'
-  titre: 'M3 — recette integree dans Control Win'
-  contexte: 'Verifier la chaine complete sur copie PLC isolee, jamais sur le CPU reel.'
-  description: 'Executer les scenarios qualifies, observer les verdicts PLC et documenter les limites de fidelite.'
-  contrat: 'A rediger avant activation (TASK_CONTRACT_T415-E3_*.yaml).'
+  titre: M3 — recette integree dans Control Win
+  contexte: Verifier la chaine complete sur copie PLC isolee, jamais sur le CPU reel.
+  description: Executer les scenarios qualifies, observer les verdicts PLC et documenter les limites de fidelite.
+  contrat: A rediger avant activation (TASK_CONTRACT_T415-E3_*.yaml).
   bloque_par:
-  - 'Scenarios T415-E2 approuves.'
+  - Scenarios T415-E2 approuves.
 - id: T415-F
   parent_id: T415
   statut: ⬜
@@ -143,12 +176,13 @@ tasks:
   domaine: OUTILLAGE / TWINBENCH / CPU REEL / LECTURE SEULE
   agent: —
   date: '2026-10-02T00:00:00+02:00'
-  titre: 'CPU reel — shadow lecture seule et decision de surete'
-  contexte: 'Reprise eventuelle de la reference historique T414, hors urgence et apres qualification Control Win.'
-  description: 'Cadrer une visualisation strictement en lecture seule des donnees reelles ; aucune injection de stimuli simules vers le CPU reel.'
-  contrat: 'A rediger apres decision humaine sur le transport et la position estimee.'
+  titre: CPU reel — shadow lecture seule et decision de surete
+  contexte: Reprise eventuelle de la reference historique T414, hors urgence et apres qualification Control Win.
+  description: Cadrer une visualisation strictement en lecture seule des donnees reelles ; aucune injection de stimuli simules
+    vers le CPU reel.
+  contrat: A rediger apres decision humaine sur le transport et la position estimee.
   bloque_par:
-  - 'Qualification T415-E3 et decision humaine explicite.'
+  - Qualification T415-E3 et decision humaine explicite.
 - id: T415-G
   parent_id: T415
   statut: ⬜
@@ -156,21 +190,25 @@ tasks:
   domaine: OUTILLAGE / TWINBENCH / LANCEUR / CONTROL WIN / ERGONOMIE
   agent: —
   date: '2026-10-02T17:20:10'
-  titre: 'TwinBench v2 — lancer la simulation (projet unique Device + Device_CtrlWinSim)'
-  contexte: 'Decision humaine 2026-10-02 : un seul projet CODESYS avec Device (CPU reel, simulation IDE) et Device_CtrlWinSim (Control Win). La copie reecrite HW_SIM du lanceur v1 n est plus le chemin nominal. Simulation IDE sans sockets (lien Modelica impossible), Control Win requis pour le lien UDP.'
-  description: 'Refondre TwinBench en outil de lancement/arret/surveillance de la partie PC (passerelle FMU, vue M3), corriger le lien PLC ExtLink selon le challenge expert (P01..P21), documenter la creation de Device_CtrlWinSim et outiller la recette Control Win jusqu au chariot qui bouge pilote par le PLC.'
+  titre: TwinBench v2 — lancer la simulation (projet unique Device + Device_CtrlWinSim)
+  contexte: 'Decision humaine 2026-10-02 : un seul projet CODESYS avec Device (CPU reel, simulation IDE) et Device_CtrlWinSim
+    (Control Win). La copie reecrite HW_SIM du lanceur v1 n est plus le chemin nominal. Simulation IDE sans sockets (lien
+    Modelica impossible), Control Win requis pour le lien UDP.'
+  description: Refondre TwinBench en outil de lancement/arret/surveillance de la partie PC (passerelle FMU, vue M3), corriger
+    le lien PLC ExtLink selon le challenge expert (P01..P21), documenter la creation de Device_CtrlWinSim et outiller la recette
+    Control Win jusqu au chariot qui bouge pilote par le PLC.
   objectifs:
-  - 'Parcours E2E en 6 actions max, reponses numeriques uniquement, fenetres au premier plan.'
-  - 'Etat de liaison lisible cote PLC (SimM3Link*) et cote vue (echo PLC).'
-  - 'Zero confusion reel/simule, zero bus terrain demarre par Control Win, zero processus tue a tort.'
-  - 'Recette tracee LN/GW/EL/BS/CW/E2E.'
+  - Parcours E2E en 6 actions max, reponses numeriques uniquement, fenetres au premier plan.
+  - Etat de liaison lisible cote PLC (SimM3Link*) et cote vue (echo PLC).
+  - Zero confusion reel/simule, zero bus terrain demarre par Control Win, zero processus tue a tort.
+  - Recette tracee LN/GW/EL/BS/CW/E2E.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T415-G_TWINBENCH_V2.yaml
   sources:
   - DOC/WFLOW/ORCHESTRATION_RAPPORTS/PROPOSITION_TWINBENCH_V2_2026-10-02.md
   - DOC/WFLOW/ORCHESTRATION_RAPPORTS/CHALLENGE_TWINBENCH_V2_2026-10-02.md
-  avancement: 'Proposition + challenge expert (GO avec reserves) + contrat rediges. Aucun lot demarre.'
+  avancement: Proposition + challenge expert (GO avec reserves) + contrat rediges. Aucun lot demarre.
   bloque_par:
-  - 'Decisions humaines G0 Q1..Q7 (contrat).'
+  - Decisions humaines G0 Q1..Q7 (contrat).
 - id: T414
   parent_id: T399
   statut: ⬜
@@ -178,22 +216,31 @@ tasks:
   domaine: OUTILLAGE / TWINBENCH / IHM / MATERIEL REEL / LECTURE SEULE
   agent: —
   date: '2026-09-29T01:10:00+02:00'
-  titre: 'Interface simulateur M3 utilisable sur le materiel reel en lecture seule'
-  contexte: 'Revue orchestrateur T409-T413 (2026-09-28/29) : le miroir codesys_m3_telemetry_mirror.py ne lit que des variables de simulation (PRG_T409_M3_FmuBridge.Fmu*, figees a 0 hors simu IMPL:1-14, et GVL_Simulation.SimM3OpenModelica.*). Sur la machine reelle, l interface afficherait des zeros. Besoin utilisateur : utiliser l interface graphique du simulateur avec le materiel hardware. Reporte apres T409-T413 par decision humaine.'
-  description: 'Rendre l interface M3 live utilisable en visualisation pure sur le PLC reel : lecture source-agnostique, protocole sans notion FMU, bandeau reel/simu, aucune commande. Aucun codeur M3 sur la machine : toute position continue est une estimation PC.'
+  titre: Interface simulateur M3 utilisable sur le materiel reel en lecture seule
+  contexte: 'Revue orchestrateur T409-T413 (2026-09-28/29) : le miroir codesys_m3_telemetry_mirror.py ne lit que des variables
+    de simulation (PRG_T409_M3_FmuBridge.Fmu*, figees a 0 hors simu IMPL:1-14, et GVL_Simulation.SimM3OpenModelica.*). Sur
+    la machine reelle, l interface afficherait des zeros. Besoin utilisateur : utiliser l interface graphique du simulateur
+    avec le materiel hardware. Reporte apres T409-T413 par decision humaine.'
+  description: 'Rendre l interface M3 live utilisable en visualisation pure sur le PLC reel : lecture source-agnostique, protocole
+    sans notion FMU, bandeau reel/simu, aucune commande. Aucun codeur M3 sur la machine : toute position continue est une
+    estimation PC.'
   objectifs:
-  - 'Lire PRG_02_Acquisition.HwIn.Translation.* (5 capteurs, frein, thermique, StatusWord, ActualFrequencyHz x100), consigne Idx402, instPosDecoderM3.LimitSwitchTremie/Maintenance et GVL_Simulation.SimulationModeActive ; meme jeu de chemins en simu et en reel.'
+  - Lire PRG_02_Acquisition.HwIn.Translation.* (5 capteurs, frein, thermique, StatusWord, ActualFrequencyHz x100), consigne
+    Idx402, instPosDecoderM3.LimitSwitchTremie/Maintenance et GVL_Simulation.SimulationModeActive ; meme jeu de chemins en
+    simu et en reel.
   - 'Protocole versionne sans butee FMU : fins de course + bit simulation_mode + bit position_estimated.'
-  - 'IHM mode materiel : bandeau permanent MACHINE REELLE / LECTURE SEULE (ou SIMULATION PLC), toutes commandes desactivees (test automatique), DONNEES PERDUES visible, IHM machine = seule reference.'
-  - 'Miroir IDE conserve pour mise en service ponctuelle uniquement (duree bornee, cadence reelle mesuree ; T407 ~217 ms/echange).'
+  - 'IHM mode materiel : bandeau permanent MACHINE REELLE / LECTURE SEULE (ou SIMULATION PLC), toutes commandes desactivees
+    (test automatique), DONNEES PERDUES visible, IHM machine = seule reference.'
+  - Miroir IDE conserve pour mise en service ponctuelle uniquement (duree bornee, cadence reelle mesuree ; T407 ~217 ms/echange).
   decisions_humaines_requises:
   - 'Transport cible : OPC UA lecture seule (recommande orchestrateur) / POU UDP emission seule (CODE/) / miroir IDE seul.'
-  - 'Position : chariot anime ESTIMEE (zone capteurs + integration Hz recalee sur fronts, hypothese 50 Hz = 1 m/s) ou affichage de la zone seule.'
-  contrat: 'A rediger (TASK_CONTRACT_T414_*.yaml) apres decisions humaines.'
-  avancement: 'Non demarre. Constats de revue disponibles dans la conversation orchestrateur du 2026-09-29.'
+  - 'Position : chariot anime ESTIMEE (zone capteurs + integration Hz recalee sur fronts, hypothese 50 Hz = 1 m/s) ou affichage
+    de la zone seule.'
+  contrat: A rediger (TASK_CONTRACT_T414_*.yaml) apres decisions humaines.
+  avancement: Non demarre. Constats de revue disponibles dans la conversation orchestrateur du 2026-09-29.
   bloque_par:
-  - 'Cloture T409-T413 (lot simulation en cours, CDX01).'
-  - 'Decisions humaines transport et position.'
+  - Cloture T409-T413 (lot simulation en cours, CDX01).
+  - Decisions humaines transport et position.
 - id: T409
   parent_id: T399
   statut: ⏳
@@ -201,18 +248,21 @@ tasks:
   domaine: OUTILLAGE / SIMULATION / FMU / CONTROL WIN / SIMBENCH
   agent: CDX01
   date: '2026-09-28T02:45:00+02:00'
-  titre: 'POC FMU M3 fonctionnel avec injection reversible dans SimBench Control Win'
-  contexte: 'T408 a valide le transport UDP natif 10 ms dans la copie Control Win. Il faut maintenant relier une plante FMU M3 a l image SimM3OpenModelica deja prevue par T403.'
-  description: 'Construire une passerelle binaire locale, valider les trames et alimenter GVL_Simulation.SimM3OpenModelica uniquement sous les deux verrous de simulation, sans modifier le PLC reel ni le code source production.'
+  titre: POC FMU M3 fonctionnel avec injection reversible dans SimBench Control Win
+  contexte: T408 a valide le transport UDP natif 10 ms dans la copie Control Win. Il faut maintenant relier une plante FMU
+    M3 a l image SimM3OpenModelica deja prevue par T403.
+  description: Construire une passerelle binaire locale, valider les trames et alimenter GVL_Simulation.SimM3OpenModelica
+    uniquement sous les deux verrous de simulation, sans modifier le PLC reel ni le code source production.
   objectifs:
-  - 'Recevoir les commandes M3 de Control Win et avancer la FMU OpenModelica.'
-  - 'Publier une image M3 complete vers SimM3OpenModelica.'
-  - 'Neutraliser sur timeout, trame invalide ou verrou de simulation absent.'
-  - 'Mesurer pertes, sequences et reprise apres coupure.'
+  - Recevoir les commandes M3 de Control Win et avancer la FMU OpenModelica.
+  - Publier une image M3 complete vers SimM3OpenModelica.
+  - Neutraliser sur timeout, trame invalide ou verrou de simulation absent.
+  - Mesurer pertes, sequences et reprise apres coupure.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T409_FMU_CONTROL_WIN_INJECTION.yaml
-  avancement: 'Contrat, plan, protocole binaire et gateway FMU créés ; POU passerelle fourni pour compilation dans la copie Control Win.'
+  avancement: Contrat, plan, protocole binaire et gateway FMU créés ; POU passerelle fourni pour compilation dans la copie
+    Control Win.
   bloque_par:
-  - 'Recette humaine de compilation et de téléchargement dans la copie Control Win.'
+  - Recette humaine de compilation et de téléchargement dans la copie Control Win.
 - id: T408
   parent_id: T399
   statut: ⏳
@@ -220,16 +270,19 @@ tasks:
   domaine: OUTILLAGE / SIMULATION / UDP NATIF / CONTROL WIN
   agent: CDX01
   date: '2026-09-28T01:50:00+02:00'
-  titre: 'POC UDP natif — mesure 10 ms dans la copie Control Win'
-  contexte: 'T407 valide le loopback mais mesure ~217 ms/echange via ScriptEngine. Il faut mesurer le transport depuis une tache PLC native non bloquante avant toute liaison M3.'
-  description: 'POC ping isole, boucle locale uniquement, sans M3 ni SimBench. Le code est importe seulement dans la copie Control Win et expose ses propres compteurs de charge.'
+  titre: POC UDP natif — mesure 10 ms dans la copie Control Win
+  contexte: T407 valide le loopback mais mesure ~217 ms/echange via ScriptEngine. Il faut mesurer le transport depuis une
+    tache PLC native non bloquante avant toute liaison M3.
+  description: POC ping isole, boucle locale uniquement, sans M3 ni SimBench. Le code est importe seulement dans la copie
+    Control Win et expose ses propres compteurs de charge.
   objectifs:
-  - 'Executer UDP non bloquant dans une tache 10 ms de la copie Control Win.'
-  - 'Mesurer cadence, pertes et p50/p95/p99/max sur 60 s.'
-  - 'Fermer explicitement le socket au stop et verifier la reprise sans changer de port.'
-  - 'Refuser toute integration M3 si le budget 50 ms n est pas respecte.'
+  - Executer UDP non bloquant dans une tache 10 ms de la copie Control Win.
+  - Mesurer cadence, pertes et p50/p95/p99/max sur 60 s.
+  - Fermer explicitement le socket au stop et verifier la reprise sans changer de port.
+  - Refuser toute integration M3 si le budget 50 ms n est pas respecte.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T408_POC_UDP_NATIF_CONTROL_WIN.yaml
-  avancement: 'Sources mono et multi-flux, echo local et garde-fou construits. Recette humaine a jouer dans une nouvelle tache 10 ms de la copie Control Win ; aucun code production ni image M3 touche.'
+  avancement: Sources mono et multi-flux, echo local et garde-fou construits. Recette humaine a jouer dans une nouvelle tache
+    10 ms de la copie Control Win ; aucun code production ni image M3 touche.
   bloque_par: []
 - id: T407
   parent_id: T399
@@ -238,16 +291,19 @@ tasks:
   domaine: OUTILLAGE / SIMULATION / UDP / CONTROL WIN
   agent: CDX01
   date: '2026-09-28T01:45:00+02:00'
-  titre: 'POC liaison UDP M3 — Control Win local et plante OpenModelica'
-  contexte: 'Le POC T402 a prouve ScriptEngine ponctuel et T404 a prouve Control Win local. Il faut maintenant mesurer un echange continu isole, sans OPC UA et sans aucune ecriture PLC.'
-  description: 'Phase 1 en lecture seule : le script CODESYS envoie les commandes M3 publiques a une plante locale par UDP loopback ; les retours sont controles et traces, mais jamais injectes dans le PLC.'
+  titre: POC liaison UDP M3 — Control Win local et plante OpenModelica
+  contexte: Le POC T402 a prouve ScriptEngine ponctuel et T404 a prouve Control Win local. Il faut maintenant mesurer un echange
+    continu isole, sans OPC UA et sans aucune ecriture PLC.
+  description: 'Phase 1 en lecture seule : le script CODESYS envoie les commandes M3 publiques a une plante locale par UDP
+    loopback ; les retours sont controles et traces, mais jamais injectes dans le PLC.'
   objectifs:
-  - 'Limiter strictement le transport a 127.0.0.1 et au runtime Control Win ouvert par l humain.'
-  - 'Porter des images atomiques sequencees, horodatees et validees.'
-  - 'Mesurer charge, pertes, doublons, rejets et percentiles de latence.'
-  - 'Conserver le PLC et FB_SimBench sans aucune ecriture pendant cette phase.'
+  - Limiter strictement le transport a 127.0.0.1 et au runtime Control Win ouvert par l humain.
+  - Porter des images atomiques sequencees, horodatees et validees.
+  - Mesurer charge, pertes, doublons, rejets et percentiles de latence.
+  - Conserver le PLC et FB_SimBench sans aucune ecriture pendant cette phase.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T407_POC_UDP_M3_CONTROL_WIN.yaml
-  avancement: 'Recette humaine shadow Control Win OK : 138/138, 0 timeout, 0 rejet. RTT p99 25.040 ms mais cadence effective ~217 ms/echange et pic 519.836 ms : ScriptEngine valide la connectivite, pas une boucle cible 50 ms. Aucune image OM ecrite.'
+  avancement: 'Recette humaine shadow Control Win OK : 138/138, 0 timeout, 0 rejet. RTT p99 25.040 ms mais cadence effective
+    ~217 ms/echange et pic 519.836 ms : ScriptEngine valide la connectivite, pas une boucle cible 50 ms. Aucune image OM ecrite.'
   bloque_par: []
 - id: T406
   parent_id: T399
@@ -256,17 +312,20 @@ tasks:
   domaine: OUTILLAGE / SIMULATION / CONTRAT LIAISON / SURETE
   agent: CDX01
   date: '2026-09-28T00:31:23+02:00'
-  titre: 'TwinBench M3 — contrat de signaux et surete de liaison PLC/plante'
-  contexte: 'La revue experte bloque toute integration PLC/OpenModelica tant que les images de donnees, leur validite, les timeouts, la neutralisation et les proprietaires ne sont pas definis et relus.'
-  description: 'Cadrer les images atomiques PLC/plante, les groupes rapide/cyclique/evenementiel, les sequences, horodatages, origins, validation, timeout et reconnexion, sans connecter aucun runtime ni modifier le PLC.'
+  titre: TwinBench M3 — contrat de signaux et surete de liaison PLC/plante
+  contexte: La revue experte bloque toute integration PLC/OpenModelica tant que les images de donnees, leur validite, les
+    timeouts, la neutralisation et les proprietaires ne sont pas definis et relus.
+  description: Cadrer les images atomiques PLC/plante, les groupes rapide/cyclique/evenementiel, les sequences, horodatages,
+    origins, validation, timeout et reconnexion, sans connecter aucun runtime ni modifier le PLC.
   objectifs:
-  - 'Definir le producteur unique, le sens, le type et l unite de chaque signal M3 initial.'
-  - 'Distinguer cadence rapide, cyclique, evenementielle et graphique sans promettre de temps reel Windows.'
-  - 'Interdire toute image partielle, perimee ou de provenance ambiguë.'
-  - 'Definir les etats de liaison et le rejet explicite sans hold-last-value silencieux.'
-  - 'Exiger une revue humaine avant toute implementation de passerelle ou connexion Control Win.'
+  - Definir le producteur unique, le sens, le type et l unite de chaque signal M3 initial.
+  - Distinguer cadence rapide, cyclique, evenementielle et graphique sans promettre de temps reel Windows.
+  - Interdire toute image partielle, perimee ou de provenance ambiguë.
+  - Definir les etats de liaison et le rejet explicite sans hold-last-value silencieux.
+  - Exiger une revue humaine avant toute implementation de passerelle ou connexion Control Win.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T406_TWINBENCH_CONTRAT_LIAISON.yaml
-  avancement: 'Contrat des images atomiques, cadences, validite, timeout et reconnexion redige et verifie. Revue humaine requise : aucun GO phase B/C/D tant que les bits variateur, timeouts, neutralisation et origins ne sont pas arbitres.'
+  avancement: 'Contrat des images atomiques, cadences, validite, timeout et reconnexion redige et verifie. Revue humaine requise
+    : aucun GO phase B/C/D tant que les bits variateur, timeouts, neutralisation et origins ne sont pas arbitres.'
   bloque_par: []
 - id: T405
   parent_id: T399
@@ -275,17 +334,22 @@ tasks:
   domaine: OUTILLAGE / SIMULATION / OPENMODELICA / INTERFACE LIVE
   agent: CDX01
   date: '2026-09-28T00:07:34+02:00'
-  titre: 'POC M3 live — joystick PySide6/QML et FMU OpenModelica à pas de 10 ms'
-  contexte: 'La simulation OMEdit par lot et ses graphes ne permettent pas de comprendre facilement les entrées/sorties des blocs ni de modifier une commande pendant l exécution. Un POC isolé doit prouver une interaction directe avec la même plante M3 compilée par OpenModelica.'
-  description: 'Compiler une façade scalaire de TranslationM3 en FMU FMI 2.0 Co-Simulation, la piloter localement avec OMSimulator par pas de communication de 10 ms et fournir une interface PySide6/QML montrant joystick, consigne, fréquence, frein, position, vitesse, capteurs et trace courte.'
+  titre: POC M3 live — joystick PySide6/QML et FMU OpenModelica à pas de 10 ms
+  contexte: La simulation OMEdit par lot et ses graphes ne permettent pas de comprendre facilement les entrées/sorties des
+    blocs ni de modifier une commande pendant l exécution. Un POC isolé doit prouver une interaction directe avec la même
+    plante M3 compilée par OpenModelica.
+  description: Compiler une façade scalaire de TranslationM3 en FMU FMI 2.0 Co-Simulation, la piloter localement avec OMSimulator
+    par pas de communication de 10 ms et fournir une interface PySide6/QML montrant joystick, consigne, fréquence, frein,
+    position, vitesse, capteurs et trace courte.
   objectifs:
-  - 'Modifier direction et fréquence pendant que la simulation tourne.'
-  - 'Avancer la FMU par pas de communication déterministes de 10 ms.'
-  - 'Afficher les entrées et sorties instantanées sans dépendre des graphes OMEdit.'
-  - 'Séparer la cadence physique 10 ms du rafraîchissement graphique plus lent.'
-  - 'Rester entièrement local, hors PLC, CODESYS, réseau et machine réelle.'
+  - Modifier direction et fréquence pendant que la simulation tourne.
+  - Avancer la FMU par pas de communication déterministes de 10 ms.
+  - Afficher les entrées et sorties instantanées sans dépendre des graphes OMEdit.
+  - Séparer la cadence physique 10 ms du rafraîchissement graphique plus lent.
+  - Rester entièrement local, hors PLC, CODESYS, réseau et machine réelle.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T405_POC_M3_LIVE_FMU_QML.yaml
-  avancement: 'FMU Co-Simulation construite avec omc 1.27.1 ; injection live et pas 10 ms validés sur 500 pas. Interface PySide6/QML chargée sans erreur après correction du conflit DLL Qt. En attente de recette visuelle humaine.'
+  avancement: FMU Co-Simulation construite avec omc 1.27.1 ; injection live et pas 10 ms validés sur 500 pas. Interface PySide6/QML
+    chargée sans erreur après correction du conflit DLL Qt. En attente de recette visuelle humaine.
   bloque_par: []
 - id: T404
   parent_id: T399
@@ -294,18 +358,24 @@ tasks:
   domaine: OUTILLAGE / SIMULATION / CODESYS CONTROL WIN
   agent: CDX01
   date: '2026-09-28T01:19:19+02:00'
-  titre: 'Control Win Runner isole — copier, deployer et ouvrir le projet simule'
-  contexte: 'Le changement manuel de device dans le projet reel a supprime les mappings E/S et provoque une regression. Avant le couplage OM ou le benchmark UDP, il faut prouver une chaine reproductible qui ne manipule qu une copie et ne peut pas contacter le PLC reel.'
-  description: 'Construire un lanceur qui demande un projet, l archive et cree une copie de travail fixe, compile cette copie en CODESYS headless, n autorise qu une cible Control Win puis permet d ouvrir la meme copie dans l IDE pour la visualisation en ligne.'
+  titre: Control Win Runner isole — copier, deployer et ouvrir le projet simule
+  contexte: Le changement manuel de device dans le projet reel a supprime les mappings E/S et provoque une regression. Avant
+    le couplage OM ou le benchmark UDP, il faut prouver une chaine reproductible qui ne manipule qu une copie et ne peut pas
+    contacter le PLC reel.
+  description: Construire un lanceur qui demande un projet, l archive et cree une copie de travail fixe, compile cette copie
+    en CODESYS headless, n autorise qu une cible Control Win puis permet d ouvrir la meme copie dans l IDE pour la visualisation
+    en ligne.
   objectifs:
-  - 'Garantir par empreinte que le projet selectionne reste inchange.'
-  - 'Conserver une copie horodatee et une copie de travail stable.'
-  - 'Compiler la copie en mode headless avant tout deploiement.'
-  - 'Interdire toute cible autre que CODESYS Control Win V3 x64.'
-  - 'Ouvrir exactement la copie deployee pour Watch, Trace et visu en ligne.'
-  - 'Rapporter les incompatibilites E/S sans modifier la logique PLC.'
+  - Garantir par empreinte que le projet selectionne reste inchange.
+  - Conserver une copie horodatee et une copie de travail stable.
+  - Compiler la copie en mode headless avant tout deploiement.
+  - Interdire toute cible autre que CODESYS Control Win V3 x64.
+  - Ouvrir exactement la copie deployee pour Watch, Trace et visu en ligne.
+  - Rapporter les incompatibilites E/S sans modifier la logique PLC.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T404_CONTROL_WIN_RUNNER_ISOLE.yaml
-  avancement: 'Recette humaine 2026-09-28 : copie TwinBench déployée sur CODESYS Control Win V3 x64 local, connexion ONLINE et lecture de variable réussies. Original inchangé par SHA-256 ; compilation Control Win 0 erreur/1 avertissement ; scan loopback obligatoire, assistant simplifié et archivage confirmé.'
+  avancement: 'Recette humaine 2026-09-28 : copie TwinBench déployée sur CODESYS Control Win V3 x64 local, connexion ONLINE
+    et lecture de variable réussies. Original inchangé par SHA-256 ; compilation Control Win 0 erreur/1 avertissement ; scan
+    loopback obligatoire, assistant simplifié et archivage confirmé.'
   bloque_par: []
 - id: T403
   parent_id: T399
@@ -314,17 +384,21 @@ tasks:
   domaine: OUTILLAGE / SIMULATION / OPENMODELICA / CODESYS
   agent: CDX01
   date: '2026-09-27T12:15:00+02:00'
-  titre: 'Aiguillage M3 SimBench entre modele ST et interface OpenModelica'
-  contexte: 'Le FB_SimBench doit rester l enveloppe unique de simulation. OpenModelica doit pouvoir fournir la meme image ST_HwTranslation que le modele ST interne, sans modifier la logique metier PLC.'
-  description: 'Ajouter un bit de selection M3 et une image de retours OpenModelica dans GVL_Simulation, puis aiguiller uniquement la sortie Translation du FB_SimBench. SimulationModeActive reste le verrou maitre et le modele ST reste le repli.'
+  titre: Aiguillage M3 SimBench entre modele ST et interface OpenModelica
+  contexte: Le FB_SimBench doit rester l enveloppe unique de simulation. OpenModelica doit pouvoir fournir la meme image ST_HwTranslation
+    que le modele ST interne, sans modifier la logique metier PLC.
+  description: Ajouter un bit de selection M3 et une image de retours OpenModelica dans GVL_Simulation, puis aiguiller uniquement
+    la sortie Translation du FB_SimBench. SimulationModeActive reste le verrou maitre et le modele ST reste le repli.
   objectifs:
-  - 'Conserver FB_SimBench, HwReal, HwSim et HwIn sans suppression.'
-  - 'Desactiver tout effet OM lorsque SimulationModeActive est FALSE.'
-  - 'Selectionner le modele ST M3 ou l image OpenModelica par un seul bit.'
-  - 'Ne modifier ni la logique metier M3 ni les sorties physiques PRG_06.'
-  - 'Fournir une interface ST_HwTranslation publique pour le futur pont om.exe.'
+  - Conserver FB_SimBench, HwReal, HwSim et HwIn sans suppression.
+  - Desactiver tout effet OM lorsque SimulationModeActive est FALSE.
+  - Selectionner le modele ST M3 ou l image OpenModelica par un seul bit.
+  - Ne modifier ni la logique metier M3 ni les sorties physiques PRG_06.
+  - Fournir une interface ST_HwTranslation publique pour le futur pont om.exe.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T403_AIGUILLAGE_M3_OPENMODELICA.yaml
-  avancement: 'Aiguillage implemente dans FB_SimBench : SimM3OpenModelicaActive selectionne le modele ST ou l image ST_HwTranslation OM. Bundle 262/262 sans erreur, G200 PASS 0 erreur. NOTE_APPLICATION_T403 trace les tests et limites. Recette CODESYS et raccordement om.exe restent a valider.'
+  avancement: 'Aiguillage implemente dans FB_SimBench : SimM3OpenModelicaActive selectionne le modele ST ou l image ST_HwTranslation
+    OM. Bundle 262/262 sans erreur, G200 PASS 0 erreur. NOTE_APPLICATION_T403 trace les tests et limites. Recette CODESYS
+    et raccordement om.exe restent a valider.'
   bloque_par: []
 - id: T402
   parent_id: T399
@@ -333,17 +407,22 @@ tasks:
   domaine: OUTILLAGE / SIMULATION / COMMUNICATION CODESYS
   agent: CDX01
   date: '2026-09-27T11:34:44+02:00'
-  titre: 'POC aller-retour M3 avec le simulateur intégré CODESYS'
-  contexte: 'Le POC Modelica utilisait un scénario implicite à la place des commandes et retours PLC. Avant de coupler OpenModelica, il faut prouver une lecture et une écriture contrôlée dans la simulation intégrée à l IDE CODESYS.'
-  description: 'Créer un script ScriptEngine exécuté dans Tools Scripting. Le mode probe lit les commandes finales et retours M3. Le mode pulse_maintenance écrit brièvement SimBtnMaintenance puis restaure FALSE. Toute écriture est interdite hors Simulation IDE.'
+  titre: POC aller-retour M3 avec le simulateur intégré CODESYS
+  contexte: Le POC Modelica utilisait un scénario implicite à la place des commandes et retours PLC. Avant de coupler OpenModelica,
+    il faut prouver une lecture et une écriture contrôlée dans la simulation intégrée à l IDE CODESYS.
+  description: Créer un script ScriptEngine exécuté dans Tools Scripting. Le mode probe lit les commandes finales et retours
+    M3. Le mode pulse_maintenance écrit brièvement SimBtnMaintenance puis restaure FALSE. Toute écriture est interdite hors
+    Simulation IDE.
   objectifs:
-  - 'Utiliser exclusivement l API ScriptEngine installée avec CODESYS 3.5.19.10.'
-  - 'Lire les commandes finales M3 et les retours de la plante simulée.'
-  - 'Prouver une écriture ponctuelle sans forçage et avec restauration garantie.'
-  - 'Refuser automatiquement l écriture hors mode Simulation IDE.'
-  - 'Ne modifier ni CODE, ni le projet CODESYS, ni le modèle OpenModelica.'
+  - Utiliser exclusivement l API ScriptEngine installée avec CODESYS 3.5.19.10.
+  - Lire les commandes finales M3 et les retours de la plante simulée.
+  - Prouver une écriture ponctuelle sans forçage et avec restauration garantie.
+  - Refuser automatiquement l écriture hors mode Simulation IDE.
+  - Ne modifier ni CODE, ni le projet CODESYS, ni le modèle OpenModelica.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T402_POC_COMMUNICATION_CODESYS_SIM_M3.yaml
-  avancement: 'POC ScriptEngine créé : probe lecture seule et lanceur pulse_maintenance Python 3 sans paramètre. Correction appliquée : propagation de la portée CODESYS (projects/online) vers le lanceur. Simulation-only avec restauration garantie ; contrat, syntaxe Python et garde-fou PASS. En attente de recette dans Tools > Scripting CODESYS.'
+  avancement: 'POC ScriptEngine créé : probe lecture seule et lanceur pulse_maintenance Python 3 sans paramètre. Correction
+    appliquée : propagation de la portée CODESYS (projects/online) vers le lanceur. Simulation-only avec restauration garantie
+    ; contrat, syntaxe Python et garde-fou PASS. En attente de recette dans Tools > Scripting CODESYS.'
   bloque_par: []
 - id: T401
   parent_id: T399
@@ -352,19 +431,24 @@ tasks:
   domaine: OUTILLAGE / SIMULATION / POC OPENMODELICA
   agent: CDX01
   date: '2026-09-27T22:23:16+02:00'
-  titre: 'POC rapide M3 — fichier OpenModelica autonome ouvrable et simulable dans OMEdit'
-  contexte: 'Avant l application Windows, la communication PLC et le modèle électromécanique détaillé, l utilisateur demande une preuve simple et rapide de la chaîne ouvrir, simuler et observer dans OpenModelica.'
-  description: 'Créer un modèle M3 isolé avec un scénario aller-retour automatique, les cinq capteurs, les deux butées hypothétiques, une rampe fréquence simplifiée et un frein simplifié. Le POC doit fonctionner directement dans OMEdit sans PLC, Python, serveur web ni FMU.'
+  titre: POC rapide M3 — fichier OpenModelica autonome ouvrable et simulable dans OMEdit
+  contexte: Avant l application Windows, la communication PLC et le modèle électromécanique détaillé, l utilisateur demande
+    une preuve simple et rapide de la chaîne ouvrir, simuler et observer dans OpenModelica.
+  description: Créer un modèle M3 isolé avec un scénario aller-retour automatique, les cinq capteurs, les deux butées hypothétiques,
+    une rampe fréquence simplifiée et un frein simplifié. Le POC doit fonctionner directement dans OMEdit sans PLC, Python,
+    serveur web ni FMU.
   objectifs:
-  - 'Ouvrir M3_POC.mo directement avec OMEdit 1.27.1.'
-  - 'Simuler un aller vers Maintenance puis un retour vers Trémie en un clic.'
-  - 'Tracer position, vitesse, consigne Hz, fréquence, frein et cinq capteurs.'
-  - 'Utiliser 50 Hz = 1 m/s comme hypothèse provisoire clairement marquée.'
-  - 'Valider compilation et simulation avec omc.exe avant recette humaine.'
-  - 'Ne modifier ni Dredge.mo, ni le PLC, ni le prototype web.'
-  - 'Régénérer Examples.AllerRetour et ajouter une boucle locale configurable séparée de la plante.'
+  - Ouvrir M3_POC.mo directement avec OMEdit 1.27.1.
+  - Simuler un aller vers Maintenance puis un retour vers Trémie en un clic.
+  - Tracer position, vitesse, consigne Hz, fréquence, frein et cinq capteurs.
+  - Utiliser 50 Hz = 1 m/s comme hypothèse provisoire clairement marquée.
+  - Valider compilation et simulation avec omc.exe avant recette humaine.
+  - Ne modifier ni Dredge.mo, ni le PLC, ni le prototype web.
+  - Régénérer Examples.AllerRetour et ajouter une boucle locale configurable séparée de la plante.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T401_POC_OPENMODELICA_M3_MINIMAL.yaml
-  avancement: 'Extension générée et validée par omc.exe 1.27.1 : Examples.AllerRetour restauré ; Examples.BoucleLocale configurable ajouté avec contrôleur séparé, retours capteurs, pauses et cycles bornés ou illimités. Tests 40 Hz/2 cycles, 20 Hz/1 cycle et cycleCount=0 PASS. En attente de recette visuelle OMEdit.'
+  avancement: 'Extension générée et validée par omc.exe 1.27.1 : Examples.AllerRetour restauré ; Examples.BoucleLocale configurable
+    ajouté avec contrôleur séparé, retours capteurs, pauses et cycles bornés ou illimités. Tests 40 Hz/2 cycles, 20 Hz/1 cycle
+    et cycleCount=0 PASS. En attente de recette visuelle OMEdit.'
   bloque_par: []
 - id: T400
   parent_id: T399
@@ -373,17 +457,19 @@ tasks:
   domaine: OUTILLAGE / SIMULATION / MODELISATION M3
   agent: CDX01
   date: '2026-09-27T10:07:52+02:00'
-  titre: 'Translation M3 — fiche récapitulative des données de modélisation'
-  contexte: 'La modélisation OpenModelica de M3 nécessite une référence courte distinguant les faits du code PLC, les données de plaque moteur, les hypothèses utilisateur, les écarts du SimBench actuel et les mesures encore nécessaires.'
-  description: 'Consolider la géométrie, les capteurs, la motorisation, les rampes, le frein, l interface du modèle et les inconnues mécaniques sur une fiche unique, sans modification du PLC ni du TwinBench.'
+  titre: Translation M3 — fiche récapitulative des données de modélisation
+  contexte: La modélisation OpenModelica de M3 nécessite une référence courte distinguant les faits du code PLC, les données
+    de plaque moteur, les hypothèses utilisateur, les écarts du SimBench actuel et les mesures encore nécessaires.
+  description: Consolider la géométrie, les capteurs, la motorisation, les rampes, le frein, l interface du modèle et les
+    inconnues mécaniques sur une fiche unique, sans modification du PLC ni du TwinBench.
   objectifs:
-  - 'Recenser les valeurs réellement câblées dans le code, pas seulement les valeurs par défaut des types.'
-  - 'Tracer les données de la plaque HELMKE sans inventer le réducteur ni la position du frein.'
-  - 'Identifier explicitement les hypothèses de butées et les écarts du SimBench actuel.'
-  - 'Définir la chaîne physique Modelica et l interface minimale PLC/plante.'
-  - 'Lister les mesures indispensables avant toute revendication de fidélité terrain.'
+  - Recenser les valeurs réellement câblées dans le code, pas seulement les valeurs par défaut des types.
+  - Tracer les données de la plaque HELMKE sans inventer le réducteur ni la position du frein.
+  - Identifier explicitement les hypothèses de butées et les écarts du SimBench actuel.
+  - Définir la chaîne physique Modelica et l interface minimale PLC/plante.
+  - Lister les mesures indispensables avant toute revendication de fidélité terrain.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T400_FICHE_MODELISATION_M3.yaml
-  avancement: 'Fiche rédigée le 2026-09-27 ; en attente de relecture humaine des hypothèses physiques et des données plaque.'
+  avancement: Fiche rédigée le 2026-09-27 ; en attente de relecture humaine des hypothèses physiques et des données plaque.
   bloque_par: []
 - id: T399
   parent_id: ''
@@ -392,18 +478,24 @@ tasks:
   domaine: OUTILLAGE / SIMULATION / ARCHITECTURE HYBRIDE
   agent: CDX01
   date: '2026-09-27T09:57:46+02:00'
-  titre: 'TwinBench hybride — feuille de route CODESYS, OpenModelica et application Windows'
-  contexte: 'La reprise TwinBench doit utiliser OpenModelica comme source physique, une application PySide6/QML comme interface et une communication locale avec le runtime CODESYS pour accéder aux variables réelles. Le protocole disponible, les droits, la charge de communication et la séparation machine réelle/banc virtuel ne sont pas encore vérifiés. Le prototype web autonome est conservé hors chemin critique.'
-  description: 'Structurer le projet en phases avec lots obligatoires, conditionnels et hypothétiques. Définir les responsabilités PLC/passerelle/OpenModelica/IHM, les jalons GO/NO-GO, l ordre de réalisation, les mesures manquantes et les conditions minimales avant toute lecture ou écriture dans le runtime CODESYS.'
+  titre: TwinBench hybride — feuille de route CODESYS, OpenModelica et application Windows
+  contexte: La reprise TwinBench doit utiliser OpenModelica comme source physique, une application PySide6/QML comme interface
+    et une communication locale avec le runtime CODESYS pour accéder aux variables réelles. Le protocole disponible, les droits,
+    la charge de communication et la séparation machine réelle/banc virtuel ne sont pas encore vérifiés. Le prototype web
+    autonome est conservé hors chemin critique.
+  description: Structurer le projet en phases avec lots obligatoires, conditionnels et hypothétiques. Définir les responsabilités
+    PLC/passerelle/OpenModelica/IHM, les jalons GO/NO-GO, l ordre de réalisation, les mesures manquantes et les conditions
+    minimales avant toute lecture ou écriture dans le runtime CODESYS.
   objectifs:
-  - 'Inventorier la communication réellement disponible dans le runtime CODESYS avant de choisir OPC UA ou une solution de repli.'
-  - 'Figer un contrat de signaux typé, horodaté et atomique par domaine.'
-  - 'Construire et valider M3 hors ligne avant toute intégration PLC.'
-  - 'Limiter la première connexion PLC à la lecture seule puis décider séparément du mode shadow et de la boucle virtuelle.'
-  - 'Reporter M1/M2 et la benne après obtention des mesures mécaniques minimales.'
-  - 'Interdire tout calcul physique dans l IHM et tout pilotage de la machine réelle par OpenModelica.'
+  - Inventorier la communication réellement disponible dans le runtime CODESYS avant de choisir OPC UA ou une solution de
+    repli.
+  - Figer un contrat de signaux typé, horodaté et atomique par domaine.
+  - Construire et valider M3 hors ligne avant toute intégration PLC.
+  - Limiter la première connexion PLC à la lecture seule puis décider séparément du mode shadow et de la boucle virtuelle.
+  - Reporter M1/M2 et la benne après obtention des mesures mécaniques minimales.
+  - Interdire tout calcul physique dans l IHM et tout pilotage de la machine réelle par OpenModelica.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T399_TWINBENCH_HYBRID_ROADMAP.yaml
-  avancement: 'Feuille de route rédigée le 2026-09-27. En attente de validation humaine avant activation du premier lot P0.1.'
+  avancement: Feuille de route rédigée le 2026-09-27. En attente de validation humaine avant activation du premier lot P0.1.
   bloque_par: []
 - id: T397
   parent_id: ''
@@ -412,17 +504,27 @@ tasks:
   domaine: DIAGNOSTIC / RESEAUX / OBSERVABILITE
   agent: —
   date: '2026-09-26T20:50:00+02:00'
-  titre: 'Calibration et prolongation de la durée d impulsion ResetPulse dans FB_AutoResetTransientDiag'
-  contexte: 'REX atelier/MES 2026-09-26 : lors du réarmement pupitre, instAutoResetTransientDiag entre bien en Phase=2 (attente stabilisation 1s) mais ResetPulse n est jamais observable dans la table de variables / watch CODESYS ni sur l IHM. Dans le code existant (FB_AutoResetTransientDiag.st:46-48), ResetPulse est remis à FALSE systématiquement à chaque scan et n est mis à TRUE que pendant 1 seul scan automate (20 ms), alors que le rafraîchissement d affichage CODESYS s effectue toutes les 100 à 200 ms. L exploitant demande une impulsion calibrée et observable d au moins 500 ms à 1 s.'
-  description: 'Ajouter une configuration de durée d impulsion (Cfg_PulseDuration : TIME := T#500ms ou T#1s) et un timer de maintien (PulseTimer : TP ou TON) dans FB_AutoResetTransientDiag.st afin de maintenir ResetPulse à TRUE pendant la durée configurée lors de chaque tentative. Vérifier la non-régression sur les blocs récepteurs FB_Diag_Ethercat et FB_Diag_CanOpen (qui fonctionnent sur front R_TRIG) et l ordonnancement des transitions Phase/State (passage à Lockout après expiration de l impulsion).'
+  titre: Calibration et prolongation de la durée d impulsion ResetPulse dans FB_AutoResetTransientDiag
+  contexte: 'REX atelier/MES 2026-09-26 : lors du réarmement pupitre, instAutoResetTransientDiag entre bien en Phase=2 (attente
+    stabilisation 1s) mais ResetPulse n est jamais observable dans la table de variables / watch CODESYS ni sur l IHM. Dans
+    le code existant (FB_AutoResetTransientDiag.st:46-48), ResetPulse est remis à FALSE systématiquement à chaque scan et
+    n est mis à TRUE que pendant 1 seul scan automate (20 ms), alors que le rafraîchissement d affichage CODESYS s effectue
+    toutes les 100 à 200 ms. L exploitant demande une impulsion calibrée et observable d au moins 500 ms à 1 s.'
+  description: 'Ajouter une configuration de durée d impulsion (Cfg_PulseDuration : TIME := T#500ms ou T#1s) et un timer de
+    maintien (PulseTimer : TP ou TON) dans FB_AutoResetTransientDiag.st afin de maintenir ResetPulse à TRUE pendant la durée
+    configurée lors de chaque tentative. Vérifier la non-régression sur les blocs récepteurs FB_Diag_Ethercat et FB_Diag_CanOpen
+    (qui fonctionnent sur front R_TRIG) et l ordonnancement des transitions Phase/State (passage à Lockout après expiration
+    de l impulsion).'
   objectifs:
   - 'Intégrer Cfg_PulseDuration : TIME := T#500ms (ou paramétrable de T#100ms à T#2s) dans FB_AutoResetTransientDiag.st.'
-  - 'Garantir le maintien de ResetPulse à TRUE pendant toute la durée Cfg_PulseDuration lors de chaque émission.'
-  - 'Vérifier que les récepteurs FB_Diag_Ethercat et FB_Diag_CanOpen acquittent immédiatement sur le front montant au scan 1 sans régression.'
-  - 'Valider la machine d état interne : State et Phase reflètent l impulsion en cours puis basculent en Lockout (Phase 3) à l issue de l impulsion.'
-  - 'Valider en CI (tests unitaires C_DIAG_RESEAUX) et vérifier la suite complète des gates mécaniques.'
+  - Garantir le maintien de ResetPulse à TRUE pendant toute la durée Cfg_PulseDuration lors de chaque émission.
+  - Vérifier que les récepteurs FB_Diag_Ethercat et FB_Diag_CanOpen acquittent immédiatement sur le front montant au scan
+    1 sans régression.
+  - 'Valider la machine d état interne : State et Phase reflètent l impulsion en cours puis basculent en Lockout (Phase 3)
+    à l issue de l impulsion.'
+  - Valider en CI (tests unitaires C_DIAG_RESEAUX) et vérifier la suite complète des gates mécaniques.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T397_CALIBRATION_RESET_PULSE_DIAG.yaml
-  avancement: 'Tâche cadrée le 2026-09-26 suite au constat exploitant en watch CODESYS.'
+  avancement: Tâche cadrée le 2026-09-26 suite au constat exploitant en watch CODESYS.
   bloque_par: []
 - id: T396
   parent_id: ''
@@ -432,17 +534,30 @@ tasks:
   agent: —
   date: '2026-09-26T20:10:00+02:00'
   updated_at: '2026-09-26T20:28:00+02:00'
-  titre: 'Compteurs horaires de fonctionnement totaliseurs (M1, M2, M3 et automate allume)'
-  contexte: 'Demande client formalisee en fin de MES 2026-09-23 : disposer des temps de fonctionnement reels pour chaque actionneur principal (M1 Treuil Levage, M2 Treuil Benne, M3 Translation) et du temps total de mise sous tension de l automate. Architecture confirmee le 2026-09-26 : comptage imperatif de TOUTES les secondes de marche reelle mémorisees en persistance NVRAM, conversion interne pour incrementer des compteurs Heures et Minutes, et diffusion sur GVL_IHM STRICTEMENT en Heures et Minutes (sans exposer les secondes a l ecran). Inviolabilite : aucune commande de remise a zero depuis l IHM, seule une purge explicite de la NVRAM / RETAIN est autorisee. Code ST deja implemente au commit d95904ae (GVL_PERSISTENT, PRG_07_Supervision, ST_RunningHoursHMI) mais non encore telecharge dans le PLC ni valide sur coupure secteur.'
-  description: 'Totaliser chaque seconde de fonctionnement reel dans GVL_PERSISTENT (_RunningHoursMachine_S, _M1_S, _M2_S, _M3_S). Calculer et diffuser vers GVL_IHM.Commun.RunningHours (type ST_RunningHoursHMI) UNIQUEMENT les heures entieres (Hours_H : DINT) et les minutes residuelles (Hours_Min : INT de 0 a 59), sans exposer les secondes. S assurer qu aucun bouton ni controle IHM ne permette de RAZ. Valider le deploiement sur l automate reel CODESYS et la retention apres coupure electrique.'
+  titre: Compteurs horaires de fonctionnement totaliseurs (M1, M2, M3 et automate allume)
+  contexte: 'Demande client formalisee en fin de MES 2026-09-23 : disposer des temps de fonctionnement reels pour chaque actionneur
+    principal (M1 Treuil Levage, M2 Treuil Benne, M3 Translation) et du temps total de mise sous tension de l automate. Architecture
+    confirmee le 2026-09-26 : comptage imperatif de TOUTES les secondes de marche reelle mémorisees en persistance NVRAM,
+    conversion interne pour incrementer des compteurs Heures et Minutes, et diffusion sur GVL_IHM STRICTEMENT en Heures et
+    Minutes (sans exposer les secondes a l ecran). Inviolabilite : aucune commande de remise a zero depuis l IHM, seule une
+    purge explicite de la NVRAM / RETAIN est autorisee. Code ST deja implemente au commit d95904ae (GVL_PERSISTENT, PRG_07_Supervision,
+    ST_RunningHoursHMI) mais non encore telecharge dans le PLC ni valide sur coupure secteur.'
+  description: 'Totaliser chaque seconde de fonctionnement reel dans GVL_PERSISTENT (_RunningHoursMachine_S, _M1_S, _M2_S,
+    _M3_S). Calculer et diffuser vers GVL_IHM.Commun.RunningHours (type ST_RunningHoursHMI) UNIQUEMENT les heures entieres
+    (Hours_H : DINT) et les minutes residuelles (Hours_Min : INT de 0 a 59), sans exposer les secondes. S assurer qu aucun
+    bouton ni controle IHM ne permette de RAZ. Valider le deploiement sur l automate reel CODESYS et la retention apres coupure
+    electrique.'
   objectifs:
-  - 'Comptage seconde reel : chaque seconde de commande/relais actif M1, M2, M3 et PLC ON incremente la memoire persistante interne.'
-  - 'Diffusion IHM filtree : seules les grandeurs Hours_H et Hours_Min sont transmises a GVL_IHM, les secondes restent internes a l automate.'
-  - 'Telecharger et instancier les variables GVL_PERSISTENT dans le PLC cible.'
-  - 'Valider l affichage IHM sans bouton de reinitialisation.'
-  - 'Valider la retention NVRAM apres coupure et remise sous tension de l automate.'
+  - 'Comptage seconde reel : chaque seconde de commande/relais actif M1, M2, M3 et PLC ON incremente la memoire persistante
+    interne.'
+  - 'Diffusion IHM filtree : seules les grandeurs Hours_H et Hours_Min sont transmises a GVL_IHM, les secondes restent internes
+    a l automate.'
+  - Telecharger et instancier les variables GVL_PERSISTENT dans le PLC cible.
+  - Valider l affichage IHM sans bouton de reinitialisation.
+  - Valider la retention NVRAM apres coupure et remise sous tension de l automate.
   contrat: ''
-  avancement: 'Code source ST conforme a l exigence deja ecrit et versionne (commit d95904ae). En attente de deploiement en ligne et de validation NVRAM.'
+  avancement: Code source ST conforme a l exigence deja ecrit et versionne (commit d95904ae). En attente de deploiement en
+    ligne et de validation NVRAM.
   bloque_par: []
 - id: T395
   parent_id: ''
@@ -451,16 +566,22 @@ tasks:
   domaine: MAINTENANCE_N2 / SECURITE / FREINS / TREUILS
   agent: —
   date: '2026-09-26T19:30:00+02:00'
-  titre: 'MAINT_N2 secours ultime : commande freins inconditionnelle et mouvements treuils/translation degrades sous defaut (sauf Top M1/M2 meca)'
-  contexte: 'REX terrain 2026-09-25 : en situation d avarie ou de defaut puissance, l exploitant doit pouvoir manoeuvrer pour remonter ou deplacer la machine en Maintenance N2. Actuellement, le forcage freins M1/M2 (PRG_06:320-331) exige PowerContactorEngaged_DI, ce qui interdit tout desserrage si la puissance est tombee.'
-  description: 'En mode MAINT_N2, rendre le forcage des freins M1/M2 possible inconditionnellement (avec chaine AU fermee et homme-mort, meme si le contacteur de puissance est retombe pour permettre une descente gravitaire controlee). Permettre en MAINT_N2 les mouvements de secours treuils et translation malgre des defauts process ou interdictions, a l EXCEPTION STRICTE du capteur mecanique FDC haut Top M1/M2 (butee de securite ultime preservee).'
+  titre: 'MAINT_N2 secours ultime : commande freins inconditionnelle et mouvements treuils/translation degrades sous defaut
+    (sauf Top M1/M2 meca)'
+  contexte: 'REX terrain 2026-09-25 : en situation d avarie ou de defaut puissance, l exploitant doit pouvoir manoeuvrer pour
+    remonter ou deplacer la machine en Maintenance N2. Actuellement, le forcage freins M1/M2 (PRG_06:320-331) exige PowerContactorEngaged_DI,
+    ce qui interdit tout desserrage si la puissance est tombee.'
+  description: En mode MAINT_N2, rendre le forcage des freins M1/M2 possible inconditionnellement (avec chaine AU fermee et
+    homme-mort, meme si le contacteur de puissance est retombe pour permettre une descente gravitaire controlee). Permettre
+    en MAINT_N2 les mouvements de secours treuils et translation malgre des defauts process ou interdictions, a l EXCEPTION
+    STRICTE du capteur mecanique FDC haut Top M1/M2 (butee de securite ultime preservee).
   objectifs:
-  - 'Relaxer la condition PowerContactorEngaged_DI sur MaintenanceN2BrakeForceM1/M2 dans PRG_06_Outputs.st.'
-  - 'Definir la matrice de bypasses automatiques actifs en MAINT_N2 pour les mouvements treuils et translation.'
-  - 'Garantir le maintien absolu de la protection FDC mecanique TopPositionFree_DI sur toute commande de montee.'
-  - 'Contrat C4 obligatoire avec double revue de surete machine.'
+  - Relaxer la condition PowerContactorEngaged_DI sur MaintenanceN2BrakeForceM1/M2 dans PRG_06_Outputs.st.
+  - Definir la matrice de bypasses automatiques actifs en MAINT_N2 pour les mouvements treuils et translation.
+  - Garantir le maintien absolu de la protection FDC mecanique TopPositionFree_DI sur toute commande de montee.
+  - Contrat C4 obligatoire avec double revue de surete machine.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T395_MAINT_N2_FREINS_ET_SECOURS.yaml
-  avancement: 'Tache cadree le 2026-09-26 suite a la demande exploitant.'
+  avancement: Tache cadree le 2026-09-26 suite a la demande exploitant.
   bloque_par: []
 - id: T394
   parent_id: ''
@@ -470,15 +591,19 @@ tasks:
   agent: —
   date: '2026-09-26T19:30:00+02:00'
   titre: 'Robustesse position P1 apres reboot sous l eau : qualification AtP1, translation PV/P2 et etude TglEnableWinchDescentLock_M3'
-  contexte: 'REX terrain 2026-09-25 : suite au blocage a -6m, l equipe a suspecte la perte de l etat AtP1 apres coupure/reboot PLC. Si le PLC reboote alors que la benne est descendue (ou si la position intermediaire P1 n est plus qualifiee), verifier les conditions de reprise, l autorisation de translation vers PV/P2 et la mise a disposition de Commun.Cfg.TglEnableWinchDescentLock_M3.'
-  description: 'Etudier la possibilite de forcer ou requalifier l etat AtP1 pour eviter les blocages de descente au reboot sous l eau. Verifier les permis de translation M3 vers PV et P2. Etudier l exposition IHM de TglEnableWinchDescentLock_M3 pour debrayer le verrou de descente treuil lie au pont M3.'
+  contexte: 'REX terrain 2026-09-25 : suite au blocage a -6m, l equipe a suspecte la perte de l etat AtP1 apres coupure/reboot
+    PLC. Si le PLC reboote alors que la benne est descendue (ou si la position intermediaire P1 n est plus qualifiee), verifier
+    les conditions de reprise, l autorisation de translation vers PV/P2 et la mise a disposition de Commun.Cfg.TglEnableWinchDescentLock_M3.'
+  description: Etudier la possibilite de forcer ou requalifier l etat AtP1 pour eviter les blocages de descente au reboot
+    sous l eau. Verifier les permis de translation M3 vers PV et P2. Etudier l exposition IHM de TglEnableWinchDescentLock_M3
+    pour debrayer le verrou de descente treuil lie au pont M3.
   objectifs:
   - 'Analyser le comportement au reboot du PLC benne descendue : perte de jeton AtP1, persistence NVRAM et impact sur WinchDescentAuth_M3.'
-  - 'Etudier une commande securisee IHM de requalification AtP1 ou de levee du verrou descente.'
-  - 'Verifier que la translation M3 jusqu a PV et P2 reste possible en mode degrade.'
-  - 'Evaluer les risques machine avant toute modification logicielle.'
+  - Etudier une commande securisee IHM de requalification AtP1 ou de levee du verrou descente.
+  - Verifier que la translation M3 jusqu a PV et P2 reste possible en mode degrade.
+  - Evaluer les risques machine avant toute modification logicielle.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T394_P1_REBOOT_ET_PERMIS_M3.yaml
-  avancement: 'Tache cadree le 2026-09-26 suite au retour d exploitation terrain.'
+  avancement: Tache cadree le 2026-09-26 suite au retour d exploitation terrain.
   bloque_par: []
 - id: T392
   parent_id: ''
@@ -490,15 +615,37 @@ tasks:
   updated_at: '2026-09-26T23:53:00+02:00'
   completed_at: '2026-09-26T23:53:00+02:00'
   titre: 'M3 SEMI_AUTO bloque en boucle : ArrivalLock ne se leve pas P1->Tremie, mapping SelTarget=3 fausse ArrivalWasTremie'
-  contexte: 'URGENCE TERRAIN 2026-09-23 : chariot M3 bloque a AX14_TRANSLATE_DUMP (SEMI_AUTO), toute la chaine de permis est verte (Step4-6/8 OK, FinalInterlockState=READY, EffectivePermitM3_Tremie=TRUE, HeightInterlock OK) mais RampTargetPct reste a 0. Cause confirmee en live (watch CODESYS avec l operateur) : instTranslationM3.ArrivalLock reste TRUE malgre ReqTremie=1 et CommandedTremie=1 (P1 -> Tremie), alors que FB_Translation.st:239 devrait le liberer des que le sens demande est oppose au dernier sens memorise (ArrivalWasTremie=FALSE attendu). CAUSE RACINE SUSPECTEE : FB_TranslationCmdArbitrationM3.st lignes ~68-80, pour SelTarget=3 (P1), le code choisit ReqTremie:=TRUE des que Joystick.AxisX.DirectionPositive est vrai (meme convention que pour la cible Tremie), au lieu de traiter l arrivee a P1 comme un arret intermediaire neutre. Consequence : une arrivee a P1 en approchant en sens positif est enregistree par FB_Translation.st (ArrivalEdge, CommandedTremie a ce moment-la) comme ArrivalWasTremie:=TRUE a tort, ce qui bloque ensuite TOUTE liberation ulterieure du verrou en direction Tremie -> deadlock structurel : en SEMI_AUTO/AX14 la cible est figee a 1 (Tremie), le joystick ne peut jamais generer ReqMaintenance pour satisfaire la condition de liberation FB_Translation.st:239. Deblocage terrain fait via bascule MAINT_N1/N2 + jog bref sens Maintenance (branche MAINT independante du mapping fautif), qui satisfait ReqMaintenance AND NOT ArrivalWasMaintenance et leve le verrou.'
-  description: 'Corriger le mapping ReqTremie/ReqMaintenance pour SelTarget=3 (P1) dans FB_TranslationCmdArbitrationM3.st afin qu une arrivee a P1 ne soit plus taguee comme "arrivee sens Tremie" dans FB_Translation.st (ArrivalWasTremie). Etudier si P1 doit produire un troisieme etat neutre (ni ArrivalWasTremie ni ArrivalWasMaintenance forcementTRUE) ou si le sens reel de deplacement (physique, pas seulement le signe du joystick) doit qualifier l arrivee. Fichier FB_Translation.st (verrou anti-rebond, C4 securite mouvement) et FB_TranslationCmdArbitrationM3.st concernes : contrat obligatoire, preuve ROUGE/VERT, revue independante avant tout changement.'
+  contexte: 'URGENCE TERRAIN 2026-09-23 : chariot M3 bloque a AX14_TRANSLATE_DUMP (SEMI_AUTO), toute la chaine de permis est
+    verte (Step4-6/8 OK, FinalInterlockState=READY, EffectivePermitM3_Tremie=TRUE, HeightInterlock OK) mais RampTargetPct
+    reste a 0. Cause confirmee en live (watch CODESYS avec l operateur) : instTranslationM3.ArrivalLock reste TRUE malgre
+    ReqTremie=1 et CommandedTremie=1 (P1 -> Tremie), alors que FB_Translation.st:239 devrait le liberer des que le sens demande
+    est oppose au dernier sens memorise (ArrivalWasTremie=FALSE attendu). CAUSE RACINE SUSPECTEE : FB_TranslationCmdArbitrationM3.st
+    lignes ~68-80, pour SelTarget=3 (P1), le code choisit ReqTremie:=TRUE des que Joystick.AxisX.DirectionPositive est vrai
+    (meme convention que pour la cible Tremie), au lieu de traiter l arrivee a P1 comme un arret intermediaire neutre. Consequence
+    : une arrivee a P1 en approchant en sens positif est enregistree par FB_Translation.st (ArrivalEdge, CommandedTremie a
+    ce moment-la) comme ArrivalWasTremie:=TRUE a tort, ce qui bloque ensuite TOUTE liberation ulterieure du verrou en direction
+    Tremie -> deadlock structurel : en SEMI_AUTO/AX14 la cible est figee a 1 (Tremie), le joystick ne peut jamais generer
+    ReqMaintenance pour satisfaire la condition de liberation FB_Translation.st:239. Deblocage terrain fait via bascule MAINT_N1/N2
+    + jog bref sens Maintenance (branche MAINT independante du mapping fautif), qui satisfait ReqMaintenance AND NOT ArrivalWasMaintenance
+    et leve le verrou.'
+  description: 'Corriger le mapping ReqTremie/ReqMaintenance pour SelTarget=3 (P1) dans FB_TranslationCmdArbitrationM3.st
+    afin qu une arrivee a P1 ne soit plus taguee comme "arrivee sens Tremie" dans FB_Translation.st (ArrivalWasTremie). Etudier
+    si P1 doit produire un troisieme etat neutre (ni ArrivalWasTremie ni ArrivalWasMaintenance forcementTRUE) ou si le sens
+    reel de deplacement (physique, pas seulement le signe du joystick) doit qualifier l arrivee. Fichier FB_Translation.st
+    (verrou anti-rebond, C4 securite mouvement) et FB_TranslationCmdArbitrationM3.st concernes : contrat obligatoire, preuve
+    ROUGE/VERT, revue independante avant tout changement.'
   objectifs:
-  - 'Reproduire en CI (test banc) : arrivee a P1 en approchant sens positif (depuis Maintenance), puis demande Tremie -> ArrivalLock doit se liberer immediatement (ROUGE avant correctif, VERT apres).'
-  - 'Corriger le mapping SelTarget=3 pour ne plus assimiler une arrivee P1 a une arrivee Tremie du point de vue du verrou anti-rebond.'
-  - 'Non-regression : les verrous anti-rebond a la Tremie et a Maintenance (arrets extremes reels) restent inchanges - seule la qualification de l arret intermediaire P1 est corrigee.'
-  - 'Aucun changement du comportement de securite (SafeStop, FDC extremes, PowerCutOff) - correctif de qualification de sens uniquement.'
+  - 'Reproduire en CI (test banc) : arrivee a P1 en approchant sens positif (depuis Maintenance), puis demande Tremie -> ArrivalLock
+    doit se liberer immediatement (ROUGE avant correctif, VERT apres).'
+  - Corriger le mapping SelTarget=3 pour ne plus assimiler une arrivee P1 a une arrivee Tremie du point de vue du verrou anti-rebond.
+  - 'Non-regression : les verrous anti-rebond a la Tremie et a Maintenance (arrets extremes reels) restent inchanges - seule
+    la qualification de l arret intermediaire P1 est corrigee.'
+  - Aucun changement du comportement de securite (SafeStop, FDC extremes, PowerCutOff) - correctif de qualification de sens
+    uniquement.
   contrat: ''
-  avancement: 'CLÔTURÉE PAR FUSION DANS T334 le 2026-09-26 (accord exploitant) : le correctif d urgence terrain 15ff306b (ArrivalIsExtreme) est livre et commite. L adoption de l architecture unifiee SelTarget=0 de l etude T334 elimine definitivement le besoin de mapping specifique pour SelTarget=3 et garantit la levee saine du verrou d arrivee dans tous les modes.'
+  avancement: 'CLÔTURÉE PAR FUSION DANS T334 le 2026-09-26 (accord exploitant) : le correctif d urgence terrain 15ff306b (ArrivalIsExtreme)
+    est livre et commite. L adoption de l architecture unifiee SelTarget=0 de l etude T334 elimine definitivement le besoin
+    de mapping specifique pour SelTarget=3 et garantit la levee saine du verrou d arrivee dans tous les modes.'
   bloque_par:
   - ''
 - id: T391
@@ -509,15 +656,15 @@ tasks:
   agent: CDX03
   locked_at: '2026-09-23T11:30:00+02:00'
   date: '2026-09-23T11:30:00+02:00'
-  titre: 'Remonter les defauts chariot M3 dans AnyFaultActive'
+  titre: Remonter les defauts chariot M3 dans AnyFaultActive
   contexte: 'Constat utilisateur : defaut mouvement chariot et defaut barriere M3 visibles mais exclus de AnyFaultActive.'
-  description: 'Etendre seulement l OR de supervision avec TranslationState.Error et TranslationState.FinalInterlockError.'
+  description: Etendre seulement l OR de supervision avec TranslationState.Error et TranslationState.FinalInterlockError.
   objectifs:
-  - 'Les deux defauts M3 rendent AnyFaultActive TRUE.'
-  - 'Aucune commande ni protection M3 ne change.'
+  - Les deux defauts M3 rendent AnyFaultActive TRUE.
+  - Aucune commande ni protection M3 ne change.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T391_M3_ANYFAULT.yaml
-  avancement: 'En cours CDX03, GO humain explicite.'
-  bloque_par:
+  avancement: En cours CDX03, GO humain explicite.
+  bloque_par: null
 - id: T390
   parent_id: ''
   statut: ✅
@@ -528,14 +675,32 @@ tasks:
   updated_at: '2026-09-26T23:53:00+02:00'
   completed_at: '2026-09-26T23:53:00+02:00'
   titre: 'M3 en cycle auto sur butee : faux defaut MecaA (deplacement sans commande) -> PowerCutOff intempestif suspecte'
-  contexte: 'Constat operateur 2026-09-23 (TRES IMPORTANT) : M3 en cycle auto arrivant sur butee s arrete et ne semble PAS deborder significativement, MAIS declenche parfois un defaut grave -> coupure (cutoff), message du type "[M3] ErrorID:06 - MecaA - deplacement sans commande" (FB_Hmi_BannerFormatter.st:1017, libelle exact retrouve par grep, non confirme verbatim par l operateur). Analyse code CODE/I_TRANSLATION/FB_Safety_Translation.st Cause 5 "Meca A" (l.179-193) : des que RunRequest=FALSE et BrakeCmd=FALSE, si ABS(DriveActualFreqHz) > 0.5 Hz pendant TonMecaA.PT := T#1S (delai FIXE, non parametrable), le defaut se latch -> PowerCutOff NON-resettable par Reset simple (defaut physique bit5, cf invariant fichier l.8-10). HYPOTHESE PRIORITAIRE A VERIFIER : a l arrivee sur butee, le variateur AC600 est encore en RAMPE DE DECELERATION naturelle au moment ou RunRequest retombe (fin de commande auto) ; si cette rampe dure plus que 1 s, Meca A se declenche a tort alors qu il n y a aucun mouvement non commande, juste une decel normale pas terminee. Non confirme par trace terrain a ce stade.'
-  description: 'Recueillir une trace terrain (DriveActualFreqHz, RunRequest, BrakeCmd, TonMecaA.Q, ErrorMecaA) au moment exact d un arret sur butee en cycle auto pour confirmer ou infirmer l hypothese de rampe de decel > 1s. Si confirmee : etudier un ajustement du delai TonMecaA et/ou une garde sur la phase de decel commandee (ex. ne pas armer la surveillance tant que le variateur est reconnu en rampe d arret suite a une commande, sans affaiblir la detection d un VRAI mouvement non commande). Toute modification de FB_Safety_Translation.st reste C1 (fichier de securite) : contrat obligatoire, preuve ROUGE/VERT, revue independante.'
+  contexte: 'Constat operateur 2026-09-23 (TRES IMPORTANT) : M3 en cycle auto arrivant sur butee s arrete et ne semble PAS
+    deborder significativement, MAIS declenche parfois un defaut grave -> coupure (cutoff), message du type "[M3] ErrorID:06
+    - MecaA - deplacement sans commande" (FB_Hmi_BannerFormatter.st:1017, libelle exact retrouve par grep, non confirme verbatim
+    par l operateur). Analyse code CODE/I_TRANSLATION/FB_Safety_Translation.st Cause 5 "Meca A" (l.179-193) : des que RunRequest=FALSE
+    et BrakeCmd=FALSE, si ABS(DriveActualFreqHz) > 0.5 Hz pendant TonMecaA.PT := T#1S (delai FIXE, non parametrable), le defaut
+    se latch -> PowerCutOff NON-resettable par Reset simple (defaut physique bit5, cf invariant fichier l.8-10). HYPOTHESE
+    PRIORITAIRE A VERIFIER : a l arrivee sur butee, le variateur AC600 est encore en RAMPE DE DECELERATION naturelle au moment
+    ou RunRequest retombe (fin de commande auto) ; si cette rampe dure plus que 1 s, Meca A se declenche a tort alors qu il
+    n y a aucun mouvement non commande, juste une decel normale pas terminee. Non confirme par trace terrain a ce stade.'
+  description: 'Recueillir une trace terrain (DriveActualFreqHz, RunRequest, BrakeCmd, TonMecaA.Q, ErrorMecaA) au moment exact
+    d un arret sur butee en cycle auto pour confirmer ou infirmer l hypothese de rampe de decel > 1s. Si confirmee : etudier
+    un ajustement du delai TonMecaA et/ou une garde sur la phase de decel commandee (ex. ne pas armer la surveillance tant
+    que le variateur est reconnu en rampe d arret suite a une commande, sans affaiblir la detection d un VRAI mouvement non
+    commande). Toute modification de FB_Safety_Translation.st reste C1 (fichier de securite) : contrat obligatoire, preuve
+    ROUGE/VERT, revue independante.'
   objectifs:
-  - 'Obtenir une trace terrain qui capture DriveActualFreqHz/RunRequest/BrakeCmd/TonMecaA autour d un evenement de coupure sur butee, pour confirmer la cause reelle.'
-  - 'Determiner si le delai TonMecaA (1s fixe) est compatible avec le temps de rampe de decel reel de l AC600 sur M3.'
-  - 'Si correctif necessaire : ne pas affaiblir la detection Meca A pour un vrai mouvement non commande (regle transverse Safety) - distinguer decel commandee de mouvement non commande.'
+  - Obtenir une trace terrain qui capture DriveActualFreqHz/RunRequest/BrakeCmd/TonMecaA autour d un evenement de coupure
+    sur butee, pour confirmer la cause reelle.
+  - Determiner si le delai TonMecaA (1s fixe) est compatible avec le temps de rampe de decel reel de l AC600 sur M3.
+  - 'Si correctif necessaire : ne pas affaiblir la detection Meca A pour un vrai mouvement non commande (regle transverse
+    Safety) - distinguer decel commandee de mouvement non commande.'
   contrat: ''
-  avancement: 'CLÔTURÉE PAR FUSION DANS T334 le 2026-09-26 (accord exploitant) : la cause racine a ete demontree par la comparaison des traces 2026-09-26 (Suivi_91). La retombee prematuree de RunRequest des le contact capteur laissait la machine en roue libre, declenchant la surveillance de deplacement sans commande. La solution validee dans l etude T334 maintient RunRequest actif jusqu a l arret physique complet confirme de l axe, supprimant structurellement la cause du faux defaut Meca A.'
+  avancement: 'CLÔTURÉE PAR FUSION DANS T334 le 2026-09-26 (accord exploitant) : la cause racine a ete demontree par la comparaison
+    des traces 2026-09-26 (Suivi_91). La retombee prematuree de RunRequest des le contact capteur laissait la machine en roue
+    libre, declenchant la surveillance de deplacement sans commande. La solution validee dans l etude T334 maintient RunRequest
+    actif jusqu a l arret physique complet confirme de l axe, supprimant structurellement la cause du faux defaut Meca A.'
   bloque_par:
   - ''
 - id: T389
@@ -546,14 +711,26 @@ tasks:
   agent: —
   date: '2026-09-23T00:00:00+02:00'
   titre: 'AX15B (vidage benne) : aucune echappatoire fermeture benne + remontee treuils si besoin operateur'
-  contexte: 'Constat operateur 2026-09-23 : en etape AX15B_DUMP_OPEN (vidage benne), impossible de fermer la benne et de remonter au FDC si besoin (ex. situation anormale, besoin de securiser rapidement). Analyse code CODE/G_CYCLE/FB_CycleSemiAuto.st:1534-1562 : (1) WinchM1Cmd.RunRequest et WinchM2Cmd.RunRequest sont forces a FALSE SANS CONDITION toute la duree de AX15B (l.1549-1550) -> aucune remontee possible depuis cette etape, meme si necessaire ; (2) BucketCmd.ReqOpen est la SEULE commande benne de l etape (l.1554, sur push+deadman) -> aucune commande de fermeture n existe a AX15B ; (3) la seule bifurcation possible est RepositionRequest -> AX15C_DUMP_REPOSITION (l.1557-1558, l.1564-1595) qui force une DESCENTE couplee M1+M2 (jamais une montee) et ne ferme pas non plus la benne. Ressenti operateur "pas les permits" coherent avec cette neutralisation structurelle, pas un defaut de permit isole.'
-  description: 'Etudier avec exploitant si une echappatoire operateur doit etre ajoutee a AX15B (et/ou AX15C) : fermeture benne sur tir joystick oppose et/ou remontee treuils autorisee sous conditions de securite explicites (homme-mort, position benne connue, etc.). Ne pas modifier la logique de securite/interlock (FB_Safety_Winch, FB_WinchOutputInterlock) - seule la sequence FB_CycleSemiAuto.st est visee. Cadrage humain requis avant toute ecriture (quelle direction, quelles conditions, quel geste operateur).'
+  contexte: 'Constat operateur 2026-09-23 : en etape AX15B_DUMP_OPEN (vidage benne), impossible de fermer la benne et de remonter
+    au FDC si besoin (ex. situation anormale, besoin de securiser rapidement). Analyse code CODE/G_CYCLE/FB_CycleSemiAuto.st:1534-1562
+    : (1) WinchM1Cmd.RunRequest et WinchM2Cmd.RunRequest sont forces a FALSE SANS CONDITION toute la duree de AX15B (l.1549-1550)
+    -> aucune remontee possible depuis cette etape, meme si necessaire ; (2) BucketCmd.ReqOpen est la SEULE commande benne
+    de l etape (l.1554, sur push+deadman) -> aucune commande de fermeture n existe a AX15B ; (3) la seule bifurcation possible
+    est RepositionRequest -> AX15C_DUMP_REPOSITION (l.1557-1558, l.1564-1595) qui force une DESCENTE couplee M1+M2 (jamais
+    une montee) et ne ferme pas non plus la benne. Ressenti operateur "pas les permits" coherent avec cette neutralisation
+    structurelle, pas un defaut de permit isole.'
+  description: 'Etudier avec exploitant si une echappatoire operateur doit etre ajoutee a AX15B (et/ou AX15C) : fermeture
+    benne sur tir joystick oppose et/ou remontee treuils autorisee sous conditions de securite explicites (homme-mort, position
+    benne connue, etc.). Ne pas modifier la logique de securite/interlock (FB_Safety_Winch, FB_WinchOutputInterlock) - seule
+    la sequence FB_CycleSemiAuto.st est visee. Cadrage humain requis avant toute ecriture (quelle direction, quelles conditions,
+    quel geste operateur).'
   objectifs:
-  - 'Confirmer avec l exploitant le besoin exact : fermeture benne depuis AX15B, remontee treuils depuis AX15B, ou les deux, et sous quelles conditions.'
-  - 'Cadrer la modification de sequence (nouvel etat ou extension AX15B/AX15C) sans toucher aux FB de securite.'
-  - 'Ne jamais permettre une remontee/fermeture hors homme-mort ni sans les permits de securite existants.'
+  - 'Confirmer avec l exploitant le besoin exact : fermeture benne depuis AX15B, remontee treuils depuis AX15B, ou les deux,
+    et sous quelles conditions.'
+  - Cadrer la modification de sequence (nouvel etat ou extension AX15B/AX15C) sans toucher aux FB de securite.
+  - Ne jamais permettre une remontee/fermeture hors homme-mort ni sans les permits de securite existants.
   contrat: ''
-  avancement: 'Non demarre. Tache creee sur signalement operateur 2026-09-23 (session AX15B, permit ressenti manquant).'
+  avancement: Non demarre. Tache creee sur signalement operateur 2026-09-23 (session AX15B, permit ressenti manquant).
   bloque_par:
   - ''
 - id: T393
@@ -564,14 +741,19 @@ tasks:
   agent: —
   date: '2026-09-23T00:00:00+02:00'
   titre: 'Defaut mou de cable silencieux : la coupure fonctionne mais aucune banniere alarme ni indication IHM'
-  contexte: 'Constat terrain 2026-09-23 (a confirmer/detailler) : sur defaut "mou de cable", la fonction de securite semble couper correctement le mouvement, mais le defaut est SILENCIEUX cote IHM - pas de banniere alarme, pas d indication visible pour l operateur. Tache differee (pas urgent immediat), a creuser plus tard.'
-  description: 'A investiguer : identifier la chaine mou de cable (capteur/entree, FB de detection, latch eventuel) et verifier pourquoi aucune remontee alarme/banniere/message IHM n est produite alors que la coupure physique a bien lieu. Corriger pour rendre le defaut visible (banniere + message), sans toucher a la logique de coupure elle-meme (deja fonctionnelle).'
+  contexte: 'Constat terrain 2026-09-23 (a confirmer/detailler) : sur defaut "mou de cable", la fonction de securite semble
+    couper correctement le mouvement, mais le defaut est SILENCIEUX cote IHM - pas de banniere alarme, pas d indication visible
+    pour l operateur. Tache differee (pas urgent immediat), a creuser plus tard.'
+  description: 'A investiguer : identifier la chaine mou de cable (capteur/entree, FB de detection, latch eventuel) et verifier
+    pourquoi aucune remontee alarme/banniere/message IHM n est produite alors que la coupure physique a bien lieu. Corriger
+    pour rendre le defaut visible (banniere + message), sans toucher a la logique de coupure elle-meme (deja fonctionnelle).'
   objectifs:
-  - 'Identifier la chaine logicielle du defaut mou de cable (detection -> coupure) et confirmer que la coupure est bien la cause du constat terrain.'
-  - 'Expliquer pourquoi aucune banniere alarme ni indication IHM n est emise pour ce defaut.'
-  - 'Ajouter la remontee IHM (banniere + message) sans modifier la logique de securite/coupure existante.'
+  - Identifier la chaine logicielle du defaut mou de cable (detection -> coupure) et confirmer que la coupure est bien la
+    cause du constat terrain.
+  - Expliquer pourquoi aucune banniere alarme ni indication IHM n est emise pour ce defaut.
+  - Ajouter la remontee IHM (banniere + message) sans modifier la logique de securite/coupure existante.
   contrat: ''
-  avancement: 'Non demarre. Tache creee sur signalement utilisateur 2026-09-23, priorite differee.'
+  avancement: Non demarre. Tache creee sur signalement utilisateur 2026-09-23, priorite differee.
   bloque_par:
   - ''
 - id: T388
@@ -1038,18 +1220,34 @@ tasks:
   agent: —
   date: '2026-09-22T06:22:09+02:00'
   updated_at: '2026-09-26T20:15:00+02:00'
-  titre: 'HOMING N1 MANUEL SANS CONTACT TOP : approche prudente sans heurter le capteur haut TOP, validation visuelle operateur et securisation contact'
-  contexte: 'REX terrain MES 2026-09-23 et avarie du 2026-09-25 (capteur fin de course mecanique Top M1/M2 casse par contrainte physique). Aller heurter physiquement le capteur haut pour se referencer presente un risque majeur de depassement et de casse materielle. Nouvelle doctrine validee avec l exploitant le 2026-09-26 : remplacement de la montee automatique au capteur par une approche manuelle prudente sous joystick a proximite immediate du capteur TOP SANS le toucher, validation visuelle de la position par l operateur via le bouton de confirmation existant du Grafcet (BtnValidation / BtnConfirmHomingBucket, sans nouveau bouton), et logique de securite en cas de contact fortuit (coupure montee, descente forcee, et PowerCutOff reserve a la persistance anormale de montee).'
-  description: 'Refondre l etape de montee du homing M1/M2 : 1) Guider l operateur pour monter prudemment a proximite du capteur haut sans aller le toucher. 2) Utiliser le bouton de confirmation existant du homing pour valider visuellement l alignement haut et declencher le referencement atomique (HomeReq). 3) En cas de contact fortuit sur le capteur Top mecanique : NE PAS declencher de PowerCutOff immediat, couper immediatement la commande de montee (SafetyPermit_Ascent := FALSE), forcer le degagement en descente, et ne declencher le PowerCutOff d arret d urgence que si un mouvement de montee persiste malgre la consigne automate coupee (ex. contacteur colle ou force mecaniquement dans l armoire).'
+  titre: 'HOMING N1 MANUEL SANS CONTACT TOP : approche prudente sans heurter le capteur haut TOP, validation visuelle operateur
+    et securisation contact'
+  contexte: 'REX terrain MES 2026-09-23 et avarie du 2026-09-25 (capteur fin de course mecanique Top M1/M2 casse par contrainte
+    physique). Aller heurter physiquement le capteur haut pour se referencer presente un risque majeur de depassement et de
+    casse materielle. Nouvelle doctrine validee avec l exploitant le 2026-09-26 : remplacement de la montee automatique au
+    capteur par une approche manuelle prudente sous joystick a proximite immediate du capteur TOP SANS le toucher, validation
+    visuelle de la position par l operateur via le bouton de confirmation existant du Grafcet (BtnValidation / BtnConfirmHomingBucket,
+    sans nouveau bouton), et logique de securite en cas de contact fortuit (coupure montee, descente forcee, et PowerCutOff
+    reserve a la persistance anormale de montee).'
+  description: 'Refondre l etape de montee du homing M1/M2 : 1) Guider l operateur pour monter prudemment a proximite du capteur
+    haut sans aller le toucher. 2) Utiliser le bouton de confirmation existant du homing pour valider visuellement l alignement
+    haut et declencher le referencement atomique (HomeReq). 3) En cas de contact fortuit sur le capteur Top mecanique : NE
+    PAS declencher de PowerCutOff immediat, couper immediatement la commande de montee (SafetyPermit_Ascent := FALSE), forcer
+    le degagement en descente, et ne declencher le PowerCutOff d arret d urgence que si un mouvement de montee persiste malgre
+    la consigne automate coupee (ex. contacteur colle ou force mecaniquement dans l armoire).'
   objectifs:
-  - 'Remplacer la step de montee automatique au capteur par une etape d approche manuelle joystick a vitesse d approche sous homme-mort.'
-  - 'Valider la position haute sur appui du bouton de confirmation existant du G7 de homing (sans creation de nouveau bouton).'
-  - 'Interdire strictement la montee (SafetyPermit_Ascent := FALSE) des que le capteur Top mecanique est franchi, sans couper brutalement la puissance (pas de PowerCutOff immediat).'
-  - 'Obliger l operateur a descendre pour liberer le capteur Top avant toute reprise.'
-  - 'Declencher un PowerCutOff / arret d urgence uniquement si un mouvement de montee effectif est detecte (via codeurs) alors que la commande automate est a zero.'
-  - 'Mettre a jour le contrat TASK_CONTRACT_T364_HOMING_N1_MANUAL_TOP.yaml (ou dedier un contrat T377) et valider sans regression.'
+  - Remplacer la step de montee automatique au capteur par une etape d approche manuelle joystick a vitesse d approche sous
+    homme-mort.
+  - Valider la position haute sur appui du bouton de confirmation existant du G7 de homing (sans creation de nouveau bouton).
+  - Interdire strictement la montee (SafetyPermit_Ascent := FALSE) des que le capteur Top mecanique est franchi, sans couper
+    brutalement la puissance (pas de PowerCutOff immediat).
+  - Obliger l operateur a descendre pour liberer le capteur Top avant toute reprise.
+  - Declencher un PowerCutOff / arret d urgence uniquement si un mouvement de montee effectif est detecte (via codeurs) alors
+    que la commande automate est a zero.
+  - Mettre a jour le contrat TASK_CONTRACT_T364_HOMING_N1_MANUAL_TOP.yaml (ou dedier un contrat T377) et valider sans regression.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_HOMING_N1_MANUAL_TOP.yaml
-  avancement: 'Doctrine exploitant integree le 2026-09-26 suite a la casse du capteur Top le 25/09. Tache reactivee en cours de cadrage avant edition ST.'
+  avancement: Doctrine exploitant integree le 2026-09-26 suite a la casse du capteur Top le 25/09. Tache reactivee en cours
+    de cadrage avant edition ST.
   bloque_par: []
 - id: T378
   parent_id: ''
@@ -2972,7 +3170,10 @@ tasks:
     et rappelle qu un resultat de banc ne vaut pas preuve terrain.
   bloque_par: []
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T348_TRACE_M3_10MS_L0.yaml
-  avancement: 'CLÔTURÉE ✅ le 2026-09-26 : les traces de reference ont ete acquises par l exploitant (Suivi_91_SIMU_M3_20260926.trace en cycle et Suivi_91_SIMU_M3_MAINTn1_20260926.trace en manuel) et depouillees integralement. Elles ont apporte la preuve formelle du comportement reel (freinage electrique regeneratif actif maintenu en manuel vs roue libre et bond de consigne a 48.6 Hz en auto), permettant la validation de la solution d unification dans l etude T334.'
+  avancement: 'CLÔTURÉE ✅ le 2026-09-26 : les traces de reference ont ete acquises par l exploitant (Suivi_91_SIMU_M3_20260926.trace
+    en cycle et Suivi_91_SIMU_M3_MAINTn1_20260926.trace en manuel) et depouillees integralement. Elles ont apporte la preuve
+    formelle du comportement reel (freinage electrique regeneratif actif maintenu en manuel vs roue libre et bond de consigne
+    a 48.6 Hz en auto), permettant la validation de la solution d unification dans l etude T334.'
 - id: T347
   parent_id: ''
   statut: ⏳
@@ -3237,7 +3438,8 @@ tasks:
   date: '2026-09-21T05:22:00+02:00'
   updated_at: '2026-09-26T23:53:00+02:00'
   completed_at: '2026-09-26T23:53:00+02:00'
-  titre: 'AX14 vers AX15A : supprimer le relachement joystick exige a l arrivee Tremie (continuite sans a-coup) — FUSIONNÉE DANS T334'
+  titre: 'AX14 vers AX15A : supprimer le relachement joystick exige a l arrivee Tremie (continuite sans a-coup) — FUSIONNÉE
+    DANS T334'
   contexte: 'Le grafcet semi-auto gele le 2026-09-03 (DOC/WFLOW/AUDITS/GEL_GRAFCET_SEMIAUTO_20260903.md, table AT14) prevoit
     JoystickDeflected AND Translation_At_Tremie vers AX15A : un MAINTIEN, pas un relachement. Le code exige un relachement
     du joystick. Le brief T345 demandait d aligner le code sur la spec en RETIRANT aussi le temporisateur de confirmation
@@ -3320,7 +3522,9 @@ tasks:
     presente dans l arbre de travail AVANT ce lot (renommage G499 vers G505 du chantier T291-B) — constatee, signalee, NON
     touchee. NON FAIT, HORS PERIMETRE : L2, D3 (trace 10 ms requise), Q5, Q6, la documentation d interface FB_Translation_v1.1.md
     (nouvelle VAR_OUTPUT a documenter), et le transit du fait d arret vers le lot L2 (champ ST_TranslationInterPrg + cablage
-    PRG_03) qui est le premier geste d ouverture de L2. AUCUN COMMIT sans accord explicite DISTINCT du GO. [MAJ 2026-09-26] : FUSIONNÉE DANS T334 — la solution d unification globale SelTarget=0 et fiabilisation ArrivalStopConfirmed couvrant a la fois AX14 et AX2 etant validee dans l etude T334, cette tache sous-lot est close par absorption.'
+    PRG_03) qui est le premier geste d ouverture de L2. AUCUN COMMIT sans accord explicite DISTINCT du GO. [MAJ 2026-09-26]
+    : FUSIONNÉE DANS T334 — la solution d unification globale SelTarget=0 et fiabilisation ArrivalStopConfirmed couvrant a
+    la fois AX14 et AX2 etant validee dans l etude T334, cette tache sous-lot est close par absorption.'
 - id: T344
   parent_id: T341
   statut: ⬜
@@ -3885,27 +4089,30 @@ tasks:
   - 'Verdict : divergence obligatoire / modifiable / anomalie — argumenté sur AF-02 (architecture), AF-03 (contrats FB), AF-11
     (translation), CODE_QUALITY_STANDARDS (producteur unique). Proposition d''unification si anomalie.'
   - Cause du dépassement P1/Trémie en cycle prouvée par trace (réelle ou SimBench T300), signal fautif nommé fichier:ligne.
-  - 'Qualifier l impact du passage de la vitesse d approche de 10 Hz a 20 Hz et de l allongement du delai retour frein (800 a 1000 ms) sur la distance d arret de M3.'
-  - 'Rétablir un arret franc et reproductible du chariot M3 a l aplomb exact des capteurs P1 et Tremie en cycle semi-auto, sans franchissement excessif ni derive.'
+  - Qualifier l impact du passage de la vitesse d approche de 10 Hz a 20 Hz et de l allongement du delai retour frein (800
+    a 1000 ms) sur la distance d arret de M3.
+  - Rétablir un arret franc et reproductible du chariot M3 a l aplomb exact des capteurs P1 et Tremie en cycle semi-auto,
+    sans franchissement excessif ni derive.
   - 'Correctif (lot séparé, après validation) : arrêt M3 à l''arrivée P1/Trémie en cycle au même scan qu''en manuel ; test
     CI échoue avant / passe après ; guard: de non-régression.'
   - 'Jamais de franchissement toléré en auto : le dépassement reste un défaut tracé, pas un comportement admis.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T334_AUTO_CYCLE_M3_OVERSHOOT.yaml
   bloque_par:
   - T300 P-A (reproduction SimBench de la perte capteur) si aucune trace réelle 10 ms n'est disponible.
-  avancement: 'REX EXPLOITATION TERRAIN 2026-09-25 (REGRESSION CONFIRMEE PAR L EXPLOITANT) : alors qu en debut de mise en service
-    l arret du chariot etait propre et net, une derive critique est constatee sur site — le chariot M3 s arrete bien au-dela
-    du capteur P1. Une suspicion analogue existait en fin de MES cote Tremie (impression d aller trop loin). CORRELATION TECHNIQUE
-    DIRECTE avec les modifications du 23/09 : (1) frequence d approche M3 doublee de 10 Hz a 20 Hz pour reduire les defauts variateur
-    -> energie cinetique quadruplee au freinage ; (2) delai retour frein etendu de 800 a 1000 ms -> glissement accru sur l inertie
-    ; (3) chaine de coupure du cycle qui retire la commande sans verrouillage mecanique franc dans l axe. TACHE PRIORITAIRE P0 :
-    ne rien modifier dans le code avant d avoir compare la trace d arret 10 Hz vs 20 Hz et la sequence de coupure. ETAPE 1 (ANALYSE)
-    LIVREE par DSH07 (fiche TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md). ETAPE 2 (CADRAGE DES SOLUTIONS) LIVREE le 2026-09-26
-    (document DOC/WFLOW/AUDITS/DESIGN/ETUDE_ARRET_M3_UNIFICATION_MANU_CYCLE_T334.md) : validation exploitant de l unification SelTarget=0,
-    maintien ReqStart jusqu a confirmation d arret complet de l axe, fiabilisation ArrivalStopConfirmed (tempo zero speed 250ms + frein mecanique retombe),
-    et verrouillage zone Maintenance en cycle auto.
-    [FUSION FORMELLE 2026-09-26] : absorption validee des taches T348 (traces depouillees), T345 (arret axe Tremie), T390 (faux defaut Meca A)
-    et T392 (ArrivalLock & mapping SelTarget=3), desormais traitees et resolues au sein de cette tache directrice unique T334. Pret pour contrat et implementation.'
+  avancement: 'REX EXPLOITATION TERRAIN 2026-09-25 (REGRESSION CONFIRMEE PAR L EXPLOITANT) : alors qu en debut de mise en
+    service l arret du chariot etait propre et net, une derive critique est constatee sur site — le chariot M3 s arrete bien
+    au-dela du capteur P1. Une suspicion analogue existait en fin de MES cote Tremie (impression d aller trop loin). CORRELATION
+    TECHNIQUE DIRECTE avec les modifications du 23/09 : (1) frequence d approche M3 doublee de 10 Hz a 20 Hz pour reduire
+    les defauts variateur -> energie cinetique quadruplee au freinage ; (2) delai retour frein etendu de 800 a 1000 ms ->
+    glissement accru sur l inertie ; (3) chaine de coupure du cycle qui retire la commande sans verrouillage mecanique franc
+    dans l axe. TACHE PRIORITAIRE P0 : ne rien modifier dans le code avant d avoir compare la trace d arret 10 Hz vs 20 Hz
+    et la sequence de coupure. ETAPE 1 (ANALYSE) LIVREE par DSH07 (fiche TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md).
+    ETAPE 2 (CADRAGE DES SOLUTIONS) LIVREE le 2026-09-26 (document DOC/WFLOW/AUDITS/DESIGN/ETUDE_ARRET_M3_UNIFICATION_MANU_CYCLE_T334.md)
+    : validation exploitant de l unification SelTarget=0, maintien ReqStart jusqu a confirmation d arret complet de l axe,
+    fiabilisation ArrivalStopConfirmed (tempo zero speed 250ms + frein mecanique retombe), et verrouillage zone Maintenance
+    en cycle auto. [FUSION FORMELLE 2026-09-26] : absorption validee des taches T348 (traces depouillees), T345 (arret axe
+    Tremie), T390 (faux defaut Meca A) et T392 (ArrivalLock & mapping SelTarget=3), desormais traitees et resolues au sein
+    de cette tache directrice unique T334. Pret pour contrat et implementation.'
 - id: T255-D
   parent_id: T255
   statut: ✅
