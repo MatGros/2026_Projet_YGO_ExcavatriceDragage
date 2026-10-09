@@ -1,4 +1,35 @@
 tasks:
+- id: T417
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: SIMULATION / SIMBENCH / TRANSLATION M3
+  agent: CC01
+  date: '2026-10-09T20:55:27'
+  titre: SimBench M3 — fidelite 50 Hz et roue libre a la perte de commande (Modelica en veille)
+  contexte: Le simulateur ST M3 plafonne a 40 Hz (20 Hz reel = 16 Hz simule) et decelere en rampe controlee au lieu de la roue libre variateur observee en reel (T334 depassement 20-40 cm). Modelica trop lourd pour iterer ; le garder en veille, pas le supprimer.
+  description: L1 echelle sim alignee sur _TranslationMaxFreq_Hz (50 Hz). L2 roue libre a la perte de commande, interrupteur dedie defaut OFF, frottement a calibrer (cible initiale 0,20-0,40 m a 20 Hz, a confirmer par T348). Gate anti nouveau lecteur de GVL_Simulation. Aucun fichier de production touche.
+  objectifs:
+  - Un 20 Hz demande donne 20 Hz simule ; 50 Hz donne 50 Hz.
+  - Interrupteur OFF = sorties identiques a v0.7.33_SimBench_M3PLC_20261009.
+  - Retrait de commande avant l arret physique reproduit le depassement T334 ; commande maintenue jusqu a |fAct| <= 0,5 Hz le supprime.
+  - Zero ligne de simulation dans le code de production (gate fige les lecteurs de GVL_Simulation).
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417_SIMBENCH_M3_FIDELITE_ROUE_LIBRE.yaml
+  avancement: Contrat redige (check_task_contract PASS). Plan technique a faire challenger par expert variateur puis valider par l humain avant tout code. Lies sans etre fusionnes - T348 (mesure 10 ms, calibration), T334 (cause racine), T366 (rebond capteurs, pas urgent), T316 (meme logique pour les treuils), T399-T415 (TwinBench/Modelica, a mettre en pause apres accord car verrous CDX01).
+  bloque_par: []
+- id: T417-B
+  parent_id: T417
+  statut: ⬜
+  criticite: C2
+  domaine: SIMULATION / REFACTOR VARIABLES SIM / IHM
+  agent: —
+  date: '2026-10-09T20:55:27'
+  titre: SimBench — regroupement des variables de simulation en structures SimM3 / SimWinch
+  contexte: GVL_Simulation melange des prefixes SimM3*, SimWinch*, SimEncoder*, SimM2*, SimKobold* a plat. Une structure par domaine avec un interrupteur par module (inertie, charge suspendue, glissement, capteurs, fautes).
+  description: Refactor apres validation de T417 L1+L2. Tenir a jour IHM_VARIABLES_MIGRATION.md (ancien vers nouveau chemin) ; ST_IHM_MANU reste figee. Verifier la compatibilite avec NAMING_CONVENTION avant de choisir struct ou prefixe.
+  contrat: A rediger avant activation (TASK_CONTRACT_T417-B_*.yaml).
+  bloque_par:
+  - T417
 - id: T416
   parent_id: null
   statut: ⏳
