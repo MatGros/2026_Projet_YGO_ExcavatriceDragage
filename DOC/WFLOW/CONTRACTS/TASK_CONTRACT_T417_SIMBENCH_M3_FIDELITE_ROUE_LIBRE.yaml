@@ -1,7 +1,8 @@
-# Contrat T417 — SimBench M3 : fidélité 50 Hz + roue libre à la perte de commande
-# Statut : BROUILLON pour validation humaine. Aucune ligne de CODE/ écrite.
-# Périmètre de ce contrat = lots L1 + L2. Le refactor struct (L3) aura son propre contrat.
-# Vérité des valeurs = code déployé en mise en service + registres MES (pas les AF).
+# Contrat T417 — SimBench M3 : fidélité échelle 50 Hz + rampe variateur, rejeu T334
+# Statut : V2 révisée après challenge expert (trace réelle Suivi_90 du 23/09). Aucune ligne de CODE/ écrite.
+# NB : le nom de fichier garde "ROUE_LIBRE" (référencé par TASKS.yaml) ; la roue libre (ex-L2) est ABANDONNÉE.
+# Périmètre = L1 (échelle) + DecelRate 25 Hz/s + rejeu T334. Refactor struct = T417-B (contrat séparé).
+# Vérité des valeurs = code déployé en mise en service + registres MES.
 
 contract:
   task_id: T417_SIMBENCH_M3_FIDELITE_ROUE_LIBRE
@@ -9,51 +10,54 @@ contract:
   strategy: patch
 
   objective: >
-    Le SimBench ST reproduit le dépassement M3 observé en réel quand la commande est retirée
-    avant l'arrêt physique (roue libre variateur, T334), à la bonne échelle de fréquence
-    (50 Hz max, approche 20 Hz), sans qu'aucune ligne de simulation n'entre dans le code
-    de production, pour tester les corrections sans réglage sur site. Modelica est mis
-    en veille, jamais supprimé.
+    Le SimBench ST fait tourner le VRAI code de production de la translation M3 face à un
+    modèle à la bonne échelle de fréquence (50 Hz max, approche 20 Hz) et à la rampe variateur
+    mesurée (~25 Hz/s), afin de rejouer le cas T334 (dépassement au contact P1/Trémie) et de
+    tester les corrections sans réglage sur site. Aucune ligne de simulation n'entre dans le
+    code de production. Modelica est en veille, jamais supprimé.
 
-  context_facts:   # tous relevés dans le code ou les registres, aucun supposé
+  context_facts:   # tous relevés dans le code, les registres ou les traces, aucun supposé
     - "Fréquence max = GVL_PERSISTENT._TranslationMaxFreq_Hz = 50.0 (source unique)"
     - "Approche par cible = 20 Hz : Trémie (déclenché PV), Maintenance (déclenché P1), P1 (déclenché P2) — ST_TranslationCfg.st"
-    - "PRG_02 envoie SpeedCmd_Pct = f/50*100 ; FB_Sim_Translation refait Hz = Pct*0,4 borné à 40 => 20 Hz réel = 16 Hz simulé (écart à corriger)"
-    - "Roue libre réelle : CommandWord=0 coupe la modulation (FB_Translation.st:297-303) ; étude T334 du 26/09 : dépassement 20 à 40 cm en cycle auto, arrêt net en manuel"
-    - "Frein réel : reste desserré tant que |fAct| > 0,5 Hz (FB_Translation.st:271-272) ; DelayMotorDecel déclaré mais non câblé (audit 14/09)"
-    - "Sim actuel : commande retirée => décélération contrôlée 20 Hz/s (FrequencyTgt=0), et VelocityTrue_Mps := 0 instantané à la fermeture frein"
-    - "Pas de position en mètres dans les traces (DI capteurs + fréquences seulement). Suivi_90 (23/09) = réel ; Suivi_91 (26/09) = banc SIMU. T348 (mesure 10 ms) non faite."
+    - "PRG_02_Acquisition.st:341-347 envoie SpeedCmd_Pct = f/50*100 ; FB_Sim_Translation refait Hz = Pct*0,4 borné à 40 => 20 Hz réel = 16 Hz simulé (écart L1)"
+    - "Mot de commande variateur : FB_Translation.st:343-349 — RequestedDriveControlWord = 0 si ni Tremie ni Maintenance (ou frein non commandé ouvert)"
+    - "Frein réel : reste desserré tant que |DriveActualFreqHz| > 0,5 Hz avec timeout (FB_Translation.st:318) ; DelayMotorDecel déclaré mais non câblé"
+    - "Trace réelle Suivi_90 (23/09, 3 événements, tous à 20 Hz) : après commande 0, ActualFrequencyHz redescend en rampe ~25 Hz/s (~ rampe variateur F01.23 = 2 s), PAS en roue libre ; frein DI reste ouvert 0,5-1,0 s après F=0 ; dépassement ~0,25 m (décél. équivalente ~0,5 m/s2)"
+    - "Rampe PLC (RequestedDriveFreqHz) était à 47,5 Hz pendant que le variateur recevait 20 Hz (clamp d'approche) ; hypothèse NON vérifiée : le dépassement vient du bond de consigne quand le clamp 20 Hz disparaît"
+    - "Sim actuel : AccelRate/DecelRate 20 Hz/s (FB_Sim_TranslationDrive), gain 0,02 m/(Hz.s) = 30/(40*37,5), provisoire (T301)"
+    - "Pas de position en mètres dans les traces (DI + fréquences, v = 0,02*f). Suivi_91 (26/09) = banc SIMU, pas du réel. T348 (trace 10 ms) non faite."
+    - "Cause exacte du dépassement du 25/09 : non retrouvée dans la trace du 23/09 ; cycle auto vs manuel des 3 événements non établi"
 
   acceptance:
     - id: AC1
-      statement: "Interrupteur roue libre FALSE (défaut) : toutes les sorties de FB_Sim_Translation sont identiques à la v0.7.33_SimBench_M3PLC_20261009 sur les scénarios de référence (aller-retour, arrêt sur capteur, SafeStop, faute frein)."
-      verified_by: "Test CI rejouant les scénarios et comparant la trace à la référence figée avant modif"
+      statement: "Non-régression : hors correction L1 et DecelRate, les sorties de FB_Sim_Translation sont identiques à la v0.7.33_SimBench_M3PLC_20261009 (aller-retour, arrêt sur capteur, SafeStop, faute frein)."
+      verified_by: "Test CI rejouant les scénarios contre une référence figée AVANT modification"
     - id: AC2
-      statement: "L1 : une consigne PRG_02 de 20 Hz (40 %) donne ActualFrequency_Hz = 20,0 Hz (±0,05) en régime établi ; 50 Hz (100 %) donne 50 Hz ; le gain reste 0,02 m/(Hz.s) (1 m/s à 50 Hz)."
-      verified_by: "Test unitaire FB_Sim_Translation + gate G518 PASS (échelle sim/estimateur)"
+      statement: "L1 : consigne PRG_02 de 20 Hz (40 %) => ActualFrequency_Hz = 20,0 Hz (+-0,05) en régime établi ; 50 Hz (100 %) => 50 Hz ; gain 0,02 m/(Hz.s) inchangé."
+      verified_by: "Test unitaire FB_Sim_Translation + gate G518 PASS (échelle sim/estimateur ; G518 lit CST_NominalFrequency_Hz=40 ligne 108 : à aligner si le test l'exige)"
     - id: AC3
-      statement: "L2 interrupteur TRUE : quand ReqTremie et ReqMaintenance tombent tous deux à FALSE avec |fAct| > 0,5 Hz, la fréquence décroît selon la loi de roue libre (pas la rampe 20 Hz/s), le frein reste ouvert jusqu'à |fAct| <= 0,5 Hz, puis seulement se ferme."
-      verified_by: "Test CI : trace 10 ms fAct/frein, comparaison au front de retrait de commande"
+      statement: "Pente de décélération : retrait de commande à 20 Hz => |dF/dt| = 25 +-1 Hz/s dans le sim, frein ouvert jusqu'à |fAct| <= 0,5 Hz."
+      verified_by: "Test CI : pente mesurée sur la trace fAct du sim"
     - id: AC4
-      statement: "L2 : à 20 Hz d'approche le dépassement après retrait de commande au contact capteur vaut 0,20 à 0,40 m (plage de l'étude T334). Cette plage est la CIBLE INITIALE de calibration, à confirmer par T348, pas une mesure."
-      verified_by: "Test CI sur PositionTrue_M ; le paramètre de roue libre est exposé et documenté comme 'à calibrer'"
+      statement: "Distance de dépassement à 20 Hz après retrait de commande au contact capteur = 0,25 m +-30 % (cible issue de la trace réelle, à confirmer par T348)."
+      verified_by: "Test CI sur PositionTrue_M"
     - id: AC5
-      statement: "L2 : le dépassement croît avec la vitesse d'approche (10 Hz < 20 Hz < 50 Hz), reproduisant l'aggravant mesuré par T334."
-      verified_by: "Test CI : trois vitesses, distances strictement croissantes"
+      statement: "Rejeu T334 : le sim pilote le VRAI code FB_Translation (non modifié) sur un aller-retour avec approche P1/Trémie en cycle auto ; la trace produite (consigne PLC, consigne variateur, mot de commande, fAct, frein, DI capteurs) est archivée et comparée qualitativement au cas réel (clamp 20 Hz, perte de commande au contact)."
+      verified_by: "Scénario TEST_AUTO_CI + rapport sous DOC/WFLOW ; écart documenté, pas masqué"
     - id: AC6
-      statement: "Comportement correctif T334 : commande maintenue jusqu'à |fAct| <= 0,5 Hz (arrêt par la rampe) donne un dépassement strictement inférieur au cas retrait immédiat, à vitesse égale."
-      verified_by: "Test CI comparatif retrait immédiat / retrait différé"
+      statement: "Le dépassement croît avec la vitesse d'approche (10 Hz < 20 Hz < 50 Hz)."
+      verified_by: "Test CI : trois vitesses, distances strictement croissantes"
     - id: AC7
-      statement: "Capteurs DI, position vraie et position estimée par Hz restent produits par la même chaîne qu'avant : le simulateur ne s'écrit que via la frontière PRG_02 ; aucun fichier de production (I_TRANSLATION, M_MAIN, J_SUPERVISION, GVL_PERSISTENT) n'est modifié."
+      statement: "Capteurs DI, position vraie et position estimée par Hz restent produits par la même chaîne ; le sim ne s'écrit que via la frontière PRG_02 ; aucun fichier de production (I_TRANSLATION, M_MAIN, J_SUPERVISION, GVL_PERSISTENT) n'est modifié."
       verified_by: "git diff --stat : zéro fichier hors scope.allowed ; G200 PASS"
     - id: AC8
-      statement: "Garde-fou (fix + guard) : un gate vérifie qu'aucun nouveau consommateur de GVL_Simulation n'apparaît hors de la liste actuelle (PRG_02, PRG_05, PRG_07, FB_SimBench, FB_TroubleshootingView, types Checklist et FBs L_SIMULATION). La liste est figée telle que relevée ce jour, sans prétendre qu'elle se réduit à PRG_02."
-      verified_by: "Nouveau script TOOLS/AGENT_WORKFLOW/scripts/ + intégration run_all_gates.py ; test négatif injectant un lecteur parasite"
+      statement: "Garde-fou (fix + guard) : un gate fige la liste des lecteurs de GVL_Simulation (PRG_02, PRG_05, PRG_07, FB_SimBench, FB_TroubleshootingView, types Checklist, FBs L_SIMULATION) ; aucun nouveau consommateur sans mise à jour explicite de la liste."
+      verified_by: "Script TOOLS/AGENT_WORKFLOW/scripts/ + intégration run_all_gates.py ; test négatif injectant un lecteur parasite"
     - id: AC9
-      statement: "SimM3OpenModelicaActive reste FALSE par défaut, aucun fichier Modelica ni tâche T399-T415 n'est supprimé ni modifié."
-      verified_by: "git diff : aucun chemin TOOLS/TWINBENCH/ ; TASKS.yaml T399-T415 seulement passées en pause par l'orchestrateur"
+      statement: "SimM3OpenModelicaActive reste FALSE ; aucun fichier TOOLS/TWINBENCH/ ni tâche T399-T415 modifié ou supprimé."
+      verified_by: "git diff : aucun chemin TOOLS/TWINBENCH/ ; TASKS.yaml T399-T415 inchangées sauf accord humain"
     - id: AC10
-      statement: "Bundle PLCopenXML et diff bundle régénérés, 21 gates PASS."
+      statement: "Bundle PLCopenXML et diff bundle régénérés, 21 gates PASS, G200 PASS."
       verified_by: "generate_codesys_bundle.py, generate_codesys_diff_bundle.py, G200 --report, run_all_gates.py"
 
   scope:
@@ -64,7 +68,7 @@ contract:
       - CODE/L_SIMULATION/FB_SimBench.st
       - CODE/L_SIMULATION/GVL_Simulation.st
       - TOOLS/TEST_AUTO_CI/   # tests des FB de simulation uniquement
-      - TOOLS/AGENT_WORKFLOW/scripts/   # nouveau gate AC8 uniquement
+      - TOOLS/AGENT_WORKFLOW/scripts/   # nouveau gate AC8 + éventuel alignement G518
     forbidden:
       - CODE/I_TRANSLATION/
       - CODE/M_MAIN/
@@ -77,11 +81,12 @@ contract:
 
   conservation:
     must_survive:
-      - "Comportement v0.7.33 quand les nouveaux interrupteurs sont à FALSE"
+      - "Comportement v0.7.33 hors L1/DecelRate"
       - "Chaîne Modelica / FMU / lien UDP (FB_Sim_Translation_ExtLink) intacte"
       - "Gate G518 et tests TC-T300"
     dropped_on_purpose:
-      - "Rien. L3 (refactor struct SimM3/SimWinch, migration variables IHM) est reporté à un contrat séparé après validation de L1+L2."
+      - "Roue libre (ex-L2, ex-AC3..AC6) : contredite par la trace réelle (rampe ~25 Hz/s), abandonnée."
+      - "Refactor struct SimM3/SimWinch et migration variables IHM : T417-B, contrat séparé."
 
   evidence_required:
     - check_linkage
@@ -90,9 +95,10 @@ contract:
     - diff_bundle
 
   open_points:   # à lever en essai, ne bloquent pas la rédaction
-    - "Valeur de frottement en roue libre inconnue : initialisée pour viser 0,20-0,40 m à 20 Hz (v = 0,4 m/s ; soit environ 0,2 à 0,4 m/s2 si décélération constante, ou tau 0,5 à 1,0 s si frottement visqueux — calcul indicatif, forme du modèle à choisir au plan). À recaler par T348."
-    - "Origine de la mesure '20 à 40 cm' de l'étude T334 non retrouvée dans les traces (pas de position en mètres)."
-    - "Valeur effective du délai frein réel et temps de décélération interne AC600 : non nécessaires ici (frein piloté par |fAct| <= 0,5 Hz), à noter pour T348."
+    - "Le dépassement est-il reproduit par le seul rejeu du vrai code (bond de consigne à la disparition du clamp 20 Hz) ? Si non, l'écart restant est une donnée pour T348, pas un motif d'ajouter un modèle."
+    - "Origine de la mesure '20 à 40 cm' (étude T334) non retrouvée ; les 3 événements du 23/09 donnent ~0,25 m."
+    - "Gain 0,02 m/(Hz.s) provisoire (T301) : impacte directement les mètres de dépassement."
+    - "Délai frein réel et décélération interne AC600 : à noter pour T348."
 
   alert_duty: >
     Tout écart constaté en cours de route est remonté immédiatement à l'orchestrateur,
