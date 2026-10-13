@@ -1,5 +1,13 @@
 Error compiling source files:
 
+FB_SimBench.st:61:34: error: Undefined type 'ST_FBSIM_TRANSLATION_EXTLINK_ECHO' in FUNCTION_BLOCK 'FB_SIMBENCH'
+  61 |     M3_PlcEcho                 : ST_fbSim_Translation_ExtLink_Echo; (* --> [TST] Etat decisionnel M3 renvoye au simulateur (diagnostic) *)
+     |                                  ^
+
+FB_SimBench.st:211:34: error: Undefined type 'FB_SIM_TRANSLATION_EXTLINK' in FUNCTION_BLOCK 'FB_SIMBENCH'
+ 211 |     instSimTranslationExtLink  : FB_Sim_Translation_ExtLink; (* * [INST] Lien simulateur externe M3 *)
+     |                                  ^
+
 ST_CommunHMI.st:54:20: error: Undefined type 'ST_RUNNINGHOURSHMI' in STRUCT 'ST_COMMUNHMI'
   54 |     RunningHours : ST_RunningHoursHMI;
      |                    ^

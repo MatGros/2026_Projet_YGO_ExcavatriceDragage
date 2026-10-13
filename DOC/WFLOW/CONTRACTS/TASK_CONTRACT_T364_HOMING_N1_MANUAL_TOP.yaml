@@ -3,13 +3,14 @@ contract:
   criticality: C3
   strategy: rebuild
   objective: >
-    Rendre obligatoire le homing machine non reference en MAINT_N1 : preparation benne
+    Proposer un homing guide en maintenance, apres validation consciente d'un message de
+    reference absente/suspecte au demarrage ou lancement volontaire IHM sur machine referencee : preparation benne
     sous homme-mort, approche manuelle couplee M1/M2 au palier 1 sans montee automatique
     au capteur haut, validation visuelle explicite de la position, puis referencement atomique.
   acceptance:
     - id: AC1
-      statement: "MachineHomed faux conduit au cycle HX en MAINT_N1 ; aucune commande de cycle normal n'est autorisee."
-      verified_by: "test FB + test integration PRG_02/PRG_03"
+      statement: "Au demarrage, reference absente ou suspecte : mouvements ordinaires bloques et message explicite. Sans validation consciente du message, aucune entree en sequence ni commande de mouvement ; la validation ouvre la procedure guidee sans produire de mouvement automatique."
+      verified_by: "test FB + integration : absence/suspicion au boot, attente, validation sur front et absence de mouvement automatique"
     - id: AC2
       statement: "HX1 ferme la benne uniquement sous homme-mort et joystick maintenu, au palier 1 ; N2 reste une recuperation explicite."
       verified_by: "test FB des sorties HX1 et absence de reprise automatique N1/N2"
@@ -31,6 +32,12 @@ contract:
     - id: AC8
       statement: "Pour chaque programme modifie sous CODE/M_MAIN, le nom de fichier est identique au nom de POU et le suffixe est identique au langage du bundle."
       verified_by: "G310 structure et bundle frais"
+    - id: AC9
+      statement: "Machine deja referencee : seul un lancement volontaire IHM ouvre la procedure de re-referencement. Homme-mort et debattement joystick seuls ne lancent pas la sequence, en N1 comme en N2."
+      verified_by: "integration : machine referencee, appui homme-mort et jog sans lancement ; front lancement IHM ouvre la procedure sans mouvement automatique"
+    - id: AC10
+      statement: "Avant implementation, le plan valide identifie le bouton existant de confirmation haute, le repere physique, la cote calibree et la tolerance acceptee ; aucun nouveau bouton ni position deduite d'une simple proximite non qualifiee."
+      verified_by: "validation humaine du plan et de la receptivite de confirmation ; tests arret non confirme/contact Top/codeurs non prets -> aucune impulsion HomeReq"
   scope:
     allowed:
       - CODE/G_CYCLE/FB_CycleMachineHoming.st
@@ -71,15 +78,15 @@ contract:
   alert_duty: >
     Toute impossibilite de routage N1, conflit de commande ou incoherence de capteur
     est remontee avant modification de la commande mouvement.
-status: IN_PROGRESS
+status: PENDING
 execution:
-  executed_by: "CDX01"
+  executed_by: "—"
   completed_at: ""
-  status: IN_PROGRESS
-  summary: "Contrat C3 de la refonte T364 cree ; implementation et tests en preparation."
+  status: PENDING
+  summary: "2026-10-13 : T377 remise a faire et libre sur instruction humaine ; deux entrees explicites alignees. Aucun travail d implementation en cours. Nom historique du contrat conserve pour ses liens."
   evidence_submitted: []
 validation:
   status: PENDING
   validated_by: "HUM"
   validated_at: ""
-  notes: "Valider AF-04 v2.4, surtout la receptivite BtnValidateTopPosition et la cote calibree, avant ecriture ST."
+  notes: "Valider le plan technique, le routage N1/N2, les deux modes de lancement et le bouton existant de confirmation haute (BtnValidateTopPosition est un nom de travail), ainsi que repere/cote/tolerance, avant ecriture ST."

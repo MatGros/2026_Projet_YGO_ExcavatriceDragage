@@ -1,4 +1,21 @@
 tasks:
+- id: T418
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: SIMULATION / SIMBENCH / JOYSTICK
+  agent: —
+  date: '2026-10-13T15:00:00'
+  titre: Simulateur joystick — homme-mort separe des boutons directionnels (front parasite qui lance le homing en N2)
+  contexte: En simulation, MAINT_N2 + zone Maintenance M3 autorisee + machine referencee, un appui bouton directionnel simule lance le grafcet homing (HX1). FB_SimBench.st:710 fabrique l homme-mort (Operator.JoyBtnRaw := SimJoystickRawButton OR DirectionCount > 0) a chaque bouton directionnel ; le front passe la transition HX0 FB_CycleMachineHoming.st:414. Le joystick reel ne le fait pas et le code machine v0.7.25 fonctionne.
+  description: Les boutons directionnels simules ne produisent que le debattement X/Y ; l homme-mort simule passe uniquement par SimJoystickRawButton. Code machine (G_CYCLE, D_JOYSTICK, M_MAIN) non modifie.
+  objectifs:
+  - Bouton directionnel simule seul -> JoyBtnRaw FALSE.
+  - N2 + reference + homme-mort tenu + jog vers Maintenance -> pas de HX1, M3 bouge.
+  - Sans homme-mort simule -> aucun mouvement (securite FB_Joystick testee pour de vrai).
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T418_SIM_JOYSTICK_HOMME_MORT_SEPARE.yaml
+  avancement: Contrat V2 apres challenge (GO avec corrections) - producteur FB_SimBench.st:710, scenario premier appui en N2 observe (AC4), guard gate (AC6). Snapshots preuve Snapshot_Troubleshooting_20261013_134929/135017.
+  bloque_par: []
 - id: T417
   parent_id: ''
   statut: ⏳
@@ -1245,12 +1262,12 @@ tasks:
   bloque_par: []
 - id: T377
   parent_id: T364
-  statut: ⏳
+  statut: ⬜
   criticite: C3
   domaine: CYCLE_HOMING / SECURITE_REFERENCEMENT
   agent: —
-  date: '2026-09-22T06:22:09+02:00'
-  updated_at: '2026-09-26T20:15:00+02:00'
+  date: '2026-10-13T16:16:34'
+  updated_at: '2026-10-13T16:16:34+02:00'
   titre: 'HOMING N1 MANUEL SANS CONTACT TOP : approche prudente sans heurter le capteur haut TOP, validation visuelle operateur
     et securisation contact'
   contexte: 'REX terrain MES 2026-09-23 et avarie du 2026-09-25 (capteur fin de course mecanique Top M1/M2 casse par contrainte
@@ -1267,9 +1284,15 @@ tasks:
     le degagement en descente, et ne declencher le PowerCutOff d arret d urgence que si un mouvement de montee persiste malgre
     la consigne automate coupee (ex. contacteur colle ou force mecaniquement dans l armoire).'
   objectifs:
+  - 'Reference absente ou suspecte au demarrage : bloquer les mouvements ordinaires, afficher un message explicite et attendre
+    une validation consciente de l operateur avant toute entree en sequence ; aucun mouvement automatique apres validation.'
+  - 'Machine deja referencee : permettre un lancement volontaire de la procedure par un bouton IHM dedie ; ni le front
+    homme-mort ni le debattement joystick seuls ne doivent lancer la sequence.'
   - Remplacer la step de montee automatique au capteur par une etape d approche manuelle joystick a vitesse d approche sous
     homme-mort.
   - Valider la position haute sur appui du bouton de confirmation existant du G7 de homing (sans creation de nouveau bouton).
+  - Referencer uniquement a l arret confirme, sans contact Top, sur confirmation explicite ; definir avant implementation
+    le bouton existant retenu, le repere physique, la cote calibree et la tolerance de position acceptee.
   - Interdire strictement la montee (SafetyPermit_Ascent := FALSE) des que le capteur Top mecanique est franchi, sans couper
     brutalement la puissance (pas de PowerCutOff immediat).
   - Obliger l operateur a descendre pour liberer le capteur Top avant toute reprise.
@@ -1277,8 +1300,11 @@ tasks:
     que la commande automate est a zero.
   - Mettre a jour le contrat TASK_CONTRACT_T364_HOMING_N1_MANUAL_TOP.yaml (ou dedier un contrat T377) et valider sans regression.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_HOMING_N1_MANUAL_TOP.yaml
-  avancement: Doctrine exploitant integree le 2026-09-26 suite a la casse du capteur Top le 25/09. Tache reactivee en cours
-    de cadrage avant edition ST.
+  avancement: '2026-10-13 - Decision humaine : remise a faire, sans agent attribue ni verrou de travail (personne ne travaille
+    dessus). Doctrine approche manuelle sans contact et reference a l arret conservee. Deux entrees explicites ajoutees :
+    validation du message de reference absente/suspecte au demarrage, ou lancement volontaire IHM sur machine referencee.
+    Aucun lancement par homme-mort/joystick seuls. Contrat aligne ; plan technique, bouton de confirmation et repere/cote/tolerance
+    a valider avant implementation. T418 reste une correction independante du stimulus simule.'
   bloque_par: []
 - id: T378
   parent_id: ''

@@ -24,7 +24,10 @@ Ce gate ECHOUE si :
      morte : le gate passerait alors sur une valeur qui n'atteint plus le modele) ;
   4. les cas de test TC-T361-ALIGN-001 / -002 ont disparu du fichier de test, ou si le fichier
      n'asserte plus l'echelle 0,02 (anti-test-vacuant) ;
-  5. le gain n'est plus injecte dans l'estimateur depuis GVL_PERSISTENT (PRG_05_Translation).
+  5. le gain n'est plus injecte dans l'estimateur depuis GVL_PERSISTENT (PRG_05_Translation) ;
+  6. le maximum variateur du banc (CST_M3MaxFreq_Hz) differe de GVL_PERSISTENT._TranslationMaxFreq_Hz
+     (PRG_02 envoie f / max x 100 : un max different decale toute consigne), ou n'est plus passe a
+     instSimTranslation (MaxFreq_Hz).
 
 Signale SANS bloquer (perimetre d'autres acteurs) : le defaut declare de
 FB_Translation_PositionEstimator.GainMetersPerHzSec, s'il diverge du gain persistant.
@@ -66,6 +69,8 @@ ECHELLE_TEST = 0.02
 CABLAGE_BANC = "FullTravelTimeS := CST_M3FullTravelTimeS"
 # Cablage du gain persistant vers l'estimateur.
 CABLAGE_GAIN = "GainMetersPerHzSec   := GVL_PERSISTENT._TranslationGainMetersPerHzSec"
+# Cablage du maximum variateur du banc vers le modele (echelle de la consigne PRG_02).
+CABLAGE_MAXFREQ = "MaxFreq_Hz      := CST_M3MaxFreq_Hz"
 
 
 def read(root: Path, relative: str) -> str:
@@ -154,6 +159,23 @@ def analyse(textes: dict[str, str]) -> tuple[list[str], list[str]]:
             f"({CIBLE_PRG05}) : le gate ne saurait plus quelle echelle est la reference"
         )
 
+    # (6) Echelle de la consigne : le maximum du banc doit egaler le maximum reel et atteindre le modele.
+    try:
+        max_reel = reel(textes[CIBLE_PERSIST], "_TranslationMaxFreq_Hz")
+        max_banc = reel(textes[CIBLE_SIMBENCH], "CST_M3MaxFreq_Hz")
+        if ecart_relatif(max_banc, max_reel) > REL_TOL:
+            erreurs.append(
+                f"maximum variateur du banc DESALIGNE : CST_M3MaxFreq_Hz = {max_banc:g} Hz contre "
+                f"_TranslationMaxFreq_Hz = {max_reel:g} Hz - PRG_02 envoie f / {max_reel:g} x 100, "
+                f"le banc reconvertirait avec une autre echelle"
+            )
+    except (ValueError, KeyError) as exc:
+        erreurs.append(f"maximum variateur introuvable : {exc}")
+    if CABLAGE_MAXFREQ not in textes[CIBLE_SIMBENCH]:
+        erreurs.append(
+            f"`{CABLAGE_MAXFREQ}` absent de FB_SimBench.st : CST_M3MaxFreq_Hz n'atteint plus le modele"
+        )
+
     # Avertissement (perimetre d'autres acteurs, sans effet au runtime : PRG_05 injecte la
     # valeur persistante) - un defaut de FB perime reste un piege pour les tests unitaires.
     try:
@@ -182,10 +204,15 @@ def charge_textes(root: Path) -> dict[str, str]:
 def _textes_de_reference() -> dict[str, str]:
     """Arbre minimal reproduisant les invariants : sert de base aux mutations du selftest."""
     return {
-        CIBLE_PERSIST: '_TranslationGainMetersPerHzSec  : REAL := 0.02; // 50 Hz = 1.0 m/s\n',
+        CIBLE_PERSIST: (
+            '_TranslationGainMetersPerHzSec  : REAL := 0.02; // 50 Hz = 1.0 m/s\n'
+            '_TranslationMaxFreq_Hz          : REAL := 50.0;\n'
+        ),
         CIBLE_SIMBENCH: (
             "CST_M3FullTravelTimeS       : REAL := 37.5;\n"
-            "instSimTranslation(\n    FullTravelTimeS := CST_M3FullTravelTimeS,\n);\n"
+            "CST_M3MaxFreq_Hz            : REAL := 50.0;\n"
+            "instSimTranslation(\n    FullTravelTimeS := CST_M3FullTravelTimeS,\n"
+            "    MaxFreq_Hz      := CST_M3MaxFreq_Hz,\n);\n"
         ),
         CIBLE_SIMTRAD: (
             "    FullTravelTimeS : REAL := 37.5;\n"
@@ -259,6 +286,20 @@ def selftest(root: Path) -> int:
     if not erreurs_de(mutation_tests_supprimes):
         echecs.append("mutation NON detectee : cas de test d'alignement supprimes")
 
+    # (6a) Maximum du banc retombe a 40 Hz (motif d'incident : 20 Hz reels -> 16 Hz simules).
+    def mutation_max_40(t):
+        t[CIBLE_SIMBENCH] = t[CIBLE_SIMBENCH].replace("CST_M3MaxFreq_Hz            : REAL := 50.0", "CST_M3MaxFreq_Hz            : REAL := 40.0")
+
+    if not erreurs_de(mutation_max_40):
+        echecs.append("mutation NON detectee : CST_M3MaxFreq_Hz remis a 40 Hz")
+
+    # (6b) Maximum du banc non passe au modele.
+    def mutation_max_non_cable(t):
+        t[CIBLE_SIMBENCH] = t[CIBLE_SIMBENCH].replace("MaxFreq_Hz      := CST_M3MaxFreq_Hz", "MaxFreq_Hz      := 50.0")
+
+    if not erreurs_de(mutation_max_non_cable):
+        echecs.append("mutation NON detectee : CST_M3MaxFreq_Hz n'est plus passee au modele")
+
     # (7) Echelle CONFORME recalculee (0,025 m/(Hz.s) => 30 s) : aucun faux positif attendu.
     def mutation_conforme(t):
         t[CIBLE_PERSIST] = t[CIBLE_PERSIST].replace("0.02", "0.025")
@@ -287,7 +328,7 @@ def selftest(root: Path) -> int:
         for echec in echecs:
             print(f"  - {echec}")
         return 1
-    print("[G518] SELFTEST PASS - 6 mutations d'echelle detectees, 0 faux positif sur arbre conforme")
+    print("[G518] SELFTEST PASS - 8 mutations d'echelle detectees, 0 faux positif sur arbre conforme")
     return 0
 
 

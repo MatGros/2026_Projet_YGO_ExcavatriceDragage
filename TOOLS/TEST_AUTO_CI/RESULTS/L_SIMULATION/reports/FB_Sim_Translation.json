@@ -57,11 +57,23 @@
     {
       "name": "TC-T361-ALIGN-002 Distance banc = integrale f x 0,02 m/(Hz.s) sur 6 s",
       "passed": true
+    },
+    {
+      "name": "TC-T417-SCALE-001 Consigne 40 pct = 20 Hz et 100 pct = 50 Hz",
+      "passed": true
+    },
+    {
+      "name": "TC-T417-DECEL-001 Pente d arret 25 Hz/s depuis l approche 20 Hz",
+      "passed": true
+    },
+    {
+      "name": "TC-T417-OVERSHOOT-001 Depassement apres retrait a 20 Hz",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 14,
-    "passed": 14,
+    "total": 17,
+    "passed": 17,
     "failed": 0
   }
 }

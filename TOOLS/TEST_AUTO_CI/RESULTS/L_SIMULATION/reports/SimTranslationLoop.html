@@ -1,0 +1,3276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Rapport de test — SimTranslationLoop [PASS]</title>
+<style>
+    :root {
+        --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
+        --accent: #818cf8; --green-bg: rgba(16, 185, 129, 0.15); --green-text: #34d399; --green-border: #059669;
+        --red-bg: rgba(239, 68, 68, 0.15); --red-text: #f87171; --red-border: #dc2626;
+        --warn-bg: rgba(245, 158, 11, 0.15); --warn-text: #fbbf24; --warn-border: #d97706;
+        --card-sub: #0f172a; --badge-prg-bg: rgba(59, 130, 246, 0.2); --badge-prg-txt: #93c5fd;
+        --badge-fb-bg: rgba(148, 163, 184, 0.15); --badge-fb-txt: #cbd5e1; --btn-bg: #1e293b; --btn-border: #334155;
+        --code-bg: #070a12; --code-border: #1e293b;
+        --neon-green-glow: 0 0 25px rgba(16, 185, 129, 0.65), 0 0 10px rgba(16, 185, 129, 0.4), inset 0 0 12px rgba(16, 185, 129, 0.15);
+        --neon-red-glow: 0 0 25px rgba(239, 68, 68, 0.65), 0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 12px rgba(239, 68, 68, 0.15);
+        --neon-blue-glow: 0 0 25px rgba(99, 102, 241, 0.6), 0 0 10px rgba(99, 102, 241, 0.35);
+    }
+    [data-theme="light"] {
+        --bg: #f8fafc; --bg-grid: rgba(0, 0, 0, 0.03); --surface: #ffffff; --surface-card: #ffffff; --border: #e2e8f0; --text: #1e293b; --muted: #64748b;
+        --accent: #4f46e5; --green-bg: #ecfdf5; --green-text: #059669; --green-border: #a7f3d0;
+        --red-bg: #fef2f2; --red-text: #dc2626; --red-border: #fecaca;
+        --warn-bg: #fffbeb; --warn-text: #b45309; --warn-border: #fde68a;
+        --card-sub: #f8fafc; --badge-prg-bg: #dbeafe; --badge-prg-txt: #1e40af;
+        --badge-fb-bg: #f1f5f9; --badge-fb-txt: #475569; --btn-bg: #f8fafc; --btn-border: #cbd5e1;
+        --code-bg: #f1f5f9; --code-border: #e2e8f0;
+        --neon-green-glow: none; --neon-red-glow: none; --neon-blue-glow: none;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0;
+        background-color: var(--bg);
+        background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+        background-size: 28px 28px;
+        background-position: -1px -1px;
+        color: var(--text); font-size: 15px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
+    .page { max-width: 1720px; width: 96%; margin: 0 auto; padding: 28px 16px 60px; }
+    .header { display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 8px; gap: 16px; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 12px; padding: 20px 26px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+    .theme-toggle-btn { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text);
+        padding: 8px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+        display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .theme-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+    h1 { font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -0.4px; color: #cbd5e1; }
+    .header .badge, .fb-section-title .badge { font-size: 16px; padding: 8px 22px; }
+    .subtitle { color: var(--muted); font-size: 14px; margin: 4px 0 26px; }
+    .subtitle b { color: var(--text); font-weight: 700; }
+    .badge { display: inline-block; padding: 6px 16px; border-radius: 8px; font-weight: 800;
+        font-size: 13.5px; letter-spacing: 0.8px; font-family: monospace; text-transform: uppercase; }
+    .badge-pass, .badge-pass.badge-strong { background: rgba(16, 185, 129, 0.22); color: #ffffff; border: 2px solid #34d399; box-shadow: 0 0 16px rgba(16, 185, 129, 0.45); }
+    .badge-fail, .badge-fail.badge-strong { background: rgba(244, 63, 94, 0.22); color: #ffffff; border: 2px solid #fb7185; box-shadow: 0 0 16px rgba(244, 63, 94, 0.45); }
+    
+    /* Cartes modernes avec effets Neon Glow */
+    .card-neon-ok { border: 1px solid var(--green-border) !important; box-shadow: var(--neon-green-glow) !important; }
+    .card-neon-fail { border: 1px solid var(--red-border) !important; box-shadow: var(--neon-red-glow) !important; }
+    .card-neon-blue { border: 1px solid #4f46e5 !important; box-shadow: var(--neon-blue-glow) !important; }
+
+    details { margin-bottom: 20px; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: text; }
+    summary:hover { color: var(--text); }
+    ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
+    .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease, padding 0.2s ease; }
+    .test-card:hover { transform: translateY(-1px); }
+    .test-card-fail { border-color: var(--red-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
+    .test-card-collapsed { padding: 10px 18px !important; }
+    .test-card-collapsed .test-card-body { display: none !important; }
+    .test-card-collapsed .test-card-header { margin-bottom: 0 !important; }
+    .test-card-collapsed .test-card-toggle { transform: rotate(-90deg); }
+    .test-card-toggle { transition: transform 0.2s ease; display: inline-block; }
+    /* Style distinct pour les tests de contrat et d'interface socle */
+    .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
+    .test-card-contract header h3 { color: #818cf8; }
+    .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .test-card header h3 { font-size: 13.5px; margin: 0; font-weight: 700; }
+    .comment { font-size: 12px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks-details { margin-top: 10px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; background: rgba(0, 0, 0, 0.02); }
+    .checks-summary { cursor: pointer; font-size: 13.5px; color: var(--text); font-weight: 700; outline: none; user-select: text; }
+    .checks-summary:hover { color: var(--accent); }
+    .checks-label { font-size: 13.5px; font-weight: 700; }
+    .checks-list, .scenario-list { list-style: none; padding-left: 0; margin: 12px 0 6px; }
+    .checks-list li { font-size: 13px; color: var(--text); padding: 5px 0 5px 26px; position: relative; line-height: 1.5; }
+    .checks-list li::before { content: "✓"; position: absolute; left: 2px; color: var(--green-text); font-weight: bold; font-size: 14px; }
+    .scenario-list li { font-size: 14px; color: #f1f5f9; padding: 7px 0 7px 28px; position: relative; line-height: 1.6; border-bottom: 1px solid rgba(255, 255, 255, 0.07); font-weight: 500; }
+    .scenario-list li:last-child { border-bottom: none; }
+    .scenario-list li::before { content: "🔹"; position: absolute; left: 0; font-size: 12px; opacity: 0.9; top: 8px; }
+    .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
+    .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
+    .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    /* Bouton discret "retour à l'index" (les rapports vivent dans RESULTS/<domaine>/reports/) */
+    .btn-index { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--btn-border); color: var(--muted); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.15s ease; user-select: none; white-space: nowrap; }
+    .btn-index:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
+    .failure { margin-top: 10px; padding: 12px 16px; background: var(--red-bg);
+        border-left: 4px solid var(--red-text); border-radius: 6px; font-size: 13px; }
+    .failure-head { color: var(--red-text); font-weight: 700; font-size: 13.5px; }
+    .failure-loc { color: var(--muted); margin-top: 3px; font-size: 11.5px; font-family: monospace; }
+    .failure-msg { color: var(--text); margin-top: 6px; font-weight: 600; }
+    .failure-diff { margin-top: 8px; color: var(--text); font-size: 12.5px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .failure-diff code { padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 12px; font-weight: 700; }
+    .failure-diff code.val-expected { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .failure-diff code.val-actual { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    [data-theme="light"] .failure-diff code.val-expected { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    [data-theme="light"] .failure-diff code.val-actual { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
+        overflow-x: auto; }
+    .chronogram-group { margin-top: 10px; }
+    .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
+        padding: 8px 12px; }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); user-select: text; }
+    .chrono-summary-inner { display: inline-flex; justify-content: space-between; align-items: center; width: calc(100% - 24px); margin-left: 6px; vertical-align: middle; }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; border-radius: 8px; border: 1px solid var(--border);
+        scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface-card); }
+    .chrono-scroll::-webkit-scrollbar, .wf-scroll::-webkit-scrollbar { display: block !important; height: 8px !important; width: 8px !important; }
+    .chrono-scroll::-webkit-scrollbar-track, .wf-scroll::-webkit-scrollbar-track { background: var(--surface-card); border-radius: 4px; }
+    .chrono-scroll::-webkit-scrollbar-thumb, .wf-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+    .chrono-scroll::-webkit-scrollbar-thumb:hover, .wf-scroll::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+    .chrono-table { border-collapse: collapse; font-size: 11.5px; white-space: nowrap; width: 100%; table-layout: auto; }
+    .chrono-table th, .chrono-table td { padding: 5px 9px; border: 1px solid var(--border); text-align: center; position: relative; }
+    .chrono-table th { background: var(--surface-card); color: var(--muted); font-weight: 700; position: sticky; top: 0; font-family: monospace; font-size: 11px; cursor: pointer; user-select: text; transition: max-width 0.2s, min-width 0.2s, padding 0.2s; }
+    .chrono-table th:hover { color: var(--accent); }
+    .col-resizer { position: absolute; top: 0; right: 0; width: 5px; cursor: col-resize; user-select: none; height: 100%; z-index: 10; }
+    .col-resizer:hover, .col-resizer.resizing { background: var(--accent); }
+    .chrono-table th.col-collapsed,
+    .chrono-table td.col-collapsed {
+        max-width: 24px !important;
+        min-width: 24px !important;
+        width: 24px !important;
+        padding: 4px 1px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        opacity: 0.35 !important;
+        background: rgba(0, 0, 0, 0.25) !important;
+        color: transparent !important;
+        border-color: rgba(255, 255, 255, 0.05) !important;
+        font-size: 0 !important;
+        position: relative;
+    }
+    .chrono-table th.col-collapsed {
+        cursor: pointer;
+        opacity: 0.75 !important;
+        background: rgba(129, 140, 248, 0.18) !important;
+    }
+    .chrono-table th.col-collapsed:hover {
+        opacity: 1 !important;
+        background: rgba(129, 140, 248, 0.38) !important;
+    }
+    .chrono-table th.col-collapsed::after {
+        content: "⋮";
+        font-size: 12px;
+        color: var(--accent);
+        display: block;
+        text-align: center;
+    }
+    /* Pastilles de provenance & typage des variables */
+    .var-prov-badge {
+        display: inline-block;
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        padding: 1px 5px;
+        border-radius: 4px;
+        margin-top: 3px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    .badge-var-in { background: rgba(2, 132, 199, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
+    .badge-var-out { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.35); }
+    .badge-var-inout { background: rgba(139, 92, 246, 0.18); color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.35); }
+    .badge-var-loc { background: rgba(100, 116, 139, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
+    .badge-var-cst { background: rgba(217, 119, 6, 0.18); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35); }
+    .badge-var-hw { background: rgba(20, 184, 166, 0.18); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.35); }
+    .badge-var-gvl { background: rgba(14, 165, 233, 0.18); color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.35); }
+    .badge-var-prg { background: rgba(99, 102, 241, 0.18); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.35); }
+    .badge-var-diag { background: rgba(217, 70, 239, 0.18); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.35); }
+    .badge-var-ext { background: rgba(59, 130, 246, 0.18); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.35); }
+
+    [data-theme="light"] .badge-var-in { background: #e0f2fe; color: #0284c7; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-out { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .badge-var-inout { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+    [data-theme="light"] .badge-var-loc { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    [data-theme="light"] .badge-var-cst { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+    [data-theme="light"] .badge-var-hw { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
+    [data-theme="light"] .badge-var-gvl { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-prg { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .badge-var-diag { background: #fdf4ff; color: #a21caf; border-color: #fbcfe8; }
+    [data-theme="light"] .badge-var-ext { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+
+    .chrono-table th .th-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        pointer-events: auto;
+    }
+    .chrono-table th .var-name-lbl {
+        font-family: monospace;
+        font-weight: 700;
+        font-size: 11px;
+    }
+    /* Mode Titres Verticaux (Compact) */
+    .chrono-table.headers-vertical {
+        width: max-content !important;
+    }
+    .chrono-table.headers-vertical th.note-th,
+    .chrono-table.headers-vertical td.chrono-note-cell {
+        max-width: 280px !important;
+        width: 280px !important;
+    }
+    .chrono-table.headers-vertical th.var-th {
+        height: 165px;
+        vertical-align: bottom;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        max-width: 36px;
+        min-width: 30px;
+        width: 34px;
+    }
+    .chrono-table.headers-vertical th.var-th .th-content {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        display: inline-flex;
+        flex-direction: row-reverse;
+        align-items: center;
+        white-space: nowrap;
+        text-align: left;
+        max-height: 145px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .chrono-table.headers-vertical th.var-th .var-prov-badge {
+        margin-top: 0;
+        margin-left: 4px;
+    }
+    .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
+    .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
+    [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
+    [data-theme="light"] .chrono-table td.changed { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    .chrono-note-cell { text-align: left !important; max-width: 360px; font-size: 11px; }
+    .chrono-note-container { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-note-chip:hover { background: rgba(129, 140, 248, 0.25); color: #ffffff; border-color: #818cf8; }
+    .chrono-chk-chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; padding: 2px 8px; font-weight: 600; font-size: 10.5px; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
+    .chrono-chk-pass { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .chrono-chk-fail { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .chrono-chk-chip .chk-icon { font-weight: 800; font-size: 11.5px; }
+    [data-theme="light"] .chrono-note-chip { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .chrono-note-chip:hover { background: #e0e7ff; color: #312e81; }
+    [data-theme="light"] .chrono-chk-pass { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .chrono-chk-fail { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .wf-check-marker { font-size: 12px; fill: #10b981; font-weight: 800; text-anchor: middle; font-family: monospace; cursor: help; }
+    .v-true { color: #34d399; font-weight: 700; }
+    .v-false { color: #64748b; }
+    .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 8px; margin-top: 8px; padding: 4px 0;
+        scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface-card); }
+    .waveform { display: block; }
+    .wf-grid { stroke: var(--border); stroke-width: 1; opacity: 0.6; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
+    .wf-scan { font-size: 9px; fill: var(--muted); opacity: 0.7; text-anchor: middle; font-family: monospace; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; font-weight: 600; }
+    .wf-label.wf-clickable { cursor: pointer; transition: fill 0.15s; }
+    .wf-label.wf-clickable:hover { fill: var(--accent); font-weight: 700; text-decoration: underline; }
+    .wf-label.active-curve { fill: #38bdf8; font-weight: 700; }
+    [data-theme="light"] .wf-label.active-curve { fill: #0284c7; }
+    .wf-line { fill: none; stroke-width: 2.2; }
+    .wf-num-line { stroke: var(--border); stroke-width: 1; }
+    .wf-num { font-size: 10.5px; fill: var(--muted); text-anchor: middle; font-family: monospace; }
+    .wf-num-changed { font-size: 10.5px; fill: #ffffff; font-weight: 700; text-anchor: middle; font-family: monospace; }
+    .wf-chip { opacity: 0.95; }
+    .wf-legend { font-size: 10px; fill: var(--muted); }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; font-family: monospace; font-weight: 600; }
+    [data-theme="light"] .wf-scale { fill: #64748b; }
+    .wf-tooltip {
+        position: fixed; pointer-events: none; z-index: 9999;
+        background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);
+        border: 1px solid rgba(56, 189, 248, 0.4); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        border-radius: 8px; padding: 8px 12px; font-size: 11.5px; color: #f8fafc;
+        display: none; max-width: 320px; line-height: 1.4;
+    }
+    [data-theme="light"] .wf-tooltip {
+        background: rgba(255, 255, 255, 0.97); border-color: #cbd5e1;
+        color: #1e293b; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    .wf-tt-head { font-weight: 700; color: #38bdf8; font-family: monospace; margin-bottom: 3px; font-size: 11px; }
+    [data-theme="light"] .wf-tt-head { color: #0284c7; }
+    .wf-tt-var { font-weight: 700; font-family: monospace; font-size: 12px; margin-bottom: 3px; }
+    .wf-tt-meta { font-size: 10.5px; margin-bottom: 4px; }
+    .wf-tt-val { margin-bottom: 3px; font-size: 12px; }
+    .wf-tt-val strong { font-family: monospace; color: #34d399; font-size: 12.5px; }
+    .wf-tt-note { font-size: 11px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 4px; margin-top: 4px; }
+    [data-theme="light"] .wf-tt-note { border-top-color: rgba(0, 0, 0, 0.1); }
+    .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
+        border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
+    .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
+    .af-warning-banner ul { margin: 0; padding-left: 20px; }
+    .af-warning-banner li { margin: 3px 0; }
+    .encaps-details, .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
+    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: text; }
+    .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
+    .wiring-pastille { display: inline-block; margin-left: 8px; padding: 1px 9px; border-radius: 999px;
+        font-size: 11px; font-weight: 700; letter-spacing: 0.3px; vertical-align: 1px; }
+    .wiring-pastille-ok { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+    .wiring-pastille-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
+    .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+    .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
+    .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
+    .encaps-table tr.encaps-row-fail { background: var(--red-bg); }
+    .encaps-table ul { margin: 0; padding-left: 16px; }
+    .chrono-fail-note { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border);
+        border-radius: 6px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }
+    .wf-fail-band { fill: #fecaca; opacity: 0.45; }
+    .wf-fail-marker { font-size: 11px; fill: #dc2626; font-weight: 700; text-anchor: middle; }
+    tr.row-fail-scan { background: var(--red-bg); outline: 2px solid var(--red-text); outline-offset: -2px; }
+    .chronogram-static { margin-top: 10px; }
+    .chronogram-static summary { font-size: 11px; }
+    .chrono-single-scan-note { font-size: 12px; color: var(--muted); font-style: italic; margin: 8px 0 4px; }
+    .static-table { font-size: 12px; margin-top: 6px; border-collapse: collapse; }
+    .static-table td { padding: 3px 10px; border-bottom: 1px solid var(--border); }
+    .pin-diagram { display: flex; align-items: flex-start; gap: 0; margin-top: 12px; font-size: 12px; width: 100%; }
+    .pin-col { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; max-height: 600px; overflow-y: auto; padding: 4px 8px;
+        scrollbar-width: none; -ms-overflow-style: none; }
+    .pin-col::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    .pin-row { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px;
+        background: var(--surface); min-width: 0; }
+    /* Entrees : texte colle au bloc -> justifie a droite (flux entrant vers le bloc) */
+    .pin-col-in .pin-row { justify-content: space-between; text-align: right; }
+    /* Sorties : texte colle au bloc -> justifie a gauche (flux sortant du bloc) */
+    .pin-col-out .pin-row { justify-content: space-between; text-align: left; }
+    .pin-name { font-family: monospace; font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f8fafc; }
+    .pin-type { color: var(--muted); font-weight: 500; font-size: 11px; margin-left: 4px; }
+    .pin-tag { font-size: 10px; border-radius: 4px; padding: 2px 6px; margin-left: 4px; font-weight: 700; white-space: nowrap; }
+    .pin-expr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .pin-expr code { background: var(--code-bg); color: #93c5fd; border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-size: 11.5px;
+        cursor: pointer; font-family: monospace; }
+    .pin-expr code:hover { border-color: var(--accent); color: #ffffff; }
+    .pin-expr code.pin-copied { background: var(--green-bg); color: var(--green-text); }
+    .pin-missing { color: #fbbf24; font-style: italic; font-size: 12px; }
+    .pin-more { color: var(--muted); font-size: 11px; }
+    .pin-row-unwired { background: var(--card-sub); }
+    .fb-section-title { display: flex; align-items: center; gap: 10px; font-size: 17px;
+        font-weight: 600; margin: 30px 0 10px; padding: 12px 18px; background: var(--surface);
+        border: 1px solid var(--border); border-radius: 10px; }
+    .fb-section-title:first-of-type { margin-top: 6px; }
+    .toc-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin-bottom: 16px; }
+    .toc-details summary { font-weight: 600; color: var(--text); font-size: 13px; }
+    .toc-group-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; margin: 12px 0 4px; }
+    .toc-group-title:first-of-type { margin-top: 10px; }
+    .toc-list { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 24px; }
+    .toc-item { font-size: 12.5px; padding: 2px 0; break-inside: avoid; }
+    .toc-item a { text-decoration: none; color: var(--text); }
+    .toc-item a:hover { text-decoration: underline; }
+    .toc-item::before { content: "●"; font-size: 8px; margin-right: 6px; }
+    .toc-pass::before { color: var(--green-text); }
+    .toc-fail::before { color: var(--red-text); }
+    .toc-fail a { color: var(--red-text); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+    <div class="header">
+        <div>
+            <h1>SimTranslationLoop</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
+            <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
+            <span class="badge badge-pass">PASS</span>
+        </div>
+    </div>
+    <div class="exec-time">2026-10-12 13:06:03</div>
+    
+    <details class="toc-details" open>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-simtranslationloop-0">TC-T417-LOOP-A Rejeu P1 a 20 Hz, demande TENUE apres arrivee : le plafond d approche maintient 20 Hz vers le variateur</a></li><li class="toc-item toc-pass"><a href="#test-simtranslationloop-1">TC-T417-LOOP-B Rejeu P1 a 20 Hz, demande RETIREE au jeton d arrivee (cycle auto) : plafond perdu, mot de commande a 0</a></li></ul>
+    </details>
+    
+    <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
+        <div>
+            <span style="font-size:14px;color:var(--text);font-weight:700;">📁 <code style="color:var(--accent);font-size:14px;">CODE/L_SIMULATION/FB_TestLoopTranslation.st</code></span>
+            <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
+        </div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);">
+            2/2 vérifications validées
+        </div>
+    </div>
+    
+    <details class="encaps-details" >
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 18 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <table class="encaps-table">
+            <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
+            <tbody>
+            <tr class="compil-row-pass">
+                <td><code>E_State.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_Fault.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_FaultCause.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_ContactorCheck.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_FaultCore.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_CycleTime.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Ramp.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Brake.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_Mode.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbTranslation_Cfg.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Translation_PositionDecoder.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Translation.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Sim_TranslationDrive.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Sim_TranslationBrake.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Sim_SuspendedLoad.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Sim_PositionSensor.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Sim_Translation.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_TestLoopTranslation.st</code><span style="background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid #d97706;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;">MOCK</span></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Simulé pour environnement CI (hors CODESYS)</td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+    
+    <details class="pin-diagram-details" open>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Sim_Translation</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 30 flux entrants · 20 flux sortants)</span></summary>
+        <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
+            <b>Sous-instances actives intégrées :</b><br>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instCycleTime <span style="color:var(--muted);font-weight:500;">(FB_CycleTime)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SensorNoiseState <span style="color:var(--muted);font-weight:500;">(REAL := 0.371)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorTremie <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorPV <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorP2 <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorP1 <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorMaintenance <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDrive <span style="color:var(--muted);font-weight:500;">(FB_Sim_TranslationDrive)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instBrake <span style="color:var(--muted);font-weight:500;">(FB_Sim_TranslationBrake)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSuspendedLoad <span style="color:var(--muted);font-weight:500;">(FB_Sim_SuspendedLoad)</span></span></div>
+        </div>
+        
+        <div style="margin:6px 0;font-size:13px;color:var(--muted);">
+            <b>Constantes internes (VAR CONSTANT) :</b><br>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtTremie</b> : REAL := 0.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtTremieSensor_M</b> : REAL := 0.05</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtPV</b> : REAL := 5.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtP2</b> : REAL := 15.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtP1</b> : REAL := 20.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtMaintenance</b> : REAL := 30.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtMaintenanceSensor_M</b> : REAL := 29.95</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_NominalFrequency_Hz</b> : REAL := 40.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_MinTimeS</b> : REAL := 0.001</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_StopFrequency_Hz</b> : REAL := 0.5</span></div>
+        </div>
+        <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedTgt_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">FullTravelTimeS <span class="pin-type" style="color:var(--muted);">REAL := 37.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeReleaseCmd <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MaxFreq_Hz <span class="pin-type" style="color:var(--muted);">REAL := 50.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">AccelRate_HzPerS <span class="pin-type" style="color:var(--muted);">REAL := 20.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DecelRate_HzPerS <span class="pin-type" style="color:var(--muted);">REAL := 25.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveTimeConstantS <span class="pin-type" style="color:var(--muted);">REAL := 0.15</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeOpenDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.10</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeCloseDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.09</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeContactDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeFaultCloseWhileRunning <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeFaultCloseDelay_S <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SuspendedLoadLength_M <span class="pin-type" style="color:var(--muted);">REAL := 1.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SuspendedLoadDamping <span class="pin-type" style="color:var(--muted);">REAL := 0.35</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LoadReactionGain_Mps2 <span class="pin-type" style="color:var(--muted);">REAL := 0.20</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EndStopRecoilMax_M <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LoadFrequencyDroopGain_Hz <span class="pin-type" style="color:var(--muted);">REAL := 0.50</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorJitterAmplitude_M <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorStabilizationS <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorElectricalDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorIntermittenceActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorLoadAngleTriggerRad <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorScenarioSeed <span class="pin-type" style="color:var(--muted);">UDINT := 3001</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorHysteresis_M <span class="pin-type" style="color:var(--muted);">REAL := 0.02</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorIntermittencePeriodS <span class="pin-type" style="color:var(--muted);">REAL := 0.12</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorBlipTransitions <span class="pin-type" style="color:var(--muted);">UDINT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorBlipDurationS <span class="pin-type" style="color:var(--muted);">REAL := 0.2</span></div></div></div>
+            <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Sim_Translation</span>
+                
+        <div style="margin: 8px 0 4px 0;"><span style="background:var(--card-sub);color:var(--text);border:1px solid var(--border);padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">PROFIL TECHNIQUE SPÉCIFIQUE</span></div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">Brique utilitaire / Interface sur-mesure</div>
+                
+                <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
+                    <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">30</b></div>
+                    <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
+                    <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
+                    <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
+                    <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">20</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">0</b></div>
+                    <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">30 IN</b> / <b style="color:#ffffff;">20 OUT</b></div>
+                </div>
+                
+    <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
+        <div style="font-weight:800;color:var(--accent);margin-bottom:4px;border-bottom:1px solid var(--border);padding-bottom:2px;font-size:11.5px;">📋 Structure ST :</div>
+        <div>❌ Cartouche En-tête <code>(* === *)</code></div>
+        <div>❌ Bannière <code>VAR_INPUT</code></div>
+        <div>❌ Bannière <code>VAR_OUTPUT</code></div>
+        <div>❌ Bannière <code>VAR</code> locale</div>
+    </div>
+            </div>
+            <div class="pin-col pin-col-out">
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>PosTremie</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>PosPV</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>PosP2</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>PosP1</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>PosMaintenance</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>FrequencyCmd_Hz</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ElectricalFrequency_Hz</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ActualFrequency_Hz</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>BrakeCoilEnergized</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>BrakeMechanicallyOpen</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>BrakeContactOpen</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>BrakeFaultCloseActive</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>PositionTrue_M</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>VelocityTrue_Mps</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>LoadAngle_Rad</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>SensorPosition_M</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>SensorTransitionCount</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">UDINT</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>SensorBlipActive</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>HardStopTremieActive</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>HardStopMaintenanceActive</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div></div>
+        </div>
+    </details>
+    
+    
+    <details class="encaps-details" >
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 12 FB de la chaine, encapsulation propre (0 violation)</summary>
+        
+        <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
+            <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
+                ℹ️ Guide d'Audit : Les 7 Invariants & Règles d'Encapsulation Automatisme (Cliquez pour afficher)
+            </summary>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; text-align: left;">
+                <thead>
+                    <tr style="background: var(--surface); color: var(--text);">
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">#</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Règle / Invariant POO</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Risque Machine Réel</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Contrôle Automatique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">1</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Écriture externe clandestine sur VAR locale</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Écrasement d'un filtre, timer ou état interne par un autre bloc.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Violation d'encapsulation (External Write)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">2</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Accès GVL direct sans passer par l'interface</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">FB non testable unitairement, couplage fort et masqué.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Effet de bord Global (Hidden GVL Dependency)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">3</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Référence VAR_IN_OUT orpheline</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Pointeur nul / crash automate lors de l'appel.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Invalidation appel de FB</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">4</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Reset sur front montant (R_TRIG)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Réarmement intempestif si le bouton reste coincé/actif.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🔒 Règle IEC Reset obligatoire</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">5</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Profils standards (Enable / Ready / Status)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Composant impossible à chaîner en sécurité AU.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Contrat AF03 §1bis</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">6</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Sorties VAR_OUTPUT orphelines</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Information calculée mais oubliée dans le câblage global.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">💡 Alerte Pinout non consommé</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">7</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Variables locales non initialisées</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Comportement aléatoire lors d'un redémarrage à chaud.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Détection d'état initial indéfini</td>
+                    </tr>
+                </tbody>
+            </table>
+        </details>
+        <table class="encaps-table">
+            <thead><tr><th>Statut</th><th>Composant (FB)</th><th>VAR_IN</th><th>VAR_OUT</th><th>IN_OUT</th><th>LOCAL</th><th>Analyse Invariants & Violations</th></tr></thead>
+            <tbody>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_FaultCore</code></td>
+                <td>3</td><td>2</td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_CycleTime</code></td>
+                <td>1</td><td>1</td>
+                <td>0</td><td>5</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (5 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Ramp</code></td>
+                <td>4</td><td>1</td>
+                <td>0</td><td>2</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (2 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Brake</code></td>
+                <td>9</td><td>5</td>
+                <td>0</td><td>8</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (8 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Translation_PositionDecoder</code></td>
+                <td>5</td><td>14</td>
+                <td>0</td><td>10</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (10 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Translation</code></td>
+                <td>24</td><td>9</td>
+                <td>0</td><td>30</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (30 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Sim_TranslationDrive</code></td>
+                <td>8</td><td>5</td>
+                <td>0</td><td>4</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Sim_TranslationBrake</code></td>
+                <td>9</td><td>5</td>
+                <td>0</td><td>4</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Sim_SuspendedLoad</code></td>
+                <td>7</td><td>4</td>
+                <td>0</td><td>5</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (5 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Sim_PositionSensor</code></td>
+                <td>13</td><td>6</td>
+                <td>0</td><td>11</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (11 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Sim_Translation</code></td>
+                <td>30</td><td>20</td>
+                <td>0</td><td>32</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (32 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_TestLoopTranslation</code></td>
+                <td>1</td><td>10</td>
+                <td>0</td><td>16</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (16 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
+        </div>
+    </details>
+    
+    <details class="encaps-details" open style="margin-top: 16px;">
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-simtranslationloop-0" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T417-LOOP-A Rejeu P1 a 20 Hz, demande TENUE apres arrivee : le plafond d approche maintient 20 Hz vers le variateur </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T417-LOOP-A Rejeu P1 a 20 Hz, demande TENUE apres arrivee : le plafond d approche maintient 20 Hz vers le variateur')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
+                <ul class="checks-list"><li>Scenario termine (arret apres P1)</li><li>Approche a 20 Hz au franchissement de P1</li><li>Demande tenue : la consigne vers le variateur reste plafonnee a 20 Hz apres P1</li><li>Depassement apres P1 &gt;= 0,30 m (caracterisation)</li><li>Depassement apres P1 &lt;= 0,80 m (caracterisation)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-simtranslationloop-1" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1; user-select: text;">TC-T417-LOOP-B Rejeu P1 a 20 Hz, demande RETIREE au jeton d arrivee (cycle auto) : plafond perdu, mot de commande a 0 </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T417-LOOP-B Rejeu P1 a 20 Hz, demande RETIREE au jeton d arrivee (cycle auto) : plafond perdu, mot de commande a 0')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>Retrait de la demande : CommandedMaintenance retombe, le plafond 20 Hz disparait et la consigne PLC
+       remonte vers la rampe (observee 48,5 Hz) pendant que le mot de commande est a 0 (arret par rampe variateur).</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
+                <ul class="checks-list"><li>Scenario termine (arret apres P1)</li><li>Approche a 20 Hz au franchissement de P1</li><li>Consigne PLC remontee au retrait de la demande (plafond 20 Hz perdu)</li><li>Depassement apres P1 &gt;= 0,15 m (ordre de grandeur T334 / trace)</li><li>Depassement apres P1 &lt;= 0,45 m (ordre de grandeur T334 / trace)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        </div>
+    </details>
+    <details>
+        <summary>Fichiers source compilés (18)</summary>
+        <ul><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/I_TRANSLATION/_TYPES/ST_fbTranslation_Cfg.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_TranslationDrive.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_TranslationBrake.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_SuspendedLoad.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_PositionSensor.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Translation.st</code></li><li><code>TOOLS/TEST_AUTO_CI/MOCKS/FB_TestLoopTranslation.st</code></li></ul>
+    </details>
+    <details>
+        <summary>Code source ST original (18)</summary>
+        
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\E_State.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des phases opérationnelles d&#x27;un FB métier
+   ⚙️ Machine d&#x27;état : Un seul état actif à la fois (orthogonal à Error)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
+   ======================================================================= *)
+
+TYPE E_State :
+ENUM
+    DISABLED := 0,   (* Enable faux, neutralisé *)
+    INIT     := 1,   (* Démarrage / vérifs *)
+    READY    := 2,   (* Prêt, attend ordre *)
+    BUSY     := 3,   (* Action en cours *)
+    DONE     := 4,   (* Action terminée *)
+    STOPPING := 5,   (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+    ERROR    := 6    (* Défaut actif non acquitté (FB en erreur — HMI non aveugle) *)
+END_ENUM
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_Fault.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l&#x27;état défaut d&#x27;un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu&#x27;au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l&#x27;acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_Fault :
+STRUCT
+    Error     : BOOL;   (* &lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant *)
+    ErrorId   : WORD;    (* &lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune) *)
+    Latched   : BOOL;    (* &lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu&#x27;au front Reset *)
+    LatchedId : WORD;    (* &lt;-- [DIAG] ErrorId figé à l&#x27;apparition du défaut, effacé au Reset *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_FaultCause.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n&#x27;alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_FaultCause :
+STRUCT
+    Active   : BOOL;    (* 1 = cause présente maintenant (interlock sur cette valeur) *)
+    Latching : BOOL;    (* 1 = cause à acquitter (arme Latched) ; 0 = live seulement *)
+    Texte    : STRING;  (* libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM) *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\ST_ContactorCheck.st</code></summary>
+                <pre>(* =======================================================================
+   🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
+   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §2
+   ======================================================================= *)
+
+TYPE ST_ContactorCheck :
+STRUCT
+    Command     : BOOL;   // Ordre envoyé au contacteur (TRUE = fermé/actif)
+    Feedback    : BOOL;   // Retour d&#x27;état câblé (TRUE = effectivement fermé)
+    StuckClosed : BOOL;   // Diag : commande OFF mais retour ON depuis trop longtemps → PowerCutOff
+    StuckOpen   : BOOL;   // Diag : commande ON mais retour OFF depuis trop longtemps
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FaultCore.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d&#x27;une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l&#x27;apparition d&#x27;une
+          cause `Active AND Latching`, conservé jusqu&#x27;au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d&#x27;effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+FUNCTION_BLOCK FB_FaultCore
+VAR_INPUT
+    Enable  : BOOL;                          // --&gt; [CMD] Autorisation générale du FB porteur
+    Reset   : BOOL;                          // --&gt; [CMD] Front d&#x27;acquittement (jamais conditionné, §9)
+    Causes  : ARRAY[0..15] OF ST_FaultCause; // --&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)
+END_VAR
+VAR_OUTPUT
+    Ready   : BOOL;                          // &lt;-- [STAT] FB porteur autorisé (= Enable)
+    Fault   : ST_Fault;                      // &lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)
+END_VAR
+VAR
+    ResetEdge : R_TRIG;                      // . [LOC] Front montant Reset
+    Latch     : ARRAY[0..15] OF BOOL;        // . [LOC] Bit laté par cause, jusqu&#x27;au Reset
+    i         : INT;                         // . [LOC] Index de parcours de la liste
+END_VAR
+
+{region &quot;§1 Reset (front, toujours effectif)&quot;}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§2 Vue LIVE — Error / ErrorId&quot;}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region &quot;§3 Armement des latches (causes à acquitter)&quot;}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu&#x27;au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;§4 Vue LATCHÉE — Latched / LatchedId&quot;}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_CycleTime.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Calcul du dt réel entre deux exécutions successives
+   ⚙️ Calcul : Delta horloge système TIME() converti en secondes
+   🛡️ Robustesse : dt borné (0 &lt; dt &lt;= CST_MaxCycleDeltaMs) sinon valeur de secours —
+      neutralise les artefacts de rebouclage TIME() (49,7 j) et de reprise (online-change, debug)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants/FB_CycleTime_v1.0.md
+   ======================================================================= *)
+FUNCTION_BLOCK FB_CycleTime
+VAR_INPUT
+    // === REGLAGES DE SECOURS ===
+    DefaultValueS           : REAL := 0.004;      // --&gt; [CFG] Valeur de secours par defaut (ex: 4ms = 0.004s)
+END_VAR
+VAR_OUTPUT
+    // === MESURE ET DIAGNOSTIC ===
+    CycleTimeS              : REAL;               // &lt;-- [DIAG] Temps ecoule reel calcule (secondes)
+END_VAR
+VAR
+    // === HORLOGE ET MEMOIRE TEMPORELLE ===
+    TimeCurrent             : TIME;               // . [LOC] Temps systeme actuel
+    TimeLast                : TIME;               // . [LOC] Empreinte de temps du cycle precedent
+    DeltaTimeMs             : UDINT;              // . [LOC] Ecart brut calcule (ms)
+    InitDone                : BOOL;               // . [LOC] Drapeau d&#x27;initialisation du premier cycle
+END_VAR
+VAR CONSTANT
+    // === BORNE HAUTE DU DELTA DE CYCLE ===
+    CST_MaxCycleDeltaMs     : UDINT := 1000;      // Plafond physique du dt entre deux scans (ms) : au-dela -&gt; valeur de secours
+END_VAR
+
+{region &quot;§1 Acquisition temps&quot;}
+// 1. ACQUISITION DU TEMPS SYSTÈME
+TimeCurrent := TIME();
+{endregion}
+
+{region &quot;§2 Initialisation&quot;}
+// 2. INITIALISATION UNIQUE AU PREMIER CYCLE
+IF NOT InitDone THEN
+    TimeLast := TimeCurrent;
+    InitDone := TRUE;
+    CycleTimeS := DefaultValueS;
+    RETURN;
+END_IF;
+{endregion}
+
+{region &quot;§3 Calcul delta&quot;}
+// 3. CALCUL DU DELTA EN MILLISECONDES
+DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+{endregion}
+
+{region &quot;§4 Conversion, secours et bornage&quot;}
+// 4. CONVERSION EN SECONDES, AVEC DOUBLE BORNAGE DU DELTA
+//
+// TIME() est un compteur systeme 32 bits en millisecondes depuis le demarrage de
+// l&#x27;automate. Il n&#x27;est PAS absolu : il reboucle a 0 tous les 2^32 ms (~49,7 jours).
+// La soustraction TimeCurrent - TimeLast est modulo 2^32 : au passage du rebouclage,
+// tant que l&#x27;ecart reel entre deux scans reste &lt; 49,7 j (toujours vrai a 10 ms),
+// DeltaTimeMs reste correct. Le rebouclage seul n&#x27;est donc pas le risque principal.
+//
+// Le vrai risque est un DeltaTimeMs REELLEMENT &gt; CST_MaxCycleDeltaMs : reprise apres
+// un online-change, sortie d&#x27;un point d&#x27;arret / pas-a-pas debug, ou fenetre du
+// rebouclage TIME(). Le chien de garde tache (200 ms, sensibilite 1) borne deja les
+// gels en fonctionnement ; ce plafond couvre les cas hors surveillance.
+// Un dt aberrant publie tel quel donnerait un CycleTimeS enorme, propage en un seul
+// scan dans les rampes de vitesse et les integrateurs de position/frein -&gt; saut
+// physique. Fail-safe : hors de la plage nominale (0 &lt; dt &lt;= plafond), on publie la
+// valeur de secours DefaultValueS au lieu de l&#x27;artefact. Pas de redemarrage auto.
+//
+// Borne basse dt = 0 (anti-zero, ex. premier appel du scan) et borne haute
+// dt &gt; CST_MaxCycleDeltaMs (anti-artefact) partagent la meme branche de secours.
+IF (DeltaTimeMs &gt; 0) AND (DeltaTimeMs &lt;= CST_MaxCycleDeltaMs) THEN
+    CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
+ELSE
+    CycleTimeS := DefaultValueS;
+END_IF;
+{endregion}
+
+{region &quot;§5 Archivage&quot;}
+// 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
+TimeLast := TimeCurrent;
+{endregion}
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Ramp.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ FB_Ramp — Rampe d&#x27;accélération et décélération asymétrique
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Limitation de variation anti-à-coups (%/s) sur signal analogique
+   🔒 Polarité : Distingue l&#x27;éloignement de zéro (Accel) et le retour à zéro (Decel)
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md §1 (TC-P11-040)
+   ======================================================================= *)
+FUNCTION_BLOCK FB_Ramp
+VAR_INPUT
+    // === CONSIGNES ET TAUX DE RAMPE ===
+    Target                  : REAL;               // --&gt; [CMD] Valeur cible visee (-100.0..+100.0 %)
+    AccelRate               : REAL;               // --&gt; [CFG] Taux d&#x27;acceleration (%/s)
+    DecelRate               : REAL;               // --&gt; [CFG] Taux de deceleration (%/s)
+    CycleTimeS              : REAL;               // --&gt; [CFG] Temps de cycle reel en secondes (dt)
+END_VAR
+VAR_OUTPUT
+    // === VALEUR RAMPEE ===
+    Current                 : REAL;               // &lt;-- [STAT] Valeur courante amortie (-100.0..+100.0 %)
+END_VAR
+VAR
+    // === CALCULS INTERNES ===
+    StepX                   : REAL;               // . [LOC] Pas de variation pour le cycle courant
+    TargetLimited           : REAL;               // . [LOC] Cible bornee a [-100.0, +100.0]
+END_VAR
+
+// Détection du comportement (Accélération vs Décélération)
+// Classification par CÔTÉ DE ZÉRO + sens de déplacement, plus par signe brut de Target seul
+// (robuste à une traversée de zéro rapide).
+// 🛡️ Garde-fou : la rampe ne sort jamais de la plage normalisée ±100 %.
+TargetLimited := LIMIT(-100.0, Target, 100.0);
+Current := LIMIT(-100.0, Current, 100.0);
+
+IF (Current &gt;= 0.0 AND TargetLimited &gt;= Current) OR (Current &lt;= 0.0 AND TargetLimited &lt;= Current) THEN
+    StepX := AccelRate * CycleTimeS; // S&#x27;éloigne du zéro (reste du même côté, va plus loin)
+ELSE
+    StepX := DecelRate * CycleTimeS; // Retourne vers zéro, ou le traverse vers l&#x27;autre signe
+END_IF;
+
+// Application de la rampe
+IF Current &lt; TargetLimited THEN
+    Current := Current + StepX;
+    IF Current &gt; TargetLimited THEN Current := TargetLimited; END_IF;
+ELSIF Current &gt; TargetLimited THEN
+    Current := Current - StepX;
+    IF Current &lt; TargetLimited THEN Current := TargetLimited; END_IF;
+END_IF;
+
+// 🛡️ Limitation finale : même une valeur d&#x27;état déjà corrompue reste bornée.
+Current := LIMIT(-100.0, Current, 100.0);
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Brake.st</code></summary>
+                <pre>(* =======================================================================
+   🛡️ FB_Brake — Séquence frein à manque de courant (temps physiques)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Gestion temporisée ouverture/fermeture frein à manque de courant
+   🔒 Polarité : Sécurité positive (BrakeCmd=FALSE = frein collé au repos)
+   🔌 Interface : Double vérification retour contacteur (ST_ContactorCheck)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md §3
+   ======================================================================= *)
+FUNCTION_BLOCK PUBLIC FB_Brake
+VAR_INPUT
+    // === COMMANDES ET CONSIGNES ===
+    Enable                  : BOOL;               // --&gt; [CMD]  Autorisation generale (FALSE = frein colle)
+    Reset                   : BOOL;               // --&gt; [CMD]  Acquittement defaut (front)
+    MovementRequested       : BOOL;               // --&gt; [CMD]  Demande de mouvement (sens+palier actifs)
+
+    // === RETOURS MATERIELS &amp; SIMULATION ===
+    ContactorFeedback       : BOOL;               // --&gt; [HW]   Retour contacteur frein (TRUE = relache/ouvert)
+    BypassContactorCheck    : BOOL;               // --&gt; [TST]  Bypass controle contacteur (simu)
+
+    // === TEMPORISATIONS ET REGLAGES ===
+    DelayContactClose       : TIME := T#100ms;    // --&gt; [CFG]  Temps de fermeture contacteur de puissance
+    DelayMagnetise          : TIME := T#300ms;    // --&gt; [CFG]  Delai magnetisation moteur avant ouverture frein
+    DelayMotorDecel         : TIME := T#500ms;    // --&gt; [CFG]  Delai deceleration avant collage frein
+    FeedbackTimeout         : TIME := T#1s;       // --&gt; [CFG]  Delai max coherence commande/retour frein
+END_VAR
+VAR_OUTPUT
+    // === ETATS IEC &amp; DERIVATION ===
+    Ready                   : BOOL;               // &lt;-- [STAT] FB pret a fonctionner
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                   : ST_Fault;
+
+    // === COMMANDES ET CONFIRMATIONS ===
+    BrakeCmd                : BOOL;               // &lt;-- [ACT]  Commande bobine frein (TRUE = relache/ouvert)
+    BrakeCommandOpenConfirmed : BOOL;            // &lt;-- [STAT] Confirmation ouverture frein pour verrous
+    ContactorCheck          : ST_ContactorCheck;  // &lt;-- [DIAG] Diagnostic detaille retour contacteur
+END_VAR
+VAR
+    // === TRIGGERS ET DETECTION FRONTS ===
+    ResetEdge               : R_TRIG;             // . [LOC]  Detecteur front acquittement
+    BypassEdge              : R_TRIG;             // . [LOC]  Detecteur front activation bypass
+
+    // === TEMPORISATEURS INTERNES ===
+    TonMagnetise            : TON;                // . [LOC]  Temporisation avant relachement frein
+    TonDecel                : TON;                // . [LOC]  Temporisation avant collage frein
+    TonFeedback             : TON;                // . [LOC]  Timeout de coherence commande/retour
+
+    // === GESTION DES DEFAUTS ===
+    ContactorIncoherentError: BOOL;               // . [LOC]  Défaut mémorisé incohérence contacteur
+    instFault               : FB_FaultCore;       // * [INST] Socle de défaut
+    instCauses              : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
+END_VAR
+
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Fronts&quot;}
+// 🔑 1. FRONTS
+ResetEdge(CLK := Reset);
+BypassEdge(CLK := BypassContactorCheck);
+
+// Acquittement des drapeaux contacteur
+IF ResetEdge.Q OR BypassContactorCheck THEN
+    ContactorIncoherentError := FALSE;
+    ContactorCheck.StuckClosed := FALSE;
+    ContactorCheck.StuckOpen   := FALSE;
+END_IF;
+{endregion}
+
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 2. GATE — pas d&#x27;Enable = frein collé (sécurité positive), aucune temporisation en cours
+IF NOT Enable THEN
+    TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
+    TonDecel(IN := FALSE, PT := DelayMotorDecel);
+    TonFeedback(IN := FALSE, PT := FeedbackTimeout);
+    BrakeCmd := FALSE;
+    Ready := FALSE;
+    ContactorCheck.Command := FALSE;          // 📊 Neutralisation : miroir de BrakeCmd := FALSE
+    ContactorCheck.Feedback := ContactorFeedback; // 📊 Neutralisation : miroir entrée physique
+    BrakeCommandOpenConfirmed := FALSE;       // 🛡️ Fail-Safe : frein commandé fermé hors Enable
+    
+    // Évaluation du socle de défaut sous neutralisation (permet acquittement Reset hors Enable)
+    instCauses[0].Active   := FALSE;
+    instCauses[0].Latching := TRUE;
+    instCauses[0].Texte    := &#x27;Incoherence retour contacteur frein&#x27;;
+    instFault(Enable := FALSE, Reset := Reset, Causes := instCauses);
+    Fault := instFault.Fault;
+    RETURN;
+END_IF;
+{endregion}
+
+{region &quot;§3 Séquence temporisée&quot;}
+// 🛠️ 3. SÉQUENCE TEMPORISÉE (démarrage vs arrêt)
+IF MovementRequested THEN
+    TonDecel(IN := FALSE, PT := DelayMotorDecel);
+    TonMagnetise(IN := TRUE, PT := DelayMagnetise + DelayContactClose);
+    IF TonMagnetise.Q THEN
+        BrakeCmd := TRUE;              // ✅ Contacteur + magnétisation acquis → relâche
+    ELSE
+        BrakeCmd := FALSE;             // ⏳ Encore collé pendant la magnétisation
+    END_IF;
+ELSE
+    // Sécurité positive : fermeture immédiate du frein (collé) dès que les contacteurs de sens s&#x27;ouvrent
+    TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
+    TonDecel(IN := FALSE, PT := DelayMotorDecel);
+    BrakeCmd := FALSE;                 // Fermeture immédiate
+END_IF;
+{endregion}
+
+{region &quot;§4 Double vérification contacteur&quot;}
+// 🔍 4. DOUBLE VÉRIFICATION RETOUR CONTACTEUR (ST_ContactorCheck)
+ContactorCheck.Command := BrakeCmd;
+ContactorCheck.Feedback := ContactorFeedback;
+
+// ContactorFeedback est dans le MÊME sens que BrakeCmd (TRUE = relâché = frein ouvert).
+TonFeedback(IN := (BrakeCmd &lt;&gt; ContactorFeedback), PT := FeedbackTimeout);
+IF NOT BypassContactorCheck THEN
+    IF TonFeedback.Q THEN
+        ContactorCheck.StuckClosed := (BrakeCmd AND NOT ContactorFeedback);
+        ContactorCheck.StuckOpen   := (NOT BrakeCmd AND ContactorFeedback);
+        ContactorIncoherentError   := TRUE;
+    END_IF;
+END_IF;
+{endregion}
+
+{region &quot;§5 Causes &amp; Socle Défaut&quot;}
+// 🚨 5. SOCLE DÉFAUT &amp; SORTIE SÛRE
+instCauses[0].Active   := NOT BypassContactorCheck AND (ContactorCheck.StuckClosed OR ContactorCheck.StuckOpen OR (TonFeedback.Q AND (BrakeCmd &lt;&gt; ContactorFeedback)));
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := &#x27;Incoherence retour contacteur frein&#x27;;
+
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+
+Ready := Enable AND NOT Fault.Latched;
+
+// Sortie sûre immédiate
+IF Fault.Error OR Fault.Latched THEN
+    BrakeCmd := FALSE;
+END_IF;
+{endregion}
+
+{region &quot;§6 Confirmation ouverture&quot;}
+// 📤 6. CONFIRMATION OUVERTURE FREIN
+IF BypassContactorCheck THEN
+    BrakeCommandOpenConfirmed := BrakeCmd;
+ELSE
+    BrakeCommandOpenConfirmed := ContactorFeedback AND NOT Fault.Latched;  (* TRUE = frein ouvert = desserrage confirmé *)
+END_IF;
+{endregion}
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\E_Mode.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_Mode — Modes de marche de la machine
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des modes d&#x27;exploitation et maintenance
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+   ======================================================================= *)
+TYPE E_Mode :
+ENUM
+    DISABLE     := 0,   (* Mode Désactivé / Veille de sécurité (sorties bloquées) *)
+    MAINT_N1    := 1,   (* Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives *)
+    MAINT_N2    := 2,   (* Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés) *)
+    SEMI_AUTO   := 3    (* Mode Semi-Automatique (séquenceur automatique) *)
+END_ENUM
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\_TYPES\ST_fbTranslation_Cfg.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   ⚙️ ST_fbTranslation_Cfg — Configuration regroupée de FB_Translation
+   ───────────────────────────────────────────────────────────────
+   📐 NC-110 / G380 : pattern « Cfg : ST_fb&lt;Fb&gt;_Cfg » (comme FB_Winch
+      avec Config : ST_fbWinch_Cfg). Regroupe en UN point d&#x27;interface les
+      ~13 scalaires `[CFG]` qui étaient des VAR_INPUT plates de FB_Translation.
+   🎯 Un seul sourcing : PRG_05_Translation assemble ce struct depuis la
+      source unique GVL_PERSISTENT (§ source propre documentée ci-dessous).
+   📤 Producteur : PRG_05_Translation (câblage).
+   📥 Consommateur : FB_Translation (Cfg, lecture seule).
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_fbTranslation_Cfg :
+STRUCT
+    // === RAMPES VITESSE (%/s) ===
+    CfgRampAccelRate            : REAL := 20.0;   // --&gt; [CFG] Accélération
+    CfgRampDecelNormalRate      : REAL := 40.0;   // --&gt; [CFG] Décélération normale
+    CfgRampDecelFastRate        : REAL := 100.0;  // --&gt; [CFG] Décélération RAPIDE (SafeStop)
+    DirectionInterlockDelay     : TIME := T#200ms; // --&gt; [CFG] Délai avant changement de sens à l&#x27;arrêt
+
+    // === VITESSES RÉDUITES D&#x27;APPROCHE (Hz) ===
+    ApproachSpeedTremieHz       : REAL := 10.0;   // --&gt; [CFG] Approche Trémie (Direction=1)
+    ApproachSpeedMaintenanceHz  : REAL := 10.0;   // --&gt; [CFG] Approche Maintenance (Direction=-1)
+    ApproachSpeedP1Hz           : REAL := 10.0;   // --&gt; [CFG] Approche P1 (Direction=-1)
+
+    // === ÉCHELLE VARIATEUR ===
+    DriveFreqScaleMaxHz         : REAL := 60.0;   // --&gt; [CFG] Échelle 0..100 % → MaxHz
+
+    // === COMMUN / FREIN ===
+    CaptorDebounce              : TIME := T#100ms; // --&gt; [CFG] Filtrage capteur position cible
+    BrakeDelayContactClose      : TIME := T#100ms; // --&gt; [CFG] Voir FB_Brake
+    BrakeDelayMagnetise         : TIME := T#100ms; // --&gt; [CFG] Voir FB_Brake
+    BrakeDelayMotorDecel        : TIME := T#2s;    // --&gt; [CFG] Voir FB_Brake - MES 2026-09-04 : monte 500ms -&gt; 2s (confirme operateur)
+    BrakeFeedbackTimeout        : TIME := T#1000ms; // --&gt; [CFG] Delai de confirmation retour contacteur frein avant defaut sequence. Doit couvrir le coast reel d&#x27;un arret dur en butee extreme (confirme operateur).
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\FB_Translation_PositionDecoder.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🧩 FB_Translation_PositionDecoder — Décodage mot capteurs M3 (5 positions)
+   ───────────────────────────────────────────────────────────────
+    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   🧩 Brique technique (AF_Partie-03 §2) : contrat minimal, pas de
+      StartStop/Enable/Reset/Mode — décode 5 capteurs TOR (Trémie|PV|P2|P1|
+      Maintenance) en mot de progression, dérive les 2 limites extrêmes,
+      détecte toute combinaison incohérente (défense en profondeur M3) et
+      les fronts individuels par capteur (arrivée/cible, robuste décalage came).
+   🎯 Mot valide : progression monotone de 11111 (extrême Trémie) à 00000
+      (extrême Maintenance) : 11111→01111→00111→00011→00001→00000.
+      Tout autre mot = incohérence câblage/mécanique (capteur collé/HS).
+   ═══════════════════════════════════════════════════════════════ *)
+
+FUNCTION_BLOCK PUBLIC FB_Translation_PositionDecoder
+VAR_INPUT
+    SensorTremie      : BOOL;   // --&gt; [HW] Capteur extrême gauche (Trémie)
+    SensorPV          : BOOL;   // --&gt; [HW] Capteur pré-ralentissement avant Trémie (Point de Vitesse)
+    SensorP2          : BOOL;   // --&gt; [HW] Capteur zone de travail P2
+    SensorP1          : BOOL;   // --&gt; [HW] Capteur zone de travail P1
+    SensorMaintenance : BOOL;   // --&gt; [HW] Capteur extrême droite (Maintenance, accès MAINT_N2 uniquement)
+END_VAR
+VAR_OUTPUT
+    LimitSwitchTremie    : BOOL;   // &lt;-- [STAT] Extrême Trémie confirmé (mot = 11111) (ex-LimitSwitchFwd)
+    LimitSwitchMaintenance : BOOL; // &lt;-- [STAT] Extrême Maintenance confirmé (mot = 00000) (ex-LimitSwitchRev)
+    Incoherent        : BOOL;   // &lt;-- [DIAG] Mot hors des 6 combinaisons valides -&gt; défaut sécurité (SafeStop+PowerCutOff, voir FB_Safety_Translation)
+    SensorsWord       : BYTE;   // &lt;-- [DIAG] Diagnostic (bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance)
+
+    // Exposition des positions individuelles pour consommation par les programmes aval
+    // ⚠️ CUMULATIF (&quot;au-dessus de ce seuil&quot;) — pour le ralentissement d&#x27;approche (zone large,
+    // doit tenir toute la durée de l&#x27;approche, pas juste un instant). Ne PAS utiliser pour
+    // détecter une arrivée/cible (voir TranslationAtXxx ci-dessous, mot exact, avec front).
+    TranslationPosTremie      : BOOL;   // &lt;-- [STAT] TRUE = capteur Trémie actif
+    TranslationPosPV          : BOOL;   // &lt;-- [STAT] TRUE = capteur PV actif
+    TranslationPosP2          : BOOL;   // &lt;-- [STAT] TRUE = capteur P2 actif
+    TranslationPosP1          : BOOL;   // &lt;-- [STAT] TRUE = capteur P1 actif
+    TranslationPosMaintenance : BOOL;   // &lt;-- [STAT] TRUE = capteur Maintenance actif
+
+    // Détection d&#x27;arrivée/cible par FRONT DU CAPTEUR PROPRE à chaque position (montant OU
+    // descendant) : le franchissement d&#x27;un point Xi est marqué par SON PROPRE capteur qui bascule
+    // (front descendant en venant de Trémie = on vient de dépasser Xi ; front montant en venant de
+    // Maintenance = on vient d&#x27;atteindre Xi). Trémie et Maintenance (bouts de chaîne) n&#x27;ont qu&#x27;un
+    // seul sens d&#x27;arrivée valide chacun. ⚠️ Signal TRANSITOIRE (1 cycle) — distinct des
+    // TranslationPosXxx (niveau cumulatif, réservé au ralentissement). L&#x27;appelant
+    // (PRG_05_Translation §0quater) le mémorise en verrou bistable pour le débounce/verrou
+    // anti-rebond de FB_Translation.
+    TranslationAtTremie      : BOOL;   // &lt;-- [STAT] TRUE 1 cycle : front montant SensorTremie (arrivée venant de Maintenance uniquement)
+    TranslationAtPV          : BOOL;   // &lt;-- [STAT] TRUE 1 cycle : front (montant ou descendant) SensorPV
+    TranslationAtP2          : BOOL;   // &lt;-- [STAT] TRUE 1 cycle : front (montant ou descendant) SensorP2
+    TranslationAtP1          : BOOL;   // &lt;-- [STAT] TRUE 1 cycle : front (montant ou descendant) SensorP1
+    TranslationAtMaintenance : BOOL;   // &lt;-- [STAT] TRUE 1 cycle : front descendant SensorMaintenance (arrivée venant de Trémie uniquement)
+END_VAR
+
+VAR
+    EdgeUpTremie      : R_TRIG;   // . [LOC] Front montant Trémie
+    EdgeDnTremie      : F_TRIG;   // . [LOC] Front descendant Trémie
+    EdgeUpPV          : R_TRIG;   // . [LOC] Front montant PV
+    EdgeDnPV          : F_TRIG;   // . [LOC] Front descendant PV
+    EdgeUpP2          : R_TRIG;   // . [LOC] Front montant P2
+    EdgeDnP2          : F_TRIG;   // . [LOC] Front descendant P2
+    EdgeUpP1          : R_TRIG;   // . [LOC] Front montant P1
+    EdgeDnP1          : F_TRIG;   // . [LOC] Front descendant P1
+    EdgeUpMaintenance : R_TRIG;   // . [LOC] Front montant Maintenance
+    EdgeDnMaintenance : F_TRIG;   // . [LOC] Front descendant Maintenance
+END_VAR
+
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Assemblage mot et cohérence&quot;}
+// 🧾 Assemblage du mot (bit4=Trémie ... bit0=Maintenance, ordre doc AF_Partie-02 §3bis)
+SensorsWord := 0;
+IF SensorTremie      THEN SensorsWord := SensorsWord OR 16#10; END_IF;
+IF SensorPV          THEN SensorsWord := SensorsWord OR 16#08; END_IF;
+IF SensorP2          THEN SensorsWord := SensorsWord OR 16#04; END_IF;
+IF SensorP1          THEN SensorsWord := SensorsWord OR 16#02; END_IF;
+IF SensorMaintenance THEN SensorsWord := SensorsWord OR 16#01; END_IF;
+
+// 🎯 Les 6 combinaisons valides (progression monotone décroissante Trémie→Maintenance)
+CASE SensorsWord OF
+    2#11111, 2#01111, 2#00111, 2#00011, 2#00001, 2#00000:
+        Incoherent := FALSE;
+    ELSE
+        Incoherent := TRUE;
+END_CASE;
+
+// 🚧 Limites extrêmes — uniquement sur mot valide (évite un Fdc fantôme déclenché par une incohérence)
+LimitSwitchTremie := (NOT Incoherent) AND (SensorsWord = 2#11111);
+LimitSwitchMaintenance := (NOT Incoherent) AND (SensorsWord = 2#00000);
+{endregion}
+
+{region &quot;§2 Reprise capteurs&quot;}
+// Reprise des capteurs de position pour les consommateurs aval (passthrough, identique à l&#x27;entrée filtrée)
+// ⚠️ CUMULATIF — voir avertissement en déclaration, réservé au ralentissement d&#x27;approche.
+TranslationPosTremie      := SensorTremie;
+TranslationPosPV          := SensorPV;
+TranslationPosP2          := SensorP2;
+TranslationPosP1          := SensorP1;
+TranslationPosMaintenance := SensorMaintenance;
+{endregion}
+
+{region &quot;§3 Fronts individuels&quot;}
+// Front individuel par capteur — voir avertissement en déclaration. Transitoire (1 cycle),
+// mémorisé par l&#x27;appelant.
+EdgeUpTremie(CLK := SensorTremie);           EdgeDnTremie(CLK := SensorTremie);
+EdgeUpPV(CLK := SensorPV);                   EdgeDnPV(CLK := SensorPV);
+EdgeUpP2(CLK := SensorP2);                   EdgeDnP2(CLK := SensorP2);
+EdgeUpP1(CLK := SensorP1);                   EdgeDnP1(CLK := SensorP1);
+EdgeUpMaintenance(CLK := SensorMaintenance); EdgeDnMaintenance(CLK := SensorMaintenance);
+
+// Front du capteur PROPRE à chaque position — voir modèle en déclaration.
+// Extrémités : un seul sens valide chacune. Points intermédiaires : les deux fronts de LEUR PROPRE
+// capteur (montant = atteint en venant de Maintenance, descendant = dépassé en venant de Trémie).
+TranslationAtTremie      := EdgeUpTremie.Q;
+TranslationAtPV          := EdgeUpPV.Q OR EdgeDnPV.Q;
+TranslationAtP2          := EdgeUpP2.Q OR EdgeDnP2.Q;
+TranslationAtP1          := EdgeUpP1.Q OR EdgeDnP1.Q;
+TranslationAtMaintenance := EdgeDnMaintenance.Q;
+{endregion}
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\FB_Translation.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   ⚙️ FB_Translation — Directeur de l&#x27;axe transversal M3 (variateur AC600)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   🔌 FB DE MOUVEMENT : porte RunRequest + SafeStop en plus de l&#x27;interface
+      standard. Précédence Enable &gt; SafeStop &gt; StartStop.
+   Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
+   🔧 Interface plate → structs : configuration regroupée en `Cfg : ST_fbTranslation_Cfg`
+      (pattern NC-110/G380, comme FB_Winch `Config : ST_fbWinch_Cfg`). Source unique
+      GVL_PERSISTENT (câblée par PRG_05_Translation).
+   🧩 Compose FB_Brake (réutilisé TEL QUEL depuis COMMUN).
+   🎯 Invariant : toute inversion de sens force la cible de rampe à 0.0 tant que le
+      changement de sens est en attente, pour garantir le croisement du seuil d&#x27;arrêt
+      qui autorise l&#x27;interlock de changement de sens (§5).
+   ═══════════════════════════════════════════════════════════════ *)
+
+FUNCTION_BLOCK PUBLIC FB_Translation
+VAR_INPUT
+    Enable                      : BOOL;        // --&gt; [CMD] Active le FB. FALSE = neutralisation totale (sorties coupées)
+    Reset                       : BOOL;        // --&gt; [CMD] Acquittement défaut (front)
+    PowerContactorEngaged       : BOOL;        // --&gt; [SAFE] Chaîne AU réarmée + conditions globales OK
+    Mode                        : E_Mode;      // --&gt; [CMD] Mode courant
+    RunRequest                  : BOOL;        // --&gt; [CMD] Demande de marche maintenue (FALSE = décélération/arrêt)
+    SafeStop                    : BOOL;        // --&gt; [SAFE] Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
+    ReqTremie                   : BOOL;        // --&gt; [CMD] Demande explicite vers Trémie
+    ReqMaintenance              : BOOL;        // --&gt; [CMD] Demande explicite vers Maintenance
+    SpeedTgt_Pct                : REAL;        // --&gt; [CMD] Magnitude de la consigne (de 0 à 100%)
+    PositionSensorTarget        : BOOL;        // --&gt; [HW] Capteur position cible courante
+    SlowdownSensorTremie        : BOOL;        // --&gt; [HW] Capteur PV — ralentissement avant Trémie (Direction=1)
+    SlowdownSensorMaintenance   : BOOL;        // --&gt; [HW] Capteur P1 — ralentissement avant Maintenance (Direction=-1)
+    SlowdownSensorP1            : BOOL;        // --&gt; [HW] Capteur P2 — ralentissement avant P1 (Direction=-1)
+    LimitSwitchTremie           : BOOL;        // --&gt; [HW] Fin de course extrême Trémie (ex-LimitSwitchFwd)
+    LimitSwitchMaintenance      : BOOL;        // --&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)
+
+    // 🛡️ Permis directionnels canoniques M3 — gate de sens (TRUE = autorisé)
+    EffectivePermitM3_Tremie    : BOOL := FALSE;  // --&gt; [SAFE] Permis effectif vers Trémie
+    EffectivePermitM3_Maintenance : BOOL := FALSE; // --&gt; [SAFE] Permis effectif vers Maintenance/P1
+
+    // 🔌 Spécifique ETHERCAT
+    DriveStatusWord             : WORD;       // --&gt; [HW] Mot d&#x27;état AC600 lu depuis l&#x27;image d&#x27;entrée EtherCAT
+    DriveActualFreqHz           : REAL;       // --&gt; [HW] Fréquence réelle mesurée (Hz)
+
+    BypassContactorCheck        : BOOL;       // --&gt; [TST] TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)
+    BypassLimitSwitch           : BOOL;       // --&gt; [TST] TRUE = ignore les fins de course extrêmes
+    BrakeFeedback               : BOOL;       // --&gt; [HW] Retour physique direct : TRUE = frein OUVERT (desserré)
+    InvertDriveDirection        : BOOL;
+
+    // 🔧 Configuration regroupée (pattern NC-110/G380 — un seul point d&#x27;interface)
+    Cfg                         : ST_fbTranslation_Cfg; // --&gt; [CFG] Rampe, vitesses d&#x27;approche, échelle, frein (source GVL_PERSISTENT)
+END_VAR
+VAR_OUTPUT
+    Ready                       : BOOL;   // &lt;-- [STAT] FB prêt (sortie libre, hors ST_Status)
+    // 🧩 Statut transverse (forme cible ST_Fault)
+    Fault                       : ST_Fault;
+    TargetReached               : BOOL;       // &lt;-- [STAT] Capteur position cible
+    ArrivalStopConfirmed        : BOOL;   // &lt;-- [STAT] Arrêt confirmé sur la cible : verrou d&#x27;arrivée armé ET axe physiquement arrêté (aucune rotation, frein non commandé ouvert)
+    RequestedDriveControlWord   : WORD; // &lt;-- [ACT] Demande métier AC600, arbitrée par FB_TranslationOutputInterlock
+    RequestedDriveFreqHz        : REAL; // &lt;-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock
+    BrakeReleaseRequest         : BOOL; // &lt;-- [ACT] Demande métier desserrage, issue de FB_Brake
+    BrakeCommandOpenConfirmed   : BOOL; // &lt;-- [STAT] TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)
+    BrakeContactorCheck         : ST_ContactorCheck; // &lt;-- [DIAG] Diag contacteur frein
+END_VAR
+VAR
+    Brake                       : FB_Brake;       // * [INST] Séquence frein
+    CycleTimeCalc               : FB_CycleTime;   // * [INST] Mesure temps de cycle
+    SpeedRamp                   : FB_Ramp;       // * [INST] Rampe de vitesse logicielle (PLC)
+    ResetEdge                   : R_TRIG;   // . [LOC] Front Reset
+    DirectionChangeDelay        : TON;            // . [LOC] Interlock changement de sens
+    CommandedTremie             : BOOL;           // . [LOC] Sens Trémie réellement appliqué
+    CommandedMaintenance        : BOOL;           // . [LOC] Sens Maintenance réellement appliqué
+    DirectionChangePending      : BOOL;         // . [LOC] Force la rampe à 0 pendant une inversion de sens en attente
+    PhysicalTremie               : BOOL;         // . [LOC] Sens physique Trémie après inversion câblage
+    PhysicalMaintenance          : BOOL;         // . [LOC] Sens physique Maintenance après inversion câblage
+    RampTargetPct               : REAL;   // . [LOC] Cible rampe en %
+    CaptorDebounceTon           : TON;    // . [LOC] Debounce capteur cible
+    ArrivalEdge                 : R_TRIG;   // . [LOC] Front arrivée sur capteur
+    ArrivalWasTremie             : BOOL;  // . [LOC] Sens d&#x27;arrivée mémorisé
+    ArrivalWasMaintenance        : BOOL;  // . [LOC] Sens d&#x27;arrivée mémorisé
+    LastMoveDirection           : INT;         // . [LOC] Sens du dernier mouvement commandé (+1 = Trémie, -1 = Maintenance) — mémoire de l&#x27;axe, insensible à la perte de la demande
+    ArrivalLock                 : BOOL;        // . [LOC] Arrêt exact sur capteur cible
+    ArrivalIsExtreme             : BOOL;  // . [LOC] Arrivée sur une extrémité réelle (Trémie/Maintenance), jamais un point intermédiaire (P1/P2/PV)
+    MovementRequested           : BOOL;         // . [LOC] Pilote FB_Brake
+    FirstScanDone               : BOOL;   // . [LOC] Initialisation premier scan
+    TonBrakeRealFreqTimeout     : TON;
+    EffectiveSafeStop           : BOOL;   // . [LOC] SafeStop effectif = SafeStop OR sens non permis (gate de sens)
+    OverrunLimitSwitch          : BOOL;   // . [LOC] Depassement reel FdC (mouvement soutenu), pas juste arrivee normale
+    TonLimitSwitchOverrun       : TON;    // . [LOC] Persistance avant fault Cause 6 (evite le faux defaut sur arrivee nominale)
+    DriveResetPulseTimer        : TON;    // . [LOC] Duree bornee de la commande reset AC600
+    DriveResetPulseActive       : BOOL;   // . [LOC] Impulsion reset AC600 en cours
+
+    // Défauts
+    DriveFaultLatching          : BOOL;   // . [LOC] Latch défaut variateur
+    instFault                   : FB_FaultCore;                  // * [INST] Socle défaut transverse
+    instCauses                  : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
+END_VAR
+VAR CONSTANT
+    CST_DriveResetPulseTime     : TIME := T#100ms; // . [CFG] Impulsion reset AC600
+END_VAR
+
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Causes &amp; Socle Défaut (évalué en continu)&quot;}
+// 🔑 1. RESET FRONT
+ResetEdge(CLK := Reset);
+
+IF ResetEdge.Q THEN
+    DriveFaultLatching := FALSE;
+    DriveResetPulseActive := Enable;
+END_IF;
+
+DriveResetPulseTimer(IN := DriveResetPulseActive, PT := CST_DriveResetPulseTime);
+IF DriveResetPulseTimer.Q OR NOT Enable THEN
+    DriveResetPulseActive := FALSE;
+END_IF;
+
+IF DriveStatusWord.4 THEN
+    DriveFaultLatching := TRUE;
+END_IF;
+
+instCauses[0].Active   := Brake.Fault.Error;
+instCauses[0].Latching := FALSE;
+instCauses[0].Texte    := &#x27;Defaut sequence ou retour frein translation&#x27;;
+
+instCauses[3].Active   := DriveFaultLatching;
+instCauses[3].Latching := TRUE;
+instCauses[3].Texte    := &#x27;Defaut variateur translation AC600&#x27;;
+
+// REX MES 2026-09-04 (trace Suivi_TranslationM3bug_20260904_27) : ce test se declenchait
+// INSTANTANEMENT a chaque arrivee NOMINALE sur le FdC (CommandedTremie ET LimitSwitchTremie
+// sont vrais des le 1er scan d&#x27;une arrivee normale, avant meme que la decel soit terminee)
+// -&gt; Fault.Error pulse -&gt; §6 force BrakeReleaseRequest:=FALSE en ecrasant Brake.BrakeCmd
+// pendant que FB_Brake pense toujours commander l&#x27;ouverture (son propre MovementRequested
+// reste vrai le temps du coast ~600ms) -&gt; incoherence commande/retour frein -&gt; latch
+// definitif dans FB_Brake. On ne fault desormais que sur un DEPASSEMENT REEL : encore
+// commande vers le FdC, sur le FdC, ET reellement en train de tourner (pas juste en decel),
+// soutenu 1.5s (meme garde que FB_Safety_Translation Cause 6).
+OverrunLimitSwitch := NOT BypassLimitSwitch
+    AND ((CommandedTremie AND LimitSwitchTremie) OR (CommandedMaintenance AND LimitSwitchMaintenance))
+    AND (ABS(DriveActualFreqHz) &gt; 0.5);
+TonLimitSwitchOverrun(IN := OverrunLimitSwitch, PT := T#1S500MS);
+instCauses[6].Active := TonLimitSwitchOverrun.Q;
+instCauses[6].Latching := FALSE;
+instCauses[6].Texte    := &#x27;Limite extreme translation atteinte&#x27;;
+
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 2. GATE
+IF NOT Enable THEN
+    SpeedRamp(Target := 0.0, AccelRate := 0.0, DecelRate := 100000.0, CycleTimeS := 1.0);
+    Brake(Enable := FALSE);
+    RequestedDriveControlWord := 0;
+    RequestedDriveFreqHz := 0.0;
+    BrakeReleaseRequest := FALSE;
+    BrakeCommandOpenConfirmed := FALSE;
+    BrakeContactorCheck.Command := FALSE;
+    BrakeContactorCheck.Feedback := BrakeFeedback;
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
+    DirectionChangePending := FALSE;
+    ArrivalLock := FALSE;
+    ArrivalIsExtreme := FALSE;
+    ArrivalWasTremie := FALSE;
+    ArrivalWasMaintenance := FALSE;
+    LastMoveDirection := 0;
+    ArrivalStopConfirmed := FALSE;
+    TargetReached := FALSE;
+    DirectionChangeDelay(IN := FALSE);
+    CaptorDebounceTon(IN := FALSE);
+    TonBrakeRealFreqTimeout(IN := FALSE);
+    Ready := FALSE;
+    RETURN;
+END_IF;
+
+Ready := Enable AND NOT Fault.Latched;
+{endregion}
+
+{region &quot;§3 Premier scan et temps de cycle&quot;}
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
+END_IF;
+
+CycleTimeCalc();
+{endregion}
+
+{region &quot;§4 Arrivée sur cible et interlock direction&quot;}
+CaptorDebounceTon(IN := PositionSensorTarget, PT := Cfg.CaptorDebounce);
+TargetReached := CaptorDebounceTon.Q;
+ArrivalEdge(CLK := TargetReached);
+
+// 🧠 Sens du dernier mouvement réellement commandé : mémoire PROPRE À L&#x27;AXE, mise à jour
+// avant la lecture du front d&#x27;arrivée (CommandedTremie/CommandedMaintenance portent encore
+// le sens du scan précédent) et jamais remise à zéro par la perte de la demande — contrairement
+// à ces deux locaux, qui retombent dès que la demande disparaît (§4 ci-dessous). C&#x27;est cette
+// mémoire qui qualifie le sens d&#x27;arrivée quand la demande est retirée avant la fin du debounce.
+IF CommandedTremie THEN
+    LastMoveDirection := 1;
+ELSIF CommandedMaintenance THEN
+    LastMoveDirection := -1;
+END_IF;
+
+// Arrivée sur une extrémité réelle uniquement (Trémie/Maintenance), jamais un point
+// intermédiaire (P1/P2/PV) : LimitSwitchMaintenance porte déjà la règle métier &quot;P1 compte
+// comme extrémité quand Maintenance est interdite comme cible&quot; (PRG_05_Translation §0ter),
+// donc aucune redondance de logique ici, juste sa consommation.
+ArrivalIsExtreme := ((LastMoveDirection = 1) AND LimitSwitchTremie)
+                  OR ((LastMoveDirection = -1) AND LimitSwitchMaintenance);
+
+IF ArrivalEdge.Q AND ArrivalIsExtreme THEN
+    ArrivalLock := TRUE;
+    IF CommandedTremie OR CommandedMaintenance THEN
+        ArrivalWasTremie := CommandedTremie;
+        ArrivalWasMaintenance := CommandedMaintenance;
+    ELSE
+        // Demande déjà retombée : le sens d&#x27;arrivée est pris sur la mémoire du dernier
+        // mouvement. Sans elle, les deux drapeaux seraient FALSE et la condition de
+        // relâchement ci-dessous accepterait une demande du MÊME sens — le verrou
+        // d&#x27;arrivée perdrait toute autorité et le chariot serait relancé au-delà du point
+        // d&#x27;arrêt (relance + dépassement). Cas nominal du séquenceur : il retire sa demande
+        // sur le jeton d&#x27;arrivée, soit 100 ms avant l&#x27;armement de ce verrou.
+        ArrivalWasTremie := (LastMoveDirection = 1);
+        ArrivalWasMaintenance := (LastMoveDirection = -1);
+    END_IF;
+END_IF;
+
+// Verrou d&#x27;arrivee extreme M3 : le FdC securite est une preuve d&#x27;arret de sens,
+// meme si le capteur de position cible n&#x27;a pas encore produit son front (cas
+// d&#x27;arrivee rapide / decalage de scans). On ne ferme pas le frein ici : le verrou
+// ne fait que maintenir la rampe a zero et empecher une re-demande du meme sens.
+// Liberation uniquement par une demande explicite du sens inverse (logique ci-dessous).
+IF NOT BypassLimitSwitch THEN
+    IF CommandedTremie AND LimitSwitchTremie THEN
+        ArrivalLock := TRUE;
+        ArrivalWasTremie := TRUE;
+        ArrivalWasMaintenance := FALSE;
+    ELSIF CommandedMaintenance AND LimitSwitchMaintenance THEN
+        ArrivalLock := TRUE;
+        ArrivalWasTremie := FALSE;
+        ArrivalWasMaintenance := TRUE;
+    END_IF;
+END_IF;
+
+IF ArrivalLock AND ((ReqTremie AND NOT ArrivalWasTremie) OR (ReqMaintenance AND NOT ArrivalWasMaintenance)) THEN
+    ArrivalLock := FALSE;
+END_IF;
+
+DirectionChangeDelay(
+    IN := (ReqTremie OR ReqMaintenance)
+          AND ((ReqTremie AND NOT CommandedTremie) OR (ReqMaintenance AND NOT CommandedMaintenance))
+          AND (ABS(SpeedRamp.Current) &lt;= 0.1)
+          AND (ABS(DriveActualFreqHz) &lt;= 0.5),
+    PT := Cfg.DirectionInterlockDelay
+);
+
+IF NOT (CommandedTremie OR CommandedMaintenance) AND (ReqTremie OR ReqMaintenance) THEN
+    CommandedTremie := ReqTremie;
+    CommandedMaintenance := ReqMaintenance;
+    DirectionChangePending := FALSE;
+ELSIF DirectionChangeDelay.Q THEN
+    CommandedTremie := ReqTremie;
+    CommandedMaintenance := ReqMaintenance;
+    DirectionChangePending := FALSE;
+ELSIF (ReqTremie OR ReqMaintenance)
+      AND ((ReqTremie AND NOT CommandedTremie) OR (ReqMaintenance AND NOT CommandedMaintenance)) THEN
+    DirectionChangePending := TRUE;
+ELSE
+    DirectionChangePending := FALSE;
+END_IF;
+
+IF NOT (ReqTremie OR ReqMaintenance) THEN
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
+    DirectionChangePending := FALSE;
+END_IF;
+{endregion}
+
+{region &quot;§4bis Permis directionnels et EffectiveSafeStop&quot;}
+// 🛡️ 4bis. GATE DE SENS (permis directionnels SAFETY) — modèle treuils FB_Winch
+// RampStopActive = SafeStop OR demande vers un sens non permis. Bloque la RAMPE
+// (arrêt réel) vers un sens non autorisé sans fabriquer de sens numérique.
+// Consommé dans la gate de rampe (§5) et le choix de décélération.
+// Le permis Maintenance représente la possibilité de rejoindre P1/maintenance physique ;
+// l&#x27;interdiction d&#x27;accès à la zone Maintenance est gérée séparément par la cible P1 et sa
+// coupure dure, sans couper le déplacement légal jusqu&#x27;à P1.
+EffectiveSafeStop := SafeStop
+                      OR (ReqTremie AND NOT EffectivePermitM3_Tremie)
+                      OR (ReqMaintenance AND NOT EffectivePermitM3_Maintenance)
+                      OR (ReqTremie AND ReqMaintenance);
+{endregion}
+
+{region &quot;§5 Consigne et rampe de vitesse&quot;}
+IF DirectionChangePending OR NOT (ReqTremie OR ReqMaintenance) OR ArrivalLock OR EffectiveSafeStop OR NOT RunRequest THEN
+    RampTargetPct := 0.0;
+ELSE
+    RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
+END_IF;
+
+SpeedRamp(
+    Target := RampTargetPct,
+    AccelRate := Cfg.CfgRampAccelRate,
+    DecelRate := SEL(EffectiveSafeStop, Cfg.CfgRampDecelNormalRate, Cfg.CfgRampDecelFastRate),
+    CycleTimeS := CycleTimeCalc.CycleTimeS
+);
+{endregion}
+
+{region &quot;§6 Commande variateur et frein&quot;}
+TonBrakeRealFreqTimeout(
+    IN := (RampTargetPct &lt;= 0.1) AND (ABS(SpeedRamp.Current) &lt;= 0.1),
+    PT := T#2S
+);
+
+MovementRequested := (ABS(SpeedRamp.Current) &gt; 0.1)
+                  OR ((ABS(DriveActualFreqHz) &gt; 0.5) AND NOT TonBrakeRealFreqTimeout.Q);
+
+Brake(
+    Enable := Enable,
+    Reset := Reset,
+    MovementRequested := MovementRequested,
+    ContactorFeedback := BrakeFeedback,
+    BypassContactorCheck := BypassContactorCheck,
+    DelayContactClose := Cfg.BrakeDelayContactClose,
+    DelayMagnetise := Cfg.BrakeDelayMagnetise,
+    DelayMotorDecel := Cfg.BrakeDelayMotorDecel,
+    FeedbackTimeout := Cfg.BrakeFeedbackTimeout
+);
+
+BrakeReleaseRequest := Brake.BrakeCmd;
+BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
+BrakeContactorCheck := Brake.ContactorCheck;
+
+PhysicalTremie := CommandedTremie;
+PhysicalMaintenance := CommandedMaintenance;
+IF InvertDriveDirection THEN
+    PhysicalTremie := CommandedMaintenance;
+    PhysicalMaintenance := CommandedTremie;
+END_IF;
+
+IF PhysicalTremie AND Brake.BrakeCmd THEN
+    RequestedDriveControlWord := 1; // FWD
+ELSIF PhysicalMaintenance AND Brake.BrakeCmd THEN
+    RequestedDriveControlWord := 2; // REV
+ELSE
+    RequestedDriveControlWord := 0;
+END_IF;
+
+RequestedDriveFreqHz := (SpeedRamp.Current / 100.0) * Cfg.DriveFreqScaleMaxHz;
+
+// Ralentissements d&#x27;approche
+IF CommandedTremie AND SlowdownSensorTremie THEN
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedTremieHz);
+ELSIF CommandedMaintenance AND SlowdownSensorMaintenance THEN
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedMaintenanceHz);
+ELSIF CommandedMaintenance AND SlowdownSensorP1 THEN
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedP1Hz);
+END_IF;
+
+IF Fault.Error THEN
+    RequestedDriveControlWord := 0;
+    RequestedDriveFreqHz := 0.0;
+    BrakeReleaseRequest := FALSE;
+END_IF;
+
+IF DriveResetPulseActive THEN
+    RequestedDriveControlWord := WORD#7;
+    RequestedDriveFreqHz := 0.0;
+    BrakeReleaseRequest := FALSE;
+END_IF;
+
+// 🎯 FAIT PUBLIC D&#x27;ARRÊT CONFIRMÉ : vrai quand l&#x27;axe a armé son verrou d&#x27;arrivée ET qu&#x27;il est
+// physiquement arrêté — aucune rotation réelle au variateur (seuil 0,5 Hz, même mesure que
+// Translation_Busy côté programme) et frein non commandé ouvert. Ce n&#x27;est donc pas une simple
+// reprise du capteur : c&#x27;est la conjonction du verrou de l&#x27;axe et de l&#x27;arrêt physique, fait
+// consommable par la porte de transition de cycle pour n&#x27;avancer qu&#x27;après un arrêt acquis.
+// ⚠️ Au banc la fréquence réelle est nulle en permanence : ce fait s&#x27;y prouve par injection
+// d&#x27;entrée (DriveActualFreqHz), jamais par la seule observation du banc.
+ArrivalStopConfirmed := ArrivalLock
+                        AND NOT Fault.Error
+                        AND (ABS(DriveActualFreqHz) &lt;= 0.5)
+                        AND NOT BrakeReleaseRequest;
+{endregion}
+
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\L_SIMULATION\FB_Sim_TranslationDrive.st</code></summary>
+                <pre>(* DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Dynamique reduite du variateur M3, sans commande metier. *)
+FUNCTION_BLOCK PUBLIC FB_Sim_TranslationDrive
+VAR_INPUT
+    Enable : BOOL;
+    FrequencyTgt_Hz : REAL;
+    AccelRate_HzPerS : REAL := 20.0;
+    DecelRate_HzPerS : REAL := 25.0; // pente d&#x27;arret relevee sur trace reelle
+    TimeConstant_S : REAL := 0.15;
+    LoadAngularVelocity_RadPerS : REAL;
+    LoadFrequencyDroopGain_Hz : REAL := 0.50;
+    CycleTime_S : REAL := 0.01;
+END_VAR
+VAR_OUTPUT
+    Ready : BOOL;
+    FrequencyCmd_Hz : REAL;
+    ElectricalFrequency_Hz : REAL;
+    ActualFrequency_Hz : REAL;
+    ResponseAlpha : REAL;
+END_VAR
+VAR
+    FrequencyDelta_Hz : REAL;
+    FrequencyStep_Hz : REAL;
+END_VAR
+VAR CONSTANT
+    CST_MinTime_S : REAL := 0.001;
+    CST_MaxFrequency_Hz : REAL := 50.0; // plafond variateur reel (GVL_PERSISTENT._TranslationMaxFreq_Hz)
+END_VAR
+
+IF NOT Enable THEN
+    Ready := FALSE;
+    FrequencyCmd_Hz := 0.0;
+    ElectricalFrequency_Hz := 0.0;
+    ActualFrequency_Hz := 0.0;
+    ResponseAlpha := 0.0;
+    RETURN;
+END_IF;
+
+FrequencyDelta_Hz := LIMIT(0.0, FrequencyTgt_Hz, CST_MaxFrequency_Hz) - FrequencyCmd_Hz;
+IF FrequencyDelta_Hz &gt;= 0.0 THEN
+    FrequencyStep_Hz := MAX(0.0, AccelRate_HzPerS) * CycleTime_S;
+ELSE
+    FrequencyStep_Hz := MAX(0.0, DecelRate_HzPerS) * CycleTime_S;
+END_IF;
+FrequencyCmd_Hz := FrequencyCmd_Hz + LIMIT(-FrequencyStep_Hz, FrequencyDelta_Hz, FrequencyStep_Hz);
+IF TimeConstant_S &gt; CST_MinTime_S THEN
+    ResponseAlpha := CycleTime_S / (TimeConstant_S + CycleTime_S);
+ELSE
+    ResponseAlpha := 1.0;
+END_IF;
+ElectricalFrequency_Hz := ElectricalFrequency_Hz
+    + ResponseAlpha * (FrequencyCmd_Hz - ElectricalFrequency_Hz);
+ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz
+    - MAX(0.0, LoadFrequencyDroopGain_Hz) * ABS(LoadAngularVelocity_RadPerS));
+IF ActualFrequency_Hz &lt; 0.005 THEN
+    ActualFrequency_Hz := 0.0;
+END_IF;
+Ready := TRUE;
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\L_SIMULATION\FB_Sim_TranslationBrake.st</code></summary>
+                <pre>(* DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Chaine bobine, effet mecanique et contact frein M3. *)
+FUNCTION_BLOCK PUBLIC FB_Sim_TranslationBrake
+VAR_INPUT
+    Enable : BOOL;
+    ReleaseCmd : BOOL;
+    ActualFrequency_Hz : REAL;
+    OpenDelay_S : REAL := 0.10;
+    CloseDelay_S : REAL := 0.09;
+    ContactDelay_S : REAL := 0.01;
+    CycleTime_S : REAL := 0.01;
+    (* Branche de FAUTE EXPLICITE — defaut FALSE : chemin nominal strictement inchange.
+       Rejoue le defaut terrain « cause 6 instantanee » : contact frein ferme alors que le
+       variateur retourne encore de la vitesse (trace 2026-09-04, 26,437 s, 10,00 Hz,
+       State.ErrorId=64). La garde nominale CST_StopFrequency_Hz est CONSERVEE telle quelle :
+       elle est validee par la meme trace (frein ouvert a 0,60 Hz, ferme a 0,00 Hz). *)
+    FaultCloseWhileRunning : BOOL := FALSE;
+    FaultCloseDelay_S : REAL := 0.0;
+END_VAR
+VAR_OUTPUT
+    Ready : BOOL;
+    CoilEnergized : BOOL;
+    MechanicallyOpen : BOOL;
+    ContactOpen : BOOL;
+    FaultCloseActive : BOOL;   (* &lt;-- [DIAG] Branche de faute effectivement appliquee ce scan *)
+END_VAR
+VAR
+    MechanicalTimer_S : REAL;
+    ContactTimer_S : REAL;
+    FaultTimer_S : REAL;
+END_VAR
+VAR CONSTANT
+    CST_StopFrequency_Hz : REAL := 0.5;
+END_VAR
+
+IF NOT Enable THEN
+    Ready := FALSE;
+    CoilEnergized := FALSE;
+    MechanicallyOpen := FALSE;
+    ContactOpen := FALSE;
+    FaultCloseActive := FALSE;
+    MechanicalTimer_S := 0.0;
+    ContactTimer_S := 0.0;
+    FaultTimer_S := 0.0;
+    RETURN;
+END_IF;
+
+(* Faute explicite : chronometre propre, remis a zero des que le stimulus retombe. *)
+IF FaultCloseWhileRunning THEN
+    FaultTimer_S := FaultTimer_S + CycleTime_S;
+ELSE
+    FaultTimer_S := 0.0;
+END_IF;
+FaultCloseActive := FaultCloseWhileRunning AND (FaultTimer_S &gt;= MAX(0.0, FaultCloseDelay_S));
+
+(* La faute fait retomber la bobine : l&#x27;etat electrique publie reste coherent avec la
+   fermeture mecanique observee (jamais « bobine energisee ET frein serre »). *)
+CoilEnergized := ReleaseCmd AND NOT FaultCloseActive;
+IF CoilEnergized THEN
+    IF NOT MechanicallyOpen THEN
+        MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
+        IF MechanicalTimer_S &gt;= MAX(0.0, OpenDelay_S) THEN
+            MechanicallyOpen := TRUE;
+            MechanicalTimer_S := 0.0;
+        END_IF;
+    ELSE
+        MechanicalTimer_S := 0.0;
+    END_IF;
+ELSIF FaultCloseActive OR (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
+    IF MechanicallyOpen THEN
+        MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
+        IF MechanicalTimer_S &gt;= MAX(0.0, CloseDelay_S) THEN
+            MechanicallyOpen := FALSE;
+            MechanicalTimer_S := 0.0;
+        END_IF;
+    ELSE
+        MechanicalTimer_S := 0.0;
+    END_IF;
+ELSE
+    MechanicalTimer_S := 0.0;
+END_IF;
+IF MechanicallyOpen &lt;&gt; ContactOpen THEN
+    ContactTimer_S := ContactTimer_S + CycleTime_S;
+    IF ContactTimer_S &gt;= MAX(0.0, ContactDelay_S) THEN
+        ContactOpen := MechanicallyOpen;
+        ContactTimer_S := 0.0;
+    END_IF;
+ELSE
+    ContactTimer_S := 0.0;
+END_IF;
+Ready := TRUE;
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\L_SIMULATION\FB_Sim_SuspendedLoad.st</code></summary>
+                <pre>(* DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Pendule reduit : reaction sur chariot sans injection DI directe. *)
+FUNCTION_BLOCK PUBLIC FB_Sim_SuspendedLoad
+VAR_INPUT
+    Enable : BOOL;
+    BrakeMechanicallyOpen : BOOL;
+    CartAcceleration_Mps2 : REAL;
+    Length_M : REAL := 1.5;
+    Damping : REAL := 0.35;
+    ReactionGain_Mps2 : REAL := 0.20;
+    CycleTime_S : REAL := 0.01;
+END_VAR
+VAR_OUTPUT
+    Ready : BOOL;
+    Angle_Rad : REAL;
+    AngularVelocity_RadPerS : REAL;
+    VelocityReaction_Mps : REAL;
+END_VAR
+VAR
+    AngularAccel_RadPerS2 : REAL;
+END_VAR
+VAR CONSTANT
+    CST_Gravity_Mps2 : REAL := 9.81;
+    CST_MinLength_M : REAL := 0.1;
+    CST_MaxAngle_Rad : REAL := 0.6;
+    CST_MaxAngularVelocity_RadPerS : REAL := 4.0;
+END_VAR
+
+IF NOT Enable THEN
+    Ready := FALSE;
+    Angle_Rad := 0.0;
+    AngularVelocity_RadPerS := 0.0;
+    VelocityReaction_Mps := 0.0;
+    RETURN;
+END_IF;
+
+VelocityReaction_Mps := 0.0;
+IF Length_M &gt; CST_MinLength_M THEN
+    AngularAccel_RadPerS2 := -(CST_Gravity_Mps2 / Length_M) * Angle_Rad
+        - MAX(0.0, Damping) * AngularVelocity_RadPerS
+        - CartAcceleration_Mps2 / Length_M;
+    AngularVelocity_RadPerS := LIMIT(-CST_MaxAngularVelocity_RadPerS,
+        AngularVelocity_RadPerS + AngularAccel_RadPerS2 * CycleTime_S, CST_MaxAngularVelocity_RadPerS);
+    Angle_Rad := LIMIT(-CST_MaxAngle_Rad, Angle_Rad + AngularVelocity_RadPerS * CycleTime_S,
+        CST_MaxAngle_Rad);
+    IF BrakeMechanicallyOpen THEN
+        VelocityReaction_Mps := ReactionGain_Mps2 * Angle_Rad * CycleTime_S;
+    END_IF;
+END_IF;
+Ready := TRUE;
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\L_SIMULATION\FB_Sim_PositionSensor.st</code></summary>
+                <pre>(* DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Capteur de position cumulatif avec hysteresis et episode intermittent rejouable.
+   Cette brique ne connait ni le mouvement ni la logique M3 : elle transforme uniquement
+   une position mecanique vraie en DI. *)
+FUNCTION_BLOCK PUBLIC FB_Sim_PositionSensor
+VAR_INPUT
+    Enable : BOOL;
+    Position_M : REAL;
+    Threshold_M : REAL;
+    Hysteresis_M : REAL := 0.02;
+    ActiveBelowThreshold : BOOL := TRUE;
+    ElectricalDelayS : REAL := 0.0;
+    IntermittenceActive : BOOL := FALSE;
+    IntermittenceDurationS : REAL := 1.0;
+    IntermittencePeriodS : REAL := 0.12;
+    ScenarioSeed : UDINT := 1;
+    CycleTimeS : REAL := 0.01;
+    (* Profil « BLIP COURT » — SECOND profil, independant du train de bascules du profil
+       d&#x27;intermittence ci-dessus (dont les parametres restent inchanges).
+       0 = desactive : le comportement historique est strictement conserve.
+       Rejoue les excursions electriques courtes mesurees sur la trace terrain du
+       2026-09-04 : Tremie contradictoire pendant 2 echantillons a 12,24 s (~200 ms) et
+       PV reactive 1 echantillon a 14,94 s (~100 ms).
+         BlipTransitions = nombre de bascules electriques (1 = une excursion puis retour) ;
+         BlipDurationS   = duree de maintien de chaque etat, donc largeur de l&#x27;excursion. *)
+    BlipTransitions : UDINT := 0;
+    BlipDurationS : REAL := 0.2;
+END_VAR
+VAR_OUTPUT
+    RawDetected : BOOL;
+    ElectricalOutput : BOOL;
+    EpisodeActive : BOOL;
+    BlipActive : BOOL;
+    TransitionCount : UDINT;
+    EpisodeTogglePeriodS : REAL;
+END_VAR
+VAR
+    Initialized : BOOL;
+    PreviousRawDetected : BOOL;
+    EpisodeTarget : BOOL;
+    DelayTimerS : REAL;
+    EpisodeTimerS : REAL;
+    ToggleTimerS : REAL;
+    RandomState : UDINT;
+    BlipRunning : BOOL;
+    BlipTimerS : REAL;
+    BlipCount : UDINT;
+END_VAR
+VAR CONSTANT
+    (* Plafond du nombre de bascules du profil « blip court » : borne la duree de l&#x27;episode
+       et interdit tout rebouclage de compteur UDINT (revue du 2026-09-20, F9). *)
+    CST_BlipMaxTransitions : UDINT := 1000;
+END_VAR
+
+IF NOT Enable THEN
+    Initialized := FALSE;
+    RawDetected := FALSE;
+    ElectricalOutput := FALSE;
+    PreviousRawDetected := FALSE;
+    EpisodeActive := FALSE;
+    BlipActive := FALSE;
+    BlipRunning := FALSE;
+    BlipTimerS := 0.0;
+    BlipCount := 0;
+    DelayTimerS := 0.0;
+    EpisodeTimerS := 0.0;
+    ToggleTimerS := 0.0;
+    TransitionCount := 0;
+    EpisodeTogglePeriodS := 0.0;
+    RETURN;
+END_IF;
+
+(* Hysteresis sur une frontiere cumulative : les cinq DI restent compatibles avec
+   le mot thermometre du decodeur M3, contrairement a cinq fenetres independantes. *)
+IF NOT Initialized THEN
+    IF ActiveBelowThreshold THEN
+        RawDetected := Position_M &lt;= Threshold_M;
+    ELSE
+        RawDetected := Position_M &gt;= Threshold_M;
+    END_IF;
+    ElectricalOutput := RawDetected;
+    PreviousRawDetected := RawDetected;
+    RandomState := ScenarioSeed MOD 1000000;
+    IF RandomState = 0 THEN
+        RandomState := 1;
+    END_IF;
+    EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS);
+    Initialized := TRUE;
+    RETURN;
+END_IF;
+
+IF ActiveBelowThreshold THEN
+    IF RawDetected THEN
+        RawDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    ELSE
+        RawDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    END_IF;
+ELSE
+    IF RawDetected THEN
+        RawDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    ELSE
+        RawDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    END_IF;
+END_IF;
+
+(* Un episode est declenche par un franchissement mecanique, pas par une de ses
+   propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)
+IF RawDetected &lt;&gt; PreviousRawDetected THEN
+    PreviousRawDetected := RawDetected;
+    EpisodeTarget := RawDetected;
+    (* Une bascule mecanique pendant l&#x27;episode modifie seulement la cible finale.
+       Elle ne remet jamais son chronometre a zero : l&#x27;episode reste borne. *)
+    IF NOT EpisodeActive THEN
+        DelayTimerS := 0.0;
+        EpisodeTimerS := 0.0;
+        ToggleTimerS := 0.0;
+        (* Tirage unique par episode : reproductible pour une graine et sans bruit
+           blanc scan-par-scan. La periode varie de 70 % a 130 % du nominal. *)
+        RandomState := RandomState + 7919;
+        IF RandomState &gt;= 1000000 THEN
+            RandomState := RandomState - 1000000;
+        END_IF;
+        EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS
+            * (0.7 + UDINT_TO_REAL(RandomState MOD 6000) / 10000.0));
+        EpisodeActive := IntermittenceActive AND (IntermittenceDurationS &gt; 0.0);
+    END_IF;
+    (* Blip court : arme sur le meme front MECANIQUE. Ses propres bascules electriques ne
+       peuvent donc jamais le rearmer — meme protection que l&#x27;episode d&#x27;intermittence. *)
+    IF (BlipTransitions &gt; 0) AND (BlipDurationS &gt; 0.0) THEN
+        BlipRunning := TRUE;
+        BlipTimerS := 0.0;
+        BlipCount := 0;
+        BlipActive := TRUE;
+        (* Ecretage : au-dela de ce plafond, un compteur UDINT pourrait reboucler et rendre
+           le blip non terminant (revue du 2026-09-20, F9). *)
+        BlipTransitions := MIN(BlipTransitions, CST_BlipMaxTransitions);
+    END_IF;
+END_IF;
+
+IF BlipRunning THEN
+    (* Protocole du blip court : (0) la sortie rejoint d&#x27;abord l&#x27;etat MECANIQUE — le
+       comportement nominal reste donc visible ; puis une excursion contradictoire toutes
+       les BlipDurationS, donc de largeur BlipDurationS ; enfin la sortie est rendue a
+       l&#x27;etat mecanique. Nombre d&#x27;excursions = BlipTransitions. *)
+    BlipTimerS := BlipTimerS + CycleTimeS;
+    IF BlipTimerS &gt;= MAX(CycleTimeS, BlipDurationS) THEN
+        BlipTimerS := 0.0;
+        IF BlipCount = 0 THEN
+            IF ElectricalOutput &lt;&gt; RawDetected THEN
+                ElectricalOutput := RawDetected;
+                TransitionCount := TransitionCount + 1;
+            END_IF;
+            BlipCount := 1;
+        ELSIF BlipCount &lt;= BlipTransitions THEN
+            ElectricalOutput := NOT ElectricalOutput;
+            TransitionCount := TransitionCount + 1;
+            BlipCount := BlipCount + 1;
+        ELSE
+            BlipRunning := FALSE;
+            BlipActive := FALSE;
+            IF ElectricalOutput &lt;&gt; RawDetected THEN
+                ElectricalOutput := RawDetected;
+                TransitionCount := TransitionCount + 1;
+            END_IF;
+            DelayTimerS := 0.0;
+        END_IF;
+    END_IF;
+ELSIF EpisodeActive THEN
+    EpisodeTimerS := EpisodeTimerS + CycleTimeS;
+    ToggleTimerS := ToggleTimerS + CycleTimeS;
+    IF ToggleTimerS &gt;= EpisodeTogglePeriodS THEN
+        ElectricalOutput := NOT ElectricalOutput;
+        ToggleTimerS := 0.0;
+        TransitionCount := TransitionCount + 1;
+    END_IF;
+    IF EpisodeTimerS &gt;= IntermittenceDurationS THEN
+        EpisodeActive := FALSE;
+        IF ElectricalOutput &lt;&gt; EpisodeTarget THEN
+            ElectricalOutput := EpisodeTarget;
+            TransitionCount := TransitionCount + 1;
+        END_IF;
+        DelayTimerS := 0.0;
+    END_IF;
+ELSIF ElectricalOutput &lt;&gt; RawDetected THEN
+    DelayTimerS := DelayTimerS + CycleTimeS;
+    IF DelayTimerS &gt;= MAX(0.0, ElectricalDelayS) THEN
+        ElectricalOutput := RawDetected;
+        DelayTimerS := 0.0;
+        TransitionCount := TransitionCount + 1;
+    END_IF;
+ELSE
+    DelayTimerS := 0.0;
+END_IF;
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\L_SIMULATION\FB_Sim_Translation.st</code></summary>
+                <pre>(* DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Modele dynamique M3 confine au SimBench. *)
+FUNCTION_BLOCK PUBLIC FB_Sim_Translation
+VAR_INPUT
+    Enable : BOOL;
+    ReqTremie : BOOL;
+    ReqMaintenance : BOOL;
+    SpeedTgt_Pct : REAL;
+    (* T361 — ECHELLE ODOMETRIQUE DU BANC, ALIGNEE SUR L&#x27;ESTIMATEUR REEL.
+       Le modele integre VelocityTarget = (CST_PositionAtMaintenance / FullTravelTimeS) x f / 40.
+       Le ratio simule vaut donc 30 / (40 x FullTravelTimeS) m/(Hz.s) et DOIT etre egal au gain
+       consomme par FB_Translation_PositionEstimator (GainMetersPerHzSec, cable sur
+       GVL_PERSISTENT._TranslationGainMetersPerHzSec = 0,02 m/(Hz.s), soit 1 m/s a 50 Hz).
+       =&gt; 30 / (40 x 37,5) = 0,02 m/(Hz.s). La valeur historique 8,0 s donnait 0,09375 m/(Hz.s),
+       soit 4,7 fois l&#x27;echelle reelle : l&#x27;estimateur prenait un retard constant et chaque
+       franchissement de capteur produisait un saut de recalage de plusieurs metres
+       (AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md, trace Suivi_74 : sauts de 4,53 a 9,12 m).
+       ⚠️ Toute evolution de _TranslationGainMetersPerHzSec exige de recalculer cette constante :
+       le gate G518 echoue si les deux echelles divergent. *)
+    FullTravelTimeS : REAL := 37.5;
+    BrakeReleaseCmd : BOOL := TRUE;
+    (* ECHELLE DE LA CONSIGNE. PRG_02 envoie SpeedCmd_Pct = f / 50 Hz x 100 : le simulateur reconvertit
+       avec le MEME maximum, sinon 20 Hz reels (40 %) deviendraient 16 Hz simules.
+       Maximum = GVL_PERSISTENT._TranslationMaxFreq_Hz (50 Hz), passe par FB_SimBench (CST_M3MaxFreq_Hz,
+       egalite verifiee par G518). Ne pas confondre avec CST_NominalFrequency_Hz (40 Hz) : echelle
+       ODOMETRIQUE (gain 0,02 m/(Hz.s)). *)
+    MaxFreq_Hz : REAL := 50.0;
+    AccelRate_HzPerS : REAL := 20.0;
+    DecelRate_HzPerS : REAL := 25.0; // pente d&#x27;arret relevee sur trace reelle (rampe variateur / rampe PLC)
+    DriveTimeConstantS : REAL := 0.15;
+    BrakeOpenDelayS : REAL := 0.10;
+    BrakeCloseDelayS : REAL := 0.09;
+    BrakeContactDelayS : REAL := 0.01;
+    (* FAUTE EXPLICITE frein M3 — defaut FALSE : reproduit le defaut terrain « frein ferme
+       alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s,
+       State.ErrorId=64). La garde nominale 0,5 Hz du frein n&#x27;est pas modifiee. *)
+    BrakeFaultCloseWhileRunning : BOOL := FALSE;
+    BrakeFaultCloseDelay_S : REAL := 0.0;
+    SuspendedLoadLength_M : REAL := 1.5;
+    SuspendedLoadDamping : REAL := 0.35;
+    LoadReactionGain_Mps2 : REAL := 0.20;
+    (* BUTEE MECANIQUE — recul borne apres arret serre.
+       0.0 (defaut) conserve EXACTEMENT le comportement historique : position ET vitesse
+       figees a la butee (decision de review tracee, correctif « contact rigide »).
+       &gt; 0 : l&#x27;inertie du chariot reste absorbee par la butee, MAIS la reaction de la charge
+       peut ressortir le chariot de la zone capteur — comportement observe sur la trace
+       terrain du 2026-09-04 a 26,437 s (Tremie actif 1 echantillon puis perdu
+       definitivement). Valeur SYNTHETIQUE, en attente de mesure terrain. *)
+    EndStopRecoilMax_M : REAL := 0.0;
+    LoadFrequencyDroopGain_Hz : REAL := 0.50;
+    SensorJitterAmplitude_M : REAL := 0.01;
+    SensorStabilizationS : REAL := 1.0;
+    SensorElectricalDelayS : REAL := 0.01;
+    SensorIntermittenceActive : BOOL := FALSE;
+    SensorLoadAngleTriggerRad : REAL := 0.01;
+    SensorScenarioSeed : UDINT := 3001;
+    SensorHysteresis_M : REAL := 0.02;
+    SensorIntermittencePeriodS : REAL := 0.12;
+    (* BLIP COURT — second profil capteur, independant du train ~1 s ci-dessus.
+       BlipTransitions = 0 (defaut) : profil historique strictement inchange.
+       Valeurs de trace : Tremie 1 excursion de 0,2 s (2 echantillons a 100 ms),
+       PV 1 excursion de 0,1 s (1 echantillon).
+       ⚠️ LIMITE CONNUE (revue 2026-09-20, F11) : UNE SEULE largeur globale est appliquee aux
+       cinq capteurs. Les deux signatures de la trace (Tremie 0,200 s et PV 0,100 s) ne sont
+       donc PAS rejouables dans la meme passe : il faut deux executions avec des valeurs
+       differentes de SensorBlipDurationS. Une largeur par capteur exigerait un
+       ARRAY[1..5] OF REAL, non retenu dans ce lot. *)
+    SensorBlipTransitions : UDINT := 0;
+    SensorBlipDurationS : REAL := 0.2;
+END_VAR
+VAR_OUTPUT
+    PosTremie : BOOL;
+    PosPV : BOOL;
+    PosP2 : BOOL;
+    PosP1 : BOOL;
+    PosMaintenance : BOOL;
+    FrequencyCmd_Hz : REAL;
+    ElectricalFrequency_Hz : REAL;
+    ActualFrequency_Hz : REAL;
+    BrakeCoilEnergized : BOOL;
+    BrakeMechanicallyOpen : BOOL;
+    BrakeContactOpen : BOOL;
+    BrakeFaultCloseActive : BOOL;
+    PositionTrue_M : REAL;
+    VelocityTrue_Mps : REAL;
+    LoadAngle_Rad : REAL;
+    SensorPosition_M : REAL;
+    SensorTransitionCount : UDINT;
+    SensorBlipActive : BOOL;
+    HardStopTremieActive : BOOL;
+    HardStopMaintenanceActive : BOOL;
+END_VAR
+VAR
+    instCycleTime : FB_CycleTime;
+    Initialized : BOOL;
+    DirectionSign : REAL;
+    (* Sens de deplacement MEMORISE. La commande peut etre retiree AVANT l&#x27;arret physique
+       (deceleration libre du variateur) : le sens du dernier ordre valide est conserve tant
+       que le variateur retourne de la vitesse, puis purge a l&#x27;arret. Sans cette memoire, la
+       vitesse du chariot s&#x27;effondrait au scan de retrait de commande alors que la frequence
+       retournee decroit encore.
+       ⚠️ ORDRE DE GRANDEUR NON MESURE : la trace terrain ne contient AUCUNE variable de
+       position (15 TraceVariable : DI, frequences, mots d&#x27;etat, erreurs). La distance de
+       roue libre de la fenetre 14,67 -&gt; 16,16 s est donc une ESTIMATION dependante du modele
+       d&#x27;echelle, qui vaut approximativement 1,1 a 1,3 m selon la methode d&#x27;integration
+       retenue (gain audit 0,0551 m/(Hz.s)). A ne pas citer comme une mesure. *)
+    TravelDirection : REAL;
+    FrequencyTarget_Hz : REAL;
+    CycleTimeS : REAL;
+    SpeedAt40Hz_Mps : REAL;
+    VelocityTarget_Mps : REAL;
+    CartAcceleration_Mps2 : REAL;
+    PreviousVelocity_Mps : REAL;
+    PositionCandidate_M : REAL;
+    (* Recul de butee ECRETE a la course : une valeur d&#x27;entree aberrante ne peut pas
+       autoriser une position hors de [0 ; 30] m (revue du 2026-09-20, F8). *)
+    RecoilMax_M : REAL;
+    SensorNoiseState : REAL := 0.371;
+    SensorNoise_M : REAL;
+    instSensorTremie : FB_Sim_PositionSensor;
+    instSensorPV : FB_Sim_PositionSensor;
+    instSensorP2 : FB_Sim_PositionSensor;
+    instSensorP1 : FB_Sim_PositionSensor;
+    instSensorMaintenance : FB_Sim_PositionSensor;
+    instDrive : FB_Sim_TranslationDrive;
+    instBrake : FB_Sim_TranslationBrake;
+    instSuspendedLoad : FB_Sim_SuspendedLoad;
+END_VAR
+VAR CONSTANT
+    CST_PositionAtTremie : REAL := 0.0;
+    (* Meme principe a Tremie : le seuil DI est legerement avant la butee afin
+       que l&#x27;hysteresis puisse commuter sans depassement numerique de course. *)
+    CST_PositionAtTremieSensor_M : REAL := 0.05;
+    CST_PositionAtPV : REAL := 5.0;
+    CST_PositionAtP2 : REAL := 15.0;
+    CST_PositionAtP1 : REAL := 20.0;
+    CST_PositionAtMaintenance : REAL := 30.0;
+    (* Le capteur cumulatif Maintenance doit commuter avant la butee mecanique,
+       sinon un modele borne a 30 m ne peut jamais produire le mot 00000. Cette
+       position est SYNTHETIQUE en attente de la mesure de la came reelle. *)
+    CST_PositionAtMaintenanceSensor_M : REAL := 29.95;
+    CST_NominalFrequency_Hz : REAL := 40.0; // echelle ODOMETRIQUE lue par G518 — PAS le maximum variateur (MaxFreq_Hz)
+    CST_MinTimeS : REAL := 0.001;
+    (* Meme seuil d&#x27;arret que FB_Sim_TranslationBrake.CST_StopFrequency_Hz (0,5 Hz).
+       Valide par la trace terrain du 2026-09-04 : frein ouvert a 0,60 Hz, ferme a 0,00 Hz. *)
+    CST_StopFrequency_Hz : REAL := 0.5;
+END_VAR
+
+instCycleTime(DefaultValueS := 0.010);
+(* Le modele mono-pas suit le temps de cycle reel jusqu&#x27;a 100 ms. Cette borne
+   evite de ralentir artificiellement la dynamique lorsque la trace est executee
+   dans VISU_TASK (environ 100 ms), tout en restant stable pour le pendule reduit.
+   Au-dela, FB_CycleTime fournit deja son temps de secours et aucun saut aberrant
+   n&#x27;est accepte. La qualification des delais sub-100 ms exige toutefois une tache
+   de trace plus rapide que 100 ms. *)
+CycleTimeS := LIMIT(0.001, instCycleTime.CycleTimeS, 0.100);
+
+IF NOT Enable THEN
+    Initialized := FALSE;
+    instDrive(Enable := FALSE);
+    instBrake(Enable := FALSE);
+    instSuspendedLoad(Enable := FALSE);
+    FrequencyCmd_Hz := 0.0;
+    ElectricalFrequency_Hz := 0.0;
+    ActualFrequency_Hz := 0.0;
+    BrakeMechanicallyOpen := FALSE;
+    BrakeContactOpen := FALSE;
+    BrakeCoilEnergized := FALSE;
+    BrakeFaultCloseActive := FALSE;
+    PositionTrue_M := CST_PositionAtP1;
+    VelocityTrue_Mps := 0.0;
+    PreviousVelocity_Mps := 0.0;
+    TravelDirection := 0.0;
+    LoadAngle_Rad := 0.0;
+    SensorTransitionCount := 0;
+    SensorBlipActive := FALSE;
+    HardStopTremieActive := FALSE;
+    HardStopMaintenanceActive := FALSE;
+    (* Repli deterministe compatible avec le mot thermometre P1 = 00011. *)
+    PosTremie := FALSE;
+    PosPV := FALSE;
+    PosP2 := FALSE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+    instSensorTremie(Enable := FALSE);
+    instSensorPV(Enable := FALSE);
+    instSensorP2(Enable := FALSE);
+    instSensorP1(Enable := FALSE);
+    instSensorMaintenance(Enable := FALSE);
+    RETURN;
+ELSIF NOT Initialized THEN
+    Initialized := TRUE;
+    PositionTrue_M := CST_PositionAtP1;
+    TravelDirection := 0.0;
+END_IF;
+
+IF Enable THEN
+    DirectionSign := 0.0;
+    IF ReqTremie AND NOT ReqMaintenance THEN
+        DirectionSign := -1.0;
+    ELSIF ReqMaintenance AND NOT ReqTremie THEN
+        DirectionSign := 1.0;
+    END_IF;
+
+    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * MaxFreq_Hz / 100.0, MaxFreq_Hz);
+    IF DirectionSign = 0.0 THEN
+        FrequencyTarget_Hz := 0.0;
+    END_IF;
+    instDrive(Enable := TRUE, FrequencyTgt_Hz := FrequencyTarget_Hz,
+        AccelRate_HzPerS := AccelRate_HzPerS, DecelRate_HzPerS := DecelRate_HzPerS,
+        TimeConstant_S := DriveTimeConstantS,
+        LoadAngularVelocity_RadPerS := instSuspendedLoad.AngularVelocity_RadPerS,
+        LoadFrequencyDroopGain_Hz := LoadFrequencyDroopGain_Hz, CycleTime_S := CycleTimeS);
+    FrequencyCmd_Hz := instDrive.FrequencyCmd_Hz;
+    ElectricalFrequency_Hz := instDrive.ElectricalFrequency_Hz;
+    ActualFrequency_Hz := instDrive.ActualFrequency_Hz;
+    instBrake(Enable := TRUE, ReleaseCmd := BrakeReleaseCmd,
+        ActualFrequency_Hz := ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
+        CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
+        CycleTime_S := CycleTimeS,
+        FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
+        FaultCloseDelay_S := BrakeFaultCloseDelay_S);
+    BrakeCoilEnergized := instBrake.CoilEnergized;
+    BrakeMechanicallyOpen := instBrake.MechanicallyOpen;
+    BrakeContactOpen := instBrake.ContactOpen;
+    BrakeFaultCloseActive := instBrake.FaultCloseActive;
+
+    (* Sens memorise (C3). Regles, dans cet ordre :
+       1. un ordre simple valide (re)memorise le sens ;
+       2. deux ordres contradictoires neutralisent immediatement le sens — aucune
+          excitation inventee (preserve TC-T300-MEC-030) ;
+       3. commande retiree : le sens est CONSERVE tant que le variateur retourne de la
+          vitesse (deceleration libre), puis purge des que la vitesse est nulle. *)
+    IF ReqTremie AND NOT ReqMaintenance THEN
+        TravelDirection := -1.0;
+    ELSIF ReqMaintenance AND NOT ReqTremie THEN
+        TravelDirection := 1.0;
+    ELSIF ReqTremie AND ReqMaintenance THEN
+        TravelDirection := 0.0;
+    ELSIF ABS(ActualFrequency_Hz) &lt;= CST_StopFrequency_Hz THEN
+        TravelDirection := 0.0;
+    END_IF;
+
+    PreviousVelocity_Mps := VelocityTrue_Mps;
+    IF (FullTravelTimeS &gt; CST_MinTimeS) AND BrakeMechanicallyOpen THEN
+        SpeedAt40Hz_Mps := CST_PositionAtMaintenance / FullTravelTimeS;
+        VelocityTarget_Mps := TravelDirection * SpeedAt40Hz_Mps * ActualFrequency_Hz / CST_NominalFrequency_Hz;
+    ELSE
+        VelocityTarget_Mps := 0.0;
+    END_IF;
+    VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
+    IF NOT BrakeMechanicallyOpen THEN
+        VelocityTrue_Mps := 0.0;
+    END_IF;
+    HardStopTremieActive := FALSE;
+    HardStopMaintenanceActive := FALSE;
+    PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
+    IF PositionCandidate_M &lt; CST_PositionAtTremie THEN
+        PositionTrue_M := CST_PositionAtTremie;
+        VelocityTrue_Mps := 0.0;
+        HardStopTremieActive := TRUE;
+    ELSIF PositionCandidate_M &gt; CST_PositionAtMaintenance THEN
+        PositionTrue_M := CST_PositionAtMaintenance;
+        VelocityTrue_Mps := 0.0;
+        HardStopMaintenanceActive := TRUE;
+    END_IF;
+    CartAcceleration_Mps2 := (VelocityTrue_Mps - PreviousVelocity_Mps) / CycleTimeS;
+    instSuspendedLoad(Enable := TRUE, BrakeMechanicallyOpen := BrakeMechanicallyOpen,
+        CartAcceleration_Mps2 := CartAcceleration_Mps2, Length_M := SuspendedLoadLength_M,
+        Damping := SuspendedLoadDamping, ReactionGain_Mps2 := LoadReactionGain_Mps2,
+        CycleTime_S := CycleTimeS);
+    LoadAngle_Rad := instSuspendedLoad.Angle_Rad;
+    IF HardStopTremieActive OR HardStopMaintenanceActive THEN
+        RecoilMax_M := MIN(MAX(0.0, EndStopRecoilMax_M), CST_PositionAtMaintenance);
+        IF (RecoilMax_M &gt; 0.0) AND BrakeMechanicallyOpen THEN
+            (* Recul autorise UNIQUEMENT en s&#x27;eloignant de la butee touchee, borne par
+               EndStopRecoilMax_M : jamais plus loin dans la butee, jamais de saut cache. *)
+            VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+            (* Contre une butee, l&#x27;entrainement DECROCHE : il ne maintient pas une consigne de
+               vitesse dans l&#x27;obstacle. Sans cette purge, la consigne de vitesse ecrasait en
+               permanence la reaction de charge et le chariot ne pouvait jamais ressortir de
+               la zone capteur (recul alors impossible, quelle que soit la charge). *)
+            TravelDirection := 0.0;
+            IF HardStopTremieActive THEN
+                VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps);
+                PositionCandidate_M := LIMIT(CST_PositionAtTremie,
+                    PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
+                    CST_PositionAtTremie + RecoilMax_M);
+            ELSE
+                VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps);
+                PositionCandidate_M := LIMIT(CST_PositionAtMaintenance - RecoilMax_M,
+                    PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
+                    CST_PositionAtMaintenance);
+            END_IF;
+            PositionTrue_M := PositionCandidate_M;
+        ELSE
+            VelocityTrue_Mps := 0.0;
+        END_IF;
+    ELSE
+        VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+        PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
+        IF PositionCandidate_M &lt; CST_PositionAtTremie THEN
+            PositionTrue_M := CST_PositionAtTremie;
+            VelocityTrue_Mps := 0.0;
+            HardStopTremieActive := TRUE;
+        ELSIF PositionCandidate_M &gt; CST_PositionAtMaintenance THEN
+            PositionTrue_M := CST_PositionAtMaintenance;
+            VelocityTrue_Mps := 0.0;
+            HardStopMaintenanceActive := TRUE;
+        ELSE
+            PositionTrue_M := PositionCandidate_M;
+        END_IF;
+    END_IF;
+END_IF;
+
+IF Enable AND (ABS(LoadAngle_Rad) &gt; 0.0001) THEN
+    SensorNoiseState := 3.91 * SensorNoiseState * (1.0 - SensorNoiseState);
+    SensorNoise_M := (2.0 * SensorNoiseState - 1.0) * SensorJitterAmplitude_M;
+ELSE
+    SensorNoise_M := 0.0;
+END_IF;
+(* Les capteurs sont fixes au rail et observent le chariot. Le balancier agit
+   seulement par la reaction mecanique sur PositionTrue_M et conditionne un
+   episode electrique ; aucune deflexion de godet n&#x27;est injectee directement. *)
+SensorPosition_M := PositionTrue_M + SensorNoise_M;
+(* Les capteurs M3 sont volontairement cumulatifs : 11111 -&gt; 00000. Chaque
+   brique garde son hysteresis et son episode propres ; aucun timer partage ne
+   peut masquer un front d&#x27;un autre capteur. *)
+instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtTremieSensor_M, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 11,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CycleTimeS := CycleTimeS);
+instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtPV, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 23,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CycleTimeS := CycleTimeS);
+instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtP2, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 37,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CycleTimeS := CycleTimeS);
+instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtP1, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 53,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CycleTimeS := CycleTimeS);
+instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtMaintenanceSensor_M, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 71,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CycleTimeS := CycleTimeS);
+
+PosTremie := instSensorTremie.ElectricalOutput;
+PosPV := instSensorPV.ElectricalOutput;
+PosP2 := instSensorP2.ElectricalOutput;
+PosP1 := instSensorP1.ElectricalOutput;
+PosMaintenance := instSensorMaintenance.ElectricalOutput;
+SensorTransitionCount := instSensorTremie.TransitionCount + instSensorPV.TransitionCount
+    + instSensorP2.TransitionCount + instSensorP1.TransitionCount
+    + instSensorMaintenance.TransitionCount;
+SensorBlipActive := instSensorTremie.BlipActive OR instSensorPV.BlipActive
+    OR instSensorP2.BlipActive OR instSensorP1.BlipActive
+    OR instSensorMaintenance.BlipActive;
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\FB_TestLoopTranslation.st</code></summary>
+                <pre>(* Harnais de test T417 : boucle fermee FB_Translation REEL (non modifie) + decodeur + FB_Sim_Translation.
+   Un appel = un scan. Reproduit le cablage de PRG_05 (decodeur, ralentissements d approche, FdC bistable P1
+   quand Maintenance est interdite, permis, jeton d arrivee P1). Non reproduit : FB_TranslationOutputInterlock
+   (traite en transparent) et FB_Safety_Translation. Cible P1. Jamais compile dans le programme CODESYS. *)
+FUNCTION_BLOCK FB_TestLoopTranslation
+VAR_INPUT
+    HoldRequest : BOOL;
+END_VAR
+VAR_OUTPUT
+    Phase : INT;
+    Overshoot_M : REAL;
+    FreqAtCross_Hz : REAL;
+    MaxCmdAfter_Hz : REAL;
+    PositionTrue_M : REAL;
+    CtrlWord : WORD;
+    FreqReq_Hz : REAL;
+    ActualFreq_Hz : REAL;
+    AtP1Token : BOOL;
+    SensorsWord : BYTE;
+END_VAR
+VAR
+    tr : FB_Translation;
+    sim : FB_Sim_Translation;
+    dec : FB_Translation_PositionDecoder;
+    cfg : ST_fbTranslation_Cfg;
+    Initialized : BOOL;
+    reqTremie : BOOL;
+    reqMaint : BOOL;
+    limTremieStable : BOOL;
+    limMaintStable : BOOL;
+    limMaintEff : BOOL;
+    atP1 : BOOL;
+    wordPrev : BYTE;
+    wordChanged : BOOL;
+    stopCount : INT;
+    maxPos_M : REAL;
+    crossed : BOOL;
+END_VAR
+
+IF NOT Initialized THEN
+    Initialized := TRUE;
+    cfg.CfgRampAccelRate := 40.0;
+    cfg.CfgRampDecelNormalRate := 50.0;
+    cfg.CfgRampDecelFastRate := 100.0;
+    cfg.DriveFreqScaleMaxHz := 50.0;
+    cfg.ApproachSpeedTremieHz := 20.0;
+    cfg.ApproachSpeedMaintenanceHz := 20.0;
+    cfg.ApproachSpeedP1Hz := 20.0;
+    Phase := 0;
+    reqTremie := TRUE;
+END_IF;
+
+dec(SensorTremie := sim.PosTremie, SensorPV := sim.PosPV, SensorP2 := sim.PosP2,
+    SensorP1 := sim.PosP1, SensorMaintenance := sim.PosMaintenance);
+limMaintEff := (NOT dec.TranslationPosP1) AND dec.TranslationPosMaintenance;
+IF dec.LimitSwitchTremie THEN
+    limTremieStable := TRUE;
+ELSIF reqMaint THEN
+    limTremieStable := FALSE;
+END_IF;
+IF limMaintEff THEN
+    limMaintStable := TRUE;
+ELSIF reqTremie THEN
+    limMaintStable := FALSE;
+END_IF;
+wordChanged := (dec.SensorsWord &lt;&gt; wordPrev);
+wordPrev := dec.SensorsWord;
+IF dec.TranslationAtP1 THEN
+    atP1 := TRUE;
+ELSIF dec.TranslationAtP2 OR dec.TranslationAtPV OR dec.TranslationAtTremie OR dec.TranslationAtMaintenance OR wordChanged THEN
+    atP1 := FALSE;
+END_IF;
+
+tr(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, RunRequest := TRUE, SafeStop := FALSE,
+   ReqTremie := reqTremie, ReqMaintenance := reqMaint, SpeedTgt_Pct := 100.0,
+   PositionSensorTarget := atP1 AND reqMaint,
+   SlowdownSensorTremie := dec.TranslationPosPV,
+   SlowdownSensorMaintenance := (NOT dec.TranslationPosP1) AND dec.TranslationPosMaintenance,
+   SlowdownSensorP1 := (NOT dec.TranslationPosP2) AND dec.TranslationPosP1,
+   LimitSwitchTremie := limTremieStable, LimitSwitchMaintenance := limMaintStable,
+   EffectivePermitM3_Tremie := NOT limTremieStable, EffectivePermitM3_Maintenance := NOT limMaintStable,
+   DriveStatusWord := 0, DriveActualFreqHz := sim.ActualFrequency_Hz,
+   BrakeFeedback := sim.BrakeContactOpen, Cfg := cfg);
+sim(Enable := TRUE,
+    ReqTremie := (tr.RequestedDriveControlWord = 1), ReqMaintenance := (tr.RequestedDriveControlWord = 2),
+    SpeedTgt_Pct := LIMIT(0.0, tr.RequestedDriveFreqHz / 50.0 * 100.0, 100.0),
+    BrakeReleaseCmd := tr.BrakeReleaseRequest,
+    LoadFrequencyDroopGain_Hz := 0.0, LoadReactionGain_Mps2 := 0.0);
+PositionTrue_M := sim.PositionTrue_M;
+CtrlWord := tr.RequestedDriveControlWord;
+FreqReq_Hz := tr.RequestedDriveFreqHz;
+ActualFreq_Hz := sim.ActualFrequency_Hz;
+AtP1Token := atP1;
+SensorsWord := dec.SensorsWord;
+
+CASE Phase OF
+    0:  (* jambe Tremie jusqu a 6 m : vitesse pleine atteinte hors zone d approche *)
+        IF sim.PositionTrue_M &lt; 6.0 THEN
+            reqTremie := FALSE;
+            Phase := 1;
+            stopCount := 0;
+        END_IF;
+    1:  (* arret complet, frein ferme *)
+        IF (sim.ActualFrequency_Hz &lt; 0.5) AND (NOT sim.BrakeMechanicallyOpen) THEN
+            stopCount := stopCount + 1;
+        ELSE
+            stopCount := 0;
+        END_IF;
+        IF stopCount &gt; 30 THEN
+            reqMaint := TRUE;
+            Phase := 2;
+        END_IF;
+    2:  (* jambe Maintenance vers la cible P1 *)
+        IF atP1 AND NOT HoldRequest THEN
+            reqMaint := FALSE;
+        END_IF;
+        IF sim.PositionTrue_M &gt; 20.0 THEN
+            IF NOT crossed THEN
+                crossed := TRUE;
+                FreqAtCross_Hz := sim.ActualFrequency_Hz;
+            END_IF;
+            maxPos_M := MAX(maxPos_M, sim.PositionTrue_M);
+            MaxCmdAfter_Hz := MAX(MaxCmdAfter_Hz, tr.RequestedDriveFreqHz);
+        END_IF;
+        IF crossed AND (sim.ActualFrequency_Hz &lt; 0.5) AND (ABS(sim.VelocityTrue_Mps) &lt; 0.01) THEN
+            Phase := 3;
+        END_IF;
+END_CASE;
+Overshoot_M := maxPos_M - 20.0;
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+    </details>
+    <details>
+        <summary>Sortie brute strucpp</summary>
+        <pre>STruC++ Test Runner v1.0
+
+test_sim_translation_loop.st
+  [PASS] TC-T417-LOOP-A Rejeu P1 a 20 Hz, demande TENUE apres arrivee : le plafond d approche maintient 20 Hz vers le variateur
+  [PASS] TC-T417-LOOP-B Rejeu P1 a 20 Hz, demande RETIREE au jeton d arrivee (cycle auto) : plafond perdu, mot de commande a 0
+
+-----------------------------------------
+2 tests, 2 passed, 0 failed
+</pre>
+    </details>
+</div>
+<script>
+function copyTextToClipboard(btn, text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    var orig = btn.innerHTML;
+    btn.innerHTML = "✓ Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
+function copyPinExpr(el) {
+    var text = el.getAttribute('title') || el.textContent;
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    el.classList.add('pin-copied');
+    setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
+}
+
+function exportTableCSV(btn, testName) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var rows = [];
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var headers = ths.map(function(th) {
+        return '"' + th.textContent.replace(/"/g, '""').trim() + '"';
+    });
+    rows.push(headers.join(';'));
+
+    table.querySelectorAll('tbody tr').forEach(function(tr) {
+        var cells = Array.from(tr.querySelectorAll('td')).map(function(td) {
+            return '"' + td.textContent.replace(/"/g, '""').trim() + '"';
+        });
+        rows.push(cells.join(';'));
+    });
+
+    var csvContent = "\uFEFF" + rows.join('\r\n');
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var safeName = (testName || 'chronogram').replace(/[^a-zA-Z0-9_\-]+/g, '_').substring(0, 50);
+    a.href = url;
+    a.download = safeName + '_chronogram.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    var orig = btn.innerHTML;
+    btn.innerHTML = "📥 Téléchargé !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
+function copyTableMarkdown(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var lines = [];
+    var ths = Array.from(table.querySelectorAll('thead th'));
+    var headers = ths.map(function(th) {
+        return th.textContent.trim();
+    });
+    lines.push('| ' + headers.join(' | ') + ' |');
+    lines.push('| ' + headers.map(function() { return '---'; }).join(' | ') + ' |');
+
+    table.querySelectorAll('tbody tr').forEach(function(tr) {
+        var cells = Array.from(tr.querySelectorAll('td')).map(function(td) {
+            return td.textContent.trim().replace(/\|/g, '\\|');
+        });
+        lines.push('| ' + cells.join(' | ') + ' |');
+    });
+
+    var md = lines.join('\n');
+    var ta = document.createElement('textarea');
+    ta.value = md;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+
+    var orig = btn.innerHTML;
+    btn.innerHTML = "📋 Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
+function toggleVerticalHeaders(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var table = details.querySelector('.chrono-table');
+    if (!table) return;
+
+    var isVert = table.classList.toggle('headers-vertical');
+    btn.innerHTML = isVert ? "↔️ Titres Horizontaux" : "📐 Titres Verticaux";
+    if (isVert) {
+        btn.classList.add('btn-copied');
+    } else {
+        btn.classList.remove('btn-copied');
+    }
+}
+
+function toggleWfLane(textEl, rowIdx) {
+    var svg = textEl.closest('svg');
+    if (!svg) return;
+    var group = svg.querySelector('.wf-numeric-group[data-row="' + rowIdx + '"]');
+    if (!group) return;
+    var analog = group.querySelector('.wf-analog-view');
+    var digital = group.querySelector('.wf-digital-view');
+    if (!analog || !digital) return;
+
+    var isAnalog = analog.style.display !== 'none';
+    if (isAnalog) {
+        analog.style.display = 'none';
+        digital.style.display = '';
+        textEl.classList.remove('active-curve');
+    } else {
+        analog.style.display = '';
+        digital.style.display = 'none';
+        textEl.classList.add('active-curve');
+    }
+}
+
+function toggleAllWaveforms(btn) {
+    var details = btn.closest('details');
+    if (!details) return;
+    var svg = details.querySelector('svg.waveform');
+    if (!svg) return;
+
+    var groups = svg.querySelectorAll('.wf-numeric-group');
+    if (!groups.length) return;
+
+    var firstAnalog = groups[0].querySelector('.wf-analog-view');
+    var currentlyAnalog = firstAnalog && firstAnalog.style.display !== 'none';
+    var targetAnalog = !currentlyAnalog;
+
+    groups.forEach(function(g) {
+        var a = g.querySelector('.wf-analog-view');
+        var d = g.querySelector('.wf-digital-view');
+        if (a) a.style.display = targetAnalog ? '' : 'none';
+        if (d) d.style.display = targetAnalog ? 'none' : '';
+    });
+
+    var labels = svg.querySelectorAll('.wf-label.wf-clickable');
+    labels.forEach(function(lbl) {
+        if (targetAnalog) lbl.classList.add('active-curve');
+        else lbl.classList.remove('active-curve');
+    });
+
+    btn.innerHTML = targetAnalog ? "🔢 Vue Chiffres" : "📈 Vue Courbes";
+}
+
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme') || 'light';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('test_ci_theme', next); } catch (e) {}
+    updateThemeBtn(next);
+}
+
+function updateThemeBtn(theme) {
+    var btns = document.querySelectorAll('.theme-toggle-btn');
+    btns.forEach(function(b) {
+        b.innerHTML = theme === 'dark' ? '☀️ Mode Clair' : '🌙 Mode Sombre';
+    });
+}
+
+(function() {
+    try {
+        var saved = localStorage.getItem('test_ci_theme');
+        if (saved) {
+            document.documentElement.setAttribute('data-theme', saved);
+            document.addEventListener('DOMContentLoaded', function() { updateThemeBtn(saved); });
+        }
+    } catch (e) {}
+})();
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Redimensionnement manuel des colonnes a la souris (Drag & Drop border)
+    var isResizing = false;
+    var currentTh = null;
+    var startX = 0;
+    var startWidth = 0;
+
+    document.addEventListener('mousedown', function(e) {
+        var resizer = e.target.closest('.col-resizer');
+        if (!resizer) return;
+        isResizing = true;
+        currentTh = resizer.closest('th');
+        startX = e.pageX;
+        startWidth = currentTh.offsetWidth;
+        resizer.classList.add('resizing');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isResizing || !currentTh) return;
+        var diff = e.pageX - startX;
+        var newWidth = Math.max(30, startWidth + diff);
+        currentTh.style.width = newWidth + 'px';
+        currentTh.style.minWidth = newWidth + 'px';
+        currentTh.style.maxWidth = newWidth + 'px';
+
+        if (currentTh.classList.contains('note-th')) {
+            var table = currentTh.closest('.chrono-table');
+            if (table) {
+                table.querySelectorAll('.chrono-note-cell').forEach(function(td) {
+                    td.style.maxWidth = newWidth + 'px';
+                });
+                table.querySelectorAll('.chrono-note-chip').forEach(function(chip) {
+                    chip.style.maxWidth = Math.max(20, newWidth - 10) + 'px';
+                });
+            }
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            document.querySelectorAll('.col-resizer.resizing').forEach(function(r) {
+                r.classList.remove('resizing');
+            });
+            currentTh = null;
+        }
+    });
+
+    // Double-clic sur un en-tete de colonne pour la replier / deplier (hors barre de redimensionnement)
+    document.addEventListener('dblclick', function(e) {
+        if (e.target.closest('.col-resizer')) return;
+        var th = e.target.closest('.chrono-table th');
+        if (!th) return;
+        var table = th.closest('.chrono-table');
+        if (!table) return;
+        var colIdx = Array.from(th.parentNode.children).indexOf(th);
+        var isCollapsed = th.classList.toggle('col-collapsed');
+        table.querySelectorAll('tbody tr').forEach(function(row) {
+            var cell = row.children[colIdx];
+            if (cell) cell.classList.toggle('col-collapsed', isCollapsed);
+        });
+    });
+
+    // Clic simple sur colonne repliee pour la reouvrir
+    document.addEventListener('click', function(e) {
+        var th = e.target.closest('.chrono-table th.col-collapsed');
+        if (th) {
+            var table = th.closest('.chrono-table');
+            if (table) {
+                var colIdx = Array.from(th.parentNode.children).indexOf(th);
+                th.classList.remove('col-collapsed');
+                table.querySelectorAll('tbody tr').forEach(function(row) {
+                    var cell = row.children[colIdx];
+                    if (cell) cell.classList.remove('col-collapsed');
+                });
+            }
+            return;
+        }
+
+        // Clic sur l'en-tête d'une carte de test pour la replier / déplier (sauf si sélection de texte en cours)
+        var testHeader = e.target.closest('.test-card-header');
+        if (testHeader) {
+            // Si l'utilisateur est en train de surligner / sélectionner du texte, ne pas replier
+            var selection = window.getSelection ? window.getSelection().toString() : '';
+            if (selection && selection.length > 0) {
+                return;
+            }
+            var card = testHeader.closest('.test-card');
+            if (card) {
+                card.classList.toggle('test-card-collapsed');
+            }
+        }
+    });
+
+    // Bulle d'inspection interactive et curseur vertical pour chronogramme graphique
+    var tt = document.getElementById('wf-global-tooltip');
+    if (!tt) {
+        tt = document.createElement('div');
+        tt.id = 'wf-global-tooltip';
+        tt.className = 'wf-tooltip';
+        document.body.appendChild(tt);
+    }
+
+    document.addEventListener('mousemove', function(e) {
+        var svg = e.target.closest('svg.waveform');
+        if (!svg) {
+            if (tt) tt.style.display = 'none';
+            document.querySelectorAll('.wf-cursor-line').forEach(function(l) { l.style.display = 'none'; });
+            return;
+        }
+
+        var rect = svg.getBoundingClientRect();
+        var scaleX = svg.viewBox.baseVal.width / rect.width;
+        var scaleY = svg.viewBox.baseVal.height / rect.height;
+
+        var svgX = (e.clientX - rect.left) * scaleX;
+        var svgY = (e.clientY - rect.top) * scaleY;
+
+        var left = parseFloat(svg.getAttribute('data-left') || '200');
+        var top = parseFloat(svg.getAttribute('data-top') || '62');
+        var colw = parseFloat(svg.getAttribute('data-colw') || '56');
+        var laneh = parseFloat(svg.getAttribute('data-laneh') || '40');
+
+        var scansData = JSON.parse(svg.getAttribute('data-scans') || '[]');
+        var fieldsData = JSON.parse(svg.getAttribute('data-fields') || '[]');
+        var metaData = JSON.parse(svg.getAttribute('data-meta') || '{}');
+
+        var colIdx = Math.floor((svgX - left) / colw);
+        var rowIdx = Math.floor((svgY - top) / laneh);
+
+        var cursorLine = svg.querySelector('.wf-cursor-line');
+
+        if (colIdx >= 0 && colIdx < scansData.length && rowIdx >= 0 && rowIdx < fieldsData.length) {
+            var s = scansData[colIdx];
+            var f = fieldsData[rowIdx];
+            var val = s.fields[f];
+            if (val === undefined) val = "—";
+
+            var displayVal = val;
+            if (val === "1") displayVal = "TRUE";
+            else if (val === "0") displayVal = "FALSE";
+            else {
+                var num = parseFloat(val);
+                if (!isNaN(num)) {
+                    displayVal = Math.abs(num) >= 100 ? num.toFixed(0) : num.toFixed(3);
+                }
+            }
+
+            if (cursorLine) {
+                var cx = left + (colIdx + 0.5) * colw;
+                cursorLine.setAttribute('x1', cx);
+                cursorLine.setAttribute('x2', cx);
+                cursorLine.style.display = '';
+            }
+
+            var fMeta = metaData[f] || {};
+            var badgeCls = fMeta.cls || 'badge-var-loc';
+            var metaBadge = fMeta.badge ? '<span class="var-prov-badge ' + badgeCls + '" style="font-size:9.5px;padding:1px 5px;margin-right:4px;">[' + fMeta.badge + ']</span>' : '';
+            var typeStr = fMeta.type ? '<span style="color:var(--muted);font-size:11px;font-family:monospace;">' + fMeta.type + '</span>' : '';
+            var metaLineHtml = (metaBadge || typeStr) ? '<div class="wf-tt-meta">' + metaBadge + typeStr + '</div>' : '';
+
+            var noteHtml = s.note ? '<div class="wf-tt-note">' + s.note + '</div>' : '';
+            var assertsHtml = '';
+            if (s.asserts && s.asserts.length > 0) {
+                var chkItems = s.asserts.map(function(c) {
+                    return '<div style="color:#34d399;font-size:10.5px;margin-top:2px;font-family:monospace;">✓ ' + c + '</div>';
+                }).join('');
+                assertsHtml = '<div style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.1);padding-top:4px;"><strong style="color:var(--accent);font-size:10.5px;">Assertions vérifiées :</strong>' + chkItems + '</div>';
+            }
+
+            tt.innerHTML = '<div class="wf-tt-head">Scan #' + s.scan + ' (' + s.t_ms + ' ms)</div>' +
+                           '<div class="wf-tt-var">' + f + '</div>' +
+                           metaLineHtml +
+                           '<div class="wf-tt-val">Valeur : <strong>' + displayVal + '</strong></div>' +
+                           noteHtml +
+                           assertsHtml;
+
+            tt.style.display = 'block';
+            var ttX = e.clientX + 16;
+            var ttY = e.clientY + 16;
+            if (ttX + 280 > window.innerWidth) ttX = e.clientX - 280;
+            if (ttY + 120 > window.innerHeight) ttY = e.clientY - 120;
+            tt.style.left = ttX + 'px';
+            tt.style.top = ttY + 'px';
+        } else {
+            if (tt) tt.style.display = 'none';
+            if (cursorLine) cursorLine.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('mouseleave', function() {
+        if (tt) tt.style.display = 'none';
+        document.querySelectorAll('.wf-cursor-line').forEach(function(l) { l.style.display = 'none'; });
+    });
+});
+</script>
+</body>
+</html>
