@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "file": "test_sim_translation_loop.st",
+  "results": [
+    {
+      "name": "TC-T417-LOOP-A Rejeu P1 a 20 Hz, demande TENUE apres arrivee : le plafond d approche maintient 20 Hz vers le variateur",
+      "passed": true
+    },
+    {
+      "name": "TC-T417-LOOP-B Rejeu P1 a 20 Hz, demande RETIREE au jeton d arrivee (cycle auto) : plafond perdu, mot de commande a 0",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0
+  }
+}

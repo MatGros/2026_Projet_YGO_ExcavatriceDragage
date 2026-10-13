@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T03:23:27.885832" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T03:23:27.885832">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-12T10:00:00.421352" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-12T10:00:00.421352">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -76,6 +76,21 @@
                 <simpleValue value="TRUE" />
               </initialValue>
             </variable>
+            <variable name="MaxFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="50" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ECHELLE DE LA CONSIGNE. PRG_02 envoie SpeedCmd_Pct = f / 50 Hz x 100 : le simulateur reconvertit
+       avec le MEME maximum, sinon 20 Hz reels (40 %) deviendraient 16 Hz simules.
+       Maximum = GVL_PERSISTENT._TranslationMaxFreq_Hz (50 Hz), passe par FB_SimBench (CST_M3MaxFreq_Hz,
+       egalite verifiee par G518). Ne pas confondre avec CST_NominalFrequency_Hz (40 Hz) : echelle
+       ODOMETRIQUE (gain 0,02 m/(Hz.s)).</xhtml>
+              </documentation>
+            </variable>
             <variable name="AccelRate_HzPerS">
               <type>
                 <REAL />
@@ -89,8 +104,11 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="20" />
+                <simpleValue value="25" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">pente d'arret relevee sur trace reelle (rampe variateur / rampe PLC)</xhtml>
+              </documentation>
             </variable>
             <variable name="DriveTimeConstantS">
               <type>
@@ -590,6 +608,9 @@
               <initialValue>
                 <simpleValue value="40" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">echelle ODOMETRIQUE lue par G518 — PAS le maximum variateur (MaxFreq_Hz)</xhtml>
+              </documentation>
             </variable>
             <variable name="CST_MinTimeS">
               <type>
@@ -677,7 +698,7 @@ IF Enable THEN
         DirectionSign := 1.0;
     END_IF;
 
-    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * 0.4, CST_NominalFrequency_Hz);
+    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * MaxFreq_Hz / 100.0, MaxFreq_Hz);
     IF DirectionSign = 0.0 THEN
         FrequencyTarget_Hz := 0.0;
     END_IF;
@@ -1757,8 +1778,11 @@ Ready := TRUE;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="20" />
+                <simpleValue value="25" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">pente d'arret relevee sur trace reelle</xhtml>
+              </documentation>
             </variable>
             <variable name="TimeConstant_S">
               <type>
@@ -1841,8 +1865,11 @@ Ready := TRUE;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="40" />
+                <simpleValue value="50" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">plafond variateur reel (GVL_PERSISTENT._TranslationMaxFreq_Hz)</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>

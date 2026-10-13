@@ -5,7 +5,7 @@ VAR_INPUT
     Enable : BOOL;
     FrequencyTgt_Hz : REAL;
     AccelRate_HzPerS : REAL := 20.0;
-    DecelRate_HzPerS : REAL := 20.0;
+    DecelRate_HzPerS : REAL := 25.0; // pente d'arret relevee sur trace reelle
     TimeConstant_S : REAL := 0.15;
     LoadAngularVelocity_RadPerS : REAL;
     LoadFrequencyDroopGain_Hz : REAL := 0.50;
@@ -24,7 +24,7 @@ VAR
 END_VAR
 VAR CONSTANT
     CST_MinTime_S : REAL := 0.001;
-    CST_MaxFrequency_Hz : REAL := 40.0;
+    CST_MaxFrequency_Hz : REAL := 50.0; // plafond variateur reel (GVL_PERSISTENT._TranslationMaxFreq_Hz)
 END_VAR
 
 IF NOT Enable THEN

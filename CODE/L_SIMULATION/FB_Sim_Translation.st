@@ -19,8 +19,14 @@ VAR_INPUT
        le gate G518 echoue si les deux echelles divergent. *)
     FullTravelTimeS : REAL := 37.5;
     BrakeReleaseCmd : BOOL := TRUE;
+    (* ECHELLE DE LA CONSIGNE. PRG_02 envoie SpeedCmd_Pct = f / 50 Hz x 100 : le simulateur reconvertit
+       avec le MEME maximum, sinon 20 Hz reels (40 %) deviendraient 16 Hz simules.
+       Maximum = GVL_PERSISTENT._TranslationMaxFreq_Hz (50 Hz), passe par FB_SimBench (CST_M3MaxFreq_Hz,
+       egalite verifiee par G518). Ne pas confondre avec CST_NominalFrequency_Hz (40 Hz) : echelle
+       ODOMETRIQUE (gain 0,02 m/(Hz.s)). *)
+    MaxFreq_Hz : REAL := 50.0;
     AccelRate_HzPerS : REAL := 20.0;
-    DecelRate_HzPerS : REAL := 20.0;
+    DecelRate_HzPerS : REAL := 25.0; // pente d'arret relevee sur trace reelle (rampe variateur / rampe PLC)
     DriveTimeConstantS : REAL := 0.15;
     BrakeOpenDelayS : REAL := 0.10;
     BrakeCloseDelayS : REAL := 0.09;
@@ -133,7 +139,7 @@ VAR CONSTANT
        sinon un modele borne a 30 m ne peut jamais produire le mot 00000. Cette
        position est SYNTHETIQUE en attente de la mesure de la came reelle. *)
     CST_PositionAtMaintenanceSensor_M : REAL := 29.95;
-    CST_NominalFrequency_Hz : REAL := 40.0;
+    CST_NominalFrequency_Hz : REAL := 40.0; // echelle ODOMETRIQUE lue par G518 — PAS le maximum variateur (MaxFreq_Hz)
     CST_MinTimeS : REAL := 0.001;
     (* Meme seuil d'arret que FB_Sim_TranslationBrake.CST_StopFrequency_Hz (0,5 Hz).
        Valide par la trace terrain du 2026-09-04 : frein ouvert a 0,60 Hz, ferme a 0,00 Hz. *)
@@ -196,7 +202,7 @@ IF Enable THEN
         DirectionSign := 1.0;
     END_IF;
 
-    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * 0.4, CST_NominalFrequency_Hz);
+    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * MaxFreq_Hz / 100.0, MaxFreq_Hz);
     IF DirectionSign = 0.0 THEN
         FrequencyTarget_Hz := 0.0;
     END_IF;

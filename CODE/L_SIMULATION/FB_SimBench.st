@@ -192,6 +192,9 @@ VAR CONSTANT
     // est effectivement passee a instSimTranslation (ligne 567) : changer le seul defaut du FB
     // n'aurait aucun effet en simulation. Garde-fou : gate G518.
     CST_M3FullTravelTimeS       : REAL := 37.5;  // Temps de Trémie à Maintenance à 100 %, modèle banc uniquement
+    // Maximum variateur M3 : DOIT egaler GVL_PERSISTENT._TranslationMaxFreq_Hz (PRG_02 envoie f/50 x 100).
+    // Constante locale (L_SIMULATION ne lit pas GVL_PERSISTENT) ; egalite verifiee par G518.
+    CST_M3MaxFreq_Hz            : REAL := 50.0;
     CST_SimBenchCycleTimeS      : REAL := 0.010; // Période tâche PLC (s) — MainTask 10 ms
     // Rattrapage mécanique M1/M2 — valeurs ESTIMÉES (voir REGISTRE_VALEURS_TREUIL_STATUTS_v1.0.md)
     CST_SimWinchCouplingTauS    : REAL := 1.0;   // [HYPOTHESE] Constante de temps du rattrapage (s)
@@ -588,6 +591,7 @@ instSimTranslation(
     ReqMaintenance  := M3_RelayRev,
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
     FullTravelTimeS := CST_M3FullTravelTimeS,
+    MaxFreq_Hz      := CST_M3MaxFreq_Hz,
     BrakeReleaseCmd := M3_BrakeCmd,
     SensorIntermittenceActive := SimM3SensorIntermittenceActive,
     SensorStabilizationS := SimM3SensorStabilizationS,

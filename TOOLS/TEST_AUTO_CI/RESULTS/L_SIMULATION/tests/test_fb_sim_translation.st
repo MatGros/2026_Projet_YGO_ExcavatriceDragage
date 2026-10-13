@@ -240,7 +240,7 @@ END_VAR
                             ASSERT_GE(fb.PositionTrue_M, 0.0, 'Course mecanique jamais inferieure a Tremie');
                             ASSERT_LE(fb.PositionTrue_M, 30.0, 'Course mecanique jamais superieure a Maintenance');
                             ASSERT_GE(fb.ActualFrequency_Hz, 0.0, 'Retour variateur non negatif');
-                            ASSERT_LE(fb.ActualFrequency_Hz, 40.0, 'Retour variateur borne a 40 Hz');
+                            ASSERT_LE(fb.ActualFrequency_Hz, 50.0, 'Retour variateur borne a 50 Hz');
                             IF perturbation <> 3 THEN
                                 ASSERT_TRUE((NOT fb.PosTremie) OR fb.PosPV,
                                     'Mot thermometre : Tremie implique PV');
@@ -309,16 +309,16 @@ END_VAR
     fb.SpeedTgt_Pct := 100.0;
     fb.BrakeReleaseCmd := TRUE;
     fb.BrakeOpenDelayS := 0.0;
-    fb.FullTravelTimeS := 13.6;   (* reference trace (R2-O1) : 30 m / (40 Hz x 0,0551 m/(Hz.s)) *)
+    (* Echelle par defaut du banc : palier 50 Hz (maximum variateur), 0,02 m/(Hz.s), rampe d'arret 25 Hz/s. *)
     (* Charge neutralisee : l'oracle porte sur la SEULE deceleration libre du variateur.
        Sans cela, le droop de charge (0,5 Hz par rad/s) peut faire passer ActualFrequency
        sous 39,5 Hz et rendre l'assertion de palier marginale — bruit, pas verite. *)
     fb.LoadFrequencyDroopGain_Hz := 0.0;
     fb.LoadReactionGain_Mps2 := 0.0;
-    FOR i := 1 TO 300 DO
+    FOR i := 1 TO 400 DO
         fb();
     END_FOR;
-    ASSERT_NEAR(fb.ActualFrequency_Hz, 40.0, 0.5, 'Palier 40 Hz etabli avant le retrait');
+    ASSERT_NEAR(fb.ActualFrequency_Hz, 50.0, 0.5, 'Palier 50 Hz etabli avant le retrait');
     ASSERT_LT(fb.PositionTrue_M, 30.0, 'Chariot encore hors butee (scenario non pollue)');
 
     (* Retrait total de la commande : plus aucune requete, consigne a zero. *)
@@ -452,7 +452,7 @@ END_VAR
     FOR i := 1 TO 400 DO
         fb();
     END_FOR;
-    ASSERT_NEAR(fb.ActualFrequency_Hz, 40.0, 0.5, 'Palier 40 Hz etabli avant lecture du ratio');
+    ASSERT_NEAR(fb.ActualFrequency_Hz, 50.0, 0.5, 'Palier 50 Hz (maximum variateur) etabli avant lecture du ratio');
     ASSERT_NEAR(fb.VelocityTrue_Mps / fb.ActualFrequency_Hz, 0.02, 0.0002,
         'Ratio banc (m/s par Hz) = _TranslationGainMetersPerHzSec (ancien : 0,09375)');
 END_TEST
@@ -487,4 +487,98 @@ END_VAR
        diverger les deux membres de plusieurs metres. *)
     ASSERT_NEAR(posStart_M - fb.PositionTrue_M, integralHzS * 0.02, 0.25,
         'Distance parcourue par le banc = position reconstituee par l estimateur odometrique');
+END_TEST
+
+(* Echelle de la consigne : PRG_02 envoie SpeedCmd_Pct = f / 50 Hz x 100.
+   20 Hz d'approche reels = 40 % doivent redonner 20 Hz (pas 16 Hz). Charge neutralisee. *)
+TEST 'TC-T417-SCALE-001 Consigne 40 pct = 20 Hz et 100 pct = 50 Hz'
+VAR
+    fbApproach : FB_Sim_Translation;
+    fbMax : FB_Sim_Translation;
+    i : INT;
+END_VAR
+    fbApproach.Enable := TRUE;
+    fbApproach.ReqMaintenance := TRUE;
+    fbApproach.SpeedTgt_Pct := 40.0;
+    fbApproach.BrakeReleaseCmd := TRUE;
+    fbApproach.BrakeOpenDelayS := 0.0;
+    fbApproach.LoadFrequencyDroopGain_Hz := 0.0;
+    fbApproach.LoadReactionGain_Mps2 := 0.0;
+    fbMax.Enable := TRUE;
+    fbMax.ReqMaintenance := TRUE;
+    fbMax.SpeedTgt_Pct := 100.0;
+    fbMax.BrakeReleaseCmd := TRUE;
+    fbMax.BrakeOpenDelayS := 0.0;
+    fbMax.LoadFrequencyDroopGain_Hz := 0.0;
+    fbMax.LoadReactionGain_Mps2 := 0.0;
+    FOR i := 1 TO 400 DO
+        fbApproach();
+        fbMax();
+    END_FOR;
+    ASSERT_NEAR(fbApproach.ActualFrequency_Hz, 20.0, 0.05, '40 pct de 50 Hz = 20 Hz en regime etabli');
+    ASSERT_NEAR(fbMax.ActualFrequency_Hz, 50.0, 0.05, '100 pct = 50 Hz (maximum variateur)');
+END_TEST
+
+(* Rampe d'arret : trace reelle ~25 Hz/s (rampe variateur). Pente mesuree sur la fenetre
+   utile 10 Hz -> ~4 Hz, apres le transitoire du filtre de 1er ordre. Charge neutralisee. *)
+TEST 'TC-T417-DECEL-001 Pente d arret 25 Hz/s depuis l approche 20 Hz'
+VAR
+    fb : FB_Sim_Translation;
+    i : INT;
+    f1_Hz : REAL;
+END_VAR
+    fb.Enable := TRUE;
+    fb.ReqMaintenance := TRUE;
+    fb.SpeedTgt_Pct := 40.0;
+    fb.BrakeReleaseCmd := TRUE;
+    fb.BrakeOpenDelayS := 0.0;
+    fb.LoadFrequencyDroopGain_Hz := 0.0;
+    fb.LoadReactionGain_Mps2 := 0.0;
+    FOR i := 1 TO 400 DO
+        fb();
+    END_FOR;
+    ASSERT_NEAR(fb.ActualFrequency_Hz, 20.0, 0.05, 'Approche 20 Hz etablie avant le retrait');
+    fb.SpeedTgt_Pct := 0.0;
+    i := 0;
+    WHILE (fb.ActualFrequency_Hz > 10.0) AND (i < 300) DO
+        fb();
+        i := i + 1;
+    END_WHILE;
+    f1_Hz := fb.ActualFrequency_Hz;
+    FOR i := 1 TO 20 DO
+        fb();
+    END_FOR;
+    ASSERT_NEAR((f1_Hz - fb.ActualFrequency_Hz) / 0.2, 25.0, 1.0, 'Pente de decroissance = 25 Hz/s');
+END_TEST
+
+(* Depassement apres retrait de commande a l'approche : ordre de grandeur de la trace reelle
+   (~0,25 m, gain 0,02 m/(Hz.s) provisoire). Bande large : cible a confirmer par la trace 10 ms. *)
+TEST 'TC-T417-OVERSHOOT-001 Depassement apres retrait a 20 Hz'
+VAR
+    fb : FB_Sim_Translation;
+    i : INT;
+    posAtCut_M : REAL;
+    overshoot_M : REAL;
+END_VAR
+    fb.Enable := TRUE;
+    fb.ReqMaintenance := TRUE;
+    fb.SpeedTgt_Pct := 40.0;
+    fb.BrakeReleaseCmd := TRUE;
+    fb.BrakeOpenDelayS := 0.0;
+    fb.LoadFrequencyDroopGain_Hz := 0.0;
+    fb.LoadReactionGain_Mps2 := 0.0;
+    FOR i := 1 TO 400 DO
+        fb();
+    END_FOR;
+    ASSERT_NEAR(fb.ActualFrequency_Hz, 20.0, 0.05, 'Approche 20 Hz etablie avant le retrait');
+    fb.ReqMaintenance := FALSE;
+    fb.SpeedTgt_Pct := 0.0;
+    fb();
+    posAtCut_M := fb.PositionTrue_M;
+    FOR i := 1 TO 300 DO
+        fb();
+    END_FOR;
+    overshoot_M := fb.PositionTrue_M - posAtCut_M;
+    ASSERT_GE(overshoot_M, 0.15, 'Depassement >= 0,15 m (ordre de grandeur trace reelle)');
+    ASSERT_LE(overshoot_M, 0.35, 'Depassement <= 0,35 m (ordre de grandeur trace reelle)');
 END_TEST

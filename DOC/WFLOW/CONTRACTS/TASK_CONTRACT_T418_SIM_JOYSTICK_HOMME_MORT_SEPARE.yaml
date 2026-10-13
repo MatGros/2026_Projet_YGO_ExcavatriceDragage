@@ -1,0 +1,101 @@
+# Contrat T418 — Simulateur joystick : homme-mort séparé des boutons directionnels
+# Statut : V2 après challenge (GO avec corrections). Aucune ligne de CODE/ écrite.
+# Vérité = code de la dernière MES réelle (v0.7.25_CptHorraireGVLPerssistantePasImplémenté_DernièreMES_20260922),
+# qui fonctionne sur la machine. Le code machine (grafcet homing, PRG_02, FB_Joystick) N'EST PAS modifié.
+
+contract:
+  task_id: T418_SIM_JOYSTICK_HOMME_MORT_SEPARE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Le SimBench publie un homme-mort joystick (Operator.JoyBtnRaw) qui ne dépend que du stimulus
+    homme-mort dédié, jamais des boutons directionnels simulés. Plus aucun front homme-mort parasite
+    n'est fabriqué à chaque jog simulé. Le comportement du code machine face à un vrai appui
+    homme-mort reste celui de la version déployée, observé et documenté, pas modifié.
+
+  context_facts:   # relevés dans le code et les snapshots, aucun supposé
+    - "Symptôme (simulation, 13/10) : MAINT_N2, zone Maintenance M3 autorisée, machine référencée (MachineHomed=TRUE, M1/M2 HomingHomed=TRUE, BucketOffsetUnknown=FALSE). Appui bouton directionnel simulé vers Maintenance -> JoyBtnRaw FALSE->TRUE, MachineHomingStep 60 -> 45, ReferenceTransaction FALSE->TRUE, M3 bloqué (M3Locked). Snapshots Snapshot_Troubleshooting_20261013_134929.csv:44 / _135017.csv:334."
+    - "PRODUCTEUR du front parasite : FB_SimBench.st:710 Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount > 0). La sortie RawButton de FB_Sim_Joystick (FB_Sim_Joystick.st:227) n'alimente PAS JoyBtnRaw."
+    - "Transition étape initiale du grafcet homing : FB_CycleMachineHoming.st:414 (StartEdge.Q OR BtnValidationEdge.Q) AND ModeIsMaint2, avec BtnValidation := HwIn.Operator.JoyBtnRaw OR GVL_IHM.CycleMachineHoming.Cmd.BtnValidate (PRG_02_Acquisition.st:610). Identique dans la version déployée : non modifiée."
+    - "Homme-mort réel (FB_Joystick.st:220-249, conservé) : armement par MAINTIEN (DeadmanArmHoldTime) si ArmingPermit ; désarmement immédiat au retrait d'ArmingPermit ; désarmement par maintien au neutre après la grâce. DeadmanArmed peut donc rester vrai après relâchement du bouton."
+    - "Stimulus homme-mort dédié existant : GVL_Simulation.SimJoystickRawButton (FB_SimBench.st:120)."
+    - "AF-13 §5 (Stimuli Joystick) décrit le comportement actuel (homme-mort inclus par les boutons directionnels) : à aligner."
+
+  acceptance:
+    - id: AC1
+      statement: "Direction seule, homme-mort jamais armé (SimJoystickRawButton=FALSE depuis le démarrage) : l'image publiée Operator.JoyBtnRaw reste FALSE, DeadmanArmed reste FALSE, aucune demande joystick (AxisCmd nulle). RawX/RawY suivent les boutons comme avant."
+      verified_by: "Test CI sur FB_SimBench (image Operator publiée) + FB_Joystick réel"
+    - id: AC2
+      statement: "Operator.JoyBtnRaw = SimJoystickRawButton à chaque scan, quels que soient les boutons directionnels (aucun front ajouté ni retiré par un bouton directionnel)."
+      verified_by: "Test CI : SimJoystickRawButton maintenu, enchaînement de boutons directionnels -> un seul front JoyBtnRaw"
+    - id: AC3
+      statement: "Homme-mort tenu AVANT l'entrée en N2 (pas de nouveau front en N2), machine référencée, grafcet homing au repos : jog vers Maintenance -> pas de nouveau front JoyBtnRaw, MachineHomingStep reste 60, pas de HX1. Le déplacement M3 éventuel suit le comportement conservé de FB_Joystick et des permis (armement/désarmement au changement de mode inclus), sans l'imposer."
+      verified_by: "Test CI d'intégration FB_SimBench + FB_Joystick + FB_CycleMachineHoming réels"
+    - id: AC4
+      statement: "Premier appui homme-mort EN N2, machine référencée, grafcet au repos : on OBSERVE et on documente le résultat tel que produit par le code machine déployé, sans le présumer (la lecture de FB_CycleMachineHoming.st:414 et le retour terrain de l'exploitant, qui ne voit jamais ce lancement, divergent : à départager par l'observation). Aucune modification du code machine dans T418 ; le constat est remonté à l'humain."
+      verified_by: "Test CI d'intégration ; résultat consigné dans la restitution"
+    - id: AC5
+      statement: "États homme-mort distingués et conservés : (a) jamais armé, bouton FALSE -> aucune demande ; (b) bouton relâché après armement -> comportement de FB_Joystick inchangé (pas d'arrêt immédiat imposé par le simulateur)."
+      verified_by: "Test CI des deux états"
+    - id: AC6
+      statement: "Garde-fou (fix + guard) : un test CI échoue si un bouton directionnel simulé produit à nouveau JoyBtnRaw, ET un gate TOOLS/AGENT_WORKFLOW/scripts/ rejette toute affectation de Operator.JoyBtnRaw dans FB_SimBench qui dépend des boutons directionnels (selftest avec mutation 'OR (SimJoystickDirectionCount > 0)')."
+      verified_by: "Nouveau gate intégré à run_all_gates.py + selftest ; test CI rouge sur la mutation"
+    - id: AC7
+      statement: "Aucun fichier du code machine n'est modifié : G_CYCLE, D_JOYSTICK, M_MAIN, F_MODES, I_TRANSLATION, H_TREUILS_BENNE."
+      verified_by: "git diff --stat limité à scope.allowed ; G200 PASS"
+    - id: AC8
+      statement: "Bundle, diff bundle et gates régénérés ; AF-13 §5 et la fiche du SimBench/joystick simulé alignées sur le nouveau comportement."
+      verified_by: "generate_codesys_bundle.py, generate_codesys_diff_bundle.py, G200 --report, run_all_gates.py ; relecture doc"
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_SimBench.st   # correction OBLIGATOIRE (ligne 710)
+      - CODE/L_SIMULATION/FB_Sim_Joystick.st   # alignement de la sortie RawButton / commentaires si nécessaire
+      - TOOLS/TEST_AUTO_CI/   # tests de simulation et intégration
+      - TOOLS/AGENT_WORKFLOW/scripts/   # nouveau gate AC6
+      - DOC/AF/AF_Partie-13_Fonction_Simulation*   # alignement description du stimulus
+    forbidden:
+      - CODE/G_CYCLE/
+      - CODE/D_JOYSTICK/
+      - CODE/M_MAIN/
+      - CODE/F_MODES/
+      - CODE/I_TRANSLATION/
+      - CODE/H_TREUILS_BENNE/
+      - CODE/GVL_PERSISTENT.st
+      - ST_IHM_MANU (table figée)
+
+  conservation:
+    must_survive:
+      - "Grafcet homing et câblage BtnValidation tels que déployés (v0.7.25)"
+      - "Comportement réel de FB_Joystick (armement par maintien, grâce, désarmement au neutre et au retrait du permis)"
+      - "Dynamique simulée des axes (montée, dépassement, retombée, bagotement)"
+    dropped_on_purpose:
+      - "L'appui homme-mort implicite produit par les boutons directionnels simulés (FB_SimBench.st:710)."
+      - "Pas de mode 'homme-mort maintenu pour la session' dans ce lot : il masquerait le constat AC4."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+
+  open_points:
+    - "Ergonomie banc : l'opérateur simulation doit actionner SimJoystickRawButton en plus du bouton directionnel. À réévaluer après AC4, pas avant."
+    - "Tests CI existants et scénarios SimBench qui comptent sur l'homme-mort implicite : à recenser et adapter."
+
+  alert_duty: >
+    Tout écart constaté est remonté à l'orchestrateur, jamais en silence. Aucun commit sans validation humaine.
+
+status: PENDING
+execution:
+  executed_by: "—"
+  completed_at: "—"
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: "—"
+  validated_at: "—"
+  notes: ""

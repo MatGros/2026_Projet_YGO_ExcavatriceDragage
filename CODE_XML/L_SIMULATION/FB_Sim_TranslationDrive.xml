@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-16T00:09:12.424660" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-16T00:09:12.424660">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-12T10:00:06.332594" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-12T10:00:06.332594">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -50,8 +50,11 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="20" />
+                <simpleValue value="25" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">pente d'arret relevee sur trace reelle</xhtml>
+              </documentation>
             </variable>
             <variable name="TimeConstant_S">
               <type>
@@ -134,8 +137,11 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="40" />
+                <simpleValue value="50" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">plafond variateur reel (GVL_PERSISTENT._TranslationMaxFreq_Hz)</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
