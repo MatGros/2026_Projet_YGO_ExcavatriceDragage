@@ -373,7 +373,7 @@
             <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-10-13 17:01:58</div>
+    <div class="exec-time">2026-10-15 02:33:05</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (32 tests)</summary>
@@ -17890,125 +17890,7 @@ END_FUNCTION_BLOCK
     </details>
     <details>
         <summary>Sortie brute strucpp</summary>
-        <pre>STruC++ Test Runner v1.0
-
-test_winch_integ.st
-         ASSERT_TRUE failed: MACHINE.BUSWINCH.WINCHM1FINALINTERLOCKREQUEST.REQUESTEDSTEP &gt; 0 expected TRUE, got FALSE
-         at test_winch_integ.st:122
-         Message: HARN-10: la demande doit atteindre FB_Winch M1
-  [FAIL] HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 1, got 0
-         at test_winch_integ.st:170
-         Message: HARN-11: M1 plafonne palier 1 (ExtractionControlActive)
-  [FAIL] HARN-11 : Extraction montee ExtractionControlActive -&gt; plafond palier 1 M1 ET M2
-         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE
-         at test_winch_integ.st:220
-         Message: HARN-12: precondition - montee en zone haute engagee M1
-  [FAIL] HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 2, got 0
-         at test_winch_integ.st:269
-         Message: HARN-13a: 20 pourcent -&gt; palier 2 (table reference)
-  [FAIL] HARN-13a : Table de verite etape remontee 20 pourcent -&gt; palier 2
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 3, got 0
-         at test_winch_integ.st:313
-         Message: HARN-13b: 70 pourcent descendu au clamp descente 3
-  [FAIL] HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective)
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 5, got 0
-         at test_winch_integ.st:356
-         Message: HARN-13c: 90 pourcent -&gt; palier 5 (table reference)
-  [FAIL] HARN-13c : Table de verite etape remontee 90 pourcent -&gt; palier 5
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 4, got 1
-         at test_winch_integ.st:402
-         Message: HARN-20: 75 pourcent -&gt; palier 4 (table reference)
-  [FAIL] HARN-20 : Rampe deflexion 0 a 100 pourcent -&gt; paliers monotones, jamais de saut brutal
-  [PASS] HARN-21 : Rampe retour 100 a 0 -&gt; decroissance propre, neutre -&gt; palier 0
-  [PASS] HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -&gt; palier 1 stable, pas de plancher
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 0, got 1
-         at test_winch_integ.st:493
-         Message: HARN-23: homme-mort relache -&gt; palier 0
-  [FAIL] HARN-23 : Homme-mort relache en mouvement -&gt; arret immediat, frein retombe
-         ASSERT_TRUE failed: MACHINE.KOBOLDIMMERSIONCONFIRMED expected TRUE, got FALSE
-         at test_winch_integ.st:528
-         Message: HARN-30: immersion confirmee au front montant en fenetre
-  [FAIL] HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -&gt; immersion confirmee puis arret latche
-         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE
-         at test_winch_integ.st:563
-         Message: HARN-31: la plongee Kobold est reellement exercee (StepNumber &gt;= 1)
-  [FAIL] HARN-31 : Interdiction palier 5 en Kobold (D12) -&gt; plafond 4 (CIBLE T181-12/16, ROUGE baseline)
-         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE
-         at test_winch_integ.st:590
-         Message: HARN-32: precondition - descente active en plongee
-  [FAIL] HARN-32 : Relache joystick en contexte plongee -&gt; palier 0 immediat, pas de plancher residuel
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 1, got 0
-         at test_winch_integ.st:626
-         Message: HARN-33: plafond zone basse gagne sur plancher plongee (amendement B)
-  [FAIL] HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amendement B, CIBLE T181-12, ROUGE baseline)
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 4, got 1
-         at test_winch_integ.st:657
-         Message: HARN-40: precondition - M1 au palier 4
-  [FAIL] HARN-40 : Jog benne -&gt; M2 bride palier 1, treuils coupes pendant Busy (anti-traversee amont)
-         ASSERT_TRUE failed: MACHINE.BUSWINCH.SYNCSTATE.SYNCDEVIATIONWARN expected TRUE, got FALSE
-         at test_winch_integ.st:693
-         Message: HARN-41: SyncDeviationWarn actif (ecart 0.3 &gt; 0.10)
-  [FAIL] HARN-41 : SyncDeviationWarn -&gt; plafond palier 1 sur M1 ET M2 (bornes communes identiques)
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 5, got 1
-         at test_winch_integ.st:726
-         Message: HARN-42: M1 libre jusqu au plafond general (5)
-  [FAIL] HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
-         at test_winch_integ.st:755
-         Message: HARN-50: precondition - montee couplee M1 etablie
-  [FAIL] HARN-50 : Nominal filet passif -&gt; FinalInterlockGoverned FALSE sur toute la montee couplee
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
-         at test_winch_integ.st:788
-         Message: HARN-51: precondition - montee nominale M1 etablie
-  [FAIL] HARN-51 : Injection cadence hors instance FB_Winch -&gt; barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline)
-         ASSERT_TRUE failed: MACHINE.FINALINTERLOCKGOVERNEDM1 = FALSE expected TRUE, got FALSE
-         at test_winch_integ.st:827
-         Message: HARN-52: pas de coupure non voulue
-  [FAIL] HARN-52 : Pas de double-freinage -&gt; barriere PRG_06 passive en marge interne FB_Winch
-         ASSERT_TRUE failed: MACHINE.SYNCDEVIATIONM_MODEL &gt; 0.10 expected TRUE, got FALSE
-         at test_winch_integ.st:857
-         Message: HARN-60: ecart modelise a depasse le seuil warn
-  [FAIL] HARN-60 : Deviation croissante -&gt; warn plafond 1 puis critique SafeStop des 2
-         ASSERT_TRUE failed: MACHINE.SYNCDEVIATIONM_MODEL &lt; 0.10 expected TRUE, got FALSE
-         at test_winch_integ.st:895
-         Message: HARN-61: re-alignement dans la tolerance
-  [FAIL] HARN-61 : Retour dans la tolerance -&gt; plafond relache, pas de latch intempestif
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
-         at test_winch_integ.st:923
-         Message: HARN-70: precondition - montee couplee active
-  [FAIL] HARN-70 : Chute chaine AU en mouvement couple -&gt; relais FALSE immediat, freins retombent
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD = FALSE expected TRUE, got FALSE
-         at test_winch_integ.st:969
-         Message: HARN-71: pas de redemarrage auto au re-Enable (cible D18)
-  [FAIL] HARN-71 : Enable=FALSE sur FB_Winch en marche -&gt; sorties sures ; re-Enable sans relache
-  [PASS] HARN-72 : Watchdog frein (retour frein ne suit pas) -&gt; barriere coupe apres timeout
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYREV = FALSE expected TRUE, got FALSE
-         at test_winch_integ.st:1033
-         Message: HARN-73: temps mort directionnel respecte (cible T175)
-  [FAIL] HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -&gt; RelayRev retenu (CIBLE T175/T181-05)
-  [PASS] HARN-74a : Coast-down apres relache lourd -&gt; PAS de faux PowerCutOff pendant la fenetre contacteurs (T178)
-  [PASS] HARN-74b : Coast-down prolonge -&gt; Meca B arme a 3 s (CIBLE T178, ROUGE baseline)
-         ASSERT_TRUE failed: MACHINE.BUSWINCH.WINCHM1STATE.DIRECTIONCHANGEPENDING OR MACHINE.BUSWINCH.WINCHM1STATE.FINALRESTARTINHIBIT expected TRUE, got FALSE
-         at test_winch_integ.st:1128
-         Message: HARN-75: temps mort applique au hot-restart (D18, cible T181-05)
-  [FAIL] HARN-75 : Redemarrage a chaud (FirstScanDone) -&gt; temps mort directionnel NON bypassse (D18, ROUGE baseline)
-         ASSERT_TRUE failed: MACHINE.BUSWINCH.WINCHM1SAFETY.ERROR expected TRUE, got FALSE
-         at test_winch_integ.st:1162
-         Message: HARN-80: CAS-001 detecte (defaut Error, cible T180)
-  [FAIL] HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -&gt; defaut + neutralisation (CIBLE T180)
-         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt; 0 expected TRUE, got FALSE
-         at test_winch_integ.st:1186
-         Message: HARN-81: precondition - treuils en mouvement
-  [FAIL] HARN-81 : CAS-012 demande benne pendant mouvement treuil -&gt; demande REFUSEE (CIBLE T175 AC3)
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
-         at test_winch_integ.st:1223
-         Message: HARN-82: precondition - mouvement semi-auto
-  [FAIL] HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement
-
------------------------------------------
-32 tests, 5 passed, 27 failed
+        <pre>Error: C++ compilation failed:
 </pre>
     </details>
 </div>

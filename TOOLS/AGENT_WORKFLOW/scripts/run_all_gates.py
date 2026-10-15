@@ -90,6 +90,7 @@ def _py313() -> str:
 
 
 PLANS: list[tuple[str, str, str, list[str]]] = [
+    ("C", "528", "G528 - Simulated operator gesture ownership (T418)", [sys.executable, f"{S}/G528_check_sim_operator_gesture.py"]),
     # Palier C â€” structure (G300..G330)
     ("C", "300", "G300 â€” Structure du depot",                       [sys.executable, f"{S}/G300_check_structure.py"]),
     ("C", "310", "G310 â€” Structure CODE (POU, suffixe, ordre)",     [sys.executable, f"{S}/G310_check_code_structure.py"]),

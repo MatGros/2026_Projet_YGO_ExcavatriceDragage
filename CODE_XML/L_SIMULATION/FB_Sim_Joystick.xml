@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-14T23:56:56.098038" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-14T23:56:56.098038">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-15T00:27:28.279410" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-15T00:27:28.279410">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -138,6 +138,39 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — 10 ms</xhtml>
               </documentation>
             </variable>
+            <variable name="GesturePermit">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Stimuli manuels au repos avant un geste automatique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Appui bouton avant debattement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ButtonReleaseDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Maintien bouton apres debut debattement</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawX">
@@ -161,7 +194,15 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Homme-mort brut = un bouton directionnel actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Appui armement simule, relache pendant le maintien du manche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModelActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Propriete exclusive des trois entrees brutes pendant le geste et le retour</xhtml>
               </documentation>
             </variable>
             <variable name="ReturningActive">
@@ -174,6 +215,73 @@
             </variable>
           </outputVars>
           <localVars>
+            <variable name="instArmTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Maintien armement avant debattement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instButtonReleaseTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Relachement bouton apres debut debattement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="GestureStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Attente relachement, disponible, appui, mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction unique demandee, 0 si aucune ou conflit</xhtml>
+              </documentation>
+            </variable>
+            <variable name="GestureDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction memorisee au nouvel appui</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeflectionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debattement admis pour le geste courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestMatchesGesture">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction demandee identique au geste</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimingValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Parametres dynamiques strictement positifs</xhtml>
+              </documentation>
+            </variable>
             <variable name="FirstCycle">
               <type>
                 <BOOL />
@@ -287,6 +395,94 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accélération de l'oscillateur</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_GESTURE_WAIT_RELEASE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Relachement complet et retour neutre requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_GESTURE_READY">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Nouveau geste disponible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_GESTURE_ARM">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Appui armement, manche neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_GESTURE_MOVE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Manche deplace, bouton ensuite relache</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DIRECTION_LEFT">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande X negatif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DIRECTION_RIGHT">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande X positif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DIRECTION_FORWARD">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande Y positif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DIRECTION_REVERSE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande Y negatif</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_ST_IDLE">
               <type>
                 <INT />
@@ -377,38 +573,13 @@
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
-   ───────────────────────────────────────────────────────────────
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧪 FB_Sim_Joystick — Simulation des entrees brutes joystick (bus CAN hors ligne)
+   🎯 Rôle : reproduire un geste operateur depuis un bouton directionnel.
+   Appui armement, debattement, relachement armement, retour dynamique.
+   Aucun etat arme produit ; permis et armement restent au joystick reel.
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
-   🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
-      (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
-      permanence — un vrai contournement de sécurité). Ici, on simule les
-      ENTRÉES BRUTES du capteur (`RawX`/`RawY`/`RawButton`) : le homme-mort réel
-      de `FB_Joystick` reste pleinement actif et doit toujours être "actionné"
-      (forcer `RawButton` en instance CODESYS) pour armer — comportement
-      métier testé pour de vrai, pas contourné.
-   🕹️ Comportement dynamique (conception validée) :
-      - Ascending : bouton actif → `RawX`/`RawY` monte de `NeutralRaw` vers la cible
-        (0 ou `MaxRaw`) en `RiseTimeS`, avec un bruit pseudo-aléatoire léger.
-      - Dépassement (`OvershootActive`) : la cible de montée DÉPASSE la butée
-        (MaxRaw+AMT ou 0−AMT) → déclenche le défaut capteur hors plage.
-      - Retombée : bouton relâché → descente LINÉAIRE en `FallTimeMs` vers le neutre.
-      - Bagotement (`BagotementActive`) : au retour, petit balancement de quelques %
-        autour du neutre avant de se stabiliser.
-   📥 Enable        : simulation active (SimulationModeActive AND NOT BusJoystickSignalIsReal)
-   📥 NeutralRaw    : valeur brute simulée au repos (voir GVL_Simulation.TstJoystickForceNeutralRaw)
-   📥 MaxRaw        : valeur brute simulée à fond (voir GVL_Simulation.TstJoystickForceMaxRaw)
-   📥 Btn*          : boutons directionnels (1 seul impose une butée d'axe ; 0 ou ≥2 = neutre)
-   📥 OvershootActive : bagotement au retour (test mouvement parasite)
-   📥 RiseTimeS / FallTimeMs / CycleTimeS : dynamique temporelle (pattern FB_Sim_Encoder)
-   📤 RawX/RawY     : valeurs brutes dynamiques (neutre = NeutralRaw)
-   📤 RawButton     : homme-mort brut = un bouton directionnel actif
-   💡 Note d'application : en vue instance CODESYS, forcer `RawX`/`RawY` à `MaxRaw` (ou une
-      valeur intermédiaire) pour simuler un débattement, et `RawButton` à `TRUE` pour simuler
-      l'appui homme-mort — exactement comme on forcerait le vrai capteur.
-   ═══════════════════════════════════════════════════════════════
+   =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Joystick) ===</xhtml>
           </documentation>
         </interface>
@@ -421,13 +592,19 @@
 {region "§1 Gate"}
 // 🔑 Initialise au neutre au premier cycle uniquement ; ensuite RawX/RawY sont pilotés
 // dynamiquement par les boutons. Quand la simulation est coupée, on revient au neutre.
-IF NOT Enable THEN
+TimingValid := (RiseTimeS &gt; 0.0) AND (CycleTimeS &gt; 0.0) AND (FallTimeMs &gt; T#0MS);
+IF NOT Enable OR NOT TimingValid THEN
     FirstCycle := TRUE;
     State      := CST_ST_IDLE;
     RawX       := NeutralRaw;
     RawY       := NeutralRaw;
     RawButton  := FALSE;
     ReturningActive := FALSE; // 📊 Neutralisation : simulation inactive hors Enable
+    ModelActive := FALSE;
+    GestureStep := CST_GESTURE_WAIT_RELEASE;
+    GestureDirection := 0;
+    instArmTimer(IN := FALSE, PT := ArmHoldTime);
+    instButtonReleaseTimer(IN := FALSE, PT := ButtonReleaseDelay);
     RETURN;
 END_IF;
 {endregion}
@@ -439,6 +616,7 @@ IF FirstCycle THEN
     RawButton  := FALSE;
     State      := CST_ST_IDLE;
     FirstCycle := FALSE;
+    GestureStep := CST_GESTURE_WAIT_RELEASE;
 END_IF;
 {endregion}
 
@@ -455,7 +633,57 @@ Noise   := (RandCnt MOD 50) - 25;   // ±25 points (≈ ±0.5% de la course)
 // déclencher le défaut capteur hors plage (RawOutOfRange) — test du dépassement de valeur.
 BtnCount := BOOL_TO_INT(BtnLeft_Rev_TREMIE) + BOOL_TO_INT(BtnRight_Fwd_MAINT)
           + BOOL_TO_INT(BtnFwd_Up_Close) + BOOL_TO_INT(BtnRev_Down_Open);
+RequestedDirection := 0;
 IF BtnCount = 1 THEN
+    IF BtnLeft_Rev_TREMIE THEN RequestedDirection := CST_DIRECTION_LEFT;
+    ELSIF BtnRight_Fwd_MAINT THEN RequestedDirection := CST_DIRECTION_RIGHT;
+    ELSIF BtnFwd_Up_Close THEN RequestedDirection := CST_DIRECTION_FORWARD;
+    ELSE RequestedDirection := CST_DIRECTION_REVERSE;
+    END_IF;
+END_IF;
+
+// Un seul appui brut par geste ; aucun nouvel essai tant que l'IHM reste tenue.
+instArmTimer(IN := GestureStep = CST_GESTURE_ARM, PT := ArmHoldTime);
+instButtonReleaseTimer(IN := GestureStep = CST_GESTURE_MOVE, PT := ButtonReleaseDelay);
+DeflectionActive := FALSE;
+RawButton := FALSE;
+RequestMatchesGesture := (RequestedDirection = GestureDirection) AND (BtnCount = 1);
+IF BtnCount &gt; 0 THEN ModelActive := TRUE; END_IF;
+IF NOT GesturePermit THEN GestureStep := CST_GESTURE_WAIT_RELEASE; END_IF;
+
+IF GestureStep = CST_GESTURE_WAIT_RELEASE THEN
+        // Les boutons doivent etre relaches APRES stabilisation du retour.
+        IF (BtnCount = 0) AND (State = CST_ST_IDLE) AND GesturePermit THEN
+            GestureStep := CST_GESTURE_READY;
+            ModelActive := FALSE;
+        END_IF;
+ELSIF GestureStep = CST_GESTURE_READY THEN
+        IF BtnCount = 1 THEN
+            GestureDirection := RequestedDirection;
+            GestureStep := CST_GESTURE_ARM;
+            RawButton := TRUE;
+        ELSIF BtnCount &gt; 1 THEN
+            GestureStep := CST_GESTURE_WAIT_RELEASE;
+        END_IF;
+ELSIF GestureStep = CST_GESTURE_ARM THEN
+        IF NOT RequestMatchesGesture THEN
+            GestureStep := CST_GESTURE_WAIT_RELEASE;
+        ELSE
+            RawButton := TRUE;
+            IF instArmTimer.Q THEN GestureStep := CST_GESTURE_MOVE; END_IF;
+        END_IF;
+ELSIF GestureStep = CST_GESTURE_MOVE THEN
+        IF NOT RequestMatchesGesture THEN
+            GestureStep := CST_GESTURE_WAIT_RELEASE;
+        ELSE
+            DeflectionActive := TRUE;
+            RawButton := NOT instButtonReleaseTimer.Q;
+        END_IF;
+ELSE
+    GestureStep := CST_GESTURE_WAIT_RELEASE;
+END_IF;
+
+IF DeflectionActive THEN
     IF BtnLeft_Rev_TREMIE THEN
         IF OvershootActive THEN TargetX := 0 - CST_OVERSHOOT_AMT; ELSE TargetX := 0; END_IF;
         TargetY := NeutralRaw; ActiveAxis := 1;
@@ -560,7 +788,7 @@ END_IF;
 {endregion}
 
 {region "§8 Homme-mort brut + drapeau retour"}
-RawButton := BtnLeft_Rev_TREMIE OR BtnRight_Fwd_MAINT OR BtnFwd_Up_Close OR BtnRev_Down_Open;
+// RawButton est exclusivement produit par le sequenceur du geste (§4).
 // Drapeau "retour dynamique en cours" : TRUE si l'état est FALL ou OVERSHOOT (retombée/bagotement).
 // Permet à FB_SimBench d'émettre la sortie du modèle même après relâchement du bouton.
 ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-14T23:56:53.228355" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-14T23:56:53.228355">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-15T00:21:18.035621" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-15T00:21:18.035621">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2211,12 +2211,20 @@ Constante locale (L_SIMULATION ne lit pas GVL_PERSISTENT) ; egalite verifiee par
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens arrière M3</xhtml>
               </documentation>
             </variable>
-            <variable name="SimJoystickDirectionCount">
+            <variable name="SimJoystickManualNeutral">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Nombre de directions actives</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Axes manuels au neutre nominal</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimJoystickGesturePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Aucune injection manuelle concurrente au geste</xhtml>
               </documentation>
             </variable>
             <variable name="M3_ActualFreqHz">
@@ -2505,6 +2513,7 @@ IF NOT Enable THEN
     Machine     := HwReal.Machine;
     // 🔌 Lien externe M3 coupé explicitement : socket fermé, état de liaison retombé.
     instSimTranslationExtLink(Enable := FALSE);
+    instSimJoystick(Enable := FALSE);
     M3LinkReady   := FALSE;
     M3LinkTimeout := FALSE;
     M3LinkInvalid := FALSE;
@@ -2896,8 +2905,11 @@ END_IF;
 
 {region "§4 Simulation operateur joystick"}
 // ── 3. MODÈLE OPÉRATEUR / JOYSTICK ───────────────────────────────────────────
+SimJoystickManualNeutral := (SimJoystickRawX = 5000) AND (SimJoystickRawY = 5000);
+SimJoystickGesturePermit := SimJoystickManualNeutral AND NOT SimJoystickRawButton;
 instSimJoystick(
     Enable              := TRUE,
+    GesturePermit       := SimJoystickGesturePermit,
     NeutralRaw          := 5000,
     MaxRaw              := 10000,
     BtnLeft_Rev_TREMIE  := SimJoystickLeft_Rev_TREMIE_Active,
@@ -2909,27 +2921,18 @@ instSimJoystick(
     CycleTimeS          := 0.010
 );
 
-// Les boutons directionnels simplifient les essais : une commande unique impose
-// une butée d'axe ; aucune commande ou une combinaison reste au neutre / stimulus avancé.
-// Le modèle dynamique (montée/retombée/bagotement) pilote RawX/RawY dès qu'un bouton est actif.
-SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeft_Rev_TREMIE_Active)
-                           + BOOL_TO_INT(SimJoystickRight_Fwd_MAINT_Active)
-                           + BOOL_TO_INT(SimJoystickFwd_Up_Close_Active)
-                           + BOOL_TO_INT(SimJoystickRev_Down_Open_Active);
-IF (SimJoystickDirectionCount &gt;= 1) OR instSimJoystick.ReturningActive THEN
-    // Bouton(s) actif(s) OU retour dynamique en cours (retombée/bagotement) → sortie du modèle.
-    // (≥2 boutons : le modèle gère lui-même le neutre — pas de diagonale implicite.)
+// Une seule source possede les trois signaux : aucun melange bouton/axes.
+// La propriete automatique persiste au retour et si un stimulus manuel est en conflit.
+IF instSimJoystick.ModelActive THEN
     Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
     Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
+    Operator.JoyBtnRaw := instSimJoystick.RawButton;
 ELSE
     // Modèle au repos → stimulus analogique avancé (mode « sans bouton »).
     Operator.JoyXRaw_ANA1 := SimJoystickRawX;
     Operator.JoyYRaw_ANA2 := SimJoystickRawY;
+    Operator.JoyBtnRaw := SimJoystickRawButton;
 END_IF;
-
-// Homme-mort : stimulus brut amont. En simulation avec boutons directionnels actifs,
-// l'appui homme-mort est automatiquement inclus pour faciliter les essais sur banc.
-Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount &gt; 0);
 
 Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
 Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
@@ -3098,6 +3101,39 @@ Done := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — 10 ms</xhtml>
               </documentation>
             </variable>
+            <variable name="GesturePermit">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Stimuli manuels au repos avant un geste automatique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Appui bouton avant debattement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ButtonReleaseDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Maintien bouton apres debut debattement</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawX">
@@ -3121,7 +3157,15 @@ Done := TRUE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Homme-mort brut = un bouton directionnel actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Appui armement simule, relache pendant le maintien du manche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModelActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Propriete exclusive des trois entrees brutes pendant le geste et le retour</xhtml>
               </documentation>
             </variable>
             <variable name="ReturningActive">
@@ -3134,6 +3178,73 @@ Done := TRUE;
             </variable>
           </outputVars>
           <localVars>
+            <variable name="instArmTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Maintien armement avant debattement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instButtonReleaseTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Relachement bouton apres debut debattement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="GestureStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Attente relachement, disponible, appui, mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction unique demandee, 0 si aucune ou conflit</xhtml>
+              </documentation>
+            </variable>
+            <variable name="GestureDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction memorisee au nouvel appui</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeflectionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debattement admis pour le geste courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestMatchesGesture">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction demandee identique au geste</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimingValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Parametres dynamiques strictement positifs</xhtml>
+              </documentation>
+            </variable>
             <variable name="FirstCycle">
               <type>
                 <BOOL />
@@ -3247,6 +3358,94 @@ Done := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accélération de l'oscillateur</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_GESTURE_WAIT_RELEASE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Relachement complet et retour neutre requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_GESTURE_READY">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Nouveau geste disponible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_GESTURE_ARM">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Appui armement, manche neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_GESTURE_MOVE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Manche deplace, bouton ensuite relache</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DIRECTION_LEFT">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande X negatif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DIRECTION_RIGHT">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande X positif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DIRECTION_FORWARD">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande Y positif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DIRECTION_REVERSE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande Y negatif</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_ST_IDLE">
               <type>
                 <INT />
@@ -3337,38 +3536,13 @@ Done := TRUE;
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
-   ───────────────────────────────────────────────────────────────
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧪 FB_Sim_Joystick — Simulation des entrees brutes joystick (bus CAN hors ligne)
+   🎯 Rôle : reproduire un geste operateur depuis un bouton directionnel.
+   Appui armement, debattement, relachement armement, retour dynamique.
+   Aucun etat arme produit ; permis et armement restent au joystick reel.
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
-   🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
-      (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
-      permanence — un vrai contournement de sécurité). Ici, on simule les
-      ENTRÉES BRUTES du capteur (`RawX`/`RawY`/`RawButton`) : le homme-mort réel
-      de `FB_Joystick` reste pleinement actif et doit toujours être "actionné"
-      (forcer `RawButton` en instance CODESYS) pour armer — comportement
-      métier testé pour de vrai, pas contourné.
-   🕹️ Comportement dynamique (conception validée) :
-      - Ascending : bouton actif → `RawX`/`RawY` monte de `NeutralRaw` vers la cible
-        (0 ou `MaxRaw`) en `RiseTimeS`, avec un bruit pseudo-aléatoire léger.
-      - Dépassement (`OvershootActive`) : la cible de montée DÉPASSE la butée
-        (MaxRaw+AMT ou 0−AMT) → déclenche le défaut capteur hors plage.
-      - Retombée : bouton relâché → descente LINÉAIRE en `FallTimeMs` vers le neutre.
-      - Bagotement (`BagotementActive`) : au retour, petit balancement de quelques %
-        autour du neutre avant de se stabiliser.
-   📥 Enable        : simulation active (SimulationModeActive AND NOT BusJoystickSignalIsReal)
-   📥 NeutralRaw    : valeur brute simulée au repos (voir GVL_Simulation.TstJoystickForceNeutralRaw)
-   📥 MaxRaw        : valeur brute simulée à fond (voir GVL_Simulation.TstJoystickForceMaxRaw)
-   📥 Btn*          : boutons directionnels (1 seul impose une butée d'axe ; 0 ou ≥2 = neutre)
-   📥 OvershootActive : bagotement au retour (test mouvement parasite)
-   📥 RiseTimeS / FallTimeMs / CycleTimeS : dynamique temporelle (pattern FB_Sim_Encoder)
-   📤 RawX/RawY     : valeurs brutes dynamiques (neutre = NeutralRaw)
-   📤 RawButton     : homme-mort brut = un bouton directionnel actif
-   💡 Note d'application : en vue instance CODESYS, forcer `RawX`/`RawY` à `MaxRaw` (ou une
-      valeur intermédiaire) pour simuler un débattement, et `RawButton` à `TRUE` pour simuler
-      l'appui homme-mort — exactement comme on forcerait le vrai capteur.
-   ═══════════════════════════════════════════════════════════════
+   =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Joystick) ===</xhtml>
           </documentation>
         </interface>
@@ -3381,13 +3555,19 @@ Done := TRUE;
 {region "§1 Gate"}
 // 🔑 Initialise au neutre au premier cycle uniquement ; ensuite RawX/RawY sont pilotés
 // dynamiquement par les boutons. Quand la simulation est coupée, on revient au neutre.
-IF NOT Enable THEN
+TimingValid := (RiseTimeS &gt; 0.0) AND (CycleTimeS &gt; 0.0) AND (FallTimeMs &gt; T#0MS);
+IF NOT Enable OR NOT TimingValid THEN
     FirstCycle := TRUE;
     State      := CST_ST_IDLE;
     RawX       := NeutralRaw;
     RawY       := NeutralRaw;
     RawButton  := FALSE;
     ReturningActive := FALSE; // 📊 Neutralisation : simulation inactive hors Enable
+    ModelActive := FALSE;
+    GestureStep := CST_GESTURE_WAIT_RELEASE;
+    GestureDirection := 0;
+    instArmTimer(IN := FALSE, PT := ArmHoldTime);
+    instButtonReleaseTimer(IN := FALSE, PT := ButtonReleaseDelay);
     RETURN;
 END_IF;
 {endregion}
@@ -3399,6 +3579,7 @@ IF FirstCycle THEN
     RawButton  := FALSE;
     State      := CST_ST_IDLE;
     FirstCycle := FALSE;
+    GestureStep := CST_GESTURE_WAIT_RELEASE;
 END_IF;
 {endregion}
 
@@ -3415,7 +3596,57 @@ Noise   := (RandCnt MOD 50) - 25;   // ±25 points (≈ ±0.5% de la course)
 // déclencher le défaut capteur hors plage (RawOutOfRange) — test du dépassement de valeur.
 BtnCount := BOOL_TO_INT(BtnLeft_Rev_TREMIE) + BOOL_TO_INT(BtnRight_Fwd_MAINT)
           + BOOL_TO_INT(BtnFwd_Up_Close) + BOOL_TO_INT(BtnRev_Down_Open);
+RequestedDirection := 0;
 IF BtnCount = 1 THEN
+    IF BtnLeft_Rev_TREMIE THEN RequestedDirection := CST_DIRECTION_LEFT;
+    ELSIF BtnRight_Fwd_MAINT THEN RequestedDirection := CST_DIRECTION_RIGHT;
+    ELSIF BtnFwd_Up_Close THEN RequestedDirection := CST_DIRECTION_FORWARD;
+    ELSE RequestedDirection := CST_DIRECTION_REVERSE;
+    END_IF;
+END_IF;
+
+// Un seul appui brut par geste ; aucun nouvel essai tant que l'IHM reste tenue.
+instArmTimer(IN := GestureStep = CST_GESTURE_ARM, PT := ArmHoldTime);
+instButtonReleaseTimer(IN := GestureStep = CST_GESTURE_MOVE, PT := ButtonReleaseDelay);
+DeflectionActive := FALSE;
+RawButton := FALSE;
+RequestMatchesGesture := (RequestedDirection = GestureDirection) AND (BtnCount = 1);
+IF BtnCount &gt; 0 THEN ModelActive := TRUE; END_IF;
+IF NOT GesturePermit THEN GestureStep := CST_GESTURE_WAIT_RELEASE; END_IF;
+
+IF GestureStep = CST_GESTURE_WAIT_RELEASE THEN
+        // Les boutons doivent etre relaches APRES stabilisation du retour.
+        IF (BtnCount = 0) AND (State = CST_ST_IDLE) AND GesturePermit THEN
+            GestureStep := CST_GESTURE_READY;
+            ModelActive := FALSE;
+        END_IF;
+ELSIF GestureStep = CST_GESTURE_READY THEN
+        IF BtnCount = 1 THEN
+            GestureDirection := RequestedDirection;
+            GestureStep := CST_GESTURE_ARM;
+            RawButton := TRUE;
+        ELSIF BtnCount &gt; 1 THEN
+            GestureStep := CST_GESTURE_WAIT_RELEASE;
+        END_IF;
+ELSIF GestureStep = CST_GESTURE_ARM THEN
+        IF NOT RequestMatchesGesture THEN
+            GestureStep := CST_GESTURE_WAIT_RELEASE;
+        ELSE
+            RawButton := TRUE;
+            IF instArmTimer.Q THEN GestureStep := CST_GESTURE_MOVE; END_IF;
+        END_IF;
+ELSIF GestureStep = CST_GESTURE_MOVE THEN
+        IF NOT RequestMatchesGesture THEN
+            GestureStep := CST_GESTURE_WAIT_RELEASE;
+        ELSE
+            DeflectionActive := TRUE;
+            RawButton := NOT instButtonReleaseTimer.Q;
+        END_IF;
+ELSE
+    GestureStep := CST_GESTURE_WAIT_RELEASE;
+END_IF;
+
+IF DeflectionActive THEN
     IF BtnLeft_Rev_TREMIE THEN
         IF OvershootActive THEN TargetX := 0 - CST_OVERSHOOT_AMT; ELSE TargetX := 0; END_IF;
         TargetY := NeutralRaw; ActiveAxis := 1;
@@ -3520,7 +3751,7 @@ END_IF;
 {endregion}
 
 {region "§8 Homme-mort brut + drapeau retour"}
-RawButton := BtnLeft_Rev_TREMIE OR BtnRight_Fwd_MAINT OR BtnFwd_Up_Close OR BtnRev_Down_Open;
+// RawButton est exclusivement produit par le sequenceur du geste (§4).
 // Drapeau "retour dynamique en cours" : TRUE si l'état est FALL ou OVERSHOOT (retombée/bagotement).
 // Permet à FB_SimBench d'émettre la sortie du modèle même après relâchement du bouton.
 ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
@@ -3531,6 +3762,846 @@ ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>a481952f-eb98-506a-b160-fd074635a746</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_Encoder" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active la simulation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens commandé avant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens commandé arrière</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepNumber">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier vitesse courant (1..5, 0 = arrêt)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Applique un preset (homing)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur brute à charger au preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedScaleFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Facteur fin de confort (défaut 1.0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoastDistanceM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Distance de roulis inertiel apres coupure des relais (m). 0 = arret net (defaut). &gt;0 = le treuil continue a vitesse palier 1 dans le dernier sens sur CoastDistanceM metres -&gt; modelise l'anticipation d'arret mecanique (ex. benne).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetLatencyCycles">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Nb cycles automate avant application du preset (referencement non instantane)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOffsetCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Front montant = applique TestOffsetPts (test banc)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOffsetPts">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Décalage signé à appliquer (points bruts)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Paramètres physiques du treuil (mêmes valeurs que FB_Encoder_Scale) + vitesse réelle.
+Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps.
+--&gt; [CFG] Vitesse palier 1 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse palier 5 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PointsPerRev">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="8192" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Résolution codeur (pts/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableM_PerRev">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Développement câble (m/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — MainTask 10 ms</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedReportTauS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Constante de temps 1er ordre du retour vitesse</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="RawPosOut">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Position brute simulée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawSpdOut">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse brute simulée (0x6031:01 en 0.1 RPM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CountSaturated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Comptage en butée de plage du modèle (saturation signalée)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="RawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Référence _SimEncoderRawPosM1/M2 (survit au reset froid)</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <localVars>
+            <variable name="Increment">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Points ajoutés par cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas borné (&gt;= 1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse simulée (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOffsetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front TestOffsetCmd</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant PresetCmd</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetPending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Preset en attente d'application (latence)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetCount">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Compteur cycles de latence restants</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IncrStep1">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Increment par cycle a vitesse palier 1 (pour le roulis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MovingDir">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier sens actif : +1 avant, -1 arriere, 0 arret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoastPtsLeft">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Roulis inertiel restant (points bruts)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse instantanee signee du modele position, avant filtrage retour</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReportedSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse rapportee filtree 1er ordre, publiee dans RawSpdOut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_CountTravelLimitPts">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1073741824" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Plage de comptage du modèle : le compteur brut est un entier SIGNÉ 32 bits (le conteneur
+UDINT n'est qu'un support d'échange, relu en DINT par toute la chaîne aval). La garde reste
+volontairement à la moitié de la plage signée (2^30 pts = 262 144 m de câble) : inatteignable
+en essai, elle interdit tout rebouclage silencieux si le modèle consommait toute sa plage.
+2^30 pts — demi-plage signée</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   📄 Spec composant : DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md
+   🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
+      Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
+      du métier machine.
+   🎯 Rôle : fait "compter" un codeur absolu comme si le treuil tournait
+      réellement, à partir des relais de sens commandés et du palier de vitesse courant.
+   📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
+   📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
+   📥 StepNumber  : palier vitesse courant (1..5) — ex. instWinchM1.StepNumber
+      Vitesse = interpolation linéaire : palier 1 → MinSpeedMps (1 m/s), palier 5 → MaxSpeedMps (2 m/s).
+   📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
+   📥 PresetValue : valeur brute à charger lors du preset
+   📥 SpeedScaleFactor : facteur fin de confort (réglable à chaud, sans recompiler). Défaut 1.0 = vitesse
+      réelle telle que définie par MinSpeedMps/MaxSpeedMps/PointsPerRev/CableM_PerRev/CycleTimeS.
+   📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
+      EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
+   🔒 Comptage brut : entier SIGNÉ 32 bits (le conteneur UDINT n'est qu'un support d'échange,
+      relu en DINT par toute la chaîne aval). Il franchit 0 sans jamais s'y figer ; la seule
+      borne est la plage de représentation, signalée par CountSaturated — jamais muette.
+   📤 CountSaturated : comptage en butée de plage du modèle (saturation signalée, vitesse purgée)
+   `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
+      (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
+      `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB. Un vrai codeur absolu physique
+      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate).
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Encoder) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
+
+{region "§1 Gate"}
+IF NOT Enable THEN
+    RawPosOut := RawPos;
+    // Comptage non evalue hors simulation : la saturation ne doit pas rester figee a TRUE.
+    CountSaturated := FALSE;
+    RETURN;
+END_IF;
+{endregion}
+
+{region "§2 Injection test"}
+// Injection test banc : VRAI saut de position (comme un glissement réel),
+// pour tester Concept 1 / Méca E ET le rattrapage joystick (voir GVL_Simulation bandeau).
+TestOffsetEdge(CLK := TestOffsetCmd);
+IF TestOffsetEdge.Q THEN
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + TestOffsetPts);
+END_IF;
+{endregion}
+
+{region "§3 Comptage"}
+// 🎚️ Vitesse simulée = interpolation linéaire du palier (palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps),
+// pas par pas de (Max−Min)/4. Palier 0 (arrêt) ramène au palier 1 mais aucun mouvement n'est
+// appliqué tant que RelayFwd/RelayRev = FALSE (section plus bas).
+EffStep  := MAX(StepNumber, 1);
+SpeedMps := MinSpeedMps + (INT_TO_REAL(EffStep) - 1.0) * ((MaxSpeedMps - MinSpeedMps) / 4.0);
+// Points par cycle = vitesse (m/s) × points par mètre × période tâche (s) × facteur confort.
+Increment := REAL_TO_UDINT(SpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
+// Increment "lent" (palier 1) : vitesse du roulis inertiel apres coupure des relais.
+IncrStep1 := REAL_TO_UDINT(MinSpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
+
+// Front du preset : lance la latence de referencement (le codeur réel n'est pas
+// instantane — il met PresetLatencyCycles cycles a se re-referencer apres le front).
+PresetEdge(CLK := PresetCmd);
+IF PresetEdge.Q THEN
+    PresetPending := TRUE;
+    PresetCount := PresetLatencyCycles;
+END_IF;
+
+// 📐 Le comptage brut est un entier SIGNÉ 32 bits : le conteneur UDINT n'est qu'un support
+// d'échange (toute la chaîne aval le relit via UDINT_TO_DINT : FB_Encoder_Scale, FB_Encoder_Homing).
+// Sa valeur 0 n'est donc PAS une butée mécanique — c'est un point de passage comme un autre, et
+// c'est la seule façon de rester fidèle à un codeur absolu, dont le zéro de comptage est arbitraire.
+// Aucune branche de comptage ne borne donc à un littéral : seule la garde de plage §3bis intervient,
+// et elle est signalée (CountSaturated).
+// Pendant l'attente du preset, la position brute est conservee (le codeur n'a pas encore re-reference).
+// Le mouvement est gelé pendant la latence, comme un codeur réel en cours de referencement.
+IF PresetPending THEN
+    IF PresetCount &gt; 0 THEN
+        PresetCount := PresetCount - 1;
+    ELSE
+        // Latence écoulée : applique la valeur cible du preset.
+        RawPos := PresetValue;
+        PresetPending := FALSE;
+    END_IF;
+    TargetSpeedMps := 0.0;
+ELSIF RelayFwd THEN
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(Increment));
+    MovingDir := 1;
+    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    TargetSpeedMps := SpeedMps;
+ELSIF RelayRev THEN
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Increment));
+    MovingDir := -1;
+    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    TargetSpeedMps := -SpeedMps;
+ELSE
+    // Relais coupes : roulis inertiel (anticipation d'arret mecanique). Le treuil
+    // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
+    IF (CoastPtsLeft &gt;= 1.0) AND (MovingDir &lt;&gt; 0) THEN
+        IF MovingDir = 1 THEN
+            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(IncrStep1));
+            TargetSpeedMps := MinSpeedMps;
+        ELSE
+            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(IncrStep1));
+            TargetSpeedMps := -MinSpeedMps;
+        END_IF;
+        CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
+    ELSE
+        MovingDir := 0;
+        CoastPtsLeft := 0.0;
+        TargetSpeedMps := 0.0;
+    END_IF;
+END_IF;
+{endregion}
+
+{region "§3bis Garde de plage de comptage"}
+// 🛑 SEULE borne du comptage : la plage de représentation signée. Elle est SIGNALÉE
+// (CountSaturated) et cohérente — une position bornée ne publie plus de vitesse de mouvement,
+// ce qui interdit la signature « position figée + vitesse non nulle + zéro défaut ».
+CountSaturated := FALSE;
+IF UDINT_TO_DINT(RawPos) &gt; CST_CountTravelLimitPts THEN
+    RawPos := DINT_TO_UDINT(CST_CountTravelLimitPts);
+    CountSaturated := TRUE;
+ELSIF UDINT_TO_DINT(RawPos) &lt; -CST_CountTravelLimitPts THEN
+    RawPos := DINT_TO_UDINT(-CST_CountTravelLimitPts);
+    CountSaturated := TRUE;
+END_IF;
+IF CountSaturated THEN
+    TargetSpeedMps := 0.0;
+END_IF;
+{endregion}
+
+{region "§4 Sortie"}
+RawPosOut := RawPos;
+// Retour vitesse rapporte (RawSpdOut) : 1er ordre vers TargetSpeedMps. SpeedReportTauS=0.0
+// -&gt; alpha=1 -&gt; saut instantane (comportement historique inchange).
+ReportedSpeedMps := ReportedSpeedMps
+    + (CycleTimeS / (SpeedReportTauS + CycleTimeS)) * (TargetSpeedMps - ReportedSpeedMps);
+// Formule inverse vitesse brute EtherCAT CoE (0.1 RPM) :
+// SpdValue = (V_mps * 60.0) / (0.1 * CableM_PerRev) = V_mps * 300.0 (sur tambour 2m)
+IF (CableM_PerRev &gt; 0.0) THEN
+    RawSpdOut := REAL_TO_DINT((ReportedSpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
+ELSE
+    RawSpdOut := 0;
+END_IF;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>526914c5-468f-5758-8161-f70e0fd85cca</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_Safety" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Activation de la simulation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimChainOkBit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimPhaseRotationOkBit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = phases réseau OK simulées ; FALSE = défaut rotation de phases injecté</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff_A">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Commande coupure canal A (TRUE = OK/fermé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff_B">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Commande coupure canal B (TRUE = OK/fermé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Requête coupure métier (TRUE = arrêt d'urgence)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArming">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Impulsion de réarmement (TRUE = pulse)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnEmergencyStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Force l'ouverture de la boucle (TRUE = bouton appuyé/défaut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestCutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Test de redondance en cours (canal A ou B coupé par le FB AU)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="SimChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Boucle AU simulée saine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimContactorOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contacteur simulé engagé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimPhaseRotationOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contrôleur de phases simulé : TRUE = phases saines (aucun défaut)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ContactorLatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mémorisation de l'auto-maintien du contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ChainOpenReq">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande brute d'ouverture de la chaîne (bit off / coup-de-poing / test / coupure)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ChainOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] État latche de la chaîne (TRUE = ouverte)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorEngageReq">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande d'engagement du contacteur (pulse ET chaîne saine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonChainOpen">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation d'ouverture de la chaîne (retombée relais)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonChainClose">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de fermeture de la chaîne (retombée relais)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonContactorEngage">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation d'engagement du contacteur (temps de collage bobine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonContactorDrop">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de retombée du contacteur (temps de décollage bobine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ChainOpenDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS PHYSIQUES SIMULÉES (compatibles séquence FB AU) ===
+⚠️ Doivent rester &lt; durées de la séquence FB AU (CST_TestDuration=200ms, CST_ArmingPulseDuration=1s,
+CST_ArmingConfirmTimeout=2s) pour que le test de redondance et la confirmation contacteur
+restent validés : ouverture/fermeture chaîne &lt; 200ms, engagement contacteur &lt; 1s.
+Temps de retombée relais AU (ouverture chaîne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ChainCloseDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de retombée relais AU (fermeture chaîne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ContactorEngageDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de collage bobine contacteur (engagement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ContactorDropDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de décollage bobine contacteur (retombée)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_Safety — Simulation de la chaîne d'AU et du contacteur de puissance
+   ───────────────────────────────────────────────────────────────
+   📥 Enable            : activation de la simulation (SimulationModeActive AND NOT SensorEmergencyStopChainIsReal)
+   📥 SimChainOkBit     : bit opérateur — TRUE = simuler la chaîne AU fermée ; FALSE = chaîne ouverte (non simulée)
+   📥 PowerCutOff_A     : demande de coupure PLC canal A (TRUE = OK/fermé) — conservé pour interface, non utilisé par SimChainOk
+   📥 PowerCutOff_B     : demande de coupure PLC canal B (TRUE = OK/fermé) — conservé pour interface, non utilisé par SimChainOk
+   📥 PowerCutOffRequest: requête de coupure métier (PowerCutOffRequest du FB AU) — TRUE = arrêt d'urgence (chaîne ouverte)
+   📥 EmergencyArming   : impulsion de réarmement (EmergencyArming_RQ)
+   📥 BtnEmergencyStop   : appui coup-de-poing AU (TRUE = boucle ouverte)
+   📥 TestCutActive     : test de redondance en cours (canal A ou B coupé par le FB AU)
+
+   📤 SimChainOk        : simulation de la boucle AU (fermée si SimChainOkBit, ouverte sur coup-de-poing/test/coupure)
+   📤 SimContactorOk    : simulation du contacteur engagé (PowerContactorEngaged)
+
+   ⚙️ MÉCANISME GRANULAIRE (contrôle opérateur de la chaîne AU) :
+      - `SimChainOkBit` pilote la chaîne : FALSE → chaîne OUVERTE (on ne peut pas armer) ;
+        TRUE → chaîne FERMÉE (le bouton Armable s'active, on arme, la séquence teste les sorties).
+      - Pendant le test de redondance (TestCutActive), la chaîne CLIGNOTE (s'ouvre pendant TEST_A/B,
+        se referme pendant RESTORE_A/B) puis revient à 1 — comme en réel.
+      - `PowerCutOffRequest` (coupure métier) ouvre la chaîne → ARRÊT D'URGENCE.
+      - `BtnEmergencyStop` (coup-de-poing) ouvre la chaîne.
+      - Le contacteur ne s'engage QUE pendant l'impulsion d'armement (EmergencyArming), avec une
+        temporisation d'engagement (CST_ContactorEngageDelay), puis s'auto-maintient tant que la
+        chaîne est saine ; il retombe (CST_ContactorDropDelay) dès que la chaîne s'ouvre.
+      - À la ré-entrée en simulation (Enable FALSE→TRUE), SimChainOkBit = FALSE → chaîne OUVERTE et
+        contacteur NON engagé (on n'a pas armé) — pas de faux « OK » immédiat.
+
+   🔒 NON-RÉGRESSION ARMEMENT (dépendance circulaire) :
+      - La chaîne n'est PAS fermée par défaut : elle est fermée UNIQUEMENT si l'opérateur pose
+        `SimChainOkBit`. Elle ne dépend PAS de PowerCutOff_A/B (qui sont dans le cercle) : le
+        réarmement après échec de test de redondance (RedundancyTestFailedCause laté → PowerCutOff_A=FALSE)
+        reste possible car la chaîne est maintenue fermée par le bit opérateur, pas par le PLC.
+      - L'ouverture « PLC coupe un canal » est représentée par TestCutActive (test redondance) et
+        PowerCutOffRequest (coupure métier) — jamais par PowerCutOff_A/B seuls.
+   ═══════════════════════════════════════════════════════════════
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+{region "§1 Gate"}
+IF NOT Enable THEN
+    SimChainOk     := FALSE;
+    SimContactorOk := FALSE;
+    SimPhaseRotationOk := FALSE;
+    ContactorLatch := FALSE;
+    ChainOpen      := TRUE; // Chaîne ouverte par défaut à la ré-entrée (on n'a pas armé)
+    ChainOpenReq   := FALSE;
+    ContactorEngageReq := FALSE;
+    TonChainOpen(IN := FALSE);
+    TonChainClose(IN := FALSE);
+    TonContactorEngage(IN := FALSE);
+    TonContactorDrop(IN := FALSE);
+    RETURN;
+END_IF;
+{endregion}
+
+{region "§2 Chaîne AU (contrôle granulaire + dynamique)"}
+// 1. La chaîne AU est saine si l'opérateur la simule fermée (SimChainOkBit = TRUE) ET si aucun
+//    événement ne l'ouvre : coup-de-poing (BtnEmergencyStop), test de redondance (TestCutActive),
+//    coupure métier (PowerCutOffRequest).
+// 🔧 DEADLOCK SIMULATION (corrigé) : la chaîne n'est PAS fermée par défaut ni dépendante de
+//    PowerCutOff_A/B (qui sont dans le cercle). Elle est fermée UNIQUEMENT par le bit opérateur
+//    `SimChainOkBit`. Le réarmement après échec de test de redondance (RedundancyTestFailedCause laté
+//    → PowerCutOff_A=FALSE) reste possible car la chaîne est maintenue fermée par le bit, pas par
+//    le PLC. Hors simulation (Enable=FALSE), la chaîne reste pilotée par le matériel via le repli
+//    HwReal (PRG_02 §1/§2) — aucune régression sécurité réelle.
+// 🆕 DYNAMIQUE : l'ouverture/fermeture suit une temporisation (CST_ChainOpenDelay / CST_ChainCloseDelay)
+//    qui simule le temps de retombée des relais AU, tout en restant &lt; 200ms (CST_TestDuration) pour
+//    ne pas fausser le test de redondance. Pendant le test, la chaîne clignote (s'ouvre en TEST_A/B,
+//    se referme en RESTORE_A/B) puis revient à 1.
+ChainOpenReq := (NOT SimChainOkBit) OR BtnEmergencyStop OR TestCutActive OR PowerCutOffRequest;
+
+// Temporisation d'ouverture : la chaîne s'ouvre après CST_ChainOpenDelay de demande soutenue
+TonChainOpen(IN := ChainOpenReq, PT := CST_ChainOpenDelay);
+// Temporisation de fermeture : la chaîne se ferme après CST_ChainCloseDelay d'absence de demande
+TonChainClose(IN := NOT ChainOpenReq, PT := CST_ChainCloseDelay);
+
+// Latch de la chaîne avec temporisations (défaut = ouverte à la ré-entrée)
+IF ChainOpenReq THEN
+    IF TonChainOpen.Q THEN
+        ChainOpen := TRUE;
+    END_IF;
+ELSE
+    IF TonChainClose.Q THEN
+        ChainOpen := FALSE;
+    END_IF;
+END_IF;
+
+SimChainOk := NOT ChainOpen;
+{endregion}
+
+{region "§3 Auto-maintien contacteur (dynamique réaliste)"}
+// 2. Logique d'auto-maintien (latch) du contacteur avec priorité à la coupure.
+// 🆕 DYNAMIQUE : le contacteur ne s'engage QUE pendant l'impulsion d'armement (EmergencyArming)
+//    tant que la chaîne est saine, après CST_ContactorEngageDelay (temps de collage bobine), puis
+//    s'auto-maintient. Il retombe après CST_ContactorDropDelay (temps de décollage bobine) dès que
+//    la chaîne s'ouvre — comme une bobine réelle qui décolle sans alimentation. Ces temporisations
+//    restent &lt; CST_ArmingPulseDuration (1s) et CST_ArmingConfirmTimeout (2s) pour que la
+//    confirmation contacteur reste validée. À la ré-entrée en simulation, le contacteur est NON
+//    engagé (on n'a pas armé).
+ContactorEngageReq := EmergencyArming AND SimChainOk;
+
+// Temporisation d'engagement : le contacteur se colle après CST_ContactorEngageDelay de pulse soutenu
+TonContactorEngage(IN := ContactorEngageReq, PT := CST_ContactorEngageDelay);
+// Temporisation de retombée : le contacteur décolle après CST_ContactorDropDelay de chaîne ouverte
+TonContactorDrop(IN := NOT SimChainOk, PT := CST_ContactorDropDelay);
+
+// Latch du contacteur avec priorité à la coupure (retombée &gt; engagement)
+IF NOT SimChainOk THEN
+    IF TonContactorDrop.Q THEN
+        ContactorLatch := FALSE;
+    END_IF;
+ELSIF ContactorEngageReq THEN
+    IF TonContactorEngage.Q THEN
+        ContactorLatch := TRUE;
+    END_IF;
+END_IF;
+
+// Recopie vers la sortie
+SimContactorOk := ContactorLatch;
+
+// Contrôleur de phases : simple propagation du bit opérateur (TRUE = sain).
+// Inopérant hors simulation (le banc ne publie l'image machine que sous Enable).
+SimPhaseRotationOk := SimPhaseRotationOkBit;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>9ab5b810-a798-5ced-ad58-9e4d01ab66eb</ObjectId>
           </data>
         </addData>
       </pou>
@@ -5439,846 +6510,6 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>cb6a7d98-36ae-5c14-9891-d5451c6e7dd0</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_Sim_Encoder" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active la simulation</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RelayFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens commandé avant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RelayRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens commandé arrière</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepNumber">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier vitesse courant (1..5, 0 = arrêt)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Applique un preset (homing)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetValue">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur brute à charger au preset</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedScaleFactor">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Facteur fin de confort (défaut 1.0)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CoastDistanceM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Distance de roulis inertiel apres coupure des relais (m). 0 = arret net (defaut). &gt;0 = le treuil continue a vitesse palier 1 dans le dernier sens sur CoastDistanceM metres -&gt; modelise l'anticipation d'arret mecanique (ex. benne).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetLatencyCycles">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Nb cycles automate avant application du preset (referencement non instantane)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TestOffsetCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Front montant = applique TestOffsetPts (test banc)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TestOffsetPts">
-              <type>
-                <DINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Décalage signé à appliquer (points bruts)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MinSpeedMps">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Paramètres physiques du treuil (mêmes valeurs que FB_Encoder_Scale) + vitesse réelle.
-Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps.
---&gt; [CFG] Vitesse palier 1 (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaxSpeedMps">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse palier 5 (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PointsPerRev">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="8192" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Résolution codeur (pts/tour)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CableM_PerRev">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Développement câble (m/tour)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CycleTimeS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — MainTask 10 ms</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedReportTauS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Constante de temps 1er ordre du retour vitesse</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="RawPosOut">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Position brute simulée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawSpdOut">
-              <type>
-                <DINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse brute simulée (0x6031:01 en 0.1 RPM)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CountSaturated">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Comptage en butée de plage du modèle (saturation signalée)</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <inOutVars>
-            <variable name="RawPos">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Référence _SimEncoderRawPosM1/M2 (survit au reset froid)</xhtml>
-              </documentation>
-            </variable>
-          </inOutVars>
-          <localVars>
-            <variable name="Increment">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Points ajoutés par cycle</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EffStep">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas borné (&gt;= 1)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedMps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse simulée (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TestOffsetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front TestOffsetCmd</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant PresetCmd</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetPending">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Preset en attente d'application (latence)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetCount">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Compteur cycles de latence restants</xhtml>
-              </documentation>
-            </variable>
-            <variable name="IncrStep1">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Increment par cycle a vitesse palier 1 (pour le roulis)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MovingDir">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier sens actif : +1 avant, -1 arriere, 0 arret</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CoastPtsLeft">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Roulis inertiel restant (points bruts)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TargetSpeedMps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse instantanee signee du modele position, avant filtrage retour</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ReportedSpeedMps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse rapportee filtree 1er ordre, publiee dans RawSpdOut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_CountTravelLimitPts">
-              <type>
-                <DINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1073741824" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Plage de comptage du modèle : le compteur brut est un entier SIGNÉ 32 bits (le conteneur
-UDINT n'est qu'un support d'échange, relu en DINT par toute la chaîne aval). La garde reste
-volontairement à la moitié de la plage signée (2^30 pts = 262 144 m de câble) : inatteignable
-en essai, elle interdit tout rebouclage silencieux si le modèle consommait toute sa plage.
-2^30 pts — demi-plage signée</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   📄 Spec composant : DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md
-   🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
-      Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
-      du métier machine.
-   🎯 Rôle : fait "compter" un codeur absolu comme si le treuil tournait
-      réellement, à partir des relais de sens commandés et du palier de vitesse courant.
-   📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
-   📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
-   📥 StepNumber  : palier vitesse courant (1..5) — ex. instWinchM1.StepNumber
-      Vitesse = interpolation linéaire : palier 1 → MinSpeedMps (1 m/s), palier 5 → MaxSpeedMps (2 m/s).
-   📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
-   📥 PresetValue : valeur brute à charger lors du preset
-   📥 SpeedScaleFactor : facteur fin de confort (réglable à chaud, sans recompiler). Défaut 1.0 = vitesse
-      réelle telle que définie par MinSpeedMps/MaxSpeedMps/PointsPerRev/CableM_PerRev/CycleTimeS.
-   📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
-      EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
-   🔒 Comptage brut : entier SIGNÉ 32 bits (le conteneur UDINT n'est qu'un support d'échange,
-      relu en DINT par toute la chaîne aval). Il franchit 0 sans jamais s'y figer ; la seule
-      borne est la plage de représentation, signalée par CountSaturated — jamais muette.
-   📤 CountSaturated : comptage en butée de plage du modèle (saturation signalée, vitesse purgée)
-   `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
-      (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
-      `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB. Un vrai codeur absolu physique
-      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate).
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Encoder) ===</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
-
-{region "§1 Gate"}
-IF NOT Enable THEN
-    RawPosOut := RawPos;
-    // Comptage non evalue hors simulation : la saturation ne doit pas rester figee a TRUE.
-    CountSaturated := FALSE;
-    RETURN;
-END_IF;
-{endregion}
-
-{region "§2 Injection test"}
-// Injection test banc : VRAI saut de position (comme un glissement réel),
-// pour tester Concept 1 / Méca E ET le rattrapage joystick (voir GVL_Simulation bandeau).
-TestOffsetEdge(CLK := TestOffsetCmd);
-IF TestOffsetEdge.Q THEN
-    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + TestOffsetPts);
-END_IF;
-{endregion}
-
-{region "§3 Comptage"}
-// 🎚️ Vitesse simulée = interpolation linéaire du palier (palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps),
-// pas par pas de (Max−Min)/4. Palier 0 (arrêt) ramène au palier 1 mais aucun mouvement n'est
-// appliqué tant que RelayFwd/RelayRev = FALSE (section plus bas).
-EffStep  := MAX(StepNumber, 1);
-SpeedMps := MinSpeedMps + (INT_TO_REAL(EffStep) - 1.0) * ((MaxSpeedMps - MinSpeedMps) / 4.0);
-// Points par cycle = vitesse (m/s) × points par mètre × période tâche (s) × facteur confort.
-Increment := REAL_TO_UDINT(SpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
-// Increment "lent" (palier 1) : vitesse du roulis inertiel apres coupure des relais.
-IncrStep1 := REAL_TO_UDINT(MinSpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
-
-// Front du preset : lance la latence de referencement (le codeur réel n'est pas
-// instantane — il met PresetLatencyCycles cycles a se re-referencer apres le front).
-PresetEdge(CLK := PresetCmd);
-IF PresetEdge.Q THEN
-    PresetPending := TRUE;
-    PresetCount := PresetLatencyCycles;
-END_IF;
-
-// 📐 Le comptage brut est un entier SIGNÉ 32 bits : le conteneur UDINT n'est qu'un support
-// d'échange (toute la chaîne aval le relit via UDINT_TO_DINT : FB_Encoder_Scale, FB_Encoder_Homing).
-// Sa valeur 0 n'est donc PAS une butée mécanique — c'est un point de passage comme un autre, et
-// c'est la seule façon de rester fidèle à un codeur absolu, dont le zéro de comptage est arbitraire.
-// Aucune branche de comptage ne borne donc à un littéral : seule la garde de plage §3bis intervient,
-// et elle est signalée (CountSaturated).
-// Pendant l'attente du preset, la position brute est conservee (le codeur n'a pas encore re-reference).
-// Le mouvement est gelé pendant la latence, comme un codeur réel en cours de referencement.
-IF PresetPending THEN
-    IF PresetCount &gt; 0 THEN
-        PresetCount := PresetCount - 1;
-    ELSE
-        // Latence écoulée : applique la valeur cible du preset.
-        RawPos := PresetValue;
-        PresetPending := FALSE;
-    END_IF;
-    TargetSpeedMps := 0.0;
-ELSIF RelayFwd THEN
-    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(Increment));
-    MovingDir := 1;
-    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
-    TargetSpeedMps := SpeedMps;
-ELSIF RelayRev THEN
-    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Increment));
-    MovingDir := -1;
-    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
-    TargetSpeedMps := -SpeedMps;
-ELSE
-    // Relais coupes : roulis inertiel (anticipation d'arret mecanique). Le treuil
-    // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
-    IF (CoastPtsLeft &gt;= 1.0) AND (MovingDir &lt;&gt; 0) THEN
-        IF MovingDir = 1 THEN
-            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(IncrStep1));
-            TargetSpeedMps := MinSpeedMps;
-        ELSE
-            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(IncrStep1));
-            TargetSpeedMps := -MinSpeedMps;
-        END_IF;
-        CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
-    ELSE
-        MovingDir := 0;
-        CoastPtsLeft := 0.0;
-        TargetSpeedMps := 0.0;
-    END_IF;
-END_IF;
-{endregion}
-
-{region "§3bis Garde de plage de comptage"}
-// 🛑 SEULE borne du comptage : la plage de représentation signée. Elle est SIGNALÉE
-// (CountSaturated) et cohérente — une position bornée ne publie plus de vitesse de mouvement,
-// ce qui interdit la signature « position figée + vitesse non nulle + zéro défaut ».
-CountSaturated := FALSE;
-IF UDINT_TO_DINT(RawPos) &gt; CST_CountTravelLimitPts THEN
-    RawPos := DINT_TO_UDINT(CST_CountTravelLimitPts);
-    CountSaturated := TRUE;
-ELSIF UDINT_TO_DINT(RawPos) &lt; -CST_CountTravelLimitPts THEN
-    RawPos := DINT_TO_UDINT(-CST_CountTravelLimitPts);
-    CountSaturated := TRUE;
-END_IF;
-IF CountSaturated THEN
-    TargetSpeedMps := 0.0;
-END_IF;
-{endregion}
-
-{region "§4 Sortie"}
-RawPosOut := RawPos;
-// Retour vitesse rapporte (RawSpdOut) : 1er ordre vers TargetSpeedMps. SpeedReportTauS=0.0
-// -&gt; alpha=1 -&gt; saut instantane (comportement historique inchange).
-ReportedSpeedMps := ReportedSpeedMps
-    + (CycleTimeS / (SpeedReportTauS + CycleTimeS)) * (TargetSpeedMps - ReportedSpeedMps);
-// Formule inverse vitesse brute EtherCAT CoE (0.1 RPM) :
-// SpdValue = (V_mps * 60.0) / (0.1 * CableM_PerRev) = V_mps * 300.0 (sur tambour 2m)
-IF (CableM_PerRev &gt; 0.0) THEN
-    RawSpdOut := REAL_TO_DINT((ReportedSpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
-ELSE
-    RawSpdOut := 0;
-END_IF;
-{endregion}
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>526914c5-468f-5758-8161-f70e0fd85cca</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_Sim_Safety" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Activation de la simulation</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SimChainOkBit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SimPhaseRotationOkBit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = phases réseau OK simulées ; FALSE = défaut rotation de phases injecté</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerCutOff_A">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Commande coupure canal A (TRUE = OK/fermé)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerCutOff_B">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Commande coupure canal B (TRUE = OK/fermé)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerCutOffRequest">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Requête coupure métier (TRUE = arrêt d'urgence)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArming">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Impulsion de réarmement (TRUE = pulse)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnEmergencyStop">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Force l'ouverture de la boucle (TRUE = bouton appuyé/défaut)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TestCutActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Test de redondance en cours (canal A ou B coupé par le FB AU)</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="SimChainOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Boucle AU simulée saine</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SimContactorOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contacteur simulé engagé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SimPhaseRotationOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contrôleur de phases simulé : TRUE = phases saines (aucun défaut)</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="ContactorLatch">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mémorisation de l'auto-maintien du contacteur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ChainOpenReq">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande brute d'ouverture de la chaîne (bit off / coup-de-poing / test / coupure)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ChainOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] État latche de la chaîne (TRUE = ouverte)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ContactorEngageReq">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande d'engagement du contacteur (pulse ET chaîne saine)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonChainOpen">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation d'ouverture de la chaîne (retombée relais)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonChainClose">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de fermeture de la chaîne (retombée relais)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonContactorEngage">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation d'engagement du contacteur (temps de collage bobine)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonContactorDrop">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de retombée du contacteur (temps de décollage bobine)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ChainOpenDelay">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#50ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS PHYSIQUES SIMULÉES (compatibles séquence FB AU) ===
-⚠️ Doivent rester &lt; durées de la séquence FB AU (CST_TestDuration=200ms, CST_ArmingPulseDuration=1s,
-CST_ArmingConfirmTimeout=2s) pour que le test de redondance et la confirmation contacteur
-restent validés : ouverture/fermeture chaîne &lt; 200ms, engagement contacteur &lt; 1s.
-Temps de retombée relais AU (ouverture chaîne)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ChainCloseDelay">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#50ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de retombée relais AU (fermeture chaîne)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ContactorEngageDelay">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#100ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de collage bobine contacteur (engagement)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ContactorDropDelay">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#50ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de décollage bobine contacteur (retombée)</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Safety — Simulation de la chaîne d'AU et du contacteur de puissance
-   ───────────────────────────────────────────────────────────────
-   📥 Enable            : activation de la simulation (SimulationModeActive AND NOT SensorEmergencyStopChainIsReal)
-   📥 SimChainOkBit     : bit opérateur — TRUE = simuler la chaîne AU fermée ; FALSE = chaîne ouverte (non simulée)
-   📥 PowerCutOff_A     : demande de coupure PLC canal A (TRUE = OK/fermé) — conservé pour interface, non utilisé par SimChainOk
-   📥 PowerCutOff_B     : demande de coupure PLC canal B (TRUE = OK/fermé) — conservé pour interface, non utilisé par SimChainOk
-   📥 PowerCutOffRequest: requête de coupure métier (PowerCutOffRequest du FB AU) — TRUE = arrêt d'urgence (chaîne ouverte)
-   📥 EmergencyArming   : impulsion de réarmement (EmergencyArming_RQ)
-   📥 BtnEmergencyStop   : appui coup-de-poing AU (TRUE = boucle ouverte)
-   📥 TestCutActive     : test de redondance en cours (canal A ou B coupé par le FB AU)
-
-   📤 SimChainOk        : simulation de la boucle AU (fermée si SimChainOkBit, ouverte sur coup-de-poing/test/coupure)
-   📤 SimContactorOk    : simulation du contacteur engagé (PowerContactorEngaged)
-
-   ⚙️ MÉCANISME GRANULAIRE (contrôle opérateur de la chaîne AU) :
-      - `SimChainOkBit` pilote la chaîne : FALSE → chaîne OUVERTE (on ne peut pas armer) ;
-        TRUE → chaîne FERMÉE (le bouton Armable s'active, on arme, la séquence teste les sorties).
-      - Pendant le test de redondance (TestCutActive), la chaîne CLIGNOTE (s'ouvre pendant TEST_A/B,
-        se referme pendant RESTORE_A/B) puis revient à 1 — comme en réel.
-      - `PowerCutOffRequest` (coupure métier) ouvre la chaîne → ARRÊT D'URGENCE.
-      - `BtnEmergencyStop` (coup-de-poing) ouvre la chaîne.
-      - Le contacteur ne s'engage QUE pendant l'impulsion d'armement (EmergencyArming), avec une
-        temporisation d'engagement (CST_ContactorEngageDelay), puis s'auto-maintient tant que la
-        chaîne est saine ; il retombe (CST_ContactorDropDelay) dès que la chaîne s'ouvre.
-      - À la ré-entrée en simulation (Enable FALSE→TRUE), SimChainOkBit = FALSE → chaîne OUVERTE et
-        contacteur NON engagé (on n'a pas armé) — pas de faux « OK » immédiat.
-
-   🔒 NON-RÉGRESSION ARMEMENT (dépendance circulaire) :
-      - La chaîne n'est PAS fermée par défaut : elle est fermée UNIQUEMENT si l'opérateur pose
-        `SimChainOkBit`. Elle ne dépend PAS de PowerCutOff_A/B (qui sont dans le cercle) : le
-        réarmement après échec de test de redondance (RedundancyTestFailedCause laté → PowerCutOff_A=FALSE)
-        reste possible car la chaîne est maintenue fermée par le bit opérateur, pas par le PLC.
-      - L'ouverture « PLC coupe un canal » est représentée par TestCutActive (test redondance) et
-        PowerCutOffRequest (coupure métier) — jamais par PowerCutOff_A/B seuls.
-   ═══════════════════════════════════════════════════════════════
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION ===
-{region "§1 Gate"}
-IF NOT Enable THEN
-    SimChainOk     := FALSE;
-    SimContactorOk := FALSE;
-    SimPhaseRotationOk := FALSE;
-    ContactorLatch := FALSE;
-    ChainOpen      := TRUE; // Chaîne ouverte par défaut à la ré-entrée (on n'a pas armé)
-    ChainOpenReq   := FALSE;
-    ContactorEngageReq := FALSE;
-    TonChainOpen(IN := FALSE);
-    TonChainClose(IN := FALSE);
-    TonContactorEngage(IN := FALSE);
-    TonContactorDrop(IN := FALSE);
-    RETURN;
-END_IF;
-{endregion}
-
-{region "§2 Chaîne AU (contrôle granulaire + dynamique)"}
-// 1. La chaîne AU est saine si l'opérateur la simule fermée (SimChainOkBit = TRUE) ET si aucun
-//    événement ne l'ouvre : coup-de-poing (BtnEmergencyStop), test de redondance (TestCutActive),
-//    coupure métier (PowerCutOffRequest).
-// 🔧 DEADLOCK SIMULATION (corrigé) : la chaîne n'est PAS fermée par défaut ni dépendante de
-//    PowerCutOff_A/B (qui sont dans le cercle). Elle est fermée UNIQUEMENT par le bit opérateur
-//    `SimChainOkBit`. Le réarmement après échec de test de redondance (RedundancyTestFailedCause laté
-//    → PowerCutOff_A=FALSE) reste possible car la chaîne est maintenue fermée par le bit, pas par
-//    le PLC. Hors simulation (Enable=FALSE), la chaîne reste pilotée par le matériel via le repli
-//    HwReal (PRG_02 §1/§2) — aucune régression sécurité réelle.
-// 🆕 DYNAMIQUE : l'ouverture/fermeture suit une temporisation (CST_ChainOpenDelay / CST_ChainCloseDelay)
-//    qui simule le temps de retombée des relais AU, tout en restant &lt; 200ms (CST_TestDuration) pour
-//    ne pas fausser le test de redondance. Pendant le test, la chaîne clignote (s'ouvre en TEST_A/B,
-//    se referme en RESTORE_A/B) puis revient à 1.
-ChainOpenReq := (NOT SimChainOkBit) OR BtnEmergencyStop OR TestCutActive OR PowerCutOffRequest;
-
-// Temporisation d'ouverture : la chaîne s'ouvre après CST_ChainOpenDelay de demande soutenue
-TonChainOpen(IN := ChainOpenReq, PT := CST_ChainOpenDelay);
-// Temporisation de fermeture : la chaîne se ferme après CST_ChainCloseDelay d'absence de demande
-TonChainClose(IN := NOT ChainOpenReq, PT := CST_ChainCloseDelay);
-
-// Latch de la chaîne avec temporisations (défaut = ouverte à la ré-entrée)
-IF ChainOpenReq THEN
-    IF TonChainOpen.Q THEN
-        ChainOpen := TRUE;
-    END_IF;
-ELSE
-    IF TonChainClose.Q THEN
-        ChainOpen := FALSE;
-    END_IF;
-END_IF;
-
-SimChainOk := NOT ChainOpen;
-{endregion}
-
-{region "§3 Auto-maintien contacteur (dynamique réaliste)"}
-// 2. Logique d'auto-maintien (latch) du contacteur avec priorité à la coupure.
-// 🆕 DYNAMIQUE : le contacteur ne s'engage QUE pendant l'impulsion d'armement (EmergencyArming)
-//    tant que la chaîne est saine, après CST_ContactorEngageDelay (temps de collage bobine), puis
-//    s'auto-maintient. Il retombe après CST_ContactorDropDelay (temps de décollage bobine) dès que
-//    la chaîne s'ouvre — comme une bobine réelle qui décolle sans alimentation. Ces temporisations
-//    restent &lt; CST_ArmingPulseDuration (1s) et CST_ArmingConfirmTimeout (2s) pour que la
-//    confirmation contacteur reste validée. À la ré-entrée en simulation, le contacteur est NON
-//    engagé (on n'a pas armé).
-ContactorEngageReq := EmergencyArming AND SimChainOk;
-
-// Temporisation d'engagement : le contacteur se colle après CST_ContactorEngageDelay de pulse soutenu
-TonContactorEngage(IN := ContactorEngageReq, PT := CST_ContactorEngageDelay);
-// Temporisation de retombée : le contacteur décolle après CST_ContactorDropDelay de chaîne ouverte
-TonContactorDrop(IN := NOT SimChainOk, PT := CST_ContactorDropDelay);
-
-// Latch du contacteur avec priorité à la coupure (retombée &gt; engagement)
-IF NOT SimChainOk THEN
-    IF TonContactorDrop.Q THEN
-        ContactorLatch := FALSE;
-    END_IF;
-ELSIF ContactorEngageReq THEN
-    IF TonContactorEngage.Q THEN
-        ContactorLatch := TRUE;
-    END_IF;
-END_IF;
-
-// Recopie vers la sortie
-SimContactorOk := ContactorLatch;
-
-// Contrôleur de phases : simple propagation du bit opérateur (TRUE = sain).
-// Inopérant hors simulation (le banc ne publie l'image machine que sous Enable).
-SimPhaseRotationOk := SimPhaseRotationOkBit;
-{endregion}
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>9ab5b810-a798-5ced-ad58-9e4d01ab66eb</ObjectId>
           </data>
         </addData>
       </pou>
@@ -8332,10 +8563,10 @@ Ready := TRUE;
         <Folder Name="L_SIMULATION">
           <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
           <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
-          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
-          <Object Name="FB_Sim_Translation_ExtLink" ObjectId="cb6a7d98-36ae-5c14-9891-d5451c6e7dd0" />
           <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
           <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
+          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
+          <Object Name="FB_Sim_Translation_ExtLink" ObjectId="cb6a7d98-36ae-5c14-9891-d5451c6e7dd0" />
           <Object Name="FB_Sim_WinchElectrical" ObjectId="d4300e91-0ca0-50b0-9b21-524eed13dd0f" />
           <Object Name="ST_fbSim_Translation_ExtLink_Echo" ObjectId="942264b5-586e-54d2-baf3-aff3f43d06e6" />
           <Object Name="FB_Sim_PositionSensor" ObjectId="538b32eb-6dc2-59d5-8226-64383264fe4b" />
