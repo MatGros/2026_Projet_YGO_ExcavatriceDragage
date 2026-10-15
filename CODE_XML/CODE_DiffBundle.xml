@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-15T01:08:03.651778" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-15T01:08:03.651778">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-15T05:28:44.019475" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-15T05:28:44.019475">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3431,10 +3431,10 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.35" />
+                <simpleValue value="1.3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; ~0.35 = finit dans la bande ouvert/ferme malgre l'anticipation d'arret</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; 1.30 = finit a la butee ouverte</xhtml>
               </documentation>
             </variable>
             <variable name="SimTopPositionActive">
@@ -4030,6 +4030,39 @@ Volontairement NON cable par PRG_02 : se regle en ligne sur l'instance (instSimB
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Demi-largeur de la bande franc ouvert/fermé (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketOffsetOpen_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Butée mécanique benne OUVERTE (m, écart M2-M1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketOpenAnticipation_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Anticipation arrêt ouverture benne (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketAx15bOpenActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Étape AX15B active</xhtml>
+              </documentation>
+            </variable>
             <variable name="HwReal">
               <type>
                 <derived name="ST_HardwareImage" />
@@ -4528,10 +4561,50 @@ Constante locale (L_SIMULATION ne lit pas GVL_PERSISTENT) ; egalite verifiee par
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.35" />
+                <simpleValue value="1.3" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance de roulis M2 courante</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2EffectiveCoastDistance_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance appliquée au codeur M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2AutoOpenCoastArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fin d'ouverture automatique à simuler</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2OpenDistanceRemaining_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance restante à la butée ouverte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2OpenStopThreshold_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Seuil avec avance d'un scan d'acquisition</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ExpectedStepDistance_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Course codeur M2 du scan actif</xhtml>
               </documentation>
             </variable>
             <variable name="M2CoupledDescentActive">
@@ -4898,6 +4971,35 @@ IF M2CoupledDescentActive THEN
     M2EffectiveSpeedScaleFactor := SimEncoderSpeedFactor * MAX(0.0, SimM2CoupledDescentFactor);
 END_IF;
 
+// P02 consomme la mesure publiée au scan précédent. Reconstituer le déplacement
+// de ce scan évite un trou d'un cycle lors du seuil d'arrêt de FB_Bucket.
+M2ExpectedStepDistance_M := (1.0 + (INT_TO_REAL(MAX(M2_StepNumber, 1)) - 1.0) * 0.25)
+                            * MAX(0.0, SimEncoderSpeedFactor)
+                            * CST_SimBenchCycleTimeS;
+M2OpenStopThreshold_M := BucketOffsetOpen_M + MAX(0.0, BucketOpenAnticipation_M)
+                         + M2ExpectedStepDistance_M;
+
+// Armer le roulis long uniquement à l'approche du seuil d'ouverture AX15B.
+// Un jog manuel, un homing ou un arrêt ailleurs garde le roulis historique.
+IF NOT M2_RelayRev OR M2_RelayFwd THEN
+    M2AutoOpenCoastArmed := FALSE;
+ELSIF SimWinchCouplingModelActive AND BucketAx15bOpenActive
+      AND NOT M1_RelayFwd AND NOT M1_RelayRev
+      AND (M2_CablePos_M - M1_CablePos_M)
+          &lt;= M2OpenStopThreshold_M THEN
+    M2AutoOpenCoastArmed := TRUE;
+END_IF;
+
+// À l'arrêt anticipé automatique, le roulis couvre seulement l'écart restant
+// jusqu'à la butée ouverte : il ne sur-ouvre pas et ne modifie pas le jog manuel.
+M2EffectiveCoastDistance_M := M2_EffectiveCoastM;
+IF M2AutoOpenCoastArmed THEN
+    M2OpenDistanceRemaining_M := MAX(0.0, M2_CablePos_M - M1_CablePos_M
+                                          - BucketOffsetOpen_M - M2ExpectedStepDistance_M);
+    M2EffectiveCoastDistance_M := MIN(MAX(0.0, BucketOpenAnticipation_M),
+                                      M2OpenDistanceRemaining_M);
+END_IF;
+
 // Instance modèle codeur M2 (avec roulis et dispersion)
 instSimEncoderM2(
     Enable           := TRUE,
@@ -4907,7 +5009,7 @@ instSimEncoderM2(
     PresetCmd        := M2_PresetCmd,
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := M2EffectiveSpeedScaleFactor,
-    CoastDistanceM   := M2_EffectiveCoastM,
+    CoastDistanceM   := M2EffectiveCoastDistance_M,
     SpeedReportTauS  := WinchSpeedReportTauEffectiveS,
     TestOffsetCmd    := SimSyncDeviationInjectM2,
     TestOffsetPts    := M2_OffsetPts,
@@ -5241,784 +5343,6 @@ Done := TRUE;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_Sim_Joystick" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active la simulation</xhtml>
-              </documentation>
-            </variable>
-            <variable name="NeutralRaw">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="5000" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur brute au repos (neutre)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaxRaw">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="10000" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur brute à fond</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnLeft_Rev_TREMIE">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bouton gauche : X→0, Y→neutre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnRight_Fwd_MAINT">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bouton droite : X→MaxRaw, Y→neutre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnFwd_Up_Close">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bouton avant : X→neutre, Y→MaxRaw</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnRev_Down_Open">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bouton arrière : X→neutre, Y→0</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OvershootActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Dépassement de montée au-delà de 100% (défaut capteur hors plage)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BagotementActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bagotement au relâchement (petit balancement autour du neutre)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RiseTimeS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps de montée 0→100% (s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FallTimeMs">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#200MS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps de retombée 100%→0</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CycleTimeS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — 10 ms</xhtml>
-              </documentation>
-            </variable>
-            <variable name="GesturePermit">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Stimuli manuels au repos avant un geste automatique</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArmHoldTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#200MS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Appui bouton avant debattement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ButtonReleaseDelay">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#200MS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Maintien bouton apres debut debattement</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="RawX">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Valeur brute axe X (dynamique, neutre = NeutralRaw)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawY">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Valeur brute axe Y (dynamique, neutre = NeutralRaw)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawButton">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Appui armement simule, relache pendant le maintien du manche</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ModelActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Propriete exclusive des trois entrees brutes pendant le geste et le retour</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ReturningActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE si retour dynamique en cours (FALL/OVERSHOOT) — FB_SimBench émet le modèle</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="instArmTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Maintien armement avant debattement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instButtonReleaseTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Relachement bouton apres debut debattement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="GestureStep">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Attente relachement, disponible, appui, mouvement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RequestedDirection">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction unique demandee, 0 si aucune ou conflit</xhtml>
-              </documentation>
-            </variable>
-            <variable name="GestureDirection">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction memorisee au nouvel appui</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeflectionActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debattement admis pour le geste courant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RequestMatchesGesture">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction demandee identique au geste</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TimingValid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Parametres dynamiques strictement positifs</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FirstCycle">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Initialisation au neutre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] 0=IDLE, 1=RISE, 2=FALL, 3=OVERSHOOT</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TargetX">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible brute axe X</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TargetY">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible brute axe Y</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ActiveAxis">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] 0=aucun, 1=X, 2=Y (axe en retour)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RiseStep">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de montée par cycle (points)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FallStep">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de retombée par cycle (points)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RandCnt">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Compteur pseudo-aléatoire (bruit de montée)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Noise">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bruit ±25 points (≈ ±0.5% de la course)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnCount">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Nombre de boutons directionnels actifs (0..4)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OscDev">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Écart au neutre de l'oscillateur de bagotement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OscVel">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse de l'oscillateur (points/cycle)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OscAcc">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accélération de l'oscillateur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_GESTURE_WAIT_RELEASE">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Relachement complet et retour neutre requis</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_GESTURE_READY">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Nouveau geste disponible</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_GESTURE_ARM">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Appui armement, manche neutre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_GESTURE_MOVE">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Manche deplace, bouton ensuite relache</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_DIRECTION_LEFT">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande X negatif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_DIRECTION_RIGHT">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande X positif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_DIRECTION_FORWARD">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande Y positif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_DIRECTION_REVERSE">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="4" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande Y negatif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ST_IDLE">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] État : au neutre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ST_RISE">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] État : montée vers la cible</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ST_FALL">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] État : retombée linéaire</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ST_OVERSHOOT">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] État : bagotement (oscillations amorties)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_OSC_K">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Raideur oscillateur (fréquence bagotement)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_OSC_C">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.05" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Amortissement (2-3 oscillations visibles)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_OVERSHOOT_AMT">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="600" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Dépassement de montée au-delà de MaxRaw (déclenche défaut capteur hors plage)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_BAGOT_AMT">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="500" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Amplitude du bagotement au relâchement (~5% autour du neutre)</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧪 FB_Sim_Joystick — Simulation des entrees brutes joystick (bus CAN hors ligne)
-   🎯 Rôle : reproduire un geste operateur depuis un bouton directionnel.
-   Appui armement, debattement, relachement armement, retour dynamique.
-   Aucun etat arme produit ; permis et armement restent au joystick reel.
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   =======================================================================
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Joystick) ===</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Joystick) ===
-
-{region "§1 Gate"}
-// 🔑 Initialise au neutre au premier cycle uniquement ; ensuite RawX/RawY sont pilotés
-// dynamiquement par les boutons. Quand la simulation est coupée, on revient au neutre.
-TimingValid := (RiseTimeS &gt; 0.0) AND (CycleTimeS &gt; 0.0) AND (FallTimeMs &gt; T#0MS);
-IF NOT Enable OR NOT TimingValid THEN
-    FirstCycle := TRUE;
-    State      := CST_ST_IDLE;
-    RawX       := NeutralRaw;
-    RawY       := NeutralRaw;
-    RawButton  := FALSE;
-    ReturningActive := FALSE; // 📊 Neutralisation : simulation inactive hors Enable
-    ModelActive := FALSE;
-    GestureStep := CST_GESTURE_WAIT_RELEASE;
-    GestureDirection := 0;
-    instArmTimer(IN := FALSE, PT := ArmHoldTime);
-    instButtonReleaseTimer(IN := FALSE, PT := ButtonReleaseDelay);
-    RETURN;
-END_IF;
-{endregion}
-
-{region "§2 Initialisation neutre"}
-IF FirstCycle THEN
-    RawX       := NeutralRaw;
-    RawY       := NeutralRaw;
-    RawButton  := FALSE;
-    State      := CST_ST_IDLE;
-    FirstCycle := FALSE;
-    GestureStep := CST_GESTURE_WAIT_RELEASE;
-END_IF;
-{endregion}
-
-{region "§3 Pseudo-aléatoire (bruit de montée)"}
-// 🎲 Compteur qui repasse à zéro, multiplié pour rester dans la plage (méthode validée).
-// Le bruit s'ajoute à la rampe de montée uniquement (pas à la retombée, linéaire propre).
-RandCnt := (RandCnt + 1) MOD 1000;
-Noise   := (RandCnt MOD 50) - 25;   // ±25 points (≈ ±0.5% de la course)
-{endregion}
-
-{region "§4 Cibles &amp; transitions"}
-// 🎯 Un SEUL bouton impose une butée d'axe ; 0 ou ≥2 boutons = neutre (pas de diagonale implicite).
-// Si OvershootActive : la cible de montée DÉPASSE la butée (MaxRaw+AMT ou 0−AMT) pour
-// déclencher le défaut capteur hors plage (RawOutOfRange) — test du dépassement de valeur.
-BtnCount := BOOL_TO_INT(BtnLeft_Rev_TREMIE) + BOOL_TO_INT(BtnRight_Fwd_MAINT)
-          + BOOL_TO_INT(BtnFwd_Up_Close) + BOOL_TO_INT(BtnRev_Down_Open);
-RequestedDirection := 0;
-IF BtnCount = 1 THEN
-    IF BtnLeft_Rev_TREMIE THEN RequestedDirection := CST_DIRECTION_LEFT;
-    ELSIF BtnRight_Fwd_MAINT THEN RequestedDirection := CST_DIRECTION_RIGHT;
-    ELSIF BtnFwd_Up_Close THEN RequestedDirection := CST_DIRECTION_FORWARD;
-    ELSE RequestedDirection := CST_DIRECTION_REVERSE;
-    END_IF;
-END_IF;
-
-// Un seul appui brut par geste ; aucun nouvel essai tant que l'IHM reste tenue.
-instArmTimer(IN := GestureStep = CST_GESTURE_ARM, PT := ArmHoldTime);
-instButtonReleaseTimer(IN := GestureStep = CST_GESTURE_MOVE, PT := ButtonReleaseDelay);
-DeflectionActive := FALSE;
-RawButton := FALSE;
-RequestMatchesGesture := (RequestedDirection = GestureDirection) AND (BtnCount = 1);
-IF BtnCount &gt; 0 THEN ModelActive := TRUE; END_IF;
-IF NOT GesturePermit THEN GestureStep := CST_GESTURE_WAIT_RELEASE; END_IF;
-
-IF GestureStep = CST_GESTURE_WAIT_RELEASE THEN
-        // Les boutons doivent etre relaches APRES stabilisation du retour.
-        IF (BtnCount = 0) AND (State = CST_ST_IDLE) AND GesturePermit THEN
-            GestureStep := CST_GESTURE_READY;
-            ModelActive := FALSE;
-        END_IF;
-ELSIF GestureStep = CST_GESTURE_READY THEN
-        IF BtnCount = 1 THEN
-            GestureDirection := RequestedDirection;
-            GestureStep := CST_GESTURE_ARM;
-            RawButton := TRUE;
-        ELSIF BtnCount &gt; 1 THEN
-            GestureStep := CST_GESTURE_WAIT_RELEASE;
-        END_IF;
-ELSIF GestureStep = CST_GESTURE_ARM THEN
-        IF NOT RequestMatchesGesture THEN
-            GestureStep := CST_GESTURE_WAIT_RELEASE;
-        ELSE
-            RawButton := TRUE;
-            IF instArmTimer.Q THEN GestureStep := CST_GESTURE_MOVE; END_IF;
-        END_IF;
-ELSIF GestureStep = CST_GESTURE_MOVE THEN
-        IF NOT RequestMatchesGesture THEN
-            GestureStep := CST_GESTURE_WAIT_RELEASE;
-        ELSE
-            DeflectionActive := TRUE;
-            RawButton := NOT instButtonReleaseTimer.Q;
-        END_IF;
-ELSE
-    GestureStep := CST_GESTURE_WAIT_RELEASE;
-END_IF;
-
-IF DeflectionActive THEN
-    IF BtnLeft_Rev_TREMIE THEN
-        IF OvershootActive THEN TargetX := 0 - CST_OVERSHOOT_AMT; ELSE TargetX := 0; END_IF;
-        TargetY := NeutralRaw; ActiveAxis := 1;
-    ELSIF BtnRight_Fwd_MAINT THEN
-        IF OvershootActive THEN TargetX := MaxRaw + CST_OVERSHOOT_AMT; ELSE TargetX := MaxRaw; END_IF;
-        TargetY := NeutralRaw; ActiveAxis := 1;
-    ELSIF BtnFwd_Up_Close THEN
-        TargetX := NeutralRaw;
-        IF OvershootActive THEN TargetY := MaxRaw + CST_OVERSHOOT_AMT; ELSE TargetY := MaxRaw; END_IF;
-        ActiveAxis := 2;
-    ELSE
-        TargetX := NeutralRaw;
-        IF OvershootActive THEN TargetY := 0 - CST_OVERSHOOT_AMT; ELSE TargetY := 0; END_IF;
-        ActiveAxis := 2;
-    END_IF;
-    State := CST_ST_RISE;
-ELSE
-    // 0 ou ≥2 boutons : retour au neutre.
-    TargetX := NeutralRaw;
-    TargetY := NeutralRaw;
-    IF State = CST_ST_RISE THEN
-        // Front de relâchement : retour au neutre. D'abord retombée linéaire (FALL),
-        // puis petit bagotement de quelques % autour du neutre si OvershootActive (voir §6).
-        State := CST_ST_FALL;
-    END_IF;
-END_IF;
-{endregion}
-
-{region "§5 Ascending (rampe + bruit)"}
-IF State = CST_ST_RISE THEN
-    // Pas de montée : pleine course (MaxRaw−NeutralRaw) en RiseTimeS.
-    RiseStep := INT_TO_REAL(MaxRaw - NeutralRaw) / (RiseTimeS / CycleTimeS);
-    // Axe X
-    IF RawX &lt; TargetX THEN
-        RawX := MIN(RawX + REAL_TO_INT(RiseStep) + Noise, TargetX);
-    ELSIF RawX &gt; TargetX THEN
-        RawX := MAX(RawX - REAL_TO_INT(RiseStep) - Noise, TargetX);
-    END_IF;
-    // Axe Y
-    IF RawY &lt; TargetY THEN
-        RawY := MIN(RawY + REAL_TO_INT(RiseStep) + Noise, TargetY);
-    ELSIF RawY &gt; TargetY THEN
-        RawY := MAX(RawY - REAL_TO_INT(RiseStep) - Noise, TargetY);
-    END_IF;
-END_IF;
-{endregion}
-
-{region "§6 Retombée linéaire (sans bagotement)"}
-IF State = CST_ST_FALL THEN
-    // Pas de retombée : pleine course en FallTimeMs (TIME_TO_REAL → ms, /1000 → s).
-    FallStep := INT_TO_REAL(MaxRaw - NeutralRaw) / (TIME_TO_REAL(FallTimeMs) / 1000.0 / CycleTimeS);
-    IF RawX &lt; NeutralRaw THEN
-        RawX := MIN(RawX + REAL_TO_INT(FallStep), NeutralRaw);
-    ELSIF RawX &gt; NeutralRaw THEN
-        RawX := MAX(RawX - REAL_TO_INT(FallStep), NeutralRaw);
-    END_IF;
-    IF RawY &lt; NeutralRaw THEN
-        RawY := MIN(RawY + REAL_TO_INT(FallStep), NeutralRaw);
-    ELSIF RawY &gt; NeutralRaw THEN
-        RawY := MAX(RawY - REAL_TO_INT(FallStep), NeutralRaw);
-    END_IF;
-    IF RawX = NeutralRaw AND RawY = NeutralRaw THEN
-        // Arrivée au neutre : si bagotement demandé, lance un petit balancement de quelques %.
-        IF BagotementActive THEN
-            State := CST_ST_OVERSHOOT;
-            IF ActiveAxis = 1 THEN
-                OscDev := INT_TO_REAL(CST_BAGOT_AMT);
-            ELSE
-                OscDev := INT_TO_REAL(CST_BAGOT_AMT);
-            END_IF;
-            OscVel := 0.0;
-        ELSE
-            State := CST_ST_IDLE;
-        END_IF;
-    END_IF;
-END_IF;
-{endregion}
-
-{region "§7 Bagotement (dépassement + oscillations amorties)"}
-IF State = CST_ST_OVERSHOOT THEN
-    // 🎢 Oscillateur harmonique amorti discret (semi-implicite) autour du neutre :
-    // le joystick dépasse le centre (~12% de l'écart initial) puis oscille 1-2 fois
-    // avant de se stabiliser — comportement d'un opérateur qui relâche et balance.
-    OscAcc := -CST_OSC_K * OscDev - CST_OSC_C * OscVel;
-    OscVel := OscVel + OscAcc;
-    OscDev := OscDev + OscVel;
-    IF ActiveAxis = 1 THEN
-        RawX := NeutralRaw + REAL_TO_INT(OscDev);
-    ELSE
-        RawY := NeutralRaw + REAL_TO_INT(OscDev);
-    END_IF;
-    // Stabilisé : revient exactement au centre.
-    IF ABS(OscDev) &lt; 1.0 AND ABS(OscVel) &lt; 1.0 THEN
-        State := CST_ST_IDLE;
-        IF ActiveAxis = 1 THEN
-            RawX := NeutralRaw;
-        ELSE
-            RawY := NeutralRaw;
-        END_IF;
-    END_IF;
-END_IF;
-{endregion}
-
-{region "§8 Homme-mort brut + drapeau retour"}
-// RawButton est exclusivement produit par le sequenceur du geste (§4).
-// Drapeau "retour dynamique en cours" : TRUE si l'état est FALL ou OVERSHOOT (retombée/bagotement).
-// Permet à FB_SimBench d'émettre la sortie du modèle même après relâchement du bouton.
-ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
-{endregion}
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>a481952f-eb98-506a-b160-fd074635a746</ObjectId>
           </data>
         </addData>
       </pou>
@@ -6703,6 +6027,9 @@ instSimBench(
     M2_CablePos_M            := Data.EncoderM2.Measurement.CablePosM,
     BucketOffsetCloseM       := _BucketCfgPersist.Config.OffsetCloseM,
     BucketCoherenceLimitM    := _BucketCfgPersist.Config.CoherenceLimitM,
+    BucketOffsetOpen_M       := _BucketCfgPersist.Config.OffsetOpenM,
+    BucketOpenAnticipation_M := _BucketCfgPersist.Config.OpenAnticipationM,
+    BucketAx15bOpenActive    := PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX15B_DUMP_OPEN,
     SimM2TensionedCableFaultInject := GVL_Simulation.SimM2TensionedCableFaultInject,
     SimM3SensorsWordOverrideActive := GVL_Simulation.SimM3SensorsWordOverrideActive,
     SimM3SensorsWord               := GVL_Simulation.SimM3SensorsWord,
@@ -7566,6 +6893,784 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>526914c5-468f-5758-8161-f70e0fd85cca</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_Joystick" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active la simulation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralRaw">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur brute au repos (neutre)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxRaw">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="10000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur brute à fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnLeft_Rev_TREMIE">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bouton gauche : X→0, Y→neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnRight_Fwd_MAINT">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bouton droite : X→MaxRaw, Y→neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnFwd_Up_Close">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bouton avant : X→neutre, Y→MaxRaw</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnRev_Down_Open">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bouton arrière : X→neutre, Y→0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OvershootActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Dépassement de montée au-delà de 100% (défaut capteur hors plage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BagotementActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bagotement au relâchement (petit balancement autour du neutre)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RiseTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps de montée 0→100% (s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FallTimeMs">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps de retombée 100%→0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — 10 ms</xhtml>
+              </documentation>
+            </variable>
+            <variable name="GesturePermit">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Stimuli manuels au repos avant un geste automatique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Appui bouton avant debattement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ButtonReleaseDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Maintien bouton apres debut debattement</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="RawX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Valeur brute axe X (dynamique, neutre = NeutralRaw)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Valeur brute axe Y (dynamique, neutre = NeutralRaw)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawButton">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Appui armement simule, relache pendant le maintien du manche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModelActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Propriete exclusive des trois entrees brutes pendant le geste et le retour</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReturningActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE si retour dynamique en cours (FALL/OVERSHOOT) — FB_SimBench émet le modèle</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="instArmTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Maintien armement avant debattement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instButtonReleaseTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Relachement bouton apres debut debattement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="GestureStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Attente relachement, disponible, appui, mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction unique demandee, 0 si aucune ou conflit</xhtml>
+              </documentation>
+            </variable>
+            <variable name="GestureDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction memorisee au nouvel appui</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeflectionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debattement admis pour le geste courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestMatchesGesture">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction demandee identique au geste</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimingValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Parametres dynamiques strictement positifs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FirstCycle">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Initialisation au neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] 0=IDLE, 1=RISE, 2=FALL, 3=OVERSHOOT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible brute axe X</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible brute axe Y</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveAxis">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] 0=aucun, 1=X, 2=Y (axe en retour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RiseStep">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de montée par cycle (points)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FallStep">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de retombée par cycle (points)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RandCnt">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Compteur pseudo-aléatoire (bruit de montée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Noise">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bruit ±25 points (≈ ±0.5% de la course)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnCount">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Nombre de boutons directionnels actifs (0..4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OscDev">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Écart au neutre de l'oscillateur de bagotement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OscVel">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse de l'oscillateur (points/cycle)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OscAcc">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accélération de l'oscillateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_GESTURE_WAIT_RELEASE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Relachement complet et retour neutre requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_GESTURE_READY">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Nouveau geste disponible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_GESTURE_ARM">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Appui armement, manche neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_GESTURE_MOVE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Manche deplace, bouton ensuite relache</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DIRECTION_LEFT">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande X negatif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DIRECTION_RIGHT">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande X positif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DIRECTION_FORWARD">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande Y positif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DIRECTION_REVERSE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande Y negatif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ST_IDLE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] État : au neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ST_RISE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] État : montée vers la cible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ST_FALL">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] État : retombée linéaire</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ST_OVERSHOOT">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] État : bagotement (oscillations amorties)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_OSC_K">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Raideur oscillateur (fréquence bagotement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_OSC_C">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.05" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Amortissement (2-3 oscillations visibles)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_OVERSHOOT_AMT">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="600" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Dépassement de montée au-delà de MaxRaw (déclenche défaut capteur hors plage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_BAGOT_AMT">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="500" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Amplitude du bagotement au relâchement (~5% autour du neutre)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧪 FB_Sim_Joystick — Simulation des entrees brutes joystick (bus CAN hors ligne)
+   🎯 Rôle : reproduire un geste operateur depuis un bouton directionnel.
+   Appui armement, debattement, relachement armement, retour dynamique.
+   Aucun etat arme produit ; permis et armement restent au joystick reel.
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   =======================================================================
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Joystick) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Joystick) ===
+
+{region "§1 Gate"}
+// 🔑 Initialise au neutre au premier cycle uniquement ; ensuite RawX/RawY sont pilotés
+// dynamiquement par les boutons. Quand la simulation est coupée, on revient au neutre.
+TimingValid := (RiseTimeS &gt; 0.0) AND (CycleTimeS &gt; 0.0) AND (FallTimeMs &gt; T#0MS);
+IF NOT Enable OR NOT TimingValid THEN
+    FirstCycle := TRUE;
+    State      := CST_ST_IDLE;
+    RawX       := NeutralRaw;
+    RawY       := NeutralRaw;
+    RawButton  := FALSE;
+    ReturningActive := FALSE; // 📊 Neutralisation : simulation inactive hors Enable
+    ModelActive := FALSE;
+    GestureStep := CST_GESTURE_WAIT_RELEASE;
+    GestureDirection := 0;
+    instArmTimer(IN := FALSE, PT := ArmHoldTime);
+    instButtonReleaseTimer(IN := FALSE, PT := ButtonReleaseDelay);
+    RETURN;
+END_IF;
+{endregion}
+
+{region "§2 Initialisation neutre"}
+IF FirstCycle THEN
+    RawX       := NeutralRaw;
+    RawY       := NeutralRaw;
+    RawButton  := FALSE;
+    State      := CST_ST_IDLE;
+    FirstCycle := FALSE;
+    GestureStep := CST_GESTURE_WAIT_RELEASE;
+END_IF;
+{endregion}
+
+{region "§3 Pseudo-aléatoire (bruit de montée)"}
+// 🎲 Compteur qui repasse à zéro, multiplié pour rester dans la plage (méthode validée).
+// Le bruit s'ajoute à la rampe de montée uniquement (pas à la retombée, linéaire propre).
+RandCnt := (RandCnt + 1) MOD 1000;
+Noise   := (RandCnt MOD 50) - 25;   // ±25 points (≈ ±0.5% de la course)
+{endregion}
+
+{region "§4 Cibles &amp; transitions"}
+// 🎯 Un SEUL bouton impose une butée d'axe ; 0 ou ≥2 boutons = neutre (pas de diagonale implicite).
+// Si OvershootActive : la cible de montée DÉPASSE la butée (MaxRaw+AMT ou 0−AMT) pour
+// déclencher le défaut capteur hors plage (RawOutOfRange) — test du dépassement de valeur.
+BtnCount := BOOL_TO_INT(BtnLeft_Rev_TREMIE) + BOOL_TO_INT(BtnRight_Fwd_MAINT)
+          + BOOL_TO_INT(BtnFwd_Up_Close) + BOOL_TO_INT(BtnRev_Down_Open);
+RequestedDirection := 0;
+IF BtnCount = 1 THEN
+    IF BtnLeft_Rev_TREMIE THEN RequestedDirection := CST_DIRECTION_LEFT;
+    ELSIF BtnRight_Fwd_MAINT THEN RequestedDirection := CST_DIRECTION_RIGHT;
+    ELSIF BtnFwd_Up_Close THEN RequestedDirection := CST_DIRECTION_FORWARD;
+    ELSE RequestedDirection := CST_DIRECTION_REVERSE;
+    END_IF;
+END_IF;
+
+// Un seul appui brut par geste ; aucun nouvel essai tant que l'IHM reste tenue.
+instArmTimer(IN := GestureStep = CST_GESTURE_ARM, PT := ArmHoldTime);
+instButtonReleaseTimer(IN := GestureStep = CST_GESTURE_MOVE, PT := ButtonReleaseDelay);
+DeflectionActive := FALSE;
+RawButton := FALSE;
+RequestMatchesGesture := (RequestedDirection = GestureDirection) AND (BtnCount = 1);
+IF BtnCount &gt; 0 THEN ModelActive := TRUE; END_IF;
+IF NOT GesturePermit THEN GestureStep := CST_GESTURE_WAIT_RELEASE; END_IF;
+
+IF GestureStep = CST_GESTURE_WAIT_RELEASE THEN
+        // Les boutons doivent etre relaches APRES stabilisation du retour.
+        IF (BtnCount = 0) AND (State = CST_ST_IDLE) AND GesturePermit THEN
+            GestureStep := CST_GESTURE_READY;
+            ModelActive := FALSE;
+        END_IF;
+ELSIF GestureStep = CST_GESTURE_READY THEN
+        IF BtnCount = 1 THEN
+            GestureDirection := RequestedDirection;
+            GestureStep := CST_GESTURE_ARM;
+            RawButton := TRUE;
+        ELSIF BtnCount &gt; 1 THEN
+            GestureStep := CST_GESTURE_WAIT_RELEASE;
+        END_IF;
+ELSIF GestureStep = CST_GESTURE_ARM THEN
+        IF NOT RequestMatchesGesture THEN
+            GestureStep := CST_GESTURE_WAIT_RELEASE;
+        ELSE
+            RawButton := TRUE;
+            IF instArmTimer.Q THEN GestureStep := CST_GESTURE_MOVE; END_IF;
+        END_IF;
+ELSIF GestureStep = CST_GESTURE_MOVE THEN
+        IF NOT RequestMatchesGesture THEN
+            GestureStep := CST_GESTURE_WAIT_RELEASE;
+        ELSE
+            DeflectionActive := TRUE;
+            RawButton := NOT instButtonReleaseTimer.Q;
+        END_IF;
+ELSE
+    GestureStep := CST_GESTURE_WAIT_RELEASE;
+END_IF;
+
+IF DeflectionActive THEN
+    IF BtnLeft_Rev_TREMIE THEN
+        IF OvershootActive THEN TargetX := 0 - CST_OVERSHOOT_AMT; ELSE TargetX := 0; END_IF;
+        TargetY := NeutralRaw; ActiveAxis := 1;
+    ELSIF BtnRight_Fwd_MAINT THEN
+        IF OvershootActive THEN TargetX := MaxRaw + CST_OVERSHOOT_AMT; ELSE TargetX := MaxRaw; END_IF;
+        TargetY := NeutralRaw; ActiveAxis := 1;
+    ELSIF BtnFwd_Up_Close THEN
+        TargetX := NeutralRaw;
+        IF OvershootActive THEN TargetY := MaxRaw + CST_OVERSHOOT_AMT; ELSE TargetY := MaxRaw; END_IF;
+        ActiveAxis := 2;
+    ELSE
+        TargetX := NeutralRaw;
+        IF OvershootActive THEN TargetY := 0 - CST_OVERSHOOT_AMT; ELSE TargetY := 0; END_IF;
+        ActiveAxis := 2;
+    END_IF;
+    State := CST_ST_RISE;
+ELSE
+    // 0 ou ≥2 boutons : retour au neutre.
+    TargetX := NeutralRaw;
+    TargetY := NeutralRaw;
+    IF State = CST_ST_RISE THEN
+        // Front de relâchement : retour au neutre. D'abord retombée linéaire (FALL),
+        // puis petit bagotement de quelques % autour du neutre si OvershootActive (voir §6).
+        State := CST_ST_FALL;
+    END_IF;
+END_IF;
+{endregion}
+
+{region "§5 Ascending (rampe + bruit)"}
+IF State = CST_ST_RISE THEN
+    // Pas de montée : pleine course (MaxRaw−NeutralRaw) en RiseTimeS.
+    RiseStep := INT_TO_REAL(MaxRaw - NeutralRaw) / (RiseTimeS / CycleTimeS);
+    // Axe X
+    IF RawX &lt; TargetX THEN
+        RawX := MIN(RawX + REAL_TO_INT(RiseStep) + Noise, TargetX);
+    ELSIF RawX &gt; TargetX THEN
+        RawX := MAX(RawX - REAL_TO_INT(RiseStep) - Noise, TargetX);
+    END_IF;
+    // Axe Y
+    IF RawY &lt; TargetY THEN
+        RawY := MIN(RawY + REAL_TO_INT(RiseStep) + Noise, TargetY);
+    ELSIF RawY &gt; TargetY THEN
+        RawY := MAX(RawY - REAL_TO_INT(RiseStep) - Noise, TargetY);
+    END_IF;
+END_IF;
+{endregion}
+
+{region "§6 Retombée linéaire (sans bagotement)"}
+IF State = CST_ST_FALL THEN
+    // Pas de retombée : pleine course en FallTimeMs (TIME_TO_REAL → ms, /1000 → s).
+    FallStep := INT_TO_REAL(MaxRaw - NeutralRaw) / (TIME_TO_REAL(FallTimeMs) / 1000.0 / CycleTimeS);
+    IF RawX &lt; NeutralRaw THEN
+        RawX := MIN(RawX + REAL_TO_INT(FallStep), NeutralRaw);
+    ELSIF RawX &gt; NeutralRaw THEN
+        RawX := MAX(RawX - REAL_TO_INT(FallStep), NeutralRaw);
+    END_IF;
+    IF RawY &lt; NeutralRaw THEN
+        RawY := MIN(RawY + REAL_TO_INT(FallStep), NeutralRaw);
+    ELSIF RawY &gt; NeutralRaw THEN
+        RawY := MAX(RawY - REAL_TO_INT(FallStep), NeutralRaw);
+    END_IF;
+    IF RawX = NeutralRaw AND RawY = NeutralRaw THEN
+        // Arrivée au neutre : si bagotement demandé, lance un petit balancement de quelques %.
+        IF BagotementActive THEN
+            State := CST_ST_OVERSHOOT;
+            IF ActiveAxis = 1 THEN
+                OscDev := INT_TO_REAL(CST_BAGOT_AMT);
+            ELSE
+                OscDev := INT_TO_REAL(CST_BAGOT_AMT);
+            END_IF;
+            OscVel := 0.0;
+        ELSE
+            State := CST_ST_IDLE;
+        END_IF;
+    END_IF;
+END_IF;
+{endregion}
+
+{region "§7 Bagotement (dépassement + oscillations amorties)"}
+IF State = CST_ST_OVERSHOOT THEN
+    // 🎢 Oscillateur harmonique amorti discret (semi-implicite) autour du neutre :
+    // le joystick dépasse le centre (~12% de l'écart initial) puis oscille 1-2 fois
+    // avant de se stabiliser — comportement d'un opérateur qui relâche et balance.
+    OscAcc := -CST_OSC_K * OscDev - CST_OSC_C * OscVel;
+    OscVel := OscVel + OscAcc;
+    OscDev := OscDev + OscVel;
+    IF ActiveAxis = 1 THEN
+        RawX := NeutralRaw + REAL_TO_INT(OscDev);
+    ELSE
+        RawY := NeutralRaw + REAL_TO_INT(OscDev);
+    END_IF;
+    // Stabilisé : revient exactement au centre.
+    IF ABS(OscDev) &lt; 1.0 AND ABS(OscVel) &lt; 1.0 THEN
+        State := CST_ST_IDLE;
+        IF ActiveAxis = 1 THEN
+            RawX := NeutralRaw;
+        ELSE
+            RawY := NeutralRaw;
+        END_IF;
+    END_IF;
+END_IF;
+{endregion}
+
+{region "§8 Homme-mort brut + drapeau retour"}
+// RawButton est exclusivement produit par le sequenceur du geste (§4).
+// Drapeau "retour dynamique en cours" : TRUE si l'état est FALL ou OVERSHOOT (retombée/bagotement).
+// Permet à FB_SimBench d'émettre la sortie du modèle même après relâchement du bouton.
+ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a481952f-eb98-506a-b160-fd074635a746</ObjectId>
           </data>
         </addData>
       </pou>
@@ -17549,12 +17654,715 @@ Ready := TRUE;
     <configurations />
   </instances>
   <addData>
+    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
+      <globalVars name="GVL_Simulation">
+        <variable name="SimulationModeActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Bit maître — rien n'est simulé si FALSE (machine réelle)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimulationBypassActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 Master Bypass Essais Banc — arme les bypass Meca (Safety/Process) en mode MAINT
+(inopérant sur machine réelle). Arme aussi les limites banc TopLimitSwitch,
+TopLimitSoftware et CableLimitSwitch, exclusivement sous le triple gate
+SimulationModeActive AND SimWinchActive AND SimulationBypassActive.
+Défaut TRUE : pré-arme le bypass banc dès le boot (n'agit que si SimulationModeActive AND SimWinchActive).
+Permet de travailler en banc sans faux blocage Meca au homing sans mouvement.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimWinchActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Activation par domaine (simulé si SimulationModeActive AND Sim&lt;Domaine&gt;Active)
+M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimTopPositionActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Stimulus explicite du capteur haut commun pour qualifier le référencement benne.
+TRUE = capteur haut actif; FALSE = position libre. Inopérant hors simulation.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimTranslationActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">M3 : AC600, fréquence, 5 capteurs et frein</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3OpenModelicaActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Source de l'image M3 dans FB_SimBench : FALSE = modèle ST interne, TRUE = simulateur
+externe (lien UDP FB_Sim_Translation_ExtLink, FMU OpenModelica). Posé par l'opérateur.
+Inopérant hors SimulationModeActive ET SimTranslationActive ; l'image réelle reste prioritaire.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3LinkReady">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 État du lien externe M3 (lecture seule, produit par PRG_02 depuis FB_SimBench).
+TRUE = trame valide reçue et lien non expiré</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3LinkTimeout">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = aucune trame valide depuis 1 s</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3LinkInvalid">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = trame rejetée ou lien expiré</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3LinkAge_Ms">
+          <type>
+            <UDINT />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée sans trame valide, ms</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimOperatorActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Joystick : bus CANopen, axes RawX/RawY et homme-mort brut</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimSafetyActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimPhaseRotationOk">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Stimulus défaut rotation de phases : TRUE = phases réseau saines (comportement
+nominal, identique au codage en dur d'avant ce lot) ; FALSE = inverse/coupe les phases
+(PhaseRotationOk_DI = FALSE dans l'image machine simulée). Inopérant hors simulation.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorsWordOverrideActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ STIMULI TRANSLATION M3 — override manuel du mot capteurs, sinon modèle dynamique.
+Bit4=Trémie, bit3=PV, bit2=PVP2, bit1=P1, bit0=Maintenance ; 16#07 = position P2 (00111).
+TRUE = SimM3SensorsWord remplace le modèle ; réserver aux injections ciblées</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorsWord">
+          <type>
+            <BYTE />
+          </type>
+          <initialValue>
+            <simpleValue value="16#07" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot manuel valide nominal : P2</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorIntermittenceActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Episode capteur dynamique : FALSE conserve le profil nominal. TRUE publie des
+pertes/reprises deterministes apres un franchissement mecanique, pour qualifier
+le decodeur et les fins de course sans ecrire directement dans le metier.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorStabilizationS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="1" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorElectricalDelayS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.01" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorIntermittencePeriodS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.12" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorHysteresis_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.02" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorLoadAngleTriggerRad">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.01" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorScenarioSeed">
+          <type>
+            <UDINT />
+          </type>
+          <initialValue>
+            <simpleValue value="3001" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3SensorBlipTransitions">
+          <type>
+            <UDINT />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ BLIP COURT — second profil de perte/reprise, independant du train ~1 s ci-dessus
+(SimM3SensorStabilizationS). 0 = desactive (profil historique inchange).
+Rejoue les excursions courtes de la trace terrain du 2026-09-04 :
+Tremie : 1 excursion de 0,2 s (actif 2 echantillons a 12,24 s en s'eloignant) ;
+PV     : 1 excursion de 0,1 s (reactive 1 echantillon a 14,94 s en deceleration).</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorBlipDurationS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.2" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3EndStopRecoilMax_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 BUTEE MECANIQUE M3 — recul borne apres arret serre (C5).
+0.0 = behavior historique : position ET vitesse figees a la butee (decision de review
+tracee). &gt; 0 autorise la reaction de charge a ressortir le chariot de la zone capteur.
+Valeur SYNTHETIQUE, non calibree : a mesurer en mise en service.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3LoadReactionGain_Mps2">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.2" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Gain de reaction de charge utilisee par le modele M3 (SYNTHETIQUE).
+0.20 = valeur historique ; un gain plus eleve est necessaire pour rejouer le recul
+post-arret observe sur la trace terrain du 2026-09-04. A calibrer.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3BrakeFaultCloseWhileRunning">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔥 FAUTE EXPLICITE FREIN M3 — defaut FALSE : comportement nominal strictement inchange.
+TRUE rejoue le defaut terrain « cause 6 instantanee » : contact frein ferme alors que le
+variateur retourne encore 10,00 Hz (trace 2026-09-04, 26,437 s, State.ErrorId=64).
+La garde nominale de fermeture (0,5 Hz) est CONSERVEE : elle est validee par la meme trace
+(frein ouvert a 0,60 Hz, ferme a 0,00 Hz). Stimulus de banc, inoperant hors simulation.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3BrakeFaultCloseDelayS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+        </variable>
+        <variable name="SimJoystickLeft_Rev_TREMIE_Active">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ STIMULI OPÉRATEUR — les boutons directionnels imposent 0/5000/10000 ; combinaison = neutre.
+Translation M3 Arrière vers Trémie (RawX=0, RawY=5000)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickRight_Fwd_MAINT_Active">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation M3 Avant vers Maintenance (RawX=10000, RawY=5000)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickFwd_Up_Close_Active">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Treuils Ascending M1/M2 / Fermeture Benne M2 (RawX=5000, RawY=10000)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickRev_Down_Open_Active">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Treuils Descending M1/M2 / Ouverture Benne M2 (RawX=5000, RawY=0)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickRawX">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="5000" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickRawY">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="5000" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickRawButton">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Homme-mort brut : TRUE = bouton joystick appuyé</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickOvershoot_Active">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = dépassement de montée au-delà de 100% (défaut capteur hors plage)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickBagotement_Active">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bagotement au relâchement (petit balancement autour du neutre)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimBtnTremie">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎛️ STIMULI BOUTONS IHM M3 — simulation des boutons IHM Translation M3 (Trémie/Maintenance).
+Pilotent GVL_IHM.M3Translation.Cmd.BtnTremie/BtnMaintenance UNIQUEMENT en mode simulation
+ET quand JoyMaster est inactif (le joystick prime sinon). Défaut FALSE = bouton relâché.
+TRUE = bouton IHM "vers Trémie" simulé appuyé</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimBtnMaintenance">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bouton IHM "vers Maintenance" simulé appuyé</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimEncoderSpeedFactor">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="1" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 STIMULI TREUILS — paramètres du modèle codeur et injection ponctuelle d'un défaut synchro.
+Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimWinchCoast_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="1.3" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Roulis inertiel treuils simulés après coupure des relais (m). 0 = arrêt net. 1.30 = la benne roule pour finir dans la butée ouverte (OffsetOpenM=0.0) malgré l'anticipation d'arrêt (Open 1.3).</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimSyncDeviationInjectM1">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Front montant : ajoute SimSyncDeviationOffset_M à la position M1 simulée</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimSyncDeviationInjectM2">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Front montant : ajoute SimSyncDeviationOffset_M à la position M2 simulée</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimSyncDeviationOffset_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.5" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart signé injecté, mètres ; persiste dans la position simulée jusqu'au reset/preset</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimWinchDynamicsActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PROFIL SIMPLE / DYNAMIQUES TREUILS ===
+FALSE = retour historique instantané ; TRUE = applique les trois réglages synthétiques ci-dessous.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimWinchSpeedReportTauS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.15" />
+          </initialValue>
+        </variable>
+        <variable name="SimWinchBrakeOpenDelayS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.1" />
+          </initialValue>
+        </variable>
+        <variable name="SimWinchBrakeCloseDelayS">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.09" />
+          </initialValue>
+        </variable>
+        <variable name="SimWinchElectricalDiagnosticsActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic électrique isolé : ne pilote jamais une entrée safety ou une commande moteur.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM2TensionedCableFaultInject">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACQUITTEMENT DIAGNOSTIC TRANSITOIRE (réseaux EtherCAT / CANopen) ===
+⛔ Aucun réglage de PRODUCTION ici : les 2 autorisations et les 3 temporisations de ce
+service vivent au site d'appel, câblées en dur à TRUE et aux défauts déclarés du FB.
+Cette GVL ne porte que des réglages de BANC (frontière réel/simulé).
+Injection safety explicite : TRUE simule le câble non tendu ; FALSE = signal nominal sain.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimWinchCouplingModelActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 RATTRAPAGE MÉCANIQUE M1/M2 — le banc reproduit la reprise de jeu entre les deux treuils.
+En MONTÉE couplée (relais de sens identiques + freins desserrés côté sim), l'écart relatif
+M2-M1 rejoint la bande FERMÉE au lieu de rester bloqué juste en dessous (trou métier de
+fermeture : coupure d'anticipation à 13,8 m alors que l'état fermé exige 14,0 m), ce qui
+laissait la benne « non fermée » et plafonnait la montée au palier 1. Inopérant hors simulation.
+[CFG] TRUE = rattrapage mécanique modélisé (FALSE = rejeu d'avant le lot)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimBucketJamActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">[TST] TRUE = mâchoires bloquées (objet coincé) : pas de rattrapage, charge forcée</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM2CoupledDescentModelActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 MODÈLE M2 / KOBOLD — réglages de banc, actifs exclusivement via FB_SimBench.
+M2 est calculé depuis M1 pendant une descente BOTH effective. Le coefficient est
+issu de la trace 2026-09-05 ; TRUE par défaut pour reproduire le comportement mesuré.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM2CoupledDescentFactor">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.9333" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Ratio déplacement M2 / déplacement M1 en descente BOTH (mesure: 0,6 m / 9 m)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldAutoModeActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Le mode auto est armé sur entrée SEMI_AUTO pendant la simulation et libéré à sa sortie.
+Une désactivation opérateur pendant une plongée est prise en compte à la plongée suivante.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldAutoDepth_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="-15" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Altitude fond signée (m), négative sous l'eau</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldPowerUpTime">
+          <type>
+            <TIME />
+          </type>
+          <initialValue>
+            <simpleValue value="TIME#50ms" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Réponse sonde après alimentation Kobold</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldCoast_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="1" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Roulis déterministe M1/M2 après arrêt Kobold (m)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldContactValue">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
+TRUE = Kobold détecte un contact fond simulé</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimChainOk">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Contrôle granulaire de la chaîne AU : TRUE = simuler la chaîne fermée (on peut armer) ;
+FALSE = chaîne ouverte (on ne peut pas armer). Défaut FALSE → à la ré-entrée en simu,
+la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
+          </documentation>
+        </variable>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c5681e14-c01a-5262-a590-fb12af051728</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 GVL_Simulation — Variables et stimuli de simulation (Banc d'essai)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   🎯 Polarité positive : TRUE = simulé/stimulus actif ; FALSE = réel/repos.
+   🔒 Consommée à la frontière PRG_02_Acquisition, par le banc, et par PRG_04_Treuils_Benne
+   🔒 (SimulationBypassActive : n'arme les bypass de sécurité QUE si SimulationModeActive
+   🔒  ET SimWinchActive — strictement inopérant sur machine réelle).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </globalVars>
+    </data>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
         <Folder Name="L_SIMULATION">
           <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
-          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
+          <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
           <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
+          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
           <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
           <Object Name="FB_Sim_Translation_ExtLink" ObjectId="cb6a7d98-36ae-5c14-9891-d5451c6e7dd0" />

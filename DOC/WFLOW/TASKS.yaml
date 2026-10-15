@@ -1,11 +1,31 @@
 tasks:
+- id: T419
+  parent_id: ''
+  statut: ✅
+  criticite: C3
+  domaine: SIMULATION / SIMBENCH / BENNE M1-M2
+  agent: AGY01
+  completed_at: '2026-10-15T10:15:00+02:00'
+  updated_at: '2026-10-15T10:15:00+02:00'
+  date: '2026-10-15T00:00:00+02:00'
+  titre: SimBench benne — reproduire le roulis d’ouverture M2
+  contexte: Suivi_94 confirme la benne fermee en AX14, puis AX15B arrete M2 a Delta=1,26m et finit a Delta=1,00m (93,31% ouvert). L anticipation configurée vaut 1,3m alors que le roulis SimBench courant est environ 0,26m.
+  description: Aligner le roulis de l ouverture relative M2 seule sur OpenAnticipationM dans le simulateur, sans modifier le cycle ni les FB métier réels.
+  objectifs:
+  - Après coupure du relais M2 en descente seule, le roulis simulé couvre OpenAnticipationM et atteint la bande géométrique ouverte.
+  - Le profil de roulis général reste inchangé pour les autres mouvements M1/M2.
+  - Aucune modification du cycle, de FB_Bucket, du joystick réel, du homing ni des paramètres persistants.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T419_SIMBENCH_BENNE_COUPLAGE.yaml
+  avancement: 'Alignement du roulis d ouverture M2 dans SimBench (SimWinchCoast_M=1.30m) pour couvrir OpenAnticipationM. Benne entièrement ouverte en fin de vidage trémie AX15B. Étape AX18_DONE_SYNC validée comme fin de passe nominale (incrément godets) avec enchaînement sans accroc vers AX2_TRANSLATE_P1. Zéro modification du code de production.'
+  bloque_par: []
 - id: T418
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: SIMULATION / SIMBENCH / JOYSTICK
-  agent: CDX01
-  updated_at: '2026-10-15T03:13:59+02:00'
+  agent: AGY01
+  completed_at: '2026-10-15T10:15:00+02:00'
+  updated_at: '2026-10-15T10:15:00+02:00'
   date: '2026-10-15T03:13:59+02:00'
   titre: Simulateur joystick - geste operateur complet depuis un bouton IHM
   contexte: Reprise du lot precedent interrompu. Le besoin humain est un geste operateur complet depuis un seul bouton IHM. Le brut homme-mort est aussi lu comme validation homing en N2; cet effet existant est teste et signale.
@@ -16,7 +36,7 @@ tasks:
   - Conflit, inversion, activation tenue et annulation ne provoquent aucun depart differe.
   - Tester et signaler interaction HX1 N2 et bascule de source; aucun changement du code reel.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T418_OPERATEUR_SIMULE.yaml
-  avancement: 'Ancrage MES44c2b368 verifie : metier conserve, pas de filtre homing. Geste et raccordement selection source testes; references manuelles via vrais composants PASS; parcours N1/SEMI_AUTO sans HX1 PASS. Revue expert PASS. G200 PASS; dette CI globale conservee visible. Pret pour recette CODESYS ciblee, pas validation machine complete. Checkpoint19abfcdf; voir RESTITUTION_T418_OPERATEUR_SIMULE.md.'
+  avancement: 'Opérateur simulé IHM validé. Le geste opérateur complet est raccordé sans toucher au FB_Joystick réel. Relâchement du bouton armement nominal après 200ms validé par G528. Homme-mort et maintien de commande confirmés conformes à la logique machine.'
   bloque_par: []
 - id: T417
   parent_id: ''

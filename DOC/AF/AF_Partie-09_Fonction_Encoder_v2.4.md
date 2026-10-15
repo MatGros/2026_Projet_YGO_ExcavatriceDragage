@@ -661,7 +661,7 @@ dédiée (AF14) — pointeur, pas de duplication ici.
 | AF10 | Consommateur `Speed_Mps`/`Homed` (`FB_Safety_Winch`, treuils) |
 | AF14 | `ST_HomingChecklist` |
 | Code | `CODE/E_CODEURS/FB_Encoder.st` (façade) + 7 sous-FB |
-| Diagnostic | `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md` — analyse complète du défaut anti-dépassement (historique git, scénarios wrap, options) |
+| Diagnostic | `ARCHIVES/Doc/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md` — analyse complète du défaut anti-dépassement (historique git, scénarios wrap, options) |
 
 ---
 

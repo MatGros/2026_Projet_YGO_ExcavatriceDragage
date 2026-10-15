@@ -329,5 +329,5 @@ plus produire de faux écart.
 | AF03 | Contrat `standard` |
 | AF10 | Consommateur `Homed`/`HomingSuspect`, auto-référencement benne M2 |
 | AF13 | Simulation codeur (`FB_Sim_Encoder`) — correction wrap requise (§7) |
-| Diagnostic | `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md` |
+| Diagnostic | `ARCHIVES/Doc/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md` |
 | Code | `CODE/E_CODEURS/FB_Encoder_Homing.st` |

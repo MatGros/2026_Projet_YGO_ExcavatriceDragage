@@ -992,7 +992,7 @@ Or mon argument d'indépendance repose **entièrement** sur la forme actuelle
 | Fichier | Rôle envisagé | Nature |
 |---|---|---|
 | `CODE/M_MAIN/PRG_07_Supervision.st` | **Vérification de cohérence + refus** avant tout pont de persistance (**avant `:140`**) — producteur unique | ✏️ modification |
-| `CODE/H_TREUILS_BENNE/FB_Hmi_BannerFormatter.st` | Message opérateur ciblé + cause | ✏️ modification |
+| `CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st` | Message opérateur ciblé + cause | ✏️ modification |
 | `CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st` | **⚠️ interdit par le contrat** (aucun nouveau champ) — lecture seule | 🔒 lecture |
 | `CODE/M_MAIN/PRG_03_Modes_Cycle.st` | Posture de départ cycle (dérivé `CST_*`) — **à confirmer** | 🔒 lecture |
 | `TOOLS/AGENT_WORKFLOW/scripts/G504_check_t330_homing_top_invariant.py` | **Nouveau garde-fou** (`fix:` + `guard:`) — ⛔ **ne pas réutiliser `G499`** | ➕ création |

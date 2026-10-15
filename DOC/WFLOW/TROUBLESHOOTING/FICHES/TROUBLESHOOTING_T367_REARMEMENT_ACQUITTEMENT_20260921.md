@@ -45,7 +45,7 @@ récupération (`T367` : « juge absurde »).
     Le diff de ce commit **crée** les affectations `Reset := PRG_09_Supervision.FaultMachineReset_IHM`
     (≈20 sites) **et** sépare explicitement les resets dédiés, avec ce commentaire toujours présent dans
     le code d'aujourd'hui : `// 🔧 REX 2026-07-07 : dédié, jamais mélangé au reset défauts général`
-    (aujourd'hui `CODE/G_CYCLE/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st:9`).
+    (aujourd'hui `CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st:9`).
     ➡️ La séparation n'est pas un état initial subi : c'est une **décision corrective datée**, prise après
     retour d'expérience, dont la leçon est **encore écrite dans le code courant**.
   - `b599d031` — **2026-08-26**, auteur **Mathieu Gros**, *« docs(af): mise en conformite AF-01

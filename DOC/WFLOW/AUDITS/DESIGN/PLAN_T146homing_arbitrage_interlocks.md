@@ -121,7 +121,7 @@ bundle + TC). Voir `DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS_v1.2.md` §2.
 |---|---|
 | `DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md` | §7/§11 : arbitrage hors homing, règle capteur TOP ⇒ levée du bridage |
 | `DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md` | §7.3 / §9bis : état garde-fou vitesse, sort `FB_WinchRateInterlock` |
-| `DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md` | §3bis/§3ter : interlock `TremieFull_OR_GateRaised_DI` dans permis M3→Trémie |
+| `DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md` | §3bis/§3ter : interlock `TremieFull_OR_GateRaised_DI` dans permis M3→Trémie |
 | `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T146.yaml` | cycle de vie (`status`, `execution`, `validation`) |
 | `DOC/WFLOW/AUDITS/DESIGN/DECISIONS_T146_ARBITRAGE_ISO13849.md` | **à créer** : décision de posture + visa humain |
 | `DOC/VERSION_HISTORY.md` | une ligne par jalon T146 |

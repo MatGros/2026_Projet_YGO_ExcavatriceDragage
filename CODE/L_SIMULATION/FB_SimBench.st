@@ -71,7 +71,7 @@ VAR_INPUT
 
     // ── Stimuli & Paramètres de banc ─────────────────────────────────────────
     SimEncoderSpeedFactor      : REAL := 1.0;   (* --> [CFG] Facteur vitesse codeur *)
-    SimWinchCoast_M            : REAL := 0.35;  (* --> [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; ~0.35 = finit dans la bande ouvert/ferme malgre l'anticipation d'arret *)
+    SimWinchCoast_M            : REAL := 1.30;  (* --> [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; 1.30 = finit a la butee ouverte *)
     SimTopPositionActive       : BOOL := FALSE; (* --> [TST] Injection manuelle capteur haut actif (essai ciblé) *)
     SimSyncDeviationInjectM1   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M1 *)
     SimSyncDeviationInjectM2   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M2 *)
@@ -140,6 +140,9 @@ VAR_INPUT
     M2_CablePos_M               : REAL := 0.0;     (* --> [HW] Position M2 recalée (m), issue de la même chaîne que le métier *)
     BucketOffsetCloseM          : REAL := 15.0;    (* --> [CFG] Butée mécanique benne FERMÉE (m, écart M2-M1) *)
     BucketCoherenceLimitM       : REAL := 1.0;     (* --> [CFG] Demi-largeur de la bande franc ouvert/fermé (m) *)
+    BucketOffsetOpen_M          : REAL := 0.0;     (* --> [CFG] Butée mécanique benne OUVERTE (m, écart M2-M1) *)
+    BucketOpenAnticipation_M    : REAL := 1.3;     (* --> [CFG] Anticipation arrêt ouverture benne (m) *)
+    BucketAx15bOpenActive       : BOOL := FALSE;   (* --> [CMD] Étape AX15B active *)
 
     // ── Image réelle fallback ────────────────────────────────────────────────
     HwReal                     : ST_HardwareImage;   (* --> [HW] Image réelle fallback *)
@@ -242,7 +245,12 @@ VAR
     M2_RelayFwdPrev            : BOOL;   (* . [LOC] Mémoire relais Fwd N-1 *)
     M2_RelayRevPrev            : BOOL;   (* . [LOC] Mémoire relais Rev N-1 *)
     RandomSeed                 : UDINT := 123456789; (* . [LOC] Générateur LCG pseudo-aléatoire *)
-    M2_EffectiveCoastM         : REAL := 0.35;       (* . [LOC] Distance de roulis M2 courante *)
+    M2_EffectiveCoastM         : REAL := 1.30;       (* . [LOC] Distance de roulis M2 courante *)
+    M2EffectiveCoastDistance_M : REAL;               (* . [LOC] Distance appliquée au codeur M2 *)
+    M2AutoOpenCoastArmed       : BOOL;               (* . [LOC] Fin d'ouverture automatique à simuler *)
+    M2OpenDistanceRemaining_M  : REAL;               (* . [LOC] Distance restante à la butée ouverte *)
+    M2OpenStopThreshold_M     : REAL;               (* . [LOC] Seuil avec avance d'un scan d'acquisition *)
+    M2ExpectedStepDistance_M  : REAL;               (* . [LOC] Course codeur M2 du scan actif *)
     M2CoupledDescentActive     : BOOL;                (* . [LOC] Ralentissement M2 actif en descente BOTH *)
     M2EffectiveSpeedScaleFactor : REAL;               (* . [LOC] Facteur vitesse du producteur unique M2 *)
     KoboldMeasureEnablePrevious : BOOL;               (* . [LOC] Front alimentation Kobold *)
@@ -422,6 +430,35 @@ IF M2CoupledDescentActive THEN
     M2EffectiveSpeedScaleFactor := SimEncoderSpeedFactor * MAX(0.0, SimM2CoupledDescentFactor);
 END_IF;
 
+// P02 consomme la mesure publiée au scan précédent. Reconstituer le déplacement
+// de ce scan évite un trou d'un cycle lors du seuil d'arrêt de FB_Bucket.
+M2ExpectedStepDistance_M := (1.0 + (INT_TO_REAL(MAX(M2_StepNumber, 1)) - 1.0) * 0.25)
+                            * MAX(0.0, SimEncoderSpeedFactor)
+                            * CST_SimBenchCycleTimeS;
+M2OpenStopThreshold_M := BucketOffsetOpen_M + MAX(0.0, BucketOpenAnticipation_M)
+                         + M2ExpectedStepDistance_M;
+
+// Armer le roulis long uniquement à l'approche du seuil d'ouverture AX15B.
+// Un jog manuel, un homing ou un arrêt ailleurs garde le roulis historique.
+IF NOT M2_RelayRev OR M2_RelayFwd THEN
+    M2AutoOpenCoastArmed := FALSE;
+ELSIF SimWinchCouplingModelActive AND BucketAx15bOpenActive
+      AND NOT M1_RelayFwd AND NOT M1_RelayRev
+      AND (M2_CablePos_M - M1_CablePos_M)
+          <= M2OpenStopThreshold_M THEN
+    M2AutoOpenCoastArmed := TRUE;
+END_IF;
+
+// À l'arrêt anticipé automatique, le roulis couvre seulement l'écart restant
+// jusqu'à la butée ouverte : il ne sur-ouvre pas et ne modifie pas le jog manuel.
+M2EffectiveCoastDistance_M := M2_EffectiveCoastM;
+IF M2AutoOpenCoastArmed THEN
+    M2OpenDistanceRemaining_M := MAX(0.0, M2_CablePos_M - M1_CablePos_M
+                                          - BucketOffsetOpen_M - M2ExpectedStepDistance_M);
+    M2EffectiveCoastDistance_M := MIN(MAX(0.0, BucketOpenAnticipation_M),
+                                      M2OpenDistanceRemaining_M);
+END_IF;
+
 // Instance modèle codeur M2 (avec roulis et dispersion)
 instSimEncoderM2(
     Enable           := TRUE,
@@ -431,7 +468,7 @@ instSimEncoderM2(
     PresetCmd        := M2_PresetCmd,
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := M2EffectiveSpeedScaleFactor,
-    CoastDistanceM   := M2_EffectiveCoastM,
+    CoastDistanceM   := M2EffectiveCoastDistance_M,
     SpeedReportTauS  := WinchSpeedReportTauEffectiveS,
     TestOffsetCmd    := SimSyncDeviationInjectM2,
     TestOffsetPts    := M2_OffsetPts,
