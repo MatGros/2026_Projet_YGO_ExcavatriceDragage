@@ -62,8 +62,8 @@
 🎯 Remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
 (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en permanence — un vrai
 contournement de sécurité, retiré). Ce FB simule uniquement les **entrées brutes** du capteur
-(`RawX`/`RawY`/`RawButton`) : le homme-mort réel de `FB_Joystick` reste pleinement actif et doit
-toujours être « actionné » (forcer `RawButton` en instance CODESYS) pour armer — comportement
+(`RawX`/`RawY`) : le homme-mort réel de `FB_Joystick` reste pleinement actif et doit
+toujours être « actionné » (`SimJoystickRawButton`, câblé par `FB_SimBench`) pour armer — comportement
 métier testé pour de vrai, pas contourné.
 
 🧩 Brique réduite (`AF_Partie-03 §2`) : outil de banc, pas de contrat `Enable/Reset/Error`.
@@ -81,15 +81,15 @@ métier testé pour de vrai, pas contourné.
 | Sortie | Type | Sens |
 |---|---|---|
 | `RawX`/`RawY` | INT | Forçables en instance CODESYS, défaut = `NeutralRaw` |
-| `RawButton` | BOOL | Forçable en instance CODESYS, défaut = `FALSE` (relâché) |
+| `RawButton` | BOOL | Indicateur « au moins un bouton directionnel actif » — **pas** l'homme-mort, jamais câblé sur `JoyBtnRaw` (T418, gate G528) |
 
 ---
 
 ## 3. Homme-mort — jamais contourné
 
 En vue instance CODESYS, forcer `RawX`/`RawY` à `MaxRaw` (ou une valeur intermédiaire) pour
-simuler un débattement, et `RawButton` à `TRUE` pour simuler l'appui homme-mort — exactement
-comme on forcerait le vrai capteur. Le FB initialise au neutre une seule fois (`FirstCycle`) puis
+simuler un débattement. L'appui homme-mort se simule **uniquement** par `SimJoystickRawButton`
+(seule source de `Operator.JoyBtnRaw`, T418) — exactement comme on actionnerait le vrai bouton. Le FB initialise au neutre une seule fois (`FirstCycle`) puis
 n'écrit plus jamais ces sorties : un `Force` CODESYS n'est jamais écrasé par une réaffectation
 cyclique, condition nécessaire pour que le forçage tienne dans la durée.
 

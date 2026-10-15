@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-04T03:10:28.093965" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-04T03:10:28.093965">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-14T23:00:30.838283" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-14T23:00:30.838283">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -691,6 +691,17 @@
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier code retour socket</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DestAddress">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <initialValue>
+                <simpleValue value="" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Adresse loopback (variable : szDestAddress est VAR_IN_OUT)</xhtml>
               </documentation>
             </variable>
             <variable name="Reply">
@@ -1407,7 +1418,7 @@ Tx[30] := WORD_TO_BYTE(SHR(INT_TO_WORD(EchoPos_Cm), 8));
 Tx[31] := WORD_TO_BYTE(PlcEcho.SafetyErrorId AND 16#FF);
 // Adresse loopback écrite en littéral : une constante STRING déclarée est importée vide
 // par le générateur PLCopenXML, et l'envoi partirait vers une adresse vide.
-Bytes := SysSockSendToUdp(SocketHandle, CST_PortLocal, '127.0.0.1', ADR(Tx), SIZEOF(Tx), ADR(LastResult));
+Bytes := SysSockSendToUdp(SocketHandle, CST_PortLocal, DestAddress, ADR(Tx), SIZEOF(Tx), ADR(LastResult));
 IF Bytes = CST_TxSize THEN
     TxCount := TxCount + 1;
     Sequence := Sequence + 1;

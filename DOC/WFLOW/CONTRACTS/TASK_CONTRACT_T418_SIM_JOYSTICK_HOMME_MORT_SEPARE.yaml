@@ -33,8 +33,8 @@ contract:
       statement: "Homme-mort tenu AVANT l'entrée en N2 (pas de nouveau front en N2), machine référencée, grafcet homing au repos : jog vers Maintenance -> pas de nouveau front JoyBtnRaw, MachineHomingStep reste 60, pas de HX1. Le déplacement M3 éventuel suit le comportement conservé de FB_Joystick et des permis (armement/désarmement au changement de mode inclus), sans l'imposer."
       verified_by: "Test CI d'intégration FB_SimBench + FB_Joystick + FB_CycleMachineHoming réels"
     - id: AC4
-      statement: "Premier appui homme-mort EN N2, machine référencée, grafcet au repos : on OBSERVE et on documente le résultat tel que produit par le code machine déployé, sans le présumer (la lecture de FB_CycleMachineHoming.st:414 et le retour terrain de l'exploitant, qui ne voit jamais ce lancement, divergent : à départager par l'observation). Aucune modification du code machine dans T418 ; le constat est remonté à l'humain."
-      verified_by: "Test CI d'intégration ; résultat consigné dans la restitution"
+      statement: "Premier appui homme-mort EN N2, machine référencée, grafcet au repos : OBSERVER et SIGNALER le résultat du code machine déployé. Constat attendu par lecture de FB_CycleMachineHoming.st:414 : lancement HX1 encore possible. T418 ne le corrige PAS et ne promet pas de le corriger : correction portée par T377 (AC9 : homme-mort et débattement seuls ne lancent pas la séquence sur machine référencée)."
+      verified_by: "Test CI d'intégration TC-T418-INT-003 (fige le constat, à inverser par T377) ; constat consigné dans la restitution"
     - id: AC5
       statement: "États homme-mort distingués et conservés : (a) jamais armé, bouton FALSE -> aucune demande ; (b) bouton relâché après armement -> comportement de FB_Joystick inchangé (pas d'arrêt immédiat imposé par le simulateur)."
       verified_by: "Test CI des deux états"
@@ -87,13 +87,17 @@ contract:
   alert_duty: >
     Tout écart constaté est remonté à l'orchestrateur, jamais en silence. Aucun commit sans validation humaine.
 
-status: PENDING
+status: IN_REVIEW
 execution:
-  executed_by: "—"
-  completed_at: "—"
-  status: PENDING
-  summary: ""
-  evidence_submitted: []
+  executed_by: "CC01"
+  completed_at: "2026-10-13T17:30:00+02:00"
+  status: DONE
+  summary: "FB_SimBench : Operator.JoyBtnRaw := SimJoystickRawButton seul. FB_Sim_Joystick : commentaires RawButton (indicateur directions, pas homme-mort). Gate G528 + selftest 6 mutations. Tests TC-T418-001/002 (FB_SimBench) et TC-T418-INT-001..003 (SimDeadmanHoming : FB_SimBench + FB_CycleMachineHoming reels). Mutation motif d'incident -> G528 FAIL, TC-T418-001/002 FAIL, TC-T418-INT-001 FAIL. CONSTAT AC4 : premier front homme-mort en N2, machine referencee -> HX1 + M3Locked (code v0.7.25 inchange) -> a corriger par T377. Test CI FB_SimBench remis en compilation (registre : ST_RunningHoursHMI, ST_fbSim_Translation_ExtLink_Echo, mock FB_Sim_Translation_ExtLink sans socket) ; 2 echecs T328 M2 (TC-P13-063/068) preexistants, verifies sur 96e281e4, hors perimetre. AC1 DeadmanArmed : couvert par construction (JoyBtnRaw FALSE -> FB_Joystick ne peut pas armer), FB_Joystick non instancie dans l'integration."
+  evidence_submitted:
+    - "G200 --report PASS (0 erreur)"
+    - "G528 PASS + selftest PASS"
+    - "run_tests --domain L_SIMULATION : 10/11 FB PASS (FB_SimBench 43/45, echecs T328 preexistants)"
+    - "run_all_gates --palier C : 5 FAIL preexistants (G300, G340, G430, G483, G519), aucun nouveau"
 validation:
   status: PENDING
   validated_by: "—"

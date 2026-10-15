@@ -8596,6 +8596,19 @@ reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non c
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Gain de reaction de charge M3, m/s2</xhtml>
               </documentation>
             </variable>
+            <variable name="SimM3SpeedFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ACCELERATION DU BANC M3 : chariot ET frequence retournee x facteur (1..5), estimation coherente.
+Volontairement NON cable par PRG_02 : se regle en ligne sur l'instance (instSimBench.SimM3SpeedFactor).
+--&gt; [TST] Facteur de vitesse du banc M3, 1,0 = dynamique reelle</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimJoystickLeft_Rev_TREMIE_Active">
               <type>
                 <BOOL />
@@ -9874,6 +9887,7 @@ instSimTranslation(
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
     FullTravelTimeS := CST_M3FullTravelTimeS,
     MaxFreq_Hz      := CST_M3MaxFreq_Hz,
+    SpeedFactor     := SimM3SpeedFactor,
     BrakeReleaseCmd := M3_BrakeCmd,
     SensorIntermittenceActive := SimM3SensorIntermittenceActive,
     SensorStabilizationS := SimM3SensorStabilizationS,
@@ -13401,6 +13415,21 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
        ODOMETRIQUE (gain 0,02 m/(Hz.s)).</xhtml>
               </documentation>
             </variable>
+            <variable name="SpeedFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ACCELERATION DU BANC (confort d'essai). Le chariot avance SpeedFactor fois plus vite ET la
+       frequence RETOURNEE au PLC est multipliee d'autant : l'estimateur (f x gain) suit exactement
+       le chariot, sans saut de recalage, et le ratio publie reste 0,02 m/(Hz.s) (G518).
+       Borne 1..5. 1,0 = dynamique reelle. Le frein et la memoire de sens restent sur la frequence
+       physique du variateur simule.</xhtml>
+              </documentation>
+            </variable>
             <variable name="AccelRate_HzPerS">
               <type>
                 <REAL />
@@ -13754,6 +13783,14 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <REAL />
               </type>
             </variable>
+            <variable name="SpeedFactorApplied">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
             <variable name="CycleTimeS">
               <type>
                 <REAL />
@@ -14019,9 +14056,10 @@ IF Enable THEN
         LoadFrequencyDroopGain_Hz := LoadFrequencyDroopGain_Hz, CycleTime_S := CycleTimeS);
     FrequencyCmd_Hz := instDrive.FrequencyCmd_Hz;
     ElectricalFrequency_Hz := instDrive.ElectricalFrequency_Hz;
-    ActualFrequency_Hz := instDrive.ActualFrequency_Hz;
+    SpeedFactorApplied := LIMIT(1.0, SpeedFactor, 5.0);
+    ActualFrequency_Hz := instDrive.ActualFrequency_Hz * SpeedFactorApplied;
     instBrake(Enable := TRUE, ReleaseCmd := BrakeReleaseCmd,
-        ActualFrequency_Hz := ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
+        ActualFrequency_Hz := instDrive.ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
         CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
         CycleTime_S := CycleTimeS,
         FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
@@ -14043,7 +14081,7 @@ IF Enable THEN
         TravelDirection := 1.0;
     ELSIF ReqTremie AND ReqMaintenance THEN
         TravelDirection := 0.0;
-    ELSIF ABS(ActualFrequency_Hz) &lt;= CST_StopFrequency_Hz THEN
+    ELSIF ABS(instDrive.ActualFrequency_Hz) &lt;= CST_StopFrequency_Hz THEN
         TravelDirection := 0.0;
     END_IF;
 
@@ -14378,6 +14416,17 @@ SensorBlipActive := instSensorTremie.BlipActive OR instSensorPV.BlipActive
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier code retour socket</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DestAddress">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <initialValue>
+                <simpleValue value="" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Adresse loopback (variable : szDestAddress est VAR_IN_OUT)</xhtml>
               </documentation>
             </variable>
             <variable name="Reply">
@@ -15094,7 +15143,7 @@ Tx[30] := WORD_TO_BYTE(SHR(INT_TO_WORD(EchoPos_Cm), 8));
 Tx[31] := WORD_TO_BYTE(PlcEcho.SafetyErrorId AND 16#FF);
 // Adresse loopback écrite en littéral : une constante STRING déclarée est importée vide
 // par le générateur PLCopenXML, et l'envoi partirait vers une adresse vide.
-Bytes := SysSockSendToUdp(SocketHandle, CST_PortLocal, '127.0.0.1', ADR(Tx), SIZEOF(Tx), ADR(LastResult));
+Bytes := SysSockSendToUdp(SocketHandle, CST_PortLocal, DestAddress, ADR(Tx), SIZEOF(Tx), ADR(LastResult));
 IF Bytes = CST_TxSize THEN
     TxCount := TxCount + 1;
     Sequence := Sequence + 1;

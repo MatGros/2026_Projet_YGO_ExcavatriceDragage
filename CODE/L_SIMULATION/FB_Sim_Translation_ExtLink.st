@@ -51,6 +51,7 @@ VAR
     NonBlocking             : DINT := 1;                  // . [LOC] Option socket non bloquant
     SocketIsOpen            : BOOL := FALSE;              // . [LOC] Socket réellement ouvert (ni invalide, ni factice)
     LastResult              : RTS_IEC_RESULT := 0;        // . [LOC] Dernier code retour socket
+    DestAddress             : STRING := '127.0.0.1';      // . [LOC] Adresse loopback (variable : szDestAddress est VAR_IN_OUT)
     Reply                   : UDP_REPLY;                  // . [LOC] Adresse émettrice de la réponse
     Tx                      : ARRAY [0..31] OF BYTE;      // . [LOC] Trame commande
     Rx                      : ARRAY [0..63] OF BYTE;      // . [LOC] Trame réponse
@@ -219,7 +220,7 @@ Tx[30] := WORD_TO_BYTE(SHR(INT_TO_WORD(EchoPos_Cm), 8));
 Tx[31] := WORD_TO_BYTE(PlcEcho.SafetyErrorId AND 16#FF);
 // Adresse loopback écrite en littéral : une constante STRING déclarée est importée vide
 // par le générateur PLCopenXML, et l'envoi partirait vers une adresse vide.
-Bytes := SysSockSendToUdp(SocketHandle, CST_PortLocal, '127.0.0.1', ADR(Tx), SIZEOF(Tx), ADR(LastResult));
+Bytes := SysSockSendToUdp(SocketHandle, CST_PortLocal, DestAddress, ADR(Tx), SIZEOF(Tx), ADR(LastResult));
 IF Bytes = CST_TxSize THEN
     TxCount := TxCount + 1;
     Sequence := Sequence + 1;

@@ -582,3 +582,64 @@ END_VAR
     ASSERT_GE(overshoot_M, 0.15, 'Depassement >= 0,15 m (ordre de grandeur trace reelle)');
     ASSERT_LE(overshoot_M, 0.35, 'Depassement <= 0,35 m (ordre de grandeur trace reelle)');
 END_TEST
+
+(* Acceleration du banc : chariot ET frequence retournee x facteur. L'estimateur reel integre
+   f_retournee x 0,02 : il doit retrouver la distance du chariot (aucun saut de recalage). *)
+TEST 'TC-SIMSPEED-001 Facteur 3 : chariot 3 m/s a 50 Hz et distance = integrale f retournee x 0,02'
+VAR
+    fb : FB_Sim_Translation;
+    i : INT;
+    posStart_M : REAL;
+    integralHzS : REAL;
+END_VAR
+    fb.Enable := TRUE;
+    fb.ReqTremie := TRUE;
+    fb.SpeedTgt_Pct := 100.0;
+    fb.SpeedFactor := 3.0;
+    fb.BrakeReleaseCmd := TRUE;
+    fb.BrakeOpenDelayS := 0.0;
+    fb.SensorElectricalDelayS := 0.0;
+    fb.LoadReactionGain_Mps2 := 0.0;
+    FOR i := 1 TO 300 DO
+        fb();
+    END_FOR;
+    ASSERT_NEAR(fb.ActualFrequency_Hz, 150.0, 3.0, 'frequence retournee = 3 x 50 Hz');
+    ASSERT_NEAR(fb.VelocityTrue_Mps, -3.0, 0.15, 'chariot a 3 m/s (1 m/s reel x 3)');
+    posStart_M := fb.PositionTrue_M;
+    integralHzS := 0.0;
+    FOR i := 1 TO 200 DO
+        fb();
+        integralHzS := integralHzS + fb.ActualFrequency_Hz * 0.010;
+    END_FOR;
+    ASSERT_NEAR(posStart_M - fb.PositionTrue_M, integralHzS * 0.02, 0.25,
+        'estimation (f retournee x 0,02) = distance du chariot : aucun saut de recalage');
+END_TEST
+
+TEST 'TC-SIMSPEED-002 Facteur borne a 5, facteur < 1 ramene a 1'
+VAR
+    fb : FB_Sim_Translation;
+    fbLow : FB_Sim_Translation;
+    i : INT;
+END_VAR
+    fb.Enable := TRUE;
+    fb.ReqTremie := TRUE;
+    fb.SpeedTgt_Pct := 100.0;
+    fb.SpeedFactor := 10.0;
+    fb.BrakeReleaseCmd := TRUE;
+    fb.BrakeOpenDelayS := 0.0;
+    fb.LoadReactionGain_Mps2 := 0.0;
+    fbLow.Enable := TRUE;
+    fbLow.ReqTremie := TRUE;
+    fbLow.SpeedTgt_Pct := 100.0;
+    fbLow.SpeedFactor := 0.0;
+    fbLow.BrakeReleaseCmd := TRUE;
+    fbLow.BrakeOpenDelayS := 0.0;
+    fbLow.LoadReactionGain_Mps2 := 0.0;
+    FOR i := 1 TO 300 DO
+        fb();
+        fbLow();
+    END_FOR;
+    ASSERT_NEAR(fb.ActualFrequency_Hz, 250.0, 5.0, 'facteur 10 borne a 5 : 250 Hz retournes');
+    ASSERT_NEAR(fbLow.ActualFrequency_Hz, 50.0, 1.0, 'facteur 0 ramene a 1 : 50 Hz retournes');
+    ASSERT_NEAR(fbLow.VelocityTrue_Mps, -1.0, 0.05, 'facteur 1 : 1 m/s reel a 50 Hz');
+END_TEST

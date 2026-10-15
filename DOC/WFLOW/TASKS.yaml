@@ -1,10 +1,11 @@
 tasks:
 - id: T418
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C2
   domaine: SIMULATION / SIMBENCH / JOYSTICK
-  agent: —
+  agent: CC01
+  updated_at: '2026-10-13T17:30:00+02:00'
   date: '2026-10-13T15:00:00'
   titre: Simulateur joystick — homme-mort separe des boutons directionnels (front parasite qui lance le homing en N2)
   contexte: En simulation, MAINT_N2 + zone Maintenance M3 autorisee + machine referencee, un appui bouton directionnel simule lance le grafcet homing (HX1). FB_SimBench.st:710 fabrique l homme-mort (Operator.JoyBtnRaw := SimJoystickRawButton OR DirectionCount > 0) a chaque bouton directionnel ; le front passe la transition HX0 FB_CycleMachineHoming.st:414. Le joystick reel ne le fait pas et le code machine v0.7.25 fonctionne.
@@ -14,7 +15,7 @@ tasks:
   - N2 + reference + homme-mort tenu + jog vers Maintenance -> pas de HX1, M3 bouge.
   - Sans homme-mort simule -> aucun mouvement (securite FB_Joystick testee pour de vrai).
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T418_SIM_JOYSTICK_HOMME_MORT_SEPARE.yaml
-  avancement: Contrat V2 apres challenge (GO avec corrections) - producteur FB_SimBench.st:710, scenario premier appui en N2 observe (AC4), guard gate (AC6). Snapshots preuve Snapshot_Troubleshooting_20261013_134929/135017.
+  avancement: 'Implemente, en attente de validation humaine (aucun commit du lot). JoyBtnRaw = SimJoystickRawButton seul ; gate G528 ; tests TC-T418-001/002 + TC-T418-INT-001..003. CONSTAT AC4 : premier appui homme-mort en N2 sur machine referencee lance encore HX1 (code machine inchange) -> correction dans T377, pas dans T418.'
   bloque_par: []
 - id: T417
   parent_id: ''

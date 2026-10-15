@@ -110,6 +110,9 @@ VAR_INPUT
     // reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non calibre.
     SimM3EndStopRecoilMax_M          : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Recul borne a la butee M3, m *)
     SimM3LoadReactionGain_Mps2       : REAL := 0.20;   (* --> [CFG][SYNTHETIQUE] Gain de reaction de charge M3, m/s2 *)
+    // ACCELERATION DU BANC M3 : chariot ET frequence retournee x facteur (1..5), estimation coherente.
+    // Volontairement NON cable par PRG_02 : se regle en ligne sur l'instance (instSimBench.SimM3SpeedFactor).
+    SimM3SpeedFactor                 : REAL := 1.0;    (* --> [TST] Facteur de vitesse du banc M3, 1,0 = dynamique reelle *)
 
     SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick gauche *)
     SimJoystickRight_Fwd_MAINT_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick droite *)
@@ -592,6 +595,7 @@ instSimTranslation(
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
     FullTravelTimeS := CST_M3FullTravelTimeS,
     MaxFreq_Hz      := CST_M3MaxFreq_Hz,
+    SpeedFactor     := SimM3SpeedFactor,
     BrakeReleaseCmd := M3_BrakeCmd,
     SensorIntermittenceActive := SimM3SensorIntermittenceActive,
     SensorStabilizationS := SimM3SensorStabilizationS,

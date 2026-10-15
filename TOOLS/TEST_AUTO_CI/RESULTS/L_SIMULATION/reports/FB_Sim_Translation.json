@@ -69,11 +69,19 @@
     {
       "name": "TC-T417-OVERSHOOT-001 Depassement apres retrait a 20 Hz",
       "passed": true
+    },
+    {
+      "name": "TC-SIMSPEED-001 Facteur 3 : chariot 3 m/s a 50 Hz et distance = integrale f retournee x 0,02",
+      "passed": true
+    },
+    {
+      "name": "TC-SIMSPEED-002 Facteur borne a 5, facteur < 1 ramene a 1",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 17,
-    "passed": 17,
+    "total": 19,
+    "passed": 19,
     "failed": 0
   }
 }

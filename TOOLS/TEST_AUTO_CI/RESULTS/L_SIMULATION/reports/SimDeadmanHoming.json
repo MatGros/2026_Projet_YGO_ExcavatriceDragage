@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "file": "test_sim_deadman_homing.st",
+  "results": [
+    {
+      "name": "TC-T418-INT-001 N2 machine referencee : jog simule sans homme-mort -> pas de HX1, M3 libre (incident 13/10)",
+      "passed": true
+    },
+    {
+      "name": "TC-T418-INT-002 Homme-mort tenu AVANT N2 puis jog vers Maintenance en N2 -> pas de HX1 (AC3)",
+      "passed": true
+    },
+    {
+      "name": "TC-T418-INT-003 CONSTAT (a corriger par T377) : premier appui homme-mort EN N2, machine referencee -> HX1",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0
+  }
+}
