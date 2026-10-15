@@ -28,6 +28,80 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
     ASSERT_FALSE(FB_Bench.Ready, 'Coupure -> Ready retombe a FALSE');
 END_TEST
 
+(* =========================================================================
+   T419 — Reprise de jeu : ne jamais ouvrir la benne pendant une descente M1+M2.
+   ========================================================================= *)
+
+TEST 'TC-P13-074 T419 descente M1-M2 : compensation de fermeture conservee'
+VAR
+    CorrectionAfterAscentPts       : DINT;
+    CorrectionAfterBothDescentPts  : DINT;
+END_VAR
+    (* La montee couplee etablit une compensation de fermeture observable. *)
+    RawPosM1 := 1000000; RawPosM2 := 1100000;
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ADVANCE_TIME(10000000);
+
+    (* Second scan : reprise de jeu de fermeture accumulee dans l'image M2. *)
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    CorrectionAfterAscentPts := UDINT_TO_DINT(FB_Bench.Winch.COD2_PosValue) - UDINT_TO_DINT(RawPosM2);
+    ASSERT_TRUE(CorrectionAfterAscentPts > 0, 'montee couplee -> compensation fermee presente');
+    ADVANCE_TIME(10000000);
+
+    (* Descente de charge M1+M2 : ce n'est pas une ouverture relative de la benne. *)
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := FALSE, M1_RelayRev := TRUE,
+             M2_RelayFwd := FALSE, M2_RelayRev := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    CorrectionAfterBothDescentPts := UDINT_TO_DINT(FB_Bench.Winch.COD2_PosValue) - UDINT_TO_DINT(RawPosM2);
+    ASSERT_EQ(CorrectionAfterBothDescentPts, CorrectionAfterAscentPts,
+              'descente M1+M2 -> compensation de fermeture inchangee');
+END_TEST
+
+TEST 'TC-P13-075 T419 ouverture M2 seule : relachement borne conserve'
+VAR
+    CorrectionBeforeOpenPts : DINT;
+    CorrectionAfterOpenPts  : DINT;
+END_VAR
+    (* Scenario autonome : etabli une fermeture avant l'ouverture relative M2 seule. *)
+    RawPosM1 := 1000000; RawPosM2 := 1100000;
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := TRUE, M2_RelayFwd := TRUE,
+             M1_BrakeCmd := TRUE, M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    ADVANCE_TIME(10000000);
+    CorrectionBeforeOpenPts := UDINT_TO_DINT(FB_Bench.Winch.COD2_PosValue) - UDINT_TO_DINT(RawPosM2);
+    ASSERT_TRUE(CorrectionBeforeOpenPts > 0, 'fermeture etablie avant ouverture M2 seule');
+    ADVANCE_TIME(10000000);
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M1_RelayFwd := FALSE, M1_RelayRev := FALSE,
+             M2_RelayFwd := FALSE, M2_RelayRev := TRUE,
+             M2_BrakeCmd := TRUE,
+             SimWinchCouplingModelActive := TRUE,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 18.5,
+             BucketOffsetCloseM := 15.0, BucketCoherenceLimitM := 1.0);
+    CorrectionAfterOpenPts := UDINT_TO_DINT(FB_Bench.Winch.COD2_PosValue) - UDINT_TO_DINT(RawPosM2);
+    ASSERT_TRUE(CorrectionAfterOpenPts < CorrectionBeforeOpenPts,
+                'ouverture M2 seule -> compensation relachee');
+    ASSERT_TRUE((CorrectionBeforeOpenPts - CorrectionAfterOpenPts) <= 82,
+                'ouverture M2 seule -> relachement borne a 0,02 m par scan');
+END_TEST
+
 TEST 'TC-P13-001 Sim_Safety : neutralisation sans Enable'
     FB_SimSafe(Enable := FALSE);
     ASSERT_FALSE(FB_SimSafe.SimChainOk, 'AU non ferme');
@@ -788,4 +862,53 @@ END_VAR
     ADVANCE_TIME(10000000);
     ASSERT_TRUE((M2_Pos_M - 5.0) >= 14.97, 'residu 14,75 m -> butee atteinte (ecart <= 0,2 %)');
     ASSERT_TRUE((M2_Pos_M - 5.0) <= 15.0, 'residu 14,75 m -> aucun depassement de butee');
+END_TEST
+
+TEST 'TC-P13-076 T419 ouverture M2 seule : roulis couvre l anticipation benne configuree'
+VAR
+    i                    : INT;
+    RawPosAfterCommand   : UDINT;
+    CoastDistanceActual_M : REAL;
+END_VAR
+    (* Un scan de descente relative charge la distance de roulis configuree dans
+       FB_Sim_Encoder ; apres coupure, le codeur doit parcourir cette distance. *)
+    RawPosM1 := 10000000;
+    RawPosM2 := 50000000;
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M2_RelayFwd := FALSE, M2_RelayRev := TRUE, M2_StepNumber := 1,
+             SimWinchCouplingModelActive := TRUE,
+             SimWinchCoast_M := 0.35,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 6.31,
+             BucketOffsetOpen_M := 0.0, BucketOpenAnticipation_M := 1.3,
+             BucketAx15bOpenActive := TRUE);
+    ASSERT_NEAR(FB_Bench.M2EffectiveCoastDistance_M, 1.3, 0.001,
+                'fin AX15B -> roulis compense le scan mesure en retard');
+    RawPosAfterCommand := RawPosM2;
+    ADVANCE_TIME(10000000);
+
+    FOR i := 1 TO 160 DO
+        FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+                 M2_RelayFwd := FALSE, M2_RelayRev := FALSE, M2_StepNumber := 0,
+                 SimWinchCouplingModelActive := TRUE,
+                 SimWinchCoast_M := 0.35,
+                 M1_CablePos_M := 5.0, M2_CablePos_M := 6.3,
+                 BucketOffsetOpen_M := 0.0, BucketOpenAnticipation_M := 1.3,
+                 BucketAx15bOpenActive := FALSE);
+        ADVANCE_TIME(10000000);
+    END_FOR;
+    CoastDistanceActual_M := DINT_TO_REAL(UDINT_TO_DINT(RawPosAfterCommand)
+                                          - UDINT_TO_DINT(RawPosM2)) * (2.0 / 8192.0);
+    ASSERT_NEAR(CoastDistanceActual_M, 1.3, 0.03,
+                'distance parcourue apres coupure atteint la butee ouverte');
+
+    (* Un mouvement unitaire M2 hors demande auto garde son roulis de base. *)
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2,
+             M2_RelayFwd := FALSE, M2_RelayRev := TRUE, M2_StepNumber := 1,
+             SimWinchCouplingModelActive := TRUE,
+             SimWinchCoast_M := 0.35,
+             M1_CablePos_M := 5.0, M2_CablePos_M := 6.31,
+             BucketOffsetOpen_M := 0.0, BucketOpenAnticipation_M := 1.3,
+             BucketAx15bOpenActive := FALSE);
+    ASSERT_NEAR(FB_Bench.M2EffectiveCoastDistance_M, FB_Bench.M2_EffectiveCoastM, 0.001,
+                'jog manuel M2 -> roulis de base conserve');
 END_TEST

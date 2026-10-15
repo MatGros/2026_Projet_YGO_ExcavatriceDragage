@@ -12,7 +12,7 @@
 | # | Document | Pourquoi |
 |---|---|---|
 | 1 | `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T204.yaml` | Contrat (scope, AC1..AC9, alert_duty, conservation) |
-| 2 | `DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md` §3ter | Modèle cible du gate (déjà rédigé pour T204) |
+| 2 | `DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md` §3ter | Modèle cible du gate (déjà rédigé pour T204) |
 | 3 | `CODE/H_TREUILS_BENNE/FB_Winch.st` : 150-260 | **Modèle de référence** `EffectiveSafeStop` (l.163) |
 | 4 | `CODE/I_TRANSLATION/FB_Translation.st` : 192-219 | Site d'insertion cible (§4bis Gate + §5 rampe) |
 | 5 | `CODE/I_TRANSLATION/FB_Safety_Translation.st` : 65-66, 231-273 | Producteur unique des permits (INTACT) |
@@ -194,7 +194,7 @@ Ajout : nouveaux TC pour AC1/AC2/AC3 (plage TC-P11 libre, voir AF-P11 §1).
 
 | Doc | Nature de la modification |
 |---|---|
-| `DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md` §3ter | Décrire le gate effectif des 2 sens + règle P1 + référence `FB_Winch.st:163` |
+| `DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md` §3ter | Décrire le gate effectif des 2 sens + règle P1 + référence `FB_Winch.st:163` |
 | Fiches `AF_Partie-11_Fonction_Translation/FB_Translation_v1.1.md` (+ `FB_TranslationCmdArbitrationM3` si retenu) | Interface + logique gate |
 | `DOC/STDS/NAMING_CONVENTION.md` | **Aucune** (hors scope, forbidden) |
 | Registres (TC, `GVL_Troubleshooting`, snapshot troubleshooting) | Ajouter les nouveaux TC et les signaux gate/trace si nouveaux |
@@ -218,7 +218,7 @@ Ajout : nouveaux TC pour AC1/AC2/AC3 (plage TC-P11 libre, voir AF-P11 §1).
 ## 9 · Références croisées
 
 - Contrat : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T204.yaml`
-- Spec : `DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md` §3ter
+- Spec : `DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md` §3ter
 - Modèle : `CODE/H_TREUILS_BENNE/FB_Winch.st` l.163
 - Site cible : `CODE/I_TRANSLATION/FB_Translation.st` §4bis/§5
 - CI : `TOOLS/TEST_AUTO_CI/TEST_AUTO_CI_UNITARY/I_TRANSLATION/`

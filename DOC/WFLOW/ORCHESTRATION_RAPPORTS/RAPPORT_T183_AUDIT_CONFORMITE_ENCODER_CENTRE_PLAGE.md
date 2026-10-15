@@ -228,7 +228,7 @@ Repris de `TASKS.yaml` T183 + complétés :
 | `git show 73fa758d -- CODE/E_CODEURS/FB_Encoder_Homing.st` | Bascule vers le neutre |
 | `DOC/WFLOW/AUDITS/DECISION_ENCODER_PRESET_TRANSACTION.md` | Variante C actée — transaction readback |
 | `DOC/WFLOW/AUDITS/DECISION_ENCODER_CFG_OWNERSHIP.md` | `Calib` IN_OUT, constantes non IHM |
-| `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md` | Diagnostic complet (scénarios wrap, options A/B/C, chronologie git) |
+| `ARCHIVES/Doc/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md` | Diagnostic complet (scénarios wrap, options A/B/C, chronologie git) |
 
 ---
 

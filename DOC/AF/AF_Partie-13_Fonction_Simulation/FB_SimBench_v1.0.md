@@ -124,6 +124,18 @@ directement dans `FB_SimBench` (sous-image `Winch`).
 > la position du treuil et bloquait la montée en simulation quand le treuil était en haut. Le
 > stimulus manuel `SimTopPositionActive` reste la seule source d'un fait capteur.
 
+### 2.2 Roulis d'ouverture benne — M2 seul
+
+Quand l'étape publique AX15B demande l'ouverture, M2 descend seul, et l'écart atteint
+`OffsetOpenM + OpenAnticipationM`, `FB_SimBench` arme le roulis d'ouverture automatique. Il
+transmet alors au codeur M2 le plus petit de l'anticipation configurée et de l'écart restant
+jusqu'à la butée ouverte, en compensant le scan d'acquisition précédent. `PRG_02_Acquisition` alimente ces entrées depuis l'étape cycle et
+`_BucketCfgPersist.Config`. Les demandes d'ouverture du homing ne sont pas assimilées à AX15B.
+
+Un jog manuel, une ouverture interrompue hors de la zone d'anticipation, ainsi que les autres
+mouvements M1/M2 conservent `SimWinchCoast_M` et sa dispersion. Le cycle, la qualification métier
+de la benne et le joystick réel ne sont pas modifiés.
+
 > 🎯 **Procédure homing en simulation** : le homing auto (T173 / `FB_MachineHomingCycle`) dépend du
 > capteur TOP (`TopPositionActive = SimTopPositionActive`, `PRG_02:436`). Le capteur TOP simulé étant
 > **libre par défaut**, l'opérateur **doit poser `SimTopPositionActive=TRUE`** pour déclencher le

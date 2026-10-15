@@ -111,7 +111,7 @@ en Phase 0 bascule l'action concernée active. C'est conforme au devoir d'alerte
 
 | Doc | Type | Nature |
 |---|---|---|
-| `DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md` | spec AF | retirer `Mode` de l'interface `FB_Translation` (le conserver dans le flux d'arbitrage amont) |
+| `DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md` | spec AF | retirer `Mode` de l'interface `FB_Translation` (le conserver dans le flux d'arbitrage amont) |
 | `DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md` | spec AF | confirmer l'interface `FB_WinchCmdArbitrationM1/M2` **sans** `SpeedStepTable` (aligner si une trace subsiste) |
 | `DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md` | spec AF | confirmer bus `ST_Modes_Autorisations` (renommé) |
 | `DOC/STDS/NAMING_CONVENTION.md` | **HORS SCOPE** (forbidden) | ne pas modifier — cité en référence seulement |

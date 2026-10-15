@@ -22,7 +22,7 @@ L'ensemble des documents d'analyse fonctionnelle définit le comportement physiq
 | [AF_Partie-08](DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md) | **v2.5** | Décodage joystick CANopen, gestion homme-mort, armement, zones mortes, paliers | ✅ Aligné (NC-110 & Cfg persistant) |
 | [AF_Partie-09](DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md) | **v2.4** | Chaîne codeurs absolus EtherCAT, homing unitaire/conjoint, calcul vitesse glissante 50ms | ✅ Aligné (Preset centre-plage & cible M2) |
 | [AF_Partie-10](DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md) | **v2.1** | Régulation levage M1/M2, synchronisme, gestion d'ouverture/fermeture benne | ✅ Aligné (Découplage Décision/Muscle) |
-| [AF_Partie-11](DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md) | **v2.3** | Translation chariot M3, variateur AC600 EtherCAT, décodage 5 capteurs de position | ✅ Aligné |
+| [AF_Partie-11](DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md) | **v2.3** | Translation chariot M3, variateur AC600 EtherCAT, décodage 5 capteurs de position | ✅ Aligné |
 | [AF_Partie-12](DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md) | **v1.4** | Diagnostic réseaux (CANopen, EtherCAT), surveillance thermique et rotations de phase | ✅ Aligné |
 | [AF_Partie-13](DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md) | **v2.5** | Modèle cinématique simulé, émulation capteurs/variateurs, mode banc hors-sol | ✅ Aligné (L_SIMULATION/) |
 | [AF_Partie-14](DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md) | **v1.4** | Vue de dépannage chronologique, capture d'états d'éjection et traçage inverse | ✅ Aligné (FB_TroubleshootingView) |

@@ -1,0 +1,71 @@
+contract:
+  task_id: T419
+  criticality: C3
+  strategy: patch
+  objective: >
+    En simulation, l'ouverture M2 seule poursuit son mouvement d'inertie sur la
+    distance d'anticipation configuree afin que la benne atteigne sa geometrie
+    ouverte apres la coupure de commande, sans modifier le cycle reel.
+  acceptance:
+    - id: AC1
+      statement: En fin d'ouverture automatique M2 seule, la distance de roulis est limitée à l'écart restant jusqu'à la butée ouverte et plafonnée à l'anticipation configurée.
+      verified_by: Test FB_SimBench en demande automatique dans la zone d'anticipation, avec mesure avant/après épuisement du roulis.
+    - id: AC2
+      statement: Pour Delta mesuré=1.31 m, OffsetOpen=0 m, OpenAnticipation=1.3 m et palier 1 à 1 m/s, le scan actif estimé est retranché et le roulis après coupure vaut 1.3 m.
+      verified_by: Test FB_SimBench mesure la distance M2 réellement parcourue après coupure à ±0.03 m.
+    - id: AC3
+      statement: Jog manuel M2, M1, M2 en montée, M2 en descente couplée, presets et mode SimWinchCouplingModelActive=FALSE gardent leur distance de roulis historique.
+      verified_by: Test ciblé du jog manuel et tests non-régression FB_SimBench.
+    - id: AC4
+      statement: Offset ouvert et anticipation configurée proviennent de la configuration persistante; l'activation du roulis long est vraie uniquement en AX15B, via le raccordement simulateur PRG_02_Acquisition.
+      verified_by: Recherche de déclaration, raccordement et G200.
+    - id: AC5
+      statement: FB_CycleSemiAuto, FB_Bucket, FB_Joystick, FB_CycleMachineHoming et les parametres persistants restent inchanges.
+      verified_by: Audit diff borne des chemins interdits contre HEAD f4db569d.
+    - id: AC6
+      statement: Le bundle complet et diff sont frais, G200 passe et les gates applicables au lot passent.
+      verified_by: generate_codesys_bundle.py, generate_codesys_diff_bundle.py, G200_check_linkage.py --report et run_all_gates.py.
+    - id: AC7
+      statement: Le nom de fichier est identique au nom de POU.
+      verified_by: Inspection du chemin source et de la declaration POU PRG_02_Acquisition.
+    - id: AC8
+      statement: Le suffixe est identique au langage genere dans le bundle.
+      verified_by: Inspection de l'objet PRG_02_Acquisition dans CODE_XML/CODE_Bundle.xml.
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_simbench.st
+      - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+      - DOC/AF/AF_Partie-13_Fonction_Simulation/FB_SimBench_v1.0.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T419_SIMBENCH_BENNE_COUPLAGE.yaml
+      - DOC/WFLOW/CONTRACTS/PLAN_T419_SIMBENCH_BENNE_COUPLAGE.md
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_CycleAX15_AX18_20261015.md
+      - CODE_XML/
+    forbidden:
+      - CODE/D_JOYSTICK/
+      - CODE/G_CYCLE/
+      - CODE/H_TREUILS_BENNE/
+      - CODE/GVL_PERSISTENT.st
+      - PRJ_CODESYS/
+      - Device.export
+  conservation:
+    must_survive:
+      - FB_Sim_Encoder reste l'unique producteur de RawPosM1 et RawPosM2.
+      - Le rattrapage de couplage reste une correction de l'image publiee M2 uniquement.
+      - Le profil de roulis general SimWinchCoast_M reste applique hors ouverture relative M2 seule.
+      - Les comportements M3, joystick reel, cycle reel, benne metier et chaine de securite restent inchanges.
+  evidence_required: [simbench_ci, diff_audit, check_linkage, bundle, diff_bundle, run_all_gates]
+  alert_duty: Toute correction necessitant un changement hors scope est signalee et arretee avant modification.
+status: IN_PROGRESS
+execution:
+  executed_by: CDX01
+  status: IN_PROGRESS
+  summary: Trace94 confirme AX10-AX14 ferme; l'ouverture AX15B s'arrete a l'anticipation mais le roulis SimBench est insuffisant.
+  evidence_submitted: [Suivi_94_SIMU_Cycle_20261015]
+validation:
+  status: APPROVED
+  validated_by: HUM
+  validated_at: '2026-10-15T06:01:15+02:00'
+  notes: Implementation autonome autorisee par l'utilisateur; perimetre exclusivement simulation.
