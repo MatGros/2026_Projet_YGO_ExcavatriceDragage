@@ -57,8 +57,12 @@ def main():
     bench = (ROOT / 'CODE/L_SIMULATION/FB_SimBench.st').read_text(encoding='utf-8-sig')
     joy = (ROOT / 'CODE/L_SIMULATION/FB_Sim_Joystick.st').read_text(encoding='utf-8-sig')
     errors = check(bench, joy)
+    acquisition = (ROOT / 'CODE/M_MAIN/PRG_02_Acquisition.st').read_text(encoding='utf-8-sig')
+    errors.extend(check_source_selection(bench, acquisition))
     tests = (ROOT / 'TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_sim_operator_joystick.st').read_text(encoding='utf-8-sig')
     errors.extend(check_test_initialization(tests))
+    manual_tests = (ROOT / 'TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_sim_manual_reference.st').read_text(encoding='utf-8-sig')
+    errors.extend(check_manual_harness(manual_tests))
     if args.selftest and not errors:
         mutations = [
             (bench.replace('Operator.JoyBtnRaw := instSimJoystick.RawButton;',
@@ -77,8 +81,20 @@ def main():
                 errors.append(f'selftest mutation {number} survived')
         if not check_test_initialization(tests.replace('nx := 5000;', '', 1)):
             errors.append('selftest uninitialized calibration survived')
+        if not check_source_selection(bench, acquisition.replace(
+                'OperatorSourceActive     := OperatorInputSourceSimulated,',
+                'OperatorSourceActive     := TRUE,')):
+            errors.append('selftest source selection disconnection survived')
+        if not check_source_selection(bench.replace(
+                'Operator := HwReal.Operator;\nELSE',
+                'Operator := HwReal.Operator;\n(* no ELSE *)'), acquisition):
+            errors.append('selftest manual fallback after real source survived')
+        if not check_manual_harness(manual_tests.replace('SETUP\nVAR', 'VAR', 1)):
+            errors.append('selftest local test VAR_IN_OUT harness survived')
+        if not check_manual_harness(manual_tests.replace('calibM1 := encoderM1.Calib;', '', 1)):
+            errors.append('selftest missing multi-FB calibration copy-out survived')
         if not errors:
-            print(f'Selftest PASS: {len(mutations) + 1} mutations rejected, source unchanged')
+            print(f'Selftest PASS: {len(mutations) + 5} mutations rejected, source unchanged')
     for error in errors:
         print(f'FAIL: {error}')
     print(f'G528 operator gesture: {"FAIL" if errors else "PASS"}')
@@ -94,6 +110,36 @@ def check_test_initialization(source):
             if required not in body:
                 errors.append(f'integration test {number}: explicit initialization missing: {required}')
     return errors
+
+
+def check_source_selection(bench, acquisition):
+    errors = []
+    if not re.search(r'OperatorSourceActive\s*:=\s*OperatorInputSourceSimulated\s*,', clean(acquisition)):
+        errors.append('effective operator source must drive SimBench')
+    pattern = (r'IF NOT OperatorSourceActive THEN\s+'
+               r'instSimJoystick\(Enable := FALSE\);\s+'
+               r'Operator := HwReal.Operator;\s+ELSE')
+    if not re.search(pattern, clean(bench)):
+        errors.append('real operator source requires reset and direct real image, exclusive from manual stimuli')
+    return errors
+
+
+def check_manual_harness(source):
+    """Multi-FB registry entry has no homonymous FB: explicit copy-out is required."""
+    source = clean(source)
+    if not re.search(r'\bSETUP\s+VAR\b.*?\bEND_SETUP\b', source, re.S):
+        return ['manual reference integration requires SETUP for VAR_IN_OUT copy-out']
+    if re.search(r"\bTEST\s+'[^']+'\s+VAR\b", source):
+        return ['manual reference integration must not use local TEST VAR_IN_OUT variables']
+    for instance, copyout in (
+            ('encoderM1', 'calibM1 := encoderM1.Calib;'),
+            ('encoderM2', 'calibM2 := encoderM2.Calib;'),
+            ('bucket', 'bucketState := bucket.BucketState;'),
+            ('bench', 'raw1 := bench.RawPosM1; raw2 := bench.RawPosM2;')):
+        calls = len(re.findall(rf'\b{instance}\s*\(', source))
+        if not calls or source.count(copyout) != calls:
+            return [f'manual reference integration: every {instance} call requires explicit VAR_IN_OUT copy-out']
+    return []
 
 
 if __name__ == '__main__':

@@ -1,0 +1,299 @@
+=== FB_Encoder exit 1 ===
+[SCRATCH CI CONSERVE] C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Encoder\89b771a9ab47
+
+-> FB_Encoder (E_CODEURS)... cablage production
+-> FB_Encoder (E_CODEURS)... 38/40
+[NETTOYAGE MANUEL REQUIS] C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Encoder\89b771a9ab47
+=== RESUME ===
+FAIL  FB_Encoder (38/40)
+  PASS  TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
+  PASS  TC-P09-010 Acquisition codeur : mise en service nominale
+  PASS  TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms
+  PASS  TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider
+  PASS  TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation
+  PASS  TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction
+  PASS  TC-P09-015 Reset conscient : acquitte le latch sans valider le preset
+  PASS  TC-P09-016 Fault live : perte materiel codeur (Cause 0)
+  PASS  TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2)
+  PASS  TC-P09-018 Fault live : incoherence mesure (Cause 1)
+  FAIL  TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations)
+        ASSERT_FALSE: FB.MEASUREMENT.SPEEDVALID expected FALSE, got TRUE -- Echantillon 1 : Fenetre 50ms pas encore remplie
+  PASS  TC-P09-010.1 Abs gel sur doute : perte bus -> EncoderAvailable=FALSE, RawPos gele
+  PASS  TC-P09-010.3 Abs acquisition nominale : bus OK -> RawPos=RawPosIn, EncoderAvailable
+  PASS  TC-P09-010.4 Abs preset : front PresetRequest -> PresetTriggerCmd=2
+  PASS  TC-P09-020 Homing : sequence nominale complete (front Home + capteur haut) -> Homed
+  PASS  TC-P09-020.1 Homing nominal : front Home + capteur haut -> cible CfgTopSensorPosM
+  PASS  TC-P09-020.2 Homing unitaire : front Home seul -> cible CfgHomingTargetM
+  PASS  T198-001 Commande BtnHome : cible haute explicite meme sans capteur
+  PASS  T198-002 Commande BtnHomingAtZero : cible zero explicite
+  PASS  TC-P09-020.3 Homing dynamique : front UseDynamicTarget -> cible DynamicHomingTargetM
+  PASS  TC-P09-020.4 Homing cible hors plage : cible > 99m -> refuse, pas d ecriture
+  PASS  TC-P09-020.5 Coherence boot : ecart RawPos/LastKnown > tolerance -> HomingSuspect, leve par ConfirmCoherence+Permit
+  PASS  TC-P09-020.6 Capteur haut absent : mode nominal ne declenche pas, seul unitaire/dynamique
+  PASS  TC-P09-020.7 Homing sans permit : front Home sans HomingPermit -> HomingModeError, pas d ecriture
+  PASS  TC-P09-020.8 HomingSuspect RETAIN : stocke dans Calib -> persiste (FB_Encoder_Homing.st:185)
+  PASS  TC-P09-030.1 Scale : RawPos=HomingRefRaw+4096 (1/2 tour) -> CablePosM=1.0
+  PASS  TC-P09-030.2 Scale : RawPos < HomingRefRaw -> CablePosM negative (sous l eau)
+  PASS  TC-P09-030.4 Safety bornage : CablePosM hors [Min;Max] -> EncoderIncoherent, auto-efface
+  PASS  TC-P09-030.5 Safety HomingSuspect : HomingSuspect=TRUE -> EncoderIncoherent, tant que non confirme
+  PASS  TC-P09-030.6 Safety BypassGlobal : TRUE neutralise bornage+coherence, retour FALSE -> causes reactives
+  PASS  TC-P09-030.7 Safety CablePosMSafe : = CablePosM toujours (jamais gelee)
+  PASS  TC-P09-030.8 Scale garde DINT : conversion DINT avant soustraction -> pas de depassement
+  PASS  TC-P09-030.9 Scale : RawPos=HomingRefRaw -> CablePosM=0.0
+  PASS  TC-P09-040.1 Reliability : EncoderAvailable=TRUE, Homed=FALSE, Incoherent=FALSE -> EncoderFault=FALSE
+  PASS  TC-P09-040.2 Reliability : meme cas -> HomedAndReliable=FALSE (gate stricte exige Homed)
+  PASS  TC-P09-040.3 Reliability : EncoderAvailable=FALSE -> EncoderFault=TRUE quel que soit Homed
+  PASS  TC-P09-040.4 Reliability : table de verite des 2 gates sur 8 combos
+  PASS  TC-P09-040.5 Reliability : EncoderIncoherent -> EncoderFault=TRUE et HomedAndReliable=FALSE
+  PASS  TC-P09-050.5 Speed : fenetre <50ms -> Valid=FALSE sans purge (essai SITE - stub logique)
+  FAIL  TC-P09-050.6 Speed : SignedSpeed=(P[5]-P[0])/WindowElapsed, Speed=ABS
+        ASSERT_NEAR: FB.MEASUREMENT.SPEED_MPS expected 1.5 +/- 0.05, got 0 -- SignedSpeed=(P[5]-P[0])/0.05 = 1.50 m/s
+  WARN  TC-P09-010.1 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-010.3 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-010.4 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-011 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-012 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-013 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-014 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-015 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-016 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-017 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-018 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-020.1 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-020.2 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-020.3 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-020.4 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-020.5 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-020.6 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-020.7 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-020.8 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-030.1 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-030.2 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-030.4 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-030.5 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-030.6 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-030.7 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-030.8 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-030.9 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-040.1 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-040.2 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-040.3 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-040.4 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-040.5 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-050.5 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P09-050.6 teste mais absent du catalogue AF (ID inconnu ou retire)
+  -- Encapsulation (interface FB) --
+    PASS  FB_Encoder_Abs           IN=11 OUT=9 IN_OUT=0 LOCAL=10
+    PASS  FB_Encoder_Homing        IN=18 OUT=9 IN_OUT=1 LOCAL=30
+    PASS  FB_Encoder_Scale         IN=4 OUT=1 IN_OUT=0 LOCAL=1
+    PASS  FB_Encoder_Safety        IN=7 OUT=4 IN_OUT=0 LOCAL=3
+    PASS  FB_EncoderReliability    IN=3 OUT=2 IN_OUT=0 LOCAL=0
+    PASS  FB_Encoder_SpeedMeasure  IN=5 OUT=3 IN_OUT=0 LOCAL=1
+    PASS  FB_CycleTime             IN=1 OUT=1 IN_OUT=0 LOCAL=5
+    PASS  FB_Filter                IN=3 OUT=1 IN_OUT=0 LOCAL=2
+    PASS  FB_FaultCore             IN=3 OUT=2 IN_OUT=0 LOCAL=3
+    PASS  FB_Encoder               IN=18 OUT=9 IN_OUT=1 LOCAL=8
+  -- [PROFILING] Temps des etapes --
+    * Conversion ST->IEC        : 0.20s
+    * Compilation STruCpp/g++   : 1.01s (CPU)
+    * Execution binaire ASSERTs : 1.11s
+    * Cablage production        : 0.21s
+    * Rapport HTML / JSON       : 0.00s
+    * Total FB                  : 10.56s
+  Scratch CI conserve : C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Encoder\89b771a9ab47
+
+1 FB testes, 0 PASS, 1 FAIL
+[TEMPS D'EXECUTION] : 10.56s
+
+=== FB_Bucket exit 0 ===
+[SCRATCH CI CONSERVE] C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Bucket\aae383301979
+
+-> FB_Bucket (H_TREUILS_BENNE)... cablage production
+-> FB_Bucket (H_TREUILS_BENNE)... 41/41
+[NETTOYAGE MANUEL REQUIS] C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Bucket\aae383301979
+=== RESUME ===
+PASS  FB_Bucket (41/41)
+  PASS  TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
+  PASS  TC-P10-023 Fermeture engagee seulement si ReqAscent ET MotionRequestActive ET EffectivePermitBucket_Close
+  PASS  TC-P10-024 Ouverture engagee seulement si ReqDescend ET MotionRequestActive ET EffectivePermitBucket_Open
+  PASS  T196-001 Etat ferme publie apres atteinte de l offset
+  PASS  T262-001 Fermeture atteinte : maintien M2 P1 puis liberation explicite
+  PASS  T323-001 Boot non reference : pas de faux ecart ni defaut de qualification au repos
+  PASS  T323-002 Homing actif : les commandes de reference ne declenchent pas ErrorID
+  PASS  T323-003 Passage homed : ErrorID non reference retombe sans Reset
+  PASS  T323-004 Ecart reel apres qualification reste acquittable
+  PASS  T196-002 Etat ouvert publie apres atteinte de l offset
+  PASS  TC-P10-025 Demande benne refusee si M1_Busy OR M2_Busy a l entree (READY)
+  PASS  TC-P10-025.1 Anti-traversee : M2_Busy seul refuse une demande benne a l entree (AC3)
+  PASS  TC-P10-025.2 Anti-traversee : mouvement deja engage + M2_Busy -> pas d avortement (AC3)
+  PASS  TC-P10-026 Glissement M1 >1.0m pendant BUSY -> M1SlipDetected + coupe M2
+  PASS  TC-P10-027 M1SlipDetected force SafeStop sur M1 cote Treuils
+  PASS  TC-P10-028 Couche 2 (Meca C) : derive M1 >2.0m -> PowerCutOff
+  PASS  TC-P10-029 Recul (sens inverse) sous commande engagee : sens descente commande
+  PASS  TC-P10-029.1 Recul borne : arret reel a la frontiere PHYSIQUE benne (T346, variante b)
+  PASS  TC-P10-T346-N2 Glissement M1 cumule : non contournable par repompage du joystick (D6)
+  PASS  TC-P10-T346-N1 Limite de recul : frontiere PHYSIQUE, relache, pas de re-armement (D1)
+  PASS  TC-P10-030 ConfirmOpen/ClosePosition reference la benne : MAINT_N2 seul, etat publie par la mesure
+  PASS  T323-005 Codeur(s) non reference(s) : statut au repos, defaut live seulement sur mouvement
+  PASS  TC-P10-032 FB_ExtractionSequence.Busy preserve l armement joystick en fin benne
+  PASS  TC-P10-033 Butee haute M2 decalee de OffsetCloseM si ferme/en fermeture
+  PASS  TC-P10-034 Terrain : cinematique reelle en charge, amplitude offset validee
+  PASS  TC-P10-045.1 Benne partiellement fermee -> remontee palier 1 seul
+  PASS  TC-P10-046.1 Timeout mouvement pendant BUSY -> defaut timeout + latch
+  PASS  TC-P10-046.2 T295 Pause operateur (relachement > PT, sans progression) -> AUCUN defaut
+  PASS  TC-P10-046.3 T295 Cumul du temps engage : 2 x 600 ms (< PT) + relachements -> defaut latche
+  PASS  TC-P10-046.4 T295 Arrivee nominale sous commande apres pause -> Done, aucun defaut
+  PASS  TC-P10-047.1 Boot : etat classe en continu sur la mesure, offset invalide sans reference benne
+  PASS  TC-P10-047.2 Boot : une mesure franche ecrase un etat memorise contradictoire (T247)
+  PASS  TC-P10-048.1 Offset RETAIN : OffsetCloseM persiste apres power cycle
+  PASS  T181-21 Copy-out VAR_IN_OUT : BucketState ecrit par FB_Bucket restitue a la variable de test
+  PASS  T291-B Continuité DisplayOffsetM : Fermé -> Intermédiaire -> Ouvert sans saut
+  PASS  T291-B Continuité DisplayOffsetM : Ouvert -> Intermédiaire -> Fermé
+  PASS  T291-B Clamping DisplayOffsetM : Sur-course ouverture et fermeture
+  PASS  T291-B Repli DisplayOffsetM si configuration invalide (OffsetOpenM >= OffsetCloseM)
+  PASS  T387-FB-003 Fermeture engagee, PERMIS NUL -> budget timeout GELÉ (attente de permis), pas de ErrorID:03
+  PASS  T387-004 Commande benne sans reference : Cause 4 (ErrorID:05) active et non latchante
+  PASS  T387-005 Referencement acquis : Cause 4 (ErrorID:05) retombe spontanement sans Reset
+  -- Encapsulation (interface FB) --
+    PASS  FB_FaultCore             IN=3 OUT=2 IN_OUT=0 LOCAL=3
+    PASS  FB_BucketCloseThreshold  IN=6 OUT=3 IN_OUT=0 LOCAL=5
+    PASS  FB_Bucket                IN=37 OUT=22 IN_OUT=1 LOCAL=51
+  -- [PROFILING] Temps des etapes --
+    * Conversion ST->IEC        : 0.21s
+    * Compilation STruCpp/g++   : 1.00s (CPU)
+    * Execution binaire ASSERTs : 0.81s
+    * Cablage production        : 0.11s
+    * Rapport HTML / JSON       : 0.00s
+    * Total FB                  : 11.33s
+  Scratch CI conserve : C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Bucket\aae383301979
+
+1 FB testes, 1 PASS, 0 FAIL
+[TEMPS D'EXECUTION] : 11.33s
+
+=== FB_CycleMachineHoming exit 0 ===
+[SCRATCH CI CONSERVE] C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_CycleMachineHoming\ac8186b24f15
+
+-> FB_CycleMachineHoming (G_CYCLE)... cablage production
+-> FB_CycleMachineHoming (G_CYCLE)... 15/15
+[NETTOYAGE MANUEL REQUIS] C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_CycleMachineHoming\ac8186b24f15
+=== RESUME ===
+PASS  FB_CycleMachineHoming (15/15)
+  PASS  TC-P09-H001 : HX0 n emet aucune sortie (hors maintenance, pas d auto-armement)
+  PASS  TC-P09-H002 : maintien repos au boot, refus hors N2, et initiation HX0 -> HX1 sur StartRequest en N2
+  PASS  TC-P09-H003 : HX1 fermeture benne sans timeout intempestif et abandon sur perte mode N2
+  PASS  TC-P09-H004 : Confirmation benne -> HX1a et attente interlock couplage
+  PASS  TC-P09-H005 : Interlock E1 valide dwell 300ms -> HX2, et securite couplage en HX2
+  PASS  TC-P09-H006 : HX2 montee couplee palier 1 sous permis
+  PASS  TC-P09-H007 : Franchissement capteur haut -> HX3 HomeReq a la volee
+  PASS  TC-P09-H008 : HX4 controle arret et inertie [8.50..8.80m] conforme -> HX5
+  PASS  TC-P09-H009 : HX4 inertie hors plage -> retry vers HX1 puis echec HX7
+  PASS  TC-P09-H010 : HX5 neutre -> HX6 MachineHomed et commit benne atomique
+  PASS  TC-P09-H011 : NOT Enable -> sorties sures + MachineHomed FALSE + HX0
+  PASS  TC-P09-H012 : perte de datum EN MOUVEMENT -> SafeStop latche jusqu a arret + Reset
+  PASS  TC-P09-H013 : HomingError axe -> HX7_FAILED et sortie uniquement sur Reset en MAINT_N2
+  PASS  TC-P09-H014 : Echec Mode A au vol -> repli automatique Mode B a l arret -> reference valide
+  PASS  TC-P09-H015 : HX5 joystick maintenu >30s -> pas d echec HX7, validation nominale au retour neutre
+  -- Encapsulation (interface FB) --
+    PASS  FB_FaultCore             IN=3 OUT=2 IN_OUT=0 LOCAL=3
+    PASS  FB_CycleMachineHoming    IN=24 OUT=21 IN_OUT=0 LOCAL=60
+  -- [PROFILING] Temps des etapes --
+    * Conversion ST->IEC        : 0.16s
+    * Compilation STruCpp/g++   : 0.89s (CPU)
+    * Execution binaire ASSERTs : 5.38s
+    * Cablage production        : 0.00s
+    * Rapport HTML / JSON       : 0.00s
+    * Total FB                  : 16.24s
+  Scratch CI conserve : C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_CycleMachineHoming\ac8186b24f15
+
+1 FB testes, 1 PASS, 0 FAIL
+[TEMPS D'EXECUTION] : 16.24s
+
+=== FB_CycleSemiAuto exit 1 ===
+[SCRATCH CI CONSERVE] C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_CycleSemiAuto\2fc0fb8b38cd
+
+-> FB_CycleSemiAuto (G_CYCLE)... cablage production
+-> FB_CycleSemiAuto (G_CYCLE)... 38/43
+[NETTOYAGE MANUEL REQUIS] C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_CycleSemiAuto\2fc0fb8b38cd
+=== RESUME ===
+FAIL  FB_CycleSemiAuto (38/43)
+  PASS  T262-002 AX10B : transfert Both P1 sans coupure M2 puis AX11 P2
+  PASS  T345-L2-001 : arrivee AX14 neutre, puis nouveau push autorise AX15B
+  PASS  T345-L2-002 : push Y maintenu a l arrivee passe AX15A mais reste bloque avant neutre
+  PASS  T345-L2-003 : diagonale X plus Y maintenue ne contourne pas le neutre AX15A
+  PASS  T345-L2-004 : forcage repete cible 15 efface un latch neutre precedent
+  PASS  T345-L2-005 : non regression AX2 vers AX3 conserve le geste PushOnly existant
+  PASS  T262-003 AX10B : timeout M1 borne a 2 s puis repli sans redemarrage implicite
+  PASS  T331-001 AX15d micro-step benne : tirer ouvre le module, pousser ouvrir, relacher retour AX15B
+  PASS  T331-002 AX15b/AX15c non-regression : vidage nominal et repositionnement inchanges
+  PASS  T331-003 AX15d micro-step : perte du geste, de l homme-mort ou defaut neutralise sans reprise
+  PASS  TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
+  PASS  TC-P04-027 T258 : ForÃ§age prepare sans action et reprise sur Start au neutre
+  PASS  TC-P04-028 T258 : ForÃ§age AX_STAB refuse et reste neutre
+  PASS  TC-P04-029 T258 : Inhibition ne masque pas le desynchronisme
+  PASS  TC-P04-030 T258 : Un forçage refuse invalide une preparation precedente
+  PASS  TC-P04-031 T258 : Apply et Start simultanes restent en preparation neutre
+  PASS  TC-P04-032 T258 : Reset simultane annule le forçage
+  PASS  TC-P04-033 T258 : Forcage semi-auto independant du bit commissioning
+  PASS  TC-P04-001 : Relachement manche (JoystickDeflected=FALSE) stoppe les commandes sans perdre l etape
+  PASS  TC-P04-002 : Le cycle produit des demandes et passe a AX1_INIT sur Start
+  PASS  TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en AX_STAB et fige l etape
+  PASS  TC-P04-004 : Reprise apres AX_STAB necessite Cause disparue + Reset + StartCycle
+  PASS  TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur AX18_DONE_SYNC
+  PASS  TC-P04-013 : Bascule Semi-Auto vers Maintenance preserve l etape et neutralise les demandes sans redemarrage auto
+  FAIL  TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutralisees, etape maintenue, PAS de redemarrage auto (T169-A S3)
+        ASSERT_TRUE: FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE -- Etabli en AX4_DESCEND_DIVING
+  FAIL  TC-P04-021 : Fond jamais atteint -> maintien AX4 car tempo max etape desactivee
+        ASSERT_TRUE: FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE -- Etabli en AX4_DESCEND_DIVING
+  FAIL  TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 60 s) sans AX_STAB
+        ASSERT_TRUE: FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE -- Etabli en X4
+  FAIL  TC-P04-026 : AX4 ne contient aucun seuil synchro local - PRG04 reste source unique
+        ASSERT_TRUE: FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE -- Etabli en X4
+  PASS  TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pas de redemarrage) (T192-A S1)
+  FAIL  TC-P04-SCEN-NOM : Parcours nominal complet X0->X13->X0 avec rebouclage et compteur
+        ASSERT_TRUE: FB.TRANSLATIONCMD.REQSTART expected TRUE, got FALSE -- X2 : translation vers cible commandee
+  PASS  TC-P04-034 T299 : journalier ET totalisateur incrementes au MEME evenement AX18 (1 fois par cycle)
+  PASS  TC-P04-035 T299 : RAZ manuelle IHM du journalier sur FRONT montant, totalisateur intact
+  PASS  TC-P04-036 T299 : mode NEVER (defaut) — aucun auto-reset au demarrage de cycle
+  PASS  TC-P04-037 T299 : mode ON_FIRST_START — RAZ au 1er demarrage de cycle, une seule fois
+  PASS  TC-P04-038 T299 : mode ON_SAFETY_REARM — RAZ au rearmement AU, sur front
+  PASS  TC-P04-039 T299 : totalisateur — test NEGATIF, aucun chemin ne peut l ecrire (RAZ, reset, mode)
+  PASS  TC-P04-040 T299 : mode (b) active EN COURS DE POSTE — aucune RAZ differee (drapeau consomme)
+  PASS  T347-001 : duree de cycle exposee en minutes/secondes entieres (chrono, figeage AX18, RAZ hors cycle)
+  PASS  TC-T358-001 : consigne traitee en un scan, meme valeur re-jouable, aucun rejeu en boucle
+  PASS  TC-T358-002 : un defaut DEJA LATCHE ne bloque plus le forcage de step
+  PASS  TC-T358-003 : sans ecriture d operateur, aucun forcage (sentinelle respectee)
+  PASS  TC-T358-004 : un Abandon du meme scan neutralise la consigne de forcage
+  PASS  T368-002 : message AX13 porteur du temps restant d egouttage, non fige
+  WARN  TC-P04-010 attendu par l AF (type AUTO) mais absent des tests -- FB_DiveSearch : mise en service recherche de couche
+  WARN  TC-P04-011 attendu par l AF (type AUTO) mais absent des tests -- Séquence Kobold 4 temps à la volée + coupure contacteur sur fond
+  WARN  TC-P04-022 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-023 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-026 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-027 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-028 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-029 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-030 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-031 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-032 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-033 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-034 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-035 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-036 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-037 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-038 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-039 teste mais absent du catalogue AF (ID inconnu ou retire)
+  WARN  TC-P04-040 teste mais absent du catalogue AF (ID inconnu ou retire)
+  -- Encapsulation (interface FB) --
+    PASS  FB_FaultCore             IN=3 OUT=2 IN_OUT=0 LOCAL=3
+    PASS  FB_CycleSemiAuto         IN=73 OUT=39 IN_OUT=2 LOCAL=100
+  -- [PROFILING] Temps des etapes --
+    * Conversion ST->IEC        : 0.19s
+    * Compilation STruCpp/g++   : 1.39s (CPU)
+    * Execution binaire ASSERTs : 5.47s
+    * Cablage production        : 0.00s
+    * Rapport HTML / JSON       : 0.00s
+    * Total FB                  : 36.00s
+  Scratch CI conserve : C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_CycleSemiAuto\2fc0fb8b38cd
+
+1 FB testes, 0 PASS, 1 FAIL
+[TEMPS D'EXECUTION] : 36.00s

@@ -1,6 +1,6 @@
 # T418 — Reprise : geste operateur simule depuis un bouton IHM
 
-Etat : proposition a valider avant code. Orchestrateur : CDX01.
+Etat : plan valide et complete apres audit de la MES. Orchestrateur : CDX01.
 Checkpoint initial : `9630ddb5` (etat existant NON TESTE, sans push).
 
 ## Besoin humain
@@ -11,13 +11,14 @@ maintien du manche, puis retour au neutre au relachement IHM.
 L'ancien contrat T418 (homme-mort brut a manipuler separement) ne repond pas
 a ce besoin et ne constitue pas le critere d'acceptation de cette reprise.
 
-## Perimetre propose — C2, patch simulation
+## Perimetre final — C3, patch simulation
 
 - Code fonctionnel : `CODE/L_SIMULATION/FB_Sim_Joystick.st` et
-  `CODE/L_SIMULATION/FB_SimBench.st` uniquement.
+  `CODE/L_SIMULATION/FB_SimBench.st` ; un argument de selection de source
+  dans l'appel SimBench de `CODE/M_MAIN/PRG_02_Acquisition.st`.
 - Tests, garde-fou dans `TOOLS/AGENT_WORKFLOW/scripts/`, documentation de
   simulation et bundles generes associes.
-- Aucun changement du joystick reel, des PRG, des modes, du homing, des
+- Aucun changement du traitement joystick/codeurs/homing des PRG, des modes, du homing, des
   interlocks, de la physique M3 ou des liaisons IHM existantes.
 
 ## Sequence proposee
@@ -66,3 +67,13 @@ Un agent expert automatisme industriel relit le diff reel et les preuves,
 en lecture seule. Il challenge chronologie, annulations, inversion, perte
 de permis, redemarrage et interaction homing. CDX01 examine ses conclusions
 avant restitution. Aucun verdict de fidelite terrain sans essai CODESYS humain.
+
+## Ancrage MES et parcours retenu
+
+Le besoin humain precise ensuite : partir du programme produisant des centaines
+de cycles, references manuelles par les trois commandes IHM existantes, puis
+N1 et SEMI_AUTO ; refonte homing T377 ulterieure. Le tag MES verifie est
+44c2b368. Le filtre de lancement homing envisage n'a jamais ete implemente.
+Seule extension d'adaptateur : source operateur simulee deselectionnee ->
+reinitialisation du geste + image reelle exacte. Le traitement metier depuis
+section 3 de PRG_02 reste identique au tag, controle par script dedie.

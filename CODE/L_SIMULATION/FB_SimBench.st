@@ -22,6 +22,7 @@
 FUNCTION_BLOCK PUBLIC FB_SimBench
 VAR_INPUT
     Enable                     : BOOL;             (* --> [CMD] Activation globale (GVL_Simulation.SimulationModeActive) *)
+    OperatorSourceActive       : BOOL := TRUE;      (* --> [CMD] Source operateur simulee effectivement selectionnee *)
 
     // ── Commandes issues de l'automate (Scan N-1 / PRG_07 / PRG_10) ──────────
     M1_RelayFwd                : BOOL;   (* --> [CMD] Sens avant M1 *)
@@ -680,38 +681,43 @@ END_IF;
 
 {region "§4 Simulation operateur joystick"}
 // ── 3. MODÈLE OPÉRATEUR / JOYSTICK ───────────────────────────────────────────
-SimJoystickManualNeutral := (SimJoystickRawX = 5000) AND (SimJoystickRawY = 5000);
-SimJoystickGesturePermit := SimJoystickManualNeutral AND NOT SimJoystickRawButton;
-instSimJoystick(
-    Enable              := TRUE,
-    GesturePermit       := SimJoystickGesturePermit,
-    NeutralRaw          := 5000,
-    MaxRaw              := 10000,
-    BtnLeft_Rev_TREMIE  := SimJoystickLeft_Rev_TREMIE_Active,
-    BtnRight_Fwd_MAINT  := SimJoystickRight_Fwd_MAINT_Active,
-    BtnFwd_Up_Close     := SimJoystickFwd_Up_Close_Active,
-    BtnRev_Down_Open    := SimJoystickRev_Down_Open_Active,
-    OvershootActive     := SimJoystickOvershoot_Active,
-    BagotementActive    := SimJoystickBagotement_Active,
-    CycleTimeS          := 0.010
-);
-
-// Une seule source possede les trois signaux : aucun melange bouton/axes.
-// La propriete automatique persiste au retour et si un stimulus manuel est en conflit.
-IF instSimJoystick.ModelActive THEN
-    Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
-    Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
-    Operator.JoyBtnRaw := instSimJoystick.RawButton;
+IF NOT OperatorSourceActive THEN
+    // Le geste ne continue pas en arriere-plan lorsque le domaine est reel.
+    instSimJoystick(Enable := FALSE);
+    Operator := HwReal.Operator;
 ELSE
-    // Modèle au repos → stimulus analogique avancé (mode « sans bouton »).
-    Operator.JoyXRaw_ANA1 := SimJoystickRawX;
-    Operator.JoyYRaw_ANA2 := SimJoystickRawY;
-    Operator.JoyBtnRaw := SimJoystickRawButton;
+    SimJoystickManualNeutral := (SimJoystickRawX = 5000) AND (SimJoystickRawY = 5000);
+    SimJoystickGesturePermit := SimJoystickManualNeutral AND NOT SimJoystickRawButton;
+    instSimJoystick(
+        Enable              := TRUE,
+        GesturePermit       := SimJoystickGesturePermit,
+        NeutralRaw          := 5000,
+        MaxRaw              := 10000,
+        BtnLeft_Rev_TREMIE  := SimJoystickLeft_Rev_TREMIE_Active,
+        BtnRight_Fwd_MAINT  := SimJoystickRight_Fwd_MAINT_Active,
+        BtnFwd_Up_Close     := SimJoystickFwd_Up_Close_Active,
+        BtnRev_Down_Open    := SimJoystickRev_Down_Open_Active,
+        OvershootActive     := SimJoystickOvershoot_Active,
+        BagotementActive    := SimJoystickBagotement_Active,
+        CycleTimeS          := 0.010
+    );
+
+    // Une seule source possede les trois signaux : aucun melange bouton/axes.
+    // La propriete automatique persiste au retour et si un stimulus manuel est en conflit.
+    IF instSimJoystick.ModelActive THEN
+        Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
+        Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
+        Operator.JoyBtnRaw := instSimJoystick.RawButton;
+    ELSE
+        // Modèle au repos → stimulus analogique avancé (mode « sans bouton »).
+        Operator.JoyXRaw_ANA1 := SimJoystickRawX;
+        Operator.JoyYRaw_ANA2 := SimJoystickRawY;
+        Operator.JoyBtnRaw := SimJoystickRawButton;
+    END_IF;
+
+    Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
+    Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 END_IF;
-
-Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
-Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
-
 
 {endregion}
 

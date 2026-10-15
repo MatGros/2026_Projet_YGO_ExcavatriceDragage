@@ -1,49 +1,35 @@
-# T418 — Revue independante expert automatisme industriel
+# T418 - Revue independante expert automatisme industriel
 
-Reviewer : agent `expert_joystick`, lecture seule. Orchestrateur : CDX01.
-Reference du diff : checkpoint `9630ddb5`. Aucun commit de correction ni push.
+Reviewer expert_joystick, lecture seule, aucun fichier edite par le reviewer.
 
-## Verdict rendu par le reviewer
+## Verdict final
 
-**MAJOR sur la bascule de source operateur ; PASS sur le geste simule dans
-son perimetre nominal.**
+PASS sur le geste simule, l'arbitrage exclusif manuel/automatique, le complement
+de selection de source et le test de reference manuelle. Pret pour recette
+CODESYS humaine ciblee apres controles finaux de l'orchestrateur.
 
-Le diff fonctionnel reste limite aux deux FB autorises. L'armement reel,
-les PRG, le homing et les modes sont inchanges. La sequence, les annulations,
-les inversions, le verrou de relachement, le retour dynamique et l'arbitrage
-exclusif manuel/automatique sont coherents.
+## Conclusions
 
-## Constat majeur non corrige hors scope
+- Source inactive : reset sous-modele et image reelle exacte ; raccordement au
+  selecteur effectif OperatorInputSourceSimulated, pas au flag global.
+- Aucun filtre homing implemente. FB_Joystick, FB_CycleMachineHoming,
+  FB_CycleSemiAuto et traitement PRG_02 depuis section 3 identiques au tag MES.
+- Le MAJOR initial de reprise cachee a reselection est corrige et teste.
+- Le front N2 vers HX1 est un comportement MES conserve ; ne pas le presenter
+  comme une regression ni comme obstacle general au parcours N1/SEMI_AUTO.
+- Test INT-009 : reference DEJA etablie par fixture ; aucun lancement homing
+  lors des gestes N1/SEMI_AUTO. Pas une preuve de cycle automatique complet.
+- Test REF-001 : vrai SimBench, vrais codeurs et benne, qualification issue
+  de leurs sorties. Etat initial non reference ; M2 puis benne restent
+  necessaires. Aucun Homed positif injecte et aucune tautologie identifiee.
+- Les copies VAR_IN_OUT restituent les resultats publics des FB, sans inventer
+  un datum. Le READBACK_ONLY passe par les retours de SimBench.
+- Les sources, tests et dependances encodeur/cycle sont compares a la MES ;
+  les echecs des anciennes suites restent une dette CI heritee visible.
 
-- PRG_02_Acquisition:138,482 selectionne la simulation operateur par
-  `SimOperatorActive`, independamment de l'activation globale du banc (:313).
-- FB_SimBench appelle le sous-modele joystick active tant que le banc l'est.
-- Le geste peut continuer quand la source operateur reelle est selectionnee,
-  puis reapparaitre au retour simule sans nouvel appui IHM.
-- Le test initial OFF/ON du banc ne couvre pas cette selection independante.
-  L'orchestrateur a ajoute TC-T418-INT-008 pour caracteriser le risque avec
-  l'arbitrage de source et le vrai FB_Joystick.
+## Limites de la revue et des essais
 
-Le reviewer recommande : si cette frontiere reste hors scope, bascule de
-domaine uniquement au repos, boutons relaches, sans pretendre que le modele
-detecte la bascule. L'orchestrateur ne declare pas le lot valide pour une
-utilisation generale avec changements de source en mouvement.
-
-## Points confirmes
-
-- Reinitialisation du sous-modele avant RETURN lorsque le banc est desactive.
-- Propriete exclusive X/Y/bouton pendant geste, retour et conflit manuel.
-- Conservation de l'armement reel pendant la grace testee.
-- Maintien reel trop long refuse, aucun bypass.
-- HX1 en N2 reproduit et annonce, aucun masquage dans la simulation.
-- Le XML autonome PRG_02 change car il embarque les dependances simulation ;
-  aucun changement du corps du PRG observe.
-- G528 est un garde statique de cablage, pas une preuve dynamique.
-
-## Position de l'orchestrateur
-
-Le code reel reste intact conformement a l'instruction humaine. Les deux
-interactions (HX1 N2 et selection de source) ne sont pas dissimulees et ne
-sont pas corrigees en elargissant silencieusement le perimetre. La demande
-d'absence d'effet de bord ne peut etre declaree satisfaite en l'etat.
-La suite requiert un arbitrage humain sur le perimetre avant recette generale.
+Geometrie, arret mecanique, permis et bus sont des conditions de fixture.
+Le harnais valide les composants et le raccordement equivalent, pas les pages
+IHM, l'approche physique, le PLC complet ou tous les cycles.
+Aucun verdict de validation machine complete et aucun Device.export utilise.

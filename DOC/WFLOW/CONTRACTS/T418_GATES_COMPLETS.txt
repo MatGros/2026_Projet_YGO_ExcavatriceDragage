@@ -5,21 +5,21 @@
 Cible : TOUS LES PALIERS Â· 67 gate(s) prÃ©vues
 LÃ©gende : âœ… PASS Â· âŒ FAIL Â· durÃ©e cumulÃ©e par famille
 â–¶ [01] G500 â€” Compilation CODESYS â€” G528
-  âœ… PASS G528 - Simulated operator gesture ownership (T418) Â· 0.14s
-  âœ… PASS  1/1 gates Â· 0.14s
+  âœ… PASS G528 - Simulated operator gesture ownership (T418) Â· 0.18s
+  âœ… PASS  1/1 gates Â· 0.18s
 â–¶ [02] G300 â€” Structure, documentation & sÃ©curitÃ© â€” G300, G310, G320, G330
-  âŒ FAIL G300 ??? Structure du depot Â· 0.13s
+  âŒ FAIL G300 ??? Structure du depot Â· 0.12s
   âœ… PASS G310 ??? Structure CODE (POU, suffixe, ordre) Â· 0.32s
-  âœ… PASS G320 ??? Couverture MAIN du bundle Â· 0.27s
-  âœ… PASS G330 ??? Securite des types et membres STRUCT Â· 0.55s
-  âŒ FAIL  3/4 gates Â· 1.28s
+  âœ… PASS G320 ??? Couverture MAIN du bundle Â· 0.24s
+  âœ… PASS G330 ??? Securite des types et membres STRUCT Â· 0.54s
+  âŒ FAIL  3/4 gates Â· 1.22s
   â””â”€ G300 â€” Structure du depot
      [ERROR] unexpected AGENT_WORKFLOW directory: .tmp
      [ERROR] unexpected AGENT_WORKFLOW directory: prototypes
      Structure check: FAIL (2 error(s), 0 warning(s))
 â–¶ [03] G100 â€” QualitÃ© du bloc â€” G100
-  âŒ FAIL G100 ??? Code style (VAR_OUTPUT, simulation) Â· 0.70s
-  âŒ FAIL  0/1 gates Â· 0.70s
+  âŒ FAIL G100 ??? Code style (VAR_OUTPUT, simulation) Â· 0.69s
+  âŒ FAIL  0/1 gates Â· 0.69s
   â””â”€ G100 â€” Code style (VAR_OUTPUT, simulation)
      [WARN] CODE\C_DIAG_RESEAUX\FB_Diag_Ethercat.st: known VAR_OUTPUT write debt: DeviceEncoderM1.State
      [WARN] CODE\C_DIAG_RESEAUX\FB_Diag_Ethercat.st: known VAR_OUTPUT write debt: DeviceEncoderM1.State
@@ -53,18 +53,18 @@ LÃ©gende : âœ… PASS Â· âŒ FAIL Â· durÃ©e cumulÃ©e par famille
      Code style check: FAIL (1 error(s), 68 warning(s))
 â–¶ [04] G200 â€” Liaison & cÃ¢blage â€” G200, G210
   âœ… PASS G200 ??? LIAISON (instances, refs, bundle) Â· 1.53s
-  âœ… PASS G210 ??? Cablage CFC natif Â· 0.15s
-  âœ… PASS  2/2 gates Â· 1.68s
+  âœ… PASS G210 ??? Cablage CFC natif Â· 0.17s
+  âœ… PASS  2/2 gates Â· 1.70s
 â–¶ [05] G300 â€” Structure, documentation & sÃ©curitÃ© â€” G340, G345, G350, G360, G370, G375, G346, G347
-  âŒ FAIL G340 ??? Liens documentaires Â· 1.46s
-  âœ… PASS G345 ??? Hygiene workspace (T279) Â· 0.20s
-  âœ… PASS G350 ??? Collision noms HW (REX 2026-08-05) Â· 0.15s
+  âŒ FAIL G340 ??? Liens documentaires Â· 1.63s
+  âœ… PASS G345 ??? Hygiene workspace (T279) Â· 0.18s
+  âœ… PASS G350 ??? Collision noms HW (REX 2026-08-05) Â· 0.17s
   âœ… PASS G360 ??? Interlock changement de sens (REX 2026-08-05) Â· 0.24s
   âœ… PASS G370 ??? Cablage position calibree (REX 2026-08-06) Â· 0.14s
   âœ… PASS G375 ??? Gate homme-mort mouvement (AF08 TC-P08-008) Â· 0.21s
-  âœ… PASS G346 ??? Completude branches de mode PRG_03 (T168-C) Â· 0.13s
-  âœ… PASS G347 ??? Type WORD sur la chaine OperatorActionId (T168-D) Â· 0.28s
-  âŒ FAIL  7/8 gates Â· 2.81s
+  âœ… PASS G346 ??? Completude branches de mode PRG_03 (T168-C) Â· 0.12s
+  âœ… PASS G347 ??? Type WORD sur la chaine OperatorActionId (T168-D) Â· 0.32s
+  âŒ FAIL  7/8 gates Â· 3.00s
   â””â”€ G340 â€” Liens documentaires
      [ERROR] DOC/WFLOW/AUDITS/DESIGN/PLAN_T204enforcement_permits_M3.md:123: lien mort `TOOLS/TEST_AUTO_CI/TEST_AUTO_CI_UNITARY/I_TRANSLATION/test_unitaires.py` (aucune version active trouvee)
      [ERROR] DOC/WFLOW/AUDITS/DESIGN/PLAN_T204enforcement_permits_M3.md:197: `DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md` est perime � version active : DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md
@@ -94,50 +94,50 @@ LÃ©gende : âœ… PASS Â· âŒ FAIL Â· durÃ©e cumulÃ©e par famille
      [ERROR] CODE/I_TRANSLATION/_TYPES/ST_fbTranslationCmdArbitration_Context.st:8: `DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md` est perime � version active : DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md
      [ERROR] CODE/I_TRANSLATION/_TYPES/ST_fbTranslationCmdArbitration_IHM.st:9: `DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md` est perime � version active : DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md
      [ERROR] CODE/I_TRANSLATION/_TYPES/ST_fbTranslation_Cfg.st:11: `DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md` est perime � version active : DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md
-     
+
      Doc links check: FAIL (147 erreur(s), 4 avertissement(s))
 â–¶ [06] G100 â€” QualitÃ© du bloc â€” G110, G120, G127
-  âœ… PASS G110 ??? Nommage IEC (NC-010 a NC-070, informatif) Â· 0.45s
-  âœ… PASS G120 ??? Nommage DUT propriete d'un FB (NC-110, informatif) Â· 0.28s
+  âœ… PASS G110 ??? Nommage IEC (NC-010 a NC-070, informatif) Â· 0.46s
+  âœ… PASS G120 ??? Nommage DUT propriete d'un FB (NC-110, informatif) Â· 0.27s
   âœ… PASS G127 ??? Completude gate neutralisation NOT Enable (informatif) Â· 0.16s
-  âœ… PASS  3/3 gates Â· 0.88s
+  âœ… PASS  3/3 gates Â· 0.89s
 â–¶ [07] G300 â€” Structure, documentation & sÃ©curitÃ© â€” G380, G390
   âœ… PASS G380 ??? Persistance config Â· 0.15s
-  âœ… PASS G390 ??? Fraicheur bundle Â· 3.08s
-  âœ… PASS  2/2 gates Â· 3.22s
+  âœ… PASS G390 ??? Fraicheur bundle Â· 3.60s
+  âœ… PASS  2/2 gates Â· 3.74s
 â–¶ [08] G400 â€” Bundle, qualitÃ© source & CI â€” G400, G405, G406, G407, G408, G430, G440, G450, G461, G470, G480, G481, G482, G483, G484, G487, G488, G491, G492, G493, G494, G495, G496, G497, G499
-  âœ… PASS G400 ??? Syntaxe ST du bundle (no terminator) Â· 0.30s
-  âœ… PASS G405 ??? Litt??raux STRING ASCII (REX 2026-08-17) Â· 0.35s
-  âœ… PASS G406 ??? Longueur litt??raux STRING (REX 2026-08-31) Â· 0.36s
-  âœ… PASS G407 ??? Pire cas CONCAT vs STRING(N) cible (REX 2026-09-19) Â· 0.76s
-  âœ… PASS G408 - Longueur max messages IHM (lisibilite operateur, REX 2026-09-19) Â· 0.80s
-  âŒ FAIL G430 ??? Commentaires REX (Z??ro journal intime, ??2ter) Â· 0.48s
-  âœ… PASS G440 ??? Skills agents (stub + canonique, anti-derive) Â· 0.14s
+  âœ… PASS G400 ??? Syntaxe ST du bundle (no terminator) Â· 0.28s
+  âœ… PASS G405 ??? Litt??raux STRING ASCII (REX 2026-08-17) Â· 0.37s
+  âœ… PASS G406 ??? Longueur litt??raux STRING (REX 2026-08-31) Â· 0.35s
+  âœ… PASS G407 ??? Pire cas CONCAT vs STRING(N) cible (REX 2026-09-19) Â· 0.89s
+  âœ… PASS G408 - Longueur max messages IHM (lisibilite operateur, REX 2026-09-19) Â· 0.75s
+  âŒ FAIL G430 ??? Commentaires REX (Z??ro journal intime, ??2ter) Â· 0.45s
+  âœ… PASS G440 ??? Skills agents (stub + canonique, anti-derive) Â· 0.13s
   âœ… PASS G450 ??? Couverture AF ??? TC ??? TEST_AUTO_CI (informatif) Â· 0.53s
-  âœ… PASS G461 ??? ArmingPermit c??bl?? (z??ro litt??ral, REX 2026-08-29) Â· 0.33s
+  âœ… PASS G461 ??? ArmingPermit c??bl?? (z??ro litt??ral, REX 2026-08-29) Â· 0.32s
   âœ… PASS G470 ??? Unicit?? catalogue TC (matrice AF, informatif, REX 2026-08-29) Â· 0.32s
   âœ… PASS G480 ? Harnais integration : stub FB_TestHarness_PRG_04 miroir de PRG_04 (T181-00 AC2) Â· 0.10s
-  âœ… PASS G481 ? Harnais integration treuil WINCH_INTEG compile+execute (T181-00 AC7, baseline rouge OK) Â· 46.23s
-  âœ… PASS G482 ? Clamp bornes FB_SpeedStep (T181-07 AC6) Â· 0.10s
+  âœ… PASS G481 ? Harnais integration treuil WINCH_INTEG compile+execute (T181-00 AC7, baseline rouge OK) Â· 59.78s
+  âœ… PASS G482 ? Clamp bornes FB_SpeedStep (T181-07 AC6) Â· 0.09s
   âŒ FAIL G483 - Matrice maintenance N1/N2 : bypass gates MAINT_N2, override FDC borne, re-homing (T181-14 AC1-AC12) Â· 0.13s
   âœ… PASS G484 - ContactorStuck proprietaire unique (T181-02/03 AC7) Â· 0.19s
   âœ… PASS G487 - Initialiseur struct anonyme en appel FB interdit (CODESYS 3.5, REX 2026-08-30 PRG_04/T181-08) Â· 0.17s
-  âœ… PASS G488 - Estimateur M3 : R_TRIG ET F_TRIG consommes par capteur (T333) Â· 0.13s
-  âœ… PASS G491 - Anti-orphelin bypass RETAIN (relais PRG_07, REX 2026-09-01 BypassNetworkGlobal) Â· 0.12s
-  âœ… PASS G492 - Verrou inversion joystick inter-scan (T222) Â· 0.09s
-  âœ… PASS G493 - Table paliers centrale vers joystick (T223) Â· 0.08s
+  âœ… PASS G488 - Estimateur M3 : R_TRIG ET F_TRIG consommes par capteur (T333) Â· 0.12s
+  âœ… PASS G491 - Anti-orphelin bypass RETAIN (relais PRG_07, REX 2026-09-01 BypassNetworkGlobal) Â· 0.11s
+  âœ… PASS G492 - Verrou inversion joystick inter-scan (T222) Â· 0.10s
+  âœ… PASS G493 - Table paliers centrale vers joystick (T223) Â· 0.09s
   âœ… PASS G494 - Invariants statiques handoff AX3/AX4 joystick maintenu (T257) Â· 0.09s
-  âœ… PASS G495 - Invariants cycle semi-auto SAT (T258) Â· 0.11s
-  âœ… PASS G496 - Polarit? NC FdC haut M1/M2 (T268) Â· 0.10s
-  âœ… PASS G497 - MecaD prot?g? pendant man?uvre benne (T269) Â· 0.09s
-  âœ… PASS G499 - Egouttage IHM en secondes, autorite unique (T289) Â· 0.09s
-  âŒ FAIL  23/25 gates Â· 52.19s
+  âœ… PASS G495 - Invariants cycle semi-auto SAT (T258) Â· 0.10s
+  âœ… PASS G496 - Polarit? NC FdC haut M1/M2 (T268) Â· 0.09s
+  âœ… PASS G497 - MecaD prot?g? pendant man?uvre benne (T269) Â· 0.12s
+  âœ… PASS G499 - Egouttage IHM en secondes, autorite unique (T289) Â· 0.10s
+  âŒ FAIL  23/25 gates Â· 65.76s
   â””â”€ G430 â€” Commentaires REX (ZÃ©ro journal intime, Â§2ter)
        - CODE\L_SIMULATION\GVL_Simulation.st:41 [avant ce lot] -> nominal, identique au codage en dur d'avant ce lot) ; FALSE = inverse/coupe les phases
        - CODE\M_MAIN\PRG_02_Acquisition.st:33 [T278] -> * [INST] Acquittement borne diagnostics T278 (EtherCAT/CANopen uniquement)
-       - CODE\M_MAIN\PRG_02_Acquisition.st:514 [T383] -> desarme au milieu de l'intervention. AX15D (T383) : module benne sur place,
-       - CODE\M_MAIN\PRG_02_Acquisition.st:574 [REX] -> ErrorID:02 juste apres la confirmation (REX MES 2026-09-04, audit T250 finding M6).
-       - CODE\M_MAIN\PRG_02_Acquisition.st:574 [T250] -> ErrorID:02 juste apres la confirmation (REX MES 2026-09-04, audit T250 finding M6).
+       - CODE\M_MAIN\PRG_02_Acquisition.st:515 [T383] -> desarme au milieu de l'intervention. AX15D (T383) : module benne sur place,
+       - CODE\M_MAIN\PRG_02_Acquisition.st:575 [REX] -> ErrorID:02 juste apres la confirmation (REX MES 2026-09-04, audit T250 finding M6).
+       - CODE\M_MAIN\PRG_02_Acquisition.st:575 [T250] -> ErrorID:02 juste apres la confirmation (REX MES 2026-09-04, audit T250 finding M6).
        - CODE\M_MAIN\PRG_03_Modes_Cycle.st:49 [T358] -> . [LOC] Consigne de forcage lue AVANT l'appel du FB : base du compare-et-efface (acquittem
        - CODE\M_MAIN\PRG_03_Modes_Cycle.st:109 [T248] -> T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
        - CODE\M_MAIN\PRG_03_Modes_Cycle.st:201 [T358] -> 🔧 T358 : la consigne de forcage est lue UNE SEULE FOIS ici, AVANT l'appel. C'est cette
@@ -161,7 +161,7 @@ LÃ©gende : âœ… PASS Â· âŒ FAIL Â· durÃ©e cumulÃ©e par famille
        - CODE\M_MAIN\PRG_07_Supervision.st:35 [T330] -> * [INST] Normalisation des reglages haut T330 (FDC / TOP / ralentissement)
        - CODE\M_MAIN\PRG_07_Supervision.st:106 [T330] -> ═══ T330 — contexte machine (reglages, constantes et memoires portes par instCfgT330Normal
        - CODE\M_MAIN\PRG_07_Supervision.st:162 [T330] -> 🔧 T330 — COHERENCE DES REGLAGES HAUT (Q1/Q2) · plan C3 v1.3
-     
+
      Standard : CODE_QUALITY_STANDARDS.md §2ter — les commentaires décrivent ce que fait le code, pas l'historique de développement. La traçabilité (lots, MES, dates, correctifs) vit dans DOC/ (VERSION_HISTORY, AF, PLAN_TASK).
   â””â”€ G483 - Matrice maintenance N1/N2 : bypass gates MAINT_N2, override FDC borne, re-homing (T181-14 AC1-AC12)
        - AC1 bypass non gat� par MAINT_N2 : BypassMecaC            := GVL_IHM.M1TreuilRetenue.Bypass.MecaC,
@@ -195,46 +195,46 @@ LÃ©gende : âœ… PASS Â· âŒ FAIL Â· durÃ©e cumulÃ©e par famille
        - AC1 local effectif non gat� par MaintN2 : BypassM2MecaDEff
        - AC1b MaintN2 ne d�rive pas de PRG_03_Modes_Cycle.Data.Auth.Mode (= E_Mode.MAINT_N2)
 â–¶ [09] G500 â€” Compilation CODESYS â€” G501, G502, G503, G504, G505, G506, G507, G508, G510, G511, G512, G513, G514, G515, G516, G517, G518, G519, G520, G522, G523
-  âœ… PASS G501 - Absence mouvement sous commande (T288) Â· 0.09s
-  âœ… PASS G502 - Frontiere SimBench M3 HwSim/HwIn (T300 AC4bis/AC14) Â· 0.22s
+  âœ… PASS G501 - Absence mouvement sous commande (T288) Â· 0.10s
+  âœ… PASS G502 - Frontiere SimBench M3 HwSim/HwIn (T300 AC4bis/AC14) Â· 0.23s
   âœ… PASS G503 - Portee stricte ManualBucketLimitsActive + borne T248 (T327) Â· 0.10s
   âœ… PASS G504 - Invariant haut T330 : reserve >= 1,00 m ET ralentissement haut >= 0,50 m (2 regles DISTINCTES, ex-regle inverse G483 AC2b abrogee) Â· 0.22s
-  âœ… PASS G505 - Continuit? M2 et autorit? M1 en Both AX12 (T291-B) Â· 0.12s
-  âœ… PASS G506 - Toute cause agregee dans AnyFaultActive a un libelle bandeau (T255-D) Â· 0.11s
-  âœ… PASS G507 - Timeout benne : temps de commande engagee seul (T295, suspension a2) Â· 0.11s
-  âœ… PASS G508 - Totalisateur prelevements : ecriture unique (increment AX18), aucune RAZ, IHM lecture seule (T299) Â· 1.08s
-  âœ… PASS G510 - Butee silencieuse interdite sur un comptage brut de position (T338) Â· 0.28s
-  âœ… PASS G511 - Garde de montee du referencement : realiste (>= course/vitesse palier 1 x marge) ET consommee seulement si la montee est commandee (T340) Â· 0.11s
-  âœ… PASS G512 - Test CI : aucun argument nomme MORT (hors interface declaree du FB teste) dans les appels de test (T339) Â· 4.14s
-  âœ… PASS G513 - Memoire de comptage brut d'un codeur : producteur unique respecte (aucune reinjection muette du banc) et aucune auto-correction sur test de valeur (T342) Â· 0.28s
-  âœ… PASS G514 - Variable locale ecrite et jamais lue (code mort = temoin d'un comportement disparu) (T346) Â· 0.24s
-  âœ… PASS G515 - Seuil IHM d'ouverture benne : branche additive, qualifiee, bornee, consommee par les deux sites (T262-B) Â· 0.13s
-  âœ… PASS G516 - Interrupteur de configuration mort : invariant de cablage T352 (autorisations en dur, aucune entree servie par GVL_Simulation) Â· 0.13s
-  âœ… PASS G517 - Enveloppe du forcage de step sans garde : placement, plage, table de conversion, acquittement PRG_03, reprise consciente preservee (T358) Â· 0.14s
+  âœ… PASS G505 - Continuit? M2 et autorit? M1 en Both AX12 (T291-B) Â· 0.13s
+  âœ… PASS G506 - Toute cause agregee dans AnyFaultActive a un libelle bandeau (T255-D) Â· 0.12s
+  âœ… PASS G507 - Timeout benne : temps de commande engagee seul (T295, suspension a2) Â· 0.10s
+  âœ… PASS G508 - Totalisateur prelevements : ecriture unique (increment AX18), aucune RAZ, IHM lecture seule (T299) Â· 1.05s
+  âœ… PASS G510 - Butee silencieuse interdite sur un comptage brut de position (T338) Â· 0.30s
+  âœ… PASS G511 - Garde de montee du referencement : realiste (>= course/vitesse palier 1 x marge) ET consommee seulement si la montee est commandee (T340) Â· 0.10s
+  âœ… PASS G512 - Test CI : aucun argument nomme MORT (hors interface declaree du FB teste) dans les appels de test (T339) Â· 7.20s
+  âœ… PASS G513 - Memoire de comptage brut d'un codeur : producteur unique respecte (aucune reinjection muette du banc) et aucune auto-correction sur test de valeur (T342) Â· 0.27s
+  âœ… PASS G514 - Variable locale ecrite et jamais lue (code mort = temoin d'un comportement disparu) (T346) Â· 0.22s
+  âœ… PASS G515 - Seuil IHM d'ouverture benne : branche additive, qualifiee, bornee, consommee par les deux sites (T262-B) Â· 0.11s
+  âœ… PASS G516 - Interrupteur de configuration mort : invariant de cablage T352 (autorisations en dur, aucune entree servie par GVL_Simulation) Â· 0.12s
+  âœ… PASS G517 - Enveloppe du forcage de step sans garde : placement, plage, table de conversion, acquittement PRG_03, reprise consciente preservee (T358) Â· 0.13s
   âœ… PASS G518 - Echelle odometrique M3 : banc et estimateur partagent le meme ratio (T361) Â· 0.13s
   âŒ FAIL G519 - L'axe possede son arret : verrou d'arrivee non annulable par la demande (T345-L1) Â· 0.14s
-  âœ… PASS G520 - Recalage M3 : le temoin d'anomalie ne conditionne jamais la correction (T361) Â· 0.12s
-  âœ… PASS G522 - Diagnostic mouvement : Step8 ne lit jamais le seul FinalInterlockError (T371) Â· 0.25s
-  âœ… PASS G523 - Restauration depuis snapshot : arrete si retrait documente dans le catalogue (REX 2026-09-22) Â· 0.90s
-  âŒ FAIL  20/21 gates Â· 9.04s
+  âœ… PASS G520 - Recalage M3 : le temoin d'anomalie ne conditionne jamais la correction (T361) Â· 0.14s
+  âœ… PASS G522 - Diagnostic mouvement : Step8 ne lit jamais le seul FinalInterlockError (T371) Â· 0.30s
+  âœ… PASS G523 - Restauration depuis snapshot : arrete si retrait documente dans le catalogue (REX 2026-09-22) Â· 0.91s
+  âŒ FAIL  20/21 gates Â· 12.15s
   â””â”€ G519 - L'axe possede son arret : verrou d'arrivee non annulable par la demande (T345-L1)
      [G519] FAIL - l'axe ne possede plus son arret :
        - AC2 l'armement du verrou ne distingue plus le cas 'demande deja retombee' : les deux drapeaux seraient FALSE et le verrou serait relachable dans le meme sens
 
 ============================================================
-RESUME â€” TOUT (Temps total : 71.97s)
+RESUME â€” TOUT (Temps total : 89.35s)
 ============================================================
-  PASS  [  0.14s]  G500 â€” Compilation CODESYS (1/1)
-  FAIL  [  1.28s]  G300 â€” Structure, documentation & sÃ©curitÃ© (3/4)
-  FAIL  [  0.70s]  G100 â€” QualitÃ© du bloc (0/1)
-  PASS  [  1.68s]  G200 â€” Liaison & cÃ¢blage (2/2)
-  FAIL  [  2.81s]  G300 â€” Structure, documentation & sÃ©curitÃ© (7/8)
-  PASS  [  0.88s]  G100 â€” QualitÃ© du bloc (3/3)
-  PASS  [  3.22s]  G300 â€” Structure, documentation & sÃ©curitÃ© (2/2)
-  FAIL  [ 52.19s]  G400 â€” Bundle, qualitÃ© source & CI (23/25)
-  FAIL  [  9.04s]  G500 â€” Compilation CODESYS (20/21)
+  PASS  [  0.18s]  G500 â€” Compilation CODESYS (1/1)
+  FAIL  [  1.22s]  G300 â€” Structure, documentation & sÃ©curitÃ© (3/4)
+  FAIL  [  0.69s]  G100 â€” QualitÃ© du bloc (0/1)
+  PASS  [  1.70s]  G200 â€” Liaison & cÃ¢blage (2/2)
+  FAIL  [  3.00s]  G300 â€” Structure, documentation & sÃ©curitÃ© (7/8)
+  PASS  [  0.89s]  G100 â€” QualitÃ© du bloc (3/3)
+  PASS  [  3.74s]  G300 â€” Structure, documentation & sÃ©curitÃ© (2/2)
+  FAIL  [ 65.76s]  G400 â€” Bundle, qualitÃ© source & CI (23/25)
+  FAIL  [ 12.15s]  G500 â€” Compilation CODESYS (20/21)
 ------------------------------------------------------------
-TEMPS TOTAL DE L'EXECUTION : 71.97 secondes
+TEMPS TOTAL DE L'EXECUTION : 89.35 secondes
 
 [FAIL] 6 gate(s) en echec sur 67 :
   - G300 â€” Structure du depot
