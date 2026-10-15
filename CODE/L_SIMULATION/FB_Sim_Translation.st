@@ -25,6 +25,12 @@ VAR_INPUT
        egalite verifiee par G518). Ne pas confondre avec CST_NominalFrequency_Hz (40 Hz) : echelle
        ODOMETRIQUE (gain 0,02 m/(Hz.s)). *)
     MaxFreq_Hz : REAL := 50.0;
+    (* ACCELERATION DU BANC (confort d'essai). Le chariot avance SpeedFactor fois plus vite ET la
+       frequence RETOURNEE au PLC est multipliee d'autant : l'estimateur (f x gain) suit exactement
+       le chariot, sans saut de recalage, et le ratio publie reste 0,02 m/(Hz.s) (G518).
+       Borne 1..5. 1,0 = dynamique reelle. Le frein et la memoire de sens restent sur la frequence
+       physique du variateur simule. *)
+    SpeedFactor : REAL := 1.0;
     AccelRate_HzPerS : REAL := 20.0;
     DecelRate_HzPerS : REAL := 25.0; // pente d'arret relevee sur trace reelle (rampe variateur / rampe PLC)
     DriveTimeConstantS : REAL := 0.15;
@@ -106,6 +112,7 @@ VAR
        retenue (gain audit 0,0551 m/(Hz.s)). A ne pas citer comme une mesure. *)
     TravelDirection : REAL;
     FrequencyTarget_Hz : REAL;
+    SpeedFactorApplied : REAL := 1.0;
     CycleTimeS : REAL;
     SpeedAt40Hz_Mps : REAL;
     VelocityTarget_Mps : REAL;
@@ -213,9 +220,10 @@ IF Enable THEN
         LoadFrequencyDroopGain_Hz := LoadFrequencyDroopGain_Hz, CycleTime_S := CycleTimeS);
     FrequencyCmd_Hz := instDrive.FrequencyCmd_Hz;
     ElectricalFrequency_Hz := instDrive.ElectricalFrequency_Hz;
-    ActualFrequency_Hz := instDrive.ActualFrequency_Hz;
+    SpeedFactorApplied := LIMIT(1.0, SpeedFactor, 5.0);
+    ActualFrequency_Hz := instDrive.ActualFrequency_Hz * SpeedFactorApplied;
     instBrake(Enable := TRUE, ReleaseCmd := BrakeReleaseCmd,
-        ActualFrequency_Hz := ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
+        ActualFrequency_Hz := instDrive.ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
         CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
         CycleTime_S := CycleTimeS,
         FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
@@ -237,7 +245,7 @@ IF Enable THEN
         TravelDirection := 1.0;
     ELSIF ReqTremie AND ReqMaintenance THEN
         TravelDirection := 0.0;
-    ELSIF ABS(ActualFrequency_Hz) <= CST_StopFrequency_Hz THEN
+    ELSIF ABS(instDrive.ActualFrequency_Hz) <= CST_StopFrequency_Hz THEN
         TravelDirection := 0.0;
     END_IF;
 

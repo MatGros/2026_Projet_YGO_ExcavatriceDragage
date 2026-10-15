@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-12T10:00:11.787871" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-12T10:00:11.787871">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-14T23:56:53.228355" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-14T23:56:53.228355">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1522,6 +1522,19 @@ reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non c
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Gain de reaction de charge M3, m/s2</xhtml>
               </documentation>
             </variable>
+            <variable name="SimM3SpeedFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ACCELERATION DU BANC M3 : chariot ET frequence retournee x facteur (1..5), estimation coherente.
+Volontairement NON cable par PRG_02 : se regle en ligne sur l'instance (instSimBench.SimM3SpeedFactor).
+--&gt; [TST] Facteur de vitesse du banc M3, 1,0 = dynamique reelle</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimJoystickLeft_Rev_TREMIE_Active">
               <type>
                 <BOOL />
@@ -2800,6 +2813,7 @@ instSimTranslation(
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
     FullTravelTimeS := CST_M3FullTravelTimeS,
     MaxFreq_Hz      := CST_M3MaxFreq_Hz,
+    SpeedFactor     := SimM3SpeedFactor,
     BrakeReleaseCmd := M3_BrakeCmd,
     SensorIntermittenceActive := SimM3SensorIntermittenceActive,
     SensorStabilizationS := SimM3SensorStabilizationS,
@@ -2967,1516 +2981,6 @@ Done := TRUE;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_Sim_Translation" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ReqTremie">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ReqMaintenance">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="SpeedTgt_Pct">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="FullTravelTimeS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="37.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T361 — ECHELLE ODOMETRIQUE DU BANC, ALIGNEE SUR L'ESTIMATEUR REEL.
-       Le modele integre VelocityTarget = (CST_PositionAtMaintenance / FullTravelTimeS) x f / 40.
-       Le ratio simule vaut donc 30 / (40 x FullTravelTimeS) m/(Hz.s) et DOIT etre egal au gain
-       consomme par FB_Translation_PositionEstimator (GainMetersPerHzSec, cable sur
-       GVL_PERSISTENT._TranslationGainMetersPerHzSec = 0,02 m/(Hz.s), soit 1 m/s a 50 Hz).
-       =&gt; 30 / (40 x 37,5) = 0,02 m/(Hz.s). La valeur historique 8,0 s donnait 0,09375 m/(Hz.s),
-       soit 4,7 fois l'echelle reelle : l'estimateur prenait un retard constant et chaque
-       franchissement de capteur produisait un saut de recalage de plusieurs metres
-       (AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md, trace Suivi_74 : sauts de 4,53 a 9,12 m).
-       ⚠️ Toute evolution de _TranslationGainMetersPerHzSec exige de recalculer cette constante :
-       le gate G518 echoue si les deux echelles divergent.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BrakeReleaseCmd">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-            </variable>
-            <variable name="MaxFreq_Hz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="50" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ECHELLE DE LA CONSIGNE. PRG_02 envoie SpeedCmd_Pct = f / 50 Hz x 100 : le simulateur reconvertit
-       avec le MEME maximum, sinon 20 Hz reels (40 %) deviendraient 16 Hz simules.
-       Maximum = GVL_PERSISTENT._TranslationMaxFreq_Hz (50 Hz), passe par FB_SimBench (CST_M3MaxFreq_Hz,
-       egalite verifiee par G518). Ne pas confondre avec CST_NominalFrequency_Hz (40 Hz) : echelle
-       ODOMETRIQUE (gain 0,02 m/(Hz.s)).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AccelRate_HzPerS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="20" />
-              </initialValue>
-            </variable>
-            <variable name="DecelRate_HzPerS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="25" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">pente d'arret relevee sur trace reelle (rampe variateur / rampe PLC)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DriveTimeConstantS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.15" />
-              </initialValue>
-            </variable>
-            <variable name="BrakeOpenDelayS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.1" />
-              </initialValue>
-            </variable>
-            <variable name="BrakeCloseDelayS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.09" />
-              </initialValue>
-            </variable>
-            <variable name="BrakeContactDelayS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-            </variable>
-            <variable name="BrakeFaultCloseWhileRunning">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FAUTE EXPLICITE frein M3 — defaut FALSE : reproduit le defaut terrain « frein ferme
-       alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s,
-       State.ErrorId=64). La garde nominale 0,5 Hz du frein n'est pas modifiee.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BrakeFaultCloseDelay_S">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-            </variable>
-            <variable name="SuspendedLoadLength_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1.5" />
-              </initialValue>
-            </variable>
-            <variable name="SuspendedLoadDamping">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.35" />
-              </initialValue>
-            </variable>
-            <variable name="LoadReactionGain_Mps2">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.2" />
-              </initialValue>
-            </variable>
-            <variable name="EndStopRecoilMax_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">BUTEE MECANIQUE — recul borne apres arret serre.
-       0.0 (defaut) conserve EXACTEMENT le comportement historique : position ET vitesse
-       figees a la butee (decision de review tracee, correctif « contact rigide »).
-       &gt; 0 : l'inertie du chariot reste absorbee par la butee, MAIS la reaction de la charge
-       peut ressortir le chariot de la zone capteur — comportement observe sur la trace
-       terrain du 2026-09-04 a 26,437 s (Tremie actif 1 echantillon puis perdu
-       definitivement). Valeur SYNTHETIQUE, en attente de mesure terrain.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LoadFrequencyDroopGain_Hz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-            </variable>
-            <variable name="SensorJitterAmplitude_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-            </variable>
-            <variable name="SensorStabilizationS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-            </variable>
-            <variable name="SensorElectricalDelayS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-            </variable>
-            <variable name="SensorIntermittenceActive">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-            </variable>
-            <variable name="SensorLoadAngleTriggerRad">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-            </variable>
-            <variable name="SensorScenarioSeed">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="3001" />
-              </initialValue>
-            </variable>
-            <variable name="SensorHysteresis_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.02" />
-              </initialValue>
-            </variable>
-            <variable name="SensorIntermittencePeriodS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.12" />
-              </initialValue>
-            </variable>
-            <variable name="SensorBlipTransitions">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">BLIP COURT — second profil capteur, independant du train ~1 s ci-dessus.
-       BlipTransitions = 0 (defaut) : profil historique strictement inchange.
-       Valeurs de trace : Tremie 1 excursion de 0,2 s (2 echantillons a 100 ms),
-       PV 1 excursion de 0,1 s (1 echantillon).
-       ⚠️ LIMITE CONNUE (revue 2026-09-20, F11) : UNE SEULE largeur globale est appliquee aux
-       cinq capteurs. Les deux signatures de la trace (Tremie 0,200 s et PV 0,100 s) ne sont
-       donc PAS rejouables dans la meme passe : il faut deux executions avec des valeurs
-       differentes de SensorBlipDurationS. Une largeur par capteur exigerait un
-       ARRAY[1..5] OF REAL, non retenu dans ce lot.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SensorBlipDurationS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.2" />
-              </initialValue>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="PosTremie">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="PosPV">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="PosP2">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="PosP1">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="PosMaintenance">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="FrequencyCmd_Hz">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="ElectricalFrequency_Hz">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="ActualFrequency_Hz">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="BrakeCoilEnergized">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BrakeMechanicallyOpen">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BrakeContactOpen">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BrakeFaultCloseActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="PositionTrue_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="VelocityTrue_Mps">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="LoadAngle_Rad">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="SensorPosition_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="SensorTransitionCount">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="SensorBlipActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="HardStopTremieActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="HardStopMaintenanceActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="instCycleTime">
-              <type>
-                <derived name="FB_CycleTime" />
-              </type>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="DirectionSign">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="TravelDirection">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens de deplacement MEMORISE. La commande peut etre retiree AVANT l'arret physique
-       (deceleration libre du variateur) : le sens du dernier ordre valide est conserve tant
-       que le variateur retourne de la vitesse, puis purge a l'arret. Sans cette memoire, la
-       vitesse du chariot s'effondrait au scan de retrait de commande alors que la frequence
-       retournee decroit encore.
-       ⚠️ ORDRE DE GRANDEUR NON MESURE : la trace terrain ne contient AUCUNE variable de
-       position (15 TraceVariable : DI, frequences, mots d'etat, erreurs). La distance de
-       roue libre de la fenetre 14,67 -&gt; 16,16 s est donc une ESTIMATION dependante du modele
-       d'echelle, qui vaut approximativement 1,1 a 1,3 m selon la methode d'integration
-       retenue (gain audit 0,0551 m/(Hz.s)). A ne pas citer comme une mesure.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FrequencyTarget_Hz">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="CycleTimeS">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="SpeedAt40Hz_Mps">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="VelocityTarget_Mps">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="CartAcceleration_Mps2">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="PreviousVelocity_Mps">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="PositionCandidate_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="RecoilMax_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Recul de butee ECRETE a la course : une valeur d'entree aberrante ne peut pas
-       autoriser une position hors de [0 ; 30] m (revue du 2026-09-20, F8).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SensorNoiseState">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.371" />
-              </initialValue>
-            </variable>
-            <variable name="SensorNoise_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="instSensorTremie">
-              <type>
-                <derived name="FB_Sim_PositionSensor" />
-              </type>
-            </variable>
-            <variable name="instSensorPV">
-              <type>
-                <derived name="FB_Sim_PositionSensor" />
-              </type>
-            </variable>
-            <variable name="instSensorP2">
-              <type>
-                <derived name="FB_Sim_PositionSensor" />
-              </type>
-            </variable>
-            <variable name="instSensorP1">
-              <type>
-                <derived name="FB_Sim_PositionSensor" />
-              </type>
-            </variable>
-            <variable name="instSensorMaintenance">
-              <type>
-                <derived name="FB_Sim_PositionSensor" />
-              </type>
-            </variable>
-            <variable name="instDrive">
-              <type>
-                <derived name="FB_Sim_TranslationDrive" />
-              </type>
-            </variable>
-            <variable name="instBrake">
-              <type>
-                <derived name="FB_Sim_TranslationBrake" />
-              </type>
-            </variable>
-            <variable name="instSuspendedLoad">
-              <type>
-                <derived name="FB_Sim_SuspendedLoad" />
-              </type>
-            </variable>
-            <variable name="CST_PositionAtTremie">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-            </variable>
-            <variable name="CST_PositionAtTremieSensor_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.05" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Meme principe a Tremie : le seuil DI est legerement avant la butee afin
-       que l'hysteresis puisse commuter sans depassement numerique de course.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_PositionAtPV">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="5" />
-              </initialValue>
-            </variable>
-            <variable name="CST_PositionAtP2">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="15" />
-              </initialValue>
-            </variable>
-            <variable name="CST_PositionAtP1">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="20" />
-              </initialValue>
-            </variable>
-            <variable name="CST_PositionAtMaintenance">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="30" />
-              </initialValue>
-            </variable>
-            <variable name="CST_PositionAtMaintenanceSensor_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="29.95" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Le capteur cumulatif Maintenance doit commuter avant la butee mecanique,
-       sinon un modele borne a 30 m ne peut jamais produire le mot 00000. Cette
-       position est SYNTHETIQUE en attente de la mesure de la came reelle.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_NominalFrequency_Hz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="40" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">echelle ODOMETRIQUE lue par G518 — PAS le maximum variateur (MaxFreq_Hz)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_MinTimeS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.001" />
-              </initialValue>
-            </variable>
-            <variable name="CST_StopFrequency_Hz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Meme seuil d'arret que FB_Sim_TranslationBrake.CST_StopFrequency_Hz (0,5 Hz).
-       Valide par la trace terrain du 2026-09-04 : frein ouvert a 0,60 Hz, ferme a 0,00 Hz.</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   Modele dynamique M3 confine au SimBench.</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-instCycleTime(DefaultValueS := 0.010);
-(* Le modele mono-pas suit le temps de cycle reel jusqu'a 100 ms. Cette borne
-   evite de ralentir artificiellement la dynamique lorsque la trace est executee
-   dans VISU_TASK (environ 100 ms), tout en restant stable pour le pendule reduit.
-   Au-dela, FB_CycleTime fournit deja son temps de secours et aucun saut aberrant
-   n'est accepte. La qualification des delais sub-100 ms exige toutefois une tache
-   de trace plus rapide que 100 ms. *)
-CycleTimeS := LIMIT(0.001, instCycleTime.CycleTimeS, 0.100);
-
-IF NOT Enable THEN
-    Initialized := FALSE;
-    instDrive(Enable := FALSE);
-    instBrake(Enable := FALSE);
-    instSuspendedLoad(Enable := FALSE);
-    FrequencyCmd_Hz := 0.0;
-    ElectricalFrequency_Hz := 0.0;
-    ActualFrequency_Hz := 0.0;
-    BrakeMechanicallyOpen := FALSE;
-    BrakeContactOpen := FALSE;
-    BrakeCoilEnergized := FALSE;
-    BrakeFaultCloseActive := FALSE;
-    PositionTrue_M := CST_PositionAtP1;
-    VelocityTrue_Mps := 0.0;
-    PreviousVelocity_Mps := 0.0;
-    TravelDirection := 0.0;
-    LoadAngle_Rad := 0.0;
-    SensorTransitionCount := 0;
-    SensorBlipActive := FALSE;
-    HardStopTremieActive := FALSE;
-    HardStopMaintenanceActive := FALSE;
-    (* Repli deterministe compatible avec le mot thermometre P1 = 00011. *)
-    PosTremie := FALSE;
-    PosPV := FALSE;
-    PosP2 := FALSE;
-    PosP1 := TRUE;
-    PosMaintenance := TRUE;
-    instSensorTremie(Enable := FALSE);
-    instSensorPV(Enable := FALSE);
-    instSensorP2(Enable := FALSE);
-    instSensorP1(Enable := FALSE);
-    instSensorMaintenance(Enable := FALSE);
-    RETURN;
-ELSIF NOT Initialized THEN
-    Initialized := TRUE;
-    PositionTrue_M := CST_PositionAtP1;
-    TravelDirection := 0.0;
-END_IF;
-
-IF Enable THEN
-    DirectionSign := 0.0;
-    IF ReqTremie AND NOT ReqMaintenance THEN
-        DirectionSign := -1.0;
-    ELSIF ReqMaintenance AND NOT ReqTremie THEN
-        DirectionSign := 1.0;
-    END_IF;
-
-    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * MaxFreq_Hz / 100.0, MaxFreq_Hz);
-    IF DirectionSign = 0.0 THEN
-        FrequencyTarget_Hz := 0.0;
-    END_IF;
-    instDrive(Enable := TRUE, FrequencyTgt_Hz := FrequencyTarget_Hz,
-        AccelRate_HzPerS := AccelRate_HzPerS, DecelRate_HzPerS := DecelRate_HzPerS,
-        TimeConstant_S := DriveTimeConstantS,
-        LoadAngularVelocity_RadPerS := instSuspendedLoad.AngularVelocity_RadPerS,
-        LoadFrequencyDroopGain_Hz := LoadFrequencyDroopGain_Hz, CycleTime_S := CycleTimeS);
-    FrequencyCmd_Hz := instDrive.FrequencyCmd_Hz;
-    ElectricalFrequency_Hz := instDrive.ElectricalFrequency_Hz;
-    ActualFrequency_Hz := instDrive.ActualFrequency_Hz;
-    instBrake(Enable := TRUE, ReleaseCmd := BrakeReleaseCmd,
-        ActualFrequency_Hz := ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
-        CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
-        CycleTime_S := CycleTimeS,
-        FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
-        FaultCloseDelay_S := BrakeFaultCloseDelay_S);
-    BrakeCoilEnergized := instBrake.CoilEnergized;
-    BrakeMechanicallyOpen := instBrake.MechanicallyOpen;
-    BrakeContactOpen := instBrake.ContactOpen;
-    BrakeFaultCloseActive := instBrake.FaultCloseActive;
-
-    (* Sens memorise (C3). Regles, dans cet ordre :
-       1. un ordre simple valide (re)memorise le sens ;
-       2. deux ordres contradictoires neutralisent immediatement le sens — aucune
-          excitation inventee (preserve TC-T300-MEC-030) ;
-       3. commande retiree : le sens est CONSERVE tant que le variateur retourne de la
-          vitesse (deceleration libre), puis purge des que la vitesse est nulle. *)
-    IF ReqTremie AND NOT ReqMaintenance THEN
-        TravelDirection := -1.0;
-    ELSIF ReqMaintenance AND NOT ReqTremie THEN
-        TravelDirection := 1.0;
-    ELSIF ReqTremie AND ReqMaintenance THEN
-        TravelDirection := 0.0;
-    ELSIF ABS(ActualFrequency_Hz) &lt;= CST_StopFrequency_Hz THEN
-        TravelDirection := 0.0;
-    END_IF;
-
-    PreviousVelocity_Mps := VelocityTrue_Mps;
-    IF (FullTravelTimeS &gt; CST_MinTimeS) AND BrakeMechanicallyOpen THEN
-        SpeedAt40Hz_Mps := CST_PositionAtMaintenance / FullTravelTimeS;
-        VelocityTarget_Mps := TravelDirection * SpeedAt40Hz_Mps * ActualFrequency_Hz / CST_NominalFrequency_Hz;
-    ELSE
-        VelocityTarget_Mps := 0.0;
-    END_IF;
-    VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
-    IF NOT BrakeMechanicallyOpen THEN
-        VelocityTrue_Mps := 0.0;
-    END_IF;
-    HardStopTremieActive := FALSE;
-    HardStopMaintenanceActive := FALSE;
-    PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
-    IF PositionCandidate_M &lt; CST_PositionAtTremie THEN
-        PositionTrue_M := CST_PositionAtTremie;
-        VelocityTrue_Mps := 0.0;
-        HardStopTremieActive := TRUE;
-    ELSIF PositionCandidate_M &gt; CST_PositionAtMaintenance THEN
-        PositionTrue_M := CST_PositionAtMaintenance;
-        VelocityTrue_Mps := 0.0;
-        HardStopMaintenanceActive := TRUE;
-    END_IF;
-    CartAcceleration_Mps2 := (VelocityTrue_Mps - PreviousVelocity_Mps) / CycleTimeS;
-    instSuspendedLoad(Enable := TRUE, BrakeMechanicallyOpen := BrakeMechanicallyOpen,
-        CartAcceleration_Mps2 := CartAcceleration_Mps2, Length_M := SuspendedLoadLength_M,
-        Damping := SuspendedLoadDamping, ReactionGain_Mps2 := LoadReactionGain_Mps2,
-        CycleTime_S := CycleTimeS);
-    LoadAngle_Rad := instSuspendedLoad.Angle_Rad;
-    IF HardStopTremieActive OR HardStopMaintenanceActive THEN
-        RecoilMax_M := MIN(MAX(0.0, EndStopRecoilMax_M), CST_PositionAtMaintenance);
-        IF (RecoilMax_M &gt; 0.0) AND BrakeMechanicallyOpen THEN
-            (* Recul autorise UNIQUEMENT en s'eloignant de la butee touchee, borne par
-               EndStopRecoilMax_M : jamais plus loin dans la butee, jamais de saut cache. *)
-            VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
-            (* Contre une butee, l'entrainement DECROCHE : il ne maintient pas une consigne de
-               vitesse dans l'obstacle. Sans cette purge, la consigne de vitesse ecrasait en
-               permanence la reaction de charge et le chariot ne pouvait jamais ressortir de
-               la zone capteur (recul alors impossible, quelle que soit la charge). *)
-            TravelDirection := 0.0;
-            IF HardStopTremieActive THEN
-                VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps);
-                PositionCandidate_M := LIMIT(CST_PositionAtTremie,
-                    PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
-                    CST_PositionAtTremie + RecoilMax_M);
-            ELSE
-                VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps);
-                PositionCandidate_M := LIMIT(CST_PositionAtMaintenance - RecoilMax_M,
-                    PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
-                    CST_PositionAtMaintenance);
-            END_IF;
-            PositionTrue_M := PositionCandidate_M;
-        ELSE
-            VelocityTrue_Mps := 0.0;
-        END_IF;
-    ELSE
-        VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
-        PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
-        IF PositionCandidate_M &lt; CST_PositionAtTremie THEN
-            PositionTrue_M := CST_PositionAtTremie;
-            VelocityTrue_Mps := 0.0;
-            HardStopTremieActive := TRUE;
-        ELSIF PositionCandidate_M &gt; CST_PositionAtMaintenance THEN
-            PositionTrue_M := CST_PositionAtMaintenance;
-            VelocityTrue_Mps := 0.0;
-            HardStopMaintenanceActive := TRUE;
-        ELSE
-            PositionTrue_M := PositionCandidate_M;
-        END_IF;
-    END_IF;
-END_IF;
-
-IF Enable AND (ABS(LoadAngle_Rad) &gt; 0.0001) THEN
-    SensorNoiseState := 3.91 * SensorNoiseState * (1.0 - SensorNoiseState);
-    SensorNoise_M := (2.0 * SensorNoiseState - 1.0) * SensorJitterAmplitude_M;
-ELSE
-    SensorNoise_M := 0.0;
-END_IF;
-(* Les capteurs sont fixes au rail et observent le chariot. Le balancier agit
-   seulement par la reaction mecanique sur PositionTrue_M et conditionne un
-   episode electrique ; aucune deflexion de godet n'est injectee directement. *)
-SensorPosition_M := PositionTrue_M + SensorNoise_M;
-(* Les capteurs M3 sont volontairement cumulatifs : 11111 -&gt; 00000. Chaque
-   brique garde son hysteresis et son episode propres ; aucun timer partage ne
-   peut masquer un front d'un autre capteur. *)
-instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtTremieSensor_M, Hysteresis_M := SensorHysteresis_M,
-    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
-        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
-    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
-    ScenarioSeed := SensorScenarioSeed + 11,
-    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
-    CycleTimeS := CycleTimeS);
-instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtPV, Hysteresis_M := SensorHysteresis_M,
-    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
-        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
-    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
-    ScenarioSeed := SensorScenarioSeed + 23,
-    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
-    CycleTimeS := CycleTimeS);
-instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtP2, Hysteresis_M := SensorHysteresis_M,
-    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
-        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
-    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
-    ScenarioSeed := SensorScenarioSeed + 37,
-    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
-    CycleTimeS := CycleTimeS);
-instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtP1, Hysteresis_M := SensorHysteresis_M,
-    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
-        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
-    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
-    ScenarioSeed := SensorScenarioSeed + 53,
-    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
-    CycleTimeS := CycleTimeS);
-instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtMaintenanceSensor_M, Hysteresis_M := SensorHysteresis_M,
-    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
-        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
-    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
-    ScenarioSeed := SensorScenarioSeed + 71,
-    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
-    CycleTimeS := CycleTimeS);
-
-PosTremie := instSensorTremie.ElectricalOutput;
-PosPV := instSensorPV.ElectricalOutput;
-PosP2 := instSensorP2.ElectricalOutput;
-PosP1 := instSensorP1.ElectricalOutput;
-PosMaintenance := instSensorMaintenance.ElectricalOutput;
-SensorTransitionCount := instSensorTremie.TransitionCount + instSensorPV.TransitionCount
-    + instSensorP2.TransitionCount + instSensorP1.TransitionCount
-    + instSensorMaintenance.TransitionCount;
-SensorBlipActive := instSensorTremie.BlipActive OR instSensorPV.BlipActive
-    OR instSensorP2.BlipActive OR instSensorP1.BlipActive
-    OR instSensorMaintenance.BlipActive;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>d7634526-8de9-5f93-b858-7e0bb59cdce2</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_Sim_TranslationDrive" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="FrequencyTgt_Hz">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="AccelRate_HzPerS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="20" />
-              </initialValue>
-            </variable>
-            <variable name="DecelRate_HzPerS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="25" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">pente d'arret relevee sur trace reelle</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TimeConstant_S">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.15" />
-              </initialValue>
-            </variable>
-            <variable name="LoadAngularVelocity_RadPerS">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="LoadFrequencyDroopGain_Hz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-            </variable>
-            <variable name="CycleTime_S">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="Ready">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="FrequencyCmd_Hz">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="ElectricalFrequency_Hz">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="ActualFrequency_Hz">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="ResponseAlpha">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="FrequencyDelta_Hz">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="FrequencyStep_Hz">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="CST_MinTime_S">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.001" />
-              </initialValue>
-            </variable>
-            <variable name="CST_MaxFrequency_Hz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="50" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">plafond variateur reel (GVL_PERSISTENT._TranslationMaxFreq_Hz)</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   Dynamique reduite du variateur M3, sans commande metier.</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-IF NOT Enable THEN
-    Ready := FALSE;
-    FrequencyCmd_Hz := 0.0;
-    ElectricalFrequency_Hz := 0.0;
-    ActualFrequency_Hz := 0.0;
-    ResponseAlpha := 0.0;
-    RETURN;
-END_IF;
-
-FrequencyDelta_Hz := LIMIT(0.0, FrequencyTgt_Hz, CST_MaxFrequency_Hz) - FrequencyCmd_Hz;
-IF FrequencyDelta_Hz &gt;= 0.0 THEN
-    FrequencyStep_Hz := MAX(0.0, AccelRate_HzPerS) * CycleTime_S;
-ELSE
-    FrequencyStep_Hz := MAX(0.0, DecelRate_HzPerS) * CycleTime_S;
-END_IF;
-FrequencyCmd_Hz := FrequencyCmd_Hz + LIMIT(-FrequencyStep_Hz, FrequencyDelta_Hz, FrequencyStep_Hz);
-IF TimeConstant_S &gt; CST_MinTime_S THEN
-    ResponseAlpha := CycleTime_S / (TimeConstant_S + CycleTime_S);
-ELSE
-    ResponseAlpha := 1.0;
-END_IF;
-ElectricalFrequency_Hz := ElectricalFrequency_Hz
-    + ResponseAlpha * (FrequencyCmd_Hz - ElectricalFrequency_Hz);
-ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz
-    - MAX(0.0, LoadFrequencyDroopGain_Hz) * ABS(LoadAngularVelocity_RadPerS));
-IF ActualFrequency_Hz &lt; 0.005 THEN
-    ActualFrequency_Hz := 0.0;
-END_IF;
-Ready := TRUE;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>03da2ca5-829e-5f35-a2f5-646da12c2d06</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_Sim_Encoder" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active la simulation</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RelayFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens commandé avant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RelayRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens commandé arrière</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepNumber">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier vitesse courant (1..5, 0 = arrêt)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Applique un preset (homing)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetValue">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur brute à charger au preset</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedScaleFactor">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Facteur fin de confort (défaut 1.0)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CoastDistanceM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Distance de roulis inertiel apres coupure des relais (m). 0 = arret net (defaut). &gt;0 = le treuil continue a vitesse palier 1 dans le dernier sens sur CoastDistanceM metres -&gt; modelise l'anticipation d'arret mecanique (ex. benne).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetLatencyCycles">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Nb cycles automate avant application du preset (referencement non instantane)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TestOffsetCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Front montant = applique TestOffsetPts (test banc)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TestOffsetPts">
-              <type>
-                <DINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Décalage signé à appliquer (points bruts)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MinSpeedMps">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Paramètres physiques du treuil (mêmes valeurs que FB_Encoder_Scale) + vitesse réelle.
-Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps.
---&gt; [CFG] Vitesse palier 1 (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaxSpeedMps">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse palier 5 (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PointsPerRev">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="8192" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Résolution codeur (pts/tour)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CableM_PerRev">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Développement câble (m/tour)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CycleTimeS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — MainTask 10 ms</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedReportTauS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Constante de temps 1er ordre du retour vitesse</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="RawPosOut">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Position brute simulée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawSpdOut">
-              <type>
-                <DINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse brute simulée (0x6031:01 en 0.1 RPM)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CountSaturated">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Comptage en butée de plage du modèle (saturation signalée)</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <inOutVars>
-            <variable name="RawPos">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Référence _SimEncoderRawPosM1/M2 (survit au reset froid)</xhtml>
-              </documentation>
-            </variable>
-          </inOutVars>
-          <localVars>
-            <variable name="Increment">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Points ajoutés par cycle</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EffStep">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas borné (&gt;= 1)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedMps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse simulée (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TestOffsetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front TestOffsetCmd</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant PresetCmd</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetPending">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Preset en attente d'application (latence)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetCount">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Compteur cycles de latence restants</xhtml>
-              </documentation>
-            </variable>
-            <variable name="IncrStep1">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Increment par cycle a vitesse palier 1 (pour le roulis)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MovingDir">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier sens actif : +1 avant, -1 arriere, 0 arret</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CoastPtsLeft">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Roulis inertiel restant (points bruts)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TargetSpeedMps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse instantanee signee du modele position, avant filtrage retour</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ReportedSpeedMps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse rapportee filtree 1er ordre, publiee dans RawSpdOut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_CountTravelLimitPts">
-              <type>
-                <DINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1073741824" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Plage de comptage du modèle : le compteur brut est un entier SIGNÉ 32 bits (le conteneur
-UDINT n'est qu'un support d'échange, relu en DINT par toute la chaîne aval). La garde reste
-volontairement à la moitié de la plage signée (2^30 pts = 262 144 m de câble) : inatteignable
-en essai, elle interdit tout rebouclage silencieux si le modèle consommait toute sa plage.
-2^30 pts — demi-plage signée</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   📄 Spec composant : DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md
-   🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
-      Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
-      du métier machine.
-   🎯 Rôle : fait "compter" un codeur absolu comme si le treuil tournait
-      réellement, à partir des relais de sens commandés et du palier de vitesse courant.
-   📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
-   📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
-   📥 StepNumber  : palier vitesse courant (1..5) — ex. instWinchM1.StepNumber
-      Vitesse = interpolation linéaire : palier 1 → MinSpeedMps (1 m/s), palier 5 → MaxSpeedMps (2 m/s).
-   📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
-   📥 PresetValue : valeur brute à charger lors du preset
-   📥 SpeedScaleFactor : facteur fin de confort (réglable à chaud, sans recompiler). Défaut 1.0 = vitesse
-      réelle telle que définie par MinSpeedMps/MaxSpeedMps/PointsPerRev/CableM_PerRev/CycleTimeS.
-   📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
-      EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
-   🔒 Comptage brut : entier SIGNÉ 32 bits (le conteneur UDINT n'est qu'un support d'échange,
-      relu en DINT par toute la chaîne aval). Il franchit 0 sans jamais s'y figer ; la seule
-      borne est la plage de représentation, signalée par CountSaturated — jamais muette.
-   📤 CountSaturated : comptage en butée de plage du modèle (saturation signalée, vitesse purgée)
-   `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
-      (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
-      `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB. Un vrai codeur absolu physique
-      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate).
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Encoder) ===</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
-
-{region "§1 Gate"}
-IF NOT Enable THEN
-    RawPosOut := RawPos;
-    // Comptage non evalue hors simulation : la saturation ne doit pas rester figee a TRUE.
-    CountSaturated := FALSE;
-    RETURN;
-END_IF;
-{endregion}
-
-{region "§2 Injection test"}
-// Injection test banc : VRAI saut de position (comme un glissement réel),
-// pour tester Concept 1 / Méca E ET le rattrapage joystick (voir GVL_Simulation bandeau).
-TestOffsetEdge(CLK := TestOffsetCmd);
-IF TestOffsetEdge.Q THEN
-    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + TestOffsetPts);
-END_IF;
-{endregion}
-
-{region "§3 Comptage"}
-// 🎚️ Vitesse simulée = interpolation linéaire du palier (palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps),
-// pas par pas de (Max−Min)/4. Palier 0 (arrêt) ramène au palier 1 mais aucun mouvement n'est
-// appliqué tant que RelayFwd/RelayRev = FALSE (section plus bas).
-EffStep  := MAX(StepNumber, 1);
-SpeedMps := MinSpeedMps + (INT_TO_REAL(EffStep) - 1.0) * ((MaxSpeedMps - MinSpeedMps) / 4.0);
-// Points par cycle = vitesse (m/s) × points par mètre × période tâche (s) × facteur confort.
-Increment := REAL_TO_UDINT(SpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
-// Increment "lent" (palier 1) : vitesse du roulis inertiel apres coupure des relais.
-IncrStep1 := REAL_TO_UDINT(MinSpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
-
-// Front du preset : lance la latence de referencement (le codeur réel n'est pas
-// instantane — il met PresetLatencyCycles cycles a se re-referencer apres le front).
-PresetEdge(CLK := PresetCmd);
-IF PresetEdge.Q THEN
-    PresetPending := TRUE;
-    PresetCount := PresetLatencyCycles;
-END_IF;
-
-// 📐 Le comptage brut est un entier SIGNÉ 32 bits : le conteneur UDINT n'est qu'un support
-// d'échange (toute la chaîne aval le relit via UDINT_TO_DINT : FB_Encoder_Scale, FB_Encoder_Homing).
-// Sa valeur 0 n'est donc PAS une butée mécanique — c'est un point de passage comme un autre, et
-// c'est la seule façon de rester fidèle à un codeur absolu, dont le zéro de comptage est arbitraire.
-// Aucune branche de comptage ne borne donc à un littéral : seule la garde de plage §3bis intervient,
-// et elle est signalée (CountSaturated).
-// Pendant l'attente du preset, la position brute est conservee (le codeur n'a pas encore re-reference).
-// Le mouvement est gelé pendant la latence, comme un codeur réel en cours de referencement.
-IF PresetPending THEN
-    IF PresetCount &gt; 0 THEN
-        PresetCount := PresetCount - 1;
-    ELSE
-        // Latence écoulée : applique la valeur cible du preset.
-        RawPos := PresetValue;
-        PresetPending := FALSE;
-    END_IF;
-    TargetSpeedMps := 0.0;
-ELSIF RelayFwd THEN
-    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(Increment));
-    MovingDir := 1;
-    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
-    TargetSpeedMps := SpeedMps;
-ELSIF RelayRev THEN
-    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Increment));
-    MovingDir := -1;
-    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
-    TargetSpeedMps := -SpeedMps;
-ELSE
-    // Relais coupes : roulis inertiel (anticipation d'arret mecanique). Le treuil
-    // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
-    IF (CoastPtsLeft &gt;= 1.0) AND (MovingDir &lt;&gt; 0) THEN
-        IF MovingDir = 1 THEN
-            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(IncrStep1));
-            TargetSpeedMps := MinSpeedMps;
-        ELSE
-            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(IncrStep1));
-            TargetSpeedMps := -MinSpeedMps;
-        END_IF;
-        CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
-    ELSE
-        MovingDir := 0;
-        CoastPtsLeft := 0.0;
-        TargetSpeedMps := 0.0;
-    END_IF;
-END_IF;
-{endregion}
-
-{region "§3bis Garde de plage de comptage"}
-// 🛑 SEULE borne du comptage : la plage de représentation signée. Elle est SIGNALÉE
-// (CountSaturated) et cohérente — une position bornée ne publie plus de vitesse de mouvement,
-// ce qui interdit la signature « position figée + vitesse non nulle + zéro défaut ».
-CountSaturated := FALSE;
-IF UDINT_TO_DINT(RawPos) &gt; CST_CountTravelLimitPts THEN
-    RawPos := DINT_TO_UDINT(CST_CountTravelLimitPts);
-    CountSaturated := TRUE;
-ELSIF UDINT_TO_DINT(RawPos) &lt; -CST_CountTravelLimitPts THEN
-    RawPos := DINT_TO_UDINT(-CST_CountTravelLimitPts);
-    CountSaturated := TRUE;
-END_IF;
-IF CountSaturated THEN
-    TargetSpeedMps := 0.0;
-END_IF;
-{endregion}
-
-{region "§4 Sortie"}
-RawPosOut := RawPos;
-// Retour vitesse rapporte (RawSpdOut) : 1er ordre vers TargetSpeedMps. SpeedReportTauS=0.0
-// -&gt; alpha=1 -&gt; saut instantane (comportement historique inchange).
-ReportedSpeedMps := ReportedSpeedMps
-    + (CycleTimeS / (SpeedReportTauS + CycleTimeS)) * (TargetSpeedMps - ReportedSpeedMps);
-// Formule inverse vitesse brute EtherCAT CoE (0.1 RPM) :
-// SpdValue = (V_mps * 60.0) / (0.1 * CableM_PerRev) = V_mps * 300.0 (sur tambour 2m)
-IF (CableM_PerRev &gt; 0.0) THEN
-    RawSpdOut := REAL_TO_DINT((ReportedSpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
-ELSE
-    RawSpdOut := 0;
-END_IF;
-{endregion}
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>526914c5-468f-5758-8161-f70e0fd85cca</ObjectId>
           </data>
         </addData>
       </pou>
@@ -5030,359 +3534,886 @@ ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
           </data>
         </addData>
       </pou>
-      <pou name="FB_Sim_Safety" pouType="functionBlock">
+      <pou name="FB_Sim_Translation" pouType="functionBlock">
         <interface>
           <inputVars>
             <variable name="Enable">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Activation de la simulation</xhtml>
-              </documentation>
             </variable>
-            <variable name="SimChainOkBit">
+            <variable name="ReqTremie">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée</xhtml>
-              </documentation>
             </variable>
-            <variable name="SimPhaseRotationOkBit">
+            <variable name="ReqMaintenance">
               <type>
                 <BOOL />
               </type>
+            </variable>
+            <variable name="SpeedTgt_Pct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="FullTravelTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="37.5" />
+              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = phases réseau OK simulées ; FALSE = défaut rotation de phases injecté</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T361 — ECHELLE ODOMETRIQUE DU BANC, ALIGNEE SUR L'ESTIMATEUR REEL.
+       Le modele integre VelocityTarget = (CST_PositionAtMaintenance / FullTravelTimeS) x f / 40.
+       Le ratio simule vaut donc 30 / (40 x FullTravelTimeS) m/(Hz.s) et DOIT etre egal au gain
+       consomme par FB_Translation_PositionEstimator (GainMetersPerHzSec, cable sur
+       GVL_PERSISTENT._TranslationGainMetersPerHzSec = 0,02 m/(Hz.s), soit 1 m/s a 50 Hz).
+       =&gt; 30 / (40 x 37,5) = 0,02 m/(Hz.s). La valeur historique 8,0 s donnait 0,09375 m/(Hz.s),
+       soit 4,7 fois l'echelle reelle : l'estimateur prenait un retard constant et chaque
+       franchissement de capteur produisait un saut de recalage de plusieurs metres
+       (AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md, trace Suivi_74 : sauts de 4,53 a 9,12 m).
+       ⚠️ Toute evolution de _TranslationGainMetersPerHzSec exige de recalculer cette constante :
+       le gate G518 echoue si les deux echelles divergent.</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerCutOff_A">
+            <variable name="BrakeReleaseCmd">
               <type>
                 <BOOL />
               </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+            <variable name="MaxFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="50" />
+              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Commande coupure canal A (TRUE = OK/fermé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ECHELLE DE LA CONSIGNE. PRG_02 envoie SpeedCmd_Pct = f / 50 Hz x 100 : le simulateur reconvertit
+       avec le MEME maximum, sinon 20 Hz reels (40 %) deviendraient 16 Hz simules.
+       Maximum = GVL_PERSISTENT._TranslationMaxFreq_Hz (50 Hz), passe par FB_SimBench (CST_M3MaxFreq_Hz,
+       egalite verifiee par G518). Ne pas confondre avec CST_NominalFrequency_Hz (40 Hz) : echelle
+       ODOMETRIQUE (gain 0,02 m/(Hz.s)).</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerCutOff_B">
+            <variable name="SpeedFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ACCELERATION DU BANC (confort d'essai). Le chariot avance SpeedFactor fois plus vite ET la
+       frequence RETOURNEE au PLC est multipliee d'autant : l'estimateur (f x gain) suit exactement
+       le chariot, sans saut de recalage, et le ratio publie reste 0,02 m/(Hz.s) (G518).
+       Borne 1..5. 1,0 = dynamique reelle. Le frein et la memoire de sens restent sur la frequence
+       physique du variateur simule.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AccelRate_HzPerS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+            </variable>
+            <variable name="DecelRate_HzPerS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="25" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">pente d'arret relevee sur trace reelle (rampe variateur / rampe PLC)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveTimeConstantS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.15" />
+              </initialValue>
+            </variable>
+            <variable name="BrakeOpenDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+            </variable>
+            <variable name="BrakeCloseDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.09" />
+              </initialValue>
+            </variable>
+            <variable name="BrakeContactDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="BrakeFaultCloseWhileRunning">
               <type>
                 <BOOL />
               </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Commande coupure canal B (TRUE = OK/fermé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FAUTE EXPLICITE frein M3 — defaut FALSE : reproduit le defaut terrain « frein ferme
+       alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s,
+       State.ErrorId=64). La garde nominale 0,5 Hz du frein n'est pas modifiee.</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerCutOffRequest">
+            <variable name="BrakeFaultCloseDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
+            <variable name="SuspendedLoadLength_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+            </variable>
+            <variable name="SuspendedLoadDamping">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.35" />
+              </initialValue>
+            </variable>
+            <variable name="LoadReactionGain_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.2" />
+              </initialValue>
+            </variable>
+            <variable name="EndStopRecoilMax_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">BUTEE MECANIQUE — recul borne apres arret serre.
+       0.0 (defaut) conserve EXACTEMENT le comportement historique : position ET vitesse
+       figees a la butee (decision de review tracee, correctif « contact rigide »).
+       &gt; 0 : l'inertie du chariot reste absorbee par la butee, MAIS la reaction de la charge
+       peut ressortir le chariot de la zone capteur — comportement observe sur la trace
+       terrain du 2026-09-04 a 26,437 s (Tremie actif 1 echantillon puis perdu
+       definitivement). Valeur SYNTHETIQUE, en attente de mesure terrain.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadFrequencyDroopGain_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+            </variable>
+            <variable name="SensorJitterAmplitude_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="SensorStabilizationS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="SensorElectricalDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="SensorIntermittenceActive">
               <type>
                 <BOOL />
               </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SensorLoadAngleTriggerRad">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="SensorScenarioSeed">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="3001" />
+              </initialValue>
+            </variable>
+            <variable name="SensorHysteresis_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+            </variable>
+            <variable name="SensorIntermittencePeriodS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.12" />
+              </initialValue>
+            </variable>
+            <variable name="SensorBlipTransitions">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Requête coupure métier (TRUE = arrêt d'urgence)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">BLIP COURT — second profil capteur, independant du train ~1 s ci-dessus.
+       BlipTransitions = 0 (defaut) : profil historique strictement inchange.
+       Valeurs de trace : Tremie 1 excursion de 0,2 s (2 echantillons a 100 ms),
+       PV 1 excursion de 0,1 s (1 echantillon).
+       ⚠️ LIMITE CONNUE (revue 2026-09-20, F11) : UNE SEULE largeur globale est appliquee aux
+       cinq capteurs. Les deux signatures de la trace (Tremie 0,200 s et PV 0,100 s) ne sont
+       donc PAS rejouables dans la meme passe : il faut deux executions avec des valeurs
+       differentes de SensorBlipDurationS. Une largeur par capteur exigerait un
+       ARRAY[1..5] OF REAL, non retenu dans ce lot.</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyArming">
+            <variable name="SensorBlipDurationS">
               <type>
-                <BOOL />
+                <REAL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Impulsion de réarmement (TRUE = pulse)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnEmergencyStop">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Force l'ouverture de la boucle (TRUE = bouton appuyé/défaut)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TestCutActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Test de redondance en cours (canal A ou B coupé par le FB AU)</xhtml>
-              </documentation>
+              <initialValue>
+                <simpleValue value="0.2" />
+              </initialValue>
             </variable>
           </inputVars>
           <outputVars>
-            <variable name="SimChainOk">
+            <variable name="PosTremie">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Boucle AU simulée saine</xhtml>
-              </documentation>
             </variable>
-            <variable name="SimContactorOk">
+            <variable name="PosPV">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contacteur simulé engagé</xhtml>
-              </documentation>
             </variable>
-            <variable name="SimPhaseRotationOk">
+            <variable name="PosP2">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contrôleur de phases simulé : TRUE = phases saines (aucun défaut)</xhtml>
-              </documentation>
+            </variable>
+            <variable name="PosP1">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PosMaintenance">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FrequencyCmd_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ElectricalFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ActualFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="BrakeCoilEnergized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BrakeMechanicallyOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BrakeContactOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BrakeFaultCloseActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PositionTrue_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="VelocityTrue_Mps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="LoadAngle_Rad">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="SensorPosition_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="SensorTransitionCount">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="SensorBlipActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HardStopTremieActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HardStopMaintenanceActive">
+              <type>
+                <BOOL />
+              </type>
             </variable>
           </outputVars>
           <localVars>
-            <variable name="ContactorLatch">
+            <variable name="instCycleTime">
+              <type>
+                <derived name="FB_CycleTime" />
+              </type>
+            </variable>
+            <variable name="Initialized">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mémorisation de l'auto-maintien du contacteur</xhtml>
-              </documentation>
             </variable>
-            <variable name="ChainOpenReq">
+            <variable name="DirectionSign">
               <type>
-                <BOOL />
+                <REAL />
+              </type>
+            </variable>
+            <variable name="TravelDirection">
+              <type>
+                <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande brute d'ouverture de la chaîne (bit off / coup-de-poing / test / coupure)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens de deplacement MEMORISE. La commande peut etre retiree AVANT l'arret physique
+       (deceleration libre du variateur) : le sens du dernier ordre valide est conserve tant
+       que le variateur retourne de la vitesse, puis purge a l'arret. Sans cette memoire, la
+       vitesse du chariot s'effondrait au scan de retrait de commande alors que la frequence
+       retournee decroit encore.
+       ⚠️ ORDRE DE GRANDEUR NON MESURE : la trace terrain ne contient AUCUNE variable de
+       position (15 TraceVariable : DI, frequences, mots d'etat, erreurs). La distance de
+       roue libre de la fenetre 14,67 -&gt; 16,16 s est donc une ESTIMATION dependante du modele
+       d'echelle, qui vaut approximativement 1,1 a 1,3 m selon la methode d'integration
+       retenue (gain audit 0,0551 m/(Hz.s)). A ne pas citer comme une mesure.</xhtml>
               </documentation>
             </variable>
-            <variable name="ChainOpen">
+            <variable name="FrequencyTarget_Hz">
               <type>
-                <BOOL />
+                <REAL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] État latche de la chaîne (TRUE = ouverte)</xhtml>
-              </documentation>
             </variable>
-            <variable name="ContactorEngageReq">
+            <variable name="SpeedFactorApplied">
               <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande d'engagement du contacteur (pulse ET chaîne saine)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonChainOpen">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation d'ouverture de la chaîne (retombée relais)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonChainClose">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de fermeture de la chaîne (retombée relais)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonContactorEngage">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation d'engagement du contacteur (temps de collage bobine)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonContactorDrop">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de retombée du contacteur (temps de décollage bobine)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ChainOpenDelay">
-              <type>
-                <TIME />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="TIME#50ms" />
+                <simpleValue value="1" />
               </initialValue>
+            </variable>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="SpeedAt40Hz_Mps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="VelocityTarget_Mps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CartAcceleration_Mps2">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="PreviousVelocity_Mps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="PositionCandidate_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="RecoilMax_M">
+              <type>
+                <REAL />
+              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS PHYSIQUES SIMULÉES (compatibles séquence FB AU) ===
-⚠️ Doivent rester &lt; durées de la séquence FB AU (CST_TestDuration=200ms, CST_ArmingPulseDuration=1s,
-CST_ArmingConfirmTimeout=2s) pour que le test de redondance et la confirmation contacteur
-restent validés : ouverture/fermeture chaîne &lt; 200ms, engagement contacteur &lt; 1s.
-Temps de retombée relais AU (ouverture chaîne)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Recul de butee ECRETE a la course : une valeur d'entree aberrante ne peut pas
+       autoriser une position hors de [0 ; 30] m (revue du 2026-09-20, F8).</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_ChainCloseDelay">
+            <variable name="SensorNoiseState">
               <type>
-                <TIME />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="TIME#50ms" />
+                <simpleValue value="0.371" />
+              </initialValue>
+            </variable>
+            <variable name="SensorNoise_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="instSensorTremie">
+              <type>
+                <derived name="FB_Sim_PositionSensor" />
+              </type>
+            </variable>
+            <variable name="instSensorPV">
+              <type>
+                <derived name="FB_Sim_PositionSensor" />
+              </type>
+            </variable>
+            <variable name="instSensorP2">
+              <type>
+                <derived name="FB_Sim_PositionSensor" />
+              </type>
+            </variable>
+            <variable name="instSensorP1">
+              <type>
+                <derived name="FB_Sim_PositionSensor" />
+              </type>
+            </variable>
+            <variable name="instSensorMaintenance">
+              <type>
+                <derived name="FB_Sim_PositionSensor" />
+              </type>
+            </variable>
+            <variable name="instDrive">
+              <type>
+                <derived name="FB_Sim_TranslationDrive" />
+              </type>
+            </variable>
+            <variable name="instBrake">
+              <type>
+                <derived name="FB_Sim_TranslationBrake" />
+              </type>
+            </variable>
+            <variable name="instSuspendedLoad">
+              <type>
+                <derived name="FB_Sim_SuspendedLoad" />
+              </type>
+            </variable>
+            <variable name="CST_PositionAtTremie">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
+            <variable name="CST_PositionAtTremieSensor_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.05" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de retombée relais AU (fermeture chaîne)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Meme principe a Tremie : le seuil DI est legerement avant la butee afin
+       que l'hysteresis puisse commuter sans depassement numerique de course.</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_ContactorEngageDelay">
+            <variable name="CST_PositionAtPV">
               <type>
-                <TIME />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="TIME#100ms" />
+                <simpleValue value="5" />
+              </initialValue>
+            </variable>
+            <variable name="CST_PositionAtP2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="15" />
+              </initialValue>
+            </variable>
+            <variable name="CST_PositionAtP1">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+            </variable>
+            <variable name="CST_PositionAtMaintenance">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="30" />
+              </initialValue>
+            </variable>
+            <variable name="CST_PositionAtMaintenanceSensor_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="29.95" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de collage bobine contacteur (engagement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Le capteur cumulatif Maintenance doit commuter avant la butee mecanique,
+       sinon un modele borne a 30 m ne peut jamais produire le mot 00000. Cette
+       position est SYNTHETIQUE en attente de la mesure de la came reelle.</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_ContactorDropDelay">
+            <variable name="CST_NominalFrequency_Hz">
               <type>
-                <TIME />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="TIME#50ms" />
+                <simpleValue value="40" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de décollage bobine contacteur (retombée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">echelle ODOMETRIQUE lue par G518 — PAS le maximum variateur (MaxFreq_Hz)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_MinTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.001" />
+              </initialValue>
+            </variable>
+            <variable name="CST_StopFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Meme seuil d'arret que FB_Sim_TranslationBrake.CST_StopFrequency_Hz (0,5 Hz).
+       Valide par la trace terrain du 2026-09-04 : frein ouvert a 0,60 Hz, ferme a 0,00 Hz.</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Safety — Simulation de la chaîne d'AU et du contacteur de puissance
-   ───────────────────────────────────────────────────────────────
-   📥 Enable            : activation de la simulation (SimulationModeActive AND NOT SensorEmergencyStopChainIsReal)
-   📥 SimChainOkBit     : bit opérateur — TRUE = simuler la chaîne AU fermée ; FALSE = chaîne ouverte (non simulée)
-   📥 PowerCutOff_A     : demande de coupure PLC canal A (TRUE = OK/fermé) — conservé pour interface, non utilisé par SimChainOk
-   📥 PowerCutOff_B     : demande de coupure PLC canal B (TRUE = OK/fermé) — conservé pour interface, non utilisé par SimChainOk
-   📥 PowerCutOffRequest: requête de coupure métier (PowerCutOffRequest du FB AU) — TRUE = arrêt d'urgence (chaîne ouverte)
-   📥 EmergencyArming   : impulsion de réarmement (EmergencyArming_RQ)
-   📥 BtnEmergencyStop   : appui coup-de-poing AU (TRUE = boucle ouverte)
-   📥 TestCutActive     : test de redondance en cours (canal A ou B coupé par le FB AU)
-
-   📤 SimChainOk        : simulation de la boucle AU (fermée si SimChainOkBit, ouverte sur coup-de-poing/test/coupure)
-   📤 SimContactorOk    : simulation du contacteur engagé (PowerContactorEngaged)
-
-   ⚙️ MÉCANISME GRANULAIRE (contrôle opérateur de la chaîne AU) :
-      - `SimChainOkBit` pilote la chaîne : FALSE → chaîne OUVERTE (on ne peut pas armer) ;
-        TRUE → chaîne FERMÉE (le bouton Armable s'active, on arme, la séquence teste les sorties).
-      - Pendant le test de redondance (TestCutActive), la chaîne CLIGNOTE (s'ouvre pendant TEST_A/B,
-        se referme pendant RESTORE_A/B) puis revient à 1 — comme en réel.
-      - `PowerCutOffRequest` (coupure métier) ouvre la chaîne → ARRÊT D'URGENCE.
-      - `BtnEmergencyStop` (coup-de-poing) ouvre la chaîne.
-      - Le contacteur ne s'engage QUE pendant l'impulsion d'armement (EmergencyArming), avec une
-        temporisation d'engagement (CST_ContactorEngageDelay), puis s'auto-maintient tant que la
-        chaîne est saine ; il retombe (CST_ContactorDropDelay) dès que la chaîne s'ouvre.
-      - À la ré-entrée en simulation (Enable FALSE→TRUE), SimChainOkBit = FALSE → chaîne OUVERTE et
-        contacteur NON engagé (on n'a pas armé) — pas de faux « OK » immédiat.
-
-   🔒 NON-RÉGRESSION ARMEMENT (dépendance circulaire) :
-      - La chaîne n'est PAS fermée par défaut : elle est fermée UNIQUEMENT si l'opérateur pose
-        `SimChainOkBit`. Elle ne dépend PAS de PowerCutOff_A/B (qui sont dans le cercle) : le
-        réarmement après échec de test de redondance (RedundancyTestFailedCause laté → PowerCutOff_A=FALSE)
-        reste possible car la chaîne est maintenue fermée par le bit opérateur, pas par le PLC.
-      - L'ouverture « PLC coupe un canal » est représentée par TestCutActive (test redondance) et
-        PowerCutOffRequest (coupure métier) — jamais par PowerCutOff_A/B seuls.
-   ═══════════════════════════════════════════════════════════════
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Modele dynamique M3 confine au SimBench.</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === IMPLEMENTATION ===
-{region "§1 Gate"}
+instCycleTime(DefaultValueS := 0.010);
+(* Le modele mono-pas suit le temps de cycle reel jusqu'a 100 ms. Cette borne
+   evite de ralentir artificiellement la dynamique lorsque la trace est executee
+   dans VISU_TASK (environ 100 ms), tout en restant stable pour le pendule reduit.
+   Au-dela, FB_CycleTime fournit deja son temps de secours et aucun saut aberrant
+   n'est accepte. La qualification des delais sub-100 ms exige toutefois une tache
+   de trace plus rapide que 100 ms. *)
+CycleTimeS := LIMIT(0.001, instCycleTime.CycleTimeS, 0.100);
+
 IF NOT Enable THEN
-    SimChainOk     := FALSE;
-    SimContactorOk := FALSE;
-    SimPhaseRotationOk := FALSE;
-    ContactorLatch := FALSE;
-    ChainOpen      := TRUE; // Chaîne ouverte par défaut à la ré-entrée (on n'a pas armé)
-    ChainOpenReq   := FALSE;
-    ContactorEngageReq := FALSE;
-    TonChainOpen(IN := FALSE);
-    TonChainClose(IN := FALSE);
-    TonContactorEngage(IN := FALSE);
-    TonContactorDrop(IN := FALSE);
+    Initialized := FALSE;
+    instDrive(Enable := FALSE);
+    instBrake(Enable := FALSE);
+    instSuspendedLoad(Enable := FALSE);
+    FrequencyCmd_Hz := 0.0;
+    ElectricalFrequency_Hz := 0.0;
+    ActualFrequency_Hz := 0.0;
+    BrakeMechanicallyOpen := FALSE;
+    BrakeContactOpen := FALSE;
+    BrakeCoilEnergized := FALSE;
+    BrakeFaultCloseActive := FALSE;
+    PositionTrue_M := CST_PositionAtP1;
+    VelocityTrue_Mps := 0.0;
+    PreviousVelocity_Mps := 0.0;
+    TravelDirection := 0.0;
+    LoadAngle_Rad := 0.0;
+    SensorTransitionCount := 0;
+    SensorBlipActive := FALSE;
+    HardStopTremieActive := FALSE;
+    HardStopMaintenanceActive := FALSE;
+    (* Repli deterministe compatible avec le mot thermometre P1 = 00011. *)
+    PosTremie := FALSE;
+    PosPV := FALSE;
+    PosP2 := FALSE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+    instSensorTremie(Enable := FALSE);
+    instSensorPV(Enable := FALSE);
+    instSensorP2(Enable := FALSE);
+    instSensorP1(Enable := FALSE);
+    instSensorMaintenance(Enable := FALSE);
     RETURN;
+ELSIF NOT Initialized THEN
+    Initialized := TRUE;
+    PositionTrue_M := CST_PositionAtP1;
+    TravelDirection := 0.0;
 END_IF;
-{endregion}
 
-{region "§2 Chaîne AU (contrôle granulaire + dynamique)"}
-// 1. La chaîne AU est saine si l'opérateur la simule fermée (SimChainOkBit = TRUE) ET si aucun
-//    événement ne l'ouvre : coup-de-poing (BtnEmergencyStop), test de redondance (TestCutActive),
-//    coupure métier (PowerCutOffRequest).
-// 🔧 DEADLOCK SIMULATION (corrigé) : la chaîne n'est PAS fermée par défaut ni dépendante de
-//    PowerCutOff_A/B (qui sont dans le cercle). Elle est fermée UNIQUEMENT par le bit opérateur
-//    `SimChainOkBit`. Le réarmement après échec de test de redondance (RedundancyTestFailedCause laté
-//    → PowerCutOff_A=FALSE) reste possible car la chaîne est maintenue fermée par le bit, pas par
-//    le PLC. Hors simulation (Enable=FALSE), la chaîne reste pilotée par le matériel via le repli
-//    HwReal (PRG_02 §1/§2) — aucune régression sécurité réelle.
-// 🆕 DYNAMIQUE : l'ouverture/fermeture suit une temporisation (CST_ChainOpenDelay / CST_ChainCloseDelay)
-//    qui simule le temps de retombée des relais AU, tout en restant &lt; 200ms (CST_TestDuration) pour
-//    ne pas fausser le test de redondance. Pendant le test, la chaîne clignote (s'ouvre en TEST_A/B,
-//    se referme en RESTORE_A/B) puis revient à 1.
-ChainOpenReq := (NOT SimChainOkBit) OR BtnEmergencyStop OR TestCutActive OR PowerCutOffRequest;
-
-// Temporisation d'ouverture : la chaîne s'ouvre après CST_ChainOpenDelay de demande soutenue
-TonChainOpen(IN := ChainOpenReq, PT := CST_ChainOpenDelay);
-// Temporisation de fermeture : la chaîne se ferme après CST_ChainCloseDelay d'absence de demande
-TonChainClose(IN := NOT ChainOpenReq, PT := CST_ChainCloseDelay);
-
-// Latch de la chaîne avec temporisations (défaut = ouverte à la ré-entrée)
-IF ChainOpenReq THEN
-    IF TonChainOpen.Q THEN
-        ChainOpen := TRUE;
+IF Enable THEN
+    DirectionSign := 0.0;
+    IF ReqTremie AND NOT ReqMaintenance THEN
+        DirectionSign := -1.0;
+    ELSIF ReqMaintenance AND NOT ReqTremie THEN
+        DirectionSign := 1.0;
     END_IF;
+
+    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * MaxFreq_Hz / 100.0, MaxFreq_Hz);
+    IF DirectionSign = 0.0 THEN
+        FrequencyTarget_Hz := 0.0;
+    END_IF;
+    instDrive(Enable := TRUE, FrequencyTgt_Hz := FrequencyTarget_Hz,
+        AccelRate_HzPerS := AccelRate_HzPerS, DecelRate_HzPerS := DecelRate_HzPerS,
+        TimeConstant_S := DriveTimeConstantS,
+        LoadAngularVelocity_RadPerS := instSuspendedLoad.AngularVelocity_RadPerS,
+        LoadFrequencyDroopGain_Hz := LoadFrequencyDroopGain_Hz, CycleTime_S := CycleTimeS);
+    FrequencyCmd_Hz := instDrive.FrequencyCmd_Hz;
+    ElectricalFrequency_Hz := instDrive.ElectricalFrequency_Hz;
+    SpeedFactorApplied := LIMIT(1.0, SpeedFactor, 5.0);
+    ActualFrequency_Hz := instDrive.ActualFrequency_Hz * SpeedFactorApplied;
+    instBrake(Enable := TRUE, ReleaseCmd := BrakeReleaseCmd,
+        ActualFrequency_Hz := instDrive.ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
+        CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
+        CycleTime_S := CycleTimeS,
+        FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
+        FaultCloseDelay_S := BrakeFaultCloseDelay_S);
+    BrakeCoilEnergized := instBrake.CoilEnergized;
+    BrakeMechanicallyOpen := instBrake.MechanicallyOpen;
+    BrakeContactOpen := instBrake.ContactOpen;
+    BrakeFaultCloseActive := instBrake.FaultCloseActive;
+
+    (* Sens memorise (C3). Regles, dans cet ordre :
+       1. un ordre simple valide (re)memorise le sens ;
+       2. deux ordres contradictoires neutralisent immediatement le sens — aucune
+          excitation inventee (preserve TC-T300-MEC-030) ;
+       3. commande retiree : le sens est CONSERVE tant que le variateur retourne de la
+          vitesse (deceleration libre), puis purge des que la vitesse est nulle. *)
+    IF ReqTremie AND NOT ReqMaintenance THEN
+        TravelDirection := -1.0;
+    ELSIF ReqMaintenance AND NOT ReqTremie THEN
+        TravelDirection := 1.0;
+    ELSIF ReqTremie AND ReqMaintenance THEN
+        TravelDirection := 0.0;
+    ELSIF ABS(instDrive.ActualFrequency_Hz) &lt;= CST_StopFrequency_Hz THEN
+        TravelDirection := 0.0;
+    END_IF;
+
+    PreviousVelocity_Mps := VelocityTrue_Mps;
+    IF (FullTravelTimeS &gt; CST_MinTimeS) AND BrakeMechanicallyOpen THEN
+        SpeedAt40Hz_Mps := CST_PositionAtMaintenance / FullTravelTimeS;
+        VelocityTarget_Mps := TravelDirection * SpeedAt40Hz_Mps * ActualFrequency_Hz / CST_NominalFrequency_Hz;
+    ELSE
+        VelocityTarget_Mps := 0.0;
+    END_IF;
+    VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
+    IF NOT BrakeMechanicallyOpen THEN
+        VelocityTrue_Mps := 0.0;
+    END_IF;
+    HardStopTremieActive := FALSE;
+    HardStopMaintenanceActive := FALSE;
+    PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
+    IF PositionCandidate_M &lt; CST_PositionAtTremie THEN
+        PositionTrue_M := CST_PositionAtTremie;
+        VelocityTrue_Mps := 0.0;
+        HardStopTremieActive := TRUE;
+    ELSIF PositionCandidate_M &gt; CST_PositionAtMaintenance THEN
+        PositionTrue_M := CST_PositionAtMaintenance;
+        VelocityTrue_Mps := 0.0;
+        HardStopMaintenanceActive := TRUE;
+    END_IF;
+    CartAcceleration_Mps2 := (VelocityTrue_Mps - PreviousVelocity_Mps) / CycleTimeS;
+    instSuspendedLoad(Enable := TRUE, BrakeMechanicallyOpen := BrakeMechanicallyOpen,
+        CartAcceleration_Mps2 := CartAcceleration_Mps2, Length_M := SuspendedLoadLength_M,
+        Damping := SuspendedLoadDamping, ReactionGain_Mps2 := LoadReactionGain_Mps2,
+        CycleTime_S := CycleTimeS);
+    LoadAngle_Rad := instSuspendedLoad.Angle_Rad;
+    IF HardStopTremieActive OR HardStopMaintenanceActive THEN
+        RecoilMax_M := MIN(MAX(0.0, EndStopRecoilMax_M), CST_PositionAtMaintenance);
+        IF (RecoilMax_M &gt; 0.0) AND BrakeMechanicallyOpen THEN
+            (* Recul autorise UNIQUEMENT en s'eloignant de la butee touchee, borne par
+               EndStopRecoilMax_M : jamais plus loin dans la butee, jamais de saut cache. *)
+            VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+            (* Contre une butee, l'entrainement DECROCHE : il ne maintient pas une consigne de
+               vitesse dans l'obstacle. Sans cette purge, la consigne de vitesse ecrasait en
+               permanence la reaction de charge et le chariot ne pouvait jamais ressortir de
+               la zone capteur (recul alors impossible, quelle que soit la charge). *)
+            TravelDirection := 0.0;
+            IF HardStopTremieActive THEN
+                VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps);
+                PositionCandidate_M := LIMIT(CST_PositionAtTremie,
+                    PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
+                    CST_PositionAtTremie + RecoilMax_M);
+            ELSE
+                VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps);
+                PositionCandidate_M := LIMIT(CST_PositionAtMaintenance - RecoilMax_M,
+                    PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
+                    CST_PositionAtMaintenance);
+            END_IF;
+            PositionTrue_M := PositionCandidate_M;
+        ELSE
+            VelocityTrue_Mps := 0.0;
+        END_IF;
+    ELSE
+        VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+        PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
+        IF PositionCandidate_M &lt; CST_PositionAtTremie THEN
+            PositionTrue_M := CST_PositionAtTremie;
+            VelocityTrue_Mps := 0.0;
+            HardStopTremieActive := TRUE;
+        ELSIF PositionCandidate_M &gt; CST_PositionAtMaintenance THEN
+            PositionTrue_M := CST_PositionAtMaintenance;
+            VelocityTrue_Mps := 0.0;
+            HardStopMaintenanceActive := TRUE;
+        ELSE
+            PositionTrue_M := PositionCandidate_M;
+        END_IF;
+    END_IF;
+END_IF;
+
+IF Enable AND (ABS(LoadAngle_Rad) &gt; 0.0001) THEN
+    SensorNoiseState := 3.91 * SensorNoiseState * (1.0 - SensorNoiseState);
+    SensorNoise_M := (2.0 * SensorNoiseState - 1.0) * SensorJitterAmplitude_M;
 ELSE
-    IF TonChainClose.Q THEN
-        ChainOpen := FALSE;
-    END_IF;
+    SensorNoise_M := 0.0;
 END_IF;
+(* Les capteurs sont fixes au rail et observent le chariot. Le balancier agit
+   seulement par la reaction mecanique sur PositionTrue_M et conditionne un
+   episode electrique ; aucune deflexion de godet n'est injectee directement. *)
+SensorPosition_M := PositionTrue_M + SensorNoise_M;
+(* Les capteurs M3 sont volontairement cumulatifs : 11111 -&gt; 00000. Chaque
+   brique garde son hysteresis et son episode propres ; aucun timer partage ne
+   peut masquer un front d'un autre capteur. *)
+instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtTremieSensor_M, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 11,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CycleTimeS := CycleTimeS);
+instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtPV, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 23,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CycleTimeS := CycleTimeS);
+instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtP2, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 37,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CycleTimeS := CycleTimeS);
+instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtP1, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 53,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CycleTimeS := CycleTimeS);
+instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
+    Threshold_M := CST_PositionAtMaintenanceSensor_M, Hysteresis_M := SensorHysteresis_M,
+    ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
+        AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
+    IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
+    ScenarioSeed := SensorScenarioSeed + 71,
+    BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CycleTimeS := CycleTimeS);
 
-SimChainOk := NOT ChainOpen;
-{endregion}
-
-{region "§3 Auto-maintien contacteur (dynamique réaliste)"}
-// 2. Logique d'auto-maintien (latch) du contacteur avec priorité à la coupure.
-// 🆕 DYNAMIQUE : le contacteur ne s'engage QUE pendant l'impulsion d'armement (EmergencyArming)
-//    tant que la chaîne est saine, après CST_ContactorEngageDelay (temps de collage bobine), puis
-//    s'auto-maintient. Il retombe après CST_ContactorDropDelay (temps de décollage bobine) dès que
-//    la chaîne s'ouvre — comme une bobine réelle qui décolle sans alimentation. Ces temporisations
-//    restent &lt; CST_ArmingPulseDuration (1s) et CST_ArmingConfirmTimeout (2s) pour que la
-//    confirmation contacteur reste validée. À la ré-entrée en simulation, le contacteur est NON
-//    engagé (on n'a pas armé).
-ContactorEngageReq := EmergencyArming AND SimChainOk;
-
-// Temporisation d'engagement : le contacteur se colle après CST_ContactorEngageDelay de pulse soutenu
-TonContactorEngage(IN := ContactorEngageReq, PT := CST_ContactorEngageDelay);
-// Temporisation de retombée : le contacteur décolle après CST_ContactorDropDelay de chaîne ouverte
-TonContactorDrop(IN := NOT SimChainOk, PT := CST_ContactorDropDelay);
-
-// Latch du contacteur avec priorité à la coupure (retombée &gt; engagement)
-IF NOT SimChainOk THEN
-    IF TonContactorDrop.Q THEN
-        ContactorLatch := FALSE;
-    END_IF;
-ELSIF ContactorEngageReq THEN
-    IF TonContactorEngage.Q THEN
-        ContactorLatch := TRUE;
-    END_IF;
-END_IF;
-
-// Recopie vers la sortie
-SimContactorOk := ContactorLatch;
-
-// Contrôleur de phases : simple propagation du bit opérateur (TRUE = sain).
-// Inopérant hors simulation (le banc ne publie l'image machine que sous Enable).
-SimPhaseRotationOk := SimPhaseRotationOkBit;
-{endregion}
+PosTremie := instSensorTremie.ElectricalOutput;
+PosPV := instSensorPV.ElectricalOutput;
+PosP2 := instSensorP2.ElectricalOutput;
+PosP1 := instSensorP1.ElectricalOutput;
+PosMaintenance := instSensorMaintenance.ElectricalOutput;
+SensorTransitionCount := instSensorTremie.TransitionCount + instSensorPV.TransitionCount
+    + instSensorP2.TransitionCount + instSensorP1.TransitionCount
+    + instSensorMaintenance.TransitionCount;
+SensorBlipActive := instSensorTremie.BlipActive OR instSensorPV.BlipActive
+    OR instSensorP2.BlipActive OR instSensorP1.BlipActive
+    OR instSensorMaintenance.BlipActive;
 </xhtml>
           </ST>
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>9ab5b810-a798-5ced-ad58-9e4d01ab66eb</ObjectId>
+            <ObjectId>d7634526-8de9-5f93-b858-7e0bb59cdce2</ObjectId>
           </data>
         </addData>
       </pou>
@@ -5571,6 +4602,17 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier code retour socket</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DestAddress">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <initialValue>
+                <simpleValue value="" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Adresse loopback (variable : szDestAddress est VAR_IN_OUT)</xhtml>
               </documentation>
             </variable>
             <variable name="Reply">
@@ -6287,7 +5329,7 @@ Tx[30] := WORD_TO_BYTE(SHR(INT_TO_WORD(EchoPos_Cm), 8));
 Tx[31] := WORD_TO_BYTE(PlcEcho.SafetyErrorId AND 16#FF);
 // Adresse loopback écrite en littéral : une constante STRING déclarée est importée vide
 // par le générateur PLCopenXML, et l'envoi partirait vers une adresse vide.
-Bytes := SysSockSendToUdp(SocketHandle, CST_PortLocal, '127.0.0.1', ADR(Tx), SIZEOF(Tx), ADR(LastResult));
+Bytes := SysSockSendToUdp(SocketHandle, CST_PortLocal, DestAddress, ADR(Tx), SIZEOF(Tx), ADR(LastResult));
 IF Bytes = CST_TxSize THEN
     TxCount := TxCount + 1;
     Sequence := Sequence + 1;
@@ -6397,6 +5439,846 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>cb6a7d98-36ae-5c14-9891-d5451c6e7dd0</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_Encoder" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active la simulation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens commandé avant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens commandé arrière</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepNumber">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier vitesse courant (1..5, 0 = arrêt)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Applique un preset (homing)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur brute à charger au preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedScaleFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Facteur fin de confort (défaut 1.0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoastDistanceM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Distance de roulis inertiel apres coupure des relais (m). 0 = arret net (defaut). &gt;0 = le treuil continue a vitesse palier 1 dans le dernier sens sur CoastDistanceM metres -&gt; modelise l'anticipation d'arret mecanique (ex. benne).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetLatencyCycles">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Nb cycles automate avant application du preset (referencement non instantane)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOffsetCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Front montant = applique TestOffsetPts (test banc)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOffsetPts">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Décalage signé à appliquer (points bruts)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Paramètres physiques du treuil (mêmes valeurs que FB_Encoder_Scale) + vitesse réelle.
+Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps.
+--&gt; [CFG] Vitesse palier 1 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse palier 5 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PointsPerRev">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="8192" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Résolution codeur (pts/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableM_PerRev">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Développement câble (m/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — MainTask 10 ms</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedReportTauS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Constante de temps 1er ordre du retour vitesse</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="RawPosOut">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Position brute simulée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawSpdOut">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse brute simulée (0x6031:01 en 0.1 RPM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CountSaturated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Comptage en butée de plage du modèle (saturation signalée)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="RawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Référence _SimEncoderRawPosM1/M2 (survit au reset froid)</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <localVars>
+            <variable name="Increment">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Points ajoutés par cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas borné (&gt;= 1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse simulée (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOffsetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front TestOffsetCmd</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant PresetCmd</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetPending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Preset en attente d'application (latence)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetCount">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Compteur cycles de latence restants</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IncrStep1">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Increment par cycle a vitesse palier 1 (pour le roulis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MovingDir">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier sens actif : +1 avant, -1 arriere, 0 arret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoastPtsLeft">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Roulis inertiel restant (points bruts)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse instantanee signee du modele position, avant filtrage retour</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReportedSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse rapportee filtree 1er ordre, publiee dans RawSpdOut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_CountTravelLimitPts">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1073741824" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Plage de comptage du modèle : le compteur brut est un entier SIGNÉ 32 bits (le conteneur
+UDINT n'est qu'un support d'échange, relu en DINT par toute la chaîne aval). La garde reste
+volontairement à la moitié de la plage signée (2^30 pts = 262 144 m de câble) : inatteignable
+en essai, elle interdit tout rebouclage silencieux si le modèle consommait toute sa plage.
+2^30 pts — demi-plage signée</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   📄 Spec composant : DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md
+   🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
+      Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
+      du métier machine.
+   🎯 Rôle : fait "compter" un codeur absolu comme si le treuil tournait
+      réellement, à partir des relais de sens commandés et du palier de vitesse courant.
+   📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
+   📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
+   📥 StepNumber  : palier vitesse courant (1..5) — ex. instWinchM1.StepNumber
+      Vitesse = interpolation linéaire : palier 1 → MinSpeedMps (1 m/s), palier 5 → MaxSpeedMps (2 m/s).
+   📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
+   📥 PresetValue : valeur brute à charger lors du preset
+   📥 SpeedScaleFactor : facteur fin de confort (réglable à chaud, sans recompiler). Défaut 1.0 = vitesse
+      réelle telle que définie par MinSpeedMps/MaxSpeedMps/PointsPerRev/CableM_PerRev/CycleTimeS.
+   📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
+      EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
+   🔒 Comptage brut : entier SIGNÉ 32 bits (le conteneur UDINT n'est qu'un support d'échange,
+      relu en DINT par toute la chaîne aval). Il franchit 0 sans jamais s'y figer ; la seule
+      borne est la plage de représentation, signalée par CountSaturated — jamais muette.
+   📤 CountSaturated : comptage en butée de plage du modèle (saturation signalée, vitesse purgée)
+   `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
+      (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
+      `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB. Un vrai codeur absolu physique
+      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate).
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Encoder) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
+
+{region "§1 Gate"}
+IF NOT Enable THEN
+    RawPosOut := RawPos;
+    // Comptage non evalue hors simulation : la saturation ne doit pas rester figee a TRUE.
+    CountSaturated := FALSE;
+    RETURN;
+END_IF;
+{endregion}
+
+{region "§2 Injection test"}
+// Injection test banc : VRAI saut de position (comme un glissement réel),
+// pour tester Concept 1 / Méca E ET le rattrapage joystick (voir GVL_Simulation bandeau).
+TestOffsetEdge(CLK := TestOffsetCmd);
+IF TestOffsetEdge.Q THEN
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + TestOffsetPts);
+END_IF;
+{endregion}
+
+{region "§3 Comptage"}
+// 🎚️ Vitesse simulée = interpolation linéaire du palier (palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps),
+// pas par pas de (Max−Min)/4. Palier 0 (arrêt) ramène au palier 1 mais aucun mouvement n'est
+// appliqué tant que RelayFwd/RelayRev = FALSE (section plus bas).
+EffStep  := MAX(StepNumber, 1);
+SpeedMps := MinSpeedMps + (INT_TO_REAL(EffStep) - 1.0) * ((MaxSpeedMps - MinSpeedMps) / 4.0);
+// Points par cycle = vitesse (m/s) × points par mètre × période tâche (s) × facteur confort.
+Increment := REAL_TO_UDINT(SpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
+// Increment "lent" (palier 1) : vitesse du roulis inertiel apres coupure des relais.
+IncrStep1 := REAL_TO_UDINT(MinSpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
+
+// Front du preset : lance la latence de referencement (le codeur réel n'est pas
+// instantane — il met PresetLatencyCycles cycles a se re-referencer apres le front).
+PresetEdge(CLK := PresetCmd);
+IF PresetEdge.Q THEN
+    PresetPending := TRUE;
+    PresetCount := PresetLatencyCycles;
+END_IF;
+
+// 📐 Le comptage brut est un entier SIGNÉ 32 bits : le conteneur UDINT n'est qu'un support
+// d'échange (toute la chaîne aval le relit via UDINT_TO_DINT : FB_Encoder_Scale, FB_Encoder_Homing).
+// Sa valeur 0 n'est donc PAS une butée mécanique — c'est un point de passage comme un autre, et
+// c'est la seule façon de rester fidèle à un codeur absolu, dont le zéro de comptage est arbitraire.
+// Aucune branche de comptage ne borne donc à un littéral : seule la garde de plage §3bis intervient,
+// et elle est signalée (CountSaturated).
+// Pendant l'attente du preset, la position brute est conservee (le codeur n'a pas encore re-reference).
+// Le mouvement est gelé pendant la latence, comme un codeur réel en cours de referencement.
+IF PresetPending THEN
+    IF PresetCount &gt; 0 THEN
+        PresetCount := PresetCount - 1;
+    ELSE
+        // Latence écoulée : applique la valeur cible du preset.
+        RawPos := PresetValue;
+        PresetPending := FALSE;
+    END_IF;
+    TargetSpeedMps := 0.0;
+ELSIF RelayFwd THEN
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(Increment));
+    MovingDir := 1;
+    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    TargetSpeedMps := SpeedMps;
+ELSIF RelayRev THEN
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Increment));
+    MovingDir := -1;
+    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    TargetSpeedMps := -SpeedMps;
+ELSE
+    // Relais coupes : roulis inertiel (anticipation d'arret mecanique). Le treuil
+    // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
+    IF (CoastPtsLeft &gt;= 1.0) AND (MovingDir &lt;&gt; 0) THEN
+        IF MovingDir = 1 THEN
+            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(IncrStep1));
+            TargetSpeedMps := MinSpeedMps;
+        ELSE
+            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(IncrStep1));
+            TargetSpeedMps := -MinSpeedMps;
+        END_IF;
+        CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
+    ELSE
+        MovingDir := 0;
+        CoastPtsLeft := 0.0;
+        TargetSpeedMps := 0.0;
+    END_IF;
+END_IF;
+{endregion}
+
+{region "§3bis Garde de plage de comptage"}
+// 🛑 SEULE borne du comptage : la plage de représentation signée. Elle est SIGNALÉE
+// (CountSaturated) et cohérente — une position bornée ne publie plus de vitesse de mouvement,
+// ce qui interdit la signature « position figée + vitesse non nulle + zéro défaut ».
+CountSaturated := FALSE;
+IF UDINT_TO_DINT(RawPos) &gt; CST_CountTravelLimitPts THEN
+    RawPos := DINT_TO_UDINT(CST_CountTravelLimitPts);
+    CountSaturated := TRUE;
+ELSIF UDINT_TO_DINT(RawPos) &lt; -CST_CountTravelLimitPts THEN
+    RawPos := DINT_TO_UDINT(-CST_CountTravelLimitPts);
+    CountSaturated := TRUE;
+END_IF;
+IF CountSaturated THEN
+    TargetSpeedMps := 0.0;
+END_IF;
+{endregion}
+
+{region "§4 Sortie"}
+RawPosOut := RawPos;
+// Retour vitesse rapporte (RawSpdOut) : 1er ordre vers TargetSpeedMps. SpeedReportTauS=0.0
+// -&gt; alpha=1 -&gt; saut instantane (comportement historique inchange).
+ReportedSpeedMps := ReportedSpeedMps
+    + (CycleTimeS / (SpeedReportTauS + CycleTimeS)) * (TargetSpeedMps - ReportedSpeedMps);
+// Formule inverse vitesse brute EtherCAT CoE (0.1 RPM) :
+// SpdValue = (V_mps * 60.0) / (0.1 * CableM_PerRev) = V_mps * 300.0 (sur tambour 2m)
+IF (CableM_PerRev &gt; 0.0) THEN
+    RawSpdOut := REAL_TO_DINT((ReportedSpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
+ELSE
+    RawSpdOut := 0;
+END_IF;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>526914c5-468f-5758-8161-f70e0fd85cca</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_Safety" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Activation de la simulation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimChainOkBit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimPhaseRotationOkBit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = phases réseau OK simulées ; FALSE = défaut rotation de phases injecté</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff_A">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Commande coupure canal A (TRUE = OK/fermé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff_B">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Commande coupure canal B (TRUE = OK/fermé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Requête coupure métier (TRUE = arrêt d'urgence)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArming">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Impulsion de réarmement (TRUE = pulse)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnEmergencyStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Force l'ouverture de la boucle (TRUE = bouton appuyé/défaut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestCutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Test de redondance en cours (canal A ou B coupé par le FB AU)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="SimChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Boucle AU simulée saine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimContactorOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contacteur simulé engagé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimPhaseRotationOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contrôleur de phases simulé : TRUE = phases saines (aucun défaut)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ContactorLatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mémorisation de l'auto-maintien du contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ChainOpenReq">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande brute d'ouverture de la chaîne (bit off / coup-de-poing / test / coupure)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ChainOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] État latche de la chaîne (TRUE = ouverte)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorEngageReq">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande d'engagement du contacteur (pulse ET chaîne saine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonChainOpen">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation d'ouverture de la chaîne (retombée relais)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonChainClose">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de fermeture de la chaîne (retombée relais)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonContactorEngage">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation d'engagement du contacteur (temps de collage bobine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonContactorDrop">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de retombée du contacteur (temps de décollage bobine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ChainOpenDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS PHYSIQUES SIMULÉES (compatibles séquence FB AU) ===
+⚠️ Doivent rester &lt; durées de la séquence FB AU (CST_TestDuration=200ms, CST_ArmingPulseDuration=1s,
+CST_ArmingConfirmTimeout=2s) pour que le test de redondance et la confirmation contacteur
+restent validés : ouverture/fermeture chaîne &lt; 200ms, engagement contacteur &lt; 1s.
+Temps de retombée relais AU (ouverture chaîne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ChainCloseDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de retombée relais AU (fermeture chaîne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ContactorEngageDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de collage bobine contacteur (engagement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ContactorDropDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de décollage bobine contacteur (retombée)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_Safety — Simulation de la chaîne d'AU et du contacteur de puissance
+   ───────────────────────────────────────────────────────────────
+   📥 Enable            : activation de la simulation (SimulationModeActive AND NOT SensorEmergencyStopChainIsReal)
+   📥 SimChainOkBit     : bit opérateur — TRUE = simuler la chaîne AU fermée ; FALSE = chaîne ouverte (non simulée)
+   📥 PowerCutOff_A     : demande de coupure PLC canal A (TRUE = OK/fermé) — conservé pour interface, non utilisé par SimChainOk
+   📥 PowerCutOff_B     : demande de coupure PLC canal B (TRUE = OK/fermé) — conservé pour interface, non utilisé par SimChainOk
+   📥 PowerCutOffRequest: requête de coupure métier (PowerCutOffRequest du FB AU) — TRUE = arrêt d'urgence (chaîne ouverte)
+   📥 EmergencyArming   : impulsion de réarmement (EmergencyArming_RQ)
+   📥 BtnEmergencyStop   : appui coup-de-poing AU (TRUE = boucle ouverte)
+   📥 TestCutActive     : test de redondance en cours (canal A ou B coupé par le FB AU)
+
+   📤 SimChainOk        : simulation de la boucle AU (fermée si SimChainOkBit, ouverte sur coup-de-poing/test/coupure)
+   📤 SimContactorOk    : simulation du contacteur engagé (PowerContactorEngaged)
+
+   ⚙️ MÉCANISME GRANULAIRE (contrôle opérateur de la chaîne AU) :
+      - `SimChainOkBit` pilote la chaîne : FALSE → chaîne OUVERTE (on ne peut pas armer) ;
+        TRUE → chaîne FERMÉE (le bouton Armable s'active, on arme, la séquence teste les sorties).
+      - Pendant le test de redondance (TestCutActive), la chaîne CLIGNOTE (s'ouvre pendant TEST_A/B,
+        se referme pendant RESTORE_A/B) puis revient à 1 — comme en réel.
+      - `PowerCutOffRequest` (coupure métier) ouvre la chaîne → ARRÊT D'URGENCE.
+      - `BtnEmergencyStop` (coup-de-poing) ouvre la chaîne.
+      - Le contacteur ne s'engage QUE pendant l'impulsion d'armement (EmergencyArming), avec une
+        temporisation d'engagement (CST_ContactorEngageDelay), puis s'auto-maintient tant que la
+        chaîne est saine ; il retombe (CST_ContactorDropDelay) dès que la chaîne s'ouvre.
+      - À la ré-entrée en simulation (Enable FALSE→TRUE), SimChainOkBit = FALSE → chaîne OUVERTE et
+        contacteur NON engagé (on n'a pas armé) — pas de faux « OK » immédiat.
+
+   🔒 NON-RÉGRESSION ARMEMENT (dépendance circulaire) :
+      - La chaîne n'est PAS fermée par défaut : elle est fermée UNIQUEMENT si l'opérateur pose
+        `SimChainOkBit`. Elle ne dépend PAS de PowerCutOff_A/B (qui sont dans le cercle) : le
+        réarmement après échec de test de redondance (RedundancyTestFailedCause laté → PowerCutOff_A=FALSE)
+        reste possible car la chaîne est maintenue fermée par le bit opérateur, pas par le PLC.
+      - L'ouverture « PLC coupe un canal » est représentée par TestCutActive (test redondance) et
+        PowerCutOffRequest (coupure métier) — jamais par PowerCutOff_A/B seuls.
+   ═══════════════════════════════════════════════════════════════
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+{region "§1 Gate"}
+IF NOT Enable THEN
+    SimChainOk     := FALSE;
+    SimContactorOk := FALSE;
+    SimPhaseRotationOk := FALSE;
+    ContactorLatch := FALSE;
+    ChainOpen      := TRUE; // Chaîne ouverte par défaut à la ré-entrée (on n'a pas armé)
+    ChainOpenReq   := FALSE;
+    ContactorEngageReq := FALSE;
+    TonChainOpen(IN := FALSE);
+    TonChainClose(IN := FALSE);
+    TonContactorEngage(IN := FALSE);
+    TonContactorDrop(IN := FALSE);
+    RETURN;
+END_IF;
+{endregion}
+
+{region "§2 Chaîne AU (contrôle granulaire + dynamique)"}
+// 1. La chaîne AU est saine si l'opérateur la simule fermée (SimChainOkBit = TRUE) ET si aucun
+//    événement ne l'ouvre : coup-de-poing (BtnEmergencyStop), test de redondance (TestCutActive),
+//    coupure métier (PowerCutOffRequest).
+// 🔧 DEADLOCK SIMULATION (corrigé) : la chaîne n'est PAS fermée par défaut ni dépendante de
+//    PowerCutOff_A/B (qui sont dans le cercle). Elle est fermée UNIQUEMENT par le bit opérateur
+//    `SimChainOkBit`. Le réarmement après échec de test de redondance (RedundancyTestFailedCause laté
+//    → PowerCutOff_A=FALSE) reste possible car la chaîne est maintenue fermée par le bit, pas par
+//    le PLC. Hors simulation (Enable=FALSE), la chaîne reste pilotée par le matériel via le repli
+//    HwReal (PRG_02 §1/§2) — aucune régression sécurité réelle.
+// 🆕 DYNAMIQUE : l'ouverture/fermeture suit une temporisation (CST_ChainOpenDelay / CST_ChainCloseDelay)
+//    qui simule le temps de retombée des relais AU, tout en restant &lt; 200ms (CST_TestDuration) pour
+//    ne pas fausser le test de redondance. Pendant le test, la chaîne clignote (s'ouvre en TEST_A/B,
+//    se referme en RESTORE_A/B) puis revient à 1.
+ChainOpenReq := (NOT SimChainOkBit) OR BtnEmergencyStop OR TestCutActive OR PowerCutOffRequest;
+
+// Temporisation d'ouverture : la chaîne s'ouvre après CST_ChainOpenDelay de demande soutenue
+TonChainOpen(IN := ChainOpenReq, PT := CST_ChainOpenDelay);
+// Temporisation de fermeture : la chaîne se ferme après CST_ChainCloseDelay d'absence de demande
+TonChainClose(IN := NOT ChainOpenReq, PT := CST_ChainCloseDelay);
+
+// Latch de la chaîne avec temporisations (défaut = ouverte à la ré-entrée)
+IF ChainOpenReq THEN
+    IF TonChainOpen.Q THEN
+        ChainOpen := TRUE;
+    END_IF;
+ELSE
+    IF TonChainClose.Q THEN
+        ChainOpen := FALSE;
+    END_IF;
+END_IF;
+
+SimChainOk := NOT ChainOpen;
+{endregion}
+
+{region "§3 Auto-maintien contacteur (dynamique réaliste)"}
+// 2. Logique d'auto-maintien (latch) du contacteur avec priorité à la coupure.
+// 🆕 DYNAMIQUE : le contacteur ne s'engage QUE pendant l'impulsion d'armement (EmergencyArming)
+//    tant que la chaîne est saine, après CST_ContactorEngageDelay (temps de collage bobine), puis
+//    s'auto-maintient. Il retombe après CST_ContactorDropDelay (temps de décollage bobine) dès que
+//    la chaîne s'ouvre — comme une bobine réelle qui décolle sans alimentation. Ces temporisations
+//    restent &lt; CST_ArmingPulseDuration (1s) et CST_ArmingConfirmTimeout (2s) pour que la
+//    confirmation contacteur reste validée. À la ré-entrée en simulation, le contacteur est NON
+//    engagé (on n'a pas armé).
+ContactorEngageReq := EmergencyArming AND SimChainOk;
+
+// Temporisation d'engagement : le contacteur se colle après CST_ContactorEngageDelay de pulse soutenu
+TonContactorEngage(IN := ContactorEngageReq, PT := CST_ContactorEngageDelay);
+// Temporisation de retombée : le contacteur décolle après CST_ContactorDropDelay de chaîne ouverte
+TonContactorDrop(IN := NOT SimChainOk, PT := CST_ContactorDropDelay);
+
+// Latch du contacteur avec priorité à la coupure (retombée &gt; engagement)
+IF NOT SimChainOk THEN
+    IF TonContactorDrop.Q THEN
+        ContactorLatch := FALSE;
+    END_IF;
+ELSIF ContactorEngageReq THEN
+    IF TonContactorEngage.Q THEN
+        ContactorLatch := TRUE;
+    END_IF;
+END_IF;
+
+// Recopie vers la sortie
+SimContactorOk := ContactorLatch;
+
+// Contrôleur de phases : simple propagation du bit opérateur (TRUE = sain).
+// Inopérant hors simulation (le banc ne publie l'image machine que sous Enable).
+SimPhaseRotationOk := SimPhaseRotationOkBit;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>9ab5b810-a798-5ced-ad58-9e4d01ab66eb</ObjectId>
           </data>
         </addData>
       </pou>
@@ -7686,6 +7568,173 @@ Ready := TRUE;
           </data>
         </addData>
       </pou>
+      <pou name="FB_Sim_TranslationDrive" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FrequencyTgt_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="AccelRate_HzPerS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+            </variable>
+            <variable name="DecelRate_HzPerS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="25" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">pente d'arret relevee sur trace reelle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeConstant_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.15" />
+              </initialValue>
+            </variable>
+            <variable name="LoadAngularVelocity_RadPerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="LoadFrequencyDroopGain_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+            </variable>
+            <variable name="CycleTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FrequencyCmd_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ElectricalFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ActualFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ResponseAlpha">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="FrequencyDelta_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="FrequencyStep_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CST_MinTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.001" />
+              </initialValue>
+            </variable>
+            <variable name="CST_MaxFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="50" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">plafond variateur reel (GVL_PERSISTENT._TranslationMaxFreq_Hz)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Dynamique reduite du variateur M3, sans commande metier.</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Ready := FALSE;
+    FrequencyCmd_Hz := 0.0;
+    ElectricalFrequency_Hz := 0.0;
+    ActualFrequency_Hz := 0.0;
+    ResponseAlpha := 0.0;
+    RETURN;
+END_IF;
+
+FrequencyDelta_Hz := LIMIT(0.0, FrequencyTgt_Hz, CST_MaxFrequency_Hz) - FrequencyCmd_Hz;
+IF FrequencyDelta_Hz &gt;= 0.0 THEN
+    FrequencyStep_Hz := MAX(0.0, AccelRate_HzPerS) * CycleTime_S;
+ELSE
+    FrequencyStep_Hz := MAX(0.0, DecelRate_HzPerS) * CycleTime_S;
+END_IF;
+FrequencyCmd_Hz := FrequencyCmd_Hz + LIMIT(-FrequencyStep_Hz, FrequencyDelta_Hz, FrequencyStep_Hz);
+IF TimeConstant_S &gt; CST_MinTime_S THEN
+    ResponseAlpha := CycleTime_S / (TimeConstant_S + CycleTime_S);
+ELSE
+    ResponseAlpha := 1.0;
+END_IF;
+ElectricalFrequency_Hz := ElectricalFrequency_Hz
+    + ResponseAlpha * (FrequencyCmd_Hz - ElectricalFrequency_Hz);
+ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz
+    - MAX(0.0, LoadFrequencyDroopGain_Hz) * ABS(LoadAngularVelocity_RadPerS));
+IF ActualFrequency_Hz &lt; 0.005 THEN
+    ActualFrequency_Hz := 0.0;
+END_IF;
+Ready := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>03da2ca5-829e-5f35-a2f5-646da12c2d06</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Sim_WinchMotor" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -8282,17 +8331,17 @@ Ready := TRUE;
       <ProjectStructure>
         <Folder Name="L_SIMULATION">
           <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
-          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
-          <Object Name="FB_Sim_TranslationDrive" ObjectId="03da2ca5-829e-5f35-a2f5-646da12c2d06" />
-          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
           <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
-          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
+          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
           <Object Name="FB_Sim_Translation_ExtLink" ObjectId="cb6a7d98-36ae-5c14-9891-d5451c6e7dd0" />
+          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
+          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
           <Object Name="FB_Sim_WinchElectrical" ObjectId="d4300e91-0ca0-50b0-9b21-524eed13dd0f" />
           <Object Name="ST_fbSim_Translation_ExtLink_Echo" ObjectId="942264b5-586e-54d2-baf3-aff3f43d06e6" />
           <Object Name="FB_Sim_PositionSensor" ObjectId="538b32eb-6dc2-59d5-8226-64383264fe4b" />
           <Object Name="FB_Sim_SuspendedLoad" ObjectId="5e90360e-a4b1-5c07-88d0-97d04f31b674" />
           <Object Name="FB_Sim_TranslationBrake" ObjectId="df996876-0665-532f-9bbb-9be3ca7669e4" />
+          <Object Name="FB_Sim_TranslationDrive" ObjectId="03da2ca5-829e-5f35-a2f5-646da12c2d06" />
           <Object Name="FB_Sim_WinchMotor" ObjectId="cce43b3e-95fc-50e1-8d52-471f9c714033" />
           <Object Name="FB_Sim_KlossTorque" ObjectId="319a2f9e-c6a8-5252-8df3-c9df3e0746f8" />
         </Folder>
