@@ -2,11 +2,11 @@ tasks:
 - id: T418
   parent_id: ''
   statut: ⏳
-  criticite: C2
+  criticite: C3
   domaine: SIMULATION / SIMBENCH / JOYSTICK
   agent: CDX01
-  updated_at: '2026-10-15T02:33:56+02:00'
-  date: '2026-10-15T02:33:56+02:00'
+  updated_at: '2026-10-15T03:13:59+02:00'
+  date: '2026-10-15T03:13:59+02:00'
   titre: Simulateur joystick - geste operateur complet depuis un bouton IHM
   contexte: Reprise du lot precedent interrompu. Le besoin humain est un geste operateur complet depuis un seul bouton IHM. Le brut homme-mort est aussi lu comme validation homing en N2; cet effet existant est teste et signale.
   description: Un bouton IHM simule appui armement puis debattement et relachement armement. Le vrai FB_Joystick reste inchange. Voir contrat de reprise pour objectifs faisant foi.
@@ -16,7 +16,7 @@ tasks:
   - Conflit, inversion, activation tenue et annulation ne provoquent aucun depart differe.
   - Tester et signaler interaction HX1 N2 et bascule de source; aucun changement du code reel.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T418_OPERATEUR_SIMULE.yaml
-  avancement: 'Geste nominal implemente et teste : simulation 11/11 FB (105 tests), joystick reel 29/29, G200 PASS, G528 9 mutations PASS. Revue expert MAJOR : reprise a bascule source et HX1 N2 caracterises, code reel intact. Gates globaux rouges hors lot. Non valide pour recette generale; arbitrage perimetre requis. Voir RESTITUTION_T418_OPERATEUR_SIMULE.md.'
+  avancement: 'Ancrage MES44c2b368 verifie : metier conserve, pas de filtre homing. Geste et raccordement selection source testes; references manuelles via vrais composants PASS; parcours N1/SEMI_AUTO sans HX1 PASS. Revue expert PASS. G200 PASS; dette CI globale conservee visible. Pret pour recette CODESYS ciblee, pas validation machine complete. Checkpoint19abfcdf; voir RESTITUTION_T418_OPERATEUR_SIMULE.md.'
   bloque_par: []
 - id: T417
   parent_id: ''

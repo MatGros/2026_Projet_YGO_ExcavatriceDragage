@@ -312,6 +312,7 @@ SimM3PlcEcho.EstimatedPos_M          := PRG_05_Translation.Data.TranslationState
 
 instSimBench(
     Enable                   := GVL_Simulation.SimulationModeActive,
+    OperatorSourceActive     := OperatorInputSourceSimulated,
     M1_RelayFwd              := PRG_06_Outputs.Data.M1RelayFwd,
     M1_RelayRev              := PRG_06_Outputs.Data.M1RelayRev,
     M1_SpeedContactor_1      := PRG_06_Outputs.Data.M1SpeedContactor1,

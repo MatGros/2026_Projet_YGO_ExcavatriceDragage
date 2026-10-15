@@ -1,6 +1,6 @@
 contract:
   task_id: T418
-  criticality: C2
+  criticality: C3
   strategy: patch
   objective: >
     Un bouton directionnel IHM reproduit le geste complet d'un operateur via
@@ -33,10 +33,23 @@ contract:
     - id: AC9
       statement: Bundle complet et diff frais, G200 PASS, resultats gates et CI documentes puis revue expert independante.
       verified_by: generate_codesys_bundle.py, generate_codesys_diff_bundle.py, G200 --report, run_all_gates.py et rapport de revue.
+    - id: AC10
+      statement: Le selecteur effectif operateur desactive et reinitialise le geste; aucune reprise tenue apres reselection, phases armement, mouvement et retour couvertes.
+      verified_by: Tests ST SimOperatorJoystick et G528 sur le raccordement OperatorInputSourceSimulated.
+    - id: AC11
+      statement: Le traitement joystick, homing, trois commandes manuelles de reference et cycle reste identique au tag MES_FIN_20260923; reference etablie puis N1 et SEMI_AUTO ne lancent aucun HX1 par geste joystick.
+      verified_by: audit_t418_commissioning_baseline.py et TC-T418-INT-009 avec vrais FB joystick et homing; ne constitue pas un essai cycle machine complet.
+    - id: AC12
+      statement: "Le nom de fichier est identique au nom de POU. Le suffixe de langage est identique au langage du bundle. PRG_02_Acquisition reste en ST."
+      verified_by: G310 et controle de liaison sur bundle frais.
+    - id: AC13
+      statement: Trois commandes manuelles successives etablissent M1, M2 et datum benne via vrais composants et retours SimBench, sans injection de statut Homed positif.
+      verified_by: TC-T418-REF-001 SimManualReference; harnais de composants, pas execution complete des PRG ou pages IHM.
   scope:
     allowed:
       - CODE/L_SIMULATION/FB_Sim_Joystick.st
       - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st # section simulation seulement, un argument d'activation du domaine
       - TOOLS/TEST_AUTO_CI/
       - TOOLS/AGENT_WORKFLOW/scripts/
       - DOC/WFLOW/
@@ -45,7 +58,11 @@ contract:
       - CODE_XML/
     forbidden:
       - CODE/D_JOYSTICK/
-      - CODE/M_MAIN/
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
       - CODE/G_CYCLE/
       - CODE/F_MODES/
       - CODE/H_TREUILS_BENNE/
@@ -62,21 +79,20 @@ contract:
       - Ancien contrat T418 exigeant une manipulation supplementaire du stimulus brut.
   evidence_required: [check_linkage, run_all_gates, bundle, diff_bundle]
   alert_duty: Tout ecart hors scope est rapporte sans modification de production ni faux verdict de validation terrain.
-status: IN_PROGRESS
+status: COMPLETED
 execution:
   executed_by: CDX01
-  status: ALERT_RAISED
-  completed_at: '2026-10-15T02:33:56+02:00'
-  summary: Geste nominal teste; revue MAJOR sur bascule de source et HX1 N2. Lot non valide pour recette generale, code reel conserve.
+  status: COMPLETED
+  completed_at: '2026-10-15T03:14:59+02:00'
+  summary: Geste simule, source effective et references manuelles testes. Metier MES conserve, aucun filtre homing. Pret pour recette CODESYS ciblee, pas validation machine complete.
   evidence_submitted:
-    - Simulation 11/11 FB et 105/105 tests PASS dont integration 8/8.
-    - FB_Joystick reel 29/29 PASS; sources de production hors deux FB simulation inchangees.
-    - G528 PASS et 9 mutations rejetees.
-    - G200 PASS 0 erreur / 1726 avertissements / 2136 instances.
-    - Bundle complet frais et diff deux objets generes.
-    - Gates globaux rouges; voir T418_GATES_COMPLETS.txt.
-    - Revue independante MAJOR et deux constats integres non masques.
-
+    - Simulation 12/12 FB et 110/110 tests PASS, dont 12 integrations joystick et 1 reference manuelle.
+    - Audit MES PASS; joystick reel 29/29 PASS; code joystick, homing et cycle inchange.
+    - G528 PASS, 13 mutations rejetees; style deux FB simulation PASS.
+    - G200 PASS 0 erreur / 1727 avertissements / 2136 instances.
+    - Bundle frais et diff trois objets generes; G390 PASS.
+    - Revue expert PASS; limites fixture et recette humaine explicites.
+    - Gates globaux 61/67 PASS; six echecs conserves et detailles dans le rapport.
 validation:
   status: PENDING
-  notes: Plan valide par humain dans la conversation; revue expert puis recette CODESYS humaine requises.
+  notes: Recette humaine CODESYS requise - references manuelles, N1, gestes joystick, SEMI_AUTO. Aucun verdict terrain general.

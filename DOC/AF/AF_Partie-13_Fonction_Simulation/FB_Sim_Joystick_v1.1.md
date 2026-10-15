@@ -62,6 +62,10 @@ saut analogique ou un front brut parasite apres le retour.
 
 Hors `FB_SimBench.Enable`, l'image `HwReal` est rendue sans alteration, et le
 sous-modele joystick est explicitement appele avec Enable FALSE.
+`FB_SimBench.OperatorSourceActive` recoit le selecteur effectif
+`OperatorInputSourceSimulated` de PRG_02. FALSE : reset du sous-modele et
+publication directe de `HwReal.Operator`, sans fallback vers les stimuli.
+La reselection avec bouton directionnel tenu exige un relachement complet.
 
 ## 5. Limites et preuves
 
@@ -78,15 +82,13 @@ homing. Un nouvel appui peut lancer HX1 meme sur machine referencee et
 verrouiller M3. TC-T418-INT-004 caracterise ce comportement sans le masquer.
 Ce lot ne revendique donc pas un jog M3 operationnel en N2 dans ce contexte.
 
-**Bascule de source operateur :** `SimOperatorActive` est selectionne dans
-PRG_02 independamment du Enable global du banc. Le sous-modele ne connait pas
-cette selection et continue en arriere-plan. Une reselection pendant un geste
-peut reprendre une demande sans nouvel appui IHM si le vrai joystick est
-encore arme pendant sa grace. TC-T418-INT-008 reproduit ce constat par le meme
-arbitrage X/Y/bouton en amont du vrai joystick (sans executer tout PRG_02).
-La bascule de domaine doit donc rester au repos, boutons relaches ; ce lot
-ne revendique aucune detection automatique de cette bascule. La revue expert
-classe ce point MAJOR avant toute promesse d'absence d'effet cache.
+**Bascule de source operateur :** le domaine est selectionne independamment
+du Enable global, mais sa selection effective pilote maintenant le sous-modele.
+TC-T418-INT-008/010/011 verifient absence de reprise apres reselection,
+pendant mouvement, armement et retour. La transition vers un joystick PHYSIQUE
+deja tenu conserve la semantique d'acquisition reelle de la MES et n'est pas
+un cas de simulation de l'operateur ; aucune securisation generale des
+changements de source sous commande physique n'est revendiquee.
 
 ## 6. Catalogue de validation
 
@@ -103,7 +105,10 @@ classe ce point MAJOR avant toute promesse d'absence d'effet cache.
 | <nobr><code>TC-T418-INT-005</code></nobr> | Priorite sources et absence de saut vers manuel | CI SimOperatorJoystick |
 | <nobr><code>TC-T418-INT-006</code></nobr> | Repli reel et reactivation tenue | CI SimOperatorJoystick |
 | <nobr><code>TC-T418-INT-007</code></nobr> | Maintien reel trop long : refus sans bypass | CI SimOperatorJoystick |
-| <nobr><code>TC-T418-INT-008</code></nobr> | Constat reprise a la reselection de source pendant la grace | CI SimOperatorJoystick |
+| <nobr><code>TC-T418-INT-008</code></nobr> | Reselection apres mouvement sans reprise tenue | CI SimOperatorJoystick |
+| <nobr><code>TC-T418-INT-009</code></nobr> | Reference etablie, N1 puis SEMI_AUTO sans HX1 par geste | CI SimOperatorJoystick |
+| <nobr><code>TC-T418-INT-010..012</code></nobr> | Deselection pendant armement/retour, image reelle exacte | CI SimOperatorJoystick |
+| <nobr><code>TC-T418-REF-001</code></nobr> | Trois commandes manuelles, vrais codeurs/benne et retours SimBench | CI SimManualReference |
 
 Validation CI = logique hors PLC ; compilation et recette CODESYS restent humaines.
 G528 controle le cablage exclusif, la reinitialisation et l'absence de production
