@@ -4,18 +4,19 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: SIMULATION / SIMBENCH / JOYSTICK
-  agent: CC01
-  updated_at: '2026-10-13T17:30:00+02:00'
-  date: '2026-10-13T15:00:00'
-  titre: Simulateur joystick — homme-mort separe des boutons directionnels (front parasite qui lance le homing en N2)
-  contexte: En simulation, MAINT_N2 + zone Maintenance M3 autorisee + machine referencee, un appui bouton directionnel simule lance le grafcet homing (HX1). FB_SimBench.st:710 fabrique l homme-mort (Operator.JoyBtnRaw := SimJoystickRawButton OR DirectionCount > 0) a chaque bouton directionnel ; le front passe la transition HX0 FB_CycleMachineHoming.st:414. Le joystick reel ne le fait pas et le code machine v0.7.25 fonctionne.
-  description: Les boutons directionnels simules ne produisent que le debattement X/Y ; l homme-mort simule passe uniquement par SimJoystickRawButton. Code machine (G_CYCLE, D_JOYSTICK, M_MAIN) non modifie.
+  agent: CDX01
+  updated_at: '2026-10-15T02:33:56+02:00'
+  date: '2026-10-15T02:33:56+02:00'
+  titre: Simulateur joystick - geste operateur complet depuis un bouton IHM
+  contexte: Reprise du lot precedent interrompu. Le besoin humain est un geste operateur complet depuis un seul bouton IHM. Le brut homme-mort est aussi lu comme validation homing en N2; cet effet existant est teste et signale.
+  description: Un bouton IHM simule appui armement puis debattement et relachement armement. Le vrai FB_Joystick reste inchange. Voir contrat de reprise pour objectifs faisant foi.
   objectifs:
-  - Bouton directionnel simule seul -> JoyBtnRaw FALSE.
-  - N2 + reference + homme-mort tenu + jog vers Maintenance -> pas de HX1, M3 bouge.
-  - Sans homme-mort simule -> aucun mouvement (securite FB_Joystick testee pour de vrai).
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T418_SIM_JOYSTICK_HOMME_MORT_SEPARE.yaml
-  avancement: 'Implemente, en attente de validation humaine (aucun commit du lot). JoyBtnRaw = SimJoystickRawButton seul ; gate G528 ; tests TC-T418-001/002 + TC-T418-INT-001..003. CONSTAT AC4 : premier appui homme-mort en N2 sur machine referencee lance encore HX1 (code machine inchange) -> correction dans T377, pas dans T418.'
+  - Un bouton IHM produit appui armement au neutre puis debattement et relachement armement.
+  - Le vrai FB_Joystick conserve ses permis et sa logique; aucun etat arme force.
+  - Conflit, inversion, activation tenue et annulation ne provoquent aucun depart differe.
+  - Tester et signaler interaction HX1 N2 et bascule de source; aucun changement du code reel.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T418_OPERATEUR_SIMULE.yaml
+  avancement: 'Geste nominal implemente et teste : simulation 11/11 FB (105 tests), joystick reel 29/29, G200 PASS, G528 9 mutations PASS. Revue expert MAJOR : reprise a bascule source et HX1 N2 caracterises, code reel intact. Gates globaux rouges hors lot. Non valide pour recette generale; arbitrage perimetre requis. Voir RESTITUTION_T418_OPERATEUR_SIMULE.md.'
   bloque_par: []
 - id: T417
   parent_id: ''

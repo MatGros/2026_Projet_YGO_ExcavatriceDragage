@@ -107,7 +107,7 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F13.05</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Entrées joystick brutes, homme-mort jamais contourné</b></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Sim_Joystick</code></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;"><a href="AF_Partie-13_Fonction_Simulation/FB_Sim_Joystick_v1.0.md"><code>FB_Sim_Joystick_v1.0.md</code></a></td>
+      <td style="padding: 6px 8px; line-height: 1.55;"><a href="AF_Partie-13_Fonction_Simulation/FB_Sim_Joystick_v1.1.md"><code>FB_Sim_Joystick_v1.1.md</code></a></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-050..052</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
@@ -202,7 +202,7 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
       <td style="padding: 6px 8px; line-height: 1.55;">
         💤 <b>Étape 0</b> : Joystick simulé au neutre<br>
         🚀 <b>Étape 1</b> : Activation <code>SimOperatorActive</code> → entrées brutes joystick<br>
-        ⚡ <b>Étape 2</b> : <code>JoyBtnRaw</code> reflète <b>seulement</b> <code>SimJoystickRawButton</code>, jamais un bouton directionnel (T418)<br>
+        ⚡ <b>Étape 2</b> : Le geste produit l'appui armement au neutre, puis le débattement et le relâchement de l'armement ; les stimuli manuels sont exclus pendant le geste (T418, fiche composant v1.1)<br>
         ✅ <b>Étape 3</b> : Homme-mort réel <code>FB_Joystick</code> reste actif — pas de bypass
       </td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>⚡ SITE+AUTO+👁️ MANUEL</code></small></td>
@@ -226,7 +226,7 @@ fiche `FB_Sim_Safety` avant tout diagnostic de blocage AU en simulation** (§4 d
 | [`FB_Sim_Safety_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Safety_v1.0.md) | `FB_Sim_Safety` | Chaîne AU/contacteur simulée — ⚠️ piège latches AU non liés à la simulation |
 | [`FB_Sim_Encoder_v1.1.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.1.md) | `FB_Sim_Encoder` | Position codeur COD1/COD2, comptage **signé** (0 non borné) + saturation de plage signalée, persistance reset froid |
 | [`FB_Sim_Translation_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md) | `FB_Sim_Translation` | 5 capteurs M3 par progression continue |
-| [`FB_Sim_Joystick_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Joystick_v1.0.md) | `FB_Sim_Joystick` | Entrées brutes joystick, homme-mort jamais contourné |
+| [`FB_Sim_Joystick_v1.1.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Joystick_v1.1.md) | `FB_Sim_Joystick` | Entrées brutes joystick, homme-mort jamais contourné |
 
 ---
 
@@ -298,8 +298,8 @@ Le sélecteur est atomique par domaine : `HwIn.<Domaine> := HwSim.<Domaine>` ou
 |---|---|---|
 | ↔️ M3 | `SimM3SensorsWordOverrideActive`, `SimM3SensorsWord` | Override manuel uniquement ; bit4=Trémie, bit3=PV, bit2=PVP2, bit1=P1, bit0=Maintenance. Le modèle dynamique reste la source nominale. |
 | ⏩ M3 vitesse banc | `instSimBench.SimM3SpeedFactor` (en ligne, **non câblé** par `PRG_02`) | Facteur 1..5 (défaut 1,0 = dynamique réelle). Le chariot simulé avance k× plus vite **et** la fréquence retournée au PLC est multipliée par k : l'estimateur (f × 0,02) suit exactement le chariot, sans saut de recalage. Effet visible : fréquence réelle affichée × k. Frein et mémoire de sens restent sur la fréquence physique. Retombe à 1,0 au téléchargement à froid. |
-| 🕹️ Joystick | `SimJoystickLeft_Rev_TREMIE_Active`, `SimJoystickRight_Fwd_MAINT_Active`, `SimJoystickFwd_Up_Close_Active`, `SimJoystickRev_Down_Open_Active` | Un seul bouton impose `0`/`5000`/`10000` (plusieurs ⇒ neutre). Un bouton directionnel produit **uniquement** le débattement X/Y, **jamais** l'appui homme-mort `JoyBtnRaw` (T418, gate G528 : sinon chaque jog fabrique un front lu aussi comme `BtnValidation` du grafcet homing). |
-| 🕹️ Homme-mort | `SimJoystickRawButton` | **Seule** source de `Operator.JoyBtnRaw` (T418). À actionner en plus du bouton directionnel pour bouger : le homme-mort `FB_Joystick` est testé fidèlement — armement par maintien, grâce, retombée au neutre. |
+| 🕹️ Joystick | `SimJoystickLeft_Rev_TREMIE_Active`, `SimJoystickRight_Fwd_MAINT_Active`, `SimJoystickFwd_Up_Close_Active`, `SimJoystickRev_Down_Open_Active` | Un bouton maintenu demande un geste complet : appui armement au neutre, débattement, relâchement armement, retour au neutre au relâchement IHM. Conflit, inversion et activation tenue exigent un nouvel appui après retour. Voir fiche v1.1 pour chronologie et limites, dont interaction HX1 en N2. |
+| 🕹️ Homme-mort | `SimJoystickRawButton` | Stimulus manuel avancé au repos. Pendant le geste et son retour, X/Y/bouton appartiennent exclusivement au modèle. Aucun état armé réel forcé ; `FB_Joystick` reste inchangé. G528 protège l'arbitrage exclusif. |
 | 🪝 Synchronisation | `SimSyncDeviationInjectM1/M2`, `SimSyncDeviationOffset_M` | Front montant : saut persistant de position simulée afin de tester l'écart M1/M2. |
 | 🪝 Capteur haut TOP | `SimTopPositionActive` | Injection manuelle d'un fait capteur haut (essai ciblé). Par défaut le capteur TOP simulé est **libre (TRUE)** — cohérent avec le mou de câble (`M2_TensionedCable_DI := TRUE`). |
 | 🔗 Rattrapage mécanique M1/M2 | `SimWinchCouplingModelActive` (défaut **`TRUE`**), `SimBucketJamActive` (défaut `FALSE`) | **`SimWinchCouplingModelActive`** : le banc reproduit la **reprise de jeu** entre les deux treuils — en **montée couplée** (relais de sens identiques + freins sim desserrés, câble tendu, benne pas au fond, hors preset/homing, sans blocage), l'écart `Δ = PosM2 − PosM1` rejoint l'**entrée de la bande fermée** (`OffsetCloseM − ½·CoherenceLimitM`) par un 1er ordre borné (τ = 1,0 s, 0,02 m/scan), appliqué **uniquement à l'image publiée** du codeur M2 (`Winch.COD2_PosValue`) — **jamais** à `_SimEncoderRawPosM2`. `FALSE` = rejeu strict d'un scénario antérieur (non-régression, non-masquage du trou métier de fermeture). **`SimBucketJamActive`** : mâchoires bloquées (objet coincé) ⇒ **aucun** rattrapage et charge forcée (observable en diagnostic `MotorTorqueM1/M2_Nm`, **sans** rebouclage effort→vitesse). |

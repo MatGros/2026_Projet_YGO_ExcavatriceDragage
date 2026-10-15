@@ -1,0 +1,82 @@
+contract:
+  task_id: T418
+  criticality: C2
+  strategy: patch
+  objective: >
+    Un bouton directionnel IHM reproduit le geste complet d'un operateur via
+    les entrees brutes simulees, sans modifier le joystick reel ni ses permis.
+  acceptance:
+    - id: AC1
+      statement: Un nouvel appui unique produit appui armement, debattement puis relachement armement dans cet ordre.
+      verified_by: Tests ST FB_Sim_Joystick et integration SimOperatorJoystick avec FB_Joystick reel.
+    - id: AC2
+      statement: Apres relachement du bouton armement simule, la demande axe reste active si le permis reel est conserve.
+      verified_by: Integration ST SimOperatorJoystick, assertions sur DeadmanArmed et AxisCmdX/Y.
+    - id: AC3
+      statement: Annulation pendant armement ne produit aucun debattement differe; relachement en mouvement ramene au neutre.
+      verified_by: Tests ST annulation et retour dynamique.
+    - id: AC4
+      statement: Une direction deja tenue au demarrage, une inversion directe ou plusieurs directions exigent relachement complet et retour neutre avant un nouveau geste.
+      verified_by: Tests ST activation, reactivation, conflit et inversion.
+    - id: AC5
+      statement: Perte de permis reel neutralise le mouvement; le simulateur ne genere aucun nouvel appui automatique pendant le maintien IHM.
+      verified_by: Integration ST refus et perte ArmingPermit avec FB_Joystick reel.
+    - id: AC6
+      statement: Hors Enable le banc rend HwReal et reinitialise le geste; le stimulus brut manuel reste utilisable hors geste automatique.
+      verified_by: Tests ST FB_SimBench repli et priorite des sources.
+    - id: AC7
+      statement: Le code de production hors deux fichiers simulation reste identique au checkpoint 9630ddb5; aucun etat arme reel n'est force.
+      verified_by: Diff Git borne et garde-fou automatique avec mutations.
+    - id: AC8
+      statement: Les fronts simules sont observes par le vrai homing et tout lancement HX1 est signale sans le masquer.
+      verified_by: Integration ST SimOperatorJoystick avec FB_CycleMachineHoming reel.
+    - id: AC9
+      statement: Bundle complet et diff frais, G200 PASS, resultats gates et CI documentes puis revue expert independante.
+      verified_by: generate_codesys_bundle.py, generate_codesys_diff_bundle.py, G200 --report, run_all_gates.py et rapport de revue.
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_Sim_Joystick.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - DOC/WFLOW/
+      - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+      - DOC/AF/AF_Partie-13_Fonction_Simulation/
+      - CODE_XML/
+    forbidden:
+      - CODE/D_JOYSTICK/
+      - CODE/M_MAIN/
+      - CODE/G_CYCLE/
+      - CODE/F_MODES/
+      - CODE/H_TREUILS_BENNE/
+      - CODE/I_TRANSLATION/
+      - PRJ_CODESYS/
+      - Device.export
+  conservation:
+    must_survive:
+      - Armement et desarmement exclusivement produits par le vrai FB_Joystick.
+      - Dynamique analogique existante, bruit, depassement et bagotement de test.
+      - Repli HwReal hors Enable; aucun changement de physique M3.
+    dropped_on_purpose:
+      - Couplage combinatoire direction et bouton homme-mort.
+      - Ancien contrat T418 exigeant une manipulation supplementaire du stimulus brut.
+  evidence_required: [check_linkage, run_all_gates, bundle, diff_bundle]
+  alert_duty: Tout ecart hors scope est rapporte sans modification de production ni faux verdict de validation terrain.
+status: IN_PROGRESS
+execution:
+  executed_by: CDX01
+  status: ALERT_RAISED
+  completed_at: '2026-10-15T02:33:56+02:00'
+  summary: Geste nominal teste; revue MAJOR sur bascule de source et HX1 N2. Lot non valide pour recette generale, code reel conserve.
+  evidence_submitted:
+    - Simulation 11/11 FB et 105/105 tests PASS dont integration 8/8.
+    - FB_Joystick reel 29/29 PASS; sources de production hors deux FB simulation inchangees.
+    - G528 PASS et 9 mutations rejetees.
+    - G200 PASS 0 erreur / 1726 avertissements / 2136 instances.
+    - Bundle complet frais et diff deux objets generes.
+    - Gates globaux rouges; voir T418_GATES_COMPLETS.txt.
+    - Revue independante MAJOR et deux constats integres non masques.
+
+validation:
+  status: PENDING
+  notes: Plan valide par humain dans la conversation; revue expert puis recette CODESYS humaine requises.

@@ -231,7 +231,8 @@ VAR
     M3_RelayFwd                : BOOL;   (* . [LOC] Sens avant M3 *)
     M3_RelayRev                : BOOL;   (* . [LOC] Sens arrière M3 *)
 
-    SimJoystickDirectionCount  : INT;   (* . [LOC] Nombre de directions actives *)
+    SimJoystickManualNeutral : BOOL; (* . [LOC] Axes manuels au neutre nominal *)
+    SimJoystickGesturePermit : BOOL; (* . [LOC] Aucune injection manuelle concurrente au geste *)
 
     M3_ActualFreqHz            : UINT;   (* . [LOC] Fréquence simulée M3 *)
     M3_StatusWordSim           : WORD;   (* . [LOC] StatusWord simulé M3 *)
@@ -287,6 +288,7 @@ IF NOT Enable THEN
     Machine     := HwReal.Machine;
     // 🔌 Lien externe M3 coupé explicitement : socket fermé, état de liaison retombé.
     instSimTranslationExtLink(Enable := FALSE);
+    instSimJoystick(Enable := FALSE);
     M3LinkReady   := FALSE;
     M3LinkTimeout := FALSE;
     M3LinkInvalid := FALSE;
@@ -678,8 +680,11 @@ END_IF;
 
 {region "§4 Simulation operateur joystick"}
 // ── 3. MODÈLE OPÉRATEUR / JOYSTICK ───────────────────────────────────────────
+SimJoystickManualNeutral := (SimJoystickRawX = 5000) AND (SimJoystickRawY = 5000);
+SimJoystickGesturePermit := SimJoystickManualNeutral AND NOT SimJoystickRawButton;
 instSimJoystick(
     Enable              := TRUE,
+    GesturePermit       := SimJoystickGesturePermit,
     NeutralRaw          := 5000,
     MaxRaw              := 10000,
     BtnLeft_Rev_TREMIE  := SimJoystickLeft_Rev_TREMIE_Active,
@@ -691,27 +696,18 @@ instSimJoystick(
     CycleTimeS          := 0.010
 );
 
-// Les boutons directionnels simplifient les essais : une commande unique impose
-// une butée d'axe ; aucune commande ou une combinaison reste au neutre / stimulus avancé.
-// Le modèle dynamique (montée/retombée/bagotement) pilote RawX/RawY dès qu'un bouton est actif.
-SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeft_Rev_TREMIE_Active)
-                           + BOOL_TO_INT(SimJoystickRight_Fwd_MAINT_Active)
-                           + BOOL_TO_INT(SimJoystickFwd_Up_Close_Active)
-                           + BOOL_TO_INT(SimJoystickRev_Down_Open_Active);
-IF (SimJoystickDirectionCount >= 1) OR instSimJoystick.ReturningActive THEN
-    // Bouton(s) actif(s) OU retour dynamique en cours (retombée/bagotement) → sortie du modèle.
-    // (≥2 boutons : le modèle gère lui-même le neutre — pas de diagonale implicite.)
+// Une seule source possede les trois signaux : aucun melange bouton/axes.
+// La propriete automatique persiste au retour et si un stimulus manuel est en conflit.
+IF instSimJoystick.ModelActive THEN
     Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
     Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
+    Operator.JoyBtnRaw := instSimJoystick.RawButton;
 ELSE
     // Modèle au repos → stimulus analogique avancé (mode « sans bouton »).
     Operator.JoyXRaw_ANA1 := SimJoystickRawX;
     Operator.JoyYRaw_ANA2 := SimJoystickRawY;
+    Operator.JoyBtnRaw := SimJoystickRawButton;
 END_IF;
-
-// Homme-mort : stimulus brut amont. En simulation avec boutons directionnels actifs,
-// l'appui homme-mort est automatiquement inclus pour faciliter les essais sur banc.
-Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount > 0);
 
 Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
 Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
