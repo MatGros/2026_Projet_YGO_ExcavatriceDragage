@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-15T05:28:44.019475" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-15T05:28:44.019475">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T09:01:36.174541" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T09:01:36.174541">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -473,389 +473,6 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_fbSim_Translation_ExtLink_Echo">
-        <baseType>
-          <struct>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitré PRG_03</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FBState">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État FB_Translation</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AxisBlockReason">
-              <type>
-                <derived name="E_TranslationTraceBlockReason" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cause prioritaire de blocage M3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintenanceTargetEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accès zone Maintenance accordé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintenanceZoneAccess">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton IHM d'accès zone Maintenance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SafeStop">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop M3 effectif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerCutOff">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance demandée par la safety M3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LimitSwitchTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de course Trémie (stable)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LimitSwitchMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de course Maintenance ou P1 si zone interdite</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PositionReached">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible atteinte</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ActiveTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande active vers Trémie</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ActiveMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande active vers Maintenance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Jeton dernier point franchi : Trémie</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AtPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Jeton dernier point franchi : PV</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AtP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Jeton dernier point franchi : P2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AtP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Jeton dernier point franchi : P1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AtMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Jeton dernier point franchi : Maintenance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SensorWordIncoherent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot capteurs incohérent côté PLC</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EstimatedPos_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position estimée PLC, m (0 Maint -&gt; +X Trémie)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SafetyErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield live FB_Safety_Translation</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>942264b5-586e-54d2-baf3-aff3f43d06e6</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 ST_fbSim_Translation_ExtLink_Echo — État décisionnel M3 renvoyé au simulateur externe
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Copie en lecture seule de l'état PLC M3 (mode, autorisations, verrous,
-      position décodée) transmise à la passerelle FMU pour diagnostic et affichage.
-   🔒 Aucune commande : le simulateur l'affiche et la journalise, il n'agit jamais dessus.
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="E_Mode">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLE" value="0" />
-              <value name="MAINT_N1" value="1" />
-              <value name="MAINT_N2" value="2" />
-              <value name="SEMI_AUTO" value="3" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N1</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N2</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SEMI_AUTO</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_State">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLED" value="0" />
-              <value name="INIT" value="1" />
-              <value name="READY" value="2" />
-              <value name="BUSY" value="3" />
-              <value name="DONE" value="4" />
-              <value name="STOPPING" value="5" />
-              <value name="ERROR" value="6" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>INIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>BUSY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>DONE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>STOPPING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>ERROR</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut actif non acquitté (FB en erreur — HMI non aveugle)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_TranslationTraceBlockReason">
-        <baseType>
-          <enum>
-            <values>
-              <value name="NONE" value="0" />
-              <value name="POWER_CUTOFF" value="1" />
-              <value name="SAFESTOP" value="2" />
-              <value name="SAFETY_FAULT" value="3" />
-              <value name="HEIGHT_INTERLOCK" value="4" />
-              <value name="DRIVE_UNAVAILABLE" value="5" />
-              <value name="FINAL_INTERLOCK" value="6" />
-              <value name="FAULT" value="7" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>NONE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Aucun blocage — permis de mouvement effectif</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>POWER_CUTOFF</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance amont (instSafetyTranslationM3.PowerCutOff) — priorité max</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SAFESTOP</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🟧 SafeStop effectif (InputModule OR safety M3)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SAFETY_FAULT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Défaut safety M3 latched (FB_Safety_Translation.Fault.Error)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HEIGHT_INTERLOCK</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Interlock hauteur M1/M2 actif (risque collision)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>DRIVE_UNAVAILABLE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Variateur AC600 injoignable / non opérationnel</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>FINAL_INTERLOCK</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Barrière finale en défaut (frein / redémarrage)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>FAULT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Défaut mouvement M3 latched (FB_Translation.Fault.Error)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>7bd7bd96-6f5f-5a55-98d4-99bd61298849</ObjectId>
-          </data>
-        </addData>
-      </dataType>
     </dataTypes>
     <pous>
       <pou name="FB_SimBench" pouType="functionBlock">
@@ -867,17 +484,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Activation globale (GVL_Simulation.SimulationModeActive)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OperatorSourceActive">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Source operateur simulee effectivement selectionnee</xhtml>
               </documentation>
             </variable>
             <variable name="M1_RelayFwd">
@@ -1092,31 +698,6 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = commande desserrage frein M3</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_SetpointFrequencyHz">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Source externe OpenModelica M3 (lien UDP FB_Sim_Translation_ExtLink) ──
---&gt; [CMD] Consigne fréquence variateur M3, Hz x100 (sortie finale PRG_06)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_OpenModelicaActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = image M3 fournie par le simulateur externe</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_PlcEcho">
-              <type>
-                <derived name="ST_fbSim_Translation_ExtLink_Echo" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Etat decisionnel M3 renvoye au simulateur (diagnostic)</xhtml>
-              </documentation>
-            </variable>
             <variable name="PowerKeepAlive_A">
               <type>
                 <BOOL />
@@ -1165,14 +746,6 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée</xhtml>
               </documentation>
             </variable>
-            <variable name="SimPhaseRotationOkBit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = phases réseau OK ; FALSE = défaut rotation de phases</xhtml>
-              </documentation>
-            </variable>
             <variable name="SimEncoderSpeedFactor">
               <type>
                 <REAL />
@@ -1190,10 +763,10 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="1.3" />
+                <simpleValue value="0.35" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; 1.30 = finit a la butee ouverte</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; ~0.35 = finit dans la bande ouvert/ferme malgre l'anticipation d'arret</xhtml>
               </documentation>
             </variable>
             <variable name="SimTopPositionActive">
@@ -1533,19 +1106,6 @@ reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non c
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][SYNTHETIQUE] Gain de reaction de charge M3, m/s2</xhtml>
               </documentation>
             </variable>
-            <variable name="SimM3SpeedFactor">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ACCELERATION DU BANC M3 : chariot ET frequence retournee x facteur (1..5), estimation coherente.
-Volontairement NON cable par PRG_02 : se regle en ligne sur l'instance (instSimBench.SimM3SpeedFactor).
---&gt; [TST] Facteur de vitesse du banc M3, 1,0 = dynamique reelle</xhtml>
-              </documentation>
-            </variable>
             <variable name="SimJoystickLeft_Rev_TREMIE_Active">
               <type>
                 <BOOL />
@@ -1789,39 +1349,6 @@ Volontairement NON cable par PRG_02 : se regle en ligne sur l'instance (instSimB
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Demi-largeur de la bande franc ouvert/fermé (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketOffsetOpen_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Butée mécanique benne OUVERTE (m, écart M2-M1)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BucketOpenAnticipation_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1.3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Anticipation arrêt ouverture benne (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BucketAx15bOpenActive">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Étape AX15B active</xhtml>
-              </documentation>
-            </variable>
             <variable name="HwReal">
               <type>
                 <derived name="ST_HardwareImage" />
@@ -1962,39 +1489,6 @@ le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317
 &lt;-- [DIAG] Un capteur M3 publie une excursion courte</xhtml>
               </documentation>
             </variable>
-            <variable name="M3LinkReady">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lien simulateur externe M3 -- diagnostic seul, publié par PRG_02 vers GVL_Simulation.
-&lt;-- [STAT] Lien externe M3 établi (trame valide, non expiré)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3LinkTimeout">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Lien externe M3 expiré</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3LinkInvalid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Trame externe M3 rejetée ou lien expiré</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3LinkAge_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Durée sans trame valide, ms</xhtml>
-              </documentation>
-            </variable>
           </outputVars>
           <inOutVars>
             <variable name="RawPosM1">
@@ -2031,18 +1525,6 @@ odometrique reel (GVL_PERSISTENT._TranslationGainMetersPerHzSec). C'est CETTE co
 est effectivement passee a instSimTranslation (ligne 567) : changer le seul defaut du FB
 n'aurait aucun effet en simulation. Garde-fou : gate G518.
 Temps de Trémie à Maintenance à 100 %, modèle banc uniquement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_M3MaxFreq_Hz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="50" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maximum variateur M3 : DOIT egaler GVL_PERSISTENT._TranslationMaxFreq_Hz (PRG_02 envoie f/50 x 100).
-Constante locale (L_SIMULATION ne lit pas GVL_PERSISTENT) ; egalite verifiee par G518.</xhtml>
               </documentation>
             </variable>
             <variable name="CST_SimBenchCycleTimeS">
@@ -2124,14 +1606,6 @@ Constante locale (L_SIMULATION ne lit pas GVL_PERSISTENT) ; egalite verifiee par
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Modèle translation M3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instSimTranslationExtLink">
-              <type>
-                <derived name="FB_Sim_Translation_ExtLink" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Lien simulateur externe M3</xhtml>
               </documentation>
             </variable>
             <variable name="instSimJoystick">
@@ -2255,20 +1729,12 @@ Constante locale (L_SIMULATION ne lit pas GVL_PERSISTENT) ; egalite verifiee par
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens arrière M3</xhtml>
               </documentation>
             </variable>
-            <variable name="SimJoystickManualNeutral">
+            <variable name="SimJoystickDirectionCount">
               <type>
-                <BOOL />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Axes manuels au neutre nominal</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SimJoystickGesturePermit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Aucune injection manuelle concurrente au geste</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Nombre de directions actives</xhtml>
               </documentation>
             </variable>
             <variable name="M3_ActualFreqHz">
@@ -2320,50 +1786,10 @@ Constante locale (L_SIMULATION ne lit pas GVL_PERSISTENT) ; egalite verifiee par
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="1.3" />
+                <simpleValue value="0.35" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance de roulis M2 courante</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2EffectiveCoastDistance_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance appliquée au codeur M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2AutoOpenCoastArmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fin d'ouverture automatique à simuler</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2OpenDistanceRemaining_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance restante à la butée ouverte</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2OpenStopThreshold_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Seuil avec avance d'un scan d'acquisition</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2ExpectedStepDistance_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Course codeur M2 du scan actif</xhtml>
               </documentation>
             </variable>
             <variable name="M2CoupledDescentActive">
@@ -2559,10 +1985,9 @@ Constante locale (L_SIMULATION ne lit pas GVL_PERSISTENT) ; egalite verifiee par
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
 
-   🎯 Rôle : Compose les blocs de modèle de simulation :
+   🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
       - FB_Sim_Encoder (instM1, instM2)
-      - FB_Sim_Translation (instTranslation) ou, si M3_OpenModelicaActive,
-        FB_Sim_Translation_ExtLink (lien UDP simulateur externe)
+      - FB_Sim_Translation (instTranslation)
       - FB_Sim_Joystick (instJoystick)
       - FB_Sim_Safety (instSafety)
 
@@ -2595,13 +2020,6 @@ IF NOT Enable THEN
     Translation := HwReal.Translation;
     Operator    := HwReal.Operator;
     Machine     := HwReal.Machine;
-    // 🔌 Lien externe M3 coupé explicitement : socket fermé, état de liaison retombé.
-    instSimTranslationExtLink(Enable := FALSE);
-    instSimJoystick(Enable := FALSE);
-    M3LinkReady   := FALSE;
-    M3LinkTimeout := FALSE;
-    M3LinkInvalid := FALSE;
-    M3LinkAge_Ms  := 0;
     RETURN;
 END_IF;
 
@@ -2730,35 +2148,6 @@ IF M2CoupledDescentActive THEN
     M2EffectiveSpeedScaleFactor := SimEncoderSpeedFactor * MAX(0.0, SimM2CoupledDescentFactor);
 END_IF;
 
-// P02 consomme la mesure publiée au scan précédent. Reconstituer le déplacement
-// de ce scan évite un trou d'un cycle lors du seuil d'arrêt de FB_Bucket.
-M2ExpectedStepDistance_M := (1.0 + (INT_TO_REAL(MAX(M2_StepNumber, 1)) - 1.0) * 0.25)
-                            * MAX(0.0, SimEncoderSpeedFactor)
-                            * CST_SimBenchCycleTimeS;
-M2OpenStopThreshold_M := BucketOffsetOpen_M + MAX(0.0, BucketOpenAnticipation_M)
-                         + M2ExpectedStepDistance_M;
-
-// Armer le roulis long uniquement à l'approche du seuil d'ouverture AX15B.
-// Un jog manuel, un homing ou un arrêt ailleurs garde le roulis historique.
-IF NOT M2_RelayRev OR M2_RelayFwd THEN
-    M2AutoOpenCoastArmed := FALSE;
-ELSIF SimWinchCouplingModelActive AND BucketAx15bOpenActive
-      AND NOT M1_RelayFwd AND NOT M1_RelayRev
-      AND (M2_CablePos_M - M1_CablePos_M)
-          &lt;= M2OpenStopThreshold_M THEN
-    M2AutoOpenCoastArmed := TRUE;
-END_IF;
-
-// À l'arrêt anticipé automatique, le roulis couvre seulement l'écart restant
-// jusqu'à la butée ouverte : il ne sur-ouvre pas et ne modifie pas le jog manuel.
-M2EffectiveCoastDistance_M := M2_EffectiveCoastM;
-IF M2AutoOpenCoastArmed THEN
-    M2OpenDistanceRemaining_M := MAX(0.0, M2_CablePos_M - M1_CablePos_M
-                                          - BucketOffsetOpen_M - M2ExpectedStepDistance_M);
-    M2EffectiveCoastDistance_M := MIN(MAX(0.0, BucketOpenAnticipation_M),
-                                      M2OpenDistanceRemaining_M);
-END_IF;
-
 // Instance modèle codeur M2 (avec roulis et dispersion)
 instSimEncoderM2(
     Enable           := TRUE,
@@ -2768,7 +2157,7 @@ instSimEncoderM2(
     PresetCmd        := M2_PresetCmd,
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := M2EffectiveSpeedScaleFactor,
-    CoastDistanceM   := M2EffectiveCoastDistance_M,
+    CoastDistanceM   := M2_EffectiveCoastM,
     SpeedReportTauS  := WinchSpeedReportTauEffectiveS,
     TestOffsetCmd    := SimSyncDeviationInjectM2,
     TestOffsetPts    := M2_OffsetPts,
@@ -2929,13 +2318,11 @@ M3_RelayFwd := M3_ReqTremie AND NOT M3_ReqMaintenance;
 M3_RelayRev := M3_ReqMaintenance AND NOT M3_ReqTremie;
 
 instSimTranslation(
-    Enable          := NOT M3_OpenModelicaActive,
+    Enable          := TRUE,
     ReqTremie       := M3_RelayFwd,
     ReqMaintenance  := M3_RelayRev,
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
     FullTravelTimeS := CST_M3FullTravelTimeS,
-    MaxFreq_Hz      := CST_M3MaxFreq_Hz,
-    SpeedFactor     := SimM3SpeedFactor,
     BrakeReleaseCmd := M3_BrakeCmd,
     SensorIntermittenceActive := SimM3SensorIntermittenceActive,
     SensorStabilizationS := SimM3SensorStabilizationS,
@@ -2953,20 +2340,6 @@ instSimTranslation(
 );
 M3BrakeFaultCloseActive := instSimTranslation.BrakeFaultCloseActive;
 M3SensorBlipActive := instSimTranslation.SensorBlipActive;
-
-// 🔌 Lien externe : actif uniquement si la source externe est sélectionnée (modèle ST sinon).
-instSimTranslationExtLink(
-    Enable              := M3_OpenModelicaActive,
-    ReqTremie           := M3_RelayFwd,
-    ReqMaintenance      := M3_RelayRev,
-    SetpointFrequencyHz := M3_SetpointFrequencyHz,
-    BrakeReleaseCmd     := M3_BrakeCmd,
-    PlcEcho             := M3_PlcEcho
-);
-M3LinkReady   := instSimTranslationExtLink.LinkReady;
-M3LinkTimeout := instSimTranslationExtLink.LinkTimeout;
-M3LinkInvalid := instSimTranslationExtLink.LinkInvalid;
-M3LinkAge_Ms  := instSimTranslationExtLink.LinkAge_Ms;
 
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
 // même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).
@@ -3007,54 +2380,49 @@ Translation.M3_StatusWord        := M3_StatusWordSim;
 Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
 Translation.AC600_DeviceState    := DEVICE_STATE.RUNNING; // État device RUNNING
 
-// 🔀 Aiguillage source M3 : le simulateur externe remplace uniquement l'image de retours du modèle ST.
-// La logique PLC continue de produire les commandes et reste inchangée.
-IF M3_OpenModelicaActive THEN
-    Translation := instSimTranslationExtLink.Translation;
-END_IF;
-
 
 {endregion}
 
 {region "§4 Simulation operateur joystick"}
 // ── 3. MODÈLE OPÉRATEUR / JOYSTICK ───────────────────────────────────────────
-IF NOT OperatorSourceActive THEN
-    // Le geste ne continue pas en arriere-plan lorsque le domaine est reel.
-    instSimJoystick(Enable := FALSE);
-    Operator := HwReal.Operator;
+instSimJoystick(
+    Enable              := TRUE,
+    NeutralRaw          := 5000,
+    MaxRaw              := 10000,
+    BtnLeft_Rev_TREMIE  := SimJoystickLeft_Rev_TREMIE_Active,
+    BtnRight_Fwd_MAINT  := SimJoystickRight_Fwd_MAINT_Active,
+    BtnFwd_Up_Close     := SimJoystickFwd_Up_Close_Active,
+    BtnRev_Down_Open    := SimJoystickRev_Down_Open_Active,
+    OvershootActive     := SimJoystickOvershoot_Active,
+    BagotementActive    := SimJoystickBagotement_Active,
+    CycleTimeS          := 0.010
+);
+
+// Les boutons directionnels simplifient les essais : une commande unique impose
+// une butée d'axe ; aucune commande ou une combinaison reste au neutre / stimulus avancé.
+// Le modèle dynamique (montée/retombée/bagotement) pilote RawX/RawY dès qu'un bouton est actif.
+SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeft_Rev_TREMIE_Active)
+                           + BOOL_TO_INT(SimJoystickRight_Fwd_MAINT_Active)
+                           + BOOL_TO_INT(SimJoystickFwd_Up_Close_Active)
+                           + BOOL_TO_INT(SimJoystickRev_Down_Open_Active);
+IF (SimJoystickDirectionCount &gt;= 1) OR instSimJoystick.ReturningActive THEN
+    // Bouton(s) actif(s) OU retour dynamique en cours (retombée/bagotement) → sortie du modèle.
+    // (≥2 boutons : le modèle gère lui-même le neutre — pas de diagonale implicite.)
+    Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
+    Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
 ELSE
-    SimJoystickManualNeutral := (SimJoystickRawX = 5000) AND (SimJoystickRawY = 5000);
-    SimJoystickGesturePermit := SimJoystickManualNeutral AND NOT SimJoystickRawButton;
-    instSimJoystick(
-        Enable              := TRUE,
-        GesturePermit       := SimJoystickGesturePermit,
-        NeutralRaw          := 5000,
-        MaxRaw              := 10000,
-        BtnLeft_Rev_TREMIE  := SimJoystickLeft_Rev_TREMIE_Active,
-        BtnRight_Fwd_MAINT  := SimJoystickRight_Fwd_MAINT_Active,
-        BtnFwd_Up_Close     := SimJoystickFwd_Up_Close_Active,
-        BtnRev_Down_Open    := SimJoystickRev_Down_Open_Active,
-        OvershootActive     := SimJoystickOvershoot_Active,
-        BagotementActive    := SimJoystickBagotement_Active,
-        CycleTimeS          := 0.010
-    );
-
-    // Une seule source possede les trois signaux : aucun melange bouton/axes.
-    // La propriete automatique persiste au retour et si un stimulus manuel est en conflit.
-    IF instSimJoystick.ModelActive THEN
-        Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
-        Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
-        Operator.JoyBtnRaw := instSimJoystick.RawButton;
-    ELSE
-        // Modèle au repos → stimulus analogique avancé (mode « sans bouton »).
-        Operator.JoyXRaw_ANA1 := SimJoystickRawX;
-        Operator.JoyYRaw_ANA2 := SimJoystickRawY;
-        Operator.JoyBtnRaw := SimJoystickRawButton;
-    END_IF;
-
-    Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
-    Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
+    // Modèle au repos → stimulus analogique avancé (mode « sans bouton »).
+    Operator.JoyXRaw_ANA1 := SimJoystickRawX;
+    Operator.JoyYRaw_ANA2 := SimJoystickRawY;
 END_IF;
+
+// Homme-mort : stimulus brut amont. En simulation avec boutons directionnels actifs,
+// l'appui homme-mort est automatiquement inclus pour faciliter les essais sur banc.
+Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount &gt; 0);
+
+Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
+Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
+
 
 {endregion}
 
@@ -3063,7 +2431,6 @@ END_IF;
 instSimSafety(
     Enable            := TRUE,
     SimChainOkBit     := SimChainOkBit,
-    SimPhaseRotationOkBit := SimPhaseRotationOkBit,
     PowerCutOff_A     := PowerKeepAlive_A,
     PowerCutOff_B     := PowerKeepAlive_B,
     PowerCutOffRequest:= PowerCutOffRequest,
@@ -3074,7 +2441,7 @@ instSimSafety(
 
 Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
 Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
-Machine.PhaseRotationOk_DI          := instSimSafety.SimPhaseRotationOk;
+Machine.PhaseRotationOk_DI             := TRUE;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
 instKoboldPowerUpTimer(IN := KoboldAutoEpisodeActive AND KoboldMeasureEnable
                         AND (M1_CablePos_M &gt; KoboldAutoDepthEpisode_M),
@@ -3703,39 +3070,6 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — 10 ms</xhtml>
               </documentation>
             </variable>
-            <variable name="GesturePermit">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Stimuli manuels au repos avant un geste automatique</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArmHoldTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#200MS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Appui bouton avant debattement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ButtonReleaseDelay">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#200MS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Maintien bouton apres debut debattement</xhtml>
-              </documentation>
-            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawX">
@@ -3759,15 +3093,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Appui armement simule, relache pendant le maintien du manche</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ModelActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Propriete exclusive des trois entrees brutes pendant le geste et le retour</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Homme-mort brut = un bouton directionnel actif</xhtml>
               </documentation>
             </variable>
             <variable name="ReturningActive">
@@ -3780,73 +3106,6 @@ END_IF;
             </variable>
           </outputVars>
           <localVars>
-            <variable name="instArmTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Maintien armement avant debattement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instButtonReleaseTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Relachement bouton apres debut debattement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="GestureStep">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Attente relachement, disponible, appui, mouvement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RequestedDirection">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction unique demandee, 0 si aucune ou conflit</xhtml>
-              </documentation>
-            </variable>
-            <variable name="GestureDirection">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction memorisee au nouvel appui</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeflectionActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debattement admis pour le geste courant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RequestMatchesGesture">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction demandee identique au geste</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TimingValid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Parametres dynamiques strictement positifs</xhtml>
-              </documentation>
-            </variable>
             <variable name="FirstCycle">
               <type>
                 <BOOL />
@@ -3960,94 +3219,6 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accélération de l'oscillateur</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_GESTURE_WAIT_RELEASE">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Relachement complet et retour neutre requis</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_GESTURE_READY">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Nouveau geste disponible</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_GESTURE_ARM">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Appui armement, manche neutre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_GESTURE_MOVE">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Manche deplace, bouton ensuite relache</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_DIRECTION_LEFT">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande X negatif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_DIRECTION_RIGHT">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande X positif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_DIRECTION_FORWARD">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande Y positif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_DIRECTION_REVERSE">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="4" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Demande Y negatif</xhtml>
-              </documentation>
-            </variable>
             <variable name="CST_ST_IDLE">
               <type>
                 <INT />
@@ -4138,13 +3309,38 @@ END_IF;
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧪 FB_Sim_Joystick — Simulation des entrees brutes joystick (bus CAN hors ligne)
-   🎯 Rôle : reproduire un geste operateur depuis un bouton directionnel.
-   Appui armement, debattement, relachement armement, retour dynamique.
-   Aucun etat arme produit ; permis et armement restent au joystick reel.
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
+   ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   =======================================================================
+   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
+   🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
+      (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
+      permanence — un vrai contournement de sécurité). Ici, on simule les
+      ENTRÉES BRUTES du capteur (`RawX`/`RawY`/`RawButton`) : le homme-mort réel
+      de `FB_Joystick` reste pleinement actif et doit toujours être "actionné"
+      (forcer `RawButton` en instance CODESYS) pour armer — comportement
+      métier testé pour de vrai, pas contourné.
+   🕹️ Comportement dynamique (conception validée) :
+      - Ascending : bouton actif → `RawX`/`RawY` monte de `NeutralRaw` vers la cible
+        (0 ou `MaxRaw`) en `RiseTimeS`, avec un bruit pseudo-aléatoire léger.
+      - Dépassement (`OvershootActive`) : la cible de montée DÉPASSE la butée
+        (MaxRaw+AMT ou 0−AMT) → déclenche le défaut capteur hors plage.
+      - Retombée : bouton relâché → descente LINÉAIRE en `FallTimeMs` vers le neutre.
+      - Bagotement (`BagotementActive`) : au retour, petit balancement de quelques %
+        autour du neutre avant de se stabiliser.
+   📥 Enable        : simulation active (SimulationModeActive AND NOT BusJoystickSignalIsReal)
+   📥 NeutralRaw    : valeur brute simulée au repos (voir GVL_Simulation.TstJoystickForceNeutralRaw)
+   📥 MaxRaw        : valeur brute simulée à fond (voir GVL_Simulation.TstJoystickForceMaxRaw)
+   📥 Btn*          : boutons directionnels (1 seul impose une butée d'axe ; 0 ou ≥2 = neutre)
+   📥 OvershootActive : bagotement au retour (test mouvement parasite)
+   📥 RiseTimeS / FallTimeMs / CycleTimeS : dynamique temporelle (pattern FB_Sim_Encoder)
+   📤 RawX/RawY     : valeurs brutes dynamiques (neutre = NeutralRaw)
+   📤 RawButton     : homme-mort brut = un bouton directionnel actif
+   💡 Note d'application : en vue instance CODESYS, forcer `RawX`/`RawY` à `MaxRaw` (ou une
+      valeur intermédiaire) pour simuler un débattement, et `RawButton` à `TRUE` pour simuler
+      l'appui homme-mort — exactement comme on forcerait le vrai capteur.
+   ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Joystick) ===</xhtml>
           </documentation>
         </interface>
@@ -4157,19 +3353,13 @@ END_IF;
 {region "§1 Gate"}
 // 🔑 Initialise au neutre au premier cycle uniquement ; ensuite RawX/RawY sont pilotés
 // dynamiquement par les boutons. Quand la simulation est coupée, on revient au neutre.
-TimingValid := (RiseTimeS &gt; 0.0) AND (CycleTimeS &gt; 0.0) AND (FallTimeMs &gt; T#0MS);
-IF NOT Enable OR NOT TimingValid THEN
+IF NOT Enable THEN
     FirstCycle := TRUE;
     State      := CST_ST_IDLE;
     RawX       := NeutralRaw;
     RawY       := NeutralRaw;
     RawButton  := FALSE;
     ReturningActive := FALSE; // 📊 Neutralisation : simulation inactive hors Enable
-    ModelActive := FALSE;
-    GestureStep := CST_GESTURE_WAIT_RELEASE;
-    GestureDirection := 0;
-    instArmTimer(IN := FALSE, PT := ArmHoldTime);
-    instButtonReleaseTimer(IN := FALSE, PT := ButtonReleaseDelay);
     RETURN;
 END_IF;
 {endregion}
@@ -4181,7 +3371,6 @@ IF FirstCycle THEN
     RawButton  := FALSE;
     State      := CST_ST_IDLE;
     FirstCycle := FALSE;
-    GestureStep := CST_GESTURE_WAIT_RELEASE;
 END_IF;
 {endregion}
 
@@ -4198,57 +3387,7 @@ Noise   := (RandCnt MOD 50) - 25;   // ±25 points (≈ ±0.5% de la course)
 // déclencher le défaut capteur hors plage (RawOutOfRange) — test du dépassement de valeur.
 BtnCount := BOOL_TO_INT(BtnLeft_Rev_TREMIE) + BOOL_TO_INT(BtnRight_Fwd_MAINT)
           + BOOL_TO_INT(BtnFwd_Up_Close) + BOOL_TO_INT(BtnRev_Down_Open);
-RequestedDirection := 0;
 IF BtnCount = 1 THEN
-    IF BtnLeft_Rev_TREMIE THEN RequestedDirection := CST_DIRECTION_LEFT;
-    ELSIF BtnRight_Fwd_MAINT THEN RequestedDirection := CST_DIRECTION_RIGHT;
-    ELSIF BtnFwd_Up_Close THEN RequestedDirection := CST_DIRECTION_FORWARD;
-    ELSE RequestedDirection := CST_DIRECTION_REVERSE;
-    END_IF;
-END_IF;
-
-// Un seul appui brut par geste ; aucun nouvel essai tant que l'IHM reste tenue.
-instArmTimer(IN := GestureStep = CST_GESTURE_ARM, PT := ArmHoldTime);
-instButtonReleaseTimer(IN := GestureStep = CST_GESTURE_MOVE, PT := ButtonReleaseDelay);
-DeflectionActive := FALSE;
-RawButton := FALSE;
-RequestMatchesGesture := (RequestedDirection = GestureDirection) AND (BtnCount = 1);
-IF BtnCount &gt; 0 THEN ModelActive := TRUE; END_IF;
-IF NOT GesturePermit THEN GestureStep := CST_GESTURE_WAIT_RELEASE; END_IF;
-
-IF GestureStep = CST_GESTURE_WAIT_RELEASE THEN
-        // Les boutons doivent etre relaches APRES stabilisation du retour.
-        IF (BtnCount = 0) AND (State = CST_ST_IDLE) AND GesturePermit THEN
-            GestureStep := CST_GESTURE_READY;
-            ModelActive := FALSE;
-        END_IF;
-ELSIF GestureStep = CST_GESTURE_READY THEN
-        IF BtnCount = 1 THEN
-            GestureDirection := RequestedDirection;
-            GestureStep := CST_GESTURE_ARM;
-            RawButton := TRUE;
-        ELSIF BtnCount &gt; 1 THEN
-            GestureStep := CST_GESTURE_WAIT_RELEASE;
-        END_IF;
-ELSIF GestureStep = CST_GESTURE_ARM THEN
-        IF NOT RequestMatchesGesture THEN
-            GestureStep := CST_GESTURE_WAIT_RELEASE;
-        ELSE
-            RawButton := TRUE;
-            IF instArmTimer.Q THEN GestureStep := CST_GESTURE_MOVE; END_IF;
-        END_IF;
-ELSIF GestureStep = CST_GESTURE_MOVE THEN
-        IF NOT RequestMatchesGesture THEN
-            GestureStep := CST_GESTURE_WAIT_RELEASE;
-        ELSE
-            DeflectionActive := TRUE;
-            RawButton := NOT instButtonReleaseTimer.Q;
-        END_IF;
-ELSE
-    GestureStep := CST_GESTURE_WAIT_RELEASE;
-END_IF;
-
-IF DeflectionActive THEN
     IF BtnLeft_Rev_TREMIE THEN
         IF OvershootActive THEN TargetX := 0 - CST_OVERSHOOT_AMT; ELSE TargetX := 0; END_IF;
         TargetY := NeutralRaw; ActiveAxis := 1;
@@ -4353,7 +3492,7 @@ END_IF;
 {endregion}
 
 {region "§8 Homme-mort brut + drapeau retour"}
-// RawButton est exclusivement produit par le sequenceur du geste (§4).
+RawButton := BtnLeft_Rev_TREMIE OR BtnRight_Fwd_MAINT OR BtnFwd_Up_Close OR BtnRev_Down_Open;
 // Drapeau "retour dynamique en cours" : TRUE si l'état est FALL ou OVERSHOOT (retombée/bagotement).
 // Permet à FB_SimBench d'émettre la sortie du modèle même après relâchement du bouton.
 ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
@@ -4384,14 +3523,6 @@ ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SimPhaseRotationOkBit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = phases réseau OK simulées ; FALSE = défaut rotation de phases injecté</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOff_A">
@@ -4458,14 +3589,6 @@ ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contacteur simulé engagé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SimPhaseRotationOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contrôleur de phases simulé : TRUE = phases saines (aucun défaut)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -4632,7 +3755,6 @@ Temps de retombée relais AU (ouverture chaîne)</xhtml>
 IF NOT Enable THEN
     SimChainOk     := FALSE;
     SimContactorOk := FALSE;
-    SimPhaseRotationOk := FALSE;
     ContactorLatch := FALSE;
     ChainOpen      := TRUE; // Chaîne ouverte par défaut à la ré-entrée (on n'a pas armé)
     ChainOpenReq   := FALSE;
@@ -4709,10 +3831,6 @@ END_IF;
 
 // Recopie vers la sortie
 SimContactorOk := ContactorLatch;
-
-// Contrôleur de phases : simple propagation du bit opérateur (TRUE = sain).
-// Inopérant hors simulation (le banc ne publie l'image machine que sous Enable).
-SimPhaseRotationOk := SimPhaseRotationOkBit;
 {endregion}
 </xhtml>
           </ST>
@@ -4775,36 +3893,6 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <simpleValue value="TRUE" />
               </initialValue>
             </variable>
-            <variable name="MaxFreq_Hz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="50" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ECHELLE DE LA CONSIGNE. PRG_02 envoie SpeedCmd_Pct = f / 50 Hz x 100 : le simulateur reconvertit
-       avec le MEME maximum, sinon 20 Hz reels (40 %) deviendraient 16 Hz simules.
-       Maximum = GVL_PERSISTENT._TranslationMaxFreq_Hz (50 Hz), passe par FB_SimBench (CST_M3MaxFreq_Hz,
-       egalite verifiee par G518). Ne pas confondre avec CST_NominalFrequency_Hz (40 Hz) : echelle
-       ODOMETRIQUE (gain 0,02 m/(Hz.s)).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedFactor">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ACCELERATION DU BANC (confort d'essai). Le chariot avance SpeedFactor fois plus vite ET la
-       frequence RETOURNEE au PLC est multipliee d'autant : l'estimateur (f x gain) suit exactement
-       le chariot, sans saut de recalage, et le ratio publie reste 0,02 m/(Hz.s) (G518).
-       Borne 1..5. 1,0 = dynamique reelle. Le frein et la memoire de sens restent sur la frequence
-       physique du variateur simule.</xhtml>
-              </documentation>
-            </variable>
             <variable name="AccelRate_HzPerS">
               <type>
                 <REAL />
@@ -4818,11 +3906,8 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="25" />
+                <simpleValue value="20" />
               </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">pente d'arret relevee sur trace reelle (rampe variateur / rampe PLC)</xhtml>
-              </documentation>
             </variable>
             <variable name="DriveTimeConstantS">
               <type>
@@ -5158,14 +4243,6 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <REAL />
               </type>
             </variable>
-            <variable name="SpeedFactorApplied">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-            </variable>
             <variable name="CycleTimeS">
               <type>
                 <REAL />
@@ -5330,9 +4407,6 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
               <initialValue>
                 <simpleValue value="40" />
               </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">echelle ODOMETRIQUE lue par G518 — PAS le maximum variateur (MaxFreq_Hz)</xhtml>
-              </documentation>
             </variable>
             <variable name="CST_MinTimeS">
               <type>
@@ -5420,7 +4494,7 @@ IF Enable THEN
         DirectionSign := 1.0;
     END_IF;
 
-    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * MaxFreq_Hz / 100.0, MaxFreq_Hz);
+    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * 0.4, CST_NominalFrequency_Hz);
     IF DirectionSign = 0.0 THEN
         FrequencyTarget_Hz := 0.0;
     END_IF;
@@ -5431,10 +4505,9 @@ IF Enable THEN
         LoadFrequencyDroopGain_Hz := LoadFrequencyDroopGain_Hz, CycleTime_S := CycleTimeS);
     FrequencyCmd_Hz := instDrive.FrequencyCmd_Hz;
     ElectricalFrequency_Hz := instDrive.ElectricalFrequency_Hz;
-    SpeedFactorApplied := LIMIT(1.0, SpeedFactor, 5.0);
-    ActualFrequency_Hz := instDrive.ActualFrequency_Hz * SpeedFactorApplied;
+    ActualFrequency_Hz := instDrive.ActualFrequency_Hz;
     instBrake(Enable := TRUE, ReleaseCmd := BrakeReleaseCmd,
-        ActualFrequency_Hz := instDrive.ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
+        ActualFrequency_Hz := ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
         CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
         CycleTime_S := CycleTimeS,
         FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
@@ -5456,7 +4529,7 @@ IF Enable THEN
         TravelDirection := 1.0;
     ELSIF ReqTremie AND ReqMaintenance THEN
         TravelDirection := 0.0;
-    ELSIF ABS(instDrive.ActualFrequency_Hz) &lt;= CST_StopFrequency_Hz THEN
+    ELSIF ABS(ActualFrequency_Hz) &lt;= CST_StopFrequency_Hz THEN
         TravelDirection := 0.0;
     END_IF;
 
@@ -5603,1031 +4676,6 @@ SensorBlipActive := instSensorTremie.BlipActive OR instSensorPV.BlipActive
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>d7634526-8de9-5f93-b858-7e0bb59cdce2</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_Sim_Translation_ExtLink" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT LIGHT (Enable) ===
---&gt; [CMD] Lien actif (simulation + domaine M3 + source externe)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ReqTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES M3 ===
---&gt; [CMD] Demande vers Trémie (sortie finale PRG_06)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ReqMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande vers Maintenance (sortie finale PRG_06)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SetpointFrequencyHz">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne fréquence variateur, Hz x100</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BrakeReleaseCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = desserrage frein commandé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PlcEcho">
-              <type>
-                <derived name="ST_fbSim_Translation_ExtLink_Echo" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ECHO ETAT PLC (diagnostic simulateur) ===
---&gt; [TST] Etat decisionnel M3 copie dans la trame</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="Ready">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT LIGHT (Ready) ===
-&lt;-- [STAT] Socket ouvert, lien en cours d'échange</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Translation">
-              <type>
-                <derived name="ST_HwTranslation" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== IMAGE MATERIELLE M3 ===
-&lt;-- [DIAG] Image retours M3 (initiale P1, puis FMU)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LinkReady">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAT DU LIEN ===
-&lt;-- [STAT] Au moins une trame valide reçue et lien non expiré</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LinkTimeout">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Aucune trame valide depuis CST_LinkTimeout</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LinkInvalid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Dernière trame rejetée, ou lien expiré</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LinkAge_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Durée sans trame valide, ms</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TxCount">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Trames commande émises</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RxCount">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Trames réponse acceptées</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RejectCount">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Trames rejetées ou émissions en échec</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="AgeTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES ===
-* [INST] Durée sans trame valide</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SocketHandle">
-              <type>
-                <derived name="RTS_IEC_HANDLE" />
-              </type>
-              <initialValue>
-                <simpleValue value="RTS_INVALID_HANDLE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOCKET ===
-. [LOC] Socket UDP</xhtml>
-              </documentation>
-            </variable>
-            <variable name="NonBlocking">
-              <type>
-                <DINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Option socket non bloquant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SocketIsOpen">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Socket réellement ouvert (ni invalide, ni factice)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LastResult">
-              <type>
-                <derived name="RTS_IEC_RESULT" />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier code retour socket</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DestAddress">
-              <type>
-                <derived name="STRING" />
-              </type>
-              <initialValue>
-                <simpleValue value="" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Adresse loopback (variable : szDestAddress est VAR_IN_OUT)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Reply">
-              <type>
-                <derived name="UDP_REPLY" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Adresse émettrice de la réponse</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Tx">
-              <type>
-                <array>
-                  <dimension lower="0" upper="31" />
-                  <baseType>
-                    <BYTE />
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Trame commande</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Rx">
-              <type>
-                <array>
-                  <dimension lower="0" upper="63" />
-                  <baseType>
-                    <BYTE />
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Trame réponse</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Bytes">
-              <type>
-                <derived name="__XINT" />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Octets émis/reçus</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HasValidFrame">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAT DU LIEN ===
-. [LOC] Une trame valide a été acceptée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FrameAccepted">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Au moins une trame acceptée ce scan</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FrameRejected">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Au moins une trame rejetée ce scan</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FrameIsAcceptedNow">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Trame en cours de lecture acceptée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RxReads">
-              <type>
-                <UINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Lectures UDP effectuées ce scan</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Sequence">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Numéro de commande émise</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LastRxSequence">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier numéro de réponse accepté</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TxFrequency_x100">
-              <type>
-                <UINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DECODAGE TRAME ===
-. [LOC] Consigne bornée émise</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TxControlWord">
-              <type>
-                <UINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] 0=arrêt, 1=Trémie, 2=Maintenance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EchoFlagsA">
-              <type>
-                <BYTE />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Écho : autorisations, sécurité, fins de course</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EchoFlagsB">
-              <type>
-                <BYTE />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Écho : sens actif, jetons de position, lien</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EchoPos_Cm">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Écho : position estimée, cm</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RxSequence">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Numéro de la réponse</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RxCommandSequence">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Commande acquittée par la réponse</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RxFrequency_x100">
-              <type>
-                <UINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fréquence mesurée FMU</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RxBrakeIsOpen">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Frein ouvert (FMU)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RxStatusWord">
-              <type>
-                <WORD />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Status word variateur simulé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RxSensors">
-              <type>
-                <array>
-                  <dimension lower="0" upper="4" />
-                  <baseType>
-                    <BOOL />
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] 0=Trémie 1=PV 2=P2 3=P1 4=Maintenance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MagicIsValid">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] En-tête M3B1 reconnu</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TypeIsValid">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Schéma 1 et type réponse</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FrameIsValid">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] En-tête complet valide</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SequenceIsNewer">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Numéros strictement croissants</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SequenceHasWrapped">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Passage FFFFFFFF -&gt; 0</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LinkIsRestarting">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Premier échange ou reprise après expiration</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SequenceIsAccepted">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Numéro acceptable</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BreakTremiePv">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rupture de chaîne Trémie/PV</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BreakPvP2">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rupture de chaîne PV/P2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BreakP2P1">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rupture de chaîne P2/P1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BreakP1Maintenance">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rupture de chaîne P1/Maintenance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BreakNearTremie">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rupture côté Trémie</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BreakNearMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rupture côté Maintenance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SensorWordIsIncoherent">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mot capteurs hors chaîne terrain</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InitialImage">
-              <type>
-                <derived name="ST_HwTranslation" />
-              </type>
-              <initialValue>
-                <structValue>
-                  <value member="M3_PosP1_DI">
-                    <simpleValue value="TRUE" />
-                  </value>
-                  <value member="M3_PosMaintenance_DI">
-                    <simpleValue value="TRUE" />
-                  </value>
-                  <value member="M3_ThermalOK_DI">
-                    <simpleValue value="TRUE" />
-                  </value>
-                  <value member="M3_StatusWord">
-                    <simpleValue value="16#0080" />
-                  </value>
-                  <value member="AC600_DeviceState">
-                    <simpleValue value="DEVICE_STATE.RUNNING" />
-                  </value>
-                </structValue>
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== IMAGE INITIALE ===
-Zone P1 (00011) : AtPositionP1 n'est jamais forcé, le PLC attend un front capteur en mouvement.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_PortLocal">
-              <type>
-                <UINT />
-              </type>
-              <initialValue>
-                <simpleValue value="29061" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Port UDP loopback commande (passerelle FMU)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_PortRemote">
-              <type>
-                <UINT />
-              </type>
-              <initialValue>
-                <simpleValue value="29062" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Port UDP loopback réponse</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_TxSize">
-              <type>
-                <derived name="__XINT" />
-              </type>
-              <initialValue>
-                <simpleValue value="32" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Taille trame commande</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_RxSize">
-              <type>
-                <derived name="__XINT" />
-              </type>
-              <initialValue>
-                <simpleValue value="39" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Taille trame réponse</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_LinkTimeout">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#1s0ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Expiration du lien</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_MaxFrequency_x100">
-              <type>
-                <UINT />
-              </type>
-              <initialValue>
-                <simpleValue value="5000" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">50,00 Hz</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_SequenceMax">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="16#FFFFFFFF" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur avant rebouclage</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ControlWordTremie">
-              <type>
-                <UINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot de commande vers Trémie</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ControlWordMaint">
-              <type>
-                <UINT />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot de commande vers Maintenance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_MaxRxPerScan">
-              <type>
-                <UINT />
-              </type>
-              <initialValue>
-                <simpleValue value="8" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lectures UDP max par scan (vidage de file borné)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_EchoVersion">
-              <type>
-                <BYTE />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Version de l'écho PLC (0 = absent)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_EchoPosMin_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="-300" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bornes de l'écho position (INT en cm)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_EchoPosMax_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="300" />
-              </initialValue>
-            </variable>
-            <variable name="CST_CmPerM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Conversion m -&gt; cm</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ResultOk">
-              <type>
-                <derived name="RTS_IEC_RESULT" />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code retour socket OK (ERR_OK)</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Translation_ExtLink — Lien UDP vers le simulateur externe M3
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Échange UDP loopback avec la passerelle FMU OpenModelica et publie l'image
-      matérielle M3 (ST_HwTranslation) ; alternative externe à FB_Sim_Translation.
-   🔒 Sécurité : Enable=FALSE ferme le socket et neutralise ; loopback 127.0.0.1 uniquement ;
-      perte de liaison = dernière image valide gelée + LinkTimeout, jamais de saut de capteurs.
-   🔌 Protocole : trames binaires M3B1 (commande 32 octets, réponse 39 octets), cadence tâche.
-   🧩 Appelé par FB_SimBench (aiguillage M3_OpenModelicaActive) ; aucune lecture de GVL ici.
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   ═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-{region "§1 Gate neutralisation"}
-// === ⚙️ §1 GATE NEUTRALISATION ===
-IF NOT Enable THEN
-    IF SocketHandle &lt;&gt; SysTypes.RTS_INVALID_HANDLE THEN
-        SysSockCloseUdp(SocketHandle);
-    END_IF;
-    SocketHandle := SysTypes.RTS_INVALID_HANDLE;
-    HasValidFrame := FALSE;
-    FrameAccepted := FALSE;
-    Sequence := 0;
-    LastRxSequence := 0;
-    AgeTimer(IN := FALSE, PT := CST_LinkTimeout);
-    Ready := FALSE;
-    LinkReady := FALSE;
-    LinkTimeout := FALSE;
-    LinkInvalid := FALSE;
-    LinkAge_Ms := 0;
-    Translation := InitialImage;
-    RETURN;
-END_IF;
-{endregion}
-
-{region "§2 Image initiale avant la premiere trame valide"}
-// === 📥 §2 IMAGE INITIALE ===
-IF NOT HasValidFrame THEN
-    Translation := InitialImage;
-END_IF;
-{endregion}
-
-{region "§3 Ouverture du socket"}
-// === 🔌 §3 SOCKET ===
-// Handle 0 = socket factice (simulateur intégré de l'IDE, sans réseau) : jamais considéré ouvert.
-SocketIsOpen := (SocketHandle &lt;&gt; SysTypes.RTS_INVALID_HANDLE) AND (SocketHandle &lt;&gt; 0);
-IF NOT SocketIsOpen THEN
-    SocketHandle := SysSockCreateUdp(CST_PortLocal, CST_PortRemote, ADR(LastResult));
-    SocketIsOpen := (SocketHandle &lt;&gt; SysTypes.RTS_INVALID_HANDLE) AND (SocketHandle &lt;&gt; 0);
-    IF SocketIsOpen THEN
-        LastResult := SysSockIoctl(SocketHandle, SOCKET_FIONBIO, ADR(NonBlocking));
-        // 🔒 Socket non bloquant obligatoire : sinon la lecture gèlerait la tâche automate.
-        IF LastResult &lt;&gt; CST_ResultOk THEN
-            SysSockCloseUdp(SocketHandle);
-            SocketHandle := RTS_INVALID_HANDLE;
-            SocketIsOpen := FALSE;
-        END_IF;
-    END_IF;
-    Ready := FALSE;
-    RETURN;
-END_IF;
-Ready := TRUE;
-{endregion}
-
-{region "§4 Emission commande"}
-// === 📤 §4 EMISSION COMMANDE ===
-TxFrequency_x100 := MIN(WORD_TO_UINT(SetpointFrequencyHz), CST_MaxFrequency_x100);
-IF ReqTremie AND NOT ReqMaintenance THEN
-    TxControlWord := CST_ControlWordTremie;
-ELSIF ReqMaintenance AND NOT ReqTremie THEN
-    TxControlWord := CST_ControlWordMaint;
-ELSE
-    TxControlWord := 0;
-END_IF;
-
-// En-tête M3B1, schéma 1, type commande 1, numéro, Hz x100, mot de commande, frein.
-Tx[0] := 16#4D; Tx[1] := 16#33; Tx[2] := 16#42; Tx[3] := 16#31;
-Tx[4] := 1; Tx[5] := 1;
-Tx[6] := UDINT_TO_BYTE(Sequence AND 16#FF);
-Tx[7] := UDINT_TO_BYTE(SHR(Sequence, 8) AND 16#FF);
-Tx[8] := UDINT_TO_BYTE(SHR(Sequence, 16) AND 16#FF);
-Tx[9] := UDINT_TO_BYTE(SHR(Sequence, 24) AND 16#FF);
-Tx[10] := UINT_TO_BYTE(TxFrequency_x100 AND 16#FF);
-Tx[11] := UINT_TO_BYTE(SHR(TxFrequency_x100, 8));
-Tx[12] := UINT_TO_BYTE(TxControlWord AND 16#FF);
-Tx[13] := UINT_TO_BYTE(SHR(TxControlWord, 8));
-Tx[14] := BOOL_TO_BYTE(BrakeReleaseCmd);
-
-// 📊 Écho de l'état PLC dans les octets libres 23..31 (lecture seule côté simulateur).
-EchoFlagsA := BOOL_TO_BYTE(PlcEcho.MaintenanceTargetEnable)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.MaintenanceZoneAccess), 1)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.SafeStop), 2)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.PowerCutOff), 3)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.LimitSwitchTremie), 4)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.LimitSwitchMaintenance), 5)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.PositionReached), 6)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.ActiveTremie), 7);
-EchoFlagsB := BOOL_TO_BYTE(PlcEcho.ActiveMaintenance)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.AtTremie), 1)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.AtPV), 2)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.AtP2), 3)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.AtP1), 4)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.AtMaintenance), 5)
-           OR SHL(BOOL_TO_BYTE(LinkReady), 6)
-           OR SHL(BOOL_TO_BYTE(PlcEcho.SensorWordIncoherent), 7);
-EchoPos_Cm := REAL_TO_INT(LIMIT(CST_EchoPosMin_M, PlcEcho.EstimatedPos_M, CST_EchoPosMax_M) * CST_CmPerM);
-Tx[23] := CST_EchoVersion;
-Tx[24] := INT_TO_BYTE(PlcEcho.Mode);
-Tx[25] := INT_TO_BYTE(PlcEcho.FBState);
-Tx[26] := INT_TO_BYTE(PlcEcho.AxisBlockReason);
-Tx[27] := EchoFlagsA;
-Tx[28] := EchoFlagsB;
-Tx[29] := WORD_TO_BYTE(INT_TO_WORD(EchoPos_Cm) AND 16#FF);
-Tx[30] := WORD_TO_BYTE(SHR(INT_TO_WORD(EchoPos_Cm), 8));
-Tx[31] := WORD_TO_BYTE(PlcEcho.SafetyErrorId AND 16#FF);
-// Adresse loopback écrite en littéral : une constante STRING déclarée est importée vide
-// par le générateur PLCopenXML, et l'envoi partirait vers une adresse vide.
-Bytes := SysSockSendToUdp(SocketHandle, CST_PortLocal, DestAddress, ADR(Tx), SIZEOF(Tx), ADR(LastResult));
-IF Bytes = CST_TxSize THEN
-    TxCount := TxCount + 1;
-    Sequence := Sequence + 1;
-ELSE
-    RejectCount := RejectCount + 1;
-END_IF;
-{endregion}
-
-{region "§5 Reception et validation réponse"}
-// === 📥 §5 RECEPTION ===
-// File UDP vidée à chaque scan (bornée) : un retard ponctuel ne devient jamais permanent.
-// Chaque trame acceptée met à jour l'image ; la dernière acceptée l'emporte.
-FrameAccepted := FALSE;
-FrameRejected := FALSE;
-RxReads := 0;
-REPEAT
-Bytes := SysSockRecvFromUdp(SocketHandle, ADR(Rx), SIZEOF(Rx), ADR(Reply), ADR(LastResult));
-RxReads := RxReads + 1;
-FrameIsAcceptedNow := FALSE;
-IF Bytes = CST_RxSize THEN
-    MagicIsValid := (Rx[0] = 16#4D) AND (Rx[1] = 16#33) AND (Rx[2] = 16#42) AND (Rx[3] = 16#31);
-    TypeIsValid := (Rx[4] = 1) AND (Rx[5] = 2);
-    FrameIsValid := MagicIsValid AND TypeIsValid;
-
-    IF FrameIsValid THEN
-        RxSequence := BYTE_TO_UDINT(Rx[6]) OR SHL(BYTE_TO_UDINT(Rx[7]), 8)
-                      OR SHL(BYTE_TO_UDINT(Rx[8]), 16) OR SHL(BYTE_TO_UDINT(Rx[9]), 24);
-        RxCommandSequence := BYTE_TO_UDINT(Rx[10]) OR SHL(BYTE_TO_UDINT(Rx[11]), 8)
-                             OR SHL(BYTE_TO_UDINT(Rx[12]), 16) OR SHL(BYTE_TO_UDINT(Rx[13]), 24);
-
-        // Numéros strictement croissants, rebouclage FFFFFFFF -&gt; 0 admis, redémarrage passerelle admis.
-        SequenceIsNewer := (RxCommandSequence &gt; LastRxSequence) AND (RxSequence &gt; LastRxSequence);
-        SequenceHasWrapped := (LastRxSequence = CST_SequenceMax) AND (RxCommandSequence = 0) AND (RxSequence = 0);
-        LinkIsRestarting := AgeTimer.Q OR NOT HasValidFrame;
-        SequenceIsAccepted := SequenceIsNewer OR SequenceHasWrapped OR LinkIsRestarting;
-
-        RxFrequency_x100 := BYTE_TO_UINT(Rx[16]) OR SHL(BYTE_TO_UINT(Rx[17]), 8);
-        RxBrakeIsOpen := Rx[20] &lt;&gt; 0;
-        RxStatusWord := BYTE_TO_WORD(Rx[21]);
-        RxSensors[0] := Rx[22] &lt;&gt; 0;
-        RxSensors[1] := Rx[23] &lt;&gt; 0;
-        RxSensors[2] := Rx[24] &lt;&gt; 0;
-        RxSensors[3] := Rx[25] &lt;&gt; 0;
-        RxSensors[4] := Rx[26] &lt;&gt; 0;
-
-        // Chaîne terrain admissible : 11111 -&gt; 01111 -&gt; 00111 -&gt; 00011 -&gt; 00001 -&gt; 00000.
-        // Rupture = un capteur actif suivi d'un capteur inactif côté Maintenance (ex. 10111).
-        BreakTremiePv := RxSensors[0] AND NOT RxSensors[1];
-        BreakPvP2 := RxSensors[1] AND NOT RxSensors[2];
-        BreakP2P1 := RxSensors[2] AND NOT RxSensors[3];
-        BreakP1Maintenance := RxSensors[3] AND NOT RxSensors[4];
-        BreakNearTremie := BreakTremiePv OR BreakPvP2;
-        BreakNearMaintenance := BreakP2P1 OR BreakP1Maintenance;
-        SensorWordIsIncoherent := BreakNearTremie OR BreakNearMaintenance;
-
-        FrameIsAcceptedNow := SequenceIsAccepted AND NOT SensorWordIsIncoherent;
-    END_IF;
-
-    IF FrameIsAcceptedNow THEN
-        Translation.M3_PosTremie_DI := RxSensors[0];
-        Translation.M3_PosPV_DI := RxSensors[1];
-        Translation.M3_PosPVP2_DI := RxSensors[2];
-        Translation.M3_PosP1_DI := RxSensors[3];
-        Translation.M3_PosMaintenance_DI := RxSensors[4];
-        Translation.M3_BrakeIsOpen_DI := RxBrakeIsOpen;
-        Translation.M3_ThermalOK_DI := TRUE;
-        Translation.M3_StatusWord := RxStatusWord;
-        Translation.M3_ActualFrequencyHz := RxFrequency_x100;
-        Translation.AC600_DeviceState := DEVICE_STATE.RUNNING;
-        LastRxSequence := RxSequence;
-        HasValidFrame := TRUE;
-        RxCount := RxCount + 1;
-        FrameAccepted := TRUE;
-    ELSE
-        RejectCount := RejectCount + 1;
-        FrameRejected := TRUE;
-    END_IF;
-ELSIF Bytes &gt; 0 THEN
-    // Datagramme de taille inattendue : rejeté.
-    RejectCount := RejectCount + 1;
-    FrameRejected := TRUE;
-END_IF;
-UNTIL (Bytes &lt;= 0) OR (RxReads &gt;= CST_MaxRxPerScan)
-END_REPEAT;
-{endregion}
-
-{region "§6 Etat du lien"}
-// === 📊 §6 ETAT DU LIEN ===
-// Une trame rejetée ou absente laisse Translation inchangée (image gelée, pas de saut de capteurs).
-AgeTimer(IN := NOT FrameAccepted, PT := CST_LinkTimeout);
-LinkTimeout := AgeTimer.Q;
-LinkReady := HasValidFrame AND NOT AgeTimer.Q;
-LinkAge_Ms := TIME_TO_UDINT(AgeTimer.ET);
-
-IF FrameAccepted THEN
-    LinkInvalid := FALSE;
-ELSIF FrameRejected THEN
-    LinkInvalid := TRUE;
-END_IF;
-IF AgeTimer.Q THEN
-    LinkInvalid := TRUE;
-END_IF;
-{endregion}
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>cb6a7d98-36ae-5c14-9891-d5451c6e7dd0</ObjectId>
           </data>
         </addData>
       </pou>
@@ -7943,11 +5991,8 @@ Ready := TRUE;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="25" />
+                <simpleValue value="20" />
               </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">pente d'arret relevee sur trace reelle</xhtml>
-              </documentation>
             </variable>
             <variable name="TimeConstant_S">
               <type>
@@ -8030,11 +6075,8 @@ Ready := TRUE;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="50" />
+                <simpleValue value="40" />
               </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">plafond variateur reel (GVL_PERSISTENT._TranslationMaxFreq_Hz)</xhtml>
-              </documentation>
             </variable>
           </localVars>
           <documentation>
@@ -8684,9 +6726,7 @@ Ready := TRUE;
           <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
           <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
-          <Object Name="FB_Sim_Translation_ExtLink" ObjectId="cb6a7d98-36ae-5c14-9891-d5451c6e7dd0" />
           <Object Name="FB_Sim_WinchElectrical" ObjectId="d4300e91-0ca0-50b0-9b21-524eed13dd0f" />
-          <Object Name="ST_fbSim_Translation_ExtLink_Echo" ObjectId="942264b5-586e-54d2-baf3-aff3f43d06e6" />
           <Object Name="FB_Sim_PositionSensor" ObjectId="538b32eb-6dc2-59d5-8226-64383264fe4b" />
           <Object Name="FB_Sim_SuspendedLoad" ObjectId="5e90360e-a4b1-5c07-88d0-97d04f31b674" />
           <Object Name="FB_Sim_TranslationBrake" ObjectId="df996876-0665-532f-9bbb-9be3ca7669e4" />
@@ -8703,7 +6743,6 @@ Ready := TRUE;
             </Folder>
             <Folder Name="2_TRANSLATION">
               <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
-              <Object Name="E_TranslationTraceBlockReason" ObjectId="7bd7bd96-6f5f-5a55-98d4-99bd61298849" />
             </Folder>
             <Folder Name="1_TREUILS_BENNE">
               <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
@@ -8712,12 +6751,6 @@ Ready := TRUE;
         </Folder>
         <Folder Name="A_COMMUN">
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
-          <Folder Name="_TYPES">
-            <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
-          </Folder>
-        </Folder>
-        <Folder Name="F_MODES">
-          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
       </ProjectStructure>
     </data>

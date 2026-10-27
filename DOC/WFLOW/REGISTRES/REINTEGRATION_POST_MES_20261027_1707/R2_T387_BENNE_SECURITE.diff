@@ -1,0 +1,290 @@
+diff --git a/CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st b/CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+index 7091b5e5..89ef7397 100644
+--- a/CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
++++ b/CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+@@ -75,6 +75,7 @@ VAR_OUTPUT
+     M2_ReqDescend                   : BOOL;                           // <-- [ACT] Ordre descente vers Winch M2
+     M2_BucketJogLimit               : BOOL;                           // <-- [ACT] Plafond palier 1 du jog benne M2
+     CloseReached                    : BOOL;                           // <-- [STAT] Fermeture atteinte, maintien AX10B eventuel en cours
++    WaitingForOperator              : BOOL;                           // <-- [STAT] Fermeture engagee mais PERMIS NUL -> budget timeout gele (attente de permis), consigne jamais servie
+ 
+     // === DIAGNOSTICS ET MESURES ===
+     M1SlipDetected                  : BOOL;                           // <-- [DIAG] Glissement M1 detecte
+@@ -106,6 +107,7 @@ VAR
+     TimeoutAccumTime                : TIME;                           // . [LOC] Temps de commande engagee deja consomme, GELE hors engagement (segments precedents)
+     TimeoutSegmentTime              : TIME;                           // . [LOC] ET du segment de commande en cours (reporte dans le cumul au relachement)
+     TimeoutRemainingTime            : TIME;                           // . [LOC] Budget restant consomme par le TON (CfgTimeoutDuration - cumul)
++    ClosePermitDeniedWhileRequested : BOOL;                           // . [LOC] Fermeture demendee (CloseReq) mais permis nul -> attente de permis, budget gele
+     TonBandClosed                   : TON;                            // . [LOC] Debounce court bande "fermee" -> cible offset (anti-chatter au bord de bande)
+     TonBandOpen                     : TON;                            // . [LOC] Debounce court bande "ouverte" -> cible offset
+     TonRecoilLimit                  : TON;                            // . [LOC] Anti-chatter de la limite de recul benne (meme base de temps que TonBand*)
+@@ -228,6 +230,14 @@ IF NOT BypassGlobal THEN
+     // Signal d'engagement : MotionRequestActive (calcule en tete de §1) — CloseReq/OpenReq sont
+     // des LATCHES (restent TRUE pendant toute la pause) et seraient ici INOPERANTS.
+     TimeoutEngaged := Lifecycle.Busy AND MotionRequestActive;
++    // Fenetre benne : une FERMETURE demandee (CloseReq) mais dont le permis est NUL -> la consigne
++    // M2 n'est pas servie (M2_RunRequest ne part pas) : c'est une ATTENTE DE PERMIS, pas un
++    // grippage. On gele le budget dans cette sous-fenetre STRICTE ; le vrai grippage (permis OK,
++    // aucun mouvement) conserve TimeoutEngaged -> ErrorID:03 toujours latche (non-vacuite).
++    ClosePermitDeniedWhileRequested := CloseReq AND (NOT EffectivePermitBucket_Close);
++    IF ClosePermitDeniedWhileRequested THEN
++        TimeoutEngaged := FALSE;
++    END_IF;
+ 
+     // Rearmement conscient : budget complet ET segment TON neuf. Un TON IEC ne retombe PAS quand
+     // PT augmente (ET cloue a PT, Q fige) : sans cette coupure d'un scan, un Reset pendant une
+@@ -279,7 +289,7 @@ IF NOT BypassGlobal THEN
+     instCauses[3].Latching := TRUE;
+     instCauses[3].Texte    := 'Glissement treuil M1 pendant manoeuvre benne';
+ 
+-    // Cause 4 : Non référencé
++    // Cause 4 : Non référencé (alarme d'information non latchante, ne bloque pas le mouvement)
+     HomingMotionWithoutReference := (ReqAscent OR ReqDescend OR CmdOpen_IHM OR CmdClose_IHM OR ProgramBucketDriveActive)
+                                   AND NOT MachineHomingActive
+                                   AND NOT (HomedM1 AND HomedM2);
+@@ -299,6 +309,10 @@ ELSE
+     instCauses[4].Active := FALSE;
+ END_IF;
+ 
++// Etat « en attente de permis » publie (consomme par PRG_04 / IHM) — fermeture engagee
++// mais permis nul. Calcule a chaque scan (independant du bypass global).
++WaitingForOperator := Lifecycle.Busy AND CloseReq AND (NOT EffectivePermitBucket_Close);
++
+ // Appel du socle de défaut
+ instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+ Fault := instFault.Fault;
+@@ -329,6 +343,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
+     CloseReached := FALSE;
+     CloseReq := FALSE;
+     OpenReq := FALSE;
++    WaitingForOperator := FALSE;
+     RETURN;
+ END_IF;
+ 
+diff --git a/CODE/H_TREUILS_BENNE/FB_Safety_Winch.st b/CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+index eea649de..9e578388 100644
+--- a/CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
++++ b/CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+@@ -35,6 +35,12 @@ VAR_INPUT
+     BenneHoldStillActive            : BOOL;                           // --> [HW] Maintien fixe M1 actif pendant benne
+     BenneBusy                       : BOOL;                           // --> [HW] Cycle benne actif sur l'autre treuil
+     OtherWinchInhibited             : BOOL;                           // --> [HW] Autre treuil inhibe (maintenance)
++    // Fenetre benne : relaxation ÉTROITE de la butée haute MATÉRIELLE de ce treuil pendant
++    // la fermeture benne sur place (M1 FIXE). Calculé dans PRG_04 sous 4 verrous (benne active,
++    // M1 maintenu/vérifié, M1 hors montée, avant CloseReached). Câblé FALSE sur l'instance M1
++    // (jamais relaxé) et à la vraie valeur sur M2 -> le FdC matériel haut M1 reste la barrière
++    // absolue. Ne relaxe QUE la barrière matérielle, jamais le bypass logique.
++    BucketCloseAscentGrant          : BOOL := FALSE;                  // --> [SAFE] Relaxe la butée haut MATÉRIELLE M2 sous fenêtre benne (4 verrous)
+ 
+     // === REGLAGES ET LIMITES SÉCURITÉ ===
+     InReferencingMode               : BOOL;                           // --> [CFG] Treuil en cours de homing
+@@ -338,7 +344,7 @@ IF NOT BypassGlobal THEN
+ 
+     // Cause 8 : Méca B absence confirmation arrêt (latched)
+     IF NOT (BypassSafety OR BypassMecaB) THEN
+-        UncommandedActiveB := JoystickYNeutral AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
++        UncommandedActiveB := NOT MovementCommanded AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
+         TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
+         IF TonMecaB.Q THEN MecaBFaultLatched := TRUE; END_IF;
+     ELSE
+@@ -572,9 +578,16 @@ DescendPermit := NOT (
+ );
+ 
+ AscentPermit := NOT (
++    // Fenetre benne : la barrier MATERIELLE (FdC haut capteur) du treuil qui bouge la
++    // benne (M2) est relachee STRICTEMENT pendant la fermeture benne sur place (M1 FIXE, pas
++    // d'altitude) : BucketCloseAscentGrant, calcule PRG_04 sous 4 verrous, cable FALSE sur M1.
++    // Hors fenetre (grant=FALSE) la barrier reprend immediatement ; le FdC materiel haut M1 est
++    // JAMAIS relache (grant toujours FALSE sur l'instance M1). Le bypass logique (BypassTopLimitSwitch)
++    // conserve sa fonction TST et n'est pas altere.
+     ((CauseTopLimitSwitchActive
+     OR (NOT TopPositionSensor AND NOT InReferencingMode))
+-    AND NOT BypassTopLimitSwitch)
++    AND NOT BypassTopLimitSwitch
++    AND NOT BucketCloseAscentGrant)
+     // TopLimitM porte la relaxation 7,5->8,5 m en override N1 / bypass N2 : la butee
+     // logicielle reste active a la valeur relevee. Bypasser le logiciel releve la butee,
+     // il ne la supprime pas ; le FDC haut materiel reste une barriere independante.
+diff --git a/CODE/M_MAIN/PRG_04_Treuils_Benne.st b/CODE/M_MAIN/PRG_04_Treuils_Benne.st
+index 31760d59..6a9fd380 100644
+--- a/CODE/M_MAIN/PRG_04_Treuils_Benne.st
++++ b/CODE/M_MAIN/PRG_04_Treuils_Benne.st
+@@ -15,6 +15,12 @@ END_VAR
+ VAR_OUTPUT
+     // === 🚌 BUS INTER-PRG (producteur unique) ===
+     Data : ST_WinchInterPrg; // <-- [BUS] Demandes finales, états, sécurités, synchro, benne
++    // === 🚦 Diagnostic fenêtre benne (observable IHM / dépannage) ===
++    // Ré-agrégation de instBucket.WaitingForOperator : fermeture benne demandée mais permis nul
++    // (budget timeout gelé, en attente de permis). Sortie ré-agrégée consommable en mapping IHM
++    // SANS toucher aux _TYPES IHM ; l'affichage dans la page « Ouverture/Fermeture Benne »
++    // (ST_ChainBucket) reste un câblage IHM de suivi (exige un champ _TYPES, hors périmètre).
++    BucketWaitingForOperator : BOOL; // <-- [STAT] Fermeture benne en attente de permis (NC-100 : TRUE = attente active, budget timeout gele)
+ END_VAR
+ 
+ VAR
+@@ -204,6 +210,20 @@ VAR
+     SlackCableAscentCapStep1    : BOOL; // mou de câble en récupération -- bride la montée au Palier 1
+     BucketNotClosedAscentCapStep1 : BOOL; // benne non fermée à 100% à la montée -- bride la montée au Palier 1
+ 
++    // === FENÊTRE BENNE — relaxation étroite de la butée haute M2 ===
++    // Fermer la benne = M2 monte RELATIVEMENT à M1 FIXE -> l'ensemble M1/M2 ne change pas
++    // d'altitude. En position haute la butée haute M2 (logicielle ET matérielle) ne doit donc pas
++    // bloquer la fermeture sur place. Signal « fermeture AUTO active » = demande programme ReqClose
++    // RÉELLEMENT engagée ET FB_Bucket.pilotant la manoeuvre (Lifecycle.Busy). Ce signal s'auto-exclut
++    // du raccordement (ReqClose=FALSE en AX10B) où M1+M2 montent couplés.
++    AutoBucketCloseActiveForTopLimit : BOOL;            // . [LOC] Fermeture AUTO benne vers la cible (butée géométrique relative)
++    // Les 4 verrous du grant M2, TOUS requis (l'un ne supplée pas l'autre).
++    BucketFenetreWindow        : BOOL;                  // . [LOC] v1 : fenêtre benne (Lifecycle.Busy ET fermeture AUTO ReqClose)
++    BucketM1HeldCheck          : BOOL;                  // . [LOC] v2 : M1 réellement maintenu (benne active = M1 épinglé)
++    BucketM1NotAscent          : BOOL;                  // . [LOC] v3 : M1 HORS montée/charge
++    BucketCloseNotReached      : BOOL;                  // . [LOC] v4 : relaxation éteinte dès CloseReached (avant HoldAscentP1AfterClose)
++    BucketCloseAscentGrant     : BOOL;                  // . [LOC] Grant M2 : relâche la butée MATÉRIELLE haute M2 (input FB_Safety_Winch)
++
+     // Bypass simplifié séquence FB_DiveSearch -- front montant
+     // Kobold pendant une descente couplée confirme directement le fond, sans passer par les
+     // préconditions strictes de FB_DiveSearch (benne ouverte, DiveStartMin_M, fenêtre immersion).
+@@ -766,7 +786,9 @@ DescendPermitDiveBucketOpen := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.Desc
+ // instWinchM2 §6 plus bas).
+ ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits
+     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2)
+-    AND NOT PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked;
++    AND NOT PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked
++    AND PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
++    AND PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable;
+ 
+ ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
+ // Phase JOG du séquencement benne-auto couplé (CoupledBucketPhaseLocked ET Arbitrated=2) :
+@@ -801,13 +823,13 @@ ProcessPermitM2_Ascent := (NOT ExtractionAssistActive
+ // Zone de ralentissement jog unitaire M2 : palier 1 forcé dans les JogSlowdownZoneM
+ // derniers mètres AVANT le point d'arrêt anticipé (Offset ± Anticipation). Le "1 m d'avant"
+ // est donc calculé sur la cible anticipée, pas sur l'offset brut, et suit tout réglage IHM.
+-M2JogApproachOpen := ManualBucketJogActive
++M2JogApproachOpen := ManualBucketJogActive AND ManualBucketLimitsActive
+     AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM
+          <= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
+              + _BucketCfgPersist.Config.OffsetOpenM
+              + _BucketCfgPersist.Config.OpenAnticipationM
+              + _BucketCfgPersist.Config.JogSlowdownZoneM));
+-M2JogApproachClose := ManualBucketJogActive
++M2JogApproachClose := ManualBucketJogActive AND ManualBucketLimitsActive
+     AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM
+          >= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
+              + _BucketCfgPersist.Config.OffsetCloseM
+@@ -886,17 +908,25 @@ TopLimitM1_M := SEL(OverrideTopSoftwareN1M1 OR BypassM1TopLimitSoftwareEff,
+ TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
+                     _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
+                     _WinchM2CfgPersist.CfgTopSensorPos_M + M2_LimitShift);
+-// EXEMPTION jog benne seule (WinchSel=2) : la formule ci-dessus, une fois M2_LimitShift
+-// applique, revient exactement a tester la position REELLE de M1 (M2_raw - ActiveOffsetM
+-// = M1). Resultat : quand M1 est deja au-dessus de CfgCableLimitAscent_M, fermer/ouvrir
+-// la benne (M2 seul, M1 IMMOBILE) est bloque par la meme limite que la montee de M1,
+-// alors que manipuler la benne ne fait jamais monter l'ensemble plus haut que M1 courant
+-// (REX MES 2026-09-04 : "le treuil ne change pas d'altimetrie en mvt benne"). En jog
+-// benne pur, on remplace donc la butee ALTITUDE ABSOLUE par une butee GEOMETRIQUE relative
+-// a M1 courant (OffsetCloseM + marge) : c'est deja le vrai limiteur mecanique de la benne
+-// (ManualBucketLimitsActive/anticipation, PRG_04 ~710-735). Le FdC haut MATERIEL
+-// (TopPositionSensor, FB_Safety_Winch) reste une barriere INDEPENDANTE et non affectee.
+-IF ManualBucketJogActive THEN
++// EXEMPTION maniement benne seule (WinchSel=2 jog manuel) ou FERMETURE AUTO sur place :
++// la formule ci-dessus, une fois M2_LimitShift applique, revient exactement a tester la position
++// REELLE de M1 (M2_raw - ActiveOffsetM = M1). Resultat : quand M1 est deja au-dessus de
++// CfgCableLimitAscent_M, fermer la benne (M2 seul, M1 IMMOBILE) est bloque par la meme limite
++// que la montee de M1, alors que manipuler/fermer la benne ne fait jamais monter l'ensemble plus
++// haut que M1 courant ("le treuil ne change pas d'altimetrie en mvt benne"). L'arbitrage
++// exploitant a etendu ce principe (deja utilise en jog) a la FERMETURE AUTO. On remplace donc
++// la butee ALTITUDE ABSOLUE par une butee GEOMETRIQUE relative a M1 courant (OffsetCloseM + marge)
++// : c'est deja le vrai limiteur mecanique de la benne (ManualBucketLimitsActive/anticipation).
++// Le FdC haut MATERIEL (TopPositionSensor, FB_Safety_Winch) reste une barriere INDEPENDANTE,
++// relachee ETROITEMENT pour M2 seulement via BucketCloseAscentGrant (4 verrous) -- jamais pour M1.
++// ⚠️ AutoBucketCloseActiveForTopLimit s'EXCLUT du raccordement (ReqClose=FALSE en AX10B,
++// FB_CycleSemiAuto.st:1348) : quand M1+M2 montent couplees, la butee haute redevient l'authorite
++// absolute (ELSIF WinchBothMotionActive), jamais neutralisee.
++AutoBucketCloseActiveForTopLimit := instBucket.Lifecycle.Busy
++    AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;
++IF (ManualBucketJogActive OR AutoBucketCloseActiveForTopLimit)
++    AND PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
++    AND PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable THEN
+     TopLimitM2_M := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
+                      + _BucketCfgPersist.Config.OffsetCloseM + 2.0;
+ ELSIF WinchBothMotionActive AND NOT (OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff) THEN
+@@ -920,6 +950,32 @@ PositionLimitOverriddenM2 := OverrideTopSoftwareN1M2 OR BypassM2TopLimitSwitchEf
+ 
+ {region "🛡️ §5bis Sécurité M1/M2"}
+ 
++// ── GRANT RELAXATION BUTÉE HAUTE M2 (fenêtre benne) ────────────────────────────────
++// Fermer la benne = M2 monte RELATIVEMENT à M1 FIXE -> l'ensemble M1/M2 ne change pas d'altitude.
++// En position haute, la butée haute MATÉRIELLE M2 (CauseTopLimitSwitchActive / TopPositionSensor,
++// FB_Safety_Winch §3) ne doit donc pas bloquer la fermeture sur place. BucketCloseAscentGrant
++// relâche CETTE barrière, de manière STRICTEMENT BORNÉE par 4 verrous TOUS requis (l'un ne
++// supplée pas l'autre) — il NE relaxe JAMAIS M1 (câblé FALSE sur instSafetyWinchM1, barrière
++// M1 inchangée) et ne réutilise AUCUN Bypass*. La butée haute M2 HORS manipulation benne
++// (grant=FALSE) reste active.
++// Les 4 verrous :
++//   v1 fenêtre benne     : benne active ET fermeture AUTO ReqClose (fermeture uniquement — le
++//                          jog benne MANUEL est HORS périmètre contractuel validé, à arbitrer
++//                          séparément ; le grant ne relâche donc pas le FdC matériel M2 en jog)
++//   v2 M1 réellement fixé : benne active (= M1 épinglé par FB_Bucket pendant la manoeuvre)
++//   v3 M1 hors montée    : NOT M1LogicReqAscent (jamais une montée de charge/extraction de M1)
++//   v4 avant l'arrivée   : NOT instBucket.CloseReached (relaxation éteinte dès CloseReached,
++//                          AVANT HoldAscentP1AfterClose / raccordement AX10B)
++// Le signal « fermeture AUTO » = ReqProgram.ReqBucket.ReqClose (FALSE en AX10B, FB_CycleSemiAuto
++// :1348) ET Lifecycle.Busy : il s'auto-exclut donc du raccordement/transfert de montée couplé.
++BucketFenetreWindow   := instBucket.Lifecycle.Busy
++    AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;   // v1 (fermeture AUTO seule)
++BucketM1HeldCheck     := instBucket.Lifecycle.Busy;                                          // v2
++BucketM1NotAscent     := NOT M1LogicReqAscent;                                               // v3
++BucketCloseNotReached := NOT instBucket.CloseReached;                                        // v4
++BucketCloseAscentGrant := BucketFenetreWindow AND BucketM1HeldCheck
++    AND BucketM1NotAscent AND BucketCloseNotReached;
++
+ // FB_Safety_Winch M1/M2.
+ // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
+ // (même lag 1 scan accepté que M4/Translation, jamais sur Reset/SafeStop/PowerCutOff/sortie finale).
+@@ -990,7 +1046,11 @@ instSafetyWinchM1(
+     BypassMecaD            := BypassM1MecaDEff,
+     BypassMecaE            := GVL_IHM.M1TreuilRetenue.Bypass.MecaE,
+     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
+-    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated
++    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated,
++    // Fenetre benne : le FdC haut MATERIEL de M1 n'est JAMAIS relâché (grant câblé FALSE). M1 reste
++    // la barrière absolue épinglée au sommet pendant TOUTE la montée de charge/extraction.
++    // La butée matérielle M2 seule est relaxée par BucketCloseAscentGrant (4 verrous).
++    BucketCloseAscentGrant := FALSE
+ );
+ 
+ instSafetyWinchM2(
+@@ -1056,7 +1116,11 @@ instSafetyWinchM2(
+     BypassMecaD            := BypassM2MecaDEff,
+     BypassMecaE            := GVL_IHM.M2TreuilBenne.Bypass.MecaE,
+     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
+-    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated
++    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated,
++    // Fenetre benne : relaxation de la butée MATÉRIELLE haute M2 STRICTEMENT sous fenêtre benne
++    // (4 verrous). FALSE hors fenêtre (montée de charge, extraction, hors manipulation benne) ->
++    // la butée M2 redevient active.
++    BucketCloseAscentGrant := BucketCloseAscentGrant
+ );
+ 
+ SafeStopM1_Raw := SafeStopM1_Raw OR instSafetyWinchM1.SafeStop;
+@@ -1245,6 +1309,12 @@ IF NOT (PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
+     CommonMaxStepDescent := 1;
+ END_IF;
+ 
++// Cycle homing machine : palier 1 MAX strict en permanence
++IF PRG_02_Acquisition.Data.MachineHoming.Active THEN
++    CommonMaxStepAscent  := 1;
++    CommonMaxStepDescent := 1;
++END_IF;
++
+ IF instWinchSync.SyncDeviationWarn THEN
+     CommonMaxStepAscent   := 1;
+     CommonMaxStepDescent := 1;
+@@ -1773,6 +1843,8 @@ BucketState.Ready := instBucket.Ready;
+ BucketState.Busy := instBucket.Lifecycle.Busy;
+ BucketState.Done := instBucket.Lifecycle.Done;
+ Data.BucketCloseReached := instBucket.CloseReached;
++// Fenêtre benne : fermeture demandée en attente de permis (budget timeout gelé) — observée IHM.
++BucketWaitingForOperator := instBucket.WaitingForOperator;
+ BucketState.Error := instBucket.Fault.Error;
+ BucketState.ErrorId := instBucket.Fault.ErrorId;
+ BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
