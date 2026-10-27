@@ -288,6 +288,7 @@ Data.Network.DriveM3         := instDiagEthercat.DeviceVariateur;
 
 instSimBench(
     Enable                   := GVL_Simulation.SimulationModeActive,
+    OperatorSourceActive     := OperatorInputSourceSimulated,
     M1_RelayFwd              := PRG_06_Outputs.Data.M1RelayFwd,
     M1_RelayRev              := PRG_06_Outputs.Data.M1RelayRev,
     M1_SpeedContactor_1      := PRG_06_Outputs.Data.M1SpeedContactor1,
@@ -334,6 +335,8 @@ instSimBench(
     PowerCutOffRequest       := PRG_06_Outputs.Data.PowerCutOffRequest,
     // 🧪 Contrôle granulaire de la chaîne AU : bit opérateur (GVL_Simulation.SimChainOk).
     SimChainOkBit            := GVL_Simulation.SimChainOk,
+    // 🧪 Stimulus défaut rotation de phases : TRUE = phases saines, FALSE = défaut.
+    SimPhaseRotationOkBit    := GVL_Simulation.SimPhaseRotationOk,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     SimWinchCoast_M          := GVL_Simulation.SimWinchCoast_M,
     SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
@@ -355,6 +358,9 @@ instSimBench(
     M2_CablePos_M            := Data.EncoderM2.Measurement.CablePosM,
     BucketOffsetCloseM       := _BucketCfgPersist.Config.OffsetCloseM,
     BucketCoherenceLimitM    := _BucketCfgPersist.Config.CoherenceLimitM,
+    BucketOffsetOpen_M       := _BucketCfgPersist.Config.OffsetOpenM,
+    BucketOpenAnticipation_M := _BucketCfgPersist.Config.OpenAnticipationM,
+    BucketAx15bOpenActive    := PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX15B_DUMP_OPEN,
     SimM2TensionedCableFaultInject := GVL_Simulation.SimM2TensionedCableFaultInject,
     SimM3SensorsWordOverrideActive := GVL_Simulation.SimM3SensorsWordOverrideActive,
     SimM3SensorsWord               := GVL_Simulation.SimM3SensorsWord,

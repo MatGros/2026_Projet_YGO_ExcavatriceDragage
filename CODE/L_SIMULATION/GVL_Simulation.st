@@ -28,6 +28,10 @@ VAR_GLOBAL
     SimTranslationActive        : BOOL := FALSE; // M3 : AC600, fréquence, 5 capteurs et frein
     SimOperatorActive           : BOOL := FALSE; // Joystick : bus CANopen, axes RawX/RawY et homme-mort brut
     SimSafetyActive             : BOOL := FALSE; // AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs
+    // 🧪 Stimulus défaut rotation de phases : TRUE = phases réseau saines (comportement
+    // nominal, identique au codage en dur d'avant ce lot) ; FALSE = inverse/coupe les phases
+    // (PhaseRotationOk_DI = FALSE dans l'image machine simulée). Inopérant hors simulation.
+    SimPhaseRotationOk          : BOOL := TRUE;
 
     // ↔️ STIMULI TRANSLATION M3 — override manuel du mot capteurs, sinon modèle dynamique.
     // Bit4=Trémie, bit3=PV, bit2=PVP2, bit1=P1, bit0=Maintenance ; 16#07 = position P2 (00111).
@@ -86,7 +90,7 @@ VAR_GLOBAL
 
     // 🪝 STIMULI TREUILS — paramètres du modèle codeur et injection ponctuelle d'un défaut synchro.
     SimEncoderSpeedFactor       : REAL := 1.0;  // Multiplicateur vitesse codeurs simulés ; 1.0 = nominal
-    SimWinchCoast_M             : REAL := 0.35;  // Roulis inertiel treuils simulés après coupure des relais (m). 0 = arrêt net. ~0.35 = la benne roule quelques dizaines de cm après l'arrêt commandé -> finit dans la bande ouvert/fermé (±CoherenceLimitM) malgré l'anticipation d'arrêt (Close 1.0 / Open 1.3).
+    SimWinchCoast_M             : REAL := 1.30; // Roulis inertiel treuils simulés après coupure des relais (m). 0 = arrêt net. 1.30 = la benne roule pour finir dans la butée ouverte (OffsetOpenM=0.0) malgré l'anticipation d'arrêt (Open 1.3).
     SimSyncDeviationInjectM1    : BOOL := FALSE; // Front montant : ajoute SimSyncDeviationOffset_M à la position M1 simulée
     SimSyncDeviationInjectM2    : BOOL := FALSE; // Front montant : ajoute SimSyncDeviationOffset_M à la position M2 simulée
     SimSyncDeviationOffset_M    : REAL := 0.5; // Écart signé injecté, mètres ; persiste dans la position simulée jusqu'au reset/preset

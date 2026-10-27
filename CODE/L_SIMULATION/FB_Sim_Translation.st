@@ -19,8 +19,20 @@ VAR_INPUT
        le gate G518 echoue si les deux echelles divergent. *)
     FullTravelTimeS : REAL := 37.5;
     BrakeReleaseCmd : BOOL := TRUE;
+    (* ECHELLE DE LA CONSIGNE. PRG_02 envoie SpeedCmd_Pct = f / 50 Hz x 100 : le simulateur reconvertit
+       avec le MEME maximum, sinon 20 Hz reels (40 %) deviendraient 16 Hz simules.
+       Maximum = GVL_PERSISTENT._TranslationMaxFreq_Hz (50 Hz), passe par FB_SimBench (CST_M3MaxFreq_Hz,
+       egalite verifiee par G518). Ne pas confondre avec CST_NominalFrequency_Hz (40 Hz) : echelle
+       ODOMETRIQUE (gain 0,02 m/(Hz.s)). *)
+    MaxFreq_Hz : REAL := 50.0;
+    (* ACCELERATION DU BANC (confort d'essai). Le chariot avance SpeedFactor fois plus vite ET la
+       frequence RETOURNEE au PLC est multipliee d'autant : l'estimateur (f x gain) suit exactement
+       le chariot, sans saut de recalage, et le ratio publie reste 0,02 m/(Hz.s) (G518).
+       Borne 1..5. 1,0 = dynamique reelle. Le frein et la memoire de sens restent sur la frequence
+       physique du variateur simule. *)
+    SpeedFactor : REAL := 1.0;
     AccelRate_HzPerS : REAL := 20.0;
-    DecelRate_HzPerS : REAL := 20.0;
+    DecelRate_HzPerS : REAL := 25.0; // pente d'arret relevee sur trace reelle (rampe variateur / rampe PLC)
     DriveTimeConstantS : REAL := 0.15;
     BrakeOpenDelayS : REAL := 0.10;
     BrakeCloseDelayS : REAL := 0.09;
@@ -100,6 +112,7 @@ VAR
        retenue (gain audit 0,0551 m/(Hz.s)). A ne pas citer comme une mesure. *)
     TravelDirection : REAL;
     FrequencyTarget_Hz : REAL;
+    SpeedFactorApplied : REAL := 1.0;
     CycleTimeS : REAL;
     SpeedAt40Hz_Mps : REAL;
     VelocityTarget_Mps : REAL;
@@ -133,7 +146,7 @@ VAR CONSTANT
        sinon un modele borne a 30 m ne peut jamais produire le mot 00000. Cette
        position est SYNTHETIQUE en attente de la mesure de la came reelle. *)
     CST_PositionAtMaintenanceSensor_M : REAL := 29.95;
-    CST_NominalFrequency_Hz : REAL := 40.0;
+    CST_NominalFrequency_Hz : REAL := 40.0; // echelle ODOMETRIQUE lue par G518 — PAS le maximum variateur (MaxFreq_Hz)
     CST_MinTimeS : REAL := 0.001;
     (* Meme seuil d'arret que FB_Sim_TranslationBrake.CST_StopFrequency_Hz (0,5 Hz).
        Valide par la trace terrain du 2026-09-04 : frein ouvert a 0,60 Hz, ferme a 0,00 Hz. *)
@@ -196,7 +209,7 @@ IF Enable THEN
         DirectionSign := 1.0;
     END_IF;
 
-    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * 0.4, CST_NominalFrequency_Hz);
+    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * MaxFreq_Hz / 100.0, MaxFreq_Hz);
     IF DirectionSign = 0.0 THEN
         FrequencyTarget_Hz := 0.0;
     END_IF;
@@ -207,9 +220,10 @@ IF Enable THEN
         LoadFrequencyDroopGain_Hz := LoadFrequencyDroopGain_Hz, CycleTime_S := CycleTimeS);
     FrequencyCmd_Hz := instDrive.FrequencyCmd_Hz;
     ElectricalFrequency_Hz := instDrive.ElectricalFrequency_Hz;
-    ActualFrequency_Hz := instDrive.ActualFrequency_Hz;
+    SpeedFactorApplied := LIMIT(1.0, SpeedFactor, 5.0);
+    ActualFrequency_Hz := instDrive.ActualFrequency_Hz * SpeedFactorApplied;
     instBrake(Enable := TRUE, ReleaseCmd := BrakeReleaseCmd,
-        ActualFrequency_Hz := ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
+        ActualFrequency_Hz := instDrive.ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
         CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
         CycleTime_S := CycleTimeS,
         FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
@@ -231,7 +245,7 @@ IF Enable THEN
         TravelDirection := 1.0;
     ELSIF ReqTremie AND ReqMaintenance THEN
         TravelDirection := 0.0;
-    ELSIF ABS(ActualFrequency_Hz) <= CST_StopFrequency_Hz THEN
+    ELSIF ABS(instDrive.ActualFrequency_Hz) <= CST_StopFrequency_Hz THEN
         TravelDirection := 0.0;
     END_IF;
 

@@ -1,35 +1,10 @@
-(* ═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
-   ───────────────────────────────────────────────────────────────
+(* =======================================================================
+   🧪 FB_Sim_Joystick — Simulation des entrees brutes joystick (bus CAN hors ligne)
+   🎯 Rôle : reproduire un geste operateur depuis un bouton directionnel.
+   Appui armement, debattement, relachement armement, retour dynamique.
+   Aucun etat arme produit ; permis et armement restent au joystick reel.
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
-   🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
-      (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
-      permanence — un vrai contournement de sécurité). Ici, on simule les
-      ENTRÉES BRUTES du capteur (`RawX`/`RawY`/`RawButton`) : le homme-mort réel
-      de `FB_Joystick` reste pleinement actif et doit toujours être "actionné"
-      (forcer `RawButton` en instance CODESYS) pour armer — comportement
-      métier testé pour de vrai, pas contourné.
-   🕹️ Comportement dynamique (conception validée) :
-      - Ascending : bouton actif → `RawX`/`RawY` monte de `NeutralRaw` vers la cible
-        (0 ou `MaxRaw`) en `RiseTimeS`, avec un bruit pseudo-aléatoire léger.
-      - Dépassement (`OvershootActive`) : la cible de montée DÉPASSE la butée
-        (MaxRaw+AMT ou 0−AMT) → déclenche le défaut capteur hors plage.
-      - Retombée : bouton relâché → descente LINÉAIRE en `FallTimeMs` vers le neutre.
-      - Bagotement (`BagotementActive`) : au retour, petit balancement de quelques %
-        autour du neutre avant de se stabiliser.
-   📥 Enable        : simulation active (SimulationModeActive AND NOT BusJoystickSignalIsReal)
-   📥 NeutralRaw    : valeur brute simulée au repos (voir GVL_Simulation.TstJoystickForceNeutralRaw)
-   📥 MaxRaw        : valeur brute simulée à fond (voir GVL_Simulation.TstJoystickForceMaxRaw)
-   📥 Btn*          : boutons directionnels (1 seul impose une butée d'axe ; 0 ou ≥2 = neutre)
-   📥 OvershootActive : bagotement au retour (test mouvement parasite)
-   📥 RiseTimeS / FallTimeMs / CycleTimeS : dynamique temporelle (pattern FB_Sim_Encoder)
-   📤 RawX/RawY     : valeurs brutes dynamiques (neutre = NeutralRaw)
-   📤 RawButton     : homme-mort brut = un bouton directionnel actif
-   💡 Note d'application : en vue instance CODESYS, forcer `RawX`/`RawY` à `MaxRaw` (ou une
-      valeur intermédiaire) pour simuler un débattement, et `RawButton` à `TRUE` pour simuler
-      l'appui homme-mort — exactement comme on forcerait le vrai capteur.
-   ═══════════════════════════════════════════════════════════════ *)
+   ======================================================================= *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Joystick) ===
 
@@ -47,14 +22,26 @@ VAR_INPUT
     RiseTimeS           : REAL := 1.5;   (* --> [CFG] Temps de montée 0→100% (s) *)
     FallTimeMs          : TIME := T#200MS;   (* --> [CFG] Temps de retombée 100%→0 *)
     CycleTimeS          : REAL := 0.010;   (* --> [CFG] Période tâche PLC (s) — 10 ms *)
+    GesturePermit       : BOOL := TRUE; (* --> [SAFE] Stimuli manuels au repos avant un geste automatique *)
+    ArmHoldTime         : TIME := T#200MS; (* --> [CFG] Appui bouton avant debattement *)
+    ButtonReleaseDelay  : TIME := T#200MS; (* --> [CFG] Maintien bouton apres debut debattement *)
 END_VAR
 VAR_OUTPUT
     RawX        : INT;   (* <-- [DIAG] Valeur brute axe X (dynamique, neutre = NeutralRaw) *)
     RawY        : INT;   (* <-- [DIAG] Valeur brute axe Y (dynamique, neutre = NeutralRaw) *)
-    RawButton   : BOOL;  (* <-- [DIAG] Homme-mort brut = un bouton directionnel actif *)
+    RawButton   : BOOL;  (* <-- [DIAG] Appui armement simule, relache pendant le maintien du manche *)
+    ModelActive : BOOL;  (* <-- [STAT] Propriete exclusive des trois entrees brutes pendant le geste et le retour *)
     ReturningActive : BOOL;  (* <-- [STAT] TRUE si retour dynamique en cours (FALL/OVERSHOOT) — FB_SimBench émet le modèle *)
 END_VAR
 VAR
+    instArmTimer : TON; (* * [INST] Maintien armement avant debattement *)
+    instButtonReleaseTimer : TON; (* * [INST] Relachement bouton apres debut debattement *)
+    GestureStep : INT := 0; (* . [LOC] Attente relachement, disponible, appui, mouvement *)
+    RequestedDirection : INT; (* . [LOC] Direction unique demandee, 0 si aucune ou conflit *)
+    GestureDirection : INT; (* . [LOC] Direction memorisee au nouvel appui *)
+    DeflectionActive : BOOL; (* . [LOC] Debattement admis pour le geste courant *)
+    RequestMatchesGesture : BOOL; (* . [LOC] Direction demandee identique au geste *)
+    TimingValid : BOOL; (* . [LOC] Parametres dynamiques strictement positifs *)
     FirstCycle  : BOOL := TRUE;   (* . [LOC] Initialisation au neutre *)
     State       : INT := 0;   (* . [LOC] 0=IDLE, 1=RISE, 2=FALL, 3=OVERSHOOT *)
     TargetX     : INT;   (* . [LOC] Cible brute axe X *)
@@ -70,6 +57,14 @@ VAR
     OscAcc      : REAL;   (* . [LOC] Accélération de l'oscillateur *)
 END_VAR
 VAR CONSTANT
+    CST_GESTURE_WAIT_RELEASE : INT := 0; (* . [CFG] Relachement complet et retour neutre requis *)
+    CST_GESTURE_READY : INT := 1; (* . [CFG] Nouveau geste disponible *)
+    CST_GESTURE_ARM : INT := 2; (* . [CFG] Appui armement, manche neutre *)
+    CST_GESTURE_MOVE : INT := 3; (* . [CFG] Manche deplace, bouton ensuite relache *)
+    CST_DIRECTION_LEFT : INT := 1; (* . [CFG] Demande X negatif *)
+    CST_DIRECTION_RIGHT : INT := 2; (* . [CFG] Demande X positif *)
+    CST_DIRECTION_FORWARD : INT := 3; (* . [CFG] Demande Y positif *)
+    CST_DIRECTION_REVERSE : INT := 4; (* . [CFG] Demande Y negatif *)
     CST_ST_IDLE      : INT := 0;   (* . [CFG] État : au neutre *)
     CST_ST_RISE      : INT := 1;   (* . [CFG] État : montée vers la cible *)
     CST_ST_FALL      : INT := 2;   (* . [CFG] État : retombée linéaire *)
@@ -85,13 +80,19 @@ END_VAR
 {region "§1 Gate"}
 // 🔑 Initialise au neutre au premier cycle uniquement ; ensuite RawX/RawY sont pilotés
 // dynamiquement par les boutons. Quand la simulation est coupée, on revient au neutre.
-IF NOT Enable THEN
+TimingValid := (RiseTimeS > 0.0) AND (CycleTimeS > 0.0) AND (FallTimeMs > T#0MS);
+IF NOT Enable OR NOT TimingValid THEN
     FirstCycle := TRUE;
     State      := CST_ST_IDLE;
     RawX       := NeutralRaw;
     RawY       := NeutralRaw;
     RawButton  := FALSE;
     ReturningActive := FALSE; // 📊 Neutralisation : simulation inactive hors Enable
+    ModelActive := FALSE;
+    GestureStep := CST_GESTURE_WAIT_RELEASE;
+    GestureDirection := 0;
+    instArmTimer(IN := FALSE, PT := ArmHoldTime);
+    instButtonReleaseTimer(IN := FALSE, PT := ButtonReleaseDelay);
     RETURN;
 END_IF;
 {endregion}
@@ -103,6 +104,7 @@ IF FirstCycle THEN
     RawButton  := FALSE;
     State      := CST_ST_IDLE;
     FirstCycle := FALSE;
+    GestureStep := CST_GESTURE_WAIT_RELEASE;
 END_IF;
 {endregion}
 
@@ -119,7 +121,57 @@ Noise   := (RandCnt MOD 50) - 25;   // ±25 points (≈ ±0.5% de la course)
 // déclencher le défaut capteur hors plage (RawOutOfRange) — test du dépassement de valeur.
 BtnCount := BOOL_TO_INT(BtnLeft_Rev_TREMIE) + BOOL_TO_INT(BtnRight_Fwd_MAINT)
           + BOOL_TO_INT(BtnFwd_Up_Close) + BOOL_TO_INT(BtnRev_Down_Open);
+RequestedDirection := 0;
 IF BtnCount = 1 THEN
+    IF BtnLeft_Rev_TREMIE THEN RequestedDirection := CST_DIRECTION_LEFT;
+    ELSIF BtnRight_Fwd_MAINT THEN RequestedDirection := CST_DIRECTION_RIGHT;
+    ELSIF BtnFwd_Up_Close THEN RequestedDirection := CST_DIRECTION_FORWARD;
+    ELSE RequestedDirection := CST_DIRECTION_REVERSE;
+    END_IF;
+END_IF;
+
+// Un seul appui brut par geste ; aucun nouvel essai tant que l'IHM reste tenue.
+instArmTimer(IN := GestureStep = CST_GESTURE_ARM, PT := ArmHoldTime);
+instButtonReleaseTimer(IN := GestureStep = CST_GESTURE_MOVE, PT := ButtonReleaseDelay);
+DeflectionActive := FALSE;
+RawButton := FALSE;
+RequestMatchesGesture := (RequestedDirection = GestureDirection) AND (BtnCount = 1);
+IF BtnCount > 0 THEN ModelActive := TRUE; END_IF;
+IF NOT GesturePermit THEN GestureStep := CST_GESTURE_WAIT_RELEASE; END_IF;
+
+IF GestureStep = CST_GESTURE_WAIT_RELEASE THEN
+        // Les boutons doivent etre relaches APRES stabilisation du retour.
+        IF (BtnCount = 0) AND (State = CST_ST_IDLE) AND GesturePermit THEN
+            GestureStep := CST_GESTURE_READY;
+            ModelActive := FALSE;
+        END_IF;
+ELSIF GestureStep = CST_GESTURE_READY THEN
+        IF BtnCount = 1 THEN
+            GestureDirection := RequestedDirection;
+            GestureStep := CST_GESTURE_ARM;
+            RawButton := TRUE;
+        ELSIF BtnCount > 1 THEN
+            GestureStep := CST_GESTURE_WAIT_RELEASE;
+        END_IF;
+ELSIF GestureStep = CST_GESTURE_ARM THEN
+        IF NOT RequestMatchesGesture THEN
+            GestureStep := CST_GESTURE_WAIT_RELEASE;
+        ELSE
+            RawButton := TRUE;
+            IF instArmTimer.Q THEN GestureStep := CST_GESTURE_MOVE; END_IF;
+        END_IF;
+ELSIF GestureStep = CST_GESTURE_MOVE THEN
+        IF NOT RequestMatchesGesture THEN
+            GestureStep := CST_GESTURE_WAIT_RELEASE;
+        ELSE
+            DeflectionActive := TRUE;
+            RawButton := NOT instButtonReleaseTimer.Q;
+        END_IF;
+ELSE
+    GestureStep := CST_GESTURE_WAIT_RELEASE;
+END_IF;
+
+IF DeflectionActive THEN
     IF BtnLeft_Rev_TREMIE THEN
         IF OvershootActive THEN TargetX := 0 - CST_OVERSHOOT_AMT; ELSE TargetX := 0; END_IF;
         TargetY := NeutralRaw; ActiveAxis := 1;
@@ -224,7 +276,7 @@ END_IF;
 {endregion}
 
 {region "§8 Homme-mort brut + drapeau retour"}
-RawButton := BtnLeft_Rev_TREMIE OR BtnRight_Fwd_MAINT OR BtnFwd_Up_Close OR BtnRev_Down_Open;
+// RawButton est exclusivement produit par le sequenceur du geste (§4).
 // Drapeau "retour dynamique en cours" : TRUE si l'état est FALL ou OVERSHOOT (retombée/bagotement).
 // Permet à FB_SimBench d'émettre la sortie du modèle même après relâchement du bouton.
 ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
