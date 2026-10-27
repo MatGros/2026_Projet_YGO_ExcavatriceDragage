@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-27T16:00:37.996859" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-27T16:00:37.996859">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-27T17:37:48.589189" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-27T17:37:48.589189">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -8734,14 +8734,15 @@ IF TonSecondM3Edge.Q THEN
     GVL_PERSISTENT._RunningHoursM3_S := GVL_PERSISTENT._RunningHoursM3_S + 1;
 END_IF;
 
-GVL_IHM.Commun.RunningHours.MachineHours_H   := GVL_PERSISTENT._RunningHoursMachine_S / DINT#3600;
-GVL_IHM.Commun.RunningHours.MachineHours_Min := DINT_TO_INT((GVL_PERSISTENT._RunningHoursMachine_S MOD DINT#3600) / DINT#60);
-GVL_IHM.Commun.RunningHours.M1Hours_H        := GVL_PERSISTENT._RunningHoursM1_S / DINT#3600;
-GVL_IHM.Commun.RunningHours.M1Hours_Min      := DINT_TO_INT((GVL_PERSISTENT._RunningHoursM1_S MOD DINT#3600) / DINT#60);
-GVL_IHM.Commun.RunningHours.M2Hours_H        := GVL_PERSISTENT._RunningHoursM2_S / DINT#3600;
-GVL_IHM.Commun.RunningHours.M2Hours_Min      := DINT_TO_INT((GVL_PERSISTENT._RunningHoursM2_S MOD DINT#3600) / DINT#60);
-GVL_IHM.Commun.RunningHours.M3Hours_H        := GVL_PERSISTENT._RunningHoursM3_S / DINT#3600;
-GVL_IHM.Commun.RunningHours.M3Hours_Min      := DINT_TO_INT((GVL_PERSISTENT._RunningHoursM3_S MOD DINT#3600) / DINT#60);
+// Totaux UDINT -&gt; IHM : heures en DINT (max 1 193 046 h, tient dans DINT), minutes 0..59 en INT.
+GVL_IHM.Commun.RunningHours.MachineHours_H   := UDINT_TO_DINT(GVL_PERSISTENT._RunningHoursMachine_S / UDINT#3600);
+GVL_IHM.Commun.RunningHours.MachineHours_Min := UDINT_TO_INT((GVL_PERSISTENT._RunningHoursMachine_S MOD UDINT#3600) / UDINT#60);
+GVL_IHM.Commun.RunningHours.M1Hours_H        := UDINT_TO_DINT(GVL_PERSISTENT._RunningHoursM1_S / UDINT#3600);
+GVL_IHM.Commun.RunningHours.M1Hours_Min      := UDINT_TO_INT((GVL_PERSISTENT._RunningHoursM1_S MOD UDINT#3600) / UDINT#60);
+GVL_IHM.Commun.RunningHours.M2Hours_H        := UDINT_TO_DINT(GVL_PERSISTENT._RunningHoursM2_S / UDINT#3600);
+GVL_IHM.Commun.RunningHours.M2Hours_Min      := UDINT_TO_INT((GVL_PERSISTENT._RunningHoursM2_S MOD UDINT#3600) / UDINT#60);
+GVL_IHM.Commun.RunningHours.M3Hours_H        := UDINT_TO_DINT(GVL_PERSISTENT._RunningHoursM3_S / UDINT#3600);
+GVL_IHM.Commun.RunningHours.M3Hours_Min      := UDINT_TO_INT((GVL_PERSISTENT._RunningHoursM3_S MOD UDINT#3600) / UDINT#60);
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
 // Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit
 // pas être présenté comme un contact Kobold.

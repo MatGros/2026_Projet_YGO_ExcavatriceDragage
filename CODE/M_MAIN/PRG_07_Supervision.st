@@ -719,14 +719,15 @@ IF TonSecondM3Edge.Q THEN
     GVL_PERSISTENT._RunningHoursM3_S := GVL_PERSISTENT._RunningHoursM3_S + 1;
 END_IF;
 
-GVL_IHM.Commun.RunningHours.MachineHours_H   := GVL_PERSISTENT._RunningHoursMachine_S / DINT#3600;
-GVL_IHM.Commun.RunningHours.MachineHours_Min := DINT_TO_INT((GVL_PERSISTENT._RunningHoursMachine_S MOD DINT#3600) / DINT#60);
-GVL_IHM.Commun.RunningHours.M1Hours_H        := GVL_PERSISTENT._RunningHoursM1_S / DINT#3600;
-GVL_IHM.Commun.RunningHours.M1Hours_Min      := DINT_TO_INT((GVL_PERSISTENT._RunningHoursM1_S MOD DINT#3600) / DINT#60);
-GVL_IHM.Commun.RunningHours.M2Hours_H        := GVL_PERSISTENT._RunningHoursM2_S / DINT#3600;
-GVL_IHM.Commun.RunningHours.M2Hours_Min      := DINT_TO_INT((GVL_PERSISTENT._RunningHoursM2_S MOD DINT#3600) / DINT#60);
-GVL_IHM.Commun.RunningHours.M3Hours_H        := GVL_PERSISTENT._RunningHoursM3_S / DINT#3600;
-GVL_IHM.Commun.RunningHours.M3Hours_Min      := DINT_TO_INT((GVL_PERSISTENT._RunningHoursM3_S MOD DINT#3600) / DINT#60);
+// Totaux UDINT -> IHM : heures en DINT (max 1 193 046 h, tient dans DINT), minutes 0..59 en INT.
+GVL_IHM.Commun.RunningHours.MachineHours_H   := UDINT_TO_DINT(GVL_PERSISTENT._RunningHoursMachine_S / UDINT#3600);
+GVL_IHM.Commun.RunningHours.MachineHours_Min := UDINT_TO_INT((GVL_PERSISTENT._RunningHoursMachine_S MOD UDINT#3600) / UDINT#60);
+GVL_IHM.Commun.RunningHours.M1Hours_H        := UDINT_TO_DINT(GVL_PERSISTENT._RunningHoursM1_S / UDINT#3600);
+GVL_IHM.Commun.RunningHours.M1Hours_Min      := UDINT_TO_INT((GVL_PERSISTENT._RunningHoursM1_S MOD UDINT#3600) / UDINT#60);
+GVL_IHM.Commun.RunningHours.M2Hours_H        := UDINT_TO_DINT(GVL_PERSISTENT._RunningHoursM2_S / UDINT#3600);
+GVL_IHM.Commun.RunningHours.M2Hours_Min      := UDINT_TO_INT((GVL_PERSISTENT._RunningHoursM2_S MOD UDINT#3600) / UDINT#60);
+GVL_IHM.Commun.RunningHours.M3Hours_H        := UDINT_TO_DINT(GVL_PERSISTENT._RunningHoursM3_S / UDINT#3600);
+GVL_IHM.Commun.RunningHours.M3Hours_Min      := UDINT_TO_INT((GVL_PERSISTENT._RunningHoursM3_S MOD UDINT#3600) / UDINT#60);
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
 // Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit
 // pas être présenté comme un contact Kobold.

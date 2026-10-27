@@ -192,11 +192,11 @@ VAR_GLOBAL PERSISTENT RETAIN
     _CycleSampleCountTotal : UDINT := 0;  // 🔒 Totalisateur de prélèvements — LECTURE SEULE, jamais remis à zéro
 
     // ⏱️ COMPTEURS HORAIRES MAINTENANCE — AJOUTÉS EN FIN DE LISTE (mapping RETAIN positionnel).
-    // Secondes entières, DINT (plage ~68 ans) — JAMAIS remis à zéro par une commande IHM.
+    // Secondes entières cumulées, UDINT (jamais négatif, plage ~136 ans) — JAMAIS remis à zéro par une commande IHM.
     // Machine = PLC sous tension (inconditionnel). M1/M2/M3 = marche contacteur reelle (preuve physique).
-    _RunningHoursMachine_S : DINT := 0;   // 🔒 Totalisateur horaire machine — LECTURE SEULE
-    _RunningHoursM1_S      : DINT := 0;   // 🔒 Totalisateur horaire treuil M1 — LECTURE SEULE
-    _RunningHoursM2_S      : DINT := 0;   // 🔒 Totalisateur horaire treuil M2 — LECTURE SEULE
-    _RunningHoursM3_S      : DINT := 0;   // 🔒 Totalisateur horaire translation M3 — LECTURE SEULE
+    _RunningHoursMachine_S : UDINT := 0;  // 🔒 Totalisateur horaire machine — LECTURE SEULE
+    _RunningHoursM1_S      : UDINT := 0;  // 🔒 Totalisateur horaire treuil M1 — LECTURE SEULE
+    _RunningHoursM2_S      : UDINT := 0;  // 🔒 Totalisateur horaire treuil M2 — LECTURE SEULE
+    _RunningHoursM3_S      : UDINT := 0;  // 🔒 Totalisateur horaire translation M3 — LECTURE SEULE
 
 END_VAR
