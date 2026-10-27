@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
 
-   🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
+   🎯 Rôle : Compose les blocs de modèle de simulation :
       - FB_Sim_Encoder (instM1, instM2)
       - FB_Sim_Translation (instTranslation)
       - FB_Sim_Joystick (instJoystick)
@@ -21,6 +21,7 @@
 FUNCTION_BLOCK PUBLIC FB_SimBench
 VAR_INPUT
     Enable                     : BOOL;             (* --> [CMD] Activation globale (GVL_Simulation.SimulationModeActive) *)
+    OperatorSourceActive       : BOOL := TRUE;      (* --> [CMD] Source operateur simulee effectivement selectionnee *)
 
     // ── Commandes issues de l'automate (Scan N-1 / PRG_07 / PRG_10) ──────────
     M1_RelayFwd                : BOOL;   (* --> [CMD] Sens avant M1 *)
@@ -61,10 +62,11 @@ VAR_INPUT
     TestCutActive              : BOOL;             (* --> [SAFE] Test de redondance AU en cours (canal A ou B coupé) *)
     PowerCutOffRequest         : BOOL;             (* --> [SAFE] Requête coupure métier (TRUE = arrêt d'urgence) *)
     SimChainOkBit              : BOOL;             (* --> [TST] Bit opérateur : TRUE = simuler chaîne AU fermée *)
+    SimPhaseRotationOkBit      : BOOL;             (* --> [TST] Bit opérateur : TRUE = phases réseau OK ; FALSE = défaut rotation de phases *)
 
     // ── Stimuli & Paramètres de banc ─────────────────────────────────────────
     SimEncoderSpeedFactor      : REAL := 1.0;   (* --> [CFG] Facteur vitesse codeur *)
-    SimWinchCoast_M            : REAL := 0.35;  (* --> [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; ~0.35 = finit dans la bande ouvert/ferme malgre l'anticipation d'arret *)
+    SimWinchCoast_M            : REAL := 1.30;  (* --> [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; 1.30 = finit a la butee ouverte *)
     SimTopPositionActive       : BOOL := FALSE; (* --> [TST] Injection manuelle capteur haut actif (essai ciblé) *)
     SimSyncDeviationInjectM1   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M1 *)
     SimSyncDeviationInjectM2   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M2 *)
@@ -104,6 +106,9 @@ VAR_INPUT
     // reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non calibre.
     SimM3EndStopRecoilMax_M          : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Recul borne a la butee M3, m *)
     SimM3LoadReactionGain_Mps2       : REAL := 0.20;   (* --> [CFG][SYNTHETIQUE] Gain de reaction de charge M3, m/s2 *)
+    // ACCELERATION DU BANC M3 : chariot ET frequence retournee x facteur (1..5), estimation coherente.
+    // Volontairement NON cable par PRG_02 : se regle en ligne sur l'instance (instSimBench.SimM3SpeedFactor).
+    SimM3SpeedFactor                 : REAL := 1.0;    (* --> [TST] Facteur de vitesse du banc M3, 1,0 = dynamique reelle *)
 
     SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick gauche *)
     SimJoystickRight_Fwd_MAINT_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick droite *)
@@ -130,6 +135,9 @@ VAR_INPUT
     M2_CablePos_M               : REAL := 0.0;     (* --> [HW] Position M2 recalée (m), issue de la même chaîne que le métier *)
     BucketOffsetCloseM          : REAL := 15.0;    (* --> [CFG] Butée mécanique benne FERMÉE (m, écart M2-M1) *)
     BucketCoherenceLimitM       : REAL := 1.0;     (* --> [CFG] Demi-largeur de la bande franc ouvert/fermé (m) *)
+    BucketOffsetOpen_M          : REAL := 0.0;     (* --> [CFG] Butée mécanique benne OUVERTE (m, écart M2-M1) *)
+    BucketOpenAnticipation_M    : REAL := 1.3;     (* --> [CFG] Anticipation arrêt ouverture benne (m) *)
+    BucketAx15bOpenActive       : BOOL := FALSE;   (* --> [CMD] Étape AX15B active *)
 
     // ── Image réelle fallback ────────────────────────────────────────────────
     HwReal                     : ST_HardwareImage;   (* --> [HW] Image réelle fallback *)
@@ -180,6 +188,9 @@ VAR CONSTANT
     // est effectivement passee a instSimTranslation (ligne 567) : changer le seul defaut du FB
     // n'aurait aucun effet en simulation. Garde-fou : gate G518.
     CST_M3FullTravelTimeS       : REAL := 37.5;  // Temps de Trémie à Maintenance à 100 %, modèle banc uniquement
+    // Maximum variateur M3 : DOIT egaler GVL_PERSISTENT._TranslationMaxFreq_Hz (PRG_02 envoie f/50 x 100).
+    // Constante locale (L_SIMULATION ne lit pas GVL_PERSISTENT) ; egalite verifiee par G518.
+    CST_M3MaxFreq_Hz            : REAL := 50.0;
     CST_SimBenchCycleTimeS      : REAL := 0.010; // Période tâche PLC (s) — MainTask 10 ms
     // Rattrapage mécanique M1/M2 — valeurs ESTIMÉES (voir REGISTRE_VALEURS_TREUIL_STATUTS_v1.0.md)
     CST_SimWinchCouplingTauS    : REAL := 1.0;   // [HYPOTHESE] Constante de temps du rattrapage (s)
@@ -212,7 +223,8 @@ VAR
     M3_RelayFwd                : BOOL;   (* . [LOC] Sens avant M3 *)
     M3_RelayRev                : BOOL;   (* . [LOC] Sens arrière M3 *)
 
-    SimJoystickDirectionCount  : INT;   (* . [LOC] Nombre de directions actives *)
+    SimJoystickManualNeutral : BOOL; (* . [LOC] Axes manuels au neutre nominal *)
+    SimJoystickGesturePermit : BOOL; (* . [LOC] Aucune injection manuelle concurrente au geste *)
 
     M3_ActualFreqHz            : UINT;   (* . [LOC] Fréquence simulée M3 *)
     M3_StatusWordSim           : WORD;   (* . [LOC] StatusWord simulé M3 *)
@@ -221,7 +233,12 @@ VAR
     M2_RelayFwdPrev            : BOOL;   (* . [LOC] Mémoire relais Fwd N-1 *)
     M2_RelayRevPrev            : BOOL;   (* . [LOC] Mémoire relais Rev N-1 *)
     RandomSeed                 : UDINT := 123456789; (* . [LOC] Générateur LCG pseudo-aléatoire *)
-    M2_EffectiveCoastM         : REAL := 0.35;       (* . [LOC] Distance de roulis M2 courante *)
+    M2_EffectiveCoastM         : REAL := 1.30;       (* . [LOC] Distance de roulis M2 courante *)
+    M2EffectiveCoastDistance_M : REAL;               (* . [LOC] Distance appliquée au codeur M2 *)
+    M2AutoOpenCoastArmed       : BOOL;               (* . [LOC] Fin d'ouverture automatique à simuler *)
+    M2OpenDistanceRemaining_M  : REAL;               (* . [LOC] Distance restante à la butée ouverte *)
+    M2OpenStopThreshold_M     : REAL;               (* . [LOC] Seuil avec avance d'un scan d'acquisition *)
+    M2ExpectedStepDistance_M  : REAL;               (* . [LOC] Course codeur M2 du scan actif *)
     M2CoupledDescentActive     : BOOL;                (* . [LOC] Ralentissement M2 actif en descente BOTH *)
     M2EffectiveSpeedScaleFactor : REAL;               (* . [LOC] Facteur vitesse du producteur unique M2 *)
     KoboldMeasureEnablePrevious : BOOL;               (* . [LOC] Front alimentation Kobold *)
@@ -266,6 +283,7 @@ IF NOT Enable THEN
     Translation := HwReal.Translation;
     Operator    := HwReal.Operator;
     Machine     := HwReal.Machine;
+    instSimJoystick(Enable := FALSE);
     RETURN;
 END_IF;
 
@@ -394,6 +412,35 @@ IF M2CoupledDescentActive THEN
     M2EffectiveSpeedScaleFactor := SimEncoderSpeedFactor * MAX(0.0, SimM2CoupledDescentFactor);
 END_IF;
 
+// P02 consomme la mesure publiée au scan précédent. Reconstituer le déplacement
+// de ce scan évite un trou d'un cycle lors du seuil d'arrêt de FB_Bucket.
+M2ExpectedStepDistance_M := (1.0 + (INT_TO_REAL(MAX(M2_StepNumber, 1)) - 1.0) * 0.25)
+                            * MAX(0.0, SimEncoderSpeedFactor)
+                            * CST_SimBenchCycleTimeS;
+M2OpenStopThreshold_M := BucketOffsetOpen_M + MAX(0.0, BucketOpenAnticipation_M)
+                         + M2ExpectedStepDistance_M;
+
+// Armer le roulis long uniquement à l'approche du seuil d'ouverture AX15B.
+// Un jog manuel, un homing ou un arrêt ailleurs garde le roulis historique.
+IF NOT M2_RelayRev OR M2_RelayFwd THEN
+    M2AutoOpenCoastArmed := FALSE;
+ELSIF SimWinchCouplingModelActive AND BucketAx15bOpenActive
+      AND NOT M1_RelayFwd AND NOT M1_RelayRev
+      AND (M2_CablePos_M - M1_CablePos_M)
+          <= M2OpenStopThreshold_M THEN
+    M2AutoOpenCoastArmed := TRUE;
+END_IF;
+
+// À l'arrêt anticipé automatique, le roulis couvre seulement l'écart restant
+// jusqu'à la butée ouverte : il ne sur-ouvre pas et ne modifie pas le jog manuel.
+M2EffectiveCoastDistance_M := M2_EffectiveCoastM;
+IF M2AutoOpenCoastArmed THEN
+    M2OpenDistanceRemaining_M := MAX(0.0, M2_CablePos_M - M1_CablePos_M
+                                          - BucketOffsetOpen_M - M2ExpectedStepDistance_M);
+    M2EffectiveCoastDistance_M := MIN(MAX(0.0, BucketOpenAnticipation_M),
+                                      M2OpenDistanceRemaining_M);
+END_IF;
+
 // Instance modèle codeur M2 (avec roulis et dispersion)
 instSimEncoderM2(
     Enable           := TRUE,
@@ -403,7 +450,7 @@ instSimEncoderM2(
     PresetCmd        := M2_PresetCmd,
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := M2EffectiveSpeedScaleFactor,
-    CoastDistanceM   := M2_EffectiveCoastM,
+    CoastDistanceM   := M2EffectiveCoastDistance_M,
     SpeedReportTauS  := WinchSpeedReportTauEffectiveS,
     TestOffsetCmd    := SimSyncDeviationInjectM2,
     TestOffsetPts    := M2_OffsetPts,
@@ -569,6 +616,8 @@ instSimTranslation(
     ReqMaintenance  := M3_RelayRev,
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
     FullTravelTimeS := CST_M3FullTravelTimeS,
+    MaxFreq_Hz      := CST_M3MaxFreq_Hz,
+    SpeedFactor     := SimM3SpeedFactor,
     BrakeReleaseCmd := M3_BrakeCmd,
     SensorIntermittenceActive := SimM3SensorIntermittenceActive,
     SensorStabilizationS := SimM3SensorStabilizationS,
@@ -631,44 +680,43 @@ Translation.AC600_DeviceState    := DEVICE_STATE.RUNNING; // État device RUNNIN
 
 {region "§4 Simulation operateur joystick"}
 // ── 3. MODÈLE OPÉRATEUR / JOYSTICK ───────────────────────────────────────────
-instSimJoystick(
-    Enable              := TRUE,
-    NeutralRaw          := 5000,
-    MaxRaw              := 10000,
-    BtnLeft_Rev_TREMIE  := SimJoystickLeft_Rev_TREMIE_Active,
-    BtnRight_Fwd_MAINT  := SimJoystickRight_Fwd_MAINT_Active,
-    BtnFwd_Up_Close     := SimJoystickFwd_Up_Close_Active,
-    BtnRev_Down_Open    := SimJoystickRev_Down_Open_Active,
-    OvershootActive     := SimJoystickOvershoot_Active,
-    BagotementActive    := SimJoystickBagotement_Active,
-    CycleTimeS          := 0.010
-);
-
-// Les boutons directionnels simplifient les essais : une commande unique impose
-// une butée d'axe ; aucune commande ou une combinaison reste au neutre / stimulus avancé.
-// Le modèle dynamique (montée/retombée/bagotement) pilote RawX/RawY dès qu'un bouton est actif.
-SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeft_Rev_TREMIE_Active)
-                           + BOOL_TO_INT(SimJoystickRight_Fwd_MAINT_Active)
-                           + BOOL_TO_INT(SimJoystickFwd_Up_Close_Active)
-                           + BOOL_TO_INT(SimJoystickRev_Down_Open_Active);
-IF (SimJoystickDirectionCount >= 1) OR instSimJoystick.ReturningActive THEN
-    // Bouton(s) actif(s) OU retour dynamique en cours (retombée/bagotement) → sortie du modèle.
-    // (≥2 boutons : le modèle gère lui-même le neutre — pas de diagonale implicite.)
-    Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
-    Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
+IF NOT OperatorSourceActive THEN
+    // Le geste ne continue pas en arriere-plan lorsque le domaine est reel.
+    instSimJoystick(Enable := FALSE);
+    Operator := HwReal.Operator;
 ELSE
-    // Modèle au repos → stimulus analogique avancé (mode « sans bouton »).
-    Operator.JoyXRaw_ANA1 := SimJoystickRawX;
-    Operator.JoyYRaw_ANA2 := SimJoystickRawY;
+    SimJoystickManualNeutral := (SimJoystickRawX = 5000) AND (SimJoystickRawY = 5000);
+    SimJoystickGesturePermit := SimJoystickManualNeutral AND NOT SimJoystickRawButton;
+    instSimJoystick(
+        Enable              := TRUE,
+        GesturePermit       := SimJoystickGesturePermit,
+        NeutralRaw          := 5000,
+        MaxRaw              := 10000,
+        BtnLeft_Rev_TREMIE  := SimJoystickLeft_Rev_TREMIE_Active,
+        BtnRight_Fwd_MAINT  := SimJoystickRight_Fwd_MAINT_Active,
+        BtnFwd_Up_Close     := SimJoystickFwd_Up_Close_Active,
+        BtnRev_Down_Open    := SimJoystickRev_Down_Open_Active,
+        OvershootActive     := SimJoystickOvershoot_Active,
+        BagotementActive    := SimJoystickBagotement_Active,
+        CycleTimeS          := 0.010
+    );
+
+    // Une seule source possede les trois signaux : aucun melange bouton/axes.
+    // La propriete automatique persiste au retour et si un stimulus manuel est en conflit.
+    IF instSimJoystick.ModelActive THEN
+        Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
+        Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
+        Operator.JoyBtnRaw := instSimJoystick.RawButton;
+    ELSE
+        // Modèle au repos → stimulus analogique avancé (mode « sans bouton »).
+        Operator.JoyXRaw_ANA1 := SimJoystickRawX;
+        Operator.JoyYRaw_ANA2 := SimJoystickRawY;
+        Operator.JoyBtnRaw := SimJoystickRawButton;
+    END_IF;
+
+    Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
+    Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 END_IF;
-
-// Homme-mort : stimulus brut amont. En simulation avec boutons directionnels actifs,
-// l'appui homme-mort est automatiquement inclus pour faciliter les essais sur banc.
-Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount > 0);
-
-Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
-Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
-
 
 {endregion}
 
@@ -677,6 +725,7 @@ Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 instSimSafety(
     Enable            := TRUE,
     SimChainOkBit     := SimChainOkBit,
+    SimPhaseRotationOkBit := SimPhaseRotationOkBit,
     PowerCutOff_A     := PowerKeepAlive_A,
     PowerCutOff_B     := PowerKeepAlive_B,
     PowerCutOffRequest:= PowerCutOffRequest,
@@ -687,7 +736,7 @@ instSimSafety(
 
 Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
 Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
-Machine.PhaseRotationOk_DI             := TRUE;
+Machine.PhaseRotationOk_DI          := instSimSafety.SimPhaseRotationOk;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
 instKoboldPowerUpTimer(IN := KoboldAutoEpisodeActive AND KoboldMeasureEnable
                         AND (M1_CablePos_M > KoboldAutoDepthEpisode_M),

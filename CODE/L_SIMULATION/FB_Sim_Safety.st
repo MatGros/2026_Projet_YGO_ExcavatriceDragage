@@ -40,6 +40,7 @@ FUNCTION_BLOCK FB_Sim_Safety
 VAR_INPUT
     Enable            : BOOL; // --> [CMD] Activation de la simulation
     SimChainOkBit     : BOOL; // --> [TST] Bit opérateur : TRUE = simuler chaîne AU fermée
+    SimPhaseRotationOkBit : BOOL; // --> [TST] Bit opérateur : TRUE = phases réseau OK simulées ; FALSE = défaut rotation de phases injecté
     PowerCutOff_A     : BOOL; // --> [SAFE] Commande coupure canal A (TRUE = OK/fermé)
     PowerCutOff_B     : BOOL; // --> [SAFE] Commande coupure canal B (TRUE = OK/fermé)
     PowerCutOffRequest: BOOL; // --> [SAFE] Requête coupure métier (TRUE = arrêt d'urgence)
@@ -50,6 +51,7 @@ END_VAR
 VAR_OUTPUT
     SimChainOk      : BOOL; // <-- [STAT] Boucle AU simulée saine
     SimContactorOk  : BOOL; // <-- [STAT] Contacteur simulé engagé
+    SimPhaseRotationOk : BOOL; // <-- [STAT] Contrôleur de phases simulé : TRUE = phases saines (aucun défaut)
 END_VAR
 VAR
     ContactorLatch  : BOOL; // . [LOC] Mémorisation de l'auto-maintien du contacteur
@@ -77,6 +79,7 @@ END_VAR
 IF NOT Enable THEN
     SimChainOk     := FALSE;
     SimContactorOk := FALSE;
+    SimPhaseRotationOk := FALSE;
     ContactorLatch := FALSE;
     ChainOpen      := TRUE; // Chaîne ouverte par défaut à la ré-entrée (on n'a pas armé)
     ChainOpenReq   := FALSE;
@@ -153,4 +156,8 @@ END_IF;
 
 // Recopie vers la sortie
 SimContactorOk := ContactorLatch;
+
+// Contrôleur de phases : simple propagation du bit opérateur (TRUE = sain).
+// Inopérant hors simulation (le banc ne publie l'image machine que sous Enable).
+SimPhaseRotationOk := SimPhaseRotationOkBit;
 {endregion}
