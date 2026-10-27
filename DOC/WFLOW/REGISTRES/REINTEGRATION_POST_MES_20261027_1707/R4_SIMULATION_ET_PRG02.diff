@@ -1,0 +1,1153 @@
+diff --git a/CODE/L_SIMULATION/FB_SimBench.st b/CODE/L_SIMULATION/FB_SimBench.st
+index 3089dd78..684f89b7 100644
+--- a/CODE/L_SIMULATION/FB_SimBench.st
++++ b/CODE/L_SIMULATION/FB_SimBench.st
+@@ -3,9 +3,10 @@
+    ───────────────────────────────────────────────────────────────
+    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+ 
+-   🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
++   🎯 Rôle : Compose les blocs de modèle de simulation :
+       - FB_Sim_Encoder (instM1, instM2)
+-      - FB_Sim_Translation (instTranslation)
++      - FB_Sim_Translation (instTranslation) ou, si M3_OpenModelicaActive,
++        FB_Sim_Translation_ExtLink (lien UDP simulateur externe)
+       - FB_Sim_Joystick (instJoystick)
+       - FB_Sim_Safety (instSafety)
+ 
+@@ -21,6 +22,7 @@
+ FUNCTION_BLOCK PUBLIC FB_SimBench
+ VAR_INPUT
+     Enable                     : BOOL;             (* --> [CMD] Activation globale (GVL_Simulation.SimulationModeActive) *)
++    OperatorSourceActive       : BOOL := TRUE;      (* --> [CMD] Source operateur simulee effectivement selectionnee *)
+ 
+     // ── Commandes issues de l'automate (Scan N-1 / PRG_07 / PRG_10) ──────────
+     M1_RelayFwd                : BOOL;   (* --> [CMD] Sens avant M1 *)
+@@ -54,6 +56,10 @@ VAR_INPUT
+     M3_ReqMaintenance          : BOOL;             (* --> [CMD] Demande explicite vers Maintenance *)
+     M3_SpeedCmd_Pct            : REAL;   (* --> [CMD] Consigne vitesse M3 *)
+     M3_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M3 *)
++    // ── Source externe OpenModelica M3 (lien UDP FB_Sim_Translation_ExtLink) ──
++    M3_SetpointFrequencyHz     : WORD;             (* --> [CMD] Consigne fréquence variateur M3, Hz x100 (sortie finale PRG_06) *)
++    M3_OpenModelicaActive      : BOOL;             (* --> [TST] TRUE = image M3 fournie par le simulateur externe *)
++    M3_PlcEcho                 : ST_fbSim_Translation_ExtLink_Echo; (* --> [TST] Etat decisionnel M3 renvoye au simulateur (diagnostic) *)
+ 
+     PowerKeepAlive_A           : BOOL;             (* --> [SAFE] TRUE = relais A maintenu sagement par le PLC *)
+     PowerKeepAlive_B           : BOOL;             (* --> [SAFE] TRUE = relais B maintenu sagement par le PLC *)
+@@ -61,10 +67,11 @@ VAR_INPUT
+     TestCutActive              : BOOL;             (* --> [SAFE] Test de redondance AU en cours (canal A ou B coupé) *)
+     PowerCutOffRequest         : BOOL;             (* --> [SAFE] Requête coupure métier (TRUE = arrêt d'urgence) *)
+     SimChainOkBit              : BOOL;             (* --> [TST] Bit opérateur : TRUE = simuler chaîne AU fermée *)
++    SimPhaseRotationOkBit      : BOOL;             (* --> [TST] Bit opérateur : TRUE = phases réseau OK ; FALSE = défaut rotation de phases *)
+ 
+     // ── Stimuli & Paramètres de banc ─────────────────────────────────────────
+     SimEncoderSpeedFactor      : REAL := 1.0;   (* --> [CFG] Facteur vitesse codeur *)
+-    SimWinchCoast_M            : REAL := 0.35;  (* --> [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; ~0.35 = finit dans la bande ouvert/ferme malgre l'anticipation d'arret *)
++    SimWinchCoast_M            : REAL := 1.30;  (* --> [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; 1.30 = finit a la butee ouverte *)
+     SimTopPositionActive       : BOOL := FALSE; (* --> [TST] Injection manuelle capteur haut actif (essai ciblé) *)
+     SimSyncDeviationInjectM1   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M1 *)
+     SimSyncDeviationInjectM2   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M2 *)
+@@ -104,6 +111,9 @@ VAR_INPUT
+     // reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non calibre.
+     SimM3EndStopRecoilMax_M          : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Recul borne a la butee M3, m *)
+     SimM3LoadReactionGain_Mps2       : REAL := 0.20;   (* --> [CFG][SYNTHETIQUE] Gain de reaction de charge M3, m/s2 *)
++    // ACCELERATION DU BANC M3 : chariot ET frequence retournee x facteur (1..5), estimation coherente.
++    // Volontairement NON cable par PRG_02 : se regle en ligne sur l'instance (instSimBench.SimM3SpeedFactor).
++    SimM3SpeedFactor                 : REAL := 1.0;    (* --> [TST] Facteur de vitesse du banc M3, 1,0 = dynamique reelle *)
+ 
+     SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick gauche *)
+     SimJoystickRight_Fwd_MAINT_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick droite *)
+@@ -130,6 +140,9 @@ VAR_INPUT
+     M2_CablePos_M               : REAL := 0.0;     (* --> [HW] Position M2 recalée (m), issue de la même chaîne que le métier *)
+     BucketOffsetCloseM          : REAL := 15.0;    (* --> [CFG] Butée mécanique benne FERMÉE (m, écart M2-M1) *)
+     BucketCoherenceLimitM       : REAL := 1.0;     (* --> [CFG] Demi-largeur de la bande franc ouvert/fermé (m) *)
++    BucketOffsetOpen_M          : REAL := 0.0;     (* --> [CFG] Butée mécanique benne OUVERTE (m, écart M2-M1) *)
++    BucketOpenAnticipation_M    : REAL := 1.3;     (* --> [CFG] Anticipation arrêt ouverture benne (m) *)
++    BucketAx15bOpenActive       : BOOL := FALSE;   (* --> [CMD] Étape AX15B active *)
+ 
+     // ── Image réelle fallback ────────────────────────────────────────────────
+     HwReal                     : ST_HardwareImage;   (* --> [HW] Image réelle fallback *)
+@@ -164,6 +177,12 @@ VAR_OUTPUT
+     M3BrakeFaultCloseActive    : BOOL;   (* <-- [DIAG] Faute frein M3 effectivement appliquee ce scan *)
+     // Blip court capteurs M3 -- diagnostic seul : observable sur trace pendant un episode court.
+     M3SensorBlipActive         : BOOL;   (* <-- [DIAG] Un capteur M3 publie une excursion courte *)
++
++    // Lien simulateur externe M3 -- diagnostic seul, publié par PRG_02 vers GVL_Simulation.
++    M3LinkReady                : BOOL;   (* <-- [STAT] Lien externe M3 établi (trame valide, non expiré) *)
++    M3LinkTimeout              : BOOL;   (* <-- [DIAG] Lien externe M3 expiré *)
++    M3LinkInvalid              : BOOL;   (* <-- [DIAG] Trame externe M3 rejetée ou lien expiré *)
++    M3LinkAge_Ms               : UDINT;  (* <-- [DIAG] Durée sans trame valide, ms *)
+ END_VAR
+ 
+ VAR_IN_OUT
+@@ -180,6 +199,9 @@ VAR CONSTANT
+     // est effectivement passee a instSimTranslation (ligne 567) : changer le seul defaut du FB
+     // n'aurait aucun effet en simulation. Garde-fou : gate G518.
+     CST_M3FullTravelTimeS       : REAL := 37.5;  // Temps de Trémie à Maintenance à 100 %, modèle banc uniquement
++    // Maximum variateur M3 : DOIT egaler GVL_PERSISTENT._TranslationMaxFreq_Hz (PRG_02 envoie f/50 x 100).
++    // Constante locale (L_SIMULATION ne lit pas GVL_PERSISTENT) ; egalite verifiee par G518.
++    CST_M3MaxFreq_Hz            : REAL := 50.0;
+     CST_SimBenchCycleTimeS      : REAL := 0.010; // Période tâche PLC (s) — MainTask 10 ms
+     // Rattrapage mécanique M1/M2 — valeurs ESTIMÉES (voir REGISTRE_VALEURS_TREUIL_STATUTS_v1.0.md)
+     CST_SimWinchCouplingTauS    : REAL := 1.0;   // [HYPOTHESE] Constante de temps du rattrapage (s)
+@@ -193,6 +215,7 @@ VAR
+     instSimEncoderM1           : FB_Sim_Encoder;   (* * [INST] Modèle codeur M1 *)
+     instSimEncoderM2           : FB_Sim_Encoder;   (* * [INST] Modèle codeur M2 *)
+     instSimTranslation         : FB_Sim_Translation;   (* * [INST] Modèle translation M3 *)
++    instSimTranslationExtLink  : FB_Sim_Translation_ExtLink; (* * [INST] Lien simulateur externe M3 *)
+     instSimJoystick            : FB_Sim_Joystick;   (* * [INST] Modèle joystick *)
+     instSimSafety              : FB_Sim_Safety;   (* * [INST] Modèle sécurité *)
+     instWinchElectricalM1      : FB_Sim_WinchElectrical;   (* * [INST] T317 exploratoire -- electrique+charge M1 *)
+@@ -212,7 +235,8 @@ VAR
+     M3_RelayFwd                : BOOL;   (* . [LOC] Sens avant M3 *)
+     M3_RelayRev                : BOOL;   (* . [LOC] Sens arrière M3 *)
+ 
+-    SimJoystickDirectionCount  : INT;   (* . [LOC] Nombre de directions actives *)
++    SimJoystickManualNeutral : BOOL; (* . [LOC] Axes manuels au neutre nominal *)
++    SimJoystickGesturePermit : BOOL; (* . [LOC] Aucune injection manuelle concurrente au geste *)
+ 
+     M3_ActualFreqHz            : UINT;   (* . [LOC] Fréquence simulée M3 *)
+     M3_StatusWordSim           : WORD;   (* . [LOC] StatusWord simulé M3 *)
+@@ -221,7 +245,12 @@ VAR
+     M2_RelayFwdPrev            : BOOL;   (* . [LOC] Mémoire relais Fwd N-1 *)
+     M2_RelayRevPrev            : BOOL;   (* . [LOC] Mémoire relais Rev N-1 *)
+     RandomSeed                 : UDINT := 123456789; (* . [LOC] Générateur LCG pseudo-aléatoire *)
+-    M2_EffectiveCoastM         : REAL := 0.35;       (* . [LOC] Distance de roulis M2 courante *)
++    M2_EffectiveCoastM         : REAL := 1.30;       (* . [LOC] Distance de roulis M2 courante *)
++    M2EffectiveCoastDistance_M : REAL;               (* . [LOC] Distance appliquée au codeur M2 *)
++    M2AutoOpenCoastArmed       : BOOL;               (* . [LOC] Fin d'ouverture automatique à simuler *)
++    M2OpenDistanceRemaining_M  : REAL;               (* . [LOC] Distance restante à la butée ouverte *)
++    M2OpenStopThreshold_M     : REAL;               (* . [LOC] Seuil avec avance d'un scan d'acquisition *)
++    M2ExpectedStepDistance_M  : REAL;               (* . [LOC] Course codeur M2 du scan actif *)
+     M2CoupledDescentActive     : BOOL;                (* . [LOC] Ralentissement M2 actif en descente BOTH *)
+     M2EffectiveSpeedScaleFactor : REAL;               (* . [LOC] Facteur vitesse du producteur unique M2 *)
+     KoboldMeasureEnablePrevious : BOOL;               (* . [LOC] Front alimentation Kobold *)
+@@ -266,6 +295,13 @@ IF NOT Enable THEN
+     Translation := HwReal.Translation;
+     Operator    := HwReal.Operator;
+     Machine     := HwReal.Machine;
++    // 🔌 Lien externe M3 coupé explicitement : socket fermé, état de liaison retombé.
++    instSimTranslationExtLink(Enable := FALSE);
++    instSimJoystick(Enable := FALSE);
++    M3LinkReady   := FALSE;
++    M3LinkTimeout := FALSE;
++    M3LinkInvalid := FALSE;
++    M3LinkAge_Ms  := 0;
+     RETURN;
+ END_IF;
+ 
+@@ -394,6 +430,35 @@ IF M2CoupledDescentActive THEN
+     M2EffectiveSpeedScaleFactor := SimEncoderSpeedFactor * MAX(0.0, SimM2CoupledDescentFactor);
+ END_IF;
+ 
++// P02 consomme la mesure publiée au scan précédent. Reconstituer le déplacement
++// de ce scan évite un trou d'un cycle lors du seuil d'arrêt de FB_Bucket.
++M2ExpectedStepDistance_M := (1.0 + (INT_TO_REAL(MAX(M2_StepNumber, 1)) - 1.0) * 0.25)
++                            * MAX(0.0, SimEncoderSpeedFactor)
++                            * CST_SimBenchCycleTimeS;
++M2OpenStopThreshold_M := BucketOffsetOpen_M + MAX(0.0, BucketOpenAnticipation_M)
++                         + M2ExpectedStepDistance_M;
++
++// Armer le roulis long uniquement à l'approche du seuil d'ouverture AX15B.
++// Un jog manuel, un homing ou un arrêt ailleurs garde le roulis historique.
++IF NOT M2_RelayRev OR M2_RelayFwd THEN
++    M2AutoOpenCoastArmed := FALSE;
++ELSIF SimWinchCouplingModelActive AND BucketAx15bOpenActive
++      AND NOT M1_RelayFwd AND NOT M1_RelayRev
++      AND (M2_CablePos_M - M1_CablePos_M)
++          <= M2OpenStopThreshold_M THEN
++    M2AutoOpenCoastArmed := TRUE;
++END_IF;
++
++// À l'arrêt anticipé automatique, le roulis couvre seulement l'écart restant
++// jusqu'à la butée ouverte : il ne sur-ouvre pas et ne modifie pas le jog manuel.
++M2EffectiveCoastDistance_M := M2_EffectiveCoastM;
++IF M2AutoOpenCoastArmed THEN
++    M2OpenDistanceRemaining_M := MAX(0.0, M2_CablePos_M - M1_CablePos_M
++                                          - BucketOffsetOpen_M - M2ExpectedStepDistance_M);
++    M2EffectiveCoastDistance_M := MIN(MAX(0.0, BucketOpenAnticipation_M),
++                                      M2OpenDistanceRemaining_M);
++END_IF;
++
+ // Instance modèle codeur M2 (avec roulis et dispersion)
+ instSimEncoderM2(
+     Enable           := TRUE,
+@@ -403,7 +468,7 @@ instSimEncoderM2(
+     PresetCmd        := M2_PresetCmd,
+     PresetValue      := M2_PresetValueOut,
+     SpeedScaleFactor := M2EffectiveSpeedScaleFactor,
+-    CoastDistanceM   := M2_EffectiveCoastM,
++    CoastDistanceM   := M2EffectiveCoastDistance_M,
+     SpeedReportTauS  := WinchSpeedReportTauEffectiveS,
+     TestOffsetCmd    := SimSyncDeviationInjectM2,
+     TestOffsetPts    := M2_OffsetPts,
+@@ -564,11 +629,13 @@ M3_RelayFwd := M3_ReqTremie AND NOT M3_ReqMaintenance;
+ M3_RelayRev := M3_ReqMaintenance AND NOT M3_ReqTremie;
+ 
+ instSimTranslation(
+-    Enable          := TRUE,
++    Enable          := NOT M3_OpenModelicaActive,
+     ReqTremie       := M3_RelayFwd,
+     ReqMaintenance  := M3_RelayRev,
+     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
+     FullTravelTimeS := CST_M3FullTravelTimeS,
++    MaxFreq_Hz      := CST_M3MaxFreq_Hz,
++    SpeedFactor     := SimM3SpeedFactor,
+     BrakeReleaseCmd := M3_BrakeCmd,
+     SensorIntermittenceActive := SimM3SensorIntermittenceActive,
+     SensorStabilizationS := SimM3SensorStabilizationS,
+@@ -587,6 +654,20 @@ instSimTranslation(
+ M3BrakeFaultCloseActive := instSimTranslation.BrakeFaultCloseActive;
+ M3SensorBlipActive := instSimTranslation.SensorBlipActive;
+ 
++// 🔌 Lien externe : actif uniquement si la source externe est sélectionnée (modèle ST sinon).
++instSimTranslationExtLink(
++    Enable              := M3_OpenModelicaActive,
++    ReqTremie           := M3_RelayFwd,
++    ReqMaintenance      := M3_RelayRev,
++    SetpointFrequencyHz := M3_SetpointFrequencyHz,
++    BrakeReleaseCmd     := M3_BrakeCmd,
++    PlcEcho             := M3_PlcEcho
++);
++M3LinkReady   := instSimTranslationExtLink.LinkReady;
++M3LinkTimeout := instSimTranslationExtLink.LinkTimeout;
++M3LinkInvalid := instSimTranslationExtLink.LinkInvalid;
++M3LinkAge_Ms  := instSimTranslationExtLink.LinkAge_Ms;
++
+ // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
+ // même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).
+ IF SimM3SensorsWordOverrideActive THEN
+@@ -626,49 +707,54 @@ Translation.M3_StatusWord        := M3_StatusWordSim;
+ Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
+ Translation.AC600_DeviceState    := DEVICE_STATE.RUNNING; // État device RUNNING
+ 
++// 🔀 Aiguillage source M3 : le simulateur externe remplace uniquement l'image de retours du modèle ST.
++// La logique PLC continue de produire les commandes et reste inchangée.
++IF M3_OpenModelicaActive THEN
++    Translation := instSimTranslationExtLink.Translation;
++END_IF;
++
+ 
+ {endregion}
+ 
+ {region "§4 Simulation operateur joystick"}
+ // ── 3. MODÈLE OPÉRATEUR / JOYSTICK ───────────────────────────────────────────
+-instSimJoystick(
+-    Enable              := TRUE,
+-    NeutralRaw          := 5000,
+-    MaxRaw              := 10000,
+-    BtnLeft_Rev_TREMIE  := SimJoystickLeft_Rev_TREMIE_Active,
+-    BtnRight_Fwd_MAINT  := SimJoystickRight_Fwd_MAINT_Active,
+-    BtnFwd_Up_Close     := SimJoystickFwd_Up_Close_Active,
+-    BtnRev_Down_Open    := SimJoystickRev_Down_Open_Active,
+-    OvershootActive     := SimJoystickOvershoot_Active,
+-    BagotementActive    := SimJoystickBagotement_Active,
+-    CycleTimeS          := 0.010
+-);
+-
+-// Les boutons directionnels simplifient les essais : une commande unique impose
+-// une butée d'axe ; aucune commande ou une combinaison reste au neutre / stimulus avancé.
+-// Le modèle dynamique (montée/retombée/bagotement) pilote RawX/RawY dès qu'un bouton est actif.
+-SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeft_Rev_TREMIE_Active)
+-                           + BOOL_TO_INT(SimJoystickRight_Fwd_MAINT_Active)
+-                           + BOOL_TO_INT(SimJoystickFwd_Up_Close_Active)
+-                           + BOOL_TO_INT(SimJoystickRev_Down_Open_Active);
+-IF (SimJoystickDirectionCount >= 1) OR instSimJoystick.ReturningActive THEN
+-    // Bouton(s) actif(s) OU retour dynamique en cours (retombée/bagotement) → sortie du modèle.
+-    // (≥2 boutons : le modèle gère lui-même le neutre — pas de diagonale implicite.)
+-    Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
+-    Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
++IF NOT OperatorSourceActive THEN
++    // Le geste ne continue pas en arriere-plan lorsque le domaine est reel.
++    instSimJoystick(Enable := FALSE);
++    Operator := HwReal.Operator;
+ ELSE
+-    // Modèle au repos → stimulus analogique avancé (mode « sans bouton »).
+-    Operator.JoyXRaw_ANA1 := SimJoystickRawX;
+-    Operator.JoyYRaw_ANA2 := SimJoystickRawY;
+-END_IF;
+-
+-// Homme-mort : stimulus brut amont. En simulation avec boutons directionnels actifs,
+-// l'appui homme-mort est automatiquement inclus pour faciliter les essais sur banc.
+-Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount > 0);
+-
+-Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
+-Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
++    SimJoystickManualNeutral := (SimJoystickRawX = 5000) AND (SimJoystickRawY = 5000);
++    SimJoystickGesturePermit := SimJoystickManualNeutral AND NOT SimJoystickRawButton;
++    instSimJoystick(
++        Enable              := TRUE,
++        GesturePermit       := SimJoystickGesturePermit,
++        NeutralRaw          := 5000,
++        MaxRaw              := 10000,
++        BtnLeft_Rev_TREMIE  := SimJoystickLeft_Rev_TREMIE_Active,
++        BtnRight_Fwd_MAINT  := SimJoystickRight_Fwd_MAINT_Active,
++        BtnFwd_Up_Close     := SimJoystickFwd_Up_Close_Active,
++        BtnRev_Down_Open    := SimJoystickRev_Down_Open_Active,
++        OvershootActive     := SimJoystickOvershoot_Active,
++        BagotementActive    := SimJoystickBagotement_Active,
++        CycleTimeS          := 0.010
++    );
++
++    // Une seule source possede les trois signaux : aucun melange bouton/axes.
++    // La propriete automatique persiste au retour et si un stimulus manuel est en conflit.
++    IF instSimJoystick.ModelActive THEN
++        Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
++        Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
++        Operator.JoyBtnRaw := instSimJoystick.RawButton;
++    ELSE
++        // Modèle au repos → stimulus analogique avancé (mode « sans bouton »).
++        Operator.JoyXRaw_ANA1 := SimJoystickRawX;
++        Operator.JoyYRaw_ANA2 := SimJoystickRawY;
++        Operator.JoyBtnRaw := SimJoystickRawButton;
++    END_IF;
+ 
++    Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
++    Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
++END_IF;
+ 
+ {endregion}
+ 
+@@ -677,6 +763,7 @@ Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
+ instSimSafety(
+     Enable            := TRUE,
+     SimChainOkBit     := SimChainOkBit,
++    SimPhaseRotationOkBit := SimPhaseRotationOkBit,
+     PowerCutOff_A     := PowerKeepAlive_A,
+     PowerCutOff_B     := PowerKeepAlive_B,
+     PowerCutOffRequest:= PowerCutOffRequest,
+@@ -687,7 +774,7 @@ instSimSafety(
+ 
+ Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
+ Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
+-Machine.PhaseRotationOk_DI             := TRUE;
++Machine.PhaseRotationOk_DI          := instSimSafety.SimPhaseRotationOk;
+ Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
+ instKoboldPowerUpTimer(IN := KoboldAutoEpisodeActive AND KoboldMeasureEnable
+                         AND (M1_CablePos_M > KoboldAutoDepthEpisode_M),
+diff --git a/CODE/L_SIMULATION/FB_Sim_Joystick.st b/CODE/L_SIMULATION/FB_Sim_Joystick.st
+index 81effe9d..cbe449e6 100644
+--- a/CODE/L_SIMULATION/FB_Sim_Joystick.st
++++ b/CODE/L_SIMULATION/FB_Sim_Joystick.st
+@@ -1,35 +1,10 @@
+-(* ═══════════════════════════════════════════════════════════════
+-   🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
+-   ───────────────────────────────────────────────────────────────
++(* =======================================================================
++   🧪 FB_Sim_Joystick — Simulation des entrees brutes joystick (bus CAN hors ligne)
++   🎯 Rôle : reproduire un geste operateur depuis un bouton directionnel.
++   Appui armement, debattement, relachement armement, retour dynamique.
++   Aucun etat arme produit ; permis et armement restent au joystick reel.
+    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+-   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
+-   🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
+-      (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
+-      permanence — un vrai contournement de sécurité). Ici, on simule les
+-      ENTRÉES BRUTES du capteur (`RawX`/`RawY`/`RawButton`) : le homme-mort réel
+-      de `FB_Joystick` reste pleinement actif et doit toujours être "actionné"
+-      (forcer `RawButton` en instance CODESYS) pour armer — comportement
+-      métier testé pour de vrai, pas contourné.
+-   🕹️ Comportement dynamique (conception validée) :
+-      - Ascending : bouton actif → `RawX`/`RawY` monte de `NeutralRaw` vers la cible
+-        (0 ou `MaxRaw`) en `RiseTimeS`, avec un bruit pseudo-aléatoire léger.
+-      - Dépassement (`OvershootActive`) : la cible de montée DÉPASSE la butée
+-        (MaxRaw+AMT ou 0−AMT) → déclenche le défaut capteur hors plage.
+-      - Retombée : bouton relâché → descente LINÉAIRE en `FallTimeMs` vers le neutre.
+-      - Bagotement (`BagotementActive`) : au retour, petit balancement de quelques %
+-        autour du neutre avant de se stabiliser.
+-   📥 Enable        : simulation active (SimulationModeActive AND NOT BusJoystickSignalIsReal)
+-   📥 NeutralRaw    : valeur brute simulée au repos (voir GVL_Simulation.TstJoystickForceNeutralRaw)
+-   📥 MaxRaw        : valeur brute simulée à fond (voir GVL_Simulation.TstJoystickForceMaxRaw)
+-   📥 Btn*          : boutons directionnels (1 seul impose une butée d'axe ; 0 ou ≥2 = neutre)
+-   📥 OvershootActive : bagotement au retour (test mouvement parasite)
+-   📥 RiseTimeS / FallTimeMs / CycleTimeS : dynamique temporelle (pattern FB_Sim_Encoder)
+-   📤 RawX/RawY     : valeurs brutes dynamiques (neutre = NeutralRaw)
+-   📤 RawButton     : homme-mort brut = un bouton directionnel actif
+-   💡 Note d'application : en vue instance CODESYS, forcer `RawX`/`RawY` à `MaxRaw` (ou une
+-      valeur intermédiaire) pour simuler un débattement, et `RawButton` à `TRUE` pour simuler
+-      l'appui homme-mort — exactement comme on forcerait le vrai capteur.
+-   ═══════════════════════════════════════════════════════════════ *)
++   ======================================================================= *)
+ 
+ // === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Joystick) ===
+ 
+@@ -47,14 +22,26 @@ VAR_INPUT
+     RiseTimeS           : REAL := 1.5;   (* --> [CFG] Temps de montée 0→100% (s) *)
+     FallTimeMs          : TIME := T#200MS;   (* --> [CFG] Temps de retombée 100%→0 *)
+     CycleTimeS          : REAL := 0.010;   (* --> [CFG] Période tâche PLC (s) — 10 ms *)
++    GesturePermit       : BOOL := TRUE; (* --> [SAFE] Stimuli manuels au repos avant un geste automatique *)
++    ArmHoldTime         : TIME := T#200MS; (* --> [CFG] Appui bouton avant debattement *)
++    ButtonReleaseDelay  : TIME := T#200MS; (* --> [CFG] Maintien bouton apres debut debattement *)
+ END_VAR
+ VAR_OUTPUT
+     RawX        : INT;   (* <-- [DIAG] Valeur brute axe X (dynamique, neutre = NeutralRaw) *)
+     RawY        : INT;   (* <-- [DIAG] Valeur brute axe Y (dynamique, neutre = NeutralRaw) *)
+-    RawButton   : BOOL;  (* <-- [DIAG] Homme-mort brut = un bouton directionnel actif *)
++    RawButton   : BOOL;  (* <-- [DIAG] Appui armement simule, relache pendant le maintien du manche *)
++    ModelActive : BOOL;  (* <-- [STAT] Propriete exclusive des trois entrees brutes pendant le geste et le retour *)
+     ReturningActive : BOOL;  (* <-- [STAT] TRUE si retour dynamique en cours (FALL/OVERSHOOT) — FB_SimBench émet le modèle *)
+ END_VAR
+ VAR
++    instArmTimer : TON; (* * [INST] Maintien armement avant debattement *)
++    instButtonReleaseTimer : TON; (* * [INST] Relachement bouton apres debut debattement *)
++    GestureStep : INT := 0; (* . [LOC] Attente relachement, disponible, appui, mouvement *)
++    RequestedDirection : INT; (* . [LOC] Direction unique demandee, 0 si aucune ou conflit *)
++    GestureDirection : INT; (* . [LOC] Direction memorisee au nouvel appui *)
++    DeflectionActive : BOOL; (* . [LOC] Debattement admis pour le geste courant *)
++    RequestMatchesGesture : BOOL; (* . [LOC] Direction demandee identique au geste *)
++    TimingValid : BOOL; (* . [LOC] Parametres dynamiques strictement positifs *)
+     FirstCycle  : BOOL := TRUE;   (* . [LOC] Initialisation au neutre *)
+     State       : INT := 0;   (* . [LOC] 0=IDLE, 1=RISE, 2=FALL, 3=OVERSHOOT *)
+     TargetX     : INT;   (* . [LOC] Cible brute axe X *)
+@@ -70,6 +57,14 @@ VAR
+     OscAcc      : REAL;   (* . [LOC] Accélération de l'oscillateur *)
+ END_VAR
+ VAR CONSTANT
++    CST_GESTURE_WAIT_RELEASE : INT := 0; (* . [CFG] Relachement complet et retour neutre requis *)
++    CST_GESTURE_READY : INT := 1; (* . [CFG] Nouveau geste disponible *)
++    CST_GESTURE_ARM : INT := 2; (* . [CFG] Appui armement, manche neutre *)
++    CST_GESTURE_MOVE : INT := 3; (* . [CFG] Manche deplace, bouton ensuite relache *)
++    CST_DIRECTION_LEFT : INT := 1; (* . [CFG] Demande X negatif *)
++    CST_DIRECTION_RIGHT : INT := 2; (* . [CFG] Demande X positif *)
++    CST_DIRECTION_FORWARD : INT := 3; (* . [CFG] Demande Y positif *)
++    CST_DIRECTION_REVERSE : INT := 4; (* . [CFG] Demande Y negatif *)
+     CST_ST_IDLE      : INT := 0;   (* . [CFG] État : au neutre *)
+     CST_ST_RISE      : INT := 1;   (* . [CFG] État : montée vers la cible *)
+     CST_ST_FALL      : INT := 2;   (* . [CFG] État : retombée linéaire *)
+@@ -85,13 +80,19 @@ END_VAR
+ {region "§1 Gate"}
+ // 🔑 Initialise au neutre au premier cycle uniquement ; ensuite RawX/RawY sont pilotés
+ // dynamiquement par les boutons. Quand la simulation est coupée, on revient au neutre.
+-IF NOT Enable THEN
++TimingValid := (RiseTimeS > 0.0) AND (CycleTimeS > 0.0) AND (FallTimeMs > T#0MS);
++IF NOT Enable OR NOT TimingValid THEN
+     FirstCycle := TRUE;
+     State      := CST_ST_IDLE;
+     RawX       := NeutralRaw;
+     RawY       := NeutralRaw;
+     RawButton  := FALSE;
+     ReturningActive := FALSE; // 📊 Neutralisation : simulation inactive hors Enable
++    ModelActive := FALSE;
++    GestureStep := CST_GESTURE_WAIT_RELEASE;
++    GestureDirection := 0;
++    instArmTimer(IN := FALSE, PT := ArmHoldTime);
++    instButtonReleaseTimer(IN := FALSE, PT := ButtonReleaseDelay);
+     RETURN;
+ END_IF;
+ {endregion}
+@@ -103,6 +104,7 @@ IF FirstCycle THEN
+     RawButton  := FALSE;
+     State      := CST_ST_IDLE;
+     FirstCycle := FALSE;
++    GestureStep := CST_GESTURE_WAIT_RELEASE;
+ END_IF;
+ {endregion}
+ 
+@@ -119,7 +121,57 @@ Noise   := (RandCnt MOD 50) - 25;   // ±25 points (≈ ±0.5% de la course)
+ // déclencher le défaut capteur hors plage (RawOutOfRange) — test du dépassement de valeur.
+ BtnCount := BOOL_TO_INT(BtnLeft_Rev_TREMIE) + BOOL_TO_INT(BtnRight_Fwd_MAINT)
+           + BOOL_TO_INT(BtnFwd_Up_Close) + BOOL_TO_INT(BtnRev_Down_Open);
++RequestedDirection := 0;
+ IF BtnCount = 1 THEN
++    IF BtnLeft_Rev_TREMIE THEN RequestedDirection := CST_DIRECTION_LEFT;
++    ELSIF BtnRight_Fwd_MAINT THEN RequestedDirection := CST_DIRECTION_RIGHT;
++    ELSIF BtnFwd_Up_Close THEN RequestedDirection := CST_DIRECTION_FORWARD;
++    ELSE RequestedDirection := CST_DIRECTION_REVERSE;
++    END_IF;
++END_IF;
++
++// Un seul appui brut par geste ; aucun nouvel essai tant que l'IHM reste tenue.
++instArmTimer(IN := GestureStep = CST_GESTURE_ARM, PT := ArmHoldTime);
++instButtonReleaseTimer(IN := GestureStep = CST_GESTURE_MOVE, PT := ButtonReleaseDelay);
++DeflectionActive := FALSE;
++RawButton := FALSE;
++RequestMatchesGesture := (RequestedDirection = GestureDirection) AND (BtnCount = 1);
++IF BtnCount > 0 THEN ModelActive := TRUE; END_IF;
++IF NOT GesturePermit THEN GestureStep := CST_GESTURE_WAIT_RELEASE; END_IF;
++
++IF GestureStep = CST_GESTURE_WAIT_RELEASE THEN
++        // Les boutons doivent etre relaches APRES stabilisation du retour.
++        IF (BtnCount = 0) AND (State = CST_ST_IDLE) AND GesturePermit THEN
++            GestureStep := CST_GESTURE_READY;
++            ModelActive := FALSE;
++        END_IF;
++ELSIF GestureStep = CST_GESTURE_READY THEN
++        IF BtnCount = 1 THEN
++            GestureDirection := RequestedDirection;
++            GestureStep := CST_GESTURE_ARM;
++            RawButton := TRUE;
++        ELSIF BtnCount > 1 THEN
++            GestureStep := CST_GESTURE_WAIT_RELEASE;
++        END_IF;
++ELSIF GestureStep = CST_GESTURE_ARM THEN
++        IF NOT RequestMatchesGesture THEN
++            GestureStep := CST_GESTURE_WAIT_RELEASE;
++        ELSE
++            RawButton := TRUE;
++            IF instArmTimer.Q THEN GestureStep := CST_GESTURE_MOVE; END_IF;
++        END_IF;
++ELSIF GestureStep = CST_GESTURE_MOVE THEN
++        IF NOT RequestMatchesGesture THEN
++            GestureStep := CST_GESTURE_WAIT_RELEASE;
++        ELSE
++            DeflectionActive := TRUE;
++            RawButton := NOT instButtonReleaseTimer.Q;
++        END_IF;
++ELSE
++    GestureStep := CST_GESTURE_WAIT_RELEASE;
++END_IF;
++
++IF DeflectionActive THEN
+     IF BtnLeft_Rev_TREMIE THEN
+         IF OvershootActive THEN TargetX := 0 - CST_OVERSHOOT_AMT; ELSE TargetX := 0; END_IF;
+         TargetY := NeutralRaw; ActiveAxis := 1;
+@@ -224,7 +276,7 @@ END_IF;
+ {endregion}
+ 
+ {region "§8 Homme-mort brut + drapeau retour"}
+-RawButton := BtnLeft_Rev_TREMIE OR BtnRight_Fwd_MAINT OR BtnFwd_Up_Close OR BtnRev_Down_Open;
++// RawButton est exclusivement produit par le sequenceur du geste (§4).
+ // Drapeau "retour dynamique en cours" : TRUE si l'état est FALL ou OVERSHOOT (retombée/bagotement).
+ // Permet à FB_SimBench d'émettre la sortie du modèle même après relâchement du bouton.
+ ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
+diff --git a/CODE/L_SIMULATION/FB_Sim_Safety.st b/CODE/L_SIMULATION/FB_Sim_Safety.st
+index 2d0f650a..b102b0dc 100644
+--- a/CODE/L_SIMULATION/FB_Sim_Safety.st
++++ b/CODE/L_SIMULATION/FB_Sim_Safety.st
+@@ -40,6 +40,7 @@ FUNCTION_BLOCK FB_Sim_Safety
+ VAR_INPUT
+     Enable            : BOOL; // --> [CMD] Activation de la simulation
+     SimChainOkBit     : BOOL; // --> [TST] Bit opérateur : TRUE = simuler chaîne AU fermée
++    SimPhaseRotationOkBit : BOOL; // --> [TST] Bit opérateur : TRUE = phases réseau OK simulées ; FALSE = défaut rotation de phases injecté
+     PowerCutOff_A     : BOOL; // --> [SAFE] Commande coupure canal A (TRUE = OK/fermé)
+     PowerCutOff_B     : BOOL; // --> [SAFE] Commande coupure canal B (TRUE = OK/fermé)
+     PowerCutOffRequest: BOOL; // --> [SAFE] Requête coupure métier (TRUE = arrêt d'urgence)
+@@ -50,6 +51,7 @@ END_VAR
+ VAR_OUTPUT
+     SimChainOk      : BOOL; // <-- [STAT] Boucle AU simulée saine
+     SimContactorOk  : BOOL; // <-- [STAT] Contacteur simulé engagé
++    SimPhaseRotationOk : BOOL; // <-- [STAT] Contrôleur de phases simulé : TRUE = phases saines (aucun défaut)
+ END_VAR
+ VAR
+     ContactorLatch  : BOOL; // . [LOC] Mémorisation de l'auto-maintien du contacteur
+@@ -77,6 +79,7 @@ END_VAR
+ IF NOT Enable THEN
+     SimChainOk     := FALSE;
+     SimContactorOk := FALSE;
++    SimPhaseRotationOk := FALSE;
+     ContactorLatch := FALSE;
+     ChainOpen      := TRUE; // Chaîne ouverte par défaut à la ré-entrée (on n'a pas armé)
+     ChainOpenReq   := FALSE;
+@@ -153,4 +156,8 @@ END_IF;
+ 
+ // Recopie vers la sortie
+ SimContactorOk := ContactorLatch;
++
++// Contrôleur de phases : simple propagation du bit opérateur (TRUE = sain).
++// Inopérant hors simulation (le banc ne publie l'image machine que sous Enable).
++SimPhaseRotationOk := SimPhaseRotationOkBit;
+ {endregion}
+diff --git a/CODE/L_SIMULATION/FB_Sim_Translation.st b/CODE/L_SIMULATION/FB_Sim_Translation.st
+index c29b2be0..b81ae9f4 100644
+--- a/CODE/L_SIMULATION/FB_Sim_Translation.st
++++ b/CODE/L_SIMULATION/FB_Sim_Translation.st
+@@ -19,8 +19,20 @@ VAR_INPUT
+        le gate G518 echoue si les deux echelles divergent. *)
+     FullTravelTimeS : REAL := 37.5;
+     BrakeReleaseCmd : BOOL := TRUE;
++    (* ECHELLE DE LA CONSIGNE. PRG_02 envoie SpeedCmd_Pct = f / 50 Hz x 100 : le simulateur reconvertit
++       avec le MEME maximum, sinon 20 Hz reels (40 %) deviendraient 16 Hz simules.
++       Maximum = GVL_PERSISTENT._TranslationMaxFreq_Hz (50 Hz), passe par FB_SimBench (CST_M3MaxFreq_Hz,
++       egalite verifiee par G518). Ne pas confondre avec CST_NominalFrequency_Hz (40 Hz) : echelle
++       ODOMETRIQUE (gain 0,02 m/(Hz.s)). *)
++    MaxFreq_Hz : REAL := 50.0;
++    (* ACCELERATION DU BANC (confort d'essai). Le chariot avance SpeedFactor fois plus vite ET la
++       frequence RETOURNEE au PLC est multipliee d'autant : l'estimateur (f x gain) suit exactement
++       le chariot, sans saut de recalage, et le ratio publie reste 0,02 m/(Hz.s) (G518).
++       Borne 1..5. 1,0 = dynamique reelle. Le frein et la memoire de sens restent sur la frequence
++       physique du variateur simule. *)
++    SpeedFactor : REAL := 1.0;
+     AccelRate_HzPerS : REAL := 20.0;
+-    DecelRate_HzPerS : REAL := 20.0;
++    DecelRate_HzPerS : REAL := 25.0; // pente d'arret relevee sur trace reelle (rampe variateur / rampe PLC)
+     DriveTimeConstantS : REAL := 0.15;
+     BrakeOpenDelayS : REAL := 0.10;
+     BrakeCloseDelayS : REAL := 0.09;
+@@ -100,6 +112,7 @@ VAR
+        retenue (gain audit 0,0551 m/(Hz.s)). A ne pas citer comme une mesure. *)
+     TravelDirection : REAL;
+     FrequencyTarget_Hz : REAL;
++    SpeedFactorApplied : REAL := 1.0;
+     CycleTimeS : REAL;
+     SpeedAt40Hz_Mps : REAL;
+     VelocityTarget_Mps : REAL;
+@@ -133,7 +146,7 @@ VAR CONSTANT
+        sinon un modele borne a 30 m ne peut jamais produire le mot 00000. Cette
+        position est SYNTHETIQUE en attente de la mesure de la came reelle. *)
+     CST_PositionAtMaintenanceSensor_M : REAL := 29.95;
+-    CST_NominalFrequency_Hz : REAL := 40.0;
++    CST_NominalFrequency_Hz : REAL := 40.0; // echelle ODOMETRIQUE lue par G518 — PAS le maximum variateur (MaxFreq_Hz)
+     CST_MinTimeS : REAL := 0.001;
+     (* Meme seuil d'arret que FB_Sim_TranslationBrake.CST_StopFrequency_Hz (0,5 Hz).
+        Valide par la trace terrain du 2026-09-04 : frein ouvert a 0,60 Hz, ferme a 0,00 Hz. *)
+@@ -196,7 +209,7 @@ IF Enable THEN
+         DirectionSign := 1.0;
+     END_IF;
+ 
+-    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * 0.4, CST_NominalFrequency_Hz);
++    FrequencyTarget_Hz := LIMIT(0.0, ABS(SpeedTgt_Pct) * MaxFreq_Hz / 100.0, MaxFreq_Hz);
+     IF DirectionSign = 0.0 THEN
+         FrequencyTarget_Hz := 0.0;
+     END_IF;
+@@ -207,9 +220,10 @@ IF Enable THEN
+         LoadFrequencyDroopGain_Hz := LoadFrequencyDroopGain_Hz, CycleTime_S := CycleTimeS);
+     FrequencyCmd_Hz := instDrive.FrequencyCmd_Hz;
+     ElectricalFrequency_Hz := instDrive.ElectricalFrequency_Hz;
+-    ActualFrequency_Hz := instDrive.ActualFrequency_Hz;
++    SpeedFactorApplied := LIMIT(1.0, SpeedFactor, 5.0);
++    ActualFrequency_Hz := instDrive.ActualFrequency_Hz * SpeedFactorApplied;
+     instBrake(Enable := TRUE, ReleaseCmd := BrakeReleaseCmd,
+-        ActualFrequency_Hz := ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
++        ActualFrequency_Hz := instDrive.ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
+         CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
+         CycleTime_S := CycleTimeS,
+         FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
+@@ -231,7 +245,7 @@ IF Enable THEN
+         TravelDirection := 1.0;
+     ELSIF ReqTremie AND ReqMaintenance THEN
+         TravelDirection := 0.0;
+-    ELSIF ABS(ActualFrequency_Hz) <= CST_StopFrequency_Hz THEN
++    ELSIF ABS(instDrive.ActualFrequency_Hz) <= CST_StopFrequency_Hz THEN
+         TravelDirection := 0.0;
+     END_IF;
+ 
+diff --git a/CODE/L_SIMULATION/FB_Sim_TranslationDrive.st b/CODE/L_SIMULATION/FB_Sim_TranslationDrive.st
+index 23e04192..0f062a80 100644
+--- a/CODE/L_SIMULATION/FB_Sim_TranslationDrive.st
++++ b/CODE/L_SIMULATION/FB_Sim_TranslationDrive.st
+@@ -5,7 +5,7 @@ VAR_INPUT
+     Enable : BOOL;
+     FrequencyTgt_Hz : REAL;
+     AccelRate_HzPerS : REAL := 20.0;
+-    DecelRate_HzPerS : REAL := 20.0;
++    DecelRate_HzPerS : REAL := 25.0; // pente d'arret relevee sur trace reelle
+     TimeConstant_S : REAL := 0.15;
+     LoadAngularVelocity_RadPerS : REAL;
+     LoadFrequencyDroopGain_Hz : REAL := 0.50;
+@@ -24,7 +24,7 @@ VAR
+ END_VAR
+ VAR CONSTANT
+     CST_MinTime_S : REAL := 0.001;
+-    CST_MaxFrequency_Hz : REAL := 40.0;
++    CST_MaxFrequency_Hz : REAL := 50.0; // plafond variateur reel (GVL_PERSISTENT._TranslationMaxFreq_Hz)
+ END_VAR
+ 
+ IF NOT Enable THEN
+diff --git a/CODE/L_SIMULATION/FB_Sim_Translation_ExtLink.st b/CODE/L_SIMULATION/FB_Sim_Translation_ExtLink.st
+new file mode 100644
+index 00000000..257bf387
+--- /dev/null
++++ b/CODE/L_SIMULATION/FB_Sim_Translation_ExtLink.st
+@@ -0,0 +1,328 @@
++(* ═══════════════════════════════════════════════════════════════
++   🧪 FB_Sim_Translation_ExtLink — Lien UDP vers le simulateur externe M3
++   ───────────────────────────────────────────────────────────────
++   🎯 Rôle : Échange UDP loopback avec la passerelle FMU OpenModelica et publie l'image
++      matérielle M3 (ST_HwTranslation) ; alternative externe à FB_Sim_Translation.
++   🔒 Sécurité : Enable=FALSE ferme le socket et neutralise ; loopback 127.0.0.1 uniquement ;
++      perte de liaison = dernière image valide gelée + LinkTimeout, jamais de saut de capteurs.
++   🔌 Protocole : trames binaires M3B1 (commande 32 octets, réponse 39 octets), cadence tâche.
++   🧩 Appelé par FB_SimBench (aiguillage M3_OpenModelicaActive) ; aucune lecture de GVL ici.
++   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
++   ═══════════════════════════════════════════════════════════════ *)
++
++FUNCTION_BLOCK PUBLIC FB_Sim_Translation_ExtLink
++VAR_INPUT
++    // === CONTRAT LIGHT (Enable) ===
++    Enable                  : BOOL;   // --> [CMD] Lien actif (simulation + domaine M3 + source externe)
++
++    // === COMMANDES M3 ===
++    ReqTremie               : BOOL;   // --> [CMD] Demande vers Trémie (sortie finale PRG_06)
++    ReqMaintenance          : BOOL;   // --> [CMD] Demande vers Maintenance (sortie finale PRG_06)
++    SetpointFrequencyHz     : WORD;   // --> [CMD] Consigne fréquence variateur, Hz x100
++    BrakeReleaseCmd         : BOOL;   // --> [CMD] TRUE = desserrage frein commandé
++
++    // === ECHO ETAT PLC (diagnostic simulateur) ===
++    PlcEcho                 : ST_fbSim_Translation_ExtLink_Echo; // --> [TST] Etat decisionnel M3 copie dans la trame
++END_VAR
++
++VAR_OUTPUT
++    // === CONTRAT LIGHT (Ready) ===
++    Ready                   : BOOL;   // <-- [STAT] Socket ouvert, lien en cours d'échange
++
++    // === IMAGE MATERIELLE M3 ===
++    Translation             : ST_HwTranslation; // <-- [DIAG] Image retours M3 (initiale P1, puis FMU)
++
++    // === ETAT DU LIEN ===
++    LinkReady               : BOOL;   // <-- [STAT] Au moins une trame valide reçue et lien non expiré
++    LinkTimeout             : BOOL;   // <-- [DIAG] Aucune trame valide depuis CST_LinkTimeout
++    LinkInvalid             : BOOL;   // <-- [DIAG] Dernière trame rejetée, ou lien expiré
++    LinkAge_Ms              : UDINT;  // <-- [DIAG] Durée sans trame valide, ms
++    TxCount                 : UDINT;  // <-- [DIAG] Trames commande émises
++    RxCount                 : UDINT;  // <-- [DIAG] Trames réponse acceptées
++    RejectCount             : UDINT;  // <-- [DIAG] Trames rejetées ou émissions en échec
++END_VAR
++
++VAR
++    // === SOUS-INSTANCES ===
++    AgeTimer                : TON;    // * [INST] Durée sans trame valide
++
++    // === SOCKET ===
++    SocketHandle            : RTS_IEC_HANDLE := RTS_INVALID_HANDLE; // . [LOC] Socket UDP
++    NonBlocking             : DINT := 1;                  // . [LOC] Option socket non bloquant
++    SocketIsOpen            : BOOL := FALSE;              // . [LOC] Socket réellement ouvert (ni invalide, ni factice)
++    LastResult              : RTS_IEC_RESULT := 0;        // . [LOC] Dernier code retour socket
++    DestAddress             : STRING := '127.0.0.1';      // . [LOC] Adresse loopback (variable : szDestAddress est VAR_IN_OUT)
++    Reply                   : UDP_REPLY;                  // . [LOC] Adresse émettrice de la réponse
++    Tx                      : ARRAY [0..31] OF BYTE;      // . [LOC] Trame commande
++    Rx                      : ARRAY [0..63] OF BYTE;      // . [LOC] Trame réponse
++    Bytes                   : __XINT := 0;                // . [LOC] Octets émis/reçus
++
++    // === ETAT DU LIEN ===
++    HasValidFrame           : BOOL := FALSE;              // . [LOC] Une trame valide a été acceptée
++    FrameAccepted           : BOOL := FALSE;              // . [LOC] Au moins une trame acceptée ce scan
++    FrameRejected           : BOOL := FALSE;              // . [LOC] Au moins une trame rejetée ce scan
++    FrameIsAcceptedNow      : BOOL := FALSE;              // . [LOC] Trame en cours de lecture acceptée
++    RxReads                 : UINT := 0;                  // . [LOC] Lectures UDP effectuées ce scan
++    Sequence                : UDINT := 0;                 // . [LOC] Numéro de commande émise
++    LastRxSequence          : UDINT := 0;                 // . [LOC] Dernier numéro de réponse accepté
++
++    // === DECODAGE TRAME ===
++    TxFrequency_x100        : UINT := 0;                  // . [LOC] Consigne bornée émise
++    TxControlWord           : UINT := 0;                  // . [LOC] 0=arrêt, 1=Trémie, 2=Maintenance
++    EchoFlagsA              : BYTE := 0;                  // . [LOC] Écho : autorisations, sécurité, fins de course
++    EchoFlagsB              : BYTE := 0;                  // . [LOC] Écho : sens actif, jetons de position, lien
++    EchoPos_Cm              : INT := 0;                   // . [LOC] Écho : position estimée, cm
++    RxSequence              : UDINT := 0;                 // . [LOC] Numéro de la réponse
++    RxCommandSequence       : UDINT := 0;                 // . [LOC] Commande acquittée par la réponse
++    RxFrequency_x100        : UINT := 0;                  // . [LOC] Fréquence mesurée FMU
++    RxBrakeIsOpen           : BOOL := FALSE;              // . [LOC] Frein ouvert (FMU)
++    RxStatusWord            : WORD := 0;                  // . [LOC] Status word variateur simulé
++    RxSensors               : ARRAY [0..4] OF BOOL;       // . [LOC] 0=Trémie 1=PV 2=P2 3=P1 4=Maintenance
++    MagicIsValid            : BOOL := FALSE;              // . [LOC] En-tête M3B1 reconnu
++    TypeIsValid             : BOOL := FALSE;              // . [LOC] Schéma 1 et type réponse
++    FrameIsValid            : BOOL := FALSE;              // . [LOC] En-tête complet valide
++    SequenceIsNewer         : BOOL := FALSE;              // . [LOC] Numéros strictement croissants
++    SequenceHasWrapped      : BOOL := FALSE;              // . [LOC] Passage FFFFFFFF -> 0
++    LinkIsRestarting        : BOOL := FALSE;              // . [LOC] Premier échange ou reprise après expiration
++    SequenceIsAccepted      : BOOL := FALSE;              // . [LOC] Numéro acceptable
++    BreakTremiePv           : BOOL := FALSE;              // . [LOC] Rupture de chaîne Trémie/PV
++    BreakPvP2               : BOOL := FALSE;              // . [LOC] Rupture de chaîne PV/P2
++    BreakP2P1               : BOOL := FALSE;              // . [LOC] Rupture de chaîne P2/P1
++    BreakP1Maintenance      : BOOL := FALSE;              // . [LOC] Rupture de chaîne P1/Maintenance
++    BreakNearTremie         : BOOL := FALSE;              // . [LOC] Rupture côté Trémie
++    BreakNearMaintenance    : BOOL := FALSE;              // . [LOC] Rupture côté Maintenance
++    SensorWordIsIncoherent  : BOOL := FALSE;              // . [LOC] Mot capteurs hors chaîne terrain
++
++    // === IMAGE INITIALE ===
++    // Zone P1 (00011) : AtPositionP1 n'est jamais forcé, le PLC attend un front capteur en mouvement.
++    InitialImage            : ST_HwTranslation := (M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE, M3_ThermalOK_DI := TRUE, M3_StatusWord := 16#0080, AC600_DeviceState := DEVICE_STATE.RUNNING);
++END_VAR
++
++VAR CONSTANT
++    CST_PortLocal           : UINT := 29061;              // Port UDP loopback commande (passerelle FMU)
++    CST_PortRemote          : UINT := 29062;              // Port UDP loopback réponse
++    CST_TxSize              : __XINT := 32;               // Taille trame commande
++    CST_RxSize              : __XINT := 39;               // Taille trame réponse
++    CST_LinkTimeout         : TIME := T#1s;               // Expiration du lien
++    CST_MaxFrequency_x100   : UINT := 5000;               // 50,00 Hz
++    CST_SequenceMax         : UDINT := 16#FFFFFFFF;       // Valeur avant rebouclage
++    CST_ControlWordTremie   : UINT := 1;                  // Mot de commande vers Trémie
++    CST_ControlWordMaint    : UINT := 2;                  // Mot de commande vers Maintenance
++    CST_MaxRxPerScan        : UINT := 8;                  // Lectures UDP max par scan (vidage de file borné)
++    CST_EchoVersion         : BYTE := 1;                  // Version de l'écho PLC (0 = absent)
++    CST_EchoPosMin_M        : REAL := -300.0;             // Bornes de l'écho position (INT en cm)
++    CST_EchoPosMax_M        : REAL := 300.0;
++    CST_CmPerM              : REAL := 100.0;              // Conversion m -> cm
++    CST_ResultOk            : RTS_IEC_RESULT := 0;        // Code retour socket OK (ERR_OK)
++END_VAR
++
++{region "§1 Gate neutralisation"}
++// === ⚙️ §1 GATE NEUTRALISATION ===
++IF NOT Enable THEN
++    IF SocketHandle <> SysTypes.RTS_INVALID_HANDLE THEN
++        SysSockCloseUdp(SocketHandle);
++    END_IF;
++    SocketHandle := SysTypes.RTS_INVALID_HANDLE;
++    HasValidFrame := FALSE;
++    FrameAccepted := FALSE;
++    Sequence := 0;
++    LastRxSequence := 0;
++    AgeTimer(IN := FALSE, PT := CST_LinkTimeout);
++    Ready := FALSE;
++    LinkReady := FALSE;
++    LinkTimeout := FALSE;
++    LinkInvalid := FALSE;
++    LinkAge_Ms := 0;
++    Translation := InitialImage;
++    RETURN;
++END_IF;
++{endregion}
++
++{region "§2 Image initiale avant la premiere trame valide"}
++// === 📥 §2 IMAGE INITIALE ===
++IF NOT HasValidFrame THEN
++    Translation := InitialImage;
++END_IF;
++{endregion}
++
++{region "§3 Ouverture du socket"}
++// === 🔌 §3 SOCKET ===
++// Handle 0 = socket factice (simulateur intégré de l'IDE, sans réseau) : jamais considéré ouvert.
++SocketIsOpen := (SocketHandle <> SysTypes.RTS_INVALID_HANDLE) AND (SocketHandle <> 0);
++IF NOT SocketIsOpen THEN
++    SocketHandle := SysSockCreateUdp(CST_PortLocal, CST_PortRemote, ADR(LastResult));
++    SocketIsOpen := (SocketHandle <> SysTypes.RTS_INVALID_HANDLE) AND (SocketHandle <> 0);
++    IF SocketIsOpen THEN
++        LastResult := SysSockIoctl(SocketHandle, SOCKET_FIONBIO, ADR(NonBlocking));
++        // 🔒 Socket non bloquant obligatoire : sinon la lecture gèlerait la tâche automate.
++        IF LastResult <> CST_ResultOk THEN
++            SysSockCloseUdp(SocketHandle);
++            SocketHandle := RTS_INVALID_HANDLE;
++            SocketIsOpen := FALSE;
++        END_IF;
++    END_IF;
++    Ready := FALSE;
++    RETURN;
++END_IF;
++Ready := TRUE;
++{endregion}
++
++{region "§4 Emission commande"}
++// === 📤 §4 EMISSION COMMANDE ===
++TxFrequency_x100 := MIN(WORD_TO_UINT(SetpointFrequencyHz), CST_MaxFrequency_x100);
++IF ReqTremie AND NOT ReqMaintenance THEN
++    TxControlWord := CST_ControlWordTremie;
++ELSIF ReqMaintenance AND NOT ReqTremie THEN
++    TxControlWord := CST_ControlWordMaint;
++ELSE
++    TxControlWord := 0;
++END_IF;
++
++// En-tête M3B1, schéma 1, type commande 1, numéro, Hz x100, mot de commande, frein.
++Tx[0] := 16#4D; Tx[1] := 16#33; Tx[2] := 16#42; Tx[3] := 16#31;
++Tx[4] := 1; Tx[5] := 1;
++Tx[6] := UDINT_TO_BYTE(Sequence AND 16#FF);
++Tx[7] := UDINT_TO_BYTE(SHR(Sequence, 8) AND 16#FF);
++Tx[8] := UDINT_TO_BYTE(SHR(Sequence, 16) AND 16#FF);
++Tx[9] := UDINT_TO_BYTE(SHR(Sequence, 24) AND 16#FF);
++Tx[10] := UINT_TO_BYTE(TxFrequency_x100 AND 16#FF);
++Tx[11] := UINT_TO_BYTE(SHR(TxFrequency_x100, 8));
++Tx[12] := UINT_TO_BYTE(TxControlWord AND 16#FF);
++Tx[13] := UINT_TO_BYTE(SHR(TxControlWord, 8));
++Tx[14] := BOOL_TO_BYTE(BrakeReleaseCmd);
++
++// 📊 Écho de l'état PLC dans les octets libres 23..31 (lecture seule côté simulateur).
++EchoFlagsA := BOOL_TO_BYTE(PlcEcho.MaintenanceTargetEnable)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.MaintenanceZoneAccess), 1)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.SafeStop), 2)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.PowerCutOff), 3)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.LimitSwitchTremie), 4)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.LimitSwitchMaintenance), 5)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.PositionReached), 6)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.ActiveTremie), 7);
++EchoFlagsB := BOOL_TO_BYTE(PlcEcho.ActiveMaintenance)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.AtTremie), 1)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.AtPV), 2)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.AtP2), 3)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.AtP1), 4)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.AtMaintenance), 5)
++           OR SHL(BOOL_TO_BYTE(LinkReady), 6)
++           OR SHL(BOOL_TO_BYTE(PlcEcho.SensorWordIncoherent), 7);
++EchoPos_Cm := REAL_TO_INT(LIMIT(CST_EchoPosMin_M, PlcEcho.EstimatedPos_M, CST_EchoPosMax_M) * CST_CmPerM);
++Tx[23] := CST_EchoVersion;
++Tx[24] := INT_TO_BYTE(PlcEcho.Mode);
++Tx[25] := INT_TO_BYTE(PlcEcho.FBState);
++Tx[26] := INT_TO_BYTE(PlcEcho.AxisBlockReason);
++Tx[27] := EchoFlagsA;
++Tx[28] := EchoFlagsB;
++Tx[29] := WORD_TO_BYTE(INT_TO_WORD(EchoPos_Cm) AND 16#FF);
++Tx[30] := WORD_TO_BYTE(SHR(INT_TO_WORD(EchoPos_Cm), 8));
++Tx[31] := WORD_TO_BYTE(PlcEcho.SafetyErrorId AND 16#FF);
++// Adresse loopback écrite en littéral : une constante STRING déclarée est importée vide
++// par le générateur PLCopenXML, et l'envoi partirait vers une adresse vide.
++Bytes := SysSockSendToUdp(SocketHandle, CST_PortLocal, DestAddress, ADR(Tx), SIZEOF(Tx), ADR(LastResult));
++IF Bytes = CST_TxSize THEN
++    TxCount := TxCount + 1;
++    Sequence := Sequence + 1;
++ELSE
++    RejectCount := RejectCount + 1;
++END_IF;
++{endregion}
++
++{region "§5 Reception et validation réponse"}
++// === 📥 §5 RECEPTION ===
++// File UDP vidée à chaque scan (bornée) : un retard ponctuel ne devient jamais permanent.
++// Chaque trame acceptée met à jour l'image ; la dernière acceptée l'emporte.
++FrameAccepted := FALSE;
++FrameRejected := FALSE;
++RxReads := 0;
++REPEAT
++Bytes := SysSockRecvFromUdp(SocketHandle, ADR(Rx), SIZEOF(Rx), ADR(Reply), ADR(LastResult));
++RxReads := RxReads + 1;
++FrameIsAcceptedNow := FALSE;
++IF Bytes = CST_RxSize THEN
++    MagicIsValid := (Rx[0] = 16#4D) AND (Rx[1] = 16#33) AND (Rx[2] = 16#42) AND (Rx[3] = 16#31);
++    TypeIsValid := (Rx[4] = 1) AND (Rx[5] = 2);
++    FrameIsValid := MagicIsValid AND TypeIsValid;
++
++    IF FrameIsValid THEN
++        RxSequence := BYTE_TO_UDINT(Rx[6]) OR SHL(BYTE_TO_UDINT(Rx[7]), 8)
++                      OR SHL(BYTE_TO_UDINT(Rx[8]), 16) OR SHL(BYTE_TO_UDINT(Rx[9]), 24);
++        RxCommandSequence := BYTE_TO_UDINT(Rx[10]) OR SHL(BYTE_TO_UDINT(Rx[11]), 8)
++                             OR SHL(BYTE_TO_UDINT(Rx[12]), 16) OR SHL(BYTE_TO_UDINT(Rx[13]), 24);
++
++        // Numéros strictement croissants, rebouclage FFFFFFFF -> 0 admis, redémarrage passerelle admis.
++        SequenceIsNewer := (RxCommandSequence > LastRxSequence) AND (RxSequence > LastRxSequence);
++        SequenceHasWrapped := (LastRxSequence = CST_SequenceMax) AND (RxCommandSequence = 0) AND (RxSequence = 0);
++        LinkIsRestarting := AgeTimer.Q OR NOT HasValidFrame;
++        SequenceIsAccepted := SequenceIsNewer OR SequenceHasWrapped OR LinkIsRestarting;
++
++        RxFrequency_x100 := BYTE_TO_UINT(Rx[16]) OR SHL(BYTE_TO_UINT(Rx[17]), 8);
++        RxBrakeIsOpen := Rx[20] <> 0;
++        RxStatusWord := BYTE_TO_WORD(Rx[21]);
++        RxSensors[0] := Rx[22] <> 0;
++        RxSensors[1] := Rx[23] <> 0;
++        RxSensors[2] := Rx[24] <> 0;
++        RxSensors[3] := Rx[25] <> 0;
++        RxSensors[4] := Rx[26] <> 0;
++
++        // Chaîne terrain admissible : 11111 -> 01111 -> 00111 -> 00011 -> 00001 -> 00000.
++        // Rupture = un capteur actif suivi d'un capteur inactif côté Maintenance (ex. 10111).
++        BreakTremiePv := RxSensors[0] AND NOT RxSensors[1];
++        BreakPvP2 := RxSensors[1] AND NOT RxSensors[2];
++        BreakP2P1 := RxSensors[2] AND NOT RxSensors[3];
++        BreakP1Maintenance := RxSensors[3] AND NOT RxSensors[4];
++        BreakNearTremie := BreakTremiePv OR BreakPvP2;
++        BreakNearMaintenance := BreakP2P1 OR BreakP1Maintenance;
++        SensorWordIsIncoherent := BreakNearTremie OR BreakNearMaintenance;
++
++        FrameIsAcceptedNow := SequenceIsAccepted AND NOT SensorWordIsIncoherent;
++    END_IF;
++
++    IF FrameIsAcceptedNow THEN
++        Translation.M3_PosTremie_DI := RxSensors[0];
++        Translation.M3_PosPV_DI := RxSensors[1];
++        Translation.M3_PosPVP2_DI := RxSensors[2];
++        Translation.M3_PosP1_DI := RxSensors[3];
++        Translation.M3_PosMaintenance_DI := RxSensors[4];
++        Translation.M3_BrakeIsOpen_DI := RxBrakeIsOpen;
++        Translation.M3_ThermalOK_DI := TRUE;
++        Translation.M3_StatusWord := RxStatusWord;
++        Translation.M3_ActualFrequencyHz := RxFrequency_x100;
++        Translation.AC600_DeviceState := DEVICE_STATE.RUNNING;
++        LastRxSequence := RxSequence;
++        HasValidFrame := TRUE;
++        RxCount := RxCount + 1;
++        FrameAccepted := TRUE;
++    ELSE
++        RejectCount := RejectCount + 1;
++        FrameRejected := TRUE;
++    END_IF;
++ELSIF Bytes > 0 THEN
++    // Datagramme de taille inattendue : rejeté.
++    RejectCount := RejectCount + 1;
++    FrameRejected := TRUE;
++END_IF;
++UNTIL (Bytes <= 0) OR (RxReads >= CST_MaxRxPerScan)
++END_REPEAT;
++{endregion}
++
++{region "§6 Etat du lien"}
++// === 📊 §6 ETAT DU LIEN ===
++// Une trame rejetée ou absente laisse Translation inchangée (image gelée, pas de saut de capteurs).
++AgeTimer(IN := NOT FrameAccepted, PT := CST_LinkTimeout);
++LinkTimeout := AgeTimer.Q;
++LinkReady := HasValidFrame AND NOT AgeTimer.Q;
++LinkAge_Ms := TIME_TO_UDINT(AgeTimer.ET);
++
++IF FrameAccepted THEN
++    LinkInvalid := FALSE;
++ELSIF FrameRejected THEN
++    LinkInvalid := TRUE;
++END_IF;
++IF AgeTimer.Q THEN
++    LinkInvalid := TRUE;
++END_IF;
++{endregion}
++
++END_FUNCTION_BLOCK
+diff --git a/CODE/L_SIMULATION/GVL_Simulation.st b/CODE/L_SIMULATION/GVL_Simulation.st
+index c02a3bfc..2d5384cd 100644
+--- a/CODE/L_SIMULATION/GVL_Simulation.st
++++ b/CODE/L_SIMULATION/GVL_Simulation.st
+@@ -26,8 +26,21 @@ VAR_GLOBAL
+     // TRUE = capteur haut actif; FALSE = position libre. Inopérant hors simulation.
+     SimTopPositionActive        : BOOL := FALSE;
+     SimTranslationActive        : BOOL := FALSE; // M3 : AC600, fréquence, 5 capteurs et frein
++    // 🔀 Source de l'image M3 dans FB_SimBench : FALSE = modèle ST interne, TRUE = simulateur
++    // externe (lien UDP FB_Sim_Translation_ExtLink, FMU OpenModelica). Posé par l'opérateur.
++    // Inopérant hors SimulationModeActive ET SimTranslationActive ; l'image réelle reste prioritaire.
++    SimM3OpenModelicaActive     : BOOL := FALSE;
++    // 📊 État du lien externe M3 (lecture seule, produit par PRG_02 depuis FB_SimBench).
++    SimM3LinkReady              : BOOL := FALSE; // TRUE = trame valide reçue et lien non expiré
++    SimM3LinkTimeout            : BOOL := FALSE; // TRUE = aucune trame valide depuis 1 s
++    SimM3LinkInvalid            : BOOL := FALSE; // TRUE = trame rejetée ou lien expiré
++    SimM3LinkAge_Ms             : UDINT := 0;    // Durée sans trame valide, ms
+     SimOperatorActive           : BOOL := FALSE; // Joystick : bus CANopen, axes RawX/RawY et homme-mort brut
+     SimSafetyActive             : BOOL := FALSE; // AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs
++    // 🧪 Stimulus défaut rotation de phases : TRUE = phases réseau saines (comportement
++    // nominal, identique au codage en dur d'avant ce lot) ; FALSE = inverse/coupe les phases
++    // (PhaseRotationOk_DI = FALSE dans l'image machine simulée). Inopérant hors simulation.
++    SimPhaseRotationOk          : BOOL := TRUE;
+ 
+     // ↔️ STIMULI TRANSLATION M3 — override manuel du mot capteurs, sinon modèle dynamique.
+     // Bit4=Trémie, bit3=PV, bit2=PVP2, bit1=P1, bit0=Maintenance ; 16#07 = position P2 (00111).
+@@ -86,7 +99,7 @@ VAR_GLOBAL
+ 
+     // 🪝 STIMULI TREUILS — paramètres du modèle codeur et injection ponctuelle d'un défaut synchro.
+     SimEncoderSpeedFactor       : REAL := 1.0;  // Multiplicateur vitesse codeurs simulés ; 1.0 = nominal
+-    SimWinchCoast_M             : REAL := 0.35;  // Roulis inertiel treuils simulés après coupure des relais (m). 0 = arrêt net. ~0.35 = la benne roule quelques dizaines de cm après l'arrêt commandé -> finit dans la bande ouvert/fermé (±CoherenceLimitM) malgré l'anticipation d'arrêt (Close 1.0 / Open 1.3).
++    SimWinchCoast_M             : REAL := 1.30; // Roulis inertiel treuils simulés après coupure des relais (m). 0 = arrêt net. 1.30 = la benne roule pour finir dans la butée ouverte (OffsetOpenM=0.0) malgré l'anticipation d'arrêt (Open 1.3).
+     SimSyncDeviationInjectM1    : BOOL := FALSE; // Front montant : ajoute SimSyncDeviationOffset_M à la position M1 simulée
+     SimSyncDeviationInjectM2    : BOOL := FALSE; // Front montant : ajoute SimSyncDeviationOffset_M à la position M2 simulée
+     SimSyncDeviationOffset_M    : REAL := 0.5; // Écart signé injecté, mètres ; persiste dans la position simulée jusqu'au reset/preset
+diff --git a/CODE/L_SIMULATION/ST_fbSim_Translation_ExtLink_Echo.st b/CODE/L_SIMULATION/ST_fbSim_Translation_ExtLink_Echo.st
+new file mode 100644
+index 00000000..908cd535
+--- /dev/null
++++ b/CODE/L_SIMULATION/ST_fbSim_Translation_ExtLink_Echo.st
+@@ -0,0 +1,32 @@
++(* ═══════════════════════════════════════════════════════════════
++   🧪 ST_fbSim_Translation_ExtLink_Echo — État décisionnel M3 renvoyé au simulateur externe
++   ───────────────────────────────────────────────────────────────
++   🎯 Rôle : Copie en lecture seule de l'état PLC M3 (mode, autorisations, verrous,
++      position décodée) transmise à la passerelle FMU pour diagnostic et affichage.
++   🔒 Aucune commande : le simulateur l'affiche et la journalise, il n'agit jamais dessus.
++   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
++   ═══════════════════════════════════════════════════════════════ *)
++TYPE ST_fbSim_Translation_ExtLink_Echo :
++STRUCT
++    Mode                    : E_Mode;                          (* Mode arbitré PRG_03 *)
++    FBState                 : E_State;                         (* État FB_Translation *)
++    AxisBlockReason         : E_TranslationTraceBlockReason;   (* Cause prioritaire de blocage M3 *)
++    MaintenanceTargetEnable : BOOL;                            (* Accès zone Maintenance accordé *)
++    MaintenanceZoneAccess   : BOOL;                            (* Bouton IHM d'accès zone Maintenance *)
++    SafeStop                : BOOL;                            (* SafeStop M3 effectif *)
++    PowerCutOff             : BOOL;                            (* Coupure puissance demandée par la safety M3 *)
++    LimitSwitchTremie       : BOOL;                            (* Fin de course Trémie (stable) *)
++    LimitSwitchMaintenance  : BOOL;                            (* Fin de course Maintenance ou P1 si zone interdite *)
++    PositionReached         : BOOL;                            (* Cible atteinte *)
++    ActiveTremie            : BOOL;                            (* Commande active vers Trémie *)
++    ActiveMaintenance       : BOOL;                            (* Commande active vers Maintenance *)
++    AtTremie                : BOOL;                            (* Jeton dernier point franchi : Trémie *)
++    AtPV                    : BOOL;                            (* Jeton dernier point franchi : PV *)
++    AtP2                    : BOOL;                            (* Jeton dernier point franchi : P2 *)
++    AtP1                    : BOOL;                            (* Jeton dernier point franchi : P1 *)
++    AtMaintenance           : BOOL;                            (* Jeton dernier point franchi : Maintenance *)
++    SensorWordIncoherent    : BOOL;                            (* Mot capteurs incohérent côté PLC *)
++    EstimatedPos_M          : REAL;                            (* Position estimée PLC, m (0 Maint -> +X Trémie) *)
++    SafetyErrorId           : WORD;                            (* Bitfield live FB_Safety_Translation *)
++END_STRUCT
++END_TYPE
+diff --git a/CODE/M_MAIN/PRG_02_Acquisition.st b/CODE/M_MAIN/PRG_02_Acquisition.st
+index b8cda19e..cd85811a 100644
+--- a/CODE/M_MAIN/PRG_02_Acquisition.st
++++ b/CODE/M_MAIN/PRG_02_Acquisition.st
+@@ -66,6 +66,7 @@ VAR
+     SimulationModeFall                : F_TRIG; // . [LOC] Front descendant desactivation simulation
+     SimulationSemiAutoActive          : BOOL;   // . [LOC] Simulation et mode SEMI_AUTO simultanés
+     SimulationSemiAutoPrevious        : BOOL;   // . [LOC] Mémoire transition SEMI_AUTO simulé
++    SimM3PlcEcho                      : ST_fbSim_Translation_ExtLink_Echo; // . [LOC] Etat M3 renvoye au simulateur externe (N-1, diagnostic)
+ END_VAR
+ 
+ VAR CONSTANT
+@@ -286,8 +287,32 @@ Data.Network.DriveM3         := instDiagEthercat.DeviceVariateur;
+ {region "§2 Simulation et aiguillage — HwIn"}
+ // === 🎭 §2 SIMULATION & AIGUILLAGE (HwIn) ===
+ 
++// 📊 Écho diagnostic vers le simulateur externe M3 : copie en lecture seule des états
++// publiés au scan précédent (N-1) par PRG_03 et PRG_05. Aucune décision n'en dépend.
++SimM3PlcEcho.Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode;
++SimM3PlcEcho.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable;
++SimM3PlcEcho.MaintenanceZoneAccess   := GVL_IHM.M3Translation.Cmd.TglMaintenanceZoneAccess;
++SimM3PlcEcho.FBState                 := PRG_05_Translation.Data.TranslationState.FBState;
++SimM3PlcEcho.AxisBlockReason         := PRG_05_Translation.Data.TranslationState.AxisBlockReason;
++SimM3PlcEcho.SafeStop                := PRG_05_Translation.Data.TranslationSafety.SafeStop;
++SimM3PlcEcho.PowerCutOff             := PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
++SimM3PlcEcho.SafetyErrorId           := PRG_05_Translation.Data.TranslationSafety.ErrorId;
++SimM3PlcEcho.LimitSwitchTremie       := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie;
++SimM3PlcEcho.LimitSwitchMaintenance  := PRG_05_Translation.Data.TranslationState.LimitSwitchMaintenance;
++SimM3PlcEcho.PositionReached         := PRG_05_Translation.Data.TranslationState.PositionReached;
++SimM3PlcEcho.ActiveTremie            := PRG_05_Translation.Data.TranslationState.ActiveTremie;
++SimM3PlcEcho.ActiveMaintenance       := PRG_05_Translation.Data.TranslationState.ActiveMaintenance;
++SimM3PlcEcho.AtTremie                := PRG_05_Translation.Data.TranslationState.AtTremie;
++SimM3PlcEcho.AtPV                    := PRG_05_Translation.Data.TranslationState.AtPV;
++SimM3PlcEcho.AtP2                    := PRG_05_Translation.Data.TranslationState.AtP2;
++SimM3PlcEcho.AtP1                    := PRG_05_Translation.Data.TranslationState.AtP1;
++SimM3PlcEcho.AtMaintenance           := PRG_05_Translation.Data.TranslationState.AtMaintenance;
++SimM3PlcEcho.SensorWordIncoherent    := PRG_05_Translation.Data.TranslationState.SensorWordIncoherent;
++SimM3PlcEcho.EstimatedPos_M          := PRG_05_Translation.Data.TranslationState.EstimatedPosM3_M;
++
+ instSimBench(
+     Enable                   := GVL_Simulation.SimulationModeActive,
++    OperatorSourceActive     := OperatorInputSourceSimulated,
+     M1_RelayFwd              := PRG_06_Outputs.Data.M1RelayFwd,
+     M1_RelayRev              := PRG_06_Outputs.Data.M1RelayRev,
+     M1_SpeedContactor_1      := PRG_06_Outputs.Data.M1SpeedContactor1,
+@@ -321,6 +346,10 @@ instSimBench(
+                                       / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
+                                       100.0),
+     M3_BrakeCmd              := PRG_06_Outputs.Data.TranslationBrakeCmd,
++    M3_SetpointFrequencyHz   := M3_SetpointFrequencyHz,
++    // 🔌 Source externe M3 : sélectionnée seulement si le domaine translation est simulé.
++    M3_OpenModelicaActive    := GVL_Simulation.SimM3OpenModelicaActive AND GVL_Simulation.SimTranslationActive,
++    M3_PlcEcho               := SimM3PlcEcho,
+     PowerKeepAlive_A         := PRG_06_Outputs.Data.PowerKeepAliveACmd,
+     PowerKeepAlive_B         := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
+     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie
+@@ -334,6 +363,8 @@ instSimBench(
+     PowerCutOffRequest       := PRG_06_Outputs.Data.PowerCutOffRequest,
+     // 🧪 Contrôle granulaire de la chaîne AU : bit opérateur (GVL_Simulation.SimChainOk).
+     SimChainOkBit            := GVL_Simulation.SimChainOk,
++    // 🧪 Stimulus défaut rotation de phases : TRUE = phases saines, FALSE = défaut.
++    SimPhaseRotationOkBit    := GVL_Simulation.SimPhaseRotationOk,
+     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
+     SimWinchCoast_M          := GVL_Simulation.SimWinchCoast_M,
+     SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
+@@ -355,6 +386,9 @@ instSimBench(
+     M2_CablePos_M            := Data.EncoderM2.Measurement.CablePosM,
+     BucketOffsetCloseM       := _BucketCfgPersist.Config.OffsetCloseM,
+     BucketCoherenceLimitM    := _BucketCfgPersist.Config.CoherenceLimitM,
++    BucketOffsetOpen_M       := _BucketCfgPersist.Config.OffsetOpenM,
++    BucketOpenAnticipation_M := _BucketCfgPersist.Config.OpenAnticipationM,
++    BucketAx15bOpenActive    := PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX15B_DUMP_OPEN,
+     SimM2TensionedCableFaultInject := GVL_Simulation.SimM2TensionedCableFaultInject,
+     SimM3SensorsWordOverrideActive := GVL_Simulation.SimM3SensorsWordOverrideActive,
+     SimM3SensorsWord               := GVL_Simulation.SimM3SensorsWord,
+@@ -399,6 +433,12 @@ HwSim.Translation := instSimBench.Translation;
+ HwSim.Operator    := instSimBench.Operator;
+ HwSim.Machine     := instSimBench.Machine;
+ 
++// 📊 État du lien simulateur externe M3 (frontière simulation, lecture seule côté IHM/diagnostic).
++GVL_Simulation.SimM3LinkReady   := instSimBench.M3LinkReady;
++GVL_Simulation.SimM3LinkTimeout := instSimBench.M3LinkTimeout;
++GVL_Simulation.SimM3LinkInvalid := instSimBench.M3LinkInvalid;
++GVL_Simulation.SimM3LinkAge_Ms  := instSimBench.M3LinkAge_Ms;
++
+ // 🔀 Détection de bascule de source (réel/simu) par domaine — impulsion 1 cycle.
+ // Même pattern que Winch : mémoire Previous*InputSourceSimulated + comparaison.
+ IF NOT WinchInputSourceInitialized THEN
+@@ -475,8 +515,10 @@ instJoystick(
+         OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT)
+         // Repli du vidage : le geste inverse (Y+ apres Y-) doit atteindre l'etape de
+         // fermeture benne sans exiger une remise au neutre, sinon l'homme-mort se
+-        // desarme au milieu de l'intervention.
+-        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN),
++        // desarme au milieu de l'intervention. AX15D (T383) : module benne sur place,
++        // l'operateur alterne pousser (ouvrir) / tirer (fermer) sans retour neutre.
++        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15B_DUMP_OPEN)
++        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX15D_DUMP_BUCKET_JOG),
+     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
+     JoystickOP                := instDiagCanOpen.DeviceJoystick,
+     RawX                      := HwIn.Operator.JoyXRaw_ANA1,

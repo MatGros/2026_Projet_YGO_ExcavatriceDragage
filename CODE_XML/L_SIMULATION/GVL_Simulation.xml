@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-15T05:28:31.883053" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-15T05:28:31.883053">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T09:01:36.176632" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T09:01:36.176632">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -93,64 +93,6 @@ TRUE = capteur haut actif; FALSE = position libre. Inopérant hors simulation.</
             <xhtml xmlns="http://www.w3.org/1999/xhtml">M3 : AC600, fréquence, 5 capteurs et frein</xhtml>
           </documentation>
         </variable>
-        <variable name="SimM3OpenModelicaActive">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Source de l'image M3 dans FB_SimBench : FALSE = modèle ST interne, TRUE = simulateur
-externe (lien UDP FB_Sim_Translation_ExtLink, FMU OpenModelica). Posé par l'opérateur.
-Inopérant hors SimulationModeActive ET SimTranslationActive ; l'image réelle reste prioritaire.</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimM3LinkReady">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 État du lien externe M3 (lecture seule, produit par PRG_02 depuis FB_SimBench).
-TRUE = trame valide reçue et lien non expiré</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimM3LinkTimeout">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = aucune trame valide depuis 1 s</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimM3LinkInvalid">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = trame rejetée ou lien expiré</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimM3LinkAge_Ms">
-          <type>
-            <UDINT />
-          </type>
-          <initialValue>
-            <simpleValue value="0" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée sans trame valide, ms</xhtml>
-          </documentation>
-        </variable>
         <variable name="SimOperatorActive">
           <type>
             <BOOL />
@@ -171,19 +113,6 @@ TRUE = trame valide reçue et lien non expiré</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimPhaseRotationOk">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="TRUE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Stimulus défaut rotation de phases : TRUE = phases réseau saines (comportement
-nominal, identique au codage en dur d'avant ce lot) ; FALSE = inverse/coupe les phases
-(PhaseRotationOk_DI = FALSE dans l'image machine simulée). Inopérant hors simulation.</xhtml>
           </documentation>
         </variable>
         <variable name="SimM3SensorsWordOverrideActive">
@@ -486,10 +415,10 @@ Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
             <REAL />
           </type>
           <initialValue>
-            <simpleValue value="1.3" />
+            <simpleValue value="0.35" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Roulis inertiel treuils simulés après coupure des relais (m). 0 = arrêt net. 1.30 = la benne roule pour finir dans la butée ouverte (OffsetOpenM=0.0) malgré l'anticipation d'arrêt (Open 1.3).</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Roulis inertiel treuils simulés après coupure des relais (m). 0 = arrêt net. ~0.35 = la benne roule quelques dizaines de cm après l'arrêt commandé -&gt; finit dans la bande ouvert/fermé (±CoherenceLimitM) malgré l'anticipation d'arrêt (Close 1.0 / Open 1.3).</xhtml>
           </documentation>
         </variable>
         <variable name="SimSyncDeviationInjectM1">

@@ -1,0 +1,26 @@
+diff --git a/CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st b/CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st
+index 84c4fa48..7074aadc 100644
+--- a/CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st
++++ b/CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st
+@@ -12,7 +12,7 @@ STRUCT
+     BtnReposition     : BOOL; (* ⬇️ Option maintenue : repositionnement couplé M1+M2 pendant le vidage trémie (X11b <-> X11c) *)
+     TglCommissioning  : BOOL := FALSE; (* 🔧 Case mise en service : déverrouille le forçage de step (front/impulsion). NON persisté. *)
+     TglCycleChecksInhibit : BOOL := FALSE; (* 🧪 Mode essai : inhibe uniquement les controles procede autorises. NON persiste. *)
+-    TglAutoDiveM2Step5Trial : BOOL := TRUE; (* Profil nominal : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. Debrayable IHM, non persiste. *)
++    TglAutoDiveM2Step5Trial : BOOL := TRUE; (* T381 (ex T291-A) : en SEMI_AUTO AX4..AX7, profil nominal avec M1 palier 4 et M2 palier 5. Debrayable IHM. NON persiste. *)
+     BtnResetSampleCount : BOOL; (* 🔢 RAZ consciente du compteur JOURNALIER de prélèvements (front) — n'agit JAMAIS sur le totalisateur, qui n'a aucune commande *)
+     // ⚠️ AJOUT EN FIN DE STRUCT (mapping positionnel : jamais d'insertion au milieu).
+     // 🔧 T358 : consigne de forcage de step — VALEUR écrite par l'opérateur, lue ET
+diff --git a/CODE/M_MAIN/PRG_07_Supervision.st b/CODE/M_MAIN/PRG_07_Supervision.st
+index 0774ab08..fdd5ed79 100644
+--- a/CODE/M_MAIN/PRG_07_Supervision.st
++++ b/CODE/M_MAIN/PRG_07_Supervision.st
+@@ -812,6 +812,8 @@ instHmiBannerFormatter(
+     DeadmanArmed                := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
+     JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
+     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
++    CycleElapsed_Min             := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_Min,
++    CycleElapsed_S               := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_S,
+     M3AtP1                      := GVL_IHM.M3Translation.State.AtP1,
+     M3StatusText                := GVL_IHM.M3Translation.State.M3StatusText,
+     TranslationMotionErrorId    := GVL_IHM.M3Translation.State.ErrorId,

@@ -7,8 +7,7 @@
                    + DOC/WFLOW/AUDITS/GEL_GRAFCET_SEMIAUTO_20260903.md
    🧊 GEL 2026-09-03 : DIVING decompose en 5 steps de plein droit (AX4..AX8) +
              step special AX_DIVING_RETRY ; EXTRACTION = AX9..AX12 ;
-             DECHARGE = AX13..AX15C + AX15D (module benne sur place, T383) + AX18_DONE_SYNC ;
-             AX_STAB repli defaut. Amendement T383 2026-09-22 : AX15D := 23.
+             DECHARGE = AX13..AX15C + AX18_DONE_SYNC ; AX_STAB repli defaut.
    ======================================================================= *)
 
 TYPE E_AutoCycleStep :
@@ -43,7 +42,6 @@ TYPE E_AutoCycleStep :
   AX_STAB              := 19,   (* Repli defaut / stabilisation - pas une erreur *)
   AX_DIVING_RETRY      := 20,   (* Reprise diving : remontee assistee palier lent jusqu'au FDC haut puis retour AX4 ; sur erreur Kobold / joystick relache / palier <> 4 en AX5..AX7 *)
   AX3_WAIT_DIVE_START  := 21,   (* Transition benne->plongee : sorties neutres jusqu'a l'arret mecanique confirme M1/M2, joystick pousse maintenu *)
-  AX10B_RACCORDEMENT_P1 := 22,  (* Raccordement continu P1 fermeture benne -> montee controlee *)
-  AX15D_DUMP_BUCKET_JOG := 23  (* Module benne sur place a la tremie (T383) : le geste ouvre, l'inverse ferme, neutre = stop ; retour AX15B au relachement *)
+  AX10B_RACCORDEMENT_P1 := 22  (* Raccordement continu P1 fermeture benne -> montee controlee *)
 );
 END_TYPE
