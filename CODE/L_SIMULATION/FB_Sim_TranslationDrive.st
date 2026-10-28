@@ -8,7 +8,7 @@ VAR_INPUT
     DecelRate_HzPerS : REAL := 25.0; // pente d'arret relevee sur trace reelle
     TimeConstant_S : REAL := 0.15;
     LoadAngularVelocity_RadPerS : REAL;
-    LoadFrequencyDroopGain_Hz : REAL := 0.50; (* Compatibilite interface ; la charge agit sur la mecanique, pas sur le PDO frequence. *)
+    LoadFrequencyDroopGain_Hz : REAL := 0.50;
     CycleTime_S : REAL := 0.01;
 END_VAR
 VAR_OUTPUT
@@ -24,7 +24,6 @@ VAR
 END_VAR
 VAR CONSTANT
     CST_MinTime_S : REAL := 0.001;
-    CST_StopFrequency_Hz : REAL := 0.5; (* Hypothese de fin d'arret variateur, F09.11 nominal. *)
     CST_MaxFrequency_Hz : REAL := 50.0; // plafond variateur reel (GVL_PERSISTENT._TranslationMaxFreq_Hz)
 END_VAR
 
@@ -51,11 +50,9 @@ ELSE
 END_IF;
 ElectricalFrequency_Hz := ElectricalFrequency_Hz
     + ResponseAlpha * (FrequencyCmd_Hz - ElectricalFrequency_Hz);
-(* Le retour PDO represente la frequence electrique de sortie. Le balancement
-   est traite par le modele mecanique du chariot et du pendule. *)
-IF (FrequencyTgt_Hz <= 0.0) AND (FrequencyCmd_Hz <= 0.0)
-    AND (ElectricalFrequency_Hz <= CST_StopFrequency_Hz) THEN
-    ElectricalFrequency_Hz := 0.0;
+ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz
+    - MAX(0.0, LoadFrequencyDroopGain_Hz) * ABS(LoadAngularVelocity_RadPerS));
+IF ActualFrequency_Hz < 0.005 THEN
+    ActualFrequency_Hz := 0.0;
 END_IF;
-ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz);
 Ready := TRUE;
