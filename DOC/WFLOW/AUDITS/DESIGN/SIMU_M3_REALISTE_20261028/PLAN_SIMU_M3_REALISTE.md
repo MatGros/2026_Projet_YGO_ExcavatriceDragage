@@ -1,7 +1,9 @@
 # 🧪 Plan — Simulateur M3 plus réaliste
 
+> Etat courant du chantier : T417 dans DOC/WFLOW/TASKS.yaml et son contrat lie. Ce document conserve le cadrage ou le bilan anterieur ; il ne vaut pas validation du lot courant.
+
 > 2026-10-28 · branche `work/base-machine-simu` · fusion Expert A + Expert B (synthèse : `SYNTHESE_EXPERTS_A_B.md`)
-> 🎯 But : **simuler plus vrai**, sans chercher le défaut. Si le modèle est juste, les problèmes réels apparaîtront d'eux-mêmes.
+> 🎯 But : **simuler une mécanique plausible**, puis observer le programme. L'apparition d'un défaut n'est pas un critère de réglage ni une preuve de fidélité du modèle.
 > 🔒 **Seul le simulateur bouge** (`CODE/L_SIMULATION/`, `GVL_Simulation`, tests CI, gates). **Programme machine intouché.**
 > 🧭 Règle : **aucune couche en double**. Le simulateur lit les mêmes réglages que le programme (`GVL_PERSISTENT`).
 
@@ -80,7 +82,7 @@
 | T5 | Franchissement capteurs (L5) | Le clignotement **ne gêne pas** : 0 défaut, 0 relance, 0 étape sautée |
 | T6 | Non-régression bits OFF | Identique à aujourd'hui · geste habituel inchangé |
 
-👉 Réussite : T1/T2 propres et T3/T4 qui dérivent comme sur la machine. Sinon on corrige la simu, pas le programme.
+👉 Acceptation : même mécanique et mêmes réglages en manuel/auto ; décroissance du variateur après retrait de commande ; frein répondant à sa bobine ; balancement secondaire et amorti. Les résultats T1-T6 sont relevés tels quels, sans imposer un dépassement ou un défaut et sans régler le banc pour les provoquer.
 
 ## 6. 🛡️ Garde-fous
 

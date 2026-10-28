@@ -1,118 +1,125 @@
-# Contrat T417 — SimBench M3 : fidélité échelle 50 Hz + rampe variateur, rejeu T334
-# Statut : V2 révisée après challenge expert (trace réelle Suivi_90 du 23/09). Aucune ligne de CODE/ écrite.
-# NB : le nom de fichier garde "ROUE_LIBRE" (référencé par TASKS.yaml) ; la roue libre (ex-L2) est ABANDONNÉE.
-# Périmètre = L1 (échelle) + DecelRate 25 Hz/s + rejeu T334. Refactor struct = T417-B (contrat séparé).
-# Vérité des valeurs = code déployé en mise en service + registres MES.
-
 contract:
-  task_id: T417_SIMBENCH_M3_FIDELITE_ROUE_LIBRE
+  task_id: T417
   criticality: C2
   strategy: patch
-
-  objective: >
-    Le SimBench ST fait tourner le VRAI code de production de la translation M3 face à un
-    modèle à la bonne échelle de fréquence (50 Hz max, approche 20 Hz) et à la rampe variateur
-    mesurée (~25 Hz/s), afin de rejouer le cas T334 (dépassement au contact P1/Trémie) et de
-    tester les corrections sans réglage sur site. Aucune ligne de simulation n'entre dans le
-    code de production. Modelica est en veille, jamais supprimé.
-
-  context_facts:   # tous relevés dans le code, les registres ou les traces, aucun supposé
-    - "Fréquence max = GVL_PERSISTENT._TranslationMaxFreq_Hz = 50.0 (source unique)"
-    - "Approche par cible = 20 Hz : Trémie (déclenché PV), Maintenance (déclenché P1), P1 (déclenché P2) — ST_TranslationCfg.st"
-    - "PRG_02_Acquisition.st:341-347 envoie SpeedCmd_Pct = f/50*100 ; FB_Sim_Translation refait Hz = Pct*0,4 borné à 40 => 20 Hz réel = 16 Hz simulé (écart L1)"
-    - "Mot de commande variateur : FB_Translation.st:343-349 — RequestedDriveControlWord = 0 si ni Tremie ni Maintenance (ou frein non commandé ouvert)"
-    - "Frein réel : reste desserré tant que |DriveActualFreqHz| > 0,5 Hz avec timeout (FB_Translation.st:318) ; DelayMotorDecel déclaré mais non câblé"
-    - "Trace réelle Suivi_90 (23/09, 3 événements, tous à 20 Hz) : après commande 0, ActualFrequencyHz redescend en rampe ~25 Hz/s (~ rampe variateur F01.23 = 2 s), PAS en roue libre ; frein DI reste ouvert 0,5-1,0 s après F=0 ; dépassement ~0,25 m (décél. équivalente ~0,5 m/s2)"
-    - "Rampe PLC (RequestedDriveFreqHz) était à 47,5 Hz pendant que le variateur recevait 20 Hz (clamp d'approche) ; hypothèse NON vérifiée : le dépassement vient du bond de consigne quand le clamp 20 Hz disparaît"
-    - "Sim actuel : AccelRate/DecelRate 20 Hz/s (FB_Sim_TranslationDrive), gain 0,02 m/(Hz.s) = 30/(40*37,5), provisoire (T301)"
-    - "Pas de position en mètres dans les traces (DI + fréquences, v = 0,02*f). Suivi_91 (26/09) = banc SIMU, pas du réel. T348 (trace 10 ms) non faite."
-    - "Cause exacte du dépassement du 25/09 : non retrouvée dans la trace du 23/09 ; cycle auto vs manuel des 3 événements non établi"
-
+  objective: Simuler une mecanique M3 plausible avec hypotheses acceptees ; reproduire commandes automate, dynamique variateur, mouvement, frein et
+    capteurs ; meme mecanique manuel/auto et balancement secondaire ; observer les effets naturels sans cible de depassement ; challenge, implementation
+    CDX01, revue et essais fonctionnels courts puis validation utilisateur.
+  context_facts:
+  - 'Retour mise en service exploitant : rampe automate reglee legerement plus douce que limite de deceleration du variateur ; retrait mot0 conserve
+    arret pilote.'
+  - Six decroissances reelles verifiees ; retour frequence non nul apres mot0. Le signal C00.01 est frequence electrique de sortie, pas une mesure
+    independante du deplacement.
+  - 'Hypotheses acceptees : gain0.02, positions0/1.5/3.5/5/10m, marge0.5m, came2+4cm ; pas de cible30cm.'
+  - 'Seuil de fin de rampe0.5Hz : hypothese du modele coherente avec seuils PLC et defaut F09.11 constructeur, parametre site non lu.'
+  - Correction frottement deja faite mais besoin global NON LIVRE ; essai utilisateur manuelTremie position vraie-0.09404063m, PLC0.
   acceptance:
-    - id: AC1
-      statement: "Non-régression : hors correction L1 et DecelRate, les sorties de FB_Sim_Translation sont identiques à la v0.7.33_SimBench_M3PLC_20261009 (aller-retour, arrêt sur capteur, SafeStop, faute frein)."
-      verified_by: "Test CI rejouant les scénarios contre une référence figée AVANT modification"
-    - id: AC2
-      statement: "L1 : consigne PRG_02 de 20 Hz (40 %) => ActualFrequency_Hz = 20,0 Hz (+-0,05) en régime établi ; 50 Hz (100 %) => 50 Hz ; gain 0,02 m/(Hz.s) inchangé."
-      verified_by: "Test unitaire FB_Sim_Translation + gate G518 PASS (échelle sim/estimateur ; G518 lit CST_NominalFrequency_Hz=40 ligne 108 : à aligner si le test l'exige)"
-    - id: AC3
-      statement: "Pente de décélération : retrait de commande à 20 Hz => |dF/dt| = 25 +-1 Hz/s dans le sim, frein ouvert jusqu'à |fAct| <= 0,5 Hz."
-      verified_by: "Test CI : pente mesurée sur la trace fAct du sim"
-    - id: AC4
-      statement: "Distance de dépassement à 20 Hz après retrait de commande au contact capteur = 0,25 m +-30 % (cible issue de la trace réelle, à confirmer par T348)."
-      verified_by: "Test CI sur PositionTrue_M"
-    - id: AC5
-      statement: "Rejeu T334 : le sim pilote le VRAI code FB_Translation (non modifié) sur un aller-retour avec approche P1/Trémie en cycle auto ; la trace produite (consigne PLC, consigne variateur, mot de commande, fAct, frein, DI capteurs) est archivée et comparée qualitativement au cas réel (clamp 20 Hz, perte de commande au contact)."
-      verified_by: "Scénario TEST_AUTO_CI + rapport sous DOC/WFLOW ; écart documenté, pas masqué"
-    - id: AC6
-      statement: "Le dépassement croît avec la vitesse d'approche (10 Hz < 20 Hz < 50 Hz)."
-      verified_by: "Test CI : trois vitesses, distances strictement croissantes"
-    - id: AC7
-      statement: "Capteurs DI, position vraie et position estimée par Hz restent produits par la même chaîne ; le sim ne s'écrit que via la frontière PRG_02 ; aucun fichier de production (I_TRANSLATION, M_MAIN, J_SUPERVISION, GVL_PERSISTENT) n'est modifié."
-      verified_by: "git diff --stat : zéro fichier hors scope.allowed ; G200 PASS"
-    - id: AC8
-      statement: "Garde-fou (fix + guard) : un gate fige la liste des lecteurs de GVL_Simulation (PRG_02, PRG_05, PRG_07, FB_SimBench, FB_TroubleshootingView, types Checklist, FBs L_SIMULATION) ; aucun nouveau consommateur sans mise à jour explicite de la liste."
-      verified_by: "Script TOOLS/AGENT_WORKFLOW/scripts/ + intégration run_all_gates.py ; test négatif injectant un lecteur parasite"
-    - id: AC9
-      statement: "SimM3OpenModelicaActive reste FALSE ; aucun fichier TOOLS/TWINBENCH/ ni tâche T399-T415 modifié ou supprimé."
-      verified_by: "git diff : aucun chemin TOOLS/TWINBENCH/ ; TASKS.yaml T399-T415 inchangées sauf accord humain"
-    - id: AC10
-      statement: "Bundle PLCopenXML et diff bundle régénérés, 21 gates PASS, G200 PASS."
-      verified_by: "generate_codesys_bundle.py, generate_codesys_diff_bundle.py, G200 --report, run_all_gates.py"
-
+  - id: AC1
+    statement: Le retour frequence electrique ne subit plus de biais fonction du balancement ; sa rampe reste presente apres mot0.
+    verified_by: Scenario ST comparant frequence electrique et retour pour plusieurs vitesses angulaires ; scenario20/50Hz existant.
+  - id: AC2
+    statement: Sous controle variateur la vitesse nominale du chariot derive directement de frequence fois gain, sans second premier ordre ; la faible
+      reaction mecanique de charge est conservee.
+    verified_by: Scenario ST retrait20Hz puis comparaison vitesse/frequence apres500ms ; comparaison avant/apres sur memes commandes.
+  - id: AC3
+    statement: Avec cible nulle, le retour s annule au seuil nominal0.5Hz sans couper prematurement une consigne non nulle.
+    verified_by: Scenario ST20Hz puis cible0, et maintien d une consigne0.2Hz.
+  - id: AC4
+    statement: Le frein suit sa bobine finale meme en mouvement ; came, adherences, vraies inversions et balancement secondaire sont conserves.
+    verified_by: Rejouer les neuf scenarios fonctionnels courts existants ; review du diff.
+  - id: AC5
+    statement: Le programme machine et les reglages persistants restent inchanges ; le bundle et diff sont frais et G200 ne signale aucune erreur.
+    verified_by: git diff CODE hors L_SIMULATION vide depuis checkpointfd32b652 ; generation complet/diff, G200 report et gatesC compares a la reference.
   scope:
     allowed:
-      - CODE/L_SIMULATION/FB_Sim_Translation.st
-      - CODE/L_SIMULATION/FB_Sim_TranslationDrive.st
-      - CODE/L_SIMULATION/FB_Sim_TranslationBrake.st
-      - CODE/L_SIMULATION/FB_SimBench.st
-      - CODE/L_SIMULATION/GVL_Simulation.st
-      - TOOLS/TEST_AUTO_CI/   # tests des FB de simulation uniquement
-      - TOOLS/AGENT_WORKFLOW/scripts/   # nouveau gate AC8 + éventuel alignement G518
+    - CODE/L_SIMULATION/FB_Sim_Translation.st
+    - CODE/L_SIMULATION/FB_Sim_TranslationDrive.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/
+    - TOOLS/AGENT_WORKFLOW/scripts/check_sim_m3_dynamics.py
+    - DOC/WFLOW/TASKS.yaml
+    - DOC/WFLOW/TASK_LOCKS.json
+    - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417_SIMBENCH_M3_FIDELITE_ROUE_LIBRE.yaml
+    - CODE_XML/
     forbidden:
-      - CODE/I_TRANSLATION/
-      - CODE/M_MAIN/
-      - CODE/J_SUPERVISION/
-      - CODE/GVL_PERSISTENT.st
-      - TOOLS/TWINBENCH/
-      - DOC/AF/
-      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
-      - ST_IHM_MANU (table figée, aucun champ ajouté)
-
+    - CODE/I_TRANSLATION/
+    - CODE/M_MAIN/
+    - CODE/J_SUPERVISION/
+    - CODE/GVL_PERSISTENT.st
+    - TOOLS/TWINBENCH/
+    - DOC/AF/
+    - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+    - ST_IHM_MANU (table figée, aucun champ ajouté)
   conservation:
     must_survive:
-      - "Comportement v0.7.33 hors L1/DecelRate"
-      - "Chaîne Modelica / FMU / lien UDP (FB_Sim_Translation_ExtLink) intacte"
-      - "Gate G518 et tests TC-T300"
+    - Commandes finales post-interlocks et frontiere HwSim.
+    - Mecanique identique manuel/auto, frein physique, balancement amorti, came spatiale et source unique positions/gain.
+    - Correction dissipative du frottement, aucune distance d arret imposee.
     dropped_on_purpose:
-      - "Roue libre (ex-L2, ex-AC3..AC6) : contredite par la trace réelle (rampe ~25 Hz/s), abandonnée."
-      - "Refactor struct SimM3/SimWinch et migration variables IHM : T417-B, contrat séparé."
-
+    - Biais artificiel de frequence electrique par balancement.
+    - Deuxieme filtre tau0.15 applique au mouvement sous controle, non etaye par les donnees acceptees.
+    - Cible de depassement0.25m et reproduction forcee du defaut.
   evidence_required:
-    - check_linkage
-    - run_all_gates
-    - bundle
-    - diff_bundle
+  - check_linkage
+  - run_all_gates
+  - bundle
+  - diff_bundle
+  open_points:
+  - Les hypotheses physiques sont acceptees pour exploration ; les essais utilisateur peuvent les affiner.
+  alert_duty: 'Tout écart constaté en cours de route est remonté immédiatement à l''orchestrateur, jamais en silence. Signaler n''est pas élargir le
+    scope. Aucun commit sans validation humaine.
 
-  open_points:   # à lever en essai, ne bloquent pas la rédaction
-    - "Le dépassement est-il reproduit par le seul rejeu du vrai code (bond de consigne à la disparition du clamp 20 Hz) ? Si non, l'écart restant est une donnée pour T348, pas un motif d'ajouter un modèle."
-    - "Origine de la mesure '20 à 40 cm' (étude T334) non retrouvée ; les 3 événements du 23/09 donnent ~0,25 m."
-    - "Gain 0,02 m/(Hz.s) provisoire (T301) : impacte directement les mètres de dépassement."
-    - "Délai frein réel et décélération interne AC600 : à noter pour T348."
-
-  alert_duty: >
-    Tout écart constaté en cours de route est remonté immédiatement à l'orchestrateur,
-    jamais en silence. Signaler n'est pas élargir le scope. Aucun commit sans validation humaine.
-
-status: PENDING
+    '
+status: IN_PROGRESS
 execution:
-  executed_by: "—"
-  completed_at: "—"
-  status: PENDING
-  summary: ""
-  evidence_submitted: []
+  executed_by: CDX01
+  status: IN_PROGRESS
+  updated_at: '2026-10-28T18:26:10+01:00'
+  summary: 'Trois corrections de dynamique implementees : frequence electrique sans biais pendule ; suppression du second filtre sur vitesse chariot
+    sous controle ; fin de rampe au seuil0.5 seulement lorsque demande ET rampe interne sont nulles. Balancement et frein physique conserves. Programme
+    machine intact.'
+  functional_results:
+    checkpoint_fd32b652: 8/12, dont les trois nouveaux controles dynamiques en echec
+    current: 12/12 PASS, ST reel compile STruCpp ; pas de compilation CODESYS revendiquee
+    guard: TOOLS/AGENT_WORKFLOW/scripts/check_sim_m3_dynamics.py
+  review:
+    model: deepseek-v4.1-flash:cloud
+    result: PASS apres resolution du MAJOR sur distinction demande/rampe interne, frequences magnitudes et reaction mecanique explicitees
+  exports:
+  - CODE_XML/CODE_Bundle.xml
+  - CODE_XML/CODE_DiffBundle.xml
+  linkage: PASS, 0 erreur, 1717 avertissements existants
+  gates_c:
+    pass: 53
+    total: 61
+    fail_existing:
+    - '300'
+    - '340'
+    - '430'
+    - '483'
+    - '503'
+    - '517'
+    - '518'
+    - '519'
+  pending: Compilation et essais utilisateur dans projet de simulation ; bilan de fidelite non declare valide.
+  handoff: T420 distincte pour regression roulis M1/M2 ; aucun code treuil modifie.
+  linkage_report: "```text\nAuto-verification liaison (G200_check_linkage.py) — PASS\n  Linkage (L1-L7):    140 OK, 0 KO\n  L8 (Output assign): 0 OK,\
+    \ 0 KO, 0 WARN\n  L9 (I/O mapping):   0 OK, 0 KO, 25 WARN\n  L10 (Single prod):  2021 OK, 1663 WARN\n  L11 (Polarity):     0 OK, 29 WARN\n  L12\
+    \ (Timing):       7 OK, 0 KO, 0 WARN\n  L13 (Orphelins):    89 OK, 0 KO\n  OK  instFault : FB_FaultCore — declaree CODE/A_COMMUN/FB_Brake.st:49\
+    \ · appelee :84\n  OK  instCloseThreshold : FB_BucketCloseThreshold — declaree CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st:151 · appelee :615\n  OK\
+    \  instFault : FB_FaultCore — declaree CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st:145 · appelee :303\n  OK  instFault : FB_FaultCore — declaree CODE/G_CYCLE/FB_CycleMachineHoming.st:103\
+    \ · appelee :363\n  OK  instFault : FB_FaultCore — declaree CODE/G_CYCLE/FB_CycleSemiAuto.st:268 · appelee :559\n  OK  instAbs : FB_Encoder_Abs\
+    \ — declaree CODE/E_CODEURS/FB_Encoder.st:71 · appelee :117\n  OK  instFault : FB_FaultCore — declaree CODE/E_CODEURS/FB_Encoder.st:77 · appelee\
+    \ :109\n  OK  instHoming : FB_Encoder_Homing — declaree CODE/E_CODEURS/FB_Encoder.st:72 · appelee :131\n  OK  instRel : FB_EncoderReliability —\
+    \ declaree CODE/E_CODEURS/FB_Encoder.st:75 · appelee :176\n  OK  instSafety : FB_Encoder_Safety — declaree CODE/E_CODEURS/FB_Encoder.st:74 · appelee\
+    \ :164\n  OK  instScale : FB_Encoder_Scale — declaree CODE/E_CODEURS/FB_Encoder.st:73 · appelee :155\n  OK  instSpeed : FB_Encoder_SpeedMeasure\
+    \ — declaree CODE/E_CODEURS/FB_Encoder.st:76 · appelee :184\n  ... 2156 autres verifiees\n  !   [L9] CODE/M_MAIN/PRG_02_Acquisition.st: Data —\
+    \ Not found in I/O map by exact name — verifier manuellement contre le nom de canal brut du CSV (convention de nommage differente)\n  !   [L9]\
+    \ CODE/M_MAIN/PRG_02_Acquisition.st: HwReal — Not found in I/O map by exact name — verifier manuellement contre le nom de canal brut du CSV (convention\
+    \ de nommage differente)\n  !   [L9] CODE/M_MAIN/PRG_02_Acquisition.st: HwSim — Not found in I/O map by exact name — verifier manuellement contre\
+    \ le nom de canal brut du CSV (convention de nommage differente)\n  !   [L9] CODE/M_MAIN/PRG_02_Acquisition.st: HwIn — Not found in I/O map by\
+    \ exact name — verifier manuellement contre le nom de canal brut du CSV (convention de nommage differente)\n  !   [L9] CODE/M_MAIN/PRG_06_Outputs.st:\
+    \ Data — Not found in I/O map by exact name — verifier manuellement contre le nom de canal brut du CSV (convention de nommage differente)\n```"
 validation:
   status: PENDING
-  validated_by: "—"
-  validated_at: "—"
-  notes: ""
+  validated_by: ''
+  notes: Essais CODESYS utilisateur apres livraison.

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-27T16:09:40.406868" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-27T16:09:40.406868">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T17:19:46.847725" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T17:19:46.847725">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -76,6 +76,9 @@
               <initialValue>
                 <simpleValue value="0.5" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compatibilite interface ; la charge agit sur la mecanique, pas sur le PDO frequence.</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleTime_S">
               <type>
@@ -132,6 +135,17 @@
                 <simpleValue value="0.001" />
               </initialValue>
             </variable>
+            <variable name="CST_StopFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Hypothese de fin d'arret variateur, F09.11 nominal.</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_MaxFrequency_Hz">
               <type>
                 <REAL />
@@ -176,11 +190,13 @@ ELSE
 END_IF;
 ElectricalFrequency_Hz := ElectricalFrequency_Hz
     + ResponseAlpha * (FrequencyCmd_Hz - ElectricalFrequency_Hz);
-ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz
-    - MAX(0.0, LoadFrequencyDroopGain_Hz) * ABS(LoadAngularVelocity_RadPerS));
-IF ActualFrequency_Hz &lt; 0.005 THEN
-    ActualFrequency_Hz := 0.0;
+(* Le retour PDO represente la frequence electrique de sortie. Le balancement
+   est traite par le modele mecanique du chariot et du pendule. *)
+IF (FrequencyTgt_Hz &lt;= 0.0) AND (FrequencyCmd_Hz &lt;= 0.0)
+    AND (ElectricalFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
+    ElectricalFrequency_Hz := 0.0;
 END_IF;
+ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz);
 Ready := TRUE;
 </xhtml>
           </ST>

@@ -15,7 +15,7 @@ END_VAR
     ASSERT_TRUE(fb.Ready, 'Brique prete sous Enable');
 END_TEST
 
-TEST 'TC-T300-DRV-030 Charge reduit retour sans inverser la frequence'
+TEST 'TC-T300-DRV-030 Charge ne biaise pas le retour de frequence electrique'
 VAR
     fb : FB_Sim_TranslationDrive;
     i : INT;
@@ -30,7 +30,8 @@ END_VAR
     unloaded_Hz := fb.ActualFrequency_Hz;
     fb.LoadAngularVelocity_RadPerS := 8.0;
     fb();
-    ASSERT_LT(fb.ActualFrequency_Hz, unloaded_Hz, 'Droop charge visible au PDO');
+    ASSERT_NEAR(fb.ActualFrequency_Hz, fb.ElectricalFrequency_Hz, 0.00001,
+        'La reaction de charge ne modifie pas artificiellement la frequence electrique');
     ASSERT_GE(fb.ActualFrequency_Hz, 0.0, 'Frequence jamais negative');
 END_TEST
 

@@ -1,0 +1,82 @@
+contract:
+  task_id: SIMU_M3_DYNAMIQUE_20261028
+  criticality: C2
+  strategy: patch
+  objective: >
+    Conserver une mecanique M3 unique pour manuel et automatique, avec arret pilote
+    par le variateur et balancement secondaire, et supprimer les inversions de
+    vitesse artificielles produites par le frottement numerique a tres basse vitesse.
+    La simulation observe les effets des commandes finales sans rechercher un defaut
+    ou une distance de depassement imposee.
+  acceptance:
+    - id: AC1
+      statement: "Apres retrait des ordres de sens, le retour frequence decroit et le chariot poursuit sa deceleration dans le sens memorise tant que le variateur reste actif."
+      verified_by: "Scenarios ST fonctionnels a 20 et 50 Hz : frequence non nulle au retrait, decroissance et sens conserves, puis arret."
+    - id: AC2
+      statement: "Le frottement seul ne peut pas inverser une vitesse faible ; une poussee suffisante peut toujours provoquer une vraie inversion."
+      verified_by: "Scenarios ST de frottement dans les deux sens a 10 et 100 ms, et de reprise sous poussee opposee ; garde automatique sur le code ST reel."
+    - id: AC3
+      statement: "Le frein simule suit sa commande finale meme si elle est retiree alors que le retour frequence reste non nul ; le mouvement s'amortit et reste immobilise frein ferme."
+      verified_by: "Scenario ST fermeture du frein en mouvement avec BrakePhysicalActive=TRUE : bobine, retour et vitesse observes successivement."
+    - id: AC4
+      statement: "Le balancement et la came spatiale sont conserves ; aucune condition de mode ni seuil de distance visant 30 cm n'est ajoute au modele."
+      verified_by: "Revue du diff, scenario balancement sous controle et scenario came avec intermittence temporelle et blips desactives."
+    - id: AC5
+      statement: "Les objets modifies sont exportes en ST dans le bundle frais et le diff bundle, G200 ne signale aucune erreur ; les echecs anterieurs des gates sont distingues des nouveaux."
+      verified_by: "Generation bundle complet et diff, G200_check_linkage.py --report, run_all_gates.py --palier C sans --pytest ni --full-ci."
+    - id: AC6
+      statement: "Le programme machine, les interfaces des FB et les reglages persistants sont identiques au checkpoint de depart."
+      verified_by: "git diff depuis le checkpoint sur CODE hors FB_Sim_Translation.st ; revue des interfaces et du routage PRG_06 -> PRG_02 -> HwSim."
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_Sim_Translation.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_translation_dynamics.st
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - TOOLS/AGENT_WORKFLOW/scripts/check_sim_m3_dynamics.py
+      - DOC/WFLOW/AUDITS/DESIGN/SIMU_M3_REALISTE_20261028/
+      - CODE_XML/
+    forbidden:
+      - CODE/I_TRANSLATION/
+      - CODE/M_MAIN/
+      - CODE/GVL_PERSISTENT.st
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "Positions et gain effectif en source unique, valeurs estimees acceptees par l'exploitant."
+      - "Rampe materielle simulee, memoire du sens, frein physique, pendule et came spatiale."
+      - "Frontiere HwSim, commandes finales post-interlocks et mecanique independante du mode."
+      - "Tous les changements preexistants L4/L5 et leurs XML sont preserves."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - bundle
+    - run_all_gates
+    - "Revue independante du plan et du diff."
+    - "Resultats des scenarios ST fonctionnels et procedure courte d'essais CODESYS."
+  alert_duty: >
+    Toute anomalie hors scope est signalee sans correction opportuniste. Les essais
+    fonctionnels ne constituent pas une mesure physique du site ni une compilation CODESYS.
+status: COMPLETED
+execution:
+  executed_by: CDX01
+  status: COMPLETED
+  summary: >
+    Checkpoint fd32b652 puis correction locale du frottement. Avant 8/9, apres 9/9
+    scenarios ST reels. Review independante PASS et DeepSeek v4.1 PASS ; remarque
+    sur frottement explicite dans les tests appliquee. G200 PASS 0 erreur ; bundles
+    frais. Palier C 53/61 PASS, 8 gates deja en echec avant correction, G390 corrige.
+    Aucun autre fichier ST ni reglage physique modifie depuis le checkpoint.
+    Compilation et essais CODESYS utilisateur restent attendus.
+  evidence_submitted:
+    - SCENARIOS_AVANT_UPDATE.txt
+    - SCENARIOS_APRES_UPDATE.txt
+    - REVIEW_DEEPSEEK_V41.md
+    - LIAISON_APRES_UPDATE.txt
+    - GATES_AVANT_UPDATE.txt
+    - GATES_APRES_UPDATE.txt
+    - BILAN_UPDATE_ET_ESSAIS.md
+validation:
+  status: PENDING
+  validated_by: ""
+  notes: "Validation fonctionnelle utilisateur dans CODESYS attendue apres livraison."

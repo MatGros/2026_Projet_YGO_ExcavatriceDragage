@@ -1,0 +1,26 @@
+Error parsing test_fb_translation_odometrygain.st:
+
+test_fb_translation_odometrygain.st:84:9: error: Expected `END_FOR`, found `ADVANCE_TIME`.
+  84 |         ADVANCE_TIME(10000000);
+     |         ^
+
+test_fb_translation_odometrygain.st:86:5: error: Expected `END_TEST`, found `END_FOR`.
+  86 |     END_FOR;
+     |     ^
+
+test_fb_translation_odometrygain.st:119:9: error: Expected `END_FOR`, found `ADVANCE_TIME`.
+ 119 |         ADVANCE_TIME(10000000);
+     |         ^
+
+test_fb_translation_odometrygain.st:121:5: error: Expected `END_TEST`, found `END_FOR`.
+ 121 |     END_FOR;
+     |     ^
+
+test_fb_translation_odometrygain.st:146:9: error: Expected `END_FOR`, found `ADVANCE_TIME`.
+ 146 |         ADVANCE_TIME(10000000);
+     |         ^
+
+test_fb_translation_odometrygain.st:148:5: error: Expected `END_TEST`, found `END_FOR`.
+ 148 |     END_FOR;
+     |     ^
+

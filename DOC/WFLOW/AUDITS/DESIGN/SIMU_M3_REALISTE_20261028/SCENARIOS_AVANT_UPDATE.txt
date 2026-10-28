@@ -1,0 +1,35 @@
+[SCRATCH CI CONSERVE] C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\SimM3Dynamics\83e683f15aa4
+
+-> SimM3Dynamics (L_SIMULATION)... cablage production                 
+-> SimM3Dynamics (L_SIMULATION)... 8/9                                
+[NETTOYAGE MANUEL REQUIS] C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\SimM3Dynamics\83e683f15aa4
+=== RESUME ===
+FAIL  SimM3Dynamics (8/9)
+  PASS  M3-DYN-010 Retrait de commande a 20 Hz conserve la deceleration pilotee
+  PASS  M3-DYN-020 Retrait brutal a 50 Hz reste limite par le variateur
+  FAIL  M3-DYN-030 Frottement seul a 100 ms sans inversion dans les deux sens
+        ASSERT_EQ: FB.VELOCITYTRUE_MPS expected 0, got -0.006 -- Frottement arrete le sens positif sans inversion
+  PASS  M3-DYN-040 Frottement seul a 10 ms sans inversion dans les deux sens
+  PASS  M3-DYN-050 Adherence au repos et au seuil puis depart sous poussee
+  PASS  M3-DYN-060 Poussee opposee suffisante autorise une vraie inversion
+  PASS  M3-DYN-070 Frein ferme en mouvement suit la bobine sans attendre les Hz
+  PASS  M3-DYN-080 Balancement conserve secondaire sous controle puis amorti
+  PASS  M3-DYN-090 Came spatiale vue perdue retrouvee stable sans blip ajoute
+  -- Encapsulation (interface FB) --
+    PASS  FB_CycleTime             IN=1 OUT=1 IN_OUT=0 LOCAL=5
+    PASS  FB_Sim_TranslationDrive  IN=8 OUT=5 IN_OUT=0 LOCAL=4
+    PASS  FB_Sim_TranslationBrake  IN=10 OUT=5 IN_OUT=0 LOCAL=4
+    PASS  FB_Sim_SuspendedLoad     IN=7 OUT=4 IN_OUT=0 LOCAL=5
+    PASS  FB_Sim_PositionSensor    IN=16 OUT=6 IN_OUT=0 LOCAL=16
+    PASS  FB_Sim_Translation       IN=46 OUT=27 IN_OUT=0 LOCAL=37
+  -- [PROFILING] Temps des etapes --
+    * Conversion ST->IEC        : 0.17s
+    * Compilation STruCpp/g++   : 0.81s (CPU)
+    * Execution binaire ASSERTs : 1.13s
+    * Cablage production        : 0.00s
+    * Rapport HTML / JSON       : 0.00s
+    * Total FB                  : 9.46s
+  Scratch CI conserve : C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\SimM3Dynamics\83e683f15aa4
+
+1 FB testes, 0 PASS, 1 FAIL
+[TEMPS D'EXECUTION] : 9.46s
