@@ -111,6 +111,13 @@ VAR_INPUT
     SimM3BrakeFaultCloseDelayS       : REAL := 0.0;    (* --> [CFG] Delai avant application de la faute frein M3, s *)
     SimM3BrakePhysicalActive         : BOOL := TRUE;   (* --> [CFG] L3 : frein M3 a manque de courant reel (FALSE = historique) *)
     SimM3BrakeDecel_Mps2             : REAL := 2.0;    (* --> [CFG][HYPOTHESE] Deceleration chariot frein serre, m/s2 *)
+    SimM3CartFreeActive              : BOOL := TRUE;   (* --> [CFG] L4 : chariot libre frein ouvert + variateur sans couple *)
+    SimM3LoadMassRatio               : REAL := 0.5;    (* --> [CFG][HYPOTHESE] Masse benne / masse totale *)
+    SimM3RollingFriction_Mps2        : REAL := 0.1;    (* --> [CFG][HYPOTHESE] Frottement de roulement, m/s2 *)
+    SimM3Slope_Mps2                  : REAL := 0.0;    (* --> [CFG][HYPOTHESE] Pente, m/s2 (+ vers Maintenance) *)
+    SimM3SensorCamDropoutActive      : BOOL := TRUE;   (* --> [CFG] L5 : came capteurs vu -> perdu -> retrouve -> fixe *)
+    SimM3SensorCamDropoutStart_M     : REAL := 0.02;   (* --> [CFG][HYPOTHESE] Debut de la zone perdue apres la cote, m *)
+    SimM3SensorCamDropoutWidth_M     : REAL := 0.04;   (* --> [CFG][HYPOTHESE] Largeur de la zone perdue, m *)
     // BUTEE MECANIQUE M3 — recul borne apres arret serre (C5). 0.0 = comportement historique
     // (position ET vitesse figees a la butee, decision de review tracee). > 0 autorise la
     // reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non calibre.
@@ -191,6 +198,8 @@ VAR_OUTPUT
     M3ObsEndStopHitCount       : UDINT;  (* <-- [DIAG] Chocs en butee mecanique *)
     M3ObsEndStopImpactSpeed_Mps : REAL;  (* <-- [DIAG] Vitesse au dernier choc en butee (m/s) *)
     M3ObsBrakeClosedMovingCount : UDINT; (* <-- [DIAG] Fermetures du frein chariot en mouvement *)
+    M3ObsCartFree              : BOOL;   (* <-- [DIAG] L4 : chariot libre (frein ouvert, variateur sans couple) *)
+    M3ObsFreeRollLast_M        : REAL;   (* <-- [DIAG] L4 : distance du dernier episode libre (m) *)
 END_VAR
 
 VAR_IN_OUT
@@ -655,7 +664,14 @@ instSimTranslation(
     EndStopRecoilMax_M := SimM3EndStopRecoilMax_M,
     LoadReactionGain_Mps2 := SimM3LoadReactionGain_Mps2,
     BrakePhysicalActive := SimM3BrakePhysicalActive,
-    BrakeDecel_Mps2 := SimM3BrakeDecel_Mps2
+    BrakeDecel_Mps2 := SimM3BrakeDecel_Mps2,
+    CartFreeActive := SimM3CartFreeActive,
+    LoadMassRatio := SimM3LoadMassRatio,
+    RollingFriction_Mps2 := SimM3RollingFriction_Mps2,
+    Slope_Mps2 := SimM3Slope_Mps2,
+    SensorCamDropoutActive := SimM3SensorCamDropoutActive,
+    SensorCamDropoutStart_M := SimM3SensorCamDropoutStart_M,
+    SensorCamDropoutWidth_M := SimM3SensorCamDropoutWidth_M
 );
 M3BrakeFaultCloseActive := instSimTranslation.BrakeFaultCloseActive;
 M3SensorBlipActive := instSimTranslation.SensorBlipActive;
@@ -666,6 +682,8 @@ M3ObsOvershootSensorId := instSimTranslation.ObsOvershootSensorId;
 M3ObsEndStopHitCount := instSimTranslation.ObsEndStopHitCount;
 M3ObsEndStopImpactSpeed_Mps := instSimTranslation.ObsEndStopImpactSpeed_Mps;
 M3ObsBrakeClosedMovingCount := instSimTranslation.ObsBrakeClosedMovingCount;
+M3ObsCartFree := instSimTranslation.ObsCartFree;
+M3ObsFreeRollLast_M := instSimTranslation.ObsFreeRollLast_M;
 
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
 // même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).

@@ -78,6 +78,18 @@ VAR_GLOBAL
     // FALSE = comportement historique (retombee seulement sous 0,5 Hz, arret instantane).
     SimM3BrakePhysicalActive         : BOOL := TRUE;
     SimM3BrakeDecel_Mps2             : REAL := 2.0;   // HYPOTHESE : 20 Hz (0,4 m/s) -> ~4 cm
+    // 🛞 L4 (2026-10-28) — CHARIOT LIBRE : frein ouvert ET variateur sans couple (mot 0, rampe finie)
+    // -> le chariot n'est plus tenu : poussee benne (ratio x g x angle) + pente - frottement.
+    // FALSE = historique (chariot esclave de la frequence). Valeurs = HYPOTHESES.
+    SimM3CartFreeActive              : BOOL := TRUE;
+    SimM3LoadMassRatio               : REAL := 0.5;
+    SimM3RollingFriction_Mps2        : REAL := 0.1;
+    SimM3Slope_Mps2                  : REAL := 0.0;   // + vers Maintenance
+    // 📡 L5 (2026-10-28) — CAME CAPTEURS M3 : a chaque franchissement le capteur est VU, PERDU
+    // sur une courte zone, RETROUVE puis FIXE (lie a la position, deux sens). FALSE = historique.
+    SimM3SensorCamDropoutActive      : BOOL := TRUE;
+    SimM3SensorCamDropoutStart_M     : REAL := 0.02;  // HYPOTHESE
+    SimM3SensorCamDropoutWidth_M     : REAL := 0.04;  // HYPOTHESE
     // 📊 L2 — OBSERVATION M3 (ecrite par PRG_02, lecture seule, aucun effet sur le pilotage)
     SimM3ObsPositionTrue_M          : REAL;   // Position vraie du chariot simule (m)
     SimM3ObsPositionError_M         : REAL;   // Position vraie - position calculee programme (m)
@@ -86,6 +98,8 @@ VAR_GLOBAL
     SimM3ObsEndStopHitCount         : UDINT;  // Chocs en butee mecanique
     SimM3ObsEndStopImpactSpeed_Mps  : REAL;   // Vitesse au dernier choc (m/s)
     SimM3ObsBrakeClosedMovingCount  : UDINT;  // Fermetures frein chariot en mouvement
+    SimM3ObsCartFree                : BOOL;   // L4 : chariot libre en ce moment
+    SimM3ObsFreeRollLast_M          : REAL;   // L4 : distance du dernier episode libre (m)
 
     // 🕹️ STIMULI OPÉRATEUR — les boutons directionnels imposent 0/5000/10000 ; combinaison = neutre.
     SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE; // Translation M3 Arrière vers Trémie (RawX=0, RawY=5000)

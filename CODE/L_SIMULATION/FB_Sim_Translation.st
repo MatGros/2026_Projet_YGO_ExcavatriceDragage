@@ -51,6 +51,19 @@ VAR_INPUT
        (BrakeDecel_Mps2) ; frein serre = chariot bloque meme si le variateur pousse. *)
     BrakePhysicalActive : BOOL := FALSE;
     BrakeDecel_Mps2 : REAL := 2.0;   (* HYPOTHESE : 0,4 m/s (20 Hz) -> arret ~0,2 s / ~4 cm *)
+    (* L4 — CHARIOT LIBRE (2026-10-28). FALSE = historique (chariot esclave de la frequence).
+       TRUE = quand le frein est OUVERT et que le variateur n'applique plus de couple (mot a 0
+       et rampe variateur terminee), le chariot n'est plus tenu : il garde sa vitesse et subit
+       la poussee de la benne suspendue (rapport de masse x g x angle), la pente et le
+       frottement de roulement. Valeurs = HYPOTHESES, sans mesure terrain. *)
+    CartFreeActive : BOOL := FALSE;
+    LoadMassRatio : REAL := 0.5;          (* masse benne / masse totale chariot+benne *)
+    RollingFriction_Mps2 : REAL := 0.1;   (* ~1 % de g *)
+    Slope_Mps2 : REAL := 0.0;             (* composante de pente, + vers Maintenance *)
+    (* L5 — came capteurs (vu -> perdu -> retrouve -> fixe), appliquee aux 5 capteurs. *)
+    SensorCamDropoutActive : BOOL := FALSE;
+    SensorCamDropoutStart_M : REAL := 0.02;
+    SensorCamDropoutWidth_M : REAL := 0.04;
     SuspendedLoadLength_M : REAL := 1.5;
     SuspendedLoadDamping : REAL := 0.35;
     LoadReactionGain_Mps2 : REAL := 0.20;
@@ -110,6 +123,8 @@ VAR_OUTPUT
     ObsEndStopHitCount : UDINT;         (* Nombre de chocs en butee mecanique *)
     ObsEndStopImpactSpeed_Mps : REAL;   (* Vitesse au dernier choc en butee *)
     ObsBrakeClosedMovingCount : UDINT;  (* Nombre de fermetures mecaniques du frein chariot en mouvement *)
+    ObsCartFree : BOOL;                 (* L4 : frein ouvert ET variateur sans couple -> chariot libre *)
+    ObsFreeRollLast_M : REAL;           (* L4 : distance parcourue pendant le dernier episode libre *)
 END_VAR
 VAR
     ObsArmed : BOOL;                    (* Front capteur d'arret vu, arret pas encore constate *)
@@ -120,6 +135,9 @@ VAR
     ObsPrevBrakeOpen : BOOL;
     ObsPrevHardStop : BOOL;
     ObsSpeedBeforeStop_Mps : REAL;      (* Vitesse du scan avant le calcul de butee *)
+    DriveTorqueActive : BOOL;           (* L4 : variateur commande ou encore en rampe -> chariot tenu *)
+    FreeAccel_Mps2 : REAL;              (* L4 : acceleration nette du chariot libre *)
+    FreeRollStart_M : REAL;             (* L4 : position au debut de l'episode libre *)
     instCycleTime : FB_CycleTime;
     Initialized : BOOL;
     DirectionSign : REAL;
@@ -274,7 +292,33 @@ IF Enable THEN
     ELSE
         VelocityTarget_Mps := 0.0;
     END_IF;
-    IF BrakeMechanicallyOpen THEN
+    (* L4 : le variateur tient le chariot tant qu'il est commande ou que sa SORTIE electrique
+       alimente encore le moteur (rampe + reponse) ; ensuite, plus aucun couple.
+       Reprise de commande en roue libre : pas de reprise a la volee (le variateur repart de 0 Hz). *)
+    DriveTorqueActive := (DirectionSign <> 0.0) OR (instDrive.ElectricalFrequency_Hz > CST_StopFrequency_Hz);
+    ObsCartFree := CartFreeActive AND BrakeMechanicallyOpen AND NOT DriveTorqueActive;
+    IF ObsCartFree THEN
+        (* Poussee de la benne (angle du scan precedent) + pente - frottement oppose au mouvement. *)
+        (* Pendule sur chariot libre : x'' = m_benne / m_chariot x g x theta = r / (1 - r) x g x theta. *)
+        FreeAccel_Mps2 := (LIMIT(0.0, LoadMassRatio, 0.9) / (1.0 - LIMIT(0.0, LoadMassRatio, 0.9)))
+                          * 9.81 * instSuspendedLoad.Angle_Rad + Slope_Mps2;
+        IF ABS(VelocityTrue_Mps) < 0.001 THEN
+            (* Adherence : ne repart que si la poussee depasse le frottement. *)
+            IF ABS(FreeAccel_Mps2) <= MAX(0.0, RollingFriction_Mps2) THEN
+                FreeAccel_Mps2 := 0.0;
+                VelocityTrue_Mps := 0.0;
+            ELSIF FreeAccel_Mps2 > 0.0 THEN
+                FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+            ELSE
+                FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+            END_IF;
+        ELSIF VelocityTrue_Mps > 0.0 THEN
+            FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+        ELSE
+            FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+        END_IF;
+        VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
+    ELSIF BrakeMechanicallyOpen THEN
         VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
     ELSIF BrakePhysicalActive THEN
         (* L3 : frein serre -> deceleration sur le frein jusqu'a l'arret, puis chariot bloque. *)
@@ -332,7 +376,10 @@ IF Enable THEN
             VelocityTrue_Mps := 0.0;
         END_IF;
     ELSE
-        VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+        IF NOT ObsCartFree THEN
+            (* Reaction historique (negligeable) ; en mode libre la poussee est deja integree (L4). *)
+            VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+        END_IF;
         PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
         IF PositionCandidate_M < EndStopTremie_M THEN
             PositionTrue_M := EndStopTremie_M;
@@ -368,6 +415,8 @@ instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 11,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosPV_M, Hysteresis_M := SensorHysteresis_M,
@@ -376,6 +425,8 @@ instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 23,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosP2_M, Hysteresis_M := SensorHysteresis_M,
@@ -384,6 +435,8 @@ instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 37,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosP1_M, Hysteresis_M := SensorHysteresis_M,
@@ -392,6 +445,8 @@ instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 53,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosMaintenance_M, Hysteresis_M := SensorHysteresis_M,
@@ -400,6 +455,8 @@ instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 71,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 
 PosTremie := instSensorTremie.ElectricalOutput;
@@ -445,6 +502,13 @@ IF Enable THEN
     ObsPrevTremie := PosTremie;
     ObsPrevP1 := PosP1;
     ObsPrevMaintenance := PosMaintenance;
+
+    (* L4 : distance de l'episode libre (frein ouvert, variateur sans couple). *)
+    IF NOT ObsCartFree THEN
+        FreeRollStart_M := PositionTrue_M;
+    ELSE
+        ObsFreeRollLast_M := ABS(PositionTrue_M - FreeRollStart_M);
+    END_IF;
 
     IF ObsArmed AND (ABS(VelocityTrue_Mps) < 0.001) THEN
         ObsOvershootLast_M := ABS(PositionTrue_M - ObsEdgePosition_M);

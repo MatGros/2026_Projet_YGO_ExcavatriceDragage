@@ -25,6 +25,16 @@ VAR_INPUT
          BlipDurationS   = duree de maintien de chaque etat, donc largeur de l'excursion. *)
     BlipTransitions : UDINT := 0;
     BlipDurationS : REAL := 0.2;
+    (* L5 (2026-10-28) — MECANISME DE CAME, SPATIAL : en franchissant le capteur on le VOIT,
+       on le PERD sur une courte zone, on le RETROUVE, puis il reste FIXE. Lie a la POSITION
+       (pas au temps) : se produit a chaque passage, dans les DEUX sens, et reste stable a
+       l'arret (bornes de la zone avec hysteresis CST_CamHysteresis_M contre le bruit/balancement).
+       Zone de perte placee APRES le front de detection (cote -/+ Hysteresis_M) :
+       [front - Start - Width ; front - Start] cote detection.
+       FALSE = historique strictement inchange. Valeurs = HYPOTHESES. *)
+    CamDropoutActive : BOOL := FALSE;
+    CamDropoutStart_M : REAL := 0.02;
+    CamDropoutWidth_M : REAL := 0.04;
 END_VAR
 VAR_OUTPUT
     RawDetected : BOOL;
@@ -45,11 +55,16 @@ VAR
     BlipRunning : BOOL;
     BlipTimerS : REAL;
     BlipCount : UDINT;
+    HystDetected : BOOL;      (* L5 : etat mecanique avec hysteresis (avant perte de came) *)
+    InCamDropout : BOOL;      (* L5 : position dans la zone de perte de la came *)
+    CamNear_M : REAL;         (* L5 : borne de la zone cote front de detection *)
+    CamFar_M : REAL;          (* L5 : borne de la zone cote interieur *)
 END_VAR
 VAR CONSTANT
     (* Plafond du nombre de bascules du profil « blip court » : borne la duree de l'episode
        et interdit tout rebouclage de compteur UDINT (revue du 2026-09-20, F9). *)
     CST_BlipMaxTransitions : UDINT := 1000;
+    CST_CamHysteresis_M : REAL := 0.01;   (* L5 : hysteresis des bornes de la zone de perte *)
 END_VAR
 
 IF NOT Enable THEN
@@ -78,6 +93,7 @@ IF NOT Initialized THEN
     ELSE
         RawDetected := Position_M >= Threshold_M;
     END_IF;
+    HystDetected := RawDetected;
     ElectricalOutput := RawDetected;
     PreviousRawDetected := RawDetected;
     RandomState := ScenarioSeed MOD 1000000;
@@ -90,18 +106,39 @@ IF NOT Initialized THEN
 END_IF;
 
 IF ActiveBelowThreshold THEN
-    IF RawDetected THEN
-        RawDetected := Position_M <= (Threshold_M + MAX(0.0, Hysteresis_M));
+    IF HystDetected THEN
+        HystDetected := Position_M <= (Threshold_M + MAX(0.0, Hysteresis_M));
     ELSE
-        RawDetected := Position_M <= (Threshold_M - MAX(0.0, Hysteresis_M));
+        HystDetected := Position_M <= (Threshold_M - MAX(0.0, Hysteresis_M));
+    END_IF;
+    (* Zone de perte : apres le front d'entree en detection (cote - hysteresis), vers l'interieur. *)
+    CamNear_M := Threshold_M - MAX(0.0, Hysteresis_M) - MAX(0.0, CamDropoutStart_M);
+    CamFar_M := CamNear_M - MAX(0.0, CamDropoutWidth_M);
+    IF NOT CamDropoutActive THEN
+        InCamDropout := FALSE;
+    ELSIF InCamDropout THEN
+        InCamDropout := (Position_M <= CamNear_M + CST_CamHysteresis_M) AND (Position_M > CamFar_M - CST_CamHysteresis_M);
+    ELSE
+        InCamDropout := (Position_M <= CamNear_M - CST_CamHysteresis_M) AND (Position_M > CamFar_M + CST_CamHysteresis_M);
     END_IF;
 ELSE
-    IF RawDetected THEN
-        RawDetected := Position_M >= (Threshold_M - MAX(0.0, Hysteresis_M));
+    IF HystDetected THEN
+        HystDetected := Position_M >= (Threshold_M - MAX(0.0, Hysteresis_M));
     ELSE
-        RawDetected := Position_M >= (Threshold_M + MAX(0.0, Hysteresis_M));
+        HystDetected := Position_M >= (Threshold_M + MAX(0.0, Hysteresis_M));
+    END_IF;
+    CamNear_M := Threshold_M + MAX(0.0, Hysteresis_M) + MAX(0.0, CamDropoutStart_M);
+    CamFar_M := CamNear_M + MAX(0.0, CamDropoutWidth_M);
+    IF NOT CamDropoutActive THEN
+        InCamDropout := FALSE;
+    ELSIF InCamDropout THEN
+        InCamDropout := (Position_M >= CamNear_M - CST_CamHysteresis_M) AND (Position_M < CamFar_M + CST_CamHysteresis_M);
+    ELSE
+        InCamDropout := (Position_M >= CamNear_M + CST_CamHysteresis_M) AND (Position_M < CamFar_M - CST_CamHysteresis_M);
     END_IF;
 END_IF;
+(* L5 : la perte de came s'applique a l'etat mecanique ; hors option, RawDetected = HystDetected. *)
+RawDetected := HystDetected AND NOT InCamDropout;
 
 (* Un episode est declenche par un franchissement mecanique, pas par une de ses
    propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)

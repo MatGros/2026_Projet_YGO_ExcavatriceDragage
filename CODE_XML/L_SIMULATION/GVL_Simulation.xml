@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T14:42:47.255978" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T14:42:47.255978">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T15:10:23.423841" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T15:10:23.423841">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -322,6 +322,80 @@ FALSE = comportement historique (retombee seulement sous 0,5 Hz, arret instantan
             <xhtml xmlns="http://www.w3.org/1999/xhtml">HYPOTHESE : 20 Hz (0,4 m/s) -&gt; ~4 cm</xhtml>
           </documentation>
         </variable>
+        <variable name="SimM3CartFreeActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛞 L4 (2026-10-28) — CHARIOT LIBRE : frein ouvert ET variateur sans couple (mot 0, rampe finie)
+-&gt; le chariot n'est plus tenu : poussee benne (ratio x g x angle) + pente - frottement.
+FALSE = historique (chariot esclave de la frequence). Valeurs = HYPOTHESES.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3LoadMassRatio">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.5" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3RollingFriction_Mps2">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.1" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3Slope_Mps2">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">+ vers Maintenance</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorCamDropoutActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 L5 (2026-10-28) — CAME CAPTEURS M3 : a chaque franchissement le capteur est VU, PERDU
+sur une courte zone, RETROUVE puis FIXE (lie a la position, deux sens). FALSE = historique.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorCamDropoutStart_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.02" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">HYPOTHESE</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorCamDropoutWidth_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.03" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">HYPOTHESE</xhtml>
+          </documentation>
+        </variable>
         <variable name="SimM3ObsPositionTrue_M">
           <type>
             <REAL />
@@ -377,6 +451,22 @@ Position vraie du chariot simule (m)</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermetures frein chariot en mouvement</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3ObsCartFree">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : chariot libre en ce moment</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3ObsFreeRollLast_M">
+          <type>
+            <REAL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : distance du dernier episode libre (m)</xhtml>
           </documentation>
         </variable>
         <variable name="SimJoystickLeft_Rev_TREMIE_Active">

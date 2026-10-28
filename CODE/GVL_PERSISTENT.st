@@ -94,8 +94,8 @@ VAR_GLOBAL PERSISTENT RETAIN
     _TranslationRampAccelRate_Pct   : REAL := 40.0;  // Accélération translation (%/s) — défaut usine 40%
     _TranslationRampDecelNormal_Pct : REAL := 50.0;  // Décélération normale (%/s) — défaut usine 50%
     _TranslationRampDecelFast_Pct   : REAL := 100.0; // Décélération rapide SafeStop (%/s)
-    _TranslationAutoSpeedCap_Pct    : REAL := 40.0;  // Plafond vitesse SEMI_AUTO (%)
-    _TranslationSetFreq_Hz          : REAL := 40.0;  // 🚦 Consigne fréquence manuelle opérateur (Hz) — 40.0 = défaut MES 2026-09-04, recopie continue (PRG_07_Supervision)
+    _TranslationAutoSpeedCap_Pct    : REAL := 40.0;  // ⛔ RÉSERVE — VARIABLE MORTE, lue nulle part, ne plafonne RIEN (auto = 100 % de _TranslationMaxFreq_Hz). Conservée uniquement pour le mapping RETAIN positionnel : ne pas supprimer (2026-10-28)
+    _TranslationSetFreq_Hz          : REAL := 50.0;  // 🚦 Consigne fréquence manuelle opérateur (Hz) — 50.0 = défaut exploitant 2026-10-28 (ex-40.0 MES 04/09), recopie continue (PRG_07_Supervision)
 
     // 📏 Positions calibrées repère Translation M3 (mètres) — À MESURER SUR SITE (T301)
     // ✅ Convention : 0 m = Trémie (Extrême gauche), Maintenance = extrême droite.
