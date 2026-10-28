@@ -97,16 +97,16 @@ VAR_GLOBAL PERSISTENT RETAIN
     _TranslationAutoSpeedCap_Pct    : REAL := 40.0;  // Plafond vitesse SEMI_AUTO (%)
     _TranslationSetFreq_Hz          : REAL := 40.0;  // 🚦 Consigne fréquence manuelle opérateur (Hz) — 40.0 = défaut MES 2026-09-04, recopie continue (PRG_07_Supervision)
 
-    // 📏 Positions calibrées repère Translation M3 (mètres)
-    // ✅ Convention : 0 m = Trémie (Extrême gauche), 30 m = Maintenance (Extrême droite).
-    // Distances NON-linéaires : Trémie(0)→PV(5)=5 m, PV(5)→P2(15)=10 m, P2(15)→P1(20)=5 m,
-    // P1(20)→Maintenance(30)=10 m.
+    // 📏 Positions calibrées repère Translation M3 (mètres) — À MESURER SUR SITE (T301)
+    // ✅ Convention : 0 m = Trémie (Extrême gauche), Maintenance = extrême droite.
+    // Défauts = estimation réaliste 2026-10-28 (P1↔Trémie ≈ 5 m, P1↔Maintenance ≈ 5 m).
+    // ⚠️ Valeurs RETENUES : changer un défaut ici ne modifie PAS un automate déjà en service.
     _TranslationPosTremie_M         : REAL := 0.0;   // Position Trémie (Extrême gauche, origine)
-    _TranslationPosPV_M             : REAL := 5.0;   // Position PV (Pré-ralentissement)
-    _TranslationPosP2_M             : REAL := 15.0;  // Position P2
-    _TranslationPosP1_M             : REAL := 20.0;  // Position P1
-    _TranslationPosMaintenance_M    : REAL := 30.0;  // Position Maintenance (Extrême droite)
-    _TranslationGainMetersPerHzSec  : REAL := 0.02; // Ratio m/s par Hz (50 Hz = 1.0 m/s) — valeur PROVISOIRE estimee 2026-09-21 (observation terrain), en attente calibration rigoureuse T301 (chrono + decametre)
+    _TranslationPosPV_M             : REAL := 1.5;   // Position PV (Pré-ralentissement)
+    _TranslationPosP2_M             : REAL := 3.5;   // Position P2
+    _TranslationPosP1_M             : REAL := 5.0;   // Position P1
+    _TranslationPosMaintenance_M    : REAL := 10.0;  // Position Maintenance (Extrême droite)
+    _TranslationGainMetersPerHzSec  : REAL := 0.02; // Gain de REPLI m/(Hz.s) (50 Hz = 1,0 m/s) — utilisé tant que _TranslationCalibTimeP2PV_S n'est pas saisi (T301, FB_Translation_OdometryGain)
     // Reprise odométrie après reboot — recopie continue (PRG_05_Translation).
     _TranslationPosEstimated_M          : REAL := 0.0;   // Dernière position estimée connue (m)
     _TranslationPosEstimatedInitialized : BOOL := FALSE;  // TRUE dès la première calibration sur capteur
@@ -198,5 +198,12 @@ VAR_GLOBAL PERSISTENT RETAIN
     _RunningHoursM1_S      : UDINT := 0;  // 🔒 Totalisateur horaire treuil M1 — LECTURE SEULE
     _RunningHoursM2_S      : UDINT := 0;  // 🔒 Totalisateur horaire treuil M2 — LECTURE SEULE
     _RunningHoursM3_S      : UDINT := 0;  // 🔒 Totalisateur horaire translation M3 — LECTURE SEULE
+
+    // 📏 ÉTALONNAGE ODOMÉTRIE M3 (T301) — AJOUTÉS EN FIN DE LISTE (mapping RETAIN positionnel).
+    // Gain = (_TranslationPosP2_M - _TranslationPosPV_M) / (CalibFreq × CalibTime), calculé par
+    // FB_Translation_OdometryGain. Saisie MANUELLE par l'exploitant à partir de la mesure proposée
+    // (PRG_05_Translation.Data.TranslationState.OdometryMeasured*) — jamais écrit par le programme.
+    _TranslationCalibFreq_Hz        : REAL := 50.0; // Fréquence stable pendant la mesure P2 <-> PV (Hz)
+    _TranslationCalibTimeP2PV_S     : REAL := 2.0;  // Temps mesuré P2 <-> PV (s) — défaut 2,0 : 2 m / (50 Hz × 2 s) = 0,02 = repli ; 0 ou gain hors [0,005 ; 0,05] -> repli
 
 END_VAR

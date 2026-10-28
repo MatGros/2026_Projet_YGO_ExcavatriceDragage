@@ -59,6 +59,9 @@ VAR_GLOBAL
     // tracee). > 0 autorise la reaction de charge a ressortir le chariot de la zone capteur.
     // Valeur SYNTHETIQUE, non calibree : a mesurer en mise en service.
     SimM3EndStopRecoilMax_M         : REAL := 0.0;
+    // 🧱 Distance capteur extreme (Tremie / Maintenance) -> butee mecanique M3, m (T301/L1).
+    // Seule donnee geometrique propre au banc ; les positions capteurs sont celles de la machine.
+    SimM3EndStopMargin_M            : REAL := 0.5;
     // Gain de reaction de charge utilisee par le modele M3 (SYNTHETIQUE).
     // 0.20 = valeur historique ; un gain plus eleve est necessaire pour rejouer le recul
     // post-arret observe sur la trace terrain du 2026-09-04. A calibrer.

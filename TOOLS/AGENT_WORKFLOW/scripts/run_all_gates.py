@@ -198,7 +198,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     # (audit T360, trace Suivi_74). G518 verrouille l'EGALITE des deux echelles, la constante du
     # banc REELLEMENT passee au modele (anti-constante-morte), le cablage du gain persistant vers
     # l'estimateur et l'existence des cas de test d'alignement (anti-test-vacuant).
-    ("C", "518", "G518 - Echelle odometrique M3 : banc et estimateur partagent le meme ratio (T361)", [sys.executable, f"{S}/G518_check_m3_odometry_scale.py", "."]),
+    ("C", "518", "G518 - Odometrie M3 : source unique machine -> banc (positions + gain effectif, T301/L1)", [sys.executable, f"{S}/G518_check_m3_odometry_scale.py", "."]),
     # T345 lot L1 - Le sequenceur retire sa demande sur le jeton d'arrivee, soit ~9 scans AVANT la
     # fin du debounce de 100 ms : le sens d'arrivee capture sur Commanded* (deja remis a FALSE)
     # laissait le verrou d'arrivee relachable par une demande du MEME sens. Rebond capteur ->

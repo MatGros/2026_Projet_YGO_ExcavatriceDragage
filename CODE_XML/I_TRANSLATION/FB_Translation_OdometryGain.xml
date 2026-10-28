@@ -1,0 +1,626 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T14:08:37.566339" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T14:08:37.566339">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_Translation_OdometryGain" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active la mesure proposée (le gain actif est toujours calculé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorPV">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Capteur PV (mot thermomètre : TRUE côté Trémie)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorP2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Capteur P2 (mot thermomètre : TRUE côté Trémie)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveActualFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Fréquence de sortie réelle du variateur (Hz)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PosPV_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position capteur PV (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PosP2_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="3.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position capteur P2 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CalibFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="50" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Fréquence stable pendant la mesure saisie (Hz)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CalibTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps P2 &lt;-&gt; PV saisi (s) — 2,0 = défaut cohérent avec 0,02 ; 0 -&gt; repli</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FallbackGain">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Gain de repli, m/(Hz.s)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="GainActive">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Gain consommé par l'estimateur, m/(Hz.s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CalibValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE = gain calculé depuis le réglage Calib* (défaut compris) ; FALSE = repli actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasureActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Mesure P2 &lt;-&gt; PV en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredTime_S">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Dernier temps mesuré entre les 2 fronts (s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredFreqAvg_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Fréquence moyenne pendant la dernière mesure (Hz)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredFreqSpread_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Écart max - min de fréquence (stabilité de la mesure)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredGain">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Gain que donnerait la dernière mesure, m/(Hz.s) — proposé, jamais appliqué</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasureCount">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Nombre de mesures abouties depuis le démarrage</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="CycleTimeCalc">
+              <type>
+                <derived name="FB_CycleTime" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Mesure temps de cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EdgeUpP2">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant P2 (départ vers Trémie)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EdgeDnP2">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant P2 (fin vers Maintenance)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EdgeUpPV">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant PV (fin vers Trémie)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EdgeDnPV">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant PV (départ vers Maintenance)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DistanceP2PV_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance P2 - PV (m), &gt; 0 si positions ordonnées</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CalibGain">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Gain calculé depuis le réglage site</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasureTowardTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens de la mesure en cours (TRUE = départ P2 montant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ElapsedS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps écoulé de la mesure en cours (s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FreqIntegral_HzS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Somme fréquence × temps de la mesure en cours (Hz.s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FreqMin_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fréquence mini pendant la mesure en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FreqMax_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fréquence maxi pendant la mesure en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FreqSample_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fréquence bornée du scan courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasureEnd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front de fin attendu observé ce scan</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_GainMin">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.005" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plage plausible du gain (m/(Hz.s)) : hors plage -&gt; repli</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_GainMax">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.05" />
+              </initialValue>
+            </variable>
+            <variable name="CST_MeasureMinFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sous ce seuil la mesure est abandonnée (arrêt en cours de mesure)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_MeasureTimeout_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="60" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Au-delà la mesure est abandonnée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_FreqMax_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="600" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne de la fréquence lue</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎯 FB_Translation_OdometryGain — Coefficient odométrique M3 réglable sur site (T301)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md §4 (cotes &amp; ratio odométrique, T301)
+      Procédure site : DOC/WFLOW/CONTRACTS/PROCEDURE_CALIBRATION_ODOMETRIE_M3_T301.md
+   🎯 Rôle :
+      1. GAIN ACTIF = |PosP2 - PosPV| / (CalibFreq × CalibTime), réglages saisis par l'exploitant.
+         Réglage absent, incohérent ou hors plage plausible -&gt; REPLI sur FallbackGain
+         (CalibValid = FALSE indique quelle source est active).
+      2. MESURE PROPOSÉE (jamais appliquée) : entre le 1er front P2 et le 1er front PV, dans les
+         deux sens, le FB mesure le temps, la fréquence moyenne, l'écart min/max de fréquence et le
+         gain qui en résulterait. L'exploitant recopie LUI-MÊME temps et fréquence dans les réglages.
+   🛡️ Sécurité : aucune. Diagnostic/estimation uniquement — la position estimée ne pilote aucun arrêt.
+   🧩 Dépendances : FB_CycleTime. Consommateur : FB_Translation_PositionEstimator (PRG_05).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+{region "§1 Gain actif (toujours calculé — réglage pur, indépendant d'Enable)"}
+DistanceP2PV_M := PosP2_M - PosPV_M;
+IF (DistanceP2PV_M &gt; 0.0) AND (CalibFreq_Hz &gt; 0.0) AND (CalibTime_S &gt; 0.0) THEN
+    CalibGain := DistanceP2PV_M / (CalibFreq_Hz * CalibTime_S);
+    CalibValid := (CalibGain &gt;= CST_GainMin) AND (CalibGain &lt;= CST_GainMax);
+ELSE
+    CalibGain := 0.0;
+    CalibValid := FALSE;
+END_IF;
+
+IF CalibValid THEN
+    GainActive := CalibGain;
+ELSE
+    // Repli borné : un repli nul/aberrant figerait l'estimateur (et le chariot simulé).
+    GainActive := LIMIT(CST_GainMin, FallbackGain, CST_GainMax);
+END_IF;
+{endregion}
+
+{region "§2 Gate mesure"}
+// Fronts évalués à chaque scan, y compris hors Enable : aucun front périmé à la réactivation.
+EdgeUpP2(CLK := SensorP2);   EdgeDnP2(CLK := SensorP2);
+EdgeUpPV(CLK := SensorPV);   EdgeDnPV(CLK := SensorPV);
+
+IF NOT Enable THEN
+    MeasureActive := FALSE;
+    RETURN;
+END_IF;
+
+CycleTimeCalc(DefaultValueS := 0.010);
+FreqSample_Hz := LIMIT(0.0, DriveActualFreq_Hz, CST_FreqMax_Hz);
+{endregion}
+
+{region "§3 Mesure proposée P2 &lt;-&gt; PV (jamais appliquée)"}
+// Mot thermomètre (TRUE si position &lt;= cote) :
+//   vers la Trémie      : P2 monte puis PV monte ;
+//   vers la Maintenance : PV descend puis P2 descend.
+// Seul le 1er front compte : les rebonds du capteur de départ (vu -&gt; perdu -&gt; retrouvé) sont
+// ignorés une fois la mesure lancée ; la mesure ne se termine que sur le front ATTENDU.
+IF NOT MeasureActive THEN
+    IF EdgeUpP2.Q OR EdgeDnPV.Q THEN
+        MeasureActive := TRUE;
+        MeasureTowardTremie := EdgeUpP2.Q;
+        ElapsedS := 0.0;
+        FreqIntegral_HzS := 0.0;
+        FreqMin_Hz := FreqSample_Hz;
+        FreqMax_Hz := FreqSample_Hz;
+    END_IF;
+ELSE
+    ElapsedS := ElapsedS + CycleTimeCalc.CycleTimeS;
+    FreqIntegral_HzS := FreqIntegral_HzS + FreqSample_Hz * CycleTimeCalc.CycleTimeS;
+    FreqMin_Hz := MIN(FreqMin_Hz, FreqSample_Hz);
+    FreqMax_Hz := MAX(FreqMax_Hz, FreqSample_Hz);
+
+    MeasureEnd := (MeasureTowardTremie AND EdgeUpPV.Q) OR (NOT MeasureTowardTremie AND EdgeDnP2.Q);
+
+    IF MeasureEnd THEN
+        MeasureActive := FALSE;
+        MeasuredTime_S := ElapsedS;
+        MeasuredFreqSpread_Hz := FreqMax_Hz - FreqMin_Hz;
+        IF ElapsedS &gt; 0.0 THEN
+            MeasuredFreqAvg_Hz := FreqIntegral_HzS / ElapsedS;
+        ELSE
+            MeasuredFreqAvg_Hz := 0.0;
+        END_IF;
+        IF (FreqIntegral_HzS &gt; 0.0) AND (DistanceP2PV_M &gt; 0.0) THEN
+            MeasuredGain := DistanceP2PV_M / FreqIntegral_HzS;
+        ELSE
+            MeasuredGain := 0.0;
+        END_IF;
+        MeasureCount := MeasureCount + 1;
+    ELSIF (FreqSample_Hz &lt; CST_MeasureMinFreq_Hz) OR (ElapsedS &gt; CST_MeasureTimeout_S) THEN
+        // Arrêt ou trajet interrompu : mesure abandonnée, dernier résultat publié conservé.
+        MeasureActive := FALSE;
+    END_IF;
+END_IF;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>252fc5b1-41ff-5035-8671-f01ad4b50508</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_CycleTime" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="DefaultValueS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.004" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES DE SECOURS ===
+--&gt; [CFG] Valeur de secours par defaut (ex: 4ms = 0.004s)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE ET DIAGNOSTIC ===
+&lt;-- [DIAG] Temps ecoule reel calcule (secondes)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="TimeCurrent">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HORLOGE ET MEMOIRE TEMPORELLE ===
+. [LOC] Temps systeme actuel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeLast">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Empreinte de temps du cycle precedent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaTimeMs">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart brut calcule (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InitDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Drapeau d'initialisation du premier cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_MaxCycleDeltaMs">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BORNE HAUTE DU DELTA DE CYCLE ===
+Plafond physique du dt entre deux scans (ms) : au-dela -&gt; valeur de secours</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Calcul du dt réel entre deux exécutions successives
+   ⚙️ Calcul : Delta horloge système TIME() converti en secondes
+   🛡️ Robustesse : dt borné (0 &lt; dt &lt;= CST_MaxCycleDeltaMs) sinon valeur de secours —
+      neutralise les artefacts de rebouclage TIME() (49,7 j) et de reprise (online-change, debug)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants/FB_CycleTime_v1.0.md
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Acquisition temps"}
+// 1. ACQUISITION DU TEMPS SYSTÈME
+TimeCurrent := TIME();
+{endregion}
+
+{region "§2 Initialisation"}
+// 2. INITIALISATION UNIQUE AU PREMIER CYCLE
+IF NOT InitDone THEN
+    TimeLast := TimeCurrent;
+    InitDone := TRUE;
+    CycleTimeS := DefaultValueS;
+    RETURN;
+END_IF;
+{endregion}
+
+{region "§3 Calcul delta"}
+// 3. CALCUL DU DELTA EN MILLISECONDES
+DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+{endregion}
+
+{region "§4 Conversion, secours et bornage"}
+// 4. CONVERSION EN SECONDES, AVEC DOUBLE BORNAGE DU DELTA
+//
+// TIME() est un compteur systeme 32 bits en millisecondes depuis le demarrage de
+// l'automate. Il n'est PAS absolu : il reboucle a 0 tous les 2^32 ms (~49,7 jours).
+// La soustraction TimeCurrent - TimeLast est modulo 2^32 : au passage du rebouclage,
+// tant que l'ecart reel entre deux scans reste &lt; 49,7 j (toujours vrai a 10 ms),
+// DeltaTimeMs reste correct. Le rebouclage seul n'est donc pas le risque principal.
+//
+// Le vrai risque est un DeltaTimeMs REELLEMENT &gt; CST_MaxCycleDeltaMs : reprise apres
+// un online-change, sortie d'un point d'arret / pas-a-pas debug, ou fenetre du
+// rebouclage TIME(). Le chien de garde tache (200 ms, sensibilite 1) borne deja les
+// gels en fonctionnement ; ce plafond couvre les cas hors surveillance.
+// Un dt aberrant publie tel quel donnerait un CycleTimeS enorme, propage en un seul
+// scan dans les rampes de vitesse et les integrateurs de position/frein -&gt; saut
+// physique. Fail-safe : hors de la plage nominale (0 &lt; dt &lt;= plafond), on publie la
+// valeur de secours DefaultValueS au lieu de l'artefact. Pas de redemarrage auto.
+//
+// Borne basse dt = 0 (anti-zero, ex. premier appel du scan) et borne haute
+// dt &gt; CST_MaxCycleDeltaMs (anti-artefact) partagent la meme branche de secours.
+IF (DeltaTimeMs &gt; 0) AND (DeltaTimeMs &lt;= CST_MaxCycleDeltaMs) THEN
+    CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
+ELSE
+    CycleTimeS := DefaultValueS;
+END_IF;
+{endregion}
+
+{region "§5 Archivage"}
+// 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
+TimeLast := TimeCurrent;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ac308017-0ba5-51da-b58a-b5951d04dc0f</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="I_TRANSLATION">
+          <Object Name="FB_Translation_OdometryGain" ObjectId="252fc5b1-41ff-5035-8671-f01ad4b50508" />
+        </Folder>
+        <Folder Name="A_COMMUN">
+          <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

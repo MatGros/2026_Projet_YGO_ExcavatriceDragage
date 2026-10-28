@@ -56,5 +56,15 @@ STRUCT
     MaintenanceTargetEnable : BOOL;    (* 🔓 TRUE = Autorise le déplacement vers la cible 4 (Maintenance) ; actif uniquement en mode MAINT_N2 *)
     SimulationModeActive    : BOOL;
     HeightInterlockBlocking : BOOL;    (* : TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise *)
+
+    (* 📏 T301 — Odométrie M3 : gain actif + mesure PROPOSÉE P2 <-> PV (jamais appliquée, recopie manuelle) *)
+    OdometryGainActive            : REAL;   (* Gain consommé par l'estimateur, m/(Hz.s) *)
+    OdometryCalibValid            : BOOL;   (* TRUE = gain calculé depuis le réglage Calib* (défaut 2,0 s compris) ; FALSE = gain de repli *)
+    OdometryMeasureActive         : BOOL;   (* Mesure P2 <-> PV en cours *)
+    OdometryMeasuredTime_S        : REAL;   (* Dernier temps mesuré P2 <-> PV (s) -> à recopier dans _TranslationCalibTimeP2PV_S *)
+    OdometryMeasuredFreqAvg_Hz    : REAL;   (* Fréquence moyenne de la mesure (Hz) -> à recopier dans _TranslationCalibFreq_Hz *)
+    OdometryMeasuredFreqSpread_Hz : REAL;   (* Écart max - min de fréquence : petit = vitesse constante, mesure fiable *)
+    OdometryMeasuredGain          : REAL;   (* Gain qui résulterait de la mesure, m/(Hz.s) *)
+    OdometryMeasureCount          : UDINT;  (* Nombre de mesures abouties depuis le démarrage *)
 END_STRUCT
 END_TYPE

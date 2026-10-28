@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-27T16:11:42.633560" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-27T16:11:42.633560">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T14:00:03.934968" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T14:00:03.934968">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -701,6 +701,73 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse M3</xhtml>
               </documentation>
             </variable>
+            <variable name="M3_PosTremie_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T301/L1 — SOURCE UNIQUE : reglages machine M3 lus par PRG_02 (le banc n'a plus de positions en dur)
+--&gt; [CFG] Position capteur Tremie (GVL_PERSISTENT)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosPV_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position capteur PV (GVL_PERSISTENT)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosP2_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="3.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position capteur P2 (GVL_PERSISTENT)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosP1_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position capteur P1 (GVL_PERSISTENT)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosMaintenance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position capteur Maintenance (GVL_PERSISTENT)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_OdometryGain">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Gain effectif de l'estimateur machine, m/(Hz.s) (PRG_05)</xhtml>
+              </documentation>
+            </variable>
             <variable name="M3_BrakeCmd">
               <type>
                 <BOOL />
@@ -1112,6 +1179,17 @@ alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s, 
 (position ET vitesse figees a la butee, decision de review tracee). &gt; 0 autorise la
 reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non calibre.
 --&gt; [CFG][SYNTHETIQUE] Recul borne a la butee M3, m</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3EndStopMargin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Distance capteur extreme -&gt; butee mecanique M3, m</xhtml>
               </documentation>
             </variable>
             <variable name="SimM3LoadReactionGain_Mps2">
@@ -1577,21 +1655,6 @@ lue à 0 (un 0 est un point de passage légitime du comptage signé, jamais une 
             </variable>
           </inOutVars>
           <localVars>
-            <variable name="CST_M3FullTravelTimeS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="37.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T361 — 37,5 s = 30 m / (40 Hz x 0,02 m/(Hz.s)) : l'echelle du banc est ALIGNEE sur le gain
-odometrique reel (GVL_PERSISTENT._TranslationGainMetersPerHzSec). C'est CETTE constante qui
-est effectivement passee a instSimTranslation (ligne 567) : changer le seul defaut du FB
-n'aurait aucun effet en simulation. Garde-fou : gate G518.
-Temps de Trémie à Maintenance à 100 %, modèle banc uniquement</xhtml>
-              </documentation>
-            </variable>
             <variable name="CST_M3MaxFreq_Hz">
               <type>
                 <REAL />
@@ -1600,7 +1663,9 @@ Temps de Trémie à Maintenance à 100 %, modèle banc uniquement</xhtml>
                 <simpleValue value="50" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maximum variateur M3 : DOIT egaler GVL_PERSISTENT._TranslationMaxFreq_Hz (PRG_02 envoie f/50 x 100).
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T301/L1 : l'ancienne echelle en dur CST_M3FullTravelTimeS (37,5 s) est SUPPRIMEE — le banc
+recoit positions + gain effectif de la machine (M3_Pos*_M, M3_OdometryGain). Gate G518.
+Maximum variateur M3 : DOIT egaler GVL_PERSISTENT._TranslationMaxFreq_Hz (PRG_02 envoie f/50 x 100).
 Constante locale (L_SIMULATION ne lit pas GVL_PERSISTENT) ; egalite verifiee par G518.</xhtml>
               </documentation>
             </variable>
@@ -2477,7 +2542,13 @@ instSimTranslation(
     ReqTremie       := M3_RelayFwd,
     ReqMaintenance  := M3_RelayRev,
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
-    FullTravelTimeS := CST_M3FullTravelTimeS,
+    PosTremie_M        := M3_PosTremie_M,
+    PosPV_M            := M3_PosPV_M,
+    PosP2_M            := M3_PosP2_M,
+    PosP1_M            := M3_PosP1_M,
+    PosMaintenance_M   := M3_PosMaintenance_M,
+    GainMetersPerHzSec := M3_OdometryGain,
+    EndStopMargin_M    := SimM3EndStopMargin_M,
     MaxFreq_Hz      := CST_M3MaxFreq_Hz,
     SpeedFactor     := SimM3SpeedFactor,
     BrakeReleaseCmd := M3_BrakeCmd,
@@ -4270,25 +4341,88 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <REAL />
               </type>
             </variable>
-            <variable name="FullTravelTimeS">
+            <variable name="PosTremie_M">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="37.5" />
+                <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T361 — ECHELLE ODOMETRIQUE DU BANC, ALIGNEE SUR L'ESTIMATEUR REEL.
-       Le modele integre VelocityTarget = (CST_PositionAtMaintenance / FullTravelTimeS) x f / 40.
-       Le ratio simule vaut donc 30 / (40 x FullTravelTimeS) m/(Hz.s) et DOIT etre egal au gain
-       consomme par FB_Translation_PositionEstimator (GainMetersPerHzSec, cable sur
-       GVL_PERSISTENT._TranslationGainMetersPerHzSec = 0,02 m/(Hz.s), soit 1 m/s a 50 Hz).
-       =&gt; 30 / (40 x 37,5) = 0,02 m/(Hz.s). La valeur historique 8,0 s donnait 0,09375 m/(Hz.s),
-       soit 4,7 fois l'echelle reelle : l'estimateur prenait un retard constant et chaque
-       franchissement de capteur produisait un saut de recalage de plusieurs metres
-       (AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md, trace Suivi_74 : sauts de 4,53 a 9,12 m).
-       ⚠️ Toute evolution de _TranslationGainMetersPerHzSec exige de recalculer cette constante :
-       le gate G518 echoue si les deux echelles divergent.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T301/L1 — SOURCE UNIQUE : le banc ne porte AUCUNE position ni echelle propre.
+       Positions capteurs = reglages machine (GVL_PERSISTENT._TranslationPos*_M) et gain =
+       gain EFFECTIVEMENT consomme par l'estimateur (PRG_05 FB_Translation_OdometryGain.GainActive),
+       passes par PRG_02 -&gt; FB_SimBench. Vitesse chariot = sens x gain x frequence.
+       Historique : l'ancienne echelle en dur (30 m / FullTravelTimeS / 40 Hz) a diverge du gain
+       reel (T360/T361, sauts de 4 a 9 m) — doublon supprime, gate G518 anti-retour.
+--&gt; [CFG] Position capteur Tremie (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PosPV_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position capteur PV (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PosP2_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="3.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position capteur P2 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PosP1_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position capteur P1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PosMaintenance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position capteur Maintenance (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="GainMetersPerHzSec">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Gain odometrique effectif, m/(Hz.s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EndStopMargin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance capteur extreme -&gt; butee mecanique (seule donnee propre au banc : physique du rail).
+       Bornee a CST_MinEndStopMargin_M pour que le capteur extreme reste franchissable.</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeReleaseCmd">
@@ -4310,7 +4444,7 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">ECHELLE DE LA CONSIGNE. PRG_02 envoie SpeedCmd_Pct = f / 50 Hz x 100 : le simulateur reconvertit
        avec le MEME maximum, sinon 20 Hz reels (40 %) deviendraient 16 Hz simules.
        Maximum = GVL_PERSISTENT._TranslationMaxFreq_Hz (50 Hz), passe par FB_SimBench (CST_M3MaxFreq_Hz,
-       egalite verifiee par G518). Ne pas confondre avec CST_NominalFrequency_Hz (40 Hz) : echelle
+       egalite verifiee par G518). Ne pas confondre avec l'ancienne echelle (40 Hz) : echelle
        ODOMETRIQUE (gain 0,02 m/(Hz.s)).</xhtml>
               </documentation>
             </variable>
@@ -4695,10 +4829,21 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <REAL />
               </type>
             </variable>
-            <variable name="SpeedAt40Hz_Mps">
+            <variable name="EndStopTremie_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">butee mecanique cote Tremie = capteur Tremie - marge</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EndStopMaintenance_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">butee mecanique cote Maintenance = capteur Maintenance + marge</xhtml>
+              </documentation>
             </variable>
             <variable name="VelocityTarget_Mps">
               <type>
@@ -4726,7 +4871,7 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Recul de butee ECRETE a la course : une valeur d'entree aberrante ne peut pas
-       autoriser une position hors de [0 ; 30] m (revue du 2026-09-20, F8).</xhtml>
+       autoriser une position hors des butees (revue du 2026-09-20, F8).</xhtml>
               </documentation>
             </variable>
             <variable name="SensorNoiseState">
@@ -4782,15 +4927,7 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <derived name="FB_Sim_SuspendedLoad" />
               </type>
             </variable>
-            <variable name="CST_PositionAtTremie">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-            </variable>
-            <variable name="CST_PositionAtTremieSensor_M">
+            <variable name="CST_MinEndStopMargin_M">
               <type>
                 <REAL />
               </type>
@@ -4798,73 +4935,9 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <simpleValue value="0.05" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Meme principe a Tremie : le seuil DI est legerement avant la butee afin
-       que l'hysteresis puisse commuter sans depassement numerique de course.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge mini capteur extreme -&gt; butee : au-dela de l'hysteresis capteur, sinon le mot
+       11111 / 00000 ne pourrait jamais etre produit (capteur colle a la butee).</xhtml>
               </documentation>
-            </variable>
-            <variable name="CST_PositionAtPV">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="5" />
-              </initialValue>
-            </variable>
-            <variable name="CST_PositionAtP2">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="15" />
-              </initialValue>
-            </variable>
-            <variable name="CST_PositionAtP1">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="20" />
-              </initialValue>
-            </variable>
-            <variable name="CST_PositionAtMaintenance">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="30" />
-              </initialValue>
-            </variable>
-            <variable name="CST_PositionAtMaintenanceSensor_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="29.95" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Le capteur cumulatif Maintenance doit commuter avant la butee mecanique,
-       sinon un modele borne a 30 m ne peut jamais produire le mot 00000. Cette
-       position est SYNTHETIQUE en attente de la mesure de la came reelle.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_NominalFrequency_Hz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="40" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">echelle ODOMETRIQUE lue par G518 — PAS le maximum variateur (MaxFreq_Hz)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_MinTimeS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.001" />
-              </initialValue>
             </variable>
             <variable name="CST_StopFrequency_Hz">
               <type>
@@ -4897,6 +4970,10 @@ instCycleTime(DefaultValueS := 0.010);
    de trace plus rapide que 100 ms. *)
 CycleTimeS := LIMIT(0.001, instCycleTime.CycleTimeS, 0.100);
 
+(* Butees mecaniques derivees des capteurs extremes (reglages machine) + marge du rail. *)
+EndStopTremie_M := PosTremie_M - MAX(EndStopMargin_M, CST_MinEndStopMargin_M);
+EndStopMaintenance_M := PosMaintenance_M + MAX(EndStopMargin_M, CST_MinEndStopMargin_M);
+
 IF NOT Enable THEN
     Initialized := FALSE;
     instDrive(Enable := FALSE);
@@ -4909,7 +4986,7 @@ IF NOT Enable THEN
     BrakeContactOpen := FALSE;
     BrakeCoilEnergized := FALSE;
     BrakeFaultCloseActive := FALSE;
-    PositionTrue_M := CST_PositionAtP1;
+    PositionTrue_M := PosP1_M;
     VelocityTrue_Mps := 0.0;
     PreviousVelocity_Mps := 0.0;
     TravelDirection := 0.0;
@@ -4932,7 +5009,7 @@ IF NOT Enable THEN
     RETURN;
 ELSIF NOT Initialized THEN
     Initialized := TRUE;
-    PositionTrue_M := CST_PositionAtP1;
+    PositionTrue_M := PosP1_M;
     TravelDirection := 0.0;
 END_IF;
 
@@ -4985,9 +5062,9 @@ IF Enable THEN
     END_IF;
 
     PreviousVelocity_Mps := VelocityTrue_Mps;
-    IF (FullTravelTimeS &gt; CST_MinTimeS) AND BrakeMechanicallyOpen THEN
-        SpeedAt40Hz_Mps := CST_PositionAtMaintenance / FullTravelTimeS;
-        VelocityTarget_Mps := TravelDirection * SpeedAt40Hz_Mps * ActualFrequency_Hz / CST_NominalFrequency_Hz;
+    IF BrakeMechanicallyOpen THEN
+        (* Source unique : meme gain que l'estimateur machine (vitesse = gain x frequence). *)
+        VelocityTarget_Mps := TravelDirection * MAX(0.0, GainMetersPerHzSec) * ActualFrequency_Hz;
     ELSE
         VelocityTarget_Mps := 0.0;
     END_IF;
@@ -4998,12 +5075,12 @@ IF Enable THEN
     HardStopTremieActive := FALSE;
     HardStopMaintenanceActive := FALSE;
     PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
-    IF PositionCandidate_M &lt; CST_PositionAtTremie THEN
-        PositionTrue_M := CST_PositionAtTremie;
+    IF PositionCandidate_M &lt; EndStopTremie_M THEN
+        PositionTrue_M := EndStopTremie_M;
         VelocityTrue_Mps := 0.0;
         HardStopTremieActive := TRUE;
-    ELSIF PositionCandidate_M &gt; CST_PositionAtMaintenance THEN
-        PositionTrue_M := CST_PositionAtMaintenance;
+    ELSIF PositionCandidate_M &gt; EndStopMaintenance_M THEN
+        PositionTrue_M := EndStopMaintenance_M;
         VelocityTrue_Mps := 0.0;
         HardStopMaintenanceActive := TRUE;
     END_IF;
@@ -5014,7 +5091,7 @@ IF Enable THEN
         CycleTime_S := CycleTimeS);
     LoadAngle_Rad := instSuspendedLoad.Angle_Rad;
     IF HardStopTremieActive OR HardStopMaintenanceActive THEN
-        RecoilMax_M := MIN(MAX(0.0, EndStopRecoilMax_M), CST_PositionAtMaintenance);
+        RecoilMax_M := MIN(MAX(0.0, EndStopRecoilMax_M), EndStopMaintenance_M - EndStopTremie_M);
         IF (RecoilMax_M &gt; 0.0) AND BrakeMechanicallyOpen THEN
             (* Recul autorise UNIQUEMENT en s'eloignant de la butee touchee, borne par
                EndStopRecoilMax_M : jamais plus loin dans la butee, jamais de saut cache. *)
@@ -5026,14 +5103,14 @@ IF Enable THEN
             TravelDirection := 0.0;
             IF HardStopTremieActive THEN
                 VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps);
-                PositionCandidate_M := LIMIT(CST_PositionAtTremie,
+                PositionCandidate_M := LIMIT(EndStopTremie_M,
                     PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
-                    CST_PositionAtTremie + RecoilMax_M);
+                    EndStopTremie_M + RecoilMax_M);
             ELSE
                 VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps);
-                PositionCandidate_M := LIMIT(CST_PositionAtMaintenance - RecoilMax_M,
+                PositionCandidate_M := LIMIT(EndStopMaintenance_M - RecoilMax_M,
                     PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
-                    CST_PositionAtMaintenance);
+                    EndStopMaintenance_M);
             END_IF;
             PositionTrue_M := PositionCandidate_M;
         ELSE
@@ -5042,12 +5119,12 @@ IF Enable THEN
     ELSE
         VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
         PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
-        IF PositionCandidate_M &lt; CST_PositionAtTremie THEN
-            PositionTrue_M := CST_PositionAtTremie;
+        IF PositionCandidate_M &lt; EndStopTremie_M THEN
+            PositionTrue_M := EndStopTremie_M;
             VelocityTrue_Mps := 0.0;
             HardStopTremieActive := TRUE;
-        ELSIF PositionCandidate_M &gt; CST_PositionAtMaintenance THEN
-            PositionTrue_M := CST_PositionAtMaintenance;
+        ELSIF PositionCandidate_M &gt; EndStopMaintenance_M THEN
+            PositionTrue_M := EndStopMaintenance_M;
             VelocityTrue_Mps := 0.0;
             HardStopMaintenanceActive := TRUE;
         ELSE
@@ -5070,7 +5147,7 @@ SensorPosition_M := PositionTrue_M + SensorNoise_M;
    brique garde son hysteresis et son episode propres ; aucun timer partage ne
    peut masquer un front d'un autre capteur. *)
 instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtTremieSensor_M, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosTremie_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
@@ -5078,7 +5155,7 @@ instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtPV, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosPV_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
@@ -5086,7 +5163,7 @@ instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtP2, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosP2_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
@@ -5094,7 +5171,7 @@ instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtP1, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosP1_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
@@ -5102,7 +5179,7 @@ instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtMaintenanceSensor_M, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosMaintenance_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,

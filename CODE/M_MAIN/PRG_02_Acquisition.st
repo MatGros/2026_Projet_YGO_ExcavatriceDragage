@@ -374,6 +374,15 @@ instSimBench(
     SimM3SensorBlipTransitions      := GVL_Simulation.SimM3SensorBlipTransitions,
     SimM3SensorBlipDurationS        := GVL_Simulation.SimM3SensorBlipDurationS,
     SimM3EndStopRecoilMax_M         := GVL_Simulation.SimM3EndStopRecoilMax_M,
+    SimM3EndStopMargin_M            := GVL_Simulation.SimM3EndStopMargin_M,
+    // T301/L1 — SOURCE UNIQUE : positions capteurs = reglages machine, gain = gain EFFECTIF de
+    // l'estimateur (PRG_05, valeur du cycle precedent). Le banc ne porte aucune geometrie propre.
+    M3_PosTremie_M                  := GVL_PERSISTENT._TranslationPosTremie_M,
+    M3_PosPV_M                      := GVL_PERSISTENT._TranslationPosPV_M,
+    M3_PosP2_M                      := GVL_PERSISTENT._TranslationPosP2_M,
+    M3_PosP1_M                      := GVL_PERSISTENT._TranslationPosP1_M,
+    M3_PosMaintenance_M             := GVL_PERSISTENT._TranslationPosMaintenance_M,
+    M3_OdometryGain                 := PRG_05_Translation.Data.TranslationState.OdometryGainActive,
     SimM3LoadReactionGain_Mps2      := GVL_Simulation.SimM3LoadReactionGain_Mps2,
     SimM3BrakeFaultCloseWhileRunning := GVL_Simulation.SimM3BrakeFaultCloseWhileRunning,
     SimM3BrakeFaultCloseDelayS       := GVL_Simulation.SimM3BrakeFaultCloseDelayS,
