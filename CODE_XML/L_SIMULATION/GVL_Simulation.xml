@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T15:10:23.423841" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T15:10:23.423841">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T19:29:02.899640" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T19:29:02.899640">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -390,7 +390,7 @@ sur une courte zone, RETROUVE puis FIXE (lie a la position, deux sens). FALSE = 
             <REAL />
           </type>
           <initialValue>
-            <simpleValue value="0.03" />
+            <simpleValue value="0.04" />
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">HYPOTHESE</xhtml>
@@ -614,7 +614,7 @@ Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
             <simpleValue value="1.3" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Roulis inertiel treuils simulés après coupure des relais (m). 0 = arrêt net. 1.30 = la benne roule pour finir dans la butée ouverte (OffsetOpenM=0.0) malgré l'anticipation d'arrêt (Open 1.3).</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Roulis inertiel treuils simulés après coupure des relais (m). Valeur commune antérieure au patch T420.</xhtml>
           </documentation>
         </variable>
         <variable name="SimSyncDeviationInjectM1">

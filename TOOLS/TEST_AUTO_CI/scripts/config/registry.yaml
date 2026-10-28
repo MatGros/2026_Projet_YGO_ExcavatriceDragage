@@ -1645,6 +1645,16 @@ FB_Sim_Translation:
   - CODE/L_SIMULATION/FB_Sim_PositionSensor.st
   - CODE/L_SIMULATION/FB_Sim_Translation.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_translation.st
+SimM3Dynamics:
+  domain: L_SIMULATION
+  sources:
+  - CODE/A_COMMUN/FB_CycleTime.st
+  - CODE/L_SIMULATION/FB_Sim_TranslationDrive.st
+  - CODE/L_SIMULATION/FB_Sim_TranslationBrake.st
+  - CODE/L_SIMULATION/FB_Sim_SuspendedLoad.st
+  - CODE/L_SIMULATION/FB_Sim_PositionSensor.st
+  - CODE/L_SIMULATION/FB_Sim_Translation.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_translation_dynamics.st
 FB_Sim_PositionSensor:
   domain: L_SIMULATION
   af_doc: DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md

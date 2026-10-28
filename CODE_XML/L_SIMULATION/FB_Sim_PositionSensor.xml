@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T15:10:08.502714" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T15:10:08.502714">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T15:15:49.047600" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T15:15:49.047600">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -142,8 +142,10 @@
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 (2026-10-28) — MECANISME DE CAME, SPATIAL : en franchissant le capteur on le VOIT,
        on le PERD sur une courte zone, on le RETROUVE, puis il reste FIXE. Lie a la POSITION
-       (pas au temps) : se produit a chaque passage, dans les deux sens, et reste stable a
-       l'arret. Zone de perte = [cote - Start - Width ; cote - Start] cote detection.
+       (pas au temps) : se produit a chaque passage, dans les DEUX sens, et reste stable a
+       l'arret (bornes de la zone avec hysteresis CST_CamHysteresis_M contre le bruit/balancement).
+       Zone de perte placee APRES le front de detection (cote -/+ Hysteresis_M) :
+       [front - Start - Width ; front - Start] cote detection.
        FALSE = historique strictement inchange. Valeurs = HYPOTHESES.</xhtml>
               </documentation>
             </variable>
@@ -160,7 +162,7 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.03" />
+                <simpleValue value="0.04" />
               </initialValue>
             </variable>
           </inputVars>
@@ -263,6 +265,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : position dans la zone de perte de la came</xhtml>
               </documentation>
             </variable>
+            <variable name="CamNear_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : borne de la zone cote front de detection</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamFar_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : borne de la zone cote interieur</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_BlipMaxTransitions">
               <type>
                 <UDINT />
@@ -273,6 +291,17 @@
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond du nombre de bascules du profil « blip court » : borne la duree de l'episode
        et interdit tout rebouclage de compteur UDINT (revue du 2026-09-20, F9).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_CamHysteresis_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : hysteresis des bornes de la zone de perte</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -331,18 +360,31 @@ IF ActiveBelowThreshold THEN
     ELSE
         HystDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
     END_IF;
-    InCamDropout := CamDropoutActive
-        AND (Position_M &lt;= (Threshold_M - MAX(0.0, CamDropoutStart_M)))
-        AND (Position_M &gt; (Threshold_M - MAX(0.0, CamDropoutStart_M) - MAX(0.0, CamDropoutWidth_M)));
+    (* Zone de perte : apres le front d'entree en detection (cote - hysteresis), vers l'interieur. *)
+    CamNear_M := Threshold_M - MAX(0.0, Hysteresis_M) - MAX(0.0, CamDropoutStart_M);
+    CamFar_M := CamNear_M - MAX(0.0, CamDropoutWidth_M);
+    IF NOT CamDropoutActive THEN
+        InCamDropout := FALSE;
+    ELSIF InCamDropout THEN
+        InCamDropout := (Position_M &lt;= CamNear_M + CST_CamHysteresis_M) AND (Position_M &gt; CamFar_M - CST_CamHysteresis_M);
+    ELSE
+        InCamDropout := (Position_M &lt;= CamNear_M - CST_CamHysteresis_M) AND (Position_M &gt; CamFar_M + CST_CamHysteresis_M);
+    END_IF;
 ELSE
     IF HystDetected THEN
         HystDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
     ELSE
         HystDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
     END_IF;
-    InCamDropout := CamDropoutActive
-        AND (Position_M &gt;= (Threshold_M + MAX(0.0, CamDropoutStart_M)))
-        AND (Position_M &lt; (Threshold_M + MAX(0.0, CamDropoutStart_M) + MAX(0.0, CamDropoutWidth_M)));
+    CamNear_M := Threshold_M + MAX(0.0, Hysteresis_M) + MAX(0.0, CamDropoutStart_M);
+    CamFar_M := CamNear_M + MAX(0.0, CamDropoutWidth_M);
+    IF NOT CamDropoutActive THEN
+        InCamDropout := FALSE;
+    ELSIF InCamDropout THEN
+        InCamDropout := (Position_M &gt;= CamNear_M - CST_CamHysteresis_M) AND (Position_M &lt; CamFar_M + CST_CamHysteresis_M);
+    ELSE
+        InCamDropout := (Position_M &gt;= CamNear_M + CST_CamHysteresis_M) AND (Position_M &lt; CamFar_M - CST_CamHysteresis_M);
+    END_IF;
 END_IF;
 (* L5 : la perte de came s'applique a l'etat mecanique ; hors option, RawDetected = HystDetected. *)
 RawDetected := HystDetected AND NOT InCamDropout;
