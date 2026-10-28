@@ -37772,7 +37772,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <simpleValue value="1.3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Roulis inertiel treuils simules apres coupure relais (m) — valeur partagee historique avant T420.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; 1.30 = finit a la butee ouverte</xhtml>
               </documentation>
             </variable>
             <variable name="SimTopPositionActive">
@@ -42827,22 +42827,6 @@ Distance roulee entre le 1er front du dernier capteur d'arret (Tremie, P1, Maint
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : acceleration nette du chariot libre</xhtml>
               </documentation>
             </variable>
-            <variable name="FreeVelocity_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse apres poussee, avant frottement, m/s</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FrictionStep_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Impulsion dissipative de frottement sur le pas, m/s</xhtml>
-              </documentation>
-            </variable>
             <variable name="FreeRollStart_M">
               <type>
                 <REAL />
@@ -43151,19 +43135,24 @@ IF Enable THEN
         (* Pendule sur chariot libre : x'' = m_benne / m_chariot x g x theta = r / (1 - r) x g x theta. *)
         FreeAccel_Mps2 := (LIMIT(0.0, LoadMassRatio, 0.9) / (1.0 - LIMIT(0.0, LoadMassRatio, 0.9)))
                           * 9.81 * instSuspendedLoad.Angle_Rad + Slope_Mps2;
-        (* La poussee peut inverser le mouvement ; le frottement ne peut que le dissiper.
-           Au repos, une poussee inferieure au frottement conserve l'adherence. *)
-        FreeVelocity_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
-        FrictionStep_Mps := MAX(0.0, RollingFriction_Mps2) * CycleTimeS;
-        IF FreeVelocity_Mps &gt; 0.0 THEN
-            VelocityTrue_Mps := MAX(0.0, FreeVelocity_Mps - FrictionStep_Mps);
+        IF ABS(VelocityTrue_Mps) &lt; 0.001 THEN
+            (* Adherence : ne repart que si la poussee depasse le frottement. *)
+            IF ABS(FreeAccel_Mps2) &lt;= MAX(0.0, RollingFriction_Mps2) THEN
+                FreeAccel_Mps2 := 0.0;
+                VelocityTrue_Mps := 0.0;
+            ELSIF FreeAccel_Mps2 &gt; 0.0 THEN
+                FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+            ELSE
+                FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+            END_IF;
+        ELSIF VelocityTrue_Mps &gt; 0.0 THEN
+            FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
         ELSE
-            VelocityTrue_Mps := MIN(0.0, FreeVelocity_Mps + FrictionStep_Mps);
+            FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
         END_IF;
+        VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
     ELSIF BrakeMechanicallyOpen THEN
-        (* Entrainement rigide sous controle : la dynamique d'arret est deja portee
-           par le variateur. La faible reaction mecanique du pendule est ajoutee ensuite. *)
-        VelocityTrue_Mps := VelocityTarget_Mps;
+        VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
     ELSIF BrakePhysicalActive THEN
         (* L3 : frein serre -&gt; deceleration sur le frein jusqu'a l'arret, puis chariot bloque. *)
         IF VelocityTrue_Mps &gt; 0.0 THEN
@@ -43637,9 +43626,6 @@ Ready := TRUE;
               <initialValue>
                 <simpleValue value="0.5" />
               </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compatibilite interface ; la charge agit sur la mecanique, pas sur le PDO frequence.</xhtml>
-              </documentation>
             </variable>
             <variable name="CycleTime_S">
               <type>
@@ -43696,17 +43682,6 @@ Ready := TRUE;
                 <simpleValue value="0.001" />
               </initialValue>
             </variable>
-            <variable name="CST_StopFrequency_Hz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Hypothese de fin d'arret variateur, F09.11 nominal.</xhtml>
-              </documentation>
-            </variable>
             <variable name="CST_MaxFrequency_Hz">
               <type>
                 <REAL />
@@ -43751,13 +43726,11 @@ ELSE
 END_IF;
 ElectricalFrequency_Hz := ElectricalFrequency_Hz
     + ResponseAlpha * (FrequencyCmd_Hz - ElectricalFrequency_Hz);
-(* Le retour PDO represente la frequence electrique de sortie. Le balancement
-   est traite par le modele mecanique du chariot et du pendule. *)
-IF (FrequencyTgt_Hz &lt;= 0.0) AND (FrequencyCmd_Hz &lt;= 0.0)
-    AND (ElectricalFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
-    ElectricalFrequency_Hz := 0.0;
+ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz
+    - MAX(0.0, LoadFrequencyDroopGain_Hz) * ABS(LoadAngularVelocity_RadPerS));
+IF ActualFrequency_Hz &lt; 0.005 THEN
+    ActualFrequency_Hz := 0.0;
 END_IF;
-ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz);
 Ready := TRUE;
 </xhtml>
           </ST>
@@ -64362,7 +64335,7 @@ Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
             <simpleValue value="1.3" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Roulis inertiel treuils simulés après coupure des relais (m). Valeur commune antérieure au patch T420.</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Roulis inertiel treuils simulés après coupure des relais (m). 0 = arrêt net. 1.30 = la benne roule pour finir dans la butée ouverte (OffsetOpenM=0.0) malgré l'anticipation d'arrêt (Open 1.3).</xhtml>
           </documentation>
         </variable>
         <variable name="SimSyncDeviationInjectM1">

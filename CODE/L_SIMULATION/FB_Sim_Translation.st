@@ -137,8 +137,6 @@ VAR
     ObsSpeedBeforeStop_Mps : REAL;      (* Vitesse du scan avant le calcul de butee *)
     DriveTorqueActive : BOOL;           (* L4 : variateur commande ou encore en rampe -> chariot tenu *)
     FreeAccel_Mps2 : REAL;              (* L4 : acceleration nette du chariot libre *)
-    FreeVelocity_Mps : REAL;            (* . [LOC] Vitesse apres poussee, avant frottement, m/s *)
-    FrictionStep_Mps : REAL;            (* . [LOC] Impulsion dissipative de frottement sur le pas, m/s *)
     FreeRollStart_M : REAL;             (* L4 : position au debut de l'episode libre *)
     instCycleTime : FB_CycleTime;
     Initialized : BOOL;
@@ -304,19 +302,24 @@ IF Enable THEN
         (* Pendule sur chariot libre : x'' = m_benne / m_chariot x g x theta = r / (1 - r) x g x theta. *)
         FreeAccel_Mps2 := (LIMIT(0.0, LoadMassRatio, 0.9) / (1.0 - LIMIT(0.0, LoadMassRatio, 0.9)))
                           * 9.81 * instSuspendedLoad.Angle_Rad + Slope_Mps2;
-        (* La poussee peut inverser le mouvement ; le frottement ne peut que le dissiper.
-           Au repos, une poussee inferieure au frottement conserve l'adherence. *)
-        FreeVelocity_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
-        FrictionStep_Mps := MAX(0.0, RollingFriction_Mps2) * CycleTimeS;
-        IF FreeVelocity_Mps > 0.0 THEN
-            VelocityTrue_Mps := MAX(0.0, FreeVelocity_Mps - FrictionStep_Mps);
+        IF ABS(VelocityTrue_Mps) < 0.001 THEN
+            (* Adherence : ne repart que si la poussee depasse le frottement. *)
+            IF ABS(FreeAccel_Mps2) <= MAX(0.0, RollingFriction_Mps2) THEN
+                FreeAccel_Mps2 := 0.0;
+                VelocityTrue_Mps := 0.0;
+            ELSIF FreeAccel_Mps2 > 0.0 THEN
+                FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+            ELSE
+                FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+            END_IF;
+        ELSIF VelocityTrue_Mps > 0.0 THEN
+            FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
         ELSE
-            VelocityTrue_Mps := MIN(0.0, FreeVelocity_Mps + FrictionStep_Mps);
+            FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
         END_IF;
+        VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
     ELSIF BrakeMechanicallyOpen THEN
-        (* Entrainement rigide sous controle : la dynamique d'arret est deja portee
-           par le variateur. La faible reaction mecanique du pendule est ajoutee ensuite. *)
-        VelocityTrue_Mps := VelocityTarget_Mps;
+        VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
     ELSIF BrakePhysicalActive THEN
         (* L3 : frein serre -> deceleration sur le frein jusqu'a l'arret, puis chariot bloque. *)
         IF VelocityTrue_Mps > 0.0 THEN
