@@ -16,6 +16,11 @@ VAR_INPUT
        elle est validee par la meme trace (frein ouvert a 0,60 Hz, ferme a 0,00 Hz). *)
     FaultCloseWhileRunning : BOOL := FALSE;
     FaultCloseDelay_S : REAL := 0.0;
+    (* L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique : la retombee mecanique attend
+       f <= 0,5 Hz (garde qui recopiait la logique PLC dans l'usine simulee). TRUE = frein a
+       manque de courant reel : retombe CloseDelay_S apres la coupure bobine, QUELLE QUE SOIT
+       la vitesse. *)
+    PhysicalBrakeActive : BOOL := FALSE;
 END_VAR
 VAR_OUTPUT
     Ready : BOOL;
@@ -66,7 +71,7 @@ IF CoilEnergized THEN
     ELSE
         MechanicalTimer_S := 0.0;
     END_IF;
-ELSIF FaultCloseActive OR (ActualFrequency_Hz <= CST_StopFrequency_Hz) THEN
+ELSIF FaultCloseActive OR PhysicalBrakeActive OR (ActualFrequency_Hz <= CST_StopFrequency_Hz) THEN
     IF MechanicallyOpen THEN
         MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
         IF MechanicalTimer_S >= MAX(0.0, CloseDelay_S) THEN

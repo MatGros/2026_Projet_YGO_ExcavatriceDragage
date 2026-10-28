@@ -73,6 +73,19 @@ VAR_GLOBAL
     // (frein ouvert a 0,60 Hz, ferme a 0,00 Hz). Stimulus de banc, inoperant hors simulation.
     SimM3BrakeFaultCloseWhileRunning : BOOL := FALSE;
     SimM3BrakeFaultCloseDelayS       : REAL := 0.0;
+    // 🛑 L3 (2026-10-28) — FREIN M3 PHYSIQUE : TRUE = frein a manque de courant reel (retombe
+    // ~90 ms apres coupure bobine quelle que soit la vitesse, puis deceleration SimM3BrakeDecel_Mps2).
+    // FALSE = comportement historique (retombee seulement sous 0,5 Hz, arret instantane).
+    SimM3BrakePhysicalActive         : BOOL := TRUE;
+    SimM3BrakeDecel_Mps2             : REAL := 2.0;   // HYPOTHESE : 20 Hz (0,4 m/s) -> ~4 cm
+    // 📊 L2 — OBSERVATION M3 (ecrite par PRG_02, lecture seule, aucun effet sur le pilotage)
+    SimM3ObsPositionTrue_M          : REAL;   // Position vraie du chariot simule (m)
+    SimM3ObsPositionError_M         : REAL;   // Position vraie - position calculee programme (m)
+    SimM3ObsOvershootLast_M         : REAL;   // Distance roulee apres le 1er front du dernier capteur d'arret (m)
+    SimM3ObsOvershootSensorId       : INT;    // 1 = Tremie, 3 = P1, 5 = Maintenance
+    SimM3ObsEndStopHitCount         : UDINT;  // Chocs en butee mecanique
+    SimM3ObsEndStopImpactSpeed_Mps  : REAL;   // Vitesse au dernier choc (m/s)
+    SimM3ObsBrakeClosedMovingCount  : UDINT;  // Fermetures frein chariot en mouvement
 
     // 🕹️ STIMULI OPÉRATEUR — les boutons directionnels imposent 0/5000/10000 ; combinaison = neutre.
     SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE; // Translation M3 Arrière vers Trémie (RawX=0, RawY=5000)

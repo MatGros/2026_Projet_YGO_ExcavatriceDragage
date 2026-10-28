@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T14:00:06.663973" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T14:00:06.663973">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T14:42:47.255978" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T14:42:47.255978">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -297,6 +297,87 @@ La garde nominale de fermeture (0,5 Hz) est CONSERVEE : elle est validee par la 
           <initialValue>
             <simpleValue value="0" />
           </initialValue>
+        </variable>
+        <variable name="SimM3BrakePhysicalActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 L3 (2026-10-28) — FREIN M3 PHYSIQUE : TRUE = frein a manque de courant reel (retombe
+~90 ms apres coupure bobine quelle que soit la vitesse, puis deceleration SimM3BrakeDecel_Mps2).
+FALSE = comportement historique (retombee seulement sous 0,5 Hz, arret instantane).</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3BrakeDecel_Mps2">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="2" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">HYPOTHESE : 20 Hz (0,4 m/s) -&gt; ~4 cm</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3ObsPositionTrue_M">
+          <type>
+            <REAL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 L2 — OBSERVATION M3 (ecrite par PRG_02, lecture seule, aucun effet sur le pilotage)
+Position vraie du chariot simule (m)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3ObsPositionError_M">
+          <type>
+            <REAL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Position vraie - position calculee programme (m)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3ObsOvershootLast_M">
+          <type>
+            <REAL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance roulee apres le 1er front du dernier capteur d'arret (m)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3ObsOvershootSensorId">
+          <type>
+            <INT />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Tremie, 3 = P1, 5 = Maintenance</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3ObsEndStopHitCount">
+          <type>
+            <UDINT />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Chocs en butee mecanique</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3ObsEndStopImpactSpeed_Mps">
+          <type>
+            <REAL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse au dernier choc (m/s)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3ObsBrakeClosedMovingCount">
+          <type>
+            <UDINT />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermetures frein chariot en mouvement</xhtml>
+          </documentation>
         </variable>
         <variable name="SimJoystickLeft_Rev_TREMIE_Active">
           <type>

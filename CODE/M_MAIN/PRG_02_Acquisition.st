@@ -383,9 +383,12 @@ instSimBench(
     M3_PosP1_M                      := GVL_PERSISTENT._TranslationPosP1_M,
     M3_PosMaintenance_M             := GVL_PERSISTENT._TranslationPosMaintenance_M,
     M3_OdometryGain                 := PRG_05_Translation.Data.TranslationState.OdometryGainActive,
+    M3_EstimatedPos_M               := PRG_05_Translation.Data.TranslationState.EstimatedPosM3_M,
     SimM3LoadReactionGain_Mps2      := GVL_Simulation.SimM3LoadReactionGain_Mps2,
     SimM3BrakeFaultCloseWhileRunning := GVL_Simulation.SimM3BrakeFaultCloseWhileRunning,
     SimM3BrakeFaultCloseDelayS       := GVL_Simulation.SimM3BrakeFaultCloseDelayS,
+    SimM3BrakePhysicalActive         := GVL_Simulation.SimM3BrakePhysicalActive,
+    SimM3BrakeDecel_Mps2             := GVL_Simulation.SimM3BrakeDecel_Mps2,
     SimJoystickLeft_Rev_TREMIE_Active  := GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active,
     SimJoystickRight_Fwd_MAINT_Active  := GVL_Simulation.SimJoystickRight_Fwd_MAINT_Active,
     SimJoystickFwd_Up_Close_Active     := GVL_Simulation.SimJoystickFwd_Up_Close_Active,
@@ -411,6 +414,18 @@ instSimBench(
 // Exposition de l'image de simulation produite par le banc
 HwSim.Winch       := instSimBench.Winch;
 HwSim.Translation := instSimBench.Translation;
+// 📊 L2 — observation M3 publiee au meme endroit que les reglages simu (lecture seule).
+// Recopie seulement en simulation (hors simu, les sorties du banc seraient figees/perimees).
+// Note : l'ecart vrai - calcule compare au calcule du cycle precedent (PRG_05 apres PRG_02) : biais ~ v x 10 ms.
+IF GVL_Simulation.SimulationModeActive THEN
+GVL_Simulation.SimM3ObsPositionTrue_M         := instSimBench.M3ObsPositionTrue_M;
+GVL_Simulation.SimM3ObsPositionError_M        := instSimBench.M3ObsPositionError_M;
+GVL_Simulation.SimM3ObsOvershootLast_M        := instSimBench.M3ObsOvershootLast_M;
+GVL_Simulation.SimM3ObsOvershootSensorId      := instSimBench.M3ObsOvershootSensorId;
+GVL_Simulation.SimM3ObsEndStopHitCount        := instSimBench.M3ObsEndStopHitCount;
+GVL_Simulation.SimM3ObsEndStopImpactSpeed_Mps := instSimBench.M3ObsEndStopImpactSpeed_Mps;
+GVL_Simulation.SimM3ObsBrakeClosedMovingCount := instSimBench.M3ObsBrakeClosedMovingCount;
+END_IF;
 HwSim.Operator    := instSimBench.Operator;
 HwSim.Machine     := instSimBench.Machine;
 
