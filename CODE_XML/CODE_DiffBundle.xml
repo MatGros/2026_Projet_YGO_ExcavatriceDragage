@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T14:42:47.253322" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T14:42:47.253322">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T15:15:49.051450" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T15:15:49.051450">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -473,6 +473,1494 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_BucketCfg">
+        <baseType>
+          <struct>
+            <variable name="Config">
+              <type>
+                <derived name="ST_fbBucket_Config" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Offsets Open/Close/Coherence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgTimeoutDuration">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#30s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Temps max pour l'ouverture/fermeture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>51266ef6-8a4b-5d43-bb90-88297b050ea8</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ST_BucketCfg — Configuration de la benne (M2)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CommunCfg">
+        <baseType>
+          <struct>
+            <variable name="LimitLegalDepthMinAllowed_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-30" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Blocage instantané à 0m : sans défaut explicite,
+ce champ vaut 0.0 tant qu'il n'a pas été réglé côté IHM -- "CablePosM &lt;= 0.0" se déclenche
+dès la position de référence, avant tout réglage réel de la cote légale. Défaut -999.0
+(jamais atteint en pratique) : LimitLegalEnabled=TRUE sans réglage ne bloque plus rien par
+erreur -- il faut régler la vraie cote pour que la protection devienne active.
+📐 Cote min de dragage autorisée (m, négatif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitLegalEnabled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Activation de la limite légale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelHomingApproachEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchMaxStepDescent">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Plafond palier descente nominal (1..5), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchMaxStepAscent">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Limitation palier vitesse en montée (1..5), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSlowdownDistanceTop_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite haute : 0 = arrêt au seuil (m), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSlowdownDistanceBottom_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite basse pour ralentir (m), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSlowdownMaxStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
+pas une vitesse continue.
+: Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgCableLimitAscent_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="7.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglEnableKoboldAutoStopDescent">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglEnableCoupledBucketSequencing">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquencement auto benne en pilotage couplé (WinchSel=0, MAINT_N1/N2) :
+pousser le joystick benne pas ouverte -&gt; ouvre d'abord puis descend couplé ;
+tirer benne pas fermée -&gt; ferme d'abord puis remonte couplé.
+Défaut TRUE (activé) ; 1 bouton IHM pour désactiver -&gt; comportement brut
+(2 treuils sans condition). OFF = jamais gouverné par instBucket.Busy hors
+action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglEnableWinchDescentLock_M3">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Verrouillage descente treuil M1/M2 en mode MAINT si le pont M3 n'est pas à P1/Maintenance :
+Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils partout).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a78d6264-59a9-5814-98b4-1f4ebf760abf</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ST_CommunCfg — Configuration des paramètres communs machine
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleCfg">
+        <baseType>
+          <struct>
+            <variable name="SetDepth_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-29" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Profondeur de dragage cible (m, négative)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DepthStopMode">
+              <type>
+                <derived name="E_CycleDepthStopMode" />
+              </type>
+              <initialValue>
+                <simpleValue value="E_CycleDepthStopMode.KOBOLD_OR_SETPOINT" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Source arrêt AX7</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DrainTime_S">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en AX13 (configurable IHM, secondes entières [1..3600])</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RaiseOffBottom_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = passage direct AX10 ; &gt;0 = distance de décollement AX9</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlAscentMaxStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Palier max montée contrôle AX11, borné [1..2] côté FB (GEL Q16)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionStartOpening_Pct">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Ouverture benne restante déclarant la fermeture atteinte [0..50 %] ; 0 = critère d'arrivée seul (branche seuil inactive), 10 = reglage nominal confirme operateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="_ReservedInerte_01">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 RESERVE / INERTE depuis T358 (ex-ForceStepTarget) — PLUS AUCUN LECTEUR : la cible de forcage est portee par ST_CycleCmd.SetForceStepTgt (zone non persistee). Renomme (pas retire) pour ne pas decaler le mapping RETAIN positionnel des champs suivants (regle : jamais d'insertion ni de retrait au milieu) ; retrait reel = lot de migration de persistance dedie. Aucune exposition IHM sur ce tag.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveStartMin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Altimétrie lancement Kobold (AT4, PRG_03)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionUpper_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Altimétrie Kobold haute confirmation immersion (AT4, PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionLower_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Altimétrie Kobold basse confirmation immersion (AT4, PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionControlDistance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance de contrôle AX11 après fermeture benne (m) — T298, reglage fin sur site a prevoir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCountResetMode">
+              <type>
+                <derived name="E_CycleSampleCountResetMode" />
+              </type>
+              <initialValue>
+                <simpleValue value="E_CycleSampleCountResetMode.NEVER" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ AJOUT EN FIN DE STRUCT — mapping RETAIN positionnel : jamais d'insertion au milieu.
+🔢 RAZ auto du compteur JOURNALIER : NEVER par defaut = aucune RAZ auto</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>19cafd99-3b26-50ad-b40a-cdf9fb79d238</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ST_CycleCfg — Configuration du cycle semi-automatique
+   SetDepth_M et DepthStopMode protégés par persistance GVL_PERSISTENT
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleMachineHomingCfg">
+        <baseType>
+          <struct>
+            <variable name="ForceStepTarget">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=HX0 .. 9=HXF), borné côté FB</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>892dec72-1fe2-5fad-a62f-d1ead6f61579</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_CycleMachineHomingCfg — Réglages IHM du cycle de référencement machine
+   ───────────────────────────────────────────────────────────────
+   🎯 Mise en service. Les réglages géométriques (positions capteur, offsets benne)
+      restent portés par GVL_PERSISTENT (_WinchM1CfgPersist / _BucketCfgPersist).
+   💾 Ponté vers persist (_CycleMachineHomingCfgPersist) via FB_CfgPersistBridge_CycleMachineHomingCfg.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Encoder_Calib">
+        <baseType>
+          <struct>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES DE REFERENCE BRUTE (RETAIN) ===
+Valeur brute figee au dernier homing reussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastKnownRawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernier point brut valide connu (continu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RestartCoherenceTolerancePts">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION &amp; REGLAGES TOLERANCE ===
+Tolerance redemarrage (pts, ~12% de 8192)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS DE CALIBRATION &amp; SECURITE ===
+TRUE des qu'un referencement a reussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si incoherence detectee au redemarrage</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>808932ee-dfa9-530c-b6b0-60a6dd0eb372</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 ST_Encoder_Calib — Calibration &amp; référence codeur (1 par treuil, RETAIN)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de calibration RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib)
+   💾 Données : Références brutes, état homed et contrôle de cohérence redémarrage
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SpeedStepTable">
+        <baseType>
+          <struct>
+            <variable name="P1R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 1 (VITESSE MINIMALE) ===
+Contacteur 1 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P1R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P1R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P1R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 2 ===
+Contacteur 1 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 3 ===
+Contacteur 1 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 4 ===
+Contacteur 1 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 5 (VITESSE MAXIMALE) ===
+Contacteur 1 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepThreshold_Pct">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SEUILS DE TRANSITION (%) ===
+Seuils de changement de palier (0..100%)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>fbfd953e-d8b9-5242-babe-f7521771609a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SyncCfg">
+        <baseType>
+          <struct>
+            <variable name="CfgSyncTolerance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 3.0m</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgSyncCriticalTolerance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="6" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Seuil 2 critique (m) — blocage synchro ; doit être &gt; CfgSyncTolerance_M</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (config restaurée depuis GVL_PERSISTENT)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a3eb8b55-b4ee-5884-9780-22df0c7ecf3c</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ST_SyncCfg — Configuration de la synchronisation M1/M2
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_TranslationCfg">
+        <baseType>
+          <struct>
+            <variable name="CfgApproachSpeedTremie_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1 — reglage nominal confirme operateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgApproachSpeedMaintenance_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1 — reglage nominal confirme operateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgApproachSpeedP1_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1 — reglage nominal confirme operateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg
+🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>2d4e63ef-38b4-5f0c-b42d-ccf25658d58a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné au paramétrage depuis l'IHM (RETAIN) — même patron que ST_WinchCfg.
+   📄 Vitesses de ralentissement d'approche réglables depuis l'IHM (RETAIN), même patron que ST_WinchCfg.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_WinchCfg">
+        <baseType>
+          <struct>
+            <variable name="CfgTopSensorPos_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Position cible du capteur haut (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgHomingTarget_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgRampAccelRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="50" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Rampe d'accélération (%/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgRampDecelNormalRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="150" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📉 Rampe de décélération normale (%/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgRampDecelFastRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="400" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Rampe de décélération rapide / SafeStop (%/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgCableLimitDescent_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-50" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite basse physique de descente (m, négatif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot — défaut FALSE non ambigu
+🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>239338a1-0092-5a3b-aef0-6597a3358ff4</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné au paramétrage et calibration depuis l'IHM (RETAIN).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbBucket_State">
+        <baseType>
+          <struct>
+            <variable name="IsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ouvert memorise</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ferme memorise</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TooOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement ouverture (Delta &lt; OffsetOpen - Tolerance)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TooClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement fermeture (Delta &gt; OffsetClose + Tolerance)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsIntermediate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position intermediaire (entre Ouvert et Ferme)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastPosM2Open">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ouvert (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastPosM2Close">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ferme (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveOffsetValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validite offset actif calcule a jour (LIVE : exige puissance + BucketReferenced)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketReferenced">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference benne PERSISTANTE (RETAIN) : offsets calibres + datum M1/M2 fiables lors de la calibration. Survit a une coupure puissance. Retombe si M1/M2 suspect/incoherent, CfgFault, ou recalibration explicite.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat non sur (divergence boot/reel)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>74e82ca6-a865-5827-ba17-53f56d8b0f29</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🚦 ST_fbBucket_State — État mémorisé et diagnostic du benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbEncoder_Cfg">
+        <baseType>
+          <struct>
+            <variable name="PresetConfirmMode">
+              <type>
+                <derived name="E_PresetConfirmMode" />
+              </type>
+              <initialValue>
+                <simpleValue value="E_PresetConfirmMode.READBACK_ONLY" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode de confirmation preset, défaut relecture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 TRUE après restauration du pont persistant</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b06fb1f4-e990-5b56-b842-84de93b5b40e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbEncoder_Cfg — Réglages technologiques publics de FB_Encoder
+   ───────────────────────────────────────────────────────────────────────
+   🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
+   🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbJoystick_Cfg">
+        <baseType>
+          <struct>
+            <variable name="DeadbandRaw">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="300" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Zone morte en points ADC bruts (0..10000)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien continu au neutre avant désarmement homme-mort</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Appui continu bouton requis pour armer le geste</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmGraceTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#3S" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai de grâce post-armement avant désarmement neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawOutOfRangeMargin">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="500" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge ADC autour des bornes [0..10000] avant défaut capteur (AF08 §5bis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les initialiseurs imbriqués de STRUCT (notamment les ARRAY) ne sont pas
+acceptés par STruCpp/CODESYS dans une déclaration de type. La table est
+fournie par la configuration persistante de l'appelant.
+🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepHystMargin">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge d'hystérésis palier (%) autour des seuils (anti-oscillation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (interne pont FB_CfgPersistBridge_fbJoystick_Cfg)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>15265f47-4d56-5d85-af5c-415e86b1194e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbJoystick_Cfg — Réglages regroupés de FB_Joystick
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter en un bloc les 5 paramètres de conditionnement du geste
+      (zone morte, temporisations homme-mort, marge défaut capteur).
+      Passé à FB_Joystick via l'entrée `Cfg` — échange bloc IHM / persistant.
+   🧬 Pattern cfg : aligné sur ST_CycleCfg / ST_WinchCfg (préfixe ST_&lt;Domaine&gt;Cfg,
+      instance persistante dans GVL_PERSISTENT, pont FB_CfgPersistBridge_* à venir).
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (§5bis)
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchLoadEstimator_SpeedCfg">
+        <baseType>
+          <struct>
+            <variable name="MaxMeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse maximale mesuree de reference (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedBandMaxMps">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafonds vitesse mesuree par palier (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedBandHysteresisMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Hysteresis anti-battement classement vitesse (m/s)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6a16b928-26ae-52c7-b420-4064d7e5d0dc</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbWinchLoadEstimator_SpeedCfg — Configuration des plages de vitesse linéaire
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Caractérisation des plages de vitesse mesurée par palier (m/s)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchLoadEstimator_Table">
+        <baseType>
+          <struct>
+            <variable name="IsConfigured">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validation explicite de la table</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadPctByStepAndSpeedBand">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <array>
+                      <dimension lower="1" upper="5" />
+                      <baseType>
+                        <REAL />
+                      </baseType>
+                    </array>
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Matrice [palier][bande_vitesse] charge (%)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ac09a372-08ec-5811-90f7-baec46ade641</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_fbWinchLoadEstimator_Table — Table empirique de charge estimée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Matrice 5x5 d'estimation de charge (palier commandé x bande vitesse)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchSpeedLearning_Cfg">
+        <baseType>
+          <struct>
+            <variable name="MinSpeedMps">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne min vitesse apprise par palier (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxSpeedMps">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne max vitesse apprise par palier (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinSamples">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nb min d'echantillons pour valider une cellule</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e33b18ad-d4ff-5cd1-939b-74be82c01450</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbWinchSpeedLearning_Cfg — Enveloppes de plausibilite par palier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Bornes min/max de vitesse apprise par palier + seuil d'echantillons
+   📄 Doc metier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchSpeedLearning_Table">
+        <baseType>
+          <struct>
+            <variable name="Cell">
+              <type>
+                <array>
+                  <dimension lower="1" upper="2" />
+                  <dimension lower="1" upper="2" />
+                  <dimension lower="1" upper="2" />
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <derived name="ST_fbWinchSpeedLearning_Cell" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[axe][sens][charge][palier]
+axe    : 1=M1, 2=M2
+sens   : 1=montee, 2=descente
+charge : 1=vide, 2=charge
+palier : 1..5</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e53cb50d-fd3d-5709-9494-4694f689ff17</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 ST_fbWinchSpeedLearning_Table — Table RETAIN apprentissage vitesse
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Matrice {axe x sens x charge/vide x palier} de vitesses apprises
+   📄 Doc metier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinch_Symmetry_Cfg">
+        <baseType>
+          <struct>
+            <variable name="DeltaStartDelay_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max tolere au demarrage (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaBrakeReleaseTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps desserrage frein (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps serrage frein (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaStopDistance_Mm">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max distance d'arret (mm)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="200" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps d'arret (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinimumCommandTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree minimale de commande pour qualification (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinimumSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.05" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse minimale pour qualification (m/s)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b3edf443-a7a8-5125-8877-3148f355844d</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚖️ ST_fbWinch_Symmetry_Cfg — Configuration des seuils de symétrie M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Seuils de tolérance pour le diagnostic passif de symétrie treuils
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinch_Symmetry_Data">
+        <baseType>
+          <struct>
+            <variable name="DeltaStartDelay_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure au demarrage (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaBrakeReleaseTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure temps desserrage frein (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure temps serrage frein (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaStopDistance_Mm">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure distance d'arret (mm)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure temps d'arret (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxSyncDeviation_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart maximal de synchronisme enregistre (m)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>30d10f2c-209a-59ac-ab89-aae03e9399fe</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_fbWinch_Symmetry_Data — Données mesurées de symétrie M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure des résultats de mesures et d'écarts du diagnostic symétrie
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_AcquisitionInterPrg">
         <baseType>
           <struct>
@@ -642,117 +2130,6 @@
       câblé à FALSE tant qu'aucun bit n'est identifié (aucun signal absent
       ne confirme implicitement le preset).
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_fbJoystick_Cfg">
-        <baseType>
-          <struct>
-            <variable name="DeadbandRaw">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="300" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Zone morte en points ADC bruts (0..10000)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="NeutralHoldTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#100MS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien continu au neutre avant désarmement homme-mort</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeadmanArmHoldTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#100MS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Appui continu bouton requis pour armer le geste</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeadmanArmGraceTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#3S" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai de grâce post-armement avant désarmement neutre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawOutOfRangeMargin">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="500" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge ADC autour des bornes [0..10000] avant défaut capteur (AF08 §5bis)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStepTable">
-              <type>
-                <derived name="ST_SpeedStepTable" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les initialiseurs imbriqués de STRUCT (notamment les ARRAY) ne sont pas
-acceptés par STruCpp/CODESYS dans une déclaration de type. La table est
-fournie par la configuration persistante de l'appelant.
-🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStepHystMargin">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge d'hystérésis palier (%) autour des seuils (anti-oscillation)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (interne pont FB_CfgPersistBridge_fbJoystick_Cfg)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>15265f47-4d56-5d85-af5c-415e86b1194e</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_fbJoystick_Cfg — Réglages regroupés de FB_Joystick
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : porter en un bloc les 5 paramètres de conditionnement du geste
-      (zone morte, temporisations homme-mort, marge défaut capteur).
-      Passé à FB_Joystick via l'entrée `Cfg` — échange bloc IHM / persistant.
-   🧬 Pattern cfg : aligné sur ST_CycleCfg / ST_WinchCfg (préfixe ST_&lt;Domaine&gt;Cfg,
-      instance persistante dans GVL_PERSISTENT, pont FB_CfgPersistBridge_* à venir).
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (§5bis)
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -927,6 +2304,279 @@ Garde globale prise de référence (0 = pas de garde)</xhtml>
              (cible haute) et _BucketCfgPersist (écarts, GVL_PERSISTENT).
              Initialized : drapeau de restauration boot (pont persistant).
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbBucket_Config">
+        <baseType>
+          <struct>
+            <variable name="OffsetOpenM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ouvert (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OffsetCloseM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ferme (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoherenceLimitM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de detection d'incoherence au boot (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CloseAnticipationM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OpenAnticipationM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JogSlowdownZoneM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance avant le point d'arret anticipe ou le jog unitaire M2 est force au palier 1 (m) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepUp">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en montée/fermeture (1..5) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en descente/ouverture (1..5) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b2af5901-62ea-5239-8b5e-fb6f7afb8a12</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbBucket_Config — Configuration des offsets du benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="E_CycleDepthStopMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="KOBOLD_ONLY" value="0" />
+              <value name="SETPOINT_ONLY" value="1" />
+              <value name="KOBOLD_OR_SETPOINT" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>KOBOLD_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Comportement historique : fond valide par DI Kobold</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SETPOINT_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret sur consigne de profondeur valide</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>KOBOLD_OR_SETPOINT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Premier evenement valide des deux</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a4e533cc-1a07-5fca-8da6-b652a120d4dd</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_CycleSampleCountResetMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NEVER" value="0" />
+              <value name="ON_FIRST_START" value="1" />
+              <value name="ON_SAFETY_REARM" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NEVER</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut : RAZ manuelle IHM uniquement (comportement historique, aucun changement)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ON_FIRST_START</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">RAZ au premier demarrage de cycle apres mise sous tension de l'automate</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ON_SAFETY_REARM</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">RAZ au rearmement de la chaine AU (contacteur puissance reengage)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ea6305ea-87dc-5770-9254-60521a6d4291</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_PresetConfirmMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="READBACK_ONLY" value="0" />
+              <value name="READBACK_AND_STATUSBIT" value="1" />
+              <value name="STATUSBIT_ONLY" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>READBACK_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation par relecture de position</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READBACK_AND_STATUSBIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Relecture et bit d'état matériel</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STATUSBIT_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit d'état matériel uniquement</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>57a2dfc8-cdc9-581a-8092-09f21d5e6939</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_fbWinchSpeedLearning_Cell">
+        <baseType>
+          <struct>
+            <variable name="Valid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cellule validee (vitesse apprise exploitable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse apprise (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCount">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur d'echantillons collectes</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8341fe63-7ea1-5607-8731-d295248cd6cb</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 ST_fbWinchSpeedLearning_Cell — Cellule de vitesse apprise
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Cellule unitaire de la table d'apprentissage vitesse par palier
+   📄 Doc metier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1522,114 +3172,6 @@ Garde globale prise de référence (0 = pas de garde)</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
    📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_Encoder_Calib">
-        <baseType>
-          <struct>
-            <variable name="HomingRefRaw">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES DE REFERENCE BRUTE (RETAIN) ===
-Valeur brute figee au dernier homing reussi</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LastKnownRawPos">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernier point brut valide connu (continu)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RestartCoherenceTolerancePts">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1000" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION &amp; REGLAGES TOLERANCE ===
-Tolerance redemarrage (pts, ~12% de 8192)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Homed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS DE CALIBRATION &amp; SECURITE ===
-TRUE des qu'un referencement a reussi</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingSuspect">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si incoherence detectee au redemarrage</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>808932ee-dfa9-530c-b6b0-60a6dd0eb372</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 ST_Encoder_Calib — Calibration &amp; référence codeur (1 par treuil, RETAIN)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de calibration RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib)
-   💾 Données : Références brutes, état homed et contrôle de cohérence redémarrage
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_fbEncoder_Cfg">
-        <baseType>
-          <struct>
-            <variable name="PresetConfirmMode">
-              <type>
-                <derived name="E_PresetConfirmMode" />
-              </type>
-              <initialValue>
-                <simpleValue value="E_PresetConfirmMode.READBACK_ONLY" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode de confirmation preset, défaut relecture</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 TRUE après restauration du pont persistant</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b06fb1f4-e990-5b56-b842-84de93b5b40e</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_fbEncoder_Cfg — Réglages technologiques publics de FB_Encoder
-   ───────────────────────────────────────────────────────────────────────
-   🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
-   🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -2458,204 +4000,6 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_SpeedStepTable">
-        <baseType>
-          <struct>
-            <variable name="P1R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 1 (VITESSE MINIMALE) ===
-Contacteur 1 pour Palier 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P1R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P1R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P1R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P2R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 2 ===
-Contacteur 1 pour Palier 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P2R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P2R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P2R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P3R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 3 ===
-Contacteur 1 pour Palier 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P3R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P3R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P3R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P4R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 4 ===
-Contacteur 1 pour Palier 4</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P4R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 4</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P4R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 4</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P4R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 4</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P5R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 5 (VITESSE MAXIMALE) ===
-Contacteur 1 pour Palier 5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P5R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P5R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P5R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepThreshold_Pct">
-              <type>
-                <array>
-                  <dimension lower="1" upper="5" />
-                  <baseType>
-                    <REAL />
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SEUILS DE TRANSITION (%) ===
-Seuils de changement de palier (0..100%)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>fbfd953e-d8b9-5242-babe-f7521771609a</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="E_Diag_State">
         <baseType>
           <enum>
@@ -2718,50 +4062,6 @@ Seuils de changement de palier (0..100%)</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>e56e22b9-6e46-55bd-973d-b226ca7d1e70</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_PresetConfirmMode">
-        <baseType>
-          <enum>
-            <values>
-              <value name="READBACK_ONLY" value="0" />
-              <value name="READBACK_AND_STATUSBIT" value="1" />
-              <value name="STATUSBIT_ONLY" value="2" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>READBACK_ONLY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation par relecture de position</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READBACK_AND_STATUSBIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Relecture et bit d'état matériel</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>STATUSBIT_ONLY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit d'état matériel uniquement</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>57a2dfc8-cdc9-581a-8092-09f21d5e6939</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -3489,6 +4789,83 @@ alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s, 
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][HYPOTHESE] Deceleration chariot frein serre, m/s2</xhtml>
               </documentation>
             </variable>
+            <variable name="SimM3CartFreeActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] L4 : chariot libre frein ouvert + variateur sans couple</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3LoadMassRatio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][HYPOTHESE] Masse benne / masse totale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3RollingFriction_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][HYPOTHESE] Frottement de roulement, m/s2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3Slope_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][HYPOTHESE] Pente, m/s2 (+ vers Maintenance)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorCamDropoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] L5 : came capteurs vu -&gt; perdu -&gt; retrouve -&gt; fixe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorCamDropoutStart_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][HYPOTHESE] Debut de la zone perdue apres la cote, m</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorCamDropoutWidth_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.04" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][HYPOTHESE] Largeur de la zone perdue, m</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimM3EndStopRecoilMax_M">
               <type>
                 <REAL />
@@ -4009,6 +5386,22 @@ le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Fermetures du frein chariot en mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3ObsCartFree">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] L4 : chariot libre (frein ouvert, variateur sans couple)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3ObsFreeRollLast_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] L4 : distance du dernier episode libre (m)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -4945,7 +6338,14 @@ instSimTranslation(
     EndStopRecoilMax_M := SimM3EndStopRecoilMax_M,
     LoadReactionGain_Mps2 := SimM3LoadReactionGain_Mps2,
     BrakePhysicalActive := SimM3BrakePhysicalActive,
-    BrakeDecel_Mps2 := SimM3BrakeDecel_Mps2
+    BrakeDecel_Mps2 := SimM3BrakeDecel_Mps2,
+    CartFreeActive := SimM3CartFreeActive,
+    LoadMassRatio := SimM3LoadMassRatio,
+    RollingFriction_Mps2 := SimM3RollingFriction_Mps2,
+    Slope_Mps2 := SimM3Slope_Mps2,
+    SensorCamDropoutActive := SimM3SensorCamDropoutActive,
+    SensorCamDropoutStart_M := SimM3SensorCamDropoutStart_M,
+    SensorCamDropoutWidth_M := SimM3SensorCamDropoutWidth_M
 );
 M3BrakeFaultCloseActive := instSimTranslation.BrakeFaultCloseActive;
 M3SensorBlipActive := instSimTranslation.SensorBlipActive;
@@ -4956,6 +6356,8 @@ M3ObsOvershootSensorId := instSimTranslation.ObsOvershootSensorId;
 M3ObsEndStopHitCount := instSimTranslation.ObsEndStopHitCount;
 M3ObsEndStopImpactSpeed_Mps := instSimTranslation.ObsEndStopImpactSpeed_Mps;
 M3ObsBrakeClosedMovingCount := instSimTranslation.ObsBrakeClosedMovingCount;
+M3ObsCartFree := instSimTranslation.ObsCartFree;
+M3ObsFreeRollLast_M := instSimTranslation.ObsFreeRollLast_M;
 
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
 // même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).
@@ -5085,6 +6487,468 @@ Done := TRUE;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_PositionSensor" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Position_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Threshold_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Hysteresis_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+            </variable>
+            <variable name="ActiveBelowThreshold">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+            <variable name="ElectricalDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
+            <variable name="IntermittenceActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="IntermittenceDurationS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="IntermittencePeriodS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.12" />
+              </initialValue>
+            </variable>
+            <variable name="ScenarioSeed">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="BlipTransitions">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profil « BLIP COURT » — SECOND profil, independant du train de bascules du profil
+       d'intermittence ci-dessus (dont les parametres restent inchanges).
+       0 = desactive : le comportement historique est strictement conserve.
+       Rejoue les excursions electriques courtes mesurees sur la trace terrain du
+       2026-09-04 : Tremie contradictoire pendant 2 echantillons a 12,24 s (~200 ms) et
+       PV reactive 1 echantillon a 14,94 s (~100 ms).
+         BlipTransitions = nombre de bascules electriques (1 = une excursion puis retour) ;
+         BlipDurationS   = duree de maintien de chaque etat, donc largeur de l'excursion.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlipDurationS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.2" />
+              </initialValue>
+            </variable>
+            <variable name="CamDropoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 (2026-10-28) — MECANISME DE CAME, SPATIAL : en franchissant le capteur on le VOIT,
+       on le PERD sur une courte zone, on le RETROUVE, puis il reste FIXE. Lie a la POSITION
+       (pas au temps) : se produit a chaque passage, dans les DEUX sens, et reste stable a
+       l'arret (bornes de la zone avec hysteresis CST_CamHysteresis_M contre le bruit/balancement).
+       Zone de perte placee APRES le front de detection (cote -/+ Hysteresis_M) :
+       [front - Start - Width ; front - Start] cote detection.
+       FALSE = historique strictement inchange. Valeurs = HYPOTHESES.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamDropoutStart_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+            </variable>
+            <variable name="CamDropoutWidth_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.04" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="RawDetected">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ElectricalOutput">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EpisodeActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BlipActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TransitionCount">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="EpisodeTogglePeriodS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreviousRawDetected">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EpisodeTarget">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DelayTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="EpisodeTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ToggleTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="RandomState">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="BlipRunning">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BlipTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="BlipCount">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="HystDetected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : etat mecanique avec hysteresis (avant perte de came)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InCamDropout">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : position dans la zone de perte de la came</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamNear_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : borne de la zone cote front de detection</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamFar_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : borne de la zone cote interieur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_BlipMaxTransitions">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond du nombre de bascules du profil « blip court » : borne la duree de l'episode
+       et interdit tout rebouclage de compteur UDINT (revue du 2026-09-20, F9).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_CamHysteresis_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : hysteresis des bornes de la zone de perte</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Capteur de position cumulatif avec hysteresis et episode intermittent rejouable.
+   Cette brique ne connait ni le mouvement ni la logique M3 : elle transforme uniquement
+   une position mecanique vraie en DI.</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Initialized := FALSE;
+    RawDetected := FALSE;
+    ElectricalOutput := FALSE;
+    PreviousRawDetected := FALSE;
+    EpisodeActive := FALSE;
+    BlipActive := FALSE;
+    BlipRunning := FALSE;
+    BlipTimerS := 0.0;
+    BlipCount := 0;
+    DelayTimerS := 0.0;
+    EpisodeTimerS := 0.0;
+    ToggleTimerS := 0.0;
+    TransitionCount := 0;
+    EpisodeTogglePeriodS := 0.0;
+    RETURN;
+END_IF;
+
+(* Hysteresis sur une frontiere cumulative : les cinq DI restent compatibles avec
+   le mot thermometre du decodeur M3, contrairement a cinq fenetres independantes. *)
+IF NOT Initialized THEN
+    IF ActiveBelowThreshold THEN
+        RawDetected := Position_M &lt;= Threshold_M;
+    ELSE
+        RawDetected := Position_M &gt;= Threshold_M;
+    END_IF;
+    HystDetected := RawDetected;
+    ElectricalOutput := RawDetected;
+    PreviousRawDetected := RawDetected;
+    RandomState := ScenarioSeed MOD 1000000;
+    IF RandomState = 0 THEN
+        RandomState := 1;
+    END_IF;
+    EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS);
+    Initialized := TRUE;
+    RETURN;
+END_IF;
+
+IF ActiveBelowThreshold THEN
+    IF HystDetected THEN
+        HystDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    ELSE
+        HystDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    END_IF;
+    (* Zone de perte : apres le front d'entree en detection (cote - hysteresis), vers l'interieur. *)
+    CamNear_M := Threshold_M - MAX(0.0, Hysteresis_M) - MAX(0.0, CamDropoutStart_M);
+    CamFar_M := CamNear_M - MAX(0.0, CamDropoutWidth_M);
+    IF NOT CamDropoutActive THEN
+        InCamDropout := FALSE;
+    ELSIF InCamDropout THEN
+        InCamDropout := (Position_M &lt;= CamNear_M + CST_CamHysteresis_M) AND (Position_M &gt; CamFar_M - CST_CamHysteresis_M);
+    ELSE
+        InCamDropout := (Position_M &lt;= CamNear_M - CST_CamHysteresis_M) AND (Position_M &gt; CamFar_M + CST_CamHysteresis_M);
+    END_IF;
+ELSE
+    IF HystDetected THEN
+        HystDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    ELSE
+        HystDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    END_IF;
+    CamNear_M := Threshold_M + MAX(0.0, Hysteresis_M) + MAX(0.0, CamDropoutStart_M);
+    CamFar_M := CamNear_M + MAX(0.0, CamDropoutWidth_M);
+    IF NOT CamDropoutActive THEN
+        InCamDropout := FALSE;
+    ELSIF InCamDropout THEN
+        InCamDropout := (Position_M &gt;= CamNear_M - CST_CamHysteresis_M) AND (Position_M &lt; CamFar_M + CST_CamHysteresis_M);
+    ELSE
+        InCamDropout := (Position_M &gt;= CamNear_M + CST_CamHysteresis_M) AND (Position_M &lt; CamFar_M - CST_CamHysteresis_M);
+    END_IF;
+END_IF;
+(* L5 : la perte de came s'applique a l'etat mecanique ; hors option, RawDetected = HystDetected. *)
+RawDetected := HystDetected AND NOT InCamDropout;
+
+(* Un episode est declenche par un franchissement mecanique, pas par une de ses
+   propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)
+IF RawDetected &lt;&gt; PreviousRawDetected THEN
+    PreviousRawDetected := RawDetected;
+    EpisodeTarget := RawDetected;
+    (* Une bascule mecanique pendant l'episode modifie seulement la cible finale.
+       Elle ne remet jamais son chronometre a zero : l'episode reste borne. *)
+    IF NOT EpisodeActive THEN
+        DelayTimerS := 0.0;
+        EpisodeTimerS := 0.0;
+        ToggleTimerS := 0.0;
+        (* Tirage unique par episode : reproductible pour une graine et sans bruit
+           blanc scan-par-scan. La periode varie de 70 % a 130 % du nominal. *)
+        RandomState := RandomState + 7919;
+        IF RandomState &gt;= 1000000 THEN
+            RandomState := RandomState - 1000000;
+        END_IF;
+        EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS
+            * (0.7 + UDINT_TO_REAL(RandomState MOD 6000) / 10000.0));
+        EpisodeActive := IntermittenceActive AND (IntermittenceDurationS &gt; 0.0);
+    END_IF;
+    (* Blip court : arme sur le meme front MECANIQUE. Ses propres bascules electriques ne
+       peuvent donc jamais le rearmer — meme protection que l'episode d'intermittence. *)
+    IF (BlipTransitions &gt; 0) AND (BlipDurationS &gt; 0.0) THEN
+        BlipRunning := TRUE;
+        BlipTimerS := 0.0;
+        BlipCount := 0;
+        BlipActive := TRUE;
+        (* Ecretage : au-dela de ce plafond, un compteur UDINT pourrait reboucler et rendre
+           le blip non terminant (revue du 2026-09-20, F9). *)
+        BlipTransitions := MIN(BlipTransitions, CST_BlipMaxTransitions);
+    END_IF;
+END_IF;
+
+IF BlipRunning THEN
+    (* Protocole du blip court : (0) la sortie rejoint d'abord l'etat MECANIQUE — le
+       comportement nominal reste donc visible ; puis une excursion contradictoire toutes
+       les BlipDurationS, donc de largeur BlipDurationS ; enfin la sortie est rendue a
+       l'etat mecanique. Nombre d'excursions = BlipTransitions. *)
+    BlipTimerS := BlipTimerS + CycleTimeS;
+    IF BlipTimerS &gt;= MAX(CycleTimeS, BlipDurationS) THEN
+        BlipTimerS := 0.0;
+        IF BlipCount = 0 THEN
+            IF ElectricalOutput &lt;&gt; RawDetected THEN
+                ElectricalOutput := RawDetected;
+                TransitionCount := TransitionCount + 1;
+            END_IF;
+            BlipCount := 1;
+        ELSIF BlipCount &lt;= BlipTransitions THEN
+            ElectricalOutput := NOT ElectricalOutput;
+            TransitionCount := TransitionCount + 1;
+            BlipCount := BlipCount + 1;
+        ELSE
+            BlipRunning := FALSE;
+            BlipActive := FALSE;
+            IF ElectricalOutput &lt;&gt; RawDetected THEN
+                ElectricalOutput := RawDetected;
+                TransitionCount := TransitionCount + 1;
+            END_IF;
+            DelayTimerS := 0.0;
+        END_IF;
+    END_IF;
+ELSIF EpisodeActive THEN
+    EpisodeTimerS := EpisodeTimerS + CycleTimeS;
+    ToggleTimerS := ToggleTimerS + CycleTimeS;
+    IF ToggleTimerS &gt;= EpisodeTogglePeriodS THEN
+        ElectricalOutput := NOT ElectricalOutput;
+        ToggleTimerS := 0.0;
+        TransitionCount := TransitionCount + 1;
+    END_IF;
+    IF EpisodeTimerS &gt;= IntermittenceDurationS THEN
+        EpisodeActive := FALSE;
+        IF ElectricalOutput &lt;&gt; EpisodeTarget THEN
+            ElectricalOutput := EpisodeTarget;
+            TransitionCount := TransitionCount + 1;
+        END_IF;
+        DelayTimerS := 0.0;
+    END_IF;
+ELSIF ElectricalOutput &lt;&gt; RawDetected THEN
+    DelayTimerS := DelayTimerS + CycleTimeS;
+    IF DelayTimerS &gt;= MAX(0.0, ElectricalDelayS) THEN
+        ElectricalOutput := RawDetected;
+        DelayTimerS := 0.0;
+        TransitionCount := TransitionCount + 1;
+    END_IF;
+ELSE
+    DelayTimerS := 0.0;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>538b32eb-6dc2-59d5-8226-64383264fe4b</ObjectId>
           </data>
         </addData>
       </pou>
@@ -5329,6 +7193,81 @@ Done := TRUE;
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">HYPOTHESE : 0,4 m/s (20 Hz) -&gt; arret ~0,2 s / ~4 cm</xhtml>
               </documentation>
+            </variable>
+            <variable name="CartFreeActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 — CHARIOT LIBRE (2026-10-28). FALSE = historique (chariot esclave de la frequence).
+       TRUE = quand le frein est OUVERT et que le variateur n'applique plus de couple (mot a 0
+       et rampe variateur terminee), le chariot n'est plus tenu : il garde sa vitesse et subit
+       la poussee de la benne suspendue (rapport de masse x g x angle), la pente et le
+       frottement de roulement. Valeurs = HYPOTHESES, sans mesure terrain.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadMassRatio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">masse benne / masse totale chariot+benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RollingFriction_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">~1 % de g</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Slope_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">composante de pente, + vers Maintenance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorCamDropoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 — came capteurs (vu -&gt; perdu -&gt; retrouve -&gt; fixe), appliquee aux 5 capteurs.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorCamDropoutStart_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+            </variable>
+            <variable name="SensorCamDropoutWidth_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.04" />
+              </initialValue>
             </variable>
             <variable name="SuspendedLoadLength_M">
               <type>
@@ -5613,6 +7552,22 @@ Distance roulee entre le 1er front du dernier capteur d'arret (Tremie, P1, Maint
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de fermetures mecaniques du frein chariot en mouvement</xhtml>
               </documentation>
             </variable>
+            <variable name="ObsCartFree">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : frein ouvert ET variateur sans couple -&gt; chariot libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ObsFreeRollLast_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : distance parcourue pendant le dernier episode libre</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ObsArmed">
@@ -5662,6 +7617,30 @@ Distance roulee entre le 1er front du dernier capteur d'arret (Tremie, P1, Maint
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse du scan avant le calcul de butee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveTorqueActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : variateur commande ou encore en rampe -&gt; chariot tenu</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FreeAccel_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : acceleration nette du chariot libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FreeRollStart_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : position au debut de l'episode libre</xhtml>
               </documentation>
             </variable>
             <variable name="instCycleTime">
@@ -5954,7 +7933,33 @@ IF Enable THEN
     ELSE
         VelocityTarget_Mps := 0.0;
     END_IF;
-    IF BrakeMechanicallyOpen THEN
+    (* L4 : le variateur tient le chariot tant qu'il est commande ou que sa SORTIE electrique
+       alimente encore le moteur (rampe + reponse) ; ensuite, plus aucun couple.
+       Reprise de commande en roue libre : pas de reprise a la volee (le variateur repart de 0 Hz). *)
+    DriveTorqueActive := (DirectionSign &lt;&gt; 0.0) OR (instDrive.ElectricalFrequency_Hz &gt; CST_StopFrequency_Hz);
+    ObsCartFree := CartFreeActive AND BrakeMechanicallyOpen AND NOT DriveTorqueActive;
+    IF ObsCartFree THEN
+        (* Poussee de la benne (angle du scan precedent) + pente - frottement oppose au mouvement. *)
+        (* Pendule sur chariot libre : x'' = m_benne / m_chariot x g x theta = r / (1 - r) x g x theta. *)
+        FreeAccel_Mps2 := (LIMIT(0.0, LoadMassRatio, 0.9) / (1.0 - LIMIT(0.0, LoadMassRatio, 0.9)))
+                          * 9.81 * instSuspendedLoad.Angle_Rad + Slope_Mps2;
+        IF ABS(VelocityTrue_Mps) &lt; 0.001 THEN
+            (* Adherence : ne repart que si la poussee depasse le frottement. *)
+            IF ABS(FreeAccel_Mps2) &lt;= MAX(0.0, RollingFriction_Mps2) THEN
+                FreeAccel_Mps2 := 0.0;
+                VelocityTrue_Mps := 0.0;
+            ELSIF FreeAccel_Mps2 &gt; 0.0 THEN
+                FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+            ELSE
+                FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+            END_IF;
+        ELSIF VelocityTrue_Mps &gt; 0.0 THEN
+            FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+        ELSE
+            FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+        END_IF;
+        VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
+    ELSIF BrakeMechanicallyOpen THEN
         VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
     ELSIF BrakePhysicalActive THEN
         (* L3 : frein serre -&gt; deceleration sur le frein jusqu'a l'arret, puis chariot bloque. *)
@@ -6012,7 +8017,10 @@ IF Enable THEN
             VelocityTrue_Mps := 0.0;
         END_IF;
     ELSE
-        VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+        IF NOT ObsCartFree THEN
+            (* Reaction historique (negligeable) ; en mode libre la poussee est deja integree (L4). *)
+            VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+        END_IF;
         PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
         IF PositionCandidate_M &lt; EndStopTremie_M THEN
             PositionTrue_M := EndStopTremie_M;
@@ -6048,6 +8056,8 @@ instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 11,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosPV_M, Hysteresis_M := SensorHysteresis_M,
@@ -6056,6 +8066,8 @@ instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 23,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosP2_M, Hysteresis_M := SensorHysteresis_M,
@@ -6064,6 +8076,8 @@ instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 37,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosP1_M, Hysteresis_M := SensorHysteresis_M,
@@ -6072,6 +8086,8 @@ instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 53,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosMaintenance_M, Hysteresis_M := SensorHysteresis_M,
@@ -6080,6 +8096,8 @@ instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 71,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 
 PosTremie := instSensorTremie.ElectricalOutput;
@@ -6126,6 +8144,13 @@ IF Enable THEN
     ObsPrevP1 := PosP1;
     ObsPrevMaintenance := PosMaintenance;
 
+    (* L4 : distance de l'episode libre (frein ouvert, variateur sans couple). *)
+    IF NOT ObsCartFree THEN
+        FreeRollStart_M := PositionTrue_M;
+    ELSE
+        ObsFreeRollLast_M := ABS(PositionTrue_M - FreeRollStart_M);
+    END_IF;
+
     IF ObsArmed AND (ABS(VelocityTrue_Mps) &lt; 0.001) THEN
         ObsOvershootLast_M := ABS(PositionTrue_M - ObsEdgePosition_M);
         ObsArmed := FALSE;
@@ -6137,223 +8162,6 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>d7634526-8de9-5f93-b858-7e0bb59cdce2</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_Sim_TranslationBrake" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ReleaseCmd">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ActualFrequency_Hz">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="OpenDelay_S">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.1" />
-              </initialValue>
-            </variable>
-            <variable name="CloseDelay_S">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.09" />
-              </initialValue>
-            </variable>
-            <variable name="ContactDelay_S">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-            </variable>
-            <variable name="CycleTime_S">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-            </variable>
-            <variable name="FaultCloseWhileRunning">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Branche de FAUTE EXPLICITE — defaut FALSE : chemin nominal strictement inchange.
-       Rejoue le defaut terrain « cause 6 instantanee » : contact frein ferme alors que le
-       variateur retourne encore de la vitesse (trace 2026-09-04, 26,437 s, 10,00 Hz,
-       State.ErrorId=64). La garde nominale CST_StopFrequency_Hz est CONSERVEE telle quelle :
-       elle est validee par la meme trace (frein ouvert a 0,60 Hz, ferme a 0,00 Hz).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FaultCloseDelay_S">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-            </variable>
-            <variable name="PhysicalBrakeActive">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique : la retombee mecanique attend
-       f &lt;= 0,5 Hz (garde qui recopiait la logique PLC dans l'usine simulee). TRUE = frein a
-       manque de courant reel : retombe CloseDelay_S apres la coupure bobine, QUELLE QUE SOIT
-       la vitesse.</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="Ready">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="CoilEnergized">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="MechanicallyOpen">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ContactOpen">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="FaultCloseActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Branche de faute effectivement appliquee ce scan</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="MechanicalTimer_S">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="ContactTimer_S">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="FaultTimer_S">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="CST_StopFrequency_Hz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   Chaine bobine, effet mecanique et contact frein M3.</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-IF NOT Enable THEN
-    Ready := FALSE;
-    CoilEnergized := FALSE;
-    MechanicallyOpen := FALSE;
-    ContactOpen := FALSE;
-    FaultCloseActive := FALSE;
-    MechanicalTimer_S := 0.0;
-    ContactTimer_S := 0.0;
-    FaultTimer_S := 0.0;
-    RETURN;
-END_IF;
-
-(* Faute explicite : chronometre propre, remis a zero des que le stimulus retombe. *)
-IF FaultCloseWhileRunning THEN
-    FaultTimer_S := FaultTimer_S + CycleTime_S;
-ELSE
-    FaultTimer_S := 0.0;
-END_IF;
-FaultCloseActive := FaultCloseWhileRunning AND (FaultTimer_S &gt;= MAX(0.0, FaultCloseDelay_S));
-
-(* La faute fait retomber la bobine : l'etat electrique publie reste coherent avec la
-   fermeture mecanique observee (jamais « bobine energisee ET frein serre »). *)
-CoilEnergized := ReleaseCmd AND NOT FaultCloseActive;
-IF CoilEnergized THEN
-    IF NOT MechanicallyOpen THEN
-        MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
-        IF MechanicalTimer_S &gt;= MAX(0.0, OpenDelay_S) THEN
-            MechanicallyOpen := TRUE;
-            MechanicalTimer_S := 0.0;
-        END_IF;
-    ELSE
-        MechanicalTimer_S := 0.0;
-    END_IF;
-ELSIF FaultCloseActive OR PhysicalBrakeActive OR (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
-    IF MechanicallyOpen THEN
-        MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
-        IF MechanicalTimer_S &gt;= MAX(0.0, CloseDelay_S) THEN
-            MechanicallyOpen := FALSE;
-            MechanicalTimer_S := 0.0;
-        END_IF;
-    ELSE
-        MechanicalTimer_S := 0.0;
-    END_IF;
-ELSE
-    MechanicalTimer_S := 0.0;
-END_IF;
-IF MechanicallyOpen &lt;&gt; ContactOpen THEN
-    ContactTimer_S := ContactTimer_S + CycleTime_S;
-    IF ContactTimer_S &gt;= MAX(0.0, ContactDelay_S) THEN
-        ContactOpen := MechanicallyOpen;
-        ContactTimer_S := 0.0;
-    END_IF;
-ELSE
-    ContactTimer_S := 0.0;
-END_IF;
-Ready := TRUE;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>df996876-0665-532f-9bbb-9be3ca7669e4</ObjectId>
           </data>
         </addData>
       </pou>
@@ -7034,6 +8842,13 @@ instSimBench(
     SimM3BrakeFaultCloseDelayS       := GVL_Simulation.SimM3BrakeFaultCloseDelayS,
     SimM3BrakePhysicalActive         := GVL_Simulation.SimM3BrakePhysicalActive,
     SimM3BrakeDecel_Mps2             := GVL_Simulation.SimM3BrakeDecel_Mps2,
+    SimM3CartFreeActive              := GVL_Simulation.SimM3CartFreeActive,
+    SimM3LoadMassRatio               := GVL_Simulation.SimM3LoadMassRatio,
+    SimM3RollingFriction_Mps2        := GVL_Simulation.SimM3RollingFriction_Mps2,
+    SimM3Slope_Mps2                  := GVL_Simulation.SimM3Slope_Mps2,
+    SimM3SensorCamDropoutActive      := GVL_Simulation.SimM3SensorCamDropoutActive,
+    SimM3SensorCamDropoutStart_M     := GVL_Simulation.SimM3SensorCamDropoutStart_M,
+    SimM3SensorCamDropoutWidth_M     := GVL_Simulation.SimM3SensorCamDropoutWidth_M,
     SimJoystickLeft_Rev_TREMIE_Active  := GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active,
     SimJoystickRight_Fwd_MAINT_Active  := GVL_Simulation.SimJoystickRight_Fwd_MAINT_Active,
     SimJoystickFwd_Up_Close_Active     := GVL_Simulation.SimJoystickFwd_Up_Close_Active,
@@ -7070,6 +8885,8 @@ GVL_Simulation.SimM3ObsOvershootSensorId      := instSimBench.M3ObsOvershootSens
 GVL_Simulation.SimM3ObsEndStopHitCount        := instSimBench.M3ObsEndStopHitCount;
 GVL_Simulation.SimM3ObsEndStopImpactSpeed_Mps := instSimBench.M3ObsEndStopImpactSpeed_Mps;
 GVL_Simulation.SimM3ObsBrakeClosedMovingCount := instSimBench.M3ObsBrakeClosedMovingCount;
+GVL_Simulation.SimM3ObsCartFree               := instSimBench.M3ObsCartFree;
+GVL_Simulation.SimM3ObsFreeRollLast_M         := instSimBench.M3ObsFreeRollLast_M;
 END_IF;
 HwSim.Operator    := instSimBench.Operator;
 HwSim.Machine     := instSimBench.Machine;
@@ -9589,370 +11406,6 @@ TimeLast := TimeCurrent;
           </data>
         </addData>
       </pou>
-      <pou name="FB_Sim_PositionSensor" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="Position_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="Threshold_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="Hysteresis_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.02" />
-              </initialValue>
-            </variable>
-            <variable name="ActiveBelowThreshold">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-            </variable>
-            <variable name="ElectricalDelayS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-            </variable>
-            <variable name="IntermittenceActive">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-            </variable>
-            <variable name="IntermittenceDurationS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-            </variable>
-            <variable name="IntermittencePeriodS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.12" />
-              </initialValue>
-            </variable>
-            <variable name="ScenarioSeed">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-            </variable>
-            <variable name="CycleTimeS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-            </variable>
-            <variable name="BlipTransitions">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profil « BLIP COURT » — SECOND profil, independant du train de bascules du profil
-       d'intermittence ci-dessus (dont les parametres restent inchanges).
-       0 = desactive : le comportement historique est strictement conserve.
-       Rejoue les excursions electriques courtes mesurees sur la trace terrain du
-       2026-09-04 : Tremie contradictoire pendant 2 echantillons a 12,24 s (~200 ms) et
-       PV reactive 1 echantillon a 14,94 s (~100 ms).
-         BlipTransitions = nombre de bascules electriques (1 = une excursion puis retour) ;
-         BlipDurationS   = duree de maintien de chaque etat, donc largeur de l'excursion.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BlipDurationS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.2" />
-              </initialValue>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="RawDetected">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ElectricalOutput">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="EpisodeActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BlipActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TransitionCount">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="EpisodeTogglePeriodS">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="PreviousRawDetected">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="EpisodeTarget">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="DelayTimerS">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="EpisodeTimerS">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="ToggleTimerS">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="RandomState">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="BlipRunning">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BlipTimerS">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="BlipCount">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="CST_BlipMaxTransitions">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1000" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond du nombre de bascules du profil « blip court » : borne la duree de l'episode
-       et interdit tout rebouclage de compteur UDINT (revue du 2026-09-20, F9).</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   Capteur de position cumulatif avec hysteresis et episode intermittent rejouable.
-   Cette brique ne connait ni le mouvement ni la logique M3 : elle transforme uniquement
-   une position mecanique vraie en DI.</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-IF NOT Enable THEN
-    Initialized := FALSE;
-    RawDetected := FALSE;
-    ElectricalOutput := FALSE;
-    PreviousRawDetected := FALSE;
-    EpisodeActive := FALSE;
-    BlipActive := FALSE;
-    BlipRunning := FALSE;
-    BlipTimerS := 0.0;
-    BlipCount := 0;
-    DelayTimerS := 0.0;
-    EpisodeTimerS := 0.0;
-    ToggleTimerS := 0.0;
-    TransitionCount := 0;
-    EpisodeTogglePeriodS := 0.0;
-    RETURN;
-END_IF;
-
-(* Hysteresis sur une frontiere cumulative : les cinq DI restent compatibles avec
-   le mot thermometre du decodeur M3, contrairement a cinq fenetres independantes. *)
-IF NOT Initialized THEN
-    IF ActiveBelowThreshold THEN
-        RawDetected := Position_M &lt;= Threshold_M;
-    ELSE
-        RawDetected := Position_M &gt;= Threshold_M;
-    END_IF;
-    ElectricalOutput := RawDetected;
-    PreviousRawDetected := RawDetected;
-    RandomState := ScenarioSeed MOD 1000000;
-    IF RandomState = 0 THEN
-        RandomState := 1;
-    END_IF;
-    EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS);
-    Initialized := TRUE;
-    RETURN;
-END_IF;
-
-IF ActiveBelowThreshold THEN
-    IF RawDetected THEN
-        RawDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
-    ELSE
-        RawDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
-    END_IF;
-ELSE
-    IF RawDetected THEN
-        RawDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
-    ELSE
-        RawDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
-    END_IF;
-END_IF;
-
-(* Un episode est declenche par un franchissement mecanique, pas par une de ses
-   propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)
-IF RawDetected &lt;&gt; PreviousRawDetected THEN
-    PreviousRawDetected := RawDetected;
-    EpisodeTarget := RawDetected;
-    (* Une bascule mecanique pendant l'episode modifie seulement la cible finale.
-       Elle ne remet jamais son chronometre a zero : l'episode reste borne. *)
-    IF NOT EpisodeActive THEN
-        DelayTimerS := 0.0;
-        EpisodeTimerS := 0.0;
-        ToggleTimerS := 0.0;
-        (* Tirage unique par episode : reproductible pour une graine et sans bruit
-           blanc scan-par-scan. La periode varie de 70 % a 130 % du nominal. *)
-        RandomState := RandomState + 7919;
-        IF RandomState &gt;= 1000000 THEN
-            RandomState := RandomState - 1000000;
-        END_IF;
-        EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS
-            * (0.7 + UDINT_TO_REAL(RandomState MOD 6000) / 10000.0));
-        EpisodeActive := IntermittenceActive AND (IntermittenceDurationS &gt; 0.0);
-    END_IF;
-    (* Blip court : arme sur le meme front MECANIQUE. Ses propres bascules electriques ne
-       peuvent donc jamais le rearmer — meme protection que l'episode d'intermittence. *)
-    IF (BlipTransitions &gt; 0) AND (BlipDurationS &gt; 0.0) THEN
-        BlipRunning := TRUE;
-        BlipTimerS := 0.0;
-        BlipCount := 0;
-        BlipActive := TRUE;
-        (* Ecretage : au-dela de ce plafond, un compteur UDINT pourrait reboucler et rendre
-           le blip non terminant (revue du 2026-09-20, F9). *)
-        BlipTransitions := MIN(BlipTransitions, CST_BlipMaxTransitions);
-    END_IF;
-END_IF;
-
-IF BlipRunning THEN
-    (* Protocole du blip court : (0) la sortie rejoint d'abord l'etat MECANIQUE — le
-       comportement nominal reste donc visible ; puis une excursion contradictoire toutes
-       les BlipDurationS, donc de largeur BlipDurationS ; enfin la sortie est rendue a
-       l'etat mecanique. Nombre d'excursions = BlipTransitions. *)
-    BlipTimerS := BlipTimerS + CycleTimeS;
-    IF BlipTimerS &gt;= MAX(CycleTimeS, BlipDurationS) THEN
-        BlipTimerS := 0.0;
-        IF BlipCount = 0 THEN
-            IF ElectricalOutput &lt;&gt; RawDetected THEN
-                ElectricalOutput := RawDetected;
-                TransitionCount := TransitionCount + 1;
-            END_IF;
-            BlipCount := 1;
-        ELSIF BlipCount &lt;= BlipTransitions THEN
-            ElectricalOutput := NOT ElectricalOutput;
-            TransitionCount := TransitionCount + 1;
-            BlipCount := BlipCount + 1;
-        ELSE
-            BlipRunning := FALSE;
-            BlipActive := FALSE;
-            IF ElectricalOutput &lt;&gt; RawDetected THEN
-                ElectricalOutput := RawDetected;
-                TransitionCount := TransitionCount + 1;
-            END_IF;
-            DelayTimerS := 0.0;
-        END_IF;
-    END_IF;
-ELSIF EpisodeActive THEN
-    EpisodeTimerS := EpisodeTimerS + CycleTimeS;
-    ToggleTimerS := ToggleTimerS + CycleTimeS;
-    IF ToggleTimerS &gt;= EpisodeTogglePeriodS THEN
-        ElectricalOutput := NOT ElectricalOutput;
-        ToggleTimerS := 0.0;
-        TransitionCount := TransitionCount + 1;
-    END_IF;
-    IF EpisodeTimerS &gt;= IntermittenceDurationS THEN
-        EpisodeActive := FALSE;
-        IF ElectricalOutput &lt;&gt; EpisodeTarget THEN
-            ElectricalOutput := EpisodeTarget;
-            TransitionCount := TransitionCount + 1;
-        END_IF;
-        DelayTimerS := 0.0;
-    END_IF;
-ELSIF ElectricalOutput &lt;&gt; RawDetected THEN
-    DelayTimerS := DelayTimerS + CycleTimeS;
-    IF DelayTimerS &gt;= MAX(0.0, ElectricalDelayS) THEN
-        ElectricalOutput := RawDetected;
-        DelayTimerS := 0.0;
-        TransitionCount := TransitionCount + 1;
-    END_IF;
-ELSE
-    DelayTimerS := 0.0;
-END_IF;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>538b32eb-6dc2-59d5-8226-64383264fe4b</ObjectId>
-          </data>
-        </addData>
-      </pou>
       <pou name="FB_Sim_SuspendedLoad" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -10102,6 +11555,223 @@ Ready := TRUE;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>5e90360e-a4b1-5c07-88d0-97d04f31b674</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_TranslationBrake" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ReleaseCmd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ActualFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="OpenDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+            </variable>
+            <variable name="CloseDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.09" />
+              </initialValue>
+            </variable>
+            <variable name="ContactDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="CycleTime_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="FaultCloseWhileRunning">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Branche de FAUTE EXPLICITE — defaut FALSE : chemin nominal strictement inchange.
+       Rejoue le defaut terrain « cause 6 instantanee » : contact frein ferme alors que le
+       variateur retourne encore de la vitesse (trace 2026-09-04, 26,437 s, 10,00 Hz,
+       State.ErrorId=64). La garde nominale CST_StopFrequency_Hz est CONSERVEE telle quelle :
+       elle est validee par la meme trace (frein ouvert a 0,60 Hz, ferme a 0,00 Hz).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FaultCloseDelay_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
+            <variable name="PhysicalBrakeActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique : la retombee mecanique attend
+       f &lt;= 0,5 Hz (garde qui recopiait la logique PLC dans l'usine simulee). TRUE = frein a
+       manque de courant reel : retombe CloseDelay_S apres la coupure bobine, QUELLE QUE SOIT
+       la vitesse.</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CoilEnergized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MechanicallyOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ContactOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FaultCloseActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Branche de faute effectivement appliquee ce scan</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="MechanicalTimer_S">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ContactTimer_S">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="FaultTimer_S">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CST_StopFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Chaine bobine, effet mecanique et contact frein M3.</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Ready := FALSE;
+    CoilEnergized := FALSE;
+    MechanicallyOpen := FALSE;
+    ContactOpen := FALSE;
+    FaultCloseActive := FALSE;
+    MechanicalTimer_S := 0.0;
+    ContactTimer_S := 0.0;
+    FaultTimer_S := 0.0;
+    RETURN;
+END_IF;
+
+(* Faute explicite : chronometre propre, remis a zero des que le stimulus retombe. *)
+IF FaultCloseWhileRunning THEN
+    FaultTimer_S := FaultTimer_S + CycleTime_S;
+ELSE
+    FaultTimer_S := 0.0;
+END_IF;
+FaultCloseActive := FaultCloseWhileRunning AND (FaultTimer_S &gt;= MAX(0.0, FaultCloseDelay_S));
+
+(* La faute fait retomber la bobine : l'etat electrique publie reste coherent avec la
+   fermeture mecanique observee (jamais « bobine energisee ET frein serre »). *)
+CoilEnergized := ReleaseCmd AND NOT FaultCloseActive;
+IF CoilEnergized THEN
+    IF NOT MechanicallyOpen THEN
+        MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
+        IF MechanicalTimer_S &gt;= MAX(0.0, OpenDelay_S) THEN
+            MechanicallyOpen := TRUE;
+            MechanicalTimer_S := 0.0;
+        END_IF;
+    ELSE
+        MechanicalTimer_S := 0.0;
+    END_IF;
+ELSIF FaultCloseActive OR PhysicalBrakeActive OR (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
+    IF MechanicallyOpen THEN
+        MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
+        IF MechanicalTimer_S &gt;= MAX(0.0, CloseDelay_S) THEN
+            MechanicallyOpen := FALSE;
+            MechanicalTimer_S := 0.0;
+        END_IF;
+    ELSE
+        MechanicalTimer_S := 0.0;
+    END_IF;
+ELSE
+    MechanicalTimer_S := 0.0;
+END_IF;
+IF MechanicallyOpen &lt;&gt; ContactOpen THEN
+    ContactTimer_S := ContactTimer_S + CycleTime_S;
+    IF ContactTimer_S &gt;= MAX(0.0, ContactDelay_S) THEN
+        ContactOpen := MechanicallyOpen;
+        ContactTimer_S := 0.0;
+    END_IF;
+ELSE
+    ContactTimer_S := 0.0;
+END_IF;
+Ready := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>df996876-0665-532f-9bbb-9be3ca7669e4</ObjectId>
           </data>
         </addData>
       </pou>
@@ -16828,6 +18498,80 @@ FALSE = comportement historique (retombee seulement sous 0,5 Hz, arret instantan
             <xhtml xmlns="http://www.w3.org/1999/xhtml">HYPOTHESE : 20 Hz (0,4 m/s) -&gt; ~4 cm</xhtml>
           </documentation>
         </variable>
+        <variable name="SimM3CartFreeActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛞 L4 (2026-10-28) — CHARIOT LIBRE : frein ouvert ET variateur sans couple (mot 0, rampe finie)
+-&gt; le chariot n'est plus tenu : poussee benne (ratio x g x angle) + pente - frottement.
+FALSE = historique (chariot esclave de la frequence). Valeurs = HYPOTHESES.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3LoadMassRatio">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.5" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3RollingFriction_Mps2">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.1" />
+          </initialValue>
+        </variable>
+        <variable name="SimM3Slope_Mps2">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">+ vers Maintenance</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorCamDropoutActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 L5 (2026-10-28) — CAME CAPTEURS M3 : a chaque franchissement le capteur est VU, PERDU
+sur une courte zone, RETROUVE puis FIXE (lie a la position, deux sens). FALSE = historique.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorCamDropoutStart_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.02" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">HYPOTHESE</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3SensorCamDropoutWidth_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.04" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">HYPOTHESE</xhtml>
+          </documentation>
+        </variable>
         <variable name="SimM3ObsPositionTrue_M">
           <type>
             <REAL />
@@ -16883,6 +18627,22 @@ Position vraie du chariot simule (m)</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermetures frein chariot en mouvement</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3ObsCartFree">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : chariot libre en ce moment</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3ObsFreeRollLast_M">
+          <type>
+            <REAL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : distance du dernier episode libre (m)</xhtml>
           </documentation>
         </variable>
         <variable name="SimJoystickLeft_Rev_TREMIE_Active">
@@ -17276,19 +19036,20 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
       <ProjectStructure>
         <Folder Name="L_SIMULATION">
           <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
+          <Object Name="FB_Sim_PositionSensor" ObjectId="538b32eb-6dc2-59d5-8226-64383264fe4b" />
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
-          <Object Name="FB_Sim_TranslationBrake" ObjectId="df996876-0665-532f-9bbb-9be3ca7669e4" />
           <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
           <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
           <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
           <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
           <Object Name="FB_Sim_WinchElectrical" ObjectId="d4300e91-0ca0-50b0-9b21-524eed13dd0f" />
-          <Object Name="FB_Sim_PositionSensor" ObjectId="538b32eb-6dc2-59d5-8226-64383264fe4b" />
           <Object Name="FB_Sim_SuspendedLoad" ObjectId="5e90360e-a4b1-5c07-88d0-97d04f31b674" />
+          <Object Name="FB_Sim_TranslationBrake" ObjectId="df996876-0665-532f-9bbb-9be3ca7669e4" />
           <Object Name="FB_Sim_TranslationDrive" ObjectId="03da2ca5-829e-5f35-a2f5-646da12c2d06" />
           <Object Name="FB_Sim_WinchMotor" ObjectId="cce43b3e-95fc-50e1-8d52-471f9c714033" />
           <Object Name="FB_Sim_KlossTorque" ObjectId="319a2f9e-c6a8-5252-8df3-c9df3e0746f8" />
         </Folder>
+        <Object Name="GVL_PERSISTENT" ObjectId="b404450e-105f-5aa6-8c01-cbf582c5f3ce" />
         <Folder Name="M_MAIN">
           <Object Name="PRG_02_Acquisition" ObjectId="212fd0f8-509e-536e-99de-b75543d86add" />
         </Folder>
@@ -17307,11 +19068,22 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             </Folder>
             <Folder Name="2_TRANSLATION">
               <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
+              <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />
             </Folder>
             <Folder Name="1_TREUILS_BENNE">
               <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
+              <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
+              <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
+            </Folder>
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
+              <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
             </Folder>
             <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
+              <Object Name="ST_CycleMachineHomingCfg" ObjectId="892dec72-1fe2-5fad-a62f-d1ead6f61579" />
+              <Object Name="E_CycleDepthStopMode" ObjectId="a4e533cc-1a07-5fca-8da6-b652a120d4dd" />
+              <Object Name="E_CycleSampleCountResetMode" ObjectId="ea6305ea-87dc-5770-9254-60521a6d4291" />
               <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />
             </Folder>
             <Folder Name="6_DIAG_ET_CHAINES">
@@ -17327,6 +19099,47 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
             <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
           </Folder>
+        </Folder>
+        <Folder Name="E_CODEURS">
+          <Folder Name="_TYPES">
+            <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
+            <Object Name="ST_fbEncoder_Cfg" ObjectId="b06fb1f4-e990-5b56-b842-84de93b5b40e" />
+            <Object Name="ST_fbEncoder_HwIn" ObjectId="e8c7e795-5e03-5a6a-b908-95ab92d42ee7" />
+            <Object Name="E_PresetConfirmMode" ObjectId="57a2dfc8-cdc9-581a-8092-09f21d5e6939" />
+            <Object Name="ST_fbEncoder_HwOut" ObjectId="1d8c05ba-e087-546f-9435-81c2f041e74c" />
+            <Object Name="ST_fbEncoder_Measurement" ObjectId="db273cb7-b66e-5a93-99be-e648e3db5387" />
+          </Folder>
+          <Object Name="FB_Encoder" ObjectId="290327ae-3055-58e1-9bbd-038d8cd93901" />
+          <Object Name="FB_EncoderReliability" ObjectId="2f0260c4-bd51-584e-a910-46b30488f46d" />
+          <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
+          <Object Name="FB_Encoder_Homing" ObjectId="0d5827b5-87bb-5d18-88a3-fc9c3bf8967b" />
+          <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
+          <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
+          <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
+        </Folder>
+        <Folder Name="H_TREUILS_BENNE">
+          <Folder Name="_TYPES">
+            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
+            <Object Name="ST_fbWinchLoadEstimator_SpeedCfg" ObjectId="6a16b928-26ae-52c7-b420-4064d7e5d0dc" />
+            <Object Name="ST_fbWinchLoadEstimator_Table" ObjectId="ac09a372-08ec-5811-90f7-baec46ade641" />
+            <Object Name="ST_fbWinchSpeedLearning_Cfg" ObjectId="e33b18ad-d4ff-5cd1-939b-74be82c01450" />
+            <Object Name="ST_fbWinchSpeedLearning_Table" ObjectId="e53cb50d-fd3d-5709-9494-4694f689ff17" />
+            <Object Name="ST_fbWinch_Symmetry_Cfg" ObjectId="b3edf443-a7a8-5125-8877-3148f355844d" />
+            <Object Name="ST_fbWinch_Symmetry_Data" ObjectId="30d10f2c-209a-59ac-ab89-aae03e9399fe" />
+            <Object Name="ST_fbWinchSpeedLearning_Cell" ObjectId="8341fe63-7ea1-5607-8731-d295248cd6cb" />
+          </Folder>
+          <Folder Name="BENNE">
+            <Folder Name="_TYPES">
+              <Object Name="ST_fbBucket_State" ObjectId="74e82ca6-a865-5827-ba17-53f56d8b0f29" />
+              <Object Name="ST_fbBucket_Config" ObjectId="b2af5901-62ea-5239-8b5e-fb6f7afb8a12" />
+            </Folder>
+          </Folder>
+        </Folder>
+        <Folder Name="D_JOYSTICK">
+          <Object Name="ST_fbJoystick_Cfg" ObjectId="15265f47-4d56-5d85-af5c-415e86b1194e" />
+          <Object Name="FB_Joystick" ObjectId="a4d06470-35ad-55a9-9871-fdd3a74327dd" />
+          <Object Name="FB_AxisScale" ObjectId="e974ff21-ff4c-5a4b-ba11-7923dd2c8334" />
+          <Object Name="ST_fbJoystick_AxisCmd" ObjectId="b6fd2799-de8b-52a1-87c0-15b96ff2b5f6" />
         </Folder>
         <Folder Name="C_DIAG_RESEAUX">
           <Object Name="FB_AutoResetTransientDiag" ObjectId="c7ba8d37-387d-51cd-8b08-2c1332258d0f" />
@@ -17347,36 +19160,8 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             <Object Name="ST_MachineHoming" ObjectId="719346ef-3775-5b4e-ac3c-37b255640eba" />
           </Folder>
         </Folder>
-        <Folder Name="E_CODEURS">
-          <Object Name="FB_Encoder" ObjectId="290327ae-3055-58e1-9bbd-038d8cd93901" />
-          <Object Name="FB_EncoderReliability" ObjectId="2f0260c4-bd51-584e-a910-46b30488f46d" />
-          <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
-          <Object Name="FB_Encoder_Homing" ObjectId="0d5827b5-87bb-5d18-88a3-fc9c3bf8967b" />
-          <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
-          <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
-          <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
-          <Folder Name="_TYPES">
-            <Object Name="ST_fbEncoder_HwIn" ObjectId="e8c7e795-5e03-5a6a-b908-95ab92d42ee7" />
-            <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
-            <Object Name="ST_fbEncoder_Cfg" ObjectId="b06fb1f4-e990-5b56-b842-84de93b5b40e" />
-            <Object Name="ST_fbEncoder_HwOut" ObjectId="1d8c05ba-e087-546f-9435-81c2f041e74c" />
-            <Object Name="ST_fbEncoder_Measurement" ObjectId="db273cb7-b66e-5a93-99be-e648e3db5387" />
-            <Object Name="E_PresetConfirmMode" ObjectId="57a2dfc8-cdc9-581a-8092-09f21d5e6939" />
-          </Folder>
-        </Folder>
-        <Folder Name="D_JOYSTICK">
-          <Object Name="FB_Joystick" ObjectId="a4d06470-35ad-55a9-9871-fdd3a74327dd" />
-          <Object Name="ST_fbJoystick_Cfg" ObjectId="15265f47-4d56-5d85-af5c-415e86b1194e" />
-          <Object Name="FB_AxisScale" ObjectId="e974ff21-ff4c-5a4b-ba11-7923dd2c8334" />
-          <Object Name="ST_fbJoystick_AxisCmd" ObjectId="b6fd2799-de8b-52a1-87c0-15b96ff2b5f6" />
-        </Folder>
         <Folder Name="F_MODES">
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
-        </Folder>
-        <Folder Name="H_TREUILS_BENNE">
-          <Folder Name="_TYPES">
-            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
-          </Folder>
         </Folder>
       </ProjectStructure>
     </data>

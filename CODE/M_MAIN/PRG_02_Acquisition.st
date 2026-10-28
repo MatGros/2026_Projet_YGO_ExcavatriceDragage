@@ -389,6 +389,13 @@ instSimBench(
     SimM3BrakeFaultCloseDelayS       := GVL_Simulation.SimM3BrakeFaultCloseDelayS,
     SimM3BrakePhysicalActive         := GVL_Simulation.SimM3BrakePhysicalActive,
     SimM3BrakeDecel_Mps2             := GVL_Simulation.SimM3BrakeDecel_Mps2,
+    SimM3CartFreeActive              := GVL_Simulation.SimM3CartFreeActive,
+    SimM3LoadMassRatio               := GVL_Simulation.SimM3LoadMassRatio,
+    SimM3RollingFriction_Mps2        := GVL_Simulation.SimM3RollingFriction_Mps2,
+    SimM3Slope_Mps2                  := GVL_Simulation.SimM3Slope_Mps2,
+    SimM3SensorCamDropoutActive      := GVL_Simulation.SimM3SensorCamDropoutActive,
+    SimM3SensorCamDropoutStart_M     := GVL_Simulation.SimM3SensorCamDropoutStart_M,
+    SimM3SensorCamDropoutWidth_M     := GVL_Simulation.SimM3SensorCamDropoutWidth_M,
     SimJoystickLeft_Rev_TREMIE_Active  := GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active,
     SimJoystickRight_Fwd_MAINT_Active  := GVL_Simulation.SimJoystickRight_Fwd_MAINT_Active,
     SimJoystickFwd_Up_Close_Active     := GVL_Simulation.SimJoystickFwd_Up_Close_Active,
@@ -425,6 +432,8 @@ GVL_Simulation.SimM3ObsOvershootSensorId      := instSimBench.M3ObsOvershootSens
 GVL_Simulation.SimM3ObsEndStopHitCount        := instSimBench.M3ObsEndStopHitCount;
 GVL_Simulation.SimM3ObsEndStopImpactSpeed_Mps := instSimBench.M3ObsEndStopImpactSpeed_Mps;
 GVL_Simulation.SimM3ObsBrakeClosedMovingCount := instSimBench.M3ObsBrakeClosedMovingCount;
+GVL_Simulation.SimM3ObsCartFree               := instSimBench.M3ObsCartFree;
+GVL_Simulation.SimM3ObsFreeRollLast_M         := instSimBench.M3ObsFreeRollLast_M;
 END_IF;
 HwSim.Operator    := instSimBench.Operator;
 HwSim.Machine     := instSimBench.Machine;

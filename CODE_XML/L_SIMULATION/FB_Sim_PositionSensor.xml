@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T15:00:10.358123" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T15:00:10.358123">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T15:10:08.502714" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T15:10:08.502714">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -132,6 +132,37 @@
                 <simpleValue value="0.2" />
               </initialValue>
             </variable>
+            <variable name="CamDropoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 (2026-10-28) — MECANISME DE CAME, SPATIAL : en franchissant le capteur on le VOIT,
+       on le PERD sur une courte zone, on le RETROUVE, puis il reste FIXE. Lie a la POSITION
+       (pas au temps) : se produit a chaque passage, dans les deux sens, et reste stable a
+       l'arret. Zone de perte = [cote - Start - Width ; cote - Start] cote detection.
+       FALSE = historique strictement inchange. Valeurs = HYPOTHESES.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamDropoutStart_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+            </variable>
+            <variable name="CamDropoutWidth_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.03" />
+              </initialValue>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawDetected">
@@ -216,6 +247,22 @@
                 <UDINT />
               </type>
             </variable>
+            <variable name="HystDetected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : etat mecanique avec hysteresis (avant perte de came)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InCamDropout">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : position dans la zone de perte de la came</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_BlipMaxTransitions">
               <type>
                 <UDINT />
@@ -266,6 +313,7 @@ IF NOT Initialized THEN
     ELSE
         RawDetected := Position_M &gt;= Threshold_M;
     END_IF;
+    HystDetected := RawDetected;
     ElectricalOutput := RawDetected;
     PreviousRawDetected := RawDetected;
     RandomState := ScenarioSeed MOD 1000000;
@@ -278,18 +326,26 @@ IF NOT Initialized THEN
 END_IF;
 
 IF ActiveBelowThreshold THEN
-    IF RawDetected THEN
-        RawDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    IF HystDetected THEN
+        HystDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
     ELSE
-        RawDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+        HystDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
     END_IF;
+    InCamDropout := CamDropoutActive
+        AND (Position_M &lt;= (Threshold_M - MAX(0.0, CamDropoutStart_M)))
+        AND (Position_M &gt; (Threshold_M - MAX(0.0, CamDropoutStart_M) - MAX(0.0, CamDropoutWidth_M)));
 ELSE
-    IF RawDetected THEN
-        RawDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    IF HystDetected THEN
+        HystDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
     ELSE
-        RawDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+        HystDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
     END_IF;
+    InCamDropout := CamDropoutActive
+        AND (Position_M &gt;= (Threshold_M + MAX(0.0, CamDropoutStart_M)))
+        AND (Position_M &lt; (Threshold_M + MAX(0.0, CamDropoutStart_M) + MAX(0.0, CamDropoutWidth_M)));
 END_IF;
+(* L5 : la perte de came s'applique a l'etat mecanique ; hors option, RawDetected = HystDetected. *)
+RawDetected := HystDetected AND NOT InCamDropout;
 
 (* Un episode est declenche par un franchissement mecanique, pas par une de ses
    propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)

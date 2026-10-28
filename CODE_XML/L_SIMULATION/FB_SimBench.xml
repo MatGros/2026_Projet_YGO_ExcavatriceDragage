@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T14:42:47.253322" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T14:42:47.253322">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T15:10:23.422690" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T15:10:23.422690">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1197,6 +1197,83 @@ alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s, 
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][HYPOTHESE] Deceleration chariot frein serre, m/s2</xhtml>
               </documentation>
             </variable>
+            <variable name="SimM3CartFreeActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] L4 : chariot libre frein ouvert + variateur sans couple</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3LoadMassRatio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][HYPOTHESE] Masse benne / masse totale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3RollingFriction_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][HYPOTHESE] Frottement de roulement, m/s2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3Slope_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][HYPOTHESE] Pente, m/s2 (+ vers Maintenance)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorCamDropoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] L5 : came capteurs vu -&gt; perdu -&gt; retrouve -&gt; fixe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorCamDropoutStart_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][HYPOTHESE] Debut de la zone perdue apres la cote, m</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM3SensorCamDropoutWidth_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.03" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG][HYPOTHESE] Largeur de la zone perdue, m</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimM3EndStopRecoilMax_M">
               <type>
                 <REAL />
@@ -1717,6 +1794,22 @@ le taux de charge n'est pas encore cable sur un signal amont (registre PLAN_T317
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Fermetures du frein chariot en mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3ObsCartFree">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] L4 : chariot libre (frein ouvert, variateur sans couple)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3ObsFreeRollLast_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] L4 : distance du dernier episode libre (m)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -2653,7 +2746,14 @@ instSimTranslation(
     EndStopRecoilMax_M := SimM3EndStopRecoilMax_M,
     LoadReactionGain_Mps2 := SimM3LoadReactionGain_Mps2,
     BrakePhysicalActive := SimM3BrakePhysicalActive,
-    BrakeDecel_Mps2 := SimM3BrakeDecel_Mps2
+    BrakeDecel_Mps2 := SimM3BrakeDecel_Mps2,
+    CartFreeActive := SimM3CartFreeActive,
+    LoadMassRatio := SimM3LoadMassRatio,
+    RollingFriction_Mps2 := SimM3RollingFriction_Mps2,
+    Slope_Mps2 := SimM3Slope_Mps2,
+    SensorCamDropoutActive := SimM3SensorCamDropoutActive,
+    SensorCamDropoutStart_M := SimM3SensorCamDropoutStart_M,
+    SensorCamDropoutWidth_M := SimM3SensorCamDropoutWidth_M
 );
 M3BrakeFaultCloseActive := instSimTranslation.BrakeFaultCloseActive;
 M3SensorBlipActive := instSimTranslation.SensorBlipActive;
@@ -2664,6 +2764,8 @@ M3ObsOvershootSensorId := instSimTranslation.ObsOvershootSensorId;
 M3ObsEndStopHitCount := instSimTranslation.ObsEndStopHitCount;
 M3ObsEndStopImpactSpeed_Mps := instSimTranslation.ObsEndStopImpactSpeed_Mps;
 M3ObsBrakeClosedMovingCount := instSimTranslation.ObsBrakeClosedMovingCount;
+M3ObsCartFree := instSimTranslation.ObsCartFree;
+M3ObsFreeRollLast_M := instSimTranslation.ObsFreeRollLast_M;
 
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
 // même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).
@@ -4656,6 +4758,81 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">HYPOTHESE : 0,4 m/s (20 Hz) -&gt; arret ~0,2 s / ~4 cm</xhtml>
               </documentation>
             </variable>
+            <variable name="CartFreeActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 — CHARIOT LIBRE (2026-10-28). FALSE = historique (chariot esclave de la frequence).
+       TRUE = quand le frein est OUVERT et que le variateur n'applique plus de couple (mot a 0
+       et rampe variateur terminee), le chariot n'est plus tenu : il garde sa vitesse et subit
+       la poussee de la benne suspendue (rapport de masse x g x angle), la pente et le
+       frottement de roulement. Valeurs = HYPOTHESES, sans mesure terrain.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadMassRatio">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">masse benne / masse totale chariot+benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RollingFriction_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">~1 % de g</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Slope_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">composante de pente, + vers Maintenance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorCamDropoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 — came capteurs (vu -&gt; perdu -&gt; retrouve -&gt; fixe), appliquee aux 5 capteurs.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorCamDropoutStart_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+            </variable>
+            <variable name="SensorCamDropoutWidth_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.03" />
+              </initialValue>
+            </variable>
             <variable name="SuspendedLoadLength_M">
               <type>
                 <REAL />
@@ -4939,6 +5116,22 @@ Distance roulee entre le 1er front du dernier capteur d'arret (Tremie, P1, Maint
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de fermetures mecaniques du frein chariot en mouvement</xhtml>
               </documentation>
             </variable>
+            <variable name="ObsCartFree">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : frein ouvert ET variateur sans couple -&gt; chariot libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ObsFreeRollLast_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : distance parcourue pendant le dernier episode libre</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ObsArmed">
@@ -4988,6 +5181,30 @@ Distance roulee entre le 1er front du dernier capteur d'arret (Tremie, P1, Maint
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse du scan avant le calcul de butee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveTorqueActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : variateur commande ou encore en rampe -&gt; chariot tenu</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FreeAccel_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : acceleration nette du chariot libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FreeRollStart_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : position au debut de l'episode libre</xhtml>
               </documentation>
             </variable>
             <variable name="instCycleTime">
@@ -5280,7 +5497,33 @@ IF Enable THEN
     ELSE
         VelocityTarget_Mps := 0.0;
     END_IF;
-    IF BrakeMechanicallyOpen THEN
+    (* L4 : le variateur tient le chariot tant qu'il est commande ou que sa SORTIE electrique
+       alimente encore le moteur (rampe + reponse) ; ensuite, plus aucun couple.
+       Reprise de commande en roue libre : pas de reprise a la volee (le variateur repart de 0 Hz). *)
+    DriveTorqueActive := (DirectionSign &lt;&gt; 0.0) OR (instDrive.ElectricalFrequency_Hz &gt; CST_StopFrequency_Hz);
+    ObsCartFree := CartFreeActive AND BrakeMechanicallyOpen AND NOT DriveTorqueActive;
+    IF ObsCartFree THEN
+        (* Poussee de la benne (angle du scan precedent) + pente - frottement oppose au mouvement. *)
+        (* Pendule sur chariot libre : x'' = m_benne / m_chariot x g x theta = r / (1 - r) x g x theta. *)
+        FreeAccel_Mps2 := (LIMIT(0.0, LoadMassRatio, 0.9) / (1.0 - LIMIT(0.0, LoadMassRatio, 0.9)))
+                          * 9.81 * instSuspendedLoad.Angle_Rad + Slope_Mps2;
+        IF ABS(VelocityTrue_Mps) &lt; 0.001 THEN
+            (* Adherence : ne repart que si la poussee depasse le frottement. *)
+            IF ABS(FreeAccel_Mps2) &lt;= MAX(0.0, RollingFriction_Mps2) THEN
+                FreeAccel_Mps2 := 0.0;
+                VelocityTrue_Mps := 0.0;
+            ELSIF FreeAccel_Mps2 &gt; 0.0 THEN
+                FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+            ELSE
+                FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+            END_IF;
+        ELSIF VelocityTrue_Mps &gt; 0.0 THEN
+            FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+        ELSE
+            FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+        END_IF;
+        VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
+    ELSIF BrakeMechanicallyOpen THEN
         VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
     ELSIF BrakePhysicalActive THEN
         (* L3 : frein serre -&gt; deceleration sur le frein jusqu'a l'arret, puis chariot bloque. *)
@@ -5338,7 +5581,10 @@ IF Enable THEN
             VelocityTrue_Mps := 0.0;
         END_IF;
     ELSE
-        VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+        IF NOT ObsCartFree THEN
+            (* Reaction historique (negligeable) ; en mode libre la poussee est deja integree (L4). *)
+            VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+        END_IF;
         PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
         IF PositionCandidate_M &lt; EndStopTremie_M THEN
             PositionTrue_M := EndStopTremie_M;
@@ -5374,6 +5620,8 @@ instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 11,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosPV_M, Hysteresis_M := SensorHysteresis_M,
@@ -5382,6 +5630,8 @@ instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 23,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosP2_M, Hysteresis_M := SensorHysteresis_M,
@@ -5390,6 +5640,8 @@ instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 37,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosP1_M, Hysteresis_M := SensorHysteresis_M,
@@ -5398,6 +5650,8 @@ instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 53,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosMaintenance_M, Hysteresis_M := SensorHysteresis_M,
@@ -5406,6 +5660,8 @@ instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 71,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 
 PosTremie := instSensorTremie.ElectricalOutput;
@@ -5451,6 +5707,13 @@ IF Enable THEN
     ObsPrevTremie := PosTremie;
     ObsPrevP1 := PosP1;
     ObsPrevMaintenance := PosMaintenance;
+
+    (* L4 : distance de l'episode libre (frein ouvert, variateur sans couple). *)
+    IF NOT ObsCartFree THEN
+        FreeRollStart_M := PositionTrue_M;
+    ELSE
+        ObsFreeRollLast_M := ABS(PositionTrue_M - FreeRollStart_M);
+    END_IF;
 
     IF ObsArmed AND (ABS(VelocityTrue_Mps) &lt; 0.001) THEN
         ObsOvershootLast_M := ABS(PositionTrue_M - ObsEdgePosition_M);
@@ -6141,6 +6404,37 @@ TimeLast := TimeCurrent;
                 <simpleValue value="0.2" />
               </initialValue>
             </variable>
+            <variable name="CamDropoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 (2026-10-28) — MECANISME DE CAME, SPATIAL : en franchissant le capteur on le VOIT,
+       on le PERD sur une courte zone, on le RETROUVE, puis il reste FIXE. Lie a la POSITION
+       (pas au temps) : se produit a chaque passage, dans les deux sens, et reste stable a
+       l'arret. Zone de perte = [cote - Start - Width ; cote - Start] cote detection.
+       FALSE = historique strictement inchange. Valeurs = HYPOTHESES.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamDropoutStart_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+            </variable>
+            <variable name="CamDropoutWidth_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.03" />
+              </initialValue>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawDetected">
@@ -6225,6 +6519,22 @@ TimeLast := TimeCurrent;
                 <UDINT />
               </type>
             </variable>
+            <variable name="HystDetected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : etat mecanique avec hysteresis (avant perte de came)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InCamDropout">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : position dans la zone de perte de la came</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_BlipMaxTransitions">
               <type>
                 <UDINT />
@@ -6275,6 +6585,7 @@ IF NOT Initialized THEN
     ELSE
         RawDetected := Position_M &gt;= Threshold_M;
     END_IF;
+    HystDetected := RawDetected;
     ElectricalOutput := RawDetected;
     PreviousRawDetected := RawDetected;
     RandomState := ScenarioSeed MOD 1000000;
@@ -6287,18 +6598,26 @@ IF NOT Initialized THEN
 END_IF;
 
 IF ActiveBelowThreshold THEN
-    IF RawDetected THEN
-        RawDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    IF HystDetected THEN
+        HystDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
     ELSE
-        RawDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+        HystDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
     END_IF;
+    InCamDropout := CamDropoutActive
+        AND (Position_M &lt;= (Threshold_M - MAX(0.0, CamDropoutStart_M)))
+        AND (Position_M &gt; (Threshold_M - MAX(0.0, CamDropoutStart_M) - MAX(0.0, CamDropoutWidth_M)));
 ELSE
-    IF RawDetected THEN
-        RawDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    IF HystDetected THEN
+        HystDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
     ELSE
-        RawDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+        HystDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
     END_IF;
+    InCamDropout := CamDropoutActive
+        AND (Position_M &gt;= (Threshold_M + MAX(0.0, CamDropoutStart_M)))
+        AND (Position_M &lt; (Threshold_M + MAX(0.0, CamDropoutStart_M) + MAX(0.0, CamDropoutWidth_M)));
 END_IF;
+(* L5 : la perte de came s'applique a l'etat mecanique ; hors option, RawDetected = HystDetected. *)
+RawDetected := HystDetected AND NOT InCamDropout;
 
 (* Un episode est declenche par un franchissement mecanique, pas par une de ses
    propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)
