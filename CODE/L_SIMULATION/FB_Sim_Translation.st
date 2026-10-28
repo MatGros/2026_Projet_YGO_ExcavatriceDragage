@@ -6,23 +6,26 @@ VAR_INPUT
     ReqTremie : BOOL;
     ReqMaintenance : BOOL;
     SpeedTgt_Pct : REAL;
-    (* T361 — ECHELLE ODOMETRIQUE DU BANC, ALIGNEE SUR L'ESTIMATEUR REEL.
-       Le modele integre VelocityTarget = (CST_PositionAtMaintenance / FullTravelTimeS) x f / 40.
-       Le ratio simule vaut donc 30 / (40 x FullTravelTimeS) m/(Hz.s) et DOIT etre egal au gain
-       consomme par FB_Translation_PositionEstimator (GainMetersPerHzSec, cable sur
-       GVL_PERSISTENT._TranslationGainMetersPerHzSec = 0,02 m/(Hz.s), soit 1 m/s a 50 Hz).
-       => 30 / (40 x 37,5) = 0,02 m/(Hz.s). La valeur historique 8,0 s donnait 0,09375 m/(Hz.s),
-       soit 4,7 fois l'echelle reelle : l'estimateur prenait un retard constant et chaque
-       franchissement de capteur produisait un saut de recalage de plusieurs metres
-       (AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md, trace Suivi_74 : sauts de 4,53 a 9,12 m).
-       ⚠️ Toute evolution de _TranslationGainMetersPerHzSec exige de recalculer cette constante :
-       le gate G518 echoue si les deux echelles divergent. *)
-    FullTravelTimeS : REAL := 37.5;
+    (* T301/L1 — SOURCE UNIQUE : le banc ne porte AUCUNE position ni echelle propre.
+       Positions capteurs = reglages machine (GVL_PERSISTENT._TranslationPos*_M) et gain =
+       gain EFFECTIVEMENT consomme par l'estimateur (PRG_05 FB_Translation_OdometryGain.GainActive),
+       passes par PRG_02 -> FB_SimBench. Vitesse chariot = sens x gain x frequence.
+       Historique : l'ancienne echelle en dur (30 m / FullTravelTimeS / 40 Hz) a diverge du gain
+       reel (T360/T361, sauts de 4 a 9 m) — doublon supprime, gate G518 anti-retour. *)
+    PosTremie_M        : REAL := 0.0;   (* --> [CFG] Position capteur Tremie (m) *)
+    PosPV_M            : REAL := 1.5;   (* --> [CFG] Position capteur PV (m) *)
+    PosP2_M            : REAL := 3.5;   (* --> [CFG] Position capteur P2 (m) *)
+    PosP1_M            : REAL := 5.0;   (* --> [CFG] Position capteur P1 (m) *)
+    PosMaintenance_M   : REAL := 10.0;  (* --> [CFG] Position capteur Maintenance (m) *)
+    GainMetersPerHzSec : REAL := 0.02;  (* --> [CFG] Gain odometrique effectif, m/(Hz.s) *)
+    (* Distance capteur extreme -> butee mecanique (seule donnee propre au banc : physique du rail).
+       Bornee a CST_MinEndStopMargin_M pour que le capteur extreme reste franchissable. *)
+    EndStopMargin_M    : REAL := 0.5;
     BrakeReleaseCmd : BOOL := TRUE;
     (* ECHELLE DE LA CONSIGNE. PRG_02 envoie SpeedCmd_Pct = f / 50 Hz x 100 : le simulateur reconvertit
        avec le MEME maximum, sinon 20 Hz reels (40 %) deviendraient 16 Hz simules.
        Maximum = GVL_PERSISTENT._TranslationMaxFreq_Hz (50 Hz), passe par FB_SimBench (CST_M3MaxFreq_Hz,
-       egalite verifiee par G518). Ne pas confondre avec CST_NominalFrequency_Hz (40 Hz) : echelle
+       egalite verifiee par G518). Ne pas confondre avec l'ancienne echelle (40 Hz) : echelle
        ODOMETRIQUE (gain 0,02 m/(Hz.s)). *)
     MaxFreq_Hz : REAL := 50.0;
     (* ACCELERATION DU BANC (confort d'essai). Le chariot avance SpeedFactor fois plus vite ET la
@@ -114,13 +117,14 @@ VAR
     FrequencyTarget_Hz : REAL;
     SpeedFactorApplied : REAL := 1.0;
     CycleTimeS : REAL;
-    SpeedAt40Hz_Mps : REAL;
+    EndStopTremie_M : REAL;       (* butee mecanique cote Tremie = capteur Tremie - marge *)
+    EndStopMaintenance_M : REAL;  (* butee mecanique cote Maintenance = capteur Maintenance + marge *)
     VelocityTarget_Mps : REAL;
     CartAcceleration_Mps2 : REAL;
     PreviousVelocity_Mps : REAL;
     PositionCandidate_M : REAL;
     (* Recul de butee ECRETE a la course : une valeur d'entree aberrante ne peut pas
-       autoriser une position hors de [0 ; 30] m (revue du 2026-09-20, F8). *)
+       autoriser une position hors des butees (revue du 2026-09-20, F8). *)
     RecoilMax_M : REAL;
     SensorNoiseState : REAL := 0.371;
     SensorNoise_M : REAL;
@@ -134,20 +138,9 @@ VAR
     instSuspendedLoad : FB_Sim_SuspendedLoad;
 END_VAR
 VAR CONSTANT
-    CST_PositionAtTremie : REAL := 0.0;
-    (* Meme principe a Tremie : le seuil DI est legerement avant la butee afin
-       que l'hysteresis puisse commuter sans depassement numerique de course. *)
-    CST_PositionAtTremieSensor_M : REAL := 0.05;
-    CST_PositionAtPV : REAL := 5.0;
-    CST_PositionAtP2 : REAL := 15.0;
-    CST_PositionAtP1 : REAL := 20.0;
-    CST_PositionAtMaintenance : REAL := 30.0;
-    (* Le capteur cumulatif Maintenance doit commuter avant la butee mecanique,
-       sinon un modele borne a 30 m ne peut jamais produire le mot 00000. Cette
-       position est SYNTHETIQUE en attente de la mesure de la came reelle. *)
-    CST_PositionAtMaintenanceSensor_M : REAL := 29.95;
-    CST_NominalFrequency_Hz : REAL := 40.0; // echelle ODOMETRIQUE lue par G518 — PAS le maximum variateur (MaxFreq_Hz)
-    CST_MinTimeS : REAL := 0.001;
+    (* Marge mini capteur extreme -> butee : au-dela de l'hysteresis capteur, sinon le mot
+       11111 / 00000 ne pourrait jamais etre produit (capteur colle a la butee). *)
+    CST_MinEndStopMargin_M : REAL := 0.05;
     (* Meme seuil d'arret que FB_Sim_TranslationBrake.CST_StopFrequency_Hz (0,5 Hz).
        Valide par la trace terrain du 2026-09-04 : frein ouvert a 0,60 Hz, ferme a 0,00 Hz. *)
     CST_StopFrequency_Hz : REAL := 0.5;
@@ -162,6 +155,10 @@ instCycleTime(DefaultValueS := 0.010);
    de trace plus rapide que 100 ms. *)
 CycleTimeS := LIMIT(0.001, instCycleTime.CycleTimeS, 0.100);
 
+(* Butees mecaniques derivees des capteurs extremes (reglages machine) + marge du rail. *)
+EndStopTremie_M := PosTremie_M - MAX(EndStopMargin_M, CST_MinEndStopMargin_M);
+EndStopMaintenance_M := PosMaintenance_M + MAX(EndStopMargin_M, CST_MinEndStopMargin_M);
+
 IF NOT Enable THEN
     Initialized := FALSE;
     instDrive(Enable := FALSE);
@@ -174,7 +171,7 @@ IF NOT Enable THEN
     BrakeContactOpen := FALSE;
     BrakeCoilEnergized := FALSE;
     BrakeFaultCloseActive := FALSE;
-    PositionTrue_M := CST_PositionAtP1;
+    PositionTrue_M := PosP1_M;
     VelocityTrue_Mps := 0.0;
     PreviousVelocity_Mps := 0.0;
     TravelDirection := 0.0;
@@ -197,7 +194,7 @@ IF NOT Enable THEN
     RETURN;
 ELSIF NOT Initialized THEN
     Initialized := TRUE;
-    PositionTrue_M := CST_PositionAtP1;
+    PositionTrue_M := PosP1_M;
     TravelDirection := 0.0;
 END_IF;
 
@@ -250,9 +247,9 @@ IF Enable THEN
     END_IF;
 
     PreviousVelocity_Mps := VelocityTrue_Mps;
-    IF (FullTravelTimeS > CST_MinTimeS) AND BrakeMechanicallyOpen THEN
-        SpeedAt40Hz_Mps := CST_PositionAtMaintenance / FullTravelTimeS;
-        VelocityTarget_Mps := TravelDirection * SpeedAt40Hz_Mps * ActualFrequency_Hz / CST_NominalFrequency_Hz;
+    IF BrakeMechanicallyOpen THEN
+        (* Source unique : meme gain que l'estimateur machine (vitesse = gain x frequence). *)
+        VelocityTarget_Mps := TravelDirection * MAX(0.0, GainMetersPerHzSec) * ActualFrequency_Hz;
     ELSE
         VelocityTarget_Mps := 0.0;
     END_IF;
@@ -263,12 +260,12 @@ IF Enable THEN
     HardStopTremieActive := FALSE;
     HardStopMaintenanceActive := FALSE;
     PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
-    IF PositionCandidate_M < CST_PositionAtTremie THEN
-        PositionTrue_M := CST_PositionAtTremie;
+    IF PositionCandidate_M < EndStopTremie_M THEN
+        PositionTrue_M := EndStopTremie_M;
         VelocityTrue_Mps := 0.0;
         HardStopTremieActive := TRUE;
-    ELSIF PositionCandidate_M > CST_PositionAtMaintenance THEN
-        PositionTrue_M := CST_PositionAtMaintenance;
+    ELSIF PositionCandidate_M > EndStopMaintenance_M THEN
+        PositionTrue_M := EndStopMaintenance_M;
         VelocityTrue_Mps := 0.0;
         HardStopMaintenanceActive := TRUE;
     END_IF;
@@ -279,7 +276,7 @@ IF Enable THEN
         CycleTime_S := CycleTimeS);
     LoadAngle_Rad := instSuspendedLoad.Angle_Rad;
     IF HardStopTremieActive OR HardStopMaintenanceActive THEN
-        RecoilMax_M := MIN(MAX(0.0, EndStopRecoilMax_M), CST_PositionAtMaintenance);
+        RecoilMax_M := MIN(MAX(0.0, EndStopRecoilMax_M), EndStopMaintenance_M - EndStopTremie_M);
         IF (RecoilMax_M > 0.0) AND BrakeMechanicallyOpen THEN
             (* Recul autorise UNIQUEMENT en s'eloignant de la butee touchee, borne par
                EndStopRecoilMax_M : jamais plus loin dans la butee, jamais de saut cache. *)
@@ -291,14 +288,14 @@ IF Enable THEN
             TravelDirection := 0.0;
             IF HardStopTremieActive THEN
                 VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps);
-                PositionCandidate_M := LIMIT(CST_PositionAtTremie,
+                PositionCandidate_M := LIMIT(EndStopTremie_M,
                     PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
-                    CST_PositionAtTremie + RecoilMax_M);
+                    EndStopTremie_M + RecoilMax_M);
             ELSE
                 VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps);
-                PositionCandidate_M := LIMIT(CST_PositionAtMaintenance - RecoilMax_M,
+                PositionCandidate_M := LIMIT(EndStopMaintenance_M - RecoilMax_M,
                     PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
-                    CST_PositionAtMaintenance);
+                    EndStopMaintenance_M);
             END_IF;
             PositionTrue_M := PositionCandidate_M;
         ELSE
@@ -307,12 +304,12 @@ IF Enable THEN
     ELSE
         VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
         PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
-        IF PositionCandidate_M < CST_PositionAtTremie THEN
-            PositionTrue_M := CST_PositionAtTremie;
+        IF PositionCandidate_M < EndStopTremie_M THEN
+            PositionTrue_M := EndStopTremie_M;
             VelocityTrue_Mps := 0.0;
             HardStopTremieActive := TRUE;
-        ELSIF PositionCandidate_M > CST_PositionAtMaintenance THEN
-            PositionTrue_M := CST_PositionAtMaintenance;
+        ELSIF PositionCandidate_M > EndStopMaintenance_M THEN
+            PositionTrue_M := EndStopMaintenance_M;
             VelocityTrue_Mps := 0.0;
             HardStopMaintenanceActive := TRUE;
         ELSE
@@ -335,7 +332,7 @@ SensorPosition_M := PositionTrue_M + SensorNoise_M;
    brique garde son hysteresis et son episode propres ; aucun timer partage ne
    peut masquer un front d'un autre capteur. *)
 instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtTremieSensor_M, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosTremie_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) >= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
@@ -343,7 +340,7 @@ instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtPV, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosPV_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) >= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
@@ -351,7 +348,7 @@ instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtP2, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosP2_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) >= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
@@ -359,7 +356,7 @@ instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtP1, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosP1_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) >= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
@@ -367,7 +364,7 @@ instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CycleTimeS := CycleTimeS);
 instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtMaintenanceSensor_M, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosMaintenance_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) >= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,

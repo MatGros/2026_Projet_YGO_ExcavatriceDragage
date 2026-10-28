@@ -23,6 +23,7 @@ VAR
     instTranslationM3           : FB_Translation;
     instSafetyTranslationM3     : FB_Safety_Translation;
     instPosEstimatorM3          : FB_Translation_PositionEstimator;
+    instOdometryGainM3          : FB_Translation_OdometryGain;    // * [INST] Gain odométrique réglable site + mesure proposée (T301)
     instPosDecoderM3            : FB_Translation_PositionDecoder; // 🧩 Decodage position M3 (migre de PRG_02, AF-02 TBD §8 #5)
     instArbM3                   : FB_TranslationCmdArbitrationM3; // * [INST] Arbitrage commande translation M3
     ArbM3_IHM                   : ST_fbTranslationCmdArbitration_IHM;     // . [LOC] Entrées IHM FB d'arbitrage M3
@@ -615,6 +616,20 @@ instTranslationM3(
     BypassLimitSwitch       := M3_MaintN2 AND (GVL_IHM.M3Translation.Bypass.Global OR GVL_IHM.M3Translation.Bypass.LimitSwitch)
 );
 
+// 📏 Gain odométrique (T301) : réglage site |P2-PV| / (CalibFreq × CalibTime), repli sur le gain
+// persistant si non saisi. La mesure P2 <-> PV est PROPOSÉE (State.OdometryMeasured*), jamais appliquée.
+instOdometryGainM3(
+    Enable               := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE),
+    SensorPV             := instPosDecoderM3.TranslationPosPV,
+    SensorP2             := instPosDecoderM3.TranslationPosP2,
+    DriveActualFreq_Hz   := TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
+    PosPV_M              := GVL_PERSISTENT._TranslationPosPV_M,
+    PosP2_M              := GVL_PERSISTENT._TranslationPosP2_M,
+    CalibFreq_Hz         := GVL_PERSISTENT._TranslationCalibFreq_Hz,
+    CalibTime_S          := GVL_PERSISTENT._TranslationCalibTimeP2PV_S,
+    FallbackGain         := GVL_PERSISTENT._TranslationGainMetersPerHzSec
+);
+
 // 📐 Estimateur de position continue M3 (odométrie + recalage 5 capteurs)
 instPosEstimatorM3(
     Enable               := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE),
@@ -632,7 +647,7 @@ instPosEstimatorM3(
     PosP2M               := GVL_PERSISTENT._TranslationPosP2_M,
     PosPVM               := GVL_PERSISTENT._TranslationPosPV_M,
     PosTremieM           := GVL_PERSISTENT._TranslationPosTremie_M,
-    GainMetersPerHzSec   := GVL_PERSISTENT._TranslationGainMetersPerHzSec,
+    GainMetersPerHzSec   := instOdometryGainM3.GainActive,
     PersistedPositionM   := GVL_PERSISTENT._TranslationPosEstimated_M,
     PersistedInitialized := GVL_PERSISTENT._TranslationPosEstimatedInitialized
 );
@@ -752,6 +767,15 @@ TranslationState.AtMaintenance := M3_AtMaintenanceStable;
 // dependance frequence variateur, contrairement a AtXxx (front/frequence). + texte statut.
 TranslationState.M3StatusText      := M3_StatusText;
 TranslationState.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
+// 📏 T301 — gain odométrique actif + mesure proposée P2 <-> PV (lecture seule, recopie manuelle)
+TranslationState.OdometryGainActive := instOdometryGainM3.GainActive;
+TranslationState.OdometryCalibValid := instOdometryGainM3.CalibValid;
+TranslationState.OdometryMeasureActive := instOdometryGainM3.MeasureActive;
+TranslationState.OdometryMeasuredTime_S := instOdometryGainM3.MeasuredTime_S;
+TranslationState.OdometryMeasuredFreqAvg_Hz := instOdometryGainM3.MeasuredFreqAvg_Hz;
+TranslationState.OdometryMeasuredFreqSpread_Hz := instOdometryGainM3.MeasuredFreqSpread_Hz;
+TranslationState.OdometryMeasuredGain := instOdometryGainM3.MeasuredGain;
+TranslationState.OdometryMeasureCount := instOdometryGainM3.MeasureCount;
 TranslationState.SensorsWord := instPosDecoderM3.SensorsWord;
 TranslationState.SensorWordIncoherent := instPosDecoderM3.Incoherent;
 TranslationState.LimitSwitchTremie := M3_LimitSwitchTremieStable;

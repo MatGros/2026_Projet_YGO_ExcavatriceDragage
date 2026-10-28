@@ -4359,6 +4359,71 @@ jeton "dernier capteur franchi" (front + libération sur mouvement confirmé) �
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise</xhtml>
               </documentation>
             </variable>
+            <variable name="OdometryGainActive">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 T301 — Odométrie M3 : gain actif + mesure PROPOSÉE P2 &lt;-&gt; PV (jamais appliquée, recopie manuelle)
+Gain consommé par l'estimateur, m/(Hz.s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OdometryCalibValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = gain calculé depuis le réglage Calib* (défaut 2,0 s compris) ; FALSE = gain de repli</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OdometryMeasureActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mesure P2 &lt;-&gt; PV en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OdometryMeasuredTime_S">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernier temps mesuré P2 &lt;-&gt; PV (s) -&gt; à recopier dans _TranslationCalibTimeP2PV_S</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OdometryMeasuredFreqAvg_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fréquence moyenne de la mesure (Hz) -&gt; à recopier dans _TranslationCalibFreq_Hz</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OdometryMeasuredFreqSpread_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart max - min de fréquence : petit = vitesse constante, mesure fiable</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OdometryMeasuredGain">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Gain qui résulterait de la mesure, m/(Hz.s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OdometryMeasureCount">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de mesures abouties depuis le démarrage</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

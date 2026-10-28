@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-27T16:11:59.638096" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-27T16:11:59.638096">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T14:00:06.663973" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T14:00:06.663973">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -248,6 +248,18 @@ PV     : 1 excursion de 0,1 s (reactive 1 echantillon a 14,94 s en deceleration)
 0.0 = behavior historique : position ET vitesse figees a la butee (decision de review
 tracee). &gt; 0 autorise la reaction de charge a ressortir le chariot de la zone capteur.
 Valeur SYNTHETIQUE, non calibree : a mesurer en mise en service.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM3EndStopMargin_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.5" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧱 Distance capteur extreme (Tremie / Maintenance) -&gt; butee mecanique M3, m (T301/L1).
+Seule donnee geometrique propre au banc ; les positions capteurs sont celles de la machine.</xhtml>
           </documentation>
         </variable>
         <variable name="SimM3LoadReactionGain_Mps2">

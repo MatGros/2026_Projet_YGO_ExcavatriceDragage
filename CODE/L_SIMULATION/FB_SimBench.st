@@ -54,6 +54,13 @@ VAR_INPUT
     M3_ReqTremie               : BOOL;             (* --> [CMD] Demande explicite vers Trémie *)
     M3_ReqMaintenance          : BOOL;             (* --> [CMD] Demande explicite vers Maintenance *)
     M3_SpeedCmd_Pct            : REAL;   (* --> [CMD] Consigne vitesse M3 *)
+    (* T301/L1 — SOURCE UNIQUE : reglages machine M3 lus par PRG_02 (le banc n'a plus de positions en dur) *)
+    M3_PosTremie_M             : REAL := 0.0;   (* --> [CFG] Position capteur Tremie (GVL_PERSISTENT) *)
+    M3_PosPV_M                 : REAL := 1.5;   (* --> [CFG] Position capteur PV (GVL_PERSISTENT) *)
+    M3_PosP2_M                 : REAL := 3.5;   (* --> [CFG] Position capteur P2 (GVL_PERSISTENT) *)
+    M3_PosP1_M                 : REAL := 5.0;   (* --> [CFG] Position capteur P1 (GVL_PERSISTENT) *)
+    M3_PosMaintenance_M        : REAL := 10.0;  (* --> [CFG] Position capteur Maintenance (GVL_PERSISTENT) *)
+    M3_OdometryGain            : REAL := 0.02;  (* --> [CFG] Gain effectif de l'estimateur machine, m/(Hz.s) (PRG_05) *)
     M3_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M3 *)
 
     PowerKeepAlive_A           : BOOL;             (* --> [SAFE] TRUE = relais A maintenu sagement par le PLC *)
@@ -105,6 +112,7 @@ VAR_INPUT
     // (position ET vitesse figees a la butee, decision de review tracee). > 0 autorise la
     // reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non calibre.
     SimM3EndStopRecoilMax_M          : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Recul borne a la butee M3, m *)
+    SimM3EndStopMargin_M             : REAL := 0.5;    (* --> [CFG] Distance capteur extreme -> butee mecanique M3, m *)
     SimM3LoadReactionGain_Mps2       : REAL := 0.20;   (* --> [CFG][SYNTHETIQUE] Gain de reaction de charge M3, m/s2 *)
     // ACCELERATION DU BANC M3 : chariot ET frequence retournee x facteur (1..5), estimation coherente.
     // Volontairement NON cable par PRG_02 : se regle en ligne sur l'instance (instSimBench.SimM3SpeedFactor).
@@ -183,11 +191,8 @@ VAR_IN_OUT
 END_VAR
 
 VAR CONSTANT
-    // T361 — 37,5 s = 30 m / (40 Hz x 0,02 m/(Hz.s)) : l'echelle du banc est ALIGNEE sur le gain
-    // odometrique reel (GVL_PERSISTENT._TranslationGainMetersPerHzSec). C'est CETTE constante qui
-    // est effectivement passee a instSimTranslation (ligne 567) : changer le seul defaut du FB
-    // n'aurait aucun effet en simulation. Garde-fou : gate G518.
-    CST_M3FullTravelTimeS       : REAL := 37.5;  // Temps de Trémie à Maintenance à 100 %, modèle banc uniquement
+    // T301/L1 : l'ancienne echelle en dur CST_M3FullTravelTimeS (37,5 s) est SUPPRIMEE — le banc
+    // recoit positions + gain effectif de la machine (M3_Pos*_M, M3_OdometryGain). Gate G518.
     // Maximum variateur M3 : DOIT egaler GVL_PERSISTENT._TranslationMaxFreq_Hz (PRG_02 envoie f/50 x 100).
     // Constante locale (L_SIMULATION ne lit pas GVL_PERSISTENT) ; egalite verifiee par G518.
     CST_M3MaxFreq_Hz            : REAL := 50.0;
@@ -615,7 +620,13 @@ instSimTranslation(
     ReqTremie       := M3_RelayFwd,
     ReqMaintenance  := M3_RelayRev,
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
-    FullTravelTimeS := CST_M3FullTravelTimeS,
+    PosTremie_M        := M3_PosTremie_M,
+    PosPV_M            := M3_PosPV_M,
+    PosP2_M            := M3_PosP2_M,
+    PosP1_M            := M3_PosP1_M,
+    PosMaintenance_M   := M3_PosMaintenance_M,
+    GainMetersPerHzSec := M3_OdometryGain,
+    EndStopMargin_M    := SimM3EndStopMargin_M,
     MaxFreq_Hz      := CST_M3MaxFreq_Hz,
     SpeedFactor     := SimM3SpeedFactor,
     BrakeReleaseCmd := M3_BrakeCmd,
