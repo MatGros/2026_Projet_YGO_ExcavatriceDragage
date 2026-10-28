@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-20T14:14:42.155503" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-20T14:14:42.155503">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T14:42:14.233524" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T14:42:14.233524">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -96,6 +96,20 @@
               <initialValue>
                 <simpleValue value="0" />
               </initialValue>
+            </variable>
+            <variable name="PhysicalBrakeActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique : la retombee mecanique attend
+       f &lt;= 0,5 Hz (garde qui recopiait la logique PLC dans l'usine simulee). TRUE = frein a
+       manque de courant reel : retombe CloseDelay_S apres la coupure bobine, QUELLE QUE SOIT
+       la vitesse.</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -195,7 +209,7 @@ IF CoilEnergized THEN
     ELSE
         MechanicalTimer_S := 0.0;
     END_IF;
-ELSIF FaultCloseActive OR (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
+ELSIF FaultCloseActive OR PhysicalBrakeActive OR (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
     IF MechanicallyOpen THEN
         MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
         IF MechanicalTimer_S &gt;= MAX(0.0, CloseDelay_S) THEN

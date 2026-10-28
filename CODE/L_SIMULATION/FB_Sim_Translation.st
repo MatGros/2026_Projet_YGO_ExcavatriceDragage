@@ -45,6 +45,12 @@ VAR_INPUT
        State.ErrorId=64). La garde nominale 0,5 Hz du frein n'est pas modifiee. *)
     BrakeFaultCloseWhileRunning : BOOL := FALSE;
     BrakeFaultCloseDelay_S : REAL := 0.0;
+    (* L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique (frein ne retombe que sous 0,5 Hz,
+       arret instantane). TRUE = frein a manque de courant reel : retombe CloseDelay apres la
+       coupure bobine QUELLE QUE SOIT la vitesse, puis le chariot decelere sur le frein
+       (BrakeDecel_Mps2) ; frein serre = chariot bloque meme si le variateur pousse. *)
+    BrakePhysicalActive : BOOL := FALSE;
+    BrakeDecel_Mps2 : REAL := 2.0;   (* HYPOTHESE : 0,4 m/s (20 Hz) -> arret ~0,2 s / ~4 cm *)
     SuspendedLoadLength_M : REAL := 1.5;
     SuspendedLoadDamping : REAL := 0.35;
     LoadReactionGain_Mps2 : REAL := 0.20;
@@ -98,8 +104,22 @@ VAR_OUTPUT
     SensorBlipActive : BOOL;
     HardStopTremieActive : BOOL;
     HardStopMaintenanceActive : BOOL;
+    (* L2 — OBSERVATION (aucun effet sur le modele ni sur le programme) *)
+    ObsOvershootLast_M : REAL;          (* Distance roulee entre le 1er front du dernier capteur d'arret (Tremie, P1, Maintenance) et l'arret *)
+    ObsOvershootSensorId : INT;         (* 1 = Tremie, 3 = P1, 5 = Maintenance, 0 = aucun *)
+    ObsEndStopHitCount : UDINT;         (* Nombre de chocs en butee mecanique *)
+    ObsEndStopImpactSpeed_Mps : REAL;   (* Vitesse au dernier choc en butee *)
+    ObsBrakeClosedMovingCount : UDINT;  (* Nombre de fermetures mecaniques du frein chariot en mouvement *)
 END_VAR
 VAR
+    ObsArmed : BOOL;                    (* Front capteur d'arret vu, arret pas encore constate *)
+    ObsEdgePosition_M : REAL;           (* Position vraie au 1er front du capteur d'arret *)
+    ObsPrevTremie : BOOL;
+    ObsPrevP1 : BOOL;
+    ObsPrevMaintenance : BOOL;
+    ObsPrevBrakeOpen : BOOL;
+    ObsPrevHardStop : BOOL;
+    ObsSpeedBeforeStop_Mps : REAL;      (* Vitesse du scan avant le calcul de butee *)
     instCycleTime : FB_CycleTime;
     Initialized : BOOL;
     DirectionSign : REAL;
@@ -224,7 +244,8 @@ IF Enable THEN
         CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
         CycleTime_S := CycleTimeS,
         FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
-        FaultCloseDelay_S := BrakeFaultCloseDelay_S);
+        FaultCloseDelay_S := BrakeFaultCloseDelay_S,
+        PhysicalBrakeActive := BrakePhysicalActive);
     BrakeCoilEnergized := instBrake.CoilEnergized;
     BrakeMechanicallyOpen := instBrake.MechanicallyOpen;
     BrakeContactOpen := instBrake.ContactOpen;
@@ -253,10 +274,19 @@ IF Enable THEN
     ELSE
         VelocityTarget_Mps := 0.0;
     END_IF;
-    VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
-    IF NOT BrakeMechanicallyOpen THEN
-        VelocityTrue_Mps := 0.0;
+    IF BrakeMechanicallyOpen THEN
+        VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
+    ELSIF BrakePhysicalActive THEN
+        (* L3 : frein serre -> deceleration sur le frein jusqu'a l'arret, puis chariot bloque. *)
+        IF VelocityTrue_Mps > 0.0 THEN
+            VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps - MAX(0.0, BrakeDecel_Mps2) * CycleTimeS);
+        ELSE
+            VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps + MAX(0.0, BrakeDecel_Mps2) * CycleTimeS);
+        END_IF;
+    ELSE
+        VelocityTrue_Mps := 0.0;   (* historique : arret instantane *)
     END_IF;
+    ObsSpeedBeforeStop_Mps := VelocityTrue_Mps;
     HardStopTremieActive := FALSE;
     HardStopMaintenanceActive := FALSE;
     PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
@@ -383,3 +413,41 @@ SensorTransitionCount := instSensorTremie.TransitionCount + instSensorPV.Transit
 SensorBlipActive := instSensorTremie.BlipActive OR instSensorPV.BlipActive
     OR instSensorP2.BlipActive OR instSensorP1.BlipActive
     OR instSensorMaintenance.BlipActive;
+
+(* ── L2 OBSERVATION (lecture seule, aucun effet sur le modele) ───────────────────────── *)
+IF Enable THEN
+    (* Frein serre en mouvement : front de fermeture mecanique avec vitesse non nulle. *)
+    IF ObsPrevBrakeOpen AND NOT BrakeMechanicallyOpen AND (ABS(PreviousVelocity_Mps) > 0.03) THEN
+        ObsBrakeClosedMovingCount := ObsBrakeClosedMovingCount + 1;
+    END_IF;
+    ObsPrevBrakeOpen := BrakeMechanicallyOpen;
+
+    (* Choc en butee : front de HardStop, vitesse avant contact. *)
+    IF (HardStopTremieActive OR HardStopMaintenanceActive) AND NOT ObsPrevHardStop THEN
+        ObsEndStopHitCount := ObsEndStopHitCount + 1;
+        ObsEndStopImpactSpeed_Mps := ABS(ObsSpeedBeforeStop_Mps);
+    END_IF;
+    ObsPrevHardStop := HardStopTremieActive OR HardStopMaintenanceActive;
+
+    (* Depassement : 1er front d'un capteur d'arret (Tremie montant, P1 dans les deux sens,
+       Maintenance descendant) -> position memorisee ; les rebonds du MEME capteur sont ignores
+       tant que l'arret n'est pas constate ; un autre capteur franchi remplace le repere. *)
+    (* Armement seulement chariot en mouvement : un rebond capteur a l'arret n'ecrase pas la mesure. *)
+    IF ABS(VelocityTrue_Mps) <= 0.005 THEN
+        ObsArmed := ObsArmed;   (* chariot a l'arret : aucun armement *)
+    ELSIF (PosTremie AND NOT ObsPrevTremie) AND NOT (ObsArmed AND ObsOvershootSensorId = 1) THEN
+        ObsArmed := TRUE; ObsOvershootSensorId := 1; ObsEdgePosition_M := PositionTrue_M;
+    ELSIF (PosP1 <> ObsPrevP1) AND NOT (ObsArmed AND ObsOvershootSensorId = 3) THEN
+        ObsArmed := TRUE; ObsOvershootSensorId := 3; ObsEdgePosition_M := PositionTrue_M;
+    ELSIF (ObsPrevMaintenance AND NOT PosMaintenance) AND NOT (ObsArmed AND ObsOvershootSensorId = 5) THEN
+        ObsArmed := TRUE; ObsOvershootSensorId := 5; ObsEdgePosition_M := PositionTrue_M;
+    END_IF;
+    ObsPrevTremie := PosTremie;
+    ObsPrevP1 := PosP1;
+    ObsPrevMaintenance := PosMaintenance;
+
+    IF ObsArmed AND (ABS(VelocityTrue_Mps) < 0.001) THEN
+        ObsOvershootLast_M := ABS(PositionTrue_M - ObsEdgePosition_M);
+        ObsArmed := FALSE;
+    END_IF;
+END_IF;

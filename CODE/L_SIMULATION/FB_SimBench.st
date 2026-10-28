@@ -61,6 +61,7 @@ VAR_INPUT
     M3_PosP1_M                 : REAL := 5.0;   (* --> [CFG] Position capteur P1 (GVL_PERSISTENT) *)
     M3_PosMaintenance_M        : REAL := 10.0;  (* --> [CFG] Position capteur Maintenance (GVL_PERSISTENT) *)
     M3_OdometryGain            : REAL := 0.02;  (* --> [CFG] Gain effectif de l'estimateur machine, m/(Hz.s) (PRG_05) *)
+    M3_EstimatedPos_M          : REAL;          (* --> [DIAG] Position calculee par le programme (PRG_05), pour l'ecart observe *)
     M3_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M3 *)
 
     PowerKeepAlive_A           : BOOL;             (* --> [SAFE] TRUE = relais A maintenu sagement par le PLC *)
@@ -108,6 +109,8 @@ VAR_INPUT
     // alors que le variateur retourne encore 10,00 Hz » (trace 2026-09-04, 26,437 s, ErrorId=64).
     SimM3BrakeFaultCloseWhileRunning : BOOL := FALSE;  (* --> [TST] TRUE = force la fermeture frein M3 hors vitesse nulle *)
     SimM3BrakeFaultCloseDelayS       : REAL := 0.0;    (* --> [CFG] Delai avant application de la faute frein M3, s *)
+    SimM3BrakePhysicalActive         : BOOL := TRUE;   (* --> [CFG] L3 : frein M3 a manque de courant reel (FALSE = historique) *)
+    SimM3BrakeDecel_Mps2             : REAL := 2.0;    (* --> [CFG][HYPOTHESE] Deceleration chariot frein serre, m/s2 *)
     // BUTEE MECANIQUE M3 — recul borne apres arret serre (C5). 0.0 = comportement historique
     // (position ET vitesse figees a la butee, decision de review tracee). > 0 autorise la
     // reaction de charge a ressortir le chariot de la zone capteur. SYNTHETIQUE, non calibre.
@@ -180,6 +183,14 @@ VAR_OUTPUT
     M3BrakeFaultCloseActive    : BOOL;   (* <-- [DIAG] Faute frein M3 effectivement appliquee ce scan *)
     // Blip court capteurs M3 -- diagnostic seul : observable sur trace pendant un episode court.
     M3SensorBlipActive         : BOOL;   (* <-- [DIAG] Un capteur M3 publie une excursion courte *)
+    (* L2 — observation M3 (lecture seule, aucun effet sur le pilotage) *)
+    M3ObsPositionTrue_M        : REAL;   (* <-- [DIAG] Position vraie du chariot simule (m) *)
+    M3ObsPositionError_M       : REAL;   (* <-- [DIAG] Position vraie - position calculee par le programme (m) *)
+    M3ObsOvershootLast_M       : REAL;   (* <-- [DIAG] Distance roulee apres le 1er front du dernier capteur d'arret (m) *)
+    M3ObsOvershootSensorId     : INT;    (* <-- [DIAG] 1 = Tremie, 3 = P1, 5 = Maintenance *)
+    M3ObsEndStopHitCount       : UDINT;  (* <-- [DIAG] Chocs en butee mecanique *)
+    M3ObsEndStopImpactSpeed_Mps : REAL;  (* <-- [DIAG] Vitesse au dernier choc en butee (m/s) *)
+    M3ObsBrakeClosedMovingCount : UDINT; (* <-- [DIAG] Fermetures du frein chariot en mouvement *)
 END_VAR
 
 VAR_IN_OUT
@@ -642,10 +653,19 @@ instSimTranslation(
     BrakeFaultCloseWhileRunning := SimM3BrakeFaultCloseWhileRunning,
     BrakeFaultCloseDelay_S := SimM3BrakeFaultCloseDelayS,
     EndStopRecoilMax_M := SimM3EndStopRecoilMax_M,
-    LoadReactionGain_Mps2 := SimM3LoadReactionGain_Mps2
+    LoadReactionGain_Mps2 := SimM3LoadReactionGain_Mps2,
+    BrakePhysicalActive := SimM3BrakePhysicalActive,
+    BrakeDecel_Mps2 := SimM3BrakeDecel_Mps2
 );
 M3BrakeFaultCloseActive := instSimTranslation.BrakeFaultCloseActive;
 M3SensorBlipActive := instSimTranslation.SensorBlipActive;
+M3ObsPositionTrue_M := instSimTranslation.PositionTrue_M;
+M3ObsPositionError_M := instSimTranslation.PositionTrue_M - M3_EstimatedPos_M;
+M3ObsOvershootLast_M := instSimTranslation.ObsOvershootLast_M;
+M3ObsOvershootSensorId := instSimTranslation.ObsOvershootSensorId;
+M3ObsEndStopHitCount := instSimTranslation.ObsEndStopHitCount;
+M3ObsEndStopImpactSpeed_Mps := instSimTranslation.ObsEndStopImpactSpeed_Mps;
+M3ObsBrakeClosedMovingCount := instSimTranslation.ObsBrakeClosedMovingCount;
 
 // Remplissage capteurs de position M3 : l'override manuel conserve exactement le
 // même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).

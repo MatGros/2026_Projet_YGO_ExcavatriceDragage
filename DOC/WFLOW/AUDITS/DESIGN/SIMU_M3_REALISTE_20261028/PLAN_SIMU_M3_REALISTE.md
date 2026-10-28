@@ -89,6 +89,11 @@
 - `guard:` : gate « aucun POU hors `L_SIMULATION`/PRG_02 ne lit `GVL_Simulation` ni `instSimBench` ».
 - Chaque lot : bundle + diff bundle + G200 PASS avant restitution.
 
+## 6bis. ⏸️ Reporté (constaté en essai 2026-10-28)
+
+- 🪝 **Roulis treuils simulé** : `SimWinchCoast_M` = 1,30 m (réglé pour la benne, T419) appliqué aussi à M1 (`FB_SimBench.st:343`) → M1 dépasse la limite haute de 1,3 m (7,5 → 8,8 m). Cible : roulis par axe et par sens, réaliste (M1 montée ≈ 0,5 m, descente ≈ 1 m, à caler sur traces). Retrouver l'origine dans git.
+- ✅ Essai auto L0+L1 : position réelle simu 5,297 m quand la position calculée affiche 5,0 → le dépassement auto (~0,3 m) est invisible côté programme (calculateur figé au retrait de la demande).
+
 ## 7. 🚫 Écarté
 
 Modelica/TwinBench (gelé) · modèle électrique AC600 · élasticité câbles · rebond élastique butée · bruit aléatoire scan par scan · toute modif `FB_Translation` / `PRG_05` / `PRG_06`.

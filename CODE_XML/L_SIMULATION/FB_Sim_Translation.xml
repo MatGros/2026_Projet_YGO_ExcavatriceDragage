@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T13:59:45.556362" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T13:59:45.556362">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T14:46:20.468717" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T14:46:20.468717">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -240,6 +240,31 @@
               <initialValue>
                 <simpleValue value="0" />
               </initialValue>
+            </variable>
+            <variable name="BrakePhysicalActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique (frein ne retombe que sous 0,5 Hz,
+       arret instantane). TRUE = frein a manque de courant reel : retombe CloseDelay apres la
+       coupure bobine QUELLE QUE SOIT la vitesse, puis le chariot decelere sur le frein
+       (BrakeDecel_Mps2) ; frein serre = chariot bloque meme si le variateur pousse.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeDecel_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">HYPOTHESE : 0,4 m/s (20 Hz) -&gt; arret ~0,2 s / ~4 cm</xhtml>
+              </documentation>
             </variable>
             <variable name="SuspendedLoadLength_M">
               <type>
@@ -483,8 +508,98 @@
                 <BOOL />
               </type>
             </variable>
+            <variable name="ObsOvershootLast_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L2 — OBSERVATION (aucun effet sur le modele ni sur le programme)
+Distance roulee entre le 1er front du dernier capteur d'arret (Tremie, P1, Maintenance) et l'arret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ObsOvershootSensorId">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Tremie, 3 = P1, 5 = Maintenance, 0 = aucun</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ObsEndStopHitCount">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de chocs en butee mecanique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ObsEndStopImpactSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse au dernier choc en butee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ObsBrakeClosedMovingCount">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de fermetures mecaniques du frein chariot en mouvement</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
+            <variable name="ObsArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front capteur d'arret vu, arret pas encore constate</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ObsEdgePosition_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position vraie au 1er front du capteur d'arret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ObsPrevTremie">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ObsPrevP1">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ObsPrevMaintenance">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ObsPrevBrakeOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ObsPrevHardStop">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ObsSpeedBeforeStop_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse du scan avant le calcul de butee</xhtml>
+              </documentation>
+            </variable>
             <variable name="instCycleTime">
               <type>
                 <derived name="FB_CycleTime" />
@@ -745,7 +860,8 @@ IF Enable THEN
         CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
         CycleTime_S := CycleTimeS,
         FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
-        FaultCloseDelay_S := BrakeFaultCloseDelay_S);
+        FaultCloseDelay_S := BrakeFaultCloseDelay_S,
+        PhysicalBrakeActive := BrakePhysicalActive);
     BrakeCoilEnergized := instBrake.CoilEnergized;
     BrakeMechanicallyOpen := instBrake.MechanicallyOpen;
     BrakeContactOpen := instBrake.ContactOpen;
@@ -774,10 +890,19 @@ IF Enable THEN
     ELSE
         VelocityTarget_Mps := 0.0;
     END_IF;
-    VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
-    IF NOT BrakeMechanicallyOpen THEN
-        VelocityTrue_Mps := 0.0;
+    IF BrakeMechanicallyOpen THEN
+        VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
+    ELSIF BrakePhysicalActive THEN
+        (* L3 : frein serre -&gt; deceleration sur le frein jusqu'a l'arret, puis chariot bloque. *)
+        IF VelocityTrue_Mps &gt; 0.0 THEN
+            VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps - MAX(0.0, BrakeDecel_Mps2) * CycleTimeS);
+        ELSE
+            VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps + MAX(0.0, BrakeDecel_Mps2) * CycleTimeS);
+        END_IF;
+    ELSE
+        VelocityTrue_Mps := 0.0;   (* historique : arret instantane *)
     END_IF;
+    ObsSpeedBeforeStop_Mps := VelocityTrue_Mps;
     HardStopTremieActive := FALSE;
     HardStopMaintenanceActive := FALSE;
     PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
@@ -904,6 +1029,44 @@ SensorTransitionCount := instSensorTremie.TransitionCount + instSensorPV.Transit
 SensorBlipActive := instSensorTremie.BlipActive OR instSensorPV.BlipActive
     OR instSensorP2.BlipActive OR instSensorP1.BlipActive
     OR instSensorMaintenance.BlipActive;
+
+(* ── L2 OBSERVATION (lecture seule, aucun effet sur le modele) ───────────────────────── *)
+IF Enable THEN
+    (* Frein serre en mouvement : front de fermeture mecanique avec vitesse non nulle. *)
+    IF ObsPrevBrakeOpen AND NOT BrakeMechanicallyOpen AND (ABS(PreviousVelocity_Mps) &gt; 0.03) THEN
+        ObsBrakeClosedMovingCount := ObsBrakeClosedMovingCount + 1;
+    END_IF;
+    ObsPrevBrakeOpen := BrakeMechanicallyOpen;
+
+    (* Choc en butee : front de HardStop, vitesse avant contact. *)
+    IF (HardStopTremieActive OR HardStopMaintenanceActive) AND NOT ObsPrevHardStop THEN
+        ObsEndStopHitCount := ObsEndStopHitCount + 1;
+        ObsEndStopImpactSpeed_Mps := ABS(ObsSpeedBeforeStop_Mps);
+    END_IF;
+    ObsPrevHardStop := HardStopTremieActive OR HardStopMaintenanceActive;
+
+    (* Depassement : 1er front d'un capteur d'arret (Tremie montant, P1 dans les deux sens,
+       Maintenance descendant) -&gt; position memorisee ; les rebonds du MEME capteur sont ignores
+       tant que l'arret n'est pas constate ; un autre capteur franchi remplace le repere. *)
+    (* Armement seulement chariot en mouvement : un rebond capteur a l'arret n'ecrase pas la mesure. *)
+    IF ABS(VelocityTrue_Mps) &lt;= 0.005 THEN
+        ObsArmed := ObsArmed;   (* chariot a l'arret : aucun armement *)
+    ELSIF (PosTremie AND NOT ObsPrevTremie) AND NOT (ObsArmed AND ObsOvershootSensorId = 1) THEN
+        ObsArmed := TRUE; ObsOvershootSensorId := 1; ObsEdgePosition_M := PositionTrue_M;
+    ELSIF (PosP1 &lt;&gt; ObsPrevP1) AND NOT (ObsArmed AND ObsOvershootSensorId = 3) THEN
+        ObsArmed := TRUE; ObsOvershootSensorId := 3; ObsEdgePosition_M := PositionTrue_M;
+    ELSIF (ObsPrevMaintenance AND NOT PosMaintenance) AND NOT (ObsArmed AND ObsOvershootSensorId = 5) THEN
+        ObsArmed := TRUE; ObsOvershootSensorId := 5; ObsEdgePosition_M := PositionTrue_M;
+    END_IF;
+    ObsPrevTremie := PosTremie;
+    ObsPrevP1 := PosP1;
+    ObsPrevMaintenance := PosMaintenance;
+
+    IF ObsArmed AND (ABS(VelocityTrue_Mps) &lt; 0.001) THEN
+        ObsOvershootLast_M := ABS(PositionTrue_M - ObsEdgePosition_M);
+        ObsArmed := FALSE;
+    END_IF;
+END_IF;
 </xhtml>
           </ST>
         </body>
@@ -1652,6 +1815,20 @@ Ready := TRUE;
                 <simpleValue value="0" />
               </initialValue>
             </variable>
+            <variable name="PhysicalBrakeActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique : la retombee mecanique attend
+       f &lt;= 0,5 Hz (garde qui recopiait la logique PLC dans l'usine simulee). TRUE = frein a
+       manque de courant reel : retombe CloseDelay_S apres la coupure bobine, QUELLE QUE SOIT
+       la vitesse.</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -1750,7 +1927,7 @@ IF CoilEnergized THEN
     ELSE
         MechanicalTimer_S := 0.0;
     END_IF;
-ELSIF FaultCloseActive OR (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
+ELSIF FaultCloseActive OR PhysicalBrakeActive OR (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
     IF MechanicallyOpen THEN
         MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
         IF MechanicalTimer_S &gt;= MAX(0.0, CloseDelay_S) THEN
