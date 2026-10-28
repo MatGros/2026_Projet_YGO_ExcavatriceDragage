@@ -1,49 +1,80 @@
+# Contrat T301 — V2 (2026-10-28) : calculateur de position M3, réglage site simple (= lot L0 du chantier simu M3)
+# V1 (2026-09-15, jamais exécutée) : procédure documentaire seule. V2 : coefficient calculé par le programme.
+# Plan : DOC/WFLOW/AUDITS/DESIGN/SIMU_M3_REALISTE_20261028/PLAN_SIMU_M3_REALISTE.md
 contract:
   task_id: T301
-  criticality: C1
+  criticality: C2
   strategy: patch
   objective: >
-    Fournir la procédure d'étalonnage terrain du gain odométrique de translation
-    GainMetersPerHzSec (ratio Hz vers m/s) et de mesure des positions réelles des
-    5 capteurs physiques, en documentant les conventions d'axe (zéro à la Trémie).
+    Sur site, l'exploitant règle le calculateur de position M3 avec uniquement des valeurs
+    mesurables : les 5 positions des capteurs (Trémie = 0) et le temps chronométré (trace ou
+    chrono) entre P2 et PV à fréquence stable. Le programme en déduit seul le coefficient
+    m/(Hz·s) = |PosP2 - PosPV| / (CalibFreq × CalibTime). Valeurs par défaut réalistes
+    (0 / 1,5 / 3,5 / 5 / 10 m, 50 Hz, 2,0 s ⇒ 0,02 = valeur actuelle).
   acceptance:
     - id: AC1
-      statement: "La documentation explicite le point de référence zéro (0.0 m = Trémie) et les sens physiques (+1 vers Trémie, -1 vers Maintenance)."
-      verified_by: "Revue de la documentation et du contrat de tâche."
+      statement: "Le gain consommé par FB_Translation_PositionEstimator vaut |_TranslationPosP2_M - _TranslationPosPV_M| / (_TranslationCalibFreq_Hz × _TranslationCalibTime_S)."
+      verified_by: "Test CI dédié (PRG_05 ou fonction de calcul) : 2 m, 50 Hz, 2 s → 0,02 ; 2 m, 50 Hz, 2,86 s → 0,014 (±1e-4)."
     - id: AC2
-      statement: "La formule de calcul du nouveau ratio odométrique GainMetersPerHzSec = (Delta_L / Temps) / Freq est formalisée avec un exemple chiffré à 50 Hz."
-      verified_by: "Revue de la procédure d'étalonnage."
+      statement: "Fréquence, temps ou distance ≤ 0 : le gain retombe sur _TranslationGainMetersPerHzSec (repli) et un témoin booléen de réglage invalide est vrai ; jamais de division par zéro."
+      verified_by: "Test CI : 3 cas invalides (Freq=0, Time=0, PV=P2) → gain = repli, témoin TRUE ; cas valide → témoin FALSE."
     - id: AC3
-      statement: "La mise à jour des cotes réelles des 5 capteurs et du gain dans GVL_PERSISTENT est prête à accueillir les mesures terrain sans altérer le fonctionnement du bloc FB_Translation_PositionEstimator."
-      verified_by: "Inspection de GVL_PERSISTENT.st et tests de régression."
+      statement: "Valeurs par défaut GVL_PERSISTENT : Trémie 0, PV 1,5, P2 3,5, P1 5, Maintenance 10, CalibFreq 50, CalibTime 2,0 ; gain résultant = 0,02 (inchangé)."
+      verified_by: "Lecture de GVL_PERSISTENT.st + test AC1 avec les défauts."
     - id: AC4
-      statement: "Bundle PLCopenXML, rapport de liaison G200 et gates applicables sont PASS."
-      verified_by: "Exécution de G200_check_linkage.py et run_all_gates.py."
+      statement: "Les 2 nouvelles persistantes sont ajoutées EN FIN de VAR_GLOBAL PERSISTENT RETAIN (après _RunningHoursM3_S) ; aucune variable existante supprimée, renommée, retypée ni déplacée."
+      verified_by: "git diff de GVL_PERSISTENT.st : seuls 5 littéraux de défaut changés + 2 lignes ajoutées en fin."
+    - id: AC5
+      statement: "Logique de translation, recalage 5 capteurs, persistance de la position estimée et interface de FB_Translation_PositionEstimator inchangés."
+      verified_by: "git diff : FB_Translation_PositionEstimator.st, FB_Translation*.st, PRG_06 intouchés ; CI FB_Translation_PositionEstimator 100 % PASS."
+    - id: AC6
+      statement: "Le gain calculé et le témoin sont lisibles en ligne (variables nommées de PRG_05), sans IHM obligatoire."
+      verified_by: "Déclarations PRG_05 + mention dans la procédure."
+    - id: AC7
+      statement: "Procédure site mise à jour : quoi mesurer, sur quel signal (DI brut M3_PosP2_DI → M3_PosPV_DI, 1er front), trajet P1→Trémie à 50 Hz atteints avant P2, où saisir."
+      verified_by: "Relecture DOC/WFLOW/CONTRACTS/PROCEDURE_CALIBRATION_ODOMETRIE_M3_T301.md."
+    - id: AC8
+      statement: "Garde-fou : gate (G518 étendu ou nouveau) qui échoue si le gain de l'estimateur n'est plus calculé depuis ces seules persistantes, ou si une seconde source de positions/gain apparaît hors GVL_PERSISTENT."
+      verified_by: "--selftest du gate : mutations refusées, 0 faux positif."
+    - id: AC10
+      statement: "Structure : nom de fichier identique au nom de POU ; suffixe identique au langage du bundle. PRG_05_Translation reste un PROGRAM ST, aucun POU créé ni renommé."
+      verified_by: "Bundle : POU PRG_05_Translation présent en ST ; aucun POU créé ni renommé."
+    - id: AC9
+      statement: "Bundle complet + diff bundle frais, G200 PASS 0 erreur, palier C sans nouvel échec."
+      verified_by: "generate_codesys_bundle.py, generate_codesys_diff_bundle.py, G200_check_linkage.py --report, run_all_gates.py --palier C."
   scope:
     allowed:
       - CODE/GVL_PERSISTENT.st
-      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/scripts/G518_check_m3_odometry_scale.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - DOC/WFLOW/CONTRACTS/PROCEDURE_CALIBRATION_ODOMETRIE_M3_T301.md
       - DOC/WFLOW/
       - CODE_XML/
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
-      - Modification des seuils de sécurité ou des rampes du variateur M3.
+      - CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - "Rampes, seuils de sécurité, frein, logique de recalage"
+      - "CODE/L_SIMULATION/* (lot L1, livré dans la MÊME campagne d'essai)"
   conservation:
     must_survive:
-      - "Le recalage automatique de position sur front montant de chaque capteur physique reste prioritaire."
-      - "La persistance RETAIN de la position estimée au reboot est préservée."
-    dropped_on_purpose: []
+      - "Recalage inconditionnel sur les 5 capteurs (décisions T333 Q2 / T361)."
+      - "Persistance RETAIN de la position estimée au reboot."
+      - "Mapping RETAIN positionnel du bloc persistant (compteurs horaires, totalisateur)."
+    dropped_on_purpose:
+      - "_TranslationGainMetersPerHzSec n'est plus la source du gain : conservé comme repli."
   evidence_required:
     - check_linkage
     - run_all_gates
     - bundle
-    - "Fiche de procédure d'étalonnage avec relevé des cotes réelles."
-  models_allowed:
-    - "omni/cc/claude-sonnet-5"
-    - "omni/cx/gpt-5.6-terra"
+    - "git diff GVL_PERSISTENT.st montrant l'ajout en fin seulement"
   alert_duty: >
-    Rappeler que l'odométrie par fréquence reste une estimation sujette au glissement
-    mécanique des galets, et que seuls les capteurs physiques font foi.
+    ⚠️ L0 SEUL REND LA SIMU INCOHÉRENTE : la simu garde ses positions 0/5/15/20/30 en dur
+    tant que L1 n'est pas livré ⇒ sauts de recalage en simu. L0 et L1 sont livrés et testés
+    dans la MÊME campagne. Toute autre anomalie remontée immédiatement.
 status: PENDING
 execution:
   executed_by: ""
