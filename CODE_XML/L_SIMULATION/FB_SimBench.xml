@@ -4893,13 +4893,14 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique (frein ne retombe que sous 0,5 Hz,
        arret instantane). TRUE = frein a manque de courant reel : retombe CloseDelay apres la
        coupure bobine QUELLE QUE SOIT la vitesse, puis le chariot decelere sur le frein
-       (BrakeDecel_Mps2) ; frein serre = chariot bloque meme si le variateur pousse.</xhtml>
+       (BrakeDecel_Mps2) ; frein serre = chariot bloque meme si le variateur pousse.
+defaut FB = historique ; GVL_Simulation.SimM3BrakePhysicalActive = TRUE (source unique)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeDecel_Mps2">
@@ -7155,13 +7156,14 @@ Ready := TRUE;
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique : la retombee mecanique attend
        f &lt;= 0,5 Hz (garde qui recopiait la logique PLC dans l'usine simulee). TRUE = frein a
        manque de courant reel : retombe CloseDelay_S apres la coupure bobine, QUELLE QUE SOIT
-       la vitesse.</xhtml>
+       la vitesse.
+defaut FB = historique ; la simulation M3 passe TRUE via GVL_Simulation (source unique)</xhtml>
               </documentation>
             </variable>
           </inputVars>
