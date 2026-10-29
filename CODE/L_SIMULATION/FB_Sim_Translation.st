@@ -49,7 +49,7 @@ VAR_INPUT
        arret instantane). TRUE = frein a manque de courant reel : retombe CloseDelay apres la
        coupure bobine QUELLE QUE SOIT la vitesse, puis le chariot decelere sur le frein
        (BrakeDecel_Mps2) ; frein serre = chariot bloque meme si le variateur pousse. *)
-    BrakePhysicalActive : BOOL := TRUE;
+    BrakePhysicalActive : BOOL := FALSE; (* defaut FB = historique ; GVL_Simulation.SimM3BrakePhysicalActive = TRUE (source unique) *)
     BrakeDecel_Mps2 : REAL := 2.0;   (* HYPOTHESE : 0,4 m/s (20 Hz) -> arret ~0,2 s / ~4 cm *)
     (* L4 — CHARIOT LIBRE (2026-10-28). FALSE = historique (chariot esclave de la frequence).
        TRUE = quand le frein est OUVERT et que le variateur n'applique plus de couple (mot a 0
