@@ -132,3 +132,18 @@ Hypothèses de la réplique : pas de balancier (angle=0), pas de came/jitter cap
 - 2026-10-29 : A/B (DeepSeek v4.1 + GLM 5.3, extraits de code fournis, pas d'accès fichiers) : A1 (coupure dure inopérante au scan capteur) VALIDÉE pour le run mesuré, le « jamais » est une extrapolation ; A2 (veto à la sortie AX14) VALIDÉE sous SEMI_AUTO ; A3 (frein ouvert pendant décélération) clause validée, conséquence NON VÉRIFIABLE ; A4 (variateur coupé par la permission) chronologie prouvée, causalité NON VÉRIFIABLE.
 - 2026-10-29 : **Trois sources candidates du délai de 0,95 s, non départageables avec la trace actuelle** : (A) veto de sortie AX14 ; (B) `FB_Brake` : `BrakeCmd` ne retombe qu'après `DelayMotorDecel` = 2 s (`ST_fbTranslation_Cfg.st:34`) depuis la fin de `MovementRequested`, lui-même lié à la rampe `SpeedRamp` et à `DriveActualFreqHz` > 0,5 Hz ; (C) coupure dure neutralisée (voir A1). Pour trancher : ajouter à la trace `PRG_05...Data.TranslationFinalInterlockRequest` côté Auth.Mode et les signaux de rampe/mouvement exposés, ou faire une run non forcée.
 - 2026-10-29 : Trou de test G518 : `TC-T301-SRC-001/002` absents ; le fichier `test_fb_sim_translation.st` ne compile pas (`FullTravelTimeS` utilisé 8 fois, supprimé du FB au refactoring T301). Réécriture des 19 tests non faite : elle change les attendus, à valider avant.
+
+## 11. 📦 Livrable partiel (état au 2026-10-29, objectif /goal non atteint)
+
+**Fait, vérifié :**
+- Checkpoint `8669c6dd`, correction des défauts FB `0990a225`, bundle régénéré `be51ce13` (G200 PASS, 0 erreur ; G390 PASS), journal `102b1676`.
+- Gates palier C : 8 échecs sur 61, tous présents sur la base `746e3a0f`. Aucun nouvel échec.
+- Suite L_SIMULATION : 6 PASS / 6 FAIL, identique à la base.
+
+**Non fait, bloquant :**
+- Délai de frein ~0,95 s : non tranché. Trois causes candidates (veto sortie AX14, `FB_Brake` DelayMotorDecel 2 s, coupure dure neutralisée). Il faut une run non forcée.
+- Import CODESYS et test banc : non effectués.
+- G518 : `TC-T301-SRC-001/002` absents ; `test_fb_sim_translation.st` ne compile pas (`FullTravelTimeS`, 8 usages). Réécriture non validée.
+- Tests A/B : faits sur extraits de code fournis uniquement (runner Ollama texte seul).
+
+**Hypothèses, non vérifiées :** les trois causes du délai ; la coupure « instantanée » observée par l'exploitant (non reproduite dans le code de référence `e38cc09a`).
