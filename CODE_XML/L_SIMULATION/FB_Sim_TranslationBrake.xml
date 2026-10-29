@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T14:42:14.233524" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T14:42:14.233524">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-29T13:52:35.909444" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-29T13:52:35.909444">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -102,7 +102,7 @@
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="FALSE" />
+                <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique : la retombee mecanique attend

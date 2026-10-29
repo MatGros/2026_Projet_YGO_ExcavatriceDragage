@@ -749,7 +749,7 @@ IF instSimTranslation.ActualFrequency_Hz > 0.5 THEN
 ELSE
     M3_StatusWordSim := 16#0080; // Comm Ready seul -- Bit0 retombé, arrêt confirmé
 END_IF;
-M3_ActualFreqHz := REAL_TO_UINT(instSimTranslation.ActualFrequency_Hz * 100.0);
+M3_ActualFreqHz := REAL_TO_UINT(LIMIT(0.0, instSimTranslation.ActualFrequency_Hz, CST_M3MaxFreq_Hz) * 100.0);
 
 Translation.M3_StatusWord        := M3_StatusWordSim;
 Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;

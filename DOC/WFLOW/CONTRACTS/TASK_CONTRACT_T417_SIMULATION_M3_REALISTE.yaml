@@ -1,0 +1,105 @@
+contract:
+  task_id: T417
+  criticality: C2
+  strategy: patch
+  objective: 'Fournir une etude et un modele fonctionnel realiste de la translation
+    M3 dans SimBench, reproduisant la chaine complete : commande automate -> dynamique
+    variateur AC600 -> glissement inertiel et frein mecanique -> cames et capteurs
+    inductifs, sans forcer artificiellement les defauts et sans modifier la logique
+    de production.
+
+    '
+  acceptance:
+  - id: AC1
+    statement: Le modele de dynamique M3 integre la rampe d acceleration (40%/s =
+      20 Hz/s), deceleration normale (50%/s = 25 Hz/s) et SafeStop (100%/s = 50 Hz/s)
+      conformement a la trace terrain reelle du 2026-09-04.
+    verified_by: Verification statique et comparaison trace simulee vs Suivi_TranslationM3bug_20260904_27_wide.csv.
+  - id: AC2
+    statement: Le comportement du frein mecanique respecte les retards de bobine (200
+      ms ouverture), le retour auxiliaire de contact (BrakeContactOpen) et la retombee
+      a manque de courant a la coupure de commande avec glissement fini (deceleration
+      d arret ~2 m/s2).
+    verified_by: Chronogramme verifie dans FB_Sim_TranslationBrake et correlation
+      avec FICHE_T400.
+  - id: AC3
+    statement: La detection de position est modelisee par cames inductives franchissables
+      avec hysteresis (0.02 m), mot binaire conforme (11111 a Tremie -> 00000 a Maintenance)
+      sans collage artificiel en butee.
+    verified_by: Inspection de FB_Sim_PositionSensor et validation des transitions
+      sur les 5 seuils.
+  - id: AC4
+    statement: 'Le retour du StatusWord AC600 au PLC est fidele a l etat de marche
+      : Bit 0 (Ready/Operating) actif en mouvement et retombe a l arret sans declencher
+      de faux defaut Meca B (TonMecaB 3s) en stationnaire.'
+    verified_by: Inspection du cablage FB_SimBench et respect du gate G200.
+  - id: AC5
+    statement: 'Zero regression sur le code automate de production : PRG_01 a PRG_07,
+      blocs de securite FB_Safety_* et sequenceurs de cycle restent strictement inchanges.'
+    verified_by: G200_check_linkage.py --report PASS (0 erreur) et git diff limite
+      a CODE/L_SIMULATION/.
+  - id: AC6
+    statement: GVL_PERSISTENT est strictement sanctuarise (zero ajout, zero suppression,
+      zero modification d adresse ou d ordre de variable).
+    verified_by: git diff CODE/GVL_PERSISTENT.st vide.
+  scope:
+    allowed:
+    - CODE/L_SIMULATION/FB_Sim_Translation.st
+    - CODE/L_SIMULATION/FB_Sim_TranslationDrive.st
+    - CODE/L_SIMULATION/FB_Sim_TranslationBrake.st
+    - CODE/L_SIMULATION/FB_Sim_PositionSensor.st
+    - CODE/L_SIMULATION/FB_SimBench.st
+    - CODE/L_SIMULATION/GVL_Simulation.st
+    - DOC/WFLOW/ETUDES/ETUDE_CONCEPTION_T417_SIMULATION_TRANSLATION_M3.md
+    - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417_SIMULATION_M3_REALISTE.yaml
+    forbidden:
+    - CODE/GVL_PERSISTENT.st
+    - CODE/M_MAIN/PRG_01_Diag.st
+    - CODE/M_MAIN/PRG_02_Acquisition.st
+    - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+    - CODE/M_MAIN/PRG_04_Cycles.st
+    - CODE/M_MAIN/PRG_05_Translation.st
+    - CODE/M_MAIN/PRG_06_Outputs.st
+    - CODE/M_MAIN/PRG_07_Supervision.st
+    - CODE/I_TRANSLATION/
+    - CODE/C_SAFETY/
+    - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+    - Gain odometrique effectif 0.02 m/(Hz.s) pour M3
+    - Maintien de l override manuel SimM3SensorsWordOverrideActive dans SimBench
+    - Sanctuarisation memoire NVRAM CODESYS (GVL_PERSISTENT)
+    dropped_on_purpose:
+    - Arret instantane sans dynamique physique sur perte de commande M3
+  evidence_required:
+  - check_linkage
+  - run_all_gates
+  - bundle
+  models_allowed:
+  - deepseek-v4.1-flash:cloud
+  - glm-5.3-flash:cloud
+  - antigravity
+  alert_duty: 'Tout ecart entre le comportement simule et les traces de terrain du
+    2026-09-04 ou les fiches TROUBLESHOOTING M3 doit etre explicite et trace dans
+    l etude.
+
+    '
+status: COMPLETED
+execution:
+  executed_by: AGY01 (orchestrateur) + subagents Ollama (deepseek-v4.1-flash:cloud,
+    glm-5.3-flash:cloud)
+  completed_at: '2026-10-29T14:53:00+01:00'
+  status: COMPLETED
+  summary: Etude M3 consolidee (course 10m, 50 Hz, frein physique reel, REX T392 documente).
+    Code ST SimBench ajuste (PhysicalBrakeActive=TRUE, clamp frequence). Bundles complet
+    et diff exportes frais. G200 Liaison PASS.
+  evidence_submitted:
+  - DOC/WFLOW/ETUDES/ETUDE_CONCEPTION_T417_SIMULATION_TRANSLATION_M3.md
+  - CODE_XML/CODE_Bundle.xml
+  - CODE_XML/CODE_DiffBundle.xml
+  - 'G200_check_linkage: PASS (0 erreur)'
+validation:
+  validated_by: —
+  validated_at: —
+  verdict: PENDING
+  notes: En attente de finalisation du dossier d etude et du plan technique.

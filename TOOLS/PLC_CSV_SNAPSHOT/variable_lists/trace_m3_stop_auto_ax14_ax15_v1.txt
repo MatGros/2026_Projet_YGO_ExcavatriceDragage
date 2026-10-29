@@ -1,0 +1,45 @@
+# T417 — Arrêt M3 en Auto (Trémie / P1) et transition AX14 -> AX15 : trace v1.
+# 30 voies publiques, toutes lues dans le code PLC (aucun ajout GVL_Troubleshooting requis).
+# Aucune commande, aucun bypass : observation seulement.
+# Base : trace_m3_cycle_auto_expert_v2_30v.txt, +ErrorId +BrakeFeedback, -AxisY.AtNeutral -ActiveMaintenance.
+# Hors liste (non publié dans GVL_Troubleshooting, à valider avant ajout) : SimM3Obs*, M3_CycleTranslationStepAuthorized.
+
+# Cycle : étape, ordre opérateur et demande publiée
+PRG_03_Modes_Cycle.Data.SequenceState.Step
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.ReqStart
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt
+PRG_02_Acquisition.Data.Joystick.DeadmanArmed
+PRG_02_Acquisition.Data.Joystick.AxisX.DirectionPositive
+PRG_02_Acquisition.Data.Joystick.AxisX.DirectionNegative
+
+# Réalité terrain M3 : capteurs, frein, vitesse mesurée
+PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI
+PRG_02_Acquisition.HwIn.Translation.M3_PosP1_DI
+PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI
+PRG_02_Acquisition.Data.M3.ActualFrequencyHz
+
+# Etats publics FB_Translation : arrivée, direction, commande frein, erreur
+PRG_05_Translation.Data.TranslationState.Error
+PRG_05_Translation.Data.TranslationState.ErrorId
+PRG_05_Translation.Data.TranslationState.PositionReached
+PRG_05_Translation.Data.TranslationState.AtTremie
+PRG_05_Translation.Data.TranslationState.AtP1
+PRG_05_Translation.Data.TranslationState.ActiveTremie
+PRG_05_Translation.Data.TranslationState.SpeedCmd_Pct
+PRG_05_Translation.Data.TranslationState.BrakeCmd
+PRG_05_Translation.Data.TranslationState.BrakeCommandOpenConfirmed
+PRG_05_Translation.Data.TranslationState.BrakeFeedback
+
+# Demande brute de PRG_05 vers la barrière finale
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqTremieSemantic
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz
+
+# Ordre réellement validé par PRG_06 avant écriture AC600
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveControlWord
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqCmd_Hz

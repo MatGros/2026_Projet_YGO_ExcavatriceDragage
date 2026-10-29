@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T20:13:50.030579" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T20:13:50.030579">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-29T16:40:17.329968" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-29T16:40:17.329968">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -50,10 +50,10 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="25" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">pente d'arret relevee sur trace reelle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pente d'arret relevee sur trace reelle MES (-20.0 Hz/s)</xhtml>
               </documentation>
             </variable>
             <variable name="TimeConstant_S">
@@ -61,8 +61,11 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.15" />
+                <simpleValue value="0.03" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reponse dynamique AC600 en boucle fermee (30 ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="LoadAngularVelocity_RadPerS">
               <type>

@@ -5,8 +5,8 @@ VAR_INPUT
     Enable : BOOL;
     FrequencyTgt_Hz : REAL;
     AccelRate_HzPerS : REAL := 20.0;
-    DecelRate_HzPerS : REAL := 25.0; // pente d'arret relevee sur trace reelle
-    TimeConstant_S : REAL := 0.15;
+    DecelRate_HzPerS : REAL := 20.0; // Pente d'arret relevee sur trace reelle MES (-20.0 Hz/s)
+    TimeConstant_S : REAL := 0.03;   // Reponse dynamique AC600 en boucle fermee (30 ms)
     LoadAngularVelocity_RadPerS : REAL;
     LoadFrequencyDroopGain_Hz : REAL := 0.50;
     CycleTime_S : REAL := 0.01;
