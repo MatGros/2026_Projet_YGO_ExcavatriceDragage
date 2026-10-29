@@ -4,6 +4,15 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `SIMU_T421_20261029` — 2026-10-29 — T421 : fidélité glissement inertiel treuils & dérive physique benne
+- **Branche** : `work/base-machine-simu`.
+- **Faits marquants & Validations banc CODESYS** :
+  - **Glissement cinétique dissymétrique (`FB_Sim_Encoder.st`)** : modélisation de décélération continue continue calée sur la trace réelle `Suivi_86` (+0.543m en montée, -1.205m en descente, jog palier 1 < 0.05m).
+  - **Nettoyage configuration simulation** : suppression totale de `SimWinchCoast_M` dans `FB_SimBench.st` et `GVL_Simulation.st` ; mémoire rémanente `GVL_PERSISTENT` 100% préservée et intacte.
+  - **Vitesse benne seule accélérée (`GVL_Simulation.st`)** : ajout de `SimBucketSpeedFactor` en RAM volatile pour les manœuvres benne seule sans impacter la NVRAM.
+  - **Dérive de plongée conjointe 100% physique (`FB_SimBench.st`)** : suppression de la dépendance indue à `PRG_03` ; déclenchement purement mécanique sur les relais matériels de descente (`M1_RelayRev AND M2_RelayRev`), reproduisant le retard de 3% de M2 issu de la trace 36 et éliminant tout faux défaut `[BENNE] ErrorID:02` jusqu'à 50 m.
+  - **Validation mécanique & Outillage** : Bundles `CODE_Bundle.xml` et `CODE_DiffBundle.xml` synchronisés, contrôle de liaison bloquant `G200_check_linkage.py` PASS (0 erreur sur 2167 instances). Essais MANU et AUTO validés par l'opérateur.
+
 ### `MES_FIN_20260923` — 2026-09-23 — fin de mise en service, levée blocages treuils & translation M3
 - **Branche** : `main` (commit `4968a541`).
 - **Faits marquants & Validations terrain** :

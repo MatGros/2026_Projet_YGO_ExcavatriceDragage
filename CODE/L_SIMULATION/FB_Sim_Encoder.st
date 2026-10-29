@@ -54,11 +54,16 @@ VAR_INPUT
         (RawSpdOut), s. 0.0 = saut instantane. >0 = RawSpdOut suit un 1er ordre vers la vitesse reelle du modele
         au lieu de sauter en escalier a la coupure des relais ; RawPosOut (position) n'est pas affecte. Valeur
         non calibree treuil M1/M2, plage indicative issue de la dynamique variateur M3 identifiee sur trace. *)
+    // 🆕 Dynamique de glissement inertiel fidele (T421 cale sur trace reelle Suivi_86)
+    CoastDecelUp_Mps2   : REAL := 1.20;  (* --> [CFG] Deceleration en montee (m/s²) : v0²/(2*0.543m) = 1.20 *)
+    CoastDecelDown_Mps2 : REAL := 0.93;  (* --> [CFG] Deceleration en descente (m/s²) : v0²/(2*1.205m) = 0.93 *)
+    MechanicStopEngaged : BOOL := FALSE; (* --> [HW] Butee mecanique engagee (coupe net le glissement) *)
 END_VAR
 VAR_OUTPUT
     RawPosOut   : UDINT;   (* <-- [DIAG] Position brute simulée *)
     RawSpdOut   : DINT;    (* <-- [DIAG] Vitesse brute simulée (0x6031:01 en 0.1 RPM) *)
     CountSaturated : BOOL; (* <-- [DIAG] Comptage en butée de plage du modèle (saturation signalée) *)
+    CoastActive    : BOOL; (* <-- [DIAG] Indicateur de glissement inertiel en cours (T421) *)
 END_VAR
 VAR_IN_OUT
     RawPos      : UDINT;   (* <-> [BUS] Référence _SimEncoderRawPosM1/M2 (survit au reset froid) *)
@@ -76,6 +81,7 @@ VAR
     CoastPtsLeft     : REAL;             (* . [LOC] Roulis inertiel restant (points bruts) *)
     TargetSpeedMps   : REAL;             (* . [LOC] Vitesse instantanee signee du modele position, avant filtrage retour *)
     ReportedSpeedMps : REAL;             (* . [LOC] Vitesse rapportee filtree 1er ordre, publiee dans RawSpdOut *)
+    CoastSpeedMps    : REAL;             (* . [LOC] Vitesse instantanee signee pendant le glissement inertiel (T421) *)
 END_VAR
 VAR CONSTANT
     // 🛑 Plage de comptage du modèle : le compteur brut est un entier SIGNÉ 32 bits (le conteneur
@@ -141,20 +147,45 @@ IF PresetPending THEN
         PresetPending := FALSE;
     END_IF;
     TargetSpeedMps := 0.0;
-ELSIF RelayFwd THEN
-    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(Increment));
-    MovingDir := 1;
-    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
-    TargetSpeedMps := SpeedMps;
-ELSIF RelayRev THEN
-    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Increment));
-    MovingDir := -1;
-    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
-    TargetSpeedMps := -SpeedMps;
+ELSIF RelayFwd AND NOT RelayRev THEN
+    IF NOT MechanicStopEngaged THEN
+        RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(Increment));
+        MovingDir := 1;
+        CoastSpeedMps := SpeedMps;
+        CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+        TargetSpeedMps := SpeedMps;
+    ELSE
+        MovingDir := 0;
+        CoastSpeedMps := 0.0;
+        CoastPtsLeft := 0.0;
+        TargetSpeedMps := 0.0;
+    END_IF;
+    CoastActive := FALSE;
+ELSIF RelayRev AND NOT RelayFwd THEN
+    IF NOT MechanicStopEngaged THEN
+        RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Increment));
+        MovingDir := -1;
+        CoastSpeedMps := -SpeedMps;
+        CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+        TargetSpeedMps := -SpeedMps;
+    ELSE
+        MovingDir := 0;
+        CoastSpeedMps := 0.0;
+        CoastPtsLeft := 0.0;
+        TargetSpeedMps := 0.0;
+    END_IF;
+    CoastActive := FALSE;
 ELSE
-    // Relais coupes : roulis inertiel (anticipation d'arret mecanique). Le treuil
-    // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
-    IF (CoastPtsLeft >= 1.0) AND (MovingDir <> 0) THEN
+    // Relais coupes (ou les deux actifs = conflit) : glissement inertiel (T421)
+    IF MechanicStopEngaged THEN
+        MovingDir := 0;
+        CoastSpeedMps := 0.0;
+        CoastPtsLeft := 0.0;
+        TargetSpeedMps := 0.0;
+        CoastActive := FALSE;
+    ELSIF (CoastDistanceM > 0.0) AND (CoastPtsLeft >= 1.0) AND (MovingDir <> 0) THEN
+        // Mode historique compatibilite (si CoastDistanceM explicitement configure > 0)
+        CoastActive := TRUE;
         IF MovingDir = 1 THEN
             RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(IncrStep1));
             TargetSpeedMps := MinSpeedMps;
@@ -163,10 +194,42 @@ ELSE
             TargetSpeedMps := -MinSpeedMps;
         END_IF;
         CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
+    ELSIF (ABS(CoastSpeedMps) > 0.005) AND (MovingDir <> 0) THEN
+        // 🆕 Modele dynamique continu T421 : deceleration signee continue calee sur trace reelle
+        CoastActive := TRUE;
+        IF CoastSpeedMps > 0.0 THEN
+            CoastSpeedMps := CoastSpeedMps - CoastDecelUp_Mps2 * CycleTimeS;
+            IF CoastSpeedMps <= 0.005 THEN
+                CoastSpeedMps := 0.0;
+                MovingDir := 0;
+                CoastActive := FALSE;
+            END_IF;
+        ELSE
+            CoastSpeedMps := CoastSpeedMps + CoastDecelDown_Mps2 * CycleTimeS;
+            IF CoastSpeedMps >= -0.005 THEN
+                CoastSpeedMps := 0.0;
+                MovingDir := 0;
+                CoastActive := FALSE;
+            END_IF;
+        END_IF;
+
+        // Deplacement par cycle correspondant a CoastSpeedMps
+        Increment := REAL_TO_UDINT(ABS(CoastSpeedMps) * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
+        IF CoastSpeedMps > 0.0 THEN
+            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + UDINT_TO_DINT(Increment));
+            TargetSpeedMps := CoastSpeedMps;
+        ELSIF CoastSpeedMps < 0.0 THEN
+            RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Increment));
+            TargetSpeedMps := CoastSpeedMps;
+        ELSE
+            TargetSpeedMps := 0.0;
+        END_IF;
     ELSE
         MovingDir := 0;
+        CoastSpeedMps := 0.0;
         CoastPtsLeft := 0.0;
         TargetSpeedMps := 0.0;
+        CoastActive := FALSE;
     END_IF;
 END_IF;
 {endregion}
