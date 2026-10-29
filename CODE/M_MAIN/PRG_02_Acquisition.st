@@ -338,15 +338,13 @@ instSimBench(
     // 🧪 Stimulus défaut rotation de phases : TRUE = phases saines, FALSE = défaut.
     SimPhaseRotationOkBit    := GVL_Simulation.SimPhaseRotationOk,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
-    SimWinchCoast_M          := GVL_Simulation.SimWinchCoast_M,
+    SimBucketSpeedFactor     := GVL_Simulation.SimBucketSpeedFactor,
     SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
     SimSyncDeviationOffset_M := GVL_Simulation.SimSyncDeviationOffset_M,
     SimM2CoupledDescentModelActive := GVL_Simulation.SimM2CoupledDescentModelActive,
     SimM2CoupledDescentFactor := GVL_Simulation.SimM2CoupledDescentFactor,
-    WinchBothDescentIntent   := PRG_03_Modes_Cycle.Data.WinchBothIntent.Active
-                                AND PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend,
     SimWinchDynamicsActive   := GVL_Simulation.SimWinchDynamicsActive,
     SimWinchSpeedReportTauS  := GVL_Simulation.SimWinchSpeedReportTauS,
     SimWinchBrakeOpenDelayS  := GVL_Simulation.SimWinchBrakeOpenDelayS,

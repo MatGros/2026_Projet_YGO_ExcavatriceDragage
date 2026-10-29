@@ -120,7 +120,7 @@ VAR_GLOBAL
 
     // 🪝 STIMULI TREUILS — paramètres du modèle codeur et injection ponctuelle d'un défaut synchro.
     SimEncoderSpeedFactor       : REAL := 1.0;  // Multiplicateur vitesse codeurs simulés ; 1.0 = nominal
-    SimWinchCoast_M             : REAL := 1.30; // Roulis inertiel treuils simulés après coupure des relais (m). 0 = arrêt net. 1.30 = la benne roule pour finir dans la butée ouverte (OffsetOpenM=0.0) malgré l'anticipation d'arrêt (Open 1.3).
+    SimBucketSpeedFactor        : REAL := 2.0;  // Multiplicateur vitesse ouverture/fermeture benne (M2 seul, non persistant, reglable en ligne)
     SimSyncDeviationInjectM1    : BOOL := FALSE; // Front montant : ajoute SimSyncDeviationOffset_M à la position M1 simulée
     SimSyncDeviationInjectM2    : BOOL := FALSE; // Front montant : ajoute SimSyncDeviationOffset_M à la position M2 simulée
     SimSyncDeviationOffset_M    : REAL := 0.5; // Écart signé injecté, mètres ; persiste dans la position simulée jusqu'au reset/preset

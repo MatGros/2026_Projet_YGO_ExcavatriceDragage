@@ -74,14 +74,13 @@ VAR_INPUT
 
     // ── Stimuli & Paramètres de banc ─────────────────────────────────────────
     SimEncoderSpeedFactor      : REAL := 1.0;   (* --> [CFG] Facteur vitesse codeur *)
-    SimWinchCoast_M            : REAL := 1.30;  (* --> [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; 1.30 = finit a la butee ouverte *)
+    SimBucketSpeedFactor       : REAL := 1.0;   (* --> [CFG] Facteur vitesse manoeuvre benne seule (non persistant) *)
     SimTopPositionActive       : BOOL := FALSE; (* --> [TST] Injection manuelle capteur haut actif (essai ciblé) *)
     SimSyncDeviationInjectM1   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M1 *)
     SimSyncDeviationInjectM2   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M2 *)
     SimSyncDeviationOffset_M   : REAL := 0.5;   (* --> [TST] Offset écart synchro *)
     SimM2CoupledDescentModelActive : BOOL := TRUE; (* --> [CFG] M2 calculé depuis M1 en descente BOTH *)
     SimM2CoupledDescentFactor  : REAL := 0.9333; (* --> [CFG] Ratio déplacement M2/M1 mesuré: 0,6m d'écart sur 9m *)
-    WinchBothDescentIntent     : BOOL := FALSE;  (* --> [CMD] Intention BOTH descente PRG_03 *)
     SimWinchSpeedReportTauS    : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Tau 1er ordre retour vitesse rapportee M1/M2, s. 0.0 = saut instantane (comportement historique). *)
     SimWinchBrakeOpenDelayS    : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Delai electrique/meca ouverture frein M1/M2 apres BrakeCmd=TRUE, s. 0.0 = instantane (comportement historique). *)
     SimWinchBrakeCloseDelayS   : REAL := 0.0;    (* --> [CFG][SYNTHETIQUE] Delai electrique/meca fermeture frein M1/M2 apres BrakeCmd=FALSE, s. 0.0 = instantane (comportement historique). *)
@@ -264,7 +263,11 @@ VAR
     M2OpenDistanceRemaining_M  : REAL;               (* . [LOC] Distance restante à la butée ouverte *)
     M2OpenStopThreshold_M     : REAL;               (* . [LOC] Seuil avec avance d'un scan d'acquisition *)
     M2ExpectedStepDistance_M  : REAL;               (* . [LOC] Course codeur M2 du scan actif *)
+    M2BucketOnlyActive         : BOOL;                (* . [LOC] Manœuvre benne seule (M2 actif, M1 au repos) *)
+    SpeedM1_Mps                : REAL;                (* . [LOC] Vitesse nominale palier M1 m/s *)
+    SpeedM2_Mps                : REAL;                (* . [LOC] Vitesse nominale palier M2 m/s *)
     M2CoupledDescentActive     : BOOL;                (* . [LOC] Ralentissement M2 actif en descente BOTH *)
+    M2_MechanicStopEngaged     : BOOL;                (* . [LOC] Butee mecanique benne atteinte (T421) *)
     M2EffectiveSpeedScaleFactor : REAL;               (* . [LOC] Facteur vitesse du producteur unique M2 *)
     KoboldMeasureEnablePrevious : BOOL;               (* . [LOC] Front alimentation Kobold *)
 
@@ -353,18 +356,19 @@ KoboldMeasureEnablePrevious := KoboldMeasureEnable;
 
 // Instance modèle codeur M1
 instSimEncoderM1(
-    Enable           := TRUE,
-    RelayFwd         := M1_RelayFwd,
-    RelayRev         := M1_RelayRev,
-    StepNumber       := M1_StepNumber,
-    PresetCmd        := M1_PresetCmd,
-    PresetValue      := M1_PresetValueOut,
-    SpeedScaleFactor := SimEncoderSpeedFactor,
-    CoastDistanceM   := SimWinchCoast_M,
-    SpeedReportTauS  := WinchSpeedReportTauEffectiveS,
-    TestOffsetCmd    := SimSyncDeviationInjectM1,
-    TestOffsetPts    := M1_OffsetPts,
-    RawPos           := RawPosM1
+    Enable              := TRUE,
+    RelayFwd            := M1_RelayFwd,
+    RelayRev            := M1_RelayRev,
+    StepNumber          := M1_StepNumber,
+    PresetCmd           := M1_PresetCmd,
+    PresetValue         := M1_PresetValueOut,
+    SpeedScaleFactor    := SimEncoderSpeedFactor,
+    CoastDistanceM      := 0.0,
+    SpeedReportTauS     := WinchSpeedReportTauEffectiveS,
+    TestOffsetCmd       := SimSyncDeviationInjectM1,
+    TestOffsetPts       := M1_OffsetPts,
+    MechanicStopEngaged := FALSE,
+    RawPos              := RawPosM1
 );
 
 // T317 exploratoire -- electrique+charge+couplage M1/M2, diagnostic seul (Winch.* metier deja
@@ -420,27 +424,46 @@ END_IF;
 IF (M2_RelayFwdPrev AND NOT M2_RelayFwd) OR (M2_RelayRevPrev AND NOT M2_RelayRev) THEN
     // Générateur LCG 32-bit standard : X_{n+1} = (1103515245 * X_n + 12345) MOD 2^31
     RandomSeed := (RandomSeed * 1103515245 + 12345) AND 16#7FFFFFFF;
-    // Dispersion pseudo-aléatoire entre -0.10 m et +0.10 m
-    M2_EffectiveCoastM := SimWinchCoast_M + (UDINT_TO_REAL(RandomSeed MOD 2000) / 10000.0) - 0.10;
+    M2_EffectiveCoastM := (UDINT_TO_REAL(RandomSeed MOD 2000) / 10000.0) - 0.10;
 END_IF;
 M2_RelayFwdPrev := M2_RelayFwd;
 M2_RelayRevPrev := M2_RelayRev;
 
-// Le FB codeur reste l'unique producteur de RawPosM2. Le ralentissement mesuré
-// agit uniquement sur sa dynamique pendant une descente BOTH effectivement appliquée.
+// Manœuvre benne seule : M2 tourne, M1 est au repos (ouverture ou fermeture benne pure)
+M2BucketOnlyActive := (M2_RelayFwd XOR M2_RelayRev) AND NOT M1_RelayFwd AND NOT M1_RelayRev;
+
+// Descente conjointe physique (les deux treuils déroulent simultanément sous charge)
+// Purement mécanique et basé sur les relais : AUCUNE dépendance à un mode ou au PRG_03.
 M2CoupledDescentActive := SimM2CoupledDescentModelActive
-                          AND WinchBothDescentIntent
                           AND M1_RelayRev AND M2_RelayRev
                           AND NOT M1_RelayFwd AND NOT M2_RelayFwd;
+
+// Vitesses de palier nominales
+SpeedM1_Mps := 0.2 + (INT_TO_REAL(MAX(M1_StepNumber, 1)) - 1.0) * 0.2;
+SpeedM2_Mps := 0.2 + (INT_TO_REAL(MAX(M2_StepNumber, 1)) - 1.0) * 0.2;
+
+// Facteur vitesse M2 :
+// 1) En manœuvre benne seule : accélération via SimBucketSpeedFactor
+// 2) En descente couplée benne ouverte : bridage de la vitesse de M2 à celle de M1 (zéro dérive -11m/-13m)
+// 3) Nominal : SimEncoderSpeedFactor
 M2EffectiveSpeedScaleFactor := SimEncoderSpeedFactor;
-IF M2CoupledDescentActive THEN
-    M2EffectiveSpeedScaleFactor := SimEncoderSpeedFactor * MAX(0.0, SimM2CoupledDescentFactor);
+IF M2BucketOnlyActive THEN
+    M2EffectiveSpeedScaleFactor := SimEncoderSpeedFactor * MAX(0.1, SimBucketSpeedFactor);
+ELSIF M2CoupledDescentActive THEN
+    // 🪝 Descente conjointe physique (M1 entraîné par la charge de benne, M2 freiné par réducteurs) :
+    // M2 a un retard naturel proportionnel de 3% mesuré sur trace réelle (trace 36 : ~0.60 m à 20 m, ~1.5 m à 50 m).
+    // Cela fait monter l\'écart (M2 - M1) progressivement et fidèlement avec la profondeur, quel que soit le mode (MANU/AUTO).
+    IF SpeedM2_Mps > 0.01 THEN
+        M2EffectiveSpeedScaleFactor := SimEncoderSpeedFactor * (SpeedM1_Mps / SpeedM2_Mps) * 0.97;
+    ELSE
+        M2EffectiveSpeedScaleFactor := SimEncoderSpeedFactor * MAX(0.0, SimM2CoupledDescentFactor);
+    END_IF;
 END_IF;
 
 // P02 consomme la mesure publiée au scan précédent. Reconstituer le déplacement
 // de ce scan évite un trou d'un cycle lors du seuil d'arrêt de FB_Bucket.
 M2ExpectedStepDistance_M := (1.0 + (INT_TO_REAL(MAX(M2_StepNumber, 1)) - 1.0) * 0.25)
-                            * MAX(0.0, SimEncoderSpeedFactor)
+                            * MAX(0.0, M2EffectiveSpeedScaleFactor)
                             * CST_SimBenchCycleTimeS;
 M2OpenStopThreshold_M := BucketOffsetOpen_M + MAX(0.0, BucketOpenAnticipation_M)
                          + M2ExpectedStepDistance_M;
@@ -466,20 +489,28 @@ IF M2AutoOpenCoastArmed THEN
                                       M2OpenDistanceRemaining_M);
 END_IF;
 
-// Instance modèle codeur M2 (avec roulis et dispersion)
+// Butée mécanique benne (T421) : bloque le mouvement de manœuvre benne à la butée.
+// N'arrête M2 que s'il est commandé SEUL vers la butée (ouverture sous BucketOffsetOpen_M
+// ou fermeture au-dessus de BucketOffsetCloseM).
+M2_MechanicStopEngaged := SimWinchCouplingModelActive
+                          AND (((M2_CablePos_M - M1_CablePos_M) <= (BucketOffsetOpen_M - 0.40) AND M2_RelayRev AND NOT M1_RelayRev)
+                               OR ((M2_CablePos_M - M1_CablePos_M) >= BucketOffsetCloseM AND M2_RelayFwd AND NOT M1_RelayFwd));
+
+// Instance modèle codeur M2 (dynamique T421 continue, CoastDistanceM=0)
 instSimEncoderM2(
-    Enable           := TRUE,
-    RelayFwd         := M2_RelayFwd,
-    RelayRev         := M2_RelayRev,
-    StepNumber       := M2_StepNumber,
-    PresetCmd        := M2_PresetCmd,
-    PresetValue      := M2_PresetValueOut,
-    SpeedScaleFactor := M2EffectiveSpeedScaleFactor,
-    CoastDistanceM   := M2EffectiveCoastDistance_M,
-    SpeedReportTauS  := WinchSpeedReportTauEffectiveS,
-    TestOffsetCmd    := SimSyncDeviationInjectM2,
-    TestOffsetPts    := M2_OffsetPts,
-    RawPos           := RawPosM2
+    Enable              := TRUE,
+    RelayFwd            := M2_RelayFwd,
+    RelayRev            := M2_RelayRev,
+    StepNumber          := M2_StepNumber,
+    PresetCmd           := M2_PresetCmd,
+    PresetValue         := M2_PresetValueOut,
+    SpeedScaleFactor    := M2EffectiveSpeedScaleFactor,
+    CoastDistanceM      := 0.0,
+    SpeedReportTauS     := WinchSpeedReportTauEffectiveS,
+    TestOffsetCmd       := SimSyncDeviationInjectM2,
+    TestOffsetPts       := M2_OffsetPts,
+    MechanicStopEngaged := M2_MechanicStopEngaged,
+    RawPos              := RawPosM2
 );
 
 // L'épisode Kobold ne produit que la DI. Le cycle commande l'arrêt ; les FB codeurs

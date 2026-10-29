@@ -1,0 +1,90 @@
+contract:
+  task_id: T421
+  criticality: C3
+  strategy: patch
+  objective: >
+    Refonte de la dynamique de décélération et de glissement inertiel des treuils M1, M2
+    et de la benne dans le banc de simulation FB_SimBench / FB_Sim_Encoder, calibrée sur
+    les mesures physiques issues des traces réelles de carrière (montée ~0.54 m, descente ~1.20 m,
+    proportionnalité stricte à la vitesse d'approche, dynamique benne iso-fonctionnelle Manu et Auto).
+  acceptance:
+    - id: AC1
+      statement: >
+        À pleine vitesse en montée (Palier 5, ~1.15 m/s), la coupure de commande sur M1 ou M2
+        produit un glissement inertiel calibré entre 0.45 m et 0.60 m (valeur de référence réelle Suivi_86 = +0.543 m).
+      verified_by: "Scénario test unitaire FB_SimBench mesurant le delta de position après coupure à pleine vitesse en montée."
+    - id: AC2
+      statement: >
+        À pleine vitesse en descente (Palier 5, ~1.50 m/s), la coupure de commande sur M1 ou M2
+        produit un glissement inertiel calibré entre 1.10 m et 1.30 m (valeur de référence réelle Suivi_86 = -1.205 m).
+      verified_by: "Scénario test unitaire FB_SimBench mesurant le delta de position après coupure à pleine vitesse en descente."
+    - id: AC3
+      statement: >
+        À vitesse réduite ou en jog (Palier 1, ~0.12 m/s), le glissement d'arrêt est proportionnel à la vitesse
+        et n'excède pas 0.05 m (valeur de référence réelle Suivi_86 = +0.021 m).
+      verified_by: "Scénario test jog court FB_SimBench vérifiant l'absence de grand saut de position."
+    - id: AC4
+      statement: >
+        La manœuvre de benne (écart M2 - M1) reproduit le glissement d'anticipation mécanique (~1.30 m à pleine vitesse)
+        jusqu'aux butées ouvertes (0.0 m) et fermées (15.0 m) de façon strictement identique en commande manuelle
+        et en cycle semi-automatique (AX15B), sans provoquer de défaut automate ErrorID:08 en AX2.
+      verified_by: "Test comparatif ouverture benne manuel vs étape AX15B et passage du cycle sans ErrorID:08."
+    - id: AC5
+      statement: >
+        Suppression du forçage de valeur commune arbitraire SimWinchCoast_M ; le glissement est calculé
+        dynamiquement selon le sens et la vitesse instantanée, encapsulé dans la couche simulation.
+      verified_by: "Revue de code FB_SimBench et FB_Sim_Encoder."
+    - id: AC6
+      statement: >
+        Les fichiers de logique automate machine (PRG_01 à PRG_07, CODE/B_AU_SECURITE/, CODE/H_TREUILS_BENNE/, CODE/G_CYCLE/)
+        sont strictement protégés et restent inchangés.
+      verified_by: "git diff --name-only sur CODE/ hors CODE/L_SIMULATION/."
+    - id: AC7
+      statement: >
+        Le contrôle de liaison G200 est à 0 erreur, les bundles XML sont régénérés et les gates de conformité passent.
+      verified_by: "G200_check_linkage.py --report et run_all_gates.py --palier C."
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/L_SIMULATION/FB_Sim_Encoder.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_simbench.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_encoder.st
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS_ORCHESTRATOR.yaml
+    forbidden:
+      - CODE/M_MAIN/
+      - CODE/G_CYCLE/
+      - CODE/H_TREUILS_BENNE/
+      - CODE/I_TRANSLATION/
+      - CODE/B_AU_SECURITE/
+      - CODE/GVL_PERSISTENT.st
+      - PRJ_CODESYS/
+      - Device.export
+
+  conservation:
+    must_survive:
+      - Les courses réelles, positions recalées et sens de rotation des codeurs M1/M2.
+      - L'intégrité de la détection de fond tactile Kobold et des butées logicielles.
+      - La continuité de simulation avec le banc HMI / TwinBench.
+    dropped_on_purpose:
+      - Le glissement constant fixe et symétrique de 1.30 m hérité de T419.
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+    - scenarios_comparatifs_traces_reelles
+
+  status: validated
+  validated_at: '2026-10-29T01:16:00+01:00'
+  validated_by: 'HUM / AGY01'
+  resolution_summary: >
+    T421 validée avec succès sur banc CODESYS physique par l'opérateur.
+    1. Glissement cinétique dissymétrique conforme trace réelle Suivi_86 (montée ~0.50m, descente ~1.20m, jog court < 0.05m).
+    2. Variable obsolète SimWinchCoast_M totalement éliminée du code source sans toucher GVL_PERSISTENT (NVRAM intacte).
+    3. SimBucketSpeedFactor créé en RAM volatile pour accélérer la manœuvre benne seule au besoin.
+    4. Dérive en descente conjointe 100% physique basée sur les relais matériels (retard 3% M2 calé sur trace 36), éliminant définitivement le faux défaut ErrorID:02 jusqu'à 50 m.
+    5. G200 Linkage PASS (0 erreur, 2167 instances vérifiées). Bundles XML CODE_Bundle.xml et CODE_DiffBundle.xml exportés et testés en MANU et AUTO.

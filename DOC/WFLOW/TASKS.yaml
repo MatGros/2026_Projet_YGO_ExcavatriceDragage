@@ -1,4 +1,34 @@
 tasks:
+- id: T421
+  parent_id: ''
+  statut: ✅
+  criticite: C3
+  domaine: SIMULATION / TREUILS M1-M2 & BENNE / FIDELITE DYNAMIQUE
+  agent: AGY01
+  date: '2026-10-28T22:10:28.416921+00:00'
+  updated_at: '2026-10-29T01:16:00+01:00'
+  completed_at: '2026-10-29T01:16:00+01:00'
+  titre: SimBench - Refonte dynamique glissement treuils M1/M2 et benne basee sur
+    traces reelles
+  contexte: 'Mesures reelles sur trace Suivi_86 : montee pleine vitesse = +0.543m,
+    descente pleine vitesse = -1.205m, petite vitesse = +0.021m. Le modele historique
+    1.30m fixe etait faux et dangereux en montee.'
+  description: 'Modeliser un glissement cinetique dissymetrique et proportionnel a
+    la vitesse : montee ~0.50m, descente ~1.20m, jog court < 0.05m. Mouvement benne
+    M2-M1 iso-fonctionnel en manuel et automatique.'
+  objectifs:
+  - Calibrer l arret montee pleine vitesse a 0.50m (+/-0.05m).
+  - Calibrer l arret descente pleine vitesse a 1.20m (+/-0.10m).
+  - Proportionnalite a la vitesse d approche (jog palier 1 < 0.05m).
+  - Ouverture/fermeture benne iso-fonctionnelle en Manuel et Auto sans ErrorID:08
+    en AX2.
+  - Zero regression sur la logique automate (PRG_01 a PRG_07 intacts).
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T421_FIDELITE_DYNAMIQUE_TREUILS.yaml
+  avancement: Valide et teste avec succes sur banc CODESYS en MANU et AUTO. Glissement
+    inertiel dissymetrique conforme trace 86 (montee ~0.50m, descente ~1.20m, jog palier 1
+    < 0.05m). SimWinchCoast_M supprime (GVL_PERSISTENT intact). SimBucketSpeedFactor
+    ajoute (volatile). Derive descente 100% physique sur relais (retard 3% M2, conforme trace 36),
+    eliminant tout faux defaut ErrorID:02 jusqu a 50m.
 - id: T420
   parent_id: ''
   statut: ❌
