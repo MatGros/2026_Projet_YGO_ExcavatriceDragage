@@ -20,7 +20,7 @@ VAR_INPUT
        f <= 0,5 Hz (garde qui recopiait la logique PLC dans l'usine simulee). TRUE = frein a
        manque de courant reel : retombe CloseDelay_S apres la coupure bobine, QUELLE QUE SOIT
        la vitesse. *)
-    PhysicalBrakeActive : BOOL := FALSE;
+    PhysicalBrakeActive : BOOL := TRUE;
 END_VAR
 VAR_OUTPUT
     Ready : BOOL;

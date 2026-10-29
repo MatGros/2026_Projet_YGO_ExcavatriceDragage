@@ -49,7 +49,7 @@ VAR_INPUT
        arret instantane). TRUE = frein a manque de courant reel : retombe CloseDelay apres la
        coupure bobine QUELLE QUE SOIT la vitesse, puis le chariot decelere sur le frein
        (BrakeDecel_Mps2) ; frein serre = chariot bloque meme si le variateur pousse. *)
-    BrakePhysicalActive : BOOL := FALSE;
+    BrakePhysicalActive : BOOL := TRUE;
     BrakeDecel_Mps2 : REAL := 2.0;   (* HYPOTHESE : 0,4 m/s (20 Hz) -> arret ~0,2 s / ~4 cm *)
     (* L4 — CHARIOT LIBRE (2026-10-28). FALSE = historique (chariot esclave de la frequence).
        TRUE = quand le frein est OUVERT et que le variateur n'applique plus de couple (mot a 0
@@ -58,7 +58,8 @@ VAR_INPUT
        frottement de roulement. Valeurs = HYPOTHESES, sans mesure terrain. *)
     CartFreeActive : BOOL := FALSE;
     LoadMassRatio : REAL := 0.5;          (* masse benne / masse totale chariot+benne *)
-    RollingFriction_Mps2 : REAL := 0.1;   (* ~1 % de g *)
+    RollingFriction_Mps2 : REAL := 0.30;  (* FEM 1.001 : frottement global galets + reducteur accouple *)
+    StaticFriction_Mps2 : REAL := 0.35;   (* Seuil de decollement statique (anti-pompage pendulaire) *)
     Slope_Mps2 : REAL := 0.0;             (* composante de pente, + vers Maintenance *)
     (* L5 — came capteurs (vu -> perdu -> retrouve -> fixe), appliquee aux 5 capteurs. *)
     SensorCamDropoutActive : BOOL := FALSE;
@@ -303,14 +304,14 @@ IF Enable THEN
         FreeAccel_Mps2 := (LIMIT(0.0, LoadMassRatio, 0.9) / (1.0 - LIMIT(0.0, LoadMassRatio, 0.9)))
                           * 9.81 * instSuspendedLoad.Angle_Rad + Slope_Mps2;
         IF ABS(VelocityTrue_Mps) < 0.001 THEN
-            (* Adherence : ne repart que si la poussee depasse le frottement. *)
-            IF ABS(FreeAccel_Mps2) <= MAX(0.0, RollingFriction_Mps2) THEN
+            (* Adherence statique au repos : ne decolle que si la poussee depasse le frottement statique *)
+            IF ABS(FreeAccel_Mps2) <= MAX(0.0, StaticFriction_Mps2) THEN
                 FreeAccel_Mps2 := 0.0;
                 VelocityTrue_Mps := 0.0;
             ELSIF FreeAccel_Mps2 > 0.0 THEN
-                FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+                FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, StaticFriction_Mps2);
             ELSE
-                FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+                FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, StaticFriction_Mps2);
             END_IF;
         ELSIF VelocityTrue_Mps > 0.0 THEN
             FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
@@ -319,7 +320,8 @@ IF Enable THEN
         END_IF;
         VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
     ELSIF BrakeMechanicallyOpen THEN
-        VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
+        (* Vitesse suivant directement le variateur (deja filtre par instDrive) sans double PT1 *)
+        VelocityTrue_Mps := VelocityTarget_Mps;
     ELSIF BrakePhysicalActive THEN
         (* L3 : frein serre -> deceleration sur le frein jusqu'a l'arret, puis chariot bloque. *)
         IF VelocityTrue_Mps > 0.0 THEN

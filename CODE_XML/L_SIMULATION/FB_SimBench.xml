@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T23:58:23.674267" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T23:58:23.674267">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-29T13:52:51.720872" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-29T13:52:51.720872">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2849,7 +2849,7 @@ IF instSimTranslation.ActualFrequency_Hz &gt; 0.5 THEN
 ELSE
     M3_StatusWordSim := 16#0080; // Comm Ready seul -- Bit0 retombé, arrêt confirmé
 END_IF;
-M3_ActualFreqHz := REAL_TO_UINT(instSimTranslation.ActualFrequency_Hz * 100.0);
+M3_ActualFreqHz := REAL_TO_UINT(LIMIT(0.0, instSimTranslation.ActualFrequency_Hz, CST_M3MaxFreq_Hz) * 100.0);
 
 Translation.M3_StatusWord        := M3_StatusWordSim;
 Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
@@ -4893,7 +4893,7 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="FALSE" />
+                <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique (frein ne retombe que sous 0,5 Hz,
@@ -4944,10 +4944,21 @@ SimPhaseRotationOk := SimPhaseRotationOkBit;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.1" />
+                <simpleValue value="0.3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">~1 % de g</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FEM 1.001 : frottement global galets + reducteur accouple</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StaticFriction_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.35" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de decollement statique (anti-pompage pendulaire)</xhtml>
               </documentation>
             </variable>
             <variable name="Slope_Mps2">
@@ -5663,14 +5674,14 @@ IF Enable THEN
         FreeAccel_Mps2 := (LIMIT(0.0, LoadMassRatio, 0.9) / (1.0 - LIMIT(0.0, LoadMassRatio, 0.9)))
                           * 9.81 * instSuspendedLoad.Angle_Rad + Slope_Mps2;
         IF ABS(VelocityTrue_Mps) &lt; 0.001 THEN
-            (* Adherence : ne repart que si la poussee depasse le frottement. *)
-            IF ABS(FreeAccel_Mps2) &lt;= MAX(0.0, RollingFriction_Mps2) THEN
+            (* Adherence statique au repos : ne decolle que si la poussee depasse le frottement statique *)
+            IF ABS(FreeAccel_Mps2) &lt;= MAX(0.0, StaticFriction_Mps2) THEN
                 FreeAccel_Mps2 := 0.0;
                 VelocityTrue_Mps := 0.0;
             ELSIF FreeAccel_Mps2 &gt; 0.0 THEN
-                FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+                FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, StaticFriction_Mps2);
             ELSE
-                FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+                FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, StaticFriction_Mps2);
             END_IF;
         ELSIF VelocityTrue_Mps &gt; 0.0 THEN
             FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
@@ -5679,7 +5690,8 @@ IF Enable THEN
         END_IF;
         VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
     ELSIF BrakeMechanicallyOpen THEN
-        VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
+        (* Vitesse suivant directement le variateur (deja filtre par instDrive) sans double PT1 *)
+        VelocityTrue_Mps := VelocityTarget_Mps;
     ELSIF BrakePhysicalActive THEN
         (* L3 : frein serre -&gt; deceleration sur le frein jusqu'a l'arret, puis chariot bloque. *)
         IF VelocityTrue_Mps &gt; 0.0 THEN
@@ -7143,7 +7155,7 @@ Ready := TRUE;
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="FALSE" />
+                <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique : la retombee mecanique attend
@@ -7308,10 +7320,10 @@ Ready := TRUE;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="25" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">pente d'arret relevee sur trace reelle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pente d'arret relevee sur trace reelle MES (-20.0 Hz/s)</xhtml>
               </documentation>
             </variable>
             <variable name="TimeConstant_S">
@@ -7319,8 +7331,11 @@ Ready := TRUE;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.15" />
+                <simpleValue value="0.03" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reponse dynamique AC600 en boucle fermee (30 ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="LoadAngularVelocity_RadPerS">
               <type>

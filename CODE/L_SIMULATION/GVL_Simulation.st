@@ -83,7 +83,7 @@ VAR_GLOBAL
     // FALSE = historique (chariot esclave de la frequence). Valeurs = HYPOTHESES.
     SimM3CartFreeActive              : BOOL := TRUE;
     SimM3LoadMassRatio               : REAL := 0.5;
-    SimM3RollingFriction_Mps2        : REAL := 0.1;
+    SimM3RollingFriction_Mps2        : REAL := 0.30; // FEM 1.001 : frottement global galets + reducteur accouple
     SimM3Slope_Mps2                  : REAL := 0.0;   // + vers Maintenance
     // 📡 L5 (2026-10-28) — CAME CAPTEURS M3 : a chaque franchissement le capteur est VU, PERDU
     // sur une courte zone, RETROUVE puis FIXE (lie a la position, deux sens). FALSE = historique.
