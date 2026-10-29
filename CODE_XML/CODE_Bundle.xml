@@ -39761,7 +39761,7 @@ IF instSimTranslation.ActualFrequency_Hz &gt; 0.5 THEN
 ELSE
     M3_StatusWordSim := 16#0080; // Comm Ready seul -- Bit0 retombé, arrêt confirmé
 END_IF;
-M3_ActualFreqHz := REAL_TO_UINT(instSimTranslation.ActualFrequency_Hz * 100.0);
+M3_ActualFreqHz := REAL_TO_UINT(LIMIT(0.0, instSimTranslation.ActualFrequency_Hz, CST_M3MaxFreq_Hz) * 100.0);
 
 Translation.M3_StatusWord        := M3_StatusWordSim;
 Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
@@ -42527,7 +42527,8 @@ Ready := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique (frein ne retombe que sous 0,5 Hz,
        arret instantane). TRUE = frein a manque de courant reel : retombe CloseDelay apres la
        coupure bobine QUELLE QUE SOIT la vitesse, puis le chariot decelere sur le frein
-       (BrakeDecel_Mps2) ; frein serre = chariot bloque meme si le variateur pousse.</xhtml>
+       (BrakeDecel_Mps2) ; frein serre = chariot bloque meme si le variateur pousse.
+defaut FB = historique ; GVL_Simulation.SimM3BrakePhysicalActive = TRUE (source unique)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeDecel_Mps2">
@@ -42572,10 +42573,21 @@ Ready := TRUE;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.1" />
+                <simpleValue value="0.3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">~1 % de g</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FEM 1.001 : frottement global galets + reducteur accouple</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StaticFriction_Mps2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.35" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de decollement statique (anti-pompage pendulaire)</xhtml>
               </documentation>
             </variable>
             <variable name="Slope_Mps2">
@@ -43291,14 +43303,14 @@ IF Enable THEN
         FreeAccel_Mps2 := (LIMIT(0.0, LoadMassRatio, 0.9) / (1.0 - LIMIT(0.0, LoadMassRatio, 0.9)))
                           * 9.81 * instSuspendedLoad.Angle_Rad + Slope_Mps2;
         IF ABS(VelocityTrue_Mps) &lt; 0.001 THEN
-            (* Adherence : ne repart que si la poussee depasse le frottement. *)
-            IF ABS(FreeAccel_Mps2) &lt;= MAX(0.0, RollingFriction_Mps2) THEN
+            (* Adherence statique au repos : ne decolle que si la poussee depasse le frottement statique *)
+            IF ABS(FreeAccel_Mps2) &lt;= MAX(0.0, StaticFriction_Mps2) THEN
                 FreeAccel_Mps2 := 0.0;
                 VelocityTrue_Mps := 0.0;
             ELSIF FreeAccel_Mps2 &gt; 0.0 THEN
-                FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+                FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, StaticFriction_Mps2);
             ELSE
-                FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+                FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, StaticFriction_Mps2);
             END_IF;
         ELSIF VelocityTrue_Mps &gt; 0.0 THEN
             FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
@@ -43307,7 +43319,8 @@ IF Enable THEN
         END_IF;
         VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
     ELSIF BrakeMechanicallyOpen THEN
-        VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
+        (* Vitesse suivant directement le variateur (deja filtre par instDrive) sans double PT1 *)
+        VelocityTrue_Mps := VelocityTarget_Mps;
     ELSIF BrakePhysicalActive THEN
         (* L3 : frein serre -&gt; deceleration sur le frein jusqu'a l'arret, puis chariot bloque. *)
         IF VelocityTrue_Mps &gt; 0.0 THEN
@@ -43596,7 +43609,8 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique : la retombee mecanique attend
        f &lt;= 0,5 Hz (garde qui recopiait la logique PLC dans l'usine simulee). TRUE = frein a
        manque de courant reel : retombe CloseDelay_S apres la coupure bobine, QUELLE QUE SOIT
-       la vitesse.</xhtml>
+       la vitesse.
+defaut FB = historique ; la simulation M3 passe TRUE via GVL_Simulation (source unique)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -43755,10 +43769,10 @@ Ready := TRUE;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="25" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">pente d'arret relevee sur trace reelle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pente d'arret relevee sur trace reelle MES (-20.0 Hz/s)</xhtml>
               </documentation>
             </variable>
             <variable name="TimeConstant_S">
@@ -43766,8 +43780,11 @@ Ready := TRUE;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.15" />
+                <simpleValue value="0.03" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reponse dynamique AC600 en boucle fermee (30 ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="LoadAngularVelocity_RadPerS">
               <type>
@@ -64222,8 +64239,11 @@ FALSE = historique (chariot esclave de la frequence). Valeurs = HYPOTHESES.</xht
             <REAL />
           </type>
           <initialValue>
-            <simpleValue value="0.1" />
+            <simpleValue value="0.3" />
           </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">FEM 1.001 : frottement global galets + reducteur accouple</xhtml>
+          </documentation>
         </variable>
         <variable name="SimM3Slope_Mps2">
           <type>
