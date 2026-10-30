@@ -940,3 +940,17 @@ devices:
       refus_silencieux: 7
       defauts_morts_ou_orphelins: 4
       anomalies_masquage_et_affichage: 3
+metadata:
+  task_id: T422
+  task_titre: Audit chirurgical exhaustif des alarmes, bannières IHM et interlocks
+    des 10 Devices machine
+  chemin_canonique: DOC/WFLOW/AUDITS/AUDIT_T422_DEVICES_ALARMS_20261030.yaml
+  date_audit: '2026-10-30'
+  agent: AGY01
+  statut: TERMINE
+  synthese_chiffree_globale:
+    total_defauts_et_interlocks: 194
+    conformes: 71
+    refus_silencieux: 53
+    defauts_morts_ou_orphelins: 36
+    anomalies_masquage_et_affichage: 26
