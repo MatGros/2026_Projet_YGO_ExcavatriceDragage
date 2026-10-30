@@ -12,6 +12,54 @@ END_VAR
     ASSERT_FALSE(fb.BrakeContactOpen, 'Frein ferme');
 END_TEST
 
+(* T301/L1 -- the isolated model receives geometry and gain.  The static G518
+   check proves the PRG_02 -> SimBench wiring; these cases prove that those
+   inputs are actually consumed by the simulated plant. *)
+TEST 'TC-T301-SRC-001 Position P1 recue initialise le chariot sans geometrie locale'
+VAR
+    fb : FB_Sim_Translation;
+END_VAR
+    fb.PosTremie_M := 2.0;
+    fb.PosPV_M := 3.0;
+    fb.PosP2_M := 5.0;
+    fb.PosP1_M := 7.0;
+    fb.PosMaintenance_M := 11.0;
+    fb.Enable := FALSE;
+    fb();
+    ASSERT_NEAR(fb.PositionTrue_M, 7.0, 0.0001,
+        'Repli positionne le chariot sur PosP1_M recu');
+    ASSERT_TRUE(fb.PosP1, 'Repli publie P1 apres initialisation sur la position recue');
+END_TEST
+
+TEST 'TC-T301-SRC-002 Gain recu convertit la frequence retournee en vitesse'
+VAR
+    fb : FB_Sim_Translation;
+    i : INT;
+END_VAR
+    fb.PosTremie_M := 0.0;
+    fb.PosPV_M := 10.0;
+    fb.PosP2_M := 20.0;
+    fb.PosP1_M := 30.0;
+    fb.PosMaintenance_M := 40.0;
+    fb.GainMetersPerHzSec := 0.03;
+    fb.MaxFreq_Hz := 20.0;
+    fb.Enable := FALSE;
+    fb();
+    fb.Enable := TRUE;
+    fb.ReqTremie := TRUE;
+    fb.SpeedTgt_Pct := 100.0;
+    fb.BrakeReleaseCmd := TRUE;
+    fb.BrakeOpenDelayS := 0.0;
+    fb.LoadReactionGain_Mps2 := 0.0;
+    FOR i := 1 TO 400 DO
+        fb();
+    END_FOR;
+    ASSERT_NEAR(fb.ActualFrequency_Hz, 20.0, 0.05,
+        'Frequence maximale recue appliquee');
+    ASSERT_NEAR(fb.VelocityTrue_Mps, -0.6, 0.02,
+        'Vitesse = sens x gain recu x frequence retournee');
+END_TEST
+
 TEST 'TC-T300-SEN-010 Les deux extremites publient les mots thermometres valides'
 VAR
     fb : FB_Sim_Translation;

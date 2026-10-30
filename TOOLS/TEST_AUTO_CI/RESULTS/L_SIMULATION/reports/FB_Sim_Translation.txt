@@ -1,32 +1,25 @@
-Error compiling source files:
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->═<- at offset: 3, skipped 63 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->�<- at offset: 71, skipped 2 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->—<- at offset: 93, skipped 1 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->é<- at offset: 121, skipped 1 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->─<- at offset: 131, skipped 63 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->�<- at offset: 199, skipped 2 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->ô<- at offset: 203, skipped 1 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->é<- at offset: 287, skipped 1 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->è<- at offset: 316, skipped 1 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->→<- at offset: 404, skipped 1 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->→<- at offset: 412, skipped 1 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->→<- at offset: 420, skipped 1 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->→<- at offset: 428, skipped 1 characters.
-
-FB_Sim_Translation.st:0:0: error: unexpected character: ->→<- at offset: 443, skipped 1 characters.
-
-FB_Sim_Translation.st:0:0: error: Unclosed block comment
+Error: C++ compilation failed:
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Sim_Translation\2b77ab016a4e\strucpp_job\strucpp-test-9qkgjG\test_main.cpp: In function 'bool test_2(strucpp::TestContext&)':
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Sim_Translation\2b77ab016a4e\strucpp_job\strucpp-test-9qkgjG\test_main.cpp:33:8: error: 'class strucpp::FB_SIM_TRANSLATION' has no member named 'FULLTRAVELTIMES'
+   33 |     FB.FULLTRAVELTIMES = 0.5;
+      |        ^~~~~~~~~~~~~~~
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Sim_Translation\2b77ab016a4e\strucpp_job\strucpp-test-9qkgjG\test_main.cpp:54:8: error: 'class strucpp::FB_SIM_TRANSLATION' has no member named 'FULLTRAVELTIMES'
+   54 |     FB.FULLTRAVELTIMES = 0.5;
+      |        ^~~~~~~~~~~~~~~
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Sim_Translation\2b77ab016a4e\strucpp_job\strucpp-test-9qkgjG\test_main.cpp: In function 'bool test_3(strucpp::TestContext&)':
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Sim_Translation\2b77ab016a4e\strucpp_job\strucpp-test-9qkgjG\test_main.cpp:79:8: error: 'class strucpp::FB_SIM_TRANSLATION' has no member named 'FULLTRAVELTIMES'
+   79 |     FB.FULLTRAVELTIMES = 8.0;
+      |        ^~~~~~~~~~~~~~~
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Sim_Translation\2b77ab016a4e\strucpp_job\strucpp-test-9qkgjG\test_main.cpp: In function 'bool test_8(strucpp::TestContext&)':
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Sim_Translation\2b77ab016a4e\strucpp_job\strucpp-test-9qkgjG\test_main.cpp:199:8: error: 'class strucpp::FB_SIM_TRANSLATION' has no member named 'FULLTRAVELTIMES'
+  199 |     FB.FULLTRAVELTIMES = 0.5;
+      |        ^~~~~~~~~~~~~~~
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Sim_Translation\2b77ab016a4e\strucpp_job\strucpp-test-9qkgjG\test_main.cpp: In function 'bool test_9(strucpp::TestContext&)':
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Sim_Translation\2b77ab016a4e\strucpp_job\strucpp-test-9qkgjG\test_main.cpp:238:28: error: 'class strucpp::FB_SIM_TRANSLATION' has no member named 'FULLTRAVELTIMES'
+  238 |                         FB.FULLTRAVELTIMES = 0.5;
+      |                            ^~~~~~~~~~~~~~~
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Sim_Translation\2b77ab016a4e\strucpp_job\strucpp-test-9qkgjG\test_main.cpp: In function 'bool test_12(strucpp::TestContext&)':
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\.scratch\FB_Sim_Translation\2b77ab016a4e\strucpp_job\strucpp-test-9qkgjG\test_main.cpp:354:8: error: 'class strucpp::FB_SIM_TRANSLATION' has no member named 'FULLTRAVELTIMES'
+  354 |     FB.FULLTRAVELTIMES = 8.0;
+      |        ^~~~~~~~~~~~~~~
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-29T16:40:17.329968" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-29T16:40:17.329968">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-30T01:13:28.744492" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-30T01:13:28.744492">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -135,6 +135,17 @@
                 <simpleValue value="0.001" />
               </initialValue>
             </variable>
+            <variable name="CST_StopFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">seuil nominal de fin de rampe variateur</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_MaxFrequency_Hz">
               <type>
                 <REAL />
@@ -179,9 +190,12 @@ ELSE
 END_IF;
 ElectricalFrequency_Hz := ElectricalFrequency_Hz
     + ResponseAlpha * (FrequencyCmd_Hz - ElectricalFrequency_Hz);
-ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz
-    - MAX(0.0, LoadFrequencyDroopGain_Hz) * ABS(LoadAngularVelocity_RadPerS));
-IF ActualFrequency_Hz &lt; 0.005 THEN
+(* Retour AC600 : frequence electrique de sortie. La charge est appliquee par le
+   modele mecanique ; elle ne doit pas biaiser le retour publie au PLC. *)
+ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz);
+IF (FrequencyTgt_Hz &lt;= 0.0) AND (FrequencyCmd_Hz &lt;= 0.0)
+    AND (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
+    ElectricalFrequency_Hz := 0.0;
     ActualFrequency_Hz := 0.0;
 END_IF;
 Ready := TRUE;

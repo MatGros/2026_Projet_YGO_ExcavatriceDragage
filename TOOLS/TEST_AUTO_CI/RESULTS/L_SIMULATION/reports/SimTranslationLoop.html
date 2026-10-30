@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Rapport de test — SimTranslationLoop [PASS]</title>
+<title>Rapport de test — SimTranslationLoop [FAIL]</title>
 <style>
     :root {
         --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
@@ -370,14 +370,14 @@
         <div style="display:flex;align-items:center;gap:12px;">
             <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
-            <span class="badge badge-pass">PASS</span>
+            <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-10-13 16:40:34</div>
+    <div class="exec-time">2026-10-29 23:17:32</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-simtranslationloop-0">TC-T417-LOOP-A Rejeu P1 a 20 Hz, demande TENUE apres arrivee : le plafond d approche maintient 20 Hz vers le variateur</a></li><li class="toc-item toc-pass"><a href="#test-simtranslationloop-1">TC-T417-LOOP-B Rejeu P1 a 20 Hz, demande RETIREE au jeton d arrivee (cycle auto) : plafond perdu, mot de commande a 0</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-fail"><a href="#test-simtranslationloop-0">TC-T417-LOOP-A Rejeu P1 a 20 Hz, demande TENUE apres arrivee : le plafond d approche maintient 20 Hz vers le variateur</a></li><li class="toc-item toc-fail"><a href="#test-simtranslationloop-1">TC-T417-LOOP-B Rejeu P1 a 20 Hz, demande RETIREE au jeton d arrivee (cycle auto) : plafond perdu, mot de commande a 0</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -386,7 +386,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            2/2 vérifications validées
+            0/2 vérifications validées
         </div>
     </div>
     
@@ -544,18 +544,18 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Sim_Translation</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 30 flux entrants · 20 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Sim_Translation</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 47 flux entrants · 27 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instCycleTime <span style="color:var(--muted);font-weight:500;">(FB_CycleTime)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SensorNoiseState <span style="color:var(--muted);font-weight:500;">(REAL := 0.371)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorTremie <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorPV <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorP2 <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorP1 <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorMaintenance <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDrive <span style="color:var(--muted);font-weight:500;">(FB_Sim_TranslationDrive)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instBrake <span style="color:var(--muted);font-weight:500;">(FB_Sim_TranslationBrake)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSuspendedLoad <span style="color:var(--muted);font-weight:500;">(FB_Sim_SuspendedLoad)</span></span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instCycleTime <span style="color:var(--muted);font-weight:500;">(FB_CycleTime)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SpeedFactorApplied <span style="color:var(--muted);font-weight:500;">(REAL := 1.0)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SensorNoiseState <span style="color:var(--muted);font-weight:500;">(REAL := 0.371)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorTremie <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorPV <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorP2 <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorP1 <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSensorMaintenance <span style="color:var(--muted);font-weight:500;">(FB_Sim_PositionSensor)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDrive <span style="color:var(--muted);font-weight:500;">(FB_Sim_TranslationDrive)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instBrake <span style="color:var(--muted);font-weight:500;">(FB_Sim_TranslationBrake)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSuspendedLoad <span style="color:var(--muted);font-weight:500;">(FB_Sim_SuspendedLoad)</span></span></div>
         </div>
         
         <div style="margin:6px 0;font-size:13px;color:var(--muted);">
             <b>Constantes internes (VAR CONSTANT) :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtTremie</b> : REAL := 0.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtTremieSensor_M</b> : REAL := 0.05</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtPV</b> : REAL := 5.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtP2</b> : REAL := 15.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtP1</b> : REAL := 20.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtMaintenance</b> : REAL := 30.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_PositionAtMaintenanceSensor_M</b> : REAL := 29.95</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_NominalFrequency_Hz</b> : REAL := 40.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_MinTimeS</b> : REAL := 0.001</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_StopFrequency_Hz</b> : REAL := 0.5</span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_MinEndStopMargin_M</b> : REAL := 0.05</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_StopFrequency_Hz</b> : REAL := 0.5</span></div>
         </div>
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedTgt_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">FullTravelTimeS <span class="pin-type" style="color:var(--muted);">REAL := 37.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeReleaseCmd <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MaxFreq_Hz <span class="pin-type" style="color:var(--muted);">REAL := 50.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">AccelRate_HzPerS <span class="pin-type" style="color:var(--muted);">REAL := 20.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DecelRate_HzPerS <span class="pin-type" style="color:var(--muted);">REAL := 25.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveTimeConstantS <span class="pin-type" style="color:var(--muted);">REAL := 0.15</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeOpenDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.10</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeCloseDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.09</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeContactDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeFaultCloseWhileRunning <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeFaultCloseDelay_S <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SuspendedLoadLength_M <span class="pin-type" style="color:var(--muted);">REAL := 1.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SuspendedLoadDamping <span class="pin-type" style="color:var(--muted);">REAL := 0.35</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LoadReactionGain_Mps2 <span class="pin-type" style="color:var(--muted);">REAL := 0.20</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EndStopRecoilMax_M <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LoadFrequencyDroopGain_Hz <span class="pin-type" style="color:var(--muted);">REAL := 0.50</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorJitterAmplitude_M <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorStabilizationS <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorElectricalDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorIntermittenceActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorLoadAngleTriggerRad <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorScenarioSeed <span class="pin-type" style="color:var(--muted);">UDINT := 3001</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorHysteresis_M <span class="pin-type" style="color:var(--muted);">REAL := 0.02</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorIntermittencePeriodS <span class="pin-type" style="color:var(--muted);">REAL := 0.12</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorBlipTransitions <span class="pin-type" style="color:var(--muted);">UDINT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorBlipDurationS <span class="pin-type" style="color:var(--muted);">REAL := 0.2</span></div></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedTgt_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PosTremie_M <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PosPV_M <span class="pin-type" style="color:var(--muted);">REAL := 1.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PosP2_M <span class="pin-type" style="color:var(--muted);">REAL := 3.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PosP1_M <span class="pin-type" style="color:var(--muted);">REAL := 5.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PosMaintenance_M <span class="pin-type" style="color:var(--muted);">REAL := 10.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">GainMetersPerHzSec <span class="pin-type" style="color:var(--muted);">REAL := 0.02</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EndStopMargin_M <span class="pin-type" style="color:var(--muted);">REAL := 0.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeReleaseCmd <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MaxFreq_Hz <span class="pin-type" style="color:var(--muted);">REAL := 50.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedFactor <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">AccelRate_HzPerS <span class="pin-type" style="color:var(--muted);">REAL := 20.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DecelRate_HzPerS <span class="pin-type" style="color:var(--muted);">REAL := 25.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveTimeConstantS <span class="pin-type" style="color:var(--muted);">REAL := 0.15</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeOpenDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.10</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeCloseDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.09</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeContactDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeFaultCloseWhileRunning <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeFaultCloseDelay_S <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakePhysicalActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeDecel_Mps2 <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CartFreeActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LoadMassRatio <span class="pin-type" style="color:var(--muted);">REAL := 0.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">RollingFriction_Mps2 <span class="pin-type" style="color:var(--muted);">REAL := 0.30</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">StaticFriction_Mps2 <span class="pin-type" style="color:var(--muted);">REAL := 0.35</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Slope_Mps2 <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorCamDropoutActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorCamDropoutStart_M <span class="pin-type" style="color:var(--muted);">REAL := 0.02</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorCamDropoutWidth_M <span class="pin-type" style="color:var(--muted);">REAL := 0.04</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SuspendedLoadLength_M <span class="pin-type" style="color:var(--muted);">REAL := 1.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SuspendedLoadDamping <span class="pin-type" style="color:var(--muted);">REAL := 0.35</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LoadReactionGain_Mps2 <span class="pin-type" style="color:var(--muted);">REAL := 0.20</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EndStopRecoilMax_M <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LoadFrequencyDroopGain_Hz <span class="pin-type" style="color:var(--muted);">REAL := 0.50</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorJitterAmplitude_M <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorStabilizationS <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorElectricalDelayS <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorIntermittenceActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorLoadAngleTriggerRad <span class="pin-type" style="color:var(--muted);">REAL := 0.01</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorScenarioSeed <span class="pin-type" style="color:var(--muted);">UDINT := 3001</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorHysteresis_M <span class="pin-type" style="color:var(--muted);">REAL := 0.02</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorIntermittencePeriodS <span class="pin-type" style="color:var(--muted);">REAL := 0.12</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorBlipTransitions <span class="pin-type" style="color:var(--muted);">UDINT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SensorBlipDurationS <span class="pin-type" style="color:var(--muted);">REAL := 0.2</span></div></div></div>
             <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Sim_Translation</span>
                 
@@ -564,15 +564,15 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">30</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">47</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">20</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">27</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">0</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">30 IN</b> / <b style="color:#ffffff;">20 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">47 IN</b> / <b style="color:#ffffff;">27 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -662,6 +662,34 @@
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>HardStopMaintenanceActive</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ObsOvershootLast_M</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ObsOvershootSensorId</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">INT</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ObsEndStopHitCount</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">UDINT</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ObsEndStopImpactSpeed_Mps</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ObsBrakeClosedMovingCount</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">UDINT</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ObsCartFree</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ObsFreeRollLast_M</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div></div>
         </div>
@@ -785,7 +813,7 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Sim_TranslationBrake</code></td>
-                <td>9</td><td>5</td>
+                <td>10</td><td>5</td>
                 <td>0</td><td>4</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
@@ -799,16 +827,16 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Sim_PositionSensor</code></td>
-                <td>13</td><td>6</td>
-                <td>0</td><td>11</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (11 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>16</td><td>6</td>
+                <td>0</td><td>16</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (16 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Sim_Translation</code></td>
-                <td>30</td><td>20</td>
-                <td>0</td><td>32</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (32 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>47</td><td>27</td>
+                <td>0</td><td>37</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (37 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -831,9 +859,9 @@
         <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-simtranslationloop-0" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-simtranslationloop-0" class="test-card test-card-fail">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
+                <span class="badge badge-fail">FAIL</span>
                 <h3 style="flex: 1; user-select: text;">TC-T417-LOOP-A Rejeu P1 a 20 Hz, demande TENUE apres arrivee : le plafond d approche maintient 20 Hz vers le variateur </h3>
                 <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T417-LOOP-A Rejeu P1 a 20 Hz, demande TENUE apres arrivee : le plafond d approche maintient 20 Hz vers le variateur')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
@@ -845,13 +873,13 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
                 <ul class="checks-list"><li>Scenario termine (arret apres P1)</li><li>Approche a 20 Hz au franchissement de P1</li><li>Demande tenue : la consigne vers le variateur reste plafonnee a 20 Hz apres P1</li><li>Depassement apres P1 &gt;= 0,30 m (caracterisation)</li><li>Depassement apres P1 &lt;= 0,80 m (caracterisation)</li></ul>
             </details>
-                
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — LOOP.PHASE expected 3, got 2</div><div class='failure-loc'>test_sim_translation_loop.st:2611</div><div class='failure-msg'>Scenario termine (arret apres P1)</div><div class='failure-diff'>attendu <code class='val-expected'>3</code> · obtenu <code class='val-actual'>2</code></div></div>
                 
             </div>
         </article>
-        <article id="test-simtranslationloop-1" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-simtranslationloop-1" class="test-card test-card-fail">
             <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
+                <span class="badge badge-fail">FAIL</span>
                 <h3 style="flex: 1; user-select: text;">TC-T417-LOOP-B Rejeu P1 a 20 Hz, demande RETIREE au jeton d arrivee (cycle auto) : plafond perdu, mot de commande a 0 </h3>
                 <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-T417-LOOP-B Rejeu P1 a 20 Hz, demande RETIREE au jeton d arrivee (cycle auto) : plafond perdu, mot de commande a 0')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
@@ -868,7 +896,7 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
                 <ul class="checks-list"><li>Scenario termine (arret apres P1)</li><li>Approche a 20 Hz au franchissement de P1</li><li>Consigne PLC remontee au retrait de la demande (plafond 20 Hz perdu)</li><li>Depassement apres P1 &gt;= 0,15 m (ordre de grandeur T334 / trace)</li><li>Depassement apres P1 &lt;= 0,45 m (ordre de grandeur T334 / trace)</li></ul>
             </details>
-                
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — LOOP.PHASE expected 3, got 2</div><div class='failure-loc'>test_sim_translation_loop.st:5223</div><div class='failure-msg'>Scenario termine (arret apres P1)</div><div class='failure-diff'>attendu <code class='val-expected'>3</code> · obtenu <code class='val-actual'>2</code></div></div>
                 
             </div>
         </article>
@@ -1935,8 +1963,8 @@ VAR_INPUT
     Enable : BOOL;
     FrequencyTgt_Hz : REAL;
     AccelRate_HzPerS : REAL := 20.0;
-    DecelRate_HzPerS : REAL := 25.0; // pente d&#x27;arret relevee sur trace reelle
-    TimeConstant_S : REAL := 0.15;
+    DecelRate_HzPerS : REAL := 20.0; // Pente d&#x27;arret relevee sur trace reelle MES (-20.0 Hz/s)
+    TimeConstant_S : REAL := 0.03;   // Reponse dynamique AC600 en boucle fermee (30 ms)
     LoadAngularVelocity_RadPerS : REAL;
     LoadFrequencyDroopGain_Hz : REAL := 0.50;
     CycleTime_S : REAL := 0.01;
@@ -2008,6 +2036,11 @@ VAR_INPUT
        elle est validee par la meme trace (frein ouvert a 0,60 Hz, ferme a 0,00 Hz). *)
     FaultCloseWhileRunning : BOOL := FALSE;
     FaultCloseDelay_S : REAL := 0.0;
+    (* L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique : la retombee mecanique attend
+       f &lt;= 0,5 Hz (garde qui recopiait la logique PLC dans l&#x27;usine simulee). TRUE = frein a
+       manque de courant reel : retombe CloseDelay_S apres la coupure bobine, QUELLE QUE SOIT
+       la vitesse. *)
+    PhysicalBrakeActive : BOOL := FALSE; (* defaut FB = historique ; la simulation M3 passe TRUE via GVL_Simulation (source unique) *)
 END_VAR
 VAR_OUTPUT
     Ready : BOOL;
@@ -2058,7 +2091,7 @@ IF CoilEnergized THEN
     ELSE
         MechanicalTimer_S := 0.0;
     END_IF;
-ELSIF FaultCloseActive OR (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
+ELSIF FaultCloseActive OR PhysicalBrakeActive OR (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
     IF MechanicallyOpen THEN
         MechanicalTimer_S := MechanicalTimer_S + CycleTime_S;
         IF MechanicalTimer_S &gt;= MAX(0.0, CloseDelay_S) THEN
@@ -2166,6 +2199,16 @@ VAR_INPUT
          BlipDurationS   = duree de maintien de chaque etat, donc largeur de l&#x27;excursion. *)
     BlipTransitions : UDINT := 0;
     BlipDurationS : REAL := 0.2;
+    (* L5 (2026-10-28) — MECANISME DE CAME, SPATIAL : en franchissant le capteur on le VOIT,
+       on le PERD sur une courte zone, on le RETROUVE, puis il reste FIXE. Lie a la POSITION
+       (pas au temps) : se produit a chaque passage, dans les DEUX sens, et reste stable a
+       l&#x27;arret (bornes de la zone avec hysteresis CST_CamHysteresis_M contre le bruit/balancement).
+       Zone de perte placee APRES le front de detection (cote -/+ Hysteresis_M) :
+       [front - Start - Width ; front - Start] cote detection.
+       FALSE = historique strictement inchange. Valeurs = HYPOTHESES. *)
+    CamDropoutActive : BOOL := FALSE;
+    CamDropoutStart_M : REAL := 0.02;
+    CamDropoutWidth_M : REAL := 0.04;
 END_VAR
 VAR_OUTPUT
     RawDetected : BOOL;
@@ -2186,11 +2229,16 @@ VAR
     BlipRunning : BOOL;
     BlipTimerS : REAL;
     BlipCount : UDINT;
+    HystDetected : BOOL;      (* L5 : etat mecanique avec hysteresis (avant perte de came) *)
+    InCamDropout : BOOL;      (* L5 : position dans la zone de perte de la came *)
+    CamNear_M : REAL;         (* L5 : borne de la zone cote front de detection *)
+    CamFar_M : REAL;          (* L5 : borne de la zone cote interieur *)
 END_VAR
 VAR CONSTANT
     (* Plafond du nombre de bascules du profil « blip court » : borne la duree de l&#x27;episode
        et interdit tout rebouclage de compteur UDINT (revue du 2026-09-20, F9). *)
     CST_BlipMaxTransitions : UDINT := 1000;
+    CST_CamHysteresis_M : REAL := 0.01;   (* L5 : hysteresis des bornes de la zone de perte *)
 END_VAR
 
 IF NOT Enable THEN
@@ -2219,6 +2267,7 @@ IF NOT Initialized THEN
     ELSE
         RawDetected := Position_M &gt;= Threshold_M;
     END_IF;
+    HystDetected := RawDetected;
     ElectricalOutput := RawDetected;
     PreviousRawDetected := RawDetected;
     RandomState := ScenarioSeed MOD 1000000;
@@ -2231,18 +2280,39 @@ IF NOT Initialized THEN
 END_IF;
 
 IF ActiveBelowThreshold THEN
-    IF RawDetected THEN
-        RawDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    IF HystDetected THEN
+        HystDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
     ELSE
-        RawDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+        HystDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    END_IF;
+    (* Zone de perte : apres le front d&#x27;entree en detection (cote - hysteresis), vers l&#x27;interieur. *)
+    CamNear_M := Threshold_M - MAX(0.0, Hysteresis_M) - MAX(0.0, CamDropoutStart_M);
+    CamFar_M := CamNear_M - MAX(0.0, CamDropoutWidth_M);
+    IF NOT CamDropoutActive THEN
+        InCamDropout := FALSE;
+    ELSIF InCamDropout THEN
+        InCamDropout := (Position_M &lt;= CamNear_M + CST_CamHysteresis_M) AND (Position_M &gt; CamFar_M - CST_CamHysteresis_M);
+    ELSE
+        InCamDropout := (Position_M &lt;= CamNear_M - CST_CamHysteresis_M) AND (Position_M &gt; CamFar_M + CST_CamHysteresis_M);
     END_IF;
 ELSE
-    IF RawDetected THEN
-        RawDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    IF HystDetected THEN
+        HystDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
     ELSE
-        RawDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+        HystDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    END_IF;
+    CamNear_M := Threshold_M + MAX(0.0, Hysteresis_M) + MAX(0.0, CamDropoutStart_M);
+    CamFar_M := CamNear_M + MAX(0.0, CamDropoutWidth_M);
+    IF NOT CamDropoutActive THEN
+        InCamDropout := FALSE;
+    ELSIF InCamDropout THEN
+        InCamDropout := (Position_M &gt;= CamNear_M - CST_CamHysteresis_M) AND (Position_M &lt; CamFar_M + CST_CamHysteresis_M);
+    ELSE
+        InCamDropout := (Position_M &gt;= CamNear_M + CST_CamHysteresis_M) AND (Position_M &lt; CamFar_M - CST_CamHysteresis_M);
     END_IF;
 END_IF;
+(* L5 : la perte de came s&#x27;applique a l&#x27;etat mecanique ; hors option, RawDetected = HystDetected. *)
+RawDetected := HystDetected AND NOT InCamDropout;
 
 (* Un episode est declenche par un franchissement mecanique, pas par une de ses
    propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)
@@ -2344,25 +2414,34 @@ VAR_INPUT
     ReqTremie : BOOL;
     ReqMaintenance : BOOL;
     SpeedTgt_Pct : REAL;
-    (* T361 — ECHELLE ODOMETRIQUE DU BANC, ALIGNEE SUR L&#x27;ESTIMATEUR REEL.
-       Le modele integre VelocityTarget = (CST_PositionAtMaintenance / FullTravelTimeS) x f / 40.
-       Le ratio simule vaut donc 30 / (40 x FullTravelTimeS) m/(Hz.s) et DOIT etre egal au gain
-       consomme par FB_Translation_PositionEstimator (GainMetersPerHzSec, cable sur
-       GVL_PERSISTENT._TranslationGainMetersPerHzSec = 0,02 m/(Hz.s), soit 1 m/s a 50 Hz).
-       =&gt; 30 / (40 x 37,5) = 0,02 m/(Hz.s). La valeur historique 8,0 s donnait 0,09375 m/(Hz.s),
-       soit 4,7 fois l&#x27;echelle reelle : l&#x27;estimateur prenait un retard constant et chaque
-       franchissement de capteur produisait un saut de recalage de plusieurs metres
-       (AUDIT_T360_TRACE_RATIO_ESTIMATEUR_M3_20260921.md, trace Suivi_74 : sauts de 4,53 a 9,12 m).
-       ⚠️ Toute evolution de _TranslationGainMetersPerHzSec exige de recalculer cette constante :
-       le gate G518 echoue si les deux echelles divergent. *)
-    FullTravelTimeS : REAL := 37.5;
+    (* T301/L1 — SOURCE UNIQUE : le banc ne porte AUCUNE position ni echelle propre.
+       Positions capteurs = reglages machine (GVL_PERSISTENT._TranslationPos*_M) et gain =
+       gain EFFECTIVEMENT consomme par l&#x27;estimateur (PRG_05 FB_Translation_OdometryGain.GainActive),
+       passes par PRG_02 -&gt; FB_SimBench. Vitesse chariot = sens x gain x frequence.
+       Historique : l&#x27;ancienne echelle en dur (30 m / FullTravelTimeS / 40 Hz) a diverge du gain
+       reel (T360/T361, sauts de 4 a 9 m) — doublon supprime, gate G518 anti-retour. *)
+    PosTremie_M        : REAL := 0.0;   (* --&gt; [CFG] Position capteur Tremie (m) *)
+    PosPV_M            : REAL := 1.5;   (* --&gt; [CFG] Position capteur PV (m) *)
+    PosP2_M            : REAL := 3.5;   (* --&gt; [CFG] Position capteur P2 (m) *)
+    PosP1_M            : REAL := 5.0;   (* --&gt; [CFG] Position capteur P1 (m) *)
+    PosMaintenance_M   : REAL := 10.0;  (* --&gt; [CFG] Position capteur Maintenance (m) *)
+    GainMetersPerHzSec : REAL := 0.02;  (* --&gt; [CFG] Gain odometrique effectif, m/(Hz.s) *)
+    (* Distance capteur extreme -&gt; butee mecanique (seule donnee propre au banc : physique du rail).
+       Bornee a CST_MinEndStopMargin_M pour que le capteur extreme reste franchissable. *)
+    EndStopMargin_M    : REAL := 0.5;
     BrakeReleaseCmd : BOOL := TRUE;
     (* ECHELLE DE LA CONSIGNE. PRG_02 envoie SpeedCmd_Pct = f / 50 Hz x 100 : le simulateur reconvertit
        avec le MEME maximum, sinon 20 Hz reels (40 %) deviendraient 16 Hz simules.
        Maximum = GVL_PERSISTENT._TranslationMaxFreq_Hz (50 Hz), passe par FB_SimBench (CST_M3MaxFreq_Hz,
-       egalite verifiee par G518). Ne pas confondre avec CST_NominalFrequency_Hz (40 Hz) : echelle
+       egalite verifiee par G518). Ne pas confondre avec l&#x27;ancienne echelle (40 Hz) : echelle
        ODOMETRIQUE (gain 0,02 m/(Hz.s)). *)
     MaxFreq_Hz : REAL := 50.0;
+    (* ACCELERATION DU BANC (confort d&#x27;essai). Le chariot avance SpeedFactor fois plus vite ET la
+       frequence RETOURNEE au PLC est multipliee d&#x27;autant : l&#x27;estimateur (f x gain) suit exactement
+       le chariot, sans saut de recalage, et le ratio publie reste 0,02 m/(Hz.s) (G518).
+       Borne 1..5. 1,0 = dynamique reelle. Le frein et la memoire de sens restent sur la frequence
+       physique du variateur simule. *)
+    SpeedFactor : REAL := 1.0;
     AccelRate_HzPerS : REAL := 20.0;
     DecelRate_HzPerS : REAL := 25.0; // pente d&#x27;arret relevee sur trace reelle (rampe variateur / rampe PLC)
     DriveTimeConstantS : REAL := 0.15;
@@ -2374,6 +2453,26 @@ VAR_INPUT
        State.ErrorId=64). La garde nominale 0,5 Hz du frein n&#x27;est pas modifiee. *)
     BrakeFaultCloseWhileRunning : BOOL := FALSE;
     BrakeFaultCloseDelay_S : REAL := 0.0;
+    (* L3 — FREIN PHYSIQUE (2026-10-28). FALSE = historique (frein ne retombe que sous 0,5 Hz,
+       arret instantane). TRUE = frein a manque de courant reel : retombe CloseDelay apres la
+       coupure bobine QUELLE QUE SOIT la vitesse, puis le chariot decelere sur le frein
+       (BrakeDecel_Mps2) ; frein serre = chariot bloque meme si le variateur pousse. *)
+    BrakePhysicalActive : BOOL := FALSE; (* defaut FB = historique ; GVL_Simulation.SimM3BrakePhysicalActive = TRUE (source unique) *)
+    BrakeDecel_Mps2 : REAL := 2.0;   (* HYPOTHESE : 0,4 m/s (20 Hz) -&gt; arret ~0,2 s / ~4 cm *)
+    (* L4 — CHARIOT LIBRE (2026-10-28). FALSE = historique (chariot esclave de la frequence).
+       TRUE = quand le frein est OUVERT et que le variateur n&#x27;applique plus de couple (mot a 0
+       et rampe variateur terminee), le chariot n&#x27;est plus tenu : il garde sa vitesse et subit
+       la poussee de la benne suspendue (rapport de masse x g x angle), la pente et le
+       frottement de roulement. Valeurs = HYPOTHESES, sans mesure terrain. *)
+    CartFreeActive : BOOL := FALSE;
+    LoadMassRatio : REAL := 0.5;          (* masse benne / masse totale chariot+benne *)
+    RollingFriction_Mps2 : REAL := 0.30;  (* FEM 1.001 : frottement global galets + reducteur accouple *)
+    StaticFriction_Mps2 : REAL := 0.35;   (* Seuil de decollement statique (anti-pompage pendulaire) *)
+    Slope_Mps2 : REAL := 0.0;             (* composante de pente, + vers Maintenance *)
+    (* L5 — came capteurs (vu -&gt; perdu -&gt; retrouve -&gt; fixe), appliquee aux 5 capteurs. *)
+    SensorCamDropoutActive : BOOL := FALSE;
+    SensorCamDropoutStart_M : REAL := 0.02;
+    SensorCamDropoutWidth_M : REAL := 0.04;
     SuspendedLoadLength_M : REAL := 1.5;
     SuspendedLoadDamping : REAL := 0.35;
     LoadReactionGain_Mps2 : REAL := 0.20;
@@ -2427,8 +2526,27 @@ VAR_OUTPUT
     SensorBlipActive : BOOL;
     HardStopTremieActive : BOOL;
     HardStopMaintenanceActive : BOOL;
+    (* L2 — OBSERVATION (aucun effet sur le modele ni sur le programme) *)
+    ObsOvershootLast_M : REAL;          (* Distance roulee entre le 1er front du dernier capteur d&#x27;arret (Tremie, P1, Maintenance) et l&#x27;arret *)
+    ObsOvershootSensorId : INT;         (* 1 = Tremie, 3 = P1, 5 = Maintenance, 0 = aucun *)
+    ObsEndStopHitCount : UDINT;         (* Nombre de chocs en butee mecanique *)
+    ObsEndStopImpactSpeed_Mps : REAL;   (* Vitesse au dernier choc en butee *)
+    ObsBrakeClosedMovingCount : UDINT;  (* Nombre de fermetures mecaniques du frein chariot en mouvement *)
+    ObsCartFree : BOOL;                 (* L4 : frein ouvert ET variateur sans couple -&gt; chariot libre *)
+    ObsFreeRollLast_M : REAL;           (* L4 : distance parcourue pendant le dernier episode libre *)
 END_VAR
 VAR
+    ObsArmed : BOOL;                    (* Front capteur d&#x27;arret vu, arret pas encore constate *)
+    ObsEdgePosition_M : REAL;           (* Position vraie au 1er front du capteur d&#x27;arret *)
+    ObsPrevTremie : BOOL;
+    ObsPrevP1 : BOOL;
+    ObsPrevMaintenance : BOOL;
+    ObsPrevBrakeOpen : BOOL;
+    ObsPrevHardStop : BOOL;
+    ObsSpeedBeforeStop_Mps : REAL;      (* Vitesse du scan avant le calcul de butee *)
+    DriveTorqueActive : BOOL;           (* L4 : variateur commande ou encore en rampe -&gt; chariot tenu *)
+    FreeAccel_Mps2 : REAL;              (* L4 : acceleration nette du chariot libre *)
+    FreeRollStart_M : REAL;             (* L4 : position au debut de l&#x27;episode libre *)
     instCycleTime : FB_CycleTime;
     Initialized : BOOL;
     DirectionSign : REAL;
@@ -2444,14 +2562,16 @@ VAR
        retenue (gain audit 0,0551 m/(Hz.s)). A ne pas citer comme une mesure. *)
     TravelDirection : REAL;
     FrequencyTarget_Hz : REAL;
+    SpeedFactorApplied : REAL := 1.0;
     CycleTimeS : REAL;
-    SpeedAt40Hz_Mps : REAL;
+    EndStopTremie_M : REAL;       (* butee mecanique cote Tremie = capteur Tremie - marge *)
+    EndStopMaintenance_M : REAL;  (* butee mecanique cote Maintenance = capteur Maintenance + marge *)
     VelocityTarget_Mps : REAL;
     CartAcceleration_Mps2 : REAL;
     PreviousVelocity_Mps : REAL;
     PositionCandidate_M : REAL;
     (* Recul de butee ECRETE a la course : une valeur d&#x27;entree aberrante ne peut pas
-       autoriser une position hors de [0 ; 30] m (revue du 2026-09-20, F8). *)
+       autoriser une position hors des butees (revue du 2026-09-20, F8). *)
     RecoilMax_M : REAL;
     SensorNoiseState : REAL := 0.371;
     SensorNoise_M : REAL;
@@ -2465,20 +2585,9 @@ VAR
     instSuspendedLoad : FB_Sim_SuspendedLoad;
 END_VAR
 VAR CONSTANT
-    CST_PositionAtTremie : REAL := 0.0;
-    (* Meme principe a Tremie : le seuil DI est legerement avant la butee afin
-       que l&#x27;hysteresis puisse commuter sans depassement numerique de course. *)
-    CST_PositionAtTremieSensor_M : REAL := 0.05;
-    CST_PositionAtPV : REAL := 5.0;
-    CST_PositionAtP2 : REAL := 15.0;
-    CST_PositionAtP1 : REAL := 20.0;
-    CST_PositionAtMaintenance : REAL := 30.0;
-    (* Le capteur cumulatif Maintenance doit commuter avant la butee mecanique,
-       sinon un modele borne a 30 m ne peut jamais produire le mot 00000. Cette
-       position est SYNTHETIQUE en attente de la mesure de la came reelle. *)
-    CST_PositionAtMaintenanceSensor_M : REAL := 29.95;
-    CST_NominalFrequency_Hz : REAL := 40.0; // echelle ODOMETRIQUE lue par G518 — PAS le maximum variateur (MaxFreq_Hz)
-    CST_MinTimeS : REAL := 0.001;
+    (* Marge mini capteur extreme -&gt; butee : au-dela de l&#x27;hysteresis capteur, sinon le mot
+       11111 / 00000 ne pourrait jamais etre produit (capteur colle a la butee). *)
+    CST_MinEndStopMargin_M : REAL := 0.05;
     (* Meme seuil d&#x27;arret que FB_Sim_TranslationBrake.CST_StopFrequency_Hz (0,5 Hz).
        Valide par la trace terrain du 2026-09-04 : frein ouvert a 0,60 Hz, ferme a 0,00 Hz. *)
     CST_StopFrequency_Hz : REAL := 0.5;
@@ -2493,6 +2602,10 @@ instCycleTime(DefaultValueS := 0.010);
    de trace plus rapide que 100 ms. *)
 CycleTimeS := LIMIT(0.001, instCycleTime.CycleTimeS, 0.100);
 
+(* Butees mecaniques derivees des capteurs extremes (reglages machine) + marge du rail. *)
+EndStopTremie_M := PosTremie_M - MAX(EndStopMargin_M, CST_MinEndStopMargin_M);
+EndStopMaintenance_M := PosMaintenance_M + MAX(EndStopMargin_M, CST_MinEndStopMargin_M);
+
 IF NOT Enable THEN
     Initialized := FALSE;
     instDrive(Enable := FALSE);
@@ -2505,7 +2618,7 @@ IF NOT Enable THEN
     BrakeContactOpen := FALSE;
     BrakeCoilEnergized := FALSE;
     BrakeFaultCloseActive := FALSE;
-    PositionTrue_M := CST_PositionAtP1;
+    PositionTrue_M := PosP1_M;
     VelocityTrue_Mps := 0.0;
     PreviousVelocity_Mps := 0.0;
     TravelDirection := 0.0;
@@ -2528,7 +2641,7 @@ IF NOT Enable THEN
     RETURN;
 ELSIF NOT Initialized THEN
     Initialized := TRUE;
-    PositionTrue_M := CST_PositionAtP1;
+    PositionTrue_M := PosP1_M;
     TravelDirection := 0.0;
 END_IF;
 
@@ -2551,13 +2664,15 @@ IF Enable THEN
         LoadFrequencyDroopGain_Hz := LoadFrequencyDroopGain_Hz, CycleTime_S := CycleTimeS);
     FrequencyCmd_Hz := instDrive.FrequencyCmd_Hz;
     ElectricalFrequency_Hz := instDrive.ElectricalFrequency_Hz;
-    ActualFrequency_Hz := instDrive.ActualFrequency_Hz;
+    SpeedFactorApplied := LIMIT(1.0, SpeedFactor, 5.0);
+    ActualFrequency_Hz := instDrive.ActualFrequency_Hz * SpeedFactorApplied;
     instBrake(Enable := TRUE, ReleaseCmd := BrakeReleaseCmd,
-        ActualFrequency_Hz := ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
+        ActualFrequency_Hz := instDrive.ActualFrequency_Hz, OpenDelay_S := BrakeOpenDelayS,
         CloseDelay_S := BrakeCloseDelayS, ContactDelay_S := BrakeContactDelayS,
         CycleTime_S := CycleTimeS,
         FaultCloseWhileRunning := BrakeFaultCloseWhileRunning,
-        FaultCloseDelay_S := BrakeFaultCloseDelay_S);
+        FaultCloseDelay_S := BrakeFaultCloseDelay_S,
+        PhysicalBrakeActive := BrakePhysicalActive);
     BrakeCoilEnergized := instBrake.CoilEnergized;
     BrakeMechanicallyOpen := instBrake.MechanicallyOpen;
     BrakeContactOpen := instBrake.ContactOpen;
@@ -2575,30 +2690,66 @@ IF Enable THEN
         TravelDirection := 1.0;
     ELSIF ReqTremie AND ReqMaintenance THEN
         TravelDirection := 0.0;
-    ELSIF ABS(ActualFrequency_Hz) &lt;= CST_StopFrequency_Hz THEN
+    ELSIF ABS(instDrive.ActualFrequency_Hz) &lt;= CST_StopFrequency_Hz THEN
         TravelDirection := 0.0;
     END_IF;
 
     PreviousVelocity_Mps := VelocityTrue_Mps;
-    IF (FullTravelTimeS &gt; CST_MinTimeS) AND BrakeMechanicallyOpen THEN
-        SpeedAt40Hz_Mps := CST_PositionAtMaintenance / FullTravelTimeS;
-        VelocityTarget_Mps := TravelDirection * SpeedAt40Hz_Mps * ActualFrequency_Hz / CST_NominalFrequency_Hz;
+    IF BrakeMechanicallyOpen THEN
+        (* Source unique : meme gain que l&#x27;estimateur machine (vitesse = gain x frequence). *)
+        VelocityTarget_Mps := TravelDirection * MAX(0.0, GainMetersPerHzSec) * ActualFrequency_Hz;
     ELSE
         VelocityTarget_Mps := 0.0;
     END_IF;
-    VelocityTrue_Mps := VelocityTrue_Mps + instDrive.ResponseAlpha * (VelocityTarget_Mps - VelocityTrue_Mps);
-    IF NOT BrakeMechanicallyOpen THEN
-        VelocityTrue_Mps := 0.0;
+    (* L4 : le variateur tient le chariot tant qu&#x27;il est commande ou que sa SORTIE electrique
+       alimente encore le moteur (rampe + reponse) ; ensuite, plus aucun couple.
+       Reprise de commande en roue libre : pas de reprise a la volee (le variateur repart de 0 Hz). *)
+    DriveTorqueActive := (DirectionSign &lt;&gt; 0.0) OR (instDrive.ElectricalFrequency_Hz &gt; CST_StopFrequency_Hz);
+    ObsCartFree := CartFreeActive AND BrakeMechanicallyOpen AND NOT DriveTorqueActive;
+    IF ObsCartFree THEN
+        (* Poussee de la benne (angle du scan precedent) + pente - frottement oppose au mouvement. *)
+        (* Pendule sur chariot libre : x&#x27;&#x27; = m_benne / m_chariot x g x theta = r / (1 - r) x g x theta. *)
+        FreeAccel_Mps2 := (LIMIT(0.0, LoadMassRatio, 0.9) / (1.0 - LIMIT(0.0, LoadMassRatio, 0.9)))
+                          * 9.81 * instSuspendedLoad.Angle_Rad + Slope_Mps2;
+        IF ABS(VelocityTrue_Mps) &lt; 0.001 THEN
+            (* Adherence statique au repos : ne decolle que si la poussee depasse le frottement statique *)
+            IF ABS(FreeAccel_Mps2) &lt;= MAX(0.0, StaticFriction_Mps2) THEN
+                FreeAccel_Mps2 := 0.0;
+                VelocityTrue_Mps := 0.0;
+            ELSIF FreeAccel_Mps2 &gt; 0.0 THEN
+                FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, StaticFriction_Mps2);
+            ELSE
+                FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, StaticFriction_Mps2);
+            END_IF;
+        ELSIF VelocityTrue_Mps &gt; 0.0 THEN
+            FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+        ELSE
+            FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+        END_IF;
+        VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
+    ELSIF BrakeMechanicallyOpen THEN
+        (* Vitesse suivant directement le variateur (deja filtre par instDrive) sans double PT1 *)
+        VelocityTrue_Mps := VelocityTarget_Mps;
+    ELSIF BrakePhysicalActive THEN
+        (* L3 : frein serre -&gt; deceleration sur le frein jusqu&#x27;a l&#x27;arret, puis chariot bloque. *)
+        IF VelocityTrue_Mps &gt; 0.0 THEN
+            VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps - MAX(0.0, BrakeDecel_Mps2) * CycleTimeS);
+        ELSE
+            VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps + MAX(0.0, BrakeDecel_Mps2) * CycleTimeS);
+        END_IF;
+    ELSE
+        VelocityTrue_Mps := 0.0;   (* historique : arret instantane *)
     END_IF;
+    ObsSpeedBeforeStop_Mps := VelocityTrue_Mps;
     HardStopTremieActive := FALSE;
     HardStopMaintenanceActive := FALSE;
     PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
-    IF PositionCandidate_M &lt; CST_PositionAtTremie THEN
-        PositionTrue_M := CST_PositionAtTremie;
+    IF PositionCandidate_M &lt; EndStopTremie_M THEN
+        PositionTrue_M := EndStopTremie_M;
         VelocityTrue_Mps := 0.0;
         HardStopTremieActive := TRUE;
-    ELSIF PositionCandidate_M &gt; CST_PositionAtMaintenance THEN
-        PositionTrue_M := CST_PositionAtMaintenance;
+    ELSIF PositionCandidate_M &gt; EndStopMaintenance_M THEN
+        PositionTrue_M := EndStopMaintenance_M;
         VelocityTrue_Mps := 0.0;
         HardStopMaintenanceActive := TRUE;
     END_IF;
@@ -2609,7 +2760,7 @@ IF Enable THEN
         CycleTime_S := CycleTimeS);
     LoadAngle_Rad := instSuspendedLoad.Angle_Rad;
     IF HardStopTremieActive OR HardStopMaintenanceActive THEN
-        RecoilMax_M := MIN(MAX(0.0, EndStopRecoilMax_M), CST_PositionAtMaintenance);
+        RecoilMax_M := MIN(MAX(0.0, EndStopRecoilMax_M), EndStopMaintenance_M - EndStopTremie_M);
         IF (RecoilMax_M &gt; 0.0) AND BrakeMechanicallyOpen THEN
             (* Recul autorise UNIQUEMENT en s&#x27;eloignant de la butee touchee, borne par
                EndStopRecoilMax_M : jamais plus loin dans la butee, jamais de saut cache. *)
@@ -2621,28 +2772,31 @@ IF Enable THEN
             TravelDirection := 0.0;
             IF HardStopTremieActive THEN
                 VelocityTrue_Mps := MAX(0.0, VelocityTrue_Mps);
-                PositionCandidate_M := LIMIT(CST_PositionAtTremie,
+                PositionCandidate_M := LIMIT(EndStopTremie_M,
                     PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
-                    CST_PositionAtTremie + RecoilMax_M);
+                    EndStopTremie_M + RecoilMax_M);
             ELSE
                 VelocityTrue_Mps := MIN(0.0, VelocityTrue_Mps);
-                PositionCandidate_M := LIMIT(CST_PositionAtMaintenance - RecoilMax_M,
+                PositionCandidate_M := LIMIT(EndStopMaintenance_M - RecoilMax_M,
                     PositionTrue_M + VelocityTrue_Mps * CycleTimeS,
-                    CST_PositionAtMaintenance);
+                    EndStopMaintenance_M);
             END_IF;
             PositionTrue_M := PositionCandidate_M;
         ELSE
             VelocityTrue_Mps := 0.0;
         END_IF;
     ELSE
-        VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+        IF NOT ObsCartFree THEN
+            (* Reaction historique (negligeable) ; en mode libre la poussee est deja integree (L4). *)
+            VelocityTrue_Mps := VelocityTrue_Mps + instSuspendedLoad.VelocityReaction_Mps;
+        END_IF;
         PositionCandidate_M := PositionTrue_M + VelocityTrue_Mps * CycleTimeS;
-        IF PositionCandidate_M &lt; CST_PositionAtTremie THEN
-            PositionTrue_M := CST_PositionAtTremie;
+        IF PositionCandidate_M &lt; EndStopTremie_M THEN
+            PositionTrue_M := EndStopTremie_M;
             VelocityTrue_Mps := 0.0;
             HardStopTremieActive := TRUE;
-        ELSIF PositionCandidate_M &gt; CST_PositionAtMaintenance THEN
-            PositionTrue_M := CST_PositionAtMaintenance;
+        ELSIF PositionCandidate_M &gt; EndStopMaintenance_M THEN
+            PositionTrue_M := EndStopMaintenance_M;
             VelocityTrue_Mps := 0.0;
             HardStopMaintenanceActive := TRUE;
         ELSE
@@ -2665,44 +2819,54 @@ SensorPosition_M := PositionTrue_M + SensorNoise_M;
    brique garde son hysteresis et son episode propres ; aucun timer partage ne
    peut masquer un front d&#x27;un autre capteur. *)
 instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtTremieSensor_M, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosTremie_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 11,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtPV, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosPV_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 23,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorP2(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtP2, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosP2_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 37,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorP1(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtP1, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosP1_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 53,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 instSensorMaintenance(Enable := Enable, Position_M := SensorPosition_M,
-    Threshold_M := CST_PositionAtMaintenanceSensor_M, Hysteresis_M := SensorHysteresis_M,
+    Threshold_M := PosMaintenance_M, Hysteresis_M := SensorHysteresis_M,
     ElectricalDelayS := SensorElectricalDelayS, IntermittenceActive := SensorIntermittenceActive
         AND (ABS(LoadAngle_Rad) &gt;= SensorLoadAngleTriggerRad),
     IntermittenceDurationS := SensorStabilizationS, IntermittencePeriodS := SensorIntermittencePeriodS,
     ScenarioSeed := SensorScenarioSeed + 71,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
+    CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
+    CamDropoutWidth_M := SensorCamDropoutWidth_M,
     CycleTimeS := CycleTimeS);
 
 PosTremie := instSensorTremie.ElectricalOutput;
@@ -2716,6 +2880,51 @@ SensorTransitionCount := instSensorTremie.TransitionCount + instSensorPV.Transit
 SensorBlipActive := instSensorTremie.BlipActive OR instSensorPV.BlipActive
     OR instSensorP2.BlipActive OR instSensorP1.BlipActive
     OR instSensorMaintenance.BlipActive;
+
+(* ── L2 OBSERVATION (lecture seule, aucun effet sur le modele) ───────────────────────── *)
+IF Enable THEN
+    (* Frein serre en mouvement : front de fermeture mecanique avec vitesse non nulle. *)
+    IF ObsPrevBrakeOpen AND NOT BrakeMechanicallyOpen AND (ABS(PreviousVelocity_Mps) &gt; 0.03) THEN
+        ObsBrakeClosedMovingCount := ObsBrakeClosedMovingCount + 1;
+    END_IF;
+    ObsPrevBrakeOpen := BrakeMechanicallyOpen;
+
+    (* Choc en butee : front de HardStop, vitesse avant contact. *)
+    IF (HardStopTremieActive OR HardStopMaintenanceActive) AND NOT ObsPrevHardStop THEN
+        ObsEndStopHitCount := ObsEndStopHitCount + 1;
+        ObsEndStopImpactSpeed_Mps := ABS(ObsSpeedBeforeStop_Mps);
+    END_IF;
+    ObsPrevHardStop := HardStopTremieActive OR HardStopMaintenanceActive;
+
+    (* Depassement : 1er front d&#x27;un capteur d&#x27;arret (Tremie montant, P1 dans les deux sens,
+       Maintenance descendant) -&gt; position memorisee ; les rebonds du MEME capteur sont ignores
+       tant que l&#x27;arret n&#x27;est pas constate ; un autre capteur franchi remplace le repere. *)
+    (* Armement seulement chariot en mouvement : un rebond capteur a l&#x27;arret n&#x27;ecrase pas la mesure. *)
+    IF ABS(VelocityTrue_Mps) &lt;= 0.005 THEN
+        ObsArmed := ObsArmed;   (* chariot a l&#x27;arret : aucun armement *)
+    ELSIF (PosTremie AND NOT ObsPrevTremie) AND NOT (ObsArmed AND ObsOvershootSensorId = 1) THEN
+        ObsArmed := TRUE; ObsOvershootSensorId := 1; ObsEdgePosition_M := PositionTrue_M;
+    ELSIF (PosP1 &lt;&gt; ObsPrevP1) AND NOT (ObsArmed AND ObsOvershootSensorId = 3) THEN
+        ObsArmed := TRUE; ObsOvershootSensorId := 3; ObsEdgePosition_M := PositionTrue_M;
+    ELSIF (ObsPrevMaintenance AND NOT PosMaintenance) AND NOT (ObsArmed AND ObsOvershootSensorId = 5) THEN
+        ObsArmed := TRUE; ObsOvershootSensorId := 5; ObsEdgePosition_M := PositionTrue_M;
+    END_IF;
+    ObsPrevTremie := PosTremie;
+    ObsPrevP1 := PosP1;
+    ObsPrevMaintenance := PosMaintenance;
+
+    (* L4 : distance de l&#x27;episode libre (frein ouvert, variateur sans couple). *)
+    IF NOT ObsCartFree THEN
+        FreeRollStart_M := PositionTrue_M;
+    ELSE
+        ObsFreeRollLast_M := ABS(PositionTrue_M - FreeRollStart_M);
+    END_IF;
+
+    IF ObsArmed AND (ABS(VelocityTrue_Mps) &lt; 0.001) THEN
+        ObsOvershootLast_M := ABS(PositionTrue_M - ObsEdgePosition_M);
+        ObsArmed := FALSE;
+    END_IF;
+END_IF;
 </pre>
             </details>
             <details>
@@ -2858,11 +3067,17 @@ END_FUNCTION_BLOCK
         <pre>STruC++ Test Runner v1.0
 
 test_sim_translation_loop.st
-  [PASS] TC-T417-LOOP-A Rejeu P1 a 20 Hz, demande TENUE apres arrivee : le plafond d approche maintient 20 Hz vers le variateur
-  [PASS] TC-T417-LOOP-B Rejeu P1 a 20 Hz, demande RETIREE au jeton d arrivee (cycle auto) : plafond perdu, mot de commande a 0
+         ASSERT_EQ failed: LOOP.PHASE expected 3, got 2
+         at test_sim_translation_loop.st:2611
+         Message: Scenario termine (arret apres P1)
+  [FAIL] TC-T417-LOOP-A Rejeu P1 a 20 Hz, demande TENUE apres arrivee : le plafond d approche maintient 20 Hz vers le variateur
+         ASSERT_EQ failed: LOOP.PHASE expected 3, got 2
+         at test_sim_translation_loop.st:5223
+         Message: Scenario termine (arret apres P1)
+  [FAIL] TC-T417-LOOP-B Rejeu P1 a 20 Hz, demande RETIREE au jeton d arrivee (cycle auto) : plafond perdu, mot de commande a 0
 
 -----------------------------------------
-2 tests, 2 passed, 0 failed
+2 tests, 0 passed, 2 failed
 </pre>
     </details>
 </div>

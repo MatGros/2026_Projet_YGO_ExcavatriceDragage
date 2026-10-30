@@ -1,0 +1,31 @@
+{
+  "sources_sha256": {
+    "CODE/A_COMMUN/_TYPES/E_State.st": "385f8fc0501ede8bcf4096a8f1ea320546291d3c2299058286e3392778426820",
+    "CODE/A_COMMUN/_TYPES/ST_Fault.st": "2b17dd462ad67386d5382d24d46735b8c563f1465a73e4e4e8397c1d85ee8359",
+    "CODE/A_COMMUN/_TYPES/ST_FaultCause.st": "691c25960b8ec280a94399b52f1473754610564320e3afd3e06b9262f04e1cb2",
+    "CODE/A_COMMUN/_TYPES/ST_Lifecycle.st": "2a554ac768ddd6103e68a0881ea7dd6d14b378b0d8f1740e3de3e0947aaa7e64",
+    "CODE/A_COMMUN/FB_FaultCore.st": "42154dcf450d4a5cd9f8da9238df05e1b410690ed77c073ca3ed08c09c8e88b4",
+    "CODE/F_MODES/E_Mode.st": "5234692e7449bb8332aee5da10e9bc78fdca59633e9eb02c9f5f0982f68729b3",
+    "CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st": "d2ee74991398a67e7625135a015994f8b01a393a2d2920789824637eb379a8ab",
+    "CODE/G_CYCLE/_TYPES/E_OperatorAxis.st": "68d4cd650c487beabfc3a800f05957486aa6fbf907118ed627ad9b24e0489e6a",
+    "CODE/G_CYCLE/_TYPES/E_ProgramSequence.st": "405aa3eda24dc8f11ba89a0c4223dcf9ff89ac7478875c5baa0408539c521f59",
+    "CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_CycleDepthStopMode.st": "9124a0e235bd219016109b561c7e986fe470c1c1d0ee3089e381c68bcc996e1e",
+    "CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_CycleSampleCountResetMode.st": "a398070235cd39e739a2b2512ce0976c17c8cb7f972d87932facad2ec49914dc",
+    "CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st": "af8605ae608ee1ab6264ea0fc1d0b992562e431044021feab518fc83d1833ebb",
+    "CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st": "10decdbed2acc2d3f9588394dd00d90fb865482dcfc9d18c72611cf18d84efde",
+    "CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st": "3d2fca1a5a1db912f513b01be434d5a300d5509b23152e103d260482bb516f30",
+    "CODE/G_CYCLE/FB_CycleSemiAuto.st": "d059a9b3d46ea259a983e630c4d27b59ef9986a902179f334e16f91922f37805",
+    "TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto_t417_m3.st": "8c5913afc4578a8dc65c10955d8acf9dd0552a725e15c725e12c5bccb9e031f5",
+    "TOOLS/TEST_AUTO_CI/scripts/run_tests.py": "eed03cf840ababf133d09eb150ae3dfdd99240c3e2117939640bac72f9eb38d2"
+  },
+  "ok": false,
+  "tests": [
+    {
+      "name": "T417-CYCLE-010 AX14 retire M3 avant AX15A",
+      "passed": false,
+      "detail": "ASSERT_TRUE: FB.CYCLESTEP = E_AUTOCYCLESTEP.AX15A_DUMP_ARRIVE expected TRUE, got FALSE -- AX15A seulement apres arret confirme et tempo cycle"
+    }
+  ],
+  "scratch": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\TEST_AUTO_CI\\.scratch\\FB_CycleSemiAuto\\6e8bd071053a",
+  "excluded_check": "production_wiring (run G200 separately for linkage)"
+}

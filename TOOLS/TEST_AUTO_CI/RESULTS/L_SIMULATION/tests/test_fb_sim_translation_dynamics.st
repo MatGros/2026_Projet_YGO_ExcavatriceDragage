@@ -54,6 +54,47 @@ END_VAR
     ASSERT_NEAR(fb.VelocityTrue_Mps, 0.0, 0.00001, 'Arret sans oscillation artificielle');
 END_TEST
 
+TEST 'M3-DYN-130 Position P1 recue initialise le chariot sans geometrie locale'
+    fb.PosTremie_M := 2.0;
+    fb.PosPV_M := 3.0;
+    fb.PosP2_M := 5.0;
+    fb.PosP1_M := 7.0;
+    fb.PosMaintenance_M := 11.0;
+    fb.Enable := FALSE;
+    fb();
+    ASSERT_NEAR(fb.PositionTrue_M, 7.0, 0.0001,
+        'Repli positionne le chariot sur PosP1_M recu');
+    ASSERT_TRUE(fb.PosP1, 'Repli publie P1 apres initialisation sur la position recue');
+END_TEST
+
+TEST 'M3-DYN-140 Gain recu convertit la frequence retournee en vitesse'
+VAR
+    i : INT;
+END_VAR
+    fb.PosTremie_M := 0.0;
+    fb.PosPV_M := 10.0;
+    fb.PosP2_M := 20.0;
+    fb.PosP1_M := 30.0;
+    fb.PosMaintenance_M := 40.0;
+    fb.GainMetersPerHzSec := 0.03;
+    fb.MaxFreq_Hz := 20.0;
+    fb.Enable := FALSE;
+    fb();
+    fb.Enable := TRUE;
+    fb.ReqMaintenance := TRUE;
+    fb.SpeedTgt_Pct := 100.0;
+    fb.BrakeReleaseCmd := TRUE;
+    fb.BrakeOpenDelayS := 0.0;
+    fb.LoadReactionGain_Mps2 := 0.0;
+    FOR i := 1 TO 400 DO
+        fb();
+    END_FOR;
+    ASSERT_NEAR(fb.ActualFrequency_Hz, 20.0, 0.05,
+        'Frequence maximale recue appliquee');
+    ASSERT_NEAR(fb.VelocityTrue_Mps, 0.6, 0.02,
+        'Vitesse = sens x gain recu x frequence retournee');
+END_TEST
+
 TEST 'M3-DYN-100 Retour frequence electrique independant du balancement'
 VAR
     drive : FB_Sim_TranslationDrive;
@@ -197,6 +238,8 @@ TEST 'M3-DYN-040 Frottement seul a 10 ms sans inversion dans les deux sens'
 END_TEST
 
 TEST 'M3-DYN-050 Adherence au repos et au seuil puis depart sous poussee'
+    (* Seuil explicite du scenario historique ; ne calibre pas le banc. *)
+    fb.StaticFriction_Mps2 := 0.1;
     fb.ReqMaintenance := FALSE;
     fb.LoadMassRatio := 0.0;
     fb.Slope_Mps2 := 0.05;
@@ -208,6 +251,60 @@ TEST 'M3-DYN-050 Adherence au repos et au seuil puis depart sous poussee'
     fb.Slope_Mps2 := 0.2;
     fb();
     ASSERT_GT(fb.VelocityTrue_Mps, 0.0, 'Poussee suffisante : depart physique');
+END_TEST
+
+TEST 'M3-DYN-051 Pente seule au repos respecte le seuil statique courant'
+VAR
+    i : INT;
+END_VAR
+    fb.ReqMaintenance := FALSE;
+    fb.LoadMassRatio := 0.0;
+    fb.LoadReactionGain_Mps2 := 0.0;
+    fb.StaticFriction_Mps2 := 0.35;
+    fb.RollingFriction_Mps2 := 0.30;
+    fb.Slope_Mps2 := 0.20;
+    positionBefore_M := fb.PositionTrue_M;
+    FOR i := 1 TO 100 DO
+        fb();
+    END_FOR;
+    ASSERT_EQ(fb.VelocityTrue_Mps, 0.0, 'Pente sous adhesion : aucun depart');
+    fb.Slope_Mps2 := 0.35;
+    fb();
+    ASSERT_EQ(fb.VelocityTrue_Mps, 0.0, 'Au seuil statique : aucun depart');
+    fb.Slope_Mps2 := 0.60;
+    fb();
+    ASSERT_GT(fb.VelocityTrue_Mps, 0.0, 'Pente au-dessus adhesion : depart');
+    ASSERT_TRUE(fb.ObsCartFree, 'Frein ouvert sans couple variateur');
+END_TEST
+
+TEST 'M3-DYN-052 Frein ferme retient une pente puis ouverture autorise derive'
+VAR
+    i : INT;
+END_VAR
+    fb.ReqMaintenance := FALSE;
+    fb.BrakeReleaseCmd := FALSE;
+    fb.LoadMassRatio := 0.0;
+    fb.LoadReactionGain_Mps2 := 0.0;
+    fb.StaticFriction_Mps2 := 0.35;
+    fb.RollingFriction_Mps2 := 0.30;
+    fb.Slope_Mps2 := -0.60;
+    fb();
+    positionBefore_M := fb.PositionTrue_M;
+    FOR i := 1 TO 100 DO
+        fb();
+    END_FOR;
+    ASSERT_EQ(fb.PositionTrue_M, positionBefore_M, 'Frein ferme : pente sans mouvement');
+    ASSERT_FALSE(fb.ObsCartFree, 'Pas de regime libre frein ferme');
+    fb.BrakeReleaseCmd := TRUE;
+    fb();
+    ASSERT_TRUE(fb.ObsCartFree, 'Relachement frein : regime libre');
+    ASSERT_LT(fb.PositionTrue_M, positionBefore_M, 'Pente negative : mouvement vers Tremie');
+    fb.BrakeReleaseCmd := FALSE;
+    FOR i := 1 TO 100 DO
+        fb();
+    END_FOR;
+    ASSERT_FALSE(fb.BrakeMechanicallyOpen, 'Frein referme');
+    ASSERT_EQ(fb.VelocityTrue_Mps, 0.0, 'Frein arrete la derive');
 END_TEST
 
 TEST 'M3-DYN-060 Poussee opposee suffisante autorise une vraie inversion'

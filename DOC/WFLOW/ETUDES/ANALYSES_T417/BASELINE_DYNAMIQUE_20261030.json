@@ -1,0 +1,721 @@
+{
+  "ok": false,
+  "tests": [
+    {
+      "name": "M3-DYN-010 Retrait de commande a 20 Hz conserve la deceleration pilotee",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-100 Retour frequence electrique independant du balancement",
+      "passed": false,
+      "detail": "ASSERT_NEAR: DRIVE.ACTUALFREQUENCY_HZ expected 20 +/- 1e-05, got 16 -- Le retour PDO conserve la frequence electrique sous balancement"
+    },
+    {
+      "name": "M3-DYN-110 Deceleration sans second retard sur la vitesse chariot",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-120 Fin de rampe a 0.5 Hz sans supprimer consigne basse non nulle",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-020 Retrait brutal a 50 Hz reste limite par le variateur",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-030 Frottement seul a 100 ms sans inversion dans les deux sens",
+      "passed": false,
+      "detail": "ASSERT_EQ: FB.VELOCITYTRUE_MPS expected 0, got -0.006 -- Frottement arrete le sens positif sans inversion"
+    },
+    {
+      "name": "M3-DYN-040 Frottement seul a 10 ms sans inversion dans les deux sens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-050 Adherence au repos et au seuil puis depart sous poussee",
+      "passed": false,
+      "detail": "ASSERT_GT: FB.VELOCITYTRUE_MPS expected > 0, got 0 -- Poussee suffisante : depart physique"
+    },
+    {
+      "name": "M3-DYN-060 Poussee opposee suffisante autorise une vraie inversion",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-070 Frein ferme en mouvement suit la bobine sans attendre les Hz",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-080 Balancement conserve secondaire sous controle puis amorti",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-090 Came spatiale vue perdue retrouvee stable sans blip ajoute",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "report": null,
+  "af_warnings": [],
+  "extra_test_warnings": [],
+  "encapsulation_report": [
+    {
+      "file": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\A_COMMUN\\FB_CycleTime.st",
+      "fb_name": "FB_CycleTime",
+      "n_input": 1,
+      "n_output": 1,
+      "n_inout": 0,
+      "n_local": 5,
+      "external_writes": [],
+      "gvl_refs": [],
+      "has_violation": false
+    },
+    {
+      "file": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_TranslationDrive.st",
+      "fb_name": "FB_Sim_TranslationDrive",
+      "n_input": 8,
+      "n_output": 5,
+      "n_inout": 0,
+      "n_local": 4,
+      "external_writes": [],
+      "gvl_refs": [],
+      "has_violation": false
+    },
+    {
+      "file": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_TranslationBrake.st",
+      "fb_name": "FB_Sim_TranslationBrake",
+      "n_input": 10,
+      "n_output": 5,
+      "n_inout": 0,
+      "n_local": 4,
+      "external_writes": [],
+      "gvl_refs": [],
+      "has_violation": false
+    },
+    {
+      "file": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_SuspendedLoad.st",
+      "fb_name": "FB_Sim_SuspendedLoad",
+      "n_input": 7,
+      "n_output": 4,
+      "n_inout": 0,
+      "n_local": 5,
+      "external_writes": [],
+      "gvl_refs": [],
+      "has_violation": false
+    },
+    {
+      "file": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_PositionSensor.st",
+      "fb_name": "FB_Sim_PositionSensor",
+      "n_input": 16,
+      "n_output": 6,
+      "n_inout": 0,
+      "n_local": 16,
+      "external_writes": [],
+      "gvl_refs": [],
+      "has_violation": false
+    },
+    {
+      "file": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_Translation.st",
+      "fb_name": "FB_Sim_Translation",
+      "n_input": 47,
+      "n_output": 27,
+      "n_inout": 0,
+      "n_local": 37,
+      "external_writes": [],
+      "gvl_refs": [],
+      "has_violation": false
+    }
+  ],
+  "report_group": null,
+  "section_kwargs": {
+    "fb_name": "FB_Sim_Translation",
+    "domain": "L_SIMULATION",
+    "sources": [
+      "CODE/A_COMMUN/FB_CycleTime.st",
+      "CODE/L_SIMULATION/FB_Sim_TranslationDrive.st",
+      "CODE/L_SIMULATION/FB_Sim_TranslationBrake.st",
+      "CODE/L_SIMULATION/FB_Sim_SuspendedLoad.st",
+      "CODE/L_SIMULATION/FB_Sim_PositionSensor.st",
+      "CODE/L_SIMULATION/FB_Sim_Translation.st"
+    ],
+    "json_data": {
+      "version": 1,
+      "file": "test_fb_sim_translation_dynamics.st",
+      "results": [
+        {
+          "name": "M3-DYN-010 Retrait de commande a 20 Hz conserve la deceleration pilotee",
+          "passed": true
+        },
+        {
+          "name": "M3-DYN-100 Retour frequence electrique independant du balancement",
+          "passed": false,
+          "failure": {
+            "assertType": "ASSERT_NEAR",
+            "detail": "DRIVE.ACTUALFREQUENCY_HZ expected 20 +/- 1e-05, got 16",
+            "file": "test_fb_sim_translation_dynamics.st",
+            "line": 70,
+            "message": "Le retour PDO conserve la frequence electrique sous balancement",
+            "expected": "20",
+            "actual": "16"
+          }
+        },
+        {
+          "name": "M3-DYN-110 Deceleration sans second retard sur la vitesse chariot",
+          "passed": true
+        },
+        {
+          "name": "M3-DYN-120 Fin de rampe a 0.5 Hz sans supprimer consigne basse non nulle",
+          "passed": true
+        },
+        {
+          "name": "M3-DYN-020 Retrait brutal a 50 Hz reste limite par le variateur",
+          "passed": true
+        },
+        {
+          "name": "M3-DYN-030 Frottement seul a 100 ms sans inversion dans les deux sens",
+          "passed": false,
+          "failure": {
+            "assertType": "ASSERT_EQ",
+            "detail": "FB.VELOCITYTRUE_MPS expected 0, got -0.006",
+            "file": "test_fb_sim_translation_dynamics.st",
+            "line": 166,
+            "message": "Frottement arrete le sens positif sans inversion",
+            "expected": "0",
+            "actual": "-0.006"
+          }
+        },
+        {
+          "name": "M3-DYN-040 Frottement seul a 10 ms sans inversion dans les deux sens",
+          "passed": true
+        },
+        {
+          "name": "M3-DYN-050 Adherence au repos et au seuil puis depart sous poussee",
+          "passed": false,
+          "failure": {
+            "assertType": "ASSERT_GT",
+            "detail": "FB.VELOCITYTRUE_MPS expected > 0, got 0",
+            "file": "test_fb_sim_translation_dynamics.st",
+            "line": 210,
+            "message": "Poussee suffisante : depart physique",
+            "expected": "0",
+            "actual": "0"
+          }
+        },
+        {
+          "name": "M3-DYN-060 Poussee opposee suffisante autorise une vraie inversion",
+          "passed": true
+        },
+        {
+          "name": "M3-DYN-070 Frein ferme en mouvement suit la bobine sans attendre les Hz",
+          "passed": true
+        },
+        {
+          "name": "M3-DYN-080 Balancement conserve secondaire sous controle puis amorti",
+          "passed": true
+        },
+        {
+          "name": "M3-DYN-090 Came spatiale vue perdue retrouvee stable sans blip ajoute",
+          "passed": true
+        }
+      ],
+      "summary": {
+        "total": 12,
+        "passed": 9,
+        "failed": 3
+      }
+    },
+    "text_report": "Error: C++ compilation failed:\n",
+    "test_st_path": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\TEST_AUTO_CI\\RESULTS\\L_SIMULATION\\tests\\test_fb_sim_translation_dynamics.st",
+    "trace_entries": [],
+    "source_paths": [
+      "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\A_COMMUN\\FB_CycleTime.st",
+      "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_TranslationDrive.st",
+      "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_TranslationBrake.st",
+      "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_SuspendedLoad.st",
+      "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_PositionSensor.st",
+      "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_Translation.st"
+    ],
+    "cycle_time_ms": 10,
+    "field_types": {},
+    "af_warnings": [],
+    "extra_test_warnings": [],
+    "wirings": [
+      {
+        "label": null,
+        "wiring": {
+          "pins": {
+            "inputs": [
+              [
+                "ENABLE",
+                "IEC_BOOL"
+              ],
+              [
+                "REQTREMIE",
+                "IEC_BOOL"
+              ],
+              [
+                "REQMAINTENANCE",
+                "IEC_BOOL"
+              ],
+              [
+                "SPEEDTGT_PCT",
+                "IEC_REAL"
+              ],
+              [
+                "POSTREMIE_M",
+                "IEC_REAL"
+              ],
+              [
+                "POSPV_M",
+                "IEC_REAL"
+              ],
+              [
+                "POSP2_M",
+                "IEC_REAL"
+              ],
+              [
+                "POSP1_M",
+                "IEC_REAL"
+              ],
+              [
+                "POSMAINTENANCE_M",
+                "IEC_REAL"
+              ],
+              [
+                "GAINMETERSPERHZSEC",
+                "IEC_REAL"
+              ],
+              [
+                "ENDSTOPMARGIN_M",
+                "IEC_REAL"
+              ],
+              [
+                "BRAKERELEASECMD",
+                "IEC_BOOL"
+              ],
+              [
+                "MAXFREQ_HZ",
+                "IEC_REAL"
+              ],
+              [
+                "SPEEDFACTOR",
+                "IEC_REAL"
+              ],
+              [
+                "ACCELRATE_HZPERS",
+                "IEC_REAL"
+              ],
+              [
+                "DECELRATE_HZPERS",
+                "IEC_REAL"
+              ],
+              [
+                "DRIVETIMECONSTANTS",
+                "IEC_REAL"
+              ],
+              [
+                "BRAKEOPENDELAYS",
+                "IEC_REAL"
+              ],
+              [
+                "BRAKECLOSEDELAYS",
+                "IEC_REAL"
+              ],
+              [
+                "BRAKECONTACTDELAYS",
+                "IEC_REAL"
+              ],
+              [
+                "BRAKEFAULTCLOSEWHILERUNNING",
+                "IEC_BOOL"
+              ],
+              [
+                "BRAKEFAULTCLOSEDELAY_S",
+                "IEC_REAL"
+              ],
+              [
+                "BRAKEPHYSICALACTIVE",
+                "IEC_BOOL"
+              ],
+              [
+                "BRAKEDECEL_MPS2",
+                "IEC_REAL"
+              ],
+              [
+                "CARTFREEACTIVE",
+                "IEC_BOOL"
+              ],
+              [
+                "LOADMASSRATIO",
+                "IEC_REAL"
+              ],
+              [
+                "ROLLINGFRICTION_MPS2",
+                "IEC_REAL"
+              ],
+              [
+                "STATICFRICTION_MPS2",
+                "IEC_REAL"
+              ],
+              [
+                "SLOPE_MPS2",
+                "IEC_REAL"
+              ],
+              [
+                "SENSORCAMDROPOUTACTIVE",
+                "IEC_BOOL"
+              ],
+              [
+                "SENSORCAMDROPOUTSTART_M",
+                "IEC_REAL"
+              ],
+              [
+                "SENSORCAMDROPOUTWIDTH_M",
+                "IEC_REAL"
+              ],
+              [
+                "SUSPENDEDLOADLENGTH_M",
+                "IEC_REAL"
+              ],
+              [
+                "SUSPENDEDLOADDAMPING",
+                "IEC_REAL"
+              ],
+              [
+                "LOADREACTIONGAIN_MPS2",
+                "IEC_REAL"
+              ],
+              [
+                "ENDSTOPRECOILMAX_M",
+                "IEC_REAL"
+              ],
+              [
+                "LOADFREQUENCYDROOPGAIN_HZ",
+                "IEC_REAL"
+              ],
+              [
+                "SENSORJITTERAMPLITUDE_M",
+                "IEC_REAL"
+              ],
+              [
+                "SENSORSTABILIZATIONS",
+                "IEC_REAL"
+              ],
+              [
+                "SENSORELECTRICALDELAYS",
+                "IEC_REAL"
+              ],
+              [
+                "SENSORINTERMITTENCEACTIVE",
+                "IEC_BOOL"
+              ],
+              [
+                "SENSORLOADANGLETRIGGERRAD",
+                "IEC_REAL"
+              ],
+              [
+                "SENSORSCENARIOSEED",
+                "IEC_UDINT"
+              ],
+              [
+                "SENSORHYSTERESIS_M",
+                "IEC_REAL"
+              ],
+              [
+                "SENSORINTERMITTENCEPERIODS",
+                "IEC_REAL"
+              ],
+              [
+                "SENSORBLIPTRANSITIONS",
+                "IEC_UDINT"
+              ],
+              [
+                "SENSORBLIPDURATIONS",
+                "IEC_REAL"
+              ]
+            ],
+            "outputs": [
+              [
+                "POSTREMIE",
+                "IEC_BOOL"
+              ],
+              [
+                "POSPV",
+                "IEC_BOOL"
+              ],
+              [
+                "POSP2",
+                "IEC_BOOL"
+              ],
+              [
+                "POSP1",
+                "IEC_BOOL"
+              ],
+              [
+                "POSMAINTENANCE",
+                "IEC_BOOL"
+              ],
+              [
+                "FREQUENCYCMD_HZ",
+                "IEC_REAL"
+              ],
+              [
+                "ELECTRICALFREQUENCY_HZ",
+                "IEC_REAL"
+              ],
+              [
+                "ACTUALFREQUENCY_HZ",
+                "IEC_REAL"
+              ],
+              [
+                "BRAKECOILENERGIZED",
+                "IEC_BOOL"
+              ],
+              [
+                "BRAKEMECHANICALLYOPEN",
+                "IEC_BOOL"
+              ],
+              [
+                "BRAKECONTACTOPEN",
+                "IEC_BOOL"
+              ],
+              [
+                "BRAKEFAULTCLOSEACTIVE",
+                "IEC_BOOL"
+              ],
+              [
+                "POSITIONTRUE_M",
+                "IEC_REAL"
+              ],
+              [
+                "VELOCITYTRUE_MPS",
+                "IEC_REAL"
+              ],
+              [
+                "LOADANGLE_RAD",
+                "IEC_REAL"
+              ],
+              [
+                "SENSORPOSITION_M",
+                "IEC_REAL"
+              ],
+              [
+                "SENSORTRANSITIONCOUNT",
+                "IEC_UDINT"
+              ],
+              [
+                "SENSORBLIPACTIVE",
+                "IEC_BOOL"
+              ],
+              [
+                "HARDSTOPTREMIEACTIVE",
+                "IEC_BOOL"
+              ],
+              [
+                "HARDSTOPMAINTENANCEACTIVE",
+                "IEC_BOOL"
+              ],
+              [
+                "OBSOVERSHOOTLAST_M",
+                "IEC_REAL"
+              ],
+              [
+                "OBSOVERSHOOTSENSORID",
+                "IEC_INT"
+              ],
+              [
+                "OBSENDSTOPHITCOUNT",
+                "IEC_UDINT"
+              ],
+              [
+                "OBSENDSTOPIMPACTSPEED_MPS",
+                "IEC_REAL"
+              ],
+              [
+                "OBSBRAKECLOSEDMOVINGCOUNT",
+                "IEC_UDINT"
+              ],
+              [
+                "OBSCARTFREE",
+                "IEC_BOOL"
+              ],
+              [
+                "OBSFREEROLLLAST_M",
+                "IEC_REAL"
+              ]
+            ],
+            "in_out": []
+          },
+          "call_args": {},
+          "output_usages": {},
+          "unwired_inputs": [
+            "ACCELRATE_HZPERS",
+            "BRAKECLOSEDELAYS",
+            "BRAKECONTACTDELAYS",
+            "BRAKEDECEL_MPS2",
+            "BRAKEFAULTCLOSEDELAY_S",
+            "BRAKEFAULTCLOSEWHILERUNNING",
+            "BRAKEOPENDELAYS",
+            "BRAKEPHYSICALACTIVE",
+            "BRAKERELEASECMD",
+            "CARTFREEACTIVE",
+            "DECELRATE_HZPERS",
+            "DRIVETIMECONSTANTS",
+            "ENABLE",
+            "ENDSTOPMARGIN_M",
+            "ENDSTOPRECOILMAX_M",
+            "GAINMETERSPERHZSEC",
+            "LOADFREQUENCYDROOPGAIN_HZ",
+            "LOADMASSRATIO",
+            "LOADREACTIONGAIN_MPS2",
+            "MAXFREQ_HZ",
+            "POSMAINTENANCE_M",
+            "POSP1_M",
+            "POSP2_M",
+            "POSPV_M",
+            "POSTREMIE_M",
+            "REQMAINTENANCE",
+            "REQTREMIE",
+            "ROLLINGFRICTION_MPS2",
+            "SENSORBLIPDURATIONS",
+            "SENSORBLIPTRANSITIONS",
+            "SENSORCAMDROPOUTACTIVE",
+            "SENSORCAMDROPOUTSTART_M",
+            "SENSORCAMDROPOUTWIDTH_M",
+            "SENSORELECTRICALDELAYS",
+            "SENSORHYSTERESIS_M",
+            "SENSORINTERMITTENCEACTIVE",
+            "SENSORINTERMITTENCEPERIODS",
+            "SENSORJITTERAMPLITUDE_M",
+            "SENSORLOADANGLETRIGGERRAD",
+            "SENSORSCENARIOSEED",
+            "SENSORSTABILIZATIONS",
+            "SLOPE_MPS2",
+            "SPEEDFACTOR",
+            "SPEEDTGT_PCT",
+            "STATICFRICTION_MPS2",
+            "SUSPENDEDLOADDAMPING",
+            "SUSPENDEDLOADLENGTH_M"
+          ],
+          "unwired_outputs": [
+            "ACTUALFREQUENCY_HZ",
+            "BRAKECOILENERGIZED",
+            "BRAKECONTACTOPEN",
+            "BRAKEFAULTCLOSEACTIVE",
+            "BRAKEMECHANICALLYOPEN",
+            "ELECTRICALFREQUENCY_HZ",
+            "FREQUENCYCMD_HZ",
+            "HARDSTOPMAINTENANCEACTIVE",
+            "HARDSTOPTREMIEACTIVE",
+            "LOADANGLE_RAD",
+            "OBSBRAKECLOSEDMOVINGCOUNT",
+            "OBSCARTFREE",
+            "OBSENDSTOPHITCOUNT",
+            "OBSENDSTOPIMPACTSPEED_MPS",
+            "OBSFREEROLLLAST_M",
+            "OBSOVERSHOOTLAST_M",
+            "OBSOVERSHOOTSENSORID",
+            "POSITIONTRUE_M",
+            "POSMAINTENANCE",
+            "POSP1",
+            "POSP2",
+            "POSPV",
+            "POSTREMIE",
+            "SENSORBLIPACTIVE",
+            "SENSORPOSITION_M",
+            "SENSORTRANSITIONCOUNT",
+            "VELOCITYTRUE_MPS"
+          ],
+          "orphan_args": []
+        }
+      }
+    ],
+    "encapsulation_report": [
+      {
+        "file": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\A_COMMUN\\FB_CycleTime.st",
+        "fb_name": "FB_CycleTime",
+        "n_input": 1,
+        "n_output": 1,
+        "n_inout": 0,
+        "n_local": 5,
+        "external_writes": [],
+        "gvl_refs": [],
+        "has_violation": false
+      },
+      {
+        "file": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_TranslationDrive.st",
+        "fb_name": "FB_Sim_TranslationDrive",
+        "n_input": 8,
+        "n_output": 5,
+        "n_inout": 0,
+        "n_local": 4,
+        "external_writes": [],
+        "gvl_refs": [],
+        "has_violation": false
+      },
+      {
+        "file": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_TranslationBrake.st",
+        "fb_name": "FB_Sim_TranslationBrake",
+        "n_input": 10,
+        "n_output": 5,
+        "n_inout": 0,
+        "n_local": 4,
+        "external_writes": [],
+        "gvl_refs": [],
+        "has_violation": false
+      },
+      {
+        "file": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_SuspendedLoad.st",
+        "fb_name": "FB_Sim_SuspendedLoad",
+        "n_input": 7,
+        "n_output": 4,
+        "n_inout": 0,
+        "n_local": 5,
+        "external_writes": [],
+        "gvl_refs": [],
+        "has_violation": false
+      },
+      {
+        "file": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_PositionSensor.st",
+        "fb_name": "FB_Sim_PositionSensor",
+        "n_input": 16,
+        "n_output": 6,
+        "n_inout": 0,
+        "n_local": 16,
+        "external_writes": [],
+        "gvl_refs": [],
+        "has_violation": false
+      },
+      {
+        "file": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\CODE\\L_SIMULATION\\FB_Sim_Translation.st",
+        "fb_name": "FB_Sim_Translation",
+        "n_input": 47,
+        "n_output": 27,
+        "n_inout": 0,
+        "n_local": 37,
+        "external_writes": [],
+        "gvl_refs": [],
+        "has_violation": false
+      }
+    ],
+    "source_prg": null
+  },
+  "timings": {
+    "conversion": 0.206939899995632,
+    "compilation": 1.2200343000004068,
+    "execution": 5.50426129999687,
+    "chronogram": 0.0,
+    "wiring": 0.0014121999993221834,
+    "af_encapsulation": 0.7091926000066451,
+    "report_generation": 1.2100004823878407e-05,
+    "total": 22.100145199998224
+  },
+  "scratch": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\TEST_AUTO_CI\\.scratch\\FB_Sim_Translation\\a31a92829f32"
+}

@@ -1,0 +1,86 @@
+{
+  "sources_sha256": {
+    "CODE/A_COMMUN/FB_CycleTime.st": "69addeea511d0f5922ac7d64e2502d9c5a96e9017624d5640388a79ed516b4f9",
+    "CODE/L_SIMULATION/FB_Sim_TranslationDrive.st": "369e595c7ae94a0f1364a1649c203e1a363fc5bd61273de6b8f5f7b95128c29a",
+    "CODE/L_SIMULATION/FB_Sim_TranslationBrake.st": "42289c202e5699230277943eb9c92ae340bd4271a09f2aea2bf97b3f81e4adb9",
+    "CODE/L_SIMULATION/FB_Sim_SuspendedLoad.st": "812ec1def910647cca498d6f2c2b49e37df576ccbc2f5ee8c82bbf7b5e7dcf25",
+    "CODE/L_SIMULATION/FB_Sim_PositionSensor.st": "6795a5fcd5e486c37cfed8621759621a88b88e4923afe7e4b0410ef0b879a1af",
+    "CODE/L_SIMULATION/FB_Sim_Translation.st": "4b3b1f08205364554ac2fdfdd20a51cd385851cf912ad98617e750d43cfb023b",
+    "TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_translation_dynamics.st": "f656648a872c3bd3249f8c0d9a3bcab87cd989e9b388e50387b5bcf610ea9f83",
+    "TOOLS/TEST_AUTO_CI/scripts/run_tests.py": "eed03cf840ababf133d09eb150ae3dfdd99240c3e2117939640bac72f9eb38d2"
+  },
+  "ok": false,
+  "tests": [
+    {
+      "name": "M3-DYN-010 Retrait de commande a 20 Hz conserve la deceleration pilotee",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-100 Retour frequence electrique independant du balancement",
+      "passed": false,
+      "detail": "ASSERT_NEAR: DRIVE.ACTUALFREQUENCY_HZ expected 20 +/- 1e-05, got 16 -- Le retour PDO conserve la frequence electrique sous balancement"
+    },
+    {
+      "name": "M3-DYN-110 Deceleration sans second retard sur la vitesse chariot",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-120 Fin de rampe a 0.5 Hz sans supprimer consigne basse non nulle",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-020 Retrait brutal a 50 Hz reste limite par le variateur",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-030 Frottement seul a 100 ms sans inversion dans les deux sens",
+      "passed": false,
+      "detail": "ASSERT_EQ: FB.VELOCITYTRUE_MPS expected 0, got -0.006 -- Frottement arrete le sens positif sans inversion"
+    },
+    {
+      "name": "M3-DYN-040 Frottement seul a 10 ms sans inversion dans les deux sens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-050 Adherence au repos et au seuil puis depart sous poussee",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-051 Pente seule au repos respecte le seuil statique courant",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-052 Frein ferme retient une pente puis ouverture autorise derive",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-060 Poussee opposee suffisante autorise une vraie inversion",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-070 Frein ferme en mouvement suit la bobine sans attendre les Hz",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-080 Balancement conserve secondaire sous controle puis amorti",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "M3-DYN-090 Came spatiale vue perdue retrouvee stable sans blip ajoute",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "scratch": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\TEST_AUTO_CI\\.scratch\\FB_Sim_Translation\\04f8c0410b6b"
+}

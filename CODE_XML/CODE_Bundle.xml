@@ -42994,6 +42994,22 @@ Distance roulee entre le 1er front du dernier capteur d'arret (Tremie, P1, Maint
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">L4 : acceleration nette du chariot libre</xhtml>
               </documentation>
             </variable>
+            <variable name="FreeVelocity_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse apres integration de la force externe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FrictionStep_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion dissipative maximale sur le pas</xhtml>
+              </documentation>
+            </variable>
             <variable name="FreeRollStart_M">
               <type>
                 <REAL />
@@ -43312,12 +43328,18 @@ IF Enable THEN
             ELSE
                 FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, StaticFriction_Mps2);
             END_IF;
-        ELSIF VelocityTrue_Mps &gt; 0.0 THEN
-            FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+            VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
         ELSE
-            FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+            (* La force externe peut inverser le mouvement ; le frottement ne peut
+               que reduire sa vitesse, au plus jusqu'a zero. *)
+            FreeVelocity_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
+            FrictionStep_Mps := MAX(0.0, RollingFriction_Mps2) * CycleTimeS;
+            IF FreeVelocity_Mps &gt; 0.0 THEN
+                VelocityTrue_Mps := MAX(0.0, FreeVelocity_Mps - FrictionStep_Mps);
+            ELSE
+                VelocityTrue_Mps := MIN(0.0, FreeVelocity_Mps + FrictionStep_Mps);
+            END_IF;
         END_IF;
-        VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
     ELSIF BrakeMechanicallyOpen THEN
         (* Vitesse suivant directement le variateur (deja filtre par instDrive) sans double PT1 *)
         VelocityTrue_Mps := VelocityTarget_Mps;
@@ -43854,6 +43876,17 @@ Ready := TRUE;
                 <simpleValue value="0.001" />
               </initialValue>
             </variable>
+            <variable name="CST_StopFrequency_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">seuil nominal de fin de rampe variateur</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_MaxFrequency_Hz">
               <type>
                 <REAL />
@@ -43898,9 +43931,12 @@ ELSE
 END_IF;
 ElectricalFrequency_Hz := ElectricalFrequency_Hz
     + ResponseAlpha * (FrequencyCmd_Hz - ElectricalFrequency_Hz);
-ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz
-    - MAX(0.0, LoadFrequencyDroopGain_Hz) * ABS(LoadAngularVelocity_RadPerS));
-IF ActualFrequency_Hz &lt; 0.005 THEN
+(* Retour AC600 : frequence electrique de sortie. La charge est appliquee par le
+   modele mecanique ; elle ne doit pas biaiser le retour publie au PLC. *)
+ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz);
+IF (FrequencyTgt_Hz &lt;= 0.0) AND (FrequencyCmd_Hz &lt;= 0.0)
+    AND (ActualFrequency_Hz &lt;= CST_StopFrequency_Hz) THEN
+    ElectricalFrequency_Hz := 0.0;
     ActualFrequency_Hz := 0.0;
 END_IF;
 Ready := TRUE;

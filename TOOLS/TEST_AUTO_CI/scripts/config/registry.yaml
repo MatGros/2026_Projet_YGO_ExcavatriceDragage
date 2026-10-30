@@ -510,7 +510,7 @@ FB_SimBench:
   - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_AlarmBanner.st
   - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_HmiBanner.st
   - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_PreflightHMI.st
-  - CODE/L_SIMULATION/ST_fbSim_Translation_ExtLink_Echo.st
+  - TOOLS/TEST_AUTO_CI/MOCKS/ST_fbSim_Translation_ExtLink_Echo.st
   - TOOLS/TEST_AUTO_CI/MOCKS/MOCK_FB_Sim_Translation_ExtLink.st
   - CODE/L_SIMULATION/FB_Sim_Encoder.st
   - CODE/L_SIMULATION/FB_Sim_Joystick.st
@@ -1821,7 +1821,7 @@ SimOperatorJoystick:
   - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_AlarmBanner.st
   - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_HmiBanner.st
   - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_PreflightHMI.st
-  - CODE/L_SIMULATION/ST_fbSim_Translation_ExtLink_Echo.st
+  - TOOLS/TEST_AUTO_CI/MOCKS/ST_fbSim_Translation_ExtLink_Echo.st
   - TOOLS/TEST_AUTO_CI/MOCKS/MOCK_FB_Sim_Translation_ExtLink.st
   - CODE/L_SIMULATION/FB_Sim_Encoder.st
   - CODE/L_SIMULATION/FB_Sim_Joystick.st
@@ -1979,7 +1979,7 @@ SimManualReference:
   - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_AlarmBanner.st
   - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_HmiBanner.st
   - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_PreflightHMI.st
-  - CODE/L_SIMULATION/ST_fbSim_Translation_ExtLink_Echo.st
+  - TOOLS/TEST_AUTO_CI/MOCKS/ST_fbSim_Translation_ExtLink_Echo.st
   - TOOLS/TEST_AUTO_CI/MOCKS/MOCK_FB_Sim_Translation_ExtLink.st
   - CODE/L_SIMULATION/FB_Sim_Encoder.st
   - CODE/L_SIMULATION/FB_Sim_Joystick.st

@@ -4,16 +4,34 @@
   "results": [
     {
       "name": "TC-T417-LOOP-A Rejeu P1 a 20 Hz, demande TENUE apres arrivee : le plafond d approche maintient 20 Hz vers le variateur",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "LOOP.PHASE expected 3, got 2",
+        "file": "test_sim_translation_loop.st",
+        "line": 2611,
+        "message": "Scenario termine (arret apres P1)",
+        "expected": "3",
+        "actual": "2"
+      }
     },
     {
       "name": "TC-T417-LOOP-B Rejeu P1 a 20 Hz, demande RETIREE au jeton d arrivee (cycle auto) : plafond perdu, mot de commande a 0",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "LOOP.PHASE expected 3, got 2",
+        "file": "test_sim_translation_loop.st",
+        "line": 5223,
+        "message": "Scenario termine (arret apres P1)",
+        "expected": "3",
+        "actual": "2"
+      }
     }
   ],
   "summary": {
     "total": 2,
-    "passed": 2,
-    "failed": 0
+    "passed": 0,
+    "failed": 2
   }
 }

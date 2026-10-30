@@ -25,10 +25,10 @@ tasks:
   - Zero regression sur la logique automate (PRG_01 a PRG_07 intacts).
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T421_FIDELITE_DYNAMIQUE_TREUILS.yaml
   avancement: Valide et teste avec succes sur banc CODESYS en MANU et AUTO. Glissement
-    inertiel dissymetrique conforme trace 86 (montee ~0.50m, descente ~1.20m, jog palier 1
-    < 0.05m). SimWinchCoast_M supprime (GVL_PERSISTENT intact). SimBucketSpeedFactor
-    ajoute (volatile). Derive descente 100% physique sur relais (retard 3% M2, conforme trace 36),
-    eliminant tout faux defaut ErrorID:02 jusqu a 50m.
+    inertiel dissymetrique conforme trace 86 (montee ~0.50m, descente ~1.20m, jog
+    palier 1 < 0.05m). SimWinchCoast_M supprime (GVL_PERSISTENT intact). SimBucketSpeedFactor
+    ajoute (volatile). Derive descente 100% physique sur relais (retard 3% M2, conforme
+    trace 36), eliminant tout faux defaut ErrorID:02 jusqu a 50m.
 - id: T420
   parent_id: ''
   statut: ❌
@@ -149,10 +149,10 @@ tasks:
   bloque_par: []
 - id: T417
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C2
   domaine: SIMULATION / SIMBENCH / TRANSLATION M3
-  agent: —
+  agent: AGY01
   date: '2026-10-28T18:26:10+01:00'
   titre: SimBench M3 - mecanique realiste et chaine automate-variateur-mouvement
   contexte: 'Decisions exploitant 2026-10-28 : deceleration pilotee par le variateur
@@ -171,17 +171,12 @@ tasks:
     provoquer.
   - Challenge independant, implementation par CDX01, revue du diff, essais fonctionnels
     courts puis validation utilisateur.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417_SIMBENCH_M3_FIDELITE_ROUE_LIBRE.yaml
-  avancement: 'EN COURS - trois corrections principales implementees : retour frequence
-    electrique sans biais de balancement, suppression du double lissage chariot, fin
-    de rampe coherente demande+rampe+seuil0.5Hz. Comparaison ST reel memes scenarios
-    : checkpoint8/12, courant12/12PASS. Review DeepSeekv4.1PASS apres reserve resolue.
-    Complet+diff frais, G200PASS0erreur ; gatesC53/61, huit echecs preexistants. Programme
-    machine intact ; compilation et essais CODESYS utilisateur attendus, fidelite
-    globale non declaree valide. T420 cadree separement pour regression M1/M2, code
-    treuil non touche.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417_SIMULATION_M3_REALISTE.yaml
+  avancement: 'Pause pour limite token agent. Checkpoint sauvegarde : FB_Sim_Translation,
+    FB_Sim_TranslationDrive, bundle XML et fiches etudes/passation a jour. Fiche passation
+    : DOC/WFLOW/TROUBLESHOOTING/FICHES/PASSATION_T417_SimM3_20261030.md.'
   bloque_par: []
-  updated_at: '2026-10-28T18:26:10+01:00'
+  updated_at: '2026-10-30T03:15:00+01:00'
   locked_at: '2026-10-28T18:10:39+01:00'
 - id: T417-B
   parent_id: T417

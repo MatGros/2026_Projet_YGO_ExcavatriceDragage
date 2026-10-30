@@ -24,6 +24,7 @@ VAR
 END_VAR
 VAR CONSTANT
     CST_MinTime_S : REAL := 0.001;
+    CST_StopFrequency_Hz : REAL := 0.5; // seuil nominal de fin de rampe variateur
     CST_MaxFrequency_Hz : REAL := 50.0; // plafond variateur reel (GVL_PERSISTENT._TranslationMaxFreq_Hz)
 END_VAR
 
@@ -50,9 +51,12 @@ ELSE
 END_IF;
 ElectricalFrequency_Hz := ElectricalFrequency_Hz
     + ResponseAlpha * (FrequencyCmd_Hz - ElectricalFrequency_Hz);
-ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz
-    - MAX(0.0, LoadFrequencyDroopGain_Hz) * ABS(LoadAngularVelocity_RadPerS));
-IF ActualFrequency_Hz < 0.005 THEN
+(* Retour AC600 : frequence electrique de sortie. La charge est appliquee par le
+   modele mecanique ; elle ne doit pas biaiser le retour publie au PLC. *)
+ActualFrequency_Hz := MAX(0.0, ElectricalFrequency_Hz);
+IF (FrequencyTgt_Hz <= 0.0) AND (FrequencyCmd_Hz <= 0.0)
+    AND (ActualFrequency_Hz <= CST_StopFrequency_Hz) THEN
+    ElectricalFrequency_Hz := 0.0;
     ActualFrequency_Hz := 0.0;
 END_IF;
 Ready := TRUE;
