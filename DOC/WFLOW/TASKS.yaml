@@ -10529,3 +10529,35 @@ tasks:
     ; (4) le message IHM doit etre contextualise (Referencement en cours - codeurs
     non references NORMAL) au lieu d etre supprime. AUCUN COMMIT, AUCUN PUSH.'
   bloque_par: []
+- id: T422
+  parent_id: ''
+  statut: ✅
+  criticite: C2
+  domaine: SUPERVISION / IHM / ALARMES / MES
+  agent: AGY01
+  locked_at: '2026-10-30T00:00:00+01:00'
+  date: '2026-10-30T00:00:00+01:00'
+  updated_at: '2026-10-30T03:15:00+01:00'
+  completed_at: '2026-10-30T03:15:00+01:00'
+  titre: Audit chirurgical exhaustif des alarmes, bannières IHM et interlocks des
+    10 Devices machine
+  contexte: 'Demande utilisateur 2026-10-30 : audit exhaustif de tous les organes
+    materiels (treuils, benne, translation, codeurs, synchro, securite AU, joystick
+    pupitre, reseaux IO et sequenceurs) pour identifier les defauts silencieux, les
+    blocages sans message, les defauts morts/orphelins et les masquages de banniere
+    IHM avant mise en service.'
+  description: Analyse exhaustive multi-agents (Vagues 1 a 4) couvrant les 10 Devices
+    (D01 a D10). Cartographie complete des chaines de defauts, verification du formateur
+    FB_Hmi_BannerFormatter.st et des bannières 1 a 5, et consolidation d un registre
+    perenne.
+  objectifs:
+  - Cartographier 100% des defauts et interlocks sur les 10 Devices (D01 a D10).
+  - Identifier tous les refus silencieux, defauts orphelins et anomalies d affichage.
+  - Generer un registre perenne YAML structure et verifie mecaniquement.
+  - Etablir l arbitrage risques/benefices pour la mise en service (MES).
+  contrat: ''
+  avancement: 'LIVRE. Registre perenne cree : DOC/WFLOW/AUDITS/AUDIT_T422_DEVICES_ALARMS_20261030.yaml.
+    Total : 194 defauts/interlocks audites (71 conformes, 53 refus silencieux, 36
+    defauts morts/orphelins, 26 anomalies affichage/masquage). Rapport de synthese
+    final restitue.'
+  bloque_par: []
