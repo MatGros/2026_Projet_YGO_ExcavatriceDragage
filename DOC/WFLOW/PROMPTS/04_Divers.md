@@ -51,3 +51,23 @@ challengela par un expert autom indus safety norme et egonmie avec expérience t
  
   Tu es responsable de la qualité et la non régressivité du reste du projet... le code doit être claire concis et suivre les standards
   du projets.
+
+
+
+
+----
+
+
+  Objectif principal de la session  🚜 Simulation Translation M3 pour reproduire ou approcher les problèmes defauts sur la machien reelle.
+  Il est impératif de ne pas prendre le problème a l'envers ... cest a dire faire une simu pour avoir les defauts...
+  On se focus sur la justesse de la simulation d'un point de vu fonctionnel, on ne cherche pas des temps pour position vitesse ultra précises.
+
+  Dans un premier dans sans modification je veux que tu organises le travails pour au final faire implémentation et test.
+
+  tu as à ta disposition des deepseek-v4.1-flash:cloud ou glm 5.3 sur ollama tu peux ten servir pour analyser les traces, l'histo git, vers travailler
+  en parallele plusieurs agents et récuperer et merger les bonne idées ... donc hesite pas à faire travail 2 ou 3 agents en meme trmps ...
+  Pour tache importante demande au agent de langer le workflow breifing projet et toujours doner des contract clair précis et évaluables au agents
+  sinon tu le fais (car risque derreur et perte de temps).
+  Ensuite je veux toujours des echanges clair concis tdah friendly avec emoji ...
+  On doit être rigoureux mais objectif si le benefice est faible on passe pas trop de temps ou energie... il faut un interet pratique par rapport à
+  l'objectif initial mon besoin.   

@@ -1,0 +1,942 @@
+version: '1.0'
+date_creation: '2026-10-29T23:46:00+01:00'
+statut_global: EN_COURS
+synthese:
+  total_devices_prevus: 10
+  devices_termines: 6
+  total_defauts_repertories: 124
+  conformes: 57
+  silencieux_detectes: 28
+  morts_ou_orphelins: 21
+  anomalies_affichage: 19
+devices:
+  D01_TREUIL_M1:
+    statut: TERMINE
+    nom: Treuil M1 (Levage)
+    perimetre: Moteur, contacteurs GV/PV, frein M1, mou de cable, fin de course haut/bas,
+      survitesse
+    fichiers_cles:
+    - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+    - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitration.st
+    - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+    - CODE/M_MAIN/PRG_06_Outputs.st
+    - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    auditeur: Auditeur D01 D02 Treuils M1 M2
+    challenger: Expert Sécurité Machine ISO 13849
+    defauts: []
+    synthese_device:
+      total_defauts_et_interlocks: 24
+      conformes: 11
+      refus_silencieux: 4
+      defauts_morts_ou_orphelins: 4
+      anomalies_affichage: 3
+  D02_TREUIL_M2:
+    statut: TERMINE
+    nom: Treuil M2 (Fermeture)
+    perimetre: Moteur, contacteurs GV/PV, frein M2, mou de cable, butees fermeture/ouverture,
+      surcouple
+    fichiers_cles:
+    - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+    - CODE/H_TREUILS_BENNE/FB_Bucket.st
+    - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+    - CODE/M_MAIN/PRG_06_Outputs.st
+    - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    auditeur: Auditeur D01 D02 Treuils M1 M2
+    challenger: Expert Sécurité Machine ISO 13849
+    defauts: []
+    synthese_device:
+      total_defauts_et_interlocks: 24
+      conformes: 10
+      refus_silencieux: 4
+      defauts_morts_ou_orphelins: 5
+      anomalies_affichage: 2
+  D03_BENNE_GEOMETRIE:
+    statut: TERMINE
+    nom: Benne & Cinématique
+    perimetre: Cotes limites, butees ouverture/fermeture, detection bourrage, calcul
+      differentiel
+    fichiers_cles:
+    - CODE/H_TREUILS_BENNE/FB_Bucket.st
+    - CODE/H_TREUILS_BENNE/FB_BucketGeometry.st
+    - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+    - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    auditeur: Auditeur D03 Benne Cinematique
+    challenger: Architecte Sécurité Machine
+    defauts: []
+    synthese_device:
+      total_defauts_et_interlocks: 18
+      conformes: 9
+      refus_silencieux: 5
+      defauts_morts_ou_orphelins: 2
+      anomalies_configuration: 2
+  D04_TRANSLATION_M3:
+    statut: TERMINE
+    nom: Chariot Translation M3
+    perimetre: Variateur AC600, frein M3, capteurs butees Tremie/P1/Maintenance, survitesse,
+      odometrie
+    fichiers_cles:
+    - CODE/I_TRANSLATION/FB_Translation.st
+    - CODE/I_TRANSLATION/FB_Safety_Translation.st
+    - CODE/M_MAIN/PRG_05_Translation.st
+    - CODE/M_MAIN/PRG_06_Outputs.st
+    - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    auditeur: Auditeur Expert Ponts & Translation M3
+    challenger: Expert Sécurité Machine ISO 13849 & Variateurs
+    defauts: []
+    synthese_device:
+      total_defauts_et_interlocks: 22
+      conformes: 8
+      refus_silencieux: 7
+      defauts_morts_ou_orphelins: 4
+      anomalies_affichage: 5
+  D05_CODEURS_POSITION:
+    statut: TERMINE
+    nom: Codeurs & Capteurs Position
+    perimetre: Codeurs absolus M1/M2/M3 (SSI/EtherCAT), gel signal, survitesse, perte
+      trame, NVRAM offset
+    fichiers_cles:
+    - CODE/G_CODEURS/FB_Encoder.st
+    - CODE/M_MAIN/PRG_02_Acquisition.st
+    - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    auditeur: Auditeur Expert Codeurs & Capteurs Position
+    challenger: Architecte Sécurité Machine ISO 13849
+    defauts: []
+    synthese_device:
+      total_defauts_et_interlocks: 25
+      conformes: 14
+      refus_silencieux: 4
+      defauts_morts_ou_orphelins: 4
+      anomalies_conception: 3
+  D06_SYNCHRO_M1_M2:
+    statut: TERMINE
+    nom: Synchronisation Treuils M1/M2
+    perimetre: Asservissement ecart, tolerances dynamique/statique, concordance contacteurs,
+      maintien inhibition 4s, couplage atomique croise
+    fichiers_cles:
+    - CODE/H_TREUILS_BENNE/FB_WinchSync.st
+    - CODE/H_TREUILS_BENNE/FB_SyncDeviation.st
+    - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
+    - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+    - CODE/M_MAIN/PRG_06_Outputs.st
+    - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCfg.st
+    - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st
+    auditeur: Auditeur Expert Synchro & Levage Lourd Multi-Axes
+    challenger: Expert Sécurité Machine ISO 13849 & Régulation
+    defauts:
+    - id: D06_01
+      nom: Alerte ecart synchronisation M1/M2 (Seuil 1 Warn)
+      condition: DeltaPosM > CfgSyncToleranceM (3.0m) avec HomedAndReliableM1 et HomedAndReliableM2
+      action_machine: Bridage automatique au Palier 1 pour les deux treuils (CommonMaxStepAscent/Descent
+        := 1)
+      enregistrement: SyncErrorId bit 0 (16#0001), SyncState.SyncDeviationWarn :=
+        TRUE
+      visibilite_ihm:
+        bandeau_alarme: '[SYNC] ErrorID:01 - ecart M1/M2'
+        action_operateur: Aucune action specifique (bridage silencieux a palier 1)
+        condition_speciale: 'ATTENTION: Synchro bridee (masquee si un bypass actif)'
+      statut: CONFORME_AVEC_RESERVE
+    - id: D06_02
+      nom: Ecart critique synchronisation treuils M1/M2 (Seuil 2 Fault)
+      condition: DeltaPosM > CfgSyncCriticalToleranceM (6.0m) filtre 800ms
+      action_machine: Defaut cycle auto (AX_STAB). AUCUN SafeStop direct en manuel
+        (deconnecte dans PRG_04) !
+      enregistrement: SyncErrorId bit 2 (16#0004), Data.WinchSyncError := TRUE
+      visibilite_ihm:
+        bandeau_alarme: DEFAUT MORT / ORPHELIN (16#0004 non teste dans FB_Hmi_BannerFormatter)
+        action_operateur: Aucune action specifique
+        condition_speciale: Aucune
+      statut: DEFAUT_MORT_ET_MANQUE_SECURITE
+    - id: D06_03
+      nom: Discordance contacteurs M1/M2 Niveau 1
+      condition: Commandes ou contacteurs M1 <> M2 pendant plus de 500ms (hors plongee
+        P4/P5)
+      action_machine: SafeStop immediat des deux treuils (WinchContactorMismatchLvl1)
+      enregistrement: SyncErrorId bit 1 (16#0002), MismatchLevel := 1
+      visibilite_ihm:
+        bandeau_alarme: '[SYNC] discordance contacteurs M1/M2 -> arret : <contacteur>'
+        action_operateur: '[SYNC] Discordance contacteurs M1/M2 - Acquitter SafeStop'
+        condition_speciale: Aucune
+      statut: CONFORME
+    - id: D06_04
+      nom: Discordance contacteurs M1/M2 Niveau 2 (Escalade)
+      condition: Discordance contacteurs confirmee tenue plus de 3.0s
+      action_machine: PowerCutOff materiel immediat via MecaE escalade (bit 13)
+      enregistrement: SyncContactorDiag.MismatchLevel := 2, instSafetyWinch.ErrorId
+        bit 13 (16#2000)
+      visibilite_ihm:
+        bandeau_alarme: '[SYNC] discordance M1/M2 persistante -> coupure : <contacteur>'
+        action_operateur: Masquee par [SECURITE] Coupure puissance active
+        condition_speciale: Aucune
+      statut: ANOMALIE_AFFICHAGE
+    - id: D06_05
+      nom: Maintien inhibition synchro 4s post-benne
+      condition: Fin d une action benne, tempo BucketActivityHold de 4.0s active
+      action_machine: instWinchSync.Enable coupe a la source, purge des etats synchro
+      enregistrement: SyncState.SyncActive := FALSE
+      visibilite_ihm:
+        bandeau_alarme: Aucun (silencieux)
+        action_operateur: Aucune
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX
+    - id: D06_06
+      nom: Refus synchro sur offset benne invalide
+      condition: instBucket.ActiveOffsetValid = FALSE
+      action_machine: SyncOperationPermit = FALSE, refus d activation de la synchro
+      enregistrement: SyncState.SyncActive := FALSE
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Aucune
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX
+    - id: D06_07
+      nom: Blocage atomique croise Both (CoupledBoth)
+      condition: Perte de permit sur un treuil en commande couplee
+      action_machine: Arret symetrique simultane des deux treuils
+      enregistrement: BothBlocked := TRUE, BothBlockReason := COUPLING_BLOCKED
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Degrade en [TREUIL] Descente interdite generique (cause
+          reelle masquee)
+        condition_speciale: Aucune
+      statut: ANOMALIE_AFFICHAGE
+    - id: D06_08
+      nom: Ecart initial excessif au re-accouplement
+      condition: Re-selection synchro avec delta physique > 2.5m/6.0m
+      action_machine: SafeStop immediat via MecaE ou bridage palier 1
+      enregistrement: WinchMxSafety.ErrorMecaE := TRUE
+      visibilite_ihm:
+        bandeau_alarme: '[M1] ErrorID:13 - MecaE - ecart synchro M1/M2 critique'
+        action_operateur: '[PUPITRE] Acquitter SafeStop (sterile sans degagement unitaire)'
+        condition_speciale: Aucune
+      statut: ANOMALIE_AFFICHAGE
+    - id: D06_09
+      nom: Soft-stop synchro directionnel unitaire
+      condition: _SyncSoftStopEnable actif et ecart > 3.0m en commande unitaire
+      action_machine: Blocage de la commande unitaire dans le sens qui aggrave l ecart
+      enregistrement: Local interne PRG_04
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Aucune
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX
+    - id: D06_10
+      nom: Sur-neutralisation synchro par bypass tiers
+      condition: Bypasser n importe quel organe sur M1 ou M2 (thermique, contacteur
+        feedback)
+      action_machine: Force instWinchSync.BypassGlobal et instSyncContactor.BypassGlobal
+        a TRUE
+      enregistrement: GVL_IHM.M1M2Sync.Bypass.Global := TRUE
+      visibilite_ihm:
+        bandeau_alarme: Alarmes synchro neutralisees
+        action_operateur: Aucune
+        condition_speciale: 'ATTENTION: Bypass actif (generique)'
+      statut: ANOMALIE_CONCEPTION
+    - id: D06_11
+      nom: Desynchronisation voulue MAINT_N2
+      condition: SelSyncEnable decoche en mode MAINT_N2
+      action_machine: SyncActive := FALSE, surveillance ecart desactivee
+      enregistrement: SyncState.SyncActive := FALSE
+      visibilite_ihm:
+        bandeau_alarme: Aucun (nominal)
+        action_operateur: Aucune
+        condition_speciale: Aucune
+      statut: CONFORME
+    - id: D06_12
+      nom: Neutralisation calcul ecart sur codeurs non fiables
+      condition: Perte de HomedAndReliable sur M1 ou M2
+      action_machine: DeltaPosM force a 0.0m, bridage automatique Palier 1
+      enregistrement: SyncState.DeltaPos_M := 0.0
+      visibilite_ihm:
+        bandeau_alarme: Aucune alarme synchro
+        action_operateur: Aucune
+        condition_speciale: Aucune (ecart affiche trompeur a 0.00m)
+      statut: ANOMALIE_AFFICHAGE
+    synthese_device:
+      total_defauts_et_interlocks: 12
+      conformes: 2
+      refus_silencieux: 4
+      defauts_morts_ou_orphelins: 2
+      anomalies_affichage: 4
+  D07_SECURITE_AU:
+    statut: TERMINE
+    nom: Sécurité & Chaîne Arrêt d'Urgence
+    perimetre: Boutons AU, relais securite, contacteurs de ligne, sequence de rearmement,
+      defauts redondance
+    fichiers_cles:
+    - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
+    - CODE/M_MAIN/PRG_06_Outputs.st
+    - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    auditeur: Auditeur Expert Sécurité Machine ISO 13849
+    challenger: Architecte Électromécanique & Contrôle-Commande
+    defauts: []
+    synthese_device:
+      total_defauts_et_interlocks: 11
+      conformes: 5
+      refus_silencieux: 4
+      defauts_morts_ou_orphelins: 2
+      anomalies_masquage_ou_typo: 4
+  D08_JOYSTICK_PUPITRE:
+    statut: TERMINE
+    nom: Joystick & Pupitre Opérateur
+    perimetre: Manipulateur 2 axes Hall JOY1, bouton Homme-Mort, arbitre de commande
+      maître, interlocks de neutre et inter-axes
+    fichiers_cles:
+    - CODE/D_JOYSTICK/FB_Joystick.st
+    - CODE/D_JOYSTICK/FB_AxisScale.st
+    - CODE/M_MAIN/PRG_02_Acquisition.st
+    - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+    - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+    - CODE/M_MAIN/PRG_05_Translation.st
+    - CODE/I_TRANSLATION/FB_TranslationCmdArbitrationM3.st
+    - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM1.st
+    - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM2.st
+    - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+    auditeur: Auditeur Expert Ergonomie Industrielle & CANopen
+    challenger: Expert Sécurité Machine ISO 13849 & Conduite
+    defauts:
+    - id: D08-01
+      nom: Perte bus CANopen JOY1
+      condition: CODE/D_JOYSTICK/FB_Joystick.st:116 (BusLost)
+      action_machine: Gate sécurité, consignes à 0 %, DeadmanArmed=FALSE
+      enregistrement: instCauses[2] (Perte liaison bus CAN joystick), ST_Fault
+      visibilite_ihm:
+        bandeau_alarme: '[CAN] Joystick JOY1 non detecte'
+        action_operateur: '[CAN] Joystick non détecté'
+        condition_speciale: Aucune
+      statut: CONFORME
+    - id: D08-02
+      nom: Tension potentiomètre hors plage ADC (RawOutOfRange)
+      condition: CODE/D_JOYSTICK/FB_Joystick.st:112 (RawX/Y < -500 ou > 10500)
+      action_machine: Consignes SpeedTgt forcées à 0.0 %, Enable=FALSE
+      enregistrement: instCauses[1] (Capteur joystick hors plage ADC), GVL_IHM.JOY1Joystick.State.Error
+      visibilite_ihm:
+        bandeau_alarme: ABSENT du bandeau alarme §5
+        action_operateur: ABSENT de l action §4 (affiche deplacement en cours a tort)
+        condition_speciale: Aucune
+      statut: DEFAUT_MORT_REFUS_SILENCIEUX
+    - id: D08-03
+      nom: Échec de calibration neutre joystick (CalibFail)
+      condition: CODE/D_JOYSTICK/FB_Joystick.st:121 (Calibrate avec axes hors [2000..8000])
+      action_machine: Rejet calibration, verrouillage Ready=FALSE via Fault.Latched
+      enregistrement: instCauses[0] (Echec calibration joystick), Fault.Latched
+      visibilite_ihm:
+        bandeau_alarme: ABSENT du bandeau alarme §5
+        action_operateur: ABSENT de l action §4
+        condition_speciale: Aucune
+      statut: DEFAUT_ORPHELIN
+    - id: D08-04
+      nom: Verrou inversion rapide inter-scan sans neutre (InversionLockActive)
+      condition: CODE/D_JOYSTICK/FB_Joystick.st:208 (FlipX ou FlipY sans neutre)
+      action_machine: Désarmement immédiat DeadmanArmed=FALSE, réarmement verrouillé
+        jusqu au neutre
+      enregistrement: Variable locale pure InversionLockActive (non publiée)
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: '[JOYSTICK] Appuyer homme-mort au neutre (trompeur sans
+          mention inversion)'
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX
+    - id: D08-05
+      nom: Refus d armement par ArmingPermit=FALSE (ArmingPermitDenied)
+      condition: CODE/D_JOYSTICK/FB_Joystick.st:244 (RawButton AND NOT ArmingPermit)
+      action_machine: Refus d armer l homme-mort, consignes à 0 %
+      enregistrement: Data.Joystick.ArmingPermitDenied (non relayé vers GVL_IHM)
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: 'Répète en boucle: [JOYSTICK] Appuyer homme-mort au neutre
+          sans expliquer la cause'
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX_MAJEUR
+    - id: D08-06
+      nom: Non-respect du maintien homme-mort 100ms
+      condition: CODE/D_JOYSTICK/FB_Joystick.st:227 (Relâchement avant DeadmanArmHoldTime)
+      action_machine: Annulation de l armement
+      enregistrement: Aucun
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: '[JOYSTICK] Appuyer homme-mort au neutre'
+        condition_speciale: Aucune
+      statut: CONFORME
+    - id: D08-07
+      nom: Désarmement par neutre prolongé après délai de grâce
+      condition: CODE/D_JOYSTICK/FB_Joystick.st:249 (AtNeutralXY > 3s + 100ms)
+      action_machine: DeadmanArmed repasse à FALSE
+      enregistrement: State.DeadmanArmed := FALSE
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: '[JOYSTICK] Appuyer homme-mort au neutre'
+        condition_speciale: Aucune
+      statut: CONFORME
+    - id: D08-08
+      nom: Conflit Joystick Maître inactif (TglJoystickMaster=FALSE)
+      condition: CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM1.st:68 & CODE/I_TRANSLATION/FB_TranslationCmdArbitrationM3.st:89
+      action_machine: Manipulateur physique ignoré à 100 %, machine immobile
+      enregistrement: Aucun
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Affiche à tort [JOYSTICK] Déplacement en cours alors que
+          la machine est bloquée
+        condition_speciale: Aucune
+      statut: ANOMALIE_AFFICHAGE_REFUS_SILENCIEUX
+    - id: D08-09
+      nom: Asymétrie homme-mort boutons écran (M3 exige Homme-Mort, Treuils non)
+      condition: CODE/I_TRANSLATION/FB_TranslationCmdArbitrationM3.st:102 vs CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM1.st:121
+      action_machine: Bouton écran M3 inopérant sans homme-mort physique maintenu
+      enregistrement: Aucun
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Aucun message n explique l interdiction de bouger au tactile
+        condition_speciale: Aucune
+      statut: INCOHERENCE_INGENIERIE_REFUS_SILENCIEUX
+    - id: D08-10
+      nom: Neutralisation translation M3 par déflexion treuils Y
+      condition: CODE/I_TRANSLATION/FB_TranslationCmdArbitrationM3.st:104 (Direction
+        Y <> 0)
+      action_machine: Translation M3 bloquée à 0.0 %
+      enregistrement: Aucun
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: ABSENT
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX
+    - id: D08-11
+      nom: Neutralisation treuils M1/M2 par déflexion translation X
+      condition: CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM1.st:124 (Direction X
+        <> 0)
+      action_machine: Treuils M1/M2 bloqués à l arrêt
+      enregistrement: Aucun
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: ABSENT
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX
+    - id: D08-12
+      nom: Checklist Dépannage neutre hardcodée hors calibration
+      condition: CODE/J_SUPERVISION/FB_TroubleshootingView.st:527-528 (Bornes fixes
+        4800..5200)
+      action_machine: Aucune
+      enregistrement: ST_JoystickChecklist.NeutralXAct/NeutralYAct
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Diagnostic checklist faux si neutre réel hors de [4800..5200]
+        condition_speciale: Aucune
+      statut: ANOMALIE_DIAGNOSTIC
+    synthese_device:
+      total_defauts_et_interlocks: 18
+      conformes: 3
+      refus_silencieux: 8
+      defauts_morts_ou_orphelins: 4
+      anomalies_arbitrage_et_priorite: 3
+  D09_BUS_RESEAUX_IO:
+    statut: TERMINE
+    nom: Bus Réseaux & Modules E/S Déportées
+    perimetre: Bus EtherCAT (Master, AC600, COD1, COD2), Bus CANopen (Master, JOY1),
+      Heartbeat IHM, 5 Modules WAGO (Local_Digital_IO, VH_0800END, VH_0808ETP, VH_0008ER,
+      VH_0008ER_1), AutoReset transitoire
+    fichiers_cles:
+    - CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st
+    - CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st
+    - CODE/C_DIAG_RESEAUX/FB_Diag_IhmHeartbeat.st
+    - CODE/C_DIAG_RESEAUX/FB_AutoResetTransientDiag.st
+    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
+    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
+    - CODE/M_MAIN/PRG_02_Acquisition.st
+    - CODE/M_MAIN/PRG_07_Supervision.st
+    - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_IOModuleDiag.st
+    - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st
+    auditeur: Auditeur Expert Réseaux Industriels & Bus de Terrain
+    challenger: Architecte Sécurité Machine ISO 13849 & CI/CD
+    defauts:
+    - id: D09-01
+      nom: Déconnexion / Défaillance coupleur d entrées Local_Digital_IO
+      condition: CODE/M_MAIN/PRG_02_Acquisition.st:211 (Local_Digital_IO.GetDeviceState()
+        <> DEVICE_STATE.RUNNING)
+      action_machine: SafeStop immédiat M1, M2 et M3. Data.DataValid passe à FALSE.
+        Risque coupure puissance (PowerCutOff) si M1_ContactorsReleased_DI retombe
+        à 0.
+      enregistrement: Data.InputModules.LocalDigitalIoOk := FALSE, Data.InputModules.Fault
+        := TRUE
+      visibilite_ihm:
+        bandeau_alarme: '[IO] Defaut module Local IO (DI8/DO8)'
+        action_operateur: '[IO] Défaut module E/S - vérifier alimentation/coupleur'
+        condition_speciale: Aucune
+      statut: CONFORME_AVEC_RESERVE
+    - id: D09-02
+      nom: Déconnexion / Défaillance module d entrées VH_0800END (Sécurité & Freins)
+      condition: CODE/M_MAIN/PRG_02_Acquisition.st:212 (VH_0800END.GetDeviceState()
+        <> DEVICE_STATE.RUNNING)
+      action_machine: Retombée physique à 0 de EmergencyChainClosed_DI et PowerContactorEngaged_DI.
+        Chute brutale de la chaîne AU et ouverture contacteur puissance !
+      enregistrement: Data.InputModules.Vh0800EndOk := FALSE, Data.InputModules.Fault
+        := TRUE
+      visibilite_ihm:
+        bandeau_alarme: '[IO] Defaut module VH0800END (DI8)'
+        action_operateur: 'MASQUÉE : Affiche [PUPITRE] Boucle urgence ouverte - réarmer
+          au lieu d indiquer la perte du module WAGO !'
+        condition_speciale: Aucune
+      statut: ANOMALIE_MASQUAGE_ACTION_OPERATEUR
+    - id: D09-03
+      nom: Déconnexion / Défaillance module mixte VH_0808ETP (Positions M3 & Paliers
+        M1/M2)
+      condition: CODE/M_MAIN/PRG_02_Acquisition.st:213 (VH_0808ETP.GetDeviceState()
+        <> DEVICE_STATE.RUNNING)
+      action_machine: SafeStop M1, M2, M3. Retombée physique des sorties contacteurs
+        de vitesse M1/M2. Toutes positions cames M3 lues à 0.
+      enregistrement: Data.InputModules.Vh0808EtpOk := FALSE, Data.InputModules.Fault
+        := TRUE
+      visibilite_ihm:
+        bandeau_alarme: '[IO] Defaut module VH0808ETP (DI8/DO8)'
+        action_operateur: '[IO] Défaut module E/S - vérifier alimentation/coupleur'
+        condition_speciale: Aucune
+      statut: CONFORME
+    - id: D09-04
+      nom: Déconnexion / Défaillance module relais VH_0008ER (Freins M1/M2/M3 & Relais
+        Sens)
+      condition: CODE/M_MAIN/PRG_02_Acquisition.st:214 (VH_0008ER.GetDeviceState()
+        <> DEVICE_STATE.RUNNING)
+      action_machine: Retombée matérielle fail-safe des relais DO, retombée mécanique
+        des freins par manque de tension. SafeStop logiciel M1, M2, M3.
+      enregistrement: Data.InputModules.Vh0008ErOk := FALSE, Data.InputModules.Fault
+        := TRUE
+      visibilite_ihm:
+        bandeau_alarme: '[IO] Defaut module VH0008ER (DO8 Relais)'
+        action_operateur: '[IO] Défaut module E/S - vérifier alimentation/coupleur'
+        condition_speciale: Aucune
+      statut: CONFORME
+    - id: D09-05
+      nom: Déconnexion / Défaillance module relais VH_0008ER_1 (Maintien AU & Réarmement)
+      condition: CODE/M_MAIN/PRG_02_Acquisition.st:215 (VH_0008ER_1.GetDeviceState()
+        <> DEVICE_STATE.RUNNING)
+      action_machine: Retombée matérielle de PowerKeepAlive_A/B, ouverture physique
+        de la boucle AU matérielle. Coupure puissance brutale immédiate !
+      enregistrement: Data.InputModules.Vh0008Er1Ok := FALSE, Data.InputModules.Fault
+        := TRUE
+      visibilite_ihm:
+        bandeau_alarme: '[IO] Defaut module VH0008ER_1 (DO8 Relais)'
+        action_operateur: 'TROMPEUSE : Affiche [PUPITRE] Boucle urgence ouverte -
+          réarmer, mais tout réarmement échoue silencieusement !'
+        condition_speciale: Aucune
+      statut: ANOMALIE_MASQUAGE_ACTION_OPERATEUR
+    - id: D09-06
+      nom: Perte de communication Maître EtherCAT physique (global)
+      condition: CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st:196
+      action_machine: SafeStop M1, M2 (via perte codeurs) et SafeStop M3 (via perte
+        drive AC600).
+      enregistrement: DeviceEthercatMaster.Operational := FALSE, GVL_IHM.Network.EcatError
+        := TRUE
+      visibilite_ihm:
+        bandeau_alarme: '[ECAT] Defaut bus EtherCAT'
+        action_operateur: '[ECAT] Défaut bus EtherCAT - vérifier liaison'
+        condition_speciale: Aucune
+      statut: CONFORME
+    - id: D09-07
+      nom: Perte esclave EtherCAT Variateur AC600 (Translation M3)
+      condition: CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st:91 (AC600_ECAT_Drive <> RUNNING)
+      action_machine: SafeStop M3 via ErrorDriveComm. Ordres variateur et consigne
+        forcés à 0.
+      enregistrement: DeviceVariateur.Operational := FALSE, ErrorId OR 16#0010
+      visibilite_ihm:
+        bandeau_alarme: 'MASQUAGE TOTAL : [M3] Variateur AC600 non detecte n apparaît
+          JAMAIS car masqué par EcatBusValid=FALSE'
+        action_operateur: Générique [ECAT] Défaut bus EtherCAT
+        condition_speciale: Aucune
+      statut: ANOMALIE_MASQUAGE_ET_DEFAUT_MORT
+    - id: D09-08
+      nom: Perte esclave EtherCAT Codeur COD1 (Treuil M1)
+      condition: CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st:92 (COD1_CODEUR <> RUNNING)
+      action_machine: EncoderAvailable := FALSE, SafeStop M1 laté, interdiction mouvement
+        M1.
+      enregistrement: DeviceEncoderM1.Operational := FALSE, ErrorId OR 16#0020
+      visibilite_ihm:
+        bandeau_alarme: 'DOUBLE MASQUAGE : Alarme mère et fille masquées. ZERO message
+          explicite codeur au carrousel !'
+        action_operateur: Affiche [ECAT] Défaut bus EtherCAT sans citer le treuil
+          M1 ni le codeur COD1
+        condition_speciale: Aucune
+      statut: ANOMALIE_MASQUAGE_ET_DEFAUT_MORT
+    - id: D09-09
+      nom: Perte esclave EtherCAT Codeur COD2 (Treuil M2)
+      condition: CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st:93 (COD2_CODEUR <> RUNNING)
+      action_machine: EncoderAvailable := FALSE, SafeStop M2 laté, interdiction mouvement
+        M2.
+      enregistrement: 'BUG ACTIF : ErrorId positionné sur 16#0030 au lieu de 16#0040'
+      visibilite_ihm:
+        bandeau_alarme: DOUBLE MASQUAGE identique à COD1
+        action_operateur: Générique [ECAT] Défaut bus EtherCAT
+        condition_speciale: Aucune
+      statut: ANOMALIE_MASQUAGE_ET_BUG_BITFIELD
+    - id: D09-10
+      nom: Perte communication Maître Bus CANopen physique (global)
+      condition: CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st:67 (CANbus.GetBusState() <>
+        2)
+      action_machine: Neutralisation FB_Joystick, SafeStop M1, M2, M3 via ErrorOperatorComm.
+      enregistrement: DeviceCanOpenMaster.Operational := FALSE, GVL_IHM.Network.CanError
+        := TRUE
+      visibilite_ihm:
+        bandeau_alarme: '[CAN] Defaut bus CANopen'
+        action_operateur: '[CAN] Défaut bus CANopen - vérifier câblage'
+        condition_speciale: Aucune
+      statut: CONFORME
+    - id: D09-11
+      nom: Perte de communication esclave Joystick JOY1 (CANopen)
+      condition: CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st:68 (JOY1 <> RUNNING)
+      action_machine: Pipeline joystick neutralisé, DeadmanArmed=FALSE, SafeStop M1,
+        M2, M3.
+      enregistrement: DeviceJoystick.Operational := FALSE, ErrorId OR 16#0001
+      visibilite_ihm:
+        bandeau_alarme: '[CAN] Joystick JOY1 non detecte'
+        action_operateur: '[CAN] Joystick non détecté - vérifier liaison'
+        condition_speciale: Aucune
+      statut: CONFORME
+    - id: D09-12
+      nom: Joystick JOY1 en mode non-opérationnel (Pre-Op / Defaut)
+      condition: CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st:104
+      action_machine: Neutralisation commandes joystick, désarmement homme-mort, SafeStop
+        M1/M2/M3.
+      enregistrement: DeviceJoystick.Operational := FALSE, ErrorId OR 16#0002
+      visibilite_ihm:
+        bandeau_alarme: '[CAN] Joystick JOY1 non detecte'
+        action_operateur: '[CAN] Joystick non détecté - vérifier liaison'
+        condition_speciale: Aucune
+      statut: CONFORME
+    - id: D09-13
+      nom: Perte communication IHM / Heartbeat Timeout
+      condition: CODE/C_DIAG_RESEAUX/FB_Diag_IhmHeartbeat.st:63 (Inversion TglHeartbeatIhm
+        absente > 2s)
+      action_machine: SafeStop M1, M2 et M3. Transition cycle en AX_STAB si cycle
+        actif.
+      enregistrement: HeartbeatIhmTimeout := TRUE, HeartbeatIhmOk := FALSE
+      visibilite_ihm:
+        bandeau_alarme: 'OPACITE : Aucun message dédié dans le carrousel. Affiche
+          [M1] ErrorID:01 - perte com operateur'
+        action_operateur: Affiche [PUPITRE] Acquitter SafeStop sans expliciter l IHM
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX_ET_MESSAGE_TROMPEUR
+    - id: D09-14
+      nom: Bypass Heartbeat IHM actif par défaut au boot
+      condition: CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st:20
+        (IhmHeartbeat := TRUE)
+      action_machine: Clignotant PLC 1 Hz injecté en continu à la place du front IHM.
+        Surveillance inerte.
+      enregistrement: GVL_IHM.Network.Bypass.IhmHeartbeat := TRUE
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Aucune
+        condition_speciale: Aucune
+      statut: ANOMALIE_SECURITE_BYPASS_PAR_DEFAUT
+    - id: D09-15
+      nom: Effacement auto non-latché des ErrorId réseau
+      condition: CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st:131 et FB_Diag_CanOpen.st:100
+      action_machine: Rendu du FB_AutoResetTransientDiag et des entrées Reset inutiles
+        car ErrorId effacé chaque scan dès que OnlineEff=TRUE.
+      enregistrement: ErrorId AND 16#FFEF
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Aucun
+        condition_speciale: Aucune
+      statut: CODE_MORT_ET_INCOHERENCE_ARCHITECTURE
+    - id: D09-16
+      nom: Fenêtre aveugle réseau de 4s post-réarmement contacteur
+      condition: CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st:226 (RearmWindowActive
+        := TRUE pendant 4s)
+      action_machine: SafeStop actif si réseau tombe, mais BannerFormatter masque
+        tous les défauts réseau.
+      enregistrement: Aucun
+      visibilite_ihm:
+        bandeau_alarme: Toutes alarmes réseaux masquées pendant 4s
+        action_operateur: Affiche [PUPITRE] Acquitter SafeStop (stérile)
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX_TEMPORAIRE
+    - id: D09-17
+      nom: Bit-shift sur les alarmes cycle dans le carrousel §5
+      condition: CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st:1139-1153
+      action_machine: Décodage binaire incohérent entre FB_CycleSemiAuto et FB_Hmi_BannerFormatter.
+      enregistrement: CycleErrorId
+      visibilite_ihm:
+        bandeau_alarme: Perte IHM affichée comme ecart codeurs remontee ! Timeout
+          étape affiché comme écart vitesse !
+        action_operateur: En §4 le texte est correct (contradiction §4 vs §5)
+        condition_speciale: Aucune
+      statut: ANOMALIE_CRITIQUE_AFFICHAGE
+    - id: D09-18
+      nom: Qualification réseau PRG_02_Acquisition.Data.DataValid
+      condition: CODE/M_MAIN/PRG_02_Acquisition.st:756 (Teste Ready au lieu d Operational)
+      action_machine: Data.DataValid reste TRUE même si tous les bus CANopen et EtherCAT
+        sont coupés.
+      enregistrement: Data.DataValid
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Aucune
+        condition_speciale: Aucune
+      statut: FAILLE_QUALIFICATION_DONNEES
+    - id: D09-19
+      nom: Bypass maître EtherCAT hardcodé inactif dans PRG_02
+      condition: CODE/M_MAIN/PRG_02_Acquisition.st:271 (EcatBusBypassActive := FALSE)
+      action_machine: Réglage IHM ignoré.
+      enregistrement: Aucun
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Aucune
+        condition_speciale: Aucune
+      statut: VARIABLE_ORPHELINE_ET_CODE_INERT
+    - id: D09-20
+      nom: Variables d état diagnostique mortes et non exploitées
+      condition: CODE/C_DIAG_RESEAUX/E_Diag_State.st:12 & ST_Diag_Device.st:14
+      action_machine: Aucune.
+      enregistrement: E_Diag_State.MONITORING n est jamais affecté nulle part.
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Aucune
+        condition_speciale: Aucune
+      statut: CODE_MORT
+    synthese_device:
+      total_defauts_et_interlocks: 20
+      conformes: 3
+      refus_silencieux: 6
+      defauts_morts_ou_orphelins: 5
+      anomalies_masquage_et_affichage: 6
+  D10_SEQUENCEURS_PROCESS:
+    statut: TERMINE
+    nom: Séquenceur & Cycles Process
+    perimetre: Machines à états AX0..AX18, AX_STAB, Homing Machine HX0..HX7, repli/reprise,
+      interlocks PRG_03, décodages IHM FB_Hmi_BannerFormatter
+    fichiers_cles:
+    - CODE/G_CYCLE/FB_CycleSemiAuto.st
+    - CODE/G_CYCLE/FB_CycleMachineHoming.st
+    - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+    - CODE/F_MODES/FB_Modes.st
+    - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    - CODE/M_MAIN/PRG_07_Supervision.st
+    - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
+    - CODE/G_CYCLE/_TYPES/E_MachineHomingTxState.st
+    auditeur: Auditeur Senior Spécialiste Automatisme & Séquenceurs d États Industriels
+    challenger: Expert Sécurité Machine ISO 13849 & Process Industriel
+    defauts:
+    - id: D10_01
+      nom: Désactivation temporisation de garde maximale d étape (StepMaxTimer)
+      condition: CODE/G_CYCLE/FB_CycleSemiAuto.st:387 (StepMaxTimer câblé avec IN:=FALSE)
+      action_machine: Aucune surveillance de temps de blocage sur les étapes AX0..AX18.
+        Le cycle peut rester bloqué indéfiniment.
+      enregistrement: instCauses[4] rendu inatteignable.
+      visibilite_ihm:
+        bandeau_alarme: Absent (Défaut mort)
+        action_operateur: Affiche la consigne normale de l étape figée
+        condition_speciale: Aucune
+      statut: DEFAUT_MORT_ET_REFUS_SILENCIEUX
+    - id: D10_02
+      nom: Neutralisation mécanisme automatique reprise plongée (AX_DIVING_RETRY)
+      condition: CODE/G_CYCLE/FB_CycleSemiAuto.st:432 (DivingRetryTrig := FALSE en
+        dur)
+      action_machine: Reprise automatique de plongée désactivée.
+      enregistrement: State := AX_DIVING_RETRY inatteignable en automatique.
+      visibilite_ihm:
+        bandeau_alarme: Aucun message de retry
+        action_operateur: Guidage plongée figé ou saut direct en AX_STAB
+        condition_speciale: Aucune
+      statut: DEFAUT_MORT_ET_ORPHELIN
+    - id: D10_03
+      nom: Neutralisation sécurités écart vitesse montée dans PRG_03
+      condition: CODE/M_MAIN/PRG_03_Modes_Cycle.st:246-247 (SpeedMismatchTimeout :=
+        T#0ms)
+      action_machine: Détection locale d écart vitesse désactivée.
+      enregistrement: instCauses[2] et instCauses[5] inatteignables.
+      visibilite_ihm:
+        bandeau_alarme: Absent du carrousel §5
+        action_operateur: Aucune alerte d écart vitesse locale
+        condition_speciale: Aucune
+      statut: DEFAUT_MORT
+    - id: D10_04
+      nom: Décalage binaire critique (Bit-Shift) alarmes cycle dans carrousel §5
+      condition: CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st:1139-1153 vs FB_CycleSemiAuto.st:483-503
+      action_machine: Inversion totale des libellés d alarme dans le carrousel.
+      enregistrement: CycleErrorId
+      visibilite_ihm:
+        bandeau_alarme: Diagnostic alarmiste faux et trompeur pour l opérateur
+        action_operateur: Décodage correct en §4 (contradiction flagrante §4 vs §5)
+        condition_speciale: Aucune
+      statut: ANOMALIE_CRITIQUE_AFFICHAGE
+    - id: D10_05
+      nom: Consigne profondeur invalide (Cause 11) non décodée en §4 Action Opérateur
+      condition: CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st:600-624 vs FB_CycleSemiAuto.st:538-542
+      action_machine: Repli AX_STAB engagé sur consigne invalide sous limite légale.
+      enregistrement: CycleErrorId = 16#0800
+      visibilite_ihm:
+        bandeau_alarme: '[CYCLE] ErrorID:12 - consigne profondeur invalide'
+        action_operateur: 'Affiche [CYCLE]AX7:cause inconnue #2048>Repr/Abandon'
+        condition_speciale: Aucune
+      statut: ANOMALIE_AFFICHAGE
+    - id: D10_06
+      nom: Exclusion erreur synchro en AX11 générant blocage silencieux indéfini
+      condition: CODE/G_CYCLE/FB_CycleSemiAuto.st:475 & :1401
+      action_machine: Montée infinie en palier lent sans transition vers AX12.
+      enregistrement: WinchSyncError actif sans défaut cycle.
+      visibilite_ihm:
+        bandeau_alarme: Dépend du seuil PRG_04
+        action_operateur: '[JOY] Tirer montee : remontee de controle affiché alors
+          que transition bloquée'
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX_BLOQUANT
+    - id: D10_07
+      nom: Neutralisation M2TopLimitReached forçant fin de montée AX12 sur M1 seul
+      condition: CODE/M_MAIN/PRG_03_Modes_Cycle.st:253 (M2TopLimitReached := FALSE)
+      action_machine: Si M2 atteint sa butée haute avant M1, M1 continue de tirer
+        seul.
+      enregistrement: M2TopLimitReached ignoré.
+      visibilite_ihm:
+        bandeau_alarme: Aucun défaut cycle
+        action_operateur: Maintien consigne AX12
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX_ET_ANOMALIE_CONCEPTION
+    - id: D10_08
+      nom: Déconnexion totale défauts cycle homing machine dans supervision §5
+      condition: CODE/M_MAIN/PRG_02_Acquisition.st:745 & CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st:1121
+      action_machine: MachineHoming verrouille Fault.Latched mais Fault.ErrorId non
+        routé vers carrousel.
+      enregistrement: MachineHoming.Step = 70 (FAILED).
+      visibilite_ihm:
+        bandeau_alarme: AUCUNE alarme de homing dans le carrousel §5
+        action_operateur: Aucune alerte de guidage spécifique en §4
+        condition_speciale: Aucune
+      statut: DEFAUT_ORPHELIN_ET_MANQUE_VISIBILITE
+    - id: D10_09
+      nom: Absence de guidage opérateur en §4 durant le Homing Machine
+      condition: CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st:368 vs :764-855
+      action_machine: Section §4 ignore le homing et affiche des textes manuels génériques
+        déphasés.
+      enregistrement: MachineHomingStep actif.
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Affiche [JOYSTICK] Déplacement en cours au lieu de la consigne
+          HX
+        condition_speciale: Aucune
+      statut: ANOMALIE_AFFICHAGE
+    - id: D10_10
+      nom: Reliquat commande translation M3 parasite dans étape repli AX_STAB
+      condition: CODE/G_CYCLE/FB_CycleSemiAuto.st:1651-1663
+      action_machine: En AX_STAB, le séquenceur émet une commande active TranslationCmd.ReqStart.
+      enregistrement: TranslationCmd.ReqStart = TRUE en état AX_STAB.
+      visibilite_ihm:
+        bandeau_alarme: Alarme cycle présente
+        action_operateur: Libellé incohérent AX2 affiché en état STABILISATION
+        condition_speciale: Aucune
+      statut: ANOMALIE_AFFICHAGE_ET_ORDRE_PARASITE
+    - id: D10_11
+      nom: Refus silencieux au démarrage de cycle en AX0 avec défaut mémorisé
+      condition: CODE/G_CYCLE/FB_CycleSemiAuto.st:909
+      action_machine: Si Fault.Latched est vrai, Start ou Deadman ignoré sans transition
+        ni message.
+      enregistrement: Fault.Latched = TRUE.
+      visibilite_ihm:
+        bandeau_alarme: Selon défaut d origine
+        action_operateur: Lit AX0 - Demarrer le cycle sans mention de l acquittement
+          obligatoire
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX
+    - id: D10_12
+      nom: Blocage sans échappatoire en AX1_INIT après abandon cycle godet immergé
+      condition: CODE/G_CYCLE/FB_CycleSemiAuto.st:925 & CODE/M_MAIN/PRG_03_Modes_Cycle.st:172-179
+      action_machine: Obligation de basculer en manuel sans guidage explicite.
+      enregistrement: InitPositionOk = FALSE.
+      visibilite_ihm:
+        bandeau_alarme: Aucun défaut
+        action_operateur: Demande d amener M1 au FDC haut mais refuse le mouvement
+          au joystick
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX_BLOQUANT
+    - id: D10_13
+      nom: Validation aveugle activation contacteur Kobold en AX5 sur timer pur
+      condition: CODE/G_CYCLE/FB_CycleSemiAuto.st:1121
+      action_machine: Transition vers AX6 au bout de 500ms sans garantie de fermeture
+        effective du contacteur.
+      enregistrement: Transition aveugle sur KoboldInitTimer.Q.
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: AX5 - Maintenir descente - initialisation Kobold
+        condition_speciale: Aucune
+      statut: DEFAUT_MATERIEL_MASQUE
+    - id: D10_14
+      nom: Présence de 11 décodages alarmes mortes issues d assistants retirés dans
+        carrousel §5
+      condition: CODE/M_MAIN/PRG_07_Supervision.st:828-829 & CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st:1087-1119
+      action_machine: DiveErrorId et ExtractionErrorId forcés à 0 dans PRG_07.
+      enregistrement: DiveErrorId = 0, ExtractionErrorId = 0.
+      visibilite_ihm:
+        bandeau_alarme: 11 alarmes mortes
+        action_operateur: Aucune
+        condition_speciale: Aucune
+      statut: CODE_MORT_ET_ORPHELIN
+    - id: D10_15
+      nom: Rejet silencieux confirmation benne en Homing HX1 sous micro-déflexion
+        joystick
+      condition: CODE/G_CYCLE/FB_CycleMachineHoming.st:431
+      action_machine: Appui sur BtnConfirmHomingBucket ignoré si JoystickDeflected
+        est vrai.
+      enregistrement: HomingBucketConfirmEdge.Q sans effet.
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Consigne d étape non mise à jour
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX
+    - id: D10_16
+      nom: Impossibilité d acquitter échec Homing Machine HX7_FAILED hors mode MAINT_N2
+      condition: CODE/G_CYCLE/FB_CycleMachineHoming.st:400 & PRG_02_Acquisition.st:720
+      action_machine: Reset effectif uniquement si sélecteur maintenu en MAINT_N2.
+      enregistrement: MachineHomingStep = FAILED (70).
+      visibilite_ihm:
+        bandeau_alarme: Absent
+        action_operateur: Indication Acquitter Reset N2 uniquement en §1
+        condition_speciale: Aucune
+      statut: CONFORME_AVEC_RESERVE
+    - id: D10_17
+      nom: Saut d étape immédiat sans contrôle de posture en mode forçage (T358)
+      condition: CODE/G_CYCLE/FB_CycleSemiAuto.st:748-802
+      action_machine: Force le Grafcet sans vérifier la cohérence géométrique.
+      enregistrement: ForceStepAccepted := TRUE.
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: Charge immédiatement l étape cible
+        condition_speciale: Aucune
+      statut: CONFORME_PAR_CONCEPTION_AVEC_RISQUE_EXPLOITATION
+    - id: D10_18
+      nom: Interdiction descente treuil en manuel sans position P1/Maintenance stabilisée
+      condition: CODE/M_MAIN/PRG_03_Modes_Cycle.st:509-514 & CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st:451
+      action_machine: Verrou général de descente en mode manuel si M3 n est pas calé
+        sur ses cibles.
+      enregistrement: WinchDescentAuth_M3 := FALSE.
+      visibilite_ihm:
+        bandeau_alarme: Aucun
+        action_operateur: '[TREUIL] Descente interdite - Chariot M3 pas a P1/Maintenance'
+        condition_speciale: 'Descente treuil verrouillee : chariot M3 pas a P1/Maintenance'
+      statut: CONFORME
+    - id: D10_19
+      nom: Blocage indéfini en étape AX10 en cas d obstacle empêchant la fermeture
+        benne
+      condition: CODE/G_CYCLE/FB_CycleSemiAuto.st:1323
+      action_machine: Attente indéfinie en AX10 sans tempo de repli.
+      enregistrement: Aucun défaut cycle généré en l absence de StepMaxTimer.
+      visibilite_ihm:
+        bandeau_alarme: Aucun défaut cycle
+        action_operateur: 'AX10 - Maintenir la commande : fermeture de la benne.'
+        condition_speciale: Aucune
+      statut: REFUS_SILENCIEUX
+    - id: D10_20
+      nom: Rétrogradation automatique et sécurisée en MAINT_N1 sur perte de datum
+        machine
+      condition: CODE/F_MODES/FB_Modes.st:251-261
+      action_machine: Perte de MachineHomed en cycle force le mode en MAINT_N1 et
+        coupe les commandes automatiques.
+      enregistrement: 'Auth.ModeChangeBlockReason := Datum machine perdu : arret controle.'
+      visibilite_ihm:
+        bandeau_alarme: Aucun défaut mode
+        action_operateur: Bascule en mode manuel
+        condition_speciale: 'Datum machine perdu : arret controle'
+      statut: CONFORME
+    synthese_device:
+      total_defauts_et_interlocks: 20
+      conformes: 6
+      refus_silencieux: 7
+      defauts_morts_ou_orphelins: 4
+      anomalies_masquage_et_affichage: 3

@@ -1,0 +1,104 @@
+Objectif principal de la session  🚜 Simulation Translation M3 pour reproduire ou approcher les problèmes defauts sur la machien reelle.
+  Il est impératif de ne pas prendre le problème a l'envers ... cest a dire faire une simu pour avoir les defauts...
+  On se focus sur la justesse de la simulation d'un point de vu fonctionnel, on ne cherche pas des temps pour position vitesse ultra précises.
+
+  Dans un premier dans sans modification je veux que tu organises le travails pour au final faire implémentation et test.
+
+  tu as à ta disposition des deepseek-v4.1-flash:cloud ou glm 5.3 sur ollama tu peux ten servir pour analyser les traces, l'histo git, vers travailler
+  en parallele plusieurs agents et récuperer et merger les bonne idées ... donc hesite pas à faire travail 2 ou 3 agents en meme trmps ...
+  Pour tache importante demande au agent de langer le workflow breifing projet et toujours doner des contract clair précis et évaluables au agents
+  sinon tu le fais (car risque derreur et perte de temps).
+  Ensuite je veux toujours des echanges clair concis tdah friendly avec emoji ...
+  On doit être rigoureux mais objectif si le benefice est faible on passe pas trop de temps ou energie... il faut un interet pratique par rapport à
+  l'objectif initial mon besoin.   
+
+
+  ---
+
+
+   ============================================================                                                                                     
+    🎯 MODE ORCHESTRATEUR / CADRAGE CHANTIER SIMULATION M3                                                                                           
+    ============================================================                                                                                     
+                                                                                                                                                     
+  Cadrage de la tâche T417 (C2) : Simulation Translation M3 — Justesse fonctionnelle & Chaîne physique réaliste.                                     
+  ──────                                                                                                                                             
+  ### 🧠 Posture & Règles du Chantier                                                                                                                
+                                                                                                                                                     
+  │ 🚨 Principe Fondamental (Anti-Biais) :                                                                                                           
+  │ On ne prend jamais le problème à l'envers en concevant une simulation "faite pour déclencher des défauts".                                       
+  │ On modélise la physique fonctionnelle naturelle (chaîne variateur AC600 → inertie → frein mécanique → capteurs réels). Les comportements limites 
+  │ ou défauts doivent découler de la réalité physique, sans artifice.                                                                               
+  │                                                                                                                                                  
+  │ 🎯 Pragmatisme TDAH-Friendly (ROI) :                                                                                                             
+  │                                                                                                                                                  
+  │ • Zéro recherche de précision chronométrique ou millimétrique inutile.                                                                           
+  │ • Priorité à la justesse d'enchaînement des états (retards réels, réponse variateur, glissement inertiel, confirmation frein, transition des     
+  │ cames).                                                                                                                                          
+  │ • Phase 1 stricte : organisation, analyse des traces et cadrage sans modification de code.                                                       
+  ──────                                                                                                                                             
+  ### 🗺 Plan d'Orchestration en 4 Phases                                                                                                             
+                                                                                                                                                     
+    ┌────────────────────────────────────────────────────────────────────────┐                                                                       
+    │ Phase 0 : Cadrage & Contrat de tâche T417 (Criticité C2, scope borné)   │                                                                      
+    └──────────────────────────────────┬─────────────────────────────────────┘                                                                       
+                                       ▼                                                                                                             
+    ┌────────────────────────────────────────────────────────────────────────┐                                                                       
+    │ Phase 1 : Analyses Parallèles Multi-Agents (Ollama Local / Traces)     │                                                                       
+    │   ├─ Agent A (DeepSeek v4.1) : Audit du modèle actuel (FB_Sim_*)       │                                                                       
+    │   ├─ Agent B (GLM-5.3)       : Extraction cinématique trace réelle 27   │                                                                      
+    │   └─ Agent C (DeepSeek v4.1) : Synthèse chaîne variateur AC600 & frein │                                                                       
+    └──────────────────────────────────┬─────────────────────────────────────┘                                                                       
+                                       ▼                                                                                                             
+    ┌────────────────────────────────────────────────────────────────────────┐                                                                       
+    │ Phase 2 : Synthèse, Arbitrage des Hypothèses & Plan Technique Validé   │                                                                       
+    │   (Arrêt obligatoire pour accord humain avant tout code ST)             │                                                                      
+    └──────────────────────────────────┬─────────────────────────────────────┘                                                                       
+                                       ▼                                                                                                             
+    ┌────────────────────────────────────────────────────────────────────────┐                                                                       
+    │ Phase 3 : Implémentation ST (SimBench M3) & Validation Mécanique        │                                                                      
+    │   (G200 liaison, 21 Gates, Diff Bundle CODESYS, Essais fonctionnels)   │                                                                       
+    └────────────────────────────────────────────────────────────────────────┘                                                                       
+  ──────                                                                                                                                             
+  ### 🤖 Répartition des 3 Missions Parallèles (Agents Ollama)                                                                                       
+                                                                                                                                                     
+  Pour ne pas saturer le quota API et avancer vite, 3 sous-agents locaux peuvent être lancés en parallèle avec subagent_preamble.md injecté en tête :
+                                                                                                                                                     
+   Agent & Modèle                   │ Rôle & Fichiers Cibles                                │ Livrable Attendu
+  ──────────────────────────────────┼───────────────────────────────────────────────────────┼────────────────────────────────────────────────────────
+   Agent Adeepseek-v4.1-flash:cloud │ Audit du SimBench M3 actuel📄 FB_Sim_Translation.st📄 │ Lister les simplifications excessives (ex. arrêt
+                                    │ FB_Sim_TranslationDrive.st📄                          │ instantané, absence de traînée,StatusWord figé) et les
+                                    │ FB_Sim_TranslationBrake.st                            │ paramètres inutiles à élaguer.
+   Agent Bglm-5.3-flash:cloud       │ Analyse de la trace réelle terrain📊                  │ Extraire le chronogramme réel : délais de
+                                    │ Suivi_TranslationM3bug_20260904_27_wide.csv📄         │ montée/descente en fréquence du variateur AC600, délai
+                                    │ TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md     │ de retombée du frein, comportement des DI capteurs aux
+                                    │                                                       │ transitions.
+   Agent Cdeepseek-v4.1-flash:cloud │ Cartographie des défauts réels M3 & interfaces📄      │ Synthétiser la liste des défauts réels observés
+                                    │ AF_Partie-11_Fonction_Translation_v2.4.md📄           │ (ErrorId 64, timeouts frein, sauts d'odométrie, perte
+                                    │ FICHE_T400_MODELISATION_TRANSLATION_M3.md             │ de cames) et les signaux nécessaires côté simulateur.
+  ──────                                                                                                                                             
+  ### 📋 Hypothèses de Travail Identifiées & Données Manquantes                                                                                      
+                                                                                                                                                     
+  Pour avancer sans blocage :                                                                                                                        
+                                                                                                                                                     
+   Grandeur / Phénomène   │ Donnée Réelle Disponible               │ Donnée Manquante / Inconnue            │ Hypothèse de Travail Retenue
+  ────────────────────────┼────────────────────────────────────────┼────────────────────────────────────────┼────────────────────────────────────────
+   Motorisation M3        │ Plaque HELMKE 7.5 kW, 963 tr/min, 50   │ Rapport exact de réduction, diamètre   │ Conservation du gain odometrique
+                          │ Hz, 17.5 A.                            │ exact des galets/roues.                │ effectif automate : 0.02 m/(Hz · s)
+                          │                                        │                                        │ (40 Hz → 0.8 m/s).
+   Frein mécanique        │ Bobine 200 ms ouverture, confirmation  │ Couple de freinage exact, profil       │ Retombée du frein en manque de courant
+                          │ attendue < 1 000 ms.                   │ d'usure des garnitures.                │ à la coupure bobine avec décélération
+                          │                                        │                                        │ d'arrêt ≈ 2.0 m/s² ( 4 cm à 20 Hz).
+   Inertie chariot & rail │ Course 0.00 à 30.00 m.                 │ Masse totale mobile (chariot + benne + │ Modèle simplifié : chariot entraîné
+                          │                                        │ structure).                            │ par la vitesse variateur tant qu'il y
+                          │                                        │                                        │ a du couple, glissement libre limité
+                          │                                        │                                        │ par le frottement ( 0.1 m/s²) si roue
+                          │                                        │                                        │ libre.
+   Capteurs de position   │ 5 cames fixes (Trémie, PV, P2, P1,     │ Hystérésis mécanique exacte des        │ Zone active de came avec hystérésis de
+                          │ Maintenance).                          │ détecteurs inductifs.                  │ 2 cm et filtrage transitoire pour
+                          │                                        │                                        │ éviter les faux rebonds numériques.
+  ──────                                                                                                                                             
+  ### 🚦 Décision pour Démarrer                                                                                                                      
+                                                                                                                                                     
+  Es-tu d'accord avec cette organisation ?                                                                                                           
+  Si oui, je lance immédiatement la rédaction du contrat T417 et les 3 sous-agents Ollama en parallèle pour extraire les faits et confronter leurs   
+  analyses.                         

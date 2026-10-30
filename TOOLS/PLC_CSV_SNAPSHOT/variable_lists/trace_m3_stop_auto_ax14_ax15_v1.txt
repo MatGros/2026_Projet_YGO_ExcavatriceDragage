@@ -29,6 +29,11 @@ PRG_05_Translation.Data.TranslationState.SpeedCmd_Pct
 PRG_05_Translation.Data.TranslationState.BrakeCmd
 PRG_05_Translation.Data.TranslationState.BrakeCommandOpenConfirmed
 PRG_05_Translation.Data.TranslationState.BrakeFeedback
+PRG_05_Translation.Data.TranslationState.EstimatedPosM3_M
+
+# Observables simulation : position vraie et erreur d'odometrie
+GVL_Simulation.SimM3ObsPositionTrue_M
+GVL_Simulation.SimM3ObsPositionError_M
 
 # Demande brute de PRG_05 vers la barrière finale
 PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop

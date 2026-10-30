@@ -219,16 +219,33 @@ def main() -> int:
 
         # Step D: Run CODESYS Headless
         print("[RUN] Launching CODESYS in Headless mode (--noUI)...")
-        cmd_str = f'"{codesys_exe}" --profile="{profile_name}" --noUI --execute="{ironpython_script}"'
-        res = subprocess.run(cmd_str, capture_output=True, text=True, shell=True)
+        # `--runscript` is the ScriptEngine switch exercised by the isolated
+        # TwinBench runner.  Invoke CODESYS directly with discrete arguments:
+        # a shell command can both break paths containing spaces and mask a
+        # script that was never run.
+        # Keep the literal quotes required by CODESYS' command-line parser;
+        # this is the same form as TwinBench_ControlWin.ps1.
+        cmd_line = (
+            f'"{codesys_exe}" '
+            f'--profile="{profile_name}" '
+            f'--runscript="{ironpython_script}" '
+            '--noUI'
+        )
+        res = subprocess.run(cmd_line, capture_output=True, text=True, shell=False)
 
         # Step E: Display Output
         if log_file.is_file():
             print("\n" + log_file.read_text(encoding="utf-8"))
         else:
+            # CODESYS peut retourner 0 apres avoir delegue la demande a une instance
+            # interactive deja ouverte, sans executer le script IronPython. Sans ce
+            # fichier, aucun check_syntax ni resultat de compilation n'est prouve.
+            print("ERROR: CODESYS did not produce build_result.log; compilation is unproven.",
+                  file=sys.stderr)
             print("\n" + res.stdout)
             if res.stderr:
                 print(res.stderr, file=sys.stderr)
+            return res.returncode if res.returncode != 0 else 1
 
         return res.returncode
 

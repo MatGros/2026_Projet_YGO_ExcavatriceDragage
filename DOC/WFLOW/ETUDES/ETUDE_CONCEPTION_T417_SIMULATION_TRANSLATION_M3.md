@@ -2,6 +2,15 @@
 ## Modélisation Physique Réaliste & Émergence Naturelle des Défauts
 
 > 📅 **Date** : 2026-10-29 · 🏷️ **Tâche** : `T417` (C2) · 👤 **Orchestrateur** : `AGY01` (Antigravity Senior)  
+> ⚠️ **ERRATUM 2026-10-30 — qualification des observations.** Les sections 3 et 5bis et les
+> formulations qui en déduisent un comportement « machine réelle » mélangent des relevés
+> oscilloscope effectués **en simulation** et un récit visuel de l'exploitant. Elles ne
+> constituent donc pas une preuve terrain ni une calibration. La source de référence pour
+> ce récit, ses limites de mémoire et les hypothèses ouvertes est le
+> [`REGISTRE_MES_TEMOIGNAGE_M3_20261030.md`](../REGISTRES/REGISTRE_MES_TEMOIGNAGE_M3_20261030.md).
+> Les traces versionnées et l'historique Git priment ; ne pas utiliser cette section pour
+> affirmer que le frein réel s'est ouvert, fermé ou temporisé d'une manière donnée.
+>
 > 📑 **Contrat de tâche** : [`TASK_CONTRACT_T417_SIMULATION_M3_REALISTE.yaml`](../CONTRACTS/TASK_CONTRACT_T417_SIMULATION_M3_REALISTE.yaml) (PASS)  
 > 🎯 **Objectif** : Établir l'étude technique complète et le plan d'implémentation pour rendre la simulation de la translation M3 dans `SimBench` fonctionnellement juste et physiquement réaliste, sans forcer artificiellement des pannes et sans altérer le code automate de production.
 

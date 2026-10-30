@@ -138,6 +138,8 @@ VAR
     ObsSpeedBeforeStop_Mps : REAL;      (* Vitesse du scan avant le calcul de butee *)
     DriveTorqueActive : BOOL;           (* L4 : variateur commande ou encore en rampe -> chariot tenu *)
     FreeAccel_Mps2 : REAL;              (* L4 : acceleration nette du chariot libre *)
+    FreeVelocity_Mps : REAL;           (* Vitesse apres integration de la force externe *)
+    FrictionStep_Mps : REAL;           (* Impulsion dissipative maximale sur le pas *)
     FreeRollStart_M : REAL;             (* L4 : position au debut de l'episode libre *)
     instCycleTime : FB_CycleTime;
     Initialized : BOOL;
@@ -313,12 +315,18 @@ IF Enable THEN
             ELSE
                 FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, StaticFriction_Mps2);
             END_IF;
-        ELSIF VelocityTrue_Mps > 0.0 THEN
-            FreeAccel_Mps2 := FreeAccel_Mps2 - MAX(0.0, RollingFriction_Mps2);
+            VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
         ELSE
-            FreeAccel_Mps2 := FreeAccel_Mps2 + MAX(0.0, RollingFriction_Mps2);
+            (* La force externe peut inverser le mouvement ; le frottement ne peut
+               que reduire sa vitesse, au plus jusqu'a zero. *)
+            FreeVelocity_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
+            FrictionStep_Mps := MAX(0.0, RollingFriction_Mps2) * CycleTimeS;
+            IF FreeVelocity_Mps > 0.0 THEN
+                VelocityTrue_Mps := MAX(0.0, FreeVelocity_Mps - FrictionStep_Mps);
+            ELSE
+                VelocityTrue_Mps := MIN(0.0, FreeVelocity_Mps + FrictionStep_Mps);
+            END_IF;
         END_IF;
-        VelocityTrue_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
     ELSIF BrakeMechanicallyOpen THEN
         (* Vitesse suivant directement le variateur (deja filtre par instDrive) sans double PT1 *)
         VelocityTrue_Mps := VelocityTarget_Mps;

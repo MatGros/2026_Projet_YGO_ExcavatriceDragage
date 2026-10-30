@@ -12,11 +12,27 @@
     },
     {
       "name": "TC-P13-034 SpeedReportTauS=0.0 conserve le saut instantane historique (non-regression)",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "FB.RAWSPDOUT expected 0, got 596",
+        "file": "test_fb_sim_encoder.st",
+        "line": 49,
+        "message": "Tau=0.0, coupure sans roulis -> vitesse rapportee tombe a 0 des le meme scan",
+        "expected": "0",
+        "actual": "596"
+      }
     },
     {
       "name": "TC-P13-035 SpeedReportTauS>0 fait decroitre RawSpdOut sur plusieurs scans (fidelite AX10, T316)",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "SPDNEXT < SPDATCUT expected TRUE, got FALSE",
+        "file": "test_fb_sim_encoder.st",
+        "line": 74,
+        "message": "Vitesse rapportee decroit scan apres scan (rampe continue, pas un escalier)"
+      }
     },
     {
       "name": "TC-P13-031 PresetCmd applique PresetValue apres PresetLatencyCycles, mouvement gele pendant la latence",
@@ -41,7 +57,7 @@
   ],
   "summary": {
     "total": 9,
-    "passed": 9,
-    "failed": 0
+    "passed": 7,
+    "failed": 2
   }
 }

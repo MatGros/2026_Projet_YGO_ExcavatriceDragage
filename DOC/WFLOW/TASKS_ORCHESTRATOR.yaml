@@ -6476,3 +6476,16 @@
     diff bundle est ECRASE a chaque appel (pas cumulatif), un import partiel a cause
     un faux negatif operateur (marge T330 vue a 1.0 au lieu de 0.4) le temps de regenerer
     un diff bundle groupe des 7 objets.'
+- id: ETUDE-SIM-M3-T417
+  date: '2026-10-29'
+  type: etude
+  priorite: haute
+  agent_id: AGY01
+  sujet: Etude fonctionnelle et physique realiste de la translation M3 pour SimBench
+    (T417) - Multi-agents Ollama
+  statut: terminé
+  livrable: DOC/WFLOW/ETUDES/ETUDE_CONCEPTION_T417_SIMULATION_TRANSLATION_M3.md
+  verdict: Etude complete livree. 3 rapports multi-agents Ollama consolides.
+  decision: Pret pour validation humaine et GO d implementation
+  note: 'Objectif : justesse fonctionnelle, emergence naturelle des defauts, 0 regressive,
+    GVL_PERSISTENT sanctuarise'
