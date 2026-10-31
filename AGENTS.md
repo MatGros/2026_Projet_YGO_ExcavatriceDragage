@@ -34,7 +34,7 @@ demande à tout moment (« rappelle-moi le briefing workflow » ou équivalent) 
    verrouillées 🔒 / en cours ⏳ / à faire ⬜.
 
 3. **Preuve de repérage des 3 piliers projet (Niveau 1 — systématique)** :
-   - 📐 **Standards & Guides (`DOC/STDS/`)** : `CODE_QUALITY_STANDARDS.md` (POO, encapsulation), `NAMING_CONVENTION.md` (PascalCase, NC-010..080, zéro Ref pour consignes), guides (`GUIDE_GATES_ET_TESTS`, `GUIDE_SEQUENCEUR`, `GUIDE_IDE_CODESYS`).
+   - 📐 **Standards & Guides (`DOC/STDS/`)** : `CODE_QUALITY_STANDARDS.md` (POO, encapsulation), `NAMING_CONVENTION.md` (PascalCase, NC-010..080, zéro Ref pour consignes), guides (`GUIDE_GATES_ET_TESTS`, `GUIDE_SEQUENCEUR`, `GUIDE_IDE_CODESYS`, `GUIDE_TEST_HEADLESS_CODESYS`).
    - 🏗️ **Architecture & Specs (`DOC/AF/` & `CODE/`)** : Architecture 7 POU (`PRG_02_Acquisition` ➔ `PRG_07_Supervision`, tâches 4ms/20ms/10ms), Fondations (AF01-03), Transverses (AF04-06), Métiers (AF08-14).
    - 🛠️ **Outillage CI/CD & Validation mécanique (`TOOLS/`)** : Bundle PLCopenXML (`generate_codesys_bundle.py`), Vérification liaison bloquante (`G200_check_linkage.py`), Suite de 21 Gates (`run_all_gates.py`), Tests unitaires CI (`TOOLS/TEST_AUTO_CI/`).
 
