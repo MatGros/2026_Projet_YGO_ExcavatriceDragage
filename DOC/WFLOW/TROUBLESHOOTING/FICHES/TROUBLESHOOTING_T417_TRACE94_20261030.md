@@ -1,5 +1,13 @@
 # 🕵️ T417 — Trace 94 : glissement treuil à vérifier
 
+> **RECTIFICATION 2026-10-31 — historique ci-dessous conservé, conclusions remplacées.**
+> La demande de refaire un essai treuil (§4) est retirée du périmètre T417 ; aucune
+> acquisition supplémentaire n'est demandée. L'arrêt à 49 786 ms est en **étape 0**,
+> pas AX14 ; l'arrêt AX14 de 94 est à 186 793 ms. `ActualFrequencyHz` est en
+> centi-Hz (division par 100). Fréquence nulle ne prouve pas immobilité mécanique.
+> Les traces 94/95 ne mesurent aucune distance vraie/estimée et ne capturent ni mode
+> ni réglage PV. Référence active : [investigation exécutée, lots A–D](../../ETUDES/ANALYSES_T417/PLAN_INVESTIGATION_20261031.md).
+
 > 📅 2026-10-30 · 🧪 **SIMULATION** · 📄 Statut : **EN COURS**  
 > Source : `TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/Suivi_94_SIMU_M3_manu_auto_20261029.trace`
 

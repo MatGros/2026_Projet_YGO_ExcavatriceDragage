@@ -316,7 +316,8 @@ TEST 'M3-DYN-060 Poussee opposee suffisante autorise une vraie inversion'
     fb();
     ASSERT_GT(fb.VelocityTrue_Mps, 0.0, 'Vitesse initiale positive');
     fb.ReqMaintenance := FALSE;
-    fb.Slope_Mps2 := -0.2;
+    (* Force superieure au seuil statique 0.35 : inversion physiquement autorisee. *)
+    fb.Slope_Mps2 := -0.6;
     ADVANCE_TIME(100000000);
     fb();
     ASSERT_LT(fb.VelocityTrue_Mps, 0.0, 'La correction ne bloque pas une vraie inversion');

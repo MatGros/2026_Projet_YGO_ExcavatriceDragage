@@ -1,0 +1,1 @@
+Je commence par lire les sources du contrat T417 (lecture seule, aucune commande lancée).
