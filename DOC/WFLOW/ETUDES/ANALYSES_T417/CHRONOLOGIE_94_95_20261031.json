@@ -1,0 +1,2256 @@
+{
+  "sources_sha256": {
+    "TOOLS/PLC_CSV_SNAPSHOT/external_python/trace_to_csv.py": "6be217df7d44a14ceb9196a63734adf8256387f303f6da5a284f103d2ed28d27",
+    "TOOLS/AGENT_WORKFLOW/scripts/check_t417_trace_evidence.py": "4c3f637236478732e734396a24f6ac02b29a48f8639e052b1851eb6bdb53f0f1",
+    "CODE/M_MAIN/PRG_05_Translation.st": "88037a5985b1fac4f748a002c9eefc4629b3690224ea4941b79a356853bd83ae",
+    "CODE/L_SIMULATION/FB_SimBench.st": "8e82ad0edd745612f3f1c04ca327bd1047dc7a36dec08a04cdf1c88275a0cd7d",
+    "CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st": "d2ee74991398a67e7625135a015994f8b01a393a2d2920789824637eb379a8ab"
+  },
+  "traces": [
+    {
+      "source": "TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/Suivi_94_SIMU_M3_manu_auto_20261029.trace",
+      "sha256": "7db7056c902d4ab21a665f20af5a05795c0fd71360676da88d933d9b4266e7de",
+      "channels": [
+        {
+          "name": "PRG_03_Modes_Cycle.Data.SequenceState.Step",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.ReqStart",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_02_Acquisition.Data.Joystick.DeadmanArmed",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_02_Acquisition.Data.Joystick.AxisX.DirectionPositive",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_02_Acquisition.Data.Joystick.AxisX.DirectionNegative",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_02_Acquisition.Data.Joystick.AxisY.AtNeutral",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_02_Acquisition.HwIn.Translation.M3_PosP1_DI",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_02_Acquisition.Data.M3.ActualFrequencyHz",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.Error",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.PositionReached",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.AtTremie",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.AtP1",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.ActiveTremie",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.ActiveMaintenance",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.SpeedCmd_Pct",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.BrakeCmd",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.BrakeCommandOpenConfirmed",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqTremieSemantic",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_06_Outputs.instTranslationOutputInterlockM3.DriveControlWord",
+          "type": "System.Double",
+          "samples": 2088
+        },
+        {
+          "name": "PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqCmd_Hz",
+          "type": "System.Double",
+          "samples": 2088
+        }
+      ],
+      "samples": 2088,
+      "start_ms": 103,
+      "end_ms": 218762,
+      "sampling_ms": {
+        "min": 99,
+        "median": 105,
+        "max": 116
+      },
+      "frequency_scale": "raw / 100 Hz (PRG_05_Translation; FB_SimBench)",
+      "steps_seen": [
+        0.0,
+        2.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0,
+        8.0,
+        10.0,
+        11.0,
+        12.0,
+        13.0,
+        14.0,
+        15.0,
+        16.0,
+        18.0,
+        21.0
+      ],
+      "error_values": [
+        0.0
+      ],
+      "events": [
+        {
+          "signal": "p1",
+          "interval_ms": [
+            6989,
+            7097
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            39854,
+            39959
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            39854,
+            39959
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            39854,
+            39959
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            39959,
+            40063
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            40485,
+            40588
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            40692,
+            40796
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            49681,
+            49786
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            49681,
+            49786
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            49786,
+            49890
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            50727,
+            50829
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            50727,
+            50829
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            56047,
+            56152
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            56047,
+            56152
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            56047,
+            56152
+          ],
+          "from": 0.0,
+          "to": 2.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            56152,
+            56255
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            56564,
+            56670
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            63373,
+            63475
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            63373,
+            63475
+          ],
+          "from": 2.0,
+          "to": 0.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            63475,
+            63577
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            63577,
+            63681
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            64516,
+            64621
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            64516,
+            64621
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            64516,
+            64621
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            75916,
+            76021
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            75916,
+            76021
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            75916,
+            76021
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            76021,
+            76125
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            76957,
+            77063
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            77063,
+            77165
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            77165,
+            77268
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            83536,
+            83643
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            83643,
+            83750
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            83750,
+            83854
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            84595,
+            84699
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            84595,
+            84699
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            87507,
+            87611
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            87507,
+            87611
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            87507,
+            87611
+          ],
+          "from": 0.0,
+          "to": 2.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            87717,
+            87822
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            88243,
+            88348
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            88452,
+            88555
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            88555,
+            88658
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            95013,
+            95117
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            95013,
+            95117
+          ],
+          "from": 2.0,
+          "to": 0.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            95117,
+            95221
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            95221,
+            95326
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            96158,
+            96261
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            96158,
+            96261
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            96261,
+            96366
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            102416,
+            102521
+          ],
+          "from": 0.0,
+          "to": 2.0
+        },
+        {
+          "signal": "target",
+          "interval_ms": [
+            102416,
+            102521
+          ],
+          "from": 0.0,
+          "to": 3.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            102937,
+            103043
+          ],
+          "from": 2.0,
+          "to": 21.0
+        },
+        {
+          "signal": "target",
+          "interval_ms": [
+            102937,
+            103043
+          ],
+          "from": 3.0,
+          "to": 0.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            103255,
+            103360
+          ],
+          "from": 21.0,
+          "to": 4.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            106381,
+            106484
+          ],
+          "from": 4.0,
+          "to": 5.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            106906,
+            107011
+          ],
+          "from": 5.0,
+          "to": 6.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            107425,
+            107529
+          ],
+          "from": 6.0,
+          "to": 7.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            115993,
+            116098
+          ],
+          "from": 7.0,
+          "to": 8.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            118716,
+            118820
+          ],
+          "from": 8.0,
+          "to": 10.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            129504,
+            129609
+          ],
+          "from": 10.0,
+          "to": 11.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            131407,
+            131511
+          ],
+          "from": 11.0,
+          "to": 12.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            142419,
+            142525
+          ],
+          "from": 12.0,
+          "to": 13.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            147387,
+            147492
+          ],
+          "from": 13.0,
+          "to": 14.0
+        },
+        {
+          "signal": "target",
+          "interval_ms": [
+            147387,
+            147492
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "req",
+          "interval_ms": [
+            178851,
+            178955
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            179059,
+            179161
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            179059,
+            179161
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            179059,
+            179161
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            179161,
+            179266
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            180102,
+            180207
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            180207,
+            180312
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            180312,
+            180416
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "req",
+          "interval_ms": [
+            186688,
+            186793
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "target",
+          "interval_ms": [
+            186688,
+            186793
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            186688,
+            186793
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            186793,
+            186898
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            188254,
+            188361
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            188254,
+            188361
+          ],
+          "from": 14.0,
+          "to": 15.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            188361,
+            188465
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            188673,
+            188779
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            188673,
+            188779
+          ],
+          "from": 15.0,
+          "to": 16.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            192957,
+            193059
+          ],
+          "from": 16.0,
+          "to": 18.0
+        },
+        {
+          "signal": "req",
+          "interval_ms": [
+            196296,
+            196401
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            196296,
+            196401
+          ],
+          "from": 18.0,
+          "to": 2.0
+        },
+        {
+          "signal": "target",
+          "interval_ms": [
+            196296,
+            196401
+          ],
+          "from": 0.0,
+          "to": 3.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            196506,
+            196612
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            196506,
+            196612
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            196506,
+            196612
+          ],
+          "from": 0.0,
+          "to": 2.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            196612,
+            196718
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            197968,
+            198072
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            198072,
+            198178
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            198178,
+            198282
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            204240,
+            204343
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            204343,
+            204447
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "req",
+          "interval_ms": [
+            204343,
+            204447
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            204343,
+            204447
+          ],
+          "from": 2.0,
+          "to": 0.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            204550,
+            204655
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            206220,
+            206324
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            206220,
+            206324
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            206324,
+            206432
+          ],
+          "from": 1.0,
+          "to": 0.0
+        }
+      ],
+      "stops": [
+        {
+          "command_zero_ms": 49786,
+          "command_interval_ms": [
+            49681,
+            49786
+          ],
+          "step": 0.0,
+          "last_direction_word": 1.0,
+          "frequency_before_Hz": 5.0,
+          "frequency_at_Hz": 4.76,
+          "error_seen": false,
+          "distance_M": null,
+          "mode": "not recorded",
+          "PV_setting_Hz": null,
+          "frequency_zero": {
+            "sample_ms": 50205,
+            "interval_ms": [
+              50102,
+              50205
+            ],
+            "delay_sample_ms": 419,
+            "delay_bounds_ms": [
+              316,
+              524
+            ]
+          },
+          "contact_closed": {
+            "sample_ms": 49890,
+            "interval_ms": [
+              49786,
+              49890
+            ],
+            "delay_sample_ms": 104,
+            "delay_bounds_ms": [
+              0,
+              209
+            ]
+          },
+          "brake_request_off": {
+            "sample_ms": 50829,
+            "interval_ms": [
+              50727,
+              50829
+            ],
+            "delay_sample_ms": 1043,
+            "delay_bounds_ms": [
+              941,
+              1148
+            ]
+          },
+          "brake_internal_off": {
+            "sample_ms": 50829,
+            "interval_ms": [
+              50727,
+              50829
+            ],
+            "delay_sample_ms": 1043,
+            "delay_bounds_ms": [
+              941,
+              1148
+            ]
+          }
+        },
+        {
+          "command_zero_ms": 63475,
+          "command_interval_ms": [
+            63373,
+            63475
+          ],
+          "step": 0.0,
+          "last_direction_word": 2.0,
+          "frequency_before_Hz": 20.0,
+          "frequency_at_Hz": 19.69,
+          "error_seen": false,
+          "distance_M": null,
+          "mode": "not recorded",
+          "PV_setting_Hz": null,
+          "frequency_zero": {
+            "sample_ms": 64621,
+            "interval_ms": [
+              64516,
+              64621
+            ],
+            "delay_sample_ms": 1146,
+            "delay_bounds_ms": [
+              1041,
+              1248
+            ]
+          },
+          "contact_closed": {
+            "sample_ms": 64621,
+            "interval_ms": [
+              64516,
+              64621
+            ],
+            "delay_sample_ms": 1146,
+            "delay_bounds_ms": [
+              1041,
+              1248
+            ]
+          },
+          "brake_request_off": {
+            "sample_ms": 64621,
+            "interval_ms": [
+              64516,
+              64621
+            ],
+            "delay_sample_ms": 1146,
+            "delay_bounds_ms": [
+              1041,
+              1248
+            ]
+          },
+          "brake_internal_off": {
+            "sample_ms": 64621,
+            "interval_ms": [
+              64516,
+              64621
+            ],
+            "delay_sample_ms": 1146,
+            "delay_bounds_ms": [
+              1041,
+              1248
+            ]
+          }
+        },
+        {
+          "command_zero_ms": 83643,
+          "command_interval_ms": [
+            83536,
+            83643
+          ],
+          "step": 0.0,
+          "last_direction_word": 1.0,
+          "frequency_before_Hz": 20.0,
+          "frequency_at_Hz": 19.34,
+          "error_seen": false,
+          "distance_M": null,
+          "mode": "not recorded",
+          "PV_setting_Hz": null,
+          "frequency_zero": {
+            "sample_ms": 84699,
+            "interval_ms": [
+              84595,
+              84699
+            ],
+            "delay_sample_ms": 1056,
+            "delay_bounds_ms": [
+              952,
+              1163
+            ]
+          },
+          "contact_closed": {
+            "sample_ms": 83854,
+            "interval_ms": [
+              83750,
+              83854
+            ],
+            "delay_sample_ms": 211,
+            "delay_bounds_ms": [
+              107,
+              318
+            ]
+          },
+          "brake_request_off": {
+            "sample_ms": 84699,
+            "interval_ms": [
+              84595,
+              84699
+            ],
+            "delay_sample_ms": 1056,
+            "delay_bounds_ms": [
+              952,
+              1163
+            ]
+          },
+          "brake_internal_off": {
+            "sample_ms": 84699,
+            "interval_ms": [
+              84595,
+              84699
+            ],
+            "delay_sample_ms": 1056,
+            "delay_bounds_ms": [
+              952,
+              1163
+            ]
+          }
+        },
+        {
+          "command_zero_ms": 95117,
+          "command_interval_ms": [
+            95013,
+            95117
+          ],
+          "step": 0.0,
+          "last_direction_word": 2.0,
+          "frequency_before_Hz": 20.0,
+          "frequency_at_Hz": 20.0,
+          "error_seen": false,
+          "distance_M": null,
+          "mode": "not recorded",
+          "PV_setting_Hz": null,
+          "frequency_zero": {
+            "sample_ms": 96261,
+            "interval_ms": [
+              96158,
+              96261
+            ],
+            "delay_sample_ms": 1144,
+            "delay_bounds_ms": [
+              1041,
+              1248
+            ]
+          },
+          "contact_closed": {
+            "sample_ms": 96366,
+            "interval_ms": [
+              96261,
+              96366
+            ],
+            "delay_sample_ms": 1249,
+            "delay_bounds_ms": [
+              1144,
+              1353
+            ]
+          },
+          "brake_request_off": {
+            "sample_ms": 96261,
+            "interval_ms": [
+              96158,
+              96261
+            ],
+            "delay_sample_ms": 1144,
+            "delay_bounds_ms": [
+              1041,
+              1248
+            ]
+          },
+          "brake_internal_off": {
+            "sample_ms": 96261,
+            "interval_ms": [
+              96158,
+              96261
+            ],
+            "delay_sample_ms": 1144,
+            "delay_bounds_ms": [
+              1041,
+              1248
+            ]
+          }
+        },
+        {
+          "command_zero_ms": 186793,
+          "command_interval_ms": [
+            186688,
+            186793
+          ],
+          "step": 14.0,
+          "last_direction_word": 1.0,
+          "frequency_before_Hz": 20.0,
+          "frequency_at_Hz": 19.34,
+          "error_seen": false,
+          "distance_M": null,
+          "mode": "not recorded",
+          "PV_setting_Hz": null,
+          "frequency_zero": {
+            "sample_ms": 187842,
+            "interval_ms": [
+              187737,
+              187842
+            ],
+            "delay_sample_ms": 1049,
+            "delay_bounds_ms": [
+              944,
+              1154
+            ]
+          },
+          "contact_closed": {
+            "sample_ms": 188465,
+            "interval_ms": [
+              188361,
+              188465
+            ],
+            "delay_sample_ms": 1672,
+            "delay_bounds_ms": [
+              1568,
+              1777
+            ]
+          },
+          "brake_request_off": {
+            "sample_ms": 188361,
+            "interval_ms": [
+              188254,
+              188361
+            ],
+            "delay_sample_ms": 1568,
+            "delay_bounds_ms": [
+              1461,
+              1673
+            ]
+          },
+          "brake_internal_off": {
+            "sample_ms": 188779,
+            "interval_ms": [
+              188673,
+              188779
+            ],
+            "delay_sample_ms": 1986,
+            "delay_bounds_ms": [
+              1880,
+              2091
+            ]
+          }
+        },
+        {
+          "command_zero_ms": 204447,
+          "command_interval_ms": [
+            204343,
+            204447
+          ],
+          "step": 2.0,
+          "last_direction_word": 2.0,
+          "frequency_before_Hz": 20.0,
+          "frequency_at_Hz": 19.35,
+          "error_seen": false,
+          "distance_M": null,
+          "mode": "not recorded",
+          "PV_setting_Hz": null,
+          "frequency_zero": {
+            "sample_ms": 205488,
+            "interval_ms": [
+              205382,
+              205488
+            ],
+            "delay_sample_ms": 1041,
+            "delay_bounds_ms": [
+              935,
+              1145
+            ]
+          },
+          "contact_closed": {
+            "sample_ms": 206432,
+            "interval_ms": [
+              206324,
+              206432
+            ],
+            "delay_sample_ms": 1985,
+            "delay_bounds_ms": [
+              1877,
+              2089
+            ]
+          },
+          "brake_request_off": {
+            "sample_ms": 206324,
+            "interval_ms": [
+              206220,
+              206324
+            ],
+            "delay_sample_ms": 1877,
+            "delay_bounds_ms": [
+              1773,
+              1981
+            ]
+          },
+          "brake_internal_off": {
+            "sample_ms": 206324,
+            "interval_ms": [
+              206220,
+              206324
+            ],
+            "delay_sample_ms": 1877,
+            "delay_bounds_ms": [
+              1773,
+              1981
+            ]
+          }
+        }
+      ],
+      "limits": [
+        "No mode or PV configuration channel",
+        "No measured mechanical position/distance",
+        "Brake request is upstream of final interlock; final brake command absent",
+        "No loaded source/version identity; source analysis is a separate evidence"
+      ]
+    },
+    {
+      "source": "TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/Suivi_95_SIMU_M3_manu_auto_10hz_20261029.trace",
+      "sha256": "28f1ad186110a60213bed218c01d737f8d20b71533ca2155c9e9a726be7f1dfa",
+      "channels": [
+        {
+          "name": "PRG_03_Modes_Cycle.Data.SequenceState.Step",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.ReqStart",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_02_Acquisition.Data.Joystick.DeadmanArmed",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_02_Acquisition.Data.Joystick.AxisX.DirectionPositive",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_02_Acquisition.Data.Joystick.AxisX.DirectionNegative",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_02_Acquisition.HwIn.Translation.M3_PosP1_DI",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_02_Acquisition.Data.M3.ActualFrequencyHz",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.Error",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.ErrorId",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.PositionReached",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.AtTremie",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.AtP1",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.ActiveTremie",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.SpeedCmd_Pct",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.BrakeCmd",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.BrakeCommandOpenConfirmed",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationState.BrakeFeedback",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqTremieSemantic",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_06_Outputs.instTranslationOutputInterlockM3.DriveControlWord",
+          "type": "System.Double",
+          "samples": 987
+        },
+        {
+          "name": "PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqCmd_Hz",
+          "type": "System.Double",
+          "samples": 987
+        }
+      ],
+      "samples": 987,
+      "start_ms": 101,
+      "end_ms": 103645,
+      "sampling_ms": {
+        "min": 96,
+        "median": 105.0,
+        "max": 146
+      },
+      "frequency_scale": "raw / 100 Hz (PRG_05_Translation; FB_SimBench)",
+      "steps_seen": [
+        2.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0,
+        8.0,
+        10.0,
+        11.0,
+        12.0,
+        13.0,
+        14.0,
+        15.0,
+        16.0,
+        18.0,
+        21.0
+      ],
+      "error_values": [
+        0.0
+      ],
+      "events": [
+        {
+          "signal": "step",
+          "interval_ms": [
+            25394,
+            25498
+          ],
+          "from": 2.0,
+          "to": 21.0
+        },
+        {
+          "signal": "target",
+          "interval_ms": [
+            25394,
+            25498
+          ],
+          "from": 3.0,
+          "to": 0.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            25706,
+            25810
+          ],
+          "from": 21.0,
+          "to": 4.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            28511,
+            28615
+          ],
+          "from": 4.0,
+          "to": 5.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            29036,
+            29139
+          ],
+          "from": 5.0,
+          "to": 6.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            29554,
+            29658
+          ],
+          "from": 6.0,
+          "to": 7.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            37806,
+            37909
+          ],
+          "from": 7.0,
+          "to": 8.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            40523,
+            40629
+          ],
+          "from": 8.0,
+          "to": 10.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            47020,
+            47124
+          ],
+          "from": 10.0,
+          "to": 11.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            48915,
+            49020
+          ],
+          "from": 11.0,
+          "to": 12.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            59619,
+            59726
+          ],
+          "from": 12.0,
+          "to": 13.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            64690,
+            64796
+          ],
+          "from": 13.0,
+          "to": 14.0
+        },
+        {
+          "signal": "target",
+          "interval_ms": [
+            64690,
+            64796
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "req",
+          "interval_ms": [
+            69416,
+            69521
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            69626,
+            69732
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            69626,
+            69732
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            69626,
+            69732
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            69732,
+            69837
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            71297,
+            71403
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "req",
+          "interval_ms": [
+            78323,
+            78429
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "target",
+          "interval_ms": [
+            78323,
+            78429
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            78323,
+            78429
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            78323,
+            78429
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            78532,
+            78636
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            79058,
+            79164
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            79580,
+            79682
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            79580,
+            79682
+          ],
+          "from": 14.0,
+          "to": 15.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            79682,
+            79785
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            80304,
+            80409
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            83126,
+            83231
+          ],
+          "from": 15.0,
+          "to": 16.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            87314,
+            87416
+          ],
+          "from": 16.0,
+          "to": 18.0
+        },
+        {
+          "signal": "req",
+          "interval_ms": [
+            88874,
+            88978
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "step",
+          "interval_ms": [
+            88874,
+            88978
+          ],
+          "from": 18.0,
+          "to": 2.0
+        },
+        {
+          "signal": "target",
+          "interval_ms": [
+            88874,
+            88978
+          ],
+          "from": 0.0,
+          "to": 3.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            89082,
+            89187
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            89082,
+            89187
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            89082,
+            89187
+          ],
+          "from": 0.0,
+          "to": 2.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            89187,
+            89295
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            89919,
+            90025
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            90025,
+            90130
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "tremie",
+          "interval_ms": [
+            90130,
+            90236
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            97474,
+            97581
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "req",
+          "interval_ms": [
+            97474,
+            97581
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "word",
+          "interval_ms": [
+            97474,
+            97581
+          ],
+          "from": 2.0,
+          "to": 0.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            97686,
+            97791
+          ],
+          "from": 0.0,
+          "to": 1.0
+        },
+        {
+          "signal": "p1",
+          "interval_ms": [
+            98416,
+            98519
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_internal",
+          "interval_ms": [
+            99459,
+            99563
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "brake_request",
+          "interval_ms": [
+            99459,
+            99563
+          ],
+          "from": 1.0,
+          "to": 0.0
+        },
+        {
+          "signal": "contact",
+          "interval_ms": [
+            99563,
+            99670
+          ],
+          "from": 1.0,
+          "to": 0.0
+        }
+      ],
+      "stops": [
+        {
+          "command_zero_ms": 78429,
+          "command_interval_ms": [
+            78323,
+            78429
+          ],
+          "step": 14.0,
+          "last_direction_word": 1.0,
+          "frequency_before_Hz": 10.0,
+          "frequency_at_Hz": 9.76,
+          "error_seen": false,
+          "distance_M": null,
+          "mode": "not recorded",
+          "PV_setting_Hz": null,
+          "frequency_zero": {
+            "sample_ms": 79164,
+            "interval_ms": [
+              79058,
+              79164
+            ],
+            "delay_sample_ms": 735,
+            "delay_bounds_ms": [
+              629,
+              841
+            ]
+          },
+          "contact_closed": {
+            "sample_ms": 79785,
+            "interval_ms": [
+              79682,
+              79785
+            ],
+            "delay_sample_ms": 1356,
+            "delay_bounds_ms": [
+              1253,
+              1462
+            ]
+          },
+          "brake_request_off": {
+            "sample_ms": 79682,
+            "interval_ms": [
+              79580,
+              79682
+            ],
+            "delay_sample_ms": 1253,
+            "delay_bounds_ms": [
+              1151,
+              1359
+            ]
+          },
+          "brake_internal_off": {
+            "sample_ms": 80409,
+            "interval_ms": [
+              80304,
+              80409
+            ],
+            "delay_sample_ms": 1980,
+            "delay_bounds_ms": [
+              1875,
+              2086
+            ]
+          }
+        },
+        {
+          "command_zero_ms": 97581,
+          "command_interval_ms": [
+            97474,
+            97581
+          ],
+          "step": 2.0,
+          "last_direction_word": 2.0,
+          "frequency_before_Hz": 10.0,
+          "frequency_at_Hz": 9.74,
+          "error_seen": false,
+          "distance_M": null,
+          "mode": "not recorded",
+          "PV_setting_Hz": null,
+          "frequency_zero": {
+            "sample_ms": 98312,
+            "interval_ms": [
+              98208,
+              98312
+            ],
+            "delay_sample_ms": 731,
+            "delay_bounds_ms": [
+              627,
+              838
+            ]
+          },
+          "contact_closed": {
+            "sample_ms": 99670,
+            "interval_ms": [
+              99563,
+              99670
+            ],
+            "delay_sample_ms": 2089,
+            "delay_bounds_ms": [
+              1982,
+              2196
+            ]
+          },
+          "brake_request_off": {
+            "sample_ms": 99563,
+            "interval_ms": [
+              99459,
+              99563
+            ],
+            "delay_sample_ms": 1982,
+            "delay_bounds_ms": [
+              1878,
+              2089
+            ]
+          },
+          "brake_internal_off": {
+            "sample_ms": 99563,
+            "interval_ms": [
+              99459,
+              99563
+            ],
+            "delay_sample_ms": 1982,
+            "delay_bounds_ms": [
+              1878,
+              2089
+            ]
+          }
+        }
+      ],
+      "limits": [
+        "No mode or PV configuration channel",
+        "No measured mechanical position/distance",
+        "Brake request is upstream of final interlock; final brake command absent",
+        "No loaded source/version identity; source analysis is a separate evidence"
+      ]
+    }
+  ]
+}

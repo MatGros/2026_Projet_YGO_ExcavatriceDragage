@@ -1,14 +1,14 @@
 version: '1.0'
 date_creation: '2026-10-29T23:46:00+01:00'
-statut_global: EN_COURS
+statut_global: TERMINE
 synthese:
   total_devices_prevus: 10
-  devices_termines: 6
-  total_defauts_repertories: 124
-  conformes: 57
-  silencieux_detectes: 28
-  morts_ou_orphelins: 21
-  anomalies_affichage: 19
+  devices_termines: 10
+  total_defauts_repertories: 194
+  conformes: 71
+  silencieux_detectes: 53
+  morts_ou_orphelins: 36
+  anomalies_affichage_et_masquage: 34
 devices:
   D01_TREUIL_M1:
     statut: TERMINE
@@ -953,4 +953,4 @@ metadata:
     conformes: 71
     refus_silencieux: 53
     defauts_morts_ou_orphelins: 36
-    anomalies_masquage_et_affichage: 26
+    anomalies_masquage_et_affichage: 34

@@ -1,5 +1,7 @@
 # 🧪 T417 — Affiche d’essais M3
 
+> Actualisation du 31/10 : [plan d'investigation et décisions](PLAN_INVESTIGATION_20261031.md). Retour utilisateur : aucune amélioration visible constatée. Validation globale ouverte.
+
 > **État : essais déjà réalisés · aucun nouvel essai demandé pour l’instant**  
 > Banc de simulation isolé uniquement. Aucun code automate de production modifié.
 
@@ -18,7 +20,7 @@
 ## ⚠️ Non démontré
 
 - Les positions physiques et estimées n’étaient pas dans les traces 94/95.
-- L’écart annoncé −10 m / −13 m ne peut donc pas être calculé depuis ces fichiers.
+- La demande d'essai −10 m / −13 m au titre de M3 était une erreur de périmètre de l'agent ; elle est retirée.
 - Les traces ne prouvent pas une distance résiduelle après arrêt.
 - Le comportement observé en simulation ne doit pas être présenté comme une observation machine réelle.
 - La cause physique (pente, inertie, frein silencieux) reste une hypothèse tant qu’elle n’est pas séparée par un scénario contrôlé.
@@ -40,6 +42,6 @@
 
 1. Comparer les traces 94/95 et le modèle actuel.
 2. Ajouter les voies de position vraie/estimée à la configuration de trace (responsabilité outillage T417).
-3. Ne demander un nouvel essai qu’après une modification ou une instrumentation qui permet une mesure nouvelle.
+3. Ne demander un nouvel essai qu’après une amélioration démontrée de la simulation, avec une instrumentation vérifiée et un bénéfice attendu précis.
 
 **Règle de restitution :** ✅ vérifié · 🟡 hypothèse · ❌ retiré/non prouvé.

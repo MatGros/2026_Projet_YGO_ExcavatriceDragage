@@ -1,0 +1,88 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE T425 — Volet 2 « source des défauts » : CI FB sécurité
+# Origine : contre-audit DOC/WFLOW/AUDITS/AUDIT_T423_CONTRE_AUDIT_BANNIERES_IHM_20261031.md (§7)
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T425_CI_SOURCE_DEFAUTS
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Prouver par la CI existante (TOOLS/TEST_AUTO_CI) que les défauts de sécurité treuils,
+    translation et cycle se lèvent à leur vrai seuil, avec la bonne réaction, et pas hors
+    condition — en remettant d'abord au vert les tests existants avant d'en ajouter.
+
+  acceptance:
+    - id: AC1
+      statement: "Une baseline fraîche existe pour FB_Safety_Winch, FB_Safety_Translation, FB_Translation et FB_CycleSemiAuto (résultats datés du jour, plus aucun résultat du 2026-09-28 sur ces 4 FB)."
+      verified_by: "TOOLS/TEST_AUTO_CI/run_fb.bat <FB> pour chacun des 4 FB ; dates dans TOOLS/TEST_AUTO_CI/index.html"
+    - id: AC2
+      statement: "Chaque FAIL de la baseline est classé TEST_PERIME (attendu non aligné sur le code MES) ou REGRESSION (comportement code à analyser), avec la ligne de code et le cas de test cités."
+      verified_by: "Tableau de tri joint au rapport T425, relu par l'orchestrateur"
+    - id: AC3
+      statement: "Les cas TEST_PERIME sont réalignés sur les valeurs du code (source unique), sans modifier CODE/ ; les 4 FB passent au vert hors REGRESSION documentées."
+      verified_by: "run_fb.bat sur les 4 FB : 0 FAIL non documenté"
+    - id: AC4
+      statement: "Chaque défaut Méca A à G de FB_Safety_Winch a au moins un cas positif (au seuil) et un cas négatif (sous le seuil ou avant la tempo)."
+      verified_by: "Liste cas ↔ cause dans le rapport T425 + run_fb.bat FB_Safety_Winch PASS"
+    - id: AC5
+      statement: "Les cas de défaut existants vérifient aussi le bit ErrorId attendu, pas seulement la réaction."
+      verified_by: "grep des ASSERT sur ErrorId dans les fichiers de test modifiés + run PASS"
+    - id: AC6
+      statement: "Les causes cycle inertes (écart vitesse, tempo d'étape, attente AX3) ont un cas qui verrouille leur état actuel (désactivé) tant qu'aucune décision contraire n'est prise."
+      verified_by: "run_fb.bat FB_CycleSemiAuto PASS + référence de la décision"
+
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/**/test_*.st
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/**
+      - DOC/WFLOW/AUDITS/AUDIT_T425_*.md
+    forbidden:
+      - CODE/**
+      - CODE_XML/**
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/TEST_AUTO_CI/run_all_tests.bat   # nettoie les scratchs : ne pas utiliser pour cette tâche
+      - DOC/AF/**                               # écarts AF signalés, non corrigés ici
+
+  conservation:
+    must_survive:
+      - "Aucune modification de CODE/ : toute REGRESSION est remontée, jamais corrigée dans cette tâche."
+      - "Les tests déjà verts (FB_Bucket 41/41, FB_WinchSync 5/5) restent verts."
+    dropped_on_purpose:
+      - "PRG complets, IHM visuelle et chaîne PRG_04 → PRG_06 → AU : hors périmètre (essai site TC-P10-051.1)."
+
+  evidence_required:
+    - run_fb_baseline        # sortie run_fb.bat des 4 FB avant / après
+    - fail_triage_table      # tableau TEST_PERIME / REGRESSION
+    - git_diff_tests         # diff limité aux fichiers de test autorisés
+
+  models_allowed:
+    - "claude-opus-5-5"
+    - "claude-sonnet-5-5"
+
+  alert_duty: >
+    Toute REGRESSION (le code ne lève pas le défaut attendu au seuil du code) est remontée
+    immédiatement à l'humain avec le cas, la ligne de code et la valeur observée. Les écarts
+    AF ↔ code (Méca A 2,0→5,0 m, Méca E 2,5→7,0 m, synchro 0,8/2,0→3,0/6,0 m) sont signalés,
+    jamais tranchés. Les valeurs GVL_PERSISTENT sont des valeurs initiales : la valeur machine
+    est à confirmer avec les registres MES.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    À remplir en fin de travail.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Étape 1 (baseline) soumise au feu vert humain avant exécution.
