@@ -105,6 +105,7 @@ END_VAR
 VAR
     // ═══ T330 — contexte machine (reglages, constantes et memoires portes par instCfgT330Normalizer) ═══
     T330InHoming              : BOOL;  // . [LOC] Homing en cours (cycle machine complet OU transaction preset)
+    SyncHmiErrorIdInjected    : WORD;  // . [LOC] Memorisation injection defaut synchro IHM (test / diagnostic)
 END_VAR
 
 {region "§1 Horloge, heartbeat et reset machine"}
@@ -504,7 +505,16 @@ GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.Data.WinchM1State;
 GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.Data.WinchM2State;
 GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.Data.WinchM1Safety;
 GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.Data.WinchM2Safety;
+SyncHmiErrorIdInjected := GVL_IHM.M1M2Sync.State.ErrorId;
 GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.Data.SyncState;
+IF SyncHmiErrorIdInjected <> WORD#0 THEN
+    GVL_IHM.M1M2Sync.State.ErrorId := PRG_04_Treuils_Benne.Data.SyncState.ErrorId OR SyncHmiErrorIdInjected;
+    GVL_IHM.M1M2Sync.State.Error   := TRUE;
+END_IF;
+IF FaultMachineReset_IHM THEN
+    SyncHmiErrorIdInjected := WORD#0;
+    GVL_IHM.M1M2Sync.State.ErrorId := WORD#0;
+END_IF;
 GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.Data.BucketState;
 GVL_IHM.M3Translation.State := PRG_05_Translation.Data.TranslationState;
 
@@ -781,7 +791,7 @@ instHmiBannerFormatter(
     CycleStateStr         := GVL_IHM.CycleSemiAuto.State.CycleStateStr,
     CycleElapsed_Min      := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_Min,
     CycleElapsed_S        := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_S,
-    CycleErrorId          := GVL_IHM.CycleSemiAuto.State.ErrorId,
+    CycleErrorId          := GVL_IHM.CycleSemiAuto.State.ErrorId OR PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId OR PRG_03_Modes_Cycle.Data.SequenceState.Fault.LatchedId,
     CycleStepAtError      := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
     CycleChecksInhibited  := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
     MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
@@ -812,6 +822,8 @@ instHmiBannerFormatter(
     CycleRequestDirection := SEL(PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqAscent, SEL(PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqDescend, 0, -1), 1),
     DeadmanArmed                := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
+    ArmingPermitDenied          := PRG_02_Acquisition.Data.Joystick.ArmingPermitDenied,
+    ArmingBlockedReason         := PRG_04_Treuils_Benne.Data.ArmingAvailability.BlockedReason,
     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
     M3AtP1                      := GVL_IHM.M3Translation.State.AtP1,
     M3StatusText                := GVL_IHM.M3Translation.State.M3StatusText,
@@ -823,7 +835,7 @@ instHmiBannerFormatter(
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
     TranslationSafety           := GVL_IHM.M3Translation.Safety,
     BucketErrorId               := GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId,
-    SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId,
+    SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId OR PRG_04_Treuils_Benne.Data.SyncState.ErrorId OR SEL(PRG_04_Treuils_Benne.instWinchSync.ContactorMismatch OR PRG_06_Outputs.Data.ContactorMismatch, WORD#0, WORD#2),
     SyncContactorDiag           := PRG_06_Outputs.Data.SyncContactorDiag,
     DiveErrorId                 := 0,
     ExtractionErrorId           := 0,

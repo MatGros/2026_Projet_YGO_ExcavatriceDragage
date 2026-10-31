@@ -54,6 +54,8 @@ VAR_INPUT
     CycleRequestDirection      : INT;   // --> [CMD] Direction cycle
     DeadmanArmed         : BOOL;   // --> [SAFE] Homme-mort armé
     JoystickAtNeutral    : BOOL;   // --> [HW] Joystick au neutre
+    ArmingPermitDenied   : BOOL;   // --> [DIAG] Appui homme-mort refusé (ArmingPermit=FALSE)
+    ArmingBlockedReason  : E_ArmingBlockReason; // --> [DIAG] Motif précis du refus d'armement
     CycleAutoBusy        : BOOL;   // --> [HW] Cycle auto actif
     CycleElapsed_Min     : INT;   // --> [DIAG] Minutes ecoulees du cycle EN COURS (FB_CycleSemiAuto.CurrentCycleElapsed_Min) — affichees seulement si CycleAutoBusy
     CycleElapsed_S       : INT;   // --> [DIAG] Secondes ecoulees du cycle EN COURS, 0..59 (FB_CycleSemiAuto.CurrentCycleElapsed_S)
@@ -619,6 +621,8 @@ IF CycleFaultActive THEN
         CycleFaultCauseStr := 'palier 4 non confirme';
     ELSIF (CycleErrorId AND 16#0400) <> 0 THEN
         CycleFaultCauseStr := 'arret meca non confirme';
+    ELSIF (CycleErrorId AND 16#0800) <> 0 THEN
+        CycleFaultCauseStr := 'consigne profondeur invalide';
     ELSE
         CycleFaultCauseStr := CONCAT('cause inconnue #', WORD_TO_STRING(CycleErrorId));
     END_IF;
@@ -825,10 +829,25 @@ ELSIF NOT BucketIsClosed AND CurrentDirection > 0 THEN
     // Sécurité : benne mal fermée (branche/caillou) → montee bridee palier 1 pour eviter un choc
     // si la benne se refermait d'un coup en montant vite.
     OperatorActionCandidate := '[BENNE] Benne non fermee - montee bridee palier 1 (securite)';
-ELSIF NOT DeadmanArmed THEN
-    OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
 ELSIF CurrentMode = E_Mode.DISABLE THEN
     OperatorActionCandidate := '[IHM] Sélectionner un mode';
+ELSIF ArmingPermitDenied THEN
+    CASE ArmingBlockedReason OF
+        E_ArmingBlockReason.MODE_DISABLE:
+            OperatorActionCandidate := '[JOYSTICK] Armement refusé : mode DÉSACTIVÉ';
+        E_ArmingBlockReason.CONTACTOR_OFF:
+            OperatorActionCandidate := '[JOYSTICK] Armement refusé : contacteur puissance non enclenché';
+        E_ArmingBlockReason.POWER_CUTOFF:
+            OperatorActionCandidate := '[JOYSTICK] Armement refusé : coupure puissance active';
+        E_ArmingBlockReason.BUCKET_BUSY:
+            OperatorActionCandidate := '[JOYSTICK] Armement refusé : action benne en cours';
+        E_ArmingBlockReason.ALL_AXES_BLOCKED:
+            OperatorActionCandidate := '[JOYSTICK] Armement refusé : aucun axe disponible';
+    ELSE
+        OperatorActionCandidate := '[JOYSTICK] Armement refusé : mouvements non autorisés';
+    END_CASE;
+ELSIF NOT DeadmanArmed THEN
+    OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
 ELSIF ((WinchM1Safety.ErrorId OR WinchM2Safety.ErrorId) AND CST_WinchErrorIdCableLimitDescent) <> 16#0000 THEN
     // 🛡️ Cause limite basse câble ACTIVE (bit 6) ⇒ descente INTERDITE
     // (DescendPermit = FALSE, FB_Safety_Winch.st:563-565) et REMONTÉE = seule action
@@ -858,7 +877,7 @@ END_IF;
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
 PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
 HardwareModuleOrBusFault := (NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid OR NOT CanBusValid OR NOT Joy1Valid OR NOT EcatBusValid OR NOT EncM1Valid OR NOT EncM2Valid OR NOT VarM3Valid);
-CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked);
+CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked OR ArmingPermitDenied);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -899,13 +918,13 @@ END_IF;
 IF NOT EcatBusValid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[ECAT] Defaut bus EtherCAT'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF EcatBusValid AND NOT EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+IF NOT EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] Codeur absolu COD1 non detecte (ECAT)'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF EcatBusValid AND NOT EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+IF NOT EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] Codeur absolu COD2 non detecte (ECAT)'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF EcatBusValid AND NOT VarM3Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+IF NOT VarM3Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] Variateur AC600 non detecte (ECAT)'; AlarmCount := AlarmCount + 1;
 END_IF;
 
@@ -917,8 +936,11 @@ END_IF;
 IF WinchM1Safety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] ErrorID:01 - perte com operateur'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ErrorEncoder AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorEncoder AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] ErrorID:02 - perte codeur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ThermalFault AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] ErrorID:03 - surchauffe moteur'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] ErrorID:05 - rotation phases'; AlarmCount := AlarmCount + 1;
@@ -931,6 +953,9 @@ IF WinchM1Safety.ErrorMecaB AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) T
 END_IF;
 IF WinchM1Safety.ErrorMecaC AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] ErrorID:10 - MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ErrorBrakeThermal AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] ErrorID:11 - surchauffe frein'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorMecaD AND LocalIoValid AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] ErrorID:12 - MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
@@ -965,8 +990,11 @@ END_IF;
 IF WinchM2Safety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] ErrorID:01 - perte com operateur'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ErrorEncoder AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorEncoder AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] ErrorID:02 - perte codeur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ThermalFault AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] ErrorID:03 - surchauffe moteur'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] ErrorID:05 - rotation phases'; AlarmCount := AlarmCount + 1;
@@ -979,6 +1007,9 @@ IF WinchM2Safety.ErrorMecaB AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) T
 END_IF;
 IF WinchM2Safety.ErrorMecaC AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] ErrorID:10 - MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorBrakeThermal AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] ErrorID:11 - surchauffe frein'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorMecaD AND LocalIoValid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] ErrorID:12 - MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
@@ -1009,6 +1040,9 @@ IF TranslationSafety.ErrorDriveComm AND VarM3Valid AND (AlarmCount < CST_NbMaxAl
 END_IF;
 IF TranslationSafety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] ErrorID:03 - rotation phases'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF TranslationSafety.ErrorBrakeThermal AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] ErrorID:04 - surchauffe frein'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF TranslationSafety.ErrorMecaB AND VarM3Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] ErrorID:05 - MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
@@ -1136,20 +1170,17 @@ END_IF;
 IF ((CycleErrorId AND 16#0002) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ErrorID:02 - defaut synchro treuils'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF ((CycleErrorId AND 16#0008) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:04 - ecart codeurs remontee'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF ((CycleErrorId AND 16#0010) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:05 - ecart vitesse confirme'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF ((CycleErrorId AND 16#0020) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:06 - perte communication IHM'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF ((CycleErrorId AND 16#0040) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:07 - timeout etape'; AlarmCount := AlarmCount + 1;
-END_IF;
 IF ((CycleErrorId AND 16#0004) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ErrorID:03 - ecart vitesse montee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:04 - perte communication IHM'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0010) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:05 - timeout etape'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0020) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:06 - ecart codeurs remontee'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((CycleErrorId AND 16#0080) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ErrorID:08 - hors FDC haut translation P1'; AlarmCount := AlarmCount + 1;

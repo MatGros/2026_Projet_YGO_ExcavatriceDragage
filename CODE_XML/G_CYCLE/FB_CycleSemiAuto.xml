@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-27T16:00:37.970265" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-27T16:00:37.970265">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-31T12:42:31.812652" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-31T12:42:31.812652">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2688,7 +2688,7 @@ SpeedMismatchActive := (State = E_AutoCycleStep.AX11_CTRL_ASCENT)
 SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
 SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
-// Tempo max d'étape (R5) — DÉSACTIVÉE (pour éviter toute coupure/repli AX_STAB intempestif sur durée)
+// Tempo max d'étape (R5) — DÉSACTIVÉE DÉLIBÉRÉMENT (décision exploitant 2026-10-31 : l'opérateur est présent en permanence face au pupitre, aucune coupure/repli intempestif sur pause ou variation de consistance de dragage)
 StepMaxTimer(IN := FALSE, PT := StepMaxTimeout);
 StepMaxPrevState := State;
 ExtractionStepDelayTimer(
