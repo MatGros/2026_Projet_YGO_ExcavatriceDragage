@@ -86,7 +86,7 @@ contract:
     '
 status: COMPLETED
 investigation_20261031:
-  status: IN_PROGRESS
+  status: AWAITING_D_APPROVAL
   agent: CDX01
   authority: Plan utilisateur T417 lots A a D ; lot E apres validation des corrections.
   objective: Etablir les chronologies 94/95, les limites de couverture et une decision de correction refutable.
@@ -102,9 +102,26 @@ investigation_20261031:
     - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T417_TRACE94_20261030.md
     - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417_SIMULATION_M3_REALISTE.yaml
     - TOOLS/AGENT_WORKFLOW/scripts/check_t417_trace_evidence.py
+    - TOOLS/AGENT_WORKFLOW/scripts/check_t417_model_boundary.py
+    - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_translation_t417_boundary.st
+    - TOOLS/TEST_AUTO_CI/MOCKS/FB_TestHarnessT417_M3.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_t417_m3_integrated.st
+    - TOOLS/AGENT_WORKFLOW/scripts/run_t417_m3_integrated.py
+    - TOOLS/AGENT_WORKFLOW/scripts/test_codesys_compile.py
+    - TOOLS/AGENT_WORKFLOW/tests/test_codesys_compile_script_encoding.py
   forbidden: [CODE/, CODE_XML/, PRJ_CODESYS/]
   delegation: Ollama lecture seule ; sources completes des composants examines ; aucun avis ne vaut preuve.
-  checks: Extraction reproductible, invariants de lecture et revue des differences documentaires ; pas de livraison PLC dans ce lot.
+  checks: Extraction reproductible, garde contre les chemins Unicode dans le runner IronPython CODESYS, compilation CODESYS Headless du FB cible, et revue des differences documentaires ; aucun changement de logique automate dans ce correctif d'outillage.
+  results:
+    traces: 8 retraits du mot extraits ; mediane 105 ms ; aucune distance mesuree ; AX15C absent.
+    boundary_ST: R2 2 PASS / 3 FAIL ; inversion artificielle sous seuil statique reproduite.
+    retained_evidence: Dynamique 16/16 et SimBench 1/1 historiques inchanges ; cycle diff commentaire seulement.
+    integrated_ST: >-
+      R19 : position physique 5.27417 m apres 5 s; le test exploratoire la comparait a 5.00 +/- 0.04 m. R21 : depassement capteur P1 mesure 0.274671 m. Le seuil 0.04 m vient de l'hysteresis et n'est pas une exigence d'arret validee; ces rejoues quantifient la surcourse sans statuer sur son acceptabilite. En fin de 5 s, commande finale nulle, frequence <=0.5 Hz, frein ferme et chariot non libre. Le cycle AX14 vers Tremie, AX15A/B/C, AX18, AX2 et jeton P1 est parcouru.
+    decision: >-
+      Mesure du repos final acquise; acceptabilite de la distance et cause de la surcourse ouvertes. Les calculs ideaux (20 Hz: rampe seule ~0.16 m; frein 2 m/s2 ~0.04 m; delai 90 ms + frein ~0.076 m) ne suffisent pas a attribuer la cause. Diagnostic CODESYS possible via les sorties publiques existantes de l'instance enfant instSimTranslation dans PRG_02_Acquisition.instSimBench, trace 10 ms autour du front P1. Tests cibles D1: frontiere 8/8, dynamique 16/16, SimBench 1/1 PASS. Ne pas retoucher les equations/parametres avant analyse de la trace.
+    entrypoint: DOC/WFLOW/ETUDES/ANALYSES_T417/PLAN_INVESTIGATION_20261031.md
+    validation: D1 prouve dans ses tests cibles limites ; acceptance cycle complet reste rouge, aucune reception du banc revendiquee.
 execution:
   executed_by: AGY01 (orchestrateur) + subagents Ollama (deepseek-v4.1-flash:cloud,
     glm-5.3-flash:cloud)

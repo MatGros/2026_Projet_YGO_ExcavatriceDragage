@@ -5706,7 +5706,13 @@ IF Enable THEN
                que reduire sa vitesse, au plus jusqu'a zero. *)
             FreeVelocity_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
             FrictionStep_Mps := MAX(0.0, RollingFriction_Mps2) * CycleTimeS;
-            IF FreeVelocity_Mps &gt; 0.0 THEN
+            IF (((VelocityTrue_Mps &gt; 0.0) AND (FreeVelocity_Mps &lt;= 0.0))
+                OR ((VelocityTrue_Mps &lt; 0.0) AND (FreeVelocity_Mps &gt;= 0.0)))
+                AND (ABS(FreeAccel_Mps2) &lt;= MAX(0.0, StaticFriction_Mps2)) THEN
+                (* Passage par zero pendant le pas : l'adherence interdit un redemarrage
+                   sous le seuil statique, meme si la force est opposee au mouvement. *)
+                VelocityTrue_Mps := 0.0;
+            ELSIF FreeVelocity_Mps &gt; 0.0 THEN
                 VelocityTrue_Mps := MAX(0.0, FreeVelocity_Mps - FrictionStep_Mps);
             ELSE
                 VelocityTrue_Mps := MIN(0.0, FreeVelocity_Mps + FrictionStep_Mps);

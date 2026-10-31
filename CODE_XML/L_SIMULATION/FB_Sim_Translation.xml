@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-29T23:53:21.189852" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-29T23:53:21.189852">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-31T13:18:24.071590" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-31T13:18:24.071590">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1059,7 +1059,13 @@ IF Enable THEN
                que reduire sa vitesse, au plus jusqu'a zero. *)
             FreeVelocity_Mps := VelocityTrue_Mps + FreeAccel_Mps2 * CycleTimeS;
             FrictionStep_Mps := MAX(0.0, RollingFriction_Mps2) * CycleTimeS;
-            IF FreeVelocity_Mps &gt; 0.0 THEN
+            IF (((VelocityTrue_Mps &gt; 0.0) AND (FreeVelocity_Mps &lt;= 0.0))
+                OR ((VelocityTrue_Mps &lt; 0.0) AND (FreeVelocity_Mps &gt;= 0.0)))
+                AND (ABS(FreeAccel_Mps2) &lt;= MAX(0.0, StaticFriction_Mps2)) THEN
+                (* Passage par zero pendant le pas : l'adherence interdit un redemarrage
+                   sous le seuil statique, meme si la force est opposee au mouvement. *)
+                VelocityTrue_Mps := 0.0;
+            ELSIF FreeVelocity_Mps &gt; 0.0 THEN
                 VelocityTrue_Mps := MAX(0.0, FreeVelocity_Mps - FrictionStep_Mps);
             ELSE
                 VelocityTrue_Mps := MIN(0.0, FreeVelocity_Mps + FrictionStep_Mps);
