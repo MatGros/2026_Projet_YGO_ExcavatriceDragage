@@ -54,16 +54,8 @@ AGGREGATE_TARGET = "GVL_IHM.Modes.State.AnyFaultActive"
 # Le libelle contient {Mx} : remplace par M1 ou M2 selon le treuil.
 WINCH_BIT_MAP: dict[int, tuple[str, str | None, tuple[str, str] | None]] = {
     0: ("[Mx] ErrorID:01 - perte com operateur", "Joy1Valid", None),
-    1: ("[Mx] ErrorID:02 - perte codeur", "EncMxValid", None),
-    2: (
-        "",
-        None,
-        (
-            "classe WARNING exclue du carrousel par la spec AF-07 v2.3 section 6 (lignes 290-291 : "
-            "mou de cable, surchauffe moteur) ; visible en [HISTO] apres disparition de la cause",
-            "spec AF-07 section 6 (retrait = decision de spec, jamais d'agent)",
-        ),
-    ),
+    1: ("[Mx] ErrorID:02 - perte codeur", None, None),
+    2: ("[Mx] ErrorID:03 - surchauffe moteur", None, None),
     3: (
         "",
         None,
@@ -91,15 +83,7 @@ WINCH_BIT_MAP: dict[int, tuple[str, str | None, tuple[str, str] | None]] = {
     7: ("[Mx] ErrorID:08 - MecaA - deplacement sans commande", "EncMxValid", None),
     8: ("[Mx] ErrorID:09 - MecaB - arret non confirme apres stop", "EncMxValid", None),
     9: ("[Mx] ErrorID:10 - MecaC - glissement pendant benne figee", "EncMxValid", None),
-    10: (
-        "",
-        None,
-        (
-            "cause LATCHEE jamais publiee en actif : visible en [HISTO] seulement APRES disparition "
-            "(FB_Hmi_BannerFormatter.st:1127) ; famille du REX MES-032 / C1-ANYFAULTACTIVE-EXHAUSTIF",
-            "T220 (retrait quand T220 publiera les defauts thermiques en actif)",
-        ),
-    ),
+    10: ("[Mx] ErrorID:11 - surchauffe frein", None, None),
     11: ("[Mx] ErrorID:12 - MecaD - non-arret au capteur haut", "EncMxValid", None),
     12: ("[Mx] ErrorID:13 - MecaE - ecart synchro M1/M2 critique", "EncMxValid", None),
     13: ("[Mx] ErrorID:13 - MecaE - ecart synchro M1/M2 critique", "EncMxValid", None),
