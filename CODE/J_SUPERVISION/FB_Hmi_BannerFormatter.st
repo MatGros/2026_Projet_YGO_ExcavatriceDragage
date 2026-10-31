@@ -610,7 +610,7 @@ IF CycleFaultActive THEN
     ELSIF (CycleErrorId AND 16#0010) <> 0 THEN
         CycleFaultCauseStr := 'tempo etape';
     ELSIF (CycleErrorId AND 16#0020) <> 0 THEN
-        CycleFaultCauseStr := 'stabilisation';
+        CycleFaultCauseStr := 'ecart codeurs remontee';
     ELSIF (CycleErrorId AND 16#0040) <> 0 THEN
         CycleFaultCauseStr := 'ecart position M1/M2';
     ELSIF (CycleErrorId AND 16#0080) <> 0 THEN
@@ -1107,7 +1107,7 @@ IF (SyncContactorDiag.MismatchLevel >= 1) AND (AlarmCount < CST_NbMaxAlarmes) TH
     ELSIF SyncContactorDiag.Step2Mismatch   THEN BannerSyncContactorWhich := 'palier 2';
     ELSIF SyncContactorDiag.Step3Mismatch   THEN BannerSyncContactorWhich := 'palier 3';
     ELSIF SyncContactorDiag.Step4Mismatch   THEN BannerSyncContactorWhich := 'palier 4';
-    ELSE  BannerSyncContactorWhich := '';
+    ELSE  BannerSyncContactorWhich := 'non identifie';
     END_IF;
     IF SyncContactorDiag.MismatchLevel >= 2 THEN
         AlarmArray[AlarmCount] := CONCAT('[SYNC] discordance M1/M2 persistante -> coupure : ', BannerSyncContactorWhich);
