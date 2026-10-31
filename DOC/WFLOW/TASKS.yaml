@@ -10587,13 +10587,13 @@ tasks:
 
 - id: T424
   parent_id: 'T423'
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: SUPERVISION / IHM / ALARMES / BANC
   agent: AGY01
   date: '2026-10-31T13:45:42+01:00'
-  locked_at: '2026-10-31T17:16:00+01:00'
-  updated_at: '2026-10-31T17:16:00+01:00'
+  locked_at: null
+  updated_at: '2026-10-31T17:32:00+01:00'
   titre: Contre-audit T423 - fiabiliser le banc d affichage et le bandeau (volet 1)
   contexte: 'Contre-audit du 2026-10-31 (DOC/WFLOW/AUDITS/AUDIT_T423_CONTRE_AUDIT_BANNIERES_IHM_20261031.md)
     : le banc T423 annonce 26/26 PASS mais prouve l affichage d une entree pinee, pas la chaine reelle
@@ -10609,7 +10609,7 @@ tasks:
   - Table unique bit -> libelle cycle partagee decodeur et collecte, avec garde-fou automatique.
   - Decisions lot 3 tracees par l humain avant toute modification fonctionnelle.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T424_BANC_AFFICHAGE_VOLET1.yaml
-  avancement: 'Tache verrouillee par AGY01. Suite directe de T423 (IHM & fiabilisation banc affichage). AC1 (copies aval) et AC2 (forcage strict) deja implementes. Reste AC3 (verification transitionnel), AC5 (table unique cycle et gate guard G507), et indicateurs contacteur/debordement.'
+  avancement: 'Lot de robustesse et anti-recidive T424 acheve avec succes. Table des libelles de cycle harmonisee (A6), repli discordance contacteur securise (non identifie au lieu de vide, A12), garde-fou mecanique automatique G507 cree et PASS (10/10 masques de cycle verifies). G200 PASS (0 erreur). Bundles XML regeneres.'
   bloque_par: []
 - id: T425
   parent_id: ''

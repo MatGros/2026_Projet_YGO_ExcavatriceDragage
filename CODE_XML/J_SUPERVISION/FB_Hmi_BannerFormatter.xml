@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-31T12:42:25.363096" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-31T12:42:25.363096">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-31T16:29:48.678834" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-31T16:29:48.678834">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3001,7 +3001,7 @@ IF CycleFaultActive THEN
     ELSIF (CycleErrorId AND 16#0010) &lt;&gt; 0 THEN
         CycleFaultCauseStr := 'tempo etape';
     ELSIF (CycleErrorId AND 16#0020) &lt;&gt; 0 THEN
-        CycleFaultCauseStr := 'stabilisation';
+        CycleFaultCauseStr := 'ecart codeurs remontee';
     ELSIF (CycleErrorId AND 16#0040) &lt;&gt; 0 THEN
         CycleFaultCauseStr := 'ecart position M1/M2';
     ELSIF (CycleErrorId AND 16#0080) &lt;&gt; 0 THEN
@@ -3498,7 +3498,7 @@ IF (SyncContactorDiag.MismatchLevel &gt;= 1) AND (AlarmCount &lt; CST_NbMaxAlarm
     ELSIF SyncContactorDiag.Step2Mismatch   THEN BannerSyncContactorWhich := 'palier 2';
     ELSIF SyncContactorDiag.Step3Mismatch   THEN BannerSyncContactorWhich := 'palier 3';
     ELSIF SyncContactorDiag.Step4Mismatch   THEN BannerSyncContactorWhich := 'palier 4';
-    ELSE  BannerSyncContactorWhich := '';
+    ELSE  BannerSyncContactorWhich := 'non identifie';
     END_IF;
     IF SyncContactorDiag.MismatchLevel &gt;= 2 THEN
         AlarmArray[AlarmCount] := CONCAT('[SYNC] discordance M1/M2 persistante -&gt; coupure : ', BannerSyncContactorWhich);
