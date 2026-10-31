@@ -10563,14 +10563,14 @@ tasks:
   bloque_par: []
 - id: T423
   parent_id: 'T422'
-  statut: 🔒
+  statut: ✅
   criticite: C2
   domaine: SUPERVISION / IHM / ALARMES / MES
   agent: AGY01
-  locked_at: '2026-10-30T03:36:00+01:00'
+  locked_at: null
   date: '2026-10-30T03:36:00+01:00'
-  updated_at: '2026-10-31T06:38:00+01:00'
-  completed_at: '2026-10-31T06:38:00+01:00'
+  updated_at: '2026-10-31T16:45:00+01:00'
+  completed_at: '2026-10-31T16:45:00+01:00'
   titre: IHM Pack 1 - Démasquage alarmes EtherCAT/codeurs et alignement carrousel cycle §5
   contexte: 'Suite a l audit chirurgical T422 des 194 defauts et interlocks, mise en oeuvre du Pack 1 (correctifs IHM et visibilite, risque regulation = 0) pour lever les masquages silencieux et aligner le carrousel d alarmes avant mise en service.'
   description: 'Application des 5 correctifs prioritaires sans toucher a la regulation machine : demasquage des esclaves EtherCAT (COD1, COD2, AC600), levee du masquage EncMxValid sur ErrorID:02, correction du bit-shift cycle §5h (16#0008 = com IHM, 16#0010 = timeout), integration surchauffes thermiques dans AlarmArray, et explicitation du refus armement joystick.'
@@ -10582,7 +10582,7 @@ tasks:
   - Expliciter le refus d armement joystick au lieu d un message generique.
   - Zero regression sur PRG_01..06 et GVL_PERSISTENT intact (G200 PASS).
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T423_IHM_PACK1_CORRECTIFS.yaml
-  avancement: 'Banc d epreuve dynamique qualifie a 100% PASS sous CODESYS simulation headless (26/26 cas de test). 5 champs du bandeau principal qualifies (Modes, Progression, Bypass, Guidage operateur, Position M3). 10 devices du carrousel d alarmes qualifies (D01, D02, D03, D04, D06, D07, D08, D09, D10). Zero refus silencieux, zero masquage parasite. Bundles complet et diff regeneres, G200 PASS (0 erreur).'
+  avancement: 'Qualification dynamique IHM validee a 100% PASS par test reel utilisateur CODESYS (27/27 cas de test). 5 champs du bandeau principal et 10 devices du carrousel d alarmes sans aucun refus silencieux ni masquage. Bundles integres et compiles sans erreur.'
   bloque_par: []
 
 - id: T424
