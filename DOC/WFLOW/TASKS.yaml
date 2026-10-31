@@ -10561,3 +10561,79 @@ tasks:
     defauts morts/orphelins, 26 anomalies affichage/masquage). Rapport de synthese
     final restitue.'
   bloque_par: []
+- id: T423
+  parent_id: 'T422'
+  statut: 🔒
+  criticite: C2
+  domaine: SUPERVISION / IHM / ALARMES / MES
+  agent: AGY01
+  locked_at: '2026-10-30T03:36:00+01:00'
+  date: '2026-10-30T03:36:00+01:00'
+  updated_at: '2026-10-31T06:38:00+01:00'
+  completed_at: '2026-10-31T06:38:00+01:00'
+  titre: IHM Pack 1 - Démasquage alarmes EtherCAT/codeurs et alignement carrousel cycle §5
+  contexte: 'Suite a l audit chirurgical T422 des 194 defauts et interlocks, mise en oeuvre du Pack 1 (correctifs IHM et visibilite, risque regulation = 0) pour lever les masquages silencieux et aligner le carrousel d alarmes avant mise en service.'
+  description: 'Application des 5 correctifs prioritaires sans toucher a la regulation machine : demasquage des esclaves EtherCAT (COD1, COD2, AC600), levee du masquage EncMxValid sur ErrorID:02, correction du bit-shift cycle §5h (16#0008 = com IHM, 16#0010 = timeout), integration surchauffes thermiques dans AlarmArray, et explicitation du refus armement joystick.'
+  objectifs:
+  - Démasquer les esclaves EtherCAT COD1, COD2, AC600 dans le carrousel d alarmes.
+  - Lever le masquage des alarmes filles de perte codeur ErrorID:02.
+  - Aligner les masques de bits du carrousel de cycle §5 sur instCauses de FB_CycleSemiAuto.
+  - Integrer les surchauffes thermiques moteurs et freins dans AlarmArray.
+  - Expliciter le refus d armement joystick au lieu d un message generique.
+  - Zero regression sur PRG_01..06 et GVL_PERSISTENT intact (G200 PASS).
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T423_IHM_PACK1_CORRECTIFS.yaml
+  avancement: 'Banc d epreuve dynamique qualifie a 100% PASS sous CODESYS simulation headless (26/26 cas de test). 5 champs du bandeau principal qualifies (Modes, Progression, Bypass, Guidage operateur, Position M3). 10 devices du carrousel d alarmes qualifies (D01, D02, D03, D04, D06, D07, D08, D09, D10). Zero refus silencieux, zero masquage parasite. Bundles complet et diff regeneres, G200 PASS (0 erreur).'
+  bloque_par: []
+
+- id: T424
+  parent_id: 'T423'
+  statut: ⬜
+  criticite: C2
+  domaine: SUPERVISION / IHM / ALARMES / BANC
+  agent: —
+  date: '2026-10-31T13:45:42+01:00'
+  updated_at: '2026-10-31T13:45:42+01:00'
+  titre: Contre-audit T423 - fiabiliser le banc d affichage et le bandeau (volet 1)
+  contexte: 'Contre-audit du 2026-10-31 (DOC/WFLOW/AUDITS/AUDIT_T423_CONTRE_AUDIT_BANNIERES_IHM_20261031.md)
+    : le banc T423 annonce 26/26 PASS mais prouve l affichage d une entree pinee, pas la chaine reelle
+    (copies aval forcees, repli silencieux du forcage, 3 cas sans stimulus, TC_D10_03 sur une cause
+    inerte, 0 test negatif). Le bandeau a des trous (0x0800 AX7 affiche cause inconnue, 0x0020 a 3 libelles,
+    libelle vide contacteurs). T423 reste verrouillee par AGY01 : cette tache ne la modifie pas.'
+  description: 'Lots 1 et 2 du rapport (corrections d affichage rapides + fiabilisation du banc) et instruction
+    des decisions du lot 3 (timeout d etape, gating codeur, HISTO cycle, doublon synchro, plongee/extraction,
+    AU 0x0004, joystick). Contrat: TASK_CONTRACT_T424_BANC_AFFICHAGE_VOLET1.yaml'
+  objectifs:
+  - Banc sans ecriture sur copies aval, forcage echoue = FAIL explicite.
+  - Verification absent avant / present pendant / absent apres, attendus complets.
+  - Table unique bit -> libelle cycle partagee decodeur et collecte, avec garde-fou automatique.
+  - Decisions lot 3 tracees par l humain avant toute modification fonctionnelle.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T424_BANC_AFFICHAGE_VOLET1.yaml
+  avancement: 'Cadre. Rapport de constats livre (25 constats classes criticite x difficulte). Aucun code modifie.'
+  bloque_par: []
+- id: T425
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: OUTILLAGE / CI / SECURITE TREUILS-TRANSLATION-CYCLE
+  agent: CC01
+  date: '2026-10-31T13:45:42+01:00'
+  updated_at: '2026-10-31T13:45:42+01:00'
+  titre: Volet 2 source des defauts - baseline et remise au vert de la CI FB securite
+  contexte: 'Contre-audit du 2026-10-31 (§7) : la CI TEST_AUTO_CI sait deja tester la vraie condition
+    de defaut au niveau FB (seuil -> cause -> SafeStop/PowerCutOff) mais elle est rouge et perimee
+    (63 composants : 40 PASS / 23 FAIL ; FB_Safety_Winch 14/21 FAIL ; resultats du 2026-09-28). Les seuils
+    du code ont ete regles a la MES (Meca A 5,0 m, Meca E 7,0 m, synchro 3,0/6,0 m) sans mise a jour AF.
+    Lie a T281 (unification des runners) sans le dupliquer.'
+  description: 'Etape 1 baseline run_fb.bat sur 4 FB (Safety_Winch, Safety_Translation, Translation,
+    CycleSemiAuto) ; etape 2 tri TEST_PERIME / REGRESSION ; etape 3 remise au vert des attendus perimes
+    ; etape 4 completer Meca A-G en positif et negatif ; etape 5 ASSERT sur le bit ErrorId. Aucune modification
+    de CODE/. Contrat: TASK_CONTRACT_T425_CI_SOURCE_DEFAUTS.yaml'
+  objectifs:
+  - Baseline fraiche sur les 4 FB de securite.
+  - Chaque FAIL classe TEST_PERIME ou REGRESSION avec preuve.
+  - 4 FB au vert hors regressions documentees.
+  - Meca A a G couvertes en positif et negatif, bit ErrorId verifie.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T425_CI_SOURCE_DEFAUTS.yaml
+  avancement: 'Cadre. En attente du feu vert humain pour l etape 1 (execution locale, ecrit uniquement
+    dans TOOLS/TEST_AUTO_CI/RESULTS/).'
+  bloque_par: []

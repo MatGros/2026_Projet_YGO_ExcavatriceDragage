@@ -85,6 +85,26 @@ contract:
 
     '
 status: COMPLETED
+investigation_20261031:
+  status: IN_PROGRESS
+  agent: CDX01
+  authority: Plan utilisateur T417 lots A a D ; lot E apres validation des corrections.
+  objective: Etablir les chronologies 94/95, les limites de couverture et une decision de correction refutable.
+  acceptance:
+    - Extraire toutes les transitions discretes avec intervalle temporel et SHA256 des traces originales.
+    - Convertir la frequence brute en Hz par division par 100, justifiee par PRG_05 et SimBench.
+    - Ne pas attribuer un mode, un reglage PV ou une distance absents des voies acquises.
+    - Tracer producteur et consommateur de chaque liaison M3 et distinguer commande de frein interne et finale.
+    - Conserver les preuves historiques ; verifier leurs empreintes avant reutilisation.
+    - Livrer trois tableaux couverture, hypotheses, experiences et une proposition concrete avant toute correction ST.
+  allowed:
+    - DOC/WFLOW/ETUDES/ANALYSES_T417/
+    - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T417_TRACE94_20261030.md
+    - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417_SIMULATION_M3_REALISTE.yaml
+    - TOOLS/AGENT_WORKFLOW/scripts/check_t417_trace_evidence.py
+  forbidden: [CODE/, CODE_XML/, PRJ_CODESYS/]
+  delegation: Ollama lecture seule ; sources completes des composants examines ; aucun avis ne vaut preuve.
+  checks: Extraction reproductible, invariants de lecture et revue des differences documentaires ; pas de livraison PLC dans ce lot.
 execution:
   executed_by: AGY01 (orchestrateur) + subagents Ollama (deepseek-v4.1-flash:cloud,
     glm-5.3-flash:cloud)
