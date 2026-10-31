@@ -4138,7 +4138,7 @@ SpeedMismatchActive := (State = E_AutoCycleStep.AX11_CTRL_ASCENT)
 SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
 SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
-// Tempo max d'étape (R5) — DÉSACTIVÉE (pour éviter toute coupure/repli AX_STAB intempestif sur durée)
+// Tempo max d'étape (R5) — DÉSACTIVÉE DÉLIBÉRÉMENT (décision exploitant 2026-10-31 : l'opérateur est présent en permanence face au pupitre, aucune coupure/repli intempestif sur pause ou variation de consistance de dragage)
 StepMaxTimer(IN := FALSE, PT := StepMaxTimeout);
 StepMaxPrevState := State;
 ExtractionStepDelayTimer(

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-27T17:37:48.589189" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-27T17:37:48.589189">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-31T05:12:55.648595" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-10-31T05:12:55.648595">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -799,6 +799,71 @@ fournie par la configuration persistante de l'appelant.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (§5bis)
    =======================================================================</xhtml>
         </documentation>
+      </dataType>
+      <dataType name="E_ArmingBlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="MODE_DISABLE" value="1" />
+              <value name="POWER_CUTOFF" value="2" />
+              <value name="CONTACTOR_OFF" value="3" />
+              <value name="BUCKET_BUSY" value="4" />
+              <value name="ALL_AXES_BLOCKED" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Armement possible (au moins un axe x sens dispo)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MODE_DISABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode DISABLE</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>POWER_CUTOFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance amont (M1/M2/M3)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CONTACTOR_OFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne AU non réarmée (PowerContactorEngaged FALSE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BUCKET_BUSY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action benne en cours (+ 1 scan de fin d'action)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ALL_AXES_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Base OK mais aucun axe x sens sélectionné n'est disponible</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a32c1a39-1a70-5035-9855-43f98d655fd2</ObjectId>
+          </data>
+        </addData>
       </dataType>
       <dataType name="E_AutoCycleStep">
         <baseType>
@@ -8171,6 +8236,14 @@ insensible a une eventuelle duree de Q etalee sur plusieurs scans.
 . [LOC] Homing en cours (cycle machine complet OU transaction preset)</xhtml>
               </documentation>
             </variable>
+            <variable name="SyncHmiErrorIdInjected">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memorisation injection defaut synchro IHM (test / diagnostic)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -8584,7 +8657,16 @@ GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.Data.WinchM1State;
 GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.Data.WinchM2State;
 GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.Data.WinchM1Safety;
 GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.Data.WinchM2Safety;
+SyncHmiErrorIdInjected := GVL_IHM.M1M2Sync.State.ErrorId;
 GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.Data.SyncState;
+IF SyncHmiErrorIdInjected &lt;&gt; WORD#0 THEN
+    GVL_IHM.M1M2Sync.State.ErrorId := PRG_04_Treuils_Benne.Data.SyncState.ErrorId OR SyncHmiErrorIdInjected;
+    GVL_IHM.M1M2Sync.State.Error   := TRUE;
+END_IF;
+IF FaultMachineReset_IHM THEN
+    SyncHmiErrorIdInjected := WORD#0;
+    GVL_IHM.M1M2Sync.State.ErrorId := WORD#0;
+END_IF;
 GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.Data.BucketState;
 GVL_IHM.M3Translation.State := PRG_05_Translation.Data.TranslationState;
 
@@ -8861,7 +8943,7 @@ instHmiBannerFormatter(
     CycleStateStr         := GVL_IHM.CycleSemiAuto.State.CycleStateStr,
     CycleElapsed_Min      := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_Min,
     CycleElapsed_S        := GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed_S,
-    CycleErrorId          := GVL_IHM.CycleSemiAuto.State.ErrorId,
+    CycleErrorId          := GVL_IHM.CycleSemiAuto.State.ErrorId OR PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId OR PRG_03_Modes_Cycle.Data.SequenceState.Fault.LatchedId,
     CycleStepAtError      := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
     CycleChecksInhibited  := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
     MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
@@ -8892,6 +8974,8 @@ instHmiBannerFormatter(
     CycleRequestDirection := SEL(PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqAscent, SEL(PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqDescend, 0, -1), 1),
     DeadmanArmed                := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
+    ArmingPermitDenied          := PRG_02_Acquisition.Data.Joystick.ArmingPermitDenied,
+    ArmingBlockedReason         := PRG_04_Treuils_Benne.Data.ArmingAvailability.BlockedReason,
     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
     M3AtP1                      := GVL_IHM.M3Translation.State.AtP1,
     M3StatusText                := GVL_IHM.M3Translation.State.M3StatusText,
@@ -8903,7 +8987,7 @@ instHmiBannerFormatter(
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
     TranslationSafety           := GVL_IHM.M3Translation.Safety,
     BucketErrorId               := GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId,
-    SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId,
+    SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId OR PRG_04_Treuils_Benne.Data.SyncState.ErrorId OR SEL(PRG_04_Treuils_Benne.instWinchSync.ContactorMismatch OR PRG_06_Outputs.Data.ContactorMismatch, WORD#0, WORD#2),
     SyncContactorDiag           := PRG_06_Outputs.Data.SyncContactorDiag,
     DiveErrorId                 := 0,
     ExtractionErrorId           := 0,
@@ -10747,6 +10831,22 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Joystick au neutre</xhtml>
               </documentation>
             </variable>
+            <variable name="ArmingPermitDenied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Appui homme-mort refusé (ArmingPermit=FALSE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingBlockedReason">
+              <type>
+                <derived name="E_ArmingBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Motif précis du refus d'armement</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleAutoBusy">
               <type>
                 <BOOL />
@@ -12034,6 +12134,8 @@ IF CycleFaultActive THEN
         CycleFaultCauseStr := 'palier 4 non confirme';
     ELSIF (CycleErrorId AND 16#0400) &lt;&gt; 0 THEN
         CycleFaultCauseStr := 'arret meca non confirme';
+    ELSIF (CycleErrorId AND 16#0800) &lt;&gt; 0 THEN
+        CycleFaultCauseStr := 'consigne profondeur invalide';
     ELSE
         CycleFaultCauseStr := CONCAT('cause inconnue #', WORD_TO_STRING(CycleErrorId));
     END_IF;
@@ -12240,10 +12342,25 @@ ELSIF NOT BucketIsClosed AND CurrentDirection &gt; 0 THEN
     // Sécurité : benne mal fermée (branche/caillou) → montee bridee palier 1 pour eviter un choc
     // si la benne se refermait d'un coup en montant vite.
     OperatorActionCandidate := '[BENNE] Benne non fermee - montee bridee palier 1 (securite)';
-ELSIF NOT DeadmanArmed THEN
-    OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
 ELSIF CurrentMode = E_Mode.DISABLE THEN
     OperatorActionCandidate := '[IHM] Sélectionner un mode';
+ELSIF ArmingPermitDenied THEN
+    CASE ArmingBlockedReason OF
+        E_ArmingBlockReason.MODE_DISABLE:
+            OperatorActionCandidate := '[JOYSTICK] Armement refusé : mode DÉSACTIVÉ';
+        E_ArmingBlockReason.CONTACTOR_OFF:
+            OperatorActionCandidate := '[JOYSTICK] Armement refusé : contacteur puissance non enclenché';
+        E_ArmingBlockReason.POWER_CUTOFF:
+            OperatorActionCandidate := '[JOYSTICK] Armement refusé : coupure puissance active';
+        E_ArmingBlockReason.BUCKET_BUSY:
+            OperatorActionCandidate := '[JOYSTICK] Armement refusé : action benne en cours';
+        E_ArmingBlockReason.ALL_AXES_BLOCKED:
+            OperatorActionCandidate := '[JOYSTICK] Armement refusé : aucun axe disponible';
+    ELSE
+        OperatorActionCandidate := '[JOYSTICK] Armement refusé : mouvements non autorisés';
+    END_CASE;
+ELSIF NOT DeadmanArmed THEN
+    OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
 ELSIF ((WinchM1Safety.ErrorId OR WinchM2Safety.ErrorId) AND CST_WinchErrorIdCableLimitDescent) &lt;&gt; 16#0000 THEN
     // 🛡️ Cause limite basse câble ACTIVE (bit 6) ⇒ descente INTERDITE
     // (DescendPermit = FALSE, FB_Safety_Winch.st:563-565) et REMONTÉE = seule action
@@ -12273,7 +12390,7 @@ END_IF;
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
 PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
 HardwareModuleOrBusFault := (NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid OR NOT CanBusValid OR NOT Joy1Valid OR NOT EcatBusValid OR NOT EncM1Valid OR NOT EncM2Valid OR NOT VarM3Valid);
-CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked);
+CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked OR ArmingPermitDenied);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -12314,13 +12431,13 @@ END_IF;
 IF NOT EcatBusValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[ECAT] Defaut bus EtherCAT'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF EcatBusValid AND NOT EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF NOT EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] Codeur absolu COD1 non detecte (ECAT)'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF EcatBusValid AND NOT EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF NOT EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] Codeur absolu COD2 non detecte (ECAT)'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF EcatBusValid AND NOT VarM3Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF NOT VarM3Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] Variateur AC600 non detecte (ECAT)'; AlarmCount := AlarmCount + 1;
 END_IF;
 
@@ -12332,8 +12449,11 @@ END_IF;
 IF WinchM1Safety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] ErrorID:01 - perte com operateur'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.ErrorEncoder AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM1Safety.ErrorEncoder AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] ErrorID:02 - perte codeur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ThermalFault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] ErrorID:03 - surchauffe moteur'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] ErrorID:05 - rotation phases'; AlarmCount := AlarmCount + 1;
@@ -12346,6 +12466,9 @@ IF WinchM1Safety.ErrorMecaB AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes
 END_IF;
 IF WinchM1Safety.ErrorMecaC AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] ErrorID:10 - MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ErrorBrakeThermal AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] ErrorID:11 - surchauffe frein'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorMecaD AND LocalIoValid AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] ErrorID:12 - MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
@@ -12380,8 +12503,11 @@ END_IF;
 IF WinchM2Safety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] ErrorID:01 - perte com operateur'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.ErrorEncoder AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+IF WinchM2Safety.ErrorEncoder AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] ErrorID:02 - perte codeur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ThermalFault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] ErrorID:03 - surchauffe moteur'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] ErrorID:05 - rotation phases'; AlarmCount := AlarmCount + 1;
@@ -12394,6 +12520,9 @@ IF WinchM2Safety.ErrorMecaB AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes
 END_IF;
 IF WinchM2Safety.ErrorMecaC AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] ErrorID:10 - MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorBrakeThermal AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] ErrorID:11 - surchauffe frein'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorMecaD AND LocalIoValid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] ErrorID:12 - MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
@@ -12424,6 +12553,9 @@ IF TranslationSafety.ErrorDriveComm AND VarM3Valid AND (AlarmCount &lt; CST_NbMa
 END_IF;
 IF TranslationSafety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] ErrorID:03 - rotation phases'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF TranslationSafety.ErrorBrakeThermal AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] ErrorID:04 - surchauffe frein'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF TranslationSafety.ErrorMecaB AND VarM3Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] ErrorID:05 - MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
@@ -12551,20 +12683,17 @@ END_IF;
 IF ((CycleErrorId AND 16#0002) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ErrorID:02 - defaut synchro treuils'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF ((CycleErrorId AND 16#0008) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:04 - ecart codeurs remontee'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF ((CycleErrorId AND 16#0010) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:05 - ecart vitesse confirme'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF ((CycleErrorId AND 16#0020) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:06 - perte communication IHM'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF ((CycleErrorId AND 16#0040) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:07 - timeout etape'; AlarmCount := AlarmCount + 1;
-END_IF;
 IF ((CycleErrorId AND 16#0004) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ErrorID:03 - ecart vitesse montee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:04 - perte communication IHM'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0010) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:05 - timeout etape'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0020) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:06 - ecart codeurs remontee'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((CycleErrorId AND 16#0080) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ErrorID:08 - hors FDC haut translation P1'; AlarmCount := AlarmCount + 1;
@@ -14876,6 +15005,16 @@ TimeLast := TimeCurrent;
               <Object Name="ST_TranslationCmd" ObjectId="9ba58c6e-bb66-5815-b28d-8fed6fa33365" />
               <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
             </Folder>
+            <Folder Name="4_JOYSTICK_ACQUISITION">
+              <Object Name="E_ArmingBlockReason" ObjectId="a32c1a39-1a70-5035-9855-43f98d655fd2" />
+              <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
+              <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
+              <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
+              <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
+              <Object Name="ST_JoystickCmd" ObjectId="486d3dcf-ebc5-586d-9a94-ea39a076f411" />
+              <Object Name="ST_JoystickState" ObjectId="f7e9804f-8654-5e66-a418-611d9f5fae02" />
+              <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
+            </Folder>
             <Folder Name="8_BANDEAU_ET_IHM">
               <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
               <Object Name="ST_PermitVisibilityHMI" ObjectId="43f321e3-3f35-5f43-a010-3ff934ced971" />
@@ -14885,15 +15024,6 @@ TimeLast := TimeCurrent;
             <Folder Name="6_DIAG_ET_CHAINES">
               <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
               <Object Name="ST_InputModuleDiagHMI" ObjectId="305fe275-43ac-5096-abc4-7a46cf78f5f9" />
-            </Folder>
-            <Folder Name="4_JOYSTICK_ACQUISITION">
-              <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
-              <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
-              <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
-              <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
-              <Object Name="ST_JoystickCmd" ObjectId="486d3dcf-ebc5-586d-9a94-ea39a076f411" />
-              <Object Name="ST_JoystickState" ObjectId="f7e9804f-8654-5e66-a418-611d9f5fae02" />
-              <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
             </Folder>
           </Folder>
         </Folder>
