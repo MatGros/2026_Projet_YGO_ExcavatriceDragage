@@ -1,0 +1,40 @@
+{
+  "scope": "manual M3 Simulation IDE, 4 legs, no automatic cycle",
+  "build_errors": 0,
+  "sampling_s": {
+    "median": 0.2089998722076416,
+    "min": 0.18700003623962402,
+    "max": 14.585999965667725
+  },
+  "results": [
+    "LEG_RESULT name=10Hz_P1_to_Tremie target=GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx101_PosTremie_DI start=5.0 sensor_pos=-0.0454980433 final_pos=REAL#-0.07176116 overshoot=REAL#0.0243753716 overshoot_sensor_id=1.0 expected_sensor_id=1 sensor_elapsed_s=26.4562072754 stop_elapsed_s=4.98867797852 max_actual_freq_hz=10.0 stopped=True stable_samples=20",
+    "LEG_RESULT name=10Hz_Tremie_to_P1 target=GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx104_PosP1_DI start=-0.07176116 sensor_pos=4.978392 final_pos=REAL#5.000095 overshoot=REAL#0.06873703 overshoot_sensor_id=3.0 expected_sensor_id=3 sensor_elapsed_s=26.5703964233 stop_elapsed_s=4.70014190674 max_actual_freq_hz=10.0 stopped=True stable_samples=20",
+    "LEG_RESULT name=20Hz_P1_to_Tremie target=GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx101_PosTremie_DI start=5.000095 sensor_pos=-0.140125543 final_pos=REAL#-0.170100242 overshoot=REAL#0.122699864 overshoot_sensor_id=1.0 expected_sensor_id=1 sensor_elapsed_s=14.1540527344 stop_elapsed_s=5.19892120361 max_actual_freq_hz=20.0 stopped=True stable_samples=20",
+    "LEG_RESULT name=20Hz_Tremie_to_P1 target=GVL_Troubleshooting.L_TranslationPontM3.Inputs_100.Idx104_PosP1_DI start=-0.170100242 sensor_pos=4.98923826 final_pos=REAL#5.152191 overshoot=REAL#0.220101833 overshoot_sensor_id=3.0 expected_sensor_id=3 sensor_elapsed_s=14.1775207520 stop_elapsed_s=5.39231109619 max_actual_freq_hz=20.0 stopped=True stable_samples=20"
+  ],
+  "source_sha256": [
+    "SOURCE_SHA256=FB_Sim_Translation fe0503eb216eafc2f7a7c1aefe20100d92442ae86b719cdd40ed399fc96bb70a",
+    "SOURCE_SHA256=FB_Hmi_BannerFormatter 11a8e069750dda1fd9d8dba9b9e4d7706662ff5e66a360597eec634ad9af0675",
+    "SOURCE_SHA256=PRG_07_Supervision 90c1b2c7f4557608664eae18999db2bfc148f8216a3ff8148cd7af93b57bdb2a",
+    "SOURCE_SHA256=FB_CycleSemiAuto bad4c0cb409fee5611b6dbc29f5f3cc4f3326c23f47a56578cbf26c54f7d0277"
+  ],
+  "cleanup": [
+    "cleanup_set_freq_restored=50.0",
+    "cleanup_mode_restored=MAINT_N1",
+    "cleanup_MinHeight_bypass_false=True",
+    "cleanup_sim_master_false=True",
+    "cleanup_unforce=True"
+  ],
+  "limitations": [
+    "Homing state forced using T423 setup",
+    "MinHeight bypass active during manual test, restored false",
+    "Online reads sequential, snapshot not atomic",
+    "Stop elapsed includes 20 stable samples, not mechanical stopping time",
+    "Automatic cycle not covered"
+  ],
+  "evidence_sha256": {
+    "runtime.py": "3d2667e2bec413d99e0d8b2b45608aaae0007ced953a7dbe0f0e5e7fb2ded5fe",
+    "runtime.log": "ee2b70cda8e771ae9558c62af9d5a4c71d2c0b2cab49366b3d46ce738a42189e",
+    "samples.csv": "3703d2852b0e61332106b7939818ef2e31d569c98e19eeebca4a45a74146980e"
+  }
+}

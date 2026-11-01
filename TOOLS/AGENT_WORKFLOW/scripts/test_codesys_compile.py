@@ -6,8 +6,9 @@ This tool:
    with all its transitive dependencies resolved automatically.
 2. Copies a base CODESYS project (.project) to a temporary location to keep hardware/IO context.
 3. Invokes CODESYS in Headless mode (--noUI) via an IronPython script.
-4. Imports the granular XML into the base project and runs project.check_syntax().
-5. Prints the exact compilation findings (C0xxx errors, warnings) in clean human-readable output.
+4. Imports the granular XML into the base project, enables IDE simulation on request,
+   and rebuilds the active application.
+5. Prints compilation findings and retains native message metadata in a scratch trace.
 
 Usage:
     python test_codesys_compile.py [OBJECT_NAME] [--base-project PATH] [--codesys-exe PATH]
@@ -94,7 +95,16 @@ def generate_xml_for_object(object_name: str, out_dir: Path) -> Path:
     return xml_file
 
 
-def create_ironpython_script(script_path: Path, project_path: Path, xml_path: Path, log_path: Path, baseline: bool = False, simulation: bool = False) -> None:
+def create_ironpython_script(
+    script_path: Path,
+    project_path: Path,
+    xml_path: Path,
+    log_path: Path,
+    baseline: bool = False,
+    simulation: bool = False,
+    incremental: bool = False,
+    generate_code: bool = False,
+) -> None:
     """Create the IronPython script to be executed inside CODESYS."""
     proj_p = str(project_path).replace("\\", "/")
     xml_p = str(xml_path).replace("\\", "/")
@@ -132,27 +142,56 @@ try:
     else:
         trace("5. Baseline: no import")
 
-    trace("7. Rebuilding active application...")
+    if {generate_code}:
+        trace("7. Generating application code...")
+    else:
+        trace("7. Building active application..." if {incremental} else "7. Rebuilding active application...")
     app = proj.active_application
     if app is None:
         raise Exception("No active application in copied project")
+    trace("Application.is_active_application=" + str(app.is_active_application))
     if {simulation}:
         device = app
         while device is not None and not hasattr(device, "set_simulation_mode"):
             device = device.parent
         if device is None:
             raise Exception("Device supporting IDE simulation not found")
+        try:
+            device_name = str(device.get_name())
+        except Exception:
+            device_name = str(device)
+        trace("Simulation device name=" + device_name)
+        try:
+            trace("Simulation device identification=" + str(device.get_device_identification()))
+        except Exception as exc:
+            trace("Simulation device identification unavailable=" + str(exc))
+        try:
+            device_description = device_repository.get_device(device.get_device_identification())
+            trace("Device repository description=" + str(device_description))
+            if device_description is not None:
+                for name in ("name", "vendor", "description", "order_number"):
+                    try:
+                        trace("DeviceDescription.%s=%s" % (name, repr(getattr(device_description, name))))
+                    except:
+                        pass
+        except Exception as exc:
+            trace("Device repository lookup failed=" + str(exc))
         device.set_simulation_mode(True)
         if not device.get_simulation_mode():
             raise Exception("IDE simulation mode not confirmed")
         trace("Simulation IDE confirmed")
     for category in system.get_message_categories(False):
         system.clear_messages(category)
-    app.rebuild()
+    if {generate_code}:
+        app.generate_code()
+    elif {incremental}:
+        app.build()
+    else:
+        app.rebuild()
     msgs = []
     for category in system.get_message_categories(True):
         msgs.extend(system.get_message_objects(category))
-    trace("8. Rebuild completed. Messages: " + str(len(msgs)))
+    trace("8. CODESYS action completed. Messages: " + str(len(msgs)))
     for index, message in enumerate(msgs):
         # Preserve CODESYS' native diagnostic fields in the scratch trace; the
         # display text alone can collapse build failures to a generic message.
@@ -228,6 +267,8 @@ def main() -> int:
     parser.add_argument("--profile", help="CODESYS Profile Name (default: auto-detect)")
     parser.add_argument("--baseline", action="store_true", help="Build the copied project without importing XML")
     parser.add_argument("--simulation", action="store_true", help="Build the copied project in CODESYS IDE simulation mode")
+    parser.add_argument("--incremental", action="store_true", help="Use the CODESYS application build instead of a full rebuild")
+    parser.add_argument("--generate-code", action="store_true", help="Run application code generation without the build stage")
     args = parser.parse_args()
 
     # 1. Find CODESYS executable
@@ -267,7 +308,16 @@ def main() -> int:
         # Step C: Prepare IronPython Script
         ironpython_script = tmp_dir / "codesys_compile_runner.py"
         log_file = tmp_dir / "build_result.log"
-        create_ironpython_script(ironpython_script, project_copy, xml_path, log_file, baseline=args.baseline, simulation=args.simulation)
+        create_ironpython_script(
+            ironpython_script,
+            project_copy,
+            xml_path,
+            log_file,
+            baseline=args.baseline,
+            simulation=args.simulation,
+            incremental=args.incremental,
+            generate_code=args.generate_code,
+        )
 
         # Step D: Run CODESYS Headless
         print("[RUN] Launching CODESYS in Headless mode (--noUI)...")
