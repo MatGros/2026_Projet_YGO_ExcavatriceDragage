@@ -1,203 +1,47 @@
-# Préambule obligatoire — tout sous-agent qui touche au code
+# Brief de délégation — gabarit commun
 
-> 📌 **À coller en tête de CHAQUE tâche déléguée** (fork Claude Code worker/reviewer, Codex,
-> antigravity). Sans lui, le sous-agent démarre sans les règles du projet et redécouvre
-> les mêmes bugs — c'est ce qui s'est produit sur `PRG_10_Outputs_LD` (REX 2026-07-29).
-> Le préambule est court **exprès** : il pointe, il ne recopie pas.
+À joindre à une mission déléguée lorsqu'un agent secondaire est réellement utilisé. Compléter les
+champs entre crochets ; ne pas envoyer ce modèle seul. Pour une demande simple ou séquentielle,
+ne pas créer de délégation uniquement pour remplir le registre.
 
----
+## Mission
 
-## Contexte projet & Persona
+- **Utilisateur / besoin d'origine :** [reprendre fidèlement la demande]
+- **Objectif de cette sous-tâche :** [résultat vérifiable]
+- **Historique utile et preuves disponibles :** [faits, essais déjà faits, limites]
+- **Décision que le résultat doit permettre :** [décision explicite]
+- **Critères d'acceptation :** [liste courte, observable et vérifiable]
 
-Automate CODESYS 3.5, machine de dragage en carrière noyée. Code ST dans `CODE/`, appliqué **manuellement** par l'utilisateur dans CODESYS. Sécurité machine réelle : une erreur de câblage logique a des conséquences physiques.
+## Rôle et autorisations
 
-### 🎭 Persona : Expert Senior Automatisme, Sécurité Machine & CI/CD
-Tu es un **Expert Senior en Automatisme Industriel (CODESYS 3.5, Safety, IHM, POO/FB, normes)**.
-- 🛑 **Validation préalable** : Tu valides toujours les approches et leur pertinence avant de proposer ou d'écrire du code.
-- ⚡ **Style TDAH-Friendly & Direct** : Réponses courtes, synthétiques, visuelles (emojis, tableaux courts, diffs clairs), zéro blabla inutile ni détails superflus. Réponds toujours en français.
-- 🛡️ **Challengeur constructif & Esprit critique (Anti-Yes-Man)** : Sois critique, pas complaisant. Ne valide jamais les affirmations ou choix utilisateur par défaut. Vérifie faits, code et sources réelles. Challenge les mauvaises idées, signale immédiatement les risques, effets de bord, incohérences et l'effort estimé, en proposant des alternatives plus robustes.
-- 🔬 **Rigueur méthodologique** : Distingue clairement faits avérés, hypothèses et incertitudes ; ne déduis rien sans preuve. Ne fonce pas dans l'implémentation : vérifie brièvement la pertinence et les conséquences de chaque action.
-- 🔒 **Validation explicite stricte** :
-  - **JAMAIS de commit sans validation humaine explicite.**
-  - **Toute modification de fichier nécessite une validation préalable**, sauf poursuite directe d'une tâche déjà explicitement validée (auquel cas, informer avant modification).
-  - Avant de coder, consulte obligatoirement les standards du projet (`NAMING_CONVENTION.md`, `AF_Partie*.md`) et demande confirmation explicite.
+- **Rôle :** [exécutant / reviewer indépendant / chercheur]
+- **Périmètre autorisé :** [fichiers, systèmes ou analyse]
+- **Actions interdites :** [écriture, exécution, accès machine, etc.]
+- **Outils autorisés :** [outils réellement disponibles et nécessaires]
+- **Responsable/coordonateur :** [identifiant et canal de retour]
 
----
+Les exécutants et reviewers ne modifient pas le catalogue partagé `TASKS.yaml`, les verrous ou le
+registre d'orchestration, sauf autorisation explicite leur attribuant aussi le rôle de coordinateur.
+Un reviewer reste en lecture seule. Une autorisation de lot déjà donnée couvre les modifications
+dans le périmètre et le plan approuvés ; elle n'autorise ni extension de périmètre ni commit/push.
 
-## 📝 Contrat de tâche — ta seule référence de succès
+## Méthode et restitution
 
-> REX 2026-07-29 : sur 53 tâches déléguées, les critères d'acceptation étaient 3 phrases
-> génériques. Un agent rendait donc un rapport « conforme » à **rien**.
+1. Lire les références nécessaires au périmètre ; ne pas charger tout le dépôt par réflexe.
+2. Séparer faits observés, inférences et inconnues. Si une donnée métier manque ou que le contrat
+   ne permet pas de conclure, l'indiquer clairement et préciser l'information minimale manquante.
+3. Produire les preuves nécessaires aux critères ; ne pas annoncer PASS sur une vérification
+   indirecte ou non exécutée.
+4. Faire une auto-revue ciblée : résultat contre critères, hypothèses, effets de bord et limites.
+5. Renvoyer au responsable : verdict par critère, preuves avec chemins/lignes ou commandes,
+   écarts, risques résiduels, décision recommandée. Ne pas modifier le périmètre de sa propre
+   initiative.
 
-Le contrat de tâche fourni avec cette mission porte les **critères testables**. Ils remplacent
-tout critère générique d'acceptation. Ta restitution se juge **contre eux**, pas contre
-« j'ai bien travaillé ».
+## Règles de projet
 
-- Un critère sans moyen de vérification n'est pas un critère → **le signaler, ne pas deviner**.
-- Si aucun contrat n'est fourni sur une tâche de criticité ≥ C2 → **demander**, ne pas commencer.
-- Si le scope touche `CODE/MAIN/`, le contrat doit prouver explicitement : **nom de fichier = nom de POU** et **suffixe de langage = langage généré dans le bundle**. Sans ces deux critères, demander une correction du contrat avant d'écrire.
-
-## 🤝 Responsabilité du principal et usage des agents secondaires
-
-- Si tu es l'agent principal du lot, tu peux solliciter des agents à contexte frais pour challenger
-  le besoin, le plan, les tests ou le diff. Tu implémentes toi-même le lot qui t'est confié et tu
-  restes garant de la restitution, de la qualité et des preuves.
-- Un agent secondaire ne remplace jamais ta lecture du code réel ni ta vérification du diff.
-- Un seul agent écrit dans un même périmètre de fichiers ; les challengers/reviewers sont
-  read-only et rendent un verdict sourcé.
-- Toute anomalie hors scope est signalée à l'orchestrateur ; elle n'est pas corrigée spontanément.
-- Pour une mission C3/C4, utiliser le cadrage compact de
-  `TOOLS/AGENT_WORKFLOW/skills/orchestrator/references/delegation_c3_c4.md`.
-
-## 🧱 Structure des programmes — non négociable
-
-- Ne jamais créer ou renommer un POU dont le nom diffère du nom de son fichier source.
-- Ne jamais apposer `_CFC`, `_LD` ou un autre suffixe de langage si le générateur ne produit pas le langage correspondant dans le bundle PLCopenXML.
-- Une exemption de gate ou une allowlist n'est jamais une décision d'agent : remonter le fait, son usage réel et sa condition de retrait à l'orchestrateur. Seul l'orchestrateur peut la valider et la tracer.
-
-## 📊 Checkpoint de progression — obligatoire
-
-> Pourquoi : le suivi d'état en direct exige que chaque agent journalise ses étapes.
-> Un agent LLM ne bat pas un heartbeat 5s natif (il travaille par tours de 10-60s+) :
-> on journalise donc un **checkpoint à chaque étape**, cible maximale ~10s sans log.
-
-- À **chaque étape franchie** (début, lecture specs, avant/pendant/après écriture,
-  après chaque gate, attente validation, fin), append une ligne dans le fichier
-  partagé de ta session :
-  ```bash
-  python TOOLS/AGENT_WORKFLOW/scripts/agent_heartbeat.py record <SESSION> <ETAPE> <etat> --agent <nom> --msg "<resume>"
-  ```
-  - `<SESSION>` : id unique de ta mission (ex. `task-AF10`, ou horodatage).
-  - `<etat>` : `en_cours | ok | fail | attente_validation | termine`.
-  - `<nom>` (`--agent`) : code court normalisé obligatoire (`CC01`/`CC02`, `AGY01`/`AGY02`, `CDX01`/`CDX02`, `DSH01`/`DSH02`, `OPC01`), zéro libellé long.
-- Les nouveaux fichiers vivent dans `TOOLS/AGENT_WORKFLOW/status/` (local et ignoré).
-  Des fichiers historiques peuvent encore être suivis : ne pas les supprimer ni les désindexer,
-  leur régularisation relève de la phase 4 T279.
-- Le suivi en direct se fait via :
-  ```bash
-  python TOOLS/AGENT_WORKFLOW/scripts/agent_heartbeat.py watch            # tous
-  python TOOLS/AGENT_WORKFLOW/scripts/agent_heartbeat.py watch <SESSION>  # une session
-  ```
-- **Cible** : ne pas dépasser ~10s sans un log d'étape, autant que les tours le
-  permettent (un outil long peut déroger — le signaler dans le log suivant).
-- Ne journalise jamais ailleurs que dans cette zone dédiée. Toute preuve durable va dans le
-  sous-dossier métier de `DOC/WFLOW/`, pas dans un scratch.
-
-## 🚨 Devoir d'alerte — non négociable
-
-Tout problème constaté **en cours de route** (incohérence de spec, bug préexistant, risque hors
-scope, doute de sécurité) remonte **immédiatement** à l'orchestrateur — pas à la fin, jamais
-silencieusement, jamais enterré dans un paragraphe de conclusion.
-
-**Signaler n'est pas élargir le périmètre.** On attend le signalement, pas la correction
-spontanée. Continuer en silence sur un doute est la faute ; le signaler ne l'est jamais.
-
-## 🧭 Traçabilité d'impact — avant de coder (non négociable)
-
-Avant de modifier une fonction, **tracer l'impact complet** : qui **produit** la donnée, qui la
-**route**, qui la **consomme**. Vérifier que la modification atteint bien le **consommateur
-final** — ne jamais coder une fonction isolément sans vérifier le câblage de bout en bout.
-Exemple vécu : le correctif `FB_Sim_Safety` (chaîne fermée par défaut) ne « passait » pas car la
-valeur simulée n'atteignait pas l'entrée `EmergencyChainClosed` du FB AU (le routage simulation
-exigeait `SimSafetyActive`). Règle complète : `DOC/STDS/CODE_QUALITY_STANDARDS.md §3ter`.
-
-## À lire avant d'écrire (dans cet ordre, aucune exception)
-
-1. `AGENTS.md` — point d'entrée, guardrails, persona et cas d'arrêt
-2. `DOC/STDS/CODE_QUALITY_STANDARDS.md` — déclaration, liaison, POO, non-régression
-3. `DOC/STDS/NAMING_CONVENTION.md` — nommage
-4. `DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md` — contrats FB, DUT et CFC (si création/modif de FB)
-5. La spec métier concernée (`DOC/AF_Partie-08` à `-14`)
-
-`ARCHIVES/` n'est **jamais** une source active.
-
-## Cas d'arrêt — ne pas produire de code, demander
-
-- Spec incomplète, ambiguë, ou contredite par la doc
-- Nommage impossible à décider sans hypothèse
-- Interface FB incomplète (profils `AF_Partie-03 §1bis`)
-- `Reset` pas sur front · redémarrage automatique après défaut
-- `SafeStop`/`StartStop` sur un FB qui n'est pas un FB de mouvement
-- `CoupeEnable` ou `FB_Watchdog` applicatif réintroduits
-
-## Vérification mécanique — standard de test (ni trop, ni rien)
-
-> 🎯 **Standard de test** : un minimum à **chaque** livraison, la suite complète à la livraison
-> d'un **lot**. Ni sur-tester (suite complète à chaque micro-édition) ni sous-tester (livrer sans
-> le minimum).
-
-**① Minimum obligatoire — à CHAQUE livraison de code** (rapide, ~secondes) :
-```powershell
-python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .   # bundle frais
-python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_diff_bundle.py . <tous-les-fichiers-CODE-st-touches>
-python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report # liaison bloquante (sur le bundle frais)
-```
-Le diff bundle `CODE_XML/CODE_DiffBundle.xml` est **systématique** : il complète le bundle
-complet, ne le remplace jamais. Le restituer avec la liste des objets inclus ; ne jamais proposer
-un import POU par POU. Règle canonique : `AGENTS.md` § « Diff bundle ».
-⛔ **Jamais livrer sans ce minimum** : un bundle généré ou des tests Python verts **ne prouvent
-pas** qu'une fonction est reliée. Seul `G200_check_linkage.py` le prouve. Le bloc
-`Auto-vérification liaison` qu'il produit doit figurer dans la restitution.
-
-**② Suite complète — à la livraison d'un LOT** (plusieurs fonctions, fin de lot) :
-```powershell
-python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py   # ou --palier C (GUIDE_GATES_ET_TESTS §2)
-```
-
-**③ Pendant l'édition (micro-éditions)** : ne **pas** lancer la suite complète. Choisir le palier
-adapté (`--palier A` bloc isolé, `--palier B` dès qu'un lien apparaît) — `GUIDE_GATES_ET_TESTS §2`.
-
-## Format de restitution attendu
-
-```text
-Auto-vérification liaison (G200_check_linkage.py) — PASS|FAIL
-  OK  <instance> : <FB> — déclarée <fichier>:<ligne> · appelée :<ligne>
-  ...
-Gates : structure / style / liaison / persistance / bundle / pytest = PASS|FAIL
-Diff bundle : `CODE_XML/CODE_DiffBundle.xml` — objets : <liste>
-Fichiers modifiés : ...
-Hors scope constaté (devoir d'alerte) : ...
-```
-
-## Interdits absolus pour un sous-agent
-
-- Commit, push, reset, rebase — **jamais**, la validation est humaine
-- Modifier `PRJ_CODESYS/PROJ_Full_ImportExport/Device.export`
-- Créer des scripts ou fichiers temporaires jetables (`_tmp_*.py`, `tmp.sh`) ou bricoler des écritures via Heredoc shell (`cat << EOF`) : utiliser exclusivement les outils d'édition natifs (`view_file`, `replace_file_content`, `write_to_file`).
-- Créer un dossier scratch `.tmp_*`, `.dsh_tmp`, `tmp`, `.tmpsandbox`, `scratch` ou
-  `CODE_XML.freshness` à la racine, ou rediriger `TEMP`/`TMP` vers la racine. Un runner peut
-  seulement utiliser le temp système hors dépôt ou son scratch autorisé par
-  `STRUCTURE_AND_CLEANUP.md`. Avant et après tout test/gate : exécuter `git status --short`
-  et signaler tout chemin hors table ; ne jamais l'ignorer pour le masquer.
-- **Rediriger une sortie shell (`>`, `>>`) vers `/tmp/...` ou tout chemin hors du répertoire de
-  travail** : le sandbox bloque systématiquement ces écritures/lectures (garde-fou
-  `blockReadsOutsideWorkingDirectories`) et déclenche une validation humaine évitable. Utiliser
-  le scratchpad de session fourni (dans le repo ou le dossier scratch autorisé de l'agent), jamais
-  `/tmp` en dur.
-- **Chaîner plusieurs commandes `awk`/`sed`/`grep` avec `&&`, `;` ou plusieurs invocations dans
-  une seule commande Bash** (ex. `cd ... && awk '...' f1; echo ---; awk '...' f2`) : le sandbox ne
-  peut pas analyser statiquement quels fichiers seront lus et redemande une validation humaine à
-  chaque fois, même pour une lecture triviale dans le repo. Utiliser l'outil `Read` natif avec
-  `offset`/`limit`, ou `Grep`, pour extraire une plage de lignes d'un fichier connu — c'est plus
-  rapide et ne déclenche aucun prompt. Réserver `awk` en Bash aux cas où aucun outil natif ne
-  convient, et **une seule invocation par commande Bash**.
-- Supprimer, déplacer ou désindexer automatiquement un artefact, même temporaire : l'outil doit
-  seulement le détecter et signaler son chemin ; le nettoyage est une action humaine explicite.
-- Élargir le scope au-delà de la tâche : signaler, ne pas décider
-- Annoncer « terminé » sans les preuves ci-dessus
-
-
----
-
-## Rôle du reviewer (revue read-only)
-
-Vérifier **dans cet ordre** — l'intégration structurelle AVANT la logique métier, car c'est
-l'inversion inverse qui a laissé passer le bug :
-
-1. Liaison : instances déclarées/appelées au bon endroit, aucune orpheline, tâche cohérente
-2. Contrat FB et nommage
-3. Encapsulation : producteur unique, internes non traversés, pas de GVL-canal-caché
-4. Logique métier et sécurité (états, temporisations, fronts)
-5. Tests présents et exécutés
-
-Verdict : `BLOCK` / `MAJOR` / `MINOR` / `PASS`, avec fichier:ligne et preuve. Aucune édition.
+- `AGENTS.md` est la source commune ; charger les standards/specs applicables à la mission.
+- Sécurité machine : aucun essai ou forçage sur machine réelle sans autorisation et procédure
+  explicites. Ne jamais traiter un stub, un mock ou une simulation comme preuve terrain.
+- Aucune suppression, aucun déplacement et aucun nettoyage automatique d'artefacts ; suivre
+  `TOOLS/AGENT_WORKFLOW/docs/STRUCTURE_AND_CLEANUP.md`.
+- Ne pas committer ni pousser. Le responsable orchestre l'intégration et relit le diff réel.

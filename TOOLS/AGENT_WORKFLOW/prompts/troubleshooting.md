@@ -1,8 +1,9 @@
 # 🕵️ Méthode de Recherche de Blocage / Diagnostic (Excavatrice Dragage)
 
 > Prompt réutilisable pour diagnostiquer un blocage/bug dans le programme CODESYS.
-> L'agent NE PEUT PAS exécuter le PLC : il lit des variables de diagnostic et raisonne par arbre de décision.
-> Fiche de session : `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_<Sujet>_<AAAAMMJJ>.md` (depuis `TEMPLATE_Troubleshooting.md`).
+> Les accès au PLC dépendent de l'environnement et de l'autorisation de la mission. Ne pas supposer
+> qu'un agent peut piloter ou lire le runtime. Une fiche est créée seulement si elle aide au suivi,
+> à la reprise ou à la conservation de preuves.
 
 > 🧭 **Répartition (T150-A / T150-D)** : ce fichier est la **méthode détaillée de référence**.
 > Il est référencé par la source canonique `TOOLS/AGENT_WORKFLOW/skills/troubleshooting/SKILL.md`
@@ -10,38 +11,27 @@
 > (déclencheurs). **Une seule copie de la méthode** — ne pas dupliquer ce contenu ailleurs.
 > Garde-fou : `TOOLS/AGENT_WORKFLOW/scripts/check_skill_stubs.py` (G440).
 
-## 0. 🎯 ORIENTATION MÉTHODE (obligatoire au lancement — AUCUNE voie imposée)
+## 0. 🎯 Choisir la méthode selon les preuves
 
 > ⛔ **Aucune méthode n'est obligatoire.** Le débogage se fait **par discussion avec l'utilisateur**, en fonction des **données disponibles** et de la **facilité**, dès le début. L'agent n'impose pas une voie lourde (ajout de variable à `GVL_Troubleshooting`, test CI...) sans que ce soit adapté au cas.
 
-Afficher la **notice des méthodes possibles** pour que l'utilisateur voie les options et oriente (et commente ce qui a déjà été testé) :
-
-```
-🧭 Méthodes de débogage possibles :
-  [1] Snapshot PLC (GVL_Troubleshooting) — lecture de variables en simu/site
-  [2] Test CI ad hoc (_TROUBLESHOOTING/) — compiler un FB + vérifier une fonction
-  [3] Analyse statique déléguée (sous-agent trace la chaîne dans le code)
-  [4] Lecture trace CODESYS (variables internes d'un FB) par l'utilisateur
-  [5] Autre / combinaison
-```
-
-Puis poser la question d'orientation (adaptée au symptôme) :
-- Quelles **données sont déjà disponibles** (snapshot, trace, variables) ?
-- Quelle méthode est la **plus facile / rapide** dans ce cas précis ?
-- (option) Que voulez-vous que je **documente / que j'ai testé** jusqu'ici, pour vos commentaires ?
-
-➡️ L'agent suit l'orientation choisie, peut combiner plusieurs méthodes, et documente dans la fiche **ce qui a été testé** (journal) pour que l'utilisateur puisse commenter.
+Commencer par les données déjà disponibles et l'analyse statique à faible coût. Choisir la mesure
+qui départage les hypothèses ; ne demander une orientation que si plusieurs voies plausibles ont
+des conséquences différentes pour l'utilisateur. Ne pas afficher le menu complet par défaut.
 
 ## 0bis-A. 📥 ACQUISITION DES VALEURS (canal)
 
 > **Comment l'agent obtient les valeurs du PLC sans l'exécuter.**
 
-- **Canal unique = snapshot CSV** du script `codesys_snapshot_troubleshooting.py` (lit `troubleshooting_variables.txt`). **Jamais de lecture Watch variable par variable.**
+- Si une acquisition live est nécessaire et autorisée, privilégier le snapshot CSV existant
+  (`codesys_snapshot_troubleshooting.py`, `troubleshooting_variables.txt`) quand il couvre les
+  variables utiles. Un autre canal existant peut convenir si le contrat le prévoit.
 - **Règle de vérification avant demande** : pour chaque variable de décision, **vérifier d'abord** qu'elle est :
   1. implémentée dans `GVL_Troubleshooting` (grep `CODE/J_SUPERVISION/GVL_Troubleshooting.st` + types `_TYPES/ST_*.st` + câblage `FB_TroubleshootingView.st`) ;
   2. présente dans la liste du script `TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_variables.txt`.
-- **Si présente** dans les deux → demander **un seul snapshot** (« lance `Ctrl+W` / `execfile(codesys_snapshot_troubleshooting.py)` et renvoie le CSV »).
-- **Si manquante** → **ne pas demander de valeur live** : proposer d'ajouter la variable dans `GVL_Troubleshooting`, régénérer la liste (`generate_variable_list_from_code.py`), **validation humaine**, puis compiler + snapshot.
+- **Si présente** dans les deux → demander un snapshot uniquement si les valeurs changent le verdict.
+- **Si manquante** → ne pas inventer de valeur ni de mesure ; signaler l'observabilité manquante et
+  proposer l'ajout seulement si cette mesure est nécessaire à la décision.
 - ⚠️ Si la cause exige > 2-3 structures → le troubleshooting est **mal conçu** OU il faut **créer une structure dédiée** à ce type de problématique. Le signaler.
 - 🚫 **Ne JAMAIS se baser sur `Device.export`** (souvent périmé). Sources fiables : `CODE/*.st` + `GVL_Troubleshooting` (via snapshot).
 
@@ -65,7 +55,8 @@ Démarche :
 4. **Preuve** : PASS prouve le comportement attendu ; FAIL donne le message d'assertion exact (valeur attendue vs obtenue).
 
 Règles :
-- **⚠️ Dossier jetable** : nettoyer `RESULTS/_TROUBLESHOOTING/` après chaque dépannage (ne pas commiter les tests ad hoc).
+- Les tests ad hoc et rapports sont des artefacts à tracer selon T279 ; aucun nettoyage ou retrait
+  automatique. Déclarer clairement leur portée et ne pas les présenter comme une validation terrain.
 - ⚠️ Dans le runner CI, **chaque appel `fb(...)` = 1 scan** (10ms) : `ADVANCE_TIME` avance le temps simulé mais ne fait **pas** tourner le FB — pour simuler N ms il faut **N/CycleTimeS appels** (ex. 1.6s @10ms = 160 appels), ou tester à l'échelle d'un scan.
 
 ## 1. 🧊 CONTEXTE FIGÉ (à remplir UNE fois selon la situation)
@@ -82,7 +73,7 @@ Règles :
 
 **Acquis :** simulation active / matériel réel · référencement fait · 2 bits posés · toute autre valeur = défaut.
 
-## 2. 🧩 INDICES UTILISATEUR / HISTORIQUE (avant l'arbre, 6 questions max)
+## 2. 🧩 Indices et historique
 
 | # | Question | Pourquoi |
 |---|---|---|
@@ -93,7 +84,11 @@ Règles :
 | 5 | Conditions d'apparition (mode, charge, position) ? | Révèle le gating |
 | 6 | Alarmes / historique d'alarmes ? | Cause souvent déjà nommée |
 
-**Force des preuves** : 🟢 lecture de variable = forte · 🟡 rapport opérateur = faible (à confirmer) · 🔴 inférence = la plus faible (jamais seule).
+Utiliser les informations déjà fournies. Poser seulement les questions sans réponse qui changent
+le périmètre ou le verdict ; ne pas rejouer une liste de questions complète.
+
+**Force des preuves** : les valeurs/mesures directes sont plus fortes que les observations rapportées ;
+une inférence seule ne confirme jamais une cause.
 
 ## 3. 🧭 PHASE 0 — Caractériser le symptôme (avant tout arbre)
 
@@ -204,7 +199,7 @@ TRACE_INVERSE(S):
 - Ne pas re-demander le contexte figé (§1).
 - Distinguer **FAIT / HYPOTHÈSE / INCERTITUDE**.
 - Lire dans `GVL_Troubleshooting` (lecture seule), **jamais forcer**.
-- **Ne pas modifier le code** sans validation humaine.
+- **Ne pas modifier le code, forcer une variable ou piloter un runtime** sans autorisation explicite.
 - Cause racine **prouvée par lecture**, jamais par inférence seule.
 - 🚫 **Ne JAMAIS se baser sur `Device.export`** : cet export est mis à jour au bon vouloir humain,
   il est **souvent périmé** et induit des conclusions fausses. Sources fiables = `CODE/*.st`

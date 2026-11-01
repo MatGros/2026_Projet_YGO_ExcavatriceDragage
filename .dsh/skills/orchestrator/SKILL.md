@@ -13,4 +13,4 @@ Déclencheur DSH pour la skill **orchestrator** (pilotage du projet).
 > Cette source est l'**unique** exemplaire de la méthode (zéro duplication, cf. `AGENTS.md`).
 > Ne copier/dupliquer **jamais** son contenu dans ce fichier.
 
-Charge le fichier canonique ci-dessus, puis applique sa procédure (bannière 🎯, usage TASKS.yaml + TASKS_ORCHESTRATOR.yaml, délégation, revue indépendante).
+Charge le fichier canonique ci-dessus. Applique la procédure au rôle, au risque et au périmètre de la mission.

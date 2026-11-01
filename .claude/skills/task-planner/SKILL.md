@@ -1,6 +1,6 @@
 ---
 name: task-planner
-description: Gestion et pilotage des tâches du projet (DOC/WFLOW/TASKS.yaml et CONTRACTS/). Déclencher dès que l'utilisateur ou un agent veut consulter, ajouter, verrouiller (lock), mettre à jour l'état (statut/horodatage), ou clore une tâche de développement. Assure la synchronisation avec Data Preview et garantit zéro écrasement.
+description: Lecture et gestion du catalogue DOC/WFLOW/TASKS.yaml et des contrats. Déclencher quand l'utilisateur demande l'état des tâches ou qu'un coordinateur doit attribuer/verrouiller/mettre à jour une tâche. Seul le coordinateur désigné écrit dans le catalogue partagé.
 ---
 
 # 🗂️ Skill Task-Planner (stub — déclencheur)
@@ -13,4 +13,4 @@ Déclencheur Claude Code pour la skill **task-planner** (catalogue des tâches &
 > Cette source est l'**unique** exemplaire de la méthode (zéro duplication, cf. `AGENTS.md`).
 > Ne copier/dupliquer **jamais** son contenu dans ce fichier.
 
-Charge le fichier canonique ci-dessus, puis applique sa procédure (bannière 🗂️, lock/unlock, horodatage compact, contrats de tâches).
+Charge le fichier canonique ci-dessus, puis applique sa procédure au rôle concerné.
