@@ -21,7 +21,23 @@ Au déclenchement, afficher :
 | 🔒 `work_locks` | tâche attribuée à un acteur jusqu'à sa remise |
 | 🚩 `edit_flags` | édition temporaire d'une tâche précise |
 
-## Protocole obligatoire avant toute écriture dans TASKS.yaml
+## Protocole de responsabilité
+
+Le catalogue global n'est pas un fichier de travail partagé par tous les agents. Pour chaque
+mission, **un orchestrateur/coordinateur désigné** en est l'unique éditeur et pilote les verrous
+globaux. Le registre d'orchestration est facultatif et réservé aux délégations longues ou suivis
+qui apportent une information absente du catalogue/contrat. Il édite par l'IHM Task Manager ou ses
+endpoints serveur existants, jamais par une modification directe du YAML.
+
+- L'exécutant délégué ne s'attribue pas la tâche et ne modifie pas `TASKS.yaml`, `TASK_LOCKS.json`
+  ni `TASKS_ORCHESTRATOR.yaml` par défaut. Il rend son état et ses preuves au coordinateur.
+- Le reviewer/challenger est en lecture seule.
+- Sans coordinateur désigné, ne pas modifier le suivi global : demander au responsable de nommer
+  un coordinateur. L'absence d'orchestrateur ne donne pas automatiquement le droit d'écriture.
+- Si le responsable de la tâche est lui-même l'unique agent actif, il peut tenir le rôle de
+  coordinateur si ce rôle lui est explicitement attribué dans le brief.
+
+## Protocole obligatoire pour le coordinateur avant toute écriture dans TASKS.yaml
 
 1. Lire `DOC/WFLOW/TASK_LOCKS.json` et la tâche cible.
 2. Si un 🚩 appartient à un autre acteur : **STOP**, aucune écriture.
@@ -32,7 +48,12 @@ Au déclenchement, afficher :
 
 Le 🔒 reste jusqu'à la remise réelle du travail. La RAZ IHM ne supprime que les 🚩.
 
-Les commandes et outils éventuels sont optionnels : la procédure prime. L'agent ne contourne jamais un 🚩 déjà posé par un autre acteur.
+`TOOLS/TASK_MANAGER/task_lock.py` est un client facultatif des opérations de verrou/flag ; il ne
+valide pas les fiches et ne remplace pas l'enregistrement d'une tâche par l'IHM/API. Ne pas créer
+de scripts de validation ou de prise en parallèle. Cette répartition des rôles est procédurale :
+le serveur vérifie le flag d'édition et la révision, mais son endpoint de sauvegarde ne vérifie pas
+que l'acteur détient le `work_lock`. Ne pas présenter le cadenas de travail comme un contrôle d'accès
+technique. Ne jamais contourner un 🚩 d'un autre acteur.
 
 ## Règles catalogue
 

@@ -288,14 +288,14 @@ def test_campaign_raw_fallback(tmp_path: Path) -> None:
     et protegeaient donc le defaut de decalage statements/preuves du repli.
     """
     root = Path(__file__).resolve().parents[3]
-    names = (
-        "TASK_CONTRACT_T130.yaml",
-        "TASK_CONTRACT_T137.yaml",
-        "TASK_CONTRACT_T151_NETTOYAGE_PI_CODING.yaml",
-        "TASK_CONTRACT_T152A_BANNERFORMATTER_STYLE.yaml",
-        "TASK_CONTRACT_T152B_REGIONS_PREFIXE.yaml",
-        "TASK_CONTRACT_T152C_VOCABULAIRE_ABANDONNE.yaml",
+    # Keep this campaign tied to active contracts. The former T130/T137/T15x
+    # fixtures were archived/removed and made the regression test fail before
+    # the parser was exercised.
+    candidates = (
+            "TASK_CONTRACT_T426.yaml",
     )
+    names = tuple(name for name in candidates if (root / "DOC" / "WFLOW" / "CONTRACTS" / name).is_file())
+    assert names, "No current contract fixture available for raw fallback campaign"
     for name in names:
         result = run(
             root / "DOC" / "WFLOW" / "CONTRACTS" / name,

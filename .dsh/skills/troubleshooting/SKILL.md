@@ -1,6 +1,6 @@
 ---
 name: troubleshooting
-description: Recherche de blocage / diagnostic de panne dans le programme CODESYS. Déclencher dès que l'utilisateur demande de chercher un blocage, une panne, un bug, « pourquoi ça bloque », « pourquoi ça ne marche pas », un diagnostic, ou un troubleshooting. Crée une fiche de session dans DOC/WFLOW/TROUBLESHOOTING/ et applique la méthode d'arbre de décision + traçage inverse.
+description: Diagnostic d'un incident ou d'un comportement inattendu dans le programme CODESYS. Charger la méthode canonique quand l'utilisateur demande une analyse causale. Une fiche durable est créée si elle sert au suivi, à la reprise ou à la conservation des preuves.
 ---
 
 # 🕵️ Skill Troubleshooting (stub — déclencheur)
@@ -12,5 +12,4 @@ Déclencheur DSH pour cette skill **troubleshooting** (recherche de blocage CODE
 > Cette source est l'**unique** exemplaire de la méthode (zéro duplication, cf. `AGENTS.md`).
 > Ne **jamais** dupliquer son contenu ici.
 
-Charge le fichier canonique ci-dessus, puis applique sa méthode (fiche de session, arbre des
-causes, snapshot, test CI ad hoc, traçage inverse).
+Charge le fichier canonique ci-dessus et choisis les étapes adaptées aux preuves et au périmètre.

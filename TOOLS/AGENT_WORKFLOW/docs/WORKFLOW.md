@@ -1,17 +1,16 @@
 # Workflow agents CODESYS
 
-## Flux obligatoire
+## Flux commun — adapter les artefacts au risque et au livrable
 
 ```text
-Entrée (CODE_CHANGE ou NEW_INFORMATION)
-→ 📚 Prise de connaissance (AF + état d'ensemble du programme) — AVANT de planifier
-→ 🏷️ Qualification criticité C0-C4 (orchestrateur propose → humain valide)
-→ 🔀 Stratégie patch / rebuild (orchestrateur propose → humain valide)
-→ voie adaptée (Fast / Standard / Safety)
-→ 📝 CONTRAT DE TÂCHE : objectifs testables (obligatoire dès C2)
-→ artefacts obligatoires selon voie
-→ avis read-only si requis → **arrêt : validation humaine du plan** → modification → gates → rapport → traçabilité
+Demande → rôle et périmètre → références pertinentes → objectifs/vérifications adaptés au risque
+→ autorisation requise par la tâche → exécution → preuve → restitution et mise à jour du suivi utile
 ```
+
+Ne pas imposer la lecture de l'ensemble du programme, un nouveau document ou un avis d'agent
+lorsqu'ils ne changent pas l'action ni le verdict. Les règles sécurité et les points d'arrêt C4
+restent obligatoires. Un document de tâche sert de fiche courante ; les annexes sont ajoutées
+seulement si un contenu ne tient pas clairement dedans ou doit être réutilisé séparément.
 
 ## 🧭 Deux axes indépendants — ne pas les confondre
 
@@ -61,7 +60,7 @@ En cas d'hésitation → **patch par défaut** : il est réversible, le rebuild 
 Rédigé par l'**orchestrateur**, **avant** toute écriture ou délégation. Obligatoire dès **C2**.
 
 - Gabarit : `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`
-- Emplacement : section `contract:` du `TASK_CONTEXT.yaml` de la tâche
+- Emplacement canonique : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_<id>.yaml`, référencé depuis `TASKS.yaml`
 - Contrôle : `python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>`
 
 Il porte : objectif métier · **critères testables** (chacun avec son `verified_by`) · périmètre
@@ -75,9 +74,8 @@ devoir d'alerte.
 `check_task_contract.py` contrôle ces critères **dans le contrat** (T8), avant toute
 écriture. `G310_check_code_structure.py` contrôle ensuite leur réalité dans le code et le bundle.
 
-🔁 **Il traverse les trois runtimes** — c'est son intérêt principal : les hooks ne couvrent que
-l'orchestrateur Claude Code, le contrat s'applique aussi aux sous-agents (ses critères
-remplacent le boilerplate de l'*acceptance contract*) et aux agents externes.
+🔁 Le contrat est un artefact lisible par tous les runtimes. Les hooks, quand ils existent, sont
+spécifiques à leur outil et ne remplacent ni le contrat ni une revue de pertinence.
 
 ## 🔀 3 Voies selon criticité
 
@@ -85,7 +83,7 @@ remplacent le boilerplate de l'*acceptance contract*) et aux agents externes.
 > Typo, renommage, doc, param mineur, refactor sans impact safety.
 
 ```text
-hook PreToolUse (bloque si specs non lues) → Plan → **validation humaine** → Code → Gates → ✅
+Besoin cadré → action proportionnée → vérification adaptée → restitution concise
 ```
 - Pas de multi-modèle, pas de REGISTRE, pas de revue complémentaire.
 - Gate 5 (compilation CODESYS) optionnel.
@@ -94,38 +92,33 @@ hook PreToolUse (bloque si specs non lues) → Plan → **validation humaine** �
 > Nouveau FB, évolution feature, mouvement/interlock.
 
 ```text
-hook PreToolUse (bloque si specs non lues)
-→ CONTRAT DE TÂCHE (obligatoire)
-→ REGISTRE_ACTIONS (proposé par l'orchestrateur)
-→ TASK_CONTEXT.yaml (proposé par l'orchestrateur)
-→ 0 ou 1 avis d'agent natif ciblé (antigravity/Codex/fork Claude Code, read-only)
-→ Plan → **validation humaine obligatoire** → Code → Gates → hook Stop
-→ revue complémentaire seulement si anomalie ou demande humaine
-→ ✅ Rapport
+Contrat ciblé → plan et autorisations → exécution → contrôles correspondant aux critères → restitution
 ```
-- REGISTRE et TASK_CONTEXT proposés, non bloquants si refusés.
-- 1 seul agent en revue (pas de double).
+- Le contrat est requis dès C2. Un registre ou `TASK_CONTEXT.yaml` n'est ajouté que si le suivi
+  apporte une information qui ne tient pas déjà au contrat et au catalogue.
+- Une revue indépendante est choisie selon le risque, un contrat, une anomalie ou une demande
+  explicite ; elle n'est pas un rituel après chaque sous-tâche.
+- Après un GO explicite sur un plan, l'exécutant peut terminer le périmètre approuvé sans demander
+  une autorisation à chaque édition. Extension de périmètre, action externe, commit/push ou étape
+  explicitement réservée restent hors de ce GO.
 
 ### 🔴 Safety Lane — C4 (et C3 safety détectée)
 > AU, PowerCutOff, SafeStop, frein, contacteur, redondance, homing safety, FAT/SAT.
 
 ```text
 hook PreToolUse (bloque si specs non lues)
-→ CONTRAT DE TÂCHE (obligatoire)
-→ REGISTRE_ACTIONS (obligatoire)
-→ TASK_CONTEXT.yaml (obligatoire)
-→ TEST_DESIGN.md (obligatoire)
+→ CONTRAT DE TÂCHE unique (obligatoire ; inclut critères, risques et approche de test)
 → ⚠️ ALERTE RISQUES explicite
 → 🔴 DOUBLE AVIS AGENTS NATIFS PARALLÈLES A/B (ex. antigravity + Codex, read-only, même contexte, sans se voir)
 → synthèse : consensus ✅ / divergence 🚨
-→ **validation humaine obligatoire : artefacts + plan + décision safety**
+→ **validation humaine obligatoire : contrat, plan et décision safety**
 → Code ST (High Effort, un seul exécutant)
 → Gates → hook Stop (bloque si liaison rouge) → CODESYS import → simulation CODESYS manuelle → Terrain
 ```
 
 ## 🔴 Règle Double Revue Parallèle (C4)
 
-- **Scope** : TEST_DESIGN, ST généré, toute revue safety C4.
+- **Scope** : revue du contrat et du plan, puis du ST généré ou du livrable safety C4.
 - **Méthode B — Parallèle** : les 2 agents reçoivent **exactement le même contexte**, sans connaissance du résultat de l'autre.
 - **Résultat** :
   - Consensus (aucun blocage contradictoire) → synthèse présentée à l'humain.
@@ -133,31 +126,36 @@ hook PreToolUse (bloque si specs non lues)
 - **Les agents ne commitent pas et ne modifient pas le code.**
 - Ponytail interdit sur toute analyse safety.
 
+Un fichier `TEST_DESIGN.md` ou `TASK_CONTEXT.yaml` séparé n'est ajouté que si le volume ou la
+structure du contenu empêche de le maintenir lisiblement dans le contrat. Le registre ne duplique
+pas la tâche : il suit seulement une coordination ou délégation qui mérite un état séparé.
+
 ## 🏷️ Qualification criticité
 
-L'orchestrateur qualifie et propose, l'humain valide en 1 mot.
+L'orchestrateur qualifie. Une validation humaine est demandée aux points d'arrêt prévus par la
+criticité, le contrat ou la sécurité ; elle n'est pas un rituel pour les tâches simples.
 
 | Niveau | Exemple | Artefacts |
 |---|---|---|
-| C0 | format, typo | aucun |
-| C1 | doc non-safety | aucun |
-| C2 | code métier | REGISTRE + TASK_CONTEXT (proposés) |
-| C3 | mouvement/interlock | REGISTRE + TASK_CONTEXT + TEST_DESIGN (proposés) |
-| C4 | safety critique | REGISTRE + TASK_CONTEXT + TEST_DESIGN (obligatoires) + alerte risques |
+| C0 | format, typo | Aucun artefact ; vérification simple |
+| C1 | documentation non-safety | Aucun artefact par défaut ; revue seulement si utile au livrable |
+| C2 | code métier | Contrat avec critères vérifiables ; registre si coordination utile |
+| C3 | mouvement/interlock | Contrat avec preuves/tests ; revue selon risque, anomalie ou demande |
+| C4 | safety critique | Contrat, alertes, revue A/B et décision humaine ; annexe si nécessaire |
 
 ## Règles générales
 
-- 🎯 **L'orchestrateur reste propriétaire du résultat** : task manager, test manager, phasage,
-  arbitrage des scopes, lecture du `git diff` réel et acceptation finale. Il délègue en priorité
+- 🎯 **L'orchestrateur désigné reste propriétaire du résultat** : phasage, arbitrage des scopes,
+  lecture du `git diff` réel et acceptation finale. Les droits Task Manager sont définis dans la
+  skill canonique `skills/task-planner/SKILL.md`. Il délègue en priorité
   les investigations longues/répétitives et les revues indépendantes, pas sa responsabilité.
 - 🛠️ **Un responsable principal et un seul écrivain par scope de fichiers.** Le responsable peut
   solliciter des spécialistes pour challenger son plan ou relire son diff ; ces reviewers restent
   read-only. Procédure C3/C4 :
   `TOOLS/AGENT_WORKFLOW/skills/orchestrator/references/delegation_c3_c4.md`.
-- 📌 **Tout sous-agent (fork Claude Code, Codex, antigravity) reçoit
-  `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` en tête de sa tâche.** Un sous-agent
-  démarre froid : sans ce préambule il ne connaît ni les règles, ni les cas d'arrêt, ni la
-  vérification de liaison — c'est ce qui a laissé passer le bug `PRG_10_Outputs_LD`.
+- 📌 Toute délégation significative reçoit un brief basé sur
+  `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md`, complété avec demande d'origine, contexte,
+  preuves, critères mesurables, rôle, périmètre, permissions, alertes attendues et auto-revue.
 - 🤖 **Aucun lot n'est restitué sans `G200_check_linkage.py --report`.** Bundle généré et tests Python
   verts ne prouvent jamais qu'une fonction est reliée.
 - `TOOLS/` reste séparé de `DOC/` et `CODE/`.
@@ -168,22 +166,24 @@ L'orchestrateur qualifie et propose, l'humain valide en 1 mot.
 - Aucun commit automatique — validation humaine obligatoire.
 - Toute modification safety exige une validation humaine.
 - Ponytail est interdit dès qu'un sujet safety, norme ou redondance est détecté.
-- Les avis passent par des agents natifs (antigravity, Codex, forks Claude Code) et restent
-  read-only. Ils sont toujours attendus, lus et synthétisés avant le plan ; aucun avis n'est
-  lancé en arrière-plan sans être relu.
+- Les reviewers restent read-only. Un avis indépendant est lancé quand le risque ou la valeur
+  discriminante le justifie ; tout avis lancé est lu et synthétisé avant de conclure.
 
 ## 🕵️ Diagnostic / Recherche de blocage
 
 > Déclenché par « cherche le blocage », « pourquoi ça bloque », « diagnostic », « troubleshooting ».
 > Skill : `.claude/skills/troubleshooting/SKILL.md` · Méthode : `TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md`
-> Fiches : `DOC/WFLOW/TROUBLESHOOTING/` (gabarit `TEMPLATE_Troubleshooting.md`).
+> Fiches utiles : `DOC/WFLOW/TROUBLESHOOTING/` (gabarit existant).
 
-1. **Créer/mettre à jour la fiche** `TROUBLESHOOTING_<Sujet>_<AAAA-MM-JJ>.md` (contexte figé, symptôme, indices, arbre d'hypothèses, journal).
-2. **Contexte figé** : lire la fiche existante ; ne re-pose pas les questions (banc/site, mode, bits, référencement).
-3. **Méthode** : caractériser le symptôme → arbre des causes (6 catégories) → traçage inverse → élimination par **preuve** (lecture `GVL_Troubleshooting`, jamais forcer).
+1. Créer/mettre à jour une fiche si l'investigation est multi-étapes, récurrente, déléguée,
+   safety-related ou si une preuve durable est nécessaire ; sinon répondre directement.
+2. Lire les éléments disponibles. Demander seulement les données absentes qui changent la
+   décision ; poursuivre en parallèle toute analyse indépendante.
+3. **Méthode** : caractériser le symptôme → arbre des causes utile au cas → traçage inverse →
+   élimination par preuve (lecture `GVL_Troubleshooting` lorsque pertinent, jamais forcer).
 4. **Critère d'arrêt** : cause racine prouvée, ou frontière au-delà du PLC, ou étape suivante = modifier/forcer → **hand-off humain**.
 5. **Règle `fix:` + `guard:`** : toute cause racine confirmée donne correction **et** garde-fou (cf. double boucle ci-dessous).
-6. **Ne jamais modifier le code ni forcer une variable sans validation humaine.**
+6. **Ne jamais modifier le code ni forcer une variable sans autorisation et procédure explicites.**
 
 ## 🔄 Règle d'apprentissage continu (Double boucle)
 
@@ -233,19 +233,17 @@ Commit unique : fix + guard ensemble
 
 | Niveau | Exemple | Traitement |
 |---|---|---|
-| C0 | format, typo | contrôle simple |
-| C1 | documentation non-safety | modèle économique + review |
-| C2 | code métier | modèle code + tests |
-| C3 | mouvement/interlock | modèle fort + review read-only |
-| C4 | AU, PowerCutOff, redondance | plan humain obligatoire, Ponytail interdit |
+| C0 | format, typo | aucun artefact ; contrôle ciblé |
+| C1 | documentation non-safety | aucun artefact/review par défaut ; contrôle selon le livrable |
+| C2 | code métier | contrat avec critères vérifiables et tests adaptés |
+| C3 | mouvement/interlock | preuves/tests ciblés ; revue selon risque, contrat ou anomalie |
+| C4 | AU, PowerCutOff, redondance | contrat, revue A/B, plan et décision humaine ; Ponytail interdit |
 
 ---
 
-## 🛡️ Stratégie de commits en 2 temps (Checkpoint / WIP)
+## 🛡️ Commits — accord humain explicite
 
-Pour sécuriser l'historique sans risquer de blocage ou de perte lors de phases de tests ou d'analyses :
-1. **Étape 1 — Sauvegarde immédiate (WIP)** : Dès qu'une modification de code ou de configuration est achevée, effectuer un commit de checkpoint :
-   `wip(scope): <description> [NON TESTE]`
-2. **Étape 2 — Validation & Rapports** : Exécution des tests CI / gates mécaniques et mise à jour des artefacts de rapport (`.html`, `.json`, `.st`, dashboard).
-3. **Étape 3 — Validation finale** : Dès que les tests sont 100% verts :
-   `test(scope): validation CI 100% PASS et mise a jour des rapports`
+Aucun commit n'est automatique : appliquer la règle d'`AGENTS.md` et obtenir un accord humain
+explicite avant tout commit. Si l'accord est donné, un checkpoint `wip(scope): ... [NON TESTE]`
+peut précéder des tests longs ; après validation, un commit final peut enregistrer les résultats.
+Sans accord, laisser le travail dans le checkout et restituer le diff, les vérifications et l'état.

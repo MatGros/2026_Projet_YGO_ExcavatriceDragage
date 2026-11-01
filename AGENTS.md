@@ -8,60 +8,27 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 
 ---
 
-## 🎬 Démarrage de session — briefing obligatoire
+## 🧭 Démarrage — consignes selon la demande
 
-> Concerne **tout agent** (Claude Code, Codex, Antigravity, autre) et tout humain qui reprend le projet —
-> `AGENTS.md` est la source unique commune à tous les outils.
+Lire ce fichier comme source commune des règles. Identifier le rôle attendu (orchestrateur,
+exécutant délégué ou reviewer), le résultat demandé et le périmètre avant d'agir. Ne pas dérouler
+un briefing complet, un inventaire du dépôt ou un menu d'options sans utilité pour la demande.
 
-**Déclenchement** : automatique au 1er message de toute session sur ce repo. Rejouable à la
-demande à tout moment (« rappelle-moi le briefing workflow » ou équivalent) — même séquence.
+**Références à charger selon le besoin :**
 
-**Séquence de Restitution Obligatoire :**
-0. **Afficher immédiatement la bannière de briefing** (format standard, gabarit
-   `DOC/WFLOW/TEMPLATE/SKILL_BANNER_TEMPLATE.md`) :
-   ```text
-   ============================================================
-   🎬 BRIEFING SESSION WORKFLOW PROJET / AGENTS.MD ACTIF
-   ============================================================
-   ```
-   Puis 1 ligne : *« Briefing session <projet> — reprise par <agent> »*.
+| Besoin | Référence à charger |
+|---|---|
+| Pilotage ou délégation | `TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md` |
+| Édition du catalogue des tâches | `TOOLS/AGENT_WORKFLOW/skills/task-planner/SKILL.md` |
+| Diagnostic d'un incident | `TOOLS/AGENT_WORKFLOW/skills/troubleshooting/SKILL.md` |
+| Changement CODESYS/ST | Standards, architecture et spécification métier concernés |
+| Autre demande | Seulement les règles et fichiers directement pertinents |
 
-1. **Restituer le tableau des 2 skills actives du projet** :
-   - `task-planner` : Pilotage catalogue `TASKS.yaml` & contrats `CONTRACTS/` · Déclencheur : « planifie tâche », « état des tâches », « tasks ».
-   - `troubleshooting` : Diagnostic formel, arbre de causes & traçage inverse · Déclencheur : « cherche le blocage », « diagnostic », « panne ».
+### Gestion du Task Manager
 
-2. **Snapshot rapide de [DOC/WFLOW/TASKS.yaml](DOC/WFLOW/TASKS.yaml)** : nombre de tâches
-   verrouillées 🔒 / en cours ⏳ / à faire ⬜.
-
-3. **Preuve de repérage des 3 piliers projet (Niveau 1 — systématique)** :
-   - 📐 **Standards & Guides (`DOC/STDS/`)** : `CODE_QUALITY_STANDARDS.md` (POO, encapsulation), `NAMING_CONVENTION.md` (PascalCase, NC-010..080, zéro Ref pour consignes), guides (`GUIDE_GATES_ET_TESTS`, `GUIDE_SEQUENCEUR`, `GUIDE_IDE_CODESYS`, `GUIDE_TEST_HEADLESS_CODESYS`).
-   - 🏗️ **Architecture & Specs (`DOC/AF/` & `CODE/`)** : Architecture 7 POU (`PRG_02_Acquisition` ➔ `PRG_07_Supervision`, tâches 4ms/20ms/10ms), Fondations (AF01-03), Transverses (AF04-06), Métiers (AF08-14).
-   - 🛠️ **Outillage CI/CD & Validation mécanique (`TOOLS/`)** : Bundle PLCopenXML (`generate_codesys_bundle.py`), Vérification liaison bloquante (`G200_check_linkage.py`), Suite de 21 Gates (`run_all_gates.py`), Tests unitaires CI (`TOOLS/TEST_AUTO_CI/`).
-
-4. **Diagramme du Workflow Standard d'Implémentation** :
-   ```text
-   1. Cadrage & Tâche (ID, criticité C0-C4, stratégie Patch / Rebuild)
-      ↓
-   2. Contrat de tâche (Objectifs testables, scope, critères d'acceptation — obligatoire dès C2)
-      ↓
-   3. Plan technique & Validation humaine (Arrêt obligatoire avant de toucher au code)
-      ↓
-   4. Implémentation ST (Respect AF_Partie-02/03 + NAMING_CONVENTION)
-      ↓
-   5. Gates mécaniques bloquants (G200 Liaison, G310 Structure, Bundle XML, 21 Gates)
-      ↓
-   6. Restitution (Bandeau de conformité + intégration CODESYS manuelle par tes soins)
-   ```
-
-5. **Cas pratique & Justification de conception (Niveau 2 — Anti-Récitation)** :
-   - L'agent ne doit jamais réciter des phrases génériques apprises par cœur.
-   - Sur toute question de nommage, d'architecture ou de variable, il doit **justifier son cheminement technique** : citer la règle exacte (`NC-xxx`), nommer la documentation source (`NAMING_CONVENTION.md`, `AF_Partie-xx`), et expliquer la sémantique de la chaîne (`Req` ➔ `Tgt` ➔ `Cmd` ➔ `Act`).
-
-6. **Proposer les options d'action réelles (Menu de démarrage)** :
-   - 🔹 **Option 1 : Tâche du catalogue (`task-planner`)** — Sélectionner et verrouiller une tâche existante de `TASKS.yaml`.
-   - 🔹 **Option 2 : Dépannage / Diagnostic (`troubleshooting`)** — Lancer une analyse causale structurée sur un blocage ou un comportement inattendu.
-   - 🔹 **Option 3 : Cadrer un nouveau besoin / refactor** — Qualifier la criticité (C1..C4), rédiger le contrat `TASK_CONTRACT_*.yaml` et planifier.
-   - 🔹 **Option 4 : Contrôle outillage & Gates** — Exécuter la suite complète des 21 gates (`run_all_gates.py`) ou un audit mécanique spécifique.
+Règle canonique des rôles et droits d'écriture :
+`TOOLS/AGENT_WORKFLOW/skills/task-planner/SKILL.md`. Le Task Manager partagé reste l'unique suivi ;
+ne pas créer de fichier local ou de script de prise de tâche parallèle.
 
 ---
 
@@ -132,25 +99,27 @@ Les agents interviennent avec la posture d'un **Expert Senior en Automatisme Ind
 
 ---
 
-## 🤖 Auto-vérification obligatoire — avant d'annoncer un lot terminé
+## 🤖 Auto-vérification — proportionnée aux fichiers et critères modifiés
 
-> ⛔ Un bundle généré, des tests Python verts ou un XML bien formé **ne prouvent jamais**
+> ⛔ Pour tout lot touchant `CODE/` ou le bundle, un bundle généré, des tests Python verts ou un XML bien formé **ne prouvent jamais**
 > qu'une fonction est reliée au reste du programme. Le bug `PRG_10_Outputs_LD` a franchi tous
-> ces contrôles (REX 2026-07-29). Seul `G200_check_linkage.py` prouve le câblage réel.
+> ces contrôles (REX 2026-07-29) ; `G200_check_linkage.py` vérifie le câblage réel. Pour un lot
+> documentaire/outillage sans changement PLC, lancer les contrôles qui couvrent les critères touchés.
 
 ```powershell
+# Requis pour un lot touchant CODE/ ou le bundle :
 python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . # bundle PLCopenXML
 python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report    # liaison sur le bundle (BLOQUANT)
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C   # fin de lot (ou A/B/D, GUIDE_GATES_ET_TESTS §2)
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py              # TOUS les gates
 ```
 
-Le bloc `Auto-vérification liaison` produit par `--report` est **collé dans la restitution**.
-Sans lui, le lot est incomplet — quel que soit l'agent qui l'écrit.
+Pour un lot PLC, coller le bloc `Auto-vérification liaison` produit par `--report` dans la
+restitution. Pour les autres lots, nommer les contrôles pertinents et leur résultat.
 
 ### 📦 Diff bundle — import rapide en parallèle du bundle complet
 
-En **complément systématique** du bundle complet (jamais un remplacement), générer aussi un
+En **complément** du bundle complet (jamais un remplacement), générer aussi un
 diff bundle ne contenant que les objets touchés par le lot — import CODESYS bien plus rapide
 pour l'utilisateur pendant l'itération :
 
@@ -163,8 +132,8 @@ Accepte des chemins `.st` ou des noms d'objet nus. Sortie fixe `CODE_XML/CODE_Di
 dispense **jamais** du bundle complet + `G200_check_linkage.py --report` avant de considérer un
 lot livré.
 
-📣 **Bandeau de restitution obligatoire** — l'agent affiche un bandeau clair à chaque étape,
-**y compris le diff bundle avec la liste des objets** :
+📣 **Bandeaux de restitution pour les lots PLC concernés** — afficher les résultats bundle,
+diff bundle et gates quand ces contrôles sont requis :
 
 ```text
 ========================================
@@ -217,12 +186,13 @@ valide de l'état actuel du projet.
 
 ## 📝 Contrat de tâche — obligatoire dès C2
 
-Avant toute écriture ou délégation, l'orchestrateur rédige les **objectifs testables** de la tâche.
+Pour une tâche C2 ou supérieure, avant écriture ou délégation, l'orchestrateur rédige les
+**objectifs testables** de la tâche. Les tâches C0/C1 gardent un cadrage léger adapté au livrable.
 Une vérification qui ne porte sur aucun objectif est creuse : sur 53 tâches déléguées, les critères
 étaient 3 phrases génériques (REX 2026-07-29).
 
 - Gabarit : `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`
-- Contrôle : `python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <TASK_CONTEXT.yaml>`
+- Contrôle : `python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_<id>.yaml`
 - Détail, axes patch/rebuild et séquence rebuild : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`
 
 🔁 **Règle `fix:` + `guard:`** : tout bug détecté donne **deux** livrables — la correction **et**
@@ -251,14 +221,12 @@ Workflow multi-agents et criticité C0–C4 : `TOOLS/AGENT_WORKFLOW/docs/WORKFLO
   ```
   Modèles locaux configurés : `deepseek-v4-flash:cloud` (défaut), `qwen3.8:27b`, `gemma4:e4b`. Le runner injecte automatiquement `subagent_preamble.md`.
 
-### 🛡️ Pattern de commit en 2 temps (Checkpoint & Sécurité)
+### 🛡️ Commits — autorisation humaine explicite
 
-Afin d'éviter toute perte de travail et d'avoir un point de retour immédiat :
-1. **Étape 1 — Sauvegarde immédiate (avant tests longs)** : Dès qu'une édition de code ou de configuration est achevée, effectuer un commit de checkpoint :
-   `wip(scope): <description> [NON TESTE]` (ou `wip: ... [WIP]`).
-2. **Étape 2 — Validation & Rapports** : Exécution des tests CI / gates mécaniques et génération des artefacts de rapport.
-3. **Étape 3 — Validation finale** : Dès que les tests sont validés :
-   `test(scope): validation CI 100% PASS et mise a jour des rapports`.
+Aucun commit n'est automatique. **Sans accord humain explicite, conserver le travail dans le
+checkout et restituer le diff et les vérifications.** Si l'accord de commit est donné, effectuer un
+checkpoint `wip(scope): ... [NON TESTE]` avant une validation longue, puis un commit final après
+les preuves. L'accord de commit n'autorise pas un push.
 
 ⚠️ **Aucun commit sans validation humaine explicite** — pour tout agent, sans exception.
 ⛔ **AUCUN PUSH DIRECT SUR MAIN SANS RELECTURE DE DIFF ET ACCORD EXPLICITE** : L'agent ne doit JAMAIS pousser sur `origin/main` sans avoir fait relire le `git diff` réel à l'humain/l'orchestrateur et sans confirmation explicite (« tu peux push » / « push »).
@@ -312,7 +280,7 @@ Toutes les specs dans **`DOC/`** — index complet et rôle de chaque document :
 
 - [VERSION_HISTORY](DOC/VERSION_HISTORY.md) — historique CODESYS ↔ DOC (une ligne par jalon)
 - [DSH_PROVIDERS](TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md) — 🔌 providers `omniroute` + `opencode-go` (glm-5.2, etc.) + Ollama local · délégation multi-modèles (workflow `provider`/`model`) · 🔄 redémarrage DSH après installation de plugin (`Stop-Process node`)
-- [PLAN_TASK](DOC/WFLOW/TASKS.yaml) & [TASKS.yaml](DOC/WFLOW/TASKS.yaml) — 🗂️ **pilotage des tâches & contrats** : skill `.claude/skills/task-planner/SKILL.md` (bannière `WORKFLOW TÂCHES / TASK-PLANNER ACTIF` au lancement, horodatage ISO 8601 `locked_at`/`updated_at`/`completed_at` obligatoire, nomenclature stricte du champ `agent` : `CC01`, `AGY01`, `CDX01`, `DSH01`, `OPC01`, `HUM` ou `—` — zéro libellé long, isolation `git worktree` et anti-destruction Git).
+- [TASKS.yaml](DOC/WFLOW/TASKS.yaml) — 🗂️ **catalogue et contrats** : skill `.claude/skills/task-planner/SKILL.md`. Le coordinateur désigné gère le catalogue et ses verrous ; les agents délégués rendent leur état au coordinateur.
 - [TROUBLESHOOTING](DOC/WFLOW/TROUBLESHOOTING/README.md) — 🕵️ **recherche de blocage / diagnostic** : skill
   `.dsh/skills/troubleshooting/SKILL.md` (DSH) & `.claude/skills/troubleshooting/SKILL.md` (Claude Code),
   méthode `TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md`, gabarit `TEMPLATE_Troubleshooting.md`,

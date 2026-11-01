@@ -68,6 +68,42 @@ contract:
 # ═══════════════════════════════════════════════════════════════════════════
 status: PENDING               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
 
+# Fiche courante unique T426 : compléter dans ce contrat, sans second journal parallèle.
+# Les champs ci-dessous sont préparatoires ; aucun hook bloquant n'est activé.
+tracking:
+  user_need: ""
+  useful_history: []          # Sources pertinentes et conclusions remplacées.
+  current_question: ""       # Information nouvelle recherchée et décision débloquée.
+  established: []            # Chaque acquis cite une preuve et sa portée.
+  unknowns: []               # Donnée manquante, impact et moyen de l'obtenir.
+  next_action: ""
+  owners:
+    accountable: ""
+    executor: ""
+    control_maintainer: ""
+  delegation:
+    required_workflows: []   # Chemin canonique et raison d'application.
+    permissions: []
+    forbidden_actions: []
+    measurable_deliverables: []
+    alert_conditions: []
+    self_review: []          # Liaison, preuve, effets de bord et limites.
+  stagnation:
+    threshold: 3             # Défaut 3 ; plage 2–5, tout changement exige justification préalable.
+    justification: ""
+    consecutive_uninformative: 0
+    blind_reviews: []        # A/B, contrats distincts ; pas d'accès réciproque avant remise.
+  experiments: []
+  # qualification=nominal exige source_identity=verified, substitutions_declared=true,
+  # build_required et cleanup_required explicitement true/false. Sinon utiliser exploratory.
+  # Une revue A/B exige deux reviewers distincts, deux fichiers de rapport distincts,
+  # independent=true, after_experiment=<id> et decision non vide. Le contenu reste a relire.
+  # Chaque entrée : id, question, prediction, discriminating_observation,
+  # decision_if_confirmed, decision_if_refuted, sources, substitutions,
+  # expected_cost, repeat_of, repeat_reason, result, evidence, information_gained, next_decision.
+  # Résultat : PASS / FAIL / INTERRUPTED / NOT_TESTED / CLEANUP_INCOMPLETE.
+  # Un test vert ne prouve que les critères couverts ; preuve absente = non vérifié.
+
 # ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
 execution:
   executed_by: "..."         # Ex: sonnet-5 (antigravity)

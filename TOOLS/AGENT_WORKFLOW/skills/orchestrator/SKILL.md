@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-description: Pilotage du projet en tant qu'orchestrateur — garant de la qualité, de la non-régression et de la délivrabilité rapide. Déclencher dès que l'utilisateur demande de piloter, coordonner, déléguer, challenger, suivre des agents/actions, valider une approche avant de coder, ou superviser la livraison d'un lot. Utilise DOC/WFLOW/TASKS.yaml (catalogue) et DOC/WFLOW/TASKS_ORCHESTRATOR.yaml (registre des agents/actions lancées).
+description: Pilotage d'une tâche ou d'un lot, coordination des agents, suivi du Task Manager et revue des preuves. Déclencher quand l'utilisateur demande de planifier, déléguer, challenger ou superviser une livraison.
 ---
 
 # 🎯 Skill Orchestrator — Pilotage du projet (Excavatrice Dragage)
@@ -15,7 +15,7 @@ modification de code.
 > | Fichier | Rôle | Contenu |
 > |---|---|---|
 > | `.claude/skills/orchestrator/SKILL.md` · `.dsh/skills/orchestrator/SKILL.md` | **Déclencheurs** (stub court) | front-matter de détection + pointeur → ce fichier. Zéro méthode. |
-> | `TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md` (ce fichier) | **Source canonique** — procédure exécutable | bannière + rôle + usage TASKS.yaml / TASKS_ORCHESTRATOR.yaml + outils + pattern de revue |
+> | `TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md` (ce fichier) | **Source canonique** — procédure exécutable | rôle + Task Manager + délégation proportionnée + vérification |
 >
 > Le **garde-fou** `TOOLS/AGENT_WORKFLOW/scripts/check_skill_stubs.py` (gate G440) vérifie que les
 > stubs pointent bien vers ce canonique et qu'aucune copie complète n'est dupliquée.
@@ -28,17 +28,18 @@ modification de code.
 explicite de la tâche et de son plan.** Tâche + plan validés → **GO** : l'orchestrateur exécute
 le lot en entier, sans s'arrêter à chaque édition.
 
-- **Avant le GO** : l'orchestrateur présente la tâche (contrat, périmètre, plan) et challenge
-  les propositions — pas de validation humaine = pas d'implémentation.
+- **Avant le GO** : présenter objectifs, périmètre et plan quand la voie de criticité ou le contrat
+  prévoit un point d'arrêt humain.
 - **Après le GO** : plus d'arrêt au fil de l'eau ; le lot roule jusqu'à sa restitution
-  (implémentation → gates mécaniques → revue indépendante → bandeau).
-- Jamais de code d'agent sans contrat clair ni revue indépendante ; la lecture du **`git diff`
+  (implémentation → contrôles adaptés → revue indépendante si requise → restitution).
+- Dès C2, pas d'implémentation sans contrat clair. La revue indépendante dépend de la criticité,
+  du contrat, d'une anomalie ou d'une demande ; la lecture du **`git diff`
   réel** reste à l'orchestrateur, **jamais** à l'agent qui a produit le code.
 - Les arrêts de validation prévus par un contrat/plan spécifique (ex. C0/C4, mentions
   « ARRÊT VALIDATION HUMAINE » dans TASKS.yaml) s'appliquent en plus — valider le plan,
   c'est accepter ses arrêts.
-- Les règles commit/push d'AGENTS.md (checkpoint `wip()` → gates → `test()` ; aucun push
-  sans accord explicite) restent inchangées.
+- Aucun commit ni push automatique. Respecter `AGENTS.md` : accord humain explicite avant commit
+  ou push ; si autorisé, checkpoint WIP puis validation et commit final selon les besoins du lot.
 
 ---
 
@@ -50,47 +51,12 @@ Déclencher sur : « pilote le projet », « orchestre », « coordonne les agen
 
 ---
 
-## 🚨 BANNIÈRE DE DÉCLENCHEMENT (OBLIGATOIRE)
+## Démarrage
 
-Dès que la skill est déclenchée, **afficher immédiatement** ce texte clair en majuscules, avant
-toute autre action :
-
-```
-============================================================
-🎯 MODE ORCHESTRATEUR / PILOTAGE PROJET ACTIF
-============================================================
-```
-
-Puis annoncer en 1 ligne le sujet du pilotage (ex. « Pilotage : validation approche T184 avant
-code »).
-
-> 📛 Format standard : `DOC/WFLOW/TEMPLATE/SKILL_BANNER_TEMPLATE.md` (gabarit unique, 60 `=`).
-
----
-
-## 📋 Résumé rapide post-bannère (à afficher après la bannière)
-
-Après la bannière 🎯 et la ligne de sujet, afficher **immédiatement** ce résumé compact pour que
-l'utilisateur voie d'un coup d'œil comment la skill est organisée, comment l'orchestrateur
-travaille et avec quels outils :
-
-```text
-📦 ORGANISATION : pattern stub + canonique (zéro duplication)
-   .dsh/ & .claude/ = stubs déclencheurs → TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md (canonique)
-   🛡️ Gate G440 (check_skill_stubs.py) = anti-dérive
-
-🧠 MÉTHODE : 1. Lire TASKS.yaml → 2. Verrouiller 🔒 + 🚩 → 3. Contrat (dès C2)
-   → 4. Répartir le travail utile (subagent_preamble.md) → 5. Revue indépendante R1→R8
-   → 6. G200 liaison + gates → 7. Restituer (bandeau + bloc Auto-vérif liaison)
-   ⛔ Règle d'or : tâche + plan validés humainement → GO ; ensuite le lot roule sans arrêt au fil de l'eau
-
-🛠️ OUTILS : TASKS.yaml · TASKS_ORCHESTRATOR.yaml · TASK_VIEWER.html
-   · subagent/subagent_fork · generate_codesys_bundle.py · generate_codesys_diff_bundle.py · G200_check_linkage.py
-   · run_all_gates.py · ollama_subagent.py · check_task_contract.py
-   🔗 Skills liées : task-planner (catalogue/contrats) · troubleshooting (diagnostic)
-```
-
-> Ce résumé est un **rappel visuel** — la procédure complète reste dans ce fichier canonique.
+Au début d'une action d'orchestration, annoncer en une phrase le besoin, le rôle pris et la
+prochaine étape. Afficher la bannière standard uniquement si l'utilisateur la demande ou si elle
+est utile pour distinguer un changement de mode ; ne pas répéter à chaque échange le catalogue des
+outils ni le workflow complet.
 
 ---
 
@@ -101,7 +67,7 @@ travaille et avec quels outils :
 | 🛡️ **Garant qualité** | Refuse le code non conforme, ne jamais approximer, applique les standards (`DOC/STDS/`). |
 | 🔁 **Non-régression** | Vérifie mécaniquement la liaison (G200) et les gates avant de restituer un lot. |
 | ⚡ **Délivrabilité rapide** | Parallélise les sous-agents indépendants, suit les tâches, lève les blocages. |
-| ✅ **Valide avant de coder** | Fait valider la tâche + le plan par l'humain **avant** d'implémenter ; GO donné, le lot s'exécute sans re-validation édition par édition. |
+| ✅ **Respecte les points d'arrêt** | Fait valider contrat/plan lorsque la criticité ou le contrat l'exige ; après GO, le périmètre approuvé s'exécute sans re-validation édition par édition. |
 | 🧠 **Challengeur constructif** | Remet en doute les propositions (y compris les ordres utilisateur), force de proposition. |
 
 ---
@@ -143,10 +109,11 @@ contourner un 🚩 d'un autre acteur). Le 🔒 reste jusqu'à la remise réelle 
 
 ---
 
-## 📋 Utilisation de `DOC/WFLOW/TASKS_ORCHESTRATOR.yaml` — registre des agents/actions
+## 📋 Registre d'orchestration — suivi facultatif
 
-`TASKS_ORCHESTRATOR.yaml` est le **suivi des agents/actions lancées** par l'orchestrateur. C'est
-une **liste plate** (structure tabulaire pour le viewer) — chaque entrée est un objet YAML.
+`TASKS_ORCHESTRATOR.yaml` est un journal facultatif des délégations indépendantes ou suivis longs
+qui ne tiennent pas déjà dans `TASKS.yaml` et le contrat. Il n'est pas requis pour toute action et
+ne remplace jamais le Task Manager comme source du statut courant des tâches.
 
 ### Structure d'une entrée
 
@@ -164,21 +131,23 @@ une **liste plate** (structure tabulaire pour le viewer) — chaque entrée est 
 | `decision` | décision actée |
 | `note` | remarque / contexte |
 
-### Comment l'enregistrer
+### Quand l'enregistrer
 
-À chaque action lancée (sous-agent, diagnostic, recherche, planification), **ajouter une entrée**
-en fin de liste avec `statut: en_cours` (ou `en_attente` si non démarrée) et `agent_id` renseigné.
+Le registre est un journal d'orchestration utile, pas un second Task Manager. Ajouter une entrée
+pour une délégation indépendante, une investigation longue ou une action dont le suivi change une
+décision ou un livrable. Ne pas créer d'entrée pour chaque lecture, commande courte ou échange.
+Le catalogue `TASKS.yaml` reste la source du statut des tâches ; ne pas recopier ses champs dans le
+registre sans valeur de suivi supplémentaire.
 
 ### Comment le mettre à jour
 
 Quand l'action progresse ou se termine, **mettre à jour** l'entrée existante : `statut`,
 `livrable`, `verdict`, `decision`, `note`. Ne pas créer de doublon.
 
-### Marquer `terminé` (auto-nettoyage)
+### Affichage des entrées terminées
 
-Le viewer (`DOC/WFLOW/TASK_VIEWER.html`) affiche par défaut uniquement les entrées
-`statut ≠ terminé`. **Marquer `statut: terminé` suffit** pour l'auto-nettoyage — pas d'effacement
-manuel, l'historique est conservé (filtre « ✅ Terminées » pour le relire).
+Le viewer (`DOC/WFLOW/TASK_VIEWER.html`) masque par défaut les entrées `statut: terminé`. C'est un
+filtre d'affichage, pas un nettoyage ni un archivage ; l'historique reste dans le fichier.
 
 ---
 
@@ -189,12 +158,13 @@ manuel, l'historique est conservé (filtre « ✅ Terminées » pour le relire).
 - `subagent` / `subagent_fork` : déléguer une sous-tâche indépendante. Lancer les délégations
   **indépendantes en parallèle** (une par message) et continuer le travail utile pendant qu'elles
   tournent.
-- **Contrat clair obligatoire** : coller `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` en
-  tête de chaque tâche déléguée (l'agent distant n'a pas le contexte de la conversation).
+- **Brief utile obligatoire** : pour toute délégation significative, compléter
+  `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` avec le besoin utilisateur, l'historique
+  utile, les preuves, les critères mesurables, le rôle, le scope et les permissions.
 - **Objectifs testables** : une vérification qui ne porte sur aucun objectif est creuse. Rédiger
   le contrat de tâche (obligatoire dès C2) avant toute délégation.
-- **Déléguer ce qui le justifie** : recherches longues/répétitives, audit historique,
-  exploration large, comparaison multi-modèle et revue indépendante. L'orchestrateur conserve
+- **Déléguer ce qui le justifie** : branches indépendantes, recherches longues/répétitives,
+  audit historique, exploration large, comparaison multi-modèle et revue indépendante. L'orchestrateur conserve
   le task manager, le test manager, le phasage, les arbitrages de scope et l'acceptation finale.
 - **Un responsable principal par lot** : l'agent chargé d'implémenter peut appeler des agents
   spécialistes (automatisme, safety, IHM, tests, mise en service) pour challenger ou relire. Il
@@ -202,6 +172,8 @@ manuel, l'historique est conservé (filtre « ✅ Terminées » pour le relire).
   responsabilité.
 - **Un seul écrivain par périmètre de fichiers**. Les challengers et reviewers restent read-only.
   L'orchestrateur tranche les recouvrements avant lancement.
+- **Task Manager** : appliquer les rôles et droits d'écriture définis dans
+  `skills/task-planner/SKILL.md` ; ne pas créer de script ou registre parallèle.
 - **L'orchestrateur vérifie lui-même** le contrat, le `git diff` réel, les résultats des tests et
   l'adéquation au besoin utilisateur. Un résumé d'agent n'est jamais une preuve suffisante.
 - Pour une délégation C3/C4 ou multi-agents, appliquer la procédure et le gabarit compact :
@@ -246,7 +218,8 @@ d'autres modèles via l'override `provider`/`model` de l'outil `workflow` :
 
 ## 🔍 Pattern de revue indépendante
 
-À la fin de **chaque sous-tâche**, un agent **différent de l'implémenteur** vérifie le travail.
+Une revue indépendante est déclenchée par la criticité, le contrat, une anomalie, un résultat
+non-discriminant répété ou une demande utilisateur. Elle n'est pas exigée après chaque sous-tâche.
 L'orchestrateur lit le **`git diff` réel** — jamais la seule parole de l'agent producteur.
 
 ### Checklist de revue (R1→R8)
@@ -335,7 +308,7 @@ l'exploitant de relever une valeur que la **CI ou un snapshot** aurait pu fourni
 |---|---|
 | 1 délégation ciblée, résultat court attendu | `subagent` (simple) |
 | **≥ 2 sous-tâches indépendantes** (audits, multi-fichiers, multi-objets, comparaisons) | **`orchestrate` mode `fanout`** |
-| **Revue / challenge obligatoire** (règle projet : toujours challenger + revoir) | **`orchestrate` mode `supervisor`** + `reviewers` (`reviewer`) + `reviewRounds` |
+| Revue / challenge indépendant requis par risque ou contrat | `orchestrate` mode `supervisor` + reviewers read-only |
 | Étapes dépendantes (cadrage → implémentation → preuve) | **`orchestrate` mode `pipeline`** |
 | Recherche multi-objets documentée (URL source, date d'observation, preuves conservées) | **`orchestrate`** + agents **`researcher`** puis **`research-merger`** |
 | Un seul lot à écrire, périmètre unique | `subagent` (un écrivain par fichier — voir la règle de collision) |
@@ -344,7 +317,7 @@ l'exploitant de relever une valeur que la **CI ou un snapshot** aurait pu fourni
 
 1. 📄 **Artefact durable** — un run doit laisser une trace sur disque (le plugin écrit un Markdown par run). *Sans ça, un rapport d'agent peut disparaître avec la conversation (2 occurrences constatées le 2026-09-22).*
 2. 🔒 **`outputSchema` avec la RÉVISION épinglée** — chaque constat délégué doit porter `{fichier, ligne, hash_revision, preuve, gravite}`. *4 incidents le 2026-09-22 venaient d'une mesure non épinglée (fausse alerte, verdict périmé, rapport CI menteur). Ce schéma rend `G527` mécanique au lieu de souhaité.*
-3. 🧑⚖️ **`supervisor` + 2 `reviewers`** — la règle « toujours challenger + revoir » devient **un run**, plus une discipline manuelle.
+3. 🧑⚖️ **`supervisor` + reviewers indépendants** — utile quand la criticité ou le contrat l'exige ; inutile pour une tâche simple sans enjeu.
 
 **Conseiller l'outil à l'exploitant** quand : la tâche se découpe en ≥ 2 sujets indépendants · une revue indépendante est requise · on veut un rapport **archivé** plutôt qu'un message de chat · plusieurs modèles doivent être comparés.
 
@@ -352,8 +325,12 @@ l'exploitant de relever une valeur que la **CI ou un snapshot** aurait pu fourni
 - ❌ **Un artefact de run reste un RAPPORT, pas une preuve** : l'orchestrateur lit **toujours** le `git diff` réel et rejoue les preuves. Un rapport peut mentir ou vieillir.
 - ❌ **Ne règle AUCUNE collision d'écriture** (plusieurs écrivains sur un même fichier) : c'est un problème de **protocole** (locks/drapeaux, un écrivain par fichier), pas d'orchestration.
 - ⚠️ **Vérifier que le schéma n'a pas été retiré silencieusement** par le provider (le plugin élague les champs non supportés) : lire `runs.jsonl` au 1er run — un schéma ignoré donne un **faux sentiment de structure**.
-- ⚠️ Les sous-agents restent **génériques** : coller `subagent_preamble.md` dans **chaque** prompt de tâche, sans exception.
-- 📍 **Le plugin écrit ses rapports À LA RACINE du dépôt** (`dsh-ha-orchestrator.run-*.md`) — ce qui **viole la règle de routage T279** (« aucun scratch à la racine »). Réflexe imposé : **copier ces rapports dans `DOC/WFLOW/ORCHESTRATION_RAPPORTS/`** et les committer **là** ; ⛔ **ne jamais déplacer `dsh-ha-orchestrator.runs.jsonl`** (c'est l'**état** du plugin, pas un rapport — le déplacer casserait `/orchestrate runs`) ; les originaux restent visibles à la racine, **signalés, jamais masqués par `.gitignore`**.
+- ⚠️ Toute délégation inclut le contexte minimum : demande d'origine, résultat attendu, preuve,
+  périmètre et permissions. Utiliser le préambule complet pour les missions significatives ; pour
+  une vérification courte, garder un brief compact avec les mêmes champs utiles.
+- 📍 Si un plugin crée un artefact à la racine, le signaler comme sortie à router selon T279.
+  Ne pas le copier, déplacer, committer ou masquer automatiquement ; le propriétaire choisit son
+  traitement selon les règles du dépôt.
 
 ---
 
@@ -373,12 +350,12 @@ l'exploitant de relever une valeur que la **CI ou un snapshot** aurait pu fourni
 
 - [ ] Bannière 🎯 affichée immédiatement au déclenchement
 - [ ] Tâche + plan validés humainement **avant** l'implémentation (GO explicite) — ensuite le lot s'exécute sans arrêt au fil de l'eau
-- [ ] Tâche verrouillée (🔒) et suivie dans `TASKS.yaml`
-- [ ] Action enregistrée / mise à jour dans `TASKS_ORCHESTRATOR.yaml` (statut, verdict, décision)
+- [ ] Tâche et verrou gérés par le coordinateur via le Task Manager existant, si la tâche est au catalogue
+- [ ] Action de coordination enregistrée seulement si elle est indépendante ou assez longue pour justifier un suivi
 - [ ] Contrat de tâche rédigé (obligatoire dès C2) avant délégation
 - [ ] Travail réparti sans conflit : un responsable principal, un seul écrivain par scope, reviewers read-only
 - [ ] Sous-agents utiles lancés avec `subagent_preamble.md` et objectifs/preuves explicites
-- [ ] Revue indépendante (R1→R8) par un agent différent de l'implémenteur
+- [ ] Revue indépendante si exigée par le contrat/criticité, déclenchée par une anomalie ou demandée par l'utilisateur
 - [ ] `git diff` réel lu par l'orchestrateur
 - [ ] Diff bundle frais généré depuis tous les fichiers `CODE/**/*.st` touchés et objets inclus relevés
 - [ ] Bloc `Auto-vérification liaison` (G200) collé dans la restitution
