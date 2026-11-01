@@ -52,3 +52,20 @@ Le test sera concluant si la distance parcourue après `DriveFreqCmd_Hz=0` est c
 - 2026-10-30 : trace 95 reçue, étiquetée par l'utilisateur « essai 10 Hz ». Elle contient la même famille de 30 signaux M3, sans position/vitesse/frein M1/M2 ; elle ne permet donc pas de conclure sur le glissement des treuils.
 - 2026-10-30 : trace 95 montre une rampe M3 jusqu'à 50 Hz puis retour à 0 et retour du frein ; comparaison 10/20 Hz treuil non réalisable avec ces variables.
 - 2026-10-30 : position −10/−13 m classée **rapport utilisateur à confirmer**, absente de la trace fournie.
+
+### R38–R42 — diagnostic CODESYS AX15C (2026-11-01)
+
+**Verdict :** blocage AX15C expliqué par l'autorisation de descente M3, observé en Simulation IDE sur copie isolée. Ce n'est pas encore un verdict de défaut automate : le comportement demandé par la séquence et la règle d'autorisation se contredisent, et la spec ne tranche pas.
+
+| Preuve | Résultat | Portée |
+|---|---|---|
+| R40–R41, verrou par défaut TRUE, AX15C | demandes M1/M2 `RunRequest=TRUE`, `ReqDescend=TRUE`; `WinchDescentAuth_M3=FALSE`; paliers treuil 0, relais inverse FALSE, freins non ouverts | Chaîne d'autorisation bloquante observée |
+| R42, déverrouillage temporaire en RAM de la copie | M1/M2 palier 1, relais inverses TRUE, commandes frein TRUE et retours frein ouvert TRUE | Le verrou est discriminant pour l'activation de la chaîne de sortie |
+| R42, positions | environ 8,5 m → 1,24/1,42 m en 3 s | Variation trop forte et non calibrée : preuve de mouvement exploitable ni de vitesse physique |
+| R42, fermeture | arrêt application, logout et runner terminés; aucun processus CODESYS restant | Le readback de restauration du réglage a échoué; ne pas réutiliser cette session. Copie projet disque inchangée et valeur persistante source par défaut TRUE |
+
+**Traçage inverse :** `FB_CycleSemiAuto.st:1566–1585` place AX15C en repositionnement et demande la descente couplée M1/M2. `PRG_03_Modes_Cycle.st:503–513` autorise cette descente seulement si le verrou est désactivé, M3 est à P1/Maintenance ou un bypass est actif. À la Trémie, le verrou TRUE donne donc l'autorisation FALSE. `PRG_04_Treuils_Benne.st:1070–1083` combine permis process/sécurité puis applique cette autorisation; les relais restent coupés.
+
+**Décision ouverte :** faire trancher la règle métier/sécurité AX15C à la Trémie avant toute modification automate ou tout nouvel essai avec le verrou neutralisé. Si la descente doit être interdite, le parcours/attendu AX15C doit changer. Si elle doit être permise, fournir une règle d'autorisation explicite et la faire valider dans le workflow C2 avant proposition de correction. R42 révèle aussi un défaut de harnais : il doit marquer le réglage « modifié » avant écriture et confirmer sa restauration, avec arrêt sûr au moindre échec.
+
+Preuves brutes : `TOOLS/AGENT_WORKFLOW/.tmp/t417_auto_r40_20261101/`, `...r41.../`, `...r42.../` (journaux runtime et résultats). Simulation uniquement; pas de validation distance, vitesse, tolérance ni parcours complet accepté.

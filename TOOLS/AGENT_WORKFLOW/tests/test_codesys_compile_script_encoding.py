@@ -48,6 +48,44 @@ def test_baseline_runner_disables_xml_import() -> None:
     assert "if False:\n        trace(\"5. Importing XML" in script.content
 
 
+def test_runner_traces_native_message_metadata() -> None:
+    script = ScriptSink()
+    compile_tool.create_ironpython_script(script, Path("project"), Path("input.xml"), Path("result"))  # type: ignore[arg-type]
+    assert "for index, message in enumerate(msgs):" in script.content
+    assert "for name in dir(message):" in script.content
+    assert 'trace("Message[%s].%s=%s"' in script.content
+    assert 'trace("Application.is_active_application=" + str(app.is_active_application))' in script.content
+    assert 'trace("Simulation device name=" + device_name)' in script.content
+    assert "device_repository.get_device(device.get_device_identification())" in script.content
+    assert 'for name in ("name", "vendor", "description", "order_number")' in script.content
+
+
+def test_incremental_option_uses_application_build() -> None:
+    script = ScriptSink()
+    compile_tool.create_ironpython_script(
+        script,
+        Path("project"),
+        Path("input.xml"),
+        Path("result"),
+        incremental=True,
+    )  # type: ignore[arg-type]
+    assert 'trace("7. Building active application..." if True' in script.content
+    assert "if True:\n        app.build()" in script.content
+
+
+def test_generate_code_option_is_separate_from_build() -> None:
+    script = ScriptSink()
+    compile_tool.create_ironpython_script(
+        script,
+        Path("project"),
+        Path("input.xml"),
+        Path("result"),
+        generate_code=True,
+    )  # type: ignore[arg-type]
+    assert 'trace("7. Generating application code...")' in script.content
+    assert "if True:\n        app.generate_code()" in script.content
+
+
 def test_compile_workspace_is_retained_in_authorized_gate_scratch() -> None:
     expected = REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / ".tmp" / "codesys_compile_FB_Sim_Translation_run"
     scratch_root = expected.parent

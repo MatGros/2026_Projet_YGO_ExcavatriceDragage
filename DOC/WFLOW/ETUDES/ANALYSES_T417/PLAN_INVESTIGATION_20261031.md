@@ -1,5 +1,32 @@
 # 🧭 T417 — Pilotage des investigations
 
+## État courant — Simulation IDE CODESYS (mise à jour 2026-11-01)
+
+| Sujet | Résultat | Décision |
+|---|---|---|
+| Simulation IDE | Device `0000 000a`, version `3.5.19.10`, confirmé dans R11. | Aucun accès machine réelle. |
+| Build + injection R11 | `app.rebuild()` après injection de 4 POU ; `BUILD_ERRORS=0`, puis login et RUN. Les SHA-256 des sources injectées sont tracés. | Build/source établis pour ces POU et cette copie seulement. |
+| Essai automatique R11 | Réarmement AU confirmé. Le homing a été forcé en lot (pas exécuté physiquement). L'entrée en semi-auto a échoué (`SEMI_AUTO not accepted`) ; aucun cycle AX14–AX18 validé. | Investiguer les permissifs de mode avant un nouvel essai de cycle. |
+| Homing R29 | 14 POU injectés, rebuild sans erreur. Après stimulation explicite du capteur haut à M1=7,157 m, le premier relevé montre M1 brut 29892 vs preset 29438 (454 points ≈111 mm), puis défaut preset latched 4 sur M1/M2 et HX7. | Échec runtime reproductible ; la lecture est déjà après HX7, donc le moment exact du désaccord reste à capturer. Joystick maintenu : l’effet d’un relâchement n’est pas testé. |
+| Essai discriminant R30 | Relâchement joystick au capteur haut préparé, mais `app.rebuild()` renvoie une erreur CODESYS générique ; le garde arrête avant login. | Aucun essai runtime ; investiguer l'intermittence du rebuild avant de conclure sur le repli à l’arrêt. |
+| Ancien essai R7, 10/20 Hz | `app.build()` générique en erreur, mais runner a poursuivi jusqu'à RUN ; identité du binaire alors exécuté non établie. | Conserver ces mesures comme observation runtime non attribuable aux sources injectées ; ne pas les utiliser comme verdict source. |
+
+Preuves : R11 `CODESYS_AUTO_R11_20261101/runtime.log` ; R29/R30 `TOOLS/AGENT_WORKFLOW/.tmp/t417_auto_r29_20261101/runtime_r29.log` et `t417_auto_r30_20261101/runtime_r30.log` (runners et journaux conservés). L'échelle codeur déclarée est 8192 points / 2 m = 4096 points/m ; le seuil de vérification 10 mm vaut environ 41 points. Les erreurs `Object reference not set...` sont intermittentes selon ces exécutions ; R30 n'a pas atteint le runtime.
+
+
+### Mise ? jour ? test dynamique Simulation IDE / m?thode T423 (2026-10-31)
+
+Le tableau initial ci-dessus est historique et supers?d? pour l'ex?cution M3 : le runner T423 a ?t? repris sur la copie `v0738.project`, Device `0000 000a`, Simulation IDE confirm?e. R?armement AU et mise en r?f?rence homing lus en retour. Le seuil de hauteur M1/M2 a bloqu? le manuel ; le seul bypass `M3Translation.Bypass.MinHeight` a ?t? activ? dans cette copie de test puis remis ? FALSE. Aucun fichier ST de production n'a ?t? chang?.
+
+| PV manuel | P1?Tr?mie | Tr?mie?P1 | arr?t apr?s rel?chement | verdict limit? |
+|---:|---:|---:|---:|---|
+| 10 Hz | 26,32 s ; arr?t 4,91 s ; d?passement rapport? 24 mm | 26,62 s ; arr?t 4,70 s ; d?passement rapport? 69 mm | position finale 5,0005 m | 2 trajets observ?s, stable 20 ?chantillons |
+| 20 Hz | 14,13 s ; arr?t 5,12 s ; d?passement rapport? 130 mm | 14,31 s ; arr?t 5,09 s ; d?passement rapport? 220 mm | position finale 5,1509 m | arr?t stable d?clar?, mais position finale 151 mm au-del? de P1 nominal |
+
+Preuves brutes : `TOOLS/AGENT_WORKFLOW/.tmp/t417_m3_t423_run_r7_20261031/runtime.log` et `samples.csv`. Crit?re d'arr?t d?clar? par le harnais : fr?quence r?elle nulle, mouvement non demand?, position inchang?e pendant 20 ?chantillons (pas de 0,2 s environ). Les distances ? d?passement ? sont la sortie `SimM3ObsOvershootLast_M`, calcul?e du front capteur d'arr?t ? la position finale ; elles sont des sorties du mod?le, pas des mesures terrain. Le crit?re physique de d?tection P1 est ? ?25 mm du P1 configur? ; la DI cumulative ne fournit pas un ?v?nement P1 distinct dans ce trajet.
+
+**Limites :** R7 n'établit pas l'identité des sources du runtime, car `app.build()` a échoué alors que le runner a continué. R11/R29 ferment ce défaut de méthode pour leurs essais (rebuild zéro erreur, sources injectées hachées) ; R30 démontre que le garde bloque bien le login lors d'un rebuild en erreur. R29 établit un échec de preset pendant le homing simulé, mais ne prouve pas encore si le mouvement résiduel, le délai du preset ou leur interaction le déclenche. Aucun cycle AX14–AX18 validé ; les mesures R7 10/20 Hz restent non attribuables au build source.
+
 > 31 octobre 2026 · Étude exécutée, proposition D prête à valider · Banc non réceptionné
 > Ce plan remplace les prochaines actions contradictoires des bilans précédents. Les preuves historiques restent conservées.
 
@@ -288,4 +315,79 @@ Le runner Headless a été corrigé pour l'encodage UTF-8 des chemins, l'import 
 
 **Rejeu Simulation IDE — 2026-10-31 :** `test_codesys_compile.py FB_Sim_Translation --simulation` a ouvert la copie `v0.7.38_SimBench_AprèstUpdateMsg_20261031.project`, importé le PLCopenXML généré depuis le ST courant et confirmé `Device.get_simulation_mode() = TRUE`. La reconstruction retourne néanmoins une erreur CODESYS : `Object reference not set to an instance of an object.` (1 erreur, 0 avertissement), comme le témoin sans import. Preuve conservée sous `TOOLS/AGENT_WORKFLOW/.tmp/codesys_compile_FB_Sim_Translation__euwqeyf/`. L'import et le réglage de mode sont donc confirmés par le script; compilation valide, connexion en ligne et exécution cyclique restent non démontrées. Ce résultat classe l'échec dans le harnais/IDE jusqu'à identification de la cause; il ne juge pas la physique D1.
 
+**Rejeu caché avec diagnostic — 2026-10-31 :** selon la consigne utilisateur, CODESYS a été lancé en tâche de fond avec `--noUI` et le parent Python en fenêtre cachée, sur une nouvelle copie. Détection directe de l'installation `CODESYS 3.5.19.10` ajoutée au runner (elle évite le parcours récursif de `Program Files`). Le PLCopenXML s'importe et le mode Simulation IDE est confirmé. Le message de reconstruction n'a ni objet ni projet associé, aucune position source ni numéro, et aucune information de détail (`object=None`, `project=None`, `position_text=None`, `number=None`, `has_details_handler=False`); texte unique : `Object reference not set to an instance of an object.` Témoin antérieur sans import : même texte. Traces complètes sous `TOOLS/AGENT_WORKFLOW/.tmp/codesys_compile_FB_Sim_Translation_321wps4i/` et `t417_codesys_bg_20261031_171751.out/.err`. Le diagnostic réduit la cause à la chaîne CODESYS/headless ou au projet de base, mais ne la distingue pas; aucune compilation ni exécution cyclique n'est prouvée.
+
+**Localisation de l'erreur — 2026-10-31 :** `app.generate_code()`, `app.build()` et `app.rebuild()` produisent le même message sur le projet actuel sans import; `app.generate_code()` reproduit aussi le message sur la sauvegarde précédente `v0.7.37`, sans import. Le FB M3 n'est donc pas la cause immédiate observée. `app.is_active_application=True`; Simulation IDE est confirmée. L'objet Device lu par le script s'identifie comme `DeviceID(type=4097, Id='0000 000a', Version='3.5.19.10')` et existe dans le Device Repository; son nom reste générique dans le projet. Les messages CODESYS ne donnent toujours ni cause source ni pile exploitable. Le runner ne contacte aucune cible, n'utilise pas Control Win et ne lance aucun mouvement. Prochaine investigation : établir à partir du projet et du Device Repository la description exacte du Device/du générateur installé, puis vérifier cette chaîne headless avec le même artefact; ne pas substituer un autre runtime.
+
 **Prochaine décision :** poursuivre avec le runtime **Simulation IDE** seulement, en diagnostiquant d'abord l'erreur de reconstruction sur copie. Après compilation réussie, exécuter une trace courte des sorties publiques `FB_Sim_Translation` autour du front P1 (10 ms, environ 1 s avant et 2 s après), sans écrire de variable de mouvement avant vérification du mode simulation et des deux verrous du POC T402. Les composants de cycle et la séquence d'écriture ne seront pas remplacés par Control Win. Aucun essai utilisateur ni essai machine réelle à ce stade.
+
+
+**Compilation du bundle complet en Simulation IDE ? 2026-10-31 :** le bundle `CODE_XML/CODE_Bundle.xml` (82 d?finitions POU PLCopenXML, horodat? 17:30:39; source ST la plus r?cente alors horodat?e 17:29:48) a ?t? import? dans un projet CODESYS neuf bas? sur le Device Repository `DeviceID(type=4097, Id='0000 000a', Version='3.5.19.10')`. CODESYS a ?t? lanc? cach? avec `--noUI`; `get_simulation_mode()=True`, application active. `generate_code()` termine avec ? Build complete -- 0 errors, 0 warnings -- Ready for download ? (code g?n?r? 17 998 octets). Preuve conserv?e sous `TOOLS/AGENT_WORKFLOW/.tmp/t417_full_bundle_sim_61fd8587/` (`runner.py`, `result.log`, projet). Aucun fichier `CODE/` n?a ?t? modifi?. Ce r?sultat prouve l?import et la g?n?ration de code sur le Device Simulation IDE pour le bundle; il ne prouve pas l?ex?cution du cycle : le bundle ne contient ni configuration de t?che ni appels cycliques. L?application sauvegard?e v0.7.38 reste en ?chec de g?n?ration avec l?erreur .NET g?n?rique document?e ci-dessus. Le projet neuf est un banc isol? compilant les sources versionn?es, pas une copie de ce projet sauvegard?.
+
+**D?cision suivante :** ne pas pr?senter la g?n?ration de code du bundle comme un test d?utilisation du cycle. Avant d?engager une connexion au runtime Sim IDE et de d?marrer un programme cyclique, ?tablir dans un projet temporaire une t?che et un POU d?essai valides, puis v?rifier la cible online explicitement. Aucune variable de mouvement ne sera forc?e; si la cible ne peut pas ?tre identifi?e comme Simulation IDE, arr?ter le test.
+
+
+### Sonde compilation sans injection - 2026-11-01
+
+- Copie v0738, aucune injection, aucun login : erreur identique. Message natif sans objet, projet, numero ou localisation ; `has_details_handler=False`. Preuve : `TOOLS/AGENT_WORKFLOW/.tmp/t417_build_probe_20261101/result.log`.
+- Garde du runner prepare dans `runtime_checked.py` : toute erreur de build provoque un arret AVANT login. Le runner historique conserve sa preuve et n'est plus le candidat pour les prochains essais.
+- Experience suivante : Simulation IDE explicite, nettoyage via API si disponible, puis rebuild sans injection. Permet de tester l'hypothese du cache de compilation sans changer les sources.
+
+
+### Diagnostic compilation - variantes du 2026-11-01
+
+Preuves sous `TOOLS/AGENT_WORKFLOW/.tmp/t417_build_probe_20261101/`. Sans login ni sauvegarde : clean/rebuild (`clean_result.log`), exclusion visualisation (`visu_result.log`), retrait taches Visu/Trend (`visu_tasks_result.log`), retrait traces (`traces_result.log`), retrait objet anonyme (`unnamed_result.log`), puis combinaison diagnostics/IHM/symboles (`dependencies_result.log`) : meme erreur generique. Ces exclusions ne prouvent pas la cause.
+
+Le temoin syntaxique volontaire en RAM (`compiler_witness_result.log`) ne produit pas de diagnostic ST ; seul le message generique apparait. Les appels metier sont presents dans MainTask 10 ms : PRG_02, 03, 04, 05, 06, 07, dans cet ordre (`tasks_result.log`). Les taches 4 ms/20 ms inspectees n'ont pas d'appel POU. Les references de bibliotheques sont inventoriees dans `dependencies_result.log`. Aucun mouvement relance.
+
+
+### Deblocage compilation - bureau Windows isole, 2026-11-01
+
+**Resultat discriminant :** meme copie v0738, Simulation IDE, clean + rebuild, sans injection, sans login : `Compile complete -- 0 errors, 1 warnings`; controle supplementaire 0 erreur. Le processus termine avec code 0. Avertissement : aucune POU dans la tache CAN. Preuve : `TOOLS/AGENT_WORKFLOW/.tmp/t417_build_probe_20261101/private_ui_result.log`.
+
+La variante fonctionnelle execute CODESYS avec interface sur un bureau Windows prive, sans `--noUI`; aucune fenetre sur le bureau utilisateur. La variante `--noUI` du meme protocole echoue. Le mode headless est donc implique dans le blocage observe; le composant interne exact reste inconnu. Lanceur `launch_private.py` avec maintien du handle du bureau jusqu'a la fin du processus.
+
+Decision : reprendre les tests dynamiques avec ce lancement invisible, le runner bloquant en cas d'erreur de compilation, et nouvelles traces distinctes. La compilation sans injection seule ne valide pas encore les sources modifiees ni le cycle.
+
+
+### Rejeu CODESYS R8 - 2026-11-01 : build reussi et mouvements mesures
+
+Preuves durables : `CODESYS_R8_20261101/RESULTAT.json`, runner, journal et CSV. FB_Sim_Translation courant injecte et empreinte enregistree; rebuild 0 erreur AVANT login, programme charge puis RUN, Simulation IDE confirmee. Lanceur sur bureau Windows prive.
+
+| Manuel | Aller Tremie | Retour P1 | Position finale retour | Depassement interne aller / retour |
+|---|---:|---:|---:|---:|
+| 10 Hz | 26,456 s | 26,570 s | 5,000095 m | 24,4 / 68,7 mm |
+| 20 Hz | 14,154 s | 14,178 s | 5,152191 m | 122,7 / 220,1 mm |
+
+Les quatre trajets atteignent la cible du harnais et finissent avec frequence nulle, contact frein applique et position identique pendant 20 lectures. Les delais de fin (~4,7 a 5,4 s) INCLUENT cette fenetre de stabilite : ils ne sont pas le temps mecanique de freinage. Lectures online sequentielles, non atomiques, cadence reelle disponible dans RESULTAT.json. Le depassement interne est une sortie du modele, distincte de position finale moins P1 nominal.
+
+Conditions : homing force selon T423, bypass dedie MinHeight actif dans la copie, restore FALSE en fin; aucun mouvement treuil teste. Cleanup master simulation FALSE et unforce confirmes. Le critere d'arret stable est observe; le retour 20 Hz finit 152 mm au-dela de P1 nominal, hors bande de detection du harnais +/-25 mm. Aucune validation globale du cycle ou de fidelite physique. Decision : poursuivre la recherche causale avec ces preuves identifiees, puis scenario automatique AX14-AX18 et retour; aucun nouvel essai utilisateur demande.
+
+
+### Analyse arret R8 - chronologie exploitable
+
+`CODESYS_R8_20261101/ANALYSE_ARRET.json` separe derniere lecture en mouvement, premiere lecture frequence nulle + frein applique, et fin de stabilisation. Intervalle median des lectures par trajet : 209 ms. Apres derniere lecture MOVE : deplacement aller/retour 10 Hz = 26,3/21,7 mm ; 20 Hz = 30,0/163,0 mm. Premiere lecture zero+frein apres cette lecture : 0,806/0,625 s puis 1,047/1,223 s. Ces delais incluent la latence des lectures sequentielles et de la commande Python; ce ne sont pas des mesures scan par scan. Ils invalident l'interpretation des ~5 s comme temps mecanique d'arret. A 20 Hz retour, l'essentiel de l'ecart final survient apres la derniere lecture MOVE, mais la part latence/rampe/mecanique reste a isoler.
+
+Le processus IDE R8 ne sortait pas car le runner historique ne termine pas par system.exit(); application STOP et logout confirmes, instance isolee arretee par PID 50692. Ajouter system.exit() aux prochains runners, sans modifier les preuves R8.
+
+
+### Automatique R9-R11 : preparation datum insuffisante
+
+R9 : build 0 erreur, SEMI_AUTO refuse. R10 : homing force partiellement applique (etape interne encore BOTH_NOT_HOMED). R11 : forcage groupe lu VALID/TRUE, mais instModes.MachineHomed=FALSE et motif `SEMI_AUTO refuse : datum machine absent`; ModeChangeAllowed=TRUE, contacteurs relaches, freins fermes, vitesses nulles. Preuves durables : `CODESYS_AUTO_R11_20261101/`. Aucune AX14 executee.
+
+Cause de refus prouvee au consommateur : datum absent. Les forcages de snapshot T423 ne prouvent pas que les consommateurs intermediaires voient le datum; les ecritures du programme dans le scan restent a examiner. Classer harnais/preparation homing, pas echec M3. Decision : utiliser le protocole de referencement simule via CycleMachineHoming.Cmd.BtnStart / BtnValidate et confirmation benne, avant nouvelle demande SEMI_AUTO.
+
+### CODESYS R38–R42 — constat courant et décision requise (2026-11-01)
+
+Les essais sont réalisés en Simulation IDE, sur copie isolée, avec `app.rebuild()` réussi avant RUN (14 POU injectées en mémoire). Ils ne valident ni le projet de production, ni l'exactitude physique. Le problème `app.build()` générique de l'ancien runner ne s'applique pas à ces runs rebuild; ce dernier restait fail-closed.
+
+| Cas | Acquis | Limite |
+|---|---|---|
+| R38 | Stimulus joystick X positif atteint AX14→AX15A. | R37 avait manqué la transition par mauvais stimulus. M3 dépassement à la Trémie ~0,393 m; seuil acceptable non établi. |
+| R39 | Montre que le polling 100 ms peut manquer un palier bref AX15B. | Capture insuffisante pour conclure sur la séquence. |
+| R40 | Parcours logique AX14→AX15A→AX15C→AX15B→AX18→AX2→P1; arrêt fréquence nulle/frein appliqué. | Position P1 ~5,345 m pour cible 5,0 m; dépassement ~0,345 m. À AX15C, M1/M2 restent à 8,5 m malgré demande de mouvement. |
+| R41–R42 | La cause de l'absence de sortie AX15C est isolée au verrou de descente M3; R42 différentiel confirme la chaîne de sortie quand le verrou est temporairement désactivé dans la copie. | Les positions R42 varient de façon non crédible; R42 échoue à confirmer le readback de restauration. Aucun verdict de calibration ou de sécurité. |
+
+**Arbre causal établi :** AX15C commande la descente couplée (FB_CycleSemiAuto.st:1566–1585) → verrou actif et M3 à la Trémie rendent `WinchDescentAuth_M3=FALSE` (PRG_03_Modes_Cycle.st:503–513) → permis descente M1/M2 bloqués (PRG_04_Treuils_Benne.st:1070–1083) → palier 0 et relais non activés. Le conflit entre cette règle et l'intention AX15C doit être tranché métier/sécurité; aucune correction de CODE n'est autorisée sur une hypothèse.
+
+**Prochaine action :** décision documentée sur l'autorisation de descendre M1/M2 à la Trémie en AX15C. En parallèle, corriger et vérifier le protocole de restauration du harnais avant tout autre test différentiel. Ne pas demander de nouvel essai utilisateur ni présenter le cycle comme validé. Aucun code automate de production modifié; aucune machine réelle sollicitée.

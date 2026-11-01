@@ -1,0 +1,110 @@
+contract:
+  task_id: T426
+  criticality: C2
+  strategy: patch
+  objective: >-
+    Rendre le pilotage des tâches et investigations vérifiable, limiter les répétitions
+    non informatives et empêcher les faux verdicts de réussite sans gêner l'usage normal.
+  acceptance:
+    - id: AC1
+      statement: Le catalogue conserve un résumé court et pointe vers une seule fiche active par tâche.
+      verified_by: Comparer TASKS.yaml, le template et deux tâches pilotes ; aucun journal ni contrat dupliqué.
+    - id: AC2
+      statement: La fiche unique décrit besoin, décision recherchée, périmètre, permissions, critères observables, preuves et responsabilités.
+      verified_by: Valider un exemple complet et rejeter un exemple privé de critère observable ou de périmètre.
+    - id: AC3
+      statement: Chaque expérience possède une question nouvelle, des prédictions discriminantes et une décision selon résultat avant lancement.
+      verified_by: Sur un historique pilote, détecter une répétition sans justification et accepter un rejeu motivé par une source modifiée.
+    - id: AC4
+      statement: Trois itérations non informatives déclenchent une revue A/B aveugle ; un seuil de deux à cinq exige une justification préalable.
+      verified_by: Cas seuil atteint, seuil non atteint, résultats proches et remise à zéro justifiée ; vérifier indépendance des deux missions.
+    - id: AC5
+      statement: Le contrat de délégation impose contexte utile, workflow applicable, sorties mesurables, alerte et auto-revue.
+      verified_by: Deux missions pilotes ; chaque conclusion renvoie à une preuve et chaque point insuffisamment établi reste non vérifié.
+    - id: AC6
+      statement: Chaque contrôle automatique possède déclencheur, portée, responsable, sévérité, diagnostic et procédure de reprise.
+      verified_by: Matrice de contrôles avec un cas valide et un contre-exemple par contrôle ; zéro blocage hors périmètre dans les cas pilotes.
+    - id: AC7
+      statement: Les contrôles nouveaux démarrent en avertissement et ne changent pas silencieusement les hooks actifs.
+      verified_by: Comparer configurations avant/après ; activation bloquante uniquement après validation humaine explicite et tests des faux positifs.
+    - id: AC8
+      statement: Les résultats distinguent PASS, FAIL, interruption, non testé et nettoyage incomplet ; une exception ne produit pas un succès implicite.
+      verified_by: Tests du validateur de résultat incluant exception, preuve absente, sortie partielle et erreur de nettoyage.
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T426.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - TOOLS/AGENT_WORKFLOW/templates/
+      - TOOLS/AGENT_WORKFLOW/skills/task-planner/
+      - TOOLS/AGENT_WORKFLOW/skills/orchestrator/
+      - TOOLS/AGENT_WORKFLOW/skills/troubleshooting/
+      - TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md
+      - TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md
+      - TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - TOOLS/AGENT_WORKFLOW/tests/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - Configuration des hooks actifs sans validation du plan d'activation
+      - Livrables T417-C et T417-D confiés à Claude
+      - Modification massive des fiches et du catalogue
+  evidence_required:
+    - Matrice exigences vers preuves et responsabilités
+    - Diff réel relu ; tests positifs et négatifs des contrôles modifiés
+    - Mesure des faux positifs sur deux tâches pilotes
+    - Plan d'activation et désactivation sans suppression de données
+  alert_duty: >-
+    Signaler immédiatement ambiguïté, contradiction, preuve faible, effet de bord ou
+    contrôle trop intrusif. Ne pas transformer une incertitude en réussite ni élargir le périmètre.
+
+status: PENDING
+framing:
+  created_at: '2026-11-01T11:07:42+01:00'
+  requested_by: HUM
+  accountable: CDX01
+  implementation_owner: Non attribué ; attribution formelle avant implémentation
+  related_tasks: [T417, T281, T279]
+  decision_sought: Quels contrôles apportent une preuve utile à faible coût et lesquels doivent rester des avertissements ?
+  baseline: >-
+    REX T417 : essais répétés, état dispersé, identité des sources partielle,
+    substitutions insuffisamment visibles, runner R43 syntaxiquement valide mais non prêt.
+  canonical_record:
+    path: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_<ID>.yaml
+    naming: ID stable, y compris sous-tâche TXXX-X ; dates ISO dans les champs et le journal.
+    template: Étendre TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml ; ne pas créer un second système de fiches.
+    catalogue: Identité, titre, statut, responsable, dates, résumé courant court, blocage et lien contrat.
+    contents: Besoin utilisateur, historique utile sourcé, acquis, inconnues, décision suivante, expériences et preuves.
+  responsibilities:
+    orchestrator: Priorités, contrats, attribution, vérification du diff et des preuves, décision de livraison.
+    executor: Mise en oeuvre, auto-revue, effets de bord, vérification et alerte immédiate.
+    control_owner: Maintenance du contrôle et tests des faux positifs ; nommé avant livraison.
+    reviewers: A/B indépendants sans accès aux conclusions de l'autre avant remise ; conclusions contrôlées par orchestrateur.
+    human: Arbitrages métier manquants et approbation de l'activation bloquante globale.
+  phases:
+    - Inventorier les mécanismes existants et conflits ; réutiliser T281 et T279 sans les dupliquer.
+    - Proposer diff du template et des skills canoniques, matrice des contrôles et plan d'activation ; validation humaine avant modification des procédures actives.
+    - Implémenter validateurs ciblés et modes avertissement, avec tests positifs et négatifs.
+    - Piloter deux tâches de nature différente ; mesurer alertes utiles, fausses alertes et coût ajouté.
+    - Revue A/B, réception et décision d'activation contrôle par contrôle.
+  controls:
+    - Contrat complet avant banc long ; avertissement initial, aucune interception de toute commande shell.
+    - Sources inconnues ou substitutions absentes interdisent le verdict validation nominale ; exploration autorisée et étiquetée.
+    - Compilation échouée interdit le verdict de réussite ; les opérations runtime restent gérées par le propriétaire du runner.
+    - Résultat incomplet ou nettoyage non confirmé produit un état explicite et conserve les preuves.
+    - Seuil de stagnation produit une alerte et une revue A/B ; ne bloque pas les autres travaux utiles.
+    - Aucun arrêt global de tour, lancement runtime, suppression, commit ou arrêt de processus utilisateur automatique.
+  exclusions:
+    - Les vérifications de cible Simulation IDE et la restauration effective CODESYS appartiennent à T417-E.
+    - Aucun lancement CODESYS nécessaire à T426 ; valider les interfaces de résultat sur fixtures.
+    - Ne pas prétendre garantir une certitude absolue ; borner chaque conclusion au périmètre réellement vérifié.
+  next_action: Attribuer l'implémentation, inventorier les contrôles existants et présenter le diff de conception.
+execution:
+  status: PENDING
+  summary: Cadrage créé ; aucun hook ni skill actif modifié.
+  evidence_submitted: []
+validation:
+  status: PENDING
+  notes: Création du cadrage autorisée ; activation des nouveaux blocages non autorisée par cette création.

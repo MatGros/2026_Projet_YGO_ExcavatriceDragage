@@ -1,4 +1,22 @@
 tasks:
+- id: T426
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: WORKFLOW / AGENTS / CONTRATS / CONTROLES
+  agent: —
+  date: '2026-11-01T11:07:42+01:00'
+  updated_at: '2026-11-01T11:07:42+01:00'
+  titre: Fiabiliser le pilotage des tâches, délégations et contrôles sans gêner l'usage normal
+  contexte: REX T417 ; responsabilité du cadrage et de la réception CDX01.
+  description: Fiche unique par tâche, expériences discriminantes, revue A/B sur stagnation et contrôles ciblés progressifs.
+  objectifs:
+  - Unifier le suivi dans le contrat existant et garder le catalogue court.
+  - Définir responsabilités, preuves mesurables, seuils de revue et devoir d'alerte.
+  - Vérifier les contrôles en avertissement avant toute activation bloquante approuvée.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T426.yaml
+  avancement: 'Cadrage créé ; implémentation non attribuée. Prochaine action : inventaire et diff de conception.'
+  bloque_par: []
 - id: T421
   parent_id: ''
   statut: ✅
