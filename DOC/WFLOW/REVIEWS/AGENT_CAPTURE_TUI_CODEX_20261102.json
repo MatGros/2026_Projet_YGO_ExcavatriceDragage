@@ -1,0 +1,38 @@
+{
+  "platform": "codex",
+  "session_id": "01a199fa-f501-7313-bea5-6db39f54df1a",
+  "source": "C:\\Users\\ZEDVICTUS\\.codex\\sessions\\2026\\11\\02\\rollout-2026-11-02T02-58-43-01a199fa-f501-7313-bea5-6db39f54df1a.jsonl",
+  "attachment": "own_resumed_TUI_already_idle",
+  "events": [
+    {
+      "seconds": 10.478966799972113,
+      "type": "response_item",
+      "role": "user",
+      "payload_type": "message"
+    },
+    {
+      "seconds": 10.478997799975332,
+      "type": "event_msg",
+      "role": null,
+      "payload_type": "item_completed"
+    },
+    {
+      "seconds": 13.311510799976531,
+      "type": "event_msg",
+      "role": null,
+      "payload_type": "item_completed"
+    },
+    {
+      "seconds": 13.31154319999041,
+      "type": "response_item",
+      "role": "assistant",
+      "payload_type": "message"
+    }
+  ],
+  "states": [
+    "active"
+  ],
+  "user_and_assistant_seen": true,
+  "test_tui_closed_cleanly": true,
+  "test_tui_exit_code": 0
+}

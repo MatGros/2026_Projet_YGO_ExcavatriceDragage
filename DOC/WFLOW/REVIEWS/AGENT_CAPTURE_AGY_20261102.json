@@ -1,0 +1,93 @@
+{
+  "platform": "agy",
+  "executable": "C:\\Users\\ZEDVICTUS\\AppData\\Local\\agy\\bin\\agy.EXE",
+  "cwd": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_xa_w9xu1",
+  "pid": 8064,
+  "expected_session_id": null,
+  "state": "exited",
+  "exit_code": 0,
+  "duration_seconds": 39.82118170004105,
+  "events": [
+    {
+      "seconds": 4.107867300044745,
+      "alive": true,
+      "keys": [
+        "conversation_id",
+        "event",
+        "init"
+      ],
+      "type": null,
+      "ids": {
+        "conversation_id": "dcd15f21-01d3-4503-81be-317d22f46c28"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 37.05030920001445,
+      "alive": true,
+      "keys": [
+        "event",
+        "step_update"
+      ],
+      "type": null,
+      "ids": {
+        "conversation_id": "dcd15f21-01d3-4503-81be-317d22f46c28"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 39.431325800018385,
+      "alive": true,
+      "keys": [
+        "event",
+        "step_update"
+      ],
+      "type": null,
+      "ids": {
+        "conversation_id": "dcd15f21-01d3-4503-81be-317d22f46c28"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 39.53244119998999,
+      "alive": true,
+      "keys": [
+        "event",
+        "step_update"
+      ],
+      "type": null,
+      "ids": {
+        "conversation_id": "dcd15f21-01d3-4503-81be-317d22f46c28"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 39.55805859999964,
+      "alive": true,
+      "keys": [
+        "event",
+        "step_update"
+      ],
+      "type": null,
+      "ids": {
+        "conversation_id": "dcd15f21-01d3-4503-81be-317d22f46c28"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 39.558221200015396,
+      "alive": true,
+      "keys": [
+        "event",
+        "result"
+      ],
+      "type": null,
+      "ids": {
+        "conversation_id": "dcd15f21-01d3-4503-81be-317d22f46c28"
+      },
+      "contains_marker": true
+    }
+  ],
+  "raw_output": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_xa_w9xu1\\stdout.jsonl",
+  "stderr": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_xa_w9xu1\\stderr.log"
+}

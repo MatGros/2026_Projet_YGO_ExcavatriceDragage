@@ -1,0 +1,23 @@
+{
+  "platform": "claude",
+  "session_id": "830156f8-1584-4f62-9bc7-844fab1a7959",
+  "source": "C:\\Users\\ZEDVICTUS\\.claude\\projects\\C--Users-ZEDVICTUS-AppData-Local-Temp-agent-capture-ztdt8o6x\\830156f8-1584-4f62-9bc7-844fab1a7959.jsonl",
+  "attachment": "existing_own_TUI_after_baseline",
+  "events": [
+    {
+      "seconds": 13.746341499965638,
+      "type": "api-request-blob"
+    },
+    {
+      "seconds": 13.746389799984172,
+      "type": "user"
+    },
+    {
+      "seconds": 16.375869099982083,
+      "type": "assistant"
+    }
+  ],
+  "user_and_assistant_seen": true,
+  "test_tui_closed_cleanly": true,
+  "test_tui_exit_code": 0
+}

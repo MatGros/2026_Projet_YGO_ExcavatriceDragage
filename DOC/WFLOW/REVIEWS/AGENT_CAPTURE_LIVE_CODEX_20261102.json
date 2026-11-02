@@ -1,0 +1,175 @@
+{
+  "platform": "codex",
+  "executable": "C:\\Users\\ZEDVICTUS\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.EXE",
+  "cwd": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_ysar_199",
+  "pid": 44484,
+  "marker": "OBSERVATION_PROBE_bab9cca607534ae4bf8d869b75591566",
+  "expected_session_id": null,
+  "native_id": "01a199fa-f501-7313-bea5-6db39f54df1a",
+  "source_path": "C:\\Users\\ZEDVICTUS\\.codex\\sessions\\2026\\11\\02\\rollout-2026-11-02T02-58-43-01a199fa-f501-7313-bea5-6db39f54df1a.jsonl",
+  "source_states": [
+    "active"
+  ],
+  "source_events": [
+    {
+      "seconds": 1.6578137999749742,
+      "alive": true,
+      "type": "session_meta",
+      "contains_marker": false
+    },
+    {
+      "seconds": 1.6579850999987684,
+      "alive": true,
+      "type": "event_msg",
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.719889800006058,
+      "alive": true,
+      "type": "response_item",
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.7201819000183605,
+      "alive": true,
+      "type": "response_item",
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.7203517999732867,
+      "alive": true,
+      "type": "response_item",
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.720415099989623,
+      "alive": true,
+      "type": "response_item",
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.720434100017883,
+      "alive": true,
+      "type": "response_item",
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.720449800021015,
+      "alive": true,
+      "type": "response_item",
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.7204655000241473,
+      "alive": true,
+      "type": "world_state",
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.7208341999794357,
+      "alive": true,
+      "type": "turn_context",
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.720861200010404,
+      "alive": true,
+      "type": "event_msg",
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.7208804999827407,
+      "alive": true,
+      "type": "response_item",
+      "contains_marker": true
+    },
+    {
+      "seconds": 2.720902099972591,
+      "alive": true,
+      "type": "event_msg",
+      "contains_marker": true
+    },
+    {
+      "seconds": 4.60209230001783,
+      "alive": true,
+      "type": "event_msg",
+      "contains_marker": true
+    },
+    {
+      "seconds": 4.602141499985009,
+      "alive": true,
+      "type": "response_item",
+      "contains_marker": true
+    },
+    {
+      "seconds": 4.689911999972537,
+      "alive": true,
+      "type": "token_usage_record",
+      "contains_marker": false
+    },
+    {
+      "seconds": 4.689968399994541,
+      "alive": true,
+      "type": "event_msg",
+      "contains_marker": false
+    },
+    {
+      "seconds": 4.690009500016458,
+      "alive": true,
+      "type": "event_msg",
+      "contains_marker": true
+    }
+  ],
+  "state": "exited",
+  "exit_code": 0,
+  "duration_seconds": 6.322861200023908,
+  "events": [
+    {
+      "seconds": 1.3314599000150338,
+      "alive": true,
+      "keys": [
+        "thread_id",
+        "type"
+      ],
+      "type": "thread.started",
+      "ids": {
+        "thread_id": "01a199fa-f501-7313-bea5-6db39f54df1a"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 1.713548699975945,
+      "alive": true,
+      "keys": [
+        "type"
+      ],
+      "type": "turn.started",
+      "ids": {},
+      "contains_marker": false
+    },
+    {
+      "seconds": 4.58770239999285,
+      "alive": true,
+      "keys": [
+        "item",
+        "type"
+      ],
+      "type": "item.completed",
+      "ids": {},
+      "contains_marker": true
+    },
+    {
+      "seconds": 4.688749799970537,
+      "alive": true,
+      "keys": [
+        "type",
+        "usage"
+      ],
+      "type": "turn.completed",
+      "ids": {},
+      "contains_marker": false
+    }
+  ],
+  "raw_output": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_ysar_199\\stdout.jsonl",
+  "stderr": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_ysar_199\\stderr.log"
+}

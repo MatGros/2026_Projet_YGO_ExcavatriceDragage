@@ -1,0 +1,57 @@
+[
+  {
+    "platform": "claude",
+    "session_id": "fe9dad59-ea4d-41c3-9469-d4d1fc2c709b",
+    "matching_paths": [
+      "C:\\Users\\ZEDVICTUS\\.claude\\projects\\C--Users-ZEDVIC-1-AppData-Local-Temp-agent-capture-jjhnj3cl\\fe9dad59-ea4d-41c3-9469-d4d1fc2c709b.jsonl"
+    ],
+    "states": [
+      "ready"
+    ],
+    "parse_state": "active",
+    "records": 27,
+    "record_types": [
+      "api-request",
+      "api-request-blob",
+      "api-request-shape",
+      "assistant",
+      "atis-latch",
+      "attachment",
+      "cost-state",
+      "last-prompt",
+      "queue-operation",
+      "system",
+      "user"
+    ]
+  },
+  {
+    "platform": "codex",
+    "session_id": "01a199f7-06ac-7423-9d24-63ee56ff21ca",
+    "matching_paths": [
+      "C:\\Users\\ZEDVICTUS\\.codex\\sessions\\2026\\11\\02\\rollout-2026-11-02T02-54-26-01a199f7-06ac-7423-9d24-63ee56ff21ca.jsonl"
+    ],
+    "states": [
+      "ready"
+    ],
+    "parse_state": "active",
+    "records": 18,
+    "record_types": [
+      "event_msg",
+      "response_item",
+      "session_meta",
+      "token_usage_record",
+      "turn_context",
+      "world_state"
+    ]
+  },
+  {
+    "platform": "agy",
+    "session_id": "dcd15f21-01d3-4503-81be-317d22f46c28",
+    "matching_paths": [],
+    "states": [
+      "source_missing",
+      "source_missing",
+      "source_missing"
+    ]
+  }
+]

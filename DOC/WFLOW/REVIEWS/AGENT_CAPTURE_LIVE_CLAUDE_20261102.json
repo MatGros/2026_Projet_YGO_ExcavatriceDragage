@@ -1,0 +1,397 @@
+{
+  "platform": "claude",
+  "executable": "C:\\Users\\ZEDVICTUS\\.local\\bin\\claude.EXE",
+  "cwd": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_ztdt8o6x",
+  "pid": 21776,
+  "marker": "OBSERVATION_PROBE_103a3b962a944be19de0cfc7ccd831f5",
+  "expected_session_id": "4a41df53-8896-4edd-8fc9-54d40aabaaa1",
+  "native_id": "4a41df53-8896-4edd-8fc9-54d40aabaaa1",
+  "source_path": "C:\\Users\\ZEDVICTUS\\.claude\\projects\\C--Users-ZEDVIC-1-AppData-Local-Temp-agent-capture-ztdt8o6x\\4a41df53-8896-4edd-8fc9-54d40aabaaa1.jsonl",
+  "source_states": [
+    "active"
+  ],
+  "source_events": [
+    {
+      "seconds": 5.673252500011586,
+      "alive": true,
+      "type": "queue-operation",
+      "contains_marker": true
+    },
+    {
+      "seconds": 5.673290300008375,
+      "alive": true,
+      "type": "queue-operation",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.673302500043064,
+      "alive": true,
+      "type": "user",
+      "contains_marker": true
+    },
+    {
+      "seconds": 5.673319599998649,
+      "alive": true,
+      "type": "attachment",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.6733391000307165,
+      "alive": true,
+      "type": "attachment",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.673351200006437,
+      "alive": true,
+      "type": "attachment",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.673366900009569,
+      "alive": true,
+      "type": "attachment",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.673402099986561,
+      "alive": true,
+      "type": "attachment",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.6735570000018924,
+      "alive": true,
+      "type": "attachment",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.673614100029226,
+      "alive": true,
+      "type": "atis-latch",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.673621900030412,
+      "alive": true,
+      "type": "attachment",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.67364200000884,
+      "alive": true,
+      "type": "attachment",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.673656500002835,
+      "alive": true,
+      "type": "attachment",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.673667300026864,
+      "alive": true,
+      "type": "attachment",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.673735600023065,
+      "alive": true,
+      "type": "api-request-shape",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.677187499997672,
+      "alive": true,
+      "type": "api-request-blob",
+      "contains_marker": true
+    },
+    {
+      "seconds": 5.677233599999454,
+      "alive": true,
+      "type": "api-request-blob",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.677408099989407,
+      "alive": true,
+      "type": "api-request",
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.6774438000284135,
+      "alive": true,
+      "type": "last-prompt",
+      "contains_marker": true
+    },
+    {
+      "seconds": 5.677452100033406,
+      "alive": true,
+      "type": "atis-latch",
+      "contains_marker": false
+    },
+    {
+      "seconds": 9.026688900019508,
+      "alive": true,
+      "type": "assistant",
+      "contains_marker": false
+    },
+    {
+      "seconds": 9.02676189999329,
+      "alive": true,
+      "type": "assistant",
+      "contains_marker": true
+    },
+    {
+      "seconds": 9.026800599996932,
+      "alive": true,
+      "type": "attachment",
+      "contains_marker": false
+    },
+    {
+      "seconds": 9.029864999989513,
+      "alive": true,
+      "type": "last-prompt",
+      "contains_marker": true
+    },
+    {
+      "seconds": 9.029905600007623,
+      "alive": true,
+      "type": "atis-latch",
+      "contains_marker": false
+    },
+    {
+      "seconds": 9.696246900013648,
+      "alive": true,
+      "type": "system",
+      "contains_marker": false
+    },
+    {
+      "seconds": 9.948435400030576,
+      "alive": true,
+      "type": "last-prompt",
+      "contains_marker": true
+    },
+    {
+      "seconds": 9.948475999990478,
+      "alive": true,
+      "type": "cost-state",
+      "contains_marker": false
+    }
+  ],
+  "state": "exited",
+  "exit_code": 0,
+  "duration_seconds": 11.875889200018719,
+  "events": [
+    {
+      "seconds": 1.4250107000116259,
+      "alive": true,
+      "keys": [
+        "hook_event",
+        "hook_id",
+        "hook_name",
+        "session_id",
+        "subtype",
+        "type",
+        "uuid"
+      ],
+      "type": "system",
+      "ids": {
+        "session_id": "4a41df53-8896-4edd-8fc9-54d40aabaaa1"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.304080600035377,
+      "alive": true,
+      "keys": [
+        "exit_code",
+        "hook_event",
+        "hook_id",
+        "hook_name",
+        "outcome",
+        "output",
+        "session_id",
+        "stderr",
+        "stdout",
+        "subtype",
+        "type",
+        "uuid"
+      ],
+      "type": "system",
+      "ids": {
+        "session_id": "4a41df53-8896-4edd-8fc9-54d40aabaaa1"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.362074800010305,
+      "alive": true,
+      "keys": [
+        "additional_directories",
+        "agents",
+        "analytics_disabled",
+        "apiKeySource",
+        "capabilities",
+        "claude_code_version",
+        "cwd",
+        "fast_mode_disabled_reason",
+        "fast_mode_state",
+        "mcp_servers",
+        "memory_paths",
+        "messaging_socket_path",
+        "model",
+        "original_cwd",
+        "output_style",
+        "per_turn_effort_active",
+        "permissionMode",
+        "plugins",
+        "powershell_path",
+        "product_feedback_disabled",
+        "session_id",
+        "skills",
+        "slash_commands",
+        "subtype",
+        "terminal_slash_commands",
+        "tools",
+        "type",
+        "ultrathink_available",
+        "uuid",
+        "view_mode"
+      ],
+      "type": "system",
+      "ids": {
+        "session_id": "4a41df53-8896-4edd-8fc9-54d40aabaaa1"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 8.488001100020483,
+      "alive": true,
+      "keys": [
+        "estimated_tokens",
+        "estimated_tokens_delta",
+        "session_id",
+        "subtype",
+        "type",
+        "uuid"
+      ],
+      "type": "system",
+      "ids": {
+        "session_id": "4a41df53-8896-4edd-8fc9-54d40aabaaa1"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 8.726969000010286,
+      "alive": true,
+      "keys": [
+        "estimated_tokens",
+        "estimated_tokens_delta",
+        "session_id",
+        "subtype",
+        "type",
+        "uuid"
+      ],
+      "type": "system",
+      "ids": {
+        "session_id": "4a41df53-8896-4edd-8fc9-54d40aabaaa1"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 8.72930589999305,
+      "alive": true,
+      "keys": [
+        "message",
+        "parent_tool_use_id",
+        "request_id",
+        "session_id",
+        "thinking_display",
+        "thinking_duration_ms",
+        "timestamp",
+        "type",
+        "uuid"
+      ],
+      "type": "assistant",
+      "ids": {
+        "session_id": "4a41df53-8896-4edd-8fc9-54d40aabaaa1"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 8.751495600037742,
+      "alive": true,
+      "keys": [
+        "message",
+        "parent_tool_use_id",
+        "request_id",
+        "session_id",
+        "timestamp",
+        "type",
+        "uuid"
+      ],
+      "type": "assistant",
+      "ids": {
+        "session_id": "4a41df53-8896-4edd-8fc9-54d40aabaaa1"
+      },
+      "contains_marker": true
+    },
+    {
+      "seconds": 8.768890100007411,
+      "alive": true,
+      "keys": [
+        "rate_limit_info",
+        "session_id",
+        "type",
+        "uuid"
+      ],
+      "type": "rate_limit_event",
+      "ids": {
+        "session_id": "4a41df53-8896-4edd-8fc9-54d40aabaaa1"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 9.682410300010815,
+      "alive": true,
+      "keys": [
+        "api_error_status",
+        "duration_api_ms",
+        "duration_ms",
+        "fast_mode_disabled_reason",
+        "fast_mode_state",
+        "first_content_frame_ms",
+        "is_error",
+        "modelUsage",
+        "model_usage_since_last_result",
+        "num_turns",
+        "permission_denials",
+        "queued_turn_count",
+        "result",
+        "result_index",
+        "safety_stops",
+        "session_id",
+        "stop_reason",
+        "subagent_stats",
+        "subtype",
+        "terminal_reason",
+        "time_to_request_ms",
+        "total_cost_usd",
+        "ttft_ms",
+        "ttft_stream_ms",
+        "type",
+        "usage",
+        "uuid"
+      ],
+      "type": "result",
+      "ids": {
+        "session_id": "4a41df53-8896-4edd-8fc9-54d40aabaaa1"
+      },
+      "contains_marker": true
+    }
+  ],
+  "raw_output": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_ztdt8o6x\\stdout.jsonl",
+  "stderr": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_ztdt8o6x\\stderr.log"
+}

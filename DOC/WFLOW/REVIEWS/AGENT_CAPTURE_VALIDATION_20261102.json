@@ -1,0 +1,59 @@
+{
+  "created_at": "2026-11-02T02:08:30.630374+00:00",
+  "test_command": "python -m pytest TOOLS/AGENT_WORKFLOW/tests/test_agent_session_watch_poc.py TOOLS/AGENT_WORKFLOW/tests/test_agent_data_source_poc.py -q -p no:cacheprovider",
+  "test_exit_code": 0,
+  "test_passed": 27,
+  "scope": "targeted POC tests; no ST or CODESYS validation",
+  "sources": {
+    "TOOLS/AGENT_WORKFLOW/scripts/agent_session_watch_poc.py": "40ee5656dca8174cf19c2335e876d139ebb38222526df5755d859ef91a7dd5f4",
+    "TOOLS/AGENT_WORKFLOW/scripts/agent_session_runtime_probe.py": "260f2954abbb122c47f500c8bba470e6b9b244320c301f3e7b0ae572923c9ebc",
+    "TOOLS/AGENT_WORKFLOW/tests/test_agent_session_watch_poc.py": "129a2600003bc77ba0770e27c2cde617ab30b041beec6a4064df662418554c41"
+  },
+  "reviews": {
+    "A": "final Codex full UUID guard confirmed by inspection; no remaining blocker identified",
+    "B": "final Codex shortened-ID counterexample rejected after fix; no remaining blocker identified"
+  },
+  "remaining_limits": [
+    "no production service/UI/semantic judge",
+    "no arbitrary session discovery",
+    "probe timeout kills direct PID only",
+    "large transcript polling cost not benchmarked"
+  ],
+  "runtime": {
+    "CLAUDE": {
+      "exit_code": 0,
+      "stream_marker_before_exit": true,
+      "source_marker_before_exit": true,
+      "source_states": [
+        "active"
+      ],
+      "tui_user_and_assistant": true,
+      "tui_closed_cleanly": true
+    },
+    "CODEX": {
+      "exit_code": 0,
+      "stream_marker_before_exit": true,
+      "source_marker_before_exit": true,
+      "source_states": [
+        "active"
+      ],
+      "tui_user_and_assistant": true,
+      "tui_closed_cleanly": true
+    },
+    "AGY": {
+      "exit_code": 0,
+      "stream_marker_before_exit": true,
+      "source_marker_before_exit": true,
+      "source_states": [
+        "active"
+      ],
+      "tui_user_and_assistant": true,
+      "tui_closed_cleanly": true
+    }
+  },
+  "two_managed_probes": {
+    "launched_concurrently": "root orchestration tool trace, two independent exec calls in one Promise.allSettled",
+    "a_marker_in_b": false,
+    "b_marker_in_a": false
+  }
+}

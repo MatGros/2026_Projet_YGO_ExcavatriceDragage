@@ -1,0 +1,122 @@
+{
+  "platform": "claude",
+  "executable": "C:\\Users\\ZEDVICTUS\\.local\\bin\\claude.EXE",
+  "cwd": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_i0_gamgu",
+  "pid": 33848,
+  "expected_session_id": "3aec55a9-7918-4433-acfc-a3f61281c7ba",
+  "state": "exited",
+  "exit_code": 1,
+  "duration_seconds": 1.7776552999857813,
+  "events": [
+    {
+      "seconds": 0.9962808999698609,
+      "alive": true,
+      "keys": [
+        "event",
+        "session_id",
+        "subtype",
+        "type",
+        "uuid"
+      ],
+      "type": "system",
+      "ids": {
+        "session_id": "3aec55a9-7918-4433-acfc-a3f61281c7ba"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 1.1103027000208385,
+      "alive": true,
+      "keys": [
+        "additional_directories",
+        "agents",
+        "analytics_disabled",
+        "apiKeySource",
+        "capabilities",
+        "claude_code_version",
+        "cwd",
+        "fast_mode_disabled_reason",
+        "fast_mode_state",
+        "mcp_servers",
+        "model",
+        "original_cwd",
+        "output_style",
+        "per_turn_effort_active",
+        "permissionMode",
+        "plugins",
+        "powershell_path",
+        "product_feedback_disabled",
+        "session_id",
+        "skills",
+        "slash_commands",
+        "subtype",
+        "terminal_slash_commands",
+        "tools",
+        "type",
+        "ultrathink_available",
+        "uuid",
+        "view_mode"
+      ],
+      "type": "system",
+      "ids": {
+        "session_id": "3aec55a9-7918-4433-acfc-a3f61281c7ba"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 1.166351100022439,
+      "alive": true,
+      "keys": [
+        "error",
+        "is_api_error_message",
+        "message",
+        "parent_tool_use_id",
+        "session_id",
+        "timestamp",
+        "type",
+        "uuid"
+      ],
+      "type": "assistant",
+      "ids": {
+        "session_id": "3aec55a9-7918-4433-acfc-a3f61281c7ba"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 1.2149315999704413,
+      "alive": true,
+      "keys": [
+        "api_error_status",
+        "duration_api_ms",
+        "duration_ms",
+        "fast_mode_disabled_reason",
+        "fast_mode_state",
+        "is_error",
+        "modelUsage",
+        "model_usage_since_last_result",
+        "num_turns",
+        "permission_denials",
+        "queued_turn_count",
+        "result",
+        "result_index",
+        "safety_stops",
+        "session_id",
+        "stop_reason",
+        "subagent_stats",
+        "subtype",
+        "terminal_reason",
+        "total_cost_usd",
+        "type",
+        "usage",
+        "uuid"
+      ],
+      "type": "result",
+      "ids": {
+        "session_id": "3aec55a9-7918-4433-acfc-a3f61281c7ba"
+      },
+      "contains_marker": false
+    }
+  ],
+  "raw_output": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_i0_gamgu\\stdout.jsonl",
+  "stderr": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_i0_gamgu\\stderr.log"
+}
