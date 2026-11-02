@@ -1,0 +1,100 @@
+{
+  "platform": "agy",
+  "executable": "C:\\Users\\ZEDVICTUS\\AppData\\Local\\agy\\bin\\agy.EXE",
+  "cwd": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_ja0r3im_",
+  "pid": 12520,
+  "marker": "OBSERVATION_PROBE_c8e3e5807837448f96be57495d3dd3cd",
+  "expected_session_id": null,
+  "native_id": "8b68e39d-b78a-48e6-a586-9c68abae2f46",
+  "source_path": "C:\\Users\\ZEDVICTUS\\.gemini\\antigravity-cli\\brain\\8b68e39d-b78a-48e6-a586-9c68abae2f46\\.system_generated\\logs\\transcript.jsonl",
+  "source_states": [
+    "active"
+  ],
+  "source_events": [
+    {
+      "seconds": 36.88592460000655,
+      "alive": true,
+      "type": "USER_INPUT",
+      "contains_marker": true
+    },
+    {
+      "seconds": 41.9847556000459,
+      "alive": true,
+      "type": "PLANNER_RESPONSE",
+      "contains_marker": true
+    }
+  ],
+  "state": "exited",
+  "exit_code": 0,
+  "duration_seconds": 42.758861500013154,
+  "events": [
+    {
+      "seconds": 3.885360300017055,
+      "alive": true,
+      "keys": [
+        "conversation_id",
+        "event",
+        "init"
+      ],
+      "type": "init",
+      "ids": {
+        "conversation_id": "8b68e39d-b78a-48e6-a586-9c68abae2f46"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 36.86797080002725,
+      "alive": true,
+      "keys": [
+        "event",
+        "step_update"
+      ],
+      "type": "step_update",
+      "ids": {
+        "conversation_id": "8b68e39d-b78a-48e6-a586-9c68abae2f46"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 41.97091820003698,
+      "alive": true,
+      "keys": [
+        "event",
+        "step_update"
+      ],
+      "type": "step_update",
+      "ids": {
+        "conversation_id": "8b68e39d-b78a-48e6-a586-9c68abae2f46"
+      },
+      "contains_marker": true
+    },
+    {
+      "seconds": 41.99668040004326,
+      "alive": true,
+      "keys": [
+        "event",
+        "step_update"
+      ],
+      "type": "step_update",
+      "ids": {
+        "conversation_id": "8b68e39d-b78a-48e6-a586-9c68abae2f46"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 41.99683429999277,
+      "alive": true,
+      "keys": [
+        "event",
+        "result"
+      ],
+      "type": "result",
+      "ids": {
+        "conversation_id": "8b68e39d-b78a-48e6-a586-9c68abae2f46"
+      },
+      "contains_marker": true
+    }
+  ],
+  "raw_output": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_ja0r3im_\\stdout.jsonl",
+  "stderr": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_ja0r3im_\\stderr.log"
+}

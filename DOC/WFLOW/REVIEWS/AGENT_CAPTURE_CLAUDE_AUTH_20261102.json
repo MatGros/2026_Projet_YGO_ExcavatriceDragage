@@ -1,0 +1,167 @@
+{
+  "platform": "claude",
+  "executable": "C:\\Users\\ZEDVICTUS\\.local\\bin\\claude.EXE",
+  "cwd": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_jjhnj3cl",
+  "pid": 44536,
+  "expected_session_id": "fe9dad59-ea4d-41c3-9469-d4d1fc2c709b",
+  "state": "exited",
+  "exit_code": 0,
+  "duration_seconds": 13.520188599999528,
+  "events": [
+    {
+      "seconds": 1.8515159000526182,
+      "alive": true,
+      "keys": [
+        "hook_event",
+        "hook_id",
+        "hook_name",
+        "session_id",
+        "subtype",
+        "type",
+        "uuid"
+      ],
+      "type": "system",
+      "ids": {
+        "session_id": "fe9dad59-ea4d-41c3-9469-d4d1fc2c709b"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.070289600000251,
+      "alive": true,
+      "keys": [
+        "exit_code",
+        "hook_event",
+        "hook_id",
+        "hook_name",
+        "outcome",
+        "output",
+        "session_id",
+        "stderr",
+        "stdout",
+        "subtype",
+        "type",
+        "uuid"
+      ],
+      "type": "system",
+      "ids": {
+        "session_id": "fe9dad59-ea4d-41c3-9469-d4d1fc2c709b"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.140041900041979,
+      "alive": true,
+      "keys": [
+        "additional_directories",
+        "agents",
+        "analytics_disabled",
+        "apiKeySource",
+        "capabilities",
+        "claude_code_version",
+        "cwd",
+        "fast_mode_disabled_reason",
+        "fast_mode_state",
+        "mcp_servers",
+        "memory_paths",
+        "messaging_socket_path",
+        "model",
+        "original_cwd",
+        "output_style",
+        "per_turn_effort_active",
+        "permissionMode",
+        "plugins",
+        "powershell_path",
+        "product_feedback_disabled",
+        "session_id",
+        "skills",
+        "slash_commands",
+        "subtype",
+        "terminal_slash_commands",
+        "tools",
+        "type",
+        "ultrathink_available",
+        "uuid",
+        "view_mode"
+      ],
+      "type": "system",
+      "ids": {
+        "session_id": "fe9dad59-ea4d-41c3-9469-d4d1fc2c709b"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 10.396305400005076,
+      "alive": true,
+      "keys": [
+        "message",
+        "parent_tool_use_id",
+        "request_id",
+        "session_id",
+        "timestamp",
+        "type",
+        "uuid"
+      ],
+      "type": "assistant",
+      "ids": {
+        "session_id": "fe9dad59-ea4d-41c3-9469-d4d1fc2c709b"
+      },
+      "contains_marker": true
+    },
+    {
+      "seconds": 10.421181900019292,
+      "alive": true,
+      "keys": [
+        "rate_limit_info",
+        "session_id",
+        "type",
+        "uuid"
+      ],
+      "type": "rate_limit_event",
+      "ids": {
+        "session_id": "fe9dad59-ea4d-41c3-9469-d4d1fc2c709b"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 11.335515200044028,
+      "alive": true,
+      "keys": [
+        "api_error_status",
+        "duration_api_ms",
+        "duration_ms",
+        "fast_mode_disabled_reason",
+        "fast_mode_state",
+        "first_content_frame_ms",
+        "is_error",
+        "modelUsage",
+        "model_usage_since_last_result",
+        "num_turns",
+        "permission_denials",
+        "queued_turn_count",
+        "result",
+        "result_index",
+        "safety_stops",
+        "session_id",
+        "stop_reason",
+        "subagent_stats",
+        "subtype",
+        "terminal_reason",
+        "time_to_request_ms",
+        "total_cost_usd",
+        "ttft_ms",
+        "ttft_stream_ms",
+        "type",
+        "usage",
+        "uuid"
+      ],
+      "type": "result",
+      "ids": {
+        "session_id": "fe9dad59-ea4d-41c3-9469-d4d1fc2c709b"
+      },
+      "contains_marker": true
+    }
+  ],
+  "raw_output": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_jjhnj3cl\\stdout.jsonl",
+  "stderr": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_jjhnj3cl\\stderr.log"
+}

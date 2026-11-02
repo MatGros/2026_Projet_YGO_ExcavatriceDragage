@@ -1,0 +1,59 @@
+{
+  "platform": "codex",
+  "executable": "C:\\Users\\ZEDVICTUS\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.EXE",
+  "cwd": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_vmqhrs2v",
+  "pid": 57256,
+  "expected_session_id": null,
+  "state": "exited",
+  "exit_code": 0,
+  "duration_seconds": 7.753528000030201,
+  "events": [
+    {
+      "seconds": 1.9757620000164025,
+      "alive": true,
+      "keys": [
+        "thread_id",
+        "type"
+      ],
+      "type": "thread.started",
+      "ids": {
+        "thread_id": "01a199f7-06ac-7423-9d24-63ee56ff21ca"
+      },
+      "contains_marker": false
+    },
+    {
+      "seconds": 2.891862399992533,
+      "alive": true,
+      "keys": [
+        "type"
+      ],
+      "type": "turn.started",
+      "ids": {},
+      "contains_marker": false
+    },
+    {
+      "seconds": 5.932167200022377,
+      "alive": true,
+      "keys": [
+        "item",
+        "type"
+      ],
+      "type": "item.completed",
+      "ids": {},
+      "contains_marker": true
+    },
+    {
+      "seconds": 6.0623126000282355,
+      "alive": true,
+      "keys": [
+        "type",
+        "usage"
+      ],
+      "type": "turn.completed",
+      "ids": {},
+      "contains_marker": false
+    }
+  ],
+  "raw_output": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_vmqhrs2v\\stdout.jsonl",
+  "stderr": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\agent_capture_vmqhrs2v\\stderr.log"
+}
