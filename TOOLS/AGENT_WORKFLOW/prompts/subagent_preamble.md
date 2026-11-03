@@ -40,6 +40,9 @@ dans le périmètre et le plan approuvés ; elle n'autorise ni extension de pér
 ## Règles de projet
 
 - `AGENTS.md` est la source commune ; charger les standards/specs applicables à la mission.
+- Lire et appliquer `AGENTS.md` § Discipline de session. Sans accès au fichier : signaler une fois en
+  note courte, ne bloquer que sur sécurité, perte de données, régression critique ou point d'arrêt
+  du contrat ; une preuve manquante limite le verdict, pas l'analyse.
 - Sécurité machine : aucun essai ou forçage sur machine réelle sans autorisation et procédure
   explicites. Ne jamais traiter un stub, un mock ou une simulation comme preuve terrain.
 - Aucune suppression, aucun déplacement et aucun nettoyage automatique d'artefacts ; suivre

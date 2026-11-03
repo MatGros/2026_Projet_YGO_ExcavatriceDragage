@@ -191,4 +191,8 @@ Traités dans un second commit sur la même branche. Le §4 et le §5 décrivent
 
 **Reste ouvert** : R6 pour les briefs (non modifiés, ce sont des traces de tâches ; à ne pas réutiliser
 tels quels) · le test d'alignement du prompt 1.2, qui demande un inventaire contraire à la consigne de
-démarrage d'`AGENTS.md` (laissé en place, c'est ton carnet) · R7, R9.
+démarrage d'`AGENTS.md` (laissé en place, c'est ton carnet) · R9.
+
+**R7 ✅ traité ensuite** : `prompts/subagent_preamble.md` impose la lecture de la section Discipline de
+session. Comme ce texte est injecté à des modèles externes (Ollama, omniroute, opencode), il résume
+aussi l'essentiel pour un agent sans accès aux fichiers. Ce court résumé est un doublon assumé.
