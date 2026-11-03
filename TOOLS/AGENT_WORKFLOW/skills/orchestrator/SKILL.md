@@ -28,6 +28,10 @@ modification de code.
 explicite de la tâche et de son plan.** Tâche + plan validés → **GO** : l'orchestrateur exécute
 le lot en entier, sans s'arrêter à chaque édition.
 
+**Portée** : cette règle vise les tâches du catalogue `TASKS.yaml` sur `CODE/` et sur les périmètres
+non dispensés de contrat (`WORKFLOW.md` § Contrat de tâche). Les actions interactives, locales et
+réversibles de la session relèvent de `AGENTS.md` § Discipline de session, règle 4.
+
 - **Avant le GO** : présenter objectifs, périmètre et plan quand la voie de criticité ou le contrat
   prévoit un point d'arrêt humain.
 - **Après le GO** : plus d'arrêt au fil de l'eau ; le lot roule jusqu'à sa restitution
@@ -104,8 +108,7 @@ contourner un 🚩 d'un autre acteur). Le 🔒 reste jusqu'à la remise réelle 
   la première écriture du livrable (dispenses : `WORKFLOW.md` § Contrat de tâche ; gabarit `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`, contrôle
   `check_task_contract.py`).
 
-> ⚠️ Ne jamais utiliser `git reset --hard`, `git checkout .` ou `git restore .` sans validation
-> humaine explicite et snapshot préalable.
+> ⚠️ Commandes destructives : voir `AGENTS.md` § Discipline de session, règle 6 (liste unique).
 
 ---
 
