@@ -164,6 +164,31 @@ preuve discriminante » · `TASKS.yaml` · stubs `.claude/` et `.dsh/`.
 ## 7. ▶️ Décisions à prendre
 
 1. Relire le diff et décider de l'intégration dans `work/base-machine-simu`.
-2. Trancher R2 (règle 4 contre règle d'or).
-3. Revoir `DOC/WFLOW/PROMPTS/prompts.md` (R6), le risque le plus concret.
-4. Choisir le sort de R5, R7 et R9.
+2. Choisir le sort de R7 et R9.
+
+---
+
+## 8. 🔁 Second passage après avis du vérificateur
+
+Traités dans un second commit sur la même branche. Le §4 et le §5 décrivent le premier passage.
+
+| Risque | Fichier | Avant | Après |
+|---|---|---|---|
+| R2 ✅ | `AGENTS.md`, règle 4 | « Action demandée, locale et réversible : la faire » | Action **interactive de la session** (lecture, recherche, test ou script local). Ne modifie jamais `CODE/` ni un périmètre non dispensé de contrat |
+| R2 ✅ | `skills/orchestrator/SKILL.md`, règle d'or | Pas de portée écrite | **Portée** : tâches du catalogue `TASKS.yaml` sur `CODE/` et périmètres non dispensés. Actions interactives : règle 4 |
+| R5 ✅ | `skills/orchestrator/SKILL.md`, `skills/task-planner/SKILL.md` | Liste de commandes recopiée | Renvoi vers `AGENTS.md` règle 6, liste unique |
+| R6 ✅ partiel | `DOC/WFLOW/PROMPTS/prompts.md`, prompts 1.1 et 1.2 | « Challenge mes propositions », « ne valide pas mes affirmations par défaut », confirmation avant toute modification | Signalement une fois en note courte, blocage limité à la liste fermée, constat terrain = postulat, confirmation réservée aux tâches sur `CODE/` |
+
+**Écarts par rapport à l'avis du vérificateur** :
+
+- Portée de la règle d'or : « sur `CODE/` » seul aurait sorti de son champ les gates, les hooks et le
+  convertisseur. Les périmètres non dispensés de contrat y sont donc ajoutés.
+- « Poser un log temporaire » n'entre pas dans la règle 4 s'il touche `CODE/` : cela contredirait
+  `WORKFLOW.md`, qui ne dispense jamais une écriture `CODE/`, même pour instrumenter.
+- `prompts.md` : la citation « ne valide jamais les affirmations ou choix utilisateur par défaut » vient
+  de `BRIEF_T224:63` et `BRIEF_T371:37`, pas de ce fichier. Aucun fichier ne référence `prompts.md` :
+  il agit quand l'utilisateur colle ces prompts, pas par chargement automatique d'un sous-agent.
+
+**Reste ouvert** : R6 pour les briefs (non modifiés, ce sont des traces de tâches ; à ne pas réutiliser
+tels quels) · le test d'alignement du prompt 1.2, qui demande un inventaire contraire à la consigne de
+démarrage d'`AGENTS.md` (laissé en place, c'est ton carnet) · R7, R9.
