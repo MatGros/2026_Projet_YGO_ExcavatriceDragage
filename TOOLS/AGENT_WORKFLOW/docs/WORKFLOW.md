@@ -57,7 +57,19 @@ En cas d'hésitation → **patch par défaut** : il est réversible, le rebuild 
 > génériques** réutilisées telles quelles. Un agent rendait donc un rapport « conforme » à rien.
 > Une vérification qui ne porte sur aucun objectif reste creuse, même rendue obligatoire.
 
-Rédigé par l'**orchestrateur**, **avant** toute écriture ou délégation. Obligatoire dès **C2**.
+Rédigé par l'**orchestrateur**, **avant la première écriture du livrable** ou sa délégation.
+Obligatoire dès **C2**.
+
+**Dispensés de contrat préalable** (définition unique, les autres documents y renvoient) :
+investigation et diagnostic en lecture seule, analyse de traces, tests ad hoc
+`TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/`, scripts locaux dans `TOOLS/`.
+
+**Jamais dispensés** : toute écriture dans `CODE/`, y compris pour instrumenter un diagnostic ;
+`TOOLS/CONVERTER_ST2XML_PLCopenXML/`, les gates et les hooks, car ils produisent ou contrôlent ce
+qui part sur la machine ; tout sujet safety.
+
+⚠️ Une dispense de contrat n'est pas une dispense d'accord : l'action reste demandée par
+l'utilisateur et dans le périmètre.
 
 - Gabarit : `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`
 - Emplacement canonique : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_<id>.yaml`, référencé depuis `TASKS.yaml`
@@ -94,7 +106,7 @@ Besoin cadré → action proportionnée → vérification adaptée → restituti
 ```text
 Contrat ciblé → plan et autorisations → exécution → contrôles correspondant aux critères → restitution
 ```
-- Le contrat est requis dès C2. Un registre ou `TASK_CONTEXT.yaml` n'est ajouté que si le suivi
+- Le contrat est requis dès C2 (dispenses : § Contrat de tâche). Un registre ou `TASK_CONTEXT.yaml` n'est ajouté que si le suivi
   apporte une information qui ne tient pas déjà au contrat et au catalogue.
 - Une revue indépendante est choisie selon le risque, un contrat, une anomalie ou une demande
   explicite ; elle n'est pas un rituel après chaque sous-tâche.

@@ -76,7 +76,7 @@ FORMAT DE RESTITUTION
 
 ## Points d'arrêt immédiat
 
-- contrat C2+ absent, ambigu ou non testable ;
+- contrat C2+ requis (hors dispenses de `WORKFLOW.md` § Contrat de tâche) absent, ambigu ou non testable ;
 - hypothèse safety non tranchée ;
 - conflit d'écriture ou modification concurrente du même fichier ;
 - diff contenant un fichier inattendu, une suppression ou un élargissement de scope ;

@@ -32,7 +32,7 @@ le lot en entier, sans s'arrêter à chaque édition.
   prévoit un point d'arrêt humain.
 - **Après le GO** : plus d'arrêt au fil de l'eau ; le lot roule jusqu'à sa restitution
   (implémentation → contrôles adaptés → revue indépendante si requise → restitution).
-- Dès C2, pas d'implémentation sans contrat clair. La revue indépendante dépend de la criticité,
+- Dès C2, pas d'implémentation sans contrat clair (dispenses : `WORKFLOW.md` § Contrat de tâche). La revue indépendante dépend de la criticité,
   du contrat, d'une anomalie ou d'une demande ; la lecture du **`git diff`
   réel** reste à l'orchestrateur, **jamais** à l'agent qui a produit le code.
 - Les arrêts de validation prévus par un contrat/plan spécifique (ex. C0/C4, mentions
@@ -68,7 +68,7 @@ outils ni le workflow complet.
 | 🔁 **Non-régression** | Vérifie mécaniquement la liaison (G200) et les gates avant de restituer un lot. |
 | ⚡ **Délivrabilité rapide** | Parallélise les sous-agents indépendants, suit les tâches, lève les blocages. |
 | ✅ **Respecte les points d'arrêt** | Fait valider contrat/plan lorsque la criticité ou le contrat l'exige ; après GO, le périmètre approuvé s'exécute sans re-validation édition par édition. |
-| 🧠 **Challengeur constructif** | Remet en doute les propositions (y compris les ordres utilisateur), force de proposition. |
+| 🧠 **Challengeur proportionné** | Applique `AGENTS.md` § Discipline de session : bloque seulement sur la liste fermée ; sinon exécute et laisse une note, force de proposition. |
 
 ---
 
@@ -85,7 +85,7 @@ Chaque tâche porte : `id`, `parent_id`, `statut`, `criticite`, `domaine`, `agen
 | Champ | Valeurs | Signification |
 |---|---|---|
 | `statut` | `✅` / `⏳` / `⬜` / `⏸️` / `⛔` / `❌` | avancement métier : fait / en cours / à faire / en pause / bloqué / échoué |
-| `criticite` | `C0`–`C4` | criticité (C0 = critique, C4 = mineure) |
+| `criticite` | `C0`–`C4` | criticité, échelle canonique dans `WORKFLOW.md` (C0 = mineure, C4 = safety critique) |
 | `domaine` | ex. `STANDARDS`, `OUTILLAGE`, `SAFETY` | domaine fonctionnel |
 | `agent` | `CC01`, `AGY01`, `CDX01`, `DSH01`, `OPC01`, `HUM`, `—` | acteur attribué (format strict Trigramme+01..99, max 6 car., zéro libellé long) |
 
@@ -101,7 +101,7 @@ contourner un 🚩 d'un autre acteur). Le 🔒 reste jusqu'à la remise réelle 
 - Identifier les `⛔` (bloquées) et lever le blocage (diagnostic `troubleshooting` si besoin).
 - Vérifier les `bloque_par` : une tâche ne se clôture pas si ses prérequis sont ouverts.
 - Dès `C2`, le contrat `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_<id>.yaml` est **obligatoire** avant
-  toute écriture (gabarit `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`, contrôle
+  la première écriture du livrable (dispenses : `WORKFLOW.md` § Contrat de tâche ; gabarit `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`, contrôle
   `check_task_contract.py`).
 
 > ⚠️ Ne jamais utiliser `git reset --hard`, `git checkout .` ou `git restore .` sans validation
@@ -162,7 +162,7 @@ filtre d'affichage, pas un nettoyage ni un archivage ; l'historique reste dans l
   `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` avec le besoin utilisateur, l'historique
   utile, les preuves, les critères mesurables, le rôle, le scope et les permissions.
 - **Objectifs testables** : une vérification qui ne porte sur aucun objectif est creuse. Rédiger
-  le contrat de tâche (obligatoire dès C2) avant toute délégation.
+  le contrat de tâche (obligatoire dès C2, hors dispenses de `WORKFLOW.md`) avant la délégation.
 - **Déléguer ce qui le justifie** : branches indépendantes, recherches longues/répétitives,
   audit historique, exploration large, comparaison multi-modèle et revue indépendante. L'orchestrateur conserve
   le task manager, le test manager, le phasage, les arbitrages de scope et l'acceptation finale.
@@ -352,7 +352,7 @@ l'exploitant de relever une valeur que la **CI ou un snapshot** aurait pu fourni
 - [ ] Tâche + plan validés humainement **avant** l'implémentation (GO explicite) — ensuite le lot s'exécute sans arrêt au fil de l'eau
 - [ ] Tâche et verrou gérés par le coordinateur via le Task Manager existant, si la tâche est au catalogue
 - [ ] Action de coordination enregistrée seulement si elle est indépendante ou assez longue pour justifier un suivi
-- [ ] Contrat de tâche rédigé (obligatoire dès C2) avant délégation
+- [ ] Contrat de tâche rédigé (obligatoire dès C2, hors dispenses de `WORKFLOW.md`) avant délégation
 - [ ] Travail réparti sans conflit : un responsable principal, un seul écrivain par scope, reviewers read-only
 - [ ] Sous-agents utiles lancés avec `subagent_preamble.md` et objectifs/preuves explicites
 - [ ] Revue indépendante si exigée par le contrat/criticité, déclenchée par une anomalie ou demandée par l'utilisateur

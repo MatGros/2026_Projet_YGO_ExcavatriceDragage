@@ -16,6 +16,13 @@ fiche pour chaque question, ni une modification de code.
   la configuration fraîche fournie pour le diagnostic et les observations horodatées.
 - Distinguer explicitement **fait**, **hypothèse**, **inférence** et **inconnu**. Une cause racine
   n'est confirmée que par une preuve qui la distingue des causes concurrentes.
+- **Observations terrain** : un constat rapporté par l'exploitant est un postulat d'analyse immédiat,
+  conservé tant que le code ou une trace ne le contredit pas. Une contradiction se signale et ne
+  l'annule pas seule. Un chiffre donné de mémoire reste une hypothèse paramétrable.
+- **Preuve manquante ≠ arrêt** : l'absence d'oscilloscope ou de traceur limite le verdict, jamais
+  l'analyse. Si un diagnostic est demandé, produire un arbre court de causes physiques déduit du code
+  et des principes électromécaniques, de la plus probable à la moins probable. Le résultat s'écrit
+  « cause la plus probable », jamais « cause prouvée ». Pas de correctif tant qu'il n'est pas demandé.
 - Respecter T279 : ne rien supprimer, déplacer ou nettoyer automatiquement.
 
 ## Choisir l'effort utile
@@ -56,7 +63,7 @@ Répondre avec :
 
 1. **Acquis** — faits démontrés et preuve.
 2. **Écart / incertitude** — hypothèses encore ouvertes et ce qui manque.
-3. **Verdict** — cause prouvée, cause écartée ou diagnostic non concluant.
+3. **Verdict** — cause prouvée, cause la plus probable (déduction), cause écartée ou diagnostic non concluant.
 4. **Action suivante** — une action précise et l'information nouvelle qu'elle doit produire.
 
 Références détaillées, cas de snapshot et méthode d'arbre inverse :
