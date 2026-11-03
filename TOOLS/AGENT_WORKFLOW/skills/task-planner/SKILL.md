@@ -59,7 +59,7 @@ technique. Ne jamais contourner un 🚩 d'un autre acteur.
 
 - Toute tâche manipulée actualise `date` au format `YYYY-MM-DDTHH:MM:SS`.
 - Une sous-tâche possède `parent_id`; avant clôture du parent, vérifier ses enfants ouverts.
-- Dès C2, le contrat `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_<id>.yaml` est obligatoire.
+- Dès C2, le contrat `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_<id>.yaml` est obligatoire (dispenses : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md` § Contrat de tâche).
 - Ne jamais utiliser `git reset --hard`, `git checkout .` ou `git restore .` sans validation humaine explicite et snapshot préalable.
 
 ## 🏷️ Nomenclature stricte du champ `agent`

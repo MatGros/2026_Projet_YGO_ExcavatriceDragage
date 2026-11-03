@@ -61,7 +61,7 @@ Règles :
 
 ## 1. 🧊 CONTEXTE FIGÉ (à remplir UNE fois selon la situation)
 
-> ⚠️ **L'agent NE DOIT PAS re-demander ces infos.** Si un point manque → « contexte incomplet », STOP, ne pas deviner. Vérifier la **fraîcheur** : **re-figer si > 5 min** ou si un événement (redémarrage, changement de mode) est survenu depuis le dernier contexte.
+> ⚠️ **L'agent NE DOIT PAS re-demander ces infos.** Si un point manque → le marquer **inconnu**, poser une hypothèse explicite et poursuivre l'analyse ; ne le demander que s'il change la sécurité ou le verdict. Vérifier la **fraîcheur** : **re-figer si > 5 min** ou si un événement (redémarrage, changement de mode) est survenu depuis le dernier contexte.
 
 **Situation :** `[SIMULATION BANC]` / `[SITE MACHINE RÉELLE]`
 
@@ -88,7 +88,8 @@ Utiliser les informations déjà fournies. Poser seulement les questions sans r�
 le périmètre ou le verdict ; ne pas rejouer une liste de questions complète.
 
 **Force des preuves** : les valeurs/mesures directes sont plus fortes que les observations rapportées ;
-une inférence seule ne confirme jamais une cause.
+une inférence seule ne confirme jamais une cause. Une observation rapportée reste un postulat
+d'analyse valable : elle n'est pas contestée faute de mesure.
 
 ## 3. 🧭 PHASE 0 — Caractériser le symptôme (avant tout arbre)
 
@@ -117,7 +118,7 @@ SYMPTÔME
 └─ 6. SORTIES / ACTIONNEURS  → commandée sans action / non commandée (reverse)
 ```
 
-**Règle d'or** : à chaque nœud, répondre *« quelle variable prouve/réfute cette branche, où la lire ? »*. Sinon branche **non testable** → le marquer, ne pas deviner.
+**Règle d'or** : à chaque nœud, répondre *« quelle variable prouve/réfute cette branche, où la lire ? »*. Sinon branche **non testable** → le marquer et l'évaluer par déduction, avec l'étiquette **hypothèse**.
 
 **💡 Exhaustivité & vitesse** : pour parcourir rapidement toutes les branches, déléguer l'exploration de branches **indépendantes** à des **sous-agents** (en parallèle), chacun remontant une branche jusqu'à sa source et rendant son verdict (cause confirmée / éliminée + preuve).
 > ⚠️ **Délégation par CONTRAT clair** : objectif précis, **mesurable et évaluable** (ex. « éliminer ou confirmer la branche X, preuve = lecture de la variable Y »). **Analyse statique** (code `.st`) = déléguable. **Lecture live** (demander à l'utilisateur) = **non déléguable** (l'orchestrateur la fait). Si le contrat n'est pas mesurable → **faire soi-même**.
@@ -200,7 +201,7 @@ TRACE_INVERSE(S):
 - Distinguer **FAIT / HYPOTHÈSE / INCERTITUDE**.
 - Lire dans `GVL_Troubleshooting` (lecture seule), **jamais forcer**.
 - **Ne pas modifier le code, forcer une variable ou piloter un runtime** sans autorisation explicite.
-- Cause racine **prouvée par lecture**, jamais par inférence seule.
+- Une cause racine n'est dite **prouvée** que par lecture ; déduite, elle est dite **la plus probable** et l'analyse continue.
 - 🚫 **Ne JAMAIS se baser sur `Device.export`** : cet export est mis à jour au bon vouloir humain,
   il est **souvent périmé** et induit des conclusions fausses. Sources fiables = `CODE/*.st`
   (sources versionnées) + `GVL_Troubleshooting` (diagnostic en direct).
