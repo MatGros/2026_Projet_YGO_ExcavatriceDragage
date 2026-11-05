@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Orchestrateur — Registre des agents & verdicts</title>
+<style>
+:root{color-scheme:dark;--bg:#1e1e2e;--card:#282a36;--border:#44475a;--text:#f8f8f2;--muted:#a6adc8;--accent:#bd93f9;--cyan:#8be9fd;--orange:#ffb86c;--red:#ff5555;--green:#50fa7b}
+*{box-sizing:border-box}body{margin:0;padding:18px;background:var(--bg);color:var(--text);font:14px system-ui,sans-serif}main{max-width:1180px;margin:auto}header,.toolbar,.entry-head,.entry-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}header{justify-content:space-between;border-bottom:2px solid var(--border);padding-bottom:12px}h1{font-size:20px;color:var(--accent);margin:0}a{color:var(--cyan)}.muted,.hint{color:var(--muted)}.hint{font-size:12px;line-height:1.45}.toolbar{margin:16px 0;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:9px}.toolbar button,.toolbar input,.entry-head{font:inherit;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);padding:8px 10px}.toolbar button{cursor:pointer}.toolbar button.active{border-color:var(--accent);color:var(--accent)}.toolbar input{flex:1;min-width:190px}.toolbar button:hover,.toolbar input:focus{border-color:var(--cyan)}#count{margin-left:auto;font-size:12px;color:var(--muted)}#error{padding:12px;border:1px solid var(--red);border-radius:7px;color:var(--red);white-space:pre-wrap}#entries{display:grid;gap:10px}.entry{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px}.entry-head{width:100%;display:flex;cursor:pointer;text-align:left}.entry-head:focus-visible{outline:2px solid var(--cyan)}.chevron{color:var(--muted);transition:transform .15s}.entry.open .chevron{transform:rotate(90deg)}.entry-id{font-family:monospace;font-weight:700;color:var(--accent)}.badge{font-size:11px;font-weight:700;padding:3px 7px;border-radius:4px;background:#393b4a}.priority-haute{color:var(--red)}.priority-moyenne{color:var(--orange)}.status-en_cours{color:var(--orange)}.status-en_attente{color:var(--cyan)}.status-termine{color:var(--green)}.entry-agent,.entry-date{font:12px monospace;color:var(--muted)}.entry-agent{margin-left:auto}.entry-subject{font-weight:650;margin:8px 0 4px}.entry-details{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.detail{border-left:3px solid var(--border);padding:7px 10px;background:rgba(0,0,0,.18);min-width:0}.detail h3{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin:0 0 5px}.detail p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.45}.detail.verdict{border-color:var(--accent)}.detail.decision{border-color:var(--green)}.detail.note{border-color:var(--cyan)}.empty{padding:22px;text-align:center;border:1px dashed var(--border);border-radius:8px;color:var(--muted)}@media(max-width:650px){body{padding:10px}.entry-details{grid-template-columns:1fr}.entry-agent{margin-left:0}}
+</style>
+</head>
+<body><main>
+<header><h1>▶ ORCHESTRATEUR — Registre des agents &amp; verdicts</h1><a href="/TASK_VIEWER.html">← Task Viewer</a></header>
+<p class="hint">Lecture seule · Source unique : <code>TASKS_ORCHESTRATOR.yaml</code>. Les entrées terminées sont masquées par défaut.</p>
+<nav class="toolbar" aria-label="Filtres du registre">
+ <button type="button" class="active" data-filter="active">Actives</button>
+ <button type="button" data-filter="done">Terminées</button>
+ <button type="button" data-filter="all">Toutes</button>
+ <input id="search" type="search" placeholder="Filtrer par tâche, agent ou texte…" aria-label="Filtrer les entrées">
+ <button type="button" id="refresh">↻ Actualiser</button><span id="count"></span>
+</nav>
+<p id="error" role="alert" hidden></p><div id="entries" aria-live="polite"></div>
+</main>
+<script>
+'use strict';
+const byId=id=>document.getElementById(id);
+let entries=[],filter='active';
+function normalized(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
+function display(value){if(value==null)return '';if(typeof value==='string')return value;if(Array.isArray(value))return value.map(display).join('\n');return JSON.stringify(value,null,2);}
+function node(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=String(text);if(className)el.className=className;return el;}
+function yamlScalar(raw){const value=raw.trim();if(value.startsWith('"')&&value.endsWith('"')){try{return JSON.parse(value);}catch(_error){return value.slice(1,-1);}}if(value.startsWith("'")&&value.endsWith("'"))return value.slice(1,-1).replace(/''/g,"'");return value;}
+function parseRegistryYaml(text){
+ const result=[];let current=null;
+ for(const line of text.split(/\r?\n/)){
+  if(!line.trim()||line.trim().startsWith('#'))continue;
+  const start=line.match(/^-\s+id:\s*(.*)$/);
+  if(start){if(current)result.push(current);current={id:yamlScalar(start[1])};continue;}
+  if(!current)continue;
+  const field=line.match(/^\s+([A-Za-z0-9_-]+):\s*(.*)$/);
+  if(field)current[field[1]]=yamlScalar(field[2]);
+ }
+ if(current)result.push(current);
+ return result;
+}
+function detail(label,value,className=''){if(!value)return null;const box=node('section',undefined,'detail '+className);box.append(node('h3',label),node('p',display(value)));return box;}
+function render(){
+ const query=normalized(byId('search').value.trim());
+ const shown=entries.filter(entry=>{
+  const completed=normalized(entry.statut)==='termine';
+  if(filter==='active'&&completed)return false;if(filter==='done'&&!completed)return false;
+  return !query||normalized(Object.values(entry).map(display).join(' ')).includes(query);
+ });
+ byId('count').textContent=`${shown.length}/${entries.length} entrées`;
+ const root=byId('entries');root.replaceChildren();
+ if(!shown.length){root.append(node('div',entries.length?'Aucune entrée pour ce filtre.':'Le registre ne contient aucune entrée.','empty'));return;}
+ for(const entry of shown){
+  const card=node('article',undefined,'entry');
+  const head=node('button',undefined,'entry-head');head.type='button';head.setAttribute('aria-expanded','false');
+  head.append(node('span','▶','chevron'),node('span',entry.id||'Sans ID','entry-id'),node('span',entry.type||'type inconnu','badge'),node('span',entry.priorite||'priorité inconnue','badge priority-'+normalized(entry.priorite).replace(/[^a-z0-9]+/g,'_')),node('span',entry.statut||'statut inconnu','badge status-'+normalized(entry.statut).replace(/[^a-z0-9]+/g,'_')),node('span',entry.agent_id||'agent non renseigné','entry-agent'),node('span',entry.date||'','entry-date'));
+  const subject=node('div',entry.sujet||'Sujet non renseigné','entry-subject');
+  const details=node('div',undefined,'entry-details');details.hidden=true;
+  for(const [key,label,cls] of [['livrable','Livrable',''],['verdict','Verdict','verdict'],['decision','Décision','decision'],['note','Note','note']]){const section=detail(label,entry[key],cls);if(section)details.append(section);}
+  head.addEventListener('click',()=>{const open=!card.classList.contains('open');card.classList.toggle('open',open);details.hidden=!open;head.setAttribute('aria-expanded',String(open));});
+  card.append(head,subject,details);root.append(card);
+ }
+}
+async function load(){
+ byId('error').hidden=true;byId('refresh').disabled=true;
+ try{
+  const response=await fetch('/api/orchestrator/json',{cache:'no-store'});
+  if(response.status===404){
+   const yamlResponse=await fetch('/TASKS_ORCHESTRATOR.yaml?'+Date.now(),{cache:'no-store'});
+   if(!yamlResponse.ok)throw Error('API absente et fichier TASKS_ORCHESTRATOR.yaml inaccessible');
+   entries=parseRegistryYaml(await yamlResponse.text());
+  }else{
+   const data=await response.json();if(!response.ok||!data.success||!Array.isArray(data.entries))throw Error(data.error||'Réponse du registre invalide');entries=data.entries;
+  }
+  render();
+ }
+ catch(error){byId('error').textContent='Registre indisponible : '+error.message;byId('error').hidden=false;}
+ finally{byId('refresh').disabled=false;}
+}
+document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{filter=button.dataset.filter;document.querySelectorAll('[data-filter]').forEach(item=>item.classList.toggle('active',item===button));render();}));
+byId('search').addEventListener('input',render);byId('refresh').addEventListener('click',load);load();
+</script>
+</body></html>

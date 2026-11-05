@@ -1,0 +1,85 @@
+contract:
+  task_id: T427
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Unifier les skills en un routeur mince à 3 voies, étendre le gabarit de contrat de tâche avec jalons, sas d essais et quotas sous-agents, et standardiser la note compagnon Markdown.
+
+  acceptance:
+    - id: AC1
+      statement: "Un routeur de skill project-workflow mince <= 50 lignes aiguille vers les 3 voies sans dupliquer le tronc commun."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_skill_stubs.py"
+    - id: AC2
+      statement: "Le gabarit task_contract.yaml intègre execution_plan, test_feedback compact, budget sous-agents 10/3 et champ companion_doc."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml"
+    - id: AC3
+      statement: "Le script check_task_contract.py valide les règles T9, T10 et T11 sans régression sur les contrats existants."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T427_WORKFLOW_SKILL_ET_CONTRAT_ETENDU.yaml"
+    - id: AC4
+      statement: "Le hook Stop autorise les checkpoints WIP déclarés et le hook PostToolUse ne bloque pas chaque micro-édition."
+      verified_by: "Vérification manuelle des scripts de hook et exécution de test"
+    - id: AC5
+      statement: "La note compagnon standardisée TASK_NOTE_T427_WORKFLOW_SKILL_ET_CONTRAT_ETENDU.md est liée et accessible pour les schémas et graphiques."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G530_check_contract_refs.py ."
+
+  scope:
+    allowed:
+      - TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml
+      - TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T427_WORKFLOW_SKILL_ET_CONTRAT_ETENDU.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_NOTE_T427_WORKFLOW_SKILL_ET_CONTRAT_ETENDU.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - AGENTS.md
+    forbidden:
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  evidence_required:
+    - check_task_contract
+    - G530_check_contract_refs
+
+  models_allowed:
+    - "claude-sonnet-5"
+    - "deepseek-v4.1-flash:cloud"
+    - "glm-5.3-flash:cloud"
+
+  alert_duty: >
+    Tout écart ou blocage sur les hooks ou le formatage YAML est immédiatement signalé sans modification destructive.
+
+  companion_doc: DOC/WFLOW/CONTRACTS/TASK_NOTE_T427_WORKFLOW_SKILL_ET_CONTRAT_ETENDU.md
+
+status: IN_PROGRESS
+
+execution_plan:
+  milestones:
+    - id: M1
+      title: "Cadrage, gabarit étendu et note compagnon"
+      done_when: "Gabarit et note compagnon rédigés, check_task_contract PASS"
+    - id: M2
+      title: "Skill project-workflow et routeur"
+      done_when: "Skill créé et validé par check_skill_stubs.py"
+    - id: M3
+      title: "Garde-fous T9-T11 et ajustement des hooks"
+      done_when: "check_task_contract étendu et gates complets PASS"
+
+test_feedback: []
+
+tracking:
+  user_need: "Refondre le workflow pour fiabiliser la prise de note sans code à chaud, cadrer /plan, rationaliser les hooks et skills, et standardiser les notes compagnons Markdown."
+  established:
+    - "G530 vérifie l existence physique des fichiers cités."
+    - "Les hooks actuels sont dans .claude/settings.json et TOOLS/AGENT_WORKFLOW/hooks."
+  budget:
+    total: 10
+    used: 2
+    parallel_max: 3
+    log:
+      - "deepseek-v4.1 · audit critique hooks & workflow · 1/10"
+      - "glm-5.3 · challenge architecture et quotas · 2/10"

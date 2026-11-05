@@ -11,6 +11,8 @@ import sys
 import threading
 import time
 import urllib.parse
+import urllib.request
+import subprocess
 import webbrowser
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -26,6 +28,82 @@ MUTEX_PATH = WFLOW / ".task_manager.write.lock"
 HOST, PORT = "127.0.0.1", 8081
 LOCAL_MUTEX = threading.Lock()
 VERBOSE = False
+
+
+class RemoteSupervisor:
+    """Relay to the single standalone collector; never owns a collector."""
+    def __init__(self, port=8082):
+        self.base = f"http://127.0.0.1:{port}"
+        self.started_here = False
+        self.notice = None
+
+    def snapshot(self):
+        with urllib.request.urlopen(self.base + "/api/supervision", timeout=3) as response:
+            data = json.load(response)
+        data.pop("token", None)
+        return data
+
+    def command(self, payload):
+        with urllib.request.urlopen(self.base + "/api/supervision", timeout=3) as response:
+            token = json.load(response)["token"]
+        request = urllib.request.Request(self.base + "/api/supervision", data=json.dumps(payload).encode(),
+            headers={"Content-Type": "application/json", "X-Supervision-Token": token})
+        with urllib.request.urlopen(request, timeout=5) as response:
+            return json.load(response)
+
+
+def find_or_start_supervisor(port=8082, state_path=None):
+    service = RemoteSupervisor(port)
+    def health():
+        with urllib.request.urlopen(service.base + '/health', timeout=1) as response:
+            data = json.load(response)
+            if data.get('service') != 'agent-supervisor':
+                raise ValueError('Port Veilleur occupe par un autre service')
+            return data
+    try:
+        info = health()
+        if info.get('update_available') is True:
+            if port != 8082 or state_path is not None or info.get('default_storage') is not True:
+                service.notice = 'Mise a jour disponible ; recharger le service configure apres sauvegarde de son etat.'
+            else:
+                # The helper snapshots sessions and chat, and refuses a busy analysis.
+                helper = ROOT / 'TOOLS/AGENT_SUPERVISOR/scripts/upgrade_legacy.py'
+                try:
+                    print('Mise a jour du Veilleur : sauvegarde et reprise des sessions en cours...', flush=True)
+                    upgrade = subprocess.run([sys.executable, str(helper)], stderr=subprocess.PIPE, text=True,
+                                             encoding='utf8', errors='replace',
+                                             creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+                    if upgrade.returncode:
+                        service.notice = 'Veilleur conserve en fonctionnement ; mise a jour non appliquee : ' + (upgrade.stderr.strip() or 'etat actif')
+                    else:
+                        updated = health()
+                        service.notice = ('Veilleur mis a jour avec sauvegarde de son etat.' if updated.get('update_available') is False
+                                          else 'Mise a jour du Veilleur non confirmee ; verifier son etat.')
+                except OSError as exc:
+                    service.notice = 'Mise a jour du Veilleur non confirmee : ' + type(exc).__name__
+        return service
+    except urllib.error.HTTPError as exc:
+        raise ValueError('Port Veilleur occupe par un autre service') from exc
+    except (urllib.error.URLError, ConnectionError, TimeoutError):
+        script = ROOT / 'TOOLS/AGENT_SUPERVISOR/scripts/supervisor_server.py'
+        args = [sys.executable, str(script), '--port', str(port)]
+        if state_path is not None:
+            args.extend(['--state', str(state_path)])
+        process = subprocess.Popen(args,
+                                   creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+        deadline = time.monotonic() + 5
+        while time.monotonic() < deadline:
+            try:
+                health()
+                service.started_here = True
+                return service
+            except urllib.error.HTTPError as exc:
+                raise ValueError('Port Veilleur occupe par un autre service') from exc
+            except (urllib.error.URLError, ConnectionError, TimeoutError):
+                if process.poll() is not None:
+                    raise OSError('Le service Veilleur ne peut pas demarrer')
+                time.sleep(.1)
+        raise TimeoutError('Demarrage du service Veilleur non confirme')
 
 
 def now() -> str:
@@ -218,7 +296,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path = urllib.parse.urlparse(self.path).path
+        if path == "/api/supervision":
+            return self.supervision_request()
         try:
+            if path == "/AGENT_SUPERVISION.html":
+                service = getattr(self.server, "supervision", None)
+                if isinstance(service, RemoteSupervisor):
+                    self.send_response(302); self.send_header("Location", service.base + "/"); self.end_headers(); return
             if path in ("/", "/index.html"):
                 self.send_response(302); self.send_header("Location", "/TASK_VIEWER.html"); self.end_headers(); return
             if path == "/favicon.ico":
@@ -240,6 +324,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self.reply(200, {"status": "ok", "host": HOST, "port": self.server.server_port, "tasks": len(tasks())}); return
             if path == "/api/tasks/json":
                 state = locks(); self.reply(200, [public(t, state) for t in tasks()]); return
+            if path == "/api/orchestrator/json":
+                registry_path = WFLOW / "TASKS_ORCHESTRATOR.yaml"
+                registry = yaml.safe_load(registry_path.read_text(encoding="utf-8")) or []
+                if not isinstance(registry, list) or any(not isinstance(item, dict) for item in registry):
+                    raise ValueError("TASKS_ORCHESTRATOR.yaml invalide : liste d'entrees attendue")
+                self.reply(200, {"success": True, "entries": registry}); return
             if path == "/api/omnidiag/data":
                 omnidiag_dir = str(ROOT / "TOOLS" / "OMNIDIAG")
                 if omnidiag_dir not in sys.path:
@@ -263,6 +353,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.reply(500, {"success": False, "error": f"{type(exc).__name__} : {exc}", "kind": "server_error"})
 
     def do_POST(self):
+        if urllib.parse.urlparse(self.path).path == "/api/supervision":
+            return self.supervision_request(mutate=True)
         try:
             path, data = urllib.parse.urlparse(self.path).path, self.body()
             if path == "/api/omnidiag/rebuild":
@@ -297,6 +389,49 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.reply(404, {"success": False, "error": "Endpoint inconnu"})
         except (ValueError, OSError, yaml.YAMLError, json.JSONDecodeError, TimeoutError) as exc:
             self.reply(400, {"success": False, "error": str(exc)})
+
+    def supervision_request(self, mutate=False):
+        """Local-only API: no wildcard CORS, mutation requires a per-server token."""
+        def respond(status, data):
+            raw = json.dumps(data, ensure_ascii=False).encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(raw)))
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.end_headers()
+            self.wfile.write(raw)
+        port = self.server.server_port
+        host = self.headers.get("Host", "")
+        origin = self.headers.get("Origin")
+        if (self.client_address[0] != "127.0.0.1"
+                or host not in (f"127.0.0.1:{port}", f"localhost:{port}")
+                or (origin is not None and origin != "http://" + host)):
+            return respond(403, {"error": "Origine locale Task Viewer requise"})
+        service = getattr(self.server, "supervision", None)
+        if service is None:
+            return respond(503, {"error": "Service de supervision non initialise"})
+        token = self.server.supervision_token
+        if mutate and not secrets.compare_digest(self.headers.get("X-Supervision-Token", ""), token):
+            return respond(403, {"error": "Jeton de session requis ; recharger le panneau"})
+        try:
+            if mutate:
+                service.command(self.body())
+            result = service.snapshot()
+            if not mutate and urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("summary") == ["1"]:
+                summary = {"running": result["running"], "unread_count": sum(
+                    1 for session in result.get("sessions", []) for alert in session.get("alerts", [])
+                    if alert.get("disposition", "new") == "new")}
+                if isinstance(service, RemoteSupervisor):
+                    summary["port"] = urllib.parse.urlparse(service.base).port
+                    summary["service_version"] = result.get("service_version")
+                    summary["build_id"] = result.get("build_id")
+                    summary["update_available"] = result.get("update_available")
+                return respond(200, summary)
+            result["token"] = token
+            return respond(200, result)
+        except (ValueError, OSError, KeyError, TypeError) as exc:
+            return respond(400, {"error": str(exc)})
 
     def acquire(self, data):
         task_id, who = str(data.get("id", "")).strip(), actor(data)
@@ -401,6 +536,25 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
         print(f"Impossible de lancer Task Manager sur {HOST}:{port} : {exc}")
         return
     url = f"http://{HOST}:{port}/TASK_VIEWER.html"
+    try:
+        supervisor_port = int(os.environ.get('VEILLEUR_PORT', '8082'))
+        if not 1 <= supervisor_port <= 65535:
+            raise ValueError('VEILLEUR_PORT doit etre compris entre 1 et 65535')
+        server.supervision = find_or_start_supervisor(supervisor_port)
+        info = server.supervision.snapshot()
+        version = info.get('service_version')
+        state = 'actif' if info.get('running') else 'arrete'
+        freshness = ('mise a jour : redemarrage necessaire' if info.get('update_available')
+                     else 'a jour' if info.get('update_available') is False else 'version non verifiable')
+        origin = 'demarre' if server.supervision.started_here else 'detecte'
+        print(f"Veilleur {origin} : {server.supervision.base}/ — {state}")
+        print(f"  -> Version : {version or 'historique'} · {info.get('build_id') or 'non identifiee'} · {freshness}")
+        if server.supervision.notice:
+            print(f"  -> {server.supervision.notice}")
+    except (OSError, ValueError) as exc:
+        server.supervision = None
+        print(f"Veilleur indisponible : {exc}")
+    server.supervision_token = secrets.token_urlsafe(32)
     print(f"Task Manager local : {url}")
     print("  -> Ctrl+Clic sur le lien pour ouvrir Task Viewer dans votre navigateur.")
     if open_browser:
