@@ -6489,3 +6489,35 @@
   decision: Pret pour validation humaine et GO d implementation
   note: 'Objectif : justesse fonctionnelle, emergence naturelle des defauts, 0 regressive,
     GVL_PERSISTENT sanctuarise'
+- id: BRIEFING-T213
+  date: '2026-11-02'
+  type: planification
+  priorite: haute
+  agent_id: DSH01
+  sujet: Briefing projet T213 (diagnostic homing M2 benne fermee) - workflow 4 audits
+    read-only avant ARRET VALIDATION 1
+  statut: terminé
+  livrable: 'DOC/WFLOW/ORCHESTRATION_RAPPORTS/BRIEFING_T213_2026-11-02.md ;
+    DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T377_HOMING_MANUEL_SANS_CONTACT_TOP.yaml ;
+    TOOLS/AGENT_WORKFLOW/scripts/G530_check_contract_refs.py ;
+    TOOLS/AGENT_WORKFLOW/config/contract_refs_baseline.json'
+  verdict: 'Premisse T213 fausse : M2Demand.UseDynamicTarget/DynamicTarget_M jamais
+    ecrits (chemin mort), CfgTopHomingTarget_M+CfgOffsetClose_M jamais calcules, REX
+    justificatif supprime par T364 (42fe45c8). 0/10 champs T213 dans F_HomingM2, 4/10
+    deja visibles (K_BenneOuvertureFermeture Idx113/114/115/119). Symptome 8,5 m explique
+    par UseDynamicTarget=FALSE -> FB_Encoder_Homing cible CfgTopSensorPosM (GVL_PERSISTENT:49).
+    4 references de fichiers mortes au contrat alors que check_task_contract.py rend PASS.'
+  decision: 'D8 TRANCHE par l exploitant : ce n est pas une conception, c est un BUG -
+    la montee automatique jusqu au capteur n est plus la doctrine. Doctrine HYBRIDE
+    actee le 2026-11-02 : reference haute = validation VISUELLE operateur, capteur
+    top = barriere de securite seule, contact fortuit = AUCUN referencement. T213 FUSIONNEE
+    dans T377 (outillage de diagnostic absorbe). T340 a reviser (conflit Homed au FDC
+    mecanique). Aucune ecriture CODE/ - ARRET VALIDATION maintenu.'
+  note: 'Contrat T377 cree et PASS (check_task_contract). Garde-fou G530 cree (98 references
+    mortes de dette figees en baseline, 0 nouvelle toleree) et enregistre palier C.
+    BLOQUANT restant : la fusion T213->T377 et la note T340 dans TASKS.yaml ne sont
+    PAS ecrites - le save du Task Manager reformate tout le fichier (10659 -> 8306
+    lignes, 13346 lignes de diff) car le YAML commite n a pas ete produit par yaml.safe_dump.
+    Decision humaine requise sur le mode d ecriture du catalogue. Ecart safety potentiel
+    a confirmer : AF-09:359/434-436 exige M1 HomedAndReliable pour la cible CablePosM1
+    +/- offset, PRG_02:566-568/718-720 ne le teste pas.'

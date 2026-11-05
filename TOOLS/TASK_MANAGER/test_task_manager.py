@@ -4,6 +4,8 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import tempfile
+import shutil
 import time
 import unittest
 from pathlib import Path
@@ -29,7 +31,18 @@ def request(path: str, payload: dict | None = None):
 class TaskManagerApiTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.server = subprocess.Popen([sys.executable, "TOOLS/TASK_MANAGER/task_server.py", str(PORT)], cwd=ROOT)
+        cls.fixture_dir = Path(tempfile.mkdtemp(prefix="task_manager_test_"))
+        shutil.copyfile(ROOT / "DOC/WFLOW/TASKS.yaml", cls.fixture_dir / "TASKS.yaml")
+        shutil.copyfile(ROOT / "DOC/WFLOW/TASKS_ORCHESTRATOR.yaml", cls.fixture_dir / "TASKS_ORCHESTRATOR.yaml")
+        shutil.copyfile(ROOT / "DOC/WFLOW/TASK_VIEWER.html", cls.fixture_dir / "TASK_VIEWER.html")
+        shutil.copyfile(ROOT / "DOC/WFLOW/ORCHESTRATOR_VIEWER.html", cls.fixture_dir / "ORCHESTRATOR_VIEWER.html")
+        launcher = (
+            "from pathlib import Path; import TOOLS.TASK_MANAGER.task_server as m; "
+            "m.WFLOW=Path(" + repr(str(cls.fixture_dir)) + "); "
+            "m.TASKS_PATH=m.WFLOW/'TASKS.yaml'; m.LOCKS_PATH=m.WFLOW/'TASK_LOCKS.json'; "
+            "m.MUTEX_PATH=m.WFLOW/'.write.lock'; m.start(" + str(PORT) + ")"
+        )
+        cls.server = subprocess.Popen([sys.executable, "-c", launcher], cwd=ROOT)
         for _ in range(30):
             try:
                 request("/api/status")
@@ -65,9 +78,24 @@ class TaskManagerApiTest(unittest.TestCase):
         _, after = request("/api/tasks/json")
         self.assertEqual(revision, next(value for value in after if value["id"] == target_id)["revision"])
 
+    def test_orchestrator_registry_read_only_endpoint(self):
+        _, result = request("/api/orchestrator/json")
+        self.assertTrue(result["success"])
+        self.assertIsInstance(result["entries"], list)
+        self.assertTrue(any(entry.get("id") == "ORCHESTRATION-REPRISE-AGY01-20261028" for entry in result["entries"]))
+
+    def test_orchestrator_page_has_dedicated_task_viewer_route(self):
+        with urlopen(BASE + "/TASK_VIEWER.html", timeout=5) as response:
+            task_viewer = response.read().decode("utf-8")
+        with urlopen(BASE + "/ORCHESTRATOR_VIEWER.html", timeout=5) as response:
+            page = response.read().decode("utf-8")
+        self.assertIn('href="/ORCHESTRATOR_VIEWER.html"', task_viewer)
+        self.assertIn("ORCHESTRATEUR", page)
+        self.assertIn("/api/orchestrator/json", page)
+
     def test_broken_yaml_returns_precise_error(self):
         """Regression REX 2026-08-30 : TASKS.yaml casse -> 500 avec ligne fautive, pas un message generique."""
-        tasks_path = ROOT / "DOC" / "WFLOW" / "TASKS.yaml"
+        tasks_path = self.fixture_dir / "TASKS.yaml"
         original = tasks_path.read_text(encoding="utf-8")
         # Meme defaut que la ligne 2775 historique : valeur non quotee contenant " : "
         broken = original + "- id: T-TEST-ERR\n  agent: Codex — rework : bits saturés\n"

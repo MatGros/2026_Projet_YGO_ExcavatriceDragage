@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Veilleur — supervision des agents</title>
+<style>
+:root{color-scheme:dark;--bg:#1e1e2e;--card:#282a36;--border:#44475a;--text:#f8f8f2;--muted:#a6adc8;--accent:#bd93f9;--cyan:#8be9fd;--orange:#ffb86c;--red:#ff5555}
+*{box-sizing:border-box}body{margin:0;padding:18px;background:var(--bg);color:var(--text);font:14px system-ui,sans-serif}main{max-width:1150px;margin:auto}header,.row,.session-top,.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}header{justify-content:space-between;border-bottom:2px solid var(--border);padding-bottom:12px}h1{font-size:21px;color:var(--accent);margin:0}h2{font-size:16px;margin:0 0 12px}a{color:var(--cyan)}p{line-height:1.5}small,.muted{color:var(--muted)}.panel,.session{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:14px}.row{align-items:end}label{display:flex;flex-direction:column;gap:5px}input,select,button{font:inherit;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text)}input:focus,select:focus,button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}button{cursor:pointer}button:hover{border-color:var(--accent)}button:disabled{opacity:.45;cursor:wait}.primary{border-color:var(--accent);color:var(--accent)}.grow{flex:1;min-width:220px}.check{display:flex;flex-direction:row;align-items:center;margin-top:10px}.check input{width:auto}.status{padding:4px 8px;border:1px solid var(--border);border-radius:20px;color:var(--cyan)}.warn{color:var(--orange)}.error{color:var(--red)}#connection-error{border:1px solid var(--red);padding:10px;border-radius:6px;margin-top:12px;white-space:pre-wrap}#notice{min-height:20px;color:var(--cyan);margin:10px 0}.session-top{justify-content:space-between}.session-name{font-size:16px;font-weight:650}.details{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;margin:12px 0}.details dt{color:var(--muted)}.details dd{margin:0;overflow-wrap:anywhere}.alerts{display:grid;gap:8px}.alert{border-left:3px solid var(--orange);padding:8px 12px;background:var(--bg)}.alert p{margin:3px 0;white-space:pre-wrap;overflow-wrap:anywhere}.evidence{color:var(--muted);font-size:12px}.actions{margin-top:12px}#empty{border:1px dashed var(--border);border-radius:10px;padding:25px;text-align:center;margin-top:14px}.hint{font-size:12px;color:var(--muted);margin:9px 0 0}#last-refresh{font-size:12px;color:var(--muted)}@media(max-width:600px){body{padding:10px}.details{grid-template-columns:1fr}.details dd{margin-bottom:5px}.row label{width:100%}.grow{min-width:0}}
+</style>
+<style>
+textarea{font:inherit;padding:9px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);resize:vertical;width:100%}textarea:focus{outline:2px solid var(--cyan);outline-offset:2px}.badge{display:inline-block;border-radius:20px;background:#664522;color:#ffdaa2;padding:3px 9px;font-size:13px}.chat-log{max-height:320px;overflow:auto;display:grid;gap:8px;margin:10px 0}.chat-message{padding:10px 12px;border-radius:8px;background:var(--bg);white-space:pre-wrap;overflow-wrap:anywhere}.chat-message.user{border-left:3px solid var(--cyan)}.chat-message.assistant{border-left:3px solid var(--accent)}.chat-message small{display:block;margin-bottom:4px}.mission{margin:10px 0}.mission textarea{min-height:80px}.notify-settings{display:flex;gap:15px;align-items:center;flex-wrap:wrap;margin-top:8px}.copy-fallback{margin-top:8px}.alert.acknowledged{border-left-color:var(--border)}.alert .actions{margin-top:7px}.chat-controls{margin-top:10px}
+</style>
+<style>
+fieldset.assignment-config,fieldset.assignment-context{border:1px solid var(--border);border-radius:8px;padding:14px;margin:12px 0}
+fieldset.assignment-config legend,fieldset.assignment-context legend{padding:0 7px;color:var(--cyan);font-weight:650}
+.assignment-context{max-width:920px;margin:18px auto!important;background:rgba(30,30,46,.45)}
+.assignment-submit{display:flex;justify-content:flex-end;margin-top:14px}
+</style>
+</head>
+<body><main>
+<header><h1>👁 Veilleur <span id="unread-count" class="badge">0 non lue</span></h1><a href="/TASK_VIEWER.html">← Task Viewer</a></header>
+<p class="muted">Affectez une conversation précise. Le collecteur lit ses nouveaux messages ; le juge peut émettre une alerte consultative. Ce panneau ne pilote ni les terminaux ni la machine.</p>
+<div id="connection-error" role="alert" hidden></div>
+<section class="panel" aria-labelledby="service-heading">
+ <div class="session-top"><h2 id="service-heading">Collecteur <span id="service-state" class="status">Connexion…</span></h2><span id="last-refresh"></span></div>
+ <div class="row"><button type="button" id="start" class="primary" data-mutation>Démarrer</button><button type="button" id="stop" data-mutation>Arrêter</button><small>Vérification des sources toutes les 8 s. Arrêter la collecte laisse les CLI ouverts.</small></div>
+</section>
+<section class="panel" aria-labelledby="model-heading">
+ <h2 id="model-heading">Juge Ollama</h2>
+ <form id="config-form"><div class="row"><label class="grow">Modèle<select id="model" required>
+  <optgroup label="Cloud — consentement explicite requis"><option value="deepseek-v4.1-flash:cloud">DeepSeek V4.1 Flash · cloud</option><option value="deepseek-v4-flash:cloud">DeepSeek V4 Flash · cloud</option><option value="glm-5.3-flash:cloud">GLM 5.3 Flash · cloud</option></optgroup>
+  <optgroup label="Local"><option value="qwen3.8:27b">Qwen 3.8 27B · local</option><option value="qwen3:8b">Qwen 3 8B · local</option><option value="gemma4:e4b">Gemma 4 E4B · local</option></optgroup>
+ </select></label><button class="primary" data-mutation>Enregistrer</button></div>
+ <label class="check"><input id="allow-cloud" type="checkbox">J’autorise l’envoi du contexte des conversations à un modèle cloud.</label></form>
+ <p class="hint">Modèles installés lors du dernier relevé Ollama. Choisir un modèle cloud ne donne pas le consentement : sans la case cochée, aucun transcript n’est envoyé et le juge reste indisponible.</p>
+</section>
+<section class="panel" aria-labelledby="chat-heading">
+ <div class="session-top"><h2 id="chat-heading">Discuter avec le superviseur <span id="chat-state" class="status">En attente</span></h2><button type="button" id="reset-chat" data-mutation>Réinitialiser le chat</button></div>
+ <p class="hint">Le superviseur répond en lecture seule. Le chat global utilise les états et alertes ; choisissez une session pour parler de son contexte affecté. Aucune réponse n’est envoyée automatiquement aux agents.</p>
+ <div id="chat-log" class="chat-log" aria-live="polite"></div>
+ <p id="chat-error" class="error" role="alert" hidden></p>
+ <form id="chat-form"><div class="row"><label class="grow">Contexte<select id="chat-session"><option value="">Global — états et alertes</option></select></label><span id="chat-scope" class="hint"></span></div><label class="chat-controls">Votre message<textarea id="chat-text" rows="2" maxlength="2000" required placeholder="Ex. Que dois-je vérifier en priorité ?"></textarea></label><div class="actions"><button class="primary" data-mutation>Envoyer</button><small>Le modèle configuré ci-dessus est utilisé.</small></div></form>
+</section>
+<section class="panel" aria-labelledby="notify-heading">
+ <h2 id="notify-heading">Notifications <span class="muted">— préférences de ce navigateur</span></h2>
+ <div class="notify-settings"><button type="button" id="enable-notifications">Activer les notifications bureau</button><label class="check"><input id="sound-enabled" type="checkbox">Son pour les alertes d’erreur</label><button type="button" id="unlock-audio" hidden>Activer le son dans cette page</button></div>
+ <p id="notification-hint" class="hint">Désactivées par défaut. La page doit rester ouverte. Les avertissements alimentent le badge ; les notifications bureau et le son concernent les erreurs.</p>
+</section>
+<section class="panel assignment-context" aria-labelledby="exchange-heading">
+ <h2 id="exchange-heading">Préparer le suivi — prompt et réponse de l’agent</h2>
+ <p class="hint">Générez le prompt, envoyez-le à l’agent, puis collez sa réponse ci-dessous. Le bouton Préremplir reporte les informations dans la configuration située après ce bloc.</p>
+ <div id="assignment-exchange">
+  <button type="button" id="copy-agent-brief">Générer et copier le prompt</button>
+  <label class="mission">Prompt à envoyer à l’agent<textarea id="assignment-prompt-preview" rows="7" readonly placeholder="Cliquez sur Générer et copier le prompt."></textarea></label>
+  <label class="mission">Réponse de l’agent<textarea id="assignment-response" maxlength="5000" rows="8" placeholder="Collez ici le bloc VEILLEUR_ASSIGN_V1 retourné par l’agent."></textarea></label>
+  <button type="button" id="apply-agent-response">Préremplir la configuration depuis le retour</button>
+ </div>
+</section>
+<section class="panel" aria-labelledby="assign-heading">
+ <h2 id="assign-heading">Configuration et affectation de la session</h2>
+ <form id="add-form">
+   <fieldset class="assignment-config"><legend>1 · Configuration de la session</legend>
+   <div class="row"><label>CLI<select id="platform"><option value="claude">Claude Code</option><option value="codex">Codex</option><option value="agy">Antigravity</option></select></label><label class="grow">ID natif de conversation<input id="native-id" required maxlength="150" placeholder="UUID exact de la session" spellcheck="false"></label><label>Alias<input id="alias" required maxlength="100" placeholder="Ex. Claude — T417"></label></div>
+    <p class="hint">Ces champs restent modifiables. Le retour structuré peut les préremplir ; vérifiez-les avant d’ajouter la session.</p>
+  </fieldset>
+    <div class="row template-row"><label class="grow">Mission type facultative<select id="mission-template"><option value="general">Suivi de tâche — général</option><option value="evidence">Revue de preuves / validation</option><option value="simulation">Simulation / CODESYS / CI</option><option value="investigation">Investigation / dépannage</option></select></label><button type="button" id="apply-mission-template">Charger le modèle</button></div>
+   <label class="mission">Mission à surveiller<textarea id="mission" maxlength="1500" rows="5" placeholder="Préremplie depuis le retour de l’agent ; vérifiez-la avant l’affectation."></textarea></label>
+  <div class="assignment-submit"><button class="primary" data-mutation>Ajouter la session au suivi</button></div>
+ </form>
+ <p class="hint">Utilisez l’ID natif complet affiché par le CLI ou le nom UUID du transcript ; jamais « la session la plus récente ». Seules les conversations affectées ici sont suivies.</p>
+</section>
+<div id="notice" role="status" aria-live="polite"></div>
+<div class="session-top"><h2>Sessions affectées <span id="count" class="muted">0</span></h2></div>
+<div id="empty" hidden>Aucune session affectée.<br><span class="muted">Récupérez son ID natif dans Claude, Codex ou AGY, puis ajoutez-la ci-dessus.</span></div>
+<div id="sessions"></div>
+</main>
+<script>
+'use strict';
+const byId=id=>document.getElementById(id);
+const stateNames={active:'Lecture active',waiting:'En attente',paused:'En pause',stopped:'Arrêtée',source_missing:'Source absente',source_reset:'Continuité rompue',source_error:'Source indisponible',parse_error:'Contenu illisible',ready:'Prête',ambiguous:'Source ambiguë',invalid_id:'ID invalide'};
+let token='',busy=false,disposed=false,refreshPromise=null,timer=null,controller=null,configDirty=false;
+const requests=new Set();
+const missionDrafts=new Map(),knownAlerts=new Set();
+const missionTemplates={
+ general:'Objectif : surveiller les écarts importants entre la demande utilisateur, les actions, les preuves et la conclusion.\nÀ signaler : changement de périmètre, affirmation de réussite sans preuve visible, contradiction, source ou contexte manquant.\nPour chaque alerte : citer exactement le message, distinguer fait observé / hypothèse / inconnu, proposer une vérification courte.\nLimites : lecture seule ; aucune alerte ne valide un test ni la sécurité machine.',
+ evidence:'Objectif : vérifier que chaque affirmation de test ou de validation est appuyée par une preuve identifiable.\nÀ relever : commande réellement exécutée, résultat, version/source testée, substitutions et limites.\nSignaler toute confusion entre compilation, exécution, CI et validation terrain.\nPour chaque alerte : citation exacte et preuve manquante. Ne jamais conclure PASS à la place de l’agent.',
+ simulation:'Objectif : suivre un essai de simulation sans confondre modèle, code automate et machine réelle.\nÀ relever : sources/version exécutées, entrées opérateur, sorties observées, substitutions/mock et états de défaut.\nSignaler les écarts de séquencement, autorisation, arrêt ou identité des sources.\nLimites : simulation isolée ; aucun essai réel ; CI ou compilation seuls ne valident pas le cycle complet.',
+ investigation:'Objectif : suivre une investigation et vérifier qu’elle réduit une incertitude utile.\nÀ relever : symptôme, hypothèse, prédiction observable, expérience discriminante et résultat.\nSignaler les conclusions sans preuve, les hypothèses répétées sans test et les données métier manquantes.\nPour chaque alerte : faits / hypothèses / inconnues et prochaine vérification utile.'
+};
+let initialAlerts=true,audio=null,chatSignature='';
+let preferences={desktop:false,sound:false};
+try{const saved=JSON.parse(localStorage.getItem('agent-supervision.notifications.v1')||'{}');preferences={desktop:saved.desktop===true,sound:saved.sound===true};for(const id of JSON.parse(localStorage.getItem('agent-supervision.notified.v1')||'[]'))knownAlerts.add(id);}catch(_error){}
+function element(tag,text,className){const node=document.createElement(tag);if(text!==undefined)node.textContent=String(text);if(className)node.className=className;return node;}
+function dateText(value){if(!value)return 'Jamais';const date=new Date(value);return Number.isNaN(date.getTime())?String(value):date.toLocaleString('fr-FR');}
+function showError(message){byId('connection-error').textContent=message;byId('connection-error').hidden=false;}
+function friendlyError(code){return code==='cloud_consent_required'?'Le modèle choisi est cloud, mais le consentement est désactivé. Aucun transcript n’a été envoyé. Activez la case cloud pour l’autoriser.':String(code||'Erreur inconnue');}
+function disableMutations(value){document.querySelectorAll('[data-mutation]').forEach(node=>node.disabled=value);}
+function detail(dl,label,value){dl.append(element('dt',label),element('dd',value||'—'));}
+function savePreferences(){try{localStorage.setItem('agent-supervision.notifications.v1',JSON.stringify(preferences));}catch(_error){}}
+function assignmentBrief(){
+ const platform=byId('platform').value,alias=byId('alias').value.trim()||'à renseigner';
+ return ['Tu es suivi en lecture seule par Veilleur. Retourne un bloc déclaratif que Task Viewer utilisera pour préremplir le CLI, l’ID, l’alias et la mission.','Plateforme sélectionnée dans Task Viewer : '+platform+'. Alias actuel (peut être remplacé) : '+alias+'.','Trouve l’ID exact de TA conversation courante uniquement dans les métadonnées de session auxquelles tu as réellement accès. Ne le déduis pas. Si tu ne peux pas le vérifier, écris inconnu.','Réponds uniquement par le bloc ci-dessous, en français, sans commentaire. Une ligne par champ, 1500 caractères maximum au total. Remplace les valeurs par tes informations ; utilise inconnu si nécessaire. Aucun secret. N’affirme pas qu’un test est réussi sans preuve réellement observée.','VEILLEUR_ASSIGN_V1','platform: '+platform,'native_id: inconnu','alias:','task:','user_goal:','current_step:','scope_and_permissions:','constraints:','acceptance_criteria:','evidence_observed:','hypotheses_and_unknowns:','next_step:','END_VEILLEUR_ASSIGN_V1'].join('\n');
+}
+function parseAssignmentResponse(raw){
+ const start='VEILLEUR_ASSIGN_V1',end='END_VEILLEUR_ASSIGN_V1',first=raw.indexOf(start),last=raw.indexOf(end);
+ if(first<0||last<first)throw Error('Bloc VEILLEUR_ASSIGN_V1 absent ou incomplet. Copiez la réponse structurée entière.');
+ const allowed=new Set(['platform','native_id','alias','task','user_goal','current_step','scope_and_permissions','constraints','acceptance_criteria','evidence_observed','hypotheses_and_unknowns','next_step']);
+ const fields={};
+ for(const line of raw.slice(first+start.length,last).split(/\r?\n/)){
+  const match=line.match(/^\s*([a-z_]+)\s*:\s*(.*?)\s*$/);if(match&&allowed.has(match[1])){if(Object.prototype.hasOwnProperty.call(fields,match[1]))throw Error('Champ dupliqué dans le bloc : '+match[1]);fields[match[1]]=match[2];}
+ }
+ if(!['claude','codex','agy'].includes(fields.platform))throw Error('Plateforme absente ou invalide dans le bloc.');
+ if(!fields.native_id)throw Error('Champ native_id absent du bloc.');
+ const mission=[['Tâche / sujet','task'],['Objectif utilisateur','user_goal'],['Étape actuelle','current_step'],['Périmètre et permissions','scope_and_permissions'],['Contraintes','constraints'],['Critères d’acceptation','acceptance_criteria'],['Preuves observées','evidence_observed'],['Hypothèses / inconnues','hypotheses_and_unknowns'],['Prochaine étape','next_step']].filter(([,key])=>fields[key]&&fields[key].toLowerCase()!=='inconnu').map(([label,key])=>label+': '+fields[key]).join('\n');
+ if(!mission.trim())throw Error('Le bloc ne contient aucun contexte de mission exploitable.');
+ if(mission.length>1500)throw Error('Mission trop longue ('+mission.length+' caractères). Réduisez le résumé à 1 500 caractères maximum.');
+ return {fields,mission};
+}
+function applyAssignmentResponse(){
+ try{
+   const {fields,mission}=parseAssignmentResponse(byId('assignment-response').value);
+   const previousId=byId('native-id').value.trim(),previousAlias=byId('alias').value.trim(),previousPlatform=byId('platform').value;
+   byId('platform').value=fields.platform;
+   if(fields.native_id.toLowerCase()!=='inconnu')byId('native-id').value=fields.native_id;
+   if(fields.alias&&fields.alias.toLowerCase()!=='inconnu')byId('alias').value=fields.alias;
+   byId('mission').value=mission;
+   const idUnknown=fields.native_id.toLowerCase()==='inconnu';
+   const previousMismatch=(!idUnknown&&previousId&&previousId!==fields.native_id)||(fields.alias&&fields.alias.toLowerCase()!=='inconnu'&&previousAlias&&previousAlias!==fields.alias)||(previousPlatform&&previousPlatform!==fields.platform);
+   const declaredId=idUnknown?'ID déclaré : inconnu':'ID déclaré par l’agent : '+fields.native_id;
+   byId('notice').textContent='Configuration et mission préremplies. '+declaredId+(previousMismatch?' · Attention : certaines valeurs différaient de celles déjà saisies ; vérifiez-les.':'')+(idUnknown?' · ID non fourni : saisissez-le manuellement.':'');
+   byId('notice').className=previousMismatch||idUnknown?'warn':'';
+  byId('mission').focus();
+ }catch(error){byId('notice').textContent=error.message;byId('notice').className='error';}
+}
+async function copyAssignmentBrief(){
+ const text=assignmentBrief(),preview=byId('assignment-prompt-preview');
+ preview.value=text;
+ try{if(!navigator.clipboard)throw Error('clipboard unavailable');await navigator.clipboard.writeText(text);byId('notice').textContent='Prompt affiché et copié. Collez-le dans l’agent suivi.';}
+ catch(_error){preview.focus();preview.select();byId('notice').textContent='Prompt affiché. Copie automatique indisponible : utilisez Ctrl+C.';}
+}
+function alertKey(session,alert){return String(session.id)+':'+String(alert.id);}
+function isUnread(alert){return !alert.disposition||alert.disposition==='new';}
+function processAlerts(sessions){
+ let unread=0;
+ for(const session of sessions)for(const alert of (session.alerts||[])){
+  if(isUnread(alert))unread++;
+  if(!alert.id)continue;
+  const key=alertKey(session,alert),fresh=!knownAlerts.has(key);knownAlerts.add(key);
+  if(!initialAlerts&&fresh&&isUnread(alert)&&alert.severity==='error'){
+   if(preferences.desktop&&'Notification' in window&&Notification.permission==='granted'){
+    try{const note=new Notification('Supervision — '+(session.alias||session.platform),{body:String(alert.reason||'Nouvelle alerte').slice(0,180),tag:key});note.onclick=()=>{window.focus();note.close();};}catch(_error){}
+   }
+   if(preferences.sound&&audio&&audio.state==='running'){
+    try{const oscillator=audio.createOscillator(),gain=audio.createGain();oscillator.connect(gain);gain.connect(audio.destination);oscillator.frequency.value=660;gain.gain.setValueAtTime(.08,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.16);oscillator.start();oscillator.stop(audio.currentTime+.17);}catch(_error){byId('notification-hint').textContent='Le son est indisponible ; les alertes restent visibles.';}
+   }
+  }
+ }
+ initialAlerts=false;
+ byId('unread-count').textContent=unread+' non lue'+(unread>1?'s':'');
+ try{localStorage.setItem('agent-supervision.notified.v1',JSON.stringify(Array.from(knownAlerts).slice(-500)));}catch(_error){}
+}
+function renderChat(snapshot,sessions){
+ const select=byId('chat-session'),selected=select.value;
+ select.replaceChildren(element('option','Global — états et alertes'));select.options[0].value='';
+ for(const session of sessions){const option=element('option',session.alias||session.native_id);option.value=session.id;select.append(option);}
+ select.value=sessions.some(s=>s.id===selected)?selected:'';
+ const chat=snapshot.chat||{},messages=Array.isArray(chat.messages)?chat.messages:[];
+ byId('chat-state').textContent=({queued:'En attente du modèle',analyzing:'Analyse en cours',thinking:'Réponse en cours',idle:'Disponible',ready:'Disponible',unavailable:'Indisponible',error:'Indisponible'})[chat.state]||chat.state||'Disponible';
+ byId('chat-error').hidden=!chat.error;byId('chat-error').textContent=chat.error?friendlyError(chat.error):'';
+ const scope=sessions.find(s=>s.id===chat.session_id);
+ byId('chat-scope').textContent=messages.length?'Dernier échange : '+(scope?(scope.alias||scope.native_id):chat.session_id?'session retirée':'global'):'';
+ const signature=JSON.stringify(messages);
+ if(signature!==chatSignature){
+  const log=byId('chat-log'),atBottom=log.scrollHeight-log.scrollTop-log.clientHeight<45;log.replaceChildren();
+  if(!messages.length)log.append(element('p','Posez une question au superviseur ou demandez-lui de clarifier une alerte.','muted'));
+  for(const message of messages){const row=element('div',undefined,'chat-message '+(message.role==='user'?'user':'assistant'));row.append(element('small',(message.role==='user'?'Vous':'Superviseur')+' · '+dateText(message.created_at)),element('div',message.text||''));log.append(row);}
+  chatSignature=signature;if(atBottom)log.scrollTop=log.scrollHeight;
+ }
+}
+async function copyFinding(session,alert,container){
+ const text=['Constat de supervision à vérifier','Session : '+(session.alias||session.native_id)+' ('+session.platform+' / '+session.native_id+')','Mission : '+(session.mission||'Non renseignée'),'Priorité proposée : '+(alert.severity||'warning'),'Motif : '+(alert.reason||''),'Extrait : '+(typeof alert.evidence==='string'?alert.evidence:JSON.stringify(alert.evidence||'')),'Limite : extrait de contexte borné ; vérifier contre les sources et preuves avant action.'].join('\n');
+ try{if(!navigator.clipboard)throw Error('clipboard unavailable');await navigator.clipboard.writeText(text);byId('notice').textContent='Constat copié. Vous choisissez où le transmettre.';}
+ catch(_error){let fallback=container.querySelector('textarea');if(!fallback){fallback=element('textarea');fallback.readOnly=true;fallback.rows=6;fallback.className='copy-fallback';container.append(fallback);}fallback.value=text;fallback.focus();fallback.select();byId('notice').textContent='Copie automatique indisponible : texte sélectionné, utilisez Ctrl+C.';}
+}
+async function copyExchange(path,container){
+ try{if(!navigator.clipboard)throw Error('clipboard unavailable');await navigator.clipboard.writeText(path);byId('notice').textContent='Chemin de la note copié.';}
+ catch(_error){let fallback=container.querySelector('textarea.copy-fallback');if(!fallback){fallback=element('textarea');fallback.className='copy-fallback';fallback.readOnly=true;container.append(fallback);}fallback.value=path;fallback.focus();fallback.select();byId('notice').textContent='Chemin sélectionné : utilisez Ctrl+C.';}
+}
+function render(snapshot){
+ byId('service-state').textContent=snapshot.running?'Démarré':'Arrêté';
+ byId('service-state').className='status'+(snapshot.running?'':' warn');
+ if(!configDirty){const model=snapshot.model||'deepseek-v4.1-flash:cloud';if(!Array.from(byId('model').options).some(option=>option.value===model)){const option=element('option',model);option.value=model;byId('model').prepend(option);}byId('model').value=model;byId('allow-cloud').checked=Boolean(snapshot.allow_cloud);}
+ const sessions=Array.isArray(snapshot.sessions)?snapshot.sessions:[];
+ processAlerts(sessions);renderChat(snapshot,sessions);
+ byId('count').textContent=String(sessions.length);byId('empty').hidden=sessions.length!==0;
+ if(document.activeElement&&document.activeElement.dataset.missionId){byId('last-refresh').textContent='Actualisé à '+new Date().toLocaleTimeString('fr-FR');return;}
+ const fragment=document.createDocumentFragment();
+ for(const session of sessions){
+  const card=element('article',undefined,'session');
+  const top=element('div',undefined,'session-top');top.append(element('div',session.alias||session.native_id,'session-name'),element('span',stateNames[session.state]||session.state||'État inconnu','status'));card.append(top);
+  const dl=element('dl',undefined,'details');detail(dl,'CLI / ID',(session.platform||'')+' / '+(session.native_id||''));detail(dl,'Source lue',session.source);detail(dl,'Dernier événement',dateText(session.last_event));detail(dl,'Analyse',String(session.analysis_state||'Non effectuée')+' · '+dateText(session.last_analysis));card.append(dl);
+  const exchange=element('div',undefined,'mission');exchange.append(element('small','Note d’échange pour transmettre le contexte'),element('p',session.exchange_path||'Aucune note générée.','evidence'));
+  if(session.exchange_error)exchange.append(element('p',session.exchange_error,'error'));
+  const noteActions=element('div',undefined,'actions'),refreshNote=element('button','Actualiser note');refreshNote.type='button';refreshNote.dataset.mutation='';refreshNote.disabled=busy;refreshNote.addEventListener('click',()=>mutate({action:'export_note',id:session.id}));noteActions.append(refreshNote);
+  if(session.exchange_path){const copyPath=element('button','Copier le chemin');copyPath.type='button';copyPath.addEventListener('click',()=>copyExchange(session.exchange_path,exchange));noteActions.append(copyPath);}exchange.append(noteActions);card.append(exchange);
+  if(session.error)card.append(element('p',session.error,'error'));
+  if(session.analysis_error)card.append(element('p','Analyse indisponible : '+friendlyError(session.analysis_error),'warn'));
+  if(session.analysis_state==='context_required')card.append(element('p','Mission requise : renseignez objectif, contraintes, preuve attendue et limites pour permettre une analyse pertinente.','warn'));
+  if(session.context_truncated)card.append(element('p','Contexte tronqué : le modèle voit seulement un extrait récent de cette conversation.','warn'));
+  const mission=element('label','Mission à surveiller','mission'),missionText=element('textarea');missionText.rows=3;missionText.maxLength=1500;missionText.dataset.missionId=session.id;missionText.placeholder='Objectif : …\nContraintes : …\nPreuve attendue : …\nLimites : …';missionText.value=missionDrafts.has(session.id)?missionDrafts.get(session.id):session.mission||'';missionText.addEventListener('input',()=>missionDrafts.set(session.id,missionText.value));mission.append(missionText);card.append(mission);
+  const saveMission=element('button','Enregistrer la mission');saveMission.type='button';saveMission.dataset.mutation='';saveMission.disabled=busy;saveMission.addEventListener('click',()=>mutate({action:'set_mission',id:session.id,mission:missionText.value.trim()}));card.append(saveMission);
+  if(['source_reset','parse_error'].includes(session.state))card.append(element('p','La lecture est suspendue. Pause puis Reprendre confirme le rattachement à la fin du fichier ; les messages de l’interruption ne seront pas rejoués.','warn'));
+  if(session.state==='source_missing')card.append(element('p','Le transcript correspondant à cet ID est introuvable. Vérifiez l’ID et la plateforme.','warn'));
+  const alerts=element('div',undefined,'alerts');
+  for(const alert of (Array.isArray(session.alerts)?session.alerts:[])){
+   const row=element('div',undefined,'alert'+(!isUnread(alert)?' acknowledged':''));row.append(element('strong','Priorité proposée — à vérifier : '+(alert.severity==='error'?'erreur':'avertissement')+' · '+(alert.occurrences||1)+' occurrence(s)'),element('p',alert.reason||'Alerte sans motif fourni'));
+   if(alert.evidence)row.append(element('p',typeof alert.evidence==='string'?alert.evidence:JSON.stringify(alert.evidence),'evidence'));
+   row.append(element('p','Contexte borné : cette proposition doit être vérifiée contre les sources.','hint'));
+   if(!isUnread(alert))row.append(element('small',alert.disposition==='false_positive'?'Marquée faux positif':'Vue'));
+   const alertActions=element('div',undefined,'actions');
+   for(const [label,disposition] of [['Vu','seen'],['Faux positif','false_positive']]){const button=element('button',label);button.type='button';if(alert.id)button.dataset.mutation='';button.disabled=busy||!alert.id;button.addEventListener('click',()=>mutate({action:'acknowledge',id:session.id,alert_id:alert.id,disposition}));alertActions.append(button);}
+   const copy=element('button','Copier le constat pour l’agent');copy.type='button';copy.addEventListener('click',()=>copyFinding(session,alert,row));alertActions.append(copy);row.append(alertActions);
+   alerts.append(row);
+  }
+  card.append(alerts);
+  const actions=element('div',undefined,'actions');
+  const paused=session.state==='paused';
+  for(const [label,action] of [[paused?'Reprendre':'Pause',paused?'resume':'pause'],['Retirer','remove']]){
+   const button=element('button',label);button.type='button';button.dataset.mutation='';button.disabled=busy;button.addEventListener('click',()=>mutate({action,id:session.id}));actions.append(button);
+  }
+  card.append(actions);fragment.append(card);
+ }
+ byId('sessions').replaceChildren(fragment);
+ byId('last-refresh').textContent='Actualisé à '+new Date().toLocaleTimeString('fr-FR');
+}
+async function refresh(){
+ if(disposed)return;
+ if(refreshPromise)return refreshPromise;
+ refreshPromise=(async()=>{
+  controller=new AbortController();requests.add(controller);
+  try{
+   const response=await fetch('/api/supervision',{cache:'no-store',signal:controller.signal});
+   if(response.status===404)throw Error('API de supervision absente : redémarrez Task Manager pour charger la nouvelle version.');
+   const data=await response.json();if(!response.ok)throw Error(data.error||'HTTP '+response.status);
+   token=data.token||token;render(data);byId('connection-error').hidden=true;return true;
+  }catch(error){if(!disposed&&error.name!=='AbortError')showError('Connexion au service indisponible : '+error.message+'. Les dernières données restent affichées.');return false;}
+  finally{requests.delete(controller);controller=null;refreshPromise=null;}
+ })();return refreshPromise;
+}
+async function mutate(payload){
+ if(busy||disposed)return;
+ busy=true;disableMutations(true);byId('notice').textContent='En cours…';
+ try{
+  if(refreshPromise)await refreshPromise;
+  if(!token&&!await refresh())throw Error('Impossible de joindre le service');
+  const mutationController=new AbortController();requests.add(mutationController);
+  let response;
+  try{response=await fetch('/api/supervision',{method:'POST',signal:mutationController.signal,headers:{'Content-Type':'application/json','X-Supervision-Token':token},body:JSON.stringify(payload)});}finally{requests.delete(mutationController);}
+  if(response.status===404)throw Error('API de supervision absente : redémarrez Task Manager pour charger la nouvelle version.');
+  const data=await response.json();if(!response.ok||data.error)throw Error(data.error||'HTTP '+response.status);
+  if(payload.action==='configure')configDirty=false;
+  if(payload.action==='add'){byId('native-id').value='';byId('alias').value='';byId('mission').value='';}
+  if(payload.action==='set_mission')missionDrafts.delete(payload.id);
+  if(payload.action==='chat')byId('chat-text').value='';
+  byId('notice').textContent='Modification enregistrée.';await refresh();
+ }catch(error){byId('notice').textContent='';showError(error.message);}
+ finally{busy=false;disableMutations(false);}
+}
+byId('start').addEventListener('click',()=>mutate({action:'start'}));byId('stop').addEventListener('click',()=>mutate({action:'stop'}));
+byId('config-form').addEventListener('input',()=>configDirty=true);byId('config-form').addEventListener('change',()=>configDirty=true);
+byId('config-form').addEventListener('submit',event=>{event.preventDefault();mutate({action:'configure',model:byId('model').value.trim(),allow_cloud:byId('allow-cloud').checked});});
+byId('add-form').addEventListener('submit',event=>{event.preventDefault();mutate({action:'add',platform:byId('platform').value,native_id:byId('native-id').value.trim(),alias:byId('alias').value.trim(),mission:byId('mission').value.trim()});});
+byId('mission').value=missionTemplates.general;
+byId('apply-mission-template').addEventListener('click',()=>{byId('mission').value=missionTemplates[byId('mission-template').value]||missionTemplates.general;});
+byId('copy-agent-brief').addEventListener('click',copyAssignmentBrief);
+byId('apply-agent-response').addEventListener('click',applyAssignmentResponse);
+byId('chat-form').addEventListener('submit',event=>{event.preventDefault();const text=byId('chat-text').value.trim();if(!text)return;const payload={action:'chat',text};if(byId('chat-session').value)payload.session_id=byId('chat-session').value;mutate(payload);});
+byId('reset-chat').addEventListener('click',()=>mutate({action:'reset_chat'}));
+byId('sound-enabled').checked=preferences.sound;
+async function unlockAudio(){try{const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)throw Error('Audio indisponible');audio=audio||new Audio();await audio.resume();byId('unlock-audio').hidden=true;byId('notification-hint').textContent='Son activé pour les nouvelles erreurs ; la page doit rester ouverte.';}catch(error){preferences.sound=false;byId('sound-enabled').checked=false;byId('notification-hint').textContent='Son indisponible : '+error.message;}savePreferences();}
+byId('unlock-audio').hidden=!preferences.sound;byId('unlock-audio').addEventListener('click',unlockAudio);
+byId('sound-enabled').addEventListener('change',async()=>{preferences.sound=byId('sound-enabled').checked;if(preferences.sound)await unlockAudio();else byId('unlock-audio').hidden=true;savePreferences();});
+byId('enable-notifications').addEventListener('click',async()=>{
+ if(preferences.desktop){preferences.desktop=false;savePreferences();byId('enable-notifications').textContent='Activer les notifications bureau';byId('notification-hint').textContent='Notifications bureau désactivées dans ce navigateur.';return;}
+ if(!('Notification' in window)){byId('notification-hint').textContent='Ce navigateur ne permet pas les notifications bureau.';return;}
+ let permission;
+ try{permission=Notification.permission==='default'?await Notification.requestPermission():Notification.permission;}catch(error){preferences.desktop=false;savePreferences();byId('notification-hint').textContent='Notifications indisponibles : '+error.message;return;}
+ preferences.desktop=permission==='granted';savePreferences();byId('enable-notifications').textContent=preferences.desktop?'Désactiver les notifications bureau':'Activer les notifications bureau';byId('notification-hint').textContent=preferences.desktop?'Notifications activées pour les nouvelles erreurs. La page doit rester ouverte.':permission==='denied'?'Permission refusée. Vous pouvez la modifier dans les réglages du navigateur ; aucune nouvelle demande automatique.':'Permission non accordée ; notifications désactivées.';
+});
+if(preferences.desktop)byId('enable-notifications').textContent='Désactiver les notifications bureau';
+window.addEventListener('storage',event=>{if(event.key==='agent-supervision.notified.v1'){try{for(const id of JSON.parse(event.newValue||'[]'))knownAlerts.add(id);}catch(_error){}}});
+async function poll(){if(disposed)return;if(!busy)await refresh();if(!disposed)timer=setTimeout(poll,8000);}
+window.addEventListener('pagehide',()=>{disposed=true;clearTimeout(timer);for(const request of requests)request.abort();});
+disableMutations(true);refresh().finally(()=>{disableMutations(false);if(!disposed)timer=setTimeout(poll,8000);});
+</script>
+</body>
+</html>

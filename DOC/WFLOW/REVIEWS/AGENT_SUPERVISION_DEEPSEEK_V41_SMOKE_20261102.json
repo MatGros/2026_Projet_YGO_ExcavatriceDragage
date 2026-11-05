@@ -1,0 +1,13 @@
+{
+  "model": "deepseek-v4.1-flash:cloud",
+  "cloud_consent_used": true,
+  "input": "synthetic test claim only; no project transcript sent",
+  "alert_returned": true,
+  "exact_evidence": true,
+  "result": {
+    "alert": true,
+    "severity": "warning",
+    "reason": "Le message affirme que tous les tests ont r\u00e9ussi (PASS) sans fournir aucune preuve d'ex\u00e9cution dans cet extrait.",
+    "evidence": "I executed all tests and everything is PASS."
+  }
+}
