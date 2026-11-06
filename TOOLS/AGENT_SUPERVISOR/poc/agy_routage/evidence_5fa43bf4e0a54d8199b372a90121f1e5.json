@@ -1,0 +1,159 @@
+{
+  "synthetic_only": true,
+  "preflight": "preflight_e0afb6eb9c7d4f569ec6e147df5e90ec.json",
+  "first_session": "c5f763e6-4236-4430-9b25-33f0fa4cdd10",
+  "marker": "POC_ALERTE_8B1BFC44EBE9",
+  "stages": [
+    {
+      "name": "create_B",
+      "args": [
+        "C:\\Users\\ZEDVICTUS\\AppData\\Local\\agy\\bin\\agy.EXE",
+        "--mode",
+        "plan",
+        "--sandbox",
+        "--print-timeout",
+        "60s",
+        "--output-format",
+        "json",
+        "--print",
+        "Ne lance aucun outil, ne lis et ne modifie aucun fichier. Essai synthétique. Réponds uniquement PRET."
+      ],
+      "returncode": 0,
+      "stdout": "{\"conversation_id\":\"24181896-3fe4-49fb-aa90-911fa62f6809\",\"status\":\"SUCCESS\",\"response\":\"PRET\\n\",\"duration_seconds\":37.3432804,\"num_turns\":1,\"usage\":{\"input_tokens\":2832,\"output_tokens\":77,\"thinking_tokens\":76,\"cache_read_tokens\":16125,\"total_tokens\":2909}}\n",
+      "stderr": "",
+      "seconds": 41.232,
+      "parsed": {
+        "conversation_id": "24181896-3fe4-49fb-aa90-911fa62f6809",
+        "status": "SUCCESS",
+        "response": "PRET\n",
+        "duration_seconds": 37.3432804,
+        "num_turns": 1,
+        "usage": {
+          "input_tokens": 2832,
+          "output_tokens": 77,
+          "thinking_tokens": 76,
+          "cache_read_tokens": 16125,
+          "total_tokens": 2909
+        }
+      }
+    },
+    {
+      "name": "send_A",
+      "args": [
+        "C:\\Users\\ZEDVICTUS\\AppData\\Local\\agy\\bin\\agy.EXE",
+        "--mode",
+        "plan",
+        "--sandbox",
+        "--print-timeout",
+        "60s",
+        "--output-format",
+        "json",
+        "--conversation",
+        "c5f763e6-4236-4430-9b25-33f0fa4cdd10",
+        "--print",
+        "Ne lance aucun outil, ne lis et ne modifie aucun fichier. Mémorise cette alerte synthétique pour le prochain message : POC_ALERTE_8B1BFC44EBE9. Réponds uniquement RECU."
+      ],
+      "returncode": 0,
+      "stdout": "{\"conversation_id\":\"c5f763e6-4236-4430-9b25-33f0fa4cdd10\",\"status\":\"SUCCESS\",\"response\":\"RECU\\n\",\"duration_seconds\":163.3375415,\"num_turns\":2,\"usage\":{\"input_tokens\":20530,\"output_tokens\":186,\"thinking_tokens\":183,\"cache_read_tokens\":16904,\"total_tokens\":20716}}\n",
+      "stderr": "",
+      "seconds": 40.39,
+      "parsed": {
+        "conversation_id": "c5f763e6-4236-4430-9b25-33f0fa4cdd10",
+        "status": "SUCCESS",
+        "response": "RECU\n",
+        "duration_seconds": 163.3375415,
+        "num_turns": 2,
+        "usage": {
+          "input_tokens": 20530,
+          "output_tokens": 186,
+          "thinking_tokens": 183,
+          "cache_read_tokens": 16904,
+          "total_tokens": 20716
+        }
+      }
+    },
+    {
+      "name": "query_A",
+      "args": [
+        "C:\\Users\\ZEDVICTUS\\AppData\\Local\\agy\\bin\\agy.EXE",
+        "--mode",
+        "plan",
+        "--sandbox",
+        "--print-timeout",
+        "60s",
+        "--output-format",
+        "json",
+        "--conversation",
+        "c5f763e6-4236-4430-9b25-33f0fa4cdd10",
+        "--print",
+        "Ne lance aucun outil, ne lis et ne modifie aucun fichier. Quel identifiant POC_ALERTE as-tu reçu dans cette conversation ? Réponds uniquement par cet identifiant ou AUCUNE."
+      ],
+      "returncode": 0,
+      "stdout": "{\"conversation_id\":\"c5f763e6-4236-4430-9b25-33f0fa4cdd10\",\"status\":\"SUCCESS\",\"response\":\"POC_ALERTE_8B1BFC44EBE9\\n\",\"duration_seconds\":204.1207896,\"num_turns\":3,\"usage\":{\"input_tokens\":22977,\"output_tokens\":301,\"thinking_tokens\":282,\"cache_read_tokens\":34890,\"total_tokens\":23278}}\n",
+      "stderr": "",
+      "seconds": 40.971,
+      "parsed": {
+        "conversation_id": "c5f763e6-4236-4430-9b25-33f0fa4cdd10",
+        "status": "SUCCESS",
+        "response": "POC_ALERTE_8B1BFC44EBE9\n",
+        "duration_seconds": 204.1207896,
+        "num_turns": 3,
+        "usage": {
+          "input_tokens": 22977,
+          "output_tokens": 301,
+          "thinking_tokens": 282,
+          "cache_read_tokens": 34890,
+          "total_tokens": 23278
+        }
+      }
+    },
+    {
+      "name": "query_B",
+      "args": [
+        "C:\\Users\\ZEDVICTUS\\AppData\\Local\\agy\\bin\\agy.EXE",
+        "--mode",
+        "plan",
+        "--sandbox",
+        "--print-timeout",
+        "60s",
+        "--output-format",
+        "json",
+        "--conversation",
+        "24181896-3fe4-49fb-aa90-911fa62f6809",
+        "--print",
+        "Ne lance aucun outil, ne lis et ne modifie aucun fichier. Quel identifiant POC_ALERTE as-tu reçu dans cette conversation ? Réponds uniquement par cet identifiant ou AUCUNE."
+      ],
+      "returncode": 0,
+      "stdout": "{\"conversation_id\":\"24181896-3fe4-49fb-aa90-911fa62f6809\",\"status\":\"SUCCESS\",\"response\":\"AUCUNE\\n\",\"duration_seconds\":159.3649573,\"num_turns\":2,\"usage\":{\"input_tokens\":5994,\"output_tokens\":260,\"thinking_tokens\":257,\"cache_read_tokens\":33033,\"total_tokens\":6254}}\n",
+      "stderr": "",
+      "seconds": 40.652,
+      "parsed": {
+        "conversation_id": "24181896-3fe4-49fb-aa90-911fa62f6809",
+        "status": "SUCCESS",
+        "response": "AUCUNE\n",
+        "duration_seconds": 159.3649573,
+        "num_turns": 2,
+        "usage": {
+          "input_tokens": 5994,
+          "output_tokens": 260,
+          "thinking_tokens": 257,
+          "cache_read_tokens": 33033,
+          "total_tokens": 6254
+        }
+      }
+    }
+  ],
+  "expected": {
+    "A": "POC_ALERTE_8B1BFC44EBE9",
+    "B": "AUCUNE"
+  },
+  "second_session": "24181896-3fe4-49fb-aa90-911fa62f6809",
+  "answers": {
+    "A": "POC_ALERTE_8B1BFC44EBE9",
+    "B": "AUCUNE"
+  },
+  "verdict": {
+    "A_exact": true,
+    "B_absent": true
+  }
+}

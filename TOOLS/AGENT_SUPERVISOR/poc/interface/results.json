@@ -1,0 +1,27 @@
+{
+  "node": "v24.18.0",
+  "platform": "win32",
+  "timestamp": "2026-11-05T03:16:23.608Z",
+  "dependency_hint": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp/supervision-dom-tests/package.json",
+  "sha256": {
+    "interface": "cc2642f955aecba9adba7f5e1f4b40e6d05bee06eb5afe0c0445e50a4f33b17c",
+    "original": "d9329a23036f97849ac895ab46324d3e4bf015e1e88836a14da8a92e7416f005",
+    "adapted": "11c65d875610d9bdad26d9ec12a39d8a2b891ad7cfaffabd419c79ecc95d302b"
+  },
+  "original": {
+    "script": "TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs",
+    "exit": 1,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "node:internal/modules/run_main:107\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\r\n\r\n4 !== 3\r\n\r\n    at file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs:72:8 {\r\n  generatedMessage: true,\r\n  code: 'ERR_ASSERTION',\r\n  actual: 4,\r\n  expected: 3,\r\n  operator: 'strictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v24.18.0\r\n"
+  },
+  "adapted": {
+    "script": "TOOLS/AGENT_SUPERVISOR/poc/interface/test_ui_adapte.mjs",
+    "exit": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "OK discovery: ambiguous candidate disabled, listing does not attach\nOK explicit selection: matching ID submitted\nOK panel state: unchanged card retained; open state survives state change\nOK alerts: collapsed by default and marked treated for session\nOK judge details: synthetic payload visible\nOK session chat: Enter sends to s1; Shift+Enter does not send\nOK global chat: Enter sends without session ID\nVeilleur UI: candidate discovery, ambiguity and explicit confirmation passed.\n",
+    "stderr": ""
+  }
+}

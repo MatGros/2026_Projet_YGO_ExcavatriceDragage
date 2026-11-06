@@ -1,0 +1,38 @@
+{
+  "synthetic_only": true,
+  "creation_proof": "creation_b84c6b1904a341b4be7ac218bd9d4304.json",
+  "session": "3bce0ed9-116f-4f87-b885-94b79503c765",
+  "marker": "POC_AGY_ACTIF_27AFB841C2",
+  "args": [
+    "agy.exe",
+    "--mode",
+    "plan",
+    "--sandbox",
+    "--print-timeout",
+    "90s",
+    "--output-format",
+    "json",
+    "--conversation",
+    "3bce0ed9-116f-4f87-b885-94b79503c765",
+    "--print",
+    "Alerte synthétique POC_AGY_ACTIF_27AFB841C2 : réponds uniquement POC_AGY_ACTIF_27AFB841C2. Ne lance aucun outil et ne lis aucun fichier."
+  ],
+  "returncode": 0,
+  "stdout": "{\"conversation_id\":\"3bce0ed9-116f-4f87-b885-94b79503c765\",\"status\":\"SUCCESS\",\"response\":\"POC_AGY_ACTIF_27AFB841C2\\n\",\"duration_seconds\":206.7109488,\"num_turns\":2,\"usage\":{\"input_tokens\":4172,\"output_tokens\":226,\"thinking_tokens\":208,\"cache_read_tokens\":34909,\"total_tokens\":4398}}\n",
+  "stderr": "",
+  "parsed": {
+    "conversation_id": "3bce0ed9-116f-4f87-b885-94b79503c765",
+    "status": "SUCCESS",
+    "response": "POC_AGY_ACTIF_27AFB841C2\n",
+    "duration_seconds": 206.7109488,
+    "num_turns": 2,
+    "usage": {
+      "input_tokens": 4172,
+      "output_tokens": 226,
+      "thinking_tokens": 208,
+      "cache_read_tokens": 34909,
+      "total_tokens": 4398
+    }
+  },
+  "seconds": 58.231
+}

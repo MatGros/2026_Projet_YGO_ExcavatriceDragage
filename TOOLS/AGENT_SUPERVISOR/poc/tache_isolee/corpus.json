@@ -1,0 +1,34 @@
+{
+  "tasks":[
+    {"id":"T501","titre":"Diagnostic synthétique","statut":"⏳","agent":"AGY01"},
+    {"id":"T502","titre":"Déjà prise","statut":"⏳","agent":"CC01"},
+    {"id":"T503","titre":"Verrou différent","statut":"⏳","agent":"AGY01"},
+    {"id":"T504","titre":"Non affectée","statut":"⬜","agent":"—"},
+    {"id":"T506","titre":"Session déjà affectée","statut":"⏳","agent":"AGY01"},
+    {"id":"T507","titre":"Sans verrou","statut":"⏳","agent":"AGY01"},
+    {"id":"T508","titre":"Clôturée","statut":"✅","agent":"AGY01"},
+    {"id":"T509","titre":"Registre indisponible","statut":"⏳","agent":"AGY01"},
+    {"id":"T510","titre":"Session déjà utilisée","statut":"⏳","agent":"AGY01"}
+  ],
+  "locks":{"work_locks":{
+    "T501":{"actor":"AGY01","token":"synthetic-token-501"},
+    "T502":{"actor":"CC01","token":"synthetic-token-502"},
+    "T503":{"actor":"AGY02","token":"synthetic-token-503"},
+    "T506":{"actor":"AGY01","token":"synthetic-token-506"},
+    "T508":{"actor":"AGY01","token":"synthetic-token-508"},
+    "T509":{"actor":"AGY01","token":"synthetic-token-509"},
+    "T510":{"actor":"AGY01","token":"synthetic-token-510"}
+  },"edit_flags":{}},
+  "cases":[
+    {"id":"concordance_et_registre_vide","task":"T501","agent":"AGY01","session":"S501","registry":[],"expected":"proposable"},
+    {"id":"autre_agent","task":"T502","agent":"AGY01","session":"S502","registry":[],"expected":"conflict_agent"},
+    {"id":"verrou_autre_agent","task":"T503","agent":"AGY01","session":"S503","registry":[],"expected":"conflict_lock"},
+    {"id":"non_affectee","task":"T504","agent":"AGY01","session":"S504","registry":[],"expected":"unassigned"},
+    {"id":"tache_inconnue","task":"T505","agent":"AGY01","session":"S505","registry":[],"expected":"task_missing"},
+    {"id":"tache_deja_suivie","task":"T506","agent":"AGY01","session":"S506","registry":[{"task":"T506","session":"AUTRE"}],"expected":"conflict_task_session"},
+    {"id":"pas_de_verrou","task":"T507","agent":"AGY01","session":"S507","registry":[],"expected":"missing_lock"},
+    {"id":"tache_close","task":"T508","agent":"AGY01","session":"S508","registry":[],"expected":"closed"},
+    {"id":"registre_non_disponible","task":"T509","agent":"AGY01","session":"S509","registry":null,"expected":"registry_unavailable"},
+    {"id":"session_deja_sur_autre_tache","task":"T510","agent":"AGY01","session":"S510","registry":[{"task":"T599","session":"S510"}],"expected":"conflict_session_task"}
+  ]
+}

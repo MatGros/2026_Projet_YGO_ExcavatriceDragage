@@ -1,0 +1,79 @@
+﻿{
+  "synthetic_only": true,
+  "temporary_root": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\veilleur-poc-affectation-jssu0uu5",
+  "cases": [
+    {
+      "case": "discovery_claude",
+      "expected": 1,
+      "observed": 1,
+      "result": "PASS"
+    },
+    {
+      "case": "attach_claude",
+      "expected": "accepted",
+      "observed": "accepted",
+      "result": "PASS"
+    },
+    {
+      "case": "discovery_codex",
+      "expected": 1,
+      "observed": 1,
+      "result": "PASS"
+    },
+    {
+      "case": "attach_codex",
+      "expected": "accepted",
+      "observed": "accepted",
+      "result": "PASS"
+    },
+    {
+      "case": "discovery_agy",
+      "expected": 1,
+      "observed": 1,
+      "result": "PASS"
+    },
+    {
+      "case": "attach_agy",
+      "expected": "accepted",
+      "observed": "accepted",
+      "result": "PASS"
+    },
+    {
+      "case": "same_session_twice",
+      "expected": "rejected: Session deja affectee",
+      "observed": "rejected: Session deja affectee",
+      "result": "PASS"
+    },
+    {
+      "case": "same_task_three_sessions",
+      "expected": 1,
+      "observed": 3,
+      "result": "FAIL"
+    },
+    {
+      "case": "attach_without_mission",
+      "expected": "accepted",
+      "observed": "accepted",
+      "result": "PASS"
+    },
+    {
+      "case": "without_mission_state",
+      "expected": "context_required",
+      "observed": "context_required",
+      "result": "PASS"
+    },
+    {
+      "case": "unknown_id",
+      "expected": "rejected: Conversation introuvable ou ambigue : verifier plateforme et ID",
+      "observed": "rejected: Conversation introuvable ou ambigue : verifier plateforme et ID",
+      "result": "PASS"
+    },
+    {
+      "case": "ambiguous_source",
+      "expected": "rejected: Conversation introuvable ou ambigue : verifier plateforme et ID",
+      "observed": "rejected: Conversation introuvable ou ambigue : verifier plateforme et ID",
+      "result": "PASS"
+    }
+  ],
+  "note": "Same task represented as free text: no formal task identity or Task Manager lookup is exercised."
+}

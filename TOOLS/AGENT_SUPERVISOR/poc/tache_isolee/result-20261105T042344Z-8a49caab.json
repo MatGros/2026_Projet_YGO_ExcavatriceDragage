@@ -1,0 +1,343 @@
+{
+  "created_utc": "2026-11-05T04:23:43.519180+00:00",
+  "synthetic_only": true,
+  "corpus_sha256": "be1a205d2e30581fdc9a12182b53b14d02a035f827bd00afe3d43963622f3e1b",
+  "scratch": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\veilleur-tache-isolee-lifg727_",
+  "endpoint": "/api/tasks/json",
+  "requests": [
+    "GET"
+  ],
+  "actual_attachments": 0,
+  "catalogue_writes": 0,
+  "http_status": 200,
+  "manager_response_synthetic": [
+    {
+      "id": "T501",
+      "titre": "Diagnostic synthétique",
+      "statut": "⏳",
+      "agent": "AGY01",
+      "revision": "058815c7e7271e066cff66f2fdc1e2ca62f7ad0e293a61405419120d53ba9319",
+      "work_lock": {
+        "actor": "AGY01",
+        "token": "synthetic-token-501"
+      },
+      "edit_flag": null
+    },
+    {
+      "id": "T502",
+      "titre": "Déjà prise",
+      "statut": "⏳",
+      "agent": "CC01",
+      "revision": "25ca5a6f46f786ba0034b8f10814d1049ed16bd31b5a86f49228d3d7fa297810",
+      "work_lock": {
+        "actor": "CC01",
+        "token": "synthetic-token-502"
+      },
+      "edit_flag": null
+    },
+    {
+      "id": "T503",
+      "titre": "Verrou différent",
+      "statut": "⏳",
+      "agent": "AGY01",
+      "revision": "3b513f250b8c4e664a2948b2d969519e9329a287f9563f4ea2ae72e16bdc4f13",
+      "work_lock": {
+        "actor": "AGY02",
+        "token": "synthetic-token-503"
+      },
+      "edit_flag": null
+    },
+    {
+      "id": "T504",
+      "titre": "Non affectée",
+      "statut": "⬜",
+      "agent": "—",
+      "revision": "1918608ee35c33d1db3d4c2115ebb55ceb039b5249736e650d5089f085827678",
+      "work_lock": null,
+      "edit_flag": null
+    },
+    {
+      "id": "T506",
+      "titre": "Session déjà affectée",
+      "statut": "⏳",
+      "agent": "AGY01",
+      "revision": "b5e7771066db5a4b076cc2bafd416df9edfabb12eed52113206f6f29efd94e1b",
+      "work_lock": {
+        "actor": "AGY01",
+        "token": "synthetic-token-506"
+      },
+      "edit_flag": null
+    },
+    {
+      "id": "T507",
+      "titre": "Sans verrou",
+      "statut": "⏳",
+      "agent": "AGY01",
+      "revision": "abe949fe26b6ff1c1081c7bf736b27aca3ebb80d954da2e21e1af5ea48d53aff",
+      "work_lock": null,
+      "edit_flag": null
+    },
+    {
+      "id": "T508",
+      "titre": "Clôturée",
+      "statut": "✅",
+      "agent": "AGY01",
+      "revision": "96a88f90e81dd7485d4f5a1164951251e61d5bb82d2fa190421a7eb926e8c48f",
+      "work_lock": {
+        "actor": "AGY01",
+        "token": "synthetic-token-508"
+      },
+      "edit_flag": null
+    },
+    {
+      "id": "T509",
+      "titre": "Registre indisponible",
+      "statut": "⏳",
+      "agent": "AGY01",
+      "revision": "250c11d9b482b875e3072713c105013671f39e8a18d66983f32dcdf6588889fc",
+      "work_lock": {
+        "actor": "AGY01",
+        "token": "synthetic-token-509"
+      },
+      "edit_flag": null
+    },
+    {
+      "id": "T510",
+      "titre": "Session déjà utilisée",
+      "statut": "⏳",
+      "agent": "AGY01",
+      "revision": "cc8cbcf2f77339bc9e590c95f485362aef0a5a687c6c3743d2004093d6d3ee7c",
+      "work_lock": {
+        "actor": "AGY01",
+        "token": "synthetic-token-510"
+      },
+      "edit_flag": null
+    }
+  ],
+  "cases": [
+    {
+      "input": {
+        "id": "concordance_et_registre_vide",
+        "task": "T501",
+        "agent": "AGY01",
+        "session": "S501",
+        "registry": [],
+        "expected": "proposable"
+      },
+      "observed": {
+        "task": "T501",
+        "session": "S501",
+        "asserted_agent": "AGY01",
+        "catalog_agent": "AGY01",
+        "work_lock_actor": "AGY01",
+        "task_revision": "058815c7e7271e066cff66f2fdc1e2ca62f7ad0e293a61405419120d53ba9319",
+        "identity_verified": false,
+        "decision": "proposable"
+      },
+      "pass": true
+    },
+    {
+      "input": {
+        "id": "autre_agent",
+        "task": "T502",
+        "agent": "AGY01",
+        "session": "S502",
+        "registry": [],
+        "expected": "conflict_agent"
+      },
+      "observed": {
+        "task": "T502",
+        "session": "S502",
+        "asserted_agent": "AGY01",
+        "catalog_agent": "CC01",
+        "work_lock_actor": "CC01",
+        "task_revision": "25ca5a6f46f786ba0034b8f10814d1049ed16bd31b5a86f49228d3d7fa297810",
+        "identity_verified": false,
+        "decision": "conflict_agent"
+      },
+      "pass": true
+    },
+    {
+      "input": {
+        "id": "verrou_autre_agent",
+        "task": "T503",
+        "agent": "AGY01",
+        "session": "S503",
+        "registry": [],
+        "expected": "conflict_lock"
+      },
+      "observed": {
+        "task": "T503",
+        "session": "S503",
+        "asserted_agent": "AGY01",
+        "catalog_agent": "AGY01",
+        "work_lock_actor": "AGY02",
+        "task_revision": "3b513f250b8c4e664a2948b2d969519e9329a287f9563f4ea2ae72e16bdc4f13",
+        "identity_verified": false,
+        "decision": "conflict_lock"
+      },
+      "pass": true
+    },
+    {
+      "input": {
+        "id": "non_affectee",
+        "task": "T504",
+        "agent": "AGY01",
+        "session": "S504",
+        "registry": [],
+        "expected": "unassigned"
+      },
+      "observed": {
+        "task": "T504",
+        "session": "S504",
+        "asserted_agent": "AGY01",
+        "catalog_agent": "—",
+        "work_lock_actor": null,
+        "task_revision": "1918608ee35c33d1db3d4c2115ebb55ceb039b5249736e650d5089f085827678",
+        "identity_verified": false,
+        "decision": "unassigned"
+      },
+      "pass": true
+    },
+    {
+      "input": {
+        "id": "tache_inconnue",
+        "task": "T505",
+        "agent": "AGY01",
+        "session": "S505",
+        "registry": [],
+        "expected": "task_missing"
+      },
+      "observed": {
+        "decision": "task_missing",
+        "identity_verified": false
+      },
+      "pass": true
+    },
+    {
+      "input": {
+        "id": "tache_deja_suivie",
+        "task": "T506",
+        "agent": "AGY01",
+        "session": "S506",
+        "registry": [
+          {
+            "task": "T506",
+            "session": "AUTRE"
+          }
+        ],
+        "expected": "conflict_task_session"
+      },
+      "observed": {
+        "task": "T506",
+        "session": "S506",
+        "asserted_agent": "AGY01",
+        "catalog_agent": "AGY01",
+        "work_lock_actor": "AGY01",
+        "task_revision": "b5e7771066db5a4b076cc2bafd416df9edfabb12eed52113206f6f29efd94e1b",
+        "identity_verified": false,
+        "decision": "conflict_task_session"
+      },
+      "pass": true
+    },
+    {
+      "input": {
+        "id": "pas_de_verrou",
+        "task": "T507",
+        "agent": "AGY01",
+        "session": "S507",
+        "registry": [],
+        "expected": "missing_lock"
+      },
+      "observed": {
+        "task": "T507",
+        "session": "S507",
+        "asserted_agent": "AGY01",
+        "catalog_agent": "AGY01",
+        "work_lock_actor": null,
+        "task_revision": "abe949fe26b6ff1c1081c7bf736b27aca3ebb80d954da2e21e1af5ea48d53aff",
+        "identity_verified": false,
+        "decision": "missing_lock"
+      },
+      "pass": true
+    },
+    {
+      "input": {
+        "id": "tache_close",
+        "task": "T508",
+        "agent": "AGY01",
+        "session": "S508",
+        "registry": [],
+        "expected": "closed"
+      },
+      "observed": {
+        "task": "T508",
+        "session": "S508",
+        "asserted_agent": "AGY01",
+        "catalog_agent": "AGY01",
+        "work_lock_actor": "AGY01",
+        "task_revision": "96a88f90e81dd7485d4f5a1164951251e61d5bb82d2fa190421a7eb926e8c48f",
+        "identity_verified": false,
+        "decision": "closed"
+      },
+      "pass": true
+    },
+    {
+      "input": {
+        "id": "registre_non_disponible",
+        "task": "T509",
+        "agent": "AGY01",
+        "session": "S509",
+        "registry": null,
+        "expected": "registry_unavailable"
+      },
+      "observed": {
+        "task": "T509",
+        "session": "S509",
+        "asserted_agent": "AGY01",
+        "catalog_agent": "AGY01",
+        "work_lock_actor": "AGY01",
+        "task_revision": "250c11d9b482b875e3072713c105013671f39e8a18d66983f32dcdf6588889fc",
+        "identity_verified": false,
+        "decision": "registry_unavailable"
+      },
+      "pass": true
+    },
+    {
+      "input": {
+        "id": "session_deja_sur_autre_tache",
+        "task": "T510",
+        "agent": "AGY01",
+        "session": "S510",
+        "registry": [
+          {
+            "task": "T599",
+            "session": "S510"
+          }
+        ],
+        "expected": "conflict_session_task"
+      },
+      "observed": {
+        "task": "T510",
+        "session": "S510",
+        "asserted_agent": "AGY01",
+        "catalog_agent": "AGY01",
+        "work_lock_actor": "AGY01",
+        "task_revision": "cc8cbcf2f77339bc9e590c95f485362aef0a5a687c6c3743d2004093d6d3ee7c",
+        "identity_verified": false,
+        "decision": "conflict_session_task"
+      },
+      "pass": true
+    }
+  ],
+  "file_hashes_before": {
+    "TASKS.yaml": "435c899110ad6203623995ae83b5114ecdc91fff1bdcd97e29f6a1ebb29e1a8d",
+    "TASK_LOCKS.json": "bdcd0a71d7c8a70a5e01bfbb172725e62ec70ece362856e857fd2dbd55d962ba"
+  },
+  "file_hashes_after": {
+    "TASKS.yaml": "435c899110ad6203623995ae83b5114ecdc91fff1bdcd97e29f6a1ebb29e1a8d",
+    "TASK_LOCKS.json": "bdcd0a71d7c8a70a5e01bfbb172725e62ec70ece362856e857fd2dbd55d962ba"
+  },
+  "unchanged": true,
+  "pass": true
+}

@@ -42,3 +42,38 @@ machine et du stockage. Le contrôle d'intégrité complet reste actif.
   `%LOCALAPPDATA%/ExcavatriceDragage/supervision-backups/`.
 - Les changements préexistants hors périmètre restent présents, notamment dans les
   gates et les documents de pilotage. Aucun commit ni push n'a été fait.
+
+
+## Suite priorisee (2026-11-06)
+
+1. Elargir le corpus francais depuis des echanges reellement observes : cas normaux difficiles,
+   pivots utilisateur, repetition apres recadrage, recommandations prematures, validations sans
+   preuve et actions hors permissions. Annoter deux classes par cas (attendu et source exacte),
+   mesurer faux positifs, non-detections, citations, doublons, latence et cout; separer les cas
+   vus pendant le reglage des cas gardes pour contre-epreuve.
+2. Stabiliser le juge OmniRoute NVIDIA a cote d'Ollama. Ne pas activer automatiquement un modele
+   avant comparaison sur les deux groupes; utiliser warning/alarme avec ancrage mecanique.
+3. Etudier puis rendre accessibles les parametres modeles pertinents (provider, ID, temperature,
+   limite de sortie, delai, contexte) dans la configuration/interface. Distinguer parametres
+   supportes par chaque provider, valeurs effectives envoyees, valeurs par defaut et consentement
+   cloud. Ajouter l'implementation apres mesure des modeles et validation du comportement.
+4. Redemarrer le Veilleur seulement apres validation du diff; le processus actif sur 8082 ne
+   charge pas les modifications presentes sur disque.
+
+Une recherche locale retrospective par agent a produit 10 candidats resumes (9 Claude, 1 AGY),
+avec contre-exemples de corrections, pivots, diagnostics normaux et propositions hors cadrage.
+Les extraits ne sont pas encore tous verifies sur le contexte complet et ne comptent pas comme
+labels definitifs. Voir `poc/retro_candidates_fr_v1.md`. La source AGY detaillee disponible est
+trop courte pour inventer un lot equilibre; les resumes restants n'ont pas de citations sources.
+
+Etat courant : le POC Bolt v4 a detecte le cas M3 via l'adaptateur de production (un appel reel,
+7,6 s) et le classifie warning; citation exacte, mais le premier controle de source de contexte
+etait invalide car le modele avait omis le champ de citation mission. L'ancrage mecanique de
+repli est ajoute et couvert par le test unitaire. Cela reste un seul cas et ne mesure pas les taux
+FP/FN. Aucun commit/push; changements preexistants et suppressions restent preserves.
+
+Redemarrage du 6 novembre : `upgrade_legacy.py` a sauvegarde et verifie le chat avant relance.
+Le service v2 charge le build `90fef02bb4f9`, `update_available=false`, collecte en marche,
+1 affectation conservee en pause et 4 messages de chat conserves. La sauvegarde reste sous
+`%LOCALAPPDATA%/ExcavatriceDragage/supervision-backups/`. Preference UI a retenir : menu lateral
+plus moderne/agreable; harmoniser les panneaux avec cette direction lors de la prochaine revue visuelle.

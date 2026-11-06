@@ -64,12 +64,54 @@ for(const bad of [
   assert.equal(document.getElementById('native-id').value,'do-not-overwrite');
   assert.equal(document.getElementById('notice').className,'error');
 }
+// JSON is a prefill format, so identity ambiguity must never alter existing fields.
+const assignmentId='11111111-1111-4111-8111-111111111111';
+for(const badJson of [
+  `{"platform":"agy","native_id":"${assignmentId}","native_id":"22222222-2222-4222-8222-222222222222","task":"T999"}`,
+  `{"platform":"agy","native_id":"${assignmentId}","native_\\u0069d":"22222222-2222-4222-8222-222222222222","task":"T999"}`,
+  '{"platform":"agy","native_id":"11111111-1111-4111-\n  8111-111111111111","task":"T999"}',
+  '{"platform":"agy","native_id":"abc\\tdef","task":"T999"}'
+]){
+  document.getElementById('native-id').value='do-not-overwrite';
+  document.getElementById('alias').value='do-not-overwrite';
+  document.getElementById('mission').value='do-not-overwrite';
+  document.getElementById('assignment-response').value=`VEILLEUR_ASSIGN_V1\n${badJson}\nEND_VEILLEUR_ASSIGN_V1`;
+  await fire('apply-agent-response');
+  assert.equal(document.getElementById('notice').className,'error');
+  assert.equal(document.getElementById('native-id').value,'do-not-overwrite');
+  assert.equal(document.getElementById('alias').value,'do-not-overwrite');
+  assert.equal(document.getElementById('mission').value,'do-not-overwrite');
+}
+document.getElementById('platform').value='agy';
+document.getElementById('native-id').value='old-id';
+document.getElementById('alias').value='Ancien alias';
+document.getElementById('assignment-response').value=`VEILLEUR_ASSIGN_V1\n${JSON.stringify({platform:'agy',native_id:assignmentId,task:'T999 — sujet',user_goal:'Texte valide : "cité" et {accolades}'})}\nEND_VEILLEUR_ASSIGN_V1`;
+await fire('apply-agent-response');
+assert.equal(document.getElementById('native-id').value,assignmentId);
+assert.equal(document.getElementById('alias').value,'','a changed identity without alias clears the prior alias');
+assert.match(document.getElementById('mission').value,/Texte valide/);
+document.getElementById('alias').value='Alias courant';
+await fire('apply-agent-response');
+assert.equal(document.getElementById('alias').value,'Alias courant','same identity may keep its existing alias');
+for(const [platform,id] of [['agy','../abc'],['agy','abc/def'],['agy','abc\u0000def'],['agy','abc\u200bdef'],['codex','non-uuid']]){
+  document.getElementById('native-id').value='do-not-overwrite';
+  document.getElementById('assignment-response').value=`VEILLEUR_ASSIGN_V1\n${JSON.stringify({platform,native_id:id,task:'T999'})}\nEND_VEILLEUR_ASSIGN_V1`;
+  await fire('apply-agent-response');
+  assert.equal(document.getElementById('notice').className,'error',`${platform}: malformed identity rejected`);
+  assert.equal(document.getElementById('native-id').value,'do-not-overwrite');
+}
+for(const [platform,id] of [['agy','agy_abc-123'],['claude','abc_123-DEF'],['codex',assignmentId],['codex','inconnu']]){
+  document.getElementById('assignment-response').value=`VEILLEUR_ASSIGN_V1\n${JSON.stringify({platform,native_id:id,task:'T999'})}\nEND_VEILLEUR_ASSIGN_V1`;
+  await fire('apply-agent-response');
+  assert.notEqual(document.getElementById('notice').className,'error',`${platform}: valid identity accepted`);
+  assert.equal(document.getElementById('native-id').value,id==='inconnu'?'':id);
+}
 snapshot.sessions=[{id:'s1',platform:'claude',native_id:'session-a',alias:'A',state:'active',mission:'Mission A',alerts:[],chat_messages:[],judge_request:null}];
 sandbox.snapshot=snapshot;
 vm.runInContext('render(snapshot)',ctx);
 const originalCard=document.querySelector('#sessions article');
 const collapsible=Array.from(originalCard.querySelectorAll('details'));
-assert.equal(collapsible.length,3);assert.ok(collapsible.every(item=>!item.open),'history, chat and alerts begin collapsed');
+assert.equal(collapsible.length,4);assert.ok(collapsible.every(item=>!item.open),'judge context, history, chat and alerts begin collapsed');
 collapsible[0].open=true;collapsible[0].dispatchEvent(new window.Event('toggle'));
 vm.runInContext('render(snapshot)',ctx);
 assert.equal(document.querySelector('#sessions article'),originalCard,'unchanged polling must not replace the card');
@@ -81,10 +123,17 @@ const alertPanel=Array.from(document.querySelectorAll('#sessions details')).find
 assert.ok(alertPanel);assert.equal(Boolean(alertPanel.open),false);assert.match(alertPanel.textContent,/1 non lue/);
 const treated=Array.from(alertPanel.querySelectorAll('button')).find(x=>x.textContent==='Traitée');treated.click();await tick();
 assert.equal(posts.at(-1).disposition,'resolved');
-const judgeButton=Array.from(document.querySelectorAll('#sessions button')).find(x=>x.textContent.includes('ce que le juge a reçu'));
+const judgeButton=Array.from(document.querySelectorAll('#sessions summary')).find(x=>x.textContent.includes('Ce que le juge a reçu'));
 judgeButton.click();await tick();assert.match(document.getElementById('sessions').textContent,/Aucune requête au juge/);
 snapshot.sessions[0].judge_request={attempted_at:'2026-11-04T00:00:00Z',attempt:1,status:'analyse',payload:{model:'local',system:'Règle système',prompt:JSON.stringify([{role:'user',text:'Texte effectivement envoyé'}]),options:{}}};
 vm.runInContext('render(snapshot)',ctx);assert.match(document.getElementById('sessions').textContent,/Texte effectivement envoyé/);
+const judgeContent=Array.from(document.querySelectorAll('#sessions pre')).find(x=>x.textContent.includes('Texte effectivement envoyé'));
+assert.equal(judgeContent.style.maxHeight,'320px');assert.equal(judgeContent.style.overflow,'auto');assert.equal(judgeContent.style.font,'inherit');assert.ok(judgeContent.classList.contains('chat-message'));
+snapshot.sessions[0].judge_request={attempted_at:'2026-11-04T00:00:00Z',attempt:1,status:'analyse',payload:{model:'nvidia/nvidia/nemotron-3.5-bolt-e4b',messages:[{role:'system',content:'Consigne OmniRoute'},{role:'user',content:JSON.stringify({events:[{id:'e1',text:'Evenement OmniRoute'}]})}],stream:true}};
+vm.runInContext('render(snapshot)',ctx);
+assert.match(document.getElementById('sessions').textContent,/Consigne OmniRoute/);
+assert.match(document.getElementById('sessions').textContent,/Evenement OmniRoute/);
+assert.match(document.getElementById('sessions').textContent,/OmniRoute/);
 const historyButton=Array.from(document.querySelectorAll('#sessions button')).find(x=>x.textContent.includes('historique de cette session'));
 historyButton.click();await tick();
 assert.match(document.getElementById('sessions').textContent,/Historique A/);

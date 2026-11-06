@@ -1,0 +1,50 @@
+[
+  {
+    "case":"tache_formelle",
+    "native_id":"11111111-1111-4111-8111-111111111111",
+    "layout":"single",
+    "expected":{"status":"ready","alias":"AGY01","task_id":"T501","requires_question":false,"task_evidence_event_ids":["e2"]},
+    "events":[
+      {"id":"e1","type":"PLANNER_RESPONSE","content":"Mon alias pour cette session est AGY01."},
+      {"id":"e2","type":"USER_INPUT","content":"La tâche formelle T501 est créée et son contrat existe. Elle est affectée à AGY01."},
+      {"id":"e3","type":"USER_INPUT","content":"Objectif : analyser le journal d'erreur en lecture seule et proposer un diagnostic."}
+    ]
+  },
+  {
+    "case":"sans_tache",
+    "native_id":"22222222-2222-4222-8222-222222222222",
+    "layout":"single",
+    "expected":{"status":"no_task","alias":"AGY02","task_id":null,"requires_question":true,"task_evidence_event_ids":["e2"]},
+    "events":[
+      {"id":"e1","type":"PLANNER_RESPONSE","content":"Mon alias pour cette session est AGY02."},
+      {"id":"e2","type":"USER_INPUT","content":"Aucune tâche formelle n'a été créée ni affectée pour ce travail de cadrage."},
+      {"id":"e3","type":"USER_INPUT","content":"Objectif : résumer les options de planification en lecture seule."}
+    ]
+  },
+  {
+    "case":"taches_contradictoires",
+    "native_id":"33333333-3333-4333-8333-333333333333",
+    "layout":"single",
+    "expected":{"status":"ambiguous","alias":"AGY03","task_id":null,"requires_question":true,"ambiguous_task_ids":["T601","T602"],"task_evidence_event_ids":["e2","e3"]},
+    "events":[
+      {"id":"e1","type":"PLANNER_RESPONSE","content":"Mon alias pour cette session est AGY03."},
+      {"id":"e2","type":"USER_INPUT","content":"On m'a indiqué que cette session est affectée à la tâche formelle T601."},
+      {"id":"e3","type":"USER_INPUT","content":"Une autre indication dit que cette même session est affectée à la tâche formelle T602 ; je ne sais pas laquelle est correcte."},
+      {"id":"e4","type":"USER_INPUT","content":"Objectif : examiner la configuration en lecture seule."}
+    ]
+  },
+  {
+    "case":"identifiant_ambigu",
+    "native_id":"44444444-4444-4444-8444-444444444444",
+    "layout":"duplicate",
+    "expected":{"status":"source_ambiguous","model_calls":0},
+    "events":[{"id":"e1","type":"USER_INPUT","content":"Objectif : un essai synthétique sans données réelles."}]
+  },
+  {
+    "case":"identifiant_absent",
+    "native_id":"55555555-5555-4555-8555-555555555555",
+    "layout":"missing",
+    "expected":{"status":"source_missing","model_calls":0},
+    "events":[]
+  }
+]

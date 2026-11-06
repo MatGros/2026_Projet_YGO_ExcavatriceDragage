@@ -1,0 +1,12 @@
+{
+  "synthetic_only": true,
+  "session_id": "97593465-800a-4352-bece-caa4f68dc0bf",
+  "creation_evidence": "creation_4e3b2e097c974463b031c5a111209b3e.json",
+  "interactive_command": "claude --resume 97593465-800a-4352-bece-caa4f68dc0bf --tools ' '",
+  "working_directory": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\veilleur-claude-actif-beekrulj",
+  "observed": "Terminal presented a workspace trust prompt with default choice No, exit. The default was confirmed; interactive process exited with code 1.",
+  "trust_was_granted": false,
+  "marker_sent": false,
+  "result": "indeterminate",
+  "limitation": "No active interactive session was reached, so neither injection success nor failure was tested. No conclusion about Claude's ability to route messages into an active session is possible."
+}
