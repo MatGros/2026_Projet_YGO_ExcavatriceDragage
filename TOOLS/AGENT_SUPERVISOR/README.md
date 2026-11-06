@@ -1,9 +1,9 @@
 # Veilleur
 
-Veilleur observe en lecture seule des conversations Claude Code, Codex ou Antigravity
+Veilleur observe en lecture seule des conversations Claude Code, Codex, Antigravity ou DSH
 explicitement affectées et propose des alertes à vérifier. Il ne pilote pas les agents,
 ne modifie ni conversations ni tâches, et ne valide ni un essai ni la sécurité machine.
-DSH et OpenCode ne sont pas pris en charge.
+OpenCode n'est pas pris en charge.
 
 ## Démarrer
 
@@ -34,6 +34,22 @@ est incorrect et qu'aucune alerte n'y est rattachée, le champ **Corriger l'ID l
 permet de le remplacer sans perdre la mission ; une source unique est exigée.
 
 ## Affecter une conversation
+
+Dans Claude Code, Antigravity ou DSH, la skill utilisateur `/connect-session-supervisor` lance l'affectation
+depuis le chat courant. Elle exige une tâche formelle identifiable, ou une confirmation
+explicite avant un suivi sans tâche. Elle demande un alias s'il manque, n'utilise jamais
+la session la plus récente et n'envoie aucun message à l'agent observé. Le script
+`scripts/connect_session.py` vérifie l'ID, l'unicité de la source et la réponse du service.
+Dans DSH, elle apparaît dans le menu des skills `/` et s'exécute comme prompt utilisateur ;
+aucune commande native de profil ni configuration DSH globale n'est installée par ce lot.
+Après l'ajout ou le renommage de la skill, recharge ou relance chaque CLI concerné pour
+rafraîchir son catalogue de commandes. Task Manager et Windows n'ont pas besoin de redémarrer.
+Codex ne fournit pas encore ici de commande de chat équivalente ; utiliser l'affectation
+manuelle depuis Task Viewer.
+
+Pour DSH, le collecteur lit le transcript local `.jsonl.zstd` avec Node.js 22 ou ultérieur.
+Le suivi commence à la fin du transcript ; aucun historique antérieur n'est rejoué.
+Une réécriture ou troncature suspend le suivi comme pour les autres sources.
 
 1. Saisir la plateforme et l'ID natif complet, ou demander la liste de candidates et
    sélectionner explicitement une ligne non ambiguë. La recherche ne lit que les noms

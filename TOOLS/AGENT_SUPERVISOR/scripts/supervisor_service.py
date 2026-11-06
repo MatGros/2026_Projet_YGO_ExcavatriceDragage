@@ -1,4 +1,4 @@
-"""Veilleur: explicit-session read-only collector and consultative Ollama worker.
+"""Veilleur: explicit-session read-only collector and consultative model worker.
 
 No task catalogue writes, CLI controls or blocking hooks. Assignments and alerts
 are persisted; observed transcript instructions remain in memory only.
@@ -20,37 +20,17 @@ import urllib.request
 import uuid
 
 try:
-    from .session_watcher import JsonlAppendWatcher, resolve_jsonl_source
+    from .session_watcher import resolve_jsonl_source
+    from .dsh_session_watcher import read_events as read_dsh_events
+    from .platform_adapters import normalize, watcher_for
 except ImportError:
-    from session_watcher import JsonlAppendWatcher, resolve_jsonl_source
+    from session_watcher import resolve_jsonl_source
+    from dsh_session_watcher import read_events as read_dsh_events
+    from platform_adapters import normalize, watcher_for
 
 
 def timestamp():
     return datetime.now(timezone.utc).isoformat()
-
-
-def text_content(value):
-    if isinstance(value, str):
-        return value
-    if isinstance(value, list):
-        return "\n".join(part.get("text", "") for part in value
-                         if isinstance(part, dict) and isinstance(part.get("text"), str) and part.get("type") in ("text", "input_text", "output_text"))
-    return ""
-
-
-def normalize(platform, event):
-    """Canonical records only: avoid duplicate Codex event_msg projections."""
-    if platform == "claude" and event.get("type") in ("user", "assistant"):
-        message = event.get("message", {})
-        if isinstance(message, dict):
-            return event["type"], text_content(message.get("content", ""))
-    if platform == "codex" and event.get("type") == "response_item":
-        message = event.get("payload", {})
-        if isinstance(message, dict) and message.get("type") == "message" and message.get("role") in ("user", "assistant"):
-            return message["role"], text_content(message.get("content", ""))
-    if platform == "agy" and event.get("type") in ("USER_INPUT", "PLANNER_RESPONSE"):
-        return ("user" if event["type"] == "USER_INPUT" else "assistant"), text_content(event.get("content", ""))
-    return None
 
 
 DEFAULT_MODEL = "deepseek-v4.1-flash:cloud"
@@ -340,7 +320,8 @@ class Supervisor:
         home = Path.home()
         self.roots = roots or {
             "claude": [home / ".claude/projects"], "codex": [home / ".codex/sessions"],
-            "agy": [home / ".gemini" / name / "brain" for name in ("antigravity", "antigravity-cli", "antigravity-ide")]}
+            "agy": [home / ".gemini" / name / "brain" for name in ("antigravity", "antigravity-cli", "antigravity-ide")],
+            "dsh": [home / ".dsh/sessions"]}
         self.state_path = Path(state_path) if state_path else Path(os.environ.get("LOCALAPPDATA", home / ".local/share")) / "ExcavatriceDragage/agent-supervision.json"
         self.judge = judge or production_judge
         self._production_judge = judge is None
@@ -364,6 +345,7 @@ class Supervisor:
         self.storage_error = None
         self._persist_pending = False
         self._threads = []
+        self.collector_stats = dict(last_cycle_at=None, sessions_enabled=0, messages_seen=0, sessions_unavailable=0, cycles=0)
         self._load()
 
     def _load(self):
@@ -451,7 +433,7 @@ class Supervisor:
                     subdirs[:] = [name for name in subdirs if not (Path(directory) / name).is_symlink()]
                     depth = len(Path(directory).relative_to(root).parts)
                     # Only session layouts, not nested subagent logs or unrelated trees.
-                    if (platform == 'claude' and depth >= 1) or (platform == 'codex' and depth >= 3) or (platform == 'agy' and depth >= 3):
+                    if (platform == 'claude' and depth >= 1) or (platform in ('codex', 'agy', 'dsh') and depth >= 3):
                         subdirs.clear()
                     elif platform == 'agy' and depth == 1:
                         subdirs[:] = [name for name in subdirs if name == '.system_generated']
@@ -469,6 +451,8 @@ class Supervisor:
                             native_id = rel.parts[0] if len(rel.parts) in (2, 4) else ''
                             if len(rel.parts) == 4 and rel.parts[1:3] != ('.system_generated', 'logs'):
                                 native_id = ''
+                        elif platform == "dsh" and name in ('session.jsonl.zstd', 'session.jsonl'):
+                            native_id = Path(directory).name
                         else:
                             continue
                         if not re.fullmatch(r'[A-Za-z0-9_-]{1,150}', native_id):
@@ -503,32 +487,38 @@ class Supervisor:
         source = self._validate_assignment(platform, native_id)
         if source is None:
             raise ValueError("Conversation introuvable ou ambigue")
-        with source.open('rb') as stream:
-            before = os.fstat(stream.fileno())
-            start = max(0, before.st_size - 512 * 1024)
-            stream.seek(start)
-            data = stream.read(512 * 1024)
-            after = os.fstat(stream.fileno())
-        if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns):
-            raise ValueError("Transcript modifie pendant la lecture : reessayer")
-        rows = data.split(b'\n')
-        partial = bool(start)
-        if start:
-            rows = rows[1:]
-        if rows and rows[-1]:
-            rows = rows[:-1]
-            partial = True
-        messages = []
-        for row in rows:
-            try:
-                event = json.loads(row.decode('utf8'))
-            except (ValueError, UnicodeDecodeError):
-                if row.strip():
-                    partial = True
-                continue
-            if not isinstance(event, dict):
+        if platform == "dsh" and source.name.endswith(".zstd"):
+            events, partial = read_dsh_events(source, native_id)
+        else:
+            with source.open('rb') as stream:
+                before = os.fstat(stream.fileno())
+                start = max(0, before.st_size - 512 * 1024)
+                stream.seek(start)
+                data = stream.read(512 * 1024)
+                after = os.fstat(stream.fileno())
+            if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns):
+                raise ValueError("Transcript modifie pendant la lecture : reessayer")
+            rows = data.split(b'\n')
+            partial = bool(start)
+            if start:
+                rows = rows[1:]
+            if rows and rows[-1]:
+                rows = rows[:-1]
                 partial = True
-                continue
+            events = []
+            for row in rows:
+                try:
+                    event = json.loads(row.decode('utf8'))
+                except (ValueError, UnicodeDecodeError):
+                    if row.strip():
+                        partial = True
+                    continue
+                if isinstance(event, dict):
+                    events.append(event)
+                else:
+                    partial = True
+        messages = []
+        for event in events:
             normalized = normalize(platform, event)
             if normalized and normalized[1]:
                 role, text = normalized
@@ -552,6 +542,7 @@ class Supervisor:
     def _new_session(sid, platform, native_id, alias, enabled, mission=""):
         return dict(id=sid, platform=platform, native_id=native_id, alias=str(alias)[:100], mission=mission, initial_mission=mission, mission_updated_at=timestamp(), memory=[], context_truncated=False,
                     enabled=enabled, state="waiting" if enabled else "paused", source=None, error=None,
+                    messages_observed=0,
                     last_event=None, last_analysis=None, analysis_state="waiting" if mission else "context_required", analysis_error=None,
                     alerts=[], watcher=None, context=[], generation=0, judge_request=None, judge_proposal=None,
                     exchange_path=None, exchange_error=None, exchange_saved_at=None)
@@ -579,12 +570,13 @@ class Supervisor:
 
     def snapshot(self):
         with self._lock:
-            public = [{key: value[key] for key in ("id", "platform", "native_id", "alias", "mission", "initial_mission", "mission_updated_at", "memory", "context_truncated", "state", "source", "error", "last_event", "last_analysis", "analysis_state", "analysis_error", "exchange_path", "exchange_error", "exchange_saved_at", "alerts", "judge_request", "judge_proposal")} for value in self.sessions.values()]
+            public = [{key: value[key] for key in ("id", "platform", "native_id", "alias", "mission", "initial_mission", "mission_updated_at", "memory", "context_truncated", "state", "source", "error", "last_event", "last_analysis", "analysis_state", "analysis_error", "exchange_path", "exchange_error", "exchange_saved_at", "alerts", "judge_request", "judge_proposal", "messages_observed")} for value in self.sessions.values()]
             for item in public:
                 item['chat_messages'] = self._chat_histories.get(item['id'], [])
             # Copy nested alerts; callers cannot alter internal state.
             return json.loads(json.dumps(dict(running=self.running, model=self.model, allow_cloud=self.allow_cloud,
-                load_error=self.load_error, storage_error=self.storage_error, chat=self._chat_state, poll_interval_seconds=self.poll_interval, sessions=public, alerts=[dict(a, session_id=s["id"], alias=s["alias"]) for s in public for a in s["alerts"]][-100:])))
+                load_error=self.load_error, storage_error=self.storage_error, chat=self._chat_state, poll_interval_seconds=self.poll_interval,
+                collector=dict(self.collector_stats), sessions=public, alerts=[dict(a, session_id=s["id"], alias=s["alias"]) for s in public for a in s["alerts"]][-100:])))
 
     def command(self, command):
         with self._lock:
@@ -649,7 +641,7 @@ class Supervisor:
                     # Establish the EOF cursor during the explicit attach command.
                     # Otherwise a reply arriving before the first collector poll could be lost.
                     session["source"] = str(source)
-                    session["watcher"] = JsonlAppendWatcher(source)
+                    session["watcher"] = watcher_for(platform, source, native_id)
                     session["context_truncated"] = True
                 self.sessions[sid] = session
                 self._persist()
@@ -806,7 +798,7 @@ class Supervisor:
                 session["error"] = session["state"]
                 return
             session["source"] = str(paths[0])
-            session["watcher"] = JsonlAppendWatcher(paths[0])
+            session["watcher"] = watcher_for(session["platform"], paths[0], session["native_id"])
             session["context_truncated"] = True  # Attachment starts at EOF; prior history was not observed.
         previous_state = session["state"]
         result = session["watcher"].poll()
@@ -821,6 +813,7 @@ class Supervisor:
             if session.get('judge_request'):
                 session['judge_request']['status'] = 'perime'
             session["last_event"] = timestamp()
+            session["messages_observed"] = session.get("messages_observed", 0) + 1
             session["context_truncated"] |= len(text) > 3000
             session["context"].append({"role": role, "text": text[-3000:]})
             if role == "user":
@@ -859,6 +852,8 @@ class Supervisor:
         while not self.closed:
             with self._lock:
                 if self.running:
+                    before_messages = sum(s.get("messages_observed", 0) for s in self.sessions.values())
+                    enabled = [s for s in self.sessions.values() if s["enabled"]]
                     for session in self.sessions.values():
                         if session["enabled"]:
                             try:
@@ -875,6 +870,11 @@ class Supervisor:
                                 session["_last_stamp"] = before_stamp if session["state"] == "active" else None
                             except Exception as exc:
                                 session.update(state="source_error", error=type(exc).__name__)
+                    after_messages = sum(s.get("messages_observed", 0) for s in self.sessions.values())
+                    self.collector_stats.update(last_cycle_at=timestamp(), sessions_enabled=len(enabled),
+                                                messages_seen=after_messages-before_messages,
+                                                sessions_unavailable=sum(s["state"] not in ("active", "waiting") for s in enabled),
+                                                cycles=self.collector_stats["cycles"]+1)
                     if self._persist_pending and not self.load_error:
                         self._persist_background()
             self._wake.wait(self.poll_interval)

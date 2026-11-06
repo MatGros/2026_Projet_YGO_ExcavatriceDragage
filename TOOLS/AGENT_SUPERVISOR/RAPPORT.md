@@ -1,5 +1,26 @@
 # Veilleur — rapport courant
 
+## État au 6 novembre 2026 — intégration en cours
+
+| Axe | Réalisation | État vérifié / limite |
+|---|---|---|
+| Commande de chat | `/connect-session-supervisor` pour Claude Code, Antigravity et DSH ; connecteur local exigeant une référence `T###` ou confirmation sans tâche | Tests unitaires passés. Essai dans les trois interfaces non démontré ; la revue DSH confirme une skill utilisateur dans le menu `/`, pas une commande native enregistrée. |
+| DSH | Lecteur Zstandard Node.js, suivi des nouvelles trames, historique borné, résolution par ID exact | Tests synthétiques passés ; watcher attaché en lecture seule à l'ID fourni, état `active`, curseur 453 455 octets. Seul l'en-tête a été vérifié ; aucune ligne de conversation n'a été affichée ni envoyée au modèle. |
+| Modularité | Normalisation et sélection du lecteur isolées dans `scripts/platform_adapters.py` ; service conserve l'orchestration | Refactor minimal fondé sur revue indépendante. Les transports de modèles et le pipeline d'analyse restent à séparer. |
+| Trajet des messages | Détails repliables, étapes cliquables, état collecteur et juge actualisés depuis l'API | Test DOM existant passé ; revue visuelle navigateur non réalisée. Le challenge A/B est une revue ponctuelle hors boucle : un seul juge LLM tourne en production. |
+
+Vérifications : suite `TOOLS/AGENT_SUPERVISOR/tests` : **40 pass** ; `test_ui.mjs` : **pass**.
+Le connecteur refuse les URL hors loopback et une deuxième session Veilleur avec le même
+`T###`. Cette collision n'est contrôlée que parmi les affectations Veilleur : l'outil ne
+vérifie pas les verrous externes du Task Manager.
+
+Les commandes `/connect-session-supervisor` n'ont pas encore été lancées
+dans les chats réels ; ne pas considérer ce lot comme livré avant ces trois essais et leur
+confirmation dans Task Viewer.
+Sur le transcript DSH de 453 Ko, 10 cycles locaux ont pris en moyenne 107 ms (maximum 119 ms)
+par cycle, démarrage Node compris. Ce petit échantillon ne prédit pas le coût de gros historiques
+ni de nombreuses sessions simultanées.
+
 ## État au 4 novembre 2026
 
 | Phase | Preuve | Résultat / limite |

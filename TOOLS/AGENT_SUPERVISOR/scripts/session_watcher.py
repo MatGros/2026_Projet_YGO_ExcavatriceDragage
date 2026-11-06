@@ -24,16 +24,20 @@ class SourceResolution:
 
 def resolve_jsonl_source(root: Path, session_id: str, *, platform: str = "claude") -> SourceResolution:
     """Resolve a complete native ID using literal platform layouts; never guess by recency."""
-    if platform not in ("claude", "codex", "agy"):
+    if platform not in ("claude", "codex", "agy", "dsh"):
         return SourceResolution("invalid_platform", None, 0)
     if not re.fullmatch(r"[A-Za-z0-9_-]+", session_id):
         return SourceResolution("invalid_id", None, 0)
     if platform == "codex" and not re.fullmatch(r"[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}", session_id):
         return SourceResolution("invalid_id", None, 0)
+    if platform == "dsh" and not re.fullmatch(r"session-[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}", session_id):
+        return SourceResolution("invalid_id", None, 0)
     if not root.is_dir():
         return SourceResolution("root_missing", None, 0)
     try:
         def matches_id(path):
+            if platform == "dsh":
+                return path.name in ("session.jsonl.zstd", "session.jsonl") and path.parent.name == session_id
             if platform == "codex":
                 return path.name.endswith("-" + session_id + ".jsonl")
             if platform == "agy":
@@ -43,6 +47,13 @@ def resolve_jsonl_source(root: Path, session_id: str, *, platform: str = "claude
             candidates = (root / session_id / "transcript.jsonl",
                           root / session_id / ".system_generated" / "logs" / "transcript.jsonl")
             matches = [p for p in candidates if p.is_file()]
+        elif platform == "dsh":
+            matches = []
+            for directory, subdirs, files in os.walk(root, followlinks=False):
+                subdirs[:] = [name for name in subdirs if not (Path(directory) / name).is_symlink()]
+                if Path(directory).name == session_id:
+                    matches.extend(Path(directory) / name for name in files if name in ("session.jsonl.zstd", "session.jsonl"))
+                    subdirs.clear()
         else:
             matches = [p for p in root.rglob("*.jsonl") if matches_id(p)]
     except OSError:
