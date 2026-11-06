@@ -1,0 +1,123 @@
+chemin;depth;classe;section;type;loc;visible
+PRG_06_Outputs.EmergencyArming_RQ;0;AUTRE;?;?;PRG_06_Outputs.st:532;False
+PRG_06_Outputs.PowerKeepAlive_A_RQ;0;AUTRE;?;?;PRG_06_Outputs.st:530;False
+PRG_06_Outputs.PowerKeepAlive_B_RQ;0;AUTRE;?;?;PRG_06_Outputs.st:531;False
+PRG_06_Outputs.EmergencyArmingCmd;1;AUTRE;VAR;BOOL;PRG_06_Outputs.st:527;True
+PRG_06_Outputs.PowerKeepAliveACmd;1;AUTRE;VAR;BOOL;PRG_06_Outputs.st:517;True
+PRG_06_Outputs.PowerKeepAliveBCmd;1;AUTRE;VAR;BOOL;PRG_06_Outputs.st:518;True
+PRG_06_Outputs.instArmContactorProtector.Cmd;2;AUTRE;VAR_OUTPUT;BOOL;FB_ContactorProtector.st:30 FB_ContactorProtector.st:60;True
+PRG_06_Outputs.instKeepAliveAProtector.Cmd;2;AUTRE;VAR_OUTPUT;BOOL;FB_ContactorProtector.st:30 FB_ContactorProtector.st:60;True
+PRG_06_Outputs.instKeepAliveBProtector.Cmd;2;AUTRE;VAR_OUTPUT;BOOL;FB_ContactorProtector.st:30 FB_ContactorProtector.st:60;True
+PRG_06_Outputs.instArmContactorProtector.ActivationLatched;3;AUTRE;VAR;BOOL;FB_ContactorProtector.st:34 FB_ContactorProtector.st:53 FB_ContactorProtector.st:56;True
+PRG_06_Outputs.instArmContactorProtector.Enable;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instKeepAliveAProtector.ActivationLatched;3;AUTRE;VAR;BOOL;FB_ContactorProtector.st:34 FB_ContactorProtector.st:53 FB_ContactorProtector.st:56;True
+PRG_06_Outputs.instKeepAliveAProtector.Enable;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instKeepAliveBProtector.ActivationLatched;3;AUTRE;VAR;BOOL;FB_ContactorProtector.st:34 FB_ContactorProtector.st:53 FB_ContactorProtector.st:56;True
+PRG_06_Outputs.instKeepAliveBProtector.Enable;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.TRUE;4;AUTRE;?;?;;False
+PRG_06_Outputs.instArmContactorProtector.InhibitActive;4;AUTRE;VAR;BOOL;FB_ContactorProtector.st:33 FB_ContactorProtector.st:42 FB_ContactorProtector.st:46;False
+PRG_06_Outputs.instArmContactorProtector.Request;4;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instKeepAliveAProtector.InhibitActive;4;AUTRE;VAR;BOOL;FB_ContactorProtector.st:33 FB_ContactorProtector.st:42 FB_ContactorProtector.st:46;False
+PRG_06_Outputs.instKeepAliveAProtector.Request;4;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instKeepAliveBProtector.InhibitActive;4;AUTRE;VAR;BOOL;FB_ContactorProtector.st:33 FB_ContactorProtector.st:42 FB_ContactorProtector.st:46;False
+PRG_06_Outputs.instKeepAliveBProtector.Request;4;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instArmContactorProtector.ReqFall.Q;5;AUTRE;VAR;F_TRIG;FB_ContactorProtector.st:38;False
+PRG_06_Outputs.instArmContactorProtector.TonInterval.Q;5;AUTRE;VAR;TON;FB_ContactorProtector.st:35 FB_ContactorProtector.st:44;False
+PRG_06_Outputs.instKeepAliveAProtector.ReqFall.Q;5;AUTRE;VAR;F_TRIG;FB_ContactorProtector.st:38;False
+PRG_06_Outputs.instKeepAliveAProtector.TonInterval.Q;5;AUTRE;VAR;TON;FB_ContactorProtector.st:35 FB_ContactorProtector.st:44;False
+PRG_06_Outputs.instKeepAliveBProtector.ReqFall.Q;5;AUTRE;VAR;F_TRIG;FB_ContactorProtector.st:38;False
+PRG_06_Outputs.instKeepAliveBProtector.TonInterval.Q;5;AUTRE;VAR;TON;FB_ContactorProtector.st:35 FB_ContactorProtector.st:44;False
+PRG_06_Outputs.instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd;5;AUTRE;VAR_OUTPUT;ST_Safety_Emergency_Cmd;FB_Safety_EmergencyManagement.st:559;True
+PRG_06_Outputs.instSafetyEmergencyManagement.Cmd.MaintainA_Cmd;5;AUTRE;VAR_OUTPUT;ST_Safety_Emergency_Cmd;FB_Safety_EmergencyManagement.st:536;True
+PRG_06_Outputs.instSafetyEmergencyManagement.Cmd.MaintainB_Cmd;5;AUTRE;VAR_OUTPUT;ST_Safety_Emergency_Cmd;FB_Safety_EmergencyManagement.st:537;True
+PRG_06_Outputs.instArmContactorProtector.Cfg_MinInterval;6;REGLAGE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instKeepAliveAProtector.Cfg_MinInterval;6;REGLAGE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instKeepAliveBProtector.Cfg_MinInterval;6;REGLAGE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instSafetyEmergencyManagement.ArmingSeqStep;6;AUTRE;VAR;INT;FB_Safety_EmergencyManagement.st:140 FB_Safety_EmergencyManagement.st:232 FB_Safety_EmergencyManagement.st:240 FB_Safety_EmergencyManagement.st:253;True
+PRG_06_Outputs.instSafetyEmergencyManagement.BtnEmergencyCutOff;6;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSafetyEmergencyManagement.CutOffActive;6;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:217;False
+PRG_06_Outputs.instSafetyEmergencyManagement.Enable;6;AUTRE;VAR_INPUT;BOOL;FB_Safety_EmergencyManagement.st:135;False
+PRG_06_Outputs.instSafetyEmergencyManagement.MaintainA_NoBlock;6;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:534;False
+PRG_06_Outputs.instSafetyEmergencyManagement.MaintainB_NoBlock;6;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:535;False
+PRG_06_Outputs.instSafetyEmergencyManagement.Maintain_ChainOk;6;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:530;False
+GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff;7;COMMANDE;VAR_GLOBAL;ST_EmergencyHMI;;True
+PRG_06_Outputs.T;7;AUTRE;?;?;;False
+PRG_06_Outputs.instSafetyEmergencyManagement.BypassArmingPreconditions;7;BYPASS;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSafetyEmergencyManagement.BypassPowerCutOff;7;BYPASS;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSafetyEmergencyManagement.BypassTestA;7;BYPASS;VAR;BOOL;FB_Safety_EmergencyManagement.st:222;True
+PRG_06_Outputs.instSafetyEmergencyManagement.BypassTestB;7;BYPASS;VAR;BOOL;FB_Safety_EmergencyManagement.st:223;True
+PRG_06_Outputs.instSafetyEmergencyManagement.EmergencyChainClosed;7;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSafetyEmergencyManagement.MaintainA_NoFault;7;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:532;False
+PRG_06_Outputs.instSafetyEmergencyManagement.MaintainB_NoFault;7;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:533;False
+PRG_06_Outputs.instSafetyEmergencyManagement.Maintain_NoCutOff;7;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:531;False
+PRG_06_Outputs.instSafetyEmergencyManagement.PowerContactorEngaged;7;AUTRE;VAR_INPUT;BOOL;;True
+PRG_06_Outputs.instSafetyEmergencyManagement.PowerCutOffRequest;7;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSafetyEmergencyManagement.PreArmDelayActive;7;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:205 FB_Safety_EmergencyManagement.st:301 FB_Safety_EmergencyManagement.st:304 FB_Safety_EmergencyManagement.st:308;False
+PRG_06_Outputs.instSafetyEmergencyManagement.TonArmingConfirm.Q;7;AUTRE;VAR;TON;FB_Safety_EmergencyManagement.st:163 FB_Safety_EmergencyManagement.st:289 FB_Safety_EmergencyManagement.st:412;False
+PRG_06_Outputs.instSafetyEmergencyManagement.TonArmingPulse.Q;7;AUTRE;VAR;TON;FB_Safety_EmergencyManagement.st:162 FB_Safety_EmergencyManagement.st:288 FB_Safety_EmergencyManagement.st:403;False
+PRG_06_Outputs.instSafetyEmergencyManagement.TonPreArm.Q;7;AUTRE;VAR;TON;FB_Safety_EmergencyManagement.st:306;False
+PRG_06_Outputs.instSafetyEmergencyManagement.TonRestoreA.Q;7;AUTRE;VAR;TON;FB_Safety_EmergencyManagement.st:159 FB_Safety_EmergencyManagement.st:285 FB_Safety_EmergencyManagement.st:346;False
+PRG_06_Outputs.instSafetyEmergencyManagement.TonRestoreB.Q;7;AUTRE;VAR;TON;FB_Safety_EmergencyManagement.st:161 FB_Safety_EmergencyManagement.st:287 FB_Safety_EmergencyManagement.st:388;False
+PRG_06_Outputs.instSafetyEmergencyManagement.TonTestA.Q;7;AUTRE;VAR;TON;FB_Safety_EmergencyManagement.st:158 FB_Safety_EmergencyManagement.st:284 FB_Safety_EmergencyManagement.st:329;False
+PRG_06_Outputs.instSafetyEmergencyManagement.TonTestB.Q;7;AUTRE;VAR;TON;FB_Safety_EmergencyManagement.st:160 FB_Safety_EmergencyManagement.st:286 FB_Safety_EmergencyManagement.st:366;False
+PRG_06_Outputs.instSafetyEmergencyManagement.WasArmed;7;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:419 FB_Safety_EmergencyManagement.st:516 FB_Safety_EmergencyManagement.st:519 FB_Safety_EmergencyManagement.st:526;True
+PRG_06_Outputs.ms;7;AUTRE;?;?;;False
+PRG_06_Outputs.s;7;AUTRE;?;?;;False
+GVL_BypassRetain.BypassAuArmingPreconditions;8;BYPASS;VAR_GLOBAL;BOOL;;False
+GVL_BypassRetain.BypassAuPowerCutOff;8;BYPASS;VAR_GLOBAL;BOOL;;False
+PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI;8;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:484;True
+PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;8;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:484;True
+PRG_06_Outputs.PowerCutOffReq;8;AUTRE;VAR;BOOL;PRG_06_Outputs.st:317 PRG_06_Outputs.st:481;True
+PRG_06_Outputs.instSafetyEmergencyManagement.ArmPulseInhibitActive;8;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:544 FB_Safety_EmergencyManagement.st:547 FB_Safety_EmergencyManagement.st:551;False
+PRG_06_Outputs.instSafetyEmergencyManagement.ArmReqEdge.Q;8;AUTRE;VAR;R_TRIG;FB_Safety_EmergencyManagement.st:132;False
+PRG_06_Outputs.instSafetyEmergencyManagement.Armable;8;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:149 FB_Safety_EmergencyManagement.st:276;True
+PRG_06_Outputs.instSafetyEmergencyManagement.BypassRedundancyTest;8;BYPASS;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSafetyEmergencyManagement.BypassRedundancyTestA;8;BYPASS;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSafetyEmergencyManagement.BypassRedundancyTestB;8;BYPASS;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSafetyEmergencyManagement.EnableRising.Q;8;AUTRE;VAR;R_TRIG;FB_Safety_EmergencyManagement.st:130;False
+PRG_06_Outputs.instSafetyEmergencyManagement.ForceTestA;8;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:141 FB_Safety_EmergencyManagement.st:282 FB_Safety_EmergencyManagement.st:327 FB_Safety_EmergencyManagement.st:332;True
+PRG_06_Outputs.instSafetyEmergencyManagement.ForceTestB;8;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:142 FB_Safety_EmergencyManagement.st:283 FB_Safety_EmergencyManagement.st:328 FB_Safety_EmergencyManagement.st:345;True
+PRG_06_Outputs.instSafetyEmergencyManagement.RedundancyTestFailedCause;8;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:154 FB_Safety_EmergencyManagement.st:199 FB_Safety_EmergencyManagement.st:309 FB_Safety_EmergencyManagement.st:334;False
+PRG_06_Outputs.instSafetyEmergencyManagement.ResetEdge.Q;8;AUTRE;VAR;R_TRIG;FB_Safety_EmergencyManagement.st:131;False
+GVL_BypassRetain.BypassAuRedundancyTest;9;BYPASS;VAR_GLOBAL;BOOL;;False
+GVL_BypassRetain.BypassAuRedundancyTestA;9;BYPASS;VAR_GLOBAL;BOOL;;False
+GVL_BypassRetain.BypassAuRedundancyTestB;9;BYPASS;VAR_GLOBAL;BOOL;;False
+PRG_02_Acquisition.HwReal.Machine;9;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:189 PRG_02_Acquisition.st:190 PRG_02_Acquisition.st:191 PRG_02_Acquisition.st:192;False
+PRG_02_Acquisition.HwSim.Machine;9;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:437;False
+PRG_02_Acquisition.MachineInputSourceSimulated;9;AUTRE;VAR;BOOL;PRG_02_Acquisition.st:138;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff;9;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;True
+PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff;9;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1937;False
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff;9;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:880;False
+PRG_06_Outputs.instSafetyEmergencyManagement.ArmRequest;9;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSafetyEmergencyManagement.Armable_ChainOk;9;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:268;False
+PRG_06_Outputs.instSafetyEmergencyManagement.Armable_Idle;9;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:269;False
+PRG_06_Outputs.instSafetyEmergencyManagement.Armable_NoBlock;9;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:270;False
+PRG_06_Outputs.instSafetyEmergencyManagement.Reset;9;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSafetyEmergencyManagement.SeqRunStartEdge.Q;9;AUTRE;VAR;R_TRIG;FB_Safety_EmergencyManagement.st:542;False
+PRG_06_Outputs.instSafetyEmergencyManagement.TonArmPulseInhibit.Q;9;AUTRE;VAR;TON;FB_Safety_EmergencyManagement.st:549;False
+GVL_IHM.Emergency.Cmd.BtnEmergencyArming;10;COMMANDE;VAR_GLOBAL;ST_EmergencyHMI;;False
+GVL_Simulation.SimSafetyActive;10;SIMU;VAR_GLOBAL;BOOL;;True
+GVL_Simulation.SimulationModeActive;10;SIMU;VAR_GLOBAL;BOOL;;True
+PRG_02_Acquisition.ConveyorInfeedReady_DI;10;AUTRE;?;?;;True
+PRG_02_Acquisition.EmergencyChainClosed_DI;10;AUTRE;?;?;;True
+PRG_02_Acquisition.HydraulicThermalOk_DI;10;AUTRE;?;?;;True
+PRG_02_Acquisition.M1_M2_KoboldBottomTouch_DI;10;AUTRE;?;?;;True
+PRG_02_Acquisition.M1_M2_M3_BrakeThermalOk_DI;10;AUTRE;?;?;;True
+PRG_02_Acquisition.PhaseRotationOk_DI;10;AUTRE;?;?;;True
+PRG_02_Acquisition.PowerContactorEngaged_DI;10;AUTRE;?;?;;True
+PRG_02_Acquisition.TremieFull_OR_GateRaised_DI;10;AUTRE;?;?;;True
+PRG_02_Acquisition.instSimBench.Machine;10;FRONTIERE;VAR_OUTPUT;ST_HwMachine;;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff;10;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1610;False
+PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff;10;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1627;False
+PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;10;AUTRE;VAR;ST_TranslationFinalInterlockRequest;PRG_05_Translation.st:702;False
+PRG_06_Outputs.instSafetyEmergencyManagement.EmergencyArmingLockoutActive;10;AUTRE;VAR;BOOL;FB_Safety_EmergencyManagement.st:148 FB_Safety_EmergencyManagement.st:203 FB_Safety_EmergencyManagement.st:237 FB_Safety_EmergencyManagement.st:250;True
+PRG_07_Supervision.FaultMachineReset_IHM;10;AUTRE;VAR_OUTPUT;BOOL;PRG_07_Supervision.st:138;False
+GVL_IHM.CycleSemiAuto.Cmd.BtnReset;11;COMMANDE;VAR_GLOBAL;ST_CycleHMI;;False
+GVL_IHM.M1TreuilRetenue.Cmd.BtnReset;11;COMMANDE;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;11;COMMANDE;VAR_GLOBAL;ST_WinchBenneHMI;;False
+GVL_IHM.M2TreuilBenne.Cmd.BtnReset;11;COMMANDE;VAR_GLOBAL;ST_WinchBenneHMI;;False
+GVL_IHM.Modes.Cmd.BtnFaultReset;11;COMMANDE;VAR_GLOBAL;ST_ModesHMI;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.PowerCutOff;11;FRONTIERE;VAR_OUTPUT;BOOL;;True
+PRG_04_Treuils_Benne.instSafetyWinchM2.PowerCutOff;11;FRONTIERE;VAR_OUTPUT;BOOL;;True
+PRG_05_Translation.instSafetyTranslationM3.PowerCutOff;11;FRONTIERE;VAR_OUTPUT;BOOL;;True
+PRG_06_Outputs.instSafetyEmergencyManagement.TonArmingLockout.Q;11;AUTRE;VAR;TON;FB_Safety_EmergencyManagement.st:164 FB_Safety_EmergencyManagement.st:440;False

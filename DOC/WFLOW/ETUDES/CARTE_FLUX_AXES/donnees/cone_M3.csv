@@ -1,0 +1,476 @@
+chemin;depth;classe;section;type;loc;visible
+PRG_06_Outputs.M3_BrakeRelease_RQ;0;AUTRE;?;?;PRG_06_Outputs.st:457;False
+PRG_06_Outputs.M3_CommandWord;0;AUTRE;?;?;PRG_06_Outputs.st:458;False
+PRG_06_Outputs.M3_SetpointFrequencyHz;0;AUTRE;?;?;PRG_06_Outputs.st:459;False
+PRG_06_Outputs.TranslationBrakeCmd;1;AUTRE;VAR;BOOL;PRG_06_Outputs.st:453;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveControlWord;1;AUTRE;VAR_OUTPUT;WORD;FB_TranslationOutputInterlock.st:133 FB_TranslationOutputInterlock.st:142 FB_TranslationOutputInterlock.st:149 FB_TranslationOutputInterlock.st:74;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqCmdWord;1;AUTRE;VAR_OUTPUT;WORD;FB_TranslationOutputInterlock.st:135 FB_TranslationOutputInterlock.st:155 FB_TranslationOutputInterlock.st:76;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeCmd;2;AUTRE;VAR_OUTPUT;BOOL;FB_TranslationOutputInterlock.st:137 FB_TranslationOutputInterlock.st:141 FB_TranslationOutputInterlock.st:144 FB_TranslationOutputInterlock.st:77;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeCommandOpenConfirmed;2;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeReleaseRequest;2;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqCmd_Hz;2;AUTRE;VAR_OUTPUT;REAL;FB_TranslationOutputInterlock.st:134 FB_TranslationOutputInterlock.st:150 FB_TranslationOutputInterlock.st:75;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqWordMaxHz;2;AUTRE;VAR;REAL;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqWordScale;2;AUTRE;VAR;REAL;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.Enable;2;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.Fault.Error;2;AUTRE;VAR_OUTPUT;ST_Fault;FB_TranslationOutputInterlock.st:120;True
+PRG_06_Outputs.instTranslationOutputInterlockM3.MovementRequested;2;AUTRE;VAR;BOOL;FB_TranslationOutputInterlock.st:84;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.PermitFinalBlocked;2;AUTRE;VAR;BOOL;FB_TranslationOutputInterlock.st:85;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.PowerContactorEngaged;2;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.RequestedDriveControlWord;2;AUTRE;VAR_INPUT;WORD;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.RestartInhibit;2;AUTRE;VAR_OUTPUT;BOOL;FB_TranslationOutputInterlock.st:104 FB_TranslationOutputInterlock.st:127;False
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed;3;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:880;False
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest;3;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:880;False
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerContactorEngaged;3;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:880;False
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord;3;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:880;False
+PRG_06_Outputs.M3InterlockEnable;3;AUTRE;VAR_OUTPUT;BOOL;PRG_06_Outputs.st:410;False
+PRG_06_Outputs.M3_TremieHardStopActive;3;AUTRE;VAR;BOOL;PRG_06_Outputs.st:431;False
+PRG_06_Outputs.WORD;3;AUTRE;?;?;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeoutCauseEdge.Q;3;AUTRE;VAR;R_TRIG;FB_TranslationOutputInterlock.st:101;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.EffectivePermitM3_Maintenance;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.EffectivePermitM3_Tremie;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.NeutralRequestSeen;3;AUTRE;VAR;BOOL;FB_TranslationOutputInterlock.st:106 FB_TranslationOutputInterlock.st:125 FB_TranslationOutputInterlock.st:128;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.RequestedDriveFreqHz;3;AUTRE;VAR_INPUT;REAL;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.ResetEdge.Q;3;AUTRE;VAR;R_TRIG;FB_TranslationOutputInterlock.st:70;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.ResetRequired;3;AUTRE;VAR;BOOL;FB_TranslationOutputInterlock.st:105 FB_TranslationOutputInterlock.st:112;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.instFault.Fault.Error;3;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:57;True
+PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI;4;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:482;True
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance;4;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:880;False
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie;4;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:880;False
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.Enable;4;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:880;False
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff;4;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:880;False
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqTremieSemantic;4;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:880;False
+PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz;4;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:880;False
+PRG_05_Translation.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed;4;AUTRE;VAR;ST_TranslationFinalInterlockRequest;PRG_05_Translation.st:706;False
+PRG_05_Translation.TranslationFinalInterlockRequest.BrakeReleaseRequest;4;AUTRE;VAR;ST_TranslationFinalInterlockRequest;PRG_05_Translation.st:705 PRG_05_Translation.st:717;False
+PRG_05_Translation.TranslationFinalInterlockRequest.PowerContactorEngaged;4;AUTRE;VAR;ST_TranslationFinalInterlockRequest;PRG_05_Translation.st:700;False
+PRG_05_Translation.TranslationFinalInterlockRequest.RequestedDriveControlWord;4;AUTRE;VAR;ST_TranslationFinalInterlockRequest;PRG_05_Translation.st:707 PRG_05_Translation.st:718;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeoutCause;4;AUTRE;VAR;BOOL;FB_TranslationOutputInterlock.st:96 FB_TranslationOutputInterlock.st:98;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.Reset;4;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.instFault.Fault.ErrorId;4;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:49;False
+PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;5;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:484;True
+PRG_02_Acquisition.HwReal.Translation;5;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:170 PRG_02_Acquisition.st:171 PRG_02_Acquisition.st:172 PRG_02_Acquisition.st:173;False
+PRG_02_Acquisition.HwSim.Translation;5;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:421;False
+PRG_02_Acquisition.TranslationInputSourceSimulated;5;AUTRE;VAR;BOOL;PRG_02_Acquisition.st:136;False
+PRG_03_Modes_Cycle.Data.Auth.Mode;5;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;True
+PRG_05_Translation.M3_CycleTranslationStepAuthorized;5;AUTRE;VAR;BOOL;PRG_05_Translation.st:400;False
+PRG_05_Translation.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance;5;AUTRE;VAR;ST_TranslationFinalInterlockRequest;PRG_05_Translation.st:704;False
+PRG_05_Translation.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie;5;AUTRE;VAR;ST_TranslationFinalInterlockRequest;PRG_05_Translation.st:703;False
+PRG_05_Translation.TranslationFinalInterlockRequest.Enable;5;AUTRE;VAR;ST_TranslationFinalInterlockRequest;PRG_05_Translation.st:698;False
+PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;5;AUTRE;VAR;ST_TranslationFinalInterlockRequest;PRG_05_Translation.st:702;False
+PRG_05_Translation.TranslationFinalInterlockRequest.ReqTremieSemantic;5;AUTRE;VAR;ST_TranslationFinalInterlockRequest;PRG_05_Translation.st:709 PRG_05_Translation.st:720;False
+PRG_05_Translation.TranslationFinalInterlockRequest.RequestedDriveFreqHz;5;AUTRE;VAR;ST_TranslationFinalInterlockRequest;PRG_05_Translation.st:708 PRG_05_Translation.st:719;False
+PRG_05_Translation.instTranslationM3.BrakeCommandOpenConfirmed;5;AUTRE;VAR_OUTPUT;BOOL;FB_Translation.st:158 FB_Translation.st:333;True
+PRG_05_Translation.instTranslationM3.BrakeReleaseRequest;5;AUTRE;VAR_OUTPUT;BOOL;FB_Translation.st:157 FB_Translation.st:332 FB_Translation.st:365 FB_Translation.st:371;True
+PRG_05_Translation.instTranslationM3.RequestedDriveControlWord;5;AUTRE;VAR_OUTPUT;WORD;FB_Translation.st:155 FB_Translation.st:344 FB_Translation.st:346 FB_Translation.st:348;True
+PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeout.Q;5;AUTRE;VAR;TON;FB_TranslationOutputInterlock.st:73 FB_TranslationOutputInterlock.st:89;False
+PRG_07_Supervision.FaultMachineReset_IHM;5;AUTRE;VAR_OUTPUT;BOOL;PRG_07_Supervision.st:138;False
+GVL_IHM.CycleSemiAuto.Cmd.BtnReset;6;COMMANDE;VAR_GLOBAL;ST_CycleHMI;;False
+GVL_IHM.M1TreuilRetenue.Cmd.BtnReset;6;COMMANDE;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;6;COMMANDE;VAR_GLOBAL;ST_WinchBenneHMI;;False
+GVL_IHM.M2TreuilBenne.Cmd.BtnReset;6;COMMANDE;VAR_GLOBAL;ST_WinchBenneHMI;;False
+GVL_IHM.Modes.Cmd.BtnFaultReset;6;COMMANDE;VAR_GLOBAL;ST_ModesHMI;;False
+GVL_Simulation.SimTranslationActive;6;SIMU;VAR_GLOBAL;BOOL;;False
+GVL_Simulation.SimulationModeActive;6;SIMU;VAR_GLOBAL;BOOL;;True
+PRG_02_Acquisition.AC600_ECAT_Drive.GetDeviceState;6;AUTRE;?;?;;False
+PRG_02_Acquisition.HwReal.Machine;6;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:189 PRG_02_Acquisition.st:190 PRG_02_Acquisition.st:191 PRG_02_Acquisition.st:192;False
+PRG_02_Acquisition.HwSim.Machine;6;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:437;False
+PRG_02_Acquisition.M3_ActualFrequencyHz;6;AUTRE;?;?;;True
+PRG_02_Acquisition.M3_BrakeIsOpen_DI;6;AUTRE;?;?;;True
+PRG_02_Acquisition.M3_PosMaintenance_DI;6;AUTRE;?;?;;True
+PRG_02_Acquisition.M3_PosP1_DI;6;AUTRE;?;?;;True
+PRG_02_Acquisition.M3_PosPVP2_DI;6;AUTRE;?;?;;True
+PRG_02_Acquisition.M3_PosPV_DI;6;AUTRE;?;?;;True
+PRG_02_Acquisition.M3_PosTremie_DI;6;AUTRE;?;?;;True
+PRG_02_Acquisition.M3_StatusWord;6;AUTRE;?;?;;True
+PRG_02_Acquisition.M3_ThermalOK_DI;6;AUTRE;?;?;;True
+PRG_02_Acquisition.MachineInputSourceSimulated;6;AUTRE;VAR;BOOL;PRG_02_Acquisition.st:138;False
+PRG_02_Acquisition.instSimBench.Translation;6;FRONTIERE;VAR_OUTPUT;ST_HwTranslation;;False
+PRG_03_Modes_Cycle.Data.SequenceState.Step;6;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;True
+PRG_05_Translation.EffectivePermitM3_Maintenance;6;AUTRE;VAR;BOOL;PRG_05_Translation.st:558;True
+PRG_05_Translation.EffectivePermitM3_Tremie;6;AUTRE;VAR;BOOL;PRG_05_Translation.st:554;True
+PRG_05_Translation.M3_ReqTremie_Active;6;AUTRE;VAR;BOOL;PRG_05_Translation.st:391 PRG_05_Translation.st:407;False
+PRG_05_Translation.instSafetyTranslationM3.PowerCutOff;6;AUTRE;VAR_OUTPUT;BOOL;FB_Safety_Translation.st:242 FB_Safety_Translation.st:269;True
+PRG_05_Translation.instTranslationM3.Brake.BrakeCmd;6;AUTRE;VAR_OUTPUT;BOOL;FB_Brake.st:104 FB_Brake.st:137 FB_Brake.st:74 FB_Brake.st:96;True
+PRG_05_Translation.instTranslationM3.Brake.BrakeCommandOpenConfirmed;6;AUTRE;VAR_OUTPUT;BOOL;FB_Brake.st:144 FB_Brake.st:146 FB_Brake.st:78;True
+PRG_05_Translation.instTranslationM3.DriveResetPulseActive;6;AUTRE;VAR;BOOL;FB_Translation.st:108 FB_Translation.st:113;False
+PRG_05_Translation.instTranslationM3.Enable;6;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.Fault.Error;6;AUTRE;VAR_OUTPUT;ST_Fault;FB_Translation.st:147;False
+PRG_05_Translation.instTranslationM3.PhysicalMaintenance;6;AUTRE;VAR;BOOL;FB_Translation.st:337 FB_Translation.st:340;False
+PRG_05_Translation.instTranslationM3.PhysicalTremie;6;AUTRE;VAR;BOOL;FB_Translation.st:336 FB_Translation.st:339;False
+PRG_05_Translation.instTranslationM3.RequestedDriveFreqHz;6;AUTRE;VAR_OUTPUT;REAL;FB_Translation.st:156 FB_Translation.st:351 FB_Translation.st:355 FB_Translation.st:357;True
+PRG_05_Translation.instTranslationM3.WORD;6;AUTRE;?;?;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.T;6;AUTRE;?;?;;False
+PRG_06_Outputs.instTranslationOutputInterlockM3.ms;6;AUTRE;?;?;;False
+GVL_Simulation.SimSafetyActive;7;SIMU;VAR_GLOBAL;BOOL;;True
+PRG_02_Acquisition.ConveyorInfeedReady_DI;7;AUTRE;?;?;;True
+PRG_02_Acquisition.EmergencyChainClosed_DI;7;AUTRE;?;?;;True
+PRG_02_Acquisition.HydraulicThermalOk_DI;7;AUTRE;?;?;;True
+PRG_02_Acquisition.M1_M2_KoboldBottomTouch_DI;7;FRONTIERE;?;?;;True
+PRG_02_Acquisition.M1_M2_M3_BrakeThermalOk_DI;7;FRONTIERE;?;?;;True
+PRG_02_Acquisition.PhaseRotationOk_DI;7;AUTRE;?;?;;True
+PRG_02_Acquisition.PowerContactorEngaged_DI;7;AUTRE;?;?;;True
+PRG_02_Acquisition.TremieFull_OR_GateRaised_DI;7;AUTRE;?;?;;True
+PRG_02_Acquisition.instSimBench.Machine;7;FRONTIERE;VAR_OUTPUT;ST_HwMachine;;False
+PRG_05_Translation.M3_SafeStop_Aggregate;7;AUTRE;VAR;BOOL;PRG_05_Translation.st:524;True
+PRG_05_Translation.M3_TremieProcessBlock;7;AUTRE;VAR;BOOL;PRG_05_Translation.st:184;True
+PRG_05_Translation.instArbM3.ReqTremie;7;AUTRE;VAR_OUTPUT;BOOL;FB_TranslationCmdArbitrationM3.st:127 FB_TranslationCmdArbitrationM3.st:49 FB_TranslationCmdArbitrationM3.st:55 FB_TranslationCmdArbitrationM3.st:77;False
+PRG_05_Translation.instSafetyTranslationM3.Enable;7;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instSafetyTranslationM3.F8;7;AUTRE;?;?;;False
+PRG_05_Translation.instSafetyTranslationM3.Fault.ErrorId;7;AUTRE;VAR_OUTPUT;ST_Fault;FB_Safety_Translation.st:235;True
+PRG_05_Translation.instSafetyTranslationM3.MaintenanceLimitClear;7;AUTRE;VAR_OUTPUT;BOOL;FB_Safety_Translation.st:252 FB_Safety_Translation.st:291;False
+PRG_05_Translation.instSafetyTranslationM3.TremieLimitClear;7;AUTRE;VAR_OUTPUT;BOOL;FB_Safety_Translation.st:251 FB_Safety_Translation.st:290;False
+PRG_05_Translation.instTranslationM3.Brake.BypassContactorCheck;7;BYPASS;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.Brake.ContactorFeedback;7;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.Brake.Enable;7;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.Brake.Fault.Error;7;AUTRE;VAR_OUTPUT;ST_Fault;FB_Brake.st:131 FB_Brake.st:85;False
+PRG_05_Translation.instTranslationM3.Brake.Fault.Latched;7;AUTRE;VAR_OUTPUT;ST_Fault;FB_Brake.st:131 FB_Brake.st:85;False
+PRG_05_Translation.instTranslationM3.Brake.MovementRequested;7;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.Brake.TonMagnetise.Q;7;AUTRE;VAR;TON;FB_Brake.st:102 FB_Brake.st:71 FB_Brake.st:94;False
+PRG_05_Translation.instTranslationM3.Cfg.ApproachSpeedMaintenanceHz;7;REGLAGE;VAR_INPUT;ST_fbTranslation_Cfg;;False
+PRG_05_Translation.instTranslationM3.Cfg.ApproachSpeedP1Hz;7;REGLAGE;VAR_INPUT;ST_fbTranslation_Cfg;;False
+PRG_05_Translation.instTranslationM3.Cfg.ApproachSpeedTremieHz;7;REGLAGE;VAR_INPUT;ST_fbTranslation_Cfg;;False
+PRG_05_Translation.instTranslationM3.Cfg.DriveFreqScaleMaxHz;7;REGLAGE;VAR_INPUT;ST_fbTranslation_Cfg;;False
+PRG_05_Translation.instTranslationM3.CommandedMaintenance;7;AUTRE;VAR;BOOL;FB_Translation.st:162 FB_Translation.st:185 FB_Translation.st:262 FB_Translation.st:266;False
+PRG_05_Translation.instTranslationM3.CommandedTremie;7;AUTRE;VAR;BOOL;FB_Translation.st:161 FB_Translation.st:184 FB_Translation.st:261 FB_Translation.st:265;False
+PRG_05_Translation.instTranslationM3.DriveResetPulseTimer.Q;7;AUTRE;VAR;TON;FB_Translation.st:111;False
+PRG_05_Translation.instTranslationM3.InvertDriveDirection;7;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.ResetEdge.Q;7;AUTRE;VAR;R_TRIG;FB_Translation.st:104;False
+PRG_05_Translation.instTranslationM3.SlowdownSensorMaintenance;7;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.SlowdownSensorP1;7;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.SlowdownSensorTremie;7;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.SpeedRamp.Current;7;AUTRE;VAR_OUTPUT;REAL;FB_Ramp.st:31 FB_Ramp.st:41 FB_Ramp.st:42 FB_Ramp.st:44;False
+PRG_05_Translation.instTranslationM3.instFault.Fault.Error;7;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:57;False
+GVL_IHM.M3Translation.Cmd.InvertDirection;8;COMMANDE;VAR_GLOBAL;ST_TranslationHMI;;False
+PRG_02_Acquisition.Data.MachineHoming.M3Locked;8;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:632;False
+PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable;8;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_05_Translation.M3_SafeStop_Active;8;AUTRE;VAR;BOOL;PRG_05_Translation.st:417;True
+PRG_05_Translation.TonTremieProcessBlock.Q;8;AUTRE;VAR;TON;PRG_05_Translation.st:179;True
+PRG_05_Translation.TranslationCfg.ApproachSpeedMaintenanceHz;8;AUTRE;VAR;ST_fbTranslation_Cfg;PRG_05_Translation.st:579;False
+PRG_05_Translation.TranslationCfg.ApproachSpeedP1Hz;8;AUTRE;VAR;ST_fbTranslation_Cfg;PRG_05_Translation.st:580;False
+PRG_05_Translation.TranslationCfg.ApproachSpeedTremieHz;8;AUTRE;VAR;ST_fbTranslation_Cfg;PRG_05_Translation.st:578;False
+PRG_05_Translation.TranslationCfg.DriveFreqScaleMaxHz;8;AUTRE;VAR;ST_fbTranslation_Cfg;PRG_05_Translation.st:577;False
+PRG_05_Translation.instArbM3.Auth.Mode;8;AUTRE;VAR_INPUT;ST_Modes_Autorisations;;False
+PRG_05_Translation.instArbM3.CommandConflict;8;AUTRE;VAR_OUTPUT;BOOL;FB_TranslationCmdArbitrationM3.st:125 FB_TranslationCmdArbitrationM3.st:51 FB_TranslationCmdArbitrationM3.st:57;False
+PRG_05_Translation.instArbM3.Enable;8;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instArbM3.IHM.BtnMaintenance;8;AUTRE;VAR_INPUT;ST_fbTranslationCmdArbitration_IHM;;False
+PRG_05_Translation.instArbM3.IHM.BtnTremie;8;AUTRE;VAR_INPUT;ST_fbTranslationCmdArbitration_IHM;;False
+PRG_05_Translation.instArbM3.Joystick.AxisX.DirectionPositive;8;AUTRE;VAR_INPUT;ST_AcquisitionJoystickQualified;;False
+PRG_05_Translation.instArbM3.RunRequest;8;AUTRE;VAR_OUTPUT;BOOL;FB_TranslationCmdArbitrationM3.st:100 FB_TranslationCmdArbitrationM3.st:118 FB_TranslationCmdArbitrationM3.st:48 FB_TranslationCmdArbitrationM3.st:54;False
+PRG_05_Translation.instArbM3.SelTarget;8;AUTRE;VAR_OUTPUT;INT;FB_TranslationCmdArbitrationM3.st:117 FB_TranslationCmdArbitrationM3.st:136 FB_TranslationCmdArbitrationM3.st:60 FB_TranslationCmdArbitrationM3.st:65;False
+PRG_05_Translation.instArbM3.TglJoystickMaster;8;REGLAGE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instPosDecoderM3.TranslationPosMaintenance;8;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:98;True
+PRG_05_Translation.instPosDecoderM3.TranslationPosP1;8;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:97;True
+PRG_05_Translation.instPosDecoderM3.TranslationPosP2;8;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:96;True
+PRG_05_Translation.instPosDecoderM3.TranslationPosPV;8;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:95;True
+PRG_05_Translation.instSafetyTranslationM3.LimitSwitchMaintenance;8;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instSafetyTranslationM3.LimitSwitchTremie;8;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instSafetyTranslationM3.SafeStop;8;AUTRE;VAR_OUTPUT;BOOL;FB_Safety_Translation.st:241 FB_Safety_Translation.st:266;True
+PRG_05_Translation.instSafetyTranslationM3.instFault.Fault.ErrorId;8;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:49;True
+PRG_05_Translation.instTranslationM3.Brake.DelayContactClose;8;AUTRE;VAR_INPUT;TIME;;False
+PRG_05_Translation.instTranslationM3.Brake.DelayMagnetise;8;AUTRE;VAR_INPUT;TIME;;False
+PRG_05_Translation.instTranslationM3.Brake.instFault.Fault.Error;8;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:57;False
+PRG_05_Translation.instTranslationM3.Brake.instFault.Fault.Latched;8;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:80;False
+PRG_05_Translation.instTranslationM3.BrakeFeedback;8;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.BypassContactorCheck;8;BYPASS;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.DirectionChangeDelay.Q;8;AUTRE;VAR;TON;FB_Translation.st:171 FB_Translation.st:252;False
+PRG_05_Translation.instTranslationM3.FALSE;8;AUTRE;?;?;;True
+PRG_05_Translation.instTranslationM3.FirstScanDone;8;AUTRE;VAR;BOOL;FB_Translation.st:183;False
+PRG_05_Translation.instTranslationM3.MovementRequested;8;AUTRE;VAR;BOOL;FB_Translation.st:317;False
+PRG_05_Translation.instTranslationM3.ReqMaintenance;8;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.ReqTremie;8;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.Reset;8;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.SpeedRamp.StepX;8;AUTRE;VAR;REAL;FB_Ramp.st:34 FB_Ramp.st:36;False
+PRG_05_Translation.instTranslationM3.SpeedRamp.TargetLimited;8;AUTRE;VAR;REAL;FB_Ramp.st:30;False
+PRG_05_Translation.instTranslationM3.instFault.Fault.ErrorId;8;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:49;False
+GVL_IHM.M3Translation.Bypass.ContactorFeedback;9;BYPASS;VAR_GLOBAL;ST_TranslationHMI;PRG_07_Supervision.st:496;False
+GVL_IHM.M3Translation.Bypass.Global;9;BYPASS;VAR_GLOBAL;ST_TranslationHMI;PRG_07_Supervision.st:297 PRG_07_Supervision.st:360;True
+GVL_IHM.M3Translation.Bypass.LimitSwitch;9;BYPASS;VAR_GLOBAL;ST_TranslationHMI;;True
+GVL_IHM.Modes.Cmd.TglJoystickMaster;9;COMMANDE;VAR_GLOBAL;ST_ModesHMI;;True
+PRG_02_Acquisition.Data.InputModules.Fault;9;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:217;True
+PRG_02_Acquisition.Data.Joystick.AxisX.DirectionPositive;9;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:529;False
+PRG_02_Acquisition.HwIn.Machine.TremieFull_OR_GateRaised_DI;9;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:484;True
+PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI;9;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:482;True
+PRG_02_Acquisition.instCycleMachineHoming.M3Locked;9;FRONTIERE;VAR_OUTPUT;BOOL;;False
+PRG_05_Translation.ArbM3_IHM.BtnMaintenance;9;AUTRE;VAR;ST_fbTranslationCmdArbitration_IHM;PRG_05_Translation.st:370;False
+PRG_05_Translation.ArbM3_IHM.BtnTremie;9;AUTRE;VAR;ST_fbTranslationCmdArbitration_IHM;PRG_05_Translation.st:369;False
+PRG_05_Translation.M3_LimitSwitchMaintenanceStable;9;AUTRE;VAR;BOOL;PRG_05_Translation.st:190 PRG_05_Translation.st:192;True
+PRG_05_Translation.M3_LimitSwitchTremieStable;9;AUTRE;VAR;BOOL;PRG_05_Translation.st:166 PRG_05_Translation.st:168;True
+PRG_05_Translation.M3_ReqMaintenance_Active;9;AUTRE;VAR;BOOL;PRG_05_Translation.st:392 PRG_05_Translation.st:408;False
+PRG_05_Translation.T;9;AUTRE;?;?;;False
+PRG_05_Translation.TRUE;9;AUTRE;?;?;;True
+PRG_05_Translation._TranslationCfgPersist.CfgApproachSpeedMaintenance_Hz;9;REGLAGE;?;?;;False
+PRG_05_Translation._TranslationCfgPersist.CfgApproachSpeedP1_Hz;9;REGLAGE;?;?;;False
+PRG_05_Translation._TranslationCfgPersist.CfgApproachSpeedTremie_Hz;9;REGLAGE;?;?;;False
+PRG_05_Translation._TranslationMaxFreq_Hz;9;AUTRE;?;?;;False
+PRG_05_Translation.instArbM3.Auth.MaintenanceM3TargetEnable;9;AUTRE;VAR_INPUT;ST_Modes_Autorisations;;False
+PRG_05_Translation.instArbM3.Context.HeightInterlockOk;9;AUTRE;VAR_INPUT;ST_fbTranslationCmdArbitration_Context;;False
+PRG_05_Translation.instArbM3.CycleJoystickAxisOk;9;AUTRE;VAR;BOOL;FB_TranslationCmdArbitrationM3.st:71;False
+PRG_05_Translation.instArbM3.IHM.BypassGlobal;9;BYPASS;VAR_INPUT;ST_fbTranslationCmdArbitration_IHM;;False
+PRG_05_Translation.instArbM3.Joystick.AxisY.Direction;9;AUTRE;VAR_INPUT;ST_AcquisitionJoystickQualified;;False
+PRG_05_Translation.instArbM3.Joystick.DeadmanArmed;9;AUTRE;VAR_INPUT;ST_AcquisitionJoystickQualified;;False
+PRG_05_Translation.instArbM3.ReqMaintenance;9;AUTRE;VAR_OUTPUT;BOOL;FB_TranslationCmdArbitrationM3.st:128 FB_TranslationCmdArbitrationM3.st:50 FB_TranslationCmdArbitrationM3.st:56 FB_TranslationCmdArbitrationM3.st:79;False
+PRG_05_Translation.instArbM3.ReqTranslation.PositionTgt;9;AUTRE;VAR_INPUT;ST_ProgramTranslationRequest;;False
+PRG_05_Translation.instArbM3.ReqTranslation.ReqStart;9;AUTRE;VAR_INPUT;ST_ProgramTranslationRequest;;False
+PRG_05_Translation.instPosDecoderM3.SensorMaintenance;9;AUTRE;VAR_INPUT;BOOL;;True
+PRG_05_Translation.instPosDecoderM3.SensorP1;9;AUTRE;VAR_INPUT;BOOL;;True
+PRG_05_Translation.instPosDecoderM3.SensorP2;9;AUTRE;VAR_INPUT;BOOL;;True
+PRG_05_Translation.instPosDecoderM3.SensorPV;9;AUTRE;VAR_INPUT;BOOL;;True
+PRG_05_Translation.instSafetyTranslationM3.Fault.Error;9;AUTRE;VAR_OUTPUT;ST_Fault;FB_Safety_Translation.st:235;False
+PRG_05_Translation.instSafetyTranslationM3.PowerContactorEngaged;9;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.Brake.instFault.Fault.ErrorId;9;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:49;False
+PRG_05_Translation.instTranslationM3.Brake.instFault.Fault.LatchedId;9;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:74;False
+PRG_05_Translation.instTranslationM3.Cfg.BrakeDelayContactClose;9;REGLAGE;VAR_INPUT;ST_fbTranslation_Cfg;;False
+PRG_05_Translation.instTranslationM3.Cfg.BrakeDelayMagnetise;9;REGLAGE;VAR_INPUT;ST_fbTranslation_Cfg;;False
+PRG_05_Translation.instTranslationM3.Cfg.DirectionInterlockDelay;9;REGLAGE;VAR_INPUT;ST_fbTranslation_Cfg;;False
+PRG_05_Translation.instTranslationM3.DriveActualFreqHz;9;AUTRE;VAR_INPUT;REAL;;False
+PRG_05_Translation.instTranslationM3.SpeedRamp.AccelRate;9;AUTRE;VAR_INPUT;REAL;;False
+PRG_05_Translation.instTranslationM3.SpeedRamp.CycleTimeS;9;AUTRE;VAR_INPUT;REAL;;False
+PRG_05_Translation.instTranslationM3.SpeedRamp.DecelRate;9;AUTRE;VAR_INPUT;REAL;;False
+PRG_05_Translation.instTranslationM3.SpeedRamp.Target;9;AUTRE;VAR_INPUT;REAL;;False
+PRG_05_Translation.instTranslationM3.TonBrakeRealFreqTimeout.Q;9;AUTRE;VAR;TON;FB_Translation.st:173 FB_Translation.st:312;False
+PRG_05_Translation.ms;9;AUTRE;?;?;;False
+GVL_IHM.M3Translation.Bypass.Initialized;10;BYPASS;VAR_GLOBAL;ST_TranslationHMI;PRG_07_Supervision.st:299;False
+GVL_IHM.M3Translation.Cmd.BtnMaintenance;10;COMMANDE;VAR_GLOBAL;ST_TranslationHMI;;True
+GVL_IHM.M3Translation.Cmd.BtnTremie;10;COMMANDE;VAR_GLOBAL;ST_TranslationHMI;;True
+GVL_Simulation.SimBtnMaintenance;10;SIMU;VAR_GLOBAL;BOOL;;False
+GVL_Simulation.SimBtnTremie;10;SIMU;VAR_GLOBAL;BOOL;;False
+PRG_02_Acquisition.Data.InputModules.LocalDigitalIoOk;10;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:205 PRG_02_Acquisition.st:211;False
+PRG_02_Acquisition.Data.InputModules.Vh0008Er1Ok;10;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:209 PRG_02_Acquisition.st:215;False
+PRG_02_Acquisition.Data.InputModules.Vh0008ErOk;10;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:208 PRG_02_Acquisition.st:214;False
+PRG_02_Acquisition.Data.InputModules.Vh0800EndOk;10;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:206 PRG_02_Acquisition.st:212;False
+PRG_02_Acquisition.Data.InputModules.Vh0808EtpOk;10;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:207 PRG_02_Acquisition.st:213;False
+PRG_02_Acquisition.Data.Joystick.AxisY.Direction;10;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:530;True
+PRG_02_Acquisition.Data.Joystick.DeadmanArmed;10;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:531;True
+PRG_02_Acquisition.Data.M3.ActualFrequencyHz;10;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:750;True
+PRG_02_Acquisition.HwIn.Translation.M3_PosMaintenance_DI;10;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:482;True
+PRG_02_Acquisition.HwIn.Translation.M3_PosP1_DI;10;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:482;True
+PRG_02_Acquisition.HwIn.Translation.M3_PosPVP2_DI;10;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:482;True
+PRG_02_Acquisition.HwIn.Translation.M3_PosPV_DI;10;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:482;True
+PRG_02_Acquisition.instJoystick.AxisCmdX.DirectionPositive;10;AUTRE;VAR_OUTPUT;ST_fbJoystick_AxisCmd;FB_Joystick.st:159 FB_Joystick.st:259;False
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt;10;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;True
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.ReqStart;10;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_05_Translation.ArbM3_Context.HeightInterlockOk;10;AUTRE;VAR;ST_fbTranslationCmdArbitration_Context;PRG_05_Translation.st:375;False
+PRG_05_Translation.ArbM3_IHM.BypassGlobal;10;BYPASS;VAR;ST_fbTranslationCmdArbitration_IHM;PRG_05_Translation.st:373;False
+PRG_05_Translation.M3_LimitSwitchMaintenanceEffective;10;AUTRE;VAR;BOOL;PRG_05_Translation.st:155;False
+PRG_05_Translation.SimBtnIHM_Active;10;FRONTIERE;VAR;BOOL;;False
+PRG_05_Translation.TranslationCfg.BrakeDelayContactClose;10;AUTRE;VAR;ST_fbTranslation_Cfg;;False
+PRG_05_Translation.TranslationCfg.BrakeDelayMagnetise;10;AUTRE;VAR;ST_fbTranslation_Cfg;;False
+PRG_05_Translation.TranslationCfg.DirectionInterlockDelay;10;AUTRE;VAR;ST_fbTranslation_Cfg;;False
+PRG_05_Translation.instArbM3.CycleTargetDirectionOk;10;AUTRE;VAR;BOOL;FB_TranslationCmdArbitrationM3.st:68;False
+PRG_05_Translation.instArbM3.Joystick.AxisX.DirectionNegative;10;AUTRE;VAR_INPUT;ST_AcquisitionJoystickQualified;;False
+PRG_05_Translation.instArbM3.Joystick.AxisY.AtNeutral;10;AUTRE;VAR_INPUT;ST_AcquisitionJoystickQualified;;False
+PRG_05_Translation.instPosDecoderM3.LimitSwitchMaintenance;10;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:88;False
+PRG_05_Translation.instPosDecoderM3.LimitSwitchTremie;10;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:87;False
+PRG_05_Translation.instSafetyTranslationM3.instFault.Fault.Error;10;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:57;False
+PRG_05_Translation.instTranslationM3.RampTargetPct;10;AUTRE;VAR;REAL;FB_Translation.st:298 FB_Translation.st:300;False
+PRG_05_Translation.instTranslationM3.S;10;AUTRE;?;?;;False
+PRG_05_Translation.instTranslationM3.T;10;AUTRE;?;?;;False
+PRG_07_Supervision.BypassTranslationGlobal;10;BYPASS;?;?;PRG_07_Supervision.st:360;False
+PRG_07_Supervision.instMirrorBypassTranslation.Hmi;10;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:24;True
+GVL_IHM.Network.Bypass.Global;11;BYPASS;VAR_GLOBAL;ST_NetworkDiagHMI;PRG_07_Supervision.st:352 PRG_07_Supervision.st:370;True
+GVL_IHM.Network.Bypass.InputModules;11;BYPASS;VAR_GLOBAL;ST_NetworkDiagHMI;;False
+PRG_02_Acquisition.DEVICE_STATE.RUNNING;11;AUTRE;?;?;;False
+PRG_02_Acquisition.Data.Joystick.AxisX.DirectionNegative;11;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:529;False
+PRG_02_Acquisition.Data.Joystick.AxisY.AtNeutral;11;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:530;False
+PRG_02_Acquisition.HwIn.Translation.M3_ActualFrequencyHz;11;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:482;True
+PRG_02_Acquisition.Local_Digital_IO.GetDeviceState;11;AUTRE;?;?;;False
+PRG_02_Acquisition.VH_0008ER.GetDeviceState;11;AUTRE;?;?;;False
+PRG_02_Acquisition.VH_0008ER_1.GetDeviceState;11;AUTRE;?;?;;False
+PRG_02_Acquisition.VH_0800END.GetDeviceState;11;AUTRE;?;?;;False
+PRG_02_Acquisition.VH_0808ETP.GetDeviceState;11;AUTRE;?;?;;False
+PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;11;AUTRE;VAR_OUTPUT;ST_fbJoystick_AxisCmd;FB_Joystick.st:163 FB_Joystick.st:305 FB_Joystick.st:306 FB_Joystick.st:307;True
+PRG_02_Acquisition.instJoystick.BusLost;11;AUTRE;VAR;BOOL;FB_Joystick.st:116;False
+PRG_02_Acquisition.instJoystick.CmdXVal;11;AUTRE;VAR;REAL;FB_Joystick.st:253;False
+PRG_02_Acquisition.instJoystick.DeadmanArmed;11;AUTRE;VAR_OUTPUT;BOOL;FB_Joystick.st:165 FB_Joystick.st:218 FB_Joystick.st:232 FB_Joystick.st:239;True
+PRG_02_Acquisition.instJoystick.Enable;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.M3_HeightInterlockOk;11;AUTRE;VAR;BOOL;PRG_05_Translation.st:137;True
+PRG_05_Translation.instPosDecoderM3.Incoherent;11;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:81 FB_Translation_PositionDecoder.st:83;True
+PRG_05_Translation.instPosDecoderM3.SensorsWord;11;AUTRE;VAR_OUTPUT;BYTE;FB_Translation_PositionDecoder.st:71 FB_Translation_PositionDecoder.st:72 FB_Translation_PositionDecoder.st:73 FB_Translation_PositionDecoder.st:74;False
+PRG_05_Translation.instTranslationM3.ArrivalLock;11;AUTRE;VAR;BOOL;FB_Translation.st:164 FB_Translation.st:215 FB_Translation.st:238 FB_Translation.st:242;False
+PRG_05_Translation.instTranslationM3.DirectionChangePending;11;AUTRE;VAR;BOOL;FB_Translation.st:163 FB_Translation.st:263 FB_Translation.st:267 FB_Translation.st:270;False
+PRG_05_Translation.instTranslationM3.EffectiveSafeStop;11;AUTRE;VAR;BOOL;FB_Translation.st:290;False
+PRG_05_Translation.instTranslationM3.RunRequest;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.SpeedTgt_Pct;11;AUTRE;VAR_INPUT;REAL;;False
+PRG_07_Supervision.instMirrorBypassTranslation.Prev;11;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:26;False
+PRG_07_Supervision.instMirrorBypassTranslation.RetainVal;11;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:22;True
+GVL_IHM.M3Translation.Bypass.MinHeight;12;BYPASS;VAR_GLOBAL;ST_TranslationHMI;;False
+GVL_IHM.Network.Bypass.Initialized;12;BYPASS;VAR_GLOBAL;ST_NetworkDiagHMI;PRG_07_Supervision.st:354;False
+GVL_PERSISTENT._TranslationMinHeightM1M2_M;12;REGLAGE;VAR_GLOBAL;REAL;;False
+PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable;12;FRONTIERE;VAR_OUTPUT;ST_AcquisitionInterPrg;;False
+PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;12;FRONTIERE;VAR_OUTPUT;ST_AcquisitionInterPrg;;True
+PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable;12;FRONTIERE;VAR_OUTPUT;ST_AcquisitionInterPrg;;False
+PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;12;FRONTIERE;VAR_OUTPUT;ST_AcquisitionInterPrg;;True
+PRG_02_Acquisition.TRUE;12;AUTRE;?;?;;True
+PRG_02_Acquisition.instJoystick.ArmingPermit;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instJoystick.AxisCmdX.DirectionNegative;12;AUTRE;VAR_OUTPUT;ST_fbJoystick_AxisCmd;FB_Joystick.st:159 FB_Joystick.st:260;False
+PRG_02_Acquisition.instJoystick.AxisCmdY.AtNeutral;12;AUTRE;VAR_OUTPUT;ST_fbJoystick_AxisCmd;FB_Joystick.st:161 FB_Joystick.st:280;False
+PRG_02_Acquisition.instJoystick.AxisCmdY.DirectionNegative;12;AUTRE;VAR_OUTPUT;ST_fbJoystick_AxisCmd;FB_Joystick.st:161 FB_Joystick.st:279;False
+PRG_02_Acquisition.instJoystick.AxisCmdY.DirectionPositive;12;AUTRE;VAR_OUTPUT;ST_fbJoystick_AxisCmd;FB_Joystick.st:161 FB_Joystick.st:278;False
+PRG_02_Acquisition.instJoystick.BusCanOpenOP.Operational;12;AUTRE;VAR_INPUT;ST_Diag_Device;;False
+PRG_02_Acquisition.instJoystick.DeadmanArmTimer.Q;12;AUTRE;VAR;TON;FB_Joystick.st:173 FB_Joystick.st:230;False
+PRG_02_Acquisition.instJoystick.DirectInversionPermit;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instJoystick.FlipX;12;AUTRE;VAR;BOOL;FB_Joystick.st:208;False
+PRG_02_Acquisition.instJoystick.FlipY;12;AUTRE;VAR;BOOL;FB_Joystick.st:209;False
+PRG_02_Acquisition.instJoystick.JoystickOP.Operational;12;AUTRE;VAR_INPUT;ST_Diag_Device;;False
+PRG_02_Acquisition.instJoystick.RawOutOfRange;12;AUTRE;VAR;BOOL;FB_Joystick.st:112;False
+PRG_02_Acquisition.instJoystick.ScaleX.OutPct;12;AUTRE;VAR_OUTPUT;REAL;FB_AxisScale.st:29 FB_AxisScale.st:31 FB_AxisScale.st:36 FB_AxisScale.st:38;False
+PRG_05_Translation.M3_RunRequest_Active;12;AUTRE;VAR;BOOL;PRG_05_Translation.st:390 PRG_05_Translation.st:406;False
+PRG_05_Translation.M3_SpeedCmd_Active;12;AUTRE;VAR;REAL;PRG_05_Translation.st:394 PRG_05_Translation.st:409;False
+PRG_05_Translation.instTranslationM3.ArrivalEdge.Q;12;AUTRE;VAR;R_TRIG;FB_Translation.st:194;False
+PRG_05_Translation.instTranslationM3.ArrivalIsExtreme;12;AUTRE;VAR;BOOL;FB_Translation.st:165 FB_Translation.st:211;False
+PRG_05_Translation.instTranslationM3.ArrivalWasMaintenance;12;AUTRE;VAR;BOOL;FB_Translation.st:167 FB_Translation.st:218 FB_Translation.st:227 FB_Translation.st:240;False
+PRG_05_Translation.instTranslationM3.ArrivalWasTremie;12;AUTRE;VAR;BOOL;FB_Translation.st:166 FB_Translation.st:217 FB_Translation.st:226 FB_Translation.st:239;False
+PRG_05_Translation.instTranslationM3.BypassLimitSwitch;12;BYPASS;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.EffectivePermitM3_Maintenance;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.EffectivePermitM3_Tremie;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.LimitSwitchMaintenance;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.LimitSwitchTremie;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_05_Translation.instTranslationM3.SafeStop;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_07_Supervision.BypassNetworkGlobal;12;BYPASS;?;?;PRG_07_Supervision.st:370;False
+PRG_07_Supervision.PrevTranslationBypass;12;BYPASS;VAR;BOOL;PRG_07_Supervision.st:360;False
+PRG_07_Supervision.instMirrorBypassNetwork.Hmi;12;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:24;True
+GVL_IHM.CycleSemiAuto.State.CycleStep;13;IHM;VAR_GLOBAL;ST_CycleHMI;PRG_07_Supervision.st:687;False
+PRG_02_Acquisition.instDiagCanOpen.DeviceCanOpenMaster.Operational;13;AUTRE;VAR_OUTPUT;ST_Diag_Device;FB_Diag_CanOpen.st:130 FB_Diag_CanOpen.st:56;True
+PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational;13;AUTRE;VAR_OUTPUT;ST_Diag_Device;FB_Diag_CanOpen.st:106 FB_Diag_CanOpen.st:108 FB_Diag_CanOpen.st:51;True
+PRG_02_Acquisition.instJoystick.Cfg.DeadmanArmHoldTime;13;REGLAGE;VAR_INPUT;ST_fbJoystick_Cfg;;False
+PRG_02_Acquisition.instJoystick.Cfg.RawOutOfRangeMargin;13;REGLAGE;VAR_INPUT;ST_fbJoystick_Cfg;;False
+PRG_02_Acquisition.instJoystick.CmdYVal;13;AUTRE;VAR;REAL;FB_Joystick.st:272;False
+PRG_02_Acquisition.instJoystick.DeadmanArmPending;13;AUTRE;VAR;BOOL;FB_Joystick.st:166 FB_Joystick.st:219 FB_Joystick.st:226 FB_Joystick.st:227;False
+PRG_02_Acquisition.instJoystick.DirX;13;AUTRE;VAR;INT;FB_Joystick.st:194 FB_Joystick.st:198 FB_Joystick.st:200;False
+PRG_02_Acquisition.instJoystick.DirY;13;AUTRE;VAR;INT;FB_Joystick.st:195 FB_Joystick.st:203 FB_Joystick.st:205;False
+PRG_02_Acquisition.instJoystick.InversionLockActive;13;AUTRE;VAR;BOOL;FB_Joystick.st:167 FB_Joystick.st:213 FB_Joystick.st:217;False
+PRG_02_Acquisition.instJoystick.PrevDirX;13;AUTRE;VAR;INT;FB_Joystick.st:168 FB_Joystick.st:311;False
+PRG_02_Acquisition.instJoystick.PrevDirY;13;AUTRE;VAR;INT;FB_Joystick.st:169 FB_Joystick.st:312;False
+PRG_02_Acquisition.instJoystick.RawX;13;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instJoystick.RawY;13;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instJoystick.ScaleX.DeadbandRaw;13;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instJoystick.ScaleX.Delta;13;AUTRE;VAR;REAL;FB_AxisScale.st:27 FB_AxisScale.st:34;False
+PRG_02_Acquisition.instJoystick.ScaleX.Neutral;13;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instJoystick.ScaleX.RawIn;13;AUTRE;VAR_INPUT;INT;;False
+PRG_04_Treuils_Benne.Data.ArmingPermit;13;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1962;True
+PRG_05_Translation.M3_MaintN2;13;AUTRE;VAR;BOOL;PRG_05_Translation.st:475;False
+PRG_05_Translation.instArbM3.SpeedPct;13;AUTRE;VAR_OUTPUT;REAL;FB_TranslationCmdArbitrationM3.st:111 FB_TranslationCmdArbitrationM3.st:119 FB_TranslationCmdArbitrationM3.st:132 FB_TranslationCmdArbitrationM3.st:58;False
+PRG_05_Translation.instTranslationM3.LastMoveDirection;13;AUTRE;VAR;INT;FB_Translation.st:168 FB_Translation.st:202 FB_Translation.st:204;False
+PRG_05_Translation.instTranslationM3.TargetReached;13;AUTRE;VAR_OUTPUT;BOOL;FB_Translation.st:170 FB_Translation.st:193;False
+PRG_07_Supervision.instMirrorBypassNetwork.Prev;13;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:26;False
+PRG_07_Supervision.instMirrorBypassNetwork.RetainVal;13;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:22;True
+PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;14;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:483;True
+PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2;14;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:483;True
+PRG_02_Acquisition.JoystickCfgEffective.DeadmanArmHoldTime;14;AUTRE;VAR;ST_fbJoystick_Cfg;PRG_02_Acquisition.st:493;False
+PRG_02_Acquisition.JoystickCfgEffective.RawOutOfRangeMargin;14;AUTRE;VAR;ST_fbJoystick_Cfg;PRG_02_Acquisition.st:493;False
+PRG_02_Acquisition.instDiagCanOpen.CANbusOnlineEff;14;AUTRE;VAR;BOOL;FB_Diag_CanOpen.st:70;True
+PRG_02_Acquisition.instDiagCanOpen.DeviceJoystickOnlineEff;14;AUTRE;VAR;BOOL;FB_Diag_CanOpen.st:71;False
+PRG_02_Acquisition.instDiagCanOpen.Enable;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instJoystick.Cfg.DeadbandRaw;14;REGLAGE;VAR_INPUT;ST_fbJoystick_Cfg;;False
+PRG_02_Acquisition.instJoystick.NeutralXMem;14;AUTRE;VAR_IN_OUT;INT;FB_Joystick.st:123;False
+PRG_02_Acquisition.instJoystick.NeutralXYEdge.Q;14;AUTRE;VAR;R_TRIG;FB_Joystick.st:171 FB_Joystick.st:211;False
+PRG_02_Acquisition.instJoystick.ScaleY.OutPct;14;AUTRE;VAR_OUTPUT;REAL;FB_AxisScale.st:29 FB_AxisScale.st:31 FB_AxisScale.st:36 FB_AxisScale.st:38;False
+PRG_04_Treuils_Benne.ArmingPermit;14;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1205;True
+PRG_05_Translation.instArbM3.FreqPct;14;AUTRE;VAR;REAL;FB_TranslationCmdArbitrationM3.st:108;False
+PRG_05_Translation.instArbM3.Joystick.AxisX.SpeedTgt;14;AUTRE;VAR_INPUT;ST_AcquisitionJoystickQualified;;False
+PRG_05_Translation.instTranslationM3.CaptorDebounceTon.Q;14;AUTRE;VAR;TON;FB_Translation.st:172 FB_Translation.st:192;False
+PRG_07_Supervision.PrevNetworkBypass;14;BYPASS;VAR;BOOL;PRG_07_Supervision.st:370;False
+GVL_PERSISTENT._JoystickCfgPersist.DeadmanArmHoldTime;15;REGLAGE;VAR_GLOBAL;ST_fbJoystick_Cfg;;False
+GVL_PERSISTENT._JoystickCfgPersist.RawOutOfRangeMargin;15;REGLAGE;VAR_GLOBAL;ST_fbJoystick_Cfg;;False
+PRG_02_Acquisition.Data.Joystick.AxisX.SpeedTgt;15;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:529;False
+PRG_02_Acquisition.HwReal.Operator;15;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:182 PRG_02_Acquisition.st:183 PRG_02_Acquisition.st:184 PRG_02_Acquisition.st:185;False
+PRG_02_Acquisition.HwSim.Operator;15;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:436;False
+PRG_02_Acquisition.JoystickCfgEffective.DeadbandRaw;15;AUTRE;VAR;ST_fbJoystick_Cfg;PRG_02_Acquisition.st:493;False
+PRG_02_Acquisition.OperatorInputSourceSimulated;15;AUTRE;VAR;BOOL;PRG_02_Acquisition.st:137;False
+PRG_02_Acquisition._JoystickNeutralX;15;AUTRE;?;?;PRG_02_Acquisition.st:496;False
+PRG_02_Acquisition.instDiagCanOpen.CANbusOnlineReal;15;AUTRE;VAR;BOOL;FB_Diag_CanOpen.st:67;False
+PRG_02_Acquisition.instDiagCanOpen.CanBusBypassActive;15;BYPASS;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instDiagCanOpen.DeviceJoystickOnlineReal;15;AUTRE;VAR;BOOL;FB_Diag_CanOpen.st:68;False
+PRG_02_Acquisition.instDiagCanOpen.JoystickBypassActive;15;BYPASS;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instDiagCanOpen.NetworkBypassActive;15;BYPASS;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instDiagCanOpen.SimBypassActive;15;BYPASS;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instJoystick.AtNeutralXY;15;AUTRE;VAR_OUTPUT;BOOL;FB_Joystick.st:164 FB_Joystick.st:185;True
+PRG_02_Acquisition.instJoystick.Calibrate;15;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instJoystick.LastCalibrate;15;AUTRE;VAR;BOOL;FB_Joystick.st:130;False
+PRG_02_Acquisition.instJoystick.ScaleY.DeadbandRaw;15;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instJoystick.ScaleY.Delta;15;AUTRE;VAR;REAL;FB_AxisScale.st:27 FB_AxisScale.st:34;False
+PRG_02_Acquisition.instJoystick.ScaleY.Neutral;15;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instJoystick.ScaleY.RawIn;15;AUTRE;VAR_INPUT;INT;;False
+PRG_04_Treuils_Benne.ArmAnyAxisAvail;15;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1175;False
+PRG_04_Treuils_Benne.ArmBucketBusy;15;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.ArmContactorOff;15;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1187;False
+PRG_04_Treuils_Benne.ArmModeDisabled;15;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1186;False
+PRG_04_Treuils_Benne.ArmPowerCutOff;15;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1188;False
+PRG_05_Translation.instArbM3.Cfg.MaxFreq_Hz;15;REGLAGE;VAR_INPUT;ST_fbTranslationCmdArbitration_Cfg;;False
+PRG_05_Translation.instArbM3.IHM.SetFreq_Hz;15;AUTRE;VAR_INPUT;ST_fbTranslationCmdArbitration_IHM;;False
+PRG_05_Translation.instTranslationM3.Cfg.CaptorDebounce;15;REGLAGE;VAR_INPUT;ST_fbTranslation_Cfg;;False
+PRG_05_Translation.instTranslationM3.PositionSensorTarget;15;AUTRE;VAR_INPUT;BOOL;;False
+GVL_IHM.JOY1Joystick.Cmd.Calibrate;16;COMMANDE;VAR_GLOBAL;ST_JoystickHMI;;False
+GVL_IHM.Network.Bypass.BusCanOpen;16;BYPASS;VAR_GLOBAL;ST_NetworkDiagHMI;;False
+GVL_IHM.Network.Bypass.Joystick;16;BYPASS;VAR_GLOBAL;ST_NetworkDiagHMI;;False
+GVL_PERSISTENT._JoystickCfgPersist.DeadbandRaw;16;REGLAGE;VAR_GLOBAL;ST_fbJoystick_Cfg;;False
+GVL_Simulation.SimOperatorActive;16;SIMU;VAR_GLOBAL;BOOL;;False
+PRG_02_Acquisition.CANbus.GetBusState;16;AUTRE;?;?;;False
+PRG_02_Acquisition.JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState;16;AUTRE;?;?;;False
+PRG_02_Acquisition.JoyBtnRaw;16;AUTRE;?;?;;True
+PRG_02_Acquisition.JoyXRaw_ANA1;16;AUTRE;?;?;;True
+PRG_02_Acquisition.JoyYRaw_ANA2;16;AUTRE;?;?;;True
+PRG_02_Acquisition.instDiagCanOpen.CANbusStateRaw;16;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instDiagCanOpen.DEVICE_STATE.RUNNING;16;AUTRE;?;?;;False
+PRG_02_Acquisition.instDiagCanOpen.DeviceJoystickStateRaw;16;AUTRE;VAR_INPUT;DEVICE_STATE;;False
+PRG_02_Acquisition.instJoystick.AxisCmdX.SpeedTgt;16;AUTRE;VAR_OUTPUT;ST_fbJoystick_AxisCmd;FB_Joystick.st:158 FB_Joystick.st:256 FB_Joystick.st:262;False
+PRG_02_Acquisition.instJoystick.NeutralYMem;16;AUTRE;VAR_IN_OUT;INT;FB_Joystick.st:124;False
+PRG_02_Acquisition.instSimBench.Operator;16;FRONTIERE;VAR_OUTPUT;ST_HwOperator;;False
+PRG_04_Treuils_Benne.ArmM1AscentAvail;16;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.ArmM1DescendAvail;16;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.ArmM2AscentAvail;16;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.ArmM2DescendAvail;16;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.ArmM3MaintenanceAvail;16;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1171;False
+PRG_04_Treuils_Benne.ArmM3TremieAvail;16;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1168;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.PowerCutOff;16;FRONTIERE;VAR_OUTPUT;BOOL;;True
+PRG_04_Treuils_Benne.instSafetyWinchM2.PowerCutOff;16;FRONTIERE;VAR_OUTPUT;BOOL;;True
+PRG_05_Translation.ArbM3_Cfg.MaxFreq_Hz;16;AUTRE;VAR;ST_fbTranslationCmdArbitration_Cfg;PRG_05_Translation.st:376;False
+PRG_05_Translation.ArbM3_IHM.SetFreq_Hz;16;AUTRE;VAR;ST_fbTranslationCmdArbitration_IHM;PRG_05_Translation.st:372;False
+PRG_05_Translation.Data.TranslationSafety.PowerCutOff;16;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:882;True
+PRG_05_Translation.M3_PositionSensorTarget;16;AUTRE;VAR;BOOL;PRG_05_Translation.st:455 PRG_05_Translation.st:456 PRG_05_Translation.st:457 PRG_05_Translation.st:458;False
+PRG_05_Translation.TranslationCfg.CaptorDebounce;16;AUTRE;VAR;ST_fbTranslation_Cfg;;False
+GVL_IHM.M3Translation.Cmd.SetFreq_Hz;17;COMMANDE;VAR_GLOBAL;ST_TranslationHMI;PRG_07_Supervision.st:276;False
+GVL_PERSISTENT._TranslationMaxFreq_Hz;17;REGLAGE;VAR_GLOBAL;REAL;;False
+PRG_02_Acquisition.HwReal.Operator.CanBusState;17;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:185;False
+PRG_02_Acquisition.HwReal.Operator.JOY1_DeviceState;17;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:186;False
+PRG_02_Acquisition._JoystickNeutralY;17;AUTRE;?;?;PRG_02_Acquisition.st:496;False
+PRG_05_Translation.Data.TranslationSafety.SafeStop;17;AUTRE;VAR_OUTPUT;ST_TranslationInterPrg;PRG_05_Translation.st:882;True
+PRG_05_Translation.M3_AtMaintenanceStable;17;AUTRE;VAR;BOOL;PRG_05_Translation.st:249 PRG_05_Translation.st:252 PRG_05_Translation.st:255 PRG_05_Translation.st:258;False
+PRG_05_Translation.M3_AtP1Stable;17;AUTRE;VAR;BOOL;PRG_05_Translation.st:249 PRG_05_Translation.st:252 PRG_05_Translation.st:255 PRG_05_Translation.st:257;False
+PRG_05_Translation.M3_AtP2Stable;17;AUTRE;VAR;BOOL;PRG_05_Translation.st:249 PRG_05_Translation.st:252 PRG_05_Translation.st:254 PRG_05_Translation.st:258;False
+PRG_05_Translation.M3_AtTremieStable;17;AUTRE;VAR;BOOL;PRG_05_Translation.st:248 PRG_05_Translation.st:252 PRG_05_Translation.st:255 PRG_05_Translation.st:258;False
+PRG_05_Translation.M3_TargetCodeSel;17;AUTRE;VAR;INT;PRG_05_Translation.st:434 PRG_05_Translation.st:435 PRG_05_Translation.st:436 PRG_05_Translation.st:437;False
+PRG_05_Translation.TranslationSafety.PowerCutOff;17;AUTRE;VAR;ST_SafetyTranslation;PRG_05_Translation.st:806;True
+GVL_IHM.M3Translation.Cmd.Initialized;18;COMMANDE;VAR_GLOBAL;ST_TranslationHMI;PRG_07_Supervision.st:277;False
+GVL_PERSISTENT._TranslationAtMaintenancePersisted;18;REGLAGE;VAR_GLOBAL;BOOL;;False
+GVL_PERSISTENT._TranslationAtP1Persisted;18;REGLAGE;VAR_GLOBAL;BOOL;;False
+GVL_PERSISTENT._TranslationAtP2Persisted;18;REGLAGE;VAR_GLOBAL;BOOL;;False
+GVL_PERSISTENT._TranslationAtTremiePersisted;18;REGLAGE;VAR_GLOBAL;BOOL;;False
+PRG_05_Translation.M3_AtPositionBootRestored;18;AUTRE;VAR;BOOL;PRG_05_Translation.st:263;False
+PRG_05_Translation.M3_BootPositionLock;18;AUTRE;VAR;BOOL;PRG_05_Translation.st:221 PRG_05_Translation.st:265;False
+PRG_05_Translation.M3_BootRestoreApplied;18;AUTRE;VAR;BOOL;PRG_05_Translation.st:217 PRG_05_Translation.st:264;False
+PRG_05_Translation.M3_BootSensorsStableTimer.Q;18;AUTRE;VAR;TON;PRG_05_Translation.st:231 PRG_05_Translation.st:233 PRG_05_Translation.st:236;False
+PRG_05_Translation.M3_ConfirmedMoving;18;AUTRE;VAR;BOOL;PRG_05_Translation.st:203;False
+PRG_05_Translation.M3_SensorsWordChanged;18;AUTRE;VAR;BOOL;PRG_05_Translation.st:215;False
+PRG_05_Translation.SelTarget;18;AUTRE;VAR;INT;PRG_05_Translation.st:389;False
+PRG_05_Translation.TranslationSafety.SafeStop;18;AUTRE;VAR;ST_SafetyTranslation;PRG_05_Translation.st:805;True
+PRG_05_Translation.instPosDecoderM3.TranslationAtMaintenance;18;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:117;False
+PRG_05_Translation.instPosDecoderM3.TranslationAtP1;18;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:116;False
+PRG_05_Translation.instPosDecoderM3.TranslationAtP2;18;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:115;False
+PRG_05_Translation.instPosDecoderM3.TranslationAtPV;18;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:114;False
+PRG_05_Translation.instPosDecoderM3.TranslationAtTremie;18;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:113;False
+PRG_05_Translation.instPosDecoderM3.TranslationPosTremie;18;AUTRE;VAR_OUTPUT;BOOL;FB_Translation_PositionDecoder.st:94;True
+PRG_07_Supervision._TranslationSetFreq_Hz;18;AUTRE;?;?;PRG_07_Supervision.st:282;False
+PRG_05_Translation.M3_BootPositionLockTimer.Q;19;AUTRE;VAR;TON;PRG_05_Translation.st:218;False
+PRG_05_Translation.M3_BootSensorsWordCandidate;19;AUTRE;VAR;BYTE;PRG_05_Translation.st:230;False
+PRG_05_Translation.M3_SensorsWordPrev;19;AUTRE;VAR;BYTE;PRG_05_Translation.st:213 PRG_05_Translation.st:216;False
+PRG_05_Translation.instPosDecoderM3.EdgeDnMaintenance.Q;19;AUTRE;VAR;F_TRIG;FB_Translation_PositionDecoder.st:108;False
+PRG_05_Translation.instPosDecoderM3.EdgeDnP1.Q;19;AUTRE;VAR;F_TRIG;FB_Translation_PositionDecoder.st:107;False
+PRG_05_Translation.instPosDecoderM3.EdgeDnP2.Q;19;AUTRE;VAR;F_TRIG;FB_Translation_PositionDecoder.st:106;False
+PRG_05_Translation.instPosDecoderM3.EdgeDnPV.Q;19;AUTRE;VAR;F_TRIG;FB_Translation_PositionDecoder.st:105;False
+PRG_05_Translation.instPosDecoderM3.EdgeUpP1.Q;19;AUTRE;VAR;R_TRIG;FB_Translation_PositionDecoder.st:107;False
+PRG_05_Translation.instPosDecoderM3.EdgeUpP2.Q;19;AUTRE;VAR;R_TRIG;FB_Translation_PositionDecoder.st:106;False
+PRG_05_Translation.instPosDecoderM3.EdgeUpPV.Q;19;AUTRE;VAR;R_TRIG;FB_Translation_PositionDecoder.st:105;False
+PRG_05_Translation.instPosDecoderM3.EdgeUpTremie.Q;19;AUTRE;VAR;R_TRIG;FB_Translation_PositionDecoder.st:104;False
+PRG_05_Translation.instPosDecoderM3.SensorTremie;19;AUTRE;VAR_INPUT;BOOL;;True
+PRG_05_Translation.s;20;AUTRE;?;?;;False
