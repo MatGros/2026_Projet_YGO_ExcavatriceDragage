@@ -1,0 +1,85 @@
+{
+  "marker": "POC_ALERTE_650C3EDEB475",
+  "platform": "codex",
+  "stages": [
+    {
+      "stage": "create_A",
+      "args": [
+        "exec",
+        "--skip-git-repo-check",
+        "-s",
+        "read-only",
+        "--json",
+        "POC synthétique : réponds uniquement PRET. Aucun outil."
+      ],
+      "exit_code": 0,
+      "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a1a9b2-1f91-7f50-adeb-94cca23a1b92\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"PRET\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":16781,\"cached_input_tokens\":13312,\"cache_write_input_tokens\":0,\"output_tokens\":6,\"reasoning_output_tokens\":0}}\n",
+      "stderr": "Reading additional input from stdin...\n"
+    },
+    {
+      "stage": "create_B",
+      "args": [
+        "exec",
+        "--skip-git-repo-check",
+        "-s",
+        "read-only",
+        "--json",
+        "POC synthétique : réponds uniquement PRET. Aucun outil."
+      ],
+      "exit_code": 0,
+      "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a1a9b2-39d2-7f70-9933-44b1c94db178\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"PRET\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":16223,\"cached_input_tokens\":0,\"cache_write_input_tokens\":0,\"output_tokens\":6,\"reasoning_output_tokens\":0}}\n",
+      "stderr": "Reading additional input from stdin...\n"
+    },
+    {
+      "stage": "queue_A",
+      "args": [
+        "queue",
+        "--thread",
+        "01a1a9b2-1f91-7f50-adeb-94cca23a1b92",
+        "--message",
+        "POC_ALERTE_650C3EDEB475"
+      ],
+      "exit_code": 0,
+      "stdout": "Queued message 01a1a9b2-5597-7830-a213-ef1ecb666e2c for thread 01a1a9b2-1f91-7f50-adeb-94cca23a1b92.\n",
+      "stderr": ""
+    },
+    {
+      "stage": "resume_A",
+      "args": [
+        "exec",
+        "--skip-git-repo-check",
+        "-s",
+        "read-only",
+        "--json",
+        "resume",
+        "01a1a9b2-1f91-7f50-adeb-94cca23a1b92",
+        "Si une alerte POC est présente, cite son identifiant exact ; sinon réponds AUCUNE. Aucun outil."
+      ],
+      "exit_code": 0,
+      "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a1a9b2-1f91-7f50-adeb-94cca23a1b92\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"POC_ALERTE_650C3EDEB475\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":50422,\"cached_input_tokens\":46592,\"cache_write_input_tokens\":0,\"output_tokens\":24,\"reasoning_output_tokens\":0}}\n",
+      "stderr": ""
+    },
+    {
+      "stage": "resume_B",
+      "args": [
+        "exec",
+        "--skip-git-repo-check",
+        "-s",
+        "read-only",
+        "--json",
+        "resume",
+        "01a1a9b2-39d2-7f70-9933-44b1c94db178",
+        "Si une alerte POC est présente, cite son identifiant exact ; sinon réponds AUCUNE. Aucun outil."
+      ],
+      "exit_code": 0,
+      "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a1a9b2-39d2-7f70-9933-44b1c94db178\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"AUCUNE\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":34436,\"cached_input_tokens\":16000,\"cache_write_input_tokens\":0,\"output_tokens\":13,\"reasoning_output_tokens\":0}}\n",
+      "stderr": ""
+    }
+  ],
+  "verdict": {
+    "distinct_sessions": true,
+    "A_mentions_marker": true,
+    "B_mentions_marker": false,
+    "resumes_exit_zero": true
+  }
+}

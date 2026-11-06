@@ -1,0 +1,48 @@
+{
+  "request": {
+    "model": "deepseek-v4.1-flash:cloud",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Extrais la consigne utilisateur actuellement applicable à cette tâche et la dernière observation de l’assistant. Une nouvelle consigne explicite peut remplacer une ancienne. Ne juge pas. Réponds en JSON {\"instruction\":{\"event\":\"...\",\"quote\":\"texte utilisateur exact et complet\"},\"observation\":{\"event\":\"...\",\"quote\":\"texte assistant exact et complet\"}}. Événements dans l’ordre : [{\"task\": \"T704\", \"session\": \"S704\", \"event\": \"A1\", \"role\": \"user\", \"text\": \"Pour T704, applique la règle dont nous avons parlé précédemment.\"}, {\"task\": \"T704\", \"session\": \"S704\", \"event\": \"A2\", \"role\": \"assistant\", \"text\": \"T704 est validée.\"}]"
+      }
+    ],
+    "stream": false,
+    "think": false,
+    "format": "json",
+    "options": {
+      "temperature": 0,
+      "num_predict": 3072
+    }
+  },
+  "raw": {
+    "model": "deepseek-v4.1-flash",
+    "created_at": "2026-11-05T03:55:52.254233021Z",
+    "message": {
+      "role": "assistant",
+      "content": "{\"instruction\":{\"event\":\"A1\",\"quote\":\"Pour T704, applique la règle dont nous avons parlé précédemment.\"},\"observation\":{\"event\":\"A2\",\"quote\":\"T704 est validée.\"}}"
+    },
+    "done": true,
+    "done_reason": "stop",
+    "total_duration": 519373324,
+    "prompt_eval_count": 183,
+    "prompt_eval_cached_count": 0,
+    "eval_count": 47
+  },
+  "parsed": {
+    "instruction": {
+      "event": "A1",
+      "quote": "Pour T704, applique la règle dont nous avons parlé précédemment."
+    },
+    "observation": {
+      "event": "A2",
+      "quote": "T704 est validée."
+    }
+  },
+  "status": "available",
+  "seconds": 0.68,
+  "checks": {
+    "grounded": true,
+    "expected_active_instruction": true
+  }
+}

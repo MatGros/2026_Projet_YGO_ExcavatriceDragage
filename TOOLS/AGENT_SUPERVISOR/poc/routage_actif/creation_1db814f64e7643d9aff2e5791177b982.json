@@ -1,0 +1,18 @@
+{
+  "synthetic_only": true,
+  "temporary_dir": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\veilleur-poc-actif-ttvh_z6p",
+  "args": [
+    "C:\\Users\\ZEDVICTUS\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.exe",
+    "exec",
+    "--skip-git-repo-check",
+    "-s",
+    "read-only",
+    "--json",
+    "Essai synthétique isolé : réponds uniquement PRET. Ne lance aucun outil et ne lis aucun fichier."
+  ],
+  "returncode": 0,
+  "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a1a9c8-0743-7550-9cd0-3668d3ecde62\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"PRET\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":16228,\"cached_input_tokens\":13312,\"cache_write_input_tokens\":0,\"output_tokens\":6,\"reasoning_output_tokens\":0}}\n",
+  "stderr": "Reading additional input from stdin...\n",
+  "thread_id": "01a1a9c8-0743-7550-9cd0-3668d3ecde62",
+  "seconds": 9.245
+}

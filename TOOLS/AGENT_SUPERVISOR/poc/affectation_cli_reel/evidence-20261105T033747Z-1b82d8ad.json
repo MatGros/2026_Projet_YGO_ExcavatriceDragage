@@ -1,0 +1,55 @@
+{
+  "synthetic_only": true,
+  "source_preflight": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\AGENT_SUPERVISOR\\poc\\agy_routage\\preflight_e0afb6eb9c7d4f569ec6e147df5e90ec.json",
+  "native_id": "c5f763e6-4236-4430-9b25-33f0fa4cdd10",
+  "created_utc": "2026-11-05T03:37:47.520482+00:00",
+  "scratch": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\veilleur-poc-agy-discovery-tgq1pjsl",
+  "started_supervisor": false,
+  "llm_calls": 0,
+  "candidates_scope": "exact synthetic ID only",
+  "resolution": [
+    {
+      "root": "C:\\Users\\ZEDVICTUS\\.gemini\\antigravity\\brain",
+      "state": "source_missing",
+      "matches": 0,
+      "path": null
+    },
+    {
+      "root": "C:\\Users\\ZEDVICTUS\\.gemini\\antigravity-cli\\brain",
+      "state": "ready",
+      "matches": 1,
+      "path": "C:\\Users\\ZEDVICTUS\\.gemini\\antigravity-cli\\brain\\c5f763e6-4236-4430-9b25-33f0fa4cdd10\\.system_generated\\logs\\transcript.jsonl"
+    },
+    {
+      "root": "C:\\Users\\ZEDVICTUS\\.gemini\\antigravity-ide\\brain",
+      "state": "source_missing",
+      "matches": 0,
+      "path": null
+    }
+  ],
+  "candidates": {
+    "candidates": [
+      {
+        "platform": "agy",
+        "native_id": "c5f763e6-4236-4430-9b25-33f0fa4cdd10",
+        "modified": 1793849666.5389,
+        "matches": 1
+      }
+    ],
+    "incomplete": false,
+    "errors": []
+  },
+  "expected": {
+    "one_unambiguous_source": true,
+    "candidate_exact": true,
+    "strict_add": "accepted"
+  },
+  "checks": {
+    "one_unambiguous_source": true,
+    "candidate_exact": true,
+    "added_exact_source": true
+  },
+  "strict_add": "accepted",
+  "attached_source": "C:\\Users\\ZEDVICTUS\\.gemini\\antigravity-cli\\brain\\c5f763e6-4236-4430-9b25-33f0fa4cdd10\\.system_generated\\logs\\transcript.jsonl",
+  "pass": true
+}

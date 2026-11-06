@@ -1,0 +1,36 @@
+{
+  "synthetic_only": true,
+  "target_existing_session": false,
+  "scratch": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\veilleur-agy-actif-tzmp8_0q",
+  "marker": "POC_AGY_ACTIF_27AFB841C2",
+  "args": [
+    "agy.exe",
+    "--mode",
+    "plan",
+    "--sandbox",
+    "--print-timeout",
+    "90s",
+    "--output-format",
+    "json",
+    "--print",
+    "Essai synthétique : réponds uniquement PRET. Ne lance aucun outil et ne lis aucun fichier."
+  ],
+  "returncode": 0,
+  "stdout": "{\"conversation_id\":\"3bce0ed9-116f-4f87-b885-94b79503c765\",\"status\":\"SUCCESS\",\"response\":\"PRET\\n\",\"duration_seconds\":36.996371,\"num_turns\":1,\"usage\":{\"input_tokens\":2047,\"output_tokens\":115,\"thinking_tokens\":114,\"cache_read_tokens\":16912,\"total_tokens\":2162}}\n",
+  "stderr": "",
+  "parsed": {
+    "conversation_id": "3bce0ed9-116f-4f87-b885-94b79503c765",
+    "status": "SUCCESS",
+    "response": "PRET\n",
+    "duration_seconds": 36.996371,
+    "num_turns": 1,
+    "usage": {
+      "input_tokens": 2047,
+      "output_tokens": 115,
+      "thinking_tokens": 114,
+      "cache_read_tokens": 16912,
+      "total_tokens": 2162
+    }
+  },
+  "seconds": 40.468
+}

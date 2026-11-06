@@ -1,0 +1,39 @@
+{
+  "synthetic_only": true,
+  "run_id": "e0afb6eb9c7d4f569ec6e147df5e90ec",
+  "temporary_dir": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp\\veilleur-agy-poc-9csr7gmp",
+  "prompt": "Essai synthétique isolé. Ne lance aucun outil, ne lis et ne modifie aucun fichier. Réponds uniquement PRET.",
+  "max_remote_calls": 1,
+  "target_existing_session": false,
+  "args": [
+    "C:\\Users\\ZEDVICTUS\\AppData\\Local\\agy\\bin\\agy.EXE",
+    "--mode",
+    "plan",
+    "--sandbox",
+    "--disable-slash-commands",
+    "--print-timeout",
+    "45s",
+    "--output-format",
+    "json",
+    "--print",
+    "Essai synthétique isolé. Ne lance aucun outil, ne lis et ne modifie aucun fichier. Réponds uniquement PRET."
+  ],
+  "returncode": 0,
+  "stdout": "{\"conversation_id\":\"c5f763e6-4236-4430-9b25-33f0fa4cdd10\",\"status\":\"SUCCESS\",\"response\":\"PRET\\n\",\"duration_seconds\":36.9898403,\"num_turns\":1,\"usage\":{\"input_tokens\":18166,\"output_tokens\":57,\"thinking_tokens\":56,\"cache_read_tokens\":0,\"total_tokens\":18223}}\n",
+  "stderr": "warning: --mode plan has no effect while slash command expansion is disabled.\n",
+  "parsed": {
+    "conversation_id": "c5f763e6-4236-4430-9b25-33f0fa4cdd10",
+    "status": "SUCCESS",
+    "response": "PRET\n",
+    "duration_seconds": 36.9898403,
+    "num_turns": 1,
+    "usage": {
+      "input_tokens": 18166,
+      "output_tokens": 57,
+      "thinking_tokens": 56,
+      "cache_read_tokens": 0,
+      "total_tokens": 18223
+    }
+  },
+  "seconds": 40.569
+}

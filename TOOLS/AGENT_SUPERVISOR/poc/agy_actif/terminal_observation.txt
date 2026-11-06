@@ -1,0 +1,19 @@
+Commande : agy --conversation 3bce0ed9-116f-4f87-b885-94b79503c765 --mode plan --sandbox
+Dossier courant : C:\Users\ZEDVICTUS\AppData\Local\Temp\veilleur-agy-actif-tzmp8_0q
+Extrait affiché dans le terminal interactif :
+Accessing workspace:
+C:\Users\ZEDVICTUS\AppData\Local\Temp\veilleur-agy-actif-tzmp8_0q
+Do you trust the contents of this project?
+Antigravity CLI requires permission to read, edit, and execute files here.
+> Yes, I trust this folder
+  No, exit
+  ↑/↓ Navigate · enter Confirm
+
+Observation : le processus est resté actif à cette question. Deux Ctrl+C ont quitté le processus, code de sortie 0. Aucun choix de confiance et aucun envoi d'alerte n'ont eu lieu. Cet extrait correspond au texte affiché ; les séquences terminal de contrôle ont été omises pour lisibilité.
+
+Essai complémentaire depuis le dépôt déjà approuvé :
+Commande TUI : agy --conversation 3bce0ed9-116f-4f87-b885-94b79503c765 --mode plan --sandbox
+La fenêtre a ouvert la conversation synthétique et affiché le tour initial et PRET, sans demander de choix de confiance. Elle a affiché également l'avertissement de règle de permission invalide `unsandboxed(python)`, ignorée par la CLI.
+Une seconde instance non interactive a reçu la commande et émis la réponse POC_AGY_ACTIF_27AFB841C2, attestée dans send_b184ec9702c7461f9f882fa61a680235.json.
+Pendant l'attente puis après réception de cette réponse, sept lectures successives du flux de sortie de la TUI ont renvoyé une sortie vide, avec processus toujours actif ; la dernière a attendu cinq secondes après la fin de la seconde instance.
+Deux Ctrl+C ont ensuite fermé le processus. L'écran de sortie affichait encore uniquement le tour initial PRET et l'avertissement de configuration, sans marqueur. Code de sortie final 0. Les séquences terminal de contrôle et l'identité du compte affichée par la CLI sont omises de cette transcription.

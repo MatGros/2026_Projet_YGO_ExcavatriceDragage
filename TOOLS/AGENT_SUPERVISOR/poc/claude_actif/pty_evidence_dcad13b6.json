@@ -1,0 +1,61 @@
+{
+  "session_id": "37f8630e-59e5-4a25-988f-bbe9559d44ae",
+  "marker": "POC_ALERTE_ACTIF_2E608F2424",
+  "frames": [
+    {
+      "phase": "initial",
+      "timestamp": "2026-11-05T03:45:20.736Z",
+      "output": "\u001b[?9001h\u001b[?1004h\u001b[?25l\u001b[2J\u001b[m\u001b[H\u001b]0;claude\u0007\u001b[?25h\u001b[?2004h\u001b[?2031h\u001b[?1004h\u001b]0;✳ Claude Code\u0007\u001b[?1049h\u001b[2J\u001b[?1000h\u001b[?1002h\u001b[?1003h\u001b[?1006h\u001b[?2026h\u001b[?2026l\u001b[?25l\u001b[K\r\n ▐▛███▛█   Claude Code v2.1.318\u001b[K\r\n▝▜██████▀  Opus 5.5 · Claude Pro\u001b[K\r\n ▝▝   ▝▝   C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage · /rc connecting…     \r\n\u001b[K\r\n\u001b[K\r\n❯ Essai synthétique. Réponds uniquement PRET. Aucun outil, ne lis ni ne modifie \r\n  aucun fichier.\u001b[K\r\n\u001b[K\r\n● PRET\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n                                                            ◐ medium · /effort  \r\n────────────────────────────────────────────────────────────────────────────────❯ \u001b[K\r\n────────────────────────────────────────────────────────────────────────────────\r\n\u001b[K\r\n  ⏵⏵ accept edits on (shift+tab to cycle) · ← for agents\u001b[K\u001b[21;3H\u001b[?25h\u001b[?2026h\u001b[?2026l\u001b[?25l\u001b[24;47H2 agents\u001b[K\u001b[21;3H\u001b[?25h\u001b[>0q\u001b[?u\u001b]7501;?\u0007\u001b[?2026h\u001b[?2026l\u001b[?25l\u001b[24;45Hinst\u001b[1Cll gh\u001b[1Cfor\u001b[1CPR\u001b[1Cstatus\u001b[1C·\u001b[1C←\u001b[1C2\u001b[1Cag…\u001b[21;3H\u001b[?25h\u001b[?2026h\u001b[?2026l[⧉\u001b[1CIn\u001b[1Creponse.md]\u001b[1C\u001b[?2026h\u001b[?2026l\u001b[?25l\u001b[4;65H\u001b[K\u001b[21;21H\u001b[?25h",
+      "exit_code": null
+    },
+    {
+      "phase": "avant_envoi",
+      "timestamp": "2026-11-05T03:45:31.964Z",
+      "output": "\u001b[?2026h\u001b[?2026l\u001b[?25l\u001b[19;61H\u001b[K\u001b[21;21H\u001b[?25h",
+      "exit_code": null
+    },
+    {
+      "phase": "pendant_envoi",
+      "timestamp": "2026-11-05T03:45:54.865Z",
+      "output": "",
+      "exit_code": null
+    },
+    {
+      "phase": "apres_reponse_1",
+      "timestamp": "2026-11-05T03:46:05.460Z",
+      "output": "",
+      "exit_code": null
+    },
+    {
+      "phase": "apres_reponse_2",
+      "timestamp": "2026-11-05T03:46:14.465Z",
+      "output": "",
+      "exit_code": null
+    },
+    {
+      "phase": "fermeture",
+      "timestamp": "2026-11-05T03:46:20.095Z",
+      "output": "\u001b[?2004h\u001b[?1000h\u001b[?1002h\u001b[?1003h\u001b[?1006h\u001b[?2026h\u001b[?2026l\u001b[?25l\u001b[20;1H                                                                                \r\n\u001b[K\r\n                                                                                \u001b[24;3H\u001b[K\u001b[78C\u001b[?1006l\u001b[?1003l\u001b[?1002l\u001b[?1000l\u001b[?2026h\u001b[?2026l\r\u001b[?25h\u001b[?1049l\u001b[>4m\u001b[>4m\u001b[?2031l\u001b[?2004l\u001b[?1016l\u001b[?1006l\u001b[?1003l\u001b[?1002l\u001b[?1000l\u001b[?25l\u001b[H\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\u001b[H\u001b[?25h\u001b[?1016l\u001b[>4m\u001b[?2031l\u001b[?2004l\r\nResume this session with:\r\nclaude --resume 37f8630e-59e5-4a25-988f-bbe9559d44ae\r\n\u001b]0;\u0007",
+      "exit_code": null
+    },
+    {
+      "phase": "termine",
+      "timestamp": "2026-11-05T03:46:26.692Z",
+      "output": "\u001b]0;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\u0007\u001b[?9001l\u001b[?1004l",
+      "exit_code": 0
+    }
+  ],
+  "concurrent_frames": [
+    {
+      "timestamp": "2026-11-05T03:45:42.145Z",
+      "output": "",
+      "exit_code": null
+    },
+    {
+      "timestamp": "2026-11-05T03:45:54.866Z",
+      "output": "{\"marker\": \"POC_ALERTE_ACTIF_2E608F2424\", \"session_id\": \"37f8630e-59e5-4a25-988f-bbe9559d44ae\", \"response\": \"POC_ALERTE_ACTIF_2E608F2424\", \"response_session_id\": \"37f8630e-59e5-4a25-988f-bbe9559d44ae\", \"evidence\": \"C:\\\\_MGS\\\\DEV\\\\2026_Projet_YGO_ExcavatriceDragage\\\\TOOLS\\\\AGENT_SUPERVISOR\\\\poc\\\\claude_actif\\\\concurrent_bb9b2dea9ea244be9d8e48f1f0db48c9.json\"}\r\n",
+      "exit_code": 0
+    }
+  ],
+  "limitations": "Capture des sorties PTY récupérées par le runner, pas une capture visuelle de pixels; l'absence du marqueur porte uniquement sur cette fenêtre de mesure."
+}

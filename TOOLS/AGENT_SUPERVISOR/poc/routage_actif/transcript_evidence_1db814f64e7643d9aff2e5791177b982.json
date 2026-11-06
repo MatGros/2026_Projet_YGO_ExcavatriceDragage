@@ -1,0 +1,21 @@
+{
+  "source": "C:\\Users\\ZEDVICTUS\\.codex\\sessions\\2026\\11\\05\\rollout-2026-11-05T04-37-01-01a1a9c8-0743-7550-9cd0-3668d3ecde62.jsonl",
+  "marker": "POC_ALERTE_ACTIF_8D145B17",
+  "events": [
+    {
+      "timestamp": "2026-11-05T03:37:50.521Z",
+      "thread": "01a1a9c8-0743-7550-9cd0-3668d3ecde62",
+      "turn": "01a1a9c8-c6ad-7890-9d52-8979fff09f5d",
+      "item_type": "UserMessage",
+      "text": "Alerte synthétique POC_ALERTE_ACTIF_8D145B17 : réponds uniquement POC_ALERTE_ACTIF_8D145B17, sans utiliser d outil."
+    },
+    {
+      "timestamp": "2026-11-05T03:37:52.238Z",
+      "thread": "01a1a9c8-0743-7550-9cd0-3668d3ecde62",
+      "turn": "01a1a9c8-c6ad-7890-9d52-8979fff09f5d",
+      "item_type": "AgentMessage",
+      "text": "POC_ALERTE_ACTIF_8D145B17"
+    }
+  ],
+  "same_thread_turn_and_exact_response": true
+}

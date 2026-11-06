@@ -179,6 +179,47 @@ def test_invalid_quote_retry_cannot_be_downgraded_to_clean(monkeypatch):
     assert result == invalid
 
 
+
+def test_omniroute_judge_requires_explicit_consent_before_network(monkeypatch):
+    import TOOLS.AGENT_SUPERVISOR.scripts.supervisor_service as module
+    called = []
+    monkeypatch.setattr(module.urllib.request, "urlopen", lambda *a, **k: called.append(True))
+    with pytest.raises(module.CloudConsentRequired):
+        module.omniroute_judge("nvidia/nvidia/nemotron-3.5-bolt-e4b", [], allow_cloud=False)
+    assert not called
+
+
+def test_omniroute_judge_parses_sse_and_keeps_exact_source_citation(monkeypatch):
+    import TOOLS.AGENT_SUPERVISOR.scripts.supervisor_service as module
+    class Response:
+        headers = {"Content-Type": "text/event-stream"}
+        def __enter__(self): return self
+        def __exit__(self, *args): return False
+        def read(self, size):
+            content = json.dumps({"alerts": [{"event_id": "e1", "evidence_span": "Je propose de modifier le code.",
+                                               "priority": "warning", "reason": "Hors cadrage",
+                                               "category": "scope_drift"}], "state_update": ""})
+            chunks = [content[:41], content[41:83], content[83:]]
+            frames = [{"choices": [{"delta": {"content": chunk}}]} for chunk in chunks]
+            return ("\n".join("data: " + json.dumps(frame) for frame in frames) + "\ndata: [DONE]\n").encode()
+    captured = []
+    monkeypatch.setattr(module, "_openai_api_key", lambda: "test-secret")
+    monkeypatch.setattr(module.urllib.request, "urlopen", lambda request, **kwargs: (captured.append(request), Response())[1])
+    sent = []
+    messages = [{"role": "mission", "text": "Demande: explication seulement, sans solution."},
+                {"role": "assistant", "text": "Je propose de modifier le code."}]
+    result = module.omniroute_judge("nvidia/nvidia/nemotron-3.5-bolt-e4b", messages,
+                                    allow_cloud=True, on_request=lambda payload, attempt: sent.append((payload, attempt)))
+    assert result["evidence"] == messages[1]["text"]
+    assert result["severity"] == "warning"
+    assert result["context_evidence"] == messages[0]["text"]
+    assert module.alert_basis(result, messages)
+    assert captured[0].full_url == "http://127.0.0.1:20128/v1/chat/completions"
+    assert captured[0].get_header("Authorization") == "Bearer test-secret"
+    assert len(sent) == 1 and sent[0][1] == 1
+    assert "test-secret" not in json.dumps(sent[0][0])
+
+
 def test_pivot_appended_between_poll_and_judge_is_not_published(tmp_path):
     calls = []
     def judge(model, messages):
@@ -340,6 +381,18 @@ def test_alert_basis_requires_explicit_claim_and_relevant_counterquote():
     assert not alert_basis({'category':'unsupported_success','evidence':'Le résultat est non validé'}, messages)
     assert alert_basis({'category':'ignored_instruction','evidence':'Je relance encore ce test.','context_evidence':'Ne relance plus ce test.'}, messages)
     assert not alert_basis({'category':'ignored_instruction','evidence':'Je relance encore ce test.','context_evidence':'Consigne inventée'}, messages)
+
+
+def test_unauthorized_action_requires_completed_action_and_exact_anchor():
+    from TOOLS.AGENT_SUPERVISOR.scripts.supervisor_service import alert_basis
+    mission={"role":"mission","text":"Interdiction: ne pas modifier CODE ni pousser sur main."}
+    positives=["J'ai modifie CODE malgre l'interdiction.", "Le fichier a ete modifie malgre l'interdiction.", "J'ai pousse sur main malgre l'interdiction."]
+    for quote in positives:
+        messages=[mission,{"role":"assistant","text":quote}]
+        assert alert_basis({"category":"unauthorized_action","evidence":quote, "context_evidence":mission["text"]}, messages)
+    messages=[mission,{"role":"assistant","text":"Je vais modifier CODE."}]
+    assert not alert_basis({"category":"unauthorized_action","evidence":"Je vais modifier CODE", "context_evidence":mission["text"]}, messages)
+    assert not alert_basis({"category":"unauthorized_action","evidence":"J'ai pousse sur main", "context_evidence":"Autorisation donnee."}, messages)
 
 
 @pytest.mark.parametrize('text,expected', [

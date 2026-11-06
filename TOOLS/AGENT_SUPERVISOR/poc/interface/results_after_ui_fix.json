@@ -1,0 +1,27 @@
+﻿{
+  "node": "v24.18.0",
+  "platform": "win32",
+  "timestamp": "2026-11-05T03:21:04.716Z",
+  "dependency_hint": "C:\\Users\\ZEDVIC~1\\AppData\\Local\\Temp/supervision-dom-tests/package.json",
+  "sha256": {
+    "interface": "8a22fe956a09459c25083c3288bebf944b61ae98b528e93a176b70d442538a10",
+    "original": "e0c981c2d5dace979897c54b0f72013f9dbe7cd5bc43480daaf235d755f821ce",
+    "adapted": "11c65d875610d9bdad26d9ec12a39d8a2b891ad7cfaffabd419c79ecc95d302b"
+  },
+  "original": {
+    "script": "TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs",
+    "exit": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "Veilleur UI: candidate discovery, ambiguity and explicit confirmation passed.\n",
+    "stderr": ""
+  },
+  "adapted": {
+    "script": "TOOLS/AGENT_SUPERVISOR/poc/interface/test_ui_adapte.mjs",
+    "exit": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "OK discovery: ambiguous candidate disabled, listing does not attach\nOK explicit selection: matching ID submitted\nOK panel state: unchanged card retained; open state survives state change\nOK alerts: collapsed by default and marked treated for session\nOK judge details: synthetic payload visible\nOK session chat: Enter sends to s1; Shift+Enter does not send\nOK global chat: Enter sends without session ID\nVeilleur UI: candidate discovery, ambiguity and explicit confirmation passed.\n",
+    "stderr": ""
+  }
+}

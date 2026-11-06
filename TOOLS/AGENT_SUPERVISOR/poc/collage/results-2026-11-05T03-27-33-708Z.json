@@ -1,0 +1,169 @@
+{
+  "synthetic": true,
+  "network": false,
+  "note": "Pre-fill UI only; no attachment or task catalog checked.",
+  "cases": [
+    {
+      "case": "legacy_indent_continuation",
+      "expected": "accepted",
+      "actual": "accepted",
+      "pass": true,
+      "missionOk": true,
+      "aliasOk": true,
+      "notice": "Configuration et mission préremplies. ID déclaré par l’agent : 11111111-1111-4111-8111-111111111111 · Attention : certaines valeurs différaient de celles déjà saisies ; vérifiez-les.",
+      "values": {
+        "platform": "agy",
+        "native_id": "11111111-1111-4111-8111-111111111111",
+        "alias": "AGY01",
+        "mission": "Tâche / sujet: T999 — Cadrage du système de tâches\nObjectif utilisateur: Cadrer le travail et ses règles\nÉtape actuelle: Attente de validation\nPérimètre et permissions: Modification outillage autorisée dans le périmètre indiqué ; code automate interdit\nContraintes: Respect des contrôles et style concis\nCritères d’acceptation: Critères vérifiables\nPreuves observées: Contrôle rapporté PASS\nHypothèses / inconnues: Modalité de validation inconnue\nProchaine étape: Attendre la décision humaine"
+      },
+      "input": "  VEILLEUR_ASSIGN_V1\n    platform: agy\n    native_id: 11111111-1111-4111-8111-111111111111\n    alias: AGY01\n    task: T999 — Cadrage du système de tâches\n    user_goal: Cadrer le travail et ses règles\n    current_step: Attente de validation\n    scope_and_permissions: Modification outillage autorisée dans le périmètre\n    indiqué ; code automate interdit\n    constraints: Respect des contrôles et style concis\n    acceptance_criteria: Critères vérifiables\n    evidence_observed: Contrôle rapporté PASS\n    hypotheses_and_unknowns: Modalité de validation inconnue\n    next_step: Attendre la décision humaine\n    END_VEILLEUR_ASSIGN_V1"
+    },
+    {
+      "case": "json_in_markers",
+      "expected": "accepted",
+      "actual": "accepted",
+      "pass": true,
+      "missionOk": true,
+      "aliasOk": true,
+      "notice": "Configuration et mission préremplies. ID déclaré par l’agent : 11111111-1111-4111-8111-111111111111 · Attention : certaines valeurs différaient de celles déjà saisies ; vérifiez-les.",
+      "values": {
+        "platform": "agy",
+        "native_id": "11111111-1111-4111-8111-111111111111",
+        "alias": "AGY01",
+        "mission": "Tâche / sujet: T999 — Cadrage\nPérimètre et permissions: Lecture seule\nPérimètre explicitement borné"
+      },
+      "input": "VEILLEUR_ASSIGN_V1\n{\"platform\":\"agy\",\"native_id\":\"11111111-1111-4111-8111-111111111111\",\"alias\":\"AGY01\",\"task\":\"T999 — Cadrage\",\"scope_and_permissions\":\"Lecture seule\\nPérimètre explicitement borné\"}\nEND_VEILLEUR_ASSIGN_V1"
+    },
+    {
+      "case": "json_raw_no_markers",
+      "expected": "error",
+      "actual": "error",
+      "pass": true,
+      "missionOk": true,
+      "aliasOk": true,
+      "notice": "Bloc VEILLEUR_ASSIGN_V1 absent, dupliqué ou incomplet. Copiez une seule réponse structurée entière.",
+      "values": {
+        "platform": "agy",
+        "native_id": "ancien-id",
+        "alias": "ANCIEN-ALIAS",
+        "mission": "ANCIENNE MISSION"
+      },
+      "input": "{\"platform\":\"agy\",\"native_id\":\"11111111-1111-4111-8111-111111111111\",\"alias\":\"AGY01\",\"task\":\"T999 — Cadrage\"}"
+    },
+    {
+      "case": "json_fenced_inside_markers",
+      "expected": "error",
+      "actual": "error",
+      "pass": true,
+      "missionOk": true,
+      "aliasOk": true,
+      "notice": "Ligne ou champ invalide dans le bloc : ```json",
+      "values": {
+        "platform": "agy",
+        "native_id": "ancien-id",
+        "alias": "ANCIEN-ALIAS",
+        "mission": "ANCIENNE MISSION"
+      },
+      "input": "VEILLEUR_ASSIGN_V1\n```json\n{\"platform\":\"agy\",\"native_id\":\"11111111-1111-4111-8111-111111111111\",\"alias\":\"AGY01\",\"task\":\"T999 — Cadrage\"}\n```\nEND_VEILLEUR_ASSIGN_V1"
+    },
+    {
+      "case": "legacy_continuation_with_colon",
+      "expected": "error",
+      "actual": "error",
+      "pass": true,
+      "missionOk": true,
+      "aliasOk": true,
+      "notice": "Ligne ou champ invalide dans le bloc :   code: interdit",
+      "values": {
+        "platform": "agy",
+        "native_id": "ancien-id",
+        "alias": "ANCIEN-ALIAS",
+        "mission": "ANCIENNE MISSION"
+      },
+      "input": "VEILLEUR_ASSIGN_V1\nplatform: agy\nnative_id: 11111111-1111-4111-8111-111111111111\ntask: T999\nscope_and_permissions: audit\n  code: interdit\nEND_VEILLEUR_ASSIGN_V1"
+    },
+    {
+      "case": "json_unknown_field",
+      "expected": "error",
+      "actual": "error",
+      "pass": true,
+      "missionOk": true,
+      "aliasOk": true,
+      "notice": "Champ inconnu dans le JSON : extra",
+      "values": {
+        "platform": "agy",
+        "native_id": "ancien-id",
+        "alias": "ANCIEN-ALIAS",
+        "mission": "ANCIENNE MISSION"
+      },
+      "input": "VEILLEUR_ASSIGN_V1\n{\"platform\":\"agy\",\"native_id\":\"11111111-1111-4111-8111-111111111111\",\"task\":\"T999\",\"extra\":\"X\"}\nEND_VEILLEUR_ASSIGN_V1"
+    },
+    {
+      "case": "json_long_mission",
+      "expected": "error",
+      "actual": "error",
+      "pass": true,
+      "missionOk": true,
+      "aliasOk": true,
+      "notice": "Mission trop longue (1542 caractères). Réduisez le résumé à 1 500 caractères maximum.",
+      "values": {
+        "platform": "agy",
+        "native_id": "ancien-id",
+        "alias": "ANCIEN-ALIAS",
+        "mission": "ANCIENNE MISSION"
+      },
+      "input": "VEILLEUR_ASSIGN_V1\n{\"platform\":\"agy\",\"native_id\":\"11111111-1111-4111-8111-111111111111\",\"task\":\"T999\",\"user_goal\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"}\nEND_VEILLEUR_ASSIGN_V1"
+    },
+    {
+      "case": "legacy_duplicate_field",
+      "expected": "error",
+      "actual": "error",
+      "pass": true,
+      "missionOk": true,
+      "aliasOk": true,
+      "notice": "Champ dupliqué dans le bloc : platform",
+      "values": {
+        "platform": "agy",
+        "native_id": "ancien-id",
+        "alias": "ANCIEN-ALIAS",
+        "mission": "ANCIENNE MISSION"
+      },
+      "input": "VEILLEUR_ASSIGN_V1\nplatform: agy\nplatform: codex\nnative_id: 11111111-1111-4111-8111-111111111111\ntask: T999\nEND_VEILLEUR_ASSIGN_V1"
+    },
+    {
+      "case": "json_duplicate_identity",
+      "expected": "error",
+      "actual": "accepted",
+      "pass": false,
+      "missionOk": true,
+      "aliasOk": true,
+      "notice": "Configuration et mission préremplies. ID déclaré par l’agent : 22222222-2222-4222-8222-222222222222 · Attention : certaines valeurs différaient de celles déjà saisies ; vérifiez-les.",
+      "values": {
+        "platform": "agy",
+        "native_id": "22222222-2222-4222-8222-222222222222",
+        "alias": "ANCIEN-ALIAS",
+        "mission": "Tâche / sujet: T999"
+      },
+      "input": "VEILLEUR_ASSIGN_V1\n{\"platform\":\"agy\",\"native_id\":\"11111111-1111-4111-8111-111111111111\",\"native_id\":\"22222222-2222-4222-8222-222222222222\",\"task\":\"T999\"}\nEND_VEILLEUR_ASSIGN_V1"
+    },
+    {
+      "case": "new_id_without_alias",
+      "expected": "accepted",
+      "actual": "accepted",
+      "pass": false,
+      "missionOk": true,
+      "aliasOk": false,
+      "notice": "Configuration et mission préremplies. ID déclaré par l’agent : 11111111-1111-4111-8111-111111111111 · Attention : certaines valeurs différaient de celles déjà saisies ; vérifiez-les.",
+      "values": {
+        "platform": "agy",
+        "native_id": "11111111-1111-4111-8111-111111111111",
+        "alias": "ANCIEN-ALIAS",
+        "mission": "Tâche / sujet: T999"
+      },
+      "input": "VEILLEUR_ASSIGN_V1\n{\"platform\":\"agy\",\"native_id\":\"11111111-1111-4111-8111-111111111111\",\"task\":\"T999\"}\nEND_VEILLEUR_ASSIGN_V1"
+    }
+  ],
+  "pass": 8,
+  "total": 10
+}
