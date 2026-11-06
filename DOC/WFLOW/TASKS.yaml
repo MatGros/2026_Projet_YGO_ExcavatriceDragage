@@ -1,4 +1,34 @@
 tasks:
+- id: T428
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: DIAGNOSTIC / GVL_TROUBLESHOOTING
+  agent: CC01
+  date: '2026-11-06T22:55:07+01:00'
+  titre: 'Refactor troubleshooting : snapshot lisible comme un flux, par axe, pour mainteneur et agent'
+  contexte: 'Demande exploitant 2026-11-06 a la reprise de T213. Trouver la source d''un blocage a partir du seul snapshot,
+    rapidement et intuitivement, pour un mainteneur comme pour un agent. Lecture de haut en bas comme un flux : entrees, traitement,
+    sorties. Plan et etat de validation : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T428_REFACTOR_TROUBLESHOOTING (.yaml et .md, branche
+    work/carte-flux-troubleshooting, non committes).'
+  description: Tache chapeau. Porte l'organisation cible, les decisions, les lots et les liens vers les taches troubleshooting
+    encore a faire. Ne couvre pas la logique machine.
+  objectifs:
+  - J1 corriger les valeurs trompeuses (contrat TS_LOT1)
+  - J2 definir la structure cible et la table de correspondance de 100 % des variables
+  - J3 ajouter les maillons manquants et mesurer la duree du snapshot
+  - J4 implementer la structure, avec table ancien vers nouveau chemin
+  - J5 fournir le guide de depannage dans le code, verifie automatiquement
+  - J6 valider par une personne sur pannes injectees, puis cloturer
+  avancement: 'VALIDE EXPLOITANT 2026-11-06 : flux entrees traitement sorties ; variable figee non retiree pour ce seul motif
+    ; les lettres ne suffisent pas ; niveaux general, axe, fonctions mixtes ; sorties PLC et mot variateur dans les axes ;
+    guide souhaite dans le code. PROPOSE NON VALIDE : fiche d''axe en 10 etapes, safety generale et alarmes d''axe, renumerotation,
+    seuils de test du plan. LIVRE : cartes M1 M2 M3 AU, commit 04b6ce99 branche work/carte-flux-troubleshooting non poussee,
+    relecture par modele, aucune preuve automate. EN ATTENTE GO : lot 1. ESSAIS : 0 cause sur 15 en reference. A TRANCHER
+    : champs M2Demand ; T371 et T340 non modifiees. LIENS : parts T375 T377 T231 ; renvois T225 T224 T324 T219. ALERTE : bypass
+    AU TestA et PowerCutOff TRUE par defaut, etat automate inconnu.'
+  contrat: ''
+  bloque_par: []
 - id: T427
   parent_id: ''
   statut: ⏳
@@ -8,16 +38,21 @@ tasks:
   date: '2026-11-04T23:55:00+01:00'
   updated_at: '2026-11-04T23:55:00+01:00'
   titre: Refonte Workflow Agents — Router de skills mince, contrat étendu, sas d'essais et note compagnon MD
-  contexte: 'REX session 2026-11-04 : court-circuit de /plan hors projet, blocage du Stop sur checkpoints WIP, G200 trop lourd à chaque édition, besoin d un sas test_feedback sans code à chaud et d un fichier compagnon Markdown standardisé pour graphiques et explications.'
-  description: 'Créer le skill unique project-workflow (tronc commun + 3 voies Tâche/Orchestrateur/Troubleshooting), étendre le gabarit task_contract.yaml (jalons, sas test_feedback, quota sous-agents 10/3, lien fichier compagnon MD) et adapter les contrôles mécaniques.'
+  contexte: 'REX session 2026-11-04 : court-circuit de /plan hors projet, blocage du Stop sur checkpoints WIP, G200 trop lourd
+    à chaque édition, besoin d un sas test_feedback sans code à chaud et d un fichier compagnon Markdown standardisé pour
+    graphiques et explications.'
+  description: Créer le skill unique project-workflow (tronc commun + 3 voies Tâche/Orchestrateur/Troubleshooting), étendre
+    le gabarit task_contract.yaml (jalons, sas test_feedback, quota sous-agents 10/3, lien fichier compagnon MD) et adapter
+    les contrôles mécaniques.
   objectifs:
-  - 'Créer le skill unique project-workflow (router mince <= 50 lignes + tronc commun compact <= 1500 tokens).'
-  - 'Enrichir task_contract.yaml : execution_plan, test_feedback (format 1 ligne <= 120 car.), budget sous-agents (10/3), et standardiser la note compagnon TASK_NOTE_<ID>_*.md.'
-  - 'Adapter check_task_contract.py avec les contrôles mécaniques T9 à T11.'
+  - Créer le skill unique project-workflow (router mince <= 50 lignes + tronc commun compact <= 1500 tokens).
+  - 'Enrichir task_contract.yaml : execution_plan, test_feedback (format 1 ligne <= 120 car.), budget sous-agents (10/3),
+    et standardiser la note compagnon TASK_NOTE_<ID>_*.md.'
+  - Adapter check_task_contract.py avec les contrôles mécaniques T9 à T11.
   - 'Ajuster les hooks : PostToolUse allégé et Stop non-bloquant autorisant les checkpoints WIP.'
-  - 'Maintenir 0 régression sur les standards du projet et la liaison CODESYS.'
+  - Maintenir 0 régression sur les standards du projet et la liaison CODESYS.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T427_WORKFLOW_SKILL_ET_CONTRAT_ETENDU.yaml
-  avancement: 'Cadrage initialisé. Verrou posé AGY01. Contrat C2 et note compagnon rédigés. En attente de validation pour implémentation.'
+  avancement: Cadrage initialisé. Verrou posé AGY01. Contrat C2 et note compagnon rédigés. En attente de validation pour implémentation.
   bloque_par: []
 - id: T426
   parent_id: ''
@@ -1416,7 +1451,7 @@ tasks:
   criticite: C3
   domaine: CYCLE_HOMING / SECURITE_REFERENCEMENT
   agent: —
-  date: '2026-10-13T16:16:34'
+  date: '2026-11-06T23:12:27+01:00'
   updated_at: '2026-10-13T16:16:34+02:00'
   titre: 'HOMING N1 MANUEL SANS CONTACT TOP : approche prudente sans heurter le capteur haut TOP, validation visuelle operateur
     et securisation contact'
@@ -1450,11 +1485,12 @@ tasks:
     que la commande automate est a zero.
   - Mettre a jour le contrat TASK_CONTRACT_T364_HOMING_N1_MANUAL_TOP.yaml (ou dedier un contrat T377) et valider sans regression.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T364_HOMING_N1_MANUAL_TOP.yaml
-  avancement: '2026-10-13 - Decision humaine : remise a faire, sans agent attribue ni verrou de travail (personne ne travaille
-    dessus). Doctrine approche manuelle sans contact et reference a l arret conservee. Deux entrees explicites ajoutees :
-    validation du message de reference absente/suspecte au demarrage, ou lancement volontaire IHM sur machine referencee.
-    Aucun lancement par homme-mort/joystick seuls. Contrat aligne ; plan technique, bouton de confirmation et repere/cote/tolerance
-    a valider avant implementation. T418 reste une correction independante du stimulus simule.'
+  avancement: 'Reserve MAINT_N2 reprise de T340, cloturee le 2026-11-06. Lien T428 : les champs diagnostic de AC4 passent
+    dans T428, la logique reste ici. 2026-10-13 - Decision humaine : remise a faire, sans agent attribue ni verrou de travail
+    (personne ne travaille dessus). Doctrine approche manuelle sans contact et reference a l arret conservee. Deux entrees
+    explicites ajoutees : validation du message de reference absente/suspecte au demarrage, ou lancement volontaire IHM sur
+    machine referencee. Aucun lancement par homme-mort/joystick seuls. Contrat aligne ; plan technique, bouton de confirmation
+    et repere/cote/tolerance a valider avant implementation. T418 reste une correction independante du stimulus simule.'
   bloque_par: []
 - id: T378
   parent_id: ''
@@ -1524,12 +1560,12 @@ tasks:
     de liberation — sans toucher aux verrous vifs dont le proprietaire est identifie.
   bloque_par: []
 - id: T380
-  parent_id: ''
+  parent_id: T428
   statut: ⬜
   criticite: C1
   domaine: OUTILLAGE / DIAGNOSTIC
   agent: —
-  date: '2026-09-22T06:22:09+02:00'
+  date: '2026-11-06T22:55:07+01:00'
   updated_at: '2026-09-22T06:22:09+02:00'
   titre: 'Snapshot troubleshooting : l outil annonce « 1 KO » SANS JAMAIS NOMMER la variable — rendre les chemins KO nominatifs
     + rapport'
@@ -1551,13 +1587,14 @@ tasks:
   - 'Cas de repli : un KO transitoire resolu par le repli n est plus compte comme echec sans explication.'
   - 'Non-regression : le compte « variables lues / declarees » reste exact et aucune variable n est perdue du CSV.'
   bloque_par: []
+  avancement: Rattachee a T428.
 - id: T375
   parent_id: ''
   statut: ⬜
   criticite: C3
   domaine: SUPERVISION / IHM / DIAGNOSTIC / SECURITE
   agent: —
-  date: '2026-09-22T06:10:20+02:00'
+  date: '2026-11-06T22:55:07+01:00'
   updated_at: '2026-09-22T06:10:20+02:00'
   titre: 'Defauts et refus SILENCIEUX : 3 voies de blocage sans message operateur (sequencement benne couple, causes latchees
     masquees par un temoin de validite, SafeStop de demande) + garde-fou anti-silence'
@@ -1598,8 +1635,9 @@ tasks:
   - 'AC8 : git diff --numstat VIDE sur FB_Safety_Winch.st, FB_WinchOutputInterlock.st, FB_Winch.st et CODE/B_AU_SECURITE/
     (aucune logique de securite modifiee).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T375_MESSAGES_BLOCAGES_SILENCIEUX.yaml
-  avancement: '[CADRAGE DSH01 2026-09-22T06:10 — CONTRAT ECRIT ET VALIDE AVANT TOUTE DELEGATION : check_task_contract.py PASS
-    0 erreur / 0 avertissement (criticite C3, strategie patch). ORIGINE : session de depannage du meme jour, fiche DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_ManuelBoth_Impossible_20260922.md
+  avancement: 'Lien T428 : les temoins de la liste de snapshot passent dans T428, le reste ici. [CADRAGE DSH01 2026-09-22T06:10
+    — CONTRAT ECRIT ET VALIDE AVANT TOUTE DELEGATION : check_task_contract.py PASS 0 erreur / 0 avertissement (criticite C3,
+    strategie patch). ORIGINE : session de depannage du meme jour, fiche DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_ManuelBoth_Impossible_20260922.md
     — c est l exploitant qui a trouve la condition du refus both (desactiver le sequencement benne auto) ; l orchestrateur
     a verifie la chaine sur source et identifie le masquage par temoin de validite. GO EXPLICITE DE L EXPLOITANT sur le couple
     fix: + guard:. PERIMETRE : IHM/diagnostic + outillage uniquement, logique de securite INTERDITE (AC8). Aucune ligne de
@@ -1696,12 +1734,12 @@ tasks:
   bloque_par: []
 - id: T371
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C4
   domaine: SUPERVISION / DIAGNOSTIC / TREUILS
   agent: —
   locked_at: '2026-09-21T13:01:18+02:00'
-  date: '2026-09-21T12:00:00+02:00'
+  date: '2026-11-06T23:12:27+01:00'
   updated_at: '2026-09-21T15:12:00+02:00'
   titre: Faux vert du diagnostic mouvement (ST_MotionChecklist) - le technicien voit une barriere OK alors qu elle refuse
   contexte: 'Trouve pendant l investigation T224 (ArmingPermit). Symptome distinct de T224 (armement trompeur) et de T370
@@ -1721,11 +1759,13 @@ tasks:
     et sur la remise a NONE, preuve avant/apres identique.
   - Aucun commit sans accord explicite distinct du GO.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T371_FAUX_VERT_MOTIONCHECKLIST.yaml
-  avancement: '[ORCHESTRATEUR DSH29 2026-09-21T13:01 — BRIEF V1 CHALLENGE AVANT TRANSMISSION, BORNE REFUTEE, BRIEF V2 ECRIT,
-    CONTRAT C4 ECRIT ET VALIDE, GO HUMAIN RENDU SUR A1-A4. AUCUN FICHIER CODE/ TOUCHE a cet instant.] LE BRIEF V1 (BRIEF_T371_FAUX_VERT_MOTIONCHECKLIST.md,
-    87 l., jamais transmis) PORTAIT UNE BORNE QUI INTERDISAIT LE SEUL CORRECTIF NECESSAIRE : il demandait d ajouter des VAR_OUTPUT
-    (Reason/Fault.Error/State) a FB_WinchOutputInterlock.st, or ces sorties EXISTENT DEJA (Reason l.56, State l.54, StateAtError
-    l.55, Fault l.53) et sont DEJA ROUTEES jusqu au consommateur (FB_WinchStateProjection.st:112-115 M1, :179-182 M2, PRG_05_Translation.st:756
+  avancement: 'CLOTURE exploitant 2026-11-06 : correctif present dans le code via 8ec1fa28, FB_TroubleshootingView.st:601-607.
+    Reserves restantes reportees sur T372 et T373, rattachees a T428. [ORCHESTRATEUR DSH29 2026-09-21T13:01 — BRIEF V1 CHALLENGE
+    AVANT TRANSMISSION, BORNE REFUTEE, BRIEF V2 ECRIT, CONTRAT C4 ECRIT ET VALIDE, GO HUMAIN RENDU SUR A1-A4. AUCUN FICHIER
+    CODE/ TOUCHE a cet instant.] LE BRIEF V1 (BRIEF_T371_FAUX_VERT_MOTIONCHECKLIST.md, 87 l., jamais transmis) PORTAIT UNE
+    BORNE QUI INTERDISAIT LE SEUL CORRECTIF NECESSAIRE : il demandait d ajouter des VAR_OUTPUT (Reason/Fault.Error/State)
+    a FB_WinchOutputInterlock.st, or ces sorties EXISTENT DEJA (Reason l.56, State l.54, StateAtError l.55, Fault l.53) et
+    sont DEJA ROUTEES jusqu au consommateur (FB_WinchStateProjection.st:112-115 M1, :179-182 M2, PRG_05_Translation.st:756
     M3, champs deja presents dans ST_WinchState.st:38-41). LE FAUX VERT VIENT D UNE CONSOMMATION TRONQUEE : FB_TroubleshootingView.st:577
     (M1) / :609 (M2) / :644 (M3) ecrivent Step8_OutputInterlockOk := NOT WinchMx.State.FinalInterlockError, or FinalInterlockError
     := InterlockMx.Fault.Error n est alimente que par UNE cause (ErrorId bit0 = timeout confirmation frein, FB_WinchOutputInterlock.st:516-519
@@ -1822,13 +1862,14 @@ tasks:
     CODESYS reelle non verifiee. HEAD a encore avance pendant la revue : b7b2c04b (lot T345-L2, AUTRE agent) — aucun commit
     de T371.'
   bloque_par: []
+  completed_at: '2026-11-06T23:12:27+01:00'
 - id: T372
-  parent_id: T371
+  parent_id: T428
   statut: ⬜
   criticite: C2
   domaine: OUTILLAGE / CI
   agent: —
-  date: '2026-09-21T13:20:00+02:00'
+  date: '2026-11-06T22:55:07+01:00'
   updated_at: '2026-09-21T13:20:00+02:00'
   titre: 'Harnais CI : entree registry incomplete (le test ne compile pas, personne ne le voit) + rapport .txt ecrit SEULEMENT
     en echec (artefact perime sur une entree qui passe)'
@@ -1861,13 +1902,14 @@ tasks:
   - 'Garde-fou associe : detecter toute incoherence entre l etat declare d une entree CI et le contenu de son rapport (rapport
     d echec alors que le json/html du meme dossier sont plus recents et verts).'
   bloque_par: []
+  avancement: 'Liee a T428 comme preuve : harnais CI de la vue.'
 - id: T373
-  parent_id: T371
+  parent_id: T428
   statut: ⬜
   criticite: C3
   domaine: SUPERVISION / DIAGNOSTIC / TRANSLATION_M3
   agent: —
-  date: '2026-09-21T15:55:00+02:00'
+  date: '2026-11-06T22:55:07+01:00'
   updated_at: '2026-09-21T15:55:00+02:00'
   titre: 'Angle mort M3 : la barriere finale M3 ne publie aucun etat, donc le diagnostic de mouvement M3 ne voit pas son refus
     directionnel'
@@ -1893,6 +1935,7 @@ tasks:
   bloque_par:
   - 'PRG_07_Supervision.st sous edit d un autre lot — arbitrage humain Q2 du 2026-09-21 : ne pas elargir T371, ouvrir une
     tache separee plus tard'
+  avancement: 'Rattachee a T428 : T371 est deja dans le code.'
 - id: T228
   parent_id: T224
   statut: ⬜
@@ -3920,12 +3963,12 @@ tasks:
   bloque_par: []
 - id: T340
   parent_id: T336
-  statut: ⬜
+  statut: ❌
   criticite: C1
   domaine: CYCLE_HOMING / SECURITE_REFERENCEMENT
   agent: —
   locked_at: '2026-09-20T20:48:29+02:00'
-  date: '2026-09-20T20:48:29+02:00'
+  date: '2026-11-06T23:12:27+01:00'
   updated_at: '2026-09-20T20:48:29+02:00'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T340_HOMING_LOCKED_ASCENT.yaml
   reserve_orchestrateur_20260921: 'AUDIT INDEPENDANT : (1) objectif "position provisoire M1" PERIME -- le code livre ABANDONNE
@@ -3971,30 +4014,33 @@ tasks:
     M3 verifie, Plan B testable independamment.'
   - Bundle PLCopenXML, G200 liaison, gates applicables PASS avant integration CODESYS.
   bloque_par: []
-  avancement: 'VERROU PRIS par CC01 le 2026-09-20T20:48:29 (GO direct humain, urgence tests utilisateur imminents). Challenge
-    AVANT code LIVRE : DOC/WFLOW/AUDITS/DESIGN/CHALLENGE_T340_REFONTE_HOMING_2026-09-20.md (1 BLOCK, 2 PASS deja-couvert,
-    2 MAJOR, 9 constats hors scope). FAITS ACTES : (a) la position provisoire M1 est ABANDONNEE — ST_Encoder_Calib n a qu
-    un booleen Homed, tout etat provisoire fuiterait dans ~20 consommateurs, et le couple M1 provisoire + M2 cale sur M1 rendrait
-    MachineHomed auto-coherent donc indetectable ; (b) le palier 1 global existe deja (PRG_04:1217-1230) et l interlock M3
-    aussi (PRG_05:134-138) : AUCUN code de plafond ni d interlock a ecrire ; (c) le cycle auto est deja bloque sans datum
-    (FB_Modes:251 expulsion + FB_CycleSemiAuto:834). ECART DANS LE SCOPE : CST_StepSlow est du code mort en MAINT_N2 (l arbitrage
-    ignore ReqWinch hors SEMI_AUTO, FB_WinchCmdArbitrationM1.st:56-104) donc un re-referencement d une machine encore referencee
-    peut se faire a palier 5 et faire echouer la capture preset (10 mm / 50 ms). IMPLEMENTATION LIVREE 2026-09-20T21:15 (NON
-    COMMITEE) : etape HX7_LOCKED_REFERENCE dediee et VERROUILLEE (entree par confirmation operateur benne fermee -> nouvelle
-    entree BucketCloseConfirmed cablee depuis le front existant BucketReferenceCloseEdge.Q ; montee vers le capteur sous permis
-    ; puis prise de reference NOMINALE A L ARRET : capteur reellement atteint + arret mecanique confirme + commande relachee)
-    ; verrou = aucune sortie d etape par changement de mode (etape TENUE sans mouvement), descente reellement commandee en
-    HX7 => abandon avec cause dediee ; A1 CORRIGE (gardes de montee ET de descente consommees UNIQUEMENT si l ordre de mouvement
-    est reellement emis ; garde de montee 120 s en dur -> 300 s DERIVEE : 58,5 m / 0,4 m/s = 146,3 s, x2 = 292,5 s) ; chemin
-    de secours MAINT_N1 hors grafcet NON touche ; FB_Encoder_Homing.st et ST_Encoder_Calib.st NON modifies. DEUX REVUES INDEPENDANTES
-    read-only : (1) NON en l etat (2 MAJOR + 9 MINOR) ; (2) OUI (1 MAJOR + 4 MINOR). Les 3 MAJOR CORRIGES : garde keyee sur
-    l ordre reellement emis (elle se consommait hors MAINT_N2 ou aucun ordre n est emis) ; garde HX3 desormais testee (H210/H211)
-    et declaree dans must_survive ; entree de l etape verrouillee EXIGEANT un capteur haut INACTIF (un capteur deja actif
-    permettait une capture sans franchissement = datum faux). PREUVES FINALES : CI 21 tests / 19 PASS / 2 FAIL (H010/H090
-    PREEXISTANTS, identiques a l archive 13/09 : 8/6/2 ; cause BootReady jamais pilote) dont 13/13 nouveaux TC-P09-H200..H212
-    PASS ; G511 PASS + --selftest PASS (8 mutations rejetees) ; G200 --report PASS (0 erreur, 2025 instances) ; bundle frais
-    259/259 objets 0 erreur + diff bundle 4 objets ; palier C 43/48 PASS avec EXACTEMENT les 5 dettes preexistantes G300/G340/G408/G430/G483
-    (aucun fichier du lot signale). Persistants : AUCUN ajout. IHM : aucune commande ni champ nouveau. Aucun commit.'
+  avancement: 'CLOTURE exploitant 2026-11-06 : remplacee. Le code livre (266fb11f, 941ec627) a ete retire par T364, la doctrine
+    hybride porte sur T377. Reserve MAINT_N2 reportee sur T377. VERROU PRIS par CC01 le 2026-09-20T20:48:29 (GO direct humain,
+    urgence tests utilisateur imminents). Challenge AVANT code LIVRE : DOC/WFLOW/AUDITS/DESIGN/CHALLENGE_T340_REFONTE_HOMING_2026-09-20.md
+    (1 BLOCK, 2 PASS deja-couvert, 2 MAJOR, 9 constats hors scope). FAITS ACTES : (a) la position provisoire M1 est ABANDONNEE
+    — ST_Encoder_Calib n a qu un booleen Homed, tout etat provisoire fuiterait dans ~20 consommateurs, et le couple M1 provisoire
+    + M2 cale sur M1 rendrait MachineHomed auto-coherent donc indetectable ; (b) le palier 1 global existe deja (PRG_04:1217-1230)
+    et l interlock M3 aussi (PRG_05:134-138) : AUCUN code de plafond ni d interlock a ecrire ; (c) le cycle auto est deja
+    bloque sans datum (FB_Modes:251 expulsion + FB_CycleSemiAuto:834). ECART DANS LE SCOPE : CST_StepSlow est du code mort
+    en MAINT_N2 (l arbitrage ignore ReqWinch hors SEMI_AUTO, FB_WinchCmdArbitrationM1.st:56-104) donc un re-referencement
+    d une machine encore referencee peut se faire a palier 5 et faire echouer la capture preset (10 mm / 50 ms). IMPLEMENTATION
+    LIVREE 2026-09-20T21:15 (NON COMMITEE) : etape HX7_LOCKED_REFERENCE dediee et VERROUILLEE (entree par confirmation operateur
+    benne fermee -> nouvelle entree BucketCloseConfirmed cablee depuis le front existant BucketReferenceCloseEdge.Q ; montee
+    vers le capteur sous permis ; puis prise de reference NOMINALE A L ARRET : capteur reellement atteint + arret mecanique
+    confirme + commande relachee) ; verrou = aucune sortie d etape par changement de mode (etape TENUE sans mouvement), descente
+    reellement commandee en HX7 => abandon avec cause dediee ; A1 CORRIGE (gardes de montee ET de descente consommees UNIQUEMENT
+    si l ordre de mouvement est reellement emis ; garde de montee 120 s en dur -> 300 s DERIVEE : 58,5 m / 0,4 m/s = 146,3
+    s, x2 = 292,5 s) ; chemin de secours MAINT_N1 hors grafcet NON touche ; FB_Encoder_Homing.st et ST_Encoder_Calib.st NON
+    modifies. DEUX REVUES INDEPENDANTES read-only : (1) NON en l etat (2 MAJOR + 9 MINOR) ; (2) OUI (1 MAJOR + 4 MINOR). Les
+    3 MAJOR CORRIGES : garde keyee sur l ordre reellement emis (elle se consommait hors MAINT_N2 ou aucun ordre n est emis)
+    ; garde HX3 desormais testee (H210/H211) et declaree dans must_survive ; entree de l etape verrouillee EXIGEANT un capteur
+    haut INACTIF (un capteur deja actif permettait une capture sans franchissement = datum faux). PREUVES FINALES : CI 21
+    tests / 19 PASS / 2 FAIL (H010/H090 PREEXISTANTS, identiques a l archive 13/09 : 8/6/2 ; cause BootReady jamais pilote)
+    dont 13/13 nouveaux TC-P09-H200..H212 PASS ; G511 PASS + --selftest PASS (8 mutations rejetees) ; G200 --report PASS (0
+    erreur, 2025 instances) ; bundle frais 259/259 objets 0 erreur + diff bundle 4 objets ; palier C 43/48 PASS avec EXACTEMENT
+    les 5 dettes preexistantes G300/G340/G408/G430/G483 (aucun fichier du lot signale). Persistants : AUCUN ajout. IHM : aucune
+    commande ni champ nouveau. Aucun commit.'
+  completed_at: '2026-11-06T23:12:27+01:00'
 - id: T339
   parent_id: ''
   statut: ⬜
@@ -4909,7 +4955,7 @@ tasks:
   criticite: C2
   domaine: CYCLE_AUTO_BENNE
   agent: —
-  date: '2026-09-19T00:00:00+02:00'
+  date: '2026-11-06T22:55:07+01:00'
   updated_at: '2026-09-19T00:00:00+02:00'
   titre: Regulariser et renumeroter les steps speciaux hors GEL (AX3_WAIT_DIVE_START, AX10B_RACCORDEMENT_P1)
   contexte: 'Analyse trace Suivi_62_SIMU_AX10_AX11 (troubleshooting 2026-09-19) : AX10B_RACCORDEMENT_P1 (implemente par T262,
@@ -4935,6 +4981,7 @@ tasks:
   contrat: ''
   bloque_par:
   - T262
+  avancement: 'Lien T428 : la vue evolue ici avec la renumerotation des etapes.'
 - id: T323
   parent_id: ''
   statut: ⬜
@@ -5114,14 +5161,14 @@ tasks:
   date: '2026-09-18T13:45:44'
   bloque_par: []
 - id: T313
-  parent_id: ''
+  parent_id: T428
   statut: ⬜
   criticite: C2
   domaine: DIAGNOSTIC / GVL_TROUBLESHOOTING
   agent: —
-  date: '2026-09-17T10:06:00+02:00'
-  avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO : demande de réorganisation chronologique du GVL de troubleshooting
-    pour exploitation rapide en maintenance.'
+  date: '2026-11-06T22:55:07+01:00'
+  avancement: 'Rattachee a T428. Cadré le 2026-09-17 suite point de situation mail YGO : demande de réorganisation chronologique
+    du GVL de troubleshooting pour exploitation rapide en maintenance.'
   titre: GVL Troubleshooting — refactor présentation chronologique pour diagnostic rapide en maintenance
   contexte: 'Mail YGO 2026-09-15 : "refactorer la présentation des informations pour qu''elle soit chronologique et directement
     exploitable en maintenance : comprendre rapidement pourquoi un moteur est bloqué, sans devoir parcourir le code." La structure
@@ -6377,12 +6424,12 @@ tasks:
   date: '2026-09-22T08:04:25'
   bloque_par: []
 - id: T213
-  parent_id: ''
+  parent_id: T428
   statut: ⬜
   criticite: C2
   domaine: OUTILLAGE
   agent: —
-  date: '2026-09-01T00:00:00+02:00'
+  date: '2026-11-06T22:55:07+01:00'
   titre: Refactorer le troubleshooting — ajouter les variables de homing M2 (cible dynamique, offset benne)
   contexte: 'Demande utilisateur (2026-09-01) : le snapshot troubleshooting ne contient pas les variables détaillées du homing
     (MachineHomingMechanicalStopOk, BucketReferenceRequested, UseDynamicTarget, DynamicHomingTargetM, M2Demand, etc.). Pour
@@ -6400,6 +6447,7 @@ tasks:
   - Permettre le diagnostic du homing M2 benne fermée (cible dynamique, offset)
   - Valider avec l'humain avant compilation
   bloque_par: []
+  avancement: 'Rattachee a T428 : diagnostic seulement, la logique homing reste a T377.'
 - id: T214
   parent_id: ''
   statut: ✅
@@ -6502,7 +6550,7 @@ tasks:
   criticite: C2
   domaine: IHM / DIAGNOSTIC
   agent: —
-  date: '2026-09-01T00:00:00'
+  date: '2026-11-06T22:55:07+01:00'
   titre: Historique d'alarmes (buffer borné + horodatage), en complément du bandeau d'alarmes actives
   contexte: 'Le bandeau d''alarmes actives ne montre que l''état courant. Besoin d''un historique (buffer FIFO borné, horodatage,
     acquittement) pour comprendre les incidents passés, notamment la raison d''un blocage.
@@ -6516,6 +6564,7 @@ tasks:
   - Bundle frais + G200 PASS + gates PASS
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T219_HISTORIQUE_ALARMES.yaml
   bloque_par: []
+  avancement: 'Lien T428 : historique d''alarmes, utile au probleme du moment de capture.'
 - id: T220
   parent_id: ''
   statut: ⬜
@@ -6633,52 +6682,52 @@ tasks:
     commande emise + interlock aval qui refuse (scope T224 original), (2) commande jamais formee car bloquee en amont par
     D18 (Defauts A/B T325). Les deux meritent d''etre couvertes, mais pas comme un seul et meme defaut.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T224_ARMINGPERMIT_ACTIONNEUR_PRET.yaml
-  date: '2026-09-17T22:01:35'
+  date: '2026-11-06T22:55:07+01:00'
   bloque_par: []
-  avancement: '[ORCHESTRATEUR DSH01 2026-09-21T10:54 — BRIEF V1 CHALLENGE AVANT TRANSMISSION, PERIMETRE CORRIGE, GO HUMAIN
-    : DIAGNOSTIC SEUL (Etape A), LECTURE SEULE CODE/]. Corrige au passage : statut etait VIDE, domaine VIDE, agent CC01 sans
-    locked_at. BRIEF V2 TRANSMIS A UN SOUS-AGENT (tag DSH28) : DOC/WFLOW/CONTRACTS/BRIEF_T224_ARMINGPERMIT_COHERENT_v2_TRANSMISSION.md,
-    preambule TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md COLLE EN TETE DU PROMPT. Le brief v1 affirmait que T224 navait
-    JAMAIS ete travaillee (aucun code, aucune analyse) : REFUTE sur pieces — le code est A HEAD depuis le commit 38a3ab3f
-    du 2026-09-02 (PRG_04_Treuils_Benne.st:1157-1214 : ArmingPermit l.1205-1206, dispos par axe et sens l.1164-1173 ; DUT
-    ST_ArmingAvailability.st et E_ArmingBlockReason.st CREES ; champ publie ST_WinchInterPrg.st:80), et le contrat C4 existe
-    avec ses arbitrages deja tranches (forme=X l.67, reprise=B l.66). Seul le statut vide etait exact. 3 TROUS REELS A CARTOGRAPHIER
-    PUIS A ARBITRER : G1 = tempos idle de la barriere finale NON couverts (voie (a) retenue par defaut, contrat l.69-79 ;
-    PRG_04:1164-1173 sans terme tempo) ; G2 = Data.ArmingAvailability ecrit par PRG_04:1208-1214 et LU PAR PERSONNE (grep
-    CODE/ = PRG_04 + DUT + ST_WinchInterPrg.st:80 seuls ; PRG_07_Supervision.st:804 ne miroir que le booleen ; ST_PermitVisibilityHMI.st
-    sans champ de disponibilite ni de motif) alors que cest le coeur de la demande client GCAM ; G3 = T228 (cloture de G1)
-    implemente en 6 commits puis INTEGRALEMENT ANNULE par le revert 263fae18 pour regression banc (FB de SECURITE touche),
-    desormais catalogue comme SOUS-TACHE T228 avec son contrat regularise. RISQUE MAJEUR IDENTIFIE ET BORNE : ne pas rejouer
-    T228 a l identique (patch de FB de SECURITE + chemin rapide NoMovement sur DI potentiellement fige). LIVRABLE ATTENDU
-    : DOC/WFLOW/AUDITS/DESIGN/DIAGNOSTIC_T224_ARMINGPERMIT_AAAAMMJJ.md — une ligne par condition susceptible de produire commande
-    sans mouvement ou arme sans mouvement, avec preuve fichier:ligne, famille (1 = T224 aval / 2 = T325 amont D18 / 3 = autre,
-    nommee), couverture par ArmMxAvail, etat concerne (pause volontaire vs SafeStop vs PowerCutOff, sans en masquer un par
-    un autre) et risque de desarmement abusif dun axe reellement disponible. AUCUN CODE avant arbitrage humain explicite (Etape
-    B). AUCUN COMMIT. [MAJ ORCHESTRATEUR DSH01 2026-09-21T12:30 — PHASE DIAGNOSTIC LIVREE ET VERIFIEE, PERIMETRE CORRECTIF
-    TOUJOURS NON TRANCHE] Livrables : DOC/WFLOW/AUDITS/DESIGN/DIAGNOSTIC_T224_ARMINGPERMIT_20260921.md (99 525 octets, 836
-    lignes, 47 conditions cartographiees : famille 1 = 19, famille 2 = 5, famille 3 = 23, non prouve = 1, 15 alertes) + DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_T224_ARMINGPERMIT_10MS.md
-    (54 726 octets, 610 lignes, 172 canaux, 4 scenarios dont un blocage DANS la fenetre de reference pour prouver C43-bis)
-    + DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T325_D18_INTERLOCK_DIRECTION_v1.0.md corrige en AJOUT SEUL (git diff --numstat = 97
-    insertions / 0 suppression). L orchestreur a rejoue en PREMIERE MAIN les affirmations portantes : trace Suivi_67 (ArmingPermit=1
-    sur 861/861, ArmingPermitDenied=0/861, 368 echantillons en 13 runs contigus, plus long 10 356 ms) ; AL-03 (Defaut 2 du
-    CADRAGE_T325 CORRIGE a HEAD, commit 657be973) ; AL-01 (AF-08:384 documente le lot REVERTE : terme tempo par c9665355/e2f5b9dc,
-    environ 1,5 s par 72ce5eec:227, bypass groupe par 44187804, prouve par git log -S) ; AL-13 (bypass de la l.89 implemente
-    en 44187804 puis RETIRE par b96a8988, verifie sur les 2 revisions) ; AL-15 (FB_SimBench.st:448-450 et :473-475 : tout
-    terme gate par un DI force au banc echappe mecaniquement aux 21 gates, prevision d un test de banc exigee) ; C12/C13 (permis
-    APPLIQUE M2 ignore par l armement + TraceM2.FinalPermitBlocked faux) ; C18 (M3_PosTremie_DI absent de l armement) ; FB_Winch.st:169-171
-    (masquage de la famille 1). ARBITRAGES HUMAINS RENDUS : (1) AUCUN lot correctif ouvert avant la trace, motif cite : ne
-    pas trancher du C4 sur des documents faux ou non prouves, la trace terrain est le seul moyen de verifier ; (2) T371 (faux
-    vert de ST_MotionChecklist) cree en tache C4 DEDIEE par un autre acteur a 12:00, non dupliquee ; (3) BORNE DE CONTRAT
-    : sur FB_WinchOutputInterlock.st, PUBLICATION D ETAT SEULE autorisee, logique d interlock et de securite INTERDITE, non-regression
-    obligatoire sur les 4 Reason existants. PROCHAINE ETAPE : l humain joue la trace 10 ms (action T224-TRACE-10MS-A-JOUER
-    au registre), puis Etape B sur PREUVE.'
+  avancement: 'Lien T428 : la publication axe, sens et raison reste ici car elle depend d''ArmingPermit. [ORCHESTRATEUR DSH01
+    2026-09-21T10:54 — BRIEF V1 CHALLENGE AVANT TRANSMISSION, PERIMETRE CORRIGE, GO HUMAIN : DIAGNOSTIC SEUL (Etape A), LECTURE
+    SEULE CODE/]. Corrige au passage : statut etait VIDE, domaine VIDE, agent CC01 sans locked_at. BRIEF V2 TRANSMIS A UN
+    SOUS-AGENT (tag DSH28) : DOC/WFLOW/CONTRACTS/BRIEF_T224_ARMINGPERMIT_COHERENT_v2_TRANSMISSION.md, preambule TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md
+    COLLE EN TETE DU PROMPT. Le brief v1 affirmait que T224 navait JAMAIS ete travaillee (aucun code, aucune analyse) : REFUTE
+    sur pieces — le code est A HEAD depuis le commit 38a3ab3f du 2026-09-02 (PRG_04_Treuils_Benne.st:1157-1214 : ArmingPermit
+    l.1205-1206, dispos par axe et sens l.1164-1173 ; DUT ST_ArmingAvailability.st et E_ArmingBlockReason.st CREES ; champ
+    publie ST_WinchInterPrg.st:80), et le contrat C4 existe avec ses arbitrages deja tranches (forme=X l.67, reprise=B l.66).
+    Seul le statut vide etait exact. 3 TROUS REELS A CARTOGRAPHIER PUIS A ARBITRER : G1 = tempos idle de la barriere finale
+    NON couverts (voie (a) retenue par defaut, contrat l.69-79 ; PRG_04:1164-1173 sans terme tempo) ; G2 = Data.ArmingAvailability
+    ecrit par PRG_04:1208-1214 et LU PAR PERSONNE (grep CODE/ = PRG_04 + DUT + ST_WinchInterPrg.st:80 seuls ; PRG_07_Supervision.st:804
+    ne miroir que le booleen ; ST_PermitVisibilityHMI.st sans champ de disponibilite ni de motif) alors que cest le coeur
+    de la demande client GCAM ; G3 = T228 (cloture de G1) implemente en 6 commits puis INTEGRALEMENT ANNULE par le revert
+    263fae18 pour regression banc (FB de SECURITE touche), desormais catalogue comme SOUS-TACHE T228 avec son contrat regularise.
+    RISQUE MAJEUR IDENTIFIE ET BORNE : ne pas rejouer T228 a l identique (patch de FB de SECURITE + chemin rapide NoMovement
+    sur DI potentiellement fige). LIVRABLE ATTENDU : DOC/WFLOW/AUDITS/DESIGN/DIAGNOSTIC_T224_ARMINGPERMIT_AAAAMMJJ.md — une
+    ligne par condition susceptible de produire commande sans mouvement ou arme sans mouvement, avec preuve fichier:ligne,
+    famille (1 = T224 aval / 2 = T325 amont D18 / 3 = autre, nommee), couverture par ArmMxAvail, etat concerne (pause volontaire
+    vs SafeStop vs PowerCutOff, sans en masquer un par un autre) et risque de desarmement abusif dun axe reellement disponible.
+    AUCUN CODE avant arbitrage humain explicite (Etape B). AUCUN COMMIT. [MAJ ORCHESTRATEUR DSH01 2026-09-21T12:30 — PHASE
+    DIAGNOSTIC LIVREE ET VERIFIEE, PERIMETRE CORRECTIF TOUJOURS NON TRANCHE] Livrables : DOC/WFLOW/AUDITS/DESIGN/DIAGNOSTIC_T224_ARMINGPERMIT_20260921.md
+    (99 525 octets, 836 lignes, 47 conditions cartographiees : famille 1 = 19, famille 2 = 5, famille 3 = 23, non prouve =
+    1, 15 alertes) + DOC/WFLOW/CONTRACTS/PROCEDURE_TRACE_T224_ARMINGPERMIT_10MS.md (54 726 octets, 610 lignes, 172 canaux,
+    4 scenarios dont un blocage DANS la fenetre de reference pour prouver C43-bis) + DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T325_D18_INTERLOCK_DIRECTION_v1.0.md
+    corrige en AJOUT SEUL (git diff --numstat = 97 insertions / 0 suppression). L orchestreur a rejoue en PREMIERE MAIN les
+    affirmations portantes : trace Suivi_67 (ArmingPermit=1 sur 861/861, ArmingPermitDenied=0/861, 368 echantillons en 13
+    runs contigus, plus long 10 356 ms) ; AL-03 (Defaut 2 du CADRAGE_T325 CORRIGE a HEAD, commit 657be973) ; AL-01 (AF-08:384
+    documente le lot REVERTE : terme tempo par c9665355/e2f5b9dc, environ 1,5 s par 72ce5eec:227, bypass groupe par 44187804,
+    prouve par git log -S) ; AL-13 (bypass de la l.89 implemente en 44187804 puis RETIRE par b96a8988, verifie sur les 2 revisions)
+    ; AL-15 (FB_SimBench.st:448-450 et :473-475 : tout terme gate par un DI force au banc echappe mecaniquement aux 21 gates,
+    prevision d un test de banc exigee) ; C12/C13 (permis APPLIQUE M2 ignore par l armement + TraceM2.FinalPermitBlocked faux)
+    ; C18 (M3_PosTremie_DI absent de l armement) ; FB_Winch.st:169-171 (masquage de la famille 1). ARBITRAGES HUMAINS RENDUS
+    : (1) AUCUN lot correctif ouvert avant la trace, motif cite : ne pas trancher du C4 sur des documents faux ou non prouves,
+    la trace terrain est le seul moyen de verifier ; (2) T371 (faux vert de ST_MotionChecklist) cree en tache C4 DEDIEE par
+    un autre acteur a 12:00, non dupliquee ; (3) BORNE DE CONTRAT : sur FB_WinchOutputInterlock.st, PUBLICATION D ETAT SEULE
+    autorisee, logique d interlock et de securite INTERDITE, non-regression obligatoire sur les 4 Reason existants. PROCHAINE
+    ETAPE : l humain joue la trace 10 ms (action T224-TRACE-10MS-A-JOUER au registre), puis Etape B sur PREUVE.'
 - id: T225
   parent_id: ''
   statut: ⬜
   criticite: C3
   domaine: TREUILS M1/M2 / CONCORDANCE CONTACTEURS
   agent: —
-  date: '2026-09-02T13:45:00+02:00'
+  date: '2026-11-06T22:55:07+01:00'
   titre: Concordance contacteurs M1/M2 graduee (SafeStop -> escalade PowerCutOff) en PRG_06
   contexte: '§2ter (PRG_06) met INSTANTANEMENT toutes les sorties treuil a FALSE des qu''un ecart de vecteur M1/M2 est vu
     : aucune tolerance ms, pas de gradation, aucune remontee decodee. FB_SyncContactor existe (debounce 500 ms -> SafeStop
@@ -6704,6 +6753,7 @@ tasks:
   bloque_par:
   - Arbitrage humain (design safety, lot MES-035): chemin forcage SafeStop depuis PRG_06, cablage escalade -> PowerCutOff,
       forme du champ diagnostic
+  avancement: 'Lien T428 : la remontee d''info reste ici car elle depend de la logique contacteurs.'
 - id: T226
   parent_id: ''
   statut: ⬜
@@ -6823,7 +6873,7 @@ tasks:
   criticite: C1
   domaine: OUTILLAGE / TEST_AUTO_CI
   agent: —
-  date: '2026-09-03T01:25:00+02:00'
+  date: '2026-11-06T22:55:07+01:00'
   titre: Assainissement compilation des harnais STruCpp et types résiduels (WINCH_INTEG, FB_Bucket, FB_TroubleshootingView)
   contexte: 'La suite de tests automatiques CI (run_tests.py) relève 3 blocs/harnais non compilés ou en échec de types STruCpp
     lors de la conversion C++ : WINCH_INTEG, FB_Bucket et FB_TroubleshootingView. Le code de production CODE/ reste la source
@@ -6844,6 +6894,7 @@ tasks:
   - Maintenir 100% de conformité de index.html et des rapports CI
   contrat: ''
   bloque_par: []
+  avancement: 'Lien T428 : la compilation du test de la vue passe dans T428, le reste ici.'
 - id: T232
   parent_id: ''
   statut: ⬜

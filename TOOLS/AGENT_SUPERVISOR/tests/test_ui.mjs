@@ -107,8 +107,21 @@ for(const [platform,id] of [['agy','agy_abc-123'],['claude','abc_123-DEF'],['cod
   assert.equal(document.getElementById('native-id').value,id==='inconnu'?'':id);
 }
 snapshot.sessions=[{id:'s1',platform:'claude',native_id:'session-a',alias:'A',state:'active',mission:'Mission A',alerts:[],chat_messages:[],judge_request:null}];
+snapshot.collector={sessions_enabled:1,messages_seen:2,cycles:7,sessions_unavailable:0,last_cycle_at:'2026-11-06T10:00:00Z'};
+snapshot.poll_interval_seconds=8;
 sandbox.snapshot=snapshot;
 vm.runInContext('render(snapshot)',ctx);
+const collectorStep=document.querySelector('[data-flow-node="collector"]');
+collectorStep.dispatchEvent(new window.Event('click',{bubbles:true,cancelable:true}));await tick();
+assert.equal(document.getElementById('flow-details').hasAttribute('open'),true,'selecting a flow node opens its compact details');
+assert.match(document.getElementById('flow-detail-content').textContent,/1 session/);
+assert.match(document.getElementById('flow-detail-content').textContent,/cycles : 7/);
+assert.equal(collectorStep.getAttribute('aria-pressed'),'true','selected flow node is accessible');
+const judgeStep=document.querySelector('[data-flow-node="judge"]');
+judgeStep.dispatchEvent(new window.Event('focusin',{bubbles:true}));await tick();
+assert.match(document.getElementById('flow-detail-content').textContent,/[Uu]n seul juge partag/);
+assert.match(document.getElementById('flow-detail-content').textContent,/Challenge A\/B/);
+assert.equal(judgeStep.getAttribute('aria-pressed'),'true','keyboard focus updates the active flow details');
 const originalCard=document.querySelector('#sessions article');
 const collapsible=Array.from(originalCard.querySelectorAll('details'));
 assert.equal(collapsible.length,4);assert.ok(collapsible.every(item=>!item.open),'judge context, history, chat and alerts begin collapsed');

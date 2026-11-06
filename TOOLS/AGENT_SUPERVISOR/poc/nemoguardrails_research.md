@@ -4,7 +4,7 @@
 
 ## 🎯 Besoin Veilleur
 
-Veilleur suit une conversation CLI choisie explicitement par `/connect-session`, conserve une mission par session et remonte des alertes consultatives avec citation. Le premier cas d'usage est la détection d'anomalies de travail : pivot utilisateur ignoré, répétition malgré recadrage, action hors permissions ou résultat annoncé sans preuve.
+Veilleur suit une conversation CLI choisie explicitement par `/connect-session-supervisor`, conserve une mission par session et remonte des alertes consultatives avec citation. Le premier cas d'usage est la détection d'anomalies de travail : pivot utilisateur ignoré, répétition malgré recadrage, action hors permissions ou résultat annoncé sans preuve.
 
 NeMo Guardrails est une bibliothèque d'orchestration de contrôles autour d'appels LLM. Elle ne collecte pas à elle seule les transcripts de Claude Code, Codex ou Antigravity. L'adaptateur/collecteur Veilleur reste nécessaire. NeMo peut ensuite recevoir les nouveaux messages et leur contexte, appliquer des rails et renvoyer un résultat structuré.
 

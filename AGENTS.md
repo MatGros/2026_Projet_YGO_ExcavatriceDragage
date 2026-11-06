@@ -30,6 +30,14 @@ Règle canonique des rôles et droits d'écriture :
 `TOOLS/AGENT_WORKFLOW/skills/task-planner/SKILL.md`. Le Task Manager partagé reste l'unique suivi ;
 ne pas créer de fichier local ou de script de prise de tâche parallèle.
 
+### Rattacher une conversation au Veilleur
+
+Dans Claude Code, Antigravity ou DSH, lancer `/connect-session-supervisor` depuis la conversation
+courante. La skill demande une tâche formelle vérifiable, ou une confirmation explicite avant un
+suivi sans tâche. Elle n'envoie rien à l'agent surveillé. Après un ajout ou renommage de la skill,
+recharger ou relancer le CLI concerné pour actualiser son catalogue. Détails et limites :
+[`TOOLS/AGENT_SUPERVISOR/README.md`](TOOLS/AGENT_SUPERVISOR/README.md).
+
 ---
 
 ## 🎯 Avant de coder — lire dans cet ordre
