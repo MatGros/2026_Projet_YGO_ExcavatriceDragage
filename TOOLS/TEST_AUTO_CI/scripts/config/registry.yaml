@@ -667,6 +667,7 @@ FB_TroubleshootingView:
   domain: J_SUPERVISION
   af_doc: DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md
   sources:
+  - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_RunningHoursHMI.st
   - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
   - CODE/B_AU_SECURITE/GVL_Safety_Emergency.st
   - TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st

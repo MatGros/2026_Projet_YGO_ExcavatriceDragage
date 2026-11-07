@@ -49,16 +49,10 @@ END_TEST
 
 TEST 'TC-P14-TSV-03 Champs TBD publies a leur valeur d init (aucune mesure inventee)'
     (* Fiche §6/§7 : un champ sans producteur reel reste a sa valeur d initialisation,
-       jamais recalculé. On verifie les 4 champs TBD documentes. *)
+       jamais recalculé. On verifie le champ TBD documente. *)
     FB(Enable := TRUE);
     ASSERT_FALSE(GVL_Troubleshooting.A_ContexteMachineGlobal.Idx203_BypassSensorsGlobal,
                  'Idx203_BypassSensorsGlobal = FALSE (TBD non cable)');
-    ASSERT_FALSE(GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI,
-                 'Idx307_SlackCablePhysical_DI = FALSE (TBD)');
-    ASSERT_FALSE(GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ,
-                 'Idx501_M2_CmdRev_DQ = FALSE (TBD)');
-    ASSERT_EQ(GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz, 0,
-             'Idx502_CmdDriveFreq_Hz = 0 (TBD)');
 END_TEST
 
 TEST 'TC-P14-TSV-04 Instance unique appelee dans PRG_07_Supervision (G200) (essai d architecture - validation partielle boite noire)'
@@ -317,4 +311,80 @@ TEST 'TC-P14-TSV-17 Vert nominal M2 et M3 -> Step8 VERT (pas de faux rouge sur l
                 'M3 nominal (pas de defaut) -> Step8 = TRUE');
     ASSERT_EQ(GVL_Troubleshooting.P_MotionM3.Step8_InterlockState, E_WinchFinalInterlockState.READY,
               'M3 : E_State.READY projete sur le vocabulaire commun (READY)');
+END_TEST
+
+TEST 'TC-P14-TSV-18 Step2 vrai dans tout mode actif, faux en DISABLE, sur les 3 axes'
+    FB.Auth.Mode := E_Mode.SEMI_AUTO;
+    FB(Enable := TRUE);
+    ASSERT_TRUE(GVL_Troubleshooting.N_MotionM1.Step2_ModeAuthorized, 'N SEMI_AUTO -> TRUE');
+    ASSERT_TRUE(GVL_Troubleshooting.O_MotionM2.Step2_ModeAuthorized, 'O SEMI_AUTO -> TRUE');
+    ASSERT_TRUE(GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized, 'P SEMI_AUTO -> TRUE');
+    FB.Auth.Mode := E_Mode.MAINT_N1;
+    FB(Enable := TRUE);
+    ASSERT_TRUE(GVL_Troubleshooting.N_MotionM1.Step2_ModeAuthorized, 'N MAINT_N1 -> TRUE');
+    FB.Auth.Mode := E_Mode.MAINT_N2;
+    FB(Enable := TRUE);
+    ASSERT_TRUE(GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized, 'P MAINT_N2 -> TRUE');
+    FB.Auth.Mode := E_Mode.DISABLE;
+    FB(Enable := TRUE);
+    ASSERT_FALSE(GVL_Troubleshooting.N_MotionM1.Step2_ModeAuthorized, 'N DISABLE -> FALSE');
+    ASSERT_FALSE(GVL_Troubleshooting.O_MotionM2.Step2_ModeAuthorized, 'O DISABLE -> FALSE');
+    ASSERT_FALSE(GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized, 'P DISABLE -> FALSE');
+END_TEST
+
+TEST 'TC-P14-TSV-19 Sorties : demande sans ordre final -> sortie FALSE, demande toujours lisible'
+    FB.WinchM1.State.RelayFwd   := TRUE;
+    FB.WinchM1.State.Contactor1 := TRUE;
+    FB.WinchM1.State.Contactor4 := TRUE;
+    FB.Outputs.M1RelayFwd        := FALSE;
+    FB.Outputs.M1SpeedContactor1 := FALSE;
+    FB.Outputs.M1SpeedContactor4 := FALSE;
+    FB(Enable := TRUE);
+    ASSERT_FALSE(GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ, 'I.Idx501 suit l ordre final');
+    ASSERT_FALSE(GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ, 'I.Idx503 suit l ordre final');
+    ASSERT_FALSE(GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ, 'I.Idx504 suit l ordre final');
+    ASSERT_FALSE(GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx501_M1_CmdRelayFwd_DQ, 'H.Idx501 suit l ordre final');
+    ASSERT_FALSE(GVL_Troubleshooting.N_MotionM1.RelayFwdActive, 'N.RelayFwdActive suit l ordre final');
+    ASSERT_FALSE(GVL_Troubleshooting.N_MotionM1.SpeedContactor1Active, 'N.SpeedContactor1Active suit l ordre final');
+    ASSERT_EQ(GVL_Troubleshooting.N_MotionM1.RequestedDirection, 1, 'la demande reste lisible');
+
+    FB.Outputs.M1RelayFwd := TRUE;
+    FB.Outputs.M2RelayRev := TRUE;
+    FB(Enable := TRUE);
+    ASSERT_TRUE(GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ, 'ordre final M1 present');
+    ASSERT_TRUE(GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_RQ, 'ordre final M2 present');
+    ASSERT_TRUE(GVL_Troubleshooting.O_MotionM2.RelayRevActive, 'O.RelayRevActive suit l ordre final');
+    ASSERT_TRUE(GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ, 'K.Idx501 suit le relais descente M2');
+END_TEST
+
+TEST 'TC-P14-TSV-20 Butee haute : lit le fait applique, avec decalage benne et bypass'
+    FB.CfgTopLimitM                        := 7.5;
+    FB.WinchM2.State.Position_M            := 21.0;
+    FB.WinchM2.Safety.CableLimitAscent     := FALSE;
+    FB(Enable := TRUE);
+    ASSERT_FALSE(GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx323_TopLimitReached, 'M2 21 m sous butee decalee -> FALSE');
+    ASSERT_FALSE(GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx324_AscentBlockedByTopLimit, 'pas de blocage');
+
+    FB.WinchM1.Safety.CableLimitAscent := TRUE;
+    FB(Enable := TRUE);
+    ASSERT_TRUE(GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx323_TopLimitReached, 'butee M1 atteinte');
+    ASSERT_TRUE(GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx324_AscentBlockedByTopLimit, 'blocage sans bypass');
+
+    FB.WinchM1.Bypass.TopLimitSoftware := TRUE;
+    FB(Enable := TRUE);
+    ASSERT_TRUE(GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx323_TopLimitReached, 'le fait reste vrai');
+    ASSERT_FALSE(GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx324_AscentBlockedByTopLimit, 'bypass -> pas de blocage');
+END_TEST
+
+TEST 'TC-P14-TSV-21 Coupure, consigne variateur et capteur mou lisent leur vraie source'
+    FB.Outputs.PowerCutOffRequest := TRUE;
+    FB.PowerCutOffActive          := FALSE;
+    FB.CmdM3DriveFreqWord         := 5000;
+    FB.HwIn.Winch.M2_TensionedCable_DI := FALSE;
+    FB(Enable := TRUE);
+    ASSERT_TRUE(GVL_Troubleshooting.C_Safety.PowerCutOffRequest, 'requete distincte de l etat actif');
+    ASSERT_FALSE(GVL_Troubleshooting.C_Safety.PowerCutOffActive, 'etat actif inchange');
+    ASSERT_EQ(GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz, 5000, '50,00 Hz');
+    ASSERT_TRUE(GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI, 'I.Idx307 = cable mou');
+    ASSERT_TRUE(GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI, 'J.Idx307 = meme signal');
 END_TEST

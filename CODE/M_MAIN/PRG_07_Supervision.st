@@ -943,6 +943,8 @@ instTroubleshootingView(
     ArmingPulseActive    := PRG_06_Outputs.Data.EmergencyArmingCmd,
     MaintainAActive      := PRG_06_Outputs.Data.PowerKeepAliveACmd,
     MaintainBActive      := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
+    Outputs              := PRG_06_Outputs.Data,
+    CmdM3DriveFreqWord   := M3_SetpointFrequencyHz,
     CycleReady           := PRG_03_Modes_Cycle.Data.SequenceState.Ready,
     CycleDone            := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done,
     CycleError           := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error,

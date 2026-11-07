@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T12:50:51.389672" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T12:50:51.389672">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-07T02:58:32.579167" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-07T02:58:32.579167">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -878,6 +878,234 @@ M1 : contacteurs retombés</xhtml>
    📡 ST_NetworkDiagHMI — Données d'échange IHM pour les diagnostics réseau
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des diagnostics CANopen et EtherCAT.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_OutputsInterPrg">
+        <baseType>
+          <struct>
+            <variable name="M1RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🪝 Ordres actionneurs finaux treuil M1 ===
+🛗 Ordre contacteur montee treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Ordre contacteur descente treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 1 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 2 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 3 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 4 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Ordre desserrage frein M1 (1=Desserrer)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1AscentStartReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 disponible pour le transfert AX10B (barriere finale purgee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🪝 Ordres actionneurs finaux treuil M2 ===
+🛗 Ordre contacteur montee/fermeture treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Ordre contacteur descente/ouverture treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 1 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 2 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 3 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 4 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Ordre desserrage frein M2 (1=Desserrer)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🔀 Concordance contacteurs M1/M2 (instance FB_SyncContactor sur vecteurs finaux) ===
+Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorMismatchEscalated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Niveau 2 persistant → escalade PowerCutOff via latch MecaE (PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncContactorDiag">
+              <type>
+                <derived name="ST_SyncContactorDiag" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détail : quel contacteur diverge + niveau atteint (IHM / troubleshooting)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationBrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ↔️ Ordre actionneur final translation M3 ===
+🔓 Demande frein M3 arbitree</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3CommandWordActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Mot de commande variateur M3 non nul (marche reelle demandee, hors reset AC600) — compteur horaire</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAliveACmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚨 Chaîne réarmement puissance AU ===
+🔒 Maintien puissance voie A (1=Maintenu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAliveBCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Maintien puissance voie B (1=Maintenu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Impulsion rearmement puissance AU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestCutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Test de redondance AU en cours (canal A ou B coupe) — consommé par FB_SimBench</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Requête coupure métier (arrêt d'urgence) — consommé par FB_SimBench</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ad92990b-f67b-5e7c-903a-3396ec929922</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📤 ST_OutputsInterPrg — Bus d'échange inter-PRG produit par PRG_06_Outputs
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les ordres actionneurs finaux (M1/M2/M3, AU) produits
+      par PRG_06_Outputs et rebouclés par FB_SimBench (instancié dans
+      PRG_02_Acquisition) pour le banc de simulation intégré.
+   📤 Producteur unique : PRG_06_Outputs (VAR_OUTPUT Data : ST_OutputsInterPrg).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §5
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3141,6 +3369,85 @@ fournie par la configuration persistante de l'appelant.
       TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
    🔗 Producteur : PRG_02_Acquisition (3 appels GetDeviceState()).
    ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SyncContactorDiag">
+        <baseType>
+          <struct>
+            <variable name="RelayFwdMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais montée M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRevMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais descente M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step1Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 1 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 2 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 3 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 4 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MismatchLevel">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = aucun · 1 = discordance confirmée (SafeStop) · 2 = escalade (PowerCutOff)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e71417df-d1db-5140-ade6-a84ec0d571c8</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔀 ST_SyncContactorDiag — Diagnostic discordance contacteurs M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : dire EN CLAIR quel contacteur diverge entre M1 et M2 et à quel
+      niveau on est (aucun / mismatch confirmé / escalade). Consommé par le
+      bandeau IHM et le troubleshooting pour répondre « pourquoi ça bloque ».
+   🔒 Bits nommés (pas de masque hexa, AF03 §4). Plusieurs bits peuvent être
+      TRUE simultanément (toutes les divergences détectées).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="E_WinchTraceBlockReason">
@@ -7291,6 +7598,23 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Maintien canal B</xhtml>
               </documentation>
             </variable>
+            <variable name="Outputs">
+              <type>
+                <derived name="ST_OutputsInterPrg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📤 Ordres finaux produits par PRG_06_Outputs, après barrière et protecteurs
+--&gt; [CMD] Ordres actionneurs finaux</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdM3DriveFreqWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne finale variateur M3 [0.01 Hz]</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleReady">
               <type>
                 <BOOL />
@@ -7671,8 +7995,8 @@ GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx301_EmergencyChainClosed := HwIn.
 GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx302_SyncFaultActive := Sync.State.Error;
 GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx303_M1_AscentPermit := WinchM1.Safety.AscentPermit;
 GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx304_M2_AscentPermit := WinchM2.Safety.AscentPermit;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx501_M1_CmdRelayFwd_DQ := WinchM1.State.RelayFwd;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ := WinchM2.State.RelayFwd;
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx501_M1_CmdRelayFwd_DQ := Outputs.M1RelayFwd;
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ := Outputs.M2RelayFwd;
 // Idx201_JoyYRaw_Pct / Idx203_ArbitratedSpeed_Pct / Idx303-304_AscentPermit / Idx401_SyncMotionAllowed /
 // Idx402-403_SetpointSpeed : non câblés — fiche §5.2 "(reste) champs à revoir un par un", laissés à
 // leur valeur d'initialisation, pas de calcul inventé (fiche §7).
@@ -7706,7 +8030,7 @@ GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive := Wi
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive := Commun.SimTopSensorBypassActive;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx306_AscentPermitEffective := WinchM1.Safety.AscentPermit;
-GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI := FALSE; // TBD non câblé - voir fiche §6 (capteur mou de câble présent uniquement côté M2 dans ST_HwWinch)
+GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI := NOT HwIn.Winch.M2_TensionedCable_DI; // Capteur unique partagé, même signal que SlackCableDetected M1
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx309_DescendPermitEffective := WinchM1.Safety.DescendPermit;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx310_ErrorOperatorComm := WinchM1.Safety.ErrorOperatorComm;
@@ -7723,8 +8047,8 @@ GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx320_ErrorNoMovement   := Wi
 // ⛔ Bloc "limite haute" — pourquoi la montée ne s'arrête pas (M1)
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx321_CfgTopLimitM               := CfgTopLimitM;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx322_CablePosM                  := WinchM1.State.Position_M;
-GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx323_TopLimitReached            := (WinchM1.State.Position_M &gt;= CfgTopLimitM) AND NOT WinchM1.State.Encoder.HomingBusy;
-GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx324_AscentBlockedByTopLimit    := (WinchM1.State.Position_M &gt;= CfgTopLimitM) AND NOT WinchM1.State.Encoder.HomingBusy AND NOT (WinchM1.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
+GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx323_TopLimitReached            := WinchM1.Safety.CableLimitAscent;
+GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx324_AscentBlockedByTopLimit    := WinchM1.Safety.CableLimitAscent AND NOT (WinchM1.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx325_BypassTopLimitSoftware     := WinchM1.Bypass.TopLimitSoftware;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx326_BypassTopLimitSoftCommun   := Commun.Bypass.TopLimitSoftware;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx327_BypassTopLimitSwitch       := WinchM1.Bypass.TopLimitSwitch;
@@ -7751,10 +8075,10 @@ GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx416_RestartRequired := Win
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx417_RestartInhibit := WinchM1.State.FinalRestartInhibit;
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx418_NeutralRequestSeen := WinchM1.State.FinalNeutralRequestSeen;
 
-GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ := WinchM1.State.RelayFwd;
-GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_RQ := WinchM1.State.RelayRev;
-GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM1.State.Contactor1;
-GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM1.State.Contactor4;
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ := Outputs.M1RelayFwd;
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_RQ := Outputs.M1RelayRev;
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ := Outputs.M1SpeedContactor1;
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ := Outputs.M1SpeedContactor4;
 GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM1.State.BrakeCmd;
 
 // --- M2 (même patron, source WinchM2) ---
@@ -7802,8 +8126,8 @@ GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx320_ErrorNoMovement   := Wi
 // ⛔ Bloc "limite haute" — pourquoi la montée ne s'arrête pas (M2, sans M2_LimitShift ici)
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx321_CfgTopLimitM               := CfgTopLimitM;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx322_CablePosM                  := WinchM2.State.Position_M;
-GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx323_TopLimitReached            := (WinchM2.State.Position_M &gt;= CfgTopLimitM) AND NOT WinchM2.State.Encoder.HomingBusy;
-GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx324_AscentBlockedByTopLimit    := (WinchM2.State.Position_M &gt;= CfgTopLimitM) AND NOT WinchM2.State.Encoder.HomingBusy AND NOT (WinchM2.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
+GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx323_TopLimitReached            := WinchM2.Safety.CableLimitAscent;
+GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx324_AscentBlockedByTopLimit    := WinchM2.Safety.CableLimitAscent AND NOT (WinchM2.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx325_BypassTopLimitSoftware     := WinchM2.Bypass.TopLimitSoftware;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx326_BypassTopLimitSoftCommun   := Commun.Bypass.TopLimitSoftware;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx327_BypassTopLimitSwitch       := WinchM2.Bypass.TopLimitSwitch;
@@ -7830,10 +8154,10 @@ GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx416_RestartRequired := Win
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx417_RestartInhibit := WinchM2.State.FinalRestartInhibit;
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx418_NeutralRequestSeen := WinchM2.State.FinalNeutralRequestSeen;
 
-GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ := WinchM2.State.RelayFwd;
-GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_RQ := WinchM2.State.RelayRev;
-GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM2.State.Contactor1;
-GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM2.State.Contactor4;
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ := Outputs.M2RelayFwd;
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_RQ := Outputs.M2RelayRev;
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ := Outputs.M2SpeedContactor1;
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ := Outputs.M2SpeedContactor4;
 GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM2.State.BrakeCmd;
 
 {endregion}
@@ -7879,7 +8203,7 @@ GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx308_EffectivePermit_Close := Pe
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx403_ExtractionControlActive := WinchM2.Bucket.State.ExtractionControlActive;
-GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD non câblé - voir fiche §6 (pas de DQ relais benne dédié publié, benne pilote M2_StartStop/M2_Direction, pas un relais propre)
+GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := Outputs.M2RelayRev; // Ouverture benne = relais descente M2
 
 {endregion}
 
@@ -7937,7 +8261,7 @@ GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx406_BrakeCommandOpenConfi
 GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed := Translation.State.FinalBrakeTimeoutElapsed;
 
 GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord := Translation.State.DriveControlWord;
-GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz := 0; // TBD non câblé - voir fiche §6 (format UINT 0.01Hz non exposé, seul DriveFreqCmd_Hz en REAL Hz existe)
+GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz := WORD_TO_UINT(CmdM3DriveFreqWord); // Consigne finale transmise, unité 0.01 Hz
 GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ := Translation.State.BrakeCmd;
 
 {endregion}
@@ -8019,7 +8343,7 @@ GVL_Troubleshooting.C_Safety.ArmingBusy           := EmergencyState.ArmingBusy;
 GVL_Troubleshooting.C_Safety.LockoutActive        := EmergencyDiag.LockoutActive;
 GVL_Troubleshooting.C_Safety.PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
 GVL_Troubleshooting.C_Safety.PowerCutOffActive    := PowerCutOffActive;
-GVL_Troubleshooting.C_Safety.PowerCutOffRequest   := PowerCutOffActive;
+GVL_Troubleshooting.C_Safety.PowerCutOffRequest   := Outputs.PowerCutOffRequest;
 GVL_Troubleshooting.C_Safety.MaintainAActive      := MaintainAActive;
 GVL_Troubleshooting.C_Safety.MaintainBActive      := MaintainBActive;
 
@@ -8083,7 +8407,7 @@ GVL_Troubleshooting.N_MotionM1.HwIn_PowerContactorEngaged_DI := HwIn.Machine.Pow
 GVL_Troubleshooting.N_MotionM1.HwIn_BrakeIsOpen_DI      := HwIn.Winch.M1_BrakeIsOpen_DI;
 GVL_Troubleshooting.N_MotionM1.Cmd_BrakeRelease         := WinchM1.State.BrakeCmd;
 
-GVL_Troubleshooting.N_MotionM1.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.N_MotionM1.Step2_ModeAuthorized     := (Auth.Mode &lt;&gt; E_Mode.DISABLE);
 GVL_Troubleshooting.N_MotionM1.Step3_NotBusyOtherTask   := NOT WinchM1.State.Encoder.HomingBusy AND NOT (WinchM2.Bucket.State.FBState = E_State.BUSY);
 GVL_Troubleshooting.N_MotionM1.Step4_MotionRequested    := WinchM1.State.Busy OR (WinchM1.State.SpeedCmd_Pct &gt; 0.0);
 GVL_Troubleshooting.N_MotionM1.RequestedDirection       := SEL(WinchM1.State.RelayFwd, SEL(WinchM1.State.RelayRev, 0, -1), 1);
@@ -8132,9 +8456,9 @@ GVL_Troubleshooting.N_MotionM1.AllConditionsMet := GVL_Troubleshooting.N_MotionM
                                               AND GVL_Troubleshooting.N_MotionM1.Step7_BrakeReleased
                                               AND GVL_Troubleshooting.N_MotionM1.Step8_OutputInterlockOk;
 
-GVL_Troubleshooting.N_MotionM1.RelayFwdActive        := WinchM1.State.RelayFwd;
-GVL_Troubleshooting.N_MotionM1.RelayRevActive        := WinchM1.State.RelayRev;
-GVL_Troubleshooting.N_MotionM1.SpeedContactor1Active := WinchM1.State.Contactor1;
+GVL_Troubleshooting.N_MotionM1.RelayFwdActive        := Outputs.M1RelayFwd;
+GVL_Troubleshooting.N_MotionM1.RelayRevActive        := Outputs.M1RelayRev;
+GVL_Troubleshooting.N_MotionM1.SpeedContactor1Active := Outputs.M1SpeedContactor1;
 
 {endregion}
 
@@ -8145,7 +8469,7 @@ GVL_Troubleshooting.O_MotionM2.HwIn_PowerContactorEngaged_DI := HwIn.Machine.Pow
 GVL_Troubleshooting.O_MotionM2.HwIn_BrakeIsOpen_DI      := HwIn.Winch.M2_BrakeIsOpen_DI;
 GVL_Troubleshooting.O_MotionM2.Cmd_BrakeRelease         := WinchM2.State.BrakeCmd;
 
-GVL_Troubleshooting.O_MotionM2.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.O_MotionM2.Step2_ModeAuthorized     := (Auth.Mode &lt;&gt; E_Mode.DISABLE);
 GVL_Troubleshooting.O_MotionM2.Step3_NotBusyOtherTask   := NOT WinchM2.State.Encoder.HomingBusy;
 GVL_Troubleshooting.O_MotionM2.Step4_MotionRequested    := WinchM2.State.Busy OR (WinchM2.State.SpeedCmd_Pct &gt; 0.0);
 GVL_Troubleshooting.O_MotionM2.RequestedDirection       := SEL(WinchM2.State.RelayFwd, SEL(WinchM2.State.RelayRev, 0, -1), 1);
@@ -8175,9 +8499,9 @@ GVL_Troubleshooting.O_MotionM2.AllConditionsMet := GVL_Troubleshooting.O_MotionM
                                               AND GVL_Troubleshooting.O_MotionM2.Step7_BrakeReleased
                                               AND GVL_Troubleshooting.O_MotionM2.Step8_OutputInterlockOk;
 
-GVL_Troubleshooting.O_MotionM2.RelayFwdActive        := WinchM2.State.RelayFwd;
-GVL_Troubleshooting.O_MotionM2.RelayRevActive        := WinchM2.State.RelayRev;
-GVL_Troubleshooting.O_MotionM2.SpeedContactor1Active := WinchM2.State.Contactor1;
+GVL_Troubleshooting.O_MotionM2.RelayFwdActive        := Outputs.M2RelayFwd;
+GVL_Troubleshooting.O_MotionM2.RelayRevActive        := Outputs.M2RelayRev;
+GVL_Troubleshooting.O_MotionM2.SpeedContactor1Active := Outputs.M2SpeedContactor1;
 
 {endregion}
 
@@ -8188,7 +8512,7 @@ GVL_Troubleshooting.P_MotionM3.HwIn_PowerContactorEngaged_DI := HwIn.Machine.Pow
 GVL_Troubleshooting.P_MotionM3.HwIn_BrakeIsOpen_DI      := HwIn.Translation.M3_BrakeIsOpen_DI;
 GVL_Troubleshooting.P_MotionM3.Cmd_BrakeRelease         := Translation.State.BrakeCmd;
 
-GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized     := (Auth.Mode &lt;&gt; E_Mode.DISABLE);
 GVL_Troubleshooting.P_MotionM3.Step3_NotBusyOtherTask   := TRUE; // Aucune tâche exclusive connue bloquant M3 (pas de homing translation)
 GVL_Troubleshooting.P_MotionM3.Step4_MotionRequested    := Translation.State.Busy OR (Translation.State.SpeedCmd_Pct &gt; 0.0);
 // Conversion locale uniquement pour compatibilité de l'index diagnostic historique :
@@ -8352,22 +8676,8 @@ GVL_Troubleshooting.T_Permits           := Permits;
               <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
               <Object Name="ST_InputModuleDiagHMI" ObjectId="305fe275-43ac-5096-abc4-7a46cf78f5f9" />
             </Folder>
-            <Folder Name="8_BANDEAU_ET_IHM">
-              <Object Name="ST_PermitVisibilityHMI" ObjectId="43f321e3-3f35-5f43-a010-3ff934ced971" />
-              <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />
-            </Folder>
-            <Folder Name="2_TRANSLATION">
-              <Object Name="ST_TraceTranslation" ObjectId="c34c2a39-9720-51c0-a152-0a8b1d813856" />
-              <Object Name="ST_TranslationHMI" ObjectId="d6558eac-730d-54eb-ad2f-d618dc359506" />
-              <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
-              <Object Name="E_TranslationTraceBlockReason" ObjectId="7bd7bd96-6f5f-5a55-98d4-99bd61298849" />
-              <Object Name="ST_BypassTranslation" ObjectId="939b065b-c824-5e9f-9d65-f78dc4331b4d" />
-              <Object Name="ST_SafetyTranslation" ObjectId="d56fcc6a-fbab-543a-8ea6-51fdbe24ae09" />
-              <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />
-              <Object Name="ST_TranslationCmd" ObjectId="9ba58c6e-bb66-5815-b28d-8fed6fa33365" />
-              <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
-            </Folder>
             <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_OutputsInterPrg" ObjectId="ad92990b-f67b-5e7c-903a-3396ec929922" />
               <Object Name="ST_TraceWinch" ObjectId="433bbcb3-dea9-55c2-b301-a41628e1f283" />
               <Object Name="ST_WinchBenneHMI" ObjectId="734a14b6-6b4b-50b8-8bce-737b6c3fa07b" />
               <Object Name="ST_WinchHMI" ObjectId="69c9434c-20aa-55ce-8395-0acc03dd2089" />
@@ -8384,6 +8694,21 @@ GVL_Troubleshooting.T_Permits           := Permits;
               <Object Name="ST_BucketCmd" ObjectId="758915ca-bb53-5f1a-ae3f-b495527bc5f4" />
               <Object Name="ST_BucketHMIState" ObjectId="ea0b3689-7d29-5817-9b66-52896d468768" />
               <Object Name="ST_BypassBucket" ObjectId="77e7b77e-4a14-5220-93aa-7bb27ede6733" />
+            </Folder>
+            <Folder Name="8_BANDEAU_ET_IHM">
+              <Object Name="ST_PermitVisibilityHMI" ObjectId="43f321e3-3f35-5f43-a010-3ff934ced971" />
+              <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />
+            </Folder>
+            <Folder Name="2_TRANSLATION">
+              <Object Name="ST_TraceTranslation" ObjectId="c34c2a39-9720-51c0-a152-0a8b1d813856" />
+              <Object Name="ST_TranslationHMI" ObjectId="d6558eac-730d-54eb-ad2f-d618dc359506" />
+              <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
+              <Object Name="E_TranslationTraceBlockReason" ObjectId="7bd7bd96-6f5f-5a55-98d4-99bd61298849" />
+              <Object Name="ST_BypassTranslation" ObjectId="939b065b-c824-5e9f-9d65-f78dc4331b4d" />
+              <Object Name="ST_SafetyTranslation" ObjectId="d56fcc6a-fbab-543a-8ea6-51fdbe24ae09" />
+              <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />
+              <Object Name="ST_TranslationCmd" ObjectId="9ba58c6e-bb66-5815-b28d-8fed6fa33365" />
+              <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
             </Folder>
           </Folder>
         </Folder>
@@ -8418,6 +8743,7 @@ GVL_Troubleshooting.T_Permits           := Permits;
         </Folder>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="_TYPES">
+            <Object Name="ST_SyncContactorDiag" ObjectId="e71417df-d1db-5140-ade6-a84ec0d571c8" />
             <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
             <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
             <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />

@@ -117,7 +117,7 @@ raccordées aux vrais producteurs.
 | `Idx202_SyncEnabled_IHM` | `Sync.Cmd.SelSyncEnable` |
 | `Idx301_EmergencyChainClosed` | `HwIn.Machine.EmergencyChainClosed_DI` |
 | `Idx302_SyncFaultActive` | `Sync.State.Error` |
-| `Idx501_M1_CmdRelayFwd_DQ` / `Idx502_M2_CmdRelayFwd_DQ` | `WinchM1.State.RelayFwd` / `WinchM2.State.RelayFwd` |
+| `Idx501_M1_CmdRelayFwd_DQ` / `Idx502_M2_CmdRelayFwd_DQ` | `Outputs.M1RelayFwd` / `Outputs.M2RelayFwd` (ordres finaux de `PRG_06_Outputs.Data`) |
 | *(reste)* | champs à revoir un par un lors de l'implémentation — pas de calcul inventé si absent |
 
 ### 5.3 `LevageUnitaireM1` / `LevageUnitaireM2 : ST_ChainWinch`
@@ -130,14 +130,35 @@ cf. audit de session : `RelayFwd`, `Contactor1-4`, `BrakeCmd`, `FinalInterlockSt
 
 🆕 `Idx101_EncoderRawPos` (points bruts codeur) et `Idx208/209_Arbitrated*` (consigne avant sécurité) sont **résolus dans le code** (audit 2026-08-29) — ils ne sont plus des `TBD` (§6).
 
+| Champ | Producteur réel |
+|---|---|
+| `Outputs_500.Idx501..504` | `Outputs.Mx*` : ordres finaux après barrière et protecteurs, jamais la demande `FB_Winch` |
+| `Control_400.Idx407_FinalAuthorizedStep` | `InterlockMx.AuthorizedStep` via `FB_WinchStateProjection`, retard d'un scan assumé |
+| `Safety_300.Idx307_SlackCablePhysical_DI` | `NOT HwIn.Winch.M2_TensionedCable_DI` pour M1 et M2 : capteur unique |
+| `Safety_300.Idx323_TopLimitReached` | `WinchMx.Safety.CableLimitAscent` : butée réellement appliquée |
+| `Safety_300.Idx324_AscentBlockedByTopLimit` | `Idx323` masqué par les bypass `TopLimitSoftware` |
+
 ### 5.4 `BenneOuvertureFermeture : ST_ChainBucket`
 
 Recopie depuis `WinchM2.Bucket : ST_BucketHMI` (déjà complet : `MechState.IsOpen/IsClosed`,
 `ActiveOffset_M`, `Busy`, `Done`, `Error`, `ErrorId`).
 
+`Idx501_M2_CmdRev_DQ` = `Outputs.M2RelayRev` : l'ouverture benne pilote le relais descente M2.
+
 ### 5.5 `TranslationPontM3 : ST_ChainTranslation`
 
 Recopie depuis `Translation : ST_TranslationHMI` (`Cmd`, `State`, `Safety`).
+
+`Outputs_500.Idx502_CmdDriveFreq_Hz` = `CmdM3DriveFreqWord` : consigne finale en 0,01 Hz.
+
+### 5.6 Checklists de mouvement et sécurité
+
+| Champ | Producteur réel |
+|---|---|
+| `N/O/P.Step2_ModeAuthorized` | `Auth.Mode <> E_Mode.DISABLE` : vrai en MAINT_N1, MAINT_N2 et SEMI_AUTO |
+| `N/O.RelayFwdActive`, `RelayRevActive`, `SpeedContactor1Active` | `Outputs.Mx*`, ordres finaux |
+| `N/O.RequestedDirection` | `WinchMx.State.RelayFwd/RelayRev` : reste la demande |
+| `C_Safety.PowerCutOffRequest` | `Outputs.PowerCutOffRequest`, distinct de `PowerCutOffActive` |
 
 🆕 `Idx317_ErrorId` (WORD) — **T129** : masque brut complet d'`ErrorId` (latch cause), source
 d'arbitrage `PowerCutOff` (`FB_Safety_Translation`). Recopié depuis `Translation.Safety.ErrorId`
@@ -201,7 +222,7 @@ Ce FB ne doit pas être bloqué par ces 2 points : ils sont publiés à `0`/`FAL
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P14-TSV-03</span></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Aucun champ TBD (§6) n'affiche une valeur laissant croire à une mesure réelle. Chaque champ TBD publié à sa valeur d'init avec commentaire explicite : <code>Idx203_BypassSensorsGlobal:=FALSE</code>, <code>Idx307_SlackCablePhysical_DI:=FALSE</code>, <code>Idx501_M2_CmdRev_DQ:=FALSE</code>, <code>Idx502_CmdDriveFreq_Hz:=0</code></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Aucun champ TBD (§6) n'affiche une valeur laissant croire à une mesure réelle. Chaque champ TBD publié à sa valeur d'init avec commentaire explicite : <code>Idx203_BypassSensorsGlobal:=FALSE</code></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>Revue code + commentaire explicite</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
