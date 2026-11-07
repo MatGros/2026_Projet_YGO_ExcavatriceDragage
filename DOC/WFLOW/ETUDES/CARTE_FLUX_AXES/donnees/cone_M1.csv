@@ -1,0 +1,1172 @@
+chemin;depth;classe;section;type;loc;visible
+PRG_06_Outputs.M1_BrakeRelease_RQ;0;AUTRE;?;?;PRG_06_Outputs.st:375;False
+PRG_06_Outputs.M1_RelayAscent_RQ;0;AUTRE;?;?;PRG_06_Outputs.st:369;False
+PRG_06_Outputs.M1_RelayDescent_RQ;0;AUTRE;?;?;PRG_06_Outputs.st:370;False
+PRG_06_Outputs.M1_SpeedContactor_1_DQ;0;AUTRE;?;?;PRG_06_Outputs.st:371;False
+PRG_06_Outputs.M1_SpeedContactor_2_DQ;0;AUTRE;?;?;PRG_06_Outputs.st:372;False
+PRG_06_Outputs.M1_SpeedContactor_3_DQ;0;AUTRE;?;?;PRG_06_Outputs.st:373;False
+PRG_06_Outputs.M1_SpeedContactor_4_DQ;0;AUTRE;?;?;PRG_06_Outputs.st:374;False
+PRG_06_Outputs.M1BrakeCmd;1;AUTRE;VAR;BOOL;PRG_06_Outputs.st:174 PRG_06_Outputs.st:261 PRG_06_Outputs.st:307 PRG_06_Outputs.st:330;False
+PRG_06_Outputs.M1RelayFwd;1;AUTRE;VAR;BOOL;PRG_06_Outputs.st:167 PRG_06_Outputs.st:286;False
+PRG_06_Outputs.M1RelayRev;1;AUTRE;VAR;BOOL;PRG_06_Outputs.st:168 PRG_06_Outputs.st:287;False
+PRG_06_Outputs.M1SpeedContactor1;1;AUTRE;VAR;BOOL;PRG_06_Outputs.st:169 PRG_06_Outputs.st:288;False
+PRG_06_Outputs.M1SpeedContactor2;1;AUTRE;VAR;BOOL;PRG_06_Outputs.st:170 PRG_06_Outputs.st:289;False
+PRG_06_Outputs.M1SpeedContactor3;1;AUTRE;VAR;BOOL;PRG_06_Outputs.st:171 PRG_06_Outputs.st:290;False
+PRG_06_Outputs.M1SpeedContactor4;1;AUTRE;VAR;BOOL;PRG_06_Outputs.st:172 PRG_06_Outputs.st:291;False
+PRG_06_Outputs.MaintenanceN2BrakeForceM1;2;AUTRE;VAR;BOOL;PRG_06_Outputs.st:320;False
+PRG_06_Outputs.instM1FwdProtector.Cmd;2;AUTRE;VAR_OUTPUT;BOOL;FB_ContactorProtector.st:30 FB_ContactorProtector.st:60;False
+PRG_06_Outputs.instM1RevProtector.Cmd;2;AUTRE;VAR_OUTPUT;BOOL;FB_ContactorProtector.st:30 FB_ContactorProtector.st:60;False
+PRG_06_Outputs.instM1Sc1Protector.Cmd;2;AUTRE;VAR_OUTPUT;BOOL;FB_ContactorProtector.st:30 FB_ContactorProtector.st:60;False
+PRG_06_Outputs.instM1Sc2Protector.Cmd;2;AUTRE;VAR_OUTPUT;BOOL;FB_ContactorProtector.st:30 FB_ContactorProtector.st:60;False
+PRG_06_Outputs.instM1Sc3Protector.Cmd;2;AUTRE;VAR_OUTPUT;BOOL;FB_ContactorProtector.st:30 FB_ContactorProtector.st:60;False
+PRG_06_Outputs.instM1Sc4Protector.Cmd;2;AUTRE;VAR_OUTPUT;BOOL;FB_ContactorProtector.st:30 FB_ContactorProtector.st:60;False
+PRG_06_Outputs.instWinchOutputInterlockM1.Contactor1;2;AUTRE;VAR_OUTPUT;BOOL;FB_WinchOutputInterlock.st:164 FB_WinchOutputInterlock.st:348 FB_WinchOutputInterlock.st:381 FB_WinchOutputInterlock.st:403;False
+PRG_06_Outputs.instWinchOutputInterlockM1.Contactor2;2;AUTRE;VAR_OUTPUT;BOOL;FB_WinchOutputInterlock.st:164 FB_WinchOutputInterlock.st:348 FB_WinchOutputInterlock.st:381 FB_WinchOutputInterlock.st:403;False
+PRG_06_Outputs.instWinchOutputInterlockM1.Contactor3;2;AUTRE;VAR_OUTPUT;BOOL;FB_WinchOutputInterlock.st:164 FB_WinchOutputInterlock.st:348 FB_WinchOutputInterlock.st:381 FB_WinchOutputInterlock.st:403;False
+PRG_06_Outputs.instWinchOutputInterlockM1.Contactor4;2;AUTRE;VAR_OUTPUT;BOOL;FB_WinchOutputInterlock.st:164 FB_WinchOutputInterlock.st:348 FB_WinchOutputInterlock.st:381 FB_WinchOutputInterlock.st:403;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RelayFwd;2;AUTRE;VAR_OUTPUT;BOOL;FB_WinchOutputInterlock.st:163 FB_WinchOutputInterlock.st:347 FB_WinchOutputInterlock.st:382 FB_WinchOutputInterlock.st:389;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RelayRev;2;AUTRE;VAR_OUTPUT;BOOL;FB_WinchOutputInterlock.st:163 FB_WinchOutputInterlock.st:347 FB_WinchOutputInterlock.st:383 FB_WinchOutputInterlock.st:389;False
+GVL_IHM.MaintenanceN2.Cmd.BtnBothBrakeRelease;3;COMMANDE;VAR_GLOBAL;ST_MaintenanceN2HMI;;False
+GVL_IHM.MaintenanceN2.Cmd.BtnM1BrakeRelease;3;COMMANDE;VAR_GLOBAL;ST_MaintenanceN2HMI;;False
+PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI;3;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:484;True
+PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;3;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:484;True
+PRG_03_Modes_Cycle.Data.Auth.Mode;3;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;True
+PRG_06_Outputs.instM1FwdProtector.ActivationLatched;3;AUTRE;VAR;BOOL;FB_ContactorProtector.st:34 FB_ContactorProtector.st:53 FB_ContactorProtector.st:56;False
+PRG_06_Outputs.instM1FwdProtector.Enable;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instM1RevProtector.ActivationLatched;3;AUTRE;VAR;BOOL;FB_ContactorProtector.st:34 FB_ContactorProtector.st:53 FB_ContactorProtector.st:56;False
+PRG_06_Outputs.instM1RevProtector.Enable;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instM1Sc1Protector.ActivationLatched;3;AUTRE;VAR;BOOL;FB_ContactorProtector.st:34 FB_ContactorProtector.st:53 FB_ContactorProtector.st:56;False
+PRG_06_Outputs.instM1Sc1Protector.Enable;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instM1Sc2Protector.ActivationLatched;3;AUTRE;VAR;BOOL;FB_ContactorProtector.st:34 FB_ContactorProtector.st:53 FB_ContactorProtector.st:56;False
+PRG_06_Outputs.instM1Sc2Protector.Enable;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instM1Sc3Protector.ActivationLatched;3;AUTRE;VAR;BOOL;FB_ContactorProtector.st:34 FB_ContactorProtector.st:53 FB_ContactorProtector.st:56;False
+PRG_06_Outputs.instM1Sc3Protector.Enable;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instM1Sc4Protector.ActivationLatched;3;AUTRE;VAR;BOOL;FB_ContactorProtector.st:34 FB_ContactorProtector.st:53 FB_ContactorProtector.st:56;False
+PRG_06_Outputs.instM1Sc4Protector.Enable;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.AuthorizedStep;3;AUTRE;VAR_OUTPUT;INT;FB_WinchOutputInterlock.st:165 FB_WinchOutputInterlock.st:355 FB_WinchOutputInterlock.st:361 FB_WinchOutputInterlock.st:371;True
+PRG_06_Outputs.instWinchOutputInterlockM1.ContactorStuckLatched;3;AUTRE;VAR;BOOL;FB_WinchOutputInterlock.st:317 FB_WinchOutputInterlock.st:513;False
+PRG_06_Outputs.instWinchOutputInterlockM1.DeadTimePending;3;AUTRE;VAR;BOOL;FB_WinchOutputInterlock.st:153 FB_WinchOutputInterlock.st:247 FB_WinchOutputInterlock.st:253 FB_WinchOutputInterlock.st:268;False
+PRG_06_Outputs.instWinchOutputInterlockM1.Enable;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.Error;3;AUTRE;VAR;BOOL;FB_WinchOutputInterlock.st:168 FB_WinchOutputInterlock.st:193 FB_WinchOutputInterlock.st:540;False
+PRG_06_Outputs.instWinchOutputInterlockM1.MotorRequest;3;AUTRE;VAR_OUTPUT;BOOL;FB_WinchOutputInterlock.st:182;True
+PRG_06_Outputs.instWinchOutputInterlockM1.PermitFinalBlocked;3;AUTRE;VAR;BOOL;FB_WinchOutputInterlock.st:186;False
+PRG_06_Outputs.instWinchOutputInterlockM1.PowerContactorEngaged;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.ReleaseOrderActive;3;AUTRE;VAR;BOOL;FB_WinchOutputInterlock.st:160 FB_WinchOutputInterlock.st:337 FB_WinchOutputInterlock.st:343 FB_WinchOutputInterlock.st:387;False
+PRG_06_Outputs.instWinchOutputInterlockM1.ReleaseOrderTimer.Q;3;AUTRE;VAR;TON;FB_WinchOutputInterlock.st:161 FB_WinchOutputInterlock.st:339 FB_WinchOutputInterlock.st:384;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RequestedContactor1;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RequestedContactor2;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RequestedContactor3;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RequestedContactor4;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RequestedRelayFwd;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RequestedRelayRev;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RequestedStepClamped;3;AUTRE;VAR;INT;FB_WinchOutputInterlock.st:177;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RestartInhibit;3;AUTRE;VAR_OUTPUT;BOOL;FB_WinchOutputInterlock.st:207 FB_WinchOutputInterlock.st:504;True
+PRG_06_Outputs.instWinchOutputInterlockM1.RestartRequired;3;AUTRE;VAR_OUTPUT;BOOL;FB_WinchOutputInterlock.st:170 FB_WinchOutputInterlock.st:205 FB_WinchOutputInterlock.st:209 FB_WinchOutputInterlock.st:222;True
+PRG_06_Outputs.instWinchOutputInterlockM1.SafeStop;3;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.SenseHoldActive;3;AUTRE;VAR_OUTPUT;BOOL;FB_WinchOutputInterlock.st:156 FB_WinchOutputInterlock.st:288 FB_WinchOutputInterlock.st:293 FB_WinchOutputInterlock.st:298;False
+PRG_02_Acquisition.HwReal.Machine;4;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:189 PRG_02_Acquisition.st:190 PRG_02_Acquisition.st:191 PRG_02_Acquisition.st:192;False
+PRG_02_Acquisition.HwSim.Machine;4;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:437;False
+PRG_02_Acquisition.MachineInputSourceSimulated;4;AUTRE;VAR;BOOL;PRG_02_Acquisition.st:138;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerContactorEngaged;4;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor1;4;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor2;4;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor3;4;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor4;4;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayFwd;4;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayRev;4;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.SafeStop;4;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_06_Outputs.M1InterlockEnable;4;AUTRE;VAR_OUTPUT;BOOL;PRG_06_Outputs.st:128;False
+PRG_06_Outputs.TRUE;4;AUTRE;?;?;;False
+PRG_06_Outputs.instM1FwdProtector.InhibitActive;4;AUTRE;VAR;BOOL;FB_ContactorProtector.st:33 FB_ContactorProtector.st:42 FB_ContactorProtector.st:46;False
+PRG_06_Outputs.instM1FwdProtector.Request;4;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instM1RevProtector.InhibitActive;4;AUTRE;VAR;BOOL;FB_ContactorProtector.st:33 FB_ContactorProtector.st:42 FB_ContactorProtector.st:46;False
+PRG_06_Outputs.instM1RevProtector.Request;4;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instM1Sc1Protector.InhibitActive;4;AUTRE;VAR;BOOL;FB_ContactorProtector.st:33 FB_ContactorProtector.st:42 FB_ContactorProtector.st:46;False
+PRG_06_Outputs.instM1Sc1Protector.Request;4;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instM1Sc2Protector.InhibitActive;4;AUTRE;VAR;BOOL;FB_ContactorProtector.st:33 FB_ContactorProtector.st:42 FB_ContactorProtector.st:46;False
+PRG_06_Outputs.instM1Sc2Protector.Request;4;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instM1Sc3Protector.InhibitActive;4;AUTRE;VAR;BOOL;FB_ContactorProtector.st:33 FB_ContactorProtector.st:42 FB_ContactorProtector.st:46;False
+PRG_06_Outputs.instM1Sc3Protector.Request;4;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instM1Sc4Protector.InhibitActive;4;AUTRE;VAR;BOOL;FB_ContactorProtector.st:33 FB_ContactorProtector.st:42 FB_ContactorProtector.st:46;False
+PRG_06_Outputs.instM1Sc4Protector.Request;4;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.AscentPermit;4;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.BrakeTimeoutCauseEdge.Q;4;AUTRE;VAR;R_TRIG;FB_WinchOutputInterlock.st:501;False
+PRG_06_Outputs.instWinchOutputInterlockM1.DeadTime.ET;4;AUTRE;VAR;TON;FB_WinchOutputInterlock.st:152 FB_WinchOutputInterlock.st:250;False
+PRG_06_Outputs.instWinchOutputInterlockM1.DeadTime.Q;4;AUTRE;VAR;TON;FB_WinchOutputInterlock.st:152 FB_WinchOutputInterlock.st:250;False
+PRG_06_Outputs.instWinchOutputInterlockM1.DescendPermit;4;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.ErrorId;4;AUTRE;VAR;WORD;FB_WinchOutputInterlock.st:516 FB_WinchOutputInterlock.st:518;False
+PRG_06_Outputs.instWinchOutputInterlockM1.NeutralRequestSeen;4;AUTRE;VAR_OUTPUT;BOOL;FB_WinchOutputInterlock.st:204 FB_WinchOutputInterlock.st:208 FB_WinchOutputInterlock.st:506;True
+PRG_06_Outputs.instWinchOutputInterlockM1.ReleaseOrderDelay;4;AUTRE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.ReleaseOrderDone;4;AUTRE;VAR;BOOL;FB_WinchOutputInterlock.st:160 FB_WinchOutputInterlock.st:338 FB_WinchOutputInterlock.st:388;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RequestedStep;4;AUTRE;VAR_INPUT;INT;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RequiredDeadTime;4;AUTRE;VAR;TIME;FB_WinchOutputInterlock.st:263 FB_WinchOutputInterlock.st:265;False
+PRG_06_Outputs.instWinchOutputInterlockM1.ResetEdge.Q;4;AUTRE;VAR;R_TRIG;FB_WinchOutputInterlock.st:142;False
+PRG_06_Outputs.instWinchOutputInterlockM1.ResetRequired;4;AUTRE;VAR;BOOL;FB_WinchOutputInterlock.st:505 FB_WinchOutputInterlock.st:512;False
+PRG_06_Outputs.instWinchOutputInterlockM1.RestartDelay.Q;4;AUTRE;VAR;TON;FB_WinchOutputInterlock.st:151 FB_WinchOutputInterlock.st:224;False
+PRG_06_Outputs.instWinchOutputInterlockM1.SenseHoldDone;4;AUTRE;VAR;BOOL;FB_WinchOutputInterlock.st:156 FB_WinchOutputInterlock.st:288 FB_WinchOutputInterlock.st:293 FB_WinchOutputInterlock.st:297;False
+PRG_06_Outputs.instWinchOutputInterlockM1.SenseHoldFeedbackTimer.Q;4;AUTRE;VAR;TON;FB_WinchOutputInterlock.st:157 FB_WinchOutputInterlock.st:290 FB_WinchOutputInterlock.st:294 FB_WinchOutputInterlock.st:307;False
+PRG_06_Outputs.instWinchOutputInterlockM1.SenseHoldRequested;4;AUTRE;VAR;BOOL;FB_WinchOutputInterlock.st:283;False
+PRG_06_Outputs.instWinchOutputInterlockM1.SenseHoldTimer.Q;4;AUTRE;VAR;TON;FB_WinchOutputInterlock.st:157 FB_WinchOutputInterlock.st:289 FB_WinchOutputInterlock.st:294 FB_WinchOutputInterlock.st:306;False
+PRG_06_Outputs.instWinchOutputInterlockM1.StepDelay.Q;4;AUTRE;VAR;TON;FB_WinchOutputInterlock.st:150 FB_WinchOutputInterlock.st:352 FB_WinchOutputInterlock.st:358 FB_WinchOutputInterlock.st:368;False
+GVL_Simulation.SimSafetyActive;5;SIMU;VAR_GLOBAL;BOOL;;True
+GVL_Simulation.SimulationModeActive;5;SIMU;VAR_GLOBAL;BOOL;;True
+PRG_02_Acquisition.ConveyorInfeedReady_DI;5;AUTRE;?;?;;True
+PRG_02_Acquisition.EmergencyChainClosed_DI;5;AUTRE;?;?;;True
+PRG_02_Acquisition.HydraulicThermalOk_DI;5;AUTRE;?;?;;True
+PRG_02_Acquisition.M1_M2_KoboldBottomTouch_DI;5;FRONTIERE;?;?;;True
+PRG_02_Acquisition.M1_M2_M3_BrakeThermalOk_DI;5;FRONTIERE;?;?;;True
+PRG_02_Acquisition.PhaseRotationOk_DI;5;AUTRE;?;?;;True
+PRG_02_Acquisition.PowerContactorEngaged_DI;5;AUTRE;?;?;;True
+PRG_02_Acquisition.TremieFull_OR_GateRaised_DI;5;AUTRE;?;?;;True
+PRG_02_Acquisition.instSimBench.Machine;5;FRONTIERE;VAR_OUTPUT;ST_HwMachine;;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.AscentPermit;5;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.DescendPermit;5;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.Enable;5;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff;5;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;True
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep;5;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerContactorEngaged;5;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1595;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor1;5;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1605 PRG_04_Treuils_Benne.st:1666;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor2;5;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1606 PRG_04_Treuils_Benne.st:1667;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor3;5;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1607 PRG_04_Treuils_Benne.st:1668;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor4;5;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1608 PRG_04_Treuils_Benne.st:1669;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayFwd;5;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1603 PRG_04_Treuils_Benne.st:1664;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayRev;5;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1604 PRG_04_Treuils_Benne.st:1665;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.SafeStop;5;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1596;False
+PRG_06_Outputs.instM1FwdProtector.ReqFall.Q;5;AUTRE;VAR;F_TRIG;FB_ContactorProtector.st:38;False
+PRG_06_Outputs.instM1FwdProtector.TonInterval.Q;5;AUTRE;VAR;TON;FB_ContactorProtector.st:35 FB_ContactorProtector.st:44;False
+PRG_06_Outputs.instM1RevProtector.ReqFall.Q;5;AUTRE;VAR;F_TRIG;FB_ContactorProtector.st:38;False
+PRG_06_Outputs.instM1RevProtector.TonInterval.Q;5;AUTRE;VAR;TON;FB_ContactorProtector.st:35 FB_ContactorProtector.st:44;False
+PRG_06_Outputs.instM1Sc1Protector.ReqFall.Q;5;AUTRE;VAR;F_TRIG;FB_ContactorProtector.st:38;False
+PRG_06_Outputs.instM1Sc1Protector.TonInterval.Q;5;AUTRE;VAR;TON;FB_ContactorProtector.st:35 FB_ContactorProtector.st:44;False
+PRG_06_Outputs.instM1Sc2Protector.ReqFall.Q;5;AUTRE;VAR;F_TRIG;FB_ContactorProtector.st:38;False
+PRG_06_Outputs.instM1Sc2Protector.TonInterval.Q;5;AUTRE;VAR;TON;FB_ContactorProtector.st:35 FB_ContactorProtector.st:44;False
+PRG_06_Outputs.instM1Sc3Protector.ReqFall.Q;5;AUTRE;VAR;F_TRIG;FB_ContactorProtector.st:38;False
+PRG_06_Outputs.instM1Sc3Protector.TonInterval.Q;5;AUTRE;VAR;TON;FB_ContactorProtector.st:35 FB_ContactorProtector.st:44;False
+PRG_06_Outputs.instM1Sc4Protector.ReqFall.Q;5;AUTRE;VAR;F_TRIG;FB_ContactorProtector.st:38;False
+PRG_06_Outputs.instM1Sc4Protector.TonInterval.Q;5;AUTRE;VAR;TON;FB_ContactorProtector.st:35 FB_ContactorProtector.st:44;False
+PRG_06_Outputs.instWinchOutputInterlockM1.BrakeFeedback;5;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.BrakeTimeoutAck;5;AUTRE;VAR;BOOL;FB_WinchOutputInterlock.st:503 FB_WinchOutputInterlock.st:511;False
+PRG_06_Outputs.instWinchOutputInterlockM1.BrakeTimeoutCause;5;AUTRE;VAR;BOOL;FB_WinchOutputInterlock.st:497 FB_WinchOutputInterlock.st:499;False
+PRG_06_Outputs.instWinchOutputInterlockM1.DeadTimeOppositeDir;5;AUTRE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.DeadTimeSameDir;5;AUTRE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.DropConfirmDelay;5;AUTRE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.FFFE;5;AUTRE;?;?;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.FwdRevSpeedFeedbackOff;5;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.LastDirection;5;AUTRE;VAR;INT;FB_WinchOutputInterlock.st:240 FB_WinchOutputInterlock.st:242;False
+PRG_06_Outputs.instWinchOutputInterlockM1.MaxSenseHoldTime;5;AUTRE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.NewDirection;5;AUTRE;VAR;INT;FB_WinchOutputInterlock.st:258 FB_WinchOutputInterlock.st:260;False
+PRG_06_Outputs.instWinchOutputInterlockM1.Reset;5;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.T;5;AUTRE;?;?;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.ms;5;AUTRE;?;?;;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.BrakeFeedback;6;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff;6;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1936;False
+PRG_04_Treuils_Benne.SafeStopM1_Active;6;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1105;True
+PRG_04_Treuils_Benne.WinchBothFinalRequestsCoherent;6;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1648;False
+PRG_04_Treuils_Benne.WinchBothMotionActive;6;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:284;True
+PRG_04_Treuils_Benne.WinchBothMotionReady;6;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1405 PRG_04_Treuils_Benne.st:1541;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.AscentPermit;6;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1611;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.DescendPermit;6;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1612;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable;6;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1593;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff;6;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1610;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedStep;6;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1609 PRG_04_Treuils_Benne.st:1670;False
+PRG_04_Treuils_Benne.instWinchM1.Contactor1;6;AUTRE;VAR_OUTPUT;BOOL;FB_Winch.st:143 FB_Winch.st:306 FB_Winch.st:323;True
+PRG_04_Treuils_Benne.instWinchM1.Contactor2;6;AUTRE;VAR_OUTPUT;BOOL;FB_Winch.st:143 FB_Winch.st:307 FB_Winch.st:323;False
+PRG_04_Treuils_Benne.instWinchM1.Contactor3;6;AUTRE;VAR_OUTPUT;BOOL;FB_Winch.st:143 FB_Winch.st:308 FB_Winch.st:323;False
+PRG_04_Treuils_Benne.instWinchM1.Contactor4;6;AUTRE;VAR_OUTPUT;BOOL;FB_Winch.st:143 FB_Winch.st:309 FB_Winch.st:323;True
+PRG_04_Treuils_Benne.instWinchM1.RelayFwd;6;AUTRE;VAR_OUTPUT;BOOL;FB_Winch.st:141 FB_Winch.st:285 FB_Winch.st:288 FB_Winch.st:291;True
+PRG_04_Treuils_Benne.instWinchM1.RelayRev;6;AUTRE;VAR_OUTPUT;BOOL;FB_Winch.st:142 FB_Winch.st:286 FB_Winch.st:289 FB_Winch.st:292;True
+PRG_06_Outputs.instM1FwdProtector.Cfg_MinInterval;6;REGLAGE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instM1RevProtector.Cfg_MinInterval;6;REGLAGE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instM1Sc1Protector.Cfg_MinInterval;6;REGLAGE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instM1Sc2Protector.Cfg_MinInterval;6;REGLAGE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instM1Sc3Protector.Cfg_MinInterval;6;REGLAGE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instM1Sc4Protector.Cfg_MinInterval;6;REGLAGE;VAR_INPUT;TIME;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.BrakeTimeout.Q;6;AUTRE;VAR;TON;FB_WinchOutputInterlock.st:149 FB_WinchOutputInterlock.st:494;False
+PRG_07_Supervision.FaultMachineReset_IHM;6;AUTRE;VAR_OUTPUT;BOOL;PRG_07_Supervision.st:138;False
+GVL_IHM.CycleSemiAuto.Cmd.BtnReset;7;COMMANDE;VAR_GLOBAL;ST_CycleHMI;;False
+GVL_IHM.M1TreuilRetenue.Cmd.BtnReset;7;COMMANDE;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;7;COMMANDE;VAR_GLOBAL;ST_WinchBenneHMI;;False
+GVL_IHM.M2TreuilBenne.Cmd.BtnReset;7;COMMANDE;VAR_GLOBAL;ST_WinchBenneHMI;;False
+GVL_IHM.Modes.Cmd.BtnFaultReset;7;COMMANDE;VAR_GLOBAL;ST_ModesHMI;;False
+PRG_03_Modes_Cycle.Data.WinchBothIntent.Active;7;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;True
+PRG_04_Treuils_Benne.CoupledBoth;7;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1103;False
+PRG_04_Treuils_Benne.EffectivePermitM1_Ascent;7;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1113;True
+PRG_04_Treuils_Benne.EffectivePermitM1_Descend;7;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1111;True
+PRG_04_Treuils_Benne.SafeStopM1_Raw;7;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1062 PRG_04_Treuils_Benne.st:713;False
+PRG_04_Treuils_Benne.SafeStopM2_Raw;7;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.WinchBothFinalStep45Coherent;7;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1631;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeFeedback;7;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1601;False
+PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff;7;AUTRE;VAR;ST_WinchFinalInterlockRequest;PRG_04_Treuils_Benne.st:1602;False
+PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor1;7;FRONTIERE;VAR;ST_WinchFinalInterlockRequest;;False
+PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor2;7;FRONTIERE;VAR;ST_WinchFinalInterlockRequest;;False
+PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor3;7;FRONTIERE;VAR;ST_WinchFinalInterlockRequest;;False
+PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor4;7;FRONTIERE;VAR;ST_WinchFinalInterlockRequest;;False
+PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayFwd;7;FRONTIERE;VAR;ST_WinchFinalInterlockRequest;;False
+PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayRev;7;FRONTIERE;VAR;ST_WinchFinalInterlockRequest;;False
+PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedStep;7;FRONTIERE;VAR;ST_WinchFinalInterlockRequest;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.PowerCutOff;7;AUTRE;VAR_OUTPUT;BOOL;FB_Safety_Winch.st:534 FB_Safety_Winch.st:584;True
+PRG_04_Treuils_Benne.instWinchM1.CommandedAscent;7;AUTRE;VAR_OUTPUT;BOOL;FB_Winch.st:146 FB_Winch.st:206;False
+PRG_04_Treuils_Benne.instWinchM1.CommandedDescend;7;AUTRE;VAR_OUTPUT;BOOL;FB_Winch.st:147 FB_Winch.st:207;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionChangePending;7;AUTRE;VAR_OUTPUT;BOOL;FB_Winch.st:149 FB_Winch.st:209;True
+PRG_04_Treuils_Benne.instWinchM1.Enable;7;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchM1.Fault.Error;7;AUTRE;VAR_OUTPUT;ST_Fault;FB_Winch.st:130;False
+PRG_04_Treuils_Benne.instWinchM1.Fault.Latched;7;AUTRE;VAR_OUTPUT;ST_Fault;FB_Winch.st:130;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Contactor1;7;AUTRE;VAR_OUTPUT;BOOL;FB_SpeedStep.st:63 FB_SpeedStep.st:74 FB_SpeedStep.st:75 FB_SpeedStep.st:76;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Contactor2;7;AUTRE;VAR_OUTPUT;BOOL;FB_SpeedStep.st:63 FB_SpeedStep.st:74 FB_SpeedStep.st:75 FB_SpeedStep.st:76;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Contactor3;7;AUTRE;VAR_OUTPUT;BOOL;FB_SpeedStep.st:63 FB_SpeedStep.st:74 FB_SpeedStep.st:75 FB_SpeedStep.st:76;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Contactor4;7;AUTRE;VAR_OUTPUT;BOOL;FB_SpeedStep.st:63 FB_SpeedStep.st:74 FB_SpeedStep.st:75 FB_SpeedStep.st:76;True
+PRG_04_Treuils_Benne.instWinchM1.StepNumber;7;AUTRE;VAR_OUTPUT;INT;FB_Winch.st:145 FB_Winch.st:281;True
+PRG_04_Treuils_Benne.instWinchM2.DirectionChangePending;7;FRONTIERE;VAR_OUTPUT;BOOL;;True
+PRG_04_Treuils_Benne.instWinchM2.Fault.Latched;7;FRONTIERE;VAR_OUTPUT;ST_Fault;;False
+PRG_06_Outputs.CST_ContactorMinInterval;7;AUTRE;VAR;TIME;;False
+PRG_06_Outputs.instWinchOutputInterlockM1.BrakeCmd;7;AUTRE;VAR_OUTPUT;BOOL;FB_WinchOutputInterlock.st:165 FB_WinchOutputInterlock.st:487 FB_WinchOutputInterlock.st:544;True
+PRG_02_Acquisition.Data.InputModules.Fault;8;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:217;True
+PRG_02_Acquisition.Data.MachineHoming.HomingLoss;8;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:627;True
+PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;8;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:481;True
+PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;8;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:481;True
+PRG_03_Modes_Cycle.Data.Auth.InhibitM1;8;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active;8;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;True
+PRG_04_Treuils_Benne.ProcessAndSafetyPermitM1_Ascent;8;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1095;False
+PRG_04_Treuils_Benne.ProcessAndSafetyPermitM1_Descend;8;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1070 PRG_04_Treuils_Benne.st:1084;False
+PRG_04_Treuils_Benne.ProcessAndSafetyPermitM2_Ascent;8;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.ProcessAndSafetyPermitM2_Descend;8;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.WinchContactorMismatchLvl1;8;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:712;False
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P4R1;8;AUTRE;?;?;;True
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P4R2;8;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P4R3;8;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P4R4;8;AUTRE;?;?;;True
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P5R1;8;AUTRE;?;?;;True
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P5R2;8;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P5R3;8;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P5R4;8;AUTRE;?;?;;True
+PRG_04_Treuils_Benne.instBucket.M1SlipDetected;8;FRONTIERE;VAR_OUTPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CausesPowerCutOffActive;8;AUTRE;VAR;BOOL;FB_Safety_Winch.st:523;True
+PRG_04_Treuils_Benne.instSafetyWinchM1.Enable;8;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.SafeStop;8;AUTRE;VAR_OUTPUT;BOOL;FB_Safety_Winch.st:531 FB_Safety_Winch.st:553 FB_Safety_Winch.st:558;True
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.CommandedAscent;8;AUTRE;VAR_OUTPUT;BOOL;FB_WinchDirectionInterlock.st:128 FB_WinchDirectionInterlock.st:136 FB_WinchDirectionInterlock.st:150 FB_WinchDirectionInterlock.st:63;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.CommandedDescend;8;AUTRE;VAR_OUTPUT;BOOL;FB_WinchDirectionInterlock.st:129 FB_WinchDirectionInterlock.st:137 FB_WinchDirectionInterlock.st:151 FB_WinchDirectionInterlock.st:64;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.DirectionChangePending;8;AUTRE;VAR_OUTPUT;BOOL;FB_WinchDirectionInterlock.st:130 FB_WinchDirectionInterlock.st:138 FB_WinchDirectionInterlock.st:143 FB_WinchDirectionInterlock.st:152;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Enable;8;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.SpeedStepReq;8;AUTRE;VAR_INPUT;INT;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.StepNumber;8;AUTRE;VAR_OUTPUT;INT;FB_SpeedStep.st:62 FB_SpeedStep.st:71 FB_SpeedStep.st:81;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P1R1;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P1R2;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P1R3;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P1R4;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P2R1;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P2R2;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P2R3;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P2R4;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P3R1;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P3R2;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P3R3;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P3R4;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P4R1;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P4R2;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P4R3;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P4R4;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P5R1;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P5R2;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P5R3;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.P5R4;8;AUTRE;VAR_INPUT;ST_SpeedStepTable;;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep._ConfigValid;8;AUTRE;VAR;BOOL;FB_SpeedStep.st:42 FB_SpeedStep.st:48 FB_SpeedStep.st:52;False
+PRG_04_Treuils_Benne.instWinchM1.StepShaper.ShapedStep;8;AUTRE;VAR_OUTPUT;INT;FB_WinchStepShaper.st:28 FB_WinchStepShaper.st:47 FB_WinchStepShaper.st:49 FB_WinchStepShaper.st:52;True
+PRG_04_Treuils_Benne.instWinchM1.instFault.Fault.Error;8;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:57;False
+PRG_04_Treuils_Benne.instWinchM1.instFault.Fault.Latched;8;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:80;False
+PRG_04_Treuils_Benne.instWinchSync.SyncActive;8;AUTRE;VAR_OUTPUT;BOOL;FB_WinchSync.st:119 FB_WinchSync.st:121 FB_WinchSync.st:123 FB_WinchSync.st:97;False
+PRG_02_Acquisition.Data.InputModules.LocalDigitalIoOk;9;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:205 PRG_02_Acquisition.st:211;False
+PRG_02_Acquisition.Data.InputModules.Vh0008Er1Ok;9;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:209 PRG_02_Acquisition.st:215;False
+PRG_02_Acquisition.Data.InputModules.Vh0008ErOk;9;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:208 PRG_02_Acquisition.st:214;False
+PRG_02_Acquisition.Data.InputModules.Vh0800EndOk;9;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:206 PRG_02_Acquisition.st:212;False
+PRG_02_Acquisition.Data.InputModules.Vh0808EtpOk;9;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:207 PRG_02_Acquisition.st:213;False
+PRG_02_Acquisition.HwReal.Winch;9;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:146 PRG_02_Acquisition.st:147 PRG_02_Acquisition.st:148 PRG_02_Acquisition.st:150;False
+PRG_02_Acquisition.HwSim.Winch;9;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:420;False
+PRG_02_Acquisition.WinchInputSourceSimulated;9;AUTRE;VAR;BOOL;PRG_02_Acquisition.st:135;False
+PRG_02_Acquisition.instCycleMachineHoming.MachineHomingLossSafeStop;9;FRONTIERE;VAR_OUTPUT;BOOL;;True
+PRG_03_Modes_Cycle.Data.SequenceState.WinchDescentAuth_M3;9;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_04_Treuils_Benne.ProcessPermitM1_Ascent;9;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:794;True
+PRG_04_Treuils_Benne.ProcessPermitM1_Descend;9;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:771;True
+PRG_04_Treuils_Benne.SafetyPermitM1_Ascent;9;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1067;False
+PRG_04_Treuils_Benne.SafetyPermitM1_Descend;9;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1065;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseBrakeThermalActive;9;AUTRE;VAR;BOOL;FB_Safety_Winch.st:504;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseMecaAActive;9;AUTRE;VAR;BOOL;FB_Safety_Winch.st:501;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseMecaBActive;9;AUTRE;VAR;BOOL;FB_Safety_Winch.st:502;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseMecaCActive;9;AUTRE;VAR;BOOL;FB_Safety_Winch.st:503;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseMecaDActive;9;AUTRE;VAR;BOOL;FB_Safety_Winch.st:505;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseMecaEEscaladeActive;9;AUTRE;VAR;BOOL;FB_Safety_Winch.st:507;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseMotorThermalActive;9;AUTRE;VAR;BOOL;FB_Safety_Winch.st:496;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseSlackCableActive;9;AUTRE;VAR;BOOL;FB_Safety_Winch.st:497;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CausesSafeStopActive;9;AUTRE;VAR;BOOL;FB_Safety_Winch.st:516;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.OverspeedFaultLatched;9;AUTRE;VAR;BOOL;FB_Safety_Winch.st:196 FB_Safety_Winch.st:215 FB_Safety_Winch.st:454;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.PowerContactorEngaged;9;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.SyncEnable;9;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P1R1;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;True
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P1R2;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P1R3;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P1R4;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;True
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P2R1;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;True
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P2R2;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P2R3;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P2R4;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;True
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P3R1;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;True
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P3R2;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P3R3;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P3R4;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;True
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P4R1;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;True
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P4R2;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P4R3;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P4R4;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;True
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P5R1;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;True
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P5R2;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P5R3;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.P5R4;9;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;True
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.DeadTimeArmed;9;AUTRE;VAR;BOOL;FB_WinchDirectionInterlock.st:107 FB_WinchDirectionInterlock.st:131 FB_WinchDirectionInterlock.st:139 FB_WinchDirectionInterlock.st:65;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.DirectionChangeDelay.Q;9;AUTRE;VAR;TON;FB_WinchDirectionInterlock.st:118;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.DirectionChanged;9;AUTRE;VAR;BOOL;FB_WinchDirectionInterlock.st:99;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.LastAscent;9;AUTRE;VAR;BOOL;FB_WinchDirectionInterlock.st:166 FB_WinchDirectionInterlock.st:61;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.LastDescend;9;AUTRE;VAR;BOOL;FB_WinchDirectionInterlock.st:167 FB_WinchDirectionInterlock.st:62;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.ReqAscent;9;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.ReqDescend;9;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.RequestActive;9;AUTRE;VAR;BOOL;FB_WinchDirectionInterlock.st:71;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.ResetEdge.Q;9;AUTRE;VAR;R_TRIG;FB_WinchDirectionInterlock.st:59;False
+PRG_04_Treuils_Benne.instWinchM1.FALSE;9;AUTRE;?;?;;True
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.Table.StepThreshold_Pct;9;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep._MaxStepClamped;9;AUTRE;VAR;INT;FB_SpeedStep.st:37;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep._MinStepClamped;9;AUTRE;VAR;INT;FB_SpeedStep.st:38;False
+PRG_04_Treuils_Benne.instWinchM1.StepShaper.Enable;9;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchM1.StepShaper.StepDelay.Q;9;AUTRE;VAR;TON;FB_WinchStepShaper.st:29 FB_WinchStepShaper.st:39;False
+PRG_04_Treuils_Benne.instWinchM1.StepShaper.TargetStep;9;AUTRE;VAR_INPUT;INT;;True
+PRG_04_Treuils_Benne.instWinchM1.instFault.Fault.ErrorId;9;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:49;False
+PRG_04_Treuils_Benne.instWinchM1.instFault.Fault.LatchedId;9;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:74;False
+PRG_04_Treuils_Benne.instWinchSync.ContactorMismatch;9;AUTRE;VAR_OUTPUT;BOOL;FB_WinchSync.st:197 FB_WinchSync.st:99;False
+PRG_04_Treuils_Benne.instWinchSync.Enable;9;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.Mode;9;AUTRE;VAR_INPUT;E_Mode;;False
+PRG_04_Treuils_Benne.instWinchSync.SyncEnable;9;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.Data.ContactorMismatch;9;AUTRE;VAR_OUTPUT;ST_OutputsInterPrg;PRG_06_Outputs.st:363;True
+GVL_IHM.Network.Bypass.Global;10;BYPASS;VAR_GLOBAL;ST_NetworkDiagHMI;PRG_07_Supervision.st:352 PRG_07_Supervision.st:370;True
+GVL_IHM.Network.Bypass.InputModules;10;BYPASS;VAR_GLOBAL;ST_NetworkDiagHMI;;False
+GVL_Simulation.SimWinchActive;10;SIMU;VAR_GLOBAL;BOOL;;False
+PRG_02_Acquisition.COD1_Alarms;10;AUTRE;?;?;;True
+PRG_02_Acquisition.COD1_CODEUR.GetDeviceState;10;AUTRE;?;?;;False
+PRG_02_Acquisition.COD1_PosValue;10;AUTRE;?;?;;True
+PRG_02_Acquisition.COD1_SpdValue;10;AUTRE;?;?;;True
+PRG_02_Acquisition.COD1_Warnings;10;AUTRE;?;?;;True
+PRG_02_Acquisition.COD2_Alarms;10;AUTRE;?;?;;True
+PRG_02_Acquisition.COD2_CODEUR.GetDeviceState;10;AUTRE;?;?;;False
+PRG_02_Acquisition.COD2_PosValue;10;AUTRE;?;?;;True
+PRG_02_Acquisition.COD2_SpdValue;10;AUTRE;?;?;;True
+PRG_02_Acquisition.COD2_Warnings;10;AUTRE;?;?;;True
+PRG_02_Acquisition.DEVICE_STATE.RUNNING;10;AUTRE;?;?;;False
+PRG_02_Acquisition.Local_Digital_IO.GetDeviceState;10;AUTRE;?;?;;False
+PRG_02_Acquisition.M1M2_TopPositionFree_DI;10;FRONTIERE;?;?;;True
+PRG_02_Acquisition.M1_BrakeIsOpen_DI;10;AUTRE;?;?;;True
+PRG_02_Acquisition.M1_ContactorsReleased_DI;10;AUTRE;?;?;;True
+PRG_02_Acquisition.M1_ThermalOk_DI;10;AUTRE;?;?;;True
+PRG_02_Acquisition.M2_BrakeIsOpen_DI;10;FRONTIERE;?;?;;True
+PRG_02_Acquisition.M2_ContactorsReleased_DI;10;FRONTIERE;?;?;;True
+PRG_02_Acquisition.M2_TensionedCable_DI;10;FRONTIERE;?;?;;True
+PRG_02_Acquisition.M2_ThermalOk_DI;10;FRONTIERE;?;?;;True
+PRG_02_Acquisition.VH_0008ER.GetDeviceState;10;AUTRE;?;?;;False
+PRG_02_Acquisition.VH_0008ER_1.GetDeviceState;10;AUTRE;?;?;;False
+PRG_02_Acquisition.VH_0800END.GetDeviceState;10;AUTRE;?;?;;False
+PRG_02_Acquisition.VH_0808ETP.GetDeviceState;10;AUTRE;?;?;;False
+PRG_02_Acquisition.instSimBench.Winch;10;FRONTIERE;VAR_OUTPUT;ST_HwWinch;;False
+PRG_03_Modes_Cycle.Data.Auth.InhibitM2;10;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_03_Modes_Cycle.Data.Auth.SyncEnable;10;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit;10;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;True
+PRG_04_Treuils_Benne.BucketActivityHold.Q;10;FRONTIERE;VAR;TOF;;False
+PRG_04_Treuils_Benne.BypassKoboldBottomTouched;10;BYPASS;VAR;BOOL;;False
+PRG_04_Treuils_Benne.DescendPermitDiveBucketOpen;10;FRONTIERE;VAR;BOOL;;True
+PRG_04_Treuils_Benne.ExtractionAssistActive;10;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:300;True
+PRG_04_Treuils_Benne.KoboldBottomTouchLatched;10;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:726 PRG_04_Treuils_Benne.st:748;True
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P1R1;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;True
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P1R2;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;False
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P1R3;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;False
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P1R4;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;True
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P2R1;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;True
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P2R2;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;False
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P2R3;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;False
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P2R4;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;True
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P3R1;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;True
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P3R2;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;False
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P3R3;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;False
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P3R4;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;True
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P4R1;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;True
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P4R2;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;False
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P4R3;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;False
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P4R4;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;True
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P5R1;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;True
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P5R2;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;False
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P5R3;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;False
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.P5R4;10;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;True
+PRG_04_Treuils_Benne.SyncOperationPermit;10;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:426;False
+PRG_04_Treuils_Benne.instBucket.ActiveOffsetSettled;10;FRONTIERE;VAR_OUTPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.AscentPermit;10;AUTRE;VAR_OUTPUT;BOOL;FB_Safety_Winch.st:533 FB_Safety_Winch.st:574;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassGlobal;10;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassProcess;10;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseEncoderActive;10;AUTRE;VAR;BOOL;FB_Safety_Winch.st:495;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseMecaEActive;10;AUTRE;VAR;BOOL;FB_Safety_Winch.st:506;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseNoMovementActive;10;AUTRE;VAR;BOOL;FB_Safety_Winch.st:509;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseOperatorCommActive;10;AUTRE;VAR;BOOL;FB_Safety_Winch.st:494;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseOppositeDirActive;10;AUTRE;VAR;BOOL;FB_Safety_Winch.st:508;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CausePhaseRotationActive;10;AUTRE;VAR;BOOL;FB_Safety_Winch.st:498;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.DescendPermit;10;AUTRE;VAR_OUTPUT;BOOL;FB_Safety_Winch.st:532 FB_Safety_Winch.st:563;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.FirstScanDone;10;AUTRE;VAR;BOOL;FB_Safety_Winch.st:200;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.MeasuredSpeedMps;10;AUTRE;VAR_INPUT;REAL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.MeasuredSpeedValid;10;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.RefWindowActive;10;AUTRE;VAR;BOOL;FB_Safety_Winch.st:248 FB_Safety_Winch.st:464;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.ResetEdge.Q;10;AUTRE;VAR;R_TRIG;FB_Safety_Winch.st:181;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.SpeedBandMaxMps;10;AUTRE;VAR_INPUT;REAL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.instCauses.Active;10;AUTRE;VAR;ARRAY[0..15] OF ST_FaultCause;FB_Safety_Winch.st:269 FB_Safety_Winch.st:271 FB_Safety_Winch.st:280 FB_Safety_Winch.st:288;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SpeedStepTable.StepThreshold_Pct;10;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.Enable;10;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.EnableRising;10;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.RemainingDelay;10;AUTRE;VAR;TIME;FB_WinchDirectionInterlock.st:94 FB_WinchDirectionInterlock.st:96;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.RequestConflict;10;AUTRE;VAR_OUTPUT;BOOL;FB_WinchDirectionInterlock.st:70;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.Reset;10;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.MaxStepNumber;10;AUTRE;VAR_INPUT;INT;;False
+PRG_04_Treuils_Benne.instWinchM1.SpeedStep.MinStepNumber;10;AUTRE;VAR_INPUT;INT;;False
+PRG_04_Treuils_Benne.instWinchM1.StepShaper.StepRampDelay;10;AUTRE;VAR_INPUT;TIME;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.ContactorMismatch;10;AUTRE;VAR_OUTPUT;BOOL;FB_SyncContactor.st:141 FB_SyncContactor.st:72;False
+PRG_06_Outputs.instSyncContactorFinal.ContactorMismatch;10;AUTRE;VAR_OUTPUT;BOOL;FB_SyncContactor.st:141 FB_SyncContactor.st:72;True
+GVL_IHM.Commun.Bypass.SlackCable;11;BYPASS;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:341 PRG_07_Supervision.st:369;True
+GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent;11;REGLAGE;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:191 PRG_07_Supervision.st:241;True
+GVL_IHM.M1TreuilRetenue.Bypass.Global;11;BYPASS;VAR_GLOBAL;ST_WinchHMI;PRG_07_Supervision.st:304 PRG_07_Supervision.st:361;True
+GVL_IHM.M1TreuilRetenue.Bypass.Process;11;BYPASS;VAR_GLOBAL;ST_WinchHMI;PRG_07_Supervision.st:390 PRG_07_Supervision.st:403;False
+GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;11;COMMANDE;VAR_GLOBAL;ST_WinchBenneHMI;;True
+GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen;11;COMMANDE;VAR_GLOBAL;ST_WinchBenneHMI;;True
+GVL_IHM.Network.Bypass.Initialized;11;BYPASS;VAR_GLOBAL;ST_NetworkDiagHMI;PRG_07_Supervision.st:354;False
+PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy;11;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:676;True
+PRG_02_Acquisition.Data.EncoderM1.Measurement.SpeedValid;11;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:676;False
+PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps;11;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:676;False
+PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy;11;FRONTIERE;VAR_OUTPUT;ST_AcquisitionInterPrg;;True
+PRG_02_Acquisition.Data.Joystick.AtNeutralXY;11;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:532;True
+PRG_02_Acquisition.Data.MachineHoming.Active;11;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:626;True
+PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated;11;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;11;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen;11;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;True
+PRG_03_Modes_Cycle.Data.SequenceState.Step;11;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;True
+PRG_04_Treuils_Benne.KoboldAutoStopFallEdge.Q;11;AUTRE;VAR;F_TRIG;PRG_04_Treuils_Benne.st:721;False
+PRG_04_Treuils_Benne.KoboldImmersionConfirmed;11;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:725 PRG_04_Treuils_Benne.st:742 PRG_04_Treuils_Benne.st:749;True
+PRG_04_Treuils_Benne.M1WinchCfg.SpeedStepTable.StepThreshold_Pct;11;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1444;False
+PRG_04_Treuils_Benne.ManualBucketJogActive;11;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne._WinchSpeedConfig.SpeedBandMaxMps;11;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P1R1;11;AUTRE;?;?;;True
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P1R2;11;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P1R3;11;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P1R4;11;AUTRE;?;?;;True
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P2R1;11;AUTRE;?;?;;True
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P2R2;11;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P2R3;11;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P2R4;11;AUTRE;?;?;;True
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P3R1;11;AUTRE;?;?;;True
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P3R2;11;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P3R3;11;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._WinchSpeedStepTable.P3R4;11;AUTRE;?;?;;True
+PRG_04_Treuils_Benne.instArbBucket.CmdClose_IHM;11;FRONTIERE;VAR_OUTPUT;BOOL;;False
+PRG_04_Treuils_Benne.instArbBucket.CmdOpen_IHM;11;FRONTIERE;VAR_OUTPUT;BOOL;;False
+PRG_04_Treuils_Benne.instBucket.ActiveOffsetValid;11;FRONTIERE;VAR_OUTPUT;BOOL;;False
+PRG_04_Treuils_Benne.instBucket.Lifecycle.Busy;11;FRONTIERE;VAR_OUTPUT;ST_Lifecycle;;True
+PRG_04_Treuils_Benne.instSafetyWinchM1.BenneBusy;11;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BrakeThermalFaultLatched;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:190 FB_Safety_Winch.st:209 FB_Safety_Winch.st:366;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassCableLimitSwitch;11;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassLimitLegal;11;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassOperatorComm;11;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassTopLimitSoftware;11;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassTopLimitSwitch;11;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CablePosM;11;AUTRE;VAR_INPUT;REAL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseCableLimitActive;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:500;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CauseTopLimitSwitchActive;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:499;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CfgCableLimitDescentM;11;REGLAGE;VAR_INPUT;REAL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CrossCheckEnable;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.EncoderFaultLatched;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:184 FB_Safety_Winch.st:203 FB_Safety_Winch.st:278;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.HeartbeatIhmOk;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.Homed;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.HomingSuspect;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.InReferencingMode;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.JoystickOnline;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.JoystickOperational;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.LimitLegalReached;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.MecaAFaultLatched;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:187 FB_Safety_Winch.st:206 FB_Safety_Winch.st:251 FB_Safety_Winch.st:334;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.MecaBFaultLatched;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:188 FB_Safety_Winch.st:207 FB_Safety_Winch.st:343;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.MecaCFaultLatched;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:189 FB_Safety_Winch.st:208 FB_Safety_Winch.st:359;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.MecaDFaultLatched;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:191 FB_Safety_Winch.st:210 FB_Safety_Winch.st:381;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.MecaEEscaladeFaultLatched;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:193 FB_Safety_Winch.st:212 FB_Safety_Winch.st:253 FB_Safety_Winch.st:407;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.MecaEFaultLatched;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:192 FB_Safety_Winch.st:211 FB_Safety_Winch.st:252 FB_Safety_Winch.st:397;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.MotorThermalFaultLatched;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:185 FB_Safety_Winch.st:204 FB_Safety_Winch.st:286;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.NoMovementFaultLatched;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:195 FB_Safety_Winch.st:214 FB_Safety_Winch.st:444;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.OppositeDirectionFaultLatched;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:194 FB_Safety_Winch.st:213 FB_Safety_Winch.st:426;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.PhaseRotationFaultLatched;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:186 FB_Safety_Winch.st:205 FB_Safety_Winch.st:303;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.PosStepDetected;11;AUTRE;VAR;BOOL;FB_Safety_Winch.st:230 FB_Safety_Winch.st:465;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.Reset;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.SlackCableDetected;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.TonRefSettle.Q;11;AUTRE;VAR;TON;FB_Safety_Winch.st:247 FB_Safety_Winch.st:463;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.TonStartupWarmup.Q;11;AUTRE;VAR;TON;FB_Safety_Winch.st:219 FB_Safety_Winch.st:540;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.TopLimitM;11;AUTRE;VAR_INPUT;REAL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.TopPositionSensor;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchM1.ActiveMaxStep;11;AUTRE;VAR;INT;FB_Winch.st:177 FB_Winch.st:179 FB_Winch.st:182 FB_Winch.st:184;True
+PRG_04_Treuils_Benne.instWinchM1.Config.StepRampDelayAscent;11;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.CapturedStoppedTime;11;AUTRE;VAR;TIME;FB_WinchDirectionInterlock.st:175 FB_WinchDirectionInterlock.st:67 FB_WinchDirectionInterlock.st:78;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.EffectiveDelay;11;AUTRE;VAR;TIME;FB_WinchDirectionInterlock.st:84 FB_WinchDirectionInterlock.st:86;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.T;11;AUTRE;?;?;;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.ms;11;AUTRE;?;?;;False
+PRG_04_Treuils_Benne.instWinchM1.Reset;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.BypassGlobal;11;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Enable;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.MismatchTimer.Q;11;AUTRE;VAR;TON;FB_SyncContactor.st:140 FB_SyncContactor.st:80;False
+PRG_06_Outputs.instSyncContactorFinal.BypassGlobal;11;BYPASS;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.Enable;11;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.MismatchTimer.Q;11;AUTRE;VAR;TON;FB_SyncContactor.st:140 FB_SyncContactor.st:80;True
+PRG_07_Supervision.BypassNetworkGlobal;11;BYPASS;?;?;PRG_07_Supervision.st:370;False
+PRG_07_Supervision.instMirrorBypassNetwork.Hmi;11;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:24;True
+GVL_IHM.Commun.Bypass.Initialized;12;BYPASS;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:343;False
+GVL_IHM.Commun.HeartbeatIhmOk;12;IHM;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:425;True
+GVL_IHM.Commun.LimitLegalReached;12;IHM;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:416;True
+GVL_IHM.CycleSemiAuto.Cfg.ImmersionLower_M;12;REGLAGE;VAR_GLOBAL;ST_CycleHMI;PRG_07_Supervision.st:261;False
+GVL_IHM.CycleSemiAuto.Cfg.ImmersionUpper_M;12;REGLAGE;VAR_GLOBAL;ST_CycleHMI;PRG_07_Supervision.st:261;False
+GVL_IHM.M1M2Sync.Bypass.Global;12;BYPASS;VAR_GLOBAL;ST_SyncHMI;;False
+GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback;12;BYPASS;VAR_GLOBAL;ST_WinchHMI;PRG_07_Supervision.st:494;False
+GVL_IHM.M1TreuilRetenue.Bypass.Initialized;12;BYPASS;VAR_GLOBAL;ST_WinchHMI;PRG_07_Supervision.st:306;False
+GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm;12;BYPASS;VAR_GLOBAL;ST_WinchHMI;;True
+GVL_IHM.M1TreuilRetenue.Bypass.Safety;12;BYPASS;VAR_GLOBAL;ST_WinchHMI;PRG_07_Supervision.st:389 PRG_07_Supervision.st:402;False
+GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback;12;BYPASS;VAR_GLOBAL;ST_WinchBenneHMI;;False
+GVL_IHM.M2TreuilBenne.Bypass.Global;12;BYPASS;VAR_GLOBAL;ST_WinchBenneHMI;;True
+GVL_IHM.M2TreuilBenne.Bypass.Process;12;BYPASS;VAR_GLOBAL;ST_WinchBenneHMI;;False
+GVL_IHM.M2TreuilBenne.Bypass.Safety;12;BYPASS;VAR_GLOBAL;ST_WinchBenneHMI;;False
+PRG_02_Acquisition.Data.EncoderM1.Homed;12;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:679;True
+PRG_02_Acquisition.Data.EncoderM1.HomingSuspect;12;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:680;True
+PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;12;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:676;True
+PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;12;FRONTIERE;VAR_OUTPUT;ST_AcquisitionInterPrg;;True
+PRG_02_Acquisition.Data.Network.Joystick.Online;12;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:279;False
+PRG_02_Acquisition.Data.Network.Joystick.Operational;12;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:279;True
+PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;12;FRONTIERE;VAR_OUTPUT;ST_HardwareImage;;True
+PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;12;FRONTIERE;VAR_OUTPUT;ST_HardwareImage;;True
+PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;12;FRONTIERE;VAR_OUTPUT;ST_HardwareImage;;True
+PRG_02_Acquisition.instCycleMachineHoming.MachineHomingActive;12;FRONTIERE;VAR_OUTPUT;BOOL;;True
+PRG_02_Acquisition.instEncoderM1.Measurement.HomingLifecycle.Busy;12;AUTRE;VAR_OUTPUT;ST_fbEncoder_Measurement;FB_Encoder.st:203 FB_Encoder.st:92;True
+PRG_02_Acquisition.instEncoderM1.Measurement.SpeedValid;12;AUTRE;VAR_OUTPUT;ST_fbEncoder_Measurement;FB_Encoder.st:201 FB_Encoder.st:90;False
+PRG_02_Acquisition.instEncoderM1.Measurement.Speed_Mps;12;AUTRE;VAR_OUTPUT;ST_fbEncoder_Measurement;FB_Encoder.st:199 FB_Encoder.st:90;False
+PRG_02_Acquisition.instJoystick.AtNeutralXY;12;AUTRE;VAR_OUTPUT;BOOL;FB_Joystick.st:164 FB_Joystick.st:185;True
+PRG_04_Treuils_Benne.BypassM1CableLimitSwitchEff;12;BYPASS;VAR;BOOL;PRG_04_Treuils_Benne.st:868;False
+PRG_04_Treuils_Benne.BypassM1LimitLegalEff;12;BYPASS;VAR;BOOL;PRG_04_Treuils_Benne.st:869;False
+PRG_04_Treuils_Benne.BypassM1TopLimitSoftwareEff;12;BYPASS;VAR;BOOL;PRG_04_Treuils_Benne.st:867;False
+PRG_04_Treuils_Benne.BypassM1TopLimitSwitchEff;12;BYPASS;VAR;BOOL;PRG_04_Treuils_Benne.st:866;False
+PRG_04_Treuils_Benne.KoboldAutoStopRiseEdge.Q;12;AUTRE;VAR;R_TRIG;PRG_04_Treuils_Benne.st:720;False
+PRG_04_Treuils_Benne.M1WinchCfg.StepRampDelayAscent;12;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1454;False
+PRG_04_Treuils_Benne.TopLimitM1_M;12;AUTRE;VAR;REAL;PRG_04_Treuils_Benne.st:883;False
+PRG_04_Treuils_Benne.WinchBothReqDescend;12;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:286;False
+PRG_04_Treuils_Benne._BucketState.IsOpen;12;FRONTIERE;?;?;;True
+PRG_04_Treuils_Benne._WinchM1CfgPersist.CfgCableLimitDescent_M;12;REGLAGE;?;?;;True
+PRG_04_Treuils_Benne._WinchSpeedStepTable.StepThreshold_Pct;12;AUTRE;?;?;;True
+PRG_04_Treuils_Benne.instSafetyWinchM1.BrakeThermalFeedback;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassBrakeThermal;12;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassMecaB;12;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassMecaD;12;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassMecaE;12;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassMotorThermal;12;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassPhaseRotation;12;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.BypassSafety;12;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CablePosMPrev;12;AUTRE;VAR;REAL;FB_Safety_Winch.st:201 FB_Safety_Winch.st:242 FB_Safety_Winch.st:466;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.CriticalSyncToleranceM;12;AUTRE;VAR_INPUT;REAL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.EncoderAvailable;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.EncoderFaultBypass;12;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.ExpectedOtherWinchPosM;12;AUTRE;VAR_INPUT;REAL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.ExpectedOtherWinchPosMPrev;12;AUTRE;VAR;REAL;FB_Safety_Winch.st:202 FB_Safety_Winch.st:243 FB_Safety_Winch.st:467;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.ExternalSyncEscalation;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.OtherWinchInhibited;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.PhaseRotationOk;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.T;12;AUTRE;?;?;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.ThermalFeedback;12;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.WinchStandstill;12;AUTRE;VAR;BOOL;FB_Safety_Winch.st:263;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.s;12;AUTRE;?;?;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SlowdownMaxStep;12;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.ChangeDelayAscent;12;AUTRE;VAR_INPUT;TIME;;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.ChangeDelayDescent;12;AUTRE;VAR_INPUT;TIME;;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.RequestActiveRising.Q;12;AUTRE;VAR;R_TRIG;FB_WinchDirectionInterlock.st:76;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.StoppedTimer.ET;12;AUTRE;VAR;TON;FB_WinchDirectionInterlock.st:114;False
+PRG_04_Treuils_Benne.instWinchM1.InBottomSlowdownZone;12;AUTRE;VAR_OUTPUT;BOOL;FB_Winch.st:154 FB_Winch.st:174;True
+PRG_04_Treuils_Benne.instWinchM1.InTopSlowdownZone;12;AUTRE;VAR_OUTPUT;BOOL;FB_Winch.st:153 FB_Winch.st:173;True
+PRG_04_Treuils_Benne.instWinchM1.WinchRequest.HomingApproachActive;12;AUTRE;VAR_INPUT;ST_fbWinch_Req;;False
+PRG_04_Treuils_Benne.instWinchM1.WinchRequest.MaxStepDown;12;AUTRE;VAR_INPUT;ST_fbWinch_Req;;True
+PRG_04_Treuils_Benne.instWinchM1.WinchRequest.MaxStepUp;12;AUTRE;VAR_INPUT;ST_fbWinch_Req;;True
+PRG_04_Treuils_Benne.instWinchM1.WinchRequest.ReqAscent;12;AUTRE;VAR_INPUT;ST_fbWinch_Req;;False
+PRG_04_Treuils_Benne.instWinchM1.WinchRequest.ReqDescend;12;AUTRE;VAR_INPUT;ST_fbWinch_Req;;False
+PRG_04_Treuils_Benne.instWinchSync.BypassGlobal;12;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.FALSE;12;AUTRE;?;?;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.MismatchActive;12;AUTRE;VAR;BOOL;FB_SyncContactor.st:134 FB_SyncContactor.st:76;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.MismatchDebounce;12;AUTRE;VAR;TIME;;False
+PRG_06_Outputs.instSyncContactorFinal.MismatchActive;12;AUTRE;VAR;BOOL;FB_SyncContactor.st:134 FB_SyncContactor.st:76;False
+PRG_06_Outputs.instSyncContactorFinal.MismatchDebounce;12;AUTRE;VAR;TIME;;False
+PRG_07_Supervision.BypassSlackCable;12;BYPASS;?;?;PRG_07_Supervision.st:369;False
+PRG_07_Supervision.BypassWinchM1Global;12;BYPASS;?;?;PRG_07_Supervision.st:361;False
+PRG_07_Supervision.SimBypassFall.Q;12;FRONTIERE;VAR;F_TRIG;;False
+PRG_07_Supervision.SimBypassRise.Q;12;FRONTIERE;VAR;R_TRIG;;False
+PRG_07_Supervision.instCfgPersistBridgeCommun.Hmi.TglEnableKoboldAutoStopDescent;12;REGLAGE;VAR_IN_OUT;ST_CommunCfg;FB_CfgPersistBridge_CommunCfg.st:21;True
+PRG_07_Supervision.instCfgT330Normalizer.CommunCfg.TglEnableKoboldAutoStopDescent;12;REGLAGE;VAR_IN_OUT;ST_CommunCfg;;True
+PRG_07_Supervision.instMirrorBypassM1.Hmi;12;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:24;True
+PRG_07_Supervision.instMirrorBypassNetwork.Prev;12;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:26;False
+PRG_07_Supervision.instMirrorBypassNetwork.RetainVal;12;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:22;True
+PRG_07_Supervision.instMirrorBypassSlackCable.Hmi;12;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:24;True
+GVL_IHM.Commun.Bypass.CableLimitSwitch;13;BYPASS;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:338 PRG_07_Supervision.st:368 PRG_07_Supervision.st:395 PRG_07_Supervision.st:400;False
+GVL_IHM.Commun.Bypass.LimitLegal;13;BYPASS;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:329 PRG_07_Supervision.st:365 PRG_07_Supervision.st:401;False
+GVL_IHM.Commun.Bypass.TopLimitSoftware;13;BYPASS;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:335 PRG_07_Supervision.st:367 PRG_07_Supervision.st:394 PRG_07_Supervision.st:399;True
+GVL_IHM.Commun.Bypass.TopLimitSwitch;13;BYPASS;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:332 PRG_07_Supervision.st:366 PRG_07_Supervision.st:393 PRG_07_Supervision.st:398;True
+GVL_IHM.M1TreuilRetenue.Bypass.BrakeThermal;13;BYPASS;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M1TreuilRetenue.Bypass.CableLimitSwitch;13;BYPASS;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault;13;BYPASS;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M1TreuilRetenue.Bypass.LimitLegal;13;BYPASS;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M1TreuilRetenue.Bypass.MecaB;13;BYPASS;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M1TreuilRetenue.Bypass.MecaE;13;BYPASS;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M1TreuilRetenue.Bypass.MotorThermal;13;BYPASS;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M1TreuilRetenue.Bypass.PhaseRotation;13;BYPASS;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware;13;BYPASS;VAR_GLOBAL;ST_WinchHMI;;True
+GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch;13;BYPASS;VAR_GLOBAL;ST_WinchHMI;;True
+PRG_02_Acquisition.Data.EncoderM1.Measurement.EncoderAvailable;13;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:676;False
+PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI;13;FRONTIERE;VAR_OUTPUT;ST_HardwareImage;;True
+PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI;13;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:484;True
+PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;13;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:481;True
+PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online;13;AUTRE;VAR_OUTPUT;ST_Diag_Device;FB_Diag_CanOpen.st:50 FB_Diag_CanOpen.st:99;False
+PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational;13;AUTRE;VAR_OUTPUT;ST_Diag_Device;FB_Diag_CanOpen.st:106 FB_Diag_CanOpen.st:108 FB_Diag_CanOpen.st:51;True
+PRG_02_Acquisition.instEncoderM1.Enable;13;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.Homed;13;AUTRE;VAR_OUTPUT;BOOL;FB_Encoder.st:101 FB_Encoder.st:213;True
+PRG_02_Acquisition.instEncoderM1.HomingSuspect;13;AUTRE;VAR_OUTPUT;BOOL;FB_Encoder.st:102 FB_Encoder.st:214;True
+PRG_02_Acquisition.instEncoderM1.Measurement.CablePosM;13;AUTRE;VAR_OUTPUT;ST_fbEncoder_Measurement;FB_Encoder.st:196 FB_Encoder.st:89;True
+PRG_02_Acquisition.instEncoderM1.instHoming.Lifecycle.Busy;13;AUTRE;VAR_OUTPUT;ST_Lifecycle;FB_Encoder_Homing.st:164 FB_Encoder_Homing.st:289;True
+PRG_02_Acquisition.instEncoderM1.instSpeed.Speed_Mps;13;AUTRE;VAR_OUTPUT;REAL;FB_Encoder_SpeedMeasure.st:38 FB_Encoder_SpeedMeasure.st:50;False
+PRG_02_Acquisition.instEncoderM1.instSpeed.Valid;13;AUTRE;VAR_OUTPUT;BOOL;FB_Encoder_SpeedMeasure.st:40 FB_Encoder_SpeedMeasure.st:51;False
+PRG_02_Acquisition.instJoystick.BusLost;13;AUTRE;VAR;BOOL;FB_Joystick.st:116;False
+PRG_02_Acquisition.instJoystick.Enable;13;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instJoystick.ScaleX.OutPct;13;AUTRE;VAR_OUTPUT;REAL;FB_AxisScale.st:29 FB_AxisScale.st:31 FB_AxisScale.st:36 FB_AxisScale.st:38;False
+PRG_02_Acquisition.instJoystick.ScaleY.OutPct;13;AUTRE;VAR_OUTPUT;REAL;FB_AxisScale.st:29 FB_AxisScale.st:31 FB_AxisScale.st:36 FB_AxisScale.st:38;False
+PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend;13;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;True
+PRG_04_Treuils_Benne.BypassM1MecaDEff;13;BYPASS;VAR;BOOL;PRG_04_Treuils_Benne.st:870;False
+PRG_04_Treuils_Benne.M1WinchCfg.SlowdownMaxStep;13;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1447;False
+PRG_04_Treuils_Benne.OverrideTopSoftwareN1M1;13;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:856;False
+PRG_04_Treuils_Benne.ReqM1Winch.HomingApproachActive;13;AUTRE;VAR;ST_fbWinch_Req;PRG_04_Treuils_Benne.st:1415;False
+PRG_04_Treuils_Benne.ReqM1Winch.MaxStepDown;13;AUTRE;VAR;ST_fbWinch_Req;PRG_04_Treuils_Benne.st:1411;True
+PRG_04_Treuils_Benne.ReqM1Winch.MaxStepUp;13;AUTRE;VAR;ST_fbWinch_Req;PRG_04_Treuils_Benne.st:1410;True
+PRG_04_Treuils_Benne.ReqM1Winch.ReqAscent;13;AUTRE;VAR;ST_fbWinch_Req;PRG_04_Treuils_Benne.st:1387 PRG_04_Treuils_Benne.st:1408;False
+PRG_04_Treuils_Benne.ReqM1Winch.ReqDescend;13;AUTRE;VAR;ST_fbWinch_Req;PRG_04_Treuils_Benne.st:1388 PRG_04_Treuils_Benne.st:1408;False
+PRG_04_Treuils_Benne.T;13;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._CommunCfgPersist.CfgCableLimitAscent_M;13;REGLAGE;?;?;;False
+PRG_04_Treuils_Benne._WinchCriticalSyncTolerance_M;13;AUTRE;?;?;;False
+PRG_04_Treuils_Benne._WinchM1CfgPersist.CfgTopSensorPos_M;13;REGLAGE;?;?;;False
+PRG_04_Treuils_Benne.instBucket.ActiveOffsetM;13;FRONTIERE;VAR_OUTPUT;REAL;;True
+PRG_04_Treuils_Benne.instSafetyWinchM1.BrakeFeedback;13;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.FwdRevSpeedFeedbackOff;13;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.JoystickYNeutral;13;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.MovementCommanded;13;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.DirectionInterlockDelayAscent;13;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.DirectionInterlockDelayDescent;13;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SlowdownDistanceBottom_M;13;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.Config.SlowdownDistanceTop_M;13;AUTRE;VAR_INPUT;ST_fbWinch_Cfg;;False
+PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.MaxDirectionDelay;13;AUTRE;VAR;TIME;FB_WinchDirectionInterlock.st:88;False
+PRG_04_Treuils_Benne.instWinchM1.Sensors.CablePosM;13;AUTRE;VAR_INPUT;ST_fbWinch_Sensors;;False
+PRG_04_Treuils_Benne.instWinchM1.Sensors.Homed;13;AUTRE;VAR_INPUT;ST_fbWinch_Sensors;;False
+PRG_04_Treuils_Benne.instWinchM1.Sensors.HomingSuspect;13;AUTRE;VAR_INPUT;ST_fbWinch_Sensors;;False
+PRG_04_Treuils_Benne.instWinchM1.WinchRequest.BottomLimitM;13;AUTRE;VAR_INPUT;ST_fbWinch_Req;;False
+PRG_04_Treuils_Benne.instWinchM1.WinchRequest.TopLimitM;13;AUTRE;VAR_INPUT;ST_fbWinch_Req;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Diag.RelayFwdMismatch;13;AUTRE;VAR_OUTPUT;ST_SyncContactorDiag;FB_SyncContactor.st:104 FB_SyncContactor.st:82;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Diag.RelayRevMismatch;13;AUTRE;VAR_OUTPUT;ST_SyncContactorDiag;FB_SyncContactor.st:105 FB_SyncContactor.st:83;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Diag.Step1Mismatch;13;AUTRE;VAR_OUTPUT;ST_SyncContactorDiag;FB_SyncContactor.st:106 FB_SyncContactor.st:128 FB_SyncContactor.st:84;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Diag.Step2Mismatch;13;AUTRE;VAR_OUTPUT;ST_SyncContactorDiag;FB_SyncContactor.st:107 FB_SyncContactor.st:129 FB_SyncContactor.st:85;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Diag.Step3Mismatch;13;AUTRE;VAR_OUTPUT;ST_SyncContactorDiag;FB_SyncContactor.st:108 FB_SyncContactor.st:130 FB_SyncContactor.st:86;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Diag.Step4Mismatch;13;AUTRE;VAR_OUTPUT;ST_SyncContactorDiag;FB_SyncContactor.st:109 FB_SyncContactor.st:131 FB_SyncContactor.st:87;False
+PRG_04_Treuils_Benne.ms;13;AUTRE;?;?;;False
+PRG_06_Outputs.Data.ContactorMismatchEscalated;13;AUTRE;VAR_OUTPUT;ST_OutputsInterPrg;PRG_06_Outputs.st:364;False
+PRG_06_Outputs.instSyncContactorFinal.Diag.RelayFwdMismatch;13;AUTRE;VAR_OUTPUT;ST_SyncContactorDiag;FB_SyncContactor.st:104 FB_SyncContactor.st:82;False
+PRG_06_Outputs.instSyncContactorFinal.Diag.RelayRevMismatch;13;AUTRE;VAR_OUTPUT;ST_SyncContactorDiag;FB_SyncContactor.st:105 FB_SyncContactor.st:83;False
+PRG_06_Outputs.instSyncContactorFinal.Diag.Step1Mismatch;13;AUTRE;VAR_OUTPUT;ST_SyncContactorDiag;FB_SyncContactor.st:106 FB_SyncContactor.st:128 FB_SyncContactor.st:84;False
+PRG_06_Outputs.instSyncContactorFinal.Diag.Step2Mismatch;13;AUTRE;VAR_OUTPUT;ST_SyncContactorDiag;FB_SyncContactor.st:107 FB_SyncContactor.st:129 FB_SyncContactor.st:85;False
+PRG_06_Outputs.instSyncContactorFinal.Diag.Step3Mismatch;13;AUTRE;VAR_OUTPUT;ST_SyncContactorDiag;FB_SyncContactor.st:108 FB_SyncContactor.st:130 FB_SyncContactor.st:86;False
+PRG_06_Outputs.instSyncContactorFinal.Diag.Step4Mismatch;13;AUTRE;VAR_OUTPUT;ST_SyncContactorDiag;FB_SyncContactor.st:109 FB_SyncContactor.st:131 FB_SyncContactor.st:87;False
+PRG_07_Supervision.PrevNetworkBypass;13;BYPASS;VAR;BOOL;PRG_07_Supervision.st:370;False
+PRG_07_Supervision._CommunCfgPersist.LimitLegalDepthMinAllowed_M;13;REGLAGE;?;?;PRG_07_Supervision.st:241;False
+PRG_07_Supervision._CommunCfgPersist.LimitLegalEnabled;13;REGLAGE;?;?;PRG_07_Supervision.st:241;False
+PRG_07_Supervision.instCfgPersistBridgeCommun.Hmi.Initialized;13;REGLAGE;VAR_IN_OUT;ST_CommunCfg;FB_CfgPersistBridge_CommunCfg.st:21 FB_CfgPersistBridge_CommunCfg.st:22;False
+PRG_07_Supervision.instCfgPersistBridgeCommun.Persist.TglEnableKoboldAutoStopDescent;13;REGLAGE;VAR_IN_OUT;ST_CommunCfg;FB_CfgPersistBridge_CommunCfg.st:25;True
+PRG_07_Supervision.instCfgPersistBridgeCycle.Hmi.ImmersionLower_M;13;REGLAGE;VAR_IN_OUT;ST_CycleCfg;FB_CfgPersistBridge_CycleCfg.st:21;False
+PRG_07_Supervision.instCfgPersistBridgeCycle.Hmi.ImmersionUpper_M;13;REGLAGE;VAR_IN_OUT;ST_CycleCfg;FB_CfgPersistBridge_CycleCfg.st:21;False
+PRG_07_Supervision.instDiagIhmHeartbeat.HeartbeatIhmOk;13;AUTRE;VAR_OUTPUT;BOOL;FB_Diag_IhmHeartbeat.st:39 FB_Diag_IhmHeartbeat.st:66;True
+PRG_07_Supervision.instMirrorBypassM1.Prev;13;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:26;False
+PRG_07_Supervision.instMirrorBypassM1.RetainVal;13;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:22;True
+PRG_07_Supervision.instMirrorBypassSlackCable.Prev;13;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:26;False
+PRG_07_Supervision.instMirrorBypassSlackCable.RetainVal;13;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:22;True
+GVL_IHM.Commun.Cfg.Initialized;14;REGLAGE;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:191 PRG_07_Supervision.st:241;False
+GVL_IHM.M1TreuilRetenue.Bypass.MecaD;14;BYPASS;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M1TreuilRetenue.Cmd.BtnOverrideTopSoftware;14;COMMANDE;VAR_GLOBAL;ST_WinchHMI;;False
+PRG_02_Acquisition.Data.Joystick.AxisY.Direction;14;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:530;True
+PRG_02_Acquisition.TRUE;14;AUTRE;?;?;;True
+PRG_02_Acquisition.instDiagCanOpen.CANbusOnlineEff;14;AUTRE;VAR;BOOL;FB_Diag_CanOpen.st:70;True
+PRG_02_Acquisition.instDiagCanOpen.DeviceJoystickOnlineEff;14;AUTRE;VAR;BOOL;FB_Diag_CanOpen.st:71;False
+PRG_02_Acquisition.instDiagCanOpen.Enable;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.Calib.Homed;14;AUTRE;VAR_IN_OUT;ST_Encoder_Calib;FB_Encoder.st:131;True
+PRG_02_Acquisition.instEncoderM1.Calib.HomingSuspect;14;AUTRE;VAR_IN_OUT;ST_Encoder_Calib;FB_Encoder.st:131;True
+PRG_02_Acquisition.instEncoderM1.Measurement.EncoderAvailable;14;AUTRE;VAR_OUTPUT;ST_fbEncoder_Measurement;FB_Encoder.st:195 FB_Encoder.st:88;False
+PRG_02_Acquisition.instEncoderM1.instHoming.Enable;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.Homed;14;AUTRE;VAR_OUTPUT;BOOL;FB_Encoder_Homing.st:169 FB_Encoder_Homing.st:290;True
+PRG_02_Acquisition.instEncoderM1.instHoming.HomingSuspect;14;AUTRE;VAR_OUTPUT;BOOL;FB_Encoder_Homing.st:170 FB_Encoder_Homing.st:291;True
+PRG_02_Acquisition.instEncoderM1.instHoming.PresetVerificationActive;14;AUTRE;VAR;BOOL;FB_Encoder_Homing.st:167 FB_Encoder_Homing.st:233 FB_Encoder_Homing.st:278;True
+PRG_02_Acquisition.instEncoderM1.instSafety.CablePosMSafe;14;AUTRE;VAR_OUTPUT;REAL;FB_Encoder_Safety.st:70 FB_Encoder_Safety.st:80;True
+PRG_02_Acquisition.instEncoderM1.instSpeed.Enable;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instSpeed.PositionValid;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instSpeed.ResetEdge.Q;14;AUTRE;VAR;R_TRIG;FB_Encoder_SpeedMeasure.st:34;False
+PRG_02_Acquisition.instEncoderM1.instSpeed.SignedSpeed_Mps;14;AUTRE;VAR_OUTPUT;REAL;FB_Encoder_SpeedMeasure.st:39 FB_Encoder_SpeedMeasure.st:49;False
+PRG_02_Acquisition.instJoystick.BusCanOpenOP.Operational;14;AUTRE;VAR_INPUT;ST_Diag_Device;;False
+PRG_02_Acquisition.instJoystick.JoystickOP.Operational;14;AUTRE;VAR_INPUT;ST_Diag_Device;;False
+PRG_02_Acquisition.instJoystick.ScaleX.DeadbandRaw;14;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instJoystick.ScaleX.Delta;14;AUTRE;VAR;REAL;FB_AxisScale.st:27 FB_AxisScale.st:34;False
+PRG_02_Acquisition.instJoystick.ScaleX.Neutral;14;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instJoystick.ScaleX.RawIn;14;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instJoystick.ScaleY.DeadbandRaw;14;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instJoystick.ScaleY.Delta;14;AUTRE;VAR;REAL;FB_AxisScale.st:27 FB_AxisScale.st:34;False
+PRG_02_Acquisition.instJoystick.ScaleY.Neutral;14;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instJoystick.ScaleY.RawIn;14;AUTRE;VAR_INPUT;INT;;False
+PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable;14;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_04_Treuils_Benne.CommonMaxStepAscent;14;AUTRE;VAR;INT;PRG_04_Treuils_Benne.st:1226 PRG_04_Treuils_Benne.st:1244 PRG_04_Treuils_Benne.st:1249 PRG_04_Treuils_Benne.st:1253;True
+PRG_04_Treuils_Benne.CommonMaxStepDescent;14;AUTRE;VAR;INT;PRG_04_Treuils_Benne.st:1227 PRG_04_Treuils_Benne.st:1245 PRG_04_Treuils_Benne.st:1250 PRG_04_Treuils_Benne.st:1279;True
+PRG_04_Treuils_Benne.M1LogicReqAscent;14;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:542 PRG_04_Treuils_Benne.st:573;False
+PRG_04_Treuils_Benne.M1LogicReqDescend;14;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:543 PRG_04_Treuils_Benne.st:573;False
+PRG_04_Treuils_Benne.M1WinchCfg.DirectionInterlockDelayAscent;14;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1452;False
+PRG_04_Treuils_Benne.M1WinchCfg.DirectionInterlockDelayDescent;14;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1453;False
+PRG_04_Treuils_Benne.M1WinchCfg.SlowdownDistanceBottom_M;14;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1446;False
+PRG_04_Treuils_Benne.M1WinchCfg.SlowdownDistanceTop_M;14;AUTRE;VAR;ST_fbWinch_Cfg;PRG_04_Treuils_Benne.st:1445;False
+PRG_04_Treuils_Benne.M1WinchSensors.CablePosM;14;AUTRE;VAR;ST_fbWinch_Sensors;PRG_04_Treuils_Benne.st:1421;False
+PRG_04_Treuils_Benne.M1WinchSensors.Homed;14;AUTRE;VAR;ST_fbWinch_Sensors;PRG_04_Treuils_Benne.st:1422;False
+PRG_04_Treuils_Benne.M1WinchSensors.HomingSuspect;14;AUTRE;VAR;ST_fbWinch_Sensors;PRG_04_Treuils_Benne.st:1423;False
+PRG_04_Treuils_Benne.MaintN1;14;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:296;False
+PRG_04_Treuils_Benne.ReqM1Winch.BottomLimitM;14;AUTRE;VAR;ST_fbWinch_Req;PRG_04_Treuils_Benne.st:1418;False
+PRG_04_Treuils_Benne.ReqM1Winch.TopLimitM;14;AUTRE;VAR;ST_fbWinch_Req;PRG_04_Treuils_Benne.st:1417;False
+PRG_04_Treuils_Benne._CommunCfgPersist.WinchSlowdownMaxStep;14;REGLAGE;?;?;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.BothCommanded;14;AUTRE;VAR;BOOL;FB_SyncContactor.st:77 FB_SyncContactor.st:98;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Contactor1_M1;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Contactor1_M2;14;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Contactor2_M1;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Contactor2_M2;14;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Contactor3_M1;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Contactor3_M2;14;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Contactor4_M1;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.Contactor4_M2;14;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.DescentStep45Matched;14;AUTRE;VAR_OUTPUT;BOOL;FB_SyncContactor.st:121 FB_SyncContactor.st:75;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.RelayFwdM1;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.RelayFwdM2;14;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.RelayRevM1;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.RelayRevM2;14;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.SyncEnable;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.BothCommanded;14;AUTRE;VAR;BOOL;FB_SyncContactor.st:77 FB_SyncContactor.st:98;False
+PRG_06_Outputs.instSyncContactorFinal.Contactor1_M1;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.Contactor1_M2;14;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.Contactor2_M1;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.Contactor2_M2;14;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.Contactor3_M1;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.Contactor3_M2;14;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.Contactor4_M1;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.Contactor4_M2;14;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.ContactorMismatchEscalated;14;AUTRE;VAR_OUTPUT;BOOL;FB_SyncContactor.st:145 FB_SyncContactor.st:73;False
+PRG_06_Outputs.instSyncContactorFinal.DescentStep45Matched;14;AUTRE;VAR_OUTPUT;BOOL;FB_SyncContactor.st:121 FB_SyncContactor.st:75;False
+PRG_06_Outputs.instSyncContactorFinal.RelayFwdM1;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.RelayFwdM2;14;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.RelayRevM1;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.RelayRevM2;14;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.SyncEnable;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_07_Supervision.BypassCableLimitSwitch;14;BYPASS;?;?;PRG_07_Supervision.st:368;False
+PRG_07_Supervision.BypassLimitLegal;14;BYPASS;?;?;PRG_07_Supervision.st:365;False
+PRG_07_Supervision.BypassTopLimitSoftware;14;BYPASS;?;?;PRG_07_Supervision.st:367;False
+PRG_07_Supervision.BypassTopLimitSwitch;14;BYPASS;?;?;PRG_07_Supervision.st:366;False
+PRG_07_Supervision.PrevM1Bypass;14;BYPASS;VAR;BOOL;PRG_07_Supervision.st:361;False
+PRG_07_Supervision.PrevSlackCable;14;AUTRE;VAR;BOOL;PRG_07_Supervision.st:369;False
+PRG_07_Supervision._CommunCfgPersist.TglEnableKoboldAutoStopDescent;14;REGLAGE;?;?;PRG_07_Supervision.st:241;False
+PRG_07_Supervision.instCfgPersistBridgeCommun.Persist.Initialized;14;REGLAGE;VAR_IN_OUT;ST_CommunCfg;FB_CfgPersistBridge_CommunCfg.st:25;False
+PRG_07_Supervision.instCfgPersistBridgeCommun.Persist.LimitLegalDepthMinAllowed_M;14;REGLAGE;VAR_IN_OUT;ST_CommunCfg;FB_CfgPersistBridge_CommunCfg.st:25;False
+PRG_07_Supervision.instCfgPersistBridgeCommun.Persist.LimitLegalEnabled;14;REGLAGE;VAR_IN_OUT;ST_CommunCfg;FB_CfgPersistBridge_CommunCfg.st:25;False
+PRG_07_Supervision.instCfgPersistBridgeCycle.Hmi.Initialized;14;REGLAGE;VAR_IN_OUT;ST_CycleCfg;FB_CfgPersistBridge_CycleCfg.st:21 FB_CfgPersistBridge_CycleCfg.st:22;False
+PRG_07_Supervision.instCfgPersistBridgeCycle.Persist.ImmersionLower_M;14;REGLAGE;VAR_IN_OUT;ST_CycleCfg;FB_CfgPersistBridge_CycleCfg.st:25;False
+PRG_07_Supervision.instCfgPersistBridgeCycle.Persist.ImmersionUpper_M;14;REGLAGE;VAR_IN_OUT;ST_CycleCfg;FB_CfgPersistBridge_CycleCfg.st:25;False
+PRG_07_Supervision.instDiagIhmHeartbeat.Enable;14;AUTRE;VAR_INPUT;BOOL;;False
+PRG_07_Supervision.instDiagIhmHeartbeat.HeartbeatIhmTimeout;14;AUTRE;VAR_OUTPUT;BOOL;FB_Diag_IhmHeartbeat.st:40 FB_Diag_IhmHeartbeat.st:65;True
+PRG_07_Supervision.instMirrorBypassCableLimitSwitch.Hmi;14;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:24;False
+PRG_07_Supervision.instMirrorBypassLimitLegal.Hmi;14;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:24;False
+PRG_07_Supervision.instMirrorBypassTopLimitSoftware.Hmi;14;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:24;True
+PRG_07_Supervision.instMirrorBypassTopLimitSwitch.Hmi;14;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:24;True
+GVL_IHM.CycleSemiAuto.Cfg.Initialized;15;REGLAGE;VAR_GLOBAL;ST_CycleHMI;PRG_07_Supervision.st:261;False
+PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable;15;AUTRE;VAR_OUTPUT;ST_AcquisitionInterPrg;PRG_02_Acquisition.st:682;False
+PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable;15;FRONTIERE;VAR_OUTPUT;ST_AcquisitionInterPrg;;False
+PRG_02_Acquisition._CalibM1.Homed;15;AUTRE;?;?;PRG_02_Acquisition.st:644;False
+PRG_02_Acquisition._CalibM1.HomingSuspect;15;AUTRE;?;?;PRG_02_Acquisition.st:644;False
+PRG_02_Acquisition.instDiagCanOpen.CANbusOnlineReal;15;AUTRE;VAR;BOOL;FB_Diag_CanOpen.st:67;False
+PRG_02_Acquisition.instDiagCanOpen.CanBusBypassActive;15;BYPASS;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instDiagCanOpen.DeviceCanOpenMaster.Operational;15;AUTRE;VAR_OUTPUT;ST_Diag_Device;FB_Diag_CanOpen.st:130 FB_Diag_CanOpen.st:56;True
+PRG_02_Acquisition.instDiagCanOpen.DeviceJoystickOnlineReal;15;AUTRE;VAR;BOOL;FB_Diag_CanOpen.st:68;False
+PRG_02_Acquisition.instDiagCanOpen.JoystickBypassActive;15;BYPASS;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instDiagCanOpen.NetworkBypassActive;15;BYPASS;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instDiagCanOpen.SimBypassActive;15;BYPASS;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.EncoderAvailable;15;AUTRE;VAR_OUTPUT;BOOL;FB_Encoder_Abs.st:91 FB_Encoder_Abs.st:97;False
+PRG_02_Acquisition.instEncoderM1.instHoming.Calib.Homed;15;AUTRE;VAR_IN_OUT;ST_Encoder_Calib;FB_Encoder_Homing.st:265;True
+PRG_02_Acquisition.instEncoderM1.instHoming.Calib.HomingSuspect;15;AUTRE;VAR_IN_OUT;ST_Encoder_Calib;FB_Encoder_Homing.st:131 FB_Encoder_Homing.st:185 FB_Encoder_Homing.st:266 FB_Encoder_Homing.st:272;True
+PRG_02_Acquisition.instEncoderM1.instHoming.HomingTrigger;15;AUTRE;VAR;BOOL;FB_Encoder_Homing.st:213;False
+PRG_02_Acquisition.instEncoderM1.instHoming.PresetVerifyTimer.Q;15;AUTRE;VAR;TON;FB_Encoder_Homing.st:168 FB_Encoder_Homing.st:241 FB_Encoder_Homing.st:279;False
+PRG_02_Acquisition.instEncoderM1.instHoming.TargetPositionM;15;AUTRE;VAR;REAL;FB_Encoder_Homing.st:218 FB_Encoder_Homing.st:220 FB_Encoder_Homing.st:222;False
+PRG_02_Acquisition.instEncoderM1.instRel.EncoderFault;15;AUTRE;VAR_OUTPUT;BOOL;FB_EncoderReliability.st:30;False
+PRG_02_Acquisition.instEncoderM1.instSafety.CablePosM;15;AUTRE;VAR_INPUT;REAL;;True
+PRG_02_Acquisition.instEncoderM1.instSafety.Enable;15;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instSpeed.CableM_PerRev;15;AUTRE;VAR_INPUT;REAL;;False
+PRG_02_Acquisition.instEncoderM1.instSpeed.Reset;15;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instSpeed.SpdValueIn;15;AUTRE;VAR_INPUT;DINT;;False
+PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;15;AUTRE;VAR_OUTPUT;ST_fbJoystick_AxisCmd;FB_Joystick.st:163 FB_Joystick.st:305 FB_Joystick.st:306 FB_Joystick.st:307;True
+PRG_02_Acquisition.instJoystick.Cfg.DeadbandRaw;15;REGLAGE;VAR_INPUT;ST_fbJoystick_Cfg;;False
+PRG_02_Acquisition.instJoystick.NeutralXMem;15;AUTRE;VAR_IN_OUT;INT;FB_Joystick.st:123;False
+PRG_02_Acquisition.instJoystick.NeutralYMem;15;AUTRE;VAR_IN_OUT;INT;FB_Joystick.st:124;False
+PRG_02_Acquisition.instJoystick.RawX;15;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instJoystick.RawY;15;AUTRE;VAR_INPUT;INT;;False
+PRG_03_Modes_Cycle.Data.Auth.WinchSelTransitionHold;15;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ExtractionControlActive;15;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_04_Treuils_Benne.BottomLimitM1_Active;15;AUTRE;VAR;REAL;PRG_04_Treuils_Benne.st:695 PRG_04_Treuils_Benne.st:698;True
+PRG_04_Treuils_Benne.BucketNotClosedAscentCapStep1;15;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.EffectiveMaxStepAscent;15;AUTRE;VAR;INT;PRG_04_Treuils_Benne.st:469 PRG_04_Treuils_Benne.st:471;True
+PRG_04_Treuils_Benne.EffectiveMaxStepDescent;15;AUTRE;VAR;INT;PRG_04_Treuils_Benne.st:475 PRG_04_Treuils_Benne.st:477;True
+PRG_04_Treuils_Benne.ExtractionControlActive;15;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:596 PRG_04_Treuils_Benne.st:603 PRG_04_Treuils_Benne.st:605;True
+PRG_04_Treuils_Benne.MaintenanceMaxStepAscent;15;AUTRE;VAR;INT;PRG_04_Treuils_Benne.st:1233;False
+PRG_04_Treuils_Benne.MaintenanceMaxStepDescent;15;AUTRE;VAR;INT;PRG_04_Treuils_Benne.st:1234;False
+PRG_04_Treuils_Benne.SlackCableAscentCapStep1;15;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:452;False
+PRG_04_Treuils_Benne._CommunCfgPersist.WinchSlowdownDistanceBottom_M;15;REGLAGE;?;?;;False
+PRG_04_Treuils_Benne._CommunCfgPersist.WinchSlowdownDistanceTop_M;15;REGLAGE;?;?;;False
+PRG_04_Treuils_Benne.instArbM1.ReqAscent;15;AUTRE;VAR_OUTPUT;BOOL;FB_WinchCmdArbitrationM1.st:100 FB_WinchCmdArbitrationM1.st:51 FB_WinchCmdArbitrationM1.st:59 FB_WinchCmdArbitrationM1.st:72;False
+PRG_04_Treuils_Benne.instArbM1.ReqDescend;15;AUTRE;VAR_OUTPUT;BOOL;FB_WinchCmdArbitrationM1.st:101 FB_WinchCmdArbitrationM1.st:52 FB_WinchCmdArbitrationM1.st:60 FB_WinchCmdArbitrationM1.st:73;False
+PRG_04_Treuils_Benne.instWinchSync.Contactor1_M1;15;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.Contactor2_M1;15;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.Contactor3_M1;15;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.Contactor4_M1;15;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.RelayFwdM1;15;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.RelayRevM1;15;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.SyncDeviationWarn;15;AUTRE;VAR_OUTPUT;BOOL;FB_WinchSync.st:144 FB_WinchSync.st:98;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.DescentStep45Permit;15;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.DescentStep4M1;15;AUTRE;VAR;BOOL;FB_SyncContactor.st:111 FB_SyncContactor.st:78;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.DescentStep5M2;15;FRONTIERE;VAR;BOOL;;False
+PRG_05_Translation.Data.M3_AtMaintenanceStable;15;FRONTIERE;VAR_OUTPUT;ST_TranslationInterPrg;;False
+PRG_06_Outputs.WinchOutputCoupled;15;AUTRE;VAR;BOOL;PRG_06_Outputs.st:256;False
+PRG_06_Outputs.instSyncContactorFinal.DescentStep45Permit;15;AUTRE;VAR_INPUT;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.DescentStep4M1;15;AUTRE;VAR;BOOL;FB_SyncContactor.st:111 FB_SyncContactor.st:78;False
+PRG_06_Outputs.instSyncContactorFinal.DescentStep5M2;15;FRONTIERE;VAR;BOOL;;False
+PRG_06_Outputs.instSyncContactorFinal.EscalationTimer.Q;15;AUTRE;VAR;TON;FB_SyncContactor.st:144 FB_SyncContactor.st:81;False
+PRG_07_Supervision.TRUE;15;AUTRE;?;?;;True
+PRG_07_Supervision._CommunCfgPersist.Initialized;15;REGLAGE;?;?;PRG_07_Supervision.st:241;False
+PRG_07_Supervision._CycleCfgPersist.ImmersionLower_M;15;REGLAGE;?;?;PRG_07_Supervision.st:261;False
+PRG_07_Supervision._CycleCfgPersist.ImmersionUpper_M;15;REGLAGE;?;?;PRG_07_Supervision.st:261;False
+PRG_07_Supervision.instCfgPersistBridgeCommun.Hmi.LimitLegalDepthMinAllowed_M;15;REGLAGE;VAR_IN_OUT;ST_CommunCfg;FB_CfgPersistBridge_CommunCfg.st:21;False
+PRG_07_Supervision.instCfgPersistBridgeCommun.Hmi.LimitLegalEnabled;15;REGLAGE;VAR_IN_OUT;ST_CommunCfg;FB_CfgPersistBridge_CommunCfg.st:21;False
+PRG_07_Supervision.instCfgPersistBridgeCycle.Persist.Initialized;15;REGLAGE;VAR_IN_OUT;ST_CycleCfg;FB_CfgPersistBridge_CycleCfg.st:25;False
+PRG_07_Supervision.instCfgT330Normalizer.CommunCfg.Initialized;15;AUTRE;VAR_IN_OUT;ST_CommunCfg;;False
+PRG_07_Supervision.instDiagIhmHeartbeat.IhmTimeoutTon.Q;15;AUTRE;VAR;TON;FB_Diag_IhmHeartbeat.st:45 FB_Diag_IhmHeartbeat.st:63;True
+PRG_07_Supervision.instMirrorBypassCableLimitSwitch.Prev;15;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:26;False
+PRG_07_Supervision.instMirrorBypassCableLimitSwitch.RetainVal;15;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:22;False
+PRG_07_Supervision.instMirrorBypassLimitLegal.Prev;15;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:26;False
+PRG_07_Supervision.instMirrorBypassLimitLegal.RetainVal;15;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:22;False
+PRG_07_Supervision.instMirrorBypassTopLimitSoftware.Prev;15;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:26;False
+PRG_07_Supervision.instMirrorBypassTopLimitSoftware.RetainVal;15;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:22;True
+PRG_07_Supervision.instMirrorBypassTopLimitSwitch.Prev;15;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:26;False
+PRG_07_Supervision.instMirrorBypassTopLimitSwitch.RetainVal;15;AUTRE;VAR_IN_OUT;BOOL;FB_MirrorBypassRetain.st:22;True
+GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;16;REGLAGE;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:191 PRG_07_Supervision.st:241;False
+GVL_IHM.Commun.Cfg.LimitLegalEnabled;16;REGLAGE;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:191 PRG_07_Supervision.st:241;False
+GVL_IHM.CycleSemiAuto.Cfg.ExtractionControlDistance_M;16;REGLAGE;VAR_GLOBAL;ST_CycleHMI;PRG_07_Supervision.st:261;False
+GVL_IHM.Network.Bypass.BusCanOpen;16;BYPASS;VAR_GLOBAL;ST_NetworkDiagHMI;;False
+GVL_IHM.Network.Bypass.Joystick;16;BYPASS;VAR_GLOBAL;ST_NetworkDiagHMI;;False
+PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;16;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:483;True
+PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2;16;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:483;True
+PRG_02_Acquisition.JoystickCfgEffective.DeadbandRaw;16;AUTRE;VAR;ST_fbJoystick_Cfg;PRG_02_Acquisition.st:493;False
+PRG_02_Acquisition._JoystickNeutralX;16;AUTRE;?;?;PRG_02_Acquisition.st:496;False
+PRG_02_Acquisition._JoystickNeutralY;16;AUTRE;?;?;PRG_02_Acquisition.st:496;False
+PRG_02_Acquisition.instDiagCanOpen.CANbusStateRaw;16;AUTRE;VAR_INPUT;INT;;False
+PRG_02_Acquisition.instDiagCanOpen.DEVICE_STATE.RUNNING;16;AUTRE;?;?;;False
+PRG_02_Acquisition.instDiagCanOpen.DeviceJoystickStateRaw;16;AUTRE;VAR_INPUT;DEVICE_STATE;;False
+PRG_02_Acquisition.instEncoderM1.CableM_PerRev;16;AUTRE;VAR_INPUT;REAL;;False
+PRG_02_Acquisition.instEncoderM1.HomedAndReliable;16;AUTRE;VAR_OUTPUT;BOOL;FB_Encoder.st:216 FB_Encoder.st:95;False
+PRG_02_Acquisition.instEncoderM1.HwIn.SpdValueIn;16;AUTRE;VAR_INPUT;ST_fbEncoder_HwIn;;False
+PRG_02_Acquisition.instEncoderM1.Reset;16;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.Enable;16;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.instCauses.Active;16;AUTRE;VAR;ARRAY[0..15] OF ST_FaultCause;FB_Encoder_Abs.st:75 FB_Encoder_Abs.st:83;False
+PRG_02_Acquisition.instEncoderM1.instHoming.Calib.RestartCoherenceTolerancePts;16;AUTRE;VAR_IN_OUT;ST_Encoder_Calib;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.CfgHomingTargetM;16;REGLAGE;VAR_INPUT;REAL;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.CfgTopSensorPosM;16;REGLAGE;VAR_INPUT;REAL;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.ConfirmCoherenceEdge.Q;16;AUTRE;VAR;R_TRIG;FB_Encoder_Homing.st:119;False
+PRG_02_Acquisition.instEncoderM1.instHoming.DynamicHomingTargetM;16;AUTRE;VAR_INPUT;REAL;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.DynamicHomingTrigger;16;AUTRE;VAR;BOOL;FB_Encoder_Homing.st:211;False
+PRG_02_Acquisition.instEncoderM1.instHoming.EncoderAvailable;16;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.HomingPermit;16;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.InitDone;16;AUTRE;VAR;BOOL;FB_Encoder_Homing.st:166 FB_Encoder_Homing.st:188;False
+PRG_02_Acquisition.instEncoderM1.instHoming.NominalHomingTrigger;16;AUTRE;VAR;BOOL;FB_Encoder_Homing.st:206;False
+PRG_02_Acquisition.instEncoderM1.instHoming.PresetConfirmed;16;AUTRE;VAR;BOOL;FB_Encoder_Homing.st:254 FB_Encoder_Homing.st:256 FB_Encoder_Homing.st:258 FB_Encoder_Homing.st:260;False
+PRG_02_Acquisition.instEncoderM1.instHoming.RawDiffRestart;16;AUTRE;VAR;DINT;FB_Encoder_Homing.st:183;False
+PRG_02_Acquisition.instEncoderM1.instHoming.UnitaryHomingTrigger;16;AUTRE;VAR;BOOL;FB_Encoder_Homing.st:209;False
+PRG_02_Acquisition.instEncoderM1.instHoming.UseDynamicTarget;16;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instRel.EncoderAvailable;16;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instRel.EncoderIncoherent;16;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instScale.CablePosM;16;AUTRE;VAR_OUTPUT;REAL;FB_Encoder_Scale.st:38 FB_Encoder_Scale.st:40;True
+PRG_02_Acquisition.instJoystick.AxisCmdY.DirectionNegative;16;AUTRE;VAR_OUTPUT;ST_fbJoystick_AxisCmd;FB_Joystick.st:161 FB_Joystick.st:279;False
+PRG_02_Acquisition.instJoystick.AxisCmdY.DirectionPositive;16;AUTRE;VAR_OUTPUT;ST_fbJoystick_AxisCmd;FB_Joystick.st:161 FB_Joystick.st:278;False
+PRG_02_Acquisition.instJoystick.Calibrate;16;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instJoystick.LastCalibrate;16;AUTRE;VAR;BOOL;FB_Joystick.st:130;False
+PRG_04_Treuils_Benne.BucketBusyFallEdge.Q;16;FRONTIERE;VAR;F_TRIG;;False
+PRG_04_Treuils_Benne.ControlAscentArmedForThisClose;16;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:593;False
+PRG_04_Treuils_Benne.ControlAscentStartM1PosM;16;AUTRE;VAR;REAL;PRG_04_Treuils_Benne.st:597;False
+PRG_04_Treuils_Benne.ControlAscentStartM2PosM;16;FRONTIERE;VAR;REAL;;False
+PRG_04_Treuils_Benne.Data.AutoDiveM1Step4M2Step5Active;16;FRONTIERE;VAR_OUTPUT;ST_WinchInterPrg;;False
+PRG_04_Treuils_Benne.Data.SyncState.SyncActive;16;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1945;False
+PRG_04_Treuils_Benne.WinchBothReqAscent;16;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:285;False
+PRG_04_Treuils_Benne._CommunCfgPersist.LimitLegalDepthMinAllowed_M;16;REGLAGE;?;?;;False
+PRG_04_Treuils_Benne._CommunCfgPersist.LimitLegalEnabled;16;REGLAGE;?;?;;False
+PRG_04_Treuils_Benne._CommunCfgPersist.WinchMaxStepAscent;16;REGLAGE;?;?;;True
+PRG_04_Treuils_Benne._CommunCfgPersist.WinchMaxStepDescent;16;REGLAGE;?;?;;True
+PRG_04_Treuils_Benne.instArbM1.Auth.JoystickWinchSelectArbitrated;16;AUTRE;VAR_INPUT;ST_Modes_Autorisations;;False
+PRG_04_Treuils_Benne.instArbM1.Auth.Mode;16;AUTRE;VAR_INPUT;ST_Modes_Autorisations;;False
+PRG_04_Treuils_Benne.instArbM1.BothIntent.Active;16;AUTRE;VAR_INPUT;ST_WinchBothIntent;;False
+PRG_04_Treuils_Benne.instArbM1.BothIntent.ReqAscent;16;AUTRE;VAR_INPUT;ST_WinchBothIntent;;False
+PRG_04_Treuils_Benne.instArbM1.BothIntent.ReqDescend;16;AUTRE;VAR_INPUT;ST_WinchBothIntent;;False
+PRG_04_Treuils_Benne.instArbM1.Enable;16;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instArbM1.IHM.BtnAscentM1;16;AUTRE;VAR_INPUT;ST_fbWinchCmdArbitration_IHM;;False
+PRG_04_Treuils_Benne.instArbM1.IHM.BtnDescentM1;16;AUTRE;VAR_INPUT;ST_fbWinchCmdArbitration_IHM;;False
+PRG_04_Treuils_Benne.instArbM1.Joystick.AxisY.Direction;16;AUTRE;VAR_INPUT;ST_AcquisitionJoystickQualified;;False
+PRG_04_Treuils_Benne.instArbM1.ReqWinch.ReqAscent;16;AUTRE;VAR_INPUT;ST_ProgramWinchRequest;;False
+PRG_04_Treuils_Benne.instArbM1.ReqWinch.ReqDescend;16;AUTRE;VAR_INPUT;ST_ProgramWinchRequest;;False
+PRG_04_Treuils_Benne.instArbM1.TglJoystickMaster;16;REGLAGE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.Fault.ErrorId;16;AUTRE;VAR_OUTPUT;ST_Fault;FB_Safety_Winch.st:489;False
+PRG_04_Treuils_Benne.instSafetyWinchM2.Fault.ErrorId;16;FRONTIERE;VAR_OUTPUT;ST_Fault;;False
+PRG_04_Treuils_Benne.instWinchSync.DescentStep45Permit;16;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.SpeedStepTable.P4R1;16;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.SpeedStepTable.P4R2;16;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.SpeedStepTable.P4R3;16;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchSync.instContactor.SpeedStepTable.P4R4;16;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.SyncDeviationWarn;16;AUTRE;VAR_OUTPUT;BOOL;FB_SyncDeviation.st:57 FB_SyncDeviation.st:93 FB_SyncDeviation.st:98;False
+PRG_06_Outputs.instSyncContactorFinal.SpeedStepTable.P4R1;16;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_06_Outputs.instSyncContactorFinal.SpeedStepTable.P4R2;16;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_06_Outputs.instSyncContactorFinal.SpeedStepTable.P4R3;16;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_06_Outputs.instSyncContactorFinal.SpeedStepTable.P4R4;16;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_07_Supervision.PrevCableLimitSwitch;16;AUTRE;VAR;BOOL;PRG_07_Supervision.st:368;False
+PRG_07_Supervision.PrevLimitLegal;16;AUTRE;VAR;BOOL;PRG_07_Supervision.st:365;False
+PRG_07_Supervision.PrevTopLimitSoftware;16;AUTRE;VAR;BOOL;PRG_07_Supervision.st:367;False
+PRG_07_Supervision.PrevTopLimitSwitch;16;AUTRE;VAR;BOOL;PRG_07_Supervision.st:366;False
+PRG_07_Supervision._CycleCfgPersist.Initialized;16;REGLAGE;?;?;PRG_07_Supervision.st:261;False
+PRG_07_Supervision.instDiagIhmHeartbeat.IhmEdgeDetected;16;AUTRE;VAR;BOOL;FB_Diag_IhmHeartbeat.st:53;False
+PRG_07_Supervision.instDiagIhmHeartbeat.IhmTimeout;16;AUTRE;VAR_INPUT;TIME;;False
+GVL_IHM.JOY1Joystick.Cmd.Calibrate;17;COMMANDE;VAR_GLOBAL;ST_JoystickHMI;;False
+GVL_IHM.Modes.Cmd.TglJoystickMaster;17;COMMANDE;VAR_GLOBAL;ST_ModesHMI;;True
+GVL_PERSISTENT._JoystickCfgPersist.DeadbandRaw;17;REGLAGE;VAR_GLOBAL;ST_fbJoystick_Cfg;;False
+PRG_02_Acquisition.HwInM1.SpdValueIn;17;AUTRE;VAR;ST_fbEncoder_HwIn;PRG_02_Acquisition.st:639;False
+PRG_02_Acquisition.HwReal.Operator;17;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:182 PRG_02_Acquisition.st:183 PRG_02_Acquisition.st:184 PRG_02_Acquisition.st:185;False
+PRG_02_Acquisition.HwReal.Operator.CanBusState;17;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:185;False
+PRG_02_Acquisition.HwReal.Operator.JOY1_DeviceState;17;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:186;False
+PRG_02_Acquisition.HwSim.Operator;17;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:436;False
+PRG_02_Acquisition.OperatorInputSourceSimulated;17;AUTRE;VAR;BOOL;PRG_02_Acquisition.st:137;False
+PRG_02_Acquisition.WINCH_CABLE_M_PER_REV;17;AUTRE;VAR;REAL;;False
+PRG_02_Acquisition.instEncoderM1.Calib.RestartCoherenceTolerancePts;17;AUTRE;VAR_IN_OUT;ST_Encoder_Calib;FB_Encoder.st:131;False
+PRG_02_Acquisition.instEncoderM1.CfgHomingTargetM;17;REGLAGE;VAR_INPUT;REAL;;False
+PRG_02_Acquisition.instEncoderM1.CfgTopSensorPosM;17;REGLAGE;VAR_INPUT;REAL;;False
+PRG_02_Acquisition.instEncoderM1.DynamicHomingTargetM;17;AUTRE;VAR_INPUT;REAL;;False
+PRG_02_Acquisition.instEncoderM1.HomingAtZero;17;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.HomingPermit;17;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.UseDynamicTarget;17;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.AlarmsIn;17;AUTRE;VAR_INPUT;UINT;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.PresetTimeoutError;17;AUTRE;VAR;BOOL;FB_Encoder_Abs.st:153 FB_Encoder_Abs.st:81;False
+PRG_02_Acquisition.instEncoderM1.instAbs.SlaveOperational;17;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.BtnConfirmCoherence;17;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.Calib.LastKnownRawPos;17;AUTRE;VAR_IN_OUT;ST_Encoder_Calib;FB_Encoder_Homing.st:267 FB_Encoder_Homing.st:286;False
+PRG_02_Acquisition.instEncoderM1.instHoming.Cfg.PresetConfirmMode;17;REGLAGE;VAR_INPUT;ST_fbEncoder_Cfg;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.DynamicTargetEdge.Q;17;AUTRE;VAR;R_TRIG;FB_Encoder_Homing.st:198;False
+PRG_02_Acquisition.instEncoderM1.instHoming.Home;17;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.HomeEdge.Q;17;AUTRE;VAR;R_TRIG;FB_Encoder_Homing.st:118;False
+PRG_02_Acquisition.instEncoderM1.instHoming.HomingModeOk;17;AUTRE;VAR;BOOL;FB_Encoder_Homing.st:200;False
+PRG_02_Acquisition.instEncoderM1.instHoming.RawPos;17;AUTRE;VAR_INPUT;UDINT;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.ReadbackOk;17;AUTRE;VAR;BOOL;FB_Encoder_Homing.st:249;False
+PRG_02_Acquisition.instEncoderM1.instHoming.StatusBitOk;17;AUTRE;VAR;BOOL;FB_Encoder_Homing.st:250;False
+PRG_02_Acquisition.instEncoderM1.instHoming.TopPositionSensor;17;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.TopSensorEdge.Q;17;AUTRE;VAR;R_TRIG;FB_Encoder_Homing.st:197;False
+PRG_02_Acquisition.instEncoderM1.instRel.HomedAndReliable;17;AUTRE;VAR_OUTPUT;BOOL;FB_EncoderReliability.st:34;False
+PRG_02_Acquisition.instEncoderM1.instSafety.EncoderIncoherent;17;AUTRE;VAR_OUTPUT;BOOL;FB_Encoder_Safety.st:71 FB_Encoder_Safety.st:81;False
+PRG_02_Acquisition.instEncoderM1.instScale.CableM_PerRev;17;AUTRE;VAR_INPUT;REAL;;False
+PRG_02_Acquisition.instEncoderM1.instScale.PointsPerRev;17;AUTRE;VAR_INPUT;UDINT;;False
+PRG_02_Acquisition.instEncoderM1.instScale.RawDiff;17;AUTRE;VAR;DINT;FB_Encoder_Scale.st:34;False
+PRG_02_Acquisition.instJoystick.CmdYVal;17;AUTRE;VAR;REAL;FB_Joystick.st:272;False
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqAscent;17;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqDescend;17;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;False
+PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqAscent;17;FRONTIERE;VAR_OUTPUT;ST_ModesCycleInterPrg;;True
+PRG_04_Treuils_Benne.ArbIHM.BtnAscentM1;17;AUTRE;VAR;ST_fbWinchCmdArbitration_IHM;PRG_04_Treuils_Benne.st:492;False
+PRG_04_Treuils_Benne.ArbIHM.BtnDescentM1;17;AUTRE;VAR;ST_fbWinchCmdArbitration_IHM;PRG_04_Treuils_Benne.st:493;False
+PRG_04_Treuils_Benne.BucketBusyRiseEdge.Q;17;FRONTIERE;VAR;R_TRIG;;False
+PRG_04_Treuils_Benne.SyncState.SyncActive;17;AUTRE;VAR;ST_SyncState;PRG_04_Treuils_Benne.st:1733;False
+PRG_04_Treuils_Benne.TRUE;17;AUTRE;?;?;;True
+PRG_04_Treuils_Benne.WinchBothAscentBucketCloseArmed;17;FRONTIERE;VAR;BOOL;;True
+PRG_04_Treuils_Benne.instSafetyWinchM1.instFault.Fault.ErrorId;17;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:49;False
+PRG_04_Treuils_Benne.instWinchSync.SpeedStepTable.P4R1;17;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchSync.SpeedStepTable.P4R2;17;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchSync.SpeedStepTable.P4R3;17;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchSync.SpeedStepTable.P4R4;17;AUTRE;VAR_INPUT;ST_SpeedStepTable;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.BypassGlobal;17;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.Enable;17;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.WarnActive;17;AUTRE;VAR;BOOL;FB_SyncDeviation.st:81;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.WarnLatched;17;AUTRE;VAR;BOOL;FB_SyncDeviation.st:100 FB_SyncDeviation.st:58 FB_SyncDeviation.st:87 FB_SyncDeviation.st:89;False
+PRG_06_Outputs._WinchSpeedStepTable.P4R1;17;AUTRE;?;?;;False
+PRG_06_Outputs._WinchSpeedStepTable.P4R2;17;AUTRE;?;?;;False
+PRG_06_Outputs._WinchSpeedStepTable.P4R3;17;AUTRE;?;?;;False
+PRG_06_Outputs._WinchSpeedStepTable.P4R4;17;AUTRE;?;?;;False
+PRG_07_Supervision.instCfgPersistBridgeCycle.Hmi.ExtractionControlDistance_M;17;REGLAGE;VAR_IN_OUT;ST_CycleCfg;FB_CfgPersistBridge_CycleCfg.st:21;False
+PRG_07_Supervision.instCfgT330Normalizer.CommunCfg.LimitLegalDepthMinAllowed_M;17;AUTRE;VAR_IN_OUT;ST_CommunCfg;;False
+PRG_07_Supervision.instCfgT330Normalizer.CommunCfg.LimitLegalEnabled;17;AUTRE;VAR_IN_OUT;ST_CommunCfg;;False
+PRG_07_Supervision.instDiagIhmHeartbeat.LastIhmToggle;17;AUTRE;VAR;BOOL;FB_Diag_IhmHeartbeat.st:43 FB_Diag_IhmHeartbeat.st:54;False
+PRG_07_Supervision.instDiagIhmHeartbeat.TglHeartbeatIhm;17;REGLAGE;VAR_INPUT;BOOL;;False
+GVL_Global.BlinkClock;18;AUTRE;VAR_GLOBAL;BOOL;PRG_07_Supervision.st:122;False
+GVL_IHM.Commun.TglHeartbeatIhm;18;REGLAGE;VAR_GLOBAL;ST_CommunHMI;;False
+GVL_IHM.M1TreuilRetenue.Cmd.BtnAscent;18;COMMANDE;VAR_GLOBAL;ST_WinchHMI;;True
+GVL_IHM.M1TreuilRetenue.Cmd.BtnDescent;18;COMMANDE;VAR_GLOBAL;ST_WinchHMI;;True
+GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero;18;COMMANDE;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.Network.Bypass.IhmHeartbeat;18;BYPASS;VAR_GLOBAL;ST_NetworkDiagHMI;;False
+GVL_Simulation.SimOperatorActive;18;SIMU;VAR_GLOBAL;BOOL;;False
+PRG_02_Acquisition.CANbus.GetBusState;18;AUTRE;?;?;;False
+PRG_02_Acquisition.FALSE;18;AUTRE;?;?;;True
+PRG_02_Acquisition.HwIn.Winch.COD1_SpdValue;18;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:481;True
+PRG_02_Acquisition.JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState;18;AUTRE;?;?;;False
+PRG_02_Acquisition.JoyBtnRaw;18;AUTRE;?;?;;True
+PRG_02_Acquisition.JoyXRaw_ANA1;18;AUTRE;?;?;;True
+PRG_02_Acquisition.JoyYRaw_ANA2;18;AUTRE;?;?;;True
+PRG_02_Acquisition.MachineHomingMechanicalStopOk;18;AUTRE;VAR;BOOL;PRG_02_Acquisition.st:557;False
+PRG_02_Acquisition._CalibM1.RestartCoherenceTolerancePts;18;AUTRE;?;?;PRG_02_Acquisition.st:644;False
+PRG_02_Acquisition._WinchM1CfgPersist.CfgTopSensorPos_M;18;REGLAGE;?;?;;False
+PRG_02_Acquisition.instCycleMachineHoming.M1Demand.HomeReq;18;FRONTIERE;VAR_OUTPUT;ST_fbMachineHomingCycle_HomingDemand;;False
+PRG_02_Acquisition.instEncoderM1.Calib.LastKnownRawPos;18;AUTRE;VAR_IN_OUT;ST_Encoder_Calib;FB_Encoder.st:131;False
+PRG_02_Acquisition.instEncoderM1.Cfg.PresetConfirmMode;18;REGLAGE;VAR_INPUT;ST_fbEncoder_Cfg;;False
+PRG_02_Acquisition.instEncoderM1.ConfirmCoherence;18;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.HomingAtTargetM;18;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.HwIn.AlarmsIn;18;AUTRE;VAR_INPUT;ST_fbEncoder_HwIn;;False
+PRG_02_Acquisition.instEncoderM1.HwIn.SlaveOperational;18;AUTRE;VAR_INPUT;ST_fbEncoder_HwIn;;False
+PRG_02_Acquisition.instEncoderM1.PointsPerRev;18;AUTRE;VAR_INPUT;UDINT;;False
+PRG_02_Acquisition.instEncoderM1.TopPositionSensor;18;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.PresetSeqStep;18;AUTRE;VAR;INT;FB_Encoder_Abs.st:100 FB_Encoder_Abs.st:136 FB_Encoder_Abs.st:148 FB_Encoder_Abs.st:154;False
+PRG_02_Acquisition.instEncoderM1.instAbs.PresetTimer.Q;18;AUTRE;VAR;TON;FB_Encoder_Abs.st:102 FB_Encoder_Abs.st:137 FB_Encoder_Abs.st:143 FB_Encoder_Abs.st:155;False
+PRG_02_Acquisition.instEncoderM1.instAbs.PresetTolerancePts;18;AUTRE;VAR_INPUT;UDINT;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.RawDiff;18;AUTRE;VAR;DINT;FB_Encoder_Abs.st:141;False
+PRG_02_Acquisition.instEncoderM1.instAbs.RawPos;18;AUTRE;VAR_OUTPUT;UDINT;FB_Encoder_Abs.st:117;False
+PRG_02_Acquisition.instEncoderM1.instAbs.ResetEdge.Q;18;AUTRE;VAR;R_TRIG;FB_Encoder_Abs.st:72;False
+PRG_02_Acquisition.instEncoderM1.instHoming.CandidateCablePosM;18;AUTRE;VAR;REAL;FB_Encoder_Homing.st:245 FB_Encoder_Homing.st:247;False
+PRG_02_Acquisition.instEncoderM1.instHoming.PresetStatusBit;18;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instRel.Homed;18;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instSafety.Fault.Error;18;AUTRE;VAR_OUTPUT;ST_Fault;FB_Encoder_Safety.st:63;False
+PRG_02_Acquisition.instEncoderM1.instScale.HomingRefRaw;18;AUTRE;VAR_INPUT;UDINT;;False
+PRG_02_Acquisition.instEncoderM1.instScale.RawPos;18;AUTRE;VAR_INPUT;UDINT;;False
+PRG_02_Acquisition.instJoystick.DeadmanArmed;18;AUTRE;VAR_OUTPUT;BOOL;FB_Joystick.st:165 FB_Joystick.st:218 FB_Joystick.st:232 FB_Joystick.st:239;True
+PRG_02_Acquisition.instJoystick.RawOutOfRange;18;AUTRE;VAR;BOOL;FB_Joystick.st:112;False
+PRG_02_Acquisition.instSimBench.Operator;18;FRONTIERE;VAR_OUTPUT;ST_HwOperator;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.CfgSyncToleranceM;18;REGLAGE;VAR_INPUT;REAL;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.DeltaPosM;18;AUTRE;VAR_OUTPUT;REAL;FB_SyncDeviation.st:56 FB_SyncDeviation.st:68 FB_SyncDeviation.st:71;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.HomedAndReliableM1;18;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.HomedAndReliableM2;18;FRONTIERE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.ResetEdge.Q;18;AUTRE;VAR;R_TRIG;FB_SyncDeviation.st:61;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.SyncEnable;18;AUTRE;VAR_INPUT;BOOL;;False
+PRG_07_Supervision.instCfgPersistBridgeCycle.Persist.ExtractionControlDistance_M;18;REGLAGE;VAR_IN_OUT;ST_CycleCfg;FB_CfgPersistBridge_CycleCfg.st:25;False
+GVL_IHM.Commun.EncoderCfg.PresetConfirmMode;19;IHM;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:231;False
+GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence;19;COMMANDE;VAR_GLOBAL;ST_WinchHMI;;False
+GVL_IHM.M1TreuilRetenue.Cmd.BtnHome;19;COMMANDE;VAR_GLOBAL;ST_WinchHMI;;False
+PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps;19;FRONTIERE;VAR_OUTPUT;ST_AcquisitionInterPrg;;False
+PRG_02_Acquisition.ENCODER_POINTS_PER_REV;19;AUTRE;VAR;UDINT;;False
+PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI;19;FRONTIERE;VAR_OUTPUT;ST_HardwareImage;;True
+PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI;19;FRONTIERE;VAR_OUTPUT;ST_HardwareImage;;True
+PRG_02_Acquisition.HwInM1.AlarmsIn;19;AUTRE;VAR;ST_fbEncoder_HwIn;PRG_02_Acquisition.st:640;False
+PRG_02_Acquisition.HwInM1.SlaveOperational;19;AUTRE;VAR;ST_fbEncoder_HwIn;PRG_02_Acquisition.st:642;False
+PRG_02_Acquisition._CalibM1.LastKnownRawPos;19;AUTRE;?;?;PRG_02_Acquisition.st:644;False
+PRG_02_Acquisition.instEncoderM1.HwIn.PresetStatusBit;19;AUTRE;VAR_INPUT;ST_fbEncoder_HwIn;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.PresetReqEdge.Q;19;AUTRE;VAR;R_TRIG;FB_Encoder_Abs.st:128;False
+PRG_02_Acquisition.instEncoderM1.instAbs.PresetTimeout;19;AUTRE;VAR_INPUT;TIME;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.PresetTimerVisual.Q;19;AUTRE;VAR;TON;FB_Encoder_Abs.st:103 FB_Encoder_Abs.st:144 FB_Encoder_Abs.st:149 FB_Encoder_Abs.st:156;False
+PRG_02_Acquisition.instEncoderM1.instAbs.PresetValueOut;19;AUTRE;VAR_OUTPUT;UDINT;FB_Encoder_Abs.st:135 FB_Encoder_Abs.st:99;False
+PRG_02_Acquisition.instEncoderM1.instAbs.RawPosIn;19;AUTRE;VAR_INPUT;UDINT;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.Reset;19;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.CableM_PerRev;19;AUTRE;VAR_INPUT;REAL;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.CandidateRawDiff;19;AUTRE;VAR;DINT;FB_Encoder_Homing.st:243;False
+PRG_02_Acquisition.instEncoderM1.instHoming.HomingRefRaw;19;AUTRE;VAR_OUTPUT;UDINT;FB_Encoder_Homing.st:171 FB_Encoder_Homing.st:292;False
+PRG_02_Acquisition.instEncoderM1.instHoming.PointsPerRev;19;AUTRE;VAR_INPUT;UDINT;;False
+PRG_02_Acquisition.instEncoderM1.instSafety.instFault.Fault.Error;19;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:57;False
+PRG_02_Acquisition.instJoystick.ArmingPermit;19;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instJoystick.Cfg.RawOutOfRangeMargin;19;REGLAGE;VAR_INPUT;ST_fbJoystick_Cfg;;False
+PRG_02_Acquisition.instJoystick.DeadmanArmTimer.Q;19;AUTRE;VAR;TON;FB_Joystick.st:173 FB_Joystick.st:230;False
+PRG_02_Acquisition.instJoystick.DirectInversionPermit;19;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instJoystick.FlipX;19;AUTRE;VAR;BOOL;FB_Joystick.st:208;False
+PRG_02_Acquisition.instJoystick.FlipY;19;AUTRE;VAR;BOOL;FB_Joystick.st:209;False
+PRG_04_Treuils_Benne.instWinchSync.CfgSyncToleranceM;19;REGLAGE;VAR_INPUT;REAL;;False
+PRG_04_Treuils_Benne.instWinchSync.HomedAndReliableM1;19;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.Reset;19;AUTRE;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.SignedDeltaPosM;19;AUTRE;VAR_OUTPUT;REAL;FB_SyncDeviation.st:56 FB_SyncDeviation.st:67 FB_SyncDeviation.st:70;True
+PRG_07_Supervision._CycleCfgPersist.ExtractionControlDistance_M;19;REGLAGE;?;?;PRG_07_Supervision.st:261;False
+PRG_07_Supervision.instBlink1Hz.OUT;19;AUTRE;VAR;BLINK;PRG_07_Supervision.st:117;False
+GVL_IHM.CycleSemiAuto.State.CycleStep;20;IHM;VAR_GLOBAL;ST_CycleHMI;PRG_07_Supervision.st:687;False
+PRG_02_Acquisition.HwIn.Winch.COD1_Alarms;20;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:481;True
+PRG_02_Acquisition.HwInM1.PresetStatusBit;20;AUTRE;VAR;ST_fbEncoder_HwIn;PRG_02_Acquisition.st:643;False
+PRG_02_Acquisition.JoystickCfgEffective.RawOutOfRangeMargin;20;AUTRE;VAR;ST_fbJoystick_Cfg;PRG_02_Acquisition.st:493;False
+PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1.Operational;20;AUTRE;VAR_OUTPUT;ST_Diag_Device;FB_Diag_Ethercat.st:136 FB_Diag_Ethercat.st:72;False
+PRG_02_Acquisition.instEncoderM1.HwIn.RawPosIn;20;AUTRE;VAR_INPUT;ST_fbEncoder_HwIn;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.MS;20;AUTRE;?;?;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.PresetRequest;20;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.PresetValue;20;AUTRE;VAR_INPUT;UDINT;;False
+PRG_02_Acquisition.instEncoderM1.instAbs.T;20;AUTRE;?;?;;False
+PRG_02_Acquisition.instEncoderM1.instHoming.Calib.HomingRefRaw;20;AUTRE;VAR_IN_OUT;ST_Encoder_Calib;FB_Encoder_Homing.st:264;False
+PRG_02_Acquisition.instEncoderM1.instHoming.PendingHomingRefRaw;20;AUTRE;VAR;UDINT;FB_Encoder_Homing.st:230;False
+PRG_02_Acquisition.instEncoderM1.instSafety.instFault.Fault.ErrorId;20;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:49;False
+PRG_02_Acquisition.instJoystick.Cfg.DeadmanArmHoldTime;20;REGLAGE;VAR_INPUT;ST_fbJoystick_Cfg;;False
+PRG_02_Acquisition.instJoystick.DeadmanArmPending;20;AUTRE;VAR;BOOL;FB_Joystick.st:166 FB_Joystick.st:219 FB_Joystick.st:226 FB_Joystick.st:227;False
+PRG_02_Acquisition.instJoystick.DirX;20;AUTRE;VAR;INT;FB_Joystick.st:194 FB_Joystick.st:198 FB_Joystick.st:200;False
+PRG_02_Acquisition.instJoystick.DirY;20;AUTRE;VAR;INT;FB_Joystick.st:195 FB_Joystick.st:203 FB_Joystick.st:205;False
+PRG_02_Acquisition.instJoystick.InversionLockActive;20;AUTRE;VAR;BOOL;FB_Joystick.st:167 FB_Joystick.st:213 FB_Joystick.st:217;False
+PRG_02_Acquisition.instJoystick.PrevDirX;20;AUTRE;VAR;INT;FB_Joystick.st:168 FB_Joystick.st:311;False
+PRG_02_Acquisition.instJoystick.PrevDirY;20;AUTRE;VAR;INT;FB_Joystick.st:169 FB_Joystick.st:312;False
+PRG_04_Treuils_Benne.Data.ArmingPermit;20;AUTRE;VAR_OUTPUT;ST_WinchInterPrg;PRG_04_Treuils_Benne.st:1962;True
+PRG_04_Treuils_Benne._SyncCfgPersist.CfgSyncTolerance_M;20;REGLAGE;?;?;;False
+PRG_04_Treuils_Benne.instWinchSync.TRUE;20;AUTRE;?;?;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.ActiveOffsetM;20;AUTRE;VAR_INPUT;REAL;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.CablePosM1;20;AUTRE;VAR_INPUT;REAL;;False
+PRG_04_Treuils_Benne.instWinchSync.instDeviation.CablePosM2;20;FRONTIERE;VAR_INPUT;REAL;;False
+PRG_07_Supervision._BlinkTimeOff;20;AUTRE;?;?;;False
+PRG_07_Supervision._BlinkTimeOn;20;AUTRE;?;?;;False
+PRG_07_Supervision.instCfgPersistBridgeEncoder.Hmi.PresetConfirmMode;20;REGLAGE;VAR_IN_OUT;ST_fbEncoder_Cfg;FB_CfgPersistBridge_fbEncoder_Cfg.st:21;False
+GVL_PERSISTENT._JoystickCfgPersist.RawOutOfRangeMargin;21;REGLAGE;VAR_GLOBAL;ST_fbJoystick_Cfg;;False
+PRG_02_Acquisition.HwInM1.RawPosIn;21;AUTRE;VAR;ST_fbEncoder_HwIn;PRG_02_Acquisition.st:638;False
+PRG_02_Acquisition.JoystickCfgEffective.DeadmanArmHoldTime;21;AUTRE;VAR;ST_fbJoystick_Cfg;PRG_02_Acquisition.st:493;False
+PRG_02_Acquisition.instDiagEthercat.Enable;21;AUTRE;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instDiagEthercat.EncoderM1OnlineEff;21;AUTRE;VAR;BOOL;FB_Diag_Ethercat.st:100;False
+PRG_02_Acquisition.instEncoderM1.Calib.HomingRefRaw;21;AUTRE;VAR_IN_OUT;ST_Encoder_Calib;FB_Encoder.st:131;False
+PRG_02_Acquisition.instEncoderM1.instHoming.PresetRequest;21;AUTRE;VAR_OUTPUT;BOOL;FB_Encoder_Homing.st:161 FB_Encoder_Homing.st:195 FB_Encoder_Homing.st:232;False
+PRG_02_Acquisition.instEncoderM1.instHoming.PresetValue;21;AUTRE;VAR_OUTPUT;UDINT;FB_Encoder_Homing.st:162 FB_Encoder_Homing.st:196 FB_Encoder_Homing.st:231;False
+PRG_02_Acquisition.instEncoderM1.instHoming.TargetPoints;21;AUTRE;VAR;DINT;FB_Encoder_Homing.st:229;False
+PRG_02_Acquisition.instJoystick.NeutralXYEdge.Q;21;AUTRE;VAR;R_TRIG;FB_Joystick.st:171 FB_Joystick.st:211;False
+PRG_04_Treuils_Benne.ArmingPermit;21;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1205;True
+PRG_04_Treuils_Benne.instWinchSync.ActiveOffsetM;21;AUTRE;VAR_INPUT;REAL;;False
+PRG_04_Treuils_Benne.instWinchSync.CablePosM1;21;AUTRE;VAR_INPUT;REAL;;False
+PRG_07_Supervision.instCfgPersistBridgeEncoder.Hmi.Initialized;21;REGLAGE;VAR_IN_OUT;ST_fbEncoder_Cfg;FB_CfgPersistBridge_fbEncoder_Cfg.st:21 FB_CfgPersistBridge_fbEncoder_Cfg.st:22;False
+PRG_07_Supervision.instCfgPersistBridgeEncoder.Persist.PresetConfirmMode;21;REGLAGE;VAR_IN_OUT;ST_fbEncoder_Cfg;FB_CfgPersistBridge_fbEncoder_Cfg.st:25;False
+GVL_IHM.Commun.EncoderCfg.Initialized;22;IHM;VAR_GLOBAL;ST_CommunHMI;PRG_07_Supervision.st:231;False
+GVL_PERSISTENT._JoystickCfgPersist.DeadmanArmHoldTime;22;REGLAGE;VAR_GLOBAL;ST_fbJoystick_Cfg;;False
+PRG_02_Acquisition.HwIn.Winch.COD1_PosValue;22;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:481;True
+PRG_02_Acquisition._CalibM1.HomingRefRaw;22;AUTRE;?;?;PRG_02_Acquisition.st:644;False
+PRG_02_Acquisition.instDiagEthercat.EncoderM1Bypass;22;BYPASS;VAR;BOOL;FB_Diag_Ethercat.st:96;False
+PRG_02_Acquisition.instDiagEthercat.EncoderM1OnlineReal;22;AUTRE;VAR;BOOL;FB_Diag_Ethercat.st:92;False
+PRG_04_Treuils_Benne.ArmAnyAxisAvail;22;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1175;False
+PRG_04_Treuils_Benne.ArmBucketBusy;22;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.ArmContactorOff;22;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1187;False
+PRG_04_Treuils_Benne.ArmModeDisabled;22;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1186;False
+PRG_04_Treuils_Benne.ArmPowerCutOff;22;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1188;False
+PRG_07_Supervision._EncoderCfgPersist.PresetConfirmMode;22;REGLAGE;?;?;PRG_07_Supervision.st:231;False
+PRG_07_Supervision.instCfgPersistBridgeEncoder.Persist.Initialized;22;REGLAGE;VAR_IN_OUT;ST_fbEncoder_Cfg;FB_CfgPersistBridge_fbEncoder_Cfg.st:25;False
+PRG_02_Acquisition.instDiagEthercat.DEVICE_STATE.RUNNING;23;AUTRE;?;?;;False
+PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1SimBypass;23;BYPASS;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1StateRaw;23;AUTRE;VAR_INPUT;DEVICE_STATE;;False
+PRG_02_Acquisition.instDiagEthercat.EncoderM1BypassActive;23;BYPASS;VAR_INPUT;BOOL;;False
+PRG_02_Acquisition.instDiagEthercat.NetworkBypassActive;23;BYPASS;VAR_INPUT;BOOL;;False
+PRG_04_Treuils_Benne.ArmM1AscentAvail;23;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1164;False
+PRG_04_Treuils_Benne.ArmM1DescendAvail;23;AUTRE;VAR;BOOL;PRG_04_Treuils_Benne.st:1165;False
+PRG_04_Treuils_Benne.ArmM2AscentAvail;23;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.ArmM2DescendAvail;23;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.ArmM3MaintenanceAvail;23;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.ArmM3TremieAvail;23;FRONTIERE;VAR;BOOL;;False
+PRG_04_Treuils_Benne.instSafetyWinchM2.PowerCutOff;23;FRONTIERE;VAR_OUTPUT;BOOL;;True
+PRG_05_Translation.Data.TranslationSafety.PowerCutOff;23;FRONTIERE;VAR_OUTPUT;ST_TranslationInterPrg;;True
+PRG_07_Supervision._EncoderCfgPersist.Initialized;23;REGLAGE;?;?;PRG_07_Supervision.st:231;False
+GVL_IHM.Network.Bypass.EncoderM1;24;BYPASS;VAR_GLOBAL;ST_NetworkDiagHMI;;False
+PRG_02_Acquisition.HwReal.Winch.COD1_DeviceState;24;AUTRE;VAR_OUTPUT;ST_HardwareImage;PRG_02_Acquisition.st:161;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.Fault.Latched;24;AUTRE;VAR_OUTPUT;ST_Fault;FB_Safety_Winch.st:489;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.instFault.Fault.Latched;25;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:80;False
+PRG_04_Treuils_Benne.instSafetyWinchM1.instFault.Fault.LatchedId;26;AUTRE;VAR_OUTPUT;ST_Fault;FB_FaultCore.st:74;False
