@@ -5,7 +5,7 @@ tasks:
   criticite: C2
   domaine: DIAGNOSTIC / GVL_TROUBLESHOOTING
   agent: CC01
-  date: '2026-11-07T05:21:07+01:00'
+  date: '2026-11-07T05:56:37+01:00'
   titre: 'Refactor troubleshooting : snapshot lisible comme un flux, par axe, pour mainteneur et agent'
   contexte: 'Demande exploitant 2026-11-06 a la reprise de T213. Trouver la source d''un blocage a partir du seul snapshot,
     rapidement et intuitivement, pour un mainteneur comme pour un agent. Lecture de haut en bas comme un flux : entrees, traitement,
@@ -20,15 +20,18 @@ tasks:
   - J4 implementer la structure, avec table ancien vers nouveau chemin
   - J5 fournir le guide de depannage dans le code, verifie automatiquement
   - J6 valider par une personne sur pannes injectees, puis cloturer
-  avancement: 'J1 EN COURS : lot 1 commit 8ac56593, import et compilation CODESYS OK selon l''exploitant, test simulation
-    partiel (quelques variables, dont Idx323). Geste habituel et tableau complet non confirmes. Pas de test machine. Rejeu
-    a l''aveugle et sens de Idx307 restent a faire. VALIDE EXPLOITANT 2026-11-06 : flux entrees traitement sorties ; variable
-    figee non retiree pour ce seul motif ; les lettres ne suffisent pas ; niveaux general, axe, fonctions mixtes ; sorties
-    PLC et mot variateur dans les axes ; guide souhaite dans le code. PROPOSE NON VALIDE : fiche d''axe en 10 etapes, safety
-    generale et alarmes d''axe, renumerotation, seuils de test du plan. LIVRE : cartes M1 M2 M3 AU, commit 04b6ce99 branche
-    work/carte-flux-troubleshooting non poussee, relecture par modele, aucune preuve automate. EN ATTENTE GO : lot 1. ESSAIS
-    : 0 cause sur 15 en reference. A TRANCHER : champs M2Demand ; T371 et T340 non modifiees. LIENS : parts T375 T377 T231
-    ; renvois T225 T224 T324 T219. ALERTE : bypass AU TestA et PowerCutOff TRUE par defaut, etat automate inconnu.'
+  avancement: 'J2 LIVRE, ATTENTE VALIDATION EXPLOITANT : DOC/WFLOW/ETUDES/T428_J2_STRUCTURE/STRUCTURE_CIBLE.md, 571 vers 424
+    variables, 147 retraits proposes, 16 ajouts J3, 8 a recabler J4, controles 11/11, revue a la source, rejeu papier sans
+    gain (0 cause, 3 maillons sur 15), rien dans CODE. Defauts de vue trouves : sorties frein et M3 fausses, hard stop M3
+    invisible, permis Safety faux. J1 EN COURS : lot 1 commit 8ac56593, import et compilation CODESYS OK selon l''exploitant,
+    test simulation partiel (quelques variables, dont Idx323). Geste habituel et tableau complet non confirmes. Pas de test
+    machine. Rejeu a l''aveugle et sens de Idx307 restent a faire. VALIDE EXPLOITANT 2026-11-06 : flux entrees traitement
+    sorties ; variable figee non retiree pour ce seul motif ; les lettres ne suffisent pas ; niveaux general, axe, fonctions
+    mixtes ; sorties PLC et mot variateur dans les axes ; guide souhaite dans le code. PROPOSE NON VALIDE : fiche d''axe en
+    10 etapes, safety generale et alarmes d''axe, renumerotation, seuils de test du plan. LIVRE : cartes M1 M2 M3 AU, commit
+    04b6ce99 branche work/carte-flux-troubleshooting non poussee, relecture par modele, aucune preuve automate. EN ATTENTE
+    GO : lot 1. ESSAIS : 0 cause sur 15 en reference. A TRANCHER : champs M2Demand ; T371 et T340 non modifiees. LIENS : parts
+    T375 T377 T231 ; renvois T225 T224 T324 T219. ALERTE : bypass AU TestA et PowerCutOff TRUE par defaut, etat automate inconnu.'
   contrat: ''
   bloque_par: []
 - id: T427

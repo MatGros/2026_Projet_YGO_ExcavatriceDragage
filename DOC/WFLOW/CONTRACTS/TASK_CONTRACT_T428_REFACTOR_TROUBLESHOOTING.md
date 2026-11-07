@@ -93,6 +93,8 @@ Chaque jalon s'arrête sur une validation humaine. Pas de jalon suivant sans GO.
 | **Évaluation** | 100 % de couverture ; 0 retrait sans panne vérifiée ; rejeu papier publié |
 | **Arrêt** | L'exploitant valide la structure et les retraits |
 
+**État au 2026-11-07 : livré, en attente de validation par l'exploitant.** Voir [STRUCTURE_CIBLE](../ETUDES/T428_J2_STRUCTURE/STRUCTURE_CIBLE.md). 571 variables vers 424, 147 retraits proposés, 16 ajouts J3, contrôles 11/11. Rejeu papier sans gain : 0 cause, 3 maillons sur 15. Aucun changement dans `CODE/`.
+
 ### J3 — Maillons manquants sans PLC
 
 | | |

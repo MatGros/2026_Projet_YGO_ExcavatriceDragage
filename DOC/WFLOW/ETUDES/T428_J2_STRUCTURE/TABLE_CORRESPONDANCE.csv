@@ -1,0 +1,588 @@
+﻿chemin_actuel;zone;etape;etape_nom;decision;regle;variable_conservee;raison;classe;source;nb_traces;listes_trace;dans_liste
+A_ContexteMachineGlobal.Idx101_ModeActive;GENERAL.Contexte;0;;GARDER;R3;;;COPIE;PRG_03_Modes_Cycle.Data.Auth.Mode;0;0;oui
+A_ContexteMachineGlobal.Idx102_SimulationEnabled;GENERAL.Contexte;0;;GARDER;R3;;;COPIE;GVL_Simulation.SimulationModeActive;0;0;oui
+A_ContexteMachineGlobal.Idx103_JoystickCommOk;GENERAL.Contexte;0;;RETRAIT_COPIE;R1;D_Joystick.Step2_JoystickOperational;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.Network.Joystick.Operational;0;0;oui
+A_ContexteMachineGlobal.Idx201_JoystickSelected;GENERAL.Contexte;0;;GARDER;R3;;;COPIE;GVL_IHM.Modes.Cmd.TglJoystickMaster;0;0;oui
+A_ContexteMachineGlobal.Idx202_BypassNetworkGlobal;GENERAL.Contexte;0;;GARDER;R3;;;COPIE;GVL_IHM.Network.Bypass.Global;0;0;oui
+A_ContexteMachineGlobal.Idx203_BypassSensorsGlobal;GENERAL.Contexte;0;;A_VALIDER;R6;;Constante FALSE, TBD : affiche 'pas de bypass' sans le mesurer. Cabler ou retirer.;CONSTANTE;FALSE;0;0;oui
+A_ContexteMachineGlobal.Idx301_EmergencyChainClosed;GENERAL.Contexte;0;;RETRAIT_COPIE;R1;B_Inputs.Machine.EmergencyChainClosed_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI, meme scan. Preuve : 752 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI;0;0;oui
+A_ContexteMachineGlobal.Idx302_PowerContactorEngaged;GENERAL.Contexte;0;;RETRAIT_COPIE;R1;B_Inputs.Machine.PowerContactorEngaged_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI, meme scan. Preuve : 1743 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+A_ContexteMachineGlobal.Idx303_SafeStopActiveAny;GENERAL.Contexte;0;;GARDER;R3;;;RECALCUL_VUE;GVL_IHM.M1TreuilRetenue.Safety.SafeStop OR GVL_IHM.M2TreuilBenne.Safety.SafeStop OR GVL_IHM.M3Translation.Safety.SafeStop;0;0;oui
+A_ContexteMachineGlobal.Idx304_PowerCutOffActiveAny;GENERAL.Contexte;0;;GARDER;R3;;;RECALCUL_VUE;GVL_IHM.M1TreuilRetenue.Safety.PowerCutOff OR GVL_IHM.M2TreuilBenne.Safety.PowerCutOff OR GVL_IHM.M3Translation.Safety.PowerCutOff;0;0;oui
+A_ContexteMachineGlobal.Idx401_HmiHeartbeatOk;GENERAL.Contexte;0;;GARDER;R3;;;COPIE;GVL_IHM.Commun.HeartbeatIhmOk;0;0;oui
+A_ContexteMachineGlobal.Idx402_CycleAutoBusy;GENERAL.Contexte;0;;GARDER;R3;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive;GENERAL.Contexte;0;;GARDER;R0;;;COPIE;GVL_IHM.Commun.SimTopSensorBypassActive;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive;GENERAL.Contexte;0;;GARDER;R0;;;COPIE;GVL_IHM.Commun.SimSlackCableBypassActive;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx321_CfgTopLimitM;GENERAL.Contexte;0;;GARDER;R0;;;COPIE;_CommunCfgPersist.CfgCableLimitAscent_M;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx326_BypassTopLimitSoftCommun;GENERAL.Contexte;0;;GARDER;R0;;;COPIE;GVL_IHM.Commun.Bypass.TopLimitSoftware;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx330_BypassGlobalCommun;GENERAL.Contexte;0;;GARDER;R0;;;COPIE;GVL_IHM.Commun.Bypass.Global;0;0;oui
+B_Inputs.Machine.PowerContactorEngaged_DI;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+B_Inputs.Machine.EmergencyChainClosed_DI;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI;0;0;oui
+B_Inputs.Machine.PhaseRotationOk_DI;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI;0;0;oui
+B_Inputs.Machine.HydraulicThermalOk_DI;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Machine.HydraulicThermalOk_DI;0;0;oui
+B_Inputs.Machine.ConveyorInfeedReady_DI;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Machine.ConveyorInfeedReady_DI;0;0;oui
+C_Safety.SimulationModeActive;GENERAL.Puissance;0;;RETRAIT_COPIE;R1;A_ContexteMachineGlobal.Idx102_SimulationEnabled;Aucune panne propre : meme source GVL_Simulation.SimulationModeActive, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;GVL_Simulation.SimulationModeActive;0;0;oui
+C_Safety.SimSafetyActive;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;GVL_Simulation.SimSafetyActive;0;0;oui
+C_Safety.HwIn_EmergencyChainClosed_DI;GENERAL.Puissance;0;;RETRAIT_COPIE;R1;B_Inputs.Machine.EmergencyChainClosed_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI, meme scan. Preuve : 752 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI;0;0;oui
+C_Safety.HwIn_PowerContactorEngaged_DI;GENERAL.Puissance;0;;RETRAIT_COPIE;R1;B_Inputs.Machine.PowerContactorEngaged_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI, meme scan. Preuve : 1743 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+C_Safety.HwIn_EmergencyBtnCut_HMI;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff;0;0;oui
+C_Safety.Step1_InputModulesOk;GENERAL.Puissance;0;;GARDER;R4;;Maillon de chaine lu sans saut.;NEGATION;NOT PRG_02_Acquisition.Data.InputModules.Fault;0;0;oui
+C_Safety.Step2_EmergencyBtnNotCut;GENERAL.Puissance;0;;GARDER;R4;;Maillon de chaine lu sans saut.;NEGATION;NOT GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff;0;0;oui
+C_Safety.Step3_EmergencyChainClosed;GENERAL.Puissance;0;;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI;0;0;oui
+C_Safety.Step4_ContactorReleased;GENERAL.Puissance;0;;GARDER;R4;;Maillon de chaine lu sans saut.;NEGATION;NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+C_Safety.Step5_ArmingAllowed;GENERAL.Puissance;0;;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;PRG_06_Outputs.EmergencyState.Armable;0;0;oui
+C_Safety.ArmingStep;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.EmergencyState.Step;0;0;oui
+C_Safety.ArmingPulseActive;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.Data.EmergencyArmingCmd;0;0;oui
+C_Safety.ArmingBusy;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.EmergencyState.ArmingBusy;0;0;oui
+C_Safety.LockoutActive;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.EmergencyDiag.LockoutActive;0;0;oui
+C_Safety.PowerContactorEngaged;GENERAL.Puissance;0;;RETRAIT_COPIE;R1;B_Inputs.Machine.PowerContactorEngaged_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI, meme scan. Preuve : 1743 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+C_Safety.PowerCutOffActive;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.PowerCutOffActive;0;0;oui
+C_Safety.PowerCutOffRequest;GENERAL.Puissance;0;;RETRAIT_COPIE;R1;C_Safety.PowerCutOffActive;Aucune panne propre : PRG_06 fixe les deux depuis PowerCutOffReq. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_06_Outputs.Data.PowerCutOffRequest;0;0;oui
+C_Safety.MaintainAActive;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.Data.PowerKeepAliveACmd;0;0;oui
+C_Safety.MaintainBActive;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.Data.PowerKeepAliveBCmd;0;0;oui
+C_Safety.AllConditionsMet;GENERAL.Puissance;0;;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI AND PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+C_Safety.SafetyError;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.EmergencyDiag.Error;0;0;oui
+C_Safety.ArmingErrorId;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.EmergencyDiag.ErrorId;0;0;oui
+C_Safety.RedundancyTestFailed;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed;0;0;oui
+C_Safety.ArmingFailed;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.EmergencyDiag.ArmFailed;0;0;oui
+C_Safety.WasArmed;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.EmergencyDiag.WasArmed;0;0;oui
+C_Safety.LastAbortStep;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.EmergencyDiag.LastAbortStep;0;0;oui
+C_Safety.LastAbortCause;GENERAL.Puissance;0;;GARDER;R3;;;COPIE;PRG_06_Outputs.EmergencyDiag.LastAbortCause;0;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.Status.Ready;GENERAL.Puissance;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.Status.Ready;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.Status.Done;GENERAL.Puissance;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.Status.Done;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.Status.State.ChainOk;GENERAL.Puissance;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.Status.State.ChainOk;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.Status.State.ContactorOk;GENERAL.Puissance;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.Status.State.ContactorOk;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.Status.State.Step;GENERAL.Puissance;0;;RETRAIT_COPIE;R1;C_Safety.ArmingStep;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.Status.State.Step;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.Status.Diag.Error;GENERAL.Puissance;0;;RETRAIT_COPIE;R1;C_Safety.SafetyError;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.Status.Diag.Error;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.Status.Diag.LastAbortStep;GENERAL.Puissance;0;;RETRAIT_COPIE;R1;C_Safety.LastAbortStep;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.Status.Diag.LastAbortStep;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.Status.Diag.LastAbortCause;GENERAL.Puissance;0;;RETRAIT_COPIE;R1;C_Safety.LastAbortCause;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.Status.Diag.LastAbortCause;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.ArmingSeqStep;GENERAL.Puissance;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.ArmingSeqStep;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.Cmd.MaintainA_Cmd;GENERAL.Puissance;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.Cmd.MaintainA_Cmd;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.Cmd.MaintainB_Cmd;GENERAL.Puissance;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.Cmd.MaintainB_Cmd;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd;GENERAL.Puissance;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.ForceTestA;GENERAL.Puissance;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.ForceTestA;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.ForceTestB;GENERAL.Puissance;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.ForceTestB;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.BypassTestA;GENERAL.Puissance;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.BypassTestA;;0;oui
+PRG_06_Outputs.instSafetyEmergencyManagement.BypassTestB;GENERAL.Puissance;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.instSafetyEmergencyManagement.BypassTestB;;0;oui
+B_Inputs.Operator.JoyXRaw_ANA1;GENERAL.Operateur;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;0;0;oui
+B_Inputs.Operator.JoyYRaw_ANA2;GENERAL.Operateur;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2;0;0;oui
+B_Inputs.Operator.JoyBtnRaw;GENERAL.Operateur;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw;0;0;oui
+B_Inputs.Operator.CanBusState;GENERAL.Operateur;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Operator.CanBusState;0;0;oui
+B_Inputs.Operator.JOY1_DeviceState;GENERAL.Operateur;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Operator.JOY1_DeviceState;0;0;oui
+D_Joystick.Step1_CanBusActive;GENERAL.Operateur;0;;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;GVL_IHM.Network.BusCanOpen.Operational;0;0;oui
+D_Joystick.Step2_JoystickOperational;GENERAL.Operateur;0;;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;GVL_IHM.Network.Joystick.Operational;0;0;oui
+D_Joystick.HwIn_JoyBtnRaw_DI;GENERAL.Operateur;0;;RETRAIT_COPIE;R1;B_Inputs.Operator.JoyBtnRaw;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw, meme scan. Preuve : 282 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw;0;0;oui
+D_Joystick.NeutralXAct;GENERAL.Operateur;0;;GARDER;R3;;;RECALCUL_VUE;(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1 >= 4800 AND PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1 <= 5200);0;0;oui
+D_Joystick.NeutralYAct;GENERAL.Operateur;0;;GARDER;R3;;;RECALCUL_VUE;(PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2 >= 4800 AND PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2 <= 5200);0;0;oui
+D_Joystick.Step3_DeadmanPressed;GENERAL.Operateur;0;;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw;0;0;oui
+D_Joystick.Step4_NeutralAcquired;GENERAL.Operateur;0;;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;GVL_IHM.JOY1Joystick.State.AtNeutral;0;0;oui
+D_Joystick.DeadmanArmed;GENERAL.Operateur;0;;GARDER;R3;;;COPIE;GVL_IHM.JOY1Joystick.State.DeadmanArmed;0;0;oui
+D_Joystick.AllConditionsMet;GENERAL.Operateur;0;;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_Troubleshooting.D_Joystick.Step1_CanBusActive AND GVL_Troubleshooting.D_Joystick.Step2_JoystickOperational AND GVL_Troubleshooting.D_Joystick.DeadmanArmed;0;0;oui
+D_Joystick.JoystickSelected;GENERAL.Operateur;0;;RETRAIT_COPIE;R1;A_ContexteMachineGlobal.Idx201_JoystickSelected;Aucune panne propre : meme source GVL_IHM.Modes.Cmd.TglJoystickMaster, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;GVL_IHM.Modes.Cmd.TglJoystickMaster;0;0;oui
+D_Joystick.SelJoystickWinch;GENERAL.Operateur;0;;GARDER;R3;;;COPIE;GVL_IHM.Modes.Cmd.SelJoystickWinch;0;0;oui
+D_Joystick.RawX;GENERAL.Operateur;0;;RETRAIT_COPIE;R1;B_Inputs.Operator.JoyXRaw_ANA1;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;0;0;oui
+D_Joystick.RawY;GENERAL.Operateur;0;;RETRAIT_COPIE;R1;B_Inputs.Operator.JoyYRaw_ANA2;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2, meme scan. Preuve : 94 paires meme lot, 1 ecart.;COPIE;PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2;0;0;oui
+D_Joystick.DeflectionX_Pct;GENERAL.Operateur;0;;GARDER;R3;;;COPIE;GVL_IHM.JOY1Joystick.State.AxisCmdX.Deflection;0;0;oui
+D_Joystick.DeflectionY_Pct;GENERAL.Operateur;0;;GARDER;R3;;;COPIE;GVL_IHM.JOY1Joystick.State.AxisCmdY.Deflection;0;0;oui
+D_Joystick.DirectionX;GENERAL.Operateur;0;;GARDER;R3;;;CONDITIONNEL_IF;-1 ## 0 ## 1;0;0;oui
+D_Joystick.DirectionY;GENERAL.Operateur;0;;GARDER;R3;;;CONDITIONNEL_IF;-1 ## 0 ## 1;0;0;oui
+T_Permits.ArmingPermit;GENERAL.Operateur;0;;GARDER;R3;;;COPIE;GVL_IHM.Permits.ArmingPermit;0;0;oui
+B_Inputs.Winch.M1M2_TopPositionFree_DI;GENERAL.CapteursCommuns;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;0;0;oui
+B_Inputs.Winch.M2_TensionedCable_DI;GENERAL.CapteursCommuns;0;;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;0;0;oui
+B_Inputs.Machine.M1_M2_M3_BrakeThermalOk_DI;GENERAL.CapteursCommuns;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI;0;0;oui
+B_Inputs.Machine.M1_M2_KoboldBottomTouch_DI;GENERAL.CapteursCommuns;0;;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;0;0;oui
+N_MotionM1.Step1_PowerEngaged;AXE.M1;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+N_MotionM1.Step2_ModeAuthorized;AXE.M1;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;(PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE);0;0;oui
+N_MotionM1.Step3_NotBusyOtherTask;AXE.M1;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;NOT GVL_IHM.M1TreuilRetenue.State.Encoder.HomingBusy AND NOT (GVL_IHM.M2TreuilBenne.Bucket.State.FBState = E_State.BUSY);0;0;oui
+N_MotionM1.Step4_MotionRequested;AXE.M1;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_IHM.M1TreuilRetenue.State.Busy OR (GVL_IHM.M1TreuilRetenue.State.SpeedCmd_Pct > 0.0);0;0;oui
+N_MotionM1.Step5_NoSafetyFault;AXE.M1;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;NOT GVL_IHM.M1TreuilRetenue.Safety.SafeStop AND NOT GVL_IHM.M1TreuilRetenue.Safety.ThermalFault;0;0;oui
+N_MotionM1.Step6_DirectionAllowed;AXE.M1;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;SEL(GVL_Troubleshooting.N_MotionM1.RequestedDirection = 1, GVL_IHM.M1TreuilRetenue.Safety.DescendPermit, GVL_IHM.M1TreuilRetenue.Safety.AscentPermit);0;0;oui
+N_MotionM1.Step7_BrakeReleased;AXE.M1;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_IHM.M1TreuilRetenue.State.BrakeCmd AND GVL_IHM.M1TreuilRetenue.State.BrakeCommandOpenConfirmed;0;0;oui
+N_MotionM1.Step8_OutputInterlockOk;AXE.M1;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;NOT GVL_IHM.M1TreuilRetenue.State.FinalInterlockError AND NOT (GVL_IHM.M1TreuilRetenue.State.FinalInterlockState = E_WinchFinalInterlockState.FAULT) AND NOT (GVL_IHM.M1TreuilRetenue.State.FinalInterlockState = E_WinchFinalInterlockState.DISABLED) AND NOT (GVL_IHM.M1TreuilRetenue.State.FinalInterlockState = E_WinchFinalInterlockState.WAIT_RESTART_DELAY) AND NOT (GVL_IHM.M1TreuilRetenue.State.FinalMotorRequest AND NOT GVL_IHM.M1TreuilRetenue.State.BrakeCmd);0;0;oui
+N_MotionM1.AllConditionsMet;AXE.M1;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_Troubleshooting.N_MotionM1.Step1_PowerEngaged AND GVL_Troubleshooting.N_MotionM1.Step2_ModeAuthorized AND GVL_Troubleshooting.N_MotionM1.Step3_NotBusyOtherTask AND GVL_Troubleshooting.N_MotionM1.Step4_MotionRequested AND GVL_Troubleshooting.N_MotionM1.Step5_NoSafetyFault AND GVL_Troubleshooting.N_MotionM1.Step6_DirectionAllowed AND GVL_Troubleshooting.N_MotionM1.Step7_BrakeReleased AND GVL_Troubleshooting.N_MotionM1.Step8_OutputInterlockOk;0;0;oui
+N_MotionM1.Step8_InterlockState;AXE.M1;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;GVL_IHM.M1TreuilRetenue.State.FinalInterlockState;0;0;oui
+N_MotionM1.Step8_InterlockReason;AXE.M1;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;GVL_IHM.M1TreuilRetenue.State.FinalInterlockReason;0;0;oui
+Q_TraceWinchM1.FinalPermitBlocked;AXE.M1;1;Bilan;RETRAIT_COPIE;R1;T_Permits.M1FinalPermitBlocked;Aucune panne propre : meme source PRG_04_Treuils_Benne.Data.TraceM1.FinalPermitBlocked, meme scan. Preuve : 2 paires meme lot, 0 ecart.;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.FinalPermitBlocked;0;0;oui
+Q_TraceWinchM1.BlockReason;AXE.M1;1;Bilan;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.BlockReason;1;1;oui
+Q_TraceWinchM1.BlockReasonTimestamp;AXE.M1;1;Bilan;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.BlockReasonTimestamp;0;0;oui
+B_Inputs.Winch.M1_ThermalOk_DI;AXE.M1;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;0;0;oui
+B_Inputs.Winch.COD1_PosValue;AXE.M1;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.COD1_PosValue;0;0;oui
+B_Inputs.Winch.COD1_SpdValue;AXE.M1;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.COD1_SpdValue;0;0;oui
+B_Inputs.Winch.COD1_Alarms;AXE.M1;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.COD1_Alarms;0;0;oui
+B_Inputs.Winch.COD1_Warnings;AXE.M1;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.COD1_Warnings;0;0;oui
+B_Inputs.Winch.COD1_DeviceState;AXE.M1;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState;0;0;oui
+I_LevageUnitaireM1.Inputs_100.Idx101_EncoderRawPos;AXE.M1;2;Entrees brutes;GARDER;R0;;;CONVERSION;UDINT_TO_DINT(PRG_02_Acquisition.HwIn.Winch.COD1_PosValue);0;0;oui
+I_LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI;AXE.M1;2;Entrees brutes;RETRAIT_COPIE;R1;B_Inputs.Winch.M1_ThermalOk_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;0;0;oui
+N_MotionM1.HwIn_PowerContactorEngaged_DI;AXE.M1;2;Entrees brutes;RETRAIT_COPIE;R1;B_Inputs.Machine.PowerContactorEngaged_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI, meme scan. Preuve : 1743 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+N_MotionM1.HwIn_BrakeIsOpen_DI;AXE.M1;2;Entrees brutes;RETRAIT_COPIE;R1;B_Inputs.Winch.M1_BrakeIsOpen_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI, meme scan. Preuve : 12 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;0;0;oui
+I_LevageUnitaireM1.Inputs_100.Idx102_CablePos_M;AXE.M1;3;Mesures traitees;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.Position_M;0;0;oui
+I_LevageUnitaireM1.Control_400.Idx412_InTopSlowdownZone;AXE.M1;3;Mesures traitees;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.InTopSlowdownZone;0;0;oui
+I_LevageUnitaireM1.Control_400.Idx413_InBottomSlowdownZone;AXE.M1;3;Mesures traitees;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.InBottomSlowdownZone;0;0;oui
+I_LevageUnitaireM1.Control_400.Idx414_BottomLimitActiveM;AXE.M1;3;Mesures traitees;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.BottomLimitActiveM;0;0;oui
+I_LevageUnitaireM1.Demandes_200.Idx206_ModeActive;AXE.M1;4;Mode et interdictions;RETRAIT_COPIE;R1;A_ContexteMachineGlobal.Idx101_ModeActive;Aucune panne propre : meme source PRG_03_Modes_Cycle.Data.Auth.Mode, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_03_Modes_Cycle.Data.Auth.Mode;0;0;oui
+I_LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm;AXE.M1;4;Mode et interdictions;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx325_BypassTopLimitSoftware;AXE.M1;4;Mode et interdictions;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx327_BypassTopLimitSwitch;AXE.M1;4;Mode et interdictions;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx328_BypassTopLimitSwitchCommun;AXE.M1;4;Mode et interdictions;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive;Aucune panne propre : meme source GVL_IHM.Commun.Bypass.TopLimitSwitch, meme scan. Preuve : 393 paires meme lot, 0 ecart.;COPIE;GVL_IHM.Commun.Bypass.TopLimitSwitch;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx329_BypassGlobal;AXE.M1;4;Mode et interdictions;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Bypass.Global;0;0;oui
+I_LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA;AXE.M1;5;Demande;RETRAIT_COPIE;R1;B_Inputs.Operator.JoyYRaw_ANA2;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2, meme scan. Preuve : 94 paires meme lot, 1 ecart.;COPIE;PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2;0;0;oui
+I_LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct;AXE.M1;5;Demande;RETRAIT_COPIE;R1;D_Joystick.DeflectionY_Pct;Aucune panne propre : meme source GVL_IHM.JOY1Joystick.State.AxisCmdY.Deflection, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;GVL_IHM.JOY1Joystick.State.AxisCmdY.Deflection;0;0;oui
+I_LevageUnitaireM1.Demandes_200.Idx203_HmiManualCmd_BtnAscent;AXE.M1;5;Demande;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Cmd.BtnAscent;0;0;oui
+I_LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDescent;AXE.M1;5;Demande;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Cmd.BtnDescent;0;0;oui
+I_LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct;AXE.M1;5;Demande;GARDER;R0;;;COPIE;CycleM1SpeedTgt_Pct;1;1;oui
+I_LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct;AXE.M1;5;Demande;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedCmd_Pct;0;0;oui
+I_LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection;AXE.M1;5;Demande;GARDER;R0;;;COPIE;(SEL(PRG_04_Treuils_Benne.Data.WinchM1State.CommandedAscent, SEL(PRG_04_Treuils_Benne.Data.WinchM1State.CommandedDescend, 0, -1), 1));9;3;oui
+I_LevageUnitaireM1.Demandes_200.Idx211_CoupledUserRequestActive;AXE.M1;5;Demande;RETRAIT_COPIE;R1;T_Permits.BothActive;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_04_Treuils_Benne.WinchBothMotionActive;1;1;oui
+I_LevageUnitaireM1.Control_400.Idx402_SpeedStepCalculated;AXE.M1;5;Demande;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.StepNumber;0;0;oui
+N_MotionM1.RequestedDirection;AXE.M1;5;Demande;GARDER;R0;;;RECALCUL_VUE;SEL(GVL_IHM.M1TreuilRetenue.State.RelayFwd, SEL(GVL_IHM.M1TreuilRetenue.State.RelayRev, 0, -1), 1);0;0;oui
+N_MotionM1.RequestedSpeedPct;AXE.M1;5;Demande;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct;Aucune panne propre : meme valeur. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M1TreuilRetenue.State.SpeedCmd_Pct;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed;AXE.M1;6;Securite axe;RETRAIT_COPIE;R1;B_Inputs.Machine.EmergencyChainClosed_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI, meme scan. Preuve : 752 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx302_SafeStopActive;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.SafeStop;4;2;oui
+I_LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.PowerCutOff;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI;AXE.M1;6;Securite axe;RETRAIT_COPIE;R1;B_Inputs.Winch.M1M2_TopPositionFree_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI, meme scan. Preuve : 246 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx306_AscentPermitEffective;AXE.M1;6;Securite axe;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM1_Ascent;Aucune panne propre : meme permis effectif. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M1TreuilRetenue.Safety.AscentPermit;1;1;oui
+I_LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI;AXE.M1;6;Securite axe;RETRAIT_NEGATION;R2;B_Inputs.Winch.M2_TensionedCable_DI;Aucune panne propre : capteur unique M2, negation du DI. Juge natif 2026-11-07, verifie a la source.;NEGATION;NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx309_DescendPermitEffective;AXE.M1;6;Securite axe;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM1_Descend;Aucune panne propre : meme permis effectif. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M1TreuilRetenue.Safety.DescendPermit;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx310_ErrorOperatorComm;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.ErrorOperatorComm;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx311_ErrorEncoder;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.ErrorEncoder;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx312_ErrorPhaseRotation;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.ErrorPhaseRotation;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx313_ErrorMecaA;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.ErrorMecaA;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx314_ErrorMecaB;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.ErrorMecaB;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx315_ErrorMecaC;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.ErrorMecaC;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx316_ErrorMecaD;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.ErrorMecaD;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx317_ErrorMecaE;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.ErrorMecaE;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx318_ErrorBrakeThermal;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.ErrorBrakeThermal;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx319_ErrorOppositeDir;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.ErrorOppositeDir;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx320_ErrorNoMovement;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.ErrorNoMovement;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx322_CablePosM;AXE.M1;6;Securite axe;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Inputs_100.Idx102_CablePos_M;Aucune panne propre : meme source M1PosHmiHeld_M, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;GVL_IHM.M1TreuilRetenue.State.Position_M;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx323_TopLimitReached;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent;0;0;oui
+I_LevageUnitaireM1.Safety_300.Idx324_AscentBlockedByTopLimit;AXE.M1;6;Securite axe;GARDER;R0;;;RECALCUL_VUE;GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent AND NOT (GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware);0;0;oui
+I_LevageUnitaireM1.Control_400.Idx401_MotionAllowed;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.Ready;0;0;oui
+Q_TraceWinchM1.SafeStopActive;AXE.M1;6;Securite axe;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Safety_300.Idx302_SafeStopActive;Aucune panne propre : meme SafeStopMx_Active. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.SafeStopActive;0;0;oui
+Q_TraceWinchM1.SafeStopSourceSafety;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.SafeStopSourceSafety;0;0;oui
+Q_TraceWinchM1.SafeStopSourceInput;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.SafeStopSourceInput;0;0;oui
+Q_TraceWinchM1.SafeStopSourceSync;AXE.M1;6;Securite axe;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.SafeStopSourceSync;0;0;oui
+Q_TraceWinchM1.PowerCutOffActive;AXE.M1;6;Securite axe;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.PowerCutOffActive;0;0;oui
+Q_TraceWinchM1.DescendPermitEffective;AXE.M1;7;Permis;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM1_Descend;Aucune panne propre : meme source PRG_04_Treuils_Benne.Data.TraceM1.DescendPermitEffective, meme scan. Preuve : 2 paires meme lot, 0 ecart.;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.DescendPermitEffective;0;0;oui
+Q_TraceWinchM1.AscentPermitEffective;AXE.M1;7;Permis;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM1_Ascent;Aucune panne propre : meme source PRG_04_Treuils_Benne.Data.TraceM1.AscentPermitEffective, meme scan. Preuve : 2 paires meme lot, 0 ecart.;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.AscentPermitEffective;0;0;oui
+Q_TraceWinchM1.AscentPermitApplied;AXE.M1;7;Permis;RETRAIT_COPIE;R1;T_Permits.AppliedPermitM1_Ascent;Aucune panne propre : meme source PRG_04_Treuils_Benne.Data.TraceM1.AscentPermitApplied, meme scan. Preuve : 2 paires meme lot, 0 ecart.;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.AscentPermitApplied;0;0;oui
+Q_TraceWinchM1.DescendPermitApplied;AXE.M1;7;Permis;RETRAIT_COPIE;R1;T_Permits.AppliedPermitM1_Descend;Aucune panne propre : meme source PRG_04_Treuils_Benne.Data.TraceM1.DescendPermitApplied, meme scan. Preuve : 2 paires meme lot, 0 ecart.;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.DescendPermitApplied;0;0;oui
+T_Permits.M1SafetyAscentPermit;AXE.M1;7;Permis;CABLER_J4;R8;;Nom faux : lit le permis Effective. Le vrai permis Safety est PRG_04_Treuils_Benne.SafetyPermitM1_Ascent.;COPIE;GVL_IHM.Permits.M1SafetyAscentPermit;0;0;oui
+T_Permits.M1SafetyDescendPermit;AXE.M1;7;Permis;CABLER_J4;R8;;Nom faux : lit le permis Effective. Le vrai permis Safety est PRG_04_Treuils_Benne.SafetyPermitM1_Descend.;COPIE;GVL_IHM.Permits.M1SafetyDescendPermit;0;0;oui
+T_Permits.M1ProcessAscentPermit;AXE.M1;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.M1ProcessAscentPermit;0;0;oui
+T_Permits.M1ProcessDescendPermit;AXE.M1;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.M1ProcessDescendPermit;0;0;oui
+T_Permits.EffectivePermitM1_Ascent;AXE.M1;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.EffectivePermitM1_Ascent;0;0;oui
+T_Permits.EffectivePermitM1_Descend;AXE.M1;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.EffectivePermitM1_Descend;0;0;oui
+T_Permits.AppliedPermitM1_Ascent;AXE.M1;7;Permis;GARDER;R4;;"Sur M1 egal a Effective ; garde car distinct sur M2 : meme fiche sur les 2 treuils.";COPIE;GVL_IHM.Permits.AppliedPermitM1_Ascent;0;0;oui
+T_Permits.AppliedPermitM1_Descend;AXE.M1;7;Permis;GARDER;R4;;"Sur M1 egal a Effective ; garde car distinct sur M2 : meme fiche sur les 2 treuils.";COPIE;GVL_IHM.Permits.AppliedPermitM1_Descend;0;0;oui
+T_Permits.M1FinalPermitBlocked;AXE.M1;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.M1FinalPermitBlocked;0;0;oui
+PRG_04_Treuils_Benne.SafetyPermitM1_Ascent;AXE.M1;7;Permis;AJOUT_J3;R8;;Vrai permis Safety avant Process.;HORS_GVL;PRG_04_Treuils_Benne.SafetyPermitM1_Ascent;;0;non
+PRG_04_Treuils_Benne.SafetyPermitM1_Descend;AXE.M1;7;Permis;AJOUT_J3;R8;;Vrai permis Safety avant Process.;HORS_GVL;PRG_04_Treuils_Benne.SafetyPermitM1_Descend;;0;non
+I_LevageUnitaireM1.Control_400.Idx403_SpeedRamp_Pct;AXE.M1;8;Barriere finale;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct;Aucune panne propre : FB_WinchStateProjection copie LogicRequestSpeedCmd_Pct. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M1TreuilRetenue.State.SpeedCmd_Pct;0;0;oui
+I_LevageUnitaireM1.Control_400.Idx404_BrakeReleaseAuthorized;AXE.M1;8;Barriere finale;GARDER;R8;;Demande frein cote treuil, scan N-1. Differente de la sortie reelle PRG_06.;COPIE;GVL_IHM.M1TreuilRetenue.State.BrakeCmd;0;0;oui
+I_LevageUnitaireM1.Control_400.Idx405_FinalInterlockState;AXE.M1;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.FinalInterlockState;2;2;oui
+I_LevageUnitaireM1.Control_400.Idx406_FinalInterlockReason;AXE.M1;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.FinalInterlockReason;5;3;oui
+I_LevageUnitaireM1.Control_400.Idx407_FinalAuthorizedStep;AXE.M1;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.FinalAuthorizedStep;2;2;oui
+I_LevageUnitaireM1.Control_400.Idx408_BrakeCommandOpenConfirmed;AXE.M1;8;Barriere finale;RETRAIT_COPIE;R1;B_Inputs.Winch.M1_BrakeIsOpen_DI;Aucune panne propre : State recopie le DI. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M1TreuilRetenue.State.BrakeCommandOpenConfirmed;0;0;oui
+I_LevageUnitaireM1.Control_400.Idx409_BrakeTimeoutElapsed;AXE.M1;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.FinalBrakeTimeoutElapsed;0;0;oui
+I_LevageUnitaireM1.Control_400.Idx410_RestartDelayElapsed;AXE.M1;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.FinalRestartDelayElapsed;1;1;oui
+I_LevageUnitaireM1.Control_400.Idx411_StepDelayElapsed;AXE.M1;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.FinalStepDelayElapsed;0;0;oui
+I_LevageUnitaireM1.Control_400.Idx415_MotorRequest;AXE.M1;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.FinalMotorRequest;13;5;oui
+I_LevageUnitaireM1.Control_400.Idx416_RestartRequired;AXE.M1;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.FinalRestartRequired;12;4;oui
+I_LevageUnitaireM1.Control_400.Idx417_RestartInhibit;AXE.M1;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.FinalRestartInhibit;0;0;oui
+I_LevageUnitaireM1.Control_400.Idx418_NeutralRequestSeen;AXE.M1;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.FinalNeutralRequestSeen;0;0;oui
+Q_TraceWinchM1.Inhibited;AXE.M1;8;Barriere finale;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.Inhibited;0;0;oui
+Q_TraceWinchM1.FinalInterlockError;AXE.M1;8;Barriere finale;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.FinalInterlockError;0;0;oui
+Q_TraceWinchM1.FinalInterlockReason;AXE.M1;8;Barriere finale;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Control_400.Idx406_FinalInterlockReason;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.FinalInterlockReason;0;0;oui
+Q_TraceWinchM1.StepNumber;AXE.M1;8;Barriere finale;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Control_400.Idx402_SpeedStepCalculated;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_04_Treuils_Benne.Data.TraceM1.StepNumber;0;0;oui
+PRG_06_Outputs.instWinchOutputInterlockM1.State;AXE.M1;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_06_Outputs.instWinchOutputInterlockM1.State;;0;oui
+PRG_06_Outputs.instWinchOutputInterlockM1.Reason;AXE.M1;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_06_Outputs.instWinchOutputInterlockM1.Reason;;0;oui
+PRG_06_Outputs.instWinchOutputInterlockM1.RestartRequired;AXE.M1;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_06_Outputs.instWinchOutputInterlockM1.RestartRequired;;0;oui
+PRG_06_Outputs.instWinchOutputInterlockM1.BrakeCmd;AXE.M1;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_06_Outputs.instWinchOutputInterlockM1.BrakeCmd;;0;oui
+PRG_06_Outputs.instWinchOutputInterlockM1.AuthorizedStep;AXE.M1;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_06_Outputs.instWinchOutputInterlockM1.AuthorizedStep;;0;oui
+PRG_04_Treuils_Benne.Data.WinchM1State.DirectionChangePending;AXE.M1;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_04_Treuils_Benne.Data.WinchM1State.DirectionChangePending;;4;oui
+PRG_06_Outputs.Data.M1AscentStartReady;AXE.M1;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_06_Outputs.Data.M1AscentStartReady;;1;oui
+I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ;AXE.M1;9;Sorties;GARDER;R0;;;COPIE;PRG_06_Outputs.Data.M1RelayFwd;12;4;oui
+I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_RQ;AXE.M1;9;Sorties;GARDER;R0;;;COPIE;PRG_06_Outputs.Data.M1RelayRev;1;1;oui
+I_LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ;AXE.M1;9;Sorties;GARDER;R0;;;COPIE;PRG_06_Outputs.Data.M1SpeedContactor1;1;1;oui
+I_LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ;AXE.M1;9;Sorties;GARDER;R0;;;COPIE;PRG_06_Outputs.Data.M1SpeedContactor4;0;0;oui
+I_LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ;AXE.M1;9;Sorties;CABLER_J4;R8;;Lit State.BrakeCmd, pas la sortie : PRG_06 recalcule le frein et ajoute le forcage N2. Rebrancher sur PRG_06_Outputs.Data.M1BrakeCmd.;COPIE;GVL_IHM.M1TreuilRetenue.State.BrakeCmd;12;4;oui
+N_MotionM1.Cmd_BrakeRelease;AXE.M1;9;Sorties;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Control_400.Idx404_BrakeReleaseAuthorized;Aucune panne propre : meme State.BrakeCmd. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M1TreuilRetenue.State.BrakeCmd;0;0;oui
+N_MotionM1.RelayFwdActive;AXE.M1;9;Sorties;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ;Aucune panne propre : meme source PRG_06_Outputs.Data.M1RelayFwd, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_06_Outputs.Data.M1RelayFwd;0;0;oui
+N_MotionM1.RelayRevActive;AXE.M1;9;Sorties;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_RQ;Aucune panne propre : meme source PRG_06_Outputs.Data.M1RelayRev, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_06_Outputs.Data.M1RelayRev;0;0;oui
+N_MotionM1.SpeedContactor1Active;AXE.M1;9;Sorties;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ;Aucune panne propre : meme source PRG_06_Outputs.Data.M1SpeedContactor1, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_06_Outputs.Data.M1SpeedContactor1;0;0;oui
+PRG_06_Outputs.Data.M1BrakeCmd;AXE.M1;9;Sorties;AJOUT_J3;R8;;Vraie commande frein, forcage N2 inclus.;HORS_GVL;PRG_06_Outputs.Data.M1BrakeCmd;;0;non
+PRG_06_Outputs.Data.M1SpeedContactor2;AXE.M1;9;Sorties;AJOUT_J3;R8;;Contacteur de palier absent de la fiche.;HORS_GVL;PRG_06_Outputs.Data.M1SpeedContactor2;;0;non
+PRG_06_Outputs.Data.M1SpeedContactor3;AXE.M1;9;Sorties;AJOUT_J3;R8;;Contacteur de palier absent de la fiche.;HORS_GVL;PRG_06_Outputs.Data.M1SpeedContactor3;;0;non
+B_Inputs.Winch.M1_ContactorsReleased_DI;AXE.M1;10;Retour physique;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;0;0;oui
+B_Inputs.Winch.M1_BrakeIsOpen_DI;AXE.M1;10;Retour physique;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;0;0;oui
+I_LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI;AXE.M1;10;Retour physique;RETRAIT_COPIE;R1;B_Inputs.Winch.M1_ContactorsReleased_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI, meme scan. Preuve : 270 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;13;5;oui
+I_LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied;AXE.M1;10;Retour physique;RETRAIT_NEGATION;R2;B_Inputs.Winch.M1_BrakeIsOpen_DI;Aucune panne propre : meme fait, polarite inverse ou meme capteur unique M2.;NEGATION;NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;21;2;oui
+O_MotionM2.Step1_PowerEngaged;AXE.M2;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+O_MotionM2.Step2_ModeAuthorized;AXE.M2;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;(PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE);0;0;oui
+O_MotionM2.Step3_NotBusyOtherTask;AXE.M2;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;NEGATION;NOT GVL_IHM.M2TreuilBenne.State.Encoder.HomingBusy;0;0;oui
+O_MotionM2.Step4_MotionRequested;AXE.M2;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_IHM.M2TreuilBenne.State.Busy OR (GVL_IHM.M2TreuilBenne.State.SpeedCmd_Pct > 0.0);0;0;oui
+O_MotionM2.Step5_NoSafetyFault;AXE.M2;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;NOT GVL_IHM.M2TreuilBenne.Safety.SafeStop AND NOT GVL_IHM.M2TreuilBenne.Safety.ThermalFault AND NOT GVL_IHM.M2TreuilBenne.Safety.SlackCable;0;0;oui
+O_MotionM2.Step6_DirectionAllowed;AXE.M2;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;SEL(GVL_Troubleshooting.O_MotionM2.RequestedDirection = 1, GVL_IHM.M2TreuilBenne.Safety.DescendPermit, GVL_IHM.M2TreuilBenne.Safety.AscentPermit);0;0;oui
+O_MotionM2.Step7_BrakeReleased;AXE.M2;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_IHM.M2TreuilBenne.State.BrakeCmd AND GVL_IHM.M2TreuilBenne.State.BrakeCommandOpenConfirmed;0;0;oui
+O_MotionM2.Step8_OutputInterlockOk;AXE.M2;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;NOT GVL_IHM.M2TreuilBenne.State.FinalInterlockError AND NOT (GVL_IHM.M2TreuilBenne.State.FinalInterlockState = E_WinchFinalInterlockState.FAULT) AND NOT (GVL_IHM.M2TreuilBenne.State.FinalInterlockState = E_WinchFinalInterlockState.DISABLED) AND NOT (GVL_IHM.M2TreuilBenne.State.FinalInterlockState = E_WinchFinalInterlockState.WAIT_RESTART_DELAY) AND NOT (GVL_IHM.M2TreuilBenne.State.FinalMotorRequest AND NOT GVL_IHM.M2TreuilBenne.State.BrakeCmd);0;0;oui
+O_MotionM2.AllConditionsMet;AXE.M2;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_Troubleshooting.O_MotionM2.Step1_PowerEngaged AND GVL_Troubleshooting.O_MotionM2.Step2_ModeAuthorized AND GVL_Troubleshooting.O_MotionM2.Step3_NotBusyOtherTask AND GVL_Troubleshooting.O_MotionM2.Step4_MotionRequested AND GVL_Troubleshooting.O_MotionM2.Step5_NoSafetyFault AND GVL_Troubleshooting.O_MotionM2.Step6_DirectionAllowed AND GVL_Troubleshooting.O_MotionM2.Step7_BrakeReleased AND GVL_Troubleshooting.O_MotionM2.Step8_OutputInterlockOk;0;0;oui
+O_MotionM2.Step8_InterlockState;AXE.M2;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;GVL_IHM.M2TreuilBenne.State.FinalInterlockState;0;0;oui
+O_MotionM2.Step8_InterlockReason;AXE.M2;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;GVL_IHM.M2TreuilBenne.State.FinalInterlockReason;0;0;oui
+R_TraceWinchM2.FinalPermitBlocked;AXE.M2;1;Bilan;RETRAIT_COPIE;R1;T_Permits.M2FinalPermitBlocked;Aucune panne propre : meme source PRG_04_Treuils_Benne.Data.TraceM2.FinalPermitBlocked, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.FinalPermitBlocked;0;0;oui
+R_TraceWinchM2.BlockReason;AXE.M2;1;Bilan;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.BlockReason;0;0;oui
+R_TraceWinchM2.BlockReasonTimestamp;AXE.M2;1;Bilan;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.BlockReasonTimestamp;0;0;oui
+B_Inputs.Winch.M2_ThermalOk_DI;AXE.M2;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI;0;0;oui
+B_Inputs.Winch.COD2_PosValue;AXE.M2;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.COD2_PosValue;0;0;oui
+B_Inputs.Winch.COD2_SpdValue;AXE.M2;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.COD2_SpdValue;0;0;oui
+B_Inputs.Winch.COD2_Alarms;AXE.M2;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.COD2_Alarms;0;0;oui
+B_Inputs.Winch.COD2_Warnings;AXE.M2;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.COD2_Warnings;0;0;oui
+B_Inputs.Winch.COD2_DeviceState;AXE.M2;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState;0;0;oui
+J_LevageUnitaireM2.Inputs_100.Idx101_EncoderRawPos;AXE.M2;2;Entrees brutes;GARDER;R0;;;CONVERSION;UDINT_TO_DINT(PRG_02_Acquisition.HwIn.Winch.COD2_PosValue);0;0;oui
+J_LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI;AXE.M2;2;Entrees brutes;RETRAIT_COPIE;R1;B_Inputs.Winch.M2_ThermalOk_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI;0;0;oui
+O_MotionM2.HwIn_PowerContactorEngaged_DI;AXE.M2;2;Entrees brutes;RETRAIT_COPIE;R1;B_Inputs.Machine.PowerContactorEngaged_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI, meme scan. Preuve : 1743 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+O_MotionM2.HwIn_BrakeIsOpen_DI;AXE.M2;2;Entrees brutes;RETRAIT_COPIE;R1;B_Inputs.Winch.M2_BrakeIsOpen_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI;0;0;oui
+J_LevageUnitaireM2.Inputs_100.Idx102_CablePos_M;AXE.M2;3;Mesures traitees;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.Position_M;0;0;oui
+J_LevageUnitaireM2.Control_400.Idx412_InTopSlowdownZone;AXE.M2;3;Mesures traitees;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.InTopSlowdownZone;0;0;oui
+J_LevageUnitaireM2.Control_400.Idx413_InBottomSlowdownZone;AXE.M2;3;Mesures traitees;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.InBottomSlowdownZone;0;0;oui
+J_LevageUnitaireM2.Control_400.Idx414_BottomLimitActiveM;AXE.M2;3;Mesures traitees;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.BottomLimitActiveM;0;0;oui
+J_LevageUnitaireM2.Demandes_200.Idx206_ModeActive;AXE.M2;4;Mode et interdictions;RETRAIT_COPIE;R1;A_ContexteMachineGlobal.Idx101_ModeActive;Aucune panne propre : meme source PRG_03_Modes_Cycle.Data.Auth.Mode, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_03_Modes_Cycle.Data.Auth.Mode;0;0;oui
+J_LevageUnitaireM2.Demandes_200.Idx207_BypassOperatorComm;AXE.M2;4;Mode et interdictions;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bypass.OperatorComm;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive;AXE.M2;4;Mode et interdictions;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive;Aucune panne propre : meme source GVL_IHM.Commun.Bypass.TopLimitSwitch, meme scan. Preuve : 393 paires meme lot, 0 ecart.;COPIE;GVL_IHM.Commun.SimTopSensorBypassActive;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive;AXE.M2;4;Mode et interdictions;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive;Aucune panne propre : meme source GVL_IHM.Commun.Bypass.SlackCable, meme scan. Preuve : 37 paires meme lot, 0 ecart.;COPIE;GVL_IHM.Commun.SimSlackCableBypassActive;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx325_BypassTopLimitSoftware;AXE.M2;4;Mode et interdictions;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx326_BypassTopLimitSoftCommun;AXE.M2;4;Mode et interdictions;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Safety_300.Idx326_BypassTopLimitSoftCommun;Aucune panne propre : meme source GVL_IHM.Commun.Bypass.TopLimitSoftware, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;GVL_IHM.Commun.Bypass.TopLimitSoftware;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx327_BypassTopLimitSwitch;AXE.M2;4;Mode et interdictions;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx328_BypassTopLimitSwitchCommun;AXE.M2;4;Mode et interdictions;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive;Aucune panne propre : meme source GVL_IHM.Commun.Bypass.TopLimitSwitch, meme scan. Preuve : 393 paires meme lot, 0 ecart.;COPIE;GVL_IHM.Commun.Bypass.TopLimitSwitch;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx329_BypassGlobal;AXE.M2;4;Mode et interdictions;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bypass.Global;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx330_BypassGlobalCommun;AXE.M2;4;Mode et interdictions;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Safety_300.Idx330_BypassGlobalCommun;Aucune panne propre : meme source GVL_IHM.Commun.Bypass.Global, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;GVL_IHM.Commun.Bypass.Global;0;0;oui
+J_LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA;AXE.M2;5;Demande;RETRAIT_COPIE;R1;B_Inputs.Operator.JoyYRaw_ANA2;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2, meme scan. Preuve : 94 paires meme lot, 1 ecart.;COPIE;PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2;0;0;oui
+J_LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct;AXE.M2;5;Demande;RETRAIT_COPIE;R1;D_Joystick.DeflectionY_Pct;Aucune panne propre : meme source GVL_IHM.JOY1Joystick.State.AxisCmdY.Deflection, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;GVL_IHM.JOY1Joystick.State.AxisCmdY.Deflection;0;0;oui
+J_LevageUnitaireM2.Demandes_200.Idx203_HmiManualCmd_BtnAscent;AXE.M2;5;Demande;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Cmd.BtnAscent;0;0;oui
+J_LevageUnitaireM2.Demandes_200.Idx204_HmiManualCmd_BtnDescent;AXE.M2;5;Demande;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Cmd.BtnDescent;0;0;oui
+J_LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct;AXE.M2;5;Demande;GARDER;R0;;;COPIE;CycleM2SpeedTgt_Pct;1;1;oui
+J_LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct;AXE.M2;5;Demande;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedCmd_Pct;0;0;oui
+J_LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection;AXE.M2;5;Demande;GARDER;R0;;;COPIE;(SEL(PRG_04_Treuils_Benne.Data.WinchM2State.CommandedAscent, SEL(PRG_04_Treuils_Benne.Data.WinchM2State.CommandedDescend, 0, -1), 1));9;3;oui
+J_LevageUnitaireM2.Demandes_200.Idx210_CoupledUserRequestDirection;AXE.M2;5;Demande;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Demandes_200.Idx210_CoupledUserRequestDirection;Aucune panne propre : meme source (SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqAscent, SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend, 0, -1), 1)), meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;(SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqAscent, SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend, 0, -1), 1));0;0;oui
+J_LevageUnitaireM2.Demandes_200.Idx211_CoupledUserRequestActive;AXE.M2;5;Demande;RETRAIT_COPIE;R1;T_Permits.BothActive;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_04_Treuils_Benne.WinchBothMotionActive;0;0;oui
+J_LevageUnitaireM2.Control_400.Idx402_SpeedStepCalculated;AXE.M2;5;Demande;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.StepNumber;0;0;oui
+O_MotionM2.RequestedDirection;AXE.M2;5;Demande;GARDER;R0;;;RECALCUL_VUE;SEL(GVL_IHM.M2TreuilBenne.State.RelayFwd, SEL(GVL_IHM.M2TreuilBenne.State.RelayRev, 0, -1), 1);0;0;oui
+O_MotionM2.RequestedSpeedPct;AXE.M2;5;Demande;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct;Aucune panne propre : meme valeur. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M2TreuilBenne.State.SpeedCmd_Pct;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed;AXE.M2;6;Securite axe;RETRAIT_COPIE;R1;B_Inputs.Machine.EmergencyChainClosed_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI, meme scan. Preuve : 752 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx302_SafeStopActive;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.SafeStop;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.PowerCutOff;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI;AXE.M2;6;Securite axe;RETRAIT_COPIE;R1;B_Inputs.Winch.M1M2_TopPositionFree_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI, meme scan. Preuve : 246 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx306_AscentPermitEffective;AXE.M2;6;Securite axe;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM2_Ascent;Aucune panne propre : meme permis effectif. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M2TreuilBenne.Safety.AscentPermit;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI;AXE.M2;6;Securite axe;RETRAIT_NEGATION;R2;B_Inputs.Winch.M2_TensionedCable_DI;Aucune panne propre : negation du DI. Juge natif 2026-11-07, verifie a la source.;NEGATION;NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx309_DescendPermitEffective;AXE.M2;6;Securite axe;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM2_Descend;Aucune panne propre : meme permis effectif. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M2TreuilBenne.Safety.DescendPermit;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx310_ErrorOperatorComm;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.ErrorOperatorComm;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx311_ErrorEncoder;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.ErrorEncoder;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx312_ErrorPhaseRotation;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.ErrorPhaseRotation;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx313_ErrorMecaA;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.ErrorMecaA;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx314_ErrorMecaB;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.ErrorMecaB;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx315_ErrorMecaC;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.ErrorMecaC;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx316_ErrorMecaD;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.ErrorMecaD;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx317_ErrorMecaE;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.ErrorMecaE;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx318_ErrorBrakeThermal;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.ErrorBrakeThermal;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx319_ErrorOppositeDir;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.ErrorOppositeDir;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx320_ErrorNoMovement;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.ErrorNoMovement;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx321_CfgTopLimitM;AXE.M2;6;Securite axe;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Safety_300.Idx321_CfgTopLimitM;Aucune panne propre : meme source _CommunCfgPersist.CfgCableLimitAscent_M, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;_CommunCfgPersist.CfgCableLimitAscent_M;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx322_CablePosM;AXE.M2;6;Securite axe;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Inputs_100.Idx102_CablePos_M;Aucune panne propre : meme source M2PosHmiHeld_M, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;GVL_IHM.M2TreuilBenne.State.Position_M;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx323_TopLimitReached;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent;0;0;oui
+J_LevageUnitaireM2.Safety_300.Idx324_AscentBlockedByTopLimit;AXE.M2;6;Securite axe;GARDER;R0;;;RECALCUL_VUE;GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent AND NOT (GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware);0;1;oui
+J_LevageUnitaireM2.Control_400.Idx401_MotionAllowed;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.Ready;0;0;oui
+R_TraceWinchM2.SafeStopActive;AXE.M2;6;Securite axe;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Safety_300.Idx302_SafeStopActive;Aucune panne propre : meme SafeStopMx_Active. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.SafeStopActive;0;0;oui
+R_TraceWinchM2.SafeStopSourceSafety;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.SafeStopSourceSafety;0;0;oui
+R_TraceWinchM2.SafeStopSourceInput;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.SafeStopSourceInput;0;0;oui
+R_TraceWinchM2.SafeStopSourceSync;AXE.M2;6;Securite axe;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.SafeStopSourceSync;0;0;oui
+R_TraceWinchM2.PowerCutOffActive;AXE.M2;6;Securite axe;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.PowerCutOffActive;0;0;oui
+R_TraceWinchM2.DescendPermitEffective;AXE.M2;7;Permis;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM2_Descend;Aucune panne propre : meme source PRG_04_Treuils_Benne.Data.TraceM2.DescendPermitEffective, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.DescendPermitEffective;0;0;oui
+R_TraceWinchM2.AscentPermitEffective;AXE.M2;7;Permis;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM2_Ascent;Aucune panne propre : meme source PRG_04_Treuils_Benne.Data.TraceM2.AscentPermitEffective, meme scan. Preuve : 2 paires meme lot, 0 ecart.;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.AscentPermitEffective;0;0;oui
+R_TraceWinchM2.AscentPermitApplied;AXE.M2;7;Permis;RETRAIT_COPIE;R1;T_Permits.AppliedPermitM2_Ascent;Aucune panne propre : meme source PRG_04_Treuils_Benne.Data.TraceM2.AscentPermitApplied, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.AscentPermitApplied;0;0;oui
+R_TraceWinchM2.DescendPermitApplied;AXE.M2;7;Permis;RETRAIT_COPIE;R1;T_Permits.AppliedPermitM2_Descend;Aucune panne propre : meme source PRG_04_Treuils_Benne.Data.TraceM2.DescendPermitApplied, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.DescendPermitApplied;0;0;oui
+T_Permits.M2SafetyAscentPermit;AXE.M2;7;Permis;CABLER_J4;R8;;Nom faux : lit le permis Effective. Le vrai permis Safety est PRG_04_Treuils_Benne.SafetyPermitM2_Ascent.;COPIE;GVL_IHM.Permits.M2SafetyAscentPermit;0;0;oui
+T_Permits.M2SafetyDescendPermit;AXE.M2;7;Permis;CABLER_J4;R8;;Nom faux : lit le permis Effective. Le vrai permis Safety est PRG_04_Treuils_Benne.SafetyPermitM2_Descend.;COPIE;GVL_IHM.Permits.M2SafetyDescendPermit;0;0;oui
+T_Permits.M2ProcessAscentPermit;AXE.M2;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.M2ProcessAscentPermit;0;0;oui
+T_Permits.M2ProcessDescendPermit;AXE.M2;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.M2ProcessDescendPermit;0;0;oui
+T_Permits.EffectivePermitM2_Ascent;AXE.M2;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.EffectivePermitM2_Ascent;0;0;oui
+T_Permits.EffectivePermitM2_Descend;AXE.M2;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.EffectivePermitM2_Descend;0;0;oui
+T_Permits.AppliedPermitM2_Ascent;AXE.M2;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.AppliedPermitM2_Ascent;0;0;oui
+T_Permits.AppliedPermitM2_Descend;AXE.M2;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.AppliedPermitM2_Descend;0;0;oui
+T_Permits.M2FinalPermitBlocked;AXE.M2;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.M2FinalPermitBlocked;0;0;oui
+PRG_04_Treuils_Benne.SafetyPermitM2_Ascent;AXE.M2;7;Permis;AJOUT_J3;R8;;Vrai permis Safety avant Process.;HORS_GVL;PRG_04_Treuils_Benne.SafetyPermitM2_Ascent;;0;non
+PRG_04_Treuils_Benne.SafetyPermitM2_Descend;AXE.M2;7;Permis;AJOUT_J3;R8;;Vrai permis Safety avant Process.;HORS_GVL;PRG_04_Treuils_Benne.SafetyPermitM2_Descend;;0;non
+J_LevageUnitaireM2.Control_400.Idx403_SpeedRamp_Pct;AXE.M2;8;Barriere finale;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct;Aucune panne propre : FB_WinchStateProjection copie LogicRequestSpeedCmd_Pct. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M2TreuilBenne.State.SpeedCmd_Pct;0;0;oui
+J_LevageUnitaireM2.Control_400.Idx404_BrakeReleaseAuthorized;AXE.M2;8;Barriere finale;GARDER;R8;;Demande frein cote treuil, scan N-1. Differente de la sortie reelle PRG_06.;COPIE;GVL_IHM.M2TreuilBenne.State.BrakeCmd;0;0;oui
+J_LevageUnitaireM2.Control_400.Idx405_FinalInterlockState;AXE.M2;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.FinalInterlockState;2;2;oui
+J_LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason;AXE.M2;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.FinalInterlockReason;2;2;oui
+J_LevageUnitaireM2.Control_400.Idx407_FinalAuthorizedStep;AXE.M2;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.FinalAuthorizedStep;2;2;oui
+J_LevageUnitaireM2.Control_400.Idx408_BrakeCommandOpenConfirmed;AXE.M2;8;Barriere finale;RETRAIT_COPIE;R1;B_Inputs.Winch.M2_BrakeIsOpen_DI;Aucune panne propre : State recopie le DI. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M2TreuilBenne.State.BrakeCommandOpenConfirmed;0;0;oui
+J_LevageUnitaireM2.Control_400.Idx409_BrakeTimeoutElapsed;AXE.M2;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.FinalBrakeTimeoutElapsed;0;0;oui
+J_LevageUnitaireM2.Control_400.Idx410_RestartDelayElapsed;AXE.M2;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.FinalRestartDelayElapsed;1;1;oui
+J_LevageUnitaireM2.Control_400.Idx411_StepDelayElapsed;AXE.M2;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.FinalStepDelayElapsed;0;0;oui
+J_LevageUnitaireM2.Control_400.Idx415_MotorRequest;AXE.M2;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.FinalMotorRequest;13;5;oui
+J_LevageUnitaireM2.Control_400.Idx416_RestartRequired;AXE.M2;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.FinalRestartRequired;8;2;oui
+J_LevageUnitaireM2.Control_400.Idx417_RestartInhibit;AXE.M2;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.FinalRestartInhibit;0;0;oui
+J_LevageUnitaireM2.Control_400.Idx418_NeutralRequestSeen;AXE.M2;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.FinalNeutralRequestSeen;0;0;oui
+R_TraceWinchM2.Inhibited;AXE.M2;8;Barriere finale;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.Inhibited;0;0;oui
+R_TraceWinchM2.FinalInterlockError;AXE.M2;8;Barriere finale;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.FinalInterlockError;0;0;oui
+R_TraceWinchM2.FinalInterlockReason;AXE.M2;8;Barriere finale;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.FinalInterlockReason;0;0;oui
+R_TraceWinchM2.StepNumber;AXE.M2;8;Barriere finale;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Control_400.Idx402_SpeedStepCalculated;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_04_Treuils_Benne.Data.TraceM2.StepNumber;0;0;oui
+PRG_06_Outputs.instWinchOutputInterlockM2.State;AXE.M2;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_06_Outputs.instWinchOutputInterlockM2.State;;0;oui
+PRG_06_Outputs.instWinchOutputInterlockM2.Reason;AXE.M2;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_06_Outputs.instWinchOutputInterlockM2.Reason;;0;oui
+PRG_06_Outputs.instWinchOutputInterlockM2.RestartRequired;AXE.M2;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_06_Outputs.instWinchOutputInterlockM2.RestartRequired;;0;oui
+PRG_06_Outputs.instWinchOutputInterlockM2.BrakeCmd;AXE.M2;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_06_Outputs.instWinchOutputInterlockM2.BrakeCmd;;0;oui
+PRG_06_Outputs.instWinchOutputInterlockM2.AuthorizedStep;AXE.M2;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_06_Outputs.instWinchOutputInterlockM2.AuthorizedStep;;0;oui
+PRG_04_Treuils_Benne.Data.WinchM2State.DirectionChangePending;AXE.M2;8;Barriere finale;GARDER;R0;;;HORS_GVL;PRG_04_Treuils_Benne.Data.WinchM2State.DirectionChangePending;;4;oui
+J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ;AXE.M2;9;Sorties;GARDER;R0;;;COPIE;PRG_06_Outputs.Data.M2RelayFwd;12;4;oui
+J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_RQ;AXE.M2;9;Sorties;GARDER;R0;;;COPIE;PRG_06_Outputs.Data.M2RelayRev;0;0;oui
+J_LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ;AXE.M2;9;Sorties;GARDER;R0;;;COPIE;PRG_06_Outputs.Data.M2SpeedContactor1;1;1;oui
+J_LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ;AXE.M2;9;Sorties;GARDER;R0;;;COPIE;PRG_06_Outputs.Data.M2SpeedContactor4;0;0;oui
+J_LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ;AXE.M2;9;Sorties;CABLER_J4;R8;;Lit State.BrakeCmd, pas la sortie : PRG_06 recalcule le frein et ajoute le forcage N2. Rebrancher sur PRG_06_Outputs.Data.M2BrakeCmd.;COPIE;GVL_IHM.M2TreuilBenne.State.BrakeCmd;12;4;oui
+O_MotionM2.Cmd_BrakeRelease;AXE.M2;9;Sorties;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Control_400.Idx404_BrakeReleaseAuthorized;Aucune panne propre : meme State.BrakeCmd. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M2TreuilBenne.State.BrakeCmd;0;0;oui
+O_MotionM2.RelayFwdActive;AXE.M2;9;Sorties;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ;Aucune panne propre : meme source PRG_06_Outputs.Data.M2RelayFwd, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_06_Outputs.Data.M2RelayFwd;0;0;oui
+O_MotionM2.RelayRevActive;AXE.M2;9;Sorties;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_RQ;Aucune panne propre : meme source PRG_06_Outputs.Data.M2RelayRev, meme scan. Preuve : 37 paires meme lot, 1 ecart.;COPIE;PRG_06_Outputs.Data.M2RelayRev;0;0;oui
+O_MotionM2.SpeedContactor1Active;AXE.M2;9;Sorties;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ;Aucune panne propre : meme source PRG_06_Outputs.Data.M2SpeedContactor1, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_06_Outputs.Data.M2SpeedContactor1;0;0;oui
+PRG_06_Outputs.Data.M2BrakeCmd;AXE.M2;9;Sorties;AJOUT_J3;R8;;Vraie commande frein, forcage N2 inclus.;HORS_GVL;PRG_06_Outputs.Data.M2BrakeCmd;;0;non
+PRG_06_Outputs.Data.M2SpeedContactor2;AXE.M2;9;Sorties;AJOUT_J3;R8;;Contacteur de palier absent de la fiche.;HORS_GVL;PRG_06_Outputs.Data.M2SpeedContactor2;;0;non
+PRG_06_Outputs.Data.M2SpeedContactor3;AXE.M2;9;Sorties;AJOUT_J3;R8;;Contacteur de palier absent de la fiche.;HORS_GVL;PRG_06_Outputs.Data.M2SpeedContactor3;;0;non
+B_Inputs.Winch.M2_ContactorsReleased_DI;AXE.M2;10;Retour physique;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI;0;0;oui
+B_Inputs.Winch.M2_BrakeIsOpen_DI;AXE.M2;10;Retour physique;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI;0;0;oui
+J_LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI;AXE.M2;10;Retour physique;RETRAIT_COPIE;R1;B_Inputs.Winch.M2_ContactorsReleased_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI;13;5;oui
+J_LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied;AXE.M2;10;Retour physique;RETRAIT_NEGATION;R2;B_Inputs.Winch.M2_BrakeIsOpen_DI;Aucune panne propre : meme fait, polarite inverse ou meme capteur unique M2.;NEGATION;NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI;2;2;oui
+P_MotionM3.Step1_PowerEngaged;AXE.M3;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+P_MotionM3.Step2_ModeAuthorized;AXE.M3;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;(PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE);0;0;oui
+P_MotionM3.Step3_NotBusyOtherTask;AXE.M3;1;Bilan;GARDER;R4;;Constante TRUE conservee : garde l'alignement des 8 maillons sur les 3 axes.;CONSTANTE;TRUE;0;0;oui
+P_MotionM3.Step4_MotionRequested;AXE.M3;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_IHM.M3Translation.State.Busy OR (GVL_IHM.M3Translation.State.SpeedCmd_Pct > 0.0);0;0;oui
+P_MotionM3.Step5_NoSafetyFault;AXE.M3;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;NOT GVL_IHM.M3Translation.Safety.SafeStop AND NOT GVL_IHM.M3Translation.State.Error;0;0;oui
+P_MotionM3.Step6_DirectionAllowed;AXE.M3;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;SEL(GVL_Troubleshooting.P_MotionM3.RequestedDirection = 1, GVL_IHM.M3Translation.Safety.EffectivePermitM3_Maintenance, GVL_IHM.M3Translation.Safety.EffectivePermitM3_Tremie);0;0;oui
+P_MotionM3.Step7_BrakeReleased;AXE.M3;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_IHM.M3Translation.State.BrakeCmd AND GVL_IHM.M3Translation.State.BrakeCommandOpenConfirmed;0;0;oui
+P_MotionM3.Step8_OutputInterlockOk;AXE.M3;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;NOT GVL_IHM.M3Translation.State.FinalInterlockError AND NOT (GVL_IHM.M3Translation.State.FinalInterlockState = E_State.ERROR);0;0;oui
+P_MotionM3.AllConditionsMet;AXE.M3;1;Bilan;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_Troubleshooting.P_MotionM3.Step1_PowerEngaged AND GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized AND GVL_Troubleshooting.P_MotionM3.Step3_NotBusyOtherTask AND GVL_Troubleshooting.P_MotionM3.Step4_MotionRequested AND GVL_Troubleshooting.P_MotionM3.Step5_NoSafetyFault AND GVL_Troubleshooting.P_MotionM3.Step6_DirectionAllowed AND GVL_Troubleshooting.P_MotionM3.Step7_BrakeReleased AND GVL_Troubleshooting.P_MotionM3.Step8_OutputInterlockOk;0;0;oui
+P_MotionM3.Step8_InterlockState;AXE.M3;1;Bilan;A_VALIDER;R6;;Valeurs de l'enum treuil recalculees pour M3 : pas de vraie barriere M3. Renommer ou retirer a J4.;CONDITIONNEL_IF;E_WinchFinalInterlockState.FAULT ## E_WinchFinalInterlockState.READY;0;0;oui
+P_MotionM3.Step8_InterlockReason;AXE.M3;1;Bilan;A_VALIDER;R6;;Valeurs de l'enum treuil recalculees pour M3 : pas de vraie barriere M3. Renommer ou retirer a J4.;CONDITIONNEL_IF;E_WinchFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED ## E_WinchFinalInterlockReason.NONE ## E_WinchFinalInterlockReason.RESTART_INHIBITED;0;0;oui
+S_TraceTranslation.BlockReason;AXE.M3;1;Bilan;GARDER;R0;;;COPIE;PRG_05_Translation.Data.TranslationTrace.BlockReason;0;0;oui
+S_TraceTranslation.BlockReasonTimestamp;AXE.M3;1;Bilan;GARDER;R0;;;COPIE;PRG_05_Translation.Data.TranslationTrace.BlockReasonTimestamp;0;0;oui
+B_Inputs.Translation.M3_PosTremie_DI;AXE.M3;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI;0;0;oui
+B_Inputs.Translation.M3_PosPV_DI;AXE.M3;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Translation.M3_PosPV_DI;0;0;oui
+B_Inputs.Translation.M3_PosPVP2_DI;AXE.M3;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Translation.M3_PosPVP2_DI;0;0;oui
+B_Inputs.Translation.M3_PosP1_DI;AXE.M3;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Translation.M3_PosP1_DI;0;0;oui
+B_Inputs.Translation.M3_PosMaintenance_DI;AXE.M3;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Translation.M3_PosMaintenance_DI;0;0;oui
+B_Inputs.Translation.M3_ThermalOK_DI;AXE.M3;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;0;0;oui
+B_Inputs.Translation.M3_StatusWord;AXE.M3;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Translation.M3_StatusWord;0;0;oui
+B_Inputs.Translation.AC600_DeviceState;AXE.M3;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Translation.AC600_DeviceState;0;0;oui
+B_Inputs.Machine.TremieFull_OR_GateRaised_DI;AXE.M3;2;Entrees brutes;GARDER;R3;;;COPIE;PRG_02_Acquisition.HwIn.Machine.TremieFull_OR_GateRaised_DI;0;0;oui
+L_TranslationPontM3.Inputs_100.Idx107_DriveStatusWord;AXE.M3;2;Entrees brutes;RETRAIT_COPIE;R1;B_Inputs.Translation.M3_StatusWord;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Translation.M3_StatusWord, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_02_Acquisition.HwIn.Translation.M3_StatusWord;0;0;oui
+P_MotionM3.HwIn_PowerContactorEngaged_DI;AXE.M3;2;Entrees brutes;RETRAIT_COPIE;R1;B_Inputs.Machine.PowerContactorEngaged_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI, meme scan. Preuve : 1743 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+P_MotionM3.HwIn_BrakeIsOpen_DI;AXE.M3;2;Entrees brutes;RETRAIT_COPIE;R1;B_Inputs.Translation.M3_BrakeIsOpen_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI;0;0;oui
+S_TraceTranslation.DriveOperational;AXE.M3;2;Entrees brutes;GARDER;R0;;;COPIE;PRG_05_Translation.Data.TranslationTrace.DriveOperational;0;0;oui
+L_TranslationPontM3.Inputs_100.Idx101_PosTremie_DI;AXE.M3;3;Mesures traitees;RETRAIT_COPIE;R1;B_Inputs.Translation.M3_PosTremie_DI;Aucune panne propre : passthrough PRG_05:115-119 et decodeur:94-98. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M3Translation.State.PositionTremie;0;0;oui
+L_TranslationPontM3.Inputs_100.Idx102_PosPV_DI;AXE.M3;3;Mesures traitees;RETRAIT_COPIE;R1;B_Inputs.Translation.M3_PosPV_DI;Aucune panne propre : passthrough PRG_05:115-119 et decodeur:94-98. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M3Translation.State.PositionPV;0;0;oui
+L_TranslationPontM3.Inputs_100.Idx103_PosP2_DI;AXE.M3;3;Mesures traitees;RETRAIT_COPIE;R1;B_Inputs.Translation.M3_PosPVP2_DI;Aucune panne propre : passthrough PRG_05:115-119 et decodeur:94-98. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M3Translation.State.PositionP2;0;0;oui
+L_TranslationPontM3.Inputs_100.Idx104_PosP1_DI;AXE.M3;3;Mesures traitees;RETRAIT_COPIE;R1;B_Inputs.Translation.M3_PosP1_DI;Aucune panne propre : passthrough PRG_05:115-119 et decodeur:94-98. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M3Translation.State.PositionP1;0;0;oui
+L_TranslationPontM3.Inputs_100.Idx105_PosMaintenance_DI;AXE.M3;3;Mesures traitees;RETRAIT_COPIE;R1;B_Inputs.Translation.M3_PosMaintenance_DI;Aucune panne propre : passthrough PRG_05:115-119 et decodeur:94-98. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M3Translation.State.PositionMaintenance;0;0;oui
+L_TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz;AXE.M3;3;Mesures traitees;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.State.DriveActualFreq_Hz;0;0;oui
+L_TranslationPontM3.Inputs_100.Idx109_DriveThermalOk;AXE.M3;3;Mesures traitees;RETRAIT_COPIE;R1;B_Inputs.Translation.M3_ThermalOK_DI;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M3Translation.State.DriveThermalOk;0;0;oui
+L_TranslationPontM3.Safety_300.Idx307_PositionDecoderIncoherent;AXE.M3;3;Mesures traitees;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.State.SensorWordIncoherent;0;0;oui
+L_TranslationPontM3.Demandes_200.Idx207_ModeActive;AXE.M3;4;Mode et interdictions;RETRAIT_COPIE;R1;A_ContexteMachineGlobal.Idx101_ModeActive;Aucune panne propre : meme source PRG_03_Modes_Cycle.Data.Auth.Mode, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_03_Modes_Cycle.Data.Auth.Mode;0;0;oui
+L_TranslationPontM3.Demandes_200.Idx208_BypassNetworkActive;AXE.M3;4;Mode et interdictions;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Bypass.Global;0;0;oui
+L_TranslationPontM3.Safety_300.Idx306_BypassLimitSwitch;AXE.M3;4;Mode et interdictions;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Bypass.LimitSwitch;0;0;oui
+L_TranslationPontM3.Safety_300.Idx308_HeightInterlockBlocking;AXE.M3;4;Mode et interdictions;RETRAIT_COPIE;R1;S_TraceTranslation.HeightInterlockBlocking;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M3Translation.State.HeightInterlockBlocking;0;0;oui
+S_TraceTranslation.HeightInterlockBlocking;AXE.M3;4;Mode et interdictions;GARDER;R0;;;COPIE;PRG_05_Translation.Data.TranslationTrace.HeightInterlockBlocking;0;0;oui
+L_TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA;AXE.M3;5;Demande;RETRAIT_COPIE;R1;B_Inputs.Operator.JoyXRaw_ANA1;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;0;0;oui
+L_TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct;AXE.M3;5;Demande;RETRAIT_COPIE;R1;D_Joystick.DeflectionX_Pct;Aucune panne propre : meme source GVL_IHM.JOY1Joystick.State.AxisCmdX.Deflection, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;GVL_IHM.JOY1Joystick.State.AxisCmdX.Deflection;0;0;oui
+L_TranslationPontM3.Demandes_200.Idx203_HmiCmd_BtnTremie;AXE.M3;5;Demande;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Cmd.BtnTremie;0;0;oui
+L_TranslationPontM3.Demandes_200.Idx204_HmiCmd_BtnMaintenance;AXE.M3;5;Demande;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Cmd.BtnMaintenance;0;0;oui
+L_TranslationPontM3.Demandes_200.Idx205_HmiTargetPosition;AXE.M3;5;Demande;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Cmd.SelTarget;0;0;oui
+L_TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition;AXE.M3;5;Demande;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt;0;0;oui
+L_TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct;AXE.M3;5;Demande;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.State.SpeedCmd_Pct;0;0;oui
+L_TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz;AXE.M3;5;Demande;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.State.DriveFreqCmd_Hz;0;0;oui
+L_TranslationPontM3.Control_400.Idx403_DriveControlWord;AXE.M3;5;Demande;GARDER;R8;;Mot demande, avant barriere finale M3.;COPIE;GVL_IHM.M3Translation.State.DriveControlWord;0;0;oui
+P_MotionM3.Cmd_BrakeRelease;AXE.M3;5;Demande;GARDER;R8;;Demande frein M3, avant barriere finale.;COPIE;GVL_IHM.M3Translation.State.BrakeCmd;0;0;oui
+P_MotionM3.RequestedDirection;AXE.M3;5;Demande;GARDER;R0;;;RECALCUL_VUE;SEL(GVL_IHM.M3Translation.State.ActiveTremie, SEL(GVL_IHM.M3Translation.State.ActiveMaintenance, -1, 0), 1);0;0;oui
+P_MotionM3.RequestedSpeedPct;AXE.M3;5;Demande;RETRAIT_COPIE;R1;L_TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct;Aucune panne propre : meme source GVL_IHM.M3Translation.State.SpeedCmd_Pct, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;GVL_IHM.M3Translation.State.SpeedCmd_Pct;0;0;oui
+P_MotionM3.RelayFwdActive;AXE.M3;5;Demande;GARDER;R0;;;RECALCUL_VUE;GVL_IHM.M3Translation.State.ActiveTremie AND GVL_IHM.M3Translation.State.Busy;0;0;oui
+P_MotionM3.RelayRevActive;AXE.M3;5;Demande;GARDER;R0;;;RECALCUL_VUE;GVL_IHM.M3Translation.State.ActiveMaintenance AND GVL_IHM.M3Translation.State.Busy;0;0;oui
+L_TranslationPontM3.Safety_300.Idx301_EmergencyChainClosed;AXE.M3;6;Securite axe;RETRAIT_COPIE;R1;B_Inputs.Machine.EmergencyChainClosed_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI, meme scan. Preuve : 752 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI;0;0;oui
+L_TranslationPontM3.Safety_300.Idx302_SafeStopActive;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Safety.SafeStop;0;0;oui
+L_TranslationPontM3.Safety_300.Idx303_PowerCutOffActive;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Safety.PowerCutOff;0;0;oui
+L_TranslationPontM3.Safety_300.Idx304_LimitSwitchTremieActive;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.State.LimitSwitchTremie;0;0;oui
+L_TranslationPontM3.Safety_300.Idx305_LimitSwitchMaintenanceActive;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.State.LimitSwitchMaintenance;0;0;oui
+L_TranslationPontM3.Safety_300.Idx309_ErrorOperatorComm;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Safety.ErrorOperatorComm;0;0;oui
+L_TranslationPontM3.Safety_300.Idx310_ErrorDriveComm;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Safety.ErrorDriveComm;0;0;oui
+L_TranslationPontM3.Safety_300.Idx311_ErrorPhaseRotation;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Safety.ErrorPhaseRotation;0;0;oui
+L_TranslationPontM3.Safety_300.Idx312_ErrorBrakeThermal;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Safety.ErrorBrakeThermal;0;0;oui
+L_TranslationPontM3.Safety_300.Idx313_ErrorMecaB;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Safety.ErrorMecaB;0;0;oui
+L_TranslationPontM3.Safety_300.Idx314_ErrorMecaA;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Safety.ErrorMecaA;0;0;oui
+L_TranslationPontM3.Safety_300.Idx315_ErrorLimitSwitch;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Safety.ErrorLimitSwitch;0;0;oui
+L_TranslationPontM3.Safety_300.Idx316_ErrorSensorIncoherent;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Safety.ErrorSensorIncoherent;0;0;oui
+L_TranslationPontM3.Safety_300.Idx317_ErrorId;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.Safety.ErrorId;0;0;oui
+L_TranslationPontM3.Control_400.Idx401_MotionAllowed;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.State.Ready;0;0;oui
+S_TraceTranslation.SafeStopActive;AXE.M3;6;Securite axe;RETRAIT_COPIE;R1;L_TranslationPontM3.Safety_300.Idx302_SafeStopActive;Aucune panne propre : meme SafeStop M3. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_05_Translation.Data.TranslationTrace.SafeStopActive;0;0;oui
+S_TraceTranslation.SafeStopSourceInput;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;PRG_05_Translation.Data.TranslationTrace.SafeStopSourceInput;0;0;oui
+S_TraceTranslation.SafeStopSourceSafety;AXE.M3;6;Securite axe;GARDER;R0;;;COPIE;PRG_05_Translation.Data.TranslationTrace.SafeStopSourceSafety;0;0;oui
+S_TraceTranslation.PowerCutOffActive;AXE.M3;6;Securite axe;RETRAIT_COPIE;R1;L_TranslationPontM3.Safety_300.Idx303_PowerCutOffActive;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_05_Translation.Data.TranslationTrace.PowerCutOffActive;0;0;oui
+L_TranslationPontM3.Safety_300.Idx318_EffectivePermitM3_Tremie;AXE.M3;7;Permis;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM3_Tremie;Aucune panne propre : PRG_05:820-821,840-842. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M3Translation.Safety.EffectivePermitM3_Tremie;0;0;oui
+L_TranslationPontM3.Safety_300.Idx319_EffectivePermitM3_Maintenance;AXE.M3;7;Permis;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM3_Maintenance;Aucune panne propre : PRG_05:820-821,840-842. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M3Translation.Safety.EffectivePermitM3_Maintenance;0;0;oui
+S_TraceTranslation.MotionPermitEffective;AXE.M3;7;Permis;RETRAIT_COPIE;R1;T_Permits.M3MotionPermitEffective;Aucune panne propre : meme source PRG_05_Translation.Data.TranslationTrace.MotionPermitEffective, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_05_Translation.Data.TranslationTrace.MotionPermitEffective;0;0;oui
+S_TraceTranslation.EffectivePermitM3_Tremie;AXE.M3;7;Permis;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM3_Tremie;Aucune panne propre : meme source PRG_05_Translation.Data.TranslationTrace.EffectivePermitM3_Tremie, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_05_Translation.Data.TranslationTrace.EffectivePermitM3_Tremie;0;0;oui
+S_TraceTranslation.EffectivePermitM3_Maintenance;AXE.M3;7;Permis;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM3_Maintenance;Aucune panne propre : meme source PRG_05_Translation.Data.TranslationTrace.EffectivePermitM3_Maintenance, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_05_Translation.Data.TranslationTrace.EffectivePermitM3_Maintenance;0;0;oui
+S_TraceTranslation.TremieProcessBlockActive;AXE.M3;7;Permis;GARDER;R0;;;COPIE;PRG_05_Translation.Data.TranslationTrace.TremieProcessBlockActive;0;0;oui
+T_Permits.EffectivePermitM3_Tremie;AXE.M3;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.EffectivePermitM3_Tremie;0;0;oui
+T_Permits.EffectivePermitM3_Maintenance;AXE.M3;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.EffectivePermitM3_Maintenance;0;0;oui
+T_Permits.M3MotionPermitEffective;AXE.M3;7;Permis;GARDER;R0;;;COPIE;GVL_IHM.Permits.M3MotionPermitEffective;0;0;oui
+L_TranslationPontM3.Control_400.Idx404_FinalInterlockState;AXE.M3;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.State.FinalInterlockState;0;0;oui
+L_TranslationPontM3.Control_400.Idx405_FinalInterlockReason;AXE.M3;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.State.FinalInterlockReason;0;0;oui
+L_TranslationPontM3.Control_400.Idx406_BrakeCommandOpenConfirmed;AXE.M3;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.State.BrakeCommandOpenConfirmed;0;0;oui
+L_TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed;AXE.M3;8;Barriere finale;GARDER;R0;;;COPIE;GVL_IHM.M3Translation.State.FinalBrakeTimeoutElapsed;0;0;oui
+S_TraceTranslation.FinalInterlockError;AXE.M3;8;Barriere finale;GARDER;R0;;;COPIE;PRG_05_Translation.Data.TranslationTrace.FinalInterlockError;0;0;oui
+PRG_06_Outputs.M3_TremieHardStopActive;AXE.M3;8;Barriere finale;AJOUT_J3;R8;;Coupure M3 aujourd'hui invisible.;HORS_GVL;PRG_06_Outputs.M3_TremieHardStopActive;;0;non
+L_TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord;AXE.M3;9;Sorties;CABLER_J4;R8;;Lit la demande, pas la sortie. Rebrancher sur PRG_06_Outputs.M3_CommandWord.;COPIE;GVL_IHM.M3Translation.State.DriveControlWord;0;0;oui
+L_TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz;AXE.M3;9;Sorties;GARDER;R0;;;RECALCUL_VUE;WORD_TO_UINT(M3_SetpointFrequencyHz);0;0;oui
+L_TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ;AXE.M3;9;Sorties;CABLER_J4;R8;;Lit la demande, pas la sortie. Rebrancher sur PRG_06_Outputs.Data.TranslationBrakeCmd.;COPIE;GVL_IHM.M3Translation.State.BrakeCmd;0;0;oui
+P_MotionM3.SpeedContactor1Active;AXE.M3;9;Sorties;RETRAIT_NON_APPLICABLE;R6;;Constante FALSE : M3 n'a pas de contacteur de vitesse (commentaire code).;CONSTANTE;FALSE;0;0;oui
+PRG_06_Outputs.M3_CommandWord;AXE.M3;9;Sorties;AJOUT_J3;R8;;Vrai mot de commande variateur.;HORS_GVL;PRG_06_Outputs.M3_CommandWord;;0;non
+PRG_06_Outputs.Data.TranslationBrakeCmd;AXE.M3;9;Sorties;AJOUT_J3;R8;;Vraie commande frein M3.;HORS_GVL;PRG_06_Outputs.Data.TranslationBrakeCmd;;0;non
+B_Inputs.Translation.M3_BrakeIsOpen_DI;AXE.M3;10;Retour physique;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI;0;0;oui
+B_Inputs.Translation.M3_ActualFrequencyHz;AXE.M3;10;Retour physique;GARDER;R0;;;COPIE;PRG_02_Acquisition.HwIn.Translation.M3_ActualFrequencyHz;0;0;oui
+L_TranslationPontM3.Inputs_100.Idx108_BrakeApplied;AXE.M3;10;Retour physique;RETRAIT_NEGATION;R2;B_Inputs.Translation.M3_BrakeIsOpen_DI;Aucune panne propre : negation du DI, PRG_05:742. Juge natif 2026-11-07, verifie a la source.;NEGATION;NOT GVL_IHM.M3Translation.State.BrakeFeedback;0;0;oui
+E_HomingM1.Step1_ModeAuthorized;FONCTION.Referencement;0;;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;(PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1) OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);0;0;oui
+E_HomingM1.Step2_WinchSelected;FONCTION.Referencement;0;;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;(PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.MAINT_N2) OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 1);0;0;oui
+E_HomingM1.Step3_EncoderAvailable;FONCTION.Referencement;0;;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_IHM.Network.EncoderM1.Operational AND NOT PRG_02_Acquisition.Data.InputModules.Fault;0;0;oui
+E_HomingM1.HwIn_ContactorsReleased_DI;FONCTION.Referencement;0;;RETRAIT_COPIE;R1;B_Inputs.Winch.M1_ContactorsReleased_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI, meme scan. Preuve : 270 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;0;1;oui
+E_HomingM1.HwIn_BrakeIsOpen_DI;FONCTION.Referencement;0;;RETRAIT_COPIE;R1;B_Inputs.Winch.M1_BrakeIsOpen_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI, meme scan. Preuve : 12 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;0;1;oui
+E_HomingM1.HwIn_TopPositionFree_DI;FONCTION.Referencement;0;;RETRAIT_COPIE;R1;B_Inputs.Winch.M1M2_TopPositionFree_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI, meme scan. Preuve : 246 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;0;0;oui
+E_HomingM1.Step4_ContactorsReleased;FONCTION.Referencement;0;;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;0;1;oui
+E_HomingM1.Step5_BrakeApplied;FONCTION.Referencement;0;;GARDER;R4;;Maillon de chaine lu sans saut.;NEGATION;NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;0;1;oui
+E_HomingM1.TopPositionSensorActive;FONCTION.Referencement;0;;RETRAIT_NEGATION;R2;B_Inputs.Winch.M1M2_TopPositionFree_DI;Aucune panne propre : negation du DI, PRG_07:419. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.Commun.TopPositionSensorActive;0;1;oui
+E_HomingM1.BucketIsOpen;FONCTION.Referencement;0;;RETRAIT_COPIE;R1;K_BenneOuvertureFermeture.Idx101_BucketIsOpen;Aucune panne propre : meme source GVL_IHM.M2TreuilBenne.Bucket.State.MechState.IsOpen, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MechState.IsOpen;0;0;oui
+E_HomingM1.AllConditionsMet;FONCTION.Referencement;0;;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_Troubleshooting.E_HomingM1.Step1_ModeAuthorized AND GVL_Troubleshooting.E_HomingM1.Step2_WinchSelected AND GVL_Troubleshooting.E_HomingM1.Step3_EncoderAvailable AND GVL_Troubleshooting.E_HomingM1.Step4_ContactorsReleased AND GVL_Troubleshooting.E_HomingM1.Step5_BrakeApplied;0;1;oui
+E_HomingM1.HomingBusy;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.Encoder.HomingBusy;0;0;oui
+E_HomingM1.HomingDone;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.Encoder.HomingDone;0;0;oui
+E_HomingM1.HomingHomed;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.Encoder.Homed;0;0;oui
+E_HomingM1.HomingSuspect;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.Encoder.HomingSuspect;0;1;oui
+E_HomingM1.RejectErrorMask;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M1TreuilRetenue.State.Encoder.HomingErrorId;0;1;oui
+F_HomingM2.Step1_ModeAuthorized;FONCTION.Referencement;0;;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;(PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1) OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);0;0;oui
+F_HomingM2.Step2_WinchSelected;FONCTION.Referencement;0;;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;(PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.MAINT_N2) OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2);0;0;oui
+F_HomingM2.Step3_EncoderAvailable;FONCTION.Referencement;0;;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_IHM.Network.EncoderM2.Operational AND NOT PRG_02_Acquisition.Data.InputModules.Fault;0;0;oui
+F_HomingM2.HwIn_ContactorsReleased_DI;FONCTION.Referencement;0;;RETRAIT_COPIE;R1;B_Inputs.Winch.M2_ContactorsReleased_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI;0;1;oui
+F_HomingM2.HwIn_BrakeIsOpen_DI;FONCTION.Referencement;0;;RETRAIT_COPIE;R1;B_Inputs.Winch.M2_BrakeIsOpen_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI;0;1;oui
+F_HomingM2.HwIn_TopPositionFree_DI;FONCTION.Referencement;0;;RETRAIT_COPIE;R1;B_Inputs.Winch.M1M2_TopPositionFree_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI, meme scan. Preuve : 246 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;0;0;oui
+F_HomingM2.Step4_ContactorsReleased;FONCTION.Referencement;0;;GARDER;R4;;Maillon de chaine lu sans saut.;COPIE;PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI;0;1;oui
+F_HomingM2.Step5_BrakeApplied;FONCTION.Referencement;0;;GARDER;R4;;Maillon de chaine lu sans saut.;NEGATION;NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI;0;1;oui
+F_HomingM2.TopPositionSensorActive;FONCTION.Referencement;0;;RETRAIT_NEGATION;R2;B_Inputs.Winch.M1M2_TopPositionFree_DI;Aucune panne propre : negation du DI. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.Commun.TopPositionSensorActive;0;1;oui
+F_HomingM2.BucketIsOpen;FONCTION.Referencement;0;;RETRAIT_COPIE;R1;K_BenneOuvertureFermeture.Idx101_BucketIsOpen;Aucune panne propre : meme source GVL_IHM.M2TreuilBenne.Bucket.State.MechState.IsOpen, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MechState.IsOpen;0;0;oui
+F_HomingM2.AllConditionsMet;FONCTION.Referencement;0;;GARDER;R4;;Maillon de chaine lu sans saut.;RECALCUL_VUE;GVL_Troubleshooting.F_HomingM2.Step1_ModeAuthorized AND GVL_Troubleshooting.F_HomingM2.Step2_WinchSelected AND GVL_Troubleshooting.F_HomingM2.Step3_EncoderAvailable AND GVL_Troubleshooting.F_HomingM2.Step4_ContactorsReleased AND GVL_Troubleshooting.F_HomingM2.Step5_BrakeApplied;0;1;oui
+F_HomingM2.HomingBusy;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.Encoder.HomingBusy;0;0;oui
+F_HomingM2.HomingDone;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.Encoder.HomingDone;0;0;oui
+F_HomingM2.HomingHomed;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.Encoder.Homed;0;0;oui
+F_HomingM2.HomingSuspect;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.Encoder.HomingSuspect;0;1;oui
+F_HomingM2.RejectErrorMask;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.State.Encoder.HomingErrorId;0;1;oui
+K_BenneOuvertureFermeture.Idx113_MachineHomed;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MachineHomed;0;0;oui
+K_BenneOuvertureFermeture.Idx114_MachineHomingStep;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MachineHomingStep;0;0;oui
+K_BenneOuvertureFermeture.Idx115_MachineHomingFailed;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MachineHomingFailed;0;0;oui
+K_BenneOuvertureFermeture.Idx116_M1ReferenceMissing;FONCTION.Referencement;0;;GARDER;R0;;;RECALCUL_VUE;NOT GVL_IHM.M1TreuilRetenue.State.Encoder.Homed OR GVL_IHM.M1TreuilRetenue.State.Encoder.HomingSuspect;0;0;oui
+K_BenneOuvertureFermeture.Idx117_M2ReferenceMissing;FONCTION.Referencement;0;;GARDER;R0;;;RECALCUL_VUE;NOT GVL_IHM.M2TreuilBenne.State.Encoder.Homed OR GVL_IHM.M2TreuilBenne.State.Encoder.HomingSuspect;0;0;oui
+K_BenneOuvertureFermeture.Idx119_ReferenceTransaction;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MachineHomingActive;0;0;oui
+K_BenneOuvertureFermeture.Idx120_MachineHomingLossSafeStop;FONCTION.Referencement;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MachineHomingLossSafeStop;0;0;oui
+H_LevageSynchroniseM1M2.Idx101_M1_CablePos_M;FONCTION.Couplage;0;;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Inputs_100.Idx102_CablePos_M;Aucune panne propre : meme source M1PosHmiHeld_M, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;GVL_IHM.M1TreuilRetenue.State.Position_M;0;0;oui
+H_LevageSynchroniseM1M2.Idx102_M2_CablePos_M;FONCTION.Couplage;0;;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Inputs_100.Idx102_CablePos_M;Aucune panne propre : meme source M2PosHmiHeld_M, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;GVL_IHM.M2TreuilBenne.State.Position_M;0;0;oui
+H_LevageSynchroniseM1M2.Idx103_SyncDelta_M;FONCTION.Couplage;0;;GARDER;R0;;;COPIE;GVL_IHM.M1M2Sync.State.DeltaPos_M;1;1;oui
+H_LevageSynchroniseM1M2.Idx201_JoyYRaw_Pct;FONCTION.Couplage;0;;RETRAIT_NON_ECRITE;R5;;Jamais ecrite par la vue : valeur par defaut trompeuse. Equivalent lisible sur les fiches d'axe.;NON_AFFECTE;aucune;0;0;oui
+H_LevageSynchroniseM1M2.Idx202_SyncEnabled_IHM;FONCTION.Couplage;0;;GARDER;R0;;;COPIE;GVL_IHM.M1M2Sync.Cmd.SelSyncEnable;0;0;oui
+H_LevageSynchroniseM1M2.Idx203_ArbitratedSpeed_Pct;FONCTION.Couplage;0;;RETRAIT_NON_ECRITE;R5;;Jamais ecrite par la vue : valeur par defaut trompeuse. Equivalent lisible sur les fiches d'axe.;NON_AFFECTE;aucune;0;0;oui
+H_LevageSynchroniseM1M2.Idx301_EmergencyChainClosed;FONCTION.Couplage;0;;RETRAIT_COPIE;R1;B_Inputs.Machine.EmergencyChainClosed_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI, meme scan. Preuve : 752 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI;0;0;oui
+H_LevageSynchroniseM1M2.Idx302_SyncFaultActive;FONCTION.Couplage;0;;GARDER;R0;;;COPIE;GVL_IHM.M1M2Sync.State.Error;0;0;oui
+H_LevageSynchroniseM1M2.Idx303_M1_AscentPermit;FONCTION.Couplage;0;;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM1_Ascent;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M1TreuilRetenue.Safety.AscentPermit;0;0;oui
+H_LevageSynchroniseM1M2.Idx304_M2_AscentPermit;FONCTION.Couplage;0;;RETRAIT_COPIE;R1;T_Permits.EffectivePermitM2_Ascent;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M2TreuilBenne.Safety.AscentPermit;0;0;oui
+H_LevageSynchroniseM1M2.Idx401_SyncMotionAllowed;FONCTION.Couplage;0;;CABLER_J3;R5;;Jamais ecrite. Maillon SyncOperationPermit prevu au jalon J3.;NON_AFFECTE;aucune;0;0;oui
+H_LevageSynchroniseM1M2.Idx402_M1_SetpointSpeed_Pct;FONCTION.Couplage;0;;RETRAIT_NON_ECRITE;R5;;Jamais ecrite par la vue : valeur par defaut trompeuse. Equivalent lisible sur les fiches d'axe.;NON_AFFECTE;aucune;0;0;oui
+H_LevageSynchroniseM1M2.Idx403_M2_SetpointSpeed_Pct;FONCTION.Couplage;0;;RETRAIT_NON_ECRITE;R5;;Jamais ecrite par la vue : valeur par defaut trompeuse. Equivalent lisible sur les fiches d'axe.;NON_AFFECTE;aucune;0;0;oui
+H_LevageSynchroniseM1M2.Idx501_M1_CmdRelayFwd_DQ;FONCTION.Couplage;0;;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ;Aucune panne propre : meme source PRG_06_Outputs.Data.M1RelayFwd, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_06_Outputs.Data.M1RelayFwd;0;0;oui
+H_LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ;FONCTION.Couplage;0;;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ;Aucune panne propre : meme source PRG_06_Outputs.Data.M2RelayFwd, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_06_Outputs.Data.M2RelayFwd;0;0;oui
+I_LevageUnitaireM1.Demandes_200.Idx210_CoupledUserRequestDirection;FONCTION.Couplage;0;;GARDER;R0;;;COPIE;(SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqAscent, SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend, 0, -1), 1));0;0;oui
+T_Permits.BothActive;FONCTION.Couplage;0;;GARDER;R0;;;COPIE;GVL_IHM.Permits.BothActive;0;0;oui
+T_Permits.BothBlocked;FONCTION.Couplage;0;;GARDER;R0;;;COPIE;GVL_IHM.Permits.BothBlocked;2;2;oui
+T_Permits.BothBlockReason;FONCTION.Couplage;0;;GARDER;R0;;;COPIE;GVL_IHM.Permits.BothBlockReason;1;1;oui
+PRG_06_Outputs.Data.ContactorMismatch;FONCTION.Couplage;0;;GARDER;R3;;;HORS_GVL;PRG_06_Outputs.Data.ContactorMismatch;;3;oui
+K_BenneOuvertureFermeture.Idx101_BucketIsOpen;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MechState.IsOpen;0;0;oui
+K_BenneOuvertureFermeture.Idx102_BucketIsClosed;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MechState.IsClosed;0;0;oui
+K_BenneOuvertureFermeture.Idx103_OffsetPos_M;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.ActiveOffset_M;0;0;oui
+K_BenneOuvertureFermeture.Idx104_AutoSeqActive;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.AutoBucketSeqActive;0;0;oui
+K_BenneOuvertureFermeture.Idx105_StateIncoherent;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MechState.StateIncoherent;0;0;oui
+K_BenneOuvertureFermeture.Idx106_FBState;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.FBState;0;0;oui
+K_BenneOuvertureFermeture.Idx107_LastPosM2Open_M;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MechState.LastPosM2Open;0;0;oui
+K_BenneOuvertureFermeture.Idx108_LastPosM2Close_M;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MechState.LastPosM2Close;0;0;oui
+K_BenneOuvertureFermeture.Idx109_BucketTooOpen;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MechState.TooOpen;0;0;oui
+K_BenneOuvertureFermeture.Idx110_BucketTooClosed;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MechState.TooClosed;0;0;oui
+K_BenneOuvertureFermeture.Idx111_BucketIsIntermediate;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.MechState.IsIntermediate;0;0;oui
+K_BenneOuvertureFermeture.Idx112_DeltaPosition_M;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.DeltaPosition_M;0;0;oui
+K_BenneOuvertureFermeture.Idx118_BucketOffsetUnknown;FONCTION.Benne;0;;GARDER;R0;;;NEGATION;NOT GVL_IHM.M2TreuilBenne.Bucket.State.MechState.ActiveOffsetValid;0;0;oui
+K_BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen;0;0;oui
+K_BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;0;0;oui
+K_BenneOuvertureFermeture.Idx203_CycleCmd_Open;FONCTION.Benne;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen;0;0;oui
+K_BenneOuvertureFermeture.Idx204_CoupledDiveOpenArmed;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.CoupledDiveOpenArmed;0;0;oui
+K_BenneOuvertureFermeture.Idx205_CoupledAscentCloseArmed;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.CoupledAscentCloseArmed;0;0;oui
+K_BenneOuvertureFermeture.Idx206_CloseReqActive;FONCTION.Benne;0;;RETRAIT_COPIE;R1;T_Permits.BucketCloseRequestActive;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.CloseActive;0;0;oui
+K_BenneOuvertureFermeture.Idx207_OpenReqActive;FONCTION.Benne;0;;RETRAIT_COPIE;R1;T_Permits.BucketOpenRequestActive;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.OpenActive;0;0;oui
+K_BenneOuvertureFermeture.Idx208_MotionBlockedByBucket;FONCTION.Benne;0;;RETRAIT_COPIE;R1;T_Permits.BucketMotionBlocked;Aucune panne propre. Juge natif 2026-11-07, verifie a la source.;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.CoupledMotionBlockedByBucket;0;0;oui
+K_BenneOuvertureFermeture.Idx301_EmergencyChainClosed;FONCTION.Benne;0;;RETRAIT_COPIE;R1;B_Inputs.Machine.EmergencyChainClosed_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI, meme scan. Preuve : 752 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI;0;0;oui
+K_BenneOuvertureFermeture.Idx302_BucketFaultActive;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.Error;0;0;oui
+K_BenneOuvertureFermeture.Idx303_KoboldAutoStopEnabled;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent;0;0;oui
+K_BenneOuvertureFermeture.Idx304_KoboldImmersionConfirmed;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.Commun.KoboldImmersionConfirmed;0;0;oui
+K_BenneOuvertureFermeture.Idx305_KoboldBottomTouchLatched;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.Commun.KoboldBottomTouchLatched;0;0;oui
+K_BenneOuvertureFermeture.Idx306_ErrorIdRaw;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId;0;0;oui
+K_BenneOuvertureFermeture.Idx307_EffectivePermit_Open;FONCTION.Benne;0;;RETRAIT_COPIE;R1;T_Permits.EffectivePermitBucket_Open;Aucune panne propre : meme source PRG_04_Treuils_Benne.Data.EffectivePermitBucket_Open, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;GVL_IHM.Permits.EffectivePermitBucket_Open;0;0;oui
+K_BenneOuvertureFermeture.Idx308_EffectivePermit_Close;FONCTION.Benne;0;;RETRAIT_COPIE;R1;T_Permits.EffectivePermitBucket_Close;Aucune panne propre : meme source PRG_04_Treuils_Benne.Data.EffectivePermitBucket_Close, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;GVL_IHM.Permits.EffectivePermitBucket_Close;0;0;oui
+K_BenneOuvertureFermeture.Idx401_BucketBusy;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.Busy;0;0;oui
+K_BenneOuvertureFermeture.Idx402_BucketDone;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.Done;0;0;oui
+K_BenneOuvertureFermeture.Idx403_ExtractionControlActive;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.M2TreuilBenne.Bucket.State.ExtractionControlActive;0;0;oui
+K_BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ;FONCTION.Benne;0;;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_RQ;Aucune panne propre : meme source PRG_06_Outputs.Data.M2RelayRev, meme scan. Preuve : 37 paires meme lot, 1 ecart.;COPIE;PRG_06_Outputs.Data.M2RelayRev;0;0;oui
+T_Permits.DiveDescendPermit;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.Permits.DiveDescendPermit;0;0;oui
+T_Permits.ExtractionAscentPermit;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.Permits.ExtractionAscentPermit;0;0;oui
+T_Permits.ExtractionAssistActive;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.Permits.ExtractionAssistActive;0;0;oui
+T_Permits.EffectivePermitBucket_Open;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.Permits.EffectivePermitBucket_Open;0;0;oui
+T_Permits.EffectivePermitBucket_Close;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.Permits.EffectivePermitBucket_Close;0;0;oui
+T_Permits.BucketOpenRequestActive;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.Permits.BucketOpenRequestActive;0;0;oui
+T_Permits.BucketCloseRequestActive;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.Permits.BucketCloseRequestActive;0;0;oui
+T_Permits.BucketMotionBlocked;FONCTION.Benne;0;;GARDER;R0;;;COPIE;GVL_IHM.Permits.BucketMotionBlocked;0;0;oui
+G_CycleSemiAuto.Idx101_ModeSemiAutoActive;FONCTION.Cycle;0;;GARDER;R0;;;RECALCUL_VUE;(PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO);0;0;oui
+G_CycleSemiAuto.Idx102_PowerAndSafetyOk;FONCTION.Cycle;0;;RETRAIT_COPIE;R1;B_Inputs.Machine.PowerContactorEngaged_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI, meme scan. Preuve : 1743 paires meme lot, 0 ecart.;COPIE;PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;0;0;oui
+G_CycleSemiAuto.Idx103_HeartbeatIhmOk;FONCTION.Cycle;0;;RETRAIT_COPIE;R1;A_ContexteMachineGlobal.Idx401_HmiHeartbeatOk;Aucune panne propre : meme source instDiagIhmHeartbeat.HeartbeatIhmOk, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;GVL_IHM.Commun.HeartbeatIhmOk;0;0;oui
+G_CycleSemiAuto.Idx104_DeadmanArmed;FONCTION.Cycle;0;;RETRAIT_COPIE;R1;D_Joystick.DeadmanArmed;Aucune panne propre : meme source PRG_02_Acquisition.Data.Joystick.DeadmanArmed, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_02_Acquisition.Data.Joystick.DeadmanArmed;12;4;oui
+G_CycleSemiAuto.Idx105_MancheDeflechi;FONCTION.Cycle;0;;GARDER;R0;;;NEGATION;NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;4;1;oui
+G_CycleSemiAuto.Idx106_HomedM1M2;FONCTION.Cycle;0;;GARDER;R0;;;RECALCUL_VUE;PRG_02_Acquisition.Data.EncoderM1.Homed AND PRG_02_Acquisition.Data.EncoderM2.Homed;0;0;oui
+G_CycleSemiAuto.Idx107_StartCycleRequest;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;GVL_IHM.CycleSemiAuto.Cmd.BtnStart;0;0;oui
+G_CycleSemiAuto.Idx108_AbortCycleRequest;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;GVL_IHM.CycleSemiAuto.Cmd.BtnAbort;0;0;oui
+G_CycleSemiAuto.Idx201_Ready;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.Ready;0;0;oui
+G_CycleSemiAuto.Idx202_Busy;FONCTION.Cycle;0;;RETRAIT_COPIE;R1;A_ContexteMachineGlobal.Idx402_CycleAutoBusy;Aucune panne propre : meme source PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy;0;0;oui
+G_CycleSemiAuto.Idx203_Done;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done;0;0;oui
+G_CycleSemiAuto.Idx204_Error;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error;0;0;oui
+G_CycleSemiAuto.Idx205_ErrorId;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId;0;0;oui
+G_CycleSemiAuto.Idx217_FaultLatched;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.Fault.Latched;0;0;oui
+G_CycleSemiAuto.Idx218_FaultLatchedId;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.Fault.LatchedId;0;0;oui
+G_CycleSemiAuto.Idx219_CycleChecksInhibited;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited;0;0;oui
+G_CycleSemiAuto.Idx220_IgnoredCycleCheckId;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId;0;0;oui
+G_CycleSemiAuto.Idx206_Step;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.Step;4;2;oui
+G_CycleSemiAuto.Idx208_StepAtError;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;0;0;oui
+G_CycleSemiAuto.Idx209_WaitingForOperator;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.WaitingForOperator;1;1;oui
+G_CycleSemiAuto.Idx210_WaitingForProcess;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.WaitingForProcess;1;1;oui
+G_CycleSemiAuto.Idx211_OperatorActionId;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.OperatorActionId;0;0;oui
+G_CycleSemiAuto.Idx213_ExpectedAxis;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.ExpectedAxis;0;0;oui
+G_CycleSemiAuto.Idx214_ExpectedDirection;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.ExpectedDirection;0;0;oui
+G_CycleSemiAuto.Idx215_WaitingResume;FONCTION.Cycle;0;;GARDER;R0;;;RECALCUL_VUE;(PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.SEMI_AUTO) AND (PRG_03_Modes_Cycle.Data.SequenceState.Step <> E_AutoCycleStep.AX0_REPOS) AND (PRG_03_Modes_Cycle.Data.SequenceState.Step <> E_AutoCycleStep.AX18_DONE_SYNC) AND (PRG_03_Modes_Cycle.Data.SequenceState.Step <> E_AutoCycleStep.AX_STAB);0;0;oui
+G_CycleSemiAuto.Idx216_PausedState;FONCTION.Cycle;0;;RETRAIT_COPIE;R1;G_CycleSemiAuto.Idx206_Step;Aucune panne propre : meme source PRG_03_Modes_Cycle.Data.SequenceState.Step, meme scan. Preuve : 94 paires meme lot, 0 ecart.;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.Step;0;0;oui
+G_CycleSemiAuto.Idx301_TargetPosition;FONCTION.Cycle;0;;RETRAIT_COPIE;R1;L_TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition;Aucune panne propre : meme source PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt;0;0;oui
+G_CycleSemiAuto.Idx302_TargetDepth_M;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M;0;0;oui
+G_CycleSemiAuto.Idx303_KoboldBottomTouch;FONCTION.Cycle;0;;RETRAIT_COPIE;R1;B_Inputs.Machine.M1_M2_KoboldBottomTouch_DI;Aucune panne propre : meme source PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI, meme scan. Preuve : aucune paire meme lot, preuve par le code seul.;COPIE;PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;0;0;oui
+G_CycleSemiAuto.Idx304_SpeedMismatchActive;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive;0;0;oui
+G_CycleSemiAuto.Idx305_LimitLegalReached;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;GVL_IHM.Commun.LimitLegalReached;0;0;oui
+G_CycleSemiAuto.Idx306_WinchSyncError;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_04_Treuils_Benne.Data.WinchSyncError;1;1;oui
+G_CycleSemiAuto.Idx307_M1SpeedStepApplied;FONCTION.Cycle;0;;RETRAIT_COPIE;R1;I_LevageUnitaireM1.Control_400.Idx402_SpeedStepCalculated;Aucune panne propre : meme StepNumber, nom 'Applied' trompeur. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber;11;3;oui
+G_CycleSemiAuto.Idx308_M2SpeedStepApplied;FONCTION.Cycle;0;;RETRAIT_COPIE;R1;J_LevageUnitaireM2.Control_400.Idx402_SpeedStepCalculated;Aucune panne propre : meme StepNumber, nom 'Applied' trompeur. Juge natif 2026-11-07, verifie a la source.;COPIE;PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber;12;4;oui
+G_CycleSemiAuto.Idx309_AutoDiveM2Step5Active;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active;0;0;oui
+G_CycleSemiAuto.Idx310_M1SpeedStepAtFault;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.M1SpeedStepAtFault;0;0;oui
+G_CycleSemiAuto.Idx311_M2SpeedStepAtFault;FONCTION.Cycle;0;;GARDER;R0;;;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.M2SpeedStepAtFault;0;0;oui
+G_CycleSemiAuto.Idx222_ForceStepResult;FONCTION.Cycle;0;;AJOUT_J3;R7;;Declaree, absente de la liste. Texte de cycle prevu au jalon J3.;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.ForceStepResult;0;0;non
+G_CycleSemiAuto.Idx207_StepStr;FONCTION.Cycle;0;;AJOUT_J3;R7;;Declaree, absente de la liste. Texte de cycle prevu au jalon J3.;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.StepStr;0;0;non
+G_CycleSemiAuto.Idx212_OperatorAction;FONCTION.Cycle;0;;AJOUT_J3;R7;;Declaree, absente de la liste. Texte de cycle prevu au jalon J3.;COPIE;PRG_03_Modes_Cycle.Data.SequenceState.OperatorAction;0;0;non
