@@ -78,7 +78,32 @@ machine et du stockage. Le contrôle d'intégrité complet reste actif.
    limite de sortie, delai, contexte) dans la configuration/interface. Distinguer parametres
    supportes par chaque provider, valeurs effectives envoyees, valeurs par defaut et consentement
    cloud. Ajouter l'implementation apres mesure des modeles et validation du comportement.
-4. Redemarrer le Veilleur seulement apres validation du diff; le processus actif sur 8082 ne
+4. Revoir la presentation des sessions sans augmenter l'encombrement de la page : chaque session
+   doit avoir un carre ou symbole colore distinct, repris a l'identique dans sa ligne du menu gauche
+   pour relier visuellement la carte et l'entree correspondantes. La session selectionnee reste
+   clairement identifiable ; les sessions non selectionnees sont fortement compactees pour eviter
+   les confusions, tout en gardant leur identite et leurs alertes visibles. Le repere ne doit pas
+   reposer uniquement sur la couleur.
+5. Etudier le cycle d'alerte injectee dans le chat exact de l'agent. Message compact :
+   `⚠️ Avertissement —<titre court> — <une ligne sur le point a verifier>`, avec criticite.
+   Dire explicitement a l'agent dans ce premier message : « Reponds en une seule ligne, sans analyse
+   detaillee ni action; attends le choix de l'utilisateur. » Inviter l'utilisateur a repondre `1`,
+   `2` ou `3`; pour `1` et `3`, une justification d'une ligne au plus. Pas de long developpement ni
+   d'action automatique a cette etape. Ne laisser qu'un seul
+   choix en attente par session pour que le chiffre seul identifie l'alarme.
+   `1` = ne pas traiter ce signal (motif requis; ne le classe pas automatiquement faux positif);
+   `2` = examiner maintenant en contestant l'hypothese et en verifiant les preuves;
+   `3` = reporter avec une condition de reprise. La reponse spontanee de l'agent n'est pas une
+   decision et ne change pas le statut de l'alerte : seul le choix explicite de l'utilisateur compte.
+   Etudier si ce choix est donne dans l'IHM ou dans le chat cible, avec un statut unique et tracable.
+   Si l'utilisateur choisit `2`, le Veilleur prepare un second message court, adresse a l'agent,
+   avec une pre-etude critique et une demande de proposition de resolution ou conseil - jamais un GO
+   de modification. Pour `3`, consigner le report et sa condition, puis reprendre l'etude a ce moment.
+   Le motif de `1` supprime les rappels identiques jusqu'a un fait nouveau ou un pivot, sans cacher
+   une nouvelle anomalie. Distinguer dans l'IHM livraison/reponse de l'agent et statut utilisateur
+   (`Vu`, `Traitee`, `Faux positif`). Tester reception, bon ciblage, choix utilisateur et anti-boucle
+   dans les chats reels de chaque plateforme avant activation automatique.
+6. Redemarrer le Veilleur seulement apres validation du diff; le processus actif sur 8082 ne
    charge pas les modifications presentes sur disque.
 
 Une recherche locale retrospective par agent a produit 10 candidats resumes (9 Claude, 1 AGY),
