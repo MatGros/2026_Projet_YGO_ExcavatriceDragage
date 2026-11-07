@@ -77,7 +77,7 @@ Chaque jalon s'arrête sur une validation humaine. Pas de jalon suivant sans GO.
 | | |
 |---|---|
 | **Livrables** | Corrections du contrat `TS_LOT1_VALEURS_TROMPEUSES` |
-| **Tests** | CI de la vue, bundle complet, diff bundle, G200, palier C, liste de variables identique, simulation : geste habituel inchangé |
+| **Tests** | Relecture du diff, bundle complet, diff bundle, G200, palier C, liste de variables identique, simulation : geste habituel inchangé. Pas de nouveau test CI exigé pour un lot diagnostic |
 | **Revue** | A/B en aveugle : 1 agent natif Claude, 1 DeepSeek ; le reviewer lit le diff réel |
 | **Évaluation** | 100 % des AC du lot PASS ; 0 faux bloquant ; rejeu à l'aveugle publié, sans seuil à ce stade |
 | **Arrêt** | GO implémentation, puis GO commit, puis chargement par l'exploitant |

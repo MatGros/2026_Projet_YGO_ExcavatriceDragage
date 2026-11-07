@@ -95,6 +95,8 @@ contract:
       - CODE/H_TREUILS_BENNE/FB_WinchStateProjection.st    # lignes 110 et 177 seulement
       - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml    # si le test de la vue l'exige
       - TOOLS/TEST_AUTO_CI/MOCKS/MOCK_GVL_Troubleshooting.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/tests/test_fb_troubleshootingview.st   # le test impose les anciennes valeurs TBD
+      - DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md     # fiche detaillee des producteurs et TBD
       - DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md
       - DOC/WFLOW/ETUDES/CARTE_FLUX_AXES/README.md
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_TS_LOT1_VALEURS_TROMPEUSES.yaml

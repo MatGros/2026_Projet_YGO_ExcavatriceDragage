@@ -70,6 +70,10 @@ VAR_INPUT
     MaintainAActive          : BOOL;   (* --> [SAFE] Maintien canal A *)
     MaintainBActive          : BOOL;   (* --> [SAFE] Maintien canal B *)
 
+    (* 📤 Ordres finaux produits par PRG_06_Outputs, après barrière et protecteurs *)
+    Outputs                  : ST_OutputsInterPrg; (* --> [CMD] Ordres actionneurs finaux *)
+    CmdM3DriveFreqWord       : WORD;   (* --> [CMD] Consigne finale variateur M3 [0.01 Hz] *)
+
     (* 🔄 Séquenceur de cycle semi-automatique *)
     CycleReady               : BOOL;   (* --> [STAT] Séquenceur prêt *)
     CycleDone                : BOOL;   (* --> [STAT] Séquenceur terminé *)
@@ -154,8 +158,8 @@ GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx301_EmergencyChainClosed := HwIn.
 GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx302_SyncFaultActive := Sync.State.Error;
 GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx303_M1_AscentPermit := WinchM1.Safety.AscentPermit;
 GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx304_M2_AscentPermit := WinchM2.Safety.AscentPermit;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx501_M1_CmdRelayFwd_DQ := WinchM1.State.RelayFwd;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ := WinchM2.State.RelayFwd;
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx501_M1_CmdRelayFwd_DQ := Outputs.M1RelayFwd;
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ := Outputs.M2RelayFwd;
 // Idx201_JoyYRaw_Pct / Idx203_ArbitratedSpeed_Pct / Idx303-304_AscentPermit / Idx401_SyncMotionAllowed /
 // Idx402-403_SetpointSpeed : non câblés — fiche §5.2 "(reste) champs à revoir un par un", laissés à
 // leur valeur d'initialisation, pas de calcul inventé (fiche §7).
@@ -189,7 +193,7 @@ GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive := Wi
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive := Commun.SimTopSensorBypassActive;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx306_AscentPermitEffective := WinchM1.Safety.AscentPermit;
-GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI := FALSE; // TBD non câblé - voir fiche §6 (capteur mou de câble présent uniquement côté M2 dans ST_HwWinch)
+GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI := NOT HwIn.Winch.M2_TensionedCable_DI; // Capteur unique partagé, même signal que SlackCableDetected M1
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx309_DescendPermitEffective := WinchM1.Safety.DescendPermit;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx310_ErrorOperatorComm := WinchM1.Safety.ErrorOperatorComm;
@@ -206,8 +210,8 @@ GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx320_ErrorNoMovement   := Wi
 // ⛔ Bloc "limite haute" — pourquoi la montée ne s'arrête pas (M1)
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx321_CfgTopLimitM               := CfgTopLimitM;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx322_CablePosM                  := WinchM1.State.Position_M;
-GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx323_TopLimitReached            := (WinchM1.State.Position_M >= CfgTopLimitM) AND NOT WinchM1.State.Encoder.HomingBusy;
-GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx324_AscentBlockedByTopLimit    := (WinchM1.State.Position_M >= CfgTopLimitM) AND NOT WinchM1.State.Encoder.HomingBusy AND NOT (WinchM1.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
+GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx323_TopLimitReached            := WinchM1.Safety.CableLimitAscent;
+GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx324_AscentBlockedByTopLimit    := WinchM1.Safety.CableLimitAscent AND NOT (WinchM1.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx325_BypassTopLimitSoftware     := WinchM1.Bypass.TopLimitSoftware;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx326_BypassTopLimitSoftCommun   := Commun.Bypass.TopLimitSoftware;
 GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx327_BypassTopLimitSwitch       := WinchM1.Bypass.TopLimitSwitch;
@@ -234,10 +238,10 @@ GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx416_RestartRequired := Win
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx417_RestartInhibit := WinchM1.State.FinalRestartInhibit;
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx418_NeutralRequestSeen := WinchM1.State.FinalNeutralRequestSeen;
 
-GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ := WinchM1.State.RelayFwd;
-GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_RQ := WinchM1.State.RelayRev;
-GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM1.State.Contactor1;
-GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM1.State.Contactor4;
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_RQ := Outputs.M1RelayFwd;
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_RQ := Outputs.M1RelayRev;
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ := Outputs.M1SpeedContactor1;
+GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ := Outputs.M1SpeedContactor4;
 GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM1.State.BrakeCmd;
 
 // --- M2 (même patron, source WinchM2) ---
@@ -285,8 +289,8 @@ GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx320_ErrorNoMovement   := Wi
 // ⛔ Bloc "limite haute" — pourquoi la montée ne s'arrête pas (M2, sans M2_LimitShift ici)
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx321_CfgTopLimitM               := CfgTopLimitM;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx322_CablePosM                  := WinchM2.State.Position_M;
-GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx323_TopLimitReached            := (WinchM2.State.Position_M >= CfgTopLimitM) AND NOT WinchM2.State.Encoder.HomingBusy;
-GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx324_AscentBlockedByTopLimit    := (WinchM2.State.Position_M >= CfgTopLimitM) AND NOT WinchM2.State.Encoder.HomingBusy AND NOT (WinchM2.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
+GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx323_TopLimitReached            := WinchM2.Safety.CableLimitAscent;
+GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx324_AscentBlockedByTopLimit    := WinchM2.Safety.CableLimitAscent AND NOT (WinchM2.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx325_BypassTopLimitSoftware     := WinchM2.Bypass.TopLimitSoftware;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx326_BypassTopLimitSoftCommun   := Commun.Bypass.TopLimitSoftware;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx327_BypassTopLimitSwitch       := WinchM2.Bypass.TopLimitSwitch;
@@ -313,10 +317,10 @@ GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx416_RestartRequired := Win
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx417_RestartInhibit := WinchM2.State.FinalRestartInhibit;
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx418_NeutralRequestSeen := WinchM2.State.FinalNeutralRequestSeen;
 
-GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ := WinchM2.State.RelayFwd;
-GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_RQ := WinchM2.State.RelayRev;
-GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM2.State.Contactor1;
-GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM2.State.Contactor4;
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_RQ := Outputs.M2RelayFwd;
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_RQ := Outputs.M2RelayRev;
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ := Outputs.M2SpeedContactor1;
+GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ := Outputs.M2SpeedContactor4;
 GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM2.State.BrakeCmd;
 
 {endregion}
@@ -362,7 +366,7 @@ GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx308_EffectivePermit_Close := Pe
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx403_ExtractionControlActive := WinchM2.Bucket.State.ExtractionControlActive;
-GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD non câblé - voir fiche §6 (pas de DQ relais benne dédié publié, benne pilote M2_StartStop/M2_Direction, pas un relais propre)
+GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := Outputs.M2RelayRev; // Ouverture benne = relais descente M2
 
 {endregion}
 
@@ -420,7 +424,7 @@ GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx406_BrakeCommandOpenConfi
 GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed := Translation.State.FinalBrakeTimeoutElapsed;
 
 GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord := Translation.State.DriveControlWord;
-GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz := 0; // TBD non câblé - voir fiche §6 (format UINT 0.01Hz non exposé, seul DriveFreqCmd_Hz en REAL Hz existe)
+GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz := WORD_TO_UINT(CmdM3DriveFreqWord); // Consigne finale transmise, unité 0.01 Hz
 GVL_Troubleshooting.L_TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ := Translation.State.BrakeCmd;
 
 {endregion}
@@ -502,7 +506,7 @@ GVL_Troubleshooting.C_Safety.ArmingBusy           := EmergencyState.ArmingBusy;
 GVL_Troubleshooting.C_Safety.LockoutActive        := EmergencyDiag.LockoutActive;
 GVL_Troubleshooting.C_Safety.PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
 GVL_Troubleshooting.C_Safety.PowerCutOffActive    := PowerCutOffActive;
-GVL_Troubleshooting.C_Safety.PowerCutOffRequest   := PowerCutOffActive;
+GVL_Troubleshooting.C_Safety.PowerCutOffRequest   := Outputs.PowerCutOffRequest;
 GVL_Troubleshooting.C_Safety.MaintainAActive      := MaintainAActive;
 GVL_Troubleshooting.C_Safety.MaintainBActive      := MaintainBActive;
 
@@ -566,7 +570,7 @@ GVL_Troubleshooting.N_MotionM1.HwIn_PowerContactorEngaged_DI := HwIn.Machine.Pow
 GVL_Troubleshooting.N_MotionM1.HwIn_BrakeIsOpen_DI      := HwIn.Winch.M1_BrakeIsOpen_DI;
 GVL_Troubleshooting.N_MotionM1.Cmd_BrakeRelease         := WinchM1.State.BrakeCmd;
 
-GVL_Troubleshooting.N_MotionM1.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.N_MotionM1.Step2_ModeAuthorized     := (Auth.Mode <> E_Mode.DISABLE);
 GVL_Troubleshooting.N_MotionM1.Step3_NotBusyOtherTask   := NOT WinchM1.State.Encoder.HomingBusy AND NOT (WinchM2.Bucket.State.FBState = E_State.BUSY);
 GVL_Troubleshooting.N_MotionM1.Step4_MotionRequested    := WinchM1.State.Busy OR (WinchM1.State.SpeedCmd_Pct > 0.0);
 GVL_Troubleshooting.N_MotionM1.RequestedDirection       := SEL(WinchM1.State.RelayFwd, SEL(WinchM1.State.RelayRev, 0, -1), 1);
@@ -615,9 +619,9 @@ GVL_Troubleshooting.N_MotionM1.AllConditionsMet := GVL_Troubleshooting.N_MotionM
                                               AND GVL_Troubleshooting.N_MotionM1.Step7_BrakeReleased
                                               AND GVL_Troubleshooting.N_MotionM1.Step8_OutputInterlockOk;
 
-GVL_Troubleshooting.N_MotionM1.RelayFwdActive        := WinchM1.State.RelayFwd;
-GVL_Troubleshooting.N_MotionM1.RelayRevActive        := WinchM1.State.RelayRev;
-GVL_Troubleshooting.N_MotionM1.SpeedContactor1Active := WinchM1.State.Contactor1;
+GVL_Troubleshooting.N_MotionM1.RelayFwdActive        := Outputs.M1RelayFwd;
+GVL_Troubleshooting.N_MotionM1.RelayRevActive        := Outputs.M1RelayRev;
+GVL_Troubleshooting.N_MotionM1.SpeedContactor1Active := Outputs.M1SpeedContactor1;
 
 {endregion}
 
@@ -628,7 +632,7 @@ GVL_Troubleshooting.O_MotionM2.HwIn_PowerContactorEngaged_DI := HwIn.Machine.Pow
 GVL_Troubleshooting.O_MotionM2.HwIn_BrakeIsOpen_DI      := HwIn.Winch.M2_BrakeIsOpen_DI;
 GVL_Troubleshooting.O_MotionM2.Cmd_BrakeRelease         := WinchM2.State.BrakeCmd;
 
-GVL_Troubleshooting.O_MotionM2.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.O_MotionM2.Step2_ModeAuthorized     := (Auth.Mode <> E_Mode.DISABLE);
 GVL_Troubleshooting.O_MotionM2.Step3_NotBusyOtherTask   := NOT WinchM2.State.Encoder.HomingBusy;
 GVL_Troubleshooting.O_MotionM2.Step4_MotionRequested    := WinchM2.State.Busy OR (WinchM2.State.SpeedCmd_Pct > 0.0);
 GVL_Troubleshooting.O_MotionM2.RequestedDirection       := SEL(WinchM2.State.RelayFwd, SEL(WinchM2.State.RelayRev, 0, -1), 1);
@@ -658,9 +662,9 @@ GVL_Troubleshooting.O_MotionM2.AllConditionsMet := GVL_Troubleshooting.O_MotionM
                                               AND GVL_Troubleshooting.O_MotionM2.Step7_BrakeReleased
                                               AND GVL_Troubleshooting.O_MotionM2.Step8_OutputInterlockOk;
 
-GVL_Troubleshooting.O_MotionM2.RelayFwdActive        := WinchM2.State.RelayFwd;
-GVL_Troubleshooting.O_MotionM2.RelayRevActive        := WinchM2.State.RelayRev;
-GVL_Troubleshooting.O_MotionM2.SpeedContactor1Active := WinchM2.State.Contactor1;
+GVL_Troubleshooting.O_MotionM2.RelayFwdActive        := Outputs.M2RelayFwd;
+GVL_Troubleshooting.O_MotionM2.RelayRevActive        := Outputs.M2RelayRev;
+GVL_Troubleshooting.O_MotionM2.SpeedContactor1Active := Outputs.M2SpeedContactor1;
 
 {endregion}
 
@@ -671,7 +675,7 @@ GVL_Troubleshooting.P_MotionM3.HwIn_PowerContactorEngaged_DI := HwIn.Machine.Pow
 GVL_Troubleshooting.P_MotionM3.HwIn_BrakeIsOpen_DI      := HwIn.Translation.M3_BrakeIsOpen_DI;
 GVL_Troubleshooting.P_MotionM3.Cmd_BrakeRelease         := Translation.State.BrakeCmd;
 
-GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized     := (Auth.Mode <> E_Mode.DISABLE);
 GVL_Troubleshooting.P_MotionM3.Step3_NotBusyOtherTask   := TRUE; // Aucune tâche exclusive connue bloquant M3 (pas de homing translation)
 GVL_Troubleshooting.P_MotionM3.Step4_MotionRequested    := Translation.State.Busy OR (Translation.State.SpeedCmd_Pct > 0.0);
 // Conversion locale uniquement pour compatibilité de l'index diagnostic historique :
