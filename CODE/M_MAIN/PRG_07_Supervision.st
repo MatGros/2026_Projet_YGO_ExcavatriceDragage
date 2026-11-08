@@ -38,6 +38,7 @@ VAR
     instWinchSymmetry      : FB_Winch_Symmetry;               // * [INST] Diagnostic passif symetrie M1/M2 (observateur strict)
     instHmiBannerFormatter : FB_Hmi_BannerFormatter;          // * [INST] Formatage bandeau IHM (alarmes/etats)
     instTroubleshootingView : FB_TroubleshootingView;         // * [INST] Vue troubleshooting (diagnostic IHM)
+    instTroubleshootingGuide : FB_TroubleshootingGuide;       // * [INST] Guide de depannage (texte seul, aucun effet machine)
     instMirrorBypassTranslation      : FB_MirrorBypassRetain; // * [INST] Miroir bypass Translation IHM<->RETAIN
     instMirrorBypassM1               : FB_MirrorBypassRetain; // * [INST] Miroir bypass M1 IHM<->RETAIN
     instMirrorBypassM2               : FB_MirrorBypassRetain; // * [INST] Miroir bypass M2 IHM<->RETAIN
@@ -984,6 +985,9 @@ instTroubleshootingView(
     WinchM2Trace         := PRG_04_Treuils_Benne.Data.TraceM2,
     TranslationTrace     := PRG_05_Translation.Data.TranslationTrace
 );
+
+// 🧭 Guide de lecture du snapshot : ouvrir FB_TroubleshootingGuide dans l'IDE.
+instTroubleshootingGuide(Enable := TRUE);
 
 {endregion}
 END_PROGRAM
