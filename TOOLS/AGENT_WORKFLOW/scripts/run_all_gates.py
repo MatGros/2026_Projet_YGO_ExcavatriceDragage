@@ -92,6 +92,7 @@ def _py313() -> str:
 PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "528", "G528 - Simulated operator gesture ownership (T418)", [sys.executable, f"{S}/G528_check_sim_operator_gesture.py"]),
     ("C", "530", "G530 - Integrite referentielle des contrats et du catalogue (REX 2026-11-02 briefing T213 : contrat PASS sur un fichier fantome)", [sys.executable, f"{S}/G530_check_contract_refs.py", "."]),
+    ("C", "531", "G531 - Guide de depannage FB_TroubleshootingGuide : chemins vivants et structure (T428 J5)", [sys.executable, f"{S}/G531_check_troubleshooting_guide.py"]),
     # Palier C â€” structure (G300..G330)
     ("C", "300", "G300 â€” Structure du depot",                       [sys.executable, f"{S}/G300_check_structure.py"]),
     ("C", "310", "G310 â€” Structure CODE (POU, suffixe, ordre)",     [sys.executable, f"{S}/G310_check_code_structure.py"]),
