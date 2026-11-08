@@ -180,7 +180,7 @@ for p, k in NEG.items():
     setd(p, "RETRAIT_NEGATION", "R2", k, "Aucune panne propre : meme fait, polarite inverse ou meme capteur unique M2.")
 for p in ("H_LevageSynchroniseM1M2.Idx201_JoyYRaw_Pct", "H_LevageSynchroniseM1M2.Idx203_ArbitratedSpeed_Pct", "H_LevageSynchroniseM1M2.Idx402_M1_SetpointSpeed_Pct", "H_LevageSynchroniseM1M2.Idx403_M2_SetpointSpeed_Pct"):
     setd(p, "RETRAIT_NON_ECRITE", "R5", "", "Jamais ecrite par la vue : valeur par defaut trompeuse. Equivalent lisible sur les fiches d'axe.")
-setd("H_LevageSynchroniseM1M2.Idx401_SyncMotionAllowed", "CABLER_J3", "R5", "", "Jamais ecrite. Maillon SyncOperationPermit prevu au jalon J3.")
+setd("H_LevageSynchroniseM1M2.Idx401_SyncMotionAllowed", "RETRAIT_NON_ECRITE", "R5", "PRG_04_Treuils_Benne.SyncOperationPermit", "Jamais ecrite : valeur par defaut trompeuse. Remplacee par SyncOperationPermit, lu directement.")
 setd("A_ContexteMachineGlobal.Idx203_BypassSensorsGlobal", "A_VALIDER", "R6", "", "Constante FALSE, TBD : affiche 'pas de bypass' sans le mesurer. Cabler ou retirer.")
 setd("P_MotionM3.SpeedContactor1Active", "RETRAIT_NON_APPLICABLE", "R6", "", "Constante FALSE : M3 n'a pas de contacteur de vitesse (commentaire code).")
 setd("P_MotionM3.Step3_NotBusyOtherTask", "GARDER", "R4", "", "Constante TRUE conservee : garde l'alignement des 8 maillons sur les 3 axes.")
@@ -225,11 +225,12 @@ for ax, I in (("1", "I_LevageUnitaireM1"), ("2", "J_LevageUnitaireM2")):
     setd("G_CycleSemiAuto.Idx30%d_M%sSpeedStepApplied" % (6 + int(ax), ax), "RETRAIT_COPIE", "R1", I + ".Control_400.Idx402_SpeedStepCalculated", "Aucune panne propre : meme StepNumber, nom 'Applied' trompeur. " + JUGE)
     setd(I + ".Demandes_200.Idx211_CoupledUserRequestActive", "RETRAIT_COPIE", "R1", "T_Permits.BothActive", "Aucune panne propre. " + JUGE)
     setd("H_LevageSynchroniseM1M2.Idx30%d_M%s_AscentPermit" % (2 + int(ax), ax), "RETRAIT_COPIE", "R1", "T_Permits.EffectivePermitM%s_Ascent" % ax, "Aucune panne propre. " + JUGE)
-    EXTRA.append(("PRG_06_Outputs.Data.M%sBrakeCmd" % ax, "AXE.M" + ax, 9, "Vraie commande frein, forcage N2 inclus."))
+    EXTRA.append(("GVL_IHM.IoHw.Out.M%s_BrakeRelease_RQ" % ax, "AXE.M" + ax, 9, "Image de la sortie frein physique, forcage N2 inclus."))
     for c in (2, 3):
-        EXTRA.append(("PRG_06_Outputs.Data.M%sSpeedContactor%d" % (ax, c), "AXE.M" + ax, 9, "Contacteur de palier absent de la fiche."))
+        EXTRA.append(("GVL_IHM.IoHw.Out.M%s_SpeedContactor_%d_DQ" % (ax, c), "AXE.M" + ax, 9, "Contacteur de palier absent de la fiche."))
     for d in ("Ascent", "Descend"):
         EXTRA.append(("PRG_04_Treuils_Benne.SafetyPermitM%s_%s" % (ax, d), "AXE.M" + ax, 7, "Vrai permis Safety avant Process."))
+    EXTRA.append(("PRG_02_Acquisition.Data.EncoderM%s.HomedAndReliable" % ax, "AXE.M" + ax, 3, "Codeur disponible, reference et coherent."))
 L = "L_TranslationPontM3."
 for n, b in (("Idx101_PosTremie_DI", "M3_PosTremie_DI"), ("Idx102_PosPV_DI", "M3_PosPV_DI"), ("Idx103_PosP2_DI", "M3_PosPVP2_DI"), ("Idx104_PosP1_DI", "M3_PosP1_DI"), ("Idx105_PosMaintenance_DI", "M3_PosMaintenance_DI")):
     setd(L + "Inputs_100." + n, "RETRAIT_COPIE", "R1", "B_Inputs.Translation." + b, "Aucune panne propre : passthrough PRG_05:115-119 et decodeur:94-98. " + JUGE)
@@ -239,8 +240,14 @@ setd(L + "Control_400.Idx403_DriveControlWord", "GARDER", "R8", "", "Mot demande
 setd("P_MotionM3.Cmd_BrakeRelease", "GARDER", "R8", "", "Demande frein M3, avant barriere finale.")
 setd(L + "Outputs_500.Idx501_CmdDriveControlWord", "CABLER_J4", "R8", "", "Lit la demande, pas la sortie. Rebrancher sur PRG_06_Outputs.M3_CommandWord.")
 setd(L + "Outputs_500.Idx503_CmdBrakeRelease_RQ", "CABLER_J4", "R8", "", "Lit la demande, pas la sortie. Rebrancher sur PRG_06_Outputs.Data.TranslationBrakeCmd.")
-EXTRA += [("PRG_06_Outputs.M3_CommandWord", "AXE.M3", 9, "Vrai mot de commande variateur."),
-          ("PRG_06_Outputs.Data.TranslationBrakeCmd", "AXE.M3", 9, "Vraie commande frein M3."),
+EXTRA += [("GVL_IHM.IoHw.Out.M3_CommandWord", "AXE.M3", 9, "Image du mot de commande variateur physique."),
+          ("GVL_IHM.IoHw.Out.M3_BrakeRelease_RQ", "AXE.M3", 9, "Image de la sortie frein M3 physique."),
+          ("PRG_06_Outputs.instSafetyEmergencyManagement.BypassPowerCutOff", "GENERAL.Puissance", 0, "Bypass MES : le PLC ne fait jamais chuter l'AU."),
+          ("PRG_06_Outputs.instSafetyEmergencyManagement.BypassRedundancyTest", "GENERAL.Puissance", 0, "Bypass de l'auto-test A/B complet."),
+          ("PRG_04_Treuils_Benne.WinchBothFinalRequestsCoherent", "FONCTION.Couplage", 0, "Demandes physiques M1 et M2 coherentes."),
+          ("PRG_04_Treuils_Benne.SyncOperationPermit", "FONCTION.Couplage", 0, "Gate canonique de la synchro ; remplace Idx401 jamais ecrite."),
+          ("PRG_04_Treuils_Benne.ManualBucketJogActive", "FONCTION.Benne", 0, "Jog benne unitaire M2 en maintenance."),
+          ("PRG_04_Treuils_Benne.M2_LimitShift", "FONCTION.Benne", 0, "Decalage benne applique aux limites M2."),
           ("PRG_06_Outputs.M3_TremieHardStopActive", "AXE.M3", 8, "Coupure M3 aujourd'hui invisible.")]
 setd(F(".Idx308_HeightInterlockBlocking") if any(p.endswith(".Idx308_HeightInterlockBlocking") for p in ALL) else [p for p in ALL if p.startswith(L + "Safety_300.Idx308")][0], "RETRAIT_COPIE", "R1", "S_TraceTranslation.HeightInterlockBlocking", "Aucune panne propre. " + JUGE)
 K = "K_BenneOuvertureFermeture."

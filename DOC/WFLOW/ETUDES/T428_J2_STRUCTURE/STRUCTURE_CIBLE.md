@@ -1,6 +1,7 @@
 # T428 J2 — Structure cible du snapshot
 
-> 🟠 **Proposition, en attente de validation par l'exploitant.** Aucune ligne de `CODE/` n'a changé.
+> ✅ **Décisions tranchées le 2026-11-08** (6 techniques par l'orchestrateur, GO J3 par l'exploitant). J3 : [J3_MAILLONS](J3_MAILLONS.md).
+> 🟠 Retraits appliqués seulement à J4. Aucune ligne de `CODE/` n'a changé.
 > Table complète : [TABLE_CORRESPONDANCE.csv](TABLE_CORRESPONDANCE.csv) · Revue : [RAPPORT_JUGE.md](RAPPORT_JUGE.md)
 
 ## 1. Résultat
@@ -123,5 +124,5 @@ Sur le cas Kobold, un retrait a été contrôlé : le DI brut reste présent, au
 | 3 | Freins en étape 10 plutôt qu'en étape 2 | ✅ Étape 10 |
 | 4 | `Idx203_BypassSensorsGlobal`, constante FALSE | Câbler ou retirer ; préférence : retirer tant qu'il n'y a pas de source |
 | 5 | `P.Step8_InterlockState/Reason` | Renommer à J4 : ce n'est pas une barrière M3 |
-| 6 | `Idx401_SyncMotionAllowed`, jamais écrite | Câbler à J3 avec `SyncOperationPermit` |
+| 6 | `Idx401_SyncMotionAllowed`, jamais écrite | Remplacée à J3 par `SyncOperationPermit`, lu directement |
 | 7 | Poursuivre J3 malgré le rejeu sans gain | ✅ Oui : J3 apporte les vraies valeurs |

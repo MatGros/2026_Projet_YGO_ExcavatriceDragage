@@ -105,6 +105,8 @@ Chaque jalon s'arrête sur une validation humaine. Pas de jalon suivant sans GO.
 | **Évaluation** | 0 KO ; durée mesurée avant et après ; maillon bien situé **au moins 8 sur 15** en rejeu quand l'incident est reproductible |
 | **Arrêt** | Résultat publié, décision de poursuivre ou non J4 |
 
+**État au 2026-11-08 : liste enrichie, lecture réelle à faire.** Voir [J3_MAILLONS](../ETUDES/T428_J2_STRUCTURE/J3_MAILLONS.md). 571 vers 595 chemins, 6 lots, 0 chemin non résolu au contrôle statique, revue challenge à 2 modèles sans ajout faux. Reste : snapshot en simulation (0 KO, durée).
+
 ### J4 — Implémentation de la structure
 
 | | |
