@@ -45,6 +45,9 @@ def test_alert_chat_choice_is_user_authoritative_and_challenges_without_tools(tm
         svc.command({'action': 'start'})
         write_message(source, 'assistant', 'Le bilan annonce neuf échecs.')
         wait(lambda: bool(svc.snapshot()['sessions'][0]['alerts']))
+        assert deliveries == [], 'new findings do not start a CLI turn without user action'
+        initial = svc.snapshot()['sessions'][0]['alerts'][0]
+        svc.command({'action':'start_alert_workflow','id':sid,'alert_id':initial['id'],'mode':'legacy'})
         wait(lambda: len(deliveries) == 1)
         alert = svc.snapshot()['sessions'][0]['alerts'][0]
         assert alert['workflow']['status'] == 'awaiting_choice'
@@ -122,7 +125,7 @@ def test_legacy_alert_can_be_explicitly_sent_into_its_session_chat(tmp_path, mon
         assert deliveries[0][1] == svc.sessions[sid]['native_id']
         assert 'Meme alerte deja vue.' in deliveries[0][2]
         assert svc.sessions[sid]['alerts'][0]['workflow']['status'] == 'awaiting_choice'
-        assert svc.sessions[sid]['alerts'][0]['workflow']['delivery_status'] == 'delivered'
+        wait(lambda: svc.snapshot()['sessions'][0]['alerts'][0]['workflow']['delivery_status'] == 'delivered')
     finally:
         svc.close()
 
@@ -166,7 +169,7 @@ def test_correct_id_preserves_mission_and_paused_state(tmp_path):
         svc.close()
 
 
-def test_enabled_session_recovers_same_transcript_after_file_move(tmp_path):
+def test_enabled_session_requires_explicit_choice_after_transcript_move(tmp_path):
     svc, source, sid = make_service(tmp_path)
     moved_dir = source.parent / 'renamed-worktree'
     moved_dir.mkdir()
@@ -175,11 +178,15 @@ def test_enabled_session_recovers_same_transcript_after_file_move(tmp_path):
         svc.command({'action': 'start'})
         wait(lambda: svc.snapshot()['sessions'][0]['state'] == 'active')
         source.rename(moved_source)
-        wait(lambda: (svc.snapshot()['sessions'][0]['state'] == 'active'
-                      and svc.snapshot()['sessions'][0]['source'] == str(moved_source)))
+        wait(lambda: svc.snapshot()['sessions'][0]['recovery']['status'] == 'unverified')
         item = svc.snapshot()['sessions'][0]
         assert item['native_id'] == 'session-a'
-        assert item['messages_observed'] == 0  # Reattachment starts at EOF; no historical replay.
+        assert item['state'] == 'paused' and item['error'] == 'continuity_unverified'
+        assert item['messages_observed'] == 0
+        assert item['recovery']['can_catch_up'] is False
+        svc.command({'action':'resume', 'id':sid, 'mode':'normal'})
+        wait(lambda: (svc.snapshot()['sessions'][0]['state'] == 'active'
+                      and svc.snapshot()['sessions'][0]['source'] == str(moved_source)))
     finally:
         svc.close()
 
@@ -238,7 +245,7 @@ def test_inflight_result_is_discarded_on_source_change(tmp_path, new_record, mon
             monkeypatch.setattr(type(source), 'stat', failing_stat)
         release.set()
         if new_record == 'missing':
-            wait(lambda: svc.snapshot()['sessions'][0]['state'] == 'source_missing')
+            wait(lambda: svc.snapshot()['sessions'][0]['recovery']['status'] == 'unverified')
             assert not svc.snapshot()['alerts']
         else:
             wait(lambda: len(calls) >= 2)
@@ -477,9 +484,10 @@ def test_repeat_with_same_exact_quote_keeps_user_disposition(tmp_path):
         alert=svc.snapshot()['alerts'][0]
         svc.command({'action':'acknowledge','id':sid,'alert_id':alert['id'],'disposition':'resolved'})
         write_message(source,'assistant','Même constat vérifiable')
-        wait(lambda: svc.snapshot()['alerts'][0]['occurrences']==2)
+        wait(lambda: len(calls)>=2 and svc.snapshot()['sessions'][0]['analysis_state']=='uncertain')
         assert len(svc.snapshot()['alerts'])==1
         assert svc.snapshot()['alerts'][0]['disposition']=='resolved'
+        assert svc.snapshot()['alerts'][0]['occurrences']==1
         assert any('Alertes précédentes' in m['text'] and 'resolved' in m['text'] for m in calls[-1])
     finally:
         svc.close()

@@ -1,0 +1,65 @@
+{
+  "name": "veilleur-vscode",
+  "displayName": "🛡️ Agent Supervisor",
+  "description": "Notifications locales et accès rapide aux constats d'Agent Supervisor.",
+  "version": "0.2.0",
+  "publisher": "excavatrice-dragage-local",
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "veilleur.open",
+        "title": "Agent Supervisor: Ouvrir les sessions"
+      },
+      {
+        "command": "veilleur.refresh",
+        "title": "Agent Supervisor: Actualiser maintenant"
+      },
+      {
+        "command": "veilleur.settings",
+        "title": "Agent Supervisor: Settings — notifications et connexion"
+      },
+      {
+        "command": "veilleur.testNotification",
+        "title": "Agent Supervisor: Tester le toast et le clic sur un constat réel (TEST)"
+      }
+    ],
+    "configuration": {
+      "title": "Agent Supervisor",
+      "properties": {
+        "veilleur.port": {
+          "type": "integer",
+          "default": 8082,
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Port local du service Agent Supervisor (écoute uniquement sur 127.0.0.1)."
+        },
+        "veilleur.pollSeconds": {
+          "type": "integer",
+          "default": 8,
+          "minimum": 5,
+          "maximum": 60,
+          "description": "Fréquence de lecture du résumé local, en secondes."
+        },
+        "veilleur.notifications": {
+          "type": "boolean",
+          "default": true,
+          "description": "Notifier un nouveau problème ou une aggravation/preuve nouvelle ; lecture, commentaires et résolution proposée restent silencieux."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
+}

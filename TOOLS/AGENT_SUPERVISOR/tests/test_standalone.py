@@ -1,4 +1,5 @@
 import json
+import hashlib
 import os
 from pathlib import Path
 import socket
@@ -41,7 +42,7 @@ def test_standalone_process_and_task_manager_relay_share_one_collector(tmp_path)
                 assert process.poll() is None and time.monotonic() < deadline
                 time.sleep(.05)
         with urlopen(base + '/') as response:
-            assert 'Veilleur' in response.read().decode('utf8')
+            assert 'Agent Supervisor' in response.read().decode('utf8')
         with pytest.raises(HTTPError) as denied:
             urlopen(Request(base + '/api/supervision', data=b'{"action":"stop"}', method='POST'))
         assert denied.value.code == 403
@@ -112,6 +113,63 @@ def test_health_reports_loaded_build_and_changed_files(tmp_path):
         server.build_id = 'outdated-build'
         with urlopen(url) as response:
             assert json.load(response)['update_available'] is True
+    finally:
+        server.shutdown()
+        server.supervision.close()
+        server.server_close()
+        worker.join(timeout=2)
+
+
+def test_notification_summary_is_read_only_and_excludes_chat_and_token(tmp_path):
+    server = create_server(0, tmp_path / 'state.json')
+    sid = '11111111-1111-4111-8111-111111111111'
+    session = server.supervision._new_session(sid, 'claude', 'native-session-id', 'TEST session', False, 'private mission')
+    session.update(state='paused', analysis_state='alert', last_event='2026-11-08T10:00:00Z')
+    session['memory'] = [{'text': 'private memory'}]
+    session['judge_request'] = {'payload': {'prompt': 'private judge prompt'}}
+    session['events'] = [{'text': 'private event'}]
+    session['framing'] = [{'text': 'private framing'}]
+    session['alerts'] = [dict(id='alert-1', severity='warning', reason='TEST reason', evidence='TEST quote',
+                              category='other', created_at='2026-11-08T10:00:00Z', last_occurrence='2026-11-08T10:00:00Z',
+                              occurrences=1, disposition='new', acknowledged_at=None,
+                              workflow={'status':'awaiting_choice', 'delivery_status':'not_sent'})]
+    session['alerts'][0]['comments'] = [{'text': 'private comment', 'author': 'user'}]
+    session['alerts'][0]['history'] = [{'reason': 'private historical reason'}]
+    server.supervision.sessions[sid] = session
+    server.supervision._chat_histories[sid] = [{'role':'user', 'text':'private chat'}]
+    server.supervision.running = True
+    worker = threading.Thread(target=server.serve_forever, daemon=True)
+    worker.start()
+    try:
+        with urlopen(f'http://127.0.0.1:{server.server_port}/api/supervision/summary') as response:
+            summary = json.load(response)
+        assert summary == {
+            'schema_version': 1,
+            'running': True,
+            'counts': {'unread': 1, 'open': 1, 'deferred': 0, 'closed': 0, 'follow_up': 1,
+                       'warnings': 1, 'alarms': 0, 'resolution_proposed': 0},
+            'sessions': [{
+                'id': sid, 'platform': 'claude', 'native_id': 'native-session-id', 'alias': 'TEST session',
+                'state': 'paused', 'analysis_state': 'alert', 'last_event': '2026-11-08T10:00:00Z',
+                'last_analysis': None,
+                'counts': {'unread': 1, 'open': 1, 'deferred': 0, 'closed': 0, 'follow_up': 1,
+                           'warnings': 1, 'alarms': 0, 'resolution_proposed': 0},
+                'alerts': [{
+                    'id': 'alert-1', 'severity': 'warning', 'reason': 'TEST reason',
+                    'evidence_hash': hashlib.sha256('TEST quote'.encode('utf8')).hexdigest()[:24],
+                    'category': 'other', 'created_at': '2026-11-08T10:00:00Z',
+                    'last_occurrence': '2026-11-08T10:00:00Z', 'occurrences': 1, 'disposition': 'new',
+                    'acknowledged_at': None, 'workflow_status': 'awaiting_choice', 'delivery_status': 'not_sent',
+                    'business_state': 'open', 'version': 1, 'reference': 'A-alert-1',
+                    'assessment': {'status': 'active', 'updated_at': '2026-11-08T10:00:00Z'}
+                }]
+            }]
+        }
+        encoded = json.dumps(summary)
+        for private_value in ('private mission', 'private memory', 'private judge prompt', 'private chat',
+                              'private event', 'private framing', 'private comment', 'private historical reason',
+                              'TEST quote', 'token'):
+            assert private_value not in encoded
     finally:
         server.shutdown()
         server.supervision.close()

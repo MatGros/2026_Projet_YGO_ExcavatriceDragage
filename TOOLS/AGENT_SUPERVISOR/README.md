@@ -1,6 +1,6 @@
-# Veilleur
+# Agent Supervisor
 
-Veilleur observe en lecture seule des conversations Claude Code, Codex, Antigravity ou DSH
+Agent Supervisor observe en lecture seule des conversations Claude Code, Codex, Antigravity ou DSH
 explicitement affectées et propose des alertes à vérifier. Il ne pilote pas les agents,
 ne modifie ni conversations ni tâches, et ne valide ni un essai ni la sécurité machine.
 OpenCode n'est pas pris en charge.
@@ -48,8 +48,8 @@ Codex ne fournit pas encore ici de commande de chat équivalente ; utiliser l'af
 manuelle depuis Task Viewer.
 
 Pour DSH, le collecteur lit le transcript local `.jsonl.zstd` avec Node.js 22 ou ultérieur.
-Le suivi commence à la fin du transcript ; aucun historique antérieur n'est rejoué.
-Une réécriture ou troncature suspend le suivi comme pour les autres sources.
+Lors du premier rattachement, le suivi commence à la fin du transcript ; aucun historique antérieur
+n'est importé. Une réécriture ou troncature suspend le suivi comme pour les autres sources.
 
 1. Saisir la plateforme et l'ID natif complet, ou demander la liste de candidates et
    sélectionner explicitement une ligne non ambiguë. La recherche ne lit que les noms
@@ -64,20 +64,30 @@ Une réécriture ou troncature suspend le suivi comme pour les autres sources.
    L'API autonome refuse les ID absents ou ambigus. Aucun rattachement n'est fait par
    simple recherche, sélection ou collage.
 
-Le rattachement commence **à la fin** du transcript. Les messages antérieurs, les
-interruptions et les périodes en pause ne sont pas rejoués ; l'historique est donc
-explicitement signalé comme partiel. Une troncature, réécriture ou erreur de lecture
-suspend le suivi : examiner la source, puis pause/reprise pour confirmer le rattachement.
+Le premier rattachement commence **à la fin** du transcript ; l'historique antérieur n'est pas
+importé. Le service conserve ensuite un curseur vérifiable (identité, chemin, position et empreinte
+du préfixe) pour détecter les messages apparus pendant une pause ou un arrêt. À la reprise, s'il
+trouve un intervalle vérifiable, il affiche son volume et propose **Reprise normale** (ignorer
+explicitement cet intervalle) ou **Reprise avec historique** (le soumettre au juge par lots).
+Sans intervalle vérifiable, il n'invente pas de rattrapage et demande une reprise normale explicite.
+Les affectations créées avant l'installation du checkpoint durable affichent aussi une continuité
+non vérifiée : leur ancien intervalle ne peut pas être reconstruit ; la reprise normale établit
+un nouveau point de départ après confirmation.
+Une réécriture, troncature ou perte de source suspend le suivi ; les lots déjà enregistrés restent
+disponibles pour terminer ou réessayer leur analyse avant un rattachement normal.
 L'historique du chat Veilleur est conservé localement, séparément pour chaque session.
 Le bouton **Voir / actualiser l'historique** lit sur demande les derniers messages du
 transcript de cette affectation, avec une limite de taille ; il n'envoie rien à l'agent.
 Le chat associé à une session parle au Veilleur au sujet de cette session ; Entrée envoie
 et Maj+Entrée insère une ligne. Les messages de ce chat peuvent être confidentiels.
 
-Les messages utilisateur observés sont gardés en mémoire pour le suivi en cours, mais
-ne sont pas persistés et sont perdus à la reprise ou au redémarrage. Les alertes et
-leurs citations sont persistées ; les retirer du suivi ne supprime pas les notes déjà
-créées. Les extraits et notes peuvent donc contenir des informations confidentielles.
+Le stockage local persiste le checkpoint, les 12 derniers messages observés (plafond de
+6 000 caractères), jusqu'à 20 éléments de mémoire utilisateur et, temporairement, les lots
+de reprise historique (plafond de 5 Mio). Les lots sont retirés après analyse terminée ; ils
+ne sont pas envoyés à l'agent observé. Le juge reçoit seulement le lot en cours, avec le
+consentement cloud requis pour un modèle distant. Les alertes et citations sont persistées ;
+les retirer du suivi ne supprime pas les notes déjà créées. Ces données locales peuvent
+contenir des informations confidentielles.
 
 ## Modèle et limites
 
@@ -108,13 +118,47 @@ des fichiers JSONL synthétiques de 1, 10 et 50 Mo dans le scratch indiqué ; ut
 nouveau chemin à chaque exécution. Aucun nettoyage automatique n'est effectué.
 
 
+## Extension VS Code (POC)
+
+Une extension locale indépendante des CLI affiche les compteurs et signale les nouveaux constats
+dans VS Code. Elle lit le résumé local, n’envoie aucun message et ne déclenche aucun appel LLM.
+L’utilisateur confirme la voir dans son VS Code ; l’usage courant reste à évaluer. Plan, preuves
+et limites : [document de tâche](../../DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md).
+Code, scénarios de test et commande de lancement isolé :
+[`poc/vscode-notifier/README.md`](poc/vscode-notifier/README.md).
+
 ## Alertes dans la conversation surveillee
 
-Quand le juge cree une nouvelle alerte, le service peut ajouter un tour consultatif a la conversation exacte. Le premier message contient la criticite, un titre court, une ligne de description et une citation. Il demande a l'agent un acquittement en une ligne, sans analyse ni action, puis attend le choix explicite de l'utilisateur.
+### Constats et décisions
+
+L'interface distingue la lecture d'un constat, son état de suivi et l'avis du superviseur.
+**Seen** signifie lu ; **Close** enregistre une décision humaine ; **Defer** reporte le suivi.
+Un commentaire saisi dans le constat s'adresse au superviseur. Il reste associé au constat et
+peut demander une réévaluation ; il n'est pas envoyé automatiquement à l'agent surveillé.
+Une correction observée peut conduire le modèle à proposer une résolution, avec citation ;
+la clôture humaine reste distincte. Une analyse indisponible ne signifie pas « aucun problème ».
+
+L'action **Send to chat** est explicite : vérifier la plateforme et l'identifiant affichés avant
+de confirmer. Selon le CLI, l'envoi peut déclencher un tour et consommer du quota. Une livraison
+incertaine ou échouée ne prouve pas la réception. Le plugin VS Code est informatif : il affiche
+les compteurs du service et ne pilote pas les conversations. Les deux niveaux affichés sont
+**Warning** et **Alarm** ; l'analyse du modèle reste consultative et expérimentale.
+
+Les paramètres avancés du juge sont dans le panneau de configuration. Le contexte observé et
+transmis est borné ; augmenter ces limites peut augmenter latence et coût. Les conversations
+existantes sans checkpoint antérieur ne permettent pas de reconstituer automatiquement l'intervalle
+manqué. Une reprise normale crée un nouveau point de départ ; le rattrapage n'est proposé que si
+la continuité peut être vérifiée.
+
+### Ancien cycle 1/2/3
+
+Le cycle historique 1/2/3 reste disponible pour les anciens constats. La création d'un nouveau constat ne lance plus automatiquement un tour dans la conversation surveillée.
 
 L'utilisateur choisit `1` (ignorer avec motif), `2` (examiner maintenant) ou `3` (reporter avec condition). Le choix peut etre fait dans cette page ou dans le chat cible. Pour `2`, le Veilleur demande une courte contre-analyse sans outils ni modification. La reponse de l'agent est affichee comme proposition; elle ne vaut pas decision utilisateur.
 
-Une alerte ancienne conservee avant ce cycle est marquee `legacy` et n'est pas envoyee automatiquement. Le bouton **Envoyer cette alerte au chat pour ouvrir le choix 1/2/3** lance explicitement son cycle dans l'UUID affecte. Les boutons sous **Statut local et copie** changent seulement l'etat dans le Veilleur et n'envoient aucun message.
+Les anciens états et choix 1/2/3 restent conservés pour compatibilité. Dans l'interface actuelle,
+**Send to chat** ouvre un aperçu et demande une confirmation explicite ; les choix locaux et le
+commentaire au superviseur ne déclenchent pas cet envoi.
 
 L'envoi via CLI est actuellement implemente pour Claude Code et Antigravity. Il cible l'UUID fourni et verifie l'ID retourne par le CLI. L'ajout d'un tour au transcript ne garantit pas le rafraichissement de la fenetre CLI deja ouverte et reutilise le compte du CLI, donc peut consommer son quota. DSH et Codex restent sans adaptateur d'envoi valide; DSH est volontairement reporte. Une erreur ou une session en pause est signalee et peut etre relancee depuis la carte.
 

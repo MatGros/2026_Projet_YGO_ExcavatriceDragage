@@ -92,3 +92,10 @@ def test_upgrade_restores_active_assignment_chat_and_memory(tmp_path, monkeypatc
     upgrade.main()
     assert actions==['stop','resume','restore_memory']
     assert new['sessions'][0]['state']=='active' and new['sessions'][0]['memory']==memory
+def test_migration_comparison_allows_additive_fields_but_rejects_data_loss():
+    from TOOLS.AGENT_SUPERVISOR.scripts.upgrade_legacy import preserves_previous
+    previous = [{'id': 'a', 'disposition': 'seen', 'workflow': {'choice': '2'}}]
+    assert preserves_previous(previous, [{'id': 'a', 'disposition': 'seen', 'workflow': {'choice': '2'}, 'version': 1}])
+    assert not preserves_previous(previous, [])
+    assert not preserves_previous(previous, [{'id': 'a', 'disposition': 'resolved', 'workflow': {'choice': '2'}}])
+    assert not preserves_previous(previous, [{'id': 'a', 'disposition': 'seen', 'workflow': {}}])
