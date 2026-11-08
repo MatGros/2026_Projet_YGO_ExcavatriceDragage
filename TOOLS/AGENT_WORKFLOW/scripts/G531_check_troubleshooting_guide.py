@@ -130,6 +130,12 @@ def main() -> int:
         if why:
             errors.append("chemin non resolu dans le code : %s (%s)" % (full, why))
 
+    # 4bis. Noms abreges (sans groupe) : chaque IdxNNN_Nom cite doit exister comme feuille dans la liste
+    leaves = {x.rsplit(".", 1)[-1] for x in liste}
+    for tok in sorted(set(re.findall(r"(?<![\w.])Idx\d{3}_[A-Za-z0-9_]+", body))):
+        if tok not in leaves:
+            errors.append("nom abrege inconnu de la liste du snapshot : %s" % tok)
+
     # 5. Texte de fonctionnement
     if "(*" in body or "*)" in body:
         errors.append("commentaire bloc dans le corps : // uniquement")

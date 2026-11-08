@@ -55,11 +55,11 @@ END_VAR
 //
 // ▶ La simulation est-elle active sans que ce soit voulu ?
 //   • A_ContexteMachineGlobal.Idx102_SimulationEnabled
-//       sain : 0 = Matériel Réel (Nominal)  |  sinon : si 1 : chaque domaine dont le drapeau de simulation est actif (treuils, translation, opérateur, sécurité) lit le simulateur et non le terrain ; sur machine réelle doit valoir 0
+//       sain : 0 = Matériel Réel (Nominal)  |  sinon : si 1 : chaque domaine dont le drapeau de simulation est actif (treuils, translation, opérateur, sécurité) lit le simulateur et non le terrain ; anormal sur machine réelle, faire retirer la simulation par le responsable
 //
 // ▶ Le domaine Safety est-il simulé ?
 //   • C_Safety.SimSafetyActive
-//       sain : FALSE = DI et comm réelles lues  |  sinon : si TRUE avec A_ContexteMachineGlobal.Idx102_SimulationEnabled = 1 : AU, contacteur, phases, thermiques et Kobold viennent du simulateur, pas du terrain ; ne doit jamais être actif sur machine réelle, le signaler au responsable
+//       sain : FALSE = DI et comm réelles lues  |  sinon : si TRUE avec A_ContexteMachineGlobal.Idx102_SimulationEnabled = 1 : AU, contacteur, phases, thermiques et Kobold viennent du simulateur, pas du terrain ; anormal sur machine réelle, faire retirer la simulation par le responsable
 //
 // ▶ Un bypass réseau global est-il oublié ?
 //   • A_ContexteMachineGlobal.Idx202_BypassNetworkGlobal
@@ -67,7 +67,7 @@ END_VAR
 //
 // ▶ Un bypass commun global est-il oublié ?
 //   • I_LevageUnitaireM1.Safety_300.Idx330_BypassGlobalCommun
-//       sain : 0 = pas de bypass global  |  sinon : si 1 : toutes les sécurités communes M1+M2 sont ignorées ; faire retirer le bypass par le responsable avant toute exploitation
+//       sain : 0 = pas de bypass global  |  sinon : si 1 : bypass global commun demandé à l'IHM, anormal en exploitation ; faire retirer le bypass par le responsable. Ce bit n'est relayé à aucune sécurité de M1 ou M2 : les bypass globaux réellement appliqués se lisent dans I_LevageUnitaireM1.Safety_300.Idx329_BypassGlobal et J_LevageUnitaireM2.Safety_300.Idx329_BypassGlobal
 //
 // ▶ La butée logicielle haute est-elle shuntée ?
 //   • I_LevageUnitaireM1.Safety_300.Idx326_BypassTopLimitSoftCommun
@@ -79,7 +79,7 @@ END_VAR
 //
 // ▶ La liaison IHM est-elle vivante ?
 //   • A_ContexteMachineGlobal.Idx401_HmiHeartbeatOk
-//       sain : 1 = Liaison IHM Active  |  sinon : si 0 : aucun changement du bit de vie IHM depuis 2 s ; vérifier la liaison IHM, le cycle SEMI_AUTO et les axes lisent ce bit
+//       sain : 1 = Liaison IHM Active  |  sinon : si 0 : aucun changement du bit de vie IHM depuis 2 s ; défaut communication opérateur sur M1, M2 et M3 (I_LevageUnitaireM1.Safety_300.Idx310_ErrorOperatorComm) et défaut du cycle SEMI_AUTO s'il est hors repos ; vérifier la liaison IHM
 //
 // ── Puissance et arrêt d'urgence ──
 //
@@ -117,11 +117,11 @@ END_VAR
 //
 // ▶ Y a-t-il un défaut sécurité actif ?
 //   • C_Safety.SafetyError
-//       sain : FALSE = pas de défaut  |  sinon : si TRUE : lire ArmingErrorId, RedundancyTestFailed, ArmingFailed
+//       sain : FALSE = pas de défaut  |  sinon : si TRUE : lire C_Safety.ArmingErrorId, C_Safety.RedundancyTestFailed et C_Safety.ArmingFailed
 //
 // ▶ Le test de redondance contacteurs a-t-il échoué ?
 //   • C_Safety.RedundancyTestFailed
-//       sain : FALSE = test redondance OK  |  sinon : si TRUE : vérifier les deux voies contacteur
+//       sain : FALSE = test redondance OK  |  sinon : si TRUE : pendant l'autotest du réarmement, la boucle AU est restée fermée alors qu'une voie devait l'ouvrir ; C_Safety.LastAbortStep (TestA ou TestB) désigne la voie A ou B en cause : vérifier son contact et son câblage
 //
 // ▶ Un SafeStop métier est-il actif sur un axe ?
 //   • A_ContexteMachineGlobal.Idx303_SafeStopActiveAny
@@ -179,7 +179,7 @@ END_VAR
 //
 // ▶ Le mou de câble M2 est-il shunté à l'IHM ?
 //   • I_LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive
-//       sain : 0 = Capteur Actif  |  sinon : si 1 : détecteur de mou de câble shunté pour M1 et M2 ; faire retirer le shunt par le responsable
+//       sain : 0 = Capteur Actif  |  sinon : si 1 : anormal ; ce shunt lève sur M1 et M2 tout le groupe de surveillances process : mou de câble, mais aussi fin de course haut, limite câble basse, rotation des phases, codeur, communication opérateur et contrôles de mouvement (sens opposé, absence de mouvement, survitesse) ; faire retirer le shunt par le responsable
 //
 // ▶ Le câble M2 est-il tendu ?
 //   • B_Inputs.Winch.M2_TensionedCable_DI
@@ -187,7 +187,7 @@ END_VAR
 //
 // ▶ Le détecteur de fond Kobold est-il actionné ?
 //   • B_Inputs.Machine.M1_M2_KoboldBottomTouch_DI
-//       sain : selon contexte  |  sinon : si incohérent : vérifier le détecteur fond
+//       sain : selon contexte  |  sinon : si le fond est touché sans effet sur la descente : suivre le cas Kobold vu mais pas pris en compte (K_BenneOuvertureFermeture.Idx303_KoboldAutoStopEnabled, K_BenneOuvertureFermeture.Idx304_KoboldImmersionConfirmed, K_BenneOuvertureFermeture.Idx305_KoboldBottomTouchLatched)
 //
 // ▶ La limite haute effective est-elle cohérente ?
 //   • I_LevageUnitaireM1.Safety_300.Idx321_CfgTopLimitM
@@ -223,7 +223,7 @@ END_VAR
 //   • Q_TraceWinchM1.BlockReason
 //       sain : NONE = aucun blocage (au moins un sens permis)  |  sinon : POWER_CUTOFF, SAFESTOP, SAFETY_FAULT ou WINCH_FAULT : étape 6 ; AXIS_DISABLED : mode DISABLE ou axe inhibé (Q_TraceWinchM1.Inhibited) ; SAFETY_PERMIT_MISSING, PROCESS_PERMIT_MISSING ou COUPLING_BLOCKED : étape 7 ; FINAL_INTERLOCK_BLOCKED : étape 8
 //   • N_MotionM1.Step4_MotionRequested
-//       sain : selon contexte : TRUE dès qu'une demande produit une consigne  |  sinon : si FALSE malgré la demande : étape 5 Demande
+//       sain : selon contexte : TRUE dès qu'une demande produit une consigne  |  sinon : si FALSE malgré la demande : étape 5 Demande ; les boutons IHM ne sont pris en compte qu'en mode boutons (A_ContexteMachineGlobal.Idx201_JoystickSelected = 0)
 //   • N_MotionM1.Step6_DirectionAllowed
 //       sain : TRUE en demande (permis effectif du sens demandé) ; à l'arrêt il reflète le permis de descente  |  sinon : si FALSE : étape 7 Permis
 //   • N_MotionM1.Step8_OutputInterlockOk
@@ -257,11 +257,11 @@ END_VAR
 //   • I_LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm
 //       sain : 0  |  sinon : si 1 : défaut de communication joystick ou IHM ignoré sur M1 ; faire retirer le bypass par le responsable
 //   • I_LevageUnitaireM1.Safety_300.Idx325_BypassTopLimitSoftware
-//       sain : 0  |  sinon : Butee logicielle shuntee IHM, verifier la consigne
+//       sain : 0  |  sinon : si 1 : butée logicielle haute ignorée pour M1, seul le fin de course haut physique arrête la montée ; anormal, faire retirer le shunt par le responsable
 //   • I_LevageUnitaireM1.Safety_300.Idx327_BypassTopLimitSwitch
-//       sain : 0  |  sinon : Capteur fin de course haut shunte IHM, verifier le capteur
+//       sain : 0  |  sinon : si 1 : fin de course haut physique ignoré pour M1, seule la butée logicielle (M1 référencé) arrête la montée ; anormal, faire retirer le shunt par le responsable
 //   • I_LevageUnitaireM1.Safety_300.Idx329_BypassGlobal
-//       sain : 0  |  sinon : Bypass global treuil actif, verifier qui l'a arme
+//       sain : 0  |  sinon : si 1 : les causes de sécurité de l'axe M1 ne sont plus évaluées et la surveillance contacteurs et synchro M1+M2 est neutralisée ; anormal, faire retirer le bypass par le responsable avant toute exploitation
 //
 // ▶ Étape 5 · Demande — Quelle est la demande reelle et la consigne arbitree pour M1 ?
 //   • I_LevageUnitaireM1.Demandes_200.Idx203_HmiManualCmd_BtnAscent
@@ -285,7 +285,7 @@ END_VAR
 //   • I_LevageUnitaireM1.Safety_300.Idx320_ErrorNoMovement
 //       sain : 0  |  sinon : si 1 : commande sans mouvement mesuré ; vérifier frein (B_Inputs.Winch.M1_BrakeIsOpen_DI), contacteurs (B_Inputs.Winch.M1_ContactorsReleased_DI) et codeur (B_Inputs.Winch.COD1_SpdValue)
 //   • I_LevageUnitaireM1.Safety_300.Idx324_AscentBlockedByTopLimit
-//       sain : 0  |  sinon : Verifier I_LevageUnitaireM1.Safety_300.Idx323_TopLimitReached
+//       sain : 0  |  sinon : si 1 : montée bloquée par la butée logicielle haute, lire I_LevageUnitaireM1.Safety_300.Idx323_TopLimitReached et I_LevageUnitaireM1.Safety_300.Idx321_CfgTopLimitM ; si Idx323 = 1 et Idx324 = 0 la butée logicielle est shuntée (I_LevageUnitaireM1.Safety_300.Idx325_BypassTopLimitSoftware ou I_LevageUnitaireM1.Safety_300.Idx326_BypassTopLimitSoftCommun) : anormal, faire retirer le shunt par le responsable
 //   • I_LevageUnitaireM1.Control_400.Idx401_MotionAllowed
 //       sain : 1  |  sinon : si 0 : axe neutralisé (mode DISABLE ou inhibé) ou défaut treuil latché ; lire Q_TraceWinchM1.BlockReason (AXIS_DISABLED ou WINCH_FAULT)
 //
@@ -309,7 +309,7 @@ END_VAR
 //   • I_LevageUnitaireM1.Control_400.Idx407_FinalAuthorizedStep
 //       sain : selon contexte  |  sinon : Verifier I_LevageUnitaireM1.Control_400.Idx415_MotorRequest
 //   • I_LevageUnitaireM1.Control_400.Idx416_RestartRequired
-//       sain : 0  |  sinon : 1 pendant 500 ms après chaque arrêt est normal ; bloqué à 1 : demande non revenue au neutre ou frein vu ouvert (B_Inputs.Winch.M1_BrakeIsOpen_DI doit être FALSE à l'arrêt)
+//       sain : 0  |  sinon : 1 pendant 500 ms après chaque arrêt est normal ; bloqué à 1 : demande non revenue au neutre, frein vu ouvert (B_Inputs.Winch.M1_BrakeIsOpen_DI doit être FALSE à l'arrêt) ou verrou I_LevageUnitaireM1.Control_400.Idx417_RestartInhibit à 1
 //   • I_LevageUnitaireM1.Control_400.Idx417_RestartInhibit
 //       sain : 0  |  sinon : si 1 : confirmation frein absente ; vérifier B_Inputs.Winch.M1_BrakeIsOpen_DI, acquitter (Reset conscient), revenir au neutre puis nouvelle demande
 //   • Q_TraceWinchM1.FinalInterlockError
@@ -347,7 +347,7 @@ END_VAR
 //   • O_MotionM2.Step2_ModeAuthorized
 //       sain : TRUE  |  sinon : Vérifier le mode actif, ne doit pas être DISABLE
 //   • O_MotionM2.Step4_MotionRequested
-//       sain : TRUE  |  sinon : Vérifier la demande active (bouton IHM ou joystick) et SpeedCmd_Pct, et TglJoystickMaster à 0 si commande IHM
+//       sain : TRUE  |  sinon : si FALSE malgré la demande : étape 5 Demande ; les boutons IHM ne sont pris en compte qu'en mode boutons (A_ContexteMachineGlobal.Idx201_JoystickSelected = 0)
 //   • O_MotionM2.Step5_NoSafetyFault
 //       sain : TRUE  |  sinon : si FALSE : lire J_LevageUnitaireM2.Safety_300.Idx302_SafeStopActive, B_Inputs.Winch.M2_ThermalOk_DI et B_Inputs.Winch.M2_TensionedCable_DI (mou de câble lu brut, même si son bypass est actif)
 //   • R_TraceWinchM2.BlockReason
@@ -387,11 +387,11 @@ END_VAR
 //   • J_LevageUnitaireM2.Demandes_200.Idx207_BypassOperatorComm
 //       sain : 0  |  sinon : si 1 : défaut de communication joystick ou IHM ignoré sur M2 ; faire retirer le bypass par le responsable
 //   • J_LevageUnitaireM2.Safety_300.Idx325_BypassTopLimitSoftware
-//       sain : 0  |  sinon : 1 = butée logicielle shunée, à remettre à 0
+//       sain : 0  |  sinon : si 1 : butée logicielle haute ignorée pour M2, seul le fin de course haut physique arrête la montée ; anormal, faire retirer le shunt par le responsable
 //   • J_LevageUnitaireM2.Safety_300.Idx327_BypassTopLimitSwitch
-//       sain : 0  |  sinon : 1 = fin de course haut shuné, à remettre à 0
+//       sain : 0  |  sinon : si 1 : fin de course haut physique ignoré pour M2, seule la butée logicielle (M2 référencé) arrête la montée ; anormal, faire retirer le shunt par le responsable
 //   • J_LevageUnitaireM2.Safety_300.Idx329_BypassGlobal
-//       sain : 0  |  sinon : 1 = bypass global treuil, à remettre à 0
+//       sain : 0  |  sinon : si 1 : les causes de sécurité de l'axe M2 ne sont plus évaluées et la surveillance contacteurs et synchro M1+M2 est neutralisée ; anormal, faire retirer le bypass par le responsable avant toute exploitation
 //
 // ▶ Étape 5 · Demande — Quelle demande est réellement arbitrée pour M2 ?
 //   • J_LevageUnitaireM2.Demandes_200.Idx203_HmiManualCmd_BtnAscent
@@ -409,7 +409,7 @@ END_VAR
 //
 // ▶ Étape 6 · Sécurité axe — La sécurité de l'axe M2 bloque-t-elle le mouvement ?
 //   • J_LevageUnitaireM2.Safety_300.Idx302_SafeStopActive
-//       sain : 0  |  sinon : 1 = arrêt rapide métier actif
+//       sain : 0  |  sinon : si 1 : lire R_TraceWinchM2.SafeStopSourceSafety, R_TraceWinchM2.SafeStopSourceInput et R_TraceWinchM2.SafeStopSourceSync pour l'origine
 //   • J_LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive
 //       sain : 0  |  sinon : 1 = coupure puissance sécurité
 //   • J_LevageUnitaireM2.Safety_300.Idx320_ErrorNoMovement
@@ -431,7 +431,7 @@ END_VAR
 //   • T_Permits.EffectivePermitM2_Descend
 //       sain : selon contexte  |  sinon : Permis effectif descente
 //   • T_Permits.M2FinalPermitBlocked
-//       sain : FALSE  |  sinon : Si TRUE, un permis manque, voir les lignes ci-dessus
+//       sain : FALSE  |  sinon : si TRUE : une demande est présente mais le permis effectif du sens demandé manque ; lire T_Permits.EffectivePermitM2_Ascent ou T_Permits.EffectivePermitM2_Descend
 //   • PRG_04_Treuils_Benne.SafetyPermitM2_Ascent
 //       sain : selon contexte  |  sinon : si FALSE en demande de montée : permis sécurité refusé (fin de course haut, capteur haut commun ou butée logicielle) ; lire B_Inputs.Winch.M1M2_TopPositionFree_DI et J_LevageUnitaireM2.Safety_300.Idx323_TopLimitReached
 //
@@ -439,13 +439,13 @@ END_VAR
 //   • J_LevageUnitaireM2.Control_400.Idx404_BrakeReleaseAuthorized
 //       sain : selon contexte  |  sinon : 1 = ordre ouverture frein, 0 = ordre serrage
 //   • J_LevageUnitaireM2.Control_400.Idx405_FinalInterlockState
-//       sain : selon contexte  |  sinon : État frontière, lire aussi Idx406_FinalInterlockReason
+//       sain : READY ; WAIT_BRAKE_COMMAND_CONFIRMATION, WAIT_STEP_DELAY, WAIT_SENSE_DROP_CONFIRM et WAIT_RESTART_DELAY sont des attentes courtes  |  sinon : FAULT, DISABLED ou attente qui dure : lire J_LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason
 //   • J_LevageUnitaireM2.Control_400.Idx407_FinalAuthorizedStep
-//       sain : selon contexte  |  sinon : Palier réellement autorisé
+//       sain : selon contexte  |  sinon : 0 alors que J_LevageUnitaireM2.Control_400.Idx415_MotorRequest = 1 : la barrière finale retient le palier ; lire J_LevageUnitaireM2.Control_400.Idx405_FinalInterlockState et J_LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason
 //   • J_LevageUnitaireM2.Control_400.Idx415_MotorRequest
-//       sain : selon contexte  |  sinon : 1 = demande moteur vue par la barrière
+//       sain : selon contexte  |  sinon : 0 malgré une demande : aucun palier ou aucun sens unique n'arrive à la barrière finale ; revenir à l'étape 5 (J_LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct)
 //   • J_LevageUnitaireM2.Control_400.Idx417_RestartInhibit
-//       sain : FALSE  |  sinon : 1 = verrou latché frein non confirmé, exige Reset conscient
+//       sain : FALSE  |  sinon : si 1 : confirmation frein absente ; vérifier B_Inputs.Winch.M2_BrakeIsOpen_DI, acquitter (Reset conscient), revenir au neutre puis nouvelle demande
 //   • R_TraceWinchM2.FinalInterlockError
 //       sain : FALSE  |  sinon : Si TRUE, défaut barrière finale frein ou redémarrage
 //
@@ -499,19 +499,19 @@ END_VAR
 //   • B_Inputs.Translation.M3_PosTremie_DI
 //       sain : selon contexte  |  sinon : 1 = fin de course trémie atteint : sens trémie coupé, recul autorisé
 //   • B_Inputs.Translation.M3_PosPV_DI
-//       sain : selon contexte  |  sinon : Capteur pré-ralentissement : B_Inputs.Translation.M3_PosPV_DI
+//       sain : selon contexte  |  sinon : doit changer au passage du pont ; combinaison impossible avec les autres capteurs : lire L_TranslationPontM3.Safety_300.Idx307_PositionDecoderIncoherent
 //   • B_Inputs.Translation.M3_PosP1_DI
-//       sain : selon contexte  |  sinon : Capteur position P1 : B_Inputs.Translation.M3_PosP1_DI
+//       sain : selon contexte  |  sinon : doit changer au passage du pont ; combinaison impossible avec les autres capteurs : lire L_TranslationPontM3.Safety_300.Idx307_PositionDecoderIncoherent
 //   • B_Inputs.Translation.M3_ThermalOK_DI
 //       sain : TRUE  |  sinon : si FALSE : thermique moteur ou variateur déclenché ; information seule, le variateur se protège lui-même : lire B_Inputs.Translation.M3_StatusWord
 //   • B_Inputs.Translation.M3_StatusWord
-//       sain : selon contexte  |  sinon : Status word AC600 : B_Inputs.Translation.M3_StatusWord
+//       sain : selon contexte  |  sinon : mot d'état du variateur AC600 ; si S_TraceTranslation.DriveOperational = FALSE ou fréquence réelle nulle malgré la consigne : comparer à GVL_IHM.IoHw.Out.M3_CommandWord et lire L_TranslationPontM3.Safety_300.Idx310_ErrorDriveComm
 //   • S_TraceTranslation.DriveOperational
 //       sain : TRUE  |  sinon : si FALSE : variateur AC600 injoignable ; lire B_Inputs.Translation.AC600_DeviceState (RUNNING attendu)
 //
 // ▶ Étape 3 · Mesures traitées — Les mesures traitées confirment-elles le mouvement et la position ?
 //   • L_TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz
-//       sain : selon contexte  |  sinon : Fréquence réelle variateur : L_TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz
+//       sain : selon contexte  |  sinon : fréquence réelle en Hz ; 0 alors que L_TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz est non nul : variateur non démarré, lire B_Inputs.Translation.M3_StatusWord
 //   • L_TranslationPontM3.Safety_300.Idx307_PositionDecoderIncoherent
 //       sain : 0  |  sinon : si 1 : combinaison impossible des 5 capteurs ; lire B_Inputs.Translation.M3_PosTremie_DI, M3_PosPV_DI, M3_PosPVP2_DI, M3_PosP1_DI, M3_PosMaintenance_DI et L_TranslationPontM3.Safety_300.Idx316_ErrorSensorIncoherent
 //
@@ -519,7 +519,7 @@ END_VAR
 //   • L_TranslationPontM3.Demandes_200.Idx208_BypassNetworkActive
 //       sain : 0  |  sinon : ATTENTION ce n'est pas un bypass réseau : 1 = BYPASS GLOBAL M3, toutes les sécurités de la translation sont ignorées ; faire retirer par le responsable avant toute exploitation
 //   • L_TranslationPontM3.Safety_300.Idx306_BypassLimitSwitch
-//       sain : 0  |  sinon : si 1 : fins de course trémie et maintenance shuntés, et blocage process trémie levé ; faire retirer le shunt par le responsable
+//       sain : 0  |  sinon : si 1 : blocage process trémie levé dans tous les modes, fins de course trémie et maintenance shuntés en MAINT_N2 ; anormal, faire retirer le shunt par le responsable
 //   • S_TraceTranslation.HeightInterlockBlocking
 //       sain : FALSE  |  sinon : si TRUE : M1 ou M2 sous la hauteur mini de translation, ou codeur non fiable ; lire I_LevageUnitaireM1.Inputs_100.Idx102_CablePos_M, J_LevageUnitaireM2.Inputs_100.Idx102_CablePos_M, PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable et PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable
 //
@@ -531,9 +531,9 @@ END_VAR
 //   • L_TranslationPontM3.Demandes_200.Idx205_HmiTargetPosition
 //       sain : selon contexte  |  sinon : 1 = Trémie, 2 = P2, 3 = P1 ; en SEMI_AUTO la cible vient du cycle (L_TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition)
 //   • L_TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct
-//       sain : selon contexte  |  sinon : Consigne vitesse : L_TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct
+//       sain : selon contexte  |  sinon : affichée seulement si la commande variateur est émise ; 0 malgré une demande : commande bloquée (hauteur, arrêt rapide, permis), lire S_TraceTranslation.BlockReason
 //   • L_TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz
-//       sain : selon contexte  |  sinon : Consigne fréquence : L_TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz
+//       sain : selon contexte  |  sinon : consigne en Hz avant barrière finale ; non nulle mais L_TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz à 0 : barrière finale ou frein, étape 8
 //   • P_MotionM3.RequestedDirection
 //       sain : selon contexte : valeurs publiées par la vue : 1 = vers trémie, 0 = vers maintenance, -1 = aucun sens actif (codage particulier, ne pas lire comme montée ou descente)  |  sinon : comparer au bouton ou à la déflexion demandés (étape 5) ; P_MotionM3.Step6_DirectionAllowed lit le permis trémie si 1, sinon le permis maintenance
 //   • L_TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition
@@ -557,7 +557,7 @@ END_VAR
 //   • T_Permits.EffectivePermitM3_Tremie
 //       sain : selon contexte  |  sinon : si FALSE en demande vers trémie : lire S_TraceTranslation.TremieProcessBlockActive, L_TranslationPontM3.Safety_300.Idx304_LimitSwitchTremieActive et S_TraceTranslation.HeightInterlockBlocking
 //   • T_Permits.EffectivePermitM3_Maintenance
-//       sain : selon contexte  |  sinon : Permis maintenance : T_Permits.EffectivePermitM3_Maintenance
+//       sain : selon contexte  |  sinon : si FALSE en demande vers maintenance : fin de course maintenance atteint (L_TranslationPontM3.Safety_300.Idx305_LimitSwitchMaintenanceActive), arrêt rapide (L_TranslationPontM3.Safety_300.Idx302_SafeStopActive) ou coupure (L_TranslationPontM3.Safety_300.Idx303_PowerCutOffActive)
 //   • T_Permits.M3MotionPermitEffective
 //       sain : TRUE (agrégat sans sens : pas de coupure, pas d'arrêt rapide, hauteur OK, variateur OK, pas de défaut)  |  sinon : si FALSE : lire S_TraceTranslation.BlockReason
 //   • S_TraceTranslation.TremieProcessBlockActive
@@ -565,7 +565,7 @@ END_VAR
 //
 // ▶ Étape 8 · Barrière finale — La barrière finale (frein, redémarrage) laisse-t-elle passer ?
 //   • L_TranslationPontM3.Control_400.Idx404_FinalInterlockState
-//       sain : READY ; ERROR = défaut barrière finale  |  sinon : État frontière : L_TranslationPontM3.Control_400.Idx404_FinalInterlockState
+//       sain : READY ; ERROR = défaut barrière finale  |  sinon : ERROR : défaut barrière finale M3 (frein non confirmé ou redémarrage inhibé) ; lire L_TranslationPontM3.Control_400.Idx405_FinalInterlockReason, L_TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed et B_Inputs.Translation.M3_BrakeIsOpen_DI
 //   • L_TranslationPontM3.Control_400.Idx405_FinalInterlockReason
 //       sain : selon contexte  |  sinon : cause mémorisée, non remise à NONE après acquittement : seule elle ne prouve pas un blocage actif ; la croiser avec L_TranslationPontM3.Control_400.Idx404_FinalInterlockState
 //   • L_TranslationPontM3.Control_400.Idx406_BrakeCommandOpenConfirmed
@@ -573,7 +573,7 @@ END_VAR
 //   • L_TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed
 //       sain : selon contexte  |  sinon : temps écoulé sans confirmation frein ; 500 ms atteint = défaut, L_TranslationPontM3.Control_400.Idx405_FinalInterlockReason passe à BRAKE_COMMAND_NOT_CONFIRMED
 //   • S_TraceTranslation.FinalInterlockError
-//       sain : FALSE  |  sinon : Défaut barrière finale : S_TraceTranslation.FinalInterlockError
+//       sain : FALSE  |  sinon : si TRUE : défaut barrière finale M3 ; lire L_TranslationPontM3.Control_400.Idx405_FinalInterlockReason, L_TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed et B_Inputs.Translation.M3_BrakeIsOpen_DI
 //   • PRG_06_Outputs.M3_TremieHardStopActive
 //       sain : FALSE  |  sinon : si TRUE : demande vers trémie alors que le fin de course trémie est atteint ; sens trémie coupé, recul autorisé
 //
@@ -709,7 +709,7 @@ END_VAR
 //   • K_BenneOuvertureFermeture.Idx302_BucketFaultActive
 //       sain : 0 = Sain ; 1 = Defaut Mouvement Benne  |  sinon : si 1 : lire K_BenneOuvertureFermeture.Idx306_ErrorIdRaw (bit0 configuration, bit1 écart M2/M1, bit2 timeout, bit3 glissement M1, bit4 codeur)
 //   • K_BenneOuvertureFermeture.Idx306_ErrorIdRaw
-//       sain : 0  |  sinon : Bitfield brut FB_Bucket : K_BenneOuvertureFermeture.Idx306_ErrorIdRaw
+//       sain : 0  |  sinon : différent de 0 : bit0 configuration, bit1 écart M2/M1, bit2 timeout, bit3 glissement M1, bit4 codeurs non référencés ; le bit à 1 donne la cause
 //   • K_BenneOuvertureFermeture.Idx106_FBState
 //       sain : READY ou DONE au repos ; BUSY pendant un mouvement benne  |  sinon : BUSY bloque le mouvement M1 (N_MotionM1.Step3_NotBusyOtherTask) ; DISABLED : benne neutralisée
 //
@@ -745,13 +745,13 @@ END_VAR
 //   • G_CycleSemiAuto.Idx204_Error
 //       sain : 0  |  sinon : si 1 : lire G_CycleSemiAuto.Idx205_ErrorId et Idx208_StepAtError
 //   • G_CycleSemiAuto.Idx205_ErrorId
-//       sain : selon contexte  |  sinon : Code d'erreur interne FB_Cycle : G_CycleSemiAuto.Idx205_ErrorId
+//       sain : selon contexte  |  sinon : différent de 0 avec G_CycleSemiAuto.Idx204_Error = 1 : code du défaut actif, à relever avec G_CycleSemiAuto.Idx208_StepAtError
 //   • G_CycleSemiAuto.Idx217_FaultLatched
 //       sain : 0  |  sinon : si 1 : départ de cycle bloqué ; lire G_CycleSemiAuto.Idx218_FaultLatchedId, supprimer la cause puis Reset conscient
 //   • G_CycleSemiAuto.Idx218_FaultLatchedId
-//       sain : selon contexte  |  sinon : Bitfield fige a l'apparition du defaut : G_CycleSemiAuto.Idx218_FaultLatchedId
+//       sain : selon contexte  |  sinon : différent de 0 : bits du défaut latché, à relever avant le Reset conscient (G_CycleSemiAuto.Idx217_FaultLatched)
 //   • G_CycleSemiAuto.Idx208_StepAtError
-//       sain : selon contexte  |  sinon : Etape memorisee lors du dernier defaut : G_CycleSemiAuto.Idx208_StepAtError
+//       sain : selon contexte  |  sinon : étape où le dernier défaut est apparu : reprendre le diagnostic de l'organe actif à cette étape (G_CycleSemiAuto.Idx205_ErrorId)
 //   • G_CycleSemiAuto.Idx306_WinchSyncError
 //       sain : 0  |  sinon : si 1 : lire H_LevageSynchroniseM1M2.Idx302_SyncFaultActive et Idx103_SyncDelta_M
 //   • F_HomingM2.Step4_ContactorsReleased

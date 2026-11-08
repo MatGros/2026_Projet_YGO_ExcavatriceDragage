@@ -285,3 +285,5 @@ gagne) : `NONE` → `POWER_CUTOFF` → `SAFESTOP` → `SAFETY_FAULT` → `HEIGHT
 - [AF_Partie-06](AF_Partie-06_Acquisition_Qualification_IO_v2.4.md) — Acquisition et qualification IO
 - [AF_Partie-10](AF_Partie-10_Fonction_Winch_v2.1.md) — Fonction treuils
 - [AF_Partie-13](AF_Partie-13_Fonction_Simulation_v2.4.md) — Simulation et diagnostic banc
+- 🧭 Guide de dépannage lisible dans CODESYS : `CODE/J_SUPERVISION/FB_TroubleshootingGuide.st` — quoi lire dans le snapshot, dans quel ordre, valeur saine et renvoi, par axe en 10 étapes ; chemins contrôlés par le gate G531
+- [Structure du snapshot](../WFLOW/ETUDES/T428_J2_STRUCTURE/STRUCTURE_CIBLE.md) — ordre de lecture général, axes, fonctions
