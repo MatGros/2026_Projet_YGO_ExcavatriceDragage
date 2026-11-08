@@ -5,7 +5,7 @@ tasks:
   criticite: C2
   domaine: DIAGNOSTIC / GVL_TROUBLESHOOTING
   agent: CC01
-  date: '2026-11-08T15:57:38+01:00'
+  date: '2026-11-08T16:05:34+01:00'
   titre: 'Refactor troubleshooting : snapshot lisible comme un flux, par axe, pour mainteneur et agent'
   contexte: 'Demande exploitant 2026-11-06 a la reprise de T213. Trouver la source d''un blocage a partir du seul snapshot,
     rapidement et intuitivement, pour un mainteneur comme pour un agent. Lecture de haut en bas comme un flux : entrees, traitement,
@@ -20,9 +20,11 @@ tasks:
   - J4 implementer la structure, avec table ancien vers nouveau chemin
   - J5 fournir le guide de depannage dans le code, verifie automatiquement
   - J6 valider par une personne sur pannes injectees, puis cloturer
-  avancement: 'J3 EN COURS 2026-11-08 : 24 chemins ajoutes a troubleshooting_variables.txt (571 vers 595, 6 lots), 0 non resolu
-    au controle statique, revue challenge DeepSeek + gpt-oss sans ajout faux ; snapshot simu (0 KO, duree) REPORTE par l''exploitant
-    2026-11-08, a faire avant cloture J3. J2 DECIDE 2026-11-08 (GO J3 exploitant) : DOC/WFLOW/ETUDES/T428_J2_STRUCTURE/STRUCTURE_CIBLE.md,
+  avancement: 'J4 LISTE SEULE 2026-11-08 (choix exploitant) : troubleshooting_variables.txt reordonnee selon la table J2,
+    595 vers 438 chemins, 5 lots, 38 blocs, 0 non resolu, rien dans CODE. Snapshot simu commun J3+J4 a faire (attendu 438/438).
+    J3 EN COURS 2026-11-08 : 24 chemins ajoutes a troubleshooting_variables.txt (571 vers 595, 6 lots), 0 non resolu au controle
+    statique, revue challenge DeepSeek + gpt-oss sans ajout faux ; snapshot simu (0 KO, duree) REPORTE par l''exploitant 2026-11-08,
+    a faire avant cloture J3. J2 DECIDE 2026-11-08 (GO J3 exploitant) : DOC/WFLOW/ETUDES/T428_J2_STRUCTURE/STRUCTURE_CIBLE.md,
     571 vers 424 variables, 147 retraits proposes, 16 ajouts J3, 8 a recabler J4, controles 11/11, revue a la source, rejeu
     papier sans gain (0 cause, 3 maillons sur 15), rien dans CODE. Defauts de vue trouves : sorties frein et M3 fausses, hard
     stop M3 invisible, permis Safety faux. J1 VALIDE EXPLOITANT 2026-11-08 : lot 1 commit 8ac56593, essais demandes faits

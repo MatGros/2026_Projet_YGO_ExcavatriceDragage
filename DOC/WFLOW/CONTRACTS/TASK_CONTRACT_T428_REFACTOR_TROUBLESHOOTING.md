@@ -117,6 +117,8 @@ Chaque jalon s'arrête sur une validation humaine. Pas de jalon suivant sans GO.
 | **Évaluation** | Tous les gates PASS ; 0 changement d'ordre machine ; 0 chemin orphelin |
 | **Arrêt** | GO humain avant écriture et avant commit |
 
+**État au 2026-11-08 : variante « liste seule » choisie par l'exploitant, liste réordonnée.** Voir [J4_LISTE](../ETUDES/T428_J2_STRUCTURE/J4_LISTE.md). 595 vers 438 chemins, 5 lots, ordre du flux en 38 blocs, 0 chemin non résolu, aucun changement dans `CODE/`. Reste : un snapshot en simulation, attendu 438/438.
+
 ### J5 — Guide de dépannage dans le code
 
 | | |
