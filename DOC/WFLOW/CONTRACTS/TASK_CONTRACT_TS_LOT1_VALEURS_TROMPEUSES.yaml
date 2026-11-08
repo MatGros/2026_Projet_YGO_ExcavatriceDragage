@@ -144,7 +144,7 @@ contract:
     consommateur non recense, Safety.CableLimitAscent different de la butee reelle,
     harnais CI de la vue non compilable (T372). Signaler n'est pas elargir le scope.
 
-status: IN_PROGRESS
+status: COMPLETED
 
 tracking:
   user_need: >
@@ -192,6 +192,9 @@ execution:
     vues se mettre a jour, dont Idx323 TRUE en haut. Le tableau de test complet et
     le geste habituel (AC8) ne sont pas confirmes. Aucun test sur machine reelle.
     Rejeu a l'aveugle (AC9) non fait.
+    2026-11-08 : l'exploitant declare avoir fait les essais demandes en J1 et
+    valide le lot. Aucun test sur machine reelle. Rejeu a l'aveugle (AC9) reste
+    a faire par l'orchestrateur.
   evidence_submitted:
     - "G200 --report : PASS, 0 erreur"
     - "Palier C : 9 echecs, 8 preexistants et G523 en faux positif"
@@ -199,9 +202,9 @@ execution:
     - "Revue A/B : aucun bloquant retenu"
 
 validation:
-  status: PENDING
-  validated_by: ""
-  validated_at: ""
+  status: APPROVED
+  validated_by: "HUM"
+  validated_at: "2026-11-08T11:28:28+01:00"
   notes: >
     Point d'arret : relecture humaine du contrat et GO d'implementation avant
     toute ecriture dans CODE/. Aucune tache catalogue creee a ce stade.

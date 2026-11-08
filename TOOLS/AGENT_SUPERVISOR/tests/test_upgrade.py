@@ -5,6 +5,16 @@ import pytest
 from TOOLS.AGENT_SUPERVISOR.scripts import upgrade_legacy as upgrade
 
 
+def test_stable_sessions_ignores_only_added_legacy_workflow_defaults():
+    alert = {'id': 'a1', 'fingerprint': 'f1', 'reason': 'text', 'evidence': 'quote'}
+    old = {'sessions': [{'id': 's1', 'alerts': [alert]}]}
+    new_alert = dict(alert, workflow=dict(upgrade.LEGACY_ALERT_WORKFLOW))
+    new = {'sessions': [{'id': 's1', 'alerts': [new_alert]}]}
+    assert upgrade.stable_sessions(old) == upgrade.stable_sessions(new)
+    changed = {'sessions': [{'id': 's1', 'alerts': [dict(new_alert, reason='changed')]}]}
+    assert upgrade.stable_sessions(old) != upgrade.stable_sessions(changed)
+
+
 def test_upgrade_backs_up_before_stop_and_restores_chat(tmp_path, monkeypatch):
     monkeypatch.setenv('LOCALAPPDATA', str(tmp_path))
     messages = [{'role':'user','text':'conversation à préserver','created_at':'2026-11-04T00:00:00Z'}]

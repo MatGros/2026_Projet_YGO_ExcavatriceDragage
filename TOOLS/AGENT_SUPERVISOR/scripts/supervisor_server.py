@@ -16,7 +16,7 @@ except ImportError:
 UI = Path(__file__).resolve().parents[1] / 'ui' / 'index.html'
 SCRIPT_DIR = Path(__file__).resolve().parent
 BUILD_FILES = (Path(__file__), SCRIPT_DIR / 'supervisor_service.py', SCRIPT_DIR / 'session_watcher.py',
-               SCRIPT_DIR / 'platform_adapters.py', SCRIPT_DIR / 'dsh_session_watcher.py',
+               SCRIPT_DIR / 'platform_adapters.py', SCRIPT_DIR / 'agent_chat.py', SCRIPT_DIR / 'dsh_session_watcher.py',
                SCRIPT_DIR / 'dsh_zstd_decode.mjs')
 
 
