@@ -41,27 +41,35 @@ challengés sans suspendre les travaux indépendants. Aucun commit/push autoris�
 
 **Suivi d'exécution courant :**
 
-**Point de reprise :** la fiche structurée facultative est raccordée au service et à l'interface ;
-les missions initiales existantes ont été vérifiées sur copie. Le service modifié conserve un
-constat clos et crée un constat lié seulement sur événement ultérieur vérifié ; cas ambigu signalé.
-La fiche actuelle est exclue du jugement historique pour éviter un GO rétroactif. Suite intégrée
-Python : 91 PASS ; DOM normal PASS, plugin 15 PASS. Ces preuves ne remplacent pas la recette visuelle,
-les notifications réelles ni la mesure générale de pertinence. Les modifications service récentes
-ne sont pas encore chargées sur 8082 : `update_available=true`. Le lot UI d'états repliés est encore
-en cours chez `implementation_interface`. Après sa remise : relire le diff, lancer les contrôles
-adaptés, mettre à jour le service avec sauvegarde, puis vérifier la recette et les limites restantes.
+**Point de situation :** le service Superviseur v2 tourne sur `http://127.0.0.1:8082/`, version build
+`04e47d28aade`, `update_available=false`. Deux sessions sont enregistrées en pause :
+1. `CC-T217` (`4819768b-5d7e-4c21-acf7-463ccf2d7093`) : préservée, source vide, 0 alerte.
+2. `t428-refactor-troubleshooting` (`ebe3ca88-d30f-4113-a9eb-51df9de93f4d`, ID interne `d4f1bcd5-6266-42c8-b9c5-e0985a6d30ce`) :
+   restaurée depuis la sauvegarde ciblée `supervision-backups/before_targeted_T428_restore_20261108T232008435.json`.
+   Suivi désactivé, 6 alertes ouvertes (1 non lue), 2 messages de chat, 0 événement au journal,
+   aucune fiche structurée, source non attachée au collecteur (fichier transcript existant sur disque).
+   Consigne stricte : session maintenue en pause, pas de reprise automatique ni de lecture de transcript
+   sans décision explicite et choix du mode de reprise.
 
-Dernier contrôle intégré : suite Python **83 PASS** ; projection du plugin vérifiée sans citation
-brute ni commentaire privé. Paramètres avancés ajoutés et persistance vérifiée ; intégration des
-bornes, requêtes réelles, interface, reprise et réévaluation modèle réel restent à recetter avant
-redémarrage du service utilisateur. Aucun verdict de livraison à ce stade.
+**État de l'interface (`ui/index.html`) :** lot UI d'ergonomie et de compacité intégré et servi
+par 8082. Les états de lecture New / Seen disposent de couleurs distinctes des états de traitement
+Open / Deferred / Closed ; le bandeau de session est compacté avec libellé accessible pour l'état de pause ;
+le journal de session explique que le compteur « 0 » ne décompte ni les alertes ni le chat ; les champs
+de cadrage vides sont explicitement signalés (« À renseigner — champ vide ») et distingués de l'ancienne
+mission texte libre.
 
-**Actualisation runtime :** service 8082 redémarré, build `b92db5ef33fa`,
-`update_available=false` ; deux sessions conservées en pause, six constats T428 et quatre messages
-de chat conservés. Sauvegarde vérifiée sous `supervision-backups/legacy_chat_20261108T215159_555587Z.json`.
-Extension VS Code 0.2.0 installée ; activation dans la fenêtre existante et recette visuelle/toast
-restent à confirmer. Un essai DeepSeek réel sur texte synthétique français a proposé une résolution
-avec citation exacte ; il ne démontre pas la fiabilité générale ni le rattrapage d'une session réelle.
+**Extension VS Code :** paquet `excavatrice-dragage-local.veilleur-vscode@0.2.0` installé dans le profil
+utilisateur VS Code. 15 tests unitaires PASS (`npm test` dans `poc/vscode-notifier`). Validation visuelle
+des toasts, des notifications système, du son et du ciblage d'alerte au clic en attente de test en conditions réelles.
+
+**Contrôles et tests exécutés :**
+- Suite Python superviseur : **91 PASS** (`py -3.13 -m pytest TOOLS/AGENT_SUPERVISOR/tests`)
+- Tests DOM interface : **PASS** (`node TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs`)
+- Test lien profond interface : **PASS** (`VEILLEUR_UI_DEEP_LINK=1 node TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs`)
+- Tests extension VS Code : **15 PASS** (`npm test` sous `TOOLS/AGENT_SUPERVISOR/poc/vscode-notifier`)
+- Format git : **PASS** (`git diff --check`)
+- Checkpoint Git : `cfcae6bc wip(agent-supervisor): checkpoint current work [NON TESTE]`. Fichiers modifiés
+  non committés sur `ui/index.html`, `test_ui.mjs` et ce plan. Aucun commit ni push sans accord explicite.
 
 **Recette Claude isolée :** session neuve `f8644eb0-0ad8-4052-9b83-dcf41e3bb801`, CLI sans
 outils, stockage de superviseur temporaire distinct. Collecte active : deux messages observés,
@@ -81,9 +89,9 @@ ne constituent pas une mesure générale de fiabilité.
 | Lot | État et preuve courante |
 |---|---|
 | Provenance des événements | Correction du lecteur : preuves outils distinctes des consignes humaines, rapports délégués sans autorité, résumés rejoués exclus ; cinq tests ciblés PASS |
-| Service/cycle | Implémentation déléguée en cours ; projection unique états/compteurs, commentaires, réévaluation et reprise à intégrer/recetter |
-| Interface | Lot produit, tests DOM normal et lien ciblé PASS ; rendu et essais service intégrés attendus |
-| Plugin | Lot 0.2 produit en cours de remise ; paquet préparé, installation et recette réelle attendues |
+| Service/cycle | Implémentation v2 active sur 8082 (build `04e47d28aade`, 91 tests pytest PASS) ; continuité, injection, déduplication et reprise normale/historique restent à recetter sur parcours réels |
+| Interface | Lot produit, intégré et servi par 8082 ; tests DOM normal et deep link PASS ; rendu visuel navigateur et clic plugin attendus |
+| Plugin | Extension 0.2.0 installée dans VS Code ; 15 tests unitaires PASS ; toast, notification bureau, son et ouverture ciblée d'alerte à valider en conditions réelles |
 | Campagne modèle réel | DeepSeek v4.1 via Ollama, consentement cloud existant confirmé ; dix cas français, cinq T428 et cinq variantes synthétiques, verdicts/citations attendus 10/10 avec ancien et nouveau prompt. Aucun gain du prompt démontré ; ce corpus ne valide pas le cycle du service |
 
 Preuves modèle : [réglage six cas](AGENT_SUPERVISOR_CAMPAGNE_FR_TUNING_V1_20261108.json),
@@ -147,7 +155,7 @@ sémantique définitif sur T428.
 | F0 — Référence (J0) | Relire diff préexistant, service/build, état sauvegardé, plan/contrat ; challenge indépendant alertes et parcours | Périmètre, preuve de départ et anomalies hors lot listés ; travail préexistant préservé |
 | F1 — Continuité (J1/J3) | Recetter reprise normale/historique, arrêt/redémarrage, source déplacée/worktree, checkpoint absent, delta croissant ; corriger les lacunes démontrées | Identité exacte conservée ; aucune perte ou saut silencieux ; choix, volume, plage lue et plage analysée visibles ; timeout rejouable sans doublon de constat |
 | F2 — Cycle et cadrage (J3) | Intégrer décisions humaines et cadrage versionné aux analyses normales et historiques ; mettre à jour/regrouper les constats sur le même problème | Pivot utilisateur pris en compte ; progression normale non accusée ; ancienne décision conservée ; fait nouveau cité pour toute réouverture ; absence d'analyse distinguée de « aucun écart détecté » |
-| F3 — Interface et plugin (J2) | Simplifier actions, uniformiser états/compteurs, deux sévérités et titres anglais courts ; textes français directs, factuels, emojis ; repli des panneaux et autres sessions | IHM et plugin donnent mêmes comptes pour même révision ; état pause/lecture/panne visible en menu et carte repliée ; texte complet accessible sans coupure droite ; notification ouvre bonne session/alerte |
+| F3 — Interface et plugin (J2) | Simplifier actions, uniformiser états/compteurs, deux sévérités et titres anglais courts ; textes français directs, factuels, concis, TDAH-friendly, emojis et puces ; compacter les bandeaux session en compteurs icône+nombre ; colorer séparément traitement, lecture New/Seen et avis du juge ; séparer résumé et détails sans répétition ; repli des panneaux et autres sessions | IHM et plugin donnent mêmes comptes pour même révision ; pause/lecture/panne visibles sans gonfler l'en-tête ; libellés complets accessibles au survol ; couleurs sémantiquement distinctes pour Open/Deferred/Closed, New/Seen et l'avis du juge ; constats parcourables, faits et limites distincts, texte complet accessible sans coupure ni duplication ; notification ouvre bonne session/alerte |
 | F4 — Recette comparée (J4) | Petit corpus français, comparaison A/B et essais des parcours réels ; bilan avant activation | Résultats par cas, FP/FN, citations, doublons, délai/coût ; limites et échecs publiés ; aucune généralisation depuis des tests simulés |
 
 En F3, proposition issue du challenge : états métier **Open / Deferred / Closed**, lecture
@@ -195,6 +203,17 @@ besoin explicite, pas un simple remplacement par une copie manuelle.
 Format proposé : `⚠️ Warning — <titre court>` puis une ou deux phrases indiquant **fait observé →
 écart à vérifier**, citation exacte et limite consultables en dépliant. Un aperçu court porte une
 ellipse explicite et ouvre le texte complet. Ne jamais fabriquer la fin d'un motif déjà tronqué.
+
+**Style des constats et événements — retour utilisateur :** les paragraphes actuels sont trop
+compacts et difficiles à parcourir. Le superviseur rédige en français, de façon concise et
+TDAH-friendly, avec emoji de repérage et puces lorsque plusieurs faits sont à distinguer. Structure
+visée : titre court ; résumé d'une ligne ; puis quelques puces séparant fait cité, écart ou doute,
+preuve manquante/contraire et vérification proposée. Garder les citations exactes et les limites,
+sans transformer une absence de preuve en accusation. Ne pas répéter le même long motif dans
+l'aperçu de l'événement et dans chaque section détaillée : résumé et détail ont des rôles distincts.
+Recetter le rendu avec un constat réel long comme « Réussite sans preuve » : lecture immédiate du
+point, faits en puces, citation complète accessible au dépliage, aucune duplication monolithique.
+
 Panne collecteur/modèle, source absente et contexte partiel sont des états techniques visibles,
 jamais des Alarm métier. Configuration modèles/contexte et sections historiques sont repliables.
 Afficher valeurs effectives, plages/omissions et requête du juge ; ne pas réduire la qualité à la
@@ -290,6 +309,13 @@ migration non destructive de la mission texte existante : contenu intégral cons
 à vérifier, aucune attribution automatique d'un champ ambigu. Réduire l'encombrement avec sections
 repliables et un résumé utile dans la carte ; saisie manuelle et bloc structuré existants conservés.
 
+**Clarté des champs vides — retour utilisateur :** la fiche doit être visiblement distincte de la
+mission texte existante, même si celle-ci contient déjà une ligne « Tâche / sujet ». Si la fiche est
+vide, afficher « À renseigner — champ vide » et expliquer qu'elle est facultative et n'est pas
+recopiée automatiquement depuis la mission texte. Ne jamais présenter la mission existante comme
+si elle avait rempli les champs structurés. Recetter avec une mission texte non vide et une fiche
+vide, puis avec une fiche partiellement renseignée.
+
 **Challenge et recette à prévoir avant de figer les champs :** reviewer indépendant examine missions
 courtes, tâches/sous-objectifs multiples, session sans tâche, pivot humain, validation partielle et
 ancienne fiche libre. Un autre contrôle l'ergonomie et la migration. Tester conservation exacte du
@@ -304,6 +330,11 @@ pouvoir les citer dans le chat du superviseur. Les constats possèdent déjà un
 référence aux événements pertinents (message source, changement de cadrage, décision/commentaire,
 révision de constat, tentative de livraison, pause/reprise). Ne pas attribuer un nouvel événement
 au simple rafraîchissement de l'interface.
+
+**Clarté du journal dans l'IHM — retour utilisateur :** nommer le panneau « Journal de session » et
+expliquer que ses références permettent de citer des messages, décisions, pivots et envois dans le
+chat Supervisor. Son compteur compte uniquement les événements journalisés, jamais les alertes ni
+les messages du chat ; l'état vide doit le dire et renvoyer aux panneaux correspondants.
 
 Conserver une identité interne stable et une référence courte affichable/copiable, reliées à
 l'affectation, la plateforme et la conversation exacte. Une révision conserve l'ID du constat et
