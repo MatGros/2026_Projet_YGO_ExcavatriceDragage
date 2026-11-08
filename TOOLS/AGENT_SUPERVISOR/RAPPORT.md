@@ -1,5 +1,64 @@
 # Veilleur — rapport courant
 
+## Plan principal actualisé — 8 novembre 2026
+
+Cette actualisation complète J2 (interface), J3 (cycle des constats) et J4 (preuve réelle)
+du plan J0–J4. Elle ne clôture pas les réserves précédentes. Le point 5 du 6 novembre,
+fondé sur les messages CLI avec ACK et choix séquentiels, décrit l'approche précédente :
+le nouveau canal de notification doit informer sans attendre une décision sur une autre alerte.
+
+**Retour utilisateur acquis :** cloche et compteur par session, couleurs des étiquettes et des
+avertissements visuellement validés sur son essai. Cela ne valide pas la livraison au chat.
+
+**Travaux liés à conserver au plan :** distinguer non-lu et à suivre ; montrer lecture active,
+pause et échec d'envoi dans le menu et les cartes repliées ; rendre cohérentes clôture et file
+d'attente ; réexaminer et requalifier les constats avec nouvelles citations, historique et
+décisions humaines ; regrouper les répétitions ; ajouter la famille « Changement de cadrage »
+sans assimiler automatiquement lot et jalon. Ces évolutions restent à implémenter et vérifier.
+
+### Mini-lot intégré : notifications VS Code indépendantes des CLI
+
+**But :** une entrée Veilleur dans la barre du bas, un clic pour consulter les détails,
+et des notifications non modales pour les nouveaux événements pertinents. Le format de bilan
+commun couvre les sessions Claude, Antigravity, Codex et DSH présentes dans Veilleur ; cela
+ne constitue pas une validation de leur collecte réelle ni de l'injection dans leurs chats.
+
+| Étape | Livrable / périmètre | Preuve attendue | Avancement |
+|---|---|---|---|
+| N1 — Étude et challenge | API VS Code officielles, deux revues indépendantes, sémantique des comptes, frontière des actions et identité plateforme + UUID + affectation Veilleur | Proposition compacte et limites documentées ; distinguer notification utilisateur et contexte fourni au modèle | Recherche et challenge faits ; périmètre v1 proposé ci-dessous |
+| N2 — Implémentation | Extension autonome sous `TOOLS/AGENT_SUPERVISOR/poc/vscode-notifier/`, lecture du service local, barre d'état et liste de détails, ouverture ciblée de l'IHM, réglages propres de notification | Statuts et comptes cohérents avec une projection commune du service ; erreur de connexion explicite ; aucun appel de CLI ou modèle | Non démarrée |
+| N3 — POC isolé | Extension Development Host, sans installation globale ; instantané réel T428 et événements synthétiques clairement TEST pour les quatre plateformes | Compte et session corrects, clic vers la bonne destination, zéro faux événement écrit dans les sessions réelles | Non démarré |
+| N4 — Test réel et livraison | Une courte campagne sur l'Extension Host : affichage, notification et clic ; changements répétés ; panne puis retour du service | Trois scénarios ci-dessous, résultat observé et limites ; revue du diff et du rendu ; paquet utilisable et notice | Non démarrée |
+
+**Actions v1 proposées après challenge :** consulter les sessions et leurs constats, ouvrir
+Veilleur au bon endroit, actualiser, régler ou tester les notifications du plugin.
+Les décisions « Vu », « Traité », « Reporter », « Faux positif » restent dans l'IHM pour ce
+premier lot ; leur ajout au plugin dépend de la cohérence du cycle et de l'API commune.
+Fermer un toast ou consulter un détail n'acquitte ni ne clôture une alerte. Le plugin ne pilote
+pas les agents. Une notification visuelle ne signifie pas que le modèle a reçu le bilan.
+
+**Trois scénarios de recette, définis avant implémentation :**
+
+1. **État et navigation :** T428 réelle, lecture active puis état de pause synthétique ; comptes
+   à suivre visibles même avec zéro non-lue ; clic depuis la barre/notification vers la bonne
+   session. Vérifier aussi deux UUID identiques sur deux plateformes dans les données TEST.
+2. **Nouvel événement :** notification VS Code observée, détail accessible, même instantané
+   répété sans doublon ; avertissement/alarme identifiables ; aucun tour LLM, aucune commande
+   CLI et aucune action sur les conversations pendant ces notifications.
+3. **Disponibilité :** source TEST interrompue puis rétablie ; état « indisponible / données
+   périmées », sans faux zéro ni nouvelle alerte métier ; reprise propre. Documenter que les
+   notifications cessent lorsque VS Code ou l'extension est fermé.
+
+Vérifier les fichiers modifiés avant/après chaque étape ; conserver le travail préexistant.
+Les sources du plugin restent dans l'outil ; les scratchs vont au temp système, les preuves
+durables éventuelles sous `DOC/WFLOW/`. Aucun changement PLC, hooks, skills ou configuration
+des CLI ; aucun commit/push ni installation globale dans ce mini-lot sans accord correspondant.
+
+Sources d'étude : [API VS Code](https://code.visualstudio.com/api/references/vscode-api),
+[barre d'état](https://code.visualstudio.com/api/ux-guidelines/status-bar),
+[notifications](https://code.visualstudio.com/api/ux-guidelines/notifications).
+Le mod UI natif Claude reste une option spécifique distincte du socle commun VS Code.
+
 ## État au 6 novembre 2026 — intégration en cours
 
 | Axe | Réalisation | État vérifié / limite |
@@ -123,3 +182,24 @@ Le service v2 charge le build `90fef02bb4f9`, `update_available=false`, collecte
 1 affectation conservee en pause et 4 messages de chat conserves. La sauvegarde reste sous
 `%LOCALAPPDATA%/ExcavatriceDragage/supervision-backups/`. Preference UI a retenir : menu lateral
 plus moderne/agreable; harmoniser les panneaux avec cette direction lors de la prochaine revue visuelle.
+
+## État de la demande alerte/chat — 7 novembre 2026
+
+| Élément | État |
+|---|---|
+| Repères de session | Implémentés : même symbole coloré dans la carte et le menu ; les cartes non sélectionnées sont repliées. |
+| Titre de la vue | Corrigé : « 🛡️ Veilleur — Supervision des conversations ». |
+| Trajet dynamique | Le détail de l’étape Résultat affiche la session sélectionnée, la livraison, le choix utilisateur et la réponse courte de l’agent. |
+| Message d’alerte | Implémenté : criticité, titre court, description, citation, consigne de réponse en une ligne et attente du choix utilisateur. |
+| Choix utilisateur | Implémenté dans l’IHM et par réponse 1, 2 ou 3 dans le chat observé. Le choix 1 demande un motif, le 3 une condition. Une seule alerte attend un choix par session. |
+| Choix 2 | Implémenté : demande une contre-analyse courte, sans outils ni modification ; réponse affichée séparément de la décision utilisateur. |
+| Envoi CLI | Adaptateurs Claude Code et Antigravity ajoutés. UUID ciblé et réponse du CLI vérifiés. Cela confirme l’ajout d’un tour à l’historique, pas le rafraîchissement de la fenêtre déjà ouverte. |
+| DSH et Codex | DSH reporté ; aucun adaptateur d’envoi validé pour DSH ou Codex. |
+
+**Encore à valider sur de vrais chats synthétiques :** réception dans le bon UUID Claude et AGY, choix 1/2/3 par le chat et l’IHM, visibilité dans le CLI actif, pause/reprise et absence de doublon. Aucun message n’a été envoyé à une conversation réelle pendant cette phase.
+
+**Limites fonctionnelles restantes :** le Veilleur ne déclenche pas encore la reprise de l’analyse au moment où la condition du choix 3 devient vraie. Les envois en attente sont restaurés après redémarrage lorsque la session est reprise ; un envoi interrompu devient « résultat incertain » et demande une relance manuelle pour éviter un doublon. La déduplication anti-boucle après pivot utilisateur reste à challenger. Le marqueur commun de favicon pour Task Viewer et Veilleur reste à faire.
+
+**Contrôles exécutés :** 54 tests Python Veilleur PASS ; test DOM/UI PASS ; py_compile PASS ; git diff --check PASS. Les aides des CLI Claude et Antigravity confirment les options de session utilisées, mais ne remplacent pas l’essai de réception dans une session synthétique.
+
+Redemarrage du 7 novembre : build bb35ac048550 actif sur 8082, update_available=false. Deux affectations en pause, l alerte T428 et les 4 messages du chat sont conserves. Sauvegarde verifiee : C:\Users\ZEDVICTUS\AppData\Local\ExcavatriceDragage\supervision-backups\legacy_chat_20261107T015325_988080Z.json. Le premier controle a releve a tort le champ workflow ajoute aux anciennes alertes ; le comparateur est corrige et couvert par un test.

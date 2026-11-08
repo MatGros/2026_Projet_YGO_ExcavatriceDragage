@@ -16,6 +16,24 @@ from urllib.request import Request, urlopen
 
 BASE = 'http://127.0.0.1:8082'
 RECOVERY = {'stopped': False, 'pid': None, 'token': None, 'was_running': False}
+LEGACY_ALERT_WORKFLOW = {'status': 'legacy', 'delivery_status': 'not_sent', 'choice': None,
+                         'rationale': '', 'chosen_at': None, 'response': ''}
+
+
+def stable_sessions(snapshot):
+    """Compare retained user data while ignoring only the v2 default added to legacy alerts."""
+    keys = ('id', 'platform', 'native_id', 'alias', 'mission', 'initial_mission', 'alerts', 'chat_messages', 'memory')
+    result = []
+    for item in snapshot.get('sessions', []):
+        saved = {key: item.get(key) for key in keys}
+        saved['alerts'] = []
+        for alert in item.get('alerts', []):
+            normalized = dict(alert)
+            if normalized.get('workflow') == LEGACY_ALERT_WORKFLOW:
+                normalized.pop('workflow')
+            saved['alerts'].append(normalized)
+        result.append(saved)
+    return sorted(result, key=lambda item: item['id'])
 
 
 def get(path):
@@ -88,9 +106,6 @@ def main():
     if json.loads(backup.read_text(encoding='utf8')) != saved:
         raise RuntimeError('Sauvegarde non vérifiée ; aucun processus arrêté')
     check = get('/api/supervision')
-    keys = ('id', 'platform', 'native_id', 'alias', 'mission', 'initial_mission', 'alerts', 'chat_messages', 'memory')
-    def stable_sessions(snapshot):
-        return sorted(({key: item.get(key) for key in keys} for item in snapshot.get('sessions', [])), key=lambda item: item['id'])
     if listener_pid() != pid or check.get('chat', {}).get('messages') != messages or stable_sessions(check) != stable_sessions(frozen):
         raise RuntimeError('Le serveur ou le chat a changé ; sauvegarde conservée, aucun processus arrêté')
     print(f'Sauvegarde vérifiée : {backup} ({len(messages)} messages).', flush=True)

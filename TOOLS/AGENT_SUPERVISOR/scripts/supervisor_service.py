@@ -1,7 +1,8 @@
-"""Veilleur: explicit-session read-only collector and consultative model worker.
+"""Veilleur: explicit-session collector, consultative judge, and bounded alert messenger.
 
-No task catalogue writes, CLI controls or blocking hooks. Assignments and alerts
-are persisted; observed transcript instructions remain in memory only.
+It never executes project tools or writes project/task files. Outgoing turns are
+restricted to one exact session and no-tool/plan mode; transcript instructions
+remain untrusted input.
 """
 from __future__ import annotations
 
@@ -23,10 +24,16 @@ try:
     from .session_watcher import resolve_jsonl_source
     from .dsh_session_watcher import read_events as read_dsh_events
     from .platform_adapters import normalize, watcher_for
+    from .agent_chat import (DeliveryError, UnsupportedPlatform, choice_message,
+                             deliver as deliver_agent_message, initial_alert_message,
+                             parse_user_choice, stop_claude_background)
 except ImportError:
     from session_watcher import resolve_jsonl_source
     from dsh_session_watcher import read_events as read_dsh_events
     from platform_adapters import normalize, watcher_for
+    from agent_chat import (DeliveryError, UnsupportedPlatform, choice_message,
+                            deliver as deliver_agent_message, initial_alert_message,
+                            parse_user_choice, stop_claude_background)
 
 
 def timestamp():
@@ -338,7 +345,9 @@ class Supervisor:
         self._lock = threading.RLock()
         self._wake = threading.Event()
         self._judge_wake = threading.Event()
+        self._agent_wake = threading.Event()
         self._queue = deque()
+        self._agent_queue = deque()
         self._queued = set()
         self._epoch = 0
         self.load_error = None
@@ -373,6 +382,9 @@ class Supervisor:
                 alerts = value.get("alerts", [])
                 if not isinstance(alerts, list) or len(alerts) > 20 or any(not isinstance(x, dict) or not all(k in x for k in ("id", "fingerprint", "model", "severity", "reason", "evidence", "created_at", "last_occurrence", "occurrences", "disposition", "acknowledged_at")) for x in alerts):
                     raise ValueError("Alertes persistantes invalides")
+                for alert in alerts:
+                    alert.setdefault("workflow", dict(status="legacy", delivery_status="not_sent", choice=None,
+                                                       rationale="", chosen_at=None, response=""))
                 session["alerts"] = alerts
                 self.sessions[sid]["exchange_path"] = str(self._note_path(sid))
             histories = data.get('chat_histories', {})
@@ -580,15 +592,15 @@ class Supervisor:
 
     def command(self, command):
         with self._lock:
-            if command.get("action") not in ("configure", "add", "pause", "resume", "remove", "set_mission", "acknowledge", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
+            if command.get("action") not in ("configure", "add", "pause", "resume", "remove", "set_mission", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
                 return self._command(command)
             backup = (copy.deepcopy(self.sessions), self.model, self.allow_cloud,
-                      self._epoch, deque(self._queue), set(self._queued), copy.deepcopy(self._chat_state), self._chat_epoch, self._chat_pending, copy.deepcopy(self._chat_histories))
+                      self._epoch, deque(self._queue), set(self._queued), copy.deepcopy(self._chat_state), self._chat_epoch, self._chat_pending, copy.deepcopy(self._chat_histories), deque(self._agent_queue))
             try:
                 return self._command(command)
             except Exception:
                 (self.sessions, self.model, self.allow_cloud,
-                 self._epoch, self._queue, self._queued, self._chat_state, self._chat_epoch, self._chat_pending, self._chat_histories) = backup
+                 self._epoch, self._queue, self._queued, self._chat_state, self._chat_epoch, self._chat_pending, self._chat_histories, self._agent_queue) = backup
                 self._chat_state['messages'] = self._chat_histories.setdefault(self._chat_state['session_id'], self._chat_state['messages'])
                 raise
 
@@ -600,7 +612,25 @@ class Supervisor:
             if action == "start":
                 self.running = True
                 if not self._threads:
-                    self._threads = [threading.Thread(target=self._collect_loop, daemon=True), threading.Thread(target=self._judge_loop, daemon=True), threading.Thread(target=self._chat_loop, daemon=True)]
+                    for session in self.sessions.values():
+                        for alert in session.get("alerts", []):
+                            workflow = alert.get("workflow", {})
+                            if workflow.get("delivery_status") == "sending":
+                                workflow.update(delivery_status="delivery_unknown",
+                                                delivery_error="process_restart_during_delivery")
+                            elif workflow.get("delivery_status") == "queued":
+                                choice = workflow.get("choice")
+                                if choice == "2":
+                                    self._queue_agent_turn(session, alert, "choice",
+                                                           choice_message(alert, "2", workflow.get("rationale", "")))
+                                elif choice in ("1", "3"):
+                                    self._queue_agent_turn(session, alert, "choice",
+                                                           choice_message(alert, choice, workflow.get("rationale", "")))
+                                elif workflow.get("status") == "awaiting_choice":
+                                    self._queue_agent_turn(session, alert, "initial", initial_alert_message(alert))
+                        self._activate_next_alert(session)
+                    self._persist_background()
+                    self._threads = [threading.Thread(target=self._collect_loop, daemon=True), threading.Thread(target=self._judge_loop, daemon=True), threading.Thread(target=self._chat_loop, daemon=True), threading.Thread(target=self._agent_message_loop, daemon=True)]
                     for thread in self._threads:
                         thread.start()
             elif action == "stop":
@@ -697,7 +727,7 @@ class Supervisor:
             elif action == "acknowledge":
                 session = self.sessions.get(command.get("id"))
                 disposition = command.get("disposition")
-                allowed = ("seen", "false_positive", "pending", "resolved") if self.strict_assignments else ("seen", "false_positive")
+                allowed = ("seen", "false_positive", "pending", "resolved", "ignored", "deferred") if self.strict_assignments else ("seen", "false_positive", "ignored", "deferred")
                 if not session or disposition not in allowed:
                     raise ValueError("Acquittement invalide")
                 alert = next((a for a in session["alerts"] if a["id"] == command.get("alert_id")), None)
@@ -706,6 +736,57 @@ class Supervisor:
                 alert.update(disposition=disposition, acknowledged_at=timestamp())
                 self._persist()
                 self._write_note(session)
+            elif action == "choose_alert":
+                sid = command.get("id")
+                session = self.sessions.get(sid)
+                if not session:
+                    raise ValueError("Affectation inconnue")
+                alert = next((a for a in session["alerts"] if a["id"] == command.get("alert_id")), None)
+                if not alert:
+                    raise ValueError("Alerte inconnue")
+                choice = str(command.get("choice", ""))
+                rationale = command.get("rationale", "")
+                if not isinstance(rationale, str) or len(rationale) > 500:
+                    raise ValueError("Motif/condition limité à 500 caractères")
+                self._choose_alert(session, alert, choice, rationale.strip(), source="ui")
+                self._persist()
+                self._write_note(session)
+            elif action == "start_alert_workflow":
+                sid = command.get("id")
+                session = self.sessions.get(sid)
+                alert = next((item for item in session["alerts"] if item["id"] == command.get("alert_id")), None) if session else None
+                if not alert or alert.get("workflow", {}).get("status") != "legacy":
+                    raise ValueError("Cette alerte n'est pas une ancienne alerte relancable")
+                workflow = alert.setdefault("workflow", {})
+                if self._pending_choice(session):
+                    workflow.update(status="waiting_turn", delivery_status="waiting_turn")
+                else:
+                    workflow.update(status="awaiting_choice", delivery_status="queued", choice=None,
+                                    rationale="", chosen_at=None, response="", agent_ack="")
+                    self._queue_agent_turn(session, alert, "initial", initial_alert_message(alert))
+                self._persist()
+                self._write_note(session)
+            elif action in ("retry_alert_delivery", "stop_background_and_retry"):
+                sid = command.get("id")
+                session = self.sessions.get(sid)
+                alert = next((a for a in session["alerts"] if a["id"] == command.get("alert_id")), None) if session else None
+                if not alert or alert.get("workflow", {}).get("status") not in ("awaiting_choice", "chosen", "deferred", "ignored"):
+                    raise ValueError("Alerte en attente introuvable")
+                workflow = alert.setdefault("workflow", {})
+                if action == "stop_background_and_retry":
+                    if (session["platform"] != "claude" or workflow.get("delivery_status") != "failed"
+                            or "That session is running in the background" not in workflow.get("delivery_error", "")):
+                        raise ValueError("Arret reserve a une erreur Claude en arriere-plan confirmee")
+                    workflow["stop_background_before_retry"] = True
+                if workflow.get("choice") == "2":
+                    kind, message = "choice", choice_message(alert, "2", workflow.get("rationale", ""))
+                elif workflow.get("choice") in ("1", "3"):
+                    kind, message = "choice", choice_message(alert, workflow["choice"], workflow.get("rationale", ""))
+                else:
+                    workflow["status"] = "awaiting_choice"
+                    kind, message = "initial", initial_alert_message(alert)
+                self._queue_agent_turn(session, alert, kind, message)
+                self._persist()
             elif action == "export_note":
                 session = self.sessions.get(command.get("id"))
                 if not session:
@@ -786,6 +867,107 @@ class Supervisor:
             self._wake.set()
             return self.snapshot()
 
+    @staticmethod
+    def _pending_choice(session):
+        return next((alert for alert in reversed(session.get("alerts", []))
+                     if alert.get("workflow", {}).get("status") == "awaiting_choice"
+                     or (alert.get("workflow", {}).get("status") == "chosen"
+                         and alert.get("workflow", {}).get("choice") == "2"
+                         and alert.get("workflow", {}).get("delivery_status") in ("queued", "sending"))), None)
+
+    def _queue_agent_turn(self, session, alert, kind, message):
+        workflow = alert.setdefault("workflow", {})
+        workflow.update(delivery_status="queued", delivery_kind=kind, delivery_error=None,
+                        delivery_message=message, delivery_started_at=None)
+        self._agent_queue.append((session["id"], alert["id"], kind, message))
+        self._agent_wake.set()
+
+    def _activate_next_alert(self, session):
+        if self._pending_choice(session):
+            return
+        waiting = next((alert for alert in session.get("alerts", [])
+                        if alert.get("workflow", {}).get("status") == "waiting_turn"), None)
+        if waiting:
+            waiting.setdefault("workflow", {})["status"] = "awaiting_choice"
+            self._queue_agent_turn(session, waiting, "initial", initial_alert_message(waiting))
+
+    def _choose_alert(self, session, alert, choice, rationale, *, source):
+        workflow = alert.setdefault("workflow", {})
+        if workflow.get("status") != "awaiting_choice":
+            raise ValueError("Aucun choix n'est attendu pour cette alerte")
+        if choice not in ("1", "2", "3"):
+            raise ValueError("Choisissez 1, 2 ou 3")
+        if choice in ("1", "3") and len(rationale) < 3:
+            raise ValueError("Ajoutez un motif pour 1 ou une condition de reprise pour 3")
+        workflow.update(status={"1": "ignored", "2": "chosen", "3": "deferred"}[choice],
+                        choice=choice, rationale=rationale[:500], chosen_at=timestamp(),
+                        choice_source=source, delivery_status="queued", delivery_error=None)
+        alert["disposition"] = {"1": "ignored", "2": "pending", "3": "deferred"}[choice]
+        alert["acknowledged_at"] = workflow["chosen_at"]
+        if source == "ui":
+            self._queue_agent_turn(session, alert, "choice", choice_message(alert, choice, rationale))
+        elif choice == "2":
+            self._queue_agent_turn(session, alert, "choice", choice_message(alert, choice, rationale))
+        else:
+            # The user’s 1/3 is already in the observed transcript; no duplicate turn is sent.
+            workflow["delivery_status"] = "delivered"
+        if choice != "2":
+            self._activate_next_alert(session)
+
+    def _agent_message_loop(self):
+        while not self.closed:
+            with self._lock:
+                work = self._agent_queue.popleft() if self.running and self._agent_queue else None
+                if work:
+                    sid, alert_id, kind, message = work
+                    session = self.sessions.get(sid)
+                    alert = next((item for item in session["alerts"] if item["id"] == alert_id), None) if session else None
+                    if not session or not alert:
+                        work = None
+                    elif not session.get("enabled"):
+                        alert.setdefault("workflow", {}).update(delivery_status="not_sent_paused",
+                                                                 delivery_error="session_paused")
+                        self._persist_background()
+                        work = None
+                    else:
+                        alert.setdefault("workflow", {})["delivery_status"] = "sending"
+                        stop_background = alert["workflow"].pop("stop_background_before_retry", False)
+                        alert["workflow"]["delivery_started_at"] = timestamp()
+                        self._persist_background()
+            if not work:
+                self._agent_wake.wait(0.5)
+                self._agent_wake.clear()
+                continue
+            try:
+                if stop_background:
+                    stop_claude_background(session["native_id"])
+                delivered = deliver_agent_message(session["platform"], session["native_id"], message)
+                response, error = delivered["response"], None
+            except UnsupportedPlatform as exc:
+                response, error = "", "unsupported_platform: " + str(exc)
+            except (DeliveryError, OSError, ValueError) as exc:
+                response, error = "", str(exc)[:300]
+            except Exception as exc:
+                response, error = "", type(exc).__name__
+            with self._lock:
+                current = self.sessions.get(sid)
+                current_alert = next((item for item in current["alerts"] if item["id"] == alert_id), None) if current else None
+                if not current_alert:
+                    continue
+                state = current_alert.setdefault("workflow", {})
+                state.update(delivery_status="failed" if error else "delivered",
+                             delivery_error=error, delivery_finished_at=timestamp())
+                if not error:
+                    if kind == "initial":
+                        state["agent_ack"] = response[:300]
+                    elif state.get("choice") == "2":
+                        state["response"] = response[:4000]
+                        self._activate_next_alert(current)
+                    else:
+                        state["agent_ack"] = response[:300]
+                self._persist_background()
+                self._write_note(current)
+
     def _poll_session(self, session):
         if session["watcher"] is None:
             found = [resolve_jsonl_source(Path(root), session["native_id"], platform=session["platform"]) for root in self.roots[session["platform"]]]
@@ -804,11 +986,34 @@ class Supervisor:
         result = session["watcher"].poll()
         session["state"] = result.state
         session["error"] = result.error
+        if result.state == "source_missing":
+            # A transcript can move with a renamed worktree. Drop only the stale
+            # reader; the next cycle resolves the same platform/ID exactly and
+            # opens the replacement at EOF, so prior messages are never replayed.
+            session["watcher"] = None
+            session["_last_stamp"] = None
         for event in result.events:
             message = normalize(session["platform"], event)
             if not message or not message[1]:
                 continue
             role, text = message
+            workflow_message = next((alert.get("workflow", {}).get("delivery_message")
+                                     for alert in session.get("alerts", [])
+                                     if alert.get("workflow", {}).get("delivery_message") == text), None)
+            if workflow_message or (role == "assistant" and text.strip() == "VEILLEUR_ACK"):
+                continue
+            if role == "user":
+                pending = self._pending_choice(session)
+                parsed_choice = parse_user_choice(text) if pending else None
+                if parsed_choice:
+                    try:
+                        self._choose_alert(session, pending, parsed_choice["choice"],
+                                           parsed_choice["rationale"], source="transcript")
+                    except ValueError:
+                        pass
+                    else:
+                        self._persist_background()
+                        continue
             session["generation"] += 1  # Any new message invalidates an in-flight judgement.
             if session.get('judge_request'):
                 session['judge_request']['status'] = 'perime'
@@ -974,10 +1179,17 @@ class Supervisor:
                         if existing["disposition"] != "new":
                             session["analysis_state"] = "alert_acknowledged"
                     else:
-                        session["alerts"].append(dict(id=fingerprint[:24], fingerprint=fingerprint, model=model,
+                        alert = dict(id=fingerprint[:24], fingerprint=fingerprint, model=model,
                             severity=result["severity"], reason=result["reason"][:500], evidence=result["evidence"],
-                            created_at=timestamp(), last_occurrence=timestamp(), occurrences=1, disposition="new", acknowledged_at=None))
+                            category=str(result.get("category", "non_precisee"))[:100],
+                            created_at=timestamp(), last_occurrence=timestamp(), occurrences=1, disposition="new", acknowledged_at=None,
+                            workflow=dict(status="awaiting_choice" if not self._pending_choice(session) else "waiting_turn",
+                                          delivery_status="queued" if not self._pending_choice(session) else "waiting_turn",
+                                          choice=None, rationale="", chosen_at=None, response=""))
+                        session["alerts"].append(alert)
                         session["alerts"] = session["alerts"][-20:]
+                        if alert["workflow"]["status"] == "awaiting_choice":
+                            self._queue_agent_turn(session, alert, "initial", initial_alert_message(alert))
                     self._persist_background()
                 self._write_note(session)
 
@@ -1102,6 +1314,7 @@ class Supervisor:
             self._queue.clear()
             self._wake.set()
             self._judge_wake.set()
+            self._agent_wake.set()
             self._chat_wake.set()
             self._chat_epoch += 1
             self._chat_pending = None

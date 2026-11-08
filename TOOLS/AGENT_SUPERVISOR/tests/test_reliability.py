@@ -31,6 +31,102 @@ def make_service(tmp_path, judge=None, interval=.02):
     return svc, source, snapshot['sessions'][0]['id']
 
 
+def test_alert_chat_choice_is_user_authoritative_and_challenges_without_tools(tmp_path, monkeypatch):
+    from TOOLS.AGENT_SUPERVISOR.scripts import supervisor_service
+    deliveries = []
+    def fake_delivery(platform, native_id, message):
+        deliveries.append((platform, native_id, message))
+        return {'session_id': native_id, 'response': 'VEILLEUR_ACK' if len(deliveries) == 1 else 'Proposition courte à vérifier.'}
+    monkeypatch.setattr(supervisor_service, 'deliver_agent_message', fake_delivery)
+    judge = lambda _model, _messages: {'alert': True, 'severity': 'warning', 'category': 'other',
+                                      'reason': 'Bilan incohérent à vérifier.', 'evidence': 'Le bilan annonce neuf échecs.'}
+    svc, source, sid = make_service(tmp_path, judge)
+    try:
+        svc.command({'action': 'start'})
+        write_message(source, 'assistant', 'Le bilan annonce neuf échecs.')
+        wait(lambda: bool(svc.snapshot()['sessions'][0]['alerts']))
+        wait(lambda: len(deliveries) == 1)
+        alert = svc.snapshot()['sessions'][0]['alerts'][0]
+        assert alert['workflow']['status'] == 'awaiting_choice'
+        assert 'une seule ligne' in deliveries[0][2]
+        assert 'Attends ensuite le choix explicite' in deliveries[0][2]
+
+        # The supervised agent's ACK is not a user decision; a user reply of `2` is.
+        write_message(source, 'assistant', 'VEILLEUR_ACK')
+        time.sleep(.06)
+        assert svc.snapshot()['sessions'][0]['alerts'][0]['workflow']['choice'] is None
+        write_message(source, 'user', '2')
+        wait(lambda: svc.snapshot()['sessions'][0]['alerts'][0]['workflow']['choice'] == '2')
+        wait(lambda: len(deliveries) == 2)
+        workflow = svc.snapshot()['sessions'][0]['alerts'][0]['workflow']
+        assert workflow['choice_source'] == 'transcript'
+        assert workflow['status'] == 'chosen'
+        assert 'contestant l’hypothèse' in deliveries[1][2]
+        assert 'N’utilise aucun outil' in deliveries[1][2]
+        wait(lambda: svc.snapshot()['sessions'][0]['alerts'][0]['workflow'].get('response') == 'Proposition courte à vérifier.')
+    finally:
+        svc.close()
+
+
+def test_queued_alert_is_restored_after_service_restart(tmp_path, monkeypatch):
+    from TOOLS.AGENT_SUPERVISOR.scripts import supervisor_service
+    deliveries = []
+    def fake_delivery(platform, native_id, message):
+        deliveries.append((platform, native_id, message))
+        return {'session_id': native_id, 'response': 'VEILLEUR_ACK'}
+    monkeypatch.setattr(supervisor_service, 'deliver_agent_message', fake_delivery)
+    svc, _source, sid = make_service(tmp_path)
+    svc.command({'action': 'resume', 'id': sid})
+    alert = dict(id='queued-alert', fingerprint='queued-alert', model='mock', severity='warning',
+                 reason='Point a verifier.', evidence='Citation exacte', category='other',
+                 created_at='now', last_occurrence='now', occurrences=1, disposition='new',
+                 acknowledged_at=None,
+                 workflow=dict(status='awaiting_choice', delivery_status='queued', choice=None,
+                               rationale='', chosen_at=None, response=''))
+    svc.sessions[sid]['alerts'].append(alert)
+    svc._persist()
+    svc.close()
+
+    restored = supervisor_service.Supervisor(svc.state_path, roots=svc.roots, poll_interval=.02,
+                                             strict_assignments=True)
+    try:
+        restored.command({'action': 'resume', 'id': sid})
+        restored.command({'action': 'start'})
+        wait(lambda: len(deliveries) == 1)
+        assert deliveries[0][1] == restored.sessions[sid]['native_id']
+        assert restored.snapshot()['sessions'][0]['alerts'][0]['workflow']['delivery_status'] == 'delivered'
+    finally:
+        restored.close()
+
+
+def test_legacy_alert_can_be_explicitly_sent_into_its_session_chat(tmp_path, monkeypatch):
+    from TOOLS.AGENT_SUPERVISOR.scripts import supervisor_service
+    deliveries = []
+    def fake_delivery(platform, native_id, message):
+        deliveries.append((platform, native_id, message))
+        return {'session_id': native_id, 'response': 'VEILLEUR_ACK'}
+    monkeypatch.setattr(supervisor_service, 'deliver_agent_message', fake_delivery)
+    svc, _source, sid = make_service(tmp_path)
+    alert = dict(id='legacy-alert', fingerprint='legacy-alert', model='mock', severity='warning',
+                 reason='Meme alerte deja vue.', evidence='Extrait exact', category='other',
+                 created_at='now', last_occurrence='now', occurrences=1, disposition='new',
+                 acknowledged_at=None,
+                 workflow=dict(status='legacy', delivery_status='not_sent', choice=None,
+                               rationale='', chosen_at=None, response=''))
+    svc.sessions[sid]['alerts'].append(alert)
+    try:
+        svc.command({'action': 'start'})
+        svc.command({'action': 'start_alert_workflow', 'id': sid, 'alert_id': 'legacy-alert'})
+        wait(lambda: len(deliveries) == 1)
+        assert deliveries[0][0] == 'claude'
+        assert deliveries[0][1] == svc.sessions[sid]['native_id']
+        assert 'Meme alerte deja vue.' in deliveries[0][2]
+        assert svc.sessions[sid]['alerts'][0]['workflow']['status'] == 'awaiting_choice'
+        assert svc.sessions[sid]['alerts'][0]['workflow']['delivery_status'] == 'delivered'
+    finally:
+        svc.close()
+
+
 def test_candidates_require_unique_existing_explicit_id(tmp_path):
     svc, source, sid = make_service(tmp_path)
     try:
@@ -66,6 +162,24 @@ def test_correct_id_preserves_mission_and_paused_state(tmp_path):
         svc.command({'action':'resume', 'id':sid})
         wait(lambda: svc.snapshot()['sessions'][0]['state'] == 'active')
         assert svc.snapshot()['sessions'][0]['source'] == str(other)
+    finally:
+        svc.close()
+
+
+def test_enabled_session_recovers_same_transcript_after_file_move(tmp_path):
+    svc, source, sid = make_service(tmp_path)
+    moved_dir = source.parent / 'renamed-worktree'
+    moved_dir.mkdir()
+    moved_source = moved_dir / source.name
+    try:
+        svc.command({'action': 'start'})
+        wait(lambda: svc.snapshot()['sessions'][0]['state'] == 'active')
+        source.rename(moved_source)
+        wait(lambda: (svc.snapshot()['sessions'][0]['state'] == 'active'
+                      and svc.snapshot()['sessions'][0]['source'] == str(moved_source)))
+        item = svc.snapshot()['sessions'][0]
+        assert item['native_id'] == 'session-a'
+        assert item['messages_observed'] == 0  # Reattachment starts at EOF; no historical replay.
     finally:
         svc.close()
 

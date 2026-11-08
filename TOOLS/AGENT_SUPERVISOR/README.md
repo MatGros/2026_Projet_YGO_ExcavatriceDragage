@@ -106,3 +106,16 @@ Le script `run_scenarios.py` ne permet que des modèles locaux et présente sept
 contrastés. Son verdict concerne uniquement ces exemples. Le benchmark crée et conserve
 des fichiers JSONL synthétiques de 1, 10 et 50 Mo dans le scratch indiqué ; utiliser un
 nouveau chemin à chaque exécution. Aucun nettoyage automatique n'est effectué.
+
+
+## Alertes dans la conversation surveillee
+
+Quand le juge cree une nouvelle alerte, le service peut ajouter un tour consultatif a la conversation exacte. Le premier message contient la criticite, un titre court, une ligne de description et une citation. Il demande a l'agent un acquittement en une ligne, sans analyse ni action, puis attend le choix explicite de l'utilisateur.
+
+L'utilisateur choisit `1` (ignorer avec motif), `2` (examiner maintenant) ou `3` (reporter avec condition). Le choix peut etre fait dans cette page ou dans le chat cible. Pour `2`, le Veilleur demande une courte contre-analyse sans outils ni modification. La reponse de l'agent est affichee comme proposition; elle ne vaut pas decision utilisateur.
+
+Une alerte ancienne conservee avant ce cycle est marquee `legacy` et n'est pas envoyee automatiquement. Le bouton **Envoyer cette alerte au chat pour ouvrir le choix 1/2/3** lance explicitement son cycle dans l'UUID affecte. Les boutons sous **Statut local et copie** changent seulement l'etat dans le Veilleur et n'envoient aucun message.
+
+L'envoi via CLI est actuellement implemente pour Claude Code et Antigravity. Il cible l'UUID fourni et verifie l'ID retourne par le CLI. L'ajout d'un tour au transcript ne garantit pas le rafraichissement de la fenetre CLI deja ouverte et reutilise le compte du CLI, donc peut consommer son quota. DSH et Codex restent sans adaptateur d'envoi valide; DSH est volontairement reporte. Une erreur ou une session en pause est signalee et peut etre relancee depuis la carte.
+
+Le marqueur colore des cartes est repris dans la liste laterale; les cartes non selectionnees sont repliees. L'etat d'ouverture reste local au navigateur.
