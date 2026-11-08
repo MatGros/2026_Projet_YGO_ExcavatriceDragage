@@ -77,6 +77,50 @@ class DshJsonlAppendWatcher:
     def reattach(self, *, start_at_end=True):
         self.__init__(self.path, self.session_id, start_at_end=start_at_end)
 
+    def checkpoint(self):
+        return {
+            "version": 1,
+            "kind": "dsh-zstd",
+            "path": str(self.path.resolve()),
+            "session_id": self.session_id,
+            "offset": self.offset,
+            "identity": list(self._identity) if self._identity is not None else None,
+            "digest": self._prefix_digest.hex(),
+            "pending": base64.b64encode(self._pending).decode("ascii"),
+        }
+
+    @classmethod
+    def restore(cls, path, session_id, checkpoint):
+        path = Path(path)
+        if not isinstance(checkpoint, dict) or checkpoint.get("version") != 1 or checkpoint.get("kind") != "dsh-zstd":
+            raise ValueError("checkpoint_version_mismatch")
+        if Path(checkpoint.get("path", "")).resolve() != path.resolve() or checkpoint.get("session_id") != session_id:
+            raise ValueError("checkpoint_identity_mismatch")
+        offset, identity = checkpoint.get("offset"), checkpoint.get("identity")
+        if not isinstance(offset, int) or offset < 0 or not isinstance(identity, list) or len(identity) != 2:
+            raise ValueError("checkpoint_invalid")
+        digest = bytes.fromhex(checkpoint.get("digest", ""))
+        if len(digest) != hashlib.sha256().digest_size:
+            raise ValueError("checkpoint_invalid")
+        pending = base64.b64decode(checkpoint.get("pending", ""), validate=True)
+        stat = path.stat()
+        if stat.st_size < offset or [stat.st_dev, stat.st_ino] != identity:
+            raise ValueError("continuity_unverified")
+        watcher = cls.__new__(cls)
+        watcher.path = path
+        watcher.session_id = session_id
+        watcher._suspended = False
+        watcher._pending = pending
+        watcher._parse_error = None
+        watcher._attach_error = None
+        watcher.offset = offset
+        watcher._identity = (identity[0], identity[1])
+        watcher._prefix_digest = digest
+        watcher.last_stamp = (stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns)
+        if watcher._digest_prefix(offset) != digest:
+            raise ValueError("continuity_unverified")
+        return watcher
+
     def poll(self):
         if self._attach_error:
             return PollResult("source_error", [], self._attach_error)

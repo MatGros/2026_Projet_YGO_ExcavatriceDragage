@@ -62,6 +62,25 @@ def test_dsh_rewrite_breaks_prefix_integrity(tmp_path):
     assert watcher.poll().state == "source_reset"
 
 
+def test_dsh_checkpoint_restores_delta_and_rejects_rewritten_prefix(tmp_path):
+    sid = "session-12345678-1234-1234-1234-123456789abc"
+    path = make_dsh_log(tmp_path, sid)
+    watcher = DshJsonlAppendWatcher(path, sid)
+    checkpoint = watcher.checkpoint()
+    append_frame(path, event(1, "assistant/message", [{"type":"text","text":"repris"}]))
+    restored = DshJsonlAppendWatcher.restore(path, sid, checkpoint)
+    result = restored.poll()
+    assert result.state == "active"
+    assert [item["seq"] for item in result.events] == [1]
+
+    latest = restored.checkpoint()
+    raw = bytearray(path.read_bytes())
+    raw[8] ^= 1
+    path.write_bytes(raw)
+    with pytest.raises(ValueError, match="continuity_unverified"):
+        DshJsonlAppendWatcher.restore(path, sid, latest)
+
+
 def test_dsh_requires_matching_header_and_native_id(tmp_path):
     sid = "session-12345678-1234-1234-1234-123456789abc"
     path = make_dsh_log(tmp_path, sid)

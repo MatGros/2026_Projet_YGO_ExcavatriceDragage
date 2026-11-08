@@ -67,6 +67,15 @@ def source_stamp(path):
         return None
 
 
+def preserves_previous(old, new):
+    """Allow additive migration fields while preserving every old value and list item."""
+    if isinstance(old, dict):
+        return isinstance(new, dict) and all(key in new and preserves_previous(value, new[key]) for key, value in old.items())
+    if isinstance(old, list):
+        return isinstance(new, list) and len(old) == len(new) and all(preserves_previous(a, b) for a, b in zip(old, new))
+    return old == new
+
+
 def main():
     if os.name != 'nt':
         raise RuntimeError('Migration automatique disponible uniquement sous Windows')
@@ -146,7 +155,7 @@ def main():
     for old in frozen.get('sessions', []):
         restored = restored_sessions[old['id']]
         for key in ('platform', 'native_id', 'alias', 'mission', 'initial_mission', 'alerts', 'chat_messages'):
-            if restored.get(key) != old.get(key):
+            if not preserves_previous(old.get(key), restored.get(key)):
                 raise RuntimeError(f'{key} de session non restauré ; sauvegarde disponible : {backup}')
     selected = payload['session_id']
     restored_chat = new['chat']['messages'] if selected is None else restored_sessions[selected].get('chat_messages', [])

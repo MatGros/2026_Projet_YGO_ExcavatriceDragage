@@ -11,6 +11,7 @@ import json
 import hashlib
 import os
 import re
+import base64
 from pathlib import Path
 from typing import Any
 
@@ -119,6 +120,61 @@ class JsonlAppendWatcher:
     def reattach(self, *, start_at_end=True):
         """Explicitly acknowledge a continuity break and choose replay policy."""
         self.__init__(self.path, start_at_end=start_at_end)
+
+    def checkpoint(self):
+        """Return a serializable cursor whose prefix can be verified on restore."""
+        return {
+            "version": 1,
+            "kind": "jsonl",
+            "path": str(self.path.resolve()),
+            "offset": self.offset,
+            "identity": list(self._identity) if self._identity is not None else None,
+            "digest": self._digest.hex(),
+            "pending": base64.b64encode(self._pending).decode("ascii"),
+        }
+
+    @classmethod
+    def restore(cls, path, checkpoint):
+        """Restore only if path identity and all bytes through the cursor still match."""
+        path = Path(path)
+        if not isinstance(checkpoint, dict) or checkpoint.get("version") != 1 or checkpoint.get("kind") != "jsonl":
+            raise ValueError("checkpoint_version_mismatch")
+        if Path(checkpoint.get("path", "")).resolve() != path.resolve():
+            raise ValueError("checkpoint_path_mismatch")
+        offset = checkpoint.get("offset")
+        identity = checkpoint.get("identity")
+        if not isinstance(offset, int) or offset < 0 or not isinstance(identity, list) or len(identity) != 2:
+            raise ValueError("checkpoint_invalid")
+        digest = bytes.fromhex(checkpoint.get("digest", ""))
+        if len(digest) != hashlib.sha256().digest_size:
+            raise ValueError("checkpoint_invalid")
+        pending = base64.b64decode(checkpoint.get("pending", ""), validate=True)
+        stat = path.stat()
+        if stat.st_size < offset or [stat.st_dev, stat.st_ino] != identity:
+            raise ValueError("continuity_unverified")
+        actual = hashlib.sha256()
+        with path.open("rb") as stream:
+            remaining = offset
+            while remaining:
+                chunk = stream.read(min(remaining, 65536))
+                if not chunk:
+                    raise ValueError("continuity_unverified")
+                actual.update(chunk)
+                remaining -= len(chunk)
+        if actual.digest() != digest:
+            raise ValueError("continuity_unverified")
+        watcher = cls.__new__(cls)
+        watcher.path = path
+        watcher._suspended = False
+        watcher._start_at_end = False
+        watcher.offset = offset
+        watcher._identity = (identity[0], identity[1])
+        watcher.last_stamp = (stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns)
+        watcher._pending = pending
+        watcher._parse_error = None
+        watcher._attach_error = None
+        watcher._digest = digest
+        return watcher
 
     def poll(self) -> PollResult:
         if self._parse_error:

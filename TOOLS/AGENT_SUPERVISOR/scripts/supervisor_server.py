@@ -70,6 +70,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.reply(200, UI.read_bytes(), 'text/html; charset=utf-8')
         if path == '/health':
             return self.reply(200, dict(service='agent-supervisor', **self.service_info()))
+        if path == '/api/supervision/summary':
+            return self.reply(200, self.server.supervision.notification_snapshot())
         if path == '/api/supervision':
             result = self.server.supervision.snapshot()
             result.update(self.service_info())
