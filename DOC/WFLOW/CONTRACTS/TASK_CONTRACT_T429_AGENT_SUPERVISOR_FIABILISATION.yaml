@@ -76,6 +76,14 @@ contract:
       statement: "Demande exploitant 2026-11-09 : la fiche mission est lisible en une ligne par attribut ('Tache : valeur'), les champs vides sont regroupes en une seule ligne, et les lignes 'Attribut : valeur' de la mission texte sont proposees en pre-remplissage confirme d'un clic (aucune attribution silencieuse) ; la ligne 'Tache / sujet : T###' produite par le connecteur alimente Tache et Reference (la skill elle-meme est hors perimetre)."
       verified_by: "pytest (analyse des lignes Attribut : valeur, migration sans perte) + test DOM (1 ligne par champ renseigne, 1 ligne 'Non renseignes') + essai sur la session cc-supervisor-fiabilisation"
 
+    - id: AC-F2.9
+      statement: "Demande exploitant 2026-11-09 (Lot C2 Moteur Mémoire Long-Terme & Détection Drift) : capture déterministe des preuves d'outils passantes dans session['acquired_proofs'], persistance du journal d'état synthétique session['session_journal'], injection automatique dans les notices du juge de '## PREUVES D'OUTILS ACQUISES' et '## JOURNAL D'ÉTAT DE SESSION', et déclencheur mécanique d'audit de trajectoire tous les 8 tours de messages."
+      verified_by: "pytest test_t429_regressions.py (test_deterministic_tool_proof_capture_and_trajectory_audit) PASS"
+
+    - id: AC-F2.10
+      statement: "Demande exploitant 2026-11-09 (Lot C1 Refonte Prompts Juge) : élimination du faux positif sur validation conversationnelle, nouvelle matrice opérationnelle Alarm (débloquée pour guardrails, drifts critiques, falsification/masquage) vs Warning, et interdiction de ré-alerter sur une preuve déjà acquise dans l'index de mémoire."
+      verified_by: "test_judge_prompt.py PASS + banc comportemental test_judge_behavior.py sur Golden Dataset et cas MEM-01 a MEM-10"
+
     # ── F3 IHM, plugin, Send to chat ──────────────────────────────────────────
     - id: AC-F3.1
       statement: "IHM et plugin affichent les memes compteurs (ouverts, reportes, non lus, Warning, Alarm, resolution proposee) pour un meme instantane, produits par le service et non recalcules."
@@ -104,6 +112,9 @@ contract:
     - id: AC-F3.9
       statement: "Ergonomie globale jugee simple : un utilisateur trouve, comprend et traite un constat sans aide."
       verified_by: "2 challenges ergonomie independants (A/B) sur captures + parcours ecrits, ecarts traites ou consignes ; retour exploitant final"
+    - id: AC-F3.10
+      statement: "Demande exploitant 2026-11-09 (Sécurité Déconnexion IHM) : signalement persistant de la perte de connexion (Failed to fetch) dans le menu lateral gauche sticky (.app-sidebar.is-disconnected avec fond rouge pastel et bandeau #sidebar-disconnected) empechant le travail aveugle sans surveillance au defilement vertical ; retablissement automatique a la reconnexion."
+      verified_by: "test DOM test_ui.mjs (presence classe is-disconnected et bandeau sticky lors de l'echec de fetch) PASS"
 
     # ── F4 Recette comparee et parcours reels ─────────────────────────────────
     - id: AC-F4.1
@@ -190,10 +201,12 @@ tracking:
     - "AC-F2.1, F2.2, F2.3, F2.5, F2.7 PASS pytest (test_finding_lifecycle, test_reliability, test_mission_structure)."
     - "AC-F2.4 + F2.6 PASS [modele reel] : tests/run_cycle_live.py DeepSeek V4.1, 4/4 (alerte sur validation non fondee ; 'c'est corrige' sans preuve -> constat actif ; correction prouvee par resultat outil -> meme constat v4 resolution_proposed, 0 doublon). Preuve AGENT_SUPERVISOR_CYCLE_MODELE_REEL_T429_20261109.json."
     - "AC-F2.8 PASS : parse_mission_attributes (pytest x3), fiche compacte (DOM), fiche de la session cc-supervisor-fiabilisation renseignee 9/12."
+    - "AC-F2.9 PASS 2026-11-09 : Moteur mémoire long-terme C2 (session['acquired_proofs'], 'session_journal', injection ## PREUVES D'OUTILS ACQUISES et audit déterministe tour modulo 8), vérifié par test_deterministic_tool_proof_capture_and_trajectory_audit (43/43 regressions)."
     - "AC-F3.1 PASS : compteurs produits par finding_lifecycle.counts, repris tels quels par IHM (sessionCounts) et plugin (summary.js projectedCounts) ; tests summary.test.js + test_finding_lifecycle."
     - "AC-F3.2, F3.4, F3.6, F3.7 PASS : tests/ui_layout_check.mjs 1440/390/360 px -> 0 debordement, 1er constat dans le 1er ecran, constat ouvert le plus recent en tete, 0 texte long duplique, 3 actions principales ; test_ui.mjs normal + deep link PASS."
     - "AC-F3.3 PASS 2026-11-09 : Pivot PULL /review-session-supervisor (Alarm > Warning FIFO), bouton Confirm send retire, Copier pour le chat conserve, 10/10 tests test_review_session.py, consigne outil brute integree pour lever l'avis incertain, et encodage cp1252 Windows reconfigure."
     - "AC-F3.8 PASS : 15/15 tests du plugin."
+    - "AC-F3.10 PASS 2026-11-09 : Sécurité déconnexion IHM (classe .app-sidebar.is-disconnected et bandeau sticky #sidebar-disconnected), vérifié par test unitaire DOM dans test_ui.mjs."
     - "AC-F4.1 PASS : campagne FR A/B DeepSeek, B 10/10 verdicts+ancrage, style 4/4, A 9/10 (DOC/WFLOW/ETUDES/AGENT_SUPERVISOR_CAMPAGNE_FR_T429_AB_FINAL_20261109.json). Cas H7-H10 consommes, plus aveugles."
     - "AC-F4.2 PASS : 0 mauvaise affectation, 0 citation inventee acceptee, 0 perte silencieuse, 0 divergence de compteurs sur l'ensemble des recettes."
     - "AC-F4.3 PARTIEL [REEL] : Codex, Claude, Antigravity PASS (2 messages collectes, bon UUID) ; DSH LIMITE documentee : profil headless sans DEEPSEEK_API_KEY (MISSING_CREDENTIAL), configuration CLI hors perimetre (AGENT_SUPERVISOR_PLATEFORMES_REEL_T429_20261109.json)."

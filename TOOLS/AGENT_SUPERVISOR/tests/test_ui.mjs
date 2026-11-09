@@ -277,6 +277,9 @@ snapshot.sessions[0].alerts=[
 vm.runInContext('render(snapshot,true)',ctx);
 const sortedFindings=Array.from(document.querySelectorAll('#sessions [data-alert-id]')).map(x=>x.dataset.alertId);
 assert.ok(sortedFindings.indexOf('new-finding') < sortedFindings.indexOf('old-finding'),'newest finding is shown first');
+vm.runInContext("showError('Connexion au service indisponible')", ctx);
+assert.equal(document.querySelector('.app-sidebar').classList.contains('is-disconnected'), true, 'sidebar reflects disconnection error');
+assert.equal(document.getElementById('sidebar-disconnected').hidden, false, 'sidebar shows disconnected banner');
 if (deepLinkTest) {
   assert.equal(vm.runInContext('requestedSupervisorSession', ctx), 's1', 'deep link target session is s1');
   assert.equal(vm.runInContext('requestedSupervisorAlert', ctx), 'a1', 'deep link target alert is a1');

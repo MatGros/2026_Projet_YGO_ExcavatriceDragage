@@ -21,7 +21,7 @@ import urllib.request
 import uuid
 
 try:
-    from .judge_prompt import OMNI_JUDGE_SYSTEM, BASELINE_OMNI_JUDGE_SYSTEM
+    from .judge_prompt import OMNI_JUDGE_SYSTEM, BASELINE_OMNI_JUDGE_SYSTEM, capture_memory_sources, validate_state_update
     from .finding_lifecycle import prepare_alert, business_state, counts, record_event, revise, apply_reviews
     from .session_watcher import resolve_jsonl_source
     from .dsh_session_watcher import read_events as read_dsh_events
@@ -30,7 +30,7 @@ try:
                              deliver as deliver_agent_message, initial_alert_message,
                              parse_user_choice, stop_claude_background)
 except ImportError:
-    from judge_prompt import OMNI_JUDGE_SYSTEM, BASELINE_OMNI_JUDGE_SYSTEM
+    from judge_prompt import OMNI_JUDGE_SYSTEM, BASELINE_OMNI_JUDGE_SYSTEM, capture_memory_sources, validate_state_update
     from finding_lifecycle import prepare_alert, business_state, counts, record_event, revise, apply_reviews
     from session_watcher import resolve_jsonl_source
     from dsh_session_watcher import read_events as read_dsh_events
@@ -256,7 +256,13 @@ def _omniroute_request(model, system, messages, max_tokens, settings=None):
 def ollama_judge(model, messages, allow_cloud=False, on_request=None, settings=None):
     settings = validate_judge_settings(settings)
     check_model_consent(model, allow_cloud)
-    payload = {"model": model, "system": JUDGE_SYSTEM, "prompt": json.dumps(messages, ensure_ascii=False),
+    mission = "\n\n".join(str(m.get("text", "")) for m in messages if m.get("role") == "mission")
+    source_by_id = {}
+    for index, item in enumerate(m for m in messages if m.get("role") in ("user", "assistant", "tool", "user_comment")):
+        event_id = item.get("event_id") or f"e{index + 1}"
+        source_by_id[event_id] = {"id": event_id, "role": item["role"], "text": item.get("text", "")}
+    system = OMNI_JUDGE_SYSTEM if any(m.get("role") == "context_notice" for m in messages) else JUDGE_SYSTEM
+    payload = {"model": model, "system": system, "prompt": json.dumps(messages, ensure_ascii=False),
                "stream": False, "think": False, "format": "json", "options": {"num_predict": settings['output_tokens'], "num_ctx": settings['model_context_tokens'], "temperature": settings['temperature']}}
     invalid_alert = None
     for attempt in range(2):
@@ -265,7 +271,15 @@ def ollama_judge(model, messages, allow_cloud=False, on_request=None, settings=N
         request = urllib.request.Request("http://127.0.0.1:11434/api/generate", data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(request, timeout=settings['timeout_seconds']) as response:
             envelope = json.loads(response.read(1_000_000).decode())
-        result = json.loads(envelope.get("response", ""))
+        raw_result = envelope.get("response", "")
+        result = json.loads(raw_result) if isinstance(raw_result, str) else raw_result
+        if isinstance(result, dict) and "alerts" in result:
+            parsed = _parse_omni_judge_response(result, source_by_id, mission, attempt=attempt, invalid_alert=invalid_alert)
+            if isinstance(parsed, dict) and parsed.get("_retry_invalid"):
+                invalid_alert = parsed["invalid_alert"]
+                payload["system"] += " Ta citation precedente est invalide. Choisis un event_id assistant fourni et recopie un extrait exact de son texte; ne change pas le constat pour eviter la citation."
+                continue
+            return parsed
         if attempt and isinstance(result, dict) and result.get("alert") is False:
             return invalid_alert  # Do not silently turn an unquotable alert into a clean verdict.
         evidence = result.get("evidence") if isinstance(result, dict) else None
@@ -273,11 +287,65 @@ def ollama_judge(model, messages, allow_cloud=False, on_request=None, settings=N
             return result
         if not attempt:
             invalid_alert = result
-            payload["system"] = JUDGE_SYSTEM + " Ta citation précédente n'était pas exacte. Recopie mot pour mot, accents et ponctuation compris, un extrait d'un seul message assistant fourni. Ne change pas ton verdict uniquement parce que tu ne peux pas citer."
+            payload["system"] = system + " Ta citation précédente n'était pas exacte. Recopie mot pour mot, accents et ponctuation compris, un extrait d'un seul message assistant fourni. Ne change pas ton verdict uniquement parce que tu ne peux pas citer."
     return result
 
 
 # OMNI_JUDGE_SYSTEM is maintained and isolated in judge_prompt.py (Lot C1)
+
+
+def _parse_omni_judge_response(response, source_by_id, mission, attempt=0, invalid_alert=None):
+    if not isinstance(response, dict):
+        raise ValueError("Reponse juge invalide: JSON objet requis")
+    if "alerts" not in response:
+        return response
+    alerts = response.get("alerts")
+    if not isinstance(alerts, list):
+        raise ValueError("Reponse juge invalide: alerts[] requis")
+    if not alerts:
+        if invalid_alert is not None:
+            return invalid_alert
+        return {"alert": False, "reviews": response.get("reviews", []), "state_update": response.get("state_update", "")}
+    if len(alerts) != 1 or not isinstance(alerts[0], dict):
+        raise ValueError("Une seule alerte structuree est acceptee par analyse")
+    candidate = alerts[0]
+    event = source_by_id.get(candidate.get("event_id"))
+    span = candidate.get("evidence_span")
+    if not event or event["role"] != "assistant" or not isinstance(span, str) or not span.strip() or len(span) > 500 or span not in event["text"]:
+        if attempt == 0:
+            return {
+                "_retry_invalid": True,
+                "invalid_alert": {
+                    "alert": True, "severity": "warning",
+                    "reason": str(candidate.get("reason", "Citation juge non verifiable")),
+                    "evidence": span if isinstance(span, str) else "",
+                    "category": candidate.get("category", "other"),
+                    "state_update": response.get("state_update", "")
+                }
+            }
+        return invalid_alert or {"alert": False}
+    context_event_id = candidate.get("context_event_id")
+    context_event = source_by_id.get(context_event_id) if isinstance(context_event_id, str) else None
+    context_evidence = ""
+    context_span = candidate.get("context_span")
+    if context_event and isinstance(context_span, str) and context_span and context_span in context_event["text"]:
+        context_evidence = context_span
+    elif candidate.get("category") in ("scope_drift", "unauthorized_action"):
+        quote = candidate.get("context_mission_quote")
+        context_evidence = quote if isinstance(quote, str) and quote and quote in mission else mission
+    priority = candidate.get("priority")
+    return {
+        "alert": True,
+        "severity": "error" if priority == "alarm" else "warning",
+        "reason": str(candidate.get("reason", "Ecart a verifier")),
+        "evidence": span,
+        "event_id": event["id"],
+        "category": candidate.get("category", "other"),
+        "title": str(candidate.get("title") or "")[:80],
+        "context_evidence": context_evidence,
+        "reviews": response.get("reviews", []),
+        "state_update": response.get("state_update", ""),
+    }
 
 
 def omniroute_judge(model, messages, allow_cloud=False, on_request=None, settings=None):
@@ -304,48 +372,12 @@ def omniroute_judge(model, messages, allow_cloud=False, on_request=None, setting
             on_request(copy.deepcopy(preview), attempt + 1)
         content, _ = _omniroute_request(model, system, judge_input, settings['output_tokens'], settings=settings)
         response = json.loads(content)
-        alerts = response.get("alerts") if isinstance(response, dict) else None
-        if not isinstance(alerts, list):
-            raise ValueError("Reponse OmniRoute invalide: alerts[] requis")
-        if not alerts:
-            if invalid_alert is not None:
-                return invalid_alert
-            return {"alert": False, "reviews": response.get("reviews", [])}
-        if len(alerts) != 1 or not isinstance(alerts[0], dict):
-            raise ValueError("Une seule alerte structuree est acceptee par analyse")
-        candidate = alerts[0]
-        event = source_by_id.get(candidate.get("event_id"))
-        span = candidate.get("evidence_span")
-        if not event or event["role"] != "assistant" or not isinstance(span, str) or not span.strip() or len(span) > 500 or span not in event["text"]:
-            if attempt == 0:
-                invalid_alert = {"alert": True, "severity": "warning", "reason": str(candidate.get("reason", "Citation OmniRoute non verifiable")),
-                                 "evidence": span if isinstance(span, str) else "", "category": candidate.get("category", "other")}
-                system += " La citation precedente est invalide. Choisis un event_id assistant fourni et recopie un extrait exact de son texte; ne change pas le constat pour eviter la citation."
-                continue
-            return invalid_alert
-        context_event_id = candidate.get("context_event_id")
-        context_event = source_by_id.get(context_event_id) if isinstance(context_event_id, str) else None
-        context_evidence = ""
-        context_span = candidate.get("context_span")
-        if context_event and isinstance(context_span, str) and context_span and context_span in context_event["text"]:
-            context_evidence = context_span
-        elif candidate.get("category") in ("scope_drift", "unauthorized_action"):
-            quote = candidate.get("context_mission_quote")
-            # The mission is application-authored context. Use it as the source anchor
-            # if the model omits its requested short quote; never trust a generated quote.
-            context_evidence = quote if isinstance(quote, str) and quote and quote in mission else mission
-        priority = candidate.get("priority")
-        return {
-            "alert": True,
-            "severity": "error" if priority == "alarm" and candidate.get("category") == "unauthorized_action" else "warning",
-            "reason": str(candidate.get("reason", "Ecart a verifier")),
-            "evidence": span,
-            "event_id": event["id"],
-            "category": candidate.get("category", "other"),
-            "title": str(candidate.get("title") or "")[:80],
-            "context_evidence": context_evidence,
-            "reviews": response.get("reviews", []),
-        }
+        parsed = _parse_omni_judge_response(response, source_by_id, mission, attempt=attempt, invalid_alert=invalid_alert)
+        if isinstance(parsed, dict) and parsed.get("_retry_invalid"):
+            invalid_alert = parsed["invalid_alert"]
+            system += " La citation precedente est invalide. Choisis un event_id assistant fourni et recopie un extrait exact de son texte; ne change pas le constat pour eviter la citation."
+            continue
+        return parsed
     return invalid_alert or {"alert": False}
 
 def _omniroute_request_preview(model, system, messages, max_tokens):
@@ -388,7 +420,7 @@ def alert_basis(result, messages):
         if not isinstance(other, str) or len(other.strip()) < 4:
             return False
         anchored = any(m.get('role') in ('mission', 'user') and other in m.get('text', '') for m in messages)
-        performed = re.search(r"\b(?:j'ai|nous avons|(?:le|la)\s+(?:fichier|code|branche|commit)\s+a\s+(?:ete|\u00e9te))\s+(?:modifi(?:e|\u00e9)|supprim(?:e|\u00e9)|execute(?:e|\u00e9)|lance(?:e|\u00e9)|commite(?:e|\u00e9)|ecrase(?:e|\u00e9)|pouss(?:e|\u00e9)|publie(?:e|\u00e9)|envoye(?:e|\u00e9))\b", evidence, re.IGNORECASE)
+        performed = re.search(r"\b(?:j'ai|nous avons|(?:le|la)\s+(?:fichier|code|branche|commit)\s+a\s+(?:ete|\u00e9te)|je\s+vais|je\s+m'appr[eê]te\s+[aà]|sur\s+le\s+point\s+de)\s+(?:modifi(?:e|\u00e9)|supprim(?:e|\u00e9)|execute(?:e|\u00e9)|lance(?:e|\u00e9)|commite(?:e|\u00e9)|ecrase(?:e|\u00e9)|pouss(?:e|\u00e9)|publie(?:e|\u00e9)|envoye(?:e|\u00e9))\b", evidence, re.IGNORECASE)
         if performed:
             prefix = evidence[max(0, performed.start()-30):performed.start()]
             if re.search(r"\b(?:ne|pas|jamais|rien|aucun|aucune)\b", prefix, re.IGNORECASE):
@@ -402,6 +434,8 @@ def alert_basis(result, messages):
         # only a user message can anchor an ignored instruction (tools carry no user authority).
         roles = ('user',) if category == 'ignored_instruction' else ('user', 'assistant', 'tool')
         return any(m.get('role') in roles and other in m.get('text', '') for m in messages)
+    if category == 'other':
+        return isinstance(evidence, str) and len(evidence.strip()) >= 4 and any(m.get('role') == 'assistant' and evidence in m.get('text', '') for m in messages)
     return False
 
 
@@ -513,6 +547,9 @@ class Supervisor:
                 session["alerts"] = alerts
                 session["events"] = value.get("events", [])
                 session["framing"] = value.get("framing", [])
+                session["acquired_proofs"] = value.get("acquired_proofs", [])
+                session["session_journal"] = value.get("session_journal", [])
+                session["judge_turn_count"] = self._nonnegative_int(value.get("judge_turn_count", 0), "judge_turn_count")
                 if not isinstance(session["events"], list) or not isinstance(session["framing"], list):
                     raise ValueError("Journal de session invalide")
                 self.sessions[sid]["exchange_path"] = str(self._note_path(sid))
@@ -986,7 +1023,7 @@ class Supervisor:
                     enabled=enabled, state="waiting" if enabled else "paused", source=None, error=None,
                     messages_observed=0,
                     last_event=None, last_analysis=None, analysis_state="waiting" if mission else "context_required", analysis_error=None,
-                    alerts=[], events=[], framing=[], watcher=None, context=[], generation=0, judge_request=None, judge_proposal=None,
+                    alerts=[], events=[], framing=[], acquired_proofs=[], session_journal=[], judge_turn_count=0, watcher=None, context=[], generation=0, judge_request=None, judge_proposal=None,
                     source_checkpoint=None, source_generation=str(uuid.uuid4()), source_event_index=0, context_revision=0, analyzed_revision=0, recovery=dict(status="none"),
                     exchange_path=None, exchange_error=None, exchange_saved_at=None)
 
@@ -994,7 +1031,7 @@ class Supervisor:
         if self.load_error:
             raise ValueError("Configuration illisible : ecriture refusee pour proteger les donnees existantes")
         data = dict(model=self.model, allow_cloud=self.allow_cloud, judge_settings=self.judge_settings, sessions=[
-            {key: value[key] for key in ("id", "platform", "native_id", "alias", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "alerts", "source_checkpoint", "source_event_index", "context_revision", "analyzed_revision", "context", "context_truncated", "messages_observed", "memory", "recovery", "enabled", "events", "framing", "source_generation")} for value in self.sessions.values()])
+            {key: value[key] for key in ("id", "platform", "native_id", "alias", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "alerts", "source_checkpoint", "source_event_index", "context_revision", "analyzed_revision", "context", "context_truncated", "messages_observed", "memory", "recovery", "enabled", "events", "framing", "source_generation", "acquired_proofs", "session_journal", "judge_turn_count")} for value in self.sessions.values()])
         if self.persist_chat:
             data['chat_histories'] = {('global' if key is None else key): value for key, value in self._chat_histories.items()}
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1524,6 +1561,16 @@ class Supervisor:
             session["memory"] = session["memory"][-20:]
             if not any(f.get("event_id") == ident for f in session["framing"] if ident):
                 session["framing"].append(dict(item, ref=event["ref"], version=len(session["framing"]) + 1))
+        elif message["role"] == "tool":
+            tool_text = str(message.get("text", ""))
+            # Barrière absolue : ne JAMAIS déduire de succès si un terme d'échec ou de négation est présent
+            if not re.search(r"\b(?:non|not|failed|échec|echec|erreur|error|exception|traceback|interrompu)\b", tool_text, re.IGNORECASE):
+                match = re.search(r"(?:={2,}\s*)?(\d+\s+passed[^\n\r]*|exited with code 0|0\s+erreur[^\n\r]*)", tool_text, re.IGNORECASE)
+                if match:
+                    summary = match.group(1).strip()
+                    item = dict(kind="tool_proof", text=summary[:200], observed_at=message.get("observed_at", timestamp()), event_id=ident, event_index=message.get("event_index"))
+                    session.setdefault("acquired_proofs", []).append(item)
+                    session["acquired_proofs"] = session["acquired_proofs"][-15:]
 
     @staticmethod
     def _pending_choice(session):
@@ -1863,7 +1910,7 @@ class Supervisor:
                         recovery = session.get("recovery", {})
                         is_recovery = recovery.get("status") == "processing" and recovery.get("batch_index", 0) < len(recovery.get("batches", []))
                         recovery_index = recovery.get("batch_index", 0) if is_recovery else None
-                        mission = "Mission initiale : " + session["initial_mission"]
+                        mission = "## CAP INITIAL GELÉ :\n" + session["initial_mission"]
                         if is_recovery:
                             mission += "\nLa fiche manuelle actuelle est exclue du jugement historique : sa date d'applicabilite aux evenements du lot n'est pas etablie. Les autorisations historiques doivent provenir des consignes source datees."
                         else:
@@ -1876,7 +1923,16 @@ class Supervisor:
                         framing = [m for m in session.get("framing", []) if limit_index is None or (isinstance(m.get("event_index"), int) and m["event_index"] <= limit_index)]
                         notices = [dict(role="context_notice", text="Historique partiel : seuls les evenements transmis sont observables.")] if session["context_truncated"] else []
                         if framing:
-                            notices.append(dict(role="context_notice", text="Cadrage utilisateur observe avec dates et sources (pas de GO retroactif) : " + json.dumps([dict(m, text=m["text"][:400], excerpt=len(m["text"])>400) for m in framing[-6:]], ensure_ascii=False)))
+                            notices.append(dict(role="context_notice", text="## DÉCISIONS UTILISATEUR (Cadrage observé avec dates et sources, pas de GO rétroactif) : " + json.dumps([dict(m, text=m["text"][:400], excerpt=len(m["text"])>400) for m in framing[-6:]], ensure_ascii=False)))
+                        acquired = session.get("acquired_proofs", [])
+                        if acquired:
+                            notices.append(dict(role="context_notice", text="## PREUVES ACQUISES (vérifiées sur disque, ne pas redemander) :\n" + "\n".join(f"- [{p.get('event_id', 'cmd')}] {p.get('text')}" for p in acquired[-6:])))
+                        journal = session.get("session_journal", [])
+                        if journal:
+                            notices.append(dict(role="context_notice", text="## MÉMOIRE DE SESSION (Jalons franchis) :\n" + "\n".join(f"- {j.get('text')}" for j in journal[-6:])))
+                        session["judge_turn_count"] = session.get("judge_turn_count", 0) + 1
+                        if session["judge_turn_count"] % 8 == 0:
+                            notices.append(dict(role="context_notice", text=f"🚨 [AUDIT DE TRAJECTOIRE — TOUR {session['judge_turn_count']}] : Confronte l'avancement global et les preuves acquises au Cap Initial Gelé. Vérifie la direction et le respect du planning."))
                         prior = []
                         for a in session["alerts"]:
                             prepare_alert(a)
@@ -2043,6 +2099,28 @@ class Supervisor:
                 if not error:
                     review_result = dict(result, reviews=[r for r in result.get("reviews", []) if isinstance(r, dict) and not any(a["id"] == r.get("alert_id") and business_state(a) == "closed" for a in session["alerts"])])
                     reviewed = apply_reviews(session, review_result, messages, timestamp())
+                    state_update = result.get("state_update")
+                    if isinstance(state_update, str) and state_update.strip() and len(state_update.strip()) >= 5:
+                        clean_update = state_update.strip()[:300]
+                        origin = "agent_observation"
+                        source_event_id = None
+                        try:
+                            event_candidates = [{"id": m.get("event_id") or f"e{i+1}", "role": m["role"], "text": m.get("text", "")}
+                                                for i, m in enumerate(observed) if m.get("role") in ("user", "assistant", "tool")]
+                            validated = validate_state_update(clean_update, event_candidates)
+                            if validated:
+                                origin = validated["origin"]
+                                source_event_id = validated["source_event_id"]
+                        except (ValueError, KeyError):
+                            pass
+                        session.setdefault("session_journal", []).append(dict(
+                            text=clean_update,
+                            source_event_id=source_event_id,
+                            origin=origin,
+                            recorded_at=timestamp()
+                        ))
+                        session["session_journal"] = session["session_journal"][-20:]
+                        record_event(session, "state_update", clean_update, timestamp())
                     for a in session["alerts"]:
                         if a.get("review_state") == "pending" and a["id"] not in reviewed:
                             a.update(review_state="unavailable", review_error="review_missing_or_unverifiable")
