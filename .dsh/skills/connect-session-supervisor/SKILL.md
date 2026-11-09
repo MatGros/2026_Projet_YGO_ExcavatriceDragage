@@ -11,11 +11,11 @@ Cette commande `/connect-session-supervisor` ne transmet aucun message à l’ag
 
 1. Vérifie si une tâche formelle unique est identifiable dans le contexte ou le Task Manager. N’invente pas un ID, un verrou, un contrat ni un état. Si la tâche ou son support n’est pas vérifiable, dis-le en une phrase, rappelle le risque d’un travail sans cadrage et demande à l’utilisateur s’il confirme un suivi sans tâche formelle. Attends sa réponse avant d’appeler le script. Une session peut être surveillée sans tâche seulement après cette confirmation explicite.
 2. Utilise l’identifiant exact fourni par l’environnement du shell DSH (`DSH_SESSION_ID`). N’utilise pas `DSH_SESSION_JSONL` comme identité ; c’est seulement un chemin. Ne cherche jamais la session la plus récente.
-3. Demande un alias si aucun alias adapté n’est évident. Prépare une mission courte et fidèle au cadrage courant ; une seule session correspond à une seule tâche.
+3. L'alias DOIT respecter strictement la convention canonique : `TXXX[-X]-AGENT Désignation courte` (ex: `T429-DSH01 Fiabilisation Veilleur`, `T428-1-DSH01 Cartes de flux`). Prépare une mission courte et fidèle au cadrage courant ; une seule session active correspond à une seule tâche. Si la tâche est déjà suivie dans le Veilleur par une session en pause (passage de relais / reprise), demande confirmation à l'utilisateur avant de transférer l'écoute, puis ajoute `--reassign`.
 4. Depuis la racine du dépôt, appelle le client local avec PowerShell :
 
 ```powershell
-py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/connect_session.py --platform dsh --alias "<alias>" --task "<ID et titre vérifiés, ou SANS TÂCHE FORMELLE après confirmation>" --mission "<mission courte>"
+py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/connect_session.py --platform dsh --alias "<TXXX-DSH01 Désignation>" --task "<ID et titre vérifiés, ou SANS TÂCHE FORMELLE après confirmation>" --mission "<mission courte>" [--reassign]
 ```
 
 Le client lit `DSH_SESSION_ID` dans l’environnement du shell d’outil. Si l’environnement ne le fournit pas, demande l’ID exact `session-<UUID>` puis passe `--session-id`.

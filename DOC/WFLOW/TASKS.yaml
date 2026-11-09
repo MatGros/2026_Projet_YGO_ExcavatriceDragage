@@ -4,8 +4,8 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: OUTILLAGE / AGENT_SUPERVISOR / PLUGIN VS CODE
-  agent: CC01
-  date: '2026-11-09T00:57:21+01:00'
+  agent: AGY01
+  date: '2026-11-09T05:51:30+01:00'
   titre: 'Agent Supervisor : fiabiliser reprise, cycle des alertes, IHM et plugin sur parcours reels'
   contexte: 'Campagne de fiabilisation du Supervisor (Veilleur) lancee le 2026-11-08, jusqu ici suivie sans ID formel. Document
     unique de pilotage (plan, decisions, preuves, limites) : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
@@ -26,20 +26,32 @@ tasks:
     Antigravity, Codex, DSH verifies cote Supervisor'
   - 'Style des constats : francais concis, titre court, faits en puces, citation verifiable, limite indiquee, sans repetition
     resume/detail'
-  avancement: '2026-11-09 reprise CC01. Service 8082 build 04e47d28aade, update_available=false. Travail committe localement
-    (cfcae6bc, 812a5eb2), non pousse. Tests : DOM UI PASS (normal + deep link), extension VS Code 15/15, pytest 90/91 (1 echec
-    PermissionError pathlib a analyser). T428 maintenue en pause (6 Warnings ouverts, source non attachee) ; CC-T217 preservee.
-    Non valide : rendu navigateur, notifications/son, clic plugin, reprise reelle, CLI hors Claude.'
-  contrat: Dispense de contrat prealable (scripts locaux TOOLS/, WORKFLOW.md par. Contrat de tache) ; cadrage et criteres
-    F0-F4 dans DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
+  - 'AC-F1.7 : Titre session canonique TXXX[-X]-AGENT et passage de relais sans doublon avec conservation historique'
+  - 'AC-F1.8 : Horodatage systematique des evenements de session (created_at ISO et affichage local dans l IHM)'
+  avancement: '2026-11-09 AGY01. Campagne multi-modeles menee avec succes (DeepSeek V4.1, GLM 5.3). AC-F1.7 valide (Handover
+    reassign + regex ALIAS_PATTERN fullmatch strict sans saut de ligne). AC-F1.8 implemente (horodatage ISO et format local
+    des evenements de session). AC-F1.5bis valide (partitionnement adaptatif glouton des lots de reprise historique eliminant
+    recovery_batch_exceeds_judge_budget). AC-F3.3 valide (pivot PULL /review-session-supervisor dans 3 CLI, retrait push UI,
+    encodage cp1252 resolu, consigne outil brute integree). AC-F3.5 (focusFindingCard, autounlock audio, deep-link test_ui.mjs).
+    AC-X.1 & AC-X.2 valides : 144/144 tests pytest PASS, ui_layout_check 1440/390/360 PASS, npm test 15/15 PASS. Service 8082
+    mis a jour (build 107f618aef55). Plan enrichi : cadrage strategique refonte des prompts/drift/alarmes (REVIEW_SUPERVISOR_PROMPTS_ET_DRIFT.md)
+    et nouvelle tache backlog "Revoir Trajet des messages" (IHM/telemetrie, decomptes dynamiques, assouplissement contexte, multi-sessions).
+    Aucun commit/push sans accord explicite.'
+  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T429_AGENT_SUPERVISOR_FIABILISATION.yaml (contrat mesurable AC-F0 a AC-F4, AC-X
+    ; preuves et revues A/B dans tracking). Pilotage detaille : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md'
   bloque_par: ''
+  work_lock:
+    actor: AGY01
+    token: 5mIZrcT-olWu5ESc1FBB-PtVWQ6oMmIn
+    acquired_at: '2026-11-09T03:39:09+00:00'
+  edit_flag: null
 - id: T428
   parent_id: ''
   statut: ⏳
   criticite: C2
   domaine: DIAGNOSTIC / GVL_TROUBLESHOOTING
   agent: CC01
-  date: '2026-11-08T17:38:59+01:00'
+  date: '2026-11-09T10:33:01+01:00'
   titre: 'Refactor troubleshooting : snapshot lisible comme un flux, par axe, pour mainteneur et agent'
   contexte: 'Demande exploitant 2026-11-06 a la reprise de T213. Trouver la source d''un blocage a partir du seul snapshot,
     rapidement et intuitivement, pour un mainteneur comme pour un agent. Lecture de haut en bas comme un flux : entrees, traitement,
@@ -54,26 +66,28 @@ tasks:
   - J4 implementer la structure, avec table ancien vers nouveau chemin
   - J5 fournir le guide de depannage dans le code, verifie automatiquement
   - J6 valider par une personne sur pannes injectees, puis cloturer
-  avancement: 'J5 LIVRE 2026-11-08, import CODESYS a faire : FB_TroubleshootingGuide (830 lignes, 324 chemins), appele par
-    PRG_07, commits 40d81bf4 c8f4907f ef0ef556. Redaction 5 DeepSeek, challenge 2 tours + panel 4 experts, 2 juges natifs
-    (262 corrections). G531 PASS (chemins et noms abreges), G200 PASS. Rejeu avec guide : 0 cause, 2 maillons sur 15, seuils
-    9 et 12 manques, publies (anciens snapshots sans valeurs J3). J3 VALIDE exploitant ; snapshot simu (438/438) prevu en
-    fin apres import XML. Constats a traiter : sens M3 de la vue, Commun.Bypass.Global non relaye. J4 LISTE SEULE 2026-11-08
-    (choix exploitant) : troubleshooting_variables.txt reordonnee selon la table J2, 595 vers 438 chemins, 5 lots, 38 blocs,
-    0 non resolu, rien dans CODE. Snapshot simu commun J3+J4 a faire (attendu 438/438). J3 EN COURS 2026-11-08 : 24 chemins
-    ajoutes a troubleshooting_variables.txt (571 vers 595, 6 lots), 0 non resolu au controle statique, revue challenge DeepSeek
-    + gpt-oss sans ajout faux ; snapshot simu (0 KO, duree) REPORTE par l''exploitant 2026-11-08, a faire avant cloture J3.
-    J2 DECIDE 2026-11-08 (GO J3 exploitant) : DOC/WFLOW/ETUDES/T428_J2_STRUCTURE/STRUCTURE_CIBLE.md, 571 vers 424 variables,
-    147 retraits proposes, 16 ajouts J3, 8 a recabler J4, controles 11/11, revue a la source, rejeu papier sans gain (0 cause,
-    3 maillons sur 15), rien dans CODE. Defauts de vue trouves : sorties frein et M3 fausses, hard stop M3 invisible, permis
-    Safety faux. J1 VALIDE EXPLOITANT 2026-11-08 : lot 1 commit 8ac56593, essais demandes faits selon l''exploitant. Pas de
-    test machine. Rejeu a l''aveugle et sens de Idx307 restent a faire. VALIDE EXPLOITANT 2026-11-06 : flux entrees traitement
-    sorties ; variable figee non retiree pour ce seul motif ; les lettres ne suffisent pas ; niveaux general, axe, fonctions
-    mixtes ; sorties PLC et mot variateur dans les axes ; guide souhaite dans le code. PROPOSE NON VALIDE : fiche d''axe en
-    10 etapes, safety generale et alarmes d''axe, renumerotation, seuils de test du plan. LIVRE : cartes M1 M2 M3 AU, commit
-    04b6ce99 branche work/carte-flux-troubleshooting non poussee, relecture par modele, aucune preuve automate. EN ATTENTE
-    GO : lot 1. ESSAIS : 0 cause sur 15 en reference. A TRANCHER : champs M2Demand ; T371 et T340 non modifiees. LIENS : parts
-    T375 T377 T231 ; renvois T225 T224 T324 T219. ALERTE : bypass AU TestA et PowerCutOff TRUE par defaut, etat automate inconnu.'
+  avancement: 'J1 VALIDE EXPLOITANT, CONFIRMATION EXPLICITE 2026-11-09 ("oui valide") apres avoir declare le 2026-11-08 avoir
+    fait les essais demandes. Aucun test machine reelle ; rejeu a l''aveugle AC9 reste a faire. J5 LIVRE 2026-11-08, import
+    CODESYS a faire : FB_TroubleshootingGuide (830 lignes, 324 chemins), appele par PRG_07, commits 40d81bf4 c8f4907f ef0ef556.
+    Redaction 5 DeepSeek, challenge 2 tours + panel 4 experts, 2 juges natifs (262 corrections). G531 PASS (chemins et noms
+    abreges), G200 PASS. Rejeu avec guide : 0 cause, 2 maillons sur 15, seuils 9 et 12 manques, publies (anciens snapshots
+    sans valeurs J3). J3 VALIDE exploitant ; snapshot simu (438/438) prevu en fin apres import XML. Constats a traiter : sens
+    M3 de la vue, Commun.Bypass.Global non relaye. J4 LISTE SEULE 2026-11-08 (choix exploitant) : troubleshooting_variables.txt
+    reordonnee selon la table J2, 595 vers 438 chemins, 5 lots, 38 blocs, 0 non resolu, rien dans CODE. Snapshot simu commun
+    J3+J4 a faire (attendu 438/438). J3 EN COURS 2026-11-08 : 24 chemins ajoutes a troubleshooting_variables.txt (571 vers
+    595, 6 lots), 0 non resolu au controle statique, revue challenge DeepSeek + gpt-oss sans ajout faux ; snapshot simu (0
+    KO, duree) REPORTE par l''exploitant 2026-11-08, a faire avant cloture J3. J2 DECIDE 2026-11-08 (GO J3 exploitant) : DOC/WFLOW/ETUDES/T428_J2_STRUCTURE/STRUCTURE_CIBLE.md,
+    571 vers 424 variables, 147 retraits proposes, 16 ajouts J3, 8 a recabler J4, controles 11/11, revue a la source, rejeu
+    papier sans gain (0 cause, 3 maillons sur 15), rien dans CODE. Defauts de vue trouves : sorties frein et M3 fausses, hard
+    stop M3 invisible, permis Safety faux. J1 VALIDE EXPLOITANT 2026-11-08 : lot 1 commit 8ac56593, essais demandes faits
+    selon l''exploitant. Pas de test machine. Rejeu a l''aveugle et sens de Idx307 restent a faire. VALIDE EXPLOITANT 2026-11-06
+    : flux entrees traitement sorties ; variable figee non retiree pour ce seul motif ; les lettres ne suffisent pas ; niveaux
+    general, axe, fonctions mixtes ; sorties PLC et mot variateur dans les axes ; guide souhaite dans le code. PROPOSE NON
+    VALIDE : fiche d''axe en 10 etapes, safety generale et alarmes d''axe, renumerotation, seuils de test du plan. LIVRE :
+    cartes M1 M2 M3 AU, commit 04b6ce99 branche work/carte-flux-troubleshooting non poussee, relecture par modele, aucune
+    preuve automate. EN ATTENTE GO : lot 1. ESSAIS : 0 cause sur 15 en reference. A TRANCHER : champs M2Demand ; T371 et T340
+    non modifiees. LIENS : parts T375 T377 T231 ; renvois T225 T224 T324 T219. ALERTE : bypass AU TestA et PowerCutOff TRUE
+    par defaut, etat automate inconnu.'
   contrat: ''
   bloque_par: []
 - id: T427

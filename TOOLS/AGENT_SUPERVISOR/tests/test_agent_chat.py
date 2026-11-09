@@ -41,6 +41,8 @@ def test_delivery_targets_the_exact_session_without_shell(platform, expected_exe
     captured = {}
 
     def fake_run(args, **kwargs):
+        if args[1:3] == ["agents", "--json"]:
+            return SimpleNamespace(returncode=0, stdout="[]")  # T429: conversation closed -> resume path
         captured.update(args=args, kwargs=kwargs)
         key = "session_id" if platform == "claude" else "conversation_id"
         response = "VEILLEUR_ACK" if platform == "claude" else "VEILLEUR_ACK"
@@ -48,7 +50,7 @@ def test_delivery_targets_the_exact_session_without_shell(platform, expected_exe
         return SimpleNamespace(returncode=0, stdout=json.dumps(value))
 
     result = agent_chat.deliver(platform, session_id, "Alerte synthétique", runner=fake_run)
-    assert result == {"session_id": session_id, "response": "VEILLEUR_ACK"}
+    assert result == {"session_id": session_id, "response": "VEILLEUR_ACK", "channel": "resume"}
     assert captured["args"][0] == expected_exe
     assert session_id in captured["args"]
     assert expected_flag in captured["args"]
@@ -60,6 +62,8 @@ def test_delivery_rejects_mismatched_session_response(monkeypatch):
     session_id = "bb64a023-b104-436a-8d49-69ce0b715092"
     monkeypatch.setattr(agent_chat.shutil, "which", lambda _name: "claude.exe")
     def fake_run(_args, **_kwargs):
+        if _args[1:3] == ["agents", "--json"]:
+            return SimpleNamespace(returncode=0, stdout="[]")
         return SimpleNamespace(returncode=0, stdout=json.dumps({"session_id": "00000000-0000-0000-0000-000000000001", "result": "VEILLEUR_ACK"}))
     with pytest.raises(agent_chat.DeliveryError, match="identifiant"):
         agent_chat.deliver("claude", session_id, "Alerte synthétique", runner=fake_run)
@@ -74,6 +78,8 @@ def test_delivery_surfaces_bounded_cli_error_detail(monkeypatch):
     session_id = 'bb64a023-b104-436a-8d49-69ce0b715092'
     monkeypatch.setattr(agent_chat.shutil, 'which', lambda _name: 'claude.exe')
     def fake_run(_args, **_kwargs):
+        if _args[1:3] == ['agents', '--json']:
+            return SimpleNamespace(returncode=0, stdout='[]')
         return SimpleNamespace(returncode=1, stdout='', stderr='Could not resume session from another project directory')
     with pytest.raises(agent_chat.DeliveryError, match='another project directory'):
         agent_chat.deliver('claude', session_id, 'Alerte', runner=fake_run)

@@ -68,7 +68,7 @@ def apply_reviews(session, result, messages, at):
     reviews = result.get("reviews", [])
     if not isinstance(reviews, list): return []
     reviewed = []
-    sources = [m for m in messages if m.get("role") in ("user", "assistant", "tool")]
+    sources = [m for m in messages if m.get("role") in ("user", "assistant", "tool", "user_comment")]  # T429: the user's comment is citable
     for review in reviews:
         if not isinstance(review, dict): continue
         alert = next((a for a in session["alerts"] if a["id"] == review.get("alert_id")), None)
@@ -81,7 +81,11 @@ def apply_reviews(session, result, messages, at):
         alert["review_state"] = "complete"
         alert.pop("review_error", None)
         old = alert.get("assessment", {})
+        if status == "uncertain" and old.get("status") in ("resolution_proposed", "withdrawn"):
+            continue  # T429: a sourced resolution is not lost because its proof left the bounded window
         if all(old.get(k) == assessment[k] for k in ("status", "reason", "evidence")): continue
+        if old.get("status") == status:
+            continue  # T429 (observed live: v18 -> v64): same opinion reworded is not a new version
         revise(alert, at, assessment=assessment)
         record_event(session, "finding_review", reason, at, alert_id=alert["id"], version=alert["version"], evidence=evidence)
     return reviewed

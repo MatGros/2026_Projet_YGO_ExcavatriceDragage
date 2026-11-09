@@ -27,8 +27,124 @@ manqué est vérifiable. Le plugin VS Code reste disponible pour une évaluation
    aucune option ne prétend alors fournir un rattrapage complet.
 
 Le rattrapage n'écrit jamais dans le chat de l'agent surveillé. L'usage éventuel d'un modèle cloud doit
-respecter le consentement existant et être montré avant l'envoi. Aucun ID de tâche `T###` n'a été créé
-dans le catalogue : ce document est le suivi explicite autorisé ici, sans usurper le suivi Task Manager.
+respecter le consentement existant et être montré avant l'envoi. **Tâche formelle : `T429`** (catalogue
+`DOC/WFLOW/TASKS.yaml`, créée le 2026-11-09 à la demande de l'exploitant, CC01). Ce document reste le
+pilotage détaillé de T429 ; le catalogue porte l'état synthétique et les objectifs F1–F4.
+**Contrat mesurable :** `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T429_AGENT_SUPERVISOR_FIABILISATION.yaml`
+(AC-F0 à AC-F4, AC-X ; preuves et revues A/B consignées dans `tracking`).
+
+### 🟢 Exécution T429 — état courant au 9 novembre 2026
+
+| Lot | État | Preuve principale |
+|---|---|---|
+| F0 Référence | ✅ | pytest 91/91 ×4 ; l'échec 90/91 venait de la garde d'écriture d'une session background |
+| F1 Continuité | ✅ [réel] 6/6 | `tests/run_recovery_live.py` → `AGENT_SUPERVISOR_RECETTE_F1_REEL_T429_20261109.json` ; 1 défaut réel corrigé (reprise implicite après rupture) |
+| F2 Cycle / cadrage | ✅ [modèle réel] 4/4 | `tests/run_cycle_live.py` : « corrigé » sans preuve ≠ résolu ; correction prouvée → même constat `resolution_proposed`, 0 doublon |
+| F3 IHM / plugin | ✅ auto · ⏳ observation exploitant | refonte après 2 challenges ergonomie ; `tests/ui_layout_check.mjs` 1440/390/360 px PASS ; reste notification, son, toast, clic (AC-F3.5) |
+| F4 Recette | ✅ corpus · ⚠️ DSH | A/B DeepSeek : B 10/10, A 9/10, style 4/4 ; CLI réels Codex, Claude, Antigravity PASS ; DSH limité (clé API du profil headless absente) |
+
+**Corrigé pendant T429 (chaque défaut a sa garde dans `tests/test_t429_regressions.py`) :**
+- Reprise sans mode après rupture de source : la session reste en pause, rupture visible, pas de saut implicite.
+- Condition de report et motif de clôture conservés, affichés et transmis au juge.
+- Aperçu « Send to chat » = texte réellement envoyé, borné à 1 800 caractères.
+- Timeout d'envoi = livraison incertaine, relance bloquée (service et IHM).
+- Fiche mission modifiée → analyse relancée ; en-tête des preuves outils conservé à la troncature.
+- Contradiction ancrée sur un résultat d'outil (FAIL contre « réussi ») acceptée, au lieu de « indéterminé ».
+- IHM : constats en tête et ouverts, motif affiché une fois, 3 actions (Close / Defer / Send to chat), compteurs non nuls libellés, panneaux techniques repliés, fiche mission « une ligne par attribut » avec pré-remplissage confirmé, résultats d'outil étiquetés « 🔧 Résultat d'outil » dans l'historique.
+- Juge : `title` court et motif en résumé + puces (consigne ajoutée après la coupure de la variante A).
+- **Demande exploitant 2026-11-09 (AC-F1.7) :** Formalisation stricte du titre des sessions Veilleur sous la forme canonique `TXXX-AGENT Désignation courte` ou `TXXX-X-AGENT Désignation courte` (ex: `T429-CC01`, `T429-AGY01`, `T429-CDX01`, `T429-DSH01`), validation de ce format dans `connect_session.py`, et support du passage de relais (Handover / Reassign) pour transférer l'écoute d'une session existante vers un nouveau CLI/ID sans créer de doublon de carte dans l'IHM et avec conservation intégrale des alertes et décisions.
+- **Demande exploitant 2026-11-09 (AC-F1.8) :** Horodatage systématique et explicite de chaque événement de session (`created_at` ISO dans le modèle, affiché en heure locale dans l'IHM sous la forme `JJ/MM/AAAA HH:MM:SS`) pour identifier sans ambiguïté quand l'agent superviseur a créé ou consigné chaque événement.
+- **Retour exploitant 2026-11-09 (Incident reprise avec historique) :** Échec du rattrapage avec le message d'erreur bloquant :
+  > `Analyse indisponible : recovery_batch_exceeds_judge_budget`
+  > `Rattrapage interrompu : recovery_batch_exceeds_judge_budget. Les messages non traités sont conservés.`
+  *Diagnostic technique* : dans `supervisor_service.py` (l.1906-1911), le calcul de taille du lot de rattrapage en mode `is_recovery` vérifie la taille totale (mission + notices de contexte + historique d'alertes + messages du lot) face au budget strict `context_chars + 4800`. Si cette taille globale excède le budget, le service passe brutalement en erreur `recovery_batch_exceeds_judge_budget` sans tronquer ni redécouper dynamiquement en lots plus fins, bloquant le rattrapage. Point d'amélioration identifié : découpage adaptatif des lots pour garantir que chaque lot rentre toujours dans le budget du juge sans échec.
+- **Retour exploitant 2026-11-09 (Test `/review-session-supervisor all` et cycle de réévaluation) :**
+  - *Observation* : L'agent invoqué via `/review-session-supervisor all` produit une excellente analyse critique et un tableau de preuves, mais lors de la relance sans nouvel outil, le Veilleur rend `Supervisor · Avis incertain : Aucun message assistant dans cet extrait pour confirmer ou corriger... Pas d'élément nouveau sur l'enregistrement de J1 comme validé par l'humain` et signale `t428-refactor-troubleshooting ne respecte pas le nommage des sessions supervisor`.
+  - *Diagnostic & Enseignement* :
+    1. **Preuve brute par outil requise pour la réévaluation automatique** : Le juge applique la règle formelle « absence de nouvel écart ne suffit pas à résoudre » et cherche des résultats d'outils vérifiables (`🔧 Résultat d'outil`). Une répétition textuelle d'un argumentaire sans appel d'outil (ex: sans `read_file` du contrat validé ou `git log`) maintient le statut en « Avis incertain ».
+    2. **Consigne d'ingénierie renforcée dans `review_session.py`** : La consigne injectée dans l'agent doit explicitement lui demander d'exécuter les outils de lecture/test pour faire figurer la trace brute dans le transcript si une résolution automatique est visée.
+    3. **Complémentarité décision humaine / résolution modèle** : Les validations accordées par l'humain dans le chat (ex: validation J1) doivent être closes par l'exploitant via le bouton **Close** dans l'IHM (action humaine souveraine) plutôt que d'attendre qu'un juge LLM infère un accord historique.
+    4. **Normalisation du nom de session (AC-F1.7)** : Fournir un moyen simple de mettre à niveau un ancien alias vers la forme canonique `T428-CC01 Refactor troubleshooting` sans recréer de session.
+
+### 🚨 Chantier Stratégique : Refonte des Prompts du Veilleur, Détection de Drift et Définition Réelle des Alarmes (2026-11-09)
+
+Suite au retour d'expérience de l'exploitant et au challenge multi-modèles consigné dans [`DOC/WFLOW/REVIEWS/REVIEW_SUPERVISOR_PROMPTS_ET_DRIFT.md`](../REVIEWS/REVIEW_SUPERVISOR_PROMPTS_ET_DRIFT.md), le système de supervision actuel présente un déséquilibre fondamental analysé et consolidé ci-dessous :
+
+1. **Hyper-focalisation sur la forme textuelle vs Angle mort sur la mission** :
+   - 90% des constats actuels sont des micro-avertissements sur la forme (« l'agent affirme que le test passe mais la commande brute n'est pas dans l'extrait »).
+   - L'agent supervisé est censé ordonnancer, planifier et suivre son avancement : or le Veilleur ne vérifie ni l'existence d'un planning, ni son suivi, ni la proactivité de l'agent.
+   - Les dérives d'objectifs (drift de mission, dispersion, abandon d'un axe sans accord utilisateur) et les manquements au **devoir d'alerte** (silence sur un risque réel ou une anomalie) ne sont pas détectés.
+
+2. **Le verrouillage artificiel des Alarmes (`🔴 Alarm`)** :
+   - Dans le prompt actuel (`supervisor_service.py:281`) : `alarm uniquement pour category=unauthorized_action avec action explicitement deja accomplie et ancrage exact dans une interdiction`.
+   - Ce verrouillage rend les Alarmes quasi-impossibles à déclencher dans la pratique : l'exploitant ne reçoit que des Warnings, banalisant les vrais signaux critiques.
+
+3. **Nouvelle Matrice Opérationnelle `Alarm` vs `Warning`** :
+   - **`🔴 Alarm` (Arrêt / Revue humaine immédiate requise)** :
+     - Violation ou contournement d'un guardrail de sécurité machine ou de projet.
+     - Action destructive ou irréversible exécutée sans consentement explicite.
+     - Masquage de défaut, falsification de preuve ou assertion critique non prouvée utilisée pour livrer.
+     - Drift matériel non consenti (changement d'objectif, de périmètre ou de contrainte sans accord).
+     - Directive utilisateur explicite de stop ou de recadrage ignorée.
+     - Manquement au devoir d'alerte (risque matériel détecté mais tu ou minimisé auprès de l'utilisateur).
+     - Boucle d'erreur ou surcoût persistant après avertissement.
+   - **`⚠️ Warning` (Défaut méthodologique actionnable, sans arrêt immédiat)** :
+     - Preuve brute à consolider sur une décision non critique.
+     - Absence de découpage en jalons sur une tâche complexe réversible.
+     - Premier drift mineur ou exploration non annoncée mais bornée.
+     - Boucle naissante (2 répétitions d'une même commande).
+
+4. **Refonte de la Récolte des Données (`Mission State Packet`)** :
+   - Remplacer l'envoi aveugle des 12 derniers messages textuels par un paquet structuré :
+     1. `MISSION_CONTRACT` : objectifs, contraintes, critères, directives prioritaires datées.
+     2. `PLAN_STATE` : jalons actuels, statut, progression, bloqueurs.
+     3. `ALERT_LEDGER` : risques détectés vs alertes réellement transmises à l'utilisateur.
+     4. `EVIDENCE_REGISTRY` : prétentions critiques adossées aux sorties d'outils brutes.
+   - Pré-filtres déterministes avant l'appel LLM (détecteur de boucle, conflit de directive, dérive de scope) pour décharger le juge et fiabiliser la décision.
+
+### 🛤️ Tâche Backlog : Revoir le Trajet des Messages (IHM & Télémétrie Opérationnelle du Veilleur)
+
+*Tâche non urgente mais planifiée pour fiabiliser la lisibilité et l'opérabilité du Veilleur en exploitation réelle.*
+
+Bien que le composant « Trajet des messages » soit visuellement structuré, son exploitation quotidienne révèle un manque de retour dynamique en direct, des informations partielles sur le multi-session et une visibilité insuffisante sur la tuyauterie interne (collecteur, juge, contexte). Les 6 axes d'amélioration retenus sont :
+
+1. **Chats Surveillés — Visibilité Multi-Sessions Réelle** :
+   - *Constat* : La vue n'affiche souvent qu'un seul chat sélectionné, masquant l'activité réelle d'autres sessions en arrière-plan (ex. 2 sessions actives en écoute et 1 en pause).
+   - *Cible* : Rendre immédiatement visible la liste des flux supervisés avec leur statut exact (écoute active, en pause, déconnecté), l'agent associé (Claude Code, Antigravity, DSH, Codex) et le volume d'échanges récent par session sans forcer la navigation.
+
+2. **Collecteur Partagé — Décompte Dynamique & Traçabilité Entrée/Sortie** :
+   - *Décompte temps réel* : Afficher un compte à rebours dynamique seconde par seconde (ex. `Collecte dans 7s... 6s...`) plutôt qu'un texte statique.
+   - *Inspection au clic (Tiroir / Modal / Accordéon)* :
+     - Permettre d'ouvrir un panneau d'inspection textuel borné (ex. 20 à 50 lignes avec scrollbar / curseur chariot) sans surcharger l'IHM.
+     - Comparer en direct **ce qui est entré** (messages bruts de transcript/stdout) et **ce qui est sorti** (après filtrage, déduplication et rejet des résumés rejoués).
+     - Exposer en tête du tiroir le rappel clair des **règles clés de collecte** appliquées par le collecteur (ignorance des messages système, détection d'outils bruts, exclusions).
+
+3. **Contexte de Session — Assouplissement du Dimensionnement** :
+   - *Constat* : Le seuil fixe rigide de 6 000 caractères cumulé à 12 messages crée des effets de bord critiques (coupure au milieu d'une consigne ou d'un rapport, erreurs bloquantes de type `recovery_batch_exceeds_judge_budget`).
+   - *Cible* :
+     - Privilégier un dimensionnement par **nombre de messages entiers** (intégrité sémantique) plutôt qu'une troncature de caractères au milieu d'un bloc.
+     - Remplacer le couperet de 6 000 caractères par une fenêtre dynamique souple (ex. 12 000 à 16 000 caractères) avec compresseur sémantique d'anciens tours uniquement si un message géant (> 8 000 car.) est détecté.
+
+4. **Juge Partagé — Télémétrie, Emplacement & Cycle de Vie du Contexte** :
+   - *Télémétrie claire* :
+     - Afficher explicitement l'emplacement et la nature du juge : modèle actif (ex. `deepseek-v4.1-flash:cloud` en local Ollama vs API cloud), nombre d'instances de juges en parallèle.
+     - Statistiques d'exécution : latence moyenne de réponse (s), volume moyen de contexte injecté, coût/tokens si disponible.
+   - *Gestion & Hygiène du Contexte du Juge* :
+     - Documenter et afficher la politique d'hygiène : le juge est-il sans état (stateless par appel) ou conserve-t-il une fenêtre glissante ?
+     - Si un contexte persistant existe, afficher le seuil de compaction, la méthode de purge pour éviter la saturation et la dérive cognitive d'un juge pollué par des tours obsolètes.
+
+5. **Contrôle des Preuves — Statistiques Opérationnelles** :
+   - Afficher un micro-tableau de bord factuel :
+     - Nombre d'assertions analysées vs prouvées par des sorties d'outils brutes (`🔧 Résultat d'outil`).
+     - Taux de conformité sur les vérifications mécaniques.
+     - Historique des types de preuves demandées vs fournies (commandes pytest, logs, lectures de contrats).
+
+6. **Synthèse des Résultats & Vue Multi-Plateformes** :
+   - *Constat* : Le bloc « Résultats » tend à ne refléter que la session locale Antigravity, alors que des sessions Claude Code, Codex ou DSH peuvent être rattachées.
+   - *Cible* : Présenter une vue unifiée ou filtrable par plateforme/CLI, permettant de visualiser d'un coup d'œil les alertes transverses sans avoir l'impression que le système est figé sur un seul agent.
+
+**Service :** 8082 mis à jour le 9 novembre (build `7b92c84391a5`) par `upgrade_legacy.py`, sauvegarde vérifiée ;
+T428 et CC-T217 conservées en pause. Prise en charge T429 par AGY01 (Antigravity). Aucun commit ni push.
 
 ## Campagne de fiabilisation proposée — 8 novembre 2026
 
@@ -39,7 +155,7 @@ du plan et simulations : campagne en cours, livraison non encore prouvée.** L'o
 service, interface et plugin par lots sans écrivains concurrents ; les choix ergonomiques sont
 challengés sans suspendre les travaux indépendants. Aucun commit/push autorisé par ce GO.
 
-**Suivi d'exécution courant :**
+**Suivi d'exécution du 8 novembre** (historique ; état courant : section « Exécution T429 » plus haut) :
 
 **Point de situation :** le service Superviseur v2 tourne sur `http://127.0.0.1:8082/`, version build
 `04e47d28aade`, `update_available=false`. Deux sessions sont enregistrées en pause :
@@ -68,8 +184,14 @@ des toasts, des notifications système, du son et du ciblage d'alerte au clic en
 - Test lien profond interface : **PASS** (`VEILLEUR_UI_DEEP_LINK=1 node TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs`)
 - Tests extension VS Code : **15 PASS** (`npm test` sous `TOOLS/AGENT_SUPERVISOR/poc/vscode-notifier`)
 - Format git : **PASS** (`git diff --check`)
-- Checkpoint Git : `cfcae6bc wip(agent-supervisor): checkpoint current work [NON TESTE]`. Fichiers modifiés
-  non committés sur `ui/index.html`, `test_ui.mjs` et ce plan. Aucun commit ni push sans accord explicite.
+- Checkpoint Git : `cfcae6bc wip(agent-supervisor): checkpoint current work [NON TESTE]`. Les retouches
+  ultérieures de `ui/index.html`, `test_ui.mjs` et de ce plan sont incluses dans le commit de sauvegarde
+  exploitant `812a5eb2`. Le 2026-11-09, `main` a été avancé sur `work/base-machine-simu` (`bb0f65c7`,
+  accord exploitant « push A », ancien `main` sous le tag `backup/origin-main-avant-ff-20261109`).
+- Revérification 2026-11-09 (reprise CC01, T429) : DOM normal et deep link PASS, extension 15/15,
+  pytest **90/91** — 1 échec `PermissionError` (`pathlib`) non encore analysé ; service 8082 inchangé
+  (build `04e47d28aade`, `update_available=false`), T428 toujours en pause et non rattachée. Session
+  `d9739b30` rattachée au Supervisor (alias `cc-supervisor-fiabilisation`, T429).
 
 **Recette Claude isolée :** session neuve `f8644eb0-0ad8-4052-9b83-dcf41e3bb801`, CLI sans
 outils, stockage de superviseur temporaire distinct. Collecte active : deux messages observés,

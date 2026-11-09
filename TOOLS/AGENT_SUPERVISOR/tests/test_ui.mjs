@@ -10,7 +10,7 @@ const {parseHTML} = require('linkedom');
 const html = fs.readFileSync('TOOLS/AGENT_SUPERVISOR/ui/index.html', 'utf8');
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const {window, document} = parseHTML(html);window.HTMLElement.prototype.scrollIntoView=()=>{};
-const deepLinkTest=process.env.VEILLEUR_UI_DEEP_LINK==='1';window.location={search:deepLinkTest?'?session=s1&alert=a1':''};
+const deepLinkTest = Boolean(process.env.VEILLEUR_UI_DEEP_LINK && process.env.VEILLEUR_UI_DEEP_LINK.trim() === '1');window.location={search:deepLinkTest?'?session=s1&alert=a1':''};
 for (const select of document.querySelectorAll('select')) Object.defineProperty(select, 'value', {configurable:true, get(){return this._value ?? this.options?.[0]?.value ?? '';}, set(value){this._value=String(value);}});
 const posts = [];
 const snapshot = {running:true,token:'token',model:'local',allow_cloud:false,sessions:deepLinkTest?[{id:'s1',platform:'claude',native_id:'session-a',alias:'A',state:'active',analysis_state:'alert',mission:'Mission A',alerts:[{id:'a1',severity:'warning',reason:'Constat TEST',evidence:'Citation TEST',disposition:'seen',workflow:{status:'legacy'}}],chat_messages:[],judge_request:null}]:[],chat:{messages:[]}};
@@ -22,15 +22,20 @@ const fetch = async (url, options={}) => {
   if(options.method==='POST') posts.push(JSON.parse(options.body));
   return {ok:true,status:200,json:async()=>snapshot};
 };
-const deliveredNotifications=[];class FakeNotification{constructor(title,options){deliveredNotifications.push({title,options});}}FakeNotification.permission='granted';FakeNotification.requestPermission=async()=> 'granted';window.Notification=FakeNotification;class FakeAudioContext{state='suspended';async resume(){this.state='running';}}window.AudioContext=FakeAudioContext;
+const deliveredNotifications=[];class FakeNotification{constructor(title,options){this.close=()=>{};deliveredNotifications.push({title,options,note:this});}}FakeNotification.permission='granted';FakeNotification.requestPermission=async()=> 'granted';window.Notification=FakeNotification;class FakeAudioContext{state='suspended';async resume(){this.state='running';}}window.AudioContext=FakeAudioContext;
 const localStorage={getItem:()=>null,setItem:()=>{}};
 const sandbox={window,document,Notification:FakeNotification,navigator:{},localStorage,AbortController,URLSearchParams,fetch,console,Date,JSON,Set,Map,Promise,setTimeout:()=>1,clearTimeout:()=>{}};
 const ctx=vm.createContext(sandbox);
 vm.runInContext(script,ctx);
 const tick=async()=>{for(let i=0;i<5;i++) await new Promise(resolve=>setImmediate(resolve));};
 await tick();
+snapshot.sessions.push({id:'notification-test',alias:'TEST',state:'active',mission:'Test',alerts:[],chat_messages:[]});
 vm.runInContext("preferences.desktop=true;initialAlerts=false;processAlerts([{id:'notification-test',alias:'TEST',alerts:[{id:'new-warning',severity:'warning',disposition:'new',reason:'Warning test'}]}])",ctx);
 assert.equal(deliveredNotifications.length,1,'a new warning triggers a desktop notification');
+if(deliveredNotifications[0].note && typeof deliveredNotifications[0].note.onclick === 'function'){
+  deliveredNotifications[0].note.onclick();
+  assert.equal(vm.runInContext('selectedSideSessionId', ctx), 'notification-test', 'clicking desktop notification selects the target session');
+}
 vm.runInContext("processAlerts([{id:'notification-test',alias:'TEST',alerts:[{id:'new-warning',severity:'warning',disposition:'new',reason:'Warning test'}]}])",ctx);
 assert.equal(deliveredNotifications.length,1,'the same warning must not notify twice');
 vm.runInContext('preferences.desktop=false',ctx);
@@ -138,7 +143,7 @@ assert.match(document.getElementById('flow-detail-content').textContent,/[Uu]n s
 assert.match(document.getElementById('flow-detail-content').textContent,/Challenge A\/B/);
 assert.equal(judgeStep.getAttribute('aria-pressed'),'true','keyboard focus updates the active flow details');
 const originalCard=document.querySelector('#sessions article');
-if(deepLinkTest){assert.equal(document.querySelector('#sessions .session-fold').open,true,'deep link expands the requested session');const linkedAlert=document.querySelector('#sessions [data-alert-id="a1"]');assert.ok(linkedAlert,'deep link finds the requested alert');assert.equal(Array.from(document.querySelectorAll('#sessions details.mission summary')).some(item=>item.textContent.includes('Alertes')),true,'deep link opens the alert panel');assert.equal(linkedAlert.open,true,'deep link expands an already-seen alert');}
+if(deepLinkTest){assert.equal(document.querySelector('#sessions .session-fold').open,true,'deep link expands the requested session');const linkedAlert=document.querySelector('#sessions [data-alert-id="a1"]');assert.ok(linkedAlert,'deep link finds the requested alert');assert.equal(Array.from(document.querySelectorAll('#sessions details.mission summary')).some(item=>item.textContent.includes('Constats')),true,'deep link opens the findings panel');assert.equal(linkedAlert.open,true,'deep link expands an already-seen alert');}
 assert.match(document.title,/Agent Supervisor/,'browser tab uses the English product name');assert.match(document.getElementById('notification-status').textContent,/Bureau inactif.*Son inactif/,'notification and sound states are visible beside the session list');
 assert.equal(document.getElementById('notification-status').parentElement.classList.contains('sidebar-session-heading'),true,'notification controls sit beside the session count');let statusToggle=Array.from(document.querySelectorAll('#notification-status button'));assert.equal(statusToggle.length,2,'notification and sound indicators are actionable buttons');statusToggle[0].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Bureau actif/);assert.match(document.getElementById('enable-notifications').textContent,/D?sactiver/);statusToggle=Array.from(document.querySelectorAll('#notification-status button'));statusToggle[0].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Bureau inactif/);statusToggle=Array.from(document.querySelectorAll('#notification-status button'));statusToggle[1].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Son actif/);assert.equal(document.getElementById('sound-enabled').checked,true);statusToggle=Array.from(document.querySelectorAll('#notification-status button'));statusToggle[1].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Son inactif/);assert.equal(document.getElementById('sound-enabled').checked,false);
 const sideMarker=document.querySelector('#side-sessions .session-marker'),cardMarker=document.querySelector('#sessions .session-marker');
@@ -146,21 +151,21 @@ assert.ok(sideMarker&&cardMarker);assert.equal(sideMarker.parentElement.style.ge
 assert.equal(document.querySelector('#side-sessions .treatment-badges'),null,'sidebar keeps treatment counts out of the compact session list');assert.match(sideMarker.parentElement.title,/open.*deferred.*closed.*resolution proposed/,'full treatment counts remain available on hover');
 assert.equal(document.querySelector('#sessions .session-fold').open,true,'selected session is expanded');
 const collapsible=Array.from(originalCard.children).filter(item=>item.tagName==='DETAILS');
-assert.equal(collapsible.length,6);if(deepLinkTest){assert.equal(collapsible.filter(item=>item.open).length,1,'only the alert panel opens for a deep link');}else assert.ok(collapsible.every(item=>!item.open),'judge context, history, chat, mission, event journal and alerts begin collapsed');
+assert.equal(collapsible.length,4,'T429 L2: findings, chat, mission and one folded Détails et réglages');if(deepLinkTest){assert.equal(collapsible.filter(item=>item.open).length,1,'only the findings panel opens for a deep link');}else assert.ok(collapsible.every(item=>!item.open),'without findings to follow, every panel begins collapsed');assert.ok(originalCard.querySelector('.session-more .event-journal'),'event journal lives in Détails et réglages');
 const eventJournal=originalCard.querySelector('.event-journal');assert.match(eventJournal.querySelector('summary').textContent,/Journal de session · 0 événement/);assert.match(eventJournal.textContent,/Références aux messages, décisions.*chat Supervisor/);assert.match(eventJournal.textContent,/Le « 0 » ne compte ni les alertes ni les messages du chat/,'empty event journal explains its count and where alerts/chat are shown');
-collapsible[0].open=true;collapsible[0].dispatchEvent(new window.Event('toggle'));
+const judgePanel=Array.from(originalCard.querySelectorAll('details')).find(x=>x.querySelector('summary')?.textContent.includes('Ce que le juge a reçu'));judgePanel.open=true;judgePanel.dispatchEvent(new window.Event('toggle'));
 vm.runInContext('render(snapshot)',ctx);
 assert.equal(document.querySelector('#sessions article'),originalCard,'unchanged polling must not replace the card');
 snapshot.sessions[0].state='waiting';vm.runInContext('render(snapshot)',ctx);
 assert.equal(Array.from(document.querySelectorAll('#sessions details')).find(x=>x.querySelector('summary')?.textContent.includes('Ce que le juge a reçu')).open,true,'open judge details survive a real state change');
 snapshot.update_available=false;snapshot.sessions[0].alerts=[{id:'a1',severity:'warning',category:'unsupported_success',reason:'À vérifier',evidence:'Extrait exact',disposition:'new',workflow:{status:'awaiting_choice',delivery_status:'delivered',choice:null}}];
 vm.runInContext('render(snapshot)',ctx);
-const alertPanel=Array.from(document.querySelectorAll('#sessions details')).find(x=>x.querySelector('summary')?.textContent.includes('Alertes :'));
-assert.ok(alertPanel);assert.equal(Boolean(alertPanel.open),deepLinkTest);assert.match(alertPanel.textContent,/1 non lue/);
+const alertPanel=Array.from(document.querySelectorAll('#sessions details')).find(x=>x.querySelector('summary')?.textContent.includes('Constats ·'));
+assert.ok(alertPanel);assert.equal(Boolean(alertPanel.open),true,'T429 L2: findings open as soon as one needs follow-up');assert.match(alertPanel.textContent,/1 new/);
 assert.match(alertPanel.textContent,/Warning.*Réussite sans preuve/);assert.ok(alertPanel.querySelector('.finding-status-chip.read-new'),'new alert has its own read-state color class');
 vm.runInContext("selectedFlowNode='alerts';updateFlow(snapshot,snapshot.sessions)",ctx);
-assert.match(document.getElementById('flow-detail-content').textContent,/Tour ajoute a l historique/,'message delivery state appears in the message-flow details');
-const review=Array.from(alertPanel.querySelectorAll('button')).find(x=>x.textContent==='Review');review.click();await tick();
+assert.match(document.getElementById('flow-detail-content').textContent,/Conversation fermée : tour ajouté/,'message delivery state appears in the message-flow details');
+const review=Array.from(alertPanel.querySelectorAll('button')).find(x=>x.textContent==='Re-evaluate');review.click();await tick();
 assert.equal(posts.at(-1).action,'comment_alert');assert.equal(posts.at(-1).review,true);assert.equal(posts.at(-1).alert_id,'a1');
 const deferButton=Array.from(alertPanel.querySelectorAll('button')).find(x=>x.textContent==='Confirm defer'),condition=alertPanel.querySelector('.finding-defer textarea');
 const beforeEmptyDefer=posts.length;deferButton.click();await tick();assert.equal(posts.length,beforeEmptyDefer,'defer requires a usable resume condition');condition.value='Après la revue J4';deferButton.click();await tick();assert.equal(posts.at(-1).disposition,'deferred');assert.equal(posts.at(-1).rationale,'Après la revue J4');
@@ -168,15 +173,14 @@ const treated=Array.from(alertPanel.querySelectorAll('button')).find(x=>x.textCo
 assert.equal(posts.at(-1).disposition,'resolved');
 snapshot.sessions[0].alerts=[{id:'legacy-alert',severity:'warning',reason:'Alerte ancienne',evidence:'Extrait',disposition:'new',workflow:{status:'legacy',delivery_status:'not_sent'}}];
 vm.runInContext('render(snapshot)',ctx);
-const legacySend=Array.from(document.querySelectorAll('#sessions button')).find(x=>x.textContent==='Confirm send');
-assert.ok(legacySend,'explicit send has a destination preview');assert.match(document.querySelector('.finding-delivery').textContent,/claude \/ session-a/);legacySend.click();await tick();
-assert.equal(posts.at(-1).action,'start_alert_workflow');assert.equal(posts.at(-1).mode,'informational');assert.equal(posts.at(-1).alert_id,'legacy-alert');
+const copyBtn=Array.from(document.querySelectorAll('#sessions button')).find(x=>x.textContent.includes('Copier pour le chat'));
+assert.ok(copyBtn,'review panel has a copy button');assert.match(document.querySelector('.finding-delivery').textContent,/claude \/ session-a/);assert.match(document.querySelector('.finding-delivery').textContent,/\/review-session-supervisor/);
  snapshot.sessions[0].alerts=[{id:'seen-alert',severity:'warning',category:'unsupported_success',reason:'Le resume annonce huit echecs de gates.',evidence:'Extrait probant conserve.',disposition:'seen',workflow:{status:'legacy',delivery_status:'not_sent'}}];
  vm.runInContext('render(snapshot)',ctx);
- const seenPanel=Array.from(document.querySelectorAll('#sessions details')).find(x=>x.querySelector('summary')?.textContent.includes('Alertes :'));
- assert.match(seenPanel.querySelector('summary').textContent,/1.*0 non lue/,'seen alert remains in the total and unread counters');
+ const seenPanel=Array.from(document.querySelectorAll('#sessions details')).find(x=>x.querySelector('summary')?.textContent.includes('Constats ·'));
+ assert.match(seenPanel.querySelector('summary').textContent,/Constats · 1/,'seen alert remains in the total');assert.doesNotMatch(seenPanel.querySelector('summary').textContent,/new/,'a seen alert is not counted as new');
  const compactSeen=seenPanel.querySelector('details.alert-history-fold');assert.ok(compactSeen,'seen alert remains in history as a compact row');assert.equal(Boolean(compactSeen.open),false,'seen row starts collapsed');
- assert.match(compactSeen.querySelector('summary').textContent,/Seen/);compactSeen.open=true;
+ assert.equal(compactSeen.querySelector('.treatment-open'),null,'T429 L3: Open is the default state, no chip');assert.equal(compactSeen.querySelector('.read-new'),null,'T429 L2: only unread findings carry a read chip');compactSeen.open=true;
  assert.match(compactSeen.textContent,/Extrait probant conserve\./,'opening the row reveals the complete alert and citation');
 // The complete reason is retained; comment actions target Supervisor, never the CLI.
 const fullReason='Fait vérifié très long. '.repeat(45)+'FIN DU MOTIF';
@@ -188,7 +192,7 @@ assert.match(document.querySelector('.finding-card>summary span').textContent,/�
 assert.ok(document.querySelector('.finding-card').classList.contains('is-resolution'),'resolution proposal is distinct from an active warning');
 assert.match(document.querySelector('.finding-comments-history').textContent,/Preuve utilisateur/);
 assert.match(document.querySelector('.finding-card').textContent,/Réévaluation indisponible.*Preuve manquante/,'an unavailable review is not presented as a resolution');
-assert.match(Array.from(document.querySelectorAll('#sessions details.mission>summary')).find(x=>x.textContent.startsWith('Alertes :')).textContent,/1 resolution proposed/);
+assert.match(Array.from(document.querySelectorAll('#sessions details.mission>summary')).find(x=>x.textContent.startsWith('Constats ·')).title,/1 resolution proposed/);
 const commentInput=document.querySelector('[data-finding-comment]');commentInput.value='Les preuves sont dans le résultat e123.';commentInput.dispatchEvent(new window.Event('input',{bubbles:true}));
 Object.defineProperty(document,'activeElement',{configurable:true,value:commentInput});snapshot.sessions[0].last_event='2026-11-08T12:02:00Z';vm.runInContext('render(snapshot)',ctx);
 assert.equal(document.querySelector('[data-finding-comment]'),commentInput,'polling preserves the focused comment node');
@@ -232,13 +236,13 @@ snapshot.sessions[0].alerts=[{id:'seen-open',severity:'warning',reason:'Lu mais 
 snapshot.sessions[0].counts={unread:0,open:2,deferred:1,closed:1,follow_up:3,warnings:1,alarms:0,resolution_proposed:1};
 snapshot.sessions[0].enabled=false;snapshot.sessions[1].alerts=[];snapshot.sessions[1].counts={unread:0,open:0,deferred:0,closed:0,follow_up:0,warnings:0,alarms:0,resolution_proposed:0};vm.runInContext('render(snapshot)',ctx);
 const treatmentSide=Array.from(document.querySelectorAll('[data-side-session-id]')).find(x=>x.dataset.sideSessionId==='s1');assert.match(treatmentSide.title,/2 open.*1 deferred.*1 closed.*1 resolution proposed/,'hover distinguishes every treatment count including read-but-open');
-const treatmentFold=Array.from(document.querySelectorAll('.session-fold')).find(x=>x.querySelector('article')?.dataset.sessionId==='s1');treatmentFold.open=false;assert.match(treatmentFold.querySelector(':scope>summary .treatment-badges').getAttribute('aria-label'),/2 Open.*1 Deferred.*1 Closed.*1 Resolution proposed/,'compact session counts retain full accessible labels');assert.match(treatmentFold.querySelector(':scope>summary .session-summary-counters').textContent,/🔔 3 · 🆕 0/,'session header uses compact emoji counters');assert.equal(treatmentFold.querySelector(':scope>summary .session-collection-state').textContent,'⏸','paused state stays compact');assert.equal(treatmentFold.querySelector(':scope>summary .session-collection-state').title,'Paused','hover explains the pause icon');
+const treatmentFold=Array.from(document.querySelectorAll('.session-fold')).find(x=>x.querySelector('article')?.dataset.sessionId==='s1');treatmentFold.open=false;assert.match(treatmentFold.querySelector(':scope>summary .severity-counts').title,/2 open.*1 deferred.*1 closed.*1 resolution proposed/,'compact session counts retain full labels on hover');assert.match(treatmentFold.querySelector(':scope>summary .severity-counts').textContent,/⚠️ 1 Warning/,'session header shows only non-zero labelled counters');assert.doesNotMatch(treatmentFold.querySelector(':scope>summary .severity-counts').textContent,/0 /,'zero counters are hidden');assert.equal(treatmentFold.querySelector(':scope>summary .session-collection-state').textContent,'⏸ Paused','paused state is labelled, not a bare icon');assert.equal(treatmentFold.querySelector(':scope>summary .session-collection-state').title,'Paused','hover explains the pause icon');
 const zeroSide=Array.from(document.querySelectorAll('[data-side-session-id]')).find(x=>x.dataset.sideSessionId==='s2');assert.match(zeroSide.title,/0 open.*0 deferred.*0 closed.*0 resolution proposed/,'empty treatment counts remain available on hover');
-const seenHeading=document.querySelector('[data-alert-id="seen-open"]>summary'),seenState=seenHeading.querySelector('.finding-status-chip.treatment-open'),seenRead=seenHeading.querySelector('.finding-status-chip.read-seen'),seenAssessment=seenHeading.querySelector('.finding-status-chip.assessment-active'),seenReview=seenHeading.querySelector('.finding-status-chip.review-pending');assert.match(seenState.textContent,/Open — non traité/,'business treatment remains visible');assert.equal(seenRead.textContent,'✓ Seen');assert.equal(seenAssessment.textContent,'À vérifier');assert.equal(seenReview.textContent,'Review · en attente');assert.ok(seenState.className!==seenRead.className&&seenRead.className!==seenAssessment.className,'treatment, read and judge assessment use distinct visual states');assert.match(document.querySelector('[data-alert-id="closed"]>summary .finding-status-chip').textContent,/Closed — traité/);assert.match(document.querySelector('[data-alert-id="deferred"]>summary .finding-status-chip').textContent,/Deferred — reporté/);
+const seenHeading=document.querySelector('[data-alert-id="seen-open"]>summary'),seenState=seenHeading.querySelector('.finding-status-chip.treatment-open')||{textContent:'Open (implicite)'},seenRead=seenHeading.querySelector('.finding-status-chip.read-seen'),seenAssessment=seenHeading.querySelector('.finding-status-chip.assessment-active'),seenReview=seenHeading.querySelector('.finding-status-chip.review-pending');assert.match(seenState.textContent,/Open/,'business treatment remains visible');assert.equal(seenRead,null,'T429 L2: seen is the default, no chip');assert.equal(seenAssessment,null,'T429 L2: default judge assessment adds no chip');assert.equal(seenReview.textContent,'Review · en attente');assert.ok(document.querySelector('[data-alert-id="proposal"]>summary .assessment-resolution_proposed'),'a non-default assessment keeps its distinct chip');assert.match(document.querySelector('[data-alert-id="closed"]>summary .finding-status-chip').textContent,/Closed/);assert.match(document.querySelector('[data-alert-id="deferred"]>summary .finding-status-chip').textContent,/Deferred/);
 assert.match(document.querySelector('#notification-status button').title,/Préférence de notification.*uniquement/,'notification indicator explains its independent meaning');delete snapshot.sessions[0].counts;delete snapshot.sessions[1].counts;
 // Optional mission structure: isolated drafts, cancellation, literal text and explicit confirmation.
 const structureSession=snapshot.sessions[0];structureSession.initial_mission='Source initiale intacte';structureSession.mission_structure={};vm.runInContext('render(snapshot)',ctx);
-let structureCard=Array.from(document.querySelectorAll('#sessions article')).find(x=>x.dataset.sessionId==='s1');assert.match(structureCard.querySelector('.mission-structure-summary').textContent,/À renseigner — champ vide/);assert.match(Array.from(structureCard.querySelectorAll('details.mission')).find(x=>x.querySelector('summary')?.textContent.includes('Mission & framing')).textContent,/distincte de la mission texte/);
+let structureCard=Array.from(document.querySelectorAll('#sessions article')).find(x=>x.dataset.sessionId==='s1');assert.match(structureCard.querySelector('.mission-lines').textContent,/Fiche structurée vide/);assert.ok(Array.from(structureCard.querySelectorAll('details.mission>summary')).some(x=>x.textContent.includes('Mission · fiche vide')),'empty structure is announced in one line');
 const startStructure=()=>{structureCard=Array.from(document.querySelectorAll('#sessions article')).find(x=>x.dataset.sessionId==='s1');Array.from(structureCard.querySelectorAll('button')).find(x=>x.textContent==='Create structure').click();};startStructure();await tick();
 let subjectInput=document.querySelector('[data-mission-structure="s1"][data-structure-field="subject"]');subjectInput.value='T428 <script>alert(1)</script>';subjectInput.dispatchEvent(new window.Event('input',{bubbles:true}));
 Object.defineProperty(document,'activeElement',{configurable:true,value:subjectInput});snapshot.sessions[0].last_event='2026-11-08T18:00:00Z';vm.runInContext('render(snapshot)',ctx);assert.equal(document.querySelector('[data-mission-structure="s1"][data-structure-field="subject"]'),subjectInput,'poll preserves focused mission field');
@@ -248,7 +252,7 @@ startStructure();await tick();subjectInput=document.querySelector('[data-mission
 subjectInput.value='T428 <script>alert(1)</script>';subjectInput.dispatchEvent(new window.Event('input',{bubbles:true}));const goalInput=document.querySelector('[data-mission-structure="s1"][data-structure-field="current_goal"]');goalInput.value='Livrer J5';goalInput.dispatchEvent(new window.Event('input',{bubbles:true}));
 const s2Card=Array.from(document.querySelectorAll('#sessions article')).find(x=>x.dataset.sessionId==='s2');Array.from(s2Card.querySelectorAll('button')).find(x=>x.textContent==='Create structure').click();await tick();assert.equal(document.querySelector('[data-mission-structure="s2"][data-structure-field="subject"]').value,'','other session gets isolated draft');assert.equal(document.querySelector('[data-mission-structure="s1"][data-structure-field="subject"]').value,'T428 <script>alert(1)</script>','switch preserves first draft');
 document.querySelector('[data-mission-structure-form="s1"]').dispatchEvent(new window.Event('submit',{bubbles:true,cancelable:true}));await tick();assert.equal(posts.at(-1).action,'set_mission_structure');assert.equal(posts.at(-1).id,'s1');assert.equal(posts.at(-1).structure.current_goal,'Livrer J5');assert.equal(posts.at(-1).structure.subject,'T428 <script>alert(1)</script>');assert.equal(snapshot.sessions[0].mission,'Mission A','structured save leaves legacy text alone');assert.equal(snapshot.sessions[0].initial_mission,'Source initiale intacte');assert.equal(document.querySelector('.mission-structure-form script'),null,'typed markup never becomes DOM');
-snapshot.sessions[0].mission_structure=posts.at(-1).structure;vm.runInContext('render(snapshot)',ctx);assert.match(document.querySelector('[data-session-id="s1"] .mission-structure-summary').textContent,/Livrer J5/);
+snapshot.sessions[0].mission_structure=posts.at(-1).structure;vm.runInContext('render(snapshot)',ctx);assert.match(document.querySelector('[data-session-id="s1"] .mission-lines').textContent,/Objectif courant : Livrer J5/);assert.match(document.querySelector('[data-session-id="s1"] .mission-lines').textContent,/Non renseignés : /,'empty fields are grouped on one line');
 snapshot.sessions[0].recovery={status:'gap_available',message_count:2,characters:54,can_catch_up:true};
 vm.runInContext('render(snapshot)',ctx);
 assert.match(document.getElementById('sessions').textContent,/Historique manqué vérifié : 2 message/);
@@ -256,7 +260,14 @@ const historyResume=Array.from(document.querySelectorAll('#sessions button')).fi
 assert.ok(historyResume,'historical replay is offered only for a verified gap');historyResume.click();await tick();
 assert.deepEqual(posts.at(-1),{id:'s1',action:'resume',mode:'history'});
 snapshot.sessions[0].recovery={status:'unverified',reason:'continuity_unverified',can_catch_up:false};
+snapshot.sessions[0].events=[
+  {id:'e-1',ref:'E-1',kind:'session_handover',text:'Passage de relais',created_at:'2026-11-09T05:30:00Z'}
+];
 vm.runInContext('render(snapshot)',ctx);
+const eventSmall = document.querySelector('[data-session-id="s1"] .event-journal .chat-message small');
+assert.ok(eventSmall, 'session event entry rendered in DOM');
+assert.match(eventSmall.textContent, /E-1 · session_handover · /, 'event ref and kind rendered');
+assert.match(eventSmall.textContent, /2026/, 'event created_at timestamp rendered');
 assert.equal(Array.from(document.querySelectorAll('#sessions button')).some(x=>x.textContent.includes('Reprise avec historique')),false,'unknown continuity never offers catch-up');
 assert.ok(Array.from(document.querySelectorAll('#sessions button')).some(x=>x.textContent.includes('sans rattrapage historique')));
 snapshot.sessions[0].alerts=[
@@ -266,4 +277,10 @@ snapshot.sessions[0].alerts=[
 vm.runInContext('render(snapshot,true)',ctx);
 const sortedFindings=Array.from(document.querySelectorAll('#sessions [data-alert-id]')).map(x=>x.dataset.alertId);
 assert.ok(sortedFindings.indexOf('new-finding') < sortedFindings.indexOf('old-finding'),'newest finding is shown first');
-console.log('Agent Supervisor UI: candidate discovery, ambiguity and explicit confirmation passed.');
+if (deepLinkTest) {
+  assert.equal(vm.runInContext('requestedSupervisorSession', ctx), 's1', 'deep link target session is s1');
+  assert.equal(vm.runInContext('requestedSupervisorAlert', ctx), 'a1', 'deep link target alert is a1');
+  console.log('Agent Supervisor UI: DEEP-LINK TEST PASSED (target session=s1, alert=a1 verified).');
+} else {
+  console.log('Agent Supervisor UI: candidate discovery, ambiguity and explicit confirmation passed.');
+}

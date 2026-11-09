@@ -43,6 +43,23 @@ def task_reference(value: str, *, anywhere: bool = False) -> str | None:
     return match.group(1).upper() if match else None
 
 
+ALIAS_PATTERN = r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC)\d{2}[^\S\r\n]+\S.*$"
+
+
+def validate_alias(alias: str, *, confirm_without_task: bool = False) -> str:
+    cleaned = alias.strip()
+    if not cleaned or len(cleaned) > 100:
+        raise ValueError("Alias requis (100 caractères maximum)")
+    if confirm_without_task:
+        return cleaned
+    if not re.fullmatch(ALIAS_PATTERN, cleaned):
+        raise ValueError(
+            f"L'alias '{cleaned}' ne respecte pas la convention canonique 'TXXX[-X]-AGENT Désignation' "
+            "(ex: T429-AGY01 Fiabilisation Veilleur, T428-1-CDX01 Cartes de flux)"
+        )
+    return cleaned
+
+
 def is_no_task(value: str) -> bool:
     folded = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii").upper()
     return folded.strip().startswith("SANS TACHE FORMELLE")
@@ -70,9 +87,9 @@ def api_json(url: str, *, token: str | None = None, payload: dict | None = None)
 
 
 def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
-            base_url: str = "http://127.0.0.1:8082", *, confirm_without_task: bool = False) -> dict:
-    if not alias.strip() or len(alias) > 100:
-        raise ValueError("Alias requis (100 caractères maximum)")
+            base_url: str = "http://127.0.0.1:8082", *, confirm_without_task: bool = False,
+            reassign: bool = False) -> dict:
+    alias = validate_alias(alias, confirm_without_task=confirm_without_task)
     if not mission.strip() or len(mission) > 1500:
         raise ValueError("Mission requise (1500 caractères maximum)")
     no_task = is_no_task(task)
@@ -100,7 +117,20 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
             current_ref = task_reference(item.get("mission", ""), anywhere=True)
             if (current_ref == task_ref and
                     (item.get("platform") != platform or item.get("native_id") != session_id)):
-                raise ValueError(f"{task_ref} est déjà suivie par {item.get('alias') or item.get('native_id')}; une tâche ne peut avoir qu'une session Veilleur")
+                if not reassign:
+                    raise ValueError(
+                        f"{task_ref} est déjà suivie par '{item.get('alias') or item.get('native_id')}'; "
+                        "pour transférer le suivi de cette tâche vers ce nouveau runtime, relancez avec --reassign"
+                    )
+                result = api_json(base_url + "/api/supervision", token=snapshot.get("token"), payload={
+                    "action": "reassign", "id": item["id"], "platform": platform, "native_id": session_id,
+                    "alias": alias.strip(), "mission": attached_mission, "handover": True})
+                attached = next((s for s in result.get("sessions", []) if s["id"] == item["id"]), None)
+                if not attached or not attached.get("source"):
+                    raise RuntimeError("Le service n’a pas confirmé une source unique pour la réassignation")
+                return dict(status="reassigned", assignment_id=attached["id"], state=attached["state"],
+                            alias=attached.get("alias"), platform=platform, native_id=session_id,
+                            task=task, source=attached["source"], previous_alias=item.get("alias"))
     result = api_json(base_url + "/api/supervision", token=snapshot.get("token"), payload={
         "action": "add", "platform": platform, "native_id": session_id,
         "alias": alias.strip(), "mission": attached_mission})
@@ -120,13 +150,14 @@ def main():
     parser.add_argument("--alias", required=True)
     parser.add_argument("--task", required=True, help="Task reference T###, or explicit 'SANS TACHE FORMELLE' after confirmation")
     parser.add_argument("--confirm-without-task", action="store_true", help="Explicit user confirmation to track without a formal task")
+    parser.add_argument("--reassign", action="store_true", help="Transférer le suivi d'une session existante pour cette tâche vers ce nouveau runtime")
     parser.add_argument("--mission", required=True)
     parser.add_argument("--url", default="http://127.0.0.1:8082")
     args = parser.parse_args()
     try:
         session_id = session_id_for(args.platform, args.session_id)
         result = connect(args.platform, session_id, args.alias, args.task, args.mission, args.url,
-                         confirm_without_task=args.confirm_without_task)
+                         confirm_without_task=args.confirm_without_task, reassign=args.reassign)
         print(json.dumps(result, ensure_ascii=False))
     except (ValueError, RuntimeError, HTTPError, URLError, TimeoutError) as exc:
         print(json.dumps({"status": "error", "message": str(exc)[:240]}, ensure_ascii=False))

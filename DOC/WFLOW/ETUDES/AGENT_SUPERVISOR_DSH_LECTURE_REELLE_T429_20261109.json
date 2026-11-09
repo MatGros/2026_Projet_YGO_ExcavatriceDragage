@@ -1,0 +1,31 @@
+﻿{
+    "contract":  "T429",
+    "ac":  "AC-F4.3 (DSH)",
+    "date":  "2026-11-09",
+    "kind":  "lecture reelle en lecture seule, Supervisor isole, aucun envoi",
+    "results":  [
+                    {
+                        "messages_read":  2,
+                        "roles":  {
+                                      "user":  2
+                                  },
+                        "source_found":  true,
+                        "native_id":  "session-a5666665-2829-4228-b75e-7d99abc44a79",
+                        "note":  "session d essai T429",
+                        "decode":  "zstd OK"
+                    },
+                    {
+                        "messages_read":  24,
+                        "roles":  {
+                                      "user":  4,
+                                      "assistant":  20
+                                  },
+                        "source_found":  true,
+                        "native_id":  "session-e912b144-952e-4342-9bfa-6527db569a59",
+                        "note":  "vraie session du projet, 760 Ko",
+                        "decode":  "zstd OK",
+                        "partial":  "borne attendue"
+                    }
+                ],
+    "limit":  "Collecte en direct de nouveaux messages non demontree : profil dsh headless sans DEEPSEEK_API_KEY (MISSING_CREDENTIAL), configuration CLI hors perimetre."
+}
