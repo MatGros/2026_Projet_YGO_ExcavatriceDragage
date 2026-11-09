@@ -33,10 +33,11 @@ tasks:
     des evenements de session). AC-F1.5bis valide (partitionnement adaptatif glouton des lots de reprise historique eliminant
     recovery_batch_exceeds_judge_budget). AC-F3.3 valide (pivot PULL /review-session-supervisor dans 3 CLI, retrait push UI,
     encodage cp1252 resolu, consigne outil brute integree). AC-F3.5 (focusFindingCard, autounlock audio, deep-link test_ui.mjs).
-    AC-X.1 & AC-X.2 valides : 144/144 tests pytest PASS, ui_layout_check 1440/390/360 PASS, npm test 15/15 PASS. Service 8082
-    mis a jour (build 107f618aef55). Plan enrichi : cadrage strategique refonte des prompts/drift/alarmes (REVIEW_SUPERVISOR_PROMPTS_ET_DRIFT.md)
-    et nouvelle tache backlog "Revoir Trajet des messages" (IHM/telemetrie, decomptes dynamiques, assouplissement contexte, multi-sessions).
-    Aucun commit/push sans accord explicite.'
+    AC-F2.9 valide (moteur memoire C2, journal session, audit trajectoire modulo 8). AC-F2.10 valide (prompt C1 OMNI_JUDGE_SYSTEM,
+    matrice Alarm/Warning deployee). AC-F3.10 valide (securite deconnexion IHM sur menu lateral gauche). Condition bloquante C1
+    resolue (durcissement regex anti-evasion pluriels/accords/0 passed + 5 tests adversaires PASS). AC-X.1 & AC-X.2 valides : 171/171 tests
+    pytest PASS, ui_layout_check 1440/390/360 PASS, npm test 15/15 PASS. Service 8082 mis a jour (build b0c05d532327). Double revue
+    finale A/B (DeepSeek V4.1 + GLM 5.3) concluant a la levee de reserve et qualification de livraison. Aucun commit/push sans accord explicite.'
   contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T429_AGENT_SUPERVISOR_FIABILISATION.yaml (contrat mesurable AC-F0 a AC-F4, AC-X
     ; preuves et revues A/B dans tracking). Pilotage detaille : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md'
   bloque_par: ''
