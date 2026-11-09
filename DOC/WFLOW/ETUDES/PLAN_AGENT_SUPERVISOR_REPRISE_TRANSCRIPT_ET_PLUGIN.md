@@ -143,6 +143,20 @@ Bien que le composant « Trajet des messages » soit visuellement structuré, so
    - *Constat* : Le bloc « Résultats » tend à ne refléter que la session locale Antigravity, alors que des sessions Claude Code, Codex ou DSH peuvent être rattachées.
    - *Cible* : Présenter une vue unifiée ou filtrable par plateforme/CLI, permettant de visualiser d'un coup d'œil les alertes transverses sans avoir l'impression que le système est figé sur un seul agent.
 
+### 🚨 Exigence Sécurité IHM : Alerte Déconnexion sur Menu Latéral Persistant (Anti-travail sans surveillance)
+
+*Demande exploitant 2026-11-09 : Prévenir le risque d'opérer un agent en croyant à tort qu'il est surveillé.*
+
+1. **Constat & Risque Observé** :
+   - Lorsque la connexion au service 8082 est coupée ou en redémarrage, l'IHM affiche : `Connexion au service indisponible : Failed to fetch. Les dernières données restent affichées.`
+   - Ce message en tête de page principale est parfaitement informatif, mais **disparaît du champ de vision dès que l'utilisateur fait défiler la page (scroll vertical)**.
+   - **Danger opérationnel réel** : L'utilisateur consulte des constats plus bas ou suit ses logs, ne voit plus l'avertissement en haut, et continue à opérer son agent en pensant qu'il est activement surveillé alors que la supervision est interrompue.
+
+2. **Cible Ergonomique & Implémentation** :
+   - **Menu latéral persistant (`fixed / sticky`)** : Répercuter immédiatement la perte de connexion dans le volet de navigation gauche, qui reste visible en permanence lors de tout défilement.
+   - **Signal visuel franc mais non agressif** : Appliquer une teinte de fond **rouge pastel / alerte déconnexion** sur le menu gauche (`background-color` rouge doux contrasté, badge clignotant ou bandeau persistant `⚠️ SUPERVISION INTERROMPUE — DÉCONNECTÉ`) tant que l'appel API `fetch` échoue.
+   - **Reprise automatique** : Dès que le service 8082 redevient joignable, le menu reprend automatiquement son aspect normal sans rechargement forcé de page.
+
 **Service :** 8082 mis à jour le 9 novembre (build `7b92c84391a5`) par `upgrade_legacy.py`, sauvegarde vérifiée ;
 T428 et CC-T217 conservées en pause. Prise en charge T429 par AGY01 (Antigravity). Aucun commit ni push.
 

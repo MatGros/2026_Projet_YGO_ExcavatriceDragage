@@ -579,3 +579,50 @@ def test_reassign_handover_preserves_alerts_and_switches_platform(tmp_path):
     finally:
         svc.close()
 
+
+def test_deterministic_tool_proof_capture_and_trajectory_audit(tmp_path):
+    svc = Supervisor(state_path=tmp_path / 'supervision.json')
+    try:
+        session = {
+            'id': 's-test', 'enabled': True, 'state': 'active', 'generation': 1,
+            'source': str(tmp_path / 'dummy.jsonl'), 'platform': 'claude', 'native_id': 'sess-1',
+            'memory': [], 'framing': [], 'alerts': [], 'events': [], 'acquired_proofs': [],
+            'session_journal': [], 'initial_mission': 'Valider le moteur', 'mission': 'Valider le moteur',
+            'mission_updated_at': None, 'context': [], 'context_truncated': False,
+            'watcher': None
+        }
+        # 1. Capture d'un tool PASS légitime
+        tool_msg = {'role': 'tool', 'event_id': 'e10', 'text': '==== 159 passed in 11.85s ===='}
+        svc._remember_source(session, tool_msg)
+        assert len(session['acquired_proofs']) == 1
+        assert '159 passed in 11.85s' in session['acquired_proofs'][0]['text']
+        assert session['acquired_proofs'][0]['kind'] == 'tool_proof'
+
+        # 1bis. Contre-exemple critique C1 : 'NON PASS : contrôle en échec' NE DOIT PAS être capturé comme preuve
+        negative_tool_msg = {'role': 'tool', 'event_id': 'e11', 'text': 'NON PASS : contrôle en échec.'}
+        svc._remember_source(session, negative_tool_msg)
+        assert len(session['acquired_proofs']) == 1, "Un résultat d'outil avec négation ne doit pas être promu en PASS !"
+
+        # 2. Compteur et audit tous les 8 tours
+        session['judge_turn_count'] = 7
+        svc.sessions['s-test'] = session
+        svc.judge_settings = {'context_chars': 6000}
+        svc._queue.append('s-test')
+        svc._queued.add('s-test')
+        session['context'] = [tool_msg]
+        svc.judge = lambda *args, **kwargs: {'alert': False, 'state_update': 'Étape A validée avec succès'}
+        sid = svc._queue.popleft()
+        svc._queued.discard(sid)
+        session['judge_turn_count'] = session.get('judge_turn_count', 0) + 1
+        notices = []
+        acquired = session.get('acquired_proofs', [])
+        if acquired:
+            notices.append({'role': 'context_notice', 'text': '## PREUVES ACQUISES :\n' + '\n'.join(p['text'] for p in acquired)})
+        if session['judge_turn_count'] % 8 == 0:
+            notices.append({'role': 'context_notice', 'text': f"[AUDIT DE TRAJECTOIRE — TOUR {session['judge_turn_count']}]"})
+
+        assert any('AUDIT DE TRAJECTOIRE — TOUR 8' in n['text'] for n in notices)
+        assert any('159 passed in 11.85s' in n['text'] for n in notices)
+    finally:
+        svc.close()
+
