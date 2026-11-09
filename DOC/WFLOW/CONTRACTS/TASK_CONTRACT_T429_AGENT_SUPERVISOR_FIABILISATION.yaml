@@ -210,8 +210,9 @@ tracking:
     - "AC-F4.1 PASS : campagne FR A/B DeepSeek, B 10/10 verdicts+ancrage, style 4/4, A 9/10 (DOC/WFLOW/ETUDES/AGENT_SUPERVISOR_CAMPAGNE_FR_T429_AB_FINAL_20261109.json). Cas H7-H10 consommes, plus aveugles."
     - "AC-F4.2 PASS : 0 mauvaise affectation, 0 citation inventee acceptee, 0 perte silencieuse, 0 divergence de compteurs sur l'ensemble des recettes."
     - "AC-F4.3 PARTIEL [REEL] : Codex, Claude, Antigravity PASS (2 messages collectes, bon UUID) ; DSH LIMITE documentee : profil headless sans DEEPSEEK_API_KEY (MISSING_CREDENTIAL), configuration CLI hors perimetre (AGENT_SUPERVISOR_PLATEFORMES_REEL_T429_20261109.json)."
-    - "AC-X.1 PASS : service 8082 mis a jour (build 107f618aef55) via upgrade_legacy.py, sauvegarde verifiee ; T428 (pause, 6 constats) et CC-T217 (pause) inchangees."
-    - "AC-X.2 PASS : pytest 144/144, test_ui x2, ui_layout_check, npm 15/15, git diff --check."
+    - "AC-X.1 PASS : service 8082 mis a jour (build b0c05d532327) via upgrade_legacy.py et daemon persistant, sauvegarde verifiee ; T428 (pause, 6 constats), CC-T217 (pause) et T429 inchangees."
+    - "AC-X.2 PASS : pytest 171/171 passed (dont 43 regressions et 26 tests judge comportementaux), test_ui x2, ui_layout_check (1440/390/360 px), git diff --check (0 erreur)."
+    - "REV-FINALE-T429 PASS 2026-11-09 : Double revue contradictoire A (DeepSeek V4.1 HOLD levé par dossier de preuves) et B (GLM 5.3 condition bloquante C1 résolue par durcissement regex pluriels/accords/0 passed et 5 tests adversaires PASS)."
   unknowns:
     - "AC-F3.5 [REEL] : notification bureau, son, toast VS Code et clic vers la bonne carte a observer par l'exploitant (non observable par l'agent)."
     - "AC-F3.9 : retour exploitant final sur la simplicite (2 challenges ergonomie realises)."
@@ -261,6 +262,11 @@ tracking:
         reviewers: ["agent natif Sonnet"]
         independent: true
         decision: "Verdict PARTIEL (probleme ? oui ; ou ? que faire ? non). Corriges : Alarm en tete des constats ouverts, session par defaut = celle a suivre, avertissements d etat avant le chat, Pause/Resume dans l en-tete, un seul constat ouvert automatiquement, chip Open et zeros masques, nom de session non repete. ui_layout_check verifie open_alarm_first. Reste non bloquant : titres distinctifs pour d anciens constats sans title."
+      - id: REV-FINALE-T429
+        scope: "revue finale contradictoire globale T429 (moteur mémoire C2, prompts C1, IHM déconnexion, évasion faux PASS)"
+        reviewers: ["deepseek-v4.1-flash:cloud", "glm-5.3-flash:cloud"]
+        independent: true
+        decision: "DeepSeek a posé un HOLD de rigueur faute de code brut -> levé par DOSSIER_PREUVES_AUDIT_T429.md. GLM 5.3 a découvert la condition bloquante C1 (évasion pluriels/accords/0 passed) -> corrigée dans supervisor_service.py et verrouillée par 5 tests adversaires passants. Qualification GO finale validée."
   experiments:
     - id: EXP-F0-1
       question: "L'echec pytest 90/91 est-il un bug du Supervisor ?"

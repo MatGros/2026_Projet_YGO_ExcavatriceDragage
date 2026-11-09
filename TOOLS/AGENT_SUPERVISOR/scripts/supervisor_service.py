@@ -1563,9 +1563,10 @@ class Supervisor:
                 session["framing"].append(dict(item, ref=event["ref"], version=len(session["framing"]) + 1))
         elif message["role"] == "tool":
             tool_text = str(message.get("text", ""))
-            # Barrière absolue : ne JAMAIS déduire de succès si un terme d'échec ou de négation est présent
-            if not re.search(r"\b(?:non|not|failed|échec|echec|erreur|error|exception|traceback|interrompu)\b", tool_text, re.IGNORECASE):
-                match = re.search(r"(?:={2,}\s*)?(\d+\s+passed[^\n\r]*|exited with code 0|0\s+erreur[^\n\r]*)", tool_text, re.IGNORECASE)
+            # Barrière absolue : ne JAMAIS déduire de succès si un terme d'échec ou de négation est présent (gestion des pluriels et accords)
+            if not re.search(r"\b(?:non|not|fail(?:ed|ures?|s)?|échecs?|echecs?|erreurs?|errors?|exceptions?|tracebacks?|interrompue?s?|annul[ée]e?s?|refus[ée]e?s?|bloqu[ée]e?s?|invalide?s?)\b", tool_text, re.IGNORECASE):
+                # Seules les traces explicites d'exécution passante sans ambiguïté sont retenues (exclure formellement '0 passed')
+                match = re.search(r"(?:={2,}\s*)?([1-9]\d*\s+passed[^\n\r]*|exited with code 0|0\s+erreur[^\n\r]*)", tool_text, re.IGNORECASE)
                 if match:
                     summary = match.group(1).strip()
                     item = dict(kind="tool_proof", text=summary[:200], observed_at=message.get("observed_at", timestamp()), event_id=ident, event_index=message.get("event_index"))

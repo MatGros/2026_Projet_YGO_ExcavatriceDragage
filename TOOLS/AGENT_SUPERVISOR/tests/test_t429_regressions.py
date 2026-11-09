@@ -598,10 +598,17 @@ def test_deterministic_tool_proof_capture_and_trajectory_audit(tmp_path):
         assert '159 passed in 11.85s' in session['acquired_proofs'][0]['text']
         assert session['acquired_proofs'][0]['kind'] == 'tool_proof'
 
-        # 1bis. Contre-exemple critique C1 : 'NON PASS : contrôle en échec' NE DOIT PAS être capturé comme preuve
-        negative_tool_msg = {'role': 'tool', 'event_id': 'e11', 'text': 'NON PASS : contrôle en échec.'}
-        svc._remember_source(session, negative_tool_msg)
-        assert len(session['acquired_proofs']) == 1, "Un résultat d'outil avec négation ne doit pas être promu en PASS !"
+        # 1bis. Contre-exemples critiques C1/Reviewer B : négations, pluriels, accords et '0 passed' ne doivent JAMAIS être promus
+        for adversary_text in [
+            'NON PASS : contrôle en échec.',
+            '12 échecs, 0 passed',
+            '118 passed, 2 errors',
+            'Opération interrompue : 5 passed',
+            'échecs : 3, 12 passed'
+        ]:
+            bad_msg = {'role': 'tool', 'event_id': f'bad_{hash(adversary_text)}', 'text': adversary_text}
+            svc._remember_source(session, bad_msg)
+            assert len(session['acquired_proofs']) == 1, f"Échec sur {adversary_text} : ne doit jamais être capturé en PASS !"
 
         # 2. Compteur et audit tous les 8 tours
         session['judge_turn_count'] = 7
