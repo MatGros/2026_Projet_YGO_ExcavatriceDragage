@@ -1,4 +1,38 @@
 tasks:
+- id: T429
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: OUTILLAGE / AGENT_SUPERVISOR / PLUGIN VS CODE
+  agent: CC01
+  date: '2026-11-09T00:57:21+01:00'
+  titre: 'Agent Supervisor : fiabiliser reprise, cycle des alertes, IHM et plugin sur parcours reels'
+  contexte: 'Campagne de fiabilisation du Supervisor (Veilleur) lancee le 2026-11-08, jusqu ici suivie sans ID formel. Document
+    unique de pilotage (plan, decisions, preuves, limites) : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
+    . Utilisation du service : TOOLS/AGENT_SUPERVISOR/README.md . Perimetre : TOOLS/AGENT_SUPERVISOR/ uniquement. Aucun changement
+    CODE/, CODESYS, hooks, skills ni configurations CLI.'
+  description: Rendre le suivi d une session surveillee fiable apres pause ou redemarrage, et rendre les constats lisibles
+    et exploitables (IHM, plugin VS Code, envoi au chat), prouve sur parcours reels et non seulement sur tests DOM ou donnees
+    synthetiques. Lots F0 a F4 du document de pilotage.
+  objectifs:
+  - 'F1 Continuite : pause/reprise normale et avec historique, redemarrage service, source deplacee ou absente ; aucune perte
+    ni saut silencieux, choix et plage visibles'
+  - 'F2 Cycle et cadrage : decisions humaines et cadrage versionne pris en compte ; meme constat revise (pas de doublon) ;
+    progression validee non accusee'
+  - 'F3 IHM et plugin : memes compteurs IHM/plugin ; deux severites Warning/Alarm ; notification bureau, son et clic plugin
+    vers le bon constat observes en reel'
+  - 'F3 Send to chat : envoi explicite a l UUID exact, livraison confirmee/echouee/incertaine distinguee, sans double envoi'
+  - 'F4 Recette : corpus francais (synthetique separe du reel autorise), FP/FN et citations publies ; parcours reels Claude,
+    Antigravity, Codex, DSH verifies cote Supervisor'
+  - 'Style des constats : francais concis, titre court, faits en puces, citation verifiable, limite indiquee, sans repetition
+    resume/detail'
+  avancement: '2026-11-09 reprise CC01. Service 8082 build 04e47d28aade, update_available=false. Travail committe localement
+    (cfcae6bc, 812a5eb2), non pousse. Tests : DOM UI PASS (normal + deep link), extension VS Code 15/15, pytest 90/91 (1 echec
+    PermissionError pathlib a analyser). T428 maintenue en pause (6 Warnings ouverts, source non attachee) ; CC-T217 preservee.
+    Non valide : rendu navigateur, notifications/son, clic plugin, reprise reelle, CLI hors Claude.'
+  contrat: Dispense de contrat prealable (scripts locaux TOOLS/, WORKFLOW.md par. Contrat de tache) ; cadrage et criteres
+    F0-F4 dans DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
+  bloque_par: ''
 - id: T428
   parent_id: ''
   statut: ⏳
