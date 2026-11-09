@@ -1,0 +1,94 @@
+{
+  "contract": "T429",
+  "kind": "REEL claude -p session d'essai",
+  "native_id": "a14757f3-f23d-49da-aa0a-f7648a016370",
+  "model": "deepseek-v4.1-flash:cloud",
+  "seconds": 68.7,
+  "steps": [
+    {
+      "ac": "AC-F1.0",
+      "step": "collecte directe",
+      "result": "PASS",
+      "messages_observed": 2,
+      "analysis_state": "no_alert",
+      "analysis_error": null
+    },
+    {
+      "ac": "AC-F1.1",
+      "step": "intervalle annonce",
+      "result": "PASS",
+      "recovery": {
+        "status": "gap_available",
+        "message_count": 6,
+        "event_range": [
+          11,
+          29
+        ],
+        "characters": 135,
+        "batch_count": 1
+      },
+      "error": null
+    },
+    {
+      "ac": "AC-F1.3",
+      "step": "redemarrage avec delta en attente",
+      "result": "PASS",
+      "recovery_after": {
+        "status": "gap_available",
+        "message_count": 6,
+        "event_range": [
+          11,
+          29
+        ]
+      },
+      "recovery_before": {
+        "status": "gap_available",
+        "message_count": 6,
+        "event_range": [
+          11,
+          29
+        ]
+      },
+      "identity_preserved": true,
+      "enabled": false
+    },
+    {
+      "ac": "AC-F1.2",
+      "step": "reprise avec historique",
+      "result": "PASS",
+      "recovery": "complete",
+      "last_error": null,
+      "new_source_events": 6,
+      "duplicates": 0,
+      "analysis_state": "no_alert",
+      "error": null
+    },
+    {
+      "ac": "AC-F1.2",
+      "step": "reprise normale",
+      "result": "PASS",
+      "recovery": {
+        "status": "skipped",
+        "message_count": 2,
+        "reason": "user_chose_normal_resume"
+      },
+      "source_events_added": 0,
+      "error": null
+    },
+    {
+      "ac": "AC-F1.4",
+      "step": "source deplacee",
+      "result": "PASS",
+      "recovery": {
+        "status": "unverified",
+        "reason": "source_unavailable"
+      },
+      "state": "paused",
+      "error_field": "continuity_unverified",
+      "enabled": false,
+      "cmd_error": null
+    }
+  ],
+  "passed": 6,
+  "total": 6
+}

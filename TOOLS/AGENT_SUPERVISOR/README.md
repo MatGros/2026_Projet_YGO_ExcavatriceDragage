@@ -127,39 +127,44 @@ et limites : [document de tâche](../../DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_R
 Code, scénarios de test et commande de lancement isolé :
 [`poc/vscode-notifier/README.md`](poc/vscode-notifier/README.md).
 
-## Alertes dans la conversation surveillee
+## Alertes dans la conversation surveillée
 
-### Constats et décisions
+### Consultation interactive : Commande `/review-session-supervisor` (Modèle Pull)
 
-L'interface distingue la lecture d'un constat, son état de suivi et l'avis du superviseur.
-**Seen** signifie lu ; **Close** enregistre une décision humaine ; **Defer** reporte le suivi.
-Un commentaire saisi dans le constat s'adresse au superviseur. Il reste associé au constat et
-peut demander une réévaluation ; il n'est pas envoyé automatiquement à l'agent surveillé.
-Une correction observée peut conduire le modèle à proposer une résolution, avec citation ;
-la clôture humaine reste distincte. Une analyse indisponible ne signifie pas « aucun problème ».
+Pour éviter toute injection asynchrone concurrente ou invisible dans les interfaces CLI, l'intégration repose sur le modèle **Pull** initié par l'utilisateur ou l'agent dans sa propre fenêtre :
 
-L'action **Send to chat** est explicite : vérifier la plateforme et l'identifiant affichés avant
-de confirmer. Selon le CLI, l'envoi peut déclencher un tour et consommer du quota. Une livraison
-incertaine ou échouée ne prouve pas la réception. Le plugin VS Code est informatif : il affiche
-les compteurs du service et ne pilote pas les conversations. Les deux niveaux affichés sont
-**Warning** et **Alarm** ; l'analyse du modèle reste consultative et expérimentale.
+Dans Claude Code, Antigravity ou DSH, lancer dans le chat actif :
+```text
+❯ /review-session-supervisor
+```
 
-Les paramètres avancés du juge sont dans le panneau de configuration. Le contexte observé et
-transmis est borné ; augmenter ces limites peut augmenter latence et coût. Les conversations
-existantes sans checkpoint antérieur ne permettent pas de reconstituer automatiquement l'intervalle
-manqué. Une reprise normale crée un nouveau point de départ ; le rattrapage n'est proposé que si
-la continuité peut être vérifiée.
+Options disponibles :
+- `/review-session-supervisor` : examine le constat prioritaire (**Alarm > Warning**, FIFO) pour focaliser l'agent sur un seul point critique.
+- `/review-session-supervisor help` : affiche l'aide et les options.
+- `/review-session-supervisor all` : examine tous les constats ouverts de la session.
+- `/review-session-supervisor alarm` : cible la première alerte critique (Alarm).
+- `/review-session-supervisor warning` : cible le premier avertissement (Warning).
+- `/review-session-supervisor <num>` : cible un constat par son index (ex. `1`, `2`).
+- `/review-session-supervisor <id_court>` : cible un constat par son préfixe hexadécimal (ex. `26fcd4`).
+- `/review-session-supervisor --session <UUID>` : force la session cible si ambiguïté.
+
+Cette commande interroge le service Veilleur local (`127.0.0.1:8082`) et insère le constat et sa consigne d'ingénierie directement dans le tour courant de l'agent. La commande est strictement **consultative** et n'auto-clôture aucun constat.
+
+### Interface Web et Décisions
+
+L'interface distingue la lecture d'un constat, son état de suivi et l'avis du superviseur :
+- **Seen** : marque le constat comme lu par l'exploitant.
+- **Close** : enregistre une décision humaine de clôture.
+- **Defer** : reporte temporairement le suivi.
+- **📋 Copier pour le chat** : copie le texte de cadrage dans le presse-papier pour transmission manuelle éventuelle.
+- Le bouton d'envoi automatique CLI (`Confirm send`) a été retiré de l'IHM au profit du pull déterministe via `/review-session-supervisor`.
+
+Un commentaire saisi dans le constat s'adresse au superviseur. Il reste associé au constat et peut demander une réévaluation ; il n'est pas envoyé automatiquement à l'agent surveillé. Une correction observée peut conduire le modèle à proposer une résolution, avec citation ; la clôture humaine reste distincte. Une analyse indisponible ne signifie pas « aucun problème ».
 
 ### Ancien cycle 1/2/3
 
 Le cycle historique 1/2/3 reste disponible pour les anciens constats. La création d'un nouveau constat ne lance plus automatiquement un tour dans la conversation surveillée.
 
-L'utilisateur choisit `1` (ignorer avec motif), `2` (examiner maintenant) ou `3` (reporter avec condition). Le choix peut etre fait dans cette page ou dans le chat cible. Pour `2`, le Veilleur demande une courte contre-analyse sans outils ni modification. La reponse de l'agent est affichee comme proposition; elle ne vaut pas decision utilisateur.
+L'utilisateur choisit `1` (ignorer avec motif), `2` (examiner maintenant) ou `3` (reporter avec condition). Pour `2`, le Veilleur demande une courte contre-analyse sans outils ni modification. La réponse de l'agent est affichée comme proposition ; elle ne vaut pas décision utilisateur.
 
-Les anciens états et choix 1/2/3 restent conservés pour compatibilité. Dans l'interface actuelle,
-**Send to chat** ouvre un aperçu et demande une confirmation explicite ; les choix locaux et le
-commentaire au superviseur ne déclenchent pas cet envoi.
-
-L'envoi via CLI est actuellement implemente pour Claude Code et Antigravity. Il cible l'UUID fourni et verifie l'ID retourne par le CLI. L'ajout d'un tour au transcript ne garantit pas le rafraichissement de la fenetre CLI deja ouverte et reutilise le compte du CLI, donc peut consommer son quota. DSH et Codex restent sans adaptateur d'envoi valide; DSH est volontairement reporte. Une erreur ou une session en pause est signalee et peut etre relancee depuis la carte.
-
-Le marqueur colore des cartes est repris dans la liste laterale; les cartes non selectionnees sont repliees. L'etat d'ouverture reste local au navigateur.
+Le marqueur coloré des cartes est repris dans la liste latérale ; les cartes non sélectionnées sont repliées. L'état d'ouverture reste local au navigateur.

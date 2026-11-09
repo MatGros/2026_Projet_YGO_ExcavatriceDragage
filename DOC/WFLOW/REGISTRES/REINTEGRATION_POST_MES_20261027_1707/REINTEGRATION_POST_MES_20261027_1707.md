@@ -33,6 +33,23 @@ Décision exploitant (27/10) : **code fonctionnel = identique à la mise en serv
 
 > 📎 Les fichiers `.diff` vont de **l'état machine (`e38cc09a`) vers `main`** : ils montrent exactement ce qui serait ajouté en les réintégrant. Les commits d'origine restent consultables : `git show <commit>`.
 
+### 🗓️ Décision exploitant 2026-11-09 — `main` avancé sur la base machine
+
+`main` = `work/base-machine-simu` (`bb0f65c7`, fast-forward, accord « push A »). L'ancien `main`
+(`b305a130`, contenant R1/R2/R3) est conservé sous le tag `backup/origin-main-avant-ff-20261109` ;
+le mot « `main` » des `.diff` ci-dessus désigne désormais ce tag.
+
+| Lot | Décision 2026-11-09 | Motif exploitant |
+|---|---|---|
+| R1 AX15D | ❌ **non récupéré** | Code fonctionnel identique à la machine, pour que la simulation porte le même code ; fonction à refaire proprement plus tard |
+| R2-C levée FdC matériel haut M2 | ❌ **jamais** | On ne lève pas un FdC matériel |
+| R2-E MecaB / faux `ErrorID:09` | ❌ **non récupéré** | La simulation doit expliquer la cause du défaut, pas le masquer |
+| R2-H palier 1 au homing (et R2-F/G liés) | ❌ **non récupéré** | Contrainte nouvelle du 22/09, jamais chargée ; homing à refaire après M3 |
+| R2-B, R2-D, R3 | ⬜ non tranchés individuellement | Absents de `main` ; R2-D et R3 suivent R1/R2 |
+
+Les changements M3 hors simulation (gain odométrique T301, défauts positions 1,5/3,5/5/10 m,
+compteurs horaires UDINT) sont **validés et conservés** : ils ne modifient pas le comportement fonctionnel.
+
 ---
 
 ## R1 — Étape AX15D (T383) · ⚠️ C4

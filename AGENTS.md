@@ -34,8 +34,10 @@ ne pas créer de fichier local ou de script de prise de tâche parallèle.
 
 Dans Claude Code, Antigravity ou DSH, lancer `/connect-session-supervisor` depuis la conversation
 courante. La skill demande une tâche formelle vérifiable, ou une confirmation explicite avant un
-suivi sans tâche. Elle n'envoie rien à l'agent surveillé. Après un ajout ou renommage de la skill,
-recharger ou relancer le CLI concerné pour actualiser son catalogue. Détails et limites :
+suivi sans tâche. Elle n'envoie rien à l'agent surveillé. Pour examiner les constats ouverts
+directement dans le tour actif de l'agent sans injection externe : lancer `/review-session-supervisor`
+(traite en priorité le constat le plus critique Alarm > Warning). Après un ajout ou renommage de
+la skill, recharger ou relancer le CLI concerné pour actualiser son catalogue. Détails et limites :
 [`TOOLS/AGENT_SUPERVISOR/README.md`](TOOLS/AGENT_SUPERVISOR/README.md).
 
 ---

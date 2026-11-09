@@ -300,3 +300,29 @@ def test_restart_requeues_durable_context_not_yet_analyzed(tmp_path):
         assert saved['analyzed_revision']==saved['context_revision']
     finally:
         restored.close()
+
+
+def test_recovery_adaptive_partition_when_batch_exceeds_budget(tmp_path):
+    calls = []
+    judge = lambda _model, messages: (calls.append([m['text'] for m in messages if m['role'] in ('user', 'assistant')]) or {'alert': False})
+    service, source, sid = make_service(tmp_path, judge)
+    # Réduire artificiellement le budget du juge pour forcer le partitionnement
+    service.judge_settings["context_chars"] = 200
+    try:
+        service.command({'action': 'start'})
+        wait_for(lambda: service.snapshot()['sessions'][0]['state'] == 'active')
+        service.command({'action': 'pause', 'id': sid})
+        # Ajouter 6 messages volumineux qui dépassent le budget de 200 + 4800 caractères
+        for i in range(6):
+            append_message(source, 'user', f"Message de test numéro {i} avec du texte suffisant pour garnir le lot " + ("X" * 1200))
+        service.command({'action': 'resume', 'id': sid})
+        assert service.snapshot()['sessions'][0]['recovery']['status'] == 'gap_available'
+        service.command({'action': 'resume', 'id': sid, 'mode': 'history'})
+        # Vérifier que le rattrapage se termine avec succès (complete) et JAMAIS avec recovery_batch_exceeds_judge_budget
+        wait_for(lambda: service.snapshot()['sessions'][0]['recovery']['status'] == 'complete', timeout=10)
+        item = service.snapshot()['sessions'][0]
+        assert item['recovery'].get('last_error') != 'recovery_batch_exceeds_judge_budget'
+        assert item['state'] == 'active'
+        assert len(calls) >= 2  # A été partitionné en au moins 2 sous-lots
+    finally:
+        service.close()

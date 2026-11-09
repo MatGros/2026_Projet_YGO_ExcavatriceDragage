@@ -1,5 +1,5 @@
 {
-    "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v11/terminal-keeper.json",
+    "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v12/terminal-keeper.json",
     "theme": "tribe",
     "active": "AI",
     "activateOnStartup": true,
@@ -75,7 +75,7 @@
                 "icon": "terminal",
                 "color": "terminal.ansiBrightYellow",
                 "commands": [
-                    "ollama launch dsh --model deepseek-v4-flash:cloud"
+                    "ollama launch dsh --model deepseek-v4.1-flash:cloud"
                 ]
             }
         ],
@@ -116,10 +116,6 @@
                     "herdr start-agent claude"
                 ]
             }
-        ]       
-
-        
-        
-
+        ]
     }
 }

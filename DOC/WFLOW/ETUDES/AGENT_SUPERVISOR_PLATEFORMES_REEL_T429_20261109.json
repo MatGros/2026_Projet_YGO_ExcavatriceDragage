@@ -1,0 +1,57 @@
+{
+  "contract": "T429",
+  "ac": "AC-F4.3",
+  "results": [
+    {
+      "platform": "codex",
+      "create_code": 0,
+      "native_id": "01a1bdf8-68c3-7591-b10b-aef98c5c748b",
+      "create_err": "",
+      "resume_code": 0,
+      "resume_err": "",
+      "result": "PASS",
+      "messages_observed": 2,
+      "state": "active",
+      "error": null,
+      "source": "C:\\Users\\ZEDVICTUS\\.codex\\sessions\\2026\\11\\09\\rollout-2026-11-09T02-42-16-01a1bdf8-68c3-7591-b10b-aef98c5c748b.jsonl",
+      "seconds": 13.9
+    },
+    {
+      "platform": "claude",
+      "create_code": 0,
+      "native_id": "4724621e-c04b-4183-b364-309f57f49009",
+      "create_err": "",
+      "resume_code": 0,
+      "resume_err": "",
+      "result": "PASS",
+      "messages_observed": 2,
+      "state": "active",
+      "error": null,
+      "source": "C:\\Users\\ZEDVICTUS\\.claude\\projects\\C--Users-ZEDVIC-1-AppData-Local-Temp-t429-plat-20261109024215-claude\\4724621e-c04b-4183-b364-309f57f49009.jsonl",
+      "seconds": 26.4
+    },
+    {
+      "platform": "agy",
+      "create_code": 0,
+      "native_id": "cbaca3bc-25f9-41fb-8530-a1b231a53a92",
+      "create_err": "",
+      "resume_code": 0,
+      "resume_err": "",
+      "result": "PASS",
+      "messages_observed": 2,
+      "state": "active",
+      "error": null,
+      "source": "C:\\Users\\ZEDVICTUS\\.gemini\\antigravity-cli\\brain\\cbaca3bc-25f9-41fb-8530-a1b231a53a92\\.system_generated\\logs\\transcript.jsonl",
+      "seconds": 18.8
+    },
+    {
+      "platform": "dsh",
+      "create_code": 1,
+      "native_id": "session-a5666665-2829-4228-b75e-7d99abc44a79",
+      "create_err": "dsh: MISSING_CREDENTIAL: llm-deepseek: no API key for provider route \"deepseek-official\"; store DEEPSEEK_API_KEY through the credentials service (the web Models page writes it), or export DEEPSEEK_API_KEY in the launching environment\n",
+      "result": "LIMIT",
+      "reason": "RuntimeError: création de session non confirmée",
+      "seconds": 14.4
+    }
+  ]
+}

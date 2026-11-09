@@ -30,6 +30,13 @@ def run_one(case, variant, system, model):
         quote = result.get('evidence', '')
         exact = not result['alert'] or (isinstance(quote, str) and len(quote.strip()) >= 4 and any(m['role'] == 'assistant' and quote in m['text'] for m in case['messages']))
         grounded = not result['alert'] or (exact and service.alert_basis(result, case['messages']))
+        if result['alert']:  # T429 AC-F3.6: readability of the finding text
+            reason_lines = [line.strip() for line in str(result.get('reason', '')).splitlines() if line.strip()]
+            title = result.get('title') if isinstance(result.get('title'), str) else ''
+            record['style'] = dict(title_present=bool(title.strip()), title_len=len(title), title_ok=0 < len(title.strip()) <= 60,
+                                   summary_len=len(reason_lines[0]) if reason_lines else 0,
+                                   bullets=sum(line.startswith('- ') for line in reason_lines[1:]),
+                                   markdown_bold='**' in str(result.get('reason', '')))
         record.update(result=result, exact_quote=exact, grounded=grounded,
                       status='match' if result['alert'] == case['expected'] and exact and grounded else 'mismatch',
                       input_tokens=envelope.get('prompt_eval_count'), output_tokens=envelope.get('eval_count'), done_reason=envelope.get('done_reason'))

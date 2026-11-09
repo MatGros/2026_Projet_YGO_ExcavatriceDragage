@@ -29,6 +29,7 @@ def stable_sessions(snapshot):
         saved['alerts'] = []
         for alert in item.get('alerts', []):
             normalized = dict(alert)
+            normalized.pop('delivery_preview', None)  # T429: derived per snapshot, not stored user data
             if normalized.get('workflow') == LEGACY_ALERT_WORKFLOW:
                 normalized.pop('workflow')
             saved['alerts'].append(normalized)

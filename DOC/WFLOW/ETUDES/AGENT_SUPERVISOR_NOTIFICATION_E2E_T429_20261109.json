@@ -1,0 +1,41 @@
+﻿{
+    "contract":  "T429",
+    "ac":  "AC-F3.5",
+    "kind":  "banc isole (port 8099, etat temporaire) + vrai juge DeepSeek V4.1 + vrai Chrome (Claude in Chrome)",
+    "date":  "2026-11-09",
+    "finding":  {
+                    "bullets":  4,
+                    "title":  "Validation du lot 1 affirmee sans preuve",
+                    "id":  "b5cdaeed878bc9b4f6f60843",
+                    "severity":  "error (Alarm)"
+                },
+    "browser":  {
+                    "beeps":  1,
+                    "badge":  "1 non lue",
+                    "note":  "Notification et AudioContext remplaces par des enregistreurs : appel verifie, rendu OS et son audible non observables par un agent",
+                    "notifications":  1,
+                    "duplicates_after_3_refresh":  0,
+                    "sidebar":  "has-alarm"
+                },
+    "plugin":  {
+                   "logic":  "poc/vscode-notifier/lib/summary.js sur le resume reel du banc",
+                   "deep_link":  "?session=...\u0026alert=b5cdaeed878bc9b4f6f60843",
+                   "toast_call":  "couvert par test/extension.test.js (showWarningMessage/showErrorMessage)",
+                   "repeated_same_snapshot_events":  0,
+                   "kind":  "new",
+                   "events":  1
+               },
+    "click":  {
+                  "in_viewport":  true,
+                  "actions":  [
+                                  "Close…",
+                                  "Defer…",
+                                  "Send to chat"
+                              ],
+                  "card_open":  true,
+                  "defer_condition_field":  true,
+                  "send_preview_exact":  true,
+                  "card_found":  true
+              },
+    "limits":  "Rendu de la notification Windows, son audible et toast dans une fenetre VS Code reelle : a confirmer par l exploitant."
+}

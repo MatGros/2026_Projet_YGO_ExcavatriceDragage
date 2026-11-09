@@ -1,0 +1,281 @@
+# CONTRAT DE TACHE T429 — Agent Supervisor : fiabilisation reprise, cycle des constats, IHM, plugin
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T429_AGENT_SUPERVISOR_FIABILISATION.yaml
+# Pilotage detaille, decisions et preuves : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
+# Demande exploitant 2026-11-09 : « ordres contractes complets et detailles, objectifs clairs, mesurables, evaluables ».
+
+contract:
+  task_id: T429
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Le Supervisor suit une session sans perte ni saut silencieux apres pause, redemarrage ou
+    rupture de source, revise un meme constat au lieu de le dupliquer en tenant compte des
+    decisions humaines, et presente des constats lisibles, coherents entre IHM et plugin,
+    actionnables en peu de gestes (dont l'envoi explicite au chat), prouve sur parcours reels.
+
+  # Regle de mesure : chaque AC est PASS seulement si sa verification nommee a ete executee
+  # et sa sortie consignee dans tracking.experiments. Un test synthetique ne valide jamais
+  # un AC marque [REEL]. Preuve absente = NOT_TESTED, jamais PASS.
+  acceptance:
+    # ── F0 Reference ──────────────────────────────────────────────────────────
+    - id: AC-F0.1
+      statement: "La suite Python du Supervisor passe integralement en session normale ; tout echec restant est explique avec preuve."
+      verified_by: "py -3.13 -m pytest TOOLS/AGENT_SUPERVISOR/tests -q → 'N passed', 0 failed, 3 passages consecutifs"
+
+    # ── F1 Continuite ─────────────────────────────────────────────────────────
+    - id: AC-F1.1
+      statement: "Pause puis N messages ajoutes puis reprise : la previsualisation annonce gap_available avec message_count = N et la plage d'evenements exacte."
+      verified_by: "test pytest dedie + parcours [REEL] sur session Claude d'essai (N >= 3) : N annonce = N ajoute"
+    - id: AC-F1.2
+      statement: "Reprise avec historique : les N evenements sont analyses une seule fois, dans l'ordre ; Reprise normale : 0 appel juge sur ces evenements et recovery.status = skipped avec message_count = N."
+      verified_by: "pytest (compteur d'appels du juge simule) + parcours [REEL] : evenements source_* uniques par source_id (0 doublon)"
+    - id: AC-F1.3
+      statement: "Arret puis redemarrage du service avec delta en attente : meme ID d'affectation, checkpoint, lots de reprise, decisions et constats restaures a l'identique."
+      verified_by: "pytest redemarrage + parcours [REEL] via upgrade_legacy.py : diff JSON avant/apres sur ces cles = vide"
+    - id: AC-F1.4
+      statement: "Source deplacee, absente, tronquee ou reecrite : etat continuity_unverified visible, source_event_index inchange (aucun saut EOF), aucune session 'la plus recente' substituee."
+      verified_by: "4 variantes pytest PASS + 1 variante [REEL] (fichier d'essai renomme) observee dans l'IHM"
+    - id: AC-F1.5
+      statement: "Delta superieur au budget : too_large et rattrapage refuse avec message clair ; timeout juge sur un lot : rejeu du meme lot, 0 constat duplique."
+      verified_by: "pytest : nombre de constats identique avant/apres rejeu ; batch_index inchange apres erreur"
+    - id: AC-F1.6
+      statement: "L'IHM affiche le choix de reprise avec volume, plage lue et plage analysee, distincts de l'historique affiche."
+      verified_by: "test DOM (test_ui.mjs) assertant les libelles et valeurs + capture navigateur"
+    - id: AC-F1.7
+      statement: "Demande exploitant 2026-11-09 : formalisation du titre de session (TXXX-AGENT Désignation courte ou TXXX-X-AGENT Désignation courte) et réassignation lors d'un passage de relais ; connect_session.py valide la convention de nommage canonique et permet de transférer l'écoute d'une tâche existante vers un nouveau CLI/ID sans créer de doublon de session."
+      verified_by: "test pytest dédié (validation syntaxique de l'alias, transfert d'affectation sans doublon avec préservation des alertes antérieures) + test CLI"
+    - id: AC-F1.8
+      statement: "Demande exploitant 2026-11-09 : Les événements de session sont systématiquement horodatés (created_at ISO dans le modèle, affiché au format local lisible JJ/MM/AAAA HH:MM:SS dans le journal de session de l'IHM) afin d'identifier avec certitude le moment exact où le Superviseur a créé chaque événement."
+      verified_by: "pytest finding_lifecycle (présence created_at sur chaque événement) + test DOM test_ui.mjs assertant l'affichage de l'horodatage dans l'élément small du journal"
+
+    # ── F2 Cycle des constats et cadrage ──────────────────────────────────────
+    - id: AC-F2.1
+      statement: "En direct ET en rattrapage, la requete du juge contient le cadrage utilisateur date (event_index <= fin du lot) et les constats precedents avec leurs decisions."
+      verified_by: "pytest inspectant le payload judge_request dans les deux modes"
+    - id: AC-F2.2
+      statement: "Les messages du Supervisor (ACK, livraisons) sont exclus de facon identique en direct et en rattrapage."
+      verified_by: "pytest : meme fixture → meme liste de messages observes dans les deux chemins"
+    - id: AC-F2.3
+      statement: "Un meme probleme (meme categorie et citation, ou meme empreinte) revise le constat existant : meme ID, version + 1, nombre de constats inchange."
+      verified_by: "pytest finding_lifecycle / reliability"
+    - id: AC-F2.4
+      statement: "Une reevaluation citee 'resolution_proposed' met a jour le constat et les compteurs (resolution_proposed +1, warnings/alarms -1) ; une citation absente du contexte ne change rien ; 'corrige' sans preuve ne ferme rien."
+      verified_by: "pytest 3 cas (valide, citation invalide, affirmation sans preuve)"
+    - id: AC-F2.5
+      statement: "Apres cloture humaine : occurrence ancienne → aucun changement ; occurrence nouvelle → constat lie (previous_alert_id) sans effacer la decision humaine ; occurrence non identifiable → incertain explicite."
+      verified_by: "pytest 3 cas"
+    - id: AC-F2.6
+      statement: "Les scenarios T428 S1 a S5 rejoues dans le service avec DeepSeek V4.1 donnent le verdict attendu du tableau de reference sur au moins 4/5 cas, 0 citation inventee acceptee, resultats bruts publies."
+      verified_by: "script de campagne → JSON de preuve sous DOC/WFLOW/ETUDES/, verdict par cas"
+    - id: AC-F2.7
+      statement: "La mission texte existante est conservee a l'octet pres lors de l'ajout d'une fiche structuree ; champs vides affiches 'A renseigner'."
+      verified_by: "pytest test_mission_structure + test DOM"
+
+    - id: AC-F2.8
+      statement: "Demande exploitant 2026-11-09 : la fiche mission est lisible en une ligne par attribut ('Tache : valeur'), les champs vides sont regroupes en une seule ligne, et les lignes 'Attribut : valeur' de la mission texte sont proposees en pre-remplissage confirme d'un clic (aucune attribution silencieuse) ; la ligne 'Tache / sujet : T###' produite par le connecteur alimente Tache et Reference (la skill elle-meme est hors perimetre)."
+      verified_by: "pytest (analyse des lignes Attribut : valeur, migration sans perte) + test DOM (1 ligne par champ renseigne, 1 ligne 'Non renseignes') + essai sur la session cc-supervisor-fiabilisation"
+
+    # ── F3 IHM, plugin, Send to chat ──────────────────────────────────────────
+    - id: AC-F3.1
+      statement: "IHM et plugin affichent les memes compteurs (ouverts, reportes, non lus, Warning, Alarm, resolution proposee) pour un meme instantane, produits par le service et non recalcules."
+      verified_by: "test croise : meme fixture servie a summary.js et a l'IHM, 5 etats (Warning ouvert, Alarm, clos, resolution proposee, donnees perimees) → 0 divergence"
+    - id: AC-F3.2
+      statement: "Chaque carte de constat propose au plus 3 actions principales a effet explicite ; clore avec motif se fait en 3 gestes ou moins ; un commentaire seul ne decremente pas les ouverts."
+      verified_by: "test DOM comptant boutons et gestes + challenge ergonomie A/B (2 reviewers distincts, convergence ou arbitrage consigne)"
+    - id: AC-F3.3
+      statement: "Apercu cadrage et copie conserves : 'Copier pour le chat' copie le cadrage formate. Retrait du push injection UI autonome (Confirm send) suite au pivot utilisateur 2026-11-09. Consultation deterministe via la commande pull /review-session-supervisor (Alarm > Warning FIFO) integree dans Claude Code, Antigravity et DSH."
+      verified_by: "pytest (test_review_session.py 9 tests) + test_ui.mjs validant le bouton Copier pour le chat et l'absence d'envoi aveugle"
+    - id: AC-F3.4
+      statement: "Constats tries du plus recent au plus ancien (ordre stable) ; clic sur une session affiche ses constats deplies ; lien ?session=&alert= vers un constat ancien fonctionne apres rafraichissement."
+      verified_by: "test DOM (normal + deep link)"
+    - id: AC-F3.5
+      statement: "Un nouveau Warning ou Alarm declenche une seule notification bureau, un son et un toast VS Code ; le clic ouvre la bonne session et la bonne carte."
+      verified_by: "test DOM deduplication + [REEL] observation exploitant consignee (notification, son, toast, clic) OK/KO"
+    - id: AC-F3.6
+      statement: "Carte de constat : titre court (<= 80 caracteres), resume d'une ligne, faits en puces, citation complete depliable, texte du resume non repete dans le detail."
+      verified_by: "test DOM sur constat reel long ('Reussite sans preuve') : longueur titre, presence puces, absence de duplication"
+    - id: AC-F3.7
+      statement: "A 360 px de large et zoom 200 %, aucun texte long (UUID, chemin Windows, motif, commentaire multiligne) n'est coupe de facon inaccessible ni ne provoque de defilement horizontal de page."
+      verified_by: "test navigateur headless : scrollWidth page <= largeur, contenu integral accessible"
+    - id: AC-F3.8
+      statement: "Le survol du plugin met Alarm/Warning en tete avec sessions concernees ; des donnees perimees ne s'affichent jamais comme '0 constat'."
+      verified_by: "tests npm du plugin (summary.test.js) sur les 5 etats de AC-F3.1"
+    - id: AC-F3.9
+      statement: "Ergonomie globale jugee simple : un utilisateur trouve, comprend et traite un constat sans aide."
+      verified_by: "2 challenges ergonomie independants (A/B) sur captures + parcours ecrits, ecarts traites ou consignes ; retour exploitant final"
+
+    # ── F4 Recette comparee et parcours reels ─────────────────────────────────
+    - id: AC-F4.1
+      statement: "Comparaison A (pipeline avant T429) / B (apres) sur le meme corpus francais et le meme modele : resultats par cas, faux positifs, non-detections, citations, doublons, latence publies."
+      verified_by: "JSON de campagne sous DOC/WFLOW/ETUDES/ + tableau dans le document de pilotage"
+    - id: AC-F4.2
+      statement: "Criteres mecaniques nuls : 0 mauvaise affectation, 0 citation inventee acceptee, 0 perte silencieuse, 0 divergence de compteurs sur l'ensemble des recettes."
+      verified_by: "agregation des preuves AC-F1.* AC-F2.* AC-F3.1"
+    - id: AC-F4.3
+      statement: "Parcours reels Claude, Antigravity, Codex et DSH : pour chacun, une session d'essai rattachee voit au moins 1 message collecte avec la bonne plateforme et le bon UUID, ou la limite est documentee avec sa cause."
+      verified_by: "[REEL] GET /api/supervision par plateforme, consigne dans le document de pilotage"
+
+    # ── Transverse ────────────────────────────────────────────────────────────
+    - id: AC-X.1
+      statement: "Aucune modification hors perimetre ; sessions T428 et CC-T217 inchangees (en pause, alertes et chat conserves)."
+      verified_by: "git status --short avant/apres chaque lot ; comparaison de l'etat des deux affectations avant/apres"
+    - id: AC-X.2
+      statement: "Toutes les suites passent en fin de lot : pytest, test_ui.mjs (normal + deep link), npm test du plugin, git diff --check."
+      verified_by: "sorties des 4 commandes consignees"
+
+  scope:
+    allowed:
+      - TOOLS/AGENT_SUPERVISOR/**
+      - DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
+      - DOC/WFLOW/ETUDES/AGENT_SUPERVISOR_*.json
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T429_AGENT_SUPERVISOR_FIABILISATION.yaml
+      - "DOC/WFLOW/TASKS.yaml (fiche T429 uniquement, via API Task Manager)"
+      - "%LOCALAPPDATA%/ExcavatriceDragage (etat du service, apres sauvegarde verifiee)"
+    forbidden:
+      - CODE/**
+      - CODE_XML/**
+      - PRJ_CODESYS/**
+      - .claude/settings*.json
+      - TOOLS/AGENT_WORKFLOW/hooks/**
+      - TOOLS/AGENT_WORKFLOW/skills/**
+      - "configurations des CLI (Claude, Antigravity, Codex, DSH)"
+      - "transcript ebe3ca88 (T428) : lecture seule pour les citations deja referencees, aucune reprise"
+      - "envoi de message a une conversation non designee comme session d'essai"
+
+  conservation:
+    must_survive:
+      - "Affectations T428 (d4f1bcd5…) et CC-T217 (4819768b…) : etat, alertes, decisions, chat"
+      - "Decisions humaines enregistrees sur les constats existants"
+      - "Mission texte existante a l'octet pres"
+      - "Rattachement cc-supervisor-fiabilisation de la session d9739b30"
+    dropped_on_purpose:
+      - "Aucun abandon decide a ce jour"
+
+  evidence_required:
+    - "pytest TOOLS/AGENT_SUPERVISOR/tests (sortie)"
+    - "node TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs normal + VEILLEUR_UI_DEEP_LINK=1"
+    - "npm test (poc/vscode-notifier)"
+    - "git diff --check et git status --short"
+    - "JSON de campagne F2.6 / F4.1 sous DOC/WFLOW/ETUDES/"
+    - "rapports de revue A/B (chemins) et arbitrage"
+    - "observations exploitant [REEL] consignees"
+
+  models_allowed:
+    - "claude (orchestrateur, seul ecrivain du checkout)"
+    - "agents Claude Code natifs (audit, revue, lecture seule)"
+    - "deepseek-v4.1-flash:cloud (ollama_subagent.py : challenge, revue, juge de campagne)"
+    - "glm-5.3-flash:cloud (ollama_subagent.py : challenge, revue B)"
+
+  alert_duty: >
+    Tout probleme constate (bug preexistant, critere irrealisable, risque sur les sessions
+    conservees, divergence de revue non arbitrable) est remonte immediatement a l'exploitant
+    dans le fil, une fois, avec preuve. Signaler n'est pas elargir le perimetre.
+
+status: IN_PROGRESS
+
+tracking:
+  user_need: "Superviseur fiable apres pause/redemarrage, constats exploitables et interface simple ; preuve reelle, pas seulement synthetique."
+  useful_history:
+    - "Plan de campagne 2026-11-08 et challenges P1/P2 : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md"
+    - "Commits cfcae6bc, 812a5eb2 : etat de depart du code"
+  current_question: "Quels criteres sont deja satisfaits par le code actuel, lesquels restent a implementer ou a prouver ?"
+  established:
+    - "AC-F0.1 PASS 2026-11-09 : 91 passed x4 en session normale ; l'echec 90/91 du 2026-11-08 venait de la garde d'isolation d'une session background (sessionKind=bg, ecriture refusee), pas d'un bug."
+    - "AC-F1.1 a F1.4 PASS [REEL] : tests/run_recovery_live.py sur session Claude d'essai neuve, 6/6 (DOC/WFLOW/ETUDES/AGENT_SUPERVISOR_RECETTE_F1_REEL_T429_20261109.json). 1er passage 5/6 : defaut reel trouve (reprise sans mode apres rupture = reprise normale implicite ou marquage annule) -> corrige + garde test_t429_regressions."
+    - "AC-F1.5 PASS (pytest test_recovery : too_large refuse, lot conserve apres erreur, rejeu sans saut). AC-F1.6 PASS (DOM : plage, volume, lot x/y affiches)."
+    - "AC-F1.5bis PASS 2026-11-09 : Partitionnement adaptatif glouton des lots de reprise historique dans supervisor_service.py, eliminant l'erreur recovery_batch_exceeds_judge_budget ; preuve test_recovery_adaptive_partition_when_batch_exceeds_budget."
+    - "AC-F1.7 PASS 2026-11-09 : Formalisation nommage canonique TXXX[-X]-AGENT et handover ; connect_session.py valide sans doublon."
+    - "AC-F1.8 PASS 2026-11-09 : Horodatage created_at ISO et affichage local JJ/MM/AAAA HH:MM:SS dans l'IHM."
+    - "AC-F2.1, F2.2, F2.3, F2.5, F2.7 PASS pytest (test_finding_lifecycle, test_reliability, test_mission_structure)."
+    - "AC-F2.4 + F2.6 PASS [modele reel] : tests/run_cycle_live.py DeepSeek V4.1, 4/4 (alerte sur validation non fondee ; 'c'est corrige' sans preuve -> constat actif ; correction prouvee par resultat outil -> meme constat v4 resolution_proposed, 0 doublon). Preuve AGENT_SUPERVISOR_CYCLE_MODELE_REEL_T429_20261109.json."
+    - "AC-F2.8 PASS : parse_mission_attributes (pytest x3), fiche compacte (DOM), fiche de la session cc-supervisor-fiabilisation renseignee 9/12."
+    - "AC-F3.1 PASS : compteurs produits par finding_lifecycle.counts, repris tels quels par IHM (sessionCounts) et plugin (summary.js projectedCounts) ; tests summary.test.js + test_finding_lifecycle."
+    - "AC-F3.2, F3.4, F3.6, F3.7 PASS : tests/ui_layout_check.mjs 1440/390/360 px -> 0 debordement, 1er constat dans le 1er ecran, constat ouvert le plus recent en tete, 0 texte long duplique, 3 actions principales ; test_ui.mjs normal + deep link PASS."
+    - "AC-F3.3 PASS 2026-11-09 : Pivot PULL /review-session-supervisor (Alarm > Warning FIFO), bouton Confirm send retire, Copier pour le chat conserve, 10/10 tests test_review_session.py, consigne outil brute integree pour lever l'avis incertain, et encodage cp1252 Windows reconfigure."
+    - "AC-F3.8 PASS : 15/15 tests du plugin."
+    - "AC-F4.1 PASS : campagne FR A/B DeepSeek, B 10/10 verdicts+ancrage, style 4/4, A 9/10 (DOC/WFLOW/ETUDES/AGENT_SUPERVISOR_CAMPAGNE_FR_T429_AB_FINAL_20261109.json). Cas H7-H10 consommes, plus aveugles."
+    - "AC-F4.2 PASS : 0 mauvaise affectation, 0 citation inventee acceptee, 0 perte silencieuse, 0 divergence de compteurs sur l'ensemble des recettes."
+    - "AC-F4.3 PARTIEL [REEL] : Codex, Claude, Antigravity PASS (2 messages collectes, bon UUID) ; DSH LIMITE documentee : profil headless sans DEEPSEEK_API_KEY (MISSING_CREDENTIAL), configuration CLI hors perimetre (AGENT_SUPERVISOR_PLATEFORMES_REEL_T429_20261109.json)."
+    - "AC-X.1 PASS : service 8082 mis a jour (build 107f618aef55) via upgrade_legacy.py, sauvegarde verifiee ; T428 (pause, 6 constats) et CC-T217 (pause) inchangees."
+    - "AC-X.2 PASS : pytest 144/144, test_ui x2, ui_layout_check, npm 15/15, git diff --check."
+  unknowns:
+    - "AC-F3.5 [REEL] : notification bureau, son, toast VS Code et clic vers la bonne carte a observer par l'exploitant (non observable par l'agent)."
+    - "AC-F3.9 : retour exploitant final sur la simplicite (2 challenges ergonomie realises)."
+  next_action: "Recette exploitant AC-F3.5 / AC-F3.9 ; decision commit."
+  owners:
+    accountable: "Claude Code CC01 (orchestrateur)"
+    executor: "Claude Code CC01 (seul ecrivain) ; agents en lecture/revue"
+    control_maintainer: "exploitant"
+  delegation:
+    required_workflows:
+      - "TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md en tete de chaque ordre delegue"
+    permissions:
+      - "agents delegues : lecture seule, aucune ecriture de fichier, aucun commit"
+    forbidden_actions:
+      - "commit/push sans accord explicite"
+      - "reprise ou mutation des affectations T428 / CC-T217"
+      - "worktree, bgIsolation none"
+    measurable_deliverables:
+      - "chaque ordre delegue cite les AC vises et rend un verdict par AC avec preuve fichier:ligne"
+    alert_conditions:
+      - "critere juge irrealisable ou contradictoire"
+      - "risque de perte d'etat du service"
+    self_review:
+      - "relecture du git diff reel par l'orchestrateur avant chaque visa de lot"
+  stagnation:
+    threshold: 3
+    justification: ""
+    consecutive_uninformative: 0
+    blind_reviews:
+      - id: REV-L1
+        scope: "lot L1 (reprise sans mode, motif de report, apercu Send to chat, livraison incertaine, requeue fiche, troncature outil)"
+        reviewers: ["deepseek-v4.1-flash:cloud", "glm-5.3-flash:cloud"]
+        independent: true
+        decision: "Convergence sur borne du message et ordre de validation : corriges. Bouton actif en livraison incertaine (DeepSeek) : corrige. 4 objections GLM refutees a la source (short_title present, rollback de command(), etc.)."
+      - id: REV-ERGO-1
+        scope: "challenge ergonomie sur captures reelles"
+        reviewers: ["agent natif Sonnet (captures)", "glm-5.3-flash:cloud (description)"]
+        independent: true
+        decision: "Convergence forte (10 problemes). Divergences arbitrees sur decisions exploitant : actions = Close/Defer/Send to chat ; libelles courts anglais conserves ; tri non clos puis recent."
+      - id: REV-L2
+        scope: "lot L2 (refonte IHM, fiche mission, style juge, historique outil)"
+        reviewers: ["deepseek-v4.1-flash:cloud", "glm-5.3-flash:cloud"]
+        independent: true
+        decision: "Retenus : motif de cloture > 500 refuse (regression L1), panneau Constats ferme definitivement, 'rien a suivre' malgre resolutions proposees, labels ambigus du parseur. Refutes : apercu non masque (CSS), tri absent, injection DOM (textContent)."
+      - id: REV-ERGO-2
+        scope: "re-challenge ergonomie apres refonte, captures du service reel"
+        reviewers: ["agent natif Sonnet"]
+        independent: true
+        decision: "Verdict PARTIEL (probleme ? oui ; ou ? que faire ? non). Corriges : Alarm en tete des constats ouverts, session par defaut = celle a suivre, avertissements d etat avant le chat, Pause/Resume dans l en-tete, un seul constat ouvert automatiquement, chip Open et zeros masques, nom de session non repete. ui_layout_check verifie open_alarm_first. Reste non bloquant : titres distinctifs pour d anciens constats sans title."
+  experiments:
+    - id: EXP-F0-1
+      question: "L'echec pytest 90/91 est-il un bug du Supervisor ?"
+      prediction: "Non : effet de la garde d'ecriture des sessions background."
+      discriminating_observation: "Suite complete en session normale, 3 passages."
+      decision_if_confirmed: "AC-F0.1 PASS, pas de garde-fou."
+      decision_if_refuted: "Analyse du test fautif, correctif + guard."
+      sources: ["transcript d9739b30 ligne 87 : sessionKind=bg, pathlib PermissionError"]
+      substitutions: []
+      expected_cost: "1 min"
+      repeat_of: ""
+      repeat_reason: ""
+      result: PASS
+      evidence: "91 passed in 9.64s / 10.19s / 9.86s / 9.99s"
+      information_gained: "Echec environnemental, non reproductible en session normale."
+      next_decision: "Passer a l'audit F1-F4."
+
+execution:
+  executed_by: "Claude Code CC01"
+  completed_at: ""
+  status: PENDING
+  summary: >
+    En cours.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Visa final : orchestrateur apres revues ; recette [REEL] par l'exploitant pour AC-F3.5 et AC-F3.9.
