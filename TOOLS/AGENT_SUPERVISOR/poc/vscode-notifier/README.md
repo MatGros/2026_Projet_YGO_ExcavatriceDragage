@@ -65,7 +65,7 @@ Dans l'Extension Development Host, la barre du bas affiche **Agent Supervisor**.
 
 Le test peut utiliser le service Agent Supervisor déjà lancé sur `127.0.0.1:8082`, sans fixture : ouvrir l'Extension Development Host avec l'extension ci-dessus, vérifier que la barre d'état reprend les sessions et compteurs réels, puis lancer cette commande de test. Le toast est explicitement marqué TEST, mais son titre vient d'un constat réel existant. Cliquer sur **Ouvrir le constat réel** ouvre l'IHM avec les paramètres de session et d'alerte. Ce parcours n'ajoute, n'acquitte et ne clôture aucun constat et n'écrit dans aucun chat. Cette procédure charge l'extension en mode développement ; elle ne l'installe pas dans tous les profils VS Code.
 
-Réglages VS Code : `veilleur.port` (8082), `veilleur.pollSeconds` (8, minimum 5) et `veilleur.notifications` (activé par défaut). L'extension ne crée pas de notification de rattrapage au tout premier lancement ; les nouveaux constats observés après la première lecture sont notifiés. VS Code doit rester ouvert pour recevoir les événements.
+Réglages VS Code : `veilleur.port` (8082), `veilleur.pollSeconds` (8, minimum 5, maximum 30 ; anciennes valeurs sup?rieures born?es ? 30) et `veilleur.notifications` (activé par défaut). L'extension ne crée pas de notification de rattrapage au tout premier lancement ; les nouveaux constats observés après la première lecture sont notifiés. VS Code doit rester ouvert pour recevoir les événements.
 
 ## Vérification et limites
 

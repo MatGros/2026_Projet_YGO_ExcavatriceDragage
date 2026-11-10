@@ -66,6 +66,112 @@ pilotage détaillé de T429 ; le catalogue porte l'état synthétique et les obj
     3. **Complémentarité décision humaine / résolution modèle** : Les validations accordées par l'humain dans le chat (ex: validation J1) doivent être closes par l'exploitant via le bouton **Close** dans l'IHM (action humaine souveraine) plutôt que d'attendre qu'un juge LLM infère un accord historique.
     4. **Normalisation du nom de session (AC-F1.7)** : Fournir un moyen simple de mettre à niveau un ancien alias vers la forme canonique `T428-CC01 Refactor troubleshooting` sans recréer de session.
 
+## 🗂️ Plan Détaillé Exhaustif & Répertoire des Demandes Exploitant (T429)
+
+*Ce chapitre centralise et détaille **l'intégralité sans exception** des demandes explicites formulées par l'exploitant au 9 novembre 2026 pour Agent Supervisor / Veilleur.*
+
+### 📊 Matrice d'inventaire et d'avancement des 19 demandes explicites
+
+| ID | Domaine | Demande explicite de l'exploitant | Livrables techniques | Critères d'acceptation & Vérification | Statut |
+|---|---|---|---|---|---|
+| **D01** | 🔊 Son | Bip sonore activé par défaut dans l'IHM | `ui/index.html` (`preferences.sound = true`) | Case cochée au 1er chargement, son actif après interaction | ✅ **Validé** |
+| **D02** | 🔊 Son | Réglage du volume sonore dans l'IHM | `ui/index.html` (slider `#sound-volume` 10–100%) | Persisté dans `localStorage`, valeur affichée en direct | ✅ **Validé** |
+| **D03** | 🔊 Son | Bouton de test du son avec retard de 5s | `ui/index.html` (`#test-sound-delay`) | Compte à rebours 5s, notification + son joués même si onglet masqué | ✅ **Validé** |
+| **D04** | 🔊 Son | Bip sonore uniquement sur front montant | `ui/index.html` (`processAlerts`) | Ne sonne qu'à l'arrivée d'un nouvel event non lu, jamais en boucle | ✅ **Validé** |
+| **D05** | 🔊 Son | Différenciation nette des bips (1 bip vs 2 bips) | `ui/index.html` (`playNotificationSound`) | • 1 bip : Warning / 1er event (880 Hz, 130 ms)<br>• 2 bips : Alarm ou ≥ 3 Warnings (court 980 Hz 80 ms · pause 240 ms · long 1150 Hz 450 ms) | ✅ **Validé & Clôturé (écoute réelle)** |
+| **D06** | 🎛️ IHM | Boutons de test direct dans la barre latérale | `ui/index.html` (`.sidebar-quick-tests`) | Boutons `1 bip`, `2 bips`, `Test VSCode` toujours visibles sans aller dans Paramètres | ⏳ **En attente d'implémentation** |
+| **D07** | 🔔 VS Code | Test de notification VS Code depuis l'IHM | `supervisor_service.py` (`test_notification`), `ui/index.html` | Clic IHM injecte constat test `new` → toast Windows natif VS Code immédiat | ⏳ **En attente d'implémentation** |
+| **D08** | ⚙️ Paramètres | Budget de contexte paramétrable & sauvegardé seul | `supervisor_service.py`, `ui/index.html` | Budget messages (ex: 12) et caractères (ex: 12 000 au lieu de 6 000) persistés | 📋 **Spécifié (chiffré)** |
+| **D09** | 🧠 Mémoire | Compactage surplus mémoire courte → longue | `supervisor_service.py`, `judge_prompt.py` | L'excédent au-delà du budget court est résumé/compacté dans la mémoire longue | 📋 **Spécifié** |
+| **D10** | 🧠 Mémoire | Fréquence de forçage lecture mémoire longue | `supervisor_service.py` | Déclencheur paramétrable (fréquence N messages ou sur événement critique) | 📋 **Spécifié** |
+| **D11** | 👁️ IHM | Masquage paramétrable des constats traités | `ui/index.html` | Constats clos au-delà du seuil (ex: 5) repliés/masqués pour dégager la vue | 📋 **Spécifié** |
+| **D12** | 🎨 IHM | Code couleur étiquette Lecture active | `ui/index.html` | 🟢 Vert = active, 🟠 Orange = en pause, 🔴 Rouge = coupure/erreur | 📋 **Spécifié** |
+| **D13** | 🎨 IHM | Espacement compteur constats | `ui/index.html` | Espace insécable après le nombre : `Constats · 0   ✓ rien à suivre` (lisible) | 📋 **Spécifié** |
+| **D14** | 🎨 IHM | Code couleur jauge complétude mission (xx/xx) | `ui/index.html` | < 8/12 = 🔴 Rouge, 8/12 = 🟠 Orange, ≥ 9/12 = 🟢 Vert | 📋 **Spécifié** |
+| **D15** | 💬 IHM | Chat Superviseur relégué en bas de page | `ui/index.html` | Déplacé en fin de page ou replié par défaut (très peu utilisé) | 📋 **Spécifié** |
+| **D16** | 🚨 Sécurité | Alerte déconnexion sur le menu latéral persistant | `ui/index.html` (`.app-sidebar.is-disconnected`) | Fond rouge pastel fixe et bandeau si service 8082 coupé (anti-travail sans surveillance) | 📋 **Spécifié** |
+| **D17** | 🧩 Archi | Clarification architecture multi-agents / instances | `PLAN_...md` § Architecture | Clarifier : 1 service, N sessions étanches, agents avec sous-agents possibles | ✅ **Documenté** |
+| **D18** | 🛡️ Superviseurs | Superviseurs spécialisés & stricts | `judge_prompt.py`, scripts dédiés | • Superviseur Trajectoire/Drift (avec mémoire)<br>• Superviseur Standards (stateless, prompt dur)<br>• Superviseur Métier AF (stateless) | 📋 **Spécifié** |
+| **D19** | ⏱️ Performance | Optimisation `/review-session-supervisor` | `review_session.py`, `supervisor_server.py` | Réduire la latence globale (route API dédiée ~20 KB vs 899 KB, prompt de réponse figé, pré-collecte de preuves) | 🔬 **Étude chiffrée intégrée** |
+
+---
+
+### 🛠️ Découpage du Plan en 5 Chantiers Opérationnels
+
+#### Chantier A — Audio, Alertes & Accès Rapide (IHM)
+- **Objectif** : Rendre les alertes perceptibles et testables en un clic depuis n'importe quelle vue.
+- **Actions** :
+  1. *Fait* : Bips Web Audio synthétisés (1 bip vs 2 bips différenciés avec pause), volume persisté, front montant strict (D01 à D05).
+  2. *À faire* : Intégrer les boutons d'accès rapide dans la barre latérale gauche fixe (`🔊 1 bip`, `🚨 2 bips`, `🔔 Test VS Code`) pour tester instantanément sans basculer d'onglet (D06).
+
+#### Chantier B — Intégration VS Code & Notifications Natives
+- **Objectif** : Alerte visuelle native garantie même si la fenêtre du navigateur est réduite ou masquée.
+- **Actions** :
+  1. *À faire* : Ajouter l'action API `test_notification` dans `supervisor_service.py` pour générer un constat de test éphémère (D07).
+  2. *À faire* : Raccorder le bouton `🔔 Test VS Code` de l'IHM pour faire popper le toast Windows natif dans VS Code via l'extension `poc/vscode-notifier`.
+  3. *Validation* : Vérifier que le clic sur le toast ouvre bien l'alerte ciblée.
+
+#### Chantier C — Ergonomie Visuelle & Paramétrage IHM
+- **Objectif** : Interface épurée, repères visuels clairs et personnalisation persistée.
+- **Actions** :
+  1. Étiquette de collecte colorée : 🟢 `Lecture active`, 🟠 `En pause`, 🔴 `Rupture` (D12).
+  2. Espacement lisible : `Constats · 0   ✓ rien à suivre` (D13).
+  3. Badges de complétude de mission : `< 8/12` rouge, `8/12` orange, `>= 9/12` vert (D14).
+  4. Réduction d'encombrement : masquage accordéon des constats clos au-delà de 5 (D11).
+  5. Relégation du chat global en bas de page (D15).
+  6. Alerte sécurité déconnexion : volet gauche rouge pastel persistant au défilement si l'API ne répond plus (D16).
+  7. Champs de configuration sauvegardés automatiquement : budget messages (12) et caractères (12 000) (D08).
+  8. Règle de compactage de contexte : migration de l'excédent mémoire courte vers mémoire longue (D09, D10).
+
+#### Chantier D — Performance et Fluidité de `/review-session-supervisor`
+- **Objectif** : Éliminer la lenteur ressentie lors de l'appel de revue de session par l'agent.
+- **Actions** :
+  1. Mesures établies : script Python seul = 0,4 s, snapshot global = 899 KB (~0,9 s).
+  2. Création d'une route API allégée `GET /api/supervision/review?session=<id>` : retourne uniquement la session cible et ses constats ouverts (~25 KB au lieu de 899 KB).
+  3. Pré-collecte déterministe dans `review_session.py` : extraire automatiquement les fichiers cités et joindre un résumé factuel sans appel d'outil supplémentaire.
+  4. Format de réponse agent figé (Constat · Preuve brute · Verdict) pour éviter les discussions verbeuses.
+  5. Parallélisation des vérifications en mode `all`.
+
+#### Chantier E — Architecture Multi-Superviseurs & Refonte des Prompts
+- **Objectif** : Fiabilité maximale par la spécialisation des rôles et fin des fausses alarmes / alarmes bloquées.
+- **Actions** :
+  1. Clarification du runtime : 1 service, N transcripts étanches, sous-agents possibles (D17).
+  2. Découplage en agents spécialisés (D18) :
+     - **Superviseur de Trajectoire (Stateful)** : suit la progression de la mission, compare aux jalons, détecte les drifts et les boucles.
+     - **Superviseur Standards de Code (Stateless)** : prompt figé, vérifie le respect strict de `CODE_QUALITY_STANDARDS.md`, `NAMING_CONVENTION.md` et les profils FB.
+     - **Superviseur Métier AF (Stateless)** : vérifie la conformité aux spécifications fonctionnelles excavatrice (`AF_Partie-08` à `-14`).
+  3. Matrice opérationnelle `Alarm` vs `Warning` : réserver `🔴 Alarm` aux violations de sécurité, actions destructives non consenties, drifts matériels et falsifications de preuves.
+
+---
+
+### 🎛️ Synthèse des Demandes Exploitant, Paramétrage IHM & Architecture Multi-Superviseurs (2026-11-09)
+
+Suite aux demandes explicites de l'exploitant du 9 novembre 2026 (inventaire exhaustif et challenge contradictoire) :
+
+1. **Architecture & Découplage : "Qui tourne sous le capot ?"**
+   - **Service Python Local (`supervisor_service.py`)** : Démon persistant unique sur port 8082. Porte l'état, lit les transcripts locaux `.jsonl` de chaque session (Claude, Antigravity, Codex, DSH), gère la persistance JSON, et orchestre les appels d'audit.
+   - **Juge Stateless (DeepSeek v4.1 via Ollama ou Nemotron via OmniRoute)** : Modèle stateless interrogé toutes les ~8s. **Aucune instance d'agent persistant**, aucun sous-agent propre. Reçoit un paquet contextuel borné, répond en JSON, et sa mémoire retombe immédiatement à zéro.
+   - **Sessions Supervisées** : Ce sont les agents réels (Claude Code, Antigravity, etc.) qui génèrent l'activité et peuvent, eux, invoquer des sous-agents.
+
+2. **Challenge Opérationnel : Architecture Multi-Superviseurs Spécialisés**
+   - *Constat* : Un juge unique devant vérifier simultanément la syntaxe CODESYS, les specs fonctionnelles AF, la sécurité machine C4 et la dérive de mission subit une dilution d'attention.
+   - *Découpage validé en 3 Superviseurs Ciblés* :
+     - 📐 **Superviseur Standards de Code (Stateless / sans mémoire)** : Contrôle uniquement les diffs ST/CODESYS et l'application stricte de `CODE_QUALITY_STANDARDS.md` (nommage PascalCase, profils FB, `Reset` sur front). Modèle rapide et économique.
+     - ⚙️ **Superviseur Métier & Spécifications AF (Stateless / centré sur les AF)** : Contrôle la cohérence des actions de l'agent vis-à-vis de la spec active (`AF_Partie-08` à `-14`).
+     - 🎯 **Superviseur de Trajectoire & Drift (Avec mémoire d'étape)** : Compare le cap initial (`MISSION_CONTRACT`), les jalons validés et l'avancement réel. Détecte les boucles, les fausses déclarations de succès et les abandons d'objectifs sans accord.
+
+3. **Demandes Ergonomiques et Paramétrage IHM**
+   - **Paramétrage Dynamique & Persisté** :
+     - Contexte récent : budget caractères assoupli (passage de 6 000 à 12 000 caractères par défaut avec marge) et nombre de messages (12 par défaut).
+     - Fréquence de l'audit de trajectoire approfondi : modulo N (8 par défaut).
+     - Seuil de masquage des constats traités : au-delà de 5 constats résolus, archivage replié dans un sous-panneau `<details>` pour préserver l'espace de lecture.
+   - **Ergonomie Visuelle Immédiate** :
+     - Étiquette *Lecture active* : code couleur explicite (🟢 vert = lecture active, 🟠 orange = en pause, 🔴 rouge = rupture de source / erreur).
+     - Compteur de constats : espacement insécable entre le nombre et le symbole `✓` (`Constats · 0 \u00a0 ✓ rien à suivre`).
+     - Jauge de complétude Mission (ex: `9/12`) : badge coloré (<8/12 rouge, 8/12 orange, >=9/12 vert).
+     - Relégation du *Chat Superviseur* : déplacé en bas de page pour prioriser le flux et les alertes.
+   - **Notifications Bureau & Sons** : Les notifications VSCode/bureau fonctionnent nativement. Le son Web Audio dans le navigateur est assujetti aux politiques d'autoplay des navigateurs modernes nécessitant un clic initial d'activation.
+
 ### 🚨 Chantier Stratégique : Refonte des Prompts du Veilleur, Détection de Drift et Définition Réelle des Alarmes (2026-11-09)
 
 Suite au retour d'expérience de l'exploitant et au challenge multi-modèles consigné dans [`DOC/WFLOW/REVIEWS/REVIEW_SUPERVISOR_PROMPTS_ET_DRIFT.md`](../REVIEWS/REVIEW_SUPERVISOR_PROMPTS_ET_DRIFT.md), le système de supervision actuel présente un déséquilibre fondamental analysé et consolidé ci-dessous :
@@ -156,6 +262,49 @@ Bien que le composant « Trajet des messages » soit visuellement structuré, so
    - **Menu latéral persistant (`fixed / sticky`)** : Répercuter immédiatement la perte de connexion dans le volet de navigation gauche, qui reste visible en permanence lors de tout défilement.
    - **Signal visuel franc mais non agressif** : Appliquer une teinte de fond **rouge pastel / alerte déconnexion** sur le menu gauche (`background-color` rouge doux contrasté, badge clignotant ou bandeau persistant `⚠️ SUPERVISION INTERROMPUE — DÉCONNECTÉ`) tant que l'appel API `fetch` échoue.
    - **Reprise automatique** : Dès que le service 8082 redevient joignable, le menu reprend automatiquement son aspect normal sans rechargement forcé de page.
+
+### ⏱️ Étude : latence de `/review-session-supervisor` (2026-11-09)
+
+*Demande exploitant : « lancement de Py puis réponse particulièrement long ». Challenger les temps, leurs causes, et les pistes parallèle LLM / script déterministe / prompt dédié.*
+
+**📏 Base mesurée (poste exploitant, service 8082 en charge, 9 nov. 20h38)**
+
+| Étape | Mesure | Constat |
+|---|---|---|
+| `py -3.13 -c pass` (lanceur + interpréteur) | ~195 ms | Négligeable |
+| `review_session.py help` / `all` (bout en bout) | ~400 ms | **Le script n'est pas le goulot** |
+| `GET /api/supervision` (snapshot complet) | ~880 ms · **899 KB** | Surdimensionné : contexte, mémoire, events de *toutes* les sessions pour en lire une |
+| `GET /api/supervision/summary` | ~185 ms · 27 KB | Existe déjà, mais sans `evidence` ni `enabled` |
+
+**🧪 Hypothèses à confirmer (classées, non prouvées)**
+
+1. **H1 — Tour agent, pas Python** : la durée ressentie vient du LLM (chargement skill → appel shell → lecture sortie → raisonnement → N appels outils *séquentiels* pour « preuve brute » par constat). `all` multiplie ces allers-retours.
+2. **H2 — Consigne trop ouverte** : « exécute l'outil approprié » laisse l'agent explorer librement (lectures larges, relances). Aucune piste de preuve n'est pré-calculée.
+3. **H3 — Démarrage shell du CLI** (PowerShell/profil, sandbox, approbation de commande) : potentiellement > script lui-même ; à mesurer par CLI (Claude Code, AGY, DSH, Codex).
+4. **H4 — Snapshot 899 KB** : coût direct faible (~0,5 s) mais croît avec les sessions ; vrai problème d'échelle.
+
+**🔬 Protocole d'étude**
+
+- **Chronométrage par segment** sur 3 CLI × 3 cas (0 constat, 1 constat, `all` 5 constats) : t₀ commande → t₁ sortie script → t₂ 1ᵉʳ appel outil de preuve → t₃ réponse finale. Source : horodatages des transcripts JSONL (déjà lus par le Veilleur). Livrable : tableau de répartition %.
+- **Construction des échanges** : relire le texte injecté par `format_single_finding` / `format_all_findings` et la séquence réelle de tours dans les transcripts ; repérer les tours inutiles (re-lecture du constat, reformulation, outils redondants).
+
+**💡 Pistes à challenger (après mesure, pas avant)**
+
+| # | Piste | Type | Gain attendu | Risque / garde-fou |
+|---|---|---|---|---|
+| P1 | Route dédiée `GET /api/supervision/review?session=<id>` : 1 session, constats ouverts + `evidence`, quelques KB | Déterministe | −0,5 s, stable à l'échelle | Résolution de session fail-closed conservée côté serveur |
+| P2 | **Pré-collecte déterministe des preuves** dans le script : pour chaque constat, extraire les candidats vérifiables (chemins `fichier:ligne`, IDs de gate, commandes citées) et joindre `git status`/existence fichier/extrait de ligne | Déterministe | Supprime une partie des appels outils agent | Le script **fournit des pistes**, ne conclut jamais ; l'agent reste juge |
+| P3 | **Prompt de traitement dédié** et court : format de réponse figé (Constat · Preuve brute · Verdict `confirmé/contesté/incertain`), budget d'appels outils explicite, interdiction des reformulations | Prompt | Moins de tours, réponse lisible TDAH | Ne pas affaiblir l'exigence de preuve brute |
+| P4 | **Parallélisme** : en `all`, demander à l'agent de grouper les lectures indépendantes en un seul tour (appels outils parallèles), ou script lançant les vérifications déterministes en parallèle (`concurrent.futures`) | Prompt + script | Divise le temps `all` par ~N | Pas de commande modifiante en parallèle |
+| P5 | Pré-tri par petit LLM / Veilleur (résumé « où chercher » joint au constat dès sa création, hors du tour agent) | LLM asynchrone | Travail fait avant la commande | Coût quota ; texte étiqueté « avis Veilleur », jamais preuve |
+| P6 | Invocation directe sans `py` lanceur (`python` du venv) | Déterministe | ~0,1 s | Négligeable — à ne faire que si gratuit |
+
+**✅ Critères d'acceptation (à figer avant implémentation)**
+
+- Tableau de répartition des temps publié, hypothèses H1–H4 tranchées par mesure.
+- Test A/B : prompt actuel vs prompt dédié (P3, + P2 si retenu) sur le **même** jeu de constats ; mesurer durée t₀→t₃, nombre d'appels outils, taux de preuves brutes réellement présentes. **Aucune régression du taux de preuve** acceptée pour un gain de temps.
+- Skill alignée sur les 3 copies (`.claude/`, `.dsh/`, `.agents/skills/review-session-supervisor/`) — garde-fou de cohérence à ajouter si divergence constatée.
+- Tests `TOOLS/AGENT_SUPERVISOR/tests/` verts ; aucune auto-clôture introduite.
 
 **Service :** 8082 mis à jour le 9 novembre (build `7b92c84391a5`) par `upgrade_legacy.py`, sauvegarde vérifiée ;
 T428 et CC-T217 conservées en pause. Prise en charge T429 par AGY01 (Antigravity). Aucun commit ni push.
@@ -518,6 +667,13 @@ son ; les nouveaux `warning` étaient silencieux. Correction : Warning et Alarm 
 parcours, avec déduplication ; test DOM ciblé PASS pour une notification Warning unique. Cela ne
 prouve pas encore la réception bureau ni l'audibilité réelle. L'interface étant servie depuis le
 disque, un rafraîchissement charge cette modification ; vérifier également les permissions et le son.
+
+✅ **Son navigateur — CLÔTURÉ par l'exploitant le 9 novembre 2026 (écoute réelle, fenêtre réduite incluse).**
+Son activé par défaut ; volume réglable 10–100 % dans Paramètres (persisté) ; bip uniquement au front
+montant d'un nouveau constat. **1 bip** (130 ms, 880 Hz) = Warning / premier événement ; **2 bips**
+(court 80 ms 980 Hz · pause 240 ms · long 450 ms 1150 Hz) = Alarm ou ≥ 3 Warning ouverts. Boutons de
+test 1 bip / 2 bips / retard 5 s dans Paramètres. Reste ouvert, hors de ce point : boutons de test
+dans le menu latéral et test du toast VS Code depuis l'IHM.
 
 **Cinq parcours techniques** avec juge simulé pour isoler la mécanique :
 

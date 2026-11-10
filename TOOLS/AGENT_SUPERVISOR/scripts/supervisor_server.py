@@ -72,6 +72,17 @@ class Handler(BaseHTTPRequestHandler):
             return self.reply(200, dict(service='agent-supervisor', **self.service_info()))
         if path == '/api/supervision/summary':
             return self.reply(200, self.server.supervision.notification_snapshot())
+        if path == '/api/supervision/review':
+            query = parse_qs(urlparse(self.path).query)
+            try:
+                result = self.server.supervision.review_snapshot(
+                    query.get('session', [''])[0], int(query.get('offset', ['0'])[0]),
+                    query.get('revision', [None])[0])
+                return self.reply(200, result)
+            except KeyError:
+                return self.reply(404, {'error': 'Session inconnue'})
+            except ValueError as exc:
+                return self.reply(400, {'error': str(exc)})
         if path == '/api/supervision':
             result = self.server.supervision.snapshot()
             result.update(self.service_info())

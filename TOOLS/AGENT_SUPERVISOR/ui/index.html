@@ -49,15 +49,29 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;overflow:auto}inp
 /* T429 L2 — ergonomie : contenu en haut, constats d'abord, pas de répétition */
 .app-main{margin:0 auto;align-self:start}
 .system-fold{margin-top:18px}.system-fold>summary{cursor:pointer;color:var(--muted);padding:6px 0}.system-fold[open]>summary{color:var(--text)}
-.severity-counts{display:inline-flex;flex-wrap:wrap;gap:6px;font-size:12px}.severity-counts span{border:1px solid #667084;border-radius:6px;padding:1px 7px;background:#282e3a;white-space:nowrap}.severity-counts .sc-alarm{border-color:#cc5a66;color:#ffd5d8}.severity-counts .sc-warning{border-color:#b68a49;color:#ffe3b8}.severity-counts .sc-new{border-color:#7aa2d8;color:#d8e6ff}.severity-counts .sc-none{color:var(--muted)}
+.severity-counts{display:inline-flex;flex-wrap:wrap;gap:6px;font-size:12px}.severity-counts span{border:1px solid #667084;border-radius:6px;padding:1px 7px;background:#282e3a;white-space:nowrap}.severity-counts .sc-alarm{border-color:#cc5a66;color:#ffd5d8}.severity-counts .sc-warning{border-color:#b68a49;color:#ffe3b8}.severity-counts .sc-new{border-color:#7aa2d8;color:#d8e6ff}.severity-counts .sc-none{color:var(--muted);margin-left:6px}
+.session-collection-state.state-active,.status.state-active{border-color:#50fa7b;color:#a3f7bf;background:#1b3327}
+.session-collection-state.state-paused,.status.state-paused{border-color:#ffb86c;color:#ffd199;background:#3c2f1f}
+.session-collection-state.state-neutral,.status.state-neutral{border-color:#667084;color:var(--muted)}
+.session-collection-state.state-error,.status.state-error{border-color:#ff5555;color:#ff858d;background:#381d22}
+.mission-gauge{display:inline-block;padding:1px 6px;border-radius:4px;border:1px solid transparent;font-weight:700;font-size:11px;margin-left:4px}
+.mission-gauge.gauge-red{border-color:#ff5555;color:#ff858d;background:#4a2328}
+.mission-gauge.gauge-orange{border-color:#ffb86c;color:#ffd199;background:#45331e}
+.mission-gauge.gauge-green{border-color:#50fa7b;color:#a3f7bf;background:#1e3d2f}
+.closed-findings-archive{border:1px dashed var(--border);border-radius:6px;padding:8px;margin-top:10px;background:#20222b}
+.closed-findings-archive>summary{cursor:pointer;color:var(--muted);font-size:12px;display:flex;align-items:center;gap:8px}
+.closed-findings-archive[open]>summary{color:var(--text);margin-bottom:8px}
+.volume-control{display:inline-flex;flex-direction:row;align-items:center;gap:6px;font-size:12px;color:var(--text);margin-left:6px}
+.volume-control input[type=range]{width:95px;cursor:pointer;accent-color:var(--cyan);vertical-align:middle}
+.volume-control span{font-weight:600;min-width:34px;color:var(--cyan);font-size:11px}
 .finding-card[open]>summary .finding-preview{display:none}.finding-card>summary .finding-preview{color:var(--muted);font-size:13px}
 .finding-reason ul{margin:4px 0 4px 18px;padding:0}.finding-reason li{margin:2px 0}.finding-reason p{margin:4px 0}
 .finding-quote>summary{cursor:pointer;color:var(--muted);font-size:13px}.finding-quote blockquote{margin:6px 0}
 .finding-secondary{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}.finding-secondary{align-items:flex-start}.finding-actions{align-items:flex-start}.finding-secondary>details{flex:0 1 auto;min-width:0}.finding-secondary>details[open]{flex:1 1 100%}
 .mission-lines{margin:6px 0;display:grid;gap:3px}.mission-lines div{overflow-wrap:anywhere}.mission-lines b{color:var(--cyan);font-weight:600}.mission-empty{color:var(--muted);font-size:12px}
 .history-tool{opacity:.85;border-left:3px solid #6b7280}.history-tool>summary{cursor:pointer;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
-@media(max-width:760px){.app-brand{display:none}.app-main>header h1{font-size:18px}#paused-notice{padding:6px 10px;margin:6px 0}}
-@media(max-width:700px){.app-main{padding:12px}.app-shell{grid-template-columns:1fr}.app-sidebar{position:static;height:auto}.flow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.flow-feedback{white-space:normal}.session-fold>summary,.alert-history-fold>summary{flex-wrap:wrap}.alert-history-fold>summary span{flex:1 1 100%}.finding-actions>*{flex:1 1 auto}}
+@media(max-width:760px){.app-main>header{margin-bottom:8px}.app-brand{display:none}.app-main>header h1{font-size:18px}#paused-notice{padding:6px 10px;margin:6px 0}}
+@media(max-width:700px){.app-main{padding:8px 12px 12px}.app-shell{grid-template-columns:1fr}.app-sidebar{position:static;height:auto}.flow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.flow-feedback{white-space:normal}.session-fold>summary,.alert-history-fold>summary{flex-wrap:wrap}.alert-history-fold>summary span{flex:1 1 100%}.finding-actions>*{flex:1 1 auto}}
 </style></head>
 <body><main>
 <header><h1>&#x1F6E1;&#xFE0F; Agent Supervisor <span id="unread-count" class="badge">0 non lue</span></h1><a href="http://127.0.0.1:8081/TASK_VIEWER.html">← Task Viewer</a></header>
@@ -83,8 +97,10 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;overflow:auto}inp
    <label>Sortie maximale · tokens<input type="number" id="judge-output-tokens" min="256" max="8192" step="1" value="1600" required></label>
    <label>Délai maximal · secondes<input type="number" id="judge-timeout-seconds" min="5" max="120" step="1" value="30" required></label>
    <label>Messages récents · maximum<input type="number" id="judge-context-messages" min="4" max="200" step="1" value="12" required></label>
-   <label>Contexte récent · caractères<input type="number" id="judge-context-chars" min="2000" max="100000" step="1" value="6000" required></label>
-   <label>Fenêtre modèle locale · tokens<input type="number" id="judge-model-context-tokens" min="8192" max="131072" step="1" value="16384" required></label>
+   <label>Contexte récent · caractères<input type="number" id="judge-context-chars" min="2000" max="100000" step="1" value="12000" required></label>
+   <label>Fenêtre modèle locale · tokens<input type="number" id="judge-model-context-tokens" min="8192" max="131072" step="1" value="32768" required></label>
+   <label>Max constats traités visibles<input type="number" id="judge-max-closed-findings" min="1" max="50" step="1" value="5" required></label>
+   <label>Intervalle audit trajectoire · tours<input type="number" id="judge-audit-interval" min="1" max="50" step="1" value="8" required></label>
   </div>
   <p id="judge-effective-settings" class="hint" aria-live="polite">Réglages effectifs en cours de vérification.</p>
   <p class="hint">Ollama : température, limite de sortie et fenêtre locale sont transmises en options ; OmniRoute : température et limite de sortie sont transmises au provider. La fenêtre locale ne redimensionne pas un modèle distant. Le délai s’applique au transport et le budget de messages au contexte constitué par Agent Supervisor. Les valeurs exactes envoyées sont consultables dans « Ce que le juge a reçu ».</p>
@@ -101,7 +117,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;overflow:auto}inp
 </details>
 <section class="panel" aria-labelledby="notify-heading">
  <h2 id="notify-heading">Notifications <span class="muted">— préférences de ce navigateur</span></h2>
- <div class="notify-settings"><button type="button" id="enable-notifications">Activer les notifications bureau</button><label class="check"><input id="sound-enabled" type="checkbox">Son pour les nouveaux Warning et Alarm</label><button type="button" id="unlock-audio" hidden>Activer le son dans cette page</button></div>
+ <div class="notify-settings"><button type="button" id="enable-notifications">Activer les notifications bureau</button><label class="check"><input id="sound-enabled" type="checkbox" checked>Son pour les nouveaux Warning et Alarm</label><label class="volume-control">Volume <input type="range" id="sound-volume" min="10" max="100" step="5" value="55"><span id="sound-volume-label">55%</span></label><button type="button" id="unlock-audio" hidden>Activer le son dans cette page</button><button type="button" id="test-sound-now">🔊 Tester 1 bip (Warning)</button><button type="button" id="test-sound-alarm">🚨 Tester 2 bips (Alarm / 3+ Warn)</button><button type="button" id="test-sound-delay">⏳ Tester retard (5s)</button><button type="button" id="test-vscode">🔔 Test VS Code</button></div>
  <p id="notification-hint" class="hint">Désactivées par défaut. La page doit rester ouverte. Chaque nouveau Warning ou Alarm déclenche une seule notification bureau et un bip court.</p>
 </section>
 <section class="panel assignment-context" aria-labelledby="exchange-heading">
@@ -137,8 +153,8 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;overflow:auto}inp
 <script>
 'use strict';
 const byId=id=>document.getElementById(id);
-const judgeSettingDefaults={temperature:0,output_tokens:1600,timeout_seconds:30,context_messages:12,context_chars:6000,model_context_tokens:16384};
-const judgeSettingFields={temperature:'judge-temperature',output_tokens:'judge-output-tokens',timeout_seconds:'judge-timeout-seconds',context_messages:'judge-context-messages',context_chars:'judge-context-chars',model_context_tokens:'judge-model-context-tokens'};
+const judgeSettingDefaults={temperature:0,output_tokens:1600,timeout_seconds:30,context_messages:12,context_chars:12000,model_context_tokens:32768,max_visible_closed_findings:5,audit_interval:8};
+const judgeSettingFields={temperature:'judge-temperature',output_tokens:'judge-output-tokens',timeout_seconds:'judge-timeout-seconds',context_messages:'judge-context-messages',context_chars:'judge-context-chars',model_context_tokens:'judge-model-context-tokens',max_visible_closed_findings:'judge-max-closed-findings',audit_interval:'judge-audit-interval'};
 function judgeSettingsInput(){return Object.fromEntries(Object.entries(judgeSettingFields).map(([key,id])=>[key,Number(byId(id).value)]));}
 const stateNames={active:'Lecture active',waiting:'En attente',paused:'En pause',stopped:'Arrêtée',source_missing:'Source absente',source_reset:'Continuité rompue',continuity_unverified:'Continuité à vérifier',source_error:'Source indisponible',parse_error:'Contenu illisible',ready:'Prête',ambiguous:'Source ambiguë',invalid_id:'ID invalide'};
 const alertCategoryNames={unsupported_success:'Réussite sans preuve',ignored_instruction:'Consigne potentiellement ignorée',unauthorized_action:'Action hors périmètre',contradiction:'Contradiction à vérifier',repeated_attempt:'Répétition à vérifier'};
@@ -161,8 +177,8 @@ const missionTemplates={
  investigation:'Objectif : suivre une investigation et vérifier qu’elle réduit une incertitude utile.\nÀ relever : symptôme, hypothèse, prédiction observable, expérience discriminante et résultat.\nSignaler les conclusions sans preuve, les hypothèses répétées sans test et les données métier manquantes.\nPour chaque alerte : faits / hypothèses / inconnues et prochaine vérification utile.'
 };
 let initialAlerts=true,audio=null,chatSignature='';
-let preferences={desktop:false,sound:false};
-try{const saved=JSON.parse(localStorage.getItem('agent-supervision.notifications.v1')||'{}');preferences={desktop:saved.desktop===true,sound:saved.sound===true};for(const id of JSON.parse(localStorage.getItem('agent-supervision.notified.v1')||'[]'))knownAlerts.add(id);}catch(_error){}
+let preferences={desktop:false,sound:true,volume:55};
+try{const saved=JSON.parse(localStorage.getItem('agent-supervision.notifications.v1')||'{}');preferences={desktop:saved.desktop===true,sound:saved.sound!==undefined?saved.sound===true:true,volume:typeof saved.volume==='number'?Math.min(100,Math.max(10,saved.volume)):55};for(const id of JSON.parse(localStorage.getItem('agent-supervision.notified.v1')||'[]'))knownAlerts.add(id);}catch(_error){}
 function element(tag,text,className){const node=document.createElement(tag);if(text!==undefined)node.textContent=String(text);if(className)node.className=className;return node;}
 // T429 L2 helpers: non-zero labelled counters, readable finding text, cosmetic quote cleanup.
 function severityCounts(counts){const group=element('span',undefined,'severity-counts');const items=[['alarms','🔴','Alarm','sc-alarm'],['warnings','⚠️','Warning','sc-warning'],['resolution_proposed','◇','resolution proposed','sc-new'],['unread','🆕','new','sc-new']];for(const [key,icon,label,cls] of items){const n=counts[key]||0;if(n)group.append(element('span',icon+' '+n+' '+label,cls));}if(!group.childNodes.length)group.append(element('span','✓ rien à suivre','sc-none'));group.title=countsText(counts);return group;}
@@ -188,7 +204,7 @@ function setupDashboardLayout(){
  const flow=element('section',undefined,'flow-panel');flow.setAttribute('aria-labelledby','flow-heading');
  flow.innerHTML='<div class="flow-title"><div><h2 id="flow-heading">Trajet des messages</h2><small>Active une étape pour voir ses détails ; le panneau reste repliable.</small></div><span id="flow-state" class="status">En attente</span></div><div class="flow-grid"><button type="button" class="flow-step" aria-pressed="false" data-flow-node="source"><span class="flow-icon">💬</span><strong>Chat surveillé</strong><small>consignes utilisateur + réponses</small></button><button type="button" class="flow-step" aria-pressed="false" data-flow-node="collector"><span class="flow-icon">📥</span><strong>Collecteur partagé</strong><small>lecture locale · sans modèle</small></button><button type="button" class="flow-step" aria-pressed="false" data-flow-node="context"><span class="flow-icon">🧵</span><strong>Contexte de session</strong><small>rôles conservés · isolé</small></button><button type="button" class="flow-step" aria-pressed="false" data-flow-node="judge"><span class="flow-icon">⚖️</span><strong>Juge partagé</strong><small>un appel LLM si nouveau message</small></button><button type="button" class="flow-step" aria-pressed="false" data-flow-node="check"><span class="flow-icon">🔎</span><strong>Contrôle</strong><small>citation exacte + limites</small></button><button type="button" class="flow-step" aria-pressed="false" data-flow-node="alerts"><span class="flow-icon">🔔</span><strong>Résultat</strong><small>attente, aucun signal, ou alerte</small></button></div><details id="flow-details" class="flow-details"><summary id="flow-details-summary">ℹ️ Cliquer sur une étape pour ouvrir ses détails</summary><div id="flow-detail-content" class="flow-detail-content" aria-live="polite"></div></details><div class="flow-foot"><span>↶</span><span><b>Tri rapide à l’étude — inactif :</b> aucun classificateur léger ne tourne actuellement. Le juge LLM reste le seul composant d’analyse.</span><span class="flow-feedback">Ton retour alimente le contexte suivant</span></div>';
  const app=element('div',undefined,'app-shell'),side=element('aside',undefined,'app-sidebar');
- const disconnectedAlert=element('div','⚠️ SUPERVISION INTERROMPUE\nService déconnecté','sidebar-disconnected-banner');disconnectedAlert.id='sidebar-disconnected';disconnectedAlert.hidden=true;side.append(disconnectedAlert);
+ const disconnectedAlert=element('div','⚠️ SUPERVISION INTERROMPUE — DÉCONNECTÉ','sidebar-disconnected-banner');disconnectedAlert.id='sidebar-disconnected';disconnectedAlert.hidden=true;side.append(disconnectedAlert);
  const brand=element('div',undefined,'app-brand'),mark=element('span','🛡️','mark');brand.append(mark,element('span','Agent Supervisor'));side.append(brand);
  const nav=element('nav',undefined,'app-nav');nav.setAttribute('aria-label','Vues du superviseur');
  for(const [id,label] of [['monitor','◉  Suivi'],['connect','＋  Connecter'],['settings','⚙  Paramètres']]){const button=element('button',label);button.type='button';button.dataset.view=id;if(id==='monitor')button.classList.add('active');button.addEventListener('click',()=>showDashboardView(id));nav.append(button);}side.append(nav);
@@ -374,7 +390,11 @@ function renderMissionStructure(session){
  const proposal=session.mission_structure_proposal&&typeof session.mission_structure_proposal==='object'?session.mission_structure_proposal:{};
  const filledFields=missionStructureFields.filter(([key])=>typeof structure[key]==='string'&&structure[key].trim());
  const headline=structure.task_ref||structure.subject||proposal.task_ref||proposal.subject||'';
- panel.append(element('summary','🎯 Mission · '+(headline?shortPreview(headline,70):'fiche vide')+' · '+filledFields.length+'/'+missionStructureFields.length));
+ const gaugeClass=filledFields.length<8?'gauge-red':filledFields.length===8?'gauge-orange':'gauge-green';
+ const missionSummary=element('summary');
+ missionSummary.append(document.createTextNode('🎯 Mission · '+(headline?shortPreview(headline,70):'fiche vide')+' · '));
+ missionSummary.append(element('span',filledFields.length+'/'+missionStructureFields.length,'mission-gauge '+gaugeClass));
+ panel.append(missionSummary);
  const lines=element('div',undefined,'mission-lines');
  for(const [key,label] of filledFields){const line=element('div');line.append(element('b',label+' : '),document.createTextNode(structure[key]));lines.append(line);}
  if(!filledFields.length)lines.append(element('div','Fiche structurée vide : la mission texte reste la référence.','mission-empty'));
@@ -498,18 +518,25 @@ function focusFindingCard(sessionId,alertId){
 function processAlerts(sessions){
 
  let unread=0;
- for(const session of sessions)for(const alert of (session.alerts||[])){
-  if(isUnread(alert))unread++;
-  if(!alert.id)continue;
-  const key=alertKey(session,alert),fresh=!knownAlerts.has(key);knownAlerts.add(key);
-  if(!initialAlerts&&fresh&&isUnread(alert)&&['warning','error','alarm'].includes(alert.severity)){
-   if(preferences.desktop&&'Notification' in window&&Notification.permission==='granted'){
-    try{const level=(alert.severity==='error'||alert.severity==='alarm')?'🔴 Alarm':'⚠️ Warning',firstLine=String(alert.reason||'Nouvelle alerte').split('\n')[0];const note=new Notification(level+' · '+(session.alias||session.platform),{body:(alert.title?alert.title+' — ':'')+firstLine.slice(0,160),tag:key});note.onclick=()=>{try{window.focus();}catch(_e){}note.close();focusFindingCard(session.id,alert.id);};}catch(_error){}
-   }
-   if(preferences.sound&&audio&&audio.state==='running'){
-    try{const oscillator=audio.createOscillator(),gain=audio.createGain();oscillator.connect(gain);gain.connect(audio.destination);oscillator.frequency.value=660;gain.gain.setValueAtTime(.08,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.16);oscillator.start();oscillator.stop(audio.currentTime+.17);}catch(_error){byId('notification-hint').textContent='Le son est indisponible ; les alertes restent visibles.';}
+ const newEvents=[];
+ for(const session of sessions){
+  const openWarns=(session.alerts||[]).filter(a=>a.severity==='warning'&&findingBusinessState(a)!=='closed').length;
+  for(const alert of (session.alerts||[])){
+   if(isUnread(alert))unread++;
+   if(!alert.id)continue;
+   const key=alertKey(session,alert),fresh=!knownAlerts.has(key);knownAlerts.add(key);
+   if(!initialAlerts&&fresh&&isUnread(alert)&&['warning','error','alarm'].includes(alert.severity)){
+    newEvents.push({alert,session,openWarns});
+    if(preferences.desktop&&'Notification' in window&&Notification.permission==='granted'){
+     try{const level=(alert.severity==='error'||alert.severity==='alarm')?'🔴 Alarm':'⚠️ Warning',firstLine=String(alert.reason||'Nouvelle alerte').split('\n')[0];const note=new Notification(level+' · '+(session.alias||session.platform),{body:(alert.title?alert.title+' — ':'')+firstLine.slice(0,160),tag:key});note.onclick=()=>{try{window.focus();}catch(_e){}note.close();focusFindingCard(session.id,alert.id);};}catch(_error){}
+    }
    }
   }
+ }
+ if(newEvents.length>0&&preferences.sound&&audio&&audio.state==='running'){
+  const hasAlarm=newEvents.some(({alert})=>alert.severity==='error'||alert.severity==='alarm');
+  const has3Warn=newEvents.some(({openWarns})=>openWarns>=3);
+  playNotificationSound(hasAlarm||has3Warn?'double':'single');
  }
  initialAlerts=false;
  const openAlarms=sessions.reduce((n,s)=>n+(s.alerts||[]).filter(a=>(a.severity==='error'||a.severity==='alarm')&&findingBusinessState(a)!=='closed').length,0);byId('unread-count').textContent=(openAlarms?'🔴 '+openAlarms+' Alarm · ':'')+unread+' non lue'+(unread>1?'s':'');
@@ -565,10 +592,10 @@ function render(snapshot,force=false){
   for(const [sessionIndex,session] of sessions.entries()){
     const color=sessionColor(sessionIndex),fold=element('details',undefined,'session-fold');fold.style.setProperty('--session-color',color);fold.open=session.id===selectedSideSessionId;
    const summary=element('summary'),marker=element('i',undefined,'session-marker');summary.append(marker,element('span',session.alias||session.native_id,'session-summary-name'),element('span',session.platform||'','session-summary-meta'));
-   const counts=sessionCounts(session),countChip=element('b','🔔 '+counts.follow_up+' · 🆕 '+counts.unread,'session-summary-counters unread'),stateName=session.enabled===false?'Paused':stateNames[session.state]||session.state||'Waiting',stateChip=element('small',session.enabled===false?'⏸ Paused':stateName,'session-collection-state');countChip.title=counts.follow_up+' à suivre · '+counts.unread+' nouvelle(s)';stateChip.title=stateName;stateChip.setAttribute('aria-label',stateName);summary.append(severityCounts(counts),stateChip);fold.append(summary);
+   const counts=sessionCounts(session),countChip=element('b','🔔 '+counts.follow_up+' · 🆕 '+counts.unread,'session-summary-counters unread');const isStatePaused=session.enabled===false||session.state==='paused',isStateError=['source_missing','source_reset','continuity_unverified','source_error','parse_error','invalid_id'].includes(session.state);const stateCls=isStateError?'state-error':isStatePaused?'state-paused':session.state==='active'?'state-active':'state-neutral';const stateName=session.enabled===false&&!isStateError?'Paused':stateNames[session.state]||session.state||'Waiting';const stateChip=element('small',session.enabled===false&&!isStateError?'⏸ Paused':stateName,'session-collection-state '+stateCls);countChip.title=counts.follow_up+' à suivre · '+counts.unread+' nouvelle(s)';stateChip.title=stateName;stateChip.setAttribute('aria-label',stateName);summary.append(severityCounts(counts),stateChip);fold.append(summary);
     fold.addEventListener('toggle',()=>{if(fold.open){openSessionCards.add(session.id);selectedSideSessionId=session.id;try{localStorage.setItem('agent-supervision.selected-session.v1',session.id);}catch(_error){}for(const other of document.querySelectorAll('.session-fold'))if(other!==fold&&other.open){other.open=false;openSessionCards.delete(other.querySelector('article')?.dataset.sessionId);}}else openSessionCards.delete(session.id);savePanelState('agent-supervision.open-session-cards.v1',openSessionCards);renderSideSessions(sessions);});
    const card=element('article',undefined,'session session-body');card.dataset.sessionId=session.id;
-  const top=element('div',undefined,'session-top');top.append(element('span',session.enabled===false?'En pause':stateNames[session.state]||session.state||'État inconnu','status'));card.append(top);
+  const top=element('div',undefined,'session-top');top.append(element('span',session.enabled===false&&!isStateError?'En pause':stateNames[session.state]||session.state||'État inconnu','status '+stateCls));card.append(top);
   // T429 L2: order = header, errors, recovery, findings, mission, chat, then one folded "Détails et réglages".
   const moreDetails=preserveFindingPanel(element('details',undefined,'mission session-more'),session.id+':more');moreDetails.append(element('summary','🔧 Détails et réglages · ID, source, note, juge, historique, journal'));
   const dl=element('dl',undefined,'details');detail(dl,'CLI / ID',(session.platform||'')+' / '+(session.native_id||''));detail(dl,'Source lue',session.source);detail(dl,'Dernier événement',dateText(session.last_event));detail(dl,'Analyse',(analysisNames[session.analysis_state]||session.analysis_state||'Non effectuée')+' · '+dateText(session.last_analysis));moreDetails.append(dl);
@@ -630,18 +657,18 @@ function render(snapshot,force=false){
   if(!events.length)eventPanel.append(element('p','Aucun événement journalisé pour cette session. Le « 0 » ne compte ni les alertes ni les messages du chat ; consulte leurs panneaux dédiés.','hint'));
   else {eventPanel.append(element('small',events.length+' événement(s) affiché(s) sur '+(session.event_count||events.length)+'. Utilisez leur référence dans le chat du Supervisor.'));const log=element('div',undefined,'chat-log');for(const entry of events){const item=element('div',undefined,'chat-message');item.append(element('small',(entry.ref||entry.id)+' · '+(entry.kind||'event')+' · '+dateText(entry.created_at)),element('p',entry.text||''));log.append(item);}eventPanel.append(log);}
   moreDetails.append(eventPanel);
-  const alertsPanel=element('details',undefined,'mission');const routeTargetsThisSession=supervisorRouteApplied&&session.id===requestedSupervisorSession&&requestedSupervisorAlert&&Array.isArray(session.alerts)&&session.alerts.some(item=>item.id===requestedSupervisorAlert);if(routeTargetsThisSession)openAlerts.add(session.id);const latestFinding=(session.alerts||[]).filter(a=>findingBusinessState(a)!=='closed').map(a=>String(a.last_occurrence||a.created_at||'')).sort().pop()||'',closedKey=session.id+'|'+latestFinding;alertsPanel.open=openAlerts.has(session.id)||(sessionCounts(session).follow_up>0&&!closedAlertPanels.has(closedKey));alertsPanel.addEventListener('toggle',()=>{if(alertsPanel.open){openAlerts.add(session.id);closedAlertPanels.delete(closedKey);}else{openAlerts.delete(session.id);for(const k of [...closedAlertPanels])if(k.startsWith(session.id+'|'))closedAlertPanels.delete(k);closedAlertPanels.add(closedKey);}savePanelState(panelKeys.alerts,openAlerts);savePanelState('agent-supervision.panel.alerts-closed.v1',closedAlertPanels);});const alertList=Array.isArray(session.alerts)?session.alerts:[],unreadAlerts=alertList.filter(isUnread).length;const alertsSummary=element('summary');alertsSummary.append(element('strong','Constats · '+alertList.length+' '),severityCounts(sessionCounts(session)));
+  const alertsPanel=element('details',undefined,'mission');const routeTargetsThisSession=supervisorRouteApplied&&session.id===requestedSupervisorSession&&requestedSupervisorAlert&&Array.isArray(session.alerts)&&session.alerts.some(item=>item.id===requestedSupervisorAlert);if(routeTargetsThisSession)openAlerts.add(session.id);const latestFinding=(session.alerts||[]).filter(a=>findingBusinessState(a)!=='closed').map(a=>String(a.last_occurrence||a.created_at||'')).sort().pop()||'',closedKey=session.id+'|'+latestFinding;alertsPanel.open=openAlerts.has(session.id)||(sessionCounts(session).follow_up>0&&!closedAlertPanels.has(closedKey));alertsPanel.addEventListener('toggle',()=>{if(alertsPanel.open){openAlerts.add(session.id);closedAlertPanels.delete(closedKey);}else{openAlerts.delete(session.id);for(const k of [...closedAlertPanels])if(k.startsWith(session.id+'|'))closedAlertPanels.delete(k);closedAlertPanels.add(closedKey);}savePanelState(panelKeys.alerts,openAlerts);savePanelState('agent-supervision.panel.alerts-closed.v1',closedAlertPanels);});const alertList=Array.isArray(session.alerts)?session.alerts:[],unreadAlerts=alertList.filter(isUnread).length;const alertsSummary=element('summary');alertsSummary.append(element('strong','Constats · '+alertList.length+'   '),severityCounts(sessionCounts(session)));
   const firstAlertTime=(alertList||[]).map(a=>a.created_at).filter(Boolean).sort()[0];
   if(firstAlertTime){const firstTimeBadge=element('small',' · 1re occurrence : '+dateText(firstAlertTime),'muted session-first-occurrence');firstTimeBadge.title='Première occurrence constatée';alertsSummary.append(firstTimeBadge);}
   alertsSummary.title=countsText(sessionCounts(session));alertsPanel.append(alertsSummary);if(!alertList.length)alertsPanel.append(element('p','Aucun constat pour cette session.','hint'));const alerts=element('div',undefined,'alerts');
-   const isAlarmFinding=a=>a.severity==='error'||a.severity==='alarm';for(const [rank,alert] of [...alertList].sort((a,b)=>(findingBusinessState(a)==='closed')-(findingBusinessState(b)==='closed')||isAlarmFinding(b)-isAlarmFinding(a)||String(b.last_occurrence||b.created_at||'').localeCompare(String(a.last_occurrence||a.created_at||''))).entries())alerts.append(renderFinding(session,alert,routeTargetsThisSession&&alert.id===requestedSupervisorAlert,rank===0&&!routeTargetsThisSession));
+   const isAlarmFinding=a=>a.severity==='error'||a.severity==='alarm';const maxClosed=(lastSnapshot&&lastSnapshot.judge_settings&&lastSnapshot.judge_settings.max_visible_closed_findings)||5;const openAlertsList=[],closedAlertsList=[];for(const a of alertList){if(findingBusinessState(a)==='closed')closedAlertsList.push(a);else openAlertsList.push(a);}openAlertsList.sort((a,b)=>isAlarmFinding(b)-isAlarmFinding(a)||String(b.last_occurrence||b.created_at||'').localeCompare(String(a.last_occurrence||a.created_at||'')));closedAlertsList.sort((a,b)=>String(b.last_occurrence||b.created_at||'').localeCompare(String(a.last_occurrence||a.created_at||'')));for(const [rank,alert] of openAlertsList.entries())alerts.append(renderFinding(session,alert,routeTargetsThisSession&&alert.id===requestedSupervisorAlert,rank===0&&!routeTargetsThisSession));const visibleClosed=closedAlertsList.slice(0,maxClosed),archivedClosed=closedAlertsList.slice(maxClosed);for(const alert of visibleClosed)alerts.append(renderFinding(session,alert,routeTargetsThisSession&&alert.id===requestedSupervisorAlert,false));if(archivedClosed.length>0){const archivePanel=preserveFindingPanel(element('details',undefined,'closed-findings-archive'),session.id+':archived_closed');archivePanel.append(element('summary','📦 '+archivedClosed.length+' autre(s) constat(s) traité(s) archivé(s) (masqués)'));if(routeTargetsThisSession&&archivedClosed.some(a=>a.id===requestedSupervisorAlert))archivePanel.open=true;for(const alert of archivedClosed)archivePanel.append(renderFinding(session,alert,routeTargetsThisSession&&alert.id===requestedSupervisorAlert,false));alerts.append(archivePanel);}
   alertsPanel.append(alerts);findingsSlot.replaceWith(alertsPanel);
   const actions=element('div',undefined,'actions');
   const paused=session.enabled===false||session.state==='paused'||['unverified','gap_available','pending_check','too_large'].includes(recovery.status);
   if(paused&&!['pending_check','gap_available','unverified','too_large','processing','error'].includes(recovery.status)){const resume=element('button','Resume');resume.type='button';resume.dataset.mutation='';resume.disabled=busy;resume.addEventListener('click',()=>mutate({action:'resume',id:session.id}));actions.append(resume);}
   if(!paused){const button=element('button','Pause');button.type='button';button.dataset.mutation='';button.disabled=busy;button.addEventListener('click',()=>mutate({action:'pause',id:session.id}));actions.append(button);}
   const remove=element('button','Retirer');remove.type='button';remove.dataset.mutation='';remove.disabled=busy;remove.addEventListener('click',()=>mutate({action:'remove',id:session.id}));moreDetails.append(element('p','Retirer arrête le suivi de cette session ; les notes déjà créées sont conservées.','hint'),remove);
-  card.append(scopedChat,moreDetails);top.append(actions);fold.append(card);fragment.append(fold);
+  card.append(moreDetails,scopedChat);top.append(actions);fold.append(card);fragment.append(fold);
  }
  byId('sessions').replaceChildren(fragment);
  if(supervisorRouteApplied&&!supervisorRouteScrolled){const card=Array.from(document.querySelectorAll('#sessions article')).find(item=>item.dataset.sessionId===requestedSupervisorSession);if(card){const fold=card.closest('.session-fold');if(fold)fold.open=true;const alertRow=requestedSupervisorAlert?Array.from(card.querySelectorAll('[data-alert-id]')).find(item=>item.dataset.alertId===requestedSupervisorAlert):null;(alertRow||card).scrollIntoView({behavior:'auto',block:'center'});showDashboardView('monitor');supervisorRouteScrolled=true;}}
@@ -652,14 +679,16 @@ async function refresh(){
  if(disposed)return;
  if(refreshPromise)return refreshPromise;
  refreshPromise=(async()=>{
-  controller=new AbortController();requests.add(controller);
+  const refreshController=new AbortController();controller=refreshController;requests.add(refreshController);let timedOut=false;const refreshTimer=setTimeout(()=>{timedOut=true;refreshController.abort();},8000);
   try{
-   const response=await fetch('/api/supervision',{cache:'no-store',signal:controller.signal});
+   const response=await fetch('/api/supervision',{cache:'no-store',signal:refreshController.signal});
    if(response.status===404)throw Error('API de supervision absente : redémarrez Task Manager pour charger la nouvelle version.');
-   const data=await response.json();if(!response.ok)throw Error(data.error||'HTTP '+response.status);
-   token=data.token||token;byId('connection-error').hidden=true;const side=document.querySelector('.app-sidebar'),banner=byId('sidebar-disconnected');if(side)side.classList.remove('is-disconnected');if(banner)banner.hidden=true;render(data);return true;
-  }catch(error){if(!disposed&&error.name!=='AbortError')showError('Connexion au service indisponible : '+error.message+'. Les dernières données restent affichées.');return false;}
-  finally{requests.delete(controller);controller=null;refreshPromise=null;}
+   let data;try{data=await response.json();}catch(parseError){if(parseError.name==='AbortError')throw parseError;throw Error('réponse illisible (HTTP '+response.status+')');}if(!response.ok)throw Error(data.error||'HTTP '+response.status);
+   token=data.token||token;byId('connection-error').hidden=true;const side=document.querySelector('.app-sidebar'),banner=byId('sidebar-disconnected');if(side)side.classList.remove('is-disconnected');if(banner)banner.hidden=true;
+   try{render(data);}catch(renderError){byId('connection-error').textContent='Erreur d’affichage : '+renderError.message;byId('connection-error').hidden=false;}
+   return true;
+  }catch(error){if(!disposed&&(timedOut||error.name!=='AbortError'))showError('Connexion au service indisponible : '+(timedOut?'délai dépassé (8 s)':error.message)+'. Les dernières données restent affichées.');return false;}
+  finally{clearTimeout(refreshTimer);requests.delete(refreshController);if(controller===refreshController)controller=null;refreshPromise=null;}
  })();return refreshPromise;
 }
 async function mutate(payload){
@@ -682,7 +711,7 @@ async function mutate(payload){
   if(payload.action==='reassign')idDrafts.delete(payload.id);
   if(payload.action==='chat'){if(payload.session_id){chatDrafts.delete(payload.session_id);for(const input of document.querySelectorAll('[data-chat-id]'))if(input.dataset.chatId===payload.session_id)input.value='';}else byId('chat-text').value='';}
   byId('notice').textContent='Modification enregistrée.';if(payload.action==='set_mission_structure')lastSessionsSignature=null;await refresh();
- }catch(error){byId('notice').textContent='Échec : '+error.message;byId('notice').className='error';showError(error.message);}
+ }catch(error){byId('notice').textContent='Échec : '+error.message;byId('notice').className='error';if(error.name==='TypeError')showError('Connexion au service indisponible : '+error.message);}
  finally{busy=false;disableMutations(false);}
 }
 byId('start').addEventListener('click',()=>mutate({action:'start'}));byId('stop').addEventListener('click',()=>mutate({action:'stop'}));
@@ -706,6 +735,17 @@ window.addEventListener('keydown',tryAutoResumeAudio,{once:true});
 async function unlockAudio(){try{const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)throw Error('Audio indisponible');audio=audio||new Audio();await audio.resume();byId('unlock-audio').hidden=true;byId('notification-hint').textContent='Son activé pour les nouveaux Warning et Alarm ; la page doit rester ouverte.';}catch(error){preferences.sound=false;byId('sound-enabled').checked=false;byId('notification-hint').textContent='Son indisponible : '+error.message;}savePreferences();}
 byId('unlock-audio').hidden=!preferences.sound;byId('unlock-audio').addEventListener('click',unlockAudio);
 byId('sound-enabled').addEventListener('change',async()=>{preferences.sound=byId('sound-enabled').checked;if(preferences.sound)await unlockAudio();else byId('unlock-audio').hidden=true;savePreferences();});
+async function playNotificationSound(pattern='single'){try{const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)return false;audio=audio||new AudioCtx();if(audio.state!=='running'){try{await audio.resume();}catch(_e){}}if(audio.state!=='running')return false;const t0=audio.currentTime,isDouble=pattern==='double'||pattern==='alarm'||pattern==='error',vol=(preferences.volume??55)/100;const tones=isDouble?[{start:t0,stop:t0+.08,freq:980},{start:t0+.32,stop:t0+.77,freq:1150}]:[{start:t0,stop:t0+.13,freq:880}];for(const tone of tones){const osc=audio.createOscillator(),gain=audio.createGain();osc.type='triangle';osc.frequency.setValueAtTime(tone.freq,tone.start);gain.connect(audio.destination);osc.connect(gain);gain.gain.setValueAtTime(vol,tone.start);gain.gain.linearRampToValueAtTime(.01,tone.stop);osc.start(tone.start);osc.stop(tone.stop);}return true;}catch(err){byId('notification-hint').textContent='Son indisponible : '+(err.message||'erreur');return false;}}
+const testVscodeBtn=byId('test-vscode');if(testVscodeBtn)testVscodeBtn.addEventListener('click',()=>mutate({action:'test_notification'}));
+const testNowBtn=byId('test-sound-now');
+if(testNowBtn){testNowBtn.addEventListener('click',async()=>{preferences.sound=true;byId('sound-enabled').checked=true;await unlockAudio();const played=await playNotificationSound('single');byId('notification-hint').textContent=played?'✓ 1 bip test joué (880 Hz · Warning standard / 1er event) !':'Son indisponible.';});}
+const testAlarmBtn=byId('test-sound-alarm');
+if(testAlarmBtn){testAlarmBtn.addEventListener('click',async()=>{preferences.sound=true;byId('sound-enabled').checked=true;await unlockAudio();const played=await playNotificationSound('double');byId('notification-hint').textContent=played?'🚨 2 bips test joués (court 980 Hz · pause · long 1150 Hz — Alarme / 3+ Warnings) !':'Son indisponible.';});}
+let testSoundTimer=null;
+const testSoundBtn=byId('test-sound-delay');
+if(testSoundBtn){testSoundBtn.addEventListener('click',async()=>{if(testSoundTimer){clearInterval(testSoundTimer);testSoundTimer=null;testSoundBtn.disabled=false;testSoundBtn.textContent='⏳ Tester retard (5s)';byId('notification-hint').textContent='Test sonore annulé.';return;}preferences.sound=true;byId('sound-enabled').checked=true;await unlockAudio();if(testSoundTimer)return;let remaining=5;testSoundBtn.textContent='⏳ Test dans '+remaining+'s...';byId('notification-hint').textContent='Test sonore programmé dans 5s (gardez la page ouverte, vous pouvez changer d’onglet)…';testSoundTimer=setInterval(async()=>{remaining--;if(remaining>0){testSoundBtn.textContent='⏳ Test dans '+remaining+'s...';}else{clearInterval(testSoundTimer);testSoundTimer=null;testSoundBtn.disabled=false;testSoundBtn.textContent='⏳ Tester retard (5s)';if(!preferences.sound){byId('notification-hint').textContent='Test sonore ignoré : le son a été désactivé.';return;}const played=await playNotificationSound('double');if(preferences.desktop&&'Notification' in window&&Notification.permission==='granted'){try{new Notification('🛡️ Test Notification & Son',{body:'Le bip sonore et la notification du Superviseur fonctionnent !',tag:'test-sound'});}catch(_e){}}byId('notification-hint').textContent=played?'✓ Bip sonore joué avec succès ('+new Date().toLocaleTimeString('fr-FR')+') !':'Son indisponible sur ce navigateur.';}},1000);});}
+const volumeInput=byId('sound-volume'),volumeLabel=byId('sound-volume-label');
+if(volumeInput){volumeInput.value=preferences.volume;if(volumeLabel)volumeLabel.textContent=preferences.volume+'%';volumeInput.addEventListener('input',()=>{preferences.volume=Number(volumeInput.value);if(volumeLabel)volumeLabel.textContent=preferences.volume+'%';});volumeInput.addEventListener('change',()=>{savePreferences();if(preferences.sound)playNotificationSound();});}
 byId('enable-notifications').addEventListener('click',toggleDesktopNotifications);
 if(preferences.desktop)byId('enable-notifications').textContent='Désactiver les notifications bureau';
 updateNotificationStatus();

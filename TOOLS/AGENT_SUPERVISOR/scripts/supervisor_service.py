@@ -102,7 +102,8 @@ def validate_mission_structure(value):
         raise ValueError('Structure de mission trop longue')
     return dict(value)
 DEFAULT_JUDGE_SETTINGS = dict(temperature=0, output_tokens=1600, timeout_seconds=30,
-                              context_messages=12, context_chars=6000, model_context_tokens=16384)
+                              context_messages=12, context_chars=12000, model_context_tokens=32768,
+                              max_visible_closed_findings=5, audit_interval=8)
 
 
 def validate_judge_settings(settings=None):
@@ -112,7 +113,8 @@ def validate_judge_settings(settings=None):
         raise ValueError("Parametres du juge inconnus")
     result = dict(DEFAULT_JUDGE_SETTINGS, **settings)
     bounds = dict(temperature=(0, 1), output_tokens=(256, 8192), timeout_seconds=(5, 120),
-                  context_messages=(4, 200), context_chars=(2000, 100000), model_context_tokens=(8192, 131072))
+                  context_messages=(4, 200), context_chars=(2000, 100000), model_context_tokens=(8192, 131072),
+                  max_visible_closed_findings=(1, 50), audit_interval=(1, 50))
     for key, (low, high) in bounds.items():
         value = result[key]
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not low <= value <= high:
@@ -1048,12 +1050,64 @@ class Supervisor:
             self.storage_error = type(exc).__name__
             self._persist_pending = True
 
+    def _expire_test_notifications(self):
+        changed = False
+        for session in self.sessions.values():
+            for alert in session.get("alerts", []):
+                if (alert.get("category") == "system_test" and business_state(alert) != "closed"
+                        and alert.get("expires_at", 0) <= time.time()):
+                    revise(alert, timestamp(), disposition="resolved")
+                    changed = True
+        if changed:
+            self._persist_background()
+
+    def review_snapshot(self, sid, offset=0, revision=None):
+        """Bounded pages of complete findings, never a full session snapshot."""
+        with self._lock:
+            self._expire_test_notifications()
+            session = self.sessions.get(sid)
+            if session is None:
+                raise KeyError("Session inconnue")
+            if offset < 0:
+                raise ValueError("Offset invalide")
+            alerts = session.get("alerts", [])
+            opened = [a for a in alerts if business_state(a) != "closed"]
+            current_revision = hashlib.sha256(json.dumps(
+                [(a["id"], a.get("version"), a.get("disposition")) for a in opened]
+            ).encode("utf8")).hexdigest()[:24]
+            if (offset or revision is not None) and revision != current_revision:
+                raise ValueError("Revue modifiee : recommencer a offset=0 avec la nouvelle revision")
+            result = {k: session.get(k) for k in ("id", "alias", "platform", "state")}
+            result.update(counts=counts(alerts), alerts=[], total=len(opened), next_offset=None,
+                          revision=current_revision)
+            size = len(json.dumps(result, ensure_ascii=False).encode("utf8"))
+            for index in range(offset, len(opened)):
+                alert = opened[index]
+                item = {k: alert.get(k) for k in ("id", "title", "reason", "severity", "category",
+                        "evidence", "created_at", "disposition", "reference", "version")}
+                item["business_state"] = business_state(alert)
+                item_size = len(json.dumps(item, ensure_ascii=False).encode("utf8")) + 2
+                if size + item_size > 28000:
+                    if not result["alerts"]:
+                        raise ValueError("Constat trop volumineux pour /review : utiliser /api/supervision")
+                    result["next_offset"] = index
+                    break
+                result["alerts"].append(item)
+                size += item_size
+            if len(json.dumps(result, ensure_ascii=False).encode("utf8")) >= 30000:
+                raise ValueError("Metadonnees trop volumineuses pour /review")
+            return copy.deepcopy(result)
+
     def snapshot(self):
         with self._lock:
+            self._expire_test_notifications()
             public = [{key: value[key] for key in ("id", "platform", "native_id", "alias", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "memory", "context_truncated", "state", "enabled", "source", "error", "last_event", "last_analysis", "analysis_state", "analysis_error", "exchange_path", "exchange_error", "exchange_saved_at", "alerts", "judge_request", "judge_proposal", "messages_observed", "recovery", "events", "framing")} for value in self.sessions.values()]
             for item, session in zip(public, self.sessions.values()):
                 item["counts"] = counts(session["alerts"])
                 item["alerts"] = [dict(a, delivery_preview=informational_message(a)) for a in item["alerts"]]
+                for alert in item["alerts"]:
+                    if alert.get("category") == "system_test" and alert.get("disposition") == "new":
+                        alert["business_state"] = "new"
                 structure = session.get("mission_structure") or {}
                 item["mission_structure_proposal"] = {k: v for k, v in parse_mission_attributes(session.get("mission") or session.get("initial_mission")).items()
                                                       if not str(structure.get(k) or "").strip()}
@@ -1074,6 +1128,7 @@ class Supervisor:
     def notification_snapshot(self):
         """Small read-only projection for external status surfaces such as VS Code."""
         with self._lock:
+            self._expire_test_notifications()
             sessions = []
             for value in self.sessions.values():
                 alerts = []
@@ -1098,7 +1153,7 @@ class Supervisor:
 
     def command(self, command):
         with self._lock:
-            if command.get("action") not in ("set_mission_structure", "comment_alert", "configure", "add", "pause", "resume", "retry_recovery", "remove", "set_mission", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
+            if command.get("action") not in ("test_notification", "set_mission_structure", "comment_alert", "configure", "add", "pause", "resume", "retry_recovery", "remove", "set_mission", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
                 return self._command(command)
             backup = (copy.deepcopy(self.sessions), self.model, self.allow_cloud,
                       self._epoch, deque(self._queue), set(self._queued), copy.deepcopy(self._chat_state), self._chat_epoch, self._chat_pending, copy.deepcopy(self._chat_histories), deque(self._agent_queue))
@@ -1115,7 +1170,26 @@ class Supervisor:
             if self.closed:
                 raise ValueError("Service ferme")
             action = command.get("action")
-            if action == "start":
+            if action == "test_notification":
+                severity = command.get("severity", "warning")
+                if severity not in ("warning", "alarm", "error", "info"):
+                    raise ValueError("Severite invalide")
+                session = (self.sessions.get(command["id"]) if command.get("id") else
+                           next((s for s in self.sessions.values() if s.get("enabled") and s.get("state") == "active"), None))
+                if session is None:
+                    raise ValueError("Session cible inconnue ou aucune session active")
+                at = timestamp()
+                alert = dict(id="test-notif-" + str(uuid.uuid4()), category="system_test",
+                             disposition="new", business_state="new", severity=severity,
+                             fingerprint=str(uuid.uuid4()), model="system", acknowledged_at=None,
+                             title="Test de notification", workflow=dict(status="informational", delivery_status="not_sent"),
+                             reason="[TEST] Notification Agent Supervisor (test sonore et VS Code). Ce constat est un test temporaire.",
+                             evidence="", created_at=at, last_occurrence=at, occurrences=1,
+                             expires_at=time.time() + 60)
+                prepare_alert(alert)
+                session["alerts"].append(alert)
+                self._persist()
+            elif action == "start":
                 self.running = True
                 if not self._threads:
                     for session in self.sessions.values():
@@ -1460,17 +1534,17 @@ class Supervisor:
                 if selected:
                     session = self.sessions[selected]
                     status = {k: session[k] for k in ("alias", "mission", "state", "context_truncated")}
-                    status["alerts"] = session["alerts"][-3:]
+                    status["alerts"] = [a for a in session["alerts"] if a.get("category") != "system_test"][-3:]
                     references = re.findall(r"\b(?:E|A)-[a-f0-9]{8,32}\b", text, re.IGNORECASE)
                     referenced = [e for e in session.get("events", []) if e.get("ref", "").lower() in [r.lower() for r in references]]
-                    referenced_alerts = [a for a in session["alerts"] if a.get("reference", "").lower() in [r.lower() for r in references]]
+                    referenced_alerts = [a for a in session["alerts"] if a.get("category") != "system_test" and a.get("reference", "").lower() in [r.lower() for r in references]]
                     status["referenced_events"] = referenced
                     status["referenced_findings"] = referenced_alerts
                     status["unresolved_references"] = [r for r in references if not any(e.get("ref", "").lower() == r.lower() for e in referenced) and not any(a.get("reference", "").lower() == r.lower() for a in referenced_alerts)]
                     context = [dict(role="selected_session", text=json.dumps(status, ensure_ascii=False))] + [dict(x) for x in session["context"]]
                     generation = session["generation"]
                 else:
-                    status = [{k: item[k] for k in ("id", "alias", "state", "alerts")} for item in self.sessions.values()]
+                    status = [dict(id=item["id"], alias=item["alias"], state=item["state"], alerts=[a for a in item["alerts"] if a.get("category") != "system_test"]) for item in self.sessions.values()]
                     context = [dict(role="global_status", text=json.dumps(status, ensure_ascii=False)[-10000:])]
                     generation = None
                 context += [{"role": m["role"], "text": m["text"]} for m in self._chat_state["messages"]]
@@ -1582,6 +1656,8 @@ class Supervisor:
                          and alert.get("workflow", {}).get("delivery_status") in ("queued", "sending"))), None)
 
     def _queue_agent_turn(self, session, alert, kind, message):
+        if alert.get("category") == "system_test":
+            raise ValueError("Notification de test locale : envoi agent interdit")
         workflow = alert.setdefault("workflow", {})
         if workflow.get("delivery_status") in ("queued", "sending") and workflow.get("delivery_message") == message:
             raise ValueError("Envoi déjà en cours")
@@ -1867,6 +1943,7 @@ class Supervisor:
     def _collect_loop(self):
         while not self.closed:
             with self._lock:
+                self._expire_test_notifications()
                 if self.running:
                     before_messages = sum(s.get("messages_observed", 0) for s in self.sessions.values())
                     enabled = [s for s in self.sessions.values() if s["enabled"]]
@@ -1932,10 +2009,13 @@ class Supervisor:
                         if journal:
                             notices.append(dict(role="context_notice", text="## MÉMOIRE DE SESSION (Jalons franchis) :\n" + "\n".join(f"- {j.get('text')}" for j in journal[-6:])))
                         session["judge_turn_count"] = session.get("judge_turn_count", 0) + 1
-                        if session["judge_turn_count"] % 8 == 0:
+                        audit_interval = self.judge_settings.get("audit_interval", 8)
+                        if session["judge_turn_count"] % audit_interval == 0:
                             notices.append(dict(role="context_notice", text=f"🚨 [AUDIT DE TRAJECTOIRE — TOUR {session['judge_turn_count']}] : Confronte l'avancement global et les preuves acquises au Cap Initial Gelé. Vérifie la direction et le respect du planning."))
                         prior = []
                         for a in session["alerts"]:
+                            if a.get("category") == "system_test":
+                                continue
                             prepare_alert(a)
                             prior.append(dict(id=a["id"], disposition=a["disposition"], decision_rationale=(a.get("rationale") or "")[:300], created_at=a.get("created_at"), acknowledged_at=a.get("acknowledged_at"), reason=a["reason"][:240], evidence=a["evidence"][:200], assessment_status=a["assessment"].get("status"), comments=[dict(c, text=c["text"][:400], excerpt=len(c["text"])>400) for c in a["comments"][-1:]]))
                         # Requested reviews first; include closed decisions and state omitted counts.
@@ -1946,7 +2026,7 @@ class Supervisor:
                         # T429: the user's latest comment on each open finding is passed as citable user speech,
                         # so a "c'est OK, corrigé" can ground a resolution even when the original proof left the window.
                         for a in session["alerts"]:
-                            if business_state(a) != "closed" and a.get("comments"):
+                            if a.get("category") != "system_test" and business_state(a) != "closed" and a.get("comments"):
                                 last = a["comments"][-1]
                                 notices.append(dict(role="user_comment", text=f"[Commentaire de l'utilisateur au Supervisor sur le constat {a['id']}] " + str(last.get("text", ""))[:600]))
                         if is_recovery:

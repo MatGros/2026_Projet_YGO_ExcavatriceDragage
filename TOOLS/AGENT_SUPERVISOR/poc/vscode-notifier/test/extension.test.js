@@ -9,6 +9,40 @@ function finding(id, disposition, severity, reason) {
   return { id, disposition, severity, reason, category: 'other', occurrences: 1, workflow_status: 'legacy' };
 }
 
+test('system_test au premier poll : toast unique et clic ciblé sans navigateur actif', async (t) => {
+  const summary = baseSummary();
+  const alert = { ...finding('test-notif-unique', 'new', 'warning', '[TEST] Notification temporaire'), category: 'system_test' };
+  summary.sessions[0].alerts.push(alert);
+  const server = http.createServer((_request, response) => {
+    response.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify(summary));
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => server.close());
+  const ui = mockVscode(server.address().port, false, 5);
+  ui.warningResults.push(Promise.resolve('Ouvrir le constat'));
+  const state = new Map();
+  const context = { subscriptions: [], globalState: {
+    get(key) { return state.get(key); },
+    async update(key, value) { state.set(key, value); }
+  } };
+  activate(context, ui.vscode);
+  t.after(() => { for (const subscription of context.subscriptions) subscription.dispose?.(); });
+  await eventually(() => ui.external.length === 1, 'toast test et clic au premier poll');
+  assert.equal(ui.warnings.length, 1);
+  assert.equal(ui.errors.length, 0, 'aucun rejeu des problèmes réels');
+  const target = new URL(ui.external[0]);
+  assert.equal(target.searchParams.get('session'), summary.sessions[0].id);
+  assert.equal(target.searchParams.get('alert'), alert.id);
+  await ui.commands.get('veilleur.refresh')();
+  assert.equal(ui.warnings.length, 1, 'aucun doublon au poll suivant');
+  alert.disposition = 'resolved';
+  await ui.commands.get('veilleur.refresh')();
+  assert.equal(ui.warnings.length, 1, 'fermeture silencieuse');
+  summary.sessions[0].alerts.push({ ...alert, id: 'test-notif-auto-poll', disposition: 'new' });
+  await new Promise((resolve) => setTimeout(resolve, 5500));
+  assert.equal(ui.warnings.length, 2, 'le polling automatique notifie sans navigateur ni commande refresh');
+});
+
 function baseSummary() {
   return {
     schema_version: 1, running: true,
@@ -28,7 +62,7 @@ function tooltipText(statusItem) {
   return typeof statusItem.tooltip === 'string' ? statusItem.tooltip : statusItem.tooltip.value;
 }
 
-function mockVscode(port) {
+function mockVscode(port, notifications = true, pollSeconds = 60) {
   const commands = new Map();
   const warnings = [];
   const errors = [];
@@ -60,7 +94,7 @@ function mockVscode(port) {
     workspace: {
       getConfiguration(section) {
         assert.equal(section, 'veilleur');
-        return { get(key, fallback) { return ({ port, pollSeconds: 60, notifications: true })[key] ?? fallback; } };
+        return { get(key, fallback) { return ({ port, pollSeconds, notifications })[key] ?? fallback; } };
       },
       onDidChangeConfiguration() { return { dispose() {} }; }
     },
