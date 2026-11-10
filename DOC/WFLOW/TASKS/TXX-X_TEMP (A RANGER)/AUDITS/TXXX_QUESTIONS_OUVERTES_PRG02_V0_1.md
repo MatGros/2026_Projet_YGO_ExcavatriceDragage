@@ -1,7 +1,7 @@
 # ❓ Questions ouvertes — Revue PRG_02 (Acquisition + HMI/Troubleshooting)
 
-📅 2026-08-24 · Consolidées à partir de [REVUE_PRG02_ACQUISITION_v0.1.md](REVUE_PRG02_ACQUISITION_v0.1.md)
-et [REVUE_PRG02_HMI_TROUBLESHOOTING_v0.1.md](REVUE_PRG02_HMI_TROUBLESHOOTING_v0.1.md).
+📅 2026-08-24 · Consolidées à partir de [REVUE_PRG02_ACQUISITION_v0.1.md](TXXX_REVUE_PRG02_ACQUISITION_V0_1.md)
+et [REVUE_PRG02_HMI_TROUBLESHOOTING_v0.1.md](TXXX_REVUE_PRG02_HMI_TROUBLESHOOTING_V0_1.md).
 Aucune de ces questions n'a bloqué le travail — elles sont listées ici pour arbitrage humain,
 comme demandé.
 
@@ -33,8 +33,8 @@ comme demandé.
 ✅ **Traitées et closes (T152, 2026-08-25)** : Q9 (commentaires-journal), Q10 (condition 5 termes),
 Q11 (duplication ×10 bypass), Q12 (vocabulaire abandonné), Q13 (régions sans `§N`), Q16
 (commentaire cassé) — voir `DOC/WFLOW/TASKS.yaml` T152/T152-A..D et
-[REVUE_PRG02_ACQUISITION_v0.1.md](REVUE_PRG02_ACQUISITION_v0.1.md) /
-[REVUE_PRG02_HMI_TROUBLESHOOTING_v0.1.md](REVUE_PRG02_HMI_TROUBLESHOOTING_v0.1.md) pour le détail
+[REVUE_PRG02_ACQUISITION_v0.1.md](TXXX_REVUE_PRG02_ACQUISITION_V0_1.md) /
+[REVUE_PRG02_HMI_TROUBLESHOOTING_v0.1.md](TXXX_REVUE_PRG02_HMI_TROUBLESHOOTING_V0_1.md) pour le détail
 d'origine.
 
 ---

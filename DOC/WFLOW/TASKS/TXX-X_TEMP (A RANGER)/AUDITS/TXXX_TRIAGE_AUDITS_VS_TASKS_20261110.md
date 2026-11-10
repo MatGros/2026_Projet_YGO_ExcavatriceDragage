@@ -221,6 +221,6 @@ Les statuts cités dans les avis reflètent le catalogue transmis. Pour les fami
 
 ## Avis DeepSeek bruts
 
-- [Lot 1 à 52 fichiers](TRIAGE_DEEPSEEK_V41_LOT1_20261110.md)
-- [Lot 2 à 54 fichiers](TRIAGE_DEEPSEEK_V41_LOT2_20261110.md)
-- [Lot 3 à 53 fichiers](TRIAGE_DEEPSEEK_V41_LOT3_20261110.md)
+- [Lot 1 à 52 fichiers](TXXX_TRIAGE_DEEPSEEK_V41_LOT1_20261110.md)
+- [Lot 2 à 54 fichiers](TXXX_TRIAGE_DEEPSEEK_V41_LOT2_20261110.md)
+- [Lot 3 à 53 fichiers](TXXX_TRIAGE_DEEPSEEK_V41_LOT3_20261110.md)

@@ -9,7 +9,7 @@
 > - **Fichiers tracés** :
 >   - `CODE/G_CYCLE/FB_MachineHomingCycle.st` + `_TYPES/E_MachineHomingStep.st`
 >   - `CODE/G_CYCLE/FB_Cycle.st` + `_TYPES/E_CycleStep.st`
-> - **Tâches liées** : [T226](TASK_CONTRACT_T226_REFONTE_HOMING_SEMIAUTO.yaml) · [T229](TASK_CONTRACT_T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml) · note [T229_DESIGN](T229_DESIGN_FB_CYCLE_STEPS.md)
+> - **Tâches liées** : [T226](TASK_CONTRACT_T226_REFONTE_HOMING_SEMIAUTO.yaml) · [T229](TASK_CONTRACT_T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml) · note [T229_DESIGN](T229_DESIGN_ETAPES_FB_CYCLE.md)
 
 ---
 
