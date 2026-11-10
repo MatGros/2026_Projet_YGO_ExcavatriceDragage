@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Genere DOC/WFLOW/AF_VIEWER.html : visualiseur AF *read-only*, hors-ligne.
+"""Genere TOOLS/AGENT_WORKFLOW/reports/AF_VIEWER.html : visualiseur AF *read-only*, hors-ligne.
 
 Lit deux sources deja produites :
   - TOOLS/AGENT_WORKFLOW/config/af_traceability_matrix.yaml  (extract_functions_matrix.py)
@@ -49,7 +49,9 @@ if sys.platform == "win32":
 REPO_ROOT = Path(__file__).resolve().parents[3]
 MATRIX_PATH = REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "config" / "af_traceability_matrix.yaml"
 SYNC_PATH = REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "config" / "fb_cartouche_sync.json"
-OUT_PATH = REPO_ROOT / "DOC" / "WFLOW" / "AF_VIEWER.html"
+OUT_PATH = REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "reports" / "AF_VIEWER.html"
+# Prefixe relatif page -> racine du depot (les liens rapport CI en dependent)
+REPO_PREFIX = __import__("os").path.relpath(REPO_ROOT, OUT_PATH.parent).replace("\\", "/")
 
 FB_TOKEN_RE = re.compile(r"FB_[A-Za-z0-9_]+")
 
@@ -96,7 +98,7 @@ def _ci_verdict(root: Path, registry: dict, fb_key: str | None) -> dict[str, Any
         "passed": passed,
         "failed": failed,
         "verdict": verdict,
-        "report_rel": f"../../TOOLS/TEST_AUTO_CI/RESULTS/{domain}/reports/{fb_key}.html",
+        "report_rel": f"{REPO_PREFIX}/TOOLS/TEST_AUTO_CI/RESULTS/{domain}/reports/{fb_key}.html",
     }
 
 
@@ -411,7 +413,7 @@ Page 100&nbsp;% hors-ligne : aucune requete reseau, aucune ecriture, aucun expor
 <div class="cmdline"><code data-cmd="2">python TOOLS/AGENT_WORKFLOW/scripts/extract_functions_matrix.py</code><button type="button" class="copybtn" data-copy="2">copier</button></div>
 <div class="cmdline"><code data-cmd="3">python TOOLS/AGENT_WORKFLOW/scripts/generate_af_viewer.py</code><button type="button" class="copybtn" data-copy="3">copier</button></div>
 <div class="cmdline"><button type="button" class="copybtn" id="copy-all">copier tout</button>
-<span class="small">ou double-clic sur <code>refresh_af_viewer.bat</code> (meme dossier que cette page)</span></div>
+<span class="small">ou double-clic sur <code>TOOLS/LANCEURS/GENERER_AF_VIEWER.bat</code></span></div>
 </div>
 
 <details class="sec"><summary>1 &middot; Fonctions par AF <span class="count" id="c-fn"></span></summary>

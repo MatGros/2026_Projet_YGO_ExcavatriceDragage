@@ -10,8 +10,8 @@ const dependencyRoot=process.env.SUPERVISION_DOM_MODULES||path.join(os.tmpdir(),
 const require=createRequire(dependencyRoot);
 const {parseHTML}=require('linkedom');
 const html=fs.readFileSync('DOC/WFLOW/AGENT_SUPERVISION.html','utf8');
-const taskViewer=fs.readFileSync('DOC/WFLOW/TASK_VIEWER.html','utf8');
-const orchestratorHtml=fs.readFileSync('DOC/WFLOW/ORCHESTRATOR_VIEWER.html','utf8');
+const taskViewer=fs.readFileSync('TOOLS/TASK_MANAGER/ui/TASK_VIEWER.html','utf8');
+const orchestratorHtml=fs.readFileSync('TOOLS/TASK_MANAGER/ui/ORCHESTRATOR_VIEWER.html','utf8');
 const script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const tick=async()=>{for(let n=0;n<5;n++)await new Promise(resolve=>setImmediate(resolve));};
 const clone=value=>JSON.parse(JSON.stringify(value));

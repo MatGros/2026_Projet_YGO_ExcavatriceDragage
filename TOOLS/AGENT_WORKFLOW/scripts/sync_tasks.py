@@ -42,7 +42,7 @@ def save_tasks_yaml(tasks, output_path: Path):
         "# ==============================================================================\n"
         "# 🗂️ TASK VIEWER — CATALOGUE DES TÂCHES\n"
         "# ==============================================================================\n"
-        "# Source officielle de données. Pour visualiser : ouvrir DOC/WFLOW/TASK_VIEWER.html\n\n"
+        "# Source officielle de données. Pour visualiser : ouvrir http://127.0.0.1:8081/TASK_VIEWER.html (serveur Task Manager)\n\n"
     )
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(header)
@@ -1275,7 +1275,7 @@ def main():
     # TASKS.yaml est l'unique source de vérité officielle !
     tasks = load_tasks_yaml(TASKS_YAML)
     
-    html_path = WFLOW_DIR / "TASK_VIEWER.html"
+    html_path = BASE_DIR / "TOOLS" / "TASK_MANAGER" / "ui" / "TASK_VIEWER.html"
     save_tasks_html(tasks, html_path)
     
     print(f"✅ {len(tasks)} tâches structurées exportées avec succès dans :")

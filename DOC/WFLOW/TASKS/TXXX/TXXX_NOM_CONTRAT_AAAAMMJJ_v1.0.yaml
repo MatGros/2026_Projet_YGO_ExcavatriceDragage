@@ -1,0 +1,28 @@
+# BASE MINIMALE D'UNE TACHE : copier le dossier TXXX, le renommer T<ID>_<NOM>, remplacer TXXX / NOM / AAAAMMJJ.
+# Source complete du gabarit (champs optionnels, strategy rebuild, tracking...) : TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml
+# Controle : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
+# Ne rien ajouter sans besoin : le detail et le raisonnement vont dans le plan (.md), pas ici.
+
+contract:
+  task_id: TXXX
+  criticality: C2            # C0 | C1 | C2 | C3 | C4
+  strategy: patch            # patch | rebuild
+  objective: >
+    <En une phrase : quel comportement change, et pourquoi.>
+  acceptance:
+    - id: AC1
+      statement: "<Comportement observable attendu, au present.>"
+      verified_by: "<Commande exacte, test, ou observation nommee.>"
+  scope:
+    allowed:
+      - <chemin que la tache PEUT modifier>
+    forbidden:
+      - CODE/            # a retirer seulement si la tache touche le code PLC
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  evidence_required:
+    - <preuve attendue : sortie d'un controle, diff relu, rapport...>
+  alert_duty: >
+    Tout probleme constate (ambiguite, bug preexistant, risque hors scope) est signale
+    immediatement, avec preuve. Signaler n'est pas elargir le scope.
+
+status: PENDING              # PENDING | IN_PROGRESS | COMPLETED | VALIDATED

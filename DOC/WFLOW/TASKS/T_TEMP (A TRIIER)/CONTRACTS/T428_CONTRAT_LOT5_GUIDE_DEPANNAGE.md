@@ -1,6 +1,6 @@
 # TS_LOT5 — Guide de dépannage dans CODESYS (T428 J5)
 
-> Contrat machine : [TASK_CONTRACT_TS_LOT5_GUIDE_DEPANNAGE.yaml](TASK_CONTRACT_TS_LOT5_GUIDE_DEPANNAGE.yaml). Ce fichier en est la lecture humaine.
+> Contrat machine : [TASK_CONTRACT_TS_LOT5_GUIDE_DEPANNAGE.yaml](T428_CONTRAT_LOT5_GUIDE_DEPANNAGE.yaml). Ce fichier en est la lecture humaine.
 
 ## 🎯 Objectif
 Ouvrir `FB_TroubleshootingGuide` dans CODESYS et savoir, pour un symptôme, quelles variables du snapshot lire, dans quel ordre, quelle valeur est saine et où aller ensuite. Aucun effet machine.

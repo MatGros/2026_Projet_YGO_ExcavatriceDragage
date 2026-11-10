@@ -28,7 +28,7 @@ if not "%_RC%"=="0" goto :err
 
 echo.
 echo ============================================================
-echo ✅ SUCCES : DOC\WFLOW\AF_VIEWER.html genere et synchronise !
+echo ✅ SUCCES : TOOLS\AGENT_WORKFLOWeports\AF_VIEWER.html genere et synchronise !
 echo ============================================================
 echo.
 pause
