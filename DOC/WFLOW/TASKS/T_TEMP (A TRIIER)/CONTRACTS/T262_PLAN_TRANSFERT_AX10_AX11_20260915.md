@@ -1,7 +1,7 @@
 # T262 — Fermeture benne → extraction sans arrêt franc
 
 > 🔴 C4 · Responsable : Codex · 2026-09-19 · **Implémentation réalisée, validation CODESYS manuelle en attente**.
-> Contrat : [TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml](TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml).
+> Contrat : [TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml](T262_CONTRAT_AX10_CLOSE_BUCKET_THRESHOLD.yaml).
 
 ## 🎯 Besoin confirmé
 

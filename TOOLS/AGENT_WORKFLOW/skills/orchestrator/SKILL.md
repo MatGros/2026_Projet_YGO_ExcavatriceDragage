@@ -149,7 +149,7 @@ Quand l'action progresse ou se termine, **mettre à jour** l'entrée existante :
 
 ### Affichage des entrées terminées
 
-Le viewer (`DOC/WFLOW/TASK_VIEWER.html`) masque par défaut les entrées `statut: terminé`. C'est un
+Le viewer (`TOOLS/TASK_MANAGER/ui/TASK_VIEWER.html`, servi sur `http://127.0.0.1:8081/TASK_VIEWER.html`) masque par défaut les entrées `statut: terminé`. C'est un
 filtre d'affichage, pas un nettoyage ni un archivage ; l'historique reste dans le fichier.
 
 ---
@@ -341,7 +341,7 @@ l'exploitant de relever une valeur que la **CI ou un snapshot** aurait pu fourni
 
 - Catalogue des tâches : `DOC/WFLOW/TASKS.yaml`
 - Registre des agents/actions : `DOC/WFLOW/TASKS_ORCHESTRATOR.yaml`
-- Viewer : `DOC/WFLOW/TASK_VIEWER.html`
+- Viewer : `TOOLS/TASK_MANAGER/ui/TASK_VIEWER.html`
 - **Bannière** : `DOC/WFLOW/TEMPLATE/SKILL_BANNER_TEMPLATE.md` (format 60 `=` unique)
 - Skills : `task-planner` (catalogue & contrats), `troubleshooting` (diagnostic)
 - Workflow multi-agents & criticité C0–C4 : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`

@@ -1,0 +1,612 @@
+{
+  "revision": "9b70dc6c665f3b3013e5b01ca3b338c3ac72fe31",
+  "method": "check_task_contract.check(path, release=False)",
+  "pass": 114,
+  "fail": 4,
+  "results": [
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T213.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T217_LIAISON_SORTIES_VARIATEUR_M3.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T218_BLOCAGE_MODE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T219_HISTORIQUE_ALARMES.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T220_ENRICHIR_BANDEAU.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T224_ARMINGPERMIT_ACTIONNEUR_PRET.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T225_SYNCCONTACTOR_ESCALADE_PRG06.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T226_REFONTE_HOMING_SEMIAUTO.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T228_ARMINGPERMIT_TEMPOS_INTERLOCK.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T230_KOBOLD_PROTECTION_THERMIQUE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T235_REFONTE_TRANSACTION_PRESET.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T253_CALIB_BENNE_PERSISTANTE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T255_DYN_USER_MESSAGES_IHM.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T258-A.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T258-B.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T258-C.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T258-D.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T258-E.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T258.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T261.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T262_LOCAL_IHM_BLOCKS.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T262_PHASE_B_BUCKET_OPENING_THRESHOLD.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T263_BUCKET_SYNC_HOLD_4S.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T263_IHM_IOHW_READONLY.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T264_HOMING_BOOT_GUARD.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T264_RETRAIT_BYPASS_POWER_CUTOFF_LIVRAISON.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T269_MECAD_BUCKET_TOP.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T270_AX12_LOADED_ASCENT_P5.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T272_M3_DESCENT_STATE_GATE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T273_WINCH_MAINTENANCE_DESCENTE_FREIN_REMONTEE_P1.yaml",
+      "errors": [
+        "T1: aucune section `contract:` — obligatoire a partir de C2. Gabarit : TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml"
+      ],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T278_AU_ALARMS_FILTERING_AND_AUTO_RESET.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T280_TROUBLESHOOTING_WORKSPACE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T286_REFACTOR_CI_NON_REGRESSION_A_G.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T287_M3_BUTEES_ESCALADE_GRADUEE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T288_DISCORDANCE_CONTACTEURS_ABSENCE_MOUVEMENT.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T288_PHASE2_REGISTRE_ERREURS.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T289_EGOUTTAGE_IHM_SECONDES.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T290_EXTRACTION_PALIER2_TEMPORISE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T294_TASK_MANAGER_PERFORMANCE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T295_AX15B_BUCKET_OPEN_TIMEOUT.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T296_M3_FREQUENCES_PERSISTANTES.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T297_CYCLE_IHM_FORCE_AX7.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T301_CALIBRATION_ODOMETRIE_M3.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T305_TREUILS_CONTRAINTES_ELECTROTHERMIQUES.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T306_PHASE1_INJECTION_SIM.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T306_VERIFICATION_DEFAUT_ROTATION_PHASE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T308_PCT_FERMETURE_BENNE_REMONTEE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T310_TREUILS_VITESSE_CABLE_PALIER.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T311_CYCLE_HOMING_BUG.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T312_EXPORT_MESSAGES_OPERATEUR.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T313_GVL_TROUBLESHOOTING_CHRONOLOGIQUE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T316_SIMBENCH_FIDELITE_TREUILS.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T317_SIMBENCH_TREUIL_ELECTRIQUE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T318_SIMBENCH_PROFIL_SIMPLE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T322_MISE_EN_SERVICE_RECALAGE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T323_BENNE_NON_REFERENCEE_DIAGNOSTIC.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T325_D18_NEUTRE_ANALYSE_RISQUE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T327_MANUAL_BUCKET_LIMITS_PHASE_JOG.yaml",
+      "errors": [
+        "T8: scope CODE/MAIN sans critere structurel explicite : nom de fichier = nom de POU; suffixe = langage genere dans le bundle"
+      ],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T331_AX15B_REPLI_TREUILS.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T331_AX1_POSTURE_DIAGNOSTIC_REMISE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T334_AUTO_CYCLE_M3_OVERSHOOT.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T338_SIM_ENCODER_FLOOR.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T339_BENNE_TESTS_DOC_REALIGN.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T340_HOMING_LOCKED_ASCENT.yaml",
+      "errors": [],
+      "warnings": [
+        "T1: criticite C1 — contrat facultatif, controle allege"
+      ]
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T341_CFGT330_NORMALIZER_FB.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T342_SIM_REINJECTION_SILENCIEUSE.yaml",
+      "errors": [],
+      "warnings": [
+        "T1: criticite C1 — contrat facultatif, controle allege"
+      ]
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T346_BORNE_RECUL.yaml",
+      "errors": [],
+      "warnings": [
+        "T1: criticite C1 — contrat facultatif, controle allege"
+      ]
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T347_DUREE_CYCLE_MIN_SEC.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T349_AX15A_AFFICHAGE_GESTE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T351_CARTOGRAPHIE_TREUILS.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T353_OUTIL_WEB_CARTOGRAPHIE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T354_ASYMETRIE_GARDE_M1_M2.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T358_FORCESTEP_SANS_GARDE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T359_AUTORESET_NOOP.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T367_ACQ_AUTO_BOOT_ET_REARM.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T367_REARMEMENT_ACQUITTEMENT.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T368_TEMPS_ECOULE_BANDEAU_AX13.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T370_CARTOGRAPHIE_DISCORDANCES.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T370_STUCKOPEN.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T371_FAUX_VERT_MOTIONCHECKLIST.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T372_REGISTRE_CI_AUTO_COHERENT.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T374_DSH_CONDITIONS_EXISTANTES.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_AUDIT.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_BOUTONS_CODE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T375_MESSAGES_BLOCAGES_SILENCIEUX.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T375_MOT7_RESET_AC600.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T377_HOMING_MANUEL_SANS_CONTACT_TOP.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T383_MECAB_SOURCE_COMMANDE.yaml",
+      "errors": [
+        "T1: aucune section `contract:` — obligatoire a partir de C2. Gabarit : TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml"
+      ],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T386_ROTATION_PHASE_POWERCUTOFF.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T387_FENETRE_BENNE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T387_MECAB_SOURCE_COMMANDE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T391_M3_ANYFAULT.yaml",
+      "errors": [
+        "T8: scope CODE/MAIN sans critere structurel explicite : nom de fichier = nom de POU; suffixe = langage genere dans le bundle"
+      ],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T397_CALIBRATION_RESET_PULSE_DIAG.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T399_TWINBENCH_HYBRID_ROADMAP.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T400_FICHE_MODELISATION_M3.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T401_POC_OPENMODELICA_M3_MINIMAL.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T402_POC_COMMUNICATION_CODESYS_SIM_M3.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T403_AIGUILLAGE_M3_OPENMODELICA.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T405_POC_M3_LIVE_FMU_QML.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T406_TWINBENCH_CONTRAT_LIAISON.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T408_POC_UDP_NATIF_CONTROL_WIN.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T409_FMU_CONTROL_WIN_INJECTION.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T415-B_M3_LIEN_EXTERNE_SIMBENCH.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T415-G_TWINBENCH_V2.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T415_TWINBENCH_PLATFORM_SIMULATOR.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T417_SIMBENCH_M3_FIDELITE_ROUE_LIBRE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T417_SIMULATION_M3_REALISTE.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T421_FIDELITE_DYNAMIQUE_TREUILS.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T423_IHM_PACK1_CORRECTIFS.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T424_BANC_AFFICHAGE_VOLET1.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T425_CI_SOURCE_DEFAUTS.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T426.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T427_WORKFLOW_SKILL_ET_CONTRAT_ETENDU.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_T428_REFACTOR_TROUBLESHOOTING.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_TS_LOT1_VALEURS_TROMPEUSES.yaml",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "DOC/WFLOW/TASKS/TXX-X_TEMP (A RANGER)/CONTRACTS/TASK_CONTRACT_TS_LOT5_GUIDE_DEPANNAGE.yaml",
+      "errors": [],
+      "warnings": []
+    }
+  ]
+}

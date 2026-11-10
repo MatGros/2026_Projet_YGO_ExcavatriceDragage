@@ -26,6 +26,8 @@ TASKS_PATH = WFLOW / "TASKS.yaml"
 LOCKS_PATH = WFLOW / "TASK_LOCKS.json"
 MUTEX_PATH = WFLOW / ".task_manager.write.lock"
 HOST, PORT = "127.0.0.1", 8081
+UI = ROOT / "TOOLS" / "TASK_MANAGER" / "ui"  # pages web (viewers) ; les donnees restent dans WFLOW
+VIEWERS = frozenset({"TASK_VIEWER.html", "ORCHESTRATOR_VIEWER.html"})
 LOCAL_MUTEX = threading.Lock()
 VERBOSE = False
 
@@ -244,6 +246,13 @@ def owns(all_locks: dict[str, dict], task_id: str, who: str, token: str) -> bool
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(WFLOW), **kwargs)
+
+    def translate_path(self, path):
+        """Viewers servis depuis UI ; TASKS.yaml, TASKS_ORCHESTRATOR.yaml, etc. depuis WFLOW."""
+        name = urllib.parse.unquote(urllib.parse.urlparse(path).path).lstrip("/")
+        if name in VIEWERS:
+            return str(UI / name)
+        return super().translate_path(path)
 
     def log_message(self, fmt, *args):
         if VERBOSE:

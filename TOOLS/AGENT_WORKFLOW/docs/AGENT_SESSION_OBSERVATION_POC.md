@@ -111,7 +111,7 @@ Le superviseur LLM est un **détecteur consultatif** : il reçoit les nouveaux m
 
 ## Intégration d’interface envisagée — à ne pas confondre avec le POC
 
-Le point d’accès naturel à évaluer est le [Task Viewer](../../../DOC/WFLOW/TASK_VIEWER.html), déjà utilisé par l’utilisateur. Ajouter éventuellement un bouton compact « Supervision » près des commandes de l’orchestrateur, sur le modèle du bouton OmniDiag, ouvrant un panneau unique : sessions disponibles, sessions suivies, dernier événement et alertes, plus commandes `Ajouter`, `Pause`, `Retirer`.
+Le point d’accès naturel à évaluer est le [Task Viewer](../../TASK_MANAGER/ui/TASK_VIEWER.html), déjà utilisé par l’utilisateur. Ajouter éventuellement un bouton compact « Supervision » près des commandes de l’orchestrateur, sur le modèle du bouton OmniDiag, ouvrant un panneau unique : sessions disponibles, sessions suivies, dernier événement et alertes, plus commandes `Ajouter`, `Pause`, `Retirer`.
 
 Cette proposition ne justifie pas encore de modifier Task Viewer : il faut d’abord démontrer les flux live pour au moins une nouvelle session et une session existante, la sélection non ambiguë, l’arrêt propre, et les erreurs de source absente. Le chat direct avec le superviseur est une étape séparée ; le panneau doit déjà permettre de savoir ce qui est surveillé sans ouvrir une page de rapports supplémentaire.
 

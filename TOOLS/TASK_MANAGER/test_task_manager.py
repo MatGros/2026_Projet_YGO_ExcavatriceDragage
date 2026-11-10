@@ -34,11 +34,11 @@ class TaskManagerApiTest(unittest.TestCase):
         cls.fixture_dir = Path(tempfile.mkdtemp(prefix="task_manager_test_"))
         shutil.copyfile(ROOT / "DOC/WFLOW/TASKS.yaml", cls.fixture_dir / "TASKS.yaml")
         shutil.copyfile(ROOT / "DOC/WFLOW/TASKS_ORCHESTRATOR.yaml", cls.fixture_dir / "TASKS_ORCHESTRATOR.yaml")
-        shutil.copyfile(ROOT / "DOC/WFLOW/TASK_VIEWER.html", cls.fixture_dir / "TASK_VIEWER.html")
-        shutil.copyfile(ROOT / "DOC/WFLOW/ORCHESTRATOR_VIEWER.html", cls.fixture_dir / "ORCHESTRATOR_VIEWER.html")
+        shutil.copyfile(ROOT / "TOOLS/TASK_MANAGER/ui/TASK_VIEWER.html", cls.fixture_dir / "TASK_VIEWER.html")
+        shutil.copyfile(ROOT / "TOOLS/TASK_MANAGER/ui/ORCHESTRATOR_VIEWER.html", cls.fixture_dir / "ORCHESTRATOR_VIEWER.html")
         launcher = (
             "from pathlib import Path; import TOOLS.TASK_MANAGER.task_server as m; "
-            "m.WFLOW=Path(" + repr(str(cls.fixture_dir)) + "); "
+            "m.WFLOW=Path(" + repr(str(cls.fixture_dir)) + "); m.UI=m.WFLOW; "
             "m.TASKS_PATH=m.WFLOW/'TASKS.yaml'; m.LOCKS_PATH=m.WFLOW/'TASK_LOCKS.json'; "
             "m.MUTEX_PATH=m.WFLOW/'.write.lock'; m.start(" + str(PORT) + ")"
         )

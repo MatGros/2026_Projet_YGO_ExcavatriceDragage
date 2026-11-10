@@ -1,0 +1,180 @@
+# CONTRAT T427 - Workflow agents (T426 fusionnee). Modele de dossier : voir T429. Originaux : ARCHIVES/
+contract:
+  task_id: T427
+  criticality: C2
+  strategy: patch
+  objective: 'Refonte du workflow agents : contrat de tache etendu et pilotage verifiable (fusion de T426 dans T427, decision
+    exploitant 2026-11-10), un dossier par tache a base minimale, controles en avertissement sans gener l''usage normal.'
+  acceptance:
+  - id: AC1
+    statement: 'Un routeur de skill project-workflow mince <= 50 lignes aiguille vers les 3 voies sans dupliquer le tronc
+      commun. [SUSPENDUE : decision D2 - l''exploitant ne veut dependre d''aucune skill de workflow]'
+    verified_by: python TOOLS/AGENT_WORKFLOW/scripts/check_skill_stubs.py
+  - id: AC2
+    statement: Le gabarit task_contract.yaml intègre execution_plan, test_feedback compact, budget sous-agents 10/3 et champ
+      companion_doc.
+    verified_by: python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml
+  - id: AC3
+    statement: Le script check_task_contract.py valide les règles T9, T10 et T11 sans régression sur les contrats existants.
+    verified_by: python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/T427_WORKFLOW_AGENTS_CONTRAT_WORKFLOW_ET_FUSION_T426_20261110_v1.0.yaml
+  - id: AC4
+    statement: Le hook Stop autorise les checkpoints WIP déclarés et le hook PostToolUse ne bloque pas chaque micro-édition.
+      [SUSPENDUE jusqu'a validation humaine du plan d'activation (T426-AC7), decision D3]
+    verified_by: Vérification manuelle des scripts de hook et exécution de test
+  - id: AC5
+    statement: La note compagnon standardisée TASK_NOTE_T427_WORKFLOW_SKILL_ET_CONTRAT_ETENDU.md est liée et accessible pour
+      les schémas et graphiques.
+    verified_by: python TOOLS/AGENT_WORKFLOW/scripts/G530_check_contract_refs.py .
+  - id: T426-AC1
+    statement: Le catalogue conserve un résumé court et pointe vers une seule fiche active par tâche.
+    verified_by: Comparer TASKS.yaml, le template et deux tâches pilotes ; aucun journal ni contrat dupliqué.
+  - id: T426-AC2
+    statement: La fiche unique décrit besoin, décision recherchée, périmètre, permissions, critères observables, preuves et
+      responsabilités.
+    verified_by: Valider un exemple complet et rejeter un exemple privé de critère observable ou de périmètre.
+  - id: T426-AC3
+    statement: Chaque expérience possède une question nouvelle, des prédictions discriminantes et une décision selon résultat
+      avant lancement.
+    verified_by: Sur un historique pilote, détecter une répétition sans justification et accepter un rejeu motivé par une
+      source modifiée.
+  - id: T426-AC4
+    statement: Trois itérations non informatives déclenchent une revue A/B aveugle ; un seuil de deux à cinq exige une justification
+      préalable.
+    verified_by: Cas seuil atteint, seuil non atteint, résultats proches et remise à zéro justifiée ; vérifier indépendance
+      des deux missions.
+  - id: T426-AC5
+    statement: Le contrat de délégation impose contexte utile, workflow applicable, sorties mesurables, alerte et auto-revue.
+    verified_by: Deux missions pilotes ; chaque conclusion renvoie à une preuve et chaque point insuffisamment établi reste
+      non vérifié.
+  - id: T426-AC6
+    statement: Chaque contrôle automatique possède déclencheur, portée, responsable, sévérité, diagnostic et procédure de
+      reprise.
+    verified_by: Matrice de contrôles avec un cas valide et un contre-exemple par contrôle ; zéro blocage hors périmètre dans
+      les cas pilotes.
+  - id: T426-AC7
+    statement: Les contrôles nouveaux démarrent en avertissement et ne changent pas silencieusement les hooks actifs.
+    verified_by: Comparer configurations avant/après ; activation bloquante uniquement après validation humaine explicite
+      et tests des faux positifs.
+  - id: T426-AC8
+    statement: Les résultats distinguent PASS, FAIL, interruption, non testé et nettoyage incomplet ; une exception ne produit
+      pas un succès implicite.
+    verified_by: Tests du validateur de résultat incluant exception, preuve absente, sortie partielle et erreur de nettoyage.
+  - id: AC6
+    statement: '[AJOUTE PAR LA FUSION, a valider par l''exploitant] La regle ''1 tache = 1 dossier, base minimale (contrat
+      + plan), extensions sur validation ecrite'' est ecrite une seule fois et appliquee a T427 et T429 sans perte de contenu,
+      selon les 5 conditions de migration de T426 (consolidation_review.acceptance_before_migration, conservees dans l''archive
+      du contrat T426).'
+    verified_by: Lecture de la regle dans WORKFLOW.md ; comparaison avant/apres des dossiers T427 et T429 ; table ancien->nouveau
+      chemin validee par l'exploitant avant tout deplacement ; G340 sans nouvelle erreur imputable.
+  scope:
+    allowed:
+    - DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/
+    - DOC/WFLOW/TASKS.yaml (fiches T426 et T427 uniquement, via l'API Task Manager)
+    - DOC/WFLOW/TASK_LOCKS.json (via l'API Task Manager)
+    - TOOLS/AGENT_WORKFLOW/templates/
+    - TOOLS/AGENT_WORKFLOW/scripts/
+    - TOOLS/AGENT_WORKFLOW/tests/
+    - TOOLS/AGENT_WORKFLOW/skills/task-planner/
+    - TOOLS/AGENT_WORKFLOW/skills/orchestrator/
+    - TOOLS/AGENT_WORKFLOW/skills/troubleshooting/
+    - TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md
+    - TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md
+    - TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md
+    - AGENTS.md
+    forbidden:
+    - CODE/
+    - CODE_XML/
+    - PRJ_CODESYS/
+    - Configuration des hooks actifs (.claude/settings.json, TOOLS/AGENT_WORKFLOW/hooks/) sans validation humaine du plan
+      d'activation (decision D3)
+    - Creation d'une skill de workflow (project-workflow) tant que la decision D2 n'est pas tranchee
+    - Livrables T417-C et T417-D confies a Claude
+    - Modification massive des fiches et du catalogue
+    - Deplacement ou suppression de fichiers hors du dossier T427 sans table ancien->nouveau chemin validee
+  evidence_required:
+  - check_task_contract (ce contrat)
+  - G530_check_contract_refs
+  - Matrice exigences vers preuves et responsabilites (T426)
+  - Diff reel relu ; tests positifs et negatifs des controles modifies
+  - Mesure des faux positifs sur deux taches pilotes (T426)
+  - Plan d'activation et desactivation sans suppression de donnees (T426)
+  models_allowed:
+  - claude-sonnet-5
+  - deepseek-v4.1-flash:cloud
+  - glm-5.3-flash:cloud
+  alert_duty: Tout écart ou blocage sur les hooks ou le formatage YAML est immédiatement signalé sans modification destructive.
+    Signaler immédiatement ambiguïté, contradiction, preuve faible, effet de bord ou contrôle trop intrusif. Ne pas transformer
+    une incertitude en réussite ni élargir le périmètre.
+  companion_doc: DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/T427_WORKFLOW_AGENTS_PLAN_20261110_v1.0.md
+status: IN_PROGRESS
+absorbed_tasks:
+  T426:
+    statut: fusionnee dans T427 le 2026-11-10
+    motif: Memes fichiers (templates/task_contract.yaml, check_task_contract.py), meme executant ; l'etude T426 (consolidation_review)
+      est la base de la regle 1 tache = 1 dossier.
+    contrat_origine: DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/ARCHIVES/T427_WORKFLOW_AGENTS_CONTRAT_T426_ORIGINE_20261101_v1.0.yaml
+    livre:
+      commit: 2a5bf86d
+      fichiers:
+      - TOOLS/AGENT_WORKFLOW/scripts/check_task_tracking.py
+      - TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml
+      - TOOLS/AGENT_WORKFLOW/tests/test_check_task_contract.py
+      - TOOLS/AGENT_WORKFLOW/tests/test_task_tracking.py
+      - TOOLS/AGENT_WORKFLOW/tests/test_task_tracking_real_pilots.py
+      - TOOLS/AGENT_WORKFLOW/tests/fixtures/t426_r3_agent_a.txt
+      - TOOLS/AGENT_WORKFLOW/tests/fixtures/t426_r3_agent_b.txt
+      tests: 43 PASS declares dans le contrat d'origine (non rejoues a la fusion)
+execution_plan:
+  milestones:
+  - id: M0
+    title: 'Recu de T426 : etude, prototype advisory CDX01, 43 tests'
+    done_when: Prototype commit 2a5bf86d relu par l'orchestrateur ; validation humaine du plan d'activation (D3) en attente
+  - id: M1
+    title: Cadrage, gabarit etendu et plan du dossier T427
+    done_when: Contrat fusionne valide (check_task_contract PASS), plan T427 redige, fiches T426/T427 mises a jour
+  - id: M2
+    title: Regle '1 tache = 1 dossier' ecrite une fois et appliquee (AC6)
+    done_when: Regle dans WORKFLOW.md, table ancien->nouveau chemin validee, T427 et T429 conformes
+  - id: M3
+    title: Skill project-workflow (AC1) - conditionnelle a D2
+    done_when: Decision D2 prise ; si oui, check_skill_stubs.py PASS
+  - id: M4
+    title: Garde-fous T9-T11 et hooks (AC3, AC4) - hooks conditionnels a D3
+    done_when: check_task_contract etendu PASS ; hooks inchanges tant que D3 non validee
+open_decisions:
+- id: D1
+  sujet: ID survivant de la fusion
+  etat: 'TRANCHE : T427 (recommandation du challenge independant du 2026-11-10 ; fusion demandee par l''exploitant)'
+- id: D2
+  sujet: Skill project-workflow nouvelle (T427-AC1) ou skills existantes ciblees (T426) ; l'exploitant a ecrit ne vouloir
+    dependre d'aucune skill de workflow
+  etat: OUVERT
+- id: D3
+  sujet: Plan d'activation des hooks Stop/PostToolUse (T427-AC4, T426-AC7)
+  etat: OUVERT, validation humaine requise
+- id: D4
+  sujet: Proprietaire unique des deux taches
+  etat: 'TRANCHE : CC01 (meme personne pour les deux, demande exploitant)'
+- id: D5
+  sujet: 'Document maitre : contrat YAML + plan MD (regle actuelle) ou plan MD seul avec TASKS.yaml en index (proposition
+    de l''autre agent)'
+  etat: OUVERT ; ce contrat reste en YAML en attendant
+test_feedback: []
+tracking:
+  user_need: 'Un workflow agents fiable et leger : un dossier par tache, base minimale, sans dependance a une skill, controles
+    qui n''entravent pas l''usage normal.'
+  established:
+  - G530 verifie l'existence physique des fichiers cites.
+  - Les hooks actuels sont dans .claude/settings.json et TOOLS/AGENT_WORKFLOW/hooks.
+  - Un save du serveur Task Manager ne change aujourd'hui que 13 lignes de TASKS.yaml (mesure le 2026-11-10) ; l'affirmation
+    d'un diff de 13 000 lignes est infirmee.
+  budget:
+    total: 10
+    used: 2
+    parallel_max: 3
+    log:
+    - deepseek-v4.1 · audit critique hooks & workflow · 1/10
+    - glm-5.3 · challenge architecture et quotas · 2/10
+  owners:
+    accountable: CC01
+    executor: CC01

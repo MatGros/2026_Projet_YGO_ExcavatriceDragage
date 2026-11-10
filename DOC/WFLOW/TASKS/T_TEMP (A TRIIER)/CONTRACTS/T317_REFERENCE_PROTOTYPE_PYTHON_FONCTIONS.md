@@ -3,8 +3,8 @@
 📌 **But de ce document** : décrire chaque fonction/calcul du prototype `sim_treuil_electrique.py`
 + `sim_treuil_gui.py`, pour qu'un futur portage en ST (CODESYS) sache quoi reprendre, avec quelles
 formules et quelles limites. Ce n'est **pas** un contrat de tâche (voir
-[TASK_CONTRACT_T317](TASK_CONTRACT_T317_SIMBENCH_TREUIL_ELECTRIQUE.yaml)) ni le plan P0
-(voir [PLAN_T317](PLAN_T317_SIMBENCH_TREUIL_ELECTRIQUE.md)) — c'est la doc technique des calculs.
+[TASK_CONTRACT_T317](T317_CONTRAT_SIMBENCH_TREUIL_ELECTRIQUE.yaml)) ni le plan P0
+(voir [PLAN_T317](T317_PLAN_SIMBENCH_TREUIL_ELECTRIQUE.md)) — c'est la doc technique des calculs.
 
 ⚠️ **Statut** : prototype exploratoire hors CODESYS, tous les paramètres numériques sont
 **SYNTHÉTIQUES** (non mesurés terrain). Rien ici n'est prêt à copier tel quel en ST — c'est la

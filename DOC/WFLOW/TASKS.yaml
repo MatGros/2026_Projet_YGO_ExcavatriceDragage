@@ -34,12 +34,13 @@ tasks:
     recovery_batch_exceeds_judge_budget). AC-F3.3 valide (pivot PULL /review-session-supervisor dans 3 CLI, retrait push UI,
     encodage cp1252 resolu, consigne outil brute integree). AC-F3.5 (focusFindingCard, autounlock audio, deep-link test_ui.mjs).
     AC-F2.9 valide (moteur memoire C2, journal session, audit trajectoire modulo 8). AC-F2.10 valide (prompt C1 OMNI_JUDGE_SYSTEM,
-    matrice Alarm/Warning deployee). AC-F3.10 valide (securite deconnexion IHM sur menu lateral gauche). Condition bloquante C1
-    resolue (durcissement regex anti-evasion pluriels/accords/0 passed + 5 tests adversaires PASS). AC-X.1 & AC-X.2 valides : 171/171 tests
-    pytest PASS, ui_layout_check 1440/390/360 PASS, npm test 15/15 PASS. Service 8082 mis a jour (build b0c05d532327). Double revue
-    finale A/B (DeepSeek V4.1 + GLM 5.3) concluant a la levee de reserve et qualification de livraison. Aucun commit/push sans accord explicite.'
-  contrat: 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T429_AGENT_SUPERVISOR_FIABILISATION.yaml (contrat mesurable AC-F0 a AC-F4, AC-X
-    ; preuves et revues A/B dans tracking). Pilotage detaille : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md'
+    matrice Alarm/Warning deployee). AC-F3.10 valide (securite deconnexion IHM sur menu lateral gauche). Condition bloquante
+    C1 resolue (durcissement regex anti-evasion pluriels/accords/0 passed + 5 tests adversaires PASS). AC-X.1 & AC-X.2 valides
+    : 171/171 tests pytest PASS, ui_layout_check 1440/390/360 PASS, npm test 15/15 PASS. Service 8082 mis a jour (build b0c05d532327).
+    Double revue finale A/B (DeepSeek V4.1 + GLM 5.3) concluant a la levee de reserve et qualification de livraison. Aucun
+    commit/push sans accord explicite.'
+  contrat: 'DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml (contrat
+    mesurable AC-F0 a AC-F4, AC-X ; preuves et revues A/B dans tracking). Pilotage detaille : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md'
   bloque_par: ''
   work_lock:
     actor: AGY01
@@ -96,8 +97,8 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: WORKFLOW / AGENTS / SKILLS / CONTRATS
-  agent: AGY01
-  date: '2026-11-04T23:55:00+01:00'
+  agent: CC01
+  date: '2026-11-10T07:09:43+01:00'
   updated_at: '2026-11-04T23:55:00+01:00'
   titre: Refonte Workflow Agents — Router de skills mince, contrat étendu, sas d'essais et note compagnon MD
   contexte: 'REX session 2026-11-04 : court-circuit de /plan hors projet, blocage du Stop sur checkpoints WIP, G200 trop lourd
@@ -113,16 +114,20 @@ tasks:
   - Adapter check_task_contract.py avec les contrôles mécaniques T9 à T11.
   - 'Ajuster les hooks : PostToolUse allégé et Stop non-bloquant autorisant les checkpoints WIP.'
   - Maintenir 0 régression sur les standards du projet et la liaison CODESYS.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T427_WORKFLOW_SKILL_ET_CONTRAT_ETENDU.yaml
-  avancement: Cadrage initialisé. Verrou posé AGY01. Contrat C2 et note compagnon rédigés. En attente de validation pour implémentation.
+  - 'T426 absorbee (etude pilotage verifiable, prototype CDX01 commit 2a5bf86d) : AC repris sous T426-AC1..8 dans le contrat
+    T427'
+  contrat: DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/T427_WORKFLOW_AGENTS_CONTRAT_WORKFLOW_ET_FUSION_T426_20261110_v1.0.yaml
+  avancement: '2026-11-10 CC01. Fusion de T426 dans T427 (decision exploitant). Dossier DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/
+    constitue : contrat fusionne valide (14 AC : AC1-5, T426-AC1-8, AC6), plan, archives des originaux, rapport de challenge.
+    Decisions ouvertes : D2 skill, D3 hooks, D5 document maitre. Aucune implementation, aucun hook ni skill modifie.'
   bloque_par: []
 - id: T426
   parent_id: ''
   statut: ⏳
   criticite: C2
   domaine: WORKFLOW / AGENTS / CONTRATS / CONTROLES
-  agent: CDX01
-  date: '2026-11-01T19:41:36'
+  agent: CC01
+  date: '2026-11-10T07:09:43+01:00'
   updated_at: '2026-11-01T19:41:36'
   titre: Fiabiliser le pilotage des tâches, délégations et contrôles sans gêner l'usage normal
   contexte: REX T417 ; responsabilité du cadrage et de la réception CDX01.
@@ -131,11 +136,12 @@ tasks:
   - Unifier le suivi dans le contrat existant et garder le catalogue court.
   - Définir responsabilités, preuves mesurables, seuils de revue et devoir d'alerte.
   - Vérifier les contrôles en avertissement avant toute activation bloquante approuvée.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T426.yaml
-  avancement: CDX01 en charge. Recherche + challenge A/B terminés ; prototype advisory validé par 43/43 tests. R2 couvre la
-    compatibilité en mémoire ; R3 a détecté une délégation sans accès de lecture et l’a arrêtée proprement. Aucun hook actif
-    modifié.
-  bloque_par: []
+  contrat: DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/T427_WORKFLOW_AGENTS_CONTRAT_WORKFLOW_ET_FUSION_T426_20261110_v1.0.yaml
+  avancement: '2026-11-10 CC01. FUSIONNEE dans T427 (decision exploitant) : AC repris sous T426-AC1..8 dans le contrat T427,
+    prototype CDX01 conserve (commit 2a5bf86d), contrat d''origine archive dans le dossier T427/ARCHIVES. Ne plus travailler
+    ici : suite dans T427.'
+  bloque_par:
+  - T427
 - id: T421
   parent_id: ''
   statut: ✅

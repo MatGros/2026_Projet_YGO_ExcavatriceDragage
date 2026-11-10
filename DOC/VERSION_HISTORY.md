@@ -2,7 +2,7 @@
 
 Trace le programme CODESYS testé/validé à un instant donné, pour retrouver quelle version de l'analyse fonctionnelle (`DOC/AF/AF_Partie*`) lui correspondait (retour arrière, FAT/SAT, essais site).
 
-**Une ligne par jalon significatif.** Format : `date · jalon · résultat · renvoi`. Preuves terrain détaillées : `WFLOW/REGISTRES/`.
+**Une ligne par jalon significatif.** Format : `date · jalon · résultat · renvoi`. Preuves terrain détaillées : `WFLOW/MISE_EN_SERVICE/`.
 📦 Le détail complet de chaque entrée (corps, chiffres, listes de fichiers) est conservé tel quel dans
 `ARCHIVES/Doc/VERSION_HISTORY_DETAIL_20261110.md` (archive — jamais une source active).
 Les noms de version réutilisés dans le journal d'origine (`v0.4.18`, `v0.4.26`, `v0.4.27`) sont gardés tels quels.
@@ -14,8 +14,8 @@ Les noms de version réutilisés dans le journal d'origine (`v0.4.18`, `v0.4.26`
 ## 2026-09
 
 - 2026-09-23 · `MES_FIN_20260923` · fin MES : inversion DI M1/M2, AX15B/AX15D sécurisé, verrou M3 T392, anti-rebond FdC M3, compteurs horaires · `main` `4968a541` · G200 PASS (2070 instances)
-- 2026-09-07 · `MES_055_SEANCE_20260907` · MES-051→055 : `BucketActivityHold` 4 s, pages IHM/modes, `BypassAuPowerCutOff` au boot (T264), FdC haut (T268) · `backup/mes-septembre-20260902` · [registre](WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService_20260907.md)
-- 2026-09-05 · `MES_046` / `MES_047` / `MES_048` · traces treuils validées, 0 défaut : cycle M1/M2 + benne (71 s), ouverture benne en haut (23 s), pleine vitesse synchro (46 s) · HEAD `35fe44ff` · [registre](WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService_20260905.md)
+- 2026-09-07 · `MES_055_SEANCE_20260907` · MES-051→055 : `BucketActivityHold` 4 s, pages IHM/modes, `BypassAuPowerCutOff` au boot (T264), FdC haut (T268) · `backup/mes-septembre-20260902` · [registre](WFLOW/MISE_EN_SERVICE/REGISTRE_Suivi_MiseEnService_20260907.md)
+- 2026-09-05 · `MES_046` / `MES_047` / `MES_048` · traces treuils validées, 0 défaut : cycle M1/M2 + benne (71 s), ouverture benne en haut (23 s), pleine vitesse synchro (46 s) · HEAD `35fe44ff` · [registre](WFLOW/MISE_EN_SERVICE/REGISTRE_Suivi_MiseEnService_20260905.md)
 - 2026-09-03 · `GRAFCET_HOMING_HX0-HX6_T146` · homing en GRAFCET `HX0..HX6`, cible M2 corrigée, plafond palier 1 hors homing (C4 interim, visa ISO 13849 ouvert)
 - 2026-09-02 · `AF01_v1.4_EMERGENCY_MANAGEMENT_T173C` · AF01 v1.4 : 3 bypass MES orthogonaux, délais 500 ms / 1 s / 5 s, message opérateur par cause d'abandon
 
