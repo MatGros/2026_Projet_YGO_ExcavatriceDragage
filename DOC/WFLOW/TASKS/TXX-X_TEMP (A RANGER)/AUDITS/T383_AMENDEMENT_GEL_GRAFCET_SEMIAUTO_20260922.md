@@ -1,7 +1,7 @@
 # 🧊 GEL GRAFCET SEMI_AUTO — AMENDEMENT T383 (2026-09-22)
 
 > **Statut : ✅ VALIDÉ par l'exploitant (2026-09-22) — phase 0 close, GO code accordé.**
-> Ce document AMENDE le GEL figé [`GEL_GRAFCET_SEMIAUTO_20260903.md`](./GEL_GRAFCET_SEMIAUTO_20260903.md)
+> Ce document AMENDE le GEL figé [`GEL_GRAFCET_SEMIAUTO_20260903.md`](TXXX_GEL_GRAFCET_SEMIAUTO_20260903.md)
 > selon le **mécanisme d'arbitrage du GEL (section 4 ✏️ / Q)**. Le fichier gelé n'est PAS réécrit :
 > l'amendement est un **ajout déclaratif** que le code livré doit respecter (AC6 / garde-fou phase 4).
 >

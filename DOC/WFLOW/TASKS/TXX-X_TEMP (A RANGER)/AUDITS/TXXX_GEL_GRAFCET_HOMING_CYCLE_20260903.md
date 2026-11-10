@@ -4,7 +4,7 @@
 > Brouillon de travail — itéré avec l'utilisateur. Rien n'est codé tant que ce doc n'est pas validé.
 >
 > - **Date** : 2026-09-03 · **Branche** : `backup/mes-septembre-20260902`
-> - **Baseline (état AVANT)** : [`BASELINE_SEQUENCEURS_HOMING_CYCLE_20260903.md`](BASELINE_SEQUENCEURS_HOMING_CYCLE_20260903.md)
+> - **Baseline (état AVANT)** : [`BASELINE_SEQUENCEURS_HOMING_CYCLE_20260903.md`](TXXX_BASELINE_SEQUENCEURS_HOMING_CYCLE_20260903.md)
 > - **Contrats liés** : [T226](TASK_CONTRACT_T226_REFONTE_HOMING_SEMIAUTO.yaml) (homing) · [T229](TASK_CONTRACT_T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml) (cycle) · [T232](TASK_CONTRACT_T232_MAJ_DOC_REFONTE_CYCLE.yaml) (doc)
 > - **Statut** : 🟡 BROUILLON — questions ouvertes non tranchées (§4)
 
