@@ -745,3 +745,110 @@ def test_deterministic_tool_proof_capture_and_trajectory_audit(tmp_path):
     finally:
         svc.close()
 
+
+def test_agy_and_dsh_tool_events_normalization():
+    from TOOLS.AGENT_SUPERVISOR.scripts.platform_adapters import normalize
+    # Antigravity tool result (type GENERIC)
+    agy_event = {"type": "GENERIC", "content": "Ran 1 shell command (exit code 0)\n==== 46 passed ===="}
+    norm = normalize("agy", agy_event)
+    assert norm is not None
+    assert norm[0] == "tool"
+    assert "46 passed" in norm[1]
+
+    # DSH tool result
+    dsh_event = {"type": "tool/result", "data": {"content": "Tests verts 15/15"}}
+    norm_dsh = normalize("dsh", dsh_event)
+    assert norm_dsh is not None
+    assert norm_dsh[0] == "tool"
+    assert "Tests verts" in norm_dsh[1]
+
+
+def test_collector_telemetry_and_poll_controls(tmp_path):
+    svc, source, sid = service(tmp_path)
+    try:
+        # Vérification set_poll_interval
+        res = svc.command({"action": "set_poll_interval", "interval": 5.0})
+        assert svc.poll_interval == 5.0
+        assert res["poll_interval_seconds"] == 5.0
+        with pytest.raises(ValueError):
+            svc.command({"action": "set_poll_interval", "interval": 0.5})
+
+        # Écriture dans le transcript
+        write(source, "user", "Message de test collecteur")
+        # Déclenchement de poll_now
+        snap = svc.command({"action": "poll_now", "id": sid})
+        s = snap["sessions"][0]
+        assert "watcher_telemetry" in s
+        tel = s["watcher_telemetry"]
+        assert tel["path"] == str(source)
+        assert tel["file_size_bytes"] > 0
+        assert "recent_raw_events" in s
+        assert "dropped_events" in s
+    finally:
+        svc.close()
+
+
+def test_connect_session_api_json_handles_payload_over_1mb(monkeypatch):
+    import io
+    from TOOLS.AGENT_SUPERVISOR.scripts import connect_session
+    # Simule un snapshot valide de plus de 1 Mo (1 500 000 octets)
+    padding = "x" * (1_500_000 - 100)
+    huge_payload = json.dumps({"running": True, "token": "test-token", "sessions": [], "padding": padding}).encode("utf-8")
+    assert len(huge_payload) >= 1_400_000
+
+    class FakeResponse(io.BytesIO):
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr(connect_session, "urlopen", lambda req, timeout=10: FakeResponse(huge_payload))
+    # Ne doit pas lever de JSONDecodeError ou de troncature
+    res = connect_session.api_json("http://127.0.0.1:8082/api/supervision")
+    assert res.get("running") is True
+    assert res.get("token") == "test-token"
+    assert len(res.get("padding")) == len(padding)
+
+
+def test_connect_session_auto_populates_mission_structure_from_contract(monkeypatch):
+    from TOOLS.AGENT_SUPERVISOR.scripts import connect_session
+    path, contract = connect_session.find_task_contract("T427")
+    assert path is not None
+    assert contract is not None
+    c = contract.get("contract") or contract
+    assert c.get("task_id") == "T427"
+    assert "objective" in c
+
+
+def test_resume_all_action(tmp_path):
+    storage = tmp_path / "storage.json"
+    source1 = tmp_path / "c1.jsonl"
+    source2 = tmp_path / "c2.jsonl"
+    source1.write_text('{"type":"user","message":{"role":"user","content":"start1"}}\n', encoding="utf-8")
+    source2.write_text('{"type":"user","message":{"role":"user","content":"start2"}}\n', encoding="utf-8")
+
+    from TOOLS.AGENT_SUPERVISOR.scripts.supervisor_service import Supervisor
+    svc = Supervisor(storage, roots={'claude': [tmp_path]})
+    try:
+        svc.command({"action": "add", "platform": "claude", "native_id": "c1", "alias": "S1"})
+        svc.command({"action": "add", "platform": "claude", "native_id": "c2", "alias": "S2"})
+        snap_initial = svc.snapshot()
+        for s in snap_initial["sessions"]:
+            svc.command({"action": "pause", "id": s["id"]})
+        snap = svc.snapshot()
+        paused = [s for s in snap["sessions"] if s.get("enabled") is False or s.get("state") == "paused"]
+        assert len(paused) == 2
+
+        res = svc.command({"action": "resume_all"})
+        assert res["count"] == 2
+        snap2 = svc.snapshot()
+        for s in snap2["sessions"]:
+            assert s["enabled"] is True
+            assert s["state"] == "active"
+    finally:
+        svc.close()
+
+
+
+
+

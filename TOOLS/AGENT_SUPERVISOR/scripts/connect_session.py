@@ -6,9 +6,15 @@ import json
 import os
 import re
 import unicodedata
+from pathlib import Path
 from urllib.parse import urlsplit
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 
 SESSION_ENV = {
@@ -74,7 +80,7 @@ def validate_local_base_url(value: str) -> str:
     return value.rstrip("/")
 
 
-def api_json(url: str, *, token: str | None = None, payload: dict | None = None):
+def api_json(url: str, *, token: str | None = None, payload: dict | None = None, max_bytes: int = 10_000_000):
     body = json.dumps(payload, ensure_ascii=False).encode("utf-8") if payload is not None else None
     headers = {"Accept": "application/json"}
     method = "GET"
@@ -82,8 +88,73 @@ def api_json(url: str, *, token: str | None = None, payload: dict | None = None)
         method = "POST"
         headers.update({"Content-Type": "application/json", "X-Supervision-Token": token or ""})
     request = Request(url, data=body, headers=headers, method=method)
-    with urlopen(request, timeout=4) as response:
-        return json.loads(response.read(1_000_000).decode("utf-8"))
+    with urlopen(request, timeout=10) as response:
+        return json.loads(response.read(max_bytes).decode("utf-8"))
+
+
+def find_task_contract(task_id: str) -> tuple[Path | None, dict | None]:
+    if not yaml:
+        return None, None
+    repo_root = Path(__file__).resolve().parents[3]
+    doc_wflow = repo_root / "DOC" / "WFLOW"
+    if not doc_wflow.exists():
+        return None, None
+    candidates = list(doc_wflow.glob(f"**/*{task_id}*.*yaml"))
+    active = [c for c in candidates if "ARCHIVES" not in c.parts]
+    for c in active or candidates:
+        try:
+            data = yaml.safe_load(c.read_text(encoding="utf-8"))
+            if isinstance(data, dict) and ("contract" in data or "task_id" in data):
+                return c, data
+        except Exception:
+            continue
+    return None, None
+
+
+def populate_mission_from_contract(base_url: str, token: str, assignment_id: str,
+                                   task_ref: str, task_raw: str, mission_raw: str) -> bool:
+    contract_path, data = find_task_contract(task_ref)
+    if not contract_path or not data:
+        return False
+    c = data.get("contract") or data
+    objective = str(c.get("objective") or task_raw).strip()
+    scope = str(c.get("scope") or "DOC/WFLOW/ selon contrat de tâche").strip()
+    constraints = str(c.get("constraints") or f"Criticité {c.get('criticality', 'C2')} · Stratégie {c.get('strategy', 'patch')}").strip()
+    acceptance = c.get("acceptance") or []
+    criteria_lines = []
+    if isinstance(acceptance, list):
+        for item in acceptance[:6]:
+            if isinstance(item, dict):
+                statement = item.get("statement") or item.get("id") or ""
+                if statement:
+                    criteria_lines.append(f"{item.get('id', 'AC')}: {statement}")
+            elif isinstance(item, str):
+                criteria_lines.append(item)
+    criteria_text = " · ".join(criteria_lines)[:600] if criteria_lines else "Selon critères du contrat"
+
+    structure = {
+        "subject": task_raw.strip(),
+        "task_ref": task_ref.strip(),
+        "primary_goal": objective[:400],
+        "current_goal": mission_raw.strip()[:400],
+        "milestone": f"Contrat {contract_path.name[:80]}",
+        "scope_permissions": scope[:300],
+        "constraints": constraints[:300],
+        "criteria": criteria_text[:400],
+        "evidence": f"Contrat validé : {contract_path.name[:80]}",
+        "unknowns": "Selon avancement session",
+        "next_step": "Exécution cadrée de la tâche",
+        "extra": f"Contrat chargé automatiquement depuis {contract_path.name}"
+    }
+    try:
+        api_json(base_url + "/api/supervision", token=token, payload={
+            "action": "set_mission_structure",
+            "id": assignment_id,
+            "structure": structure
+        })
+        return True
+    except Exception:
+        return False
 
 
 def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
@@ -128,9 +199,15 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
                 attached = next((s for s in result.get("sessions", []) if s["id"] == item["id"]), None)
                 if not attached or not attached.get("source"):
                     raise RuntimeError("Le service n’a pas confirmé une source unique pour la réassignation")
+                structure_loaded = False
+                if task_ref and snapshot.get("token"):
+                    structure_loaded = populate_mission_from_contract(
+                        base_url, snapshot.get("token"), attached["id"], task_ref, task, mission
+                    )
                 return dict(status="reassigned", assignment_id=attached["id"], state=attached["state"],
                             alias=attached.get("alias"), platform=platform, native_id=session_id,
-                            task=task, source=attached["source"], previous_alias=item.get("alias"))
+                            task=task, source=attached["source"], previous_alias=item.get("alias"),
+                            mission_structure_loaded=structure_loaded)
     result = api_json(base_url + "/api/supervision", token=snapshot.get("token"), payload={
         "action": "add", "platform": platform, "native_id": session_id,
         "alias": alias.strip(), "mission": attached_mission})
@@ -138,9 +215,14 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
                      if item.get("platform") == platform and item.get("native_id") == session_id), None)
     if not attached or not attached.get("source"):
         raise RuntimeError("Le service n’a pas confirmé une source unique pour cet ID")
+    structure_loaded = False
+    if task_ref and snapshot.get("token"):
+        structure_loaded = populate_mission_from_contract(
+            base_url, snapshot.get("token"), attached["id"], task_ref, task, mission
+        )
     return dict(status="attached", assignment_id=attached["id"], state=attached["state"],
                 alias=attached.get("alias"), platform=platform, native_id=session_id,
-                task=task, source=attached["source"])
+                task=task, source=attached["source"], mission_structure_loaded=structure_loaded)
 
 
 def main():

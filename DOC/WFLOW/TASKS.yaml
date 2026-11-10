@@ -1,4 +1,35 @@
 tasks:
+- id: T430
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: DOC / WFLOW / OUTILLAGE
+  agent: CDX01
+  date: '2026-11-10T14:02:50+01:00'
+  titre: Organisation documentaire — terminer la migration des versions, chemins et consommateurs
+  contexte: Reprise demandee par exploitant le 2026-11-10 apres revue des renommages AUDITS/CONTRACTS/REVIEWS/TESTS. Integrite394
+    fichiers confirmee ; migration des references incomplete. Challenge expert avant implementation realise. Lot distinct
+    de T384 (reconciliation historique, sans renommage) et T427 (workflow CC01).
+  description: Reparer la compatibilite documentaire, les consommateurs et les references exactes apres les deplacements et
+    renommages. Aucun changement PLC, aucune nouvelle suppression, aucun changement d identite/statut metier des taches. PLAN
+    unique + CONTRAT de criteres.
+  objectifs:
+  - AC1 conserver les 394 fichiers et leur contenu métier
+  - AC2 rétablir 33 suffixes de version réellement couverts par G340
+  - AC3 extraire les chemins avec espaces et parenthèses, rejeter une cible manquante
+  - AC4 couvrir les sources déclarées G530 avec legacy, contexte et exemples distingués
+  - AC5 migrer les références exactes via API sans modifier les champs métier
+  - AC6 résoudre les liens actifs et préserver la provenance historique
+  - AC7 exécuter G525 avec source GEL unique et inventaire non vide
+  - AC8 générer un nouveau run T356 sans écraser les neuf annexes historiques
+  - AC9 préserver qualifications historiques et exclusions documentaires pertinentes
+  - AC10 fournir un garde-fou automatique et des mutations discriminantes
+  - AC11 distinguer dette préexistante, corrections prouvées et hors périmètre
+  contrat: DOC/WFLOW/TASKS/T430_ORGANISATION_DOCUMENTAIRE/T430_CONTRAT_ORGANISATION_DOCUMENTAIRE_20261110_v1.0.yaml
+  avancement: '2026-11-10 CDX01. Deux challenges experts indépendants terminés, objections intégrées dans le PLAN unique.
+    Contrat C2 contrôlé : PASS, 0 erreur / 0 avertissement, 11 AC. Plan et contrat prêts ; aucune modification des gates,
+    des documents rangés ni du code PLC. GO humain attendu avant implémentation. T384 et T427 restent distinctes. Aucun commit/push.'
+  bloque_par: []
 - id: T429
   parent_id: ''
   statut: ⏳
@@ -38,7 +69,10 @@ tasks:
     C1 resolue (durcissement regex anti-evasion pluriels/accords/0 passed + 5 tests adversaires PASS). AC-X.1 & AC-X.2 valides
     : 171/171 tests pytest PASS, ui_layout_check 1440/390/360 PASS, npm test 15/15 PASS. Service 8082 mis a jour (build b0c05d532327).
     Double revue finale A/B (DeepSeek V4.1 + GLM 5.3) concluant a la levee de reserve et qualification de livraison. Aucun
-    commit/push sans accord explicite.'
+    commit/push sans accord explicite. 2026-11-10 AGY01 : Decision utilisateur : bloc Trajet des messages mis de cote / gele
+    (composant maquette semi-statique non probant). Synthese d audit collecteur AC1-AC5 mise en attente pour traitement ulterieur.
+    Priorite donnee a la refonte ergonomique du ruban Collecteur et Flux (etiquetage des sessions, clarification du statut de veille,
+    regles de tri perennes dans l IHM et allegement de la charge cognitive des historiques).'
   contrat: 'DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml (contrat
     mesurable AC-F0 a AC-F4, AC-X ; preuves et revues A/B dans tracking). Pilotage detaille : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md'
   bloque_par: ''
