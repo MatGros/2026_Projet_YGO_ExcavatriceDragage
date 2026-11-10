@@ -48,7 +48,7 @@
           "type": "integer",
           "default": 8,
           "minimum": 5,
-          "maximum": 60,
+          "maximum": 30,
           "description": "Fréquence de lecture du résumé local, en secondes."
         },
         "veilleur.notifications": {

@@ -14,7 +14,10 @@ const deepLinkTest = Boolean(process.env.VEILLEUR_UI_DEEP_LINK && process.env.VE
 for (const select of document.querySelectorAll('select')) Object.defineProperty(select, 'value', {configurable:true, get(){return this._value ?? this.options?.[0]?.value ?? '';}, set(value){this._value=String(value);}});
 const posts = [];
 const snapshot = {running:true,token:'token',model:'local',allow_cloud:false,sessions:deepLinkTest?[{id:'s1',platform:'claude',native_id:'session-a',alias:'A',state:'active',analysis_state:'alert',mission:'Mission A',alerts:[{id:'a1',severity:'warning',reason:'Constat TEST',evidence:'Citation TEST',disposition:'seen',workflow:{status:'legacy'}}],chat_messages:[],judge_request:null}]:[],chat:{messages:[]}};
+let fetchMode='up';const timers=[];
 const fetch = async (url, options={}) => {
+  if(fetchMode==='down') throw new TypeError('Failed to fetch');
+  if(fetchMode==='abort-timeout') throw Object.assign(new Error('aborted'),{name:'AbortError'});
   if (url.includes('/history?id=')) return {ok:true,json:async()=>({session_id:'s1',partial:false,messages:[{role:'user',text:'Historique A'}]})};
   if (url.endsWith('/candidates')) return {ok:true,json:async()=>({candidates:[
     {platform:'codex',native_id:'11111111-1111-1111-1111-111111111111',modified:1730000000,matches:1},
@@ -24,7 +27,7 @@ const fetch = async (url, options={}) => {
 };
 const deliveredNotifications=[];class FakeNotification{constructor(title,options){this.close=()=>{};deliveredNotifications.push({title,options,note:this});}}FakeNotification.permission='granted';FakeNotification.requestPermission=async()=> 'granted';window.Notification=FakeNotification;class FakeAudioContext{state='suspended';async resume(){this.state='running';}}window.AudioContext=FakeAudioContext;
 const localStorage={getItem:()=>null,setItem:()=>{}};
-const sandbox={window,document,Notification:FakeNotification,navigator:{},localStorage,AbortController,URLSearchParams,fetch,console,Date,JSON,Set,Map,Promise,setTimeout:()=>1,clearTimeout:()=>{}};
+const sandbox={window,document,Notification:FakeNotification,navigator:{},localStorage,AbortController,URLSearchParams,fetch,console,Date,JSON,Set,Map,Promise,setTimeout:(f,ms)=>{timers.push({f,ms});return timers.length;},clearTimeout:()=>{}};
 const ctx=vm.createContext(sandbox);
 vm.runInContext(script,ctx);
 const tick=async()=>{for(let i=0;i<5;i++) await new Promise(resolve=>setImmediate(resolve));};
@@ -41,12 +44,12 @@ assert.equal(deliveredNotifications.length,1,'the same warning must not notify t
 vm.runInContext('preferences.desktop=false',ctx);
 const fire=async(id,type='click')=>{document.getElementById(id).dispatchEvent(new window.Event(type,{bubbles:true,cancelable:true}));await tick();};
 // Editing advanced settings survives polling and the same config submit sends real parameters.
-snapshot.judge_settings={temperature:0,output_tokens:1600,timeout_seconds:30,context_messages:12,context_chars:6000,model_context_tokens:16384};sandbox.snapshot=snapshot;vm.runInContext('render(snapshot)',ctx);
+snapshot.judge_settings={temperature:0,output_tokens:1600,timeout_seconds:30,context_messages:12,context_chars:6000,model_context_tokens:16384,max_visible_closed_findings:5,audit_interval:8};sandbox.snapshot=snapshot;vm.runInContext('render(snapshot)',ctx);
 assert.equal(document.getElementById('judge-context-chars').value,'6000');
 document.getElementById('judge-context-chars').value='18000';document.getElementById('judge-context-chars').dispatchEvent(new window.Event('input',{bubbles:true}));
 snapshot.judge_settings.context_chars=8000;vm.runInContext('render(snapshot)',ctx);assert.equal(document.getElementById('judge-context-chars').value,'18000','poll does not overwrite edited advanced settings');
 assert.match(document.getElementById('judge-effective-settings').textContent,/8000 caractères/,'effective settings stay distinct from the draft');
-await fire('config-form','submit');assert.deepEqual(posts.at(-1).judge_settings,{temperature:0,output_tokens:1600,timeout_seconds:30,context_messages:12,context_chars:18000,model_context_tokens:16384});posts.length=0;
+await fire('config-form','submit');assert.deepEqual(posts.at(-1).judge_settings,{temperature:0,output_tokens:1600,timeout_seconds:30,context_messages:12,context_chars:18000,model_context_tokens:16384,max_visible_closed_findings:5,audit_interval:8});posts.length=0;
 
 await fire('load-candidates');
 const options=document.getElementById('candidates').options;
@@ -144,8 +147,8 @@ assert.match(document.getElementById('flow-detail-content').textContent,/Challen
 assert.equal(judgeStep.getAttribute('aria-pressed'),'true','keyboard focus updates the active flow details');
 const originalCard=document.querySelector('#sessions article');
 if(deepLinkTest){assert.equal(document.querySelector('#sessions .session-fold').open,true,'deep link expands the requested session');const linkedAlert=document.querySelector('#sessions [data-alert-id="a1"]');assert.ok(linkedAlert,'deep link finds the requested alert');assert.equal(Array.from(document.querySelectorAll('#sessions details.mission summary')).some(item=>item.textContent.includes('Constats')),true,'deep link opens the findings panel');assert.equal(linkedAlert.open,true,'deep link expands an already-seen alert');}
-assert.match(document.title,/Agent Supervisor/,'browser tab uses the English product name');assert.match(document.getElementById('notification-status').textContent,/Bureau inactif.*Son inactif/,'notification and sound states are visible beside the session list');
-assert.equal(document.getElementById('notification-status').parentElement.classList.contains('sidebar-session-heading'),true,'notification controls sit beside the session count');let statusToggle=Array.from(document.querySelectorAll('#notification-status button'));assert.equal(statusToggle.length,2,'notification and sound indicators are actionable buttons');statusToggle[0].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Bureau actif/);assert.match(document.getElementById('enable-notifications').textContent,/D?sactiver/);statusToggle=Array.from(document.querySelectorAll('#notification-status button'));statusToggle[0].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Bureau inactif/);statusToggle=Array.from(document.querySelectorAll('#notification-status button'));statusToggle[1].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Son actif/);assert.equal(document.getElementById('sound-enabled').checked,true);statusToggle=Array.from(document.querySelectorAll('#notification-status button'));statusToggle[1].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Son inactif/);assert.equal(document.getElementById('sound-enabled').checked,false);
+assert.match(document.title,/Agent Supervisor/,'browser tab uses the English product name');assert.match(document.getElementById('notification-status').textContent,/Bureau inactif.*Son à activer/,'notification and sound states are visible beside the session list');
+assert.equal(document.getElementById('notification-status').parentElement.classList.contains('sidebar-session-heading'),true,'notification controls sit beside the session count');let statusToggle=Array.from(document.querySelectorAll('#notification-status button'));assert.equal(statusToggle.length,2,'notification and sound indicators are actionable buttons');statusToggle[0].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Bureau actif/);assert.match(document.getElementById('enable-notifications').textContent,/D?sactiver/);statusToggle=Array.from(document.querySelectorAll('#notification-status button'));statusToggle[0].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Bureau inactif/);statusToggle=Array.from(document.querySelectorAll('#notification-status button'));statusToggle[1].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Son inactif/);assert.equal(document.getElementById('sound-enabled').checked,false);statusToggle=Array.from(document.querySelectorAll('#notification-status button'));statusToggle[1].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Son actif/);assert.equal(document.getElementById('sound-enabled').checked,true);statusToggle=Array.from(document.querySelectorAll('#notification-status button'));statusToggle[1].click();await tick();assert.match(document.getElementById('notification-status').textContent,/Son inactif/);assert.equal(document.getElementById('sound-enabled').checked,false);
 const sideMarker=document.querySelector('#side-sessions .session-marker'),cardMarker=document.querySelector('#sessions .session-marker');
 assert.ok(sideMarker&&cardMarker);assert.equal(sideMarker.parentElement.style.getPropertyValue('--session-color'),cardMarker.parentElement.parentElement.style.getPropertyValue('--session-color'),'session sidebar and card share one color marker');
 assert.equal(document.querySelector('#side-sessions .treatment-badges'),null,'sidebar keeps treatment counts out of the compact session list');assert.match(sideMarker.parentElement.title,/open.*deferred.*closed.*resolution proposed/,'full treatment counts remain available on hover');
@@ -280,6 +283,87 @@ assert.ok(sortedFindings.indexOf('new-finding') < sortedFindings.indexOf('old-fi
 vm.runInContext("showError('Connexion au service indisponible')", ctx);
 assert.equal(document.querySelector('.app-sidebar').classList.contains('is-disconnected'), true, 'sidebar reflects disconnection error');
 assert.equal(document.getElementById('sidebar-disconnected').hidden, false, 'sidebar shows disconnected banner');
+// T429 L1 — boutons de test : dans Paramètres > Notifications, JAMAIS dans la sidebar.
+assert.equal(document.querySelector('.app-sidebar .sidebar-quick-tests'),null,'no quick-test container in the left sidebar');
+for(const id of ['side-test-1bip','side-test-2bips','side-test-vscode'])assert.equal(document.getElementById(id),null,id+' must not exist in the sidebar');
+const settingsView=document.getElementById('view-settings');
+for(const id of ['test-sound-now','test-sound-alarm','test-vscode'])assert.ok(settingsView.querySelector('.notify-settings #'+id),id+' lives in Paramètres > Notifications');
+const realPlay=vm.runInContext('playNotificationSound',ctx);let oscillators=0;
+const makeAC=state=>class{constructor(){this.state=state;this.currentTime=0;this.destination={};}async resume(){}createOscillator(){oscillators++;return {type:'',frequency:{setValueAtTime(){}},connect(){},start(){},stop(){}};}createGain(){return {gain:{setValueAtTime(){},linearRampToValueAtTime(){}},connect(){}};}};
+window.AudioContext=makeAC('running');vm.runInContext('audio=null',ctx);oscillators=0;assert.equal(await realPlay('single'),true);assert.equal(oscillators,1,'single = 1 beep');
+vm.runInContext('audio=null',ctx);oscillators=0;assert.equal(await realPlay('double'),true);assert.equal(oscillators,2,'double = 2 beeps');
+window.AudioContext=makeAC('suspended');vm.runInContext('audio=null',ctx);oscillators=0;assert.equal(await realPlay('single'),false,'suspended audio is reported as failure');assert.equal(oscillators,0,'nothing scheduled when audio is suspended');
+vm.runInContext('audio=null',ctx);delete window.AudioContext;
+vm.runInContext("playNotificationSound=async p=>{globalThis.__played.push(p);return true;}",ctx);
+vm.runInContext("unlockAudio=async()=>{}",ctx);
+vm.runInContext("showDashboardView('settings');globalThis.__played=[];preferences.sound=false",ctx);posts.length=0;
+await fire('test-sound-now');await fire('test-sound-alarm');
+assert.deepEqual(Array.from(vm.runInContext("globalThis.__played",ctx)),['single','double'],'Paramètres buttons play 1 then 2 beeps');
+assert.equal(posts.length,0,'sound buttons never POST');
+await fire('test-vscode');await tick();
+assert.equal(posts.length,1,'VS Code test sends exactly one POST');
+assert.deepEqual(posts[0],{action:'test_notification'},'VS Code test payload is strictly {action:test_notification}');
+vm.runInContext("showDashboardView('monitor')",ctx);
+// T429 L1 — déconnexion sticky : vraie panne de fetch (pas un appel direct à showError), puis retour automatique sans rechargement.
+const sidebar=document.querySelector('.app-sidebar'),banner=document.getElementById('sidebar-disconnected');
+fetchMode='up';await vm.runInContext('refresh()',ctx);
+assert.equal(sidebar.classList.contains('is-disconnected'),false,'successful poll clears is-disconnected without reload');
+assert.equal(banner.hidden,true,'successful poll hides the banner');
+fetchMode='down';await vm.runInContext('refresh()',ctx);
+assert.equal(sidebar.classList.contains('is-disconnected'),true,'failed fetch(/api/supervision) sets is-disconnected');
+assert.equal(banner.hidden,false,'failed fetch shows the banner');
+assert.equal(banner.textContent.trim(),'⚠️ SUPERVISION INTERROMPUE — DÉCONNECTÉ','banner text matches the contract');
+fetchMode='up';await vm.runInContext('refresh()',ctx);
+assert.equal(sidebar.classList.contains('is-disconnected'),false,'service back: sidebar returns to normal automatically');
+assert.equal(banner.hidden,true,'service back: banner hidden');
+// Un rendu qui jette après un fetch réussi ne doit PAS reposer is-disconnected à tort.
+snapshot.sessions.push({id:'bad',alias:'BAD',alerts:null,chat_messages:null});
+vm.runInContext("const __r=render;render=()=>{throw new Error('boom');}",ctx);
+await vm.runInContext('refresh()',ctx);
+vm.runInContext("render=__r",ctx);snapshot.sessions.pop();
+assert.equal(sidebar.classList.contains('is-disconnected'),false,'a render error is not a disconnection');
+// Chemins d'échec supplémentaires : 500 HTML/JSON illisible, délai dépassé, POST refusé (≠ déconnexion).
+const origFetch=sandbox.fetch;
+sandbox.fetch=async()=>({ok:false,status:500,json:async()=>{throw new SyntaxError('Unexpected token <');}});
+await vm.runInContext('refresh()',ctx);
+assert.equal(sidebar.classList.contains('is-disconnected'),true,'HTTP 500 with unreadable body marks the supervision as interrupted');
+assert.match(document.getElementById('connection-error').textContent,/illisible \(HTTP 500\)/,'unreadable body is named, not shown as a raw SyntaxError');
+sandbox.fetch=async()=>({ok:true,status:200,json:async()=>snapshot});await vm.runInContext('refresh()',ctx);
+assert.equal(sidebar.classList.contains('is-disconnected'),false,'recovery after 500');
+// Délai dépassé : un fetch qui ne répond jamais doit finir par marquer la supervision interrompue.
+sandbox.fetch=(url,o={})=>new Promise((_,reject)=>{o.signal.addEventListener('abort',()=>reject(Object.assign(new Error('aborted'),{name:'AbortError'})));});
+timers.length=0;const hung=vm.runInContext('refresh()',ctx);
+const t8=timers.find(t=>t.ms===8000);assert.ok(t8,'refresh arms an 8 s timeout');t8.f();await hung;
+assert.equal(sidebar.classList.contains('is-disconnected'),true,'a fetch that never answers marks the supervision as interrupted');
+assert.match(document.getElementById('connection-error').textContent,/délai dépassé/,'timeout is named');
+sandbox.fetch=async()=>({ok:true,status:200,json:async()=>snapshot});await vm.runInContext('refresh()',ctx);
+assert.equal(sidebar.classList.contains('is-disconnected'),false,'recovery after timeout');
+sandbox.fetch=origFetch;fetchMode='abort-timeout';await vm.runInContext('refresh()',ctx);
+assert.equal(sidebar.classList.contains('is-disconnected'),false,'a voluntary abort (page unload/dispose) is not a disconnection');
+fetchMode='up';
+sandbox.fetch=async()=>({ok:true,status:200,json:async()=>{throw Object.assign(new Error('aborted'),{name:'AbortError'});}});await vm.runInContext('refresh()',ctx);
+assert.equal(sidebar.classList.contains('is-disconnected'),false,'an abort while reading the body is not a disconnection');
+sandbox.fetch=async(url,o={})=>o.method==='POST'?{ok:false,status:400,json:async()=>({error:'champ invalide'})}:{ok:true,status:200,json:async()=>snapshot};
+await vm.runInContext("mutate({action:'test_notification'})",ctx);
+assert.equal(sidebar.classList.contains('is-disconnected'),false,'a refused mutation (HTTP 400) is not a disconnection');
+assert.match(document.getElementById('notice').textContent,/champ invalide/,'refused mutation is reported in the notice');
+sandbox.fetch=async(url,o={})=>{if(o.method==='POST')throw new TypeError('Failed to fetch');return {ok:true,status:200,json:async()=>snapshot};};
+await vm.runInContext("mutate({action:'test_notification'})",ctx);
+assert.equal(sidebar.classList.contains('is-disconnected'),true,'a network failure during a mutation marks the supervision as interrupted');
+sandbox.fetch=async()=>({ok:true,status:200,json:async()=>snapshot});await vm.runInContext('refresh()',ctx);
+assert.equal(sidebar.classList.contains('is-disconnected'),false,'recovery after mutation network failure');
+sandbox.fetch=origFetch;
+// État inconnu ou en attente : jamais vert.
+for(const st of ['waiting','ready','inconnu-xyz']){snapshot.sessions[0].enabled=true;snapshot.sessions[0].state=st;vm.runInContext('render(snapshot,true)',ctx);const chip=document.querySelector('#sessions .session-collection-state').classList;assert.equal(chip.contains('state-active')||chip.contains('state-error')||chip.contains('state-paused'),false,st+' is neutral, never green/red/orange');assert.ok(chip.contains('state-neutral'),st+' uses the neutral class');}
+snapshot.sessions[0].state='paused';vm.runInContext('render(snapshot,true)',ctx);assert.ok(document.querySelector('#sessions .session-collection-state').classList.contains('state-paused'),'state=paused is orange');
+snapshot.sessions[0].state='active';
+// Priorité d'état : rupture de source > pause.
+snapshot.sessions[0].enabled=false;snapshot.sessions[0].state='source_error';vm.runInContext('render(snapshot,true)',ctx);
+assert.ok(document.querySelector('#sessions .session-collection-state').classList.contains('state-error'),'source error wins over paused');
+assert.doesNotMatch(document.querySelector('#sessions .session-collection-state').textContent,/Paused/,'a source error is never labelled Paused');
+assert.doesNotMatch(document.querySelector('#sessions .session-top .status').textContent,/En pause/,'status label does not hide a source error');
+snapshot.sessions[0].enabled=true;snapshot.sessions[0].state='active';vm.runInContext('render(snapshot,true)',ctx);
+assert.ok(document.querySelector('#sessions .session-collection-state').classList.contains('state-active'),'active reading is green');
 if (deepLinkTest) {
   assert.equal(vm.runInContext('requestedSupervisorSession', ctx), 's1', 'deep link target session is s1');
   assert.equal(vm.runInContext('requestedSupervisorAlert', ctx), 'a1', 'deep link target alert is a1');

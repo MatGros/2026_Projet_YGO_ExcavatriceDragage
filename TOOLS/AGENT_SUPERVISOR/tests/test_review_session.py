@@ -195,3 +195,67 @@ def test_review_session_cli_encoding_cp1252():
     res = subprocess.run([sys.executable, review_session.__file__, "help"], capture_output=True, env=env)
     assert res.returncode == 0
     assert b"Agent Supervisor" in res.stdout
+
+
+def test_extract_candidate_files_detects_existing_file():
+    text = "Erreur dans TOOLS/AGENT_SUPERVISOR/scripts/review_session.py et faux/chemin/inexistant.txt"
+    files = review_session.extract_candidate_files(text)
+    assert "TOOLS/AGENT_SUPERVISOR/scripts/review_session.py" in files
+    assert "faux/chemin/inexistant.txt" not in files
+
+
+def test_fast_path_uses_summary_and_review():
+    fake_summary = {
+        "running": True,
+        "last_poll_at": "2026-11-10T01:00:00Z",
+        "sessions": [
+            {
+                "id": "s_fast",
+                "native_id": "test-uuid-fast",
+                "alias": "Test Fast",
+                "platform": "agy",
+                "enabled": True,
+                "state": "active",
+                "counts": {"closed": 5, "open": 1}
+            }
+        ]
+    }
+    fake_review_alerts = [
+        {
+            "id": "a_fast_1",
+            "severity": "warning",
+            "reason": "Test de preuve rapide",
+            "evidence": "Voir TOOLS/AGENT_SUPERVISOR/scripts/review_session.py",
+            "created_at": "2026-11-10T01:01:00Z",
+            "version": 1
+        }
+    ]
+    with patch("TOOLS.AGENT_SUPERVISOR.scripts.review_session.fetch_summary", return_value=fake_summary), \
+         patch("TOOLS.AGENT_SUPERVISOR.scripts.review_session.fetch_session_review", return_value=(fake_summary["sessions"][0], fake_review_alerts)):
+        out = review_session.run_review(session_id="test-uuid-fast")
+        assert "Point prioritaire [1/1]" in out
+        assert "Test de preuve rapide" in out
+        assert "Pistes déterministes détectées" in out
+        assert "TOOLS/AGENT_SUPERVISOR/scripts/review_session.py" in out
+        assert "[CONSTAT]" in out
+        assert "[PREUVE BRUTE]" in out
+        assert "[VERDICT]" in out
+
+
+def test_skills_sha256_parity():
+    """Garde-fou T429 Lot 3 : vérifie la parité stricte des 3 copies de review-session-supervisor/SKILL.md."""
+    import hashlib
+    from pathlib import Path
+    paths = [
+        ".claude/skills/review-session-supervisor/SKILL.md",
+        ".agents/skills/review-session-supervisor/SKILL.md",
+        ".dsh/skills/review-session-supervisor/SKILL.md",
+    ]
+    hashes = []
+    for p in paths:
+        path_obj = Path(p)
+        assert path_obj.exists(), f"Skill file {p} must exist"
+        hashes.append(hashlib.sha256(path_obj.read_bytes()).hexdigest())
+    assert len(set(hashes)) == 1, f"Skill files must have identical SHA256 hashes: {hashes}"
+
+

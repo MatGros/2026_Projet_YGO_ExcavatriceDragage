@@ -114,10 +114,19 @@ function activate(context, vscodeApi) {
 
   function pollInterval() {
     const configured = Number(vscode.workspace.getConfiguration('veilleur').get('pollSeconds', 8));
-    return Number.isInteger(configured) ? Math.min(60, Math.max(5, configured)) : 8;
+    // Poll before a 60-second system_test can expire, including legacy 60s settings.
+    return Number.isInteger(configured) ? Math.min(30, Math.max(5, configured)) : 8;
   }
 
   function notifyFindings(events) {
+    if (!events.length) return;
+    for (const event of events.filter(({ alert, kind }) => alert.category === 'system_test' && kind === 'new')) {
+      const action = 'Ouvrir le constat';
+      Promise.resolve(vscode.window.showWarningMessage(event.alert.reason, action))
+        .then((choice) => choice === action ? openTarget(event.session.id, event.alert.id) : undefined)
+        .catch(() => {});
+    }
+    events = events.filter(({ alert }) => alert.category !== 'system_test');
     if (!events.length) return;
     const alarmCount = events.filter(({ alert }) => alert.severity === 'error' || alert.severity === 'alarm').length;
     const severity = alarmCount ? 'alarm' : 'warning';
@@ -158,15 +167,16 @@ function activate(context, vscodeApi) {
         lastSuccessAt = new Date();
         updateStatus(true);
         if (known === null) {
-          known = changedFindings({}, summary).known;
+          const initial = changedFindings({}, summary);
+          known = initial.known;
           await context.globalState.update(`${STATE_KEY}.${servicePort}`, known);
+          notifyFindings(initial.events.filter(({ alert }) => alert.category === 'system_test'));
         } else {
           const changes = changedFindings(known, summary);
           known = changes.known;
           await context.globalState.update(`${STATE_KEY}.${servicePort}`, known);
-          if (vscode.workspace.getConfiguration('veilleur').get('notifications', true)) {
-            notifyFindings(changes.events);
-          }
+          notifyFindings(changes.events.filter(({ alert }) => alert.category === 'system_test'
+            || vscode.workspace.getConfiguration('veilleur').get('notifications', true)));
         }
         return true;
       } catch (error) {

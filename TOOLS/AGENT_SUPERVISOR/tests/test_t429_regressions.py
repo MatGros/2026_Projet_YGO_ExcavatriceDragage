@@ -12,6 +12,118 @@ from TOOLS.AGENT_SUPERVISOR.scripts.supervisor_service import Supervisor, bounde
 EVIDENCE = 'Lot validé et enregistré.'
 
 
+def test_lot2_notification_is_local_and_excluded_from_real_judge_batches(tmp_path):
+    observed = []
+    def judge(model, messages):
+        observed.append(json.loads(json.dumps(messages)))
+        return alerting_judge()(model, messages)
+    svc, source, sid = service(tmp_path, judge)
+    try:
+        svc.command({'action': 'start'})
+        write(source, 'assistant', EVIDENCE)
+        wait(lambda: bool(svc.sessions[sid]['alerts']))
+        result = svc.command({'action': 'test_notification', 'id': sid})
+        alert = next(a for a in result['sessions'][0]['alerts'] if a['category'] == 'system_test')
+        assert alert['id'].startswith('test-notif-')
+        assert alert['disposition'] == alert['business_state'] == 'new'
+        assert 59 < alert['expires_at'] - time.time() <= 60
+        svc.command({'action': 'comment_alert', 'id': sid, 'alert_id': alert['id'],
+                     'comment': 'SENTINEL_TEST_COMMENT', 'review': False})
+        before = len(observed)
+        write(source, 'user', 'Réexaminer les preuves de la mission.')
+        wait(lambda: len(observed) > before)
+        batch = json.dumps(observed[-1], ensure_ascii=False)
+        assert 'Alertes précédentes' in batch
+        assert alert['id'] not in batch and '[TEST]' not in batch and 'SENTINEL_TEST_COMMENT' not in batch
+        assert not svc._agent_queue
+        with pytest.raises(ValueError, match='envoi agent interdit'):
+            svc._queue_agent_turn(svc.sessions[sid], svc.sessions[sid]['alerts'][-1], 'initial', 'test')
+        with pytest.raises(ValueError):
+            svc.command({'action': 'test_notification', 'id': sid, 'severity': 'invalid'})
+    finally:
+        svc.close()
+
+
+def test_lot2_notification_expiry_survives_restart_while_stopped(tmp_path):
+    svc, _source, sid = service(tmp_path)
+    svc.command({'action': 'test_notification', 'id': sid, 'severity': 'alarm'})
+    svc.sessions[sid]['alerts'][-1]['expires_at'] = time.time() - 1
+    svc._persist()
+    svc.close()
+    restored = Supervisor(tmp_path / 'state.json')
+    try:
+        alert = restored.snapshot()['sessions'][0]['alerts'][-1]
+        assert alert['disposition'] == 'resolved' and alert['business_state'] == 'closed'
+        assert restored.notification_snapshot()['counts']['follow_up'] == 0
+        assert not restored._agent_queue
+    finally:
+        restored.close()
+
+
+def test_lot2_review_real_http_loaded_session(capsys):
+    import tempfile
+    import threading
+    import urllib.request
+    from TOOLS.AGENT_SUPERVISOR.scripts.supervisor_server import create_server
+    with tempfile.TemporaryDirectory(prefix='t429-lot2-') as folder:
+        server = create_server(port=0, state_path=Path(folder) / 'state.json')
+        svc = server.supervision
+        root = Path(folder) / 'sources'; root.mkdir()
+        source = root / 'session-a.jsonl'; source.touch()
+        svc.roots = {'claude': [root]}
+        sid = svc.command({'action': 'add', 'platform': 'claude', 'native_id': 'session-a',
+                           'mission': 'Mission'})['sessions'][0]['id']
+        for _ in range(80):
+            svc.command({'action': 'test_notification', 'id': sid})
+        for index, alert in enumerate(svc.sessions[sid]['alerts']):
+            alert.update(category='review_fixture', evidence=f'Citation {index} ' + 'é' * 600)
+        # Unrelated transcript history must not be copied into the response.
+        svc.sessions[sid]['context'] = [{'role': 'tool', 'text': 'HISTORY' * 150000}]
+        closed = dict(svc.sessions[sid]['alerts'][0], id='closed-fixture', disposition='resolved')
+        svc.sessions[sid]['alerts'].append(closed)
+        thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
+        base = f'http://127.0.0.1:{server.server_port}'
+        seen, sizes, timings, network_timings = [], [], [], []
+        offset = 0
+        revision = None
+        try:
+            while True:
+                started = time.perf_counter()
+                projection = svc.review_snapshot(sid, offset, revision)
+                timings.append((time.perf_counter() - started) * 1000)
+                suffix = f'&revision={revision}' if revision else ''
+                network_started = time.perf_counter()
+                with urllib.request.urlopen(f'{base}/api/supervision/review?session={sid}&offset={offset}{suffix}') as response:
+                    raw = response.read()
+                    assert int(response.headers['Content-Length']) == len(raw)
+                network_timings.append((time.perf_counter() - network_started) * 1000)
+                sizes.append(len(raw))
+                page = json.loads(raw)
+                assert page == projection
+                assert page['counts']['closed'] == 1 and page['total'] == 80
+                assert b'HISTORY' not in raw
+                for alert in page['alerts']:
+                    seen.append(alert['id'])
+                    assert len(alert['evidence']) > 600
+                if page['next_offset'] is None:
+                    break
+                offset = page['next_offset']
+                revision = page['revision']
+            assert len(seen) == len(set(seen)) == 80
+            assert max(sizes) < 30000 and max(timings) < 50 and max(network_timings) < 50
+            print(f'LOT2 HTTP: pages={len(sizes)}, bytes={sizes}, server_ms={timings}, network_ms={network_timings}')
+            first = svc.review_snapshot(sid)
+            svc.sessions[sid]['alerts'][0]['disposition'] = 'resolved'
+            with pytest.raises(ValueError, match='Revue modifiee'):
+                svc.review_snapshot(sid, first['next_offset'], first['revision'])
+            svc.sessions[sid]['alerts'][0]['disposition'] = 'new'
+            svc.sessions[sid]['alerts'][0]['evidence'] = 'é' * 40000
+            with pytest.raises(ValueError, match='trop volumineux'):
+                svc.review_snapshot(sid)
+        finally:
+            server.shutdown(); thread.join(); server.server_close(); svc.close()
+
+
 def wait(predicate, timeout=4):
     end = time.monotonic() + timeout
     while time.monotonic() < end:
