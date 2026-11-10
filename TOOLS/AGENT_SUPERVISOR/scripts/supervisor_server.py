@@ -161,11 +161,15 @@ def main():
     args = parser.parse_args()
     server = create_server(args.port, args.state)
     server.supervision.command({'action': 'start'})
-    print(f'Veilleur: http://127.0.0.1:{server.server_port}/')
+    print(f'Veilleur: http://127.0.0.1:{server.server_port}/', flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
+    except Exception:
+        import traceback
+        traceback.print_exc()
+        raise
     finally:
         server.supervision.close()
         server.server_close()

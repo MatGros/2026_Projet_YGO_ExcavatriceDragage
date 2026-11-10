@@ -552,6 +552,8 @@ class Supervisor:
                 session["acquired_proofs"] = value.get("acquired_proofs", [])
                 session["session_journal"] = value.get("session_journal", [])
                 session["judge_turn_count"] = self._nonnegative_int(value.get("judge_turn_count", 0), "judge_turn_count")
+                session["recent_raw_events"] = []
+                session["dropped_events"] = []
                 if not isinstance(session["events"], list) or not isinstance(session["framing"], list):
                     raise ValueError("Journal de session invalide")
                 self.sessions[sid]["exchange_path"] = str(self._note_path(sid))
@@ -1027,7 +1029,30 @@ class Supervisor:
                     last_event=None, last_analysis=None, analysis_state="waiting" if mission else "context_required", analysis_error=None,
                     alerts=[], events=[], framing=[], acquired_proofs=[], session_journal=[], judge_turn_count=0, watcher=None, context=[], generation=0, judge_request=None, judge_proposal=None,
                     source_checkpoint=None, source_generation=str(uuid.uuid4()), source_event_index=0, context_revision=0, analyzed_revision=0, recovery=dict(status="none"),
-                    exchange_path=None, exchange_error=None, exchange_saved_at=None)
+                    exchange_path=None, exchange_error=None, exchange_saved_at=None,
+                    recent_raw_events=[], dropped_events=[])
+
+    @staticmethod
+    def _watcher_telemetry(session):
+        source = session.get("source")
+        checkpoint = session.get("source_checkpoint") or {}
+        offset = checkpoint.get("offset", 0) if isinstance(checkpoint, dict) else 0
+        file_size = 0
+        if source:
+            try:
+                file_size = Path(source).stat().st_size
+            except OSError:
+                file_size = 0
+        read_pct = round((offset / file_size * 100), 1) if (file_size > 0 and offset <= file_size) else 100.0 if file_size == 0 else 100.0
+        return {
+            "path": source or "non résolue",
+            "file_size_bytes": file_size,
+            "offset_bytes": offset,
+            "read_pct": read_pct,
+            "source_event_index": session.get("source_event_index", 0),
+            "last_event": session.get("last_event"),
+            "state": session.get("state")
+        }
 
     def _persist(self):
         if self.load_error:
@@ -1118,6 +1143,9 @@ class Supervisor:
                     item["recovery"]["can_catch_up"] = True
                 if session["recovery"].get("status") in ("unverified", "too_large"):
                     item["recovery"]["can_catch_up"] = False
+                item["watcher_telemetry"] = self._watcher_telemetry(session)
+                item["recent_raw_events"] = session.get("recent_raw_events", [])[-15:]
+                item["dropped_events"] = session.get("dropped_events", [])[-15:]
             for item in public:
                 item['chat_messages'] = self._chat_histories.get(item['id'], [])
             # Copy nested alerts; callers cannot alter internal state.
@@ -1153,7 +1181,7 @@ class Supervisor:
 
     def command(self, command):
         with self._lock:
-            if command.get("action") not in ("test_notification", "set_mission_structure", "comment_alert", "configure", "add", "pause", "resume", "retry_recovery", "remove", "set_mission", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
+            if command.get("action") not in ("test_notification", "set_mission_structure", "comment_alert", "configure", "add", "pause", "resume", "resume_all", "retry_recovery", "remove", "set_mission", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
                 return self._command(command)
             backup = (copy.deepcopy(self.sessions), self.model, self.allow_cloud,
                       self._epoch, deque(self._queue), set(self._queued), copy.deepcopy(self._chat_state), self._chat_epoch, self._chat_pending, copy.deepcopy(self._chat_histories), deque(self._agent_queue))
@@ -1283,6 +1311,22 @@ class Supervisor:
                 self.sessions[sid] = session
                 self._persist()
                 self._write_note(self.sessions[sid])
+            elif action == "resume_all":
+                mode = command.get("mode")
+                resumed = []
+                for sid, session in list(self.sessions.items()):
+                    if session.get("enabled") is False or session.get("state") == "paused":
+                        try:
+                            rec_status = session.get("recovery", {}).get("status")
+                            session_mode = mode if mode is not None else ("normal" if rec_status in ("gap_available", "unverified", "too_large") else None)
+                            self._resume_session(session, mode=session_mode)
+                            self._write_note(session)
+                            resumed.append(sid)
+                        except Exception:
+                            pass
+                self._persist()
+                self._wake.set()
+                return {"resumed": resumed, "count": len(resumed)}
             elif action in ("pause", "resume", "retry_recovery", "remove", "set_mission", "reassign"):
                 sid = command.get("id")
                 if sid not in self.sessions:
@@ -1550,6 +1594,22 @@ class Supervisor:
                 context += [{"role": m["role"], "text": m["text"]} for m in self._chat_state["messages"]]
                 self._chat_pending = (self._chat_epoch, self._epoch, selected, generation, self.model, self.allow_cloud, context)
                 self._chat_wake.set()
+            elif action == "poll_now":
+                sid = command.get("id")
+                if sid:
+                    session = self.sessions.get(sid)
+                    if session:
+                        session["_last_stamp"] = None
+                else:
+                    for s in self.sessions.values():
+                        s["_last_stamp"] = None
+                self._wake.set()
+            elif action == "set_poll_interval":
+                interval = command.get("interval")
+                if not isinstance(interval, (int, float)) or interval < 1.0 or interval > 60.0:
+                    raise ValueError("Intervalle de scan invalide (1 à 60s)")
+                self.poll_interval = float(interval)
+                self._wake.set()
             else:
                 raise ValueError("Action inconnue")
             self._wake.set()
@@ -1870,11 +1930,26 @@ class Supervisor:
             session["source_event_index"]=event_index+1
             self._confirm_peer_delivery(session, event)
             message = normalize(session["platform"], event)
+            raw_type = str(event.get("type") or "unknown")
+            raw_preview = str(event.get("content") or event.get("message") or event.get("payload") or "")[:120].strip()
+            # Ignorer les événements de métadonnées internes système d'AGY/IDE sans contenu textuel utile
+            if raw_type in ("bridge-session", "atis-latch", "session-owner", "mode", "agent-setting", "agent-name", "ai-title", "custom-title"):
+                session["system_events_skipped"] = session.get("system_events_skipped", 0) + 1
+                continue
             if not message or not message[1]:
+                drop_item = dict(event_index=event_index, timestamp=timestamp(), raw_type=raw_type, reason="type ou contenu non retenu", preview=raw_preview)
+                session.setdefault("dropped_events", []).append(drop_item)
+                session["dropped_events"] = session["dropped_events"][-15:]
+                session.setdefault("recent_raw_events", []).append(dict(event_index=event_index, status="dropped", role=None, raw_type=raw_type, reason="type non retenu", timestamp=timestamp(), preview=raw_preview))
+                session["recent_raw_events"] = session["recent_raw_events"][-15:]
                 continue
             role, text = message
             if self._supervision_message(session, role, text):
+                session.setdefault("recent_raw_events", []).append(dict(event_index=event_index, status="dropped", role=role, raw_type=raw_type, reason="supervision interne", timestamp=timestamp(), preview=text[:120].strip()))
+                session["recent_raw_events"] = session["recent_raw_events"][-15:]
                 continue
+            session.setdefault("recent_raw_events", []).append(dict(event_index=event_index, status="kept", role=role, raw_type=raw_type, reason=None, timestamp=timestamp(), preview=text[:120].strip()))
+            session["recent_raw_events"] = session["recent_raw_events"][-15:]
             if role == "user":
                 pending = self._pending_choice(session)
                 parsed_choice = parse_user_choice(text) if pending else None
