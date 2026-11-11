@@ -82,7 +82,7 @@ def main():
         raise RuntimeError('Migration automatique disponible uniquement sous Windows')
     health, current = get('/health'), get('/api/supervision')
     if health.get('service') != 'agent-supervisor' or not (health.get('version') == 1 or health.get('service_version') == 2):
-        raise RuntimeError('Le service actif n’est pas un Veilleur reconnu')
+        raise RuntimeError('Le service actif n’est pas un Superviseur reconnu')
     if health.get('default_storage') is False:
         raise RuntimeError('Stockage personnalisé : migration automatique refusée')
     sessions = current.get('sessions', [])
@@ -94,7 +94,7 @@ def main():
     previous = {s['id']: {'state':s['state'], 'source':s.get('source'), 'stamp':source_stamp(s.get('source'))} for s in sessions}
     pid = listener_pid()
     token = current['token']
-    print('Serveur Veilleur identifié ; arrêt de sa collecte avant sauvegarde.', flush=True)
+    print('Serveur Superviseur identifié ; arrêt de sa collecte avant sauvegarde.', flush=True)
     post(token, {'action':'stop'})
     RECOVERY.update(stopped=True, pid=pid, token=token, was_running=was_running)
     frozen = get('/api/supervision')
@@ -204,7 +204,7 @@ if __name__ == '__main__':
             try:
                 if listener_pid() == RECOVERY['pid']:
                     post(RECOVERY['token'], {'action':'start'})
-                    print('Ancien Veilleur relancé. Vérifiez les messages reçus pendant l’interruption.', file=sys.stderr, flush=True)
+                    print('Ancien Superviseur relancé. Vérifiez les messages reçus pendant l’interruption.', file=sys.stderr, flush=True)
             except Exception as recovery_error:
-                print(f'Reprise de l’ancien Veilleur non confirmée : {recovery_error}', file=sys.stderr, flush=True)
+                print(f'Reprise de l’ancien Superviseur non confirmée : {recovery_error}', file=sys.stderr, flush=True)
         sys.exit(1)

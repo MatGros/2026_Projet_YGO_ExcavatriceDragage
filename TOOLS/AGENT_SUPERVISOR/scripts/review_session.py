@@ -1,6 +1,6 @@
 """Script client de revue de session pour la commande /review-session-supervisor (T429).
 
-Interroge le serveur Veilleur local (port 8082) en mode PULL, résout la session active
+Interroge le serveur Superviseur local (port 8082) en mode PULL, résout la session active
 de manière fail-closed, sélectionne le constat prioritaire (ou selon filtre), et formate
 le texte d'injection pour l'agent dans le tour de chat courant.
 """
@@ -21,7 +21,7 @@ if hasattr(sys.stdout, "reconfigure"):
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
-DEFAULT_PORT = 8082
+DEFAULT_PORT = int(os.environ.get("SUPERVISOR_PORT") or os.environ.get("VEILLEUR_PORT", "8082"))
 
 
 def help_text() -> str:
@@ -48,10 +48,10 @@ def fetch_supervision_state(port: int = DEFAULT_PORT) -> dict:
         with urllib.request.urlopen(req, timeout=5) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
-        raise RuntimeError(f"🔴 Supervisor — Erreur HTTP {exc.code} retournée par le Veilleur sur 127.0.0.1:{port}.") from exc
+        raise RuntimeError(f"🔴 Supervisor — Erreur HTTP {exc.code} retournée par le Superviseur sur 127.0.0.1:{port}.") from exc
     except urllib.error.URLError as exc:
         raise ConnectionError(f"🔴 Supervisor — Service local injoignable sur 127.0.0.1:{port}.\n"
-                              f"Vérifiez que le serveur Veilleur est démarré :\n"
+                              f"Vérifiez que le serveur Superviseur est démarré :\n"
                               f"  py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/supervisor_server.py --port {port}") from exc
 
 
@@ -144,7 +144,7 @@ def resolve_session(sessions: list[dict], requested_id: str | None = None) -> tu
     active_sessions = [s for s in sessions if s.get("enabled") is not False and s.get("state") not in ("stopped",)]
     if not active_sessions:
         if not sessions:
-            return None, "ℹ️ Aucune session n'est enregistrée dans le Veilleur."
+            return None, "ℹ️ Aucune session n'est enregistrée dans le Superviseur."
         return None, "ℹ️ Aucune session active n'est enregistrée (toutes les sessions sont en pause ou arrêtées)."
 
     if len(active_sessions) == 1:
@@ -166,7 +166,7 @@ def resolve_session(sessions: list[dict], requested_id: str | None = None) -> tu
 
     # Ambiguïté non résolue -> FAIL-CLOSED immédiat
     lines = [
-        "⚠️ Supervisor — Session ambiguë : plusieurs sessions actives détectées sur le Veilleur.",
+        "⚠️ Supervisor — Session ambiguë : plusieurs sessions actives détectées sur le Superviseur.",
         "Précisez l'identifiant de session avec l'option --session :\n"
     ]
     for s in active_sessions:
@@ -225,7 +225,7 @@ def format_single_finding(alert: dict, session: dict, index: int, total_open: in
         "1. [CONSTAT] : Analyse factuelle en 2 lignes (sans paraphrase verbeuse).",
         "2. [PREUVE BRUTE] : Exécution de l'outil approprié et citation du résultat brut vérifiable.",
         "3. [VERDICT] : Confirmé / Contesté / Résolu avec preuve.",
-        "- Une simple affirmation textuelle sans résultat d'outil sera jugée « Avis incertain » par le Veilleur.",
+        "- Une simple affirmation textuelle sans résultat d'outil sera jugée « Avis incertain » par le Superviseur.",
     ])
 
     if remaining_count > 0:
@@ -265,7 +265,7 @@ def format_all_findings(alerts: list[dict], session: dict) -> str:
         "  1. [CONSTAT i/N] : Résumé factuel.",
         "  2. [PREUVE BRUTE] : Exécution d'outil obligatoire pour faire figurer la preuve dans le transcript.",
         "  3. [VERDICT] : Confirmé / Contesté / Résolu.",
-        "Rappel : Cette commande est consultative. Aucun statut n'est clos automatiquement dans le Veilleur."
+        "Rappel : Cette commande est consultative. Aucun statut n'est clos automatiquement dans le Superviseur."
     ])
 
     return "\n".join(lines)
@@ -365,7 +365,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, add_help=False)
     parser.add_argument("filter", nargs="?", default=None, help="Filtre (help, all, alarm, warning, numéro, ou ID court)")
     parser.add_argument("--session", "-s", dest="session_id", default=None, help="UUID de session spécifique")
-    parser.add_argument("--port", "-p", type=int, default=DEFAULT_PORT, help="Port du Veilleur (défaut 8082)")
+    parser.add_argument("--port", "-p", type=int, default=DEFAULT_PORT, help="Port du Superviseur (défaut 8082, variable SUPERVISOR_PORT ou VEILLEUR_PORT)")
     parser.add_argument("--help", "-h", action="store_true", help="Afficher l'aide")
 
     args = parser.parse_args()

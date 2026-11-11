@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-🛡️ SPECIALIST SUPERVISOR RUNNER — Passerelle Spécialistes & Veilleur
+🛡️ SPECIALIST SUPERVISOR RUNNER — Passerelle Spécialistes & Superviseur
 =====================================================================
 Permet à l'agent superviseur (ou à l'opérateur via la commande /ask-specialist-supervisor)
-d'interroger un persona spécialisé tout en préservant le contexte du Veilleur.
+d'interroger un persona spécialisé tout en préservant le contexte du Superviseur.
 
 Rôles supportés :
   - safety    : FB_Agent_Safety (Sécurité machine ISO 13849, AU, anti-chute, mou de câble)
@@ -69,7 +69,7 @@ def main():
         print("Erreur : --role requis (ex: --role safety). Tapez --list-roles pour voir la liste.")
         sys.exit(1)
 
-    print(f"\n[VEILLEUR · SUPERVISOR] Invocateur Spécialiste : {args.role.upper()}")
+    print(f"\n[SUPERVISOR] Invocateur Spécialiste : {args.role.upper()}")
     exit_code = query_specialist(role=args.role, targets=args.target, prompt=args.prompt,
                                  task_id=args.task, output_file=args.output, model=args.model)
     sys.exit(exit_code)

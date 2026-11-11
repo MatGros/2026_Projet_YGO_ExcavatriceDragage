@@ -1,17 +1,17 @@
 ---
 name: connect-session-supervisor
-description: Connecte explicitement la conversation CLI courante au Veilleur local.
+description: Connecte explicitement la conversation CLI courante au Superviseur local.
 user-invocable: true
 disable-model-invocation: true
 ---
 
-# Connecter cette session au Veilleur
+# Connecter cette session au Superviseur
 
 Cette commande `/connect-session-supervisor` ne transmet aucun message à l’agent surveillé et ne crée aucune tâche.
 
 1. Vérifie si une tâche formelle unique est identifiable dans le contexte ou le Task Manager. N’invente pas un ID, un verrou, un contrat ni un état. Si la tâche ou son support n’est pas vérifiable, dis-le en une phrase, rappelle le risque d’un travail sans cadrage et demande à l’utilisateur s’il confirme un suivi sans tâche formelle. Attends sa réponse avant d’appeler le script. Une session peut être surveillée sans tâche seulement après cette confirmation explicite.
 2. Utilise l’identifiant natif exact de la conversation courante fourni par l’environnement Claude Code (`CLAUDE_CODE_SESSION_ID`) ou déjà présent dans les métadonnées fiables du runtime. Ne cherche jamais la session la plus récente. Refuse un identifiant `session_…` de claude.ai.
-3. L'alias DOIT respecter strictement la convention canonique : `TXXX[-X]-AGENT Désignation courte` (ex: `T429-CC01 Fiabilisation Veilleur`, `T428-1-CC01 Cartes de flux`). Prépare une mission courte et fidèle au cadrage courant ; une seule session active correspond à une seule tâche. Si la tâche est déjà suivie dans le Veilleur par une session en pause (passage de relais / reprise), demande confirmation à l'utilisateur avant de transférer l'écoute, puis ajoute `--reassign`.
+3. L'alias DOIT respecter strictement la convention canonique : `TXXX[-X]-AGENT Désignation courte` (ex: `T429-CC01 Fiabilisation Superviseur`, `T428-1-CC01 Cartes de flux`). Prépare une mission courte et fidèle au cadrage courant ; une seule session active correspond à une seule tâche. Si la tâche est déjà suivie dans le Superviseur par une session en pause (passage de relais / reprise), demande confirmation à l'utilisateur avant de transférer l'écoute, puis ajoute `--reassign`.
 4. Depuis la racine du dépôt, appelle le client local avec PowerShell :
 
 ```powershell
@@ -22,4 +22,4 @@ Le client lit `CLAUDE_CODE_SESSION_ID` dans l’environnement du shell d’outil
 Si l’utilisateur a confirmé le suivi sans tâche formelle, ajoute `--confirm-without-task` ; sinon, le script le refuse.
 5. Ne réessaie pas en changeant d’ID si l’API refuse. Rapporte le résultat JSON, l’alias, l’ID exact et l’état (`attached`, `already_assigned` ou erreur). Une affectation en pause doit être reprise dans l’interface.
 
-Le client n’accepte que l’API Veilleur locale `127.0.0.1:8082`, exige une source unique et n’envoie pas le transcript lors du rattachement. Le service lit ensuite uniquement les nouveaux événements. Le partage du texte avec un modèle reste contrôlé séparément par le réglage de consentement cloud.
+Le client n’accepte que l’API Superviseur locale `127.0.0.1:8082`, exige une source unique et n’envoie pas le transcript lors du rattachement. Le service lit ensuite uniquement les nouveaux événements. Le partage du texte avec un modèle reste contrôlé séparément par le réglage de consentement cloud.

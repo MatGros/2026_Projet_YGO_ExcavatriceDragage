@@ -1,4 +1,4 @@
-"""Loopback-only standalone Veilleur server. No Task Manager dependency."""
+"""Loopback-only standalone Supervisor server. No Task Manager dependency."""
 import argparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -161,7 +161,7 @@ def main():
     args = parser.parse_args()
     server = create_server(args.port, args.state)
     server.supervision.command({'action': 'start'})
-    print(f'Veilleur: http://127.0.0.1:{server.server_port}/', flush=True)
+    print(f'Supervisor: http://127.0.0.1:{server.server_port}/', flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
