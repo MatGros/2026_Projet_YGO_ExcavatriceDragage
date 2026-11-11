@@ -168,16 +168,16 @@ Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force
 Cette voie configure **le CLI Claude Code**, indépendamment de la route OpenAI-compatible utilisée par DSH et `omniroute_subagent.py`.
 
 - **Modèle OmniRoute** : `agy/gemini-3.8-flash-tiered`
-- **Serveur** : `http://localhost:20128`
+- **Serveur** : `http://127.0.0.1:20128` (loopback uniquement)
 - **Protocole côté Claude Code** : Anthropic Messages API ; `ANTHROPIC_BASE_URL` reçoit la racine, sans suffixe `/v1`.
 - **Terminal Keeper** : session **Claude Code OmniRoute AGY (Gemini 3.8)** dans `.vscode/sessions.json`.
 
 Commande Windows (variables isolées au processus `cmd`, sans changer la configuration Claude habituelle) :
 
 ```cmd
-cmd /c "set ANTHROPIC_BASE_URL=http://localhost:20128&& set ANTHROPIC_AUTH_TOKEN=local-dev&& set ANTHROPIC_API_KEY=&& set ANTHROPIC_MODEL=agy/gemini-3.8-flash-tiered&& claude --model agy/gemini-3.8-flash-tiered"
+cmd /c "set ANTHROPIC_BASE_URL=http://127.0.0.1:20128&& set ANTHROPIC_AUTH_TOKEN=local-dev&& set ANTHROPIC_API_KEY=&& set ANTHROPIC_MODEL=agy/gemini-3.8-flash-tiered&& claude --model agy/gemini-3.8-flash-tiered"
 ```
 
 `local-dev` a été accepté pendant l’essai local. Si OmniRoute exige une authentification différente, remplacer ce jeton par le jeton d’accès local correspondant. Le lanceur `omniroute launch` est actuellement inutilisable avec l’installation Windows de Claude Code observée : il tente `claude.cmd`, absent lorsque seul `claude.exe` est installé.
 
-⚠️ Essai réel du 2026-11-11 : OmniRoute local 3.8.49 transmet la requête, mais AGY renvoie `This version of Antigravity is no longer supported`. Ce message est signalé pour OmniRoute <= 3.8.51, avec correction du fallback client en 3.8.52 ; mettre OmniRoute à jour au moins en 3.8.52 et redémarrer le serveur. Si le refus continue, vider **Cache > Clear Semantic Cache** dans le tableau de bord : le refus peut être stocké comme une réponse 200 ([issue OmniRoute #19619](https://github.com/cheaper-inference/OmniRoute/issues/19619)). `omniroute cache status` ne fournit pas de statistiques sur l’instance locale.
+Le terminal **OmniRoute Server** doit être démarré avant celui de Claude Code. Dans Terminal Keeper, il force `OMNIROUTE_SERVER_HOST=127.0.0.1`, pour limiter l'écoute à la machine locale. Test réel du 2026-11-11 avec OmniRoute 3.8.53 : la requête `PONG` a abouti. Claude Code affiche encore un avertissement de modèle inconnu (fenêtre supposée de 200k), sans bloquer l'appel.

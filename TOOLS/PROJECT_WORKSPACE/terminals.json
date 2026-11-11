@@ -56,10 +56,11 @@
       "color": "terminal.ansiGreen"
     },
     {
-      "name": "🌐 OmniRoute Server",
+      "name": "OmniRoute Server (archivé — géré par Terminal Keeper)",
       "cwd": "${workspaceFolder}",
       "command": "omniroute",
       "open": true,
+      "onlyAPI": true,
       "focus": false,
       "icon": "server",
       "color": "terminal.ansiBrightGreen"

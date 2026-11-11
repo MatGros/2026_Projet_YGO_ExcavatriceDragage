@@ -48,7 +48,7 @@
                 "icon": "server",
                 "color": "terminal.ansiBrightGreen",
                 "commands": [
-                    "omniroute"
+                    "cmd /c \"set OMNIROUTE_SERVER_HOST=127.0.0.1&& omniroute\""
                 ]
             },
             {
@@ -75,11 +75,20 @@
                 "icon": "code",
                 "color": "terminal.ansiBrightCyan",
                 "commands": [
-                    "cmd /c \"set ANTHROPIC_BASE_URL=http://localhost:20128&& set ANTHROPIC_AUTH_TOKEN=local-dev&& set ANTHROPIC_API_KEY=&& set ANTHROPIC_MODEL=agy/gemini-3.8-flash-tiered&& claude --model agy/gemini-3.8-flash-tiered\""
+                    "cmd /c \"set ANTHROPIC_BASE_URL=http://127.0.0.1:20128&& set ANTHROPIC_AUTH_TOKEN=local-dev&& set ANTHROPIC_API_KEY=&& set ANTHROPIC_MODEL=agy/gemini-3.8-flash-tiered&& claude --model agy/gemini-3.8-flash-tiered\""
                 ]
             }
         ],
         "disabled_terminals": [
+            {
+                "name": "OmniRoute Server (ancienne commande archivée)",
+                "autoExecuteCommands": true,
+                "icon": "server",
+                "color": "terminal.ansiBrightGreen",
+                "commands": [
+                    "omniroute"
+                ]
+            },
             {
                 "name": "OpenCode-Go (glm-5.2) - desactive",
                 "autoExecuteCommands": true,
