@@ -35,7 +35,7 @@ Cet environnement ouvre, dans le terminal intégré VS Code, huit onglets indép
 | **🧠 Claude Code** | `claude` | Agent Claude Code CLI dans le projet |
 | **Claude Code OmniRoute AGY** | Voir la commande détaillée ci-dessous | Claude Code via `agy/gemini-3.8-flash-tiered` |
 | **🔓 OpenCode** | `opencode --agent orchestrateur` | Interface OpenCode unique avec agents Orchestrateur, Codeur (`@codeur`) et Vérificateur (`@verificateur`) |
-| **🌐 OmniRoute Server** | `omniroute` | Serveur OmniRoute |
+| **🌐 OmniRoute Server** | `cmd /c "set OMNIROUTE_SERVER_HOST=127.0.0.1&& omniroute"` | Serveur local, limité à la machine |
 | **🤖 Codex (OpenAI)** | `codex` | Agent Codex CLI dans le projet |
 | **🦙 DSH (Ollama)** | `ollama launch dsh` | Agent DSH local via Ollama |
 
@@ -144,11 +144,11 @@ Vérifier que le fichier contient :
 Le terminal Terminal Keeper **Claude Code OmniRoute AGY (Gemini 3.8)** lance Claude Code avec le modèle `agy/gemini-3.8-flash-tiered` via le serveur OmniRoute local.
 
 ```cmd
-cmd /c "set ANTHROPIC_BASE_URL=http://localhost:20128&& set ANTHROPIC_AUTH_TOKEN=local-dev&& set ANTHROPIC_API_KEY=&& set ANTHROPIC_MODEL=agy/gemini-3.8-flash-tiered&& claude --model agy/gemini-3.8-flash-tiered"
+cmd /c "set ANTHROPIC_BASE_URL=http://127.0.0.1:20128&& set ANTHROPIC_AUTH_TOKEN=local-dev&& set ANTHROPIC_API_KEY=&& set ANTHROPIC_MODEL=agy/gemini-3.8-flash-tiered&& claude --model agy/gemini-3.8-flash-tiered"
 ```
 
-Les variables ne vivent que dans le processus `cmd` et ses enfants : le terminal Claude classique conserve sa configuration. L’URL est la racine OmniRoute, sans `/v1`, car Claude Code utilise le protocole Anthropic. Le `local-dev` est le jeton local accepté pendant l’essai ; si l’instance OmniRoute impose une clé, utiliser le jeton local configuré pour cette instance.
+Les variables ne vivent que dans le processus `cmd` et ses enfants : le terminal **Claude Code classique** conserve sa configuration. L’URL loopback est la racine OmniRoute, sans `/v1`, car Claude Code utilise le protocole Anthropic. Le `local-dev` est le jeton local accepté pendant l’essai ; si l’instance OmniRoute impose une clé, utiliser le jeton local configuré pour cette instance.
 
 Le raccourci `omniroute launch` échoue sur cette installation Windows en cherchant `claude.cmd` alors que Claude Code est installé comme `claude.exe` ; la commande ci-dessus lance directement `claude`.
 
-⚠️ Diagnostic du 2026-11-11 : OmniRoute local est en 3.8.49. Ce refus Antigravity est rapporté pour OmniRoute <= 3.8.51 ; le fallback de version client a été corrigé en 3.8.52. Mettre OmniRoute à jour au moins en 3.8.52 puis redémarrer le serveur. Si le refus persiste, vider **Cache > Clear Semantic Cache** dans le tableau de bord : OmniRoute peut avoir mis en cache le refus upstream comme réponse HTTP 200 ([issue OmniRoute #19619](https://github.com/cheaper-inference/OmniRoute/issues/19619)). Les stats du cache ne sont pas disponibles via le CLI local. OpenCode-Go (glm-5.2) est conservé dans `disabled_terminals` et peut être réactivé dans `.vscode/sessions.json`.
+Le terminal **OmniRoute Server** de Terminal Keeper est lié à `127.0.0.1` : il n'écoute pas sur le réseau local. Il démarre le serveur une seule fois avant **Claude Code OmniRoute AGY**. L'ancienne commande `omniroute` est archivée dans `disabled_terminals`; l'entrée du modèle Terminals Manager est masquée de ses commandes d'exécution (`onlyAPI: true`) pour éviter un second serveur. Test réel du 2026-11-11 après mise à jour vers OmniRoute 3.8.53 : Claude Code a reçu `PONG` de `agy/gemini-3.8-flash-tiered`. L'avertissement Claude Code « model isn't recognized » reste affiché, mais n'empêche pas la requête. OpenCode-Go (glm-5.2) est conservé dans `disabled_terminals` et peut être réactivé dans `.vscode/sessions.json`.
