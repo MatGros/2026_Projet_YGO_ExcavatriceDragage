@@ -582,7 +582,7 @@ Règles absolues :
  <div id="assignment-exchange">
   <button type="button" id="copy-agent-brief">Générer et copier le prompt</button>
   <label class="mission">Prompt à envoyer à l’agent<textarea id="assignment-prompt-preview" rows="7" readonly placeholder="Cliquez sur Générer et copier le prompt."></textarea></label>
-  <label class="mission">Réponse de l’agent<textarea id="assignment-response" maxlength="5000" rows="8" placeholder="Collez ici le bloc VEILLEUR_ASSIGN_V1 retourné par l’agent."></textarea></label>
+  <label class="mission">Réponse de l’agent<textarea id="assignment-response" maxlength="5000" rows="8" placeholder="Collez ici le bloc SUPERVISOR_ASSIGN_V1 (ou VEILLEUR_ASSIGN_V1) retourné par l’agent."></textarea></label>
   <button type="button" id="apply-agent-response">Préremplir la configuration depuis le retour</button>
  </div>
 </section>
@@ -877,13 +877,13 @@ function duplicateAssignmentJsonKey(json){
 }
 function parseAssignmentResponse(raw){
  const lines=raw.split(/\r?\n/),starts=[],ends=[];
- lines.forEach((line,index)=>{if(line.trim()==='VEILLEUR_ASSIGN_V1')starts.push(index);if(line.trim()==='END_VEILLEUR_ASSIGN_V1')ends.push(index);});
- if(starts.length!==1||ends.length!==1||ends[0]<=starts[0])throw Error('Bloc VEILLEUR_ASSIGN_V1 absent, dupliqué ou incomplet. Copiez une seule réponse structurée entière.');
+ lines.forEach((line,index)=>{const t=line.trim();if(t==='SUPERVISOR_ASSIGN_V1'||t==='VEILLEUR_ASSIGN_V1')starts.push(index);if(t==='END_SUPERVISOR_ASSIGN_V1'||t==='END_VEILLEUR_ASSIGN_V1')ends.push(index);});
+ if(starts.length!==1||ends.length!==1||ends[0]<=starts[0])throw Error('Bloc d’affectation absent, dupliqué ou incomplet (SUPERVISOR_ASSIGN_V1 ou VEILLEUR_ASSIGN_V1 attendu).');
  const allowed=new Set(['platform','native_id','alias','task','user_goal','current_step','scope_and_permissions','constraints','acceptance_criteria','evidence_observed','hypotheses_and_unknowns','next_step']);
  const fields={},payload=lines.slice(starts[0]+1,ends[0]).join('\n').trim();
  if(payload.startsWith('{')){
   const repaired=repairWrappedJson(payload);
-  let parsed;try{parsed=JSON.parse(repaired);}catch(_error){throw Error('JSON invalide dans le bloc VEILLEUR_ASSIGN_V1. Copiez le bloc complet sans modifier ses lignes.');}
+  let parsed;try{parsed=JSON.parse(repaired);}catch(_error){throw Error('JSON invalide dans le bloc d’affectation. Copiez le bloc complet sans modifier ses lignes.');}
   if(!parsed||Array.isArray(parsed)||typeof parsed!=='object')throw Error('Le bloc JSON doit contenir un objet.');
   const duplicate=duplicateAssignmentJsonKey(repaired);if(duplicate!==null)throw Error('Champ dupliqué dans le JSON : '+duplicate);
   for(const [key,value] of Object.entries(parsed)){if(!allowed.has(key))throw Error('Champ inconnu dans le JSON : '+key);if(typeof value!=='string')throw Error('Le champ '+key+' doit être une chaîne de texte.');fields[key]=value.trim();}

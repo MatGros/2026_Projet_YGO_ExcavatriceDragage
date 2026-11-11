@@ -1,13 +1,13 @@
 ---
 name: ask-specialist-supervisor
-description: Invoque un persona spécialisé certifié Veilleur (Safety, PLC, HMI, Testing, Standards, Challenger) en préservant le contexte du Superviseur.
+description: Invoque un persona spécialisé certifié (Safety, PLC, HMI, Testing, Standards, Challenger) en préservant le contexte du Superviseur.
 user-invocable: true
 disable-model-invocation: true
 ---
 
-# Invoquer un Spécialiste Veilleur (Préservation du Contexte Superviseur)
+# Invoquer un Spécialiste (Préservation du Contexte Superviseur)
 
-La commande `/ask-specialist-supervisor` permet au Veilleur ou à l'opérateur de solliciter une expertise pointue sans polluer ni saturer la fenêtre glissante des messages du Superviseur (`context_messages` et `context_chars`).
+La commande `/ask-specialist-supervisor` permet au Superviseur ou à l'opérateur de solliciter une expertise pointue sans polluer ni saturer la fenêtre glissante des messages du Superviseur (`context_messages` et `context_chars`).
 
 ### 1. Rôles Disponibles
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-🥊 CHALLENGE SUPERVISOR RUNNER — Passerelle Arène Dialectique & Veilleur
+🥊 CHALLENGE SUPERVISOR RUNNER — Passerelle Arène Dialectique & Superviseur
 ========================================================================
 Permet au superviseur ou à l'opérateur de lancer un challenge technique contradictoire :
   Étape 0 : Challenge & Cadrage préalable du Prompt (Anti-Garbage-In)
@@ -40,7 +40,7 @@ def main():
 
     args = parser.parse_args()
 
-    print("\n[VEILLEUR · SUPERVISOR] Session de Challenge Dialectique")
+    print("\n[SUPERVISOR] Session de Challenge Dialectique")
     if args.check_prompt:
         res = run_prompt_check(prompt=args.prompt, targets=args.target, model=args.model)
         if res:

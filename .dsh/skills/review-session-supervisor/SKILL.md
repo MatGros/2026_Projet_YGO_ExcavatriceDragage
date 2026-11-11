@@ -1,13 +1,13 @@
 ---
 name: review-session-supervisor
-description: Interroge le Veilleur local et examine le ou les constats ouverts pour la session courante (mode PULL).
+description: Interroge le Superviseur local et examine le ou les constats ouverts pour la session courante (mode PULL).
 user-invocable: true
 disable-model-invocation: true
 ---
 
-# Examiner les constats du Veilleur pour cette session
+# Examiner les constats du Superviseur pour cette session
 
-Cette commande `/review-session-supervisor` interroge l'API locale du Veilleur (`http://127.0.0.1:8082`) pour récupérer les constats et alertes en attente de traitement.
+Cette commande `/review-session-supervisor` interroge l'API locale du Superviseur (`http://127.0.0.1:8082`) pour récupérer les constats et alertes en attente de traitement.
 
 ### 1. Syntaxe et options
 
@@ -37,4 +37,4 @@ py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/review_session.py [arguments]
   1. `[CONSTAT]` : Résumé factuel en 2 lignes (pas de reformulation longue).
   2. `[PREUVE BRUTE]` : Exécuter l'outil idoine (`read_file`, commande git/test) et citer la sortie brute dans le transcript. Les pistes déterministes proposées par le script indiquent directement les fichiers à inspecter.
   3. `[VERDICT]` : `Confirmé` / `Contesté` / `Résolu avec preuve`.
-- **Aucune auto-clôture** : cette commande est consultative. Elle n'auto-clôture aucun constat dans le Veilleur. La résolution doit être confirmée par les preuves brutes.
+- **Aucune auto-clôture** : cette commande est consultative. Elle n'auto-clôture aucun constat dans le Superviseur. La résolution doit être confirmée par les preuves brutes.

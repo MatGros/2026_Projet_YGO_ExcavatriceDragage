@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Veilleur — supervision des agents</title>
+<title>Superviseur — supervision des agents</title>
 <style>
 :root{color-scheme:dark;--bg:#1e1e2e;--card:#282a36;--border:#44475a;--text:#f8f8f2;--muted:#a6adc8;--accent:#bd93f9;--cyan:#8be9fd;--orange:#ffb86c;--red:#ff5555}
 *{box-sizing:border-box}body{margin:0;padding:18px;background:var(--bg);color:var(--text);font:14px system-ui,sans-serif}main{max-width:1150px;margin:auto}header,.row,.session-top,.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}header{justify-content:space-between;border-bottom:2px solid var(--border);padding-bottom:12px}h1{font-size:21px;color:var(--accent);margin:0}h2{font-size:16px;margin:0 0 12px}a{color:var(--cyan)}p{line-height:1.5}small,.muted{color:var(--muted)}.panel,.session{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:14px}.row{align-items:end}label{display:flex;flex-direction:column;gap:5px}input,select,button{font:inherit;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text)}input:focus,select:focus,button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}button{cursor:pointer}button:hover{border-color:var(--accent)}button:disabled{opacity:.45;cursor:wait}.primary{border-color:var(--accent);color:var(--accent)}.grow{flex:1;min-width:220px}.check{display:flex;flex-direction:row;align-items:center;margin-top:10px}.check input{width:auto}.status{padding:4px 8px;border:1px solid var(--border);border-radius:20px;color:var(--cyan)}.warn{color:var(--orange)}.error{color:var(--red)}#connection-error{border:1px solid var(--red);padding:10px;border-radius:6px;margin-top:12px;white-space:pre-wrap}#notice{min-height:20px;color:var(--cyan);margin:10px 0}.session-top{justify-content:space-between}.session-name{font-size:16px;font-weight:650}.details{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;margin:12px 0}.details dt{color:var(--muted)}.details dd{margin:0;overflow-wrap:anywhere}.alerts{display:grid;gap:8px}.alert{border-left:3px solid var(--orange);padding:8px 12px;background:var(--bg)}.alert p{margin:3px 0;white-space:pre-wrap;overflow-wrap:anywhere}.evidence{color:var(--muted);font-size:12px}.actions{margin-top:12px}#empty{border:1px dashed var(--border);border-radius:10px;padding:25px;text-align:center;margin-top:14px}.hint{font-size:12px;color:var(--muted);margin:9px 0 0}#last-refresh{font-size:12px;color:var(--muted)}@media(max-width:600px){body{padding:10px}.details{grid-template-columns:1fr}.details dd{margin-bottom:5px}.row label{width:100%}.grow{min-width:0}}
@@ -19,7 +19,7 @@ fieldset.assignment-config legend,fieldset.assignment-context legend{padding:0 7
 </style>
 </head>
 <body><main>
-<header><h1>👁 Veilleur <span id="unread-count" class="badge">0 non lue</span></h1><a href="/TASK_VIEWER.html">← Task Viewer</a></header>
+<header><h1>👁 Superviseur <span id="unread-count" class="badge">0 non lue</span></h1><a href="/TASK_VIEWER.html">← Task Viewer</a></header>
 <p class="muted">Affectez une conversation précise. Le collecteur lit ses nouveaux messages ; le juge peut émettre une alerte consultative. Ce panneau ne pilote ni les terminaux ni la machine.</p>
 <div id="connection-error" role="alert" hidden></div>
 <section class="panel" aria-labelledby="service-heading">
@@ -53,7 +53,7 @@ fieldset.assignment-config legend,fieldset.assignment-context legend{padding:0 7
  <div id="assignment-exchange">
   <button type="button" id="copy-agent-brief">Générer et copier le prompt</button>
   <label class="mission">Prompt à envoyer à l’agent<textarea id="assignment-prompt-preview" rows="7" readonly placeholder="Cliquez sur Générer et copier le prompt."></textarea></label>
-  <label class="mission">Réponse de l’agent<textarea id="assignment-response" maxlength="5000" rows="8" placeholder="Collez ici le bloc VEILLEUR_ASSIGN_V1 retourné par l’agent."></textarea></label>
+  <label class="mission">Réponse de l’agent<textarea id="assignment-response" maxlength="5000" rows="8" placeholder="Collez ici le bloc SUPERVISOR_ASSIGN_V1 (ou VEILLEUR_ASSIGN_V1) retourné par l’agent."></textarea></label>
   <button type="button" id="apply-agent-response">Préremplir la configuration depuis le retour</button>
  </div>
 </section>
@@ -100,11 +100,13 @@ function detail(dl,label,value){dl.append(element('dt',label),element('dd',value
 function savePreferences(){try{localStorage.setItem('agent-supervision.notifications.v1',JSON.stringify(preferences));}catch(_error){}}
 function assignmentBrief(){
  const platform=byId('platform').value,alias=byId('alias').value.trim()||'à renseigner';
- return ['Tu es suivi en lecture seule par Veilleur. Retourne un bloc déclaratif que Task Viewer utilisera pour préremplir le CLI, l’ID, l’alias et la mission.','Plateforme sélectionnée dans Task Viewer : '+platform+'. Alias actuel (peut être remplacé) : '+alias+'.','Trouve l’ID exact de TA conversation courante uniquement dans les métadonnées de session auxquelles tu as réellement accès. Ne le déduis pas. Si tu ne peux pas le vérifier, écris inconnu.','Réponds uniquement par le bloc ci-dessous, en français, sans commentaire. Une ligne par champ, 1500 caractères maximum au total. Remplace les valeurs par tes informations ; utilise inconnu si nécessaire. Aucun secret. N’affirme pas qu’un test est réussi sans preuve réellement observée.','VEILLEUR_ASSIGN_V1','platform: '+platform,'native_id: inconnu','alias:','task:','user_goal:','current_step:','scope_and_permissions:','constraints:','acceptance_criteria:','evidence_observed:','hypotheses_and_unknowns:','next_step:','END_VEILLEUR_ASSIGN_V1'].join('\n');
+ return ['Tu es suivi en lecture seule par le Superviseur. Retourne un bloc déclaratif que Task Viewer utilisera pour préremplir le CLI, l’ID, l’alias et la mission.','Plateforme sélectionnée dans Task Viewer : '+platform+'. Alias actuel (peut être remplacé) : '+alias+'.','Trouve l’ID exact de TA conversation courante uniquement dans les métadonnées de session auxquelles tu as réellement accès. Ne le déduis pas. Si tu ne peux pas le vérifier, écris inconnu.','Réponds uniquement par le bloc ci-dessous, en français, sans commentaire. Une ligne par champ, 1500 caractères maximum au total. Remplace les valeurs par tes informations ; utilise inconnu si nécessaire. Aucun secret. N’affirme pas qu’un test est réussi sans preuve réellement observée.','VEILLEUR_ASSIGN_V1','platform: '+platform,'native_id: inconnu','alias:','task:','user_goal:','current_step:','scope_and_permissions:','constraints:','acceptance_criteria:','evidence_observed:','hypotheses_and_unknowns:','next_step:','END_VEILLEUR_ASSIGN_V1'].join('\n');
 }
 function parseAssignmentResponse(raw){
- const start='VEILLEUR_ASSIGN_V1',end='END_VEILLEUR_ASSIGN_V1',first=raw.indexOf(start),last=raw.indexOf(end);
- if(first<0||last<first)throw Error('Bloc VEILLEUR_ASSIGN_V1 absent ou incomplet. Copiez la réponse structurée entière.');
+ let start='SUPERVISOR_ASSIGN_V1',end='END_SUPERVISOR_ASSIGN_V1';
+ if(!raw.includes(start)){start='VEILLEUR_ASSIGN_V1';end='END_VEILLEUR_ASSIGN_V1';}
+ const first=raw.indexOf(start),last=raw.indexOf(end);
+ if(first<0||last<first)throw Error('Bloc d’affectation absent ou incomplet. Copiez la réponse structurée entière.');
  const allowed=new Set(['platform','native_id','alias','task','user_goal','current_step','scope_and_permissions','constraints','acceptance_criteria','evidence_observed','hypotheses_and_unknowns','next_step']);
  const fields={};
  for(const line of raw.slice(first+start.length,last).split(/\r?\n/)){

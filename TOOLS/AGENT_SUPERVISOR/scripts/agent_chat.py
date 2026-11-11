@@ -1,4 +1,4 @@
-"""Safe, exact-session chat turns for consultative Veilleur alerts.
+"""Safe, exact-session chat turns for consultative Supervisor alerts.
 
 These adapters append a bounded, tool-restricted turn to the observed session.
 They do not guarantee that an already-open terminal redraws in real time.

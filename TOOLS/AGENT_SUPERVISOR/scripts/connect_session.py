@@ -1,4 +1,4 @@
-"""Attach the current, explicitly identified CLI conversation to Veilleur."""
+"""Attach the current, explicitly identified CLI conversation to Supervisor."""
 from __future__ import annotations
 
 import argparse
@@ -61,7 +61,7 @@ def validate_alias(alias: str, *, confirm_without_task: bool = False) -> str:
     if not re.fullmatch(ALIAS_PATTERN, cleaned):
         raise ValueError(
             f"L'alias '{cleaned}' ne respecte pas la convention canonique 'TXXX[-X]-AGENT Désignation' "
-            "(ex: T429-AGY01 Fiabilisation Veilleur, T428-1-CDX01 Cartes de flux)"
+            "(ex: T429-AGY01 Fiabilisation Superviseur, T428-1-CDX01 Cartes de flux)"
         )
     return cleaned
 
@@ -76,7 +76,7 @@ def validate_local_base_url(value: str) -> str:
     if (parsed.scheme != "http" or parsed.hostname not in ("127.0.0.1", "localhost", "::1")
             or parsed.username or parsed.password or parsed.query or parsed.fragment
             or parsed.path not in ("", "/")):
-        raise ValueError("Le service Veilleur doit rester sur HTTP loopback local")
+        raise ValueError("Le service Superviseur doit rester sur HTTP loopback local")
     return value.rstrip("/")
 
 
@@ -175,7 +175,7 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
     base_url = validate_local_base_url(base_url)
     snapshot = api_json(base_url + "/api/supervision")
     if not snapshot.get("running"):
-        raise RuntimeError("Collecte Veilleur arrêtée : démarrez-la depuis Task Manager puis relancez /connect-session-supervisor")
+        raise RuntimeError("Collecte Superviseur arrêtée : démarrez-la depuis Task Manager puis relancez /connect-session-supervisor")
     existing = next((item for item in snapshot.get("sessions", [])
                      if item.get("platform") == platform and item.get("native_id") == session_id), None)
     if existing:

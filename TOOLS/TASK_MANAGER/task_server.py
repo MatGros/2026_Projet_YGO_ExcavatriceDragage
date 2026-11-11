@@ -60,7 +60,7 @@ def find_or_start_supervisor(port=8082, state_path=None):
         with urllib.request.urlopen(service.base + '/health', timeout=1) as response:
             data = json.load(response)
             if data.get('service') != 'agent-supervisor':
-                raise ValueError('Port Veilleur occupe par un autre service')
+                raise ValueError('Port Superviseur occupe par un autre service')
             return data
     try:
         info = health()
@@ -71,21 +71,21 @@ def find_or_start_supervisor(port=8082, state_path=None):
                 # The helper snapshots sessions and chat, and refuses a busy analysis.
                 helper = ROOT / 'TOOLS/AGENT_SUPERVISOR/scripts/upgrade_legacy.py'
                 try:
-                    print('Mise a jour du Veilleur : sauvegarde et reprise des sessions en cours...', flush=True)
+                    print('Mise a jour du Superviseur : sauvegarde et reprise des sessions en cours...', flush=True)
                     upgrade = subprocess.run([sys.executable, str(helper)], stderr=subprocess.PIPE, text=True,
                                              encoding='utf8', errors='replace',
                                              creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
                     if upgrade.returncode:
-                        service.notice = 'Veilleur conserve en fonctionnement ; mise a jour non appliquee : ' + (upgrade.stderr.strip() or 'etat actif')
+                        service.notice = 'Superviseur conserve en fonctionnement ; mise a jour non appliquee : ' + (upgrade.stderr.strip() or 'etat actif')
                     else:
                         updated = health()
-                        service.notice = ('Veilleur mis a jour avec sauvegarde de son etat.' if updated.get('update_available') is False
-                                          else 'Mise a jour du Veilleur non confirmee ; verifier son etat.')
+                        service.notice = ('Superviseur mis a jour avec sauvegarde de son etat.' if updated.get('update_available') is False
+                                          else 'Mise a jour du Superviseur non confirmee ; verifier son etat.')
                 except OSError as exc:
-                    service.notice = 'Mise a jour du Veilleur non confirmee : ' + type(exc).__name__
+                    service.notice = 'Mise a jour du Superviseur non confirmee : ' + type(exc).__name__
         return service
     except urllib.error.HTTPError as exc:
-        raise ValueError('Port Veilleur occupe par un autre service') from exc
+        raise ValueError('Port Superviseur occupe par un autre service') from exc
     except (urllib.error.URLError, ConnectionError, TimeoutError):
         script = ROOT / 'TOOLS/AGENT_SUPERVISOR/scripts/supervisor_server.py'
         args = [sys.executable, str(script), '--port', str(port)]
@@ -100,12 +100,12 @@ def find_or_start_supervisor(port=8082, state_path=None):
                 service.started_here = True
                 return service
             except urllib.error.HTTPError as exc:
-                raise ValueError('Port Veilleur occupe par un autre service') from exc
+                raise ValueError('Port Superviseur occupe par un autre service') from exc
             except (urllib.error.URLError, ConnectionError, TimeoutError):
                 if process.poll() is not None:
-                    raise OSError('Le service Veilleur ne peut pas demarrer')
+                    raise OSError('Le service Superviseur ne peut pas demarrer')
                 time.sleep(.1)
-        raise TimeoutError('Demarrage du service Veilleur non confirme')
+        raise TimeoutError('Demarrage du service Superviseur non confirme')
 
 
 def now() -> str:
@@ -546,9 +546,9 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
         return
     url = f"http://{HOST}:{port}/TASK_VIEWER.html"
     try:
-        supervisor_port = int(os.environ.get('VEILLEUR_PORT', '8082'))
+        supervisor_port = int(os.environ.get('SUPERVISOR_PORT') or os.environ.get('VEILLEUR_PORT', '8082'))
         if not 1 <= supervisor_port <= 65535:
-            raise ValueError('VEILLEUR_PORT doit etre compris entre 1 et 65535')
+            raise ValueError('SUPERVISOR_PORT (ou VEILLEUR_PORT) doit etre compris entre 1 et 65535')
         server.supervision = find_or_start_supervisor(supervisor_port)
         info = server.supervision.snapshot()
         version = info.get('service_version')
@@ -556,13 +556,13 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
         freshness = ('mise a jour : redemarrage necessaire' if info.get('update_available')
                      else 'a jour' if info.get('update_available') is False else 'version non verifiable')
         origin = 'demarre' if server.supervision.started_here else 'detecte'
-        print(f"Veilleur {origin} : {server.supervision.base}/ — {state}")
+        print(f"Superviseur {origin} : {server.supervision.base}/ — {state}")
         print(f"  -> Version : {version or 'historique'} · {info.get('build_id') or 'non identifiee'} · {freshness}")
         if server.supervision.notice:
             print(f"  -> {server.supervision.notice}")
     except (OSError, ValueError) as exc:
         server.supervision = None
-        print(f"Veilleur indisponible : {exc}")
+        print(f"Superviseur indisponible : {exc}")
     server.supervision_token = secrets.token_urlsafe(32)
     print(f"Task Manager local : {url}")
     print("  -> Ctrl+Clic sur le lien pour ouvrir Task Viewer dans votre navigateur.")

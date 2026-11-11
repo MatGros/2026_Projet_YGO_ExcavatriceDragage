@@ -1,11 +1,11 @@
 ---
 name: challenge-agent-supervisor
-description: Lance un challenge contradictoire (Étape 0 cadrage prompt, puis A vs B, puis arbitrage) certifié Veilleur en préservant le contexte du Superviseur.
+description: Lance un challenge contradictoire (Étape 0 cadrage prompt, puis A vs B, puis arbitrage) certifié en préservant le contexte du Superviseur.
 user-invocable: true
 disable-model-invocation: true
 ---
 
-# Lancer un Challenge Veilleur (Préservation du Contexte Superviseur)
+# Lancer un Challenge (Préservation du Contexte Superviseur)
 
 La commande `/challenge-agent-supervisor` soumet une idée, une architecture ou un choix technique à l'arène contradictoire sans saturer le contexte du Superviseur.
 

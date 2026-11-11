@@ -1,4 +1,4 @@
-"""Platform-specific transcript parsing behind the Veilleur poll contract."""
+"""Platform-specific transcript parsing behind the Supervisor poll contract."""
 from __future__ import annotations
 
 import re

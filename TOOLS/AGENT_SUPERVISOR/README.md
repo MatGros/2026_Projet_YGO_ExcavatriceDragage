@@ -14,14 +14,14 @@ py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/supervisor_server.py
 ```
 
 Ouvrir `http://127.0.0.1:8082/`. Le port est modifiable avec `--port 8092`.
-Task Manager détecte ou démarre le service sur 8082 ; définir `VEILLEUR_PORT=8092`
-avant son lancement pour utiliser le même autre port. Un verrou associé au fichier
+Task Manager détecte ou démarre le service sur 8082 ; définir `SUPERVISOR_PORT=8092`
+(ou `VEILLEUR_PORT=8092`) avant son lancement pour utiliser le même autre port. Un verrou associé au fichier
 d'état interdit à deux serveurs d'utiliser simultanément ce stockage. Un port occupé
 ou un verrou déjà pris empêche le démarrage, sans écraser la configuration.
-Task Manager affiche l'adresse du Veilleur, son origine (détecté ou démarré) et sa
+Task Manager affiche l'adresse du Superviseur, son origine (détecté ou démarré) et sa
 version au lancement. L'interface indique aussi si le code sur disque a changé depuis
-le lancement ; si une mise à jour est signalée, le processus Veilleur doit être redémarré
-pour la charger. Redémarrer uniquement Task Manager ne redémarre pas le Veilleur autonome.
+le lancement ; si une mise à jour est signalée, le processus Superviseur doit être redémarré
+pour la charger. Redémarrer uniquement Task Manager ne redémarre pas le Superviseur autonome.
 
 Pour isoler une installation ou un essai, le serveur accepte `--state <chemin>`.
 Le chemin historique par défaut est `%LOCALAPPDATA%/ExcavatriceDragage/agent-supervision.json`
@@ -55,7 +55,7 @@ n'est importé. Une réécriture ou troncature suspend le suivi comme pour les a
    sélectionner explicitement une ligne non ambiguë. La recherche ne lit que les noms
    et dates des fichiers et ne démarre pas le suivi.
 2. Variante : générer le prompt, le transmettre soi-même à l'agent et coller le bloc
-   `VEILLEUR_ASSIGN_V1` pour préremplir les champs. Le format attendu est un objet JSON ;
+   `SUPERVISOR_ASSIGN_V1` (ou `VEILLEUR_ASSIGN_V1`) pour préremplir les champs. Le format attendu est un objet JSON ;
    l'ancien format `clé: valeur` reste accepté. Un ID déclaré `inconnu` efface l'ancien ID :
    il faut saisir ou sélectionner le bon. Le résumé humain peut précéder le bloc.
    L'absence de référence de tâche formelle affiche un avertissement ; suivre une session
@@ -75,10 +75,10 @@ non vérifiée : leur ancien intervalle ne peut pas être reconstruit ; la repri
 un nouveau point de départ après confirmation.
 Une réécriture, troncature ou perte de source suspend le suivi ; les lots déjà enregistrés restent
 disponibles pour terminer ou réessayer leur analyse avant un rattachement normal.
-L'historique du chat Veilleur est conservé localement, séparément pour chaque session.
+L'historique du chat Superviseur est conservé localement, séparément pour chaque session.
 Le bouton **Voir / actualiser l'historique** lit sur demande les derniers messages du
 transcript de cette affectation, avec une limite de taille ; il n'envoie rien à l'agent.
-Le chat associé à une session parle au Veilleur au sujet de cette session ; Entrée envoie
+Le chat associé à une session parle au Superviseur au sujet de cette session ; Entrée envoie
 et Maj+Entrée insère une ligne. Les messages de ce chat peuvent être confidentiels.
 
 Le stockage local persiste le checkpoint, les 12 derniers messages observés (plafond de
@@ -148,7 +148,7 @@ Options disponibles :
 - `/review-session-supervisor <id_court>` : cible un constat par son préfixe hexadécimal (ex. `26fcd4`).
 - `/review-session-supervisor --session <UUID>` : force la session cible si ambiguïté.
 
-Cette commande interroge le service Veilleur local (`127.0.0.1:8082`) et insère le constat et sa consigne d'ingénierie directement dans le tour courant de l'agent. La commande est strictement **consultative** et n'auto-clôture aucun constat.
+Cette commande interroge le service Superviseur local (`127.0.0.1:8082`) et insère le constat et sa consigne d'ingénierie directement dans le tour courant de l'agent. La commande est strictement **consultative** et n'auto-clôture aucun constat.
 
 ### Interface Web et Décisions
 
@@ -165,6 +165,6 @@ Un commentaire saisi dans le constat s'adresse au superviseur. Il reste associé
 
 Le cycle historique 1/2/3 reste disponible pour les anciens constats. La création d'un nouveau constat ne lance plus automatiquement un tour dans la conversation surveillée.
 
-L'utilisateur choisit `1` (ignorer avec motif), `2` (examiner maintenant) ou `3` (reporter avec condition). Pour `2`, le Veilleur demande une courte contre-analyse sans outils ni modification. La réponse de l'agent est affichée comme proposition ; elle ne vaut pas décision utilisateur.
+L'utilisateur choisit `1` (ignorer avec motif), `2` (examiner maintenant) ou `3` (reporter avec condition). Pour `2`, le Superviseur demande une courte contre-analyse sans outils ni modification. La réponse de l'agent est affichée comme proposition ; elle ne vaut pas décision utilisateur.
 
 Le marqueur coloré des cartes est repris dans la liste latérale ; les cartes non sélectionnées sont repliées. L'état d'ouverture reste local au navigateur.
