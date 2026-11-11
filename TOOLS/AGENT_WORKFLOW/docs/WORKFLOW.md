@@ -253,6 +253,16 @@ Commit unique : fix + guard ensemble
 
 ---
 
+## 📐 Formats de Restitution & Personas Spécialisés
+
+Tout rapport d'audit, revue de code ou évaluation par un agent ou sous-agent respecte le standard :
+- **Spécification de restitution** : [`AGENT_OUTPUT_STANDARD.md`](AGENT_OUTPUT_STANDARD.md).
+- **Structure TDAH unifiée** : Bannière Niveau 0 avec métrique de durée (`⏱️ Durée : X.Xs`), Grille Niveau 1 en **liste numérotée sans tableau Markdown**, Argumentaire technique concis mais non bridé, et Plan d'action Niveau 2 relié aux scripts déterministes de `TOOLS/`.
+- **Catalogue des Prompts Markdown** : [`DOC/WFLOW/PROMPTS/SPECIALISTS/`](../../DOC/WFLOW/PROMPTS/SPECIALISTS/) (visualisation CLI : `python TOOLS/AGENT_WORKFLOW/scripts/specialist_runner.py --list-prompts`).
+- **Arène Dialectique & Devil's Advocate** : [`challenge_runner.py`](../scripts/challenge_runner.py) avec Étape 0 de cadrage préalable obligatoire (Anti-Garbage-In).
+
+---
+
 ## 🛡️ Commits — accord humain explicite
 
 Aucun commit n'est automatique : appliquer la règle d'`AGENTS.md` et obtenir un accord humain

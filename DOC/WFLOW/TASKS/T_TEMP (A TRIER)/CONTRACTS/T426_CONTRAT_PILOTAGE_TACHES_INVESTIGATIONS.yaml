@@ -1,0 +1,352 @@
+contract:
+  task_id: T426
+  criticality: C2
+  strategy: patch
+  objective: >-
+    Rendre le pilotage des tâches et investigations vérifiable, limiter les répétitions
+    non informatives et empêcher les faux verdicts de réussite sans gêner l'usage normal.
+  acceptance:
+    - id: AC1
+      statement: Le catalogue conserve un résumé court et pointe vers une seule fiche active par tâche.
+      verified_by: Comparer TASKS.yaml, le template et deux tâches pilotes ; aucun journal ni contrat dupliqué.
+    - id: AC2
+      statement: La fiche unique décrit besoin, décision recherchée, périmètre, permissions, critères observables, preuves et responsabilités.
+      verified_by: Valider un exemple complet et rejeter un exemple privé de critère observable ou de périmètre.
+    - id: AC3
+      statement: Chaque expérience possède une question nouvelle, des prédictions discriminantes et une décision selon résultat avant lancement.
+      verified_by: Sur un historique pilote, détecter une répétition sans justification et accepter un rejeu motivé par une source modifiée.
+    - id: AC4
+      statement: Trois itérations non informatives déclenchent une revue A/B aveugle ; un seuil de deux à cinq exige une justification préalable.
+      verified_by: Cas seuil atteint, seuil non atteint, résultats proches et remise à zéro justifiée ; vérifier indépendance des deux missions.
+    - id: AC5
+      statement: Le contrat de délégation impose contexte utile, workflow applicable, sorties mesurables, alerte et auto-revue.
+      verified_by: Deux missions pilotes ; chaque conclusion renvoie à une preuve et chaque point insuffisamment établi reste non vérifié.
+    - id: AC6
+      statement: Chaque contrôle automatique possède déclencheur, portée, responsable, sévérité, diagnostic et procédure de reprise.
+      verified_by: Matrice de contrôles avec un cas valide et un contre-exemple par contrôle ; zéro blocage hors périmètre dans les cas pilotes.
+    - id: AC7
+      statement: Les contrôles nouveaux démarrent en avertissement et ne changent pas silencieusement les hooks actifs.
+      verified_by: Comparer configurations avant/après ; activation bloquante uniquement après validation humaine explicite et tests des faux positifs.
+    - id: AC8
+      statement: Les résultats distinguent PASS, FAIL, interruption, non testé et nettoyage incomplet ; une exception ne produit pas un succès implicite.
+      verified_by: Tests du validateur de résultat incluant exception, preuve absente, sortie partielle et erreur de nettoyage.
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T426_CONTRAT_PILOTAGE_TACHES_INVESTIGATIONS.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - TOOLS/AGENT_WORKFLOW/templates/
+      - TOOLS/AGENT_WORKFLOW/skills/task-planner/
+      - TOOLS/AGENT_WORKFLOW/skills/orchestrator/
+      - TOOLS/AGENT_WORKFLOW/skills/troubleshooting/
+      - TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md
+      - TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md
+      - TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - TOOLS/AGENT_WORKFLOW/tests/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - Configuration des hooks actifs sans validation du plan d'activation
+      - Livrables T417-C et T417-D confiés à Claude
+      - Modification massive des fiches et du catalogue
+  evidence_required:
+    - Matrice exigences vers preuves et responsabilités
+    - Diff réel relu ; tests positifs et négatifs des contrôles modifiés
+    - Mesure des faux positifs sur deux tâches pilotes
+    - Plan d'activation et désactivation sans suppression de données
+  alert_duty: >-
+    Signaler immédiatement ambiguïté, contradiction, preuve faible, effet de bord ou
+    contrôle trop intrusif. Ne pas transformer une incertitude en réussite ni élargir le périmètre.
+
+status: IN_PROGRESS
+consolidation_review:
+  requested_by: HUM
+  state: ANALYSIS_NO_MIGRATION
+  problem: "Le prototype ajoute une commande manuelle ; le parcours Task Manager et le classement documentaire restent dispersés. La clôture précédente était prématurée."
+  verified_inventory:
+    AUDITS: 158
+    CONTRACTS: 181
+    ETUDES: 81
+    TESTS: 11
+    REVIEWS: 2
+    TROUBLESHOOTING: 55
+  existing_entrypoints:
+    assignment: "TOOLS/TASK_MANAGER/task_server.py : work-lock/acquire, work-lock/release, edit-flag/acquire, edit-flag/release"
+    contract_structure: TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py
+    declared_plc_tests: TOOLS/AGENT_WORKFLOW/scripts/check_task_test_contract.py
+    tracking_prototype: "check_task_tracking.py : cohérence déclarative ; aucune attribution ni verrou"
+  proposals:
+    - "Conserver le serveur Task Manager comme point unique de prise et remise de tâche ; réutiliser son API pour humains et agents."
+    - "Afficher la synthèse des contrôles dans la fiche Task Manager ; aucun nouveau verrou ni seconde attribution."
+    - "Avant intégration, comparer les validations existantes et fusionner les contrôles redondants ; le module tracking peut rester interne au validateur de contrat."
+    - "Conserver un contrat vivant par tâche ; joindre les annexes seulement lorsqu'elles apportent une preuve ou un détail nécessaire."
+    - "Étudier le regroupement des études, audits, reviews, plans de tests et diagnostics propres à une tâche dans un dossier de tâche commun ; pas un sous-dossier par type."
+    - "Garder les registres terrain, les REX transverses et les documents personnels séparés ; identifier explicitement le dossier personnel avant migration."
+    - "Distinguer tests des outils Python et CI machine ST ; les présenter depuis une même fiche sans déplacer les suites techniques par principe."
+  next_decision: "Inventorier les liens consommateurs avant de proposer la table ancien chemin -> chemin cible et le diff d'intégration Task Manager."
+  acceptance_before_migration:
+    - "Aucune perte de contenu ni modification des registres terrain."
+    - "Liens entrants et scripts consommateurs inventoriés pour chaque chemin déplacé."
+    - "Parcours humain et agent identiques pour attribution et contrôles."
+    - "Aucune obligation de saisir deux fois le même état courant."
+    - "Validation humaine de la table de migration avant tout déplacement."
+framing:
+  created_at: '2026-11-01T11:07:42+01:00'
+  requested_by: HUM
+  accountable: CDX01
+  implementation_owner: CDX01
+  related_tasks: [T417, T281, T279]
+  decision_sought: Quels contrôles apportent une preuve utile à faible coût et lesquels doivent rester des avertissements ?
+  baseline: >-
+    REX T417 : essais répétés, état dispersé, identité des sources partielle,
+    substitutions insuffisamment visibles, runner R43 syntaxiquement valide mais non prêt.
+  canonical_record:
+    path: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_<ID>.yaml
+    naming: ID stable, y compris sous-tâche TXXX-X ; dates ISO dans les champs et le journal.
+    template: Étendre TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml ; ne pas créer un second système de fiches.
+    catalogue: Identité, titre, statut, responsable, dates, résumé courant court, blocage et lien contrat.
+    contents: Besoin utilisateur, historique utile sourcé, acquis, inconnues, décision suivante, expériences et preuves.
+  responsibilities:
+    orchestrator: Priorités, contrats, attribution, vérification du diff et des preuves, décision de livraison.
+    executor: Mise en oeuvre, auto-revue, effets de bord, vérification et alerte immédiate.
+    control_owner: Maintenance du contrôle et tests des faux positifs ; nommé avant livraison.
+    reviewers: A/B indépendants sans accès aux conclusions de l'autre avant remise ; conclusions contrôlées par orchestrateur.
+    human: Arbitrages métier manquants et approbation de l'activation bloquante globale.
+  phases:
+    - Inventorier les mécanismes existants et conflits ; réutiliser T281 et T279 sans les dupliquer.
+    - Proposer diff du template et des skills canoniques, matrice des contrôles et plan d'activation ; validation humaine avant modification des procédures actives.
+    - Implémenter validateurs ciblés et modes avertissement, avec tests positifs et négatifs.
+    - Piloter deux tâches de nature différente ; mesurer alertes utiles, fausses alertes et coût ajouté.
+    - Revue A/B, réception et décision d'activation contrôle par contrôle.
+  controls:
+    - Contrat complet avant banc long ; avertissement initial, aucune interception de toute commande shell.
+    - Sources inconnues ou substitutions absentes interdisent le verdict validation nominale ; exploration autorisée et étiquetée.
+    - Compilation échouée interdit le verdict de réussite ; les opérations runtime restent gérées par le propriétaire du runner.
+    - Résultat incomplet ou nettoyage non confirmé produit un état explicite et conserve les preuves.
+    - Seuil de stagnation produit une alerte et une revue A/B ; ne bloque pas les autres travaux utiles.
+    - Aucun arrêt global de tour, lancement runtime, suppression, commit ou arrêt de processus utilisateur automatique.
+  control_matrix:
+    - id: TRK-01
+      trigger: "Commande manuelle check_task_tracking.py sur une fiche"
+      scope: "Bloc tracking de la fiche ciblée"
+      responsible: CDX01
+      severity: warning
+      diagnostic: "Sortie JSON advisory avec code et emplacement"
+      recovery: "Compléter la fiche ou documenter la limite ; aucune migration automatique"
+      counterexample: "Contrats T417-C/T417-D legacy signalés TRACKING_ABSENT sans modification"
+    - id: TRK-02
+      trigger: "Option --strict explicitement demandée"
+      scope: "Même fiche ; jamais raccordé automatiquement à un hook"
+      responsible: CDX01 (control maintainer named in tracking.owners.control_maintainer)
+      severity: blocking_on_explicit_invocation
+      diagnostic: "Code retour 1 et liste des findings"
+      recovery: "Corriger puis relancer ; revenir au mode advisory si exploratoire"
+      counterexample: "Fiche legacy : advisory retourne 0, strict retourne 1"
+    - id: TRK-03
+      trigger: "Résultat d'expérience avec evidence"
+      scope: "Chemins sous la racine du checkout et fichiers existants"
+      responsible: tracking.owners.executor
+      severity: warning
+      diagnostic: "EVIDENCE_MISSING ou EVIDENCE_OUTSIDE_ROOT"
+      recovery: "Conserver l'état non confirmé et fournir une preuve locale ; ne rien supprimer"
+      counterexample: "Chemin ../proof.txt rejeté"
+    - id: TRK-04
+      trigger: "Résultat PASS"
+      scope: "Exception, build, nettoyage, identité des sources et substitutions"
+      responsible: tracking.owners.executor
+      severity: warning
+      diagnostic: "CONTRADICTORY_PASS, INCOMPLETE_PASS ou NOMINAL_UNSUPPORTED"
+      recovery: "Requalifier PASS en état incomplet/échec et garder la trace"
+      counterexample: "Build INTERRUPTED ou cleanup UNKNOWN ne valide pas PASS"
+    - id: TRK-05
+      trigger: "Seuil de runs non informatifs atteint"
+      scope: "Expériences d'une fiche ; seuil 3 par défaut, 2..5 justifié"
+      responsible: tracking.owners.accountable
+      severity: warning
+      diagnostic: "BLIND_REVIEW_DUE"
+      recovery: "Revue A/B indépendante, décision et preuves ; ne pas effacer l'historique"
+      counterexample: "Trois PASS sans information déclenchent la revue ; un FAIL informatif réinitialise"
+  exclusions:
+    - Les vérifications de cible Simulation IDE et la restauration effective CODESYS appartiennent à T417-E.
+    - Aucun lancement CODESYS nécessaire à T426 ; valider les interfaces de résultat sur fixtures.
+    - Ne pas prétendre garantir une certitude absolue ; borner chaque conclusion au périmètre réellement vérifié.
+  next_action: Présenter l'étude terminée pour validation humaine ; activation procédurale séparée et non automatique.
+execution:
+  status: COMPLETED
+  summary: Recherche officielle, challenge A/B et trois pilotes réalisés ; 43 tests ciblés PASS. R3 a détecté et tracé une délégation sans accès de lecture, sans faux succès. Aucun hook ni skill actif modifié ; validation des changements procéduraux reste ouverte.
+  evidence_submitted:
+    - "T426-R1 : check_task_tracking.py sur les contrats T417-C et T417-D ; sorties TRACKING_ABSENT, mode advisory, aucune écriture."
+    - "T426-R2 : scénarios de compatibilité adossés à T417-C (technique) et T280 (documentation), tracking enrichi en mémoire ; 0 finding chacun, aucun contrat modifié."
+    - "T426-R3 : deux missions aveugles interrompues proprement faute de moyen de lecture disponible ; réponses conservées dans tests/fixtures, aucun verdict technique inventé."
+    - "43/43 tests ciblés : contrats, validateur, revue A/B et pilotes T417-C/T280."
+  inventory:
+    - 'check_task_contract.py : contrôle la présence du contrat et des critères ; ne contrôle pas le gain d information des expériences.'
+    - 'task-planner : verrouillage et catalogue ; ne contrôle pas les verdicts des bancs.'
+    - 'subagent_preamble.md : contient déjà alerte, contrats et auto-revue ; enrichir les interfaces plutôt que recopier les règles.'
+    - 'task_contract.yaml : extension tracking préparatoire ajoutée ; pas de migration des anciennes tâches.'
+  tests:
+    - command: python -m unittest discover -s TOOLS/AGENT_WORKFLOW/tests -p test_task_tracking.py -v
+      observed: 19 tests PASS en 0.088 s après corrections de revue ; CLI avertissement/strict, résultats partiels, clôture de revue A/B et tâche documentaire inclus.
+      scope: Fonctions du validateur ; ne prouve pas que les agents rempliront correctement les fiches.
+    - command: python -m pytest TOOLS/AGENT_WORKFLOW/tests/test_check_task_contract.py TOOLS/AGENT_WORKFLOW/tests/test_task_tracking.py TOOLS/AGENT_WORKFLOW/tests/test_task_tracking_real_pilots.py -q -p no:cacheprovider
+      observed: 43 PASS en 6.34 s ; la campagne inclut les scénarios adossés aux contrats T417-C/T280, sans modifier leurs contrats.
+      scope: Régression du contrôle structurel et du nouveau prototype ; compatibilité locale vérifiée, workflow agent réel non mesuré.
+  research:
+    consulted_at: '2026-11-01'
+    sources:
+      - url: https://developers.openai.com/blog/eval-skills
+        retained: Évaluer les actions et traces observées avec des cas concrets ; tester aussi les boucles de travail.
+        local_decision: Tester des comportements et contre-exemples ; ne pas considérer le style de la réponse ou un contrat rempli comme une preuve d'exécution.
+      - url: https://developers.openai.com/cookbook/examples/codex/iterating-development-workflows-with-codex
+        retained: Ajuster le harnais au besoin, préférer une amélioration ciblée d'une skill existante et évaluer le processus complet séparément.
+        local_decision: Étendre le contrat existant et proposer des changements ciblés aux skills canoniques ; aucune nouvelle skill parallèle.
+      - url: https://code.claude.com/docs/en/hooks
+        retained: Distinguer emplacement du script, CLAUDE_PROJECT_DIR et cwd ; protéger les hooks Stop contre les continuations répétées.
+        local_decision: Définir une résolution de chemins checkout/worktree testée ; aucun nouveau Stop global. Configurations actives inchangées.
+      - url: https://agentskills.io/specification
+        retained: Séparer entrée courte et ressources spécialisées ; références relatives au dossier de la skill.
+        local_decision: Garder les détails techniques dans leurs ressources canoniques plutôt que les copier dans chaque prompt.
+    limits: Sources de bonnes pratiques, pas preuve d'efficacité locale ; aucun gain de productivité chiffré déduit de ces publications.
+  blind_challenge:
+    method: Deux agents à contexte neuf, même contrat, sans consultation des conclusions réciproques ; lecture seule, aucune exécution.
+    findings:
+      - id: AB1
+        source: check_task_contract.py, fonction check et option --release
+        fact: Vérifie la structure du contrat, pas l'exécution ou ses preuves ; PASS ambigu si utilisé comme résultat du travail.
+        action: Garder le contrôle structurel et qualifier explicitement sa portée ; ajouter le contrôle ciblé séparé.
+      - id: AB2
+        source: check_task_contract.py, repli sans PyYAML
+        fact: La présence de evidence_required peut suffire dans le repli alors que le chemin PyYAML exige un contenu.
+        action: Tester les deux modes sur mêmes fixtures avant correction ; ne pas annoncer équivalence des validateurs.
+      - id: AB3
+        source: skills/troubleshooting/SKILL.md et skills/orchestrator/SKILL.md
+        fact: Fiche diagnostic et registre recopient décision courante ; risque de divergence avec contrat unique.
+        action: Proposer contrat comme autorité, catalogue/registre comme index, diagnostics comme annexes historiques liées.
+      - id: AB4
+        source: skills/troubleshooting/SKILL.md, étapes nettoyage et déplacement CSV
+        fact: Instructions incompatibles avec interdiction supérieure de supprimer/déplacer automatiquement.
+        action: Proposer inventaire des artefacts et action humaine explicite ; distinguer conservation normale et défaut de restauration runtime.
+      - id: AB5
+        source: templates/task_contract.yaml, stagnation.threshold
+        fact: Commentaire ne précisait pas la justification pour seuil personnalisé dans la plage 2–5.
+        action: Commentaire corrigé ; validateur vérifie plage et justification.
+  change_rationale:
+    - file: TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml
+      reason: Réduire la redécouverte du contexte et rendre la prochaine décision visible dans une fiche existante.
+      benefit: Champs communs pour besoin, preuves, délégation et expériences ; pas de nouveau journal parallèle.
+      limit: Remplissage déclaratif ; le template seul n'empêche aucune dérive.
+    - file: TOOLS/AGENT_WORKFLOW/scripts/check_task_tracking.py
+      reason: Détecter des incohérences simples avant qu'elles deviennent des faux verdicts ou des répétitions.
+      benefit: Avertissements explicites, aucune écriture, aucun lancement runtime ; mode strict uniquement demandé par commande.
+      limit: Existence de preuve et déclarations vérifiées, pas vérité du contenu ni détection sémantique automatique de résultats proches ; revue humaine/agent requise.
+    - file: TOOLS/AGENT_WORKFLOW/tests/test_task_tracking.py
+      reason: Montrer que le contrôle distingue des cas utiles et ne pénalise pas un échec qui apporte de l'information.
+      benefit: Contre-exemples reproductibles ; contrôles locaux rapides.
+      limit: Aucun benchmark agent réel ni mesure en production.
+    - file: TOOLS/AGENT_WORKFLOW/scripts/check_task_tracking.py
+      reason: "Empêcher qu'une revue A/B réutilise le même rapport pour les deux avis."
+      benefit: "Détecte un minimum d'indépendance manquant sans prétendre lire la qualité des rapports."
+      limit: "Deux fichiers distincts ne prouvent ni deux missions aveugles ni une conclusion pertinente."
+  prototype_review:
+    - finding: Un result de type liste provoquait TypeError.
+      correction: Type vérifié avant appartenance ; test malformé ajouté et PASS.
+    - finding: PASS accepté malgré build interrompu ou nettoyage inconnu.
+      correction: INCOMPLETE_PASS ; applicabilité explicite pour qualification nominale ; contre-exemple PASS.
+    - finding: Revue A/B terminée ne levait jamais l'alerte de stagnation.
+      correction: Événement after_experiment avec deux acteurs, preuves locales, indépendance déclarée et décision ; test clôture et revue incomplète PASS.
+      limit: La réalité de l'indépendance et la qualité des rapports nécessitent lecture ; aucune validation sémantique automatique.
+    - finding: Surcontrôle possible des tâches documentaires.
+      observation: Le challenger B a testé une fiche documentaire avec experiments vide ; zéro alerte observée. Test automatisé ajouté.
+    - finding: Deux reviewers pouvaient citer le meme rapport.
+      correction: Le validateur exige maintenant deux chemins de rapport locaux distincts ; l'independance reelle reste a verifier par l'orchestrateur.
+    - finding: Une mission aveugle sans permission de lecture ne pouvait pas citer les lignes demandées.
+      correction: Le contrat de délégation décrit maintenant les permissions, livrables mesurables et l'alerte d'accès insuffisant ; l'essai est resté INTERRUPTED informatif.
+  proposed_procedure_changes:
+    approval_state: PROPOSED_NOT_ACTIVATED
+    task_planner: Contrat comme fiche courante ; catalogue résumé et lien ; validation tracking opt-in sans migration massive.
+    orchestrator: Réduire registre aux pointeurs et état d'action ; décision technique actuelle tenue dans le contrat ; décrire gain d'information avant expérience longue.
+    troubleshooting: Réutiliser contrat existant comme état courant ; annexes de preuves liées ; remplacer nettoyage et déplacement automatiques par inventaire et action humaine.
+    delegation: Référencer tracking.delegation plutôt que recopier règles ; exiger critères testables, limites, permissions, alertes et auto-revue proportionnée.
+    hook_configuration: Aucun changement actif ; proposition distincte sur résolution racine du script et cwd cible, avec tests checkout/worktree avant activation approuvée.
+    activation: D'abord commande manuelle en avertissement ; strict réservé à une commande explicitement demandée. Pas de branchement automatique ni Stop global.
+tracking:
+  user_need: T426 doit réduire les investigations répétitives et rendre les conclusions auditables, avec des contrôles qui gênent peu l'usage normal.
+  current_question: Quels défauts mécaniques peut-on signaler sans prétendre juger automatiquement la pertinence d'une investigation ?
+  established:
+    - Contradictions des procédures existantes identifiées par deux lectures indépendantes.
+    - Prototype opt-in, sans raccordement aux hooks ; 43 tests ciblés passent, dont deux scénarios adossés à des contrats existants en mémoire.
+  unknowns:
+    - Faux positifs sur un workflow agent réel et effet sur les décisions des agents non mesurés ; R2 ne couvre que la compatibilité des données en mémoire.
+    - La suite complète du dépôt n'est pas couverte par cette campagne ciblée ; sa portée devra être mesurée avant livraison.
+    - Procédures actives contredisent encore la fiche unique et la règle de conservation ; changements précis proposés, pas activés.
+  next_action: Validation humaine séparée de l'activation ; aucun hook ne doit être branché automatiquement.
+  owners:
+    accountable: CDX01
+    executor: CDX01
+    control_maintainer: CDX01
+  delegation:
+    required_workflows:
+      - "Lecture seule du contrat task-planner et du fichier cible"
+      - "Auto-revue : portée, preuves, limites, alerte et décision suivante"
+    permissions:
+      - "Lire les chemins explicitement fournis"
+      - "Exécuter uniquement des commandes de lecture si le contrat l'autorise"
+    forbidden_actions:
+      - "Modifier, supprimer, déplacer ou committer"
+      - "Lancer CODESYS, runtime ou essai machine"
+    measurable_deliverables:
+      - "Besoin, question, prédiction, observation, décisions confirmée/réfutée"
+      - "Au moins une preuve avec chemin et ligne, ou alerte explicite si inaccessible"
+      - "Limites et données métier manquantes"
+    alert_conditions:
+      - "Accès de lecture insuffisant pour vérifier une ligne"
+      - "Contrat ambigu, preuve absente ou conclusion plus large que le périmètre"
+    self_review:
+      - "Aucune conclusion technique sans lecture effective"
+      - "Distinguer NOT_TESTED/INTERRUPTED de FAIL et PASS"
+  stagnation:
+    threshold: 3
+    justification: Défaut du contrat ; un échec instructif ne compte pas comme stagnation.
+  experiments:
+    - id: T426-R1
+      question: "Le contrôle peut-il inspecter deux contrats T417 réels sans les migrer ni bloquer leur usage ?"
+      prediction: "T417-C et T417-D sont signalés comme legacy avec TRACKING_ABSENT ; aucun fichier n'est modifié."
+      discriminating_observation: "Les deux sorties JSON contiennent TRACKING_ABSENT et les contrats restent inchangés."
+      decision_if_confirmed: "Garder la migration opt-in et proposer l'ajout du bloc tracking lors d'une reprise de tâche."
+      decision_if_refuted: "Suspendre tout raccordement aux hooks et corriger le périmètre de lecture avant un nouvel essai."
+      result: PASS
+      evidence:
+        - .claude/worktrees/t417-cd/DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417-C.yaml
+        - .claude/worktrees/t417-cd/DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417-D.yaml
+      information_gained: true
+      qualification: exploratory
+    - id: T426-R2
+      question: "Le suivi reste-t-il compatible avec une tache technique et une tache documentaire adossees a des contrats existants ?"
+      prediction: "Un scenario technique informatif et un scenario documentaire sans experience retournent tous deux zero finding."
+      discriminating_observation: "Les contrats T417-C et T280 sont lus depuis le depot ; le tracking est ajoute en memoire uniquement ; 0 finding sur chaque scenario."
+      decision_if_confirmed: "Conserver le controle en advisory et lancer une mesure plus large avant toute activation."
+      decision_if_refuted: "Analyser chaque alerte et ne pas brancher le controle aux hooks."
+      result: PASS
+      evidence:
+        - .claude/worktrees/t417-cd/DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417-C.yaml
+        - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T280_TROUBLESHOOTING_WORKSPACE.yaml
+        - TOOLS/AGENT_WORKFLOW/tests/test_task_tracking_real_pilots.py
+      information_gained: true
+      qualification: exploratory
+    - id: T426-R3
+      question: "Un agent peut-il produire une conclusion vérifiable quand le moyen de lecture n'est pas disponible ?"
+      prediction: "L'agent doit signaler l'accès insuffisant et rendre NOT_TESTED/INTERRUPTED, sans inventer de lignes ni de verdict."
+      discriminating_observation: "Deux missions aveugles signalent l'absence de contenu vérifiable ; aucune ne prétend avoir confirmé T417-C/D."
+      decision_if_confirmed: "Rendre les permissions de lecture explicites dans chaque délégation et conserver l'alerte comme résultat utile."
+      decision_if_refuted: "Revoir le préambule et les outils disponibles avant toute délégation supplémentaire."
+      result: INTERRUPTED
+      evidence:
+        - TOOLS/AGENT_WORKFLOW/tests/fixtures/t426_r3_agent_a.txt
+        - TOOLS/AGENT_WORKFLOW/tests/fixtures/t426_r3_agent_b.txt
+      information_gained: true
+      qualification: exploratory
+validation:
+  status: PENDING
+  notes: Étude T426 terminée et documentée ; activation des nouveaux contrôles bloquants non autorisée par cette création.

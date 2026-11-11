@@ -172,7 +172,7 @@ Diving et Extraction sont utilisables en maintenance et reutilises par le cycle 
 
 ## 🛡️ 4bis · Matrice de bypass maintenance — treuils M1/M2
 
-> **Source** : cadrage T181-11 (`DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T181-11_MATRICE_MAINT.md`), décision Q8 du plan de gel T181. Implémentation : T181-14.
+> **Source** : cadrage T181-11 (`DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/AUDITS/T181-11_CADRAGE_MATRICE_MAINT.md`), décision Q8 du plan de gel T181. Implémentation : T181-14.
 
 ### Principe
 

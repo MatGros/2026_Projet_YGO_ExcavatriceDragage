@@ -849,6 +849,74 @@ def test_resume_all_action(tmp_path):
         svc.close()
 
 
+def test_close_and_reopen_session_and_resume_all_safety(tmp_path):
+    storage = tmp_path / "storage.json"
+    source1 = tmp_path / "c1.jsonl"
+    source2 = tmp_path / "c2.jsonl"
+    source1.write_text('{"type":"user","message":{"role":"user","content":"start1"}}\n', encoding="utf-8")
+    source2.write_text('{"type":"user","message":{"role":"user","content":"start2"}}\n', encoding="utf-8")
+
+    from TOOLS.AGENT_SUPERVISOR.scripts.supervisor_service import Supervisor
+    svc = Supervisor(storage, roots={'claude': [tmp_path]})
+    try:
+        svc.command({"action": "add", "platform": "claude", "native_id": "c1", "alias": "S1"})
+        svc.command({"action": "add", "platform": "claude", "native_id": "c2", "alias": "S2"})
+        snap = svc.snapshot()
+        s1, s2 = snap["sessions"][0], snap["sessions"][1]
+
+        # 1. Clôturer S1 : doit figer la session
+        svc.command({"action": "close", "id": s1["id"]})
+        snap_after_close = svc.snapshot()
+        s1_closed = [s for s in snap_after_close["sessions"] if s["id"] == s1["id"]][0]
+        assert s1_closed["closed"] is True
+        assert s1_closed["state"] == "closed"
+        assert s1_closed["enabled"] is False
+
+        # 2. Mettre S2 en pause
+        svc.command({"action": "pause", "id": s2["id"]})
+
+        # 3. Lancer resume_all : S1 clôturée ne DOIT PAS se relancer, seul S2 reprend
+        res = svc.command({"action": "resume_all"})
+        assert res["count"] == 1
+        assert res["resumed"] == [s2["id"]]
+
+        snap_after_resume = svc.snapshot()
+        s1_still_closed = [s for s in snap_after_resume["sessions"] if s["id"] == s1["id"]][0]
+        s2_resumed = [s for s in snap_after_resume["sessions"] if s["id"] == s2["id"]][0]
+        assert s1_still_closed["closed"] is True
+        assert s1_still_closed["state"] == "closed"
+        assert s2_resumed["enabled"] is True
+
+        # 4. Tenter de reprendre directement S1 sans rouvrir : doit lever une exception
+        import pytest
+        with pytest.raises(ValueError, match="Session clôturée / figée"):
+            svc.command({"action": "resume", "id": s1["id"]})
+
+        # 5. Rouvrir S1 : doit défiger S1 (la remet en pause sans la lancer directement)
+        svc.command({"action": "reopen", "id": s1["id"]})
+        snap_reopened = svc.snapshot()
+        s1_reopened = [s for s in snap_reopened["sessions"] if s["id"] == s1["id"]][0]
+        assert s1_reopened["closed"] is False
+        assert s1_reopened["state"] == "paused"
+
+        # 6. Maintenant resume_all reprend S1
+        res2 = svc.command({"action": "resume_all"})
+        assert res2["count"] == 1
+        assert res2["resumed"] == [s1["id"]]
+        snap_final = svc.snapshot()
+        s1_final = [s for s in snap_final["sessions"] if s["id"] == s1["id"]][0]
+        assert s1_final["enabled"] is True
+
+        # 7. Suppression de session avec remove
+        svc.command({"action": "remove", "id": s1["id"]})
+        snap_after_remove = svc.snapshot()
+        assert len(snap_after_remove["sessions"]) == 1
+        assert snap_after_remove["sessions"][0]["id"] == s2["id"]
+    finally:
+        svc.close()
+
+
+
 
 
 

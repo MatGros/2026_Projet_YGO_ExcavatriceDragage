@@ -36,6 +36,13 @@ dans le périmètre et le plan approuvés ; elle n'autorise ni extension de pér
 5. Renvoyer au responsable : verdict par critère, preuves avec chemins/lignes ou commandes,
    écarts, risques résiduels, décision recommandée. Ne pas modifier le périmètre de sa propre
    initiative.
+6. Restituer impérativement selon le standard TDAH-friendly (`AGENT_OUTPUT_STANDARD.md`) :
+   - Niveau 0 : Bannière visuelle (Émoji géant `🟢 PASS` / `🟡 ADVISORY` / `🔴 BLOCK` + Verdict + 1 phrase d'impact + Durée/Horodatage).
+   - Niveau 1 : Liste numérotée d'invariants (1. 2. avec statut `[✅ PASS / ❌ FAIL / ⚪ N/A]` — ZÉRO TABLEAU MARKDOWN).
+   - Niveau 1 bis : Argumentaire technique (concis 3-4 lignes par défaut, extensible sans blocage si analyse complexe requise).
+   - Niveau 2 : Plan d'action chirurgical (Localisation, Ancre, Action exacte, Outil déterministe associé, Risque si ignoré).
+   - Priorité absolue aux scripts et outils déterministes Python (`G200`, `G521`, `G340`, `pytest`, etc.) pour prouver un constat sans hallucination LLM.
+   - Zéro préambule bavard, zéro politesse introductive. Direct au but.
 
 ## Règles de projet
 

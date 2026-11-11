@@ -6,8 +6,9 @@ contract:
     écrasement de preuves historiques.
   acceptance:
   - id: AC1
-    statement: Les 394 fichiers du corpus AUDITS157/CONTRACTS192/REVIEWS34/TESTS11 restent présents après correction
-      ; seules les modifications de noms, métadonnées de migration et liens identifiés sont autorisées.
+    statement: Les 391 fichiers inventoriés au GO de T430 restent présents après correction ; seules les modifications
+      de noms, métadonnées de migration et liens identifiés sont autorisées. L’écart de trois sauvegardes .bak avec le
+      relevé historique de 394 est déclaré comme antérieur à ce lot, sans attribuer sa cause.
     verified_by: Inventaire et empreintes avant/après ; diff explicite des contenus changés, zéro disparition et zéro
       collision Windows.
   - id: AC2
@@ -60,8 +61,10 @@ contract:
     verified_by: Script check_document_organisation.py avec tests positifs et négatifs ; revue indépendante du diff ;
       aucun ajout de baseline pour absorber ces défauts.
   - id: AC11
-    statement: Le lot distingue les erreurs corrigées des dettes préexistantes et laisse intactes les trois sauvegardes
-      .bak ignorées, les trois contrats déjà en échec structurel et les collisions d’identité hors périmètre.
+    statement: Le lot distingue les corrections prouvées des dettes préexistantes ; aucune nouvelle perte n’est introduite.
+      Les trois sauvegardes .bak absentes au GO sont signalées et leurs copies antérieures hors dépôt sont vérifiées,
+      sans prétendre à leur présence dans le corpus ou dans Git ; les trois contrats déjà en échec structurel et les
+      collisions d’identité restent hors périmètre.
     verified_by: Baseline des contrôles avant/après, contenu des trois .bak inchangé, aucun changement d’identifiant
       interne ; liste des écarts résiduels avec portée, sans validation PLC revendiquée.
   scope:
@@ -95,8 +98,10 @@ contract:
     - Toute suppression supplémentaire, réaffectation d’identité ou modification de sémantique métier
   conservation:
     must_survive:
-    - 394 fichiers identifiés, leurs contenus métier et leurs preuves historiques.
-    - Toutes les décisions et réserves humaines, les trois sauvegardes .bak et leurs contenus.
+    - 391 fichiers présents au snapshot du GO, leurs contenus métier et preuves historiques ; écart antérieur des trois
+      .bak explicitement documenté.
+    - Toutes les décisions et réserves humaines ; aucune restauration ou suppression automatique des sauvegardes absentes
+      au GO.
     - Les tâches, agents et statuts métier existants ; seules les références univoques et dates de suivi changent via
       API.
     dropped_on_purpose: []
@@ -106,8 +111,9 @@ contract:
   - Comparaison baseline, couverture déclarée et revue indépendante du vrai diff.
   alert_duty: Tout nouvel écart de périmètre, cible ambiguë ou modification concurrente est signalé ; aucune correction
     métier inventée.
-status: PENDING
+status: IN_PROGRESS
 validation:
   status: PENDING
-  notes: Plan challengé par deux reviewers. GO humain requis avant la première modification de gate. Aucun commit/push
-    autorisé dans ce lot.
+  notes: GO utilisateur donné le 2026-11-11 ; exécution CDX04. Amendement factuel de baseline :391 présents au GO, trois
+    .bak absents avant toute opération T430 (copies antérieures vérifiées hors dépôt). Aucun relâchement des contrôles
+    de références ni élargissement de baseline G530.

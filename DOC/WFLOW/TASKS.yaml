@@ -1,11 +1,11 @@
 tasks:
 - id: T430
   parent_id: ''
-  statut: ⬜
+  statut: ⏸️
   criticite: C2
   domaine: DOC / WFLOW / OUTILLAGE
-  agent: CDX01
-  date: '2026-11-10T14:02:50+01:00'
+  agent: CDX04
+  date: '2026-11-11T15:36:06+01:00'
   titre: Organisation documentaire — terminer la migration des versions, chemins et consommateurs
   contexte: Reprise demandee par exploitant le 2026-11-10 apres revue des renommages AUDITS/CONTRACTS/REVIEWS/TESTS. Integrite394
     fichiers confirmee ; migration des references incomplete. Challenge expert avant implementation realise. Lot distinct
@@ -26,9 +26,12 @@ tasks:
   - AC10 fournir un garde-fou automatique et des mutations discriminantes
   - AC11 distinguer dette préexistante, corrections prouvées et hors périmètre
   contrat: DOC/WFLOW/TASKS/T430_ORGANISATION_DOCUMENTAIRE/T430_CONTRAT_ORGANISATION_DOCUMENTAIRE_20261110_v1.0.yaml
-  avancement: '2026-11-10 CDX01. Deux challenges experts indépendants terminés, objections intégrées dans le PLAN unique.
-    Contrat C2 contrôlé : PASS, 0 erreur / 0 avertissement, 11 AC. Plan et contrat prêts ; aucune modification des gates,
-    des documents rangés ni du code PLC. GO humain attendu avant implémentation. T384 et T427 restent distinctes. Aucun commit/push.'
+  avancement: 'PAUSE 2026-11-11 sur demande exploitant, posee par CC01 : le checkpoint 3469b7ed a deplace les fichiers T428
+    vers T_TEMP (A TRIIER) ; G530 en FAIL sur 3 references T428 et lien AF-14 mort. Reprendre quand T428 aura un dossier definitif.
+    2026-11-11 CDX04. Prise en charge explicite par la session Codex 01a1c3c8-aebe-7fd1-aeb7-28e5ff83efa6, chat T430-CDX04
+    — Organisation documentaire. Attribution CDX01 régularisée sur ordre utilisateur ; CDX01/CDX02/CDX03 déjà cités au catalogue.
+    Petite étude ciblée en cours sur le plan déjà challengé par deux experts. Dossier de tâche avec PLAN unique et CONTRAT
+    présent, sans nouveau rapport. Aucune réparation de gate appliquée ; aucune suppression ni changement PLC. Aucun commit/push.'
   bloque_par: []
 - id: T429
   parent_id: ''
@@ -71,8 +74,8 @@ tasks:
     Double revue finale A/B (DeepSeek V4.1 + GLM 5.3) concluant a la levee de reserve et qualification de livraison. Aucun
     commit/push sans accord explicite. 2026-11-10 AGY01 : Decision utilisateur : bloc Trajet des messages mis de cote / gele
     (composant maquette semi-statique non probant). Synthese d audit collecteur AC1-AC5 mise en attente pour traitement ulterieur.
-    Priorite donnee a la refonte ergonomique du ruban Collecteur et Flux (etiquetage des sessions, clarification du statut de veille,
-    regles de tri perennes dans l IHM et allegement de la charge cognitive des historiques).'
+    Priorite donnee a la refonte ergonomique du ruban Collecteur et Flux (etiquetage des sessions, clarification du statut
+    de veille, regles de tri perennes dans l IHM et allegement de la charge cognitive des historiques).'
   contrat: 'DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml (contrat
     mesurable AC-F0 a AC-F4, AC-X ; preuves et revues A/B dans tracking). Pilotage detaille : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md'
   bloque_par: ''
@@ -87,7 +90,7 @@ tasks:
   criticite: C2
   domaine: DIAGNOSTIC / GVL_TROUBLESHOOTING
   agent: CC01
-  date: '2026-11-09T10:33:01+01:00'
+  date: '2026-11-11T15:36:06+01:00'
   titre: 'Refactor troubleshooting : snapshot lisible comme un flux, par axe, pour mainteneur et agent'
   contexte: 'Demande exploitant 2026-11-06 a la reprise de T213. Trouver la source d''un blocage a partir du seul snapshot,
     rapidement et intuitivement, pour un mainteneur comme pour un agent. Lecture de haut en bas comme un flux : entrees, traitement,
@@ -102,11 +105,17 @@ tasks:
   - J4 implementer la structure, avec table ancien vers nouveau chemin
   - J5 fournir le guide de depannage dans le code, verifie automatiquement
   - J6 valider par une personne sur pannes injectees, puis cloturer
-  avancement: 'J1 VALIDE EXPLOITANT, CONFIRMATION EXPLICITE 2026-11-09 ("oui valide") apres avoir declare le 2026-11-08 avoir
-    fait les essais demandes. Aucun test machine reelle ; rejeu a l''aveugle AC9 reste a faire. J5 LIVRE 2026-11-08, import
-    CODESYS a faire : FB_TroubleshootingGuide (830 lignes, 324 chemins), appele par PRG_07, commits 40d81bf4 c8f4907f ef0ef556.
-    Redaction 5 DeepSeek, challenge 2 tours + panel 4 experts, 2 juges natifs (262 corrections). G531 PASS (chemins et noms
-    abreges), G200 PASS. Rejeu avec guide : 0 cause, 2 maillons sur 15, seuils 9 et 12 manques, publies (anciens snapshots
+  avancement: 'PLAN 2026-11-11 (CC01 responsable) : A valider J3+J4+J5 = A0 patch console T380 (KO nommes), A1 import diff
+    bundle + compilation, A2 snapshot simu 438/438 + duree ; B corriger les trouvailles = B1 RequestedDirection M3 (vue),
+    B2 Commun.Bypass.Global (decision securite exploitant), B3 commentaires de declaration perimes, chacun avec garde-fou
+    ; C J6 mesure = pannes injectees en simulation, rejeu aveugle 3 modeles x 2 passes, seuils proposes cause 9/15 et maillon
+    12/15 ; D cloture = verifier une a une T313 T213 T380 T373 T372 T231 avec preuve. Validation interimaire par groupes d''agents
+    experts, validation humaine a la fin (decision exploitant 2026-11-11). Ecritures CODE/ et contrats via orchestrateur en
+    session normale. J1 VALIDE EXPLOITANT, CONFIRMATION EXPLICITE 2026-11-09 ("oui valide") apres avoir declare le 2026-11-08
+    avoir fait les essais demandes. Aucun test machine reelle ; rejeu a l''aveugle AC9 reste a faire. J5 LIVRE 2026-11-08,
+    import CODESYS a faire : FB_TroubleshootingGuide (830 lignes, 324 chemins), appele par PRG_07, commits 40d81bf4 c8f4907f
+    ef0ef556. Redaction 5 DeepSeek, challenge 2 tours + panel 4 experts, 2 juges natifs (262 corrections). G531 PASS (chemins
+    et noms abreges), G200 PASS. Rejeu avec guide : 0 cause, 2 maillons sur 15, seuils 9 et 12 manques, publies (anciens snapshots
     sans valeurs J3). J3 VALIDE exploitant ; snapshot simu (438/438) prevu en fin apres import XML. Constats a traiter : sens
     M3 de la vue, Commun.Bypass.Global non relaye. J4 LISTE SEULE 2026-11-08 (choix exploitant) : troubleshooting_variables.txt
     reordonnee selon la table J2, 595 vers 438 chemins, 5 lots, 38 blocs, 0 non resolu, rien dans CODE. Snapshot simu commun
@@ -182,7 +191,7 @@ tasks:
   criticite: C3
   domaine: SIMULATION / TREUILS M1-M2 & BENNE / FIDELITE DYNAMIQUE
   agent: AGY01
-  date: '2026-10-28T22:10:28.416921+00:00'
+  date: '2026-11-11T02:58:59+01:00'
   updated_at: '2026-10-29T01:16:00+01:00'
   completed_at: '2026-10-29T01:16:00+01:00'
   titre: SimBench - Refonte dynamique glissement treuils M1/M2 et benne basee sur traces reelles
@@ -196,7 +205,7 @@ tasks:
   - Proportionnalite a la vitesse d approche (jog palier 1 < 0.05m).
   - Ouverture/fermeture benne iso-fonctionnelle en Manuel et Auto sans ErrorID:08 en AX2.
   - Zero regression sur la logique automate (PRG_01 a PRG_07 intacts).
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T421_FIDELITE_DYNAMIQUE_TREUILS.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T421_CONTRAT_FIDELITE_DYNAMIQUE_TREUILS.yaml
   avancement: Valide et teste avec succes sur banc CODESYS en MANU et AUTO. Glissement inertiel dissymetrique conforme trace
     86 (montee ~0.50m, descente ~1.20m, jog palier 1 < 0.05m). SimWinchCoast_M supprime (GVL_PERSISTENT intact). SimBucketSpeedFactor
     ajoute (volatile). Derive descente 100% physique sur relais (retard 3% M2, conforme trace 36), eliminant tout faux defaut
@@ -300,7 +309,7 @@ tasks:
   criticite: C2
   domaine: SIMULATION / SIMBENCH / TRANSLATION M3
   agent: AGY01
-  date: '2026-10-28T18:26:10+01:00'
+  date: '2026-11-11T02:59:02+01:00'
   titre: SimBench M3 - mecanique realiste et chaine automate-variateur-mouvement
   contexte: 'Decisions exploitant 2026-10-28 : deceleration pilotee par le variateur apres mot zero ; rampe automate legerement
     plus douce que sa limite materielle ; estimations de geometrie/vitesse acceptees ; balancement secondaire. Aucun depassement
@@ -313,7 +322,7 @@ tasks:
   - Utiliser la meme mecanique en manuel et auto, balancement conserve mais secondaire.
   - Observer depassements, butees et defauts naturels sans regler le banc pour les provoquer.
   - Challenge independant, implementation par CDX01, revue du diff, essais fonctionnels courts puis validation utilisateur.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417_SIMULATION_M3_REALISTE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T417_CONTRAT_SIMULATION_M3_REALISTE.yaml
   avancement: 'Pause pour limite token agent. Checkpoint sauvegarde : FB_Sim_Translation, FB_Sim_TranslationDrive, bundle
     XML et fiches etudes/passation a jour. Fiche passation : DOC/WFLOW/TROUBLESHOOTING/FICHES/PASSATION_T417_SimM3_20261030.md.'
   bloque_par: []
@@ -362,7 +371,7 @@ tasks:
   criticite: C3
   domaine: OUTILLAGE / TWINBENCH / SIMULATEUR INDUSTRIEL / PLATEFORME
   agent: —
-  date: '2026-10-02T00:00:00+02:00'
+  date: '2026-11-11T02:59:04+01:00'
   titre: TwinBench — plateforme generale de simulation industrielle
   contexte: Le projet doit disposer d un simulateur general integre autour de CODESYS, SimBench et OpenModelica. M3 est son
     premier cas metier, avant M1, M2 et la benne.
@@ -373,7 +382,7 @@ tasks:
   - Definir et faire respecter la frontiere entre PLC, SimBench, simulateur externe et IHM.
   - Qualifier M3 comme premier cas metier par scenarios reproductibles et verdicts PLC.
   - Preparer l extension aux treuils et a la benne sans melanger composant physique et logique PLC.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T415_TWINBENCH_PLATFORM_SIMULATOR.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T415_CONTRAT_TWINBENCH_PLATFORM_SIMULATOR.yaml
   enfants:
   - T415-A
   - T415-B
@@ -409,12 +418,12 @@ tasks:
   criticite: C3
   domaine: OUTILLAGE / TWINBENCH / CONTRAT DE LIAISON
   agent: —
-  date: '2026-10-02T22:08:43'
+  date: '2026-11-11T02:59:07+01:00'
   titre: TwinBench — frontiere PLC, SimBench et simulateur externe
   contexte: Definir un contrat unique avant toute nouvelle injection.
   description: Le simulateur lit les commandes publiees et ecrit uniquement une image materielle complete a la frontiere SimBench,
     sous verrou de simulation.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T415-B_M3_LIEN_EXTERNE_SIMBENCH.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T415-B_CONTRAT_M3_LIEN_EXTERNE_SIMBENCH.yaml
   avancement: 'L1 livre non commite. 2026-10-02 COMMUNICATION VALIDEE dans Control Win (Device_CtrlWinSim) : PLC <-> passerelle
     FMU ~96 trames/s, 0 rejet, reprise auto apres redemarrage passerelle ; le PLC pilote la plante (sens, frequence, frein)
     et recoit les capteurs. Correctifs livres : adresse loopback litterale (constante STRING videe par le generateur), types
@@ -524,7 +533,7 @@ tasks:
   criticite: C3
   domaine: OUTILLAGE / TWINBENCH / LANCEUR / CONTROL WIN / ERGONOMIE
   agent: —
-  date: '2026-10-02T17:20:10'
+  date: '2026-11-11T02:59:10+01:00'
   titre: TwinBench v2 — lancer la simulation (projet unique Device + Device_CtrlWinSim)
   contexte: 'Decision humaine 2026-10-02 : un seul projet CODESYS avec Device (CPU reel, simulation IDE) et Device_CtrlWinSim
     (Control Win). La copie reecrite HW_SIM du lanceur v1 n est plus le chemin nominal. Simulation IDE sans sockets (lien
@@ -537,7 +546,7 @@ tasks:
   - Etat de liaison lisible cote PLC (SimM3Link*) et cote vue (echo PLC).
   - Zero confusion reel/simule, zero bus terrain demarre par Control Win, zero processus tue a tort.
   - Recette tracee LN/GW/EL/BS/CW/E2E.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T415-G_TWINBENCH_V2.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T415-G_CONTRAT_TWINBENCH_V2.yaml
   sources:
   - DOC/WFLOW/ORCHESTRATION_RAPPORTS/PROPOSITION_TWINBENCH_V2_2026-10-02.md
   - DOC/WFLOW/ORCHESTRATION_RAPPORTS/CHALLENGE_TWINBENCH_V2_2026-10-02.md
@@ -582,7 +591,7 @@ tasks:
   criticite: C3
   domaine: OUTILLAGE / SIMULATION / FMU / CONTROL WIN / SIMBENCH
   agent: —
-  date: '2026-09-28T02:45:00+02:00'
+  date: '2026-11-11T02:59:13+01:00'
   titre: POC FMU M3 fonctionnel avec injection reversible dans SimBench Control Win
   contexte: T408 a valide le transport UDP natif 10 ms dans la copie Control Win. Il faut maintenant relier une plante FMU
     M3 a l image SimM3OpenModelica deja prevue par T403.
@@ -593,7 +602,7 @@ tasks:
   - Publier une image M3 complete vers SimM3OpenModelica.
   - Neutraliser sur timeout, trame invalide ou verrou de simulation absent.
   - Mesurer pertes, sequences et reprise apres coupure.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T409_FMU_CONTROL_WIN_INJECTION.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T409_CONTRAT_FMU_CONTROL_WIN_INJECTION.yaml
   avancement: Contrat, plan, protocole binaire et gateway FMU créés ; POU passerelle fourni pour compilation dans la copie
     Control Win.
   bloque_par:
@@ -604,7 +613,7 @@ tasks:
   criticite: C3
   domaine: OUTILLAGE / SIMULATION / UDP NATIF / CONTROL WIN
   agent: —
-  date: '2026-09-28T01:50:00+02:00'
+  date: '2026-11-11T02:59:16+01:00'
   titre: POC UDP natif — mesure 10 ms dans la copie Control Win
   contexte: T407 valide le loopback mais mesure ~217 ms/echange via ScriptEngine. Il faut mesurer le transport depuis une
     tache PLC native non bloquante avant toute liaison M3.
@@ -615,7 +624,7 @@ tasks:
   - Mesurer cadence, pertes et p50/p95/p99/max sur 60 s.
   - Fermer explicitement le socket au stop et verifier la reprise sans changer de port.
   - Refuser toute integration M3 si le budget 50 ms n est pas respecte.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T408_POC_UDP_NATIF_CONTROL_WIN.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T408_CONTRAT_POC_UDP_NATIF_CONTROL_WIN.yaml
   avancement: Sources mono et multi-flux, echo local et garde-fou construits. Recette humaine a jouer dans une nouvelle tache
     10 ms de la copie Control Win ; aucun code production ni image M3 touche.
   bloque_par: []
@@ -646,7 +655,7 @@ tasks:
   criticite: C3
   domaine: OUTILLAGE / SIMULATION / CONTRAT LIAISON / SURETE
   agent: —
-  date: '2026-09-28T00:31:23+02:00'
+  date: '2026-11-11T02:59:18+01:00'
   titre: TwinBench M3 — contrat de signaux et surete de liaison PLC/plante
   contexte: La revue experte bloque toute integration PLC/OpenModelica tant que les images de donnees, leur validite, les
     timeouts, la neutralisation et les proprietaires ne sont pas definis et relus.
@@ -658,7 +667,7 @@ tasks:
   - Interdire toute image partielle, perimee ou de provenance ambiguë.
   - Definir les etats de liaison et le rejet explicite sans hold-last-value silencieux.
   - Exiger une revue humaine avant toute implementation de passerelle ou connexion Control Win.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T406_TWINBENCH_CONTRAT_LIAISON.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T406_CONTRAT_TWINBENCH_CONTRAT_LIAISON.yaml
   avancement: 'Contrat des images atomiques, cadences, validite, timeout et reconnexion redige et verifie. Revue humaine requise
     : aucun GO phase B/C/D tant que les bits variateur, timeouts, neutralisation et origins ne sont pas arbitres.'
   bloque_par: []
@@ -668,7 +677,7 @@ tasks:
   criticite: C2
   domaine: OUTILLAGE / SIMULATION / OPENMODELICA / INTERFACE LIVE
   agent: —
-  date: '2026-09-28T00:07:34+02:00'
+  date: '2026-11-11T02:59:21+01:00'
   titre: POC M3 live — joystick PySide6/QML et FMU OpenModelica à pas de 10 ms
   contexte: La simulation OMEdit par lot et ses graphes ne permettent pas de comprendre facilement les entrées/sorties des
     blocs ni de modifier une commande pendant l exécution. Un POC isolé doit prouver une interaction directe avec la même
@@ -682,7 +691,7 @@ tasks:
   - Afficher les entrées et sorties instantanées sans dépendre des graphes OMEdit.
   - Séparer la cadence physique 10 ms du rafraîchissement graphique plus lent.
   - Rester entièrement local, hors PLC, CODESYS, réseau et machine réelle.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T405_POC_M3_LIVE_FMU_QML.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T405_CONTRAT_POC_M3_LIVE_FMU_QML.yaml
   avancement: FMU Co-Simulation construite avec omc 1.27.1 ; injection live et pas 10 ms validés sur 500 pas. Interface PySide6/QML
     chargée sans erreur après correction du conflit DLL Qt. En attente de recette visuelle humaine.
   bloque_par: []
@@ -718,7 +727,7 @@ tasks:
   criticite: C2
   domaine: OUTILLAGE / SIMULATION / OPENMODELICA / CODESYS
   agent: —
-  date: '2026-09-27T12:15:00+02:00'
+  date: '2026-11-11T02:59:24+01:00'
   titre: Aiguillage M3 SimBench entre modele ST et interface OpenModelica
   contexte: Le FB_SimBench doit rester l enveloppe unique de simulation. OpenModelica doit pouvoir fournir la meme image ST_HwTranslation
     que le modele ST interne, sans modifier la logique metier PLC.
@@ -730,7 +739,7 @@ tasks:
   - Selectionner le modele ST M3 ou l image OpenModelica par un seul bit.
   - Ne modifier ni la logique metier M3 ni les sorties physiques PRG_06.
   - Fournir une interface ST_HwTranslation publique pour le futur pont om.exe.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T403_AIGUILLAGE_M3_OPENMODELICA.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T403_CONTRAT_AIGUILLAGE_M3_OPENMODELICA.yaml
   avancement: 'Aiguillage implemente dans FB_SimBench : SimM3OpenModelicaActive selectionne le modele ST ou l image ST_HwTranslation
     OM. Bundle 262/262 sans erreur, G200 PASS 0 erreur. NOTE_APPLICATION_T403 trace les tests et limites. Recette CODESYS
     et raccordement om.exe restent a valider.'
@@ -741,7 +750,7 @@ tasks:
   criticite: C2
   domaine: OUTILLAGE / SIMULATION / COMMUNICATION CODESYS
   agent: —
-  date: '2026-09-27T11:34:44+02:00'
+  date: '2026-11-11T02:59:28+01:00'
   titre: POC aller-retour M3 avec le simulateur intégré CODESYS
   contexte: Le POC Modelica utilisait un scénario implicite à la place des commandes et retours PLC. Avant de coupler OpenModelica,
     il faut prouver une lecture et une écriture contrôlée dans la simulation intégrée à l IDE CODESYS.
@@ -754,7 +763,7 @@ tasks:
   - Prouver une écriture ponctuelle sans forçage et avec restauration garantie.
   - Refuser automatiquement l écriture hors mode Simulation IDE.
   - Ne modifier ni CODE, ni le projet CODESYS, ni le modèle OpenModelica.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T402_POC_COMMUNICATION_CODESYS_SIM_M3.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T402_CONTRAT_POC_COMMUNICATION_CODESYS_SIM_M3.yaml
   avancement: 'POC ScriptEngine créé : probe lecture seule et lanceur pulse_maintenance Python 3 sans paramètre. Correction
     appliquée : propagation de la portée CODESYS (projects/online) vers le lanceur. Simulation-only avec restauration garantie
     ; contrat, syntaxe Python et garde-fou PASS. En attente de recette dans Tools > Scripting CODESYS.'
@@ -765,7 +774,7 @@ tasks:
   criticite: C2
   domaine: OUTILLAGE / SIMULATION / POC OPENMODELICA
   agent: —
-  date: '2026-09-27T22:23:16+02:00'
+  date: '2026-11-11T02:59:31+01:00'
   titre: POC rapide M3 — fichier OpenModelica autonome ouvrable et simulable dans OMEdit
   contexte: Avant l application Windows, la communication PLC et le modèle électromécanique détaillé, l utilisateur demande
     une preuve simple et rapide de la chaîne ouvrir, simuler et observer dans OpenModelica.
@@ -780,7 +789,7 @@ tasks:
   - Valider compilation et simulation avec omc.exe avant recette humaine.
   - Ne modifier ni Dredge.mo, ni le PLC, ni le prototype web.
   - Régénérer Examples.AllerRetour et ajouter une boucle locale configurable séparée de la plante.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T401_POC_OPENMODELICA_M3_MINIMAL.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T401_CONTRAT_POC_OPENMODELICA_M3_MINIMAL.yaml
   avancement: 'Extension générée et validée par omc.exe 1.27.1 : Examples.AllerRetour restauré ; Examples.BoucleLocale configurable
     ajouté avec contrôleur séparé, retours capteurs, pauses et cycles bornés ou illimités. Tests 40 Hz/2 cycles, 20 Hz/1 cycle
     et cycleCount=0 PASS. En attente de recette visuelle OMEdit.'
@@ -791,7 +800,7 @@ tasks:
   criticite: C2
   domaine: OUTILLAGE / SIMULATION / MODELISATION M3
   agent: —
-  date: '2026-09-27T10:07:52+02:00'
+  date: '2026-11-11T02:59:34+01:00'
   titre: Translation M3 — fiche récapitulative des données de modélisation
   contexte: La modélisation OpenModelica de M3 nécessite une référence courte distinguant les faits du code PLC, les données
     de plaque moteur, les hypothèses utilisateur, les écarts du SimBench actuel et les mesures encore nécessaires.
@@ -803,7 +812,7 @@ tasks:
   - Identifier explicitement les hypothèses de butées et les écarts du SimBench actuel.
   - Définir la chaîne physique Modelica et l interface minimale PLC/plante.
   - Lister les mesures indispensables avant toute revendication de fidélité terrain.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T400_FICHE_MODELISATION_M3.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T400_CONTRAT_FICHE_MODELISATION_M3.yaml
   avancement: Fiche rédigée le 2026-09-27 ; en attente de relecture humaine des hypothèses physiques et des données plaque.
   bloque_par: []
 - id: T399
@@ -812,7 +821,7 @@ tasks:
   criticite: C2
   domaine: OUTILLAGE / SIMULATION / ARCHITECTURE HYBRIDE
   agent: —
-  date: '2026-09-27T09:57:46+02:00'
+  date: '2026-11-11T02:59:37+01:00'
   titre: TwinBench hybride — feuille de route CODESYS, OpenModelica et application Windows
   contexte: La reprise TwinBench doit utiliser OpenModelica comme source physique, une application PySide6/QML comme interface
     et une communication locale avec le runtime CODESYS pour accéder aux variables réelles. Le protocole disponible, les droits,
@@ -829,7 +838,7 @@ tasks:
   - Limiter la première connexion PLC à la lecture seule puis décider séparément du mode shadow et de la boucle virtuelle.
   - Reporter M1/M2 et la benne après obtention des mesures mécaniques minimales.
   - Interdire tout calcul physique dans l IHM et tout pilotage de la machine réelle par OpenModelica.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T399_TWINBENCH_HYBRID_ROADMAP.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T399_CONTRAT_TWINBENCH_HYBRID_ROADMAP.yaml
   avancement: Feuille de route rédigée le 2026-09-27. En attente de validation humaine avant activation du premier lot P0.1.
   bloque_par: []
 - id: T397
@@ -838,7 +847,7 @@ tasks:
   criticite: C2
   domaine: DIAGNOSTIC / RESEAUX / OBSERVABILITE
   agent: —
-  date: '2026-09-26T20:50:00+02:00'
+  date: '2026-11-11T02:59:40+01:00'
   titre: Calibration et prolongation de la durée d impulsion ResetPulse dans FB_AutoResetTransientDiag
   contexte: 'REX atelier/MES 2026-09-26 : lors du réarmement pupitre, instAutoResetTransientDiag entre bien en Phase=2 (attente
     stabilisation 1s) mais ResetPulse n est jamais observable dans la table de variables / watch CODESYS ni sur l IHM. Dans
@@ -858,7 +867,7 @@ tasks:
   - 'Valider la machine d état interne : State et Phase reflètent l impulsion en cours puis basculent en Lockout (Phase 3)
     à l issue de l impulsion.'
   - Valider en CI (tests unitaires C_DIAG_RESEAUX) et vérifier la suite complète des gates mécaniques.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T397_CALIBRATION_RESET_PULSE_DIAG.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T397_CONTRAT_CALIBRATION_RESET_PULSE_DIAG.yaml
   avancement: Tâche cadrée le 2026-09-26 suite au constat exploitant en watch CODESYS.
   bloque_par: []
 - id: T396
@@ -990,14 +999,14 @@ tasks:
   domaine: SUPERVISION / IHM / TRANSLATION M3
   agent: —
   locked_at: '2026-09-23T11:30:00+02:00'
-  date: '2026-09-23T11:30:00+02:00'
+  date: '2026-11-11T02:59:43+01:00'
   titre: Remonter les defauts chariot M3 dans AnyFaultActive
   contexte: 'Constat utilisateur : defaut mouvement chariot et defaut barriere M3 visibles mais exclus de AnyFaultActive.'
   description: Etendre seulement l OR de supervision avec TranslationState.Error et TranslationState.FinalInterlockError.
   objectifs:
   - Les deux defauts M3 rendent AnyFaultActive TRUE.
   - Aucune commande ni protection M3 ne change.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T391_M3_ANYFAULT.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T391_CONTRAT_M3_ANYFAULT.yaml
   avancement: En cours CDX03, GO humain explicite.
   bloque_par: null
 - id: T390
@@ -1696,7 +1705,7 @@ tasks:
   criticite: C3
   domaine: SUPERVISION / IHM / DIAGNOSTIC / SECURITE
   agent: —
-  date: '2026-11-06T22:55:07+01:00'
+  date: '2026-11-11T02:59:46+01:00'
   updated_at: '2026-09-22T06:10:20+02:00'
   titre: 'Defauts et refus SILENCIEUX : 3 voies de blocage sans message operateur (sequencement benne couple, causes latchees
     masquees par un temoin de validite, SafeStop de demande) + garde-fou anti-silence'
@@ -1736,7 +1745,7 @@ tasks:
   - 'AC7 : bundle frais + diff bundle + G200 --report PASS 0 erreur.'
   - 'AC8 : git diff --numstat VIDE sur FB_Safety_Winch.st, FB_WinchOutputInterlock.st, FB_Winch.st et CODE/B_AU_SECURITE/
     (aucune logique de securite modifiee).'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T375_MESSAGES_BLOCAGES_SILENCIEUX.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T375_CONTRAT_MESSAGES_BLOCAGES_SILENCIEUX.yaml
   avancement: 'Lien T428 : les temoins de la liste de snapshot passent dans T428, le reste ici. [CADRAGE DSH01 2026-09-22T06:10
     — CONTRAT ECRIT ET VALIDE AVANT TOUTE DELEGATION : check_task_contract.py PASS 0 erreur / 0 avertissement (criticite C3,
     strategie patch). ORIGINE : session de depannage du meme jour, fiche DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_ManuelBoth_Impossible_20260922.md
@@ -1771,7 +1780,7 @@ tasks:
   domaine: MAINTENANCE_N2 / TREUILS / SECURITE
   agent: —
   locked_at: '2026-09-22T00:17:35+02:00'
-  date: '2026-09-22T00:17:35+02:00'
+  date: '2026-11-11T02:59:49+01:00'
   titre: 'MAINT_N2 : restreindre la commande manuelle des treuils par boutons IHM a MAINT_N2 uniquement (inactive en MAINT_N1
     + message op ; joystick inchange)'
   contexte: Demande client pour la mise en service. Les six boutons moteur existent dans ST_MaintenanceN2Cmd.st:9-14, mais
@@ -1802,7 +1811,7 @@ tasks:
     frais + diff bundle + G200 --report PASS 0 erreur + palier C sans rouge nouveau.'
   - 'BC7 : modification minimale de la commande EXISTANTE ; aucun nouveau bouton, aucun FB de securite touche, aucun refactor
     de matrice de protections.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_AUDIT.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T374_CONTRAT_MAINT_N2_AUDIT.yaml
   contrat_analyse_conditions: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_DSH_CONDITIONS_EXISTANTES.yaml
   contrat_boutons_code: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T374_MAINT_N2_BOUTONS_CODE.yaml
   updated_at: '2026-09-22T10:41:00+02:00'
@@ -1841,7 +1850,7 @@ tasks:
   domaine: SUPERVISION / DIAGNOSTIC / TREUILS
   agent: —
   locked_at: '2026-09-21T13:01:18+02:00'
-  date: '2026-11-06T23:12:27+01:00'
+  date: '2026-11-11T02:59:52+01:00'
   updated_at: '2026-09-21T15:12:00+02:00'
   titre: Faux vert du diagnostic mouvement (ST_MotionChecklist) - le technicien voit une barriere OK alors qu elle refuse
   contexte: 'Trouve pendant l investigation T224 (ArmingPermit). Symptome distinct de T224 (armement trompeur) et de T370
@@ -1860,7 +1869,7 @@ tasks:
   - Test de non-regression sur les 3 causes de la barriere (RESTART_INHIBITED, SENSE_DROP_TIMEOUT, BRAKE_COMMAND_NOT_CONFIRMED)
     et sur la remise a NONE, preuve avant/apres identique.
   - Aucun commit sans accord explicite distinct du GO.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T371_FAUX_VERT_MOTIONCHECKLIST.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T371_CONTRAT_FAUX_VERT_MOTIONCHECKLIST.yaml
   avancement: 'CLOTURE exploitant 2026-11-06 : correctif present dans le code via 8ec1fa28, FB_TroubleshootingView.st:601-607.
     Reserves restantes reportees sur T372 et T373, rattachees a T428. [ORCHESTRATEUR DSH29 2026-09-21T13:01 — BRIEF V1 CHALLENGE
     AVANT TRANSMISSION, BORNE REFUTEE, BRIEF V2 ECRIT, CONTRAT C4 ECRIT ET VALIDE, GO HUMAIN RENDU SUR A1-A4. AUCUN FICHIER
@@ -2044,7 +2053,7 @@ tasks:
   criticite: C3
   domaine: JOYSTICK / ARMEMENT
   agent: —
-  date: '2026-09-21T10:54:10+02:00'
+  date: '2026-11-11T02:59:54+01:00'
   updated_at: '2026-09-21T10:54:10+02:00'
   titre: ArmingPermit couvre les tempos idle de l interlock final (cloture du scope_conflict_flagged de T224)
   contexte: 'Entree CREEE le 2026-09-21 pour regulariser un travail REEL reste ORPHELIN : le contrat DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T228_ARMINGPERMIT_TEMPOS_INTERLOCK.yaml
@@ -2066,7 +2075,7 @@ tasks:
   - Aucun axe reellement disponible n est desarme par l inhibition d un autre axe
   - 'Non-regression : ArmingPermit reste UN SEUL booleen, FB_Joystick inchange, StepDelay reste EXCLU (rate-limit de palier,
     pas un blocage)'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T228_ARMINGPERMIT_TEMPOS_INTERLOCK.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T228_CONTRAT_ARMINGPERMIT_TEMPOS_INTERLOCK.yaml
   bloque_par:
   - Arbitrage humain du perimetre T224 (trous G1/G2/G3, brief v2 Etape B) — ce lot ne se rejoue PAS a l identique, le revert
     263fae18 fait reference de risque
@@ -2093,7 +2102,7 @@ tasks:
   domaine: SECURITE_ET_AU / TREUILS_M1_M2
   agent: —
   locked_at: '2026-09-22T00:23:05+02:00'
-  date: '2026-09-22T00:23:05+02:00'
+  date: '2026-11-11T02:59:58+01:00'
   updated_at: '2026-09-22T00:23:05+02:00'
   titre: Cartographie exhaustive des discordances contacteurs M1/M2 et choix de codage alarmes/messages
   contexte: 'Mail client GCAM 2026-09-15 : detection de discordance commande/retour contacteurs deja validee en simulation
@@ -2109,7 +2118,7 @@ tasks:
     presents.
   - Comparatif testable des deux architectures bits/messages, avec cas simultanes, priorites et capacite des structures.
   - Aucune ligne de CODE/ modifiee dans ce lot.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T370_CARTOGRAPHIE_DISCORDANCES.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T370_CONTRAT_CARTOGRAPHIE_DISCORDANCES.yaml
   avancement: Diagnostic statique initial deja rendu dans TROUBLESHOOTING_T370_DISCORDANCE_CONTACTEURS_20260921.md. Mission
     complementaire exhaustive confiee a CDX03, read-only ; choix bits/messages puis plan code a valider avec l humain.
   bloque_par: []
@@ -2190,7 +2199,7 @@ tasks:
   domaine: SUPERVISION / IHM
   agent: —
   locked_at: '2026-09-21T08:45:00+02:00'
-  date: '2026-09-21T08:05:00+02:00'
+  date: '2026-11-11T03:00:00+01:00'
   updated_at: '2026-09-21T09:28:00+02:00'
   titre: Afficher le temps ecoule (min/s) a cote du bandeau mode et dans le texte AX13 egouttage
   contexte: 'T347 a deja cree CurrentCycleElapsed_Min/_S (FB_CycleSemiAuto.st:151-152, calcules :344-345) ; ces valeurs atteignent
@@ -2215,7 +2224,7 @@ tasks:
   - 'G408 reste PASS (exit 0, 0 violation) : aucun message IHM (CycleStateStr / SequenceProgressText) au-dela de 70 car.,
     pire cas CONCAT borne et prouve.'
   - Test CI neuf du nouvel affichage (rouge AVANT / vert APRES) + non-regression des suites FB_Hmi_BannerFormatter et FB_CycleSemiAuto.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T368_TEMPS_ECOULE_BANDEAU_AX13.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T368_CONTRAT_TEMPS_ECOULE_BANDEAU_AX13.yaml
   avancement: '[ORCHESTRATEUR 2026-09-21T08:45 — VERROU T368 POSE SOUS DSH27 (premier tag libre verifie : grep DSH2[7-9] =
     0 occurrence ; edit_flags VIDE a la prise), BRIEF TRANSMIS A UN SOUS-AGENT AVEC PREAMBULE subagent_preamble.md EN TETE,
     GO = brief utilisateur lui-meme. ETAT MESURE A LA PRISE (releve, pas declare) : FB_CycleSemiAuto.st et FB_Hmi_BannerFormatter.st
@@ -2625,7 +2634,7 @@ tasks:
   domaine: SECURITE_ET_AU / DIAGNOSTIC
   agent: —
   locked_at: '2026-09-21T03:35:00+02:00'
-  date: '2026-09-21T03:40:00+02:00'
+  date: '2026-11-11T03:00:03+01:00'
   updated_at: '2026-09-21T03:40:00+02:00'
   titre: 'Auto-acquittement borne : le pulse ResetTransient est un NO-OP demontre, et la voie « front Online » est demontree
     impossible'
@@ -2657,7 +2666,7 @@ tasks:
   - Preuve executable que le resultat est identique au cadrage de production (pulse emis 1 s apres le retour de liaison).
   - Preuve executable qu aucun scan n expose l equipement en ligne avec son bit de perte de liaison encore pose.
   - Aucun fichier CODE/ modifie avant l arbitrage humain de la cible du correctif.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T359_AUTORESET_NOOP.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T359_CONTRAT_AUTORESET_NOOP.yaml
   bloque_par: []
   avancement: '[DSH22 2026-09-21T03:40 — PHASE PREUVE TERMINEE, ZERO ligne de CODE/ ecrite (git status --short -- CODE/ VIDE)]
     Contrat C3 ecrit avant le lot : TASK_CONTRACT_T359_AUTORESET_NOOP.yaml, check_task_contract.py PASS 0 erreur / 0 avertissement.
@@ -2700,7 +2709,7 @@ tasks:
   domaine: CYCLE_AUTO / COMMANDE / SECURITE
   agent: —
   locked_at: '2026-09-21T03:05:00+02:00'
-  date: '2026-09-21T03:05:00+02:00'
+  date: '2026-11-11T03:00:06+01:00'
   updated_at: '2026-09-21T04:40:00+02:00'
   titre: 'Forçage de step du cycle semi-auto : saut immédiat à une valeur, sans aucune garde de contexte ni confirmation'
   contexte: 'Constats exploitant 2026-09-21 : le forçage etait INUTILISABLE — refuse au-dela du step 7 sans KoboldImmersionQualified
@@ -2728,7 +2737,7 @@ tasks:
     partages ne perdent aucun autre consommateur.
   - Aucun commit sans accord explicite distinct du GO d implementation.
   bloque_par: []
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T358_FORCESTEP_SANS_GARDE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T358_CONTRAT_FORCESTEP_SANS_GARDE.yaml
   avancement: '[DSH21 2026-09-21 GO humain pris sur le brief] Contrat C4 ecrit AVANT le lot (check_task_contract.py PASS 0
     erreur / 0 avertissement). 4 ARBITRAGES HUMAINS RECUS : D2 cible en Cmd NON persistee (un saut automatique au boot sur
     une valeur oubliee serait un risque nouveau non voulu) ; D3 forcage applique APRES la porte §2 sans toucher Mode/AU/codeur
@@ -2856,7 +2865,7 @@ tasks:
   domaine: SECURITE / TREUILS_M1_M2 / ARBITRAGE
   agent: —
   locked_at: '2026-09-21T02:31:00+02:00'
-  date: '2026-09-21T01:35:23+02:00'
+  date: '2026-11-11T03:00:09+01:00'
   updated_at: '2026-09-21T02:43:49+02:00'
   titre: 'Asymetrie de garde M1/M2 : NOT BucketBusy present au gate M1 et absent du gate M2 — M2 peut partir seul benne occupee'
   contexte: 'Trouvaille 🔴 candidate du lot T351 (fiche TROUBLESHOOTING_TREUILS_JoystickContacteur_20260921.md section 6.4
@@ -2885,7 +2894,7 @@ tasks:
     garde.
   - Doctrine M1 vs M2 etablie avec sa source documentaire, ou declaree NON SOURCEE si aucune spec ne la porte.
   - Options de correction comparees et chiffrees, non implementees ; aucun CODE/ modifie dans ce lot.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T354_ASYMETRIE_GARDE_M1_M2.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T354_CONTRAT_ASYMETRIE_GARDE_M1_M2.yaml
   avancement: '[DSH20 2026-09-21T02:31 prise de tag + verrou] TAG DSH20 = premier tag libre verifie a la prise (DSH01 contamine,
     DSH02=T333, DSH03=T328/T300, DSH04=T332, DSH05=T255-D, DSH06=T330, DSH07=T334, DSH08=T295, DSH09=T331, DSH10=T338, DSH11=T339,
     DSH12=T342, DSH13=T346, DSH14=T347, DSH15=T345, DSH16=T262, DSH17=T352, DSH18=T351, DSH19=T353, CC01=T299/T340/T341, AGY01=T291-B)
@@ -2934,7 +2943,7 @@ tasks:
   domaine: OUTILLAGE / DOCUMENTATION / VISUALISATION
   agent: —
   locked_at: '2026-09-21T02:18:19+02:00'
-  date: '2026-09-21T02:18:19+02:00'
+  date: '2026-11-11T03:00:11+01:00'
   updated_at: '2026-09-21T03:50:00+02:00'
   titre: 'PHASE 2 T351 — outil web interactif : choisir un geste joystick et voir le chemin exact parcouru dans le code (PRG,
     FB, variables), chronologiquement'
@@ -2965,7 +2974,7 @@ tasks:
     et les branches rejetees identifiees.
   - Livraison dans TOOLS/ conforme a STRUCTURE_AND_CLEANUP.md ; aucun fichier CODE/ modifie ; aucun commit sans relecture
     humaine du diff.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T353_OUTIL_WEB_CARTOGRAPHIE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T353_CONTRAT_OUTIL_WEB_CARTOGRAPHIE.yaml
   avancement: '[ORCHESTRATEUR — VERROU DSH19 POSE 2026-09-21T02:18:19+02:00 SUR GO HUMAIN EXPLICITE] Contrat C2 ecrit AVANT
     le lot : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T353_OUTIL_WEB_CARTOGRAPHIE.yaml (check_task_contract.py PASS 0 erreur / 0
     avertissement, 12 criteres AC1-AC12). 3 DECISIONS HUMAINES VALIDEES : (D1) plan complet a 2 modes — statique file:// a
@@ -3352,7 +3361,7 @@ tasks:
   domaine: DOCUMENTATION / TROUBLESHOOTING / TREUILS_TRANSLATION
   agent: —
   locked_at: '2026-09-21T01:22:07+02:00'
-  date: '2026-09-21T01:35:23+02:00'
+  date: '2026-11-11T03:00:14+01:00'
   updated_at: '2026-09-21T01:35:23+02:00'
   titre: Cartographie exhaustive joystick -> contacteur, MANU et AUTO, treuils M1/M2 ET translation M3 (besoin utilisateur
     recurrent)
@@ -3376,7 +3385,7 @@ tasks:
   - Points de convergence/divergence entre les 2 chaines identifies explicitement (comme fait pour M3 dans T334).
   - Verification que la chaine M3 existante (T334) est au meme niveau de completude ; combler les trous si releves.
   - Document livre en DOC/WFLOW/TROUBLESHOOTING/FICHES/, reutilisable comme reference permanente (pas un jetable de debug).
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T351_CARTOGRAPHIE_TREUILS.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T351_CONTRAT_CARTOGRAPHIE_TREUILS.yaml
   livrable: DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_TREUILS_JoystickContacteur_20260921.md (786 l, 2 chaines M01-M66
     / C01-C35) + annexe M3 DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T351_ANNEXE_M3_TrousT334_20260921.md (603 l, audit
     de peremption de T334)
@@ -3452,7 +3461,7 @@ tasks:
   criticite: C2
   domaine: CYCLE_AUTO / INTERFACE_IHM
   agent: —
-  date: '2026-09-21T00:45:00+02:00'
+  date: '2026-11-11T03:00:17+01:00'
   updated_at: '2026-09-21T00:45:00+02:00'
   titre: 'AX15A : afficher le geste reellement exige (homme-mort + appui Y-) au lieu d une deflection generique'
   contexte: 'Trouvaille annexe du challenge de T345. En AX15A les 2 indicateurs publies vers la supervision derivent de JoystickDeflected,
@@ -3477,7 +3486,7 @@ tasks:
   - Aucune autre etape du graphe ne voit ses indicateurs d attente changer, et aucune commande de mouvement n est modifiee.
   bloque_par:
   - 'T347 : verrou d ecriture sur CODE/G_CYCLE/FB_CycleSemiAuto.st au moment de la creation de cette tache'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T349_AX15A_AFFICHAGE_GESTE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T349_CONTRAT_AX15A_AFFICHAGE_GESTE.yaml
   alerte: 'La porte de sortie AX15A utilise JoystickPush, qui n exclut PAS une deflection simultanee de l axe X, alors que
     la garde stricte JoystickPushOnly existe deja (FB_CycleSemiAuto.st, arbre de travail :783) et est utilisee par la porte
     AX2 (:966). Resserrer la porte est une decision C3 (mouvement/geste) qui touche la semantique du repli benne etudiee par
@@ -3533,7 +3542,7 @@ tasks:
   domaine: SUPERVISION / INTERFACE_IHM
   agent: —
   locked_at: '2026-09-21T00:18:00+02:00'
-  date: '2026-09-21T00:40:00+02:00'
+  date: '2026-11-11T03:00:20+01:00'
   updated_at: '2026-09-21T00:40:00+02:00'
   titre: Remplacer TIME par minutes/secondes (INT) pour les durees cycle affichees IHM (CurrentCycleElapsed, LastCycleDuration)
     — LOT LIVRE, NON COMMITE
@@ -3555,7 +3564,7 @@ tasks:
   - 'Non-regression : aucun autre champ TIME de GVL_IHM modifie, comportement du chrono/figeage a X13 inchange.'
   - Bundle + diff bundle + G200 + gates palier C avant restitution.
   bloque_par: []
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T347_DUREE_CYCLE_MIN_SEC.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T347_CONTRAT_DUREE_CYCLE_MIN_SEC.yaml
   avancement: 'VERROU PRIS par DSH14 le 2026-09-21T00:18:00 (premier tag libre, verifie a la prise : DSH01 contamine, DSH02=T333,
     DSH03=T328/T300, DSH04=T332, DSH05=T255-D, DSH06=T330, DSH07=T334, DSH08=T295, DSH09=T331, DSH10=T338, DSH11=T339, DSH12=T342,
     DSH13=T346, CC01=T299/T340/T341, AGY01=T291-B ; l entree T347 portait agent em-dash = verrou libre). LOT LIVRE 2026-09-21T00:40,
@@ -3591,7 +3600,7 @@ tasks:
   domaine: TREUILS_BENNE / SECURITE_MACHINE
   agent: —
   locked_at: '2026-09-20T22:36:25+02:00'
-  date: '2026-09-20T23:10:00+02:00'
+  date: '2026-11-11T03:00:23+01:00'
   updated_at: '2026-09-20T23:58:00+02:00'
   titre: Restaurer une borne de recul correcte sur FB_Bucket (frontiere PHYSIQUE, pas M2StartPosM), sans reproduire les coupures
     parasites du 2026-09-05 — LOT LIVRE, NON COMMITE
@@ -3611,7 +3620,7 @@ tasks:
     rouge->vert.
   - LeftStartSinceArm purge ou reellement reutilise, plus de variable a moitie morte.
   - Bundle + diff bundle + G200 + gates palier C avant restitution.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T346_BORNE_RECUL.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T346_CONTRAT_BORNE_RECUL.yaml
   avancement: 'VERROU PRIS par DSH13 le 2026-09-20T22:36:25 (premier tag libre, verifie a la prise : DSH01 contamine, DSH02=T333,
     DSH03=T328/T300, DSH04=T332, DSH05=T255-D, DSH06=T330, DSH07=T334, DSH08=T295, DSH09=T331, DSH10=T338, DSH11=T339, DSH12=T342,
     CC01=T299/T340/T341, AGY01=T291-B ; lentree T346 portait agent em-dash = verrou libre). PHASE 1 DIAGNOSTIC LIVREE 2026-09-20T22:34
@@ -3951,7 +3960,7 @@ tasks:
   domaine: TREUILS_BENNE / ENCODEURS / SIMULATION
   agent: —
   locked_at: '2026-09-20T21:14:11+02:00'
-  date: '2026-09-20T21:32:00+02:00'
+  date: '2026-11-11T03:00:27+01:00'
   updated_at: '2026-09-20T21:14:11+02:00'
   titre: T338 CR2 — reinjection silencieuse RawPosM2=0 -> 1 100 000 pts dans FB_SimBench.st:273-280 (cause directe du saut
     post-AU)
@@ -3971,7 +3980,7 @@ tasks:
   - 'Si la reinjection reste necessaire : la rendre OBSERVABLE (sortie diagnostic ou log), jamais silencieuse.'
   - Non-regression du correctif T338 (comptage signe, CI 9/9, G510).
   - Bundle PLCopenXML, G200 liaison, gates applicables PASS.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T342_SIM_REINJECTION_SILENCIEUSE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T342_CONTRAT_SIM_REINJECTION_SILENCIEUSE.yaml
   bloque_par: []
   avancement: 'PRISE 2026-09-20T21:14:11 par DSH12 (verrou pose, tag DSH12 = premier libre ; libelle du brief "Orchestrateur
     CC01" non usurpe). ARBITRAGE DE CONCEPTION (fait par l agent, sur preuve) : la reinjection est SUPPRIMEE, pas rendue observable
@@ -4001,7 +4010,7 @@ tasks:
   domaine: QUALITE_CODE / TESTS_CI / SECURITE_POSITIONNELLE
   agent: —
   locked_at: '2026-09-20T21:30:00+02:00'
-  date: '2026-09-20T21:30:00+02:00'
+  date: '2026-11-11T03:00:30+01:00'
   updated_at: '2026-09-20T21:30:00+02:00'
   titre: T330 suite — extraire FB_CfgT330Normalizer en vrai FB + ecrire les 37 cas ST TC-P10-056-092
   contexte: 'Revue independante T330 (B2, non bloquant pour la cloture) : les 37 cas ST prevus par le plan n existent pas
@@ -4023,7 +4032,7 @@ tasks:
     pour detecter les ecritures INDIRECTES du totalisateur (REF_TO, VAR_IN_OUT aliase), pas seulement les affectations textuelles
     nommees -- aujourd hui G508 PASS ne prouve que l absence d ecriture DIRECTE.'
   - Bundle + diff bundle + G200 + gates palier C avant restitution.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T341_CFGT330_NORMALIZER_FB.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T341_CONTRAT_CFGT330_NORMALIZER_FB.yaml
   avancement: 'VERROU PRIS par CC01 le 2026-09-20T21:30 (GO direct humain, "verrou a poser toi-meme", Orchestrateur CC01).
     ARBITRAGE HUMAIN EN COURS DE LOT (2026-09-20) — LE LOT EST TRANCHE A LA BAISSE : sur les 37 cas declares par le plan T330,
     seuls 21 sont decidables sur un FB unitaire. Les 16 autres (075-081, 083-089, 072, 073) ne portent PAS sur la normalisation
@@ -4070,9 +4079,9 @@ tasks:
   domaine: CYCLE_HOMING / SECURITE_REFERENCEMENT
   agent: —
   locked_at: '2026-09-20T20:48:29+02:00'
-  date: '2026-11-06T23:12:27+01:00'
+  date: '2026-11-11T03:00:33+01:00'
   updated_at: '2026-09-20T20:48:29+02:00'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T340_HOMING_LOCKED_ASCENT.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T340_CONTRAT_HOMING_LOCKED_ASCENT.yaml
   reserve_orchestrateur_20260921: 'AUDIT INDEPENDANT : (1) objectif "position provisoire M1" PERIME -- le code livre ABANDONNE
     cette position provisoire (ST_Encoder_Calib n a qu un booleen Homed), jamais mis a jour dans les objectifs structures.
     (2) ECART CONNU NON CORRIGE : FB_CycleMachineHoming.st:716-721 -- en MAINT_N2 l arbitrage aval (FB_WinchCmdArbitrationM1/M2)
@@ -4150,7 +4159,7 @@ tasks:
   domaine: TESTS_CI / DOC (BENNE)
   agent: —
   locked_at: '2026-09-20T21:05:00+02:00'
-  date: '2026-09-20T21:05:00+02:00'
+  date: '2026-11-11T03:00:35+01:00'
   avancement: 'VERROU PRIS par DSH11 le 2026-09-20T21:05 (DSH11 = premier tag libre, DSH01 contamine / DSH02..DSH10 tous portes).
     Créée le 2026-09-20 par CC01 sur accord explicite de l''humain, après le lot T295 qui a signalé ces trois dettes sans
     les corriger. IMPLEMENTATION LIVREE 2026-09-20T21:35 (NON COMMITEE), ZERO fichier CODE/ modifie. (1) TRI DES 9 TESTS :
@@ -4216,7 +4225,7 @@ tasks:
     bit 2 = valeur 4).'
   - Aucun fichier de CODE/ touché ; les 4 tests T295 (TC-P10-046.1 à 046.4) restent inchangés et verts.
   - Bundle frais, G200 liaison et gates palier C avant restitution, avec comparatif avant/après des rapports CI.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T339_BENNE_TESTS_DOC_REALIGN.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T339_CONTRAT_BENNE_TESTS_DOC_REALIGN.yaml
   bloque_par: []
 - id: T338
   parent_id: ''
@@ -4301,8 +4310,8 @@ tasks:
     apres AU/rearmement est une CONSEQUENCE de ce meme blocage M2, pas un second incident independant. Perimetre du diagnostic
     a garder etroit : chaine M2 uniquement (FB_Encoder instance M2, HwIn cote M2, FB_SimBench cote M2), ne pas elargir a M1
     ni a une hypothese de panne generale simulateur.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T338_SIM_ENCODER_FLOOR.yaml
-  date: '2026-09-20T20:35:00+02:00'
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T338_CONTRAT_SIM_ENCODER_FLOOR.yaml
+  date: '2026-11-11T03:00:39+01:00'
   updated_at: '2026-09-20T20:35:00+02:00'
   titre: Position M2 (encodeur) figee malgre vitesse non nulle et contacteurs actifs — recurrent, cause non etablie
   contexte: 'Constat terrain reproduit 2 fois le 2026-09-20 : commande de descente/ouverture engagee, homme-mort + contacteurs
@@ -4416,7 +4425,7 @@ tasks:
   criticite: C3
   domaine: CYCLE_SEMIAUTO / TRANSLATION_M3 / SECURITE_MOUVEMENTS
   agent: —
-  date: '2026-09-20T16:47:46+02:00'
+  date: '2026-11-11T03:00:41+01:00'
   locked_at: '2026-09-20T15:58:00+02:00'
   updated_at: '2026-09-26T23:22:00+02:00'
   titre: 'Translation M3 : pourquoi deux chemins de commande (manuel/MAINT vs cycle auto) ? Chaînes complètes, comparatif,
@@ -4451,7 +4460,7 @@ tasks:
   - 'Correctif (lot séparé, après validation) : arrêt M3 à l''arrivée P1/Trémie en cycle au même scan qu''en manuel ; test
     CI échoue avant / passe après ; guard: de non-régression.'
   - 'Jamais de franchissement toléré en auto : le dépassement reste un défaut tracé, pas un comportement admis.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T334_AUTO_CYCLE_M3_OVERSHOOT.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T334_CONTRAT_AUTO_CYCLE_M3_OVERSHOOT.yaml
   bloque_par:
   - T300 P-A (reproduction SimBench de la perte capteur) si aucune trace réelle 10 ms n'est disponible.
   avancement: 'REX EXPLOITATION TERRAIN 2026-09-25 (REGRESSION CONFIRMEE PAR L EXPLOITANT) : alors qu en debut de mise en
@@ -4580,7 +4589,7 @@ tasks:
   criticite: C3
   domaine: CYCLE_SEMIAUTO / AX1_POSTURE / DIAGNOSTIC_IHM / SECURITE_MOUVEMENTS
   agent: —
-  date: '2026-09-20T18:47:00+02:00'
+  date: '2026-11-11T03:00:44+01:00'
   updated_at: '2026-09-20T18:47:00+02:00'
   titre: 'Cycle SEMI_AUTO — famille "retour arrière contrôlé" : remise en posture AX1 (départ) ET repli AX15b (vidage, treuils
     bloqués)'
@@ -4622,7 +4631,7 @@ tasks:
     de position figée.'
   - 'Le plan est phasé : diagnostic et matrice de causes ; design validé humainement ; implémentation séparée diagnostic puis
     remise en posture ; tests unitaires/simulation ; validation CODESYS et essais terrain supervisés.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T331_AX1_POSTURE_DIAGNOSTIC_REMISE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T331_CONTRAT_AX1_POSTURE_DIAGNOSTIC_REMISE.yaml
   contrat_sous_partie_ax15b: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T331_AX15B_REPLI_TREUILS.yaml
   bloque_par:
   - 'Phase 1 (diagnostic + matrice de causes, lecture seule) : LIBRE des le 2026-09-20 (T319 fait, T327 OK visuel). [MAJ CC01]'
@@ -4855,7 +4864,7 @@ tasks:
   criticite: C2
   domaine: TREUILS_BENNE / SYNCHRO / PROCESS
   agent: —
-  date: '2026-09-20T03:37:18+02:00'
+  date: '2026-11-11T03:00:47+01:00'
   updated_at: '2026-09-20T15:20:00+02:00'
   avancement: 'Fix livre (commit ebe12198, bundle 55700932). Test utilisateur 2026-09-20 : difficile a tester, semble OK.
     Verrou CC01 libere le 2026-09-20T15:20 ; PRG_04 libre. Cloture definitive a la prochaine confirmation terrain. [MAJ CC01]'
@@ -4901,7 +4910,7 @@ tasks:
     force, ni coupure permis avant IsClosed/IsOpen) -- reactivite identique au jog WinchSel=2.'
   - 'WinchSel=2 operateur : bornes manuelles strictement inchangees (non-regression).'
   - Config incoherente (Anticipation > CoherenceLimit) detectee au boot par CfgFault, jamais un blocage silencieux.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T327_MANUAL_BUCKET_LIMITS_PHASE_JOG.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T327_CONTRAT_MANUAL_BUCKET_LIMITS_PHASE_JOG.yaml
   bloque_par: []
 - id: T326
   parent_id: ''
@@ -4935,7 +4944,7 @@ tasks:
   criticite: C2
   domaine: TREUILS / SECURITE_MACHINE / INTERLOCK_DIRECTION
   agent: —
-  date: '2026-09-20T00:00:00+02:00'
+  date: '2026-11-11T03:00:50+01:00'
   updated_at: '2026-09-20T00:00:00+02:00'
   titre: Analyse de risque - FB_WinchDirectionInterlock (D18) ne credite pas le temps reel deja passe au neutre
   contexte: 'Discussion troubleshooting AX10->AX11 (2026-09-20) : FB_WinchDirectionInterlock (D18, delais M1WinchCfg.DirectionInterlockDelayAscent/Descent
@@ -5049,7 +5058,7 @@ tasks:
     image PLC/source.
   - Fiche ou note versionnee dans DOC/WFLOW/ tracant l'analyse complete, prete pour double relecture (Mathieu + expert externe)
     avant toute suite en implementation.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T325_D18_NEUTRE_ANALYSE_RISQUE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T325_CONTRAT_D18_NEUTRE_ANALYSE_RISQUE.yaml
   bloque_par: []
 - id: T324
   parent_id: T262
@@ -5090,7 +5099,7 @@ tasks:
   criticite: C3
   domaine: TREUILS / BENNE / DIAGNOSTIC / HOMING
   agent: —
-  date: '2026-09-19T00:00:00+02:00'
+  date: '2026-11-11T03:00:53+01:00'
   updated_at: '2026-09-19T00:00:00+02:00'
   avancement: Diagnostic confirme, correctif FB_Bucket implemente et 5 tests T323 PASS. La suite FB_Bucket conserve 9 echecs
     preexistants/hors scope ; gates C echouent sur dettes documentaires et G483 preexistants. Validation CODESYS humaine restante.
@@ -5110,7 +5119,7 @@ tasks:
   - Un vrai écart après référencement reste latched et acquittable par Reset.
   - Les causes configuration, timeout, glissement et datum suspect restent inchangées.
   - Tests FB_Bucket, bundle PLCopenXML, G200 et gates palier C fournis.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T323_BENNE_NON_REFERENCEE_DIAGNOSTIC.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T323_CONTRAT_BENNE_NON_REFERENCEE_DIAGNOSTIC.yaml
   bloque_par: []
 - id: T322
   parent_id: ''
@@ -5118,7 +5127,7 @@ tasks:
   criticite: C2
   domaine: MISE_EN_SERVICE / SIMULATION / TREUILS
   agent: HUM
-  date: '2026-09-20T00:00:00+02:00'
+  date: '2026-11-11T03:00:55+01:00'
   updated_at: '2026-09-20T00:00:00+02:00'
   titre: Mise en service - campagne de recalage terrain des hypotheses du modele treuils (M1/M2)
   contexte: Le simulateur travaille sur des hypotheses (constantes SYNTHETIQUES puis HYPOTHESE) ; 6 inconnues bloquantes subsistent,
@@ -5138,7 +5147,7 @@ tasks:
     NOTE.
   - Caracteriser le partage de charge M1/M2 (M1 seul porteur benne fermee, ouverture en l'air).
   - Faire passer chaque valeur du bloc de calage de ESTIMEE a MESUREE, ou ecrire la raison du maintien en ESTIMEE.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T322_MISE_EN_SERVICE_RECALAGE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T322_CONTRAT_MISE_EN_SERVICE_RECALAGE.yaml
   bloque_par: []
 - id: T319
   parent_id: ''
@@ -5170,7 +5179,7 @@ tasks:
   criticite: C3
   domaine: SIMULATION / TREUILS
   agent: —
-  date: '2026-09-19T00:00:00+02:00'
+  date: '2026-11-11T03:00:58+01:00'
   titre: SimBench - profil simple treuils et injection explicite cable
   contexte: Le lien implicite Kobold -> cable mou declenche SlackCable en cycle auto.
   description: Restaurer le profil nominal simple et rendre les modeles recents treuils activables explicitement.
@@ -5178,7 +5187,7 @@ tasks:
   - Restaurer cable tendu nominal et separer son injection de defaut.
   - Exposer les gates de dynamique et diagnostics electriques dans GVL_Simulation.
   - Ne pas toucher le cycle semi-auto ni les textes operateur.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T318_SIMBENCH_PROFIL_SIMPLE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T318_CONTRAT_SIMBENCH_PROFIL_SIMPLE.yaml
   bloque_par: []
 - id: T317
   parent_id: ''
@@ -5199,8 +5208,8 @@ tasks:
   - Trancher si la correction 1 (terme transitoire de commutation de gradin, jugée manquante par le challenge expert) est
     un blocant de scope ou une limite documentée acceptée.
   - Ne pas écrire de code ST tant que R0 n'est pas validé par l'humain.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T317_SIMBENCH_TREUIL_ELECTRIQUE.yaml
-  date: '2026-09-18T13:45:30'
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T317_CONTRAT_SIMBENCH_TREUIL_ELECTRIQUE.yaml
+  date: '2026-11-11T03:01:01+01:00'
   bloque_par: []
 - id: T316
   parent_id: ''
@@ -5208,7 +5217,7 @@ tasks:
   criticite: C2
   domaine: SIMULATION / FIDELITE_SIMBENCH_TREUILS
   agent: —
-  date: '2026-09-18T00:00:00+02:00'
+  date: '2026-11-11T03:01:03+01:00'
   avancement: 'Phase 1 livree et testee : dynamique treuil M1/M2 opt-in dans SimBench (defaut 0.0 = comportement historique
     inchange) — retour vitesse rapportee M1/M2 en 1er ordre (SimWinchSpeedReportTauS, FB_Sim_Encoder.st) et delai electrique/meca
     frein M1/M2 (SimWinchBrakeOpenDelayS/CloseDelayS, FB_SimBench.st) au lieu d''un saut instantane. Tests TC-P13-034/035
@@ -5236,7 +5245,7 @@ tasks:
   - Rester dans CODE/L_SIMULATION/ ; aucune modification du code metier (FB_CycleSemiAuto.st etc.).
   - 'Phase 2 (non commencee, a cadrer separement) : test CI de bout en bout au niveau du grafcet AX10_WAIT_ASCENT_START exercant
     reellement cette dynamique et assertant absence de secousse + continuite armement joystick.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T316_SIMBENCH_FIDELITE_TREUILS.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T316_CONTRAT_SIMBENCH_FIDELITE_TREUILS.yaml
   bloque_par: []
 - id: T315
   parent_id: ''
@@ -5268,7 +5277,7 @@ tasks:
   criticite: C2
   domaine: DIAGNOSTIC / GVL_TROUBLESHOOTING
   agent: —
-  date: '2026-11-06T22:55:07+01:00'
+  date: '2026-11-11T03:01:06+01:00'
   avancement: 'Rattachee a T428. Cadré le 2026-09-17 suite point de situation mail YGO : demande de réorganisation chronologique
     du GVL de troubleshooting pour exploitation rapide en maintenance.'
   titre: GVL Troubleshooting — refactor présentation chronologique pour diagnostic rapide en maintenance
@@ -5286,7 +5295,7 @@ tasks:
   - Valider sur au moins un cas réel de blocage (archive troubleshooting existante) que la nouvelle présentation raccourcit
     le temps de compréhension.
   - Bundle PLCopenXML, G200 liaison et gates applicables PASS.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T313_GVL_TROUBLESHOOTING_CHRONOLOGIQUE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T313_CONTRAT_GVL_TROUBLESHOOTING_CHRONOLOGIQUE.yaml
   bloque_par: []
 - id: T312
   parent_id: ''
@@ -5294,7 +5303,7 @@ tasks:
   criticite: C2
   domaine: IHM / DIAGNOSTIC / EXPORT
   agent: —
-  date: '2026-09-17T10:05:00+02:00'
+  date: '2026-11-11T03:01:09+01:00'
   avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO : outil de recherche/export CSV/Excel des messages opérateur,
     alarmes et indications. Structure prête selon le mail, reste à valider les textes.'
   titre: Export CSV/Excel des messages opérateur, alarmes et indications — finaliser les textes
@@ -5307,7 +5316,7 @@ tasks:
   - Recenser exhaustivement les messages/alarmes/indications existants et leur texte actuel.
   - Valider ou rédiger le texte de cause, le conseil de maintenance et l'action opérateur pour chacun.
   - Vérifier que l'export CSV/Excel produit un fichier exploitable sans erreur pour l'ensemble du périmètre.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T312_EXPORT_MESSAGES_OPERATEUR.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T312_CONTRAT_EXPORT_MESSAGES_OPERATEUR.yaml
   bloque_par: []
 - id: T311
   parent_id: ''
@@ -5315,7 +5324,7 @@ tasks:
   criticite: C2
   domaine: CYCLE / HOMING
   agent: —
-  date: '2026-09-17T10:04:00+02:00'
+  date: '2026-11-11T03:01:12+01:00'
   avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO : "le cycle homing est actuellement buggué : reproduire
     le défaut, corriger la séquence, valider en simulation puis tester sur machine."'
   titre: Cycle homing — reproduire le défaut signalé, corriger la séquence, valider simulation puis machine
@@ -5329,7 +5338,7 @@ tasks:
   - Corriger la séquence a minima, sans régression sur les cas déjà validés (T146/T226/T233).
   - Valider en simulation puis sur machine avant clôture.
   - Bundle PLCopenXML, G200 liaison et gates applicables PASS.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T311_CYCLE_HOMING_BUG.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T311_CONTRAT_CYCLE_HOMING_BUG.yaml
   bloque_par: []
 - id: T310
   parent_id: ''
@@ -5337,7 +5346,7 @@ tasks:
   criticite: C3
   domaine: TREUILS / SECURITE_MACHINE
   agent: —
-  date: '2026-09-17T10:03:00+02:00'
+  date: '2026-11-11T03:01:14+01:00'
   avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO : passage à un palier de treuil supérieur conditionné
     à une vitesse câble suffisante, en complément des temporisations fixes existantes.'
   titre: Treuils — condition de vitesse câble avant passage à un palier supérieur (en complément des temporisations fixes)
@@ -5357,7 +5366,7 @@ tasks:
   - Ne pas modifier T305 (investigation origine 400ms/thermique) — sujet distinct et complémentaire.
   - Simuler et valider tous les cas (seuil franchi/non franchi, désactivation, persistance) avant tout essai machine.
   - Bundle PLCopenXML, G200 liaison et gates applicables PASS.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T310_TREUILS_VITESSE_CABLE_PALIER.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T310_CONTRAT_TREUILS_VITESSE_CABLE_PALIER.yaml
   bloque_par: []
 - id: T309
   parent_id: ''
@@ -5383,7 +5392,7 @@ tasks:
   criticite: C2
   domaine: TREUILS_BENNE / CYCLE_AUTO
   agent: —
-  date: '2026-09-17T10:01:00+02:00'
+  date: '2026-11-11T03:01:17+01:00'
   avancement: 'Cadré le 2026-09-17 suite point de situation mail YGO : variables IHM prêtes, aucune logique cycle encore écrite.
     Cadrage minimal, sans sur-spécification.'
   titre: '% de fermeture benne avant remontée — cadrage de la logique cycle (variables IHM déjà prêtes)'
@@ -5397,7 +5406,7 @@ tasks:
   - Définir le seuil minimal de % de fermeture benne autorisant la remontée en cycle auto.
   - Raccorder la variable IHM existante à la condition de cycle, sans dupliquer ou modifier T309.
   - Simuler le comportement avant tout essai machine.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T308_PCT_FERMETURE_BENNE_REMONTEE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T308_CONTRAT_PCT_FERMETURE_BENNE_REMONTEE.yaml
   bloque_par: []
 - id: T307
   parent_id: ''
@@ -5422,7 +5431,7 @@ tasks:
   criticite: C2
   domaine: SECURITE / SIMULATION / CONTROLE_PHASES
   agent: —
-  date: '2026-09-16T21:36:00+02:00'
+  date: '2026-11-11T03:01:20+01:00'
   avancement: 'Cadré le 2026-09-16 suite demande utilisateur : vérification en simulation de l''interdiction de fonctionnement
     sous défaut de rotation de phase (PhaseRotationOk_DI = FALSE). [RAPPEL EXPLOITANT 2026-09-22 — VERIFICATION DU CONTROLEUR
     DE PHASE, PRIORITE INSCRITE POUR DEMAIN] Verifier le CONTROLEUR DE PHASE (PhaseRotationOk_DI, FB_Acquisition_Preflight
@@ -5515,7 +5524,7 @@ tasks:
   - Vérifier l'affichage de l'alarme sur la bannière de supervision et le code d'erreur preflight (16#0100).
   - Valider le comportement de contournement contrôlé sous BypassPhaseRotation (autorisé uniquement selon matrice de maintenance).
   - Valider la procédure de réarmement (Reset front montant) après rétablissement de PhaseRotationOk = TRUE.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T306_VERIFICATION_DEFAUT_ROTATION_PHASE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T306_CONTRAT_VERIFICATION_DEFAUT_ROTATION_PHASE.yaml
   bloque_par: []
 - id: T305
   parent_id: ''
@@ -5523,7 +5532,7 @@ tasks:
   criticite: C2
   domaine: TREUILS / SECURITE MACHINE / ELECTROTHERMIQUE
   agent: —
-  date: '2026-09-16T12:00:28+02:00'
+  date: '2026-11-11T03:01:23+01:00'
   avancement: 'Cadré le 2026-09-16 suite analyse des contraintes électromécaniques : trois questions sans réponse écrite sur
     le plancher de commutation de palier et la tenue thermique des moteurs de treuil.'
   titre: Treuils — Tracer l'origine du plancher de commutation 400 ms, statuer sur l'asymétrie montée/descente et évaluer
@@ -5550,7 +5559,7 @@ tasks:
   - Inventorier les protections thermiques en distinguant ce qui est détecté de ce qui est prévenu.
   - Évaluer si la cadence de cycle nominale laisse une marge thermique aux moteurs, à partir des traces existantes.
   - Convertir les données manquantes en points de relevé de mise en service.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T305_TREUILS_CONTRAINTES_ELECTROTHERMIQUES.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T305_CONTRAT_TREUILS_CONTRAINTES_ELECTROTHERMIQUES.yaml
   bloque_par: []
 - id: T304
   parent_id: ''
@@ -5647,7 +5656,7 @@ tasks:
   criticite: C1
   domaine: TRANSLATION_M3 / ETALONNAGE_ODOMETRIE
   agent: —
-  date: '2026-09-15T23:45:00+02:00'
+  date: '2026-11-11T03:01:26+01:00'
   avancement: 'Tâche annexe cadrée le 2026-09-15 suite demande utilisateur : procédure d étalonnage du gain odométrique (ratio
     Hz -> m/s) et recalage physique des positions des 5 capteurs.'
   titre: Translation M3 — Procédure et étalonnage terrain du ratio fréquence/déplacement et recalage des 5 capteurs
@@ -5667,7 +5676,7 @@ tasks:
   - 'Définir la formule et la méthode d étalonnage terrain du ratio fréquence/déplacement : Gain = (Delta_L / Temps) / Frequence_Stabilisée.'
   - Mettre à jour _TranslationGainMetersPerHzSec et les cotes capteurs dans GVL_PERSISTENT une fois les mesures réelles fournies.
   - Vérifier la bonne intégration dans FB_Translation_PositionEstimator sans régression sur le recalage sur front de capteur.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T301_CALIBRATION_ODOMETRIE_M3.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T301_CONTRAT_CALIBRATION_ODOMETRIE_M3.yaml
   bloque_par: []
 - id: T300
   parent_id: ''
@@ -5815,7 +5824,7 @@ tasks:
   criticite: C4
   domaine: CYCLE_AUTO / IHM_MISE_EN_SERVICE
   agent: —
-  date: '2026-09-15T13:16:00+02:00'
+  date: '2026-11-11T03:01:29+01:00'
   avancement: 'Demandé le 2026-09-15 ; cadrage seulement, aucune modification automate ou IHM engagée. Précision utilisateur
     2026-09-17 : point mineur/simple — les variables (étape en cours, champ de saut d''étape) existent déjà en local sur l''IHM
     mais ne sont pas encore diffusées dans GVL_IHM. En attente des noms exacts de variables fournis par l''utilisateur avant
@@ -5846,7 +5855,7 @@ tasks:
     non neutre, préparation neutre, confirmation Start et absence de mouvement automatique.
   - Bundle PLCopenXML, G200 liaison, tests/gates applicables PASS ; nom fichier = POU et suffixe = langage bundle pour tout
     POU modifié sous CODE/M_MAIN.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T297_CYCLE_IHM_FORCE_AX7.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T297_CONTRAT_CYCLE_IHM_FORCE_AX7.yaml
   bloque_par: []
 - id: T296
   parent_id: ''
@@ -5854,7 +5863,7 @@ tasks:
   criticite: C3
   domaine: TRANSLATION_M3 / CONFIGURATION
   agent: —
-  date: '2026-09-17T10:07:00+02:00'
+  date: '2026-11-11T03:01:32+01:00'
   avancement: 'Agent libéré le 2026-09-17 (personne ne travaille dessus actuellement). Cadrage antérieur conservé : persistance
     et consignes M3 (50 Hz nominal / 15 Hz zone PV) restent à implémenter.'
   titre: 'M3 — fréquences configurables et persistantes : 50 Hz standard / 15 Hz en zone PV'
@@ -5873,7 +5882,7 @@ tasks:
   - Tests couvrent PV/non-PV, changement de zone en mouvement, limites de consigne, redémarrage/persistance et non-régression
     des autres zones M3.
   - Bundle PLCopenXML, G200 liaison et gates applicables PASS avant intégration CODESYS.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T296_M3_FREQUENCES_PERSISTANTES.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T296_CONTRAT_M3_FREQUENCES_PERSISTANTES.yaml
   bloque_par: []
 - id: T295
   parent_id: ''
@@ -5881,7 +5890,7 @@ tasks:
   criticite: C3
   domaine: CYCLE_AUTO / BENNE
   agent: —
-  date: '2026-09-20T18:02:24+02:00'
+  date: '2026-11-11T03:01:34+01:00'
   avancement: '2026-09-20 : cause racine CONFIRMEE par CC01 (FB_Bucket.st:199 TonTimeout(IN := Lifecycle.Busy) — le relâchement
     joystick ne sort pas de Busy) + brief émis (DOC/WFLOW/PROMPTS/09_BRIEF_T295_timeout_benne_AX3.md) + verrou DSH08 posé.
     Sémantique ACTÉE PAR L''HUMAIN : temps de timeout SUSPENDU (jamais remis à zéro) hors commande active, cumulé pendant
@@ -5934,7 +5943,7 @@ tasks:
   note_utilisateur_20260917: 'Avant tout diagnostic approfondi : questionner l''utilité réelle de ce défaut logiciel. L''opérateur
     constate de toute façon rapidement l''absence de mouvement — la valeur ajoutée du timeout logiciel est peut-être faible.
     Trancher (garder / simplifier / retirer la détection logicielle) avant d''investir du temps de diagnostic dessus.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T295_AX15B_BUCKET_OPEN_TIMEOUT.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T295_CONTRAT_AX15B_BUCKET_OPEN_TIMEOUT.yaml
   bloque_par: []
 - id: T294
   parent_id: ''
@@ -5942,7 +5951,7 @@ tasks:
   criticite: C2
   domaine: OUTILLAGE
   agent: —
-  date: '2026-09-15T06:50:00+02:00'
+  date: '2026-11-11T03:01:37+01:00'
   avancement: Cadré et challengé par expert web le 2026-09-15. À traiter ultérieurement.
   titre: Task Manager & Viewer — Optimisation serveur (cache YAML/ETag 304) et IHM (zéro reflow DWM/GC)
   contexte: Saccades observées sur le curseur souris et gel DWM Windows lors de la réduction de la fenêtre Chrome du Task
@@ -5960,7 +5969,7 @@ tasks:
   - 'IHM JS : suspendre le polling en arrière-plan via Page Visibility API (document.hidden).'
   - 'Intégrité absolue des données : zéro tâche perdue, zéro régression sur les verrous TASK_LOCKS.json et l atomicité des
     écritures.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T294_TASK_MANAGER_PERFORMANCE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T294_CONTRAT_TASK_MANAGER_PERFORMANCE.yaml
   bloque_par: []
 - id: T293
   parent_id: ''
@@ -6129,7 +6138,7 @@ tasks:
   criticite: C3
   domaine: TREUILS_BENNE
   agent: —
-  date: '2026-09-15T11:34:47+02:00'
+  date: '2026-11-11T03:01:40+01:00'
   updated_at: '2026-09-19T19:18:02+02:00'
   validation_note: P2 AX11 confirmé en simulation utilisateur ; recette terrain et validation mécanique restent nécessaires
     avant clôture.
@@ -6148,7 +6157,7 @@ tasks:
   - Les interlocks, paliers logic treuils et limitations existantes restent prioritaires.
   - Manuel et maintenance restent inchanges.
   - Gates G200 + palier C PASS ; zero regression sur les TC extraction/synchro existants.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T290_EXTRACTION_PALIER2_TEMPORISE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T290_CONTRAT_EXTRACTION_PALIER2_TEMPORISE.yaml
   bloque_par: []
 - id: T289
   parent_id: ''
@@ -6156,7 +6165,7 @@ tasks:
   criticite: C2
   domaine: CYCLE_AUTO / IHM
   agent: —
-  date: '2026-09-17T10:08:00+02:00'
+  date: '2026-11-11T03:01:43+01:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T289_DECOMPTE_RESTANT_20260915.md
   avancement: 'Rouverte le 2026-09-17 sur correction utilisateur : implémentation testée et validée en simulation uniquement
     (consigne égouttage IHM en secondes DrainTime_S, décompte restant DrainTimeRemaining / DrainTimeElapsed_S, bypass Skip).
@@ -6181,7 +6190,7 @@ tasks:
   - Gates G200 + palier C PASS
   - Ajouté 2026-09-17 — essai machine sur site réel (hors simulation) confirmant le décompte restant et le bypass Skip avant
     toute clôture définitive de la tâche
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T289_EGOUTTAGE_IHM_SECONDES.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T289_CONTRAT_EGOUTTAGE_IHM_SECONDES.yaml
   bloque_par: []
 - id: T288
   parent_id: ''
@@ -6229,14 +6238,14 @@ tasks:
   criticite: C3
   domaine: TRANSLATION_M3
   agent: —
-  date: '2026-09-15T12:45:29+02:00'
+  date: '2026-11-11T03:01:46+01:00'
   titre: Régression M3 sur butées — escalade graduée sans toucher FB_Brake
   contexte: 'Arrêt directionnel immédiat conservé ; qualifie un mouvement réel persistant après arrêt. Retour terrain 2026-09-15
     : récidive du défaut séquence/retour frein M3 aux arrivées Trémie et P1. Une trace réelle montre des commutations capteur
     0↔1 rapides pendant environ 1 s ; chemin exact encore attendu.'
   description: 'Phases contrôlées. Ajouter une phase de reproduction SimBench déterministe des fronts/rebonds capteurs et
     du retour frein avant toute correction de la séquence réelle. Contrat: TASK_CONTRACT_T287_M3_BUTEES_ESCALADE_GRADUEE.yaml'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T287_M3_BUTEES_ESCALADE_GRADUEE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T287_CONTRAT_M3_BUTEES_ESCALADE_GRADUEE.yaml
   objectifs:
   - Qualifier le comportement actuel de FB_Brake sans modifier CODE/.
   - Fournir un chronogramme de reference pour ouverture, fermeture et neutralisation.
@@ -6263,11 +6272,11 @@ tasks:
   criticite: C2
   domaine: OUTILLAGE
   agent: —
-  date: '2026-09-13T23:30:00+02:00'
+  date: '2026-11-11T03:01:48+01:00'
   titre: Refactor CI non-régression mise en service — domaines A à G
   contexte: Réduire les faux verts et prioriser les scénarios de mise en service à risque.
   description: 'Phases 0 à 4. Contrat: TASK_CONTRACT_T286_REFACTOR_CI_NON_REGRESSION_A_G.yaml'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T286_REFACTOR_CI_NON_REGRESSION_A_G.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T286_CONTRAT_REFACTOR_CI_NON_REGRESSION_A_G.yaml
   objectifs: []
   bloque_par: []
 - id: T285
@@ -6328,11 +6337,11 @@ tasks:
   criticite: C2
   domaine: OUTILLAGE
   agent: —
-  date: '2026-09-13T20:45:00+02:00'
+  date: '2026-11-11T03:01:51+01:00'
   titre: Normaliser le workspace CI de troubleshooting par agent
   contexte: RESULTATS troubleshooting historiques sous HUM_LEGACY ; aucune suppression autorisee.
   description: 'Contrat: TASK_CONTRACT_T280_TROUBLESHOOTING_WORKSPACE.yaml'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T280_TROUBLESHOOTING_WORKSPACE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T280_CONTRAT_TROUBLESHOOTING_WORKSPACE.yaml
   objectifs: []
   bloque_par: []
 - id: T015
@@ -6531,7 +6540,7 @@ tasks:
   criticite: C2
   domaine: OUTILLAGE
   agent: —
-  date: '2026-11-06T22:55:07+01:00'
+  date: '2026-11-11T03:01:54+01:00'
   titre: Refactorer le troubleshooting — ajouter les variables de homing M2 (cible dynamique, offset benne)
   contexte: 'Demande utilisateur (2026-09-01) : le snapshot troubleshooting ne contient pas les variables détaillées du homing
     (MachineHomingMechanicalStopOk, BucketReferenceRequested, UseDynamicTarget, DynamicHomingTargetM, M2Demand, etc.). Pour
@@ -6542,7 +6551,7 @@ tasks:
     BucketReferenceRequested, UseDynamicTarget, DynamicHomingTargetM, M2Demand (HomeReq, UseDynamicTarget, DynamicTarget_M),
     CfgTopHomingTarget_M, CfgOffsetClose_M, état FB_MachineHomingCycle. Régénérer la liste (generate_variable_list_from_code.py)
     et valider avec l''humain avant compilation.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T213.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T213_CONTRAT_DIAGNOSTIC_HOMING_M2.yaml
   objectifs:
   - Exposer les variables de homing M2 dans GVL_Troubleshooting (structure + câblage)
   - Ajouter les variables à troubleshooting_variables.txt (régénérer la liste)
@@ -6631,7 +6640,7 @@ tasks:
   criticite: C4
   domaine: MODES / SÉCURITÉ
   agent: —
-  date: '2026-09-01T00:00:00'
+  date: '2026-11-11T03:01:56+01:00'
   titre: Résoudre le blocage de mode (déverrouiller la bascule quand le retour contacteur n'est pas câblé)
   contexte: 'L''opérateur est bloqué dans un mode quand le retour contacteur M1/M2_ContactorsReleased_DI n''est pas câblé
     (=0) : ModeChangeAllowed reste 0, la bascule est refusée. Diagnostic IHM fait (motif + 6 sous-conditions) mais cause non
@@ -6644,7 +6653,7 @@ tasks:
   - Aucun redémarrage auto du cycle, interlocks physiques et permits M3 inchangés
   - Diagnostic IHM conservé (ModeChangeBlockReason + 6 sous-conditions)
   - Bundle frais + G200 PASS + gates PASS + CI FB_Modes PASS
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T218_BLOCAGE_MODE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T218_CONTRAT_BLOCAGE_MODE.yaml
   bloque_par: []
 - id: T219
   parent_id: ''
@@ -6652,7 +6661,7 @@ tasks:
   criticite: C2
   domaine: IHM / DIAGNOSTIC
   agent: —
-  date: '2026-11-06T22:55:07+01:00'
+  date: '2026-11-11T03:01:59+01:00'
   titre: Historique d'alarmes (buffer borné + horodatage), en complément du bandeau d'alarmes actives
   contexte: 'Le bandeau d''alarmes actives ne montre que l''état courant. Besoin d''un historique (buffer FIFO borné, horodatage,
     acquittement) pour comprendre les incidents passés, notamment la raison d''un blocage.
@@ -6664,7 +6673,7 @@ tasks:
   - Lecture par l'IHM (binding buffer)
   - 'Note de design préalable : taille, source horodatage, interaction bandeau'
   - Bundle frais + G200 PASS + gates PASS
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T219_HISTORIQUE_ALARMES.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T219_CONTRAT_HISTORIQUE_ALARMES.yaml
   bloque_par: []
   avancement: 'Lien T428 : historique d''alarmes, utile au probleme du moment de capture.'
 - id: T220
@@ -6673,7 +6682,7 @@ tasks:
   criticite: C2
   domaine: IHM / BANDEAU
   agent: —
-  date: '2026-09-15T12:45:29+02:00'
+  date: '2026-11-11T03:02:02+01:00'
   titre: 'Enrichir le bandeau IHM (maximum d''infos : défauts actifs, état AU, homing, blocage de mode)'
   contexte: 'Donner à l''opérateur le maximum d''infos utiles au bandeau : défauts actifs (codeur, synchro, benne, translation),
     état AU/urgence, état homing, motif du blocage de mode — sans surcharger l''affichage. Retour terrain 2026-09-15 : défaut
@@ -6692,7 +6701,7 @@ tasks:
     et acquittable dans AlarmBanner
   - AnyFaultActive inclut les défauts mouvement M3 et interlock final M3 qui utilisent le même acquittement global
   avancement: Anomalies terrain ajoutées le 2026-09-15 ; cadrage uniquement, aucun correctif IHM appliqué.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T220_ENRICHIR_BANDEAU.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T220_CONTRAT_ENRICHIR_BANDEAU.yaml
   bloque_par: []
 - id: T222
   parent_id: ''
@@ -6783,8 +6792,8 @@ tasks:
     pour le detail. A distinguer clairement les deux familles de cause avant de cadrer l''implementation C4 de T224 : (1)
     commande emise + interlock aval qui refuse (scope T224 original), (2) commande jamais formee car bloquee en amont par
     D18 (Defauts A/B T325). Les deux meritent d''etre couvertes, mais pas comme un seul et meme defaut.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T224_ARMINGPERMIT_ACTIONNEUR_PRET.yaml
-  date: '2026-11-06T22:55:07+01:00'
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T224_CONTRAT_ARMINGPERMIT_ACTIONNEUR_PRET.yaml
+  date: '2026-11-11T03:02:04+01:00'
   bloque_par: []
   avancement: 'Lien T428 : la publication axe, sens et raison reste ici car elle depend d''ArmingPermit. [ORCHESTRATEUR DSH01
     2026-09-21T10:54 — BRIEF V1 CHALLENGE AVANT TRANSMISSION, PERIMETRE CORRIGE, GO HUMAIN : DIAGNOSTIC SEUL (Etape A), LECTURE
@@ -6829,7 +6838,7 @@ tasks:
   criticite: C3
   domaine: TREUILS M1/M2 / CONCORDANCE CONTACTEURS
   agent: —
-  date: '2026-11-06T22:55:07+01:00'
+  date: '2026-11-11T03:02:07+01:00'
   titre: Concordance contacteurs M1/M2 graduee (SafeStop -> escalade PowerCutOff) en PRG_06
   contexte: '§2ter (PRG_06) met INSTANTANEMENT toutes les sorties treuil a FALSE des qu''un ecart de vecteur M1/M2 est vu
     : aucune tolerance ms, pas de gradation, aucune remontee decodee. FB_SyncContactor existe (debounce 500 ms -> SafeStop
@@ -6851,7 +6860,7 @@ tasks:
   - Info erreur decodee (niveau + contacteur) vers IHM / troubleshooting
   - Neutralisation par le bypass groupe synchro treuils existant, pas de nouveau bit
   - Non-regression mode unitaire + bypass ; bundle + G200 + gates verts
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T225_SYNCCONTACTOR_ESCALADE_PRG06.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T225_CONTRAT_SYNCCONTACTOR_ESCALADE_PRG06.yaml
   bloque_par:
   - Arbitrage humain (design safety, lot MES-035): chemin forcage SafeStop depuis PRG_06, cablage escalade -> PowerCutOff,
       forme du champ diagnostic
@@ -6879,8 +6888,8 @@ tasks:
   - Reference benne fermee sur confirmation operateur ; reference M1/M2 au front capteur haut, stop dur
   - '[object Object]'
   - Reprise consciente sur les 3 cas (arret capteur, perte datum, expulsion mode)
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T226_REFONTE_HOMING_SEMIAUTO.yaml
-  date: '2026-09-17T22:01:16'
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T226_CONTRAT_REFONTE_HOMING_SEMIAUTO.yaml
+  date: '2026-11-11T03:02:09+01:00'
   bloque_par: []
 - id: T173-C
   parent_id: T173
@@ -6913,7 +6922,7 @@ tasks:
   criticite: C3
   domaine: SEQUENCEUR SEMI_AUTO / FB_CYCLE
   agent: —
-  date: '2026-09-02T19:45:00+02:00'
+  date: '2026-11-11T03:02:12+01:00'
   titre: FB_Cycle - une config treuil unique par etape (split X11, sequenceur au propre avant MES)
   contexte: 'Le sequenceur SEMI_AUTO (FB_Cycle) et le homing machine ne sont PAS encore en service. L''etape X11_OPEN_DUMP
     melange descente couplee M1+M2 et ouverture benne differentielle dans le meme scan -> FB_WinchSync entierement coupe (via
@@ -6934,7 +6943,7 @@ tasks:
   - Conserver l'anti-telescopage (ecart position) pendant les phases couplees
   - Aucune modification PRG_04 / PRG_05 / FB_Modes
   - Cycle SEMI_AUTO complet rejoue sans faux SafeStop synchro
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T229_CONTRAT_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml
   bloque_par:
   - STUB rapide cree pendant MES - a completer (sous-etapes detaillees, chronogrammes, arbitrage bit IHM)
   - Lien a clarifier avec T226 (refonte homing <-> SEMI_AUTO)
@@ -6944,7 +6953,7 @@ tasks:
   criticite: C2
   domaine: SEQUENCEUR SEMI_AUTO / KOBOLD / PROTECTION MOTEUR
   agent: —
-  date: '2026-09-03T00:00:00+02:00'
+  date: '2026-11-11T03:02:14+01:00'
   titre: Protection thermique moteur / contacteur Kobold (temps maxi + repos impose + bypass)
   contexte: 'Le moteur du capteur de fond Kobold chauffe et risque de griller. Le contacteur est active dans le cycle a l''approche
     de l''eau et coupe peu apres detection du fond, mais rien ne borne aujourd''hui la duree d''activation ni n''impose de
@@ -6965,7 +6974,7 @@ tasks:
   - Tempos exposees en config IHM avec defauts surs
   - Un seul FB de garde, instancie une fois - FB_Cycle / FB_DiveSearch non dupliques
   - Bypass dedie coherent avec la matrice de bypass (G483)
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T230_KOBOLD_PROTECTION_THERMIQUE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T230_CONTRAT_KOBOLD_PROTECTION_THERMIQUE.yaml
   bloque_par:
   - STUB rapide cree pendant MES - a completer (valeurs tempo, placement Q1, politique bypass Q2, remontee IHM Q4)
   - Lien avec T229 (FB_Cycle X4) et AF-04 3bis H1
@@ -7088,7 +7097,7 @@ tasks:
   criticite: C4
   domaine: CODEURS / HOMING
   agent: —
-  date: '2026-09-03T09:00:00+02:00'
+  date: '2026-11-11T03:02:17+01:00'
   titre: Refonte transaction de vérification preset homing (suppression latence 500 ms)
   contexte: 'Demande utilisateur (2026-09-03) : retirer la temporisation de référencement CST_PresetVerifyTime (500 ms) dans
     FB_Encoder_Homing.st. Analyse : ce n''est PAS un simple retrait de constante — c''est la latence de sécurité transactionnelle
@@ -7109,7 +7118,7 @@ tasks:
   - Garantir Calib.Homed non validé si position hors tolérance (0.010 m)
   - Conserver les modes de confirmation (READBACK_ONLY / READBACK_AND_STATUSBIT / STATUSBIT_ONLY)
   - Documenter la nouvelle logique dans AF_Partie-09 v2.4
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T235_REFONTE_TRANSACTION_PRESET.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T235_CONTRAT_REFONTE_TRANSACTION_PRESET.yaml
   bloque_par: []
 - id: T237
   parent_id: ''
@@ -7639,7 +7648,7 @@ tasks:
   criticite: C4
   domaine: BENNE_PERSISTANCE
   agent: —
-  date: '2026-09-05T08:11:00+02:00'
+  date: '2026-11-11T03:02:19+01:00'
   titre: Calibration géométrie benne réelle et fiabilisation persistance NVRAM
   contexte: 'Constat terrain 2026-09-05 : au démarrage matin, après homing à 0m, la benne est reconnue ''ouverte'' au lieu
     de ''fermée'' car Delta=M2-M1 (~0m) matche OffsetOpenM (0m) au lieu de OffsetCloseM par défaut (15m). Nécessité de verrouiller
@@ -7647,7 +7656,7 @@ tasks:
   description: 1. Mesurer sur site l'écart Delta = M2 - M1 benne fermée. 2. Renseigner OffsetCloseM et CoherenceLimitM dans
     GVL_PERSISTENT / IHM. 3. Valider le pont FB_CfgPersistBridge_BucketCfg et la survie après reboot sans écrasement. 4. Valider
     le verrou BucketReferenced := TRUE sur confirmation explicite N2 ou homing conjoint.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T253_CALIB_BENNE_PERSISTANTE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T253_CONTRAT_CALIB_BENNE_PERSISTANTE.yaml
   objectifs:
   - Caler les seuils géométriques réels de la benne (OffsetOpenM, OffsetCloseM, CoherenceLimitM)
   - Garantir la reconnaissance déterministe IsClosed/IsOpen sans bascule intempestive au reboot
@@ -7681,7 +7690,7 @@ tasks:
   criticite: C2
   domaine: SUPERVISION_IHM
   agent: —
-  date: '2026-09-05T10:25:00+02:00'
+  date: '2026-11-11T03:02:22+01:00'
   locked_at: '2026-09-05T10:25:00+02:00'
   titre: Guidage dynamique précis des messages opérateur et conditions IHM (Retours essais MES)
   contexte: 'Lors des essais de mise en service (MES cycle semi-auto / homing / maintenance), certains messages affichés dans
@@ -7695,7 +7704,7 @@ tasks:
     bloquante' (SpecialConditionText) de l''Action physique' requise (OperatorActionText). 4. Enrichir les retours d'étapes
     (AX0..AX18, AX_STAB, Homing, Verrous M3/Treuils) selon les retours réels. 5. Valider systématiquement la compilation,
     la liaison mécanique G200 (PASS 0 erreur) et régénérer le bundle PLCopenXML.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T255_DYN_USER_MESSAGES_IHM.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T255_CONTRAT_DYN_USER_MESSAGES_IHM.yaml
   objectifs:
   - Dynamisation du diagnostic d'étape AX1_INIT (affichage de la cause bloquante exacte parmi les 5 conditions)
   - Clarté contextuelle: Action opérateur concrète + Condition spéciale explicite
@@ -7708,14 +7717,14 @@ tasks:
   criticite: C2
   domaine: CYCLE_SEMIAUTO
   agent: —
-  date: '2026-09-05T10:33:00+02:00'
+  date: '2026-11-11T03:02:24+01:00'
   titre: Déblocage commande Exit / Abort en état pause (WaitingResume) et hors mode
   contexte: 'Constat terrain MES : quand le cycle est en pause (WaitingResume), l''appui sur Exit/BtnAbort ne réinitialise
     pas le cycle à AX0_REPOS. Nécessité de basculer en manuel/maintenance. La gestion Abort doit être prioritaire et active
     en tête de bloc.'
   description: 1. Placer le traitement de AbortEdge et ResetEdge avant la neutralisation et dans le bloc WaitingResume. 2.
     Permettre à BtnAbort de forcer State := AX0_REPOS et WaitingResume := FALSE.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T255_DYN_USER_MESSAGES_IHM.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T255_CONTRAT_DYN_USER_MESSAGES_IHM.yaml
   objectifs:
   - Réactivité immédiate du bouton Exit / Abort en pause
   - Sortie propre sans blocage vers AX0_REPOS
@@ -7726,14 +7735,14 @@ tasks:
   criticite: C2
   domaine: CYCLE_SEMIAUTO
   agent: —
-  date: '2026-09-05T10:33:00+02:00'
+  date: '2026-11-11T03:02:28+01:00'
   titre: Assouplissement condition départ cycle AX1_INIT (état benne qualifié vs range rigide M2)
   contexte: 'Constat terrain MES : au départ cycle, PRG_03 impose M1 ET M2 dans ±0.4m du FDC haut. Si la benne est entre-ouverte
     ou fermée avec un léger jeu, M2 sort de la fenêtre et bloque AX1_INIT. M1 seul porte la position FDC haut, M2 doit s''appuyer
     sur l''état FB_Bucket (IsClosed ou IsOpen).'
   description: 1. Modifier CycleWinchesAtTopOk dans PRG_03_Modes_Cycle.st pour tester M1 au FDC haut ET benne qualifiée. 2.
     Supprimer la butée géométrique rigide arbitraire sur M2.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T255_DYN_USER_MESSAGES_IHM.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T255_CONTRAT_DYN_USER_MESSAGES_IHM.yaml
   objectifs:
   - Tolérance physique de la géométrie benne à l'initialisation AX1
   - Démarrage fluide du cycle
@@ -7744,13 +7753,13 @@ tasks:
   criticite: C2
   domaine: SUPERVISION_IHM
   agent: —
-  date: '2026-09-05T10:33:00+02:00'
+  date: '2026-11-11T03:02:30+01:00'
   titre: Dynamisation des messages de conditions et actions opérateur (Bandeau IHM)
   contexte: Les messages affichés lors d'une attente ou d'un blocage sont trop génériques. Nécessité d'exposer la condition
     exacte (SpecialConditionText) et l'action requise (OperatorActionText).
   description: 1. Rendre le diagnostic des conditions initiales d'AX1 dynamique dans FB_CycleSemiAuto et FB_Hmi_BannerFormatter.
     2. Enrichir les messages au fil des retours d'essais.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T255_DYN_USER_MESSAGES_IHM.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T255_CONTRAT_DYN_USER_MESSAGES_IHM.yaml
   objectifs:
   - Messages ciblés et actionnables pour l'opérateur
   - Zéro ambigüité lors des essais MES
@@ -7783,7 +7792,7 @@ tasks:
   criticite: C3
   domaine: CYCLE_SEMI_AUTO_SAT
   agent: —
-  date: '2026-09-05T23:30:27+02:00'
+  date: '2026-11-11T03:02:33+01:00'
   titre: Fiabiliser le cycle semi-auto pour SAT J2
   contexte: 'Revue croisee automatisme/safety, CI et IHM du 2026-09-05 : plan initial bloque tant que directions, Kobold,
     arret AX8, geometrie extraction, forçage et preuves CI ne sont pas corriges.'
@@ -7793,7 +7802,7 @@ tasks:
   - Protections machine toujours actives, controles procede temporairement inhibables et visibles
   - Forçage de step transactionnel sans commande au scan de preparation
   - Neutralite MAINT_N1 et MAINT_N2 prouvee
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T258.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T258_CONTRAT_CYCLE_SEMIAUTO_SAT_J2.yaml
   bloque_par: []
 - id: T258-A
   parent_id: T258
@@ -7801,7 +7810,7 @@ tasks:
   criticite: C3
   domaine: TEST_CI_CYCLE
   agent: —
-  date: '2026-09-06T00:05:00+02:00'
+  date: '2026-11-11T03:02:36+01:00'
   titre: Etablir le socle de preuve STruC++ cycle et inter-PRG
   contexte: Les tests actuels ne cablent ni Kobold reel, ni commissioning/forçage et le harness PRG04 ne reproduit pas la
     barriere atomique.
@@ -7810,7 +7819,7 @@ tasks:
   - Tests scan-par-scan AX4 a AX12 et priorites concurrentes
   - Preuve atomicite SEMI_AUTO et neutralite bit a bit MAINT_N1/N2
   - Interdiction automatique du pseudo-feedback Kobold et des ecarts bruts AX11
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T258-A.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T258-A_CONTRAT_PREUVE_CYCLE_FRONTIERES_PRG03_PRG04.yaml
   bloque_par: []
 - id: T258-B
   parent_id: T258
@@ -7818,7 +7827,7 @@ tasks:
   criticite: C3
   domaine: CYCLE_DIVING_KOBOLD
   agent: CDX01
-  date: '2026-09-05T23:30:27+02:00'
+  date: '2026-11-11T03:02:38+01:00'
   titre: Fiabiliser AX4 a AX8 diving et sequence Kobold
   contexte: Le contacteur alimente le capteur sans retour auxiliaire. La DI unique suit la sequence terrain a confirmer 0
     hors eau, 1 immergee, 0 au fond.
@@ -7827,7 +7836,7 @@ tasks:
   - Aucun faux feedback de contacteur Kobold
   - Fond impossible sans immersion prealablement qualifiee
   - AX8 vers AX9 impossible tant que M1 et M2 ne sont pas physiquement arretes
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T258-B.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T258-B_CONTRAT_PLONGEE_KOBOLD_AX4_AX8.yaml
   bloque_par:
   - T258-A
 - id: T258-C
@@ -7836,7 +7845,7 @@ tasks:
   criticite: C3
   domaine: CYCLE_EXTRACTION
   agent: CDX01
-  date: '2026-09-05T23:30:27+02:00'
+  date: '2026-11-11T03:02:41+01:00'
   titre: Fiabiliser AX9 a AX12 pretension, fermeture et remontee
   contexte: Le code accepte toute deflexion joystick, partage une cible M1 avec M2 et compare un ecart brut incompatible avec
     l offset benne.
@@ -7845,7 +7854,7 @@ tasks:
   - Aucune montee ou fermeture sans intention Y+ et homme-mort
   - Chaque treuil atteint sa propre cible de pretension
   - AX11 utilise WinchSyncDeltaM et conserve les barrieres finales atomiques
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T258-C.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T258-C_CONTRAT_PRETENSION_FERMETURE_REMONTEE_AX9_AX12.yaml
   bloque_par:
   - T258-A
   - T258-B
@@ -7855,7 +7864,7 @@ tasks:
   criticite: C3
   domaine: COMMISSIONING_IHM
   agent: CDX01
-  date: '2026-09-05T23:30:27+02:00'
+  date: '2026-11-11T03:02:43+01:00'
   titre: Ajouter mode essai controle et forçage transactionnel de step
   contexte: Le forçage actuel execute la cible dans le meme scan et ne publie aucun accepte/refuse. L inhibition demandee
     ne doit jamais masquer les protections machine.
@@ -7865,7 +7874,7 @@ tasks:
   - Causes ignorees toujours calculees et journalisees
   - Scan de preparation et attente de reprise sans aucune demande actionneur
   - Cibles contextuelles refusees sans registres valides
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T258-D.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T258-D_CONTRAT_MODE_ESSAI_FORCAGE_ETAPE.yaml
   bloque_par:
   - T258-A
 - id: T258-E
@@ -7874,7 +7883,7 @@ tasks:
   criticite: C3
   domaine: VALIDATION_SAT
   agent: CDX01
-  date: '2026-09-05T23:30:27+02:00'
+  date: '2026-11-11T03:02:46+01:00'
   titre: Integrer, documenter et qualifier le lot cycle SAT J2
   contexte: Cloture seulement apres tests cibles, AF conforme au code, bundle frais, G200 et gates complets.
   description: Revue flux G7 vers actionneurs, regression maintenance, documentation et protocole SAT terrain.
@@ -7883,7 +7892,7 @@ tasks:
   - Bundle frais et G200 sans erreur
   - Palier C puis 21 gates PASS
   - Limites de preuve CI et controles terrain explicitement restitues
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T258-E.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T258-E_CONTRAT_QUALIFICATION_AF_BUNDLE_SAT.yaml
   bloque_par:
   - T258-B
   - T258-C
@@ -7917,7 +7926,7 @@ tasks:
   criticite: C3
   domaine: AU_SECURITE
   agent: —
-  date: '2026-09-07T03:05:00'
+  date: '2026-11-11T03:02:49+01:00'
   titre: Bypass granulaire auto-test redondance AU par canal keepalive A / B
   contexte: En MES un seul canal PowerKeepAlive (A ou B) peut avoir son cablage/DI pret. Le BypassAuRedundancyTest actuel
     est tout-ou-rien (IDLE->RESTORE_B) et empeche de qualifier le canal deja pret.
@@ -7932,7 +7941,7 @@ tasks:
   - A+B (ou BypassRedundancyTest global) => comportement actuel IDLE->RESTORE_B inchange
   - Exigence chaine fermee, CONFIRM contacteur, aborts et BypassArmingPreconditions inchanges
   - Banniere MES NON SECURISE affichee des qu un des 5 flags bypass est actif
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T261.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T261_CONTRAT_BYPASS_AUTOTEST_CANAL_POWER_KEEP_ALIVE.yaml
   bloque_par: []
 - id: T262
   parent_id: ''
@@ -7940,7 +7949,7 @@ tasks:
   criticite: C4
   domaine: CYCLE_AUTO_BENNE
   agent: —
-  date: '2026-09-21T03:10:00+02:00'
+  date: '2026-11-11T03:02:51+01:00'
   updated_at: '2026-09-21T03:10:00+02:00'
   implementation_note: 'PHASE B LIVREE 2026-09-21 (DSH16) ET COMMITEE : 065591fb (code, FB de decision, gate G515, contrat,
     challenge, docs) puis c9e1fbfe (fichier de test CI 315 lignes + fiche AF FB_Bucket, oublies du premier commit). Seuil
@@ -8020,7 +8029,7 @@ tasks:
   - 'B ⬜ Critere : 0 % historique, seuil positif prepare seulement ; AX10b conserve ; validation traces.'
   - 'C ⬜ Raccordement : preparation M1, P1 commun sans arret, repli AX10b ; DQ/freins valides.'
   - D ⬜ AX11 cible P2 puis AX12 ; plafonds prioritaires et MES validates.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T262_CONTRAT_AX10_CLOSE_BUCKET_THRESHOLD.yaml
   bloque_par: []
 - id: T263
   parent_id: ''
@@ -8028,7 +8037,7 @@ tasks:
   criticite: C3
   domaine: SECURITE_SYNCHRO_BENNE
   agent: —
-  date: '2026-09-07T13:05:00+02:00'
+  date: '2026-11-11T03:02:54+01:00'
   titre: Étendre à 4 s le maintien d'inhibition synchro après pilotage benne
   contexte: Défaut écart/synchronisme rapporté pendant le pilotage manuel de la benne. Une temporisation TOF existante de
     2 s maintient déjà l inhibition après retombée ; la mesure demandée est de l étendre à 4 s, sans créer de second temporisateur.
@@ -8041,7 +8050,7 @@ tasks:
   - Aucune seconde inhibition ni aucun bypass de sécurité n est ajouté.
   - Le contrôle final PRG_06.instSyncContactorFinal reste actif et inchangé.
   - Bundle régénéré et liaison G200 sans erreur.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T263_BUCKET_SYNC_HOLD_4S.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T263_CONTRAT_BUCKET_SYNC_HOLD_4S.yaml
   bloque_par: []
 - id: T264
   parent_id: ''
@@ -8049,7 +8058,7 @@ tasks:
   criticite: C3
   domaine: LIVRAISON_SECURITE_AU
   agent: AGY01
-  date: '2026-09-07T14:10:00+02:00'
+  date: '2026-11-11T03:02:57+01:00'
   titre: Retrait des bypass ingénierie AU (BypassAuPowerCutOff et RedundancyTestA) à la livraison machine
   contexte: Pendant la mise en service (MES), BypassAuPowerCutOff et BypassAuRedundancyTestA ont été initialisés à TRUE au
     boot PLC dans GVL_BypassRetain.st pour les besoins d essai. Pour la livraison finale client et la conformité ISO 13849,
@@ -8064,7 +8073,7 @@ tasks:
   - Coupure de puissance automate opérationnelle et vérifiée sur défaut critique
   - Disparition de l alerte IHM 'AU: BYPASS INGENIERIE MES ACTIF - NON SECURISE'
   - Bundle XML régénéré et validation mécanique Palier C 100% PASS
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T264_RETRAIT_BYPASS_POWER_CUTOFF_LIVRAISON.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T264_CONTRAT_RETRAIT_BYPASS_POWER_CUTOFF_LIVRAISON.yaml
   bloque_par: []
 - id: T269
   parent_id: ''
@@ -8072,7 +8081,7 @@ tasks:
   criticite: C3
   domaine: SECURITE_TREUILS_BENNE
   agent: —
-  date: '2026-09-07T14:35:00+02:00'
+  date: '2026-11-11T03:02:59+01:00'
   titre: Empêcher le faux MecaD pendant ouverture benne au FdC haut
   contexte: Le snapshot 20260907_143114 montre ErrorMecaD M1/M2 et SafeStop pendant la manœuvre benne alors que le FdC haut
     est actif volontairement. Le FdC doit continuer à interdire la montée, mais l escalade MecaD ne doit pas déclencher l
@@ -8087,7 +8096,7 @@ tasks:
   - Hors BenneBusy/BenneHoldStillActive, un non-arrêt réel au FdC continue à déclencher MecaD après PostRampTimeout.
   - Aucun bypass, aucune modification des sorties physiques et aucune suppression de la surveillance FdC.
   - G497, bundle PLCopenXML, G200 et gates Palier C sont exécutés; test CODESYS sans bypass requis avant machine réelle.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T269_MECAD_BUCKET_TOP.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T269_CONTRAT_MECAD_BUCKET_TOP.yaml
   avancement: ' [EXTENSION DE PERIMETRE 2026-09-22 - DECISION EXPLOITANT (GO donne) : LE LOT FENETRE BENNE EST CETTE TACHE,
     PAS UN NOUVEAU LOT.] Demande relayee par l agent T383 : « peut-on preparer le lot separe fenetre benne (correction de
     FB_Safety_Winch) pour debloquer la fermeture ? » - reponse OUI, et le lot est T269 (contrat deja ecrit, AUCUN VERROU :
@@ -8115,7 +8124,7 @@ tasks:
   criticite: C3
   domaine: CYCLE_AUTO_EXTRACTION
   agent: —
-  date: '2026-09-07T14:45:00+02:00'
+  date: '2026-11-11T03:03:02+01:00'
   titre: Remontée en charge AX12 au palier 5
   contexte: 'Demande opérateur : la remontée en cycle automatique doit utiliser P5 sur AX12. AX10 et AX11 restent inchangés.'
   description: Modifier uniquement CST_StepLoaded de FB_CycleSemiAuto; les plafonds de sécurité aval PRG_04 restent prioritaires.
@@ -8123,7 +8132,7 @@ tasks:
   - AX12 commande P5 par défaut.
   - AX9 reste P1 et AX10/AX11 sont inchangés.
   - Les conditions AX4..AX8, FdC, AU et interlocks ne sont pas modifiées.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T270_AX12_LOADED_ASCENT_P5.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T270_CONTRAT_AX12_LOADED_ASCENT_P5.yaml
   bloque_par: []
 - id: T271
   parent_id: ''
@@ -8150,7 +8159,7 @@ tasks:
   criticite: C3
   domaine: TREUILS_BENNE_TRANSLATION
   agent: —
-  date: '2026-09-07T15:20:00+02:00'
+  date: '2026-11-11T03:03:05+01:00'
   titre: Verrou descente M3 basé sur State.AtMaintenance/AtP1
   contexte: Le verrou de descente ne doit pas utiliser les entrées brutes de position. La source consommée est l état validé
     GVL_IHM.M3Translation.State.
@@ -8160,7 +8169,7 @@ tasks:
   - 'Verrou actif et sans bypass : transit/PV/P2/Trémie interdit; P1 ou Maintenance validé autorise.'
   - Aucun M3_PosMaintenance_DI ou M3_PosP1_DI dans le calcul du permis.
   - Bundle et G200 passés.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T272_M3_DESCENT_STATE_GATE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T272_CONTRAT_M3_DESCENT_STATE_GATE.yaml
   bloque_par: []
 - id: T273
   parent_id: ''
@@ -8168,7 +8177,7 @@ tasks:
   criticite: C3
   domaine: TREUILS_BENNE_TRANSLATION
   agent: AGY01
-  date: '2026-09-07T16:40:00+02:00'
+  date: '2026-11-11T03:03:07+01:00'
   titre: Révision cinématique treuils en maintenance (Descente frein, Remontée synchro/fermée P1 & Inhibition défauts)
   contexte: 'Besoin d optimiser et sécuriser les mouvements treuils en maintenance : descente par relâchement de frein, remontée
     assistée synchro/fermée en P1 et étude d inhibition ciblée de certains défauts.'
@@ -8180,7 +8189,7 @@ tasks:
   - Spécifier la remontée assistée synchro M1+M2 ou benne fermée bridée à P1 en maintenance.
   - Définir la matrice d inhibition sélective des défauts en Maintenance (défauts process masqués vs sécurités dures préservées).
   - Rédiger la proposition technique et le plan d implémentation pour validation humaine.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T273_WINCH_MAINTENANCE_DESCENTE_FREIN_REMONTEE_P1.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T273_CONTRAT_WINCH_MAINTENANCE_DESCENTE_FREIN_REMONTEE_P1.yaml
   bloque_par: []
 - id: T274
   parent_id: ''
@@ -8266,7 +8275,7 @@ tasks:
   criticite: C3
   domaine: SECURITE_ET_AU
   agent: —
-  date: '2026-09-19T12:00:00+02:00'
+  date: '2026-11-11T03:03:10+01:00'
   titre: Filtrage alarmes transitoires demarrage CPU et auto-reset post-rearmement
   contexte: L ouverture de l AU génère une cascade de faux positifs (coupure bus, perte codeurs, discordance contacteurs),
     et le réarmement nécessite des resets manuels répétés pendant le démarrage des équipements.
@@ -8280,7 +8289,7 @@ tasks:
     d''environ 1 s sur une fenêtre d''environ 3 s, déclenchée uniquement sur front de réarmement complet et en l''absence
     de tout AU actif (annulée si AU redevient actif pendant la fenêtre). Ne jamais acquitter automatiquement une alarme qui
     persiste au-delà de la fenêtre ni une alarme de sécurité bloquante (AU, discordance, PowerCutOff).'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T278_AU_ALARMS_FILTERING_AND_AUTO_RESET.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T278_CONTRAT_AU_ALARMS_FILTERING_AND_AUTO_RESET.yaml
   bloque_par: []
   avancement: 'Implementation ST faite : FB_AutoResetTransientDiag, reset cible EtherCAT/CANopen, bypass maitre supprime,
     flags GVL par defaut FALSE. Bundle/G200 PASS ; validation CODESYS humaine restante.'
@@ -8309,7 +8318,7 @@ tasks:
   criticite: C4
   domaine: SECURITE / TREUILS_M1_M2 / DIAGNOSTIC
   agent: —
-  date: '2026-09-22T11:50:00+02:00'
+  date: '2026-11-11T03:03:13+01:00'
   titre: 'FB_Safety_Winch : rendre la confirmation d''arret MecaB independante de la source de commande (JoystickYNeutral
     -> MovementCommanded) — faux ErrorID:09 en mode boutons MAINT_N2'
   contexte: 'DIAGNOSTIC CONFIRME 2026-09-22 (mode boutons MAINT_N2 en simu, commande Both) : MecaB se declenche FAUSSEMENT
@@ -8335,7 +8344,7 @@ tasks:
   - 'AC5 : PostRampTimeout et escalade SafeStop/PowerCutOff intouches (git diff borne sur :341 + test).'
   - 'AC6 : bundle frais + diff bundle (FB_Safety_Winch) + G200 --report PASS 0 erreur + palier C sans rouge nouveau.'
   - 'AC7 : non-regression : WinchStandstill/MecaE conserves (JoystickYNeutral reste consomme a :264).'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T387_MECAB_SOURCE_COMMANDE.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T387_CONTRAT_MECAB_SOURCE_COMMANDE.yaml
   avancement: '[CADRAGE DSH01 2026-09-22T11:50 — CONTRAT C4 ECRIT ET VALIDE (check_task_contract.py PASS 0/0), AUCUNE LIGNE
     DE CODE. DIAGNOSTIC CONFIRME PAR TRAVAIL D EQUIPE ORCHESTRE (H1 confirme sur source, H2 simulation ecartee, consequence
     AU = T369 distinct). Cause racine : MecaB base sur JoystickYNeutral (geste) au lieu de MovementCommanded (commande reelle).
@@ -8410,7 +8419,7 @@ tasks:
   domaine: SUPERVISION / IHM / ALARMES / MES
   agent: AGY01
   locked_at: null
-  date: '2026-10-30T03:36:00+01:00'
+  date: '2026-11-11T03:03:16+01:00'
   updated_at: '2026-10-31T16:45:00+01:00'
   completed_at: '2026-10-31T16:45:00+01:00'
   titre: IHM Pack 1 - Démasquage alarmes EtherCAT/codeurs et alignement carrousel cycle §5
@@ -8426,7 +8435,7 @@ tasks:
   - Integrer les surchauffes thermiques moteurs et freins dans AlarmArray.
   - Expliciter le refus d armement joystick au lieu d un message generique.
   - Zero regression sur PRG_01..06 et GVL_PERSISTENT intact (G200 PASS).
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T423_IHM_PACK1_CORRECTIFS.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T423_CONTRAT_IHM_PACK1_CORRECTIFS.yaml
   avancement: Qualification dynamique IHM validee a 100% PASS par test reel utilisateur CODESYS (27/27 cas de test). 5 champs
     du bandeau principal et 10 devices du carrousel d alarmes sans aucun refus silencieux ni masquage. Bundles integres et
     compiles sans erreur.
@@ -8437,7 +8446,7 @@ tasks:
   criticite: C2
   domaine: SUPERVISION / IHM / ALARMES / BANC
   agent: AGY01
-  date: '2026-10-31T13:45:42+01:00'
+  date: '2026-11-11T03:03:18+01:00'
   locked_at: null
   updated_at: '2026-10-31T17:32:00+01:00'
   titre: Contre-audit T423 - fiabiliser le banc d affichage et le bandeau (volet 1)
@@ -8454,7 +8463,7 @@ tasks:
   - Verification absent avant / present pendant / absent apres, attendus complets.
   - Table unique bit -> libelle cycle partagee decodeur et collecte, avec garde-fou automatique.
   - Decisions lot 3 tracees par l humain avant toute modification fonctionnelle.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T424_BANC_AFFICHAGE_VOLET1.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T424_CONTRAT_BANC_AFFICHAGE_VOLET1.yaml
   avancement: Lot de robustesse et anti-recidive T424 acheve avec succes. Table des libelles de cycle harmonisee (A6), repli
     discordance contacteur securise (non identifie au lieu de vide, A12), garde-fou mecanique automatique G507 cree et PASS
     (10/10 masques de cycle verifies). G200 PASS (0 erreur). Bundles XML regeneres.
@@ -8465,7 +8474,7 @@ tasks:
   criticite: C2
   domaine: OUTILLAGE / CI / SECURITE TREUILS-TRANSLATION-CYCLE
   agent: CC01
-  date: '2026-10-31T13:45:42+01:00'
+  date: '2026-11-11T03:03:21+01:00'
   updated_at: '2026-10-31T13:45:42+01:00'
   titre: Volet 2 source des defauts - baseline et remise au vert de la CI FB securite
   contexte: 'Contre-audit du 2026-10-31 (§7) : la CI TEST_AUTO_CI sait deja tester la vraie condition de defaut au niveau
@@ -8480,6 +8489,6 @@ tasks:
   - Chaque FAIL classe TEST_PERIME ou REGRESSION avec preuve.
   - 4 FB au vert hors regressions documentees.
   - Meca A a G couvertes en positif et negatif, bit ErrorId verifie.
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T425_CI_SOURCE_DEFAUTS.yaml
+  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T425_CONTRAT_CI_SOURCE_DEFAUTS.yaml
   avancement: Cadre. En attente du feu vert humain pour l etape 1 (execution locale, ecrit uniquement dans TOOLS/TEST_AUTO_CI/RESULTS/).
   bloque_par: []

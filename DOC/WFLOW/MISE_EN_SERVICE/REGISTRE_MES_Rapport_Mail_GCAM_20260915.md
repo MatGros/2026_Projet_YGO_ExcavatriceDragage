@@ -53,13 +53,13 @@ Points techniques à traiter avant la semaine prochaine :
 | **Cycle (AX10➔AX11)** | Transition en grappin (remontée avant fermeture complète) | Soulager M2 seul ; étude chronogramme continue freins/contacteurs. | `T262` |
 | **Treuils (Sécurité)** | Fin de course haut calé sur M1 en Both | M1 doit être la référence nominale en Both (M2 reste barrière de sécurité). | **`T301`** (à créer) |
 | **Sécurité / Puissance** | Détection discordance contacteurs | Phase 1 validée simu (alarme + SafeStop 3s) ; détailler les causes maintenance. | `T288` |
-| **Benne (AX15B)** | Diagnostic timeout ouverture benne ErrorID:03 | Cartographier et diagnostiquer la cause réelle avant de toucher au timeout. | [`T295`](../CONTRACTS/TASK_CONTRACT_T295_AX15B_BUCKET_OPEN_TIMEOUT.yaml) |
-| **Translation M3** | Fréquences 50 Hz nominal / 15 Hz en zone PV | Deux paramètres configurables et persistants sans modifier les sécurités. | [`T296`](../CONTRACTS/TASK_CONTRACT_T296_M3_FREQUENCES_PERSISTANTES.yaml) |
+| **Benne (AX15B)** | Diagnostic timeout ouverture benne ErrorID:03 | Cartographier et diagnostiquer la cause réelle avant de toucher au timeout. | [`T295`](<../TASKS/T_TEMP (A TRIIER)/CONTRACTS/T295_CONTRAT_AX15B_BUCKET_OPEN_TIMEOUT.yaml>) |
+| **Translation M3** | Fréquences 50 Hz nominal / 15 Hz en zone PV | Deux paramètres configurables et persistants sans modifier les sécurités. | [`T296`](<../TASKS/T_TEMP (A TRIIER)/CONTRACTS/T296_CONTRAT_M3_FREQUENCES_PERSISTANTES.yaml>) |
 | **Translation M3** | Dépassement sur butées Trémie / P1 | Analyse des rebonds capteurs et arrêt mécanique avant patch. | `T287` / `T288` |
 | **Joystick** | Armement (`ArmingPermit`) cohérent avec permis | Éviter le faux état armé qui génère "commande sans mouvement". | `T224` |
 | **Treuils (Contrôle)** | Paliers sous charge conditionnés par la vitesse câble | Éviter calage et disjonction ; condition vitesse + tempo, seuils débrayables. | **`T300`** (à créer) |
 | **Cycle Homing** | Fiabilisation cycle référencement | Reproduire le bug, corriger la séquence, valider en simu puis machine. | **`T302`** (à créer) |
 | **Supervision / Outils** | Outil export CSV/Excel alarmes et messages | Valider textes, causes et conseils opérateur. | `T255` |
 | **Supervision** | Refonte chronologique GVL Troubleshooting | Vue temporelle directe pour diagnostic rapide sans ouvrir le code. | **`T303`** (à créer) |
-| **IHM / Essais** | Raccourcis / sauts d'étapes (AX7, Trémie...) | Sauts contrôlés pour essais avec préconditions et reprise consciente. | [`T297`](../CONTRACTS/TASK_CONTRACT_T297_CYCLE_IHM_FORCE_AX7.yaml) |
+| **IHM / Essais** | Raccourcis / sauts d'étapes (AX7, Trémie...) | Sauts contrôlés pour essais avec préconditions et reprise consciente. | [`T297`](<../TASKS/T_TEMP (A TRIIER)/CONTRACTS/T297_CONTRAT_CYCLE_IHM_FORCE_AX7.yaml>) |
 | **Cycle (Compteur)** | Compteur de prélèvements (dépose trémie) + RAZ | Incrément en AX18 vérifié + bouton RAZ IHM à ajouter. | [`T299`](../CONTRACTS/TASK_CONTRACT_T299_CYCLE_SAMPLE_COUNT.yaml) |

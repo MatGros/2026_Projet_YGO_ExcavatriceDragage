@@ -1,0 +1,210 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Lot 1 du refactor troubleshooting : faire dire la verite aux valeurs du
+# snapshot, sans renommer, sans deplacer, sans changer la logique machine.
+# Base : DOC/WFLOW/ETUDES/CARTE_FLUX_AXES/README.md (essais 0/15, cas AX12).
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: TS_LOT1_VALEURS_TROMPEUSES
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Le snapshot affiche pour chaque variable corrigee la valeur annoncee par
+    son nom : ordre valide et non demande, palier autorise et non demande,
+    autorisation de mode correcte en SEMI_AUTO. Aucun ordre machine ne change.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        N/O/P.Step2_ModeAuthorized valent TRUE si Auth.Mode <> DISABLE, comme
+        l'annonce ST_MotionChecklist.st:10. AllConditionsMet n'est donc plus
+        faux par construction en SEMI_AUTO. E_HomingM1/F_HomingM2.Step1 et
+        M3 RequestedDirection restent inchanges.
+      verified_by: >
+        Test CI FB_TroubleshootingView : cas SEMI_AUTO TRUE, DISABLE FALSE,
+        MAINT_N1 et MAINT_N2 TRUE, pour N, O et P.
+    - id: AC2
+      statement: >
+        I/J.Outputs_500.Idx501 a Idx504, H.Idx501 et Idx502, N/O.RelayFwdActive,
+        RelayRevActive, SpeedContactor1Active et K.Idx501_M2_CmdRev_DQ lisent
+        les ordres finaux publies PRG_06_Outputs.Data.M1RelayFwd, M1RelayRev,
+        M1SpeedContactor1 et 4, et leurs equivalents M2, apres barriere et
+        protecteur.
+      verified_by: >
+        Test CI : demande active et Data a FALSE donnent FALSE sur ces champs.
+    - id: AC3
+      statement: >
+        N/O.RequestedDirection et le terme Step8_OutputInterlockOk restent bases
+        sur les memes sources qu'aujourd'hui : la demande reste affichee comme
+        demande, le REX T371 est conserve.
+      verified_by: "Revue du diff FB_TroubleshootingView.st, lignes 572, 603-607, 634, 646-650."
+    - id: AC4
+      statement: >
+        I/J.Idx407_FinalAuthorizedStep lit le palier autorise par la barriere
+        finale (InterlockM1/M2.AuthorizedStep), avec un retard d'un cycle au plus.
+      verified_by: >
+        Grep : aucun autre consommateur de FinalAuthorizedStep que la vue ;
+        test CI palier demande 5, autorise 1, affichage 1.
+    - id: AC5
+      statement: >
+        I/J.Idx323 lit Safety.CableLimitAscent, soit la butee reellement appliquee
+        (FB_WinchStateProjection.st:219-229, 256 : Homed, non suspect, hors homing,
+        M2_LimitShift pour M2). Idx324 reste ce fait masque par les bypass.
+      verified_by: "Test CI M2 a 21 m avec decalage 15 m : Idx323 FALSE."
+    - id: AC6
+      statement: >
+        C_Safety.PowerCutOffRequest lit PRG_06_Outputs.Data.PowerCutOffRequest ;
+        L.Idx502_CmdDriveFreq_Hz (UINT, 0.01 Hz) lit la consigne finale M3 sans
+        conversion cachee ; I.Idx307_SlackCablePhysical_DI lit le meme
+        signal que SlackCableDetected M1 (PRG_04_Treuils_Benne.st:944).
+      verified_by: "Revue du diff ; G200 ; types verifies en declaration."
+    - id: AC7
+      statement: >
+        Aucun nom, aucun chemin ni ordre de troubleshooting_variables.txt ne
+        change. Les consommateurs de snapshot restent compatibles.
+      verified_by: >
+        generate_variable_list_from_code.py vers un fichier temporaire hors depot,
+        puis comparaison sans difference.
+    - id: AC8
+      statement: >
+        Aucun changement de comportement machine : seules la vue et ses entrees
+        changent, plus une ligne de projection d'etat par treuil.
+      verified_by: >
+        Bundle complet, diff bundle, G200 --report PASS, run_all_gates --palier C ;
+        git diff limite au perimetre autorise ; simu : geste habituel inchange.
+    - id: AC10
+      statement: >
+        Les POU modifies conservent un nom de fichier identique au nom de POU et
+        un suffixe de langage (ST) identique au langage genere dans le bundle ;
+        toute nouvelle entree respecte NAMING_CONVENTION.
+      verified_by: "Bundle PLCopenXML genere, G200 --report, audit de nommage des nouvelles entrees."
+    - id: AC9
+      statement: "Le test a l'aveugle sur les 5 incidents est rejoue et son resultat publie, sans seuil de reussite."
+      verified_by: "Note mise a jour dans DOC/WFLOW/ETUDES/CARTE_FLUX_AXES/README.md, a valeurs historiques reinterpretees."
+
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - CODE/M_MAIN/PRG_07_Supervision.st                  # nouvelles entrees de la vue
+      - CODE/H_TREUILS_BENNE/FB_WinchStateProjection.st    # lignes 110 et 177 seulement
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml    # si le test de la vue l'exige
+      - TOOLS/TEST_AUTO_CI/MOCKS/MOCK_GVL_Troubleshooting.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/tests/test_fb_troubleshootingview.st   # le test impose les anciennes valeurs TBD
+      - DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md     # fiche detaillee des producteurs et TBD
+      - DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md
+      - DOC/WFLOW/ETUDES/CARTE_FLUX_AXES/README.md
+      - DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T428_CONTRAT_LOT1_VALEURS_TROMPEUSES.yaml
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/CODE_DiffBundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/J_SUPERVISION/GVL_Troubleshooting.st
+      - CODE/J_SUPERVISION/_TYPES/**
+      - CODE/G_CYCLE/**
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - DOC/WFLOW/TASKS.yaml
+      - ARCHIVES/**
+
+  conservation:
+    must_survive:
+      - "Aucun ordre, permis, sequence ou seuil machine ne change"
+      - "Noms et chemins GVL_Troubleshooting inchanges (IHM, snapshots, traces)"
+      - "FB_TroubleshootingView reste en lecture seule"
+      - "Le terme T371 de Step8_OutputInterlockOk reste base sur BrakeCmd valide"
+      - "La demande reste lisible : Idx208, Idx209 et RequestedDirection inchanges"
+    dropped_on_purpose:
+      - "La lecture historique des champs Outputs comme demande : un snapshot ancien ne se compare plus directement sur ces champs"
+      - "Hors lot : ajout de maillons, reordonnancement, retraits, G.Idx216_PausedState, A.Idx203, P.Step3 et noms ambigus"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+    - generated_variable_list_comparison
+    - diff_review
+
+  models_allowed:
+    - "claude-opus-5-5"
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout probleme constate en cours de route est remonte IMMEDIATEMENT a
+    l'orchestrateur, pas a la fin et jamais silencieusement : type incompatible,
+    consommateur non recense, Safety.CableLimitAscent different de la butee reelle,
+    harnais CI de la vue non compilable (T372). Signaler n'est pas elargir le scope.
+
+status: COMPLETED
+
+tracking:
+  user_need: >
+    Mainteneur et agent doivent voir ou le flux s'arrete. Les essais montrent
+    des diagnostics stoppes par des valeurs fausses.
+  useful_history:
+    - "DOC/WFLOW/ETUDES/CARTE_FLUX_AXES/README.md : essais, 0 cause sur 15, cas AX12."
+    - "CODE/J_SUPERVISION/FB_TroubleshootingView.st:589-599 : REX T371, State.RelayFwd est la demande."
+    - "CODE/F_MODES/E_Mode.st : DISABLE, MAINT_N1, MAINT_N2, SEMI_AUTO ; pas de mode MANUEL."
+  current_question: "Les corrections de valeur suffisent-elles a mieux situer le blocage ?"
+  established:
+    - "Sources verifiees : PRG_06_Outputs.st:387-402 et 539 publient les ordres finaux et PowerCutOffRequest."
+    - "FB_WinchStateProjection.st:110,177 : FinalAuthorizedStep lit RequestedStep."
+    - "PRG_04_Treuils_Benne.st:944,1014 : M1 et M2 utilisent M2_TensionedCable_DI."
+  unknowns:
+    - "M3_SetpointFrequencyHz est un WORD (ST_IoHw_Out.st:47) et L.Idx502 un UINT : conversion explicite et echelle a confirmer avant branchement."
+    - "Etat du harnais CI de la vue : T372."
+  next_action: "GO d'implementation humain, distinct de la validation de ce contrat."
+  owners:
+    accountable: "HUM"
+    executor: "CC01"
+    control_maintainer: "CC01"
+  delegation:
+    required_workflows: []
+    permissions: []
+    forbidden_actions:
+      - "commit ou push sans accord humain explicite"
+    measurable_deliverables: []
+    alert_conditions: []
+    self_review: []
+  stagnation:
+    threshold: 3
+    justification: ""
+    consecutive_uninformative: 0
+    blind_reviews: []
+  experiments: []
+
+execution:
+  executed_by: "CC01"
+  completed_at: "2026-11-07T04:26:59+01:00"
+  status: COMPLETED
+  summary: >
+    Lot implemente, commit 8ac56593. Import et compilation CODESYS OK, declares
+    par l'exploitant le 2026-11-07. Test en simulation PARTIEL : quelques variables
+    vues se mettre a jour, dont Idx323 TRUE en haut. Le tableau de test complet et
+    le geste habituel (AC8) ne sont pas confirmes. Aucun test sur machine reelle.
+    Rejeu a l'aveugle (AC9) non fait.
+    2026-11-08 : l'exploitant declare avoir fait les essais demandes en J1 et
+    valide le lot. Aucun test sur machine reelle. Rejeu a l'aveugle (AC9) reste
+    a faire par l'orchestrateur.
+  evidence_submitted:
+    - "G200 --report : PASS, 0 erreur"
+    - "Palier C : 9 echecs, 8 preexistants et G523 en faux positif"
+    - "Liste de variables : identique, 571 variables"
+    - "Revue A/B : aucun bloquant retenu"
+
+validation:
+  status: APPROVED
+  validated_by: "HUM"
+  validated_at: "2026-11-08T11:28:28+01:00"
+  notes: >
+    Point d'arret : relecture humaine du contrat et GO d'implementation avant
+    toute ecriture dans CODE/. Aucune tache catalogue creee a ce stade.

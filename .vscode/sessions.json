@@ -43,15 +43,6 @@
                 ]
             },
             {
-                "name": "⚡ OpenCode-Go (glm-5.2)",
-                "autoExecuteCommands": true,
-                "icon": "zap",
-                "color": "terminal.ansiBrightCyan",
-                "commands": [
-                    "opencode-go --provider opencode --model glm-5.2 --permission-mode default"
-                ]
-            },
-            {
                 "name": "🌐 OmniRoute Server",
                 "autoExecuteCommands": true,
                 "icon": "server",
@@ -77,9 +68,27 @@
                 "commands": [
                     "ollama launch dsh --model deepseek-v4.1-flash:cloud"
                 ]
+            },
+            {
+                "name": "Claude Code OmniRoute AGY (Gemini 3.8)",
+                "autoExecuteCommands": true,
+                "icon": "code",
+                "color": "terminal.ansiBrightCyan",
+                "commands": [
+                    "cmd /c \"set ANTHROPIC_BASE_URL=http://localhost:20128&& set ANTHROPIC_AUTH_TOKEN=local-dev&& set ANTHROPIC_API_KEY=&& set ANTHROPIC_MODEL=agy/gemini-3.8-flash-tiered&& claude --model agy/gemini-3.8-flash-tiered\""
+                ]
             }
         ],
         "disabled_terminals": [
+            {
+                "name": "OpenCode-Go (glm-5.2) - desactive",
+                "autoExecuteCommands": true,
+                "icon": "zap",
+                "color": "terminal.ansiBrightCyan",
+                "commands": [
+                    "opencode-go --provider opencode --model glm-5.2 --permission-mode default"
+                ]
+            },
             {
                 "name": "🦙 Claude Code (Ollama)",
                 "autoExecuteCommands": true,

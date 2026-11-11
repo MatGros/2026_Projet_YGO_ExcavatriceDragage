@@ -1,7 +1,7 @@
 # FB_Winch — fiche composant (v2.0, T181)
 
 > Statut : **implémenté (T181-08) — interface struct réelle, vérifiée code** (`CODE/H_TREUILS_BENNE/FB_Winch.st`).  
-> Source normative de cette fiche : `DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T181-06_DRIVEREQUEST.md` et `AF10_INTERFACE_TREUIL_CIBLE_T181.md`.
+> Source normative de cette fiche : `DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/AUDITS/T181-06_CADRAGE_DRIVEREQUEST.md` et `AF10_INTERFACE_TREUIL_CIBLE_T181.md`.
 > La v1.0 (interface plate périmée) est archivée (G340) : `ARCHIVES/Doc/AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md`.
 
 ## 🧭 Sommaire

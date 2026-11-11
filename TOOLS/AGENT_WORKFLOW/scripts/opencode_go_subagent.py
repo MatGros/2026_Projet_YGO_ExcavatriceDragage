@@ -40,6 +40,37 @@ PREAMBLE_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "subage
 _AUTH_JSON = os.path.expanduser("~/.local/share/opencode/auth.json")
 
 
+def validate_output_path(output_path: str):
+    """Garde-fou mécanique Norme T279 & règle '1 tâche = 1 dossier'.
+
+    Interdit d'enregistrer des sorties d'agents directement à la racine du dépôt
+    ou directement sous DOC/WFLOW/. Tout livrable doit être ordonné sous
+    DOC/WFLOW/TASKS/T<ID>_<NOM>/PREUVES/ ou ARCHIVES/ (ou dans un sous-dossier outillage).
+    """
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    abs_path = os.path.abspath(output_path)
+    try:
+        rel = os.path.relpath(abs_path, repo_root)
+        parts = rel.split(os.sep)
+    except ValueError:
+        parts = output_path.split(os.sep)
+
+    is_repo_root = (len(parts) == 1)
+    is_doc_wflow_root = (len(parts) == 3 and parts[0].upper() == "DOC" and parts[1].upper() == "WFLOW")
+
+    if is_repo_root or is_doc_wflow_root:
+        print("=" * 72)
+        print(f"⛔ [BLOQUÉ NORME T279] Chemin de sortie interdit : '{output_path}'")
+        print("=" * 72)
+        print("Règles obligatoires (AGENTS.md & STRUCTURE_AND_CLEANUP.md) :")
+        print("  1. Interdit d'écrire des fichiers à la racine du dépôt ou dans DOC/WFLOW/.")
+        print("  2. Règle '1 tâche = 1 dossier' : classer sous :")
+        print("     DOC/WFLOW/TASKS/T<ID>_<NOM>/PREUVES/<session>/ ou ARCHIVES/")
+        print("     Exemple : DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/PREUVES/.../T429_REVUE_..._v1.0.md")
+        print("=" * 72)
+        sys.exit(1)
+
+
 def _resolve_key() -> str:
     key = os.environ.get("OPENCODE_GO_API_KEY", "").strip()
     if key:
@@ -156,6 +187,9 @@ def main():
     if args.list_models:
         list_models(base_url)
         return
+
+    if args.output:
+        validate_output_path(args.output)
 
     if args.file:
         with open(args.file, encoding="utf-8") as f:

@@ -21,7 +21,7 @@
 | [`MISE_EN_SERVICE/`](WFLOW/MISE_EN_SERVICE/) | **Traçabilité sur site** : pendant qu'on est devant la machine, ce qu'on a fait, vu et décidé. Journaux de séance datés, témoignages, bilans, réintégration dans le code. Un journal ne se réécrit pas : correction = nouvelle entrée |
 | [`TROUBLESHOOTING/`](WFLOW/TROUBLESHOOTING/) | Fiches de diagnostic d'incidents |
 | [`REX/`](WFLOW/REX/) | Retours d'expérience transverses (leçons réutilisables) |
-| [`PROMPTS/`](WFLOW/PROMPTS/) | `PERSO/` : prompts personnels de l'exploitant (usage humain, les agents ne les modifient pas) · `AGENTS/` : briefs et passations pour agents |
+| [`PROMPTS/`](WFLOW/PROMPTS/) | `PERSO/` : prompts personnels de l'exploitant (usage humain, les agents ne les modifient pas) · `AGENTS/` : briefs et passations pour agents · `SPECIALISTS/` : prompts système versionnés des 6 personas d'évaluation et challenge ([`INDEX_PROMPTS_SPECIALISTS.md`](WFLOW/PROMPTS/SPECIALISTS/INDEX_PROMPTS_SPECIALISTS.md)) |
 | [`TEMPLATE/`](WFLOW/TEMPLATE/) | Gabarits du projet (les gabarits d'outillage sont dans `TOOLS/AGENT_WORKFLOW/templates/`) |
 | [`DIAGRAMS/`](WFLOW/DIAGRAMS/) | GRAFCET métier |
 | [`ELEC/`](WFLOW/ELEC/) | Électricité : matrice de câblage E/S, plans. **Hors tâche**, par nature |

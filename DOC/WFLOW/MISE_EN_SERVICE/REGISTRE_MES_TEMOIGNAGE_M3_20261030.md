@@ -31,6 +31,6 @@ Ce témoignage corrige et remplace les reformulations antérieures de l'agent co
 
 - [Passation T417 du 30 octobre](../TROUBLESHOOTING/FICHES/PASSATION_T417_SimM3_20261030.md).
 - [Étude T417, notamment §5bis](../ETUDES/ETUDE_CONCEPTION_T417_SIMULATION_TRANSLATION_M3.md).
-- [Reprise du 28 octobre](../AUDITS/DESIGN/SIMU_M3_REALISTE_20261028/REPRISE_20261028.md).
+- [Reprise du 28 octobre](<../TASKS/T_TEMP (A TRIIER)/AUDITS/T417_PASSATION_SIMULATION_M3_20261028.md>).
 
 Ces liens facilitent la reprise ; ils ne valent pas validation des affirmations contenues dans ces documents.
