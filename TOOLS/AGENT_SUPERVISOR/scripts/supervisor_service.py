@@ -40,12 +40,41 @@ except ImportError:
                              parse_user_choice, stop_claude_background)
 
 
+def clean_stream_preview(text, limit=4000):
+    text = str(text or "")
+    text = re.sub(r'</?(?:USER_REQUEST|ADDITIONAL_METADATA|SYSTEM_MESSAGE)>', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'<ADDITIONAL_METADATA>[\s\S]*?</ADDITIONAL_METADATA>', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'^\[tool result [^\]]*\]\s*', '', text)
+    cleaned = text.strip()
+    return cleaned[:limit] if limit else cleaned
+
+
 def bounded_text(text, limit=3000, head=400):
     """Keep the start (typed tool header, provenance) and the end of a long message, with an explicit gap."""
     if len(text) <= limit:
         return text
     marker = f"\n[… {len(text) - limit} caractères omis …]\n"
     return text[:head] + marker + text[-(limit - head - len(marker)):]
+
+
+def compact_specialist_text(text: str) -> str:
+    """Condense un retour d'agent spécialiste pour préserver le contexte glissant du superviseur."""
+    if not any(k in text for k in ("specialist_evaluation:", "agent_evaluation:", "challenge_evaluation:", "=== RESTITUTION EXPERT")):
+        return text
+    
+    verdict_match = re.search(r"verdict:\s*[\"']?([A-Z_]+)[\"']?", text, re.IGNORECASE)
+    role_match = re.search(r"(?:agent:\s*[\"']?([A-Za-z0-9_]+)[\"']?|=== RESTITUTION EXPERT \[([A-Z_]+)\])", text, re.IGNORECASE)
+    impact_match = re.search(r"(?:impact_line|summary):\s*[\"']?([^\r\n\"']+)[\"']?", text)
+    
+    v = verdict_match.group(1).upper() if verdict_match else "EVAL"
+    r = ((role_match.group(1) or role_match.group(2)) if role_match else "SPECIALIST").upper()
+    impact = f" — {impact_match.group(1).strip()}" if impact_match else ""
+    
+    invariants = re.findall(r"id:\s*[\"']?([A-Z0-9_-]+)[\"']?.*?status:\s*[\"']?([A-Z_]+)[\"']?", text, re.DOTALL)
+    inv_str = ", ".join(f"{i[0]}:{i[1]}" for i in invariants[:5])
+    inv_detail = f" [{inv_str}]" if inv_str else ""
+    
+    return f"[AUDIT SPÉCIALISTE {r} : {v}{impact}{inv_detail}]"
 
 
 def timestamp():
@@ -519,6 +548,9 @@ class Supervisor:
                 sid = str(uuid.UUID(value["id"]))
                 self.sessions[sid] = self._new_session(sid, value["platform"], value["native_id"], value.get("alias", ""), False, self._mission(value.get("mission", "")))
                 session = self.sessions[sid]
+                session["closed"] = bool(value.get("closed", False))
+                if session["closed"]:
+                    session["state"] = "closed"
                 session["recovery"] = self._validate_recovery(value.get("recovery"))
                 session["source_checkpoint"] = value.get("source_checkpoint")
                 session["source_generation"] = value.get("source_generation")
@@ -552,8 +584,8 @@ class Supervisor:
                 session["acquired_proofs"] = value.get("acquired_proofs", [])
                 session["session_journal"] = value.get("session_journal", [])
                 session["judge_turn_count"] = self._nonnegative_int(value.get("judge_turn_count", 0), "judge_turn_count")
-                session["recent_raw_events"] = []
-                session["dropped_events"] = []
+                session["recent_raw_events"] = value.get("recent_raw_events", [])[-15:]
+                session["dropped_events"] = value.get("dropped_events", [])[-15:]
                 if not isinstance(session["events"], list) or not isinstance(session["framing"], list):
                     raise ValueError("Journal de session invalide")
                 self.sessions[sid]["exchange_path"] = str(self._note_path(sid))
@@ -746,6 +778,8 @@ class Supervisor:
         return True
 
     def _resume_session(self, session, mode=None):
+        if session.get("closed") or session.get("state") == "closed":
+            raise ValueError("Session clôturée / figée : rouvrir la session avant de la reprendre")
         if mode not in (None, "normal", "history"):
             raise ValueError("Mode de reprise invalide")
         recovery=session.get("recovery", {"status":"none"})
@@ -805,9 +839,12 @@ class Supervisor:
                 return
             for message in recovery.get("messages", []):
                 context_message=dict(message)
-                if len(context_message["text"])>3000:
-                    context_message["text"]=bounded_text(context_message["text"]) if context_message.get("role")=="tool" else context_message["text"][-3000:]
+                rec_text = compact_specialist_text(context_message["text"])
+                if len(rec_text)>3000:
+                    context_message["text"]=bounded_text(rec_text) if context_message.get("role")=="tool" else rec_text[-3000:]
                     session["context_truncated"]=True
+                else:
+                    context_message["text"]=rec_text
                 session["context"].append(context_message)
                 session["context_revision"] += 1
 
@@ -1024,7 +1061,7 @@ class Supervisor:
     @staticmethod
     def _new_session(sid, platform, native_id, alias, enabled, mission=""):
         return dict(id=sid, platform=platform, native_id=native_id, alias=str(alias)[:100], mission=mission, initial_mission=mission, mission_updated_at=timestamp(), mission_structure={}, mission_structure_updated_at=None, memory=[], context_truncated=False,
-                    enabled=enabled, state="waiting" if enabled else "paused", source=None, error=None,
+                    enabled=enabled, state="waiting" if enabled else "paused", closed=False, source=None, error=None,
                     messages_observed=0,
                     last_event=None, last_analysis=None, analysis_state="waiting" if mission else "context_required", analysis_error=None,
                     alerts=[], events=[], framing=[], acquired_proofs=[], session_journal=[], judge_turn_count=0, watcher=None, context=[], generation=0, judge_request=None, judge_proposal=None,
@@ -1058,7 +1095,7 @@ class Supervisor:
         if self.load_error:
             raise ValueError("Configuration illisible : ecriture refusee pour proteger les donnees existantes")
         data = dict(model=self.model, allow_cloud=self.allow_cloud, judge_settings=self.judge_settings, sessions=[
-            {key: value[key] for key in ("id", "platform", "native_id", "alias", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "alerts", "source_checkpoint", "source_event_index", "context_revision", "analyzed_revision", "context", "context_truncated", "messages_observed", "memory", "recovery", "enabled", "events", "framing", "source_generation", "acquired_proofs", "session_journal", "judge_turn_count")} for value in self.sessions.values()])
+            {key: value.get(key, False if key == "closed" else None) for key in ("id", "platform", "native_id", "alias", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "alerts", "source_checkpoint", "source_event_index", "context_revision", "analyzed_revision", "context", "context_truncated", "messages_observed", "memory", "recovery", "enabled", "events", "framing", "source_generation", "acquired_proofs", "session_journal", "judge_turn_count", "closed")} for value in self.sessions.values()])
         if self.persist_chat:
             data['chat_histories'] = {('global' if key is None else key): value for key, value in self._chat_histories.items()}
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1102,7 +1139,8 @@ class Supervisor:
             ).encode("utf8")).hexdigest()[:24]
             if (offset or revision is not None) and revision != current_revision:
                 raise ValueError("Revue modifiee : recommencer a offset=0 avec la nouvelle revision")
-            result = {k: session.get(k) for k in ("id", "alias", "platform", "state")}
+            result = {k: session.get(k) for k in ("id", "alias", "platform", "state", "judge_turn_count")}
+            result["re_evaluations_count"] = max(0, session.get("judge_turn_count", 0) - 1) if session.get("judge_turn_count", 0) > 0 else 0
             result.update(counts=counts(alerts), alerts=[], total=len(opened), next_offset=None,
                           revision=current_revision)
             size = len(json.dumps(result, ensure_ascii=False).encode("utf8"))
@@ -1126,8 +1164,9 @@ class Supervisor:
     def snapshot(self):
         with self._lock:
             self._expire_test_notifications()
-            public = [{key: value[key] for key in ("id", "platform", "native_id", "alias", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "memory", "context_truncated", "state", "enabled", "source", "error", "last_event", "last_analysis", "analysis_state", "analysis_error", "exchange_path", "exchange_error", "exchange_saved_at", "alerts", "judge_request", "judge_proposal", "messages_observed", "recovery", "events", "framing")} for value in self.sessions.values()]
+            public = [{key: value.get(key, False if key == "closed" else 0 if key == "judge_turn_count" else None) for key in ("id", "platform", "native_id", "alias", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "memory", "context_truncated", "state", "enabled", "source", "error", "last_event", "last_analysis", "analysis_state", "analysis_error", "exchange_path", "exchange_error", "exchange_saved_at", "alerts", "judge_request", "judge_proposal", "messages_observed", "recovery", "events", "framing", "closed", "judge_turn_count")} for value in self.sessions.values()]
             for item, session in zip(public, self.sessions.values()):
+                item["re_evaluations_count"] = max(0, session.get("judge_turn_count", 0) - 1) if session.get("judge_turn_count", 0) > 0 else 0
                 item["counts"] = counts(session["alerts"])
                 item["alerts"] = [dict(a, delivery_preview=informational_message(a)) for a in item["alerts"]]
                 for alert in item["alerts"]:
@@ -1174,14 +1213,14 @@ class Supervisor:
                     alerts[-1]["delivery_status"] = workflow.get("delivery_status")
                 sessions.append({key: value.get(key) for key in (
                     "id", "platform", "native_id", "alias", "state", "analysis_state",
-                    "last_event", "last_analysis")})
+                    "last_event", "last_analysis", "judge_turn_count")})
                 sessions[-1]["alerts"] = alerts
                 sessions[-1]["counts"] = counts(value.get("alerts", []))
             return dict(schema_version=1, running=self.running, sessions=sessions, counts=counts([a for s in self.sessions.values() for a in s["alerts"]]))
 
     def command(self, command):
         with self._lock:
-            if command.get("action") not in ("test_notification", "set_mission_structure", "comment_alert", "configure", "add", "pause", "resume", "resume_all", "retry_recovery", "remove", "set_mission", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
+            if command.get("action") not in ("test_notification", "set_mission_structure", "comment_alert", "configure", "add", "pause", "resume", "resume_all", "close", "reopen", "retry_recovery", "remove", "set_mission", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
                 return self._command(command)
             backup = (copy.deepcopy(self.sessions), self.model, self.allow_cloud,
                       self._epoch, deque(self._queue), set(self._queued), copy.deepcopy(self._chat_state), self._chat_epoch, self._chat_pending, copy.deepcopy(self._chat_histories), deque(self._agent_queue))
@@ -1315,6 +1354,8 @@ class Supervisor:
                 mode = command.get("mode")
                 resumed = []
                 for sid, session in list(self.sessions.items()):
+                    if session.get("closed") or session.get("state") == "closed":
+                        continue
                     if session.get("enabled") is False or session.get("state") == "paused":
                         try:
                             rec_status = session.get("recovery", {}).get("status")
@@ -1327,11 +1368,34 @@ class Supervisor:
                 self._persist()
                 self._wake.set()
                 return {"resumed": resumed, "count": len(resumed)}
-            elif action in ("pause", "resume", "retry_recovery", "remove", "set_mission", "reassign"):
+            elif action in ("pause", "resume", "close", "reopen", "retry_recovery", "remove", "set_mission", "reassign"):
                 sid = command.get("id")
                 if sid not in self.sessions:
                     raise ValueError("Affectation inconnue")
                 session = self.sessions[sid]
+                if action == "close":
+                    session["closed"] = True
+                    session["enabled"] = False
+                    session["state"] = "closed"
+                    session["analysis_state"] = "waiting"
+                    if session.get("watcher") is not None:
+                        session["source_checkpoint"] = session["watcher"].checkpoint()
+                    self._queued.discard(sid)
+                    self._queue = deque(x for x in self._queue if x != sid)
+                    record_event(session, "session_closed", "Session clôturée / figée", timestamp())
+                    self._persist()
+                    self._write_note(session)
+                    return
+                if action == "reopen":
+                    session["closed"] = False
+                    session["enabled"] = False
+                    session["state"] = "paused"
+                    if session.get("source_checkpoint") and session.get("recovery", {}).get("status") not in ("processing", "error"):
+                        session["recovery"] = dict(status="pending_check")
+                    record_event(session, "session_reopened", "Session réouverte (en pause)", timestamp())
+                    self._persist()
+                    self._write_note(session)
+                    return
                 if action == "resume":
                     self._resume_session(session, command.get("mode"))
                     self._write_note(session)
@@ -1931,24 +1995,39 @@ class Supervisor:
             self._confirm_peer_delivery(session, event)
             message = normalize(session["platform"], event)
             raw_type = str(event.get("type") or "unknown")
-            raw_preview = str(event.get("content") or event.get("message") or event.get("payload") or "")[:120].strip()
+            alias = str(session.get("alias") or session.get("native_id") or "Session")
+            raw_preview = clean_stream_preview(event.get("content") or event.get("message") or event.get("payload") or "")
+            if not raw_preview:
+                tool_calls = event.get("tool_calls") or []
+                if isinstance(tool_calls, list) and tool_calls:
+                    summaries = []
+                    for tc in tool_calls[:3]:
+                        name = tc.get("name") or tc.get("function", {}).get("name") or tc.get("tool") or "outil"
+                        args = tc.get("arguments") or tc.get("args") or {}
+                        ts = args.get("toolSummary") if isinstance(args, dict) else None
+                        summaries.append(f"{name} ('{ts}')" if ts else str(name))
+                    raw_preview = "Appel outil : " + ", ".join(summaries)
+                elif event.get("thinking"):
+                    raw_preview = "Pensée interne : " + str(event["thinking"]).strip()[:140]
             # Ignorer les événements de métadonnées internes système d'AGY/IDE sans contenu textuel utile
             if raw_type in ("bridge-session", "atis-latch", "session-owner", "mode", "agent-setting", "agent-name", "ai-title", "custom-title"):
                 session["system_events_skipped"] = session.get("system_events_skipped", 0) + 1
                 continue
+            drop_reason = "appel outil" if (event.get("tool_calls") or (raw_type == "PLANNER_RESPONSE" and "Appel outil" in raw_preview)) else ("pensée interne" if event.get("thinking") else "type non retenu")
             if not message or not message[1]:
-                drop_item = dict(event_index=event_index, timestamp=timestamp(), raw_type=raw_type, reason="type ou contenu non retenu", preview=raw_preview)
+                drop_item = dict(event_index=event_index, timestamp=timestamp(), raw_type=raw_type, reason=drop_reason, preview=raw_preview, session_alias=alias)
                 session.setdefault("dropped_events", []).append(drop_item)
                 session["dropped_events"] = session["dropped_events"][-15:]
-                session.setdefault("recent_raw_events", []).append(dict(event_index=event_index, status="dropped", role=None, raw_type=raw_type, reason="type non retenu", timestamp=timestamp(), preview=raw_preview))
+                session.setdefault("recent_raw_events", []).append(dict(event_index=event_index, status="dropped", role=None, raw_type=raw_type, reason=drop_reason, timestamp=timestamp(), preview=raw_preview, session_alias=alias))
                 session["recent_raw_events"] = session["recent_raw_events"][-15:]
                 continue
             role, text = message
+            cleaned_text = clean_stream_preview(text)
             if self._supervision_message(session, role, text):
-                session.setdefault("recent_raw_events", []).append(dict(event_index=event_index, status="dropped", role=role, raw_type=raw_type, reason="supervision interne", timestamp=timestamp(), preview=text[:120].strip()))
+                session.setdefault("recent_raw_events", []).append(dict(event_index=event_index, status="dropped", role=role, raw_type=raw_type, reason="supervision interne", timestamp=timestamp(), preview=cleaned_text, session_alias=alias))
                 session["recent_raw_events"] = session["recent_raw_events"][-15:]
                 continue
-            session.setdefault("recent_raw_events", []).append(dict(event_index=event_index, status="kept", role=role, raw_type=raw_type, reason=None, timestamp=timestamp(), preview=text[:120].strip()))
+            session.setdefault("recent_raw_events", []).append(dict(event_index=event_index, status="kept", role=role, raw_type=raw_type, reason=None, timestamp=timestamp(), preview=cleaned_text, session_alias=alias))
             session["recent_raw_events"] = session["recent_raw_events"][-15:]
             if role == "user":
                 pending = self._pending_choice(session)
@@ -1971,8 +2050,9 @@ class Supervisor:
                 session['judge_request']['status'] = 'perime'
             session["last_event"] = timestamp()
             session["messages_observed"] = session.get("messages_observed", 0) + 1
-            session["context_truncated"] |= len(text) > 3000
-            session["context"].append({"role": role, "source_generation": session.get("source_generation"), "text": bounded_text(text) if role == "tool" else text[-3000:], "event_id": self._event_id(session, event_index, event), "observed_at": event.get("timestamp") if isinstance(event.get("timestamp"), str) else session["last_event"], "event_index": event_index})
+            processed_text = compact_specialist_text(text)
+            session["context_truncated"] |= len(processed_text) > 3000
+            session["context"].append({"role": role, "source_generation": session.get("source_generation"), "text": bounded_text(processed_text) if role == "tool" else processed_text[-3000:], "event_id": self._event_id(session, event_index, event), "observed_at": event.get("timestamp") if isinstance(event.get("timestamp"), str) else session["last_event"], "event_index": event_index})
             session["context_revision"] += 1
             if not recovering:
                 self._remember_source(session, session["context"][-1])

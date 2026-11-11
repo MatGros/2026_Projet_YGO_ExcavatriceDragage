@@ -188,10 +188,13 @@ def format_single_finding(alert: dict, session: dict, index: int, total_open: in
     short_ref = ref[:8]
     created = str(alert.get("created_at") or "")[:19].replace("T", " ")
     native_id = str(session.get('native_id') or "")
+    turns = session.get("judge_turn_count", 0)
+    reevals = session.get("re_evaluations_count", max(0, turns - 1) if turns > 0 else 0)
+    eval_info = f" · Suivi : {turns} tour(s) ({reevals} ré-év.)" if turns > 0 else ""
 
     lines = [
         f"🔎 Supervisor — Point prioritaire [{index}/{total_open}]",
-        f"Session : {session.get('alias', session.get('platform'))} ({session.get('platform')} / {native_id[:8]}...)",
+        f"Session : {session.get('alias', session.get('platform'))} ({session.get('platform')} / {native_id[:8]}...){eval_info}",
         "",
         f"{icon} · Ref {short_ref} (v{version}) — {title}",
         f"Date : {created}",
@@ -305,9 +308,13 @@ def run_review(filter_arg: str | None = None, session_id: str | None = None, por
         closed_count = len(all_alerts) - len(open_alerts)
         last_poll = str(state.get("last_poll_at") or "")[:19].replace("T", " ")
 
+    turns = session.get("judge_turn_count", 0)
+    reevals = session.get("re_evaluations_count", max(0, turns - 1) if turns > 0 else 0)
+    eval_str = f" · {turns} tour(s) d'évaluation ({reevals} ré-évaluation(s))" if turns > 0 else ""
+
     if not open_alerts:
         return (f"✅ Supervisor — Aucun point ouvert pour cette session ({session.get('alias', session.get('platform'))}).\n"
-                f"Statut : Session saine · {closed_count} constat(s) clos archivé(s).\n"
+                f"Statut : Session saine · {closed_count} constat(s) clos archivé(s){eval_str}.\n"
                 f"Dernière collecte : {last_poll or 'active'}.")
 
     # Ordonner : Alarmes d'abord, puis par ancienneté croissante (FIFO des problèmes)

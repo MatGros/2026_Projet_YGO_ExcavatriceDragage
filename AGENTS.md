@@ -69,8 +69,26 @@ Les agents interviennent avec la posture d'un **Expert Senior en Automatisme Ind
 
 ### ✍️ Style de communication & Rédaction
 - 🎯 **Style TDAH-Friendly** : Direct, synthétique, concis, zéro blabla inutile.
-- 🎨 **Repères visuels** : Utilisation d'emojis, de tableaux courts, de listes et de diffs clairs pour capter immédiatement l'essentiel.
-- 📖 **Specs vs Docs de pilotage** : Concisions strictes dans le pilotage ; précision technique chirurgicale et zéro perte d'information dans les specs métier (`AF_PartieN`).
+- 🎨 **Repères visuels** : Utilisation d'emojis, de listes courtes et de diffs clairs pour capter immédiatement l'essentiel.
+- 📖 **Specs vs Docs de pilotage** : Concision stricte dans le pilotage ; précision technique chirurgicale et zéro perte d'information dans les specs métier (`AF_PartieN`).
+
+### 📐 Restitution Standardisée & Arène Dialectique (Norme TDAH)
+- 🏁 **Structure en 3 niveaux unifiée** ([AGENT_OUTPUT_STANDARD.md](TOOLS/AGENT_WORKFLOW/docs/AGENT_OUTPUT_STANDARD.md)) :
+  - **Niveau 0 (Bannière & Métrique temporelle)** : Verdict visible (`PASS` / `BLOCK` / `ADVISORY`), objet audité et **durée d'exécution obligatoire** (`⏱️ Durée : X.Xs | 🕒 Horodatage`).
+  - **Niveau 1 (Grille des Invariants)** : Liste numérotée `1. INV-XXX [STATUT] — Règle : Preuve factuelle`. **STRICTEMENT AUCUN TABLEAU MARKDOWN** pour les invariants (banni pour éviter tout débordement en console étroite/mobile).
+  - **Niveau 1bis (Argumentaire Technique)** : Cadré et concis par défaut (3-4 lignes), mais **non bridé** lorsqu'une démonstration causale ou physique approfondie est nécessaire.
+  - **Niveau 2 (Plan d'Action & Outillage Déterministe)** : Cible, modification chirurgicale, et commande de vérification déterministe tirée de `TOOLS/`. Interdiction formelle de substituer du texte LLM à un script projet existant (`G200`, `G340`, `G521`, `pytest`, `check_task_contract.py`).
+- 🤖 **Personas Spécialisés & Prompts Markdown Versionnés** :
+  - 6 personas actifs (`safety`, `plc`, `hmi`, `testing`, `standards`, `challenger`) définis dans [`TOOLS/AGENT_WORKFLOW/specialists/`](TOOLS/AGENT_WORKFLOW/specialists/).
+  - Prompts système consultables en CLI via `python TOOLS/AGENT_WORKFLOW/scripts/specialist_runner.py --list-prompts` et `--show-prompt <role>` (répertoire source : [`DOC/WFLOW/PROMPTS/SPECIALISTS/`](DOC/WFLOW/PROMPTS/SPECIALISTS/)).
+  - Appel via commandes : `/ask-specialist-supervisor role=<role> ...`
+- 🥊 **Protocole de Challenge Dialectique & Devil's Advocate** :
+  - **Étape 0 (Obligatoire — Anti-Garbage-In)** : Cadrer et durcir le prompt (démasquer les postulats implicites, objectif mesurable, Non-Goals) avant tout débat (`/challenge prompt="..." check_prompt=true`).
+  - **Étape 1 (Arène A vs B)** : Agent A (Innovation & opportunité) vs Agent B (Red Team traquant les risques indirects non évidents : usure mécanique, météo, facteur humain, mode commun).
+  - **Étape 2 (Arbitrage C)** : Synthèse décisionnelle avec pépites retenues, pièges éliminés et action immédiate.
+- 🛡️ **Superviseur de Session & Protection de Contexte** :
+  - Les échanges avec le superviseur informent simplement sur les agents système activés et leur justification, sans surcharger le dialogue.
+  - Compaction automatique des retours d'outils et de spécialistes pour préserver la fenêtre de contexte (12 messages / 12k car.) et ne jamais évincer les consignes de l'utilisateur.
 
 ---
 
@@ -248,7 +266,7 @@ Workflow multi-agents et criticité C0–C4 : `TOOLS/AGENT_WORKFLOW/docs/WORKFLO
 - 💻 **Subagent Ollama Local (`ollama_subagent.py`)** : Quand l'utilisateur demande explicitement un *« subagent Ollama »* ou *« DeepSeek »*, déléguer l'analyse, l'audit ou la revue au modèle local sans consommer aucun quota cloud :
   ```bash
   python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "..." --model deepseek-v4-flash:cloud
-  python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --file PROMPT.md --output REPONSE.md
+  python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --file DOC/WFLOW/TASKS/T<ID>_.../ARCHIVES/T<ID>_PROMPT_..._v1.0.md --output DOC/WFLOW/TASKS/T<ID>_.../PREUVES/.../T<ID>_REVUE_..._v1.0.md
   python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --list-models
   ```
   Modèles locaux configurés : `deepseek-v4-flash:cloud` (défaut), `qwen3.8:27b`, `gemma4:e4b`. Le runner injecte automatiquement `subagent_preamble.md`.

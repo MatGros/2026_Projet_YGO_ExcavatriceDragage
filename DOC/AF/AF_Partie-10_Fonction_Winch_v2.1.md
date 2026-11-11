@@ -521,7 +521,7 @@ et la contrepartie assumée). Conservé ici pour l'historique de la décision, p
 **T91 (asymétrie montée/descente) et T93 (tempo par palier au lieu de rampe %/s) sont ainsi
 implémentés** ; seule l'apprentissage/validation en charge réelle (§7.3) reste ouvert. ⚠️ Correction
 2026-08-26 : la référence "T91" citée ici dans une version antérieure ne concerne **pas** ce
-sujet — le seul `T91` réel documenté (`DOC/WFLOW/AUDITS/ETUDE_T91_SEQ_FREIN_PUISSANCE_v0.1.md`)
+sujet — le seul `T91` réel documenté (`DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/AUDITS/T91_ETUDE_SEQUENCE_FREIN_PUISSANCE_v0.1.md`)
 porte sur l'asymétrie montée/descente de `FB_Brake`, un périmètre différent et sans rapport
 depuis que le frein a été découplé de `FB_Winch` (§2bis).
 
@@ -607,7 +607,7 @@ vitesse = 1** sur **les deux treuils**, en **montée ET en descente**. Posture *
   **capteur haut (TOP) actif ⇒ position connue ⇒ levée du plafond** : **à définir / valider**
   (polarité TOP, sens autorisés, non-régression interlock hauteur M3 strict).
 - **Statut** : plafond hors homing **CODÉ en interim** (`PRG_04_Treuils_Benne` §5ter) ;
-  décision de posture ISO 13849 à contresigner — `DOC/WFLOW/AUDITS/DESIGN/DECISIONS_T146_ARBITRAGE_ISO13849.md`.
+  décision de posture ISO 13849 à contresigner — `DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/AUDITS/T146_DECISIONS_ARBITRAGE_ISO13849.md`.
 - ⚠️ **Distinct** du non-bypass de `SyncDeviationWarn` de §5.2 (note T184) : cette clause-ci
   clampe le **palier** faute de position fiable ; la note T184 interdit de **lever la
   surveillance d'écart synchro** faute d'offset benne qualifié. Deux verrous indépendants.
@@ -679,5 +679,5 @@ vitesse = 1** sur **les deux treuils**, en **montée ET en descente**. Posture *
 | AF05 | Modes — InhibitM1/M2, SyncEnable |
 | AF06 | E/S physiques treuils |
 | AF09 | Codeurs — Homed, position, vitesse |
-| Étude | `DOC/WFLOW/AUDITS/ETUDE_T91_SEQ_FREIN_PUISSANCE_v0.1.md` — FB_Brake (périmètre distinct, voir §7.2) |
+| Étude | `DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/AUDITS/T91_ETUDE_SEQUENCE_FREIN_PUISSANCE_v0.1.md` — FB_Brake (périmètre distinct, voir §7.2) |
 | Code | `CODE/TREUILS/*.st`, `CODE/M_MAIN/PRG_04_Treuils_Benne.st` (ST actuel) ; cible `PRG_04_Treuils_Benne.xml` absente |

@@ -26,19 +26,20 @@ Le port `8081` est exclusivement reserve au Task Manager.
 
 ## 🎯 Rôle
 
-Cet environnement ouvre, dans le terminal intégré VS Code, neuf onglets indépendants :
+Cet environnement ouvre, dans le terminal intégré VS Code, huit onglets indépendants :
 
 | Onglet | Commande | Rôle |
 |---|---|---|
+| **Task Manager** | `cmd /c TOOLS\TASK_MANAGER\LANCER_TASK_MANAGER.bat` | Suivi local des tâches |
 | **🚀 AGY Antigravity** | `agy` | Agent Antigravity CLI dans le projet |
 | **🧠 Claude Code** | `claude` | Agent Claude Code CLI dans le projet |
-| **🦙 Claude Code (Ollama)** | `ollama launch claude --model gemma4:e4b` | Agent Claude Code local via Ollama (`gemma4:e4b`) |
+| **Claude Code OmniRoute AGY** | Voir la commande détaillée ci-dessous | Claude Code via `agy/gemini-3.8-flash-tiered` |
 | **🔓 OpenCode** | `opencode --agent orchestrateur` | Interface OpenCode unique avec agents Orchestrateur, Codeur (`@codeur`) et Vérificateur (`@verificateur`) |
-| **🦙 OpenCode (Ollama)** | `ollama launch opencode --model gemma4:e4b` | Agent OpenCode local via Ollama (`gemma4:e4b`) |
-| **✅ Gates** | `python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --skip-codesys` | Contrôles Python du workflow |
 | **🌐 OmniRoute Server** | `omniroute` | Serveur OmniRoute |
 | **🤖 Codex (OpenAI)** | `codex` | Agent Codex CLI dans le projet |
 | **🦙 DSH (Ollama)** | `ollama launch dsh` | Agent DSH local via Ollama |
+
+OpenCode-Go (glm-5.2) est désactivé dans `disabled_terminals` ; les terminaux Ollama et Gates qui y figurent restent désactivés.
 
 Chaque terminal utilise la racine du projet comme répertoire courant :
 `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage`.
@@ -74,7 +75,7 @@ deux fichiers doit être reportée à l'identique dans l'autre dans le même ges
 
 L’ouverture de VS Code ne lance rien automatiquement (`autorun: false`).
 
-Pour lancer les neuf onglets :
+Pour lancer les huit onglets :
 
 1. `Ctrl+Shift+P`
 2. Exécuter **Terminals: Run**
@@ -137,3 +138,17 @@ Vérifier que le fichier contient :
 - Aucun `runOn: folderOpen` dans les tasks.
 - Aucun split forcé.
 - `TOOLS/CONVERTER_ST2XML_PLCopenXML/` reste totalement autonome et n’est pas modifié par cette configuration.
+
+## Claude Code via OmniRoute / AGY
+
+Le terminal Terminal Keeper **Claude Code OmniRoute AGY (Gemini 3.8)** lance Claude Code avec le modèle `agy/gemini-3.8-flash-tiered` via le serveur OmniRoute local.
+
+```cmd
+cmd /c "set ANTHROPIC_BASE_URL=http://localhost:20128&& set ANTHROPIC_AUTH_TOKEN=local-dev&& set ANTHROPIC_API_KEY=&& set ANTHROPIC_MODEL=agy/gemini-3.8-flash-tiered&& claude --model agy/gemini-3.8-flash-tiered"
+```
+
+Les variables ne vivent que dans le processus `cmd` et ses enfants : le terminal Claude classique conserve sa configuration. L’URL est la racine OmniRoute, sans `/v1`, car Claude Code utilise le protocole Anthropic. Le `local-dev` est le jeton local accepté pendant l’essai ; si l’instance OmniRoute impose une clé, utiliser le jeton local configuré pour cette instance.
+
+Le raccourci `omniroute launch` échoue sur cette installation Windows en cherchant `claude.cmd` alors que Claude Code est installé comme `claude.exe` ; la commande ci-dessus lance directement `claude`.
+
+⚠️ Diagnostic du 2026-11-11 : OmniRoute local est en 3.8.49. Ce refus Antigravity est rapporté pour OmniRoute <= 3.8.51 ; le fallback de version client a été corrigé en 3.8.52. Mettre OmniRoute à jour au moins en 3.8.52 puis redémarrer le serveur. Si le refus persiste, vider **Cache > Clear Semantic Cache** dans le tableau de bord : OmniRoute peut avoir mis en cache le refus upstream comme réponse HTTP 200 ([issue OmniRoute #19619](https://github.com/cheaper-inference/OmniRoute/issues/19619)). Les stats du cache ne sont pas disponibles via le CLI local. OpenCode-Go (glm-5.2) est conservé dans `disabled_terminals` et peut être réactivé dans `.vscode/sessions.json`.

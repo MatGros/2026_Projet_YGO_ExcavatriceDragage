@@ -1,0 +1,96 @@
+contract:
+  task_id: T409
+  criticality: C3
+  strategy: patch
+  objective: >
+    Faire fonctionner une plante FMU OpenModelica avec la logique PLC de la
+    copie Control Win en alimentant l image M3 SimBench par UDP natif,
+    reversible et borne.
+  acceptance:
+    - id: AC1
+      statement: "La plante FMU reçoit les commandes M3 produites par Control Win et renvoie une image binaire complète."
+      verified_by: "rapport gateway avec séquences, trames acceptées et rejets"
+    - id: AC2
+      statement: "Le POU Control Win n écrit GVL_Simulation.SimM3OpenModelica que si SimulationModeActive et SimM3OpenModelicaActive sont vrais."
+      verified_by: "revue ST et test Watch des deux verrous"
+    - id: AC3
+      statement: "Une trame absente, périmée, invalide ou hors bornes neutralise l image OM et ne conserve pas silencieusement la dernière valeur."
+      verified_by: "test de coupure gateway et compteurs LinkInvalid/Timeout"
+    - id: AC4
+      statement: "La perte de la liaison ne modifie ni HwReal, ni la logique métier, ni le PLC réel."
+      verified_by: "diff limité aux outils/documents et essai dans la copie Control Win"
+    - id: AC5
+      statement: "Le flux natif respecte le budget mesuré T408 : zéro perte et p99 rapide inférieur ou égal à 50 ms dans la copie."
+      verified_by: "journal T408/T409 et compteurs PLC"
+    - id: AC6
+      statement: "Dans la copie POC uniquement, SimulationModeActive est la seule activation manuelle ; le bridge et le sélecteur M3 OM suivent automatiquement."
+      verified_by: "garde-fou statique POU et recette Control Win"
+    - id: AC7
+      statement: "Après perte ou redémarrage de la passerelle, l'image est neutralisée au timeout puis le lien reprend sur la première réponse FMU valide sans intervention opérateur."
+      verified_by: "test recovery, revue de séquence ST et recette Control Win"
+    - id: AC8
+      statement: "Le lanceur démarre le gateway et la vue ; le gateway duplique en lecture seule vers la vue la réponse FMU déjà envoyée au Control Win, sans login ni script CODESYS supplémentaire."
+      verified_by: "test d'égalité des datagrammes gateway/écran et recette Control Win"
+    - id: AC9
+      statement: "Sans trame PLC valide, la vue indique l'attente ou la perte de données et ne place jamais le chariot ni les capteurs à une position par défaut."
+      verified_by: "test backend lecture seule et vérification QML sans télémétrie"
+    - id: AC10
+      statement: "Avec une trame fraîche, la vue reflète position et capteurs reçus ; si le flux devient périmé, elle cesse de présenter ces valeurs comme actuelles."
+      verified_by: "test backend réception, expiration et reprise"
+    - id: AC11
+      statement: "Les tests gateway utilisent des ports dédiés et ne perturbent pas une instance utilisateur sur les ports 29061/29072."
+      verified_by: "revue des ports des tests round-trip/recovery"
+    - id: AC12
+      statement: "Le lanceur d'intégration repart d'un état FMU neuf à P1 et n'arrête que le processus gateway T409 identifié ; un propriétaire inconnu bloque sans action destructive."
+      verified_by: "revue du garde-fou PowerShell, test statique et recette Control Win"
+  scope:
+    allowed:
+      - TOOLS/TWINBENCH/90_PROTOTYPES/m3_link/
+      - TOOLS/TWINBENCH/02_SIM/modelica/live_poc/Start_M3_Live.ps1
+      - TOOLS/TWINBENCH/02_SIM/modelica/live_poc/app.py
+      - TOOLS/TWINBENCH/02_SIM/modelica/live_poc/Main.qml
+      - TOOLS/TWINBENCH/02_SIM/modelica/live_poc/test_readonly_backend.py
+      - TOOLS/TWINBENCH/03_TRANSPORT/udp_native/
+      - DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T409_CONTRAT_FMU_CONTROL_WIN_INJECTION.yaml
+      - DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T409_PLAN_FMU_CONTROL_WIN_INJECTION.md
+      - DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T409_FMU_CONTROL_WIN_INJECTION.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - automate_reel
+      - runtime_Codesys_reel
+      - commit
+      - push
+  conservation:
+    must_survive:
+      - "FB_SimBench reste l enveloppe unique et son aiguillage existant reste inchangé."
+      - "SimulationModeActive reste le verrou maître."
+      - "Le modèle ST M3 reste le repli lorsque le bit OM est faux ou lorsque la liaison est invalide."
+      - "Le projet source et le PLC réel ne sont jamais contactés."
+    dropped_on_purpose: []
+  evidence_required:
+    - "check_task_contract.py PASS"
+    - "garde-fou statique protocole et bornes PASS"
+    - "rapport FMU gateway"
+    - "recette humaine Control Win copie"
+  models_allowed:
+    - "omni/cx/gpt-6-sol"
+  alert_duty: >
+    Toute ambiguïté de structure ST_HwTranslation, timeout ou origine bloque
+    l injection et doit être signalée ; aucune valeur par défaut ne doit être
+    inventée pour un bit variateur ou une sécurité.
+status: IN_PROGRESS
+execution:
+  executed_by: CDX01
+  completed_at: ""
+  status: PENDING
+  summary: "Contrat créé avant implémentation ; T408 fournit la preuve de transport natif."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Implémentation limitée à la copie Control Win et aux outils."

@@ -51,7 +51,14 @@ NUMBERING_HISTORICAL_PREFIXES = (
 NUMBERING_OPT_OUT = "doc-links:numerotation-historique"
 
 VERSIONED = re.compile(r"^(?P<stem>.+?)_v(?P<major>\d+)\.(?P<minor>\d+)\.md$")
-LINK = re.compile(r"(?P<path>(?:DOC|CODE|TOOLS)/[A-Za-z0-9_./\-]+\.(?:md|st|py|xml))")
+# La capture s'arrete a la premiere extension : les espaces et parentheses
+# appartiennent notamment aux noms des dossiers de taches, pas a un separateur.
+LINK = re.compile(
+    r"(?<![\w/\\])(?P<path>(?:DOC|CODE|TOOLS)/(?=[\w.*-])"
+    r"(?:(?!(?<![\w/\\])(?:DOC|CODE|TOOLS)/|/\s)[^\r\n`\"'<>\[\]])+?"
+    r"\.(?:md|st|py|xml))"
+    r"(?=$|[\s#)\]`\"'.,;:<>])"
+)
 AF_PARTIE = re.compile(r"^AF_Partie-(?P<num>\d{2})_")
 
 AF_MENTION = re.compile(
@@ -64,7 +71,23 @@ AF_MENTION = re.compile(
 
 
 def is_excluded(path: Path) -> bool:
-    return any(part in EXCLUDED_PARTS for part in path.parts)
+    if any(part in EXCLUDED_PARTS for part in path.parts):
+        return True
+    # TXXX est le dossier exemple, pas tous les fichiers prefixés TXXX.
+    return path.parts[:4] == ("DOC", "WFLOW", "TASKS", "TXXX")
+
+
+def historical_numbering(rel: str, text: str) -> bool:
+    """Conserve D7 historique apres deplacement des corpus AUDITS/CONTRACTS.
+
+    Cela n'exempte ni le sas entier, ni les liens actifs de D1/D2.
+    """
+    parts = Path(rel).parts
+    moved_corpus = (
+        parts[:3] == ("DOC", "WFLOW", "TASKS")
+        and any(part in {"AUDITS", "CONTRACTS"} for part in parts[4:-1])
+    )
+    return rel.startswith(NUMBERING_HISTORICAL_PREFIXES) or NUMBERING_OPT_OUT in text or moved_corpus
 
 
 def doc_key(name: str) -> str | None:
@@ -87,6 +110,8 @@ def latest_versions(doc_dir: Path) -> dict[str, tuple[tuple[int, int], str]]:
     """
     latest: dict[str, tuple[tuple[int, int], str]] = {}
     for entry in doc_dir.rglob("*.md"):
+        if is_excluded(Path("DOC") / entry.relative_to(doc_dir)):
+            continue
         match = VERSIONED.match(entry.name)
         key = doc_key(entry.name)
         if not match or not key:
@@ -102,6 +127,8 @@ def all_versions(doc_dir: Path) -> dict[str, list[str]]:
     filtre `f != best` du rapport D3 fonctionne — deux formats differents ne matchent jamais)."""
     versions: dict[str, list[str]] = {}
     for entry in sorted(doc_dir.rglob("*.md")):
+        if is_excluded(Path("DOC") / entry.relative_to(doc_dir)):
+            continue
         key = doc_key(entry.name)
         if key:
             versions.setdefault(key, []).append(entry.relative_to(doc_dir).as_posix())
@@ -120,6 +147,8 @@ def iter_files(root: Path):
 def active_af_numbers(doc_dir: Path) -> set[str]:
     numbers: set[str] = set()
     for entry in doc_dir.rglob("*.md"):
+        if is_excluded(Path("DOC") / entry.relative_to(doc_dir)):
+            continue
         match = AF_PARTIE.match(entry.name)
         if match:
             numbers.add(match.group("num"))
@@ -187,7 +216,7 @@ def main() -> int:
                     f"(commence par : {first.strip()[:60]!r})"
                 )
 
-        historical = rel.startswith(NUMBERING_HISTORICAL_PREFIXES) or NUMBERING_OPT_OUT in text
+        historical = historical_numbering(rel, text)
         archive_spans = [m.span() for m in re.finditer(r"ARCHIVES/[A-Za-z0-9_./\-]+", text)]
 
         if rel.startswith("DOC/AF/") and path.suffix == ".md" and not historical:
@@ -219,7 +248,9 @@ def main() -> int:
 
         for match in LINK.finditer(text):
             target = match.group("path")
-            if "..." in target or "XX" in target or "PartieN" in target:
+            # TXXX_ est aussi un vrai prefixe de documents non attribues. Ne
+            # pas l'utiliser pour escamoter leurs liens morts.
+            if "..." in target or "*" in target or "PartieN" in target or re.search(r"(?:Partie-|/)(?:XX|NN)(?:[_. /]|$)", target):
                 continue
             line = text.count("\n", 0, match.start()) + 1
             resolved = root / target

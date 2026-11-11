@@ -9,7 +9,8 @@ vide » passe trivialement. Le controle de structure ne verifie pas l'existence
 des chemins cites : c'est ce trou que ce gate ferme.
 
 Ce gate lit :
-  - tous les DOC/WFLOW/CONTRACTS/*.yaml ;
+  - les sources YAML des dossiers CONTRACTS, anciens ou ranges sous TASKS/ ;
+  - les contrats des dossiers de tache actifs (role, contenu ou reference explicite) ;
   - le champ `contrat:` de chaque tache de DOC/WFLOW/TASKS.yaml.
 
 Il extrait les chemins de fichiers du depot (CODE/, DOC/, TOOLS/, PRJ_CODESYS/)
@@ -38,7 +39,10 @@ import re
 import sys
 from pathlib import Path
 
+import yaml
+
 CONTRACTS_DIR = "DOC/WFLOW/CONTRACTS"
+TASK_DIRECTORIES = "DOC/WFLOW/TASKS"
 TASKS_FILE = "DOC/WFLOW/TASKS.yaml"
 BASELINE_PATH = "TOOLS/AGENT_WORKFLOW/config/contract_refs_baseline.json"
 
@@ -49,9 +53,17 @@ EXTENSIONS = (
     ".st", ".md", ".yaml", ".yml", ".json", ".py", ".txt", ".xml",
     ".html", ".bat", ".ps1", ".mjs", ".js", ".csv",
 )
-# Un chemin peut etre precede de ponctuation Markdown / YAML ; on capture le token.
-PATH_RE = re.compile(r"[A-Za-z0-9_./\\-]+")
-CONTRAT_FIELD_RE = re.compile(r"^\s*contrat:\s*['\"]?([^'\"\n]+)['\"]?\s*$", re.MULTILINE)
+# Capturer le chemin jusqu'a son extension, espaces et parentheses inclus.
+# Un autre debut de chemin ne doit pas etre absorbe par une citation de dossier.
+_ROOT_PATTERN = r"(?:CODE_XML|PRJ_CODESYS|TOOLS|CODE|DOC)[/\\]"
+_EXT_PATTERN = "|".join(re.escape(ext[1:]) for ext in EXTENSIONS)
+_OPTION_PATTERN = r"\s--?[A-Za-z][A-Za-z0-9-]*(?=\s|=|$)"
+PATH_RE = re.compile(
+    rf"(?<![A-Za-z0-9_]){_ROOT_PATTERN}(?=[\w.*-])"
+    rf"(?:(?!{_ROOT_PATTERN}|[/\\]\s|{_OPTION_PATTERN})[^\r\n`\"'<>|;,:+=])*?"
+    rf"\.(?:{_EXT_PATTERN})(?=$|[\s,;:)\]}}>\x60\"'#]|\.(?=\s|$))"
+)
+EXCLUDED_PARTS = {"archives", ".git", "node_modules", ".venv", "venv"}
 
 
 def normalise(token: str) -> str:
@@ -68,6 +80,10 @@ def looks_like_repo_path(value: str) -> bool:
     # Un motif (glob, ellipse de documentation) ne designe aucun fichier precis.
     if "*" in value or "..." in value:
         return False
+    # Une parenthese ouvrant une explication en prose ne fait pas partie
+    # du chemin ; les vrais dossiers parentheses restent acceptes.
+    if value.count("(") != value.count(")"):
+        return False
     if value.endswith(EXTENSIONS):
         return True
     # Un dossier cite comme perimetre (ex. ARCHIVES/**) n'est pas un fichier.
@@ -75,36 +91,116 @@ def looks_like_repo_path(value: str) -> bool:
 
 
 def extract_paths(text: str) -> set[str]:
-    """Retourne l'ensemble des chemins de fichiers du depot cites dans un texte."""
+    """Retourne les chemins complets cites, espaces et parentheses inclus."""
+    return {
+        candidate
+        for match in PATH_RE.finditer(text)
+        if looks_like_repo_path(candidate := normalise(match.group(0)))
+    }
+
+
+def _strings(value):
+    """Scalaires textuels YAML, y compris les scalaires replies et listes."""
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for item in value.values():
+            yield from _strings(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _strings(item)
+
+
+def _load_yaml(path: Path):
+    try:
+        return yaml.safe_load(path.read_text(encoding="utf-8", errors="replace"))
+    except yaml.YAMLError as exc:
+        raise ValueError(f"YAML inexploitable : {path}: {exc}") from exc
+
+
+def catalogue_paths(root: Path) -> set[str]:
+    """References du champ contrat reel, jamais une ligne physique tronquee."""
+    path = root / TASKS_FILE
+    if not path.is_file():
+        return set()
+    document = _load_yaml(path)
+    if not isinstance(document, dict) or not isinstance(document.get("tasks"), list):
+        raise ValueError(f"Catalogue inexploitable : {TASKS_FILE} doit porter tasks: [..]")
     found: set[str] = set()
-    for raw in PATH_RE.findall(text):
-        candidate = normalise(raw)
-        # Les chemins multi-lignes YAML peuvent etre prefixes par du bruit.
-        index = next((candidate.find(root) for root in ROOTS if root in candidate), -1)
-        if index > 0:
-            candidate = candidate[index:]
-        if looks_like_repo_path(candidate):
-            found.add(candidate)
+    for task in document["tasks"]:
+        if isinstance(task, dict):
+            for text in _strings(task.get("contrat")):
+                found.update(extract_paths(text))
     return found
 
 
-def collect_references(root: Path) -> dict[str, set[str]]:
-    """Retourne {source: {chemins cites}} pour les contrats et le catalogue."""
-    references: dict[str, set[str]] = {}
-    contracts = root / CONTRACTS_DIR
-    if contracts.is_dir():
-        for path in sorted(contracts.glob("*.yaml")):
+def _active_source(root: Path, path: Path) -> bool:
+    """Exclure l'exemple TXXX/, pas les vrais fichiers nommes TXXX_*.yaml."""
+    if not path.resolve().is_relative_to(root.resolve()):
+        return False
+    try:
+        relative = path.relative_to(root)
+    except ValueError:
+        return False
+    if any(part.casefold() in EXCLUDED_PARTS for part in relative.parts):
+        return False
+    if path.suffix.lower() not in {".yaml", ".yml"} or ".bak" in path.name.casefold():
+        return False
+    try:
+        task_relative = path.relative_to(root / TASK_DIRECTORIES)
+    except ValueError:
+        return True
+    return not (task_relative.parts and task_relative.parts[0] == "TXXX")
+
+
+def discover_sources(root: Path) -> list[Path]:
+    """Sources controlees, independantes du nom du sas de rangement.
+
+    Un dossier CONTRACTS garde son corpus YAML complet (contrat standard,
+    legacy, contexte, catalogue de signaux). Hors de ce dossier, le role
+    contractuel doit etre explicite dans le nom, le contenu ou le catalogue.
+    """
+    sources: set[Path] = set()
+    legacy = root / CONTRACTS_DIR
+    if legacy.is_dir():
+        sources.update(p for p in legacy.rglob("*") if p.is_file() and _active_source(root, p))
+    task_root = root / TASK_DIRECTORIES
+    if task_root.is_dir():
+        for path in task_root.rglob("*"):
+            if not path.is_file() or not _active_source(root, path):
+                continue
+            parents = path.relative_to(task_root).parts[:-1]
+            named = re.search(r"(?:^|_)(?:CONTRAT|CONTRACT)(?:_|\.)", path.name, re.I)
+            in_corpus = any(part.casefold() == "contracts" for part in parents)
+            if in_corpus or named:
+                sources.add(path)
+                continue
             text = path.read_text(encoding="utf-8", errors="replace")
-            references[f"{CONTRACTS_DIR}/{path.name}"] = extract_paths(text)
-    tasks = root / TASKS_FILE
-    if tasks.is_file():
-        text = tasks.read_text(encoding="utf-8", errors="replace")
-        # Le champ `contrat:` porte parfois une note libre (« A ECRIRE ... ») :
-        # on n'y retient que les vrais chemins de fichiers.
-        cites: set[str] = set()
-        for match in CONTRAT_FIELD_RE.finditer(text):
-            cites |= extract_paths(match.group(1))
-        references[TASKS_FILE] = cites
+            if re.search(r"^contract\s*:", text, re.M) or (
+                re.search(r"^task_id\s*:", text, re.M)
+                and re.search(r"^(?:objectifs_testables|objective|criticality)\s*:", text, re.M)
+            ):
+                sources.add(path)
+    for value in catalogue_paths(root):
+        path = root / value
+        if path.is_file() and _active_source(root, path):
+            sources.add(path)
+    return sorted(sources)
+
+
+def collect_references(root: Path) -> dict[str, set[str]]:
+    """Retourne {source: {chemins cites}} pour les sources et le catalogue."""
+    references: dict[str, set[str]] = {}
+    for path in discover_sources(root):
+        # Conserver les commentaires deja controles, puis reconstituer les
+        # scalaires replies/quotes pour ne perdre aucune reference structuree.
+        text = path.read_text(encoding="utf-8", errors="replace")
+        cites = extract_paths(text)
+        for scalar in _strings(_load_yaml(path)):
+            cites.update(extract_paths(scalar))
+        references[path.relative_to(root).as_posix()] = cites
+    if (root / TASKS_FILE).is_file():
+        references[TASKS_FILE] = catalogue_paths(root)
     return references
 
 
@@ -156,10 +252,20 @@ def main() -> int:
     args = [a for a in argv if not a.startswith("--")]
     root = Path(args[0] if args else ".").resolve()
 
-    references = collect_references(root)
+    try:
+        references = collect_references(root)
+    except (ValueError, OSError) as exc:
+        print(f"G530 FAIL: {exc}")
+        return 1
     if not references:
         print("G530 FAIL: aucun contrat ni catalogue trouve (racine erronee ?)")
         return 1
+
+    source_count = sum(source != TASKS_FILE for source in references)
+    if not source_count:
+        print("G530 FAIL: aucune source YAML de contrat decouverte ; le catalogue seul ne prouve pas la couverture")
+        return 1
+    print(f"G530 couverture: {source_count} source(s) YAML, catalogue {'present' if TASKS_FILE in references else 'absent'}")
 
     missing = missing_paths(root, references)
     total_refs = sum(len(paths) for paths in references.values())

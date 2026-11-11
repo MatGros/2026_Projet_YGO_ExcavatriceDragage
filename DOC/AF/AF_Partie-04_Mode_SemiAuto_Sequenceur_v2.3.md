@@ -14,7 +14,7 @@
 - **Type de composant** : `FB_Cycle`, `FB_DiveSearch`, `FB_ExtractionAssist` (briques ST transverses partagées Maintenance + Semi-auto).
 - 🆕 Refonte du séquenceur conforme `GUIDE_SEQUENCEUR_v1.2.md` (§11bis R1-R9) : instance unique,
   homme-mort fenêtre 3 s, tempo max d'étape, `STABILIZING`.
-  Conception : `DOC/WFLOW/AUDITS/DESIGN/DESIGN_SEMI_AUTO_CYCLE_v0.1.md`.
+  Conception : `DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/AUDITS/TXXX_DESIGN_SEMI_AUTO_CYCLE_v0.1.md`.
 
 ### Addendum T257 — transfert benne ouverte vers plongée
 

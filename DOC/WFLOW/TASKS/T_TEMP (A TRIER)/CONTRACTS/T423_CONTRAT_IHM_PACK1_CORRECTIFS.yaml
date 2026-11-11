@@ -1,0 +1,59 @@
+contract:
+  task_id: T423
+  criticality: C2
+  strategy: patch
+  objective: >
+    Corriger les 5 anomalies de masquage, refus silencieux et discordance de masques
+    identifiees par l audit T422 dans la supervision IHM (FB_Hmi_BannerFormatter et PRG_07_Supervision),
+    afin de garantir une transparence totale des alarmes et interlocks sans aucun risque sur la regulation machine.
+  acceptance:
+    - id: AC1
+      statement: "Les esclaves EtherCAT COD1, COD2 et AC600 sont signales absents dans le carrousel d alarmes meme si EcatBusValid est faux (suppression du filtre masquant EcatBusValid sur ces defauts)."
+      verified_by: "Inspection statique de FB_Hmi_BannerFormatter.st et verification des conditions AlarmArray."
+    - id: AC2
+      statement: "Les defauts perte codeur ErrorID:02 sur M1 et M2 sont affiches dans le carrousel d alarmes meme quand EncMxValid est faux (suppression du AND EncMxValid masquant)."
+      verified_by: "Verification des conditions de collecte WinchM1Safety.ErrorEncoder et WinchM2Safety.ErrorEncoder dans FB_Hmi_BannerFormatter.st."
+    - id: AC3
+      statement: "Les masques de bits du carrousel de cycle Section 5h de FB_Hmi_BannerFormatter sont alignes a 100% sur instCauses de FB_CycleSemiAuto (16#0008 = perte com IHM, 16#0010 = timeout etape)."
+      verified_by: "Comparaison terme a terme entre FB_CycleSemiAuto.st instCauses[0..11] et les masques 16#0001..16#0800 de FB_Hmi_BannerFormatter.st."
+    - id: AC4
+      statement: "Les defauts de surchauffe thermique moteur et frein de M1, M2 et M3 sont integres au carrousel des alarmes actives du bandeau IHM."
+      verified_by: "Presence des alarmes [M1/M2/M3] Surchauffe thermique moteur/frein dans la collecte AlarmArray de FB_Hmi_BannerFormatter.st."
+    - id: AC5
+      statement: "En cas de refus d armement joystick (ArmingPermitDenied), la banniere IHM explicite le motif reel de refus au lieu d afficher un message generique homme-mort."
+      verified_by: "Inspection de la logique d action operateur dans FB_Hmi_BannerFormatter.st / PRG_07_Supervision.st."
+    - id: AC6
+      statement: "PRG_01 a PRG_06 et blocs de regulation restent intacts, GVL_PERSISTENT strictement inchange, G200_check_linkage.py PASS avec 0 erreur."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report et git diff."
+    - id: AC7
+      statement: "Le nom de fichier est identique au nom de POU pour PRG_07_Supervision et le suffixe est identique au langage bundle."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G310_check_structure.py et generate_codesys_bundle.py."
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T423_CONTRAT_IHM_PACK1_CORRECTIFS.yaml
+    forbidden:
+      - CODE/GVL_PERSISTENT.st
+      - CODE/M_MAIN/PRG_01_Diag.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/C_SAFETY/
+      - CODE/L_SIMULATION/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - Priorite des defauts AU et PowerCutOff sur les alarmes metier
+      - Format et structure de ST_HmiBanner
+      - Temps de maintien AntiFlickerText
+    dropped_on_purpose:
+      - Masquage des alarmes filles de codeurs par le statut bus Ecat/Enc
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+status: COMPLETED

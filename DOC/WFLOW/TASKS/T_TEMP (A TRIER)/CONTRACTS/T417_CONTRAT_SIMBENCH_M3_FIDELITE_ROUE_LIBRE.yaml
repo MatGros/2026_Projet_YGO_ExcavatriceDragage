@@ -1,0 +1,125 @@
+contract:
+  task_id: T417
+  criticality: C2
+  strategy: patch
+  objective: Simuler une mecanique M3 plausible avec hypotheses acceptees ; reproduire commandes automate, dynamique variateur, mouvement, frein et
+    capteurs ; meme mecanique manuel/auto et balancement secondaire ; observer les effets naturels sans cible de depassement ; challenge, implementation
+    CDX01, revue et essais fonctionnels courts puis validation utilisateur.
+  context_facts:
+  - 'Retour mise en service exploitant : rampe automate reglee legerement plus douce que limite de deceleration du variateur ; retrait mot0 conserve
+    arret pilote.'
+  - Six decroissances reelles verifiees ; retour frequence non nul apres mot0. Le signal C00.01 est frequence electrique de sortie, pas une mesure
+    independante du deplacement.
+  - 'Hypotheses acceptees : gain0.02, positions0/1.5/3.5/5/10m, marge0.5m, came2+4cm ; pas de cible30cm.'
+  - 'Seuil de fin de rampe0.5Hz : hypothese du modele coherente avec seuils PLC et defaut F09.11 constructeur, parametre site non lu.'
+  - Correction frottement deja faite mais besoin global NON LIVRE ; essai utilisateur manuelTremie position vraie-0.09404063m, PLC0.
+  acceptance:
+  - id: AC1
+    statement: Le retour frequence electrique ne subit plus de biais fonction du balancement ; sa rampe reste presente apres mot0.
+    verified_by: Scenario ST comparant frequence electrique et retour pour plusieurs vitesses angulaires ; scenario20/50Hz existant.
+  - id: AC2
+    statement: Sous controle variateur la vitesse nominale du chariot derive directement de frequence fois gain, sans second premier ordre ; la faible
+      reaction mecanique de charge est conservee.
+    verified_by: Scenario ST retrait20Hz puis comparaison vitesse/frequence apres500ms ; comparaison avant/apres sur memes commandes.
+  - id: AC3
+    statement: Avec cible nulle, le retour s annule au seuil nominal0.5Hz sans couper prematurement une consigne non nulle.
+    verified_by: Scenario ST20Hz puis cible0, et maintien d une consigne0.2Hz.
+  - id: AC4
+    statement: Le frein suit sa bobine finale meme en mouvement ; came, adherences, vraies inversions et balancement secondaire sont conserves.
+    verified_by: Rejouer les neuf scenarios fonctionnels courts existants ; review du diff.
+  - id: AC5
+    statement: Le programme machine et les reglages persistants restent inchanges ; le bundle et diff sont frais et G200 ne signale aucune erreur.
+    verified_by: git diff CODE hors L_SIMULATION vide depuis checkpointfd32b652 ; generation complet/diff, G200 report et gatesC compares a la reference.
+  scope:
+    allowed:
+    - CODE/L_SIMULATION/FB_Sim_Translation.st
+    - CODE/L_SIMULATION/FB_Sim_TranslationDrive.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/
+    - TOOLS/AGENT_WORKFLOW/scripts/check_sim_m3_dynamics.py
+    - DOC/WFLOW/TASKS.yaml
+    - DOC/WFLOW/TASK_LOCKS.json
+    - DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/T417_CONTRAT_SIMBENCH_M3_FIDELITE_ROUE_LIBRE.yaml
+    - CODE_XML/
+    forbidden:
+    - CODE/I_TRANSLATION/
+    - CODE/M_MAIN/
+    - CODE/J_SUPERVISION/
+    - CODE/GVL_PERSISTENT.st
+    - TOOLS/TWINBENCH/
+    - DOC/AF/
+    - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+    - ST_IHM_MANU (table figée, aucun champ ajouté)
+  conservation:
+    must_survive:
+    - Commandes finales post-interlocks et frontiere HwSim.
+    - Mecanique identique manuel/auto, frein physique, balancement amorti, came spatiale et source unique positions/gain.
+    - Correction dissipative du frottement, aucune distance d arret imposee.
+    dropped_on_purpose:
+    - Biais artificiel de frequence electrique par balancement.
+    - Deuxieme filtre tau0.15 applique au mouvement sous controle, non etaye par les donnees acceptees.
+    - Cible de depassement0.25m et reproduction forcee du defaut.
+  evidence_required:
+  - check_linkage
+  - run_all_gates
+  - bundle
+  - diff_bundle
+  open_points:
+  - Les hypotheses physiques sont acceptees pour exploration ; les essais utilisateur peuvent les affiner.
+  alert_duty: 'Tout écart constaté en cours de route est remonté immédiatement à l''orchestrateur, jamais en silence. Signaler n''est pas élargir le
+    scope. Aucun commit sans validation humaine.
+
+    '
+status: IN_PROGRESS
+execution:
+  executed_by: CDX01
+  status: IN_PROGRESS
+  updated_at: '2026-10-28T18:26:10+01:00'
+  summary: 'Trois corrections de dynamique implementees : frequence electrique sans biais pendule ; suppression du second filtre sur vitesse chariot
+    sous controle ; fin de rampe au seuil0.5 seulement lorsque demande ET rampe interne sont nulles. Balancement et frein physique conserves. Programme
+    machine intact.'
+  functional_results:
+    checkpoint_fd32b652: 8/12, dont les trois nouveaux controles dynamiques en echec
+    current: 12/12 PASS, ST reel compile STruCpp ; pas de compilation CODESYS revendiquee
+    guard: TOOLS/AGENT_WORKFLOW/scripts/check_sim_m3_dynamics.py
+  review:
+    model: deepseek-v4.1-flash:cloud
+    result: PASS apres resolution du MAJOR sur distinction demande/rampe interne, frequences magnitudes et reaction mecanique explicitees
+  exports:
+  - CODE_XML/CODE_Bundle.xml
+  - CODE_XML/CODE_DiffBundle.xml
+  linkage: PASS, 0 erreur, 1717 avertissements existants
+  gates_c:
+    pass: 53
+    total: 61
+    fail_existing:
+    - '300'
+    - '340'
+    - '430'
+    - '483'
+    - '503'
+    - '517'
+    - '518'
+    - '519'
+  pending: Compilation et essais utilisateur dans projet de simulation ; bilan de fidelite non declare valide.
+  handoff: T420 distincte pour regression roulis M1/M2 ; aucun code treuil modifie.
+  linkage_report: "```text\nAuto-verification liaison (G200_check_linkage.py) — PASS\n  Linkage (L1-L7):    140 OK, 0 KO\n  L8 (Output assign): 0 OK,\
+    \ 0 KO, 0 WARN\n  L9 (I/O mapping):   0 OK, 0 KO, 25 WARN\n  L10 (Single prod):  2021 OK, 1663 WARN\n  L11 (Polarity):     0 OK, 29 WARN\n  L12\
+    \ (Timing):       7 OK, 0 KO, 0 WARN\n  L13 (Orphelins):    89 OK, 0 KO\n  OK  instFault : FB_FaultCore — declaree CODE/A_COMMUN/FB_Brake.st:49\
+    \ · appelee :84\n  OK  instCloseThreshold : FB_BucketCloseThreshold — declaree CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st:151 · appelee :615\n  OK\
+    \  instFault : FB_FaultCore — declaree CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st:145 · appelee :303\n  OK  instFault : FB_FaultCore — declaree CODE/G_CYCLE/FB_CycleMachineHoming.st:103\
+    \ · appelee :363\n  OK  instFault : FB_FaultCore — declaree CODE/G_CYCLE/FB_CycleSemiAuto.st:268 · appelee :559\n  OK  instAbs : FB_Encoder_Abs\
+    \ — declaree CODE/E_CODEURS/FB_Encoder.st:71 · appelee :117\n  OK  instFault : FB_FaultCore — declaree CODE/E_CODEURS/FB_Encoder.st:77 · appelee\
+    \ :109\n  OK  instHoming : FB_Encoder_Homing — declaree CODE/E_CODEURS/FB_Encoder.st:72 · appelee :131\n  OK  instRel : FB_EncoderReliability —\
+    \ declaree CODE/E_CODEURS/FB_Encoder.st:75 · appelee :176\n  OK  instSafety : FB_Encoder_Safety — declaree CODE/E_CODEURS/FB_Encoder.st:74 · appelee\
+    \ :164\n  OK  instScale : FB_Encoder_Scale — declaree CODE/E_CODEURS/FB_Encoder.st:73 · appelee :155\n  OK  instSpeed : FB_Encoder_SpeedMeasure\
+    \ — declaree CODE/E_CODEURS/FB_Encoder.st:76 · appelee :184\n  ... 2156 autres verifiees\n  !   [L9] CODE/M_MAIN/PRG_02_Acquisition.st: Data —\
+    \ Not found in I/O map by exact name — verifier manuellement contre le nom de canal brut du CSV (convention de nommage differente)\n  !   [L9]\
+    \ CODE/M_MAIN/PRG_02_Acquisition.st: HwReal — Not found in I/O map by exact name — verifier manuellement contre le nom de canal brut du CSV (convention\
+    \ de nommage differente)\n  !   [L9] CODE/M_MAIN/PRG_02_Acquisition.st: HwSim — Not found in I/O map by exact name — verifier manuellement contre\
+    \ le nom de canal brut du CSV (convention de nommage differente)\n  !   [L9] CODE/M_MAIN/PRG_02_Acquisition.st: HwIn — Not found in I/O map by\
+    \ exact name — verifier manuellement contre le nom de canal brut du CSV (convention de nommage differente)\n  !   [L9] CODE/M_MAIN/PRG_06_Outputs.st:\
+    \ Data — Not found in I/O map by exact name — verifier manuellement contre le nom de canal brut du CSV (convention de nommage differente)\n```"
+validation:
+  status: PENDING
+  validated_by: ''
+  notes: Essais CODESYS utilisateur apres livraison.

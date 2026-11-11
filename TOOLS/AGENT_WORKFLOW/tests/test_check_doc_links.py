@@ -41,7 +41,8 @@ def test_lien_valide_passe(tmp_path: Path) -> None:
 
 
 def test_d1_lien_mort(tmp_path: Path) -> None:
-    root = make(tmp_path, {"DOC/README.md": "# Doc\n", "AGENTS.md": "# A\nDOC/Absent.md\n"})
+    # G340 audite le produit DOC/CODE ; AGENTS.md est hors de ce perimetre.
+    root = make(tmp_path, {"DOC/README.md": "# Doc\nDOC/Absent.md\n"})
     result = run(root)
     assert result.returncode == 1
     assert "lien mort" in result.stderr
@@ -52,15 +53,15 @@ def test_d2_version_perimee_detectee_et_corrigee(tmp_path: Path) -> None:
     files = {
         "DOC/AF_Partie-09_Fonction_Winch_v1.12.md": "# Winch ancien\n",
         "DOC/AF_Partie-09_Fonction_Winch_v1.14.md": "# Winch actif\n",
-        "AGENTS.md": "# A\nVoir DOC/AF_Partie-09_Fonction_Winch_v1.12.md\n",
+        "DOC/INDEX.md": "# A\nVoir DOC/AF_Partie-09_Fonction_Winch_v1.12.md\n",
     }
     root = make(tmp_path, files)
     assert run(root).returncode == 1
 
     fixed = run(root, "--fix")
     assert fixed.returncode == 0, fixed.stderr
-    assert "v1.14" in (root / "AGENTS.md").read_text(encoding="utf-8")
-    assert "v1.12" not in (root / "AGENTS.md").read_text(encoding="utf-8")
+    assert "v1.14" in (root / "DOC/INDEX.md").read_text(encoding="utf-8")
+    assert "v1.12" not in (root / "DOC/INDEX.md").read_text(encoding="utf-8")
 
 
 def test_d3_deux_versions_actives_avertissent(tmp_path: Path) -> None:

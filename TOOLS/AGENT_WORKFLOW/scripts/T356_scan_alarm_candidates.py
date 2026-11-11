@@ -26,19 +26,24 @@ CE QU'IL EXTRAIT (5 etages independants) :
 Sorties (CSV + JSON) dans le dossier passe en argument.
 
 Usage :
-    python T356_scan_alarm_candidates.py [racine_projet] [--out DOSSIER]
-    python T356_scan_alarm_candidates.py . --out DOC/WFLOW/AUDITS/T356_ALARMES_20260921
+    python T356_scan_alarm_candidates.py [racine_projet] --out NOUVEAU_DOSSIER
+    python T356_scan_alarm_candidates.py . --out C:/Temp/T356_nouveau_run
 
-Aucune ecriture hors du dossier `--out`, aucun CODE/ modifie, aucun exit code
-non nul hors erreur d'usage (1) ou fichier manquant (2).
+La destination est obligatoire et doit etre inexistante. Les noms contiennent
+la date du run courant ; les annexes historiques ne sont jamais remplacees.
+
+Aucune ecriture hors du dossier `--out`, aucun CODE/ modifie. Les erreurs
+d'usage ou de destination produisent un code retour non nul.
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import re
 import sys
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 # ── Patterns candidats ────────────────────────────────────────────────────────
@@ -486,20 +491,44 @@ def scan_qualification(root: Path, declarations: list[dict], causes: list[dict],
     return rows
 
 
-def main() -> int:
-    args = sys.argv[1:]
-    root = Path.cwd()
-    out_dir = Path("DOC/WFLOW/AUDITS/T356_ALARMES_20260921")
-    positional = [a for a in args if not a.startswith("--")]
-    if positional:
-        root = Path(positional[0]).resolve()
-    if "--out" in args:
-        out_dir = Path(args[args.index("--out") + 1])
+OUTPUT_STEMS = (
+    "CANDIDATS_DECLARATIONS", "CAUSES_PRODUCTEURS", "ERRORID_BITS_AD_HOC",
+    "BANDEAU_LIBELLES", "AGGREGATION_ANYFAULT", "REFERENCES", "UNIVERS_COMPLET",
+)
+
+
+def output_names(run_date: date | None = None) -> tuple[str, ...]:
+    """Les huit artefacts d'un nouveau run, distincts des annexes historiques."""
+    stamp = (run_date or date.today()).strftime("%Y%m%d")
+    return tuple(f"T356_DONNEES_ALARMES_{stem}_{stamp}.csv" for stem in OUTPUT_STEMS) + (
+        f"T356_SYNTHESE_ALARMES_SCAN_{stamp}.json",
+    )
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("root", nargs="?", default=".", type=Path)
+    parser.add_argument("--out", required=True, type=Path,
+                        help="nouveau dossier de sortie, inexistant (aucun ecrasement)")
+    args = parser.parse_args(argv)
+    root = args.root.resolve()
+    out_dir = args.out
     if not (root / "CODE").is_dir():
         print(f"ERROR: dossier CODE introuvable sous {root}", file=sys.stderr)
         return 2
     out_dir = (root / out_dir) if not out_dir.is_absolute() else out_dir
-    out_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        out_dir.mkdir(parents=True, exist_ok=False)
+    except OSError as exc:
+        print(f"ERROR: nouvelle destination requise, aucun ecrasement : {exc}", file=sys.stderr)
+        return 2
+    names_by_legacy = dict(zip(
+        ("T356_candidats_declarations.csv", "T356_causes_producteurs.csv",
+         "T356_errorid_bits_ad_hoc.csv", "T356_bandeau_libelles.csv",
+         "T356_aggregation_anyfault.csv", "T356_references.csv",
+         "T356_univers_complet.csv", "T356_synthese_scan.json"),
+        output_names(),
+    ))
 
     files = st_files(root)
     cleaned = {rel(root, p): strip_comments(p.read_text(encoding="utf-8", errors="replace")) for p in files}
@@ -514,8 +543,8 @@ def main() -> int:
     references = scan_references(root, files, cleaned, names)
 
     def dump(name: str, rows: list[dict], fields: list[str]) -> None:
-        path = out_dir / name
-        with path.open("w", newline="", encoding="utf-8") as fh:
+        path = out_dir / names_by_legacy[name]
+        with path.open("x", newline="", encoding="utf-8") as fh:
             writer = csv.DictWriter(fh, fieldnames=fields)
             writer.writeheader()
             for row in rows:
@@ -555,6 +584,8 @@ def main() -> int:
         return "non", ""
 
     synth: dict = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "source_root": root.as_posix(),
         "fichiers_st": len(files),
         "candidats_declarations": len(declarations),
         "candidats_par_tier": {},
@@ -574,8 +605,8 @@ def main() -> int:
     for row in causes:
         synth["causes_par_producteur"][row["producteur"]] = synth["causes_par_producteur"].get(row["producteur"], 0) + 1
 
-    (out_dir / "T356_synthese_scan.json").write_text(
-        json.dumps(synth, indent=2, ensure_ascii=False), encoding="utf-8")
+    with (out_dir / names_by_legacy["T356_synthese_scan.json"]).open("x", encoding="utf-8") as fh:
+        fh.write(json.dumps(synth, indent=2, ensure_ascii=False))
 
     print(f"[T356] declarations={len(declarations)} causes={len(causes)} "
           f"libelles={len(banner)} termes_agreges={len(aggregation)} references={len(references)}")

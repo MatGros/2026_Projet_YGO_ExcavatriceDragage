@@ -144,6 +144,6 @@ intégrateurs de temps de frein treuil (`FB_Winch_Symmetry`).
 | Document | Lien |
 |---|---|
 | Chapô contrats composants | [`AF_Partie-03_Contrats_Composants_v2.3.md`](../AF_Partie-03_Contrats_Composants_v2.3.md) |
-| Étude de conception T088 | `DOC/WFLOW/AUDITS/DESIGN/DESIGN_FB_CYCLETIME_GARDE_FOU_WRAP_v0.1.md` |
+| Étude de conception T088 | `DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/AUDITS/TXXX_DESIGN_FB_CYCLETIME_GARDE_FOU_WRAP_v0.1.md` |
 | Contrat de tâche T088 | `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T088_CYCLETIME_WRAP_GUARD.yaml` |
 | Tests CI | `TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_cycletime.st` |
