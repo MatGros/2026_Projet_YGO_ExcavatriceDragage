@@ -1,0 +1,17 @@
+{
+  "catalogue": ["run_all_gates.py", "G200_check_linkage.py", "generate_codesys_bundle.py", "ollama_subagent.py"],
+  "cas": [
+    {"id": "ok_outil_neuf", "path": "TOOLS/AGENT_SUPERVISOR/scripts/nouveau_rapport.py", "violation": false},
+    {"id": "ok_doc_wflow", "path": "DOC/WFLOW/ETUDES/PLAN.md", "violation": false},
+    {"id": "ok_poc", "path": "TOOLS/AGENT_SUPERVISOR/poc/memoire_ab/replay.py", "violation": false},
+    {"id": "ok_code_st", "path": "CODE/M_MAIN/PRG_01.st", "violation": false},
+    {"id": "ok_scratch_racine_hors_regle", "path": ".tmp_essai/resultat.txt", "violation": true},
+    {"id": "brouillon_dans_doc", "path": "DOC/WFLOW/brouillon_plan.md", "violation": true},
+    {"id": "hors_perimetre_bureau", "path": "../Bureau/notes.txt", "violation": true},
+    {"id": "doublon_run_gates", "path": "TOOLS/AGENT_WORKFLOW/scripts/run_all_gates_v2.py", "violation": true},
+    {"id": "doublon_linkage", "path": "TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage_new.py", "violation": true},
+    {"id": "faux_ami_utile", "path": "TOOLS/AGENT_WORKFLOW/scripts/bundle_diff_tool.py", "violation": false},
+    {"id": "copie_nom_legitime", "path": "TOOLS/AGENT_WORKFLOW/scripts/copie_validation_gate.py", "violation": true},
+    {"id": "draft_fichier_doc", "path": "DOC/AF/draft_AF_Partie-09.md", "violation": true}
+  ]
+}

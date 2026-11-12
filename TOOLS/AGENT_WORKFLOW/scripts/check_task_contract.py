@@ -18,6 +18,13 @@ Ce script verifie qu'un contrat existe et qu'il est REELLEMENT specifique :
   T7  preuves attendues declarees
   T8  une tache touchant CODE/MAIN declare les deux preuves structurelles :
       nom de fichier = nom de POU et suffixe de langage = langage bundle
+  T9  execution_plan present des C2 : au moins un jalon avec title et
+      done_when non vides (T427-AC3 ; defaut = WARN, T426-AC7)
+  T10 chaque entree test_feedback tient sur une ligne <= 120 caracteres :
+      le sas d'essais n'accepte ni code a chaud ni paragraphe (T427-AC3)
+  T11 tracking.budget coherent (0 <= used <= total, 1 <= parallel_max <=
+      total) et companion_doc cite comme chemin de projet sans restes de
+      gabarit — l'existence physique du fichier relve de G530 (T427-AC3)
 
 Usage :
   python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <TASK_CONTEXT.yaml>
@@ -51,6 +58,8 @@ PLACEHOLDERS = ["…", "...", "LOT_XX", "FB_Xxx", "Comportement observable atten
                 "En une phrase :", "commande exacte, test PLC"]
 
 CRITICALITY_REQUIRING_CONTRACT = {"C2", "C3", "C4"}
+# Seuil du sas d'essais (T427-AC2) : une entree test_feedback = 1 ligne courte.
+TEST_FEEDBACK_MAX_CHARS = 120
 
 # Un contrat touchant un PROGRAM doit rendre les deux controles structurels
 # explicites AVANT ecriture. Ce gate ne parse jamais le code : il valide que
@@ -94,6 +103,10 @@ def raw_scope_allowed(text: str) -> list[str]:
 
     Le repli ne doit jamais confondre une entree forbidden avec une entree
     allowed : cela transformerait une tache documentaire en tache CODE/MAIN.
+    Indentation des items toleree a partir de 4 espaces : les contrats ecrits
+    par l'API Task Manager (ex. fusion T426->T427) indentent les listes au
+    niveau de la cle, contrairement au gabarit (6 espaces). REX 2026-11-12 :
+    le repli declarait T5 a tort sur le contrat fusionne actif.
     """
     scope = re.search(r"(?ms)^  scope:\s*\n(?P<body>.*?)(?=^  [A-Za-z_]\w*:\s*|\Z)", text)
     if not scope:
@@ -101,7 +114,7 @@ def raw_scope_allowed(text: str) -> list[str]:
     allowed = re.search(r"(?ms)^    allowed:\s*\n(?P<items>.*?)(?=^    [A-Za-z_]\w*:\s*|\Z)", scope.group("body"))
     if not allowed:
         return []
-    return re.findall(r"^      -\s+['\"]?([^'\"\n]+)", allowed.group("items"), re.MULTILINE)
+    return re.findall(r"^[ \t]+-\s+['\"]?([^'\"\n]+)", allowed.group("items"), re.MULTILINE)
 
 
 def raw_acceptance_values(text: str, field: str) -> list[str]:
@@ -151,6 +164,148 @@ def is_generic(statement: str) -> bool:
 
 def has_placeholder(value: str) -> bool:
     return any(ph.lower() in value.lower() for ph in PLACEHOLDERS)
+
+
+def normalize_entry(value: object) -> str:
+    """Aplatit une entree YAML (inline, repliee ou multi-ligne) en une ligne."""
+    return " ".join(str(value).split()) if value is not None else ""
+
+
+def scan_execution_plan(text: str) -> list[dict]:
+    """Extrait les jalons du bloc `execution_plan:` replie standard du projet.
+
+    Le bloc attendu, au niveau racine ou de `contract:`, porte des jalons en
+    liste : `- id: M1` / `title:` / `done_when:` (gabarit et contrat T427).
+    """
+    block = re.search(
+        r"(?ms)^(?:execution_plan:|  execution_plan:)\s*\n(?P<body>.*?)(?=^[A-Za-z_]\w*:\s*|^  [A-Za-z_]\w*:\s*|\Z)",
+        text,
+    )
+    if not block:
+        return []
+    milestones: list[dict] = []
+    current: dict = {}
+    for line in block.group("body").splitlines():
+        stripped = line.strip()
+        if line.startswith("  - "):
+            if current:
+                milestones.append(current)
+            current = {}
+        m = re.match(r"(id|title|done_when|done-when)\s*:\s*(.*)", stripped)
+        if m:
+            current["id" if m.group(1) == "id" else ("title" if m.group(1) == "title" else "done_when")] = m.group(2).strip()
+    if current:
+        milestones.append(current)
+    return [jalon for jalon in milestones if jalon]
+
+
+def scan_test_feedback(text: str) -> list[str]:
+    """Extrait les entrees test_feedback (inline simples ou items de liste)."""
+    block = re.search(r"(?ms)^test_feedback:\s*(\[)\s*(.*?)\]", text)
+    if block:
+        return [normalize_entry(item) for item in block.group(2).split(",") if item.strip()]
+    block = re.search(r"(?ms)^test_feedback:\s*\n(?P<body>.*?)(?=^[A-Za-z_]\w*:\s*|\Z)", text)
+    if not block:
+        return []
+    return [
+        normalize_entry(m.group(1))
+        for m in re.finditer(r"^[ \t]+-\s+(.+)$", block.group("body"), re.MULTILINE)
+    ]
+
+
+def check_workflow_fields(data: dict | None, text: str) -> list[str]:
+    """Contrôles T9-T11 (T427-AC3) sous la forme d'AVERTISSEMENTS uniquement.
+
+    T426-AC7 : « Les contrôles nouveaux démarrent en avertissement et ne
+    changent pas silencieusement les hooks actifs. » Aucune de ces infractions
+    ne bascule donc l'exit code : les contrats antérieurs restent valides.
+    """
+    findings: list[str] = []
+
+    # T9 — execution_plan des C2 : jalons avec title et done_when.
+    milestones: list[dict] = []
+    if data is not None:
+        plan = data.get("execution_plan") or (data.get("contract") or {}).get("execution_plan") or {}
+        if isinstance(plan, dict):
+            raw = plan.get("milestones")
+            if isinstance(raw, list):
+                milestones = [dict(m) for m in raw if isinstance(m, dict)]
+            elif raw is None and plan:
+                # Forme directe d'un jalon unique : execution_plan.title/done_when.
+                milestones = [plan]
+        elif isinstance(plan, list):
+            milestones = [dict(m) for m in plan if isinstance(m, dict)]
+    if not milestones:
+        milestones = scan_execution_plan(text)
+    if not milestones:
+        findings.append(
+            "T9: aucun `execution_plan` — des C2, le contrat declare au moins un jalon "
+            "testable (id, title, done_when) pour cadrer le suivi."
+        )
+    else:
+        for m in milestones:
+            mid = normalize_entry(m.get("id")) or "?"
+            title = normalize_entry(m.get("title"))
+            done = normalize_entry(m.get("done_when"))
+            if not title:
+                findings.append(f"T9: jalon {mid} sans `title` — un jalon anonyme ne cadre rien.")
+            if not done or has_placeholder(done):
+                findings.append(
+                    f"T9: jalon {mid} sans `done_when` exploitable — comment saura-t-on qu'il est atteint ?"
+                )
+
+    # T10 — sas d'essais : une entree = une ligne <= 120 caracteres.
+    feedback: list[str] = []
+    if data is not None:
+        raw_fb = data.get("test_feedback")
+        if isinstance(raw_fb, list):
+            feedback = [normalize_entry(e) for e in raw_fb]
+        elif isinstance(raw_fb, str) and raw_fb.strip():
+            feedback = [normalize_entry(raw_fb)]
+    if not feedback:
+        feedback = scan_test_feedback(text)
+    for entry in feedback:
+        if len(entry) > TEST_FEEDBACK_MAX_CHARS:
+            findings.append(
+                f"T10: entree test_feedback de {len(entry)} caracteres (limite "
+                f"{TEST_FEEDBACK_MAX_CHARS}) — le sas d'essais n'accepte qu'une ligne courte : "
+                f"{entry[:70]!r}..."
+            )
+
+    # T11 — budget sous-agents coherent + companion_doc comme chemin de projet.
+    tracking = (data or {}).get("tracking") if data is not None else {}
+    budget = (tracking or {}).get("budget") if isinstance(tracking, dict) else {}
+    if isinstance(budget, dict):
+        total = budget.get("total")
+        used = budget.get("used")
+        parallel_max = budget.get("parallel_max")
+        numbers = {
+            name: value
+            for name, value in (("total", total), ("used", used), ("parallel_max", parallel_max))
+            if isinstance(value, (int, float))
+        }
+        if set(numbers) != {"total", "used", "parallel_max"}:
+            findings.append("T11: `tracking.budget` incomplet — total, used et parallel_max attendus.")
+        elif not (0 <= used <= total):
+            findings.append(f"T11: budget incoherent — used ({used}) hors [0, total={total}].")
+        elif not (1 <= parallel_max <= total):
+            findings.append(
+                f"T11: budget incoherent — parallel_max ({parallel_max}) doit tenir dans [1, total={total}]."
+            )
+    companion = data.get("companion_doc") if data is not None else None
+    if not companion:
+        block = re.search(r"(?m)^\s*(?:companion_doc|  companion_doc):\s*['\"]?([^\n]+)", text)
+        companion = block.group(1).strip() if block else None
+    companion = normalize_entry(companion)
+    if companion:
+        if companion.startswith(("'", '"')):
+            companion = companion.strip("'\"")
+        if has_placeholder(companion) or not re.match(r"^(DOC|TOOLS)/", companion):
+            findings.append(
+                f"T11: `companion_doc` n'est pas un chemin de projet (DOC/ ou TOOLS/) : "
+                f"{companion[:70]!r} — l'existence physique du fichier est l'affaire de G530."
+            )
+    return findings
 
 
 def touches_program_main(allowed: list[str]) -> bool:
@@ -268,6 +423,11 @@ def check(path: Path, release: bool) -> tuple[list[str], list[str]]:
                 "T8: scope CODE/MAIN sans critere structurel explicite : "
                 + "; ".join(missing)
             )
+
+    # T9-T11 — workflow fields (T427-AC3) : avertissements progressifs, jamais
+    # bloquants (T426-AC7) ; uniquement des C2, comme le contrat lui-meme.
+    if criticality in CRITICALITY_REQUIRING_CONTRACT:
+        warnings.extend(check_workflow_fields(data, text))
 
     if release and errors:
         errors.append("--release : lot INCOMPLET, ne pas annoncer termine")
