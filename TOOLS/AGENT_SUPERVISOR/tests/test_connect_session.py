@@ -31,11 +31,11 @@ def test_connect_registers_one_exact_local_source_and_reports_existing(tmp_path)
     worker.start()
     base = f"http://127.0.0.1:{server.server_port}"
     try:
-        attached = connect("claude", session_id, "T999-CC01 Test Claude", "T999 — test", "Mission de test", base)
+        attached = connect("claude", session_id, "T999-CC01", "T999 — test", "Mission de test", base)
         assert attached["status"] == "attached"
         assert attached["native_id"] == session_id
         assert Path(attached["source"]).name == f"{session_id}.jsonl"
-        repeated = connect("claude", session_id, "T999-CC01 Autre alias", "T999 — test", "Mission de test", base)
+        repeated = connect("claude", session_id, "T999-CC02", "T999 — test", "Mission de test", base)
         assert repeated["status"] == "already_assigned"
         with urlopen(base + "/api/supervision") as response:
             snapshot = json.loads(response.read().decode("utf-8"))
@@ -61,19 +61,19 @@ def test_connect_refuses_a_second_session_for_the_same_formal_task(tmp_path):
     worker.start()
     base = f"http://127.0.0.1:{server.server_port}"
     try:
-        connect("claude", sid_a, "T217-CC01 Premier", "T217 — audit", "Mission A", base)
+        connect("claude", sid_a, "T217-CC01", "T217 — audit", "Mission A", base)
         try:
-            connect("claude", sid_b, "T217-CC02 Second", "T217 — audit", "Mission B", base)
+            connect("claude", sid_b, "T217-CC02", "T217 — audit", "Mission B", base)
         except ValueError as exc:
             assert "déjà suivie" in str(exc)
             assert "--reassign" in str(exc)
         else:
             raise AssertionError("a formal task cannot be monitored by two sessions")
         # AC-F1.7 Handover : avec reassign=True, la session existante est reassignee sans doublon
-        reassigned = connect("claude", sid_b, "T217-CC02 Second", "T217 — audit", "Mission B", base, reassign=True)
+        reassigned = connect("claude", sid_b, "T217-CC02", "T217 — audit", "Mission B", base, reassign=True)
         assert reassigned["status"] == "reassigned"
         assert reassigned["native_id"] == sid_b
-        assert reassigned["previous_alias"] == "T217-CC01 Premier"
+        assert reassigned["previous_alias"] == "T217-CC01"
         with urlopen(base + "/api/supervision") as response:
             snapshot = json.loads(response.read().decode("utf-8"))
         assert len(snapshot["sessions"]) == 1
@@ -85,7 +85,27 @@ def test_connect_refuses_a_second_session_for_the_same_formal_task(tmp_path):
         worker.join(timeout=2)
 
 
-def test_connect_requires_a_formal_task_or_explicit_no_task_confirmation():
+def test_connect_provisional_t000_and_auto_title_lookup():
+    from TOOLS.AGENT_SUPERVISOR.scripts.connect_session import validate_alias, lookup_task_title
+
+    # 1. Alias pur et strict
+    assert validate_alias("T423-AGY01") == "T423-AGY01"
+    assert validate_alias("T000-CC01") == "T000-CC01"
+    assert validate_alias("T428-1-CDX01") == "T428-1-CDX01"
+
+    # Rejet des alias avec texte libre invente
+    try:
+        validate_alias("T423-AGY01 Texte Invente")
+    except ValueError as exc:
+        assert "format strict" in str(exc)
+    else:
+        raise AssertionError("alias with free text must be rejected")
+
+    # 2. Lookup automatique du titre officiel dans TASKS.yaml
+    title = lookup_task_title("T423")
+    assert title is not None
+    assert "IHM Pack 1" in title
+
     from TOOLS.AGENT_SUPERVISOR.scripts.connect_session import is_no_task, task_reference
 
     assert is_no_task("SANS TÂCHE FORMELLE")

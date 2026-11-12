@@ -49,10 +49,15 @@ def task_reference(value: str, *, anywhere: bool = False) -> str | None:
     return match.group(1).upper() if match else None
 
 
-ALIAS_PATTERN = r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC)\d{2}[^\S\r\n]+\S.*$"
+ALIAS_PATTERN = r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC)\d{2}$"
 
 
 def validate_alias(alias: str, *, confirm_without_task: bool = False) -> str:
+    """Valide l'alias de session : strictement 'TXXX-AGENT' (ex: T429-AGY01, T000-CC01, T428-1-CDX01).
+
+    L'alias identifie la session et la machine exécutante (tâche + runtime + index).
+    Il ne contient aucun texte libre/métier afin d'éviter toute ambiguïté ou invention.
+    """
     cleaned = alias.strip()
     if not cleaned or len(cleaned) > 100:
         raise ValueError("Alias requis (100 caractères maximum)")
@@ -60,10 +65,30 @@ def validate_alias(alias: str, *, confirm_without_task: bool = False) -> str:
         return cleaned
     if not re.fullmatch(ALIAS_PATTERN, cleaned):
         raise ValueError(
-            f"L'alias '{cleaned}' ne respecte pas la convention canonique 'TXXX[-X]-AGENT Désignation' "
-            "(ex: T429-AGY01 Fiabilisation Superviseur, T428-1-CDX01 Cartes de flux)"
+            f"L'alias '{cleaned}' ne respecte pas le format strict 'TXXX[-X]-AGENT' "
+            "(ex: T429-AGY01, T428-1-CDX01, T000-CC01)"
         )
     return cleaned
+
+
+def lookup_task_title(task_ref: str) -> str | None:
+    """Récupère automatiquement le titre officiel d'une tâche depuis DOC/WFLOW/TASKS.yaml."""
+    if not yaml:
+        return None
+    repo_root = Path(__file__).resolve().parents[3]
+    tasks_file = repo_root / "DOC" / "WFLOW" / "TASKS.yaml"
+    if not tasks_file.exists():
+        return None
+    try:
+        data = yaml.safe_load(tasks_file.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            return None
+        for t in data.get("tasks", []):
+            if isinstance(t, dict) and str(t.get("id", "")).upper() == task_ref.upper():
+                return t.get("titre")
+    except Exception:
+        return None
+    return None
 
 
 def is_no_task(value: str) -> bool:
@@ -165,11 +190,22 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
         raise ValueError("Mission requise (1500 caractères maximum)")
     no_task = is_no_task(task)
     task_ref = task_reference(task)
+    # T000 ou tâche provisoire : dispensée de confirmation explicite
+    is_provisional = (task_ref == "T000")
     if not task_ref and not no_task:
         raise ValueError("Référence de tâche T### requise, ou suivi sans tâche formelle confirmé explicitement")
     if no_task and not confirm_without_task:
         raise ValueError("Suivi sans tâche formelle : confirmation explicite requise")
-    attached_mission = f"Tâche / sujet : {task.strip()}\n{mission.strip()}"
+
+    # Résolution automatique du libellé de tâche :
+    # Si task est juste l'ID (ex: "T423") ou si un titre officiel existe dans TASKS.yaml, on l'aligne automatiquement
+    official_title = lookup_task_title(task_ref) if task_ref else None
+    if official_title and (task.strip().upper() == task_ref.upper() or len(task.strip()) <= len(task_ref) + 3):
+        task_label = f"{task_ref} {official_title}"
+    else:
+        task_label = task.strip()
+
+    attached_mission = f"Tâche / sujet : {task_label}\n{mission.strip()}"
     if len(attached_mission) > 1500:
         raise ValueError("Tâche et mission combinées : 1500 caractères maximum")
     base_url = validate_local_base_url(base_url)
@@ -183,7 +219,7 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
         return dict(status=status, assignment_id=existing["id"], state=existing["state"],
                     alias=existing.get("alias"), platform=platform, native_id=session_id,
                     task=task, source=existing.get("source"), error=existing.get("error"))
-    if task_ref:
+    if task_ref and not is_provisional:
         for item in snapshot.get("sessions", []):
             current_ref = task_reference(item.get("mission", ""), anywhere=True)
             if (current_ref == task_ref and
@@ -202,11 +238,11 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
                 structure_loaded = False
                 if task_ref and snapshot.get("token"):
                     structure_loaded = populate_mission_from_contract(
-                        base_url, snapshot.get("token"), attached["id"], task_ref, task, mission
+                        base_url, snapshot.get("token"), attached["id"], task_ref, task_label, mission
                     )
                 return dict(status="reassigned", assignment_id=attached["id"], state=attached["state"],
                             alias=attached.get("alias"), platform=platform, native_id=session_id,
-                            task=task, source=attached["source"], previous_alias=item.get("alias"),
+                            task=task_label, source=attached["source"], previous_alias=item.get("alias"),
                             mission_structure_loaded=structure_loaded)
     result = api_json(base_url + "/api/supervision", token=snapshot.get("token"), payload={
         "action": "add", "platform": platform, "native_id": session_id,
@@ -218,11 +254,11 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
     structure_loaded = False
     if task_ref and snapshot.get("token"):
         structure_loaded = populate_mission_from_contract(
-            base_url, snapshot.get("token"), attached["id"], task_ref, task, mission
+            base_url, snapshot.get("token"), attached["id"], task_ref, task_label, mission
         )
     return dict(status="attached", assignment_id=attached["id"], state=attached["state"],
                 alias=attached.get("alias"), platform=platform, native_id=session_id,
-                task=task, source=attached["source"], mission_structure_loaded=structure_loaded)
+                task=task_label, source=attached["source"], mission_structure_loaded=structure_loaded)
 
 
 def main():

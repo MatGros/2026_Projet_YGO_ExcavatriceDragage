@@ -43,6 +43,7 @@ dans le périmètre et le plan approuvés ; elle n'autorise ni extension de pér
    - Niveau 2 : Plan d'action chirurgical (Localisation, Ancre, Action exacte, Outil déterministe associé, Risque si ignoré).
    - Priorité absolue aux scripts et outils déterministes Python (`G200`, `G521`, `G340`, `pytest`, etc.) pour prouver un constat sans hallucination LLM.
    - Zéro préambule bavard, zéro politesse introductive. Direct au but.
+   - Bannissement absolu de la complaisance et de la flagornerie : interdiction formelle des formules flatteuses (« génial », « excellente idée »). Ton strictement neutre, factuel et sobre. Validation conditionnée à la preuve mécanique/numérique, jamais d'approbation sur parole.
 
 ## Règles de projet
 

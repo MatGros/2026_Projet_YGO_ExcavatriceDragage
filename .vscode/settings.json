@@ -66,5 +66,7 @@
             "color": "foldercolorizer.color_8700ff",
             "isFolderOnly": true
         }
-    ]
+    ],
+    "terminal.integrated.tabs.title": "${sequence}",
+    "terminal.integrated.tabs.description": "${process}"
 }
