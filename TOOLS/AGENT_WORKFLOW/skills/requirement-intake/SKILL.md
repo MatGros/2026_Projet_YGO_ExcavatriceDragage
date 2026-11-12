@@ -5,6 +5,9 @@ description: Qualifie une nouvelle information client, réunion, chantier ou ess
 
 # Intake et refinement
 
+Pour choisir et appeler des agents dans ce workflow, utiliser la référence commune
+`TOOLS/AGENT_WORKFLOW/docs/MODEL_ROUTING.md`.
+
 1. Enregistrer l'information brute sans l'interpréter.
 2. Capturer date, source, auteur et contexte.
 3. Poser les questions automatisme/IHM/safety nécessaires.

@@ -916,6 +916,130 @@ def test_close_and_reopen_session_and_resume_all_safety(tmp_path):
         svc.close()
 
 
+def test_t429_auto_resume_only_previously_enabled_sessions(tmp_path):
+    """Vérifie qu'au démarrage du service, seules les sessions qui étaient en fonctionnement
+
+    (enabled=True) reprennent automatiquement. Les sessions en pause (enabled=False)
+    et les sessions clôturées (closed=True) restent strictement en pause ou fermées.
+    """
+    state_file = tmp_path / "agent-supervision.json"
+    transcript_active = tmp_path / "session_active.jsonl"
+    transcript_active.write_text('{"type": "user", "message": "hello active"}\n', encoding="utf-8")
+    transcript_paused = tmp_path / "session_paused.jsonl"
+    transcript_paused.write_text('{"type": "user", "message": "hello paused"}\n', encoding="utf-8")
+    transcript_closed = tmp_path / "session_closed.jsonl"
+    transcript_closed.write_text('{"type": "user", "message": "hello closed"}\n', encoding="utf-8")
+
+    initial_data = {
+        "model": "deepseek-v4.1-flash:cloud",
+        "allow_cloud": True,
+        "judge_settings": {
+            "temperature": 0, "output_tokens": 1600, "timeout_seconds": 30,
+            "context_messages": 12, "context_chars": 10000, "model_context_tokens": 16384,
+            "max_visible_closed_findings": 5, "audit_interval": 8
+        },
+        "sessions": [
+            {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "platform": "claude",
+                "native_id": str(transcript_active.name)[:-6],
+                "alias": "ActiveSession",
+                "enabled": True,
+                "closed": False,
+                "mission": "Mission active",
+                "source_checkpoint": {"path": str(transcript_active), "offset": 0},
+                "alerts": []
+            },
+            {
+                "id": "22222222-2222-2222-2222-222222222222",
+                "platform": "claude",
+                "native_id": str(transcript_paused.name)[:-6],
+                "alias": "PausedSession",
+                "enabled": False,
+                "closed": False,
+                "mission": "Mission paused",
+                "alerts": []
+            },
+            {
+                "id": "33333333-3333-3333-3333-333333333333",
+                "platform": "claude",
+                "native_id": str(transcript_closed.name)[:-6],
+                "alias": "ClosedSession",
+                "enabled": False,
+                "closed": True,
+                "mission": "Mission closed",
+                "alerts": []
+            },
+            {
+                "id": "44444444-4444-4444-4444-444444444444",
+                "platform": "claude",
+                "native_id": str(transcript_active.name)[:-6],
+                "alias": "UnverifiedBrokenSession",
+                "enabled": True,
+                "closed": False,
+                "mission": "Mission broken",
+                "recovery": {"status": "unverified", "reason": "broken_delta"},
+                "alerts": []
+            }
+        ]
+    }
+    state_file.write_text(json.dumps(initial_data), encoding="utf-8")
+
+    from TOOLS.AGENT_SUPERVISOR.scripts.supervisor_service import Supervisor
+    from unittest.mock import patch
+
+    # Mock source discovery to point directly to our files
+    with patch.object(Supervisor, "_validate_assignment") as mock_val:
+        def fake_val(platform, native_id):
+            if "active" in native_id:
+                return transcript_active
+            if "paused" in native_id:
+                return transcript_paused
+            if "closed" in native_id:
+                return transcript_closed
+            return None
+        mock_val.side_effect = fake_val
+
+        svc = Supervisor(state_path=state_file, strict_assignments=False)
+        try:
+            # Au démarrage du serveur, on déclenche l'action "start"
+            svc.command({"action": "start"})
+
+            snap = svc.snapshot()
+            s_active = [s for s in snap["sessions"] if s["id"] == "11111111-1111-1111-1111-111111111111"][0]
+            s_paused = [s for s in snap["sessions"] if s["id"] == "22222222-2222-2222-2222-222222222222"][0]
+            s_closed = [s for s in snap["sessions"] if s["id"] == "33333333-3333-3333-3333-333333333333"][0]
+            s_broken = [s for s in snap["sessions"] if s["id"] == "44444444-4444-4444-4444-444444444444"][0]
+
+            # Vérifications :
+            # 1. La session qui était active doit avoir redémarré avec watcher attaché et trace d'événement
+            assert s_active["enabled"] is True
+            assert s_active["state"] in ("active", "waiting")
+            assert svc.sessions["11111111-1111-1111-1111-111111111111"].get("watcher") is not None
+            event_kinds = [e.get("kind") for e in s_active.get("events", [])]
+            assert "session_auto_resumed" in event_kinds
+
+            # 2. La session qui était en pause doit RESTER en pause
+            assert s_paused["enabled"] is False
+            assert s_paused["state"] == "paused"
+
+            # 3. La session clôturée doit RESTER fermée
+            assert s_closed["enabled"] is False
+            assert s_closed["closed"] is True
+            assert s_closed["state"] == "closed"
+
+            # 4. AC-F1.4: La session rompue (unverified) ne doit PAS reprendre implicitement
+            assert s_broken["enabled"] is False
+            assert s_broken["state"] == "paused"
+
+            # 4. Mettre en pause s_active à chaud -> saved_enabled doit passer à False
+            svc.command({"action": "pause", "id": "11111111-1111-1111-1111-111111111111"})
+            assert svc.sessions["11111111-1111-1111-1111-111111111111"]["saved_enabled"] is False
+        finally:
+            svc.close()
+
+
+
 
 
 

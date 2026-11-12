@@ -185,7 +185,13 @@ filtre d'affichage, pas un nettoyage ni un archivage ; l'historique reste dans l
   moyen d'exécution, jamais une excuse pour perdre le fil, diluer la responsabilité ou élargir le
   périmètre.
 
-### Subagent multi-modèle (si l'orchestrateur est un agent DSH)
+### Responsabilité de l'agent chargé d'une tâche
+
+Tout agent auquel un brief attribue la responsabilité d'une tâche peut organiser des sous-agents
+pour la réaliser, suivre leur avancement et vérifier leurs preuves. Il reste responsable de la
+livraison de cette tâche ; les droits sur le Task Manager global suivent la skill `task-planner`.
+
+### Override multi-modèle dans DSH
 
 Un orchestrateur tournant sous **DSH (DeepSeek Harness)** peut lancer des sous-agents sur
 d'autres modèles via l'override `provider`/`model` de l'outil `workflow` :

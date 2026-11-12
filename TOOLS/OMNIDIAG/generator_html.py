@@ -1086,8 +1086,14 @@ def generate_html_viewer(items: List[Dict[str, Any]], output_path: Path, rack_da
         <button class="btn-top btn-rebuild" id="btnRebuild" onclick="triggerRebuild()">
           🔄 Re-scanner le code ST
         </button>
-        <a href="/TASK_VIEWER.html" class="btn-top">
-          🗂️ Task Manager
+        <a href="/TASK_VIEWER.html" class="btn-top" title="Ouvrir le Task Manager">
+          🗂️ Task Manager ↗
+        </a>
+        <a href="/ORCHESTRATOR_VIEWER.html" target="_blank" class="btn-top" title="Ouvrir l’Orchestrateur">
+          🤖 Orchestrateur ↗
+        </a>
+        <a href="http://127.0.0.1:8082/" target="_blank" class="btn-top" title="Ouvrir Agent Supervisor">
+          🛡️ Supervisor ↗
         </a>
       </div>
     </div>

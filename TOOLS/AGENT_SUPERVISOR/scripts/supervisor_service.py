@@ -551,6 +551,7 @@ class Supervisor:
                 session["closed"] = bool(value.get("closed", False))
                 if session["closed"]:
                     session["state"] = "closed"
+                session["saved_enabled"] = bool(value.get("enabled", False)) and not session["closed"]
                 session["recovery"] = self._validate_recovery(value.get("recovery"))
                 session["source_checkpoint"] = value.get("source_checkpoint")
                 session["source_generation"] = value.get("source_generation")
@@ -861,6 +862,7 @@ class Supervisor:
             recovery["recovery_revision_end"]=session["context_revision"]
             session["recovery"]=recovery
             session["enabled"]=True
+            session["saved_enabled"]=True
             session["state"]="active"
             session["analysis_state"]="queued"
             session["generation"]+=1
@@ -898,6 +900,7 @@ class Supervisor:
                 session["recovery"]={"status":"skipped", "message_count":recovery.get("message_count",0),
                                      "reason":"user_chose_normal_resume", "can_catch_up":False}
             session["enabled"]=True
+            session["saved_enabled"]=True
             session["state"]="active"
             session["analysis_state"]="waiting"
             session["generation"]+=1
@@ -1061,7 +1064,7 @@ class Supervisor:
     @staticmethod
     def _new_session(sid, platform, native_id, alias, enabled, mission=""):
         return dict(id=sid, platform=platform, native_id=native_id, alias=str(alias)[:100], mission=mission, initial_mission=mission, mission_updated_at=timestamp(), mission_structure={}, mission_structure_updated_at=None, memory=[], context_truncated=False,
-                    enabled=enabled, state="waiting" if enabled else "paused", closed=False, source=None, error=None,
+                    enabled=enabled, saved_enabled=enabled, state="waiting" if enabled else "paused", closed=False, source=None, error=None,
                     messages_observed=0,
                     last_event=None, last_analysis=None, analysis_state="waiting" if mission else "context_required", analysis_error=None,
                     alerts=[], events=[], framing=[], acquired_proofs=[], session_journal=[], judge_turn_count=0, watcher=None, context=[], generation=0, judge_request=None, judge_proposal=None,
@@ -1276,10 +1279,27 @@ class Supervisor:
                                 elif workflow.get("status") == "awaiting_choice":
                                     self._queue_agent_turn(session, alert, "initial", initial_alert_message(alert))
                         self._activate_next_alert(session)
-                    self._persist_background()
                     self._threads = [threading.Thread(target=self._collect_loop, daemon=True), threading.Thread(target=self._judge_loop, daemon=True), threading.Thread(target=self._chat_loop, daemon=True), threading.Thread(target=self._agent_message_loop, daemon=True)]
                     for thread in self._threads:
                         thread.start()
+                    for sid, session in list(self.sessions.items()):
+                        if session.get("closed") or session.get("state") == "closed":
+                            continue
+                        if not session.get("saved_enabled"):
+                            continue
+                        try:
+                            # T429 AC-F1.4: Ne jamais forcer la reprise d'une continuite rompue ou trop large
+                            rec_status = session.get("recovery", {}).get("status")
+                            session_mode = None if rec_status in ("unverified", "too_large") else "normal"
+                            self._resume_session(session, mode=session_mode)
+                            if session.get("enabled"):
+                                record_event(session, "session_auto_resumed", "Reprise automatique au démarrage du serveur", timestamp())
+                            self._write_note(session)
+                        except Exception as exc:
+                            session["error"] = f"startup_resume_failed: {str(exc)[:100]}"
+                            record_event(session, "session_auto_resume_failed", str(exc)[:200], timestamp())
+                    self._persist_background()
+                    self._wake.set()
             elif action == "stop":
                 self.running = False
                 self._epoch += 1
@@ -1376,6 +1396,7 @@ class Supervisor:
                 if action == "close":
                     session["closed"] = True
                     session["enabled"] = False
+                    session["saved_enabled"] = False
                     session["state"] = "closed"
                     session["analysis_state"] = "waiting"
                     if session.get("watcher") is not None:
@@ -1389,6 +1410,7 @@ class Supervisor:
                 if action == "reopen":
                     session["closed"] = False
                     session["enabled"] = False
+                    session["saved_enabled"] = False
                     session["state"] = "paused"
                     if session.get("source_checkpoint") and session.get("recovery", {}).get("status") not in ("processing", "error"):
                         session["recovery"] = dict(status="pending_check")
@@ -1456,7 +1478,7 @@ class Supervisor:
                         self._chat_pending = None
                         self._chat_state = dict(state='idle', messages=self._chat_histories.setdefault(None, []), error=None, session_id=None)
                 elif action != "reassign":
-                    session.update(enabled=False, state="paused" if action == "pause" else "waiting")
+                    session.update(enabled=False, saved_enabled=False if action == "pause" else session.get("saved_enabled", False), state="paused" if action == "pause" else "waiting")
                     if action == "pause" and session.get("source_checkpoint") and session.get("recovery", {}).get("status") not in ("processing", "error"):
                         session["recovery"] = dict(status="pending_check")
                 else:

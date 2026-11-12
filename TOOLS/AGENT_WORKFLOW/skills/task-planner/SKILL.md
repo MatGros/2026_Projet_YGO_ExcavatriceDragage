@@ -5,6 +5,10 @@ description: Pilotage du catalogue DOC/WFLOW/TASKS.yaml, contrats et coordinatio
 
 # Task-Planner — règle canonique
 
+Le choix des modèles et le budget de sous-agents sont communs aux workflows projet et tâche :
+`TOOLS/AGENT_WORKFLOW/docs/MODEL_ROUTING.md`. Cette référence ne remplace pas les droits et rôles
+de coordination définis dans cette skill.
+
 Au déclenchement, afficher :
 
 ```text
