@@ -25,42 +25,46 @@ if hasattr(sys.stdout, "reconfigure"):
 REPO_ROOT = Path(r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage")
 APP_DATA = Path(r"C:\Users\ZEDVICTUS\.gemini\antigravity-cli")
 
+DEBUG_LOG = Path(os.environ.get("LOCALAPPDATA", r"C:\Users\ZEDVICTUS\AppData\Local")) / "Temp" / "session_statusline_debug.log"
+
+def log_debug(msg: str):
+    try:
+        with open(DEBUG_LOG, "a", encoding="utf-8") as f:
+            f.write(f"[{os.getpid()}] {msg}\n")
+    except Exception:
+        pass
+
 def set_terminal_title(title_text: str):
     """Met à jour le titre du terminal :
     1. Via l'API Win32 SetConsoleTitleW (prioritaire pour la console Windows).
     2. Via les séquences ANSI OSC 0 et OSC 2 directement sur CONOUT$/tty.
     3. Via stdout en fallback."""
     # 1. Win32 API SetConsoleTitleW
+    win32_res = None
     if os.name == "nt":
         try:
-            ctypes.windll.kernel32.SetConsoleTitleW(str(title_text))
-        except Exception:
-            pass
+            win32_res = ctypes.windll.kernel32.SetConsoleTitleW(str(title_text))
+        except Exception as e:
+            win32_res = f"err:{e}"
 
     # 2. Séquences ANSI OSC 0 et OSC 2 directement sur le descripteur console
-    written = False
+    conout_ok = False
     osc_seq = f"\x1b]0;{title_text}\x07\x1b]2;{title_text}\x07"
     try:
         if os.name == "nt":
             with open("CONOUT$", "w", encoding="utf-8", errors="replace") as tty:
                 tty.write(osc_seq)
                 tty.flush()
-                written = True
+                conout_ok = True
         else:
             with open("/dev/tty", "w", encoding="utf-8", errors="replace") as tty:
                 tty.write(osc_seq)
                 tty.flush()
-                written = True
-    except Exception:
-        pass
+                conout_ok = True
+    except Exception as e:
+        conout_ok = f"err:{e}"
 
-    # 3. Fallback standard sur stdout
-    if not written:
-        try:
-            sys.stdout.write(osc_seq)
-            sys.stdout.flush()
-        except Exception:
-            pass
+    log_debug(f"set_terminal_title target='{title_text}' SetConsoleTitleW={win32_res} CONOUT$={conout_ok}")
 
 def get_ancestor_cli_process():
     """Remonte l'arbre des processus pour trouver le PID de l'exécutable CLI parent (agy, claude, codex).
@@ -124,21 +128,7 @@ def find_current_conversation_id(cli_name: str = "agy", parent_pid: int = None, 
     if stdin_session_id:
         return stdin_session_id.strip()
 
-    # 1. Variables d'environnement standard
-    if "claude" in cli:
-        cid = os.environ.get("CLAUDE_CODE_SESSION_ID", "").strip()
-        if cid:
-            return cid
-    elif "dsh" in cli:
-        cid = os.environ.get("DSH_SESSION_ID", "").strip()
-        if cid:
-            return cid
-    else:
-        cid = os.environ.get("ANTIGRAVITY_CONVERSATION_ID", "").strip()
-        if cid:
-            return cid
-
-    # 2. Détection Claude Code via ~/.claude/sessions/<pid>.json
+    # 1. Détection Claude Code via ~/.claude/sessions/<pid>.json
     if "claude" in cli and parent_pid:
         claude_sess_dir = Path.home() / ".claude" / "sessions"
         sess_file = claude_sess_dir / f"{parent_pid}.json"
@@ -152,28 +142,43 @@ def find_current_conversation_id(cli_name: str = "agy", parent_pid: int = None, 
             except Exception:
                 pass
 
-    # 3. Détection Antigravity par log de pid
-    try:
-        log_dir = APP_DATA / "log"
-        if log_dir.exists() and parent_pid:
-            log_files = sorted(log_dir.glob("cli-*.log"), key=lambda p: p.stat().st_mtime, reverse=True)
-            for log_file in log_files:
-                try:
-                    with open(log_file, "r", encoding="utf-8", errors="ignore") as f:
-                        head = f.read(500)
-                        if f"pid {parent_pid}" in head:
-                            f.seek(0)
-                            content = f.read()
-                            matches = re.findall(r"conversation update stream for ([a-f0-9\-]+)", content)
-                            if matches:
-                                return matches[-1]
-                            matches2 = re.findall(r"Streaming conversation ([a-f0-9\-]+)", content)
-                            if matches2:
-                                return matches2[-1]
-                except Exception:
-                    pass
-    except Exception:
-        pass
+    # 2. Détection Antigravity par log de PID (prioritaire sur les variables d'environnement héritées)
+    if "agy" in cli and parent_pid:
+        try:
+            log_dir = APP_DATA / "log"
+            if log_dir.exists():
+                log_files = sorted(log_dir.glob("cli-*.log"), key=lambda p: p.stat().st_mtime, reverse=True)
+                for log_file in log_files:
+                    try:
+                        with open(log_file, "r", encoding="utf-8", errors="ignore") as f:
+                            head = f.read(500)
+                            if f"pid {parent_pid}" in head:
+                                f.seek(0)
+                                content = f.read()
+                                matches = re.findall(r"conversation update stream for ([a-f0-9\-]+)", content)
+                                if matches:
+                                    return matches[-1]
+                                matches2 = re.findall(r"Streaming conversation ([a-f0-9\-]+)", content)
+                                if matches2:
+                                    return matches2[-1]
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+
+    # 3. Fallback sur variables d'environnement (si non résolu par PID)
+    if "claude" in cli:
+        cid = os.environ.get("CLAUDE_CODE_SESSION_ID", "").strip()
+        if cid:
+            return cid
+    elif "dsh" in cli:
+        cid = os.environ.get("DSH_SESSION_ID", "").strip()
+        if cid:
+            return cid
+    else:
+        cid = os.environ.get("ANTIGRAVITY_CONVERSATION_ID", "").strip()
+        if cid:
+            return cid
 
     return None
 
@@ -290,10 +295,12 @@ def main():
         raw_title, actor = get_session_info(conv_id, parent_name)
         boot_name = get_boot_terminal_name(parent_name)
 
-        # Extraire le repère canonique de tâche (TXXX ou TXXX-ACTEUR ex: T423 ou T423-AGY01)
+        # Extraire le repère canonique de tâche (TXXX ou TXXX-ACTEUR ex: T423 ou T423-AGY01 ou T000-AGY00)
         task_id = None
         if raw_title:
-            m = re.search(r"\b(T\d+(?:-[0-9A-Z]+)*)\b", raw_title, re.IGNORECASE)
+            m = re.match(r"^(T\d+(?:-[0-9A-Z]+)*)", raw_title, re.IGNORECASE)
+            if not m:
+                m = re.search(r"\b(T\d+(?:-[0-9A-Z]+)*)\b", raw_title, re.IGNORECASE)
             if m:
                 task_id = m.group(1).upper()
 
