@@ -4,6 +4,11 @@
 > Cette politique décrit les choix et limites d'exécution ; elle ne garantit pas qu'un outil tiers
 > applique automatiquement le modèle demandé. Les appels déterministes doivent préciser le modèle.
 
+Cette même règle de routage sert aux deux niveaux : pilotage du projet et réalisation d'une tâche
+attribuée, y compris la préparation d'un brief, d'une spécification ou d'un contrat. L'agent
+responsable peut utiliser des sous-agents, suivre leur avancement et vérifier les tests et preuves ;
+les règles de chaque workflow continuent de définir ses responsabilités et droits.
+
 ## Règles de choix
 
 1. **Suivre la demande de l'utilisateur.** Un modèle ou fournisseur demandé explicitement prime,
@@ -22,7 +27,7 @@
 ## Budget de délégation Ollama par session
 
 - Jusqu'à **4 agents Ollama simultanés** et **20 appels Ollama au total dans une session** :
-  l'orchestrateur peut les lancer sans demander un accord supplémentaire, si la tâche y gagne.
+  le responsable de la tâche peut les lancer sans demander un accord supplémentaire, si la tâche y gagne.
 - Au-delà de l'une de ces limites, demander l'accord de l'utilisateur avant de lancer les appels
   supplémentaires.
 - Favoriser des sous-tâches indépendantes, avec des livrables distincts et un brief commun

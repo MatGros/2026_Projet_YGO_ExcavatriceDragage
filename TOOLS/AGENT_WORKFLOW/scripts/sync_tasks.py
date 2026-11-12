@@ -1275,14 +1275,12 @@ def main():
     # TASKS.yaml est l'unique source de vérité officielle !
     tasks = load_tasks_yaml(TASKS_YAML)
     
-    html_path = BASE_DIR / "TOOLS" / "TASK_MANAGER" / "ui" / "TASK_VIEWER.html"
-    save_tasks_html(tasks, html_path)
-    
-    print(f"✅ {len(tasks)} tâches structurées exportées avec succès dans :")
+    # Sécurité anti-régression : TASK_VIEWER.html est l'IHM riche dynamique du serveur Task Manager
+    # (redimensionnement, badges, header multi-outils, API /api/tasks/json).
+    # sync_tasks.py ne doit JAMAIS écraser ce fichier d'interface.
+    print(f"✅ {len(tasks)} tâches structurées chargées et validées dans :")
     print(f"   YAML : {TASKS_YAML}")
-    print(f"   HTML : {html_path}")
-
-    print("\n💡 Visualisez en 1 clic : Ouvrez TASK_VIEWER.html dans votre navigateur ou VS Code Simple Browser !")
+    print("\n💡 Visualisez en 1 clic : Ouvrez http://127.0.0.1:8081/TASK_VIEWER.html (serveur Task Manager) !")
 
 
 if __name__ == "__main__":
