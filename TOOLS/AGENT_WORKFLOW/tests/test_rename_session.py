@@ -69,3 +69,43 @@ def test_wal_audit_logging(tmp_path, monkeypatch):
     assert len(lines) == 2
     assert "[INTENT] [test-uuid-1234] 'OLD_ALIAS' -> 'NEW_ALIAS'" in lines[0]
     assert "[COMMIT] [test-uuid-1234] 'OLD_ALIAS' -> 'NEW_ALIAS'" in lines[1]
+
+def test_notify_supervisor_nominal(monkeypatch):
+    class FakeResponse:
+        def __init__(self, data, status=200):
+            self.data = data
+            self.status = status
+        def read(self):
+            return self.data
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    calls = []
+    def fake_urlopen(req, timeout=1.0):
+        calls.append(req)
+        if req.get_method() == "GET":
+            return FakeResponse(b'{"token": "test-token-xyz"}', 200)
+        elif req.get_method() == "POST":
+            return FakeResponse(b'{"status": "updated"}', 200)
+
+    import urllib.request
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+
+    res = rename_session.notify_supervisor("sess-123", "T429-AGY01")
+    assert res is True
+    assert len(calls) == 2
+    assert calls[0].get_method() == "GET"
+    assert calls[1].get_method() == "POST"
+    assert calls[1].headers.get("X-supervision-token") == "test-token-xyz" or calls[1].headers.get("X-Supervision-Token") == "test-token-xyz"
+
+def test_notify_supervisor_offline(monkeypatch):
+    import urllib.request
+    def fake_urlopen_fail(req, timeout=1.0):
+        raise ConnectionRefusedError("Offline")
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen_fail)
+
+    res = rename_session.notify_supervisor("sess-123", "T429-AGY01")
+    assert res is False
+

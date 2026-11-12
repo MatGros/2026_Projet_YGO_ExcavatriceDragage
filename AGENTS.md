@@ -89,12 +89,14 @@ Les agents interviennent avec la posture d'un **Expert Senior en Automatisme Ind
   - **Étape 0 (Obligatoire — Anti-Garbage-In)** : Cadrer et durcir le prompt (démasquer les postulats implicites, objectif mesurable, Non-Goals) avant tout débat (`/challenge prompt="..." check_prompt=true`).
   - **Étape 1 (Arène A vs B)** : Agent A (Innovation & opportunité) vs Agent B (Red Team traquant les risques indirects non évidents : usure mécanique, météo, facteur humain, mode commun).
   - **Étape 2 (Arbitrage C)** : Synthèse décisionnelle avec pépites retenues, pièges éliminés et action immédiate.
-  - **Étape 3 (Protocole de Convergence — Règle des 2 Écarts) :**
-    - *Déclenchement* : Si le Challenger ou la confrontation relève **plus de 2 écarts notables vérifiés**, le passage au code est **interdit**. Le sujet est réputé non stabilisé.
-    - *Cadrage du Cycle N+1 (Anti-Bouclage)* :
-      1. **Table fermée** : Le cycle suivant porte strictement et exclusivement sur la liste numérotée des écarts du cycle précédent (interdiction d'ouvrir de nouveaux débats hors liste).
+  - **Étape 3 (Protocole de Convergence, Revue Post-Livraison & Règle des 2 Écarts) :**
+    - *Annonce de fin ≠ Fin validée* : Toute déclaration « J'ai fini » place la tâche sous revue (`UNDER_REVIEW`). L'agent ne s'auto-attribue jamais `DONE`.
+    - *Déclenchement du blocage* : Si la revue ou le contrôle relève **plus de 2 écarts notables vérifiés** (3 ou plus avec preuve mécanique reproductible `fichier:ligne` ou échec de test), le travail est réputé **non stabilisé**. Les corrections doivent être appliquées et une **re-fermeture / re-validation est obligatoire** (sauf bypass explicite tracé de l'utilisateur).
+    - *Garde-fou Anti-Bouclage & Anti-Garbage-In* : Dès le 1er écart notable ou si une liste de constats pléthorique surgit, **interdiction formelle de renvoyer des sous-agents en boucle** : challenger obligatoirement le **PROMPT** d'abord (l'objectif est-il clair, logique, mesurable, fait-il avancer la tâche ?). Si l'ambiguïté vient de la consigne, corriger le prompt avant toute nouvelle délégation.
+    - *Cadrage du Cycle N+1 (Table fermée)* :
+      1. **Table fermée** : Le cycle suivant porte strictement et exclusivement sur la liste numérotée des écarts vérifiés du cycle précédent (interdiction d'ouvrir de nouveaux débats hors liste).
       2. **Arbitrage forcé** : Chaque écart reçoit une résolution technique binaire imposée.
-    - *Critère d'arrêt* : Le cycle s'arrête dès que les écarts résiduels sont **≤ 1 mineur** (maximum 2 cycles de re-challenge).
+    - *Critère d'arrêt* : Le cycle s'arrête dès que les écarts résiduels sont **≤ 1 mineur** (maximum 2 cycles de re-challenge ; au-delà : escalade humaine).
 - 🛡️ **Superviseur de Session & Protection de Contexte** :
   - Les échanges avec le superviseur informent simplement sur les agents système activés et leur justification, sans surcharger le dialogue.
   - Compaction automatique des retours d'outils et de spécialistes pour préserver la fenêtre de contexte (12 messages / 12k car.) et ne jamais évincer les consignes de l'utilisateur.
