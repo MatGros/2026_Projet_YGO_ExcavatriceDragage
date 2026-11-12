@@ -1223,7 +1223,7 @@ class Supervisor:
 
     def command(self, command):
         with self._lock:
-            if command.get("action") not in ("test_notification", "set_mission_structure", "comment_alert", "configure", "add", "pause", "resume", "resume_all", "close", "reopen", "retry_recovery", "remove", "set_mission", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
+            if command.get("action") not in ("test_notification", "set_mission_structure", "comment_alert", "configure", "add", "pause", "resume", "resume_all", "close", "reopen", "retry_recovery", "remove", "set_mission", "set_alias", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
                 return self._command(command)
             backup = (copy.deepcopy(self.sessions), self.model, self.allow_cloud,
                       self._epoch, deque(self._queue), set(self._queued), copy.deepcopy(self._chat_state), self._chat_epoch, self._chat_pending, copy.deepcopy(self._chat_histories), deque(self._agent_queue))
@@ -1388,6 +1388,29 @@ class Supervisor:
                 self._persist()
                 self._wake.set()
                 return {"resumed": resumed, "count": len(resumed)}
+            elif action == "set_alias":
+                sid = command.get("id")
+                alias = str(command.get("alias", "")).strip()
+                if not alias:
+                    raise ValueError("Alias requis")
+                if not re.fullmatch(r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC)\d{2}$", alias):
+                    raise ValueError("Format d'alias invalide (attendu TXXX[-X]-AGENT)")
+                session = self.sessions.get(sid)
+                if not session:
+                    candidate_id = sid or command.get("native_id")
+                    for s in self.sessions.values():
+                        if s.get("native_id") == candidate_id:
+                            session = s
+                            sid = s["id"]
+                            break
+                if not session:
+                    raise ValueError("Affectation inconnue")
+                session["alias"] = alias
+                session["generation"] += 1
+                record_event(session, "alias_updated", f"Alias mis à jour : {alias}", timestamp())
+                self._persist()
+                self._write_note(session)
+                return {"status": "updated", "id": sid, "alias": alias}
             elif action in ("pause", "resume", "close", "reopen", "retry_recovery", "remove", "set_mission", "reassign"):
                 sid = command.get("id")
                 if sid not in self.sessions:

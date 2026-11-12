@@ -97,16 +97,30 @@ def sanitize_and_validate(raw_input: str) -> tuple[str, str]:
 
     return task_token, normalized
 
-def notify_supervisor(session_id: str, alias: str, timeout: float = 0.5) -> bool:
-    """Notifie l'API locale du Superviseur de la mise à jour de l'alias."""
+def notify_supervisor(session_id: str, alias: str, base_url: str = "http://127.0.0.1:8082", timeout: float = 1.0) -> bool:
+    """Notifie l'API locale du Superviseur de la mise à jour de l'alias via POST /api/supervision."""
     try:
-        req = urllib.request.Request(
-            f"http://127.0.0.1:8082/api/supervision/session/{session_id}/alias",
-            data=json.dumps({"alias": alias}).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+        # 1. Récupération du token de supervision
+        req_get = urllib.request.Request(f"{base_url}/api/supervision", headers={"Accept": "application/json"}, method="GET")
+        with urllib.request.urlopen(req_get, timeout=timeout) as resp:
+            if resp.status != 200:
+                return False
+            data = json.loads(resp.read().decode("utf-8"))
+            token = data.get("token", "")
+
+        # 2. Envoi de l'action set_alias
+        payload = json.dumps({"action": "set_alias", "id": session_id, "alias": alias}).encode("utf-8")
+        req_post = urllib.request.Request(
+            f"{base_url}/api/supervision",
+            data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "X-Supervision-Token": token,
+                "Accept": "application/json"
+            },
             method="POST"
         )
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with urllib.request.urlopen(req_post, timeout=timeout) as resp:
             return resp.status in (200, 204)
     except Exception:
         return False
@@ -171,7 +185,12 @@ def main():
     log_audit("INTENT", conv_id, current_alias or "NONE", target_alias, status_code=0)
 
     # 5. Application locale du renommage
-    # Titre d'onglet court sans info Superviseur
+    actor = "AGY01" if "agy" in (parent_name or "").lower() else ("CC01" if "claude" in (parent_name or "").lower() else ("DSH01" if "dsh" in (parent_name or "").lower() else "CDX01"))
+    if re.fullmatch(r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC)\d{2}$", task_id):
+        machine_alias = task_id
+    else:
+        machine_alias = f"{task_id}-{actor}"
+
     boot_name = "🚀 AGY Antigravity"
     if "claude" in (parent_name or "").lower():
         boot_name = "🧠 Claude Code"
@@ -180,19 +199,19 @@ def main():
     elif "dsh" in (parent_name or "").lower():
         boot_name = "DSH"
 
-    tab_title = f"{task_id} {boot_name}"
+    tab_title = f"{target_alias} {boot_name}"
     update_vscode_tab_title(tab_title)
 
     # 6. Notification Superviseur
-    sup_ok = notify_supervisor(conv_id, target_alias, timeout=0.5)
+    sup_ok = notify_supervisor(conv_id, machine_alias, timeout=1.0)
     if not sup_ok:
-        mark_dirty_supervisor(conv_id, target_alias)
+        mark_dirty_supervisor(conv_id, machine_alias)
         sys.stderr.write("⚠️ Note : Superviseur non joignable (alias marqué pour réconciliation ultérieure).\n")
 
     # 7. Étape WAL : Validation finale (COMMIT)
-    log_audit("COMMIT", conv_id, current_alias or "NONE", target_alias, status_code=0)
+    log_audit("COMMIT", conv_id, current_alias or "NONE", machine_alias, status_code=0)
 
-    print(f"✅ Session renommée avec succès : {target_alias}")
+    print(f"✅ Session renommée avec succès : {machine_alias}")
     print(f"   Onglet terminal : {tab_title}")
     sys.exit(0)
 
