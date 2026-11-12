@@ -57,7 +57,7 @@ PROMPT_FILE_MAP = {
 }
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
-DEFAULT_MODEL = "deepseek-v4-flash:cloud"
+DEFAULT_MODEL = "deepseek-v4.1-flash:cloud"
 DEFAULT_NUM_CTX = 16384
 DEFAULT_TIMEOUT_S = 300
 

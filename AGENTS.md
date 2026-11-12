@@ -259,17 +259,20 @@ l'orchestrateur (lecture du `git diff` réel), jamais à l'agent qui a produit l
 
 Plugin antigravity : `antigravity:delegate` · `antigravity:resume` · `antigravity:review`.
 Workflow multi-agents et criticité C0–C4 : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`.
+Référence commune de choix des agents/modèles et budget Ollama par session :
+[`TOOLS/AGENT_WORKFLOW/docs/MODEL_ROUTING.md`](TOOLS/AGENT_WORKFLOW/docs/MODEL_ROUTING.md).
 
 ### 🧠 Modes de Délégation : Subagent Plateforme vs Multi-modèle vs Ollama Local
 - 🌐 **Subagent standard (`invoke_subagent` / `agent`)** : Utilise le modèle cloud de la plateforme (consomme le quota API).
-- 🔀 **Subagent multi-modèle (`workflow` + override `provider`/`model`)** : lance un sous-agent sur un autre modèle du catalogue (ex. `opencode-go`/`glm-5.2` — validé 2026-08-31 ; `omniroute`/`auto/best-reasoning`) pour réflexion, second avis ou test comparatif (ex. vs `deepseek-v4-flash:cloud` local). Routes, clés et caveats prompt court/lourd : `TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md`.
-- 💻 **Subagent Ollama Local (`ollama_subagent.py`)** : Quand l'utilisateur demande explicitement un *« subagent Ollama »* ou *« DeepSeek »*, déléguer l'analyse, l'audit ou la revue au modèle local sans consommer aucun quota cloud :
+- 🔀 **Subagent multi-modèle (`workflow` + override `provider`/`model`)** : déléguer à un autre modèle si le besoin le justifie. Les routes et détails techniques sont dans `TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md` ; les règles communes de choix et de parallélisme sont dans `TOOLS/AGENT_WORKFLOW/docs/MODEL_ROUTING.md`.
+- 💻 **Subagent Ollama (`ollama_subagent.py`)** : peut être utilisé par défaut quand une délégation locale est utile, même si l'utilisateur n'a pas nommé Ollama. Le modèle par défaut est `deepseek-v4.1-flash:cloud`; choisir un autre modèle avec `--model` :
   ```bash
-  python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "..." --model deepseek-v4-flash:cloud
+  python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "..."
+  python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "..." --model glm-5.3-flash:cloud
   python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --file DOC/WFLOW/TASKS/T<ID>_.../ARCHIVES/T<ID>_PROMPT_..._v1.0.md --output DOC/WFLOW/TASKS/T<ID>_.../PREUVES/.../T<ID>_REVUE_..._v1.0.md
   python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --list-models
   ```
-  Modèles locaux configurés : `deepseek-v4-flash:cloud` (défaut), `qwen3.8:27b`, `gemma4:e4b`. Le runner injecte automatiquement `subagent_preamble.md`.
+  Le runner injecte automatiquement `subagent_preamble.md`. Budget : jusqu'à 4 appels Ollama simultanés et 20 par session ; demander accord avant de dépasser l'une de ces limites.
 
 ### 🛡️ Commits — autorisation humaine explicite
 
@@ -329,7 +332,8 @@ la totalité de la CI est verte. Au moindre échec, tous les scratchs de ce lanc
 Toutes les specs dans **`DOC/`** — index complet et rôle de chaque document : [DOC/README.md](DOC/README.md).
 
 - [VERSION_HISTORY](DOC/VERSION_HISTORY.md) — historique CODESYS ↔ DOC (une ligne par jalon)
-- [DSH_PROVIDERS](TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md) — 🔌 providers `omniroute` + `opencode-go` (glm-5.2, etc.) + Ollama local · délégation multi-modèles (workflow `provider`/`model`) · 🔄 redémarrage DSH après installation de plugin (`Stop-Process node`)
+- [MODEL_ROUTING](TOOLS/AGENT_WORKFLOW/docs/MODEL_ROUTING.md) — 🧭 règles communes de choix des agents/modèles, budget Ollama et identifiants exacts dans les commandes.
+- [DSH_PROVIDERS](TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md) — 🔌 routes et détails techniques DSH/OmniRoute/Ollama ; résultats de modèles datés = observations historiques.
 - [TASKS.yaml](DOC/WFLOW/TASKS.yaml) — 🗂️ **catalogue et contrats** : skill `.claude/skills/task-planner/SKILL.md`. Le coordinateur désigné gère le catalogue et ses verrous ; les agents délégués rendent leur état au coordinateur.
 - [TROUBLESHOOTING](DOC/WFLOW/TROUBLESHOOTING/README.md) — 🕵️ **recherche de blocage / diagnostic** : skill
   `.dsh/skills/troubleshooting/SKILL.md` (DSH) & `.claude/skills/troubleshooting/SKILL.md` (Claude Code),

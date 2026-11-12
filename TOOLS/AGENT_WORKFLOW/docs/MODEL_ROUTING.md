@@ -1,96 +1,61 @@
-# Routage des modèles
+# Choix des agents et des modèles
 
-> 🔧 **Révisé 2026-08-17.** L'ancien environnement de sous-agents (Herdr) est abandonné. Le gate
-> `G220_check_model_routing.py` lisait un artefact structuré (modèle réellement exécuté) — ce
-> mécanisme n'existe plus, et ni antigravity ni Codex ne déposent d'équivalent structuré dans le
-> dépôt. Le gate est archivé (`ARCHIVES/Tools/AGENT_WORKFLOW/scripts/README.md`) plutôt que laissé
-> à faire semblant de vérifier (même décision que l'abandon de `PLC_TESTS` le 2026-07-26,
-> `docs/TASK_CONTEXT.md`).
-> Ce document garde les principes de choix de modèle (toujours valides) et documente franchement
-> que le respect de ces principes n'est **plus vérifié automatiquement** — seulement par la
-> validation humaine et la double revue A/B (`SAFETY_POLICY.md`).
+> Référence commune aux orchestrateurs de projet, responsables de tâche et agents délégués.
+> Cette politique décrit les choix et limites d'exécution ; elle ne garantit pas qu'un outil tiers
+> applique automatiquement le modèle demandé. Les appels déterministes doivent préciser le modèle.
 
-## 🧭 Deux notions à ne pas confondre
+## Règles de choix
 
-| Notion | Exemple | Ce que ça change |
-|---|---|---|
-| **Famille rapide** | `gemini-3.5-flash`, `*-mini`, `*-nano`, `haiku` | Petit modèle conçu pour la vitesse |
-| **Effort réduit** | `claude-sonnet-5:low`, `nemotron-550b:low` | Gros modèle **bridé** |
+1. **Suivre la demande de l'utilisateur.** Un modèle ou fournisseur demandé explicitement prime,
+   sous réserve des contraintes de sécurité et du contrat de tâche.
+2. **Déléguer selon le besoin, pas selon un nom de modèle figé.** Un sous-agent natif utilise le
+   modèle de la plateforme/configuration courante si aucun override n'est disponible. Les familles
+   rapides conviennent au repérage et au tri ; une revue, une décision ou une tâche de code exige
+   un modèle adapté à la difficulté et au risque. Les noms et capacités des modèles évoluent :
+   vérifier le catalogue au moment d'un appel.
+3. **Pour une délégation Ollama économique**, le modèle par défaut des scripts du projet est
+   `deepseek-v4.1-flash:cloud`. On peut en choisir un autre avec `--model <identifiant>`.
+4. **Pour une tâche risquée**, suivre le contrat et les règles C3/C4 : une faible consommation
+   ou un grand nombre d'agents ne remplace ni une revue indépendante requise, ni la validation
+   de l'orchestrateur et de l'humain.
 
-Un `scout` qui repère des fichiers ne juge rien : les deux lui conviennent.
-Un `reviewer` juge : la famille rapide lui est **interdite**, l'effort réduit est **signalé**.
+## Budget de délégation Ollama par session
 
-## 👤 Rôles et modèles
+- Jusqu'à **4 agents Ollama simultanés** et **20 appels Ollama au total dans une session** :
+  l'orchestrateur peut les lancer sans demander un accord supplémentaire, si la tâche y gagne.
+- Au-delà de l'une de ces limites, demander l'accord de l'utilisateur avant de lancer les appels
+  supplémentaires.
+- Favoriser des sous-tâches indépendantes, avec des livrables distincts et un brief commun
+  suffisant. L'orchestrateur compare les résultats et reste responsable de la synthèse.
+- Ce budget concerne les appels aux runners Ollama du projet ; il ne constitue pas un objectif
+  à atteindre ni une autorisation de multiplier les tâches sans utilité.
 
-| Rôle | Ce qu'il fait | Famille rapide | Effort |
-|---|---|---|---|
-| `scout` | Repérage, cartographie, « où est X » | ✅ **recommandée** | `:low` |
-| `researcher` | Collecte, lecture documentaire | ✅ autorisée | `:medium` |
-| `worker` | Produit du code | ⛔ interdite | `:high` |
-| `reviewer` | Juge le travail | ⛔ interdite | `:high` |
-| `oracle` | Tranche une question de conception | ⛔ interdite | `:high` |
+## Spécialistes du projet et modèles
 
-### 🆕 Modèles rapides — où ils gagnent vraiment
+Les personas `safety`, `plc`, `hmi`, `testing`, `standards` et `challenger` sont des assistants
+spécialisés conçus d'abord pour le Superviseur. Leur rôle détermine leur consigne et leur domaine,
+pas un modèle dédié. Ils peuvent aussi être appelés directement par l'utilisateur ou un agent.
 
-`antigravity/gemini-3.5-flash-medium` · `antigravity/gemini-3.5-flash-high`
+Le lanceur `specialist_supervisor.py` utilise le runner Ollama commun et son modèle par défaut ;
+`--model <identifiant>` permet de choisir un autre modèle. Si le persona s'avère trop lié au
+Superviseur pour un autre workflow, traiter cette limite au niveau du workflow au lieu de créer
+une nouvelle voie de lancement sans besoin établi.
 
-Pour un `scout` (repérage, cartographie), un modèle rapide n'est pas un compromis, c'est **le bon
-outil** — inutile de payer un gros modèle bridé pour du repérage.
+## Identifiants exacts et documentation
 
-| Usage | Modèle |
-|---|---|
-| `scout` — repérage, cartographie | `flash-medium` |
-| Résumé, reformulation doc, C0–C1 non-safety | `flash-medium` |
-| Pré-lecture avant une revue coûteuse (débroussaillage) | `flash-high` |
-| **Revue A/B C4, safety, normes, redondance** | ⛔ **interdit** |
+- Dans une **commande, un script, un contrat ou `models_allowed`**, employer l'identifiant exact
+  attendu par le fournisseur. Un changement de nom de modèle se vérifie avec le fournisseur ou
+  `--list-models` lorsque le runner le propose.
+- Dans les consignes générales, parler de capacités/familles (rapide, raisonnement, code) plutôt
+  que d'épingler une version précise. Les exemples de modèles sont temporaires.
+- `DSH_PROVIDERS.md` documente les routes et détails techniques DSH/Ollama/OmniRoute ; ses mesures
+  de performance datées sont des observations historiques, pas un catalogue actuel.
+- `AGENTS.md` pointe ici comme référence commune. Le workflow d'orchestration précise quand et
+  comment déléguer ; les contrats de tâche priment s'ils limitent les modèles autorisés.
 
-L'interdiction safety n'est pas un jugement sur le modèle : c'est la règle existante du projet
-(Ponytail déjà banni du safety) appliquée par cohérence à toute la famille rapide.
+## Limites de vérification
 
-## 🔀 Multi-modèle — pas la règle par défaut
-
-Voie exécutée par l'**orchestrateur** (agent Claude Code) qui délègue selon le besoin, via les
-agents natifs disponibles : **antigravity**, **Codex**, ou un **fork Claude Code**.
-
-| Voie | Analyse | Revue | Double A/B |
-|---|---|---|---|
-| C0–C1 Fast | orchestrateur seul | — | — |
-| C2 Standard | modèle fort | avis ciblé optionnel (1 agent natif read-only) | — |
-| C3 Standard | modèle fort | 1 agent natif read-only si le risque le justifie | — |
-| C4 Safety | modèle fort **High Effort** | 2 agents natifs A/B read-only parallèles | ✅ **obligatoire** |
-| C4 + divergence | orchestrateur + humain | l'humain tranche | — |
-
-## 🔴 Double revue parallèle A/B (C4 uniquement)
-
-**Déclencheur** : TEST_DESIGN, ST généré, toute revue safety C4.
-
-1. Agent A (ex. antigravity) reçoit le contexte complet (contrat de tâche + code), en read-only.
-2. Agent B (ex. Codex, ou un fork Claude Code) reçoit **exactement le même contexte**, sans voir
-   le résultat de A.
-3. L'orchestrateur attend, lit, compare :
-   - consensus → synthèse présentée à l'humain ;
-   - divergence (≥1 point contradictoire) → 🚨 alerte + positions A/B côte à côte.
-
-**Règles** : pas de fusion automatique · aucun agent ne commit ni ne valide la safety ·
-Ponytail et famille rapide interdits sur toute analyse safety/normative/redondance.
-
-## ⚠️ Vérification — non automatique, tracée dans le contrat de tâche
-
-Sans artefact structuré équivalent à celui de l'ancien environnement de sous-agents, le respect
-de ces règles **n'est plus contrôlé par un gate**. La garantie repose sur :
-
-- `models_allowed` déclaré dans le `TASK_CONTEXT` de la tâche (`templates/task_contract.yaml`) ;
-- `human_validation_required` — l'automaticien vérifie que la voie suivie (simple/double revue)
-  correspond à la criticité annoncée, avant tout chargement CODESYS ;
-- le devoir d'alerte de l'orchestrateur si un agent délégué s'écarte de ces règles.
-
-Si un futur outil de délégation dépose un artefact structuré (modèle/rôle réellement exécuté),
-`ARCHIVES/Tools/AGENT_WORKFLOW/scripts/G220_check_model_routing.py` est réutilisable comme base :
-seule sa source de données (l'ancien répertoire d'artefacts) est morte, sa logique de détection
-reste valide.
-
-## 🔌 Fournisseurs
-
-Catalogue connu : `antigravity/` · `openai/` (Codex) · `nvidia/` · `omni/` · `gh/` ·
-`openrouter/` · `ollama/`.
-Les clés ne sont **jamais** stockées dans le dépôt.
+Le choix réellement exécuté par un agent natif ou un service distant n'est pas toujours exposé au
+dépôt. Ne pas prétendre qu'un modèle a été vérifié si l'outil n'en fournit pas la preuve. Les
+runners Ollama du projet reçoivent l'identifiant exact dans leur paramètre `model` et acceptent
+`--model` en ligne de commande.

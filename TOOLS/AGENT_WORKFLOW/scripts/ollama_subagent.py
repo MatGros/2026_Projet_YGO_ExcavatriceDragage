@@ -8,7 +8,7 @@ sans consommer de quota cloud.
 
 Usage :
   python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "Ton prompt"
-  python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --file chemin/vers/prompt.md --model deepseek-v4-flash:cloud
+  python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --file chemin/vers/prompt.md --model deepseek-v4.1-flash:cloud
   python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --list-models
 """
 
@@ -22,9 +22,10 @@ import urllib.error
 sys.stdout.reconfigure(encoding='utf-8')
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
-DEFAULT_MODEL = "deepseek-v4-flash:cloud"
+DEFAULT_MODEL = "deepseek-v4.1-flash:cloud"
 # Modeles locaux (qwen3:8b/27b, gemma4:*) : OK petit prompt SEULEMENT (timeout sur un gros contrat/diff,
-# matrice 2026-08-28). Sur gros prompt : deepseek-v4-flash:cloud (~130s, --num-ctx 16384) ou omniroute_subagent.py.
+# matrice historique 2026-08-28). Sur gros prompt : utiliser le modèle Ollama par défaut (ou choisir
+# un modèle approprié avec --model) et ajuster --num-ctx selon le volume.
 # num_ctx par defaut d'Ollama ~= 4k tokens : il TRONQUE SILENCIEUSEMENT le prompt d'entree (REX 2026-08-28
 # B3). Fenetre par defaut relevee a 8192 ; ajuster --num-ctx pour un gros contrat/diff.
 DEFAULT_NUM_CTX = int(os.environ.get("OLLAMA_NUM_CTX", "8192"))

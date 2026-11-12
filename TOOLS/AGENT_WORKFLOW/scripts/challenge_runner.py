@@ -38,7 +38,7 @@ CHALLENGER_SPEC = os.path.join(os.path.dirname(__file__), "..", "specialists", "
 PREAMBLE_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "subagent_preamble.md")
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
-DEFAULT_MODEL = "deepseek-v4-flash:cloud"
+DEFAULT_MODEL = "deepseek-v4.1-flash:cloud"
 DEFAULT_NUM_CTX = 16384
 DEFAULT_TIMEOUT_S = 360
 

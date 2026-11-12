@@ -16,6 +16,24 @@
                 ]
             },
             {
+                "name": "🌐 OmniRoute Server",
+                "autoExecuteCommands": true,
+                "icon": "server",
+                "color": "terminal.ansiBrightGreen",
+                "commands": [
+                    "cmd /c \"set OMNIROUTE_SERVER_HOST=127.0.0.1&& omniroute\""
+                ]
+            },
+            {
+                "name": "DSH (Ollama deepseek-v4.1-flash:cloud)",
+                "autoExecuteCommands": true,
+                "icon": "terminal",
+                "color": "terminal.ansiBrightYellow",
+                "commands": [
+                    "ollama launch dsh --model deepseek-v4.1-flash:cloud"
+                ]
+            },
+            {
                 "name": "🚀 AGY Antigravity",
                 "autoExecuteCommands": true,
                 "icon": "rocket",
@@ -34,7 +52,54 @@
                 ]
             },
             {
-                "name": "🔓 OpenCode",
+                "name": "🤖 Codex (OpenAI)",
+                "autoExecuteCommands": true,
+                "icon": "symbol-class",
+                "color": "terminal.ansiGreen",
+                "commands": [
+                    "codex"
+                ]
+            },
+            {
+                "name": "🐋 Claude Code Ollama (deepseek-v4.1-flash:cloud)",
+                "autoExecuteCommands": true,
+                "icon": "code",
+                "color": "terminal.ansiBrightBlue",
+                "commands": [
+                    "ollama launch claude --model deepseek-v4.1-flash:cloud"
+                ]
+            },
+            {
+                "name": "♊ Claude Code OmniRoute AGY (Gemini 3.8)",
+                "autoExecuteCommands": true,
+                "icon": "code",
+                "color": "terminal.ansiBrightYellow",
+                "commands": [
+                    "cmd /c \"set ANTHROPIC_BASE_URL=http://127.0.0.1:20128&& set ANTHROPIC_AUTH_TOKEN=local-dev&& set ANTHROPIC_API_KEY=&& set ANTHROPIC_MODEL=agy/gemini-3.8-flash-tiered&& claude --model agy/gemini-3.8-flash-tiered\""
+                ]
+            },
+            {
+                "name": "⚡ Claude Code Ollama (glm-5.3-flash:cloud)",
+                "autoExecuteCommands": true,
+                "icon": "code",
+                "color": "terminal.ansiBrightMagenta",
+                "commands": [
+                    "ollama launch claude --model glm-5.3-flash:cloud"
+                ]
+            },
+            {
+                "name": "🚀 Claude Code Ollama (minimax-m3.1-flash:cloud)",
+                "autoExecuteCommands": true,
+                "icon": "code",
+                "color": "terminal.ansiBrightCyan",
+                "commands": [
+                    "ollama launch claude --model minimax-m3.1-flash:cloud"
+                ]
+            }
+        ],
+        "disabled_terminals": [
+            {
+                "name": "OpenCode (desactive)",
                 "autoExecuteCommands": true,
                 "icon": "organization",
                 "color": "terminal.ansiBrightBlue",
@@ -42,44 +107,6 @@
                     "opencode --agent orchestrateur"
                 ]
             },
-            {
-                "name": "🌐 OmniRoute Server",
-                "autoExecuteCommands": true,
-                "icon": "server",
-                "color": "terminal.ansiBrightGreen",
-                "commands": [
-                    "cmd /c \"set OMNIROUTE_SERVER_HOST=127.0.0.1&& omniroute\""
-                ]
-            },
-            {
-                "name": "🤖 Codex (OpenAI)",
-                "autoExecuteCommands": true,
-                "icon": "symbol-class",
-                "color": "terminal.ansiBrightRed",
-                "commands": [
-                    "codex"
-                ]
-            },
-            {
-                "name": "🦙 DSH (Ollama deepseek-v4-flash)",
-                "autoExecuteCommands": true,
-                "icon": "terminal",
-                "color": "terminal.ansiBrightYellow",
-                "commands": [
-                    "ollama launch dsh --model deepseek-v4.1-flash:cloud"
-                ]
-            },
-            {
-                "name": "Claude Code OmniRoute AGY (Gemini 3.8)",
-                "autoExecuteCommands": true,
-                "icon": "code",
-                "color": "terminal.ansiBrightCyan",
-                "commands": [
-                    "cmd /c \"set ANTHROPIC_BASE_URL=http://127.0.0.1:20128&& set ANTHROPIC_AUTH_TOKEN=local-dev&& set ANTHROPIC_API_KEY=&& set ANTHROPIC_MODEL=agy/gemini-3.8-flash-tiered&& claude --model agy/gemini-3.8-flash-tiered\""
-                ]
-            }
-        ],
-        "disabled_terminals": [
             {
                 "name": "OmniRoute Server (ancienne commande archivée)",
                 "autoExecuteCommands": true,
