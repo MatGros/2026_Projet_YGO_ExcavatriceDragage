@@ -190,12 +190,10 @@ filtre d'affichage, pas un nettoyage ni un archivage ; l'historique reste dans l
 Un orchestrateur tournant sous **DSH (DeepSeek Harness)** peut lancer des sous-agents sur
 d'autres modèles via l'override `provider`/`model` de l'outil `workflow` :
 
-- 🧠 **Réflexion / second avis** : déléguer une analyse, un challenge ou une revue à un autre
-  modèle pour confronter les conclusions (ex. `opencode-go` / `glm-5.2`, validé 2026-08-31).
-- ⚖️ **Test comparatif** : faire tourner la même tâche sur 2 modèles (ex. `opencode-go/glm-5.2`
-  vs Ollama local `deepseek-v4-flash:cloud` via `ollama_subagent.py`) et comparer les verdicts.
-- 📑 Routes, clés et caveats (prompt court vs lourd) : `TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md`
-  (source unique) — à lire avant délégation.
+- 🧠 **Réflexion / second avis** : déléguer à un autre modèle si cela apporte une analyse
+  indépendante ou une comparaison utile. Suivre les règles communes de choix et de parallélisme
+  de `TOOLS/AGENT_WORKFLOW/docs/MODEL_ROUTING.md`.
+- 📑 Routes et détails techniques DSH : `TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md`.
 - Mêmes règles que toute délégation : préambule `subagent_preamble.md`, objectifs testables,
   validation finale par l'orchestrateur.
 
@@ -207,7 +205,7 @@ d'autres modèles via l'override `provider`/`model` de l'outil `workflow` :
 | `generate_codesys_diff_bundle.py` | génère le diff bundle `CODE_XML/CODE_DiffBundle.xml` pour tous les objets ST touchés ; complément obligatoire du bundle complet |
 | `G200_check_linkage.py --report` | **vérifie la liaison réelle** sur le bundle (BLOQUANT) |
 | `run_all_gates.py [--palier A/B/C/D]` | suite des 21 gates CI (fin de lot ou tous) |
-| `ollama_subagent.py` | subagent Ollama local (modèle `deepseek-v4-flash:cloud` par défaut) sans quota cloud |
+| `ollama_subagent.py` | subagent Ollama (défaut `deepseek-v4.1-flash:cloud`, personnalisable avec `--model`) |
 | `check_skill_stubs.py` | gate G440 — vérifie les stubs de skills (stub + canonique) |
 | `check_task_contract.py` | contrôle un contrat de tâche |
 

@@ -3,6 +3,10 @@
 > 🎯 **But** : ne plus redécouvrir les noms de provider/modèles à chaque session.
 > Tout agent DSH qui veut lancer un sous-agent sur un **autre modèle** lit ce fichier.
 
+> 🧭 Les règles communes de délégation, le budget Ollama et le modèle par défaut actuel sont dans
+> [`MODEL_ROUTING.md`](MODEL_ROUTING.md). Les temps et résultats ci-dessous sont des mesures
+> datées, pas une liste de modèles recommandés aujourd'hui ; revérifier avant de reprendre un ID.
+
 ---
 
 ## 🔌 Provider DSH configuré
@@ -28,7 +32,7 @@ C'est la cause n°1 d'échec d'override (REX 2026-08-16).
 | **Modèle validé** | `glm-5.2` (test PONG via `workflow`, override `provider`/`model`) |
 
 - ✅ `provider: "opencode-go"` + `model: "glm-5.2"` → réponse reçue (2026-08-31). Usages :
-  **réflexion / second avis** et **test comparatif** (ex. vs `deepseek-v4-flash:cloud` local).
+  **réflexion / second avis** et **test comparatif** (les IDs de ce relevé sont historiques).
 - ❌ `glm-5.2` via `omniroute` (`ollamacloud/glm-5.2`) → échec (2 tentatives 2026-08-31) :
   pour glm-5.2, la route est **`opencode-go`**, pas omniroute.
 - ✅ **Prompt lourd mesuré 2026-08-31** (test réel) : préambule + contrat 5 objectifs + FB ST
@@ -42,7 +46,7 @@ C'est la cause n°1 d'échec d'override (REX 2026-08-16).
 
 ---
 
-## 🧠 Modèles utilisables pour les sous-agents (matrice 2026-08-28)
+## 🧠 Mesures historiques de modèles pour sous-agents (2026-08-28)
 
 > Testé sur un **prompt court** (« PONG ») + un **prompt lourd de ~7,6k tokens** (taille d'une revue de
 > code FB réelle). Le critère `omniroute_subagent.py` : réponse non vide **avant le timeout** (300 s
@@ -60,7 +64,7 @@ C'est la cause n°1 d'échec d'override (REX 2026-08-16).
 | `codex/gpt-5.6-terra-medium` | omniroute | ✅ ~90 s | revue profonde (plus lent, à réserver aux gros lots) |
 
 > Hors catalogue mais **techniquement viables** en dépannage (plus lents, non retenus par défaut) :
-> `codex/gpt-5.6-sol-medium` (~140 s), `deepseek-v4-flash:cloud` natif `:11434` (~130 s, `--num-ctx 16384`).
+> `codex/gpt-5.6-sol-medium` (~140 s), ancien modèle DeepSeek natif `:11434` (~130 s, `--num-ctx 16384`).
 
 ### ❌ À NE PAS utiliser — timeout systématique sur prompt lourd
 
@@ -101,9 +105,10 @@ const resultat = await agent("Ta tâche ici", {
 
 ### Outil `ollama_subagent.py` (Local Ollama / DeepSeek — Zéro quota cloud)
 
-Pour déléguer directement à l'instance locale Ollama (`deepseek-v4-flash:cloud`, `qwen3.8:27b`, etc.) :
+Pour déléguer directement à l'instance locale Ollama (modèle par défaut défini par le runner, remplaçable avec `--model`) :
 ```bash
-python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "Analyse de sécurité..." --model deepseek-v4-flash:cloud
+python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "Analyse de sécurité..."
+python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "Analyse de sécurité..." --model glm-5.3-flash:cloud
 python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --file CONTRAT.md --output RESULTAT.md --num-ctx 16384 --timeout 400
 ```
 ⚠️ **`num_ctx` par défaut d'Ollama ≈ 4k tokens → TRONQUE SILENCIEUSEMENT le prompt d'entrée** (REX 2026-08-28) :
@@ -131,7 +136,7 @@ Timeout via `OMNIROUTE_TIMEOUT_S` (défaut 300). Injecte `subagent_preamble.md` 
 - ✅ `workflow` + `provider: "opencode-go"` + `model: "glm-5.2"` → PONG prompt court + **analyse safety FB 426 lignes (~7k tokens) reçue structurée, sans timeout** (2026-08-31) — validé revue/audit.
 - ✅ `workflow` + `provider: "omniroute"` + `model: "auto/best-reasoning"` → réponse en ~15 s sur prompt lourd (matrice 2026-08-28).
 - ⚠️ `codex/gpt-5.6-*-high` / `*-max`, `ollamacloud/*`, `claude/claude-sonnet-5` (via omniroute) : **timeout** sur prompt lourd (matrice 2026-08-28).
-- ✅ `ollama_subagent.py` + `model: "deepseek-v4-flash:cloud"` → réponse locale instantanée reçue.
+- ✅ `ollama_subagent.py` + ancien modèle DeepSeek cloud Ollama → réponse reçue (observation historique ; modèle actuel défini dans `MODEL_ROUTING.md`).
 - ❌ `omni-route` / `omni_cloud` / `omniRoute` / `omni-cloud` → échec (mauvais nom de route).
 
 ---

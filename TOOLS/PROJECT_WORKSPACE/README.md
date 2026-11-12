@@ -31,13 +31,16 @@ Cet environnement ouvre, dans le terminal intégré VS Code, huit onglets indép
 | Onglet | Commande | Rôle |
 |---|---|---|
 | **Task Manager** | `cmd /c TOOLS\TASK_MANAGER\LANCER_TASK_MANAGER.bat` | Suivi local des tâches |
+| **🌐 OmniRoute Server** | `cmd /c "set OMNIROUTE_SERVER_HOST=127.0.0.1&& omniroute"` | Serveur local, limité à la machine |
+| **DSH (Ollama deepseek-v4.1-flash:cloud)** | `ollama launch dsh --model deepseek-v4.1-flash:cloud` | Agent DSH via Ollama |
 | **🚀 AGY Antigravity** | `agy` | Agent Antigravity CLI dans le projet |
 | **🧠 Claude Code** | `claude` | Agent Claude Code CLI dans le projet |
-| **Claude Code OmniRoute AGY** | Voir la commande détaillée ci-dessous | Claude Code via `agy/gemini-3.8-flash-tiered` |
-| **🔓 OpenCode** | `opencode --agent orchestrateur` | Interface OpenCode unique avec agents Orchestrateur, Codeur (`@codeur`) et Vérificateur (`@verificateur`) |
-| **🌐 OmniRoute Server** | `cmd /c "set OMNIROUTE_SERVER_HOST=127.0.0.1&& omniroute"` | Serveur local, limité à la machine |
 | **🤖 Codex (OpenAI)** | `codex` | Agent Codex CLI dans le projet |
-| **🦙 DSH (Ollama)** | `ollama launch dsh` | Agent DSH local via Ollama |
+| **🐋 Claude Code Ollama (deepseek-v4.1-flash:cloud)** | `ollama launch claude --model deepseek-v4.1-flash:cloud` | Claude Code via Ollama, sans DSH |
+| **♊ Claude Code OmniRoute AGY** | Voir la commande détaillée ci-dessous | Claude Code via `agy/gemini-3.8-flash-tiered` |
+| **⚡ Claude Code Ollama (glm-5.3-flash:cloud)** | `ollama launch claude --model glm-5.3-flash:cloud` | Claude Code via Ollama Cloud |
+| **🚀 Claude Code Ollama (minimax-m3.1-flash:cloud)** | `ollama launch claude --model minimax-m3.1-flash:cloud` | Claude Code via Ollama Cloud |
+| **OpenCode (desactive)** | `opencode --agent orchestrateur` | Commande conservee dans la session inactive `disabled_terminals` |
 
 OpenCode-Go (glm-5.2) est désactivé dans `disabled_terminals` ; les terminaux Ollama et Gates qui y figurent restent désactivés.
 
@@ -151,4 +154,4 @@ Les variables ne vivent que dans le processus `cmd` et ses enfants : le terminal
 
 Le raccourci `omniroute launch` échoue sur cette installation Windows en cherchant `claude.cmd` alors que Claude Code est installé comme `claude.exe` ; la commande ci-dessus lance directement `claude`.
 
-Le terminal **OmniRoute Server** de Terminal Keeper est lié à `127.0.0.1` : il n'écoute pas sur le réseau local. Il démarre le serveur une seule fois avant **Claude Code OmniRoute AGY**. L'ancienne commande `omniroute` est archivée dans `disabled_terminals`; l'entrée du modèle Terminals Manager est masquée de ses commandes d'exécution (`onlyAPI: true`) pour éviter un second serveur. Test réel du 2026-11-11 après mise à jour vers OmniRoute 3.8.53 : Claude Code a reçu `PONG` de `agy/gemini-3.8-flash-tiered`. L'avertissement Claude Code « model isn't recognized » reste affiché, mais n'empêche pas la requête. OpenCode-Go (glm-5.2) est conservé dans `disabled_terminals` et peut être réactivé dans `.vscode/sessions.json`.
+Le terminal **OmniRoute Server** de Terminal Keeper est lié à `127.0.0.1` : il n'écoute pas sur le réseau local. Il démarre le serveur une seule fois avant **♊ Claude Code OmniRoute AGY**. L'ancienne commande `omniroute` est archivée dans `disabled_terminals`; l'entrée du modèle Terminals Manager est masquée de ses commandes d'exécution (`onlyAPI: true`) pour éviter un second serveur. Test réel du 2026-11-11 après mise à jour vers OmniRoute 3.8.53 : Claude Code a reçu `PONG` de `agy/gemini-3.8-flash-tiered`. L'avertissement Claude Code « model isn't recognized » reste affiché, mais n'empêche pas la requête. OpenCode-Go (glm-5.2) est conservé dans `disabled_terminals` et peut être réactivé dans `.vscode/sessions.json`.

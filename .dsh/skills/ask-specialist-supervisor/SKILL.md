@@ -30,6 +30,10 @@ Depuis la racine du projet :
 py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/specialist_supervisor.py --role <role> --prompt "<question>" --target <fichier1> <fichier2>
 ```
 
+Le modèle par défaut est `deepseek-v4.1-flash:cloud`. Pour choisir un autre modèle Ollama,
+ajouter `--model <identifiant>` à la commande. Les personas définissent le domaine d'expertise,
+pas un modèle différent par rôle.
+
 Pour rattacher à une tâche avec auto-archivage sous `DOC/WFLOW/TASKS/T<ID>/PREUVES/` :
 ```powershell
 py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/specialist_supervisor.py --role <role> --task T429 --target <fichiers>
