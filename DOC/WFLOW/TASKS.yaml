@@ -1,4 +1,28 @@
 tasks:
+- id: T431
+  parent_id: T429
+  statut: ⬜
+  criticite: C2
+  domaine: OUTILLAGE / AGENT_SUPERVISOR
+  agent: —
+  date: '2026-11-12T07:11:39+01:00'
+  titre: 'Agent Supervisor : audits spécialistes asynchrones, mémoire sourcée et couverture visible'
+  contexte: Complément de T429 explicitement confirmé par utilisateur le 2026-11-12. Cadrage documentaire autorisé; aucune
+    réalisation produit autorisée.
+  description: 'Raccorder les spécialistes en lecture seule avec corpus explicite, audits asynchrones échelonnés, mémoire
+    événementielle sourcée et audit profond éphémère. J0-J7 détaillent livrables, critères, tests adversaires, challenges
+    et recette. Plan : DOC/WFLOW/TASKS/T431_AGENT_SUPERVISOR_AUDITS_ASYNCHRONES/T431_PLAN_AUDITS_MEMOIRE_SPECIALISTES_v1.0.md'
+  objectifs:
+  - J0 réconciliation et contrats des interfaces T429
+  - J1-J2 journal durable, projection et validité des preuves
+  - J3-J4 corpus spécialistes et ordonnanceur asynchrone sans rafale
+  - J5 audit profond sur question et cooldown
+  - J6-J7 états visibles, recette réelle et challenge final
+  contrat: DOC/WFLOW/TASKS/T431_AGENT_SUPERVISOR_AUDITS_ASYNCHRONES/T431_PLAN_AUDITS_MEMOIRE_SPECIALISTES_v1.0.md
+  avancement: 'Préparation terminée : deux analyses DeepSeek indépendantes arbitrées. Document unique Markdown réunissant
+    contrat, plan J0-J7, critères et suivi; aucun contrat YAML séparé. Plan en attente de validation humaine, réalisation
+    produit non démarrée.'
+  bloque_par: []
 - id: T430
   parent_id: ''
   statut: ⏸️
@@ -41,8 +65,8 @@ tasks:
   agent: AGY01
   date: '2026-11-09T05:51:30+01:00'
   titre: 'Agent Supervisor : fiabiliser reprise, cycle des alertes, IHM et plugin sur parcours reels'
-  contexte: 'Campagne de fiabilisation du Supervisor lancee le 2026-11-08, jusqu ici suivie sans ID formel. Document
-    unique de pilotage (plan, decisions, preuves, limites) : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
+  contexte: 'Campagne de fiabilisation du Supervisor lancee le 2026-11-08, jusqu ici suivie sans ID formel. Document unique
+    de pilotage (plan, decisions, preuves, limites) : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
     . Utilisation du service : TOOLS/AGENT_SUPERVISOR/README.md . Perimetre : TOOLS/AGENT_SUPERVISOR/ uniquement. Aucun changement
     CODE/, CODESYS, hooks, skills ni configurations CLI.'
   description: Rendre le suivi d une session surveillee fiable apres pause ou redemarrage, et rendre les constats lisibles

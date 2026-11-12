@@ -290,15 +290,106 @@ def test_campaign_raw_fallback(tmp_path: Path) -> None:
     root = Path(__file__).resolve().parents[3]
     # Keep this campaign tied to active contracts. The former T130/T137/T15x
     # fixtures were archived/removed and made the regression test fail before
-    # the parser was exercised.
+    # the parser was exercised. T426 was merged into T427 (2026-11-10) : the
+    # active merged contract replaced the standalone one.
     candidates = (
-            "TASK_CONTRACT_T426.yaml",
+            root / "DOC" / "WFLOW" / "TASKS" / "T427_WORKFLOW_AGENTS"
+            / "T427_WORKFLOW_AGENTS_CONTRAT_WORKFLOW_ET_FUSION_T426_20261110_v1.0.yaml",
+            root / "DOC" / "WFLOW" / "TASKS" / "T429_AGENT_SUPERVISOR"
+            / "T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml",
     )
-    names = tuple(name for name in candidates if (root / "DOC" / "WFLOW" / "CONTRACTS" / name).is_file())
+    names = tuple(name for name in candidates if name.is_file())
     assert names, "No current contract fixture available for raw fallback campaign"
-    for name in names:
+    for contract_path in names:
         result = run(
-            root / "DOC" / "WFLOW" / "CONTRACTS" / name,
+            contract_path,
             disable_pyyaml=True,
         )
-        assert result.returncode == 0, f"{name}: {result.stdout}{result.stderr}"
+        assert result.returncode == 0, f"{contract_path.name}: {result.stdout}{result.stderr}"
+
+
+# ── T9-T11 — contrôles progressifs du workflow (T427-AC3, T426-AC7) ──────────
+# Toute infraction T9-T11 est un AVERTISSEMENT : exit code 0 inchangé.
+
+WORKFLOW_FIELDS = {
+    # Champ top-level conforme au gabarit : execution_plan + jalon complet.
+    "MILESTONE": "execution_plan:\n  milestones:\n  - id: M1\n    title: Jalon cadre\n    done_when: Contrat valide humainement\n",
+}
+
+
+def test_t9_plan_absent_sur_c2_averti_sans_bloquer(tmp_path: Path) -> None:
+    result = run(write(tmp_path, VALID))
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "T9: aucun `execution_plan`" in result.stdout
+
+
+def test_t9_pas_de_controle_sous_c2(tmp_path: Path) -> None:
+    c1 = VALID.replace("criticality: C3", "criticality: C1")
+    result = run(write(tmp_path, c1))
+    assert result.returncode == 0
+    assert "T9" not in result.stdout
+
+
+def test_t9_jalon_sans_done_when_averti(tmp_path: Path) -> None:
+    bad = VALID + WORKFLOW_FIELDS["MILESTONE"].replace("    done_when: Contrat valide humainement\n", "")
+    result = run(write(tmp_path, bad))
+    assert result.returncode == 0
+    assert "T9: jalon M1 sans `done_when`" in result.stdout
+
+
+def test_t9_jalon_complet_passe_sans_avertir(tmp_path: Path) -> None:
+    good = VALID + WORKFLOW_FIELDS["MILESTONE"]
+    result = run(write(tmp_path, good))
+    assert result.returncode == 0
+    assert "T9:" not in result.stdout
+
+
+def test_t10_ligne_trop_longue_avertie(tmp_path: Path) -> None:
+    long_entry = "e" * 130
+    bad = VALID + "test_feedback:\n  - " + long_entry + "\n"
+    result = run(write(tmp_path, bad))
+    assert result.returncode == 0
+    assert "T10: entree test_feedback de 130 caracteres" in result.stdout
+
+
+def test_t10_ligne_courte_passe(tmp_path: Path) -> None:
+    good = VALID + "test_feedback:\n  - G200 liaison: PASS sur bundle regenere\n"
+    result = run(write(tmp_path, good))
+    assert result.returncode == 0
+    assert "T10:" not in result.stdout
+
+
+def test_t11_budget_incoherent_averti(tmp_path: Path) -> None:
+    bad = VALID + "tracking:\n  budget:\n    total: 10\n    used: 12\n    parallel_max: 3\n"
+    result = run(write(tmp_path, bad))
+    assert result.returncode == 0
+    assert "T11: budget incoherent — used (12) hors [0, total=10]" in result.stdout
+
+
+def test_t11_companion_doc_hors_projet_averti(tmp_path: Path) -> None:
+    bad = VALID + "companion_doc: https://exemple.com/note.md\n"
+    result = run(write(tmp_path, bad))
+    assert result.returncode == 0
+    assert "T11: `companion_doc`" in result.stdout
+
+
+def test_t11_budget_ok_passe_sans_avertir(tmp_path: Path) -> None:
+    good = VALID + "tracking:\n  budget:\n    total: 10\n    used: 2\n    parallel_max: 3\ncompanion_doc: DOC/WFLOW/TASKS/T1_X/NOTE.md\n"
+    result = run(write(tmp_path, good))
+    assert result.returncode == 0
+    assert "T11:" not in result.stdout
+
+
+def test_workflow_fields_silencieux_sur_contrat_actif_complet() -> None:
+    """Le contrat fusionne T427 porte tous les champs : zero avertissement T9-T11."""
+    root = Path(__file__).resolve().parents[3]
+    contract = (
+        root / "DOC" / "WFLOW" / "TASKS" / "T427_WORKFLOW_AGENTS"
+        / "T427_WORKFLOW_AGENTS_CONTRAT_WORKFLOW_ET_FUSION_T426_20261110_v1.0.yaml"
+    )
+    assert contract.is_file(), "contrat fusionne T427 requis"
+    result = run(contract)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "T9:" not in result.stdout
+    assert "T10:" not in result.stdout
+    assert "T11:" not in result.stdout

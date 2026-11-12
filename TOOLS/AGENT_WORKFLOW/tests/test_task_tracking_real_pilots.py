@@ -16,8 +16,13 @@ spec.loader.exec_module(tracking)
 class ContractBackedScenarioTests(unittest.TestCase):
     def setUp(self):
         self.root = Path(__file__).resolve().parents[3]
-        self.t417 = self.root / ".claude/worktrees/t417-cd/DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417-C.yaml"
-        self.t280 = self.root / "DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T280_TROUBLESHOOTING_WORKSPACE.yaml"
+        # Fixtures locales : contenu reel des contrats pilotes T417-C et T280
+        # captures au moment du prototype T426 (commit 2a5bf86d). Les emplacements
+        # d'origine dans le depot ont bouge (fusions T426->T427, archivage) ; le
+        # test ne depend plus d'aucun emplacement mobile.
+        self.fixtures = Path(__file__).resolve().parent / "fixtures"
+        self.t417 = self.fixtures / "TASK_CONTRACT_T417-C.yaml"
+        self.t280 = self.fixtures / "TASK_CONTRACT_T280_TROUBLESHOOTING_WORKSPACE.yaml"
         self.assertTrue(self.t417.is_file(), "T417-C pilot contract is required")
         self.assertTrue(self.t280.is_file(), "T280 pilot contract is required")
 

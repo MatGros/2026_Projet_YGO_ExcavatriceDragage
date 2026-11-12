@@ -1,0 +1,126 @@
+# Contrat T417-C — POC CI des vraies PRG (sans miroir)
+# Source : DOC/WFLOW/ETUDES/ANALYSES_T417/PROPOSITION_PILOTAGE_ET_BANCS_20261101.md (ligne "Faisabilite CI des PRG")
+# GO humain 2026-11-01 avec 4 corrections Codex (CDX01), integrees ci-dessous.
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417-C.yaml
+
+contract:
+  task_id: T417-C
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Etablir par paliers si TEST_AUTO_CI peut compiler et cycler le code reel de CODE/
+    (FB, GVL, puis PRG_02 et suivantes) sans miroir recode, afin que la CI rapide teste
+    le programme machine lui-meme et non une reecriture (constat : FB_TestHarness_PRG_04
+    = 179 lignes contre 1982 pour PRG_04_Treuils_Benne).
+
+  acceptance:
+    - id: AC1
+      statement: "Palier 1 : un FB reel de CODE/ et ses dependances transitives compilent et cyclent dans TEST_AUTO_CI, sources prises telles quelles depuis CODE/."
+      verified_by: "Commande de palier rejouable (script POC) + journal strucpp + manifeste du palier (chemin + sha256 de chaque source) ; un test ST minimal passe."
+    - id: AC2
+      statement: "Palier 2 : PRG_02_Acquisition reel compile avec le minimum de dependances necessaires ; les references vers les autres PRG sont resolues explicitement (vraie source ou frontiere declaree)."
+      verified_by: "Meme commande au palier 2 ; manifeste listant chaque reference inter-PRG et sa resolution ; un cycle execute sans exception."
+    - id: AC3
+      statement: "Les vraies GVL (dont GVL_IHM) et la logique metier sont conservees ; seules les frontieres non portables (bibliotheques CODESYS, E/S variateur, fonctions systeme) sont adaptees, chacune listee avec les donnees simulees."
+      verified_by: "Manifeste : section 'frontieres' (fichier mock, raison, donnees simulees) ; diff verifiant qu'aucun fichier CODE/ n'est remplace par un mock."
+    - id: AC4
+      statement: "Le manifeste couvre exactement les sources du perimetre compile au palier ; toute source absente, substituee ou inconnue est signalee avant tout verdict."
+      verified_by: "Le script POC compare la liste compilee au manifeste et echoue si un ecart n'est pas declare (test negatif : source retiree -> echec)."
+    - id: AC5
+      statement: "Test de sensibilite : rompre temporairement un lien d'assemblage (reference inter-PRG ou GVL) fait echouer le banc."
+      verified_by: "Run negatif documente (sortie ROUGE attendue) puis restauration et run VERT ; les deux journaux conserves."
+    - id: AC6
+      statement: "Un echec est rendu comme 'obstacle identifie' : fichier:ligne, cause, cout estime, alternatives. 'Non faisable' n'est prononce qu'avec une justification plus forte (plusieurs voies essayees et chiffrees)."
+      verified_by: "Rapport de palier DOC/WFLOW/ETUDES/ANALYSES_T417/T417C_POC_CI_PRG_<date>.md, une ligne par obstacle."
+
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/POC_PRG/
+      - TOOLS/TEST_AUTO_CI/MOCKS/
+      - DOC/WFLOW/ETUDES/ANALYSES_T417/T417C_*
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417-C.yaml
+      - DOC/WFLOW/TASKS.yaml (entree T417-C uniquement)
+    forbidden:
+      - CODE/ (zero modification, lecture seule)
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml (pas d'ajout a la CI nominale pendant le POC)
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_0*.st (miroirs existants conserves)
+      - Configuration des hooks / gates bloquants
+      - Remplacement global de GVL_IHM par un mock
+
+  evidence_required:
+    - Commande rejouable par palier et sa sortie
+    - Manifeste de sources (chemin + sha256) et liste des frontieres simulees par palier
+    - Run negatif de sensibilite + run positif
+    - Rapport d'obstacles avec cout et alternatives
+    - git diff reel (aucun fichier CODE/ touche)
+
+  alert_duty: >
+    Signaler immediatement : obstacle compilateur, besoin de toucher CODE/, mock qui
+    recoderait de la logique metier, ecart manifeste/sources. Ne pas transformer un
+    echec localise en verdict d'impossibilite, ni une compilation reussie en preuve
+    d'equivalence avec CODESYS.
+
+status: IN_PROGRESS
+
+framing:
+  created_at: '2026-11-01T11:13:55+01:00'
+  requested_by: HUM
+  accountable: CDX01
+  implementation_owner: CC01
+  parent: T417
+  related_tasks: [T417-D, T417-E, T426, T372, T384]
+  paliers:
+    - "P1 : un FB reel + dependances (choix : plus petit FB utilise par PRG_02)"
+    - "P2 : PRG_02_Acquisition + minimum necessaire"
+    - "P3+ : extension PRG par PRG, uniquement si P2 concluant ; decision a chaque palier"
+  exclusions:
+    - Pas d'equivalence CODESYS revendiquee (identite IDE = T417-E).
+    - Pas de suppression ni modification des miroirs FB_TestHarness_PRG_0*.
+    - Aucun chiffre de gain de temps sans mesure.
+
+execution:
+  executed_by: CC01
+  completed_at: ""
+  status: PENDING
+  summary: >-
+    P1 valide (FB_Diag_Ethercat 7/7, source retiree detectee, frontiere non declaree refusee).
+    P2 "PRG02 avec voisins simules" : rupture semantique detectee, doublon diagnostique
+    explicitement ; P2b consolide (12 initialiseurs restaures et verifies, sens T5 controle,
+    21 controles unitaires) PASS 5/5. P3 liaison reelle PRG02->PRG03 PASS 4/4, ruptures
+    producteur et consommateur detectees avec signature distincte. P4 chaine commande operateur ->
+    demande M3 (PRG02/03/05 reels, PRG04/06/07 simules, sorties finales non couvertes) PASS 5/5,
+    ruptures PRG_02 et PRG_03 detectees (interpretation a posteriori : limite methodologique).
+    P5 commande operateur -> sorties finales M3 (PRG02/03/05/06 reels, frein/variateur physiques simules)
+    PASS 4/4, predictions ecrites avant execution, 3 mutations conformes. PASS limites aux cas testes ;
+    integration PRG02-07 et equivalence CODESYS NON validees.
+    Voir DOC/WFLOW/ETUDES/ANALYSES_T417/T417C_POC_CI_PRG_20261101.md.
+  evidence_submitted:
+    - "P1 PASS : T417C_POC_RESULTS/P1_FB_DIAG_ETHERCAT_20261101T111831"
+    - "P1 sensibilite : P1_FB_DIAG_ETHERCAT_BREAK_ST_Diag_Device_20261101T111858"
+    - "P1 AC4 : P1_FB_DIAG_ETHERCAT_NEG_SANS_FRONTIERE_20261101T111914"
+    - "P2 doublon refuse : P2_PRG02_VOISINS_SIMULES_20261101T115558"
+    - "P2 PASS 3/3 : P2_PRG02_VOISINS_SIMULES_20261101T120720"
+    - "P2 rupture semantique : P2_PRG02_VOISINS_SIMULES_MUTATION_20261101T120754"
+    - "CODE/ : 0 fichier modifie (git diff --name-only -- CODE)"
+    - "P2b T4 restaure + T5 controle PASS 5/5 : P2_PRG02_VOISINS_SIMULES_20261101T124457"
+    - "P2b mutations init / T5 detectees : P2_..._MUTATION_20261101T124036 / 124055"
+    - "Controles unitaires transformations + derive mock E/S : pytest POC_PRG/tests/test_transforms.py 21/21"
+    - "P3 liaison reelle PRG02->PRG03 PASS 4/4 : P3_PRG02_PRG03_REELS_20261101T124525"
+    - "P3 ruptures producteur / consommateur detectees : P3_..._MUTATION_20261101T124559 / 124621"
+    - "P4 chaine operateur -> demande M3 (PRG02/03/05 reels) PASS 5/5 : P4_PRG02_03_05_REELS_20261101T142950"
+    - "P4 ruptures PRG_02 / PRG_03 detectees : P4_..._MUTATION_20261101T143028 / 143053"
+    - "Non-regression apres stub [E3] : P1 143210, P2 143118, P3 143146 PASS ; pytest 22/22"
+    - "P4 LIMITE METHODOLOGIQUE : signatures des ruptures interpretees apres execution (pas de prediction prealable)"
+    - "P5 predictions ecrites avant execution : DOC/WFLOW/ETUDES/ANALYSES_T417/T417C_P5_PREDICTIONS_20261101T154238.md"
+    - "P5 sorties finales M3 (PRG02/03/05/06 reels) PASS 4/4 conformes aux predictions : P5_PRG02_03_05_06_REELS_20261101T154347"
+    - "P5 mutations M5a/M5b/M5c conformes aux predictions : P5_..._MUTATION_20261101T154431 / 154500 / 154528"
+    - "Non-regression apres regle de fermeture GVL : P1 154615, P2 154627, P3 154650, P4 154720, SCN 154748 PASS ; pytest 24/24"
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

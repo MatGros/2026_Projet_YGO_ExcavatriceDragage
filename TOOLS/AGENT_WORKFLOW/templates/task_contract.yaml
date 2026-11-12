@@ -63,6 +63,30 @@ contract:
     preexistant, risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur,
     pas a la fin et jamais silencieusement. Signaler n'est pas elargir le scope.
 
+  # ── 8. Note compagnon (T427-AC5) ─────────────────────────────────────────
+  # Fichier compagnon MARKDOWN lie au contrat : schémas, graphiques, notes
+  # visuelles. C'est un chemin de projet (DOC/ ou TOOLS/) ; son existence
+  # physique est vérifiée par G530. Le parseur du contrôle n'attendrait pas
+  # une fiche complète : le champ reste facultatif, utile dès que la tâche
+  # mérite un support visuel.
+  # companion_doc: "DOC/WFLOW/TASKS/T<ID>_<NOM>/TASK_NOTE_<ID>_…_v1.0.md"
+
+# ── Plan d'exécution (T427-AC2) : jalons testables, au moins un dès C2 ──────
+# Un jalon sans done_when mesurable ne cadre rien (contrôle T9 en avertissement).
+execution_plan:
+  milestones:
+  - id: M0
+    title: 'Cadrage et contrat validé'
+    done_when: 'GO explicite du plan enregistré, contrat check_task_contract PASS'
+  - id: M1
+    title: '…'
+    done_when: '…'
+
+# ── Sas d'essais (T427-AC2) : UNE ligne par essai, ≤ 120 caractères ────────
+# Pas de code à chaud ni de paragraphe (contrôle T10 en avertissement).
+# Format attendu : `<commande ou essai> — <résultat en un fait>`.
+test_feedback: []               # ex: "G200 --report: PASS (0 erreur) sur bundle regenere"
+
 # ═══════════════════════════════════════════════════════════════════════════
 # 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
 # ═══════════════════════════════════════════════════════════════════════════
@@ -77,6 +101,14 @@ tracking:
   established: []            # Chaque acquis cite une preuve et sa portée.
   unknowns: []               # Donnée manquante, impact et moyen de l'obtenir.
   next_action: ""
+  # ── Budget sous-agents (T427-AC2) : cohérence contrôlée (T11 avertissement) ─
+  # total = budget de la session/tâche, used = appels consommés,
+  # parallel_max = maximum d'appels simultanés. Chaque ligne de log = 1 appel.
+  budget:
+    total: 10                 # défaut projet ; tout dépassement = accord humain
+    used: 0
+    parallel_max: 3
+    log: []                   # ex: "deepseek-v4.1 · audit critique hooks · 1/10"
   owners:
     accountable: ""
     executor: ""
