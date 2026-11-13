@@ -2,6 +2,8 @@
 Script de statusline et titre de terminal dynamique pour Antigravity CLI (agy), Claude Code et Codex.
 Le titre terminal reprend le titre lisible validé par /rename-session, puis l'identifiant du CLI.
 La ligne de statut affiche l'état de liaison au Superviseur.
+Deuxième ligne (2026-11-13) : état du workflow projet (ACTIF/OFF + voie) et repère git
+(branche, worktree, écart avec l'upstream, fichiers modifiés).
 Garanti sans plantage (exit 0) et robuste aux encodages Windows.
 """
 import sys
@@ -14,6 +16,11 @@ import ctypes
 from ctypes import wintypes
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from statusline_indicators import (  # noqa: E402  (chemin local du script)
+    STATUSLINE_INDENT, get_git_badge, get_workflow_badge,
+)
+
 # Forcer UTF-8 avec fallback sur remplacement si le terminal est en cp1252
 if hasattr(sys.stdout, "reconfigure"):
     try:
@@ -23,6 +30,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 REPO_ROOT = Path(r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage")
 APP_DATA = Path(r"C:\Users\ZEDVICTUS\.gemini\antigravity-cli")
+
 
 DEBUG_LOG = Path(os.environ.get("LOCALAPPDATA", r"C:\Users\ZEDVICTUS\AppData\Local")) / "Temp" / "session_statusline_debug.log"
 
@@ -394,6 +402,8 @@ def main():
 
             sup_badge = get_supervisor_status(conv_id)
             print(f"{colored_label} {dim}│{reset} {sup_badge}")
+            # 2026-11-13 : deuxième ligne compacte — état du workflow + repère git.
+            print(f"{STATUSLINE_INDENT}{get_workflow_badge(conv_id)} │ {get_git_badge()}")
     except Exception:
         # Filet de sécurité absolu : ne JAMAIS crasher en code 1
         print("🚀 AGY Antigravity")

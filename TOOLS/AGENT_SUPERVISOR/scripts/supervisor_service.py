@@ -133,11 +133,12 @@ def validate_mission_structure(value):
 
 
 def session_display_title(session):
-    """Expose only the single-line title set by /rename-session to local status surfaces."""
+    """Expose the first single-line alias/title from connection or rename to local status surfaces."""
     alias = str(session.get("alias", "")).strip()
     mission = str(session.get("mission", "")).strip()
-    if alias and mission.startswith(alias + " ") and "\n" not in mission and "\r" not in mission:
-        return mission.partition("Dossier:")[0].rstrip(" —").strip()[:200]
+    title_line = mission.splitlines()[0].strip() if mission else ""
+    if alias and title_line.startswith(alias + " "):
+        return title_line.partition("Dossier:")[0].rstrip(" —").strip()[:200]
     return alias[:200]
 
 DEFAULT_JUDGE_SETTINGS = dict(temperature=0, output_tokens=1600, timeout_seconds=30,

@@ -61,15 +61,19 @@ def read_state(key: str) -> dict | None:
 
 
 VOIES = {"1": "Orchestrateur", "2": "Tâche", "3": "Troubleshooting"}
+# Ligne d'etape du projet (AGENTS.md § "Ligne d'etape").
+ETAPES = ("CADRAGE", "ÉTUDE", "RÉALISATION", "TEST", "RESTITUTION", "DIAGNOSTIC", "ARRÊT")
 
 
-def write_state(key: str, etat: str, mode: str | None, voie: str | None = None) -> dict:
+def write_state(key: str, etat: str, mode: str | None, voie: str | None = None,
+                etape: str | None = None) -> dict:
     prev = read_state(key) or {}
     data = {
         "session_id": key,
         "etat": etat,
         "mode": mode or prev.get("mode", "fresh"),
         "voie": voie,
+        "etape": etape or prev.get("etape"),
         "seq": int(prev.get("seq", 0)) + 1,
         "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
@@ -160,7 +164,7 @@ def identity_lines(key: str, alias: str | None) -> list[str]:
 
 
 def render(etat: str, mode: str | None, seq: int | None, key: str = "", alias: str | None = None,
-           voie: str | None = None) -> str:
+           voie: str | None = None, etape: str | None = None) -> str:
     counts, fresh = summary_status()
     agents_ok = "présent" if AGENTS.is_file() else "ABSENT — arrêt"
     token = f"{etat}/{seq}" if seq is not None else etat
@@ -173,6 +177,7 @@ def render(etat: str, mode: str | None, seq: int | None, key: str = "", alias: s
         lines += identity_lines(key, alias)
     lines += [
         f"🧭 Mode : {mode or '—'}",
+        f"🪜 Étape : {etape or '— (non renseignée)'}",
         f"📊 Projet : {counts} · résumé {fresh}",
         f"📚 AGENTS.md : {agents_ok}",
     ]
@@ -225,7 +230,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         argv = [routed[0]] + ([routed[1]] if routed[1] else [])
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=("enter", "off", "status", "voie"))
+    parser.add_argument("command", choices=("enter", "off", "status", "voie", "etape"))
     parser.add_argument("mode", nargs="?", default=None, help="fresh | resume (pour enter)")
     parser.add_argument("--session", default=None, help="clé de session (sinon CLAUDE_CODE_SESSION_ID)")
     args = parser.parse_args(argv)
@@ -242,13 +247,26 @@ def main(argv: list[str] | None = None) -> int:
 
     alias = supervisor_alias(key)
 
+    if args.command == "etape":
+        cur = read_state(key)
+        if cur is None or cur.get("etat") != "ACTIF":
+            print("⚠️ Workflow non actif : tape /workflow-project d'abord.")
+            return 0
+        wanted = (args.mode or "").strip().upper()
+        if wanted not in ETAPES:
+            print(f"ERREUR : étape inconnue « {wanted} » (attendu : {', '.join(ETAPES)}).", file=sys.stderr)
+            return 2
+        data = write_state(key, "ACTIF", cur.get("mode"), voie=cur.get("voie"), etape=wanted)
+        print(render(data["etat"], data["mode"], data["seq"], key, alias, data.get("voie"), data.get("etape")))
+        return 0
+
     if args.command == "status":
         data = read_state(key)
         if data is None:
             print(render("INDÉTERMINÉ", None, None, key, alias))
             print("⚠️ Pas d'état lisible pour cette session : traiter comme INACTIF, rien n'est supposé.")
             return 0
-        print(render(data["etat"], data.get("mode"), data.get("seq"), key, alias))
+        print(render(data["etat"], data.get("mode"), data.get("seq"), key, alias, data.get("voie"), data.get("etape")))
         return 0
 
     if args.command == "voie":
@@ -257,14 +275,14 @@ def main(argv: list[str] | None = None) -> int:
             print("⚠️ Workflow non actif : tape /workflow-project d'abord, puis le numéro.")
             return 0
         data = write_state(key, "ACTIF", cur.get("mode"), voie=VOIES[args.mode])
-        print(render(data["etat"], data["mode"], data["seq"], key, alias, data["voie"]))
+        print(render(data["etat"], data["mode"], data["seq"], key, alias, data["voie"], data.get("etape")))
         return 0
 
     if args.command == "enter":
         data = write_state(key, "ACTIF", args.mode or "fresh")
     else:
         data = write_state(key, "OFF", None)
-    print(render(data["etat"], data["mode"], data["seq"], key, alias, data.get("voie")))
+    print(render(data["etat"], data["mode"], data["seq"], key, alias, data.get("voie"), data.get("etape")))
     return 0
 
 

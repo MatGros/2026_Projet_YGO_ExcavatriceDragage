@@ -54,6 +54,11 @@
             "type": "command",
             "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_stop.py",
             "timeout": 150
+          },
+          {
+            "type": "command",
+            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_workflow_attest.py",
+            "timeout": 20
           }
         ]
       }

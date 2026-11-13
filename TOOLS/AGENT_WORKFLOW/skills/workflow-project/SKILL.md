@@ -54,6 +54,20 @@ pas une tâche du catalogue).
   avec `/workflow-project` ou `off`.
 - **Résumé `PÉRIMÉ` ou `ABSENT`** : le signaler dans 📊, sans lire `TASKS.yaml` entier.
 
+## 3bis. 🪜 Tenir l'étape à jour (alimente la ligne de statut)
+
+La ligne de statut du terminal affiche l'état du workflow **et** l'étape en cours. Elle se met
+à jour **au changement**, jamais à chaque message. Quand l'étape change (CADRAGE, ÉTUDE,
+RÉALISATION, TEST, RESTITUTION, DIAGNOSTIC, ARRÊT — cf. `AGENTS.md` § « Ligne d'étape »),
+appeler une seule fois :
+
+```text
+python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py etape "<ÉTAPE>" --session "$CLAUDE_CODE_SESSION_ID"
+```
+
+L'étape est refusée si elle n'est pas dans la liste fermée ci-dessus ; le workflow doit être
+`ACTIF` pour qu'elle soit mémorisée. Aucun effet sur le catalogue ni sur les verrous.
+
 ## 4. 🚫 Ce que la commande ne fait pas
 
 - Aucune écriture dans le dépôt : l'état vit dans `%LOCALAPPDATA%/ExcavatriceDragage/workflow/`.
