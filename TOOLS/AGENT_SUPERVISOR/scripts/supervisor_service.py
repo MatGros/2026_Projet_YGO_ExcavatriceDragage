@@ -1128,7 +1128,7 @@ class Supervisor:
 
     @staticmethod
     def _new_session(sid, platform, native_id, alias, enabled, mission=""):
-        return dict(id=sid, platform=platform, native_id=native_id, alias=str(alias)[:100], mission=mission, initial_mission=mission, mission_updated_at=timestamp(), mission_structure={}, mission_structure_updated_at=None, memory=[], context_truncated=False,
+        return dict(id=sid, platform=platform, native_id=native_id, alias=str(alias)[:100], task_id="", task_title="", mission=mission, initial_mission=mission, mission_updated_at=timestamp(), mission_structure={}, mission_structure_updated_at=None, memory=[], context_truncated=False,
                     enabled=enabled, saved_enabled=enabled, state="waiting" if enabled else "paused", closed=False, source=None, error=None,
                     messages_observed=0,
                     last_event=None, last_analysis=None, analysis_state="waiting" if mission else "context_required", analysis_error=None,
@@ -1163,7 +1163,7 @@ class Supervisor:
         if self.load_error:
             raise ValueError("Configuration illisible : ecriture refusee pour proteger les donnees existantes")
         data = dict(model=self.model, allow_cloud=self.allow_cloud, judge_settings=self.judge_settings, sessions=[
-            {key: value.get(key, False if key == "closed" else None) for key in ("id", "platform", "native_id", "alias", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "alerts", "source_checkpoint", "source_event_index", "context_revision", "analyzed_revision", "context", "context_truncated", "messages_observed", "memory", "recovery", "enabled", "events", "framing", "source_generation", "acquired_proofs", "session_journal", "judge_turn_count", "closed")} for value in self.sessions.values()])
+            {key: value.get(key, False if key == "closed" else None) for key in ("id", "platform", "native_id", "alias", "task_id", "task_title", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "alerts", "source_checkpoint", "source_event_index", "context_revision", "analyzed_revision", "context", "context_truncated", "messages_observed", "memory", "recovery", "enabled", "events", "framing", "source_generation", "acquired_proofs", "session_journal", "judge_turn_count", "closed")} for value in self.sessions.values()])
         if self.persist_chat:
             data['chat_histories'] = {('global' if key is None else key): value for key, value in self._chat_histories.items()}
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
