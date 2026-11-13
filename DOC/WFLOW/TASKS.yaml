@@ -76,11 +76,11 @@ tasks:
   bloque_par: []
 - id: T429
   parent_id: ''
-  statut: ⏸️
+  statut: ⏳
   criticite: C2
   domaine: OUTILLAGE / AGENT_SUPERVISOR / PLUGIN VS CODE
-  agent: AGY01
-  date: '2026-11-09T05:51:30+01:00'
+  agent: CC01
+  date: '2026-11-13T14:58:01+01:00'
   titre: 'Agent Supervisor : fiabiliser reprise, cycle des alertes, IHM et plugin sur parcours reels'
   contexte: 'Campagne de fiabilisation du Supervisor lancee le 2026-11-08, jusqu ici suivie sans ID formel. Document unique
     de pilotage (plan, decisions, preuves, limites) : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
@@ -132,11 +132,11 @@ tasks:
     mesurable AC-F0 a AC-F4, AC-X ; preuves et revues A/B dans tracking). Pilotage detaille : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md'
   bloque_par: ''
   work_lock:
-    actor: AGY01
-    token: 5mIZrcT-olWu5ESc1FBB-PtVWQ6oMmIn
-    acquired_at: '2026-11-09T03:39:09+00:00'
+    actor: CC01
+    token: DhFsDsuet8HqBuqIJFwSozcES5zjq0Ug
+    acquired_at: '2026-11-13T13:57:52+00:00'
   edit_flag: null
-  revision: 20d77368e9f7aa824b526da5cbf4e0999b17d2795986d0de5707985d012f8161
+  revision: d1236240b4ae505f617a61312abc0c2bda1dc6fa7a2b6ac4dac1c8f7bf98f47f
 - id: T428
   parent_id: ''
   statut: ⏸️
