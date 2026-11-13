@@ -214,3 +214,21 @@ def test_task_title_resolution_refuses_missing_or_duplicate_titles():
             [{"id": "T423", "titre": "IHM Pack 1"}, {"id": "T423", "titre": "Autre titre"}],
             "T423",
         )
+
+
+def test_split_alias_accepts_a_full_name_and_keeps_the_machine_alias():
+    """T429 (2026-11-13) : l'exploitant peut donner le NOM COMPLET ; l'alias machine
+    reste 'TXXX-AGENT', la designation devient le titre lisible."""
+    from TOOLS.AGENT_SUPERVISOR.scripts import connect_session
+
+    alias, designation = connect_session.split_alias("T417-C-AGY02 GEMINI 4 HYDRO CHALLENGE SIMU M3")
+
+    assert alias == "T417-C-AGY02"
+    assert designation == "GEMINI 4 HYDRO CHALLENGE SIMU M3"
+    assert connect_session.validate_alias(alias) == "T417-C-AGY02"
+
+
+def test_split_alias_keeps_a_canonical_alias_untouched():
+    from TOOLS.AGENT_SUPERVISOR.scripts import connect_session
+
+    assert connect_session.split_alias("T429-MMX01") == ("T429-MMX01", "")

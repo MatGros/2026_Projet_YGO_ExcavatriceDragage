@@ -222,7 +222,7 @@ def get_session_info(conv_id, cli_name: str = "agy"):
             pass
 
     # 2. Si Claude Code : lire le dernier ai-title dans le transcript
-    if "claude" in (cli_name or "").lower() and conv_id:
+    if not raw_title and "claude" in (cli_name or "").lower() and conv_id:
         try:
             projects_dir = Path.home() / ".claude" / "projects"
             if projects_dir.exists():
@@ -241,7 +241,7 @@ def get_session_info(conv_id, cli_name: str = "agy"):
             pass
 
     # 3. Si Antigravity : vérifier si /rename dans SQLite est plus récent
-    if "agy" in (cli_name or "").lower():
+    if not raw_title and "agy" in (cli_name or "").lower():
         db_file = APP_DATA / "conversation_summaries.db"
         if db_file.exists():
             try:

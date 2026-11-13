@@ -1,4 +1,6 @@
 import sys
+import json
+import sqlite3
 from pathlib import Path
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
@@ -6,6 +8,37 @@ sys.path.insert(0, str(SCRIPTS_DIR))
 
 import session_statusline
 from TOOLS.AGENT_SUPERVISOR.scripts.supervisor_service import Supervisor
+
+
+def _mock_supervisor_sessions(monkeypatch, sessions):
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+        def read(self):
+            return json.dumps({"sessions": sessions}).encode("utf-8")
+
+    monkeypatch.setattr(
+        session_statusline.urllib.request,
+        "urlopen",
+        lambda *_args, **_kwargs: FakeResponse(),
+    )
+
+
+def _create_antigravity_title_db(app_data, title):
+    app_data.mkdir(parents=True, exist_ok=True)
+    db_path = app_data / "conversation_summaries.db"
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            "CREATE TABLE conversation_summaries (conversation_id TEXT, title TEXT)"
+        )
+        conn.execute(
+            "INSERT INTO conversation_summaries (conversation_id, title) VALUES (?, ?)",
+            ("conversation-id", title),
+        )
 
 
 def test_statusline_reapplies_full_explicit_terminal_title(monkeypatch, capsys):
@@ -55,6 +88,80 @@ def test_supervisor_display_title_restores_the_full_session_title(monkeypatch):
     title, _actor = session_statusline.get_session_info("conversation-id", "codex.exe")
 
     assert title == "T000-CDX02 FABLE 5-2 CHALLENGE M3 SIMULATION"
+
+
+def test_supervisor_title_wins_over_stale_antigravity_sqlite_title(monkeypatch, tmp_path):
+    supervisor_title = "T000-AGY02 GEMINI 4 HYDRO CHALLENGE SIMU M3"
+    monkeypatch.setattr(session_statusline, "APP_DATA", tmp_path)
+    _create_antigravity_title_db(tmp_path, "Gemini 4 Hydro Test And Project Workflow")
+    _mock_supervisor_sessions(
+        monkeypatch,
+        [{
+            "native_id": "conversation-id",
+            "alias": "T000-AGY02",
+            "display_title": supervisor_title,
+        }],
+    )
+
+    title, _actor = session_statusline.get_session_info("conversation-id", "agy.exe")
+
+    assert title == supervisor_title
+
+
+def test_antigravity_sqlite_title_remains_fallback_without_supervisor_title(
+    monkeypatch, tmp_path
+):
+    sqlite_title = "Gemini 4 Hydro Test And Project Workflow"
+    monkeypatch.setattr(session_statusline, "APP_DATA", tmp_path)
+    _create_antigravity_title_db(tmp_path, sqlite_title)
+    _mock_supervisor_sessions(monkeypatch, [])
+
+    title, _actor = session_statusline.get_session_info("conversation-id", "agy.exe")
+
+    assert title == sqlite_title
+
+
+def test_supervisor_title_wins_over_stale_claude_transcript_title(monkeypatch, tmp_path):
+    supervisor_title = "T000-CC10 MULTITASK ORCHESTRATOR AGENT"
+    project_dir = tmp_path / ".claude" / "projects" / "project"
+    project_dir.mkdir(parents=True)
+    transcript = project_dir / "conversation-id.jsonl"
+    transcript.write_text(
+        json.dumps({"type": "ai-title", "aiTitle": "Old Claude title"}) + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(session_statusline.Path, "home", lambda: tmp_path)
+    _mock_supervisor_sessions(
+        monkeypatch,
+        [{
+            "native_id": "conversation-id",
+            "alias": "T000-CC10",
+            "display_title": supervisor_title,
+        }],
+    )
+
+    title, _actor = session_statusline.get_session_info("conversation-id", "claude.exe")
+
+    assert title == supervisor_title
+
+
+def test_claude_transcript_title_remains_fallback_without_supervisor_title(
+    monkeypatch, tmp_path
+):
+    transcript_title = "Old Claude title"
+    project_dir = tmp_path / ".claude" / "projects" / "project"
+    project_dir.mkdir(parents=True)
+    transcript = project_dir / "conversation-id.jsonl"
+    transcript.write_text(
+        json.dumps({"type": "ai-title", "aiTitle": transcript_title}) + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(session_statusline.Path, "home", lambda: tmp_path)
+    _mock_supervisor_sessions(monkeypatch, [])
+
+    title, _actor = session_statusline.get_session_info("conversation-id", "claude.exe")
+
+    assert title == transcript_title
 
 
 def test_supervisor_summary_exposes_only_rename_title(tmp_path):
