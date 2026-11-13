@@ -293,7 +293,9 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
                             mission_structure_loaded=structure_loaded)
     result = api_json(base_url + "/api/supervision", token=snapshot.get("token"), payload={
         "action": "add", "platform": platform, "native_id": session_id,
-        "alias": alias.strip(), "mission": attached_mission})
+        "alias": alias.strip(), "mission": attached_mission,
+        # T429 : la tache et son titre sont des DONNEES, plus du texte a parser.
+        "task_ref": task_ref, "task_title": resolved_title})
     attached = next((item for item in result.get("sessions", [])
                      if item.get("platform") == platform and item.get("native_id") == session_id), None)
     if not attached or not attached.get("source"):
