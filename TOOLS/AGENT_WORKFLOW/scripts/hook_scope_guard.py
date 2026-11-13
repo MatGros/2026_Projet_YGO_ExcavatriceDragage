@@ -29,13 +29,35 @@ WRITE_TOOLS = ("Edit", "Write", "MultiEdit", "NotebookEdit")
 
 
 def mode() -> str:
-    value = (os.environ.get("TASK_SCOPE_GUARD") or "report").strip().lower()
-    return value if value in ("report", "block") else "report"
+    """Refus ACTIF par defaut (2026-11-13, accord exploitant). 'report' = simple signalement."""
+    value = (os.environ.get("TASK_SCOPE_GUARD") or "block").strip().lower()
+    return value if value in ("report", "block") else "block"
 
 
 def evaluate(session_id: str, target: str) -> dict:
     """Décide (ou non) d'une écriture. Pur :aucun effet de bord."""
-    scope = task_scope.scope_for_session(session_id)
+    # 1) Deny-list GLOBALE : verifiee AVANT tout (aucune derogation script ne l'ouvre).
+    absolute_relative = task_scope.normalize(target)
+    pinned_allowed = []
+    pinned = task_scope.pinned_scope(session_id)
+    if pinned:
+        pinned_allowed = list(pinned.get("allowed") or [])
+    if task_scope.is_absolute_denied(absolute_relative, pinned_allowed):
+        return {"decision": "block", "kind": "interdit",
+                "reason": "chemin interdit par la regle du projet (deny-list globale)",
+                "path": absolute_relative, "task_id": None, "scope": []}
+
+    if not task_scope.is_inside_repo(absolute_relative) and not task_scope.is_scratch(absolute_relative):
+        # Hors depot et hors espace provisoire : ce n est pas du travail projet.
+        # La deny-list globale a deja tranche (premiere verification).
+        return {"decision": "allow", "kind": "hors depot",
+                "reason": "chemin hors depot : hors perimetre produit, non compte comme travail projet"}
+
+    if task_scope.is_scratch(absolute_relative):
+        # Espace provisoire : autorise, jamais comptabilise comme travail projet.
+        return {"decision": "allow", "kind": "scratch", "reason": "espace provisoire hors depot"}
+
+    scope = task_scope.effective_scope(session_id)
     if not scope.get("produit"):
         return {"decision": "allow", "kind": "inconnu", "reason": "aucun perimetre declare pour cette session"}
     check = task_scope.verify_scope(session_id)
@@ -163,22 +185,21 @@ def main() -> int:
         f"--path \"{verdict.get('path')}\" --motif \"<motif>\"\n"
         "Sinon, reste dans le perimetre : la phase en cours (CADRAGE) est dediee a la tache attribuee."
     )
-    if task_scope.is_absolute_denied(relative):
-        # Deny-list globale : refus ABSOLU (meme en mode report). Seul l exploitant peut
-        # deroger, chemin par chemin, avec un motif (task_scope.py deroge).
+    if verdict.get("kind") == "interdit":
         absolute = (
-            f"ECRITURE INTERDITE PAR LA REGLE DU PROJET : {relative}\n\n"
-            "Ce chemin fait partie de la deny-list globale (code machine, reglages, hooks, skills). "
-            "Aucun contrat de tache ne peut l autoriser.\n"
-            "Si l ecriture est legitime et demandee, fais-la autoriser explicitement :\n"
-            f"  python TOOLS/AGENT_WORKFLOW/scripts/task_scope.py deroge --session {session_id} "
-            f"--path \"{relative}\" --motif \"<motif>\"\n"
+            "ECRITURE INTERDITE PAR LA REGLE DU PROJET : " + str(verdict.get("path")) + "\n\n"
+            "Ce chemin fait partie de la deny-list globale (code machine, reglages, hooks, skills).\n"
+            "Aucun contrat de tache, aucune derogation script ne peut l ouvrir :\n"
+            "ces chemins sont laisses a l exploitant, hors de cet agent.\n"
+            "S il faut vraiment y ecrire, fais-le hors de l agent (editeur, terminal) ;\n"
+            "le trace le consignera alors comme ecriture non tracee (M11).\n"
         )
         print(absolute, file=sys.stderr)
-        miss_log.record(session_id, "M10", f"Ecriture sur un chemin interdit par la regle : {relative}",
+        miss_log.record(session_id, "M10",
+                        "Ecriture sur un chemin interdit par la regle : " + str(verdict.get("path")),
                         "deny-list globale")
-        trace_log.emit("ecriture", session=session_id, path=relative, kind_verdict="interdit",
-                       decision="block", derogation=False, task_id=scope.get("task_id"))
+        trace_log.emit("ecriture", session=session_id, path=verdict.get("path"),
+                       kind_verdict="interdit", decision="block", derogation=False)
         return 2
 
     if mode() == "block":

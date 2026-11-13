@@ -548,6 +548,12 @@ def evidence_provenance(session, evidence, event_id=None):
             return {"source": "preuves", "in_window": False,
                     "event_id": item.get("event_id"), "at": item.get("acquired_at")}
 
+    for item in session.get("framing", []) or []:
+        if text and text in str(item.get("text", "")):
+            return {"source": "cadrage", "in_window": False,
+                    "event_id": item.get("event_id"), "event_index": item.get("event_index"),
+                    "at": item.get("observed_at")}
+
     return {"source": "introuvable", "in_window": False, "event_id": event_id}
 
 
@@ -1466,7 +1472,7 @@ class Supervisor:
                     if str(scripts_dir) not in sys.path:
                         sys.path.insert(0, str(scripts_dir))
                     import task_scope
-                    session["scope_snapshot"] = task_scope.write_pinned(sid, session["task_id"])
+                    session["scope_snapshot"] = task_scope.write_pinned(sid, session["task_id"], native_id=session.get("native_id", ""))
                 except Exception:
                     session["scope_snapshot"] = {}
                 if source is not None:
@@ -1530,7 +1536,7 @@ class Supervisor:
                         if str(scripts_dir) not in sys.path:
                             sys.path.insert(0, str(scripts_dir))
                         import task_scope
-                        session["scope_snapshot"] = task_scope.write_pinned(sid, session["task_id"])
+                        session["scope_snapshot"] = task_scope.write_pinned(sid, session["task_id"], native_id=session.get("native_id", ""))
                     except Exception:
                         pass
                 if command.get("task_title"):
@@ -2599,6 +2605,8 @@ class Supervisor:
                                 existing["title"] = result["title"].strip()[:80]
                         existing["occurrences"] += 1
                         existing["last_occurrence"] = timestamp()
+                        # La provenance est un ETAT : elle est recalculee a chaque occurrence.
+                        existing["evidence_provenance"] = evidence_provenance(session, existing.get("evidence"))
                         if existing["disposition"] != "new":
                             session["analysis_state"] = "alert_acknowledged"
                     elif not closed_match or previous_alert_id:
@@ -2622,6 +2630,10 @@ class Supervisor:
                 if not error:
                     review_result = dict(result, reviews=[r for r in result.get("reviews", []) if isinstance(r, dict) and not any(a["id"] == r.get("alert_id") and business_state(a) == "closed" for a in session["alerts"])])
                     reviewed = apply_reviews(session, review_result, messages, timestamp())
+                    for alert in session["alerts"]:
+                        if alert["id"] in reviewed:
+                            alert["evidence_provenance"] = evidence_provenance(
+                                session, (alert.get("assessment") or {}).get("evidence") or alert.get("evidence"))
                     state_update = result.get("state_update")
                     if isinstance(state_update, str) and state_update.strip() and len(state_update.strip()) >= 5:
                         clean_update = state_update.strip()[:300]

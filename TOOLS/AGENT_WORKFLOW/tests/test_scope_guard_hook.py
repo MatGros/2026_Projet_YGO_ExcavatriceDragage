@@ -93,3 +93,61 @@ def test_hook_ignores_read_only_tools(monkeypatch):
     monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps({
         "tool_name": "Read", "session_id": "s", "tool_input": {"file_path": "CODE/x.st"}})))
     assert hook_scope_guard.main() == 0
+
+
+def test_absolute_deny_is_checked_before_any_derogation(monkeypatch):
+    """La deny-list globale ne s'ouvre PAS par une derogation ecrite par l'agent."""
+    monkeypatch.setattr(task_scope, "scope_for_session", lambda _s: SCOPE)
+    monkeypatch.setattr(task_scope, "is_derogated", lambda _s, _p: True)  # meme derogue
+
+    verdict = hook_scope_guard.evaluate("s", "CODE/PRG_00.st")
+
+    assert verdict["decision"] == "block"
+    assert verdict["kind"] == "interdit"
+
+
+def test_absolute_deny_ignores_the_contract(monkeypatch):
+    """Meme si le contrat autorise, le chemin interdit reste refuse."""
+    monkeypatch.setattr(task_scope, "scope_for_session", lambda _s: dict(SCOPE, produit=["CODE/**"]))
+    monkeypatch.setattr(task_scope, "is_derogated", lambda _s, _p: False)
+
+    assert hook_scope_guard.evaluate("s", "CODE/PRG_00.st")["decision"] == "block"
+
+
+def test_default_mode_is_block(monkeypatch):
+    monkeypatch.delenv("TASK_SCOPE_GUARD", raising=False)
+    assert hook_scope_guard.mode() == "block"
+    monkeypatch.setenv("TASK_SCOPE_GUARD", "report")
+    assert hook_scope_guard.mode() == "report"
+
+
+def test_end_to_end_deny_returns_exit_code_two(monkeypatch, capsys):
+    """Test de BOUT EN BOUT : le hook rend 2 (refus reel) sur un chemin protege."""
+    import io
+
+    monkeypatch.setattr(task_scope, "scope_for_session", lambda _s: SCOPE)
+    monkeypatch.setattr(task_scope, "effective_scope", lambda _s: SCOPE)
+    monkeypatch.setattr(task_scope, "pinned_scope", lambda _s: {})
+    monkeypatch.setattr(task_scope, "is_derogated", lambda _s, _p: True)
+    monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps({
+        "tool_name": "Edit", "session_id": "s",
+        "tool_input": {"file_path": "C:/repo/CODE/PRG_00.st"}})))
+
+    assert hook_scope_guard.main() == 2
+    assert "INTERDITE" in capsys.readouterr().err
+
+
+def test_end_to_end_protected_path_allowed_when_pinned(monkeypatch, capsys):
+    """Un contrat qui declarait deja le chemin (epingle) reste autorise."""
+    import io
+
+    monkeypatch.setattr(task_scope, "scope_for_session", lambda _s: SCOPE)
+    monkeypatch.setattr(task_scope, "effective_scope", lambda _s: dict(SCOPE, produit=["CODE/**"]))
+    monkeypatch.setattr(task_scope, "pinned_scope",
+                        lambda _s: {"allowed": ["CODE/**"], "digest": "d"})
+    monkeypatch.setattr(task_scope, "is_derogated", lambda _s, _p: False)
+    monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps({
+        "tool_name": "Edit", "session_id": "s",
+        "tool_input": {"file_path": "C:/repo/CODE/PRG_00.st"}})))
+
+    assert hook_scope_guard.main() == 0
