@@ -328,6 +328,9 @@ def check(path: Path, release: bool) -> tuple[list[str], list[str]]:
     text = path.read_text(encoding="utf-8", errors="replace")
 
     data = load_yaml(path)
+    if data is not None:
+        # T429 (revue GLM 2026-11-13) : aucun contrat ne peut autoriser un chemin interdit global.
+        errors.extend(check_absolute_deny(data))
     if data is None:
         warnings.append("PyYAML absent : analyse textuelle degradee (pip install pyyaml)")
         raw = scan_raw(text)
@@ -433,6 +436,38 @@ def check(path: Path, release: bool) -> tuple[list[str], list[str]]:
         errors.append("--release : lot INCOMPLET, ne pas annoncer termine")
 
     return errors, warnings
+
+
+# Interdits GLOBAUX : aucun contrat de tache ne peut les declarer "autorises"
+# (revue GLM 2026-11-13). Source unique : task_scope.ABSOLUTE_DENY.
+ABSOLUTE_DENY = (
+    "CODE/**", "CODE_XML/**", "PRJ_CODESYS/**",
+    ".claude/settings.json", ".claude/settings.local.json", ".claude/settings*.json",
+    ".claude/hooks/**", "TOOLS/AGENT_WORKFLOW/hooks/**",
+    "TOOLS/AGENT_WORKFLOW/skills/**", ".claude/skills/**", ".agents/skills/**", ".dsh/skills/**",
+)
+
+
+def _deny_hits(entries) -> list:
+    hits = []
+    for entry in entries or []:
+        text = str(entry)
+        for denied in ABSOLUTE_DENY:
+            base = denied[:-3] if denied.endswith("/**") else denied
+            if text == base or text.startswith(base + "/") or base in text:
+                hits.append((text, denied))
+                break
+    return hits
+
+
+def check_absolute_deny(data) -> list:
+    """Un `scope.allowed` qui touche un interdit global = erreur de contrat."""
+    problems = []
+    contract = (data or {}).get("contract") or {}
+    scope = contract.get("scope") or {}
+    for entry, denied in _deny_hits(scope.get("allowed")):
+        problems.append(f"T9: scope.allowed contient « {entry} » qui touche l'interdit global « {denied} »")
+    return problems
 
 
 def main() -> int:

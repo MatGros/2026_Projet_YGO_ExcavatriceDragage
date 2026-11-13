@@ -191,6 +191,18 @@ def main() -> int:
         "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
     })
 
+    # Couverture : toute modif reelle (git) absente du journal des ecritures est signalee.
+    try:
+        import task_scope
+        untraced = task_scope.untracked_writes(session_id)
+        for path in untraced:
+            miss_log.record(session_id, "M11", f"Ecriture non tracee par le hook : {path}",
+                            "la metrique de perimetre ne voit pas cette ecriture")
+            trace_log.emit("ecriture", session=session_id, path=path, kind_verdict="non_trace",
+                           decision="inconnu", derogation=False)
+    except Exception:
+        pass
+
     trace_log.emit("attestation", session=session_id, conform=conform, banner=bool(banner),
                    footer=has_footer, turns=turns, conform_turns=conform_turns,
                    etape=banner[1] if banner else None, voie=banner[2] if banner else None)

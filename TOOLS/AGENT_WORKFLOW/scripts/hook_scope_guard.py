@@ -38,6 +38,13 @@ def evaluate(session_id: str, target: str) -> dict:
     scope = task_scope.scope_for_session(session_id)
     if not scope.get("produit"):
         return {"decision": "allow", "kind": "inconnu", "reason": "aucun perimetre declare pour cette session"}
+    check = task_scope.verify_scope(session_id)
+    if not check.get("ok", True):
+        # Le contrat de tache a ete modifie en session : auto-elargissement du perimetre.
+        return {"decision": "block", "kind": "hors",
+                "reason": "perimetre de la tache modifie en session : " + str(check.get("reason")),
+                "path": task_scope.normalize(target), "task_id": scope.get("task_id"),
+                "scope": scope.get("produit")}
     relative = task_scope.normalize(target)
     kind = task_scope.classify(relative, scope["produit"], scope["interdits"], scope["processus"])
     if kind == "produit":
@@ -156,6 +163,24 @@ def main() -> int:
         f"--path \"{verdict.get('path')}\" --motif \"<motif>\"\n"
         "Sinon, reste dans le perimetre : la phase en cours (CADRAGE) est dediee a la tache attribuee."
     )
+    if task_scope.is_absolute_denied(relative):
+        # Deny-list globale : refus ABSOLU (meme en mode report). Seul l exploitant peut
+        # deroger, chemin par chemin, avec un motif (task_scope.py deroge).
+        absolute = (
+            f"ECRITURE INTERDITE PAR LA REGLE DU PROJET : {relative}\n\n"
+            "Ce chemin fait partie de la deny-list globale (code machine, reglages, hooks, skills). "
+            "Aucun contrat de tache ne peut l autoriser.\n"
+            "Si l ecriture est legitime et demandee, fais-la autoriser explicitement :\n"
+            f"  python TOOLS/AGENT_WORKFLOW/scripts/task_scope.py deroge --session {session_id} "
+            f"--path \"{relative}\" --motif \"<motif>\"\n"
+        )
+        print(absolute, file=sys.stderr)
+        miss_log.record(session_id, "M10", f"Ecriture sur un chemin interdit par la regle : {relative}",
+                        "deny-list globale")
+        trace_log.emit("ecriture", session=session_id, path=relative, kind_verdict="interdit",
+                       decision="block", derogation=False, task_id=scope.get("task_id"))
+        return 2
+
     if mode() == "block":
         print(message, file=sys.stderr)
         return 2  # refus : le message revient a l'agent
