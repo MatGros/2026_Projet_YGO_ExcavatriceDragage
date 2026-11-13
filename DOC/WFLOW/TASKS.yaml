@@ -133,7 +133,12 @@ tasks:
     CC01 : plan complet, detaille et verifie ecrit (T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md) avec 7 restes numerotes R1
     a R7, chacun avec critere de fin et commande de verification ; generateur du resume de catalogue (TASKS_ACTIVE_SUMMARY.md)
     livre : le bandeau de demarrage n''affiche plus PERIME. Restes : R1/R2 exploitant, R3/R4 agent T000, R5 alignement service,
-    R6 push sur accord.'
+    R6 push sur accord. 2026-11-13 CC01 (suite) : college d experts mixte (DeepSeek V4.1, GLM 5.3, agent natif) sur le garde
+    de derive ; 3 trous critiques fermes (deny-list globale non derivable, perimetre epingle par le service avec empreinte,
+    trace chainee) + couverture chiffree (M11) + lint en avertissement (14 tests du depot casses, repares) + provenance recalculee.
+    Tests : supervisor 206/206, workflow 126/126, UI PASS, layout 3 largeurs 0 echec. Service 8082 redploie (build cfa06b10c296),
+    8 affectations conservees, 7 perimetres eingles et verifies. Reste : AC-F3.5, AC-F3.9, push (36 commits non pousses),
+    et l arbitrage T427/T429 sur la propriete des gardes.'
   contrat: DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md (plan complet, detaille et verifie)
     + DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml (contrat mesurable
     AC-F0 a AC-F4, AC-X)
@@ -143,7 +148,7 @@ tasks:
     token: DhFsDsuet8HqBuqIJFwSozcES5zjq0Ug
     acquired_at: '2026-11-13T13:57:52+00:00'
   edit_flag: null
-  revision: aa477e53a9e37aa9655c18284a923dc2a4dd56a1f20133fcdb8db5eafdef82b3
+  revision: adbb6bd00e30700d6d7bae947e538d0907791bb9fe5d7889b464ca1a3ee6566c
 - id: T428
   parent_id: ''
   statut: ⏸️
