@@ -53,6 +53,11 @@
 | **R8** | **Prédicat de périmètre** — le périmètre d'une tâche devient une donnée (ensemble de chemins autorisés, déduit du contrat `scope.allowed`), pas une phrase dans un prompt | un prédicat booléen, testable, sans LLM : `chemin ∈ périmètre` ; T429 sert de cas d'école | tests unitaires du prédicat (inclus / exclu / chemin voisin) | CC01 (T427) |
 | **R9** | **Garde de dérive** — hook `PreToolUse` sur `Edit|Write|MultiEdit` : écriture hors périmètre → refus motivé + question à l'exploitant ; une dérogation confirmée est **enregistrée** (durable) | aucune écriture hors périmètre sans dérogation tracée ; le refus force la confirmation au lieu de la recommending | hook testé (chemin autorisé → passe ; hors périmètre → refus ; dérogation → passe) | CC01 (T427) |
 | **R10** | **Métrique de dérive** — part des N derniers fichiers touchés qui sont hors périmètre, recalculée depuis le transcript (les chemins y sont dans la trace) | la métrique est **comptée**, pas estimée : aucun avis involved ; elle alimente le constat du Superviseur (preuve citable) et la 2ᵉ ligne de la statusline | métrique recalculée et affichée ; le constat `scope_drift` cite le décompte | CC01 (T427 pour la mesure, T429 pour l'affichage et le constat) |
+| **R11** | **Panneau Mémoire lisible** — les 4 groupes (fenêtre / longue / journal / preuves) avec leur contenu, pas seulement leurs compteurs | l'exploitant voit d'un coup d'œil ce que le juge voit et ce qu'il ne voit plus | test DOM (4 groupes + extraits) · layout 0 échec | CC01 (T429) |
+| **R12** | **Constat autoportant** — chaque constat porte l'inventaire mémoire du moment du verdict + la provenance de sa preuve | un constat relu plus tard donne son contexte sans rouvrir le transcript | test (inventaire cohérent avec la fenêtre) · affichage | CC01 (T429) |
+| **R13** | **Lectures déclarées** — dossier de lecture borné, lecture seule, la liste est déclarée dans l'argumentaire | aucune lecture non déclarée ; fichier illisible signalé, jamais deviné | test (dossier joint, déclaration exacte) | CC01 (T429) |
+| **R14** | **Dossier de lecture ≠ lecture du dépôt** — les deux notions sont distinguées partout | aucune confusion dans l'affichage ni dans le journal | test DOM | CC01 (T429) |
+| **R15** | **Personas tracées** — chaque invocation de spécialiste est journalisée et visible | l'usage des 6 personas devient un fait | test (entrée journalisée) · affichage | CC01 (T429) |
 
 ---
 
@@ -109,6 +114,27 @@
 - l'**état du Superviseur** (muet / en erreur / actif).
 
 Production : hooks (mécanique, déterministe). Consommation : revue périodique + **T431** (« audits asynchrones, mémoire sourcée ») qui transforme les manquements récurrents en contre-mesures.
+
+---
+
+## 3quater. 👁️ Ce que le Superviseur montre, ce qu'il lit, ce qu'il déclare
+
+**Constat de l'exploitant (2026-11-13)** : la mémoire du Superviseur n'était pas lisible (fenêtre = **6 messages sur 3 000+ observés**, mémoire longue / journal / preuves invisibles), l'argumentaire d'un constat ne disait pas **quelles données venaient de quelle mémoire**, le Superviseur ne pouvait **lire aucun fichier du dépôt**, et les **agents spécialisés n'étaient pas tracés** — donc inexploitables en surveillance.
+
+**Principe retenu** : *ce que le Superviseur utilise est montré ; ce qu'il lit est déclaré ; ce qu'il ne fait pas est écrit.*
+
+| # | Reste | Contenu | Critère de fin vérifiable | Propriétaire |
+|---|---|---|---|---|
+| **R11** | **Panneau Mémoire lisible d'un coup d'œil** | 4 groupes séparés dans l'IHM : **Fenêtre** (ce que le juge voit maintenant) · **Mémoire longue** (hors fenêtre) · **Journal d'état** · **Preuves acquises** ; chaque groupe avec son compteur et ses **extraits** (rôle, index d'événement, horodatage, texte). Ligne de tête : fenêtre tronquée oui/non, règle du juge (N messages), événements écartés | à l'ouverture d'une session, l'exploitant voit les 4 groupes **et** le contenu de la fenêtre sans clic supplémentaire | test DOM (4 groupes + extraits présents) · `ui_layout_check` 0 échec |
+| **R12** | **Constat autoportant : ce que le juge avait sous les yeux** | chaque constat porte `memory_usage` : inventaire **au moment du verdict** (fenêtre n, longue n, journal n, preuves n, cadrage n, tronquée oui/non) + les identifiants des éléments disponibles + la provenance de **sa** preuve | un constat relu des mois plus tard indique son contexte exact sans rouvrir le transcript | test : `memory_usage` non vide et cohérent avec la fenêtre du moment · affichage DOM sous le constat |
+| **R13** | **Le Superviseur ne lit rien sans le dire** | v1 : le juge reçoit un **dossier de lecture** borné (contrat + plan de la tâche + fichiers cités par les constats ouverts), **lecture seule**, et **déclare** la liste dans l'argumentaire (`lecture_declaree`). Pas de boucle d'agent en v1 ; budget ≤ 6 fichiers et ≤ 12 000 caractères | chaque constat porte la liste exacte des fichiers lus ; un fichier illisible est **signalé**, jamais deviné | test : dossier joint, déclaration exacte, fichier illisible signalé · journal interne : la lecture est consignée |
+| **R14** | **Dossier de lecture ≠ lecture du dépôt** | distinction explicite dans l'IHM et dans l'argumentaire : « dossier de lecture (fourni au juge) » vs « accès direct au dépôt (interdit en v1) » | aucune confusion possible dans l'affichage ni dans le journal | test DOM (les deux libellés distincts) |
+| **R15** | **Les agents deviennent tracables** | chaque invocation de `specialist_runner.py` est journalisée (rôle, cible, session) → l'IHM affiche « spécialistes invoquées : HMI 2 · tests 1 » ou « aucune invocation ». Le Superviseur pourra **réclamer** un avis de spécialiste (v2), déclaré comme les lectures | l'usage réel des 6 personas devient un fait ; la question « pourquoi on les a faits » a une réponse factuelle | test : une invocation produit une entrée journalisée · affichage IHM |
+
+**Décisions figées sur ce lot**
+- **v1 = lecture seule, bornée, sans boucle d'agent.** Le dossier de lecture est fourni en une passe ; la boucle « le juge demande un fichier, le service le lit, le juge re-juge » est **hors v1** (à chiffrer avant).
+- Les **personas restent déclenchés** par l'agent ou l'exploitant — mais **tracés** (R15) avant d'être **branchés** sur le Superviseur.
+- La **mémoire longue reste exposée et invalidable, pas signée** (signature = T431).
 
 ---
 
