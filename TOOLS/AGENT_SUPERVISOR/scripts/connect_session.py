@@ -60,6 +60,23 @@ ALIAS_IDENTITY_PATTERN = re.compile(
 )
 
 
+def split_alias(alias: str) -> tuple[str, str]:
+    """Separe l'alias machine de la designation libre de l'exploitant.
+
+    "T417-C-AGY02 GEMINI 4 HYDRO CHALLENGE SIMU M3" -> ("T417-C-AGY02", "GEMINI 4 HYDRO CHALLENGE SIMU M3")
+    L'alias reste un identifiant machine ; la designation devient le titre lisible.
+    """
+    cleaned = str(alias or "").strip()
+    if not cleaned:
+        return "", ""
+    if re.fullmatch(ALIAS_PATTERN, cleaned):
+        return cleaned, ""
+    parts = cleaned.split(maxsplit=1)
+    if len(parts) == 2 and re.fullmatch(ALIAS_PATTERN, parts[0]):
+        return parts[0], parts[1].strip()
+    return cleaned, ""
+
+
 def validate_alias(alias: str) -> str:
     """Valide l'alias de session : strictement 'TXXX-AGENT' (ex: T429-AGY01, T000-CC01, T428-1-CDX01).
 
@@ -209,6 +226,7 @@ def populate_mission_from_contract(base_url: str, token: str, assignment_id: str
 def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
             base_url: str = "http://127.0.0.1:8082", *, task_title: str | None = None,
             confirm_without_task: bool = False, reassign: bool = False) -> dict:
+    alias, designation = split_alias(alias)
     alias = validate_alias(alias)
     identity = alias_identity(alias)
     if not identity:
@@ -244,7 +262,14 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
     if not mission.strip() or len(mission) > 1500:
         raise ValueError("Mission requise (1500 caractères maximum)")
     task_label = f"{task_ref} {resolved_title}"
-    attached_mission = f"{alias} {resolved_title}\nTâche / sujet : {task_label}\n{mission.strip()}"
+    # T429 : 1re ligne = le titre choisi par l exploitant (alias + designation) ;
+    # le titre officiel de la tache passe en 2e ligne, il n ecrase plus le titre.
+    title_line = f"{alias} {designation}".strip() if designation else f"{alias} {resolved_title}"
+    attached_mission = title_line
+    if resolved_title and not is_provisional:  # T000 : pas de doublon
+        # le titre explicite est deja dans la premiere ligne
+        attached_mission += f"\nTâche : {resolved_title}"
+    attached_mission += f"\nTâche / sujet : {task_label}\n{mission.strip()}"
     if len(attached_mission) > 1500:
         raise ValueError("Tâche et mission combinées : 1500 caractères maximum")
     base_url = validate_local_base_url(base_url)
@@ -254,11 +279,15 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
     existing = next((item for item in snapshot.get("sessions", [])
                      if item.get("platform") == platform and item.get("native_id") == session_id), None)
     if existing:
-        expected_prefix = f"{alias} {resolved_title}\nTâche / sujet : {task_label}\n"
-        if existing.get("alias") != alias or not str(existing.get("initial_mission", "")).startswith(expected_prefix):
+        current_mission = str(existing.get("initial_mission", ""))
+        same_task = current_mission.split("\n")[1:2] == [f"Tâche / sujet : {task_label}"] or f"Tâche / sujet : {task_label}" in current_mission
+        if existing.get("alias") != alias or not same_task:
             raise ValueError(
                 f"Session déjà reliée avec alias/tâche/titre différents ({existing.get('alias')}); "
-                "aucun changement appliqué, utilisez /rename-session pour l'alias."
+                "aucun changement appliqué. Pour transférer le suivi vers cette tâche, relancez avec --reassign :\n"
+                f"  py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/connect_session.py --platform {platform} "
+                f"--session-id {session_id} --alias \"{alias}\" --task \"{task_ref}\" "
+                f"--mission \"{mission.strip()[:80]}\" --reassign"
             )
         status = "already_assigned" if existing.get("source") and existing.get("state") in ("active", "paused", "waiting") else "source_unavailable"
         return dict(status=status, assignment_id=existing["id"], state=existing["state"],
