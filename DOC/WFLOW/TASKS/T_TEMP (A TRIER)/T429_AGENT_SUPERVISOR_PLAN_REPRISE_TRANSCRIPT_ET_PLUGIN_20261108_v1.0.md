@@ -30,10 +30,25 @@ Le rattrapage n'écrit jamais dans le chat de l'agent surveillé. L'usage évent
 respecter le consentement existant et être montré avant l'envoi. **Tâche formelle : `T429`** (catalogue
 `DOC/WFLOW/TASKS.yaml`, créée le 2026-11-09 à la demande de l'exploitant, CC01). Ce document reste le
 pilotage détaillé de T429 ; le catalogue porte l'état synthétique et les objectifs F1–F4.
-**Contrat mesurable :** `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T429_AGENT_SUPERVISOR_FIABILISATION.yaml`
+**Contrat mesurable :** `DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml`
 (AC-F0 à AC-F4, AC-X ; preuves et revues A/B consignées dans `tracking`).
 
-### 🟢 Exécution T429 — état courant au 9 novembre 2026
+### 🟢 Exécution T429 — état courant au 13 novembre 2026
+
+**Lot de fiabilisation du 13 novembre (constats exploitant : « je n'ai pas pu voir le Superviseur valider l'événement », « j'aimerais que le Superviseur comprenne que c'est ok »).**
+
+| AC | État | Preuve |
+|---|---|---|
+| AC-F1.9 | ✅ | *Perte silencieuse* : un événement écrit entre l'affectation et le premier démarrage était consommé par la prévisualisation de rattrapage, puis perdu. Corrigé dans `_resume_session` (une session qui n'a rien observé n'a pas d'intervalle à rattraper) + 2 gardes pytest (`test_events_written_after_attach_are_not_dropped_by_the_first_start`, `test_paused_gap_is_still_skipped_on_explicit_normal_resume`). |
+| AC-F2.11 | ✅ [réel] | *Réévaluation à la demande* : sur une session **en pause**, la demande de réévaluation reste désormais en `review_pending` sans jamais de verdict. Le Superviseur interroge maintenant le juge sur **ce seul constat** (extrait d'origine + queue observée + commentaire exploitant comme parole citable) : verdict en **2 s**, `review_state = complete`, raisonnement et preuve affichés. Constat `26fcd421` (session T429-AGY01, en pause) traité en réel. 3 gardes pytest (`tests/test_t429_scoped_review.py`). |
+| AC-F2.12 | ✅ | Une résolution proposée n'est plus rétrogradée en « incertain » par une réévaluation dont la preuve est sortie de la fenêtre bornée (`apply_reviews`). Le commentaire de l'exploitant devient une source citable (rôle `user_comment`). |
+| AC-F3.11 | ✅ | Écran étroit : la navigation système passait sur 3 lignes (108 px) et le 1ᵉʳ constat tombait sous la ligne de flottaison à 360 px (`first_finding_in_first_screen` **échouait**). Navigation au pictogramme sous 600 px → `firstFindingTop` 733 / 715 / 717 pour 1440 / 390 / 360 px, 0 débordement, 0 défilement horizontal. |
+
+**Suites au 13 novembre :** pytest **197/197**, `test_ui.mjs` normal + deep link PASS, `ui_layout_check.mjs` 3 largeurs PASS, `npm test` plugin 15/15, `git diff --check` propre. Service 8082 redéployé (build `71e9a47c851d`) via `upgrade_legacy.py`, sauvegarde vérifiée, 7 affectations conservées.
+
+**Restent à faire par l'exploitant :** AC-F3.5 (notification bureau, son, toast VS Code, clic vers la bonne carte — banc automatisé passé, observation humaine à consigner) et AC-F3.9 (retour final sur la simplicité, dont le correctif écran étroit de ce jour).
+
+### 🟢 Exécution T429 — état courant au 9 novembre 2026 (historique)
 
 | Lot | État | Preuve principale |
 |---|---|---|

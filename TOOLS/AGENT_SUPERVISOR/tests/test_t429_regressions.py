@@ -1044,3 +1044,42 @@ def test_t429_auto_resume_only_previously_enabled_sessions(tmp_path):
 
 
 
+
+
+def test_events_written_after_attach_are_not_dropped_by_the_first_start(tmp_path):
+    """T429 (defect 2026-11-13): the attach cursor is at EOF; events written before the first
+    start were consumed by the recovery preview and never judged. A session that never observed
+    anything has no gap to catch up: the collector must read them."""
+    svc, source, sid = service(tmp_path, alerting_judge())
+    try:
+        write(source, 'assistant', EVIDENCE)
+        svc.command({'action': 'start'})
+        wait(lambda: bool(svc.snapshot()['sessions'][0]['alerts']))
+        assert svc.snapshot()['sessions'][0]['messages_observed'] >= 1
+        assert svc.snapshot()['sessions'][0]['recovery'].get('status') == 'none'
+    finally:
+        svc.close()
+
+
+def test_paused_gap_is_still_skipped_on_explicit_normal_resume(tmp_path):
+    """Counter-guard: a real pause/resume gap keeps its documented semantics."""
+    calls = []
+    def judge(model, messages):
+        calls.append(messages)
+        return {'alert': False}
+    svc, source, sid = service(tmp_path, judge)
+    try:
+        svc.command({'action': 'start'})
+        wait(lambda: svc.snapshot()['sessions'][0]['state'] == 'active')
+        svc.command({'action': 'pause', 'id': sid})
+        write(source, 'user', 'Le lot 2 peut commencer ?')
+        write(source, 'assistant', 'Oui, je prépare le lot 2.')
+        svc.command({'action': 'resume', 'id': sid})
+        item = svc.snapshot()['sessions'][0]
+        assert item['state'] == 'paused' and item['recovery']['status'] == 'gap_available'
+        svc.command({'action': 'resume', 'id': sid, 'mode': 'normal'})
+        wait(lambda: svc.snapshot()['sessions'][0]['state'] == 'active')
+        assert svc.snapshot()['sessions'][0]['recovery']['status'] == 'skipped'
+        assert calls == [], 'la reprise normale ne doit pas analyser les messages ignorés'
+    finally:
+        svc.close()

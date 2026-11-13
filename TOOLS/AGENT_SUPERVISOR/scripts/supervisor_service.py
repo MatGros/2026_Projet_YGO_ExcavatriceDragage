@@ -527,10 +527,15 @@ class Supervisor:
         self._lock = threading.RLock()
         self._wake = threading.Event()
         self._judge_wake = threading.Event()
+        self._review_wake = threading.Event()
         self._agent_wake = threading.Event()
         self._queue = deque()
         self._agent_queue = deque()
         self._queued = set()
+        # T429: re-evaluations demanded on a session that cannot run the full judge
+        # (paused, or no observed context yet). Keyed by (session id, alert id).
+        self._review_queue = deque()
+        self._reviews_queued = set()
         self._epoch = 0
         self.load_error = None
         self.storage_error = None
@@ -802,10 +807,16 @@ class Supervisor:
                 self._persist_background()
                 return
         if recovery.get("status") in ("pending_check", "none"):
-            found=self._preview_recovery(session)
-            recovery=session["recovery"]
-            if found and mode is None:
-                return
+            # T429 (defect observe le 2026-11-13): a session that never observed anything has no
+            # gap to catch up. Its events written after the attach cursor are live activity: the
+            # collector must read them. Consuming them here dropped them silently.
+            never_observed = (recovery.get("status") == "none" and not session.get("context")
+                              and not session.get("messages_observed"))
+            if not never_observed:
+                found=self._preview_recovery(session)
+                recovery=session["recovery"]
+                if found and mode is None:
+                    return
         if recovery.get("status")=="gap_available" and mode is None:
             return
         if recovery.get("status") in ("unverified", "too_large") and mode is None:
@@ -907,8 +918,12 @@ class Supervisor:
                 session["source_checkpoint"]=session["watcher"].checkpoint()
                 session["recovery"]={"status":"skipped", "reason":"continuity_unverified", "can_catch_up":False}
             else:
-                session["recovery"]={"status":"skipped", "message_count":recovery.get("message_count",0),
-                                     "reason":"user_chose_normal_resume", "can_catch_up":False}
+                # T429: only a real detected gap is "skipped". A session that never observed
+                # anything keeps an empty recovery: its post-attach events are still pending.
+                skipped = bool(recovery.get("message_count"))
+                session["recovery"]=({"status":"skipped", "message_count":recovery.get("message_count",0),
+                                      "reason":"user_chose_normal_resume", "can_catch_up":False} if skipped
+                                     else {"status":"none", "can_catch_up":False})
             session["enabled"]=True
             session["saved_enabled"]=True
             session["state"]="active"
@@ -1290,7 +1305,7 @@ class Supervisor:
                                 elif workflow.get("status") == "awaiting_choice":
                                     self._queue_agent_turn(session, alert, "initial", initial_alert_message(alert))
                         self._activate_next_alert(session)
-                    self._threads = [threading.Thread(target=self._collect_loop, daemon=True), threading.Thread(target=self._judge_loop, daemon=True), threading.Thread(target=self._chat_loop, daemon=True), threading.Thread(target=self._agent_message_loop, daemon=True)]
+                    self._threads = [threading.Thread(target=self._collect_loop, daemon=True), threading.Thread(target=self._judge_loop, daemon=True), threading.Thread(target=self._chat_loop, daemon=True), threading.Thread(target=self._agent_message_loop, daemon=True), threading.Thread(target=self._review_loop, daemon=True)]
                     for thread in self._threads:
                         thread.start()
                     for sid, session in list(self.sessions.items()):
@@ -1318,6 +1333,7 @@ class Supervisor:
                 self._chat_pending = None
                 self._chat_state.update(state="idle", error=None)
                 self._queue.clear(); self._queued.clear()
+                self._review_queue.clear(); self._reviews_queued.clear()
                 for session in self.sessions.values():
                     if session.get("watcher") is not None:
                         session["source_checkpoint"] = session["watcher"].checkpoint()
@@ -1789,6 +1805,112 @@ class Supervisor:
             session["analysis_state"] = "queued" if self.running and session["enabled"] and session["context"] else "review_pending"
             if session["analysis_state"] == "queued" and session["id"] not in self._queued:
                 self._queue.append(session["id"]); self._queued.add(session["id"]); self._judge_wake.set()
+            elif self.running:
+                # T429 (2026-11-13): the operator asked for a verdict now. A paused session cannot
+                # run the full judge, so the request would stay pending and invisible: run a
+                # re-evaluation limited to this finding.
+                self._enqueue_scoped_review(session, alert)
+
+    def _enqueue_scoped_review(self, session, alert):
+        key = (session["id"], alert["id"])
+        if key in self._reviews_queued:
+            return
+        self._review_queue.append(key)
+        self._reviews_queued.add(key)
+        session["analysis_state"] = "review_queued"
+        self._review_wake.set()
+
+    def _scoped_review_messages(self, session, alert):
+        """T429: context limited to one finding, its excerpt and the operator's comment.
+
+        The full judge needs an active session and the observed window. On a paused session
+        the operator would never see a verdict; this context carries the finding itself,
+        the exact excerpt it was raised on, the recent observed tail and the operator's
+        comment as citable user speech, so the judge can decide this one finding only.
+        """
+        mission = "## CAP INITIAL GELÉ :\n" + str(session.get("initial_mission", ""))
+        if session.get("mission"):
+            mission += "\nFiche manuelle datee " + str(session.get("mission_updated_at") or "inconnue") + " : " + str(session["mission"])
+        record = {
+            "alert_id": alert.get("id"),
+            "reference": alert.get("reference"),
+            "titre": alert.get("title") or str(alert.get("reason", ""))[:80],
+            "raison": alert.get("reason", ""),
+            "preuve": alert.get("evidence", ""),
+            "categorie": alert.get("category"),
+            "severite": alert.get("severity"),
+            "statut_actuel": (alert.get("assessment") or {}).get("status"),
+            "commentaires": [str(c.get("text", ""))[:400] for c in alert.get("comments", [])[-3:]],
+        }
+        messages = [
+            dict(role="mission", text=mission),
+            dict(role="context_notice", text="## CONSTAT SOUMIS À RÉÉVALUATION (source unique : ne signale aucun autre écart) : " + json.dumps(record, ensure_ascii=False)),
+        ]
+        evidence = str(alert.get("evidence", "") or "").strip()
+        if len(evidence) >= 4:
+            messages.append(dict(role="assistant", text=evidence))
+        for item in list(session.get("context", []))[-6:]:
+            if item.get("role") in ("user", "assistant", "tool") and item.get("text"):
+                messages.append(dict(role=item["role"], text=item["text"][:1500]))
+        last = (alert.get("comments") or [{}])[-1]
+        comment_text = str(last.get("text", "")).strip()
+        if comment_text:
+            messages.append(dict(role="user_comment", text=comment_text))
+        return messages
+
+    def _review_loop(self):
+        """T429: re-evaluations demanded by the operator on a session the full judge cannot serve."""
+        while not self.closed:
+            self._review_wake.wait()
+            self._review_wake.clear()
+            while True:
+                with self._lock:
+                    if not self.running or not self._review_queue:
+                        break
+                    key = self._review_queue.popleft()
+                    self._reviews_queued.discard(key)
+                    sid, alert_id = key
+                    session = self.sessions.get(sid)
+                    alert = next((a for a in (session or {}).get("alerts", []) if a["id"] == alert_id), None)
+                    if not session or not alert or alert.get("review_state") != "pending":
+                        continue
+                    messages = self._scoped_review_messages(session, alert)
+                    generation = session["generation"]
+                    model, allow_cloud = self.model, self.allow_cloud
+                error, result = None, None
+                try:
+                    if self._production_judge:
+                        result = self.judge(model, messages, allow_cloud=allow_cloud, settings=dict(self.judge_settings))
+                    else:
+                        result = self.judge(model, messages)
+                    if not isinstance(result, dict):
+                        raise ValueError("Reponse JSON du juge invalide")
+                except Exception as exc:
+                    error = type(exc).__name__
+                with self._lock:
+                    session = self.sessions.get(sid)
+                    if not session or session["generation"] != generation:
+                        continue
+                    alert = next((a for a in session["alerts"] if a["id"] == alert_id), None)
+                    if not alert:
+                        continue
+                    if error:
+                        alert.update(review_state="unavailable", review_error=error)
+                        record_event(session, "finding_review_unavailable", str(error)[:200], timestamp(), alert_id=alert["id"], version=alert.get("version", 1))
+                    else:
+                        reviews = [r for r in result.get("reviews", []) if isinstance(r, dict)]
+                        matched = [r for r in reviews if r.get("alert_id") == alert_id]
+                        if not matched and len(reviews) == 1:
+                            # T429: the scoped context carries exactly one finding; a lone verdict
+                            # is that finding's, whatever identifier the judge echoed.
+                            matched = [dict(reviews[0], alert_id=alert_id)]
+                        payload = dict(result, reviews=matched)
+                        reviewed = apply_reviews(session, payload, messages, timestamp())
+                        if alert_id not in reviewed:
+                            alert.update(review_state="unavailable", review_error="review_missing_or_unverifiable")
+                            record_event(session, "finding_review_unavailable", "Verdict absent ou non citable sur cet extrait", timestamp(), alert_id=alert["id"], version=alert.get("version", 1))
+                    session["analysis_state"] = "waiting"
+                    self._persist_background()
 
     @staticmethod
     def _supervision_message(session, role, text):
@@ -2574,6 +2696,7 @@ class Supervisor:
             self._judge_wake.set()
             self._agent_wake.set()
             self._chat_wake.set()
+            self._review_wake.set()
             self._chat_epoch += 1
             self._chat_pending = None
             self._chat_state["state"] = "paused"

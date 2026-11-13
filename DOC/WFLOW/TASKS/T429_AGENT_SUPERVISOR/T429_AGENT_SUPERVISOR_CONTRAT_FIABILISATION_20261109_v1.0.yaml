@@ -1,5 +1,5 @@
 # CONTRAT DE TACHE T429 — Agent Supervisor : fiabilisation reprise, cycle des constats, IHM, plugin
-# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T429_AGENT_SUPERVISOR_FIABILISATION.yaml
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml
 # Pilotage detaille, decisions et preuves : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
 # Demande exploitant 2026-11-09 : « ordres contractes complets et detailles, objectifs clairs, mesurables, evaluables ».
 
@@ -49,6 +49,10 @@ contract:
       statement: "Demande exploitant 2026-11-09 : Les événements de session sont systématiquement horodatés (created_at ISO dans le modèle, affiché au format local lisible JJ/MM/AAAA HH:MM:SS dans le journal de session de l'IHM) afin d'identifier avec certitude le moment exact où le Superviseur a créé chaque événement."
       verified_by: "pytest finding_lifecycle (présence created_at sur chaque événement) + test DOM test_ui.mjs assertant l'affichage de l'horodatage dans l'élément small du journal"
 
+    - id: AC-F1.9
+      statement: "Aucun evenement ecrit dans le transcript apres l'affectation n'est perdu au premier demarrage : une session qui n'a encore rien observe n'a aucun 'intervalle manquant' a rattraper, le collecteur lit donc les evenements ecrits entre l'affectation et le demarrage."
+      verified_by: "pytest test_t429_regressions.py (test_events_written_after_attach_are_not_dropped_by_the_first_start + contre-garde test_paused_gap_is_still_skipped_on_explicit_normal_resume) PASS"
+
     # ── F2 Cycle des constats et cadrage ──────────────────────────────────────
     - id: AC-F2.1
       statement: "En direct ET en rattrapage, la requete du juge contient le cadrage utilisateur date (event_index <= fin du lot) et les constats precedents avec leurs decisions."
@@ -84,6 +88,14 @@ contract:
       statement: "Demande exploitant 2026-11-09 (Lot C1 Refonte Prompts Juge) : élimination du faux positif sur validation conversationnelle, nouvelle matrice opérationnelle Alarm (débloquée pour guardrails, drifts critiques, falsification/masquage) vs Warning, et interdiction de ré-alerter sur une preuve déjà acquise dans l'index de mémoire."
       verified_by: "test_judge_prompt.py PASS + banc comportemental test_judge_behavior.py sur Golden Dataset et cas MEM-01 a MEM-10"
 
+    - id: AC-F2.11
+      statement: "Demande exploitant 2026-11-13 : une reevaluation demandee par l'exploitant (bouton 'Re-evaluate' ou commentaire) sur une session en pause ou sans contexte observe produit un verdict visible en moins de 30 s : le juge est interroge sur ce seul constat (extrait d'origine, queue observee, commentaire exploitant comme parole citable), le verdict s'applique au constat vise, et un verdict non citable laisse le constat intact (review_state = unavailable avec cause)."
+      verified_by: "pytest test_t429_scoped_review.py (3 cas : verdict applique, verdict non citable, 0 nouveau constat) + [REEL] sur la session T429-AGY01 en pause (constat 26fcd421) : verdict en 2 s, review_state = complete, raisonnement et preuve affiches"
+
+    - id: AC-F2.12
+      statement: "Un constat en resolution_proposed ou withdrawn ne peut pas etre retrograde en uncertain par une reevaluation dont la preuve est sortie de la fenetre bornee ; seule une preuve citee nouvelle peut faire evoluer l'avis."
+      verified_by: "pytest finding_lifecycle apply_reviews (uncertain sans downgrade) + observation [REEL] 2026-11-13 (constat 26fcd421 retrograde avant correction, bloque depuis)"
+
     # ── F3 IHM, plugin, Send to chat ──────────────────────────────────────────
     - id: AC-F3.1
       statement: "IHM et plugin affichent les memes compteurs (ouverts, reportes, non lus, Warning, Alarm, resolution proposee) pour un meme instantane, produits par le service et non recalcules."
@@ -116,6 +128,10 @@ contract:
       statement: "Demande exploitant 2026-11-09 (Sécurité Déconnexion IHM) : signalement persistant de la perte de connexion (Failed to fetch) dans le menu lateral gauche sticky (.app-sidebar.is-disconnected avec fond rouge pastel et bandeau #sidebar-disconnected) empechant le travail aveugle sans surveillance au defilement vertical ; retablissement automatique a la reconnexion."
       verified_by: "test DOM test_ui.mjs (presence classe is-disconnected et bandeau sticky lors de l'echec de fetch) PASS"
 
+    - id: AC-F3.11
+      statement: "Sur ecran etroit (<= 600 px), le premier constat reste dans le premier ecran sans defilement horizontal de page : la navigation systeme passe au pictogramme, la barre de specialistes et le chrome restant se compriment."
+      verified_by: "test navigateur headless ui_layout_check.mjs (1440/390/360 px) : firstFindingTop < hauteur du viewport aux 3 largeurs, 0 debordement, 0 defilement horizontal"
+
     # ── F4 Recette comparee et parcours reels ─────────────────────────────────
     - id: AC-F4.1
       statement: "Comparaison A (pipeline avant T429) / B (apres) sur le meme corpus francais et le meme modele : resultats par cas, faux positifs, non-detections, citations, doublons, latence publies."
@@ -140,7 +156,7 @@ contract:
       - TOOLS/AGENT_SUPERVISOR/**
       - DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
       - DOC/WFLOW/ETUDES/AGENT_SUPERVISOR_*.json
-      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T429_AGENT_SUPERVISOR_FIABILISATION.yaml
+      - DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml
       - "DOC/WFLOW/TASKS.yaml (fiche T429 uniquement, via API Task Manager)"
       - "%LOCALAPPDATA%/ExcavatriceDragage (etat du service, apres sauvegarde verifiee)"
     forbidden:
@@ -213,9 +229,14 @@ tracking:
     - "AC-X.1 PASS : service 8082 mis a jour (build b0c05d532327) via upgrade_legacy.py et daemon persistant, sauvegarde verifiee ; T428 (pause, 6 constats), CC-T217 (pause) et T429 inchangees."
     - "AC-X.2 PASS : pytest 171/171 passed (dont 43 regressions et 26 tests judge comportementaux), test_ui x2, ui_layout_check (1440/390/360 px), git diff --check (0 erreur)."
     - "REV-FINALE-T429 PASS 2026-11-09 : Double revue contradictoire A (DeepSeek V4.1 HOLD levé par dossier de preuves) et B (GLM 5.3 condition bloquante C1 résolue par durcissement regex pluriels/accords/0 passed et 5 tests adversaires PASS)."
+    - "AC-F1.9 PASS 2026-11-13 : defaut reel trouve par pytest (un evenement ecrit entre l'affectation et le premier demarrage etait consomme par la previsualisation de rattrapage puis perdu). Corrige dans _resume_session (une session qui n'a rien observe n'a pas d'intervalle a rattraper) + 2 gardes (test_events_written_after_attach_are_not_dropped_by_the_first_start, test_paused_gap_is_still_skipped_on_explicit_normal_resume)."
+    - "AC-F2.11 PASS [REEL] 2026-11-13 : reevaluation a la demande sur session en pause (constat 26fcd421 de T429-AGY01, session en pause) : verdict du juge en 2 s, review_state = complete, raisonnement 'L'extrait ne contient pas de nouvelle affirmation globale de validation F0-F4...' et preuve citable affiches ; 0 nouveau constat cree ; garde-fous pytest (3 cas) dans test_t429_scoped_review.py."
+    - "AC-F2.12 PASS 2026-11-13 : apply_reviews ne retrograde plus un constat resolution_proposed/withdrawn en uncertain ; le commentaire exploitant est une source citable (role user_comment)."
+    - "AC-F3.11 PASS 2026-11-13 : navigation systeme au pictogramme sous 600 px ; ui_layout_check.mjs : firstFindingTop 733/715/717 pour 1440/390/360 px, 0 defilement horizontal, 0 debordement (le controle 360 px echouait avant correction)."
+    - "AC-X.2 PASS 2026-11-13 : pytest 197/197, test_ui.mjs normal + deep link, ui_layout_check.mjs 3 largeurs, npm test plugin 15/15, git diff --check propre ; service 8082 deploie (build 71e9a47c851d) via upgrade_legacy.py, sauvegarde verifiee, 7 affectations conservees."
   unknowns:
-    - "AC-F3.5 [REEL] : notification bureau, son, toast VS Code et clic vers la bonne carte a observer par l'exploitant (non observable par l'agent)."
-    - "AC-F3.9 : retour exploitant final sur la simplicite (2 challenges ergonomie realises)."
+    - "AC-F3.5 [REEL] : notification bureau, son, toast VS Code et clic vers la bonne carte a observer par l'exploitant (non observable par l'agent). Banc automatise passe (run_notify_bench.py) mais l'observation humaine reste a consigner."
+    - "AC-F3.9 : retour exploitant final sur la simplicite (2 challenges ergonomie realises ; correctif 2026-11-13 sur ecran etroit a valider par l'exploitant)."
   next_action: "Recette exploitant AC-F3.5 / AC-F3.9 ; decision commit."
   owners:
     accountable: "Claude Code CC01 (orchestrateur)"
