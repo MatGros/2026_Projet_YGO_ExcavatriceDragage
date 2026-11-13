@@ -328,6 +328,20 @@ def main():
 
     args = parser.parse_args()
 
+    # R15 (2026-11-13) : chaque invocation de persona est TRACEE (journal interne) ->
+    # l usage reel des 6 agents specialises devient un fait, pas une impression.
+    try:
+        import os as _os, sys as _sys
+        _scripts_dir = str(Path(__file__).resolve().parent)
+        if _scripts_dir not in _sys.path:
+            _sys.path.insert(0, _scripts_dir)
+        import trace_log
+        trace_log.emit("persona", role=args.role, target=args.target, task=args.task,
+                       session=_os.environ.get("CLAUDE_CODE_SESSION_ID"),
+                       prompt_len=len(args.prompt or ""))
+    except Exception:
+        pass
+
     if args.list_roles:
         list_roles()
         sys.exit(0)
