@@ -150,8 +150,9 @@ def test_notification_summary_is_read_only_and_excludes_chat_and_token(tmp_path)
                        'warnings': 1, 'alarms': 0, 'resolution_proposed': 0},
             'sessions': [{
                 'id': sid, 'platform': 'claude', 'native_id': 'native-session-id', 'alias': 'TEST session',
+                'display_title': 'TEST session',
                 'state': 'paused', 'analysis_state': 'alert', 'last_event': '2026-11-08T10:00:00Z',
-                'last_analysis': None,
+                    'last_analysis': None, 'judge_turn_count': 0,
                 'counts': {'unread': 1, 'open': 1, 'deferred': 0, 'closed': 0, 'follow_up': 1,
                            'warnings': 1, 'alarms': 0, 'resolution_proposed': 0},
                 'alerts': [{

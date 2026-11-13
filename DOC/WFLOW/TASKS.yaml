@@ -1,4 +1,21 @@
 tasks:
+- id: T417-C
+  parent_id: T417
+  statut: ⏸️
+  criticite: C2
+  domaine: SIMULATION / SIMBENCH / TRANSLATION M3
+  agent: AGY02
+  date: '2026-11-13T08:30:00'
+  titre: Challenge & diagnostic simulation M3 (depassement butee petite vitesse)
+  contexte: 'Phase 1 lecture seule + audit reel M3 (PRG_05/PRG_06/FB_Translation + L_SIMULATION). Dossier provisoire: DOC/WFLOW/TASKS/T000-AGY02_GEMINI_4_HYDRO_CHALLENGE_SIMU_M3.'
+  description: Tri historique T417 sans effacer, cartographie chaine reelle M3 vs modele simule, registre d hypotheses, reproduction
+    isolee en sandbox et dossier de patch (fix+guard) si valide.
+  objectifs:
+  - Trier l historique T417 avec controle par echantillonnage
+  - Cartographier la chaine automate reelle M3 vs L_SIMULATION sur code et traces
+  - Reproduire le depassement de butee en simulation isolee avec oracles experts
+  - Produire le dossier de validation (patch + guard) ou basculer C3/C4 si code production touche
+  bloque_par: []
 - id: T431
   parent_id: T429
   statut: ⬜
@@ -59,7 +76,7 @@ tasks:
   bloque_par: []
 - id: T429
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C2
   domaine: OUTILLAGE / AGENT_SUPERVISOR / PLUGIN VS CODE
   agent: AGY01
@@ -110,7 +127,7 @@ tasks:
   edit_flag: null
 - id: T428
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C2
   domaine: DIAGNOSTIC / GVL_TROUBLESHOOTING
   agent: CC01
@@ -161,7 +178,7 @@ tasks:
   bloque_par: []
 - id: T427
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C2
   domaine: WORKFLOW / AGENTS / SKILLS / CONTRATS
   agent: CC01
@@ -190,7 +207,7 @@ tasks:
   bloque_par: []
 - id: T426
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C2
   domaine: WORKFLOW / AGENTS / CONTRATS / CONTROLES
   agent: CC01
@@ -329,7 +346,7 @@ tasks:
   bloque_par: []
 - id: T417
   parent_id: ''
-  statut: ⏳
+  statut: ⏸️
   criticite: C2
   domaine: SIMULATION / SIMBENCH / TRANSLATION M3
   agent: AGY01

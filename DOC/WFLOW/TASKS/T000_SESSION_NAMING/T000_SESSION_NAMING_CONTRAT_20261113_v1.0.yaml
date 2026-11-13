@@ -1,0 +1,87 @@
+contract:
+  task_id: T000_SESSION_NAMING
+  criticality: C2
+  strategy: patch
+  objective: >
+    Rendre le renommage de session explicite et déterministe : l'alias machine, le titre lisible,
+    la liaison Superviseur et le titre du terminal ont chacun un résultat vérifiable, sans création
+    ni sélection implicite d'une session.
+  acceptance:
+    - id: AC1
+      statement: "rename-session refuse une session non identifiée exactement et ne remplace jamais son ID par PID ou valeur par défaut."
+      verified_by: "pytest -q TOOLS/AGENT_WORKFLOW/tests/test_rename_session.py"
+    - id: AC2
+      statement: "rename-session ne crée jamais une affectation Superviseur absente ; seule la commande connect attache une session."
+      verified_by: "Tests HTTP simulés : affectation absente, aucune action add, résultat FAIL explicite."
+    - id: AC3
+      statement: "Le succès n'est annoncé que si les cibles activées ont confirmé la mise à jour ; chaque échec cible est rapporté séparément."
+      verified_by: "Tests unitaires succès complet, panne Superviseur et panne titre terminal."
+    - id: AC4
+      statement: "Les tests déterministes couvrent alias canonique, titre lisible, liaison exacte, Codex et titre terminal sans écriture réelle."
+      verified_by: "pytest -q TOOLS/AGENT_WORKFLOW/tests/test_rename_session.py TOOLS/AGENT_WORKFLOW/tests/test_session_statusline.py TOOLS/AGENT_SUPERVISOR/tests/test_standalone.py"
+    - id: AC5
+      statement: "Le résolveur des dossiers de challenge refuse les préfixes ambigus au lieu de choisir selon l'ordre du système de fichiers."
+      verified_by: "Test unitaire avec deux dossiers T000 et assertion de refus d'ambiguïté."
+  scope:
+    allowed:
+      - TOOLS/AGENT_WORKFLOW/scripts/rename_session.py
+      - TOOLS/AGENT_WORKFLOW/scripts/session_statusline.py
+      - TOOLS/AGENT_WORKFLOW/scripts/challenge_runner.py
+      - TOOLS/AGENT_WORKFLOW/tests/
+      - TOOLS/AGENT_SUPERVISOR/scripts/connect_session.py
+      - TOOLS/AGENT_SUPERVISOR/scripts/supervisor_service.py
+      - TOOLS/AGENT_SUPERVISOR/tests/
+      - DOC/WFLOW/TASKS/T000_SESSION_NAMING/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
+      - Configuration des CLI et hooks actifs
+      - Déplacement ou suppression des dossiers de tâches existants
+  conservation:
+    must_survive:
+      - "Les identifiants natifs des sessions existantes restent inchangés."
+      - "Les données historiques du Superviseur et les journaux d'audit restent conservés."
+      - "Une liaison manquante ou ambiguë ne cible aucune autre session ni aucun dossier."
+    dropped_on_purpose: []
+  evidence_required:
+    - "Tests unitaires ciblés passants, incluant les cas négatifs et l'absence d'action add."
+    - "Diff réel des scripts, tests et notes de résultat relu par l'orchestrateur."
+    - "Observation séparée du titre de conversation et du titre d'onglet terminal ; un test simulé ne vaut pas preuve UI."
+  models_allowed:
+    - "Codex"
+  alert_duty: >
+    Remonter immédiatement tout échec d'identification, toute synchronisation partielle et toute
+    impossibilité d'observer le titre VS Code depuis le processus appelant ; ne jamais déclarer
+    toutes les cibles synchronisées sur la seule base d'un code retour nul.
+execution_plan:
+  milestones:
+    - id: M1
+      title: "Contrat de comportement explicite"
+      done_when: "check_task_contract.py valide le contrat et les cibles d'essai sont listées."
+    - id: M2
+      title: "Renommage sans effets implicites"
+      done_when: "Aucun fallback ID ni auto-add Superviseur ; erreurs partielles produisent un résultat non-success."
+    - id: M3
+      title: "Résolution et vérification multiplateforme"
+      done_when: "Tests ciblés couvrent Codex, le résolveur de dossier, le service et les résultats par cible."
+tracking:
+  budget:
+    total: 10
+    used: 0
+    parallel_max: 3
+    log: []
+status: IN_PROGRESS
+execution:
+  executed_by: "CDX02"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

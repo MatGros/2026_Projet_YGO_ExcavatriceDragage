@@ -25,10 +25,10 @@
                 ]
             },
             {
-                "name": "DSH (Ollama deepseek-v4.1-flash:cloud)",
+                "name": "DSH (deepseek-v4.1)",
                 "autoExecuteCommands": true,
                 "icon": "terminal",
-                "color": "terminal.ansiBrightYellow",
+                "color": "terminal.ansiBrightCyan",
                 "commands": [
                     "ollama launch dsh --model deepseek-v4.1-flash:cloud"
                 ]
@@ -61,25 +61,25 @@
                 ]
             },
             {
-                "name": "🐋 Claude Code Ollama (deepseek-v4.1-flash:cloud)",
+                "name": "🐋 CC Ollama (deepseek-v4.1)",
                 "autoExecuteCommands": true,
                 "icon": "code",
-                "color": "terminal.ansiBrightBlue",
+                "color": "terminal.ansiBrightCyan",
                 "commands": [
                     "ollama launch claude --model deepseek-v4.1-flash:cloud"
                 ]
             },
             {
-                "name": "♊ Claude Code OmniRoute AGY (Gemini 3.8)",
+                "name": "♊ CC OmniRte AGY (Gemini 3.8)",
                 "autoExecuteCommands": true,
                 "icon": "code",
-                "color": "terminal.ansiBrightYellow",
+                "color": "terminal.ansiBlue",
                 "commands": [
                     "cmd /c \"set ANTHROPIC_BASE_URL=http://127.0.0.1:20128&& set ANTHROPIC_AUTH_TOKEN=local-dev&& set ANTHROPIC_API_KEY=&& set ANTHROPIC_MODEL=agy/gemini-3.8-flash-tiered&& claude --model agy/gemini-3.8-flash-tiered\""
                 ]
             },
             {
-                "name": "⚡ Claude Code Ollama (glm-5.3-flash:cloud)",
+                "name": "⚡ CC Ollama (glm-5.3)",
                 "autoExecuteCommands": true,
                 "icon": "code",
                 "color": "terminal.ansiBrightMagenta",
@@ -88,10 +88,10 @@
                 ]
             },
             {
-                "name": "🚀 Claude Code Ollama (minimax-m3.1-flash:cloud)",
+                "name": "🔥 CC Ollama (minimax-m3.1)",
                 "autoExecuteCommands": true,
-                "icon": "code",
-                "color": "terminal.ansiBrightCyan",
+                "icon": "flame",
+                "color": "terminal.ansiBrightYellow",
                 "commands": [
                     "ollama launch claude --model minimax-m3.1-flash:cloud"
                 ]

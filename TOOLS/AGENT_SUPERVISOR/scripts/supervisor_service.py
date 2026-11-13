@@ -130,6 +130,16 @@ def validate_mission_structure(value):
     if any(not isinstance(v, str) or len(v) > 4000 for v in value.values()) or sum(len(v) for v in value.values()) > 20000:
         raise ValueError('Structure de mission trop longue')
     return dict(value)
+
+
+def session_display_title(session):
+    """Expose only the single-line title set by /rename-session to local status surfaces."""
+    alias = str(session.get("alias", "")).strip()
+    mission = str(session.get("mission", "")).strip()
+    if alias and mission.startswith(alias + " ") and "\n" not in mission and "\r" not in mission:
+        return mission.partition("Dossier:")[0].rstrip(" —").strip()[:200]
+    return alias[:200]
+
 DEFAULT_JUDGE_SETTINGS = dict(temperature=0, output_tokens=1600, timeout_seconds=30,
                               context_messages=12, context_chars=12000, model_context_tokens=32768,
                               max_visible_closed_findings=5, audit_interval=8)
@@ -1217,6 +1227,7 @@ class Supervisor:
                 sessions.append({key: value.get(key) for key in (
                     "id", "platform", "native_id", "alias", "state", "analysis_state",
                     "last_event", "last_analysis", "judge_turn_count")})
+                sessions[-1]["display_title"] = session_display_title(value)
                 sessions[-1]["alerts"] = alerts
                 sessions[-1]["counts"] = counts(value.get("alerts", []))
             return dict(schema_version=1, running=self.running, sessions=sessions, counts=counts([a for s in self.sessions.values() for a in s["alerts"]]))
@@ -1393,7 +1404,7 @@ class Supervisor:
                 alias = str(command.get("alias", "")).strip()
                 if not alias:
                     raise ValueError("Alias requis")
-                if not re.fullmatch(r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC)\d{2}$", alias):
+                if not re.fullmatch(r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$", alias):
                     raise ValueError("Format d'alias invalide (attendu TXXX[-X]-AGENT)")
                 session = self.sessions.get(sid)
                 if not session:

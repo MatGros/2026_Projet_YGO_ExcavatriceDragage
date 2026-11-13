@@ -65,18 +65,24 @@ def validate_output_path(output_path: str):
 
 
 def resolve_task_folder(task_id: str) -> str:
-    """Retrouve le dossier de la tâche sous DOC/WFLOW/TASKS/."""
+    """Retrouve l'unique dossier exact de la tâche ; refuse les préfixes ambigus."""
     tasks_dir = os.path.join(REPO_ROOT, "DOC", "WFLOW", "TASKS")
     clean_id = task_id.upper().strip()
     if not clean_id.startswith("T"):
         clean_id = "T" + clean_id
 
-    if os.path.exists(tasks_dir):
-        for entry in os.listdir(tasks_dir):
-            if entry.upper().startswith(clean_id + "_") or entry.upper() == clean_id:
-                return os.path.join(tasks_dir, entry)
-
-    return os.path.join(tasks_dir, f"{clean_id}_CHALLENGE_REVIEW")
+    if not os.path.isdir(tasks_dir):
+        raise FileNotFoundError(f"Répertoire des tâches absent : {tasks_dir}")
+    matches = sorted(
+        entry for entry in os.listdir(tasks_dir)
+        if os.path.isdir(os.path.join(tasks_dir, entry))
+        and (entry.upper() == clean_id or entry.upper().startswith(clean_id + "_"))
+    )
+    if not matches:
+        raise FileNotFoundError(f"Aucun dossier explicite trouvé pour {clean_id} dans {tasks_dir}")
+    if len(matches) > 1:
+        raise ValueError(f"Dossier ambigu pour {clean_id} : {', '.join(matches)}")
+    return os.path.join(tasks_dir, matches[0])
 
 
 def extract_yaml_payload(response_text: str) -> tuple[dict | None, str]:

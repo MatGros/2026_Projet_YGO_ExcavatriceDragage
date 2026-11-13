@@ -1,3 +1,14 @@
+- id: PAUSE-CHANTIERS-URGENCE-20261113
+  date: '2026-11-13'
+  type: orchestration
+  priorite: haute
+  agent_id: CC10
+  sujet: 'Pause de tous les chantiers ⏳ (décision exploitant) suite à la cassure du workflow (rename-session bloqué, qualité dégradée). Session T000-CC10 rattachée au Superviseur (connect_session).'
+  statut: en_cours
+  livrable: DOC/WFLOW/TASKS.yaml (T417, T417-C, T426, T427, T428, T429 passés ⏸️) ; recherche historique en cours (2 agents GLM 5.3, lecture seule)
+  verdict: 'En attente des rapports de chronologie (A) et de contre-analyse rename/hooks (B). Aucun chantier relancé.'
+  decision: 'Pause totale ; relance uniquement sur ordre exploitant. Aucune modification de CODE/ ni de hooks avant plan d''urgence validé.'
+  note: 'Données sources : $CLAUDE_JOB_DIR/tmp (hist_workflow.txt, hist_rename.txt, promptA/B.md). Rapports : reportA.md, reportB.md.'
 - id: ORCHESTRATION-REPRISE-AGY01-20261028
   date: '2026-10-28'
   type: orchestration
