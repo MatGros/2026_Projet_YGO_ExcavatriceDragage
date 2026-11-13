@@ -79,7 +79,8 @@ ne pas créer de fichier local ou de script de prise de tâche parallèle.
 ### Rattacher une conversation au Superviseur
 
 Dans Claude Code, Antigravity ou DSH, lancer `/connect-session-supervisor` depuis la conversation
-courante. La skill demande une tâche formelle vérifiable, ou une confirmation explicite avant un
+courante. Dans Codex, invoquer la skill projet `$connect-session-supervisor` (ou la sélectionner
+avec `/skills`). Le rattachement exige une tâche formelle vérifiable, ou une confirmation explicite avant un
 suivi sans tâche. Elle n'envoie rien à l'agent surveillé. Pour examiner les constats ouverts
 directement dans le tour actif de l'agent sans injection externe : lancer `/review-session-supervisor`
 (traite en priorité le constat le plus critique Alarm > Warning). Après un ajout ou renommage de
@@ -166,6 +167,7 @@ guardrails et points d'arrêt prévus par un contrat ou la voie C4.
 | 4 | Inhibition procédurale | Action interactive de la session, demandée, locale et réversible (lecture, recherche, test ou script local) : la faire, sans question pour gagner du temps. Elle ne modifie jamais `CODE/` ni un périmètre non dispensé de contrat : ceux-ci relèvent de la règle d'or (`orchestrator/SKILL.md`), qui vise les tâches du catalogue `TASKS.yaml`. Une question de l'utilisateur reçoit une réponse, pas une modification. |
 | 5 | Sévérité dévoyée | Une demande de sévérité porte sur les preuves et les risques. Pas de blocage sur la forme ou un détail ; un constat de l'exploitant n'est pas contesté faute de mesure. |
 | 6 | Affolement | Un nouveau message n'abandonne pas la tâche en cours en silence : dire si elle est poursuivie ou en pause. Après une erreur : une ligne pour la nommer, puis l'action corrective. Sous pression comme ailleurs, aucune commande destructive (`git reset`, `checkout .`, `restore .`, `clean`, `stash`) sans accord explicite et snapshot. |
+| 7 | Remarque prise pour un ordre | Une remarque de l'exploitant **ne remplace pas** une règle du projet, une validation acquise ou une preuve versée : elle s'y **ajoute**. On exécute la part compatible, on signale en une ligne ce qu'elle touche, et — sauf contradiction avec une règle, une preuve ou une validation (cf. ligne 1 et § Posture) — on l'applique sans la discuter. Une consigne qui corrige une erreur précédente s'applique **en plus**, jamais à la place. |
 
 ---
 

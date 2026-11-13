@@ -22,6 +22,9 @@ contract:
     - id: AC5
       statement: "Le résolveur des dossiers de challenge refuse les préfixes ambigus au lieu de choisir selon l'ordre du système de fichiers."
       verified_by: "Test unitaire avec deux dossiers T000 et assertion de refus d'ambiguïté."
+    - id: AC6
+      statement: "Chaque rattachement expose un ID tâche, un ID agent canonique et un titre lisible : tâche formelle existante et titre officiel unique ; T000 avec titre explicite ; sans tâche formelle uniquement après confirmation, enregistré comme T000 titré ; mission distincte ; l'ID tâche de l'alias correspond."
+      verified_by: "Tests positifs et négatifs contre le client de connexion et le serveur local isolé : tâche inconnue, titre absent/ambigu, alias incohérent, T000 confirmé, sans-tâche confirmé puis normalisé en T000."
   scope:
     allowed:
       - TOOLS/AGENT_WORKFLOW/scripts/rename_session.py
@@ -32,6 +35,10 @@ contract:
       - TOOLS/AGENT_SUPERVISOR/scripts/supervisor_service.py
       - TOOLS/AGENT_SUPERVISOR/tests/
       - DOC/WFLOW/TASKS/T000_SESSION_NAMING/
+      - .agents/skills/connect-session-supervisor/SKILL.md
+      - .claude/skills/connect-session-supervisor/SKILL.md
+      - .dsh/skills/connect-session-supervisor/SKILL.md
+      - AGENTS.md
     forbidden:
       - CODE/
       - CODE_XML/

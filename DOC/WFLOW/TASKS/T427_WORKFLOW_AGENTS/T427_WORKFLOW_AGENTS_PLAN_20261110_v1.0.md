@@ -274,3 +274,8 @@ Chaque cas se joue sur **Claude** et sur **Codex** ; noter ✅ / ❌ + l'extrait
   (observation / consigne / question / ambigu). Challengé par 2 experts : la préséance « ordre explicite
   > décision antérieure » manque. Pas encore écrit dans `AGENTS.md`. Décision en attente.
 - **2026-11-13 · ⏸️ Non commité** — modifications de I1c, I1d (menu) et de la commande : à commiter après validation.
+- **P7 — Ligne d'état (statusline) à rattacher à T429** (demande exploitant 13/11) : afficher en
+  permanence l'état workflow (ACTIF / OFF), l'identifiant de session, la tâche, et une ligne compacte
+  de contexte git (branche, worktree principal ou non, remote). Ligne configurée aujourd'hui dans
+  `~/.claude/settings.json` (hors projet). Script existant non commité : `TOOLS/AGENT_WORKFLOW/scripts/session_statusline.py`.
+  Transmis à T429 : à attacher par le coordinateur via le Task Manager (T429 verrouillée par AGY01, pas d'écriture ici).
