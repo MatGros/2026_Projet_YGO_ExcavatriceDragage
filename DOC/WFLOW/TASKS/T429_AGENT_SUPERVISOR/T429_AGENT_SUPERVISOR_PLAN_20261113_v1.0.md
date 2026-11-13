@@ -50,6 +50,36 @@
 | **R5** | **Alignement du service 8082** — l'arbre HEAD est en avance du build en service (`71e9a47c851d`, `update_available: true`) | le build servi = HEAD, sauvegarde vérifiée, 7 affectations conservées, 0 constat perdu | `GET /health` → `update_available: false` + diff de l'état avant/après | CC01 (après R4) |
 | **R6** | **Push** — 5 commits locaux non poussés (`7f487148`, `cf14f135`, `22535a09`, + à venir) | branche distante à jour, aucun commit perdu | `git rev-list --left-right --count origin/main...HEAD` → `0 0` | **exploitant** (accord explicite requis) |
 | **R7** | **Bruit de fond catalogue** — le résumé était figé (PÉRIMÉ) | générateur mécanique en place, résumé À JOUR, contrôle en CI | `python TOOLS/AGENT_WORKFLOW/scripts/generate_tasks_summary.py --check` → 0 | CC01 ✅ **fait le 2026-11-13** |
+| **R8** | **Prédicat de périmètre** — le périmètre d'une tâche devient une donnée (ensemble de chemins autorisés, déduit du contrat `scope.allowed`), pas une phrase dans un prompt | un prédicat booléen, testable, sans LLM : `chemin ∈ périmètre` ; T429 sert de cas d'école | tests unitaires du prédicat (inclus / exclu / chemin voisin) | CC01 (T427) |
+| **R9** | **Garde de dérive** — hook `PreToolUse` sur `Edit|Write|MultiEdit` : écriture hors périmètre → refus motivé + question à l'exploitant ; une dérogation confirmée est **enregistrée** (durable) | aucune écriture hors périmètre sans dérogation tracée ; le refus force la confirmation au lieu de la recommending | hook testé (chemin autorisé → passe ; hors périmètre → refus ; dérogation → passe) | CC01 (T427) |
+| **R10** | **Métrique de dérive** — part des N derniers fichiers touchés qui sont hors périmètre, recalculée depuis le transcript (les chemins y sont dans la trace) | la métrique est **comptée**, pas estimée : aucun avis involved ; elle alimente le constat du Superviseur (preuve citable) et la 2ᵉ ligne de la statusline | métrique recalculée et affichée ; le constat `scope_drift` cite le décompte | CC01 (T427 pour la mesure, T429 pour l'affichage et le constat) |
+
+---
+
+## 3bis. 🛡️ Garde de dérive — conception retenue (R8 → R10)
+
+**Pourquoi ce lot existe** : le 2026-11-13, en phase CADRAGE sur T429, l'agent a dérivé vers le statut de session, une règle de conduite et un générateur de résumé — **sans que le Superviseur ne signale quoi que ce soit**. Diagnostic : le Superviseur **ne peut pas** voir une dérive de longue durée (fenêtre de 12 messages, cap sans périmètre, jugement probabiliste). Une dérive se prouve par des **chemins de fichiers**, pas par une impression.
+
+**Principe : remplacer les promesses par des preuves.** Une consigne (prompt, skill) est probabiliste ; un prédicat calculé sur la trace est **infaillible**.
+
+| Brique | Mécanisme | Dépend de ma bonne volonté ? | Effet |
+|---|---|---|---|
+| **Prédicat** (R8) | ensemble de chemins autorisés, déduit du contrat `scope.allowed` ; test booléen `chemin ∈ périmètre` | non | le périmètre devient une donnée |
+| **Garde** (R9) | hook `PreToolUse` sur `Edit\|Write\|MultiEdit` : hors périmètre → refus motivé ; la confirmation de l'exploitant est enregistrée (dérogation durable) | non (exécuté par le harnais) | rend la règle « une remarque n'est pas un ordre » **opposable** |
+| **Métrique** (R10) | part des N derniers fichiers touchés hors périmètre, **comptée** depuis le transcript | non | rend la dérive visible et citable ; alimente le constat du Superviseur |
+| **Visibilité** (R10) | 2ᵉ ligne de la statusline : `🎯 k/N sur périmètre` | — | tu vois la dérive avant qu'elle ne coûte une demi-journée |
+| **Juge LLM** | `scope_drift` sémantique (dérive *dans* le périmètre) | partiellement | complément qualitatif, jamais la preuve |
+
+**Règle de phase, rendue mesurable** : « la phase CADRAGE est dédiée à 90 % à la tâche attribuée » devient `part des tours sur périmètre / tours totaux` — chiffrée, donc discutable, et non un slogan.
+
+**Répartition en 3 lots** (aucun lot supplémentaire) :
+- **T427** (workflow) : prédicat + hook + dérogations + métrique → générique
+- **T429** (Superviseur) : affichage de la métrique + constat de dérive **citable** (« 7 des 9 derniers fichiers touchés sont hors périmètre ») au lieu d'un avis
+- **T431** (collège d'experts) : le collège mixte (Claude Code + DeepSeek + GLM + spécialistes) consomme les **motifs déjà extraits** par la métrique — pas des logs bruts → classification des dérives récurrentes → contre-mesures
+
+**Limites assumées** : `Bash` peut écrire hors périmètre sans que le hook voie le chemin (la commande est analysée, pas les fichiers) → c'est la **métrique** qui prend le relais, elle voit la commande. Une dérive *à l'intérieur* du périmètre (mauvaise sous-tâche) reste au ressort du juge sémantique.
+
+**Décisions à prendre avant l'écriture** : seuil d'alerte (part hors périmètre) · comportement face à une écriture hors périmètre (refus net, ou refus + proposition) · portée du périmètre (strict `scope.allowed`, ou élargi `DOC/WFLOW/**` pour la doc de tâche) · lot porteur (T427 seul, ou T427 + T429 + T431).
 
 ---
 
@@ -84,6 +114,7 @@ git diff --check && git status --short
 5. **Règle de conduite** (`AGENTS.md`, Discipline de session ligne 7) : une remarque de l'exploitant ne remplace ni une règle, ni une validation, ni une preuve — elle s'y ajoute.
 6. **Écriture catalogue** : uniquement via l'API Task Manager (🔒 de travail + 🚩 d'édition + relecture), jamais par édition directe du YAML.
 7. **Commits** : aucun commit ni push sans accord humain explicite ; un push n'est jamais déduit d'un accord de commit.
+8. **Dérive** : elle se **prouve** par les chemins touchés (comptés depuis la trace), elle ne se discute pas au jugé. Une consigne ne remplace pas une preuve ; le périmètre est une donnée, pas une phrase.
 
 ---
 
@@ -92,6 +123,7 @@ git diff --check && git status --short
 - **DSH** : collecte réelle bloquée (clé API absente du profil headless) — documenté, pas contourné.
 - **Consentement cloud** : le juge utilise `deepseek-v4.1-flash:cloud` avec consentement actif ; le réglage est dans le service, pas dans le dépôt.
 - **Concurrence d'agents** : d'autres agents travaillent dans le même checkout (lot T000) — chaque lot ne commite que ses fichiers, et le diff est relu avant commit.
+- **Dérive non détectable par le hook** : une écriture faite par `Bash` échappe au refus `PreToolUse` ; seule la métrique (qui lit la trace) la voit. La garantie est donc « quasi » sur l'action et « exacte » sur la détection.
 - **Réversibilité** : tout redémarrage du service passe par `upgrade_legacy.py` (sauvegarde vérifiée, jamais supprimée).
 
 ---
