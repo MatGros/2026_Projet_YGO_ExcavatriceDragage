@@ -132,6 +132,19 @@ def validate_mission_structure(value):
     return dict(value)
 
 
+def _trace(**fields):
+    """Journal interne (jamais affiche) : transition, constat, erreur de source."""
+    try:
+        import sys
+        scripts_dir = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts"
+        if str(scripts_dir) not in sys.path:
+            sys.path.insert(0, str(scripts_dir))
+        import trace_log
+        trace_log.emit("superviseur", **fields)
+    except Exception:
+        pass  # le trace ne doit jamais faire tomber le service
+
+
 def session_display_title(session):
     """Expose the first single-line alias/title from connection or rename to local status surfaces."""
     alias = str(session.get("alias", "")).strip()
@@ -1454,6 +1467,8 @@ class Supervisor:
                     session["source_checkpoint"] = session["watcher"].checkpoint()
                     session["context_truncated"] = True
                 self.sessions[sid] = session
+                _trace(event="affectation_ajoutee", session=sid, alias=session.get("alias"),
+                       platform=platform, native_id=native_id, task_id=session.get("task_id"))
                 self._persist()
                 self._write_note(self.sessions[sid])
             elif action == "resume_all":
@@ -2205,6 +2220,8 @@ class Supervisor:
                 paths = [r.path for r in found if r.state == "ready"]
                 if any(r.state == "source_error" for r in found):
                     session.update(state="source_error", error="source_resolution_error")
+                    _trace(event="source_error", session=session.get("id"),
+                           alias=session.get("alias"), etat="source_error")
                     return
                 if len(paths) != 1 or any(r.state == "ambiguous" for r in found):
                     session["state"] = "ambiguous" if len(paths) > 1 or any(r.state == "ambiguous" for r in found) else "source_missing"
@@ -2575,6 +2592,10 @@ class Supervisor:
                             alert.update(previous_alert_id=previous_alert_id, source_event_id=occurrence["event_id"], source_event_index=occurrence["event_index"])
                         alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"), result.get("event_id"))
                         session["alerts"].append(alert)
+                        _trace(event="constat", session=sid, alias=session.get("alias"),
+                               alert_id=alert["id"], severity=alert.get("severity"),
+                               category=alert.get("category"),
+                               provenance=(alert.get("evidence_provenance") or {}).get("source"))
                         prepare_alert(alert)
                         record_event(session, "finding_created", alert["reason"], timestamp(), alert_id=alert["id"], version=alert["version"])
 

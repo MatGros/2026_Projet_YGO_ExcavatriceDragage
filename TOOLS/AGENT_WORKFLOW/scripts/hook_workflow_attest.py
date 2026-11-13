@@ -26,6 +26,8 @@ STATE_DIR = LOCAL_APP / "ExcavatriceDragage" / "workflow"
 SUPERVISOR_SUMMARY_URL = "http://127.0.0.1:8082/api/supervision/summary"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import miss_log  # noqa: E402  (chemin local du script)
+import terminal_title  # noqa: E402  (chemin local du script)
+import trace_log  # noqa: E402  (journal interne)
 TAIL_BYTES = 512_000
 
 
@@ -151,28 +153,6 @@ def last_ai_title(transcript_path) -> str:
     return ""
 
 
-def set_terminal_title(title_text: str) -> bool:
-    """Titre du terminal (console Windows + sequences OSC 0/2)."""
-    if not title_text:
-        return False
-    try:
-        import ctypes
-        if os.name == "nt":
-            ctypes.windll.kernel32.SetConsoleTitleW(str(title_text))
-        sequence = f"\x1b]0;{title_text}\x07\x1b]2;{title_text}\x07"
-        if os.name == "nt":
-            with open("CONOUT$", "w", encoding="utf-8", errors="replace") as tty:
-                tty.write(sequence)
-                tty.flush()
-        else:
-            with open("/dev/tty", "w", encoding="utf-8", errors="replace") as tty:
-                tty.write(sequence)
-                tty.flush()
-        return True
-    except Exception:
-        return False
-
-
 def main() -> int:
     try:
         payload = json.load(sys.stdin)
@@ -211,6 +191,10 @@ def main() -> int:
         "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
     })
 
+    trace_log.emit("attestation", session=session_id, conform=conform, banner=bool(banner),
+                   footer=has_footer, turns=turns, conform_turns=conform_turns,
+                   etape=banner[1] if banner else None, voie=banner[2] if banner else None)
+
     # M1 : le Superviseur n'observe plus (erreur / arret) alors que la session travaille.
     state = supervisor_state(session_id)
     if state and state != "active":
@@ -227,7 +211,8 @@ def main() -> int:
     try:
         title = last_ai_title(transcript)
         if title:
-            set_terminal_title(f"{title} \U0001F9E0 CC")
+            # Sequence ecrite + relue + consignee (terminal_title.refresh).
+            terminal_title.refresh(session_id, f"{title} \U0001F9E0 CC")
     except Exception:
         pass
     return 0

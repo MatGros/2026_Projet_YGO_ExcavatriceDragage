@@ -17,6 +17,7 @@ from ctypes import wintypes
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import terminal_title  # noqa: E402  (chemin local du script)
 from statusline_indicators import (  # noqa: E402  (chemin local du script)
     STATUSLINE_INDENT, get_git_badge, get_scope_badge, get_workflow_badge,
 )
@@ -343,9 +344,13 @@ def main():
                 task_id = m.group(1).upper()
 
         tab_title = f"{raw_title.strip()} {boot_name}" if raw_title else boot_name
-        # Le statusline revient après les commandes outil : réappliquer le titre
-        # complet synchronisé résiste au titre du shell enfant.
-        set_terminal_title(tab_title)
+        # T429 : ecriture VERIFIEE (ecrire -> relire -> reessayer -> consigner).
+        # Le statusline revient apres les commandes outil : reappliquer le titre ici
+        # resiste au titre du shell enfant, et la verification prouve le resultat.
+        try:
+            terminal_title.refresh(conv_id, tab_title)
+        except Exception:
+            set_terminal_title(tab_title)
 
         # Sortie pour la commande :
         if mode == "title":
