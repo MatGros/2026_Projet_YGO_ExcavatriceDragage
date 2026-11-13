@@ -18,10 +18,14 @@ import os
 import sys
 import tempfile
 import time
+import urllib.request
 from pathlib import Path
 
 LOCAL_APP = Path(os.environ.get("LOCALAPPDATA", r"C:\Users\ZEDVICTUS\AppData\Local"))
 STATE_DIR = LOCAL_APP / "ExcavatriceDragage" / "workflow"
+SUPERVISOR_SUMMARY_URL = "http://127.0.0.1:8082/api/supervision/summary"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import miss_log  # noqa: E402  (chemin local du script)
 TAIL_BYTES = 512_000
 
 
@@ -106,6 +110,23 @@ def write_attestation(path: Path, payload: dict) -> None:
         pass
 
 
+def supervisor_state(session_id: str) -> str:
+    """Etat du Superviseur pour cette session ('active', 'paused', 'source_error', ...).
+
+    Vide si le Superviseur est injoignable : une panne de l'observateur ne doit pas
+    etre confondu avec une session muette.
+    """
+    try:
+        with urllib.request.urlopen(SUPERVISOR_SUMMARY_URL, timeout=1.5) as response:
+            data = json.loads(response.read().decode("utf-8"))
+    except (OSError, ValueError):
+        return ""
+    for item in data.get("sessions", []):
+        if str(item.get("native_id") or "") == session_id:
+            return str(item.get("state") or "")
+    return ""
+
+
 def main() -> int:
     try:
         payload = json.load(sys.stdin)
@@ -143,6 +164,17 @@ def main() -> int:
         "voie": banner[2] if banner else "",
         "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
     })
+
+    # M1 : le Superviseur n'observe plus (erreur / arret) alors que la session travaille.
+    state = supervisor_state(session_id)
+    if state and state != "active":
+        miss_log.record(session_id, "M1", f"Superviseur en etat '{state}' pendant une session active",
+                        f"session={session_id} etat_superviseur={state}")
+
+    # M2 : le workflow est declare actif mais aucun tour conforme n'a ete atteste.
+    if conform_turns == 0 and not any(item.get("kind") == "M2" for item in miss_log.list_misses(session_id, 200)):
+        miss_log.record(session_id, "M2", "Workflow declare actif mais debut non effectue",
+                        "aucun bandeau de ligne d'etape ni pied '➡️ Choix' atteste sur les tours passes")
     return 0
 
 
