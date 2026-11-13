@@ -217,22 +217,22 @@ def notify_supervisor(session_id: str, alias: str, mission_text: str = "", platf
         # T429 (2026-11-13) : le TITRE de la tâche (officiel, catalogue) doit figurer dans
         # le titre de session Superviseur — la désignation libre de l'exploitant passe en
         # corps de mission (elle décrit la session, pas la tâche).
-        task_title = resolve_task_title(alias)
         designation = mission_text.strip()
         folder_name = resolve_session_task_folder(alias)
+        # 1re ligne = le titre choisi par l'exploitant (ce qu'il voit partout).
+        # 2e ligne = le titre officiel de la tache : il informe le juge et l'IHM
+        # sans ecraser le titre de session.
+        task_title = resolve_task_title(alias)
         if task_title:
-            # Une seule ligne : le titre de session reste lisible partout (terminal,
-            # notifications) et la désignation de l'exploitant n'est pas perdue.
-            mission = f"{alias} · {task_title}"
-            if designation:
-                mission += f" ({designation})"
+            mission = f"{alias} {designation}".strip()
+            mission += f"\nTache : {task_title}"
             if folder_name:
-                mission += f" — Dossier: {folder_name}"
+                mission += f"\nDossier: {folder_name}"
         else:
-            # T000 / tache inconnue : format historique inchange.
+            # T000 / tache inconnue : format historique inchange (une seule ligne).
             mission = f"{alias} {designation}".strip()
             if folder_name:
-                mission += f" — Dossier: {folder_name}"
+                mission += f" \u2014 Dossier: {folder_name}"
             elif not designation:
                 mission = alias
 
