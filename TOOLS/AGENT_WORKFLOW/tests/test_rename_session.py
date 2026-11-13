@@ -291,11 +291,12 @@ def test_rename_uses_real_supervisor_assignment_id_for_alias_and_mission(tmp_pat
         # T429 (2026-11-13) : le titre officiel de la tache porte le titre de session.
         task_title = rename_session.resolve_task_title(alias)
         assert task_title, "le titre officiel de la tache doit etre resolu"
-        assert assignment["mission"] == f"{alias} · {task_title} (Hydro M3)"
+        assert assignment["mission"].splitlines()[0] == f"{alias} Hydro M3"
+        assert f"Tache : {task_title}" in assignment["mission"]
         with urlopen(base_url + "/api/supervision/summary") as response:
             summary = json.loads(response.read().decode("utf-8"))
         displayed = next(item for item in summary["sessions"] if item["native_id"] == native_id)
-        assert displayed["display_title"] == f"{alias} · {task_title} (Hydro M3)"
+        assert displayed["display_title"] == f"{alias} Hydro M3"
     finally:
         server.supervision.close()
         server.shutdown()

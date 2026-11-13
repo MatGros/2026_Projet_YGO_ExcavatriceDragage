@@ -1083,3 +1083,59 @@ def test_paused_gap_is_still_skipped_on_explicit_normal_resume(tmp_path):
         assert calls == [], 'la reprise normale ne doit pas analyser les messages ignorés'
     finally:
         svc.close()
+
+def test_evidence_provenance_points_to_the_window_when_the_quote_is_visible():
+    session = {"context": [{"role": "assistant", "text": "Le lot est valide.",
+                            "event_id": "e1", "event_index": 42, "observed_at": "2026-11-13T10:00:00Z"}],
+               "memory": [], "session_journal": [], "acquired_proofs": []}
+    provenance = supervisor_service.evidence_provenance(session, "Le lot est valide.")
+    assert provenance["source"] == "fenetre"
+    assert provenance["in_window"] is True
+    assert provenance["event_id"] == "e1"
+    assert provenance["event_index"] == 42
+
+
+def test_evidence_provenance_reports_the_long_memory_when_the_quote_left_the_window():
+    session = {"context": [], "memory": [{"kind": "user_message", "text": "Corrige.",
+                                         "event_id": "e9", "event_index": 7}],
+               "session_journal": [], "acquired_proofs": []}
+    provenance = supervisor_service.evidence_provenance(session, "Corrige.")
+    assert provenance["source"] == "memoire longue"
+    assert provenance["in_window"] is False
+    assert provenance["event_id"] == "e9"
+
+
+def test_evidence_provenance_says_introuvable_instead_of_guessing():
+    session = {"context": [], "memory": [], "session_journal": [], "acquired_proofs": []}
+    provenance = supervisor_service.evidence_provenance(session, "preuve disparue")
+    assert provenance["source"] == "introuvable"
+    assert provenance["in_window"] is False
+
+
+def test_snapshot_exposes_the_memory_state_without_leaking_into_the_public_summary(tmp_path):
+    from TOOLS.AGENT_SUPERVISOR.scripts.supervisor_service import Supervisor
+
+    svc = Supervisor(state_path=tmp_path / "state.json")
+    sid = "session-memoire"
+    svc.sessions[sid] = svc._new_session(sid, "claude", "native-id", "T429-MMX01", False, "mission")
+    svc.sessions[sid]["context"] = [{"role": "assistant", "text": "dans la fenetre", "event_id": "e1"}]
+    svc.sessions[sid]["memory"] = [{"kind": "user_message", "text": "hors fenetre", "event_id": "e2"}]
+    svc.sessions[sid]["session_journal"] = [{"text": "jalon", "source_event_id": "e3"}]
+    svc.sessions[sid]["acquired_proofs"] = [{"text": "pytest 200 passed", "event_id": "e4"}]
+
+    snapshot = svc.snapshot()
+    item = next(s for s in snapshot["sessions"] if s["id"] == sid)
+    assert item["context"][0]["text"] == "dans la fenetre"
+    assert item["session_journal"][0]["source_event_id"] == "e3"
+    assert item["acquired_proofs"][0]["event_id"] == "e4"
+    state = item["memory_state"]
+    assert state["fenetre"] == 1 and state["memoire_longue"] == 1
+    assert state["journal"] == 1 and state["preuves_acquises"] == 1
+
+    # Le resume public (plugin, statusline) ne doit RIEN ajouter de nouveau.
+    public = svc.notification_snapshot()
+    public_item = next(s for s in public["sessions"] if s["id"] == sid)
+    assert "memory_state" not in public_item
+    assert "context" not in public_item
+    assert "acquired_proofs" not in public_item
+    svc.close()

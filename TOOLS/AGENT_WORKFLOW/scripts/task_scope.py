@@ -237,16 +237,29 @@ def metric(session_id: str, transcript_path: str | Path, window: int = 10) -> di
     return _metric_from_paths(scope, paths, window)
 
 
+def _inside_repo(relative: str) -> bool:
+    """Vrai si le chemin est relatif au depot (un scratch externe ne compte pas)."""
+    text = str(relative or "").replace("\\", "/")
+    if text.startswith("/") or re.match(r"^[A-Za-z]:", text):
+        return False
+    return True
+
+
 def _metric_from_paths(scope: dict, paths: list[str], window: int) -> dict:
     counts = {"produit": 0, "processus": 0, "derogation": 0, "hors": 0}
     details = []
     for relative in paths:
+        if not relative.startswith(("/", "\\")) and ":" not in relative.split("/")[0]:
+            pass
+        elif not _inside_repo(relative):
+            # Fichiers temporaires / hors depot : ce n'est pas du travail projet.
+            continue
         kind = classify(relative, scope["produit"], scope["interdits"], scope["processus"])
         if kind == "hors" and is_derogated(scope.get("session_id", ""), relative):
             kind = "derogation"
         counts[kind] += 1
         details.append({"path": relative, "kind": kind})
-    total = len(paths)
+    total = sum(counts.values())  # seules les ecritures projet comptent
     hors = counts["hors"]
     return {
         "session_id": scope.get("session_id", ""),

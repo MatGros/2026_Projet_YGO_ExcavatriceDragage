@@ -499,6 +499,45 @@ def ollama_chat(model, messages, allow_cloud=False):
     return result[:6000]
 
 
+def evidence_provenance(session, evidence, event_id=None):
+    """Origine de la preuve citee par un constat (calcul, jamais devine).
+
+    "fenetre"        : le message est dans les 12 derniers observes (le juge le voit)
+    "memoire longue" : le message est dans la memoire de session (hors fenetre)
+    "journal"        : anchor dans le journal d'etat
+    "preuves"        : anchor dans les preuves acquises
+    "cadrage"        : anchor dans la mission / les decisions
+    "introuvable"    : la preuve n'est plus la (c'est la cause des retrogradations)
+    """
+    text = str(evidence or "").strip()
+    if not text:
+        return {"source": "introuvable", "in_window": False}
+
+    for item in session.get("context", []) or []:
+        if text and text in str(item.get("text", "")):
+            return {"source": "fenetre", "in_window": True,
+                    "event_id": item.get("event_id"), "event_index": item.get("event_index"),
+                    "at": item.get("observed_at")}
+
+    for item in session.get("memory", []) or []:
+        if text and text in str(item.get("text", "")):
+            return {"source": "memoire longue", "in_window": False,
+                    "event_id": item.get("event_id"), "event_index": item.get("event_index"),
+                    "at": item.get("observed_at")}
+
+    for item in session.get("session_journal", []) or []:
+        if text and text in str(item.get("text", "")):
+            return {"source": "journal", "in_window": False,
+                    "event_id": item.get("source_event_id"), "at": item.get("recorded_at")}
+
+    for item in session.get("acquired_proofs", []) or []:
+        if text and text in str(item.get("text", "")):
+            return {"source": "preuves", "in_window": False,
+                    "event_id": item.get("event_id"), "at": item.get("acquired_at")}
+
+    return {"source": "introuvable", "in_window": False, "event_id": event_id}
+
+
 class Supervisor:
     def __init__(self, state_path=None, roots=None, judge=None, poll_interval=8.0, chat=None, strict_assignments=False, persist_chat=False):
         if poll_interval <= 0:
@@ -1214,6 +1253,20 @@ class Supervisor:
                 item["watcher_telemetry"] = self._watcher_telemetry(session)
                 item["recent_raw_events"] = session.get("recent_raw_events", [])[-15:]
                 item["dropped_events"] = session.get("dropped_events", [])[-15:]
+                # R12 : ce que le juge voit reellement, et ce qu'il ne voit plus.
+                item["context"] = session.get("context", [])
+                item["session_journal"] = session.get("session_journal", [])
+                item["acquired_proofs"] = session.get("acquired_proofs", [])
+                item["memory_state"] = {
+                    "fenetre": len(session.get("context", []) or []),
+                    "memoire_longue": len(session.get("memory", []) or []),
+                    "journal": len(session.get("session_journal", []) or []),
+                    "preuves_acquises": len(session.get("acquired_proofs", []) or []),
+                    "cadrage": len(session.get("framing", []) or []),
+                    "ecartes": len(session.get("dropped_events", []) or []),
+                    "fenetre_tronquee": bool(session.get("context_truncated")),
+                    "regles": self.judge_settings.get("context_messages"),
+                }
             for item in public:
                 item['chat_messages'] = self._chat_histories.get(item['id'], [])
             # Copy nested alerts; callers cannot alter internal state.
@@ -2506,6 +2559,7 @@ class Supervisor:
                             workflow=dict(status="informational", delivery_status="not_sent", choice=None, rationale="", chosen_at=None, response=""))
                         if previous_alert_id:
                             alert.update(previous_alert_id=previous_alert_id, source_event_id=occurrence["event_id"], source_event_index=occurrence["event_index"])
+                        alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"), result.get("event_id"))
                         session["alerts"].append(alert)
                         prepare_alert(alert)
                         record_event(session, "finding_created", alert["reason"], timestamp(), alert_id=alert["id"], version=alert["version"])
