@@ -1,6 +1,6 @@
 ---
 name: workflow-project
-description: Lance ou relance le workflow projet dans ce chat (neuf ou déjà ouvert). Argument `resume` = avec récupération du contexte, `fresh` = sans récupération, rien = proposer le choix. Déclencher sur /workflow-project ou « lance le workflow projet ».
+description: "Commande utilisateur explicite : TOUJOURS exécuter dans ce chat, quelle que soit la tâche en cours (ne prend aucune tâche, ne change aucun verrou). Rejoue le démarrage du workflow projet. `resume` = reprend le fil de ce chat, `fresh` = sans récupération, rien = restitution courte puis choix."
 ---
 
 # 🧭 workflow-project (stub — déclencheur)

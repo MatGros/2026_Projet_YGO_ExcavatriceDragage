@@ -1,37 +1,67 @@
 ---
 name: workflow-project
-description: Lance ou relance le workflow projet dans n'importe quel chat (neuf ou déjà ouvert). Argument `resume` (avec récupération du contexte) ou `fresh` (sans récupération).
+description: Commande explicite /workflow-project [resume|fresh|off]. Toujours exécuter via le script workflow_state.py ; son résultat fait foi. Ne prend aucune tâche.
 ---
 
-# 🧭 workflow-project — Lancer le workflow projet
+# 🧭 workflow-project — commande déterministe
 
-> 📌 **Source canonique de la commande `/workflow-project`** (stubs : `.claude/skills/` et `.dsh/skills/`).
-> Cette commande **ne contient aucune règle** : les règles vivent dans `AGENTS.md` § « Démarrage de
-> session — Entonnoir réflexe ». Elle sert seulement à le **rejouer** à la demande.
-> Origine : T427, incrément I1b (2026-11-13).
+> 📌 Source canonique de `/workflow-project` (stubs : `.claude/skills/` et `.dsh/skills/`).
+> Origine : T427, incrément I1c (2026-11-13). Plan : `DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/`.
 
-## 1. 📚 Toujours, en premier
+## 0. ⚠️ Règle absolue
 
-1. Relire **`AGENTS.md` en entier, à jour sur disque** (le contexte du chat peut contenir une
-   version périmée chargée au démarrage de la session).
-2. Lire `DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md`. Ne jamais lire `DOC/WFLOW/TASKS.yaml` en entier.
-3. Appliquer le § Démarrage selon l'argument ci-dessous.
+- Une commande **tapée par l'utilisateur s'exécute toujours**, dans le chat en cours, quelle que
+  soit la tâche en cours. Ne jamais la refuser, ni la renvoyer vers un autre agent.
+- Elle **ne prend aucune tâche** et ne change aucun verrou.
+- Chaque invocation est **indépendante** : ne pas se fonder sur un refus ou un choix antérieur.
+- Aucune question avant d'exécuter.
 
-## 2. 🔀 Selon l'argument
+## 1. 🔧 Étape unique : appeler le script
 
-**🔁 `resume` — avec récupération du contexte**
-- Résumer le fil en cours en **5 lignes max** : tâche · étape · dernière décision · prochaine action · ce qui attend une validation.
-- Poser la **ligne d'étape** correspondant à ce résumé.
-- Finir par le pied `➡️ Choix`.
+Lancer, depuis la racine du dépôt, **la commande exacte** ci-dessous, en passant l'ID natif
+de la session (`CLAUDE_CODE_SESSION_ID` pour Claude) :
 
-**🆕 `fresh` — sans récupération**
-- Faire la restitution standard du § Démarrage : rôle · compteurs 🔒/⏳/⏸️/⬜ · une question.
-- Ne pas s'appuyer sur l'historique du chat pour le cadrage.
-- ⚠️ Limite à dire en une ligne si utile : l'historique reste dans le contexte ; seul `/clear` ou un nouveau chat repart réellement de zéro.
+```text
+python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py <enter|off|status> [fresh|resume] --session "$CLAUDE_CODE_SESSION_ID"
+```
 
-**❓ Sans argument**
-- Proposer en une ligne : `resume` (reprendre le fil) ou `fresh` (repartir du cadrage).
+| Commande utilisateur | Appel du script |
+|---|---|
+| `/workflow-project` ou `/workflow-project fresh` | `enter fresh` |
+| `/workflow-project resume` | `enter resume` |
+| `/workflow-project off` | `off` |
 
-## 3. 🚫 Ce que la commande ne fait pas
-- Aucune écriture de fichier, aucun changement de statut au catalogue.
-- Aucune règle propre : en cas d'écart, `AGENTS.md` fait foi.
+Le script écrit l'état hors dépôt et imprime le bloc de sortie. **Ce bloc fait foi** :
+- il indique `WORKFLOW ACTIF`, `OFF` ou `INDÉTERMINÉ` ;
+- il donne les compteurs du catalogue et dit si le résumé est à jour ;
+- il dit si `AGENTS.md` est présent.
+
+## 2. ✍️ Ce que l'agent remplit (et seulement ça)
+
+Le bloc contient trois champs à compléter. Rien d'autre :
+- 📍 **Ce chat** : la tâche en cours, ou « aucune », avec le dernier point en une phrase ;
+- ⏸️ **En attente** : ce qui attend l'utilisateur, ou « rien » ;
+- ➡️ **Choix** : 2 à 4 suites possibles.
+
+Pour `resume` : résumer le fil du chat en 5 lignes au maximum dans 📍 (il reprend le **fil de ce chat**,
+pas une tâche du catalogue).
+
+## 3. 🔀 Cas du script
+
+- **`ACTIF`** : appliquer le § Démarrage de `AGENTS.md` (ligne d'étape, pied de réponse).
+- **`OFF`** : répondre en simple assistant. Pas de ligne d'étape ni de pied `➡️`.
+- **`INDÉTERMINÉ`** : dire que l'état n'est pas connu, sans rien supposer. Demander de relancer
+  avec `/workflow-project` ou `off`.
+- **Résumé `PÉRIMÉ` ou `ABSENT`** : le signaler dans 📊, sans lire `TASKS.yaml` entier.
+
+## 4. 🚫 Ce que la commande ne fait pas
+
+- Aucune écriture dans le dépôt : l'état vit dans `%LOCALAPPDATA%/ExcavatriceDragage/workflow/`.
+- Aucune modification du catalogue, des verrous ou du code.
+- Aucune règle propre : `AGENTS.md` fait foi.
+
+## 5. ⚠️ Limites à connaître
+
+- Un **nouveau chat** n'a pas de clé de session connue pour Codex : le script répond `INDÉTERMINÉ`.
+- Le déclenchement automatique à chaque message (hook) n'est **pas** configuré : tant que
+  l'utilisateur ne lance pas la commande, rien n'est rejoué.

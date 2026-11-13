@@ -238,5 +238,39 @@ Chaque cas se joue sur **Claude** et sur **Codex** ; noter ✅ / ❌ + l'extrait
   `AGENTS.md` (demande exploitant : « savoir où on en est, où on peut aller ») ; cas de test T5.
 - **2026-11-13 · 🛠️ I1b** — `/workflow-project [resume|fresh]` : skill canonique renommée
   `project-workflow` → `workflow-project` (résout P2), stubs Claude + DSH, renvoi dans `AGENTS.md`.
+- **2026-11-13 · 🧪 I1 test réel** — 4 vraies sessions non interactives, dépôt réel, hooks actifs
+  (`claude -p` ×3, `codex exec -s read-only` ×1). Résultat : 4/4 conformes sur l'essentiel.
+  - ✅ « Salut » (Claude, Codex) : ligne d'étape, compteurs, empreinte SHA vérifiée, question, pied `➡️ Choix`.
+  - ✅ « J'ai un bug sur le treuil » : voie Troubleshooting, 4 questions de précision, aucune écriture.
+  - ✅ « Prends T430 » : détecte le verrou CDX04, demande confirmation avant transfert, propose a/b.
+  - ⚠️ Écart 1 : un agent propose `/workflow-project resume` « pour reprendre une tâche » → préciser que `resume` reprend le **fil du chat**, pas une tâche.
+  - ⚠️ Écart 2 : Codex inverse l'ordre (`CADRAGE · T000`) → format à figer.
+  - ⚠️ Écart 3 : Codex lit le résumé via PowerShell 5.1 → accents illisibles (UTF-8 sans BOM) → I2 : écrire avec BOM ou indiquer l'encodage.
+- **2026-11-13 · 🟥 I1b retour usage réel** — dans un chat T000 (`/rename-session`), `/workflow-project`
+  refusé par l'agent (« tu prends le workflow et l'agent T427 »). Cause : la skill ne disait pas
+  qu'elle ne prend aucune tâche. Correctif : §0 « commande explicite = toujours exécuter, ne prend
+  aucune tâche », `resume` = fil du chat, sans argument = restitution puis choix ; descriptions des
+  stubs précisées. G440 PASS. À retester dans ce même chat après `/reload-skills`.
+- **2026-11-13 · 🛠️ I1c — déterminisme par script** — collège V4 (3 experts Ollama) : ce qui est
+  figeable (état, sortie, fraîcheur, absence de fichier) contre ce qui reste à l'agent (📍 ⏸️ ➡️).
+  Implémenté : `TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py` (`enter|off|status`), état **par
+  session** hors dépôt (`%LOCALAPPDATA%/ExcavatriceDragage/workflow/`), écriture atomique, sans clé
+  = INDÉTERMINÉ. Tests : 12 PASS (`test_workflow_state.py`). Vérifié en réel : enter → off → status
+  restitue OFF. Skill réécrite pour appeler le script. Non commité.
+  - ⚠️ Limites : Codex sans clé de session ; hook automatique non configuré ; l'agent doit remplir
+    📍 ⏸️ ➡️ (sinon les placeholders restent visibles) ; le titre `T000` est fixe dans le script.
 - **2026-11-13 · ✍️ Style** — plan converti en listes à puces, sans tableaux (consigne exploitant
   pour les documents : français, aéré, emoji, pas de tableaux complexes).
+- **2026-11-13 · 🧪 Tests réels** — `claude -p` (Haiku) : `/workflow-project` injecte bien le script,
+  mais le modèle réécrit la réponse (ajoute ses choix, pose des questions). Non déterministe dans le chat.
+- **2026-11-13 · 🧹 Entrée unique** — stub de skill Claude `.claude/skills/workflow-project/` retiré
+  (doublon avec la commande). Seule entrée Claude : `.claude/commands/workflow-project.md`.
+- **2026-11-13 · 🔀 Menu** — sortie figée : `1` Orchestrateur · `2` Tâche · `3` Troubleshooting ·
+  `0` Quitter. Texte libre = réponse directe. Quitter : `0` ou `off` (retiré : quit, exit, retour).
+  Tapé via `/workflow-project 1|2|3|0`. Testé (15 PASS + essai réel de la séquence).
+- **2026-11-13 · ⚠️ Superviseur** — rattachement T427-CC02 refusé : `source_changed_during_read`
+  (transcript écrit pendant la lecture). Aucune réparation faite, `--reassign` non utilisé.
+- **2026-11-13 · ⚠️ Principe non écrit** — « une remarque n'est pas un ordre » + discernement
+  (observation / consigne / question / ambigu). Challengé par 2 experts : la préséance « ordre explicite
+  > décision antérieure » manque. Pas encore écrit dans `AGENTS.md`. Décision en attente.
+- **2026-11-13 · ⏸️ Non commité** — modifications de I1c, I1d (menu) et de la commande : à commiter après validation.

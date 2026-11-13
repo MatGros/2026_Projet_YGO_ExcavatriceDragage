@@ -103,6 +103,10 @@ tasks:
     resume/detail'
   - 'AC-F1.7 : Titre session canonique TXXX[-X]-AGENT et passage de relais sans doublon avec conservation historique'
   - 'AC-F1.8 : Horodatage systematique des evenements de session (created_at ISO et affichage local dans l IHM)'
+  - 'AC-F1.9 : Aucun evenement ecrit apres l''affectation n''est perdu au premier demarrage (0 perte silencieuse)'
+  - 'AC-F2.11 : Reevaluation demandee par l''exploitant sur une session en pause : verdict visible en moins de 30 s'
+  - 'AC-F2.12 : Un constat en resolution_proposed n''est pas retrograde en uncertain sans nouvelle preuve'
+  - 'AC-F3.11 : Ecran etroit (<= 600 px) : 1er constat dans le 1er ecran, 0 defilement horizontal'
   avancement: '2026-11-09 AGY01. Campagne multi-modeles menee avec succes (DeepSeek V4.1, GLM 5.3). AC-F1.7 valide (Handover
     reassign + regex ALIAS_PATTERN fullmatch strict sans saut de ligne). AC-F1.8 implemente (horodatage ISO et format local
     des evenements de session). AC-F1.5bis valide (partitionnement adaptatif glouton des lots de reprise historique eliminant
@@ -116,7 +120,14 @@ tasks:
     commit/push sans accord explicite. 2026-11-10 AGY01 : Decision utilisateur : bloc Trajet des messages mis de cote / gele
     (composant maquette semi-statique non probant). Synthese d audit collecteur AC1-AC5 mise en attente pour traitement ulterieur.
     Priorite donnee a la refonte ergonomique du ruban Collecteur et Flux (etiquetage des sessions, clarification du statut
-    de veille, regles de tri perennes dans l IHM et allegement de la charge cognitive des historiques).'
+    de veille, regles de tri perennes dans l IHM et allegement de la charge cognitive des historiques). 2026-11-13 CC01 :
+    Lot de fiabilisation T429 (jalons F0-F4) sur service 8082. AC-F1.9 : perte silencieuse corrigee (evenements ecrits entre
+    l''affectation et le premier demarrage) + 2 gardes. AC-F2.11 : reevaluation a la demande sur session en pause desormais
+    operationnelle (verdict du juge en 2 s, cite et visible) + 3 gardes pytest. AC-F2.12 : une resolution proposee n''est
+    plus retrogradee en incertain. AC-F3.11 : ecran etroit corrige (navigation au pictogramme) ; ui_layout_check 360 px passe
+    enfin. Etat : pytest 197/197, test_ui.mjs normal + deep link, ui_layout_check 3 largeurs, npm test plugin 15/15. Service
+    deploie (build 71e9a47c851d, sauvegarde verifiee, 7 affectations conservees). Restent : AC-F3.5 (notification/son/toast/clic
+    a observer par l''exploitant) et AC-F3.9 (retour final sur la simplicite). Aucun commit/push sans accord explicite.'
   contrat: 'DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml (contrat
     mesurable AC-F0 a AC-F4, AC-X ; preuves et revues A/B dans tracking). Pilotage detaille : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md'
   bloque_par: ''
@@ -125,6 +136,7 @@ tasks:
     token: 5mIZrcT-olWu5ESc1FBB-PtVWQ6oMmIn
     acquired_at: '2026-11-09T03:39:09+00:00'
   edit_flag: null
+  revision: 20d77368e9f7aa824b526da5cbf4e0999b17d2795986d0de5707985d012f8161
 - id: T428
   parent_id: ''
   statut: ⏸️

@@ -67,3 +67,7 @@
 [2026-11-13T10:33:59.348369+00:00] [FAILED] [139d7672-37f8-47e7-94e6-62a0018a8b8c] 'Orchestration de la tâche T427' -> 'T427-CC02' (code=1)
 [2026-11-13T10:34:50.851396+00:00] [INTENT] [139d7672-37f8-47e7-94e6-62a0018a8b8c] 'Orchestration de la tâche T427' -> 'T427-CC02' (code=0)
 [2026-11-13T10:34:50.864429+00:00] [REJECTED] [139d7672-37f8-47e7-94e6-62a0018a8b8c] 'Orchestration de la tâche T427' -> 'T427-CC02' (code=4)
+[2026-11-13T12:56:57.560993+00:00] [INTENT] [d9739b30-d0bb-46e9-87c5-243ffc255f90] 'supervisor-reliability-campaign-handoff' -> 'T429-MMX01' (code=0)
+[2026-11-13T12:56:57.564521+00:00] [REJECTED] [d9739b30-d0bb-46e9-87c5-243ffc255f90] 'supervisor-reliability-campaign-handoff' -> 'T429-MMX01' (code=4)
+[2026-11-13T12:57:28.314404+00:00] [INTENT] [d9739b30-d0bb-46e9-87c5-243ffc255f90] 'supervisor-reliability-campaign-handoff' -> 'T429-MMX01' (code=0)
+[2026-11-13T12:57:28.698832+00:00] [COMMIT] [d9739b30-d0bb-46e9-87c5-243ffc255f90] 'supervisor-reliability-campaign-handoff' -> 'T429-MMX01' (code=0)
