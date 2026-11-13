@@ -85,7 +85,9 @@ tasks:
   contexte: 'Campagne de fiabilisation du Supervisor lancee le 2026-11-08, jusqu ici suivie sans ID formel. Document unique
     de pilotage (plan, decisions, preuves, limites) : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
     . Utilisation du service : TOOLS/AGENT_SUPERVISOR/README.md . Perimetre : TOOLS/AGENT_SUPERVISOR/ uniquement. Aucun changement
-    CODE/, CODESYS, hooks, skills ni configurations CLI.'
+    CODE/, CODESYS, hooks, skills ni configurations CLI. Session Superviseur : T429-MMX01 — le titre de session porte le titre
+    officiel de la tache (depuis le 2026-11-13) ; alias T429-MMX01 valide par le Superviseur, champ `agent` du catalogue regex
+    CC/AGY/CDX/DSH/OPC (arbitrage famille MMX avec le lot T000_SESSION_NAMING en cours).'
   description: Rendre le suivi d une session surveillee fiable apres pause ou redemarrage, et rendre les constats lisibles
     et exploitables (IHM, plugin VS Code, envoi au chat), prouve sur parcours reels et non seulement sur tests DOM ou donnees
     synthetiques. Lots F0 a F4 du document de pilotage.
@@ -127,16 +129,21 @@ tasks:
     plus retrogradee en incertain. AC-F3.11 : ecran etroit corrige (navigation au pictogramme) ; ui_layout_check 360 px passe
     enfin. Etat : pytest 197/197, test_ui.mjs normal + deep link, ui_layout_check 3 largeurs, npm test plugin 15/15. Service
     deploie (build 71e9a47c851d, sauvegarde verifiee, 7 affectations conservees). Restent : AC-F3.5 (notification/son/toast/clic
-    a observer par l''exploitant) et AC-F3.9 (retour final sur la simplicite). Aucun commit/push sans accord explicite.'
-  contrat: 'DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml (contrat
-    mesurable AC-F0 a AC-F4, AC-X ; preuves et revues A/B dans tracking). Pilotage detaille : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md'
+    a observer par l''exploitant) et AC-F3.9 (retour final sur la simplicite). Aucun commit/push sans accord explicite. 2026-11-13
+    CC01 : plan complet, detaille et verifie ecrit (T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md) avec 7 restes numerotes R1
+    a R7, chacun avec critere de fin et commande de verification ; generateur du resume de catalogue (TASKS_ACTIVE_SUMMARY.md)
+    livre : le bandeau de demarrage n''affiche plus PERIME. Restes : R1/R2 exploitant, R3/R4 agent T000, R5 alignement service,
+    R6 push sur accord.'
+  contrat: DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md (plan complet, detaille et verifie)
+    + DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml (contrat mesurable
+    AC-F0 a AC-F4, AC-X)
   bloque_par: ''
   work_lock:
     actor: CC01
     token: DhFsDsuet8HqBuqIJFwSozcES5zjq0Ug
     acquired_at: '2026-11-13T13:57:52+00:00'
   edit_flag: null
-  revision: d1236240b4ae505f617a61312abc0c2bda1dc6fa7a2b6ac4dac1c8f7bf98f47f
+  revision: aa477e53a9e37aa9655c18284a923dc2a4dd56a1f20133fcdb8db5eafdef82b3
 - id: T428
   parent_id: ''
   statut: ⏸️

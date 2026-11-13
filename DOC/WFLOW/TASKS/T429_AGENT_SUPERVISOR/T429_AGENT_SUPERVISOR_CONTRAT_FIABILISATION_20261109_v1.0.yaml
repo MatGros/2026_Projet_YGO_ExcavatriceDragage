@@ -1,6 +1,7 @@
 # CONTRAT DE TACHE T429 — Agent Supervisor : fiabilisation reprise, cycle des constats, IHM, plugin
 # Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml
-# Pilotage detaille, decisions et preuves : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
+# Plan complet, detaille et verifie : DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md
+# Pilotage detaille initial (historique) : DOC/WFLOW/TASKS/T_TEMP (A TRIER)/T429_AGENT_SUPERVISOR_PLAN_REPRISE_TRANSCRIPT_ET_PLUGIN_20261108_v1.0.md
 # Demande exploitant 2026-11-09 : « ordres contractes complets et detailles, objectifs clairs, mesurables, evaluables ».
 
 contract:
@@ -154,7 +155,7 @@ contract:
   scope:
     allowed:
       - TOOLS/AGENT_SUPERVISOR/**
-      - DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md
+      - DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md
       - DOC/WFLOW/ETUDES/AGENT_SUPERVISOR_*.json
       - DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml
       - "DOC/WFLOW/TASKS.yaml (fiche T429 uniquement, via API Task Manager)"
@@ -237,7 +238,7 @@ tracking:
   unknowns:
     - "AC-F3.5 [REEL] : notification bureau, son, toast VS Code et clic vers la bonne carte a observer par l'exploitant (non observable par l'agent). Banc automatise passe (run_notify_bench.py) mais l'observation humaine reste a consigner."
     - "AC-F3.9 : retour exploitant final sur la simplicite (2 challenges ergonomie realises ; correctif 2026-11-13 sur ecran etroit a valider par l'exploitant)."
-  next_action: "Recette exploitant AC-F3.5 / AC-F3.9 ; decision commit."
+  next_action: "Recette exploitant AC-F3.5 / AC-F3.9 (R1, R2 du plan) ; arbitrage famille MMX avec le lot T000 (R3) ; alignement du service 8082 (R5) ; push sur accord explicite (R6). Plan : DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md"
   owners:
     accountable: "Claude Code CC01 (orchestrateur)"
     executor: "Claude Code CC01 (seul ecrivain) ; agents en lecture/revue"
