@@ -1459,6 +1459,16 @@ class Supervisor:
                 # T429 : tache liee et titre officiel stockes comme champs propres.
                 session["task_id"] = str(command.get("task_ref") or "").strip()[:32]
                 session["task_title"] = str(command.get("task_title") or "").strip()[:300]
+                # T429 : le service est NOTAIRE du perimetre (empinle a l affectation).
+                try:
+                    import sys
+                    scripts_dir = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts"
+                    if str(scripts_dir) not in sys.path:
+                        sys.path.insert(0, str(scripts_dir))
+                    import task_scope
+                    session["scope_snapshot"] = task_scope.write_pinned(sid, session["task_id"])
+                except Exception:
+                    session["scope_snapshot"] = {}
                 if source is not None:
                     # Establish the EOF cursor during the explicit attach command.
                     # Otherwise a reply arriving before the first collector poll could be lost.
@@ -1514,6 +1524,15 @@ class Supervisor:
                 # T429 : la tache liee peut etre rafraichie a la renommage (transfert de relais).
                 if command.get("task_ref"):
                     session["task_id"] = str(command.get("task_ref")).strip()[:32]
+                    try:
+                        import sys
+                        scripts_dir = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts"
+                        if str(scripts_dir) not in sys.path:
+                            sys.path.insert(0, str(scripts_dir))
+                        import task_scope
+                        session["scope_snapshot"] = task_scope.write_pinned(sid, session["task_id"])
+                    except Exception:
+                        pass
                 if command.get("task_title"):
                     session["task_title"] = str(command.get("task_title")).strip()[:300]
                 session["generation"] += 1

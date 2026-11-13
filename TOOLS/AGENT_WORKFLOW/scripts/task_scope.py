@@ -40,6 +40,24 @@ DEROG_DIR = LOCAL_APP / "ExcavatriceDragage" / "workflow"
 # Fichiers de regle du projet : licites en phase de tache, mais signales comme "processus".
 PROCESS_GLOBAL = ("AGENTS.md", "CLAUDE.md", "DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md")
 WRITE_TOOLS = ("Edit", "Write", "MultiEdit", "NotebookEdit")
+
+# Deny-list GLOBALE : aucun contrat de tache ne peut la lever (revue DeepSeek 2026-11-13,
+# point le plus grave). Seul l exploitant peut deroger chemin par chemin, avec un motif.
+ABSOLUTE_DENY = (
+    "CODE/**",
+    "CODE_XML/**",
+    "PRJ_CODESYS/**",
+    ".claude/settings.json",
+    ".claude/settings.local.json",
+    ".claude/settings*.json",
+    ".claude/hooks/**",
+    "TOOLS/AGENT_WORKFLOW/hooks/**",
+    "TOOLS/AGENT_WORKFLOW/skills/**",
+    ".claude/skills/**",
+    ".agents/skills/**",
+    ".dsh/skills/**",
+    "TOOLS/AGENT_SUPERVISOR/poc/vscode-notifier/**",
+)
 TAIL_BYTES = 512_000  # lecture de queue : le transcript peut faire plusieurs Mo
 
 
@@ -135,15 +153,98 @@ def matches(relative: str, prefixes: list[str]) -> bool:
     return False
 
 
+def is_absolute_denied(relative: str) -> bool:
+    """Chemin interdit par la regle du projet, quel que soit le contrat de la tache."""
+    return matches(relative, list(ABSOLUTE_DENY))
+
+
 def classify(relative: str, product: list[str], forbidden: list[str], process: list[str]) -> str:
     """produit | processus | hors."""
-    if matches(relative, forbidden):
+    if is_absolute_denied(relative) or matches(relative, forbidden):
         return "hors"
     if matches(relative, product):
         return "produit"
     if matches(relative, process):
         return "processus"
     return "hors"
+
+
+def scope_digest(allowed: list[str], forbidden: list[str]) -> str:
+    """Empreinte stable du perimetre (canonique : trie, sans blancs)."""
+    import hashlib
+    payload = json.dumps({"allowed": sorted(str(x).strip() for x in allowed),
+                          "forbidden": sorted(str(x).strip() for x in forbidden)},
+                         ensure_ascii=False, sort_keys=True)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def scope_for_task(task_id: str) -> dict:
+    """Perimetre lu SUR LE DISQUE (etat courant) + son empreinte."""
+    contract = contract_for_task(task_id) if task_id else None
+    allowed, forbidden = _scope_lists(contract) if contract else ([], [])
+    return {"allowed": allowed, "forbidden": forbidden,
+            "digest": scope_digest(allowed, forbidden),
+            "contract": str(contract.relative_to(ROOT).as_posix()) if contract else ""}
+
+
+SCOPE_DIR = LOCAL_APP / "ExcavatriceDragage" / "scopes"
+
+
+def pinned_path(session_id: str) -> Path:
+    safe = "".join(char for char in str(session_id or "session") if char.isalnum() or char in "-_")[:80]
+    return SCOPE_DIR / f"{safe}.json"
+
+
+def write_pinned(session_id: str, task_id: str) -> dict:
+    """Ecrit le perimetre epingle (appele par le service a l'affectation)."""
+    scope = scope_for_task(task_id) if task_id else {"allowed": [], "forbidden": [], "digest": ""}
+    payload = {"session_id": session_id, "task_id": task_id, "allowed": scope.get("allowed", []),
+               "forbidden": scope.get("forbidden", []), "digest": scope.get("digest", ""),
+               "contract": scope.get("contract", ""),
+               "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
+    try:
+        SCOPE_DIR.mkdir(parents=True, exist_ok=True)
+        pinned_path(session_id).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    except OSError:
+        pass
+    return payload
+
+
+def pinned_scope(session_id: str) -> dict:
+    """Perimetre EPINGLE (fichier du service, puis API en repli)."""
+    try:
+        data = json.loads(pinned_path(session_id).read_text(encoding="utf-8"))
+        if data.get("digest"):
+            return data
+    except (OSError, ValueError):
+        pass
+    try:
+        with urllib.request.urlopen(SUPERVISOR_SUMMARY_URL, timeout=1.5) as response:
+            data = json.loads(response.read().decode("utf-8"))
+    except (OSError, ValueError):
+        return {}
+    for item in data.get("sessions", []):
+        if str(item.get("native_id") or "") == session_id:
+            snapshot = item.get("scope_snapshot")
+            return snapshot if isinstance(snapshot, dict) else {}
+    return {}
+
+
+def verify_scope(session_id: str) -> dict:
+    """Compare le perimetre courant (disque) au perimetre epingle (service).
+
+    Divergence -> le contrat a ete modifie en session : tentative d'auto-elargissement,
+    elle doit etre signalee, pas appliquee.
+    """
+    pinned = pinned_scope(session_id)
+    if not pinned or not pinned.get("digest"):
+        return {"ok": True, "reason": "aucun perimetre epingle"}
+    task_id = pinned.get("task_id") or ""
+    current = scope_for_task(task_id) if task_id else {"digest": ""}
+    ok = current.get("digest") == pinned.get("digest")
+    return {"ok": ok, "pinned_digest": pinned.get("digest"), "current_digest": current.get("digest"),
+            "task_id": task_id, "reason": "identique" if ok else "perimetre modifie en session",
+            "allowed": pinned.get("allowed", []), "forbidden": pinned.get("forbidden", [])}
 
 
 def scope_for_session(session_id: str) -> dict:
@@ -173,9 +274,13 @@ def read_derogations(session_id: str) -> list[dict]:
     return data if isinstance(data, list) else []
 
 
-def write_derogation(session_id: str, path: str, motif: str) -> dict:
+def write_derogation(session_id: str, path: str, motif: str, ttl_days: int = 30) -> dict:
+    """Derogation ACCORDEE mais DATEDE (GLM 2026-11-13) : pas d'arrimage eternel."""
     entries = read_derogations(session_id)
-    entry = {"path": normalize(path), "motif": str(motif or "").strip()[:300]}
+    entry = {"path": normalize(path), "motif": str(motif or "").strip()[:300],
+             "granted_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+             "expires_at": time.time() + max(1, int(ttl_days)) * 86400,
+             "ttl_days": int(ttl_days)}
     if not any(item.get("path") == entry["path"] for item in entries):
         entries.append(entry)
     DEROG_DIR.mkdir(parents=True, exist_ok=True)
@@ -185,10 +290,14 @@ def write_derogation(session_id: str, path: str, motif: str) -> dict:
 
 def is_derogated(session_id: str, relative: str) -> bool:
     """Une derogation vaut pour un chemin exact ou pour un prefixe marque '.../**'."""
+    now = time.time()
     for item in read_derogations(session_id):
         granted = str(item.get("path") or "")
         if not granted:
             continue
+        expiry = item.get("expires_at")
+        if isinstance(expiry, (int, float)) and expiry < now:
+            continue  # derogation expiree
         if granted.endswith("/**"):
             base = granted[:-3]
             if relative == base or relative.startswith(base + "/"):
@@ -324,6 +433,34 @@ def metric_logged(session_id: str, window: int = 10) -> dict:
     """Métrique depuis le journal des écritures (rapide, exact)."""
     scope = scope_for_session(session_id)
     return _metric_from_paths(scope, logged_paths(session_id, window), window)
+
+
+def git_modified_paths(root=None) -> list[str]:
+    """Fichiers modifies / ajoutes dans le depot (git status --porcelain)."""
+    import subprocess
+    base = str(root or ROOT)
+    try:
+        done = subprocess.run(["git", "status", "--porcelain"], cwd=base, capture_output=True,
+                              text=True, timeout=5, encoding="utf-8", errors="replace")
+    except (OSError, subprocess.SubprocessError):
+        return []
+    if done.returncode != 0:
+        return []
+    paths = []
+    for line in done.stdout.splitlines():
+        if len(line) < 4:
+            continue
+        raw = line[3:].strip().strip('"')
+        if " -> " in raw:
+            raw = raw.split(" -> ")[-1]
+        paths.append(normalize(raw))
+    return paths
+
+
+def untracked_writes(session_id: str, root=None) -> list[str]:
+    """Ecritures reellement faites (git) mais ABSENTES du journal des ecritures."""
+    logged = set(logged_paths(session_id, limit=0))
+    return [path for path in git_modified_paths(root) if path and path not in logged]
 
 
 def main(argv: list[str] | None = None) -> int:

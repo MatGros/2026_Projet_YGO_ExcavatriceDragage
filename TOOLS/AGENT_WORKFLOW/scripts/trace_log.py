@@ -34,17 +34,71 @@ KINDS = (
 )
 
 
+def _chain_digest(entry: dict, previous: str) -> str:
+    import hashlib
+    payload = json.dumps(entry, ensure_ascii=False, sort_keys=True, default=str) + "|" + previous
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def emit(kind: str, **fields) -> dict:
-    """Ajoute un evenement au journal interne (jamais affiche)."""
+    """Ajoute un evenement au journal interne (jamais affiche).
+
+    Chaque entree est CHAINEE (prev + seq monotone + empreinte) : une troncature ou une
+    reecriture devient detectable (consensus DeepSeek + GLM 2026-11-13).
+    """
     entry = {"ts": time.time(), "at": time.strftime("%Y-%m-%dT%H:%M:%S"), "kind": kind}
     entry.update({key: value for key, value in fields.items() if value is not None})
     try:
         TRACE_DIR.mkdir(parents=True, exist_ok=True)
+        previous, seq = "", 0
+        if TRACE_PATH.is_file():
+            with TRACE_PATH.open("r", encoding="utf-8", errors="replace") as stream:
+                lines = [line for line in stream.read().splitlines() if line.strip()]
+            if lines:
+                try:
+                    last = json.loads(lines[-1])
+                    previous = str(last.get("chain") or "")
+                    seq = int(last.get("seq", 0))
+                except ValueError:
+                    previous, seq = "", 0
+        entry["seq"] = seq + 1
+        entry["prev"] = previous
+        payload = {k: v for k, v in entry.items() if k not in ("chain", "prev")}
+        entry["chain"] = _chain_digest(payload, previous)
         with TRACE_PATH.open("a", encoding="utf-8") as stream:
             stream.write(json.dumps(entry, ensure_ascii=False, default=str) + "\n")
+            stream.flush()
+            os.fsync(stream.fileno())
     except OSError:
         pass
     return entry
+
+
+def verify_chain() -> dict:
+    """Verifie la chaine du journal (empreinte + sequence). Rupture -> rapportee."""
+    try:
+        with TRACE_PATH.open("r", encoding="utf-8", errors="replace") as stream:
+            lines = [line for line in stream.read().splitlines() if line.strip()]
+    except OSError:
+        return {"entries": 0, "intact": True, "reason": "journal absent"}
+    previous, expected_seq, broken = "", 1, None
+    for index, line in enumerate(lines):
+        try:
+            entry = json.loads(line)
+        except ValueError:
+            broken = {"index": index, "reason": "ligne illisible"}
+            break
+        if int(entry.get("seq", 0)) != expected_seq:
+            broken = {"index": index, "reason": "sequence rompue", "seq": entry.get("seq"),
+                      "expected": expected_seq}
+            break
+        recomputed = _chain_digest({k: v for k, v in entry.items() if k not in ("chain", "prev")}, previous)
+        if recomputed != entry.get("chain"):
+            broken = {"index": index, "reason": "empreinte invalide"}
+            break
+        previous = str(entry.get("chain") or "")
+        expected_seq += 1
+    return {"entries": len(lines), "intact": broken is None, "break": broken}
 
 
 def query(kind: str | None = None, session: str | None = None, limit: int = 500,
