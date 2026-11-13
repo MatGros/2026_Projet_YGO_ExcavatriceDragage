@@ -23,6 +23,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import miss_log  # noqa: E402  (chemin local du script)
 import task_scope  # noqa: E402  (chemin local du script)
+import trace_log  # noqa: E402  (journal interne)
 
 WRITE_TOOLS = ("Edit", "Write", "MultiEdit", "NotebookEdit")
 
@@ -125,6 +126,10 @@ def main() -> int:
     try:
         relative = task_scope.normalize(target)
         task_scope.record_write(session_id, relative, verdict.get("kind", "hors"))
+        trace_log.emit("ecriture", session=session_id, path=relative,
+                       kind_verdict=verdict.get("kind"), decision=verdict.get("decision"),
+                       derogation=task_scope.is_derogated(session_id, relative),
+                       task_id=verdict.get("task_id"))
         if verdict.get("kind") == "hors":
             # M3 : ecriture hors perimetre -> manquement consigne (revue ulterieure).
             miss_log.record(session_id, "M3", f"Ecriture hors perimetre : {relative}",

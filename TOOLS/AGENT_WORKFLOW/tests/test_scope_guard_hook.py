@@ -10,6 +10,17 @@ sys.path.insert(0, str(SCRIPTS_DIR))
 import hook_scope_guard
 import task_scope
 
+
+import pytest
+import trace_log
+
+
+@pytest.fixture(autouse=True)
+def _trace_isolated(tmp_path, monkeypatch):
+    """Les tests n'ecrivent jamais dans le journal interne de production."""
+    monkeypatch.setattr(trace_log, "TRACE_DIR", tmp_path / "trace")
+    monkeypatch.setattr(trace_log, "TRACE_PATH", tmp_path / "trace" / "trace.jsonl")
+
 SCOPE = {
     "session_id": "s", "task_id": "T429", "contract": "c.yaml",
     "produit": ["TOOLS/AGENT_SUPERVISOR/**"], "interdits": ["CODE/**"],

@@ -24,6 +24,9 @@ import sys
 import time
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import trace_log  # noqa: E402  (journal interne)
+
 LOCAL_APP = Path(os.environ.get("LOCALAPPDATA", r"C:\Users\ZEDVICTUS\AppData\Local"))
 MISS_DIR = LOCAL_APP / "ExcavatriceDragage" / "misses"
 KINDS = {
@@ -65,6 +68,8 @@ def record(session_id: str, kind: str, signature: str, evidence: str = "") -> di
             stream.write(line + "\n")
     except OSError:
         pass
+    trace_log.emit("manquement", session=session_id, signature=entry["kind"],
+                   kind_label=entry["kind_label"], detail=entry["signature"])
     return entry
 
 

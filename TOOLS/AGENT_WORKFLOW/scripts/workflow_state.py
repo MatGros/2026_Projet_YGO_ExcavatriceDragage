@@ -30,6 +30,9 @@ import tempfile
 import time
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import trace_log  # noqa: E402  (journal interne)
+
 ROOT = Path(__file__).resolve().parents[3]
 TASKS = ROOT / "DOC" / "WFLOW" / "TASKS.yaml"
 SUMMARY = ROOT / "DOC" / "WFLOW" / "TASKS_ACTIVE_SUMMARY.md"
@@ -257,6 +260,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"ERREUR : étape inconnue « {wanted} » (attendu : {', '.join(ETAPES)}).", file=sys.stderr)
             return 2
         data = write_state(key, "ACTIF", cur.get("mode"), voie=cur.get("voie"), etape=wanted)
+        trace_log.emit("workflow", session=key, etat="ACTIF", voie=data.get("voie"),
+                       etape=data.get("etape"), seq=data.get("seq"))
         print(render(data["etat"], data["mode"], data["seq"], key, alias, data.get("voie"), data.get("etape")))
         return 0
 
@@ -275,6 +280,8 @@ def main(argv: list[str] | None = None) -> int:
             print("⚠️ Workflow non actif : tape /workflow-project d'abord, puis le numéro.")
             return 0
         data = write_state(key, "ACTIF", cur.get("mode"), voie=VOIES[args.mode])
+        trace_log.emit("workflow", session=key, etat="ACTIF", voie=data.get("voie"),
+                       etape=data.get("etape"), seq=data.get("seq"))
         print(render(data["etat"], data["mode"], data["seq"], key, alias, data["voie"], data.get("etape")))
         return 0
 
@@ -282,6 +289,8 @@ def main(argv: list[str] | None = None) -> int:
         data = write_state(key, "ACTIF", args.mode or "fresh")
     else:
         data = write_state(key, "OFF", None)
+    trace_log.emit("workflow", session=key, etat=data["etat"], mode=data.get("mode"),
+                   voie=data.get("voie"), etape=data.get("etape"), seq=data.get("seq"))
     print(render(data["etat"], data["mode"], data["seq"], key, alias, data.get("voie"), data.get("etape")))
     return 0
 
