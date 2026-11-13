@@ -1,5 +1,5 @@
 # TASKS_ACTIVE_SUMMARY — résumé du catalogue pour le démarrage de session
-<!-- sha256(TASKS.yaml)=f1f82eea4e8e0c59132dc6fc044efba1fc7f36aada8740907caf619c6bcda550 | genere=2026-11-13T16:10:49 | generateur=TOOLS/AGENT_WORKFLOW/scripts/generate_tasks_summary.py -->
+<!-- sha256(TASKS.yaml)=f1f82eea4e8e0c59132dc6fc044efba1fc7f36aada8740907caf619c6bcda550 | genere=2026-11-13T16:12:35 | generateur=TOOLS/AGENT_WORKFLOW/scripts/generate_tasks_summary.py -->
 
 **Compteurs** : 🔒 6 · ⏳ 1 · ⏸️ 8 · ⬜ 141 · ⛔ 0 (✅ 73 · ❌ 8 · total 231)
 
