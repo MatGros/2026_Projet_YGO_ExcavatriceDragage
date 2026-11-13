@@ -1139,3 +1139,18 @@ def test_snapshot_exposes_the_memory_state_without_leaking_into_the_public_summa
     assert "context" not in public_item
     assert "acquired_proofs" not in public_item
     svc.close()
+
+
+def test_memory_inventory_describes_what_the_judge_could_see():
+    """R12 : l'inventaire memoire d'un constat decrit l'etat, pas une appreciation."""
+    session = {"context": [{"text": "a"}], "memory": [{"text": "b"}, {"text": "c"}],
+               "session_journal": [], "acquired_proofs": [{"text": "d"}],
+               "framing": [{"text": "e"}], "context_truncated": True}
+    inventory = supervisor_service.memory_inventory(session, {"context_messages": 12})
+
+    assert inventory["fenetre"] == 1
+    assert inventory["memoire_longue"] == 2
+    assert inventory["preuves_acquises"] == 1
+    assert inventory["cadrage"] == 1
+    assert inventory["fenetre_tronquee"] is True
+    assert inventory["regle_juge"] == 12

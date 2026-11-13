@@ -512,6 +512,39 @@ def ollama_chat(model, messages, allow_cloud=False):
     return result[:6000]
 
 
+def memory_inventory(session, judge_settings=None) -> dict:
+    """Ce que le juge avait sous les yeux AU MOMENT du verdict (etat, pas avis)."""
+    settings = judge_settings or {}
+    return {
+        "fenetre": len(session.get("context", []) or []),
+        "memoire_longue": len(session.get("memory", []) or []),
+        "journal": len(session.get("session_journal", []) or []),
+        "preuves_acquises": len(session.get("acquired_proofs", []) or []),
+        "cadrage": len(session.get("framing", []) or []),
+        "fenetre_tronquee": bool(session.get("context_truncated")),
+        "regle_juge": settings.get("context_messages"),
+        "at": timestamp(),
+    }
+
+
+def persona_usage(session_id: str) -> list:
+    """Invocations de personas tracees pour cette session (R15) : usage reel, pas une impression."""
+    try:
+        import sys
+        scripts_dir = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts"
+        if str(scripts_dir) not in sys.path:
+            sys.path.insert(0, str(scripts_dir))
+        import trace_log
+        entries = trace_log.query(kind="persona", session=session_id, limit=0)
+    except Exception:
+        return []
+    usage = {}
+    for entry in entries:
+        role = str(entry.get("role") or "?")
+        usage[role] = usage.get(role, 0) + 1
+    return [{"role": role, "count": count} for role, count in sorted(usage.items())]
+
+
 def evidence_provenance(session, evidence, event_id=None):
     """Origine de la preuve citee par un constat (calcul, jamais devine).
 
@@ -1285,6 +1318,8 @@ class Supervisor:
                     "ecartes": len(session.get("dropped_events", []) or []),
                     "fenetre_tronquee": bool(session.get("context_truncated")),
                     "regles": self.judge_settings.get("context_messages"),
+                    # R15 : usage reel des agents specialises (trace interne).
+                    "personas": persona_usage(session.get("native_id", "")),
                 }
             for item in public:
                 item['chat_messages'] = self._chat_histories.get(item['id'], [])
@@ -2607,6 +2642,7 @@ class Supervisor:
                         existing["last_occurrence"] = timestamp()
                         # La provenance est un ETAT : elle est recalculee a chaque occurrence.
                         existing["evidence_provenance"] = evidence_provenance(session, existing.get("evidence"))
+                        existing["memory_usage"] = memory_inventory(session, self.judge_settings)
                         if existing["disposition"] != "new":
                             session["analysis_state"] = "alert_acknowledged"
                     elif not closed_match or previous_alert_id:
@@ -2618,6 +2654,7 @@ class Supervisor:
                         if previous_alert_id:
                             alert.update(previous_alert_id=previous_alert_id, source_event_id=occurrence["event_id"], source_event_index=occurrence["event_index"])
                         alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"), result.get("event_id"))
+                        alert["memory_usage"] = memory_inventory(session, self.judge_settings)
                         session["alerts"].append(alert)
                         _trace(event="constat", session=sid, alias=session.get("alias"),
                                alert_id=alert["id"], severity=alert.get("severity"),
@@ -2634,6 +2671,7 @@ class Supervisor:
                         if alert["id"] in reviewed:
                             alert["evidence_provenance"] = evidence_provenance(
                                 session, (alert.get("assessment") or {}).get("evidence") or alert.get("evidence"))
+                            alert["memory_usage"] = memory_inventory(session, self.judge_settings)
                     state_update = result.get("state_update")
                     if isinstance(state_update, str) and state_update.strip() and len(state_update.strip()) >= 5:
                         clean_update = state_update.strip()[:300]
