@@ -81,13 +81,17 @@ def verify_chain() -> dict:
             lines = [line for line in stream.read().splitlines() if line.strip()]
     except OSError:
         return {"entries": 0, "intact": True, "reason": "journal absent"}
-    previous, expected_seq, broken = "", 1, None
+    previous, expected_seq, broken, legacy = "", 1, None, 0
     for index, line in enumerate(lines):
         try:
             entry = json.loads(line)
         except ValueError:
             broken = {"index": index, "reason": "ligne illisible"}
             break
+        if "seq" not in entry:
+            # Entree LEGACY (avant le chainage) : ignoree pour la continuite, mais notee.
+            legacy += 1
+            continue
         if int(entry.get("seq", 0)) != expected_seq:
             broken = {"index": index, "reason": "sequence rompue", "seq": entry.get("seq"),
                       "expected": expected_seq}
@@ -98,7 +102,7 @@ def verify_chain() -> dict:
             break
         previous = str(entry.get("chain") or "")
         expected_seq += 1
-    return {"entries": len(lines), "intact": broken is None, "break": broken}
+    return {"entries": len(lines), "intact": broken is None, "break": broken, "legacy": legacy}
 
 
 def query(kind: str | None = None, session: str | None = None, limit: int = 500,
@@ -194,6 +198,10 @@ def report(session: str | None = None, limit: int = 20) -> str:
     for entry in query(session=session, limit=limit):
         counts[entry.get("kind", "?")] = counts.get(entry.get("kind", "?"), 0) + 1
     lines.append("Evenements : " + (", ".join(f"{kind}={count}" for kind, count in sorted(counts.items())) or "aucun"))
+    chain = verify_chain()
+    lines.append(f"Chaine du journal : {'intacte' if chain.get('intact') else 'ROMPUE'} "
+                 f"({chain.get('entries')} entrees, {chain.get('legacy', 0)} legacy)"
+                 + (f" — {chain.get('break')}" if chain.get("break") else ""))
     anomalies = inconsistencies(session=session)
     lines.append(f"Incoherences : {len(anomalies)}")
     for anomaly in anomalies[:limit]:

@@ -38,6 +38,9 @@ KINDS = {
     "M6": "attribution inventee (l'agent impute a l'exploitant une action non demandee)",
     "M7": "cause avancee sans preuve",
     "M8": "handoff orphelin (point ecrit dans le mauvais dossier de tache)",
+    "M9": "pas de chemin de transfert de verrou (blocage)",
+    "M10": "ecriture sur un chemin interdit par la regle du projet",
+    "M11": "ecriture reelle absente du journal des ecritures (couverture non garantie)",
 }
 
 

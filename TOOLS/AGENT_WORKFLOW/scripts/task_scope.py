@@ -56,7 +56,16 @@ ABSOLUTE_DENY = (
     ".claude/skills/**",
     ".agents/skills/**",
     ".dsh/skills/**",
-    "TOOLS/AGENT_SUPERVISOR/poc/vscode-notifier/**",
+    # Les gardes eux-memes : les reecrire, c'est se desarmer.
+    "TOOLS/AGENT_WORKFLOW/scripts/task_scope.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/hook_scope_guard.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/trace_log.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/miss_log.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/hook_workflow_attest.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/hook_pre_edit.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/hook_post_edit.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/hook_stop.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py",
 )
 TAIL_BYTES = 512_000  # lecture de queue : le transcript peut faire plusieurs Mo
 
@@ -139,23 +148,101 @@ def process_scope(task_id: str | None) -> list[str]:
 
 
 def matches(relative: str, prefixes: list[str]) -> bool:
+    """Comparaison par composants de chemin ; les motifs '*' sont acceptes.
+
+    "TOOLS/AGENT_SUPERVISOR/**" -> le dossier et tout son contenu
+    ".claude/settings*.json"    -> les fichiers correspondants
+    """
+    import fnmatch
     for prefix in prefixes:
         clean = str(prefix).replace("\\", "/").rstrip("/")
         if not clean:
             continue
         if relative == clean or relative.startswith(clean + "/"):
             return True
-        # "TOOLS/AGENT_SUPERVISOR/**" -> prefixe du dossier
         if clean.endswith("/**"):
             base = clean[:-3]
             if relative == base or relative.startswith(base + "/"):
                 return True
+        if "*" in clean:
+            if fnmatch.fnmatch(relative, clean):
+                return True
+            if fnmatch.fnmatch(relative, clean + "/*"):
+                return True
     return False
 
 
-def is_absolute_denied(relative: str) -> bool:
-    """Chemin interdit par la regle du projet, quel que soit le contrat de la tache."""
-    return matches(relative, list(ABSOLUTE_DENY))
+# Espace provisoire de l agent : ce n est pas du travail projet (il vit hors depot et
+# n entre pas dans la metrique). Autorise, mais JAMAIS dans le perimetre produit.
+SCRATCH_PREFIXES = (
+    str(LOCAL_APP / "Temp").replace("\\", "/").lower(),
+    "/tmp/",
+    "c:/users/zedvictus/appdata/local/temp/",
+)
+
+
+def is_inside_repo(relative: str) -> bool:
+    """Le chemin est-il dans le depot (relatif) ? Un chemin absolu est hors depot."""
+    text = str(relative or "").replace("\\", "/")
+    if not text:
+        return False
+    if text.startswith("/") or re.match(r"^[A-Za-z]:", text):
+        return False
+    return True
+
+
+def is_scratch(relative: str) -> bool:
+    """Fichier provisoire (hors depot) : autorise, non compte comme travail projet."""
+    text = str(relative or "").replace("\\", "/").lower()
+    if not text:
+        return False
+    if text.startswith("/tmp/") or text.startswith("tmp/"):
+        return True
+    return any(text.startswith(prefix) for prefix in SCRATCH_PREFIXES)
+
+
+def _matches_anywhere(relative: str, prefixes: list[str]) -> bool:
+    """Le motif est-il present dans le chemin, quel que soit le racine ?
+
+    Indispensable : un chemin ABSOLU hors depot (C:/autre/CODE/x.st) doit tomber
+    dans la meme deny-list qu'un chemin relatif du depot.
+    """
+    import fnmatch
+    text = str(relative or "").replace("\\", "/")
+    lowered = text.lower()
+    for prefix in prefixes:
+        clean = str(prefix).replace("\\", "/").rstrip("/")
+        if not clean:
+            continue
+        base = clean[:-3] if clean.endswith("/**") else clean
+        if "*" in base:
+            pattern = base.lower()
+            for index in range(len(lowered) - len(pattern) + 1):
+                chunk = lowered[index:index + len(pattern)]
+                if fnmatch.fnmatch(chunk, pattern):
+                    return True
+            continue
+        marker = "/" + base.lower()
+        if lowered.startswith(base.lower() + "/") or lowered == base.lower():
+            return True
+        if marker in lowered:
+            # n'importe quelle occurrence du motif dans le chemin (CODE/, scripts/, ...)
+            return True
+    return False
+
+
+def is_absolute_denied(relative: str, pinned_allowed: list[str] | None = None) -> bool:
+    """Chemin protege : interdit SAUF si le perimetre EPINGLE l'autorisait deja.
+
+    Regle : la protection porte sur ce que la session N'A PAS obtenu avant de commencer.
+    Un contrat PLC legitime (CODE/) declare avant la session reste valable ; un
+    auto-elargissement en cours de session est bloque (empreinte divergente).
+    """
+    allowed = list(pinned_allowed or [])
+    if matches(relative, allowed) or _matches_anywhere(relative, allowed):
+        return False  # le perimetre epingle l autorisait deja
+    return (matches(relative, list(ABSOLUTE_DENY))
+            or _matches_anywhere(relative, list(ABSOLUTE_DENY)))
 
 
 def classify(relative: str, product: list[str], forbidden: list[str], process: list[str]) -> str:
@@ -195,16 +282,18 @@ def pinned_path(session_id: str) -> Path:
     return SCOPE_DIR / f"{safe}.json"
 
 
-def write_pinned(session_id: str, task_id: str) -> dict:
+def write_pinned(session_id: str, task_id: str, native_id: str = "") -> dict:
     """Ecrit le perimetre epingle (appele par le service a l'affectation)."""
     scope = scope_for_task(task_id) if task_id else {"allowed": [], "forbidden": [], "digest": ""}
-    payload = {"session_id": session_id, "task_id": task_id, "allowed": scope.get("allowed", []),
+    payload = {"session_id": session_id, "native_id": native_id or session_id,
+               "task_id": task_id, "allowed": scope.get("allowed", []),
                "forbidden": scope.get("forbidden", []), "digest": scope.get("digest", ""),
                "contract": scope.get("contract", ""),
                "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
     try:
         SCOPE_DIR.mkdir(parents=True, exist_ok=True)
-        pinned_path(session_id).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        # La CLE du fichier est l ID NATIF de session : c'est celle que lit le hook.
+        pinned_path(native_id or session_id).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     except OSError:
         pass
     return payload
@@ -245,6 +334,23 @@ def verify_scope(session_id: str) -> dict:
     return {"ok": ok, "pinned_digest": pinned.get("digest"), "current_digest": current.get("digest"),
             "task_id": task_id, "reason": "identique" if ok else "perimetre modifie en session",
             "allowed": pinned.get("allowed", []), "forbidden": pinned.get("forbidden", [])}
+
+
+def effective_scope(session_id: str) -> dict:
+    """Perimetre EFFECTIF de la session : l'EPINGLE s'il existe, sinon le contrat courant.
+
+    Le contrat du disque peut avoir ete elargi en cours de session : le perimetre
+    epingle (fige par le service a l affectation) reste, lui, le reference.
+    """
+    scope = scope_for_session(session_id)
+    pinned = pinned_scope(session_id)
+    if pinned.get("digest"):
+        scope = dict(scope)
+        scope["produit"] = list(pinned.get("allowed") or [])
+        scope["interdits"] = list(pinned.get("forbidden") or [])
+        scope["pinned"] = True
+        scope["digest"] = pinned.get("digest")
+    return scope
 
 
 def scope_for_session(session_id: str) -> dict:
@@ -459,7 +565,7 @@ def git_modified_paths(root=None) -> list[str]:
 
 def untracked_writes(session_id: str, root=None) -> list[str]:
     """Ecritures reellement faites (git) mais ABSENTES du journal des ecritures."""
-    logged = set(logged_paths(session_id, limit=0))
+    logged = set(logged_paths(session_id, window=0))
     return [path for path in git_modified_paths(root) if path and path not in logged]
 
 

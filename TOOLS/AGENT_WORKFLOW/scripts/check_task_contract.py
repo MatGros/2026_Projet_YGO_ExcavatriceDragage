@@ -329,8 +329,10 @@ def check(path: Path, release: bool) -> tuple[list[str], list[str]]:
 
     data = load_yaml(path)
     if data is not None:
-        # T429 (revue GLM 2026-11-13) : aucun contrat ne peut autoriser un chemin interdit global.
-        errors.extend(check_absolute_deny(data))
+        # T429 (revue GLM + 3e expert) : un contrat qui ouvre un chemin protege est
+        # AVERTISSEMENT, pas erreur : le controle reel est l epinglage par le service
+        # (un contrat elargi en session est refuse par l empreinte divergente).
+        warnings.extend(check_absolute_deny(data))
     if data is None:
         warnings.append("PyYAML absent : analyse textuelle degradee (pip install pyyaml)")
         raw = scan_raw(text)
@@ -461,12 +463,13 @@ def _deny_hits(entries) -> list:
 
 
 def check_absolute_deny(data) -> list:
-    """Un `scope.allowed` qui touche un interdit global = erreur de contrat."""
+    """Un `scope.allowed` qui ouvre un chemin protege = AVERTISSEMENT (le controle
+    reel est l epinglage par le service : un contrat elargi en session est refuse)."""
     problems = []
     contract = (data or {}).get("contract") or {}
     scope = contract.get("scope") or {}
     for entry, denied in _deny_hits(scope.get("allowed")):
-        problems.append(f"T9: scope.allowed contient « {entry} » qui touche l'interdit global « {denied} »")
+        problems.append(f"[DENY] scope.allowed ouvre un chemin protege : « {entry} » ({denied})")
     return problems
 
 
