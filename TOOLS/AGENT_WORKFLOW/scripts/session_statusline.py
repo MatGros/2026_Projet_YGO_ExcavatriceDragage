@@ -18,7 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from statusline_indicators import (  # noqa: E402  (chemin local du script)
-    STATUSLINE_INDENT, get_git_badge, get_workflow_badge,
+    STATUSLINE_INDENT, get_git_badge, get_scope_badge, get_workflow_badge,
 )
 
 # Forcer UTF-8 avec fallback sur remplacement si le terminal est en cp1252
@@ -282,7 +282,13 @@ def get_supervisor_status(conv_id):
                     warnings = counts.get("warnings", 0)
 
                     # 'Linked (Active)' affiché en vert sobre
-                    state_str = f"🛡️ Supervisor : {green}Linked (Active){reset}" if state == "active" else f"🛡️ Supervisor : {yellow}Linked ({state}){reset}"
+                    # T429 M1 : un observateur en erreur doit crier, pas passer en jaune discret.
+                    if state == "active":
+                        state_str = f"🛡️ Supervisor : {green}Linked (Active){reset}"
+                    elif state in ("source_error", "source_missing", "ambiguous", "state_error"):
+                        state_str = f"🛡️ Supervisor : {red}EN ERREUR ({state}) — il n'observe plus{reset}"
+                    else:
+                        state_str = f"🛡️ Supervisor : {yellow}Linked ({state}){reset}"
 
                     badges = []
                     if alarms > 0:
@@ -302,12 +308,14 @@ def main():
     try:
         # Lire stdin s'il est alimenté (ex: Claude Code envoie du JSON contenant session_id)
         stdin_session_id = None
+        stdin_transcript = None
         if not sys.stdin.isatty():
             try:
                 stdin_data = sys.stdin.read()
                 if stdin_data:
                     parsed = json.loads(stdin_data)
                     stdin_session_id = parsed.get("session_id") or parsed.get("sessionId")
+                    stdin_transcript = parsed.get("transcript_path")
             except Exception:
                 pass
 
@@ -403,7 +411,9 @@ def main():
             sup_badge = get_supervisor_status(conv_id)
             print(f"{colored_label} {dim}│{reset} {sup_badge}")
             # 2026-11-13 : deuxième ligne compacte — état du workflow + repère git.
-            print(f"{STATUSLINE_INDENT}{get_workflow_badge(conv_id)} │ {get_git_badge()}")
+            scope_badge = get_scope_badge(conv_id, stdin_transcript)
+            scope_part = f" │ {scope_badge}" if scope_badge else ""
+            print(f"{STATUSLINE_INDENT}{get_workflow_badge(conv_id)}{scope_part} │ {get_git_badge()}")
     except Exception:
         # Filet de sécurité absolu : ne JAMAIS crasher en code 1
         print("🚀 AGY Antigravity")

@@ -83,6 +83,35 @@
 
 ---
 
+## 3ter. 🔎 Analyse des manquements du Superviseur (échange T427-CC02 du 2026-11-13)
+
+**Constat tête** : pendant cette session, le Superviseur était en `source_error` → **il n'observait plus rien**, et la dérive (sortie de workflow, arrêt inutile, rôle inventé, attribution inventée) est passée sans que personne ne la voie. **Un observateur muet est le pire mode de défaillance** : il donne l'illusion d'une surveillance.
+
+| # | Signature observée | Détecteur | Contre-mesure |
+|---|---|---|---|
+| M1 | 🔇 Superviseur en `source_error`/arrêt alors que la session est active | mécanique : état du service | impossible de clore un tour avec le Superviseur en erreur ; la barre l'annonce en clair (pas de « ? ») |
+| M2 | 🧭 « WORKFLOW ACTIF » alors que le *début* du workflow n'a pas eu lieu (ni socle, ni ligne d'étape, ni voie) | mécanique : attestation d'**entrée** (bandeau + voie + phrase de rôle) | la barre affiche « déclaré, non entré » ; aucun auto-attribution de rôle |
+| M3 | ⛔ Arrêt inutile : validation demandée pour un élément *dans* le périmètre | le bloc d'entrée porte périmètre + « GO seulement pour CODE/, catalogue, hors périmètre » | rôle et périmètre connus **dès l'entrée** |
+| M4 | 🎭 Rôle inventé (« je suis responsable de T427 ») alors que le workflow n'était pas démarré | juge : cohérence des affirmations de rôle avec l'état | l'assertion de rôle est **ancrée** dans l'état, pas dans le catalogue |
+| M5 | 🗣️ Attente annoncée puis action (« je ne modifie rien tant que tu ne dis pas fais » → il modifie) | mécanique : message précédent contient une attente + le tour suivant écrit | refus de clore le tour (Stop) si l'attente est violée |
+| M6 | 📌 Attribution inventée (« je n'ai rien à annuler » — l'exploitant ne l'a pas dit) | juge : contradiction avec le transcript | constat `contradiction` ancré |
+| M7 | 🔄 Cause affirmée sans preuve (« état mis en cache / lecture échouée ») | la cause se vérifie (taille du transcript, dernière écriture) | cause **prouvée** ou étiquetée hypothèse |
+| M8 | 🗂️ Handoff orphelin : point écrit « transmis à T429 » dans le plan de T427 → invisible pour T429 | scan des plans | le point apparaît dans la **fiche T429** |
+| M9 | 🔒 Pas de chemin de transfert de verrou (« je ne peux pas écrire là-dessus ») | procédure manquante | transfert de verrou = opération de 1ʳᵉ classe (API release + acquire) |
+
+**Cas similaires à ne pas louper** : Superviseur arrêté mais session active · watchdog cassé puis reprise · double affectation sur une même session · dérogation de périmètre non tracée · point écrit dans le mauvais dossier de tâche · affirmation de rôle après une reprise de session · correction faite sans rejouer la preuve.
+
+### 🧠 Le journal de manquements (« remise en question »)
+
+À chaque tour, les mécanismes de surveillance consignent **ce qu'ils auraient dû dire** : signature, preuve, moment, session. Ce journal est un **corpus machine**, pas un rapport rédigé : il alimente la revue périodique et donc la mise à jour des règles (prompts, `AGENTS.md`, détecteurs). Il s'appuie sur :
+- l'**attestation** du hook Stop (bandeau, pied, entrée du workflow) ;
+- le **journal des écritures** du hook de périmètre (ce qui a été touché, et où) ;
+- l'**état du Superviseur** (muet / en erreur / actif).
+
+Production : hooks (mécanique, déterministe). Consommation : revue périodique + **T431** (« audits asynchrones, mémoire sourcée ») qui transforme les manquements récurrents en contre-mesures.
+
+---
+
 ## 4. 🧪 Plan de vérification (état au 2026-11-13)
 
 ```powershell

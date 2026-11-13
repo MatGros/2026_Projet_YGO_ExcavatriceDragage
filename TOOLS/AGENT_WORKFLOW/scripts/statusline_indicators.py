@@ -37,6 +37,7 @@ def get_workflow_badge(conv_id):
     (hook_workflow_attest.py) reste déposée à côté comme constat, elle ne commande rien.
     """
     green = "\033[1;32m"
+    pastel_yellow = "\033[38;2;228;208;140m"
     reset = "\033[0m"
     if not conv_id:
         return "· session inconnue"
@@ -50,8 +51,51 @@ def get_workflow_badge(conv_id):
         voie = data.get("voie") or "libre"
         etape = data.get("etape")
         detail = " · ".join(part for part in (etape, voie) if part)
-        return f"{green}🛣️ ●{reset} · {detail}"
+        marker = ""
+        try:
+            attestation = json.loads((WORKFLOW_STATE_DIR / f"{conv_id}.attest.json").read_text(encoding="utf-8"))
+            if int(attestation.get("conform_turns", 0)) == 0:
+                # T429 M2 : declare actif, mais aucun tour conforme n'a ete atteste.
+                marker = f" {pastel_yellow}⚠ non entré{reset}"
+        except (OSError, ValueError):
+            pass
+        return f"{green}🛣️ ●{reset} · {detail}{marker}"
     return "🛣️ ○ · /workflow-project pour reprendre"
+
+
+def get_scope_badge(conv_id, transcript_path=None, window=10):
+    """Part du travail réellement dans le périmètre de la tâche (R10).
+
+    Compté depuis la trace des appels d'outils : c'est un décompte, pas un avis.
+    Vert tant que la dérive reste faible, ambre au-delà de 10 %, rouge au-delà de 30 %.
+    """
+    green = "\033[1;32m"
+    pastel_yellow = "\033[38;2;228;208;140m"
+    soft_red = "\033[38;2;235;130;130m"
+    reset = "\033[0m"
+    if not conv_id:
+        return ""
+    try:
+        import task_scope
+    except ImportError:
+        return ""
+    try:
+        result = task_scope.metric_logged(conv_id, window)
+        if not result.get("total") and transcript_path:
+            # Journal vide (hook installe recemment) : on replique sur le transcript.
+            result = task_scope.metric(conv_id, transcript_path, window)
+    except Exception:
+        return ""
+    total = int(result.get("total", 0))
+    if not total or not result.get("scope_known"):
+        return ""
+    counts = result.get("counts", {})
+    ratio = float(result.get("ratio_hors", 0.0))
+    color = green if ratio <= 0.1 else pastel_yellow if ratio <= 0.3 else soft_red
+    produit = int(counts.get("produit", 0))
+    derogations = int(counts.get("derogation", 0))
+    extra = f" (+{derogations} dérog.)" if derogations else ""
+    return f"{color}🎯 {produit}/{total} produit{extra}{reset}"
 
 
 def _git(args, cwd):
