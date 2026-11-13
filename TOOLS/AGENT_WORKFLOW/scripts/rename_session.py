@@ -170,6 +170,32 @@ def resolve_session_task_folder(session_ref: str) -> str | None:
     # Une liaison absente ou dupliquée ne sélectionne jamais un dossier arbitraire.
     return matches[0] if len(matches) == 1 else None
 
+def resolve_task_title(alias: str) -> str:
+    """Titre officiel de la tâche déduite de l'alias (T429-MMX01 -> titre de T429).
+
+    Lecture ciblée du catalogue : aucun dossier arbitraire, aucun fichier entier lu.
+    Renvoyé vide si la tâche est inconnue, hors catalogue (T000) ou le catalogue illisible.
+    """
+    match = re.match(r"^(T\d{3})", (alias or "").strip(), re.IGNORECASE)
+    if not match:
+        return ""
+    task_id = match.group(1).upper()
+    if task_id == "T000":
+        return ""
+    catalog = REPO_ROOT / "DOC" / "WFLOW" / "TASKS.yaml"
+    try:
+        import yaml
+        data = yaml.safe_load(catalog.read_text(encoding="utf-8")) or []
+    except (OSError, ValueError, ImportError):
+        return ""
+    if isinstance(data, dict):
+        data = data.get("tasks", [])
+    for item in data if isinstance(data, list) else []:
+        if isinstance(item, dict) and str(item.get("id", "")).upper() == task_id:
+            return " ".join(str(item.get("titre") or "").split())
+    return ""
+
+
 def notify_supervisor(session_id: str, alias: str, mission_text: str = "", platform: str = "claude", base_url: str = "http://127.0.0.1:8082", timeout: float = 1.0) -> bool:
     """Notifie l'API locale du Superviseur de la mise à jour de l'alias via POST /api/supervision.
     Une session absente n'est jamais créée ici : seul connect_session.py peut l'attacher."""
@@ -188,12 +214,27 @@ def notify_supervisor(session_id: str, alias: str, mission_text: str = "", platf
             token = data.get("token", "")
 
         # Le même nom lisible est conservé dans le chat et la mission Superviseur.
-        mission = f"{alias} {mission_text.strip()}".strip()
+        # T429 (2026-11-13) : le TITRE de la tâche (officiel, catalogue) doit figurer dans
+        # le titre de session Superviseur — la désignation libre de l'exploitant passe en
+        # corps de mission (elle décrit la session, pas la tâche).
+        task_title = resolve_task_title(alias)
+        designation = mission_text.strip()
         folder_name = resolve_session_task_folder(alias)
-        if folder_name:
-            mission += f" — Dossier: {folder_name}"
-        elif not mission_text.strip():
-            mission = alias
+        if task_title:
+            # Une seule ligne : le titre de session reste lisible partout (terminal,
+            # notifications) et la désignation de l'exploitant n'est pas perdue.
+            mission = f"{alias} · {task_title}"
+            if designation:
+                mission += f" ({designation})"
+            if folder_name:
+                mission += f" — Dossier: {folder_name}"
+        else:
+            # T000 / tache inconnue : format historique inchange.
+            mission = f"{alias} {designation}".strip()
+            if folder_name:
+                mission += f" — Dossier: {folder_name}"
+            elif not designation:
+                mission = alias
 
         # 3. Mise à jour de l'affectation déjà liée.
         payload = json.dumps({"action": "set_alias", "id": supervisor_id, "alias": alias}).encode("utf-8")
@@ -393,7 +434,15 @@ def main():
         machine_alias = task_id
     else:
         machine_alias = f"{task_id}-{actor}"
-    canonical_title = f"{machine_alias} {description}".strip()
+    # T429 (2026-11-13) : le titre canonique porte le titre officiel de la tache ;
+    # la designation libre de l'exploitant reste visible entre parentheses.
+    task_title = resolve_task_title(task_id)
+    if task_title:
+        canonical_title = f"{machine_alias} · {task_title}"
+        if description:
+            canonical_title += f" ({description})"
+    else:
+        canonical_title = f"{machine_alias} {description}".strip()
     platform_code = "claude" if "claude" in parent_lower else ("agy" if "agy" in parent_lower else ("dsh" if "dsh" in parent_lower else "codex"))
 
     if preflight_only:
