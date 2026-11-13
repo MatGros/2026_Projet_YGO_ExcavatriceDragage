@@ -53,7 +53,11 @@ def normalize(path: str) -> str:
 
 
 def task_id_for_session(session_id: str) -> str | None:
-    """Tâche de la session, déduite de son alias Superviseur (T429-MMX01 -> T429)."""
+    """Tâche de la session.
+
+    Source prioritaire : le champ `task_id` stocke par le Superviseur a la connexion.
+    Repli : l'alias (T429-MMX01 -> T429) si le champ n'est pas renseigne.
+    """
     if not session_id:
         return None
     try:
@@ -63,6 +67,9 @@ def task_id_for_session(session_id: str) -> str | None:
         return None
     for item in data.get("sessions", []):
         if str(item.get("native_id") or "") == session_id:
+            stored = str(item.get("task_id") or "").strip()
+            if stored:
+                return stored.upper()
             alias = str(item.get("alias") or "")
             match = re.match(r"^(T\d{3})", alias, re.IGNORECASE)
             return match.group(1).upper() if match else None

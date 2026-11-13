@@ -1232,7 +1232,7 @@ class Supervisor:
     def snapshot(self):
         with self._lock:
             self._expire_test_notifications()
-            public = [{key: value.get(key, False if key == "closed" else 0 if key == "judge_turn_count" else None) for key in ("id", "platform", "native_id", "alias", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "memory", "context_truncated", "state", "enabled", "source", "error", "last_event", "last_analysis", "analysis_state", "analysis_error", "exchange_path", "exchange_error", "exchange_saved_at", "alerts", "judge_request", "judge_proposal", "messages_observed", "recovery", "events", "framing", "closed", "judge_turn_count")} for value in self.sessions.values()]
+            public = [{key: value.get(key, False if key == "closed" else 0 if key == "judge_turn_count" else None) for key in ("id", "platform", "native_id", "alias", "task_id", "task_title", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "memory", "context_truncated", "state", "enabled", "source", "error", "last_event", "last_analysis", "analysis_state", "analysis_error", "exchange_path", "exchange_error", "exchange_saved_at", "alerts", "judge_request", "judge_proposal", "messages_observed", "recovery", "events", "framing", "closed", "judge_turn_count")} for value in self.sessions.values()]
             for item, session in zip(public, self.sessions.values()):
                 item["re_evaluations_count"] = max(0, session.get("judge_turn_count", 0) - 1) if session.get("judge_turn_count", 0) > 0 else 0
                 item["counts"] = counts(session["alerts"])
@@ -1293,6 +1293,8 @@ class Supervisor:
                     alerts[-1]["assessment"] = {key: alert["assessment"].get(key) for key in ("status", "updated_at")}
                     alerts[-1]["workflow_status"] = workflow.get("status")
                     alerts[-1]["delivery_status"] = workflow.get("delivery_status")
+                # Le resume public reste strictement minimal (test de confidentialite) :
+                # la tache liee et son titre restent dans le snapshot complet (protege par jeton).
                 sessions.append({key: value.get(key) for key in (
                     "id", "platform", "native_id", "alias", "state", "analysis_state",
                     "last_event", "last_analysis", "judge_turn_count")})
@@ -1441,6 +1443,9 @@ class Supervisor:
                     raise ValueError("Session deja affectee")
                 sid = str(uuid.uuid4())
                 session = self._new_session(sid, platform, native_id, command.get("alias", native_id), True, self._mission(command.get("mission", "")))
+                # T429 : tache liee et titre officiel stockes comme champs propres.
+                session["task_id"] = str(command.get("task_ref") or "").strip()[:32]
+                session["task_title"] = str(command.get("task_title") or "").strip()[:300]
                 if source is not None:
                     # Establish the EOF cursor during the explicit attach command.
                     # Otherwise a reply arriving before the first collector poll could be lost.
@@ -1474,7 +1479,11 @@ class Supervisor:
                 alias = str(command.get("alias", "")).strip()
                 if not alias:
                     raise ValueError("Alias requis")
-                if not re.fullmatch(r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$", alias):
+                # Le format n'est impose QUE si l'alias change : les affectations anciennes
+                # (alias porte encore une description) doivent rester adressables.
+                session_ref = self.sessions.get(sid)
+                current_alias = str(session_ref.get("alias") or "") if session_ref else ""
+                if alias != current_alias and not re.fullmatch(r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$", alias):
                     raise ValueError("Format d'alias invalide (attendu TXXX[-X]-AGENT)")
                 session = self.sessions.get(sid)
                 if not session:
@@ -1487,6 +1496,11 @@ class Supervisor:
                 if not session:
                     raise ValueError("Affectation inconnue")
                 session["alias"] = alias
+                # T429 : la tache liee peut etre rafraichie a la renommage (transfert de relais).
+                if command.get("task_ref"):
+                    session["task_id"] = str(command.get("task_ref")).strip()[:32]
+                if command.get("task_title"):
+                    session["task_title"] = str(command.get("task_title")).strip()[:300]
                 session["generation"] += 1
                 record_event(session, "alias_updated", f"Alias mis à jour : {alias}", timestamp())
                 self._persist()
