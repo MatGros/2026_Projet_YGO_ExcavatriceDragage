@@ -120,3 +120,123 @@ Conditions de migration reprises de T426 : aucune perte de contenu · liens entr
 Pour chaque idée : 1) retrouver l’exemple concret, 2) examiner bénéfice/coût et contradiction avec les règles actuelles, 3) proposer une expérience discriminante, 4) décider avec l’utilisateur retenir / modifier / rejeter / différer. Une idée retenue reçoit alors son jalon, critère d’acceptation, contrôle et responsable dans le présent plan. Les autres restent tracées avec leur motif, sans multiplier les documents.
 
 **Prochaine étape de ce carnet :** l’enrichir au fil des retours de T431 et de la coordination T429, puis tenir la séance de challenge demandée par l’utilisateur. Aucun arbitrage D2/D3/D5 du plan antérieur n’est silencieusement déclaré résolu par cette annexe.
+
+---
+
+## 9. 🔁 Plan incrémental — Démarrage V3.1 (ouvert le 2026-11-13)
+
+> **Principe exploitant** : on avance, on teste, on note, on incrémente. Chaque incrément est
+> petit, réversible, testé en session réelle avant le suivant. Le workflow n'a pas besoin d'être
+> entièrement défini pour commencer à tester.
+> 📌 Responsable : `CC01`/`CC02` · Statut T427 au catalogue : ⏸️ (pause exploitant)
+
+### 9.1 Pourquoi (constat établi le 2026-11-13)
+- 🎯 **Cause racine** : commit `2a5bf86d` (01/11, intitulé « wip(T426) : prototype advisory task
+  tracking ») a supprimé de `AGENTS.md` la section « Démarrage de session — briefing obligatoire »
+  (−72 lignes). Depuis, rien ne fait lire les standards au 1er message.
+- 🔓 `e06047d1` (03/11) a retiré « l'agent DOIT interpeller et poser des questions ».
+- ✅ Hooks Claude inchangés depuis août et fonctionnels ; aucun hook de démarrage n'a jamais existé.
+- 📂 Preuves : [`PREUVES/20261113_SESSION_COLLEGE_WORKFLOW/`](PREUVES/20261113_SESSION_COLLEGE_WORKFLOW/)
+  (collège 4 experts + binôme historique).
+
+### 9.2 Cible V3.1 (résumé)
+1. Démarrage : 1er message + après compaction ; ≤ 10 lignes ; rôle + compteurs 🔒/⏳/⏸️/⬜ + voie.
+2. Socle : `AGENTS.md` + `TASKS_ACTIVE_SUMMARY.md` (généré, ≤ 5 Ko) ; jamais `TASKS.yaml` entier.
+3. 4 voies : Réponse directe (lecture seule sur `CODE/`) / Orchestrator / Task / Troubleshooting.
+4. Restaurés : interpeller avant le GO (`CODE/`, catalogue, safety) ; anti-récitation.
+5. Mécanique : hooks Claude existants ; `commit-msg` + `pre-commit` communs, **en avertissement d'abord**.
+6. 🧭 **Ligne d'étape** (demande exploitant 13/11) : 1 ligne en tête de chaque réponse de travail,
+   `━━ <couleur> <emoji> <TXXX> · <ÉTAPE> · <voie> ━━━━`. Remplace les bannières `====` de 3 lignes.
+   Étapes : ⬜💬 CADRAGE · 🟦🔎 ÉTUDE · 🟧🛠️ RÉALISATION · 🟨🧪 TEST · 🟩✅ RESTITUTION · 🟪🕵️ DIAGNOSTIC · 🟥⛔ ARRÊT.
+   Emojis d'esprit encouragés dans le corps des réponses (demande exploitant).
+   Couleur = carré emoji (pas d'ANSI dans le chat). Hors tâche : `T000`. Déclaratif, testé en I1.
+
+### 9.3 Incréments
+
+**✅ I0 — Checkpoint avant modification**
+- 📦 Livrable : commit `a4871f3d`
+- 🧪 Passage : arbre propre, 0 suppression
+
+**🟨 I1 — Démarrage V3.1 dans `AGENTS.md` + résumé généré une fois à la main** · livré, tests à jouer
+- 📦 Livrables : `AGENTS.md` § Démarrage · `DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md`
+- 🧪 Passage : les 5 cas du §9.4, sur Claude et sur Codex
+
+**🟨 I1b — Commande commune `/workflow-project [resume|fresh]`** · livré, tests à jouer
+- 📦 Livrables : canonique `TOOLS/AGENT_WORKFLOW/skills/workflow-project/SKILL.md` (ex-`project-workflow`, renommé) · stubs `.claude/skills/` et `.dsh/skills/` · renvoi dans `AGENTS.md` § Démarrage
+- 🧪 Passage : G440 PASS · cas T6 et T7 du §9.4
+- ⏳ Reste : Codex (commandes par utilisateur, `~/.codex/prompts/`, format à vérifier) · Antigravity non vérifié
+
+**⬜ I2 — Script autonome `generate_tasks_summary.py`**
+- 📦 Livrable : script + test unitaire
+- 🧪 Passage : normalise `U+FE0F` · compteurs exacts · SHA-256 · ≤ 5 Ko · lancé à la main
+
+**⬜ I3 — Hook `SessionStart` Claude** · attend le plan d'activation (D3)
+- 📦 Livrable : essai isolé, puis branchement dans `settings.json`
+- 🧪 Passage : une session neuve reçoit le résumé sans `Read`
+
+**⬜ I4 — Réparer les chemins de contrat du catalogue** · décision requise (édition de masse interdite par le contrat)
+- 📦 Livrable : table ancien → nouveau chemin, validée par l'exploitant
+- 🧪 Passage : G530 sans hausse · contrats C2+ ouverts tous trouvables
+- 🎼 Outil prévu : `/workflow` en lecture seule (vérification et propositions), écriture par l'orchestrateur
+
+**⬜ I5 — `check_workflow.py` + `commit-msg` en avertissement** · après I4
+- 📦 Livrable : hooks git
+- 🧪 Passage : contre-exemples détectés · 0 blocage · bascule bloquante seulement sur GO
+
+**⬜ I6 — Liaison Session ↔ TASK_ID sans `/rename-session`** · hors périmètre T427, coordination T429
+- 🧪 Passage : 2 terminaux en parallèle · 0 écrasement
+
+**⬜ I7 — Générateur branché sur la sauvegarde Task Manager** · périmètre à amender
+- 🧪 Passage : résumé à jour après chaque sauvegarde
+
+### 9.4 Protocole de test I1 (sessions neuves, exploitant aux commandes)
+
+Chaque cas se joue sur **Claude** et sur **Codex** ; noter ✅ / ❌ + l'extrait de réponse.
+
+1. 👋 **T1 — « Salut »**
+   - Attendu : ≤ 10 lignes · rôle · compteurs · une question
+   - Claude ⬜ · Codex ⬜
+2. 🐞 **T2 — « J'ai un bug sur le treuil »**
+   - Attendu : reformulation + question · aucune écriture
+   - Claude ⬜ · Codex ⬜
+3. 📋 **T3 — « État de T427 »**
+   - Attendu : voie annoncée · bonne skill chargée
+   - Claude ⬜ · Codex ⬜
+4. 🔁 **T4 — 3 échanges de travail enchaînés**
+   - Attendu : ligne d'étape sur chaque réponse · étape juste
+   - Claude ⬜ · Codex ⬜
+5. 🗺️ **T5 — « aide workflow » en cours de tâche**
+   - Attendu : carte ≤ 15 lignes (position, transitions, commandes) · pied `➡️ Choix` présent
+   - Claude ⬜ · Codex ⬜
+
+6. 🔁 **T6 — `/workflow-project resume` dans un chat déjà en cours**
+   - Attendu : résumé ≤ 5 lignes juste (tâche, étape, décision, suite) · ligne d'étape · pied `➡️ Choix`
+   - Claude ⬜ · DSH ⬜
+7. 🆕 **T7 — `/workflow-project fresh`**
+   - Attendu : restitution standard (rôle, compteurs, une question) · ne reprend pas le fil
+   - Claude ⬜ · DSH ⬜
+
+↩️ Retour arrière I1 : `git diff AGENTS.md`, puis restauration ciblée de ce seul fichier depuis `a4871f3d`.
+
+### 9.5 Points ouverts (à trancher au fil des incréments, sans bloquer I1)
+- **P1** — Antigravity et DSH lisent-ils `AGENTS.md` nativement ? Non vérifié.
+- **P2** — Skill `project-workflow` (créée le 12/11, D2) doublonne l'aiguillage V3.1 dans `AGENTS.md` : garder, réduire ou retirer.
+- **P3** — I4 touche 135 fiches : exige une décision d'édition de masse (interdite par le contrat v1.0).
+- **P4** — Contrat T427 à amender avant I3, I5, I6, I7 (périmètre hooks, Task Manager, Superviseur).
+- **P5** — `AGENTS.md` § Restitution standardisée (« Niveau 0 : bannière ») coexiste avec la ligne d'étape : à observer en I1, puis aligner (une seule convention).
+- **P6** — `TASKS_ACTIVE_SUMMARY.md` est un fichier généré dans `DOC/WFLOW/` : versionné ou non, et inscription dans la table T279 (à trancher en I2).
+
+### 9.6 Journal des incréments (ajout en fin, une entrée par événement)
+
+- **2026-11-13 · 🔎 Diagnostic** — cause racine `2a5bf86d` identifiée ; collège de 4 experts.
+  📂 `PREUVES/20261113_SESSION_COLLEGE_WORKFLOW/`
+- **2026-11-13 · ✅ I0** — checkpoint général. 📦 `a4871f3d`
+- **2026-11-13 · ⬜ I1 cadrage** — ligne d'étape colorée ajoutée (demande exploitant) + cas de test T4.
+- **2026-11-13 · 🛠️ I1** — GO exploitant. `AGENTS.md` § Démarrage remplacé (5 sous-sections, ligne
+  d'étape couleur + emoji). Résumé généré à la main : 1 684 octets · 🔒 6 · ⏳ 0 · ⏸️ 9 · ⬜ 141 · ⛔ 0.
+- **2026-11-13 · 🛠️ I1 complément** — pied de réponse `➡️ Choix` + commande « aide workflow » dans
+  `AGENTS.md` (demande exploitant : « savoir où on en est, où on peut aller ») ; cas de test T5.
+- **2026-11-13 · 🛠️ I1b** — `/workflow-project [resume|fresh]` : skill canonique renommée
+  `project-workflow` → `workflow-project` (résout P2), stubs Claude + DSH, renvoi dans `AGENTS.md`.
+- **2026-11-13 · ✍️ Style** — plan converti en listes à puces, sans tableaux (consigne exploitant
+  pour les documents : français, aéré, emoji, pas de tableaux complexes).

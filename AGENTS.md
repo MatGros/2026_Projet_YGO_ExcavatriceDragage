@@ -8,21 +8,67 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 
 ---
 
-## 🧭 Démarrage — consignes selon la demande
+## 🧭 Démarrage de session — Entonnoir réflexe
 
-Lire ce fichier comme source commune des règles. Identifier le rôle attendu (orchestrateur,
-exécutant délégué ou reviewer), le résultat demandé et le périmètre avant d'agir. Ne pas dérouler
-un briefing complet, un inventaire du dépôt ou un menu d'options sans utilité pour la demande.
+> 🧪 Version d'essai (T427, incrément I1 — 2026-11-13). Restaure l'effet du briefing obligatoire
+> supprimé par `2a5bf86d`, sans son décor. Plan et tests :
+> `DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/T427_WORKFLOW_AGENTS_PLAN_20261110_v1.0.md` §9.
 
-**Références à charger selon le besoin :**
+### 1. ⏱️ Portée & exemptions
+- **Quand :** une fois au **1er message** de la session, puis **uniquement** après une compaction de contexte.
+- **Relance à la demande (chat déjà ouvert) :** `/workflow-project resume` (avec récupération du contexte)
+  ou `/workflow-project fresh` (sans récupération) — canonique `TOOLS/AGENT_WORKFLOW/skills/workflow-project/SKILL.md`.
+- **Exemptions (passage direct à la mission) :** sous-agent délégué
+  (`TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md`) ou agent mandaté en revue/audit en lecture seule.
 
-| Besoin | Référence à charger |
-|---|---|
-| Pilotage ou délégation | `TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md` |
-| Édition du catalogue des tâches | `TOOLS/AGENT_WORKFLOW/skills/task-planner/SKILL.md` |
-| Diagnostic d'un incident | `TOOLS/AGENT_WORKFLOW/skills/troubleshooting/SKILL.md` |
-| Changement CODESYS/ST | Standards, architecture et spécification métier concernés |
-| Autre demande | Seulement les règles et fichiers directement pertinents |
+### 2. 📚 Socle minimal & restitution (≤ 10 lignes, zéro bannière épaisse)
+- **Lectures au démarrage :** `AGENTS.md` (via `@import` ou lecture directe) +
+  `DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md` (résumé généré : compteurs 🔒/⏳/⏸️/⬜, tâches ⏳/⏸️/⛔,
+  empreinte SHA-256 de `TASKS.yaml` en tête). 🚫 **Ne jamais lire `DOC/WFLOW/TASKS.yaml` en entier au démarrage.**
+- Résumé absent ou périmé (empreinte ≠ `TASKS.yaml`) : le signaler en une ligne, sans lire le catalogue entier.
+- **Restitution obligatoire (10 lignes max) :** rôle, compteurs du catalogue (🔒 / ⏳ / ⏸️ / ⬜),
+  voie retenue — ou **une question directe** si l'intention est floue.
+
+### 3. 🔀 Tri & aiguillage sur 4 voies
+- **Intention floue ou incomplète :** reformuler et poser **une question ciblée** avant d'agir.
+  **Obligation d'interpeller avant le GO** dès que `CODE/`, le catalogue `TASKS.yaml` ou la sécurité machine est en jeu.
+- **Intention claire — charger uniquement la référence requise :**
+  - 💬 **Réponse directe :** question simple ou action locale réversible (**lecture seule stricte sur `CODE/`**).
+  - 🎼 **Orchestrator :** `TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md` (pilotage de lot, validation humaine pré-code ; modèles selon `MODEL_ROUTING.md`).
+  - 🗂️ **Task :** `TOOLS/AGENT_WORKFLOW/skills/task-planner/SKILL.md` (protocole avant toute écriture dans `TASKS.yaml`, contrats C2+, verrous).
+  - 🕵️ **Troubleshooting :** `TOOLS/AGENT_WORKFLOW/skills/troubleshooting/SKILL.md` + méthode `TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md` (snapshot, test CI ad hoc, `Device.export` interdit).
+- Changement CODESYS/ST : standards (`DOC/STDS/`), architecture et spec métier (`DOC/AF/`) chargés à la demande (§ Avant de coder).
+
+### 4. 🧭 Ligne d'étape — savoir où on en est
+En tête de **chaque réponse de travail** (pas d'une simple réponse de dialogue), une seule ligne :
+
+```text
+━━ 🟦 🔎 T427 · ÉTUDE · Orchestrator ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+- ⬜ 💬 **CADRAGE** — tri de l'intention, questions
+- 🟦 🔎 **ÉTUDE** — lecture, analyse, revue, challenge
+- 🟧 🛠️ **RÉALISATION** — écriture après GO
+- 🟨 🧪 **TEST** — essais, gates, contrôles
+- 🟩 ✅ **RESTITUTION** — bilan, preuves, attente de validation
+- 🟪 🕵️ **DIAGNOSTIC** — voie troubleshooting
+- 🟥 ⛔ **ARRÊT** — cas de la liste fermée
+
+Hors tâche : `T000`. Les emojis d'esprit sont encouragés dans le corps des réponses.
+
+**Pied de réponse — où on peut aller :** chaque réponse de travail finit par une ligne
+`➡️ Choix : …` listant 2 à 4 suites possibles (étape suivante, autre voie, retour, aide).
+L'utilisateur n'est jamais laissé sans savoir ce qu'il peut faire ensuite.
+
+**Aide :** le message « aide workflow » (ou « où en est-on ? ») affiche la carte en ≤ 15 lignes :
+position actuelle (tâche · étape · voie), étapes et voies disponibles, transitions possibles depuis
+l'étape courante, commandes utiles, et ce qui attend une validation humaine.
+
+### 5. 🏭 Qualité
+- **Anti-récitation (code machine) :** justifier tout choix de nommage ou d'architecture par la règle
+  exacte (`NC-xxx`), la source (`AF_Partie-xx`) et la chaîne sémantique (`Req ➔ Tgt ➔ Cmd ➔ Act`).
+- **Superviseur :** l'association Session ↔ TASK_ID automatique est en cours de définition (T429) ;
+  en attendant, voir § Rattacher une conversation au Superviseur.
 
 ### Gestion du Task Manager
 
