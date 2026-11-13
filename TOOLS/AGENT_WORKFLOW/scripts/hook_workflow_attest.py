@@ -127,6 +127,52 @@ def supervisor_state(session_id: str) -> str:
     return ""
 
 
+def last_ai_title(transcript_path) -> str:
+    """Dernier titre lisible ecrit dans le transcript (par /rename-session)."""
+    try:
+        path = Path(transcript_path)
+        size = path.stat().st_size
+        with path.open("rb") as stream:
+            if size > 400_000:
+                stream.seek(size - 400_000)
+                stream.readline()
+            raw = stream.read().decode("utf-8", errors="replace")
+    except OSError:
+        return ""
+    for line in reversed(raw.splitlines()):
+        if '"ai-title"' not in line:
+            continue
+        try:
+            entry = json.loads(line)
+        except ValueError:
+            continue
+        if entry.get("type") == "ai-title" and entry.get("aiTitle"):
+            return str(entry["aiTitle"]).strip()
+    return ""
+
+
+def set_terminal_title(title_text: str) -> bool:
+    """Titre du terminal (console Windows + sequences OSC 0/2)."""
+    if not title_text:
+        return False
+    try:
+        import ctypes
+        if os.name == "nt":
+            ctypes.windll.kernel32.SetConsoleTitleW(str(title_text))
+        sequence = f"\x1b]0;{title_text}\x07\x1b]2;{title_text}\x07"
+        if os.name == "nt":
+            with open("CONOUT$", "w", encoding="utf-8", errors="replace") as tty:
+                tty.write(sequence)
+                tty.flush()
+        else:
+            with open("/dev/tty", "w", encoding="utf-8", errors="replace") as tty:
+                tty.write(sequence)
+                tty.flush()
+        return True
+    except Exception:
+        return False
+
+
 def main() -> int:
     try:
         payload = json.load(sys.stdin)
@@ -175,6 +221,15 @@ def main() -> int:
     if conform_turns == 0 and not any(item.get("kind") == "M2" for item in miss_log.list_misses(session_id, 200)):
         miss_log.record(session_id, "M2", "Workflow declare actif mais debut non effectue",
                         "aucun bandeau de ligne d'etape ni pied '➡️ Choix' atteste sur les tours passes")
+
+    # T429 : le titre du terminal est pose ICI (fin de tour), sinon Claude Code repose
+    # le sien juste apres le statusline et l'ecrase.
+    try:
+        title = last_ai_title(transcript)
+        if title:
+            set_terminal_title(f"{title} \U0001F9E0 CC")
+    except Exception:
+        pass
     return 0
 
 
