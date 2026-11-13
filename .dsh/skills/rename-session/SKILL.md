@@ -1,13 +1,15 @@
 ---
 name: rename-session
-description: Renomme robustement la session courante (alias machine, onglet terminal et notification Superviseur).
+description: Renomme la session courante avec vérification du Superviseur et des titres natifs disponibles.
 user-invocable: true
 disable-model-invocation: true
 ---
 
 # Renommer la session courante (DSH)
 
-Cette commande `/rename-session` met à jour l'alias machine dans le Superviseur local, journalise l'opération en WAL dans `DOC/WFLOW/SESSION_RENAME_AUDIT.log` et met à jour le titre de l'onglet du terminal VS Code.
+Cette commande `/rename-session` met à jour l'alias et le titre lisible d'une session déjà reliée au Superviseur, puis journalise le résultat. Elle ne crée jamais de liaison : si la session n'est pas reliée, elle s'arrête sans modifier les autres titres. Lance `/connect-session-supervisor` séparément, puis réessaie.
+
+Le script ne garantit pas que l'onglet terminal VS Code a changé : il indique une demande de titre, et l'affichage doit être vérifié dans VS Code. Ne pas annoncer que l'onglet est à jour sans observation.
 
 ## Usage
 

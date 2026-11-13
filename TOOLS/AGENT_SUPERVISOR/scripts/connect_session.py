@@ -49,7 +49,7 @@ def task_reference(value: str, *, anywhere: bool = False) -> str | None:
     return match.group(1).upper() if match else None
 
 
-ALIAS_PATTERN = r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC)\d{2}$"
+ALIAS_PATTERN = r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$"
 
 
 def validate_alias(alias: str, *, confirm_without_task: bool = False) -> str:

@@ -1,8 +1,7 @@
 """
 Script de statusline et titre de terminal dynamique pour Antigravity CLI (agy), Claude Code et Codex.
-Conforme aux règles :
-- Titre du terminal (VS Code) : strictement épuré (ex: T429 🚀 AGY Antigravity), AUCUNE info Superviseur.
-- Ligne de statut (statusline CLI) : affiche l'état de liaison au Superviseur (🛡️ Lié / Non lié / Hors ligne).
+Le titre terminal reprend le titre lisible validé par /rename-session, puis l'identifiant du CLI.
+La ligne de statut affiche l'état de liaison au Superviseur.
 Garanti sans plantage (exit 0) et robuste aux encodages Windows.
 """
 import sys
@@ -113,12 +112,12 @@ def get_boot_terminal_name(cli_name: str = "agy"):
     """Détermine le nom de base configuré dans Terminal Keeper selon le CLI parent."""
     cli = (cli_name or "").lower()
     if "claude" in cli:
-        return "🧠 Claude Code"
+        return "🧠 CC"
     elif "codex" in cli:
-        return "🤖 Codex (OpenAI)"
+        return "🤖 CDX"
     elif "dsh" in cli:
         return "DSH"
-    return "🚀 AGY Antigravity"
+    return "🚀 AGY"
 
 def find_current_conversation_id(cli_name: str = "agy", parent_pid: int = None, stdin_session_id: str = None):
     """Détecte l'identifiant exact de conversation pour CE terminal spécifique."""
@@ -175,6 +174,18 @@ def find_current_conversation_id(cli_name: str = "agy", parent_pid: int = None, 
         cid = os.environ.get("DSH_SESSION_ID", "").strip()
         if cid:
             return cid
+    elif "codex" in cli:
+        codex_ids = {
+            os.environ.get("CODEX_THREAD_ID", "").strip(),
+            os.environ.get("CODEX_SESSION_ID", "").strip(),
+        } - {""}
+        # Ne jamais réutiliser l'ID Antigravity hérité dans le processus Codex.
+        # En cas de conflit ou de format inattendu, échouer fermé.
+        if len(codex_ids) == 1:
+            codex_id = codex_ids.pop()
+            if re.fullmatch(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", codex_id):
+                return codex_id
+        return None
     else:
         cid = os.environ.get("ANTIGRAVITY_CONVERSATION_ID", "").strip()
         if cid:
@@ -196,12 +207,32 @@ def get_session_info(conv_id, cli_name: str = "agy"):
                     if s.get("native_id") == conv_id:
                         alias = s.get("alias", "")
                         if alias:
-                            raw_title = alias.strip()
+                            alias = alias.strip()
+                            raw_title = s.get("display_title", "").strip() or alias
                             break
         except Exception:
             pass
 
-    # 2. Si Antigravity : vérifier si /rename dans SQLite est plus récent
+    # 2. Si Claude Code : lire le dernier ai-title dans le transcript
+    if "claude" in (cli_name or "").lower() and conv_id:
+        try:
+            projects_dir = Path.home() / ".claude" / "projects"
+            if projects_dir.exists():
+                for tp in projects_dir.glob(f"**/{conv_id}.jsonl"):
+                    with open(tp, "r", encoding="utf-8") as f:
+                        for line in f:
+                            try:
+                                d = json.loads(line)
+                                if d.get("type") == "ai-title" and d.get("aiTitle"):
+                                    raw_title = d.get("aiTitle").strip()
+                            except Exception:
+                                pass
+                    if raw_title:
+                        break
+        except Exception:
+            pass
+
+    # 3. Si Antigravity : vérifier si /rename dans SQLite est plus récent
     if "agy" in (cli_name or "").lower():
         db_file = APP_DATA / "conversation_summaries.db"
         if db_file.exists():
@@ -210,17 +241,6 @@ def get_session_info(conv_id, cli_name: str = "agy"):
                 cur = conn.cursor()
                 if conv_id:
                     cur.execute("SELECT title FROM conversation_summaries WHERE conversation_id = ?", (conv_id,))
-                    row = cur.fetchone()
-                    if row and row[0]:
-                        raw_title = row[0].strip()
-                if not raw_title:
-                    # Fallback : dernière conversation modifiée dans ce workspace
-                    ws_uri = f"file:///{str(REPO_ROOT).replace(chr(92), '/')}"
-                    cur.execute(
-                        "SELECT title, conversation_id FROM conversation_summaries "
-                        "WHERE workspace_uris LIKE ? ORDER BY last_modified_time DESC LIMIT 1",
-                        (f"%{ws_uri}%",)
-                    )
                     row = cur.fetchone()
                     if row and row[0]:
                         raw_title = row[0].strip()
@@ -253,7 +273,8 @@ def get_supervisor_status(conv_id):
                     alarms = counts.get("alarms", 0)
                     warnings = counts.get("warnings", 0)
 
-                    state_str = f"{green}{bold}🛡️ Supervisor : Linked (Active){reset}" if state == "active" else f"{yellow}{bold}🛡️ Supervisor : Linked ({state}){reset}"
+                    # 'Linked (Active)' affiché en vert sobre
+                    state_str = f"🛡️ Supervisor : {green}Linked (Active){reset}" if state == "active" else f"🛡️ Supervisor : {yellow}Linked ({state}){reset}"
 
                     badges = []
                     if alarms > 0:
@@ -261,7 +282,8 @@ def get_supervisor_status(conv_id):
                     if warnings > 0:
                         badges.append(f"{yellow}{bold}⚠️ {warnings} warning{'' if warnings == 1 else 's'}{reset}")
                     if not alarms and not warnings:
-                        badges.append(f"{green}🟢 0 alerte{reset}")
+                        # 0 alerte en gris/dim neutre pour ne pas flasher inutilement en vert
+                        badges.append(f"{dim}0 alerte{reset}")
 
                     return f"{state_str} [{' '.join(badges)}]"
             return f"{dim}🛡️ Supervisor : Not Linked{reset}"
@@ -304,14 +326,9 @@ def main():
             if m:
                 task_id = m.group(1).upper()
 
-        # Titre du terminal : STRICTEMENT épuré, sans info Superviseur
-        # Exemple : T423-AGY01 🚀 AGY Antigravity
-        if task_id:
-            tab_title = f"{task_id} {boot_name}"
-        else:
-            tab_title = boot_name
-
-        # Mettre à jour l'onglet du terminal VS Code via CONOUT$ (sans info Superviseur)
+        tab_title = f"{raw_title.strip()} {boot_name}" if raw_title else boot_name
+        # Le statusline revient après les commandes outil : réappliquer le titre
+        # complet synchronisé résiste au titre du shell enfant.
         set_terminal_title(tab_title)
 
         # Sortie pour la commande :
@@ -322,6 +339,38 @@ def main():
             # Mode 'statusLine' CLI : stylé avec couleurs ANSI selon les conventions du projet
             # TXXX-ACTEUR : Bleu vif / Cyan
             # Désignation : Violet pastel clair / lavande (haute lisibilité sur fond sombre)
+            # Couleurs d'identification stricte par famille d'agent :
+            # CC : Rouge / Corail
+            # AGY : Bleu azur (Gemini / Antigravity)
+            # CDX : Vert émeraude (Codex)
+            # DSH : Cyan / Bleu turquoise (DeepSeek baleine)
+            # GLM : Magenta / Violet (GLM-4 / GLM-5)
+            # MMX : Jaune ambre (MiniMax)
+            # OPC : Vert menthe (OpenCode)
+            # HUM : Magenta vif (Humain)
+            AGENT_COLORS = {
+                "CC": "\033[1;31m",
+                "AGY": "\033[1;34m",
+                "CDX": "\033[1;32m",
+                "DSH": "\033[1;36m",
+                "GLM": "\033[1;35m",
+                "MMX": "\033[1;33m",
+                "OPC": "\033[38;2;45;212;191m",
+                "HUM": "\033[1;35m"
+            }
+
+            def colorize_task_id(full_tid: str) -> str:
+                # full_tid ex: T000-CC01 ou T429-AGY02 ou T423
+                # Colore la partie tâche (TXXX) en blanc/gris et l'acteur dans sa couleur dédiée
+                m_agent = re.search(r"-(CC|AGY|CDX|DSH|GLM|MMX|OPC|HUM)(\d{2})?$", full_tid)
+                if m_agent:
+                    prefix = full_tid[:m_agent.start()]
+                    actor_key = m_agent.group(1)
+                    actor_suffix = m_agent.group(0)[1:] # CC01, AGY, etc.
+                    actor_color = AGENT_COLORS.get(actor_key, blue_bold)
+                    return f"\033[1;37m{prefix}\033[0m-\033[1m{actor_color}{actor_suffix}\033[0m"
+                return f"{blue_bold}{full_tid}{reset}"
+
             blue_bold = "\033[1;36m"
             pastel_purple = "\033[38;2;216;180;254m\033[1m"
             dim = "\033[90m"
@@ -332,17 +381,14 @@ def main():
             m_parts = re.match(r"^(T\d+(?:-[0-9A-Z]+)*)(.*)$", status_text, re.IGNORECASE)
             if m_parts:
                 tid = m_parts.group(1).upper()
+                colored_tid = colorize_task_id(tid)
                 raw_rest = m_parts.group(2)
                 if raw_rest.startswith("_"):
-                    # Si lié par un underscore : préserver l'underscore SANS espace parasite
-                    # Exemple : T123-AGAY01_AGENT_SUPERVISOR_TEST_123
-                    colored_label = f"{blue_bold}{tid}{reset}{pastel_purple}{raw_rest.upper()}{reset}"
+                    colored_label = f"{colored_tid}{pastel_purple}{raw_rest.upper()}{reset}"
                 elif raw_rest.strip():
-                    # Si séparé par un espace : espace normal
-                    # Exemple : T123-AGAY01 AGENT_SUPERVISOR_TEST_123
-                    colored_label = f"{blue_bold}{tid}{reset} {pastel_purple}{raw_rest.strip().upper()}{reset}"
+                    colored_label = f"{colored_tid} {pastel_purple}{raw_rest.strip().upper()}{reset}"
                 else:
-                    colored_label = f"{blue_bold}{tid}{reset}"
+                    colored_label = colored_tid
             else:
                 colored_label = f"{pastel_purple}{status_text.upper()}{reset}"
 
