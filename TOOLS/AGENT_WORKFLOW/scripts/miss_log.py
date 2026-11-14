@@ -29,6 +29,17 @@ import trace_log  # noqa: E402  (journal interne)
 
 LOCAL_APP = Path(os.environ.get("LOCALAPPDATA", r"C:\Users\ZEDVICTUS\AppData\Local"))
 MISS_DIR = LOCAL_APP / "ExcavatriceDragage" / "misses"
+# Contre-mesure de poste proposee pour chaque signature mecanique (deterministe).
+COUNTERMEASURES = {
+    "M1": "reactiver la collecte du Superviseur avant de conclure un tour",
+    "M2": "exiger la ligne d etape et la voie dans le premier tour du workflow",
+    "M3": "restreindre le perimetre ecrit ou obtenir une derogation avant d ecrire",
+    "M5": "ne pas conclure un tour tant qu une attente est annoncee",
+    "M7": "annoncer la cause d un echec seulement apres verification",
+    "M10": "ne jamais ecrire hors du perimetre protege",
+    "M11": "couvrir les ecritures reelles dans le journal (verification a chaque tour)",
+}
+
 KINDS = {
     "M1": "superviseur muet (erreur ou arret) pendant une session active",
     "M2": "workflow declare actif mais debut non effectue (pas de bandeau, pas de voie)",
@@ -73,6 +84,17 @@ def record(session_id: str, kind: str, signature: str, evidence: str = "") -> di
         pass
     trace_log.emit("manquement", session=session_id, signature=entry["kind"],
                    kind_label=entry["kind_label"], detail=entry["signature"])
+    # Pont : une signature MECANIQUE devient aussi une experience (poste = observateur).
+    # C est la derive que le juge n alerte pas : elle doit finir dans le corpus.
+    try:
+        import experience_log
+        experience_log.write("superviseur", "incident",
+                             f"signature {entry['kind']} — {entry['signature']}",
+                             hypothese=entry["kind_label"],
+                             action=COUNTERMEASURES.get(entry["kind"], ""),
+                             session_id=session_id, refs=[entry["kind"]])
+    except Exception:
+        pass
     return entry
 
 

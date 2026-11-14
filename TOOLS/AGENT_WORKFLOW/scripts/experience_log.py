@@ -30,7 +30,7 @@ LOCAL_APP = Path(os.environ.get("LOCALAPPDATA", r"C:\Users\ZEDVICTUS\AppData\Loc
 EXPERIENCE_DIR = LOCAL_APP / "ExcavatriceDragage" / "experience"
 POSTES = ("superviseur", "juge", "exploitant", "plugin", "ihm", "agent")
 
-TYPES = ("constat", "auto-retrospective", "proposition", "incident")
+TYPES = ("constat", "auto-retrospective", "proposition", "incident", "lecture")
 
 
 def post_path(poste: str) -> Path:
@@ -46,6 +46,18 @@ def session_path(session_id: str) -> Path:
 
 def all_log() -> Path:
     return EXPERIENCE_DIR / "all.jsonl"
+
+
+def signature(pattern: str) -> str:
+    """Signature stable d un enchainement (roles + extrait decisif), pour detecter les repetitions."""
+    import hashlib
+    text = " ".join(str(pattern or "").split())
+    roles = "".join(part.split(":")[0][:4] for part in text.split("→") if ":" in part)
+    decisive = ""
+    match = re.search(r"\|\| preuve citée : (.*)$", text)
+    if match:
+        decisive = match.group(1)[:80]
+    return hashlib.sha256((roles + "||" + decisive).encode("utf-8")).hexdigest()[:16]
 
 
 def write(poste: str, type_: str, pattern: str, hypothese: str = "", action: str = "",
@@ -69,6 +81,9 @@ def write(poste: str, type_: str, pattern: str, hypothese: str = "", action: str
         "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "ts": time.time(),
     }
+    entry["signature"] = signature(pattern)
+    if poste not in POSTES:
+        print(f"[experience_log] poste inconnu « {poste} » (connus : {', '.join(POSTES)})", file=sys.stderr)
     try:
         EXPERIENCE_DIR.mkdir(parents=True, exist_ok=True)
         line = json.dumps(entry, ensure_ascii=False)
@@ -79,7 +94,19 @@ def write(poste: str, type_: str, pattern: str, hypothese: str = "", action: str
                     stream.write(line + "\n")
             except OSError:
                 pass
-    except OSError:
+    except OSError as exc:
+        # perte de donnees JAMAIS silencieuse (juge A/B 2026-11-13)
+        print(f"[experience_log] ecriture impossible : {exc}", file=sys.stderr)
+    # chaine dans la trace interne : une alteration ulterieure serait detectable
+    try:
+        import sys as _sys
+        scripts_dir = str(Path(__file__).resolve().parent)
+        if scripts_dir not in _sys.path:
+            _sys.path.insert(0, scripts_dir)
+        import trace_log
+        trace_log.emit("experience", poste=poste, type=type_, signature=entry.get("signature"),
+                       session=session_id, pattern=pattern[:200])
+    except Exception:
         pass
     return entry
 
@@ -106,8 +133,13 @@ def read(session_id: str | None = None, poste: str | None = None, limit: int = 2
             entry = json.loads(line)
         except ValueError:
             continue
+            continue
         if poste and str(entry.get("poste")) != str(poste).lower():
             continue
+        if session_id and poste:
+            # un poste + une session : on ne melange pas les sessions
+            if str(entry.get("session_id") or "") not in ("", str(session_id)):
+                continue
         entries.append(entry)
     return entries[-limit:] if limit else entries
 
@@ -119,11 +151,15 @@ def review(limit: int = 50) -> str:
         return "Aucune experience consignee."
     par_poste = Counter(entry.get("poste", "?") for entry in entries)
     par_type = Counter(entry.get("type", "?") for entry in entries)
+    occurrences = Counter(entry.get("signature") for entry in entries if entry.get("signature"))
+    recurrents = [(sig, count) for sig, count in occurrences.items() if count > 1]
     lignes = [
         "Postes : " + ", ".join(f"{poste}={count}" for poste, count in sorted(par_poste.items())),
         "Types : " + ", ".join(f"{type_}={count}" for type_, count in sorted(par_type.items())),
-        "",
     ]
+    if recurrents:
+        lignes.append("Enchainements recurrents : " + ", ".join(f"{sig}×{count}" for sig, count in recurrents))
+    lignes.append("")
     for poste in sorted(par_poste):
         lignes.append(f"── {poste}")
         for entry in [e for e in entries if e.get("poste") == poste][-limit:]:
