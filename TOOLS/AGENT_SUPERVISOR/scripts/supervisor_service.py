@@ -650,15 +650,46 @@ def persona_usage(session_id: str) -> list:
     return [{"role": role, "count": count} for role, count in sorted(usage.items())]
 
 
+def _experience_read(session, poste: str, pattern: str, refs=None) -> None:
+    """Journalise une LECTURE de contexte (poste concerne)."""
+    try:
+        import sys
+        scripts_dir = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts"
+        if str(scripts_dir) not in sys.path:
+            sys.path.insert(0, str(scripts_dir))
+        import experience_log
+        experience_log.write(poste, "lecture", pattern, session_id=str(session.get("id") or ""), refs=refs or [])
+    except Exception:
+        pass
+
+
+TRUNCATION_MARKERS = ("caractères omis", "caracteres omis", "[…")
+
+
+def _is_truncated_text(text: str) -> bool:
+    marque = " ".join(str(text or "").split())
+    return any(marker in marque for marker in TRUNCATION_MARKERS)
+
+
 def _experience_pattern(session, alert) -> str:
-    """Enchainement d echanges qui a mene au constat (_roles + extraits courts)."""
+    """Enchainement d echanges qui a mene au constat (_roles + extraits courts).
+
+    Si un extrait est tronque, on le dit : les deux variantes de l A/B ont montre
+    qu un extrait coupe passe inapercu, et c est la source de la derive.
+    """
     parts = []
+    tronques = []
     for item in (session.get("context") or [])[-5:]:
         role = str(item.get("role") or "?")
-        text = " ".join(str(item.get("text") or "").split())[:70]
+        raw = str(item.get("text") or "")
+        if _is_truncated_text(raw):
+            tronques.append(role)
+        text = " ".join(raw.split())[:70]
         parts.append(f"{role}: {text}")
     evidence = " ".join(str(alert.get("evidence") or "").split())[:120]
     pattern = " → ".join(parts)
+    if tronques:
+        pattern = f"[EXTRAITS TRONQUÉS : {', '.join(sorted(set(tronques)))}] " + pattern
     return f"{pattern} || preuve citée : {evidence}" if evidence else pattern
 
 
@@ -1129,6 +1160,11 @@ class Supervisor:
                 else:
                     context_message["text"]=rec_text
                 session["context"].append(context_message)
+                # T429 : l historique conserve plus que la fenetre (60 evenements) pour
+                # que le juge puisse lire le debut d echange qui explique l instant.
+                history = session.setdefault("history", [])
+                history.append(context_message)
+                del history[:-60]
                 session["context_revision"] += 1
 
             session["memory"]=session["memory"][-20:]
@@ -2685,8 +2721,19 @@ class Supervisor:
                         limit_index = max((m.get("event_index", -1) for m in batch), default=-1) if is_recovery else None
                         framing = [m for m in session.get("framing", []) if limit_index is None or (isinstance(m.get("event_index"), int) and m["event_index"] <= limit_index)]
                         notices = [dict(role="context_notice", text="Historique partiel : seuls les evenements transmis sont observables.")] if session["context_truncated"] else []
-                        if framing:
-                            notices.append(dict(role="context_notice", text="## DÉCISIONS UTILISATEUR (Cadrage observé avec dates et sources, pas de GO rétroactif) : " + json.dumps([dict(m, text=m["text"][:400], excerpt=len(m["text"])>400) for m in framing[-6:]], ensure_ascii=False)))
+                        deep = [item for item in (session.get("history") or [])[:-len(observed) or None]][-20:]
+                        if deep:
+                            # T429 : lecture de contexte elargi, bornee et JOURNALISEE.
+                            brief = "\n".join(
+                                f"[{item.get('role')}] " + " ".join(str(item.get('text') or '').split())[:180]
+                                for item in deep)
+                            notices.append(dict(role="context_notice",
+                                                text="## CONTEXTE PROFOND (ce qui precede immediatement la fenetre ; "
+                                                     "a lire pour situer l echange, sans le confondre avec la fenetre) :\n" + brief[:3000]))
+                            _experience_read(session, "juge",
+                                             f"lecture du contexte profond : {len(deep)} evenements anterieurs a la fenetre",
+                                             refs=[str(item.get("event_id")) for item in deep[-5:]])
+                        notices.append(dict(role="context_notice", text="## DÉCISIONS UTILISATEUR (Cadrage observé avec dates et sources, pas de GO rétroactif) : " + json.dumps([dict(m, text=m["text"][:400], excerpt=len(m["text"])>400) for m in framing[-6:]], ensure_ascii=False)))
                         acquired = session.get("acquired_proofs", [])
                         if acquired:
                             notices.append(dict(role="context_notice", text="## PREUVES ACQUISES (vérifiées sur disque, ne pas redemander) :\n" + "\n".join(f"- [{p.get('event_id', 'cmd')}] {p.get('text')}" for p in acquired[-6:])))

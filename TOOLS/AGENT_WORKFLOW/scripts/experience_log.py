@@ -33,9 +33,15 @@ POSTES = ("superviseur", "juge", "exploitant", "plugin", "ihm", "agent")
 TYPES = ("constat", "auto-retrospective", "proposition", "incident")
 
 
-def log_path(session_id: str) -> Path:
+def post_path(poste: str) -> Path:
+    """Un FICHIER par poste de traitement (ex: experience/superviseur.jsonl)."""
+    safe = "".join(c for c in str(poste or "global").lower() if c.isalnum() or c in "-_")[:60]
+    return EXPERIENCE_DIR / f"poste-{safe}.jsonl"
+
+
+def session_path(session_id: str) -> Path:
     safe = "".join(c for c in str(session_id or "global") if c.isalnum() or c in "-_")[:80]
-    return EXPERIENCE_DIR / f"{safe}.jsonl"
+    return EXPERIENCE_DIR / f"session-{safe}.jsonl"
 
 
 def all_log() -> Path:
@@ -66,17 +72,27 @@ def write(poste: str, type_: str, pattern: str, hypothese: str = "", action: str
     try:
         EXPERIENCE_DIR.mkdir(parents=True, exist_ok=True)
         line = json.dumps(entry, ensure_ascii=False)
-        with log_path(session_id).open("a", encoding="utf-8") as stream:
-            stream.write(line + "\n")
-        with all_log().open("a", encoding="utf-8") as stream:
-            stream.write(line + "\n")
+        # un fichier par poste + un fichier par session + l agregat de revue
+        for path in (post_path(poste), session_path(session_id), all_log()):
+            try:
+                with path.open("a", encoding="utf-8") as stream:
+                    stream.write(line + "\n")
+            except OSError:
+                pass
     except OSError:
         pass
     return entry
 
 
 def read(session_id: str | None = None, poste: str | None = None, limit: int = 200) -> list:
-    path = log_path(session_id) if session_id else all_log()
+    if session_id and poste:
+        path = post_path(poste)
+    elif session_id:
+        path = session_path(session_id)
+    elif poste:
+        path = post_path(poste)
+    else:
+        path = all_log()
     try:
         raw = path.read_text(encoding="utf-8", errors="replace")
     except OSError:
