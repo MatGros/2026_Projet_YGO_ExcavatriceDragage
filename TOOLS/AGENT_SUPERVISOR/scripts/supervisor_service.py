@@ -117,6 +117,24 @@ MISSION_FIELDS_LABELS = (
 )
 
 
+def _experiences_for(session) -> list:
+    """Experiences consignees pour cette session (journal d experience, hors depot)."""
+    try:
+        import sys
+        scripts_dir = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts"
+        if str(scripts_dir) not in sys.path:
+            sys.path.insert(0, str(scripts_dir))
+        import experience_log
+        entries = experience_log.read(session.get("id"), limit=30)
+        return [{"poste": item.get("poste"), "type": item.get("type"),
+                 "pattern": str(item.get("pattern") or "")[:300],
+                 "hypothese": str(item.get("hypothese") or "")[:300],
+                 "action": str(item.get("action") or "")[:300],
+                 "refs": item.get("refs") or [], "at": item.get("at")} for item in entries]
+    except Exception:
+        return []
+
+
 def _structure_quality(session) -> dict:
     """Verdict par attribut de la fiche structuree (mecanique, sans modele)."""
     try:
@@ -630,6 +648,38 @@ def persona_usage(session_id: str) -> list:
         role = str(entry.get("role") or "?")
         usage[role] = usage.get(role, 0) + 1
     return [{"role": role, "count": count} for role, count in sorted(usage.items())]
+
+
+def _experience_pattern(session, alert) -> str:
+    """Enchainement d echanges qui a mene au constat (_roles + extraits courts)."""
+    parts = []
+    for item in (session.get("context") or [])[-5:]:
+        role = str(item.get("role") or "?")
+        text = " ".join(str(item.get("text") or "").split())[:70]
+        parts.append(f"{role}: {text}")
+    evidence = " ".join(str(alert.get("evidence") or "").split())[:120]
+    pattern = " → ".join(parts)
+    return f"{pattern} || preuve citée : {evidence}" if evidence else pattern
+
+
+def _experience_write(session, alert, pattern: str) -> None:
+    """Une entree d experience par poste (journal d experience, hors depot)."""
+    try:
+        import sys
+        scripts_dir = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts"
+        if str(scripts_dir) not in sys.path:
+            sys.path.insert(0, str(scripts_dir))
+        import experience_log
+        experience_log.write(
+            "superviseur", "constat", pattern,
+            hypothese=str(alert.get("reason") or "")[:600],
+            action="",
+            session_id=str(session.get("id") or ""),
+            refs=[str(alert.get("id") or ""), str(session.get("alias") or ""),
+                  str((alert.get("evidence_provenance") or {}).get("event_id") or "")],
+        )
+    except Exception:
+        pass
 
 
 def archive_evidence(session, alert):
@@ -1455,6 +1505,8 @@ class Supervisor:
                     # T429 : verdict mecanique par attribut (valeur, source, etat) + verdict
                     # de la fiche (livrables couverts / non couverts).
                     "structure_qualite": _structure_quality(session),
+                    # T429 : le journal d experience par poste (ce que chaque poste a appris).
+                    "experiences": _experiences_for(session),
                     "cadrage": {
                         "renseignes": len(session.get("mission_structure") or {}),
                         "total": len(MISSION_FIELDS),
@@ -2811,6 +2863,8 @@ class Supervisor:
                         alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"), result.get("event_id"))
                         alert["memory_usage"] = memory_inventory(session, self.judge_settings)
                         archive_evidence(session, alert)
+                        # T429 : le Superviseur consigne ce qu il a observe (journal d experience).
+                        _experience_write(session, alert, _experience_pattern(session, alert))
                         session["alerts"].append(alert)
                         _trace(event="constat", session=sid, alias=session.get("alias"),
                                alert_id=alert["id"], severity=alert.get("severity"),

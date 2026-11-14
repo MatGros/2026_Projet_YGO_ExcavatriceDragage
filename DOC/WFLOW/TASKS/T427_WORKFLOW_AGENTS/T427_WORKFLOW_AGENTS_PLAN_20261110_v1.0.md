@@ -279,3 +279,75 @@ Chaque cas se joue sur **Claude** et sur **Codex** ; noter ✅ / ❌ + l'extrait
   de contexte git (branche, worktree principal ou non, remote). Ligne configurée aujourd'hui dans
   `~/.claude/settings.json` (hors projet). Script existant non commité : `TOOLS/AGENT_WORKFLOW/scripts/session_statusline.py`.
   Transmis à T429 : à attacher par le coordinateur via le Task Manager (T429 verrouillée par AGY01, pas d'écriture ici).
+
+## 10. 📝 À faire plus tard — lisibilité du bloc workflow
+
+> Demande exploitant (2026-11-14). Pas traité maintenant : noté pour la suite.
+
+- 🔤 **Espacement** : les emojis en début de ligne sont collés au texte. Ajouter un espace après chaque emoji.
+- 🧱 **Bloc menu** : les choix forment un bloc compact sans respiration. Aérer avec une ligne vide entre les sections (identité, état, choix, consigne).
+- 🎯 **Tâche** : la ligne mélange l'identifiant machine et le titre. Séparer en deux champs : identifiant (`T427`) puis titre. Ajouter un champ « Objectif » (ce qu'on cherche à obtenir), distinct du titre.
+- 🔁 **« Mode »** : valeur `fresh` / `resume` peu parlante. Remplacer par une formulation claire (ex. « Reprise : oui / non »).
+- 🪜 **« Étape »** : « non renseignée » n'aide pas. Afficher l'étape courante en clair (ex. « Étape : CADRAGE ») ou la masquer tant qu'elle n'est pas choisie.
+- 📊 **Projet** : la ligne est lisible, à garder. Ajouter une légende des symboles une seule fois, pas à chaque bloc.
+- 🚫 **Consigne « Agent : … »** : à retirer de l'affichage utilisateur. Elle sert au modèle, pas à la personne qui lit.
+
+## 11. 📝 À faire plus tard — contenu du démarrage et lecture par voie
+
+> Demande exploitant (2026-11-14). Notes, pas traité maintenant.
+
+- 📉 **Haut du bloc** : le décompte global (⏳ ⏸️ ⬜…) ne sert pas au démarrage. Le remplacer par le détail utile : tâche active, dernier point, ce qui attend une validation.
+- 📚 **Lecture avant le menu** : aucune lecture de documents projet n'est visible avant l'affichage du menu. À corriger : lister en premier les documents minimum à lire (rapide, challengé par agents), puis afficher le menu.
+- 🧭 **Après choix de l'Orchestrateur** : lecture approfondie et analysée, avant tout choix technique :
+  - conventions de nommage ;
+  - analyses fonctionnelles (survol) ;
+  - outils et tools disponibles, avec leur usage ;
+  - le task planner et ses règles ;
+  - sortie : un diagnostic court et des choix argumentés.
+  - Méthode : des agents en parallèle, chacun sur un sujet, avec une grille d'évaluation.
+
+## 12. 📋 Backlog consolidé (2026-11-14) — à exécuter dans l'ordre
+
+> Consolidation de §9.5, §10, §11 et des revues du 2026-11-14 (journal : BLOQUANT, consignes : AMBIGU).
+> Chaque point a un livrable et un test. Rien n'est fait tant que le test n'est pas PASS.
+
+**🔴 Priorité 1 — fiabilité (journal et état)**
+- B1 · Cause de la rupture de chaîne du journal réel (« empreinte invalide », 9 068 entrées).
+  Livrable : cause identifiée, pas de réécriture. Test : `verify_chain()` expliqué ligne à ligne.
+- B2 · Verrou des écritures concurrentes sur le journal (deux émetteurs = même seq).
+  Livrable : verrou fichier lecture+écriture. Test : 2 threads, seq uniques, chaîne intacte.
+- B3 · `--session` réservé au développement (un drapeau explicite, pas le chemin normal).
+  Test : `enter --session KEY_B` depuis KEY_A ne modifie pas KEY_B.
+- B4 · Test d'échec d'écriture du journal (dossier illisible) : `echecs.log` doit être créé.
+
+**🟠 Priorité 2 — sécurité de la commande**
+- B5 · `$ARGUMENTS` non protégé dans la ligne `!` de la commande. Livrable : validation côté Python.
+  Test : un `;` ou un espace dans l'argument ne lance rien d'autre.
+- B6 · Nom d'utilisateur codé en dur dans `trace_log.py`. Livrable : `Path.home()`. Test : chemin calculé.
+- B7 · Origine (`--source`) déclarée, non authentifiée : documenter la limite dans le journal.
+
+**🟡 Priorité 3 — lisibilité du bloc (§10)**
+- B8 · Espace après chaque emoji ; ligne vide entre les sections du bloc.
+- B9 · Ligne « Tâche » : identifiant (`T427`), titre, et un champ « Objectif » séparé.
+- B10 · « Mode : fresh » remplacé par une formulation claire (reprise oui / non).
+- B11 · « Étape : non renseignée » remplacé par l'étape en clair, ou masqué tant qu'elle n'est pas choisie.
+- B12 · Légende des symboles une seule fois, pas à chaque bloc.
+- B13 · Retirer la consigne « Agent : … » de ce qui est affiché à l'utilisateur.
+
+**🟢 Priorité 4 — démarrage et lecture (§11)**
+- B14 · Haut du bloc : tâche active, dernier point, validation en attente (pas de décompte global).
+- B15 · Lecture avant le menu : liste courte de documents minimum, challengée par agents, puis menu.
+- B16 · Après choix Orchestrateur : lecture approfondie (nommage, analyses fonctionnelles, outils,
+  task planner), par agents en parallèle, avec une grille. Sortie : diagnostic court et choix argumentés.
+- B17 · Accueil de la voie Tâche : court, chaleureux, qui demande la tâche et le résultat attendu
+  (proposition faite le 2026-11-14, à valider).
+
+**⚙️ Rappels (règles de rôle)**
+- R1 · Aucun rôle (orchestrateur, tâche…) n'est annoncé avant un choix de voie. Les en-têtes
+  « Orchestrator » mis sans choix étaient une erreur.
+- R2 · Le superviseur sert au suivi et aux alertes. Il ne valide pas le workflow.
+
+**❓ Points ouverts (à trancher, pas de code)**
+- O1 · T427 est verrouillée par CC01 : transfert de verrou ou autre tâche ?
+- O2 · Commit des modifications en attente : oui, quand, et par quel lot ?
+- O3 · Limites acceptées : source non authentifiée (B7), voie choisie en message libre non garantie.
