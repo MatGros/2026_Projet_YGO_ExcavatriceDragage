@@ -632,6 +632,120 @@ def memory_inventory(session, judge_settings=None) -> dict:
     }
 
 
+# T429 R13 : le juge recoit un dossier de lecture BORNE (contrat + plan de la tache +
+# fichiers cites par les constats ouverts), lecture seule, en une passe, sans boucle
+# d'agent. Tout constat declare la liste exacte des fichiers lus (lecture_declaree) ;
+# un fichier illisible est signale, jamais devine.
+# T429 R14 : le dossier de lecture n'est PAS un acces direct au depot — en v1 l'acces
+# direct au depot est interdit ; les deux notions restent distinguees partout.
+REPO_ROOT = Path(__file__).resolve().parents[3]
+READING_DOSSIER_MAX_FILES = 6
+READING_DOSSIER_MAX_CHARS = 12_000
+READING_DOSSIER_FILE_CHARS = 2_500
+READING_DOSSIER_EXTENSIONS = (".py", ".md", ".yaml", ".yml", ".json", ".st", ".html", ".js", ".mjs", ".xml")
+_REPO_PATH_RE = re.compile(r"[A-Za-z0-9_.\-]{2,}(?:/[A-Za-z0-9_.\-]{2,})+\.(?:py|md|yaml|yml|json|st|html|js|mjs|xml)")
+
+
+def cited_repo_files(session) -> list:
+    """Chemins du depot cites par les constats OUVERTS (fait extrait du texte, pas une impression)."""
+    seen, found = set(), []
+    for alert in (session.get("alerts") or []):
+        try:
+            closed = business_state(alert) == "closed"
+        except Exception:
+            closed = False   # etat inconnu : traite comme ouvert (ne cite pas = risque de sous-declaration)
+        if closed:
+            continue
+        texts = [str(alert.get("reason") or ""), str(alert.get("evidence") or "")]
+        for comment in (alert.get("comments") or [])[-3:]:
+            texts.append(str(comment.get("text") or ""))
+        for text in texts:
+            for match in _REPO_PATH_RE.finditer(text):
+                path = match.group(0).replace("\\", "/").strip("/")
+                if path not in seen:
+                    seen.add(path)
+                    found.append(path)
+    return found
+
+
+def _inside_repo(target: Path) -> bool:
+    """Un chemin hors depot n'est JAMAIS lu : le dossier ne lit que dans le depot."""
+    try:
+        target.resolve().relative_to(REPO_ROOT)
+        return True
+    except (ValueError, OSError):
+        return False
+
+
+def reading_dossier(session) -> dict:
+    """Dossier de lecture borne du juge : candidats bornes, lus en une passe.
+    Budget : <= READING_DOSSIER_MAX_FILES fichiers et <= READING_DOSSIER_MAX_CHARS caracteres.
+    Ordre : socle de la tache (contrat, plan, notes), puis fichiers cites par les constats ouverts."""
+    if not isinstance(session, dict):
+        session = {}
+    task = str(session.get("task_id") or "").strip().upper()
+    socle = [str(item).replace("\\", "/").strip("/") for item in (session.get("socle") or [])
+             if task and str(item).replace("\\", "/").startswith(f"DOC/WFLOW/TASKS/{task}")]
+    candidates: list = []
+    for path_text in socle + cited_repo_files(session):
+        if path_text not in candidates:
+            candidates.append(path_text)
+    files, unreadable, total = [], [], 0
+    for path_text in candidates:
+        if len(files) + len(unreadable) >= READING_DOSSIER_MAX_FILES:
+            break
+        target = REPO_ROOT / path_text
+        if not _inside_repo(target):
+            unreadable.append(dict(path=path_text, erreur="hors depot"))
+            continue
+        try:
+            text = target.open("rb").read().decode("utf-8", errors="replace")
+        except OSError as exc:
+            unreadable.append(dict(path=path_text, erreur=type(exc).__name__))
+            continue
+        kept = min(len(text), READING_DOSSIER_FILE_CHARS, max(0, READING_DOSSIER_MAX_CHARS - total))
+        if kept <= 0:
+            unreadable.append(dict(path=path_text, erreur="budget depasse"))
+            continue
+        files.append(dict(path=path_text, caracteres=kept, tronque=kept < len(text), extrait=text[:kept]))
+        total += kept
+    return dict(fichiers=files, illisibles=unreadable, total_caracteres=total,
+                budget=dict(max_fichiers=READING_DOSSIER_MAX_FILES, max_caracteres=READING_DOSSIER_MAX_CHARS))
+
+
+def dossier_notice_text(dossier) -> str:
+    """La notice du juge : ce que le service a lu pour ce verdict, avec la distinction R14."""
+    parts = []
+    for fich in dossier.get("fichiers") or []:
+        etat = "tronque" if fich.get("tronque") else "complet"
+        parts.append(f"### {fich['path']} ({fich['caracteres']} caracteres, {etat})\n{fich['extrait']}")
+    text = ("## DOSSIER DE LECTURE (fourni au juge, lecture seule — un dossier de lecture "
+            "n'est PAS un acces direct au depot ; en v1 l'acces direct au depot est interdit) :\n"
+            + "\n".join(parts))
+    if dossier.get("illisibles"):
+        text += "\nFichier(s) illisible(s) — signale(s), jamais devine(s) : " + json.dumps(
+            dossier["illisibles"], ensure_ascii=False)
+    return text
+
+
+def dossier_declared_paths(dossier) -> dict:
+    """La declaration portee par un constat : liste exacte des fichiers lus + signales."""
+    return dict(fichiers=[f["path"] for f in dossier.get("fichiers") or []],
+                illisibles=[u["path"] for u in dossier.get("illisibles") or []])
+
+
+def dossier_public(dossier) -> dict:
+    """Vue memory_state : chemins lus + signales, sans le contenu (extraits exclus)."""
+    dossier = dossier or {}
+    return dict(fichiers=[f["path"] for f in dossier.get("fichiers") or []],
+                illisibles=list(dossier.get("illisibles") or []),
+                total_caracteres=dossier.get("total_caracteres", 0),
+                budget=dict(dossier.get("budget") or dict(max_fichiers=READING_DOSSIER_MAX_FILES,
+                                                          max_caracteres=READING_DOSSIER_MAX_CHARS)),
+                distinction="dossier fourni au juge (lecture seule) · acces direct au depot interdit en v1",
+                declared_at=dossier.get("declared_at"))
+
+
 def persona_usage(session_id: str) -> list:
     """Invocations de personas tracees pour cette session (R15) : usage reel, pas une impression."""
     try:
@@ -1553,6 +1667,9 @@ class Supervisor:
                     "preuves_constats": (session.get("evidence_archive") or [])[-30:],
                     # T429 : le socle exige a l attachement et son etat de lecture.
                     "socle": list(session.get("socle") or []),
+                    # R13/R14 : le dernier dossier de lecture fourni au juge (borne, lecture
+                    # seule), distinct de tout acces direct au depot (interdit en v1).
+                    "dossier_lecture": dossier_public(session.get("reading_dossier")),
                     # T429 : le cadrage (attributs de mission) est visible aussi dans la
                     # ligne de supervision, pas seulement dans l IHM.
                     "vigilance": _vigilance_for(session),
@@ -2758,6 +2875,15 @@ class Supervisor:
                         journal = session.get("session_journal", [])
                         if journal:
                             notices.append(dict(role="context_notice", text="## MÉMOIRE DE SESSION (Jalons franchis) :\n" + "\n".join(f"- {j.get('text')}" for j in journal[-6:])))
+                        # R13/R14 : le dossier de lecture est construit UNE fois par verdict,
+                        # journalise, et porte par le verdict (lecture_declaree sur le constat).
+                        dossier = reading_dossier(session)
+                        session["reading_dossier"] = dict(dossier, declared_at=timestamp())
+                        notices.append(dict(role="context_notice", text=dossier_notice_text(dossier)))
+                        _experience_read(session, "superviseur",
+                                         "dossier de lecture : " + str(len(dossier["fichiers"])) + " fichier(s), "
+                                         + str(dossier["total_caracteres"]) + " caracteres",
+                                         refs=[f["path"] for f in dossier["fichiers"][-5:]])
                         session["judge_turn_count"] = session.get("judge_turn_count", 0) + 1
                         audit_interval = self.judge_settings.get("audit_interval", 8)
                         if session["judge_turn_count"] % audit_interval == 0:
@@ -2814,12 +2940,12 @@ class Supervisor:
                         # Bind the verdict to the bytes actually read, not a later stat:
                         # a pivot can be appended between polling and starting the judge.
                         stamp = getattr(session["watcher"], "last_stamp", None)
-                        work = (sid, session["generation"], self._epoch, self.model, self.allow_cloud, messages, stamp, is_recovery, recovery_index, session.get("context_revision", 0))
+                        work = (sid, session["generation"], self._epoch, self.model, self.allow_cloud, messages, stamp, is_recovery, recovery_index, session.get("context_revision", 0), dossier)
             if work is None:
                 self._judge_wake.wait()
                 self._judge_wake.clear()
                 continue
-            sid, generation, epoch, model, allow_cloud, messages, source_stamp, is_recovery, recovery_index, context_revision = work
+            sid, generation, epoch, model, allow_cloud, messages, source_stamp, is_recovery, recovery_index, context_revision, dossier = work
             error, result, uncertain = None, None, False
             try:
                 def record_request(payload, attempt):
@@ -2915,6 +3041,7 @@ class Supervisor:
                         # La provenance est un ETAT : elle est recalculee a chaque occurrence.
                         existing["evidence_provenance"] = evidence_provenance(session, existing.get("evidence"))
                         existing["memory_usage"] = memory_inventory(session, self.judge_settings)
+                        existing["lecture_declaree"] = dossier_declared_paths(dossier)
                         if existing["disposition"] != "new":
                             session["analysis_state"] = "alert_acknowledged"
                     elif not closed_match or previous_alert_id:
@@ -2927,6 +3054,7 @@ class Supervisor:
                             alert.update(previous_alert_id=previous_alert_id, source_event_id=occurrence["event_id"], source_event_index=occurrence["event_index"])
                         alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"), result.get("event_id"))
                         alert["memory_usage"] = memory_inventory(session, self.judge_settings)
+                        alert["lecture_declaree"] = dossier_declared_paths(dossier)
                         archive_evidence(session, alert)
                         # T429 : le Superviseur consigne ce qu il a observe (journal d experience).
                         _experience_write(session, alert, _experience_pattern(session, alert))
@@ -2947,6 +3075,7 @@ class Supervisor:
                             alert["evidence_provenance"] = evidence_provenance(
                                 session, (alert.get("assessment") or {}).get("evidence") or alert.get("evidence"))
                             alert["memory_usage"] = memory_inventory(session, self.judge_settings)
+                            alert["lecture_declaree"] = dossier_declared_paths(dossier)
                             archive_evidence(session, alert)
                     state_update = result.get("state_update")
                     if isinstance(state_update, str) and state_update.strip() and len(state_update.strip()) >= 5:
