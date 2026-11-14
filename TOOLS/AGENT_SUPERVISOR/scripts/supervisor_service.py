@@ -117,6 +117,15 @@ MISSION_FIELDS_LABELS = (
 )
 
 
+def _structure_quality(session) -> dict:
+    """Verdict par attribut de la fiche structuree (mecanique, sans modele)."""
+    try:
+        import structure_quality
+        return structure_quality.quality(session)
+    except Exception:
+        return {}
+
+
 def _vigilance_for(session) -> dict:
     """Profil de vigilance de la session (derive de la CRITICITE de la tache).
 
@@ -1440,6 +1449,9 @@ class Supervisor:
                     # T429 : le cadrage (attributs de mission) est visible aussi dans la
                     # ligne de supervision, pas seulement dans l IHM.
                     "vigilance": _vigilance_for(session),
+                    # T429 : verdict mecanique par attribut (valeur, source, etat) + verdict
+                    # de la fiche (livrables couverts / non couverts).
+                    "structure_qualite": _structure_quality(session),
                     "cadrage": {
                         "renseignes": len(session.get("mission_structure") or {}),
                         "total": len(MISSION_FIELDS),
