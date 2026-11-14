@@ -83,9 +83,10 @@ def get_cadrage_badge(conv_id):
         return ""
     renseignes = int(cadrage.get("renseignes") or 0)
     green = "\033[1;32m"
+    yellow = "\033[38;2;228;208;140m"
     soft_red = "\033[38;2;235;130;130m"
     reset = "\033[0m"
-    color = green if renseignes else soft_red
+    color = green if renseignes >= total else (yellow if renseignes else soft_red)
     return f"{color}📋 {renseignes}/{total}{reset}"
 
 

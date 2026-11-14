@@ -961,6 +961,9 @@ function renderMissionStructure(session){
  const lines=element('div',undefined,'mission-lines');
  for(const [key,label] of filledFields){const line=element('div');line.append(element('b',label+' : '),document.createTextNode(structure[key]));lines.append(line);}
  if(!filledFields.length)lines.append(element('div','Fiche structurée vide : la mission texte reste la référence.','mission-empty'));
+ const qualite=(session.memory_state||{}).structure_qualite||{};
+ if(qualite.verdict){const head=element('div','Cadrage : '+qualite.verdict+(qualite.livrables_non_couverts&&qualite.livrables_non_couverts.length?' · livrables non couverts : '+qualite.livrables_non_couverts.join(', '):''),'mission-empty');lines.append(head);
+  for(const item of qualite.attributs||[]){if(item.etat==='renseigne'&&!(item.alertes||[]).length)continue;const row=element('div');row.append(element('b',item.label+' : '),element('span','['+item.etat+(item.source?' · '+item.source:'')+'] '+(item.valeur||'—').slice(0,120),'muted'));for(const alerte of item.alertes||[])row.append(element('small',alerte,'warn'));lines.append(row);}}
  const empty=missionStructureFields.filter(([key])=>!(typeof structure[key]==='string'&&structure[key].trim())).map(([,label])=>label);
  if(empty.length&&filledFields.length)lines.append(element('div','Non renseignés : '+empty.join(', '),'mission-empty'));
  panel.append(lines);
