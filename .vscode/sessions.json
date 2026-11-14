@@ -1,12 +1,12 @@
 {
     "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v12/terminal-keeper.json",
     "theme": "tribe",
-    "active": "serveur",
+    "active": "Server",
     "activateOnStartup": false,
     "keepExistingTerminals": true,
     "noClear": true,
     "sessions": {
-        "serveur": [
+        "Server": [
             {
                 "name": "🗃️ Task Manager",
                 "env": { "TK_HIST": "task-manager" },
@@ -38,7 +38,7 @@
                 ]
             }
         ],
-        "AI": [
+        "AI Premium": [
             {
                 "name": "🚀 AGY Antigravity",
                 "env": { "TK_HIST": "agy" },
@@ -70,7 +70,7 @@
                 ]
             }
         ],
-        "AI Ollama": [
+        "AI Third-Party": [
             {
                 "name": "🐋 CC Ollama (deepseek-v4.1)",
                 "env": { "TK_HIST": "cc-ollama-deepseek" },
@@ -110,10 +110,11 @@
                 "commands": [
                     "ollama launch claude --model minimax-m3.1-flash:cloud"
                 ]
-            },
+            }
+        ],
+        "disabled_terminals": [
             {
-                "name": "📦 OpenCode",
-                "env": { "TK_HIST": "opencode" },
+                "name": "OpenCode (desactive)",
                 "autoExecuteCommands": true,
                 "icon": "organization",
                 "color": "terminal.ansiBrightBlue",
@@ -122,8 +123,16 @@
                 ]
             },
             {
-                "name": "⚙️ OpenCode-Go (glm-5.2)",
-                "env": { "TK_HIST": "opencode-go" },
+                "name": "OmniRoute Server (ancienne commande archivée)",
+                "autoExecuteCommands": true,
+                "icon": "server",
+                "color": "terminal.ansiBrightGreen",
+                "commands": [
+                    "omniroute"
+                ]
+            },
+            {
+                "name": "OpenCode-Go (glm-5.2) - desactive",
                 "autoExecuteCommands": true,
                 "icon": "zap",
                 "color": "terminal.ansiBrightCyan",
@@ -132,8 +141,7 @@
                 ]
             },
             {
-                "name": "🦙 Claude Code (Ollama gemma4)",
-                "env": { "TK_HIST": "cc-ollama-gemma4" },
+                "name": "🦙 Claude Code (Ollama)",
                 "autoExecuteCommands": true,
                 "icon": "cpu",
                 "color": "terminal.ansiBrightMagenta",
@@ -142,24 +150,12 @@
                 ]
             },
             {
-                "name": "🦙 OpenCode (Ollama gemma4)",
-                "env": { "TK_HIST": "opencode-ollama-gemma4" },
+                "name": "🦙 OpenCode (Ollama)",
                 "autoExecuteCommands": true,
                 "icon": "cpu",
                 "color": "terminal.ansiBrightCyan",
                 "commands": [
                     "ollama launch opencode --model gemma4:e4b"
-                ]
-            }
-        ],
-        "disabled_terminals": [
-            {
-                "name": "OmniRoute Server (ancienne commande archivée)",
-                "autoExecuteCommands": true,
-                "icon": "server",
-                "color": "terminal.ansiBrightGreen",
-                "commands": [
-                    "omniroute"
                 ]
             },
             {
