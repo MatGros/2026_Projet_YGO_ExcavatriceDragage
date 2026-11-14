@@ -11,6 +11,7 @@ Règles :
   * Git : branche (tronquée), worktree, écart avec l'upstream, fichiers modifiés.
   * Aucun plantage : toute erreur d'accès retombe sur un libellé neutre.
 """
+import hashlib
 import json
 import os
 import subprocess
@@ -19,7 +20,7 @@ from pathlib import Path
 
 LOCAL_APP = Path(os.environ.get("LOCALAPPDATA", r"C:\Users\ZEDVICTUS\AppData\Local"))
 WORKFLOW_STATE_DIR = LOCAL_APP / "ExcavatriceDragage" / "workflow"
-GIT_CACHE = LOCAL_APP / "Temp" / "session_statusline_git.json"
+GIT_CACHE_DIR = LOCAL_APP / "Temp" / "session_statusline_git"
 GIT_CACHE_TTL = 1.5  # secondes : évite 4 appels git à chaque rafraîchissement de prompt
 
 # Décalage à droite de la 2e ligne. Claude Code SUPPRIME les espaces de tête de chaque
@@ -183,18 +184,26 @@ def _git(args, cwd):
 
 
 def _git_facts():
-    """Faits git bruts (mis en cache 1,5 s pour ne pas ralentir chaque rafraîchissement)."""
-    try:
-        if GIT_CACHE.is_file() and (time.time() - GIT_CACHE.stat().st_mtime) < GIT_CACHE_TTL:
-            cached = json.loads(GIT_CACHE.read_text(encoding="utf-8"))
-            if cached.get("root"):
-                return cached
-    except (OSError, ValueError):
-        pass
+    """Faits git bruts, mis en cache par racine pendant 1,5 s.
+
+    Plusieurs CLI/worktrees peuvent appeler cette fonction simultanément. Un cache global
+    unique permettait à un terminal de réutiliser la branche d'un autre dépôt.
+    """
     cwd = os.getcwd()
     root = _git(["rev-parse", "--show-toplevel"], cwd)
     if not root:
         return {"root": ""}
+
+    root_key = os.path.normcase(os.path.abspath(root))
+    cache_key = hashlib.sha256(root_key.encode("utf-8")).hexdigest()[:20]
+    cache_path = GIT_CACHE_DIR / f"{cache_key}.json"
+    try:
+        if cache_path.is_file() and (time.time() - cache_path.stat().st_mtime) < GIT_CACHE_TTL:
+            cached = json.loads(cache_path.read_text(encoding="utf-8"))
+            if os.path.normcase(os.path.abspath(cached.get("root", ""))) == root_key:
+                return cached
+    except (OSError, ValueError):
+        pass
     facts = {"root": root}
     facts["branch"] = _git(["rev-parse", "--abbrev-ref", "HEAD"], cwd) or "?"
     upstream = _git(["rev-parse", "--abbrev-ref", "@{u}"], cwd)
@@ -211,8 +220,10 @@ def _git_facts():
     status = _git(["status", "--porcelain"], cwd)
     facts["dirty"] = len([line for line in status.splitlines() if line.strip()]) if status else 0
     try:
-        GIT_CACHE.parent.mkdir(parents=True, exist_ok=True)
-        GIT_CACHE.write_text(json.dumps(facts), encoding="utf-8")
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        temp_path = cache_path.with_name(f"{cache_path.stem}.{os.getpid()}.tmp")
+        temp_path.write_text(json.dumps(facts), encoding="utf-8")
+        os.replace(temp_path, cache_path)
     except OSError:
         pass
     return facts
