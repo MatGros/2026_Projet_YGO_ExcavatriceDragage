@@ -1186,3 +1186,73 @@ def test_archived_evidence_is_bounded():
         supervisor_service.archive_evidence(session, {"id": f"a{index}", "evidence": f"e{index}",
                                                      "reason": "r", "created_at": "t"})
     assert len(session["evidence_archive"]) <= 200
+
+
+def test_reading_dossier_orders_task_files_and_excludes_globals():
+    """R13 (2026-11-14) : le dossier de lecture du juge = contrat + plan + notes de la
+    tache + fichiers cites par les constats ouverts. Les globaux (AGENTS.md, resume du
+    catalogue) ne sont pas le dossier de la tache ; un chemin cite qui n'existe pas est
+    signale, jamais devine."""
+    socle = ["AGENTS.md",
+             "DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md",
+             "DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml"]
+    session = dict(task_id="T429", socle=socle,
+                   alerts=[dict(id="x", fingerprint="x", disposition="new",
+                                reason="lire DOC/README.md puis DOC/WFLOW/inconnu_absent.md",
+                                evidence="", comments=[])])
+    dossier = supervisor_service.reading_dossier(session)
+    paths = [f["path"] for f in dossier["fichiers"]]
+    assert paths and paths[0] == socle[-1], "le contrat de la tache passe en premier"
+    assert "AGENTS.md" not in paths and "DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md" not in paths
+    assert "DOC/README.md" in paths, "un chemin cite par un constat ouvert entre dans le dossier"
+    signales = [u["path"] for u in dossier["illisibles"]]
+    assert "DOC/WFLOW/inconnu_absent.md" in signales, "un fichier illisible/existant-pas est signale"
+    assert not any(f.get("extrait") for f in dossier["fichiers"] if f["path"] in signales), "jamais devine"
+
+
+def test_reading_dossier_honours_budget_and_marks_truncation(monkeypatch):
+    """R13 : budget borne (fichiers et caracteres), troncature marquee explicitement."""
+    session = dict(task_id="", socle=[],
+                   alerts=[dict(id="x", fingerprint="x", disposition="new",
+                                reason="voir DOC/README.md et DOC/VERSION_HISTORY.md",
+                                evidence="", comments=[])])
+    monkeypatch.setattr(supervisor_service, "READING_DOSSIER_FILE_CHARS", 120)
+    monkeypatch.setattr(supervisor_service, "READING_DOSSIER_MAX_CHARS", 260)
+    dossier = supervisor_service.reading_dossier(session)
+    assert dossier["total_caracteres"] <= 260, "budget total respecte"
+    assert all(f["caracteres"] <= 120 for f in dossier["fichiers"]), "budget par fichier respecte"
+    assert any(f["tronque"] for f in dossier["fichiers"]), "la troncature est marqueee, pas silencieuse"
+    assert len(dossier["fichiers"]) <= supervisor_service.READING_DOSSIER_MAX_FILES
+
+
+def test_judge_declares_reading_dossier_and_finding_carries_it(tmp_path):
+    """R13/R14 : la notice du juge porte le dossier (avec la distinction depot), le constat
+    porte la declaration exacte du verdict, et memory_state l'expose sans le contenu."""
+    observed = []
+
+    def judge(model, messages):
+        observed.append(json.loads(json.dumps(messages)))
+        return dict(alert=True, severity='warning', reason='Constat dossier.' + EVIDENCE,
+                    evidence=EVIDENCE, category='cadrage')
+
+    svc, source, sid = service(tmp_path, judge)
+    try:
+        svc.command({'action': 'start'})
+        session = svc.sessions[sid]
+        session['task_id'] = 'T429'
+        write(source, 'assistant', EVIDENCE)
+        wait(lambda: bool(svc.sessions[sid]['alerts']))
+        svc.sessions[sid]['alerts'][-1]['reason'] += ' — chemin teste : DOC/README.md'
+        before = len(observed)
+        write(source, 'assistant', EVIDENCE)
+        wait(lambda: len(observed) > before)
+        declared = svc.sessions[sid]['alerts'][-1]['lecture_declaree']
+        assert declared.get('fichiers') == ['DOC/README.md'], f"declaration exacte : {declared}"
+        batch = json.dumps(observed[-1], ensure_ascii=False)
+        assert 'DOSSIER DE LECTURE' in batch and 'DOC/README.md' in batch, "le juge recoit le dossier"
+        assert 'acces direct au depot est interdit' in batch, "la distinction R14 est dans la notice"
+        public = svc.snapshot()['sessions'][0]['memory_state']['dossier_lecture']
+        assert public['fichiers'] == ['DOC/README.md'], "le dossier est visible dans memory_state"
+        assert public['distinction'].startswith('dossier fourni au juge'), "R14 : notions distinctes"
+    finally:
+        svc.close()
