@@ -93,6 +93,17 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _split_counts(raw: str) -> str:
+    """Sépare les verrous 🔒 des statuts : 🔒 n'est pas un statut, il est affiché à part."""
+    def num(sym: str) -> str:
+        m = re.search(re.escape(sym) + r"\s*(\d+)", raw)
+        return m.group(1) if m else "?"
+    total = re.search(r"total\s*(\d+)", raw)
+    statuts = f"⏳ {num('⏳')} · ⏸️ {num('⏸️')} · ⬜ {num('⬜')} · ⛔ {num('⛔')} · ✅ {num('✅')} · ❌ {num('❌')}"
+    total_txt = f" (total {total.group(1)})" if total else ""
+    return f"{statuts}{total_txt} · 🔒 {num('🔒')} verrouillées"
+
+
 def summary_status() -> tuple[str, str]:
     """Retourne (ligne compteurs, état de fraîcheur) depuis TASKS_ACTIVE_SUMMARY.md."""
     if not SUMMARY.is_file():
@@ -103,7 +114,7 @@ def summary_status() -> tuple[str, str]:
     if not head or not TASKS.is_file():
         return (counts.group(1).strip() if counts else "compteurs inconnus"), "INCONNUE"
     fresh = "À JOUR" if head.group(1) == sha256(TASKS) else "PÉRIMÉ (régénérer)"
-    return (counts.group(1).strip() if counts else "compteurs inconnus"), fresh
+    return (_split_counts(counts.group(1).strip()) if counts else "compteurs inconnus"), fresh
 
 
 SUPERVISOR_URL = "http://127.0.0.1:8082/api/supervision/summary"
@@ -194,8 +205,9 @@ def render(etat: str, mode: str | None, seq: int | None, key: str = "", alias: s
             "2 · Tâche (prendre une tâche du catalogue, verrous)",
             "3 · Troubleshooting (diagnostiquer un incident)",
             "0 · Quitter le workflow",
-            "Tape le numéro : /workflow-project 1 · 2 · 3 · 0",
+            "Pour choisir : /workflow-project 1 (Orchestrateur) · 2 (Tâche) · 3 (Troubleshooting) · 0 (Quitter)",
             "Ou écris ta demande : elle reste une réponse directe.",
+            "Agent : si l'utilisateur répond 1, 2, 3 ou 0 juste après ce menu, exécute `python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py cmd <numéro>` et affiche sa sortie. Autre réponse numérique : « choix inconnu », sans rien enregistrer.",
         ]
     elif etat == "OFF":
         lines.append("⏹️ Workflow quitté. Pour revenir : /workflow-project")
