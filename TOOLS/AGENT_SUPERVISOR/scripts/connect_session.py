@@ -320,11 +320,23 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
                             task_id=task_ref, task_title=resolved_title, agent_id=agent_id,
                             task=task_label, source=attached["source"], previous_alias=item.get("alias"),
                             mission_structure_loaded=structure_loaded)
+    # T429 : le socle (documents a lire AVANT d agir) est exige des l affectation.
+    try:
+        import sys as _sys
+        _wf = str(Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts")
+        if _wf not in _sys.path:
+            _sys.path.insert(0, _wf)
+        import task_socle
+        socle = task_socle.socle_for(task_ref)
+    except Exception:
+        socle = []
     result = api_json(base_url + "/api/supervision", token=snapshot.get("token"), payload={
         "action": "add", "platform": platform, "native_id": session_id,
         "alias": alias.strip(), "mission": attached_mission,
         # T429 : la tache et son titre sont des DONNEES, plus du texte a parser.
-        "task_ref": task_ref, "task_title": resolved_title})
+        "task_ref": task_ref, "task_title": resolved_title,
+        # T429 : le socle a lire est exige des l attachement.
+        "socle": socle})
     attached = next((item for item in result.get("sessions", [])
                      if item.get("platform") == platform and item.get("native_id") == session_id), None)
     if not attached or not attached.get("source"):

@@ -19,7 +19,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import terminal_title  # noqa: E402  (chemin local du script)
 from statusline_indicators import (  # noqa: E402  (chemin local du script)
-    STATUSLINE_INDENT, get_git_badge, get_scope_badge, get_workflow_badge,
+    STATUSLINE_INDENT, get_git_badge, get_progress_badge, get_scope_badge,
+    get_socle_badge, get_workflow_badge,
 )
 
 # Forcer UTF-8 avec fallback sur remplacement si le terminal est en cp1252
@@ -417,7 +418,14 @@ def main():
             print(f"{colored_label} {dim}│{reset} {sup_badge}")
             # 2026-11-13 : deuxième ligne compacte — état du workflow + repère git.
             scope_badge = get_scope_badge(conv_id, stdin_transcript)
-            scope_part = f" │ {scope_badge}" if scope_badge else ""
+            socle_badge = get_socle_badge(conv_id)
+            alias = ""
+            try:
+                alias = str((raw_title or "")).split()[0] if raw_title else ""
+            except Exception:
+                alias = ""
+            progress_badge = get_progress_badge(alias)
+            scope_part = f" │ {progress_badge}{socle_badge}{scope_badge}" if (progress_badge or socle_badge or scope_badge) else ""
             print(f"{STATUSLINE_INDENT}{get_workflow_badge(conv_id)}{scope_part} │ {get_git_badge()}")
     except Exception:
         # Filet de sécurité absolu : ne JAMAIS crasher en code 1

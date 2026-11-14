@@ -1300,6 +1300,7 @@ function render(snapshot,force=false){
     else{for(const item of group.items.slice(-15)){const row=element('div',undefined,'chat-message');row.append(element('small',(item.role||'')+(item.index!==undefined&&item.index!==null?' #'+item.index:'')+' · '+dateText(item.at)),element('div',shortPreview(String(item.text||''),400)));groupBox.append(row);}}
     memFold.append(groupBox);
    }
+   const socle=session.socle||[];if(socle.length){const socleBox=element('details',undefined,'memory-group session-config');const socleSummary=element('summary','📚 Socle exigé à l\'attachement · '+socle.length+' document(s)');appendFoldPills(socleSummary);socleBox.append(socleSummary);for(const doc of socle){socleBox.append(element('p','· '+doc,'muted'));}memFold.append(socleBox);}
    const personas=memoryState.personas||[];
    memFold.append(element('p',personas.length?('🧑‍💼 Agents spécialistes invoqués : '+personas.map(item=>item.role+' ×'+item.count).join(', ')):'🧑‍💼 Agents spécialistes : aucune invocation tracée pour cette session.','hint'));
    memFold.append(element('p','Le dossier de lecture (fichiers fournis au juge) et les agents spécialistes sont des entrées distinctes : voir le journal interne.','hint'));
