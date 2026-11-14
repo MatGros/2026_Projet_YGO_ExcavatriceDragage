@@ -202,7 +202,9 @@ def populate_mission_from_contract(base_url: str, token: str, assignment_id: str
         "subject": task_raw.strip(),
         "task_ref": task_ref.strip(),
         "primary_goal": objective[:400],
-        "current_goal": mission_raw.strip()[:400],
+        # T429 : le titre de session n est PAS un objectif courant -> on ne le recopie
+        # pas ; le champ reste a completer par l exploitant (la consigne est dans l IHM).
+        "current_goal": "",
         "milestone": f"Contrat {contract_path.name[:80]}",
         "scope_permissions": scope[:300],
         "constraints": constraints[:300],
@@ -214,7 +216,7 @@ def populate_mission_from_contract(base_url: str, token: str, assignment_id: str
     }
     try:
         api_json(base_url + "/api/supervision", token=token, payload={
-            "action": "set_mission_structure",
+            "action": "set_mission_structure", "origin": "contrat",
             "id": assignment_id,
             "structure": structure
         })

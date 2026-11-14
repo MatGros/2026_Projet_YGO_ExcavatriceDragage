@@ -793,6 +793,9 @@ class Supervisor:
                 session["mission_updated_at"] = value.get("mission_updated_at")
                 session["mission_structure"] = validate_mission_structure(value.get("mission_structure", {}))
                 session["mission_structure_updated_at"] = value.get("mission_structure_updated_at")
+                # T429 : qui a ecrit la fiche ? (exploitant = confirme ; contrat/mission = deduit)
+                origin = str(value.get("origin") or "exploitant").strip().lower()
+                session["mission_structure_origin"] = origin if origin in ("exploitant", "contrat", "mission") else "exploitant"
                 if session['mission_updated_at'] is not None and not isinstance(session['mission_updated_at'], str):
                     raise ValueError('Date de mission invalide')
                 alerts = value.get("alerts", [])
