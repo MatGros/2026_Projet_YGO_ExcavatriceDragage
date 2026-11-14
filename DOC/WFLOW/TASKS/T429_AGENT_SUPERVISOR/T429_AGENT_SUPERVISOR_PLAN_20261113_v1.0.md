@@ -1,3 +1,192 @@
+---
+plan_project:
+  schema: 1
+  task_id: T429
+  updated_at: 2026-11-14
+  milestones:
+    - id: M0
+      title: "F0 — Référence et socle de tests verts"
+      done_when: "Tests unitaires du Superviseur verts sur l'arbre courant"
+      execution: DONE
+      execution_by: CC01
+      evidence: "DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/PREUVES/ (pytest TOOLS/AGENT_SUPERVISOR/tests : 200 passed)"
+      execution_comment: ""
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M1
+      title: "F1 — Continuité pause / reprise / source déplacée"
+      done_when: "Recette réelle F1 sans perte d'événement ni de constat"
+      execution: DONE
+      execution_by: CC01
+      evidence: "PREUVES/20261109_SESSION_QUALIF_INITIALE/T429_PREUVE_RECETTE_F1_REEL_20261109_v1.0.json (6/6)"
+      execution_comment: "Fix _resume_session (événements post-affectation) + 2 tests le 2026-11-13"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M2
+      title: "F2 — Cycle des constats, cadrage versionné, réévaluation"
+      done_when: "Cycle complet sur session réelle + campagne A/B comparée"
+      execution: DONE
+      execution_by: CC01
+      evidence: "PREUVES/…/T429_PREUVE_CAMPAGNE_FR_AB_FINAL_20261109_v1.0.json (B 10/10, A 9/10) + cycle modèle réel 4/4"
+      execution_comment: "Réévaluation à la demande en pause (verdict ~2 s) + 3 tests"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M3
+      title: "F3 — IHM, plugin VS Code, « Send to chat »"
+      done_when: "Layout PASS aux 3 largeurs, plugin vert, deep link PASS"
+      execution: DONE
+      execution_by: CC01
+      evidence: "ui_layout_check.mjs 1440/390/360 px PASS · plugin 16/16 · deep link PASS"
+      execution_comment: "Restent 2 AC observation humaine (AC-F3.5, AC-F3.9 — jalons M7/M8)"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M4
+      title: "F4 — Recette comparée, parcours réels multi-CLI"
+      done_when: "Corpus multi-CLI vert sur parcours réels"
+      execution: DONE
+      execution_by: CC01
+      evidence: "PREUVES/<session>/ (Codex / Claude Code / Antigravity PASS)"
+      execution_comment: "DSH limité (clé API absente du profil headless) — documenté, pas contourné"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M5
+      title: "Lot dérive — résumé À JOUR + prédicat + garde + métrique (R7→R10)"
+      done_when: "generate_tasks_summary --check=0, prédicat testé, hook refus motivé, métrique affichée et citable"
+      execution: DONE
+      execution_by: CC01
+      evidence: "TOOLS/AGENT_WORKFLOW/scripts/task_scope.py + hook_scope_guard.py + tests (13+10+8) + badge 🎯 k/n en statusline"
+      execution_comment: "Réparti T427 (mécanique générique) / T429 (affichage + constat citable)"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M6
+      title: "Visibilité mémoire — panneau lisible + constat autoportant (R11→R12)"
+      done_when: "4 groupes mémoire avec extraits dans l'IHM ; chaque constat porte l'inventaire mémoire du verdict"
+      execution: DONE
+      execution_by: CC01
+      evidence: "test_t429_regressions.py (62 tests incl. R11/R12) · snapshot complet exposé"
+      execution_comment: ""
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M7
+      title: "AC-F3.5 — notification bureau, son, toast, clic"
+      done_when: "1 notification + 1 bip + 1 toast ; le clic ouvre la session et la carte visées — observation humaine consignée dans tracking.experiments"
+      execution: BLOCKED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "Attente exploitant (observation humaine, non automatisable)"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M8
+      title: "AC-F3.9 — retour exploitant sur la simplicité d'usage"
+      done_when: "Verdict « simple / à corriger » consigné ; correctifs appliqués si « à corriger »"
+      execution: BLOCKED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "Attente exploitant + CC01"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M9
+      title: "R13+R14 — dossier de lecture déclaré ≠ lecture du dépôt"
+      done_when: "Juge reçoit un dossier borné en lecture seule et déclare la liste exacte dans l'argumentaire ; distinction affichée"
+      execution: DONE
+      execution_by: CC01
+      evidence: "reading_dossier() + notice juge + lecture_declaree sur le constat + dossier_lecture dans memory_state + bloc IHM ; tests : test_t429_regressions 65/65 (3 nouveaux), test_dossier_ui.mjs 8 asserts, suite 214 passed, layout 0 failed (2026-11-14)"
+      execution_comment: "Budget 6 fichiers / 12 000 car., troncature marquée ; illisible signalé jamais deviné ; corrigé au passage : champ preuves affiché undefined (clé prouves_acquises) ; v1 sans boucle d'agent"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M10
+      title: "R15 — personas journalisées et visibles"
+      done_when: "Chaque invocation de specialist_runner est journalisée (rôle, cible, session) et affichée"
+      execution: NOT_STARTED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "Traçage avant branchement v2"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M11
+      title: "R3+R4 — famille d'acteur MMX et test rouge renommage"
+      done_when: "Une seule règle d'alias tracée des deux côtés ; test_supervisor_summary_exposes_only_rename_title vert"
+      execution: NOT_STARTED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "Fait nouveau 2026-11-14 : R4 vert (test_session_statusline 8 passed, était 1 failed) — prérequis de R5 levé ; R3 (décision MMX) reste chez l'agent T000 (lot T000_SESSION_NAMING)"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M12
+      title: "R5 — alignement du service 8082 sur HEAD"
+      done_when: "GET /health → update_available: false, sauvegarde vérifiée, 7 affectations conservées, 0 constat perdu"
+      execution: NOT_STARTED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "Après M11 (R4)"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M13
+      title: "R6 — push des commits locaux"
+      done_when: "git rev-list --left-right --count origin/main...HEAD → 0 0"
+      execution: NOT_STARTED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "Accord humain explicite requis (jamais déduit d'un accord de commit)"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+    - id: M14
+      title: "R16 — Menu de gauche : couleur d'état sur l'indicateur, texte neutre, identifiant d'agent coloré"
+      done_when: "Titre de session neutre même en alarme ; état sur marqueur/fond/étiquette ; badge d'agent coloré par standard (claude/codex/agy/dsh/opc)"
+      execution: DONE
+      execution_by: CC01
+      evidence: "CSS : titre neutre var(--text) + has-* color var(--text) + marker par état (vert/orange/rouge/gris) + .model-tag standard 5 acteurs ; JS : badge model-tag + metaRow ; test_dossier_ui.mjs 16 asserts, test_ui.mjs PASS, layout 0 fail (2026-11-14)"
+      execution_comment: "Demande exploitant 2026-11-14 ; checkpoint 68cbb76d (M9) puis checkpoint M14"
+      validation: NOT_REVIEWED
+      validated_by: ""
+      validated_at: ""
+      validation_comment: ""
+      comments: []
+---
+
+<!-- markdownlint-disable MD025 -->
 # T429 — Plan complet, détaillé et vérifié
 
 > **Contrat mesurable** : `T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml` (AC-F0 → AC-F4, AC-X, `tracking` avec preuves datées)
@@ -51,7 +240,7 @@
 | **R6** | **Push** — 5 commits locaux non poussés (`7f487148`, `cf14f135`, `22535a09`, + à venir) | branche distante à jour, aucun commit perdu | `git rev-list --left-right --count origin/main...HEAD` → `0 0` | **exploitant** (accord explicite requis) |
 | **R7** | **Bruit de fond catalogue** — le résumé était figé (PÉRIMÉ) | générateur mécanique en place, résumé À JOUR, contrôle en CI | `python TOOLS/AGENT_WORKFLOW/scripts/generate_tasks_summary.py --check` → 0 | CC01 ✅ **fait le 2026-11-13** |
 | **R8** | **Prédicat de périmètre** — le périmètre d'une tâche devient une donnée (ensemble de chemins autorisés, déduit du contrat `scope.allowed`), pas une phrase dans un prompt | un prédicat booléen, testable, sans LLM : `chemin ∈ périmètre` ; T429 sert de cas d'école | tests unitaires du prédicat (inclus / exclu / chemin voisin) | CC01 (T427) |
-| **R9** | **Garde de dérive** — hook `PreToolUse` sur `Edit|Write|MultiEdit` : écriture hors périmètre → refus motivé + question à l'exploitant ; une dérogation confirmée est **enregistrée** (durable) | aucune écriture hors périmètre sans dérogation tracée ; le refus force la confirmation au lieu de la recommending | hook testé (chemin autorisé → passe ; hors périmètre → refus ; dérogation → passe) | CC01 (T427) |
+| **R9** | **Garde de dérive** — hook `PreToolUse` sur `Edit\|Write\|MultiEdit` : écriture hors périmètre → refus motivé + question à l'exploitant ; une dérogation confirmée est **enregistrée** (durable) | aucune écriture hors périmètre sans dérogation tracée ; le refus force la confirmation au lieu de la recommending | hook testé (chemin autorisé → passe ; hors périmètre → refus ; dérogation → passe) | CC01 (T427) |
 | **R10** | **Métrique de dérive** — part des N derniers fichiers touchés qui sont hors périmètre, recalculée depuis le transcript (les chemins y sont dans la trace) | la métrique est **comptée**, pas estimée : aucun avis involved ; elle alimente le constat du Superviseur (preuve citable) et la 2ᵉ ligne de la statusline | métrique recalculée et affichée ; le constat `scope_drift` cite le décompte | CC01 (T427 pour la mesure, T429 pour l'affichage et le constat) |
 | **R11** | **Panneau Mémoire lisible** — les 4 groupes (fenêtre / longue / journal / preuves) avec leur contenu, pas seulement leurs compteurs | l'exploitant voit d'un coup d'œil ce que le juge voit et ce qu'il ne voit plus | test DOM (4 groupes + extraits) · layout 0 échec | CC01 (T429) |
 | **R12** | **Constat autoportant** — chaque constat porte l'inventaire mémoire du moment du verdict + la provenance de sa preuve | un constat relu plus tard donne son contexte sans rouvrir le transcript | test (inventaire cohérent avec la fenêtre) · affichage | CC01 (T429) |
@@ -132,8 +321,10 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
 | **R13** | **Le Superviseur ne lit rien sans le dire** | v1 : le juge reçoit un **dossier de lecture** borné (contrat + plan de la tâche + fichiers cités par les constats ouverts), **lecture seule**, et **déclare** la liste dans l'argumentaire (`lecture_declaree`). Pas de boucle d'agent en v1 ; budget ≤ 6 fichiers et ≤ 12 000 caractères | chaque constat porte la liste exacte des fichiers lus ; un fichier illisible est **signalé**, jamais deviné | test : dossier joint, déclaration exacte, fichier illisible signalé · journal interne : la lecture est consignée |
 | **R14** | **Dossier de lecture ≠ lecture du dépôt** | distinction explicite dans l'IHM et dans l'argumentaire : « dossier de lecture (fourni au juge) » vs « accès direct au dépôt (interdit en v1) » | aucune confusion possible dans l'affichage ni dans le journal | test DOM (les deux libellés distincts) |
 | **R15** | **Les agents deviennent tracables** | chaque invocation de `specialist_runner.py` est journalisée (rôle, cible, session) → l'IHM affiche « spécialistes invoquées : HMI 2 · tests 1 » ou « aucune invocation ». Le Superviseur pourra **réclamer** un avis de spécialiste (v2), déclaré comme les lectures | l'usage réel des 6 personas devient un fait ; la question « pourquoi on les a faits » a une réponse factuelle | test : une invocation produit une entrée journalisée · affichage IHM |
+| **R16** | **Menu de gauche — la couleur porte l'état, pas le texte** (demande exploitant 2026-11-14) | le titre de session reste neutre (blanc) même en alarme ; l'état vit sur le marqueur + fond discret + étiquette (info active/défaut/alarme) ; l'identifiant d'agent = badge coloré selon un standard par acteur (claude/codex/agy/dsh/opc) | test DOM (badge model-tag + neutralisation texte) · layout 0 échec | CC01 (T429) |
 
-**Décisions figées sur ce lot**
+### Décisions figées sur ce lot
+
 - **v1 = lecture seule, bornée, sans boucle d'agent.** Le dossier de lecture est fourni en une passe ; la boucle « le juge demande un fichier, le service le lit, le juge re-juge » est **hors v1** (à chiffrer avant).
 - Les **personas restent déclenchés** par l'agent ou l'exploitant — mais **tracés** (R15) avant d'être **branchés** sur le Superviseur.
 - La **mémoire longue reste exposée et invalidable, pas signée** (signature = T431).

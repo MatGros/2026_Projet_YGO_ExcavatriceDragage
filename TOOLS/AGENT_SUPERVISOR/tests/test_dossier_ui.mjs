@@ -34,4 +34,17 @@ assert.match(text,/budget 6 fichiers \/ 12000 caractères/,'le budget affiche es
 assert.match(text,/📖 Fichiers déclarés lus pour ce verdict/,'R13 : chaque constat declare sa lecture');
 assert.match(text,/DOC\/inexistant\.md/,'la declaration du constat porte le fichier signale');
 assert.match(text,/preuves 3 /,'la cle preuves_acquises est lue (le champ n affiche plus undefined)');
-console.log('R13/R14 UI : 8 asserts PASS');
+// R16 : la couleur porte l'etat (marqueur, fond discret, etiquette) — le texte du menu de gauche reste neutre ;
+// l'identifiant d'agent est un badge colore selon le standard par acteur.
+assert.match(html,/\.side-session\.has-alarm,[^}]*color:var\(--text\)/,'R16 : meme en alarme le bouton garde un texte neutre');
+assert.match(html,/\.side-session\.status-alarm \.side-session-title\{color:var\(--text\);font-weight:650\}/,'R16 : le titre de session n est plus recolore par l etat');
+assert.match(html,/\.side-session\.has-alarm \.session-marker\{background:#ff626d\}/,'R16 : l alarme vit sur le marqueur d etat');
+const sideTitle=document.querySelector('.side-session .side-session-title');
+assert.ok(sideTitle,'le titre de session latéral rendu');
+const badge=document.querySelector('.side-session-content .model-tag');
+assert.ok(badge,'R16 : badge identifiant d agent present dans le menu de gauche');
+assert.equal(badge.textContent,'claude');
+assert.ok(badge.classList.contains('model-claude'),'R16 : badge colore selon le standard d acteur');
+assert.match(html,/\.model-tag\.model-agy\{border-color:#4285f4/,'standard par acteur declare (agy)');
+assert.match(html,/\.side-session-meta-row\{display:flex/,'le badge et la meta partagent une ligne');
+console.log('R13/R14 + R16 UI : 16 asserts PASS');
