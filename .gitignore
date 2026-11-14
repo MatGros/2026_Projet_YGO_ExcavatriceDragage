@@ -61,6 +61,11 @@ launch_workspace.ps1
 
 # Outils / Agents / Plugins tiers
 .agents/
+!.agents/
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/plan-project/
+!.agents/skills/plan-project/SKILL.md
 .codex/
 .immorterm/
 .opencode/
@@ -77,6 +82,11 @@ package-lock.json
 !.vscode/settings.json
 !.vscode/sessions.json
 .claude/
+!.claude/
+.claude/*
+!.claude/commands/
+.claude/commands/*
+!.claude/commands/plan-project.md
 .mgs-workspace.code-workspace
 node_modules/
 
