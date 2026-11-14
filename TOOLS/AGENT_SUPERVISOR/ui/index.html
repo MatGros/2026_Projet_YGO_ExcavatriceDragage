@@ -46,14 +46,16 @@ body{padding:0;background:radial-gradient(ellipse at 72% -10%,#30324a 0,transpar
 .side-session-state.is-warning{color:var(--orange)}
 .side-session-state.is-alarm{color:var(--red)}
 
-/* R16 : identifiant d'agent colore — standard par acteur (demande exploitant 2026-11-14). */
+/* R16 : identifiant d'agent colore — TEXTE colore seul (remarque exploitant 2026-11-14 :
+le badge encadre etait peu lisible), standard par acteur. */
 .side-session-meta-row{display:flex;align-items:center;gap:6px;min-width:0;margin-top:2px}
-.model-tag{border:1px solid var(--border);border-radius:8px;padding:0 5px;font-size:9px;line-height:14px;letter-spacing:.04em;color:var(--muted);flex:none}
-.model-tag.model-claude{border-color:#d97757;color:#f4a68a;background:rgba(217,119,87,.12)}
-.model-tag.model-codex{border-color:#67b58a;color:#6fd3b6;background:rgba(16,163,127,.14)}
-.model-tag.model-agy{border-color:#4285f4;color:#8ab4f8;background:rgba(66,133,244,.14)}
-.model-tag.model-dsh{border-color:#a291f5;color:#c4b8f8;background:rgba(162,145,245,.14)}
-.model-tag.model-opc{border-color:#e5b94c;color:#f5d78e;background:rgba(229,185,76,.14)}
+.model-tag{font-size:10px;line-height:16px;font-weight:650;letter-spacing:.04em;color:var(--muted);flex:none}
+.model-tag.model-claude{color:#f4a68a}
+.model-tag.model-codex{color:#6fd3b6}
+.model-tag.model-agy{color:#8ab4f8}
+.model-tag.model-dsh{color:#c4b8f8}
+.model-tag.model-opc{color:#f5d78e}
+.model-tag.model-mmx{color:#ffdd57}
 .session-summary-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .session-summary-name.is-closed{color:#6272a4}
 .session-summary-name.is-paused{color:var(--muted)}
@@ -791,7 +793,8 @@ function renderSideSessions(sessions){
    const text=element('span',undefined,'side-session-content');
    const titleEl=element('b',session.alias||session.native_id,'side-session-title');
    const stateEl=element('span',stateLabel,'side-session-state is-'+statusKey);
-   const modelTag=element('span',session.platform||'—','model-tag model-'+(session.platform||'unknown'));
+   const actorHit=[['MMX','mmx'],['AGY','agy'],['CDX','codex'],['DSH','dsh'],['OPC','opc'],['CC','claude']].find(entry=>(String(session.alias||'')+' '+(session.platform||'')).toUpperCase().includes(entry[0]));
+   const modelTag=element('span',actorHit?actorHit[0]:(session.platform||'—'),'model-tag model-'+(actorHit?actorHit[1]:(session.platform||'unknown')));
    const metaEl=element('small',counts.unread?('· '+counts.unread+' new'):'','session-meta');
    const metaRow=element('span',undefined,'side-session-meta-row');metaRow.append(modelTag,metaEl);
    text.append(titleEl,stateEl,metaRow);
