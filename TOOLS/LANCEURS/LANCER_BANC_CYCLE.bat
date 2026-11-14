@@ -6,10 +6,10 @@ cd /d "%~dp0\..\.."
 
 title Banc de test interactif FB_Cycle - T173
 
-echo ============================================================
+echo.
 echo   BANC DE TEST INTERACTIF FB_Cycle - binaire compile
 echo   Pilotage joystick : tu conduis les transitions
-echo ============================================================
+echo.
 echo.
 
 REM --- 0) Trouver Python - fallbacks ---

@@ -117,6 +117,8 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
 
 ---
 
+> 📌 **Les écarts du point d'entrée `/workflow-project`** (socle non proposé, lecture non prouvée, voie effacée, 3 champs non remplis…) sont consignés dans la note dédiée : `T429_AGENT_SUPERVISOR_NOTE_WORKFLOW_POINT_ENTREE_20261113_v1.0.md` → à traiter par la tâche qui porte le workflow (T427).
+
 ## 3quater. 👁️ Ce que le Superviseur montre, ce qu'il lit, ce qu'il déclare
 
 **Constat de l'exploitant (2026-11-13)** : la mémoire du Superviseur n'était pas lisible (fenêtre = **6 messages sur 3 000+ observés**, mémoire longue / journal / preuves invisibles), l'argumentaire d'un constat ne disait pas **quelles données venaient de quelle mémoire**, le Superviseur ne pouvait **lire aucun fichier du dépôt**, et les **agents spécialisés n'étaient pas tracés** — donc inexploitables en surveillance.

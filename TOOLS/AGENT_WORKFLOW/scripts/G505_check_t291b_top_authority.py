@@ -131,9 +131,7 @@ def main(argv: list[str] | None = None) -> int:
     root_path = pathlib.Path(args.root).resolve()
     errors = run_checks(root_path)
 
-    print("=" * 60)
     print("🛡️ GARDE-FOU MÉCANIQUE T291-B — CONTINUITÉ & AUTORITÉ M1 (G505)")
-    print("=" * 60)
 
     if errors:
         for err in errors:

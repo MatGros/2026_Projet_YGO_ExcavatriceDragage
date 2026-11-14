@@ -1,15 +1,15 @@
 @echo off
 cd /d "%~dp0\..\.."
 chcp 65001 >nul
-echo =======================================================================
+echo.
 echo 🧪 LANCEMENT COMPLET DU BANC DE TESTS CI (AVEC RAPPORTS HTML & INDEX)
-echo =======================================================================
+echo.
 echo.
 
 python TOOLS\TEST_AUTO_CI\scripts\run_tests.py --all
 
 echo.
-echo =======================================================================
+echo.
 echo 📄 Tableau de bord genere : TOOLS\TEST_AUTO_CI\index.html
-echo =======================================================================
+echo.
 pause

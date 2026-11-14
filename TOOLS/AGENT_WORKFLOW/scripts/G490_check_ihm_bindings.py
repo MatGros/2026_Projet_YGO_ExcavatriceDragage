@@ -344,9 +344,7 @@ def render(data, findings, verbose: bool, only_errors: bool) -> int:
     n_prod = sum(len(v) for v in data["producers"].values())
     n_cons = sum(len(v) for v in data["consumers"].values())
 
-    print("=" * 78)
     print("G490 - RAPPORT LIAISONS IHM (GVL_IHM)")
-    print("=" * 78)
     print(f"Champs GVL_IHM (feuilles) : {n_leaves}")
     print(f"References GVL_IHM brutes : {data['raw_refs']}")
     print(f"  (ecritures feuilles {n_prod}, lectures feuilles {n_cons})")
@@ -402,7 +400,7 @@ def render(data, findings, verbose: bool, only_errors: bool) -> int:
             print(f"{leaf:<60} {direction:<8} {len(prod):<4} {len(cons):<4} {'?':<6} {status}")
         print()
 
-    print("-" * 78)
+    print()
     print(f"Resume : {errors} erreur(s), {warnings} avertissement(s)")
     if only_errors:
         code = 1 if errors else 0

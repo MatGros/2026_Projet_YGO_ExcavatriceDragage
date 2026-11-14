@@ -85,9 +85,7 @@ def main() -> int:
     if result.returncode:
         return result.returncode
 
-    print("=" * 40)
     print(f"[OK] DIFF BUNDLE EXPORTE : CODE_XML/{bundle_name}.xml")
-    print("=" * 40)
     print("Objets inclus (+ fermeture des dependances de type) :")
     for name in object_names:
         print(f"  - {name}")

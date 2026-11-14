@@ -2,10 +2,10 @@
 setlocal
 set "SCRIPT_DIR=%~dp0"
 
-echo ========================================================
+echo.
 echo   TEST_AUTO_CI : Domaine _TROUBLESHOOTING
 echo   Rapport + Chronogrammes complets
-echo ========================================================
+echo.
 
 python "%SCRIPT_DIR%..\..\..\..\..\scripts\run_tests.py" --domain _TROUBLESHOOTING %*
 

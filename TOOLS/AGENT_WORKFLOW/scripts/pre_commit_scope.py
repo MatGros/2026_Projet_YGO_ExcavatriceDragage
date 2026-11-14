@@ -83,16 +83,13 @@ def main() -> int:
         # main n'a pas touché le fichier depuis la divergence -> merge sûr.
         return 0
 
-    print("=" * 60)
     print(f"⛔ BLOQUÉ : {PROTECTED_FILE} modifié sur la branche '{branch}'")
     print("   ET main a aussi bougé depuis le point de divergence.")
     print("   Risque de désynchronisation du fichier partagé.")
-    print("=" * 60)
     print("   → Mets à jour main manuellement, puis retire ce fichier du commit :")
     print(f"       git restore --staged {PROTECTED_FILE}")
     print("   → Ou, si la mise à jour est volontaire et coordonnée, demande")
     print("     explicitement à l'humain de débloquer.")
-    print("=" * 60)
     return 1
 
 

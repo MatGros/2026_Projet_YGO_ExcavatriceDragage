@@ -30,6 +30,56 @@ class SupervisorSessionNotLinked(RuntimeError):
     """Rename was requested for a session not explicitly attached to Supervisor."""
 
 
+def get_linked_supervisor_session(session_id: str, platform: str,
+                                  base_url: str = "http://127.0.0.1:8082",
+                                  timeout: float = 1.0) -> dict | None:
+    """Return the exact existing assignment; None means the service is unavailable."""
+    request = urllib.request.Request(
+        f"{base_url}/api/supervision/summary",
+        headers={"Accept": "application/json"},
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            summary = json.loads(response.read().decode("utf-8"))
+    except Exception:
+        return None
+
+    linked = [
+        item for item in summary.get("sessions", [])
+        if item.get("platform") == platform and item.get("native_id") == session_id
+    ]
+    if not linked:
+        raise SupervisorSessionNotLinked(
+            f"Session {platform}:{session_id} is not linked to Supervisor"
+        )
+    if len(linked) != 1:
+        raise SupervisorSessionNotLinked(
+            f"Multiple Supervisor assignments match {platform}:{session_id}"
+        )
+    if not linked[0].get("id"):
+        raise SupervisorSessionNotLinked("Supervisor assignment has no internal ID")
+    return linked[0]
+
+
+def get_last_committed_alias(session_id: str) -> str:
+    """Return the latest successful alias logged for this native session ID."""
+    if not AUDIT_LOG_FILE.exists():
+        return ""
+    pattern = re.compile(
+        r"^\[[^\]]+\] \[COMMIT\] \[" + re.escape(session_id)
+        + r"\] '[^']*' -> '([^']*)' \(code=0\)$"
+    )
+    try:
+        for line in reversed(AUDIT_LOG_FILE.read_text(encoding="utf-8").splitlines()):
+            match = pattern.match(line.strip())
+            if match:
+                return match.group(1).strip()
+    except Exception:
+        return ""
+    return ""
+
+
 def resolve_supervisor_session_id(session_id: str, platform: str,
                                   base_url: str = "http://127.0.0.1:8082",
                                   timeout: float = 1.0) -> str | None:
@@ -65,6 +115,7 @@ def resolve_supervisor_session_id(session_id: str, platform: str,
 # Interdiction formelle de démarrer par '-' ou espace (évite flags CLI et splitting)
 RE_VALID_STRING = re.compile(r"^[A-Za-z0-9_À-ÖØ-öø-ÿ][A-Za-z0-9_ \-À-ÖØ-öø-ÿ]*$")
 RE_TASK_ID = re.compile(r"^T\d+(?:-[0-9A-Z]+)*$")
+RE_MACHINE_ALIAS = re.compile(r"^T\d+(?:-[0-9A-Z]+)*-(?:CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$")
 
 def log_audit(action_type: str, session_id: str, old_alias: str, new_alias: str, status_code: int = 0):
     """Écriture atomique en mode append avec INTENT/COMMIT (Write-Ahead Logging)."""
@@ -387,22 +438,23 @@ def update_codex_thread_title(thread_id: str, new_title: str, timeout: float = 4
         return False
 
 def main():
-    if len(sys.argv) < 2:
-        sys.stderr.write("❌ Erreur : Paramètre manquant.\n")
-        sys.stderr.write("Usage : rename_session.py <TXXX[-ACTEUR]> <Description>\n")
-        sys.stderr.write("Exemple : rename_session.py T123-AGY01 Mon Titre De Session\n")
-        sys.exit(2)
-
     preflight_only = "--preflight" in sys.argv[1:]
     control_flags = {"--preflight"}
-    raw_args = " ".join(arg for arg in sys.argv[1:] if arg not in control_flags)
+    raw_args = " ".join(arg for arg in sys.argv[1:] if arg not in control_flags).strip()
+    replay_existing = not raw_args and not preflight_only
 
-    # 1. Validation & Assainissement
-    try:
-        task_id, target_alias, description = sanitize_and_validate(raw_args)
-    except ValueError as e:
-        sys.stderr.write(f"❌ Erreur de validation : {e}\n")
+    if not raw_args and not replay_existing:
+        sys.stderr.write("❌ Erreur : paramètre manquant pour le préflight.\n")
+        sys.stderr.write("Usage : rename_session.py [<TXXX[-ACTEUR]> <Description>]\n")
         sys.exit(2)
+
+    # 1. Validation & Assainissement (sauf rejeu du nom existant).
+    if not replay_existing:
+        try:
+            task_id, target_alias, description = sanitize_and_validate(raw_args)
+        except ValueError as e:
+            sys.stderr.write(f"❌ Erreur de validation : {e}\n")
+            sys.exit(2)
 
     # 2. Détection de la session courante via session_statusline
     sys.path.insert(0, str(REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "scripts"))
@@ -414,7 +466,9 @@ def main():
         conv_id = session_statusline.find_current_conversation_id(parent_name, parent_pid)
         if not conv_id:
             raise ValueError("ID natif non résolu")
-        current_alias, _ = session_statusline.get_session_info(conv_id, parent_name)
+        current_alias = ""
+        if not replay_existing:
+            current_alias, _ = session_statusline.get_session_info(conv_id, parent_name)
     except Exception as e:
         sys.stderr.write(f"❌ Session courante non identifiée : {e}\n")
         sys.exit(3)
@@ -430,20 +484,52 @@ def main():
 
     # 3. Alias machine canonique, identique dans le Superviseur et le préfixe du chat.
     actor = "AGY01" if "agy" in parent_lower else ("CC01" if "claude" in parent_lower else ("DSH01" if "dsh" in parent_lower else "CDX01"))
-    if re.fullmatch(r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$", task_id):
-        machine_alias = task_id
-    else:
-        machine_alias = f"{task_id}-{actor}"
-    # T429 (2026-11-13) : le titre canonique porte le titre officiel de la tache ;
-    # la designation libre de l'exploitant reste visible entre parentheses.
-    task_title = resolve_task_title(task_id)
-    if task_title:
-        canonical_title = f"{machine_alias} · {task_title}"
-        if description:
-            canonical_title += f" ({description})"
-    else:
-        canonical_title = f"{machine_alias} {description}".strip()
     platform_code = "claude" if "claude" in parent_lower else ("agy" if "agy" in parent_lower else ("dsh" if "dsh" in parent_lower else "codex"))
+
+    if replay_existing:
+        fallback_alias = get_last_committed_alias(conv_id)
+        try:
+            linked_session = get_linked_supervisor_session(conv_id, platform_code, timeout=1.0)
+        except SupervisorSessionNotLinked as e:
+            old_alias = fallback_alias or "NONE"
+            log_audit("INTENT", conv_id, old_alias, old_alias, status_code=0)
+            log_audit("REJECTED", conv_id, old_alias, old_alias, status_code=4)
+            sys.stderr.write(f"❌ {e}. Aucun titre modifié.\n")
+            sys.exit(4)
+        if not linked_session:
+            old_alias = fallback_alias or "NONE"
+            log_audit("INTENT", conv_id, old_alias, old_alias, status_code=0)
+            log_audit("FAILED", conv_id, old_alias, old_alias, status_code=1)
+            sys.stderr.write("❌ Superviseur indisponible ; aucun titre modifié.\n")
+            sys.exit(1)
+
+        machine_alias = str(linked_session.get("alias") or fallback_alias).strip()
+        canonical_title = str(linked_session.get("display_title") or machine_alias).strip()
+        if not RE_MACHINE_ALIAS.fullmatch(machine_alias):
+            old_alias = machine_alias or fallback_alias or "NONE"
+            log_audit("INTENT", conv_id, old_alias, old_alias, status_code=0)
+            log_audit("REJECTED", conv_id, old_alias, old_alias, status_code=4)
+            sys.stderr.write("❌ Alias existant absent ou invalide ; aucun titre modifié.\n")
+            sys.exit(4)
+        if not canonical_title:
+            canonical_title = machine_alias
+        current_alias = machine_alias
+        description = ""
+        log_audit("INTENT", conv_id, current_alias, machine_alias, status_code=0)
+    else:
+        if re.fullmatch(r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$", task_id):
+            machine_alias = task_id
+        else:
+            machine_alias = f"{task_id}-{actor}"
+        # T429 (2026-11-13) : le titre canonique porte le titre officiel de la tache ;
+        # la designation libre de l'exploitant reste visible entre parentheses.
+        task_title = resolve_task_title(task_id)
+        if task_title:
+            canonical_title = f"{machine_alias} · {task_title}"
+            if description:
+                canonical_title += f" ({description})"
+        else:
+            canonical_title = f"{machine_alias} {description}".strip()
 
     if preflight_only:
         try:
@@ -461,21 +547,23 @@ def main():
     # Toujours rejouer les cibles : le terminal peut avoir été réinitialisé même
     # si l'alias et le titre du chat sont déjà conformes.
 
-    # 5. Étape WAL : journaliser l'alias machine prévu avant les effets de bord.
-    log_audit("INTENT", conv_id, current_alias or "NONE", machine_alias, status_code=0)
+    # 5. Étape WAL : le rejeu journalise après vérification de la liaison existante.
+    if not replay_existing:
+        log_audit("INTENT", conv_id, current_alias or "NONE", machine_alias, status_code=0)
 
     # 6. Vérifier et mettre à jour la liaison Superviseur avant les autres cibles.
-    try:
-        sup_ok = notify_supervisor(conv_id, machine_alias, mission_text=description, platform=platform_code, timeout=1.0)
-    except SupervisorSessionNotLinked as e:
-        log_audit("REJECTED", conv_id, current_alias or "NONE", machine_alias, status_code=4)
-        sys.stderr.write(f"❌ {e}. Aucun renommage appliqué ; relance après la liaison explicite.\n")
-        sys.exit(4)
-    if not sup_ok:
-        mark_dirty_supervisor(conv_id, machine_alias, canonical_title)
-        log_audit("FAILED", conv_id, current_alias or "NONE", machine_alias, status_code=1)
-        sys.stderr.write("❌ Superviseur indisponible ou mise à jour refusée ; aucune autre cible modifiée. Réessaie après diagnostic.\n")
-        sys.exit(1)
+    if not replay_existing:
+        try:
+            sup_ok = notify_supervisor(conv_id, machine_alias, mission_text=description, platform=platform_code, timeout=1.0)
+        except SupervisorSessionNotLinked as e:
+            log_audit("REJECTED", conv_id, current_alias or "NONE", machine_alias, status_code=4)
+            sys.stderr.write(f"❌ {e}. Aucun renommage appliqué ; relance après la liaison explicite.\n")
+            sys.exit(4)
+        if not sup_ok:
+            mark_dirty_supervisor(conv_id, machine_alias, canonical_title)
+            log_audit("FAILED", conv_id, current_alias or "NONE", machine_alias, status_code=1)
+            sys.stderr.write("❌ Superviseur indisponible ou mise à jour refusée ; aucune autre cible modifiée. Réessaie après diagnostic.\n")
+            sys.exit(1)
 
     codex_title_ok = None
     if "codex" in parent_lower:
@@ -512,7 +600,11 @@ def main():
 
     # 7. Validation finale après succès de la cible Superviseur et émission des cibles locales.
     log_audit("COMMIT", conv_id, current_alias or "NONE", machine_alias, status_code=0)
-    print(f"✅ Alias Superviseur mis à jour : {machine_alias}")
+    if replay_existing:
+        print(f"✅ Titre existant réappliqué : {canonical_title}")
+        print(f"   Alias Superviseur conservé : {machine_alias}")
+    else:
+        print(f"✅ Alias Superviseur mis à jour : {machine_alias}")
     print(f"   Titre lisible : {canonical_title}")
     print(f"   Titre terminal demandé : {tab_title} (confirmation visuelle requise)")
     if codex_title_ok:

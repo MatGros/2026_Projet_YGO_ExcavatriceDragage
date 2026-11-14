@@ -125,9 +125,8 @@ class DeviceExportParser:
     
     def pretty_print(self, limit: int = 20):
         """Affiche les I/O mappées de manière lisible."""
-        print(f"\n{'Mapping I/O':=^60}")
+        print("\nMapping I/O")
         print(f"{'VAR':30} {'ADDRESS':12} {'TYPE':8}")
-        print("=" * 60)
         
         for var_name in sorted(self.io_map.keys())[:limit]:
             info = self.io_map[var_name]
@@ -137,7 +136,6 @@ class DeviceExportParser:
         
         if len(self.io_map) > limit:
             print(f"... et {len(self.io_map) - limit} autres")
-        print("=" * 60)
 
 
 def parse_device_export(export_path: Path) -> Dict[str, Dict[str, Any]]:

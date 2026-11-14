@@ -190,9 +190,7 @@ def main() -> int:
     dut_present = dut_exists(args.root)
 
     if args.report or unauthorized or not dut_present:
-        print("=" * 70)
         print(f"[RAPPORT] CLASSIFICATION DES INTERFACES FB (Total: {total_fbs})")
-        print("=" * 70)
         target_form, legacy_status, legacy_flat = split_standard_by_form(standard_fbs)
         print(f"  * DUT ST_Fault present dans CODE/ : {'OUI' if dut_present else 'NON ⚠️'}")
         print(f"  * Profil Standard (bloc d'etat complet) : {len(standard_fbs)}")
@@ -209,7 +207,6 @@ def main() -> int:
             print(f"\n[ALERTE] FB HORS-CONTRAT NON AUTORISES ({len(unauthorized)}) :")
             for path, score in unauthorized:
                 print(f"      [!] {path.name:35} (Score {score}/5)")
-        print("=" * 70)
 
     if not dut_present:
         print("FAIL: le DUT cible ST_Fault est absent de CODE/A_COMMUN/ (migration T164-x impossible).", file=sys.stderr)

@@ -22,9 +22,7 @@ Niveau 2 (30 secondes)  ➔ PLAN D'ACTION CHIRURGICAL (Quoi, Où, Comment + Outi
 ## 📤 1. Format Markdown Visuel (Pour l'Humain & le Chat)
 
 ```markdown
-========================================================================
 🛑 VERDICT : BLOCK — Risque de mouvement intempestif en reprise secteur
-========================================================================
 > 🎯 **Agent** : `FB_Agent_Safety` | 📂 **Cible** : `CODE/M_MAIN/PRG_04_Treuils_Benne.st` | 🏷️ **Tâche** : `T429`
 > ⏱️ **Durée d'exécution** : 1.42s | 🕒 **Horodatage** : 2026-11-11T14:25:00Z | 🛠️ **Outil Déterministe** : `G521`
 
@@ -48,7 +46,6 @@ Niveau 2 (30 secondes)  ➔ PLAN D'ACTION CHIRURGICAL (Quoi, Où, Comment + Outi
 - ⚓ **Ancre** : `IF bResetButton AND NOT bFault THEN`
 - 🔧 **Action exacte** : Remplacer `bResetButton` par `instResetTrig.Q` (instance de `R_TRIG`).
 - ⚠️ **Impact si ignoré** : Si l'opérateur maintient le bouton enfoncé, la benne redémarre seule à l'effacement du défaut.
-========================================================================
 ```
 
 ---

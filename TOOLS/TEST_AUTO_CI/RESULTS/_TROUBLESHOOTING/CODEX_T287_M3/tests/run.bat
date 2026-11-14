@@ -2,10 +2,10 @@
 setlocal
 set "SCRIPT_DIR=%~dp0"
 
-echo ========================================================
+echo.
 echo   TROUBLESHOOTING : CODEX_T287_M3
 echo   Rapport exploratoire (hors CI officiel)
-echo ========================================================
+echo.
 
 python "%SCRIPT_DIR%run.py" %*
 

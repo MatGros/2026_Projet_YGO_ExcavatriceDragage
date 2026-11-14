@@ -199,6 +199,138 @@ def test_main_fails_closed_when_current_session_id_is_missing(monkeypatch, capsy
     assert result.value.code == 3
     assert "ID natif non résolu" in capsys.readouterr().err
 
+
+def test_main_without_args_replays_current_supervisor_title_without_updating_assignment(
+    monkeypatch, tmp_path, capsys
+):
+    native_id = "3d75f1e6-9e7a-4205-9330-6415d460ef7b"
+    title = "T000-CC10"
+    audit_events = []
+    terminal_titles = []
+    native_titles = []
+    monkeypatch.setattr(rename_session.sys, "argv", ["rename_session.py"])
+    monkeypatch.setattr(rename_session, "AUDIT_LOG_FILE", tmp_path / "SESSION_RENAME_AUDIT.log")
+
+    class FakeStatusline:
+        @staticmethod
+        def get_ancestor_cli_process():
+            return 123, "claude.exe"
+
+        @staticmethod
+        def find_current_conversation_id(*_args):
+            return native_id
+
+        @staticmethod
+        def get_session_info(*_args):
+            raise AssertionError("Le rejeu utilise directement l'enregistrement Superviseur")
+
+    monkeypatch.setitem(sys.modules, "session_statusline", FakeStatusline)
+    monkeypatch.setattr(rename_session, "get_last_committed_alias", lambda _session_id: "")
+    monkeypatch.setattr(
+        rename_session,
+        "get_linked_supervisor_session",
+        lambda *_args, **_kwargs: {
+            "id": "assignment-id",
+            "platform": "claude",
+            "native_id": native_id,
+            "alias": "T000-CC10",
+            "display_title": title,
+        },
+    )
+    monkeypatch.setattr(
+        rename_session,
+        "notify_supervisor",
+        lambda *_args, **_kwargs: pytest.fail("Le rejeu ne doit pas modifier l'affectation"),
+    )
+    monkeypatch.setattr(
+        rename_session,
+        "log_audit",
+        lambda action, *_args, **_kwargs: audit_events.append(action),
+    )
+    monkeypatch.setattr(
+        rename_session,
+        "update_vscode_tab_title",
+        lambda value: terminal_titles.append(value),
+    )
+    monkeypatch.setattr(
+        rename_session,
+        "update_claude_transcript_title",
+        lambda _session_id, value: native_titles.append(value),
+    )
+
+    with pytest.raises(SystemExit) as result:
+        rename_session.main()
+
+    assert result.value.code == 0
+    assert audit_events == ["INTENT", "COMMIT"]
+    assert terminal_titles == [f"{title} 🧠 CC"]
+    assert native_titles == [title]
+    assert title in capsys.readouterr().out
+
+
+def test_main_without_args_rejects_unlinked_session_without_changing_titles(
+    monkeypatch, tmp_path, capsys
+):
+    native_id = "unlinked-native-id"
+    audit_events = []
+    title_writes = []
+    monkeypatch.setattr(rename_session.sys, "argv", ["rename_session.py"])
+    monkeypatch.setattr(rename_session, "AUDIT_LOG_FILE", tmp_path / "SESSION_RENAME_AUDIT.log")
+
+    class FakeStatusline:
+        @staticmethod
+        def get_ancestor_cli_process():
+            return 123, "claude.exe"
+
+        @staticmethod
+        def find_current_conversation_id(*_args):
+            return native_id
+
+    monkeypatch.setitem(sys.modules, "session_statusline", FakeStatusline)
+    monkeypatch.setattr(rename_session, "get_last_committed_alias", lambda _session_id: "")
+
+    def reject_unlinked(*_args, **_kwargs):
+        raise rename_session.SupervisorSessionNotLinked("session unlinked")
+
+    monkeypatch.setattr(rename_session, "get_linked_supervisor_session", reject_unlinked)
+    monkeypatch.setattr(
+        rename_session,
+        "log_audit",
+        lambda action, *_args, **_kwargs: audit_events.append(action),
+    )
+    monkeypatch.setattr(
+        rename_session,
+        "update_vscode_tab_title",
+        lambda value: title_writes.append(value),
+    )
+    monkeypatch.setattr(
+        rename_session,
+        "notify_supervisor",
+        lambda *_args, **_kwargs: pytest.fail("Une session ne doit jamais être rattachée ici"),
+    )
+
+    with pytest.raises(SystemExit) as result:
+        rename_session.main()
+
+    assert result.value.code == 4
+    assert audit_events == ["INTENT", "REJECTED"]
+    assert title_writes == []
+    assert "Aucun titre modifié" in capsys.readouterr().err
+
+
+def test_last_committed_alias_is_recovered_for_exact_session_id(tmp_path, monkeypatch):
+    audit_file = tmp_path / "SESSION_RENAME_AUDIT.log"
+    audit_file.write_text(
+        "[2026-11-13T06:25:29+00:00] [COMMIT] "
+        "[3d75f1e6-9e7a-4205-9330-6415d460ef7b] 'old' -> 'T000-CC10' (code=0)\n"
+        "[2026-11-13T06:25:30+00:00] [COMMIT] [other-session] 'old' -> 'T000-CC11' (code=0)\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(rename_session, "AUDIT_LOG_FILE", audit_file)
+
+    assert rename_session.get_last_committed_alias("3d75f1e6-9e7a-4205-9330-6415d460ef7b") == "T000-CC10"
+    assert rename_session.get_last_committed_alias("unlinked-session") == ""
+
 def test_notify_supervisor_keeps_chat_name_and_explicit_folder_together(tmp_path, monkeypatch):
     tasks_dir = tmp_path / "DOC" / "WFLOW" / "TASKS"
     task_dir = tasks_dir / "T000_CHALLENGE_M3_SIMULATION_AGY02"

@@ -37,9 +37,7 @@ def main() -> int:
     remote = sys.argv[1] if len(sys.argv) > 1 else "?"
     url = sys.argv[2] if len(sys.argv) > 2 else "?"
 
-    print("=" * 60)
     print(f"pre-push guard (informatif, non bloquant) — remote: {remote}")
-    print("=" * 60)
 
     lines = [ln.strip() for ln in sys.stdin if ln.strip()]
     if not lines:
@@ -86,7 +84,7 @@ def main() -> int:
                 print(f"    - [{status}] {path}")
             print("    -> Ces fichiers ne doivent PAS etre deplaces/supprimes/committes par un agent.")
 
-    print("\n" + "=" * 60)
+    print()
     print("RAPPEL : ce hook est INFORMATIF et NON BLOQUANT.")
     print("PREMIER REFLEXE : si tu vois un fichier que tu n'as PAS modifie, ou une")
     print("suppression, ou un fichier qui ne devrait pas etre la -> STOP et DEMANDE a l'humain.")
@@ -94,7 +92,6 @@ def main() -> int:
     print("l'humain (ou un autre agent) a pu l'editer. Ce n'est pas ton role de")
     print("deplacer, supprimer ou ne-pas-committer des fichiers. La decision finale")
     print("appartient a l'humain.")
-    print("=" * 60)
     return 0
 
 

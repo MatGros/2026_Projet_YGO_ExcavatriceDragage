@@ -3,9 +3,9 @@ rem Fichier volontairement ASCII pur
 chcp 65001 >nul
 title OMNIDIAG - Re-scan ST et Regeneration
 
-echo ============================================================
+echo.
 echo   OMNIDIAG - RE-SCAN DU CODE SOURCE ST ET REGENERATION
-echo ============================================================
+echo.
 echo.
 
 cd /d "%~dp0"
