@@ -24,6 +24,12 @@ LOCAL_APP = Path(os.environ.get("LOCALAPPDATA", r"C:\Users\ZEDVICTUS\AppData\Loc
 TRACE_DIR = LOCAL_APP / "ExcavatriceDragage" / "trace"
 TRACE_PATH = TRACE_DIR / "trace.jsonl"
 
+
+def _trace_path() -> Path:
+    """Journal réel par défaut ; WORKFLOW_TRACE_DIR le redirige (tests, jamais le réel)."""
+    override = os.environ.get("WORKFLOW_TRACE_DIR")
+    return Path(override) / "trace.jsonl" if override else TRACE_PATH
+
 KINDS = (
     "workflow",      # entree / sortie / voie / etape
     "titre",         # ecriture + verification du titre
@@ -46,13 +52,14 @@ def emit(kind: str, **fields) -> dict:
     Chaque entree est CHAINEE (prev + seq monotone + empreinte) : une troncature ou une
     reecriture devient detectable (consensus DeepSeek + GLM 2026-11-13).
     """
+    trace_path = _trace_path()
     entry = {"ts": time.time(), "at": time.strftime("%Y-%m-%dT%H:%M:%S"), "kind": kind}
     entry.update({key: value for key, value in fields.items() if value is not None})
     try:
-        TRACE_DIR.mkdir(parents=True, exist_ok=True)
+        trace_path.parent.mkdir(parents=True, exist_ok=True)
         previous, seq = "", 0
-        if TRACE_PATH.is_file():
-            with TRACE_PATH.open("r", encoding="utf-8", errors="replace") as stream:
+        if trace_path.is_file():
+            with trace_path.open("r", encoding="utf-8", errors="replace") as stream:
                 lines = [line for line in stream.read().splitlines() if line.strip()]
             if lines:
                 try:
@@ -65,7 +72,7 @@ def emit(kind: str, **fields) -> dict:
         entry["prev"] = previous
         payload = {k: v for k, v in entry.items() if k not in ("chain", "prev")}
         entry["chain"] = _chain_digest(payload, previous)
-        with TRACE_PATH.open("a", encoding="utf-8") as stream:
+        with trace_path.open("a", encoding="utf-8") as stream:
             stream.write(json.dumps(entry, ensure_ascii=False, default=str) + "\n")
             stream.flush()
             os.fsync(stream.fileno())
@@ -77,7 +84,7 @@ def emit(kind: str, **fields) -> dict:
 def verify_chain() -> dict:
     """Verifie la chaine du journal (empreinte + sequence). Rupture -> rapportee."""
     try:
-        with TRACE_PATH.open("r", encoding="utf-8", errors="replace") as stream:
+        with _trace_path().open("r", encoding="utf-8", errors="replace") as stream:
             lines = [line for line in stream.read().splitlines() if line.strip()]
     except OSError:
         return {"entries": 0, "intact": True, "reason": "journal absent"}

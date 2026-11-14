@@ -279,12 +279,17 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
     existing = next((item for item in snapshot.get("sessions", [])
                      if item.get("platform") == platform and item.get("native_id") == session_id), None)
     if existing:
-        current_mission = str(existing.get("initial_mission", ""))
-        same_task = current_mission.split("\n")[1:2] == [f"Tâche / sujet : {task_label}"] or f"Tâche / sujet : {task_label}" in current_mission
+        # T429 : on compare l ETAT COURANT (alias + mission). La mission INITIALE est gelee
+        # au premier rattachement : apres un renommage legitime, elle ne correspond plus
+        # jamais et le rattachement etait refuse pour toujours.
+        current_mission = str(existing.get("mission") or "")
+        current_task = task_reference(current_mission, anywhere=True)
+        same_task = bool(current_task) and current_task.upper() == task_ref.upper()
         if existing.get("alias") != alias or not same_task:
             raise ValueError(
-                f"Session déjà reliée avec alias/tâche/titre différents ({existing.get('alias')}); "
-                "aucun changement appliqué. Pour transférer le suivi vers cette tâche, relancez avec --reassign :\n"
+                f"Session déjà reliée avec alias/tâche différents ({existing.get('alias')}, "
+                f"tâche {current_task or 'inconnue'} vs {task_ref}); aucun changement appliqué. "
+                "Pour transférer le suivi vers cette tâche, relancez avec --reassign :\n"
                 f"  py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/connect_session.py --platform {platform} "
                 f"--session-id {session_id} --alias \"{alias}\" --task \"{task_ref}\" "
                 f"--mission \"{mission.strip()[:80]}\" --reassign"
@@ -332,7 +337,7 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
         socle = []
     result = api_json(base_url + "/api/supervision", token=snapshot.get("token"), payload={
         "action": "add", "platform": platform, "native_id": session_id,
-        "alias": alias.strip(), "mission": attached_mission,
+        "alias": alias.strip(), "display_title": title_line, "mission": attached_mission,
         # T429 : la tache et son titre sont des DONNEES, plus du texte a parser.
         "task_ref": task_ref, "task_title": resolved_title,
         # T429 : le socle a lire est exige des l attachement.

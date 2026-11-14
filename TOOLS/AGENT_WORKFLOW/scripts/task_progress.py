@@ -37,6 +37,8 @@ def contract_path(task_id: str) -> Path | None:
 def progress(task_id: str) -> dict:
     """{task_id, total, valides, part, contrat} — 0 si le contrat est introuvable."""
     empty = {"task_id": task_id, "total": 0, "valides": 0, "part": None, "contrat": ""}
+    if (task_id or "").upper() == "T000":
+        return empty  # T000 = hors catalogue : pas de criteres a compter
     path = contract_path(task_id)
     if path is None:
         return empty
