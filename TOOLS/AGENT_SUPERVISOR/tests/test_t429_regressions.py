@@ -1154,3 +1154,30 @@ def test_memory_inventory_describes_what_the_judge_could_see():
     assert inventory["cadrage"] == 1
     assert inventory["fenetre_tronquee"] is True
     assert inventory["regle_juge"] == 12
+
+
+def test_finding_evidence_is_archived_in_the_long_memory():
+    """2026-11-14 (demande exploitant) : la raison et la preuve d'un constat doivent
+    survivre a la fenetre, sinon le constat devient inauditable ('preuve introuvable')."""
+    session = {"context": [], "memory": [], "session_journal": [], "acquired_proofs": [],
+               "framing": [], "evidence_archive": []}
+    alert = {"id": "a1", "evidence": "le lot est valide", "reason": "preuve citee",
+             "created_at": "2026-11-14T10:00:00Z", "disposition": "new"}
+
+    supervisor_service.archive_evidence(session, alert)
+
+    assert session["evidence_archive"], "la preuve doit etre archivee"
+    assert session["evidence_archive"][-1]["evidence"] == "le lot est valide"
+    assert session["evidence_archive"][-1]["reason"] == "preuve citee"
+    # la provenance redevient resolvable meme si la fenetre a bouge
+    provenance = supervisor_service.evidence_provenance(session, "le lot est valide")
+    assert provenance["source"] == "preuves acquises"
+    assert provenance["in_window"] is False
+
+
+def test_archived_evidence_is_bounded():
+    session = {"evidence_archive": []}
+    for index in range(260):
+        supervisor_service.archive_evidence(session, {"id": f"a{index}", "evidence": f"e{index}",
+                                                     "reason": "r", "created_at": "t"})
+    assert len(session["evidence_archive"]) <= 200

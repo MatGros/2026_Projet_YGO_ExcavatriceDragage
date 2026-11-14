@@ -112,3 +112,25 @@ def test_derogation_is_recorded_and_recognized(tmp_path, monkeypatch):
     assert task_scope.is_derogated("s", "TOOLS/OTHER/b.py")
     assert not task_scope.is_derogated("s", "TOOLS/OTHER/c.py")
     assert task_scope.read_derogations("s")[0]["motif"] == "accord exploitant"
+
+
+def test_socle_is_derived_from_the_task_and_reads_are_verified(tmp_path):
+    """T429 (C1) : le socle se DEDUIT de la tache ; la lecture se CONSTATE (relecture du
+    transcript), elle ne se declare pas."""
+    import task_socle
+
+    socle = task_socle.socle_for("T429")
+
+    assert "AGENTS.md" in socle
+    assert any("T429_AGENT_SUPERVISOR" in path for path in socle)
+
+    transcript = tmp_path / "session.jsonl"
+    record = {"type": "assistant", "message": {"content": [
+        {"type": "tool_use", "name": "Read", "input": {"file_path": "AGENTS.md"}}]}}
+    transcript.write_text(json.dumps(record, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    status = task_socle.read_status(transcript, ["AGENTS.md", "DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md"])
+
+    assert "AGENTS.md" in status["lu"]
+    assert status["manquants"] == ["DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md"]
+    assert status["complet"] is False

@@ -92,10 +92,58 @@ def get_scope_badge(conv_id, transcript_path=None, window=10):
     counts = result.get("counts", {})
     ratio = float(result.get("ratio_hors", 0.0))
     color = green if ratio <= 0.1 else pastel_yellow if ratio <= 0.3 else soft_red
-    produit = int(counts.get("produit", 0))
-    derogations = int(counts.get("derogation", 0))
-    extra = f" (+{derogations} dérog.)" if derogations else ""
-    return f"{color}🎯 {produit}/{total} produit{extra}{reset}"
+    dedans = int(counts.get("produit", 0)) + int(counts.get("derogation", 0))
+    return f"{color}🎯 {dedans}/{total} dans le périmètre{reset}"
+
+
+def get_progress_badge(alias):
+    """Position reelle de la tache : criteres valides / total, lus dans le contrat.
+
+    Reponse a "ou on en est" : le titre de la tache dit le PROBLEME, pas l'etat.
+    """
+    if not alias:
+        return ""
+    try:
+        import task_progress
+    except ImportError:
+        return ""
+    try:
+        data = task_progress.progress_for_alias(alias)
+    except Exception:
+        return ""
+    total = int(data.get("total") or 0)
+    if not total:
+        return ""
+    valides = int(data.get("valides") or 0)
+    green = "\033[1;32m"
+    yellow = "\033[38;2;228;208;140m"
+    reset = "\033[0m"
+    color = green if valides == total else yellow
+    return f"{color}📐 {valides}/{total} AC{reset}"
+
+
+def get_socle_badge(conv_id):
+    """Socle lu / attendu, d'apres l attestation (constat par relecture du transcript).
+
+    Voyant d'alarme quand le socle n'est pas complet : c'est la preuve que l'agent
+    n'a pas lu les documents exiges a l'attachement.
+    """
+    if not conv_id:
+        return ""
+    try:
+        payload = json.loads((WORKFLOW_STATE_DIR / f"{conv_id}.attest.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return ""
+    socle = payload.get("socle") or {}
+    total = int(socle.get("total") or 0)
+    if not total:
+        return ""
+    lu = len(socle.get("lu") or [])
+    green = "\033[1;32m"
+    soft_red = "\033[38;2;235;130;130m"
+    reset = "\033[0m"
+    color = green if lu >= total else soft_red
+    return f"{color}📚 {lu}/{total} lus{reset}"
 
 
 def _git(args, cwd):

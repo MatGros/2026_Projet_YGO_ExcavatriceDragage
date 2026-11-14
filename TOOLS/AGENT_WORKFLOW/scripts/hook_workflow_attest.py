@@ -178,18 +178,26 @@ def main() -> int:
     turns = int(previous.get("turns", 0)) + 1
     conform_turns = int(previous.get("conform_turns", 0)) + (1 if conform else 0)
 
-    write_attestation(attest_path(session_id), {
-        "session_id": session_id,
-        "turns": turns,
-        "conform_turns": conform_turns,
-        "conform": conform,
-        "banner": bool(banner),
-        "footer": has_footer,
-        "task": banner[0] if banner else "",
-        "etape": banner[1] if banner else "",
-        "voie": banner[2] if banner else "",
-        "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
-    })
+    # T429 : le socle exige a l attachement — on relit le transcript pour constater
+    # ce qui a reellement ete lu (une regle "se lire" ne se declare pas).
+    socle_state = {"total": 0, "complet": False, "manquants": [], "lu": [], "attendu": []}
+    try:
+        import task_socle
+        alias = ""
+        try:
+            with urllib.request.urlopen(SUPERVISOR_SUMMARY_URL, timeout=1.5) as response:
+                summary = json.loads(response.read().decode("utf-8"))
+            for item in summary.get("sessions", []):
+                if str(item.get("native_id") or "") == session_id:
+                    alias = str(item.get("alias") or "")
+        except Exception:
+            alias = ""
+        expected = task_socle.socle_for(task_socle.task_id_from_alias(alias) or "")
+        if expected:
+            socle_state = task_socle.read_status(transcript, expected)
+            socle_state["attendu"] = expected
+    except Exception:
+        socle_state = {"total": 0, "complet": False, "manquants": [], "lu": [], "attendu": []}
 
     # Couverture : toute modif reelle (git) absente du journal des ecritures est signalee.
     try:
@@ -202,6 +210,20 @@ def main() -> int:
                            decision="inconnu", derogation=False)
     except Exception:
         pass
+
+    write_attestation(attest_path(session_id), {
+        "session_id": session_id,
+        "turns": turns,
+        "conform_turns": conform_turns,
+        "conform": conform,
+        "banner": bool(banner),
+        "footer": has_footer,
+        "socle": socle_state,
+        "task": banner[0] if banner else "",
+        "etape": banner[1] if banner else "",
+        "voie": banner[2] if banner else "",
+        "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
+    })
 
     trace_log.emit("attestation", session=session_id, conform=conform, banner=bool(banner),
                    footer=has_footer, turns=turns, conform_turns=conform_turns,

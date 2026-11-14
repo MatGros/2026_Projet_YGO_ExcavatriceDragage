@@ -545,6 +545,28 @@ def persona_usage(session_id: str) -> list:
     return [{"role": role, "count": count} for role, count in sorted(usage.items())]
 
 
+def archive_evidence(session, alert):
+    """Conserve la preuve d'un constat dans la MEMOIRE LONGUE (demande exploitant 2026-11-14).
+
+    Sans cela, la provenance d'une alarme devient 'introuvable' des que la fenetre a
+    bouge : le constat devient inauditable. L'archive est bornee (200 derniers), et
+    elle garde les constats ouverts ET clos (une raison d'alarme vaut aussi a l'arbitrage).
+    """
+    archive = session.setdefault("evidence_archive", [])
+    entry = {
+        "alert_id": alert.get("id"),
+        "evidence": str(alert.get("evidence") or "")[:600],
+        "reason": str(alert.get("reason") or "")[:400],
+        "source_event_id": (alert.get("evidence_provenance") or {}).get("event_id"),
+        "created_at": alert.get("created_at") or timestamp(),
+        "disposition": alert.get("disposition"),
+    }
+    archive[:] = [item for item in archive if item.get("alert_id") != entry["alert_id"]]
+    archive.append(entry)
+    del archive[:-200]
+    return entry
+
+
 def evidence_provenance(session, evidence, event_id=None):
     """Origine de la preuve citee par un constat (calcul, jamais devine).
 
@@ -586,6 +608,12 @@ def evidence_provenance(session, evidence, event_id=None):
             return {"source": "cadrage", "in_window": False,
                     "event_id": item.get("event_id"), "event_index": item.get("event_index"),
                     "at": item.get("observed_at")}
+
+    # Memoire longue des preuves : l archive des constats (preuve + raison).
+    for item in session.get("evidence_archive", []) or []:
+        if text and text in str(item.get("evidence", "")):
+            return {"source": "preuves acquises", "in_window": False,
+                    "event_id": item.get("source_event_id"), "at": item.get("created_at")}
 
     return {"source": "introuvable", "in_window": False, "event_id": event_id}
 
@@ -1320,6 +1348,10 @@ class Supervisor:
                     "regles": self.judge_settings.get("context_messages"),
                     # R15 : usage reel des agents specialises (trace interne).
                     "personas": persona_usage(session.get("native_id", "")),
+                    # Memoire longue des preuves : les raisons des constats restent lisibles.
+                    "preuves_constats": (session.get("evidence_archive") or [])[-30:],
+                    # T429 : le socle exige a l attachement et son etat de lecture.
+                    "socle": list(session.get("socle") or []),
                 }
             for item in public:
                 item['chat_messages'] = self._chat_histories.get(item['id'], [])
@@ -1352,6 +1384,9 @@ class Supervisor:
                 sessions.append({key: value.get(key) for key in (
                     "id", "platform", "native_id", "alias", "state", "analysis_state",
                     "last_event", "last_analysis", "judge_turn_count")})
+                # T429 : le socle exige (liste de documents, metadonnee) — lisible par le
+                # hook d attestation et la barre de statut.
+                sessions[-1]["socle"] = list(value.get("socle") or [])
                 sessions[-1]["display_title"] = session_display_title(value)
                 sessions[-1]["alerts"] = alerts
                 sessions[-1]["counts"] = counts(value.get("alerts", []))
@@ -1500,6 +1535,9 @@ class Supervisor:
                 # T429 : tache liee et titre officiel stockes comme champs propres.
                 session["task_id"] = str(command.get("task_ref") or "").strip()[:32]
                 session["task_title"] = str(command.get("task_title") or "").strip()[:300]
+                # T429 : le socle a lire est exige des l affectation (C1 de la note).
+                socle = command.get("socle")
+                session["socle"] = [str(item) for item in socle][:20] if isinstance(socle, list) else []
                 # T429 : le service est NOTAIRE du perimetre (empinle a l affectation).
                 try:
                     import sys
@@ -2655,6 +2693,7 @@ class Supervisor:
                             alert.update(previous_alert_id=previous_alert_id, source_event_id=occurrence["event_id"], source_event_index=occurrence["event_index"])
                         alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"), result.get("event_id"))
                         alert["memory_usage"] = memory_inventory(session, self.judge_settings)
+                        archive_evidence(session, alert)
                         session["alerts"].append(alert)
                         _trace(event="constat", session=sid, alias=session.get("alias"),
                                alert_id=alert["id"], severity=alert.get("severity"),
@@ -2672,6 +2711,7 @@ class Supervisor:
                             alert["evidence_provenance"] = evidence_provenance(
                                 session, (alert.get("assessment") or {}).get("evidence") or alert.get("evidence"))
                             alert["memory_usage"] = memory_inventory(session, self.judge_settings)
+                            archive_evidence(session, alert)
                     state_update = result.get("state_update")
                     if isinstance(state_update, str) and state_update.strip() and len(state_update.strip()) >= 5:
                         clean_update = state_update.strip()[:300]
