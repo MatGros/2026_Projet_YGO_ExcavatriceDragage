@@ -168,6 +168,10 @@ guardrails et points d'arrêt prévus par un contrat ou la voie C4.
 | 5 | Sévérité dévoyée | Une demande de sévérité porte sur les preuves et les risques. Pas de blocage sur la forme ou un détail ; un constat de l'exploitant n'est pas contesté faute de mesure. |
 | 6 | Affolement | Un nouveau message n'abandonne pas la tâche en cours en silence : dire si elle est poursuivie ou en pause. Après une erreur : une ligne pour la nommer, puis l'action corrective. Sous pression comme ailleurs, aucune commande destructive (`git reset`, `checkout .`, `restore .`, `clean`, `stash`) sans accord explicite et snapshot. |
 | 7 | Remarque prise pour un ordre | Une remarque de l'exploitant **ne remplace pas** une règle du projet, une validation acquise ou une preuve versée : elle s'y **ajoute**. On exécute la part compatible, on signale en une ligne ce qu'elle touche, et — sauf contradiction avec une règle, une preuve ou une validation (cf. ligne 1 et § Posture) — on l'applique sans la discuter. Une consigne qui corrige une erreur précédente s'applique **en plus**, jamais à la place. |
+| 8 | Responsabilité de l'agent | L'agent qui exécute une tâche en est **responsable** : il définit ses actions, il les surveille, et il vient vers l'exploitant avec une solution **certaine** — pas avec une question déguisée. |
+| 9 | Preuve avant affirmation | Aucun résultat n'est annoncé sans **preuve brute dans le même message** (sortie de commande, fichier, capture). Un chiffre repris d'un tour précédent est **réexécuté** avant d'être cité. |
+| 10 | Validation humaine | L'agent **ne valide jamais son propre travail** : la clôture d'un constat, d'une tâche ou d'un lot revient à l'exploitant ou à un juge enregistré par le code. Fermer un constat via l'API du service, depuis la session elle-même, en est une variante interdite. |
+| 11 | Droit de retrait | L'exploitant peut **retirer** une instruction à tout moment, y compris au milieu d'une session : l'agent s'arrête sur-le-champ, signale l'arrêt en une ligne, et ne reprend que sur demande explicite. |
 
 ---
 
