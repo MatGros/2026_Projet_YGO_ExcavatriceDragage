@@ -23,6 +23,44 @@ TASKS_DIR = ROOT / "DOC" / "WFLOW" / "TASKS"
 
 CONTRACT_FIELDS = ("scope.allowed", "scope.forbidden")
 
+# Valeurs generiques : produites par defaut, sans information pour l exploitant.
+GENERIC_VALUES = (
+    "selon avancement session",
+    "execution cadree de la tache",
+    "a completer",
+    "a completer par l exploitant",
+    "-",
+)
+VALUE_LIMIT = 4000
+
+
+def _is_generic(value: str) -> bool:
+    text = str(value or "").strip().lower()
+    if not text:
+        return True
+    if text in GENERIC_VALUES:
+        return True
+    return text.startswith("contrat valide") or text.startswith("criticite c") or text.startswith("selon ")
+
+
+VALUE_CAPS = (300, 400, 1000, 2000, 4000)
+
+
+def _is_truncated(value: str) -> bool:
+    """Valeur coupee sans marqueur de troncature.
+
+    Deux signatures : des crochets non equilibres (repr d un dict/list coupe),
+    ou une valeur arrivee au cap de l auto-remplissage sans terminateur.
+    """
+    text = str(value or "").rstrip()
+    if not text:
+        return False
+    if text.count("[") != text.count("]") or text.count("{") != text.count("}"):
+        return True
+    if len(text) in VALUE_CAPS and not text.endswith(("…", "...", ".", ")", "]", "}", "'", '"')):
+        return True
+    return False
+
 
 def contract_for(task_id: str) -> Path | None:
     if not task_id:
@@ -105,6 +143,11 @@ def quality(session) -> dict:
             state = "renseigne"
         else:
             state = "deduit"
+        # T429 : une valeur ecrite par l auto-remplissage n est PAS confirmee.
+        if source == "confirmé" and str(session.get("mission_structure_origin") or "exploitant") != "exploitant":
+            origin = str(session.get("mission_structure_origin"))
+            source = f"déduit ({origin})"
+            state = "deduit"
         if value and forbidden:
             for denied in forbidden:
                 base = denied[:-3] if denied.endswith("/**") else denied
@@ -120,6 +163,21 @@ def quality(session) -> dict:
                         for denied in forbidden):
                     alerts.append(f"la valeur cite le perimetre autorise ({allowed_path})")
                     break
+        if value and _is_generic(value) and not source.startswith("confirm"):
+            alerts.append("valeur generique : elle n apporte aucune information")
+            state = "a_completer"
+        if value and _is_truncated(value):
+            alerts.append("valeur tronquee sans marqueur : lire la source pour la fin")
+            state = "hors_perimetre"
+        alias = str(session.get("alias") or "").strip()
+        title = str((session.get("mission") or "").splitlines()[0] if session.get("mission") else "").strip()
+        if value and field in ("primary_goal", "current_goal") and (
+                (alias and value.strip().upper().startswith(alias.upper() + " ")) or
+                (title and title and value.strip().upper().startswith(title.upper())) or
+                (alias and value.strip().upper() == alias.upper()) or
+                (title and value.strip().upper() == title.upper())):
+            alerts.append("la valeur reprend le titre de session : ce n est pas un objectif")
+            state = "hors_sujet"
         if value and markers and field in ("primary_goal", "current_goal", "scope_permissions", "criteria", "milestone"):
             if not any(marker.lower() in value.lower() for marker in markers):
                 alerts.append("la valeur ne renvoie aucun livrable de l objectif")
@@ -127,6 +185,16 @@ def quality(session) -> dict:
         counts["renseigne" if state == "renseigne" else ("deduit" if state == "deduit" else ("a_completer" if state == "a_completer" else "alerte"))] += 1
         items.append({"champ": field, "label": label, "valeur": value, "source": source,
                       "etat": state, "alertes": alerts})
+
+    # Reference de tache : doit correspondre a la tache dont le contrat alimente la fiche.
+    declared_ref = str((structure.get("task_ref") or "").strip().upper())
+    contract_ref = str((contract.get("task_id") or "")).strip().upper()
+    if declared_ref and contract_ref and declared_ref != contract_ref:
+        for item in items:
+            if item["champ"] == "task_ref":
+                item["alertes"].append(f"la reference declaree ({declared_ref}) ne correspond pas "
+                                       f"au contrat utilise ({contract_ref})")
+                item["etat"] = "hors_sujet"
 
     covered = []
     uncovered = []
