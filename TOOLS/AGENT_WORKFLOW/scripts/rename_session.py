@@ -247,6 +247,20 @@ def resolve_task_title(alias: str) -> str:
     return ""
 
 
+MAX_DISPLAY_TITLE_LENGTH = 80
+
+
+def build_display_title(machine_alias: str, description: str = "") -> str:
+    """Use a short operator label for UI; keep the official task title in mission metadata."""
+    title = " ".join(f"{machine_alias} {description}".split()) if description.strip() else machine_alias
+    if len(title) > MAX_DISPLAY_TITLE_LENGTH:
+        raise ValueError(
+            f"Titre de session trop long ({len(title)} caractères, maximum {MAX_DISPLAY_TITLE_LENGTH}). "
+            "Raccourcis la description ; le titre officiel reste dans la mission Superviseur."
+        )
+    return title
+
+
 def notify_supervisor(session_id: str, alias: str, mission_text: str = "", platform: str = "claude", base_url: str = "http://127.0.0.1:8082", timeout: float = 1.0, display_title: str = "") -> bool:
     """Notifie l'API locale du Superviseur de la mise à jour de l'alias via POST /api/supervision.
     Une session absente n'est jamais créée ici : seul connect_session.py peut l'attacher."""
@@ -539,15 +553,13 @@ def main():
             machine_alias = task_id
         else:
             machine_alias = f"{task_id}-{actor}"
-        # T429 (2026-11-13) : le titre canonique porte le titre officiel de la tache ;
-        # la designation libre de l'exploitant reste visible entre parentheses.
-        task_title = resolve_task_title(task_id)
-        if task_title:
-            canonical_title = f"{machine_alias} · {task_title}"
-            if description:
-                canonical_title += f" ({description})"
-        else:
-            canonical_title = f"{machine_alias} {description}".strip()
+        # Le titre de status line est court et choisi par l'exploitant.
+        # Le titre officiel de la tâche reste dans la mission Supervisor.
+        try:
+            canonical_title = build_display_title(machine_alias, description)
+        except ValueError as e:
+            sys.stderr.write(f"❌ Erreur de validation : {e}\n")
+            sys.exit(2)
 
     if preflight_only:
         try:

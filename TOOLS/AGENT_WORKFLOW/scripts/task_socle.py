@@ -29,6 +29,10 @@ def task_id_from_alias(alias: str) -> str | None:
 def task_folder(task_id: str) -> Path | None:
     if not task_id:
         return None
+    # T000 is a provisional supervisor label, not a catalogue task. Never bind it
+    # to whichever unrelated T000-* directory happens to sort first.
+    if str(task_id).strip().upper() == "T000":
+        return None
     for folder in sorted(TASKS_DIR.glob(f"{task_id}*")):
         if folder.is_dir():
             return folder

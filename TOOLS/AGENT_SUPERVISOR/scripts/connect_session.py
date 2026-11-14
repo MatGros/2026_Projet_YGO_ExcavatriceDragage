@@ -58,6 +58,7 @@ ALIAS_PATTERN = r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$"
 ALIAS_IDENTITY_PATTERN = re.compile(
     r"^(?P<task>T\d+(?:-[0-9A-Z]+)?)-(?P<agent>(?:CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2})$"
 )
+MAX_DISPLAY_TITLE_LENGTH = 80
 
 
 def split_alias(alias: str) -> tuple[str, str]:
@@ -92,6 +93,20 @@ def validate_alias(alias: str) -> str:
             "(ex: T429-AGY01, T428-1-CDX01, T000-CC01)"
         )
     return cleaned
+
+
+def resolve_display_title(alias: str, requested: str | None = None, legacy_designation: str = "") -> str:
+    """Build a compact display title; the official task title stays in the mission metadata."""
+    descriptor = " ".join(str(requested or legacy_designation or "").split())
+    if not descriptor:
+        title = alias
+    elif descriptor == alias or descriptor.startswith(alias + " "):
+        title = descriptor
+    else:
+        title = f"{alias} {descriptor}"
+    if len(title) > MAX_DISPLAY_TITLE_LENGTH:
+        raise ValueError(f"Titre de session trop long ({len(title)} caractères, maximum {MAX_DISPLAY_TITLE_LENGTH})")
+    return title
 
 
 def alias_identity(alias: str) -> tuple[str, str] | None:
@@ -227,7 +242,8 @@ def populate_mission_from_contract(base_url: str, token: str, assignment_id: str
 
 def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
             base_url: str = "http://127.0.0.1:8082", *, task_title: str | None = None,
-            confirm_without_task: bool = False, reassign: bool = False) -> dict:
+            confirm_without_task: bool = False, reassign: bool = False,
+            display_title: str | None = None) -> dict:
     alias, designation = split_alias(alias)
     alias = validate_alias(alias)
     identity = alias_identity(alias)
@@ -264,9 +280,8 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
     if not mission.strip() or len(mission) > 1500:
         raise ValueError("Mission requise (1500 caractères maximum)")
     task_label = f"{task_ref} {resolved_title}"
-    # T429 : 1re ligne = le titre choisi par l exploitant (alias + designation) ;
-    # le titre officiel de la tache passe en 2e ligne, il n ecrase plus le titre.
-    title_line = f"{alias} {designation}".strip() if designation else f"{alias} {resolved_title}"
+    # Titre de status line compact et séparé du titre officiel, conservé dans la mission.
+    title_line = resolve_display_title(alias, display_title, designation)
     attached_mission = title_line
     if resolved_title and not is_provisional:  # T000 : pas de doublon
         # le titre explicite est deja dans la premiere ligne
@@ -317,6 +332,14 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
                 attached = next((s for s in result.get("sessions", []) if s["id"] == item["id"]), None)
                 if not attached or not attached.get("source"):
                     raise RuntimeError("Le service n’a pas confirmé une source unique pour la réassignation")
+                api_json(base_url + "/api/supervision", token=snapshot.get("token"), payload={
+                    "action": "set_alias", "id": attached["id"], "alias": alias.strip(),
+                    "display_title": title_line})
+                confirmed = api_json(base_url + "/api/supervision/summary")
+                confirmed_session = next((s for s in confirmed.get("sessions", [])
+                                          if s.get("id") == attached["id"]), None)
+                if not confirmed_session or confirmed_session.get("display_title") != title_line:
+                    raise RuntimeError("Réaffectation faite, mais le titre court n’a pas été confirmé")
                 structure_loaded = False
                 if task_ref and not is_provisional and snapshot.get("token"):
                     structure_loaded = populate_mission_from_contract(
@@ -326,6 +349,7 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
                             alias=attached.get("alias"), platform=platform, native_id=session_id,
                             task_id=task_ref, task_title=resolved_title, agent_id=agent_id,
                             task=task_label, source=attached["source"], previous_alias=item.get("alias"),
+                            display_title=title_line,
                             mission_structure_loaded=structure_loaded)
     # T429 : le socle (documents a lire AVANT d agir) est exige des l affectation.
     try:
@@ -356,7 +380,8 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
     return dict(status="attached", assignment_id=attached["id"], state=attached["state"],
                 alias=attached.get("alias"), platform=platform, native_id=session_id,
                 task_id=task_ref, task_title=resolved_title, agent_id=agent_id,
-                task=task_label, source=attached["source"], mission_structure_loaded=structure_loaded)
+                task=task_label, source=attached["source"], display_title=title_line,
+                mission_structure_loaded=structure_loaded)
 
 
 def main():
@@ -366,6 +391,7 @@ def main():
     parser.add_argument("--alias", required=True)
     parser.add_argument("--task", required=True, help="Task ID T###, optionally followed by its exact official title")
     parser.add_argument("--task-title", help="Required for T000; formal task titles resolve from TASKS.yaml")
+    parser.add_argument("--display-title", help="Titre court lisible; l'alias canonique est préfixé automatiquement (80 caractères max)")
     parser.add_argument("--confirm-without-task", action="store_true", help="Explicit user confirmation to track without a formal task")
     parser.add_argument("--reassign", action="store_true", help="Transférer le suivi d'une session existante pour cette tâche vers ce nouveau runtime")
     parser.add_argument("--mission", required=True, help="Short mission context, separate from the task title")
@@ -375,7 +401,8 @@ def main():
         session_id = session_id_for(args.platform, args.session_id)
         result = connect(args.platform, session_id, args.alias, args.task, args.mission, args.url,
                          task_title=args.task_title,
-                         confirm_without_task=args.confirm_without_task, reassign=args.reassign)
+                         confirm_without_task=args.confirm_without_task, reassign=args.reassign,
+                         display_title=args.display_title)
         print(json.dumps(result, ensure_ascii=False))
     except (ValueError, RuntimeError, HTTPError, URLError, TimeoutError) as exc:
         print(json.dumps({"status": "error", "message": str(exc)[:240]}, ensure_ascii=False))
