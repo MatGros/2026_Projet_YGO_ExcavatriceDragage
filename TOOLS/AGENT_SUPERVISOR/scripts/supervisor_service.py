@@ -679,7 +679,10 @@ def _experience_pattern(session, alert) -> str:
     """
     parts = []
     tronques = []
-    for item in (session.get("context") or [])[-5:]:
+    # l historique (60 evenements) et non la seule fenetre (12) : une derive dont
+    # l echange decisif est sorti de la fenetre doit rester visible.
+    source = session.get("history") or session.get("context") or []
+    for item in source[-5:]:
         role = str(item.get("role") or "?")
         raw = str(item.get("text") or "")
         if _is_truncated_text(raw):
@@ -693,6 +696,21 @@ def _experience_pattern(session, alert) -> str:
     return f"{pattern} || preuve citée : {evidence}" if evidence else pattern
 
 
+CATEGORY_COUNTERMEASURE = {
+    "unsupported_success": "exiger la sortie brute dans le message qui annonce la reussite",
+    "contradiction": "citer la source en contradiction avant de conclure",
+    "scope_drift": "rappeler le perimetre de la tache avant d agir",
+    "ignored_instruction": "verifier la consigne avant de s en ecarter",
+    "unauthorized_action": "faire confirmer l action irreversible avant de l executer",
+}
+
+
+def _countermeasure(alert) -> str:
+    """Contre-mesure proposee pour le constat (deterministe, sans modele)."""
+    category = str(alert.get("category") or "other")
+    return CATEGORY_COUNTERMEASURE.get(category, "nommer la preuve manquante qui ferait passer le constat")
+
+
 def _experience_write(session, alert, pattern: str) -> None:
     """Une entree d experience par poste (journal d experience, hors depot)."""
     try:
@@ -704,7 +722,7 @@ def _experience_write(session, alert, pattern: str) -> None:
         experience_log.write(
             "superviseur", "constat", pattern,
             hypothese=str(alert.get("reason") or "")[:600],
-            action="",
+            action=_countermeasure(alert),
             session_id=str(session.get("id") or ""),
             refs=[str(alert.get("id") or ""), str(session.get("alias") or ""),
                   str((alert.get("evidence_provenance") or {}).get("event_id") or "")],
