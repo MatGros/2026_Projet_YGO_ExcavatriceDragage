@@ -180,6 +180,21 @@ def main() -> int:
 
     # T429 : le socle exige a l attachement — on relit le transcript pour constater
     # ce qui a reellement ete lu (une regle "se lire" ne se declare pas).
+    # T429 : le cadrage (attributs de mission) est releve pour etre affiche dans la barre.
+    cadrage_state = {"renseignes": 0, "total": 0, "manquants": []}
+    try:
+        with urllib.request.urlopen(SUPERVISOR_SUMMARY_URL, timeout=1.5) as response:
+            summary = json.loads(response.read().decode("utf-8"))
+        for item in summary.get("sessions", []):
+            if str(item.get("native_id") or "") == session_id:
+                structure = item.get("mission_structure") or {}
+                proposal = item.get("mission_structure_proposal") or {}
+                cadrage_state = {"renseignes": len(structure),
+                                 "total": len(structure) + len(proposal),
+                                 "manquants": list(proposal)}
+    except Exception:
+        cadrage_state = {"renseignes": 0, "total": 0, "manquants": []}
+
     socle_state = {"total": 0, "complet": False, "manquants": [], "lu": [], "attendu": []}
     try:
         import task_socle
@@ -219,6 +234,7 @@ def main() -> int:
         "banner": bool(banner),
         "footer": has_footer,
         "socle": socle_state,
+        "cadrage": cadrage_state,
         "task": banner[0] if banner else "",
         "etape": banner[1] if banner else "",
         "voie": banner[2] if banner else "",

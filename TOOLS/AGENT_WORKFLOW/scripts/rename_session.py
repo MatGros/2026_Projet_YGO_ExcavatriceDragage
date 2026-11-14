@@ -247,7 +247,7 @@ def resolve_task_title(alias: str) -> str:
     return ""
 
 
-def notify_supervisor(session_id: str, alias: str, mission_text: str = "", platform: str = "claude", base_url: str = "http://127.0.0.1:8082", timeout: float = 1.0) -> bool:
+def notify_supervisor(session_id: str, alias: str, mission_text: str = "", platform: str = "claude", base_url: str = "http://127.0.0.1:8082", timeout: float = 1.0, display_title: str = "") -> bool:
     """Notifie l'API locale du Superviseur de la mise à jour de l'alias via POST /api/supervision.
     Une session absente n'est jamais créée ici : seul connect_session.py peut l'attacher."""
     try:
@@ -270,25 +270,43 @@ def notify_supervisor(session_id: str, alias: str, mission_text: str = "", platf
         # corps de mission (elle décrit la session, pas la tâche).
         designation = mission_text.strip()
         folder_name = resolve_session_task_folder(alias)
-        # 1re ligne = le titre choisi par l'exploitant (ce qu'il voit partout).
-        # 2e ligne = le titre officiel de la tache : il informe le juge et l'IHM
+        # 1re ligne = le titre choisi par l exploitant (ce qu il voit partout).
+        # 2e ligne = le titre officiel de la tache : il informe le juge et l IHM
         # sans ecraser le titre de session.
         task_title = resolve_task_title(alias)
+        # T429 : on NE RECONSTRUIT que les lignes d IDENTITE. Les lignes d OBJECTIF de la
+        # mission courante sont conservees : le renommage ne doit pas faire disparaitre le
+        # but de la session (constat : la mission ne gardait plus que le titre).
+        identity_markers = ("tache : ", "tache / sujet : ", "dossier: ", "dossier : ")
+        previous_lines = []
+        for item in data.get("sessions", []):
+            if str(item.get("id") or "") == str(supervisor_id):
+                previous_lines = str(item.get("mission") or "").splitlines()
+                break
+        objective_lines = [line for line in previous_lines[1:]
+                           if line.strip() and not line.strip().lower().startswith(identity_markers)]
         if task_title:
             mission = f"{alias} {designation}".strip()
             mission += f"\nTache : {task_title}"
             if folder_name:
                 mission += f"\nDossier: {folder_name}"
+            if objective_lines:
+                mission += "\n" + "\n".join(objective_lines)
         else:
-            # T000 / tache inconnue : format historique inchange (une seule ligne).
+            # T000 / tache inconnue : titre + objectif conserve.
             mission = f"{alias} {designation}".strip()
+            if objective_lines:
+                mission += "\n" + "\n".join(objective_lines)
             if folder_name:
                 mission += f" \u2014 Dossier: {folder_name}"
             elif not designation:
                 mission = alias
 
         # 3. Mise à jour de l'affectation déjà liée.
-        payload = json.dumps({"action": "set_alias", "id": supervisor_id, "alias": alias}).encode("utf-8")
+        payload = json.dumps({
+            "action": "set_alias", "id": supervisor_id, "alias": alias,
+            "display_title": display_title or f"{alias} {mission_text}".strip(),
+        }).encode("utf-8")
         req_post = urllib.request.Request(
             f"{base_url}/api/supervision",
             data=payload,
@@ -554,7 +572,7 @@ def main():
     # 6. Vérifier et mettre à jour la liaison Superviseur avant les autres cibles.
     if not replay_existing:
         try:
-            sup_ok = notify_supervisor(conv_id, machine_alias, mission_text=description, platform=platform_code, timeout=1.0)
+            sup_ok = notify_supervisor(conv_id, machine_alias, mission_text=description, platform=platform_code, timeout=1.0, display_title=canonical_title)
         except SupervisorSessionNotLinked as e:
             log_audit("REJECTED", conv_id, current_alias or "NONE", machine_alias, status_code=4)
             sys.stderr.write(f"❌ {e}. Aucun renommage appliqué ; relance après la liaison explicite.\n")

@@ -63,6 +63,29 @@ def get_workflow_badge(conv_id):
     return "🛣️ ○ · /workflow-project pour reprendre"
 
 
+def get_cadrage_badge(conv_id):
+    """Cadrage de la session : attributs de mission renseignes / attendus.
+
+    Ex. « 0/12 » = aucun attribut de cadrage renseigne : la session n est pas cadree.
+    """
+    if not conv_id:
+        return ""
+    try:
+        payload = json.loads((WORKFLOW_STATE_DIR / f"{conv_id}.attest.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return ""
+    cadrage = payload.get("cadrage") or {}
+    total = int(cadrage.get("total") or 0)
+    if not total:
+        return ""
+    renseignes = int(cadrage.get("renseignes") or 0)
+    green = "\033[1;32m"
+    soft_red = "\033[38;2;235;130;130m"
+    reset = "\033[0m"
+    color = green if renseignes else soft_red
+    return f"{color}📋 {renseignes}/{total}{reset}"
+
+
 def get_scope_badge(conv_id, transcript_path=None, window=10):
     """Part du travail réellement dans le périmètre de la tâche (R10).
 

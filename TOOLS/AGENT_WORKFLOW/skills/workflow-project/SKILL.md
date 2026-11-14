@@ -38,7 +38,7 @@ Le script écrit l'état hors dépôt et imprime le bloc de sortie. **Ce bloc fa
 
 ## 2. ✍️ Ce que l'agent remplit (et seulement ça)
 
-Le bloc contient trois champs à compléter. Rien d'autre :
+Le bloc est complet : rien à compléter.
 - 📍 **Ce chat** : la tâche en cours, ou « aucune », avec le dernier point en une phrase ;
 - ⏸️ **En attente** : ce qui attend l'utilisateur, ou « rien » ;
 - ➡️ **Choix** : 2 à 4 suites possibles.

@@ -56,7 +56,13 @@ def test_connect_registers_one_exact_local_source_and_reports_existing(tmp_path)
             "T417-C-AGY02 Ancien titre\nTâche / sujet : T417-C Ancien titre\nMission de test"
         )
         server.supervision._persist()
-        with pytest.raises(ValueError, match="tâche/titre différents"):
+        # T429 (2026-11-13) : l identite d une affectation = (alias, TACHE). Un titre
+        # fige different (renommage legitime) ne doit plus faire refuser le rattachement.
+        idempotent = connect("claude", session_id, "T417-C-AGY02", "T417-C", "Mission de test", base)
+        assert idempotent["status"] in ("already_assigned", "source_unavailable")
+        # En revanche, un re-pointage vers une AUTRE tache reste refuse.
+        with pytest.raises(ValueError, match="alias/tâche différents"):
+            connect("claude", session_id, "T426-AGY02", "T426", "Mission de test", base)
             connect("claude", session_id, "T417-C-AGY02", "T417-C", "Mission de test", base)
         with urlopen(base + "/api/supervision") as response:
             snapshot = json.loads(response.read().decode("utf-8"))
@@ -232,3 +238,36 @@ def test_split_alias_keeps_a_canonical_alias_untouched():
     from TOOLS.AGENT_SUPERVISOR.scripts import connect_session
 
     assert connect_session.split_alias("T429-MMX01") == ("T429-MMX01", "")
+
+
+def test_renamed_session_can_be_reconnected_idempotently(tmp_path):
+    """T429 (2026-11-13) : une session renommee legitimement (T417-C-AGY02 -> T000-AGY02)
+    ne doit plus eter refusee au rattachement : le garde comparait la mission INITIALE
+    (gelee au premier rattachement) au lieu de l etat courant."""
+    from TOOLS.AGENT_SUPERVISOR.scripts import connect_session
+
+    server = create_server(0, tmp_path / "state.json")
+    native_id = "66d7ad8a-a14e-4cfb-b5f1-0d3df70949f0"
+    session = server.supervision._new_session("sid-agy", "agy", native_id, "T000-AGY02", True,
+                                              "T000-AGY02 GEMINI 4 HYDRO CHALLENGE SIMU M3")
+    # la mission INITIALE conserve l ancien rattachement (T417-C) : c est le piege
+    session["initial_mission"] = ("T417-C-AGY02 Challenge & diagnostic simulation M3\n"
+                                  "Tâche / sujet : T417-C Challenge & diagnostic simulation M3\n"
+                                  "Challenge et diagnostic simulation M3")
+    server.supervision.sessions["sid-agy"] = session
+    server.supervision.running = True
+    worker = threading.Thread(target=server.serve_forever, daemon=True)
+    worker.start()
+    try:
+        result = connect_session.connect(
+            "agy", native_id, "T000-AGY02", "T000", "Challenge et diagnostic simulation M3",
+            base_url=f"http://127.0.0.1:{server.server_port}",
+            task_title="GEMINI 4 HYDRO CHALLENGE SIMU M3")
+    finally:
+        worker.join(timeout=2)
+        server.supervision.close()
+        server.server_close()
+    # La fixture n a pas de source lisible : le statut importe peu, l absence d exception
+    # et le fait que le rattachement ne soit PAS refuse importe beaucoup.
+    assert result["status"] in ("already_assigned", "source_unavailable", "attached")
+    assert result["alias"] == "T000-AGY02"

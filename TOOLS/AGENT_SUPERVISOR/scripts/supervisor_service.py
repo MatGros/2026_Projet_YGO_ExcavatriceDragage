@@ -146,12 +146,21 @@ def _trace(**fields):
 
 
 def session_display_title(session):
-    """Expose the first single-line alias/title from connection or rename to local status surfaces."""
+    """Return the canonical display title without exposing arbitrary mission text."""
     alias = str(session.get("alias", "")).strip()
+    display_title = str(session.get("display_title", "")).strip()
+    if display_title:
+        return display_title[:200]
     mission = str(session.get("mission", "")).strip()
-    title_line = mission.splitlines()[0].strip() if mission else ""
+    lines = mission.splitlines()
+    title_line = lines[0].strip() if lines else ""
+    # Legacy T000 missions had a metadata header before the display title. Accept only
+    # this known shape; never search arbitrary mission/objective lines for alias-like text.
+    if (alias and title_line.casefold().startswith(("tâche / sujet :", "tache / sujet :"))
+            and len(lines) > 1 and lines[1].strip().startswith(alias + " ")):
+        title_line = lines[1].strip()
     if alias and title_line.startswith(alias + " "):
-        return title_line.partition("Dossier:")[0].rstrip(" —").strip()[:200]
+        return title_line.partition("Dossier:")[0].partition(" —")[0].rstrip().strip()[:200]
     return alias[:200]
 
 DEFAULT_JUDGE_SETTINGS = dict(temperature=0, output_tokens=1600, timeout_seconds=30,
@@ -683,6 +692,7 @@ class Supervisor:
                 sid = str(uuid.UUID(value["id"]))
                 self.sessions[sid] = self._new_session(sid, value["platform"], value["native_id"], value.get("alias", ""), False, self._mission(value.get("mission", "")))
                 session = self.sessions[sid]
+                session["display_title"] = str(value.get("display_title") or session_display_title(session)).strip()[:200]
                 session["closed"] = bool(value.get("closed", False))
                 if session["closed"]:
                     session["state"] = "closed"
@@ -1207,8 +1217,8 @@ class Supervisor:
         return value.strip()
 
     @staticmethod
-    def _new_session(sid, platform, native_id, alias, enabled, mission=""):
-        return dict(id=sid, platform=platform, native_id=native_id, alias=str(alias)[:100], task_id="", task_title="", mission=mission, initial_mission=mission, mission_updated_at=timestamp(), mission_structure={}, mission_structure_updated_at=None, memory=[], context_truncated=False,
+    def _new_session(sid, platform, native_id, alias, enabled, mission="", display_title=""):
+        return dict(id=sid, platform=platform, native_id=native_id, alias=str(alias)[:100], display_title=str(display_title or "").strip()[:200], task_id="", task_title="", mission=mission, initial_mission=mission, mission_updated_at=timestamp(), mission_structure={}, mission_structure_updated_at=None, memory=[], context_truncated=False,
                     enabled=enabled, saved_enabled=enabled, state="waiting" if enabled else "paused", closed=False, source=None, error=None,
                     messages_observed=0,
                     last_event=None, last_analysis=None, analysis_state="waiting" if mission else "context_required", analysis_error=None,
@@ -1243,7 +1253,7 @@ class Supervisor:
         if self.load_error:
             raise ValueError("Configuration illisible : ecriture refusee pour proteger les donnees existantes")
         data = dict(model=self.model, allow_cloud=self.allow_cloud, judge_settings=self.judge_settings, sessions=[
-            {key: value.get(key, False if key == "closed" else None) for key in ("id", "platform", "native_id", "alias", "task_id", "task_title", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "alerts", "source_checkpoint", "source_event_index", "context_revision", "analyzed_revision", "context", "context_truncated", "messages_observed", "memory", "recovery", "enabled", "events", "framing", "source_generation", "acquired_proofs", "session_journal", "judge_turn_count", "closed")} for value in self.sessions.values()])
+            {key: value.get(key, False if key == "closed" else None) for key in ("id", "platform", "native_id", "alias", "display_title", "task_id", "task_title", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "alerts", "source_checkpoint", "source_event_index", "context_revision", "analyzed_revision", "context", "context_truncated", "messages_observed", "memory", "recovery", "enabled", "events", "framing", "source_generation", "acquired_proofs", "session_journal", "judge_turn_count", "closed")} for value in self.sessions.values()])
         if self.persist_chat:
             data['chat_histories'] = {('global' if key is None else key): value for key, value in self._chat_histories.items()}
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1352,6 +1362,13 @@ class Supervisor:
                     "preuves_constats": (session.get("evidence_archive") or [])[-30:],
                     # T429 : le socle exige a l attachement et son etat de lecture.
                     "socle": list(session.get("socle") or []),
+                    # T429 : le cadrage (attributs de mission) est visible aussi dans la
+                    # ligne de supervision, pas seulement dans l IHM.
+                    "cadrage": {
+                        "renseignes": len(session.get("mission_structure") or {}),
+                        "total": len(session.get("mission_structure") or {}) + len(session.get("mission_structure_proposal") or {}),
+                        "manquants": list(session.get("mission_structure_proposal") or {}),
+                    },
                 }
             for item in public:
                 item['chat_messages'] = self._chat_histories.get(item['id'], [])
@@ -1531,7 +1548,7 @@ class Supervisor:
                 if any(s["platform"] == platform and s["native_id"] == native_id for s in self.sessions.values()):
                     raise ValueError("Session deja affectee")
                 sid = str(uuid.uuid4())
-                session = self._new_session(sid, platform, native_id, command.get("alias", native_id), True, self._mission(command.get("mission", "")))
+                session = self._new_session(sid, platform, native_id, command.get("alias", native_id), True, self._mission(command.get("mission", "")), command.get("display_title", ""))
                 # T429 : tache liee et titre officiel stockes comme champs propres.
                 session["task_id"] = str(command.get("task_ref") or "").strip()[:32]
                 session["task_title"] = str(command.get("task_title") or "").strip()[:300]
@@ -1600,6 +1617,13 @@ class Supervisor:
                 if not session:
                     raise ValueError("Affectation inconnue")
                 session["alias"] = alias
+                if "display_title" in command:
+                    display_title = str(command.get("display_title") or "").strip()
+                    if len(display_title) > 200:
+                        raise ValueError("Titre lisible: 200 caracteres maximum")
+                    if not display_title:
+                        raise ValueError("Titre lisible requis")
+                    session["display_title"] = display_title
                 # T429 : la tache liee peut etre rafraichie a la renommage (transfert de relais).
                 if command.get("task_ref"):
                     session["task_id"] = str(command.get("task_ref")).strip()[:32]

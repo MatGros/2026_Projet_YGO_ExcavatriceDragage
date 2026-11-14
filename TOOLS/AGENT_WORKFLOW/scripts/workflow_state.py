@@ -38,6 +38,7 @@ TASKS = ROOT / "DOC" / "WFLOW" / "TASKS.yaml"
 SUMMARY = ROOT / "DOC" / "WFLOW" / "TASKS_ACTIVE_SUMMARY.md"
 AGENTS = ROOT / "AGENTS.md"
 VALID_MODES = ("fresh", "resume")
+SOURCE = "cli"  # origine : slash | bang | agent | cli
 
 
 def state_dir() -> Path:
@@ -63,6 +64,12 @@ def read_state(key: str) -> dict | None:
     return data
 
 
+BASE_COMMUNE = "AGENTS.md (règles), DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md (catalogue résumé)"
+VOIE_PROCEDURE = {
+    "Orchestrateur": ("", "TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md"),
+    "Tâche": ("", "TOOLS/AGENT_WORKFLOW/skills/task-planner/SKILL.md"),
+    "Troubleshooting": ("", "TOOLS/AGENT_WORKFLOW/skills/troubleshooting/SKILL.md"),
+}
 VOIES = {"1": "Orchestrateur", "2": "Tâche", "3": "Troubleshooting"}
 # Ligne d'etape du projet (AGENTS.md § "Ligne d'etape").
 ETAPES = ("CADRAGE", "ÉTUDE", "RÉALISATION", "TEST", "RESTITUTION", "DIAGNOSTIC", "ARRÊT")
@@ -195,6 +202,14 @@ def render(etat: str, mode: str | None, seq: int | None, key: str = "", alias: s
         f"📊 Projet : {counts} · résumé {fresh}",
         f"📚 AGENTS.md : {agents_ok}",
     ]
+    # Voie choisie : charger la base commune puis la procédure de la voie.
+    if etat == "ACTIF" and voie in VOIE_PROCEDURE:
+        base, proc = VOIE_PROCEDURE[voie]
+        lines += [
+            "",
+            f"📖 Lire d'abord : {BASE_COMMUNE}",
+            f"📘 Procédure de la voie {voie} : {proc}",
+        ]
     # Fin de bloc FIGÉE : menu numéroté, pas de question libre, pas de choix rédigé par le LLM.
     if etat == "ACTIF":
         lines += [
@@ -207,7 +222,7 @@ def render(etat: str, mode: str | None, seq: int | None, key: str = "", alias: s
             "0 · Quitter le workflow",
             "Pour choisir : /workflow-project 1 (Orchestrateur) · 2 (Tâche) · 3 (Troubleshooting) · 0 (Quitter)",
             "Ou écris ta demande : elle reste une réponse directe.",
-            "Agent : si l'utilisateur répond 1, 2, 3 ou 0 juste après ce menu, exécute `python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py cmd <numéro>` et affiche sa sortie. Autre réponse numérique : « choix inconnu », sans rien enregistrer.",
+            "Agent : si le message suit immédiatement un bloc `Choix :` d'un /workflow-project ACTIF et vaut 0, 1, 2 ou 3, exécute `python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py cmd <n> --source agent` et affiche sa sortie telle quelle, sans commentaire. Tout autre message, chiffre compris : réponse directe, sans script.",
         ]
     elif etat == "OFF":
         lines.append("⏹️ Workflow quitté. Pour revenir : /workflow-project")
@@ -238,10 +253,17 @@ def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if argv and argv[0] == "cmd":
         # Mode commande : `cmd <texte tapé>` (ex. "resume", "off", vide = fresh). Déterministe.
-        text = " ".join(a for a in argv[1:] if not a.startswith("--"))
+        global SOURCE
+        rest = argv[1:]
+        if "--source" in rest:
+            i = rest.index("--source")
+            SOURCE = rest[i + 1] if i + 1 < len(rest) else "cli"
+            rest = rest[:i] + rest[i + 2:]
+        text = " ".join(a for a in rest if not a.startswith("--"))
         routed = dispatch(text)
         if routed is None:
             print(f"ERREUR : argument inconnu « {text} » (attendu : resume | fresh | off, ou rien).")
+            trace_log.emit("workflow", source=SOURCE, session=session_key(None), action="choix_inconnu", texte=text)
             return 2
         argv = [routed[0]] + ([routed[1]] if routed[1] else [])
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -272,7 +294,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"ERREUR : étape inconnue « {wanted} » (attendu : {', '.join(ETAPES)}).", file=sys.stderr)
             return 2
         data = write_state(key, "ACTIF", cur.get("mode"), voie=cur.get("voie"), etape=wanted)
-        trace_log.emit("workflow", session=key, etat="ACTIF", voie=data.get("voie"),
+        trace_log.emit("workflow", source=SOURCE, session=key, etat="ACTIF", voie=data.get("voie"),
                        etape=data.get("etape"), seq=data.get("seq"))
         print(render(data["etat"], data["mode"], data["seq"], key, alias, data.get("voie"), data.get("etape")))
         return 0
@@ -292,7 +314,7 @@ def main(argv: list[str] | None = None) -> int:
             print("⚠️ Workflow non actif : tape /workflow-project d'abord, puis le numéro.")
             return 0
         data = write_state(key, "ACTIF", cur.get("mode"), voie=VOIES[args.mode])
-        trace_log.emit("workflow", session=key, etat="ACTIF", voie=data.get("voie"),
+        trace_log.emit("workflow", source=SOURCE, session=key, etat="ACTIF", voie=data.get("voie"),
                        etape=data.get("etape"), seq=data.get("seq"))
         print(render(data["etat"], data["mode"], data["seq"], key, alias, data["voie"], data.get("etape")))
         return 0
@@ -301,9 +323,11 @@ def main(argv: list[str] | None = None) -> int:
         data = write_state(key, "ACTIF", args.mode or "fresh")
     else:
         data = write_state(key, "OFF", None)
-    trace_log.emit("workflow", session=key, etat=data["etat"], mode=data.get("mode"),
+    trace_log.emit("workflow", source=SOURCE, session=key, etat=data["etat"], mode=data.get("mode"),
                    voie=data.get("voie"), etape=data.get("etape"), seq=data.get("seq"))
     print(render(data["etat"], data["mode"], data["seq"], key, alias, data.get("voie"), data.get("etape")))
+    if data["etat"] == "ACTIF":
+        trace_log.emit("workflow", source=SOURCE, session=key, action="menu_affiche", seq=data["seq"])
     return 0
 
 
