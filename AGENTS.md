@@ -391,6 +391,7 @@ Toutes les specs dans **`DOC/`** — index complet et rôle de chaque document :
 - [VERSION_HISTORY](DOC/VERSION_HISTORY.md) — historique CODESYS ↔ DOC (une ligne par jalon)
 - [MODEL_ROUTING](TOOLS/AGENT_WORKFLOW/docs/MODEL_ROUTING.md) — 🧭 règles communes de choix des agents/modèles, budget Ollama et identifiants exacts dans les commandes.
 - [DSH_PROVIDERS](TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md) — 🔌 routes et détails techniques DSH/OmniRoute/Ollama ; résultats de modèles datés = observations historiques.
+- [TERMINAL_HISTORY](TOOLS/AGENT_WORKFLOW/docs/TERMINAL_HISTORY.md) — ⌨️ historique ↑ isolé par terminal VS Code (clé `env.TK_HIST` + `profile.ps1`), réglages Terminal Keeper associés. Configuration **poste de travail**, globale à tous les projets.
 - [TASKS.yaml](DOC/WFLOW/TASKS.yaml) — 🗂️ **catalogue et contrats** : skill `.claude/skills/task-planner/SKILL.md`. Le coordinateur désigné gère le catalogue et ses verrous ; les agents délégués rendent leur état au coordinateur.
 - [TROUBLESHOOTING](DOC/WFLOW/TROUBLESHOOTING/README.md) — 🕵️ **recherche de blocage / diagnostic** : skill
   `.dsh/skills/troubleshooting/SKILL.md` (DSH) & `.claude/skills/troubleshooting/SKILL.md` (Claude Code),

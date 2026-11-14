@@ -68,5 +68,8 @@
         }
     ],
     "terminal.integrated.tabs.title": "${sequence}",
-    "terminal.integrated.tabs.description": "${process}"
+    "terminal.integrated.tabs.description": "${process}",
+    "terminal.integrated.enablePersistentSessions": true,
+    "terminal.integrated.persistentSessionReviveProcess": "onExitAndWindowClose",
+    "terminal.integrated.persistentSessionScrollback": 5000
 }
