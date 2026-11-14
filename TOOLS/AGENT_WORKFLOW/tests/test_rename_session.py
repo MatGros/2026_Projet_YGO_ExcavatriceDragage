@@ -11,6 +11,7 @@ Couvre tous les invariants arrêtés avec le Challenger :
 import sys
 import os
 import json
+import io
 import pytest
 from pathlib import Path
 
@@ -381,7 +382,7 @@ def test_notify_supervisor_keeps_chat_name_and_explicit_folder_together(tmp_path
     )
 
 @pytest.mark.parametrize(("platform", "actor"), [("claude", "CC"), ("codex", "CDX")])
-def test_rename_uses_real_supervisor_assignment_id_for_alias_and_mission(tmp_path, platform, actor):
+def test_rename_uses_real_supervisor_assignment_id_for_alias_and_mission(tmp_path, platform, actor, monkeypatch):
     """Reproduit connect puis rename contre le vrai serveur local isolé."""
     import threading
     from urllib.request import urlopen
@@ -407,12 +408,16 @@ def test_rename_uses_real_supervisor_assignment_id_for_alias_and_mission(tmp_pat
         linked = connect(platform, native_id, alias, "T423", "Mission initiale", base_url)
         assert linked["status"] == "attached"
 
+        task_title = rename_session.resolve_task_title(alias)
+        assert task_title, "le titre officiel de la tache doit etre resolu"
+        canonical_title = f"{alias} · {task_title}"
         assert rename_session.notify_supervisor(
             native_id,
             alias,
             mission_text="Hydro M3",
             platform=platform,
             base_url=base_url,
+            display_title=canonical_title,
         ) is True
 
         with urlopen(base_url + "/api/supervision") as response:
@@ -421,19 +426,80 @@ def test_rename_uses_real_supervisor_assignment_id_for_alias_and_mission(tmp_pat
         assert assignment["id"] == linked["assignment_id"]
         assert assignment["alias"] == alias
         # T429 (2026-11-13) : le titre officiel de la tache porte le titre de session.
-        task_title = rename_session.resolve_task_title(alias)
-        assert task_title, "le titre officiel de la tache doit etre resolu"
         assert assignment["mission"].splitlines()[0] == f"{alias} Hydro M3"
         assert f"Tache : {task_title}" in assignment["mission"]
         with urlopen(base_url + "/api/supervision/summary") as response:
             summary = json.loads(response.read().decode("utf-8"))
         displayed = next(item for item in summary["sessions"] if item["native_id"] == native_id)
-        assert displayed["display_title"] == f"{alias} Hydro M3"
+        assert displayed["display_title"] == canonical_title
+        persisted = json.loads((tmp_path / "supervisor-state.json").read_text(encoding="utf-8"))
+        persisted_assignment = next(item for item in persisted["sessions"] if item["native_id"] == native_id)
+        assert persisted_assignment["display_title"] == canonical_title
+        from TOOLS.AGENT_SUPERVISOR.scripts.supervisor_service import Supervisor
+        reloaded = Supervisor(state_path=tmp_path / "supervisor-state.json", roots=server.supervision.roots)
+        try:
+            restored = next(item for item in reloaded.notification_snapshot()["sessions"]
+                            if item["native_id"] == native_id)
+            assert restored["display_title"] == canonical_title
+        finally:
+            reloaded.close()
+
+        # Cas utilisateur reel : sans argument, relire le titre canonique du vrai
+        # endpoint isole, puis le reappliquer aux titres natifs sans aucun POST.
+        writes = {"terminal": [], "chat": []}
+        monkeypatch.setattr(rename_session.sys, "argv", ["rename_session.py"])
+        monkeypatch.setattr(rename_session, "AUDIT_LOG_FILE", tmp_path / "SESSION_RENAME_AUDIT.log")
+        monkeypatch.setattr(rename_session, "get_last_committed_alias", lambda _sid: "")
+        original_get_linked = rename_session.get_linked_supervisor_session
+        monkeypatch.setattr(rename_session, "get_linked_supervisor_session",
+                            lambda sid, cli, timeout=1.0: original_get_linked(sid, cli, base_url, timeout))
+        monkeypatch.setattr(rename_session, "notify_supervisor",
+                            lambda *_args, **_kwargs: pytest.fail("Le rejeu ne doit emettre aucun POST"))
+        monkeypatch.setattr(rename_session, "update_vscode_tab_title", lambda title: writes["terminal"].append(title))
+        monkeypatch.setattr(rename_session, "update_claude_transcript_title", lambda _sid, title: writes["chat"].append(title))
+        monkeypatch.setattr(rename_session, "update_codex_thread_title", lambda _sid, title: writes["chat"].append(title) or True)
+        captured_stdout = io.StringIO()
+        monkeypatch.setattr(rename_session.sys, "stdout", captured_stdout)
+
+        class FakeStatusline:
+            @staticmethod
+            def get_ancestor_cli_process():
+                return 123, "claude.exe" if platform == "claude" else "codex.exe"
+            @staticmethod
+            def find_current_conversation_id(*_args):
+                return native_id
+
+        monkeypatch.setitem(sys.modules, "session_statusline", FakeStatusline)
+        with pytest.raises(SystemExit) as result:
+            rename_session.main()
+        assert result.value.code == 0
+        assert writes["terminal"] == [f"{canonical_title} {'🧠 CC' if platform == 'claude' else '🤖 CDX'}"]
+        if platform == "claude":
+            assert writes["chat"] == [canonical_title]
+        after = original_get_linked(native_id, platform, base_url)
+        assert after["alias"] == alias
+        assert after["display_title"] == canonical_title
+        assert canonical_title in captured_stdout.getvalue()
     finally:
         server.supervision.close()
         server.shutdown()
         server.server_close()
         worker.join(timeout=2)
+
+
+def test_legacy_t000_display_title_uses_only_known_mission_header():
+    from TOOLS.AGENT_SUPERVISOR.scripts.supervisor_service import session_display_title
+
+    alias = "T000-CC10"
+    mission = (
+        "Tache / sujet : T000\n"
+        "T000-CC10 MULTITASK ORCHESTRATOR AGENT — pause chantiers et plan d'urgence workflow\n"
+        "Notes privees qui ne doivent pas devenir le titre"
+    )
+    assert session_display_title({"alias": alias, "mission": mission}) == (
+        "T000-CC10 MULTITASK ORCHESTRATOR AGENT"
+    )
+    assert session_display_title({"alias": alias, "mission": "Notes privees\nT000-CC10 fuit"}) == alias
 
 def test_notify_supervisor_offline(monkeypatch):
     import urllib.request

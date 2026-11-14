@@ -46,6 +46,23 @@ def _chain_digest(entry: dict, previous: str) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def _write_head(trace_path: Path, entry: dict) -> None:
+    """Ancre : seq + empreinte de la dernière entrée, écrite atomiquement à chaque émission."""
+    head = trace_path.parent / "trace.head"
+    tmp = head.with_suffix(".tmp")
+    tmp.write_text(json.dumps({"seq": entry["seq"], "chain": entry["chain"]}), encoding="utf-8")
+    os.replace(tmp, head)
+
+
+def _echec(trace_path: Path, exc: Exception, kind: str) -> None:
+    """Échec d'écriture : jamais silencieux. Trace dans echecs.log (rien n'est affiché)."""
+    try:
+        with (trace_path.parent / "echecs.log").open("a", encoding="utf-8") as stream:
+            stream.write(f"{time.strftime('%Y-%m-%dT%H:%M:%S')} kind={kind} erreur={exc!r}\n")
+    except OSError:
+        pass
+
+
 def emit(kind: str, **fields) -> dict:
     """Ajoute un evenement au journal interne (jamais affiche).
 
@@ -76,8 +93,9 @@ def emit(kind: str, **fields) -> dict:
             stream.write(json.dumps(entry, ensure_ascii=False, default=str) + "\n")
             stream.flush()
             os.fsync(stream.fileno())
-    except OSError:
-        pass
+        _write_head(trace_path, entry)
+    except OSError as exc:
+        _echec(trace_path, exc, kind)
     return entry
 
 
@@ -87,6 +105,9 @@ def verify_chain() -> dict:
         with _trace_path().open("r", encoding="utf-8", errors="replace") as stream:
             lines = [line for line in stream.read().splitlines() if line.strip()]
     except OSError:
+        head = _trace_path().parent / "trace.head"
+        if head.is_file():
+            return {"entries": 0, "intact": False, "break": {"reason": "journal absent alors qu'une ancre existe"}, "legacy": 0}
         return {"entries": 0, "intact": True, "reason": "journal absent"}
     previous, expected_seq, broken, legacy = "", 1, None, 0
     for index, line in enumerate(lines):
@@ -109,6 +130,15 @@ def verify_chain() -> dict:
             break
         previous = str(entry.get("chain") or "")
         expected_seq += 1
+    head = _trace_path().parent / "trace.head"
+    if broken is None and head.is_file():
+        try:
+            anchor = json.loads(head.read_text(encoding="utf-8"))
+        except ValueError:
+            anchor = {}
+        if int(anchor.get("seq", -1)) != expected_seq - 1 or str(anchor.get("chain", "")) != previous:
+            broken = {"index": len(lines), "reason": "ancre divergente : queue tronquée ou réécrite",
+                      "seq": anchor.get("seq"), "expected": expected_seq - 1}
     return {"entries": len(lines), "intact": broken is None, "break": broken, "legacy": legacy}
 
 
@@ -116,7 +146,7 @@ def query(kind: str | None = None, session: str | None = None, limit: int = 500,
           since: float | None = None) -> list[dict]:
     """Evenements filtrés (debug, tests, analyse)."""
     try:
-        raw = TRACE_PATH.read_text(encoding="utf-8", errors="replace")
+        raw = _trace_path().read_text(encoding="utf-8", errors="replace")
     except OSError:
         return []
     entries = []

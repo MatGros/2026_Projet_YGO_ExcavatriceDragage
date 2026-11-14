@@ -75,6 +75,29 @@ VOIES = {"1": "Orchestrateur", "2": "Tâche", "3": "Troubleshooting"}
 ETAPES = ("CADRAGE", "ÉTUDE", "RÉALISATION", "TEST", "RESTITUTION", "DIAGNOSTIC", "ARRÊT")
 
 
+def criticality_for_session(key: str) -> str:
+    """Criticalite de la tache de la session (contrat), pour la barre de statut."""
+    try:
+        import sys as _sys
+        _wf = str(Path(__file__).resolve().parent)
+        if _wf not in _sys.path:
+            _sys.path.insert(0, _wf)
+        import vigilance
+        alias = ""
+        try:
+            import urllib.request
+            with urllib.request.urlopen(vigilance.__dict__.get("SUPERVISOR_SUMMARY_URL", ""), timeout=1.0) as response:
+                data = json.loads(response.read().decode("utf-8"))
+            for item in data.get("sessions", []):
+                if str(item.get("native_id") or "") == key:
+                    alias = str(item.get("alias") or "")
+        except Exception:
+            alias = ""
+        return vigilance.criticality_for_task(vigilance.task_id_from_alias(alias) or "")
+    except Exception:
+        return ""
+
+
 def write_state(key: str, etat: str, mode: str | None, voie: str | None = None,
                 etape: str | None = None) -> dict:
     prev = read_state(key) or {}
@@ -84,6 +107,7 @@ def write_state(key: str, etat: str, mode: str | None, voie: str | None = None,
         "mode": mode or prev.get("mode", "fresh"),
         "voie": voie,
         "etape": etape or prev.get("etape"),
+        "criticality": prev.get("criticality") or criticality_for_session(key),
         "seq": int(prev.get("seq", 0)) + 1,
         "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
@@ -258,6 +282,8 @@ def main(argv: list[str] | None = None) -> int:
         if "--source" in rest:
             i = rest.index("--source")
             SOURCE = rest[i + 1] if i + 1 < len(rest) else "cli"
+            if SOURCE not in ("slash", "bang", "agent", "cli"):
+                SOURCE = "cli"
             rest = rest[:i] + rest[i + 2:]
         text = " ".join(a for a in rest if not a.startswith("--"))
         routed = dispatch(text)
@@ -313,6 +339,9 @@ def main(argv: list[str] | None = None) -> int:
         if cur is None or cur.get("etat") != "ACTIF":
             print("⚠️ Workflow non actif : tape /workflow-project d'abord, puis le numéro.")
             return 0
+        if args.mode not in VOIES:
+            print("ERREUR : voie inconnue (attendu : 1, 2 ou 3).")
+            return 2
         data = write_state(key, "ACTIF", cur.get("mode"), voie=VOIES[args.mode])
         trace_log.emit("workflow", source=SOURCE, session=key, etat="ACTIF", voie=data.get("voie"),
                        etape=data.get("etape"), seq=data.get("seq"))

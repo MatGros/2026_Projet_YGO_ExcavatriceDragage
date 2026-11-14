@@ -35,7 +35,7 @@ def task_folder(task_id: str) -> Path | None:
     return None
 
 
-def socle_for(task_id: str) -> list[str]:
+def socle_for(task_id: str, extra=()) -> list[str]:
     """Documents à lire pour cette tâche (chemins relatifs au dépôt)."""
     socle = [path for path in GLOBAL_SOCLE if (ROOT / path).is_file()]
     folder = task_folder(task_id)
@@ -48,6 +48,9 @@ def socle_for(task_id: str) -> list[str]:
             path = candidate.relative_to(ROOT).as_posix()
             if path not in socle:
                 socle.append(path)
+    for path in extra or ():
+        if path and path not in socle and (ROOT / path).is_file():
+            socle.append(path)
     return socle
 
 

@@ -333,6 +333,8 @@ def check(path: Path, release: bool) -> tuple[list[str], list[str]]:
         # AVERTISSEMENT, pas erreur : le controle reel est l epinglage par le service
         # (un contrat elargi en session est refuse par l empreinte divergente).
         warnings.extend(check_absolute_deny(data))
+        # T429 : qualite des criteres (mesurables, atomiques, uniques, couverture).
+        warnings.extend(check_criteria_quality(data))
     if data is None:
         warnings.append("PyYAML absent : analyse textuelle degradee (pip install pyyaml)")
         raw = scan_raw(text)
@@ -460,6 +462,92 @@ def _deny_hits(entries) -> list:
                 hits.append((text, denied))
                 break
     return hits
+
+
+COMMAND_HINT = re.compile(r"\b(py\.?3?\.?\d*|python|pytest|node|npm|git|curl|pwsh|powershell|bash|docker|make)\b|\.(py|mjs|js|bat|ps1|sh)\b", re.IGNORECASE)
+
+
+def _verified_by(item) -> str:
+    if isinstance(item, dict):
+        return str(item.get("verified_by") or item.get("verification") or "")
+    return ""
+
+
+def check_criteria_quality(data) -> list:
+    """Avertissements de qualite des criteres (mesurables, atomiques, uniques, couverts)."""
+    findings = []
+    contract = (data or {}).get("contract") or {}
+    acceptance = contract.get("acceptance") or []
+    if not isinstance(acceptance, list) or not acceptance:
+        return findings
+
+    for item in acceptance:
+        if not isinstance(item, dict):
+            continue
+        ident = str(item.get("id") or "?")
+        verification = _verified_by(item)
+        if not COMMAND_HINT.search(verification):
+            if "observation" in verification.lower():
+                # T429 : certaines preuves sont HUMAINES (notification, avis de simplicite) :
+                # elles sont declarees comme telles, pas万台 pretending to be automatisables.
+                findings.append(f"T10 (preuve humaine) : le critere {ident} repose sur une observation "
+                                f"de l exploitant -> sa preuve n est pas rejouable automatiquement.")
+            else:
+                findings.append(f"T10 (mesurabilite) : le critere {ident} ne nomme aucune commande executable "
+                                f"-> sa preuve ne peut pas etre rejouee automatiquement.")
+        if len(COMMAND_HINT.findall(verification)) > 3 and not ident.startswith("AC-X"):
+            findings.append(f"T10 (atomicite) : le critere {ident} melange plusieurs verifications "
+                            f"-> scinder pour une mesure fiable.")
+
+    seen = {}
+    for item in acceptance:
+        if not isinstance(item, dict):
+            continue
+        ident = str(item.get("id") or "?")
+        key = " ".join(_verified_by(item).split())
+        if not key:
+            continue
+        if key in seen:
+            findings.append(f"T10 (redondance) : les criteres {seen[key]} et {ident} citent la meme verification.")
+        else:
+            seen[key] = ident
+
+    livrables = contract.get("livrables") or []
+    if not livrables:
+        findings.append("T10 (objectif) : l objectif n est pas decompose en livrables -> "
+                        "la suffisance des criteres n est pas verifiable automatiquement.")
+    else:
+        for livrable in livrables:
+            if isinstance(livrable, dict):
+                marker = str(livrable.get("id") or livrable.get("path") or "")
+            else:
+                marker = str(livrable)
+            if not marker:
+                continue
+            # Un livrable est couvert si un critere le declare (champ `couvre`) ou si sa
+            # ZONE (chemin) apparait dans l critere : la lecture automatique reste possible.
+            zone = ""
+            for livrable_item in livrables:
+                if isinstance(livrable_item, dict) and str(livrable_item.get("id") or "") == marker:
+                    zone = str(livrable_item.get("path") or "")
+            covered = False
+            for item in acceptance:
+                if not isinstance(item, dict):
+                    continue
+                text = str(item.get("statement") or "") + " " + _verified_by(item)
+                declared = [str(x).strip() for x in (item.get("couvre") or [])]
+                if marker.lower() in [x.lower() for x in declared]:
+                    covered = True
+                    break
+                if zone and zone.lower() in text.lower():
+                    covered = True
+                    break
+                if zone and zone.split("/")[0].lower() in text.lower():
+                    covered = True
+                    break
+            if not covered:
+                findings.append(f"T10 (couverture) : le livrable « {marker} » n est couvert par aucun critere.")
+    return findings
 
 
 def check_absolute_deny(data) -> list:

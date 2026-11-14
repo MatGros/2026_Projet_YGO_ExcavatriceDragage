@@ -82,7 +82,7 @@ def timestamp():
 
 
 DEFAULT_MODEL = "deepseek-v4.1-flash:cloud"
-MISSION_FIELDS = frozenset(('subject','task_ref','primary_goal','current_goal','milestone','scope_permissions','constraints','criteria','evidence','unknowns','next_step','extra'))
+MISSION_FIELDS = frozenset(('subject','task_ref','primary_goal','current_goal','milestone','scope_permissions','constraints','criteria','evidence','unknowns','next_step','extra','criticality'))
 
 
 _MISSION_LABELS = (  # order matters: specific labels before generic ones
@@ -98,6 +98,69 @@ _MISSION_LABELS = (  # order matters: specific labels before generic ones
     (r"inconnues?|hypoth[eè]ses?", "unknowns"),
     (r"prochaine\s+[ée]tape", "next_step"),
 )
+
+
+MISSION_FIELDS_LABELS = (
+    ("subject", "Sujet"),
+    ("task_ref", "Référence de tâche"),
+    ("primary_goal", "Objectif initial"),
+    ("current_goal", "Objectif courant"),
+    ("milestone", "Jalon courant"),
+    ("scope_permissions", "Périmètre et permissions"),
+    ("constraints", "Contraintes"),
+    ("criteria", "Critères d'acceptation"),
+    ("evidence", "Preuves observées"),
+    ("unknowns", "Inconnues et hypothèses"),
+    ("next_step", "Prochaine étape"),
+    ("extra", "Complément"),
+    ("criticality", "Criticité"),
+)
+
+
+def _vigilance_for(session) -> dict:
+    """Profil de vigilance de la session (derive de la CRITICITE de la tache).
+
+    La criticite vient de la fiche structuree si elle est renseignee, sinon du contrat.
+    """
+    try:
+        import sys
+        scripts_dir = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts"
+        if str(scripts_dir) not in sys.path:
+            sys.path.insert(0, str(scripts_dir))
+        import vigilance
+    except Exception:
+        return {}
+    structure = session.get("mission_structure") or {}
+    criticality = structure.get("criticality") or vigilance.criticality_for_task(session.get("task_id") or "")
+    profile = vigilance.profile_for(criticality)
+    profile["criticality_source"] = "fiche structuree" if structure.get("criticality") else "contrat"
+    return profile
+
+
+def structure_proposal(session) -> dict:
+    """Fiche structuree proposee : 12 lignes, valeur + source (jamais ecrite sans confirmation)."""
+    confirmed = session.get("mission_structure") or {}
+    parsed = parse_mission_attributes(session.get("mission") or session.get("initial_mission") or "")
+    proposal = {}
+    for field, label in MISSION_FIELDS_LABELS:
+        if field in confirmed and str(confirmed.get(field) or "").strip():
+            value, source = str(confirmed.get(field)).strip(), "confirmé"
+        elif field in parsed and str(parsed.get(field) or "").strip():
+            value, source = str(parsed.get(field)).strip(), "mission"
+        elif field == "criticality":
+            try:
+                import sys as _sys
+                scripts_dir = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts"
+                if str(scripts_dir) not in _sys.path:
+                    _sys.path.insert(0, str(scripts_dir))
+                import vigilance as _vigilance
+                value, source = _vigilance.criticality_for_task(session.get("task_id") or ""), "contrat"
+            except Exception:
+                value, source = "C2", "contrat"
+        else:
+            value, source = "", "à compléter"
+        proposal[field] = {"label": label, "value": value, "source": source}
+    return proposal
 
 
 def parse_mission_attributes(text):
@@ -160,7 +223,13 @@ def session_display_title(session):
             and len(lines) > 1 and lines[1].strip().startswith(alias + " ")):
         title_line = lines[1].strip()
     if alias and title_line.startswith(alias + " "):
-        return title_line.partition("Dossier:")[0].partition(" —")[0].rstrip().strip()[:200]
+        structured_tail = any(
+            line.strip().casefold().startswith(("tâche :", "tache :", "tâche / sujet :", "tache / sujet :", "dossier:"))
+            for line in lines[1:]
+        )
+        legacy_folder_suffix = "dossier:" in title_line.casefold()
+        if structured_tail or legacy_folder_suffix or len(lines) > 1 and lines[0].casefold().startswith(("tâche / sujet :", "tache / sujet :")):
+            return title_line.partition("Dossier:")[0].partition(" —")[0].rstrip().strip()[:200]
     return alias[:200]
 
 DEFAULT_JUDGE_SETTINGS = dict(temperature=0, output_tokens=1600, timeout_seconds=30,
@@ -1331,8 +1400,14 @@ class Supervisor:
                     if alert.get("category") == "system_test" and alert.get("disposition") == "new":
                         alert["business_state"] = "new"
                 structure = session.get("mission_structure") or {}
-                item["mission_structure_proposal"] = {k: v for k, v in parse_mission_attributes(session.get("mission") or session.get("initial_mission")).items()
-                                                      if not str(structure.get(k) or "").strip()}
+                # T429 : la fiche structuree est TOUJOURS proposee (12 lignes, avec la
+                # source de chaque valeur) — meme sans contrat. Une fiche vide ne degrade
+                # rien : la mission texte reste la reference.
+                proposal = structure_proposal(session)
+                item["mission_structure_proposal"] = {key: item["value"] for key, item in proposal.items()
+                                                      if not str(structure.get(key) or "").strip() and item["value"]}
+                item["mission_structure_sources"] = {key: item["source"] for key, item in proposal.items()}
+                item["mission_structure_fields"] = [{"field": key, "label": label} for key, label in MISSION_FIELDS_LABELS]
                 item["event_count"] = len(session.get("events", []))
                 item["events"] = session.get("events", [])[-100:]
                 item["recovery"] = {key: value for key, value in session["recovery"].items() if key not in ("messages", "batches", "candidate_checkpoint")}
@@ -1364,10 +1439,13 @@ class Supervisor:
                     "socle": list(session.get("socle") or []),
                     # T429 : le cadrage (attributs de mission) est visible aussi dans la
                     # ligne de supervision, pas seulement dans l IHM.
+                    "vigilance": _vigilance_for(session),
                     "cadrage": {
                         "renseignes": len(session.get("mission_structure") or {}),
-                        "total": len(session.get("mission_structure") or {}) + len(session.get("mission_structure_proposal") or {}),
-                        "manquants": list(session.get("mission_structure_proposal") or {}),
+                        "total": len(MISSION_FIELDS),
+                        "manquants": [key for key, label in MISSION_FIELDS_LABELS
+                                      if not str((session.get("mission_structure") or {}).get(key) or "").strip()],
+                        "sources": {key: item["source"] for key, item in structure_proposal(session).items()},
                     },
                 }
             for item in public:

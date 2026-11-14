@@ -34,6 +34,29 @@ def mode() -> str:
     return value if value in ("report", "block") else "block"
 
 
+def session_task_id(session_id: str) -> str:
+    """Tache de la session, lue dans le Superviseur (jamais supposee)."""
+    try:
+        import urllib.request
+        with urllib.request.urlopen(task_scope.SUPERVISOR_SUMMARY_URL, timeout=1.5) as response:
+            data = json.loads(response.read().decode("utf-8"))
+    except Exception:
+        return ""
+    for item in data.get("sessions", []):
+        if str(item.get("native_id") or "") == session_id:
+            return str(item.get("task_id") or "")
+    return ""
+
+
+def vigilance_profile(session_id: str) -> dict:
+    """Profil de vigilance (criticite de la tache) ; profil neutre si inconnu."""
+    try:
+        import vigilance
+        return vigilance.profile_for_task(session_task_id(session_id))
+    except Exception:
+        return {}
+
+
 def evaluate(session_id: str, target: str) -> dict:
     """Décide (ou non) d'une écriture. Pur :aucun effet de bord."""
     # 1) Deny-list GLOBALE : verifiee AVANT tout (aucune derogation script ne l'ouvre).
@@ -202,7 +225,10 @@ def main() -> int:
                        kind_verdict="interdit", decision="block", derogation=False)
         return 2
 
-    if mode() == "block":
+    # T429 : la CRITICITE de la tache decide si le hors-perimetre est refuse (C3/C4)
+    # ou signale (C2 et en dessous).
+    profile = vigilance_profile(session_id)
+    if mode() == "block" or bool(profile.get("perimetre_refuse")):
         print(message, file=sys.stderr)
         return 2  # refus : le message revient a l'agent
     print("[garde de perimetre - rapport] " + message.replace("\n", " | "), file=sys.stderr)
