@@ -1,4 +1,5 @@
 """Garde-fous statusline : workflow attesté par le harnais + repère git compact (13/11/2026)."""
+import hashlib
 import json
 import os
 import sys
@@ -108,6 +109,44 @@ def test_git_badge_says_hors_depot_outside_a_repository(monkeypatch):
     monkeypatch.setattr(statusline_indicators, "_git_facts", lambda: {"root": ""})
 
     assert "hors dépôt" in session_statusline.get_git_badge()
+
+
+def test_git_cache_isolated_between_worktrees(monkeypatch, tmp_path):
+    """Deux terminaux sur des racines différentes ne doivent pas partager leur badge Git."""
+    root_a = r"C:\\worktrees\\feature-a"
+    root_b = r"C:\\worktrees\\feature-b"
+    cache_dir = tmp_path / "git-cache"
+    monkeypatch.setattr(statusline_indicators, "GIT_CACHE_DIR", cache_dir)
+    monkeypatch.setattr(statusline_indicators.os, "getcwd", lambda: root_b)
+
+    def cache_path(root):
+        key = os.path.normcase(os.path.abspath(root))
+        digest = hashlib.sha256(key.encode("utf-8")).hexdigest()[:20]
+        return cache_dir / f"{digest}.json"
+
+    cache_dir.mkdir()
+    cache_path(root_a).write_text(json.dumps({
+        "root": root_a, "branch": "feature-a", "upstream": "", "dirty": 1,
+    }), encoding="utf-8")
+
+    def git(args, cwd):
+        if args == ["rev-parse", "--show-toplevel"]:
+            return root_b
+        if args == ["rev-parse", "--abbrev-ref", "HEAD"]:
+            return "feature-b"
+        if args == ["rev-parse", "--absolute-git-dir"]:
+            return root_b + r"\\.git"
+        if args == ["status", "--porcelain"]:
+            return ""
+        return ""
+
+    monkeypatch.setattr(statusline_indicators, "_git", git)
+
+    facts = statusline_indicators._git_facts()
+
+    assert facts["root"] == root_b
+    assert facts["branch"] == "feature-b"
+    assert facts["dirty"] == 0
 
 
 def test_workflow_state_etape_command_writes_the_step(monkeypatch, tmp_path):
