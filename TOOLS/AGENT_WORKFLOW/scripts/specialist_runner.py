@@ -319,15 +319,17 @@ def main():
     # l usage reel des 6 agents specialises devient un fait, pas une impression.
     try:
         import os as _os, sys as _sys
-        _scripts_dir = str(Path(__file__).resolve().parent)
+        _scripts_dir = _os.path.dirname(_os.path.abspath(__file__))
         if _scripts_dir not in _sys.path:
             _sys.path.insert(0, _scripts_dir)
         import trace_log
-        trace_log.emit("persona", role=args.role, target=args.target, task=args.task,
-                       session=_os.environ.get("CLAUDE_CODE_SESSION_ID"),
-                       prompt_len=len(args.prompt or ""))
-    except Exception:
-        pass
+        if args.role or args.show_prompt:   # les modes liste n'invoquent pas de persona
+            trace_log.emit("persona", role=args.role or args.show_prompt, target=args.target, task=args.task,
+                           session=_os.environ.get("CLAUDE_CODE_SESSION_ID"),
+                           prompt_len=len(args.prompt or ""))
+    except Exception as _trace_exc:
+        # R15 : la journalisation ne casse jamais l'invocation, mais elle n'est jamais muette (M7).
+        sys.stderr.write("[trace] journalisation persona echouee : %s\n" % _trace_exc)
 
     if args.list_roles:
         list_roles()

@@ -1256,3 +1256,21 @@ def test_judge_declares_reading_dossier_and_finding_carries_it(tmp_path):
         assert public['distinction'].startswith('dossier fourni au juge'), "R14 : notions distinctes"
     finally:
         svc.close()
+
+
+def test_persona_invocation_is_traced_and_readable(monkeypatch, tmp_path):
+    """R15 (defaut reel du 2026-11-14 : NameError silencieux -> 0 jamais journalise) :
+    une invocation reelle de specialist_runner produit une entree kind=persona que le
+    service expose via persona_usage ; l'echec de journalisation n'est pas muet."""
+    monkeypatch.setenv("WORKFLOW_TRACE_DIR", str(tmp_path))
+    monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", "test-session-t429")
+    import subprocess
+    import sys as _sys
+    from TOOLS.AGENT_SUPERVISOR.scripts import supervisor_service
+    runner = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts" / "specialist_runner.py"
+    proc = subprocess.run([_sys.executable, str(runner), "--show-prompt", "safety"],
+                          capture_output=True, text=True, timeout=60)
+    assert proc.returncode == 0, proc.stderr
+    assert "journalisation persona echouee" not in proc.stderr, "la journalisation ne doit pas echouer"
+    usage = supervisor_service.persona_usage("test-session-t429")
+    assert usage == [{"role": "safety", "count": 1}], f"usage reel expose : {usage}"
