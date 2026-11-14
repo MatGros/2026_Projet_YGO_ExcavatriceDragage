@@ -110,11 +110,10 @@
                 "commands": [
                     "ollama launch claude --model minimax-m3.1-flash:cloud"
                 ]
-            }
-        ],
-        "disabled_terminals": [
+            },
             {
-                "name": "OpenCode (desactive)",
+                "name": "📦 OpenCode",
+                "env": { "TK_HIST": "opencode" },
                 "autoExecuteCommands": true,
                 "icon": "organization",
                 "color": "terminal.ansiBrightBlue",
@@ -123,16 +122,8 @@
                 ]
             },
             {
-                "name": "OmniRoute Server (ancienne commande archivée)",
-                "autoExecuteCommands": true,
-                "icon": "server",
-                "color": "terminal.ansiBrightGreen",
-                "commands": [
-                    "omniroute"
-                ]
-            },
-            {
-                "name": "OpenCode-Go (glm-5.2) - desactive",
+                "name": "⚙️ OpenCode-Go (glm-5.2)",
+                "env": { "TK_HIST": "opencode-go" },
                 "autoExecuteCommands": true,
                 "icon": "zap",
                 "color": "terminal.ansiBrightCyan",
@@ -141,7 +132,8 @@
                 ]
             },
             {
-                "name": "🦙 Claude Code (Ollama)",
+                "name": "🦙 Claude Code (Ollama gemma4)",
+                "env": { "TK_HIST": "cc-ollama-gemma4" },
                 "autoExecuteCommands": true,
                 "icon": "cpu",
                 "color": "terminal.ansiBrightMagenta",
@@ -150,12 +142,24 @@
                 ]
             },
             {
-                "name": "🦙 OpenCode (Ollama)",
+                "name": "🦙 OpenCode (Ollama gemma4)",
+                "env": { "TK_HIST": "opencode-ollama-gemma4" },
                 "autoExecuteCommands": true,
                 "icon": "cpu",
                 "color": "terminal.ansiBrightCyan",
                 "commands": [
                     "ollama launch opencode --model gemma4:e4b"
+                ]
+            }
+        ],
+        "disabled_terminals": [
+            {
+                "name": "OmniRoute Server (ancienne commande archivée)",
+                "autoExecuteCommands": true,
+                "icon": "server",
+                "color": "terminal.ansiBrightGreen",
+                "commands": [
+                    "omniroute"
                 ]
             },
             {
