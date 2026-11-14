@@ -1,14 +1,15 @@
 # TASKS_ACTIVE_SUMMARY — résumé du catalogue pour le démarrage de session
-<!-- sha256(TASKS.yaml)=2dc358e81fea7c54eb4557f7a6f64284b7f34fd4985a12144de4f2cd339fc0e2 | genere=2026-11-14T04:57:44 | generateur=TOOLS/AGENT_WORKFLOW/scripts/generate_tasks_summary.py -->
+<!-- sha256(TASKS.yaml)=ab4bc38db1ec0ce10ea725fbe2645d35db0313b6f09097cfb56c0894bc3bf7c2 | genere=2026-11-14T05:10:18 | generateur=TOOLS/AGENT_WORKFLOW/scripts/generate_tasks_summary.py -->
 
-**Compteurs** : 🔒 6 · ⏳ 1 · ⏸️ 8 · ⬜ 141 · ⛔ 0 (✅ 73 · ❌ 8 · total 231)
+**Compteurs** : 🔒 7 · ⏳ 2 · ⏸️ 8 · ⬜ 140 · ⛔ 0 (✅ 73 · ❌ 8 · total 231)
 
-**Verrous 🔒** : T428 (CC01), T427 (CC01), T426 (CC01), T430 (CDX04), T417-C (AGY02), T429 (CC01)
+**Verrous 🔒** : T428 (CC01), T427 (CC01), T426 (CC01), T430 (CDX04), T417-C (AGY02), T429 (CC01), T377 (CC03)
 
 **Tâches ⏳ / ⏸️ / ⛔**
 
 | ID | Statut | Agent | Titre |
 |---|---|---|---|
+| T377 | ⏳ | CC03 | HOMING N1 MANUEL SANS CONTACT TOP : approche prudente sans heurter le capteur haut TOP, v… |
 | T429 | ⏳ | CC01 | Agent Supervisor : fiabiliser reprise, cycle des alertes, IHM et plugin sur parcours reels |
 | T417-C | ⏸️ | AGY02 | Challenge & diagnostic simulation M3 (depassement butee petite vitesse) |
 | T430 | ⏸️ | CDX04 | Organisation documentaire — terminer la migration des versions, chemins et consommateurs |

@@ -34,6 +34,21 @@ def test_sanitize_and_validate_accented():
     assert "Mémoire" in alias
     assert desc == "Fiabilisation Mémoire Données"
 
+
+def test_display_title_override_does_not_append_long_catalog_title():
+    alias = "T427-CC02"
+    official_title = "Refonte Workflow Agents — Router de skills mince, contrat étendu, sas d'essais et note compagnon MD"
+    assert rename_session.build_display_title(alias, "REFONTE WORKFLOW AGENT") == (
+        "T427-CC02 REFONTE WORKFLOW AGENT"
+    )
+    assert rename_session.build_display_title(alias) == alias
+    assert len(rename_session.build_display_title(alias, "REFONTE WORKFLOW AGENT")) < len(official_title)
+
+
+def test_display_title_rejects_statusline_overflow():
+    with pytest.raises(ValueError, match="Titre de session trop long"):
+        rename_session.build_display_title("T427-CC02", "X" * 80)
+
 def test_sanitize_reject_empty():
     with pytest.raises(ValueError, match="vide"):
         rename_session.sanitize_and_validate("")
@@ -451,6 +466,7 @@ def test_rename_uses_real_supervisor_assignment_id_for_alias_and_mission(tmp_pat
         monkeypatch.setattr(rename_session, "AUDIT_LOG_FILE", tmp_path / "SESSION_RENAME_AUDIT.log")
         monkeypatch.setattr(rename_session, "get_last_committed_alias", lambda _sid: "")
         original_get_linked = rename_session.get_linked_supervisor_session
+        original_notify = rename_session.notify_supervisor
         monkeypatch.setattr(rename_session, "get_linked_supervisor_session",
                             lambda sid, cli, timeout=1.0: original_get_linked(sid, cli, base_url, timeout))
         monkeypatch.setattr(rename_session, "notify_supervisor",
@@ -480,6 +496,58 @@ def test_rename_uses_real_supervisor_assignment_id_for_alias_and_mission(tmp_pat
         assert after["alias"] == alias
         assert after["display_title"] == canonical_title
         assert canonical_title in captured_stdout.getvalue()
+
+        # Cas utilisateur : une description explicite remplace le titre catalogue long
+        # dans les surfaces UI, tandis que le titre officiel reste dans la mission.
+        short_title = f"{alias} REFONTE WORKFLOW AGENT"
+        writes["terminal"].clear()
+        writes["chat"].clear()
+        monkeypatch.setattr(rename_session.sys, "argv",
+                            ["rename_session.py", alias, "REFONTE WORKFLOW AGENT"])
+
+        def notify_again(sid, new_alias, mission_text="", platform="claude", timeout=1.0, display_title=""):
+            return original_notify(sid, new_alias, mission_text=mission_text, platform=platform,
+                                   base_url=base_url, timeout=timeout, display_title=display_title)
+
+        monkeypatch.setattr(rename_session, "notify_supervisor", notify_again)
+        short_stdout = io.StringIO()
+        monkeypatch.setattr(rename_session.sys, "stdout", short_stdout)
+
+        class FakeStatuslineWithCurrentAlias(FakeStatusline):
+            @staticmethod
+            def get_session_info(*_args):
+                return alias, ""
+
+        monkeypatch.setitem(sys.modules, "session_statusline", FakeStatuslineWithCurrentAlias)
+        with pytest.raises(SystemExit) as short_result:
+            rename_session.main()
+        assert short_result.value.code == 0
+        assert writes["terminal"] == [f"{short_title} {'🧠 CC' if platform == 'claude' else '🤖 CDX'}"]
+        assert writes["chat"] == [short_title]
+        with urlopen(base_url + "/api/supervision") as response:
+            after_short_snapshot = json.loads(response.read().decode("utf-8"))
+        after_short = next(item for item in after_short_snapshot["sessions"] if item["native_id"] == native_id)
+        assert after_short["alias"] == alias
+        assert f"Tache : {task_title}" in after_short["mission"]
+        with urlopen(base_url + "/api/supervision/summary") as response:
+            after_short_summary = json.loads(response.read().decode("utf-8"))
+        displayed_short = next(item for item in after_short_summary["sessions"] if item["native_id"] == native_id)
+        assert displayed_short["display_title"] == short_title
+        from TOOLS.AGENT_WORKFLOW.scripts import session_statusline
+        import urllib.request
+        real_urlopen = urllib.request.urlopen
+
+        def read_isolated_supervisor(req, timeout=1.0):
+            requested_url = req.full_url if hasattr(req, "full_url") else str(req)
+            prefix = "http://127.0.0.1:8082"
+            if requested_url.startswith(prefix):
+                req = urllib.request.Request(base_url + requested_url[len(prefix):],
+                                             headers={"Accept": "application/json"})
+            return real_urlopen(req, timeout=timeout)
+
+        monkeypatch.setattr(session_statusline.urllib.request, "urlopen", read_isolated_supervisor)
+        assert session_statusline.get_session_info(native_id, f"{platform}.exe")[0] == short_title
+        assert short_title in short_stdout.getvalue()
     finally:
         server.supervision.close()
         server.shutdown()

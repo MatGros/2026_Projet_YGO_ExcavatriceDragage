@@ -351,3 +351,33 @@ Chaque cas se joue sur **Claude** et sur **Codex** ; noter ✅ / ❌ + l'extrait
 - O1 · T427 est verrouillée par CC01 : transfert de verrou ou autre tâche ?
 - O2 · Commit des modifications en attente : oui, quand, et par quel lot ?
 - O3 · Limites acceptées : source non authentifiée (B7), voie choisie en message libre non garantie.
+
+## 13. 🧪 Tests standardisés du backlog (2026-11-14)
+
+Fichier : `TOOLS/AGENT_WORKFLOW/tests/test_workflow_backlog.py`. Convention : un test par point B<n>.
+Un point non réalisé = test en `xfail(strict=True)` : il devient rouge dès qu'il passe, à retirer alors de xfail.
+
+- ✅ Passent (5) : B4 (échec tracé), B5 (argument injecté refusé), B8a (emoji suivi d'un espace), cohérence commande/script (2).
+- 🔴 Défaut confirmé : **B2** — 20 écritures simultanées produisent 13 entrées et des seq dupliqués.
+- ⏳ En attente (9) : B3, B6, B7, B8b, B9, B10, B11, B13, B17.
+
+## 14. 🔎 État des lieux vérifiable (2026-11-14, 15:44)
+
+> Objectif de mission Superviseur : état des lieux vérifiable. Chaque point cite sa preuve.
+
+**✅ Ce qui est prouvé**
+- 🧪 Tests workflow : `pytest test_workflow_state.py test_workflow_backlog.py` → **27 passed, 10 xfailed**, 0 échec.
+- 🧩 Stubs de skills (G440) : **PASS**, 0 erreur.
+- 📄 Commande `/workflow-project` : sortie du script injectée avant le modèle (doc Claude Code, rapport agent du 2026-11-14).
+
+**🔴 Défauts confirmés par mesure**
+- **B2 — écritures concurrentes** : test → 20 écritures simultanées = 13 entrées. Journal réel : **4 104 numéros de séquence dupliqués sur 16 785** entrées chaînées. Plusieurs émetteurs écrivent sans verrou.
+- **B1 — rupture de chaîne** : `verify_chain()` → rompue à l'index 49, « empreinte invalide », sur la **toute première** entrée chaînée (seq 1, 2026-11-13 19:51:06, kind `titre`).
+  Hypothèse (non prouvée) : entrées écrites par une version antérieure de `emit`, avec une autre règle d'empreinte. Les 49 entrées précédentes sont sans chaînage (legacy).
+- **Titre de session** : `display_title` modifié dans le Superviseur sans passer par `rename_session.py` (aucun `COMMIT` au journal de renommage). Auteur non tracé. Transmis à l'agent du Superviseur.
+
+**⏳ En attente (10 tests xfail)** : B2, B3, B6, B7, B8b, B9, B10, B11, B13, B17.
+
+**⛔ Bloqué** : chantier O3 (fiches de rôle) — pas de GO de T000-CC10, trois décisions oui/non à trancher par l'exploitant.
+
+**📦 Non commité (mes fichiers)** : plan T427, `test_workflow_backlog.py`. Fichiers modifiés par d'autres agents dans le même périmètre : `rename_session.py`, `task_socle.py`, `test_rename_session.py` (non touchés par moi).

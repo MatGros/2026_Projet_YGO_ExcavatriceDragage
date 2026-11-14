@@ -1,7 +1,7 @@
 {
     "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v12/terminal-keeper.json",
     "theme": "tribe",
-    "active": "Server",
+    "active": "AI Third-Party",
     "activateOnStartup": false,
     "keepExistingTerminals": true,
     "noClear": true,
@@ -9,7 +9,9 @@
         "Server": [
             {
                 "name": "🗃️ Task Manager",
-                "env": { "TK_HIST": "task-manager" },
+                "env": {
+                    "TK_HIST": "task-manager"
+                },
                 "autoExecuteCommands": true,
                 "icon": "server",
                 "color": "terminal.ansiBrightMagenta",
@@ -19,7 +21,9 @@
             },
             {
                 "name": "🌐 OmniRoute Server",
-                "env": { "TK_HIST": "omniroute" },
+                "env": {
+                    "TK_HIST": "omniroute"
+                },
                 "autoExecuteCommands": true,
                 "icon": "server",
                 "color": "terminal.ansiBrightGreen",
@@ -29,7 +33,9 @@
             },
             {
                 "name": "🐋 DSH server (deepseek-v4.1)",
-                "env": { "TK_HIST": "dsh" },
+                "env": {
+                    "TK_HIST": "dsh"
+                },
                 "autoExecuteCommands": true,
                 "icon": "terminal",
                 "color": "terminal.ansiBrightCyan",
@@ -41,7 +47,9 @@
         "AI Premium": [
             {
                 "name": "🚀 AGY Antigravity",
-                "env": { "TK_HIST": "agy" },
+                "env": {
+                    "TK_HIST": "agy"
+                },
                 "autoExecuteCommands": true,
                 "icon": "rocket",
                 "color": "terminal.ansiBlue",
@@ -51,7 +59,9 @@
             },
             {
                 "name": "🧠 Claude Code",
-                "env": { "TK_HIST": "claude-code" },
+                "env": {
+                    "TK_HIST": "claude-code"
+                },
                 "autoExecuteCommands": true,
                 "icon": "code",
                 "color": "terminal.ansiRed",
@@ -61,7 +71,9 @@
             },
             {
                 "name": "🤖 Codex (OpenAI)",
-                "env": { "TK_HIST": "codex" },
+                "env": {
+                    "TK_HIST": "codex"
+                },
                 "autoExecuteCommands": true,
                 "icon": "symbol-class",
                 "color": "terminal.ansiGreen",
@@ -73,7 +85,9 @@
         "AI Third-Party": [
             {
                 "name": "🐋 CC Ollama (deepseek-v4.1)",
-                "env": { "TK_HIST": "cc-ollama-deepseek" },
+                "env": {
+                    "TK_HIST": "cc-ollama-deepseek"
+                },
                 "autoExecuteCommands": true,
                 "icon": "code",
                 "color": "terminal.ansiBrightCyan",
@@ -83,7 +97,9 @@
             },
             {
                 "name": "♊ CC OmniRte AGY (Gemini 3.8)",
-                "env": { "TK_HIST": "cc-omniroute-gemini" },
+                "env": {
+                    "TK_HIST": "cc-omniroute-gemini"
+                },
                 "autoExecuteCommands": true,
                 "icon": "code",
                 "color": "terminal.ansiBlue",
@@ -93,7 +109,9 @@
             },
             {
                 "name": "⚡ CC Ollama (glm-5.3)",
-                "env": { "TK_HIST": "cc-ollama-glm" },
+                "env": {
+                    "TK_HIST": "cc-ollama-glm"
+                },
                 "autoExecuteCommands": true,
                 "icon": "code",
                 "color": "terminal.ansiBrightMagenta",
@@ -103,7 +121,9 @@
             },
             {
                 "name": "🔥 CC Ollama (minimax-m3.1)",
-                "env": { "TK_HIST": "cc-ollama-minimax" },
+                "env": {
+                    "TK_HIST": "cc-ollama-minimax"
+                },
                 "autoExecuteCommands": true,
                 "icon": "flame",
                 "color": "terminal.ansiBrightYellow",

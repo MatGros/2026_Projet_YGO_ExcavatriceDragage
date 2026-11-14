@@ -12,6 +12,27 @@ from TOOLS.AGENT_SUPERVISOR.scripts.connect_session import (
 from TOOLS.AGENT_SUPERVISOR.scripts.supervisor_server import create_server
 
 
+def test_provisional_t000_socle_ne_resolves_pas_un_dossier_t000_aleatoire(tmp_path, monkeypatch):
+    from TOOLS.AGENT_WORKFLOW.scripts import task_socle
+
+    root = tmp_path / "repo"
+    tasks = root / "DOC" / "WFLOW" / "TASKS"
+    unrelated = tasks / "T000-AGY02_GEMINI_HYDRO"
+    unrelated.mkdir(parents=True)
+    (unrelated / "README.md").write_text("Dossier d'une autre session", encoding="utf-8")
+    (root / "AGENTS.md").write_text("Consignes globales", encoding="utf-8")
+    summary = root / "DOC" / "WFLOW" / "TASKS_ACTIVE_SUMMARY.md"
+    summary.parent.mkdir(parents=True, exist_ok=True)
+    summary.write_text("Résumé global", encoding="utf-8")
+    monkeypatch.setattr(task_socle, "ROOT", root)
+    monkeypatch.setattr(task_socle, "TASKS_DIR", tasks)
+
+    assert task_socle.task_folder("T000") is None
+    assert task_socle.socle_for("T000") == [
+        "AGENTS.md", "DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md"
+    ]
+
+
 def test_cli_session_id_uses_current_runtime_and_rejects_mismatch(monkeypatch):
     monkeypatch.setenv("DSH_SESSION_ID", "session-12345678-1234-1234-1234-123456789abc")
     assert session_id_for("dsh") == os.environ["DSH_SESSION_ID"]
@@ -35,7 +56,9 @@ def test_connect_registers_one_exact_local_source_and_reports_existing(tmp_path)
     worker.start()
     base = f"http://127.0.0.1:{server.server_port}"
     try:
-        attached = connect("claude", session_id, "T417-C-AGY02", "T417-C", "Mission de test", base)
+        short_title = "T417-C-AGY02 HYDRO M3"
+        attached = connect("claude", session_id, "T417-C-AGY02", "T417-C", "Mission de test", base,
+                           display_title="HYDRO M3")
         assert attached["status"] == "attached"
         assert attached["task_id"] == "T417-C"
         assert attached["agent_id"] == "AGY02"
@@ -67,9 +90,13 @@ def test_connect_registers_one_exact_local_source_and_reports_existing(tmp_path)
         with urlopen(base + "/api/supervision") as response:
             snapshot = json.loads(response.read().decode("utf-8"))
         assert sum(s["native_id"] == session_id for s in snapshot["sessions"]) == 1
+        stored = next(s for s in snapshot["sessions"] if s["native_id"] == session_id)
+        assert stored["mission"].startswith(short_title + "\nTâche : ")
+        assert lookup_task_title("T417-C") in stored["mission"]
         with urlopen(base + "/api/supervision/summary") as response:
             summary = json.loads(response.read().decode("utf-8"))
-        assert summary["sessions"][0]["display_title"] == f"T417-C-AGY02 {lookup_task_title('T417-C')}"
+        assert summary["sessions"][0]["display_title"] == short_title
+        assert summary["sessions"][0]["display_title"] != f"T417-C-AGY02 {lookup_task_title('T417-C')}"
     finally:
         server.supervision.close()
         server.shutdown()
@@ -100,14 +127,19 @@ def test_connect_refuses_a_second_session_for_the_same_formal_task(tmp_path):
         else:
             raise AssertionError("a formal task cannot be monitored by two sessions")
         # AC-F1.7 Handover : avec reassign=True, la session existante est reassignee sans doublon
-        reassigned = connect("claude", sid_b, "T423-CC02", "T423", "Mission B", base, reassign=True)
+        reassigned = connect("claude", sid_b, "T423-CC02", "T423", "Mission B", base,
+                             reassign=True, display_title="T423-CC02 MISSION B")
         assert reassigned["status"] == "reassigned"
         assert reassigned["native_id"] == sid_b
         assert reassigned["previous_alias"] == "T423-CC01"
+        assert reassigned["display_title"] == "T423-CC02 MISSION B"
         with urlopen(base + "/api/supervision") as response:
             snapshot = json.loads(response.read().decode("utf-8"))
         assert len(snapshot["sessions"]) == 1
         assert snapshot["sessions"][0]["native_id"] == sid_b
+        with urlopen(base + "/api/supervision/summary") as response:
+            summary = json.loads(response.read().decode("utf-8"))
+        assert summary["sessions"][0]["display_title"] == "T423-CC02 MISSION B"
     finally:
         server.supervision.close()
         server.shutdown()
@@ -130,6 +162,9 @@ def test_connect_rejects_unknown_task_incoherent_alias_and_wrong_title(monkeypat
     official_title = lookup_task_title("T423")
     with pytest.raises(ValueError, match="différent du titre officiel"):
         connect("claude", "native-id", "T423-CC01", "T423", "Mission", task_title="Titre inventé")
+
+    with pytest.raises(ValueError, match="Titre de session trop long"):
+        connect("claude", "native-id", "T423-CC01", "T423", "Mission", display_title="x" * 80)
 
     with pytest.raises(ValueError, match="Titre explicite requis"):
         connect("claude", "native-id", "T000-CDX02", "T000", "Exploration")
@@ -162,10 +197,16 @@ def test_connect_no_formal_task_requires_confirmed_t000_id_agent_and_title(tmp_p
         assert result["task_title"] == "Session naming"
         assert result["mission_structure_loaded"] is False
 
+        with urlopen(base + "/api/supervision/summary") as response:
+            summary = json.loads(response.read().decode("utf-8"))
+        summary_assignment = next(item for item in summary["sessions"] if item["native_id"] == native_id)
+        assert summary_assignment["display_title"] == "T000-CC03"
+        assert not any(path.startswith("DOC/WFLOW/TASKS/T000-")
+                       for path in summary_assignment["socle"])
         with urlopen(base + "/api/supervision") as response:
-            snapshot = json.loads(response.read().decode("utf-8"))
-        assignment = next(item for item in snapshot["sessions"] if item["native_id"] == native_id)
-        assert assignment["mission"].startswith("T000-CC03 Session naming\nTâche / sujet : T000 Session naming\n")
+            full = json.loads(response.read().decode("utf-8"))
+        assignment = next(item for item in full["sessions"] if item["native_id"] == native_id)
+        assert assignment["mission"].startswith("T000-CC03\nTâche / sujet : T000 Session naming\n")
     finally:
         server.supervision.close()
         server.shutdown()

@@ -66,6 +66,8 @@ launch_workspace.ps1
 .agents/skills/*
 !.agents/skills/plan-project/
 !.agents/skills/plan-project/SKILL.md
+!.agents/skills/rename-session/
+!.agents/skills/rename-session/SKILL.md
 .codex/
 .immorterm/
 .opencode/
@@ -87,6 +89,10 @@ package-lock.json
 !.claude/commands/
 .claude/commands/*
 !.claude/commands/plan-project.md
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/rename-session/
+!.claude/skills/rename-session/SKILL.md
 .mgs-workspace.code-workspace
 node_modules/
 

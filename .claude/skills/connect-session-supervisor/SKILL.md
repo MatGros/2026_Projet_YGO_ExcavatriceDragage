@@ -13,7 +13,8 @@ Cette commande rattache une session existante au Superviseur local. Elle n'envoi
 
 1. **ID natif exact** de la conversation courante. Utilise seulement les métadonnées fiables du runtime ou l'ID fourni par l'utilisateur. Ne cherche jamais la session la plus récente et ne confonds pas ID de conversation et ID agent.
 2. **ID tâche** `T###` et **ID agent de session** encodé dans l'alias canonique, par exemple `T427-CC02`. La partie tâche de l'alias doit être identique à `--task`. L'ID agent de session est distinct du champ agent propriétaire de la tâche dans `TASKS.yaml`.
-3. **Titre lisible** : pour une tâche formelle, le script le résout depuis `TASKS.yaml` et refuse si la tâche ou son titre est absent ou ambigu. Pour `T000`, fournir `--task-title`. `--mission` est le contexte de travail et ne remplace jamais le titre.
+3. **Titre officiel de tâche** : pour une tâche formelle, le script le résout depuis `TASKS.yaml` et refuse si la tâche ou son titre est absent ou ambigu. Pour `T000`, fournir `--task-title`. Ce titre reste dans les métadonnées et la mission Superviseur.
+4. **Titre UI court (facultatif)** : `--display-title "REFONTE WORKFLOW AGENT"` ajoute ce libellé après l'alias ; par défaut, le titre UI est l'alias seul. Maximum 80 caractères. `--mission` reste le contexte de travail.
 
 Si l'utilisateur confirme un suivi sans tâche formelle, utiliser l'alias `T000-<AGENT>`, `--task "SANS TACHE FORMELLE"`, un `--task-title` explicite et `--confirm-without-task`. La liaison sera enregistrée sous l'identifiant provisoire `T000`.
 
@@ -24,7 +25,7 @@ Si la même session native est déjà reliée avec une tâche, un agent ou un ti
 Depuis la racine du dépôt, utilise le client local :
 
 ```powershell
-py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/connect_session.py --platform <claude|codex|agy|dsh> --session-id "<ID natif exact>" --alias "<T427-CC02>" --task "T427" --mission "<contexte court>" [--reassign]
+py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/connect_session.py --platform <claude|codex|agy|dsh> --session-id "<ID natif exact>" --alias "<T427-CC02>" --task "T427" --display-title "REFONTE WORKFLOW AGENT" --mission "<contexte court>" [--reassign]
 ```
 
 Pour une session T000, ajoute `--task-title "<titre lisible explicite>"`.
