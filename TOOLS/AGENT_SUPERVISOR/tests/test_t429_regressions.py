@@ -307,7 +307,12 @@ def test_mission_proposal_is_exposed_but_never_written(tmp_path):
     try:
         svc.command({'action': 'set_mission', 'id': sid, 'mission': 'Tâche / sujet : T999 essai\nJalon : J2'})
         item = svc.snapshot()['sessions'][0]
-        assert item['mission_structure_proposal'] == {'subject': 'T999 essai', 'task_ref': 'T999', 'milestone': 'J2'}
+        # T429 (2026-11-13) : la fiche propose TOUJOURS ses lignes, dont la criticite
+        # (source : contrat) ; l ecriture reste reservee a l exploitant.
+        assert item['mission_structure_proposal'] == {'subject': 'T999 essai', 'task_ref': 'T999',
+                                                     'milestone': 'J2', 'criticality': 'C2'}
+        assert item['mission_structure_sources']['criticality'] == 'contrat'
+        assert item['mission_structure_sources']['subject'] == 'mission'
         assert not item.get('mission_structure'), 'a proposal is never stored without confirmation'
         svc.command({'action': 'set_mission_structure', 'id': sid, 'structure': {'milestone': 'J3'}})
         assert 'milestone' not in svc.snapshot()['sessions'][0]['mission_structure_proposal'], 'filled fields are not re-proposed'

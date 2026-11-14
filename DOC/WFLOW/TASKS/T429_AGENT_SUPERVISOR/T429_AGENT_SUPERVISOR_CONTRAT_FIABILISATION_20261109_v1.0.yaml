@@ -15,6 +15,26 @@ contract:
     decisions humaines, et presente des constats lisibles, coherents entre IHM et plugin,
     actionnables en peu de gestes (dont l'envoi explicite au chat), prouve sur parcours reels.
 
+  # T429 (2026-11-14) : l objectif est decompose en LIVRABLES, pour que la suffisance
+  # et la pertinence des criteres soient verifiables automatiquement (check_task_contract,
+  # controle T10). Un livrable sans critere = non couvert.
+  livrables:
+    - id: LV-SERVICE
+      path: TOOLS/AGENT_SUPERVISOR/scripts/supervisor_service.py
+      attendu: "collecte, memoire, constats, provenance, livraison"
+    - id: LV-IHM
+      path: TOOLS/AGENT_SUPERVISOR/ui/index.html
+      attendu: "constats lisibles, memoire visible, provenance affichee"
+    - id: LV-CONTRAT
+      path: DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml
+      attendu: "criteres mesurables et suivis"
+    - id: LV-PLAN
+      path: DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md
+      attendu: "jalons, restes, preuves"
+    - id: LV-PLUGIN
+      path: TOOLS/AGENT_SUPERVISOR/poc/vscode-notifier
+      attendu: "notification, son, clic vers la bonne carte"
+
   # Regle de mesure : chaque AC est PASS seulement si sa verification nommee a ete executee
   # et sa sortie consignee dans tracking.experiments. Un test synthetique ne valide jamais
   # un AC marque [REEL]. Preuve absente = NOT_TESTED, jamais PASS.
@@ -72,7 +92,7 @@ contract:
       verified_by: "pytest 3 cas"
     - id: AC-F2.6
       statement: "Les scenarios T428 S1 a S5 rejoues dans le service avec DeepSeek V4.1 donnent le verdict attendu du tableau de reference sur au moins 4/5 cas, 0 citation inventee acceptee, resultats bruts publies."
-      verified_by: "script de campagne → JSON de preuve sous DOC/WFLOW/ETUDES/, verdict par cas"
+      verified_by: "py -3.13 TOOLS/AGENT_SUPERVISOR/tests/run_cycle_live.py (script de campagne) -> JSON de preuve sous DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/PREUVES/, verdict par cas"
     - id: AC-F2.7
       statement: "La mission texte existante est conservee a l'octet pres lors de l'ajout d'une fiche structuree ; champs vides affiches 'A renseigner'."
       verified_by: "pytest test_mission_structure + test DOM"
@@ -103,28 +123,28 @@ contract:
       verified_by: "test croise : meme fixture servie a summary.js et a l'IHM, 5 etats (Warning ouvert, Alarm, clos, resolution proposee, donnees perimees) → 0 divergence"
     - id: AC-F3.2
       statement: "Chaque carte de constat propose au plus 3 actions principales a effet explicite ; clore avec motif se fait en 3 gestes ou moins ; un commentaire seul ne decremente pas les ouverts."
-      verified_by: "test DOM comptant boutons et gestes + challenge ergonomie A/B (2 reviewers distincts, convergence ou arbitrage consigne)"
+      verified_by: "node TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs (test DOM : boutons et gestes) + 2 challenges ergonomie A/B (2 reviewers distincts, convergence ou arbitrage consigne)"
     - id: AC-F3.3
       statement: "Apercu cadrage et copie conserves : 'Copier pour le chat' copie le cadrage formate. Retrait du push injection UI autonome (Confirm send) suite au pivot utilisateur 2026-11-09. Consultation deterministe via la commande pull /review-session-supervisor (Alarm > Warning FIFO) integree dans Claude Code, Antigravity et DSH."
       verified_by: "pytest (test_review_session.py 9 tests) + test_ui.mjs validant le bouton Copier pour le chat et l'absence d'envoi aveugle"
     - id: AC-F3.4
       statement: "Constats tries du plus recent au plus ancien (ordre stable) ; clic sur une session affiche ses constats deplies ; lien ?session=&alert= vers un constat ancien fonctionne apres rafraichissement."
-      verified_by: "test DOM (normal + deep link)"
+      verified_by: "node TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs et VEILLEUR_UI_DEEP_LINK=1 node TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs (test DOM normal + deep link)"
     - id: AC-F3.5
       statement: "Un nouveau Warning ou Alarm declenche une seule notification bureau, un son et un toast VS Code ; le clic ouvre la bonne session et la bonne carte."
       verified_by: "test DOM deduplication + [REEL] observation exploitant consignee (notification, son, toast, clic) OK/KO"
     - id: AC-F3.6
       statement: "Carte de constat : titre court (<= 80 caracteres), resume d'une ligne, faits en puces, citation complete depliable, texte du resume non repete dans le detail."
-      verified_by: "test DOM sur constat reel long ('Reussite sans preuve') : longueur titre, presence puces, absence de duplication"
+      verified_by: "node TOOLS/AGENT_SUPERVISOR/tests/ui_layout_check.mjs (test navigateur headless sur constat reel long : longueur titre, puces, absence de duplication)"
     - id: AC-F3.7
       statement: "A 360 px de large et zoom 200 %, aucun texte long (UUID, chemin Windows, motif, commentaire multiligne) n'est coupe de facon inaccessible ni ne provoque de defilement horizontal de page."
-      verified_by: "test navigateur headless : scrollWidth page <= largeur, contenu integral accessible"
+      verified_by: "node TOOLS/AGENT_SUPERVISOR/tests/ui_layout_check.mjs (test navigateur headless : scrollWidth <= largeur, contenu integral accessible)"
     - id: AC-F3.8
       statement: "Le survol du plugin met Alarm/Warning en tete avec sessions concernees ; des donnees perimees ne s'affichent jamais comme '0 constat'."
       verified_by: "tests npm du plugin (summary.test.js) sur les 5 etats de AC-F3.1"
     - id: AC-F3.9
       statement: "Ergonomie globale jugee simple : un utilisateur trouve, comprend et traite un constat sans aide."
-      verified_by: "2 challenges ergonomie independants (A/B) sur captures + parcours ecrits, ecarts traites ou consignes ; retour exploitant final"
+      verified_by: "observation de l exploitant : 2 challenges ergonomie independants (A/B) sur captures + parcours ecrits, ecarts traites ou consignes ; retour exploitant final consigne dans ce contrat"
     - id: AC-F3.10
       statement: "Demande exploitant 2026-11-09 (Sécurité Déconnexion IHM) : signalement persistant de la perte de connexion (Failed to fetch) dans le menu lateral gauche sticky (.app-sidebar.is-disconnected avec fond rouge pastel et bandeau #sidebar-disconnected) empechant le travail aveugle sans surveillance au defilement vertical ; retablissement automatique a la reconnexion."
       verified_by: "test DOM test_ui.mjs (presence classe is-disconnected et bandeau sticky lors de l'echec de fetch) PASS"
@@ -136,13 +156,13 @@ contract:
     # ── F4 Recette comparee et parcours reels ─────────────────────────────────
     - id: AC-F4.1
       statement: "Comparaison A (pipeline avant T429) / B (apres) sur le meme corpus francais et le meme modele : resultats par cas, faux positifs, non-detections, citations, doublons, latence publies."
-      verified_by: "JSON de campagne sous DOC/WFLOW/ETUDES/ + tableau dans le document de pilotage"
+      verified_by: "py -3.13 TOOLS/AGENT_SUPERVISOR/tests/run_campaign_fr.py (campagne A/B) -> JSON de preuve sous DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/PREUVES/ + tableau dans le plan de pilotage"
     - id: AC-F4.2
       statement: "Criteres mecaniques nuls : 0 mauvaise affectation, 0 citation inventee acceptee, 0 perte silencieuse, 0 divergence de compteurs sur l'ensemble des recettes."
-      verified_by: "agregation des preuves AC-F1.* AC-F2.* AC-F3.1"
+      verified_by: "py -3.13 -m pytest TOOLS/AGENT_SUPERVISOR/tests TOOLS/AGENT_WORKFLOW/tests -q (agregation des preuves AC-F1.* AC-F2.* AC-F3.1)"
     - id: AC-F4.3
       statement: "Parcours reels Claude, Antigravity, Codex et DSH : pour chacun, une session d'essai rattachee voit au moins 1 message collecte avec la bonne plateforme et le bon UUID, ou la limite est documentee avec sa cause."
-      verified_by: "[REEL] GET /api/supervision par plateforme, consigne dans le document de pilotage"
+      verified_by: "curl -s http://127.0.0.1:8082/api/supervision (par plateforme), consigne dans le plan de pilotage"
 
     # ── Transverse ────────────────────────────────────────────────────────────
     - id: AC-X.1
@@ -150,7 +170,7 @@ contract:
       verified_by: "git status --short avant/apres chaque lot ; comparaison de l'etat des deux affectations avant/apres"
     - id: AC-X.2
       statement: "Toutes les suites passent en fin de lot : pytest, test_ui.mjs (normal + deep link), npm test du plugin, git diff --check."
-      verified_by: "sorties des 4 commandes consignees"
+      verified_by: "py -3.13 -m pytest TOOLS/AGENT_SUPERVISOR/tests -q ; node TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs ; node TOOLS/AGENT_SUPERVISOR/tests/ui_layout_check.mjs ; (cd TOOLS/AGENT_SUPERVISOR/poc/vscode-notifier && npm test) — sorties des 4 commandes consignees"
 
   scope:
     allowed:

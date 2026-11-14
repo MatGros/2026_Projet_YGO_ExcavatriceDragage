@@ -53,7 +53,7 @@ def test_statusline_reapplies_full_explicit_terminal_title(monkeypatch, capsys):
         lambda *_args: ("T000-AGY02 GEMINI 4 HYDRO CHALLENGE SIMU M3", "AGY02"),
     )
     monkeypatch.setattr(session_statusline, "get_supervisor_status", lambda *_args: "Supervisor: Linked")
-    monkeypatch.setattr(session_statusline, "set_terminal_title", lambda title: title_writes.append(title))
+    monkeypatch.setattr(session_statusline.terminal_title, "refresh", lambda _conv_id, title: title_writes.append(title))
 
     session_statusline.main()
 

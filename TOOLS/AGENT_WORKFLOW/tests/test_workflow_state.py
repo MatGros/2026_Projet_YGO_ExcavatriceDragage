@@ -180,3 +180,28 @@ def test_journal_reel_non_touche(tmp_path, capsys):
     ws.main(["enter", "--session", KEY_A])
     apres = reel.stat().st_mtime_ns if reel.is_file() else None
     assert avant == apres
+    assert (tmp_path / "trace" / "trace.jsonl").is_file(), "l'événement doit aller dans le journal de test"
+
+
+def test_troncature_queue_detectee(tmp_path, capsys):
+    import trace_log
+    ws.main(["enter", "--session", KEY_A])
+    ws.main(["off", "--session", KEY_A])
+    assert trace_log.verify_chain()["intact"] is True
+    path = tmp_path / "trace" / "trace.jsonl"
+    lines = path.read_text(encoding="utf-8").splitlines()
+    path.write_text(chr(10).join(lines[:-1]) + chr(10), encoding="utf-8")
+    assert trace_log.verify_chain()["intact"] is False
+
+
+def test_voie_sans_mode_refusee(tmp_path, capsys, monkeypatch):
+    monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", KEY_A)
+    ws.main(["enter", "--session", KEY_A])
+    assert ws.main(["voie", "9", "--session", KEY_A]) == 2
+
+
+def test_source_hors_enum_ramenee_a_cli(tmp_path, capsys, monkeypatch):
+    monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", KEY_A)
+    ws.main(["cmd", "resume", "--source", "n_importe_quoi"])
+    evts = [e for e in _journal(tmp_path) if e.get("kind") == "workflow"]
+    assert evts and all(e.get("source") == "cli" for e in evts)

@@ -51,6 +51,9 @@ def get_workflow_badge(conv_id):
         voie = data.get("voie") or "libre"
         etape = data.get("etape")
         detail = " · ".join(part for part in (etape, voie) if part)
+        criticality = data.get("criticality") or ""
+        if criticality:
+            detail = f"{criticality} · {detail}"
         marker = ""
         try:
             attestation = json.loads((WORKFLOW_STATE_DIR / f"{conv_id}.attest.json").read_text(encoding="utf-8"))

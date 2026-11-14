@@ -208,6 +208,14 @@ def main() -> int:
         except Exception:
             alias = ""
         expected = task_socle.socle_for(task_socle.task_id_from_alias(alias) or "")
+        try:
+            import vigilance
+            profile = vigilance.profile_for_task(task_socle.task_id_from_alias(alias) or "")
+            for path in profile.get("socle_ajoute") or []:
+                if path not in expected:
+                    expected.append(path)
+        except Exception:
+            pass
         if expected:
             socle_state = task_socle.read_status(transcript, expected)
             socle_state["attendu"] = expected

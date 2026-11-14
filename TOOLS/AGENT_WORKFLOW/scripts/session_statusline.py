@@ -416,19 +416,8 @@ def main():
 
             sup_badge = get_supervisor_status(conv_id)
             print(f"{colored_label} {dim}│{reset} {sup_badge}")
-            # 2026-11-13 : deuxième ligne compacte — état du workflow + repère git.
-            scope_badge = get_scope_badge(conv_id, stdin_transcript)
-            socle_badge = get_socle_badge(conv_id)
-            cadrage_badge = get_cadrage_badge(conv_id)
-            alias = ""
-            try:
-                alias = str((raw_title or "")).split()[0] if raw_title else ""
-            except Exception:
-                alias = ""
-            progress_badge = get_progress_badge(alias)
-            parts = [part for part in (progress_badge, socle_badge, cadrage_badge, scope_badge) if part]
-            scope_part = (" │ " + "".join(parts)) if parts else ""
-            print(f"{STATUSLINE_INDENT}{get_workflow_badge(conv_id)}{scope_part} │ {get_git_badge()}")
+            # 2026-11-14 : deuxième ligne épurée et uniforme (AGY / Claude / Codex) — workflow + git uniquement.
+            print(f"{STATUSLINE_INDENT}{get_workflow_badge(conv_id)} │ {get_git_badge()}")
     except Exception:
         # Filet de sécurité absolu : ne JAMAIS crasher en code 1
         print("🚀 AGY Antigravity")
