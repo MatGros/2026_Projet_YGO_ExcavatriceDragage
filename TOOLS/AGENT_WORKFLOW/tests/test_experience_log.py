@@ -11,7 +11,8 @@ import experience_log
 
 def test_write_and_read_per_post(tmp_path, monkeypatch):
     monkeypatch.setattr(experience_log, "EXPERIENCE_DIR", tmp_path)
-    monkeypatch.setattr(experience_log, "log_path", lambda _s: tmp_path / "s1.jsonl")
+    monkeypatch.setattr(experience_log, "post_path", lambda _p: tmp_path / "poste.jsonl")
+    monkeypatch.setattr(experience_log, "session_path", lambda _s: tmp_path / "s1.jsonl")
     monkeypatch.setattr(experience_log, "all_log", lambda: tmp_path / "all.jsonl")
 
     experience_log.write("superviseur", "constat", "user: coupe -> agent: continue quand meme",
@@ -26,11 +27,14 @@ def test_write_and_read_per_post(tmp_path, monkeypatch):
     assert entries[1]["type"] == "auto-retrospective"
 
     assert len(experience_log.read("s1", poste="CC01")) == 1
+    # un fichier par poste de traitement
+    assert (tmp_path / "poste.jsonl").exists()
 
 
 def test_an_empty_pattern_is_refused(tmp_path, monkeypatch):
     monkeypatch.setattr(experience_log, "EXPERIENCE_DIR", tmp_path)
-    monkeypatch.setattr(experience_log, "log_path", lambda _s: tmp_path / "s2.jsonl")
+    monkeypatch.setattr(experience_log, "post_path", lambda _p: tmp_path / "poste.jsonl")
+    monkeypatch.setattr(experience_log, "session_path", lambda _s: tmp_path / "s2.jsonl")
     monkeypatch.setattr(experience_log, "all_log", lambda: tmp_path / "all.jsonl")
 
     try:
@@ -43,7 +47,8 @@ def test_an_empty_pattern_is_refused(tmp_path, monkeypatch):
 
 def test_review_groups_by_post(tmp_path, monkeypatch):
     monkeypatch.setattr(experience_log, "EXPERIENCE_DIR", tmp_path)
-    monkeypatch.setattr(experience_log, "log_path", lambda _s: tmp_path / "s3.jsonl")
+    monkeypatch.setattr(experience_log, "post_path", lambda _p: tmp_path / "poste.jsonl")
+    monkeypatch.setattr(experience_log, "session_path", lambda _s: tmp_path / "s3.jsonl")
     monkeypatch.setattr(experience_log, "all_log", lambda: tmp_path / "all.jsonl")
 
     experience_log.write("juge", "constat", "pattern A", "hypothese A", "action A", "s3")
