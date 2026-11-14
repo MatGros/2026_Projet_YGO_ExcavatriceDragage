@@ -373,7 +373,7 @@
             <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-10-31 14:20:24</div>
+    <div class="exec-time">2026-11-14 01:06:53</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (32 tests)</summary>
@@ -15393,7 +15393,7 @@ IF CycleFaultActive THEN
     ELSIF (CycleErrorId AND 16#0010) &lt;&gt; 0 THEN
         CycleFaultCauseStr := &#x27;tempo etape&#x27;;
     ELSIF (CycleErrorId AND 16#0020) &lt;&gt; 0 THEN
-        CycleFaultCauseStr := &#x27;stabilisation&#x27;;
+        CycleFaultCauseStr := &#x27;ecart codeurs remontee&#x27;;
     ELSIF (CycleErrorId AND 16#0040) &lt;&gt; 0 THEN
         CycleFaultCauseStr := &#x27;ecart position M1/M2&#x27;;
     ELSIF (CycleErrorId AND 16#0080) &lt;&gt; 0 THEN
@@ -15890,7 +15890,7 @@ IF (SyncContactorDiag.MismatchLevel &gt;= 1) AND (AlarmCount &lt; CST_NbMaxAlarm
     ELSIF SyncContactorDiag.Step2Mismatch   THEN BannerSyncContactorWhich := &#x27;palier 2&#x27;;
     ELSIF SyncContactorDiag.Step3Mismatch   THEN BannerSyncContactorWhich := &#x27;palier 3&#x27;;
     ELSIF SyncContactorDiag.Step4Mismatch   THEN BannerSyncContactorWhich := &#x27;palier 4&#x27;;
-    ELSE  BannerSyncContactorWhich := &#x27;&#x27;;
+    ELSE  BannerSyncContactorWhich := &#x27;non identifie&#x27;;
     END_IF;
     IF SyncContactorDiag.MismatchLevel &gt;= 2 THEN
         AlarmArray[AlarmCount] := CONCAT(&#x27;[SYNC] discordance M1/M2 persistante -&gt; coupure : &#x27;, BannerSyncContactorWhich);

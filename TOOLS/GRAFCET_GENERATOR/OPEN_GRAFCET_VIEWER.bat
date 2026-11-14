@@ -1,9 +1,9 @@
 @echo off
 chcp 65001 > nul
 title Cockpit GRAFCET Automatique (Parseur ST)
-echo ============================================================
+echo.
 echo 🧭 PARSEUR ST DE GRAFCET - EXTRACTION SANS LLM
-echo ============================================================
+echo.
 echo Generation des diagrammes et mise a jour du visualiseur...
 echo.
 

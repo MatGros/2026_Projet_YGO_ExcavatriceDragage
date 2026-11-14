@@ -43,7 +43,7 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 En tête de **chaque réponse de travail** (pas d'une simple réponse de dialogue), une seule ligne :
 
 ```text
-━━ 🟦 🔎 T427 · ÉTUDE · Orchestrator ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🟦 🔎 T427 · ÉTUDE · Orchestrator
 ```
 
 - ⬜ 💬 **CADRAGE** — tri de l'intention, questions
@@ -243,15 +243,11 @@ lot livré.
 diff bundle et gates quand ces contrôles sont requis :
 
 ```text
-========================================
 ✅ BUNDLE EXPORTÉ : CODE_XML/CODE_Bundle.xml
-========================================
 ```
 
 ```text
-========================================
 [OK] DIFF BUNDLE EXPORTE : CODE_XML/CODE_DiffBundle.xml
-========================================
 Objets inclus (+ fermeture des dependances de type) :
   - FB_SimBench
   - GVL_Simulation
@@ -259,11 +255,9 @@ Objets inclus (+ fermeture des dependances de type) :
 ```
 
 ```text
-========================================
 ✅ BUNDLE EXPORTÉ ET VALIDÉ
    Gates Palier C : 15/15 PASS
    G200 liaison : PASS (0 erreur)
-========================================
 ```
 
 - **Bandeau 1** : dès que `generate_codesys_bundle.py` réussit (bundle frais).

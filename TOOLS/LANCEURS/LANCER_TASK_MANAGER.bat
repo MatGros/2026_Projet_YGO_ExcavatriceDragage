@@ -2,9 +2,9 @@
 chcp 65001 >nul
 title TASK MANAGER — Visualiseur & Synchronisation TASKS.yaml
 
-echo ============================================================
+echo.
 echo 📋 LANCEMENT DU TASK MANAGER (SERVEUR LOCAL)
-echo ============================================================
+echo.
 echo.
 
 cd /d "%~dp0\..\TASK_MANAGER"

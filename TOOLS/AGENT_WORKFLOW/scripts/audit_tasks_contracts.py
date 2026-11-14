@@ -111,9 +111,7 @@ def main() -> int:
     duplicates = {k: v for k, v in prefix_map.items() if len(v) > 1}
 
     # ---- Rapport ----
-    print("=" * 70)
     print("AUDIT COHERENCE TACHES <-> CONTRATS")
-    print("=" * 70)
     print(f"Taches dans TASKS.yaml        : {len(tasks)}")
     print(f"Fichiers contrat (DOC+ARCH)   : {len(contract_files)}")
     print()
@@ -150,9 +148,7 @@ def main() -> int:
 
     # Synthese
     total_issues = len(no_contract_crit) + len(broken) + len(orphans_doc) + len(mismatched_taskid) + len(duplicates)
-    print("=" * 70)
     print(f"SYNTHESE : {total_issues} ecart(s) detecte(s)")
-    print("=" * 70)
     return 0
 
 

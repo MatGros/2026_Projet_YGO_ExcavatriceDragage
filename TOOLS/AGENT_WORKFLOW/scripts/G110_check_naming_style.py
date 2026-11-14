@@ -314,12 +314,10 @@ def main() -> int:
         new_findings[rule] = new_items
 
     # Affichage du tableau récapitulatif
-    print("=" * 100)
     print("AUDIT DE NOMMAGE IEC 61131-3 (G110_check_naming_style.py)")
     print("Référentiel : DOC/STDS/NAMING_CONVENTION.md (Règles NC-010 à NC-070)")
-    print("=" * 100)
     print(f"{'Règle':<8} | {'Description':<52} | {'Conformes':<9} | {'Exemptés/Legacy':<15} | {'Baseline':<9} | {'Nouveaux':<8}")
-    print("-" * 100)
+    print()
 
     total_conf = 0
     total_ex_leg = 0
@@ -353,9 +351,8 @@ def main() -> int:
         }
         print(f"{rule:<8} | {desc_map[rule]:<52} | {conf:<9} | {ex_leg:<15} | {rule_base:<9} | {rule_new:<8}")
 
-    print("-" * 100)
+    print()
     print(f"{'TOTAL':<8} | {'Ensemble des 7 règles analysées':<52} | {total_conf:<9} | {total_ex_leg:<15} | {total_base:<9} | {total_new:<8}")
-    print("=" * 100)
 
     if new_count > 0:
         print(f"\n[WARNING] {new_count} NOUVEAU(X) SIGNALEMENT(S) DE NOMMAGE (hors baseline) :")

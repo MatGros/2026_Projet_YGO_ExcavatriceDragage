@@ -32,7 +32,7 @@ def test_identite_tache_affichee(capsys):
     out = capsys.readouterr().out
     assert "🎯 Tâche : T427 — Titre de T427" in out
     assert "🆔 Session : T427-CC02" in out
-    assert "━━ 🟢 T427 · WORKFLOW ACTIF" in out
+    assert "🟢 T427 · WORKFLOW ACTIF" in out
 
 
 def test_hors_catalogue_T000_dit_aucune_tache(capsys):

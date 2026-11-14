@@ -12,9 +12,7 @@ de coordination définis dans cette skill.
 Au déclenchement, afficher :
 
 ```text
-============================================================
 🗂️ WORKFLOW TÂCHES / TASK-PLANNER ACTIF
-============================================================
 ```
 
 ## Concepts strictement séparés

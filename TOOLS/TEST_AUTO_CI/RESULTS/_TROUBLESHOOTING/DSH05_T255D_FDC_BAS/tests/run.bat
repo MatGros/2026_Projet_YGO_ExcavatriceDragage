@@ -2,10 +2,10 @@
 setlocal
 set "SCRIPT_DIR=%~dp0"
 
-echo ========================================================
+echo.
 echo   TROUBLESHOOTING : DSH01_T255D_FDC_BAS
 echo   Reproduction exploratoire (hors CI officiel)
-echo ========================================================
+echo.
 
 python "%SCRIPT_DIR%run.py" %*
 

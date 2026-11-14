@@ -87,13 +87,11 @@ def inventory(root: Path, args: argparse.Namespace) -> None:
 
     if not declarees or not codees:
         raise ValueError("Inventaire vide : transitions declarees et codees requises")
-    print("=" * 90)
     print(f"SOURCE GEL : {gel_path}")
     print("TRANSITIONS DECLAREES AU GEL : %d" % len(declarees))
     print("TRANSITIONS CODEES (State := AX...) : %d" % len(codees))
-    print("=" * 90)
     print("%-6s %-26s %-26s %s" % ("LIGNE", "SOURCE (etape courante)", "CIBLE", "VERDICT"))
-    print("-" * 90)
+    print()
     hors, arriere = 0, 0
     for n, s, c in codees:
         if s == c:
@@ -109,9 +107,8 @@ def inventory(root: Path, args: argparse.Namespace) -> None:
                 verdict += "  <<< SAUT ARRIERE"
                 arriere += 1
         print("%-6d %-26s %-26s %s" % (n, s, c, verdict))
-    print("-" * 90)
+    print()
     print("RESULTAT : %d transition(s) NON declaree(s) au GEL, dont %d SAUT(S) ARRIERE" % (hors, arriere))
-    print("=" * 90)
     print("(lecture seule : inventaire produit, pas une validation des transitions)")
 
 

@@ -3,9 +3,9 @@ rem Fichier volontairement ASCII pur : le parseur cmd deforme les emojis UTF-8 e
 chcp 65001 >nul
 title OMNIDIAG - Explorateur de Diagnostics et Alarmes
 
-echo ============================================================
+echo.
 echo   OMNIDIAG - EXPLORATEUR DE DIAGNOSTICS ET ALARMES
-echo ============================================================
+echo.
 echo.
 
 cd /d "%~dp0\..\OMNIDIAG"

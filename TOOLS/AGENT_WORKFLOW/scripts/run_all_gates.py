@@ -345,9 +345,8 @@ def main() -> int:
         target_label = "FICHIER(S) " + " ".join(str(f) for f in args.files)
     else:
         target_label = f"PALIER {args.palier.upper()}" if args.palier else "TOUS LES PALIERS"
-    print("\n" + "=" * 60, flush=True)
+    print(flush=True)
     print(f"ðŸ§ª GATES PROJET / MODE {mode_label} ACTIF", flush=True)
-    print("=" * 60, flush=True)
     print(f"Cible : {target_label} Â· {len(plan)} gate(s) prÃ©vues", flush=True)
     print("LÃ©gende : âœ… PASS Â· âŒ FAIL Â· durÃ©e cumulÃ©e par famille", flush=True)
 
@@ -358,9 +357,8 @@ def main() -> int:
     def gate(idx: int, total: int, title: str, cmd: list[str]) -> bool:
         clean_title = title.encode("ascii", "replace").decode("ascii")
         if not args.compact:
-            print("\n" + "=" * 60, flush=True)
+            print(flush=True)
             print(f"â³ [{idx}/{total}] {clean_title} ...", flush=True)
-            print("=" * 60, flush=True)
         t0 = time.perf_counter()
         code, out, _err = run_stream(cmd, project_root, stream=not args.compact)
         duration = time.perf_counter() - t0
@@ -377,17 +375,15 @@ def main() -> int:
         return code == 0
 
     for gid, title in skipped_global:
-        print("\n" + "=" * 60, flush=True)
+        print(flush=True)
         print(title, flush=True)
-        print("=" * 60, flush=True)
         print(f"[--] Gate {gid} global : non applicable en mode --files (bloc isolÃ©). S'exÃ©cutera sur le bundle complet (palier C).", flush=True)
         results.append((f"{title} [non applicable : gate global, bundle requis]", True, 0.0))
 
     d_plan = [g for g in plan if g[1] == "500"]
     if d_plan and not args.codesys_log and not args.skip_codesys:
-        print("\n" + "=" * 60, flush=True)
+        print(flush=True)
         print("G500 â€” Compilation CODESYS (log)", flush=True)
-        print("=" * 60, flush=True)
         print("Palier D = validation sur demande : fournir --codesys-log <build.log> pour exÃ©cuter G500.", flush=True)
         results.append(("G500 â€” Compilation CODESYS (log) [sautÃ© : aucun log fourni]", True, 0.0))
         plan = [g for g in plan if g[1] != "500"]
@@ -434,13 +430,12 @@ def main() -> int:
 
     total_duration = time.perf_counter() - start_total_time
 
-    print("\n" + "=" * 60)
+    print()
     if file_mode:
         label = "FICHIER(S) " + " ".join(str(f) for f in args.files)
     else:
         label = f"PALIER {args.palier.upper()}" if args.palier else "TOUT"
     print(f"RESUME â€” {label} (Temps total : {total_duration:.2f}s)")
-    print("=" * 60)
     failed = [title for title, ok, _dur in results if not ok]
     if args.compact:
         for family, ok, passed, count, duration in compact_results:
@@ -451,7 +446,7 @@ def main() -> int:
             status_str = "PASS" if ok else "FAIL"
             print(f"  {color_status(status_str, ok):4s}  [{dur:6.2f}s]  {title}")
     
-    print("-" * 60)
+    print()
     print(f"TEMPS TOTAL DE L'EXECUTION : {total_duration:.2f} secondes")
     
     if failed:

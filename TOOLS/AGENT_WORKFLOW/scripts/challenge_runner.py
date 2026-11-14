@@ -53,14 +53,11 @@ def validate_output_path(output_path: str):
 
     t279_pattern = r"^DOC/WFLOW/TASKS/T[0-9]+[^/]*/(PREUVES|ARCHIVES)/.+"
     if not re.match(t279_pattern, rel, re.IGNORECASE):
-        print("=" * 72)
         print(f"⛔ [BLOQUÉ NORME T279] Chemin de sortie non conforme : '{output_path}'")
-        print("=" * 72)
         print("Règles obligatoires (AGENTS.md & STRUCTURE_AND_CLEANUP.md) :")
         print("  1. Interdit d'écrire des fichiers à la racine du dépôt ou dans DOC/WFLOW/.")
         print("  2. Règle '1 tâche = 1 dossier' : classer sous :")
         print("     DOC/WFLOW/TASKS/T<ID>_<NOM>/PREUVES/<session>/ ou ARCHIVES/")
-        print("=" * 72)
         sys.exit(1)
 
 
@@ -132,9 +129,8 @@ def run_prompt_check(prompt: str, targets: list[str] = None, model: str = DEFAUL
         "Livre ton analyse Étape 0 : Biais démasqués, Objectif recadré mesurable, Non-Goals, Critères de validation."
     )
 
-    print("\n" + "=" * 72)
+    print()
     print("🎯 ÉTAPE 0 : CHALLENGE & CADRAGE PRÉALABLE DU PROMPT (Anti-Garbage-In)")
-    print("=" * 72)
     
     t0 = time.time()
     res = execute_llm_query(system_prompt, user_query, model)
@@ -190,9 +186,8 @@ def run_full_challenge(prompt: str, targets: list[str] = None, task_id: str = No
     if output_file:
         validate_output_path(output_file)
 
-    print("\n" + "=" * 72)
+    print()
     print("🥊 LANCEMENT DU CHALLENGE TECHNIQUE (Cadrage ➔ A vs B ➔ Arbitrage C)")
-    print("=" * 72)
 
     t0 = time.time()
     response_text = execute_llm_query(full_system, user_query, model)
@@ -211,7 +206,6 @@ def run_full_challenge(prompt: str, targets: list[str] = None, task_id: str = No
 
     print("\n=== RESTITUTION DU CHALLENGE ===")
     print(response_text)
-    print("=" * 72 + "\n")
 
     parsed, err = extract_yaml_payload(response_text)
     if err:

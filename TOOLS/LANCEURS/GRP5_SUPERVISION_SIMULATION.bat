@@ -1,16 +1,16 @@
 @echo off
 cd /d "%~dp0\..\.."
 chcp 65001 >nul
-echo =======================================================================
+echo.
 echo 🧪 GROUPE 5 : SUPERVISION, IHM ET SIMULATION
 echo    (J_SUPERVISION, L_SIMULATION)
-echo =======================================================================
+echo.
 echo.
 
 python TOOLS\TEST_AUTO_CI\scripts\run_tests.py --domain J_SUPERVISION L_SIMULATION
 
 echo.
-echo =======================================================================
+echo.
 echo 📄 Tableau de bord mis a jour : TOOLS\TEST_AUTO_CI\index.html
-echo =======================================================================
+echo.
 pause

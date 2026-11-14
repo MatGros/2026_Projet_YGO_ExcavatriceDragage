@@ -1268,9 +1268,7 @@ def load_tasks_yaml(yaml_path: Path):
 
 
 def main():
-    print("=" * 60)
     print("🔄 GÉNÉRATION DU CATALOGUE OFFICIEL (TASKS.yaml & TASKS.html)")
-    print("=" * 60)
 
     # TASKS.yaml est l'unique source de vérité officielle !
     tasks = load_tasks_yaml(TASKS_YAML)

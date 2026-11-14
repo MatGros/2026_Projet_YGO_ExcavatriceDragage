@@ -173,8 +173,8 @@ def render(etat: str, mode: str | None, seq: int | None, key: str = "", alias: s
     token = f"{etat}/{seq}" if seq is not None else etat
     head_id = task_of_alias(alias) or (alias or "sans session")
     lines = [
-        f"━━ {'🟢' if etat == 'ACTIF' else '🔴' if etat == 'OFF' else '⚪'} "
-        f"{head_id} · WORKFLOW {etat} · token {token} ━━━━━━━━━━━━━━━━━━━━━━━━",
+        f"{'🟢' if etat == 'ACTIF' else '🔴' if etat == 'OFF' else '⚪'} "
+        f"{head_id} · WORKFLOW {etat} · token {token}",
     ]
     if key:
         lines += identity_lines(key, alias)

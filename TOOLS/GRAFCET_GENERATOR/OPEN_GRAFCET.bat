@@ -2,9 +2,9 @@
 chcp 65001 >nul
 title Grafcet Generator & Cockpit Séquenceur - Excavatrice Dragage
 
-echo ============================================================
+echo.
 echo 🧭 GRAFCET GENERATOR -- OUVERTURE DU COCKPIT SEQUENCEUR
-echo ============================================================
+echo.
 echo.
 echo [1/2] Generation / Rafraichissement de la vue HTML...
 python "%~dp0generate_grafcet.py" --cycle data_homing.json --output index.html
@@ -20,7 +20,7 @@ echo [2/2] Lancement du navigateur par defaut...
 start "" "%~dp0index.html"
 
 echo.
-echo ============================================================
+echo.
 echo [OK] Page ouverte dans le navigateur.
-echo ============================================================
+echo.
 timeout /t 3 >nul

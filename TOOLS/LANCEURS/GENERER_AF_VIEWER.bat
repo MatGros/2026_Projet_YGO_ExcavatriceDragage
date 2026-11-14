@@ -2,9 +2,9 @@
 chcp 65001 >nul
 title AF VIEWER — Generation ^& Synchronisation Spec AF
 
-echo ============================================================
+echo.
 echo 📋 GENERATION ^& SYNCHRONISATION DU VISUALISEUR AF
-echo ============================================================
+echo.
 echo.
 
 cd /d "%~dp0\..\.."
@@ -27,18 +27,18 @@ set _RC=%ERRORLEVEL%
 if not "%_RC%"=="0" goto :err
 
 echo.
-echo ============================================================
+echo.
 echo ✅ SUCCES : TOOLS\AGENT_WORKFLOWeports\AF_VIEWER.html genere et synchronise !
-echo ============================================================
+echo.
 echo.
 pause
 exit /b 0
 
 :err
 echo.
-echo ============================================================
+echo.
 echo ❌ ECHEC de generation AF_VIEWER (code %_RC%)
-echo ============================================================
+echo.
 echo.
 pause
 exit /b %_RC%

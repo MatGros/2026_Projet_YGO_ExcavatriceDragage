@@ -59,15 +59,12 @@ def validate_output_path(output_path: str):
     is_doc_wflow_root = (len(parts) == 3 and parts[0].upper() == "DOC" and parts[1].upper() == "WFLOW")
 
     if is_repo_root or is_doc_wflow_root:
-        print("=" * 72)
         print(f"⛔ [BLOQUÉ NORME T279] Chemin de sortie interdit : '{output_path}'")
-        print("=" * 72)
         print("Règles obligatoires (AGENTS.md & STRUCTURE_AND_CLEANUP.md) :")
         print("  1. Interdit d'écrire des fichiers à la racine du dépôt ou dans DOC/WFLOW/.")
         print("  2. Règle '1 tâche = 1 dossier' : classer sous :")
         print("     DOC/WFLOW/TASKS/T<ID>_<NOM>/PREUVES/<session>/ ou ARCHIVES/")
         print("     Exemple : DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/PREUVES/.../T429_REVUE_..._v1.0.md")
-        print("=" * 72)
         sys.exit(1)
 
 
@@ -165,7 +162,6 @@ def query(prompt, model, base_url, system_prompt=None, output_file=None, tempera
         print(f"[opencode-go] reponse enregistree : {output_file}")
     print("\n=== REPONSE SOUS-AGENT OPENCODE-GO ===")
     print(text)
-    print("======================================")
     if usage:
         print(f"[usage] {usage}")
     return text

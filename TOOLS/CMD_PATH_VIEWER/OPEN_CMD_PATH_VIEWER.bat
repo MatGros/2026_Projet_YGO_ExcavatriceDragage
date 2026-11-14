@@ -14,9 +14,9 @@ set PAGE=http://127.0.0.1:%PORT%/TOOLS/CMD_PATH_VIEWER/index.html
 REM Racine du dépôt = deux niveaux au-dessus de ce fichier .bat
 pushd "%~dp0..\.."
 
-echo ============================================================
+echo.
 echo  CMD_PATH_VIEWER - MODE LIVE (serveur de fichiers statique)
-echo ============================================================
+echo.
 echo  Racine servie : %CD%
 echo  Page          : %PAGE%
 echo  Port          : %PORT%   (zéro logique métier côté serveur)
@@ -26,7 +26,7 @@ echo    %~dp0index.html
 echo  ... les badges de fraicheur y seront FIGES et horodates.
 echo.
 echo  Fermez cette fenetre (ou Ctrl+C) pour arreter le serveur.
-echo ============================================================
+echo.
 echo.
 
 start "" "%PAGE%"

@@ -4,9 +4,9 @@ set "SCRIPT_DIR=%~dp0"
 pushd "%~dp0..\.."
 
 if "%~1"=="" (
-    echo ========================================================
+    echo.
     echo   TEST_AUTO_CI : Testeur de FB specifique
-    echo ========================================================
+    echo.
     echo Usage:
     echo   run_fb.bat ^<Nom_du_FB^> [options]
     echo.
@@ -14,7 +14,7 @@ if "%~1"=="" (
     echo   run_fb.bat FB_Joystick
     echo   run_fb.bat FB_Safety_EmergencyManagement
     echo   run_fb.bat FB_Modes --debug
-    echo ========================================================
+    echo.
     set /p FB_NAME="Entrez le nom du FB a tester : "
 ) else (
     set "FB_NAME=%~1"
@@ -28,9 +28,9 @@ if "%FB_NAME%"=="" (
     exit /b 1
 )
 
-echo ========================================================
+echo.
 echo   Lancement du test pour %FB_NAME% (avec chronogrammes)
-echo ========================================================
+echo.
 python "%SCRIPT_DIR%scripts\run_tests.py" --fb %FB_NAME% %1 %2 %3 %4 %5 %6 %7 %8 %9
 echo.
 popd

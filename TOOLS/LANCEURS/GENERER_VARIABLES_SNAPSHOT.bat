@@ -2,9 +2,9 @@
 setlocal
 cd /d "%~dp0\..\.."
 
-echo ============================================================
+echo.
 echo GENERATION LISTE VARIABLES SNAPSHOT TROUBLESHOOTING
-echo ============================================================
+echo.
 py -3.13 "TOOLS\PLC_CSV_SNAPSHOT\variable_lists\generate_variable_list_from_code.py" --output "TOOLS\PLC_CSV_SNAPSHOT\variable_lists\troubleshooting_variables.txt"
 
 if errorlevel 1 (

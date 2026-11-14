@@ -1,15 +1,15 @@
 @echo off
 cd /d "%~dp0\..\.."
 chcp 65001 >nul
-echo =======================================================================
+echo.
 echo ⚡ LANCEMENT RAPIDE DU BANC DE TESTS CI (ASSERTIONS SEULES SANS HTML)
-echo =======================================================================
+echo.
 echo.
 
 python TOOLS\TEST_AUTO_CI\scripts\run_tests.py --all --fast
 
 echo.
-echo =======================================================================
+echo.
 echo ✅ Execution rapide terminee.
-echo =======================================================================
+echo.
 pause

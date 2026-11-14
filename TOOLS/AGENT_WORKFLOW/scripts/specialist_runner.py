@@ -73,14 +73,11 @@ def validate_output_path(output_path: str):
     # Whitelist stricte T279 : sous DOC/WFLOW/TASKS/T<ID>.../(PREUVES|ARCHIVES)/
     t279_pattern = r"^DOC/WFLOW/TASKS/T[0-9]+[^/]*/(PREUVES|ARCHIVES)/.+"
     if not re.match(t279_pattern, rel, re.IGNORECASE):
-        print("=" * 72)
         print(f"⛔ [BLOQUÉ NORME T279] Chemin de sortie non conforme : '{output_path}'")
-        print("=" * 72)
         print("Règles obligatoires (AGENTS.md & STRUCTURE_AND_CLEANUP.md) :")
         print("  1. Interdit d'écrire des fichiers à la racine du dépôt ou dans DOC/WFLOW/.")
         print("  2. Règle '1 tâche = 1 dossier' : classer obligatoirement sous :")
         print("     DOC/WFLOW/TASKS/T<ID>_<NOM>/PREUVES/<session>/ ou ARCHIVES/")
-        print("=" * 72)
         sys.exit(1)
 
 
@@ -101,9 +98,7 @@ def resolve_task_folder(task_id: str) -> str:
 
 
 def list_roles():
-    print("=" * 70)
     print("🤖 PANEL D'AGENTS SPÉCIALISÉS DU PROJET (Orientés Objet)")
-    print("=" * 70)
     for role, filename in ROLE_MAP.items():
         filepath = os.path.join(SPECIALISTS_DIR, filename)
         desc = "Fiche non trouvée"
@@ -114,19 +109,15 @@ def list_roles():
                         desc = line.replace("> **Rôle** :", "").strip()
                         break
         print(f"  • {role:<12} -> {desc}")
-    print("=" * 70)
 
 
 def list_prompts():
-    print("=" * 72)
     print("📚 CATALOGUE DES PROMPTS SYSTÈME DES PERSONAS SPÉCIALISÉS")
     print("📂 Répertoire de référence : DOC/WFLOW/PROMPTS/SPECIALISTS/")
-    print("=" * 72)
     for role, filename in PROMPT_FILE_MAP.items():
         filepath = os.path.join(PROMPTS_DIR, filename)
         exists_str = "✅ Présent" if os.path.exists(filepath) else "❌ Manquant"
         print(f"  • {role:<12} -> {filename:<32} [{exists_str}]")
-    print("=" * 72)
 
 
 def show_prompt(role: str):
@@ -139,13 +130,10 @@ def show_prompt(role: str):
         print(f"[ERREUR] Fichier de prompt introuvable : {filepath}")
         sys.exit(1)
 
-    print("=" * 72)
     print(f"📖 PROMPT SYSTÈME DU PERSONA [{role.upper()}]")
     print(f"📄 Fichier source : {os.path.relpath(filepath, REPO_ROOT)}")
-    print("=" * 72)
     with open(filepath, "r", encoding="utf-8") as f:
         print(f.read())
-    print("=" * 72)
 
 
 def load_persona(role: str) -> str:
@@ -282,7 +270,6 @@ def query_specialist(role: str, targets: list[str] = None, prompt: str = None, t
 
             print(f"\n=== RESTITUTION EXPERT [{role.upper()}] ===")
             print(response_text)
-            print("=" * 50 + "\n")
 
             # Validation du contrat YAML et code de sortie
             parsed, err = extract_and_validate_yaml(response_text)
