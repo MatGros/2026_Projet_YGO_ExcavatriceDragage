@@ -1,13 +1,14 @@
 tasks:
 - id: T417-C
   parent_id: T417
-  statut: ⏸️
+  statut: ⏳
   criticite: C2
   domaine: SIMULATION / SIMBENCH / TRANSLATION M3
   agent: AGY02
-  date: '2026-11-13T08:30:00'
+  date: '2026-11-15T03:07:30'
   titre: Challenge & diagnostic simulation M3 (depassement butee petite vitesse)
-  contexte: 'Phase 1 lecture seule + audit reel M3 (PRG_05/PRG_06/FB_Translation + L_SIMULATION). Dossier provisoire: DOC/WFLOW/TASKS/T000-AGY02_GEMINI_4_HYDRO_CHALLENGE_SIMU_M3.'
+  contexte: 'Phase 1 lecture seule + audit reel M3 (PRG_05/PRG_06/FB_Translation + L_SIMULATION). Dossier: DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3.
+    Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417-C.yaml.'
   description: Tri historique T417 sans effacer, cartographie chaine reelle M3 vs modele simule, registre d hypotheses, reproduction
     isolee en sandbox et dossier de patch (fix+guard) si valide.
   objectifs:

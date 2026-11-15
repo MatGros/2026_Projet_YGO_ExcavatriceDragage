@@ -443,3 +443,17 @@ Vérifié à la source avant inscription.
 - Résidu : fichier `statusline_cache/conversation-id.json` écrit par un test avant isolation (non supprimé, règle « aucune suppression automatique »).
 - Constat séparé : « ⚠ non entré » = attestation 98 tours, 0 conforme (ni ligne d'étape ni pied « ➡️ Choix »).
   Contradiction à trancher : consigne « plus d'emoji » (mémoire, 2026-11-14) contre `AGENTS.md` § Ligne d'étape (emoji).
+
+## 19. Revue du plan par workflow (2026-11-15) — verdict : PLAN À CORRIGER
+
+Workflow `review-plan-t427` (run `wf_92da4675-9ce`, 10 agents lecture seule : 3 relecteurs, 6 contradicteurs, 1 synthèse). 6 constats, tous confirmés après contradiction.
+
+1. **[bloquant] Garde de périmètre** : une dérogation lève aussi la liste d'interdiction absolue (`CODE/**` compris), et le périmètre du contrat n'est jamais pris en compte (`task_scope.py` classify sans périmètre épinglé ; `hook_scope_guard.decide` teste la dérogation avant l'interdiction). Cause réelle du « défaut du garde » (§17), pas la phase CADRAGE. → fix + guard.
+2. **GO non tracés** : registre unique des GO avec l'identifiant du message de l'exploitant ou de T000-CC10.
+3. **Documents désalignés** : ROLE.md et COORDINATOR.md citent des commandes inexistantes ; plan et notice disent « bloqué » pour O3 livré.
+4. **Jalons** : M0-M4 sans état (`plan_project` : 0/5) ; ajouter M5 (I1/I1b), M6 (journal B1-B4), M7 (fiches de rôle).
+5. **Backlog** : B2 avant B1 ; test binaire pour B1 ; tests xfail manquants (B12, B14, B15, B16).
+6. **Besoins non planifiés** : commandes de rôle, question « je gère qui, quoi ? », prompt F4 dans le Superviseur → items B testables.
+
+Décisions attendues de l'exploitant : D2/D3, validation a posteriori des fiches de rôle (f6753d24), emplacement et porteur de F4, écrivain du registre des dérogations.
+Workflow de suivi : non lancé tant que le plan n'est pas corrigé.

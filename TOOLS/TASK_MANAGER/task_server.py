@@ -366,6 +366,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.supervision_request(mutate=True)
         try:
             path, data = urllib.parse.urlparse(self.path).path, self.body()
+            if path == "/api/orchestrator/entry":
+                if str(UI.parent) not in sys.path:
+                    sys.path.insert(0, str(UI.parent))
+                from orchestrator_registry import append_entry
+                try:
+                    entry_id = append_entry(WFLOW / "TASKS_ORCHESTRATOR.yaml", data)
+                    self.reply(200, {"success": True, "id": entry_id}); return
+                except FileExistsError as exc:
+                    self.reply(409, {"success": False, "error": str(exc)}); return
+                except ValueError as exc:
+                    self.reply(400, {"success": False, "error": str(exc)}); return
             if path == "/api/omnidiag/rebuild":
                 import subprocess
                 proc = subprocess.run([sys.executable, str(ROOT / "TOOLS" / "OMNIDIAG" / "build_omnidiag.py")], cwd=str(ROOT), capture_output=True, text=True, encoding="utf-8", errors="replace")

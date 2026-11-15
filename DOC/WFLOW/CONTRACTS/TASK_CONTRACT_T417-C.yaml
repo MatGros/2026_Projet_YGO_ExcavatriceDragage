@@ -1,0 +1,64 @@
+contract:
+  task_id: T417-C
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Diagnostiquer et reproduire en simulation isolee le depassement de butee petite vitesse M3
+    et preparer le dossier de validation (patch + guard) sans modifier CODE/ sans GO C3/C4.
+
+  acceptance:
+    - id: AC1
+      statement: "L'historique T417 est trie avec controle par echantillonnage dans le dossier T417-C."
+      verified_by: "DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3/T417-C_HISTORIQUE_TRIE_ECHANTILLON_20261113_v1.0.md"
+    - id: AC2
+      statement: "La chaine automate reelle M3 vs L_SIMULATION est cartographiee avec un registre d'hypotheses."
+      verified_by: "DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3/T417-C_CARTOGRAPHIE_M3_REGISTRE_HYPOTHESES_20261113_v1.0.md"
+    - id: AC3
+      statement: "Le depassement de butee est reproduit en sandbox isolee avec oracles experts et challenge."
+      verified_by: "DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3/T417-C_CHALLENGE_HYPOTHESES_20261113_v1.0.md"
+    - id: AC4
+      statement: "L'arbitrage exploitant valide l'hypothese retenue et la passation ou bascule C3/C4."
+      verified_by: "Validation humaine explicite sur le dossier de passation T417-C"
+
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3/**
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417-C.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/AGY02_T417_M3_SANDBOX/**
+    forbidden:
+      - CODE/**
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Lecture seule stricte sur CODE/ pendant la phase diagnostic T417-C"
+      - "Tracabilite des 4 livrables Phase 1/2 et des essais sandbox"
+    dropped_on_purpose:
+      - "Dossier provisoire T000-AGY02 remplace par DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3/"
+
+  evidence_required:
+    - check_task_contract
+    - plan_project
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug preexistant,
+    risque hors scope) est remonte immediatement, sans modifier CODE/ hors contrat.
+
+execution_plan:
+  milestones:
+    - id: M0
+      title: "Mise en conformite dossier, contrat C2 et Task Manager"
+      done_when: "check_task_contract.py PASS sur TASK_CONTRACT_T417-C.yaml et plan_project.py T417-C opérationnel"
+    - id: M1
+      title: "Tri historique, cartographie M3, sandbox et challenge des hypotheses"
+      done_when: "4 livrables T417-C_*.md et sandbox AGY02_T417_M3_SANDBOX presents"
+    - id: M2
+      title: "Arbitrage exploitant et dossier de passation (patch + guard ou C3/C4)"
+      done_when: "Choix d'hypothese valide par l'humain et dossier de passation approuve"
+
+test_feedback: []

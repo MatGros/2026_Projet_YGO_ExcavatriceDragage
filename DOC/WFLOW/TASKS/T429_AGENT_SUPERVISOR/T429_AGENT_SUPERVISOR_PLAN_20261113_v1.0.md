@@ -181,9 +181,9 @@ plan_project:
     - id: M15
       title: "R17 — Le Superviseur reconnaît une session orchestrateur et adapte sa vigilance"
       done_when: "Détection mécanique du rôle coordination (alias/tâche T000-CCxx) ; notice dédiée au juge avec les critères de gestion (verrou, écriture hors contrat, clôture de constat par l'agent interdite) ; alerte mécanique si DEUX orchestrateurs actifs simultanés"
-      execution: NOT_STARTED
-      execution_by: ""
-      evidence: ""
+      execution: DONE
+      execution_by: CC01
+      evidence: "commit 9ad9e447 : is_coordination_session + notice COORDINATION_JUDGE_NOTICE + _detect_coordination_conflicts idempotent ; tests 217 py verts (test_coordination_session_judge_notice_only_for_t000, test_two_active_coordination_sessions_raise_one_finding) ; handoff T427-CC02 transmis + accusé (d2878f46/b5ed67ec)"
       execution_comment: "Fait prouvé 2026-11-15 : zéro notion orchestrateur dans service + vigilance (grep) — le juge l'évalue comme toute session ; demande exploitant 2026-11-14"
       validation: NOT_REVIEWED
       validated_by: ""

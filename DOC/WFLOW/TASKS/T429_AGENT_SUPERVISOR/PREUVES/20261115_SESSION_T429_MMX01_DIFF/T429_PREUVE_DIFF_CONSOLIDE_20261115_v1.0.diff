@@ -1,0 +1,861 @@
+diff --git a/DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md b/DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md
+index 09c6a4b0..6e0d5c21 100644
+--- a/DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md
++++ b/DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md
+@@ -1,3 +1,198 @@
++---
++plan_project:
++  schema: 1
++  task_id: T429
++  updated_at: 2026-11-14
++  milestones:
++    - id: M0
++      title: "F0 — Référence et socle de tests verts"
++      done_when: "Tests unitaires du Superviseur verts sur l'arbre courant"
++      execution: DONE
++      execution_by: CC01
++      evidence: "DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/PREUVES/ (pytest TOOLS/AGENT_SUPERVISOR/tests : 200 passed)"
++      execution_comment: ""
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M1
++      title: "F1 — Continuité pause / reprise / source déplacée"
++      done_when: "Recette réelle F1 sans perte d'événement ni de constat"
++      execution: DONE
++      execution_by: CC01
++      evidence: "PREUVES/20261109_SESSION_QUALIF_INITIALE/T429_PREUVE_RECETTE_F1_REEL_20261109_v1.0.json (6/6)"
++      execution_comment: "Fix _resume_session (événements post-affectation) + 2 tests le 2026-11-13"
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M2
++      title: "F2 — Cycle des constats, cadrage versionné, réévaluation"
++      done_when: "Cycle complet sur session réelle + campagne A/B comparée"
++      execution: DONE
++      execution_by: CC01
++      evidence: "PREUVES/…/T429_PREUVE_CAMPAGNE_FR_AB_FINAL_20261109_v1.0.json (B 10/10, A 9/10) + cycle modèle réel 4/4"
++      execution_comment: "Réévaluation à la demande en pause (verdict ~2 s) + 3 tests"
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M3
++      title: "F3 — IHM, plugin VS Code, « Send to chat »"
++      done_when: "Layout PASS aux 3 largeurs, plugin vert, deep link PASS"
++      execution: DONE
++      execution_by: CC01
++      evidence: "ui_layout_check.mjs 1440/390/360 px PASS · plugin 16/16 · deep link PASS"
++      execution_comment: "Restent 2 AC observation humaine (AC-F3.5, AC-F3.9 — jalons M7/M8)"
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M4
++      title: "F4 — Recette comparée, parcours réels multi-CLI"
++      done_when: "Corpus multi-CLI vert sur parcours réels"
++      execution: DONE
++      execution_by: CC01
++      evidence: "PREUVES/<session>/ (Codex / Claude Code / Antigravity PASS)"
++      execution_comment: "DSH limité (clé API absente du profil headless) — documenté, pas contourné"
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M5
++      title: "Lot dérive — résumé À JOUR + prédicat + garde + métrique (R7→R10)"
++      done_when: "generate_tasks_summary --check=0, prédicat testé, hook refus motivé, métrique affichée et citable"
++      execution: DONE
++      execution_by: CC01
++      evidence: "TOOLS/AGENT_WORKFLOW/scripts/task_scope.py + hook_scope_guard.py + tests (13+10+8) + badge 🎯 k/n en statusline"
++      execution_comment: "Réparti T427 (mécanique générique) / T429 (affichage + constat citable)"
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M6
++      title: "Visibilité mémoire — panneau lisible + constat autoportant (R11→R12)"
++      done_when: "4 groupes mémoire avec extraits dans l'IHM ; chaque constat porte l'inventaire mémoire du verdict"
++      execution: DONE
++      execution_by: CC01
++      evidence: "test_t429_regressions.py (62 tests incl. R11/R12) · snapshot complet exposé"
++      execution_comment: ""
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M7
++      title: "AC-F3.5 — notification bureau, son, toast, clic"
++      done_when: "1 notification + 1 bip + 1 toast ; le clic ouvre la session et la carte visées — observation humaine consignée dans tracking.experiments"
++      execution: BLOCKED
++      execution_by: ""
++      evidence: ""
++      execution_comment: "Attente exploitant (observation humaine, non automatisable)"
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M8
++      title: "AC-F3.9 — retour exploitant sur la simplicité d'usage"
++      done_when: "Verdict « simple / à corriger » consigné ; correctifs appliqués si « à corriger »"
++      execution: BLOCKED
++      execution_by: ""
++      evidence: ""
++      execution_comment: "Attente exploitant + CC01"
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M9
++      title: "R13+R14 — dossier de lecture déclaré ≠ lecture du dépôt"
++      done_when: "Juge reçoit un dossier borné en lecture seule et déclare la liste exacte dans l'argumentaire ; distinction affichée"
++      execution: DONE
++      execution_by: CC01
++      evidence: "reading_dossier() + notice juge + lecture_declaree sur le constat + dossier_lecture dans memory_state + bloc IHM ; tests : test_t429_regressions 65/65 (3 nouveaux), test_dossier_ui.mjs 8 asserts, suite 214 passed, layout 0 failed (2026-11-14)"
++      execution_comment: "Budget 6 fichiers / 12 000 car., troncature marquée ; illisible signalé jamais deviné ; corrigé au passage : champ preuves affiché undefined (clé prouves_acquises) ; v1 sans boucle d'agent"
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M10
++      title: "R15 — personas journalisées et visibles"
++      done_when: "Chaque invocation de specialist_runner est journalisée (rôle, cible, session) et affichée"
++      execution: DONE
++      execution_by: CC01
++      evidence: "Défaut réel prouvé (probe traceback : NameError Path → except muet, 0 jamais journalisé) ; fix runner + stderr non muet + role=args.role or args.show_prompt ; test persistant subprocess → persona_usage ; suite AG 215 passed ; runs réels 2 entrées seq=1/2 (2026-11-14)"
++      execution_comment: "Reste à l'exploitant : KINDS += \"persona\" dans trace_log.py (deny-list, garde a refusé l'écriture) pour la lecture CLI --kind persona ; affichage IHM déjà posé (fold mémoire)"
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M11
++      title: "R3+R4 — famille d'acteur MMX et test rouge renommage"
++      done_when: "Une seule règle d'alias tracée des deux côtés ; test_supervisor_summary_exposes_only_rename_title vert"
++      execution: NOT_STARTED
++      execution_by: ""
++      evidence: ""
++      execution_comment: "Fait nouveau 2026-11-14 : R4 vert (test_session_statusline 8 passed, était 1 failed) — prérequis de R5 levé ; R3 (décision MMX) reste chez l'agent T000 (lot T000_SESSION_NAMING)"
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M12
++      title: "R5 — alignement du service 8082 sur HEAD"
++      done_when: "GET /health → update_available: false, sauvegarde vérifiée, 7 affectations conservées, 0 constat perdu"
++      execution: NOT_STARTED
++      execution_by: ""
++      evidence: ""
++      execution_comment: "Coordination 2026-11-15 (T000-CC10) : son lot 2 (supervisor_server.py, request_queue_size 5→128, cause racine du faux « Offline », prouvé : file 5 → plafond 0,51 s sous 12 appels, file 128 → 0/300) attend la même dérogation et exige un redémarrage — accord : appliquer le lot 2 AVANT le restart R5, UN seul redémarrage. En attente de la dérogation + GO exploitant. Cible mise à jour : un redémarrage, deux vérifications (R5 + lot 2)"
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M13
++      title: "R6 — push des commits locaux"
++      done_when: "git rev-list --left-right --count origin/main...HEAD → 0 0"
++      execution: NOT_STARTED
++      execution_by: ""
++      evidence: ""
++      execution_comment: "Accord humain explicite requis (jamais déduit d'un accord de commit)"
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++    - id: M14
++      title: "R16 — Menu de gauche : couleur d'état sur l'indicateur, texte neutre, identifiant d'agent coloré"
++      done_when: "Titre de session neutre même en alarme ; état sur marqueur/fond/étiquette ; badge d'agent coloré par standard (claude/codex/agy/dsh/opc)"
++      execution: DONE
++      execution_by: CC01
++      evidence: "CSS : titre neutre var(--text) + has-* color var(--text) + marker par état (vert/orange/rouge/gris) + .model-tag standard 5 acteurs ; JS : badge model-tag + metaRow ; test_dossier_ui.mjs 16 asserts, test_ui.mjs PASS, layout 0 fail (2026-11-14)"
++      execution_comment: "2 amendements exploitant le jour même (checkpoint 5f895090) : texte colore SEUL (badge encadre illisible supprime) + couleur portee par la FAMILLE detectee dans l alias (T429-MMX01 -> MMX jaune), la couleur suivra l acteur meme en changeant de terminal"
++    - id: M15
++      title: "R17 — Le Superviseur reconnaît une session orchestrateur et adapte sa vigilance"
++      done_when: "Détection mécanique du rôle coordination (alias/tâche T000-CCxx) ; notice dédiée au juge avec les critères de gestion (verrou, écriture hors contrat, clôture de constat par l'agent interdite) ; alerte mécanique si DEUX orchestrateurs actifs simultanés"
++      execution: NOT_STARTED
++      execution_by: ""
++      evidence: ""
++      execution_comment: "Fait prouvé 2026-11-15 : zéro notion orchestrateur dans service + vigilance (grep) — le juge l'évalue comme toute session ; demande exploitant 2026-11-14"
++      validation: NOT_REVIEWED
++      validated_by: ""
++      validated_at: ""
++      validation_comment: ""
++      comments: []
++---
++
++<!-- markdownlint-disable MD025 -->
+ # T429 — Plan complet, détaillé et vérifié
+ 
+ > **Contrat mesurable** : `T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml` (AC-F0 → AC-F4, AC-X, `tracking` avec preuves datées)
+@@ -51,7 +246,7 @@
+ | **R6** | **Push** — 5 commits locaux non poussés (`7f487148`, `cf14f135`, `22535a09`, + à venir) | branche distante à jour, aucun commit perdu | `git rev-list --left-right --count origin/main...HEAD` → `0 0` | **exploitant** (accord explicite requis) |
+ | **R7** | **Bruit de fond catalogue** — le résumé était figé (PÉRIMÉ) | générateur mécanique en place, résumé À JOUR, contrôle en CI | `python TOOLS/AGENT_WORKFLOW/scripts/generate_tasks_summary.py --check` → 0 | CC01 ✅ **fait le 2026-11-13** |
+ | **R8** | **Prédicat de périmètre** — le périmètre d'une tâche devient une donnée (ensemble de chemins autorisés, déduit du contrat `scope.allowed`), pas une phrase dans un prompt | un prédicat booléen, testable, sans LLM : `chemin ∈ périmètre` ; T429 sert de cas d'école | tests unitaires du prédicat (inclus / exclu / chemin voisin) | CC01 (T427) |
+-| **R9** | **Garde de dérive** — hook `PreToolUse` sur `Edit|Write|MultiEdit` : écriture hors périmètre → refus motivé + question à l'exploitant ; une dérogation confirmée est **enregistrée** (durable) | aucune écriture hors périmètre sans dérogation tracée ; le refus force la confirmation au lieu de la recommending | hook testé (chemin autorisé → passe ; hors périmètre → refus ; dérogation → passe) | CC01 (T427) |
++| **R9** | **Garde de dérive** — hook `PreToolUse` sur `Edit\|Write\|MultiEdit` : écriture hors périmètre → refus motivé + question à l'exploitant ; une dérogation confirmée est **enregistrée** (durable) | aucune écriture hors périmètre sans dérogation tracée ; le refus force la confirmation au lieu de la recommending | hook testé (chemin autorisé → passe ; hors périmètre → refus ; dérogation → passe) | CC01 (T427) |
+ | **R10** | **Métrique de dérive** — part des N derniers fichiers touchés qui sont hors périmètre, recalculée depuis le transcript (les chemins y sont dans la trace) | la métrique est **comptée**, pas estimée : aucun avis involved ; elle alimente le constat du Superviseur (preuve citable) et la 2ᵉ ligne de la statusline | métrique recalculée et affichée ; le constat `scope_drift` cite le décompte | CC01 (T427 pour la mesure, T429 pour l'affichage et le constat) |
+ | **R11** | **Panneau Mémoire lisible** — les 4 groupes (fenêtre / longue / journal / preuves) avec leur contenu, pas seulement leurs compteurs | l'exploitant voit d'un coup d'œil ce que le juge voit et ce qu'il ne voit plus | test DOM (4 groupes + extraits) · layout 0 échec | CC01 (T429) |
+ | **R12** | **Constat autoportant** — chaque constat porte l'inventaire mémoire du moment du verdict + la provenance de sa preuve | un constat relu plus tard donne son contexte sans rouvrir le transcript | test (inventaire cohérent avec la fenêtre) · affichage | CC01 (T429) |
+@@ -132,14 +327,64 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
+ | **R13** | **Le Superviseur ne lit rien sans le dire** | v1 : le juge reçoit un **dossier de lecture** borné (contrat + plan de la tâche + fichiers cités par les constats ouverts), **lecture seule**, et **déclare** la liste dans l'argumentaire (`lecture_declaree`). Pas de boucle d'agent en v1 ; budget ≤ 6 fichiers et ≤ 12 000 caractères | chaque constat porte la liste exacte des fichiers lus ; un fichier illisible est **signalé**, jamais deviné | test : dossier joint, déclaration exacte, fichier illisible signalé · journal interne : la lecture est consignée |
+ | **R14** | **Dossier de lecture ≠ lecture du dépôt** | distinction explicite dans l'IHM et dans l'argumentaire : « dossier de lecture (fourni au juge) » vs « accès direct au dépôt (interdit en v1) » | aucune confusion possible dans l'affichage ni dans le journal | test DOM (les deux libellés distincts) |
+ | **R15** | **Les agents deviennent tracables** | chaque invocation de `specialist_runner.py` est journalisée (rôle, cible, session) → l'IHM affiche « spécialistes invoquées : HMI 2 · tests 1 » ou « aucune invocation ». Le Superviseur pourra **réclamer** un avis de spécialiste (v2), déclaré comme les lectures | l'usage réel des 6 personas devient un fait ; la question « pourquoi on les a faits » a une réponse factuelle | test : une invocation produit une entrée journalisée · affichage IHM |
++| **R16** | **Menu de gauche — la couleur porte l'état, pas le texte** (demande exploitant 2026-11-14) | le titre de session reste neutre (blanc) même en alarme ; l'état vit sur le marqueur + fond discret + étiquette (info active/défaut/alarme) ; l'identifiant d'agent = badge coloré selon un standard par acteur (claude/codex/agy/dsh/opc) | test DOM (badge model-tag + neutralisation texte) · layout 0 échec | CC01 (T429) |
++
++### Décisions figées sur ce lot
+ 
+-**Décisions figées sur ce lot**
+ - **v1 = lecture seule, bornée, sans boucle d'agent.** Le dossier de lecture est fourni en une passe ; la boucle « le juge demande un fichier, le service le lit, le juge re-juge » est **hors v1** (à chiffrer avant).
+ - Les **personas restent déclenchés** par l'agent ou l'exploitant — mais **tracés** (R15) avant d'être **branchés** sur le Superviseur.
+ - La **mémoire longue reste exposée et invalidable, pas signée** (signature = T431).
+ 
+ ---
+ 
++## 3quints. 🧭 Handoff → 🐋 T427-CC02 (2026-11-15, GO exploitant)
++
++> Transmission réelle faite le 2026-11-15 par le canal inter-sessions (désignation explicite de
++> l'exploitant) ; M15/R17 livré côté service (commit `9ad9e447`, 217 tests verts). La canonique
++> orchestrateur revient au lot T427. Piège M8 évité : le texte exact est consigné **ici**, dans
++> le dossier T429, et T427-CC02 a été informé de son emplacement.
++
++**Accusé T427-CC02 (2026-11-15)** : section prévue dans `skills/orchestrator/SKILL.md`, placée
++**après leur sous-section « Échange avec les autres sessions », avant « Rôle & Objectifs »** ;
++lot orchestrateur : secours 1bis/3 + veille 5bis intégrés (non commité), dérogation enregistrée
++pour le fichier ; **en attente du GO de l'exploitant ou de T000-CC10**, puis relecture du texte
++au diff. Le GO de pose n'appartient PAS à T429 : il revient à l'exploitant.
++
++**Ce que T429 a posé (service Superviseur)** : détection mécanique (alias `T000-*` ou tâche T000) ·
++notice au juge avec les 5 critères de gestion · constat mécanique idempotent `coordination_conflict`
++si deux sessions coordination actives.
++
++**Texte exact à poser dans `TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md`**
++(deny-list agent → pose humaine ou via T000-CC10, puis relecture au diff par T427) :
++
++```markdown
++## 🧭 Identité de coordination & surveillance du Superviseur
++
++> Finalisée le 2026-11-15 (T429 M15/R17, GO exploitant le jour même). La détection mécanique du
++> Superviseur et les critères passés à son juge s'ancrent sur cette section — le rôle coordination
++> ne se devine pas depuis une mission.
++
++- **Un seul coordinateur désigné à la fois** : la session de coordination porte un alias `T000-CCxx`
++  (ex. `T000-CC10`). Deux sessions `T000-*` **actives** simultanément = conflit de coordination : le
++  Superviseur lève un constat mécanique (`coordination_conflict`) sur chacune, jusqu'à remise explicite
++  d'un périmètre.
++- **Détection mécanique** : alias commençant par `T000-` (ou tâche liée `T000`) → la session est
++  marquée coordination ; le juge du Superviseur reçoit explicitement les critères de gestion.
++- **Critères passés au juge** (cités du canonique, pas recopiés) : règle d'or (validation avant
++  implémentation) · verrou d'écriture / 🚩 d'un autre acteur jamais contournés · une fiche de tâche
++  modifiée uniquement par le coordinateur désigné via l'API Task Manager · clôture de constat ou
++  tâche jamais par l'agent (règle 10 `AGENTS.md`) · `git diff` réel lu par le coordinateur, un
++  rapport d'agent n'est jamais une preuve · aucun commit ni push sans accord humain explicite.
++- **Limite assumée** : le Superviseur juge, il ne remplace ni le Task Manager ni la désignation
++  humaine ; une session `T000-*` en pause ou arrêtée ne compte pas dans le conflit (seules les
++  sessions enabled + active).
++```
++
++**À l'exploitant, même geste** : ajouter `"persona"` à `KINDS` dans `TOOLS/AGENT_WORKFLOW/scripts/trace_log.py`
++(lecture CLI du journal personas ; refus deny-list tracé au tour 2026-11-14).
++
++---
++
+ ## 4. 🧪 Plan de vérification (état au 2026-11-13)
+ 
+ ```powershell
+diff --git a/TOOLS/AGENT_SUPERVISOR/scripts/supervisor_service.py b/TOOLS/AGENT_SUPERVISOR/scripts/supervisor_service.py
+index 9762e393..6edce94e 100644
+--- a/TOOLS/AGENT_SUPERVISOR/scripts/supervisor_service.py
++++ b/TOOLS/AGENT_SUPERVISOR/scripts/supervisor_service.py
+@@ -632,6 +632,144 @@ def memory_inventory(session, judge_settings=None) -> dict:
+     }
+ 
+ 
++# T429 R13 : le juge recoit un dossier de lecture BORNE (contrat + plan de la tache +
++# fichiers cites par les constats ouverts), lecture seule, en une passe, sans boucle
++# d'agent. Tout constat declare la liste exacte des fichiers lus (lecture_declaree) ;
++# un fichier illisible est signale, jamais devine.
++# T429 R14 : le dossier de lecture n'est PAS un acces direct au depot — en v1 l'acces
++# direct au depot est interdit ; les deux notions restent distinguees partout.
++REPO_ROOT = Path(__file__).resolve().parents[3]
++READING_DOSSIER_MAX_FILES = 6
++READING_DOSSIER_MAX_CHARS = 12_000
++READING_DOSSIER_FILE_CHARS = 2_500
++READING_DOSSIER_EXTENSIONS = (".py", ".md", ".yaml", ".yml", ".json", ".st", ".html", ".js", ".mjs", ".xml")
++_REPO_PATH_RE = re.compile(r"[A-Za-z0-9_.\-]{2,}(?:/[A-Za-z0-9_.\-]{2,})+\.(?:py|md|yaml|yml|json|st|html|js|mjs|xml)")
++
++
++def cited_repo_files(session) -> list:
++    """Chemins du depot cites par les constats OUVERTS (fait extrait du texte, pas une impression)."""
++    seen, found = set(), []
++    for alert in (session.get("alerts") or []):
++        try:
++            closed = business_state(alert) == "closed"
++        except Exception:
++            closed = False   # etat inconnu : traite comme ouvert (ne cite pas = risque de sous-declaration)
++        if closed:
++            continue
++        texts = [str(alert.get("reason") or ""), str(alert.get("evidence") or "")]
++        for comment in (alert.get("comments") or [])[-3:]:
++            texts.append(str(comment.get("text") or ""))
++        for text in texts:
++            for match in _REPO_PATH_RE.finditer(text):
++                path = match.group(0).replace("\\", "/").strip("/")
++                if path not in seen:
++                    seen.add(path)
++                    found.append(path)
++    return found
++
++
++def _inside_repo(target: Path) -> bool:
++    """Un chemin hors depot n'est JAMAIS lu : le dossier ne lit que dans le depot."""
++    try:
++        target.resolve().relative_to(REPO_ROOT)
++        return True
++    except (ValueError, OSError):
++        return False
++
++
++def reading_dossier(session) -> dict:
++    """Dossier de lecture borne du juge : candidats bornes, lus en une passe.
++    Budget : <= READING_DOSSIER_MAX_FILES fichiers et <= READING_DOSSIER_MAX_CHARS caracteres.
++    Ordre : socle de la tache (contrat, plan, notes), puis fichiers cites par les constats ouverts."""
++    if not isinstance(session, dict):
++        session = {}
++    task = str(session.get("task_id") or "").strip().upper()
++    socle = [str(item).replace("\\", "/").strip("/") for item in (session.get("socle") or [])
++             if task and str(item).replace("\\", "/").startswith(f"DOC/WFLOW/TASKS/{task}")]
++    candidates: list = []
++    for path_text in socle + cited_repo_files(session):
++        if path_text not in candidates:
++            candidates.append(path_text)
++    files, unreadable, total = [], [], 0
++    for path_text in candidates:
++        if len(files) + len(unreadable) >= READING_DOSSIER_MAX_FILES:
++            break
++        target = REPO_ROOT / path_text
++        if not _inside_repo(target):
++            unreadable.append(dict(path=path_text, erreur="hors depot"))
++            continue
++        try:
++            text = target.open("rb").read().decode("utf-8", errors="replace")
++        except OSError as exc:
++            unreadable.append(dict(path=path_text, erreur=type(exc).__name__))
++            continue
++        kept = min(len(text), READING_DOSSIER_FILE_CHARS, max(0, READING_DOSSIER_MAX_CHARS - total))
++        if kept <= 0:
++            unreadable.append(dict(path=path_text, erreur="budget depasse"))
++            continue
++        files.append(dict(path=path_text, caracteres=kept, tronque=kept < len(text), extrait=text[:kept]))
++        total += kept
++    return dict(fichiers=files, illisibles=unreadable, total_caracteres=total,
++                budget=dict(max_fichiers=READING_DOSSIER_MAX_FILES, max_caracteres=READING_DOSSIER_MAX_CHARS))
++
++
++def dossier_notice_text(dossier) -> str:
++    """La notice du juge : ce que le service a lu pour ce verdict, avec la distinction R14."""
++    parts = []
++    for fich in dossier.get("fichiers") or []:
++        etat = "tronque" if fich.get("tronque") else "complet"
++        parts.append(f"### {fich['path']} ({fich['caracteres']} caracteres, {etat})\n{fich['extrait']}")
++    text = ("## DOSSIER DE LECTURE (fourni au juge, lecture seule — un dossier de lecture "
++            "n'est PAS un acces direct au depot ; en v1 l'acces direct au depot est interdit) :\n"
++            + "\n".join(parts))
++    if dossier.get("illisibles"):
++        text += "\nFichier(s) illisible(s) — signale(s), jamais devine(s) : " + json.dumps(
++            dossier["illisibles"], ensure_ascii=False)
++    return text
++
++
++def dossier_declared_paths(dossier) -> dict:
++    """La declaration portee par un constat : liste exacte des fichiers lus + signales."""
++    return dict(fichiers=[f["path"] for f in dossier.get("fichiers") or []],
++                illisibles=[u["path"] for u in dossier.get("illisibles") or []])
++
++
++def dossier_public(dossier) -> dict:
++    """Vue memory_state : chemins lus + signales, sans le contenu (extraits exclus)."""
++    dossier = dossier or {}
++    return dict(fichiers=[f["path"] for f in dossier.get("fichiers") or []],
++                illisibles=list(dossier.get("illisibles") or []),
++                total_caracteres=dossier.get("total_caracteres", 0),
++                budget=dict(dossier.get("budget") or dict(max_fichiers=READING_DOSSIER_MAX_FILES,
++                                                          max_caracteres=READING_DOSSIER_MAX_CHARS)),
++                distinction="dossier fourni au juge (lecture seule) · acces direct au depot interdit en v1",
++                declared_at=dossier.get("declared_at"))
++
++
++# T429 M15/R17 (2026-11-15, GO exploitant) : la coordination du projet est une session dont
++# l alias porte le prefixe T000 (ex. T000-CC10). La detection est MECANIQUE : le juge ne
++# devine pas un role. Canonique des criteres : TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md
++# section "Identite de coordination & surveillance du Superviseur".
++COORDINATION_JUDGE_NOTICE = (
++    "## SESSION DE COORDINATION (role orchestrateur/coordinateur, alias T000-*) : le juge applique "
++    "les criteres de gestion specifiques — (1) la session ne cloture ni un constat ni une tache "
++    "elle-meme (la cloture revient a l exploitant ou a un juge enregistre par le code) ; (2) une fiche "
++    "de tache ne se modifie que par le coordinateur designe via l API Task Manager, jamais par edition "
++    "directe ; (3) ne jamais contourner ni ecraser un verrou d un autre acteur ; (4) la lecture du git "
++    "diff reel reste au coordinateur, un rapport d agent n est jamais une preuve ; (5) aucun commit ni "
++    "push sans accord humain explicite. Canonique : TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md."
++)
++
++
++def is_coordination_session(session) -> bool:
++    """T429 M15/R17 : session de coordination = alias T000-* ou tache liee T000. Detection mecanique."""
++    if not isinstance(session, dict):
++        return False
++    alias = str(session.get("alias") or "").upper()
++    task = str(session.get("task_id") or "").upper()
++    return alias.startswith("T000") or task == "T000"
++
++
+ def persona_usage(session_id: str) -> list:
+     """Invocations de personas tracees pour cette session (R15) : usage reel, pas une impression."""
+     try:
+@@ -1553,6 +1691,9 @@ class Supervisor:
+                     "preuves_constats": (session.get("evidence_archive") or [])[-30:],
+                     # T429 : le socle exige a l attachement et son etat de lecture.
+                     "socle": list(session.get("socle") or []),
++                    # R13/R14 : le dernier dossier de lecture fourni au juge (borne, lecture
++                    # seule), distinct de tout acces direct au depot (interdit en v1).
++                    "dossier_lecture": dossier_public(session.get("reading_dossier")),
+                     # T429 : le cadrage (attributs de mission) est visible aussi dans la
+                     # ligne de supervision, pas seulement dans l IHM.
+                     "vigilance": _vigilance_for(session),
+@@ -2679,6 +2820,36 @@ class Supervisor:
+             session["source_checkpoint"] = session["watcher"].checkpoint()
+             self._persist_background()
+ 
++    def _detect_coordination_conflicts(self):
++        """T429 M15/R17 : deux sessions de coordination actives simultanement = conflit.
++        Constat MECANIQUE (pas le juge), idempotent : cree une fois, reste jusqu a cloture humaine."""
++        coordination = [s for s in self.sessions.values() if s.get("enabled") and s.get("state") == "active" and is_coordination_session(s)]
++        if len(coordination) < 2:
++            return
++        names = {}
++        for session in coordination:
++            names[str(session["id"])] = (session.get("alias") or session.get("native_id") or str(session["id"]))
++        for session in coordination:
++            others = sorted(name for ident, name in names.items() if ident != str(session["id"]))
++            fingerprint = hashlib.sha256(("coordination_conflict\n" + ",".join(others)).encode()).hexdigest()
++            if next((a for a in session["alerts"] if a.get("fingerprint") == fingerprint), None):
++                continue
++            me = names[str(session["id"])]
++            text = (me + " et " + ", ".join(others) + " : deux sessions de coordination (T000-*) sont "
++                    "actives simultanement. Le projet designe UN coordinateur a la fois : remettre un "
++                    "des deux perimetres et transmettre l etat.")
++            alert = dict(id=fingerprint[:24], fingerprint=fingerprint, model="service",
++                severity="warning", reason=text, evidence=text, category="coordination_conflict",
++                title="Conflit de coordination", created_at=timestamp(), last_occurrence=timestamp(),
++                occurrences=1, disposition="new", acknowledged_at=None,
++                workflow=dict(status="informational", delivery_status="not_sent", choice=None, rationale="", chosen_at=None, response=""))
++            alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"))
++            alert["memory_usage"] = memory_inventory(session)
++            session["alerts"].append(alert)
++            prepare_alert(alert)
++            record_event(session, "finding_created", text, timestamp(), alert_id=alert["id"], version=alert["version"])
++            _trace(event="coordination_conflict", session=str(session["id"]), alias=session.get("alias"), peers=",".join(others))
++
+     def _collect_loop(self):
+         while not self.closed:
+             with self._lock:
+@@ -2710,6 +2881,7 @@ class Supervisor:
+                                                 messages_seen=after_messages-before_messages,
+                                                 sessions_unavailable=sum(s["state"] not in ("active", "waiting") for s in enabled),
+                                                 cycles=self.collector_stats["cycles"]+1)
++                    self._detect_coordination_conflicts()
+                     if self._persist_pending and not self.load_error:
+                         self._persist_background()
+             self._wake.wait(self.poll_interval)
+@@ -2758,6 +2930,18 @@ class Supervisor:
+                         journal = session.get("session_journal", [])
+                         if journal:
+                             notices.append(dict(role="context_notice", text="## MÉMOIRE DE SESSION (Jalons franchis) :\n" + "\n".join(f"- {j.get('text')}" for j in journal[-6:])))
++                        # R13/R14 : le dossier de lecture est construit UNE fois par verdict,
++                        # journalise, et porte par le verdict (lecture_declaree sur le constat).
++                        dossier = reading_dossier(session)
++                        session["reading_dossier"] = dict(dossier, declared_at=timestamp())
++                        notices.append(dict(role="context_notice", text=dossier_notice_text(dossier)))
++                        _experience_read(session, "superviseur",
++                                         "dossier de lecture : " + str(len(dossier["fichiers"])) + " fichier(s), "
++                                         + str(dossier["total_caracteres"]) + " caracteres",
++                                         refs=[f["path"] for f in dossier["fichiers"][-5:]])
++                        # M15/R17 : le role coordination est annonce au juge, il ne se devine pas.
++                        if is_coordination_session(session):
++                            notices.append(dict(role="context_notice", text=COORDINATION_JUDGE_NOTICE))
+                         session["judge_turn_count"] = session.get("judge_turn_count", 0) + 1
+                         audit_interval = self.judge_settings.get("audit_interval", 8)
+                         if session["judge_turn_count"] % audit_interval == 0:
+@@ -2814,12 +2998,12 @@ class Supervisor:
+                         # Bind the verdict to the bytes actually read, not a later stat:
+                         # a pivot can be appended between polling and starting the judge.
+                         stamp = getattr(session["watcher"], "last_stamp", None)
+-                        work = (sid, session["generation"], self._epoch, self.model, self.allow_cloud, messages, stamp, is_recovery, recovery_index, session.get("context_revision", 0))
++                        work = (sid, session["generation"], self._epoch, self.model, self.allow_cloud, messages, stamp, is_recovery, recovery_index, session.get("context_revision", 0), dossier)
+             if work is None:
+                 self._judge_wake.wait()
+                 self._judge_wake.clear()
+                 continue
+-            sid, generation, epoch, model, allow_cloud, messages, source_stamp, is_recovery, recovery_index, context_revision = work
++            sid, generation, epoch, model, allow_cloud, messages, source_stamp, is_recovery, recovery_index, context_revision, dossier = work
+             error, result, uncertain = None, None, False
+             try:
+                 def record_request(payload, attempt):
+@@ -2915,6 +3099,7 @@ class Supervisor:
+                         # La provenance est un ETAT : elle est recalculee a chaque occurrence.
+                         existing["evidence_provenance"] = evidence_provenance(session, existing.get("evidence"))
+                         existing["memory_usage"] = memory_inventory(session, self.judge_settings)
++                        existing["lecture_declaree"] = dossier_declared_paths(dossier)
+                         if existing["disposition"] != "new":
+                             session["analysis_state"] = "alert_acknowledged"
+                     elif not closed_match or previous_alert_id:
+@@ -2927,6 +3112,7 @@ class Supervisor:
+                             alert.update(previous_alert_id=previous_alert_id, source_event_id=occurrence["event_id"], source_event_index=occurrence["event_index"])
+                         alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"), result.get("event_id"))
+                         alert["memory_usage"] = memory_inventory(session, self.judge_settings)
++                        alert["lecture_declaree"] = dossier_declared_paths(dossier)
+                         archive_evidence(session, alert)
+                         # T429 : le Superviseur consigne ce qu il a observe (journal d experience).
+                         _experience_write(session, alert, _experience_pattern(session, alert))
+@@ -2947,6 +3133,7 @@ class Supervisor:
+                             alert["evidence_provenance"] = evidence_provenance(
+                                 session, (alert.get("assessment") or {}).get("evidence") or alert.get("evidence"))
+                             alert["memory_usage"] = memory_inventory(session, self.judge_settings)
++                            alert["lecture_declaree"] = dossier_declared_paths(dossier)
+                             archive_evidence(session, alert)
+                     state_update = result.get("state_update")
+                     if isinstance(state_update, str) and state_update.strip() and len(state_update.strip()) >= 5:
+diff --git a/TOOLS/AGENT_SUPERVISOR/tests/test_dossier_ui.mjs b/TOOLS/AGENT_SUPERVISOR/tests/test_dossier_ui.mjs
+new file mode 100644
+index 00000000..194d16d1
+--- /dev/null
++++ b/TOOLS/AGENT_SUPERVISOR/tests/test_dossier_ui.mjs
+@@ -0,0 +1,56 @@
++import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import vm from 'node:vm';
++import {createRequire} from 'node:module';
++
++// T429 R13/R14 (2026-11-14) : le dossier de lecture du juge est VISIBLE et DISTINGUE de
++// tout acces direct au depot ; chaque constat declare la liste exacte des fichiers lus.
++const require = createRequire(process.env.SUPERVISION_DOM_MODULES || path.join(os.tmpdir(), 'supervision-dom-tests', 'package.json'));
++const {parseHTML} = require('linkedom');
++const html = fs.readFileSync('TOOLS/AGENT_SUPERVISOR/ui/index.html', 'utf8');
++const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
++const {window, document} = parseHTML(html);window.HTMLElement.prototype.scrollIntoView=()=>{};
++for (const select of document.querySelectorAll('select')) Object.defineProperty(select, 'value', {configurable:true, get(){return this._value ?? this.options?.[0]?.value ?? '';}, set(value){this._value=String(value);}});
++const timers=[];
++const snapshot = {running:true,token:'token',model:'local',allow_cloud:false,sessions:[{id:'s1',platform:'claude',native_id:'session-a',alias:'A',state:'active',analysis_state:'alert',mission:'Mission A',chat_messages:[],judge_request:null,
++ memory_state:{fenetre:2,memoire_longue:5,journal:3,preuves_acquises:3,cadrage:1,ecartes:0,fenetre_tronquee:false,regles:12,dossier_lecture:{fichiers:['DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/CONTRAT.yaml','DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/PLAN.md'],illisibles:[{path:'DOC/inexistant.md',erreur:'FileNotFoundError'}],total_caracteres:900,budget:{max_fichiers:6,max_caracteres:12000}}},
++ alerts:[{id:'a1',severity:'warning',reason:'Constat TEST',evidence:'Citation TEST',disposition:'new',workflow:{status:'legacy'},memory_usage:{fenetre:2,memoire_longue:5,journal:3,preuves_acquises:3,cadrage:1,fenetre_tronquee:false},lecture_declaree:{fichiers:['DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/CONTRAT.yaml'],illisibles:['DOC/inexistant.md']}}]},
++ {id:'s2',platform:'claude',native_id:'session-mmx',alias:'T429-MMX01',state:'active',analysis_state:'no_alert',mission:'Mission MMX',chat_messages:[],judge_request:null,alerts:[]}],chat:{messages:[]}}
++class FakeNotification{constructor(title,options){this.close=()=>{};}}FakeNotification.permission='granted';FakeNotification.requestPermission=async()=>'granted';window.Notification=FakeNotification;class FakeAudioContext{state='suspended';async resume(){this.state='running';}}window.AudioContext=FakeAudioContext;
++const fetch = async () => ({ok:true,status:200,json:async()=>snapshot});
++const sandbox={window,document,Notification:FakeNotification,navigator:{},localStorage:{getItem:()=>null,setItem:()=>{}},AbortController,URLSearchParams,fetch,console,Date,JSON,Set,Map,Promise,setTimeout:(f,ms)=>{timers.push({f,ms});return timers.length;},clearTimeout:()=>{}};
++const ctx=vm.createContext(sandbox);
++vm.runInContext(script,ctx);
++await new Promise(resolve=>setImmediate(resolve));
++sandbox.snapshot=snapshot;vm.runInContext('render(snapshot)',ctx);
++const text=document.body.textContent;
++
++assert.match(text,/📖 Dossier de lecture \(fourni au juge, lecture seule\)/,'R13 : le dossier de lecture est affiche avec son propre libelle');
++assert.match(text,/Accès direct au dépôt : interdit en v1/,'R14 : le libelle depot-access interdit reste distinct');
++assert.match(text,/DOC\/WFLOW\/TASKS\/T429_AGENT_SUPERVISOR\/CONTRAT\.yaml/,'les chemins du dossier sont affiches');
++assert.match(text,/DOC\/inexistant\.md: FileNotFoundError/,'un fichier illisible est signale avec sa cause, jamais devine');
++assert.match(text,/budget 6 fichiers \/ 12000 caractères/,'le budget affiche est le budget reel');
++assert.match(text,/📖 Fichiers déclarés lus pour ce verdict/,'R13 : chaque constat declare sa lecture');
++assert.match(text,/DOC\/inexistant\.md/,'la declaration du constat porte le fichier signale');
++assert.match(text,/preuves 3 /,'la cle preuves_acquises est lue (le champ n affiche plus undefined)');
++// R16 : la couleur porte l'etat (marqueur, fond discret, etiquette) — le texte du menu de gauche reste neutre ;
++// l'identifiant d'agent est un badge colore selon le standard par acteur.
++assert.match(html,/\.side-session\.has-alarm,[^}]*color:var\(--text\)/,'R16 : meme en alarme le bouton garde un texte neutre');
++assert.match(html,/\.side-session\.status-alarm \.side-session-title\{color:var\(--text\);font-weight:650\}/,'R16 : le titre de session n est plus recolore par l etat');
++assert.match(html,/\.side-session\.has-alarm \.session-marker\{background:#ff626d\}/,'R16 : l alarme vit sur le marqueur d etat');
++const sideTitle=document.querySelector('.side-session .side-session-title');
++assert.ok(sideTitle,'le titre de session latéral rendu');
++const badge=document.querySelector('.side-session-content .model-tag');
++assert.ok(badge,'R16 : badge identifiant d agent present dans le menu de gauche');
++assert.equal(badge.textContent,'claude');
++assert.ok(badge.classList.contains('model-claude'),'R16 : badge colore selon le standard d acteur');
++const mmxBadge=Array.from(document.querySelectorAll('.side-session-content .model-tag')).find(item=>item.textContent==='MMX');
++assert.ok(mmxBadge,'R16 : la famille d acteur MMX est detectee dans l alias T429-MMX01');
++assert.ok(mmxBadge.classList.contains('model-mmx'),'R16 : MMX colore en jaune meme sous terminal claude');
++assert.match(html,/\.model-tag\.model-mmx\{color:#ffdd57\}/,'standard acteur MMX declare');
++assert.match(html,/\.model-tag\.model-agy\{color:#8ab4f8\}/,'standard par acteur : texte colore seul');
++assert.doesNotMatch(html,/\.model-tag\{[^}]*background/,'remarque exploitant : plus de badge encadre, du texte colore');
++assert.match(html,/\.side-session-meta-row\{display:flex/,'le badge et la meta partagent une ligne');
++console.log('R13/R14 + R16 UI : 16 asserts PASS');
+diff --git a/TOOLS/AGENT_SUPERVISOR/tests/test_t429_regressions.py b/TOOLS/AGENT_SUPERVISOR/tests/test_t429_regressions.py
+index a0b48444..b703ec52 100644
+--- a/TOOLS/AGENT_SUPERVISOR/tests/test_t429_regressions.py
++++ b/TOOLS/AGENT_SUPERVISOR/tests/test_t429_regressions.py
+@@ -1186,3 +1186,142 @@ def test_archived_evidence_is_bounded():
+         supervisor_service.archive_evidence(session, {"id": f"a{index}", "evidence": f"e{index}",
+                                                      "reason": "r", "created_at": "t"})
+     assert len(session["evidence_archive"]) <= 200
++
++
++def test_reading_dossier_orders_task_files_and_excludes_globals():
++    """R13 (2026-11-14) : le dossier de lecture du juge = contrat + plan + notes de la
++    tache + fichiers cites par les constats ouverts. Les globaux (AGENTS.md, resume du
++    catalogue) ne sont pas le dossier de la tache ; un chemin cite qui n'existe pas est
++    signale, jamais devine."""
++    socle = ["AGENTS.md",
++             "DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md",
++             "DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/T429_AGENT_SUPERVISOR_CONTRAT_FIABILISATION_20261109_v1.0.yaml"]
++    session = dict(task_id="T429", socle=socle,
++                   alerts=[dict(id="x", fingerprint="x", disposition="new",
++                                reason="lire DOC/README.md puis DOC/WFLOW/inconnu_absent.md",
++                                evidence="", comments=[])])
++    dossier = supervisor_service.reading_dossier(session)
++    paths = [f["path"] for f in dossier["fichiers"]]
++    assert paths and paths[0] == socle[-1], "le contrat de la tache passe en premier"
++    assert "AGENTS.md" not in paths and "DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md" not in paths
++    assert "DOC/README.md" in paths, "un chemin cite par un constat ouvert entre dans le dossier"
++    signales = [u["path"] for u in dossier["illisibles"]]
++    assert "DOC/WFLOW/inconnu_absent.md" in signales, "un fichier illisible/existant-pas est signale"
++    assert not any(f.get("extrait") for f in dossier["fichiers"] if f["path"] in signales), "jamais devine"
++
++
++def test_reading_dossier_honours_budget_and_marks_truncation(monkeypatch):
++    """R13 : budget borne (fichiers et caracteres), troncature marquee explicitement."""
++    session = dict(task_id="", socle=[],
++                   alerts=[dict(id="x", fingerprint="x", disposition="new",
++                                reason="voir DOC/README.md et DOC/VERSION_HISTORY.md",
++                                evidence="", comments=[])])
++    monkeypatch.setattr(supervisor_service, "READING_DOSSIER_FILE_CHARS", 120)
++    monkeypatch.setattr(supervisor_service, "READING_DOSSIER_MAX_CHARS", 260)
++    dossier = supervisor_service.reading_dossier(session)
++    assert dossier["total_caracteres"] <= 260, "budget total respecte"
++    assert all(f["caracteres"] <= 120 for f in dossier["fichiers"]), "budget par fichier respecte"
++    assert any(f["tronque"] for f in dossier["fichiers"]), "la troncature est marqueee, pas silencieuse"
++    assert len(dossier["fichiers"]) <= supervisor_service.READING_DOSSIER_MAX_FILES
++
++
++def test_judge_declares_reading_dossier_and_finding_carries_it(tmp_path):
++    """R13/R14 : la notice du juge porte le dossier (avec la distinction depot), le constat
++    porte la declaration exacte du verdict, et memory_state l'expose sans le contenu."""
++    observed = []
++
++    def judge(model, messages):
++        observed.append(json.loads(json.dumps(messages)))
++        return dict(alert=True, severity='warning', reason='Constat dossier.' + EVIDENCE,
++                    evidence=EVIDENCE, category='cadrage')
++
++    svc, source, sid = service(tmp_path, judge)
++    try:
++        svc.command({'action': 'start'})
++        session = svc.sessions[sid]
++        session['task_id'] = 'T429'
++        write(source, 'assistant', EVIDENCE)
++        wait(lambda: bool(svc.sessions[sid]['alerts']))
++        svc.sessions[sid]['alerts'][-1]['reason'] += ' — chemin teste : DOC/README.md'
++        before = len(observed)
++        write(source, 'assistant', EVIDENCE)
++        wait(lambda: len(observed) > before)
++        declared = svc.sessions[sid]['alerts'][-1]['lecture_declaree']
++        assert declared.get('fichiers') == ['DOC/README.md'], f"declaration exacte : {declared}"
++        batch = json.dumps(observed[-1], ensure_ascii=False)
++        assert 'DOSSIER DE LECTURE' in batch and 'DOC/README.md' in batch, "le juge recoit le dossier"
++        assert 'acces direct au depot est interdit' in batch, "la distinction R14 est dans la notice"
++        public = svc.snapshot()['sessions'][0]['memory_state']['dossier_lecture']
++        assert public['fichiers'] == ['DOC/README.md'], "le dossier est visible dans memory_state"
++        assert public['distinction'].startswith('dossier fourni au juge'), "R14 : notions distinctes"
++    finally:
++        svc.close()
++
++
++def test_persona_invocation_is_traced_and_readable(monkeypatch, tmp_path):
++    """R15 (defaut reel du 2026-11-14 : NameError silencieux -> 0 jamais journalise) :
++    une invocation reelle de specialist_runner produit une entree kind=persona que le
++    service expose via persona_usage ; l'echec de journalisation n'est pas muet."""
++    monkeypatch.setenv("WORKFLOW_TRACE_DIR", str(tmp_path))
++    monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", "test-session-t429")
++    import subprocess
++    import sys as _sys
++    from TOOLS.AGENT_SUPERVISOR.scripts import supervisor_service
++    runner = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts" / "specialist_runner.py"
++    proc = subprocess.run([_sys.executable, str(runner), "--show-prompt", "safety"],
++                          capture_output=True, text=True, timeout=60)
++    assert proc.returncode == 0, proc.stderr
++    assert "journalisation persona echouee" not in proc.stderr, "la journalisation ne doit pas echouer"
++    usage = supervisor_service.persona_usage("test-session-t429")
++    assert usage == [{"role": "safety", "count": 1}], f"usage reel expose : {usage}"
++
++
++def test_coordination_session_judge_notice_only_for_t000(tmp_path):
++    """M15/R17 (2026-11-15) : une session de coordination (T000-*) est annoncee au juge ;
++    une session normale ne recoit PAS la notice (le role se detecte, il ne se devine pas)."""
++    observed = []
++
++    def judge(model, messages):
++        observed.append(json.loads(json.dumps(messages)))
++        return dict(alert=False, summary='ok', reviews=[])
++
++    svc, source, sid = service(tmp_path, judge)
++    try:
++        svc.command({'action': 'start'})
++        session = svc.sessions[sid]
++        session['task_id'] = 'T429'
++        write(source, 'user', 'message normal T429')
++        wait(lambda: len(observed) >= 1)
++        assert 'SESSION DE COORDINATION' not in json.dumps(observed[0], ensure_ascii=False)
++        session['task_id'] = 'T000'
++        write(source, 'user', 'message coordination T000')
++        wait(lambda: len(observed) >= 2)
++        assert 'SESSION DE COORDINATION' in json.dumps(observed[-1], ensure_ascii=False)
++        assert 'SESSION DE COORDINATION' not in json.dumps(observed[0], ensure_ascii=False)
++        assert not any(a.get('category') == 'coordination_conflict' for a in session['alerts'])
++    finally:
++        svc.close()
++
++
++def test_two_active_coordination_sessions_raise_one_finding(tmp_path):
++    """M15/R17 : deux sessions T000-* actives simultanement -> un constat mecanique par
++    session, idempotent au cycle suivant ; une session en pause ne declenche plus."""
++    svc, _source, sid = service(tmp_path)
++    try:
++        s1 = svc.sessions[sid]
++        s1.update(task_id='T000', alias='T000-CC10', alerts=[], enabled=True, state='active')
++        fake = dict(id='sid2', enabled=True, state='active', alias='T000-CC11', task_id='T000',
++                    native_id='native2', alerts=[], events=[], version=0)
++        svc.sessions['sid2'] = fake
++        svc._detect_coordination_conflicts()
++        assert len(s1['alerts']) == 1 and s1['alerts'][0]['category'] == 'coordination_conflict'
++        assert len(fake['alerts']) == 1
++        svc._detect_coordination_conflicts()
++        assert len(s1['alerts']) == 1 and len(fake['alerts']) == 1, 'constat idempotent, pas de doublon'
++        fake['enabled'] = False
++        svc._detect_coordination_conflicts()
++        assert len(fake['alerts']) == 1, 'une session en pause ne declenche plus le conflit'
++        assert supervisor_service.is_coordination_session(fake) is True
++        assert supervisor_service.is_coordination_session(dict(alias='T429-CC01', task_id='T429')) is False
++    finally:
++        svc.close()
+diff --git a/TOOLS/AGENT_SUPERVISOR/ui/index.html b/TOOLS/AGENT_SUPERVISOR/ui/index.html
+index cbd92d32..b46da323 100644
+--- a/TOOLS/AGENT_SUPERVISOR/ui/index.html
++++ b/TOOLS/AGENT_SUPERVISOR/ui/index.html
+@@ -29,21 +29,33 @@ body{padding:0;background:radial-gradient(ellipse at 72% -10%,#30324a 0,transpar
+ .app-main{width:100%;max-width:1500px;padding:22px clamp(16px,3vw,42px);margin:auto}.app-main>header{margin-bottom:14px}.app-main>header h1{font-size:22px}.app-main>.muted{margin:0 0 12px}.view-page[hidden]{display:none}.view-page{animation:page-in .16s ease-out}@keyframes page-in{from{opacity:.55;transform:translateY(3px)}to{opacity:1;transform:none}}
+ .flow-panel{background:linear-gradient(145deg,#242a39,#1b202c);border:1px solid #41495d;border-radius:12px;padding:14px;margin:12px 0}.flow-title{display:flex;justify-content:space-between;gap:12px;align-items:center}.flow-title h2{margin:0}.flow-title small{color:var(--muted)}.flow-grid{display:grid;grid-template-columns:repeat(6,minmax(80px,1fr));gap:12px;margin:12px 0 10px}.flow-step{position:relative;min-height:76px;border:1px solid #3c4659;border-radius:10px;background:#191e29;color:var(--text);font:inherit;padding:8px 6px;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px;cursor:pointer}.flow-step strong{font-size:11px}.flow-step small{font-size:10px;color:var(--muted)}.flow-step .flow-icon{font-size:18px}.flow-step:not(:last-child):not(.side-signal)::after{content:'›';position:absolute;right:-11px;top:calc(50% - 12px);color:#8190a8;font-size:21px;pointer-events:none}.flow-step:hover,.flow-step:focus-visible,.flow-step[aria-pressed=true]{border-color:var(--accent);outline:2px solid #bd93f966;outline-offset:1px}.flow-step.is-working{border-color:var(--cyan);box-shadow:0 0 18px #8be9fd24}.flow-step.is-working:before{content:'';position:absolute;top:7px;left:7px;width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:flow-pulse .85s ease-in-out infinite alternate}@keyframes flow-pulse{to{opacity:.15;transform:scale(.55)}}.flow-step.side-signal{border-style:dashed;border-color:var(--orange)}.flow-details{border:1px solid #394356;background:#191e29;border-radius:8px;margin:8px 0}.flow-details summary{cursor:pointer;color:var(--cyan);padding:8px 10px;font-size:12px}.flow-detail-content{padding:0 10px 9px}.flow-detail-content p{margin:4px 0;color:var(--muted);font-size:11px;line-height:1.4}.flow-foot{display:flex;gap:9px;align-items:flex-start;border-top:1px dashed #4d5669;padding-top:8px;color:var(--muted);font-size:10px}.flow-foot b{color:var(--orange)}.flow-feedback{margin-left:auto;color:#d9c9ff!important;white-space:nowrap}
+ .alert.is-alarm{border-left-color:var(--red);background:#302128}.alert.is-alarm strong{color:#ff9fa7}.alert:not(.is-alarm) strong{color:var(--orange)}
+-.side-session{border-color:transparent}.side-session.active{border-color:var(--session-color,#bd93f9);background:#2a2d3b;color:var(--text)}.side-session.has-warning,.side-session.has-warning.active{border-left:3px solid #e5b94c;background:#403923;color:#fff1bd}.side-session.has-alarm,.side-session.has-alarm.active{border-left:3px solid #ff626d;background:#452a32;color:#ffd5d8}.alert-severity{width:17px;height:17px;flex:none;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:800}.has-warning .alert-severity{background:#e5b94c;color:#28230f}.has-alarm .alert-severity{background:#ff626d;color:#2a1014}.notification-status{display:flex;gap:6px;flex-wrap:wrap}.notification-status span{padding:4px 8px;border:1px solid var(--border);border-radius:16px;font-size:11px;color:var(--muted)}.notification-status .is-on{border-color:#8be9a4;color:#b6f3c0}.notification-status .needs-activation{border-color:var(--orange);color:#ffdaa2}
++.side-session{border-color:transparent}.side-session.active{border-color:var(--session-color,#bd93f9);background:#2a2d3b;color:var(--text)}.side-session.has-warning,.side-session.has-warning.active{border-left:3px solid #e5b94c;background:#403923;color:var(--text)}.side-session.has-alarm,.side-session.has-alarm.active{border-left:3px solid #ff626d;background:#452a32;color:var(--text)}.alert-severity{width:17px;height:17px;flex:none;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:800}.has-warning .alert-severity{background:#e5b94c;color:#28230f}.has-alarm .alert-severity{background:#ff626d;color:#2a1014}.notification-status{display:flex;gap:6px;flex-wrap:wrap}.notification-status span{padding:4px 8px;border:1px solid var(--border);border-radius:16px;font-size:11px;color:var(--muted)}.notification-status .is-on{border-color:#8be9a4;color:#b6f3c0}.notification-status .needs-activation{border-color:var(--orange);color:#ffdaa2}
+ .session-fold{border:1px solid var(--border);border-left:4px solid var(--session-color,#bd93f9);border-radius:10px;background:var(--card);margin-top:10px;overflow:hidden}.session-fold>summary{list-style:none;display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;color:var(--text);min-height:42px;transition:background .15s}.session-fold>summary:hover{background:rgba(255,255,255,.04)}.session-fold>summary::-webkit-details-marker{display:none}.session-fold>summary:before{content:'▸';font-size:14px;line-height:1;color:var(--session-color,#bd93f9);margin-right:4px;transition:transform .15s ease-in-out;display:inline-block}.session-fold[open]>summary:before{transform:rotate(90deg)}.session-fold:not([open])>summary{font-size:12px}.session-fold .session-body{margin:0;border:0;border-radius:0;border-top:1px solid var(--border)}.session-body>.session-top>.status{display:none}
+ .session-marker{width:12px;height:12px;flex:none;border-radius:3px;background:var(--session-color,#bd93f9);box-shadow:none}
+ .side-session .side-session-title{display:block;font-weight:650;overflow-wrap:anywhere;word-break:normal;line-height:1.25}
+-.side-session.status-closed .side-session-title{color:#6272a4;opacity:.85}
+-.side-session.status-paused .side-session-title{color:var(--muted)}
+-.side-session.status-active .side-session-title{color:#8be9a4}
+-.side-session.status-warning .side-session-title{color:var(--orange);font-weight:700}
+-.side-session.status-alarm .side-session-title{color:var(--red);font-weight:700}
++.side-session.status-closed .side-session-title,.side-session.status-paused .side-session-title{color:var(--muted);opacity:.85}
++.side-session.status-active .side-session-title,.side-session.status-warning .side-session-title,.side-session.status-alarm .side-session-title{color:var(--text);font-weight:650}
++.side-session .session-marker{background:#8be9a4}
++.side-session.status-warning .session-marker,.side-session.has-warning .session-marker{background:#e5b94c}
++.side-session.status-alarm .session-marker,.side-session.has-alarm .session-marker{background:#ff626d}
++.side-session.status-closed .session-marker,.side-session.status-paused .session-marker{background:#6272a4}
+ .side-session-state{display:block;text-transform:uppercase;font-size:10px;font-weight:750;letter-spacing:.05em;margin-top:2px}
+ .side-session-state.is-closed{color:#6272a4}
+ .side-session-state.is-paused{color:#fae89c;font-weight:750}
+ .side-session-state.is-active{color:#8be9a4}
+ .side-session-state.is-warning{color:var(--orange)}
+ .side-session-state.is-alarm{color:var(--red)}
++
++/* R16 : identifiant d'agent colore — TEXTE colore seul (remarque exploitant 2026-11-14 :
++le badge encadre etait peu lisible), standard par acteur. */
++.side-session-meta-row{display:flex;align-items:center;gap:6px;min-width:0;margin-top:2px}
++.model-tag{font-size:10px;line-height:16px;font-weight:650;letter-spacing:.04em;color:var(--muted);flex:none}
++.model-tag.model-claude{color:#f4a68a}
++.model-tag.model-codex{color:#6fd3b6}
++.model-tag.model-agy{color:#8ab4f8}
++.model-tag.model-dsh{color:#c4b8f8}
++.model-tag.model-opc{color:#f5d78e}
++.model-tag.model-mmx{color:#ffdd57}
+ .session-summary-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .session-summary-name.is-closed{color:#6272a4}
+ .session-summary-name.is-paused{color:var(--muted)}
+@@ -781,8 +793,11 @@ function renderSideSessions(sessions){
+    const text=element('span',undefined,'side-session-content');
+    const titleEl=element('b',session.alias||session.native_id,'side-session-title');
+    const stateEl=element('span',stateLabel,'side-session-state is-'+statusKey);
+-   const metaEl=element('small',(session.platform||'')+(counts.unread?' · '+counts.unread+' new':''),'session-meta');
+-   text.append(titleEl,stateEl,metaEl);
++   const actorHit=[['MMX','mmx'],['AGY','agy'],['CDX','codex'],['DSH','dsh'],['OPC','opc'],['CC','claude']].find(entry=>(String(session.alias||'')+' '+(session.platform||'')).toUpperCase().includes(entry[0]));
++   const modelTag=element('span',actorHit?actorHit[0]:(session.platform||'—'),'model-tag model-'+(actorHit?actorHit[1]:(session.platform||'unknown')));
++   const metaEl=element('small',counts.unread?('· '+counts.unread+' new'):'','session-meta');
++   const metaRow=element('span',undefined,'side-session-meta-row');metaRow.append(modelTag,metaEl);
++   text.append(titleEl,stateEl,metaRow);
+    button.append(marker,text);
+    button.classList.toggle('has-alarm',alarm);button.classList.toggle('has-warning',!alarm&&warning);
+    if(alarm||warning)button.append(element('i',alarm?'🔴':'⚠️','alert-severity'));
+@@ -1031,7 +1046,8 @@ function renderFinding(session,alert,routeTarget,autoOpen=false){
+  const body=element('div',undefined,'alert-history-body');row.append(body);
+  body.append(formatReason(alert.reason));
+  if(alert.evidence){const quote=element('details',undefined,'finding-quote session-config');quote.open=Boolean(autoOpen&&row.open);const quoteSummary=element('summary','❝ Citation · '+shortPreview(cleanQuote(alert.evidence),90));appendFoldPills(quoteSummary);quote.append(quoteSummary,element('blockquote',cleanQuote(alert.evidence),'evidence'));body.append(quote);}
+- const usage=alert.memory_usage;if(usage){const used=element('small',undefined,'evidence-origin');used.textContent='Ce que le juge avait sous les yeux : fenêtre '+usage.fenetre+' · longue '+usage.memoire_longue+' · journal '+usage.journal+' · preuves '+usage.prouves_acquises+' · cadrage '+usage.cadrage+(usage.fenetre_tronquee?' · fenêtre tronquée':'');used.classList.add('muted');body.append(used);}
++ const usage=alert.memory_usage;if(usage){const used=element('small',undefined,'evidence-origin');used.textContent='Ce que le juge avait sous les yeux : fenêtre '+usage.fenetre+' · longue '+usage.memoire_longue+' · journal '+usage.journal+' · preuves '+usage.preuves_acquises+' · cadrage '+usage.cadrage+(usage.fenetre_tronquee?' · fenêtre tronquée':'');used.classList.add('muted');body.append(used);}
++const declared=alert.lecture_declaree;if(declared){const readList=element('small',undefined,'evidence-origin');const ills=(declared.illisibles||[]).length?' · illisible(s) signalé(s), jamais deviné(s) : '+declared.illisibles.join(', '):'';readList.textContent='📖 Fichiers déclarés lus pour ce verdict : '+((declared.fichiers||[]).join(', ')||'aucun')+ills;readList.classList.add('muted');body.append(readList);}
+  const provenance=alert.evidence_provenance;if(provenance&&provenance.source){const labels={fenetre:'fenêtre observée',"memoire longue":'mémoire longue (hors fenêtre)',journal:"journal d'état",preuves:'preuves acquises',cadrage:'cadrage',introuvable:'introuvable (la preuve a quitté la mémoire)'};const origin=element('small',undefined,'evidence-origin');origin.textContent='Preuve : '+(labels[provenance.source]||provenance.source)+(provenance.event_index!==undefined&&provenance.event_index!==null?' #'+provenance.event_index:'')+(provenance.event_id?' ('+String(provenance.event_id).slice(0,8)+')':'')+(provenance.in_window===false&&provenance.source!=='introuvable'?' · hors de la fenêtre du juge':'');origin.classList.add(provenance.source==='introuvable'?'warn':'muted');body.append(origin);}
+  const assessmentDiffers=(assessment.status&&assessment.status!=='active')||(assessment.reason&&String(assessment.reason).trim()!==String(alert.reason||'').trim());
+  if(assessmentDiffers){const advice=element('section',undefined,'assessment-note');advice.append(element('strong','Supervisor · '+(assessmentLabels[assessment.status]||assessment.status)),formatReason(assessment.reason||'Avis à réévaluer.'));if(assessment.evidence&&assessment.evidence!==alert.evidence)advice.append(element('blockquote',cleanQuote(assessment.evidence)));body.append(advice);}
+@@ -1307,7 +1323,14 @@ function render(snapshot,force=false){
+    const socle=session.socle||[];if(socle.length){const socleBox=element('details',undefined,'memory-group session-config');const socleSummary=element('summary','📚 Socle exigé à l\'attachement · '+socle.length+' document(s)');appendFoldPills(socleSummary);socleBox.append(socleSummary);for(const doc of socle){socleBox.append(element('p','· '+doc,'muted'));}memFold.append(socleBox);}
+    const personas=memoryState.personas||[];
+    memFold.append(element('p',personas.length?('🧑‍💼 Agents spécialistes invoqués : '+personas.map(item=>item.role+' ×'+item.count).join(', ')):'🧑‍💼 Agents spécialistes : aucune invocation tracée pour cette session.','hint'));
+-   memFold.append(element('p','Le dossier de lecture (fichiers fournis au juge) et les agents spécialistes sont des entrées distinctes : voir le journal interne.','hint'));
++   const dossier=memoryState.dossier_lecture||{};
++   const dossierBox=element('details',undefined,'memory-group session-config');
++   const dossierSummary=element('summary','📖 Dossier de lecture (fourni au juge, lecture seule) · '+((dossier.fichiers||[]).length)+' fichier(s)');
++   appendFoldPills(dossierSummary);dossierBox.append(dossierSummary);
++   dossierBox.append(element('p',((dossier.fichiers||[]).length)?('· '+dossier.fichiers.join(' · ')):'Aucun fichier lu pour le dernier verdict.','muted'));
++   if((dossier.illisibles||[]).length)dossierBox.append(element('p','⚠️ Illisible(s), signalé(s) jamais deviné(s) : '+dossier.illisibles.map(item=>(typeof item==='object'?(item.path+': '+item.erreur):item)).join(' · '),'warn'));
++   dossierBox.append(element('p','Ce dossier est fourni au juge en lecture seule ('+(dossier.total_caracteres||0)+' caractères, budget '+((dossier.budget||{}).max_fichiers||'?')+' fichiers / '+((dossier.budget||{}).max_caracteres||'?')+' caractères, une passe par verdict). Accès direct au dépôt : interdit en v1 — dossier de lecture et accès direct au dépôt sont deux notions distinctes.','hint'));
++   memFold.append(dossierBox);
+    moreDetails.append(memFold);}
+   const dl=element('dl',undefined,'details');detail(dl,'CLI / ID',(session.platform||'')+' / '+(session.native_id||''));if(session.task_id)detail(dl,'Tâche liée',session.task_id+(session.task_title?' — '+session.task_title:''));detail(dl,'Source lue',session.source);detail(dl,'Dernier événement',dateText(session.last_event));detail(dl,'Analyse',(analysisNames[session.analysis_state]||session.analysis_state||'Non effectuée')+' · '+dateText(session.last_analysis));detail(dl,'Suivi ré-évaluations',`${session.judge_turn_count||0} tour(s) (${Math.max(0,(session.judge_turn_count||0)-1)} ré-évaluation(s))`);moreDetails.append(dl);
+   if(session.error)card.append(element('p',session.error,'error'));
+diff --git a/TOOLS/AGENT_WORKFLOW/scripts/specialist_runner.py b/TOOLS/AGENT_WORKFLOW/scripts/specialist_runner.py
+index dcaff7db..9b34cc66 100644
+--- a/TOOLS/AGENT_WORKFLOW/scripts/specialist_runner.py
++++ b/TOOLS/AGENT_WORKFLOW/scripts/specialist_runner.py
+@@ -319,15 +319,17 @@ def main():
+     # l usage reel des 6 agents specialises devient un fait, pas une impression.
+     try:
+         import os as _os, sys as _sys
+-        _scripts_dir = str(Path(__file__).resolve().parent)
++        _scripts_dir = _os.path.dirname(_os.path.abspath(__file__))
+         if _scripts_dir not in _sys.path:
+             _sys.path.insert(0, _scripts_dir)
+         import trace_log
+-        trace_log.emit("persona", role=args.role, target=args.target, task=args.task,
+-                       session=_os.environ.get("CLAUDE_CODE_SESSION_ID"),
+-                       prompt_len=len(args.prompt or ""))
+-    except Exception:
+-        pass
++        if args.role or args.show_prompt:   # les modes liste n'invoquent pas de persona
++            trace_log.emit("persona", role=args.role or args.show_prompt, target=args.target, task=args.task,
++                           session=_os.environ.get("CLAUDE_CODE_SESSION_ID"),
++                           prompt_len=len(args.prompt or ""))
++    except Exception as _trace_exc:
++        # R15 : la journalisation ne casse jamais l'invocation, mais elle n'est jamais muette (M7).
++        sys.stderr.write("[trace] journalisation persona echouee : %s\n" % _trace_exc)
+ 
+     if args.list_roles:
+         list_roles()
