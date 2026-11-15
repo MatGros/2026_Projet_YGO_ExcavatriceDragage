@@ -227,6 +227,13 @@ plan_project:
       execution_by: ""
       evidence: ""
       execution_comment: "Demande exploitant via CC10 ; source de référence : MODEL_ROUTING.md à enrichir (pose humaine, hors périmètre strict T429 : docs) + les 4 familles Claude 5 ; le transport au service = liste en config, JAMAIS une lecture du dépôt par le service (règle v1)"
+    - id: M22
+      title: "R25 — titre de session court + rattachement de tâche explicite"
+      done_when: "Titre affiché = alias + désignation courte (≤ 40 car.) ; set_task modifie la tâche liée, recalcule le titre, journalise, et ne touche jamais l'identité"
+      execution: NOT_STARTED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "Décision datée 2026-11-15 (demande T427-CC02, preuve attendue par l'exploitant) ; le format du titre remplace la décision figée N°4 « alias · titre officiel (désignation) » — mise à jour du registre des décisions figées au prochain lot ; l'implémentation démarre après M17 (le GO de l'épisode) ; l'édition d'objectif reste chez T000_SESSION_NAMING"
       validation: NOT_REVIEWED
       validated_by: ""
       validated_at: ""
@@ -376,6 +383,7 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
 | **R21** | **Statut de migration visible dans l'IHM** (proposition T000-CC10 acceptée, cas « Migration interrompue : timed out » invisible) | bandeau IHM : état `en cours/réussie/échec`, étape courante, cause, chemin de sauvegarde — sans changement de format d'état, migration jamais lancée sans GO (AC-1→AC-6 de la proposition) | tests upgrade + bandeau DOM ; à trancher §6 : canal HTTP avec jeton vs fichier d'état, statut expiré 24 h | CC01 (T429), implémentation après le restart M12 |
 | **R22** | **Constat : même acteur porté par deux sessions actives** (demande exploitant via CC10 ; le cas T000-* reste couvert par coordination_conflict) | 2+ sessions enabled+active portant le même acteur (partie après `Txxx-` de l'alias) → constat `actor_conflict` posé sur chacune, idempotent, s'éteint à la pause ; acteur absent → jamais de constat | tests (doublon → 1 constat chacun · pause → aucun · idempotent) | CC01 (T429) |
 | **R23** | **Constat : identifiant de modèle consommé hors liste de référence** — PARTIEL : le service n'inspecte que les identifiants qu'il consomme, JAMAIS la doc/contrats (le service ne lit pas le dépôt en v1) | liste de référence FOURNIE au service par config (source : MODEL_ROUTING.md à enrichir, pose humaine) ; identifiant du juge hors liste → constat `model_out_of_reference` ; liste absente → aucun constat, jamais deviné ; constat seulement, pas de correction | tests (liste fournie + hors liste → constat · liste absente → rien) | CC01 (T429) ; liste → exploitant/CC10 |
+| **R25** | **Titre de session court + rattachement de tâche explicite** (demande T427-CC02 relayée par l'exploitant, 2026-11-15) | format tranché : titre de session = `<alias> <désignation courte>` (≤ 40 car., posée au renommage par l'exploitant, défaut = 3-4 premiers mots du titre catalogue ; le titre catalogue complet reste en détail de carte) ; le changement de sujet se fait par un **rattachement explicite** (`set_task` protégé par le jeton, journalisé), JAMAIS deviné : l'identité (id natif) ne change jamais | tests rename+display (titres courts, longs tronqués) · test set_task (champ modifié, titre recalculé, journal, identité intacte) | CC01 (T429) — la partie édition d'objectif reste le lot T000_SESSION_NAMING |
 
 ### Décisions figées sur ce lot
 
