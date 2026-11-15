@@ -97,9 +97,19 @@ def test_metric_counts_product_process_and_outside(tmp_path, monkeypatch):
     assert result["total"] == 4
 
 
+def _transcript(tmp_path, *messages):
+    """Transcript minimal : messages humains cites par les derogations (T427 P1)."""
+    import json as _json
+    path = tmp_path / "transcript.jsonl"
+    path.write_text("".join(_json.dumps({"type": "user", "message": {"content": m}}) + "\n"
+                            for m in messages), encoding="utf-8")
+    return path
+
+
 def test_derogation_covers_a_prefix(tmp_path, monkeypatch):
     monkeypatch.setattr(task_scope, "DEROG_DIR", tmp_path)
-    task_scope.write_derogation("s", "TOOLS/AGENT_WORKFLOW/**", "accord")
+    task_scope.write_derogation("s", "TOOLS/AGENT_WORKFLOW/**", "accord",
+                                transcript=_transcript(tmp_path, "oui accord pour ce dossier"))
     assert task_scope.is_derogated("s", "TOOLS/AGENT_WORKFLOW/scripts/x.py")
     assert not task_scope.is_derogated("s", "TOOLS/AUTRE/y.py")
 
@@ -107,7 +117,8 @@ def test_derogation_covers_a_prefix(tmp_path, monkeypatch):
 def test_derogation_is_recorded_and_recognized(tmp_path, monkeypatch):
     monkeypatch.setattr(task_scope, "DEROG_DIR", tmp_path)
 
-    task_scope.write_derogation("s", "TOOLS/OTHER/b.py", "accord exploitant")
+    task_scope.write_derogation("s", "TOOLS/OTHER/b.py", "accord exploitant",
+                                transcript=_transcript(tmp_path, "GO : accord exploitant sur b.py"))
 
     assert task_scope.is_derogated("s", "TOOLS/OTHER/b.py")
     assert not task_scope.is_derogated("s", "TOOLS/OTHER/c.py")

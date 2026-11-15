@@ -61,7 +61,9 @@ def test_verify_scope_detects_a_contract_modified_during_the_session(monkeypatch
 
 def test_derogation_expires(monkeypatch, tmp_path):
     monkeypatch.setattr(task_scope, "DEROG_DIR", tmp_path)
-    task_scope.write_derogation("s1", "TOOLS/X.py", "motif", ttl_days=1)
+    transcript = tmp_path / "t.jsonl"
+    transcript.write_text(json.dumps({"type": "user", "message": {"content": "motif valide"}}) + "\n", encoding="utf-8")
+    task_scope.write_derogation("s1", "TOOLS/X.py", "motif", ttl_days=1, transcript=transcript)
     assert task_scope.is_derogated("s1", "TOOLS/X.py")
 
     entries = task_scope.read_derogations("s1")

@@ -1,0 +1,296 @@
+diff --git a/TOOLS/AGENT_WORKFLOW/scripts/task_scope.py b/TOOLS/AGENT_WORKFLOW/scripts/task_scope.py
+--- a/TOOLS/AGENT_WORKFLOW/scripts/task_scope.py
++++ b/TOOLS/AGENT_WORKFLOW/scripts/task_scope.py
+@@ -67,6 +67,22 @@
+     "TOOLS/AGENT_WORKFLOW/scripts/hook_stop.py",
+     "TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py",
+ )
++# Interdiction DURE (T427 P1, GO exploitant 2026-11-15) : aucune DEROGATION ne la leve.
++# Seul le perimetre EPINGLE d'un contrat valide (ex. tache PLC sur CODE/) l'autorise.
++HARD_DENY = (
++    "CODE/**",
++    "CODE_XML/**",
++    "PRJ_CODESYS/**",
++    "TOOLS/AGENT_WORKFLOW/scripts/task_scope.py",
++    "TOOLS/AGENT_WORKFLOW/scripts/hook_scope_guard.py",
++    "TOOLS/AGENT_WORKFLOW/scripts/trace_log.py",
++    "TOOLS/AGENT_WORKFLOW/scripts/miss_log.py",
++    "TOOLS/AGENT_WORKFLOW/scripts/hook_workflow_attest.py",
++    "TOOLS/AGENT_WORKFLOW/scripts/hook_pre_edit.py",
++    "TOOLS/AGENT_WORKFLOW/scripts/hook_post_edit.py",
++    "TOOLS/AGENT_WORKFLOW/scripts/hook_stop.py",
++    "TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py",
++)
+ TAIL_BYTES = 512_000  # lecture de queue : le transcript peut faire plusieurs Mo
+ 
+ 
+@@ -245,9 +261,19 @@
+             or _matches_anywhere(relative, list(ABSOLUTE_DENY)))
+ 
+ 
+-def classify(relative: str, product: list[str], forbidden: list[str], process: list[str]) -> str:
+-    """produit | processus | hors."""
+-    if is_absolute_denied(relative) or matches(relative, forbidden):
++def is_hard_denied(relative: str) -> bool:
++    """Chemin qu'aucune derogation ne peut ouvrir (CODE/, sources automate, garde-fous)."""
++    return matches(relative, list(HARD_DENY)) or _matches_anywhere(relative, list(HARD_DENY))
++
++
++def classify(relative: str, product: list[str], forbidden: list[str], process: list[str],
++             pinned_allowed: list[str] | None = None) -> str:
++    """produit | processus | hors.
++
++    T427 P1 : le perimetre EPINGLE du contrat est transmis, sinon un chemin protege que le
++    contrat autorise (ex. skills/orchestrator/) etait classe hors et exigeait une derogation.
++    """
++    if is_absolute_denied(relative, pinned_allowed) or matches(relative, forbidden):
+         return "hors"
+     if matches(relative, product):
+         return "produit"
+@@ -380,8 +406,59 @@
+     return data if isinstance(data, list) else []
+ 
+ 
+-def write_derogation(session_id: str, path: str, motif: str, ttl_days: int = 30) -> dict:
+-    """Derogation ACCORDEE mais DATEDE (GLM 2026-11-13) : pas d'arrimage eternel."""
++class DerogationRefusee(ValueError):
++    """Derogation refusee : motif absent, citation introuvable ou chemin a interdiction dure."""
++
++
++def _user_messages(transcript) -> list:
++    """Textes des messages humains du transcript (jsonl Claude Code)."""
++    texts = []
++    if not transcript:
++        return texts
++    try:
++        with open(transcript, "r", encoding="utf-8", errors="replace") as stream:
++            for line in stream:
++                if '"user"' not in line:
++                    continue
++                try:
++                    entry = json.loads(line)
++                except ValueError:
++                    continue
++                if entry.get("type") != "user":
++                    continue
++                content = (entry.get("message") or {}).get("content")
++                if isinstance(content, str):
++                    texts.append(content)
++                elif isinstance(content, list):
++                    texts.extend(str(c.get("text", "")) for c in content
++                                 if isinstance(c, dict) and c.get("type") == "text")
++    except OSError:
++        return []
++    return texts
++
++
++def citation_from_user(transcript, citation: str) -> bool:
++    """Vrai si la citation figure MOT POUR MOT dans un message humain (aucune reformulation)."""
++    cite = " ".join(str(citation or "").split())
++    if len(cite) < 2:
++        return False
++    return any(cite in " ".join(text.split()) for text in _user_messages(transcript))
++
++
++def write_derogation(session_id: str, path: str, motif: str, ttl_days: int = 30,
++                     transcript=None) -> dict:
++    """Derogation ACCORDEE mais DATEDE (GLM 2026-11-13) : pas d'arrimage eternel.
++
++    T427 P1 : motif OBLIGATOIRE, copie mot pour mot d'un message humain du transcript ;
++    aucun chemin a interdiction dure ne peut etre deroge.
++    """
++    if is_hard_denied(normalize(path)):
++        raise DerogationRefusee(f"interdiction dure : {normalize(path)} ne peut pas etre deroge")
++    if not str(motif or "").strip():
++        raise DerogationRefusee("motif obligatoire : citer mot pour mot le message de l'exploitant")
++    if not citation_from_user(transcript, motif):
++        raise DerogationRefusee("citation introuvable dans les messages humains du transcript : "
++                                "le motif doit etre copie mot pour mot, sans reformulation")
+     entries = read_derogations(session_id)
+     entry = {"path": normalize(path), "motif": str(motif or "").strip()[:300],
+              "granted_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+@@ -395,6 +472,8 @@
+ 
+ 
+ def is_derogated(session_id: str, relative: str) -> bool:
++    if is_hard_denied(normalize(relative)):
++        return False  # T427 P1 : interdiction dure, aucune derogation ne compte
+     """Une derogation vaut pour un chemin exact ou pour un prefixe marque '.../**'."""
+     now = time.time()
+     for item in read_derogations(session_id):
+@@ -588,7 +667,8 @@
+     p_derog = sub.add_parser("deroge")
+     p_derog.add_argument("--session", required=True)
+     p_derog.add_argument("--path", required=True)
+-    p_derog.add_argument("--motif", default="")
++    p_derog.add_argument("--motif", required=True, help="citation EXACTE du message de l exploitant")
++    p_derog.add_argument("--transcript", default="", help="transcript de la session (sinon CLAUDE_TRANSCRIPT_PATH)")
+ 
+     args = parser.parse_args(argv)
+ 
+@@ -598,8 +678,13 @@
+         return 0
+ 
+     if args.command == "deroge":
+-        entry = write_derogation(args.session, args.path, args.motif)
+-        print(f"Dérogation enregistrée : {entry['path']} — {entry['motif'] or 'sans motif'}")
++        transcript = args.transcript or os.environ.get("CLAUDE_TRANSCRIPT_PATH", "")
++        try:
++            entry = write_derogation(args.session, args.path, args.motif, transcript=transcript)
++        except DerogationRefusee as exc:
++            print(f"Dérogation REFUSÉE : {exc}")
++            return 2
++        print(f"Dérogation enregistrée : {entry['path']} — {entry['motif']}")
+         return 0
+ 
+     transcript = args.transcript or os.environ.get("CLAUDE_TRANSCRIPT_PATH", "")
+diff --git a/TOOLS/AGENT_WORKFLOW/scripts/hook_scope_guard.py b/TOOLS/AGENT_WORKFLOW/scripts/hook_scope_guard.py
+--- a/TOOLS/AGENT_WORKFLOW/scripts/hook_scope_guard.py
++++ b/TOOLS/AGENT_WORKFLOW/scripts/hook_scope_guard.py
+@@ -91,7 +91,8 @@
+                 "path": task_scope.normalize(target), "task_id": scope.get("task_id"),
+                 "scope": scope.get("produit")}
+     relative = task_scope.normalize(target)
+-    kind = task_scope.classify(relative, scope["produit"], scope["interdits"], scope["processus"])
++    kind = task_scope.classify(relative, scope["produit"], scope["interdits"], scope["processus"],
++                               pinned_allowed)
+     if kind == "produit":
+         return {"decision": "allow", "kind": "produit", "reason": "dans le perimetre produit"}
+     if kind == "processus":
+diff --git a/TOOLS/AGENT_WORKFLOW/tests/test_task_scope.py b/TOOLS/AGENT_WORKFLOW/tests/test_task_scope.py
+--- a/TOOLS/AGENT_WORKFLOW/tests/test_task_scope.py
++++ b/TOOLS/AGENT_WORKFLOW/tests/test_task_scope.py
+@@ -97,9 +97,19 @@
+     assert result["total"] == 4
+ 
+ 
++def _transcript(tmp_path, *messages):
++    """Transcript minimal : messages humains cites par les derogations (T427 P1)."""
++    import json as _json
++    path = tmp_path / "transcript.jsonl"
++    path.write_text("".join(_json.dumps({"type": "user", "message": {"content": m}}) + "\n"
++                            for m in messages), encoding="utf-8")
++    return path
++
++
+ def test_derogation_covers_a_prefix(tmp_path, monkeypatch):
+     monkeypatch.setattr(task_scope, "DEROG_DIR", tmp_path)
+-    task_scope.write_derogation("s", "TOOLS/AGENT_WORKFLOW/**", "accord")
++    task_scope.write_derogation("s", "TOOLS/AGENT_WORKFLOW/**", "accord",
++                                transcript=_transcript(tmp_path, "oui accord pour ce dossier"))
+     assert task_scope.is_derogated("s", "TOOLS/AGENT_WORKFLOW/scripts/x.py")
+     assert not task_scope.is_derogated("s", "TOOLS/AUTRE/y.py")
+ 
+@@ -107,7 +117,8 @@
+ def test_derogation_is_recorded_and_recognized(tmp_path, monkeypatch):
+     monkeypatch.setattr(task_scope, "DEROG_DIR", tmp_path)
+ 
+-    task_scope.write_derogation("s", "TOOLS/OTHER/b.py", "accord exploitant")
++    task_scope.write_derogation("s", "TOOLS/OTHER/b.py", "accord exploitant",
++                                transcript=_transcript(tmp_path, "GO : accord exploitant sur b.py"))
+ 
+     assert task_scope.is_derogated("s", "TOOLS/OTHER/b.py")
+     assert not task_scope.is_derogated("s", "TOOLS/OTHER/c.py")
+diff --git a/TOOLS/AGENT_WORKFLOW/tests/test_scope_integrity.py b/TOOLS/AGENT_WORKFLOW/tests/test_scope_integrity.py
+--- a/TOOLS/AGENT_WORKFLOW/tests/test_scope_integrity.py
++++ b/TOOLS/AGENT_WORKFLOW/tests/test_scope_integrity.py
+@@ -61,7 +61,9 @@
+ 
+ def test_derogation_expires(monkeypatch, tmp_path):
+     monkeypatch.setattr(task_scope, "DEROG_DIR", tmp_path)
+-    task_scope.write_derogation("s1", "TOOLS/X.py", "motif", ttl_days=1)
++    transcript = tmp_path / "t.jsonl"
++    transcript.write_text(json.dumps({"type": "user", "message": {"content": "motif valide"}}) + "\n", encoding="utf-8")
++    task_scope.write_derogation("s1", "TOOLS/X.py", "motif", ttl_days=1, transcript=transcript)
+     assert task_scope.is_derogated("s1", "TOOLS/X.py")
+ 
+     entries = task_scope.read_derogations("s1")
+diff --git a/TOOLS/AGENT_WORKFLOW/tests/test_scope_guard_p1.py b/TOOLS/AGENT_WORKFLOW/tests/test_scope_guard_p1.py
+new file mode 100644
+--- /dev/null
++++ b/TOOLS/AGENT_WORKFLOW/tests/test_scope_guard_p1.py
+@@ -0,0 +1,84 @@
++"""Garde-fous P1 (T427, GO exploitant 2026-11-15) : correction du garde de perimetre.
++
++Contrat : (1) CODE/** refuse sans exception, derogation comprise ; (2) motif obligatoire,
++copie mot pour mot d'un message humain ; (3) perimetre du contrat respecte ; (4) tests.
++"""
++import json
++import sys
++from pathlib import Path
++
++import pytest
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
++import task_scope  # noqa: E402
++
++
++def _transcript(tmp_path, *messages):
++    path = tmp_path / "transcript.jsonl"
++    path.write_text("".join(json.dumps({"type": "user", "message": {"content": m}}) + "\n"
++                            for m in messages), encoding="utf-8")
++    return path
++
++
++@pytest.fixture(autouse=True)
++def _registre_isole(tmp_path, monkeypatch):
++    monkeypatch.setattr(task_scope, "DEROG_DIR", tmp_path / "derog")
++
++
++def test_P1_code_refuse_meme_avec_derogation_existante(tmp_path):
++    """(1) une derogation deja presente dans le registre ne compte jamais pour CODE/."""
++    reg = tmp_path / "derog"
++    reg.mkdir()
++    task_scope.derogations_path("s").write_text(json.dumps([{
++        "path": "CODE/**", "motif": "force", "expires_at": 9e12}]), encoding="utf-8")
++    assert task_scope.is_derogated("s", "CODE/MAIN/PRG_01.st") is False
++    assert task_scope.is_absolute_denied("CODE/MAIN/PRG_01.st", []) is True
++
++
++def test_P1_code_derogation_refusee_a_l_ecriture(tmp_path):
++    with pytest.raises(task_scope.DerogationRefusee):
++        task_scope.write_derogation("s", "CODE/**", "oui", transcript=_transcript(tmp_path, "oui"))
++
++
++def test_P1_garde_lui_meme_non_derogeable(tmp_path):
++    with pytest.raises(task_scope.DerogationRefusee):
++        task_scope.write_derogation("s", "TOOLS/AGENT_WORKFLOW/scripts/task_scope.py", "oui",
++                                    transcript=_transcript(tmp_path, "oui"))
++
++
++def test_P1_skills_autorise_par_le_contrat_sans_derogation():
++    """(3) un chemin protege que le perimetre epingle du contrat autorise est classe produit."""
++    pinned = ["TOOLS/AGENT_WORKFLOW/skills/orchestrator/"]
++    kind = task_scope.classify("TOOLS/AGENT_WORKFLOW/skills/orchestrator/ROLE.md",
++                               pinned, [], [], pinned_allowed=pinned)
++    assert kind == "produit"
++
++
++def test_P1_contrat_plc_epingle_reste_valable():
++    """Un contrat PLC valide (CODE/ dans le perimetre epingle) n'est pas casse par P1."""
++    assert task_scope.is_absolute_denied("CODE/MAIN/PRG_01.st", ["CODE/MAIN/"]) is False
++
++
++def test_P1_motif_vide_refuse(tmp_path):
++    with pytest.raises(task_scope.DerogationRefusee):
++        task_scope.write_derogation("s", "TOOLS/X.py", "   ", transcript=_transcript(tmp_path, "oui"))
++
++
++def test_P1_derogation_sans_motif_refusee_en_cli(tmp_path, capsys):
++    """(4) la CLI exige --motif."""
++    with pytest.raises(SystemExit):
++        task_scope.main(["deroge", "--session", "s", "--path", "TOOLS/X.py"])
++
++
++def test_P1_citation_reformulee_refusee(tmp_path):
++    """(2) un motif qui ne figure pas mot pour mot dans un message humain est refuse."""
++    tr = _transcript(tmp_path, "Je te rappelle que tu es le responsable. C'est toi qui décides là, non ?")
++    with pytest.raises(task_scope.DerogationRefusee):
++        task_scope.write_derogation("s", "TOOLS/X.py", "c'est toi qui decides", transcript=tr)
++
++
++def test_P1_citation_exacte_acceptee(tmp_path):
++    tr = _transcript(tmp_path, "GO P1 avrec /worglow")
++    entry = task_scope.write_derogation("s", "TOOLS/X.py", "GO P1 avrec /worglow", transcript=tr)
++    assert entry["motif"] == "GO P1 avrec /worglow"
++    assert task_scope.is_derogated("s", "TOOLS/X.py")
