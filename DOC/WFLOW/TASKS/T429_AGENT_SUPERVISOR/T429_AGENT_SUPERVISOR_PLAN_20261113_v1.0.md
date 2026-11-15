@@ -127,10 +127,10 @@ plan_project:
     - id: M10
       title: "R15 — personas journalisées et visibles"
       done_when: "Chaque invocation de specialist_runner est journalisée (rôle, cible, session) et affichée"
-      execution: NOT_STARTED
-      execution_by: ""
-      evidence: ""
-      execution_comment: "Traçage avant branchement v2"
+      execution: DONE
+      execution_by: CC01
+      evidence: "Défaut réel prouvé (probe traceback : NameError Path → except muet, 0 jamais journalisé) ; fix runner + stderr non muet + role=args.role or args.show_prompt ; test persistant subprocess → persona_usage ; suite AG 215 passed ; runs réels 2 entrées seq=1/2 (2026-11-14)"
+      execution_comment: "Reste à l'exploitant : KINDS += \"persona\" dans trace_log.py (deny-list, garde a refusé l'écriture) pour la lecture CLI --kind persona ; affichage IHM déjà posé (fold mémoire)"
       validation: NOT_REVIEWED
       validated_by: ""
       validated_at: ""
@@ -178,7 +178,14 @@ plan_project:
       execution: DONE
       execution_by: CC01
       evidence: "CSS : titre neutre var(--text) + has-* color var(--text) + marker par état (vert/orange/rouge/gris) + .model-tag standard 5 acteurs ; JS : badge model-tag + metaRow ; test_dossier_ui.mjs 16 asserts, test_ui.mjs PASS, layout 0 fail (2026-11-14)"
-      execution_comment: "Demande exploitant 2026-11-14 ; checkpoint 68cbb76d (M9) puis checkpoint M14"
+      execution_comment: "2 amendements exploitant le jour même (checkpoint 5f895090) : texte colore SEUL (badge encadre illisible supprime) + couleur portee par la FAMILLE detectee dans l alias (T429-MMX01 -> MMX jaune), la couleur suivra l acteur meme en changeant de terminal"
+    - id: M15
+      title: "R17 — Le Superviseur reconnaît une session orchestrateur et adapte sa vigilance"
+      done_when: "Détection mécanique du rôle coordination (alias/tâche T000-CCxx) ; notice dédiée au juge avec les critères de gestion (verrou, écriture hors contrat, clôture de constat par l'agent interdite) ; alerte mécanique si DEUX orchestrateurs actifs simultanés"
+      execution: NOT_STARTED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "Fait prouvé 2026-11-15 : zéro notion orchestrateur dans service + vigilance (grep) — le juge l'évalue comme toute session ; demande exploitant 2026-11-14"
       validation: NOT_REVIEWED
       validated_by: ""
       validated_at: ""
@@ -328,6 +335,48 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
 - **v1 = lecture seule, bornée, sans boucle d'agent.** Le dossier de lecture est fourni en une passe ; la boucle « le juge demande un fichier, le service le lit, le juge re-juge » est **hors v1** (à chiffrer avant).
 - Les **personas restent déclenchés** par l'agent ou l'exploitant — mais **tracés** (R15) avant d'être **branchés** sur le Superviseur.
 - La **mémoire longue reste exposée et invalidable, pas signée** (signature = T431).
+
+---
+
+## 3quints. 🧭 Handoff → 🐋 T427-CC02 (2026-11-15, GO exploitant)
+
+> Transmission réelle faite le 2026-11-15 par le canal inter-sessions (désignation explicite de
+> l'exploitant) ; M15/R17 livré côté service (commit `9ad9e447`, 217 tests verts). La canonique
+> orchestrateur revient au lot T427. Piège M8 évité : le texte exact est consigné **ici**, dans
+> le dossier T429, et T427-CC02 a été informé de son emplacement.
+
+**Ce que T429 a posé (service Superviseur)** : détection mécanique (alias `T000-*` ou tâche T000) ·
+notice au juge avec les 5 critères de gestion · constat mécanique idempotent `coordination_conflict`
+si deux sessions coordination actives.
+
+**Texte exact à poser dans `TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md`**
+(deny-list agent → pose humaine ou via T000-CC10, puis relecture au diff par T427) :
+
+```markdown
+## 🧭 Identité de coordination & surveillance du Superviseur
+
+> Finalisée le 2026-11-15 (T429 M15/R17, GO exploitant le jour même). La détection mécanique du
+> Superviseur et les critères passés à son juge s'ancrent sur cette section — le rôle coordination
+> ne se devine pas depuis une mission.
+
+- **Un seul coordinateur désigné à la fois** : la session de coordination porte un alias `T000-CCxx`
+  (ex. `T000-CC10`). Deux sessions `T000-*` **actives** simultanément = conflit de coordination : le
+  Superviseur lève un constat mécanique (`coordination_conflict`) sur chacune, jusqu'à remise explicite
+  d'un périmètre.
+- **Détection mécanique** : alias commençant par `T000-` (ou tâche liée `T000`) → la session est
+  marquée coordination ; le juge du Superviseur reçoit explicitement les critères de gestion.
+- **Critères passés au juge** (cités du canonique, pas recopiés) : règle d'or (validation avant
+  implémentation) · verrou d'écriture / 🚩 d'un autre acteur jamais contournés · une fiche de tâche
+  modifiée uniquement par le coordinateur désigné via l'API Task Manager · clôture de constat ou
+  tâche jamais par l'agent (règle 10 `AGENTS.md`) · `git diff` réel lu par le coordinateur, un
+  rapport d'agent n'est jamais une preuve · aucun commit ni push sans accord humain explicite.
+- **Limite assumée** : le Superviseur juge, il ne remplace ni le Task Manager ni la désignation
+  humaine ; une session `T000-*` en pause ou arrêtée ne compte pas dans le conflit (seules les
+  sessions enabled + active).
+```
+
+**À l'exploitant, même geste** : ajouter `"persona"` à `KINDS` dans `TOOLS/AGENT_WORKFLOW/scripts/trace_log.py`
+(lecture CLI du journal personas ; refus deny-list tracé au tour 2026-11-14).
 
 ---
 
