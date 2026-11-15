@@ -143,6 +143,7 @@ def kill_port_listeners(port: int) -> None:
     except (OSError, subprocess.SubprocessError):
         return
     my_pid = os.getpid()
+    killed = []
     for line in out.splitlines():
         stripped = line.strip()
         if f':{port} ' not in stripped + ' ' or 'LISTENING' not in stripped:
@@ -156,16 +157,21 @@ def kill_port_listeners(port: int) -> None:
         try:
             print(f"[supervisor] port {port} : arrêt de l'instance précédente PID {pid}", flush=True)
             log_line(f"kill port {port} pid={pid}")
+            killed.append(pid)
             os.kill(pid, signal.SIGTERM)
         except (OSError, ValueError):
             pass
-    # R29 (demande exploitant) : apres les kills on REVÉRIFIE le port et le verdict est trace.
+    # R29 : apres les kills on REVÉRIFIE le port et le verdict est trace.
+    if not killed:
+        log_line(f"port {port} : rien a purger (deja libre)")
+        return
     import time as _time
     _time.sleep(1.0)
     try:
         recheck = subprocess.run(['netstat', '-ano'], capture_output=True, text=True,
                                  encoding='utf-8', errors='replace', timeout=20).stdout
     except (OSError, subprocess.SubprocessError):
+        log_line(f"port {port} : verdict indetermine (netstat indisponible), kills={killed}")
         return
     survivors = []
     for line in recheck.splitlines():
@@ -176,11 +182,11 @@ def kill_port_listeners(port: int) -> None:
             survivors.append(int(stripped.rsplit(None, 1)[-1]))
         except (ValueError, IndexError):
             continue
-    ours_only = all(pid == my_pid or pid <= 0 for pid in survivors)
-    if survivors and not ours_only:
-        log_line(f"VERDICT port {port} : ENCORE OCCUPE par pid(s) {[s for s in survivors if s != my_pid]}")
+    remaining = [pid for pid in survivors if pid != my_pid and pid > 0]
+    if remaining:
+        log_line(f"VERDICT port {port} : ENCORE OCCUPE par pid(s) {remaining} (killed={killed})")
     else:
-        log_line(f"VERDICT port {port} : libere")
+        log_line(f"VERDICT port {port} : libere (killed={killed})")
 
 
 def create_server(port=8082, state_path=None):
@@ -240,18 +246,30 @@ def main():
     server.supervision.command({'action': 'start'})
     log_line(f"serveur PRET port={server.server_port} build={server.build_id} ui={ui_build_id()}")
     print(f'Supervisor: http://127.0.0.1:{server.server_port}/', flush=True)
+    # Pattern canonique (docs.python) : serve_forever dans un THREAD, Ctrl+C attrape
+    # dans le thread principal, shutdown() appele depuis un autre thread que la boucle.
+    import threading
+    run_thread = threading.Thread(target=server.serve_forever, daemon=True)
+    run_thread.start()
     try:
-        server.serve_forever()
+        threading.Event().wait()  # le thread principal attend ici ; Ctrl+C leve ici
     except KeyboardInterrupt:
-        pass
-    except Exception:
-        import traceback
-        traceback.print_exc()
-        raise
+        log_line('arret du serveur (Ctrl+C)')
     finally:
-        log_line("arret du serveur")
-        server.supervision.close()
-        server.server_close()
+        log_line('arret du serveur')
+        try:
+            server.shutdown()
+        except Exception:
+            pass
+        try:
+            server.supervision.close(timeout=3)
+        except Exception:
+            pass
+        try:
+            server.server_close()
+        except Exception:
+            pass
+        os._exit(0)  # garantie de mort : tue tout thread residuel, sans negocier
 
 
 if __name__ == '__main__':
