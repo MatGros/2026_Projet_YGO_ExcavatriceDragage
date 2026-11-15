@@ -770,6 +770,22 @@ def is_coordination_session(session) -> bool:
     return alias.startswith("T000") or task == "T000"
 
 
+# T429 M16/R18 (2026-11-15, ecart exploitant) : une session qui travaille SANS objectif ni
+# criteres ne peut pas etre jugee de facon exploitable — le systeme doit le DIRE. Les 3 champs
+# minimum viennent de la note workflow T427 (« 3 champs remplis ») ; detection mecanique pure.
+CADRAGE_MINIMAL_FIELDS = ("primary_goal", "criteria", "scope_permissions")
+_CADRAGE_LABELS = {"primary_goal": "Objectif initial", "criteria": "Critères d'acceptation",
+                   "scope_permissions": "Périmètre et permissions"}
+
+
+def mission_cadrage_missing(session) -> list:
+    """Les 3 champs minimum pour travailler : objectif, criteres d'acceptation, perimetre.
+    Mecanique pure (pas de juge) — renvoie les libelles manquants, dans l'ordre canonique."""
+    structure = (session.get("mission_structure") or {}) if isinstance(session, dict) else {}
+    return [_CADRAGE_LABELS[key] for key in CADRAGE_MINIMAL_FIELDS
+            if not str(structure.get(key) or "").strip()]
+
+
 def persona_usage(session_id: str) -> list:
     """Invocations de personas tracees pour cette session (R15) : usage reel, pas une impression."""
     try:
@@ -2850,6 +2866,59 @@ class Supervisor:
             record_event(session, "finding_created", text, timestamp(), alert_id=alert["id"], version=alert["version"])
             _trace(event="coordination_conflict", session=str(session["id"]), alias=session.get("alias"), peers=",".join(others))
 
+    def _detect_mission_cadrage(self):
+        """R18/M16 : une session qui travaille SANS objectif ni criteres doit etre DITE.
+        Constat mecanique mission_non_cadree pose UNIQUEMENT aux sessions de coordination
+        (case signalée T000-CDX02) : vigilance renforcée, idempotent. Toute autre session
+        active recoit un etat lisible (cadrage_state) sans envahir la liste de constats ;
+        quand le cadrage est rempli, constat marque « corrigé observé » (resolved_observed_at)
+        — la clôture reste humaine (règle 10)."""
+        for session in self.sessions.values():
+            try:
+                if not session.get("enabled") or session.get("state") != "active":
+                    continue
+                missing = mission_cadrage_missing(session)
+                session["cadrage_state"] = dict(manquants=missing, at=timestamp())
+                if not is_coordination_session(session):
+                    continue
+                existing = next((a for a in (session.get("alerts") or []) if a.get("category") == "mission_non_cadree"), None)
+            except Exception as detect_exc:   # la detection ne doit jamais tuer le cycle de collecte (M1)
+                _trace(event="mission_cadrage_detect_error", session=str(session.get("id") or "?"), erreur=type(detect_exc).__name__)
+                continue
+            if missing:
+                fingerprint = hashlib.sha256((str(session["id"]) + "\nmission_non_cadree\n" + ";".join(missing)).encode()).hexdigest()
+                if existing and existing.get("fingerprint") == fingerprint:
+                    continue
+                text = ("Session de coordination travaillant sans objectif ni critères déclarés — "
+                        "manquants : " + ", ".join(missing) + ". Un objectif et des critères d'acceptation "
+                        "sont obligatoires pour juger et clôturer un travail ; remplir la fiche (IHM : "
+                        "« Pré-remplir depuis la mission texte ») ou renseigner les champs.")
+                if existing:
+                    existing.update(fingerprint=fingerprint, reason=text, evidence=text,
+                                    last_occurrence=timestamp())
+                    existing["occurrences"] += 1
+                    existing["evidence_provenance"] = evidence_provenance(session, existing.get("evidence"))
+                    existing["memory_usage"] = memory_inventory(session, self.judge_settings)
+                    existing.pop("resolved_observed_at", None)
+                    continue
+                alert = dict(id=fingerprint[:24], fingerprint=fingerprint, model="service",
+                    severity="warning", reason=text, evidence=text, category="mission_non_cadree",
+                    title="Session de coordination sans cadrage", created_at=timestamp(), last_occurrence=timestamp(),
+                    occurrences=1, disposition="new", acknowledged_at=None,
+                    workflow=dict(status="informational", delivery_status="not_sent", choice=None, rationale="", chosen_at=None, response=""))
+                alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"))
+                alert["memory_usage"] = memory_inventory(session, self.judge_settings)
+                session["alerts"].append(alert)
+                prepare_alert(alert)
+                record_event(session, "finding_created", text, timestamp(), alert_id=alert["id"], version=alert["version"])
+                _trace(event="mission_non_cadree", session=str(session["id"]), alias=session.get("alias"), manquants=";".join(missing))
+            elif existing and not existing.get("resolved_observed_at"):
+                existing["resolved_observed_at"] = timestamp()
+                record_event(session, "mission_cadrage_filled",
+                             "Cadrage minimal rempli (objectif, critères, périmètre) : le constat mission_non_cadree est marqué corrigé observé ; clôture humaine.",
+                             timestamp(), alert_id=existing["id"], version=existing["version"])
+                _trace(event="mission_cadrage_filled", session=str(session["id"]), alias=session.get("alias"))
+
     def _collect_loop(self):
         while not self.closed:
             with self._lock:
@@ -2882,6 +2951,7 @@ class Supervisor:
                                                 sessions_unavailable=sum(s["state"] not in ("active", "waiting") for s in enabled),
                                                 cycles=self.collector_stats["cycles"]+1)
                     self._detect_coordination_conflicts()
+                    self._detect_mission_cadrage()
                     if self._persist_pending and not self.load_error:
                         self._persist_background()
             self._wake.wait(self.poll_interval)

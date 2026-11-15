@@ -1309,9 +1309,11 @@ def test_two_active_coordination_sessions_raise_one_finding(tmp_path):
     svc, _source, sid = service(tmp_path)
     try:
         s1 = svc.sessions[sid]
-        s1.update(task_id='T000', alias='T000-CC10', alerts=[], enabled=True, state='active')
+        s1.update(task_id='T000', alias='T000-CC10', alerts=[], enabled=True, state='active',
+                  mission_structure=dict(primary_goal='c', criteria='c', scope_permissions='c'))
         fake = dict(id='sid2', enabled=True, state='active', alias='T000-CC11', task_id='T000',
-                    native_id='native2', alerts=[], events=[], version=0)
+                    native_id='native2', alerts=[], events=[], version=0,
+                    mission_structure=dict(primary_goal='c', criteria='c', scope_permissions='c'))
         svc.sessions['sid2'] = fake
         svc._detect_coordination_conflicts()
         assert len(s1['alerts']) == 1 and s1['alerts'][0]['category'] == 'coordination_conflict'
@@ -1323,5 +1325,57 @@ def test_two_active_coordination_sessions_raise_one_finding(tmp_path):
         assert len(fake['alerts']) == 1, 'une session en pause ne declenche plus le conflit'
         assert supervisor_service.is_coordination_session(fake) is True
         assert supervisor_service.is_coordination_session(dict(alias='T429-CC01', task_id='T429')) is False
+    finally:
+        svc.close()
+
+
+def test_mission_cadrage_finding_targets_coordination_only(tmp_path):
+    """R18/M16 (ecart exploitant 2026-11-15 : une session travaille sans objectif ni criteres
+    et rien ne le dit) : le constat mécanique cible les sessions de COORDINATION ; toute autre
+    session active recoit un etat lisible (cadrage_state) sans envahir les constats."""
+    svc, _source, sid = service(tmp_path)
+    try:
+        s1 = svc.sessions[sid]
+        s1.update(enabled=True, state='active', alerts=[], mission_structure={})
+        s2 = dict(id='sid-coord', enabled=True, state='active', alias='T000-CDX02', task_id='T000',
+                  native_id='native-cdx', alerts=[], events=[], version=0, mission_structure={})
+        svc.sessions['sid-coord'] = s2
+        svc._detect_mission_cadrage()
+        finding = next(a for a in s2['alerts'] if a['category'] == 'mission_non_cadree')
+        assert 'Objectif initial' in finding['reason'] and "Critères d'acceptation" in finding['reason']
+        assert 'Périmètre et permissions' in finding['reason']
+        assert 'coordination' in finding['reason'], 'le constat nomme le cas : coordination sans cadrage'
+        assert s1['alerts'] == [], 'une session non coordination ne recoit pas de constat'
+        assert s1['cadrage_state']['manquants'] == ['Objectif initial', "Critères d'acceptation", 'Périmètre et permissions'], 'etat lisible pose'
+        svc._detect_mission_cadrage()
+        assert sum(1 for a in s2['alerts'] if a['category'] == 'mission_non_cadree') == 1, 'idempotent'
+        s2['mission_structure'] = dict(primary_goal='Coordonner le catalogue', criteria='Résumé à jour',
+                                       scope_permissions='TASKS.yaml via API TM')
+        svc._detect_mission_cadrage()
+        assert 'resolved_observed_at' in finding, 'corrigé observé quand le cadrage est rempli'
+        assert finding['disposition'] != 'closed' and not finding.get('acknowledged_at'), 'la clôture reste humaine'
+        assert s1['cadrage_state']['manquants'] == ['Objectif initial', "Critères d'acceptation", 'Périmètre et permissions'], 'l etat de s1 reste fidele a sa fiche'
+        s2['state'] = 'paused'; s2['mission_structure'] = {}
+        svc._detect_mission_cadrage()
+        assert len(s2['alerts']) == 1, 'session en pause ne declenche plus'
+    finally:
+        svc.close()
+
+
+def test_mission_cadrage_finding_text_tracks_partial_fill(tmp_path):
+    """R18 : quand un champ se remplit, le constat est revisé avec la liste réduite des
+    manquants (meme constat, pas un doublon)."""
+    svc, _source, sid = service(tmp_path)
+    try:
+        s1 = svc.sessions[sid]
+        s1.update(enabled=True, state='active', alias='T000-CC10', task_id='T000',
+                  alerts=[], mission_structure={})
+        svc._detect_mission_cadrage()
+        finding = next(a for a in s1['alerts'] if a['category'] == 'mission_non_cadree')
+        s1['mission_structure'] = dict(primary_goal='Cadrer la session')
+        svc._detect_mission_cadrage()
+        assert 'Objectif initial' not in finding['reason'], 'le champ rempli sort de la liste'
+        assert "Critères d'acceptation" in finding['reason'] and 'Périmètre et permissions' in finding['reason']
+        assert finding['occurrences'] == 2, 'le constat est revisé, pas dupliqué'
     finally:
         svc.close()
