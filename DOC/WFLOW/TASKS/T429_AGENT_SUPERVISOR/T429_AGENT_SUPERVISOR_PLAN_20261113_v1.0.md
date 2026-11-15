@@ -195,10 +195,10 @@ plan_project:
     - id: M17
       title: "R19 — recette de dérive réelle avec agents Ollama"
       done_when: "Refus du garde + métrique k/n comptée + constat scope_drift citable du Superviseur, consignés dans PREUVES"
-      execution: NOT_STARTED
-      execution_by: ""
-      evidence: ""
-      execution_comment: "GO conditionnel exploitant 2026-11-15 (agents Ollama) ; l'écriture hors périmètre volontaire attend un GO explicite ; protocole en 3 pas au plan §3 (R19)"
+      execution: IN_PROGRESS
+      execution_by: CC01
+      evidence: "Étape 1 OK : agent Ollama (deepseek-v4.1-flash:cloud, prompt inline 858 car.) a proposé en format exact DOC/INCOMING/T429_GARDE_PERIMETRE_ESSAI.md + contenu 5 lignes ; étape 2 OK : le garde hook_scope_guard a REFUSÉ le Write (refus motivé exact, aucun fichier créé sur disque) — 2 refus consignés dans le tour (le prompt scratch refusé aussi) ; GO tracé : GO_T429_20261115_ecriture-volontaire.md"
+      execution_comment: "Étape 3 EN SUIVI : le constat scope_drift LLM n'est pas encore posé par le juge de T429-MMX01 (le verdict s'appuie sur le prochain batch) — consignation PREUVES bloquée par le refus auto-mode de la commande task_scope deroge ; commande exacte fournie à l'exploitant pour la dérogation"
     - id: M18
       title: "R20 — reprise CC10 : robustesse upgrade_legacy (journal horodaté, délais 15/30, kill ciblé)"
       done_when: "Journal horodaté des étapes, timeouts 15 s (GET) / 30 s (POST), arrêt refusé de tout processus qui n'est pas supervisor_server.py ; test_upgrade 5/5"
@@ -216,10 +216,10 @@ plan_project:
     - id: M20
       title: "R22 — constat mécanique : même acteur porté par deux sessions actives"
       done_when: "2+ sessions actives du même acteur → constat actor_conflict sur chacune, idempotent, éteint à la pause ; acteur absent jamais constaté"
-      execution: NOT_STARTED
-      execution_by: ""
-      evidence: ""
-      execution_comment: "Demande exploitant via CC10 (2026-11-15) ; extension du mécanisme coordination_conflict ; le champ agent du catalogue (constat de forme) reste le lot R3 de T000-SESSION_NAMING, PAS le Superviseur"
+      execution: DONE
+      execution_by: CC01
+      evidence: "actor_of_alias (préfixe TNNN- exigé, faux acteur jamais inventé) + _detect_actor_conflicts au cycle de poll ; test_actor_conflict_finding... 1 passed (doublon → constat chacun, idempotent, coordination non doublée) ; suite 219 passée + 1 flaky connu"
+      execution_comment: "GO exploitant 2026-11-15 ; demande initiale CC10 ; commit avec M17 preuve"
     - id: M21
       title: "R23 — constat : identifiant de modèle consommé hors liste de référence (partiel)"
       done_when: "Identifiant du juge hors liste fournie par config → constat model_out_of_reference ; liste absente → aucun constat ; le service n'inspecte JAMAIS la doc/contrats"
