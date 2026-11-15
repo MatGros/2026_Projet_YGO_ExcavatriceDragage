@@ -185,7 +185,7 @@ def create_server(port=8082, state_path=None):
         else:
             import fcntl
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-        server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+        server = type('Server', (ThreadingHTTPServer,), {'daemon_threads': True})(('127.0.0.1', port), Handler)
         server.supervision = Supervisor(state_path=state_path, strict_assignments=True, persist_chat=True)
     except Exception:
         lock.close()
@@ -207,7 +207,12 @@ def main():
     parser.add_argument('--port', type=int, default=8082)
     parser.add_argument('--state', type=Path)
     args = parser.parse_args()
-    server = create_server(args.port, args.state)
+    try:
+        server = create_server(args.port, args.state)
+    except Exception:
+        import traceback
+        log_line('ECHEC au demarrage :\n' + traceback.format_exc())
+        raise
     server.supervision.command({'action': 'start'})
     log_line(f"serveur PRET port={server.server_port} build={server.build_id} ui={ui_build_id()}")
     print(f'Supervisor: http://127.0.0.1:{server.server_port}/', flush=True)

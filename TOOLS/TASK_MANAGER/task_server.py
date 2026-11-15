@@ -550,7 +550,8 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
         print("Task Manager deja actif : aucun second serveur ne sera lance.")
         return
     try:
-        server = http.server.ThreadingHTTPServer((HOST, port), Handler)
+        # R29 : threads daemon sinon le processus survit au Ctrl+C (threads bloques)
+        server = type('Server', (http.server.ThreadingHTTPServer,), {'daemon_threads': True})((HOST, port), Handler)
     except OSError as exc:
         msvcrt.locking(lock_handle.fileno(), msvcrt.LK_UNLCK, 1); lock_handle.close()
         print(f"Impossible de lancer Task Manager sur {HOST}:{port} : {exc}")
