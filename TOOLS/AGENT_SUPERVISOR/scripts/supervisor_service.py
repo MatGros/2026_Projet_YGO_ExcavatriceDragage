@@ -13,6 +13,8 @@ import html
 from datetime import datetime, timezone
 import json
 import os
+import subprocess
+import sys
 from pathlib import Path
 import re
 import threading
@@ -1829,7 +1831,7 @@ class Supervisor:
 
     def command(self, command):
         with self._lock:
-            if command.get("action") not in ("test_notification", "set_mission_structure", "comment_alert", "configure", "add", "pause", "resume", "resume_all", "close", "reopen", "retry_recovery", "remove", "set_mission", "set_alias", "set_task", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
+            if command.get("action") not in ("test_notification", "set_mission_structure", "comment_alert", "configure", "add", "pause", "resume", "resume_all", "close", "reopen", "retry_recovery", "remove", "set_mission", "set_alias", "set_task", "restart_service", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
                 return self._command(command)
             backup = (copy.deepcopy(self.sessions), self.model, self.allow_cloud,
                       self._epoch, deque(self._queue), set(self._queued), copy.deepcopy(self._chat_state), self._chat_epoch, self._chat_pending, copy.deepcopy(self._chat_histories), deque(self._agent_queue))
@@ -2013,6 +2015,17 @@ class Supervisor:
                 self._persist()
                 self._wake.set()
                 return {"resumed": resumed, "count": len(resumed)}
+            elif action == "restart_service":
+                # M26/R29 (demande exploitant, 1 clic IHM) : le service se relance SOUS SON
+                # PROPRE BINAIRE — os.execv remplace le processus : le code du disque est
+                # recharge, l etat persiste, les affectations repartent en pause (la
+                # securite connue du redemarrage). La reponse est envoyee avant le remplacement.
+                def _self_restart():
+                    time.sleep(1.0)
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
+                threading.Thread(target=_self_restart, daemon=True).start()
+                return {"restarting": True, "delay_seconds": 1.0}
+
             elif action == "set_task":
                 sid = command.get("id")
                 session = self.sessions.get(sid)

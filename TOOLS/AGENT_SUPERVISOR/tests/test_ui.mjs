@@ -49,7 +49,7 @@ assert.equal(document.getElementById('judge-context-chars').value,'6000');
 document.getElementById('judge-context-chars').value='18000';document.getElementById('judge-context-chars').dispatchEvent(new window.Event('input',{bubbles:true}));
 snapshot.judge_settings.context_chars=8000;vm.runInContext('render(snapshot)',ctx);assert.equal(document.getElementById('judge-context-chars').value,'18000','poll does not overwrite edited advanced settings');
 assert.match(document.getElementById('judge-effective-settings').textContent,/8000 caractères/,'effective settings stay distinct from the draft');
-await fire('config-form','submit');assert.deepEqual(posts.at(-1).judge_settings,{temperature:0,output_tokens:1600,timeout_seconds:30,context_messages:12,context_chars:18000,model_context_tokens:16384,max_visible_closed_findings:5,audit_interval:8});posts.length=0;
+await fire('config-form','submit');assert.deepEqual(posts.at(-1).judge_settings,{temperature:0,output_tokens:1600,timeout_seconds:30,context_messages:12,context_chars:18000,model_context_tokens:16384,memory_max_items:20,max_visible_closed_findings:5,audit_interval:8});posts.length=0;
 
 await fire('load-candidates');
 const options=document.getElementById('candidates').options;

@@ -1350,6 +1350,27 @@ def test_memory_limit_is_configurable_not_hardcoded(tmp_path, monkeypatch):
     assert supervisor_service.head_tail_text('court') == 'court', 'inchange sous la limite'
 
 
+def test_restart_service_action_self_replaces_process(tmp_path, monkeypatch):
+    """R29 (demande exploitant : 1 clic IHM relance le serveur, alerte fixe au scroll) : l
+    action restart_service reposte OK AVANT que le thread remplace le processus par lui-meme
+    (os.execv avec le meme binaire et les memes arguments) ; jamais deux serveurs simultanes."""
+    monkeypatch.setenv("WORKFLOW_TRACE_DIR", str(tmp_path / "trace"))
+    started = []
+    class FakeThread:
+        def __init__(self, target=None, daemon=None):
+            started.append(target)
+        def start(self):
+            pass   # le thread n'est PAS lance dans le test : os.execv remplacerait le processus de test
+    monkeypatch.setattr(supervisor_service.threading, 'Thread', FakeThread)
+    svc, _source, sid = service(tmp_path)
+    try:
+        result = svc.command({'action': 'restart_service'})
+        assert result.get('restarting') is True and result.get('delay_seconds') == 1.0
+        assert started and callable(started[0]), 'le thread de relance est prepare'
+    finally:
+        svc.close()
+
+
 def test_persona_invocation_is_traced_and_readable(monkeypatch, tmp_path):
     """R15 (defaut reel du 2026-11-14 : NameError silencieux -> 0 jamais journalise) :
     une invocation reelle de specialist_runner produit une entree kind=persona que le
