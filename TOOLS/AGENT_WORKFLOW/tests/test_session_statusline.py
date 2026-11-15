@@ -10,6 +10,15 @@ import session_statusline
 from TOOLS.AGENT_SUPERVISOR.scripts.supervisor_service import Supervisor
 
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _cache_isole(tmp_path, monkeypatch):
+    """Aucun test n'écrit dans le vrai cache de la barre (dernière valeur connue)."""
+    monkeypatch.setattr(session_statusline, "LAST_KNOWN_DIR", tmp_path / "statusline_cache")
+
+
 def _mock_supervisor_sessions(monkeypatch, sessions):
     class FakeResponse:
         def __enter__(self):
@@ -47,12 +56,13 @@ def test_statusline_reapplies_full_explicit_terminal_title(monkeypatch, capsys):
     monkeypatch.setattr(session_statusline.sys, "argv", ["session_statusline.py"])
     monkeypatch.setattr(session_statusline, "get_ancestor_cli_process", lambda: (123, "agy.exe"))
     monkeypatch.setattr(session_statusline, "find_current_conversation_id", lambda *_args: "conversation-id")
+    monkeypatch.setattr(session_statusline, "fetch_supervisor_summary", lambda: ({"sessions": []}, None))
     monkeypatch.setattr(
         session_statusline,
         "get_session_info",
-        lambda *_args: ("T000-AGY02 GEMINI 4 HYDRO CHALLENGE SIMU M3", "AGY02"),
+        lambda *_args, **_kwargs: ("T000-AGY02 GEMINI 4 HYDRO CHALLENGE SIMU M3", "AGY02"),
     )
-    monkeypatch.setattr(session_statusline, "get_supervisor_status", lambda *_args: "Supervisor: Linked")
+    monkeypatch.setattr(session_statusline, "get_supervisor_status", lambda *_args, **_kwargs: "Supervisor: Linked")
     monkeypatch.setattr(session_statusline.terminal_title, "refresh", lambda _conv_id, title: title_writes.append(title))
 
     session_statusline.main()
@@ -193,3 +203,117 @@ def test_codex_session_detection_uses_only_consistent_codex_ids(monkeypatch):
 
     monkeypatch.setenv("CODEX_SESSION_ID", "99999999-2222-4333-8444-555555555555")
     assert session_statusline.find_current_conversation_id("codex.exe") is None
+
+
+# --- Garde-fous faux "Offline" (2026-11-14) -------------------------------------------
+# Constat : file d'écoute du Superviseur à 5 + timeout client 0.15 s + 2 appels par rendu
+# -> "Offline" et titre de repli affichés alors que le service tournait.
+
+def _raise_on_urlopen(monkeypatch, exc):
+    def boom(*_args, **_kwargs):
+        raise exc
+    monkeypatch.setattr(session_statusline.urllib.request, "urlopen", boom)
+
+
+def test_timeout_is_reported_as_slow_never_offline(monkeypatch):
+    _raise_on_urlopen(monkeypatch, TimeoutError("timed out"))
+    summary, error = session_statusline.fetch_supervisor_summary()
+    assert (summary, error) == (None, "timeout")
+    badge = session_statusline.get_supervisor_status("conversation-id", summary=summary, summary_error=error)
+    assert "Offline" not in badge
+    assert "Lent" in badge
+
+
+def test_urlerror_wrapping_a_timeout_is_also_slow(monkeypatch):
+    _raise_on_urlopen(monkeypatch, session_statusline.urllib.error.URLError(TimeoutError("timed out")))
+    assert session_statusline.fetch_supervisor_summary() == (None, "timeout")
+
+
+def test_connection_refused_is_the_only_offline(monkeypatch):
+    _raise_on_urlopen(monkeypatch, session_statusline.urllib.error.URLError(ConnectionRefusedError(10061, "refused")))
+    summary, error = session_statusline.fetch_supervisor_summary()
+    assert error == "refused"
+    badge = session_statusline.get_supervisor_status("conversation-id", summary=summary, summary_error=error)
+    assert "Offline" in badge
+
+
+def test_unreadable_answer_is_unknown_not_offline(monkeypatch):
+    badge = session_statusline.get_supervisor_status("conversation-id", summary={"sessions": "corrompu"})
+    assert "Offline" not in badge
+    assert "inconnu" in badge
+
+
+def test_one_render_makes_exactly_one_supervisor_call(monkeypatch, capsys):
+    calls = []
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+        def read(self):
+            return json.dumps({"sessions": [{
+                "native_id": "conversation-id", "alias": "T000-CC10", "state": "active",
+                "display_title": "T000-CC10 MULTITASK ORCHESTRATOR AGENT",
+                "counts": {"alarms": 0, "warnings": 0},
+            }]}).encode("utf-8")
+
+    def fake_urlopen(*_args, **_kwargs):
+        calls.append(_kwargs.get("timeout"))
+        return FakeResponse()
+
+    monkeypatch.setattr(session_statusline.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(session_statusline.sys, "stdin", type("Input", (), {"isatty": lambda self: True})())
+    monkeypatch.setattr(session_statusline.sys, "argv", ["session_statusline.py"])
+    monkeypatch.setattr(session_statusline, "get_ancestor_cli_process", lambda: (123, "claude.exe"))
+    monkeypatch.setattr(session_statusline, "find_current_conversation_id", lambda *_args: "conversation-id")
+    monkeypatch.setattr(session_statusline.terminal_title, "refresh", lambda *_args: None)
+    monkeypatch.setattr(session_statusline, "get_workflow_badge", lambda *_args: "wf")
+    monkeypatch.setattr(session_statusline, "get_git_badge", lambda *_args: "git")
+
+    session_statusline.main()
+
+    output = capsys.readouterr().out
+    assert len(calls) == 1, "titre et badge doivent partager UN seul appel summary"
+    assert calls[0] == session_statusline.SUPERVISOR_TIMEOUT_S >= 0.6
+    assert "Linked (Active)" in output
+    assert "MULTITASK ORCHESTRATOR AGENT" in output
+
+
+# ── Anti-clignotement : dernière valeur connue (T427, 2026-11-15) ────────────
+
+def _entry():
+    return {"native_id": "conv-anti-flicker", "alias": "T427-CC02",
+            "display_title": "T427-CC02 REFONTE WORKFLOW AGENT", "state": "active",
+            "counts": {"alarms": 0, "warnings": 0}}
+
+
+def test_lenteur_reutilise_le_dernier_titre_connu(tmp_path, monkeypatch):
+    monkeypatch.setattr(session_statusline, "LAST_KNOWN_DIR", tmp_path / "cache")
+    summary, err, stale = session_statusline.resolve_summary("conv-anti-flicker", {"sessions": [_entry()]}, None)
+    assert stale is False
+    summary, err, stale = session_statusline.resolve_summary("conv-anti-flicker", None, "timeout")
+    assert stale is True and err is None
+    title, _ = session_statusline.get_session_info("conv-anti-flicker", "claude", summary=summary)
+    assert title == "T427-CC02 REFONTE WORKFLOW AGENT"
+
+
+def test_service_arrete_ne_reutilise_rien(tmp_path, monkeypatch):
+    monkeypatch.setattr(session_statusline, "LAST_KNOWN_DIR", tmp_path / "cache")
+    session_statusline.resolve_summary("conv-anti-flicker", {"sessions": [_entry()]}, None)
+    summary, err, stale = session_statusline.resolve_summary("conv-anti-flicker", None, "refused")
+    assert summary is None and err == "refused" and stale is False
+
+
+def test_sans_cache_comportement_inchange(tmp_path, monkeypatch):
+    monkeypatch.setattr(session_statusline, "LAST_KNOWN_DIR", tmp_path / "cache")
+    summary, err, stale = session_statusline.resolve_summary("conv-inconnue", None, "timeout")
+    assert summary is None and err == "timeout" and stale is False
+
+
+def test_cache_ecrit_hors_depot(tmp_path, monkeypatch):
+    monkeypatch.setattr(session_statusline, "LAST_KNOWN_DIR", tmp_path / "cache")
+    session_statusline.resolve_summary("conv-anti-flicker", {"sessions": [_entry()]}, None)
+    assert (tmp_path / "cache" / "conv-anti-flicker.json").is_file()

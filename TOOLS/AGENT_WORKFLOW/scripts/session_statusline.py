@@ -11,6 +11,7 @@ import os
 import json
 import re
 import sqlite3
+import urllib.error
 import urllib.request
 import ctypes
 from ctypes import wintypes
@@ -203,25 +204,99 @@ def find_current_conversation_id(cli_name: str = "agy", parent_pid: int = None, 
 
     return None
 
-def get_session_info(conv_id, cli_name: str = "agy"):
+SUPERVISOR_SUMMARY_URL = "http://127.0.0.1:8082/api/supervision/summary"
+# 2026-11-14 : 0.15 s était plus court qu'UNE relance de connexion Windows (~0.5 s quand la
+# file d'écoute du service est pleine) -> faux "Offline" intermittent. 0.6 s reste très
+# en deçà du budget de 4 s de l'enveloppe statusLine.
+SUPERVISOR_TIMEOUT_S = 0.6
+_NOT_FETCHED = object()
+
+
+def fetch_supervisor_summary():
+    """UN seul appel summary par rendu, partagé entre titre et badge.
+
+    Renvoie (data, erreur) ; erreur ∈ {None, "timeout", "refused", "other"}.
+    Seul "refused" (rien n'écoute sur le port) prouve que le service est arrêté.
+    """
+    try:
+        req = urllib.request.Request(SUPERVISOR_SUMMARY_URL)
+        with urllib.request.urlopen(req, timeout=SUPERVISOR_TIMEOUT_S) as resp:
+            return json.loads(resp.read()), None
+    except TimeoutError:
+        return None, "timeout"
+    except urllib.error.URLError as exc:
+        reason = getattr(exc, "reason", None)
+        if isinstance(reason, ConnectionRefusedError):
+            return None, "refused"
+        if isinstance(reason, TimeoutError):
+            return None, "timeout"
+        return None, "other"
+    except Exception:
+        return None, "other"
+
+
+LAST_KNOWN_DIR = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "ExcavatriceDragage" / "statusline_cache"
+
+
+def save_last_known(conv_id, summary) -> None:
+    """Mémorise l'entrée Superviseur de la session après une réponse valide (hors dépôt)."""
+    if not conv_id or not summary:
+        return
+    for s in summary.get("sessions", []):
+        if s.get("native_id") == conv_id:
+            try:
+                LAST_KNOWN_DIR.mkdir(parents=True, exist_ok=True)
+                tmp = LAST_KNOWN_DIR / f"{conv_id}.tmp"
+                tmp.write_text(json.dumps(s, ensure_ascii=False), encoding="utf-8")
+                os.replace(tmp, LAST_KNOWN_DIR / f"{conv_id}.json")
+            except OSError:
+                pass
+            return
+
+
+def load_last_known(conv_id):
+    """Dernière entrée Superviseur connue pour la session, ou None."""
+    if not conv_id:
+        return None
+    try:
+        return json.loads((LAST_KNOWN_DIR / f"{conv_id}.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def resolve_summary(conv_id, summary, summary_error):
+    """Anti-clignotement (T427, 2026-11-15) : un Superviseur LENT ne fait plus basculer le titre.
+
+    - réponse valide -> on la mémorise et on l'utilise ;
+    - lenteur ou réponse illisible -> on réutilise la dernière valeur connue, marquée « stale » ;
+    - connexion refusée (service arrêté) -> rien n'est réutilisé, l'état réel est affiché.
+    Renvoie (summary, error, stale).
+    """
+    if summary is not None:
+        save_last_known(conv_id, summary)
+        return summary, summary_error, False
+    if summary_error == "refused":
+        return None, summary_error, False
+    cached = load_last_known(conv_id)
+    if cached is None:
+        return None, summary_error, False
+    return {"sessions": [cached]}, None, True
+
+
+def get_session_info(conv_id, cli_name: str = "agy", summary=_NOT_FETCHED):
     raw_title = ""
     actor = "AGY01" if "agy" in (cli_name or "") else ("CC01" if "claude" in (cli_name or "") else "CDX01")
 
     # 1. Si session rattachée au Superviseur : l'alias vérifié est prioritaire
     if conv_id:
-        try:
-            req = urllib.request.Request("http://127.0.0.1:8082/api/supervision/summary")
-            with urllib.request.urlopen(req, timeout=0.15) as resp:
-                data = json.load(resp)
-                for s in data.get("sessions", []):
-                    if s.get("native_id") == conv_id:
-                        alias = s.get("alias", "")
-                        if alias:
-                            alias = alias.strip()
-                            raw_title = s.get("display_title", "").strip() or alias
-                            break
-        except Exception:
-            pass
+        if summary is _NOT_FETCHED:
+            summary, _error = fetch_supervisor_summary()
+        for s in (summary or {}).get("sessions", []):
+            if s.get("native_id") == conv_id:
+                alias = (s.get("alias") or "").strip()
+                if alias:
+                    raw_title = (s.get("display_title") or "").strip() or alias
+                    break
 
     # 2. Si Claude Code : lire le dernier ai-title dans le transcript
     if not raw_title and "claude" in (cli_name or "").lower() and conv_id:
@@ -260,9 +335,12 @@ def get_session_info(conv_id, cli_name: str = "agy"):
 
     return raw_title, actor
 
-def get_supervisor_status(conv_id):
+def get_supervisor_status(conv_id, summary=_NOT_FETCHED, summary_error=None):
     """Vérifie si la conversation est rattachée et active dans le Superviseur,
-    et renvoie le badge riche avec l'état et les compteurs réels (alarmes, warnings)."""
+    et renvoie le badge riche avec l'état et les compteurs réels (alarmes, warnings).
+
+    "Offline" n'est affiché que si la connexion est refusée ; un service lent ou une
+    réponse illisible donne un état inconnu explicite, jamais un faux "Offline"."""
     dim = "\033[90m"
     bold = "\033[1m"
     green = "\033[1;32m"
@@ -272,39 +350,45 @@ def get_supervisor_status(conv_id):
 
     if not conv_id:
         return f"{dim}🛡️ Supervisor : Not Linked{reset}"
+    if summary is _NOT_FETCHED:
+        summary, summary_error = fetch_supervisor_summary()
+    if summary is None:
+        if summary_error == "refused":
+            return f"{dim}🛡️ Supervisor : Offline{reset}"
+        if summary_error == "timeout":
+            return f"{yellow}🛡️ Supervisor : Lent (état inconnu){reset}"
+        return f"{yellow}🛡️ Supervisor : État inconnu{reset}"
     try:
-        req = urllib.request.Request("http://127.0.0.1:8082/api/supervision/summary")
-        with urllib.request.urlopen(req, timeout=0.15) as resp:
-            data = json.load(resp)
-            for s in data.get("sessions", []):
-                if s.get("native_id") == conv_id:
-                    state = s.get("state", "active")
-                    counts = s.get("counts", {})
-                    alarms = counts.get("alarms", 0)
-                    warnings = counts.get("warnings", 0)
+        for s in summary.get("sessions", []):
+            if s.get("native_id") == conv_id:
+                state = s.get("state", "active")
+                counts = s.get("counts", {})
+                alarms = counts.get("alarms", 0)
+                warnings = counts.get("warnings", 0)
 
-                    # 'Linked (Active)' affiché en vert sobre
-                    # T429 M1 : un observateur en erreur doit crier, pas passer en jaune discret.
-                    if state == "active":
-                        state_str = f"🛡️ Supervisor : {green}Linked (Active){reset}"
-                    elif state in ("source_error", "source_missing", "ambiguous", "state_error"):
-                        state_str = f"🛡️ Supervisor : {red}EN ERREUR ({state}) — il n'observe plus{reset}"
-                    else:
-                        state_str = f"🛡️ Supervisor : {yellow}Linked ({state}){reset}"
+                # 'Linked (Active)' affiché en vert sobre
+                # T429 M1 : un observateur en erreur doit crier, pas passer en jaune discret.
+                if state == "active":
+                    state_str = f"🛡️ Supervisor : {green}Linked (Active){reset}"
+                elif state in ("source_error", "source_missing", "ambiguous", "state_error"):
+                    state_str = f"🛡️ Supervisor : {red}EN ERREUR ({state}) — il n'observe plus{reset}"
+                else:
+                    state_str = f"🛡️ Supervisor : {yellow}Linked ({state}){reset}"
 
-                    badges = []
-                    if alarms > 0:
-                        badges.append(f"{red}{bold}🚨 {alarms} alarme{'' if alarms == 1 else 's'}{reset}")
-                    if warnings > 0:
-                        badges.append(f"{yellow}{bold}⚠️ {warnings} warning{'' if warnings == 1 else 's'}{reset}")
-                    if not alarms and not warnings:
-                        # 0 alerte en gris/dim neutre pour ne pas flasher inutilement en vert
-                        badges.append(f"{dim}0 alerte{reset}")
+                badges = []
+                if alarms > 0:
+                    badges.append(f"{red}{bold}🚨 {alarms} alarme{'' if alarms == 1 else 's'}{reset}")
+                if warnings > 0:
+                    badges.append(f"{yellow}{bold}⚠️ {warnings} warning{'' if warnings == 1 else 's'}{reset}")
+                if not alarms and not warnings:
+                    # 0 alerte en gris/dim neutre pour ne pas flasher inutilement en vert
+                    badges.append(f"{dim}0 alerte{reset}")
 
-                    return f"{state_str} [{' '.join(badges)}]"
-            return f"{dim}🛡️ Supervisor : Not Linked{reset}"
+                return f"{state_str} [{' '.join(badges)}]"
+        return f"{dim}🛡️ Supervisor : Not Linked{reset}"
     except Exception:
-        return f"{dim}🛡️ Supervisor : Offline{reset}"
+        # Réponse reçue mais structure inattendue : état inconnu, pas "Offline".
+        return f"{yellow}🛡️ Supervisor : État inconnu{reset}"
 
 def main():
     try:
@@ -332,7 +416,11 @@ def main():
 
         parent_pid, parent_name = get_ancestor_cli_process()
         conv_id = find_current_conversation_id(parent_name, parent_pid, stdin_session_id)
-        raw_title, actor = get_session_info(conv_id, parent_name)
+        # UN seul appel Superviseur par rendu, partagé entre titre et badge (2026-11-14).
+        summary, summary_error = fetch_supervisor_summary() if conv_id else (None, None)
+        # Anti-clignotement : sur lenteur, dernière valeur connue au lieu du titre IA.
+        summary, summary_error, summary_stale = resolve_summary(conv_id, summary, summary_error)
+        raw_title, actor = get_session_info(conv_id, parent_name, summary=summary)
         boot_name = get_boot_terminal_name(parent_name)
 
         # Extraire le repère canonique de tâche (TXXX ou TXXX-ACTEUR ex: T423 ou T423-AGY01 ou T000-AGY00)
@@ -414,7 +502,9 @@ def main():
             else:
                 colored_label = f"{pastel_purple}{status_text.upper()}{reset}"
 
-            sup_badge = get_supervisor_status(conv_id)
+            sup_badge = get_supervisor_status(conv_id, summary=summary, summary_error=summary_error)
+            if summary_stale:
+                sup_badge += f" {dim}(dernier connu, Superviseur lent){reset}"
             print(f"{colored_label} {dim}│{reset} {sup_badge}")
             # 2026-11-14 : deuxième ligne épurée et uniforme (AGY / Claude / Codex) — workflow + git uniquement.
             print(f"{STATUSLINE_INDENT}{get_workflow_badge(conv_id)} │ {get_git_badge()}")
