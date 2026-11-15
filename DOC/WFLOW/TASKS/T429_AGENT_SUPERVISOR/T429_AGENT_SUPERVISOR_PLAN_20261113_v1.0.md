@@ -255,6 +255,13 @@ plan_project:
       execution_by: CC01
       evidence: "judge_prompt.py l.109 amendé ; test_judge_prompt + test_judge_behavior → 26 passed ; commit 0a86fb72 ; V1 : la copie datée au dossier de tâche entre dans le dossier de lecture déclaré (zéro code), posée par l'exploitant ou dérogation"
       execution_comment: "Demande exploitant 2026-11-15 (les /subtask) ; l'amendement texte exact de la fork repris"
+    - id: M26
+      title: "R29 — alerte mise à jour fixe au scroll, relance 1 clic, fond du menu en alerte"
+      done_when: "Le bandeau fixe + bouton relance 1 clic + fond du menu de gauche en alerte, le tout testé et relu"
+      execution: DONE
+      execution_by: CC01 (pose par la fork, commis ec091f00, relu CC01)
+      evidence: "restart_service 1 passed (os.execv jamais appelé en test) · DOM 16 asserts (bandeau fix + fond + clic) · test_ui régression PASS · layout 0 fail ; NOTE : le 1er redémarrage reste manuel (le build en service est encore périmé), ensuite le bandeau prend le relais"
+      execution_comment: "URGENT exploitant via /subtask ; la fork a posé le code, CC01 relu le diff et relancé les 4 vérifications"
       validation: NOT_REVIEWED
       validated_by: ""
       validated_at: ""
@@ -408,6 +415,7 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
 | **R26** | **Mémoire longue élargie et observable** (demande exploitant 2026-11-15 « 20 msgs… pas bcp » pour un modèle 1M contexte) | la borne 20 hardcodée à 4 sites devient `memory_max_items` configurable (défaut 20 inchangé, config 20→500) ; plafonds de fenêtre montés (context_messages 200→2000, context_chars 100k→1M, model_context_tokens 131k→1 048 576) ; l'IHM : champ config + **stats d'état du panneau mémoire** (éléments/caractères/borne/plus ancien) ; le textes bornés **tête+queue** (le début du message n'est plus jeté — constat 2026-11-15) | test memory_limit (25 gardés > 20 hardcode, défaut 20 inchangé, head_tail markée) · DOM stats · layout | CC01 (T429) |
 | **R27** | **Standardiser le plan de session `/plan`** (demande exploitant 2026-11-15 « le backlog est bordélique… y a pas un template ? ») | un gabarit `SESSION_PLAN_TEMPLATE.md` à 9 sections (objectif/périmètre/jalons alignés plan_project/poses/review/challenge/méthodes/critères/rules of engagement) + le lien dans la skill canonique plan-project | liste de vérification : le plan de session généré suit les 9 sections | pose humaine le gabarit + la skill (hors périmètre épinglé) — texte exact fourni par CC01 2026-11-15 |
 | **R28** | **Le juge distingue plan de tâche et plan de session** (demande exploitant 2026-11-15 `/subtask « challenger le prompt »`) | amendement du prompt du juge : deux places possibles, la PROVENANCE de chaque objectif vérifiée, l'écart signé au lieu d'ignorer un des deux, l'absence de plan dans la fenêtre ≠ défaut ; **V1** : le contenu du plan de session est copié daté au dossier de tâche (il entre dans le dossier de lecture déclaré, zéro code) | `test_judge_prompt.py` + `test_judge_behavior.py` 26 passed | CC01 (T429) |
+| **R29** | **Alerte mise à jour visible en tout scroll + relance 1 clic + fond du menu en alerte** (URGENT exploitant 2026-11-15) | bandeau `position:fixed` en haut (« Mise à jour du service disponible : redémarrage nécessaire ») ; bouton 1 clic → action `restart_service` (os.execv du même binaire, l'état persiste, affectations en pause, réponse envoyée avant remplacement) ; fond du menu de gauche en roge sombre tant que le service est périmé | test restart_service (os.execv jamais appelé en test) · DOM 16 asserts · test_ui · layout 0 fail — relelu CC01 | CC01 (T429) — pose exécutée par la fork, commis ec091f00, relue CC01 |
 
 ### Décisions figées sur ce lot
 
