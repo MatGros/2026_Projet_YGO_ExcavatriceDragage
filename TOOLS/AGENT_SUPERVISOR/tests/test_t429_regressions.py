@@ -1258,6 +1258,38 @@ def test_judge_declares_reading_dossier_and_finding_carries_it(tmp_path):
         svc.close()
 
 
+def test_actor_conflict_finding_for_duplicated_active_actor(tmp_path, monkeypatch):
+    """R22/M20 : deux sessions actives du MEME acteur -> un constat actor_conflict sur chacune,
+    idempotent ; les sessions de coordination ne recoivent PAS le doublon (coordination_conflict
+    les couvre deja) ; un acteur absent n'est jamais constate."""
+    monkeypatch.setenv("WORKFLOW_TRACE_DIR", str(tmp_path / "trace"))
+    svc, _source, sid = service(tmp_path)
+    try:
+        s1 = svc.sessions[sid]
+        s1.update(enabled=True, state='active', alias='T429-MMX01', alerts=[])
+        s2 = dict(id='sid-mmx', enabled=True, state='active', alias='T428-MMX01', task_id='T428',
+                  native_id='native2', alerts=[], events=[], version=0)
+        svc.sessions['sid-mmx'] = s2
+        svc._detect_actor_conflicts()
+        f1 = next(a for a in s1['alerts'] if a['category'] == 'actor_conflict')
+        f2 = next(a for a in s2['alerts'] if a['category'] == 'actor_conflict')
+        assert 'MMX01' in f1['reason'] and 'MMX01' in f2['reason'], "l'acteur est cite"
+        svc._detect_actor_conflicts()
+        assert sum(1 for a in s1['alerts'] if a['category'] == 'actor_conflict') == 1, 'idempotent'
+        # coordination : pas de doublon d'acteur (coordination_conflict couvre)
+        s3 = dict(id='sid-cc', enabled=True, state='active', alias='T000-CC12', task_id='T000',
+                  native_id='native3', alerts=[], events=[], version=0)
+        s4 = dict(id='sid-cc2', enabled=True, state='active', alias='T001-CC12', task_id='T001',
+                  native_id='native4', alerts=[], events=[], version=0)
+        svc.sessions['sid-cc'] = s3; svc.sessions['sid-cc2'] = s4
+        svc._detect_actor_conflicts()
+        assert not any(a['category'] == 'actor_conflict' for a in s3['alerts'])
+        assert supervisor_service.actor_of_alias('T429-MMX01') == 'MMX01'
+        assert supervisor_service.actor_of_alias('session-sans-tiret') == '', 'aucun faux acteur'
+    finally:
+        svc.close()
+
+
 def test_persona_invocation_is_traced_and_readable(monkeypatch, tmp_path):
     """R15 (defaut reel du 2026-11-14 : NameError silencieux -> 0 jamais journalise) :
     une invocation reelle de specialist_runner produit une entree kind=persona que le

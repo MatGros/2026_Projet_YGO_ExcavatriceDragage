@@ -786,6 +786,17 @@ def mission_cadrage_missing(session) -> list:
             if not str(structure.get(key) or "").strip()]
 
 
+def actor_of_alias(alias) -> str:
+    """L'acteur d'une session supervisionnee : famille+numero apres le prefixe de tache (ex.
+    T429-MMX01 -> MMX01). Exige le format TNNN- : un alias non canonique n'a PAS d'acteur
+    derive — un faux acteur n'est JAMAIS invente."""
+    text = str(alias or "").strip().upper()
+    if not re.match(r"^T\d{3}-", text):
+        return ""
+    actor = text.rsplit("-", 1)[-1]
+    return actor if actor else ""
+
+
 def persona_usage(session_id: str) -> list:
     """Invocations de personas tracees pour cette session (R15) : usage reel, pas une impression."""
     try:
@@ -2919,6 +2930,47 @@ class Supervisor:
                              timestamp(), alert_id=existing["id"], version=existing["version"])
                 _trace(event="mission_cadrage_filled", session=str(session["id"]), alias=session.get("alias"))
 
+    def _detect_actor_conflicts(self):
+        """R22/M20 : deux sessions actives du meme acteur (famille+numero de l'alias) = conflit.
+        Constat mecanique actor_conflict sur chacune, idempotent, eteint a la pause. Les sessions
+        de coordination sont couvertes par coordination_conflict — pas de doublon de constat."""
+        actors = {}
+        for session in self.sessions.values():
+            if not (session.get("enabled") and session.get("state") == "active"):
+                continue
+            try:
+                actor = actor_of_alias(session.get("alias"))
+            except Exception:
+                continue
+            if actor:
+                actors.setdefault(actor, []).append(session)
+        for actor, members in sorted(actors.items()):
+            if len(members) < 2:
+                continue
+            names = {str(s["id"]): (s.get("alias") or s.get("native_id") or str(s["id"])) for s in members}
+            for session in members:
+                if is_coordination_session(session):
+                    continue   # coordination_conflict couvre deja le cas T000-*
+                others = sorted(name for ident, name in names.items() if ident != str(session["id"]))
+                fingerprint = hashlib.sha256((str(session["id"]) + "\nactor_conflict\n" + actor).encode()).hexdigest()
+                if next((a for a in session["alerts"] if a.get("fingerprint") == fingerprint), None):
+                    continue
+                me = names[str(session["id"])]
+                text = (me + " et " + ", ".join(others) + " : deux sessions actives portent le meme "
+                        "acteur (" + actor + "). Un acteur = une session de travail a la fois : "
+                        "mettre une des sessions en pause ou retransmetter son etat.")
+                alert = dict(id=fingerprint[:24], fingerprint=fingerprint, model="service",
+                    severity="warning", reason=text, evidence=text, category="actor_conflict",
+                    title="Conflit d'acteur", created_at=timestamp(), last_occurrence=timestamp(),
+                    occurrences=1, disposition="new", acknowledged_at=None,
+                    workflow=dict(status="informational", delivery_status="not_sent", choice=None, rationale="", chosen_at=None, response=""))
+                alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"))
+                alert["memory_usage"] = memory_inventory(session, self.judge_settings)
+                session["alerts"].append(alert)
+                prepare_alert(alert)
+                record_event(session, "finding_created", text, timestamp(), alert_id=alert["id"], version=alert["version"])
+                _trace(event="actor_conflict", session=str(session["id"]), alias=session.get("alias"), actor=actor, peers=",".join(others))
+
     def _collect_loop(self):
         while not self.closed:
             with self._lock:
@@ -2952,6 +3004,7 @@ class Supervisor:
                                                 cycles=self.collector_stats["cycles"]+1)
                     self._detect_coordination_conflicts()
                     self._detect_mission_cadrage()
+                    self._detect_actor_conflicts()
                     if self._persist_pending and not self.load_error:
                         self._persist_background()
             self._wake.wait(self.poll_interval)
