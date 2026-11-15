@@ -480,8 +480,9 @@ Workflow de suivi : non lancé tant que le plan n'est pas corrigé.
    épinglé, deny-list dure non levée par dérogation, citation littérale exigée (commit
    `6e261378`). Trou des écritures shell fermé le 2026-11-15 (`9d1f19b0`) : hook
    `Bash|PowerShell` actif. Limite assumée : analyse lexicale.
-2. **GO non tracés** — 🟡 **partiel**. Convention inscrite dans `AGENTS.md` (GO + copie
-   datée, un GO verbal non copié n'autorise rien). ❌ **Registre dédié non livré**.
+2. **GO non tracés** — ✅ **traité**. Convention dans `AGENTS.md` (GO + copie datée) et
+   **registre append-only livré** : `go_registry.py`, qui **refuse un GO sans référence
+   du message d'origine** — c'est ce qui distingue un GO tracé d'un souvenir (7 tests).
 3. **Documents désalignés** — ✅ **traité pour les commandes**. Vérifié le 2026-11-15 :
    `.claude/commands/` ne contenait que `plan-project.md` et `workflow-project.md`, alors
    que `ROLE.md` et `COORDINATOR.md` annonçaient des commandes dédiées. Les deux
@@ -502,5 +503,6 @@ emplacement et porteur de F4 · écrivain du registre des dérogations · réord
 du backlog.
 
 **Livré le 2026-11-15, hors plan** : procédures d'échange v0.3 (3 revues adverses),
-`AGENTS.md` § « Échanges entre sessions », `exchange_tracker.py` (13 tests), 2 commandes
-de rôle. Total du périmètre T427 : **74 tests verts**, `CODE/` intact.
+`AGENTS.md` § « Échanges entre sessions », `exchange_tracker.py` (13 tests),
+`go_registry.py` (7 tests), 2 commandes de rôle versionnées.
+Total du périmètre T427 : **81 tests verts**, `CODE/` intact.
