@@ -355,6 +355,32 @@ git config core.hooksPath TOOLS/AGENT_WORKFLOW/hooks
 
 ---
 
+### 📡 Échanges entre sessions (T427, 2026-11-15)
+
+Source : `DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/T427_WORKFLOW_AGENTS_ECHANGES_ET_CAS_LIMITES_20261115_v0.3.md`.
+
+- 🚫 **Solliciter** — contacter une autre session de sa propre initiative pour coordonner,
+  attribuer ou réaffecter : **interdit** sans désignation humaine ou de l'orchestrateur.
+- ✅ **Signaler** — déclarer un blocage, un manque ou un désaccord : **obligatoire**.
+  Canal : journal + copie datée dans le dossier de la tâche de l'émetteur.
+  Échéance : date de revue attendue. Un signalement sans échéance est un trou sans fond.
+- 📨 **Format d'une consigne** : `from` · `to` · `tâche` · `objet` · `demande` ·
+  preuve attendue · échéance · réf. de session. Réponse d'abord en `RECU` + quoi + quand.
+- ⏳ **Clause de silence** : échéance effective = la date promise dans `RECU`, sinon celle de
+  la consigne. Sans réponse à cette date → une relance tracée, puis escalade humaine.
+  Un `RECU` sans réponse vaut un silence total.
+- 🔒 **Verrou de fichier** : un délégué ne prend jamais son verrou lui-même, il le **demande**
+  à l'orchestrateur. Orchestrateur injoignable → il signale et n'écrit pas.
+- ⚖️ **Autorité ambiguë** (deux sessions se croyant orchestratrices, homonymes) : **fail-closed**
+  — arrêt des écritures hors dossier de tâche, trace immédiate, escalade humaine. Jamais
+  « la session qui répond le plus vite ».
+- 🧾 **GO tracé** : `GO <tâche> <réf. émetteur> <périmètre>` + copie datée au dossier de tâche.
+  Un GO verbal non copié n'autorise rien.
+- 🧪 **Preuve** = commande exacte + contexte (`commit`, date) + **code retour** + sortie brute,
+  hash conservé à la citation. « Fait » sans preuve = non fait.
+
+⚠️ Conventions **non outillées** à ce jour : aucun script ne les impose encore.
+
 ## 🛠️ Workflow d'édition
 
 `0.` règles → `1.` architecture → `2.` existant → `3.` plan **validé** → `4.` code ST + note
