@@ -213,6 +213,20 @@ plan_project:
       execution_by: ""
       evidence: ""
       execution_comment: "Proposition DOC/WFLOW/TASKS/T000-CC10_PROPOSITION_STATUT_MIGRATION_IHM/ acceptée par CC01 — constat réel, AC testables ; à trancher §6 (canal HTTP avec jeton vs fichier d'état, statut expiré 24 h) ; lot 1 déjà fait par M18 ; implémentation après le restart M12"
+    - id: M20
+      title: "R22 — constat mécanique : même acteur porté par deux sessions actives"
+      done_when: "2+ sessions actives du même acteur → constat actor_conflict sur chacune, idempotent, éteint à la pause ; acteur absent jamais constaté"
+      execution: NOT_STARTED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "Demande exploitant via CC10 (2026-11-15) ; extension du mécanisme coordination_conflict ; le champ agent du catalogue (constat de forme) reste le lot R3 de T000-SESSION_NAMING, PAS le Superviseur"
+    - id: M21
+      title: "R23 — constat : identifiant de modèle consommé hors liste de référence (partiel)"
+      done_when: "Identifiant du juge hors liste fournie par config → constat model_out_of_reference ; liste absente → aucun constat ; le service n'inspecte JAMAIS la doc/contrats"
+      execution: NOT_STARTED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "Demande exploitant via CC10 ; source de référence : MODEL_ROUTING.md à enrichir (pose humaine, hors périmètre strict T429 : docs) + les 4 familles Claude 5 ; le transport au service = liste en config, JAMAIS une lecture du dépôt par le service (règle v1)"
       validation: NOT_REVIEWED
       validated_by: ""
       validated_at: ""
@@ -360,6 +374,8 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
 | **R19** | **Recette de dérive RÉELLE avec agents Ollama** (GO conditionnel exploitant 2026-11-15 ; lesson PRG_10 : tests verts ≠ câblé) | l'agent Ollama rédige une écriture hors périmètre (contenu fourni dans son prompt, il ne lit jamais le code) ; l'écriture volontaire déclenche le garde (refus + journal + métrique `k/n`) ; le Superviseur publie le constat `scope_drift` citable sur la session surveillée ; le tout consigné dans PREUVES/ | preuve brute : refus du garde + métrique comptée + constat cité dans PREUVES | CC01 (T429), GO explicite de l'écriture volontaire requis |
 | **R20** | **upgrade_legacy robuste** (reprise CC10 demandée par l'exploitant) | journal horodaté par étape, délais 15 s (GET) / 30 s (POST), **kill ciblé** : un processus sur 8082 n'est arrêté que s'il est `supervisor_server.py`, sinon refus | `test_upgrade.py` 5 passed (réexécuté CC01 2026-11-15) | T000-CC10 → repris CC01 (T429) |
 | **R21** | **Statut de migration visible dans l'IHM** (proposition T000-CC10 acceptée, cas « Migration interrompue : timed out » invisible) | bandeau IHM : état `en cours/réussie/échec`, étape courante, cause, chemin de sauvegarde — sans changement de format d'état, migration jamais lancée sans GO (AC-1→AC-6 de la proposition) | tests upgrade + bandeau DOM ; à trancher §6 : canal HTTP avec jeton vs fichier d'état, statut expiré 24 h | CC01 (T429), implémentation après le restart M12 |
+| **R22** | **Constat : même acteur porté par deux sessions actives** (demande exploitant via CC10 ; le cas T000-* reste couvert par coordination_conflict) | 2+ sessions enabled+active portant le même acteur (partie après `Txxx-` de l'alias) → constat `actor_conflict` posé sur chacune, idempotent, s'éteint à la pause ; acteur absent → jamais de constat | tests (doublon → 1 constat chacun · pause → aucun · idempotent) | CC01 (T429) |
+| **R23** | **Constat : identifiant de modèle consommé hors liste de référence** — PARTIEL : le service n'inspecte que les identifiants qu'il consomme, JAMAIS la doc/contrats (le service ne lit pas le dépôt en v1) | liste de référence FOURNIE au service par config (source : MODEL_ROUTING.md à enrichir, pose humaine) ; identifiant du juge hors liste → constat `model_out_of_reference` ; liste absente → aucun constat, jamais deviné ; constat seulement, pas de correction | tests (liste fournie + hors liste → constat · liste absente → rien) | CC01 (T429) ; liste → exploitant/CC10 |
 
 ### Décisions figées sur ce lot
 
