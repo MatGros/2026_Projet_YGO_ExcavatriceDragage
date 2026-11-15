@@ -14,12 +14,13 @@ const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const {window, document} = parseHTML(html);window.HTMLElement.prototype.scrollIntoView=()=>{};
 for (const select of document.querySelectorAll('select')) Object.defineProperty(select, 'value', {configurable:true, get(){return this._value ?? this.options?.[0]?.value ?? '';}, set(value){this._value=String(value);}});
 const timers=[];
-const snapshot = {running:true,token:'token',model:'local',allow_cloud:false,sessions:[{id:'s1',platform:'claude',native_id:'session-a',alias:'A',state:'active',analysis_state:'alert',mission:'Mission A',chat_messages:[],judge_request:null,
+const snapshot = {running:true,token:'token',model:'local',allow_cloud:false,service_version:2,update_available:true,sessions:[{id:'s1',platform:'claude',native_id:'session-a',alias:'A',state:'active',analysis_state:'alert',mission:'Mission A',chat_messages:[],judge_request:null,
  memory_state:{fenetre:2,memoire_longue:5,journal:3,preuves_acquises:3,cadrage:1,ecartes:0,fenetre_tronquee:false,regles:12,dossier_lecture:{fichiers:['DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/CONTRAT.yaml','DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/PLAN.md'],illisibles:[{path:'DOC/inexistant.md',erreur:'FileNotFoundError'}],total_caracteres:900,budget:{max_fichiers:6,max_caracteres:12000}}},
  alerts:[{id:'a1',severity:'warning',reason:'Constat TEST',evidence:'Citation TEST',disposition:'new',workflow:{status:'legacy'},memory_usage:{fenetre:2,memoire_longue:5,journal:3,preuves_acquises:3,cadrage:1,fenetre_tronquee:false},lecture_declaree:{fichiers:['DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/CONTRAT.yaml'],illisibles:['DOC/inexistant.md']}}]},
  {id:'s2',platform:'claude',native_id:'session-mmx',alias:'T429-MMX01',state:'active',analysis_state:'no_alert',mission:'Mission MMX',chat_messages:[],judge_request:null,alerts:[]}],chat:{messages:[]}}
 class FakeNotification{constructor(title,options){this.close=()=>{};}}FakeNotification.permission='granted';FakeNotification.requestPermission=async()=>'granted';window.Notification=FakeNotification;class FakeAudioContext{state='suspended';async resume(){this.state='running';}}window.AudioContext=FakeAudioContext;
-const fetch = async () => ({ok:true,status:200,json:async()=>snapshot});
+const posts=[];
+const fetch = async (url, options={}) => { if(options.method==='POST') posts.push(JSON.parse(options.body||'{}')); return {ok:true,status:200,json:async()=>snapshot}; };
 const sandbox={window,document,Notification:FakeNotification,navigator:{},localStorage:{getItem:()=>null,setItem:()=>{}},AbortController,URLSearchParams,fetch,console,Date,JSON,Set,Map,Promise,setTimeout:(f,ms)=>{timers.push({f,ms});return timers.length;},clearTimeout:()=>{}};
 const ctx=vm.createContext(sandbox);
 vm.runInContext(script,ctx);
@@ -34,6 +35,14 @@ assert.match(text,/DOC\/inexistant\.md: FileNotFoundError/,'un fichier illisible
 assert.match(text,/budget 6 fichiers \/ 12000 caractères/,'le budget affiche est le budget reel');
 // M23 : les stats d etat de la memoire longue affichees (demande exploitant 2026-11-15)
 assert.match(text,/📊 Mémoire longue : \d+ élément\(s\) · ~\d+ caractères · bornée à \d+/,'les stats d etat de la memoire longue sont visibles a l IHM');
+// R29 : l alerte mise a jour est FIXE au scroll, avec relance 1 clic ; le fond du menu gauche devient rouge sombre
+const bannerEl=document.getElementById('update-banner');
+assert.ok(bannerEl && !bannerEl.hidden,'R29 : le bandeau mise a jour est visible sans scroll');
+assert.match(document.querySelector('.app-sidebar').className,/needs-restart/,'R29 : le menu de gauche porte l etat d alerte (fond rouge sombre)');
+const restartBtn=document.getElementById('restart-service-button');
+assert.ok(restartBtn,'R29 : le bouton 1 clic de relance est present');
+restartBtn.dispatchEvent(new window.Event('click',{bubbles:true,cancelable:true}));await new Promise(r=>setImmediate(r));
+assert.ok(posts.some(p=>typeof p==='object'&&p.action==='restart_service'),'R29 : le clic poste l action de relance');
 assert.match(text,/📖 Fichiers déclarés lus pour ce verdict/,'R13 : chaque constat declare sa lecture');
 assert.match(text,/DOC\/inexistant\.md/,'la declaration du constat porte le fichier signale');
 assert.match(text,/preuves 3 /,'la cle preuves_acquises est lue (le champ n affiche plus undefined)');
