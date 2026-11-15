@@ -746,6 +746,30 @@ def dossier_public(dossier) -> dict:
                 declared_at=dossier.get("declared_at"))
 
 
+# T429 M15/R17 (2026-11-15, GO exploitant) : la coordination du projet est une session dont
+# l alias porte le prefixe T000 (ex. T000-CC10). La detection est MECANIQUE : le juge ne
+# devine pas un role. Canonique des criteres : TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md
+# section "Identite de coordination & surveillance du Superviseur".
+COORDINATION_JUDGE_NOTICE = (
+    "## SESSION DE COORDINATION (role orchestrateur/coordinateur, alias T000-*) : le juge applique "
+    "les criteres de gestion specifiques — (1) la session ne cloture ni un constat ni une tache "
+    "elle-meme (la cloture revient a l exploitant ou a un juge enregistre par le code) ; (2) une fiche "
+    "de tache ne se modifie que par le coordinateur designe via l API Task Manager, jamais par edition "
+    "directe ; (3) ne jamais contourner ni ecraser un verrou d un autre acteur ; (4) la lecture du git "
+    "diff reel reste au coordinateur, un rapport d agent n est jamais une preuve ; (5) aucun commit ni "
+    "push sans accord humain explicite. Canonique : TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md."
+)
+
+
+def is_coordination_session(session) -> bool:
+    """T429 M15/R17 : session de coordination = alias T000-* ou tache liee T000. Detection mecanique."""
+    if not isinstance(session, dict):
+        return False
+    alias = str(session.get("alias") or "").upper()
+    task = str(session.get("task_id") or "").upper()
+    return alias.startswith("T000") or task == "T000"
+
+
 def persona_usage(session_id: str) -> list:
     """Invocations de personas tracees pour cette session (R15) : usage reel, pas une impression."""
     try:
@@ -2796,6 +2820,36 @@ class Supervisor:
             session["source_checkpoint"] = session["watcher"].checkpoint()
             self._persist_background()
 
+    def _detect_coordination_conflicts(self):
+        """T429 M15/R17 : deux sessions de coordination actives simultanement = conflit.
+        Constat MECANIQUE (pas le juge), idempotent : cree une fois, reste jusqu a cloture humaine."""
+        coordination = [s for s in self.sessions.values() if s.get("enabled") and s.get("state") == "active" and is_coordination_session(s)]
+        if len(coordination) < 2:
+            return
+        names = {}
+        for session in coordination:
+            names[str(session["id"])] = (session.get("alias") or session.get("native_id") or str(session["id"]))
+        for session in coordination:
+            others = sorted(name for ident, name in names.items() if ident != str(session["id"]))
+            fingerprint = hashlib.sha256(("coordination_conflict\n" + ",".join(others)).encode()).hexdigest()
+            if next((a for a in session["alerts"] if a.get("fingerprint") == fingerprint), None):
+                continue
+            me = names[str(session["id"])]
+            text = (me + " et " + ", ".join(others) + " : deux sessions de coordination (T000-*) sont "
+                    "actives simultanement. Le projet designe UN coordinateur a la fois : remettre un "
+                    "des deux perimetres et transmettre l etat.")
+            alert = dict(id=fingerprint[:24], fingerprint=fingerprint, model="service",
+                severity="warning", reason=text, evidence=text, category="coordination_conflict",
+                title="Conflit de coordination", created_at=timestamp(), last_occurrence=timestamp(),
+                occurrences=1, disposition="new", acknowledged_at=None,
+                workflow=dict(status="informational", delivery_status="not_sent", choice=None, rationale="", chosen_at=None, response=""))
+            alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"))
+            alert["memory_usage"] = memory_inventory(session)
+            session["alerts"].append(alert)
+            prepare_alert(alert)
+            record_event(session, "finding_created", text, timestamp(), alert_id=alert["id"], version=alert["version"])
+            _trace(event="coordination_conflict", session=str(session["id"]), alias=session.get("alias"), peers=",".join(others))
+
     def _collect_loop(self):
         while not self.closed:
             with self._lock:
@@ -2827,6 +2881,7 @@ class Supervisor:
                                                 messages_seen=after_messages-before_messages,
                                                 sessions_unavailable=sum(s["state"] not in ("active", "waiting") for s in enabled),
                                                 cycles=self.collector_stats["cycles"]+1)
+                    self._detect_coordination_conflicts()
                     if self._persist_pending and not self.load_error:
                         self._persist_background()
             self._wake.wait(self.poll_interval)
@@ -2884,6 +2939,9 @@ class Supervisor:
                                          "dossier de lecture : " + str(len(dossier["fichiers"])) + " fichier(s), "
                                          + str(dossier["total_caracteres"]) + " caracteres",
                                          refs=[f["path"] for f in dossier["fichiers"][-5:]])
+                        # M15/R17 : le role coordination est annonce au juge, il ne se devine pas.
+                        if is_coordination_session(session):
+                            notices.append(dict(role="context_notice", text=COORDINATION_JUDGE_NOTICE))
                         session["judge_turn_count"] = session.get("judge_turn_count", 0) + 1
                         audit_interval = self.judge_settings.get("audit_interval", 8)
                         if session["judge_turn_count"] % audit_interval == 0:
