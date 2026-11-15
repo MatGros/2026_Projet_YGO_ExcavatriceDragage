@@ -16,6 +16,11 @@ from urllib.request import Request, urlopen
 
 BASE = 'http://127.0.0.1:8082'
 RECOVERY = {'stopped': False, 'pid': None, 'token': None, 'was_running': False}
+
+
+def log(step, detail=''):
+    """Horodatage terminal de chaque etape (lu aussi par le lanceur)."""
+    print(f"[{datetime.now():%H:%M:%S}] {step}" + (f" : {detail}" if detail else ''), flush=True)
 LEGACY_ALERT_WORKFLOW = {'status': 'legacy', 'delivery_status': 'not_sent', 'choice': None,
                          'rationale': '', 'chosen_at': None, 'response': ''}
 
@@ -38,14 +43,14 @@ def stable_sessions(snapshot):
 
 
 def get(path):
-    with urlopen(BASE + path, timeout=3) as response:
+    with urlopen(BASE + path, timeout=15) as response:
         return json.load(response)
 
 
 def post(token, payload):
     req = Request(BASE + '/api/supervision', data=json.dumps(payload).encode('utf8'),
                   headers={'Content-Type': 'application/json', 'X-Supervision-Token': token})
-    with urlopen(req, timeout=5) as response:
+    with urlopen(req, timeout=30) as response:
         return json.load(response)
 
 
@@ -56,6 +61,18 @@ def listener_pid():
     if len(matches) != 1:
         raise RuntimeError('Impossible d’identifier uniquement le serveur local sur 8082')
     return int(matches[0])
+
+
+def stop_supervisor_pid(pid):
+    """Arrete un processus sur 8082 seulement s'il est un supervisor_server.py ; sinon refus."""
+    cmd = subprocess.run(['powershell', '-NoProfile', '-Command',
+                          f"(Get-CimInstance Win32_Process -Filter 'ProcessId={int(pid)}').CommandLine"],
+                         capture_output=True, text=True, encoding='utf8', errors='replace', check=False,
+                         creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0)).stdout.strip()
+    if 'supervisor_server.py' not in cmd:
+        raise RuntimeError(f'Port 8082 occupe par un processus non Superviseur (PID {pid}) ; arret refuse')
+    log('Arret du Superviseur restant', f'PID {pid}')
+    os.kill(pid, signal.SIGTERM)
 
 
 def source_stamp(path):
@@ -94,7 +111,8 @@ def main():
     previous = {s['id']: {'state':s['state'], 'source':s.get('source'), 'stamp':source_stamp(s.get('source'))} for s in sessions}
     pid = listener_pid()
     token = current['token']
-    print('Serveur Superviseur identifié ; arrêt de sa collecte avant sauvegarde.', flush=True)
+    log('Serveur Superviseur identifié', f'PID {pid}, version {health.get("service_version")}')
+    log('Arret de la collecte avant sauvegarde')
     post(token, {'action':'stop'})
     RECOVERY.update(stopped=True, pid=pid, token=token, was_running=was_running)
     frozen = get('/api/supervision')
@@ -118,7 +136,8 @@ def main():
     check = get('/api/supervision')
     if listener_pid() != pid or check.get('chat', {}).get('messages') != messages or stable_sessions(check) != stable_sessions(frozen):
         raise RuntimeError('Le serveur ou le chat a changé ; sauvegarde conservée, aucun processus arrêté')
-    print(f'Sauvegarde vérifiée : {backup} ({len(messages)} messages).', flush=True)
+    log('Sauvegarde verifiee', f'{backup} ({len(messages)} messages)')
+    log('Arret de l\'ancien serveur', f'PID {pid}')
     os.kill(pid, signal.SIGTERM)
     RECOVERY['stopped'] = False  # The old server no longer owns the port.
     deadline = time.monotonic() + 5
@@ -128,10 +147,13 @@ def main():
         except RuntimeError:
             break
         if old_pid != pid:
-            raise RuntimeError(f'Le port est occupé par un autre processus ; sauvegarde : {backup}')
+            stop_supervisor_pid(old_pid)  # refuse si ce n'est pas un Superviseur
+            time.sleep(.5)
+            continue
         time.sleep(.1)
     else:
         raise RuntimeError(f'Le serveur historique ne s’est pas arrêté ; sauvegarde : {backup}')
+    log('Demarrage du nouveau serveur', 'port 8082')
     server_script = Path(__file__).with_name('supervisor_server.py')
     process = subprocess.Popen([sys.executable, str(server_script), '--port', '8082'],
                                creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0),
@@ -190,7 +212,7 @@ def main():
                 resumed += 1
     else:
         post(new['token'], {'action':'stop'})
-    print(f"Nouveau service v{health['service_version']} ({health['build_id']}) actif ; {len(messages)} messages et {len(previous)} affectations conservés, {resumed} reprises.", flush=True)
+    log('Migration reussie', f"service v{health['service_version']} ({health['build_id']}) ; {len(messages)} messages, {len(previous)} affectations, {resumed} reprises")
     for warning in attention:
         print('À vérifier : ' + warning, flush=True)
 
@@ -199,6 +221,7 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as exc:
+        log('ECHEC migration (aucun processus perdu, voir etat ci-dessous)', f'{type(exc).__name__}: {exc}')
         print(f'Migration interrompue : {exc}', file=sys.stderr, flush=True)
         if RECOVERY['stopped'] and RECOVERY['was_running']:
             try:
