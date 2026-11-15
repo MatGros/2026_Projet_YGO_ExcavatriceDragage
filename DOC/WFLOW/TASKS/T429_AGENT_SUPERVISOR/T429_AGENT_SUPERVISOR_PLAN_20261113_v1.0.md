@@ -237,9 +237,9 @@ plan_project:
     - id: M23
       title: "R26 — mémoire longue élargie et observable (demande exploitant 2026-11-15)"
       done_when: "memory_max_items configurable (défaut 20, config 20→500) ; plafonds de fenêtre 1M ; l'IHM stats d'état ; textes tête+queue"
-      execution: IN_PROGRESS
+      execution: DONE
       execution_by: CC01
-      evidence: "Constante MEMORY_MAX_ITEMS + memory_limit() ; 4 sites déhardcodés ; head_tail_text() aux textes de mémoire/contexte (le début du message conservé) ; plafonds de validation élargis 1M ; IHM : champ memory-max-items + stats du fold mémoire (l'élément/caractères/borne/plus ancien) ; test memory_limit 1 passed (25 gardés > 20) ; DOM 16 asserts + layout OK"
+      evidence: "Constante MEMORY_MAX_ITEMS + memory_limit() ; 4 sites déhardcodés ; head_tail_text() aux textes de mémoire/contexte (le début du message conservé) ; plafonds de validation élargis 1M ; IHM : champ memory-max-items + stats du fold mémoire (l'élément/caractères/borne/plus ancien) ; test memory_limit 1 passed (25 gardés > 20) ; DOM 16 asserts + layout OK ; suite complète : 221 passed + 2 failed (les 2 intermittents connus en suivi, solo verts x3) [commit 8dbd86bd]"
       execution_comment: "Demande exploitant 2026-11-15 (modèle 1M contexte) — le run de suite est en cours de dernière preuve ; le restart restera nécessaire pour le service"
     - id: M24
       title: "R27 — standardiser le plan de session /plan (gabarit + lien skill)"
