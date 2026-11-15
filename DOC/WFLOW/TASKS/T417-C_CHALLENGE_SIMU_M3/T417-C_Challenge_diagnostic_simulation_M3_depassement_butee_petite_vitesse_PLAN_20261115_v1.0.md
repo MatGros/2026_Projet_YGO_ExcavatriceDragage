@@ -31,10 +31,10 @@ plan_project:
     - id: M2
       title: "Arbitrage exploitant et dossier de passation (patch + guard ou bascule C3/C4)"
       done_when: "Choix d'hypothèse validé par l'humain et dossier de passation approuvé"
-      execution: NOT_STARTED
-      execution_by: ""
-      evidence: ""
-      execution_comment: ""
+      execution: IN_PROGRESS
+      execution_by: "AGY03"
+      evidence: "T417-C_SYNTHESE_ETUDE_M3_20261115_v1.0.md + plan_abc_matrix.py + be_dynamic_study.py"
+      execution_comment: "Plans A/B/C, matrice sandbox et protocole de test prêts pour validation humaine au retour"
       validation: NOT_REVIEWED
       validated_by: ""
       validated_at: ""

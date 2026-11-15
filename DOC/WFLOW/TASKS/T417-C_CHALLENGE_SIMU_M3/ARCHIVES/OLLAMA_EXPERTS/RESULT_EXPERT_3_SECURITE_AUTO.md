@@ -1,0 +1,10 @@
+🔴 **BLOCK — T417-C : aucune mesure A1/A2/B2/C1 ne garantit l’état sûr après redémarrage ou perte de capteur. Non signable C3/C4.**
+
+1. **Faille/mode commun non couvert**
+A1/A2 supposent une séquence et un `Reset` valides ; B2 ne fait qu’échantillonner ; C1 ne détecte que `11111→01111`. Toutes reposent sur `M3_PosTremie_DI` comme vérité physique et sur un front. Cas critique : coupure secteur/redémarrage automate avec chariot déjà au-delà de la came en `01111`, capteur bloqué à `0` avant contact. Aucun `11111` préalable : C1 silencieux ; `ErrorId=64` non latchant s’efface ; A1/A2 peuvent réarmer ; B2 à 5 Hz lit la même valeur stale. Mode commun : perte de diversité/position absolue et état non conservé au power-up. Exiger : mouvement interdit au démarrage jusqu’à preuve de position (référence ou deux canaux divergents), verrou de redémarrage, diagnostic latché, surveillance hardwired indépendante.
+
+2. **Détection <=2 scans : faux positifs probables**
+Oui, risque élevé. Deux scans PLC sont très courts face aux rebonds, vibrations, saletés et jitter. À 5 Hz PV, deux échantillons = 400 ms alors que la came est traversée en 115 ms : aliasing et détection incohérente. Blinder : mesure du jitter, filtre d’entrée, confirmation par deux canaux divergents, fenêtre d’occupation attendue selon vitesse, masque limité à la durée max de traversée + marge, hystérésis, test pulse/diagnostic, aucun masque permanent. Valider par injections de rebonds et cycles réels ; sinon revenir à un seuil temporel prouvé.
+
+3. **FAT/SAT minimal avant signature**
+FAT : injection stuck-at-0/1 avant/pendant/après came ; coupure secteur/restart en `01111` au-delà came ; Reset/réarmement et sens opposé ; symétrie Maintenance ; perte communication/5 Hz ; rejet gain `0,0551` ; coupure permit/hardstop et temps d’arrêt. SAT réel : arrêt à vitesse/charge max, mesure overrun et temps de réaction, capteur débranché/bloqué, redémarrage chariot hors zone, non-redémarrage sans Reset et position prouvée, zéro faux déclenchement sur campagne définie. Preuves tracées et seuils validés ; sinon refus C3/C4.

@@ -16,8 +16,8 @@ END_VAR
     END_FOR;
     ASSERT_NEAR(FB.M3PositionTrue_M, 5.0, 0.05, 'Depart P1');
 
-    (* Deplacement vers Tremie en Manu (JoystickLeft) *)
-    FOR i := 1 TO 1200 DO
+    (* Deplacement vers Tremie en Manu (JoystickLeft) : 5.0 m a 0.20 m/s -> ~25 s *)
+    FOR i := 1 TO 3000 DO
         ADVANCE_TIME(10000000);
         FB(Enable := TRUE, StepForceTgt := -1, JoystickLeft := TRUE, SimM3Slope_Mps2 := 0.0, BenneDone := FALSE, BenneIsOpen := FALSE);
     END_FOR;

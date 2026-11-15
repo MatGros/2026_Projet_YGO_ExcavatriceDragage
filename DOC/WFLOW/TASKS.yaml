@@ -1,4 +1,55 @@
 tasks:
+- id: T417-F
+  parent_id: T417-C
+  statut: ⬜
+  criticite: C3
+  domaine: CYCLE / MODES / BENNE TREMIE
+  agent: —
+  date: '2026-11-15T18:35:30'
+  titre: Branche Cycle & Modes (ouverture benne Tremie + conditions initiales Auto)
+  contexte: Branche parallele T417-C (perimetre exclusif FB_Modes.st, FB_CycleSemiAuto.st, PRG_03_Modes_Cycle.st, CODE/H_TREUILS_BENNE/**).
+    Zero recouvrement ecriture avec T417-D/E.
+  description: Simplification conditions initiales mode SEMI_AUTO (AX1_INIT / CycleInitPositionOk) et fluidification/securisation
+    ouverture benne au-dessus de la tremie (M3AtTremie vs M3_AtTremieStable, AX15A/B).
+  objectifs:
+  - Auditer et simplifier CycleInitPositionOk / AX1_INIT avec diagnostic IHM clair
+  - Securiser M3AtTremie (stabilite/memoire) et fluidifier ouverture benne au-dessus de la tremie
+  - Preparer cascade Plan A -> Plan B semi-auto avec validation bundle + G200 + Gates Palier C
+  bloque_par: []
+- id: T417-E
+  parent_id: T417-C
+  statut: ⬜
+  criticite: C3
+  domaine: AUTOMATISME / SECURITE M3
+  agent: —
+  date: '2026-11-15T18:35:30'
+  titre: Branche Securite M3 & Sorties (Latch Tremie, Symetrie Maint., PV 5 Hz)
+  contexte: 'Branche parallele T417-C (perimetre exclusif PRG_06_Outputs.st, PRG_05_Translation.st, CODE/I_TRANSLATION/**).
+    Prepa hors CODE: ARCHIVES/PREPA_CODE/T417-E_SECU_M3/.'
+  description: 'Plans A1/A2/B1/B2/C securite deplacement M3 : latch directionnel RETAIN + anti-rebond ~100ms + reset poste,
+    symetrie Maintenance sur capteur dedie (piege 2#00000), PV 5 Hz sur 1-2 derniers m, verrou C1.'
+  objectifs:
+  - Implementer M3_TremieHardStopLatched RETAIN + anti-rebond ~100ms + protection power-up 01111
+  - Verifier polarite 2#00000 et securiser symetrie Maintenance si capteur dedie disponible
+  - Prevoir bascule Plan B2 (5 Hz 1-2m) + B1 (CST_GainMax) + C1 si echec ou glissade
+  bloque_par: []
+- id: T417-D
+  parent_id: T417-C
+  statut: ⬜
+  criticite: C2
+  domaine: SIMULATION / SIMBENCH / M3
+  agent: —
+  date: '2026-11-15T18:35:30'
+  titre: Branche Simulation M3 (came finie, frein, gain k, banc WORST_CASE_SITE)
+  contexte: 'Branche parallele T417-C (perimetre exclusif CODE/L_SIMULATION/** et AGY02_T417_M3_SANDBOX/**). Prepa hors CODE:
+    ARCHIVES/PREPA_CODE/T417-D_SIMU/.'
+  description: 'Plan A0 simulation M3 : came finie dans FB_Sim_PositionSensor, exposition CloseDelay_S et GainMetersPerHzSec
+    dans GVL_Simulation, profil WORST_CASE_SITE. Cascade : Plan A0 -> 1 debug -> Plan B Python isole.'
+  objectifs:
+  - Exposer SimM3SensorFiniteCam_BOOL et SimM3SensorCamLength_M dans GVL_Simulation / FB_Sim_PositionSensor
+  - Exposer SimM3BrakeCloseDelay_S et SimM3GainMetersPerHzSec (plage [0.02 ; 0.06])
+  - Valider bundle + G200 + Gates Palier C + run_m3_sandbox.py
+  bloque_par: []
 - id: T417-C
   parent_id: T417
   statut: ⏳
@@ -43,11 +94,11 @@ tasks:
   bloque_par: []
 - id: T430
   parent_id: ''
-  statut: ⏸️
+  statut: ⏳
   criticite: C2
   domaine: DOC / WFLOW / OUTILLAGE
   agent: CDX04
-  date: '2026-11-11T15:36:06+01:00'
+  date: '2026-11-15T16:19:12'
   titre: Organisation documentaire — terminer la migration des versions, chemins et consommateurs
   contexte: Reprise demandee par exploitant le 2026-11-10 apres revue des renommages AUDITS/CONTRACTS/REVIEWS/TESTS. Integrite394
     fichiers confirmee ; migration des references incomplete. Challenge expert avant implementation realise. Lot distinct
@@ -73,7 +124,9 @@ tasks:
     2026-11-11 CDX04. Prise en charge explicite par la session Codex 01a1c3c8-aebe-7fd1-aeb7-28e5ff83efa6, chat T430-CDX04
     — Organisation documentaire. Attribution CDX01 régularisée sur ordre utilisateur ; CDX01/CDX02/CDX03 déjà cités au catalogue.
     Petite étude ciblée en cours sur le plan déjà challengé par deux experts. Dossier de tâche avec PLAN unique et CONTRAT
-    présent, sans nouveau rapport. Aucune réparation de gate appliquée ; aucune suppression ni changement PLC. Aucun commit/push.'
+    présent, sans nouveau rapport. Aucune réparation de gate appliquée ; aucune suppression ni changement PLC. Aucun commit/push.
+    REPRISE demandée par l’exploitant le 2026-11-15. Plan mis à jour ; vérifications R1 et analyse indépendante R2-R4 à réaliser
+    sur l’état courant. T428 reste hors de T430 ; son état documentaire sera vérifié avant d’attribuer des changements.'
   bloque_par: []
 - id: T429
   parent_id: ''
