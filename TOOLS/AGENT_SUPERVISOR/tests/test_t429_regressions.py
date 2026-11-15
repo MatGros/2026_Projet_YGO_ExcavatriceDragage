@@ -1274,3 +1274,54 @@ def test_persona_invocation_is_traced_and_readable(monkeypatch, tmp_path):
     assert "journalisation persona echouee" not in proc.stderr, "la journalisation ne doit pas echouer"
     usage = supervisor_service.persona_usage("test-session-t429")
     assert usage == [{"role": "safety", "count": 1}], f"usage reel expose : {usage}"
+
+
+def test_coordination_session_judge_notice_only_for_t000(tmp_path):
+    """M15/R17 (2026-11-15) : une session de coordination (T000-*) est annoncee au juge ;
+    une session normale ne recoit PAS la notice (le role se detecte, il ne se devine pas)."""
+    observed = []
+
+    def judge(model, messages):
+        observed.append(json.loads(json.dumps(messages)))
+        return dict(alert=False, summary='ok', reviews=[])
+
+    svc, source, sid = service(tmp_path, judge)
+    try:
+        svc.command({'action': 'start'})
+        session = svc.sessions[sid]
+        session['task_id'] = 'T429'
+        write(source, 'user', 'message normal T429')
+        wait(lambda: len(observed) >= 1)
+        assert 'SESSION DE COORDINATION' not in json.dumps(observed[0], ensure_ascii=False)
+        session['task_id'] = 'T000'
+        write(source, 'user', 'message coordination T000')
+        wait(lambda: len(observed) >= 2)
+        assert 'SESSION DE COORDINATION' in json.dumps(observed[-1], ensure_ascii=False)
+        assert 'SESSION DE COORDINATION' not in json.dumps(observed[0], ensure_ascii=False)
+        assert not any(a.get('category') == 'coordination_conflict' for a in session['alerts'])
+    finally:
+        svc.close()
+
+
+def test_two_active_coordination_sessions_raise_one_finding(tmp_path):
+    """M15/R17 : deux sessions T000-* actives simultanement -> un constat mecanique par
+    session, idempotent au cycle suivant ; une session en pause ne declenche plus."""
+    svc, _source, sid = service(tmp_path)
+    try:
+        s1 = svc.sessions[sid]
+        s1.update(task_id='T000', alias='T000-CC10', alerts=[], enabled=True, state='active')
+        fake = dict(id='sid2', enabled=True, state='active', alias='T000-CC11', task_id='T000',
+                    native_id='native2', alerts=[], events=[], version=0)
+        svc.sessions['sid2'] = fake
+        svc._detect_coordination_conflicts()
+        assert len(s1['alerts']) == 1 and s1['alerts'][0]['category'] == 'coordination_conflict'
+        assert len(fake['alerts']) == 1
+        svc._detect_coordination_conflicts()
+        assert len(s1['alerts']) == 1 and len(fake['alerts']) == 1, 'constat idempotent, pas de doublon'
+        fake['enabled'] = False
+        svc._detect_coordination_conflicts()
+        assert len(fake['alerts']) == 1, 'une session en pause ne declenche plus le conflit'
+        assert supervisor_service.is_coordination_session(fake) is True
+        assert supervisor_service.is_coordination_session(dict(alias='T429-CC01', task_id='T429')) is False
+    finally:
+        svc.close()
