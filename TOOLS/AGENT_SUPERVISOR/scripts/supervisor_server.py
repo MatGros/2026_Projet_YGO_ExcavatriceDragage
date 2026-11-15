@@ -6,6 +6,8 @@ from pathlib import Path
 import secrets
 import os
 import hashlib
+import signal
+import subprocess
 from urllib.parse import urlparse, parse_qs
 
 try:
@@ -119,7 +121,35 @@ class Handler(BaseHTTPRequestHandler):
             return self.reply(400, {'error': str(exc)})
 
 
+def kill_port_listeners(port: int) -> None:
+    """M27 (decision exploitant 2026-11-15) : AU LANCEMENT, tout ce qui ecoute le port est tue.
+    Aucune instance precedente n est reutilisee et nul ne fait foi : le serveur demarre toujours
+    sur du code frais et un port libre. Les PID du netstat sont tures sauf le notre."""
+    try:
+        out = subprocess.run(['netstat', '-ano'], capture_output=True, text=True,
+                             encoding='utf-8', errors='replace', timeout=20).stdout
+    except (OSError, subprocess.SubprocessError):
+        return
+    my_pid = os.getpid()
+    for line in out.splitlines():
+        stripped = line.strip()
+        if f':{port} ' not in stripped + ' ' or 'LISTENING' not in stripped:
+            continue
+        try:
+            pid = int(stripped.rsplit(None, 1)[-1])
+        except (ValueError, IndexError):
+            continue
+        if pid == my_pid or pid <= 0:
+            continue
+        try:
+            print(f"[supervisor] port {port} : arrêt de l'instance précédente PID {pid}", flush=True)
+            os.kill(pid, signal.SIGTERM)
+        except (OSError, ValueError):
+            pass
+
+
 def create_server(port=8082, state_path=None):
+    kill_port_listeners(port)
     home = Path.home()
     default_path = Path(os.environ.get('LOCALAPPDATA', home / '.local/share')) / 'ExcavatriceDragage/agent-supervision.json'
     state_path = Path(state_path) if state_path else default_path
