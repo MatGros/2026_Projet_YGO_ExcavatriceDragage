@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import secrets
 import os
+import sys
 import hashlib
 import signal
 import subprocess
@@ -158,6 +159,28 @@ def kill_port_listeners(port: int) -> None:
             os.kill(pid, signal.SIGTERM)
         except (OSError, ValueError):
             pass
+    # R29 (demande exploitant) : apres les kills on REVÉRIFIE le port et le verdict est trace.
+    import time as _time
+    _time.sleep(1.0)
+    try:
+        recheck = subprocess.run(['netstat', '-ano'], capture_output=True, text=True,
+                                 encoding='utf-8', errors='replace', timeout=20).stdout
+    except (OSError, subprocess.SubprocessError):
+        return
+    survivors = []
+    for line in recheck.splitlines():
+        stripped = line.strip()
+        if f':{port} LISTENING' not in stripped + ' ':
+            continue
+        try:
+            survivors.append(int(stripped.rsplit(None, 1)[-1]))
+        except (ValueError, IndexError):
+            continue
+    ours_only = all(pid == my_pid or pid <= 0 for pid in survivors)
+    if survivors and not ours_only:
+        log_line(f"VERDICT port {port} : ENCORE OCCUPE par pid(s) {[s for s in survivors if s != my_pid]}")
+    else:
+        log_line(f"VERDICT port {port} : libere")
 
 
 def create_server(port=8082, state_path=None):
@@ -207,6 +230,7 @@ def main():
     parser.add_argument('--port', type=int, default=8082)
     parser.add_argument('--state', type=Path)
     args = parser.parse_args()
+    log_line(f"SCRIPT LANCE : {Path(sys.argv[0]).resolve()} args={sys.argv[1:] or '[aucun]'}")
     try:
         server = create_server(args.port, args.state)
     except Exception:
