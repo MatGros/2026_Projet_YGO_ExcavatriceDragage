@@ -191,7 +191,10 @@ details[open]>summary .fold-state-pill.when-open{border-color:var(--cyan);color:
 .btn-sys-nav{background:rgba(255,255,255,0.08);border:1px solid var(--border);color:var(--text);font-size:12px;font-weight:600;padding:6px 12px;border-radius:6px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;transition:all 0.2s ease-in-out;white-space:nowrap}.btn-sys-nav:hover{background:rgba(255,255,255,0.16);border-color:rgba(255,255,255,0.35);color:#fff;transform:translateY(-1px)}
 @media(max-width:700px){.app-main{padding:8px 12px 12px}.app-shell{grid-template-columns:1fr}.app-sidebar{position:static;height:auto}.flow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.flow-feedback{white-space:normal}.session-fold>summary,.alert-history-fold>summary{flex-wrap:wrap}.alert-history-fold>summary span{flex:1 1 100%}.finding-actions>*{flex:1 1 auto}}
 </style></head>
-<body><div id="update-banner" hidden><span id="update-banner-text">Mise à jour du service disponible : redémarrage nécessaire</span><button id="restart-service-button" type="button">1 clic : relancer le serveur</button></div><main>
+<!-- R30 : panneau rouge AFFICHE PAR DEFAUT ; le JS ne le cache que sur la preuve
+explicite update_available === false du snapshot FRAIS (jamais sur une snapshot
+incomplet/vieux/service injoignable). -->
+<body><div id="update-banner"><span id="update-banner-text">Mise à jour du service disponible : redémarrage nécessaire</span><button id="restart-service-button" type="button">1 clic : relancer le serveur</button></div><main>
 <header>
  <h1>&#x1F6E1;&#xFE0F; Agent Supervisor <span id="unread-count" class="badge">0 non lue</span></h1>
  <div class="header-nav">
@@ -1265,8 +1268,12 @@ function render(snapshot,force=false){
  byId('service-state').textContent=snapshot.running?'Démarré':'Arrêté';
  byId('service-state').className='status'+(snapshot.running?'':' warn');
  const version=byId('service-version');version.textContent=!snapshot.service_version?'Ancienne version : redémarrage nécessaire':snapshot.update_available?'Mise à jour du service disponible : redémarrage nécessaire':snapshot.update_available===null?'Version non vérifiable':'Service '+snapshot.service_version+' · '+snapshot.build_id+' · interface '+(snapshot.ui_build_id||'ancienne')+' · à jour';version.className='status'+(!snapshot.service_version||snapshot.update_available!==false?' warn':'');
- const needsUpdate=snapshot.update_available===true;
- const updateBanner=byId('update-banner');if(updateBanner){updateBanner.hidden=!needsUpdate;const bannerHost=(typeof location!=='undefined'&&location.host)?location.host:'?';byId('update-banner-text').textContent='Mise à jour du service disponible : redémarrage nécessaire — page servie par '+bannerHost+' · build '+(snapshot.build_id||'?')+' · interface '+(snapshot.ui_build_id||'?');}
+ // R30 : le bandeau n'est caché que sur la PREUVE explicite update_available === false
+ // d'un snapshot fraîchement reçu (render n'est appelé que sur un fetch réussi).
+ // Toute autre valeur (true / null / champ absent / snapshot incomplet) = bandeau VISIBLE.
+ const provenUpToDate=snapshot.update_available===false;
+ const needsUpdate=!provenUpToDate;
+ const updateBanner=byId('update-banner');if(updateBanner){updateBanner.hidden=provenUpToDate;const bannerHost=(typeof location!=='undefined'&&location.host)?location.host:'?';const bannerText=needsUpdate&&(snapshot.update_available===true||!snapshot.service_version)?'Mise à jour du service disponible : redémarrage nécessaire':'État du service non vérifié : mise à jour possible — relancez le service';byId('update-banner-text').textContent=bannerText+' — page servie par '+bannerHost+' · build '+(snapshot.build_id||'?')+' · interface '+(snapshot.ui_build_id||'?');}
  const appSidebar=document.querySelector('.app-sidebar');if(appSidebar)appSidebar.classList.toggle('needs-restart',needsUpdate);
  if(snapshot.load_error||snapshot.storage_error)showError(snapshot.load_error?'Configuration illisible : aucune écriture ne sera effectuée. Vérifiez le fichier de stockage.':'Enregistrement indisponible : les nouvelles données restent en mémoire et seront réessayées.');
  if(!configDirty){const model=snapshot.model||'deepseek-v4.1-flash:cloud';if(!Array.from(byId('model').options).some(option=>option.value===model)){const option=element('option',model);option.value=model;byId('model').prepend(option);}byId('model').value=model;byId('allow-cloud').checked=Boolean(snapshot.allow_cloud);const settings={...judgeSettingDefaults,...(snapshot.judge_settings||{})};for(const [key,id] of Object.entries(judgeSettingFields))byId(id).value=String(settings[key]);}
@@ -1492,7 +1499,7 @@ async function refresh(){
    token=data.token||token;byId('connection-error').hidden=true;const side=document.querySelector('.app-sidebar'),banner=byId('sidebar-disconnected');if(side)side.classList.remove('is-disconnected');if(banner)banner.hidden=true;
    try{render(data);}catch(renderError){byId('connection-error').textContent='Erreur d’affichage : '+renderError.message;byId('connection-error').hidden=false;}
    return true;
-  }catch(error){if(!disposed&&(timedOut||error.name!=='AbortError'))showError('Connexion au service indisponible : '+(timedOut?'délai dépassé (8 s)':error.message)+'. Les dernières données restent affichées.');return false;}
+  }catch(error){if(!disposed&&(timedOut||error.name!=='AbortError')){showError('Connexion au service indisponible : '+(timedOut?'délai dépassé (8 s)':error.message)+'. Les dernières données restent affichées.');const staleBanner=byId('update-banner');if(staleBanner){staleBanner.hidden=false;const staleText=byId('update-banner-text');if(staleText)staleText.textContent='Service injoignable : état de la mise à jour inconnu — relancez le serveur si besoin';}}return false;}
   finally{clearTimeout(refreshTimer);requests.delete(refreshController);if(controller===refreshController)controller=null;refreshPromise=null;}
  })();return refreshPromise;
 }
