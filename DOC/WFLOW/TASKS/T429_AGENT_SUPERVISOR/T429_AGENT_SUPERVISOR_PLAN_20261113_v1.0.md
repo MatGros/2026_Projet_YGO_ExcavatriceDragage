@@ -345,6 +345,12 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
 > orchestrateur revient au lot T427. Piège M8 évité : le texte exact est consigné **ici**, dans
 > le dossier T429, et T427-CC02 a été informé de son emplacement.
 
+**Accusé T427-CC02 (2026-11-15)** : section prévue dans `skills/orchestrator/SKILL.md`, placée
+**après leur sous-section « Échange avec les autres sessions », avant « Rôle & Objectifs »** ;
+lot orchestrateur : secours 1bis/3 + veille 5bis intégrés (non commité), dérogation enregistrée
+pour le fichier ; **en attente du GO de l'exploitant ou de T000-CC10**, puis relecture du texte
+au diff. Le GO de pose n'appartient PAS à T429 : il revient à l'exploitant.
+
 **Ce que T429 a posé (service Superviseur)** : détection mécanique (alias `T000-*` ou tâche T000) ·
 notice au juge avec les 5 critères de gestion · constat mécanique idempotent `coordination_conflict`
 si deux sessions coordination actives.
