@@ -279,7 +279,8 @@ details[open]>summary .fold-state-pill.when-open{border-color:var(--cyan);color:
    <label>Délai maximal · secondes<input type="number" id="judge-timeout-seconds" min="5" max="120" step="1" value="30" required></label>
    <label>Messages récents · maximum<input type="number" id="judge-context-messages" min="4" max="200" step="1" value="12" required></label>
    <label>Contexte récent · caractères<input type="number" id="judge-context-chars" min="2000" max="100000" step="1" value="12000" required></label>
-   <label>Fenêtre modèle locale · tokens<input type="number" id="judge-model-context-tokens" min="8192" max="131072" step="1" value="32768" required></label>
+   <label>Fenêtre modèle locale · tokens<input type="number" id="judge-model-context-tokens" min="8192" max="1048576" step="1" value="32768" required></label>
+   <label>Mémoire longue · éléments<input type="number" id="memory-max-items" min="20" max="500" step="1" value="20" required></label>
    <label>Max constats traités visibles<input type="number" id="judge-max-closed-findings" min="1" max="50" step="1" value="5" required></label>
    <label>Intervalle audit trajectoire · tours<input type="number" id="judge-audit-interval" min="1" max="50" step="1" value="8" required></label>
   </div>
@@ -629,8 +630,8 @@ Règles absolues :
 <script>
 'use strict';
 const byId=id=>document.getElementById(id);
-const judgeSettingDefaults={temperature:0,output_tokens:1600,timeout_seconds:30,context_messages:12,context_chars:12000,model_context_tokens:32768,max_visible_closed_findings:5,audit_interval:8};
-const judgeSettingFields={temperature:'judge-temperature',output_tokens:'judge-output-tokens',timeout_seconds:'judge-timeout-seconds',context_messages:'judge-context-messages',context_chars:'judge-context-chars',model_context_tokens:'judge-model-context-tokens',max_visible_closed_findings:'judge-max-closed-findings',audit_interval:'judge-audit-interval'};
+const judgeSettingDefaults={temperature:0,output_tokens:1600,timeout_seconds:30,context_messages:12,context_chars:12000,model_context_tokens:32768,memory_max_items:20,max_visible_closed_findings:5,audit_interval:8};
+const judgeSettingFields={temperature:'judge-temperature',output_tokens:'judge-output-tokens',timeout_seconds:'judge-timeout-seconds',context_messages:'judge-context-messages',context_chars:'judge-context-chars',model_context_tokens:'judge-model-context-tokens',memory_max_items:'memory-max-items',max_visible_closed_findings:'judge-max-closed-findings',audit_interval:'judge-audit-interval'};
 function judgeSettingsInput(){return Object.fromEntries(Object.entries(judgeSettingFields).map(([key,id])=>[key,Number(byId(id).value)]));}
 const stateNames={active:'Lecture active',waiting:'En attente',paused:'En pause',closed:'🔒 Clôturée',stopped:'Arrêtée',source_missing:'Source absente',source_reset:'Continuité rompue',continuity_unverified:'Continuité à vérifier',source_error:'Source indisponible',parse_error:'Contenu illisible',ready:'Prête',ambiguous:'Source ambiguë',invalid_id:'ID invalide'};
 const alertCategoryNames={unsupported_success:'Réussite sans preuve',ignored_instruction:'Consigne potentiellement ignorée',unauthorized_action:'Action hors périmètre',contradiction:'Contradiction à vérifier',repeated_attempt:'Répétition à vérifier'};
@@ -1306,6 +1307,9 @@ function render(snapshot,force=false){
    const memSummary=element('summary','🧠 Mémoire du Superviseur · fenêtre '+memoryState.fenetre+' · longue '+memoryState.memoire_longue+' · journal '+memoryState.journal+' · preuves '+memoryState.preuves_acquises);
    appendFoldPills(memSummary);memFold.append(memSummary);
    memFold.append(element('p',(memoryState.fenetre_tronquee?'⚠️ Fenêtre tronquée : le juge ne voit qu\'un extrait récent. ':'')+'Règle du juge : '+memoryState.regles+' message(s) · '+memoryState.ecartes+' événement(s) écarté(s).','hint'));
+   const longMem=(session.memory||[]);const longMemChars=longMem.reduce((sum,item)=>sum+String(item.text||'').length,0);
+   const oldest=longMem.length?String(longMem[0].observed_at||'').slice(0,16):'—';
+   memFold.append(element('p','📊 Mémoire longue : '+longMem.length+' élément(s) · ~'+longMemChars+' caractères · bornée à '+((snapshot.judge_settings||{}).memory_max_items||20)+' · plus ancien : '+oldest+' (les liens mémoire sont la liste ci-dessus).','hint'));
    const groups=[
     {key:'fenêtre',label:'👁️ Fenêtre — ce que le juge voit maintenant',items:(session.context||[]).map(item=>({role:item.role,text:item.text||'',index:item.event_index,at:item.observed_at}))},
     {key:'longue',label:'🗂️ Mémoire longue — hors fenêtre',items:(session.memory||[]).map(item=>({role:item.kind||'mémoire',text:item.text||'',index:item.event_index,at:item.observed_at}))},

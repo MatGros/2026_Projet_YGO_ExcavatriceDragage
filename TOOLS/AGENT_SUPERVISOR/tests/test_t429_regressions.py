@@ -1326,6 +1326,30 @@ def test_display_title_short_defaults_and_bounded():
     assert supervisor_service.session_display_title_short(dict(alias='T429-MMX01')) == 'T429-MMX01', 'aucun faux titre invente'
 
 
+def test_memory_limit_is_configurable_not_hardcoded(tmp_path, monkeypatch):
+    """M23/R26 (demande exploitant 2026-11-15) : la borne 20 n est plus hardcoded —
+    memory_max_items configurable (3 -> 3 element(s) gardes) ; le défaut reste 20 ;
+    le texte de memoire est borne tete+queue (le debut du message n est plus jete)."""
+    monkeypatch.setenv("WORKFLOW_TRACE_DIR", str(tmp_path / "trace"))
+    monitor_svc, source, sid = service(tmp_path)
+    try:
+        monitor_svc.judge_settings['memory_max_items'] = 500
+        monitor_svc.command({'action': 'start'})
+        for index in range(25):
+            write(source, 'user', f'Objet {index} - demande distincte numero {index}')
+        wait(lambda: len(monitor_svc.sessions[sid]['memory']) >= 25)
+        memory = monitor_svc.sessions[sid]['memory']
+        assert len(memory) == 25, f'la borne configurable ELARGIT au-dela de 20 (hardcode aboli) : {len(memory)}'
+        assert 'Objet 24' in memory[-1]['text'], 'les plus recents sont conserves'
+    finally:
+        monitor_svc.close()
+    assert supervisor_service.memory_limit(None) == 20, 'le defaut reste 20'
+    text = supervisor_service.head_tail_text('DEBUT' + 'x' * 4000 + 'FIN')
+    assert text.startswith('DEBUT') and text.endswith('FIN'), 'la tete ET la queue sont conservees'
+    assert 'caracteres omis au centre' in text, 'le centre elide est marque explicitement'
+    assert supervisor_service.head_tail_text('court') == 'court', 'inchange sous la limite'
+
+
 def test_persona_invocation_is_traced_and_readable(monkeypatch, tmp_path):
     """R15 (defaut reel du 2026-11-14 : NameError silencieux -> 0 jamais journalise) :
     une invocation reelle de specialist_runner produit une entree kind=persona que le
