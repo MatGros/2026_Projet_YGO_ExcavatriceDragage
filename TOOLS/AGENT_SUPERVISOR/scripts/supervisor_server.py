@@ -121,6 +121,17 @@ class Handler(BaseHTTPRequestHandler):
             return self.reply(400, {'error': str(exc)})
 
 
+def log_line(message: str) -> None:
+    """Journal du serveur : trace qui tourne, qui est tue, qui s arrete (R29)."""
+    try:
+        from datetime import datetime
+        log_dir = Path(os.environ.get('LOCALAPPDATA', Path.home() / '.local/share')) / 'ExcavatriceDragage'
+        with open(log_dir / 'agent-supervisor-server.log', 'a', encoding='utf-8') as handle:
+            handle.write(f"{datetime.now().isoformat(timespec='seconds')} pid={os.getpid()} {message}\n")
+    except OSError:
+        pass
+
+
 def kill_port_listeners(port: int) -> None:
     """M27 (decision exploitant 2026-11-15) : AU LANCEMENT, tout ce qui ecoute le port est tue.
     Aucune instance precedente n est reutilisee et nul ne fait foi : le serveur demarre toujours
@@ -143,12 +154,19 @@ def kill_port_listeners(port: int) -> None:
             continue
         try:
             print(f"[supervisor] port {port} : arrêt de l'instance précédente PID {pid}", flush=True)
+            log_line(f"kill port {port} pid={pid}")
             os.kill(pid, signal.SIGTERM)
         except (OSError, ValueError):
             pass
 
 
 def create_server(port=8082, state_path=None):
+    # R29 (demande exploitant) : au lancement on purge aussi les ports voisins du
+    # superviseur (8081 relance TM, 8092 serveur d'essai), pas seulement le notre.
+    log_line(f"demarrage : purge des ports 8081 8082 8092 avant bind sur {port}")
+    for known in (8081, 8092):
+        if known != port:
+            kill_port_listeners(known)
     kill_port_listeners(port)
     home = Path.home()
     default_path = Path(os.environ.get('LOCALAPPDATA', home / '.local/share')) / 'ExcavatriceDragage/agent-supervision.json'
@@ -191,6 +209,7 @@ def main():
     args = parser.parse_args()
     server = create_server(args.port, args.state)
     server.supervision.command({'action': 'start'})
+    log_line(f"serveur PRET port={server.server_port} build={server.build_id} ui={ui_build_id()}")
     print(f'Supervisor: http://127.0.0.1:{server.server_port}/', flush=True)
     try:
         server.serve_forever()
@@ -201,6 +220,7 @@ def main():
         traceback.print_exc()
         raise
     finally:
+        log_line("arret du serveur")
         server.supervision.close()
         server.server_close()
 
