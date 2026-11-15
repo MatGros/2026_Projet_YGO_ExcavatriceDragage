@@ -599,8 +599,12 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
     import threading as _threading
     run_thread = _threading.Thread(target=server.serve_forever, daemon=True)
     run_thread.start()
+    # R29 : Event().wait() infini n est PAS interruptible par Ctrl+C sur Windows
+    # (preuve exploitant 2026-11-16 : exception sortait dans Thread-1 serve_forever).
+    # Boucle d attente par tranches courtes : le Ctrl+C se leve sur le thread principal.
     try:
-        _threading.Event().wait()
+        while run_thread.is_alive():
+            run_thread.join(0.5)
     except KeyboardInterrupt:
         tm_log("arret du serveur Task Manager (Ctrl+C)")
     finally:

@@ -251,8 +251,12 @@ def main():
     import threading
     run_thread = threading.Thread(target=server.serve_forever, daemon=True)
     run_thread.start()
+    # R29 : Event().wait() infini n est PAS interruptible par Ctrl+C sur Windows
+    # (preuve exploitant 2026-11-16 : l exception sortait dans le thread serve_forever).
+    # Boucle d attente par tranches courtes : le Ctrl+C se leve sur le thread principal.
     try:
-        threading.Event().wait()  # le thread principal attend ici ; Ctrl+C leve ici
+        while not threading.Event().is_set() and run_thread.is_alive():
+            run_thread.join(0.5)
     except KeyboardInterrupt:
         log_line('arret du serveur (Ctrl+C)')
     finally:
