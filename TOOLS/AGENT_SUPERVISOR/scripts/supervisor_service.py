@@ -259,6 +259,27 @@ def session_display_title(session):
             return title_line.partition("Dossier:")[0].partition(" —")[0].rstrip().strip()[:200]
     return alias[:200]
 
+# R25/M22 (decision 2026-11-15, demande T427-CC02) : le titre de session court = <alias> <designation>
+# <= 40 caracteres ; le titre cataloge complet reste en detail de carte.
+SESSION_DESIGNATION_MAX = 40
+
+
+def session_display_title_short(session) -> str:
+    """Le titre de session court R25 : <alias> <designation courte>.
+    Designation : session['task_designation'] si posee, sinon les 5 premiers mots du titre
+    officiel (avant le premier tiret). JAMAIS le titre cataloge complet ; un faux titre
+    n'est JAMAIS invente quand ni l'alias ni une designation ne sont disponibles."""
+    alias = str(session.get("alias", "")).strip()
+    designation = " ".join(str(session.get("task_designation", "") or "").split())
+    if not designation:
+        first_segment = str(session.get("task_title", "") or "").split("-", 1)[0]
+        designation = " ".join(first_segment.split()[:5])
+    designation = designation[:SESSION_DESIGNATION_MAX]
+    if alias and designation:
+        return (alias + " " + designation)[:200]
+    return (alias or designation)[:200]
+
+
 DEFAULT_JUDGE_SETTINGS = dict(temperature=0, output_tokens=1600, timeout_seconds=30,
                               context_messages=12, context_chars=12000, model_context_tokens=32768,
                               max_visible_closed_findings=5, audit_interval=8)
@@ -1778,7 +1799,7 @@ class Supervisor:
 
     def command(self, command):
         with self._lock:
-            if command.get("action") not in ("test_notification", "set_mission_structure", "comment_alert", "configure", "add", "pause", "resume", "resume_all", "close", "reopen", "retry_recovery", "remove", "set_mission", "set_alias", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
+            if command.get("action") not in ("test_notification", "set_mission_structure", "comment_alert", "configure", "add", "pause", "resume", "resume_all", "close", "reopen", "retry_recovery", "remove", "set_mission", "set_alias", "set_task", "acknowledge", "choose_alert", "start_alert_workflow", "retry_alert_delivery", "stop_background_and_retry", "reassign", "chat", "reset_chat", "import_chat", "restore_memory"):
                 return self._command(command)
             backup = (copy.deepcopy(self.sessions), self.model, self.allow_cloud,
                       self._epoch, deque(self._queue), set(self._queued), copy.deepcopy(self._chat_state), self._chat_epoch, self._chat_pending, copy.deepcopy(self._chat_histories), deque(self._agent_queue))
@@ -1962,6 +1983,30 @@ class Supervisor:
                 self._persist()
                 self._wake.set()
                 return {"resumed": resumed, "count": len(resumed)}
+            elif action == "set_task":
+                sid = command.get("id")
+                session = self.sessions.get(sid)
+                if not session:
+                    raise ValueError("Affectation inconnue")
+                task_id = str(command.get("task_id", "") or "").strip().upper()[:24]
+                task_title = " ".join(str(command.get("task_title", "") or "").split())[:200]
+                task_designation = " ".join(str(command.get("task_designation", "") or "").split())[:SESSION_DESIGNATION_MAX]
+                if task_id and not re.fullmatch(r"^T\d{3}(?:-[0-9A-Z]{2,4})?$", task_id):
+                    raise ValueError("task_id invalide (attendu TXXX ou TXXX-XX) : le rattachement ne se devine jamais")
+                task_id = task_id or str(session.get("task_id") or "")
+                task_title = task_title or str(session.get("task_title") or "")
+                previous = {k: session.get(k) for k in ("task_id", "task_title", "task_designation")}
+                session.update(task_id=task_id, task_title=task_title, task_designation=task_designation)
+                if not session.get("display_title"):
+                    session["display_title"] = session_display_title_short(session)
+                changed = previous != {k: session.get(k) for k in ("task_id", "task_title", "task_designation")}
+                if changed or task_designation:
+                    record_event(session, "task_rattachement",
+                                 f"Rattachement explicite : tache {task_id or '—'} ({task_title or '—'}) par {command.get('by', 'exploitant')}",
+                                 timestamp())
+                    _trace(event="set_task", session=str(session["id"]), task_id=task_id, designation=task_designation)
+                return {"id": session["id"], "task_id": task_id, "title": session_display_title_short(session)}
+
             elif action == "set_alias":
                 sid = command.get("id")
                 alias = str(command.get("alias", "")).strip()

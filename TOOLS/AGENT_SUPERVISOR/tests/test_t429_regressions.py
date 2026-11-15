@@ -1290,6 +1290,42 @@ def test_actor_conflict_finding_for_duplicated_active_actor(tmp_path, monkeypatc
         svc.close()
 
 
+def test_set_task_explicit_rattachement_and_short_title(tmp_path, monkeypatch):
+    """R25/M22 (decision 2026-11-15, demande T427-CC02) : set_task modifie la tache liee,
+    recalcule le titre court, journalise, et ne touche JAMAIS l'identite ; un task_id non
+    canonique est refuse (le rattachement ne se devine jamais)."""
+    monkeypatch.setenv("WORKFLOW_TRACE_DIR", str(tmp_path / "trace"))
+    svc, _source, sid = service(tmp_path)
+    try:
+        session = svc.sessions[sid]
+        session['alias'] = 'T429-MMX01'
+        native_before = session['native_id']
+        svc.command({'action': 'set_task', 'id': sid, 'task_id': 'T430',
+                     'task_title': 'Organisation documentaire - terminer la migration des versions, chemins et consommateurs',
+                     'task_designation': 'ORGANISATION DOC'})
+        assert session['task_id'] == 'T430' and session['task_designation'] == 'ORGANISATION DOC'
+        assert session['native_id'] == native_before, 'identite jamais touchee'
+        assert supervisor_service.session_display_title_short(session) == 'T429-MMX01 ORGANISATION DOC'
+        assert any(e.get('kind') == 'task_rattachement' for e in session.get('events', []))
+        with pytest.raises(ValueError):
+            svc.command({'action': 'set_task', 'id': sid, 'task_id': 'INCORRECT'})
+        assert session['task_id'] == 'T430', 'l echeec de validation ne change rien'
+    finally:
+        svc.close()
+
+
+def test_display_title_short_defaults_and_bounded():
+    """R25 : designation par defaut = les 5 premiers mots du titre officiel avant le tiret ;
+    troncature a 40 caracteres ; le titre catalogue complet n'en fait jamais partie."""
+    long_title = 'Refonte Workflow Agents - Router de skills mince, contrat etendu, sas d essais et note complete'
+    assert supervisor_service.session_display_title_short(
+        dict(alias='T427-CC02', task_title=long_title)) == 'T427-CC02 Refonte Workflow Agents'
+    padded = dict(alias='T429-MMX01', task_designation='X' * 80)
+    result = supervisor_service.session_display_title_short(padded)
+    assert len(result) <= len('T429-MMX01 ') + supervisor_service.SESSION_DESIGNATION_MAX
+    assert supervisor_service.session_display_title_short(dict(alias='T429-MMX01')) == 'T429-MMX01', 'aucun faux titre invente'
+
+
 def test_persona_invocation_is_traced_and_readable(monkeypatch, tmp_path):
     """R15 (defaut reel du 2026-11-14 : NameError silencieux -> 0 jamais journalise) :
     une invocation reelle de specialist_runner produit une entree kind=persona que le
