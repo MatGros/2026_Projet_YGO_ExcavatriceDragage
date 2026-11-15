@@ -67,6 +67,22 @@ ABSOLUTE_DENY = (
     "TOOLS/AGENT_WORKFLOW/scripts/hook_stop.py",
     "TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py",
 )
+# Interdiction DURE (T427 P1, GO exploitant 2026-11-15) : aucune DEROGATION ne la leve.
+# Seul le perimetre EPINGLE d'un contrat valide (ex. tache PLC sur CODE/) l'autorise.
+HARD_DENY = (
+    "CODE/**",
+    "CODE_XML/**",
+    "PRJ_CODESYS/**",
+    "TOOLS/AGENT_WORKFLOW/scripts/task_scope.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/hook_scope_guard.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/trace_log.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/miss_log.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/hook_workflow_attest.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/hook_pre_edit.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/hook_post_edit.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/hook_stop.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py",
+)
 TAIL_BYTES = 512_000  # lecture de queue : le transcript peut faire plusieurs Mo
 
 
@@ -245,9 +261,19 @@ def is_absolute_denied(relative: str, pinned_allowed: list[str] | None = None) -
             or _matches_anywhere(relative, list(ABSOLUTE_DENY)))
 
 
-def classify(relative: str, product: list[str], forbidden: list[str], process: list[str]) -> str:
-    """produit | processus | hors."""
-    if is_absolute_denied(relative) or matches(relative, forbidden):
+def is_hard_denied(relative: str) -> bool:
+    """Chemin qu'aucune derogation ne peut ouvrir (CODE/, sources automate, garde-fous)."""
+    return matches(relative, list(HARD_DENY)) or _matches_anywhere(relative, list(HARD_DENY))
+
+
+def classify(relative: str, product: list[str], forbidden: list[str], process: list[str],
+             pinned_allowed: list[str] | None = None) -> str:
+    """produit | processus | hors.
+
+    T427 P1 : le perimetre EPINGLE du contrat est transmis, sinon un chemin protege que le
+    contrat autorise (ex. skills/orchestrator/) etait classe hors et exigeait une derogation.
+    """
+    if is_absolute_denied(relative, pinned_allowed) or matches(relative, forbidden):
         return "hors"
     if matches(relative, product):
         return "produit"
@@ -380,8 +406,59 @@ def read_derogations(session_id: str) -> list[dict]:
     return data if isinstance(data, list) else []
 
 
-def write_derogation(session_id: str, path: str, motif: str, ttl_days: int = 30) -> dict:
-    """Derogation ACCORDEE mais DATEDE (GLM 2026-11-13) : pas d'arrimage eternel."""
+class DerogationRefusee(ValueError):
+    """Derogation refusee : motif absent, citation introuvable ou chemin a interdiction dure."""
+
+
+def _user_messages(transcript) -> list:
+    """Textes des messages humains du transcript (jsonl Claude Code)."""
+    texts = []
+    if not transcript:
+        return texts
+    try:
+        with open(transcript, "r", encoding="utf-8", errors="replace") as stream:
+            for line in stream:
+                if '"user"' not in line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                except ValueError:
+                    continue
+                if entry.get("type") != "user":
+                    continue
+                content = (entry.get("message") or {}).get("content")
+                if isinstance(content, str):
+                    texts.append(content)
+                elif isinstance(content, list):
+                    texts.extend(str(c.get("text", "")) for c in content
+                                 if isinstance(c, dict) and c.get("type") == "text")
+    except OSError:
+        return []
+    return texts
+
+
+def citation_from_user(transcript, citation: str) -> bool:
+    """Vrai si la citation figure MOT POUR MOT dans un message humain (aucune reformulation)."""
+    cite = " ".join(str(citation or "").split())
+    if len(cite) < 2:
+        return False
+    return any(cite in " ".join(text.split()) for text in _user_messages(transcript))
+
+
+def write_derogation(session_id: str, path: str, motif: str, ttl_days: int = 30,
+                     transcript=None) -> dict:
+    """Derogation ACCORDEE mais DATEDE (GLM 2026-11-13) : pas d'arrimage eternel.
+
+    T427 P1 : motif OBLIGATOIRE, copie mot pour mot d'un message humain du transcript ;
+    aucun chemin a interdiction dure ne peut etre deroge.
+    """
+    if is_hard_denied(normalize(path)):
+        raise DerogationRefusee(f"interdiction dure : {normalize(path)} ne peut pas etre deroge")
+    if not str(motif or "").strip():
+        raise DerogationRefusee("motif obligatoire : citer mot pour mot le message de l'exploitant")
+    if not citation_from_user(transcript, motif):
+        raise DerogationRefusee("citation introuvable dans les messages humains du transcript : "
+                                "le motif doit etre copie mot pour mot, sans reformulation")
     entries = read_derogations(session_id)
     entry = {"path": normalize(path), "motif": str(motif or "").strip()[:300],
              "granted_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -395,6 +472,8 @@ def write_derogation(session_id: str, path: str, motif: str, ttl_days: int = 30)
 
 
 def is_derogated(session_id: str, relative: str) -> bool:
+    if is_hard_denied(normalize(relative)):
+        return False  # T427 P1 : interdiction dure, aucune derogation ne compte
     """Une derogation vaut pour un chemin exact ou pour un prefixe marque '.../**'."""
     now = time.time()
     for item in read_derogations(session_id):
@@ -588,7 +667,8 @@ def main(argv: list[str] | None = None) -> int:
     p_derog = sub.add_parser("deroge")
     p_derog.add_argument("--session", required=True)
     p_derog.add_argument("--path", required=True)
-    p_derog.add_argument("--motif", default="")
+    p_derog.add_argument("--motif", required=True, help="citation EXACTE du message de l exploitant")
+    p_derog.add_argument("--transcript", default="", help="transcript de la session (sinon CLAUDE_TRANSCRIPT_PATH)")
 
     args = parser.parse_args(argv)
 
@@ -598,8 +678,13 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "deroge":
-        entry = write_derogation(args.session, args.path, args.motif)
-        print(f"Dérogation enregistrée : {entry['path']} — {entry['motif'] or 'sans motif'}")
+        transcript = args.transcript or os.environ.get("CLAUDE_TRANSCRIPT_PATH", "")
+        try:
+            entry = write_derogation(args.session, args.path, args.motif, transcript=transcript)
+        except DerogationRefusee as exc:
+            print(f"Dérogation REFUSÉE : {exc}")
+            return 2
+        print(f"Dérogation enregistrée : {entry['path']} — {entry['motif']}")
         return 0
 
     transcript = args.transcript or os.environ.get("CLAUDE_TRANSCRIPT_PATH", "")

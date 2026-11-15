@@ -91,7 +91,8 @@ def evaluate(session_id: str, target: str) -> dict:
                 "path": task_scope.normalize(target), "task_id": scope.get("task_id"),
                 "scope": scope.get("produit")}
     relative = task_scope.normalize(target)
-    kind = task_scope.classify(relative, scope["produit"], scope["interdits"], scope["processus"])
+    kind = task_scope.classify(relative, scope["produit"], scope["interdits"], scope["processus"],
+                               pinned_allowed)
     if kind == "produit":
         return {"decision": "allow", "kind": "produit", "reason": "dans le perimetre produit"}
     if kind == "processus":
