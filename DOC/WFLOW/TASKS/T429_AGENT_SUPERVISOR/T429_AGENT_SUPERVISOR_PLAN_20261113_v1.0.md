@@ -192,6 +192,13 @@ plan_project:
       execution_by: CC01
       evidence: "mission_cadrage_missing + _detect_mission_cadrage au cycle de poll ; 2 tests verts (ciblage coordination + révision partielle) ; suite 0 failed au dernier run ; design scopré après 17 échecs de v1 (constat global = bruit), robustesse M1 (la détection ne tue jamais le cycle de collecte)"
       execution_comment: "Écart exploitant 2026-11-15 (cas T000-CDX02) ; 3 champs minimum = note T427 ; flakiness intermittente notée sur 2 tests (solo toujours verts) à surveiller"
+    - id: M17
+      title: "R19 — recette de dérive réelle avec agents Ollama"
+      done_when: "Refus du garde + métrique k/n comptée + constat scope_drift citable du Superviseur, consignés dans PREUVES"
+      execution: NOT_STARTED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "GO conditionnel exploitant 2026-11-15 (agents Ollama) ; l'écriture hors périmètre volontaire attend un GO explicite ; protocole en 3 pas au plan §3 (R19)"
       validation: NOT_REVIEWED
       validated_by: ""
       validated_at: ""
@@ -336,6 +343,7 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
 | **R15** | **Les agents deviennent tracables** | chaque invocation de `specialist_runner.py` est journalisée (rôle, cible, session) → l'IHM affiche « spécialistes invoquées : HMI 2 · tests 1 » ou « aucune invocation ». Le Superviseur pourra **réclamer** un avis de spécialiste (v2), déclaré comme les lectures | l'usage réel des 6 personas devient un fait ; la question « pourquoi on les a faits » a une réponse factuelle | test : une invocation produit une entrée journalisée · affichage IHM |
 | **R16** | **Menu de gauche — la couleur porte l'état, pas le texte** (demande exploitant 2026-11-14) | le titre de session reste neutre (blanc) même en alarme ; l'état vit sur le marqueur + fond discret + étiquette (info active/défaut/alarme) ; l'identifiant d'agent = badge coloré selon un standard par acteur (claude/codex/agy/dsh/opc) | test DOM (badge model-tag + neutralisation texte) · layout 0 échec | CC01 (T429) |
 | **R18** | **Le système doit DIRE une session qui travaille sans objectif ni critères** (écart exploitant 2026-11-15, cas T000-CDX02) | constat mécanique `mission_non_cadree` posé aux sessions de coordination à fiche vide (3 champs minimum : objectif/critères/périmètre) ; pour toute autre session active, état lisible `cadrage_state` sans envahir les constats ; corrigé observé quand rempli, clôture humaine | tests cadrage (ciblage coordination, idempotent, révision partielle, pausé) · suite 219 verts | CC01 (T429) |
+| **R19** | **Recette de dérive RÉELLE avec agents Ollama** (GO conditionnel exploitant 2026-11-15 ; lesson PRG_10 : tests verts ≠ câblé) | l'agent Ollama rédige une écriture hors périmètre (contenu fourni dans son prompt, il ne lit jamais le code) ; l'écriture volontaire déclenche le garde (refus + journal + métrique `k/n`) ; le Superviseur publie le constat `scope_drift` citable sur la session surveillée ; le tout consigné dans PREUVES/ | preuve brute : refus du garde + métrique comptée + constat cité dans PREUVES | CC01 (T429), GO explicite de l'écriture volontaire requis |
 
 ### Décisions figées sur ce lot
 
