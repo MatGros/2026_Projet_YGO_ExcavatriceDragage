@@ -32,6 +32,8 @@ assert.match(text,/Accès direct au dépôt : interdit en v1/,'R14 : le libelle 
 assert.match(text,/DOC\/WFLOW\/TASKS\/T429_AGENT_SUPERVISOR\/CONTRAT\.yaml/,'les chemins du dossier sont affiches');
 assert.match(text,/DOC\/inexistant\.md: FileNotFoundError/,'un fichier illisible est signale avec sa cause, jamais devine');
 assert.match(text,/budget 6 fichiers \/ 12000 caractères/,'le budget affiche est le budget reel');
+// M23 : les stats d etat de la memoire longue affichees (demande exploitant 2026-11-15)
+assert.match(text,/📊 Mémoire longue : \d+ élément\(s\) · ~\d+ caractères · bornée à \d+/,'les stats d etat de la memoire longue sont visibles a l IHM');
 assert.match(text,/📖 Fichiers déclarés lus pour ce verdict/,'R13 : chaque constat declare sa lecture');
 assert.match(text,/DOC\/inexistant\.md/,'la declaration du constat porte le fichier signale');
 assert.match(text,/preuves 3 /,'la cle preuves_acquises est lue (le champ n affiche plus undefined)');

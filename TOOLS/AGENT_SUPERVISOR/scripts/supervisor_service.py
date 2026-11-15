@@ -280,8 +280,37 @@ def session_display_title_short(session) -> str:
     return (alias or designation)[:200]
 
 
+# M23/R26 (demande exploitant 2026-11-15) : la memoire longue devient CONFIGURABLE (defaut 20
+# inchange, elargissable pour un modele a grand contexte — ex. 1M tokens) ; les plafonds des
+# reglages de fenetre montent pareil. Les liens memoire sont visibles a l IHM avec des stats d etat.
+MEMORY_MAX_ITEMS = 20
+
+
+def head_tail_text(text: str, limit: int = 3000) -> str:
+    """Texte borne tete + queue : le DEBUT du message n est plus jete (le constat du
+    2026-11-15 : `[-3000:]` perdait la demande principale qui est souvent en tete) ; le centre
+    est elide avec un marqueur explicite, jamais devine."""
+    text = str(text or "")
+    if len(text) <= limit:
+        return text
+    marker = " …[caracteres omis au centre]… "
+    half = (limit - len(marker)) // 2
+    return text[:half] + marker + text[-half:]
+
+
+def memory_limit(settings=None) -> int:
+    """La borne de la memoire longue (M23/R26) : setting `memory_max_items` (defaut 20,
+    elargissable pour un modele a grand contexte ; borne de config plafee a 500)."""
+    try:
+        value = int((settings or {}).get("memory_max_items") or MEMORY_MAX_ITEMS)
+    except (TypeError, ValueError, AttributeError):
+        return MEMORY_MAX_ITEMS
+    return min(max(value, MEMORY_MAX_ITEMS), 500)
+
+
 DEFAULT_JUDGE_SETTINGS = dict(temperature=0, output_tokens=1600, timeout_seconds=30,
                               context_messages=12, context_chars=12000, model_context_tokens=32768,
+                              memory_max_items=20,
                               max_visible_closed_findings=5, audit_interval=8)
 
 
@@ -292,7 +321,8 @@ def validate_judge_settings(settings=None):
         raise ValueError("Parametres du juge inconnus")
     result = dict(DEFAULT_JUDGE_SETTINGS, **settings)
     bounds = dict(temperature=(0, 1), output_tokens=(256, 8192), timeout_seconds=(5, 120),
-                  context_messages=(4, 200), context_chars=(2000, 100000), model_context_tokens=(8192, 131072),
+                  context_messages=(4, 2000), context_chars=(2000, 1000000), model_context_tokens=(8192, 1048576),
+                  memory_max_items=(20, 500),
                   max_visible_closed_findings=(1, 50), audit_interval=(1, 50))
     for key, (low, high) in bounds.items():
         value = result[key]
@@ -1359,7 +1389,7 @@ class Supervisor:
                 context_message=dict(message)
                 rec_text = compact_specialist_text(context_message["text"])
                 if len(rec_text)>3000:
-                    context_message["text"]=bounded_text(rec_text) if context_message.get("role")=="tool" else rec_text[-3000:]
+                    context_message["text"]=bounded_text(rec_text) if context_message.get("role")=="tool" else head_tail_text(rec_text)
                     session["context_truncated"]=True
                 else:
                     context_message["text"]=rec_text
@@ -1371,7 +1401,7 @@ class Supervisor:
                 del history[:-60]
                 session["context_revision"] += 1
 
-            session["memory"]=session["memory"][-20:]
+            session["memory"]=session["memory"][-memory_limit(self.judge_settings):]
             recovery.pop("messages", None)
             while len(session["context"])>self.judge_settings["context_messages"] or sum(len(x["text"]) for x in session["context"])>self.judge_settings["context_chars"]:
                 session["context"].pop(0); session["context_truncated"]=True
@@ -1572,7 +1602,7 @@ class Supervisor:
             if normalized and normalized[1]:
                 role, text = normalized
                 partial |= len(text) > 3000
-                messages.append(dict(role=role, text=bounded_text(text) if role == "tool" else text[-3000:]))
+                messages.append(dict(role=role, text=bounded_text(text) if role == "tool" else head_tail_text(text)))
         if len(messages) > 50:
             partial = True
         with self._lock:
@@ -2298,11 +2328,11 @@ class Supervisor:
             elif action == "restore_memory":
                 sid, memory = command.get('id'), command.get('memory')
                 session = self.sessions.get(sid)
-                if not session or not isinstance(memory, list) or len(memory) > 20 or any(not isinstance(m, dict) or m.get('kind') != 'user_message' or not isinstance(m.get('text'), str) or len(m['text']) > 3000 or not isinstance(m.get('observed_at'), str) for m in memory):
+                if not session or not isinstance(memory, list) or len(memory) > memory_limit(self.judge_settings) or any(not isinstance(m, dict) or m.get('kind') != 'user_message' or not isinstance(m.get('text'), str) or len(m['text']) > 3000 or not isinstance(m.get('observed_at'), str) for m in memory):
                     raise ValueError('Memoire de session invalide')
                 had_new_context = bool(session['context'])
                 session['generation'] += 1
-                session['memory'] = (copy.deepcopy(memory) + session['memory'])[-20:]
+                session['memory'] = (copy.deepcopy(memory) + session['memory'])[-memory_limit(self.judge_settings):]
                 session['context'] = ([dict(role='user', text=m['text']) for m in memory] + session['context'])[-12:]
                 while sum(len(m['text']) for m in session['context']) > 6000:
                     session['context'].pop(0)
@@ -2549,9 +2579,9 @@ class Supervisor:
             return
         event = record_event(session, "source_" + message["role"], message["text"], message.get("observed_at", timestamp()), source_id=ident, event_index=message.get("event_index"))
         if message["role"] == "user" and not any(m.get("event_id") == ident for m in session["memory"] if ident):
-            item = dict(kind="user_message", text=message["text"][-3000:], observed_at=message.get("observed_at", timestamp()), event_id=ident, event_index=message.get("event_index"))
+            item = dict(kind="user_message", text=head_tail_text(message["text"]), observed_at=message.get("observed_at", timestamp()), event_id=ident, event_index=message.get("event_index"))
             session["memory"].append(item)
-            session["memory"] = session["memory"][-20:]
+            session["memory"] = session["memory"][-memory_limit(self.judge_settings):]
             if not any(f.get("event_id") == ident for f in session["framing"] if ident):
                 session["framing"].append(dict(item, ref=event["ref"], version=len(session["framing"]) + 1))
         elif message["role"] == "tool":
@@ -2849,7 +2879,7 @@ class Supervisor:
             session["messages_observed"] = session.get("messages_observed", 0) + 1
             processed_text = compact_specialist_text(text)
             session["context_truncated"] |= len(processed_text) > 3000
-            session["context"].append({"role": role, "source_generation": session.get("source_generation"), "text": bounded_text(processed_text) if role == "tool" else processed_text[-3000:], "event_id": self._event_id(session, event_index, event), "observed_at": event.get("timestamp") if isinstance(event.get("timestamp"), str) else session["last_event"], "event_index": event_index})
+            session["context"].append({"role": role, "source_generation": session.get("source_generation"), "text": bounded_text(processed_text) if role == "tool" else head_tail_text(processed_text), "event_id": self._event_id(session, event_index, event), "observed_at": event.get("timestamp") if isinstance(event.get("timestamp"), str) else session["last_event"], "event_index": event_index})
             session["context_revision"] += 1
             if not recovering:
                 self._remember_source(session, session["context"][-1])
