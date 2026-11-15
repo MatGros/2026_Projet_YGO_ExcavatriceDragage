@@ -146,6 +146,16 @@ def test_B11_etape_lisible(monkeypatch, capsys):
     assert "non renseignée" not in capsys.readouterr().out
 
 
+@pytest.mark.xfail(strict=True, reason="B12 : légende des symboles absente ou répétée (à réaliser)")
+def test_B12_legende_une_seule_fois(monkeypatch, capsys):
+    """La légende des symboles doit exister, et apparaître une seule fois."""
+    monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", KEY_A)
+    ws.main(["enter", "--session", KEY_A])
+    out = capsys.readouterr().out
+    assert "Légende" in out
+    assert out.count("Légende") == 1
+
+
 @pytest.mark.xfail(strict=True, reason="B13 : consigne « Agent : » visible par l'utilisateur (à retirer)")
 def test_B13_consigne_agent_non_affichee(monkeypatch, capsys):
     monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", KEY_A)
@@ -154,6 +164,26 @@ def test_B13_consigne_agent_non_affichee(monkeypatch, capsys):
 
 
 # ── 🟢 Priorité 4 : démarrage et lecture ─────────────────────────────────────
+
+@pytest.mark.xfail(strict=True, reason="B14 : haut du bloc = tâche active, dernier point, validation en attente")
+def test_B14_haut_du_bloc_utile(monkeypatch, capsys):
+    """Le haut du bloc doit dire où on en est, pas un décompte global."""
+    monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", KEY_A)
+    ws.main(["enter", "--session", KEY_A])
+    assert "Validation en attente" in capsys.readouterr().out
+
+
+@pytest.mark.xfail(strict=True, reason="B15 : lecture minimale avant le menu, à challenger par agents")
+def test_B15_lecture_minimale_avant_menu():
+    script = (SCRIPTS / "workflow_state.py").read_bytes().decode("utf-8").lower()
+    assert "lecture minimale" in script
+
+
+@pytest.mark.xfail(strict=True, reason="B16 : après choix Orchestrateur, lecture approfondie avec grille")
+def test_B16_lecture_approfondie_orchestrateur():
+    role = (ROOT / "TOOLS/AGENT_WORKFLOW/skills/orchestrator/ROLE.md").read_bytes().decode("utf-8")
+    assert "lecture approfondie" in role.lower()
+
 
 @pytest.mark.xfail(strict=True, reason="B17 : accueil de la voie Tâche (à valider, à réaliser)")
 def test_B17_accueil_tache_demande_tache_et_resultat():
