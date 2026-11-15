@@ -485,11 +485,15 @@ Workflow de suivi : non lancé tant que le plan n'est pas corrigé.
 3. **Documents désalignés** — ✅ **traité pour les commandes**. Vérifié le 2026-11-15 :
    `.claude/commands/` ne contenait que `plan-project.md` et `workflow-project.md`, alors
    que `ROLE.md` et `COORDINATOR.md` annonçaient des commandes dédiées. Les deux
-   commandes sont créées et un test les verrouille (`test_role_commands.py`, 3 cas).
-   ⏳ Reste : le §17 dit encore « bloqué » pour O3 alors qu'il est livré.
+   commandes sont créées et un test les verrouille (`test_role_commands.py`, 3 cas),
+   et elles sont **versionnées** dans git (`.gitignore` n'autorisait que
+   `plan-project.md` : `/workflow-project` elle-même n'était pas dans le dépôt).
+   ⏳ Reste : les mentions « bloqué » des §14 et §17 sont des **instantanés datés**
+   du 2026-11-14 — elles ne sont pas réécrites, §20 fait foi pour l'état courant.
 4. **Jalons sans état** — ✅ **traité**. État M0→M7 ajouté en §4 (5 ✅, 3 ⏳).
-5. **Backlog** — ⏳ **non traité**. L'ordre B2-avant-B1 et les tests manquants
-   (B12, B14, B15, B16) restent à faire ; le backlog §12 n'a pas été réordonné.
+5. **Backlog** — ✅ **traité**. B2 passe avant B1 (§12, avec la raison écrite) et les
+   4 cas sans test (B12, B14, B15, B16) sont écrits en `xfail(strict=True)`. Le
+   journal total passe de 10 à 14 xfail, tous documentés.
 6. **Besoins non planifiés** — 🟡 **partiel**. Commandes de rôle livrées. ❌ La question
    « je gère qui, quoi ? » et le prompt F4 dans le Superviseur restent non planifiés.
 
