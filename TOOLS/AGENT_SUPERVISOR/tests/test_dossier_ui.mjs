@@ -43,6 +43,13 @@ const restartBtn=document.getElementById('restart-service-button');
 assert.ok(restartBtn,'R29 : le bouton 1 clic de relance est present');
 restartBtn.dispatchEvent(new window.Event('click',{bubbles:true,cancelable:true}));await new Promise(r=>setImmediate(r));
 assert.ok(posts.some(p=>typeof p==='object'&&p.action==='restart_service'),'R29 : le clic poste l action de relance');
+// R30 : panneau rouge par defaut, cache seulement si PREUVE que tout est a jour
+assert.doesNotMatch(html,/<div id="update-banner" hidden/,'R30 : le bandeau mise a jour est AFFICHE PAR DEFAUT dans le HTML source');
+const rawFixture={...snapshot};delete rawFixture.update_available;vm.runInContext('const _rawFixture={...snapshot};delete _rawFixture.update_available;render(_rawFixture)',ctx);
+const updateBanner=document.getElementById('update-banner');
+assert.ok(updateBanner&&!updateBanner.hidden,'R30 : snapshot INCOMPLET (champ update_available absent) -> bandeau reste visible, jamais cache sans preuve');
+assert.match(document.getElementById('update-banner-text').textContent,/non vérifié|non verifie/,'R30 : snapshot incomplet -> le texte annonce un etat non verifie, pas un service a jour');
+assert.match(document.querySelector('.app-sidebar').className,/needs-restart/,'R30 : snapshot incomplet -> le menu de gauche reste en alerte');
 assert.match(text,/📖 Fichiers déclarés lus pour ce verdict/,'R13 : chaque constat declare sa lecture');
 assert.match(text,/DOC\/inexistant\.md/,'la declaration du constat porte le fichier signale');
 assert.match(text,/preuves 3 /,'la cle preuves_acquises est lue (le champ n affiche plus undefined)');
