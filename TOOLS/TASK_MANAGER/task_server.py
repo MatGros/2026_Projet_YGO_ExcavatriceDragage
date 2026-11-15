@@ -546,6 +546,7 @@ def tm_log(message: str) -> None:
 def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
     global VERBOSE
     VERBOSE = verbose
+    tm_log(f"SCRIPT LANCE : {Path(sys.argv[0]).resolve()} args={sys.argv[1:] or '[aucun]'}")
     # Ce verrou reste pris pendant toute la vie du serveur : une seule instance locale.
     import msvcrt
     server_mutex_path = WFLOW / f".task_manager.server.{port}.lock"
