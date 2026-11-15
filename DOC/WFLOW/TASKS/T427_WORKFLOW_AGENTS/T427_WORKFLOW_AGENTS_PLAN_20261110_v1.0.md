@@ -323,10 +323,12 @@ Chaque cas se joue sur **Claude** et sur **Codex** ; noter ✅ / ❌ + l'extrait
 > Chaque point a un livrable et un test. Rien n'est fait tant que le test n'est pas PASS.
 
 **🔴 Priorité 1 — fiabilité (journal et état)**
-- B1 · Cause de la rupture de chaîne du journal réel (« empreinte invalide », 9 068 entrées).
-  Livrable : cause identifiée, pas de réécriture. Test : `verify_chain()` expliqué ligne à ligne.
 - B2 · Verrou des écritures concurrentes sur le journal (deux émetteurs = même seq).
   Livrable : verrou fichier lecture+écriture. Test : 2 threads, seq uniques, chaîne intacte.
+- B1 · Cause de la rupture de chaîne du journal réel (« empreinte invalide », 9 068 entrées).
+  Livrable : cause identifiée, pas de réécriture. Test : `verify_chain()` expliqué ligne à ligne.
+  ℹ️ **B2 avant B1** (constat de revue n°5) : tant que deux émetteurs écrivent en parallèle,
+  toute analyse de la chaîne se fait sur un journal déjà corrompu.
 - B3 · `--session` réservé au développement (un drapeau explicite, pas le chemin normal).
   Test : `enter --session KEY_B` depuis KEY_A ne modifie pas KEY_B.
 - B4 · Test d'échec d'écriture du journal (dossier illisible) : `echecs.log` doit être créé.
