@@ -594,8 +594,15 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
     tm_log("serveur PRET port=" + str(port))
     if open_browser:
         webbrowser.open(url)
-    try: server.serve_forever()
-    except KeyboardInterrupt: pass
+    # Pattern canonique (docs.python) : serve_forever dans un THREAD, Ctrl+C attrape
+    # dans le thread principal, shutdown() appele depuis un autre thread que la boucle.
+    import threading as _threading
+    run_thread = _threading.Thread(target=server.serve_forever, daemon=True)
+    run_thread.start()
+    try:
+        _threading.Event().wait()
+    except KeyboardInterrupt:
+        tm_log("arret du serveur Task Manager (Ctrl+C)")
     finally:
         tm_log("arret du serveur Task Manager")
         server.server_close()
