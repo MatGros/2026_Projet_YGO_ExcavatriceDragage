@@ -154,8 +154,7 @@ plan_project:
       execution: NOT_STARTED
       execution_by: ""
       evidence: ""
-      execution_comment: "Après M11 (R4)"
-      validation: NOT_REVIEWED
+      execution_comment: "Coordination 2026-11-15 (T000-CC10) : son lot 2 (supervisor_server.py, request_queue_size 5→128, cause racine du faux « Offline », prouvé : file 5 → plafond 0,51 s sous 12 appels, file 128 → 0/300) attend la même dérogation et exige un redémarrage — accord : appliquer le lot 2 AVANT le restart R5, UN seul redémarrage. En attente de la dérogation + GO exploitant. Cible mise à jour : un redémarrage, deux vérifications (R5 + lot 2)"
       validated_by: ""
       validated_at: ""
       validation_comment: ""
