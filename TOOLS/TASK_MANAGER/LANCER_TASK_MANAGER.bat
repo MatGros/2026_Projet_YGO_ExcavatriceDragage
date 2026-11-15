@@ -8,6 +8,10 @@ echo  LANCEMENT DU TASK MANAGER (SERVEUR LOCAL)
 echo.
 echo.
 
+echo Script lance : TOOLS\TASK_MANAGER\task_server.py
+echo   - Task Manager : port 8081 (TASK_VIEWER.html)
+echo   - Superviseur  : port 8082 (verifie ou demarre automatiquement)
+
 cd /d "%~dp0"
 echo Arret de toute instance precedente sur le port 8081...
 powershell -NoProfile -Command "$connections = Get-NetTCPConnection -State Listen -LocalPort 8081 -ErrorAction SilentlyContinue; foreach ($connection in $connections) { Stop-Process -Id $connection.OwningProcess -Force -ErrorAction SilentlyContinue; Write-Host ('  Instance arretee (PID ' + $connection.OwningProcess + ')') }"

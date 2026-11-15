@@ -533,6 +533,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.reply(200, {"success": True, "task_id": task_id})
 
 
+def tm_log(message: str) -> None:
+    """R29 : journal du Task Manager au meme endroit que celui du superviseur."""
+    try:
+        log_dir = Path(os.environ.get("LOCALAPPDATA", Path.home() / ".local/share")) / "ExcavatriceDragage"
+        with open(log_dir / "agent-supervisor-server.log", "a", encoding="utf-8") as handle:
+            handle.write(f"{datetime.now().isoformat(timespec='seconds')} pid={os.getpid()} [TM] {message}\n")
+    except OSError:
+        pass
+
+
 def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
     global VERBOSE
     VERBOSE = verbose
@@ -548,7 +558,9 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
     except OSError:
         if 'lock_handle' in locals(): lock_handle.close()
         print("Task Manager deja actif : aucun second serveur ne sera lance.")
+        tm_log("demande recue mais instance deja active sur ce port")
         return
+    tm_log("demarrage : verrou pris, bind du port " + str(port))
     try:
         # R29 : threads daemon sinon le processus survit au Ctrl+C (threads bloques)
         server = type('Server', (http.server.ThreadingHTTPServer,), {'daemon_threads': True})((HOST, port), Handler)
@@ -578,11 +590,13 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
     server.supervision_token = secrets.token_urlsafe(32)
     print(f"Task Manager local : {url}")
     print("  -> Ctrl+Clic sur le lien pour ouvrir Task Viewer dans votre navigateur.")
+    tm_log("serveur PRET port=" + str(port))
     if open_browser:
         webbrowser.open(url)
     try: server.serve_forever()
     except KeyboardInterrupt: pass
     finally:
+        tm_log("arret du serveur Task Manager")
         server.server_close()
         lock_handle.seek(0); msvcrt.locking(lock_handle.fileno(), msvcrt.LK_UNLCK, 1); lock_handle.close()
 
