@@ -1276,7 +1276,8 @@ def test_persona_invocation_is_traced_and_readable(monkeypatch, tmp_path):
     assert usage == [{"role": "safety", "count": 1}], f"usage reel expose : {usage}"
 
 
-def test_coordination_session_judge_notice_only_for_t000(tmp_path):
+def test_coordination_session_judge_notice_only_for_t000(tmp_path, monkeypatch):
+    monkeypatch.setenv("WORKFLOW_TRACE_DIR", str(tmp_path / "trace"))   # hygiène : jamais le journal réel
     """M15/R17 (2026-11-15) : une session de coordination (T000-*) est annoncee au juge ;
     une session normale ne recoit PAS la notice (le role se detecte, il ne se devine pas)."""
     observed = []
@@ -1303,7 +1304,8 @@ def test_coordination_session_judge_notice_only_for_t000(tmp_path):
         svc.close()
 
 
-def test_two_active_coordination_sessions_raise_one_finding(tmp_path):
+def test_two_active_coordination_sessions_raise_one_finding(tmp_path, monkeypatch):
+    monkeypatch.setenv("WORKFLOW_TRACE_DIR", str(tmp_path / "trace"))   # hygiène : jamais le journal réel
     """M15/R17 : deux sessions T000-* actives simultanement -> un constat mecanique par
     session, idempotent au cycle suivant ; une session en pause ne declenche plus."""
     svc, _source, sid = service(tmp_path)
@@ -1329,7 +1331,8 @@ def test_two_active_coordination_sessions_raise_one_finding(tmp_path):
         svc.close()
 
 
-def test_mission_cadrage_finding_targets_coordination_only(tmp_path):
+def test_mission_cadrage_finding_targets_coordination_only(tmp_path, monkeypatch):
+    monkeypatch.setenv("WORKFLOW_TRACE_DIR", str(tmp_path / "trace"))   # hygiène : jamais le journal réel
     """R18/M16 (ecart exploitant 2026-11-15 : une session travaille sans objectif ni criteres
     et rien ne le dit) : le constat mécanique cible les sessions de COORDINATION ; toute autre
     session active recoit un etat lisible (cadrage_state) sans envahir les constats."""
@@ -1362,7 +1365,8 @@ def test_mission_cadrage_finding_targets_coordination_only(tmp_path):
         svc.close()
 
 
-def test_mission_cadrage_finding_text_tracks_partial_fill(tmp_path):
+def test_mission_cadrage_finding_text_tracks_partial_fill(tmp_path, monkeypatch):
+    monkeypatch.setenv("WORKFLOW_TRACE_DIR", str(tmp_path / "trace"))   # hygiène : jamais le journal réel
     """R18 : quand un champ se remplit, le constat est revisé avec la liste réduite des
     manquants (meme constat, pas un doublon)."""
     svc, _source, sid = service(tmp_path)
