@@ -50,6 +50,17 @@
             "onFailure": "block"
           }
         ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_shell_scope_guard.py",
+            "timeout": 10,
+            "onFailure": "block"
+          }
+        ]
       }
     ],
     "PostToolUse": [
