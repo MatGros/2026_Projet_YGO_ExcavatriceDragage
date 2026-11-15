@@ -87,3 +87,23 @@ def test_mode_report_ne_bloque_pas(monkeypatch, capsys) -> None:
 def test_entree_illisible_laisse_passer(monkeypatch) -> None:
     monkeypatch.setattr(sys, "stdin", io.StringIO("pas du json"))
     assert guard.main() == 0
+
+
+# --- Faux positif mesure le 2026-11-15 : `-Path` n'est pas une ecriture en soi -----------
+# `Select-String -Path CODE/x.st` est une LECTURE. Le garde l'a bloquee (constat reel,
+# premiere mise en service). Correctif : `-Path` ne compte que si la commande ecrit.
+
+@pytest.mark.parametrize("command", [
+    "Select-String -Path CODE/x.st -Pattern foo",
+    "Get-Content -Path CODE/x.st",
+])
+def test_option_path_seule_n_est_pas_une_ecriture(command: str) -> None:
+    assert _decision(command) == "allow"
+
+
+@pytest.mark.parametrize("command", [
+    "Remove-Item -Path CODE/x.st",
+    "New-Item -Path CODE/x.st -ItemType File",
+])
+def test_option_path_compte_quand_la_commande_ecrit(command: str) -> None:
+    assert _decision(command) == "block"

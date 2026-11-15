@@ -110,8 +110,9 @@ def written_paths(command: str) -> list[str]:
 
     for match in REDIRECT.finditer(text):
         found.append(_clean(match.group("p")))
-    for match in FLAG_PATH.finditer(text):
-        found.append(_clean(match.group("p")))
+    if REDIRECT.search(text) or DD_OUT.search(text) or VERB.search(text) or GIT_APPLY.search(text) or GIT_MUTATE.search(text):
+        for match in FLAG_PATH.finditer(text):
+            found.append(_clean(match.group("p")))
     for match in DD_OUT.finditer(text):
         found.append(_clean(match.group("p")))
 

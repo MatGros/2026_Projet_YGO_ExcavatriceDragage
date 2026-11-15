@@ -59,6 +59,7 @@ ABSOLUTE_DENY = (
     # Les gardes eux-memes : les reecrire, c'est se desarmer.
     "TOOLS/AGENT_WORKFLOW/scripts/task_scope.py",
     "TOOLS/AGENT_WORKFLOW/scripts/hook_scope_guard.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/hook_shell_scope_guard.py",
     "TOOLS/AGENT_WORKFLOW/scripts/trace_log.py",
     "TOOLS/AGENT_WORKFLOW/scripts/miss_log.py",
     "TOOLS/AGENT_WORKFLOW/scripts/hook_workflow_attest.py",
@@ -67,6 +68,7 @@ ABSOLUTE_DENY = (
     "TOOLS/AGENT_WORKFLOW/scripts/hook_stop.py",
     "TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py",
 )
+
 # Interdiction DURE (T427 P1, GO exploitant 2026-11-15) : aucune DEROGATION ne la leve.
 # Seul le perimetre EPINGLE d'un contrat valide (ex. tache PLC sur CODE/) l'autorise.
 HARD_DENY = (
@@ -75,6 +77,7 @@ HARD_DENY = (
     "PRJ_CODESYS/**",
     "TOOLS/AGENT_WORKFLOW/scripts/task_scope.py",
     "TOOLS/AGENT_WORKFLOW/scripts/hook_scope_guard.py",
+    "TOOLS/AGENT_WORKFLOW/scripts/hook_shell_scope_guard.py",
     "TOOLS/AGENT_WORKFLOW/scripts/trace_log.py",
     "TOOLS/AGENT_WORKFLOW/scripts/miss_log.py",
     "TOOLS/AGENT_WORKFLOW/scripts/hook_workflow_attest.py",
