@@ -65,6 +65,7 @@ def read_state(key: str) -> dict | None:
 
 
 BASE_COMMUNE = "AGENTS.md (règles), DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md (catalogue résumé)"
+VOIE_NOM = {"Orchestrateur": "Orchestrateur projet", "Tâche": "Coordinateur de tâche", "Troubleshooting": "Troubleshooting"}
 VOIE_PROCEDURE = {
     "Orchestrateur": ("", "TOOLS/AGENT_WORKFLOW/skills/orchestrator/ROLE.md"),
     "Tâche": ("", "TOOLS/AGENT_WORKFLOW/skills/task-planner/COORDINATOR.md"),
@@ -234,8 +235,14 @@ def render(etat: str, mode: str | None, seq: int | None, key: str = "", alias: s
             f"📖 Lire d'abord : {BASE_COMMUNE}",
             f"📘 Procédure de la voie {voie} : {proc}",
         ]
-    # Fin de bloc FIGÉE : menu numéroté, pas de question libre, pas de choix rédigé par le LLM.
-    if etat == "ACTIF":
+    # Voie déjà choisie : bannière de rôle seule, sans le menu général (hors sujet dans un rôle).
+    if etat == "ACTIF" and voie in VOIE_NOM:
+        lines += [
+            f"🧭 Rôle : {VOIE_NOM[voie]}",
+            "Pour changer de rôle ou sortir : « off » (Quitter).",
+        ]
+    # Mode libre (aucune voie) : menu numéroté, pas de question libre, pas de choix rédigé par le LLM.
+    elif etat == "ACTIF":
         lines += [
             f"🧭 Voie : {voie or 'aucune (libre = réponse directe)'}",
             "",
@@ -244,14 +251,14 @@ def render(etat: str, mode: str | None, seq: int | None, key: str = "", alias: s
             "2 · Tâche (prendre une tâche du catalogue, verrous)",
             "3 · Troubleshooting (diagnostiquer un incident)",
             "0 · Quitter le workflow",
-            "Pour choisir : /workflow-project 1 (Orchestrateur) · 2 (Tâche) · 3 (Troubleshooting) · 0 (Quitter)",
+            "Pour choisir : /workflow-project-orchestrator (1) · /workflow-project-coordinator (2) · 3 (Troubleshooting) · 0 (Quitter)",
             "Ou écris ta demande : elle reste une réponse directe.",
-            "Agent : si le message suit immédiatement un bloc `Choix :` d'un /workflow-project ACTIF et vaut 0, 1, 2 ou 3, exécute `python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py cmd <n> --source agent` et affiche sa sortie telle quelle, sans commentaire. Tout autre message, chiffre compris : réponse directe, sans script.",
+            "Agent : si le message suit immédiatement un bloc `Choix :` d'une voie ACTIVE et vaut 0, 1, 2 ou 3, exécute `python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py cmd <n> --source agent` et affiche sa sortie telle quelle, sans commentaire. Tout autre message, chiffre compris : réponse directe, sans script.",
         ]
     elif etat == "OFF":
-        lines.append("⏹️ Workflow quitté. Pour revenir : /workflow-project")
+        lines.append("⏹️ Workflow quitté. Pour revenir : /workflow-project-orchestrator ou /workflow-project-coordinator")
     else:
-        lines.append("⚠️ État inconnu : aucune supposition. Relancer avec /workflow-project.")
+        lines.append("⚠️ État inconnu : aucune supposition. Relancer avec /workflow-project-orchestrator.")
     return "\n".join(lines)
 
 
@@ -313,7 +320,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "etape":
         cur = read_state(key)
         if cur is None or cur.get("etat") != "ACTIF":
-            print("⚠️ Workflow non actif : tape /workflow-project d'abord.")
+            print("⚠️ Workflow non actif : lance d'abord une commande de rôle (/workflow-project-orchestrator ou /workflow-project-coordinator).")
             return 0
         wanted = (args.mode or "").strip().upper()
         if wanted not in ETAPES:
@@ -337,7 +344,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "voie":
         cur = read_state(key)
         if cur is None or cur.get("etat") != "ACTIF":
-            print("⚠️ Workflow non actif : tape /workflow-project d'abord, puis le numéro.")
+            print("⚠️ Workflow non actif : lance d'abord une commande de rôle, puis le numéro.")
             return 0
         if args.mode not in VOIES:
             print("ERREUR : voie inconnue (attendu : 1, 2 ou 3).")

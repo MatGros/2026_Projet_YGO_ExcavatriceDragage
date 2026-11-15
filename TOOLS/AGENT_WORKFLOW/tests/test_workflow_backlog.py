@@ -194,8 +194,9 @@ def test_B17_accueil_tache_demande_tache_et_resultat():
 # ── Cohérence des textes (commande, skill, AGENTS.md) ────────────────────────
 
 def test_coherence_commande_et_script():
-    cmd = (ROOT / ".claude/commands/workflow-project.md").read_bytes().decode("utf-8")
-    assert "workflow_state.py cmd $ARGUMENTS --source slash" in cmd
+    for nom, voie in (("workflow-project-orchestrator", "cmd 1"), ("workflow-project-coordinator", "cmd 2")):
+        cmd = (ROOT / ".claude/commands" / f"{nom}.md").read_bytes().decode("utf-8")
+        assert f"workflow_state.py {voie} --source slash" in cmd
 
 
 def test_coherence_regle_agent_identique():

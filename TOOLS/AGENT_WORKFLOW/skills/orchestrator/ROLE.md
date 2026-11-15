@@ -2,7 +2,7 @@
 
 > Fiche courte (T427, O3, 2026-11-15). Elle **pointe**, elle ne recopie pas.
 > Méthode complète : `TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md`.
-> Lancement : `/workflow-project-orchestrator` (ou `/workflow-project 1`).
+> Lancement : `/workflow-project-orchestrator`.
 
 ## 1. Mission
 

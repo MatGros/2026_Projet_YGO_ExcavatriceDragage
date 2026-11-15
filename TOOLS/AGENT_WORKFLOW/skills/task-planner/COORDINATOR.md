@@ -2,7 +2,7 @@
 
 > Fiche courte (T427, O3, 2026-11-15). Elle **pointe**, elle ne recopie pas.
 > Règles du catalogue : `TOOLS/AGENT_WORKFLOW/skills/task-planner/SKILL.md`.
-> Lancement : `/workflow-project-coordinator` (ou `/workflow-project 2`).
+> Lancement : `/workflow-project-coordinator`.
 
 ## 1. Mission
 

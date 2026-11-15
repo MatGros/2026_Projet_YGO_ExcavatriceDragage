@@ -64,7 +64,7 @@ def get_workflow_badge(conv_id):
         except (OSError, ValueError):
             pass
         return f"{green}🛣️ ●{reset} · {detail}{marker}"
-    return "🛣️ ○ · /workflow-project pour reprendre"
+    return "🛣️ ○ · /workflow-project-orchestrator pour reprendre"
 
 
 def get_cadrage_badge(conv_id):
