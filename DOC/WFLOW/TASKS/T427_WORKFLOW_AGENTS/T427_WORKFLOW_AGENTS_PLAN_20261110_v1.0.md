@@ -32,6 +32,17 @@ flowchart LR
   M2 --> M4["M4 garde-fous T9-T11 + hooks (si D3)"]
 ```
 
+**État au 2026-11-15** (constat de revue n°4 : les jalons n'avaient aucun état)
+
+- ✅ **M0** — reçu de T426 : prototype + 43 tests.
+- ✅ **M1** — contrat fusionné + plan en place.
+- ⏳ **M2** — règle « 1 tâche = 1 dossier » (§5) proposée, **non migrée** : la table ancien→nouveau doit être validée par l'exploitant.
+- ✅ **M3** — skill `workflow-project` livrée ; **commandes de rôle livrées le 2026-11-15** (`/workflow-project-orchestrator`, `/workflow-project-coordinator`).
+- ✅ **M4** — garde-fous : hook de périmètre (P1) + garde shell actifs et branchés le 2026-11-15.
+- ⏳ **M5** — I1/I1b : entonnoir de démarrage en essai (§9), **non validé sur sessions neuves**.
+- ✅ **M6** — journal et état : `workflow_state.py`, `trace_log.py`, conventions d'échange v0.3 + `exchange_tracker.py`.
+- ⏳ **M7** — fiches de rôle : `ROLE.md` / `COORDINATOR.md` écrites, commandes livrées, **validation humaine en attente**.
+
 ## 5. Règle « 1 tâche = 1 dossier » (proposée, à valider — AC6)
 ```
 DOC/WFLOW/TASKS/T<ID>_<NOM>/
@@ -457,3 +468,33 @@ Workflow `review-plan-t427` (run `wf_92da4675-9ce`, 10 agents lecture seule : 3 
 
 Décisions attendues de l'exploitant : D2/D3, validation a posteriori des fiches de rôle (f6753d24), emplacement et porteur de F4, écrivain du registre des dérogations.
 Workflow de suivi : non lancé tant que le plan n'est pas corrigé.
+
+## 20. ✅ Clôture de l'étude (2026-11-15)
+
+> Traitement des 6 constats de la revue §19. Aucune modification dans `CODE/`.
+> Chaque ligne dit ce qui est **fait**, ce qui est **partiel**, ce qui **reste**.
+
+1. **[bloquant] Garde de périmètre** — ✅ **traité**. `classify()` respecte le périmètre
+   épinglé, deny-list dure non levée par dérogation, citation littérale exigée (commit
+   `6e261378`). Trou des écritures shell fermé le 2026-11-15 (`9d1f19b0`) : hook
+   `Bash|PowerShell` actif. Limite assumée : analyse lexicale.
+2. **GO non tracés** — 🟡 **partiel**. Convention inscrite dans `AGENTS.md` (GO + copie
+   datée, un GO verbal non copié n'autorise rien). ❌ **Registre dédié non livré**.
+3. **Documents désalignés** — ✅ **traité pour les commandes**. Vérifié le 2026-11-15 :
+   `.claude/commands/` ne contenait que `plan-project.md` et `workflow-project.md`, alors
+   que `ROLE.md` et `COORDINATOR.md` annonçaient des commandes dédiées. Les deux
+   commandes sont créées et un test les verrouille (`test_role_commands.py`, 3 cas).
+   ⏳ Reste : le §17 dit encore « bloqué » pour O3 alors qu'il est livré.
+4. **Jalons sans état** — ✅ **traité**. État M0→M7 ajouté en §4 (5 ✅, 3 ⏳).
+5. **Backlog** — ⏳ **non traité**. L'ordre B2-avant-B1 et les tests manquants
+   (B12, B14, B15, B16) restent à faire ; le backlog §12 n'a pas été réordonné.
+6. **Besoins non planifiés** — 🟡 **partiel**. Commandes de rôle livrées. ❌ La question
+   « je gère qui, quoi ? » et le prompt F4 dans le Superviseur restent non planifiés.
+
+**Décisions toujours attendues de l'exploitant** : D2/D3 · validation des fiches de rôle ·
+emplacement et porteur de F4 · écrivain du registre des dérogations · réordonnancement
+du backlog.
+
+**Livré le 2026-11-15, hors plan** : procédures d'échange v0.3 (3 revues adverses),
+`AGENTS.md` § « Échanges entre sessions », `exchange_tracker.py` (13 tests), 2 commandes
+de rôle. Total du périmètre T427 : **74 tests verts**, `CODE/` intact.
