@@ -199,6 +199,20 @@ plan_project:
       execution_by: ""
       evidence: ""
       execution_comment: "GO conditionnel exploitant 2026-11-15 (agents Ollama) ; l'écriture hors périmètre volontaire attend un GO explicite ; protocole en 3 pas au plan §3 (R19)"
+    - id: M18
+      title: "R20 — reprise CC10 : robustesse upgrade_legacy (journal horodaté, délais 15/30, kill ciblé)"
+      done_when: "Journal horodaté des étapes, timeouts 15 s (GET) / 30 s (POST), arrêt refusé de tout processus qui n'est pas supervisor_server.py ; test_upgrade 5/5"
+      execution: DONE
+      execution_by: T000-CC10 (relu et vérifié par CC01)
+      evidence: "diff WT 29/6 relu par CC01 ; test_upgrade.py 5 passed (réexécuté 2026-11-15) ; le kill refuse tout processus non-Superviseur sur 8082"
+      execution_comment: "Reprise demandée par l'exploitant via CC10 ; le COMMIT attend la décision CC01 + le GO exploitant (CC10 n'écrit plus dans le Superviseur)"
+    - id: M19
+      title: "R21 — statut de migration visible dans l'IHM (proposition T000-CC10 acceptée)"
+      done_when: "AC-1→AC-6 de la proposition : bandeau IHM (en cours/étape/cause/backup), aucun changement de format d'état, migration jamais lancée sans GO"
+      execution: NOT_STARTED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "Proposition DOC/WFLOW/TASKS/T000-CC10_PROPOSITION_STATUT_MIGRATION_IHM/ acceptée par CC01 — constat réel, AC testables ; à trancher §6 (canal HTTP avec jeton vs fichier d'état, statut expiré 24 h) ; lot 1 déjà fait par M18 ; implémentation après le restart M12"
       validation: NOT_REVIEWED
       validated_by: ""
       validated_at: ""
@@ -344,6 +358,8 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
 | **R16** | **Menu de gauche — la couleur porte l'état, pas le texte** (demande exploitant 2026-11-14) | le titre de session reste neutre (blanc) même en alarme ; l'état vit sur le marqueur + fond discret + étiquette (info active/défaut/alarme) ; l'identifiant d'agent = badge coloré selon un standard par acteur (claude/codex/agy/dsh/opc) | test DOM (badge model-tag + neutralisation texte) · layout 0 échec | CC01 (T429) |
 | **R18** | **Le système doit DIRE une session qui travaille sans objectif ni critères** (écart exploitant 2026-11-15, cas T000-CDX02) | constat mécanique `mission_non_cadree` posé aux sessions de coordination à fiche vide (3 champs minimum : objectif/critères/périmètre) ; pour toute autre session active, état lisible `cadrage_state` sans envahir les constats ; corrigé observé quand rempli, clôture humaine | tests cadrage (ciblage coordination, idempotent, révision partielle, pausé) · suite 219 verts | CC01 (T429) |
 | **R19** | **Recette de dérive RÉELLE avec agents Ollama** (GO conditionnel exploitant 2026-11-15 ; lesson PRG_10 : tests verts ≠ câblé) | l'agent Ollama rédige une écriture hors périmètre (contenu fourni dans son prompt, il ne lit jamais le code) ; l'écriture volontaire déclenche le garde (refus + journal + métrique `k/n`) ; le Superviseur publie le constat `scope_drift` citable sur la session surveillée ; le tout consigné dans PREUVES/ | preuve brute : refus du garde + métrique comptée + constat cité dans PREUVES | CC01 (T429), GO explicite de l'écriture volontaire requis |
+| **R20** | **upgrade_legacy robuste** (reprise CC10 demandée par l'exploitant) | journal horodaté par étape, délais 15 s (GET) / 30 s (POST), **kill ciblé** : un processus sur 8082 n'est arrêté que s'il est `supervisor_server.py`, sinon refus | `test_upgrade.py` 5 passed (réexécuté CC01 2026-11-15) | T000-CC10 → repris CC01 (T429) |
+| **R21** | **Statut de migration visible dans l'IHM** (proposition T000-CC10 acceptée, cas « Migration interrompue : timed out » invisible) | bandeau IHM : état `en cours/réussie/échec`, étape courante, cause, chemin de sauvegarde — sans changement de format d'état, migration jamais lancée sans GO (AC-1→AC-6 de la proposition) | tests upgrade + bandeau DOM ; à trancher §6 : canal HTTP avec jeton vs fichier d'état, statut expiré 24 h | CC01 (T429), implémentation après le restart M12 |
 
 ### Décisions figées sur ce lot
 
