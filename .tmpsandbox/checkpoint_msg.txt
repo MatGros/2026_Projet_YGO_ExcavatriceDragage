@@ -1,0 +1,18 @@
+chore(checkpoint): etat local complet avant poursuite T427
+
+Commit de sauvegarde demande par l exploitant. Contenu NON produit par cette
+session, hors T427 :
+- 19 fichiers non suivis (T000_SESSION_NAMING, T377, T429, T417-C, CONTRACTS)
+- 6 fichiers modifies (TASKS.yaml, task_server.py, orchestrator_registry.py,
+  SESSION_DIRTY_ALIASES, SESSION_RENAME_AUDIT, plans T427 et T429)
+- 16 suppressions sous T000-AGY02 (ARCHIVES et T417-C) : elles n ont PAS ete
+  faites par cette session. Elles sont enregistrees telles quelles et restent
+  recuperables integralement dans le commit parent.
+- scratchs .tmpsandbox
+
+Le travail T427 lui-meme est deja commite :
+  6e261378  garde de perimetre P1 + garde shell lot 2
+  0e8f620d  procedures d echange inter-agents v0.3
+  9d1f19b0  branchement du garde shell + faux positif corrige
+
+Co-Authored-By: Claude Code <noreply@anthropic.com>

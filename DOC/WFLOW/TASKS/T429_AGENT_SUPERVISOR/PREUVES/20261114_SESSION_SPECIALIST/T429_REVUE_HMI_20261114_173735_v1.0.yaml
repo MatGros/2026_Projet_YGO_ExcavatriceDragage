@@ -1,0 +1,68 @@
+🟡 **ADVISORY** — Expertise HMI non exécutable : aucune source fournie dans cette session.
+
+**Impact** : les 6 invariants HMI restent non évalués ; aucun verdict PASS/BLOCK ne peut être prononcé sur T429 sans les fichiers cibles. Durée : session unique, horodatage non fourni par l'environnement.
+
+---
+
+## Niveau 1 — Invariants (état réel de l'audit)
+
+1. **INV-HMI-01 — Zéro refus silencieux** `[⚪ N/A]` — Non évalué : `PRG_07_Supervision.st` absent du contexte.
+2. **INV-HMI-02 — Gabarit 42 car. bandeau / 14 car. boutons** `[⚪ N/A]` — Non évalué : aucun littéral de message ni libellé de bouton fourni.
+3. **INV-HMI-03 — Concordance bit-à-bit du décodeur** `[⚪ N/A]` — Non évalué : `instCauses`, `AlarmArray`, `ErrorId` non accessibles.
+4. **INV-HMI-04 — Double codage forme + couleur** `[⚪ N/A]` — Non évalué : aucun mapping pictogramme/état fourni.
+5. **INV-HMI-05 — Action opérateur guidée** `[⚪ N/A]` — Non évalué : dépend du texte réel des alarmes.
+6. **INV-HMI-06 — Latch refus transitoire ≥ 3 s** `[⚪ N/A]` — Non évalué : présence de `TOF`/`TP` sur les refus non vérifiable.
+
+Aucun de ces statuts n'est un PASS implicite. `N/A` = preuve manquante, pas défaut constaté.
+
+---
+
+## Niveau 1 bis — Argumentaire technique
+
+Aucun accès fichier ni outil d'exécution n'a été fourni dans cette session : ni `CODE/M_MAIN/PRG_07_Supervision.st`, ni `ST_HMI_*.st`, ni `AF_Partie-07_Interface_IHM_v*.md`. Le brief interdit explicitement d'annoncer PASS sur vérification non exécutée, et un stub/simulation ne vaut pas preuve terrain — je ne peux donc ni simuler un rendu 800x480 ni inférer un comportement d'écran.
+
+Point bloquant secondaire : le libellé de la tâche parente **T429** n'est pas transmis (objectif, périmètre, ce qui a déjà été testé, verrou éventuel). Sans lui, je ne peux pas délimiter la vue à inspecter (`ScreenContext`) ni exclure un chevauchement avec un audit HMI déjà rendu.
+
+Conséquence : le livrable attendu (`specialist_evaluation` avec `evidence` par invariant) ne peut pas être produit honnêtement. Toute restitution chiffrée ici serait une fabrication.
+
+---
+
+## Niveau 2 — Plan d'action chirurgical
+
+1. **Localisation** : contexte de session / canal de retour coordinateur.
+   **Ancre** : demande d'expertise T429.
+   **Action exacte** : transmettre le libellé de T429 (objectif, périmètre, `ScreenContext` = vue ou bandeau à inspecter).
+   **Outil** : message au coordinateur.
+   **Risque si ignoré** : audit hors périmètre, doublon ou angle mort sur la vue réellement défaillante.
+
+2. **Localisation** : `CODE/M_MAIN/PRG_07_Supervision.st`.
+   **Ancre** : blocs bandeau d'état/alarme, décodeur (`instCauses` / `AlarmArray` / `ErrorId`), gestion des refus joystick/armement.
+   **Action exacte** : fournir le fichier intégral ou le diff T429.
+   **Outil** : `git diff` / copie du fichier.
+   **Risque si ignoré** : INV-HMI-01, 03, 05, 06 non évaluables.
+
+3. **Localisation** : `ST_HMI_*.st` + `AF_Partie-07_Interface_IHM_v*.md`.
+   **Ancre** : structures de messages, table de décodage, mapping pictogrammes.
+   **Action exacte** : fournir la version courante (préciser le numéro de version).
+   **Outil** : copie des fichiers.
+   **Risque si ignoré** : INV-HMI-02 et 04 restent sur parole.
+
+4. **Localisation** : `TOOLS/AGENT_WORKFLOW/scripts/specialist_runner.py`.
+   **Ancre** : `--show-prompt hmi`.
+   **Action exacte** : exécuter le runner avec accès dépôt pour charger le prompt versionné et le périmètre déclaré, plutôt que le prompt embarqué dans ce brief (risque de divergence de version).
+   **Outil** : `python TOOLS/AGENT_WORKFLOW/scripts/specialist_runner.py --show-prompt hmi`.
+   **Risque si ignoré** : audit mené sur une spec obsolète.
+
+5. **Localisation** : mesure déterministe à exécuter dès réception (script Python, pas de jugement LLM).
+   **Ancre** : littéraux affectés à `HMI_StatusText` / libellés boutons.
+   **Action exacte** : `len()` sur chaque littéral ; compter les bits déclarés vs entrées de la table de décodage ; lister toute variable `*Refused*`/`*Inhibit*`/`*Lock*` affectée sans écriture HMI corrélative ; vérifier présence d'un `TOF`/`TP` avec `PT >= T#3S` sur chaque refus transitoire.
+   **Outil** : Python (`G200`/`G521`/`G340` selon disponibilité) + `pytest` si tests existants.
+   **Risque si ignoré** : verdict non mécanisable, donc non opposable.
+
+---
+
+**Décision recommandée** : maintenir l'expertise en attente (statut ADVISORY), fournir les 3 entrées minimales (libellé T429 + `PRG_07_Supervision.st` + `ST_HMI_*`/`AF_Partie-07`), puis relancer pour un verdict PASS/BLOCK opposable par invariant.
+
+**Information minimale manquante** : (a) énoncé de T429, (b) `PRG_07_Supervision.st`, (c) `ST_HMI_*.st` et version de `AF_Partie-07_Interface_IHM_v*.md`.
+
+**Limites déclarées** : aucun accès dépôt ni machine dans cette session ; aucune vérification exécutée ; aucun test terrain simulé.

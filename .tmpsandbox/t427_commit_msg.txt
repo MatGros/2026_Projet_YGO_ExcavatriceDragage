@@ -1,0 +1,22 @@
+fix(T427): garde shell branche et faux positif -Path corrige
+
+- .claude/settings.json : hook PreToolUse Bash|PowerShell actif
+  (onFailure block), le trou du lot 2 est referme
+- task_scope.py : hook_shell_scope_guard.py ajoute a ABSOLUTE_DENY et
+  HARD_DENY ; doublon HARD_DENY et lignes parasites supprimes
+- hook_shell_scope_guard.py : l option -Path ne compte comme chemin ecrit
+  que si la commande ecrit reellement. Faux positif mesure le 2026-11-15 :
+  Select-String -Path <chemin protege> (lecture) etait bloque
+- tests : 4 cas de non-regression (lecture avec -Path autorisee,
+  Remove-Item et New-Item avec -Path refuses)
+
+Mesures : IMPORT OK, ABSOLUTE_DENY 22 / HARD_DENY 13, 53 passed.
+
+Incident trace : un collage de bloc Markdown dans task_scope.py a casse
+l import (SyntaxError U+FE0F) et bloque tous les hooks de la session.
+Repare par commentaire des 2 lignes puis nettoyage du doublon.
+
+Limite connue du garde shell : il analyse aussi le texte des messages de
+commit, d ou un second faux positif observe en fin de session.
+
+Co-Authored-By: Claude Code <noreply@anthropic.com>
