@@ -37,9 +37,23 @@ def task_folder(task: dict) -> Path:
     contract = ROOT / contract_ref if contract_ref else None
     if contract and contract.is_file():
         return contract.parent
-    candidates = sorted(p for p in TASKS_DIR.glob(f"{task['id']}*") if p.is_dir())
-    if len(candidates) != 1:
-        raise ValueError(f"Dossier de tâche absent ou ambigu pour {task['id']}")
+    task_id = task["id"]
+    # Correspondance exacte : « T417 » ne doit pas capturer « T417-C_… » (sous-tâche distincte).
+    candidates = sorted(
+        p for p in TASKS_DIR.iterdir()
+        if p.is_dir() and (p.name == task_id or p.name.startswith(task_id + "_"))
+    ) if TASKS_DIR.is_dir() else []
+    if len(candidates) > 1:
+        raise ValueError(
+            f"Dossier de tâche ambigu pour {task_id} : " + ", ".join(p.name for p in candidates)
+        )
+    if not candidates:
+        raise ValueError(
+            f"Dossier de tâche absent pour {task_id}. Attendu : "
+            f"{TASKS_DIR.relative_to(ROOT).as_posix()}/{task_id}_<NOM>/ "
+            "(ou un champ « contrat » pointant un fichier existant dans TASKS.yaml). "
+            "Créer le dossier de la tâche, puis relancer. Aucune création automatique."
+        )
     return candidates[0]
 
 
@@ -212,8 +226,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--report-only", action="store_true", help="ne pas créer de plan manquant")
     args = parser.parse_args(argv)
     task_id = (args.task_id or os.environ.get("PLAN_PROJECT_TASK_ID", "")).strip().upper()
-    if not re.fullmatch(r"T\d{3}", task_id):
-        print("ERREUR : tâche courante indéterminée. Le skill doit résoudre la tâche formelle du chat et passer son ID exact (T###).", file=sys.stderr)
+    if not re.fullmatch(r"T\d{3}(?:-[0-9A-Z]+)*", task_id):
+        print("ERREUR : tâche courante indéterminée. Le skill doit résoudre la tâche formelle du chat et passer son ID exact (T###, ou sous-tâche T###-X).", file=sys.stderr)
         return 2
     try:
         task = load_task(task_id)

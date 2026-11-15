@@ -65,3 +65,41 @@ def test_creation_genere_un_plan_avec_execution_et_validation_separees(tmp_path,
     assert "execution: NOT_STARTED" in content
     assert "validation: NOT_REVIEWED" in content
     assert "validated_by: \"\"" in content
+
+
+# ── Garde-fous B18 / B19 (retour T417-C-AGY03, 2026-11-15) ──────────────────
+
+def test_B18_sous_tache_acceptee_par_la_validation(capsys):
+    """B18 — un ID de sous-tâche (T417-C) passe la validation ; un ID tronqué est refusé."""
+    import re
+    motif = r"T\d{3}(?:-[0-9A-Z]+)*"
+    assert re.fullmatch(motif, "T417-C")
+    assert re.fullmatch(motif, "T428-1")
+    assert not re.fullmatch(motif, "T41")
+    assert not re.fullmatch(motif, "T417-")
+    assert plan_project.main(["T41"]) == 2
+    assert "indéterminée" in capsys.readouterr().err
+
+
+def test_B19_dossier_absent_message_guidant(tmp_path, monkeypatch):
+    """B19 — dossier absent : message avec le chemin attendu, aucune création."""
+    import pytest
+    monkeypatch.setattr(plan_project, "ROOT", tmp_path)
+    monkeypatch.setattr(plan_project, "TASKS_DIR", tmp_path / "DOC" / "WFLOW" / "TASKS")
+    (tmp_path / "DOC" / "WFLOW" / "TASKS").mkdir(parents=True)
+    with pytest.raises(ValueError) as exc:
+        plan_project.task_folder({"id": "T417-C", "contrat": ""})
+    assert "T417-C_<NOM>" in str(exc.value)
+    assert list((tmp_path / "DOC" / "WFLOW" / "TASKS").iterdir()) == []
+
+
+def test_B19_tache_mere_ne_capture_pas_la_sous_tache(tmp_path, monkeypatch):
+    """B19 — « T417 » ne doit pas trouver le dossier « T417-C_… »."""
+    import pytest
+    tasks = tmp_path / "DOC" / "WFLOW" / "TASKS"
+    (tasks / "T417-C_CHALLENGE").mkdir(parents=True)
+    monkeypatch.setattr(plan_project, "ROOT", tmp_path)
+    monkeypatch.setattr(plan_project, "TASKS_DIR", tasks)
+    assert plan_project.task_folder({"id": "T417-C", "contrat": ""}).name == "T417-C_CHALLENGE"
+    with pytest.raises(ValueError):
+        plan_project.task_folder({"id": "T417", "contrat": ""})

@@ -381,3 +381,65 @@ Un point non réalisé = test en `xfail(strict=True)` : il devient rouge dès qu
 **⛔ Bloqué** : chantier O3 (fiches de rôle) — pas de GO de T000-CC10, trois décisions oui/non à trancher par l'exploitant.
 
 **📦 Non commité (mes fichiers)** : plan T427, `test_workflow_backlog.py`. Fichiers modifiés par d'autres agents dans le même périmètre : `rename_session.py`, `task_socle.py`, `test_rename_session.py` (non touchés par moi).
+
+## 15. Exigence coordinateur : workflow dynamique par sprint (2026-11-14)
+
+> Demande exploitant. S'intègre à la fiche de rôle coordinateur (chantier O3, en attente de GO).
+
+**Quoi**
+- Le coordinateur de tâche peut lancer un **workflow dynamique** (outil Workflow de Claude Code) pour un **sprint** : traiter un jalon intermédiaire, pas tout le plan de la tâche.
+- Exemples : comparer plusieurs pistes de solution, faire réfuter une proposition au code, inventorier un sous-ensemble de fichiers.
+
+**Forme type (reprise d'un retour d'agent du 2026-11-14)**
+- Pipeline en 2 étages par problème :
+  1. **Cherche** : 1 agent par problème, lecture seule.
+  2. **Verdict** : dès que son chercheur finit, 1 agent adverse tente de réfuter au code (relit les lignes citées et leurs voisines).
+- Sortie **structurée par schéma JSON** (solutions, mécanisme, fichiers, risques ; verdict CONFIRMÉ / RÉFUTÉ / À PRÉCISER) : pas d'interprétation libre.
+- L'arbitrage final reste au coordinateur.
+
+**Garde-fous obligatoires**
+- [!] Agents du workflow en **lecture seule** stricte (pas d'écriture, pas de gates, pas de git, pas de commit).
+- [!] Taille : guideline de session (aujourd'hui *medium*, moins de 10 agents).
+- [!] Le sprint vise **un jalon** du plan, cité par son identifiant ; pas de workflow sans jalon.
+- [!] Résultat versé comme preuve dans `PREUVES/` du dossier de tâche, avec l'identifiant du run.
+- [!] Reprise possible (`resumeFromRunId`) : les agents déjà terminés ne sont pas relancés.
+- [!] Lancement seulement si les workflows sont activés et sur demande de l'exploitant.
+
+**Test d'acceptation**
+- Un sprint sur un jalon réel : le résultat JSON est conforme au schéma, 0 écriture hors `PREUVES/`, l'arbitrage cite chaque verdict.
+
+## 16. Retour d'usage `/plan-project` (T417-C-AGY03, 2026-11-14) — non urgent
+
+Vérifié à la source avant inscription.
+
+- **B18 · ID de sous-tâche refusé** : `plan_project.py:215` → `re.fullmatch(r"T\d{3}", task_id)`. Une sous-tâche `T417-C` est rejetée (« tâche courante indéterminée »).
+  Livrable : motif aligné sur `T\d{3}(?:-[0-9A-Z]+)*` (comme `TASKS.yaml` et `connect_session.py`).
+  Test : `T417-C` accepté, `T41` et `T417-` refusés.
+- **B19 · Dossier de tâche absent** : `task_folder()` lève « Dossier de tâche absent ou ambigu » sans guider.
+  Livrable : message qui indique le dossier attendu (`DOC/WFLOW/TASKS/<ID>_<NOM>/`) et la marche à suivre ; aucune création automatique.
+  Test : tâche sans dossier → message avec le chemin attendu, code retour non nul, 0 fichier créé.
+- Source : retour de T417-C-AGY03 ; disponible pour plus de détails.
+
+## 17. En attente de GO — procédure sessions de secours (T000-CC10, 2026-11-14)
+
+- Source : `DOC/WFLOW/TASKS/T000_SESSION_NAMING/PROCEDURE_SESSIONS_SECOURS.md` (rédigée par T000-CC10).
+- Contenu : trouver les sessions joignables (ListAgents puis Superviseur), relier un agent (consigne courte, accusé attendu), répondre (copier `from` dans `to`), interdits, fermeture.
+- Cible : fiche de rôle orchestrateur (chantier O3).
+- Ajout (section 1bis de la procédure) : au premier message, l'orchestrateur se présente, explique la procédure d'échange en 5 lignes max, et ne contacte **aucune session sans désignation de l'humain**.
+- [OK] **Intégré le 2026-11-14** dans `TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md` (sous-section « Échange avec les autres sessions », pointeur, +13 lignes). GO T000-CC10 + accord exploitant ; dérogation enregistrée via `task_scope.py deroge`.
+- [X] **Défaut du garde de périmètre** : le hook a d'abord refusé ce chemin alors que sa propre liste l'autorise. Piste : restriction de phase CADRAGE. À corriger (règle `fix:` + `guard:`).
+
+- **2026-11-15 · B18 + B19 livrés** (relance urgente T417-C-AGY03) : `plan_project.py` accepte `T###-X` ; `task_folder()` en correspondance exacte, message guidant si dossier absent, aucune création. Tests `test_plan_project.py` : 7 passed (3 garde-fous). Essai réel T417-C : dossier absent, message correct. Non commité. Retour à AGY03 impossible par messagerie (relais expiré).
+
+## 18. Barre de statut : anti-clignotement (essai, 2026-11-15)
+
+- Cause mesurée : titre qui oscille entre `T427-CC02 REFONTE WORKFLOW AGENT` et le titre IA
+  « challengeur constructif… » (journal, 01:33 à 01:45). Sur Superviseur lent (> 0,6 s), la barre
+  retombait sur le titre IA.
+- Correctif (essai, GO exploitant) dans `session_statusline.py`, en partant de la modification non
+  commitée existante : dernière valeur connue par session (`%LOCALAPPDATA%/ExcavatriceDragage/statusline_cache/`),
+  réutilisée sur lenteur avec la mention « (dernier connu, Superviseur lent) » ; jamais sur service arrêté.
+- Preuves : 29 tests de la barre verts (4 nouveaux) ; essai réel : même titre en normal et en lenteur simulée.
+- Résidu : fichier `statusline_cache/conversation-id.json` écrit par un test avant isolation (non supprimé, règle « aucune suppression automatique »).
+- Constat séparé : « ⚠ non entré » = attestation 98 tours, 0 conforme (ni ligne d'étape ni pied « ➡️ Choix »).
+  Contradiction à trancher : consigne « plus d'emoji » (mémoire, 2026-11-14) contre `AGENTS.md` § Ligne d'étape (emoji).

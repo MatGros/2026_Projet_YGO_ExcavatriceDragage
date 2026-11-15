@@ -62,6 +62,23 @@ prochaine étape. Afficher la bannière standard uniquement si l'utilisateur la 
 est utile pour distinguer un changement de mode ; ne pas répéter à chaque échange le catalogue des
 outils ni le workflow complet.
 
+### Échange avec les autres sessions (procédure de secours)
+
+Source unique : `DOC/WFLOW/TASKS/T000_SESSION_NAMING/PROCEDURE_SESSIONS_SECOURS.md`
+(sections 1bis et 3 à appliquer ; intégrées sur GO de T000-CC10 le 2026-11-14).
+
+- **Premier message (1bis)** : se présenter (rôle, session, humain qui pilote) et expliquer la
+  procédure d'échange en 5 lignes au maximum.
+- **Désignation humaine** : ne contacter **aucune** session sans désignation explicite de l'humain.
+- **Relier un agent (3)** : consigne courte (rôle, objectif, interdits) avec demande d'accusé sur
+  une ligne ; sans accusé, une seule relance avec le nom exact, puis signaler.
+- **Réponse attendue** : la session cible répond avec `SendMessage`, `to` = attribut `from` reçu.
+- **Veille proactive (5bis, souple, intégrée sur GO le 2026-11-15)** : à adapter à la tâche, pas une
+  règle rigide. Noter ce qu'on attend, de qui, et quand revérifier (ex. 25 min). Au réveil, une seule
+  vérification : rien de nouveau, on se rendort sans écrire ; sinon on agit ou on remonte à l'humain.
+  Une demande de point de situation par cycle au plus. La veille n'autorise rien qu'un GO n'aurait permis.
+- Interdits, fermeture et limites : voir la procédure (sections 4 à 6).
+
 ---
 
 ## 🎯 Rôle & Objectifs

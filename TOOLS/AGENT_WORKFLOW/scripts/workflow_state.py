@@ -66,8 +66,8 @@ def read_state(key: str) -> dict | None:
 
 BASE_COMMUNE = "AGENTS.md (règles), DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md (catalogue résumé)"
 VOIE_PROCEDURE = {
-    "Orchestrateur": ("", "TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md"),
-    "Tâche": ("", "TOOLS/AGENT_WORKFLOW/skills/task-planner/SKILL.md"),
+    "Orchestrateur": ("", "TOOLS/AGENT_WORKFLOW/skills/orchestrator/ROLE.md"),
+    "Tâche": ("", "TOOLS/AGENT_WORKFLOW/skills/task-planner/COORDINATOR.md"),
     "Troubleshooting": ("", "TOOLS/AGENT_WORKFLOW/skills/troubleshooting/SKILL.md"),
 }
 VOIES = {"1": "Orchestrateur", "2": "Tâche", "3": "Troubleshooting"}
