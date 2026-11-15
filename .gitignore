@@ -89,6 +89,11 @@ package-lock.json
 !.claude/commands/
 .claude/commands/*
 !.claude/commands/plan-project.md
+# Commandes du workflow projet (T427, 2026-11-15) : SKILL.md et les fiches de role
+# les citent. Non versionnees, un clone neuf n'a pas /workflow-project du tout.
+!.claude/commands/workflow-project.md
+!.claude/commands/workflow-project-orchestrator.md
+!.claude/commands/workflow-project-coordinator.md
 !.claude/skills/
 .claude/skills/*
 !.claude/skills/rename-session/
