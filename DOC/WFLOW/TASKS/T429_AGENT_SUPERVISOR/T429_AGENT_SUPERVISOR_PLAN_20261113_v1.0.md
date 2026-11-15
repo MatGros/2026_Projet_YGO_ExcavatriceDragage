@@ -241,6 +241,20 @@ plan_project:
       execution_by: CC01
       evidence: "Constante MEMORY_MAX_ITEMS + memory_limit() ; 4 sites déhardcodés ; head_tail_text() aux textes de mémoire/contexte (le début du message conservé) ; plafonds de validation élargis 1M ; IHM : champ memory-max-items + stats du fold mémoire (l'élément/caractères/borne/plus ancien) ; test memory_limit 1 passed (25 gardés > 20) ; DOM 16 asserts + layout OK"
       execution_comment: "Demande exploitant 2026-11-15 (modèle 1M contexte) — le run de suite est en cours de dernière preuve ; le restart restera nécessaire pour le service"
+    - id: M24
+      title: "R27 — standardiser le plan de session /plan (gabarit + lien skill)"
+      done_when: "Le gabarit SESSION_PLAN_TEMPLATE.md posé et la skill plan-project pointe vers lui (tâche/dossier vs session/l'ordre)"
+      execution: NOT_STARTED
+      execution_by: ""
+      evidence: ""
+      execution_comment: "POSE HUMAINE (hors périmètre épinglé) — le texte exact fourni par CC01 le 2026-11-15 ; la fork a prouvé l'absence de tout template (listing templates/ + skill)"
+    - id: M25
+      title: "R28 — le juge vérifie la PROVENANCE du plan (dossier de tâche vs /plan de session)"
+      done_when: "Le amendement du prompt posé, les suites 26/26 vertes ; la procédure V1 (copie datée du plan de session au dossier) documentée"
+      execution: DONE
+      execution_by: CC01
+      evidence: "judge_prompt.py l.109 amendé ; test_judge_prompt + test_judge_behavior → 26 passed ; commit 0a86fb72 ; V1 : la copie datée au dossier de tâche entre dans le dossier de lecture déclaré (zéro code), posée par l'exploitant ou dérogation"
+      execution_comment: "Demande exploitant 2026-11-15 (les /subtask) ; l'amendement texte exact de la fork repris"
       validation: NOT_REVIEWED
       validated_by: ""
       validated_at: ""
@@ -392,6 +406,8 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
 | **R23** | **Constat : identifiant de modèle consommé hors liste de référence** — PARTIEL : le service n'inspecte que les identifiants qu'il consomme, JAMAIS la doc/contrats (le service ne lit pas le dépôt en v1) | liste de référence FOURNIE au service par config (source : MODEL_ROUTING.md à enrichir, pose humaine) ; identifiant du juge hors liste → constat `model_out_of_reference` ; liste absente → aucun constat, jamais deviné ; constat seulement, pas de correction | tests (liste fournie + hors liste → constat · liste absente → rien) | CC01 (T429) ; liste → exploitant/CC10 |
 | **R25** | **Titre de session court + rattachement de tâche explicite** (demande T427-CC02 relayée par l'exploitant, 2026-11-15) | format tranché : titre de session = `<alias> <désignation courte>` (≤ 40 car., posée au renommage par l'exploitant, défaut = 3-4 premiers mots du titre catalogue ; le titre catalogue complet reste en détail de carte) ; le changement de sujet se fait par un **rattachement explicite** (`set_task` protégé par le jeton, journalisé), JAMAIS deviné : l'identité (id natif) ne change jamais | tests rename+display (titres courts, longs tronqués) · test set_task (champ modifié, titre recalculé, journal, identité intacte) | CC01 (T429) — la partie édition d'objectif reste le lot T000_SESSION_NAMING |
 | **R26** | **Mémoire longue élargie et observable** (demande exploitant 2026-11-15 « 20 msgs… pas bcp » pour un modèle 1M contexte) | la borne 20 hardcodée à 4 sites devient `memory_max_items` configurable (défaut 20 inchangé, config 20→500) ; plafonds de fenêtre montés (context_messages 200→2000, context_chars 100k→1M, model_context_tokens 131k→1 048 576) ; l'IHM : champ config + **stats d'état du panneau mémoire** (éléments/caractères/borne/plus ancien) ; le textes bornés **tête+queue** (le début du message n'est plus jeté — constat 2026-11-15) | test memory_limit (25 gardés > 20 hardcode, défaut 20 inchangé, head_tail markée) · DOM stats · layout | CC01 (T429) |
+| **R27** | **Standardiser le plan de session `/plan`** (demande exploitant 2026-11-15 « le backlog est bordélique… y a pas un template ? ») | un gabarit `SESSION_PLAN_TEMPLATE.md` à 9 sections (objectif/périmètre/jalons alignés plan_project/poses/review/challenge/méthodes/critères/rules of engagement) + le lien dans la skill canonique plan-project | liste de vérification : le plan de session généré suit les 9 sections | pose humaine le gabarit + la skill (hors périmètre épinglé) — texte exact fourni par CC01 2026-11-15 |
+| **R28** | **Le juge distingue plan de tâche et plan de session** (demande exploitant 2026-11-15 `/subtask « challenger le prompt »`) | amendement du prompt du juge : deux places possibles, la PROVENANCE de chaque objectif vérifiée, l'écart signé au lieu d'ignorer un des deux, l'absence de plan dans la fenêtre ≠ défaut ; **V1** : le contenu du plan de session est copié daté au dossier de tâche (il entre dans le dossier de lecture déclaré, zéro code) | `test_judge_prompt.py` + `test_judge_behavior.py` 26 passed | CC01 (T429) |
 
 ### Décisions figées sur ce lot
 
