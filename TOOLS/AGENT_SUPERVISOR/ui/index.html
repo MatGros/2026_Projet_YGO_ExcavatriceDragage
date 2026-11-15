@@ -22,6 +22,7 @@ fieldset.assignment-config legend,fieldset.assignment-context legend{padding:0 7
 body{padding:0;background:radial-gradient(ellipse at 72% -10%,#30324a 0,transparent 43%),var(--bg)}
 .app-shell{min-height:100vh;display:grid;grid-template-columns:280px minmax(0,1fr)}
 #update-banner{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:center;gap:12px;background:#452a32;border-bottom:2px solid #ff626d;color:#ffd5d8;padding:8px 14px;font-weight:600}
+#update-banner[hidden]{display:none}
 #update-banner button{font:inherit;padding:4px 10px;border-radius:6px;border:1px solid #ffd5d8;background:#7a2430;color:#ffd5d8;cursor:pointer}
 .app-sidebar.needs-restart{background:#452a32;border-right:2px solid #ff626d;transition:background .25s}
 .app-sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;background:#171a24;border-right:1px solid var(--border);padding:20px 14px;display:flex;flex-direction:column;gap:22px}
