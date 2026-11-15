@@ -230,10 +230,10 @@ plan_project:
     - id: M22
       title: "R25 — titre de session court + rattachement de tâche explicite"
       done_when: "Titre affiché = alias + désignation courte (≤ 40 car.) ; set_task modifie la tâche liée, recalcule le titre, journalise, et ne touche jamais l'identité"
-      execution: NOT_STARTED
-      execution_by: ""
-      evidence: ""
-      execution_comment: "Décision datée 2026-11-15 (demande T427-CC02, preuve attendue par l'exploitant) ; le format du titre remplace la décision figée N°4 « alias · titre officiel (désignation) » — mise à jour du registre des décisions figées au prochain lot ; l'implémentation démarre après M17 (le GO de l'épisode) ; l'édition d'objectif reste chez T000_SESSION_NAMING"
+      execution: IN_PROGRESS
+      execution_by: CC01
+      evidence: "Lot 1 posé : session_display_title_short() (désignation posée, sinon 5 premiers mots du titre officiel avant tiret, tronc 40 car., aucun titre inventé) + action set_task (task_id TXXX exigé sinon conservé, task_title/designation, display_title posé si absent, journalisation task_rattachement + trace) ; tests : test_set_task... 2/2 verts, suites titre 48 passed (R4 au vert)"
+      execution_comment: "Reste du lot : branchement de l'affichage au snapshot et à l'IHM (le R4 du renommage reste la priorité du lot T000) ; l'édition d'objectif reste chez T000_SESSION_NAMING"
       validation: NOT_REVIEWED
       validated_by: ""
       validated_at: ""
