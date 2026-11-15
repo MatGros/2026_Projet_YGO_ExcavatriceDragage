@@ -79,6 +79,14 @@ Source unique : `DOC/WFLOW/TASKS/T000_SESSION_NAMING/PROCEDURE_SESSIONS_SECOURS.
   Une demande de point de situation par cycle au plus. La veille n'autorise rien qu'un GO n'aurait permis.
 - Interdits, fermeture et limites : voir la procédure (sections 4 à 6).
 
+### Commits (règle de référence, non dupliquée)
+
+Source unique : `AGENTS.md` § « Commits — autorisation humaine explicite ». Rappel de ce qu'elle impose
+à l'orchestrateur : commit à chaque **jalon validé** (pas à chaque sous-étape, accord requis) ; avant tout
+push, regroupement des commits non poussés par tâche, après branche de secours ; réécriture d'historique
+uniquement sur commits non poussés, avec accord écrit de l'exploitant, jamais sur les commits d'un autre
+agent sans son accord et relecture du diff. Seuil confirmé par l'exploitant (2026-11-15) : petits commits sûrs sans demander ; commits à risque, lots de 5 à 10 commits, et push : demander.
+
 ---
 
 ## 🎯 Rôle & Objectifs
@@ -172,6 +180,14 @@ filtre d'affichage, pas un nettoyage ni un archivage ; l'historique reste dans l
 ---
 
 ## 🛠️ Outils disponibles
+
+### Forks de session : `/plan` et `/subtask` (observé, à vérifier)
+
+- `/plan` : active le mode plan, en lecture seule. Il ne crée aucun fork. Seul le fichier de plan de session est modifiable.
+- `/subtask <consigne>` : crée un fork en arrière-plan (affiché « ⑂ forked <nom> »). Le fork travaille seul et peut écrire dans le dépôt.
+- Un fork ne porte pas ton GO : traiter son résultat comme une proposition, jamais comme une validation.
+- Après un fork qui écrit : relire le fichier modifié (`git diff`) et le signaler à l'exploitant avant toute suite.
+- Statut : comportement observé dans cette session (2026-11-15). La documentation officielle de `/subtask` n'a pas été vérifiée.
 
 ### Sous-agents (délégation sélective)
 

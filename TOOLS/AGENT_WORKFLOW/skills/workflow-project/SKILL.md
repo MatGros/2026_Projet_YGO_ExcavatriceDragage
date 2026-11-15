@@ -1,11 +1,11 @@
 ---
 name: workflow-project
-description: Commande explicite /workflow-project [resume|fresh|off]. Toujours exécuter via le script workflow_state.py ; son résultat fait foi. Ne prend aucune tâche.
+description: Commandes de rôle /workflow-project-orchestrator et /workflow-project-coordinator (l'ancienne commande générique est retirée). Toujours exécuter via le script workflow_state.py ; son résultat fait foi. Ne prend aucune tâche.
 ---
 
 # 🧭 workflow-project — commande déterministe
 
-> 📌 Source canonique de `/workflow-project` (stubs : `.claude/skills/` et `.dsh/skills/`).
+> 📌 Source canonique du script des commandes de rôle (stubs : `.claude/skills/` et `.dsh/skills/`).
 > Origine : T427, incrément I1c (2026-11-13). Plan : `DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/`.
 
 ## 0. ⚠️ Règle absolue
@@ -27,9 +27,8 @@ python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py <enter|off|status> [fresh|
 
 | Commande utilisateur | Appel du script |
 |---|---|
-| `/workflow-project` ou `/workflow-project fresh` | `enter fresh` |
-| `/workflow-project resume` | `enter resume` |
-| `/workflow-project off` | `off` |
+| `/workflow-project-orchestrator` | `cmd 1 --source slash` |
+| `/workflow-project-coordinator` | `cmd 2 --source slash` |
 
 Le script écrit l'état hors dépôt et imprime le bloc de sortie. **Ce bloc fait foi** :
 - il indique `WORKFLOW ACTIF`, `OFF` ou `INDÉTERMINÉ` ;
@@ -51,7 +50,7 @@ pas une tâche du catalogue).
 - **`ACTIF`** : appliquer le § Démarrage de `AGENTS.md` (ligne d'étape, pied de réponse).
 - **`OFF`** : répondre en simple assistant. Pas de ligne d'étape ni de pied `➡️`.
 - **`INDÉTERMINÉ`** : dire que l'état n'est pas connu, sans rien supposer. Demander de relancer
-  avec `/workflow-project` ou `off`.
+  avec `/workflow-project-orchestrator` ou `/workflow-project-coordinator`.
 - **Résumé `PÉRIMÉ` ou `ABSENT`** : le signaler dans 📊, sans lire `TASKS.yaml` entier.
 
 ## 3bis. 🪜 Tenir l'étape à jour (alimente la ligne de statut)

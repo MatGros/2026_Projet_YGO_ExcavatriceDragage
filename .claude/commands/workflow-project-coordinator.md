@@ -3,7 +3,7 @@ description: Voie Tâche (coordinateur) — entre dans le workflow puis sélecti
 argument-hint: (aucun argument)
 allowed-tools: Bash(python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py:*)
 ---
-!`python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py enter resume`
+!`python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py enter resume > /dev/null 2>&1`
 !`python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py cmd 2 --source slash`
 
 RÈGLES (figées, non négociables) :

@@ -302,6 +302,7 @@ Chaque cas se joue sur **Claude** et sur **Codex** ; noter ✅ / ❌ + l'extrait
 - 🪜 **« Étape »** : « non renseignée » n'aide pas. Afficher l'étape courante en clair (ex. « Étape : CADRAGE ») ou la masquer tant qu'elle n'est pas choisie.
 - 📊 **Projet** : la ligne est lisible, à garder. Ajouter une légende des symboles une seule fois, pas à chaque bloc.
 - 🚫 **Consigne « Agent : … »** : à retirer de l'affichage utilisateur. Elle sert au modèle, pas à la personne qui lit.
+- 🧹 **Ligne d'étape en tête de réponse (2026-11-15)** : demande exploitant — les emojis de structure décalent le texte dans le chat. Supprimer la ligne d'étape `🟦 🔎 T427 · ÉTUDE · …` et les puces emoji de structure ; réponses en texte simple (tirets, numéros). Emojis tolérés seulement dans le corps, jamais en repère de structure. Appliquer dès maintenant dans les réponses de la session.
 
 ## 11. 📝 À faire plus tard — contenu du démarrage et lecture par voie
 
@@ -506,3 +507,206 @@ du backlog.
 `AGENTS.md` § « Échanges entre sessions », `exchange_tracker.py` (13 tests),
 `go_registry.py` (7 tests), 2 commandes de rôle versionnées.
 Total du périmètre T427 : **81 tests verts**, `CODE/` intact.
+
+## 20. Règle de commits (désignation exploitant, 2026-11-15)
+
+- Source unique : `AGENTS.md` § « Commits — autorisation humaine explicite » (non dupliquée ici).
+- Reprise dans la procédure de l'orchestrateur : `TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md`, sous-section « Commits ».
+- Application T427 : commit à chaque jalon validé ; regroupement et branche de secours avant push ; pas de réécriture sans accord écrit.
+- Seuil confirmé par l'exploitant (2026-11-15, dans son chat) : « Petits commits sûrs sans demander ; commits à risque, lots de 5 à 10 commits, et push : demander. »
+- Aucun push sans GO explicite de l'exploitant.
+
+## 21. Audit de cohérence plan / code (2026-11-15)
+
+Méthode : relecture du plan, sous-agent en lecture seule, puis vérification par grep / ls le même jour.
+Seuls les points marqués **prouvé** ont une preuve brute. Le reste est signalé **non vérifié**.
+
+### Tests exécutés
+- 5 fichiers (test_workflow_backlog, test_plan_project, test_go_registry, test_role_commands, test_exchange_tracker) : **35 passed, 14 xfailed, code retour 0**.
+- Les 14 xfail sont ceux documentés en §13.
+
+### Prouvé fait
+- M4 garde-fous : hook_scope_guard.py et hook_shell_scope_guard.py référencés dans .claude/settings.json ; commits 6e261378 et 9d1f19b0 présents dans git log.
+- M6 : workflow_state.py, trace_log.py, exchange_tracker.py, go_registry.py présents.
+- M3 : .claude/commands/workflow-project-orchestrator.md et workflow-project-coordinator.md présents, non commités.
+- B4 : test sans xfail, passe (suite ci-dessus).
+- B18 et B19 : passent (test_plan_project).
+- I2 : TOOLS/AGENT_WORKFLOW/scripts/generate_tasks_summary.py existe alors que le plan le marque ⬜. Critères (taille, SHA-256) non vérifiés.
+
+### Prouvé non fait
+- B2 (verrou écritures) : aucun msvcrt, fcntl ni lock dans trace_log.py ni workflow_state.py.
+- B3 (--session réservé dev) : option toujours présente, workflow_state.py:305 ; trace_log.py:260 et :264.
+- B6 (chemin en dur) : repli codé en dur, trace_log.py:23. Non corrigé.
+- B13 (consigne « Agent : … ») : encore affichée, workflow_state.py:256.
+- I1b : .claude/skills/workflow-project absent.
+- I3 (hook SessionStart) : aucune clé SessionStart dans .claude/settings.json.
+- I5 (check_workflow.py) : fichier absent.
+- Ligne d'étape : encore présente dans AGENTS.md:46 (🟦 🔎 T427 · ÉTUDE · Orchestrator), alors que §10 demande de la retirer.
+- Plan : deux sections numérotées « 20 » (lignes 475 et 511).
+
+### Non vérifié (à ne pas citer comme acquis)
+- M2 (migration 1 tâche = 1 dossier), M5 (tests T1 à T7), M7 (validation humaine des fiches de rôle).
+- Le « 43 tests » de M0 et le « check_task_contract PASS » de M1.
+- B1 (test binaire demandé en §19), B5, B7, B8b, B9 à B12, B14 à B17 : non exécutés hors xfail.
+- I4, I6, I7 ; §18 « 29 tests ».
+
+### Écarts entre le plan et le journal
+- §9.6 annonce « 4/4 conformes » pour les tests T1 à T7 ; aucune preuve d'exécution, et §9.4 les laisse à ⬜.
+- §17 dit « B18/B19 non commités » ; le fichier est suivi par git, non modifié (à reconfirmer au commit).
+
+## 22. Demandes exploitant (2026-11-15) — entrées de workflow
+
+Demande : retirer l'ancien point d'entrée `/workflow-project`, mapper une voie `/workflow-project-troubleshooting`
+conforme au standard (bannière, restitution), enrichir le texte d'accueil des `/workflow-project-*` avec des
+conseils de cas d'usage, et ajouter un lien vers la doc de la skill projet.
+
+### Renvois trouvés (grep, 2026-11-15) à traiter avant retrait de `/workflow-project`
+- `.dsh/skills/workflow-project/SKILL.md` (skill DSH, hors périmètre à confirmer)
+- `AGENTS.md`
+- `TOOLS/AGENT_WORKFLOW/scripts/hook_session_brief.py`
+- `TOOLS/AGENT_WORKFLOW/scripts/statusline_indicators.py`
+- `TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py`
+- `TOOLS/AGENT_WORKFLOW/skills/orchestrator/ROLE.md`
+- `TOOLS/AGENT_WORKFLOW/skills/task-planner/COORDINATOR.md`
+- `TOOLS/AGENT_WORKFLOW/skills/workflow-project/SKILL.md`
+- `TOOLS/AGENT_WORKFLOW/tests/test_role_commands.py`, `test_workflow_backlog.py`
+- Hors T427 : `DOC/WFLOW/TASKS/T000_SESSION_NAMING/BESOINS_VS_REALITE_WORKFLOW.md`
+
+### Éléments existants
+- Skill troubleshooting présente : `TOOLS/AGENT_WORKFLOW/skills/troubleshooting/SKILL.md` et `.claude/skills/troubleshooting/SKILL.md`.
+- Référence standard de restitution citée dans `AGENTS.md` : `TOOLS/AGENT_WORKFLOW/docs/AGENT_OUTPUT_STANDARD.md` (existe).
+
+### Évaluation rapide ou pas
+- Retrait de `/workflow-project` : PAS RAPIDE. 11 renvois, dont des tests verts à conserver et une skill DSH. Faire après inventaire, par lot.
+- `/workflow-project-troubleshooting` : PAS RAPIDE. Mapping de l'ancienne version à challenger contre le standard (bannière, restitution, voie). Demande un contrat et une revue, pas une copie.
+- Texte d'accueil des `/workflow-project-*` (cas d'usage) : MOYEN. Touche `workflow_state.py` et les tests de rendu ; liste des cas d'usage à valider d'abord.
+- Lien vers la doc de la skill projet : RAPIDE. Une ligne, une fois la doc cible confirmée (`TOOLS/AGENT_WORKFLOW/skills/workflow-project/SKILL.md`).
+
+### Ordre proposé
+1. Lien vers la doc (rapide).
+2. Liste des cas d'usage à valider par l'exploitant.
+3. Texte d'accueil (avec tests).
+4. Mapping troubleshooting (contrat, challenge, standard).
+5. Retrait de `/workflow-project` après inventaire des 11 renvois.
+
+## 23. Étude-challenge express : cadrage de l'orchestrateur au niveau projet (2026-11-15)
+
+Demande exploitant : cadrer l'orchestrateur au niveau du projet (doc, skill, etc.) pour améliorer le workflow.
+
+### Constat (lecture seule, grep du jour)
+- Le rôle est décrit dans au moins 3 endroits : `AGENTS.md` (voies, échanges, commits), `TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md` (394 lignes), `TOOLS/AGENT_WORKFLOW/skills/orchestrator/ROLE.md` (50 lignes, pointeur), et la commande `.claude/commands/workflow-project-orchestrator.md`.
+- Il est aussi cité dans 10 documents de `TOOLS/AGENT_WORKFLOW/docs/` (WORKFLOW, MODEL_ROUTING, SAFETY_POLICY, STRUCTURE_AND_CLEANUP, etc.).
+- Conséquence : une règle de l'orchestrateur peut exister en deux versions. C'est le défaut déjà relevé dans `AGENTS.md` (« une règle écrite deux fois dérive »).
+
+### Challenge
+1. Périmètre : l'orchestrateur est-il un rôle de projet (catalogue, lots, validation) ou un rôle de session (une voie du workflow) ? Aujourd'hui les deux sont mêlés.
+2. Source unique : le rôle doit être défini une seule fois (proposition : `ROLE.md` comme définition courte, `SKILL.md` comme procédure détaillée, `AGENTS.md` ne renvoyant qu'à ces deux fichiers).
+3. Limites : ce qui est interdit à l'orchestrateur doit être écrit à un seul endroit (écriture `TASKS.yaml` réservée au coordinateur désigné ; aucune modification de `CODE/` sans GO).
+4. Doc projet : `DOC/README.md` doit lister le rôle et ses fiches, sans en reprendre le contenu.
+
+### Évaluation rapide ou pas
+- Choisir le périmètre (projet ou session) et écrire la définition courte : RAPIDE, décision de l'exploitant.
+- Ramener les 10 documents `docs/` à un renvoi vers la source unique : PAS RAPIDE, lot dédié, vérification par grep.
+- Lien dans `DOC/README.md` : RAPIDE, une fois la source unique choisie.
+
+### Ordre proposé
+1. Décision de périmètre (projet ou session).
+2. Définition courte dans `ROLE.md`, renvois depuis `AGENTS.md`.
+3. Inventaire des 10 documents `docs/` et renvois.
+4. Lien dans `DOC/README.md`.
+
+Non vérifié dans cette étude : le contenu détaillé de `SKILL.md` (394 lignes, non relu en entier) et les doublons exacts entre fichiers.
+
+## 24. Étude-challenge express : orchestrateur projet et conseils /schedule (2026-11-15)
+
+Source : demande exploitant (deux points) + tableau d'exemples fourni. Lecture et challenge, aucune modification du code.
+
+### 1. Cadrage de l'orchestrateur au niveau projet
+Proposition exploitant : nom court unique, « TORC-CC07 MULTI-TASK ORCHESTRATOR AGENT ». Un seul orchestrateur, deux seulement de façon temporaire.
+
+Challenge :
+- Convention d'alias : `connect_session.py` et `rename_session.py` exigent un identifiant `T###` (ex. `T427-CC02`). Le préfixe « TORC » ne passe pas en l'état. Options : garder `T000-CC07` (T000 = provisoire) ou modifier la convention. Décision exploitant.
+- Unicité : la liste des sessions montre aujourd'hui plusieurs sessions « T000-CC10 MULTITASK ORCHESTRATOR AGENT » (une désignée « orchestrateur unique », trois autres). Le nom seul ne règle pas l'autorité : sans désignation écrite et unique, la règle fail-closed (AGENTS.md, échanges entre sessions) impose l'arrêt.
+- « Deux orchestrateurs » : admis seulement avec désignation écrite, périmètre séparé et date de fin de cohabitation.
+- Cadrage projet : une seule source à définir (AGENTS.md ou skill orchestrateur), limites écrites une fois, lien dans `DOC/README.md`.
+
+Évaluation :
+- Définition courte et règle d'unicité : rapide, une fois le nom tranché.
+- Alias « TORC » : bloqué par la convention `T###`, décision exploitant.
+- Lien dans `DOC/README.md` : rapide.
+
+### 2. Conseils /schedule selon taille et risque
+Constats sur le tableau fourni :
+- Commandes absentes de cette session : `/swarm`, `/run_workflow`, `/define_subagent`, `/goal` ne figurent ni dans les skills ni dans les outils disponibles ici. Présents : `/plan`, la skill `schedule` (routines cloud), l'outil `Workflow` (soumis à opt-in explicite). À vérifier avant toute reprise.
+- Exemples hors projet : build .NET, Jira, BigQuery, Selenium, NCBI. Le projet est un automate CODESYS 3.5 ; ces exemples ne s'appliquent pas tels quels.
+- Sécurité machine : déploiement planifié vers « prod », auto-remédiation (scale-up, redémarrage de service) et daemon qui agit sans supervision sont incompatibles avec AGENTS.md (sécurité machine réelle, jamais de redémarrage automatique après défaut).
+
+Grille proposée :
+- Risque faible (lecture, veille documentaire, rapport dans `DOC/WFLOW/`) : planifiable, lecture seule.
+- Risque moyen (génération de bundle, gates, tests hors machine dans `PLC_TESTS`) : planifiable, déclenchement manuel recommandé, aucune écriture dans `CODE/`.
+- Risque élevé ou safety (`CODE/`, mise en service, IHM d'exploitation, AU, Enable, déploiement machine) : jamais planifié. Exécution humaine, validation avant code (GO de l'orchestrateur).
+
+Évaluation :
+- Grille de risque : rapide, à écrire dans le skill orchestrateur ensuite.
+- Réécriture du tableau d'exemples sur le projet : pas rapide, à faire après vérification des commandes.
+- Non vérifié : comportement exact de `/schedule` dans cette installation (seule la description de la skill a été lue).
+
+### Ordre proposé
+1. Trancher le nom et la convention d'alias.
+2. Valider la grille de risque /schedule.
+3. Cadrer l'orchestrateur dans la source unique choisie.
+4. Réécrire les exemples seulement après vérification des commandes.
+
+## 25. Lecture obligatoire avant tâche (demande exploitant, 2026-11-15)
+
+Constat (vérifié) : `AGENTS.md` avait une section « Démarrage de session — briefing obligatoire » (ligne 11)
+avant le commit `2a5bf86d`. Ce commit a réécrit `AGENTS.md` (112 lignes) et `subagent_preamble.md` (250 lignes).
+Résultat : aujourd'hui, rien n'oblige à lire le catalogue, le contrat et le plan avant d'agir.
+
+Où vivent les objectifs :
+- Catalogue : `DOC/WFLOW/TASKS.yaml`, champ `objectifs:` par tâche (YAML). Ne pas le lire en entier : passer par `DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md`.
+- Contrat : YAML de la tâche, objectifs testables (obligatoire dès C2). Gabarit : `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`.
+- Plan : Markdown dans `DOC/WFLOW/TASKS/<T>/`.
+
+Proposition (non appliquée dans `AGENTS.md` ni dans le préambule des sous-agents) :
+1. Avant toute action sur une tâche : lire le résumé du catalogue, le contrat et le plan de la tâche.
+2. Annoncer en une ligne les objectifs repris du contrat.
+3. Sans contrat pour une tâche C2 ou plus : arrêt, et demande à l'orchestrateur.
+
+Statut : à valider par l'exploitant avant écriture dans `AGENTS.md`.
+Non vérifié : que les sous-agents lisent aujourd'hui le contrat avant de travailler.
+
+## 26. Reste à faire (liste de suivi, 2026-11-15)
+
+Points en attente, par ordre de priorité. Chacun attend une décision ou un GO de l'exploitant.
+
+### Mémoire (worktrees)
+- [ ] Mettre à jour l'index `MEMORY.md` (ligne « Pas de worktree par défaut ») avec la règle du 2026-11-15.
+- [ ] Fusionner les règles du fichier `feedback_worktree_confirm.md` : la note du 2026-11-09 (« NE PLUS CRÉER DE WORKTREE ») contredit celle du 2026-11-15. Une seule règle datée.
+- [x] Sous-agents : jamais de worktree (précisé 2026-11-15). Coordinateur et orchestrateur sont des agents, pas des sous-agents.
+- [x] Périmètre worktree : coordinateur ET orchestrateur (tranché 2026-11-15).
+
+### Hook d'alerte worktree
+- [ ] GO exploitant pour un hook `PreToolUse` (filtre `EnterWorktree|Agent`), écrit dans `.claude/settings.json`, avec test.
+
+### Tests
+- [ ] `test_role_commands.py` échoue : une citation de l'ancienne commande reste dans la description de `TOOLS/AGENT_WORKFLOW/skills/workflow-project/SKILL.md`. Correction refusée une fois, à relancer sur accord.
+
+### Superviseur et titre
+- [ ] Choix : connecter la session au Superviseur (ID natif `139d7672-37f8-47e7-94e6-62a0018a8b8c`, titre court `PROJECT WORKFLOW AGENTS`) ou ne pas la connecter.
+
+### Commits
+- [ ] Proposition A (plan T427) : commit seulement sur GO.
+- [ ] Proposition B (fichiers de rôle et scripts) : relecture du diff avant GO.
+
+### Worktrees existants
+- [ ] `t428-j5` : 266 fichiers modifiés non committés (surtout `CODE_XML/`). Décision : committer dans une branche, ou abandonner. Aucune suppression sans GO.
+- [ ] `t429-supervisor-docs` : 1 fichier modifié, T429 l'utilise encore. À garder tant que T429 l'utilise.
+
+### Origine des commits sur main
+- [ ] Qui a fait le regroupement de `main` (12 commits au-dessus du backup `pre-regroupement-20261115`) : à remonter.
+- [ ] Travail direct sur `main` (commits T429 de ce soir) : faut-il un accord écrit par tâche ?
+
+### Plan T427
+- [ ] Section 25 (lecture obligatoire avant tâche) : valider avant écriture dans `AGENTS.md`.
+- [ ] Fusionner les sections 23 et 24 (étude orchestrateur et `/schedule`), et trancher le nom `T000-CC07` (la convention exige `T###`).

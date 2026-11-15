@@ -63,7 +63,7 @@ def build_brief() -> str:
         f"◆ Catalogue : {_counters()}.",
         "◆ Rôle : aucun pour l'instant (pas de commande de lancement).",
         "→ Commandes utiles :",
-        "    /workflow-project : démarrage guidé (tâche, dépannage, cadrage)",
+        "    /workflow-project-orchestrator ou /workflow-project-coordinator : démarrage guidé (tâche, dépannage, cadrage)",
         "    « état des tâches » : lecture du catalogue",
         "    « cherche le blocage » : dépannage",
         "    /connect-session-supervisor : rattacher la session au Superviseur",
