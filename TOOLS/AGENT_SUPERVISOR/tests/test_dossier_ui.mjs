@@ -17,7 +17,7 @@ const timers=[];
 const snapshot = {running:true,token:'token',model:'local',allow_cloud:false,service_version:2,update_available:true,sessions:[{id:'s1',platform:'claude',native_id:'session-a',alias:'A',state:'active',analysis_state:'alert',mission:'Mission A',chat_messages:[],judge_request:null,
  memory_state:{fenetre:2,memoire_longue:5,journal:3,preuves_acquises:3,cadrage:1,ecartes:0,fenetre_tronquee:false,regles:12,dossier_lecture:{fichiers:['DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/CONTRAT.yaml','DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/PLAN.md'],illisibles:[{path:'DOC/inexistant.md',erreur:'FileNotFoundError'}],total_caracteres:900,budget:{max_fichiers:6,max_caracteres:12000}}},
  alerts:[{id:'a1',severity:'warning',reason:'Constat TEST',evidence:'Citation TEST',disposition:'new',workflow:{status:'legacy'},memory_usage:{fenetre:2,memoire_longue:5,journal:3,preuves_acquises:3,cadrage:1,fenetre_tronquee:false},lecture_declaree:{fichiers:['DOC/WFLOW/TASKS/T429_AGENT_SUPERVISOR/CONTRAT.yaml'],illisibles:['DOC/inexistant.md']}}]},
- {id:'s2',platform:'claude',native_id:'session-mmx',alias:'T429-MMX01',state:'active',analysis_state:'no_alert',mission:'Mission MMX',chat_messages:[],judge_request:null,alerts:[]}],chat:{messages:[]}}
+ {id:'s2',platform:'claude',native_id:'session-mmx',alias:'T429-MMX01',display_title:'T429-MMX01 FIABILISATION MENU COMPLET',state:'active',analysis_state:'no_alert',mission:'Mission MMX',chat_messages:[],judge_request:null,alerts:[]}],chat:{messages:[]}}
 class FakeNotification{constructor(title,options){this.close=()=>{};}}FakeNotification.permission='granted';FakeNotification.requestPermission=async()=>'granted';window.Notification=FakeNotification;class FakeAudioContext{state='suspended';async resume(){this.state='running';}}window.AudioContext=FakeAudioContext;
 const posts=[];
 const fetch = async (url, options={}) => { if(options.method==='POST') posts.push(JSON.parse(options.body||'{}')); return {ok:true,status:200,json:async()=>snapshot}; };
@@ -71,4 +71,9 @@ assert.match(html,/\.model-tag\.model-mmx\{color:#ffdd57\}/,'standard acteur MMX
 assert.match(html,/\.model-tag\.model-agy\{color:#8ab4f8\}/,'standard par acteur : texte colore seul');
 assert.doesNotMatch(html,/\.model-tag\{[^}]*background/,'remarque exploitant : plus de badge encadre, du texte colore');
 assert.match(html,/\.side-session-meta-row\{display:flex/,'le badge et la meta partagent une ligne');
-console.log('R13/R14 + R16 UI : 16 asserts PASS');
+// R29 (demande exploitant 2026-11-16) : le MENU DE GAUCHE affiche le titre COMPLET
+// (display_title), pas l alias seul ; fallback alias quand le titre n est pas pose.
+const sidebarTitles=Array.from(document.querySelectorAll('.side-session .side-session-title')).map(el=>el.textContent);
+assert.ok(sidebarTitles.includes('T429-MMX01 FIABILISATION MENU COMPLET'),'menu gauche : titre COMPLET affiche quand display_title est pose');
+assert.ok(sidebarTitles.includes('A'),'menu gauche : repli sur l alias quand display_title absent');
+console.log('R13/R14 + R16 + R29 titre complet menu gauche : PASS');
