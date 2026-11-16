@@ -1656,7 +1656,7 @@ class Supervisor:
         if self.load_error:
             raise ValueError("Configuration illisible : ecriture refusee pour proteger les donnees existantes")
         data = dict(model=self.model, allow_cloud=self.allow_cloud, judge_settings=self.judge_settings, sessions=[
-            {key: value.get(key, False if key == "closed" else None) for key in ("id", "platform", "native_id", "alias", "display_title", "task_id", "task_title", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "alerts", "source_checkpoint", "source_event_index", "context_revision", "analyzed_revision", "context", "context_truncated", "messages_observed", "memory", "recovery", "enabled", "events", "framing", "source_generation", "acquired_proofs", "session_journal", "judge_turn_count", "closed")} for value in self.sessions.values()])
+            {key: value.get(key, False if key == "closed" else None) for key in ("id", "platform", "native_id", "alias", "display_title", "task_id", "task_title", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_origin", "mission_structure_updated_at", "alerts", "source_checkpoint", "source_event_index", "context_revision", "analyzed_revision", "context", "context_truncated", "messages_observed", "memory", "recovery", "enabled", "events", "framing", "source_generation", "acquired_proofs", "session_journal", "judge_turn_count", "closed")} for value in self.sessions.values()])
         if self.persist_chat:
             data['chat_histories'] = {('global' if key is None else key): value for key, value in self._chat_histories.items()}
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1967,8 +1967,21 @@ class Supervisor:
                     raise ValueError("Maximum 20 affectations")
                 if any(s["platform"] == platform and s["native_id"] == native_id for s in self.sessions.values()):
                     raise ValueError("Session deja affectee")
-                sid = str(uuid.uuid4())
-                session = self._new_session(sid, platform, native_id, command.get("alias", native_id), True, self._mission(command.get("mission", "")), command.get("display_title", ""))
+                # R29/P7 (2026-11-16) : une session CLOTUREE du meme native_id n'invente pas un
+                # nouvel id a chaque re-rattachement : la meme affectation est relancee (id conserve),
+                # alias/mission/tache remis a l'etat du rattachement. Historique et evenements gardes.
+                session = next((s for s in self.sessions.values()
+                                if s["platform"] == platform and s["native_id"] == native_id and s.get("closed")), None)
+                created = False
+                if session is None:
+                    created = True
+                    sid = str(uuid.uuid4())
+                    session = self._new_session(sid, platform, native_id, command.get("alias", native_id), True, self._mission(command.get("mission", "")), command.get("display_title", ""))
+                else:
+                    session["closed"] = False
+                    session["enabled"] = True
+                    session["state"] = "active"
+                    session["alias"] = str(command.get("alias") or native_id)[:100]
                 # T429 : tache liee et titre officiel stockes comme champs propres.
                 session["task_id"] = str(command.get("task_ref") or "").strip()[:32]
                 session["task_title"] = str(command.get("task_title") or "").strip()[:300]
@@ -1993,8 +2006,15 @@ class Supervisor:
                     session["source_checkpoint"] = session["watcher"].checkpoint()
                     session["context_truncated"] = True
                 self.sessions[sid] = session
-                _trace(event="affectation_ajoutee", session=sid, alias=session.get("alias"),
-                       platform=platform, native_id=native_id, task_id=session.get("task_id"))
+                if created:
+                    _trace(event="affectation_ajoutee", session=sid, alias=session.get("alias"),
+                           platform=platform, native_id=native_id, task_id=session.get("task_id"))
+                else:
+                    record_event(session, "session_reattached",
+                                 f"Re-rattachement d'une session clôturée : affectation conservée ({sid})",
+                                 timestamp())
+                    _trace(event="affectation_reattachee", session=sid, alias=session.get("alias"),
+                           platform=platform, native_id=native_id, task_id=session.get("task_id"))
                 self._persist()
                 self._write_note(self.sessions[sid])
             elif action == "resume_all":
