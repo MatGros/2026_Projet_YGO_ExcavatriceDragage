@@ -509,7 +509,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // Position de travail exacte = jeton AtP1/AtMaintenance issu d'un front.
     // Le mot capteurs reste une information de zone et n'autorise pas la descente.
     Data.SequenceState.WinchDescentAuth_M3     :=
-        NOT GVL_IHM.Commun.Cfg.TglEnableWinchDescentLock_M3
+        (instModes.Auth.Mode = E_Mode.MAINT_N2)
+        OR NOT GVL_IHM.Commun.Cfg.TglEnableWinchDescentLock_M3
         OR GVL_IHM.M3Translation.State.AtP1
         OR GVL_IHM.M3Translation.State.AtMaintenance
         OR GVL_IHM.M3Translation.Bypass.LimitSwitch

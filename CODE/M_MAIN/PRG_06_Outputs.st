@@ -353,6 +353,7 @@ instSyncContactorFinal(
     Contactor3_M1 := M1SpeedContactor3, Contactor3_M2 := M2SpeedContactor3,
     Contactor4_M1 := M1SpeedContactor4, Contactor4_M2 := M2SpeedContactor4,
     BypassGlobal  := GVL_IHM.M1M2Sync.Bypass.Global
+                     OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
                      OR GVL_IHM.M1TreuilRetenue.Bypass.Global
                      OR GVL_IHM.M2TreuilBenne.Bypass.Global
                      OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback
