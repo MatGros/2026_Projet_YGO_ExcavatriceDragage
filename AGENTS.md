@@ -16,10 +16,19 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 
 ### 1. ⏱️ Portée & exemptions
 - **Quand :** une fois au **1er message** de la session, puis **uniquement** après une compaction de contexte.
-- **Relance à la demande (chat déjà ouvert) :** `/workflow-project resume` (avec récupération du contexte)
-  ou `/workflow-project fresh` (sans récupération) — canonique `TOOLS/AGENT_WORKFLOW/skills/workflow-project/SKILL.md`.
+- **Relance à la demande (chat déjà ouvert) :** `/workflow-project-orchestrator` ou `/workflow-project-coordinator` (avec récupération du contexte).
+  L'ancienne commande `/workflow-project` est retirée (plan T427 §22).
 - **Exemptions (passage direct à la mission) :** sous-agent délégué
   (`TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md`) ou agent mandaté en revue/audit en lecture seule.
+
+### 1bis. Lecture et choix au démarrage (tout agent, toute session)
+Quel que soit l'agent (orchestrateur, coordinateur, autre), à l'ouverture d'une session dans le projet :
+1. Lire les documents de démarrage : résumé du catalogue (`DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md`), puis le contrat et le plan de la tâche si une tâche est en cours. Jamais le catalogue `TASKS.yaml` en entier.
+2. Dire en quelques lignes où on en est : tâche, étape, ce qui attend une décision de l'exploitant.
+3. Proposer 3 ou 4 choix concrets pour la suite.
+4. Lister les commandes utiles pour ces choix, une ligne chacune.
+5. Poser une question seulement si une décision est nécessaire ; sinon attendre une consigne.
+Il ne modifie rien, ne prend aucune tâche et ne lance aucun rattachement sans accord.
 
 ### 2. 📚 Socle minimal & restitution (≤ 10 lignes, zéro bannière épaisse)
 - **Lectures au démarrage :** `AGENTS.md` (via `@import` ou lecture directe) +
@@ -39,22 +48,11 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
   - 🕵️ **Troubleshooting :** `TOOLS/AGENT_WORKFLOW/skills/troubleshooting/SKILL.md` + méthode `TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md` (snapshot, test CI ad hoc, `Device.export` interdit).
 - Changement CODESYS/ST : standards (`DOC/STDS/`), architecture et spec métier (`DOC/AF/`) chargés à la demande (§ Avant de coder).
 
-### 4. 🧭 Ligne d'étape — savoir où on en est
-En tête de **chaque réponse de travail** (pas d'une simple réponse de dialogue), une seule ligne :
-
-```text
-🟦 🔎 T427 · ÉTUDE · Orchestrator
-```
-
-- ⬜ 💬 **CADRAGE** — tri de l'intention, questions
-- 🟦 🔎 **ÉTUDE** — lecture, analyse, revue, challenge
-- 🟧 🛠️ **RÉALISATION** — écriture après GO
-- 🟨 🧪 **TEST** — essais, gates, contrôles
-- 🟩 ✅ **RESTITUTION** — bilan, preuves, attente de validation
-- 🟪 🕵️ **DIAGNOSTIC** — voie troubleshooting
-- 🟥 ⛔ **ARRÊT** — cas de la liste fermée
-
-Hors tâche : `T000`. Les emojis d'esprit sont encouragés dans le corps des réponses.
+### 4. Ligne d'étape — retirée (2026-11-15)
+Demande exploitant : les emojis de structure décalent le texte dans le chat. Plus de ligne d'étape
+en tête de réponse. Réponses en texte simple (tirets, numéros). L'étape reste affichée dans la barre
+de statut, pas dans les réponses.
+Hors tâche : `T000` (provisoire, sans contrat ni critère évaluable ; un seul coordinateur T000 à la fois).
 
 **Pied de réponse — où on peut aller :** chaque réponse de travail finit par une ligne
 `➡️ Choix : …` listant 2 à 4 suites possibles (étape suivante, autre voie, retour, aide).
@@ -299,7 +297,9 @@ Une vérification qui ne porte sur aucun objectif est creuse : sur 53 tâches d�
 étaient 3 phrases génériques (REX 2026-07-29).
 
 - Gabarit : `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`
-- Contrôle : `python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_<id>.yaml`
+- Emplacement canonique : `DOC/WFLOW/TASKS/<dossier-tâche>/CONTRACTS/TASK_CONTRACT_<id>.yaml`, référencé par le champ `contrat` de `TASKS.yaml`.
+  Réutiliser le dossier propre à la tâche s'il existe ; sinon créer `DOC/WFLOW/TASKS/<id>/CONTRACTS/`.
+- Contrôle : `python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <chemin-du-contrat>`
 - Détail, axes patch/rebuild et séquence rebuild : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`
 
 🔁 **Règle `fix:` + `guard:`** : tout bug détecté donne **deux** livrables — la correction **et**

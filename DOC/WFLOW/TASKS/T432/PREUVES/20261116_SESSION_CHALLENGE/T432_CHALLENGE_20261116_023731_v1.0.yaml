@@ -1,0 +1,151 @@
+```
+🟡 ADVISORY — Ni A brute ni B ne satisfont le critère « zéro seconde source de vérité ».
+Seule une A bornée (index de routage + clause de préséance + garde CI) rend un agent neuf opérationnel au 1er message.
+Horodatage : 2026-11-16 · Tâche : T432 · Mode : FULL_DIALECTIC
+```
+
+---
+
+## Phase 0 — Cadrage & Challenge du Prompt
+
+**Question brute :** *« A (bloc de 15 lignes) vs B (ligne de désambiguïsation par skill/commande) — laquelle rend un agent neuf opérationnel dès le 1er message sans créer de seconde source de vérité ? »*
+
+### Corrections factuelles au cadrage (postulats démasqués)
+
+1. **« 4 pointeurs lignes 45-48 » ne sont pas des définitions de rôle.** Dans le fichier fourni, ce sont les 4 voies de *routage* (§3 : réponse directe / orchestrator / task / troubleshooting). La « règle canonique des rôles » est ailleurs : §Gestion du Task Manager renvoie à `task-planner/SKILL.md`. Le prompt mélange donc deux objets distincts : *routage* et *définition de rôle*.
+2. **« 2 rôles » n'est pas ancré dans le fichier.** Le contexte nomme au moins 4 artefacts qui se chevauchent : skill `orchestrator`, commande `/workflow-project-orchestrator`, commande `/workflow-project-coordinator` (§1), fiche `ROLE.md`, skill `task-planner`. Le chiffre « 2 » est une hypothèse de l'auteur, pas un fait mesuré — le bloc de 15 lignes reposerait donc sur une taxonomie non validée.
+3. **L'échantillon n = 2 dont 1 Haiku.** L'échec « annonce la commande sans savoir la lancer » est un symptôme d'**hallucination de modèle** (petit modèle), pas de structure documentaire. Une des deux observations n'est donc pas adressée par A ni par B.
+4. **`AGENTS.md` interdit explicitement la duplication** (« Il pointe les règles, il ne les recopie pas — une règle écrite deux fois dérive toujours »). Toute proposition doit être jugée contre cet invariant, pas seulement contre le ressenti de session.
+5. **Précédent de dérive déjà présent :** §1 acte la suppression de `/workflow-project` (T427 §22). Les libellés de commandes *changent* — c'est la preuve empirique que tout contenu volatil mis dans `AGENTS.md` dérivera.
+
+### Objectif mesurable recadré
+
+- 🎯 **Objectif :** réduire à **≤ 1** le nombre de fichiers ouverts avant la première décision de routage correcte, et à **0** le taux de commande hallucinée sur une session neuve — sans qu'aucune règle de rôle ne soit écrite dans deux fichiers à des fins contradictoires.
+- ⛔ **Non-Goals :**
+  - Ne pas recopier les procédures de rôle (elles restent dans `SKILL.md`).
+  - Ne pas insérer d'arborescence racine dans `AGENTS.md` (contenu le plus volatile, exposition maximale à la dérive).
+  - Ne pas créer de `N` désambiguïsations croisées skill ↔ commande (O(N²) de vérité dupliquée).
+  - Ne pas modifier le comportement des skills ni le catalogue `TASKS.yaml`.
+- 📐 **Critère d'acceptation :** test session neuve, n ≥ 5, ≥ 2 modèles dont un petit (Haiku) : routage correct au 1er message, 0 commande hallucinée, rôles cités 5/5.
+
+---
+
+## Phase 1 — Arène contradictoire
+
+### 🚀 Agent A (Innovation & Opportunité)
+
+- **La racine du mal n'est pas le pointeur, c'est l'absence d'index de « quoi/lequel ».** Les `SKILL.md` sont autoritaires pour le *comment* ; personne n'est autoritaire pour le *quel*. A crée cet index, et par construction il ne duplique pas le *comment*.
+- **Un tableau de routage n'est pas une seconde source de vérité s'il est borné et subordonné.** Un DNS n'est pas le serveur : il est autoritaire pour router, subordonné pour servir. Une clause « en cas de divergence, `SKILL.md` fait foi » suffit à lever l'ambiguïté de préséance.
+- **Le vrai levier contre Haiku n'est pas 15 lignes de prose mais le jeton de commande verbatim.** Écrire exactement `` `/workflow-project-orchestrator` `` (avec la bonne orthographe, en code inline) supprime l'hallucination de commande à coût quasi nul — c'est ça qui a cassé en T000-CC10.
+- **Pépite : rendre l'index vérifiable mécaniquement.** Un script déterministe qui échoue en CI si un chemin de l'index n'existe plus ou si la règle de choix ne correspond plus à une constante canonique transforme la « discipline humaine » en garde-fou. La dérive devient impossible sans build rouge.
+
+### 🛡️ Agent B (Red Team & Risques indirects non évidents)
+
+- **A viole l'invariant écrit du fichier.** « Ne pas recopier » est explicite. Un bloc de 15 lignes de rôles *est* une recopie → seconde source de vérité dès la première divergence. Qui gagne en cas de conflit ? Non défini dans la formulation brute → risque d'agent confiant et faux.
+- **L'arborescence racine est l'élément le plus volatil.** L'inscrire dans le fichier lu à *chaque* session maximise la surface de dérive : ajout de répertoire = index périmé = routage faux avec assurance élevée. C'est le pire champ possible à mettre ici.
+- **B est pire que A sur le critère demandé.** « Une ligne de désambiguïsation dans *chaque* description » = vérité dupliquée en O(N²) (chaque paire skill/commande doit se désambiguïser mutuellement). Renommer un skill impose N éditions synchronisées. C'est exactement l'anti-pattern que l'en-tête du fichier dénonce.
+- **Risque de fausse opérationnalité (nouveau mode de panne).** Un agent qui lit un résumé de 15 lignes *croira* savoir et sautera l'ouverture de `SKILL.md` → il agira sur un résumé insuffisant. L'état actuel, lent mais correct, disparaît.
+- **Coût de contexte permanent + dilution.** 15 lignes × chaque session × chaque agent, sur un petit modèle : effet « lost in the middle » possible, qui peut *aggraver* le symptôme « ne cite pas les rôles » au lieu de le corriger.
+- **Facteur humain sous stress (nuit, carrière noyée).** Un exploitant lit l'index et le tient pour à jour ; une arborescence périmée devient un risque d'exploitation, pas seulement de routage agent.
+- **Risque de mode commun.** Si A est appliqué à moitié et B aussi (deux contributeurs), on obtient deux cartes superposées sans règle de préséance → pire que l'état initial.
+- **Gouvernance.** L'architecture « pointeurs seuls » a été choisie délibérément (T427). La remplacer est un changement de contrat qui exige un plan avec critères d'acceptation, pas un patch de 15 lignes en session.
+
+---
+
+## Phase 2 — Synthèse décisionnelle (Arbitre C)
+
+**Verdict : la question est un faux dilemme.** A brute échoue (viole l'invariant anti-duplication, arborescence volatile, fausse opérationnalité). B échoue plus gravement (O(N²) de vérité dupliquée, exactement ce que le fichier interdit). Seule une **A bornée, subordonnée et gardée mécaniquement** satisfait le critère « opérationnel au 1er message sans seconde source de vérité ». B est conservée, mais *réduite* à un pointeur d'une ligne par fichier (O(N), pas O(N²)).
+
+### 🌟 Pépites émergentes retenues
+
+1. **Index de routage borné** dans `AGENTS.md` (~8 lignes, pas 15) : les 2 chemins canoniques de rôle, la règle de choix en une ligne, et la clause de préséance *« `SKILL.md` fait foi en cas de divergence ; ce bloc n'est qu'un index »*. C'est l'autorité du « lequel », pas du « comment ».
+2. **Jeton de commande verbatim** en code inline (orthographe exacte) : neutralise directement l'échec T000-CC10 (commande annoncée mais non lançable).
+3. **Garde CI déterministe** (`check_routing_index.py`) : échoue si un chemin de l'index n'existe plus ou si la règle de choix diverge d'une constante canonique. La dérive devient un build rouge, plus une affaire de discipline.
+
+### 🛑 Pièges et risques indirects éliminés
+
+- ❌ **Arborescence racine dans `AGENTS.md`** — champ le plus volatil, dérive maximale, aucun besoin pour le routage au 1er message.
+- ❌ **Bloc de 15 lignes de description de rôles** — devient une seconde source de vérité par construction ; viole l'invariant écrit du fichier.
+- ❌ **Désambiguïsation croisée dans chaque skill/commande (B brute)** — O(N²) de vérité dupliquée, pire que A sur le critère demandé.
+- ❌ **Généraliser depuis n = 2 dont 1 Haiku** — l'échec de commande hallucinée est un symptôme de modèle ; il se traite par jeton verbatim, pas par prose supplémentaire.
+
+### 🎯 Décision recommandée & plan d'action chirurgical
+
+1. **`AGENTS.md` §3** — remplacer les 4 pointeurs de routage par un bloc « Index de routage » borné : chemins canoniques + règle de choix 1 ligne + jeton verbatim + clause de préséance. **Pas d'arborescence.**
+2. **`AGENTS.md` §Gestion du Task Manager** — conserver le renvoi unique vers `task-planner/SKILL.md` comme autorité de rôle (déjà en place, ne pas dupliquer).
+3. **`TOOLS/AGENT_WORKFLOW/scripts/check_routing_index.py`** (nouveau) — vérifie existence des chemins + égalité de la règle de choix à une constante canonique ; sortie non nulle en cas de dérive. Brancher en CI.
+4. **Une ligne par skill/commande** : `Index de routage : AGENTS.md §Index de routage` (O(N), unidirectionnel vers l'index).
+5. **Test d'acceptation session neuve** : n = 5, ≥ 2 modèles dont Haiku ; mesurer fichiers ouverts avant routage, commande citée correcte, commandes hallucinées. Seuils : ≤ 1 fichier, 5/5, 0.
+6. **Rollback** : diff confiné à une section + un script ; revert trivial si le test d'acceptation échoue.
+
+---
+
+```yaml
+challenge_evaluation:
+  version: "1.0"
+  subject: "Routage premier message — index AGENTS.md vs désambiguïsation par skill"
+  task: "T432"
+  prompt_status: "HARDENED"
+  verdict: "ADVISORY"
+
+  target_goal: "≤ 1 fichier ouvert avant routage correct au 1er message, 0 commande hallucinée, 0 seconde source de vérité"
+  non_goals:
+    - "Pas d'arborescence racine dans AGENTS.md"
+    - "Pas de recopie des procédures de rôle (SKILL.md reste autoritaire)"
+    - "Pas de désambiguïsation croisée O(N²) dans chaque skill/commande"
+    - "Pas de modification du catalogue TASKS.yaml ni des skills"
+
+  prompt_corrections:
+    - "Les '4 pointeurs lignes 45-48' sont des voies de routage, pas des définitions de rôle"
+    - "'2 rôles' est une hypothèse non mesurée (au moins 5 artefacts chevauchants dans le contexte)"
+    - "n=2 dont 1 Haiku : l'échec commande hallucinée est un symptôme de modèle, pas de structure"
+    - "Preuve de dérive existante : suppression de /workflow-project (T427 §22)"
+
+  emergent_ideas:
+    - title: "Index de routage borné + clause de préséance"
+      gain: "Autorité du 'lequel' sans dupliquer le 'comment'"
+      safety_guard: "Clause 'SKILL.md fait foi en cas de divergence'"
+    - title: "Jeton de commande verbatim en code inline"
+      gain: "Neutralise l'échec T000-CC10 (commande non lançable)"
+      safety_guard: "Orthographe exacte validée par garde CI"
+    - title: "Garde CI déterministe check_routing_index.py"
+      gain: "Dérive = build rouge, plus une affaire de discipline"
+      safety_guard: "Échec si chemin absent ou règle de choix divergente"
+
+  identified_indirect_risks:
+    - risk: "Violation de l'invariant écrit anti-duplication d'AGENTS.md"
+      severity: "HIGH"
+      mitigation: "Index borné au 'quoi/lequel' + clause de préséance explicite"
+    - risk: "Arborescence racine volatile dérivant chaque session"
+      severity: "HIGH"
+      mitigation: "Arborescence exclue du Non-Goals"
+    - risk: "Prop B : vérité dupliquée en O(N²) skill/commande"
+      severity: "HIGH"
+      mitigation: "Réduite à un pointeur d'une ligne vers l'index"
+    - risk: "Fausse opérationnalité — agent saute SKILL.md en croyant savoir"
+      severity: "MEDIUM"
+      mitigation: "Index explicitement déclaré non procédural"
+    - risk: "Dilution de contexte sur petits modèles (lost in the middle)"
+      severity: "MEDIUM"
+      mitigation: "Bloc ~8 lignes, pas 15"
+    - risk: "Mode commun : A et B appliqués partiellement sans préséance"
+      severity: "MEDIUM"
+      mitigation: "Clause de préséance unique dans l'index"
+    - risk: "Facteur humain — exploitant sous stress lit un index périmé"
+      severity: "MEDIUM"
+      mitigation: "Garde CI + mention 'index, non procédure'"
+
+  recommended_action:
+    file: "AGENTS.md"
+    section: "§3 Tri & aiguillage sur 4 voies"
+    summary: "Remplacer les 4 pointeurs de routage par un index borné (~8 lignes) : chemins canoniques de rôle, règle de choix 1 ligne, jeton de commande verbatim, clause 'SKILL.md fait foi'. Arborescence exclue. Ajouter check_routing_index.py en CI et un pointeur d'une ligne dans chaque skill/commande."
+
+  acceptance_tests:
+    - "n=5 sessions neuves, >=2 modèles dont Haiku"
+    - "fichiers ouverts avant routage correct <= 1"
+    - "commandes hallucinées = 0"
+    - "rôles cités 5/5"
+    - "check_routing_index.py : sortie 0 en état stable, non nulle si chemin renommé"
+```
+
+➡️ Choix : (1) valider la A bornée et rédiger le diff `AGENTS.md` §3 · (2) écrire d'abord `check_routing_index.py` (garde CI avant tout) · (3) instruire la taxonomie réelle des rôles avant l'index · (4) relancer un challenge ciblé sur le seul échec Haiku.

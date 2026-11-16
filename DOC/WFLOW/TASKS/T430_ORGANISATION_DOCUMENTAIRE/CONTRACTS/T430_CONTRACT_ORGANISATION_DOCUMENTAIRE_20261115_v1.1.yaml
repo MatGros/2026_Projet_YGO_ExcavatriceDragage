@@ -1,0 +1,176 @@
+contract:
+  task_id: T430
+  criticality: C2
+  strategy: patch
+  objective: Rendre chaque dossier de tâche directement navigable et compatible avec Task Manager et les outils, en normalisant les documents racine et les contrats sans perte de références ni de preuves historiques.
+  acceptance:
+  - id: AC1
+    statement: Les 391 fichiers inventoriés au GO de T430 restent présents après correction ; seules les modifications
+      de noms, métadonnées de migration et liens identifiés sont autorisées. L’écart de trois sauvegardes .bak avec le
+      relevé historique de 394 est déclaré comme antérieur à ce lot, sans attribuer sa cause.
+    verified_by: Inventaire et empreintes avant/après ; diff explicite des contenus changés, zéro disparition et zéro
+      collision Windows.
+  - id: AC2
+    statement: Les 33 suffixes de version altérés _VX_Y.md sont rétablis en _vX.Y.md avec préfixe de tâche T majuscule
+      conservé ; G340 découvre réellement ces versions sous DOC/WFLOW/TASKS.
+    verified_by: Test de latest_versions/all_versions sur leur emplacement réel et test CLI G340 en fixture avec ancienne/nouvelle
+      version ; la version périmée est signalée.
+  - id: AC3
+    statement: G340 et G530 extraient intégralement un chemin actif contenant espaces et parenthèses, sans traiter une
+      extraction vide comme une preuve de présence ; le retrait de sa cible provoque le résultat d’échec attendu.
+    verified_by: 'Tests fixtures : chemin réel T_TEMP (A TRIIER), formes YAML simple/quotée/repliée et liens Markdown
+      pertinents ; mutation cible retirée rejetée.'
+  - id: AC4
+    statement: G530 retrouve toutes les sources attendues du corpus contractuel déclaré, y compris le contrat legacy
+      T273 et les autres YAML du dossier CONTRACTS historique ; exemples TASKS/TXXX, archives et sauvegardes sont exclus,
+      les fichiers réels préfixés TXXX restent contrôlés.
+    verified_by: Inventaire indépendant des sources avec rôles ; tests contrat standard, legacy, contexte/catalogue de
+      signaux et fichiers exemple/archives/sauvegardes ; vérification que la suppression d’une source attendue est détectée
+      par le contrôle de couverture.
+  - id: AC5
+    statement: Chaque référence catalogue de ce lot est migrée par correspondance exacte ancien chemin complet vers successeur
+      existant unique ; les champs métier id/statut/agent/objectif restent identiques, hors date de suivi imposée par
+      le protocole.
+    verified_by: Table de correspondance dans le PLAN, comparaison sémantique avant/après de chaque tâche ; API Task
+      Manager avec work-lock/edit-flag/revision ; ambiguïtés laissées explicitement non modifiées.
+  - id: AC6
+    statement: Les liens opératoires du corpus concernés par la migration résolvent vers les fichiers attendus ; les
+      citations historiques et preuves datées conservent leur provenance.
+    verified_by: Contrôle des liens avec résolution depuis chaque appelant ; cinq liens T226/T229 de la revue inclus
+      ; échantillons historiques conservés et métadonnées racine historique/racine courante distinguées.
+  - id: AC7
+    statement: G525 retrouve un GEL courant unique, termine sans erreur de fichier et produit un inventaire non vide
+      ; aucune conclusion de conformité des transitions n’est déduite du seul code retour.
+    verified_by: Exécution read-only sur le dépôt et fixtures absent/ambigu ; source GEL et nombres de transitions publiés,
+      résultats non déclarés conservés comme constats.
+  - id: AC8
+    statement: T356 exige une destination explicite de nouveau run et refuse l’écrasement d’artefacts existants ; un
+      scan ne recrée pas DOC/WFLOW/AUDITS et ne modifie aucune des neuf annexes historiques T356.
+    verified_by: Génération en temp système hors dépôt, comparaison de l’ensemble attendu de sept CSV et un JSON ; empreintes
+      des neuf annexes historiques inchangées ; cas destination occupée refusé ; CLI avec --out sans racine correctement
+      analysée.
+  - id: AC9
+    statement: Les contrôles de versions et de références conservent les exclusions et qualifications historiques pertinentes
+      lors des déplacements ; le sas T_TEMP n’est pas exclu globalement pour obtenir un succès.
+    verified_by: Tests D7/prose historique, exemples/archives exclus de la découverte et des versions actives selon la
+      politique explicitée ; aucune réécriture de décisions humaines ni de sémantique AF.
+  - id: AC10
+    statement: Un garde-fou automatique couvre les défauts de migration corrigés et échoue pour une référence active
+      cassée, une perte de couverture ou un suffixe de version invalide dans le corpus déclaré.
+    verified_by: Script check_document_organisation.py avec tests positifs et négatifs ; revue indépendante du diff ;
+      aucun ajout de baseline pour absorber ces défauts.
+  - id: AC11
+    statement: Le lot distingue les corrections prouvées des dettes préexistantes ; aucune nouvelle perte n’est introduite.
+      Les trois sauvegardes .bak absentes au GO sont signalées et leurs copies antérieures hors dépôt sont vérifiées,
+      sans prétendre à leur présence dans le corpus ou dans Git ; les trois contrats déjà en échec structurel et les
+      collisions d’identité restent hors périmètre.
+    verified_by: Baseline des contrôles avant/après, contenu des trois .bak inchangé, aucun changement d’identifiant
+      interne ; liste des écarts résiduels avec portée, sans validation PLC revendiquée.
+  - id: AC12
+    statement: >-
+      Les dossiers actifs T430, T432 et T417-C réutilisent chacun leur dossier existant sans créer de doublon
+      et exposent à la racine les documents de tâche convenus, datés et versionnés : étude, plan et fiche
+      d’entrée de tâche. Chaque document a un rôle distinct et renvoie aux autres sans recopier leur contenu.
+    verified_by: >-
+      Inventaire des trois arborescences, noms comparés aux formats
+      T<ID>_TASK_STUDY_DOCUMENT_<AAAAMMJJ>_v<X.Y>.md,
+      T<ID>_TASK_PLAN_<AAAAMMJJ>_v<X.Y>.md et T<ID>_TASK_<AAAAMMJJ>_v<X.Y>.md ; revue des liens et des rôles.
+  - id: AC13
+    statement: >-
+      Les contrats actifs des tâches ciblées sont rangés sous leur dossier CONTRACTS/ et leurs noms suivent
+      le format T<ID>_CONTRACT_<DESIGNATION>_<AAAAMMJJ>_v<X.Y>.yaml. Le champ contrat du Task Manager contient le chemin exact du YAML tant
+      que ses contrôles exigent un fichier.
+    verified_by: >-
+      Vérification du chemin par API Task Manager et audit_tasks_contracts.py ; check_task_contract.py accepte
+      le YAML ; contrôle négatif d’un champ contrat pointant vers un dossier ; nom du YAML comparé à la
+      convention validée.
+  - id: AC14
+    statement: >-
+      Les gabarits et consignes des agents décrivent la même structure, les rôles distincts des trois documents
+      racine, CONTRACTS/ par défaut, PREUVES/ lorsque des preuves sont produites et ARCHIVES/ pour préserver
+      les pièces historiques. Aucune règle ne dit que le plan est l’unique document de travail ou que ces
+      dossiers exigent une approbation au cas par cas.
+    verified_by: >-
+      Revue croisée de AGENTS.md, WORKFLOW.md, task-planner, orchestrator et TXXX ; recherche des anciennes
+      formulations contradictoires et concordance des noms avec le contrat et le Task Manager.
+  - id: AC15
+    statement: >-
+      Les références actives de T432 et T417-C pointent toutes vers les emplacements actuels ; les anciennes
+      références opératoires sont migrées exactement, tandis que citations et archives historiques restent conservées.
+    verified_by: >-
+      Comparaison des liens dans TASKS.yaml, contexte, README, plans et contrats ; G340/G530 ciblés ; comparaison
+      de contenu et historique Git avant/après, après accord des propriétaires ou transfert formel des verrous.
+  - id: AC16
+    statement: >-
+      Le lot n’altère pas les contenus métier des tâches T432/T417-C, leurs identifiants, statuts ou responsables ;
+      seules les références de rangement et dates imposées par l’API changent, et aucune modification n’est faite
+      dans un dossier verrouillé par un autre acteur sans remise ou transfert formel.
+    verified_by: >-
+      Comparaison sémantique des objets Task Manager via API et revue du diff par chemin ; états des verrous et
+      traces de remise consignés avant toute écriture.
+  scope:
+    allowed:
+    - DOC/WFLOW/TASKS/T430_ORGANISATION_DOCUMENTAIRE/T430_PLAN_ORGANISATION_DOCUMENTAIRE_20261110_v1.0.md
+    - DOC/WFLOW/TASKS/T430_ORGANISATION_DOCUMENTAIRE/T430_CONTRAT_ORGANISATION_DOCUMENTAIRE_20261110_v1.0.yaml
+    - DOC/WFLOW/TASKS/T430_ORGANISATION_DOCUMENTAIRE/CONTRACTS/T430_CONTRACT_ORGANISATION_DOCUMENTAIRE_20261115_v1.1.yaml
+    - DOC/WFLOW/TASKS/T430_ORGANISATION_DOCUMENTAIRE/T430_TASK_STUDY_DOCUMENT_20261115_v1.0.md
+    - DOC/WFLOW/TASKS/T430_ORGANISATION_DOCUMENTAIRE/T430_TASK_PLAN_20261115_v1.1.md
+    - DOC/WFLOW/TASKS/T430_ORGANISATION_DOCUMENTAIRE/T430_TASK_20261115_v1.0.md
+    - DOC/WFLOW/TASKS/T432/ — documents et contrats uniquement après remise ou transfert formel du verrou CDX02
+    - DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3/ — documents et contrats uniquement après remise ou transfert formel du verrou AGY02
+    - DOC/WFLOW/TASKS/TXXX/ — gabarits de structure et de nommage uniquement
+    - AGENTS.md — section contrat de tâche uniquement
+    - TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md — emplacement et structure documentaire des tâches uniquement
+    - TOOLS/AGENT_WORKFLOW/skills/task-planner/SKILL.md — emplacement et structure documentaire des tâches uniquement
+    - TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md — emplacement et structure documentaire des tâches uniquement
+    - TOOLS/AGENT_WORKFLOW/scripts/audit_tasks_contracts.py — découverte du nouveau nommage et des contrats par tâche uniquement
+    - TOOLS/AGENT_WORKFLOW/scripts/G530_check_contract_refs.py — couverture des contrats par tâche uniquement
+    - DOC/WFLOW/TASKS.yaml — champ contrat et date via API uniquement
+    - DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/AUDITS/ — suffixes, liens et métadonnées de migration seulement
+    - DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/CONTRACTS/ — suffixes et liens seulement
+    - DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/REVIEWS/ — liens seulement
+    - DOC/WFLOW/TASKS/T_TEMP (A TRIIER)/TESTS/ — suffixes et liens seulement
+    - DOC/WFLOW/TASKS.yaml — champs contrat et date via API uniquement
+    - DOC/WFLOW/TASK_LOCKS.json — protocole API uniquement
+    - DOC/**/*.md — uniquement liens actifs univoques vers le corpus, hors documents en édition concurrente
+    - TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py
+    - TOOLS/AGENT_WORKFLOW/scripts/G530_check_contract_refs.py
+    - TOOLS/AGENT_WORKFLOW/scripts/G525_inventaire_transitions_gel.py
+    - TOOLS/AGENT_WORKFLOW/scripts/T356_scan_alarm_candidates.py
+    - TOOLS/AGENT_WORKFLOW/scripts/check_document_organisation.py
+    - TOOLS/AGENT_WORKFLOW/tests/ — tests ciblés de ces scripts
+    forbidden:
+    - CODE/
+    - CODE_XML/
+    - PRJ_CODESYS/
+    - Device.export — aucune lecture
+    - ARCHIVES/ — aucune source active
+    - TOOLS/AGENT_WORKFLOW/hooks/
+    - TOOLS/AGENT_WORKFLOW/config/contract_refs_baseline.json — aucun élargissement de dette
+    - DOC/WFLOW/TASKS/TXXX/ — aucune donnée de tâche active, gabarits uniquement
+    - CODE/ — aucun changement de logique machine
+    - migration générale des tâches hors T430, T432 et T417-C
+    - T384/T426/T427 — aucune fusion ni implémentation de leur périmètre
+    - TOOLS/AGENT_SUPERVISOR/ — travail concurrent hors lot
+    - Toute suppression supplémentaire, réaffectation d’identité ou modification de sémantique métier
+  conservation:
+    must_survive:
+    - 391 fichiers présents au snapshot du GO, leurs contenus métier et preuves historiques ; écart antérieur des trois
+      .bak explicitement documenté.
+    - Toutes les décisions et réserves humaines ; aucune restauration ou suppression automatique des sauvegardes absentes
+      au GO.
+    - Les tâches, agents et statuts métier existants ; seules les références univoques et dates de suivi changent via
+      API.
+    dropped_on_purpose: []
+  evidence_required:
+  - Inventaire/empreintes et diff des modifications autorisées.
+  - Contrôles ciblés positifs et négatifs des scripts concernés.
+  - Comparaison baseline, couverture déclarée et revue indépendante du vrai diff.
+  alert_duty: Tout nouvel écart de périmètre, cible ambiguë ou modification concurrente est signalé ; aucune correction
+    métier inventée.
+status: IN_PROGRESS
+validation:
+  status: PENDING
+  notes: GO utilisateur donné le 2026-11-11 ; exécution CDX04. Amendement factuel de baseline :391 présents au GO, trois
+    .bak absents avant toute opération T430 (copies antérieures vérifiées hors dépôt). Aucun relâchement des contrôles
+    de références ni élargissement de baseline G530.

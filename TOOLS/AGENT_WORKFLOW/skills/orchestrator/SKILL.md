@@ -62,6 +62,8 @@ prochaine étape. Afficher la bannière standard uniquement si l'utilisateur la 
 est utile pour distinguer un changement de mode ; ne pas répéter à chaque échange le catalogue des
 outils ni le workflow complet.
 
+**Ouverture de session (tout agent, 2026-11-16) :** lire le résumé du catalogue, puis le contrat et le plan de la tâche si une tâche est en cours (jamais `TASKS.yaml` en entier). Dire en quelques lignes où on en est, proposer 3 ou 4 choix, lister les commandes utiles, et poser une question seulement si une décision est nécessaire. Règle complète : `AGENTS.md` § « Lecture et choix au démarrage ».
+
 ### Échange avec les autres sessions (procédure de secours)
 
 Source unique : `DOC/WFLOW/TASKS/T000_SESSION_NAMING/PROCEDURE_SESSIONS_SECOURS.md`
@@ -129,7 +131,7 @@ contourner un 🚩 d'un autre acteur). Le 🔒 reste jusqu'à la remise réelle 
 - Lister les tâches `⏳` (en cours) et `⬜` (à faire) par criticité décroissante.
 - Identifier les `⛔` (bloquées) et lever le blocage (diagnostic `troubleshooting` si besoin).
 - Vérifier les `bloque_par` : une tâche ne se clôture pas si ses prérequis sont ouverts.
-- Dès `C2`, le contrat `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_<id>.yaml` est **obligatoire** avant
+- Dès `C2`, le contrat `DOC/WFLOW/TASKS/<dossier-tâche>/CONTRACTS/TASK_CONTRACT_<id>.yaml` est **obligatoire** avant
   la première écriture du livrable (dispenses : `WORKFLOW.md` § Contrat de tâche ; gabarit `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`, contrôle
   `check_task_contract.py`).
 

@@ -1,4 +1,25 @@
 tasks:
+- id: T432
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: ''
+  agent: —
+  titre: Commandes workflow projet accessibles dans les CLI
+  contexte: 'Demande utilisateur : rendre les voies workflow-project-orchestrator et workflow-project-coordinator accessibles
+    dans les CLI projet, notamment Codex et Antigravity, et clarifier le support des autres interfaces.'
+  description: Établir une source de comportement canonique et des adaptateurs fins par CLI pour découvrir et invoquer les
+    voies orchestrateur et coordinateur. Mesurer le support réel de Claude Code, Antigravity, Codex, DSH et Ollama avant de
+    déclarer une compatibilité.
+  objectifs:
+  - 'AC1 : Claude Code expose les deux commandes existantes et invoque la voie correspondante.'
+  - 'AC2 : Antigravity découvre et invoque les deux voies via ses skills projet.'
+  - 'AC3 : Codex découvre les deux skills via /skills et les invoque avec la syntaxe supportée.'
+  - 'AC4 : les adaptateurs délèguent à workflow_state.py et aux fiches de rôle canoniques sans recopier les procédures.'
+  - 'AC5 : vérifier séparément DSH et Ollama, consigner version, commande et preuve, sans annoncer de support non observé.'
+  contrat: DOC/WFLOW/TASKS/T432/CONTRACTS/TASK_CONTRACT_T432_COMMANDS_MULTI_CLI.yaml
+  date: '2026-11-16T01:04:48'
+  bloque_par: []
 - id: T417-F
   parent_id: T417-C
   statut: ⬜
@@ -56,7 +77,7 @@ tasks:
   criticite: C2
   domaine: SIMULATION / SIMBENCH / TRANSLATION M3
   agent: AGY02
-  date: '2026-11-15T03:07:30'
+  date: '2026-11-15T22:30:54+01:00'
   titre: Challenge & diagnostic simulation M3 (depassement butee petite vitesse)
   contexte: 'Phase 1 lecture seule + audit reel M3 (PRG_05/PRG_06/FB_Translation + L_SIMULATION). Dossier: DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3.
     Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417-C.yaml.'
@@ -68,6 +89,7 @@ tasks:
   - Reproduire le depassement de butee en simulation isolee avec oracles experts
   - Produire le dossier de validation (patch + guard) ou basculer C3/C4 si code production touche
   bloque_par: []
+  contrat: DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3/CONTRACTS/TASK_CONTRACT_T417-C.yaml
 - id: T431
   parent_id: T429
   statut: ⬜
@@ -98,7 +120,7 @@ tasks:
   criticite: C2
   domaine: DOC / WFLOW / OUTILLAGE
   agent: CDX04
-  date: '2026-11-15T16:19:12'
+  date: '2026-11-16T00:06:01'
   titre: Organisation documentaire — terminer la migration des versions, chemins et consommateurs
   contexte: Reprise demandee par exploitant le 2026-11-10 apres revue des renommages AUDITS/CONTRACTS/REVIEWS/TESTS. Integrite394
     fichiers confirmee ; migration des references incomplete. Challenge expert avant implementation realise. Lot distinct
@@ -118,7 +140,7 @@ tasks:
   - AC9 préserver qualifications historiques et exclusions documentaires pertinentes
   - AC10 fournir un garde-fou automatique et des mutations discriminantes
   - AC11 distinguer dette préexistante, corrections prouvées et hors périmètre
-  contrat: DOC/WFLOW/TASKS/T430_ORGANISATION_DOCUMENTAIRE/T430_CONTRAT_ORGANISATION_DOCUMENTAIRE_20261110_v1.0.yaml
+  contrat: DOC/WFLOW/TASKS/T430_ORGANISATION_DOCUMENTAIRE/CONTRACTS/T430_CONTRACT_ORGANISATION_DOCUMENTAIRE_20261115_v1.1.yaml
   avancement: 'PAUSE 2026-11-11 sur demande exploitant, posee par CC01 : le checkpoint 3469b7ed a deplace les fichiers T428
     vers T_TEMP (A TRIIER) ; G530 en FAIL sur 3 references T428 et lien AF-14 mort. Reprendre quand T428 aura un dossier definitif.
     2026-11-11 CDX04. Prise en charge explicite par la session Codex 01a1c3c8-aebe-7fd1-aeb7-28e5ff83efa6, chat T430-CDX04

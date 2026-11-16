@@ -61,6 +61,17 @@
             "onFailure": "block"
           }
         ]
+      },
+      {
+        "matcher": "EnterWorktree|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_worktree_guard.py",
+            "timeout": 10,
+            "onFailure": "block"
+          }
+        ]
       }
     ],
     "PostToolUse": [

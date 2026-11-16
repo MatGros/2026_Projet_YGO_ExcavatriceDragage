@@ -72,7 +72,8 @@ qui part sur la machine ; tout sujet safety.
 l'utilisateur et dans le périmètre.
 
 - Gabarit : `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`
-- Emplacement canonique : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_<id>.yaml`, référencé depuis `TASKS.yaml`
+- Emplacement canonique : `DOC/WFLOW/TASKS/<dossier-tâche>/CONTRACTS/TASK_CONTRACT_<id>.yaml`, référencé par le champ `contrat` de `TASKS.yaml`.
+  Réutiliser le dossier propre à la tâche s'il existe ; sinon créer `DOC/WFLOW/TASKS/<id>/CONTRACTS/`.
 - Contrôle : `python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>`
 
 Il porte : objectif métier · **critères testables** (chacun avec son `verified_by`) · périmètre

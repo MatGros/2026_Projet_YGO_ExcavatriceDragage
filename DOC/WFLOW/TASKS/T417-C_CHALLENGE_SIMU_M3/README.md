@@ -1,7 +1,7 @@
 # T417-C — Challenge & diagnostic simulation M3 (dépassement butée petite vitesse)
 
 - **Statut :** `⏳` (M0/M1 `DONE`, M2 prêt pour arbitrage & test au retour) · **Criticité :** `C2` (`CODE/` intact en lecture seule)
-- **Session active :** `T417-C-AGY03` · **Contrat :** [TASK_CONTRACT_T417-C.yaml](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417-C.yaml)
+- **Session active :** `T417-C-AGY03` · **Contrat :** [TASK_CONTRACT_T417-C.yaml](CONTRACTS/TASK_CONTRACT_T417-C.yaml)
 
 ## Contenu du dossier (3 fichiers actifs à la racine)
 1. **`README.md`** — Cette vue d'ensemble (1 page)

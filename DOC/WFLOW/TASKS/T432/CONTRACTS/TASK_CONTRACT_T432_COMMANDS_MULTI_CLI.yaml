@@ -1,0 +1,231 @@
+contract:
+  task_id: T432
+  revision: v1.1 (2026-11-16, périmètre restreint au Superviseur sur décision exploitant)
+  criticality: C2
+  strategy: patch
+  objective: >
+    Rendre les deux commandes du Superviseur, connect-session-supervisor et
+    review-session-supervisor, découvrables et invocables depuis chaque CLI
+    projet supporté, avec une source canonique unique de la procédure et des
+    adaptateurs fins propres à chaque interface. Hors périmètre : les voies
+    workflow-project-orchestrator et workflow-project-coordinator.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Dans Claude Code, /connect-session-supervisor et
+        /review-session-supervisor apparaissent dans la liste des commandes
+        invocables et chaque invocation produit la sortie du script Superviseur
+        correspondant.
+      verified_by: >
+        Invocation réelle des deux commandes dans une session Claude Code et
+        sortie brute de connect_session.py / review_session.py consignée.
+    - id: AC2
+      statement: >
+        Dans Codex, les deux skills sont trouvables via /skills et invocables
+        avec le préfixe de skill pris en charge par Codex.
+      verified_by: >
+        Observation de /skills dans Codex, puis invocation réelle de chaque
+        skill avec sortie correspondant au script attendu.
+    - id: AC3
+      statement: >
+        Dans Antigravity, les deux commandes sont présentes dans le menu slash
+        du projet et s'invoquent avec la sortie attendue.
+      verified_by: >
+        Observation du menu slash dans Antigravity puis invocation réelle de
+        chaque commande, sortie brute consignée.
+    - id: AC4
+      statement: >
+        Dans DSH, les deux skills sont découvrables depuis .dsh/skills et
+        invocables, ou la limite de découverte est documentée avec sa référence.
+      verified_by: >
+        Relevé daté dans DOC/WFLOW/TASKS/T432/ : commande, sortie observée ou
+        référence officielle justifiant la limite.
+    - id: AC5
+      statement: >
+        Aucune commande slash n'est annoncée pour le runner Ollama non
+        interactif ; sa limite est consignée explicitement.
+      verified_by: >
+        Relevé daté dans DOC/WFLOW/TASKS/T432/ expliquant pourquoi le runner
+        ollama_subagent.py ne peut pas exposer de commande slash.
+    - id: AC6
+      statement: >
+        La procédure de chaque commande n'existe qu'en un seul exemplaire
+        canonique ; les fichiers SKILL.md présents dans .claude/skills,
+        .agents/skills et .dsh/skills ne sont que des adaptateurs qui désignent
+        la source canonique sans recopier ses étapes.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G532_check_skill_adapters.py --report
+        et revue du diff des adaptateurs.
+    - id: AC7
+      statement: >
+        Chaque adaptateur délègue l'exécution aux clients locaux
+        TOOLS/AGENT_SUPERVISOR/scripts/connect_session.py et review_session.py,
+        sans redéfinir d'API ni de port.
+      verified_by: >
+        Revue du diff des adaptateurs et recherche des occurrences de 127.0.0.1:8082
+        dans les adaptateurs.
+
+  scope:
+    allowed:
+      - .agents/skills/connect-session-supervisor/SKILL.md
+      - .agents/skills/review-session-supervisor/SKILL.md
+      - .claude/skills/connect-session-supervisor/SKILL.md
+      - .claude/skills/review-session-supervisor/SKILL.md
+      - .dsh/skills/connect-session-supervisor/SKILL.md
+      - .dsh/skills/review-session-supervisor/SKILL.md
+      - TOOLS/AGENT_WORKFLOW/skills/supervisor-commands/**
+      - TOOLS/AGENT_WORKFLOW/scripts/G532_check_skill_adapters.py
+      - TOOLS/AGENT_WORKFLOW/tests/test_skill_adapters.py
+      - AGENTS.md
+      - TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md
+      - TOOLS/AGENT_SUPERVISOR/README.md
+      - DOC/WFLOW/TASKS/T432/**
+
+    forbidden:
+      - CODE/**
+      - DOC/WFLOW/TASKS.yaml (édition directe ; utiliser le Task Manager)
+      - DOC/WFLOW/TASK_LOCKS.json (édition directe ; utiliser le Task Manager)
+      - Toute modification des missions ou affectations d'autres sessions
+      - Tout changement de comportement du service Superviseur ou de ses scripts clients
+      - Push ou commit sans accord explicite distinct
+
+  conservation:
+    must_survive:
+      - Les deux commandes gardent leurs options et leur sémantique actuelles (--reassign, --confirm-without-task, --display-title, mode PULL).
+      - connect_session.py et review_session.py restent l'unique voie d'exécution.
+      - connect_session.py reste seul juge de la résolution du titre officiel de tâche depuis TASKS.yaml.
+      - Les skills existantes du dépôt restent découvrables dans leurs CLI respectifs.
+    dropped_on_purpose:
+      - Le périmètre workflow-project-orchestrator / workflow-project-coordinator est retiré de T432 par décision exploitant du 2026-11-16.
+
+  evidence_required:
+    - Résultat de check_task_contract.py sur ce contrat.
+    - Pour chaque CLI testé : version, commande invoquée, sortie brute et observation de découverte.
+    - Empreintes sha256 des adaptateurs prouvant qu'aucun corps de procédure n'est dupliqué.
+    - Diff des adaptateurs et preuve qu'ils délèguent aux scripts clients.
+    - Résultat du garde-fou de non-divergence sur l'ensemble des skills multi-CLI.
+    - État de rattachement Superviseur de la session T432-CDX02 (sortie de /api/supervision/summary).
+
+  models_allowed:
+    - gpt-6-luna
+    - deepseek-v4.1-flash
+
+  alert_duty: >
+    Signaler immédiatement une différence de découverte ou d'invocation entre CLI,
+    une divergence de procédure, un conflit de noms, ou une interface qui ne
+    permet pas l'appel demandé. Ne pas prétendre à un support non observé.
+
+execution_plan:
+  milestones:
+    - id: M0
+      title: Périmètre restreint et session rattachée
+      done_when: >
+        Contrat v1.1 valide, écart de catalogue transmis à l'orchestrateur, et
+        session rattachée au Superviseur sous l'alias T432-CDX02.
+    - id: M1
+      title: Formats et duplication relevés
+      done_when: >
+        Surfaces de découverte de chaque CLI relevées et duplication des
+        procédures chiffrée par empreinte.
+    - id: M2
+      title: Source canonique et adaptateurs fins
+      done_when: >
+        Une procédure canonique unique par commande, six adaptateurs qui la
+        désignent, garde-fou de divergence en place.
+    - id: M3
+      title: Vérifications sur les usages réels
+      done_when: >
+        Découverte et invocation observées par CLI, sorties brutes consignées,
+        garde-fou et contrôles ciblés verts.
+    - id: M4
+      title: Restitution et transfert
+      done_when: >
+        Diff, limites par CLI et preuves remis ; l'exploitant peut valider la
+        clôture de T432.
+
+test_feedback: []
+status: PENDING
+
+tracking:
+  user_need: >
+    Disposer des commandes du Superviseur dans chaque CLI du projet, sans
+    dépendre du menu propre à Claude Code, et sans que les copies divergent.
+  useful_history:
+    - >
+      Les deux skills connect-session-supervisor et review-session-supervisor sont
+      présentes et byte-identiques dans .claude/skills, .agents/skills et .dsh/skills
+      (sha256 9876b2e8ced1 et 1d0024438fdb, relevé 2026-11-16).
+    - >
+      La dérive entre copies est déjà matérialisée sur rename-session : trois
+      empreintes distinctes 072d2b030599 / 624f7c8483c5 / 662b8df475ef.
+    - >
+      Décision exploitant du 2026-11-16 : périmètre T432 limité aux commandes du
+      Superviseur, voies workflow hors périmètre.
+  current_question: >
+    Quelle forme d'adaptateur reste découvrable par chaque CLI tout en ne
+    contenant aucune étape de procédure ?
+  established:
+    - Les deux commandes existent déjà sur les trois surfaces de skills.
+    - Le Superviseur n'expose qu'une session dans /api/supervision/summary : T000-CC10.
+  unknowns:
+    - Découverte réelle dans les versions locales Antigravity et DSH.
+    - Comportement d'une skill dont le corps renvoie à un fichier canonique.
+  next_action: >
+    Consigner le relevé M1 dans DOC/WFLOW/TASKS/T432/ puis proposer la structure
+    des adaptateurs avant toute écriture.
+  budget:
+    total: 1
+    used: 0
+    parallel_max: 1
+    log: []
+  owners:
+    accountable: HUM
+    executor: CDX02
+    control_maintainer: HUM
+  delegation:
+    required_workflows:
+      - TOOLS/AGENT_WORKFLOW/skills/task-planner/SKILL.md
+    permissions:
+      - Lecture des formats de skills et de commandes des CLI concernés.
+      - Modification des adaptateurs explicitement listés dans scope.allowed.
+      - Vérification des commandes dans les sessions de test explicitement utilisées.
+    forbidden_actions:
+      - Modification de CODE/ ou du comportement machine.
+      - Modification directe de TASKS.yaml ou des verrous globaux.
+      - Réaffectation ou message à une autre session sans désignation humaine.
+      - Déclaration de support sans invocation observée dans le CLI concerné.
+    measurable_deliverables:
+      - Deux procédures canoniques uniques et six adaptateurs fins.
+      - Garde-fou automatique de non-divergence entre adaptateurs.
+      - Preuves d'invocation des deux commandes dans chaque CLI supporté.
+      - Document court des différences et limites par CLI.
+    alert_conditions:
+      - Nom de skill masqué, conflit ou invocation qui ne déclenche pas la commande attendue.
+      - Besoin de modifier un fichier hors périmètre autorisé.
+      - Une CLI exige une méthode d'enregistrement propriétaire incompatible.
+    self_review:
+      - Vérifier qu'aucune procédure métier n'a été copiée dans plusieurs adaptateurs.
+      - Vérifier qu'aucune invocation réelle n'a modifié une autre tâche ou session.
+      - Associer chaque revendication de support à une observation datée et brute.
+  stagnation:
+    threshold: 3
+    justification: >
+      Trois cycles sans nouvelle preuve distinguent un défaut de découverte d'un
+      défaut de déclenchement ou d'un blocage propre au CLI.
+    consecutive_uninformative: 0
+    blind_reviews: []
+  experiments: []
+
+execution:
+  executed_by: CDX02
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

@@ -126,6 +126,14 @@ Conditions de migration reprises de T426 : aucune perte de contenu · liens entr
 - **Idée :** avant réalisation, relire l’état réel et les fichiers concernés, comparer à la référence de l’analyse et attribuer précisément les changements; préserver les éditions des autres agents.
 - **Risque / test proposé :** ancien diagnostic présenté comme défaut actuel ou changement cosmétique annulé; scénario de rapport sur révision antérieure et diff concurrent conservé.
 
+### I11 — Distinguer le contrat principal des contrats de délégation
+- **Origine :** échange exploitant sur T432 : un contrat principal doit être immédiatement repérable; les contrats de sous-agents restent dans le dossier de la tâche. L’exploitant ne veut pas figer un patron complet `CONTRACT_<ID>_<TYPE>_<DESCRIPTION>.yaml`.
+- **Proposition challengée :** réserver `TASK_CONTRACT_<ID>.yaml` au contrat principal, à la racine du dossier de tâche près du plan. Placer les contrats de délégation sous `CONTRACTS/`, sans imposer un préfixe `SUBAGENT` ni une composition rigide du nom; le nom reste lisible et référencé depuis le contrat ou le plan principal. Créer un contrat distinct seulement quand la délégation a un périmètre/livrable propre; un brief court suffit pour une revue ponctuelle.
+- **Arguments pour :** nom principal stable = découverte et validation automatiques simples; sous-dossier = séparation claire; noms libres = accepte plusieurs types de délégation sans faire évoluer le patron à chaque nouveau rôle.
+- **Risques / objections :** liberté totale des noms peut casser les liens et la détection automatique; doublon entre contrat principal, plan et briefs; ce modèle doit aussi être concilié avec les règles actuelles qui imposent parfois un chemin de contrat YAML sous `CONTRACTS/` et avec la préférence exprimée pour un document principal unique.
+- **Arbitrage proposé :** figer seulement l’identité et l’emplacement du contrat principal; pour les contrats spécialisés, imposer leur rattachement vérifiable à l’ID de tâche et leur lien depuis le document principal, mais laisser le suffixe descriptif libre. Avant d’en faire une règle générale, vérifier le gabarit, le validateur et les chemins déjà exigés par `task-planner`/`AGENTS.md`.
+- **Statut :** proposition inscrite au carnet T427; aucune convention globale, migration, modification de gabarit ou de validateur n’est autorisée par cette note.
+
 ### Séance de challenge et intégration ultérieure
 
 Pour chaque idée : 1) retrouver l’exemple concret, 2) examiner bénéfice/coût et contradiction avec les règles actuelles, 3) proposer une expérience discriminante, 4) décider avec l’utilisateur retenir / modifier / rejeter / différer. Une idée retenue reçoit alors son jalon, critère d’acceptation, contrôle et responsable dans le présent plan. Les autres restent tracées avec leur motif, sans multiplier les documents.
@@ -589,7 +597,7 @@ conseils de cas d'usage, et ajouter un lien vers la doc de la skill projet.
 4. Mapping troubleshooting (contrat, challenge, standard).
 5. Retrait de `/workflow-project` après inventaire des 11 renvois.
 
-## 23. Étude-challenge express : cadrage de l'orchestrateur au niveau projet (2026-11-15)
+## 23. Étude-challenge express : orchestrateur projet et conseils /schedule (2026-11-15, fusion des sections 23 et 24)
 
 Demande exploitant : cadrer l'orchestrateur au niveau du projet (doc, skill, etc.) pour améliorer le workflow.
 
@@ -617,7 +625,7 @@ Demande exploitant : cadrer l'orchestrateur au niveau du projet (doc, skill, etc
 
 Non vérifié dans cette étude : le contenu détaillé de `SKILL.md` (394 lignes, non relu en entier) et les doublons exacts entre fichiers.
 
-## 24. Étude-challenge express : orchestrateur projet et conseils /schedule (2026-11-15)
+### 23 bis. Suite de l'étude (ex-section 24, conservée telle quelle)
 
 Source : demande exploitant (deux points) + tableau d'exemples fourni. Lecture et challenge, aucune modification du code.
 
@@ -710,3 +718,10 @@ Points en attente, par ordre de priorité. Chacun attend une décision ou un GO 
 ### Plan T427
 - [ ] Section 25 (lecture obligatoire avant tâche) : valider avant écriture dans `AGENTS.md`.
 - [ ] Fusionner les sections 23 et 24 (étude orchestrateur et `/schedule`), et trancher le nom `T000-CC07` (la convention exige `T###`).
+
+## 27. Démarrage : lecture des documents par tout agent (exigence exploitant, 2026-11-15)
+
+- Exigence : quel que soit l'agent (orchestrateur, coordinateur, autre) et quelle que soit la session lancée dans le projet, lire les documents de démarrage avant d'agir. Demandé plusieurs fois, pas encore écrit dans `AGENTS.md`.
+- Constat : la nouvelle session de l'ancien orchestrateur a repris la ligne d'étape à l'écran, alors qu'elle avait été retirée d'`AGENTS.md`. La référence restait dans `skills/workflow-project/SKILL.md` : retirée ce jour (sur demande de l'exploitant).
+- À faire, sur GO : écrire la lecture obligatoire de démarrage dans `AGENTS.md`, puis vérifier qu'une session neuve la respecte.
+- Décision ouverte : le pied de réponse `➡️ Choix` reste dans `AGENTS.md`. L'exploitant a demandé de retirer son emoji. Décider si on retire aussi l'emoji de la règle.

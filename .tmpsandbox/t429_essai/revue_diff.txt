@@ -1,0 +1,29 @@
+commit 31fe54fa55f21f407b26bddee8ac0e534e1480f8
+Author: Mathieu Gros <mathieu.gros@gmail.com>
+Date:   Sun Nov 15 20:35:12 2026 +0100
+
+    fix(t429): R29 bug bandeau - condition sur service_version absent du snapshot->toujours visible
+    
+    - cause racine prouvee par la mesure de l exploitant sur serveur d essai vierge 8092 : bandeau visible sur page a jour
+    - la condition testait service_version (champ ABSENT du snapshot) -> needsUpdate toujours vrai
+    - fix : needsUpdate = update_available === true (champ reellement expose)
+    - serveur d essai 8092 relance avec l interface corrigee (6f6bd78bf9b0)
+    
+    Co-Authored-By: Claude Code <noreply@anthropic.com>
+
+diff --git a/TOOLS/AGENT_SUPERVISOR/ui/index.html b/TOOLS/AGENT_SUPERVISOR/ui/index.html
+index c3951b4d..ce39fc8e 100644
+--- a/TOOLS/AGENT_SUPERVISOR/ui/index.html
++++ b/TOOLS/AGENT_SUPERVISOR/ui/index.html
+@@ -1264,7 +1264,7 @@ function render(snapshot,force=false){
+  byId('service-state').textContent=snapshot.running?'Démarré':'Arrêté';
+  byId('service-state').className='status'+(snapshot.running?'':' warn');
+  const version=byId('service-version');version.textContent=!snapshot.service_version?'Ancienne version : redémarrage nécessaire':snapshot.update_available?'Mise à jour du service disponible : redémarrage nécessaire':snapshot.update_available===null?'Version non vérifiable':'Service '+snapshot.service_version+' · '+snapshot.build_id+' · interface '+(snapshot.ui_build_id||'ancienne')+' · à jour';version.className='status'+(!snapshot.service_version||snapshot.update_available!==false?' warn':'');
+- const needsUpdate=!snapshot.service_version||snapshot.update_available===true;
++ const needsUpdate=snapshot.update_available===true;
+  const updateBanner=byId('update-banner');if(updateBanner){updateBanner.hidden=!needsUpdate;const bannerHost=(typeof location!=='undefined'&&location.host)?location.host:'?';byId('update-banner-text').textContent='Mise à jour du service disponible : redémarrage nécessaire — page servie par '+bannerHost+' · build '+(snapshot.build_id||'?')+' · interface '+(snapshot.ui_build_id||'?');}
+  const appSidebar=document.querySelector('.app-sidebar');if(appSidebar)appSidebar.classList.toggle('needs-restart',needsUpdate);
+  if(snapshot.load_error||snapshot.storage_error)showError(snapshot.load_error?'Configuration illisible : aucune écriture ne sera effectuée. Vérifiez le fichier de stockage.':'Enregistrement indisponible : les nouvelles données restent en mémoire et seront réessayées.');
+
+ .../T429_AGENT_SUPERVISOR_PLAN_20261113_v1.0.md          | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
