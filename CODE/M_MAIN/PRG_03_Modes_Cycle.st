@@ -108,9 +108,10 @@ instModes(
     SelMaintenanceZoneAccess := GVL_IHM.M3Translation.Cmd.TglMaintenanceZoneAccess,
     // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
     CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,
-    // T417-F : stabiliser M3AtTremie via M3_AtTremieStable pour maintenir la garde benne au-dessus de la tremie
+    // Stabiliser M3AtTremie via M3_AtTremieStable (et zone PV si ouverture anticipee active) pour maintenir la garde benne
     M3AtTremie              := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie
-                               OR PRG_05_Translation.Data.M3_AtTremieStable,
+                               OR PRG_05_Translation.Data.M3_AtTremieStable
+                               OR (GVL_IHM.CycleSemiAuto.Cmd.TglAllowDumpInPV AND PRG_02_Acquisition.HwIn.Translation.M3_PosPV_DI),
     AllowWinchMoveAtTremie  := GVL_IHM.M3Translation.Cmd.TglAllowWinchMoveAtTremie,
     JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
@@ -256,6 +257,7 @@ instCycleSemiAuto(
     Translation_At_P1       := PRG_05_Translation.Data.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.Data.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.Data.M3_AtMaintenanceStable,
+    Translation_PosPV        := PRG_02_Acquisition.HwIn.Translation.M3_PosPV_DI,
     Translation_PosP1        := PRG_02_Acquisition.HwIn.Translation.M3_PosP1_DI,
     Translation_PosMaintenance := PRG_02_Acquisition.HwIn.Translation.M3_PosMaintenance_DI,
     Translation_Busy        := PRG_05_Translation.Data.TranslationBusy,
@@ -275,6 +277,8 @@ instCycleSemiAuto(
     CfgDrainTime            := CycleDrainTimeEffective,
     SkipDrainRequest        := GVL_IHM.CycleSemiAuto.Cmd.BtnSkipDrain,
     RepositionRequest       := GVL_IHM.CycleSemiAuto.Cmd.BtnReposition,
+    CfgAllowDumpInPV        := GVL_IHM.CycleSemiAuto.Cmd.TglAllowDumpInPV,
+    CfgPauseBeforeDump_S    := GVL_IHM.CycleSemiAuto.Cmd.SetPauseBeforeDump_S,
     CfgCommissioningEnable  := GVL_IHM.CycleSemiAuto.Cmd.TglCommissioning,
     CfgCycleChecksInhibit   := GVL_IHM.CycleSemiAuto.Cmd.TglCycleChecksInhibit,
     CfgAutoDiveM2Step5Trial := GVL_IHM.CycleSemiAuto.Cmd.TglAutoDiveM2Step5Trial,

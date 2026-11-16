@@ -22,5 +22,8 @@ STRUCT
     //    Zone Cmd = NON persistée : la consigne ne survit jamais à une coupure.
     //    -1 = aucune demande ; 0..22 = étape cible (plage E_AutoCycleStep).
     SetForceStepTgt : INT := -1; (* 🔧 Étape cible du forçage immédiat du cycle ; -1 = aucune demande *)
+    // Options souplesse cycle vidage tremie & conditions initiales (non persistees, zero decalage GVL_PERSISTENT)
+    TglAllowDumpInPV      : BOOL := FALSE; (* 🪣 Autorise l'ouverture benne dès la zone PV + retour P1 dès benne ouverte sans exiger capteur Trémie *)
+    SetPauseBeforeDump_S  : REAL := 0.0;   (* ⏱️ Pause réglable (s) entre l'arrêt translation AX14 et l'ouverture benne AX15B (0.0 = transparent) *)
 END_STRUCT
 END_TYPE

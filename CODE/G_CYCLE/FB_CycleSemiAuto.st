@@ -59,6 +59,7 @@ VAR_INPUT
     Translation_At_P1           : BOOL;     // --> [HW] Capteur position P1 (arret travail)
     Translation_At_Tremie       : BOOL;     // --> [HW] Capteur fin de course tremie
     Translation_At_Maintenance : BOOL;     // --> [HW] Capteur fin de course maintenance
+    Translation_PosPV            : BOOL;     // --> [HW] Etat brut capteur PV (zone approche tremie)
     Translation_PosP1            : BOOL;     // --> [HW] Etat brut capteur P1 (diagnostic de zone)
     Translation_PosMaintenance   : BOOL;     // --> [HW] Etat brut capteur Maintenance (diagnostic de zone)
     Translation_Busy            : BOOL;     // --> [HW] Mouvement translation en cours
@@ -84,6 +85,8 @@ VAR_INPUT
     CfgDrainTime           : TIME;         // --> [CFG] Duree d'egouttage AX13 configurable IHM (<= 0 -> defaut interne)
     SkipDrainRequest       : BOOL;         // --> [CMD] Bouton IHM : passer l'etape d'egouttage AX13 (front)
     RepositionRequest      : BOOL;         // --> [CMD] Option IHM (maintenue) : repositionnement couple M1+M2 pendant le vidage tremie (AX15B <-> AX15C)
+    CfgAllowDumpInPV       : BOOL;         // --> [CMD] Option IHM : autorise ouverture benne des la zone PV et retour P1 des benne ouverte
+    CfgPauseBeforeDump_S   : REAL;         // --> [CFG] Pause reglable (s) entre fin translation AX14 et ouverture benne AX15B (0 = inactif)
     // 🔧 T358 : la cible de forcage n'est PLUS une configuration persistee ni une
     // impulsion de bouton. Elle est portee par l'argument StepForceTgt ci-dessous
     // (champ IHM non persiste) : une valeur oubliee d'une session precedente ne peut
@@ -263,6 +266,9 @@ VAR
     CST_KoboldBottomConfirmTime : TIME := T#100ms; // . [LOC] Anti-rebond contact fond
     CST_BottomTouchStabTime : TIME := T#500ms;  // . [LOC] Stabilisation arret apres contact fond
     CST_TranslationStopConfirmTime : TIME := T#500ms; // . [LOC] Confirmation arret physique M3 sur FDC P1/trémie
+    PauseBeforeDumpTimer    : TON;              // . [LOC] Pause configurable entre fin approche tremie et ouverture benne
+    PauseBeforeDumpTime     : TIME;             // . [LOC] Duree effective de la pause avant ouverture benne
+    PvDumpLatched           : BOOL;             // . [LOC] Ouverture benne anticipee amorcee en zone PV
 
     // === SOCLE DEFAUT TRANSVERSE ===
     instFault               : FB_FaultCore;                  // * [INST] Socle defaut transverse
@@ -367,6 +373,18 @@ TranslationStopTimer(
            OR ((State = E_AutoCycleStep.AX14_TRANSLATE_DUMP) AND Translation_At_Tremie))
           AND NOT Translation_Busy,
     PT := CST_TranslationStopConfirmTime);
+
+PauseBeforeDumpTime := DINT_TO_TIME(REAL_TO_DINT(LIMIT(0.0, CfgPauseBeforeDump_S, 30.0) * 1000.0));
+PauseBeforeDumpTimer(
+    IN := ((State = E_AutoCycleStep.AX15A_DUMP_ARRIVE)
+           OR ((State = E_AutoCycleStep.AX14_TRANSLATE_DUMP) AND Translation_At_Tremie AND NOT Translation_Busy))
+          AND (CfgPauseBeforeDump_S > 0.0),
+    PT := PauseBeforeDumpTime);
+IF (State <> E_AutoCycleStep.AX14_TRANSLATE_DUMP)
+   AND (State <> E_AutoCycleStep.AX15A_DUMP_ARRIVE)
+   AND (State <> E_AutoCycleStep.AX15B_DUMP_OPEN) THEN
+    PvDumpLatched := FALSE;
+END_IF;
 
 // AX5 : le contacteur alimente le capteur ; aucun retour auxiliaire n existe.
 KoboldInitTimer(IN := (State = E_AutoCycleStep.AX5_KOBOLD_INIT) AND DeadmanArmed AND JoystickPush,
@@ -810,7 +828,7 @@ Ready := Enable AND NOT Fault.Latched;
 // démarrage). Le séquenceur (transitions X0→X13) reste piloté par JoystickDeflected.
 CycleMotionPermit := JoystickDeflected AND DeadmanArmed;
 TranslationP1Permit := DeadmanArmed AND JoystickRight AND NOT JoystickPush AND NOT JoystickPull;
-TranslationTremiePermit := DeadmanArmed AND JoystickLeft AND NOT JoystickPush AND NOT JoystickPull;
+TranslationTremiePermit := DeadmanArmed AND JoystickLeft AND ((CfgAllowDumpInPV AND Translation_PosPV) OR NOT JoystickPush) AND NOT JoystickPull;
 JoystickPushOnly := JoystickPush AND NOT (JoystickLeft OR JoystickRight);
 
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
@@ -1487,7 +1505,22 @@ CASE State OF
         TranslationCmd.PositionTgt := 1; // Trémie
         TranslationCmd.ReqStart := TranslationTremiePermit;
 
-        IF Translation_At_Tremie THEN
+        // Option IHM : ouverture benne anticipee des la zone PV tout en poursuivant vers Tremie,
+        // et retour autorise vers P1 (AX18) des que la benne est ouverte meme sans capteur Tremie.
+        IF CfgAllowDumpInPV AND Translation_PosPV AND DeadmanArmed AND JoystickPush THEN
+            PvDumpLatched := TRUE;
+        END_IF;
+        IF PvDumpLatched THEN
+            BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
+        END_IF;
+
+        IF (PvDumpLatched OR (CfgAllowDumpInPV AND Translation_PosPV))
+           AND Benne_Done AND Benne_IsOpen THEN
+            BucketCmd.ReqOpen := FALSE;
+            TranslationCmd.ReqStart := FALSE;
+            TranslationCmd.PositionTgt := 0;
+            State := E_AutoCycleStep.AX18_DONE_SYNC;
+        ELSIF Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
             TranslationCmd.PositionTgt := 1;
             WaitingForOperator := JoystickDeflected;
@@ -1517,10 +1550,21 @@ CASE State OF
         TranslationCmd.ReqStart := FALSE;
         TranslationCmd.PositionTgt := 0;
 
-        // T345-L2 : vrai latch inter-scan. Le scan qui observe le neutre arme le
-        // geste suivant, mais ne peut pas consommer ce meme armement. AX15B exige
-        // donc toujours un push posterieur a au moins un scan neutre en AX15A.
-        IF SeenNeutralAfterArrival THEN
+        IF PvDumpLatched THEN
+            BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
+        END_IF;
+
+        IF PvDumpLatched AND Benne_Done AND Benne_IsOpen THEN
+            BucketCmd.ReqOpen := FALSE;
+            State := E_AutoCycleStep.AX18_DONE_SYNC;
+        ELSIF (CfgPauseBeforeDump_S > 0.0) AND NOT PauseBeforeDumpTimer.Q THEN
+            WaitingForOperator := FALSE;
+            WaitingForProcess := TRUE;
+            OperatorAction := 'AX15a - Stabilisation chariot avant ouverture benne.';
+            IF NOT JoystickDeflected THEN
+                SeenNeutralAfterArrival := TRUE;
+            END_IF;
+        ELSIF SeenNeutralAfterArrival OR PvDumpLatched THEN
             WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
             WaitingForProcess := DeadmanArmed AND JoystickPush;
             OperatorAction := 'AX15a - Pousser vers le bas pour ouvrir et vider.';
