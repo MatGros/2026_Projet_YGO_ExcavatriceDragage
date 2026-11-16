@@ -604,9 +604,9 @@ instCycleMachineHoming(
     JoystickDeflected          := NOT Data.Joystick.AtNeutralXY,
     JoystickPull               := Data.Joystick.AxisY.DirectionPositive,
     JoystickPush               := Data.Joystick.AxisY.DirectionNegative,
-    // Lancer / valider le cycle : BP joystick (= bouton homme-mort) pour le motif 3 appuis,
-    // OU commande IHM dediee (front) pour le lancement direct.
-    BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.CycleMachineHoming.Cmd.BtnValidate,
+    // Lancer / valider le cycle : commande IHM dediee UNIQUEMENT (le BP homme-mort
+    // brut du joystick ne peut plus lancer/valider le cycle ; garde manche-neutre cote FB HX0).
+    BtnValidation              := GVL_IHM.CycleMachineHoming.Cmd.BtnValidate,
     StartRequest               := GVL_IHM.CycleMachineHoming.Cmd.BtnStart,
     // Confirmation visuelle benne fermee (nouveau bouton dedie IHM HX1)
     BtnConfirmHomingBucket     := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmHomingBucket,

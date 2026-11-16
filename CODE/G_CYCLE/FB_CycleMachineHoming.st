@@ -411,7 +411,9 @@ CASE SeqStep OF
     E_MachineHomingTxState.HX0_REPOS:
         // Etape initiale pure : aucune action.
         CmdWinchSelect := -1;
-        IF (StartEdge.Q OR BtnValidationEdge.Q) AND ModeIsMaint2 THEN
+        // Entree cycle exige manche au neutre au front de lancement
+        // (jeu joystick / deplacement accidentel ne lance pas le cycle).
+        IF (StartEdge.Q OR BtnValidationEdge.Q) AND ModeIsMaint2 AND NOT JoystickDeflected THEN
             HomeReqDone := FALSE;
             RetryCount  := 0;
             SeqStep     := E_MachineHomingTxState.HX1_BUCKET_PREPARE;
