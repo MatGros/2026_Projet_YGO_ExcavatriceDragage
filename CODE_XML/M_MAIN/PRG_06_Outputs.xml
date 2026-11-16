@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-16T01:39:49.403661" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-11-16T01:39:49.403661">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-16T04:00:45.719290" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-16T04:00:45.719290">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1539,14 +1539,6 @@ Remplace le zeroage binaire instantane de l'ex-§2ter.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [SAFE] FDC brut Tremie coupe immediatement le sens Tremie</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_TremieHardStopLatched">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [SAFE] T417-E : latch directionnel Tremie (anti-perte came + power-up)</xhtml>
-              </documentation>
-            </variable>
             <variable name="PowerKeepAliveACmd">
               <type>
                 <BOOL />
@@ -1616,6 +1608,17 @@ Remplace le zeroage binaire instantane de l'ex-§2ter.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Intervalle mini entre 2 activations d'un même contacteur mouvement (anti-chatter dur).
 Choisi STRICTEMENT sous la plus courte tempo de séquencement des interlocks
 (BrakeTimeout 0,5 s) pour rester transparent en exploitation.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_TremieHardStopLatched">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [SAFE] T417-E : latch directionnel Tremie RETAIN (survit au reboot)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -1951,8 +1954,8 @@ M3BlockedBySafetyInfo := M3PowerCutOffSafetyInfo OR M3SafeStopSafetyInfo;
 // Coupure directionnelle ultime sur le FDC physique Tremie. Cette barriere lit
 // le DI qualifie du meme scan et ne depend ni du decodeur de position, ni du G7,
 // ni du step courant. Le recul vers P1/Maintenance reste autorise.
-// T417-E (Plan A1) : latch directionnel Tremie (couvre perte came apres depassement + power-up hors came).
-IF PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI OR GVL_PERSISTENT._TranslationAtTremiePersisted THEN
+// T417-E (Plan A1) : latch directionnel Tremie RETAIN (couvre perte came + reboot hors came, sans filtre 100 ms).
+IF PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI THEN
     M3_TremieHardStopLatched := TRUE;
 END_IF;
 

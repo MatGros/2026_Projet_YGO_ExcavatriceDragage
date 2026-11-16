@@ -33,6 +33,10 @@
 M3AtTremie := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie
               OR PRG_05_Translation.Data.M3_AtTremieStable;
 ```
+- **Décisions exploitant (2026-11-16) :**
+  1. **Plancher vitesse PV à `20 Hz` maintenu** (pas de `5 Hz` : risque surchauffe moteur + vibrations).
+  2. **Pause réglable avant `AX15B_DUMP_OPEN` :** `TON` paramétrable (`0 s` par défaut, testable à `0,3–0,5 s` sur site pour garantir le serrage frein avant ouverture).
+  3. **Ouverture dès la zone PV :** autoriser l'ouverture benne dès la zone PV tout en poursuivant la translation vers Trémie pendant l'ouverture ; une fois ouverte, retour vers `P1` autorisé même si le capteur Trémie n'est pas encore atteint.
 - **Option fluidité `AX15A` (`FB_CycleSemiAuto.st:1524-1534`) :** conserver `SeenNeutralAfterArrival` pour éviter l'ouverture involontaire en fin de translation, mais exposer un bit IHM/diag explicite `WaitingNeutralForDump` pour guider l'opérateur instantanément.
 
 ### 2.2 Simplification & test rapide conditions initiales Auto (`PRG_03_Modes_Cycle.st:172-179` + `FB_CycleSemiAuto.st:948-955`)

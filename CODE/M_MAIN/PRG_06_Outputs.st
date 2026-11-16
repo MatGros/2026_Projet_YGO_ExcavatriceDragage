@@ -14,7 +14,6 @@ PROGRAM PRG_06_Outputs
 
 VAR_INPUT
     // === 📥 ENTRÉES PROGRAMME (AUCUNE - PILOTÉ VIA GVL_IHM & PRG_02 À 05) ===
-    M3_TremieHardStopLatched     : BOOL := FALSE; // . [SAFE] T417-E : latch directionnel Tremie RETAIN (survit au reboot)
 END_VAR
 
 VAR_OUTPUT
@@ -46,7 +45,6 @@ VAR_OUTPUT
     // Les noms Device bruts (*_DQ / *_RQ) ne sont pas declares ici : les declarer
     // creerait une collision avec la globale homonyme du mapping E/S.
     KoboldContactorCmd           : BOOL; // <-- [ACT] Ordre alimentation contacteur capteur fond Kobold
-    M3_TremieHardStopLatched     : BOOL := FALSE; // . [SAFE] T417-E : latch directionnel Tremie RETAIN (survit au reboot)
 END_VAR
 
 VAR
@@ -107,7 +105,6 @@ VAR
 
     // === 🔒 CONCORDANCE SORTIES TREUILS M1/M2 (§2ter) ===
     WinchOutputCoupled               : BOOL; // . [LOC] Treuils couples (synchro OU both) : arme instSyncContactorFinal
-    M3_TremieHardStopLatched     : BOOL := FALSE; // . [SAFE] T417-E : latch directionnel Tremie RETAIN (survit au reboot)
 END_VAR
 
 VAR CONSTANT
@@ -115,7 +112,10 @@ VAR CONSTANT
     // Choisi STRICTEMENT sous la plus courte tempo de séquencement des interlocks
     // (BrakeTimeout 0,5 s) pour rester transparent en exploitation.
     CST_ContactorMinInterval         : TIME := T#400ms;
-    M3_TremieHardStopLatched     : BOOL := FALSE; // . [SAFE] T417-E : latch directionnel Tremie RETAIN (survit au reboot)
+END_VAR
+
+VAR RETAIN
+    M3_TremieHardStopLatched         : BOOL := FALSE; // . [SAFE] T417-E : latch directionnel Tremie RETAIN (survit au reboot)
 END_VAR
 
 // ═══════════════════════════════════════════════════════════════
