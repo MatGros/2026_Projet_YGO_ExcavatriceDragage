@@ -1,0 +1,13 @@
+Supervisor: http://127.0.0.1:8082/
+Exception in thread Thread-411 (_self_restart):
+Traceback (most recent call last):
+  File "C:\Users\ZEDVICTUS\AppData\Local\Python\pythoncore-3.14-64\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\ZEDVICTUS\AppData\Local\Python\pythoncore-3.14-64\Lib\threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\AGENT_SUPERVISOR\scripts\supervisor_service.py", line 2025, in _self_restart
+    os.execv(sys.executable, [sys.executable] + sys.argv)
+             ^^^
+NameError: cannot access free variable 'sys' where it is not associated with a value in enclosing scope. Did you forget to import 'sys'?

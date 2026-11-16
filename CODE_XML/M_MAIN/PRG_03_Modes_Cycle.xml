@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-27T15:19:10.853944" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-27T15:19:10.853944">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-16T01:39:54.825063" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-16T01:39:54.825063">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1690,7 +1690,9 @@ instModes(
     SelMaintenanceZoneAccess := GVL_IHM.M3Translation.Cmd.TglMaintenanceZoneAccess,
     // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
     CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,
-    M3AtTremie              := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie,
+    // T417-F : stabiliser M3AtTremie via M3_AtTremieStable pour maintenir la garde benne au-dessus de la tremie
+    M3AtTremie              := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie
+                               OR PRG_05_Translation.Data.M3_AtTremieStable,
     AllowWinchMoveAtTremie  := GVL_IHM.M3Translation.Cmd.TglAllowWinchMoveAtTremie,
     JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,

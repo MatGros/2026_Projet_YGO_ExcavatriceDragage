@@ -47,7 +47,7 @@ pas une tâche du catalogue).
 
 ## 3. 🔀 Cas du script
 
-- **`ACTIF`** : appliquer le § Démarrage de `AGENTS.md` (ligne d'étape, pied de réponse).
+- **`ACTIF`** : appliquer le § Démarrage de `AGENTS.md` (pied de réponse).
 - **`OFF`** : répondre en simple assistant. Pas de ligne d'étape ni de pied `➡️`.
 - **`INDÉTERMINÉ`** : dire que l'état n'est pas connu, sans rien supposer. Demander de relancer
   avec `/workflow-project-orchestrator` ou `/workflow-project-coordinator`.
@@ -57,7 +57,7 @@ pas une tâche du catalogue).
 
 La ligne de statut du terminal affiche l'état du workflow **et** l'étape en cours. Elle se met
 à jour **au changement**, jamais à chaque message. Quand l'étape change (CADRAGE, ÉTUDE,
-RÉALISATION, TEST, RESTITUTION, DIAGNOSTIC, ARRÊT — cf. `AGENTS.md` § « Ligne d'étape »),
+RÉALISATION, TEST, RESTITUTION, DIAGNOSTIC, ARRÊT — affichées dans la barre de statut, jamais dans les réponses),
 appeler une seule fois :
 
 ```text

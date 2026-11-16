@@ -1,0 +1,19 @@
+{
+  "model": "deepseek-v4.1-flash:cloud",
+  "allow_cloud": false,
+  "judge_settings": {
+    "temperature": 0,
+    "output_tokens": 1600,
+    "timeout_seconds": 30,
+    "context_messages": 12,
+    "context_chars": 12000,
+    "model_context_tokens": 32768,
+    "memory_max_items": 20,
+    "max_visible_closed_findings": 5,
+    "audit_interval": 8
+  },
+  "sessions": [],
+  "chat_histories": {
+    "global": []
+  }
+}

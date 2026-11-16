@@ -52,7 +52,7 @@ Diagnostiquer et reproduire en simulation isolée le dépassement de butée peti
 
 ## 2. Périmètre et dépendances
 
-- **Inclus :** `DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3/**`, `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417-C.yaml`, `TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/AGY02_T417_M3_SANDBOX/**`.
+- **Inclus :** `DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3/**`, `DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3/CONTRACTS/TASK_CONTRACT_T417-C.yaml`, `TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/AGY02_T417_M3_SANDBOX/**`.
 - **Exclus :** toute écriture dans `CODE/**` sans contrat C3/C4 et GO explicite, `Device.export`.
 - **Dépendances / décisions attendues :** tâche parente `T417` (`SimBench M3`), arbitrage exploitant sur les 3 hypothèses réalistes (`M2`).
 

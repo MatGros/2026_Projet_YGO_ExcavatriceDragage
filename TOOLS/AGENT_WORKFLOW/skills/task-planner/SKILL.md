@@ -61,7 +61,7 @@ technique. Ne jamais contourner un 🚩 d'un autre acteur.
 
 - Toute tâche manipulée actualise `date` au format `YYYY-MM-DDTHH:MM:SS`.
 - Une sous-tâche possède `parent_id`; avant clôture du parent, vérifier ses enfants ouverts.
-- Dès C2, le contrat `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_<id>.yaml` est obligatoire (dispenses : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md` § Contrat de tâche).
+- Dès C2, le contrat `DOC/WFLOW/TASKS/<dossier-tâche>/CONTRACTS/TASK_CONTRACT_<id>.yaml` est obligatoire et son chemin est inscrit dans le champ `contrat` de `TASKS.yaml` (dispenses : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md` § Contrat de tâche).
 - Commandes destructives : voir `AGENTS.md` § Discipline de session, règle 6 (liste unique).
 
 ## 🏷️ Nomenclature stricte du champ `agent`
