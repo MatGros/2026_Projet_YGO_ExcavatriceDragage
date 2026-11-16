@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T14:41:33.343610" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T14:41:33.343610">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-16T12:34:06.086189" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-16T12:34:06.086189">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1911,7 +1911,9 @@ CASE SeqStep OF
     E_MachineHomingTxState.HX0_REPOS:
         // Etape initiale pure : aucune action.
         CmdWinchSelect := -1;
-        IF (StartEdge.Q OR BtnValidationEdge.Q) AND ModeIsMaint2 THEN
+        // Entree cycle exige manche au neutre au front de lancement
+        // (jeu joystick / deplacement accidentel ne lance pas le cycle).
+        IF (StartEdge.Q OR BtnValidationEdge.Q) AND ModeIsMaint2 AND NOT JoystickDeflected THEN
             HomeReqDone := FALSE;
             RetryCount  := 0;
             SeqStep     := E_MachineHomingTxState.HX1_BUCKET_PREPARE;

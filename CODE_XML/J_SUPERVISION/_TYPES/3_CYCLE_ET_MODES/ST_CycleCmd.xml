@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-27T16:00:37.980219" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-27T16:00:37.980219">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-16T12:31:28.366172" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-16T12:31:28.366172">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -139,6 +139,40 @@ confirmation, plus de cible persistée (donc aucun saut d'étape au démarrage).
 Zone Cmd = NON persistée : la consigne ne survit jamais à une coupure.
 -1 = aucune demande ; 0..22 = étape cible (plage E_AutoCycleStep).
 🔧 Étape cible du forçage immédiat du cycle ; -1 = aucune demande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglAllowDumpInPV">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Options souplesse cycle vidage tremie &amp; conditions initiales (non persistees, zero decalage GVL_PERSISTENT)
+🪣 Autorise l'ouverture benne dès la zone PV + retour P1 dès benne ouverte sans exiger capteur Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglRelaxSemiAutoStart">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Assouplit les conditions initiales en AX1_INIT (fenêtre haute élargie + dispense qualification benne si treuils hauts)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetPauseBeforeDump_S">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Pause réglable (s) entre l'arrêt translation AX14 et l'ouverture benne AX15B (0.0 = transparent)</xhtml>
               </documentation>
             </variable>
           </struct>

@@ -512,6 +512,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = mouvement demande vers Tremie, independant de InvertDriveDirection</xhtml>
               </documentation>
             </variable>
+            <variable name="ReqMaintenanceSemantic">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = mouvement demande vers Maintenance/P1, independant de InvertDriveDirection</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

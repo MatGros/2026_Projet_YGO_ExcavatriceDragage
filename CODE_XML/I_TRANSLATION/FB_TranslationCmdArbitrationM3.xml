@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.333252" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.333252">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-16T08:01:10.665634" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-16T08:01:10.665634">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -877,7 +877,8 @@ ELSE
         CycleTargetDirectionOk := (SelTarget = 3)
                                OR ((SelTarget = 1) AND Joystick.AxisX.DirectionPositive)
                                OR ((SelTarget &lt;&gt; 1) AND Joystick.AxisX.DirectionNegative);
-        CycleJoystickAxisOk := CycleTargetDirectionOk AND Joystick.AxisY.AtNeutral;
+        CycleJoystickAxisOk := CycleTargetDirectionOk
+                               AND (Joystick.AxisY.AtNeutral OR ((SelTarget = 1) AND (Joystick.AxisY.Direction &lt;= 0)));
         RunRequest := ReqTranslation.ReqStart AND Context.HeightInterlockOk AND CycleJoystickAxisOk;
         IF RunRequest THEN
             SpeedPct := 100.0;

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.294217" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.294217">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-16T08:05:17.215985" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-16T08:05:17.215985">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1153,8 +1153,14 @@ END_IF;
 
 Auth.CoupledBucketPhaseLocked := FALSE;
 
-IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
-    // GARDE Tremie (MAINT uniquement -- ne doit PAS interferer avec SEMI_AUTO/cycle auto,
+IF Auth.Mode = E_Mode.MAINT_N2 THEN
+    // En MAINT_N2, selection operateur directe et inconditionnelle (0=M1+M2 ensemble,
+    // 1=M1 seul, 2=M2 seul), sans écrasement par la garde Trémie ni par la séquence benne T248.
+    Auth.CoupledBucketPhaseLocked := FALSE;
+    BucketSeqSatisfied := FALSE;
+    Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+ELSIF Auth.Mode = E_Mode.MAINT_N1 THEN
+    // GARDE Tremie (MAINT_N1 uniquement -- ne doit PAS interferer avec SEMI_AUTO/cycle auto,
     // qui pilote la benne via ReqProgram.ReqBucket, pas ce selecteur) : a la Tremie, seul
     // le pilotage benne (WinchSel=2) est permis - le couple (0) ne doit JAMAIS s'y engager
     // manuellement, meme via T248 (BucketSeqSatisfied pouvait se lever a tort si la benne

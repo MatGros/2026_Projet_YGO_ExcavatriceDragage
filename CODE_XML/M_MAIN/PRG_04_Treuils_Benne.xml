@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-27T16:00:37.995333" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-27T16:00:37.995333">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-16T08:05:14.324621" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-16T08:05:14.324621">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6010,6 +6010,14 @@ FB_Bucket ne connaissent que des booléens déjà gatés, jamais le mode (encaps
 . [LOC] Mode MAINT_N1 arbitré (override FDC logiciel momentané)</xhtml>
               </documentation>
             </variable>
+            <variable name="MaintN2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mode MAINT_N2 arbitre (secours et pilotage direct contacteurs)</xhtml>
+              </documentation>
+            </variable>
             <variable name="ExtractionAssistActive">
               <type>
                 <BOOL />
@@ -6177,6 +6185,7 @@ BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConf
 // (y compris SEMI_AUTO / AUTO). Choix opérateur assumé, tracé — voir AF-05 §4bis.
 // MAINT_N1 reste utilisé pour l'override momentané du FDC haut logiciel (§5) et l'assistance extraction.
 MaintN1 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1);
+MaintN2 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
 // Séquence d'extraction active (mode MAINT + toggle) : gate le permis de montée assistée (§5).
 // Le permis lui-même (AscentPermit) est produit par FB_ExtractionAssist et consommé via le contrat benne.
 // FB_ExtractionAssist retire (legacy, plus de toggle IHM) : gate desormais toujours ferme.
@@ -6379,8 +6388,8 @@ ArbIHM.BtnDescentM2         := GVL_IHM.M2TreuilBenne.Cmd.BtnDescent;
 ArbIHM.BtnWinchBothAscent    := GVL_IHM.Commun.BtnWinchBothAscent;
 ArbIHM.BtnWinchBothDescent  := GVL_IHM.Commun.BtnWinchBothDescent;
 
-ArbContext.BucketBusy                     := instBucket.Lifecycle.Busy;
-ArbContext.BucketM2RunRequest             := instBucket.M2_RunRequest;
+ArbContext.BucketBusy                     := instBucket.Lifecycle.Busy AND NOT MaintN2;
+ArbContext.BucketM2RunRequest             := instBucket.M2_RunRequest AND NOT MaintN2;
 ArbContext.BucketM2ReqAscent              := BucketM2ReqAscent;
 ArbContext.BucketM2ReqDescend             := BucketM2ReqDescend;
 ArbContext.BucketAutoCloseActive          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
@@ -6390,9 +6399,9 @@ ArbContext.BucketHandoffP1Active          := (PRG_03_Modes_Cycle.Data.Auth.Mode 
     AND (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX10B_RACCORDEMENT_P1)
     AND instBucket.CloseReached
     AND PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqHoldAscentP1AfterClose;
-ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
-ArbContext.SyncBlocksAscent                   := SyncMinorDeviationBlocksUp;
-ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown;
+ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket AND NOT MaintN2;
+ArbContext.SyncBlocksAscent                   := SyncMinorDeviationBlocksUp AND NOT MaintN2;
+ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown AND NOT MaintN2;
 // 🔗 Atomicité Both : agrégats consommés par la commande both (§5 calcule
 // Both*Permit APRÈS §3 → lag 1 scan assumé au gate d'arbitre, documenté comme les
 // autres gates lag-1 de PRG_04 ; l'enforcement même-scan est assuré par le routage
@@ -6996,6 +7005,20 @@ EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND NOT SafeStopM2
 EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND NOT SafeStopM1_Active AND (NOT CoupledBoth OR ProcessAndSafetyPermitM2_Ascent);
 EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND NOT SafeStopM2_Active AND (NOT CoupledBoth OR ProcessAndSafetyPermitM1_Ascent);
 
+// Mode secours MAINT_N2 : pilotage direct inconditionnel des contacteurs M1/M2 (ensemble ou separement)
+// sous la seule reserve de la chaine AU physique fermee (PowerContactorEngaged_DI) et du capteur
+// mecanique haut (TopPositionFree_DI, sauf bypass explicite).
+IF MaintN2 THEN
+    SafeStopM1_Active := NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
+    SafeStopM2_Active := NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
+    EffectivePermitM1_Descend := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
+    EffectivePermitM2_Descend := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
+    EffectivePermitM1_Ascent  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
+                                 AND (PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI OR BypassM1TopLimitSwitchEff);
+    EffectivePermitM2_Ascent  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
+                                 AND (PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI OR BypassM2TopLimitSwitchEff);
+END_IF;
+
 // Permis canoniques benne : ouverture = M2 vers le bas, fermeture = M2 vers le haut.
 // Les fins de course benne restent des faits fonctionnels distincts des limites treuil.
 EffectivePermitBucket_Open := EffectivePermitM2_Descend
@@ -7044,10 +7067,10 @@ END_IF;
 // EffectivePermitM*_* couvre deja process + safety + NOT SafeStop de cet axe +
 // verif couplage ; on ajoute NOT Fault.Latched (faute finale) et, pour M3, le
 // permis effectif directionnel + SafeStop/PowerCutOff M3 (bus PRG_05, lag 1 scan).
-ArmM1AscentAvail  := EffectivePermitM1_Ascent  AND NOT instSafetyWinchM1.Fault.Latched;
-ArmM1DescendAvail := EffectivePermitM1_Descend AND NOT instSafetyWinchM1.Fault.Latched;
-ArmM2AscentAvail  := EffectivePermitM2_Ascent  AND NOT instSafetyWinchM2.Fault.Latched;
-ArmM2DescendAvail := EffectivePermitM2_Descend AND NOT instSafetyWinchM2.Fault.Latched;
+ArmM1AscentAvail  := EffectivePermitM1_Ascent  AND (MaintN2 OR NOT instSafetyWinchM1.Fault.Latched);
+ArmM1DescendAvail := EffectivePermitM1_Descend AND (MaintN2 OR NOT instSafetyWinchM1.Fault.Latched);
+ArmM2AscentAvail  := EffectivePermitM2_Ascent  AND (MaintN2 OR NOT instSafetyWinchM2.Fault.Latched);
+ArmM2DescendAvail := EffectivePermitM2_Descend AND (MaintN2 OR NOT instSafetyWinchM2.Fault.Latched);
 ArmM3TremieAvail  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
                      AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
                      AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
@@ -7063,13 +7086,15 @@ ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
 // En SEMI_AUTO ou lors d'une commande benne programme (AX3_OPEN_BUCKET / vidage), l'operateur
 // doit pouvoir armer l'homme-mort (DeadmanArmed) pour autoriser le mouvement benne !
 ArmBucketBusy := (instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q)
+                 AND NOT MaintN2
                  AND (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
                  AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
                  AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;
 ArmModeDisabled := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE);
 ArmContactorOff := NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
-ArmPowerCutOff := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff
-               OR PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
+ArmPowerCutOff := NOT MaintN2
+               AND (instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff
+                    OR PRG_05_Translation.Data.TranslationSafety.PowerCutOff);
 
 IF ArmModeDisabled THEN
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.MODE_DISABLE;
@@ -7287,7 +7312,7 @@ ReqM1Winch.SpeedStepReq             := M1LogicRequestStepTgt;
 // ou M2 devient pret, les deux demarrent ensemble.
 WinchBothMotionReady := NOT (instWinchM1.DirectionChangePending OR instWinchM2.DirectionChangePending)
                         AND NOT instWinchM1.Fault.Latched AND NOT instWinchM2.Fault.Latched;
-IF WinchBothMotionActive AND (instWinchM2.DirectionChangePending OR instWinchM2.Fault.Latched) THEN
+IF NOT MaintN2 AND WinchBothMotionActive AND (instWinchM2.DirectionChangePending OR instWinchM2.Fault.Latched) THEN
     ReqM1Winch.RunRequest := FALSE; ReqM1Winch.ReqAscent := FALSE; ReqM1Winch.ReqDescend := FALSE; ReqM1Winch.SpeedStepReq := 0;
 END_IF;
 ReqM1Winch.MaxStepUp                := CommonMaxStepAscent;
@@ -7379,7 +7404,7 @@ ReqM2Winch.SyncCoupled              := instWinchSync.SyncActive;
 // Meme verrou : en intention both, si l'un des deux treuils n'est pas pret, on fige AUSSI
 // la commande finale M2. Cas symetrique du REX : M2 relance seul pendant que M1 est en
 // dead-time D18 -&gt; cable qui file. On fige M2 UNIQUEMENT si M1 est le treuil pas pret.
-IF WinchBothMotionActive AND (instWinchM1.DirectionChangePending OR instWinchM1.Fault.Latched) THEN
+IF NOT MaintN2 AND WinchBothMotionActive AND (instWinchM1.DirectionChangePending OR instWinchM1.Fault.Latched) THEN
     ReqM2Winch.RunRequest := FALSE; ReqM2Winch.ReqAscent := FALSE; ReqM2Winch.ReqDescend := FALSE; ReqM2Winch.SpeedStepReq := 0;
 END_IF;
 
@@ -7481,8 +7506,12 @@ WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
 // BrakeCommandOpenConfirmed calcules par FB_Winch — la barriere finale
 // (FB_WinchOutputInterlock) recoit le retour PHYSIQUE brut directement,
 // et calcule elle-meme BrakeCmd := RelayFwd OR RelayRev (voir bandeau de ce FB).
-WinchM1FinalInterlockRequest.BrakeFeedback := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;
-WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;
+WinchM1FinalInterlockRequest.BrakeFeedback := SEL(MaintN2 OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback OR GVL_IHM.M1TreuilRetenue.Bypass.Global,
+                                                   PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
+                                                   instWinchM1.RelayFwd OR instWinchM1.RelayRev);
+WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff := SEL(MaintN2 OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback OR GVL_IHM.M1TreuilRetenue.Bypass.Global,
+                                                           PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
+                                                           NOT (instWinchM1.RelayFwd OR instWinchM1.RelayRev));
 WinchM1FinalInterlockRequest.RequestedRelayFwd := instWinchM1.RelayFwd;
 WinchM1FinalInterlockRequest.RequestedRelayRev := instWinchM1.RelayRev;
 WinchM1FinalInterlockRequest.RequestedContactor1 := instWinchM1.Contactor1;
@@ -7490,7 +7519,7 @@ WinchM1FinalInterlockRequest.RequestedContactor2 := instWinchM1.Contactor2;
 WinchM1FinalInterlockRequest.RequestedContactor3 := instWinchM1.Contactor3;
 WinchM1FinalInterlockRequest.RequestedContactor4 := instWinchM1.Contactor4;
 WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
-WinchM1FinalInterlockRequest.PowerCutOff := instSafetyWinchM1.PowerCutOff;
+WinchM1FinalInterlockRequest.PowerCutOff := instSafetyWinchM1.PowerCutOff AND NOT MaintN2;
 WinchM1FinalInterlockRequest.AscentPermit := EffectivePermitM1_Ascent;
 WinchM1FinalInterlockRequest.DescendPermit := EffectivePermitM1_Descend;
 
@@ -7498,8 +7527,12 @@ WinchM2FinalInterlockRequest.Enable := TRUE;
 WinchM2FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 WinchM2FinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 WinchM2FinalInterlockRequest.SafeStop := SafeStopM2_Active;
-WinchM2FinalInterlockRequest.BrakeFeedback := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI;
-WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI;
+WinchM2FinalInterlockRequest.BrakeFeedback := SEL(MaintN2 OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback OR GVL_IHM.M2TreuilBenne.Bypass.Global,
+                                                   PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
+                                                   instWinchM2.RelayFwd OR instWinchM2.RelayRev);
+WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff := SEL(MaintN2 OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback OR GVL_IHM.M2TreuilBenne.Bypass.Global,
+                                                           PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
+                                                           NOT (instWinchM2.RelayFwd OR instWinchM2.RelayRev));
 WinchM2FinalInterlockRequest.RequestedRelayFwd := instWinchM2.RelayFwd;
 WinchM2FinalInterlockRequest.RequestedRelayRev := instWinchM2.RelayRev;
 WinchM2FinalInterlockRequest.RequestedContactor1 := instWinchM2.Contactor1;
@@ -7507,7 +7540,7 @@ WinchM2FinalInterlockRequest.RequestedContactor2 := instWinchM2.Contactor2;
 WinchM2FinalInterlockRequest.RequestedContactor3 := instWinchM2.Contactor3;
 WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
 WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
-WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
+WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff AND NOT MaintN2;
 WinchM2FinalInterlockRequest.AscentPermit := M2AscentPermitApplied;
 WinchM2FinalInterlockRequest.DescendPermit := M2DescendPermitApplied;
 
