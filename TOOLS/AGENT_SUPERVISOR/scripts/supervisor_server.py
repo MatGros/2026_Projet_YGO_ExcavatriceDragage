@@ -190,12 +190,10 @@ def kill_port_listeners(port: int) -> None:
 
 
 def create_server(port=8082, state_path=None):
-    # R29 (demande exploitant) : au lancement on purge aussi les ports voisins du
-    # superviseur (8081 relance TM, 8092 serveur d'essai), pas seulement le notre.
-    log_line(f"demarrage : purge des ports 8081 8082 8092 avant bind sur {port}")
-    for known in (8081, 8092):
-        if known != port:
-            kill_port_listeners(known)
+    # R29 - architecture exploitant (un python par service) : le superviseur ne purge
+    # que SON port. Pas de croisade sur 8081/8092 : chaque service est maitre chez lui.
+    log_line(f"SCRIPT LANCE : {Path(sys.argv[0]).resolve()} args={sys.argv[1:] or '[aucun]'}")
+    log_line(f"demarrage : purge du port {port} avant bind")
     kill_port_listeners(port)
     home = Path.home()
     default_path = Path(os.environ.get('LOCALAPPDATA', home / '.local/share')) / 'ExcavatriceDragage/agent-supervision.json'
