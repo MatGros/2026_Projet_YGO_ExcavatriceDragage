@@ -195,7 +195,16 @@ def test_connect_no_formal_task_requires_confirmed_t000_id_agent_and_title(tmp_p
         assert result["task_id"] == "T000"
         assert result["agent_id"] == "CC03"
         assert result["task_title"] == "Session naming"
-        assert result["mission_structure_loaded"] is False
+        assert result["mission_structure_loaded"] is True  # R29/T427 : fiche jamais muette, meme pour T000
+        with urlopen(base + "/api/supervision") as response:
+            complet = json.loads(response.read().decode("utf-8"))
+        fiche_t000 = next(item["mission_structure"] for item in complet["sessions"]
+                          if item["native_id"] == native_id)
+        # Invariant T427 : la fiche porte soit le template coordination, soit le contrat ;
+        # une fiche VIDE ou muette est un defaut, quelque soit la voie.
+        assert any(str(value or "").strip() for value in fiche_t000.values()), "fiche jamais vide"
+        marqueur = str(fiche_t000.get("milestone") or "") + str(fiche_t000.get("extra") or "")
+        assert ("Coordination" in marqueur) or ("Contrat" in marqueur), "l'origine de la fiche est tracee"
 
         with urlopen(base + "/api/supervision/summary") as response:
             summary = json.loads(response.read().decode("utf-8"))

@@ -224,6 +224,18 @@ def validate_mission_structure(value):
     return dict(value)
 
 
+def service_log(message: str) -> str:
+    """R29 : journal du service, meme fichier que le serveur (trace qui doit survivre)."""
+    try:
+        from datetime import datetime
+        base = Path(os.environ.get('LOCALAPPDATA', 'C:/')) / 'ExcavatriceDragage'
+        with open(base / 'agent-supervisor-server.log', 'a', encoding='utf-8') as handle:
+            handle.write(f"{datetime.now().isoformat(timespec='seconds')} pid={os.getpid()} {message}\n")
+        return 'ok'
+    except OSError:
+        return '(log indisponible)'
+
+
 def _trace(**fields):
     """Journal interne (jamais affiche) : transition, constat, erreur de source."""
     try:
@@ -804,7 +816,7 @@ def dossier_public(dossier) -> dict:
 # devine pas un role. Canonique des criteres : TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md
 # section "Identite de coordination & surveillance du Superviseur".
 COORDINATION_JUDGE_NOTICE = (
-    "## SESSION DE COORDINATION (role orchestrateur/coordinateur, alias T000-*) : le juge applique "
+    "## SESSION DE COORDINATION (role orchestrateur/coordinateur, alias T000-*/TORC-*) : le juge applique "
     "les criteres de gestion specifiques — (1) la session ne cloture ni un constat ni une tache "
     "elle-meme (la cloture revient a l exploitant ou a un juge enregistre par le code) ; (2) une fiche "
     "de tache ne se modifie que par le coordinateur designe via l API Task Manager, jamais par edition "
@@ -815,12 +827,82 @@ COORDINATION_JUDGE_NOTICE = (
 
 
 def is_coordination_session(session) -> bool:
-    """T429 M15/R17 : session de coordination = alias T000-* ou tache liee T000. Detection mecanique."""
+    """T429 M15/R17 : session de coordination = alias T000-*/TORC-* ou tache liee T000/TORC.
+    R29/T427-CC02 (2026-11-17) : TORC est un orchestrateur HORS catalogue — il doit recevoir
+    la notice de coordination et entrer dans la detection de conflits comme T000."""
     if not isinstance(session, dict):
         return False
     alias = str(session.get("alias") or "").upper()
     task = str(session.get("task_id") or "").upper()
-    return alias.startswith("T000") or task == "T000"
+    return (alias.startswith(("T000", "TORC")) or task in ("T000", "TORC")
+            or task.startswith("TORC-"))
+
+
+_CONTRACT_CRITICITY_CACHE = {}
+
+
+def _inactivity_threshold_seconds(session) -> float:
+    """R29/T427-CC02 : seuil d'inactivité — coordination (T000*/TORC*) 4 h,
+    sinon la criticité du contrat lu via structure_quality (cache mtime),
+    défaut 24 h hors catalogue."""
+    if is_coordination_session(session):
+        return 4 * 3600
+    hours = 24.0
+    task_id = str(session.get("task_id") or "").strip()
+    if task_id:
+        try:
+            scripts_dir = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts"
+            if str(scripts_dir) not in sys.path:
+                sys.path.insert(0, str(scripts_dir))
+            import structure_quality
+            contract_file = structure_quality.contract_for(task_id)
+            stamp = _mtime(contract_file)
+            cached = _CONTRACT_CRITICITY_CACHE.get(task_id)
+            if cached is None or cached[0] != stamp:
+                data = structure_quality.contract_data(task_id)
+                criticite = str((data.get("contract") or {}).get("criticality") or "").strip().upper()
+                _CONTRACT_CRITICITY_CACHE[task_id] = (stamp, criticite)
+            criticite = _CONTRACT_CRITICITY_CACHE[task_id][1]
+        except Exception:
+            criticite = ""
+        if criticite == "C1":
+            hours = 24.0
+        elif criticite == "C2":
+            hours = 12.0
+        elif criticite in ("C3", "C4"):
+            hours = 24.0
+    return hours * 3600.0
+
+
+def _mtime(path) -> float:
+    try:
+        return path.stat().st_mtime if path else 0.0
+    except OSError:
+        return 0.0
+
+
+def _seconds_since_last_activity(session) -> float:
+    """Secondes depuis le dernier evenement de la session (fallback : derniere analyse)."""
+    events = session.get("events") or []
+    stamps = [str(event.get("at") or "") for event in events if isinstance(event, dict)]
+    stamp = _parse_iso_or_none(stamps[-1]) if stamps else None
+    if stamp is None:
+        stamp = _parse_iso_or_none(str(session.get("last_analysis") or ""))
+    if stamp is None:
+        return -1.0  # pas de base temporelle : le seuil decide seul
+    return max(0.0, time.time() - stamp)
+
+
+def _parse_iso_or_none(text):
+    try:
+        from datetime import datetime
+        from datetime import timezone
+        value = datetime.fromisoformat(str(text).strip().replace("Z", "+00:00"))
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.timestamp()
+    except (ValueError, TypeError):
+        return None
 
 
 # T429 M16/R18 (2026-11-15, ecart exploitant) : une session qui travaille SANS objectif ni
@@ -2036,21 +2118,21 @@ class Supervisor:
                 self._wake.set()
                 return {"resumed": resumed, "count": len(resumed)}
             elif action == "restart_service":
-                # M26/R29 (demande exploitant, 1 clic IHM) : le service se relance sous son
-                # BINAIRE — R29 (incident 2026-11-16) : os.execv est NON FIABLE sous Windows
-                # (lancemants "ok" puis aucune relance, journal vide). Desormais : spawn
-                # detach du meme script + sortie propre de l ancien processus. L etat
-                # persiste, les affectations non cloturees repartent en pause (securite connue).
-                def _self_restart():
-                    time.sleep(1.0)
-                    import subprocess
-                    script = str(Path(sys.argv[0]).resolve())
-                    subprocess.Popen([sys.executable, script] + list(sys.argv[1:]),
-                                     creationflags=getattr(subprocess, 'CREATE_NEW_PROCESS_GROUP', 0)
-                                     | getattr(subprocess, 'DETACHED_PROCESS', 0))
-                    os._exit(0)
-                threading.Thread(target=_self_restart, daemon=True).start()
-                return {"restarting": True, "delay_seconds": 1.0}
+                # M26/R29 (demande exploitant, 1 clic IHM). R29 2026-11-16 (incident prove,
+                # 3 mecanismes de spawn figes dans ce contexte, journal 12:16→12:27) : le
+                # service NE SE RESTART PLUS LUI-MEME. Il pose un flag expose dans /health ;
+                # le Task Manager (console attachée, spawn fiable) relai et relance le
+                # superviseur, dont la purge reprend alors la main.
+                self._restart_requested = True
+                try:
+                    self._persist()
+                except Exception:
+                    pass
+                return {"restarting": True, "mode": "task_manager_relay"}
+            elif action == "clear_restart_request":
+                # R29 : le relais (TM) relané le superviseur : le flag consomme.
+                self._restart_requested = False
+                return {"cleared": True}
 
             elif action == "set_task":
                 sid = command.get("id")
@@ -2961,6 +3043,43 @@ class Supervisor:
             session["source_checkpoint"] = session["watcher"].checkpoint()
             self._persist_background()
 
+    def _detect_inactive_sessions(self):
+        """R29/T427-CC02 (2026-11-17) : veille d'inactivite MECANIQUE, idempotente.
+        Une session active (surtout de coordination T000*/TORC*) qui ne produit plus
+        rien depuis son seuil recoit UN constat unique (category session_inactive).
+        Seuils : coordination 4 h ; autres selon criticite du contrat, defaut 24 h."""
+        for session in self.sessions.values():
+            if not session.get("enabled") or session.get("closed") or session.get("state") != "active":
+                continue
+            seconds_idle = _seconds_since_last_activity(session)
+            if seconds_idle <= 0:
+                continue
+            threshold = _inactivity_threshold_seconds(session)
+            if seconds_idle < threshold:
+                continue
+            fingerprint = hashlib.sha256(
+                ("session_inactive\n" + str(session.get("alias") or session.get("native_id"))
+                 + f"\n{int(threshold)}s").encode()).hexdigest()
+            if any(a.get("category") == "session_inactive" and a.get("fingerprint") == fingerprint
+                   for a in session["alerts"]):
+                continue
+            alias = session.get("alias") or session.get("native_id") or str(session["id"])
+            hours = round(threshold / 3600, 1)
+            kind = "seuil coordination (T000*/TORC*)" if is_coordination_session(session) else "seuil criticite"
+            text = (f"{alias} : aucune activite depuis plus de {hours} h ({kind}) - "
+                    "la session travaille-t-elle encore ? A relever par l'exploitant.")
+            alert = dict(id=fingerprint[:24], fingerprint=fingerprint, model="service",
+                severity="warning", reason=text, evidence=text, category="session_inactive",
+                title="Session inactive", created_at=timestamp(), last_occurrence=timestamp(),
+                occurrences=1, disposition="new", acknowledged_at=None,
+                workflow=dict(status="informational", delivery_status="not_sent", choice=None, rationale="", chosen_at=None, response=""))
+            alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"))
+            alert["memory_usage"] = memory_inventory(session)
+            session["alerts"].append(alert)
+            prepare_alert(alert)
+            record_event(session, "finding_created", text, timestamp(), alert_id=alert["id"], version=alert["version"])
+            _trace(event="session_inactive", session=str(session["id"]), alias=alias, seuil_heures=hours)
+
     def _detect_coordination_conflicts(self):
         """T429 M15/R17 : deux sessions de coordination actives simultanement = conflit.
         Constat MECANIQUE (pas le juge), idempotent : cree une fois, reste jusqu a cloture humaine."""
@@ -3003,8 +3122,20 @@ class Supervisor:
                 if not session.get("enabled") or session.get("state") != "active":
                     continue
                 missing = mission_cadrage_missing(session)
-                session["cadrage_state"] = dict(manquants=missing, at=timestamp())
+                structure = session.get("mission_structure") or {}
+                # R29/T427 (2026-11-17) : une fiche qui PORTE son etat (marqueur
+                # "Fiche incomplete" pose par connect_session sans contrat, cas
+                # T000*/TORC) ne doit pas produire un constat redondant — l'information
+                # est deja livree a l'attache, visible sur la fiche elle-meme.
+                declared_incomplete = any(
+                    "Fiche incomplete" in str(structure.get(key) or "")
+                    for key in ("unknowns", "extra", "milestone"))
+                session["cadrage_state"] = dict(
+                    manquants=missing, at=timestamp(),
+                    fiche_declaree_incomplete=declared_incomplete)
                 if not is_coordination_session(session):
+                    continue
+                if declared_incomplete:
                     continue
                 existing = next((a for a in (session.get("alerts") or []) if a.get("category") == "mission_non_cadree"), None)
             except Exception as detect_exc:   # la detection ne doit jamais tuer le cycle de collecte (M1)
@@ -3119,6 +3250,7 @@ class Supervisor:
                     self._detect_coordination_conflicts()
                     self._detect_mission_cadrage()
                     self._detect_actor_conflicts()
+                    self._detect_inactive_sessions()
                     if self._persist_pending and not self.load_error:
                         self._persist_background()
             self._wake.wait(self.poll_interval)

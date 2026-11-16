@@ -46,14 +46,24 @@ def _is_generic(value: str) -> bool:
 VALUE_CAPS = (300, 400, 1000, 2000, 4000)
 
 
+def cap_marker(value: str) -> bool:
+    """R29 : la valeur porte DEJA le marqueur explicite de troncature auto-remplissage."""
+    text = str(value or "")
+    return "[…] tronqué" in text or "… tronqué" in text
+
+
 def _is_truncated(value: str) -> bool:
     """Valeur coupee sans marqueur de troncature.
 
     Deux signatures : des crochets non equilibres (repr d un dict/list coupe),
     ou une valeur arrivee au cap de l auto-remplissage sans terminateur.
+    R29 : une valeur portant le marqueur explicite("[…] trone a N car. — lire X")
+    n est PAS "sans marqueur" — c est exactement le cas marque.
     """
     text = str(value or "").rstrip()
     if not text:
+        return False
+    if cap_marker(text):
         return False
     if text.count("[") != text.count("]") or text.count("{") != text.count("}"):
         return True
@@ -68,7 +78,11 @@ def contract_for(task_id: str) -> Path | None:
     for folder in sorted(TASKS_DIR.glob(f"{task_id}*")):
         if not folder.is_dir():
             continue
-        for candidate in sorted(folder.glob("*CONTRAT*.yaml")):
+        # R29 : les contrats portent CONTRAT (fr) au CONTRACT (en, ex. T432), et
+        # peuvent vivre dans le dossier de tache OU son sous-dossier CONTRACTS/ —
+        # au moment du 2026-11-17, T432 etait invisible (rglob des deux orthographes).
+        candidates = sorted(folder.rglob('*CONTRAT*.yaml')) + sorted(folder.rglob('*CONTRACT*.yaml'))
+        for candidate in candidates:
             return candidate
     return None
 
@@ -108,6 +122,11 @@ def quality(session) -> dict:
             markers.append(str(livrable.get("path") or ""))
         else:
             markers.append(str(livrable))
+    # R29 : les identifiants des criteres d acceptation (AC-...) sont des marqueurs
+    # de livrable legitimes — les "criteria" les citent mot pour mot.
+    for critere in (contract.get("acceptance") or []):
+        if isinstance(critere, dict) and critere.get("id"):
+            markers.append(str(critere["id"]))
     markers = [m for m in markers if m]
 
     sources = {}
@@ -178,7 +197,12 @@ def quality(session) -> dict:
                 (title and value.strip().upper() == title.upper())):
             alerts.append("la valeur reprend le titre de session : ce n est pas un objectif")
             state = "hors_sujet"
-        if value and markers and field in ("primary_goal", "current_goal", "scope_permissions", "criteria", "milestone"):
+        # R29 : l exigence de citer un livrable ne vaut QUE pour les criteres — qui
+        # decrivent des livrables testables et citent leurs identifiants. La preuve
+        # (contacter la source), le jalon (le contrat lui-meme), l objectif (l intention)
+        # ne citent pas de livrable par construction ; les exiger produisait des faux
+        # hors_sujet en serie (preuves exploitant 2026-11-16, fiche T429).
+        if value and markers and field in ("criteria",):
             if not any(marker.lower() in value.lower() for marker in markers):
                 alerts.append("la valeur ne renvoie aucun livrable de l objectif")
                 state = "hors_sujet"
