@@ -41685,6 +41685,25 @@ Ready := TRUE;
                 <simpleValue value="0.04" />
               </initialValue>
             </variable>
+            <variable name="FiniteCamActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Came finie : FALSE = capteur cumulatif ; TRUE = sortie active uniquement sur CamLength_M apres Threshold_M.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamLength_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawDetected">
@@ -41801,6 +41820,22 @@ Ready := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : borne de la zone cote interieur</xhtml>
               </documentation>
             </variable>
+            <variable name="PastFiniteCam">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement au-dela de la longueur physique de came</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamEnd_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne de fin de came finie</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_BlipMaxTransitions">
               <type>
                 <UDINT />
@@ -41851,6 +41886,7 @@ IF NOT Enable THEN
     ToggleTimerS := 0.0;
     TransitionCount := 0;
     EpisodeTogglePeriodS := 0.0;
+    PastFiniteCam := FALSE;
     RETURN;
 END_IF;
 
@@ -41859,8 +41895,20 @@ END_IF;
 IF NOT Initialized THEN
     IF ActiveBelowThreshold THEN
         RawDetected := Position_M &lt;= Threshold_M;
+        IF FiniteCamActive THEN
+            PastFiniteCam := Position_M &lt; (Threshold_M - MAX(0.0, CamLength_M));
+            RawDetected := RawDetected AND NOT PastFiniteCam;
+        ELSE
+            PastFiniteCam := FALSE;
+        END_IF;
     ELSE
         RawDetected := Position_M &gt;= Threshold_M;
+        IF FiniteCamActive THEN
+            PastFiniteCam := Position_M &gt; (Threshold_M + MAX(0.0, CamLength_M));
+            RawDetected := RawDetected AND NOT PastFiniteCam;
+        ELSE
+            PastFiniteCam := FALSE;
+        END_IF;
     END_IF;
     HystDetected := RawDetected;
     ElectricalOutput := RawDetected;
@@ -41890,6 +41938,14 @@ IF ActiveBelowThreshold THEN
     ELSE
         InCamDropout := (Position_M &lt;= CamNear_M - CST_CamHysteresis_M) AND (Position_M &gt; CamFar_M + CST_CamHysteresis_M);
     END_IF;
+    CamEnd_M := Threshold_M - MAX(0.0, CamLength_M);
+    IF NOT FiniteCamActive THEN
+        PastFiniteCam := FALSE;
+    ELSIF PastFiniteCam THEN
+        PastFiniteCam := Position_M &lt; (CamEnd_M + CST_CamHysteresis_M);
+    ELSE
+        PastFiniteCam := Position_M &lt; CamEnd_M;
+    END_IF;
 ELSE
     IF HystDetected THEN
         HystDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
@@ -41905,9 +41961,17 @@ ELSE
     ELSE
         InCamDropout := (Position_M &gt;= CamNear_M + CST_CamHysteresis_M) AND (Position_M &lt; CamFar_M - CST_CamHysteresis_M);
     END_IF;
+    CamEnd_M := Threshold_M + MAX(0.0, CamLength_M);
+    IF NOT FiniteCamActive THEN
+        PastFiniteCam := FALSE;
+    ELSIF PastFiniteCam THEN
+        PastFiniteCam := Position_M &gt; (CamEnd_M - CST_CamHysteresis_M);
+    ELSE
+        PastFiniteCam := Position_M &gt; CamEnd_M;
+    END_IF;
 END_IF;
-(* L5 : la perte de came s'applique a l'etat mecanique ; hors option, RawDetected = HystDetected. *)
-RawDetected := HystDetected AND NOT InCamDropout;
+(* L5 : perte de came + came finie ; hors options, RawDetected = HystDetected. *)
+RawDetected := HystDetected AND NOT InCamDropout AND NOT PastFiniteCam;
 
 (* Un episode est declenche par un franchissement mecanique, pas par une de ses
    propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)
