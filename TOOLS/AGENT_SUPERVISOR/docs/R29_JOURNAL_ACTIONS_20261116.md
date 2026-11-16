@@ -75,3 +75,38 @@ service (`%LOCALAPPDATA%\ExcavatriceDragage\agent-supervisor-server.log`).
 ### A11 — 11:56 · Commit incident
 - `3dce9dce` : fix purge + re-verif par colonnes + run_forever journalisé + taisement
   aborts + conftest garde + test_purge_guard (3 tests) + journal d'actions + RECU T432
+
+---
+
+## 12:07 → 12:16 · Logs debug + P7 + restart réel (A12-A16)
+
+### A12 — 12:07 · Logs de debug du serveur (demande exploitant)
+- Fichier : `supervisor_server.py` — requêtes HTTP (POST + erreurs ; polls GET 200 muets),
+  commandes API (action, cible, ok/ECHEC), PRET avec build/python, chemin d'état persisté,
+  rotation du journal à 2 Mo
+- Preuve live : les nouveaux logs ont tout de suite servi — `commande -> ECHEC :
+  JSONDecodeError` (mon POST mal échappé) visible dans le journal
+- Commit `80986343` (rapide checkpoint, à la demande)
+
+### A13 — 12:12 · P7 : re-rattachement de session clôturée (id conservé)
+- Fichier : `supervisor_service.py` (handler add) — session clôturée du même native_id
+  relancée SUR L'ID EXISTANT (au lieu d'inventer un assignment_id neuf à chaque fois) ;
+  événement `session_reattached` tracé
+- Preuves : `test_connect_session 11 passed` avec le service réel en marche (gardes
+  conftest actifs, états isoles dans %TEMP%\pytest) ; journal : `purge ignoree`
+- Commit `dc088b5f`
+
+### A14 — 12:14 · Découverte : `restart_service` répond "ok" mais ne relance JAMAIS
+- Preuves journal : `action=restart_service -> ok` puis aucun `SCRIPT LANCE` derrière
+- Cause : `os.execv` non fiable sous Windows + chemin de script relatif
+- Fix : spawn détaché du même script (chemin absolu, `CREATE_NEW_PROCESS_GROUP` +
+  `DETACHED_PROCESS`) puis `os._exit(0)` de l'ancien
+- **Preuve en réel** : commande 12:16:10 → nouveau pid 21796 (`SCRIPT LANCE` 12:16:20)
+  → `VERDICT libere (killed=[5640])` → PRET, état conservé
+- Commit `6c33499d` (erreur corrégée au passage : un vidage du journal dans un premier
+  jet du patch a été retiré avant commit — le journal est une archive)
+
+### A15 — 12:16 · État machine final
+- 8082 : process auto-relancé pid 21796, build `aaba0ba8c629`, `update_available: false`
+- 8081 : TM de l'exploitant en marche
+- Exploit prêt pour un essai réel de `/connect-session-supervisor` (P7 en service)

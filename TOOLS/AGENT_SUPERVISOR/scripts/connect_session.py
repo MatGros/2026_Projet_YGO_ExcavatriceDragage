@@ -45,7 +45,7 @@ def session_id_for(platform: str, supplied: str | None = None) -> str:
 
 def task_reference(value: str, *, anywhere: bool = False) -> str | None:
     matcher = re.search if anywhere else re.match
-    match = matcher(r"\s*(T\d+(?:-[0-9A-Z]+)*)", value, re.IGNORECASE)
+    match = matcher(r"\s*(TORC|T\d+(?:-[0-9A-Z]+)*)", value, re.IGNORECASE)
     if not match:
         return None
     task_ref = match.group(1)
@@ -54,9 +54,11 @@ def task_reference(value: str, *, anywhere: bool = False) -> str | None:
     return task_ref.upper()
 
 
-ALIAS_PATTERN = r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$"
+# TORC : identifiant reserve a l'orchestrateur multi-tache (plan T427, ligne 731).
+# Il ne correspond a aucune tache du catalogue : le titre est donc fourni explicitement.
+ALIAS_PATTERN = r"^(TORC|T\d+(-[0-9A-Z]+)?)-(CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$"
 ALIAS_IDENTITY_PATTERN = re.compile(
-    r"^(?P<task>T\d+(?:-[0-9A-Z]+)?)-(?P<agent>(?:CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2})$"
+    r"^(?P<task>(?:TORC|T\d+(?:-[0-9A-Z]+)?))-(?P<agent>(?:CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2})$"
 )
 MAX_DISPLAY_TITLE_LENGTH = 80
 
@@ -196,10 +198,74 @@ def populate_mission_from_contract(base_url: str, token: str, assignment_id: str
                                    task_ref: str, task_raw: str, mission_raw: str) -> bool:
     contract_path, data = find_task_contract(task_ref)
     if not contract_path or not data:
-        return False
+        # R29/T427-CC02 (2026-11-17) : une fiche vide acceptee en silence = une mission
+        # fantome que le juge analyse.
+        # T000/TORC : l'outil CONNAIT le contrat de gouvernance d'un orchestrateur
+        # (les 5 criteres de la notice COORDINATION_JUDGE_NOTICE) -> template rempli,
+        # non vide, ajustable par l'exploitant. Sans contrat par conception.
+        if task_ref.strip().upper().startswith(("T000", "TORC")):
+            structure = {
+                "subject": task_raw.strip(),
+                "task_ref": task_ref.strip(),
+                "primary_goal": (f"Coordination du projet par {task_ref.strip()} : piloter les taches "
+                                  "du catalogue via le canal orchestrateur designe ; NE JAMAIS cloter "
+                                  "un constat ni une tache soi-meme (regle 10)."),
+                "current_goal": "N/A — suivi au fil de l'eau, jalon porte par le pilotage orchestrateur",
+                "milestone": "Coordination (sans contrat par conception — alias T000*/TORC*)",
+                "scope_permissions": ("Coordination : DOC/WFLOW/TASKS via API Task Manager, chat agent, "
+                                       "journal ; lecture seule partout ailleurs"),
+                "constraints": "Orchestrateur hors catalogue : pas de contrat, regles de gouvernance obligatoires",
+                "criteria": ("Criteres de gestion : (1) clotures par l'exploitant ou un juge code ; "
+                              "(2) fiches modifiees via l'API Task Manager, jamais en direct ; "
+                              "(3) ne jamais contourner un verrou d'un autre acteur ; "
+                              "(4) preuve = git diff reel, pas un rapport d'agent ; "
+                              "(5) aucun commit ni push sans accord humain explicite."),
+                "evidence": "Template coordination pose par connect_session",
+                "unknowns": "Fiche coordination generique — ajustable par l'exploitant (pas de contrat)",
+                "next_step": "Pilotage du canal orchestrateur selon les criteres de gestion",
+                "extra": "Template coordination (T000*/TORC*) pose par connect_session",
+            }
+        else:
+            # R29 (regle exploitant 2026-11-17) : AUCUN champ vide — chaque champ non
+            # applicable est rempli explicitement ("N/A — raison"), informer toujours.
+            na = "N/A — fiche sans contrat, a cadrer par l'exploitant"
+            structure = {
+                "subject": task_raw.strip(),
+                "task_ref": task_ref.strip(),
+                "primary_goal": na,
+                "current_goal": na,
+                "milestone": f"Contrat introuvable pour {task_ref.strip()}",
+                "scope_permissions": na,
+                "constraints": na,
+                "criteria": na,
+                "evidence": "Fiche generee depuis connect_session sans contrat",
+                "unknowns": ("Fiche incomplete : contrat absent ou alias hors catalogue — a "
+                             "completer par l'exploitant (T000/TORC : sans contrat par conception)"),
+                "next_step": "A cadrer avec l'exploitant si la tache est formelle",
+                "extra": "Fiche generee depuis connect_session sans contrat",
+            }
+        try:
+            api_json(base_url + "/api/supervision", token=token, payload={
+                "action": "set_mission_structure", "origin": "contrat",
+                "id": assignment_id,
+                "structure": structure
+            })
+            return True
+        except Exception:
+            return False
     c = data.get("contract") or data
     objective = str(c.get("objective") or task_raw).strip()
-    scope = str(c.get("scope") or "DOC/WFLOW/ selon contrat de tâche").strip()
+    raw_scope = c.get("scope")
+    # R29 : humaniser le perimetre — {"allowed": [...], "forbidden": [...]} devient
+    # "Autorise : a, b · Interdit : c" au lieu du repr brut du dict.
+    if isinstance(raw_scope, dict):
+        allowed_text = ", ".join(str(item) for item in (raw_scope.get("allowed") or []))
+        forbidden_text = ", ".join(str(item) for item in (raw_scope.get("forbidden") or []))
+        scope = "Autorisé : " + (allowed_text or "—")
+        if forbidden_text:
+            scope += " · Interdit : " + forbidden_text
+    else:
+        scope = str(raw_scope or "DOC/WFLOW/ selon contrat de tâche").strip()
     constraints = str(c.get("constraints") or f"Criticité {c.get('criticality', 'C2')} · Stratégie {c.get('strategy', 'patch')}").strip()
     acceptance = c.get("acceptance") or []
     criteria_lines = []
@@ -213,17 +279,25 @@ def populate_mission_from_contract(base_url: str, token: str, assignment_id: str
                 criteria_lines.append(item)
     criteria_text = " · ".join(criteria_lines)[:600] if criteria_lines else "Selon critères du contrat"
 
+    def capped(value: str, limit: int, source_name: str) -> str:
+        """R29 : jamais de troncature silencieuse — un marqueur dit ou lire la fin."""
+        text = str(value or "").strip()
+        if len(text) <= limit:
+            return text
+        marker = f" […] tronqué à {limit} car. — lire {source_name}"
+        return text[:max(0, limit - len(marker))].rstrip() + marker
+
     structure = {
         "subject": task_raw.strip(),
         "task_ref": task_ref.strip(),
-        "primary_goal": objective[:400],
+        "primary_goal": capped(objective, 400, contract_path.name),
         # T429 : le titre de session n est PAS un objectif courant -> on ne le recopie
         # pas ; le champ reste a completer par l exploitant (la consigne est dans l IHM).
         "current_goal": "",
-        "milestone": f"Contrat {contract_path.name[:80]}",
-        "scope_permissions": scope[:300],
-        "constraints": constraints[:300],
-        "criteria": criteria_text[:400],
+        "milestone": capped(f"Contrat {contract_path.name}", 80, contract_path.name),
+        "scope_permissions": capped(scope, 300, contract_path.name),
+        "constraints": capped(constraints, 300, contract_path.name),
+        "criteria": capped(criteria_text, 400, contract_path.name),
         "evidence": f"Contrat validé : {contract_path.name[:80]}",
         "unknowns": "Selon avancement session",
         "next_step": "Exécution cadrée de la tâche",
@@ -259,14 +333,14 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
         raise ValueError("ID de tâche T### requis")
     if alias_task_ref != task_ref:
         raise ValueError(f"L'ID tâche de l'alias ({alias_task_ref}) ne correspond pas à --task ({task_ref})")
-    is_provisional = task_ref == "T000"
+    is_provisional = task_ref in ("T000", "TORC")
 
     task_match = re.match(r"^\s*T\d+(?:-[0-9A-Z]+)*\b(.*)$", task, re.IGNORECASE)
     inline_title = task_match.group(1).strip(" \t:—-") if task_match and not no_task else ""
     if is_provisional:
         resolved_title = (task_title or inline_title).strip()
         if not resolved_title:
-            raise ValueError("Titre explicite requis pour T000 / le suivi sans tâche formelle")
+            raise ValueError("Titre explicite requis pour T000 / TORC / le suivi sans tâche formelle")
         if task_title and inline_title and " ".join(task_title.split()).casefold() != " ".join(inline_title.split()).casefold():
             raise ValueError("Les titres fournis pour T000 ne correspondent pas")
     else:
@@ -312,10 +386,18 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
                 f"--mission \"{mission.strip()[:80]}\" --reassign"
             )
         status = "already_assigned" if existing.get("source") and existing.get("state") in ("active", "paused", "waiting") else "source_unavailable"
+        # R29/T427 (2026-11-17) : une fiche VIDE heritee d'un attach anterieur est comblee
+        # ici aussi — une fiche muette ne doit survivre a aucun re-rattachement.
+        fiche_vide = not (existing.get("mission_structure") or {})
+        if fiche_vide and task_ref and snapshot.get("token"):
+            populate_mission_from_contract(
+                base_url, snapshot.get("token"), existing["id"], task_ref, task_label, mission
+            )
         return dict(status=status, assignment_id=existing["id"], state=existing["state"],
                     alias=existing.get("alias"), platform=platform, native_id=session_id,
                     task_id=task_ref, task_title=resolved_title, agent_id=agent_id,
-                    task=task_label, source=existing.get("source"), error=existing.get("error"))
+                    task=task_label, source=existing.get("source"), error=existing.get("error"),
+                    fiche_completee=fiche_vide)
     if task_ref and not is_provisional:
         for item in snapshot.get("sessions", []):
             current_ref = task_reference(item.get("mission", ""), anywhere=True)
@@ -341,7 +423,9 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
                 if not confirmed_session or confirmed_session.get("display_title") != title_line:
                     raise RuntimeError("Réaffectation faite, mais le titre court n’a pas été confirmé")
                 structure_loaded = False
-                if task_ref and not is_provisional and snapshot.get("token"):
+                if task_ref and snapshot.get("token"):
+                    # R29/T427 : TORC/T000 passent aussi — la fiche porte son etat
+                    # "sans contrat par conception" au lieu de rester vide et muette.
                     structure_loaded = populate_mission_from_contract(
                         base_url, snapshot.get("token"), attached["id"], task_ref, task_label, mission
                     )
@@ -373,7 +457,8 @@ def connect(platform: str, session_id: str, alias: str, task: str, mission: str,
     if not attached or not attached.get("source"):
         raise RuntimeError("Le service n’a pas confirmé une source unique pour cet ID")
     structure_loaded = False
-    if task_ref and not is_provisional and snapshot.get("token"):
+    if task_ref and snapshot.get("token"):
+        # R29/T427 : TORC/T000 compris — fiche explicite "sans contrat par conception".
         structure_loaded = populate_mission_from_contract(
             base_url, snapshot.get("token"), attached["id"], task_ref, task_label, mission
         )
