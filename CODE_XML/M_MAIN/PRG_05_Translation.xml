@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-28T13:52:10.259055" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-28T13:52:10.259055">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-16T07:57:30.504718" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-16T07:57:30.504718">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -472,6 +472,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = mouvement demande vers Tremie, independant de InvertDriveDirection</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqMaintenanceSemantic">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = mouvement demande vers Maintenance/P1, independant de InvertDriveDirection</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -3067,6 +3075,7 @@ TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
 TranslationFinalInterlockRequest.ReqTremieSemantic := M3_ReqTremie_Active;
+TranslationFinalInterlockRequest.ReqMaintenanceSemantic := M3_ReqMaintenance_Active;
 
 // Derniere barriere avant PRG_06 : neutralisation immediate du variateur ET du
 // frein M3 hors AX2/AX14 en SEMI_AUTO. Elle reste volontairement redondante avec
@@ -3078,6 +3087,7 @@ IF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
     TranslationFinalInterlockRequest.RequestedDriveControlWord := 0;
     TranslationFinalInterlockRequest.RequestedDriveFreqHz := 0.0;
     TranslationFinalInterlockRequest.ReqTremieSemantic := FALSE;
+    TranslationFinalInterlockRequest.ReqMaintenanceSemantic := FALSE;
 END_IF;
 
 {endregion}
@@ -4809,6 +4819,7 @@ END_IF;
 // l'interdiction d'accès à la zone Maintenance est gérée séparément par la cible P1 et sa
 // coupure dure, sans couper le déplacement légal jusqu'à P1.
 EffectiveSafeStop := SafeStop
+                      OR ArrivalLock
                       OR (ReqTremie AND NOT EffectivePermitM3_Tremie)
                       OR (ReqMaintenance AND NOT EffectivePermitM3_Maintenance)
                       OR (ReqTremie AND ReqMaintenance);
@@ -4835,8 +4846,11 @@ TonBrakeRealFreqTimeout(
     PT := T#2S
 );
 
-MovementRequested := (ABS(SpeedRamp.Current) &gt; 0.1)
-                  OR ((ABS(DriveActualFreqHz) &gt; 0.5) AND NOT TonBrakeRealFreqTimeout.Q);
+// Des que ArrivalLock est arme au 1er trou capteur (Tremie ou P1),
+// couper immediatement MovementRequested pour fermer le frein comme en MANU.
+MovementRequested := NOT ArrivalLock
+                  AND ((ABS(SpeedRamp.Current) &gt; 0.1)
+                       OR ((ABS(DriveActualFreqHz) &gt; 0.5) AND NOT TonBrakeRealFreqTimeout.Q));
 
 Brake(
     Enable := Enable,
@@ -5122,7 +5136,8 @@ ELSE
         CycleTargetDirectionOk := (SelTarget = 3)
                                OR ((SelTarget = 1) AND Joystick.AxisX.DirectionPositive)
                                OR ((SelTarget &lt;&gt; 1) AND Joystick.AxisX.DirectionNegative);
-        CycleJoystickAxisOk := CycleTargetDirectionOk AND Joystick.AxisY.AtNeutral;
+        CycleJoystickAxisOk := CycleTargetDirectionOk
+                               AND (Joystick.AxisY.AtNeutral OR ((SelTarget = 1) AND (Joystick.AxisY.Direction &lt;= 0)));
         RunRequest := ReqTranslation.ReqStart AND Context.HeightInterlockOk AND CycleJoystickAxisOk;
         IF RunRequest THEN
             SpeedPct := 100.0;

@@ -5818,6 +5818,7 @@ instSensorTremie(Enable := Enable, Position_M := SensorPosition_M,
     BlipTransitions := SensorBlipTransitions, BlipDurationS := SensorBlipDurationS,
     CamDropoutActive := SensorCamDropoutActive, CamDropoutStart_M := SensorCamDropoutStart_M,
     CamDropoutWidth_M := SensorCamDropoutWidth_M,
+    FiniteCamActive := TRUE, CamLength_M := 0.04,
     CycleTimeS := CycleTimeS);
 instSensorPV(Enable := Enable, Position_M := SensorPosition_M,
     Threshold_M := PosPV_M, Hysteresis_M := SensorHysteresis_M,
