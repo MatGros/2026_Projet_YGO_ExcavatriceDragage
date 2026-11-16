@@ -94,6 +94,8 @@ def tm_stop_supervisor_port(port: int) -> bool:
 
 
 def find_or_start_supervisor(port=8082, state_path=None):
+    """R29 - architecture un-python-par-service : le TM DETECTE le superviseur,
+    jamais il ne le demarre ni ne l'arrete (celui-ci a son propre lanceur)."""
     service = RemoteSupervisor(port)
     def health():
         with urllib.request.urlopen(service.base + '/health', timeout=1) as response:
@@ -104,48 +106,14 @@ def find_or_start_supervisor(port=8082, state_path=None):
     try:
         info = health()
         if info.get('update_available') is True:
-            if port != 8082 or state_path is not None or info.get('default_storage') is not True:
-                service.notice = 'Mise a jour disponible ; recharger le service configure apres sauvegarde de son etat.'
-            else:
-                # The helper snapshots sessions and chat, and refuses a busy analysis.
-                helper = ROOT / 'TOOLS/AGENT_SUPERVISOR/scripts/upgrade_legacy.py'
-                try:
-                    print('Mise a jour du Superviseur : sauvegarde et reprise des sessions en cours...', flush=True)
-                    upgrade = subprocess.run([sys.executable, str(helper)], stderr=subprocess.PIPE, text=True,
-                                             encoding='utf8', errors='replace',
-                                             creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
-                    if upgrade.returncode:
-                        service.notice = 'Superviseur conserve en fonctionnement ; mise a jour non appliquee : ' + (upgrade.stderr.strip() or 'etat actif')
-                    else:
-                        updated = health()
-                        service.notice = ('Superviseur mis a jour avec sauvegarde de son etat.' if updated.get('update_available') is False
-                                          else 'Mise a jour du Superviseur non confirmee ; verifier son etat.')
-                except OSError as exc:
-                    service.notice = 'Mise a jour du Superviseur non confirmee : ' + type(exc).__name__
+            service.notice = 'Mise a jour du Superviseur disponible ; le relancer via LANCER_SUPERVISEUR.bat apres sauvegarde de son etat.'
         return service
     except urllib.error.HTTPError as exc:
-        raise ValueError('Port Superviseur occupe par un autre service') from exc
+        service.notice = 'Port Superviseur occupe par un autre service'
+        return service
     except (urllib.error.URLError, ConnectionError, TimeoutError):
-        script = ROOT / 'TOOLS/AGENT_SUPERVISOR/scripts/supervisor_server.py'
-        args = [sys.executable, str(script), '--port', str(port)]
-        if state_path is not None:
-            args.extend(['--state', str(state_path)])
-        process = subprocess.Popen(args,
-                                   creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
-        deadline = time.monotonic() + 5
-        while time.monotonic() < deadline:
-            try:
-                health()
-                service.started_here = True
-                service.process = process
-                return service
-            except urllib.error.HTTPError as exc:
-                raise ValueError('Port Superviseur occupe par un autre service') from exc
-            except (urllib.error.URLError, ConnectionError, TimeoutError):
-                if process.poll() is not None:
-                    raise OSError('Le service Superviseur ne peut pas demarrer')
-                time.sleep(.1)
-        raise TimeoutError('Demarrage du service Superviseur non confirme')
+        service.notice = 'Superviseur absent : demarre-le avec LANCER_SUPERVISEUR.bat'
+        return service
 
 
 def now() -> str:
@@ -574,10 +542,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 
 def tm_log(message: str) -> None:
-    """R29 : journal du Task Manager au meme endroit que celui du superviseur."""
+    """R29 : journal DU Task Manager, fichier propre (architecture : un journal par service)."""
     try:
         log_dir = Path(os.environ.get("LOCALAPPDATA", Path.home() / ".local/share")) / "ExcavatriceDragage"
-        with open(log_dir / "agent-supervisor-server.log", "a", encoding="utf-8") as handle:
+        with open(log_dir / "task-manager-server.log", "a", encoding="utf-8") as handle:
             handle.write(f"{datetime.now().isoformat(timespec='seconds')} pid={os.getpid()} [TM] {message}\n")
     except OSError:
         pass
@@ -610,24 +578,22 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
         print(f"Impossible de lancer Task Manager sur {HOST}:{port} : {exc}")
         return
     url = f"http://{HOST}:{port}/TASK_VIEWER.html"
+    # R29 - architecture un-python-par-service : detection pour AFFICHAGE seulement,
+    # jamais de demarrage ni d'arret du superviseur par le TM.
     try:
-        supervisor_port = int(os.environ.get('SUPERVISOR_PORT') or os.environ.get('VEILLEUR_PORT', '8082'))
-        if not 1 <= supervisor_port <= 65535:
-            raise ValueError('SUPERVISOR_PORT (ou VEILLEUR_PORT) doit etre compris entre 1 et 65535')
-        server.supervision = find_or_start_supervisor(supervisor_port)
+        server.supervision = find_or_start_supervisor(8082)
         info = server.supervision.snapshot()
         version = info.get('service_version')
         state = 'actif' if info.get('running') else 'arrete'
-        freshness = ('mise a jour : redemarrage necessaire' if info.get('update_available')
+        freshness = ('mise a jour : redemarrage necessaire (LANCER_SUPERVISEUR.bat)' if info.get('update_available')
                      else 'a jour' if info.get('update_available') is False else 'version non verifiable')
-        origin = 'demarre' if server.supervision.started_here else 'detecte'
-        print(f"Superviseur {origin} : {server.supervision.base}/ — {state}")
+        print(f"Superviseur detecte : {server.supervision.base}/ — {state}")
         print(f"  -> Version : {version or 'historique'} · {info.get('build_id') or 'non identifiee'} · {freshness}")
         if server.supervision.notice:
             print(f"  -> {server.supervision.notice}")
     except (OSError, ValueError) as exc:
         server.supervision = None
-        print(f"Superviseur indisponible : {exc}")
+        print("Superviseur absent : lance-le avec TOOLS\\AGENT_SUPERVISOR\\LANCER_SUPERVISEUR.bat")
     server.supervision_token = secrets.token_urlsafe(32)
     print(f"Task Manager local : {url}  (PID {os.getpid()})")
     print("  -> Ctrl+Clic sur le lien pour ouvrir Task Viewer dans votre navigateur.")
@@ -651,23 +617,9 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
         tm_log("arret du serveur Task Manager")
         server.server_close()
         lock_handle.seek(0); msvcrt.locking(lock_handle.fileno(), msvcrt.LK_UNLCK, 1); lock_handle.close()
-        # R29 - regle exploitant (2026-11-16, symetrique de la purge au lancement) :
-        # fermer le TM coupe AUSSI le superviseur du port 8082, demarre par nous ou
-        # detecte. Le TM est le lance d ensemble : Ctrl+C = tout meurt, ordre determine.
-        service = getattr(server, "supervision", None)
-        proc = getattr(service, "process", None) if service else None
-        if proc is not None and proc.poll() is None:
-            tm_log(f"arret du superviseur demarre par le TM (pid {proc.pid})")
-            try:
-                proc.terminate()
-                proc.wait(timeout=10)
-            except Exception as exc:
-                tm_log(f"arret superviseur : {type(exc).__name__} (pid {proc.pid})")
-            stopped = True
-        else:
-            stopped = tm_stop_supervisor_port(8082)
-        if not stopped:
-            tm_log("arret superviseur : aucun listener sur 8082 (deja libre)")
+        # R29 - architecture un-python-par-service : le TM n arrete QUE lui-meme.
+        # Le superviseur appartient a son propre lanceur (LANCER_SUPERVISEUR.bat).
+        tm_log("arret du serveur Task Manager : port 8081 libere")
 
 
 def parse_cli_args(argv: list[str] | None = None) -> tuple[int, bool, bool]:
