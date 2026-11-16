@@ -20,6 +20,18 @@
                 ]
             },
             {
+                "name": "🛡️ Supervisor",
+                "env": {
+                    "TK_HIST": "supervisor"
+                },
+                "autoExecuteCommands": true,
+                "icon": "shield",
+                "color": "terminal.ansiBrightBlue",
+                "commands": [
+                    "cmd /c TOOLS\\AGENT_SUPERVISOR\\LANCER_SUPERVISEUR.bat"
+                ]
+            },
+            {
                 "name": "🌐 OmniRoute Server",
                 "env": {
                     "TK_HIST": "omniroute"
