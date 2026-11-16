@@ -2036,13 +2036,19 @@ class Supervisor:
                 self._wake.set()
                 return {"resumed": resumed, "count": len(resumed)}
             elif action == "restart_service":
-                # M26/R29 (demande exploitant, 1 clic IHM) : le service se relance SOUS SON
-                # PROPRE BINAIRE — os.execv remplace le processus : le code du disque est
-                # recharge, l etat persiste, les affectations repartent en pause (la
-                # securite connue du redemarrage). La reponse est envoyee avant le remplacement.
+                # M26/R29 (demande exploitant, 1 clic IHM) : le service se relance sous son
+                # BINAIRE — R29 (incident 2026-11-16) : os.execv est NON FIABLE sous Windows
+                # (lancemants "ok" puis aucune relance, journal vide). Desormais : spawn
+                # detach du meme script + sortie propre de l ancien processus. L etat
+                # persiste, les affectations non cloturees repartent en pause (securite connue).
                 def _self_restart():
                     time.sleep(1.0)
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+                    import subprocess
+                    script = str(Path(sys.argv[0]).resolve())
+                    subprocess.Popen([sys.executable, script] + list(sys.argv[1:]),
+                                     creationflags=getattr(subprocess, 'CREATE_NEW_PROCESS_GROUP', 0)
+                                     | getattr(subprocess, 'DETACHED_PROCESS', 0))
+                    os._exit(0)
                 threading.Thread(target=_self_restart, daemon=True).start()
                 return {"restarting": True, "delay_seconds": 1.0}
 
