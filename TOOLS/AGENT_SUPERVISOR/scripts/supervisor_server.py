@@ -136,7 +136,15 @@ def log_line(message: str) -> None:
 def kill_port_listeners(port: int) -> None:
     """M27 (decision exploitant 2026-11-15) : AU LANCEMENT, tout ce qui ecoute le port est tue.
     Aucune instance precedente n est reutilisee et nul ne fait foi : le serveur demarre toujours
-    sur du code frais et un port libre. Les PID du netstat sont tures sauf le notre."""
+    sur du code frais et un port libre. Les PID du netstat sont tures sauf le notre.
+
+    R29 (2026-11-16, incident prove) : le filtre par sous-chaine ':<port> ' matchait la
+    colonne DISTANTE (0.0.0.0:0 sur toute ligne LISTENING). Avec port=0 (tests), la fonction
+    tuait TOUS les listeners de la machine. Desormais : parsing par colonnes, l adresse
+    LOCALE seule decide, et une purge sans port (<= 0) est ignoree."""
+    if port is None or port <= 0:
+        log_line(f"port {port} : purge ignoree (sans port concret, rien a tuer)")
+        return
     try:
         out = subprocess.run(['netstat', '-ano'], capture_output=True, text=True,
                              encoding='utf-8', errors='replace', timeout=20).stdout
@@ -146,10 +154,16 @@ def kill_port_listeners(port: int) -> None:
     killed = []
     for line in out.splitlines():
         stripped = line.strip()
-        if f':{port} ' not in stripped + ' ' or 'LISTENING' not in stripped:
+        if 'LISTENING' not in stripped:
+            continue
+        columns = stripped.split()
+        if len(columns) < 4:
+            continue
+        local_address = columns[1]
+        if not local_address.endswith(f':{port}'):
             continue
         try:
-            pid = int(stripped.rsplit(None, 1)[-1])
+            pid = int(columns[-1])
         except (ValueError, IndexError):
             continue
         if pid == my_pid or pid <= 0:
@@ -176,10 +190,13 @@ def kill_port_listeners(port: int) -> None:
     survivors = []
     for line in recheck.splitlines():
         stripped = line.strip()
-        if f':{port} LISTENING' not in stripped + ' ':
+        if 'LISTENING' not in stripped:
+            continue
+        columns = stripped.split()
+        if len(columns) < 4 or not columns[1].endswith(f':{port}'):
             continue
         try:
-            survivors.append(int(stripped.rsplit(None, 1)[-1]))
+            survivors.append(int(columns[-1]))
         except (ValueError, IndexError):
             continue
     remaining = [pid for pid in survivors if pid != my_pid and pid > 0]
@@ -189,12 +206,27 @@ def kill_port_listeners(port: int) -> None:
         log_line(f"VERDICT port {port} : libere (killed={killed})")
 
 
+def _silence_client_abort(self, request, client_address):
+    """R29 : les pollers qui coupent leur connexion en cours d'ecriture produisent
+    ConnectionAborted/ConnectionReset — bruit, pas un defaut. On le tait ; tout
+    autre probleme reste trace."""
+    import sys
+    if sys.exc_info()[0] in (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
+        return
+    import traceback
+    traceback.print_exc()
+
+
 def create_server(port=8082, state_path=None):
     # R29 - architecture exploitant (un python par service) : le superviseur ne purge
     # que SON port. Pas de croisade sur 8081/8092 : chaque service est maitre chez lui.
     log_line(f"SCRIPT LANCE : {Path(sys.argv[0]).resolve()} args={sys.argv[1:] or '[aucun]'}")
-    log_line(f"demarrage : purge du port {port} avant bind")
-    kill_port_listeners(port)
+    # R29 (incident 2026-11-16) : port=0 (tests, socket ephemere) = aucune purge.
+    if port is None or port <= 0:
+        log_line("bind ephemere (port 0) : purge ignoree")
+    else:
+        log_line(f"demarrage : purge du port {port} avant bind")
+        kill_port_listeners(port)
     home = Path.home()
     default_path = Path(os.environ.get('LOCALAPPDATA', home / '.local/share')) / 'ExcavatriceDragage/agent-supervision.json'
     state_path = Path(state_path) if state_path else default_path
@@ -212,7 +244,10 @@ def create_server(port=8082, state_path=None):
         else:
             import fcntl
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-        server = type('Server', (ThreadingHTTPServer,), {'daemon_threads': True})(('127.0.0.1', port), Handler)
+        server = type('Server', (ThreadingHTTPServer,), {
+            'daemon_threads': True,
+            'handle_error': _silence_client_abort,
+        })(('127.0.0.1', port), Handler)
         server.supervision = Supervisor(state_path=state_path, strict_assignments=True, persist_chat=True)
     except Exception:
         lock.close()
@@ -246,22 +281,35 @@ def main():
     # Pattern canonique (docs.python) : serve_forever dans un THREAD, Ctrl+C attrape
     # dans le thread principal, shutdown() appele depuis un autre thread que la boucle.
     import threading
-    run_thread = threading.Thread(target=server.serve_forever, daemon=True)
+
+    def run_forever(server_ref):
+        """R29 : le thread journalise proprement ce qui le tue — un serveur qui meurt
+        sans explication est inacceptable (constat exploitant 2026-11-16)."""
+        try:
+            server_ref.serve_forever()
+        except Exception:
+            import traceback
+            log_line('THREAD SERVEUR MORT :\n' + traceback.format_exc())
+            raise
+
+    run_thread = threading.Thread(target=run_forever, args=(server,), daemon=True, name='supervisor-serve')
     run_thread.start()
     # R29 : Event().wait() infini n est PAS interruptible par Ctrl+C sur Windows
     # (preuve exploitant 2026-11-16 : l exception sortait dans le thread serve_forever).
     # Boucle d attente par tranches courtes : le Ctrl+C se leve sur le thread principal.
     try:
-        while not threading.Event().is_set() and run_thread.is_alive():
+        while run_thread.is_alive():
             run_thread.join(0.5)
     except KeyboardInterrupt:
         log_line('arret du serveur (Ctrl+C)')
     finally:
-        log_line('arret du serveur')
-        try:
-            server.shutdown()
-        except Exception:
-            pass
+        # Le thread peut deja etre mort (trace dans le journal) : shutdown() n'attendrait
+        # rien et peut se bloquer a l'infini dans ce cas.
+        if run_thread.is_alive():
+            try:
+                server.shutdown()
+            except Exception:
+                pass
         try:
             server.supervision.close(timeout=3)
         except Exception:
