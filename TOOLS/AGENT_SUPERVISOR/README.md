@@ -47,6 +47,13 @@ rafraîchir son catalogue de commandes. Task Manager et Windows n'ont pas besoin
 Codex ne fournit pas encore ici de commande de chat équivalente ; utiliser l'affectation
 manuelle depuis Task Viewer.
 
+**Titre affiché dans le menu de gauche (R29, 2026-11-16).** Le nom visible dans le menu
+gauche de l'IHM est le *titre UI* = `<alias> <désignation>`. Il vient de l'option
+`--display-title "..."` du rattachement (ou de la désignation libre saisie après l'alias),
+et il est aussi posable après coup via l'action `set_alias` (`id`, `alias`, `display_title`).
+Sans titre UI, l'IHM n'affiche que l'alias : ce n'est pas un défaut d'affichage, c'est un
+titre absent. Le titre catalogue officiel de la tâche reste dans les métadonnées et la mission.
+
 Pour DSH, le collecteur lit le transcript local `.jsonl.zstd` avec Node.js 22 ou ultérieur.
 Lors du premier rattachement, le suivi commence à la fin du transcript ; aucun historique antérieur
 n'est importé. Une réécriture ou troncature suspend le suivi comme pour les autres sources.
