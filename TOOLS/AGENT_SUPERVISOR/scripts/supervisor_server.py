@@ -35,12 +35,41 @@ def ui_build_id():
     return hashlib.sha256(UI.read_bytes()).hexdigest()[:12]
 
 
+LOG_ROTATE_BYTES = 2 * 1024 * 1024  # R29 : rotation simple a 2 Mo, une seule archive
+
+
+def log_line(message: str) -> None:
+    """Journal du serveur : trace qui tourne, qui est tue, qui s arrete, qui interroge (R29)."""
+    try:
+        from datetime import datetime
+        log_dir = Path(os.environ.get('LOCALAPPDATA', Path.home() / '.local/share')) / 'ExcavatriceDragage'
+        log_path = log_dir / 'agent-supervisor-server.log'
+        try:
+            if log_path.exists() and log_path.stat().st_size > LOG_ROTATE_BYTES:
+                log_path.replace(log_path.with_name('agent-supervisor-server.log.1'))
+        except OSError:
+            pass
+        with open(log_path, 'a', encoding='utf-8') as handle:
+            handle.write(f"{datetime.now().isoformat(timespec='seconds')} pid={os.getpid()} {message}\n")
+    except OSError:
+        pass
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass
 
     def reply(self, status, value, content_type='application/json; charset=utf-8'):
         raw = value if isinstance(value, bytes) else json.dumps(value, ensure_ascii=False).encode('utf-8')
+        # R29 : trace debug des requetes — POST (commandes) et erreurs ; les GET 200
+        # (polls IHM toutes les 2 s) restent silencieux pour ne pas inonder le journal.
+        try:
+            verb = self.command
+            route = urlparse(self.path).path
+            if verb == 'POST' or status >= 400:
+                log_line(f"HTTP {verb} {route} -> {status} ({len(raw)} o)")
+        except Exception:
+            pass
         self.send_response(status)
         self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(len(raw)))
@@ -113,12 +142,15 @@ class Handler(BaseHTTPRequestHandler):
             command = json.loads(self.rfile.read(size))
             if not isinstance(command, dict):
                 raise ValueError('Object required')
+            log_line(f"commande action={command.get('action')} id={command.get('id') or '-'}")
             self.server.supervision.command(command)
             result = self.server.supervision.snapshot()
             result.update(self.service_info())
             result['token'] = self.server.supervision_token
+            log_line(f"commande action={command.get('action')} -> ok")
             return self.reply(200, result)
         except (ValueError, OSError, KeyError, TypeError) as exc:
+            log_line(f"commande -> ECHEC : {type(exc).__name__}: {exc}")
             return self.reply(400, {'error': str(exc)})
 
 
@@ -232,6 +264,7 @@ def create_server(port=8082, state_path=None):
     state_path = Path(state_path) if state_path else default_path
     state_path = state_path.resolve()
     state_path.parent.mkdir(parents=True, exist_ok=True)
+    log_line(f"etat persiste : {state_path}")
     lock = open(str(state_path) + '.lock', 'a+b')
     try:
         if os.name == 'nt':
@@ -276,7 +309,8 @@ def main():
         log_line('ECHEC au demarrage :\n' + traceback.format_exc())
         raise
     server.supervision.command({'action': 'start'})
-    log_line(f"serveur PRET port={server.server_port} build={server.build_id} ui={ui_build_id()}")
+    log_line(f"serveur PRET port={server.server_port} build={server.build_id} ui={ui_build_id()} "
+             f"python={sys.version.split()[0]}")
     print(f'Supervisor: http://127.0.0.1:{server.server_port}/', flush=True)
     # Pattern canonique (docs.python) : serve_forever dans un THREAD, Ctrl+C attrape
     # dans le thread principal, shutdown() appele depuis un autre thread que la boucle.

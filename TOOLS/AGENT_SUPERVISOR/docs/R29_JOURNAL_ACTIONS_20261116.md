@@ -50,4 +50,28 @@ service (`%LOCALAPPDATA%\ExcavatriceDragage\agent-supervisor-server.log`).
 ### Question ouverte (Q1)
 - Mort de l'ancien serveur 46508 entre 11:48:35 et 11:53:03 : mon run de test n'a tué
   personne (preuve journal factice ci-dessus) — cause non tranchée, notée dans
-  l'inventaire des problèmes, pas de spéculation.
+  l'inventaire des problèmes, pas de spéculation. (Exploitant : « on verra après »)
+
+---
+
+## 11:54 → 11:58 · Clôture de l'incident (A8-A11)
+
+### A8 — 11:54 · main() restructuré
+- Le thread serveur s'appelle via `run_forever()` : toute mort du thread est journalisée
+  (« THREAD SERVEUR MORT : + traceback ») — fini les morts sans explication
+- `shutdown()` n'est appelé que si le thread est encore vivant (sinon blocage infini,
+  preuve console exploitant : traceback dans `socketserver.shutdown.wait`)
+
+### A9 — 11:55 · Preuves du correctif en conditions réelles
+- Run pytest ciblé (2 fichiers) pendant que le service réel tournait : **exit 0, service
+  survivant** — journal live `11:53:55 bind ephemere (port 0) : purge ignoree`
+- Le garde conftest + le fix purge ont tenu ensemble
+
+### A10 — 11:55 · Bascules du service
+- 46508 → 46588 → 28624 → 41768 → **42168**, chaque purge tracée avec `VERDICT port 8082 :
+  libere (killed=[pid])` (parsing colonnes confirmé live)
+- État final : 8082 pid 42168, build `49f3ac4aa683`, `update_available: false`
+
+### A11 — 11:56 · Commit incident
+- `3dce9dce` : fix purge + re-verif par colonnes + run_forever journalisé + taisement
+  aborts + conftest garde + test_purge_guard (3 tests) + journal d'actions + RECU T432
