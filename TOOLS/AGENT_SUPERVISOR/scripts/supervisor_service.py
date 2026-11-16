@@ -1725,7 +1725,7 @@ class Supervisor:
     def snapshot(self):
         with self._lock:
             self._expire_test_notifications()
-            public = [{key: value.get(key, False if key == "closed" else 0 if key == "judge_turn_count" else None) for key in ("id", "platform", "native_id", "alias", "task_id", "task_title", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "memory", "context_truncated", "state", "enabled", "source", "error", "last_event", "last_analysis", "analysis_state", "analysis_error", "exchange_path", "exchange_error", "exchange_saved_at", "alerts", "judge_request", "judge_proposal", "messages_observed", "recovery", "events", "framing", "closed", "judge_turn_count")} for value in self.sessions.values()]
+            public = [{key: value.get(key, False if key == "closed" else 0 if key == "judge_turn_count" else None) for key in ("id", "platform", "native_id", "alias", "display_title", "task_id", "task_title", "task_designation", "mission", "initial_mission", "mission_updated_at", "mission_structure", "mission_structure_updated_at", "memory", "context_truncated", "state", "enabled", "source", "error", "last_event", "last_analysis", "analysis_state", "analysis_error", "exchange_path", "exchange_error", "exchange_saved_at", "alerts", "judge_request", "judge_proposal", "messages_observed", "recovery", "events", "framing", "closed", "judge_turn_count")} for value in self.sessions.values()]
             for item, session in zip(public, self.sessions.values()):
                 item["re_evaluations_count"] = max(0, session.get("judge_turn_count", 0) - 1) if session.get("judge_turn_count", 0) > 0 else 0
                 item["counts"] = counts(session["alerts"])
