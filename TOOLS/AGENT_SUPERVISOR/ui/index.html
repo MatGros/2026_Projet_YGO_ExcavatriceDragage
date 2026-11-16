@@ -60,7 +60,7 @@ le badge encadre etait peu lisible), standard par acteur. */
 .model-tag.model-dsh{color:#c4b8f8}
 .model-tag.model-opc{color:#f5d78e}
 .model-tag.model-mmx{color:#ffdd57}
-.session-summary-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.session-summary-name{font-weight:700;white-space:normal;overflow-wrap:anywhere}
 .session-summary-name.is-closed{color:#6272a4}
 .session-summary-name.is-paused{color:var(--muted)}
 .session-summary-name.is-active{color:#8be9a4}
@@ -1308,7 +1308,7 @@ function render(snapshot,force=false){
     statusKey='warning';
    }
    fold.classList.add('status-'+statusKey);
-   const summary=element('summary'),marker=element('i',undefined,'session-marker');summary.append(marker,element('span',session.alias||session.native_id,'session-summary-name is-'+statusKey),element('span',session.platform||'','session-summary-meta'));
+   const summary=element('summary'),marker=element('i',undefined,'session-marker');summary.append(marker,element('span',session.display_title||session.alias||session.native_id,'session-summary-name is-'+statusKey),element('span',session.platform||'','session-summary-meta'));
    const countChip=element('b','🔔 '+counts.follow_up+' · 🆕 '+counts.unread,'session-summary-counters unread');const stateCls=isStateError?'state-error':isStateClosed?'state-closed':isStatePaused?'state-paused':session.state==='active'?'state-active':'state-neutral';const stateName=isStateClosed?'🔒 Clôturée':(session.enabled===false&&!isStateError?'Paused':stateNames[session.state]||session.state||'Waiting');const stateChip=element('small',isStateClosed?'🔒 Clôturée':(session.enabled===false&&!isStateError?'⏸ Paused':stateName),'session-collection-state '+stateCls);countChip.title=counts.follow_up+' à suivre · '+counts.unread+' nouvelle(s)';stateChip.title=stateName;stateChip.setAttribute('aria-label',stateName);summary.append(severityCounts(counts),stateChip,element('span','▾ Déplié','fold-state-pill when-open'),element('span','▸ Replié','fold-state-pill when-closed'));fold.append(summary);
     summary.addEventListener('click',()=>{if(!fold.open){openSessionCards.clear();openSessionCards.add(session.id);selectedSideSessionId=session.id;try{localStorage.setItem('agent-supervision.selected-session.v1',session.id);}catch(_error){}for(const other of document.querySelectorAll('.session-fold')){if(other!==fold&&other.open){other.open=false;const otherId=other.querySelector('article')?.dataset.sessionId;if(otherId)openSessionCards.delete(otherId);}}savePanelState('agent-supervision.open-session-cards.v1',openSessionCards);renderSideSessions(sessions);}});
     fold.addEventListener('toggle',()=>{if(fold.open){openSessionCards.clear();openSessionCards.add(session.id);selectedSideSessionId=session.id;try{localStorage.setItem('agent-supervision.selected-session.v1',session.id);}catch(_error){}for(const other of document.querySelectorAll('.session-fold')){if(other!==fold&&other.open){other.open=false;const otherId=other.querySelector('article')?.dataset.sessionId;if(otherId)openSessionCards.delete(otherId);}}}else{openSessionCards.delete(session.id);}savePanelState('agent-supervision.open-session-cards.v1',openSessionCards);renderSideSessions(sessions);});
