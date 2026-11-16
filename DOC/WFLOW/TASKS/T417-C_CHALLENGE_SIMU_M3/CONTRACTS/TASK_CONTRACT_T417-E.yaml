@@ -1,0 +1,13 @@
+task_id: T417-E
+parent_id: T417-C
+criticality: C3
+domain: AUTOMATISME / SECURITE M3
+scope_files:
+  - CODE/M_MAIN/PRG_06_Outputs.st
+  - CODE/M_MAIN/PRG_05_Translation.st
+  - CODE/I_TRANSLATION/**
+acceptance_criteria:
+  - AC1: "Latch directionnel Tremie persistant (RETAIN) + anti-rebond ~100 ms + reset poste/IHM"
+  - AC2: "Garde anti-piege 2#00000 documentee / respectee pour Maintenance"
+  - AC3: "generate_codesys_bundle.py + G200_check_linkage.py PASS (0 erreur)"
+status: IN_PROGRESS
