@@ -1489,12 +1489,11 @@ CASE State OF
 
         IF Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
-            TranslationCmd.PositionTgt := 0;
+            TranslationCmd.PositionTgt := 1;
             WaitingForOperator := JoystickDeflected;
             WaitingForProcess := NOT JoystickDeflected;
             OperatorAction := 'AX14 - Tremie : relacher le joystick avant ouverture.';
             IF TranslationStopTimer.Q THEN
-                // T345-L2 : entree normale AX15A = nouveau cycle d'armement du geste benne.
                 SeenNeutralAfterArrival := FALSE;
                 State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
             END_IF;

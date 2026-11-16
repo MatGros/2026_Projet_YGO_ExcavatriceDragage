@@ -707,6 +707,7 @@ TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
 TranslationFinalInterlockRequest.ReqTremieSemantic := M3_ReqTremie_Active;
+TranslationFinalInterlockRequest.ReqMaintenanceSemantic := M3_ReqMaintenance_Active;
 
 // Derniere barriere avant PRG_06 : neutralisation immediate du variateur ET du
 // frein M3 hors AX2/AX14 en SEMI_AUTO. Elle reste volontairement redondante avec
@@ -718,6 +719,7 @@ IF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
     TranslationFinalInterlockRequest.RequestedDriveControlWord := 0;
     TranslationFinalInterlockRequest.RequestedDriveFreqHz := 0.0;
     TranslationFinalInterlockRequest.ReqTremieSemantic := FALSE;
+    TranslationFinalInterlockRequest.ReqMaintenanceSemantic := FALSE;
 END_IF;
 
 {endregion}

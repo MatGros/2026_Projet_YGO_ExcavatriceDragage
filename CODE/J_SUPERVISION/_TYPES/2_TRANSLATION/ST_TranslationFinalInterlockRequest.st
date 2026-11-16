@@ -25,5 +25,6 @@ STRUCT
     RequestedDriveControlWord    : WORD; // 0=None, 1=Fwd, 2=Rev, 7=Reset AC600
     RequestedDriveFreqHz         : REAL;
     ReqTremieSemantic            : BOOL; // TRUE = mouvement demande vers Tremie, independant de InvertDriveDirection
+    ReqMaintenanceSemantic       : BOOL; // TRUE = mouvement demande vers Maintenance/P1, independant de InvertDriveDirection
 END_STRUCT
 END_TYPE

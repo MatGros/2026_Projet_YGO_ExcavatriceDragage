@@ -288,6 +288,7 @@ END_IF;
 // l'interdiction d'accès à la zone Maintenance est gérée séparément par la cible P1 et sa
 // coupure dure, sans couper le déplacement légal jusqu'à P1.
 EffectiveSafeStop := SafeStop
+                      OR ArrivalLock
                       OR (ReqTremie AND NOT EffectivePermitM3_Tremie)
                       OR (ReqMaintenance AND NOT EffectivePermitM3_Maintenance)
                       OR (ReqTremie AND ReqMaintenance);
@@ -314,8 +315,11 @@ TonBrakeRealFreqTimeout(
     PT := T#2S
 );
 
-MovementRequested := (ABS(SpeedRamp.Current) > 0.1)
-                  OR ((ABS(DriveActualFreqHz) > 0.5) AND NOT TonBrakeRealFreqTimeout.Q);
+// Des que ArrivalLock est arme au 1er trou capteur (Tremie ou P1),
+// couper immediatement MovementRequested pour fermer le frein comme en MANU.
+MovementRequested := NOT ArrivalLock
+                  AND ((ABS(SpeedRamp.Current) > 0.1)
+                       OR ((ABS(DriveActualFreqHz) > 0.5) AND NOT TonBrakeRealFreqTimeout.Q));
 
 Brake(
     Enable := Enable,
