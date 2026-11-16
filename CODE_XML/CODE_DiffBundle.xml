@@ -15253,6 +15253,532 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_Sim_PositionSensor" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Position_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Threshold_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Hysteresis_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+            </variable>
+            <variable name="ActiveBelowThreshold">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+            <variable name="ElectricalDelayS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
+            <variable name="IntermittenceActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="IntermittenceDurationS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="IntermittencePeriodS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.12" />
+              </initialValue>
+            </variable>
+            <variable name="ScenarioSeed">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+            </variable>
+            <variable name="BlipTransitions">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profil « BLIP COURT » — SECOND profil, independant du train de bascules du profil
+       d'intermittence ci-dessus (dont les parametres restent inchanges).
+       0 = desactive : le comportement historique est strictement conserve.
+       Rejoue les excursions electriques courtes mesurees sur la trace terrain du
+       2026-09-04 : Tremie contradictoire pendant 2 echantillons a 12,24 s (~200 ms) et
+       PV reactive 1 echantillon a 14,94 s (~100 ms).
+         BlipTransitions = nombre de bascules electriques (1 = une excursion puis retour) ;
+         BlipDurationS   = duree de maintien de chaque etat, donc largeur de l'excursion.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlipDurationS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.2" />
+              </initialValue>
+            </variable>
+            <variable name="CamDropoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 (2026-10-28) — MECANISME DE CAME, SPATIAL : en franchissant le capteur on le VOIT,
+       on le PERD sur une courte zone, on le RETROUVE, puis il reste FIXE. Lie a la POSITION
+       (pas au temps) : se produit a chaque passage, dans les DEUX sens, et reste stable a
+       l'arret (bornes de la zone avec hysteresis CST_CamHysteresis_M contre le bruit/balancement).
+       Zone de perte placee APRES le front de detection (cote -/+ Hysteresis_M) :
+       [front - Start - Width ; front - Start] cote detection.
+       FALSE = historique strictement inchange. Valeurs = HYPOTHESES.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamDropoutStart_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+            </variable>
+            <variable name="CamDropoutWidth_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.04" />
+              </initialValue>
+            </variable>
+            <variable name="FiniteCamActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Came finie : FALSE = capteur cumulatif ; TRUE = sortie active uniquement sur CamLength_M apres Threshold_M.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamLength_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="RawDetected">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ElectricalOutput">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EpisodeActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BlipActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TransitionCount">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="EpisodeTogglePeriodS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreviousRawDetected">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EpisodeTarget">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DelayTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="EpisodeTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ToggleTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="RandomState">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="BlipRunning">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BlipTimerS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="BlipCount">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="HystDetected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : etat mecanique avec hysteresis (avant perte de came)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InCamDropout">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : position dans la zone de perte de la came</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamNear_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : borne de la zone cote front de detection</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamFar_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : borne de la zone cote interieur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PastFiniteCam">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement au-dela de la longueur physique de came</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CamEnd_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne de fin de came finie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_BlipMaxTransitions">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond du nombre de bascules du profil « blip court » : borne la duree de l'episode
+       et interdit tout rebouclage de compteur UDINT (revue du 2026-09-20, F9).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_CamHysteresis_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : hysteresis des bornes de la zone de perte</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+   Capteur de position cumulatif avec hysteresis et episode intermittent rejouable.
+   Cette brique ne connait ni le mouvement ni la logique M3 : elle transforme uniquement
+   une position mecanique vraie en DI.</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Initialized := FALSE;
+    RawDetected := FALSE;
+    ElectricalOutput := FALSE;
+    PreviousRawDetected := FALSE;
+    EpisodeActive := FALSE;
+    BlipActive := FALSE;
+    BlipRunning := FALSE;
+    BlipTimerS := 0.0;
+    BlipCount := 0;
+    DelayTimerS := 0.0;
+    EpisodeTimerS := 0.0;
+    ToggleTimerS := 0.0;
+    TransitionCount := 0;
+    EpisodeTogglePeriodS := 0.0;
+    PastFiniteCam := FALSE;
+    RETURN;
+END_IF;
+
+(* Hysteresis sur une frontiere cumulative : les cinq DI restent compatibles avec
+   le mot thermometre du decodeur M3, contrairement a cinq fenetres independantes. *)
+IF NOT Initialized THEN
+    IF ActiveBelowThreshold THEN
+        RawDetected := Position_M &lt;= Threshold_M;
+        IF FiniteCamActive THEN
+            PastFiniteCam := Position_M &lt; (Threshold_M - MAX(0.0, CamLength_M));
+            RawDetected := RawDetected AND NOT PastFiniteCam;
+        ELSE
+            PastFiniteCam := FALSE;
+        END_IF;
+    ELSE
+        RawDetected := Position_M &gt;= Threshold_M;
+        IF FiniteCamActive THEN
+            PastFiniteCam := Position_M &gt; (Threshold_M + MAX(0.0, CamLength_M));
+            RawDetected := RawDetected AND NOT PastFiniteCam;
+        ELSE
+            PastFiniteCam := FALSE;
+        END_IF;
+    END_IF;
+    HystDetected := RawDetected;
+    ElectricalOutput := RawDetected;
+    PreviousRawDetected := RawDetected;
+    RandomState := ScenarioSeed MOD 1000000;
+    IF RandomState = 0 THEN
+        RandomState := 1;
+    END_IF;
+    EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS);
+    Initialized := TRUE;
+    RETURN;
+END_IF;
+
+IF ActiveBelowThreshold THEN
+    IF HystDetected THEN
+        HystDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    ELSE
+        HystDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    END_IF;
+    (* Zone de perte : apres le front d'entree en detection (cote - hysteresis), vers l'interieur. *)
+    CamNear_M := Threshold_M - MAX(0.0, Hysteresis_M) - MAX(0.0, CamDropoutStart_M);
+    CamFar_M := CamNear_M - MAX(0.0, CamDropoutWidth_M);
+    IF NOT CamDropoutActive THEN
+        InCamDropout := FALSE;
+    ELSIF InCamDropout THEN
+        InCamDropout := (Position_M &lt;= CamNear_M + CST_CamHysteresis_M) AND (Position_M &gt; CamFar_M - CST_CamHysteresis_M);
+    ELSE
+        InCamDropout := (Position_M &lt;= CamNear_M - CST_CamHysteresis_M) AND (Position_M &gt; CamFar_M + CST_CamHysteresis_M);
+    END_IF;
+    CamEnd_M := Threshold_M - MAX(0.0, CamLength_M);
+    IF NOT FiniteCamActive THEN
+        PastFiniteCam := FALSE;
+    ELSIF PastFiniteCam THEN
+        PastFiniteCam := Position_M &lt; (CamEnd_M + CST_CamHysteresis_M);
+    ELSE
+        PastFiniteCam := Position_M &lt; CamEnd_M;
+    END_IF;
+ELSE
+    IF HystDetected THEN
+        HystDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
+    ELSE
+        HystDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
+    END_IF;
+    CamNear_M := Threshold_M + MAX(0.0, Hysteresis_M) + MAX(0.0, CamDropoutStart_M);
+    CamFar_M := CamNear_M + MAX(0.0, CamDropoutWidth_M);
+    IF NOT CamDropoutActive THEN
+        InCamDropout := FALSE;
+    ELSIF InCamDropout THEN
+        InCamDropout := (Position_M &gt;= CamNear_M - CST_CamHysteresis_M) AND (Position_M &lt; CamFar_M + CST_CamHysteresis_M);
+    ELSE
+        InCamDropout := (Position_M &gt;= CamNear_M + CST_CamHysteresis_M) AND (Position_M &lt; CamFar_M - CST_CamHysteresis_M);
+    END_IF;
+    CamEnd_M := Threshold_M + MAX(0.0, CamLength_M);
+    IF NOT FiniteCamActive THEN
+        PastFiniteCam := FALSE;
+    ELSIF PastFiniteCam THEN
+        PastFiniteCam := Position_M &gt; (CamEnd_M - CST_CamHysteresis_M);
+    ELSE
+        PastFiniteCam := Position_M &gt; CamEnd_M;
+    END_IF;
+END_IF;
+(* L5 : perte de came + came finie ; hors options, RawDetected = HystDetected. *)
+RawDetected := HystDetected AND NOT InCamDropout AND NOT PastFiniteCam;
+
+(* Un episode est declenche par un franchissement mecanique, pas par une de ses
+   propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)
+IF RawDetected &lt;&gt; PreviousRawDetected THEN
+    PreviousRawDetected := RawDetected;
+    EpisodeTarget := RawDetected;
+    (* Une bascule mecanique pendant l'episode modifie seulement la cible finale.
+       Elle ne remet jamais son chronometre a zero : l'episode reste borne. *)
+    IF NOT EpisodeActive THEN
+        DelayTimerS := 0.0;
+        EpisodeTimerS := 0.0;
+        ToggleTimerS := 0.0;
+        (* Tirage unique par episode : reproductible pour une graine et sans bruit
+           blanc scan-par-scan. La periode varie de 70 % a 130 % du nominal. *)
+        RandomState := RandomState + 7919;
+        IF RandomState &gt;= 1000000 THEN
+            RandomState := RandomState - 1000000;
+        END_IF;
+        EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS
+            * (0.7 + UDINT_TO_REAL(RandomState MOD 6000) / 10000.0));
+        EpisodeActive := IntermittenceActive AND (IntermittenceDurationS &gt; 0.0);
+    END_IF;
+    (* Blip court : arme sur le meme front MECANIQUE. Ses propres bascules electriques ne
+       peuvent donc jamais le rearmer — meme protection que l'episode d'intermittence. *)
+    IF (BlipTransitions &gt; 0) AND (BlipDurationS &gt; 0.0) THEN
+        BlipRunning := TRUE;
+        BlipTimerS := 0.0;
+        BlipCount := 0;
+        BlipActive := TRUE;
+        (* Ecretage : au-dela de ce plafond, un compteur UDINT pourrait reboucler et rendre
+           le blip non terminant (revue du 2026-09-20, F9). *)
+        BlipTransitions := MIN(BlipTransitions, CST_BlipMaxTransitions);
+    END_IF;
+END_IF;
+
+IF BlipRunning THEN
+    (* Protocole du blip court : (0) la sortie rejoint d'abord l'etat MECANIQUE — le
+       comportement nominal reste donc visible ; puis une excursion contradictoire toutes
+       les BlipDurationS, donc de largeur BlipDurationS ; enfin la sortie est rendue a
+       l'etat mecanique. Nombre d'excursions = BlipTransitions. *)
+    BlipTimerS := BlipTimerS + CycleTimeS;
+    IF BlipTimerS &gt;= MAX(CycleTimeS, BlipDurationS) THEN
+        BlipTimerS := 0.0;
+        IF BlipCount = 0 THEN
+            IF ElectricalOutput &lt;&gt; RawDetected THEN
+                ElectricalOutput := RawDetected;
+                TransitionCount := TransitionCount + 1;
+            END_IF;
+            BlipCount := 1;
+        ELSIF BlipCount &lt;= BlipTransitions THEN
+            ElectricalOutput := NOT ElectricalOutput;
+            TransitionCount := TransitionCount + 1;
+            BlipCount := BlipCount + 1;
+        ELSE
+            BlipRunning := FALSE;
+            BlipActive := FALSE;
+            IF ElectricalOutput &lt;&gt; RawDetected THEN
+                ElectricalOutput := RawDetected;
+                TransitionCount := TransitionCount + 1;
+            END_IF;
+            DelayTimerS := 0.0;
+        END_IF;
+    END_IF;
+ELSIF EpisodeActive THEN
+    EpisodeTimerS := EpisodeTimerS + CycleTimeS;
+    ToggleTimerS := ToggleTimerS + CycleTimeS;
+    IF ToggleTimerS &gt;= EpisodeTogglePeriodS THEN
+        ElectricalOutput := NOT ElectricalOutput;
+        ToggleTimerS := 0.0;
+        TransitionCount := TransitionCount + 1;
+    END_IF;
+    IF EpisodeTimerS &gt;= IntermittenceDurationS THEN
+        EpisodeActive := FALSE;
+        IF ElectricalOutput &lt;&gt; EpisodeTarget THEN
+            ElectricalOutput := EpisodeTarget;
+            TransitionCount := TransitionCount + 1;
+        END_IF;
+        DelayTimerS := 0.0;
+    END_IF;
+ELSIF ElectricalOutput &lt;&gt; RawDetected THEN
+    DelayTimerS := DelayTimerS + CycleTimeS;
+    IF DelayTimerS &gt;= MAX(0.0, ElectricalDelayS) THEN
+        ElectricalOutput := RawDetected;
+        DelayTimerS := 0.0;
+        TransitionCount := TransitionCount + 1;
+    END_IF;
+ELSE
+    DelayTimerS := 0.0;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>538b32eb-6dc2-59d5-8226-64383264fe4b</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Translation" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -47229,468 +47755,6 @@ END_IF;
           </data>
         </addData>
       </pou>
-      <pou name="FB_Sim_PositionSensor" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="Position_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="Threshold_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="Hysteresis_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.02" />
-              </initialValue>
-            </variable>
-            <variable name="ActiveBelowThreshold">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-            </variable>
-            <variable name="ElectricalDelayS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-            </variable>
-            <variable name="IntermittenceActive">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-            </variable>
-            <variable name="IntermittenceDurationS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-            </variable>
-            <variable name="IntermittencePeriodS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.12" />
-              </initialValue>
-            </variable>
-            <variable name="ScenarioSeed">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-            </variable>
-            <variable name="CycleTimeS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-            </variable>
-            <variable name="BlipTransitions">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profil « BLIP COURT » — SECOND profil, independant du train de bascules du profil
-       d'intermittence ci-dessus (dont les parametres restent inchanges).
-       0 = desactive : le comportement historique est strictement conserve.
-       Rejoue les excursions electriques courtes mesurees sur la trace terrain du
-       2026-09-04 : Tremie contradictoire pendant 2 echantillons a 12,24 s (~200 ms) et
-       PV reactive 1 echantillon a 14,94 s (~100 ms).
-         BlipTransitions = nombre de bascules electriques (1 = une excursion puis retour) ;
-         BlipDurationS   = duree de maintien de chaque etat, donc largeur de l'excursion.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BlipDurationS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.2" />
-              </initialValue>
-            </variable>
-            <variable name="CamDropoutActive">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 (2026-10-28) — MECANISME DE CAME, SPATIAL : en franchissant le capteur on le VOIT,
-       on le PERD sur une courte zone, on le RETROUVE, puis il reste FIXE. Lie a la POSITION
-       (pas au temps) : se produit a chaque passage, dans les DEUX sens, et reste stable a
-       l'arret (bornes de la zone avec hysteresis CST_CamHysteresis_M contre le bruit/balancement).
-       Zone de perte placee APRES le front de detection (cote -/+ Hysteresis_M) :
-       [front - Start - Width ; front - Start] cote detection.
-       FALSE = historique strictement inchange. Valeurs = HYPOTHESES.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CamDropoutStart_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.02" />
-              </initialValue>
-            </variable>
-            <variable name="CamDropoutWidth_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.04" />
-              </initialValue>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="RawDetected">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ElectricalOutput">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="EpisodeActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BlipActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TransitionCount">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="EpisodeTogglePeriodS">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="PreviousRawDetected">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="EpisodeTarget">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="DelayTimerS">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="EpisodeTimerS">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="ToggleTimerS">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="RandomState">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="BlipRunning">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BlipTimerS">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="BlipCount">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="HystDetected">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : etat mecanique avec hysteresis (avant perte de came)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InCamDropout">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : position dans la zone de perte de la came</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CamNear_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : borne de la zone cote front de detection</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CamFar_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : borne de la zone cote interieur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_BlipMaxTransitions">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1000" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond du nombre de bascules du profil « blip court » : borne la duree de l'episode
-       et interdit tout rebouclage de compteur UDINT (revue du 2026-09-20, F9).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_CamHysteresis_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">L5 : hysteresis des bornes de la zone de perte</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">DOC: DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   Capteur de position cumulatif avec hysteresis et episode intermittent rejouable.
-   Cette brique ne connait ni le mouvement ni la logique M3 : elle transforme uniquement
-   une position mecanique vraie en DI.</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-IF NOT Enable THEN
-    Initialized := FALSE;
-    RawDetected := FALSE;
-    ElectricalOutput := FALSE;
-    PreviousRawDetected := FALSE;
-    EpisodeActive := FALSE;
-    BlipActive := FALSE;
-    BlipRunning := FALSE;
-    BlipTimerS := 0.0;
-    BlipCount := 0;
-    DelayTimerS := 0.0;
-    EpisodeTimerS := 0.0;
-    ToggleTimerS := 0.0;
-    TransitionCount := 0;
-    EpisodeTogglePeriodS := 0.0;
-    RETURN;
-END_IF;
-
-(* Hysteresis sur une frontiere cumulative : les cinq DI restent compatibles avec
-   le mot thermometre du decodeur M3, contrairement a cinq fenetres independantes. *)
-IF NOT Initialized THEN
-    IF ActiveBelowThreshold THEN
-        RawDetected := Position_M &lt;= Threshold_M;
-    ELSE
-        RawDetected := Position_M &gt;= Threshold_M;
-    END_IF;
-    HystDetected := RawDetected;
-    ElectricalOutput := RawDetected;
-    PreviousRawDetected := RawDetected;
-    RandomState := ScenarioSeed MOD 1000000;
-    IF RandomState = 0 THEN
-        RandomState := 1;
-    END_IF;
-    EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS);
-    Initialized := TRUE;
-    RETURN;
-END_IF;
-
-IF ActiveBelowThreshold THEN
-    IF HystDetected THEN
-        HystDetected := Position_M &lt;= (Threshold_M + MAX(0.0, Hysteresis_M));
-    ELSE
-        HystDetected := Position_M &lt;= (Threshold_M - MAX(0.0, Hysteresis_M));
-    END_IF;
-    (* Zone de perte : apres le front d'entree en detection (cote - hysteresis), vers l'interieur. *)
-    CamNear_M := Threshold_M - MAX(0.0, Hysteresis_M) - MAX(0.0, CamDropoutStart_M);
-    CamFar_M := CamNear_M - MAX(0.0, CamDropoutWidth_M);
-    IF NOT CamDropoutActive THEN
-        InCamDropout := FALSE;
-    ELSIF InCamDropout THEN
-        InCamDropout := (Position_M &lt;= CamNear_M + CST_CamHysteresis_M) AND (Position_M &gt; CamFar_M - CST_CamHysteresis_M);
-    ELSE
-        InCamDropout := (Position_M &lt;= CamNear_M - CST_CamHysteresis_M) AND (Position_M &gt; CamFar_M + CST_CamHysteresis_M);
-    END_IF;
-ELSE
-    IF HystDetected THEN
-        HystDetected := Position_M &gt;= (Threshold_M - MAX(0.0, Hysteresis_M));
-    ELSE
-        HystDetected := Position_M &gt;= (Threshold_M + MAX(0.0, Hysteresis_M));
-    END_IF;
-    CamNear_M := Threshold_M + MAX(0.0, Hysteresis_M) + MAX(0.0, CamDropoutStart_M);
-    CamFar_M := CamNear_M + MAX(0.0, CamDropoutWidth_M);
-    IF NOT CamDropoutActive THEN
-        InCamDropout := FALSE;
-    ELSIF InCamDropout THEN
-        InCamDropout := (Position_M &gt;= CamNear_M - CST_CamHysteresis_M) AND (Position_M &lt; CamFar_M + CST_CamHysteresis_M);
-    ELSE
-        InCamDropout := (Position_M &gt;= CamNear_M + CST_CamHysteresis_M) AND (Position_M &lt; CamFar_M - CST_CamHysteresis_M);
-    END_IF;
-END_IF;
-(* L5 : la perte de came s'applique a l'etat mecanique ; hors option, RawDetected = HystDetected. *)
-RawDetected := HystDetected AND NOT InCamDropout;
-
-(* Un episode est declenche par un franchissement mecanique, pas par une de ses
-   propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)
-IF RawDetected &lt;&gt; PreviousRawDetected THEN
-    PreviousRawDetected := RawDetected;
-    EpisodeTarget := RawDetected;
-    (* Une bascule mecanique pendant l'episode modifie seulement la cible finale.
-       Elle ne remet jamais son chronometre a zero : l'episode reste borne. *)
-    IF NOT EpisodeActive THEN
-        DelayTimerS := 0.0;
-        EpisodeTimerS := 0.0;
-        ToggleTimerS := 0.0;
-        (* Tirage unique par episode : reproductible pour une graine et sans bruit
-           blanc scan-par-scan. La periode varie de 70 % a 130 % du nominal. *)
-        RandomState := RandomState + 7919;
-        IF RandomState &gt;= 1000000 THEN
-            RandomState := RandomState - 1000000;
-        END_IF;
-        EpisodeTogglePeriodS := MAX(0.01, IntermittencePeriodS
-            * (0.7 + UDINT_TO_REAL(RandomState MOD 6000) / 10000.0));
-        EpisodeActive := IntermittenceActive AND (IntermittenceDurationS &gt; 0.0);
-    END_IF;
-    (* Blip court : arme sur le meme front MECANIQUE. Ses propres bascules electriques ne
-       peuvent donc jamais le rearmer — meme protection que l'episode d'intermittence. *)
-    IF (BlipTransitions &gt; 0) AND (BlipDurationS &gt; 0.0) THEN
-        BlipRunning := TRUE;
-        BlipTimerS := 0.0;
-        BlipCount := 0;
-        BlipActive := TRUE;
-        (* Ecretage : au-dela de ce plafond, un compteur UDINT pourrait reboucler et rendre
-           le blip non terminant (revue du 2026-09-20, F9). *)
-        BlipTransitions := MIN(BlipTransitions, CST_BlipMaxTransitions);
-    END_IF;
-END_IF;
-
-IF BlipRunning THEN
-    (* Protocole du blip court : (0) la sortie rejoint d'abord l'etat MECANIQUE — le
-       comportement nominal reste donc visible ; puis une excursion contradictoire toutes
-       les BlipDurationS, donc de largeur BlipDurationS ; enfin la sortie est rendue a
-       l'etat mecanique. Nombre d'excursions = BlipTransitions. *)
-    BlipTimerS := BlipTimerS + CycleTimeS;
-    IF BlipTimerS &gt;= MAX(CycleTimeS, BlipDurationS) THEN
-        BlipTimerS := 0.0;
-        IF BlipCount = 0 THEN
-            IF ElectricalOutput &lt;&gt; RawDetected THEN
-                ElectricalOutput := RawDetected;
-                TransitionCount := TransitionCount + 1;
-            END_IF;
-            BlipCount := 1;
-        ELSIF BlipCount &lt;= BlipTransitions THEN
-            ElectricalOutput := NOT ElectricalOutput;
-            TransitionCount := TransitionCount + 1;
-            BlipCount := BlipCount + 1;
-        ELSE
-            BlipRunning := FALSE;
-            BlipActive := FALSE;
-            IF ElectricalOutput &lt;&gt; RawDetected THEN
-                ElectricalOutput := RawDetected;
-                TransitionCount := TransitionCount + 1;
-            END_IF;
-            DelayTimerS := 0.0;
-        END_IF;
-    END_IF;
-ELSIF EpisodeActive THEN
-    EpisodeTimerS := EpisodeTimerS + CycleTimeS;
-    ToggleTimerS := ToggleTimerS + CycleTimeS;
-    IF ToggleTimerS &gt;= EpisodeTogglePeriodS THEN
-        ElectricalOutput := NOT ElectricalOutput;
-        ToggleTimerS := 0.0;
-        TransitionCount := TransitionCount + 1;
-    END_IF;
-    IF EpisodeTimerS &gt;= IntermittenceDurationS THEN
-        EpisodeActive := FALSE;
-        IF ElectricalOutput &lt;&gt; EpisodeTarget THEN
-            ElectricalOutput := EpisodeTarget;
-            TransitionCount := TransitionCount + 1;
-        END_IF;
-        DelayTimerS := 0.0;
-    END_IF;
-ELSIF ElectricalOutput &lt;&gt; RawDetected THEN
-    DelayTimerS := DelayTimerS + CycleTimeS;
-    IF DelayTimerS &gt;= MAX(0.0, ElectricalDelayS) THEN
-        ElectricalOutput := RawDetected;
-        DelayTimerS := 0.0;
-        TransitionCount := TransitionCount + 1;
-    END_IF;
-ELSE
-    DelayTimerS := 0.0;
-END_IF;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>538b32eb-6dc2-59d5-8226-64383264fe4b</ObjectId>
-          </data>
-        </addData>
-      </pou>
       <pou name="FB_Sim_SuspendedLoad" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -48858,6 +48922,20 @@ Ready := TRUE;
           <Object Name="FB_Modes" ObjectId="472bf31b-6364-520b-84dc-569fca7609c9" />
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
+        <Folder Name="L_SIMULATION">
+          <Object Name="FB_Sim_PositionSensor" ObjectId="538b32eb-6dc2-59d5-8226-64383264fe4b" />
+          <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
+          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
+          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
+          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
+          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
+          <Object Name="FB_Sim_WinchElectrical" ObjectId="d4300e91-0ca0-50b0-9b21-524eed13dd0f" />
+          <Object Name="FB_Sim_SuspendedLoad" ObjectId="5e90360e-a4b1-5c07-88d0-97d04f31b674" />
+          <Object Name="FB_Sim_TranslationBrake" ObjectId="df996876-0665-532f-9bbb-9be3ca7669e4" />
+          <Object Name="FB_Sim_TranslationDrive" ObjectId="03da2ca5-829e-5f35-a2f5-646da12c2d06" />
+          <Object Name="FB_Sim_WinchMotor" ObjectId="cce43b3e-95fc-50e1-8d52-471f9c714033" />
+          <Object Name="FB_Sim_KlossTorque" ObjectId="319a2f9e-c6a8-5252-8df3-c9df3e0746f8" />
+        </Folder>
         <Folder Name="I_TRANSLATION">
           <Object Name="FB_Translation" ObjectId="de336a4c-425c-5d56-a65e-a979a390c79c" />
           <Object Name="FB_TranslationCmdArbitrationM3" ObjectId="36ea547a-49af-554a-909b-ff3e7bde3897" />
@@ -48982,20 +49060,6 @@ Ready := TRUE;
           <Object Name="ST_fbJoystick_Cfg" ObjectId="15265f47-4d56-5d85-af5c-415e86b1194e" />
           <Object Name="ST_fbJoystick_AxisCmd" ObjectId="b6fd2799-de8b-52a1-87c0-15b96ff2b5f6" />
           <Object Name="FB_AxisScale" ObjectId="e974ff21-ff4c-5a4b-ba11-7923dd2c8334" />
-        </Folder>
-        <Folder Name="L_SIMULATION">
-          <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
-          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
-          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
-          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
-          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
-          <Object Name="FB_Sim_WinchElectrical" ObjectId="d4300e91-0ca0-50b0-9b21-524eed13dd0f" />
-          <Object Name="FB_Sim_PositionSensor" ObjectId="538b32eb-6dc2-59d5-8226-64383264fe4b" />
-          <Object Name="FB_Sim_SuspendedLoad" ObjectId="5e90360e-a4b1-5c07-88d0-97d04f31b674" />
-          <Object Name="FB_Sim_TranslationBrake" ObjectId="df996876-0665-532f-9bbb-9be3ca7669e4" />
-          <Object Name="FB_Sim_TranslationDrive" ObjectId="03da2ca5-829e-5f35-a2f5-646da12c2d06" />
-          <Object Name="FB_Sim_WinchMotor" ObjectId="cce43b3e-95fc-50e1-8d52-471f9c714033" />
-          <Object Name="FB_Sim_KlossTorque" ObjectId="319a2f9e-c6a8-5252-8df3-c9df3e0746f8" />
         </Folder>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="BENNE">
