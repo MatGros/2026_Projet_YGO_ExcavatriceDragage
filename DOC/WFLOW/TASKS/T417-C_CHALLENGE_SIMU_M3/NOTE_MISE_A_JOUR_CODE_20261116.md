@@ -1,6 +1,6 @@
 # 📦 Note de mise à jour code — Lot M3 / Cycle Semi-Auto / MAINT N2 (2026-11-16)
 
-> **Statut :** Implémenté en local (non commité) · **Bundles prêts :** `CODE_XML/CODE_Bundle.xml` et `CODE_XML/CODE_DiffBundle.xml` (10 objets).  
+> **Statut :** Commité en lots granulaires · **Bundles prêts :** `CODE_XML/CODE_Bundle.xml` et `CODE_XML/CODE_DiffBundle.xml` (12 objets).  
 > **Compagnon terrain :** [GUIDE_TERRAIN_MES_M3_ET_CHANTIERS_20261116.md](./GUIDE_TERRAIN_MES_M3_ET_CHANTIERS_20261116.md)  
 > **Principe :** Toutes les nouvelles souplesses de cycle sont **débrayables** et **désactivées par défaut** (`FALSE` / `0.0`) dans `GVL_IHM.CycleSemiAuto.Cmd` (fin de `ST_CycleCmd.st:26-28`, non persistées ➔ zéro décalage `GVL_PERSISTENT`).
 
@@ -66,9 +66,21 @@
 
 ---
 
-## 6. 📊 Trace CODESYS & fichiers de livraison associés
+## 6. 🛡️ Anti-démarrage accidentel du Grafcet Homing au joystick (`T377` partiel R3)
 
-- **Trace M3 classée par échelle (35 variables, 4 groupes) :** `TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/Trace_Site_M3_Par_Echelle.trace`
+- **Toujours actif** (sans bit IHM supplémentaire) :
+  - [`PRG_02_Acquisition.st:607-609`](../../../../CODE/M_MAIN/PRG_02_Acquisition.st#L607-L609) : retrait de `HwIn.Operator.JoyBtnRaw OR` sur `BtnValidation` — seul le bouton IHM dédié (`BtnStart` / `BtnValidate`) reste actif.
+  - [`FB_CycleMachineHoming.st:411-420`](../../../../CODE/G_CYCLE/FB_CycleMachineHoming.st#L411-L420) (`HX0_REPOS`) : ajout de `AND NOT JoystickDeflected` à l'entrée du cycle.
+- **Conséquence terrain à connaître :**
+  - Toucher le joystick (homme-mort `JoyBtnRaw` ou débattement manche) en `MAINT_N2` **ne démarre plus jamais** `FB_CycleMachineHoming` — le homing unitaire manuel (`BtnHome` / `BtnHomingAtZero`) reste 100 % libre.
+  - Le geste *« 3 appuis homme-mort joystick »* est retiré (lancement cycle = IHM exclusif, manche au neutre).
+  - *Rappel code vérifié (`FB_CycleMachineHoming.st:23, 273-289, 602-605` + `PRG_04_Treuils_Benne.st:715-718`) :* `BootReady` n'est pas bloquant en `HX0` (ne pas appuyer sur `BtnStart` sans codeurs), et si `MachineHomed` a déjà été `TRUE` dans la session puis perdu, un **Reset IHM à l'arrêt mécanique** (`FaultMachineReset_IHM`) reste nécessaire pour réarmer `ReHomingAckRequired` avant `SEMI_AUTO`.
+
+---
+
+## 7. 📊 Trace CODESYS & fichiers de livraison associés
+
+- **Trace M3 classée par échelle (35 variables, 4 groupes) :** `TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/config/Trace_Site_M3_Par_Echelle.trace`
 - **Générateur complet / diff :**
   - `CODE_XML/CODE_Bundle.xml` (264 objets)
-  - `CODE_XML/CODE_DiffBundle.xml` (10 objets modifiés + fermeture des types)
+  - `CODE_XML/CODE_DiffBundle.xml` (12 objets modifiés + fermeture des types)

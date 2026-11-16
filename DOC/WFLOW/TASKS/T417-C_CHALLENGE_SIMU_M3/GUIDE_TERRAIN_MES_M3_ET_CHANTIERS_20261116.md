@@ -3,8 +3,8 @@
 > **Date :** 2026-11-16 · **Version :** 3.0 (Consolidé après Challenge 7 Agents Ollama & Implémentation ST)  
 > **Note technique de cette mise à jour :** [NOTE_MISE_A_JOUR_CODE_20261116.md](./NOTE_MISE_A_JOUR_CODE_20261116.md) (bits IHM exacts, défauts `FALSE`/`0.0`, nuances & périmètre).  
 > **Format :** TDAH-Friendly · Checklists actionnables · Arbres de décision (Action ➔ Résultat ➔ Piste ➔ Solution)  
-> **Bundles prêts à importer :** `CODE_XML/CODE_Bundle.xml` (complet) et `CODE_XML/CODE_DiffBundle.xml` (rapide : 10 objets modifiés).  
-> **Trace M3 classée par échelle :** `TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/Trace_Site_M3_Par_Echelle.trace` (35 variables actives, 4 groupes d'échelle).
+> **Bundles prêts à importer :** `CODE_XML/CODE_Bundle.xml` (complet) et `CODE_XML/CODE_DiffBundle.xml` (rapide : 12 objets modifiés, incluant verrou R3 anti-démarrage homing au joystick).  
+> **Trace M3 classée par échelle :** `TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/config/Trace_Site_M3_Par_Echelle.trace` (35 variables actives, 4 groupes d'échelle).
 
 ---
 
