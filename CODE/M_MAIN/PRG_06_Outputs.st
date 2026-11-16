@@ -94,6 +94,7 @@ VAR
     M2BrakeCmd                   : BOOL; // . [LOC] Ordre desserrage frein M2
     TranslationBrakeCmd          : BOOL; // . [LOC] Demande frein M3 arbitree
     M3_TremieHardStopActive      : BOOL; // . [SAFE] FDC brut Tremie coupe immediatement le sens Tremie
+    M3_TremieHardStopLatched     : BOOL; // . [SAFE] T417-E : latch directionnel Tremie (anti-perte came + power-up)
     PowerKeepAliveACmd           : BOOL; // . [LOC] Maintien puissance voie A
     PowerKeepAliveBCmd           : BOOL; // . [LOC] Maintien puissance voie B
     EmergencyArmingCmd           : BOOL; // . [LOC] Impulsion rearmement puissance AU
@@ -428,7 +429,19 @@ M3BlockedBySafetyInfo := M3PowerCutOffSafetyInfo OR M3SafeStopSafetyInfo;
 // Coupure directionnelle ultime sur le FDC physique Tremie. Cette barriere lit
 // le DI qualifie du meme scan et ne depend ni du decodeur de position, ni du G7,
 // ni du step courant. Le recul vers P1/Maintenance reste autorise.
-M3_TremieHardStopActive := PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI
+// T417-E (Plan A1) : latch directionnel Tremie (couvre perte came apres depassement + power-up hors came).
+IF PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI OR GVL_PERSISTENT._TranslationAtTremiePersisted THEN
+    M3_TremieHardStopLatched := TRUE;
+END_IF;
+
+// Rearmement uniquement par Reset IHM + capteur revenu + commande opposee Maintenance.
+IF PRG_07_Supervision.FaultMachineReset_IHM
+   AND NOT PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI
+   AND PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqMaintenanceSemantic THEN
+    M3_TremieHardStopLatched := FALSE;
+END_IF;
+
+M3_TremieHardStopActive := (PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI OR M3_TremieHardStopLatched)
                            AND PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqTremieSemantic;
 
 instTranslationOutputInterlockM3(
@@ -437,7 +450,8 @@ instTranslationOutputInterlockM3(
     PowerContactorEngaged      := PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop,
     EffectivePermitM3_Tremie   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
-                                  AND NOT PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI,
+                                  AND NOT PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI
+                                  AND NOT M3_TremieHardStopLatched,
     EffectivePermitM3_Maintenance := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance,
     BrakeReleaseRequest        := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest
                                   AND NOT M3_TremieHardStopActive,
