@@ -108,7 +108,9 @@ instModes(
     SelMaintenanceZoneAccess := GVL_IHM.M3Translation.Cmd.TglMaintenanceZoneAccess,
     // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
     CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,
-    M3AtTremie              := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie,
+    // T417-F : stabiliser M3AtTremie via M3_AtTremieStable pour maintenir la garde benne au-dessus de la tremie
+    M3AtTremie              := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie
+                               OR PRG_05_Translation.Data.M3_AtTremieStable,
     AllowWinchMoveAtTremie  := GVL_IHM.M3Translation.Cmd.TglAllowWinchMoveAtTremie,
     JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,

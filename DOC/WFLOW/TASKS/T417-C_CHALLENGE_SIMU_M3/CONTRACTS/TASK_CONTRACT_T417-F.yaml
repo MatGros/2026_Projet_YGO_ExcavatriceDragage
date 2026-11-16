@@ -1,0 +1,12 @@
+task_id: T417-F
+parent_id: T417-C
+criticality: C3
+domain: CYCLE / MODES / BENNE TREMIE
+scope_files:
+  - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+  - CODE/F_MODES/FB_Modes.st
+  - CODE/G_CYCLE/FB_CycleSemiAuto.st
+acceptance_criteria:
+  - AC1: "M3AtTremie stabilise via M3_AtTremieStable pour maintenir la garde benne au-dessus de la tremie"
+  - AC2: "generate_codesys_bundle.py + G200_check_linkage.py PASS (0 erreur)"
+status: READY
