@@ -48,10 +48,15 @@ VAR
     CycleDrainTimeEffective       : TIME; // . [LOC] Consigne egouttage convertie en TIME pour FB_CycleSemiAuto
     StepForceTgtCmd               : INT;  // . [LOC] Consigne de forcage lue AVANT l'appel du FB : base du compare-et-efface (acquittement T358, cf. §3)
     EffectiveWinchSelectRequest   : INT;  // . [LOC] Selecteur treuil effectif (override cycle homing HX1/HX1a ou IHM)
+    CycleInitWindowEff_M          : REAL; // . [LOC] Fenetre haute effective AX1_INIT (nominale ou elargie par option IHM)
+    CycleWinchesHighZoneOk        : BOOL; // . [LOC] Sous-critere AX1_INIT : treuils M1/M2 dans la zone haute
+    CycleBucketQualifiedOk        : BOOL; // . [LOC] Sous-critere AX1_INIT : etat benne qualifie (ou dispense souple)
+    CycleM3NotInMaintOk           : BOOL; // . [LOC] Sous-critere AX1_INIT : chariot M3 hors zone Maintenance
 END_VAR
 
 VAR CONSTANT
-    CST_CycleInitWindowM : REAL := 0.4;    // Plage d'acceptation posture de départ cycle (m)
+    CST_CycleInitWindowM      : REAL := 0.4;    // Plage d'acceptation posture de départ cycle (m)
+    CST_CycleInitWindowRelaxM : REAL := 2.0;    // Plage elargie d'acceptation posture de depart cycle sous option souple (m)
 END_VAR
 
 // === 🔀 §1 ARBITRAGE DES MODES MACHINE & INTENTION OPÉRATEUR ===
@@ -172,14 +177,23 @@ END_IF;
 // ET état mécanique benne qualifié (IsClosed ou IsOpen via FB_Bucket, les sécurités gérant les écarts anormaux)
 // ET chariot M3 PAS à droite de P1 (côté maintenance interdit). Le positionnement fin
 // sur P1 est fait ensuite en AX2. Calculé ici — FB_CycleSemiAuto ne fait que consommer.
-CycleWinchesAtTopOk :=
-    (PRG_04_Treuils_Benne.Data.WinchM1Safety.CableLimitAscent
-     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.CableLimitAscent
-     OR (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - _CommunCfgPersist.CfgCableLimitAscent_M) <= CST_CycleInitWindowM))
-    AND (PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed OR PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen);
+CycleInitWindowEff_M := SEL(GVL_IHM.CycleSemiAuto.Cmd.TglRelaxSemiAutoStart,
+                            CST_CycleInitWindowM,
+                            CST_CycleInitWindowRelaxM);
+CycleWinchesHighZoneOk :=
+    PRG_04_Treuils_Benne.Data.WinchM1Safety.CableLimitAscent
+    OR PRG_04_Treuils_Benne.Data.WinchM2Safety.CableLimitAscent
+    OR (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - _CommunCfgPersist.CfgCableLimitAscent_M) <= CycleInitWindowEff_M);
+CycleBucketQualifiedOk :=
+    PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed
+    OR PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen
+    OR (GVL_IHM.CycleSemiAuto.Cmd.TglRelaxSemiAutoStart AND CycleWinchesHighZoneOk);
+CycleM3NotInMaintOk := NOT PRG_05_Translation.Data.M3_AtMaintenanceStable;
+
+CycleWinchesAtTopOk := CycleWinchesHighZoneOk AND CycleBucketQualifiedOk;
 
 // Posture de départ complète (AX1_INIT) = treuils en haut ET chariot M3 PAS à droite de P1.
-CycleInitPositionOk := NOT PRG_05_Translation.Data.M3_AtMaintenanceStable AND CycleWinchesAtTopOk;
+CycleInitPositionOk := CycleM3NotInMaintOk AND CycleWinchesAtTopOk;
 
 {endregion}
 
@@ -272,6 +286,9 @@ instCycleSemiAuto(
     HomedM1                 := PRG_02_Acquisition.Data.EncoderM1.Homed,
     HomedM2                 := PRG_02_Acquisition.Data.EncoderM2.Homed,
     InitPositionOk          := CycleInitPositionOk,
+    InitM3MaintBlocked      := NOT CycleM3NotInMaintOk,
+    InitWinchTopBlocked     := NOT CycleWinchesHighZoneOk,
+    InitBucketStateBlocked  := NOT CycleBucketQualifiedOk,
     WinchesAtTopWindow      := CycleWinchesAtTopOk,
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
     CfgDrainTime            := CycleDrainTimeEffective,

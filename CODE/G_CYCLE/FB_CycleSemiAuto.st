@@ -79,6 +79,9 @@ VAR_INPUT
     HomedM2                 : BOOL;         // --> [HW] Codeur M2 reference
     HomingRequest           : BOOL;         // --> [CMD] Demande de referencement (front)
     InitPositionOk          : BOOL;         // --> [HW] Posture de depart OK (treuils/M3 dans la plage, calcul PRG_03) - condition AX1_INIT
+    InitM3MaintBlocked      : BOOL;         // --> [DIAG] Sous-cause AX1 : chariot M3 en zone Maintenance
+    InitWinchTopBlocked     : BOOL;         // --> [DIAG] Sous-cause AX1 : treuils M1/M2 hors fenetre haute
+    InitBucketStateBlocked  : BOOL;         // --> [DIAG] Sous-cause AX1 : etat benne non qualifie (ni ouvert ni ferme)
     WinchesAtTopWindow      : BOOL;         // --> [HW] Treuils M1 ET M2 dans la fenetre FDC logiciel haut (calcul PRG_03) - surveille en AX2
 
     // === CONFIG & COMMANDES CYCLE (IHM) ===
@@ -964,12 +967,23 @@ CASE State OF
             OperatorActionId := 16#0401;
             OperatorAction := 'AX1 - Defaut cycle actif : acquitter avec Reset.';
         ELSIF NOT InitPositionOk THEN
-            CycleStateStr := 'AX1 - Posture depart incorrecte (M3, FDC haut M1 ou benne)';
             ExpectedAxis := E_OperatorAxis.BUTTON;
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'AX1 - Amener M1 au FDC haut et qualifier la benne.';
+            IF InitM3MaintBlocked THEN
+                CycleStateStr := 'AX1 - Chariot M3 en zone Maintenance';
+                OperatorAction := 'AX1 - Degager le chariot M3 hors zone Maintenance.';
+            ELSIF InitWinchTopBlocked THEN
+                CycleStateStr := 'AX1 - Treuils M1/M2 hors zone haute';
+                OperatorAction := 'AX1 - Remonter les treuils M1/M2 au FDC haut.';
+            ELSIF InitBucketStateBlocked THEN
+                CycleStateStr := 'AX1 - Etat benne non qualifie';
+                OperatorAction := 'AX1 - Ouvrir ou fermer la benne pour qualifier son etat.';
+            ELSE
+                CycleStateStr := 'AX1 - Posture depart incorrecte (M3, FDC haut M1 ou benne)';
+                OperatorAction := 'AX1 - Amener M1 au FDC haut et qualifier la benne.';
+            END_IF;
         ELSE
             CycleStateStr := 'AX1 - Conditions initiales non remplies';
             ExpectedAxis := E_OperatorAxis.BUTTON;
