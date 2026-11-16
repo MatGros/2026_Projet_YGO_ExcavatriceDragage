@@ -37,6 +37,7 @@ class RemoteSupervisor:
     def __init__(self, port=8082):
         self.base = f"http://127.0.0.1:{port}"
         self.started_here = False
+        self.process = None  # handle du superviseur si demarre par nous (R29 : arret a la fermeture)
         self.notice = None
 
     def snapshot(self):
@@ -98,6 +99,7 @@ def find_or_start_supervisor(port=8082, state_path=None):
             try:
                 health()
                 service.started_here = True
+                service.process = process
                 return service
             except urllib.error.HTTPError as exc:
                 raise ValueError('Port Superviseur occupe par un autre service') from exc
@@ -611,6 +613,20 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
         tm_log("arret du serveur Task Manager")
         server.server_close()
         lock_handle.seek(0); msvcrt.locking(lock_handle.fileno(), msvcrt.LK_UNLCK, 1); lock_handle.close()
+        # R29 - ordre de fermeture : le superviseur demarre PAR le TM s arrete AVANT le
+        # lock du TM, pour ne jamais laisser un cache-survivant orphelin sans fenetre.
+        # Une instance DETECTEE (d un autre lanceur) n est jamais touchee.
+        service = getattr(server, "supervision", None)
+        proc = getattr(service, "process", None) if service else None
+        if getattr(service, "started_here", False) and proc is not None and proc.poll() is None:
+            tm_log(f"arret du superviseur demarre par le TM (pid {proc.pid})")
+            try:
+                proc.terminate()
+                proc.wait(timeout=10)
+            except Exception as exc:
+                tm_log(f"arret superviseur : {type(exc).__name__} (pid {proc.pid})")
+        elif getattr(service, "started_here", False):
+            tm_log("superviseur deja arrete avant la fermeture du TM")
 
 
 def parse_cli_args(argv: list[str] | None = None) -> tuple[int, bool, bool]:
