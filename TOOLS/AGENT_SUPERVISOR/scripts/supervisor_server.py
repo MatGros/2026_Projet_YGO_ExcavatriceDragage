@@ -234,7 +234,6 @@ def main():
     parser.add_argument('--port', type=int, default=8082)
     parser.add_argument('--state', type=Path)
     args = parser.parse_args()
-    log_line(f"SCRIPT LANCE : {Path(sys.argv[0]).resolve()} args={sys.argv[1:] or '[aucun]'}")
     try:
         server = create_server(args.port, args.state)
     except Exception:
