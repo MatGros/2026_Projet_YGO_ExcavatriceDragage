@@ -591,7 +591,7 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
         server.supervision = None
         print(f"Superviseur indisponible : {exc}")
     server.supervision_token = secrets.token_urlsafe(32)
-    print(f"Task Manager local : {url}")
+    print(f"Task Manager local : {url}  (PID {os.getpid()})")
     print("  -> Ctrl+Clic sur le lien pour ouvrir Task Viewer dans votre navigateur.")
     tm_log("serveur PRET port=" + str(port))
     if open_browser:
