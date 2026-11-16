@@ -14,6 +14,7 @@ PROGRAM PRG_06_Outputs
 
 VAR_INPUT
     // === 📥 ENTRÉES PROGRAMME (AUCUNE - PILOTÉ VIA GVL_IHM & PRG_02 À 05) ===
+    M3_TremieHardStopLatched     : BOOL := FALSE; // . [SAFE] T417-E : latch directionnel Tremie RETAIN (survit au reboot)
 END_VAR
 
 VAR_OUTPUT
@@ -45,6 +46,7 @@ VAR_OUTPUT
     // Les noms Device bruts (*_DQ / *_RQ) ne sont pas declares ici : les declarer
     // creerait une collision avec la globale homonyme du mapping E/S.
     KoboldContactorCmd           : BOOL; // <-- [ACT] Ordre alimentation contacteur capteur fond Kobold
+    M3_TremieHardStopLatched     : BOOL := FALSE; // . [SAFE] T417-E : latch directionnel Tremie RETAIN (survit au reboot)
 END_VAR
 
 VAR
@@ -94,7 +96,6 @@ VAR
     M2BrakeCmd                   : BOOL; // . [LOC] Ordre desserrage frein M2
     TranslationBrakeCmd          : BOOL; // . [LOC] Demande frein M3 arbitree
     M3_TremieHardStopActive      : BOOL; // . [SAFE] FDC brut Tremie coupe immediatement le sens Tremie
-    M3_TremieHardStopLatched     : BOOL; // . [SAFE] T417-E : latch directionnel Tremie (anti-perte came + power-up)
     PowerKeepAliveACmd           : BOOL; // . [LOC] Maintien puissance voie A
     PowerKeepAliveBCmd           : BOOL; // . [LOC] Maintien puissance voie B
     EmergencyArmingCmd           : BOOL; // . [LOC] Impulsion rearmement puissance AU
@@ -106,6 +107,7 @@ VAR
 
     // === 🔒 CONCORDANCE SORTIES TREUILS M1/M2 (§2ter) ===
     WinchOutputCoupled               : BOOL; // . [LOC] Treuils couples (synchro OU both) : arme instSyncContactorFinal
+    M3_TremieHardStopLatched     : BOOL := FALSE; // . [SAFE] T417-E : latch directionnel Tremie RETAIN (survit au reboot)
 END_VAR
 
 VAR CONSTANT
@@ -113,6 +115,7 @@ VAR CONSTANT
     // Choisi STRICTEMENT sous la plus courte tempo de séquencement des interlocks
     // (BrakeTimeout 0,5 s) pour rester transparent en exploitation.
     CST_ContactorMinInterval         : TIME := T#400ms;
+    M3_TremieHardStopLatched     : BOOL := FALSE; // . [SAFE] T417-E : latch directionnel Tremie RETAIN (survit au reboot)
 END_VAR
 
 // ═══════════════════════════════════════════════════════════════
@@ -429,8 +432,8 @@ M3BlockedBySafetyInfo := M3PowerCutOffSafetyInfo OR M3SafeStopSafetyInfo;
 // Coupure directionnelle ultime sur le FDC physique Tremie. Cette barriere lit
 // le DI qualifie du meme scan et ne depend ni du decodeur de position, ni du G7,
 // ni du step courant. Le recul vers P1/Maintenance reste autorise.
-// T417-E (Plan A1) : latch directionnel Tremie (couvre perte came apres depassement + power-up hors came).
-IF PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI OR GVL_PERSISTENT._TranslationAtTremiePersisted THEN
+// T417-E (Plan A1) : latch directionnel Tremie RETAIN (couvre perte came + reboot hors came, sans filtre 100 ms).
+IF PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI THEN
     M3_TremieHardStopLatched := TRUE;
 END_IF;
 
