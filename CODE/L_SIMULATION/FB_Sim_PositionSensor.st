@@ -35,6 +35,9 @@ VAR_INPUT
     CamDropoutActive : BOOL := FALSE;
     CamDropoutStart_M : REAL := 0.02;
     CamDropoutWidth_M : REAL := 0.04;
+    (* Came finie : FALSE = capteur cumulatif ; TRUE = sortie active uniquement sur CamLength_M apres Threshold_M. *)
+    FiniteCamActive : BOOL := FALSE;
+    CamLength_M : REAL := 0.0;
 END_VAR
 VAR_OUTPUT
     RawDetected : BOOL;
@@ -59,6 +62,8 @@ VAR
     InCamDropout : BOOL;      (* L5 : position dans la zone de perte de la came *)
     CamNear_M : REAL;         (* L5 : borne de la zone cote front de detection *)
     CamFar_M : REAL;          (* L5 : borne de la zone cote interieur *)
+    PastFiniteCam : BOOL;     (* Depassement au-dela de la longueur physique de came *)
+    CamEnd_M : REAL;          (* Borne de fin de came finie *)
 END_VAR
 VAR CONSTANT
     (* Plafond du nombre de bascules du profil « blip court » : borne la duree de l'episode
@@ -82,6 +87,7 @@ IF NOT Enable THEN
     ToggleTimerS := 0.0;
     TransitionCount := 0;
     EpisodeTogglePeriodS := 0.0;
+    PastFiniteCam := FALSE;
     RETURN;
 END_IF;
 
@@ -90,8 +96,20 @@ END_IF;
 IF NOT Initialized THEN
     IF ActiveBelowThreshold THEN
         RawDetected := Position_M <= Threshold_M;
+        IF FiniteCamActive THEN
+            PastFiniteCam := Position_M < (Threshold_M - MAX(0.0, CamLength_M));
+            RawDetected := RawDetected AND NOT PastFiniteCam;
+        ELSE
+            PastFiniteCam := FALSE;
+        END_IF;
     ELSE
         RawDetected := Position_M >= Threshold_M;
+        IF FiniteCamActive THEN
+            PastFiniteCam := Position_M > (Threshold_M + MAX(0.0, CamLength_M));
+            RawDetected := RawDetected AND NOT PastFiniteCam;
+        ELSE
+            PastFiniteCam := FALSE;
+        END_IF;
     END_IF;
     HystDetected := RawDetected;
     ElectricalOutput := RawDetected;
@@ -121,6 +139,14 @@ IF ActiveBelowThreshold THEN
     ELSE
         InCamDropout := (Position_M <= CamNear_M - CST_CamHysteresis_M) AND (Position_M > CamFar_M + CST_CamHysteresis_M);
     END_IF;
+    CamEnd_M := Threshold_M - MAX(0.0, CamLength_M);
+    IF NOT FiniteCamActive THEN
+        PastFiniteCam := FALSE;
+    ELSIF PastFiniteCam THEN
+        PastFiniteCam := Position_M < (CamEnd_M + CST_CamHysteresis_M);
+    ELSE
+        PastFiniteCam := Position_M < CamEnd_M;
+    END_IF;
 ELSE
     IF HystDetected THEN
         HystDetected := Position_M >= (Threshold_M - MAX(0.0, Hysteresis_M));
@@ -136,9 +162,17 @@ ELSE
     ELSE
         InCamDropout := (Position_M >= CamNear_M + CST_CamHysteresis_M) AND (Position_M < CamFar_M - CST_CamHysteresis_M);
     END_IF;
+    CamEnd_M := Threshold_M + MAX(0.0, CamLength_M);
+    IF NOT FiniteCamActive THEN
+        PastFiniteCam := FALSE;
+    ELSIF PastFiniteCam THEN
+        PastFiniteCam := Position_M > (CamEnd_M - CST_CamHysteresis_M);
+    ELSE
+        PastFiniteCam := Position_M > CamEnd_M;
+    END_IF;
 END_IF;
-(* L5 : la perte de came s'applique a l'etat mecanique ; hors option, RawDetected = HystDetected. *)
-RawDetected := HystDetected AND NOT InCamDropout;
+(* L5 : perte de came + came finie ; hors options, RawDetected = HystDetected. *)
+RawDetected := HystDetected AND NOT InCamDropout AND NOT PastFiniteCam;
 
 (* Un episode est declenche par un franchissement mecanique, pas par une de ses
    propres bascules electriques. Les fronts restent donc bornes et reproductibles. *)
