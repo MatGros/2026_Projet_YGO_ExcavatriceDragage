@@ -115,7 +115,7 @@ VAR CONSTANT
 END_VAR
 
 VAR RETAIN
-    M3_TremieHardStopLatched         : BOOL := FALSE; // . [SAFE] T417-E : latch directionnel Tremie RETAIN (survit au reboot)
+    M3_TremieHardStopLatched         : BOOL := FALSE; // . [SAFE] Latch directionnel Tremie RETAIN (survit au reboot)
 END_VAR
 
 // ═══════════════════════════════════════════════════════════════
@@ -432,20 +432,19 @@ M3BlockedBySafetyInfo := M3PowerCutOffSafetyInfo OR M3SafeStopSafetyInfo;
 // Coupure directionnelle ultime sur le FDC physique Tremie. Cette barriere lit
 // le DI qualifie du meme scan et ne depend ni du decodeur de position, ni du G7,
 // ni du step courant. Le recul vers P1/Maintenance reste autorise.
-// T417-E (Plan A1) : latch directionnel Tremie RETAIN (couvre perte came + reboot hors came, sans filtre 100 ms).
+// Latch directionnel Tremie RETAIN (couvre perte came + reboot hors came, sans filtre 100 ms).
 IF PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI THEN
     M3_TremieHardStopLatched := TRUE;
 END_IF;
 
-// Rearmement uniquement par Reset IHM + capteur revenu + commande opposee Maintenance.
-IF PRG_07_Supervision.FaultMachineReset_IHM
-   AND NOT PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI
-   AND PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqMaintenanceSemantic THEN
+// Rearmement des qu'une commande opposee Maintenance/P1 est demandee, ou par Reset IHM hors capteur.
+IF PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqMaintenanceSemantic
+   OR (PRG_07_Supervision.FaultMachineReset_IHM AND NOT PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI) THEN
     M3_TremieHardStopLatched := FALSE;
 END_IF;
 
 M3_TremieHardStopActive := (PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI OR M3_TremieHardStopLatched)
-                           AND PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqTremieSemantic;
+                           AND NOT PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqMaintenanceSemantic;
 
 instTranslationOutputInterlockM3(
     Enable                     := M3InterlockEnable,
