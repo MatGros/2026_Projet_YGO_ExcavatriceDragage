@@ -1,0 +1,12 @@
+task_id: T417-D
+parent_id: T417-C
+criticality: C2
+domain: SIMULATION / SIMBENCH / M3
+scope_files:
+  - CODE/L_SIMULATION/FB_Sim_PositionSensor.st
+  - CODE/L_SIMULATION/GVL_Simulation.st
+  - TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/AGY02_T417_M3_SANDBOX/**
+acceptance_criteria:
+  - AC1: "Came finie (FiniteCamActive, CamLength_M) et parametres simu (CloseDelay_S, k) exposes"
+  - AC2: "generate_codesys_bundle.py + G200_check_linkage.py PASS (0 erreur)"
+status: DONE_PENDING_HUMAN_REVIEW
