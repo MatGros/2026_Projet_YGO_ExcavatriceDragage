@@ -68,7 +68,8 @@ ELSE
         CycleTargetDirectionOk := (SelTarget = 3)
                                OR ((SelTarget = 1) AND Joystick.AxisX.DirectionPositive)
                                OR ((SelTarget <> 1) AND Joystick.AxisX.DirectionNegative);
-        CycleJoystickAxisOk := CycleTargetDirectionOk AND Joystick.AxisY.AtNeutral;
+        CycleJoystickAxisOk := CycleTargetDirectionOk
+                               AND (Joystick.AxisY.AtNeutral OR ((SelTarget = 1) AND (Joystick.AxisY.Direction <= 0)));
         RunRequest := ReqTranslation.ReqStart AND Context.HeightInterlockOk AND CycleJoystickAxisOk;
         IF RunRequest THEN
             SpeedPct := 100.0;
