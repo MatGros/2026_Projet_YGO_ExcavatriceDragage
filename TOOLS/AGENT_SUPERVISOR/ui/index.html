@@ -799,7 +799,7 @@ function renderSideSessions(sessions){
    button.classList.add('status-'+statusKey);
    const marker=element('i',undefined,'session-marker');
    const text=element('span',undefined,'side-session-content');
-   const titleEl=element('b',session.alias||session.native_id,'side-session-title');
+   const titleEl=element('b',session.display_title||session.alias||session.native_id,'side-session-title');
    const stateEl=element('span',stateLabel,'side-session-state is-'+statusKey);
    const actorHit=[['MMX','mmx'],['AGY','agy'],['CDX','codex'],['DSH','dsh'],['OPC','opc'],['CC','claude']].find(entry=>(String(session.alias||'')+' '+(session.platform||'')).toUpperCase().includes(entry[0]));
    const modelTag=element('span',actorHit?actorHit[0]:(session.platform||'—'),'model-tag model-'+(actorHit?actorHit[1]:(session.platform||'unknown')));
