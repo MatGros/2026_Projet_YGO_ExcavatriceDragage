@@ -7,6 +7,7 @@ import http.server
 import json
 import os
 import secrets
+import signal
 import sys
 import threading
 import time
@@ -53,6 +54,43 @@ class RemoteSupervisor:
             headers={"Content-Type": "application/json", "X-Supervision-Token": token})
         with urllib.request.urlopen(request, timeout=5) as response:
             return json.load(response)
+
+
+def tm_stop_supervisor_port(port: int) -> bool:
+    """R29 : arrête tout listener du port superviseur, sauf nous-mêmes. True si un kill a eu lieu."""
+    try:
+        out = subprocess.run(["netstat", "-ano"], capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=20).stdout
+    except (OSError, subprocess.SubprocessError):
+        return False
+    killed = []
+    for line in out.splitlines():
+        stripped = line.strip()
+        if f":{port} " not in stripped + " " or "LISTENING" not in stripped:
+            continue
+        try:
+            pid = int(stripped.rsplit(None, 1)[-1])
+        except (ValueError, IndexError):
+            continue
+        if pid == os.getpid() or pid <= 0:
+            continue
+        try:
+            tm_log(f"kill port {port} pid={pid}")
+            os.kill(pid, signal.SIGTERM)
+            killed.append(pid)
+        except (OSError, ValueError):
+            pass
+    if not killed:
+        return False
+    time.sleep(1)
+    try:
+        recheck = subprocess.run(["netstat", "-ano"], capture_output=True, text=True,
+                                 encoding="utf-8", errors="replace", timeout=20).stdout
+        alive = f":{port} " in recheck and "LISTENING" in recheck
+    except (OSError, subprocess.SubprocessError):
+        alive = None
+    tm_log(f"VERDICT port {port} : " + ("encore occupe" if alive else "libere") + f" (killed={killed})")
+    return True
 
 
 def find_or_start_supervisor(port=8082, state_path=None):
@@ -613,20 +651,23 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
         tm_log("arret du serveur Task Manager")
         server.server_close()
         lock_handle.seek(0); msvcrt.locking(lock_handle.fileno(), msvcrt.LK_UNLCK, 1); lock_handle.close()
-        # R29 - ordre de fermeture : le superviseur demarre PAR le TM s arrete AVANT le
-        # lock du TM, pour ne jamais laisser un cache-survivant orphelin sans fenetre.
-        # Une instance DETECTEE (d un autre lanceur) n est jamais touchee.
+        # R29 - regle exploitant (2026-11-16, symetrique de la purge au lancement) :
+        # fermer le TM coupe AUSSI le superviseur du port 8082, demarre par nous ou
+        # detecte. Le TM est le lance d ensemble : Ctrl+C = tout meurt, ordre determine.
         service = getattr(server, "supervision", None)
         proc = getattr(service, "process", None) if service else None
-        if getattr(service, "started_here", False) and proc is not None and proc.poll() is None:
+        if proc is not None and proc.poll() is None:
             tm_log(f"arret du superviseur demarre par le TM (pid {proc.pid})")
             try:
                 proc.terminate()
                 proc.wait(timeout=10)
             except Exception as exc:
                 tm_log(f"arret superviseur : {type(exc).__name__} (pid {proc.pid})")
-        elif getattr(service, "started_here", False):
-            tm_log("superviseur deja arrete avant la fermeture du TM")
+            stopped = True
+        else:
+            stopped = tm_stop_supervisor_port(8082)
+        if not stopped:
+            tm_log("arret superviseur : aucun listener sur 8082 (deja libre)")
 
 
 def parse_cli_args(argv: list[str] | None = None) -> tuple[int, bool, bool]:
