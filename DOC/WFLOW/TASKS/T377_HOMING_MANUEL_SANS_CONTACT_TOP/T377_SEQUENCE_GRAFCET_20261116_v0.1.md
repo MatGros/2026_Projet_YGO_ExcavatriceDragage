@@ -92,7 +92,8 @@ HX2A_DEGAGEMENT                 (latch TopContactLatched + cause C8 visible)
 
 PAS de HX7 forcé après un simple contact. Reset conscient uniquement si
 échec avéré (timeout, preset non confirmé). HX4 reste le dernier rempart :
-ABS(CablePos - 8,50) <= tolérance rejette toute validation au mauvais endroit.
+bande asymétrique réglable, défaut +0,10 / -0,10 m ([8,40 ; 8,60]) — la
+référence écrite reste toujours exactement 8,50 m (D5, exploitant 2026-11-16).
 ```
 
 - Fondement physique : le garde capteur coupe déjà `AscentPermit` au contact
