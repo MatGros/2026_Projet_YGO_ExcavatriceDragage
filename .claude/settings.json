@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_session_brief.py",
+            "command": "python \"$CLAUDE_PROJECT_DIR/TOOLS/AGENT_WORKFLOW/scripts/hook_session_brief.py\"",
             "timeout": 10
           }
         ]
@@ -40,12 +40,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_pre_edit.py",
+            "command": "python \"$CLAUDE_PROJECT_DIR/TOOLS/AGENT_WORKFLOW/scripts/hook_pre_edit.py\"",
             "timeout": 30
           },
           {
             "type": "command",
-            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_scope_guard.py",
+            "command": "python \"$CLAUDE_PROJECT_DIR/TOOLS/AGENT_WORKFLOW/scripts/hook_scope_guard.py\"",
             "timeout": 15,
             "onFailure": "block"
           }
@@ -56,7 +56,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_shell_scope_guard.py",
+            "command": "python \"$CLAUDE_PROJECT_DIR/TOOLS/AGENT_WORKFLOW/scripts/hook_shell_scope_guard.py\"",
             "timeout": 10,
             "onFailure": "block"
           }
@@ -67,7 +67,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_worktree_guard.py",
+            "command": "python \"$CLAUDE_PROJECT_DIR/TOOLS/AGENT_WORKFLOW/scripts/hook_worktree_guard.py\"",
             "timeout": 10,
             "onFailure": "block"
           }
@@ -80,7 +80,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_post_edit.py",
+            "command": "python \"$CLAUDE_PROJECT_DIR/TOOLS/AGENT_WORKFLOW/scripts/hook_post_edit.py\"",
             "timeout": 90
           }
         ]
@@ -91,12 +91,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_stop.py",
+            "command": "python \"$CLAUDE_PROJECT_DIR/TOOLS/AGENT_WORKFLOW/scripts/hook_stop.py\"",
             "timeout": 150
           },
           {
             "type": "command",
-            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_workflow_attest.py",
+            "command": "python \"$CLAUDE_PROJECT_DIR/TOOLS/AGENT_WORKFLOW/scripts/hook_workflow_attest.py\"",
             "timeout": 20
           }
         ]
