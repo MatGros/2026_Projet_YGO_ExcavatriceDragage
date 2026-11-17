@@ -1,4 +1,38 @@
 tasks:
+- id: T377-B
+  parent_id: T377
+  statut: ⬜
+  criticite: C4
+  domaine: SECURITE_ET_AU / DEMARRAGE / DIAGNOSTIC
+  agent: —
+  date: '2026-11-18T00:10:00+01:00'
+  updated_at: '2026-11-18T00:10:00+01:00'
+  titre: 'Defauts parasites au demarrage : ne pas armer la perte codeur M1/M2 avant le 1er OP du bus, reporter l autotest
+    AU apres le 1er rebouclage'
+  contexte: 'MES 2026-11-17 : au demarrage apres arret, 3 defauts apparaissent (M1 ErrorID:02 et M2 ErrorID:02 perte codeur,
+    AU ErrorID:04 echec autotest demarrage) alors qu aucun defaut reel n existe ; la machine fonctionne apres un Reset. Cause
+    lue dans le code : la cause 1 de FB_Safety_Winch (:277-279) est armee a chaque scan tant que NOT EncoderAvailable, donc
+    pendant toute l initialisation EtherCAT, et un Reset avant le 1er OP se re-arme ; l autotest AU est evalue une seule fois
+    au 1er EnableRising alors que la boucle AU est physiquement ouverte. FB_AutoResetTransientDiag (T278) n atteint que les
+    diagnostics reseau et son impulsion est un no-op prouve (T359). Etude T377-CC03 du 2026-11-17 puis challenge A/B (Ollama)
+    : variante B etendue retenue, aucun reset automatique d un defaut de securite.'
+  description: 'Variante B etendue : (1) ne pas armer la perte codeur avant le premier OP du bus, avec un delai maximal X
+    mesure ; (2) ne declencher l autotest AU qu apres le premier rebouclage de la chaine ; (3) repli unique prevu : une impulsion
+    d acquittement apres la fin du boot + 5 s, limitee a la perte codeur, jamais en marche, jamais sur l autotest AU ; (4)
+    un bit Tgl par mecanisme, defaut = comportement actuel. Sous-tache de T377 : T377-CC03 decide de l integrer a son dossier
+    ou de la separer. Taches proches a rattacher ou fusionner par le responsable du catalogue : T367, T363, T278, T357, T359,
+    T397. Specification : DOC/WFLOW/MISE_EN_SERVICE/T377-B_SPEC_DEFAUTS_DEMARRAGE_20261117_v0.1.md.'
+  objectifs:
+  - 'Redemarrage PLC sous puissance, bus sain : 0 defaut perte codeur M1/M2 et ArmingErrorId = 0.'
+  - Un codeur reellement mort au demarrage est arme apres X secondes au plus ; une perte en marche ou apres un AU arme immediatement.
+  - L autotest AU est evalue apres le premier rebouclage de la chaine ; un AU reellement en defaut arme le defaut.
+  - Aucun defaut de securite arme n est efface automatiquement, hors l impulsion de repli unique limitee a la perte codeur
+    (GO C4 explicite).
+  - X est mesure sur la machine ; chaque mecanisme a son bit Tgl (defaut = historique) ; G200 et gates palier C verts.
+  contrat: DOC/WFLOW/MISE_EN_SERVICE/TASK_CONTRACT_T377-B.yaml
+  avancement: Cree le 2026-11-18 par TORC-CC10 sur GO de l exploitant. Contrat provisoire dans le dossier de mise en service
+    (check_task_contract PASS) ; dossier de tache a decider par T377-CC03.
+  bloque_par: []
 - id: T432
   parent_id: ''
   statut: ⬜
