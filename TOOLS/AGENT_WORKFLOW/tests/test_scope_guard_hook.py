@@ -95,15 +95,29 @@ def test_hook_ignores_read_only_tools(monkeypatch):
     assert hook_scope_guard.main() == 0
 
 
-def test_absolute_deny_is_checked_before_any_derogation(monkeypatch):
-    """La deny-list globale ne s'ouvre PAS par une derogation ecrite par l'agent."""
+def test_derogation_ouvre_un_chemin_protege(monkeypatch):
+    """2026-11-18 : la derogation, accordee sur citation humaine exacte, ouvre CODE/.
+
+    Ce n'est plus une impasse : l'exploitant garde la cle, et `write_derogation`
+    verifie que le motif est copie d'un message humain du transcript.
+    """
     monkeypatch.setattr(task_scope, "scope_for_session", lambda _s: SCOPE)
-    monkeypatch.setattr(task_scope, "is_derogated", lambda _s, _p: True)  # meme derogue
+    monkeypatch.setattr(task_scope, "is_derogated", lambda _s, _p: True)
+
+    verdict = hook_scope_guard.evaluate("s", "CODE/PRG_00.st")
+
+    assert verdict["decision"] == "allow"
+
+
+def test_sans_derogation_le_refus_dit_la_phrase_a_demander(monkeypatch):
+    """Sans derogation, le refus donne la phrase exacte a demander a l'exploitant."""
+    monkeypatch.setattr(task_scope, "scope_for_session", lambda _s: SCOPE)
+    monkeypatch.setattr(task_scope, "is_derogated", lambda _s, _p: False)
 
     verdict = hook_scope_guard.evaluate("s", "CODE/PRG_00.st")
 
     assert verdict["decision"] == "block"
-    assert verdict["kind"] == "interdit"
+    assert "GO CODE/PRG_00.st" in verdict["reason"]
 
 
 def test_absolute_deny_ignores_the_contract(monkeypatch):
@@ -128,13 +142,13 @@ def test_end_to_end_deny_returns_exit_code_two(monkeypatch, capsys):
     monkeypatch.setattr(task_scope, "scope_for_session", lambda _s: SCOPE)
     monkeypatch.setattr(task_scope, "effective_scope", lambda _s: SCOPE)
     monkeypatch.setattr(task_scope, "pinned_scope", lambda _s: {})
-    monkeypatch.setattr(task_scope, "is_derogated", lambda _s, _p: True)
+    monkeypatch.setattr(task_scope, "is_derogated", lambda _s, _p: False)
     monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps({
         "tool_name": "Edit", "session_id": "s",
         "tool_input": {"file_path": "C:/repo/CODE/PRG_00.st"}})))
 
     assert hook_scope_guard.main() == 2
-    assert "INTERDITE" in capsys.readouterr().err
+    assert "GO C:/repo/CODE/PRG_00.st" in capsys.readouterr().err
 
 
 def test_end_to_end_protected_path_allowed_when_pinned(monkeypatch, capsys):

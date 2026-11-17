@@ -25,25 +25,30 @@ def _registre_isole(tmp_path, monkeypatch):
     monkeypatch.setattr(task_scope, "DEROG_DIR", tmp_path / "derog")
 
 
-def test_P1_code_refuse_meme_avec_derogation_existante(tmp_path):
-    """(1) une derogation deja presente dans le registre ne compte jamais pour CODE/."""
-    reg = tmp_path / "derog"
-    reg.mkdir()
-    task_scope.derogations_path("s").write_text(json.dumps([{
-        "path": "CODE/**", "motif": "force", "expires_at": 9e12}]), encoding="utf-8")
+def test_P1_code_refuse_sans_derogation():
+    """(1) sans derogation, CODE/ reste refuse par la deny-list."""
     assert task_scope.is_derogated("s", "CODE/MAIN/PRG_01.st") is False
     assert task_scope.is_absolute_denied("CODE/MAIN/PRG_01.st", []) is True
 
 
-def test_P1_code_derogation_refusee_a_l_ecriture(tmp_path):
-    with pytest.raises(task_scope.DerogationRefusee):
-        task_scope.write_derogation("s", "CODE/**", "oui", transcript=_transcript(tmp_path, "oui"))
+def test_code_derogation_accordee_par_citation_humaine(tmp_path):
+    """2026-11-18 : CODE/ s'ouvre par une citation exacte de l'exploitant, pas autrement."""
+    phrase = "GO CODE/MAIN/PRG_01.st"
+    entry = task_scope.write_derogation("s", "CODE/MAIN/PRG_01.st", phrase,
+                                        transcript=_transcript(tmp_path, phrase))
+    assert entry["path"] == "CODE/MAIN/PRG_01.st"
+    assert task_scope.is_derogated("s", "CODE/MAIN/PRG_01.st") is True
 
 
-def test_P1_garde_lui_meme_non_derogeable(tmp_path):
+def test_garde_derogation_exige_une_citation_humaine(tmp_path):
+    """Un fichier de garde s'ouvre aussi, mais seulement sur ces mots exacts."""
     with pytest.raises(task_scope.DerogationRefusee):
         task_scope.write_derogation("s", "TOOLS/AGENT_WORKFLOW/scripts/task_scope.py", "oui",
-                                    transcript=_transcript(tmp_path, "oui"))
+                                    transcript=_transcript(tmp_path, "bonjour"))
+    phrase = "GO TOOLS/AGENT_WORKFLOW/scripts/task_scope.py"
+    task_scope.write_derogation("s", "TOOLS/AGENT_WORKFLOW/scripts/task_scope.py", phrase,
+                                transcript=_transcript(tmp_path, phrase))
+    assert task_scope.is_derogated("s", "TOOLS/AGENT_WORKFLOW/scripts/task_scope.py") is True
 
 
 def test_P1_skills_autorise_par_le_contrat_sans_derogation():

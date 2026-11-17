@@ -33,24 +33,24 @@ def isolated_state(tmp_path, monkeypatch):
 def test_identite_tache_affichee(capsys):
     ws.main(["enter", "--session", KEY_A])
     out = capsys.readouterr().out
-    assert "🎯 Tâche : T427 — Titre de T427" in out
-    assert "🆔 Session : T427-CC02" in out
-    assert "🟢 T427 · WORKFLOW ACTIF" in out
+    assert "Tache   : T427 — Titre de T427" in out
+    assert "Session : T427-CC02" in out
+    assert "[ACTIF] T427 · WORKFLOW ACTIF" in out
 
 
 def test_hors_catalogue_T000_dit_aucune_tache(capsys):
     ws.main(["enter", "--session", KEY_B])
     out = capsys.readouterr().out
-    assert "🎯 Tâche : aucune · hors catalogue" in out
-    assert "🆔 Session : T000-CC10" in out
+    assert "Tache   : aucune · hors catalogue" in out
+    assert "Session : T000-CC10" in out
 
 
 def test_superviseur_injoignable_le_dit(monkeypatch, capsys):
     monkeypatch.setattr(ws, "supervisor_alias", lambda key: None)
     ws.main(["enter", "--session", "session-cccc-3333"])
     out = capsys.readouterr().out
-    assert "non rattachée au Superviseur" in out
-    assert "🎯 Tâche : aucune (non rattachée)" in out
+    assert "non rattachee au Superviseur" in out
+    assert "Tache   : aucune (non rattachee)" in out
 
 
 def test_enter_puis_status_ACTIF(capsys):
@@ -81,7 +81,7 @@ def test_retour_apres_off_reste_OFF(capsys):
 
 def test_sans_argument_enter_vaut_fresh(capsys):
     ws.main(["enter", "--session", KEY_A])
-    assert "Mode : fresh" in capsys.readouterr().out
+    assert "nouveau depart" in capsys.readouterr().out
 
 
 def test_sessions_isolees(capsys):
@@ -105,7 +105,7 @@ def test_cle_depuis_environnement(monkeypatch, capsys):
     ws.main(["enter", "resume"])
     out = capsys.readouterr().out
     assert "WORKFLOW ACTIF" in out
-    assert "Mode : resume" in out
+    assert "reprise du contexte" in out
 
 
 def test_json_corrompu_est_indetermine(isolated_state, capsys):

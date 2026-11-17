@@ -39,8 +39,18 @@ def test_commandes_de_role_appellent_le_script_canonique() -> None:
 
 
 def test_commandes_de_role_entrent_avant_de_choisir() -> None:
-    """Sans entree prealable, la voie ne peut pas etre selectionnee (etat non actif)."""
+    """Choisir une voie vaut entree dans le workflow, meme sans etat prealable.
+
+    Depuis 2026-11-16, le script auto-entre dans la branche `voie` : la commande de role
+    ne depend plus d'un appel `enter` prealable, dont l'echec etait masque par une
+    redirection vers /dev/null.
+    """
+    script = (ROOT / "TOOLS" / "AGENT_WORKFLOW" / "scripts" / "workflow_state.py").read_text(encoding="utf-8")
+    assert 'write_state(key, "ACTIF", mode, voie=VOIES[args.mode])' in script, \
+        "le script doit auto-entrer sur choix de voie, en une seule ecriture"
+    assert 'mode = cur.get("mode") or "fresh"' in script, \
+        "le mode deja enregistre doit etre conserve (jamais un resume impose)"
     for name, _ in ROLE_COMMANDS:
         text = (COMMANDS / f"{name}.md").read_text(encoding="utf-8")
-        assert "enter resume" in text, f"{name} doit entrer dans le workflow avant de choisir"
-        assert text.index("enter resume") < text.index("cmd "), f"{name} : ordre inverse"
+        assert "cmd " in text, f"{name} ne choisit pas de voie"
+        assert "/dev/null" not in text, f"{name} masque encore les erreurs d entree"

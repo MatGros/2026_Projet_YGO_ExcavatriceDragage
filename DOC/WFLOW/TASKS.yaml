@@ -1737,8 +1737,8 @@ tasks:
   criticite: C3
   domaine: CYCLE_HOMING / SECURITE_REFERENCEMENT
   agent: CC03
-  date: '2026-11-14T05:10:01+01:00'
-  updated_at: '2026-11-14T05:10:01+01:00'
+  date: '2026-11-18T00:25:00+01:00'
+  updated_at: '2026-11-18T00:25:00+01:00'
   titre: 'HOMING N1 MANUEL SANS CONTACT TOP : approche prudente sans heurter le capteur haut TOP, validation visuelle operateur
     et securisation contact'
   contexte: 'REX terrain MES 2026-09-23 et avarie du 2026-09-25 (capteur fin de course mecanique Top M1/M2 casse par contrainte
@@ -1774,7 +1774,7 @@ tasks:
   - Validation de la position haute par BtnValidation du grafcet, utilisable a toute etape (decision exploitant 2026-11-14).
   - 'Plan technique : DOC/WFLOW/TASKS/T377_HOMING_MANUEL_SANS_CONTACT_TOP/PLAN_TASK_v1.0.md ; points D1/D2/D3 a trancher avant
     toute ecriture de code.'
-  contrat: DOC/WFLOW/TASKS/T_TEMP (A TRIER)/CONTRACTS/T377_CONTRAT_HOMING_MANUEL_SANS_CONTACT_TOP.yaml
+  contrat: DOC/WFLOW/TASKS/T377_HOMING_MANUEL_SANS_CONTACT_TOP/CONTRACTS/TASK_CONTRACT_T377_HOMING_MANUEL_SANS_CONTACT_TOP.yaml
   avancement: 'Reserve MAINT_N2 reprise de T340, cloturee le 2026-11-06. Lien T428 : les champs diagnostic de AC4 passent
     dans T428, la logique reste ici. 2026-10-13 - Decision humaine : remise a faire, sans agent attribue ni verrou de travail
     (personne ne travaille dessus). Doctrine approche manuelle sans contact et reference a l arret conservee. Deux entrees

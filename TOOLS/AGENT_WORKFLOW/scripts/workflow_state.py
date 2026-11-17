@@ -65,6 +65,7 @@ def read_state(key: str) -> dict | None:
 
 
 BASE_COMMUNE = "AGENTS.md (règles), DOC/WFLOW/TASKS_ACTIVE_SUMMARY.md (catalogue résumé)"
+MODE_LABEL = {"resume": "reprise du contexte", "fresh": "nouveau depart"}
 VOIE_NOM = {"Orchestrateur": "Orchestrateur projet", "Tâche": "Coordinateur de tâche", "Troubleshooting": "Troubleshooting"}
 VOIE_PROCEDURE = {
     "Orchestrateur": ("", "TOOLS/AGENT_WORKFLOW/skills/orchestrator/ROLE.md"),
@@ -194,18 +195,18 @@ def identity_lines(key: str, alias: str | None) -> list[str]:
     short = key[:8]
     if alias is None:
         return [
-            f"🆔 Session : {short}… · non rattachée au Superviseur (ou Superviseur injoignable)",
-            "🎯 Tâche : aucune (non rattachée)",
+            f"Session : {short}... · non rattachee au Superviseur (ou Superviseur injoignable)",
+            "Tache   : aucune (non rattachee)",
         ]
     task = task_of_alias(alias)
     if task is None:
         return [
-            f"🆔 Session : {alias} · {short}…",
-            f"🎯 Tâche : aucune · hors catalogue (session {alias})",
+            f"Session : {alias} · {short}...",
+            f"Tache   : aucune · hors catalogue (session {alias})",
         ]
     return [
-        f"🆔 Session : {alias} · {short}…",
-        f"🎯 Tâche : {task} — {task_title(task)}",
+        f"Session : {alias} · {short}...",
+        f"Tache   : {task} — {task_title(task)}",
     ]
 
 
@@ -216,35 +217,35 @@ def render(etat: str, mode: str | None, seq: int | None, key: str = "", alias: s
     token = f"{etat}/{seq}" if seq is not None else etat
     head_id = task_of_alias(alias) or (alias or "sans session")
     lines = [
-        f"{'🟢' if etat == 'ACTIF' else '🔴' if etat == 'OFF' else '⚪'} "
+        f"{'[ACTIF]' if etat == 'ACTIF' else '[OFF]' if etat == 'OFF' else '[?]'} "
         f"{head_id} · WORKFLOW {etat} · token {token}",
     ]
     if key:
         lines += identity_lines(key, alias)
     lines += [
-        f"🧭 Mode : {mode or '—'}",
-        f"🪜 Étape : {etape or '— (non renseignée)'}",
-        f"📊 Projet : {counts} · résumé {fresh}",
-        f"📚 AGENTS.md : {agents_ok}",
+        f"Mode    : {MODE_LABEL.get((mode or '').lower(), '—')}",
+        f"Etape   : {etape or '—'}",
+        f"Projet  : {counts} · resume {fresh}",
+        f"AGENTS  : {agents_ok}",
     ]
     # Voie choisie : charger la base commune puis la procédure de la voie.
     if etat == "ACTIF" and voie in VOIE_PROCEDURE:
         base, proc = VOIE_PROCEDURE[voie]
         lines += [
             "",
-            f"📖 Lire d'abord : {BASE_COMMUNE}",
-            f"📘 Procédure de la voie {voie} : {proc}",
+            f"Lire d'abord : {BASE_COMMUNE}",
+            f"Procedure de la voie {voie} : {proc}",
         ]
     # Voie déjà choisie : bannière de rôle seule, sans le menu général (hors sujet dans un rôle).
     if etat == "ACTIF" and voie in VOIE_NOM:
         lines += [
-            f"🧭 Rôle : {VOIE_NOM[voie]}",
+            f"Role : {VOIE_NOM[voie]}",
             "Pour changer de rôle ou sortir : « off » (Quitter).",
         ]
     # Mode libre (aucune voie) : menu numéroté, pas de question libre, pas de choix rédigé par le LLM.
     elif etat == "ACTIF":
         lines += [
-            f"🧭 Voie : {voie or 'aucune (libre = réponse directe)'}",
+            f"Voie : {voie or 'aucune (libre = reponse directe)'}",
             "",
             "Choix :",
             "1 · Orchestrateur (piloter un lot, valider avant code)",
@@ -256,9 +257,9 @@ def render(etat: str, mode: str | None, seq: int | None, key: str = "", alias: s
             "Agent : si le message suit immédiatement un bloc `Choix :` d'une voie ACTIVE et vaut 0, 1, 2 ou 3, exécute `python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py cmd <n> --source agent` et affiche sa sortie telle quelle, sans commentaire. Tout autre message, chiffre compris : réponse directe, sans script.",
         ]
     elif etat == "OFF":
-        lines.append("⏹️ Workflow quitté. Pour revenir : /workflow-project-orchestrator ou /workflow-project-coordinator")
+        lines.append("Workflow quitte. Pour revenir : /workflow-project-orchestrator ou /workflow-project-coordinator")
     else:
-        lines.append("⚠️ État inconnu : aucune supposition. Relancer avec /workflow-project-orchestrator.")
+        lines.append("Etat inconnu : aucune supposition. Relancer avec /workflow-project-orchestrator.")
     return "\n".join(lines)
 
 
@@ -342,14 +343,19 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "voie":
-        cur = read_state(key)
-        if cur is None or cur.get("etat") != "ACTIF":
-            print("⚠️ Workflow non actif : lance d'abord une commande de rôle, puis le numéro.")
-            return 0
+        # Valider AVANT d'ecrire : une voie invalide ne doit laisser aucun etat
+        # (revue 2026-11-17 : `voie 9` activait le workflow puis renvoyait 2).
         if args.mode not in VOIES:
             print("ERREUR : voie inconnue (attendu : 1, 2 ou 3).")
             return 2
-        data = write_state(key, "ACTIF", cur.get("mode"), voie=VOIES[args.mode])
+        cur = read_state(key) or {}
+        # Auto-entree (2026-11-16) : choisir une voie vaut entree dans le workflow,
+        # par exemple quand l'appel `enter` precedent a echoue. Le mode deja
+        # enregistre est conserve ; a defaut, "fresh" (jamais "resume" impose).
+        mode = cur.get("mode") or "fresh"
+        # Une seule ecriture : le compteur avance d'un cran par action utilisateur
+        # et la transition ACTIF est journalisee comme les autres.
+        data = write_state(key, "ACTIF", mode, voie=VOIES[args.mode])
         trace_log.emit("workflow", source=SOURCE, session=key, etat="ACTIF", voie=data.get("voie"),
                        etape=data.get("etape"), seq=data.get("seq"))
         print(render(data["etat"], data["mode"], data["seq"], key, alias, data["voie"], data.get("etape")))
