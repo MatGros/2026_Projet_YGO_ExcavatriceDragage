@@ -16,6 +16,18 @@ try:
 except ImportError:
     from supervisor_service import Supervisor
 
+# R29 (2026-11-17) : un enfant relai mourait SANS TRACE avant le premier log —
+# l'empreinte de vie est ecrite en TETE de module, avant tout traitement lourd ;
+# toute mort de process laisse desormais une trace (regle : jamais mort muet).
+try:
+    from datetime import datetime as _dt
+    _log_dir = Path(os.environ.get('LOCALAPPDATA', Path.home() / '.local/share')) / 'ExcavatriceDragage'
+    with open(_log_dir / 'agent-supervisor-server.log', 'a', encoding='utf-8') as _h:
+        _h.write(f"{_dt.now().isoformat(timespec='seconds')} pid={os.getpid()} "
+                 f"process CHARGE : {Path(sys.argv[0]).resolve()} args={sys.argv[1:] or '[aucun]'}\n")
+except OSError:
+    pass
+
 UI = Path(__file__).resolve().parents[1] / 'ui' / 'index.html'
 SCRIPT_DIR = Path(__file__).resolve().parent
 BUILD_FILES = (Path(__file__), SCRIPT_DIR / 'supervisor_service.py', SCRIPT_DIR / 'session_watcher.py',
@@ -92,7 +104,8 @@ class Handler(BaseHTTPRequestHandler):
             update = None
             interface = None
         return {'service_version': 2, 'build_id': self.server.build_id, 'ui_build_id': interface, 'update_available': update,
-                'default_storage': self.server.default_storage}
+                'default_storage': self.server.default_storage,
+                'restart_requested': bool(getattr(self.server.supervision, '_restart_requested', False))}
 
     def do_GET(self):
         if not self.local():

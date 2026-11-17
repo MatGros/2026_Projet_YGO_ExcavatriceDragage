@@ -110,3 +110,36 @@ service (`%LOCALAPPDATA%\ExcavatriceDragage\agent-supervisor-server.log`).
 - 8082 : process auto-relancé pid 21796, build `aaba0ba8c629`, `update_available: false`
 - 8081 : TM de l'exploitant en marche
 - Exploit prêt pour un essai réel de `/connect-session-supervisor` (P7 en service)
+
+---
+
+## 2026-11-17 · Consigne T427-CC02 (TORC, fiche, inactivité) — A16-A19
+
+### A16 — RECU à T427-CC02 (PE 2026-11-17) + plan approuvé exploitant
+- 3 constats : TORC pas reconnu coordination · fiche vide muette · 0 veille d'inactivité
+- Approbation exploitant : plan 3 correctifs + forme alerte = constat mécanique seul par défaut
+
+### A17 — Implémentation (commit `3aef23a3`, 18 tests verts)
+- B : `is_coordination_session` reconnait T000*/TORC* (+ notice juge TORC)
+- C : `_detect_inactive_sessions` au cycle de poll (fingerprint, idempotent), seuils 4 h
+  coordination / criticité contrat (cache mtime, C2=12 h, défaut 24 h)
+- A : fiche jamais vide — règle exploitant « N/A — raison » pour tout champ non rempli ;
+  TEMPLATE COORDINATION auto-rempli pour T000*/TORC* (objectif + 5 critères de gouvernance,
+  les mêmes que la notice) ; backfill des fiches vides héritées au re-rattachement
+  (`fiche_completee: true`) ; PAS de constat cadrage redondant quand la fiche porte son état
+- Preuve live (essai isolé 8093, coupé après) : attach TORC → fiche remplie ;
+  `is_coordination_session("TORC-CC10") == True`
+- Correctif au passage : `structure_quality.contract_for` invisible pour T432 (CONTRACT/rglob)
+
+### A18 — Relai restart : de la mort muette au cycle complet
+- Enfants du relai mouraient SANS TRACE (`can't open file ...AGENT_SUPERVISOR...` —
+  chemin erroné, sans TOOLS/ ; trouvé grace au journal enfant→journal du relai v2)
+- Fix `task_server.py` (dérogation « ok ») : chemin correct ; + journal des enfants
+  dirigé dans le journal service ; + drapeau consommé (pas de boucle 20 s)
+- PREUVE réelle complète : 1-clic → `[TM] RESTART : enfant relai lance` → purge de
+  l'ancien (VERDICT libere) → `PRET build=2965f79ee90a`, `update_available: false`
+- État final : 8082 pid 41576 (build final), 8081 TM pid 13960 (relai actif, caché)
+
+### Reste à l'exploitant
+- Fermer la 1 le constat `Session de coordination sans cadrage` de TORC (règle 10 : un clic) ;
+  une re-attach TORC posera la fiche template complète désormais.
