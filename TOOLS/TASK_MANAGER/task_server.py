@@ -93,6 +93,58 @@ def tm_stop_supervisor_port(port: int) -> bool:
     return True
 
 
+def tm_watch_supervisor_restart(base: str = "http://127.0.0.1:8082"):
+    """R29 (incident prove 2026-11-16) : le superviseur ne peut pas se relancer lui-meme
+    depuis son process detach (3 mecanismes de spawn figes, journal 12:16-12:27). Le TM,
+    console attachee (classe de spawn fiable), surveille /health toutes les 2 s et relance
+    le superviseur quand le flag restart_requested est vrai. Debounce 20 s ; l enfant purge
+    l ancien instance par le chemin standard (VERDICT trace)."""
+    import json as _json
+    import subprocess as _sub
+    import sys as _sys
+    import threading as _th
+    import time as _time
+    script = ROOT / "TOOLS" / "AGENT_SUPERVISOR" / "scripts" / "supervisor_server.py"
+
+    def loop():
+        last_spawn = 0.0
+        while True:
+            _time.sleep(2)
+            try:
+                with urllib.request.urlopen(base + "/health", timeout=1.5) as response:
+                    info = _json.load(response)
+            except Exception:
+                continue
+            now = _time.monotonic()
+            if bool(info.get("restart_requested")) and now - last_spawn > 20:
+                last_spawn = now
+                tm_log("RESTART : demande du superviseur -> relance par le relai TM")
+                try:
+                    # R29 : les erreurs de l'enfant vont DANS LE JOURNAL (un enfant mort
+                    # sans trace est inacceptable — preuve 12:42, enfant 13516 sorti muet).
+                    log_dir = Path(os.environ.get("LOCALAPPDATA", Path.home() / ".local/share")) / "ExcavatriceDragage"
+                    child_std = open(log_dir / "agent-supervisor-server.log", "a", encoding="utf-8")
+                    child = _sub.Popen([_sys.executable, str(script)],
+                                       stdin=_sub.DEVNULL, stdout=child_std,
+                                       stderr=child_std,
+                                       creationflags=getattr(_sub, "CREATE_NO_WINDOW", 0)
+                                       | getattr(_sub, "CREATE_NEW_PROCESS_GROUP", 0))
+                    tm_log(f"RESTART : enfant relai lance pid={child.pid}")
+                    # Le drapeau est consomme : sinon le relai re-lance toutes les 20 s.
+                    with urllib.request.urlopen(base + "/api/supervision", timeout=3) as response:
+                        token = _json.load(response).get("token")
+                    request = urllib.request.Request(
+                        base + "/api/supervision",
+                        data=_json.dumps({"action": "clear_restart_request"}).encode(),
+                        headers={"Content-Type": "application/json", "X-Supervision-Token": str(token or "")})
+                    urllib.request.urlopen(request, timeout=5)
+                    tm_log("RESTART : drapeau consomme")
+                except Exception as exc:
+                    tm_log(f"RESTART : relai echec : {type(exc).__name__}: {exc}")
+
+    _th.Thread(target=loop, daemon=True, name="tm-restart-relay").start()
+
+
 def find_or_start_supervisor(port=8082, state_path=None):
     """R29 - architecture un-python-par-service : le TM DETECTE le superviseur,
     jamais il ne le demarre ni ne l'arrete (celui-ci a son propre lanceur)."""
@@ -598,6 +650,8 @@ def start(port: int = PORT, open_browser: bool = False, verbose: bool = False):
     print(f"Task Manager local : {url}  (PID {os.getpid()})")
     print("  -> Ctrl+Clic sur le lien pour ouvrir Task Viewer dans votre navigateur.")
     tm_log("serveur PRET port=" + str(port))
+    # R29 : relai de restart du superviseur (un process detach ne peut pas se relancer seul).
+    tm_watch_supervisor_restart()
     if open_browser:
         webbrowser.open(url)
     # Pattern canonique (docs.python) : serve_forever dans un THREAD, Ctrl+C attrape
