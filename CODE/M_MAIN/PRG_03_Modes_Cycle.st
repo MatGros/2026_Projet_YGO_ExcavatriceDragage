@@ -72,7 +72,7 @@ CycleDrainTimeEffective_S := LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S, 360
 CycleDrainTimeEffective := DINT_TO_TIME(INT_TO_DINT(CycleDrainTimeEffective_S) * DINT#1000);
 
 // 📄 Événement changement de page IHM : sélection automatique du mode (provisoire sans mdp :
-// 1 = SEMI_AUTO ; 2, 5 = MAINT_N1 ; 3, 4, 6, 7 = MAINT_N2)
+// 1 = SEMI_AUTO ; 2, 5 = MAINT_N1 ; 3, 4, 6, 7, 8 = MAINT_N2)
 IF NOT ModeBootInitialized THEN
     // Sécurité d'exploitation : après boot PLC, le mode demandé repart en
     // SEMI_AUTO. La page affichée est mémorisée comme référence afin qu'une
@@ -87,7 +87,7 @@ ELSIF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage <> PrevActualPage THEN
             GVL_IHM.Modes.Cmd.SelMode := E_Mode.SEMI_AUTO;
         2, 5:
             GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
-        3, 4, 6, 7:
+        3, 4, 6, 7, 8:
             GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N2;
     END_CASE;
 END_IF;
