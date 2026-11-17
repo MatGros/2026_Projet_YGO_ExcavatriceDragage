@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-16T12:31:28.366172" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-11-16T12:31:28.366172">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-17T13:28:13.801014" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-17T13:28:13.801014">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1691,7 +1691,8 @@ CycleSetDepthEffective_M := MAX(GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M, CycleDepth
 CycleDrainTimeEffective_S := LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S, 3600);
 CycleDrainTimeEffective := DINT_TO_TIME(INT_TO_DINT(CycleDrainTimeEffective_S) * DINT#1000);
 
-// 📄 Événement changement de page IHM : sélection automatique du mode (page 5 = MAINT_N1, page 1 = SEMI_AUTO)
+// 📄 Événement changement de page IHM : sélection automatique du mode (provisoire sans mdp :
+// 1 = SEMI_AUTO ; 2, 5 = MAINT_N1 ; 3, 4, 6, 7 = MAINT_N2)
 IF NOT ModeBootInitialized THEN
     // Sécurité d'exploitation : après boot PLC, le mode demandé repart en
     // SEMI_AUTO. La page affichée est mémorisée comme référence afin qu'une
@@ -1701,13 +1702,14 @@ IF NOT ModeBootInitialized THEN
     PrevActualPage := GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage;
 ELSIF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage &lt;&gt; PrevActualPage THEN
     PrevActualPage := GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage;
-    IF PrevActualPage = 5 THEN
-        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
-    ELSIF PrevActualPage = 4 THEN
-        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N2;
-    ELSIF PrevActualPage = 1 THEN
-        GVL_IHM.Modes.Cmd.SelMode := E_Mode.SEMI_AUTO;
-    END_IF;
+    CASE PrevActualPage OF
+        1:
+            GVL_IHM.Modes.Cmd.SelMode := E_Mode.SEMI_AUTO;
+        2, 5:
+            GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
+        3, 4, 6, 7:
+            GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N2;
+    END_CASE;
 END_IF;
 
 // Arbitrage amont selecteur treuil : le cycle homing machine peut forcer temporairement
