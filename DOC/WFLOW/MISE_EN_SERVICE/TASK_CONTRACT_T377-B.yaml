@@ -1,0 +1,146 @@
+# CONTRAT PROVISOIRE T377-B — rédigé par TORC-CC10 le 2026-11-18, à déplacer par T377-CC03
+# dans DOC/WFLOW/TASKS/<dossier>/CONTRACTS/TASK_CONTRACT_T377-B.yaml (dossier non créé : décision CC03).
+# Spécification : DOC/WFLOW/MISE_EN_SERVICE/T377-B_SPEC_DEFAUTS_DEMARRAGE_20261117_v0.1.md
+
+contract:
+  task_id: T377-B
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Supprimer les défauts parasites de démarrage (perte codeur M1/M2, échec autotest AU) en retardant
+    leur armement jusqu'à ce que leurs préconditions soient valides, sans jamais effacer un défaut
+    de sécurité réel ni réarmer automatiquement en marche.
+
+  acceptance:
+    - id: AC1
+      statement: "Au redémarrage du PLC sous puissance, bus sain, aucun défaut de perte codeur M1/M2 n'est armé et ArmingErrorId vaut 0."
+      verified_by: "snapshot Troubleshooting avant/après redémarrage : EncoderFaultLatched M1/M2 = FALSE, ArmingErrorId = 0 (sortie brute)"
+    - id: AC2
+      statement: "Un codeur réellement mort au démarrage est armé au plus X secondes après le démarrage, et aucun mouvement n'est possible avant."
+      verified_by: "essai ou simulation avec codeur débranché + trace horodatée ; X mesuré, valeur citée"
+    - id: AC3
+      statement: "Une perte codeur en marche, après un premier OP du bus, arme le défaut immédiatement (comportement actuel conservé)."
+      verified_by: "test unitaire C_DIAG_RESEAUX / SimBench : OP vu puis perte ⇒ latch au scan suivant"
+    - id: AC4
+      statement: "Après un AU puis rebouclage, la perte codeur consécutive arme immédiatement le défaut."
+      verified_by: "test SimBench : flag OP déjà vrai, perte ⇒ latch immédiat"
+    - id: AC5
+      statement: "Démarrage à froid, boucle AU ouverte : l'autotest AU n'échoue pas tant que la boucle n'a jamais été fermée ; après le premier rebouclage il est évalué, et un AU réellement en défaut arme le défaut."
+      verified_by: "test PLC sur FB_Safety_EmergencyManagement + essai terrain démarrage à froid"
+    - id: AC6
+      statement: "Aucun défaut de sécurité armé n'est effacé automatiquement, hors l'impulsion de repli unique décrite en AC8."
+      verified_by: "revue de code du diff + test déterministe : aucun chemin d'effacement automatique hors AC8"
+    - id: AC7
+      statement: "Chaque mécanisme (prévention codeur, report de l'autotest AU, impulsion de repli) a son bit Tgl dédié ; défaut = comportement actuel."
+      verified_by: "test : bits à FALSE ⇒ comportement identique à la version précédente (non-régression)"
+    - id: AC8
+      statement: "L'impulsion de repli, si activée, est émise une seule fois après la fin du boot + 5 s, limitée à la perte codeur, jamais en marche, jamais sur un retour de bus, jamais sur l'autotest AU."
+      verified_by: "test : défaut réel présent ⇒ ré-armé au scan suivant ; autotest AU intact ; aucune impulsion en marche"
+    - id: AC9
+      statement: "X est mesuré sur la machine (démarrage à froid et après retour contacteur) avant d'être figé."
+      verified_by: "relevé horodaté du temps de montée à OP des codeurs M1/M2, noté au registre de mise en service"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/E_CODEURS/FB_Encoder_Abs.st
+      - TOOLS/AGENT_WORKFLOW/scripts/task_scope.py
+      - DOC/WFLOW/TASKS.yaml
+
+  conservation:
+    must_survive:
+      - "Armement immédiat de la perte codeur en marche (AC3, AC4)"
+      - "Cause 0 (communication opérateur) et toutes les autres causes de FB_Safety_Winch"
+      - "Reset opérateur sur front, jamais conditionné"
+    dropped_on_purpose:
+      - "Armement de la perte codeur avant le premier OP du bus (retardé de X secondes, décision exploitant 2026-11-18)"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug
+    preexistant, risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur,
+    pas a la fin et jamais silencieusement. Signaler n'est pas elargir le scope.
+
+execution_plan:
+  milestones:
+  - id: M0
+    title: 'Cadrage et contrat validé'
+    done_when: 'GO explicite de l exploitant sur la variante B étendue et le repli ; check_task_contract PASS'
+  - id: M1
+    title: 'Mesure de X et lecture des points ouverts'
+    done_when: 'temps de montée à OP des codeurs M1/M2 relevé à froid ; effet de Reset sur l autotest AU lu dans le code'
+  - id: M2
+    title: 'Implémentation sous bits Tgl, défaut = historique'
+    done_when: 'diff relu par un agent indépendant ; AC1 à AC9 prouvés ; G200 PASS ; gates palier C PASS'
+  - id: M3
+    title: 'Essai terrain'
+    done_when: 'démarrage à froid sans défaut parasite, snapshot avant/après consigné au registre'
+
+test_feedback: []
+
+status: PENDING
+
+tracking:
+  user_need: "Supprimer les défauts parasites au démarrage sans masquer un défaut réel."
+  useful_history:
+    - "Étude T377-CC03 (boot perte codeur + autotest AU) ; challenge A/B Ollama du 2026-11-17 ; tâches proches T367, T363, T278, T357, T359, T397."
+  current_question: "Valeur de X (temps de montée à OP) et ordre rebouclage AU / engagement du contacteur."
+  established:
+    - "Le latch codeur est armé à chaque scan tant que NOT EncoderAvailable (FB_Safety_Winch.st:277-279)."
+  unknowns:
+    - "Temps de montée réel du bus EtherCAT ; autres consommateurs de EncoderAvailable ; effet de Reset sur le flag d autotest AU."
+  next_action: "GO exploitant puis mesure de X."
+  budget:
+    total: 10
+    used: 2
+    parallel_max: 3
+    log:
+      - "glm-5.3-flash · challenge A (innovation) démarrage · 1/10"
+      - "deepseek-v4.1-flash · challenge B (red team) démarrage · 2/10"
+  owners:
+    accountable: "HUM"
+    executor: ""
+    control_maintainer: "TORC-CC10"
+  delegation:
+    required_workflows: []
+    permissions: []
+    forbidden_actions:
+      - "Tout reset automatique d un défaut de sécurité sans GO C4"
+    measurable_deliverables: []
+    alert_conditions: []
+    self_review: []
+  stagnation:
+    threshold: 3
+    justification: ""
+    consecutive_uninformative: 0
+    blind_reviews: []
+  experiments: []
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Non démarré.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    En attente.
