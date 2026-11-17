@@ -1,4 +1,4 @@
-# T377 — Préparation : diff futurs + cadrage (lecture seule)
+- Dernier rempart inchangé : HX4 vérifie ABS(CablePos - 8,50) ≤ tolérance.# T377 — Préparation : diff futurs + cadrage (lecture seule)
 
 > v0.1 · 2026-11-16 · CC03 — **aucune ligne de `CODE/` modifiée**, audit lecture seule.
 > Sources : PLAN_TASK_v1.0.md · contrat 2026-11-02 · code constaté au 2026-11-16 (main).
@@ -66,8 +66,43 @@ Interdits respectés : `FB_Safety_Winch.st` (sauf accord), `FB_Encoder_Homing.st
 - **D3 — renommages** HX3_FLYING_REFERENCE → HX3_REFERENCE_RESTORE,
   HX4_STABILIZATION_CHECK → HX4_REFERENCE_VERIFY : 3 fichiers consommateurs
   (coût faible) ou noms gardés + commentaires corrigés.
+- **D4 — hors périmètre initial, décision 2026-11-16** : signal + refus de
+  translation quand homing non OK (v. §5.1) — tâche dédiée recommandée.
+- **D5 — tolérance HX4 (décision exploitant 2026-11-16)** : remplacer la
+  vérification symétrique `ABS(CablePos - 8,50)` par une bande **asymétrique
+  réglable** : deux seuils séparés haut / bas, défaut +0,10 / -0,10 m
+  (bande acceptée [8,40 ; 8,60]). La référence écrite reste toujours
+  exactement 8,50 m (preset) — la bande ne sert qu'à rejeter une validation
+  faite au mauvais endroit (1 seule re-émission puis HX7). Le seuil haut
+  (dépassement vers le capteur) est le plus critique et doit pouvoir être
+  serré indépendamment du seuil bas.
 
-## 5. Tests prévus après GO
+## 5. Constats opérateur du 2026-11-16 (lecture seule, à intégrer au cadrage)
+
+1. **Translation sans homing** — confirmé au code : la chaîne translation
+   (CODE/I_TRANSLATION/ : FB_Translation, FB_Safety_Translation, arbitrage M3,
+   interlock) ne connaît PAS `MachineHomed` (0 occurrence). MachineHomed ne bloque
+   que l'entrée SEMI_AUTO (FB_Modes.st:160). En manu la translation bouge alors
+   que le référencement n'est pas OK.
+   Précision correction exploitant : le canal IHM existe (mapping obligatoire) —
+   `MachineHomingInstruction` (FB_CycleMachineHoming.st:600-680, consommé par le
+   bandeau FB_Hmi_BannerFormatter.st:26) + champ `OperatorActionText`. HX0 affiche
+   déjà « M1+M2 non ref » (FB_CycleMachineHoming.st:654-668). Ce qui manque :
+   la mention « translation / pilotage non qualifié » dans ce libellé hors cycle,
+   et aucun refus n'accompagne une demande de translation hors homing.
+   → Décision D4 à trancher : nouvelle tâche dédiée (périmètre I_TRANSLATION + PRG_05
+   + IHM) vs point intégré à T377. Recommandé : tâche dédiée, T377 ne doit pas
+   s'élargir sur la translation.
+2. **Déclenchement accidentel par jeu joystick** — l'entrée du cycle homing se
+   fait par BtnValidationEdge ou StartEdge (FB_CycleMachineHoming.st:414) en
+   MAINT_N2. Avec le nouveau design HX2, une entrée accidentelle avec homme-mort
+   armé et manche défléchi serait immédiatement une montée (ClimbPermit).
+   → Garde ajoutée au diff HX2 : entrée cycle acceptée uniquement manche au
+   neutre (latch SeenNeutral existant), un petit déplacement ne peut pas
+   lancer une montée du cycle.
+
+
+## 6. Tests prévus après GO
 
 SimBench : 4 refus garde · validation nominale 8,50 m · contact fortuit → HX2A
 sans `HomeReq` · preset non confirmé → aucun mouvement · 13 TC existants adaptés.
