@@ -725,3 +725,40 @@ Points en attente, par ordre de priorité. Chacun attend une décision ou un GO 
 - Constat : la nouvelle session de l'ancien orchestrateur a repris la ligne d'étape à l'écran, alors qu'elle avait été retirée d'`AGENTS.md`. La référence restait dans `skills/workflow-project/SKILL.md` : retirée ce jour (sur demande de l'exploitant).
 - À faire, sur GO : écrire la lecture obligatoire de démarrage dans `AGENTS.md`, puis vérifier qu'une session neuve la respecte.
 - Décision ouverte : le pied de réponse `➡️ Choix` reste dans `AGENTS.md`. L'exploitant a demandé de retirer son emoji. Décider si on retire aussi l'emoji de la règle.
+
+## 28. Décisions de l'exploitant (2026-11-16)
+
+1. Identifiant de l'orchestrateur : `TORC-CC10` (MULTITASK ORCHESTRATOR AGENT). `T000` est une tâche provisoire, pas l'identifiant de l'orchestrateur. À vérifier : la convention `T###-ACTEUR` ne contient pas `TORC` ; à aligner (convention ou script) avant usage.
+2. Lecture au démarrage, deux niveaux :
+   - Commun à tout agent : savoir ce qui est possible, avoir une idée de l'architecture du projet.
+   - Orchestrateur (`/workflow-project-orchestrator`) : vue d'ensemble du projet ; connaît et utilise des commandes comme `/schedule` ; échange avec les autres sessions, délègue, suit et revoit le travail des autres agents.
+   - Coordinateur (`/workflow-project-coordinator`) : vue technique (standards, conventions, tests) ; vue des autres tâches, mais en détail seulement pour sa tâche et son objectif ; gère ses sous-agents ; expose à l'exploitant les commandes utiles, dont `/subtask` pour ajouter au plan.
+3. Titre de session : `T427-CC02 PROJECT WORKFLOW AGENTS`. Appliqué.
+4. Pied `➡️ Choix` : emoji retiré, remplacé par du texte. Règle générale : pas d'emoji dans les réponses ni les documents d'agent. Périmètre du retrait dans les documents à décider.
+5. Hook worktree : écrit, branché dans `.claude/settings.json` (PreToolUse, `EnterWorktree|Agent`, bloquant). Testé en simulation uniquement. Effet réel non vérifié, et une session ouverte avant le changement peut ne pas l'avoir.
+6. `AGENTS.md` : mes passages ont été écrasés une fois par une autre écriture, puis réappliqués. Auteur de la réécriture inconnu. Décision à prendre : qui peut modifier `AGENTS.md`.
+7. Commits : mon dernier commit T427 est `ddeed059`. Mes changements ultérieurs (hook, `AGENTS.md`, skill orchestrateur, plan) figurent dans `4be9460d` « chore(checkpoint): sauvegarde locale complete projet », fait par une autre session.
+
+## 29. Orchestrateur surveille comme un agent particulier (constat 2026-11-16)
+
+Constat vérifié côté Superviseur, à traiter en T429 (périmètre Superviseur, pas T427).
+
+1. Fiche de mission vide acceptée : `agent-supervision.json` porte `"mission_structure": {}` pour la session
+   `1602d0f1…` (alias TORC-CC10). `connect_session.py:197-201` rend `False` sans rien dire quand aucun contrat
+   n'est trouvé, et `supervisor_service.py:219-224` accepte `{}`. Le Superviseur enregistre donc une fiche vide
+   comme valide, et le juge analyse quand même la session.
+2. Orchestrateur non reconnu : `is_coordination_session` (`supervisor_service.py:829-835`) ne détecte que `T000`.
+   `TORC-CC10` rend `False`, donc il ne reçoit pas la notice de coordination et échappe à la détection de conflit
+   entre deux sessions de coordination.
+3. Aucune alerte d'inactivité : aucune recherche sur `inactiv`, `silence`, `watchdog`, `idle` ne trouve de
+   mécanisme. Rien ne signale qu'un agent ne fait rien, ni qu'il fait mal.
+
+Correctifs demandés à T429 :
+- Refuser ou signaler explicitement une fiche non remplie, au lieu de stocker `{}`.
+- Reconnaître le préfixe `TORC` dans la détection de session de coordination.
+- Ajouter une surveillance d'inactivité (seuil par criticité) et un réveil périodique, avec alerte quand une
+  session de coordination ne produit rien.
+
+Côté T427 : l'orchestrateur est un agent à part, il délègue, suit et revoit ; sa surveillance ne peut pas être
+celle d'un agent d'exécution. Critères à écrire une fois la forme d'alerte tranchée par l'exploitant
+(constat Superviseur, notification, ou les deux).

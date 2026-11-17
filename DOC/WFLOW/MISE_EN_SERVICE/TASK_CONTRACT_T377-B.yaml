@@ -1,5 +1,7 @@
-# CONTRAT PROVISOIRE T377-B — rédigé par TORC-CC10 le 2026-11-18, à déplacer par T377-CC03
-# dans DOC/WFLOW/TASKS/<dossier>/CONTRACTS/TASK_CONTRACT_T377-B.yaml (dossier non créé : décision CC03).
+# CONTRAT PROVISOIRE T377-B — rédigé par TORC-CC10 le 2026-11-18.
+# Décision T377-CC03 (2026-11-18) : T377-B est RENDUE à son propre dossier (pas d'intégration dans T377) ;
+# le contrat sera déplacé dans DOC/WFLOW/TASKS/<dossier T377-B>/CONTRACTS/TASK_CONTRACT_T377-B.yaml.
+# Périmètre corrigé après réponse de T377-CC03 : FB_Encoder_Abs.st et PRG_04 ajoutés (sortie BusOppedOnce et câblage), AC10 ajouté.
 # Spécification : DOC/WFLOW/MISE_EN_SERVICE/T377-B_SPEC_DEFAUTS_DEMARRAGE_20261117_v0.1.md
 
 contract:
@@ -40,6 +42,12 @@ contract:
     - id: AC9
       statement: "X est mesuré sur la machine (démarrage à froid et après retour contacteur) avant d'être figé."
       verified_by: "relevé horodaté du temps de montée à OP des codeurs M1/M2, noté au registre de mise en service"
+    - id: AC10
+      statement: "L'impulsion de repli (auto-acquittement d'un défaut de sécurité) reste visible en IHM (journal et bandeau) et limitée aux causes bus/codeur (point d'alerte T377-CC03, discipline ISO 13849)."
+      verified_by: "test : à l'émission de l'impulsion, le bandeau et le journal l'affichent ; aucune autre cause que la perte codeur n'est affectée"
+    - id: AC11
+      statement: "Structure du bundle conservée : le nom de fichier est identique au nom de POU ; le suffixe correspond au langage généré dans le bundle (PRG_04_Treuils_Benne.st reste un POU ST)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . puis python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report : PASS"
 
   scope:
     allowed:
@@ -47,9 +55,10 @@ contract:
       - CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st
       - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
       - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/E_CODEURS/FB_Encoder_Abs.st          # sortie BusOppedOnce (~2 lignes, pré-cadrage T377-CC03)
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st       # câblage de la sortie vers FB_Safety_Winch (~2 arguments)
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
-      - CODE/E_CODEURS/FB_Encoder_Abs.st
       - TOOLS/AGENT_WORKFLOW/scripts/task_scope.py
       - DOC/WFLOW/TASKS.yaml
 

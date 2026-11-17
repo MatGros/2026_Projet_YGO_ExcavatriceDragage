@@ -65,7 +65,21 @@ def evaluate(session_id: str, target: str) -> dict:
     pinned = task_scope.pinned_scope(session_id)
     if pinned:
         pinned_allowed = list(pinned.get("allowed") or [])
-    if task_scope.is_absolute_denied(absolute_relative, pinned_allowed):
+    # 1) Chemins protégés (CODE/, CODE_XML/, PRJ_CODESYS/, fichiers de garde).
+    #    Refus par défaut, et le refus PERSISTE tant que l'exploitant n'a pas écrit la
+    #    phrase exacte. Aucune impasse : la clé est sa citation, vérifiée dans le
+    #    transcript par `write_derogation`, puis `is_derogated` ouvre ce chemin précis.
+    if (task_scope.is_hard_denied(absolute_relative)
+            and not task_scope.is_derogated(session_id, absolute_relative)
+            and task_scope.is_absolute_denied(absolute_relative, pinned_allowed)):
+        return {"decision": "block", "kind": "interdit",
+                "reason": (f"chemin protégé : {absolute_relative}. Demande à l'exploitant "
+                           f"d'écrire exactement « GO {absolute_relative} ». S'il répond ces mots, "
+                           f"enregistre la dérogation avec ce motif (citation exacte), puis relance."),
+                "path": absolute_relative, "task_id": None, "scope": []}
+
+    if (task_scope.is_absolute_denied(absolute_relative, pinned_allowed)
+            and not task_scope.is_derogated(session_id, absolute_relative)):
         return {"decision": "block", "kind": "interdit",
                 "reason": "chemin interdit par la regle du projet (deny-list globale)",
                 "path": absolute_relative, "task_id": None, "scope": []}
@@ -212,11 +226,15 @@ def main() -> int:
     if verdict.get("kind") == "interdit":
         absolute = (
             "ECRITURE INTERDITE PAR LA REGLE DU PROJET : " + str(verdict.get("path")) + "\n\n"
-            "Ce chemin fait partie de la deny-list globale (code machine, reglages, hooks, skills).\n"
-            "Aucun contrat de tache, aucune derogation script ne peut l ouvrir :\n"
-            "ces chemins sont laisses a l exploitant, hors de cet agent.\n"
-            "S il faut vraiment y ecrire, fais-le hors de l agent (editeur, terminal) ;\n"
-            "le trace le consignera alors comme ecriture non tracee (M11).\n"
+            "Ce chemin est protege (code machine, reglages, hooks, skills).\n"
+            "Il ne s ouvre que par une phrase EXACTE de l exploitant, copiee mot pour mot.\n\n"
+            "Demande-lui d ecrire exactement :\n"
+            "    GO " + str(verdict.get("path")) + "\n\n"
+            "S il repond ces mots, enregistre la derogation avec ce motif, puis relance :\n"
+            "  python TOOLS/AGENT_WORKFLOW/scripts/task_scope.py deroge --session "
+            + session_id + " --path \"" + str(verdict.get("path")) + "\" --motif \"GO "
+            + str(verdict.get("path")) + "\"\n"
+            "Tant qu il n a pas repondu, le refus persiste : ne contourne pas par le shell.\n"
         )
         print(absolute, file=sys.stderr)
         miss_log.record(session_id, "M10",

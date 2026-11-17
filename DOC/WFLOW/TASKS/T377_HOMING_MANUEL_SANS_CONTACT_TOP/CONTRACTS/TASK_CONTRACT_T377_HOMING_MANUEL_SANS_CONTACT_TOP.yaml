@@ -1,0 +1,213 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# T377 — HOMING N1 MANUEL SANS REFERENCEMENT SUR CAPTEUR TOP
+#
+# v1.1 (2026-11-18, GO exploitant) — remplace la v2026-11-02 restée dans
+# DOC/WFLOW/TASKS/T_TEMP (A TRIER)/CONTRACTS/. Amendments :
+#   AC2  : 5 gardes (decisions exploitant 2026-11-14), MAINT_N2 seul ;
+#          BtnValidation = IHM seul apres mini-lot PRG_02:609 (JoyBtnRaw retire)
+#   AC3  : requalifie — arret au contact = RETRAIT DE PERMIS (PRG_04:1126-1129),
+#          PAS d'escalade PowerCutOff routee en MAINT_N2 (masquee PRG_04:1632/1653,
+#          contacteur bypass PRG_06:355-356) ; evenement expose par le FB
+#          (cause C8 non-latching + sortie dediee + instruction IHM) ;
+#          "SafetyPermit_Ascent" -> AscentPermit (variable reelle, FB_Safety_Winch:574)
+#   AC4  : reformule — la cible benne ~23,5 m (BucketReferenceTargetM) est HORS homing
+#   scope: chemin contractuel corrige (cette racine), typo T_TEMP (A TRIIER) supprimee
+# Decision exploitant 2026-11-16 : D1=C, contact = latch + degagement sans FAIL,
+# bande HX4 asymetrique +0,10/-0,10 (D5), garde d'ecart M1/M2 en HX2.
+# Design et arbitrages : DOC/WFLOW/TASKS/T377_HOMING_MANUEL_SANS_CONTACT_TOP/
+#   T377_BROUILLON_ST_DIFF_20261116_v0.1.md (v0.4) + T377_ARBITRAGE_*.md + SEQ doc.
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T377_HOMING_MANUEL_SANS_CONTACT_TOP
+  criticality: C3
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Supprimer tout referencement obtenu en montant jusqu'au contact du capteur
+    haut : la reference de M1 et M2 est desormais validee visuellement par
+    l'operateur sur une approche manuelle arretee AVANT le capteur, et le
+    capteur top ne sert plus que de barriere de securite — s'il est touche,
+    meme fortuitement, aucune reference n'est ecrite, la montee est coupee et
+    la descente est imposee. Objectif : ne plus casser le capteur mecanique
+    Top M1/M2 en allant le heurter pour se referencer.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        Aucune etape du cycle de referencement ne commande une montee dont
+        l'objectif est d'atteindre le contact du capteur haut : la montee vers
+        le haut est une approche manuelle sous joystick et homme-mort (palier 1),
+        avec arret AVANT le capteur ; validation operateur sous 5 gardes
+        (MAINT_N2, arret mecanique, capteur libre polarite homing, manche neutre,
+        pas de latch contact).
+      verified_by: >
+        Lecture du diff de FB_CycleMachineHoming.st (HX2/HX2A/HX3) montrant
+        l'absence de commande de montee automatique vers TopPositionSensor ;
+        bundle regenere + G511_check_homing_climb_guard.py et
+        G496_check_top_sensor_polarity.py en PASS.
+
+    - id: AC2
+      statement: >
+        La reference haute est ecrite uniquement sur validation visuelle de
+        l'operateur (BtnValidation IHM, apres mini-lot PRG_02:609 :
+        HwIn.Operator.JoyBtnRaw retire) ou BtnConfirmHomingBucket, et la
+        validation HX2 n'est acceptee que si CINQ gardes sont vraies au meme
+        scan : ModeIsMaint2, WinchesMechanicallyStopped, TopPositionSensor=FALSE
+        (polarite homing : TRUE = contact), NOT JoystickDeflected,
+        NOT TopContactLatched. Hors gardes : refus explicite (latch refuse,
+        compteur, message IHM avec la garde fautive), aucune ecriture.
+      verified_by: >
+        Grep du cablage PRG_02_Acquisition.st -> FB_CycleMachineHoming.st
+        + test SimBench rejouant 4 combinaisons de refus (manche deflechi,
+        treuils non arretes, capteur atteint, hors MAINT_N2) avec compteur
+        et message ; G408_check_ihm_message_length.py PASS.
+
+    - id: AC3
+      statement: >
+        Sur contact du capteur top pendant l'approche, meme fortuit : aucune
+        reference n'est ecrite (aucun HomeReq, aucun preset), la montee est
+        coupee par retrait de permis existant (AscentPermit, PRG_04:1126-1129),
+        latch TopContactLatched + cause non-latching C8 + degagement impose
+        sous joystick (descente palier 1). PAS d'escalade PowerCutOff routee
+        en MAINT_N2 : l'evenement est expose par le cycle (sortie dediee +
+        instruction IHM) ; risques residuels documentes (AU physique
+        independant + butee + survol a mesurer en essai site).
+      verified_by: >
+        Scenario SimBench « contact fortuit pendant HX2 » : HomeReq=FALSE,
+        position non modifiee, latch pose, HX2A atteint, descente commandee ;
+        grep AscentPermit (FB_Safety_Winch.st:574) + chaines PRG_04:1632/1653
+        documentees dans la note de risque residuel du dossier T377.
+
+    - id: AC4
+      statement: >
+        LE homing machine ne modifie PAS la cible benne : la reference benne
+        fermee (~23,5 m, BucketReferenceTargetM, PRG_02:575-577) reste hors
+        perimetre ; le preset homing reste CfgTopSensorPos_M = 8,50 m
+        (PRG_02:661-663 / :715-717, persistant GVL_PERSISTENT.st:41/:49),
+        publie et lisible dans le snapshot de depannage.
+      verified_by: >
+        Grep des champs GVL_Troubleshooting.F_HomingM2.* dans le bundle et
+        troubleshooting_variables.txt regenere + G200 PASS ; verification que
+        BucketReferenceTargetM est inchange par le diff du lot.
+
+    - id: AC5
+      statement: >
+        Aucun consommateur ne confond une position validee visuellement avec
+        un referencement valide : Homed / MachineHomed restent ecrits par la
+        seule transaction preset verifiee (ReadbackOk), et une validation
+        visuelle sans preset verifie laisse Homed a FALSE ; la bande HX4
+        (CfgVerifyTolHighM/LowM, +0,10/-0,10) est un controle cycle
+        additionnel qui rejette une validation au mauvais endroit.
+      verified_by: >
+        Grep des consommateurs de Homed/HomedAndReliable dans CODE/
+        (PRG_04, PRG_05, FB_Safety_*) + test SimBench « validation visuelle +
+        verification preset en echec » : Homed=FALSE, aucun mouvement autorise.
+
+    - id: AC6
+      statement: >
+        Le fichier PRG_02_Acquisition.st conserve un nom de fichier identique
+        au nom du POU declare et un suffixe de langage identique au langage
+        genere dans le bundle.
+      verified_by: >
+        Bundle PLCopenXML frais : comparaison nom fichier / POU / langage.
+
+    - id: AC7
+      statement: >
+        Les POU et types touches restent conformes a la NAMING_CONVENTION
+        (PascalCase, prefixes, unites _M pour les positions) et aucun nouveau
+        champ ne duplique un fait deja publie ailleurs dans le snapshot.
+      verified_by: >
+        G110_check_naming_style.py et G120_check_fb_dut_naming.py en PASS,
+        plus revue du diff des nouveaux champs.
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/G_CYCLE/_TYPES/E_MachineHomingTxState.st
+      - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_Cfg.st
+      - CODE/G_CYCLE/FB_CycleMachineHoming.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/J_SUPERVISION/GVL_Troubleshooting.st
+      - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_HomingChecklist.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_variables.txt
+      - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
+      - DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md
+      - DOC/WFLOW/TASKS/T377_HOMING_MANUEL_SANS_CONTACT_TOP/CONTRACTS/TASK_CONTRACT_T377_HOMING_MANUEL_SANS_CONTACT_TOP.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/E_CODEURS/FB_Encoder_Homing.st
+      - CODE/E_CODEURS/FB_Encoder.st
+      - CODE/H_TREUILS_BENNE/FB_WinchSync.st
+      - ARCHIVES/**
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Le capteur haut reste une barriere de securite independante : polarite, latch et SafeStop existants non affaiblis (PRG_04:1126-1129 non touches)"
+      - "La transaction preset verifiee (ReadbackOk + CST_HomingVerifyToleranceM, FB_Encoder_Homing) reste la seule source de Homed"
+      - "Le homing conjoint benne (recalage M2 sur M1 + offset) deja cable dans PRG_02 reste fonctionnel"
+      - "FB_Encoder_Homing.st et FB_Encoder.st restent inchanges (perimetre T235 distinct)"
+      - "Aucune position n'est validee sur une mesure non fiable : M1 doit etre HomedAndReliable pour une cible derivee de M1"
+      - "Reset = front, jamais conditionne ; purge des latches identique sur Reset conscient ET Enable FALSE (gate §7, invariant v0.4)"
+      - "Mini-lot anti-demarrage accidentel (PRG_02:609 IHM seule ; FB:416 manche neutre) applique le 17/11 reste inchangé"
+    dropped_on_purpose:
+      - "Le referencement par contact physique du capteur haut M1/M2 — abandonne sciemment le 2026-09-26 (avarie du 2026-09-25)"
+      - "L'escalade PowerCutOff routee en MAINT_N2 — deja masquee (PRG_04:1632/1653) ; evenement expose par cause C8 + IHM (D1=C, exploitant 2026-11-16)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - bundle
+    - check_linkage
+    - run_all_gates
+    - diff_review
+    - simulation_scenario
+    - matrice_mapping_sortie_consommateur
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "deepseek-v4.1-flash:cloud"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout ecart constate entre la doctrine hybride et le code est remonte
+    IMMEDIATEMENT a l'orchestrateur, pas a la fin et jamais silencieusement :
+    chemin de montee encore automatique, capteur top utilise comme source de
+    reference, Homed ecrit hors transaction preset, ou conflit avec T340 /
+    T240 / T235. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    Contrat v1.1 redige le 2026-11-18 sur GO exploitant (session T377-CC03).
+    Aucun fichier CODE/ modifie. Design v0.4 arbitre (4 revues d'agents
+    independantes 16-17/11) en attente de brief de delegation.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Arret de validation LEVE le 2026-11-18 : GO exploitant sur la correction du
+    contrat (« GO sur le point 1 (contrat) ») ; doctrine et liste AC amendees
+    (AC2 5 gardes, AC3 retrait de permis, AC4 hors homing). Le GO d'IMPLÉMENTATION
+    reste une validation distincte (feedback : GO implementation ≠ GO commit).

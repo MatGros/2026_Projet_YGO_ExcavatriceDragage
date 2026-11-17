@@ -132,18 +132,18 @@ def test_B9_champ_objectif(monkeypatch, capsys):
     assert "Objectif" in capsys.readouterr().out
 
 
-@pytest.mark.xfail(strict=True, reason="B10 : « Mode : fresh » à reformuler (à réaliser)")
 def test_B10_mode_lisible(monkeypatch, capsys):
     monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", KEY_A)
     ws.main(["enter", "--session", KEY_A])
-    assert "Mode : fresh" not in capsys.readouterr().out
+    assert "fresh" not in capsys.readouterr().out
 
 
-@pytest.mark.xfail(strict=True, reason="B11 : « Étape : non renseignée » à remplacer (à réaliser)")
 def test_B11_etape_lisible(monkeypatch, capsys):
     monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", KEY_A)
     ws.main(["enter", "--session", KEY_A])
-    assert "non renseignée" not in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert "non renseignée" not in out
+    assert "non renseignee" not in out
 
 
 @pytest.mark.xfail(strict=True, reason="B12 : légende des symboles absente ou répétée (à réaliser)")

@@ -146,15 +146,6 @@
         ],
         "disabled_terminals": [
             {
-                "name": "OpenCode (desactive)",
-                "autoExecuteCommands": true,
-                "icon": "organization",
-                "color": "terminal.ansiBrightBlue",
-                "commands": [
-                    "opencode --agent orchestrateur"
-                ]
-            },
-            {
                 "name": "OmniRoute Server (ancienne commande archivée)",
                 "autoExecuteCommands": true,
                 "icon": "server",
@@ -208,6 +199,19 @@
                     "herdr start-agent claude"
                 ]
             }
+        ],
+        "SnapShot": [
+            {
+                "name": "🤠 Herdr",
+                "autoExecuteCommands": true,
+                "icon": "robot",
+                "color": "terminal.ansiYellow",
+                "commands": [
+                    "herdr start-agent claude"
+                ]
+            }
         ]
+
+
     }
 }

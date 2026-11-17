@@ -373,7 +373,7 @@
             <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-11-16 03:20:15</div>
+    <div class="exec-time">2026-11-17 18:42:03</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (32 tests)</summary>
@@ -1975,9 +1975,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_CycleSemiAuto</code></td>
-                <td>73</td><td>39</td>
-                <td>2</td><td>100</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (100 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>79</td><td>39</td>
+                <td>2</td><td>103</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (103 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -6531,8 +6531,14 @@ END_IF;
 
 Auth.CoupledBucketPhaseLocked := FALSE;
 
-IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
-    // GARDE Tremie (MAINT uniquement -- ne doit PAS interferer avec SEMI_AUTO/cycle auto,
+IF Auth.Mode = E_Mode.MAINT_N2 THEN
+    // En MAINT_N2, selection operateur directe et inconditionnelle (0=M1+M2 ensemble,
+    // 1=M1 seul, 2=M2 seul), sans écrasement par la garde Trémie ni par la séquence benne T248.
+    Auth.CoupledBucketPhaseLocked := FALSE;
+    BucketSeqSatisfied := FALSE;
+    Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+ELSIF Auth.Mode = E_Mode.MAINT_N1 THEN
+    // GARDE Tremie (MAINT_N1 uniquement -- ne doit PAS interferer avec SEMI_AUTO/cycle auto,
     // qui pilote la benne via ReqProgram.ReqBucket, pas ce selecteur) : a la Tremie, seul
     // le pilotage benne (WinchSel=2) est permis - le couple (0) ne doit JAMAIS s&#x27;y engager
     // manuellement, meme via T248 (BucketSeqSatisfied pouvait se lever a tort si la benne
@@ -6836,6 +6842,7 @@ VAR_INPUT
     Translation_At_P1           : BOOL;     // --&gt; [HW] Capteur position P1 (arret travail)
     Translation_At_Tremie       : BOOL;     // --&gt; [HW] Capteur fin de course tremie
     Translation_At_Maintenance : BOOL;     // --&gt; [HW] Capteur fin de course maintenance
+    Translation_PosPV            : BOOL;     // --&gt; [HW] Etat brut capteur PV (zone approche tremie)
     Translation_PosP1            : BOOL;     // --&gt; [HW] Etat brut capteur P1 (diagnostic de zone)
     Translation_PosMaintenance   : BOOL;     // --&gt; [HW] Etat brut capteur Maintenance (diagnostic de zone)
     Translation_Busy            : BOOL;     // --&gt; [HW] Mouvement translation en cours
@@ -6855,12 +6862,17 @@ VAR_INPUT
     HomedM2                 : BOOL;         // --&gt; [HW] Codeur M2 reference
     HomingRequest           : BOOL;         // --&gt; [CMD] Demande de referencement (front)
     InitPositionOk          : BOOL;         // --&gt; [HW] Posture de depart OK (treuils/M3 dans la plage, calcul PRG_03) - condition AX1_INIT
+    InitM3MaintBlocked      : BOOL;         // --&gt; [DIAG] Sous-cause AX1 : chariot M3 en zone Maintenance
+    InitWinchTopBlocked     : BOOL;         // --&gt; [DIAG] Sous-cause AX1 : treuils M1/M2 hors fenetre haute
+    InitBucketStateBlocked  : BOOL;         // --&gt; [DIAG] Sous-cause AX1 : etat benne non qualifie (ni ouvert ni ferme)
     WinchesAtTopWindow      : BOOL;         // --&gt; [HW] Treuils M1 ET M2 dans la fenetre FDC logiciel haut (calcul PRG_03) - surveille en AX2
 
     // === CONFIG &amp; COMMANDES CYCLE (IHM) ===
     CfgDrainTime           : TIME;         // --&gt; [CFG] Duree d&#x27;egouttage AX13 configurable IHM (&lt;= 0 -&gt; defaut interne)
     SkipDrainRequest       : BOOL;         // --&gt; [CMD] Bouton IHM : passer l&#x27;etape d&#x27;egouttage AX13 (front)
     RepositionRequest      : BOOL;         // --&gt; [CMD] Option IHM (maintenue) : repositionnement couple M1+M2 pendant le vidage tremie (AX15B &lt;-&gt; AX15C)
+    CfgAllowDumpInPV       : BOOL;         // --&gt; [CMD] Option IHM : autorise ouverture benne des la zone PV et retour P1 des benne ouverte
+    CfgPauseBeforeDump_S   : REAL;         // --&gt; [CFG] Pause reglable (s) entre fin translation AX14 et ouverture benne AX15B (0 = inactif)
     // 🔧 T358 : la cible de forcage n&#x27;est PLUS une configuration persistee ni une
     // impulsion de bouton. Elle est portee par l&#x27;argument StepForceTgt ci-dessous
     // (champ IHM non persiste) : une valeur oubliee d&#x27;une session precedente ne peut
@@ -7040,6 +7052,9 @@ VAR
     CST_KoboldBottomConfirmTime : TIME := T#100ms; // . [LOC] Anti-rebond contact fond
     CST_BottomTouchStabTime : TIME := T#500ms;  // . [LOC] Stabilisation arret apres contact fond
     CST_TranslationStopConfirmTime : TIME := T#500ms; // . [LOC] Confirmation arret physique M3 sur FDC P1/trémie
+    PauseBeforeDumpTimer    : TON;              // . [LOC] Pause configurable entre fin approche tremie et ouverture benne
+    PauseBeforeDumpTime     : TIME;             // . [LOC] Duree effective de la pause avant ouverture benne
+    PvDumpLatched           : BOOL;             // . [LOC] Ouverture benne anticipee amorcee en zone PV
 
     // === SOCLE DEFAUT TRANSVERSE ===
     instFault               : FB_FaultCore;                  // * [INST] Socle defaut transverse
@@ -7144,6 +7159,18 @@ TranslationStopTimer(
            OR ((State = E_AutoCycleStep.AX14_TRANSLATE_DUMP) AND Translation_At_Tremie))
           AND NOT Translation_Busy,
     PT := CST_TranslationStopConfirmTime);
+
+PauseBeforeDumpTime := DINT_TO_TIME(REAL_TO_DINT(LIMIT(0.0, CfgPauseBeforeDump_S, 30.0) * 1000.0));
+PauseBeforeDumpTimer(
+    IN := ((State = E_AutoCycleStep.AX15A_DUMP_ARRIVE)
+           OR ((State = E_AutoCycleStep.AX14_TRANSLATE_DUMP) AND Translation_At_Tremie AND NOT Translation_Busy))
+          AND (CfgPauseBeforeDump_S &gt; 0.0),
+    PT := PauseBeforeDumpTime);
+IF (State &lt;&gt; E_AutoCycleStep.AX14_TRANSLATE_DUMP)
+   AND (State &lt;&gt; E_AutoCycleStep.AX15A_DUMP_ARRIVE)
+   AND (State &lt;&gt; E_AutoCycleStep.AX15B_DUMP_OPEN) THEN
+    PvDumpLatched := FALSE;
+END_IF;
 
 // AX5 : le contacteur alimente le capteur ; aucun retour auxiliaire n existe.
 KoboldInitTimer(IN := (State = E_AutoCycleStep.AX5_KOBOLD_INIT) AND DeadmanArmed AND JoystickPush,
@@ -7587,7 +7614,7 @@ Ready := Enable AND NOT Fault.Latched;
 // démarrage). Le séquenceur (transitions X0→X13) reste piloté par JoystickDeflected.
 CycleMotionPermit := JoystickDeflected AND DeadmanArmed;
 TranslationP1Permit := DeadmanArmed AND JoystickRight AND NOT JoystickPush AND NOT JoystickPull;
-TranslationTremiePermit := DeadmanArmed AND JoystickLeft AND NOT JoystickPush AND NOT JoystickPull;
+TranslationTremiePermit := DeadmanArmed AND JoystickLeft AND ((CfgAllowDumpInPV AND Translation_PosPV) OR NOT JoystickPush) AND NOT JoystickPull;
 JoystickPushOnly := JoystickPush AND NOT (JoystickLeft OR JoystickRight);
 
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
@@ -7723,12 +7750,23 @@ CASE State OF
             OperatorActionId := 16#0401;
             OperatorAction := &#x27;AX1 - Defaut cycle actif : acquitter avec Reset.&#x27;;
         ELSIF NOT InitPositionOk THEN
-            CycleStateStr := &#x27;AX1 - Posture depart incorrecte (M3, FDC haut M1 ou benne)&#x27;;
             ExpectedAxis := E_OperatorAxis.BUTTON;
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := &#x27;AX1 - Amener M1 au FDC haut et qualifier la benne.&#x27;;
+            IF InitM3MaintBlocked THEN
+                CycleStateStr := &#x27;AX1 - Chariot M3 en zone Maintenance&#x27;;
+                OperatorAction := &#x27;AX1 - Degager le chariot M3 hors zone Maintenance.&#x27;;
+            ELSIF InitWinchTopBlocked THEN
+                CycleStateStr := &#x27;AX1 - Treuils M1/M2 hors zone haute&#x27;;
+                OperatorAction := &#x27;AX1 - Remonter les treuils M1/M2 au FDC haut.&#x27;;
+            ELSIF InitBucketStateBlocked THEN
+                CycleStateStr := &#x27;AX1 - Etat benne non qualifie&#x27;;
+                OperatorAction := &#x27;AX1 - Ouvrir ou fermer la benne pour qualifier son etat.&#x27;;
+            ELSE
+                CycleStateStr := &#x27;AX1 - Posture depart incorrecte (M3, FDC haut M1 ou benne)&#x27;;
+                OperatorAction := &#x27;AX1 - Amener M1 au FDC haut et qualifier la benne.&#x27;;
+            END_IF;
         ELSE
             CycleStateStr := &#x27;AX1 - Conditions initiales non remplies&#x27;;
             ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -8264,14 +8302,28 @@ CASE State OF
         TranslationCmd.PositionTgt := 1; // Trémie
         TranslationCmd.ReqStart := TranslationTremiePermit;
 
-        IF Translation_At_Tremie THEN
+        // Option IHM : ouverture benne anticipee des la zone PV tout en poursuivant vers Tremie,
+        // et retour autorise vers P1 (AX18) des que la benne est ouverte meme sans capteur Tremie.
+        IF CfgAllowDumpInPV AND Translation_PosPV AND DeadmanArmed AND JoystickPush THEN
+            PvDumpLatched := TRUE;
+        END_IF;
+        IF PvDumpLatched THEN
+            BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
+        END_IF;
+
+        IF (PvDumpLatched OR (CfgAllowDumpInPV AND Translation_PosPV))
+           AND Benne_Done AND Benne_IsOpen THEN
+            BucketCmd.ReqOpen := FALSE;
             TranslationCmd.ReqStart := FALSE;
             TranslationCmd.PositionTgt := 0;
+            State := E_AutoCycleStep.AX18_DONE_SYNC;
+        ELSIF Translation_At_Tremie THEN
+            TranslationCmd.ReqStart := FALSE;
+            TranslationCmd.PositionTgt := 1;
             WaitingForOperator := JoystickDeflected;
             WaitingForProcess := NOT JoystickDeflected;
             OperatorAction := &#x27;AX14 - Tremie : relacher le joystick avant ouverture.&#x27;;
             IF TranslationStopTimer.Q THEN
-                // T345-L2 : entree normale AX15A = nouveau cycle d&#x27;armement du geste benne.
                 SeenNeutralAfterArrival := FALSE;
                 State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
             END_IF;
@@ -8295,10 +8347,21 @@ CASE State OF
         TranslationCmd.ReqStart := FALSE;
         TranslationCmd.PositionTgt := 0;
 
-        // T345-L2 : vrai latch inter-scan. Le scan qui observe le neutre arme le
-        // geste suivant, mais ne peut pas consommer ce meme armement. AX15B exige
-        // donc toujours un push posterieur a au moins un scan neutre en AX15A.
-        IF SeenNeutralAfterArrival THEN
+        IF PvDumpLatched THEN
+            BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
+        END_IF;
+
+        IF PvDumpLatched AND Benne_Done AND Benne_IsOpen THEN
+            BucketCmd.ReqOpen := FALSE;
+            State := E_AutoCycleStep.AX18_DONE_SYNC;
+        ELSIF (CfgPauseBeforeDump_S &gt; 0.0) AND NOT PauseBeforeDumpTimer.Q THEN
+            WaitingForOperator := FALSE;
+            WaitingForProcess := TRUE;
+            OperatorAction := &#x27;AX15a - Stabilisation chariot avant ouverture benne.&#x27;;
+            IF NOT JoystickDeflected THEN
+                SeenNeutralAfterArrival := TRUE;
+            END_IF;
+        ELSIF SeenNeutralAfterArrival OR PvDumpLatched THEN
             WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
             WaitingForProcess := DeadmanArmed AND JoystickPush;
             OperatorAction := &#x27;AX15a - Pousser vers le bas pour ouvrir et vider.&#x27;;
@@ -13290,6 +13353,7 @@ END_IF;
 // l&#x27;interdiction d&#x27;accès à la zone Maintenance est gérée séparément par la cible P1 et sa
 // coupure dure, sans couper le déplacement légal jusqu&#x27;à P1.
 EffectiveSafeStop := SafeStop
+                      OR ArrivalLock
                       OR (ReqTremie AND NOT EffectivePermitM3_Tremie)
                       OR (ReqMaintenance AND NOT EffectivePermitM3_Maintenance)
                       OR (ReqTremie AND ReqMaintenance);
@@ -13316,8 +13380,11 @@ TonBrakeRealFreqTimeout(
     PT := T#2S
 );
 
-MovementRequested := (ABS(SpeedRamp.Current) &gt; 0.1)
-                  OR ((ABS(DriveActualFreqHz) &gt; 0.5) AND NOT TonBrakeRealFreqTimeout.Q);
+// Des que ArrivalLock est arme au 1er trou capteur (Tremie ou P1),
+// couper immediatement MovementRequested pour fermer le frein comme en MANU.
+MovementRequested := NOT ArrivalLock
+                  AND ((ABS(SpeedRamp.Current) &gt; 0.1)
+                       OR ((ABS(DriveActualFreqHz) &gt; 0.5) AND NOT TonBrakeRealFreqTimeout.Q));
 
 Brake(
     Enable := Enable,
@@ -13872,6 +13939,7 @@ STRUCT
     RequestedDriveControlWord    : WORD; // 0=None, 1=Fwd, 2=Rev, 7=Reset AC600
     RequestedDriveFreqHz         : REAL;
     ReqTremieSemantic            : BOOL; // TRUE = mouvement demande vers Tremie, independant de InvertDriveDirection
+    ReqMaintenanceSemantic       : BOOL; // TRUE = mouvement demande vers Maintenance/P1, independant de InvertDriveDirection
 END_STRUCT
 END_TYPE
 </pre>

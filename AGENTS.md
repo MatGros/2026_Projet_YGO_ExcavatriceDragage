@@ -55,7 +55,7 @@ de statut, pas dans les réponses.
 Hors tâche : `T000` (provisoire, sans contrat ni critère évaluable ; un seul coordinateur T000 à la fois).
 
 **Pied de réponse — où on peut aller :** chaque réponse de travail finit par une ligne
-`➡️ Choix : …` listant 2 à 4 suites possibles (étape suivante, autre voie, retour, aide).
+`Choix : …` listant 2 à 4 suites possibles (étape suivante, autre voie, retour, aide).
 L'utilisateur n'est jamais laissé sans savoir ce qu'il peut faire ensuite.
 
 **Aide :** le message « aide workflow » (ou « où en est-on ? ») affiche la carte en ≤ 15 lignes :
@@ -435,3 +435,8 @@ métier, une par FB.
   concis, direct, TDAH-friendly, emoji, tables courtes > prose.
 - **Specs `AF_PartieN`** : concis et technique, **zéro perte d'information**, emoji comme repères.
   La précision technique prime sur la brièveté.
+
+
+## Garde-fous d'execution CLI (Anti-saturation)
+- **Interdiction de pytest global :** Ne JAMAIS lancer `python -m pytest TOOLS/AGENT_SUPERVISOR/tests` sans cibler un fichier precis (`test_xxx.py`) ou un filtre `-k`.
+- **Isolation des tests :** Toujours executer `pytest` sur un etat/port isole, jamais contre les serveurs actifs (`8081` / `8082`), avec `-x --tb=short`.

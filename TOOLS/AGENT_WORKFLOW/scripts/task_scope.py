@@ -22,6 +22,7 @@ CLI :
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import json
 import os
 import re
@@ -220,33 +221,98 @@ def is_scratch(relative: str) -> bool:
     return any(text.startswith(prefix) for prefix in SCRATCH_PREFIXES)
 
 
-def _matches_anywhere(relative: str, prefixes: list[str]) -> bool:
-    """Le motif est-il present dans le chemin, quel que soit le racine ?
+def _components(text: str) -> list[str]:
+    """Composants canonises d'un chemin (minuscules, sans lecteur, sans point final).
+
+    Un point ou un espace final est retire : sous Windows, `CODE.` designe le meme
+    dossier que `CODE`, et laisser passer cette variante ouvrirait la deny-list.
+    """
+    parts: list[str] = []
+    for raw in str(text or "").replace("\\", "/").split("/"):
+        comp = raw.strip().lower()
+        if not comp or comp == ".":
+            continue
+        if len(comp) >= 2 and comp[1] == ":":
+            comp = comp[2:].strip()
+            if not comp:
+                continue
+        comp = comp.rstrip(". ").strip()
+        if comp:
+            parts.append(comp)
+    return parts
+
+
+SHORT_NAME = re.compile(r"^(.{1,6})~\d+$")
+_COMPONENTS_CACHE: dict[str, list[str]] = {}
+
+
+def _deny_components(prefix: str) -> list[str]:
+    """Composants d'un motif de deny-list, calcules une seule fois par motif."""
+    cached = _COMPONENTS_CACHE.get(prefix)
+    if cached is None:
+        clean = str(prefix or "").replace("\\", "/").rstrip("/")
+        base = clean[:-3] if clean.endswith("/**") else clean
+        cached = _components(base)
+        _COMPONENTS_CACHE[prefix] = cached
+    return cached
+
+
+def _short_stem(comp: str) -> str | None:
+    """Racine d'un nom court 8.3, avec ou sans extension (`AGENT_~1`, `TASK_S~1.PY`)."""
+    main, _dot, _ext = comp.partition(".")
+    match = SHORT_NAME.match(main)
+    return match.group(1) if match else None
+
+
+def _comp_matches(window: str, pattern: str, strict: bool = False) -> bool:
+    """Un composant correspond-il au motif ? Egalite, joker, ou alias court 8.3.
+
+    Le nom court Windows tronque la racine a six caracteres : `AGENT_~1` pour
+    `AGENT_WORKFLOW`, et `TASK_S~1.PY` pour `task_scope.py` (l'extension suit le
+    tilde). Verifie le 2026-11-17 : `TOOLS/AGENT_~1/scripts/task_scope.py` et le
+    vrai fichier de garde sont le meme (samefile).
+
+    `strict=True` desactive l'alias court : la comparaison sert alors a une liste
+    d'AUTORISATION, ou une tolerance transformerait un perimetre epingle en passe-droit.
+    """
+    if any(ch in pattern for ch in "*?["):
+        return fnmatch.fnmatch(window, pattern)
+    if window == pattern:
+        return True
+    if strict:
+        return False
+    stem = _short_stem(window)
+    if stem and (pattern.startswith(stem) or stem.startswith(pattern)):
+        return True
+    # Forme large : `SCRIPTS~1`. NTFS ne produit pas ce nom, mais refuser la forme
+    # coute moins cher que dependre de la facon dont le volume a nomme le dossier.
+    window_stem = window.partition(".")[0]
+    return window_stem.startswith(pattern.partition(".")[0] + "~")
+
+
+def _matches_anywhere(relative: str, prefixes: list[str], strict: bool = False) -> bool:
+    """Le motif est-il present dans le chemin, quel que soit la racine ?
 
     Indispensable : un chemin ABSOLU hors depot (C:/autre/CODE/x.st) doit tomber
     dans la meme deny-list qu'un chemin relatif du depot.
+
+    Comparaison par COMPOSANTS ENTIERS, jamais par sous-chaine (correctif 2026-11-17) :
+    `codex_notes.md` ou `DOC/code_review/` ne doivent pas etre refuses parce qu'ils
+    contiennent les lettres « code » ; `.../CODE/x.st` doit l'etre parce qu'un de ses
+    composants EST `code`.
     """
-    import fnmatch
-    text = str(relative or "").replace("\\", "/")
-    lowered = text.lower()
+    parts = _components(relative)
+    if not parts:
+        return False
     for prefix in prefixes:
-        clean = str(prefix).replace("\\", "/").rstrip("/")
-        if not clean:
+        want = _deny_components(str(prefix or ""))
+        if not want:
             continue
-        base = clean[:-3] if clean.endswith("/**") else clean
-        if "*" in base:
-            pattern = base.lower()
-            for index in range(len(lowered) - len(pattern) + 1):
-                chunk = lowered[index:index + len(pattern)]
-                if fnmatch.fnmatch(chunk, pattern):
-                    return True
-            continue
-        marker = "/" + base.lower()
-        if lowered.startswith(base.lower() + "/") or lowered == base.lower():
-            return True
-        if marker in lowered:
-            # n'importe quelle occurrence du motif dans le chemin (CODE/, scripts/, ...)
-            return True
+        span = len(want)
+        for start_index in range(len(parts) - span + 1):
+            window = parts[start_index:start_index + span]
+            if all(_comp_matches(win, pat, strict) for win, pat in zip(window, want)):
+                return True
     return False
 
 
@@ -256,9 +322,15 @@ def is_absolute_denied(relative: str, pinned_allowed: list[str] | None = None) -
     Regle : la protection porte sur ce que la session N'A PAS obtenu avant de commencer.
     Un contrat PLC legitime (CODE/) declare avant la session reste valable ; un
     auto-elargissement en cours de session est bloque (empreinte divergente).
+
+    La liste d'autorisation est comparee en mode STRICT : sans cela, un nom court
+    comme `CODE/MA~1/x.st` serait reconnu comme `CODE/MAIN` et ouvrirait une
+    ecriture que le contrat n'a jamais autorisee (revue 2026-11-17).
     """
+    if "\x00" in str(relative or ""):
+        return True  # octet nul : jamais legitime, refuse avant toute autre analyse
     allowed = list(pinned_allowed or [])
-    if matches(relative, allowed) or _matches_anywhere(relative, allowed):
+    if matches(relative, allowed) or _matches_anywhere(relative, allowed, strict=True):
         return False  # le perimetre epingle l autorisait deja
     return (matches(relative, list(ABSOLUTE_DENY))
             or _matches_anywhere(relative, list(ABSOLUTE_DENY)))
@@ -266,6 +338,8 @@ def is_absolute_denied(relative: str, pinned_allowed: list[str] | None = None) -
 
 def is_hard_denied(relative: str) -> bool:
     """Chemin qu'aucune derogation ne peut ouvrir (CODE/, sources automate, garde-fous)."""
+    if "\x00" in str(relative or ""):
+        return True
     return matches(relative, list(HARD_DENY)) or _matches_anywhere(relative, list(HARD_DENY))
 
 
@@ -452,11 +526,13 @@ def write_derogation(session_id: str, path: str, motif: str, ttl_days: int = 30,
                      transcript=None) -> dict:
     """Derogation ACCORDEE mais DATEDE (GLM 2026-11-13) : pas d'arrimage eternel.
 
-    T427 P1 : motif OBLIGATOIRE, copie mot pour mot d'un message humain du transcript ;
-    aucun chemin a interdiction dure ne peut etre deroge.
+    T427 P1 : motif OBLIGATOIRE, copie mot pour mot d'un message humain du transcript.
+
+    2026-11-18 : plus d'interdiction sans issue. Un chemin protege (CODE/, CODE_XML/,
+    PRJ_CODESYS/, fichiers de garde) s'ouvre par une citation EXACTE de l'exploitant,
+    verifiee dans le transcript : l'agent ne peut pas l'inventer, l'exploitant garde la
+    cle. Le refus reste le defaut, et il persiste tant que la phrase n'a pas ete dite.
     """
-    if is_hard_denied(normalize(path)):
-        raise DerogationRefusee(f"interdiction dure : {normalize(path)} ne peut pas etre deroge")
     if not str(motif or "").strip():
         raise DerogationRefusee("motif obligatoire : citer mot pour mot le message de l'exploitant")
     if not citation_from_user(transcript, motif):
@@ -475,9 +551,11 @@ def write_derogation(session_id: str, path: str, motif: str, ttl_days: int = 30,
 
 
 def is_derogated(session_id: str, relative: str) -> bool:
-    if is_hard_denied(normalize(relative)):
-        return False  # T427 P1 : interdiction dure, aucune derogation ne compte
-    """Une derogation vaut pour un chemin exact ou pour un prefixe marque '.../**'."""
+    """Une derogation vaut pour un chemin exact ou pour un prefixe marque '.../**'.
+
+    2026-11-18 : vaut aussi pour un chemin protege, des lors que l'exploitant l'a
+    accorde par une citation exacte (voir `write_derogation`).
+    """
     now = time.time()
     for item in read_derogations(session_id):
         granted = str(item.get("path") or "")
