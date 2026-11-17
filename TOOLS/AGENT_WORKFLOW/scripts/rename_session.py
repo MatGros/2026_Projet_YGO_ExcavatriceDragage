@@ -25,6 +25,12 @@ APP_DATA = Path(r"C:\Users\ZEDVICTUS\.gemini\antigravity-cli")
 AUDIT_LOG_FILE = REPO_ROOT / "DOC" / "WFLOW" / "SESSION_RENAME_AUDIT.log"
 DIRTY_MARKER_FILE = REPO_ROOT / "DOC" / "WFLOW" / "SESSION_DIRTY_ALIASES.json"
 
+# 2026-11-16 : le service repond en ~0,55 s par appel ; un budget de 1,0 s faisait
+# echouer le renommage des que le juge travaillait. Trois appels sont enchaines
+# (jeton, alias, mission) : 5,0 s laisse la marge necessaire sans masquer un vrai
+# service hors ligne.
+SUPERVISOR_HTTP_TIMEOUT = 5.0
+
 
 class SupervisorSessionNotLinked(RuntimeError):
     """Rename was requested for a session not explicitly attached to Supervisor."""
@@ -32,7 +38,7 @@ class SupervisorSessionNotLinked(RuntimeError):
 
 def get_linked_supervisor_session(session_id: str, platform: str,
                                   base_url: str = "http://127.0.0.1:8082",
-                                  timeout: float = 1.0) -> dict | None:
+                                  timeout: float = SUPERVISOR_HTTP_TIMEOUT) -> dict | None:
     """Return the exact existing assignment; None means the service is unavailable."""
     request = urllib.request.Request(
         f"{base_url}/api/supervision/summary",
@@ -82,7 +88,7 @@ def get_last_committed_alias(session_id: str) -> str:
 
 def resolve_supervisor_session_id(session_id: str, platform: str,
                                   base_url: str = "http://127.0.0.1:8082",
-                                  timeout: float = 1.0) -> str | None:
+                                  timeout: float = SUPERVISOR_HTTP_TIMEOUT) -> str | None:
     """Return the unique existing assignment ID; never create or guess an assignment."""
     request = urllib.request.Request(
         f"{base_url}/api/supervision/summary",
@@ -114,8 +120,9 @@ def resolve_supervisor_session_id(session_id: str, platform: str,
 # Whitelist stricte et déterministe post-NFC : alphanumérique latin étendu, tiret, underscore, espace
 # Interdiction formelle de démarrer par '-' ou espace (évite flags CLI et splitting)
 RE_VALID_STRING = re.compile(r"^[A-Za-z0-9_À-ÖØ-öø-ÿ][A-Za-z0-9_ \-À-ÖØ-öø-ÿ]*$")
-RE_TASK_ID = re.compile(r"^T\d+(?:-[0-9A-Z]+)*$")
-RE_MACHINE_ALIAS = re.compile(r"^T\d+(?:-[0-9A-Z]+)*-(?:CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$")
+RE_TASK_ID = re.compile(r"^(?:TORC(?:-(?:CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2})?|T\d+(?:-[0-9A-Z]+)*)$")
+# TORC : identifiant reserve a l'orchestrateur multi-tache (plan T427, ligne 731).
+RE_MACHINE_ALIAS = re.compile(r"^(?:TORC|T\d+(?:-[0-9A-Z]+)*)-(?:CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$")
 
 def log_audit(action_type: str, session_id: str, old_alias: str, new_alias: str, status_code: int = 0):
     """Écriture atomique en mode append avec INTENT/COMMIT (Write-Ahead Logging)."""
@@ -261,7 +268,7 @@ def build_display_title(machine_alias: str, description: str = "") -> str:
     return title
 
 
-def notify_supervisor(session_id: str, alias: str, mission_text: str = "", platform: str = "claude", base_url: str = "http://127.0.0.1:8082", timeout: float = 1.0, display_title: str = "") -> bool:
+def notify_supervisor(session_id: str, alias: str, mission_text: str = "", platform: str = "claude", base_url: str = "http://127.0.0.1:8082", timeout: float = SUPERVISOR_HTTP_TIMEOUT, display_title: str = "") -> bool:
     """Notifie l'API locale du Superviseur de la mise à jour de l'alias via POST /api/supervision.
     Une session absente n'est jamais créée ici : seul connect_session.py peut l'attacher."""
     try:
@@ -521,7 +528,7 @@ def main():
     if replay_existing:
         fallback_alias = get_last_committed_alias(conv_id)
         try:
-            linked_session = get_linked_supervisor_session(conv_id, platform_code, timeout=1.0)
+            linked_session = get_linked_supervisor_session(conv_id, platform_code, timeout=SUPERVISOR_HTTP_TIMEOUT)
         except SupervisorSessionNotLinked as e:
             old_alias = fallback_alias or "NONE"
             log_audit("INTENT", conv_id, old_alias, old_alias, status_code=0)
@@ -549,7 +556,7 @@ def main():
         description = ""
         log_audit("INTENT", conv_id, current_alias, machine_alias, status_code=0)
     else:
-        if re.fullmatch(r"^T\d+(-[0-9A-Z]+)?-(CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$", task_id):
+        if re.fullmatch(r"^(?:TORC|T\d+(-[0-9A-Z]+)?)-(CC|AGY|CDX|DSH|OPC|GLM|MMX|QWN)\d{2}$", task_id):
             machine_alias = task_id
         else:
             machine_alias = f"{task_id}-{actor}"
@@ -563,7 +570,7 @@ def main():
 
     if preflight_only:
         try:
-            assignment_id = resolve_supervisor_session_id(conv_id, platform_code, timeout=1.0)
+            assignment_id = resolve_supervisor_session_id(conv_id, platform_code, timeout=SUPERVISOR_HTTP_TIMEOUT)
         except SupervisorSessionNotLinked as e:
             sys.stderr.write(f"❌ Prévol refusé : {e}. Aucun titre ni alias modifié.\n")
             sys.exit(4)
@@ -584,7 +591,7 @@ def main():
     # 6. Vérifier et mettre à jour la liaison Superviseur avant les autres cibles.
     if not replay_existing:
         try:
-            sup_ok = notify_supervisor(conv_id, machine_alias, mission_text=description, platform=platform_code, timeout=1.0, display_title=canonical_title)
+            sup_ok = notify_supervisor(conv_id, machine_alias, mission_text=description, platform=platform_code, timeout=SUPERVISOR_HTTP_TIMEOUT, display_title=canonical_title)
         except SupervisorSessionNotLinked as e:
             log_audit("REJECTED", conv_id, current_alias or "NONE", machine_alias, status_code=4)
             sys.stderr.write(f"❌ {e}. Aucun renommage appliqué ; relance après la liaison explicite.\n")
