@@ -12,7 +12,8 @@
 
 TYPE ST_fbMachineHomingCycle_Cfg :
 STRUCT
-    CfgTopHomingTarget_M : REAL;           // Position capteur haut M2/benne (m) — sert UNIQUEMENT a la cible dynamique M2 du cycle (HX3)
+    CfgTopHomingTarget_M   : REAL;          // Position capteur haut M2/benne (m) — cible finale HX4 M2 (+ OffsetCloseM)
+    CfgTopHomingTargetM1_M : REAL := 8.5;   // Position capteur haut M1 (m) — cible finale HX4 M1 (defaut 8.5 m)
     CfgOffsetOpen_M      : REAL;           // Ecart géométrique benne ouverte (m)
     CfgOffsetClose_M     : REAL;           // Ecart géométrique benne fermée (m)
     // Garde de montee : budget d'une MONTER CONTINUE (un temporisateur remet son temps ecoule a
@@ -22,12 +23,12 @@ STRUCT
     // (GVL_PERSISTENT._WinchSpeedConfig.SpeedBandMaxMps[1], valeur de banc A MESURER sur site)
     // => 58,5 / 0,4 = 146,3 s ; marge x2 = 292,5 s ; valeur retenue 300 s (arrondie au-dessus).
     // A revoir si la course ou la vitesse du palier 1 changent (gate G511).
-    CfgTimeoutClimb      : TIME := T#300s; // Garde de montee au capteur haut (0 = pas de garde)
-    // Garde de descente HX3 : meme regle (budget de DESCENTE CONTINUE).
-    CfgTimeoutHomeAxes   : TIME := T#60s;  // Garde globale prise de référence (0 = pas de garde)
-    CfgTimeoutFlyingHoming : TIME := T#3s; // Garde essai prise de référence au vol (Mode A) avant repli automatique à l'arrêt (Mode B)
-    CfgStabilizationMinM : REAL := 7.50;   // Seuil bas d'inertie stabilisée après référence (m) - HX4 (constante volontaire, valeur a risque, pas d'IHM)
-    CfgStabilizationMaxM : REAL := 9.50;   // Seuil haut d'inertie stabilisée après référence (m) - HX4 (constante volontaire, valeur a risque, pas d'IHM)
-    Initialized          : BOOL := FALSE;  // Drapeau de restauration config au boot (pont persistant)
+    CfgTimeoutClimb         : TIME := T#300s; // Garde de montee au capteur haut (0 = pas de garde)
+    CfgEntryHoldTime        : TIME := T#5s;   // Duree maintien BP joystick au neutre en HX0 (MAINT_N1)
+    CfgBucketPrepareTimeout : TIME := T#20s;  // Duree max commande continue M2 en HX1 (coupe -> neutre)
+    CfgSlackReliefMaxTime   : TIME := T#2s;   // Duree max descente detente cable par geste en HX2
+    CfgTopClearanceTime     : TIME := T#4s;   // Duree descente accumulee apres relachement TOP en HX3
+    CfgTimeoutHomeAxes      : TIME := T#60s;  // Garde globale prise de reference (HX4)
+    Initialized             : BOOL := FALSE;  // Drapeau de restauration config au boot (pont persistant)
 END_STRUCT
 END_TYPE

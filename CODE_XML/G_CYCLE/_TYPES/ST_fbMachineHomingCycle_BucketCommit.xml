@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.304521" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.304521">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T02:47:05.248370" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T02:47:05.248370">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -40,6 +40,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Publier "benne fermee" (impulsion 1 scan)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommitInvalidate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Revoquer reference benne (abandon avant calibration altimetrie)</xhtml>
               </documentation>
             </variable>
           </struct>

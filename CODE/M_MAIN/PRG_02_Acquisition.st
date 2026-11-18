@@ -353,6 +353,7 @@ instSimBench(
     // Rattrapage mecanique M1/M2 : reprise de jeu en montee couplee (banc uniquement).
     SimWinchCouplingModelActive := GVL_Simulation.SimWinchCouplingModelActive,
     SimBucketJamActive       := GVL_Simulation.SimBucketJamActive,
+    WinchesHomed             := Data.EncoderM1.Homed AND Data.EncoderM2.Homed,
     M2_CablePos_M            := Data.EncoderM2.Measurement.CablePosM,
     BucketOffsetCloseM       := _BucketCfgPersist.Config.OffsetCloseM,
     BucketCoherenceLimitM    := _BucketCfgPersist.Config.CoherenceLimitM,
@@ -546,14 +547,16 @@ Data.Joystick.NeutralYAct        := instJoystick.NeutralYAct;
 // Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
 (* Centralise les fronts IHM avant les deux facades codeur. La polarite du DI
    est explicite : Free=TRUE signifie capteur haut non atteint. *)
-MachineHomingM1Status.HomedAndReliable := Data.EncoderM1.HomedAndReliable;
-MachineHomingM1Status.HomingBusy       := Data.EncoderM1.Measurement.HomingLifecycle.Busy;
-MachineHomingM1Status.HomingDone       := Data.EncoderM1.Measurement.HomingLifecycle.Done;
-MachineHomingM1Status.HomingError      := Data.EncoderM1.Measurement.HomingFault.Error;
-MachineHomingM2Status.HomedAndReliable := Data.EncoderM2.HomedAndReliable;
-MachineHomingM2Status.HomingBusy       := Data.EncoderM2.Measurement.HomingLifecycle.Busy;
-MachineHomingM2Status.HomingDone       := Data.EncoderM2.Measurement.HomingLifecycle.Done;
-MachineHomingM2Status.HomingError      := Data.EncoderM2.Measurement.HomingFault.Error;
+MachineHomingM1Status.HomedAndReliable  := Data.EncoderM1.HomedAndReliable;
+MachineHomingM1Status.HomingBusy        := Data.EncoderM1.Measurement.HomingLifecycle.Busy;
+MachineHomingM1Status.HomingDone        := Data.EncoderM1.Measurement.HomingLifecycle.Done;
+MachineHomingM1Status.HomingError       := Data.EncoderM1.Measurement.HomingFault.Error;
+MachineHomingM1Status.HomingProvisional := instEncoderM1.HomingProvisional;
+MachineHomingM2Status.HomedAndReliable  := Data.EncoderM2.HomedAndReliable;
+MachineHomingM2Status.HomingBusy        := Data.EncoderM2.Measurement.HomingLifecycle.Busy;
+MachineHomingM2Status.HomingDone        := Data.EncoderM2.Measurement.HomingLifecycle.Done;
+MachineHomingM2Status.HomingError       := Data.EncoderM2.Measurement.HomingFault.Error;
+MachineHomingM2Status.HomingProvisional := instEncoderM2.HomingProvisional;
 MachineHomingMechanicalStopOk := HwIn.Winch.M1_ContactorsReleased_DI AND NOT HwIn.Winch.M1_BrakeIsOpen_DI
                                  AND (ABS(Data.EncoderM1.Measurement.Speed_Mps) < 0.02)
                                  AND HwIn.Winch.M2_ContactorsReleased_DI AND NOT HwIn.Winch.M2_BrakeIsOpen_DI
@@ -565,6 +568,7 @@ BucketReferenceOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPo
 BucketReferenceCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 BucketReferenceRequested := (BucketReferenceOpenEdge.Q XOR BucketReferenceCloseEdge.Q)
                           AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                          AND NOT instCycleMachineHoming.MachineHomingActive
                           AND MachineHomingMechanicalStopOk;
 IF BucketReferenceOpenEdge.Q THEN
     // Symetrique du CLOSE ci-dessous : Delta attendu benne ouverte = OffsetOpenM (butee
@@ -580,7 +584,8 @@ END_IF;
 // DYNAMIQUE M2 du cycle (FB_CycleMachineHoming §7) consomme ce champ ; M1 y home sur
 // sa propre config (ligne CfgTopSensorPosM M1 ci-dessous). Geometrie de mouflage
 // benne differente -> jamais la position M1.
-MachineHomingCfg.CfgTopHomingTarget_M := _WinchM2CfgPersist.CfgTopSensorPos_M;
+MachineHomingCfg.CfgTopHomingTargetM1_M := _WinchM1CfgPersist.CfgTopSensorPos_M;
+MachineHomingCfg.CfgTopHomingTarget_M   := _WinchM2CfgPersist.CfgTopSensorPos_M;
 MachineHomingCfg.CfgOffsetOpen_M      := _BucketCfgPersist.Config.OffsetOpenM;
 MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 MachineHomingCfg.Initialized          := TRUE;
@@ -599,18 +604,18 @@ instCycleMachineHoming(
     // simple coupure secteur si le datum absolu M1/M2 est intact.
     BucketOffsetValid          := PRG_04_Treuils_Benne.Data.BucketState.MechState.BucketReferenced,
     // Permis operateur maintenu (meme source que l'arbitrage joystick) : sens montee = manche
-    // tire (Y+), sens descente = manche pousse (Y-) ; ref. baseline continuite C1.
+    // tire (Y+), sens descente = manche pousse (Y-) ; BP brut transmis pour entree HX0 N1 (5 s).
     DeadmanArmed               := Data.Joystick.DeadmanArmed,
+    RawDeadmanButton           := HwIn.Operator.JoyBtnRaw,
     JoystickDeflected          := NOT Data.Joystick.AtNeutralXY,
     JoystickPull               := Data.Joystick.AxisY.DirectionPositive,
     JoystickPush               := Data.Joystick.AxisY.DirectionNegative,
-    // Lancer / valider le cycle : commande IHM dediee UNIQUEMENT (le BP homme-mort
-    // brut du joystick ne peut plus lancer/valider le cycle ; garde manche-neutre cote FB HX0).
+    // Lancer / valider le cycle : commande IHM dediee
     BtnValidation              := GVL_IHM.CycleMachineHoming.Cmd.BtnValidate,
     StartRequest               := GVL_IHM.CycleMachineHoming.Cmd.BtnStart,
-    // Confirmation visuelle benne fermee (nouveau bouton dedie IHM HX1)
+    // Confirmation visuelle benne (compat bouton historique)
     BtnConfirmHomingBucket     := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmHomingBucket,
-    // Interlock couplage E1 et mesures pour controle stabilisation HX4
+    // Interlock couplage E1 et mesures
     JoystickWinchSelectArbitrated := PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated,
     CablePosM1                 := Data.EncoderM1.Measurement.CablePosM,
     CablePosM2                 := Data.EncoderM2.Measurement.CablePosM,
@@ -635,6 +640,11 @@ Data.MachineHoming.CmdWinchM2       := instCycleMachineHoming.CmdWinchM2;
 Data.MachineHoming.CmdBucketOpen    := instCycleMachineHoming.CmdBucketOpen;
 Data.MachineHoming.CmdBucketClose   := instCycleMachineHoming.CmdBucketClose;
 Data.MachineHoming.CmdWinchSelect   := instCycleMachineHoming.CmdWinchSelect;
+Data.MachineHoming.AllowAscent      := instCycleMachineHoming.AllowAscent;
+Data.MachineHoming.AllowDescend     := instCycleMachineHoming.AllowDescend;
+Data.MachineHoming.SoftLimitsOff       := instCycleMachineHoming.SoftLimitsOff;
+Data.MachineHoming.BucketRefInvalidate := instCycleMachineHoming.BucketCommit.CommitInvalidate;
+Data.MachineHoming.ProvisionalActive   := instEncoderM1.HomingProvisional OR instEncoderM2.HomingProvisional;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwInM1.SpdValueIn        := HwIn.Winch.COD1_SpdValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
@@ -644,25 +654,24 @@ HwInM1.PresetStatusBit    := FALSE;
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    // Homing unitaire M1 : autorise en MAINT_N1/N2 quel que soit WinchSel (0/1/2).
-    // L'ancien verrou croise WinchSel<>2 est retire (demande MES) : le homing est un
-    // appui bouton delibere ET conditionne a une position de reference (butee meca OK,
-    // ou capteur haut atteint pour BtnHome) -> la garde position suffit. Le cycle homing
-    // machine reste inconditionnel via M1Demand.HomeReq.
-    HomingPermit          := (((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                               AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
-                                                                       AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
+    // Homing unitaire M1 : autorise en MAINT_N2 uniquement (BtnHomingAtZero a l'arret ou BtnHome au capteur haut).
+    // Le cycle machine (instCycleMachineHoming.M1Demand.HomeReq) reste autorise en N1/N2 via cible dynamique Step 4.
+    HomingPermit          := (((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                               AND ((GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero AND MachineHomingMechanicalStopOk)
+                                    OR (GVL_IHM.M1TreuilRetenue.Cmd.BtnHome AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
                               OR instCycleMachineHoming.M1Demand.HomeReq),
     HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome
                              OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
                              OR instCycleMachineHoming.M1Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
+    InvalidateDatum       := instCycleMachineHoming.InvalidateProvisionalDatum,
+    ProvisionalHoming     := instCycleMachineHoming.M1Demand.Provisional,
     CfgHomingTargetM      := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
                                  _WinchM1CfgPersist.CfgTopSensorPos_M, 0.0),
     CfgTopSensorPosM      := _WinchM1CfgPersist.CfgTopSensorPos_M,
-    UseDynamicTarget      := FALSE,
-    DynamicHomingTargetM  := 0.0,
+    UseDynamicTarget      := instCycleMachineHoming.M1Demand.UseDynamicTarget,
+    DynamicHomingTargetM  := instCycleMachineHoming.M1Demand.DynamicTarget_M,
     TopPositionSensor     := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
     HwIn                  := HwInM1,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
@@ -699,12 +708,10 @@ HwInM2.PresetStatusBit    := FALSE;
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    // Homing unitaire M2 (benne) : autorise en MAINT_N1/N2 quel que soit WinchSel (0/1/2).
-    // L'ancien verrou croise WinchSel<>1 est retire (demande MES) : meme raisonnement que
-    // M1 ci-dessus. Permet notamment le homing benne en mode benne WinchSel=2.
-    HomingPermit          := (((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                               AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
-                                                                       AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
+    // Homing unitaire M2 (benne) : autorise en MAINT_N2 uniquement (benne / zero / capteur haut).
+    HomingPermit          := (((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                               AND (((GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero OR BucketReferenceRequested) AND MachineHomingMechanicalStopOk)
+                                    OR (GVL_IHM.M2TreuilBenne.Cmd.BtnHome AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
                               OR instCycleMachineHoming.M2Demand.HomeReq),
     HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome
                              OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
@@ -712,6 +719,8 @@ instEncoderM2(
                              OR instCycleMachineHoming.M2Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
+    InvalidateDatum       := instCycleMachineHoming.InvalidateProvisionalDatum,
+    ProvisionalHoming     := instCycleMachineHoming.M2Demand.Provisional,
     CfgHomingTargetM      := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
                                  _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
     CfgTopSensorPosM      := _WinchM2CfgPersist.CfgTopSensorPos_M,

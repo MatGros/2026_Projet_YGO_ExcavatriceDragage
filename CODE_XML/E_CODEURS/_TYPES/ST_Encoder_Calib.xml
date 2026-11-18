@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.390379" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.390379">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T03:00:42.185507" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T03:00:42.185507">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -70,6 +70,14 @@ TRUE des qu'un referencement a reussi</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si incoherence detectee au redemarrage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingProvisional">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si zero provisoire 0m HX1 (avant HX4 8.5m)</xhtml>
               </documentation>
             </variable>
           </struct>

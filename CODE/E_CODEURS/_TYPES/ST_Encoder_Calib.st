@@ -18,5 +18,6 @@ STRUCT
     // === ETATS DE CALIBRATION & SECURITE ===
     Homed                         : BOOL;          // TRUE des qu'un referencement a reussi
     HomingSuspect                 : BOOL;          // TRUE si incoherence detectee au redemarrage
+    HomingProvisional             : BOOL;          // TRUE si zero provisoire 0m HX1 (avant HX4 8.5m)
 END_STRUCT
 END_TYPE

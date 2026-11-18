@@ -20,8 +20,9 @@ VAR_INPUT
     ReqDescend                      : BOOL;                           // --> [CMD] Demande descente arbitree
     EffectivePermitBucket_Open      : BOOL;                           // --> [SAFE] Ouverture benne autorisee
     EffectivePermitBucket_Close     : BOOL;                           // --> [SAFE] Fermeture benne autorisee
-    MachineHomingCommitOpen             : BOOL;                           // --> [CMD] Commit atomique reference benne ouverte
-    MachineHomingCommitClose            : BOOL;                           // --> [CMD] Commit atomique reference benne fermee
+    MachineHomingCommitOpen         : BOOL;                           // --> [CMD] Commit atomique reference benne ouverte
+    MachineHomingCommitClose        : BOOL;                           // --> [CMD] Commit atomique reference benne fermee
+    InvalidateRef                   : BOOL := FALSE;                  // --> [CMD] Invalidation immediate reference benne (abandon avant HX4)
     MachineHomed           : BOOL;                           // --> [STAT] Qualification conjointe M1/M2/benne
     MachineHomingActive      : BOOL;                           // --> [STAT] Homing conjoint en cours
     ConfirmOpenPosition             : BOOL;                           // --> [CMD] Confirmation visuelle IHM : benne ouverte
@@ -302,6 +303,38 @@ END_IF;
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
+
+// --- Bookkeeping reference homing (execute meme sous AU / InhibitM2 pour ne jamais perdre une impulsion 1-scan) ---
+IF MachineHomingCommitOpen AND (NOT Lifecycle.Busy OR NOT Enable OR NOT PowerContactorEngaged) THEN
+    BucketState.IsOpen := TRUE;
+    BucketState.IsClosed := FALSE;
+    BucketState.LastPosM2Open := CablePosM2;
+    BucketState.StateIncoherent := FALSE;
+END_IF;
+
+IF MachineHomingCommitClose AND (NOT Lifecycle.Busy OR NOT Enable OR NOT PowerContactorEngaged) THEN
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := TRUE;
+    BucketState.LastPosM2Close := CablePosM2;
+    BucketState.StateIncoherent := FALSE;
+END_IF;
+
+IF MachineHomingCommitOpen OR MachineHomingCommitClose THEN
+    BucketRefRequest := TRUE;
+END_IF;
+IF ResetEdge.Q
+   OR InvalidateRef
+   OR NOT ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) THEN
+    BucketRefRequest := FALSE;
+END_IF;
+IF InvalidateRef THEN
+    BucketState.BucketReferenced := FALSE;
+END_IF;
+IF BucketRefRequest AND NOT CfgFaultLatched
+   AND HomedAndReliableM1 AND HomedAndReliableM2 THEN
+    BucketState.BucketReferenced := TRUE;
+    BucketRefRequest := FALSE;
+END_IF;
 {endregion}
 
 {region "§2 Gate securite"}
@@ -365,40 +398,15 @@ IF ConfirmCloseEdge.Q
     BucketState.StateIncoherent := FALSE;
 END_IF;
 
-IF MachineHomingCommitOpen AND NOT Lifecycle.Busy THEN
-    BucketState.IsOpen := TRUE;
-    BucketState.IsClosed := FALSE;
-    BucketState.LastPosM2Open := CablePosM2;
-    BucketState.StateIncoherent := FALSE;
-END_IF;
-
-IF MachineHomingCommitClose AND NOT Lifecycle.Busy THEN
-    BucketState.IsOpen := FALSE;
-    BucketState.IsClosed := TRUE;
-    BucketState.LastPosM2Close := CablePosM2;
-    BucketState.StateIncoherent := FALSE;
-END_IF;
-
 // --- Reference benne PERSISTANTE (RETAIN via GVL_PERSISTENT._BucketState) --------------
 // Decouple la "reference benne" (position franche confirmee + datum M1/M2 fiables lors de
 // la confirmation) de la validite LIVE (puissance). Survit a une coupure puissance :
 // codeurs absolus M1/M2 -> Delta = M2-M1 reste connu au retour, aucune re-calibration.
-//
-// SET en 2 temps (anti-race, challenge Q7) : on LATCHE la demande (bouton N2 a l'arret,
-// ou impulsion commit homing machine), puis on pose BucketReferenced des que M1 ET M2
-// sont fiables. La demande ne survit pas a un reboot (intention transitoire) et est
-// purgee sur Reset ou hors maintenance.
+// (Commit homing + InvalidateRef deja traites en fin de §1 avant le RETURN de garde.)
 IF (ConfirmOpenEdge.Q OR ConfirmCloseEdge.Q)
    AND (Mode = E_Mode.MAINT_N2)
    AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
     BucketRefRequest := TRUE;
-END_IF;
-IF MachineHomingCommitOpen OR MachineHomingCommitClose THEN
-    BucketRefRequest := TRUE;
-END_IF;
-IF ResetEdge.Q
-   OR NOT ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) THEN
-    BucketRefRequest := FALSE;
 END_IF;
 IF BucketRefRequest AND NOT CfgFaultLatched
    AND HomedAndReliableM1 AND HomedAndReliableM2 THEN
@@ -413,7 +421,7 @@ END_IF;
 //    chargement effacerait la ref a tort ; CfgFault bloque deja ActiveOffsetValid LIVE.
 //  - HomingSuspect n'est pose qu'apres le controle de coherence au demarrage (bus up) ->
 //    pas de faux positif pendant l'enum EtherCAT. Aucun redemarrage auto : re-confirmer.
-TonDatumUnreliable(IN := HomingSuspectM1 OR HomingSuspectM2, PT := T#2s);
+TonDatumUnreliable(IN := HomingSuspectM1 OR HomingSuspectM2 OR NOT HomedM1 OR NOT HomedM2, PT := T#2s);
 IF TonDatumUnreliable.Q THEN
     BucketState.BucketReferenced := FALSE;
 END_IF;
@@ -469,35 +477,36 @@ IF SevereError THEN
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
 ELSE
-    // ⚠️ SÉCURITÉ : abandon propre si une open/close est restée Busy HORS de tout contexte
-    // de pilotage benne (opérateur a quitté WinchSel=2 sans que le mouvement soit fini,
-    // hors cycle AUTO/SEMI_AUTO, hors homing machine). Sinon M2 continue de suivre la benne
-    // pendant un pilotage COUPLÉ WinchSel=0 -> désynchro des câbles (REX MES 2026-09-04).
-    IF Lifecycle.Busy
-       AND NOT WinchSelBucket
-       AND NOT ProgramBucketDriveActive
-       AND NOT MachineHomingActive
-       AND NOT (Mode = E_Mode.SEMI_AUTO) THEN
+    // Purge automatique pendant le homing machine (evite ErrorID:04/05 sur Busy residuel)
+    // ou hors contexte de pilotage benne.
+    IF MachineHomingActive
+       OR (Lifecycle.Busy
+           AND NOT WinchSelBucket
+           AND NOT ProgramBucketDriveActive
+           AND NOT (Mode = E_Mode.SEMI_AUTO)) THEN
         M2_RunRequest := FALSE;
         M2_ReqAscent := FALSE;
         M2_ReqDescend := FALSE;
         M2_BucketJogLimit := FALSE;
         CloseReq := FALSE;
         OpenReq := FALSE;
+        CloseReached := FALSE;
         Lifecycle.Busy := FALSE;
         Lifecycle.Done := FALSE;
     END_IF;
 
     // Prise en compte des demandes IHM — anti-traversée (TC-P10-025) :
-    // demande benne refusée si un treuil agit (M1_Busy OR M2_Busy) à l'entrée READY.
-    IF CmdOpen_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
-        OpenReq := TRUE;
-        CloseReq := FALSE;
-        CloseReached := FALSE;
-    ELSIF CmdClose_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
-        CloseReq := TRUE;
-        OpenReq := FALSE;
-        CloseReached := FALSE;
+    // demande benne refusée si un treuil agit (M1_Busy OR M2_Busy) ou si homing actif.
+    IF NOT MachineHomingActive THEN
+        IF CmdOpen_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
+            OpenReq := TRUE;
+            CloseReq := FALSE;
+            CloseReached := FALSE;
+        ELSIF CmdClose_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
+            CloseReq := TRUE;
+            OpenReq := FALSE;
+            CloseReached := FALSE;
+        END_IF;
     END_IF;
 
     // Armement de la manoeuvre : uniquement HORS manoeuvre deja engagee.

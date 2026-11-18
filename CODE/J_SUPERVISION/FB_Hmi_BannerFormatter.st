@@ -24,6 +24,13 @@ VAR_INPUT
     CycleChecksInhibited : BOOL;   // --> [TST] Mode essai cycle : controles procede inhibes
     MachineHomingStep        : INT;   // --> [HW] Étape guide homing machine (E_MachineHomingStep : 0..70, 60 = valide)
     MachineHomingInstruction : STRING(120);   // --> [HW] Consigne opérateur en clair produite par FB_CycleMachineHoming
+    MachineHomingFailed      : BOOL := FALSE; // --> [DIAG] Echec ou abandon cycle homing machine
+    MachineHomingProvisional : BOOL := FALSE; // --> [DIAG] Zero provisoire 0m HX1 actif (machine non encore calibree)
+    WinchM1Error             : BOOL := FALSE; // --> [DIAG] Defaut commande/barriere treuil M1 (FB_Winch/Interlock)
+    WinchM2Error             : BOOL := FALSE; // --> [DIAG] Defaut commande/barriere treuil M2 (FB_Winch/Interlock)
+    EncoderM1Fault           : BOOL := FALSE; // --> [DIAG] Defaut codeur M1
+    EncoderM2Fault           : BOOL := FALSE; // --> [DIAG] Defaut codeur M2
+    JoystickLatchedFault     : BOOL := FALSE; // --> [DIAG] Defaut joystick latche
 
     // 🛡️ Dérogations & particularités
     BypassGlobalActive   : BOOL;   // --> [TST] Bypass global
@@ -438,6 +445,8 @@ IF ModeChangePendingBlocked AND ModeChangeBlockReason <> '' THEN
     SpecialConditionCandidate := ModeChangeBlockReason;
 ELSIF CycleChecksInhibited THEN
     SpecialConditionCandidate := 'ESSAI CYCLE : CONTROLES INHIBES';
+ELSIF MachineHomingProvisional THEN
+    SpecialConditionCandidate := 'ATTENTION: Ref 0m PROVISOIRE - Non calibre';
 ELSIF AnyBypassActive THEN
     SpecialConditionCandidate := 'ATTENTION: Bypass actif';
 ELSIF SyncDegradedActive THEN
@@ -1193,6 +1202,26 @@ IF ((CycleErrorId AND 16#0200) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) T
 END_IF;
 IF ((CycleErrorId AND 16#0800) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ErrorID:12 - consigne profondeur invalide'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5h-bis. Collecte — defauts homing / commande treuils / codeurs / joystick / AU global
+IF MachineHomingFailed AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HOMING] Echec ou abandon referencement machine - Reset'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Error AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] Defaut commande ou barriere finale treuil'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Error AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] Defaut commande ou barriere finale treuil'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF EncoderM1Fault AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CODEUR] Defaut codeur treuil M1'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF EncoderM2Fault AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CODEUR] Defaut codeur treuil M2'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF JoystickLatchedFault AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[JOYSTICK] Defaut joystick latche - Reset'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5i. Collecte [HISTO] — défauts latched passés (LatchedId AND NOT ErrorId)

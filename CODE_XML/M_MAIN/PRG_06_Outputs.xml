@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-16T12:31:27.571265" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-11-16T12:31:27.571265">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T01:47:06.079884" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T01:47:06.079884">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1781,7 +1781,9 @@ M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 // volontairement de ~15 m -&gt; faux ContactorMismatch -&gt; escalade MecaE bit13 / PowerCutOff).
 WinchOutputCoupled := (PRG_04_Treuils_Benne.Data.SyncState.SyncActive
                        OR PRG_03_Modes_Cycle.Data.WinchBothIntent.Active)
-                      AND NOT PRG_02_Acquisition.Data.MachineHoming.Active;
+                      AND NOT (PRG_02_Acquisition.Data.MachineHoming.Active
+                               AND ((PRG_02_Acquisition.Data.MachineHoming.SeqStep = 1)
+                                    OR (PRG_02_Acquisition.Data.MachineHoming.SeqStep = 4)));
 
 // Frein = OR des relais de sens GATES (jamais desserre sans un sens valide).
 M1BrakeCmd := M1RelayFwd OR M1RelayRev;

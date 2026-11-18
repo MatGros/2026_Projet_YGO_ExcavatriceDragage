@@ -259,7 +259,9 @@ M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 // volontairement de ~15 m -> faux ContactorMismatch -> escalade MecaE bit13 / PowerCutOff).
 WinchOutputCoupled := (PRG_04_Treuils_Benne.Data.SyncState.SyncActive
                        OR PRG_03_Modes_Cycle.Data.WinchBothIntent.Active)
-                      AND NOT PRG_02_Acquisition.Data.MachineHoming.Active;
+                      AND NOT (PRG_02_Acquisition.Data.MachineHoming.Active
+                               AND ((PRG_02_Acquisition.Data.MachineHoming.SeqStep = 1)
+                                    OR (PRG_02_Acquisition.Data.MachineHoming.SeqStep = 4)));
 
 // Frein = OR des relais de sens GATES (jamais desserre sans un sens valide).
 M1BrakeCmd := M1RelayFwd OR M1RelayRev;

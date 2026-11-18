@@ -149,6 +149,7 @@ VAR_INPUT
     // ── Rattrapage mécanique M1/M2 (reprise de jeu en mouvement couplé) ──
     SimWinchCouplingModelActive : BOOL := TRUE;    (* --> [CFG] TRUE = rattrapage mécanique modélisé au banc *)
     SimBucketJamActive          : BOOL := FALSE;   (* --> [TST] TRUE = mâchoires bloquées (objet coincé) *)
+    WinchesHomed                : BOOL := TRUE;    (* --> [HW] TRUE = M1 et M2 references (butee meca benne inactive avant homing) *)
     M2_CablePos_M               : REAL := 0.0;     (* --> [HW] Position M2 recalée (m), issue de la même chaîne que le métier *)
     BucketOffsetCloseM          : REAL := 15.0;    (* --> [CFG] Butée mécanique benne FERMÉE (m, écart M2-M1) *)
     BucketCoherenceLimitM       : REAL := 1.0;     (* --> [CFG] Demi-largeur de la bande franc ouvert/fermé (m) *)
@@ -493,6 +494,7 @@ END_IF;
 // N'arrête M2 que s'il est commandé SEUL vers la butée (ouverture sous BucketOffsetOpen_M
 // ou fermeture au-dessus de BucketOffsetCloseM).
 M2_MechanicStopEngaged := SimWinchCouplingModelActive
+                          AND WinchesHomed
                           AND (((M2_CablePos_M - M1_CablePos_M) <= (BucketOffsetOpen_M - 0.40) AND M2_RelayRev AND NOT M1_RelayRev)
                                OR ((M2_CablePos_M - M1_CablePos_M) >= BucketOffsetCloseM AND M2_RelayFwd AND NOT M1_RelayFwd));
 

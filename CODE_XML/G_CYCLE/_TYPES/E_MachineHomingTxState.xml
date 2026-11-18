@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T07:10:43.411169" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T07:10:43.411169">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T01:43:05.022303" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T01:43:05.022303">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -29,13 +29,10 @@
             <values>
               <value name="HX0_REPOS" value="0" />
               <value name="HX1_BUCKET_PREPARE" value="1" />
-              <value name="HX1A_COUPLING_INTERLOCK" value="2" />
-              <value name="HX2_CLIMB_COUPLED" value="3" />
-              <value name="HX3_FLYING_REFERENCE" value="4" />
-              <value name="HX4_STABILIZATION_CHECK" value="5" />
-              <value name="HX5_RELEASE_CLEARANCE" value="6" />
-              <value name="HX6_HOMED_SUCCESS" value="7" />
-              <value name="HX7_FAILED" value="8" />
+              <value name="HX2_CLIMB_TO_TOP" value="2" />
+              <value name="HX3_TOP_CLEARANCE" value="3" />
+              <value name="HX4_FINAL_CONFIRM" value="4" />
+              <value name="HX7_FAILED" value="5" />
             </values>
           </enum>
         </baseType>
@@ -45,55 +42,37 @@
               <EnumValue>
                 <Name>HX0_REPOS</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape initiale pure : repos, aucune action</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repos : N1 libre bloque si NOT Homed, M3 bloque N1/SEMI, attente 5s BP joy N1 ou BtnStart N2</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>HX1_BUCKET_PREPARE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne palier 1 sous FDC off, timer 8s, bouton IHM dedie</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 seul palier 1, ouv + ferm sans butees soft, garde continue 20s + decompte, BtnValidate neutre</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>HX1A_COUPLING_INTERLOCK</Name>
+                <Name>HX2_CLIMB_TO_TOP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bascule WinchSel=0, FDC benne reactive, interlock couplage bloquant</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Couple M1+M2 palier 1 : montee lente + detente 2s max/geste, viser avant TOP sans toucher</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>HX2_CLIMB_COUPLED</Name>
+                <Name>HX3_TOP_CLEARANCE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montee couplee M1+M2 palier 1 MAX vers capteur haut</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact TOP = perdu/surcourse -&gt; montee interdite, descente ~4s apres relachement TOP -&gt; retour HX1</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>HX3_FLYING_REFERENCE</Name>
+                <Name>HX4_FINAL_CONFIRM</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prise de reference a la volee M1+M2 sur position de config persistante (8.5m)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HX4_STABILIZATION_CHECK</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret mecanique, controle inertie [8.50..8.80m], max 3 retries</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HX5_RELEASE_CLEARANCE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Degagement zone haute, verification neutre joystick</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>HX6_HOMED_SUCCESS</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Machine qualifiee : MachineHomed := TRUE, commit atomique benne</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret avant TOP + avertissement -&gt; BtnValidate neutre -&gt; preset 8.5m M1+M2 + CommitClose -&gt; Homed</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>HX7_FAILED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Echec sequence unifie : Reset conscient requis en MAINT_N2</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Echec / abandon : coupure mouvements, purge etats, attente Reset conscient</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

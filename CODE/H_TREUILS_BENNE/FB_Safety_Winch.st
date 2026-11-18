@@ -37,7 +37,9 @@ VAR_INPUT
     OtherWinchInhibited             : BOOL;                           // --> [HW] Autre treuil inhibe (maintenance)
 
     // === REGLAGES ET LIMITES SÉCURITÉ ===
-    InReferencingMode               : BOOL;                           // --> [CFG] Treuil en cours de homing
+    InReferencingMode               : BOOL;                           // --> [CFG] Transaction preset SDO codeur active
+    SoftLimitsBypassed              : BOOL := FALSE;                  // --> [CFG] Inhibe uniquement les butees soft (HX1..HX3), jamais TOP ni Meca D
+    BrakeForceAllowed               : BOOL := FALSE;                  // --> [CFG] Desserrage frein volontaire N2 (inhibe faux Meca B)
     CablePosM                       : REAL;                           // --> [CFG] Position actuelle cable (m)
     CfgCableLimitDescentM           : REAL;                           // --> [CFG] Limite basse physique descente (m)
     LimitLegalReached               : BOOL;                           // --> [CFG] Limite legale de profondeur atteinte
@@ -316,7 +318,7 @@ IF NOT BypassGlobal THEN
     instCauses[5].Texte    := 'Fin de course haut capteur atteint';
 
     // Cause 6 : Limite max câble descente (live)
-    IF NOT (BypassProcess OR BypassCableLimitSwitch) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode THEN
+    IF NOT (BypassProcess OR BypassCableLimitSwitch) AND Homed AND NOT HomingSuspect AND NOT SoftLimitsBypassed AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode THEN
         instCauses[6].Active := TRUE;
     ELSE
         instCauses[6].Active := FALSE;
@@ -338,7 +340,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 8 : Méca B absence confirmation arrêt (latched)
     IF NOT (BypassSafety OR BypassMecaB) THEN
-        UncommandedActiveB := JoystickYNeutral AND NOT BenneHoldStillActive AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
+        UncommandedActiveB := JoystickYNeutral AND NOT BenneHoldStillActive AND NOT BrakeForceAllowed AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
         TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
         IF TonMecaB.Q THEN MecaBFaultLatched := TRUE; END_IF;
     ELSE
@@ -376,6 +378,7 @@ IF NOT BypassGlobal THEN
     IF NOT (BypassSafety OR BypassMecaD) THEN
         UncommandedActiveD := NOT (BenneBusy OR BenneHoldStillActive)
             AND NOT TopPositionSensor AND NOT InReferencingMode
+            AND NOT (ReqDescend AND NOT ReqAscent)
             AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
         TonMecaD(IN := UncommandedActiveD, PT := PostRampTimeout);
         IF TonMecaD.Q THEN MecaDFaultLatched := TRUE; END_IF;
@@ -562,7 +565,7 @@ END_IF;
 
 DescendPermit := NOT (
     ((CauseCableLimitActive OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
-    OR ((CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode AND NOT BypassCableLimitSwitch)
+    OR (Homed AND NOT HomingSuspect AND NOT SoftLimitsBypassed AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode AND NOT BypassCableLimitSwitch)
     // La limite légale est une interdiction d'exploitation distincte du groupe
     // SafeStop/Permit. Le bypass banc BypassProcess ne doit jamais la lever :
     // seul le bypass dédié BypassLimitLegal, déjà filtré par la matrice MAINT_N2
@@ -578,7 +581,7 @@ AscentPermit := NOT (
     // TopLimitM porte la relaxation 7,5->8,5 m en override N1 / bypass N2 : la butee
     // logicielle reste active a la valeur relevee. Bypasser le logiciel releve la butee,
     // il ne la supprime pas ; le FDC haut materiel reste une barriere independante.
-    OR (Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM >= TopLimitM) AND NOT (BypassGlobal OR BypassTopLimitSoftware))
+    OR (Homed AND NOT HomingSuspect AND NOT InReferencingMode AND NOT SoftLimitsBypassed AND (CablePosM >= TopLimitM) AND NOT (BypassGlobal OR BypassTopLimitSoftware))
 );
 
 PowerCutOff := CausesPowerCutOffActive;

@@ -24,5 +24,10 @@ STRUCT
     CmdBucketOpen    : BOOL;          (* Ordre ouverture benne palier 1 sans FDC soft *)
     CmdBucketClose   : BOOL;          (* Ordre fermeture benne palier 1 sans FDC soft (HX1) *)
     CmdWinchSelect   : INT;           (* Override selecteur treuil cycle homing (-1=neutre, 0=couple, 2=benne) *)
+    AllowAscent      : BOOL;          (* Autorisation montee par etape GRAFCET homing *)
+    AllowDescend     : BOOL;          (* Autorisation descente par etape GRAFCET homing *)
+    SoftLimitsOff       : BOOL;          (* Inhibition limites soft position (HX1..HX3 uniquement, hors capteur TOP) *)
+    BucketRefInvalidate : BOOL;          (* Revoque reference benne sur abandon cycle avant HX4 *)
+    ProvisionalActive   : BOOL;          (* TRUE tant que le zero 0m HX1 est provisoire avant HX4 8.5m *)
 END_STRUCT
 END_TYPE

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-29T13:52:51.720872" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-29T13:52:51.720872">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T01:50:23.308709" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T01:50:23.308709">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1522,6 +1522,17 @@ Volontairement NON cable par PRG_02 : se regle en ligne sur l'instance (instSimB
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = mâchoires bloquées (objet coincé)</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchesHomed">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] TRUE = M1 et M2 references (butee meca benne inactive avant homing)</xhtml>
+              </documentation>
+            </variable>
             <variable name="M2_CablePos_M">
               <type>
                 <REAL />
@@ -2593,6 +2604,7 @@ END_IF;
 // N'arrête M2 que s'il est commandé SEUL vers la butée (ouverture sous BucketOffsetOpen_M
 // ou fermeture au-dessus de BucketOffsetCloseM).
 M2_MechanicStopEngaged := SimWinchCouplingModelActive
+                          AND WinchesHomed
                           AND (((M2_CablePos_M - M1_CablePos_M) &lt;= (BucketOffsetOpen_M - 0.40) AND M2_RelayRev AND NOT M1_RelayRev)
                                OR ((M2_CablePos_M - M1_CablePos_M) &gt;= BucketOffsetCloseM AND M2_RelayFwd AND NOT M1_RelayFwd));
 

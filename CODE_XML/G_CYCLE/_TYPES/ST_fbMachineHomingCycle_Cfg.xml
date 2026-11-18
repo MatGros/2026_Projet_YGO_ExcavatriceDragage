@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-21T10:51:52.197445" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-21T10:51:52.197445">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T02:47:08.643597" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T02:47:08.643597">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -31,7 +31,18 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position capteur haut M2/benne (m) — sert UNIQUEMENT a la cible dynamique M2 du cycle (HX3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position capteur haut M2/benne (m) — cible finale HX4 M2 (+ OffsetCloseM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgTopHomingTargetM1_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position capteur haut M1 (m) — cible finale HX4 M1 (defaut 8.5 m)</xhtml>
               </documentation>
             </variable>
             <variable name="CfgOffsetOpen_M">
@@ -68,6 +79,50 @@ A revoir si la course ou la vitesse du palier 1 changent (gate G511).
 Garde de montee au capteur haut (0 = pas de garde)</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgEntryHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#5s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree maintien BP joystick au neutre en HX0 (MAINT_N1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgBucketPrepareTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#20s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree max commande continue M2 en HX1 (coupe -&gt; neutre)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgSlackReliefMaxTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#2s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree max descente detente cable par geste en HX2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgTopClearanceTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#4s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree descente accumulee apres relachement TOP en HX3</xhtml>
+              </documentation>
+            </variable>
             <variable name="CfgTimeoutHomeAxes">
               <type>
                 <TIME />
@@ -76,41 +131,7 @@ Garde de montee au capteur haut (0 = pas de garde)</xhtml>
                 <simpleValue value="TIME#60s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde de descente HX3 : meme regle (budget de DESCENTE CONTINUE).
-Garde globale prise de référence (0 = pas de garde)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgTimeoutFlyingHoming">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#3s0ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde essai prise de référence au vol (Mode A) avant repli automatique à l'arrêt (Mode B)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgStabilizationMinM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="7.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil bas d'inertie stabilisée après référence (m) - HX4 (constante volontaire, valeur a risque, pas d'IHM)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgStabilizationMaxM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="9.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil haut d'inertie stabilisée après référence (m) - HX4 (constante volontaire, valeur a risque, pas d'IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde globale prise de reference (HX4)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">

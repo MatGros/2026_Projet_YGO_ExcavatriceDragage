@@ -74,11 +74,14 @@ CycleDrainTimeEffective := DINT_TO_TIME(INT_TO_DINT(CycleDrainTimeEffective_S) *
 // 📄 Événement changement de page IHM : sélection automatique du mode (provisoire sans mdp :
 // 1 = SEMI_AUTO ; 2, 5 = MAINT_N1 ; 3, 4, 6, 7, 8 = MAINT_N2)
 IF NOT ModeBootInitialized THEN
-    // Sécurité d'exploitation : après boot PLC, le mode demandé repart en
-    // SEMI_AUTO. La page affichée est mémorisée comme référence afin qu'une
-    // page IHM restaurée ne force pas MAINT_N1 au premier scan.
+    // Securite d'exploitation : au boot, MAINT_N1 si machine non referencee (evite faux refus SEMI_AUTO),
+    // sinon SEMI_AUTO. La page affichee est memorisee au premier scan.
     ModeBootInitialized := TRUE;
-    GVL_IHM.Modes.Cmd.SelMode := E_Mode.SEMI_AUTO;
+    IF PRG_02_Acquisition.Data.MachineHoming.Homed THEN
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.SEMI_AUTO;
+    ELSE
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
+    END_IF;
     PrevActualPage := GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage;
 ELSIF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage <> PrevActualPage THEN
     PrevActualPage := GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage;
@@ -113,12 +116,14 @@ instModes(
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState <> DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState <> DEVICE_STATE.RUNNING),
     JoystickWinchSelectRequest := EffectiveWinchSelectRequest,
     SelMaintenanceZoneAccess := GVL_IHM.M3Translation.Cmd.TglMaintenanceZoneAccess,
-    // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
-    CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,
-    // Stabiliser M3AtTremie via M3_AtTremieStable (et zone PV si ouverture anticipee active) pour maintenir la garde benne
-    M3AtTremie              := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie
-                               OR PRG_05_Translation.Data.M3_AtTremieStable
-                               OR (GVL_IHM.CycleSemiAuto.Cmd.TglAllowDumpInPV AND PRG_02_Acquisition.HwIn.Translation.M3_PosPV_DI),
+    // Sequencement auto benne en couple inhibe pendant homing machine
+    CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
+                               AND NOT PRG_02_Acquisition.Data.MachineHoming.Active,
+    // Stabiliser M3AtTremie via M3_AtTremieStable ; neutralise pendant homing machine (D7)
+    M3AtTremie              := (PRG_05_Translation.Data.TranslationState.LimitSwitchTremie
+                                OR PRG_05_Translation.Data.M3_AtTremieStable
+                                OR (GVL_IHM.CycleSemiAuto.Cmd.TglAllowDumpInPV AND PRG_02_Acquisition.HwIn.Translation.M3_PosPV_DI))
+                               AND NOT PRG_02_Acquisition.Data.MachineHoming.Active,
     AllowWinchMoveAtTremie  := GVL_IHM.M3Translation.Cmd.TglAllowWinchMoveAtTremie,
     JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
@@ -350,9 +355,9 @@ Data.Auth := instModes.Auth;
 Data.ModesFault := instModes.Fault;
 
 // 1bis. Intention both continue opérateur (inconditionnelle, TOUS modes) — source unique
-Data.WinchBothIntent.Active    := WinchBothMotionActive;
-Data.WinchBothIntent.ReqAscent  := WinchBothMotionDirection > 0;
-Data.WinchBothIntent.ReqDescend := WinchBothMotionDirection < 0;
+Data.WinchBothIntent.Active     := WinchBothMotionActive;
+Data.WinchBothIntent.ReqAscent  := WinchBothMotionActive AND (WinchBothMotionDirection > 0);
+Data.WinchBothIntent.ReqDescend := WinchBothMotionActive AND (WinchBothMotionDirection < 0);
 
 // 2. Demandes programme et état public de séquence
 IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -453,7 +458,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // M1+M2 palier 1 (HX2 montee / HX3 descente). Le FB gate deja sur permis operateur
     // maintenu (homme-mort + joystick) et ne commande qu'en HX2/HX3 ; PRG_04 conserve
     // ses interlocks maintenance. Copie struct entiere (ST_ProgramWinchRequest).
-    IF instModes.Auth.Mode = E_Mode.MAINT_N2
+    IF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2)
        AND PRG_02_Acquisition.Data.MachineHoming.Active THEN
         Data.ReqProgram.ReqWinchM1 := PRG_02_Acquisition.Data.MachineHoming.CmdWinchM1;
         Data.ReqProgram.ReqWinchM2 := PRG_02_Acquisition.Data.MachineHoming.CmdWinchM2;
@@ -481,10 +486,10 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // Mutuellement exclusifs cote FB. Route OVERRIDE (pas un OR) quand le cycle homing est
     // engage : evite le cumul ReqOpen+ReqClose si un assistant (DumpAtTremie / Extraction)
     // etait actif au meme instant. Hors cycle homing : demandes assistants inchangees.
-    IF instModes.Auth.Mode = E_Mode.MAINT_N2
+    IF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2)
        AND PRG_02_Acquisition.Data.MachineHoming.Active THEN
-        Data.ReqProgram.ReqBucket.ReqOpen  := PRG_02_Acquisition.Data.MachineHoming.CmdBucketOpen;
-        Data.ReqProgram.ReqBucket.ReqClose := PRG_02_Acquisition.Data.MachineHoming.CmdBucketClose;
+        Data.ReqProgram.ReqBucket.ReqOpen  := FALSE;
+        Data.ReqProgram.ReqBucket.ReqClose := FALSE;
     END_IF;
 
     // États de séquence — assistants FB_DiveSearch/FB_ExtractionAssist retires : neutre.
@@ -533,6 +538,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // Le mot capteurs reste une information de zone et n'autorise pas la descente.
     Data.SequenceState.WinchDescentAuth_M3     :=
         (instModes.Auth.Mode = E_Mode.MAINT_N2)
+        OR PRG_02_Acquisition.Data.MachineHoming.Active
         OR NOT GVL_IHM.Commun.Cfg.TglEnableWinchDescentLock_M3
         OR GVL_IHM.M3Translation.State.AtP1
         OR GVL_IHM.M3Translation.State.AtMaintenance
