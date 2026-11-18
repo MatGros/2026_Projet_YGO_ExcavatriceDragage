@@ -56,63 +56,60 @@
    - *Parade :* exempter `Meca D` uniquement sur descente intentionnelle pure (aucune demande/contacteur montée, demande descente active).
 6. **Démasquer `PowerCutOff` en `MAINT_N2` déclenche `Meca B` au desserrage frein** (`PRG_06:324-335`) — *Parade :* démasquer `Meca D` (hors bypass `Meca D`) en `N2` ou inhiber `Meca B` pendant `MaintenanceN2BrakeForce`.
 7. **Faux boot fault `SEMI_AUTO` (`PRG_03:76-93` + `FB_Modes:251`)** — forcer `SelMode := SEMI_AUTO` au boot quand `NOT MachineHomed` lève `ModesFault.Error` et allume `AnyFaultActive` dès le démarrage. *Parade :* boot en `MAINT_N1` si `NOT MachineHomed`.
-8. **Verrou `M3` dès Step 0 vs chariot garé à la Trémie/PV** — si `M3` est bloqué en Step 0 et que `WinchDescentAuth_M3 = FALSE` (car M3 hors `P1`), interblocage avec Step 3 ! *Parade :* prévoir rapatriement `M3` possible en `MAINT_N2` vers `P1`/Maintenance + précondition position `M3` à l'entrée du homing.
+8. **Verrou `M3` dès Step 0 vs position chariot quelconque** — D7 impose de pouvoir lancer le homing **quelle que soit la position de `M3` (même entre deux capteurs)**, sans imposer de déplacement préalable du chariot ni bloquer sur `M3AtTremie`/`WinchDescentAuth_M3`. *Parade :* verrouiller `M3` dès Step 0 en `N1`/`SEMI`, lever les blocages treuils liés à `M3` pendant `MachineHoming.Active`, et conserver `MAINT_N2` comme échappatoire manuelle.
 9. **Autres corrections conjointes :** `PRG_06:260-262` (garder `WinchOutputCoupled` actif sur les phases couplées en `N1`), `PRG_07:385-397` (ne pas persister `BypassTopLimitSwitch` en `RETAIN` hors sim), `FB_Bucket:274, 476-480` (purger `instBucket` à l'entrée Step 1 pour éviter `ErrorID:04`), `FB_Encoder_Homing.st:206-223` (empêcher `UnitaryHomingTrigger` d'écrire `8.5 m` hors capteur haut sur micro-rebond ou en `N1`), et mise à jour coordonnée des gates `G506`, `G511`, `G480`, `G483` + tests `TEST_AUTO_CI` (`test_fb_cyclemachinehoming.st`, `test_sim_operator_joystick.st`, `test_sim_manual_reference.st`, `test_prg_03/04/05.st`, `test_fb_bucket.st`, `test_fb_modes.st`).
 
 ---
 
-## 4. Architecture Cible du Nouveau GRAFCET (Vue Step-by-Step)
+## 4. Architecture Cible du Nouveau GRAFCET (Vue Step-by-Step — D1 à D7 verrouillés)
 
 ```text
-  [Step 0 : H0_REPOS]  (NOT MachineHomed, N1 bloqué sauf homing, M3 bloqué N1/SEMI)
+  [Step 0 : H0_REPOS]  (NOT MachineHomed, N1 libre bloqué, M3 verrouillé N1/SEMI, M3 autorisé partout)
          │  Maintien 5 s JoyBtnRaw au neutre strict + anti-collage (ou BtnStart N2)
          │  [Verrou absolu : IMPOSSIBLE si MachineHomed = TRUE]
          ▼
-  [Step 1 : H1_BUCKET_PREPARE]  (M2 seul P1, ouv + ferm, AUCUNE butée soft, TON max X s + neutre)
+  [Step 1 : H1_BUCKET_PREPARE]  (M2 seul, ouv + ferm, AUCUNE butée soft, TON max 20 s + décompte message)
          │  "Fermer visuellement la benne — DANGER aucune limite" + BtnValidate au neutre
          ▼
-  [Step 2 : H2_CLIMB_P1_TO_TOP]  (Couplé M1+M2 P1, montée seule, ou max 2s détente si retenu)
-         │  "Approcher doucement du capteur haut"
-         │  Contact TOP (TopPositionSensor) -> coupure immédiate montée (Meca D actif si collage)
+  [Step 2 : H2_CLIMB_TO_TOP]  (Couplé M1+M2, montée lente + max 2 s détente câble bornée)
+         │  "Approcher le plus près du capteur haut SANS le toucher"
+         ├──▶ Contact TOP (TopPositionSensor) = PERDU / SURCOURSE -> coupure montée immédiate
+         │       ▼
+         │   [Step 3 : H3_TOP_CLEARANCE]  (Montée interdite -> descente continue ~4 s après relâchement TOP, temporisée sans codeur)
+         │       │  Temps dégagement écoulé + arrêt neutre -> retour [Step 1] (re-fermer/confirmer benne puis réessayer Step 2)
          ▼
-  [Step 3 : H3_TOP_CLEARANCE_AND_OPEN]  (Montée interdite -> descendre ≥ Δz m pour quitter TOP)
-         │  Ref provisoire posée -> dégagement capteur relâché + ouverture benne
-         ▼
-  [Step 4 : H4_BUCKET_RECLOSE_P2]  (Fermeture benne en zone dégagée -> BtnValidate au neutre)
-         ▼
-  [Step 5 : H5_CLIMB_P2_BEFORE_TOP]  (Couplé M1+M2 P1 -> arrêt visuel AVANT TOP, TOP = faute/repli)
-         ▼
-  [Step 6 : H6_FINAL_CONFIRM]  (Avertissement + BtnValidate -> contrôle M1/M2/Benne ref -> "Homing fait")
+  [Step 4 : H4_FINAL_CONFIRM]  (Arrêt visuel au plus près AVANT TOP -> avertissement + BtnValidate)
+         │  Contrôle TOP=FALSE + écriture cote 8.5 m + ref benne -> "Homing fait"
          │  MachineHomed := TRUE, machine libérée -> retour Step 0 verrouillé
          ▼
-  [HX7_FAILED]  (Timeout, collage TOP/Meca D, discordance, perte mode -> Reset conscient en N1/N2)
+  [HX7_FAILED]  (Timeout, collage contacteurs/frein / Meca D, discordance, perte mode -> Reset conscient en N1/N2)
 ```
 
 ---
 
-## 5. Décisions actées (D1–D4) & restantes à confirmer (D5–D7)
+## 5. Décisions actées (D1–D7 — Plan verrouillé)
 
 ### Actées par l'exploitant (2026-11-18)
 - **D1 — Mode homing :** ✅ **Validé = `MAINT_N1` et `MAINT_N2`**. Cycle guidé complet faisable directement en `MAINT_N1` (direct depuis page d'accueil, mouvements libres bloqués en Step 0). Si problème mécanique, l'opérateur sort du cycle (`Abort`) et passe en `MAINT_N2` pour dégagement secours inconditionnel.
 - **D2 — Entrée Step 0 :** ✅ **Validé = `JoyBtnRaw` 5 s au neutre strict + anti-collage en `MAINT_N1`** (+ décompte visible), et `BtnStart` IHM en `MAINT_N2`. Message `MAINT_N1` Step 0 rappelle aussi la possibilité de passer en `MAINT_N2` (secours).
 - **D3 — Durée max continue Step 1 (`X` s) :** ✅ **Validé = `20 s` par défaut (paramétrable `Cfg`) avec décompte temps visible dans le champ message** + coupure nette et retour neutre/homme-mort si dépassé.
 - **D4 — Step 2 descente détente câble :** ✅ **Validé = descente détente câble autorisée mais bornée à max `2 s` par geste** (coupure nette à 2 s + retour neutre obligatoire pour réarmer).
-
-### Restantes à confirmer (D5–D7 — un « OK D5–D7 » suffit avant Phase 1 code)
-- **D5 — Prise de cote `8.5 m` (Passe 1 vs Passe 2) :**
-  - *Option 1 (recommandée précision) :* Preset `8.5 m` pris au contact capteur TOP **Passe 1** (ou ref provisoire puis preset à l'arrêt) → Passe 2 vérifie ouverture/fermeture benne + remontée **avant TOP** → validation finale (`MachineHomed := TRUE`) **sans réécriture** de `8.5 m`.
-  - *Option 2 :* Passe 1 = ref provisoire seulement → Passe 2 réécrit `8.5 m` sur arrêt visuel avant TOP *(écart possible ± quelques décimètres)*.
-- **D6 — Step 3 dégagement :** Descente mini **`2.0 m`** sous capteur haut + ouverture benne **manuelle guidée** (ou **automatique** ?).
-- **D7 — `Meca D` & `M3` :** Démasquer `Meca D` (`PowerCutOff`) en `MAINT_N2` + bloquer `M3` dès Step 0 en `N1`/`SEMI` avec échappatoire `N2` pour ramener le chariot en `P1`/Maintenance.
+- **D5 — Contact TOP vs cote `8.5 m` :** ✅ **Validé = toucher `TopPositionSensor` est TOUJOURS PERDU / surcourse** (course inconnue derrière le contact, jamais de prise de `8.5 m` sur contact TOP). L'opérateur vise au plus près **avant** `TopPositionSensor` sans le toucher, puis valide avec avertissement → écriture `8.5 m` + référence benne → `"Homing fait"` (`MachineHomed := TRUE`).
+- **D6 — Dégagement contact TOP (Step 3) :** ✅ **Validé = coupure immédiate de la montée**, passage en Step 3 exigeant une **descente continue temporisée (`~4 s` après relâchement du capteur TOP, indépendante des codeurs)**, puis **retour à Step 1** (vérification/fermeture benne puis nouvelle tentative Step 2 en s'arrêtant avant TOP).
+- **D7 — `Meca D` & `M3` :** ✅ **Validé** :
+  - **`Meca D` (`PowerCutOff`) reste ACTIF en `MAINT_N2`** (capteur de surcourse mécanique après fins de course logiciels ; jamais démasqué automatiquement en `N2` — un éventuel bypass explicite ne peut être que manuel).
+  - **Position `M3` indifférente pour le homing** (y compris entre deux capteurs) : pas de prérequis de mouvement chariot, levée des blocages treuils liés à `M3` pendant `MachineHoming.Active`, verrouillage `M3` dès Step 0 en `N1`/`SEMI`, échappatoire manuelle préservée en `MAINT_N2`.
 
 ---
 
 ## 6. Roadmap Phasée (Jalons, Commits, Challenges & Tests)
 
+> *Gouvernance Task Manager :* `T377` dans `DOC/WFLOW/TASKS.yaml` est actuellement verrouillée par `CC03`. Au GO, ouverture/usage d'un contrat dédié C4 (ou validation explicite exploitant sur `TASKS.yaml`) avant toute modification `CODE/`.
+
 | Phase | Contenu | Livrables & Contrôles | Jalon Git / Validation |
 |---|---|---|---|
-| **Phase 0** | ✅ Spec + Audits 5 agents + Avis T377 + Décisions §5 | `SUIVI_...` + `PLAN_...` | `commit` checkpoint + **GO utilisateur sur D1..D7** |
-| **Phase 1 — Contrat & Socle Sécurité/IHM** | Contrat C4 mis à jour ; `Meca D` en `N2` ; `InReferencingMode` séparé des butées soft ; `BucketReferenced` invalidé sur `NOT Homed` ; `AnyFaultActive` + `G506` ; `BtnValidate`/`BtnAbort` unifiés ; boot `MAINT_N1` ; `WinchBothIntent` | `CODE/` hors GRAFCET + `G200` + `G506` + `G483` + challenge `safety` | `commit` jalon 1 + revue `safety`/`challenger` Ollama |
-| **Phase 2 — Nouveau GRAFCET Homing + Arbitrage** | `FB_CycleMachineHoming` (Step 0 5 s neutre, Step 1 ouv/ferm + TON `X` s, Step 2–Step 6 Passe 1/Passe 2) + routage `PRG_03`/`PRG_04`/`PRG_05`/`PRG_06` | `CODE/` + `G200 --report` + `G511` + `G480` + bundle XML + diff bundle | `commit` jalon 2 + revue `plc`/`safety` Ollama |
-| **Phase 3 — Tests CI & Simulateur** | Réécriture `test_fb_cyclemachinehoming.st` + mise à jour tests `M_MAIN`/`F_MODES`/`L_SIMULATION` + scénarios `FB_SimBench` (Passe 1 TOP, Step 1 timeout `X` s, relance verrouillée, `AnyFaultActive`, `Meca D`) | `pytest TOOLS/TEST_AUTO_CI` + `run_all_gates.py --palier C` (0 fail) | `commit` jalon 3 + **Livrable prêt pour TON test en simulation CODESYS** |
+| **Phase 0** | ✅ Spec + Audits + Avis T377 + Décisions D1–D7 verrouillées | `SUIVI_...` + `PLAN_...` | `commit` plan verrouillé + **GO utilisateur (et choix contrat C4)** |
+| **Phase 1 — Contrat & Socle Sécurité/IHM** | Contrat C4 ; `Meca D` actif en `N2` (sans faux `Meca B` sur déblocage frein) ; `InReferencingMode` séparé des butées soft ; `BucketReferenced` invalidé sur `NOT Homed` ; `AnyFaultActive` + `G506` ; `BtnValidate`/`BtnAbort` unifiés ; boot `MAINT_N1` ; `WinchBothIntent` ; levée blocages `M3` pendant homing | `CODE/` hors GRAFCET + `G200` + `G506` + `G483` + challenge `safety` | `commit` jalon 1 + revue `safety`/`challenger` Ollama |
+| **Phase 2 — Nouveau GRAFCET Homing + Arbitrage** | `FB_CycleMachineHoming` (Step 0 5 s neutre, Step 1 ouv/ferm + TON `20 s` décompte, Step 2 montée + détente `2 s`, Step 3 dégagement TOP `~4 s` → Step 1, Step 4 validation finale `8.5 m`) + routage `PRG_03`/`PRG_04`/`PRG_05`/`PRG_06` | `CODE/` + `G200 --report` + `G511` + `G480` + bundle XML + diff bundle | `commit` jalon 2 + revue `plc`/`safety` Ollama |
+| **Phase 3 — Tests CI & Simulateur** | Réécriture `test_fb_cyclemachinehoming.st` + mise à jour tests `M_MAIN`/`F_MODES`/`L_SIMULATION` + scénarios `FB_SimBench` (contact TOP → dégagement ~4 s → Step 1, Step 1 timeout `20 s`, détente `2 s`, relance verrouillée, `AnyFaultActive`, `Meca D` en `N2`) | `pytest TOOLS/TEST_AUTO_CI` + `run_all_gates.py --palier C` (0 fail) | `commit` jalon 3 + **Livrable prêt pour TON test en simulation CODESYS** |
 | **Phase 4 — Docs AF** | Mise à jour `AF_Partie-05/07/09/10/11` + archivage anciens brouillons T377 | `G340_check_doc_links.py --fix` + `run_all_gates.py` complet | `commit` final après ton verdict simu |
