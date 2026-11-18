@@ -1,0 +1,74 @@
+# =====================================================================
+# Trace mix M1M2_Winch_Joy_Cod_GraphHoming — 59 variables tracables
+# Generee le 2026-11-18 a partir du modele Trace_Treuils_M1M2_Debug_20261118.trace
+# Regles : aucune STRING, aucune VAR locale [LOC]
+# =====================================================================
+
+# --- 1. Contexte Global & Securite (5) ---
+GVL_Troubleshooting.A_ContexteMachineGlobal.Idx101_ModeActive
+GVL_Troubleshooting.A_ContexteMachineGlobal.Idx201_JoystickSelected
+GVL_Troubleshooting.A_ContexteMachineGlobal.Idx301_EmergencyChainClosed
+PRG_06_Outputs.Data.PowerCutOffRequest
+PRG_06_Outputs.Data.TopHardStopLatched
+
+# --- 2. GraphHoming — Cycle Homing Machine (11) ---
+PRG_02_Acquisition.instCycleMachineHoming.MachineHomingSeqStep
+GVL_IHM.CycleMachineHoming.State.Active
+GVL_IHM.CycleMachineHoming.State.Homed
+GVL_IHM.CycleMachineHoming.State.ProvisionalActive
+GVL_IHM.CycleMachineHoming.State.Failed
+GVL_IHM.CycleMachineHoming.State.TopContactLatched
+GVL_IHM.CycleMachineHoming.State.TopContactCount
+GVL_IHM.CycleMachineHoming.State.CmdWinchSelect
+GVL_IHM.CycleMachineHoming.State.AllowAscent
+GVL_IHM.CycleMachineHoming.State.AllowDescend
+GVL_IHM.CycleMachineHoming.State.SoftLimitsOff
+
+# --- 3. Joystick — Prise en main, Axes & Selection Treuil (7) ---
+GVL_Troubleshooting.D_Joystick.Step2_JoystickOperational
+GVL_Troubleshooting.D_Joystick.HwIn_JoyBtnRaw_DI
+GVL_Troubleshooting.D_Joystick.DeadmanArmed
+GVL_Troubleshooting.D_Joystick.AllConditionsMet
+GVL_Troubleshooting.D_Joystick.SelJoystickWinch
+GVL_Troubleshooting.D_Joystick.DeflectionY_Pct
+GVL_Troubleshooting.D_Joystick.DirectionY
+
+# --- 4. Codeurs M1 & M2 — Brut, Position, Vitesse & Calib (14) ---
+PRG_02_Acquisition.Data.EncoderM1.Measurement.RawPos
+PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
+PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps
+PRG_02_Acquisition.Data.EncoderM1.Measurement.EncoderAvailable
+GVL_PERSISTENT._CalibM1.Homed
+GVL_PERSISTENT._CalibM1.HomingProvisional
+GVL_PERSISTENT._CalibM1.HomingSuspect
+PRG_02_Acquisition.Data.EncoderM2.Measurement.RawPos
+PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM
+PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps
+PRG_02_Acquisition.Data.EncoderM2.Measurement.EncoderAvailable
+GVL_PERSISTENT._CalibM2.Homed
+GVL_PERSISTENT._CalibM2.HomingProvisional
+GVL_PERSISTENT._CalibM2.HomingSuspect
+
+# --- 5. Treuils M1 & M2 — Capteur TOP, Permis, Freins, Relais & Defauts (22) ---
+GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI
+GVL_Troubleshooting.I_LevageUnitaireM1.Safety_300.Idx316_ErrorMecaD
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx402_SpeedStepCalculated
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx406_FinalInterlockReason
+GVL_Troubleshooting.Q_TraceWinchM1.BlockReason
+GVL_Troubleshooting.Q_TraceWinchM1.SafeStopActive
+GVL_Troubleshooting.Q_TraceWinchM1.PowerCutOffActive
+PRG_06_Outputs.Data.M1RelayFwd
+PRG_06_Outputs.Data.M1RelayRev
+IoHw.Out.M1_BrakeRelease_RQ
+IoHw.In.Hardware.Winch.M1_BrakeIsOpen_DI
+GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx316_ErrorMecaD
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx402_SpeedStepCalculated
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason
+GVL_Troubleshooting.R_TraceWinchM2.BlockReason
+GVL_Troubleshooting.R_TraceWinchM2.SafeStopActive
+GVL_Troubleshooting.R_TraceWinchM2.PowerCutOffActive
+PRG_06_Outputs.Data.M2RelayFwd
+PRG_06_Outputs.Data.M2RelayRev
+IoHw.Out.M2_BrakeRelease_RQ
+IoHw.In.Hardware.Winch.M2_BrakeIsOpen_DI
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx103_SyncDelta_M
