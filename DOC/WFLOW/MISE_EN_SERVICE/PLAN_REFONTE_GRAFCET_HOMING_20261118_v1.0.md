@@ -90,17 +90,20 @@
 
 ---
 
-## 5. Décisions à Valider avant Phase 1 (avec Recommandations)
+## 5. Décisions actées (D1–D4) & restantes à confirmer (D5–D7)
 
-- **D1 — Mode homing :** Recommandé = **`MAINT_N1` (et `N2`)** avec mouvement libre bloqué en `N1` Step 0.
-- **D2 — Entrée Step 0 :** Recommandé = **`JoyBtnRaw` 5 s au neutre strict + anti-collage** en `N1` (+ `BtnStart` IHM en `N2`).
-- **D3 — Durée max continue Step 1 (`X` s) :** Recommandé = **`15 s` ou `20 s`** (configurable `Cfg`, avec retour neutre + relâchement homme-mort après coupure).
-- **D4 — Step 2 descente détente câble :** Recommandé = **Montée seule stricte** (ou descente bridée max `2 s` si câbles très désynchronisés).
+### Actées par l'exploitant (2026-11-18)
+- **D1 — Mode homing :** ✅ **Validé = `MAINT_N1` et `MAINT_N2`**. Cycle guidé complet faisable directement en `MAINT_N1` (direct depuis page d'accueil, mouvements libres bloqués en Step 0). Si problème mécanique, l'opérateur sort du cycle (`Abort`) et passe en `MAINT_N2` pour dégagement secours inconditionnel.
+- **D2 — Entrée Step 0 :** ✅ **Validé = `JoyBtnRaw` 5 s au neutre strict + anti-collage en `MAINT_N1`** (+ décompte visible), et `BtnStart` IHM en `MAINT_N2`. Message `MAINT_N1` Step 0 rappelle aussi la possibilité de passer en `MAINT_N2` (secours).
+- **D3 — Durée max continue Step 1 (`X` s) :** ✅ **Validé = `20 s` par défaut (paramétrable `Cfg`) avec décompte temps visible dans le champ message** + coupure nette et retour neutre/homme-mort si dépassé.
+- **D4 — Step 2 descente détente câble :** ✅ **Validé = descente détente câble autorisée mais bornée à max `2 s` par geste** (coupure nette à 2 s + retour neutre obligatoire pour réarmer).
+
+### Restantes à confirmer (D5–D7 — un « OK D5–D7 » suffit avant Phase 1 code)
 - **D5 — Prise de cote `8.5 m` (Passe 1 vs Passe 2) :**
-  - *Option 1 (précision capteur) :* Preset `8.5 m` pris au contact capteur TOP **Passe 1** (à vitesse P1, avec vérification à l'arrêt) → Passe 2 vérifie ouverture/fermeture benne + remontée avant TOP → validation finale (`MachineHomed := TRUE`) **sans réécriture** de `8.5 m`.
-  - *Option 2 (sans contact référence) :* Passe 1 = ref provisoire seulement → Passe 2 réécrit `8.5 m` sur arrêt visuel avant TOP *(écart possible ± quelques décimètres)*.
-- **D6 — Step 3 dégagement :** Distance mini sous capteur haut (`ex. ≥ 2.0 m` ou capteur relâché + `≥ 1.5 m`) et ouverture benne manuelle guidée vs automatique.
-- **D7 — `Meca D` & `M3` :** Retirer `AND NOT MaintN2` pour `Meca D` (`PowerCutOff`), et bloquer `M3` dès Step 0 en `N1`/`SEMI` avec échappatoire `N2` pour ramener le chariot en `P1`/Maintenance.
+  - *Option 1 (recommandée précision) :* Preset `8.5 m` pris au contact capteur TOP **Passe 1** (ou ref provisoire puis preset à l'arrêt) → Passe 2 vérifie ouverture/fermeture benne + remontée **avant TOP** → validation finale (`MachineHomed := TRUE`) **sans réécriture** de `8.5 m`.
+  - *Option 2 :* Passe 1 = ref provisoire seulement → Passe 2 réécrit `8.5 m` sur arrêt visuel avant TOP *(écart possible ± quelques décimètres)*.
+- **D6 — Step 3 dégagement :** Descente mini **`2.0 m`** sous capteur haut + ouverture benne **manuelle guidée** (ou **automatique** ?).
+- **D7 — `Meca D` & `M3` :** Démasquer `Meca D` (`PowerCutOff`) en `MAINT_N2` + bloquer `M3` dès Step 0 en `N1`/`SEMI` avec échappatoire `N2` pour ramener le chariot en `P1`/Maintenance.
 
 ---
 
