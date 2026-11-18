@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T03:01:12.074407" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T03:01:12.074407">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T13:59:46.966479" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T13:59:46.966479">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -927,7 +927,7 @@ IF ResetEdge.Q THEN
 END_IF;
 
 // Levée de doute incohérence boot (BtnConfirmCoherence)
-IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
+IF ConfirmCoherenceEdge.Q THEN
     Calib.HomingSuspect := FALSE;
     BootIncoherentError := FALSE;
 END_IF;

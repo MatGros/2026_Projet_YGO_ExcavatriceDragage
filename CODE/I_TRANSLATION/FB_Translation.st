@@ -94,7 +94,7 @@ VAR
     instCauses                  : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
 END_VAR
 VAR CONSTANT
-    CST_DriveResetPulseTime     : TIME := T#100ms; // . [CFG] Impulsion reset AC600
+    CST_DriveResetPulseTime     : TIME := T#500ms; // . [CFG] Impulsion reset AC600
 END_VAR
 
 // === IMPLEMENTATION ===

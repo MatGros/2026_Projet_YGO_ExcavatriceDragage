@@ -722,6 +722,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de contacts capteur TOP pendant cycle homing (purge Reset)</xhtml>
               </documentation>
             </variable>
+            <variable name="ActionText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne d action directe du GRAFCET pour bandeau operateur</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

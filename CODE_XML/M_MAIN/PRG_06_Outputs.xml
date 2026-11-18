@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T10:36:32.899190" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T10:36:32.899190">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T15:54:33.703489" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T15:54:33.703489">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2106,7 +2106,8 @@ instTranslationOutputInterlockM3(
     BrakeReleaseRequest        := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest
                                   AND NOT M3_TremieHardStopActive,
     BrakeCommandOpenConfirmed  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
-    RequestedDriveControlWord  := SEL(M3_TremieHardStopActive,
+    RequestedDriveControlWord  := SEL(M3_TremieHardStopActive
+                                      AND (PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord &lt;&gt; WORD#7),
                                       PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord,
                                       WORD#0),
     RequestedDriveFreqHz       := SEL(M3_TremieHardStopActive,

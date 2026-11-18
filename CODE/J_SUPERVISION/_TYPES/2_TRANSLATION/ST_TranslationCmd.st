@@ -17,5 +17,6 @@ STRUCT
     TglMaintenanceZoneAccess : BOOL; (* : autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable) *)
     TglAllowWinchMoveAtTremie : BOOL; (* T249 : autorisation CONSCIENTE montee/descente treuil couple (WinchSel=0) a la Tremie, EN PLUS de la garde WinchSel=2 forcee (FB_Modes) *)
     Initialized        : BOOL := FALSE; (* 🚦 TRUE = SetFreq_Hz restauré depuis GVL_PERSISTENT ce boot *)
+    BtnSetAtP1         : BOOL;    (* 🎯 Forcage position P1 depuis IHM en MAINT_N2 (mise en service) *)
 END_STRUCT
 END_TYPE

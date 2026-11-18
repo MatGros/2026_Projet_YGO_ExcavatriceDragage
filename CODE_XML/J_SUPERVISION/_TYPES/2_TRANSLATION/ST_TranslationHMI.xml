@@ -527,6 +527,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 TRUE = SetFreq_Hz restauré depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
             </variable>
+            <variable name="BtnSetAtP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Forcage position P1 depuis IHM en MAINT_N2 (mise en service)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

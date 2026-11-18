@@ -770,6 +770,14 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de contacts capteur TOP pendant cycle homing (purge Reset)</xhtml>
               </documentation>
             </variable>
+            <variable name="ActionText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne d action directe du GRAFCET pour bandeau operateur</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -4584,6 +4592,14 @@ fournie par la configuration persistante de l'appelant.
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 TRUE = SetFreq_Hz restauré depuis GVL_PERSISTENT ce boot</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnSetAtP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Forcage position P1 depuis IHM en MAINT_N2 (mise en service)</xhtml>
               </documentation>
             </variable>
           </struct>

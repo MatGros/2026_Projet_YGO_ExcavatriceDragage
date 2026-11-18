@@ -508,7 +508,8 @@ instTranslationOutputInterlockM3(
     BrakeReleaseRequest        := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest
                                   AND NOT M3_TremieHardStopActive,
     BrakeCommandOpenConfirmed  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
-    RequestedDriveControlWord  := SEL(M3_TremieHardStopActive,
+    RequestedDriveControlWord  := SEL(M3_TremieHardStopActive
+                                      AND (PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord <> WORD#7),
                                       PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord,
                                       WORD#0),
     RequestedDriveFreqHz       := SEL(M3_TremieHardStopActive,

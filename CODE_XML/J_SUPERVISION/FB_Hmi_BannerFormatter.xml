@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T10:49:20.964832" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T10:49:20.964832">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T14:19:38.828384" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T14:19:38.828384">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1497,6 +1497,39 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Consigne opérateur en clair produite par FB_CycleMachineHoming</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHomingActionText">
+              <type>
+                <string length="120" />
+              </type>
+              <initialValue>
+                <simpleValue value="" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Consigne action operateur directe du GRAFCET homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHomingActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Cycle de homing actif (HX1..HX4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHomingSoftLimitsOff">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Butees soft inhibees pendant le homing</xhtml>
               </documentation>
             </variable>
             <variable name="MachineHomingFailed">
@@ -3298,6 +3331,15 @@ ELSIF CfgCorrectedT330 THEN
     // ne doit JAMAIS masquer une alarme de securite. Prefixe [CFG] discriminant pour rester
     // distinguable de D18, benne non fermee et synchro (cadrage §11bis). Longueur &lt;= 70 car. (G408).
     OperatorActionCandidate := '[CFG] Reglage corrige : reserve TOP/FDC a 1,00 m';
+ELSIF CurrentMode = E_Mode.DISABLE THEN
+    OperatorActionCandidate := '[IHM] Sélectionner un mode';
+ELSIF TopHardStopLatched AND NOT MachineHomingActive THEN
+    OperatorActionCandidate := 'Position haute deja depassee - redescendre pour degager';
+ELSIF (MachineHomingActive OR MachineHomingFailed
+       OR ((CurrentMode = E_Mode.MAINT_N1) AND (MachineHomingStep &gt; 0) AND (MachineHomingStep &lt;&gt; 60)))
+      AND (MachineHomingActionText &lt;&gt; '') THEN
+    // Consignes directes du GRAFCET homing : priment sur les actions generiques joystick/benne.
+    OperatorActionCandidate := MachineHomingActionText;
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // Guidance par étape du cycle (AF-07 §5.1) — ne masque jamais un défaut
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
@@ -3412,7 +3454,7 @@ END_IF;
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
 PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
 HardwareModuleOrBusFault := (NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid OR NOT CanBusValid OR NOT Joy1Valid OR NOT EcatBusValid OR NOT EncM1Valid OR NOT EncM2Valid OR NOT VarM3Valid);
-CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked OR ArmingPermitDenied OR TopHardStopLatched);
+CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked OR ArmingPermitDenied OR TopHardStopLatched OR CycleFaultActive OR MachineHomingActive OR MachineHomingFailed);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -3893,11 +3935,11 @@ END_IF;
 IF TopHardStopLatched AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[W] Position haute deja depassee - redescendre'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.CableLimitAscent AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[W] [M1] Limite haute cable atteinte'; AlarmCount := AlarmCount + 1;
+IF MachineHomingSoftLimitsOff AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] HOMING: BUTEES SOFT INHIBEES - SURVEILLER'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.CableLimitAscent AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[W] [M2] Limite haute cable atteinte'; AlarmCount := AlarmCount + 1;
+IF MachineHomingProvisional AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] REF 0m PROVISOIRE ACTIVE - MACHINE NON CALIBREE'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5k. Rotation carrousel — un message à la fois, maintien AlarmHoldTime

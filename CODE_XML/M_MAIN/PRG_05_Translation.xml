@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-16T07:57:30.504718" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-11-16T07:57:30.504718">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T15:35:36.336804" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T15:35:36.336804">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2656,6 +2656,13 @@ END_IF;
 IF M3_ReqMaintenance_Active THEN
     M3_AtTremieStable := FALSE;
 END_IF;
+IF GVL_IHM.M3Translation.Cmd.BtnSetAtP1 THEN
+    M3_AtP1Stable := TRUE;
+    M3_AtTremieStable := FALSE;
+    M3_AtPVStable := FALSE;
+    M3_AtP2Stable := FALSE;
+    M3_AtMaintenanceStable := FALSE;
+END_IF;
 IF M3_ReqTremie_Active THEN
     M3_AtMaintenanceStable := FALSE;
 END_IF;
@@ -4599,7 +4606,7 @@ MaintenanceLimitClear := NOT LimitSwitchMaintenance;
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#100ms" />
+                <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [CFG] Impulsion reset AC600</xhtml>

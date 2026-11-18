@@ -2189,7 +2189,7 @@ IF ResetEdge.Q THEN
 END_IF;
 
 // Levée de doute incohérence boot (BtnConfirmCoherence)
-IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
+IF ConfirmCoherenceEdge.Q THEN
     Calib.HomingSuspect := FALSE;
     BootIncoherentError := FALSE;
 END_IF;

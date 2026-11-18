@@ -288,6 +288,13 @@ END_IF;
 IF M3_ReqMaintenance_Active THEN
     M3_AtTremieStable := FALSE;
 END_IF;
+IF GVL_IHM.M3Translation.Cmd.BtnSetAtP1 THEN
+    M3_AtP1Stable := TRUE;
+    M3_AtTremieStable := FALSE;
+    M3_AtPVStable := FALSE;
+    M3_AtP2Stable := FALSE;
+    M3_AtMaintenanceStable := FALSE;
+END_IF;
 IF M3_ReqTremie_Active THEN
     M3_AtMaintenanceStable := FALSE;
 END_IF;
