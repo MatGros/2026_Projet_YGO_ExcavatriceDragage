@@ -24,6 +24,9 @@ VAR_INPUT
     CycleChecksInhibited : BOOL;   // --> [TST] Mode essai cycle : controles procede inhibes
     MachineHomingStep        : INT;   // --> [HW] Étape guide homing machine (E_MachineHomingStep : 0..70, 60 = valide)
     MachineHomingInstruction : STRING(120);   // --> [HW] Consigne opérateur en clair produite par FB_CycleMachineHoming
+    MachineHomingActionText  : STRING(120) := ''; // --> [DIAG] Consigne action operateur directe du GRAFCET homing
+    MachineHomingActive      : BOOL := FALSE; // --> [HW] Cycle de homing actif (HX1..HX4)
+    MachineHomingSoftLimitsOff : BOOL := FALSE; // --> [SAFE] Butees soft inhibees pendant le homing
     MachineHomingFailed      : BOOL := FALSE; // --> [DIAG] Echec ou abandon cycle homing machine
     MachineHomingLoss        : BOOL := FALSE; // --> [DIAG] Perte reference en mouvement (HomingLoss)
     MachineHomingProvisional : BOOL := FALSE; // --> [DIAG] Zero provisoire 0m HX1 actif (machine non encore calibree)
@@ -787,6 +790,15 @@ ELSIF CfgCorrectedT330 THEN
     // ne doit JAMAIS masquer une alarme de securite. Prefixe [CFG] discriminant pour rester
     // distinguable de D18, benne non fermee et synchro (cadrage §11bis). Longueur <= 70 car. (G408).
     OperatorActionCandidate := '[CFG] Reglage corrige : reserve TOP/FDC a 1,00 m';
+ELSIF CurrentMode = E_Mode.DISABLE THEN
+    OperatorActionCandidate := '[IHM] Sélectionner un mode';
+ELSIF TopHardStopLatched AND NOT MachineHomingActive THEN
+    OperatorActionCandidate := 'Position haute deja depassee - redescendre pour degager';
+ELSIF (MachineHomingActive OR MachineHomingFailed
+       OR ((CurrentMode = E_Mode.MAINT_N1) AND (MachineHomingStep > 0) AND (MachineHomingStep <> 60)))
+      AND (MachineHomingActionText <> '') THEN
+    // Consignes directes du GRAFCET homing : priment sur les actions generiques joystick/benne.
+    OperatorActionCandidate := MachineHomingActionText;
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // Guidance par étape du cycle (AF-07 §5.1) — ne masque jamais un défaut
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
@@ -901,7 +913,7 @@ END_IF;
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
 PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
 HardwareModuleOrBusFault := (NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid OR NOT CanBusValid OR NOT Joy1Valid OR NOT EcatBusValid OR NOT EncM1Valid OR NOT EncM2Valid OR NOT VarM3Valid);
-CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked OR ArmingPermitDenied OR TopHardStopLatched);
+CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked OR ArmingPermitDenied OR TopHardStopLatched OR CycleFaultActive OR MachineHomingActive OR MachineHomingFailed);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -1382,11 +1394,11 @@ END_IF;
 IF TopHardStopLatched AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[W] Position haute deja depassee - redescendre'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM1Safety.CableLimitAscent AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[W] [M1] Limite haute cable atteinte'; AlarmCount := AlarmCount + 1;
+IF MachineHomingSoftLimitsOff AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] HOMING: BUTEES SOFT INHIBEES - SURVEILLER'; AlarmCount := AlarmCount + 1;
 END_IF;
-IF WinchM2Safety.CableLimitAscent AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[W] [M2] Limite haute cable atteinte'; AlarmCount := AlarmCount + 1;
+IF MachineHomingProvisional AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] REF 0m PROVISOIRE ACTIVE - MACHINE NON CALIBREE'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5k. Rotation carrousel — un message à la fois, maintien AlarmHoldTime

@@ -103,8 +103,8 @@ TEST 'TC-P07-020 RootCause : alarme fille visible quand materiel sain'
     );
     ASSERT_TRUE(FB_Banner.Banner.AlarmBanner.HasAlarm, 'Alarme presente');
     ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Count, 1, '1 alarme au carrousel');
-    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '1/1 [M1] mou de cable', 'Alarme fille correctement affichee');
-    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.AlarmArray[0], '[M1] mou de cable', 'Tableau AlarmArray[0] correctement rempli');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '1/1 [W] [M1] Mou de cable detecte', 'Alarme fille correctement affichee');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.AlarmArray[0], '[W] [M1] Mou de cable detecte', 'Tableau AlarmArray[0] correctement rempli');
 END_TEST
 
 TEST 'TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO'
@@ -145,7 +145,6 @@ TEST 'TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END'
     ADVANCE_TIME(5000000000); // 5s BootInhibit
 
     WinchM1Safety.ErrorPhaseRotation := TRUE;
-    WinchM1Safety.ErrorBrakeThermal := TRUE;
     NetDiag.InputModules.Vh0800EndOk := FALSE; // Panne module VH0800
 
     FB_Banner(
@@ -171,7 +170,7 @@ TEST 'TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT'
               Network := NetDiag);
     ADVANCE_TIME(5000000000); // 5s BootInhibit
 
-    WinchM1Safety.ErrorEncoder := TRUE;
+    WinchM1Safety.ErrorMecaA := TRUE;
     WinchM1Safety.CableLimitDescent := TRUE;
     NetDiag.EncoderM1.Operational := FALSE; // Perte com EtherCAT codeur M1
 
@@ -259,7 +258,7 @@ TEST 'TC-P07-008 Carrousel d alarmes : un message a la fois, index n/N coherent'
     ASSERT_TRUE(FB_Banner.Banner.AlarmBanner.HasAlarm, '2 defauts -> HasAlarm=TRUE');
     ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Count, 2, '2 defauts -> Count=2');
     ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Index, 1, 'premier message -> Index=1');
-    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '1/2 [M1] mou de cable', 'premier message affiche');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '1/2 [W] [M1] Mou de cable detecte', 'premier message affiche');
 
     // Apres AlarmHoldTime (1s) : rotation vers le message 2
     ADVANCE_TIME(1000000000);
@@ -268,7 +267,7 @@ TEST 'TC-P07-008 Carrousel d alarmes : un message a la fois, index n/N coherent'
               WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
               Network := NetDiag, AlarmHoldTime := T#1s);
     ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Index, 2, 'rotation -> Index=2');
-    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '2/2 [M2] mou de cable', 'deuxieme message affiche');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '2/2 [W] [M2] Mou de cable detecte', 'deuxieme message affiche');
 
     // Apres un nouveau AlarmHoldTime : le TON a ete reset au scan precedent (rotation
     // cyclique sur 2 scans : un scan pour re-accumuler le temps, un scan pour basculer).
@@ -286,7 +285,7 @@ TEST 'TC-P07-008 Carrousel d alarmes : un message a la fois, index n/N coherent'
               WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
               Network := NetDiag, AlarmHoldTime := T#1s);
     ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Index, 1, 'rotation cyclique -> retour Index=1');
-    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '1/2 [M1] mou de cable', 'retour au premier message');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '1/2 [W] [M1] Mou de cable detecte', 'retour au premier message');
 END_TEST
 
 TEST 'TC-P07-006 Separation messages action/etat vs alarmes : alarme dans le carrousel, contexte dans le bandeau info'
@@ -305,7 +304,7 @@ TEST 'TC-P07-006 Separation messages action/etat vs alarmes : alarme dans le car
               Network := NetDiag);
     // L'alarme vit dans le carrousel (AlarmBanner), pas dans le bandeau info
     ASSERT_TRUE(FB_Banner.Banner.AlarmBanner.HasAlarm, 'alarme presente dans le carrousel');
-    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '1/1 [M1] mou de cable', 'alarme dans le carrousel');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Text, '1/1 [W] [M1] Mou de cable detecte', 'alarme dans le carrousel');
     // Le bandeau info (GlobalContextText) reste un contexte, pas l'alarme
     ASSERT_FALSE(FB_Banner.Banner.GlobalContextText = '', 'contexte global non vide');
     ASSERT_FALSE(FB_Banner.Banner.GlobalContextText = FB_Banner.Banner.AlarmBanner.Text,
@@ -752,5 +751,47 @@ TEST 'T368-001 : bandeau mode porteur du temps ecoule, uniquement pendant un cyc
               Network := NetDiag);
     ASSERT_EQ(FB_Banner.Banner.GlobalContextText, '[SIMULATION] [SEMI-AUTO] [CYCLE AUTO]',
               'T368 : hors cycle -> aucune duree affichee, meme si les entrees portent encore 1 min 05 s');
+END_TEST
+
+TEST 'TC-P07-HOMING-001 : OperatorActionText pilote par GRAFCET homing + alarmes rouges SoftLimitsOff & Provisional'
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ADVANCE_TIME(5000000000); // Depasser BootInhibit (4s)
+
+    (* Pendant homing HX1 (SoftLimitsOff + ActionText) avec descente et benne fermee :
+       OperatorActionText doit afficher ActionText GRAFCET, PAS [BENNE] Ouvrir la benne ni [JOYSTICK] homme-mort *)
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag,
+              BucketIsOpen := FALSE, M2LogicRequestDirection := -1, DeadmanArmed := FALSE,
+              MachineHomingStep := 20, MachineHomingActive := TRUE, MachineHomingSoftLimitsOff := TRUE,
+              MachineHomingProvisional := TRUE,
+              MachineHomingInstruction := 'HX1 - FERMER BENNE M2 20s (AUCUNE BUTEE!)',
+              MachineHomingActionText := '[BENNE] FERMER PRUDEMMENT (SANS BUTEES) puis HOMME-MORT 5s NEUTRE = 0m');
+    ASSERT_EQ(FB_Banner.Banner.OperatorActionText,
+              '[BENNE] FERMER PRUDEMMENT (SANS BUTEES) puis HOMME-MORT 5s NEUTRE = 0m',
+              'ActionText GRAFCET prime sur messages generiques joystick/benne');
+    ASSERT_TRUE(FB_Banner.Banner.AlarmBanner.HasAlarm, 'Alarmes rouges presentes');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.Count, 2, '2 alarmes [W] homing (SoftLimitsOff + Provisional)');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.AlarmArray[0],
+              '[W] HOMING: BUTEES SOFT INHIBEES - SURVEILLER',
+              'Alarme rouge butees soft inhibees presente');
+    ASSERT_EQ(FB_Banner.Banner.AlarmBanner.AlarmArray[1],
+              '[W] REF 0m PROVISOIRE ACTIVE - MACHINE NON CALIBREE',
+              'Alarme rouge reference 0m provisoire presente');
+
+    (* Priorite securite preservee : ouverture AU coupe OperatorActionText vers [PUPITRE] *)
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := FALSE, PowerContactorEngaged := FALSE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag,
+              MachineHomingStep := 20, MachineHomingActive := TRUE, MachineHomingSoftLimitsOff := TRUE,
+              MachineHomingActionText := '[BENNE] FERMER PRUDEMMENT (SANS BUTEES) puis HOMME-MORT 5s NEUTRE = 0m');
+    ASSERT_EQ(FB_Banner.Banner.OperatorActionText,
+              '[PUPITRE] Boucle urgence ouverte - réarmer',
+              'AU reste strictement prioritaire sur guide homing');
 END_TEST
 
