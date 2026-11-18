@@ -53,7 +53,10 @@ Sorties brutes avec code retour, diff réel, snapshots avant/après redémarrage
 T377 (CC03, homing sans contact TOP, mêmes FB) ; T417-C (AGY02, `PRG_03`, `CODE_DiffBundle.xml`) ; T427-CC02 (garde d'écriture) ; T386, T387, T395 (selon brief T377).
 
 ## Points ouverts (non tranchés)
-- Définition de « AU actif » si une variante avec reset est un jour reconsidérée (signal unique à nommer).
-- Position de la chaîne AU et affectation 24 V des codeurs au démarrage (schéma `DOC/WFLOW/ELEC`, à confirmer).
-- Effet exact d'un Reset sur le flag d'autotest AU et ordre rebouclage / engagement du contacteur (à lire avant de coder).
-- Autres consommateurs de `EncoderAvailable` (non vus).
+Mise à jour 2026-11-18 après réponse de T377-CC03 (vérifiée à la source par TORC-CC10) :
+- **Fermé** : effet d'un Reset sur l'autotest AU. `StartupFail` est latché par `FB_FaultCore` et purgé au front Reset (`FB_Safety_EmergencyManagement.st:184`, §4 `:189-200`).
+- **Précisé** : consommateurs de `EncoderAvailable`. Pas seulement les 2 appels safety de `PRG_04:985/:1058` : aussi `FB_Encoder.st` (cause 0 live), `FB_EncoderReliability.st` (`EncoderFault`, `HomedAndReliable`), `FB_Encoder_Homing.st`, `FB_Safety_Winch.st:441` et la vue troubleshooting. **Conséquence : la sémantique de `EncoderAvailable` ne doit pas changer** ; on ajoute une sortie séparée (`BusOppedOnce`, pré-cadrage T377-CC03) et seul l'armement du latch (`FB_Safety_Winch.st:277-279`) change (AC12).
+- **Ouvert, à lever par l'exploitant (schéma `DOC/WFLOW/ELEC`)** : la chaîne AU est-elle ouverte au démarrage matinal ? Les 24 V des codeurs sont-ils coupés par l'AU ? Ordre rebouclage / engagement du contacteur. Cela conditionne le report de l'autotest AU (diff 4) et le repli « boot + 5 s ».
+- **Ouvert, mesure site** : valeur de X (temps de montée du bus) ; le démarrage à froid du 18/11 matin fournit la référence sans correctif, une 2e mesure après correctif la calera.
+- **Hors périmètre ici** : définition de « AU actif » (inutile tant qu'aucun reset de latch de sécurité n'est conçu).
+- **Pièces de T377-CC03** : étude `T377_ETUDE_BOOT_PERTE_CODEUR_20261117_v0.1.md` ; pré-cadrage `T377B_PRECADRAGE_DIFF_POUR_TORC_20261118_v0.1.md` (4 blocs : `FB_Encoder_Abs`, `FB_Safety_Winch`, `PRG_04`, autotest ; matrice de 6 scénarios), à déplacer dans le dossier T377-B. Aucun conflit avec le lot T377 (fichiers disjoints) ; 2 commits séparés.

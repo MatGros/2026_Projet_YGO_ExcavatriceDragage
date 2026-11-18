@@ -1,0 +1,43 @@
+﻿Variable;Type;Valeur lue;Defaut du code;Origine du defaut;Volatile
+GVL_PERSISTENT._CalibM1.HomingRefRaw;UDINT;16752547;0;implicite 0/FALSE;
+GVL_PERSISTENT._CalibM1.LastKnownRawPos;UDINT;16784754;0;implicite 0/FALSE;volatile
+GVL_PERSISTENT._CalibM1.Homed;;TRUE;FALSE;implicite 0/FALSE;
+GVL_PERSISTENT._CalibM2.HomingRefRaw;UDINT;16748709;0;implicite 0/FALSE;
+GVL_PERSISTENT._CalibM2.LastKnownRawPos;UDINT;16779883;0;implicite 0/FALSE;volatile
+GVL_PERSISTENT._CalibM2.Homed;;TRUE;FALSE;implicite 0/FALSE;
+GVL_PERSISTENT._WinchSymmetryDataPersist.DeltaStartDelay_Ms;UDINT;490;0;implicite 0/FALSE;volatile
+GVL_PERSISTENT._WinchSymmetryDataPersist.DeltaStopDistance_Mm;UDINT;31;0;implicite 0/FALSE;volatile
+GVL_PERSISTENT._WinchSymmetryDataPersist.DeltaStopTime_Ms;UDINT;60;0;implicite 0/FALSE;volatile
+GVL_PERSISTENT._WinchSymmetryDataPersist.MaxSyncDeviation_M;REAL;6.487549;0;implicite 0/FALSE;volatile
+GVL_PERSISTENT._WinchM1CfgPersist.Initialized;;TRUE;FALSE;explicite;
+GVL_PERSISTENT._WinchM2CfgPersist.Initialized;;TRUE;FALSE;explicite;
+GVL_PERSISTENT._SyncCfgPersist.Initialized;;TRUE;FALSE;explicite;
+GVL_PERSISTENT._BucketCfgPersist.Initialized;;TRUE;FALSE;explicite;
+GVL_PERSISTENT._BucketState.IsOpen;;TRUE;FALSE;implicite 0/FALSE;
+GVL_PERSISTENT._BucketState.LastPosM2Open;REAL;7.61084;0;implicite 0/FALSE;volatile
+GVL_PERSISTENT._BucketState.LastPosM2Close;REAL;21.8723145;0;implicite 0/FALSE;volatile
+GVL_PERSISTENT._BucketState.ActiveOffsetValid;;TRUE;FALSE;implicite 0/FALSE;
+GVL_PERSISTENT._BucketState.BucketReferenced;;TRUE;FALSE;implicite 0/FALSE;
+GVL_PERSISTENT._TranslationCfgPersist.CfgApproachSpeedTremie_Hz;REAL;25;20.0;explicite;
+GVL_PERSISTENT._TranslationCfgPersist.CfgApproachSpeedMaintenance_Hz;REAL;15;20.0;explicite;
+GVL_PERSISTENT._TranslationCfgPersist.CfgApproachSpeedP1_Hz;REAL;25;20.0;explicite;
+GVL_PERSISTENT._TranslationCfgPersist.Initialized;;TRUE;FALSE;explicite;
+GVL_PERSISTENT._TranslationPosPV_M;REAL;5;1.5;explicite;
+GVL_PERSISTENT._TranslationPosP2_M;REAL;15;3.5;explicite;
+GVL_PERSISTENT._TranslationPosP1_M;REAL;20;5.0;explicite;
+GVL_PERSISTENT._TranslationPosMaintenance_M;REAL;30;10.0;explicite;
+GVL_PERSISTENT._TranslationPosEstimated_M;REAL;20.2685566;0.0;explicite;volatile
+GVL_PERSISTENT._TranslationPosEstimatedInitialized;;TRUE;FALSE;explicite;volatile
+GVL_PERSISTENT._TranslationAtP1Persisted;;TRUE;FALSE;explicite;volatile
+GVL_PERSISTENT._JoystickCfgPersist.Initialized;;TRUE;FALSE;explicite;
+GVL_PERSISTENT._CycleCfgPersist.DrainTime_S;INT;2;5;explicite;
+GVL_PERSISTENT._CycleCfgPersist.Initialized;;TRUE;FALSE;explicite;
+GVL_PERSISTENT._CycleMachineHomingCfgPersist.Initialized;;TRUE;FALSE;explicite;
+GVL_PERSISTENT._CommunCfgPersist.Initialized;;TRUE;FALSE;explicite;
+GVL_PERSISTENT._CycleSampleCount;INT;57;0;explicite;volatile
+GVL_PERSISTENT._EncoderCfgPersist.Initialized;;TRUE;FALSE;explicite;
+GVL_PERSISTENT._CycleSampleCountTotal;UDINT;761;0;explicite;volatile
+GVL_PERSISTENT._RunningHoursMachine_S;UDINT;105814;0;explicite;volatile
+GVL_PERSISTENT._RunningHoursM1_S;UDINT;1396;0;explicite;volatile
+GVL_PERSISTENT._RunningHoursM2_S;UDINT;2166;0;explicite;volatile
+GVL_PERSISTENT._RunningHoursM3_S;UDINT;970;0;explicite;volatile

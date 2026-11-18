@@ -5,6 +5,8 @@
 > **Règle :** valeur mesurée = valeur brute + source. Une impression = « hypothèse ».
 > **Documents liés :** revue de l'agent T417-C (AGY02, analyse des traces M3 et du variateur) = `REVUE_T417-C_MES_20261117.md` · revue de l'agent TORC-CC10 = `REVUE_TORC-CC10_MES_20261117.md` (autocritique, à lire après la journée) · relevés des persistantes = `20261117_PERSISTANTES/` · conventions du dossier = `README.md`.
 
+> **Suite :** le plan restant et les chantiers ouverts sont dans `REGISTRE_Suivi_MiseEnService_20261118.md` (cette fiche reste le registre du jour 1).
+
 **Étape en cours : ____** (à mettre à jour) · **Début de journée : __h__**
 
 ## Sommaire
