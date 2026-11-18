@@ -60,8 +60,10 @@ VAR_INPUT
     OppositeDirectionTimeout        : TIME := T#1s;                   // --> [CFG] Delai confirmation sens oppose
     NoMovementTimeout               : TIME := T#3s;                   // --> [CFG] Delai confirmation absence mouvement
 
-    // === ESCALADE EXTERNE ===
+    // === ESCALADE EXTERNE & CAPTEUR HAUT ===
     ExternalSyncEscalation          : BOOL := FALSE;                  // --> [SAFE] Discordance contacteurs M1/M2 persistante (FB_SyncContactor niveau 2) -> latch MecaE escalade (bit13 -> PowerCutOff), meme routing/Reset/bypass que MecaE
+    CfgTopEscalateDelay             : TIME := T#2s;                   // --> [CFG] Delai escalade coupure puissance Meca D si non-arret materiel au capteur TOP (min 2s)
+    TopHardStopLatched              : BOOL := FALSE;                  // --> [SAFE] Latch directionnel capteur position haute M1/M2 (PRG_06_Outputs)
 
     // === BYPASSES ET SIMULATION ===
     EncoderFaultBypass              : BOOL;                           // --> [TST] Bypass defaut codeur
@@ -110,6 +112,7 @@ VAR
     // === TIMERS INTERNES ===
     TonMecaB                        : TON;                            // . [LOC] Delai confirmation arret contacteurs/frein
     TonMecaD                        : TON;                            // . [LOC] Delai confirmation arret fin de course haut
+    TonTopEscalate                  : TON;                            // . [LOC] Delai 2s escalade PowerCutOff si non-arret reel au TOP (Option 2)
     TonMecaE                        : TON;                            // . [LOC] Delai confirmation arret ecart synchro
     TonOppositeDirection            : TON;                            // . [LOC] Delai confirmation sens oppose
     TonNoMovement                   : TON;                            // . [LOC] Delai confirmation absence mouvement
@@ -124,6 +127,7 @@ VAR
     ExpectedOtherWinchPosMPrev      : REAL;                           // . [LOC] ExpectedOtherWinchPosM scan precedent (detection de saut de l'autre treuil)
     UncommandedActiveB              : BOOL;                           // . [LOC] Condition active Meca B
     UncommandedActiveD              : BOOL;                           // . [LOC] Condition active Meca D
+    TopEscalateActive               : BOOL;                           // . [LOC] Non-arret materiel reel au contact/latch TOP (Option 2)
     OppositeDirectionActive         : BOOL;                           // . [LOC] Condition active sens oppose
     PositionMovementDetected        : BOOL;                           // . [LOC] Mouvement confirme par variation de position codeur
     MovementCommandedPrev           : BOOL;                           // . [LOC] Etat precedent de commande mouvement
@@ -381,9 +385,20 @@ IF NOT BypassGlobal THEN
             AND NOT (ReqDescend AND NOT ReqAscent)
             AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
         TonMecaD(IN := UncommandedActiveD, PT := PostRampTimeout);
-        IF TonMecaD.Q THEN MecaDFaultLatched := TRUE; END_IF;
+        TopEscalateActive := NOT (BenneBusy OR BenneHoldStillActive)
+            AND (NOT TopPositionSensor OR TopHardStopLatched)
+            AND NOT InReferencingMode
+            AND NOT BypassTopLimitSwitch
+            AND NOT (ReqDescend AND NOT ReqAscent)
+            AND NOT BrakeForceAllowed
+            AND (MovementCommanded
+                 OR NOT FwdRevSpeedFeedbackOff
+                 OR (MeasuredSpeedValid AND (MeasuredSpeedSignedMps > UncommandedSpeedThresholdMps)));
+        TonTopEscalate(IN := TopEscalateActive, PT := CfgTopEscalateDelay);
+        IF TonMecaD.Q OR TonTopEscalate.Q THEN MecaDFaultLatched := TRUE; END_IF;
     ELSE
         TonMecaD(IN := FALSE);
+        TonTopEscalate(IN := FALSE);
     END_IF;
     instCauses[11].Active   := MecaDFaultLatched;
     instCauses[11].Latching := TRUE;
@@ -460,6 +475,7 @@ IF NOT BypassGlobal THEN
 ELSE
     TonMecaB(IN := FALSE);
     TonMecaD(IN := FALSE);
+    TonTopEscalate(IN := FALSE);
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
@@ -537,6 +553,7 @@ IF NOT Enable THEN
     PowerCutOff := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaD(IN := FALSE);
+    TonTopEscalate(IN := FALSE);
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
@@ -576,7 +593,7 @@ DescendPermit := NOT (
 
 AscentPermit := NOT (
     ((CauseTopLimitSwitchActive
-    OR (NOT TopPositionSensor AND NOT InReferencingMode))
+    OR ((NOT TopPositionSensor OR TopHardStopLatched) AND NOT InReferencingMode))
     AND NOT BypassTopLimitSwitch)
     // TopLimitM porte la relaxation 7,5->8,5 m en override N1 / bypass N2 : la butee
     // logicielle reste active a la valeur relevee. Bypasser le logiciel releve la butee,

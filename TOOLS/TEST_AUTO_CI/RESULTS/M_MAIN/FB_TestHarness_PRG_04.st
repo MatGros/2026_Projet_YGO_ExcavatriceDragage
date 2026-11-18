@@ -30,6 +30,9 @@ VAR_INPUT
     M2_TensionedCable       : BOOL := TRUE;
     PhaseRotationOk         : BOOL := TRUE;
     TopPositionFreeDI       : BOOL := TRUE;
+    TopHardStopLatched      : BOOL := FALSE;
+    CfgTopEscalateDelay     : TIME := T#2s;
+    BrakeForceAllowedM1     : BOOL := FALSE;
     FaultMachineResetIHM    : BOOL := FALSE;
     CfgCableLimitAscentM    : REAL := 7.5;
     CfgCableLimitDescentM1  : REAL := -30.0;
@@ -92,6 +95,7 @@ instSafetyWinchM1(
     Reset                   := FaultMachineResetIHM,
     Mode                    := ModesAuth.Mode,
     SyncEnable              := ModesAuth.SyncEnable,
+    CrossCheckEnable        := ModesAuth.SyncEnable,
     ReqAscent               := M1LogicReqAscent,
     ReqDescend              := M1LogicReqDescend,
     MovementCommanded       := instWinchM1.RelayFwd OR instWinchM1.RelayRev,
@@ -116,7 +120,11 @@ instSafetyWinchM1(
     HomingSuspect           := AcqData.EncoderM1.HomingSuspect,
     MeasuredSpeedMps        := AcqData.EncoderM1.Measurement.Speed_Mps,
     MeasuredSpeedSignedMps  := AcqData.EncoderM1.Measurement.SignedSpeed_Mps,
-    MeasuredSpeedValid      := AcqData.EncoderM1.Measurement.SpeedValid
+    MeasuredSpeedValid      := AcqData.EncoderM1.Measurement.SpeedValid,
+    SpeedBandMaxMps         := 2.0,
+    BrakeForceAllowed       := BrakeForceAllowedM1,
+    TopHardStopLatched      := TopHardStopLatched,
+    CfgTopEscalateDelay     := CfgTopEscalateDelay
 );
 
 SafeStopM1_Active := instSafetyWinchM1.SafeStop;
@@ -167,6 +175,10 @@ Data.WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
 
 Data.WinchM1Safety.SafeStop := SafeStopM1_Active;
 Data.WinchM1Safety.PowerCutOff := instSafetyWinchM1.PowerCutOff;
+Data.WinchM1Safety.Error := instSafetyWinchM1.Fault.Error;
+Data.WinchM1Safety.ErrorId := instSafetyWinchM1.Fault.ErrorId;
+Data.WinchM1Safety.LatchedId := instSafetyWinchM1.Fault.LatchedId;
+Data.WinchM1Safety.ErrorMecaD := ((instSafetyWinchM1.Fault.ErrorId OR instSafetyWinchM1.Fault.LatchedId) AND 16#0800) <> 16#0000;
 Data.WinchM1Safety.AscentPermit := EffectivePermitM1_Ascent;
 Data.WinchM1Safety.DescendPermit := EffectivePermitM1_Descend;
 

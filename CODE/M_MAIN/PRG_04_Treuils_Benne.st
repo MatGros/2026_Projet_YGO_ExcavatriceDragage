@@ -1039,7 +1039,8 @@ instSafetyWinchM1(
     BypassMecaD            := BypassM1MecaDEff,
     BypassMecaE            := GVL_IHM.M1TreuilRetenue.Bypass.MecaE,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
-    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated
+    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated,
+    TopHardStopLatched     := PRG_06_Outputs.Data.TopHardStopLatched
 );
 
 instSafetyWinchM2(
@@ -1108,7 +1109,8 @@ instSafetyWinchM2(
     BypassMecaD            := BypassM2MecaDEff,
     BypassMecaE            := GVL_IHM.M2TreuilBenne.Bypass.MecaE,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
-    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated
+    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated,
+    TopHardStopLatched     := PRG_06_Outputs.Data.TopHardStopLatched
 );
 
 SafeStopM1_Raw := SafeStopM1_Raw OR instSafetyWinchM1.SafeStop;
