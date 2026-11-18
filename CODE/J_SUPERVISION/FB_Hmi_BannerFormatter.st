@@ -26,6 +26,8 @@ VAR_INPUT
     MachineHomingInstruction : STRING(120);   // --> [HW] Consigne opérateur en clair produite par FB_CycleMachineHoming
     MachineHomingFailed      : BOOL := FALSE; // --> [DIAG] Echec ou abandon cycle homing machine
     MachineHomingProvisional : BOOL := FALSE; // --> [DIAG] Zero provisoire 0m HX1 actif (machine non encore calibree)
+    TopHardStopLatched       : BOOL := FALSE; // --> [SAFE] Latch directionnel capteur TOP actif (montee bloquee)
+    TopPositionSensorActive  : BOOL := FALSE; // --> [HW] Capteur position haute physique au contact
     WinchM1Error             : BOOL := FALSE; // --> [DIAG] Defaut commande/barriere treuil M1 (FB_Winch/Interlock)
     WinchM2Error             : BOOL := FALSE; // --> [DIAG] Defaut commande/barriere treuil M2 (FB_Winch/Interlock)
     EncoderM1Fault           : BOOL := FALSE; // --> [DIAG] Defaut codeur M1
@@ -445,6 +447,8 @@ IF ModeChangePendingBlocked AND ModeChangeBlockReason <> '' THEN
     SpecialConditionCandidate := ModeChangeBlockReason;
 ELSIF CycleChecksInhibited THEN
     SpecialConditionCandidate := 'ESSAI CYCLE : CONTROLES INHIBES';
+ELSIF TopHardStopLatched THEN
+    SpecialConditionCandidate := 'ATTENTION: Capteur TOP franchi - redescendre';
 ELSIF MachineHomingProvisional THEN
     SpecialConditionCandidate := 'ATTENTION: Ref 0m PROVISOIRE - Non calibre';
 ELSIF AnyBypassActive THEN
@@ -730,6 +734,8 @@ ELSIF NOT PowerContactorEngaged THEN
 ELSIF SafeStopActive THEN
     IF SyncContactorDiag.MismatchLevel >= 1 THEN
         OperatorActionCandidate := '[SYNC] Discordance contacteurs M1/M2 - Acquitter SafeStop';
+    ELSIF WinchM1Safety.SlackCable OR WinchM2Safety.SlackCable THEN
+        OperatorActionCandidate := '[TREUIL] Mou de cable detecte - retendre ou acquitter';
     ELSE
         OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
     END_IF;
@@ -756,6 +762,10 @@ ELSIF DirectionBlocked THEN
         ELSE
             OperatorActionCandidate := '[TREUIL] Descente interdite';
         END_IF;
+    ELSIF TopHardStopLatched THEN
+        OperatorActionCandidate := 'Position haute deja depassee - redescendre pour degager';
+    ELSIF TopPositionSensorActive THEN
+        OperatorActionCandidate := '[TREUIL] Montee interdite - capteur haut';
     ELSIF TopLimitReached THEN
         // 🛡️ Montée bloquée par butée logicielle haute (agrégat M1/M2) — cause exposée par le safety.
         OperatorActionCandidate := '[TREUIL] Montée interdite - limite haute';
@@ -855,6 +865,8 @@ ELSIF ArmingPermitDenied THEN
     ELSE
         OperatorActionCandidate := '[JOYSTICK] Armement refusé : mouvements non autorisés';
     END_CASE;
+ELSIF TopHardStopLatched THEN
+    OperatorActionCandidate := 'Position haute deja depassee - redescendre pour degager';
 ELSIF NOT DeadmanArmed THEN
     OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
 ELSIF ((WinchM1Safety.ErrorId OR WinchM2Safety.ErrorId) AND CST_WinchErrorIdCableLimitDescent) <> 16#0000 THEN
@@ -886,7 +898,7 @@ END_IF;
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
 PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
 HardwareModuleOrBusFault := (NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid OR NOT CanBusValid OR NOT Joy1Valid OR NOT EcatBusValid OR NOT EncM1Valid OR NOT EncM2Valid OR NOT VarM3Valid);
-CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked OR ArmingPermitDenied);
+CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked OR ArmingPermitDenied OR TopHardStopLatched);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -1342,7 +1354,30 @@ IF (HistoM3 AND 16#0080) <> 16#0000 AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[HISTO] [M3] ErrorID:08 - capteurs incoherents'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5j. Rotation carrousel — un message à la fois, maintien AlarmHoldTime
+// 5j. Collecte [W] — Warnings non bloquants (apres bloquants et [HISTO], AF-07 §6)
+IF (WinchM1Safety.SlackCable OR ((WinchM1Safety.ErrorId AND 16#0008) <> 16#0000)) AND LocalIoValid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M1] Mou de cable detecte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (WinchM2Safety.SlackCable OR ((WinchM2Safety.ErrorId AND 16#0008) <> 16#0000)) AND LocalIoValid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M2] Mou de cable detecte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((WinchM1Safety.ErrorId AND 16#0020) <> 16#0000) AND LocalIoValid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M1] Capteur haut atteint'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((WinchM2Safety.ErrorId AND 16#0020) <> 16#0000) AND LocalIoValid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M2] Capteur haut atteint'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF TopHardStopLatched AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] Position haute deja depassee - redescendre'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.CableLimitAscent AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M1] Limite haute cable atteinte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.CableLimitAscent AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M2] Limite haute cable atteinte'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5k. Rotation carrousel — un message à la fois, maintien AlarmHoldTime
 // Publication du tableau complet instantane dans le DUT IHM
 FOR i := AlarmCount TO (CST_NbMaxAlarmes - 1) DO
     AlarmArray[i] := '';

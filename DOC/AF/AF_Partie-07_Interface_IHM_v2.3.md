@@ -284,12 +284,14 @@ l'opérateur. Stratégie **hybride** :
 > et fonctionne en code (`ST_AlarmBanner.st`, `FB_Hmi_BannerFormatter.st`), documenté ici pour la
 > première fois.
 
-`GVL_IHM.Banner.AlarmBanner : ST_AlarmBanner` liste **uniquement les défauts actifs bloquants**
-de la machine (SafeStop / PowerCutOff / interlock) et les affiche **un à la fois, en rotation**
-(carrousel), distinct du bandeau d'information (§5) qui ne porte que 4 messages fixes par
-responsabilité. Les **warnings non bloquants** (ex. `[M1] mou de cable`, `[M1] surchauffe moteur`)
-**ne sont pas publiés** dans le carrousel : ils relèvent du bandeau d'information / journal de
-supervision, pas du carrousel de défauts bloquants.
+`GVL_IHM.Banner.AlarmBanner : ST_AlarmBanner` liste **tout défaut ou alerte actif**
+de la machine (bloquants SafeStop / PowerCutOff / interlock en tête, puis **warnings
+non bloquants** préfixés **`[W] `** : mou de câble, capteur haut / latch TOP, limite haute
+câble — décision mise en service 2026-11-18, surrogeant l'exclusion historique de 2026-09-01)
+et les affiche **un à la fois, en rotation** (carrousel), distinct du bandeau d'information
+(§5) qui ne porte que 4 messages fixes par responsabilité. En cas de saturation du carrousel
+(`CST_NbMaxAlarmes = 50`), les défauts **bloquants** et `[HISTO]` remplissent les premiers
+emplacements avant les `[W] `.
 
 > 🔒 **Invariant de non-silence (T255-D, 2026-09-20)** — *toute cause agrégée dans
 > `GVL_IHM.Modes.State.AnyFaultActive` doit posséder un libellé dans le carrousel* (ou être

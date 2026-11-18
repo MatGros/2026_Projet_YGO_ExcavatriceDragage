@@ -56,29 +56,9 @@ WINCH_BIT_MAP: dict[int, tuple[str, str | None, tuple[str, str] | None]] = {
     0: ("[Mx] ErrorID:01 - perte com operateur", "Joy1Valid", None),
     1: ("[Mx] ErrorID:02 - perte codeur", None, None),
     2: ("[Mx] ErrorID:03 - surchauffe moteur", None, None),
-    3: (
-        "",
-        None,
-        (
-            "classe WARNING exclue du carrousel par la spec AF-07 v2.3 section 6 (lignes 290-291) ; "
-            "visible en [HISTO] quand la cause a disparu et n'est pas acquittee",
-            "spec AF-07 section 6 (retrait = decision de spec, jamais d'agent)",
-        ),
-    ),
+    3: ("[W] [Mx] Mou de cable detecte", "LocalIoValid", None),
     4: ("[Mx] ErrorID:05 - rotation phases", "Vh0800Valid", None),
-    5: (
-        "",
-        None,
-        (
-            "ETAT NORMAL de fin de course haut, pas un defaut : capteur haut actionne "
-            "(FB_Safety_Winch.st:309-316), etat volontairement maintenu pendant les manoeuvres "
-            "benne (FB_Safety_Winch.st:373-378). Classe warning au sens AF-07 section 6 ; de plus "
-            "la DI M1M2_TopPositionFree_DI est COMMUNE aux deux treuils, donc une publication par "
-            "treuil afficherait 2 alarmes pour un seul capteur (revue 2026-09-20, MINOR-1/2). "
-            "L'action operateur est deja publiee par la branche « Montee interdite - limite haute »",
-            "T220 (retrait si decision de publier les etats de fin de course en carrousel)",
-        ),
-    ),
+    5: ("[W] [Mx] Capteur haut atteint", "LocalIoValid", None),
     6: ("[Mx] Limite basse cable atteinte", "EncMxValid", None),
     7: ("[Mx] ErrorID:08 - MecaA - deplacement sans commande", "EncMxValid", None),
     8: ("[Mx] ErrorID:09 - MecaB - arret non confirme apres stop", "EncMxValid", None),

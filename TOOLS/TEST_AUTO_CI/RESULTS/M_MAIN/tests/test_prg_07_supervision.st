@@ -1147,3 +1147,50 @@ END_VAR
 
     ASSERT_EQ(pulseCount, 0, 'Geste perime : aucune impulsion sur un front machine tardif');
 END_TEST
+
+TEST 'PRG_07_Supervision : T417-C A3 Message persistant TopHardStopLatched et carrousel [W] priorise'
+VAR
+    netOk : ST_NetworkDiagHMI;
+END_VAR
+    netOk.InputModules.LocalDigitalIoOk := TRUE;
+    netOk.InputModules.Vh0800EndOk := TRUE;
+    netOk.InputModules.Vh0808EtpOk := TRUE;
+    netOk.InputModules.Vh0008ErOk := TRUE;
+    netOk.InputModules.Vh0008Er1Ok := TRUE;
+    netOk.BusCanOpen.Operational := TRUE;
+    netOk.Joystick.Operational := TRUE;
+    netOk.BusEthercat.Operational := TRUE;
+    netOk.EncoderM1.Operational := TRUE;
+    netOk.EncoderM2.Operational := TRUE;
+    netOk.VariateurM3.Operational := TRUE;
+
+    modesAuth.Mode := E_Mode.MAINT_N2;
+    winchData.WinchM1Safety.DescendPermit := TRUE;
+    winchData.WinchM1Safety.AscentPermit := FALSE;
+    winchData.WinchM2Safety.DescendPermit := TRUE;
+    winchData.WinchM2Safety.AscentPermit := FALSE;
+    winchData.WinchM1Safety.SlackCable := TRUE;
+    winchData.WinchM1Safety.ErrorId := 16#0028; // bits 3 (mou) + 5 (capteur haut)
+    winchData.WinchM1Safety.CableLimitAscent := TRUE;
+
+    // 1. Persistance message TOP + warnings [W] au carrousel quand aucun bloquant
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, EmergencyChainClosed := TRUE,
+            PowerContactorEngaged := TRUE, TopHardStopLatched := TRUE, Network := netOk);
+    ASSERT_EQ(harness.Banner.OperatorActionText, 'Position haute deja depassee - redescendre pour degager',
+              'A3 : message persistant latch TOP dans OperatorActionText');
+    ASSERT_EQ(harness.Banner.AlarmBanner.AlarmArray[0], '[W] [M1] Mou de cable detecte',
+              'A3bis : warning mou de cable prefixe [W]');
+
+    // 2. Ajout d un defaut bloquant (perte codeur M1) -> bloquant passe en position 0 avant les [W]
+    winchData.WinchM1Safety.ErrorEncoder := TRUE;
+    winchData.WinchM1Safety.ErrorId := 16#002A;
+    ADVANCE_TIME(1000000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, EmergencyChainClosed := TRUE,
+            PowerContactorEngaged := TRUE, TopHardStopLatched := TRUE, Network := netOk);
+    ASSERT_EQ(harness.Banner.AlarmBanner.AlarmArray[0], '[M1] ErrorID:02 - perte codeur',
+              'A3bis : alarme bloquante prioritaire devant [W]');
+    ASSERT_EQ(harness.Banner.AlarmBanner.AlarmArray[1], '[W] [M1] Mou de cable detecte',
+              'A3bis : warning [W] conserve en second apres le bloquant');
+END_TEST

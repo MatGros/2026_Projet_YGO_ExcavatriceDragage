@@ -819,6 +819,8 @@ instHmiBannerFormatter(
     MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction,
     MachineHomingFailed      := PRG_02_Acquisition.Data.MachineHoming.Failed,
     MachineHomingProvisional := HomingProvisionalHmi,
+    TopHardStopLatched       := PRG_06_Outputs.Data.TopHardStopLatched,
+    TopPositionSensorActive  := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     WinchM1Error             := GVL_IHM.M1TreuilRetenue.State.Error OR GVL_IHM.M1TreuilRetenue.State.FinalInterlockError,
     WinchM2Error             := GVL_IHM.M2TreuilBenne.State.Error OR GVL_IHM.M2TreuilBenne.State.FinalInterlockError,
     EncoderM1Fault           := PRG_02_Acquisition.Data.EncoderM1.Fault.Error,

@@ -30,6 +30,9 @@ VAR_INPUT
     PowerContactorEngaged   : BOOL := TRUE;
     PowerCutOffActive       : BOOL := FALSE;
     BtnResetMachine         : BOOL := FALSE;
+    TopHardStopLatched      : BOOL := FALSE;
+    TopPositionSensorActive : BOOL := FALSE;
+    Network                 : ST_NetworkDiagHMI;
 END_VAR
 
 VAR_OUTPUT
@@ -160,8 +163,16 @@ instHmiBannerFormatter(
     CycleStateStr         := 'X0_PREPARATION',
     CycleErrorId          := 16#0000,
     CycleStepAtError      := E_AutoCycleStep.AX0_REPOS,
-    MachineHomingStep     := 0,
-    MachineHomingInstruction := '',
+    MachineHomingStep     := AcqData.MachineHoming.Step,
+    MachineHomingInstruction := AcqData.MachineHoming.Instruction,
+    MachineHomingFailed   := AcqData.MachineHoming.Failed,
+    TopHardStopLatched    := TopHardStopLatched,
+    TopPositionSensorActive := TopPositionSensorActive,
+    WinchM1Error          := WinchData.WinchM1State.Error OR WinchData.WinchM1State.FinalInterlockError,
+    WinchM2Error          := WinchData.WinchM2State.Error OR WinchData.WinchM2State.FinalInterlockError,
+    EncoderM1Fault        := AcqData.EncoderM1.Fault.Error,
+    EncoderM2Fault        := AcqData.EncoderM2.Fault.Error,
+    JoystickLatchedFault  := AcqData.Joystick.Fault.Latched,
 
     
     BypassGlobalActive    := FALSE,
@@ -180,7 +191,7 @@ instHmiBannerFormatter(
     BucketIsOpen          := WinchData.BucketState.MechState.IsOpen,
     BucketIsClosed        := WinchData.BucketState.MechState.IsClosed,
     DiveActive            := FALSE,
-    TopLimitReached       := FALSE,
+    TopLimitReached       := WinchData.WinchM1Safety.CableLimitAscent OR WinchData.WinchM2Safety.CableLimitAscent,
     WinchBothMotionDirection := 0,
     M1LogicRequestDirection     := 0,
     M2LogicRequestDirection     := 0,
@@ -198,7 +209,8 @@ instHmiBannerFormatter(
     EmergencyErrorId      := 16#0000,
     RedundancyTestFailed  := FALSE,
     EmergencyArmingFailed := FALSE,
-    AlarmHoldTime         := T#1s
+    AlarmHoldTime         := T#1s,
+    Network               := Network
 );
 
 Banner := instHmiBannerFormatter.Banner;
